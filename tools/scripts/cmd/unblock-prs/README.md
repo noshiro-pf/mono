@@ -135,7 +135,10 @@ PR — から行います。public repository なので、コメントではな�
   やレビュー待ち）も、`skip-ci` が付いていれば `main` に追従させます。
 - queue に動かす候補が無いときだけ動きます。`main` がすぐまた動くときに push
   しても無駄になるからです。
-- stack の一番下の層に付ければ足ります。上の層はまとめて運ばれます。
+- `open-pr` が stack の全層に付けます。一番下より上の層は下の層と一緒に運ば
+  れるだけで、このラベルが効くのは、下の層がマージされてその層が `main` に付
+  け替えられてからです。付け替えのときに付ける仕組みは無いので、最初から付け
+  ておきます。
 - 印を付けた PR だけが対象です（opt-in）。寝かせてあるブランチを付け忘れで動
   かしてしまわないためです。レビューを頼む直前に付ければ足ります。
 
@@ -373,9 +376,9 @@ survey と違う / lease 負けで push が拒否され、remote の head が変
   か `main` が動くか、retry の欄にチェックが入るまで試し直しません）。
 - 何か動いたら、triage の前に survey をやり直します。
 
-**`auto-rebase` ラベル**は stack の一番下の層に付ければ足ります。上の層はまと
-めて運ばれます。付いていない PR は、寝かせてあるブランチも含めて、この節では
-動かしません。
+**`auto-rebase` ラベル**は `open-pr` が stack の全層に付けます。対象は base が
+`main` の層だけなので、上の層は下の層がマージされるまで一緒に運ばれるだけです。
+付いていない PR は、寝かせてあるブランチも含めて、この節では動かしません。
 
 #### 4. watch
 
@@ -748,7 +751,10 @@ changes and easy to review ("3a").
   `skip-ci` is on.
 - It acts only when the queue has nothing to do, because a push while `main`
   is about to move again is wasted.
-- It goes on the bottom layer of a stack; the layers above are carried along.
+- `open-pr` puts it on every layer of a stack. A layer above the bottom is
+  only carried along until the layer below merges and it is moved onto
+  `main`; that is when its own label starts to count, and nothing adds one
+  then, so it is there from the start.
 - It is opt-in, so that a branch left to sleep is never moved for want of a
   label. Putting it on just before asking for a review is enough.
 
@@ -1004,9 +1010,10 @@ waiting its turn, to its own changes.
   is ticked.
 - If anything moved, survey again before triage.
 
-**The `auto-rebase` label** goes on the bottom layer of a stack; the layers
-above are carried along. A pull request with neither label — a branch left to
-sleep included — is not moved by this step.
+**The `auto-rebase` label** is on every layer of a stack, where `open-pr` puts
+it; only a layer based on `main` is a target, so the layers above are carried
+along until the one below merges. A pull request with neither label — a
+branch left to sleep included — is not moved by this step.
 
 #### 4. Watch
 

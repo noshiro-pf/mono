@@ -1,5 +1,5 @@
 import * as fs from 'node:fs/promises';
-import { SKIP_CI_LABEL } from 'pr-report-core';
+import { AUTO_REBASE_LABEL, SKIP_CI_LABEL } from 'pr-report-core';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { log } from '../unblock-prs/util.mjs';
@@ -21,7 +21,8 @@ import { mergeAfterTrailer, withStackParent } from './steps.mjs';
 
 /**
  * Opens the pull request for the current branch the way this repository wants
- * one opened: push, create it ready for review, and add `skip-ci`.
+ * one opened: push, create it ready for review, add `skip-ci`, then
+ * `auto-rebase`.
  *
  * **It never arms auto-merge.** `unblock-prs` does, when it picks the pull
  * request — once the author has queued it with `merge-queued`, and once it is
@@ -32,6 +33,13 @@ import { mergeAfterTrailer, withStackParent } from './steps.mjs';
  *
  * Every step is skipped when it is already done, so a run that failed part
  * way through is finished by running it again rather than unpicked.
+ *
+ * **`auto-rebase` goes on every layer, stacked or not.** `unblock-prs` keeps
+ * only a pull request based on the default branch on its tip, so on a layer
+ * above it does nothing until the layer below merges and GitHub moves this
+ * one onto the default branch — the moment it is needed, and one at which
+ * nothing would add it. It goes on after `skip-ci`, so that its own `labeled`
+ * run finds the checks held.
  *
  * **A `--base` other than the default branch stacks it** on the open pull
  * request that branch is from, which has to exist and which the branch has to
@@ -111,9 +119,17 @@ export const openPullRequest = async (
 
   log(`#${prNumber.value}: ${SKIP_CI_LABEL} is on`);
 
+  const autoRebase = await addLabel(api, prNumber.value, AUTO_REBASE_LABEL);
+
+  if (Result.isErr(autoRebase)) {
+    return Result.err(`cannot add ${AUTO_REBASE_LABEL}: ${autoRebase.value}`);
+  }
+
+  log(`#${prNumber.value}: ${AUTO_REBASE_LABEL} is on`);
+
   return Result.ok(
     [
-      `#${prNumber.value}: opened, ${SKIP_CI_LABEL} on, auto-merge left unarmed.`,
+      `#${prNumber.value}: opened, ${SKIP_CI_LABEL} and ${AUTO_REBASE_LABEL} on, auto-merge left unarmed.`,
       `Once it is reviewed, add merge-queued: unblock-prs arms auto-merge when it picks it${parent === undefined ? '' : `, which is once #${parent.value} has merged`}.`,
     ].join('\n'),
   );
@@ -242,6 +258,7 @@ const dryRun = async (
       ? `#${existing.value.number}: mark it ready for review`
       : undefined,
     `add ${SKIP_CI_LABEL}`,
+    `add ${AUTO_REBASE_LABEL}`,
     parent === undefined
       ? 'leave auto-merge unarmed: unblock-prs arms it when it picks it'
       : `leave auto-merge unarmed: it is stacked on #${parent}, and unblock-prs arms it when it picks it, after #${parent} merges`,

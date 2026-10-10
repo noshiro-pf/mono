@@ -300,8 +300,8 @@ ingest the feed). Outside reports come through private vulnerability reporting
   stack means replaying the layers above onto it
   (`git rebase --onto <new> <old>`) and force-pushing them too.
 - **`pnpm run open-pr` opens it**: push, create it ready for review (never a
-  draft), add `skip-ci` — and never arm auto-merge. **Nothing is armed until
-  the queue picks it**: the ruleset asks for
+  draft), add `skip-ci` and `auto-rebase` — and never arm auto-merge.
+  **Nothing is armed until the queue picks it**: the ruleset asks for
   `required_approving_review_count: 0`, so outside `.github/CODEOWNERS` paths
   an armed green branch merges with nothing else to clear, and a stacked one,
   onto a branch no ruleset covers, merges into the layer below at once.
@@ -309,8 +309,6 @@ ingest the feed). Outside reports come through private vulnerability reporting
   second time after a person switches it off. Run the local checks first and
   say in the description which ones — while the label is on they are the only
   checks the branch gets. Details in `tools/scripts/cmd/open-pr/README.md`.
-  **Then add `auto-rebase`** (REST `POST /issues/<n>/labels`; on a stack, the
-  bottom layer only), so `unblock-prs` keeps it on `main` while it waits.
 - **A Claude Code session names itself in the description**, on a line of its
   own outside a code fence: `Claude-Session: [<title>](<session URL>)`, the
   title as it reads when the pull request is opened, or the URL alone when the
