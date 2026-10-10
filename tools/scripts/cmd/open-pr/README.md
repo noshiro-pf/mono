@@ -15,9 +15,10 @@ and "CI". This file describes what the script does with them.
 
 ### 何をするスクリプトか
 
-現在のブランチを push し、PR を **ready for review** で作り、**`skip-ci`** を
-付けます。この3手順だけです。マージもせず、`merge-queued` も付けず（それは
-レビュー後に人が行うことです）、**auto-merge も張りません**。
+現在のブランチを push し、PR を **ready for review** で作り、**`skip-ci`** と
+**`auto-rebase`** を付けます。することはこれだけです。マージもせず、
+`merge-queued` も付けず（それはレビュー後に人が行うことです）、**auto-merge も
+張りません**。
 
 ### auto-merge を張らない理由
 
@@ -31,6 +32,16 @@ stack する PR（下記）ならなおさらで、base は ruleset の掛から
 ときに張ります**。キューに入れること（ `merge-queued` ）が「マージしてよい」の
 合図で、それより前には誰も張りません。`skip-ci` はチェックを止め、
 `no-skip-ci-label` でマージも止めておくためのものです。
+
+### `auto-rebase` を付ける理由
+
+`auto-rebase` は、レビューや順番を待っている間も `unblock-prs` に `main` へ追従
+させるためのラベルです（`tools/scripts/cmd/unblock-prs/README.md`）。stack の
+場合も全層に付けます。`unblock-prs` が rebase するのは base が `main` の PR だけ
+なので、上の層に付いていても、下の層がマージされるまでは何も起きません。その
+層が `main` に付け替えられたときに初めて効きますが、そのときに付ける仕組みは無
+いので、最初から付けておきます。`skip-ci` の後に付けるのは、このラベルの
+`labeled` で走る CI を `skip-ci` で止めるためです。
 
 ### 認証情報
 
@@ -117,9 +128,9 @@ pnpm run open-pr -- --base feat/lower-layer        # その PR の上に積む
 ## English
 
 `pnpm run open-pr` pushes the current branch, creates the pull request ready
-for review, and adds `skip-ci`. It merges nothing, never adds `merge-queued`,
-which is a person's statement that the pull request has been reviewed, and
-**never arms auto-merge**.
+for review, and adds `skip-ci` and `auto-rebase`. It merges nothing, never
+adds `merge-queued`, which is a person's statement that the pull request has
+been reviewed, and **never arms auto-merge**.
 
 **Why it arms nothing.** The `main` ruleset asks for
 `required_approving_review_count: 0`, so outside the paths `.github/CODEOWNERS`
@@ -130,6 +141,15 @@ pull request when it picks it**, which it does only once it is labelled
 `merge-queued` and onto the default branch: queueing is the signal that it may
 merge, and nothing is armed before it. `skip-ci` holds the checks, and with
 `no-skip-ci-label` the merge, until then.
+
+**Why it adds `auto-rebase`.** The label asks `unblock-prs` to keep the pull
+request on `main` while it waits for review or its turn
+(`tools/scripts/cmd/unblock-prs/README.md`). It goes on every layer of a stack
+too: `unblock-prs` rebases only a pull request based on `main`, so on a layer
+above it does nothing until the layer below merges and GitHub moves this one
+onto `main` — the moment it is needed, and one at which nothing would add it.
+It goes on after `skip-ci`, so that the run its `labeled` event starts finds
+the checks held.
 
 It calls the GitHub API directly; `gh` is not required. The token is looked
 for in **`GITHUB_TOKEN`, then `GH_TOKEN`, then `gh auth token`** — the first

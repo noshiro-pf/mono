@@ -43,7 +43,9 @@ export const BLOCKS_RELEASE_LABEL = 'blocks-release';
  * The label that asks `unblock-prs` to keep a pull request on the tip of the
  * default branch while it waits, so that its diff stays readable for review.
  * It is honoured only together with `skip-ci`, under which the push runs no
- * checks, and only when the queue has nothing to do. Put it on the bottom
- * layer of a stack; the layers above are carried along.
+ * checks, and only when the queue has nothing to do. `open-pr` puts it on
+ * every layer of a stack: one above the bottom is carried along by the layer
+ * below, and needs the label of its own once that layer merges and it is
+ * moved onto the default branch.
  */
 export const AUTO_REBASE_LABEL = 'auto-rebase';
