@@ -1,3 +1,4 @@
+import * as t from 'ts-fortress';
 import { type StrictExclude } from 'ts-type-forge';
 import {
   displayStatuses,
@@ -64,7 +65,9 @@ export const sortKeys = [
   'estimate',
 ] as const;
 
-export type SortKey = (typeof sortKeys)[number];
+export const SortKeyCodec = t.enumType(sortKeys);
+
+export type SortKey = t.TypeOf<typeof SortKeyCodec>;
 
 export type SortOrder = 'asc' | 'desc';
 

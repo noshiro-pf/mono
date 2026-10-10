@@ -13,17 +13,9 @@ import { map } from 'synstate';
 import { toSignal } from 'synstate-preact-signals';
 import {
   fromEvent,
-  loadAnimationSetting,
-  loadDagViewMode,
-  loadDiagramSort,
-  loadListSettings,
-  loadNodeSize,
+  loadSetting,
   mediaQuery,
-  saveAnimationSetting,
-  saveDagViewMode,
-  saveDiagramSort,
-  saveListSettings,
-  saveNodeSize,
+  saveSetting,
 } from '../browser.mjs';
 import {
   arcEdges,
@@ -35,7 +27,15 @@ import {
   toElkGraph,
 } from '../dag/index.mjs';
 import { type Backend } from '../repository/index.mjs';
-import { buildMilestoneRows, buildTaskRows } from '../view-model/index.mjs';
+import {
+  animationSettingStorage,
+  buildMilestoneRows,
+  buildTaskRows,
+  dagViewModeStorage,
+  diagramSortStorage,
+  listSettingsStorage,
+  nodeSizeStorage,
+} from '../view-model/index.mjs';
 import { createAnimationSettingStore } from './animation-setting-store.mjs';
 import { createClockStore } from './clock-store.mjs';
 import { createDagLayoutStore } from './dag-layout-store.mjs';
@@ -93,8 +93,8 @@ export const editorStore = createEditorStore({
 });
 
 export const listSettingsStore = createListSettingsStore({
-  initial: loadListSettings(),
-  save: saveListSettings,
+  initial: loadSetting(listSettingsStorage),
+  save: saveSetting(listSettingsStorage),
 });
 
 export const narrowStore = createMediaStore(mediaQuery(NARROW_QUERY));
@@ -108,23 +108,23 @@ export const reducedMotionStore = createMediaStore(
 );
 
 export const animationSettingStore = createAnimationSettingStore({
-  initial: loadAnimationSetting(),
-  save: saveAnimationSetting,
+  initial: loadSetting(animationSettingStorage),
+  save: saveSetting(animationSettingStorage),
 });
 
 export const dagViewModeStore = createDagViewModeStore({
-  initial: loadDagViewMode(),
-  save: saveDagViewMode,
+  initial: loadSetting(dagViewModeStorage),
+  save: saveSetting(dagViewModeStorage),
 });
 
 export const nodeSizeStore = createNodeSizeStore({
-  initial: loadNodeSize(),
-  save: saveNodeSize,
+  initial: loadSetting(nodeSizeStorage),
+  save: saveSetting(nodeSizeStorage),
 });
 
 export const diagramSortStore = createDiagramSortStore({
-  initial: loadDiagramSort(),
-  save: saveDiagramSort,
+  initial: loadSetting(diagramSortStorage),
+  save: saveSetting(diagramSortStorage),
 });
 
 export const dagLayoutStore = createDagLayoutStore({

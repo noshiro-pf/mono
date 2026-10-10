@@ -13,6 +13,7 @@
  * again.
  */
 
+import * as t from 'ts-fortress';
 import { type DeepReadonly, type StrictPick } from 'ts-type-forge';
 import {
   type DependencyGraph,
@@ -36,6 +37,8 @@ export const COMPACT_TASK_NODE_SIZE = { width: 148, height: 32 } as const;
 export const COMPACT_MILESTONE_NODE_SIZE = { width: 140, height: 32 } as const;
 
 export const dagDirections = ['right', 'down'] as const;
+
+export const DagDirectionCodec = t.enumType(dagDirections);
 
 /** `SS` for a start-to-start dependency, then the lag if there is one. */
 export const edgeLabel = ({
@@ -176,7 +179,7 @@ export const fromElkGraph = (
  * to the right on a wide screen, down on a narrow one, unless the reader has
  * chosen (`dag-layout.mts`).
  */
-export type DagDirection = (typeof dagDirections)[number];
+export type DagDirection = t.TypeOf<typeof DagDirectionCodec>;
 
 export type LayoutInput = DeepReadonly<{
   direction: DagDirection;

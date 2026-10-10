@@ -1,30 +1,31 @@
 import {
   animationSettings,
+  animationSettingStorage,
   DEFAULT_ANIMATION_SETTING,
-  parseAnimationSetting,
-  serializeAnimationSetting,
   shouldAnimate,
 } from './animation-setting.mjs';
 
-describe(parseAnimationSetting, () => {
-  test('round-trips with serializeAnimationSetting', () => {
+describe(animationSettingStorage.parse, () => {
+  test('round-trips with serialize', () => {
     for (const setting of animationSettings) {
       assert.strictEqual(
-        parseAnimationSetting(serializeAnimationSetting(setting)),
+        animationSettingStorage.parse(
+          animationSettingStorage.serialize(setting),
+        ),
         setting,
       );
     }
   });
 
   test('is 自動 for nothing stored', () => {
-    assert.strictEqual(parseAnimationSetting(null), 'auto');
+    assert.strictEqual(animationSettingStorage.parse(null), 'auto');
 
     assert.strictEqual(DEFAULT_ANIMATION_SETTING, 'auto');
   });
 
   test('is 自動 for what is not a setting', () => {
     for (const stored of ['', 'on', 'not json', '"always"', '1', '["on"]']) {
-      assert.strictEqual(parseAnimationSetting(stored), 'auto');
+      assert.strictEqual(animationSettingStorage.parse(stored), 'auto');
     }
   });
 });
@@ -47,4 +48,10 @@ describe(shouldAnimate, () => {
 
     assert.isFalse(shouldAnimate('off', true));
   });
+});
+
+test('the stored setting keeps its key and its JSON', () => {
+  assert.strictEqual(animationSettingStorage.key, 'task-manager-app:animation');
+
+  assert.strictEqual(animationSettingStorage.serialize('off'), '"off"');
 });
