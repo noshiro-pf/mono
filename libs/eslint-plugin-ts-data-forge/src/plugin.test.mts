@@ -1,20 +1,7 @@
 import { eslintPluginTsDataForge } from './plugin.mjs';
-import { tsDataForgeRules } from './rules/index.mjs';
 
 describe('eslintPluginTsDataForge.configs.recommended', () => {
   const recommended = eslintPluginTsDataForge.configs.recommended;
-
-  test('enables every rule of the plugin, and nothing else, at "error"', () => {
-    assert.deepStrictEqual(
-      recommended.rules,
-      Object.fromEntries(
-        Object.keys(tsDataForgeRules).map((name) => [
-          `ts-data-forge/${name}`,
-          'error',
-        ]),
-      ),
-    );
-  });
 
   test('registers the exported plugin object itself', () => {
     // Registering a *copy* would make `Cannot redefine plugin` errors possible

@@ -28,6 +28,48 @@ type RuleOptionsOf<Name extends keyof typeof tsFortressRules> =
     : never;
 
 /**
+ * @description Report a ts-fortress codec `X` paired with `type Y = t.TypeOf<typeof X>` whose value nothing reads, so that `Y` is declared as a plain type instead.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | false      |
+ *  ```
+ */
+namespace NoTypeOnlyCodec {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "entryPoints": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "uniqueItems": true,
+   *         "description": "Files whose exports are public API — for a library, the modules its package.json `exports` point at, as source files. A codec they export, directly or through re-exports, is never reported. Relative paths are resolved against the working directory ESLint runs in; pass absolute paths to make the config independent of it. Defaults to none."
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = NonNullable<RuleOptionsOf<'no-type-only-codec'>[0]>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
  * @description Normalize a length-constrained ts-fortress array combinator whose bounds are degenerate (e.g. `minLengthArray(1, x)`, `boundedLengthTuple(n, n, x)`) to the combinator that names that constraint directly.
  *
  *  ```md
@@ -132,12 +174,14 @@ namespace PreferSchemaOverGuardChain {
 }
 
 export type EslintTsFortressRules = Readonly<{
+  'ts-fortress/no-type-only-codec': NoTypeOnlyCodec.RuleEntry;
   'ts-fortress/prefer-canonical-length-constrained-type': PreferCanonicalLengthConstrainedType.RuleEntry;
   'ts-fortress/prefer-namespace-import': PreferNamespaceImport.RuleEntry;
   'ts-fortress/prefer-schema-over-guard-chain': PreferSchemaOverGuardChain.RuleEntry;
 }>;
 
 export type EslintTsFortressRulesOption = Readonly<{
+  'ts-fortress/no-type-only-codec': NoTypeOnlyCodec.Options;
   'ts-fortress/prefer-namespace-import': PreferNamespaceImport.Options;
   'ts-fortress/prefer-schema-over-guard-chain': PreferSchemaOverGuardChain.Options;
 }>;

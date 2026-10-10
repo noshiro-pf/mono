@@ -83,6 +83,12 @@ You can control the embedded range within sample files using the following keywo
 - `// embed-sample-code-ignore-below`: Code below this line will not be embedded
 - `/* embed-sample-code-ignore-this-line */ ...`: This entire line will be excluded
 
+The two range markers may be used any number of times, alternating: code between
+an `ignore-below` and the next `ignore-above` is hidden, so one sample can show
+several ranges (each unindented on its own and joined by a blank line) with the
+scaffolding between them left out. Two markers of the same kind in a row are an
+error.
+
 **Example:**
 
 ```typescript
