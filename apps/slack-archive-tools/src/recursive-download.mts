@@ -1,18 +1,10 @@
+import { execFile } from 'node:child_process';
 import type * as fsType from 'node:fs';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import {
-  Arr,
-  ISet,
-  Json,
-  Result,
-  asUint32,
-  isRecord,
-  isString,
-} from 'ts-data-forge';
-import { $ } from 'ts-repo-utils';
-import { type DeepReadonly } from 'ts-type-forge';
-import { extractExt } from './extract-ext.mjs';
+import * as util from 'node:util';
+import { Arr, ISet, Json, Result, asUint32 } from 'ts-data-forge';
+import { listDownloadFiles, unknownExtensions } from './download-list.mjs';
 import { getAllJsonFiles } from './get-all-json-files.mjs';
 import { validateJsonObject } from './validator.mjs';
 
@@ -30,6 +22,8 @@ const maxFileDownloadCount = asUint32(20_000);
 // const maxFileDownloadCount = asUint32(200);
 
 const downloadParallelSize = 10;
+
+const execFileAsync = util.promisify(execFile);
 
 const reExportMessageFiles: boolean = Math.random() < 0;
 
@@ -82,10 +76,9 @@ export const main = async (): Promise<void> => {
     const { value } = content;
 
     mut_downloadList.push(
-      ...listDownloadFileRecursively(
+      ...listDownloadFiles(
         value,
         path.resolve(fileDistSubDir, path.parse(file.name).name),
-        '',
       ),
     );
 
@@ -149,8 +142,14 @@ export const main = async (): Promise<void> => {
       // }
       // eslint-disable-next-line no-await-in-loop
       await Promise.all(
+        // `execFile` hands `wget` an argument vector, so the URL and the path
+        // reach it as they are, with no shell in between to read them.
         chunk.map(({ url, outputFilePath }) =>
-          $(`wget ${url} -O ${outputFilePath}`),
+          execFileAsync('wget', [url, '-O', outputFilePath]).catch(
+            (error: unknown) => {
+              console.error(error);
+            },
+          ),
         ),
       );
 
@@ -163,68 +162,8 @@ export const main = async (): Promise<void> => {
   console.log('Done.');
 
   console.log({
-    unknownExtensions: Array.from(mut_unknownExtensions),
+    unknownExtensions: unknownExtensions(),
   });
 };
-
-const listDownloadFileRecursively = (
-  data: unknown,
-  dir: string,
-  prop: string,
-): DeepReadonly<{ url: string; outputFilePath: string }[]> => {
-  if (Arr.isArray(data)) {
-    return data.flatMap((el, i) =>
-      listDownloadFileRecursively(el, path.resolve(dir, prop), i.toString()),
-    );
-  }
-
-  if (isRecord(data)) {
-    return Object.entries(data).flatMap(([key, value]) =>
-      listDownloadFileRecursively(value, path.resolve(dir, prop), key),
-    );
-  }
-
-  if (isString(data) && matchFileURL(data)) {
-    const ext = extractExt(data);
-
-    if (knownExtensions.has(ext)) {
-      return [
-        {
-          url: data,
-          outputFilePath: path.resolve(dir, `${prop}${ext}`),
-        },
-      ];
-    }
-
-    mut_unknownExtensions.add(ext);
-
-    return [];
-  }
-
-  return [];
-};
-
-const mut_unknownExtensions: Set<string> = new Set<string>();
-
-const knownExtensions = ISet.create<`.${string}`>([
-  '.jpg',
-  '.png',
-  '.gif',
-  '.jpeg',
-  '.pdf',
-  '.html',
-  '.bmp',
-  '.heic',
-  '.zip',
-  '.xlsx',
-  '.co',
-  // '.mov',
-  // '.mp4',
-  // '.vtt', // error
-  // '.m3u8', // error
-]);
-
-const matchFileURL = (s: string): s is `https://files.slack.com${string}` =>
-  s.startsWith('https://files.slack.com');
 
 await main();

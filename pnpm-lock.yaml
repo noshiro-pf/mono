@@ -2307,9 +2307,6 @@ importers:
       ts-fortress:
         specifier: workspace:*
         version: link:../../libs/ts-fortress
-      ts-repo-utils:
-        specifier: workspace:*
-        version: link:../../libs/ts-repo-utils
     devDependencies:
       eslint:
         specifier: 'catalog:'

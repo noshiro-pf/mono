@@ -27,8 +27,7 @@
   },
   "dependencies": {
     "ts-data-forge": "workspace:*",
-    "ts-fortress": "workspace:*",
-    "ts-repo-utils": "workspace:*"
+    "ts-fortress": "workspace:*"
   },
   "devDependencies": {
     "eslint": "catalog:",
