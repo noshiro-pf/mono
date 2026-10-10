@@ -273,6 +273,9 @@ leaves the verbatim texts under `docs/` alone.
   "Commits and pull requests"); merge or add `merge-queued`; run the `gh` CLI
   (it is a person's account; use the GitHub API — `pnpm run unblock-prs` shells
   out to `gh`); access `~/.ssh` or other sensitive directories.
+- **An issue that should wait for another issue or pull request ends with
+  `Start-After: #N`**, for a prerequisite or only a better order; what it
+  means, and which issues never carry one, is `docs/issue-start-after.md`.
 
 ## Security findings
 
