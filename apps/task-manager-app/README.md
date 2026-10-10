@@ -162,6 +162,8 @@ CI では行われないので、オーナーが手で行う。
 2. **承認済みドメイン**: Authentication → 設定 → 承認済みドメインに `localhost` と
    `noshiro-pf.github.io` を入れる。
 3. **ログインプロバイダ**: Authentication → ログイン方法で Google を有効にする。
+   `firestore.rules` も Google でサインインしたトークンしか受け付けないので、
+   ほかのプロバイダを有効にしてもデータには触れない。
 
 サインインはポップアップで行う。ページ（`noshiro-pf.github.io`）と認証ドメイン
 （`firebaseapp.com`）が別のため、リダイレクト方式は Safari（iOS のすべてのブラウザ）の
