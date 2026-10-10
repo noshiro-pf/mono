@@ -4,7 +4,7 @@ import {
   isPropertyAccessExpression,
 } from 'typescript-native/unstable/ast';
 import { type Checker, type Type } from 'typescript-native/unstable/sync';
-import { ownerOf } from '../ast/index.mjs';
+import { ownerOf, unwrap } from '../ast/index.mjs';
 import { type Rule } from '../engine/index.mjs';
 
 /**
@@ -66,7 +66,8 @@ export const noTupleMutatingMethod: Rule = {
       return;
     }
 
-    const callee = node.expression;
+    // `(t.push)(1)` and `(t.push as F)(1)` still call `push` on `t`.
+    const callee = unwrap(node.expression);
 
     if (!isPropertyAccessExpression(callee)) {
       return;
@@ -88,7 +89,9 @@ export const noTupleMutatingMethod: Rule = {
       return;
     }
 
-    const receiverType = checker.getTypeAtLocation(callee.expression);
+    // The value's type, not the cast's: `(t as X[]).push(3)` still grows the
+    // tuple `t` is.
+    const receiverType = checker.getTypeAtLocation(unwrap(callee.expression));
 
     if (receiverType === undefined || !isTupleTyped(checker, receiverType)) {
       return;
