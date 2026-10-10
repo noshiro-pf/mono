@@ -5,6 +5,11 @@ import {
 } from '@typescript-eslint/utils';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import {
+  getArgumentText,
+  getValueType,
+  skipTypeWrappers,
+} from './ast-utils.mjs';
+import {
   buildImportFixes,
   getNamedImports,
   getTsStdForgeImport,
@@ -79,14 +84,13 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
 
     const tsStdForgeImport = getTsStdForgeImport(program);
 
-    const services = sourceCode.parserServices;
-
-    const checker = services?.program?.getTypeChecker();
+    const checker = sourceCode.parserServices?.program?.getTypeChecker();
 
     /**
      * Whether `expression` is an array or tuple. Without type information the
      * answer is no: `.length` is also a string's, a function's and a
-     * `TypedArray`'s, and none of those can be handed to the guard.
+     * `TypedArray`'s, and none of those can be handed to the guard. The type is
+     * the value's, not a cast's: a string cast to an array is still a string.
      */
     const isArrayLike = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -96,15 +100,12 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
         return false;
       }
 
-      const tsNode = services?.esTreeNodeToTSNodeMap?.get(expression);
+      const type = getValueType(sourceCode, expression);
 
-      if (tsNode === undefined) {
-        return false;
-      }
-
-      const type = checker.getTypeAtLocation(tsNode);
-
-      return checker.isArrayType(type) || checker.isTupleType(type);
+      return (
+        type !== undefined &&
+        (checker.isArrayType(type) || checker.isTupleType(type))
+      );
     };
 
     const mut_nodesToFix: {
@@ -140,7 +141,7 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
           index,
           { node, arrayExpression, guard },
         ] of mut_nodesToFix.entries()) {
-          const arrayText = sourceCode.getText(arrayExpression);
+          const arrayText = getArgumentText(sourceCode, arrayExpression);
 
           context.report({
             node,
@@ -180,11 +181,11 @@ const matchLengthComparison = (
 ):
   | Readonly<{ arrayExpression: TSESTree.Expression; guard: Guard }>
   | undefined => {
-  const { left, right } = node;
+  // Both operands are read through their type wrappers, which change neither
+  // the length nor the bound: `(xs.length as number) > (0 as const)`.
+  const left = skipTypeWrappers(node.left);
 
-  if (left.type === AST_NODE_TYPES.PrivateIdentifier) {
-    return undefined;
-  }
+  const right = skipTypeWrappers(node.right);
 
   const lengthOnLeft = isLengthAccess(left);
 
@@ -218,7 +219,7 @@ const matchLengthComparison = (
 
 const isLengthAccess = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Expression,
+  node: TSESTree.Node,
 ): node is TSESTree.MemberExpression =>
   node.type === AST_NODE_TYPES.MemberExpression &&
   !node.computed &&

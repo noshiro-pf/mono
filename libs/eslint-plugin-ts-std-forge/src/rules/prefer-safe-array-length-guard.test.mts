@@ -150,3 +150,101 @@ describe('prefer-safe-array-length-guard', () => {
     ],
   });
 });
+
+describe('prefer-safe-array-length-guard through type wrappers', () => {
+  tester.run('prefer-safe-array-length-guard', preferSafeArrayLengthGuard, {
+    valid: [
+      {
+        name: 'a string cast to an array is still a string',
+        code: dedent`
+          declare const s: string;
+          const ok = (s as unknown as readonly string[]).length > 0;
+        `,
+      },
+      {
+        name: 'a bound with no named guard behind `as const` is left alone',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ok = xs.length > (2 as const);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'reads the bound through `as const`',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ok = xs.length > (0 as const);
+        `,
+        output: dedent`
+          import { SafeArray } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const ok = SafeArray.isNonEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'reads the length through `as`',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ok = (xs.length as number) > 0;
+        `,
+        output: dedent`
+          import { SafeArray } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const ok = SafeArray.isNonEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'reads the length through `!`, with the bound on the left',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ok = (0 satisfies number) === xs.length!;
+        `,
+        output: dedent`
+          import { SafeArray } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const ok = SafeArray.isEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsEmpty' }],
+      },
+      {
+        name: 'keeps a wrapper on the array and reads `!` as the array it asserts',
+        code: dedent`
+          declare const xs: readonly number[] | undefined;
+          const ok = xs!.length !== 0;
+        `,
+        output: dedent`
+          import { SafeArray } from 'ts-std-forge';
+          declare const xs: readonly number[] | undefined;
+          const ok = SafeArray.isNonEmpty(xs!);
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+    ],
+  });
+});
+
+describe('prefer-safe-array-length-guard with parenthesized operands', () => {
+  tester.run('prefer-safe-array-length-guard', preferSafeArrayLengthGuard, {
+    valid: [],
+    invalid: [
+      {
+        name: 'keeps the parentheses of a sequence array',
+        code: dedent`
+          declare const a: number;
+          declare const xs: readonly number[];
+          const ok = (a, xs).length > 0;
+        `,
+        output: dedent`
+          import { SafeArray } from 'ts-std-forge';
+          declare const a: number;
+          declare const xs: readonly number[];
+          const ok = SafeArray.isNonEmpty((a, xs));
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+    ],
+  });
+});

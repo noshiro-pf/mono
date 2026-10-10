@@ -433,3 +433,148 @@ describe('prefer-canonical-length-constrained-type', () => {
     },
   );
 });
+
+describe('prefer-canonical-length-constrained-type through type wrappers', () => {
+  tester.run(
+    'prefer-canonical-length-constrained-type',
+    preferCanonicalLengthConstrainedType,
+    {
+      valid: [
+        {
+          name: 'ignores a bound widened with `as`, which changes the inferred length',
+          code: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.minLengthArray(1 as number, t.string());
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: 'reads a bound through `satisfies` and drops it whole',
+          code: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.minLengthArray(1 satisfies number, t.string());
+          `,
+          output: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.nonEmptyArray(t.string());
+          `,
+          errors: [{ messageId: 'useCanonicalType' }],
+        },
+        {
+          name: 'reads a bound through `as const`',
+          code: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.minLengthTuple(0 as const, t.string());
+          `,
+          output: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.array(t.string());
+          `,
+          errors: [{ messageId: 'useCanonicalType' }],
+        },
+        {
+          name: 'keeps a kept bound wrapped in `satisfies` as written',
+          code: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.boundedLengthTuple(2 satisfies number, 2, t.string());
+          `,
+          output: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.fixedLengthTuple(2 satisfies number, t.string());
+          `,
+          errors: [{ messageId: 'useCanonicalType' }],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-canonical-length-constrained-type with parenthesized operands', () => {
+  tester.run(
+    'prefer-canonical-length-constrained-type',
+    preferCanonicalLengthConstrainedType,
+    {
+      valid: [],
+      invalid: [
+        {
+          name: 'drops a parenthesized bound together with its parentheses',
+          code: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.minLengthArray((1), t.string());
+          `,
+          output: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.nonEmptyArray(t.string());
+          `,
+          errors: [{ messageId: 'useCanonicalType' }],
+        },
+        {
+          name: 'keeps the parentheses of the argument after a dropped bound',
+          code: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.minLengthTuple(0, (t.string()));
+          `,
+          output: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.array((t.string()));
+          `,
+          errors: [{ messageId: 'useCanonicalType' }],
+        },
+        {
+          name: 'drops a doubly parenthesized bound before a parenthesized one',
+          code: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.boundedLengthTuple(((0)), (3), t.string());
+          `,
+          output: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.maxLengthTuple((3), t.string());
+          `,
+          errors: [{ messageId: 'useCanonicalType' }],
+        },
+        {
+          name: 'drops the second bound, parenthesized, and keeps the first',
+          code: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.boundedLengthTuple((2), (2), t.string());
+          `,
+          output: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.fixedLengthTuple((2), t.string());
+          `,
+          errors: [{ messageId: 'useCanonicalType' }],
+        },
+        {
+          name: 'keeps a comment before the dropped bound and drops one after it',
+          code: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.minLengthArray(/* n */ (1), /* x */ t.string());
+          `,
+          output: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = t.nonEmptyArray(/* n */ t.string());
+          `,
+          errors: [{ messageId: 'useCanonicalType' }],
+        },
+      ],
+    },
+  );
+});
