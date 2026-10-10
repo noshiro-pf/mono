@@ -4,8 +4,9 @@ import { type ESLintFlatConfig, type ESLintPlugin } from './types.mjs';
 /**
  * Every rule this plugin ships, at `error`.
  *
- * The `satisfies` clause below is keyed off {@link tsTypeForgeRules}, so adding
- * a rule without listing it here fails to type-check.
+ * The `satisfies` clause below is keyed off {@link tsTypeForgeRules}, so leaving a
+ * rule out, naming one that does not exist, or setting one to anything
+ * but `error` fails to type-check. That is the whole check; no test repeats it.
  */
 const recommendedRules = {
   'ts-type-forge/no-side-effect-import': 'error',

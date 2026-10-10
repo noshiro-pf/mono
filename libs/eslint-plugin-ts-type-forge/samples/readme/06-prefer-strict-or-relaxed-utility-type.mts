@@ -8,27 +8,28 @@ import {
 
 type Person = Readonly<{ name: string; email: string }>;
 
-// embed-sample-code-ignore-above
-/* embed-sample-code-ignore-this-line */ // prettier-ignore
-/* embed-sample-code-ignore-this-line */ {
+{
+  // embed-sample-code-ignore-above
   // ❌
   type Remaining = Exclude<'a' | 'b' | 'c', 'a'>;
   type PublicInfo = Omit<Person, 'email'>;
+  // embed-sample-code-ignore-below
 
-  /* embed-sample-code-ignore-this-line */ expectType<Remaining, 'b' | 'c'>('=');
-  /* embed-sample-code-ignore-this-line */ expectType<PublicInfo, Readonly<{ name: string }>>('=');
-/* embed-sample-code-ignore-this-line */ }
+  expectType<Remaining, 'b' | 'c'>('=');
+  expectType<PublicInfo, Readonly<{ name: string }>>('=');
+}
 
-/* embed-sample-code-ignore-this-line */ // prettier-ignore
-/* embed-sample-code-ignore-this-line */ {
+{
+  // embed-sample-code-ignore-above
   // ✅ — the key is checked against the union / `keyof T`
   type Remaining = StrictExclude<'a' | 'b' | 'c', 'a'>;
   type PublicInfo = StrictOmit<Person, 'email'>;
 
   // ✅ — deliberately unchecked (the subtrahend need not be part of `T`)
   type NonStrings = RelaxedExclude<string | number | boolean, string>;
+  // embed-sample-code-ignore-below
 
-  /* embed-sample-code-ignore-this-line */ expectType<Remaining, 'b' | 'c'>('=');
-  /* embed-sample-code-ignore-this-line */ expectType<PublicInfo, Readonly<{ name: string }>>('=');
-  /* embed-sample-code-ignore-this-line */ expectType<NonStrings, number | boolean>('=');
-/* embed-sample-code-ignore-this-line */ }
+  expectType<Remaining, 'b' | 'c'>('=');
+  expectType<PublicInfo, Readonly<{ name: string }>>('=');
+  expectType<NonStrings, number | boolean>('=');
+}

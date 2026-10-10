@@ -1,4 +1,5 @@
 import { Arr, pipe } from 'ts-data-forge';
+import { type FixedLengthTuple } from 'ts-type-forge';
 
 export type ExtractSampleCodeOptions = Readonly<{
   /**
@@ -11,7 +12,22 @@ export type ExtractSampleCodeOptions = Readonly<{
   stripTransformerDirectives?: boolean;
 }>;
 
-/** Extracts the relevant sample code, removing ignore markers */
+/**
+ * Extracts the part of a sample file that is embedded, removing the markers.
+ *
+ * `// embed-sample-code-ignore-above` and `// embed-sample-code-ignore-below`
+ * each sit on a line of their own and may be used any number of times, so a
+ * sample can show several ranges and hide the scaffolding between them. A
+ * stretch of lines is hidden when the marker before it is `ignore-below` or the
+ * marker after it is `ignore-above`; the start and the end of the file count as
+ * neither. Each range left loses the indentation common to its own lines, and
+ * the ranges are joined by a blank line.
+ * `/* embed-sample-code-ignore-this-line *\/` drops a single line wherever it
+ * is.
+ *
+ * Two markers of the same kind in a row are an error rather than a guess at
+ * what was meant.
+ */
 export const extractSampleCode = (
   content: string,
   { stripTransformerDirectives = false }: ExtractSampleCodeOptions = {},
@@ -20,28 +36,68 @@ export const extractSampleCode = (
     ? [ignoreLineKeyword, transformerIgnoreLineKeyword]
     : [ignoreLineKeyword];
 
-  const startIndex = content.indexOf(ignoreAboveKeyword);
+  const lines = content.split('\n');
 
-  const endIndex = content.indexOf(ignoreBelowKeyword);
+  const markers = lines.flatMap((line, index): readonly Marker[] => {
+    const trimmed = line.trimStart();
 
-  const start = startIndex === -1 ? 0 : startIndex + ignoreAboveKeyword.length;
+    return trimmed.startsWith(ignoreAboveKeyword)
+      ? [{ index, kind: 'above' }]
+      : trimmed.startsWith(ignoreBelowKeyword)
+        ? [{ index, kind: 'below' }]
+        : [];
+  });
 
-  const end = endIndex === -1 ? content.length : endIndex;
+  for (const [previous, next] of adjacentPairs(markers)) {
+    if (previous.kind === next.kind) {
+      throw new Error(
+        `two embed-sample-code-ignore-${next.kind} markers in a row, on lines ${previous.index + 1} and ${next.index + 1}; close the range between them with the other marker`,
+      );
+    }
+  }
 
-  return pipe(content.slice(start, end))
-    .map((s) =>
-      s
-        .split('\n')
-        .filter((line) =>
-          ignoreLineKeywords.every(
-            (keyword) => !line.trimStart().startsWith(keyword),
-          ),
+  const bounds: readonly Marker[] = [
+    { index: -1, kind: undefined },
+    ...markers,
+    { index: lines.length, kind: undefined },
+  ];
+
+  return adjacentPairs(bounds)
+    .filter(([start, end]) => start.kind !== 'below' && end.kind !== 'above')
+    .map(
+      ([start, end]) =>
+        pipe(
+          lines
+            .slice(start.index + 1, end.index)
+            .filter((line) =>
+              ignoreLineKeywords.every(
+                (keyword) => !line.trimStart().startsWith(keyword),
+              ),
+            )
+            .join('\n'),
         )
-        .join('\n'),
+          .map(normalizeIndent)
+          .map((s) => s.trim()).value,
     )
-    .map(normalizeIndent)
-    .map((s) => s.trim()).value;
+    .filter((range) => range !== '')
+    .join('\n\n');
 };
+
+/** Each element with the one after it: `[a, b, c]` gives `[a, b]`, `[b, c]`. */
+const adjacentPairs = <T,>(
+  xs: readonly T[],
+): readonly FixedLengthTuple<2, T>[] =>
+  xs.flatMap((x, index) => {
+    const next = xs[index + 1];
+
+    return next === undefined ? [] : [[x, next] as const];
+  });
+
+/** A marker line, or (with no kind) the start or the end of the file. */
+type Marker = Readonly<{
+  index: number;
+  kind: 'above' | 'below' | undefined;
+}>;
 
 const ignoreAboveKeyword = '// embed-sample-code-ignore-above';
 

@@ -1,19 +1,28 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
+import { type ReadonlyRecord, type StrictExclude } from 'ts-type-forge';
 import { tsFortressRules } from './rules/index.mjs';
 import { type ESLintFlatConfig, type ESLintPlugin } from './types.mjs';
 
 /**
- * Every rule this plugin ships, at `error`.
+ * Rules the preset leaves off, because enabling one takes more than turning it
+ * on: `no-type-only-codec` needs type information, and a library has to tell
+ * it its entry points or it reports the codecs of its public API.
+ */
+type OptInRule = 'no-type-only-codec';
+
+/**
+ * Every rule this plugin ships, at `error`, but those in {@link OptInRule}.
  *
- * The `satisfies` clause below is keyed off {@link tsFortressRules}, so adding
- * a rule without listing it here fails to type-check.
+ * The `satisfies` clause below is keyed off {@link tsFortressRules}, so leaving
+ * out a rule that is not opt-in, naming one that does not exist, or setting one
+ * to anything but `error` fails to type-check. That is the whole check; no test
+ * repeats it.
  */
 const recommendedRules = {
   'ts-fortress/prefer-canonical-length-constrained-type': 'error',
   'ts-fortress/prefer-namespace-import': 'error',
   'ts-fortress/prefer-schema-over-guard-chain': 'error',
 } as const satisfies ReadonlyRecord<
-  `ts-fortress/${keyof typeof tsFortressRules}`,
+  `ts-fortress/${StrictExclude<keyof typeof tsFortressRules, OptInRule>}`,
   'error'
 >;
 
@@ -39,7 +48,7 @@ export const eslintPluginTsFortress = {
   },
   rules: tsFortressRules,
   configs: {
-    /** Enables every rule of this plugin at `error`. */
+    /** Enables every rule of this plugin at `error`, but the opt-in ones. */
     recommended: recommendedConfig,
   },
 } as const satisfies ESLintPlugin;

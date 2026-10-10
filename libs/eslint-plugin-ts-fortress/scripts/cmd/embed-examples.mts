@@ -18,6 +18,8 @@ const documents = [
       '06-prefer-namespace-import-options.mts',
       '07-prefer-schema-over-guard-chain.mts',
       '08-prefer-schema-over-guard-chain-options.mts',
+      '09-no-type-only-codec.mts',
+      '10-no-type-only-codec-config.mts',
     ],
   },
 ] as const;

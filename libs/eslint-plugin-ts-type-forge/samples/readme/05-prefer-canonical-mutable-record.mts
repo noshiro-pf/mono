@@ -8,23 +8,24 @@ import {
 
 type Item = Readonly<{ id: string }>;
 
-// embed-sample-code-ignore-above
-/* embed-sample-code-ignore-this-line */ // prettier-ignore
-/* embed-sample-code-ignore-this-line */ {
+{
+  // embed-sample-code-ignore-above
   // ❌
   type Counters = Mutable<Record<string, number>>;
   type Draft = Mutable<ReadonlyRecord<string, Item>>;
+  // embed-sample-code-ignore-below
 
-  /* embed-sample-code-ignore-this-line */ expectType<Counters, MutableRecord<string, number>>('=');
-  /* embed-sample-code-ignore-this-line */ expectType<Draft, MutableRecord<string, Item>>('=');
-/* embed-sample-code-ignore-this-line */ }
+  expectType<Counters, MutableRecord<string, number>>('=');
+  expectType<Draft, MutableRecord<string, Item>>('=');
+}
 
-/* embed-sample-code-ignore-this-line */ // prettier-ignore
-/* embed-sample-code-ignore-this-line */ {
+{
+  // embed-sample-code-ignore-above
   // ✅
   type Counters = MutableRecord<string, number>;
   type Draft = MutableRecord<string, Item>;
+  // embed-sample-code-ignore-below
 
-  /* embed-sample-code-ignore-this-line */ expectType<Counters, Mutable<Record<string, number>>>('=');
-  /* embed-sample-code-ignore-this-line */ expectType<Draft, Mutable<ReadonlyRecord<string, Item>>>('=');
-/* embed-sample-code-ignore-this-line */ }
+  expectType<Counters, Mutable<Record<string, number>>>('=');
+  expectType<Draft, Mutable<ReadonlyRecord<string, Item>>>('=');
+}
