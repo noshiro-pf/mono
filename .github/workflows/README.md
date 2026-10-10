@@ -68,7 +68,8 @@ on:
 - **`labeled` / `unlabeled`** are what let `skip-ci` stop the checks and
   taking it off start them again (see "`skip-ci` and `no-skip-ci-label`").
   Any label event re-runs the workflow; the gate's reuse of an earlier
-  verdict is what makes that affordable.
+  verdict is what makes that affordable. While `skip-ci` is on, a label event
+  reports nothing at all (see "A label event under `skip-ci`").
 - **No `edited`, no `issue_comment`.** Such a run cancels the one in progress
   (see "Concurrency") and its skipped aggregate supersedes the last verdict.
 - **`push` to `main`**, where the gate asks whether the pushed tree already
@@ -283,7 +284,7 @@ booted, since a job-level `if` is evaluated by GitHub itself:
 
 - **`skip-ci` on the pull request.** The label arrives in the event payload,
   so this costs nothing, and it is on the `gates` job as well so that a
-  labelled pull request boots no runner anywhere. Being a draft is
+  labelled pull request boots no runner in a check workflow. Being a draft is
   deliberately not one of these states.
 - **A branch behind `main`**, the state the pull request page calls "This
   branch is out-of-date with the base branch". Such a branch cannot be
@@ -309,7 +310,9 @@ booted, since a job-level `if` is evaluated by GitHub itself:
 
 The skipped conclusion satisfies a required status check in every case, so
 each needs something else to hold the merge, and each has one. Behind:
-the ruleset. `skip-ci`: the `no-skip-ci-label` status. Nothing relevant in
+the ruleset. `skip-ci`: the `no-skip-ci-label` status, and, in the seconds
+before it turns `pending`, the verdict the label event leaves in place (see
+"A label event under `skip-ci`"). Nothing relevant in
 the diff: nothing would have read those paths anyway, which is the one case
 where "not checked" is the right answer. A reused verdict: the aggregate
 reports that verdict rather than `skipped`.
@@ -501,6 +504,12 @@ case (see "The gate"). That `if` starts with `always()` too, because a called
 job with no status function carries an implicit `success()`, and a cancelled
 run would then read `skipped` rather than red.
 
+The one skip on the calling job is deliberate: a `labeled` or `unlabeled`
+event while `skip-ci` is on. There, leaving `<name>-result / result` as it was
+is the point, and it never blocks forever — a commit that reached such an
+event has had its aggregate reported by the event that brought it, and taking
+the label off reports a new one. "A label event under `skip-ci`" says why.
+
 The step reads the gate's `reused_result` first (`success` passes, `failure`
 fails and says to use "Re-run all jobs"), then requires every need but
 `gates` to have succeeded, and a red aggregate names the jobs that did not,
@@ -557,18 +566,19 @@ job to serve them would cost more than it saves.
 
 ## `skip-ci` and `no-skip-ci-label`
 
-`skip-ci` on a pull request skips the five check workflows and the three
-`lint-pull-request.yml` jobs; every gated job carries the label condition and
-boots no runner. GitHub has no label-based merge block, so on its own the
+`skip-ci` on a pull request skips the five check workflows; every gated job
+carries the label condition and boots no runner. The three
+`lint-pull-request.yml` jobs run regardless (see "A label event under
+`skip-ci`"). GitHub has no label-based merge block, so on its own the
 label would leave a pull request that nothing checked looking exactly like one
 that passed. The block is `skip-ci-label.yml`: it writes a required commit
 status, `no-skip-ci-label`, on every head commit, `pending` while the label is
 on and `success` without it.
 
-- **It is the only thing that holds a labelled pull request.** The
-  aggregates deliberately report `skipped` while the label is on (a pull
-  request nobody is checking yet should read grey, not broken), and a skipped
-  required check is satisfied. Removing the workflow, or its context from
+- **It is what holds a labelled pull request.** The aggregates report
+  `skipped` on a commit pushed while the label is on (a pull request nobody
+  is checking yet should read grey, not broken), and a skipped required check
+  is satisfied. Removing the workflow, or its context from
   `repo-settings/rulesets/main.json`, leaves `skip-ci` skipping every check
   with nothing holding the merge.
 - **A commit status, not a job's check run.** A check run concludes the way
@@ -590,6 +600,38 @@ on and `success` without it.
   on GitHub; the
   strings are in the workflows and `apps/pr-report-core/src/labels.mts`.
   Change them everywhere or nowhere.
+
+### A label event under `skip-ci`
+
+`no-skip-ci-label` is written by a job, so it turns `pending` only once a
+runner has booted, tens of seconds after the label goes on; a gated job's
+`if` is answered at once. If the `labeled` run reported `skipped`, the label
+would replace whatever verdict the aggregates had, red included, with a
+satisfied one while `no-skip-ci-label` still said `success` from before it.
+For those seconds every required context is met, and a pull request with
+auto-merge armed merges. #2141 merged red that way: `unblock-prs` paused it
+while the bot that opened it had armed it.
+
+So on a `labeled` or `unlabeled` event while `skip-ci` is on, each check
+workflow skips the job that calls its aggregate. A skipped caller reports a
+check run under its own name (`code-check-result`) and leaves the required
+`code-check-result / result` as it was. Putting the label on, or another
+label while it is on, then changes no verdict; only `no-skip-ci-label` moves,
+and only towards holding. A run the label event cancels still ends red, since
+the aggregate is `always()`, so a pull request whose checks were in flight is
+held as well. The other events under the label (`synchronize`, `reopened`)
+still report `skipped`: a new head has no verdict to keep, and has no
+`no-skip-ci-label` either until one is written, which holds it meanwhile.
+
+What it costs: the red the `opened` run leaves when `open-pr`'s label
+cancels it now stays until the label comes off, where the `labeled` run used
+to replace it with `skipped`. `pr-report` reads both the same way: `paused`,
+its red marked stale.
+
+`lint-pull-request.yml`'s three jobs are their own required contexts, with no
+caller to skip, so they carry no `skip-ci` condition and run on every event.
+They read the API for seconds, and a job still queued or running is
+`pending`, which holds the merge as well.
 
 ## `pull_request_target`
 

@@ -136,9 +136,9 @@ read for you, as `mergeAfter`, `stackedOn` and `blockedBy` — see "The declared
 merge order" and "Stacked pull requests" below.
 
 **A `skip-ci` PR in that list is a paused one, not an excluded one.** While the
-label is on, the five check workflows and the two lint jobs skip and
-`skip-ci-label.yml` writes the required `no-skip-ci-label` status as `pending`,
-which is the only thing holding the merge — so its checks cannot go green
+label is on, the five check workflows skip and `skip-ci-label.yml` writes the
+required `no-skip-ci-label` status as `pending`, which holds the merge — so its
+checks cannot go green
 however long it is watched, and `pr-report` calls the verdict `paused` rather
 than pretending otherwise. Taking the label off is the action, one PR at a
 time. See "CI" in `CLAUDE.md`.

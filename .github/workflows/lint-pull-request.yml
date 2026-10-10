@@ -5,8 +5,9 @@ name: Lint Pull Request
 # Three checks on the pull request itself rather than on its tree: the title,
 # the commit messages, and the commit count. Each job's name is its required
 # context. `pull_request_target`, and why nothing here checks the branch out,
-# is in README.md under "`pull_request_target`"; the `skip-ci` condition on
-# each job is under "`skip-ci` and `no-skip-ci-label`" there.
+# is in README.md under "`pull_request_target`"; why these jobs run under
+# `skip-ci` when every other check skips is under "`skip-ci` and
+# `no-skip-ci-label`" there.
 
 on:
   pull_request_target:
@@ -55,11 +56,23 @@ env:
   LC_ALL: C.UTF-8
 
 jobs:
-  # Only `pull_request_target` reaches this workflow, so the `skip-ci`
-  # condition has no other event to exempt.
+  # No `skip-ci` condition, unlike every other check. Each job here is its own
+  # required context, and a job skipped by its `if` reports `skipped` under
+  # that name, which supersedes the verdict it had: putting `skip-ci` on a
+  # pull request whose title check was red would satisfy that check in the
+  # seconds before `no-skip-ci-label` turns `pending`. The aggregates in the
+  # check workflows avoid this by skipping their caller instead, which these
+  # jobs, having no caller, cannot. They read the API for seconds, so running
+  # them always costs next to nothing and always reports a real verdict.
+  #
+  # A fourth check goes into an aggregate rather than beside these three: move
+  # the jobs behind one `lint-pull-request-result` that calls
+  # `check-result.yml` the way the check workflows do, and make that the one
+  # required context. Each job added here is otherwise one more context in
+  # `repo-settings/rulesets/main.json`, which takes `repo-settings:apply` by
+  # hand before it holds anything.
   semantic-pull-request:
     name: Validate PR title
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-ci') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -92,7 +105,6 @@ jobs:
 
   commit-messages:
     name: Validate commit messages
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-ci') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -135,7 +147,6 @@ jobs:
 
   commit-count:
     name: Validate commit count
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-ci') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
