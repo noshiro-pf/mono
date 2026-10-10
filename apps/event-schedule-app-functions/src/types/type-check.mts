@@ -1,8 +1,8 @@
 import { Answer, EventSchedule } from 'event-schedule-app-shared';
-import { type DocumentData } from 'firebase-admin/firestore';
+import type { DocumentData } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions/v1';
 import { fastDeepEqual, isString, unknownToString } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 
 export const toStringWithCheck = (value: unknown): string => {
   if (isString(value)) {

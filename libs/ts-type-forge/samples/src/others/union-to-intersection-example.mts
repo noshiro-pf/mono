@@ -1,4 +1,4 @@
-import { type UnionToIntersection } from 'ts-type-forge';
+import type { UnionToIntersection } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

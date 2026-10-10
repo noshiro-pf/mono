@@ -1,6 +1,6 @@
 import { Num, isNumber, isRecord } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
-import { type HoursEnum, type MinutesEnum } from 'ts-type-forge';
+import type { HoursEnum, MinutesEnum } from 'ts-type-forge';
 import { hasKeyValue } from '../../../../utils/index.mjs';
 
 export type HoursMinutes = Readonly<{

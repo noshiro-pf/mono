@@ -1,8 +1,8 @@
-import {
-  type AbsoluteValue,
-  type Int16,
-  type StrictExclude,
-  type Int8 as TtfImported_Int8,
+import type {
+  AbsoluteValue,
+  Int16,
+  StrictExclude,
+  Int8 as TtfImported_Int8,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';

@@ -12,7 +12,7 @@
  */
 
 import { createState, type InitializedObservable } from 'synstate';
-import { type DagLayout } from '../dag/index.mjs';
+import type { DagLayout } from '../dag/index.mjs';
 import {
   removeNode,
   type DomainState,
@@ -20,8 +20,8 @@ import {
   type NodeRef,
   type Task,
 } from '../domain/index.mjs';
-import { type Repository } from '../repository/index.mjs';
-import { type Session } from './session-store.mjs';
+import type { Repository } from '../repository/index.mjs';
+import type { Session } from './session-store.mjs';
 
 export type DataStatus = 'idle' | 'loading' | 'ready';
 

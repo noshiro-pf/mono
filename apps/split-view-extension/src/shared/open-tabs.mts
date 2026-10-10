@@ -1,5 +1,5 @@
 import { isString } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { splitViewOpenTabKeyPrefix } from './constants.mjs';
 
 /**

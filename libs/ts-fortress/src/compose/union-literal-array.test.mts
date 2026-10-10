@@ -2,7 +2,7 @@ import { expectType, Result } from 'ts-data-forge';
 import { array } from '../array/index.mjs';
 import { literal } from '../other-types/index.mjs';
 import { number } from '../primitives/index.mjs';
-import { type TypeOf } from '../type.mjs';
+import type { TypeOf } from '../type.mjs';
 import {
   type ValidationError,
   validationErrorsToMessages,

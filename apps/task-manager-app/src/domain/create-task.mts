@@ -1,5 +1,5 @@
-import { type StrictOmit } from 'ts-type-forge';
-import { type Task, type TaskId } from './types.mjs';
+import type { StrictOmit } from 'ts-type-forge';
+import type { Task, TaskId } from './types.mjs';
 
 /**
  * A new task: `id`, `title` and the creation time are required, and every

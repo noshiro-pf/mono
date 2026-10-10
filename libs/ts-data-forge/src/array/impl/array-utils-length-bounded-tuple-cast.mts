@@ -1,10 +1,10 @@
-import {
-  type BoundedLengthTuple,
-  type FixedLengthTuple,
-  type MaxLengthTuple,
-  type MinLengthTuple,
+import type {
+  BoundedLengthTuple,
+  FixedLengthTuple,
+  MaxLengthTuple,
+  MinLengthTuple,
 } from 'ts-type-forge';
-import { type SizeType } from '../../types.mjs';
+import type { SizeType } from '../../types.mjs';
 import {
   isBoundedLengthTuple,
   isEmptyTuple,

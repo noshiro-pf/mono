@@ -4,9 +4,9 @@ import styled from '@emotion/styled';
 import * as React from 'react';
 import { SwitchWithoutLabelStyled } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { type SafeUint } from 'ts-type-forge';
+import type { SafeUint } from 'ts-type-forge';
 import { dict } from '../../../../constants/index.mjs';
-import { type NumIconFilterState } from '../../../../types/index.mjs';
+import type { NumIconFilterState } from '../../../../types/index.mjs';
 import { IconCountNumericInput } from '../../../molecules/index.mjs';
 
 const dc = dict.answerPage.answers.iconHeaderFilter;

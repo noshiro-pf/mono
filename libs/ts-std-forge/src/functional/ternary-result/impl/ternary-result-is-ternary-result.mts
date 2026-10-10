@@ -1,5 +1,5 @@
 import { hasKey, isRecord } from '../../../guard/index.mjs';
-import { type UnknownTernaryResult } from '../ternary-result.mjs';
+import type { UnknownTernaryResult } from '../ternary-result.mjs';
 import { ErrTypeTagName, OkTypeTagName, WarnTypeTagName } from './tag.mjs';
 
 /**

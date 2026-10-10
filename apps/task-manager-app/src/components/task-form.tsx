@@ -1,6 +1,6 @@
-import { type GenericEventHandler } from 'preact';
+import type { GenericEventHandler } from 'preact';
 import { memoNamed } from 'preact-utils';
-import { type RelaxedExtract } from 'ts-type-forge';
+import type { RelaxedExtract } from 'ts-type-forge';
 import { priorities, progresses } from '../domain/index.mjs';
 import {
   domainSignal,

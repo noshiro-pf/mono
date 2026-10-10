@@ -1,4 +1,4 @@
-import { type Variable } from '../types/index.mjs';
+import type { Variable } from '../types/index.mjs';
 
 export const isVariable = (term: unknown): term is Variable =>
   /* "x" -> true, ["lambda", "x", "x"] -> false */

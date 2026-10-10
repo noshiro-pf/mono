@@ -1,4 +1,4 @@
-import { type MaxLengthString, type SupportedLength } from 'ts-type-forge';
+import type { MaxLengthString, SupportedLength } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

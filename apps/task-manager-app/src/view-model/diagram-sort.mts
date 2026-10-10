@@ -10,7 +10,7 @@
  */
 
 import { Arr, Json, Result } from 'ts-data-forge';
-import { type SortSpec } from '../domain/index.mjs';
+import type { SortSpec } from '../domain/index.mjs';
 import { SortSpecsType, uniqueSortKeys } from './sort-edit.mjs';
 
 export const DIAGRAM_SORT_STORAGE_KEY = 'task-manager-app:diagram-sort';

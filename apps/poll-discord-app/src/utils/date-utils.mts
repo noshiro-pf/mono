@@ -1,4 +1,4 @@
-import { type DayOfWeekIndex } from 'ts-type-forge';
+import type { DayOfWeekIndex } from 'ts-type-forge';
 
 /**
  * The handful of date helpers this app uses.

@@ -1,4 +1,4 @@
-import { type AnimationSetting } from '../view-model/index.mjs';
+import type { AnimationSetting } from '../view-model/index.mjs';
 import { createAnimationSettingStore } from './animation-setting-store.mjs';
 
 const setup = (

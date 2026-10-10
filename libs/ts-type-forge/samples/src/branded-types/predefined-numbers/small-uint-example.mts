@@ -1,4 +1,4 @@
-import { type SmallUint } from 'ts-type-forge';
+import type { SmallUint } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

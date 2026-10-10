@@ -10,11 +10,7 @@ import {
   Result,
   unknownToString,
 } from 'ts-data-forge';
-import {
-  type DeepReadonly,
-  type ReadonlyRecord,
-  type StrictOmit,
-} from 'ts-type-forge';
+import type { DeepReadonly, ReadonlyRecord, StrictOmit } from 'ts-type-forge';
 import { assertPathExists } from './assert-path-exists.mjs';
 import { $ } from './exec-async.mjs';
 

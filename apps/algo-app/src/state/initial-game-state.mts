@@ -1,4 +1,4 @@
-import { type GameState } from '../types/index.mjs';
+import type { GameState } from '../types/index.mjs';
 
 export const initialGameState: GameState = {
   playerCards: [

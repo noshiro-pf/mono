@@ -1,4 +1,4 @@
-import { type StrictExclude } from 'ts-type-forge';
+import type { StrictExclude } from 'ts-type-forge';
 import {
   displayStatuses,
   type DisplayStatus,

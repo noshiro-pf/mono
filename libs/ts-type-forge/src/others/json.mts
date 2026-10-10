@@ -1,4 +1,4 @@
-import { type MutableRecord, type ReadonlyRecord } from './std.mjs';
+import type { MutableRecord, ReadonlyRecord } from './std.mjs';
 
 /**
  * Represents the primitive types allowed in JSON according to RFC 7159.

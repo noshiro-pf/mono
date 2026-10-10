@@ -1,4 +1,4 @@
-import { type Err, type Ok } from '../../adt-types.mjs';
+import type { Err, Ok } from '../../adt-types.mjs';
 
 /**
  * Represents a value that can either be a success (`Ok`) or an error (`Err`).

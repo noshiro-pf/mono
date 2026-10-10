@@ -3,7 +3,7 @@ import * as React from 'react';
 import { ButtonNowrapStyled } from 'react-blueprintjs-utils';
 import { memoNamed, useAlive } from 'react-utils';
 import { hasKey, isRecord } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { createToaster, showToast } from '../../../functions/index.mjs';
 import { ConfirmDialog } from './confirm-dialog.js';
 

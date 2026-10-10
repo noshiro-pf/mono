@@ -10,11 +10,11 @@ import {
   type NonNegativeFiniteNumber,
   type SizeType,
 } from 'ts-data-forge';
-import {
-  type FixedLengthTuple,
-  type NonEmptyArray,
-  type Percent,
-  type SmallUint,
+import type {
+  FixedLengthTuple,
+  NonEmptyArray,
+  Percent,
+  SmallUint,
 } from 'ts-type-forge';
 import { hslToRgb, relativeLuminance, type Hue } from 'ts-utils-additional';
 import { huesDefault } from '../constants/index.mjs';

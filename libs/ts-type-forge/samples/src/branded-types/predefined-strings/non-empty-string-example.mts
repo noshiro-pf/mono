@@ -1,4 +1,4 @@
-import { type MinLengthString, type NonEmptyString } from 'ts-type-forge';
+import type { MinLengthString, NonEmptyString } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

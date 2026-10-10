@@ -1,6 +1,6 @@
-import { type Optional, type UnknownOptional } from '../optional.mjs';
+import type { Optional, UnknownOptional } from '../optional.mjs';
 import { unwrap } from './optional-unwrap.mjs';
-import { type Unwrap } from './types.mjs';
+import type { Unwrap } from './types.mjs';
 
 /**
  * Unwraps an `Optional`, returning the contained value or a default value if

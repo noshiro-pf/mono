@@ -8,11 +8,7 @@ import {
   tp,
   type PositiveFiniteNumber,
 } from 'ts-data-forge';
-import {
-  type DeepReadonly,
-  type NonEmptyArray,
-  type Percent,
-} from 'ts-type-forge';
+import type { DeepReadonly, NonEmptyArray, Percent } from 'ts-type-forge';
 import {
   hslToRgb,
   relativeLuminance,
@@ -21,7 +17,7 @@ import {
   type Hue,
 } from 'ts-utils-additional';
 import { huesDefault } from '../constants/index.mjs';
-import { type ColorResult, type DivisionNumber } from '../types/index.mjs';
+import type { ColorResult, DivisionNumber } from '../types/index.mjs';
 import { hueListToContrastRatioList } from './get-contrast-ratio-list.mjs';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated.mjs';
 import { normalizeList } from './normalize-list.mjs';

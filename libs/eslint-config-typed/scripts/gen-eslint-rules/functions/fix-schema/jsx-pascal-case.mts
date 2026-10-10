@@ -1,4 +1,4 @@
-import { type JSONSchema4 } from '../type.mjs';
+import type { JSONSchema4 } from '../type.mjs';
 import { normalizeArrayItemsProperties } from './normalize-array-items.mjs';
 
 /**

@@ -1,4 +1,4 @@
-import { type Int, type NonNegativeNumber } from 'ts-type-forge';
+import type { Int, NonNegativeNumber } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

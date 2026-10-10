@@ -296,8 +296,8 @@ if (Result.isOk(result)) {
 **Return Type:**
 
 ```tsx
-import { type ExecException } from 'node:child_process';
-import { type Result } from 'ts-data-forge';
+import type { ExecException } from 'node:child_process';
+import type { Result } from 'ts-data-forge';
 
 type Ret = Promise<
     Result<
@@ -547,8 +547,8 @@ Runs `git diff --name-only [--diff-filter=d] <base> --`
 **Common Return Type:**
 
 ```tsx
-import { type ExecException } from 'node:child_process';
-import { type Result } from 'ts-data-forge';
+import type { ExecException } from 'node:child_process';
+import type { Result } from 'ts-data-forge';
 
 type Ret = Result<
     readonly string[],
@@ -663,8 +663,8 @@ await formatUncommittedFiles({
 **Return Type:**
 
 ```tsx
-import { type ExecException } from 'node:child_process';
-import { type Result } from 'ts-data-forge';
+import type { ExecException } from 'node:child_process';
+import type { Result } from 'ts-data-forge';
 
 type Ret = Promise<
     Result<
@@ -710,8 +710,8 @@ await formatDiffFrom('main', {
 **Return Type:**
 
 ```tsx
-import { type ExecException } from 'node:child_process';
-import { type Result } from 'ts-data-forge';
+import type { ExecException } from 'node:child_process';
+import type { Result } from 'ts-data-forge';
 
 type Ret = Promise<
     Result<
@@ -866,7 +866,7 @@ console.log(packages.map((pkg) => pkg.name));
 **Return Type:**
 
 ```tsx
-import { type JsonValue, type ReadonlyRecord } from 'ts-type-forge';
+import type { JsonValue, ReadonlyRecord } from 'ts-type-forge';
 
 type Package = Readonly<{
     name: string;

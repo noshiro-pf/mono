@@ -1,7 +1,7 @@
 import { styled } from 'goober';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
-import { type Rect } from 'ts-utils-additional';
+import type { Rect } from 'ts-utils-additional';
 import {
   inTurnColor,
   playerNameRectPadding,

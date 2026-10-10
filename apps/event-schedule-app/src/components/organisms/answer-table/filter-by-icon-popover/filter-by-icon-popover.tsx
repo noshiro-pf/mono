@@ -2,7 +2,7 @@ import { PopoverNext } from '@blueprintjs/core';
 import { useBoolState } from 'better-react-use-state';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { type SafeUint } from 'ts-type-forge';
+import type { SafeUint } from 'ts-type-forge';
 import { dict } from '../../../../constants/index.mjs';
 import { AnswerFilterAndSortStore } from '../../../../store/index.mjs';
 import { CustomIconButton } from '../../../molecules/index.mjs';

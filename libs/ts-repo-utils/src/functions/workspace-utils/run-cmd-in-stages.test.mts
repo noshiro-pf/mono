@@ -1,9 +1,9 @@
 /* eslint-disable vitest/no-restricted-vi-methods */
-import { type MockInstance } from 'vitest';
+import type { MockInstance } from 'vitest';
 import { executeStages } from './execute-parallel.mjs';
 import { getWorkspacePackages } from './get-workspace-packages.mjs';
 import { runCmdInStagesAcrossWorkspaces } from './run-cmd-in-stages.mjs';
-import { type Package } from './types.mjs';
+import type { Package } from './types.mjs';
 
 // Mock the dependencies
 vi.mock(import('./execute-parallel.mjs'), () => ({

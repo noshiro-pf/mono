@@ -1,6 +1,6 @@
 import { Arr, asUint32, memoizeFunction, Result } from 'ts-data-forge';
-import { type MinLengthArray, type SupportedLength } from 'ts-type-forge';
-import { type Type } from '../type.mjs';
+import type { MinLengthArray, SupportedLength } from 'ts-type-forge';
+import type { Type } from '../type.mjs';
 import {
   createPrimitiveValidationError,
   type ValidationError,

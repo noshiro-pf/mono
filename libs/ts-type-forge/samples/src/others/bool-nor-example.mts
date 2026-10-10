@@ -1,4 +1,4 @@
-import { type BoolNor } from 'ts-type-forge';
+import type { BoolNor } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

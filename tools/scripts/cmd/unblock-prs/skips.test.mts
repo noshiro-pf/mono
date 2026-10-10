@@ -1,10 +1,10 @@
-import { type SetAside } from 'pr-report-core';
+import type { SetAside } from 'pr-report-core';
 import { newSkips, settleSkips, withSkip } from './skips.mjs';
-import {
-  type OwnSetAsideComment,
-  type PullRequest,
-  type SkipRecord,
-  type SkipRecords,
+import type {
+  OwnSetAsideComment,
+  PullRequest,
+  SkipRecord,
+  SkipRecords,
 } from './types.mjs';
 
 describe(newSkips, () => {

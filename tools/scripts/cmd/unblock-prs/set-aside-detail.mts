@@ -10,7 +10,7 @@
 
 import { Arr } from 'ts-data-forge';
 import { describeWaitingOn } from './checks.mjs';
-import { type ChecksSummary } from './types.mjs';
+import type { ChecksSummary } from './types.mjs';
 
 /**
  * The failed required checks by name, and each with its run, which the

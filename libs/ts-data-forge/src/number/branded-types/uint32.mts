@@ -1,4 +1,4 @@
-import { type Uint32 as TtfImported_Uint32 } from 'ts-type-forge';
+import type { Uint32 as TtfImported_Uint32 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';
 

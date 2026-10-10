@@ -1,4 +1,4 @@
-import { type GraphNodeId } from '../domain/index.mjs';
+import type { GraphNodeId } from '../domain/index.mjs';
 import { ARC_NODE_GAP, arcDiagramNodes, arcLayout } from './arc-layout.mjs';
 import { COMPACT_TASK_NODE_SIZE, TASK_NODE_SIZE } from './graph-layout.mjs';
 

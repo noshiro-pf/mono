@@ -1,4 +1,4 @@
-import { type ReadonlyRecord, type UintRange } from 'ts-type-forge';
+import type { ReadonlyRecord, UintRange } from 'ts-type-forge';
 
 export const Seats = {
   Chicha: { id: 0, displayName: '自家' },

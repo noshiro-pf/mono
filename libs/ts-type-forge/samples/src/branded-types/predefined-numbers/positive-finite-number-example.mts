@@ -1,4 +1,4 @@
-import { type PositiveFiniteNumber } from 'ts-type-forge';
+import type { PositiveFiniteNumber } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

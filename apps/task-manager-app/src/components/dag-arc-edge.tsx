@@ -1,5 +1,5 @@
 import { memoNamed } from 'preact-utils';
-import { type ArcGeometry, type HighlightState } from '../dag/index.mjs';
+import type { ArcGeometry, HighlightState } from '../dag/index.mjs';
 
 type Props = Readonly<{
   arc: ArcGeometry;

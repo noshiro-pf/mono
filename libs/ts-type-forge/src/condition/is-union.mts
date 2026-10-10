@@ -1,6 +1,6 @@
-import { type BoolNot } from '../others/index.mjs';
-import { type TypeEq } from './eq.mjs';
-import { type IsNever } from './is-never.mjs';
+import type { BoolNot } from '../others/index.mjs';
+import type { TypeEq } from './eq.mjs';
+import type { IsNever } from './is-never.mjs';
 
 /**
  * Checks if a given type `U` is a union type (contains more than one distinct type member).

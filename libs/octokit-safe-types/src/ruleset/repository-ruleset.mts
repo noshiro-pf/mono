@@ -1,11 +1,7 @@
-import { type components } from '@octokit/openapi-types';
+import type { components } from '@octokit/openapi-types';
 import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import {
-  type DeepReadonly,
-  type StrictExtract,
-  type StrictPick,
-} from 'ts-type-forge';
+import type { DeepReadonly, StrictExtract, StrictPick } from 'ts-type-forge';
 import { RepositoryRulesetBypassActor } from './bypass-actor.mjs';
 import { RepositoryRulesetConditions } from './conditions.mjs';
 import { RepositoryRule } from './repository-rule.mjs';

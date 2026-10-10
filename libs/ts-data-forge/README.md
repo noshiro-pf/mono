@@ -375,7 +375,7 @@ The `Arr` object provides a rich set of functions for array manipulation.
 
 ```tsx
 import { Arr, expectType, Optional } from 'ts-data-forge';
-import { type FixedLengthTuple, type MinLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple, MinLengthTuple } from 'ts-type-forge';
 
 const numbers: readonly number[] = [1, 2, 3, 4, 5, 2, 3] as const;
 

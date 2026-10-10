@@ -1,8 +1,8 @@
-import { type NonEmptyTuple } from 'ts-type-forge';
+import type { NonEmptyTuple } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { Optional } from '../../functional/index.mjs';
 import { asInt32, asUint32 } from '../../number/index.mjs';
-import { type None, type Some } from '../../types.mjs';
+import type { None, Some } from '../../types.mjs';
 import { at, head, last } from './array-utils-element-access.mjs';
 
 describe('Arr element access', () => {

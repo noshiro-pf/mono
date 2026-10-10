@@ -1,11 +1,11 @@
 import { panic } from '../../../panic/index.mjs';
-import {
-  type TernaryResult,
-  type UnknownTernaryResult,
+import type {
+  TernaryResult,
+  UnknownTernaryResult,
 } from '../ternary-result.mjs';
 import { isOk } from './ternary-result-is-ok.mjs';
 import { unwrapOk } from './ternary-result-unwrap-ok.mjs';
-import { type UnwrapOk } from './types.mjs';
+import type { UnwrapOk } from './types.mjs';
 
 /**
  * Unwraps the Ok value or throws with the provided message.

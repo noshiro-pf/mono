@@ -6,7 +6,7 @@ import { formatUncommittedFiles, isDirectlyExecuted } from 'ts-repo-utils';
 import { environmentsDir } from '../constants.mjs';
 import { settingsFilePath } from '../settings-file-path.mjs';
 import { getAllEnvironments, setEnvironment } from './api/index.mjs';
-import { type EnvironmentSettings } from './constants.mjs';
+import type { EnvironmentSettings } from './constants.mjs';
 import { readEnvironmentFiles } from './read-environment-contents.mjs';
 
 /**

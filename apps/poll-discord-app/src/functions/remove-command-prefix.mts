@@ -1,5 +1,5 @@
-import { type ValueOf } from 'ts-type-forge';
-import { type triggerCommand } from '../constants.mjs';
+import type { ValueOf } from 'ts-type-forge';
+import type { triggerCommand } from '../constants.mjs';
 
 export const removeCommandPrefix = (
   message: string,

@@ -1,4 +1,4 @@
-import { type LinkedIssue } from 'pr-report-core';
+import type { LinkedIssue } from 'pr-report-core';
 import { Fragment } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { ExternalLink } from './external-link.js';

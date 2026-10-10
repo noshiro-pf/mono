@@ -1,7 +1,7 @@
 import { expectType } from 'ts-data-forge';
-import { type UnknownRecord } from '../constants/index.mjs';
-import { type RelaxedPick } from '../others/index.mjs';
-import { type DeepOmit, type DeepPick } from './deep-pick-omit.mjs';
+import type { UnknownRecord } from '../constants/index.mjs';
+import type { RelaxedPick } from '../others/index.mjs';
+import type { DeepOmit, DeepPick } from './deep-pick-omit.mjs';
 
 // --- DeepPick ---
 {

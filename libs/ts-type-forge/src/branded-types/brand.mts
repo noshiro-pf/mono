@@ -1,6 +1,6 @@
-import { type IsNever, type TypeEq } from '../condition/index.mjs';
-import { type StrictExclude, type StrictPick } from '../others/index.mjs';
-import { type TSTypeForgeInternals_BrandEncapsulated } from './_internals.mjs';
+import type { IsNever, TypeEq } from '../condition/index.mjs';
+import type { StrictExclude, StrictPick } from '../others/index.mjs';
+import type { TSTypeForgeInternals_BrandEncapsulated } from './_internals.mjs';
 
 /**
  * Base type for all branded types. Represents a brand with unknown value type and no keys.

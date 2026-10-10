@@ -1,4 +1,4 @@
-import { type Variable } from './variable.mjs';
+import type { Variable } from './variable.mjs';
 
 export type NumberTerm<S extends Variable, Z extends Variable> = readonly [
   'lambda',

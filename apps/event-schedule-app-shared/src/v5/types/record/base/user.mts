@@ -1,4 +1,4 @@
-import { type UserId, type UserName } from '../../named-primitive-types.mjs';
+import type { UserId, UserName } from '../../named-primitive-types.mjs';
 
 export type User = Readonly<{
   id: UserId;

@@ -2,8 +2,8 @@ import { ButtonGroup } from '@blueprintjs/core';
 import { css } from '@emotion/react';
 import { BpButton } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { type DeepReadonly } from 'ts-type-forge';
-import { type TwoDiceSumValue } from '../types/index.mjs';
+import type { DeepReadonly } from 'ts-type-forge';
+import type { TwoDiceSumValue } from '../types/index.mjs';
 
 type Props = DeepReadonly<{
   columnsAliveWithHandler: {

@@ -1,7 +1,7 @@
 /** The issues GitHub says a pull request closes, as a report lists them. */
 
 import { Arr, Num, Result } from 'ts-data-forge';
-import { type LinkedIssue, type RepoRef } from './types.mjs';
+import type { LinkedIssue, RepoRef } from './types.mjs';
 
 /**
  * One entry of GraphQL's `closingIssuesReferences.nodes`, asked for with

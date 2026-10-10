@@ -1,5 +1,5 @@
 import { Num } from 'ts-data-forge';
-import { type Percent } from 'ts-type-forge';
+import type { Percent } from 'ts-type-forge';
 
 const clamp = Num.clamp(0, 100);
 

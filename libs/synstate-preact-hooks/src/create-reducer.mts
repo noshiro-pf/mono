@@ -2,7 +2,7 @@ import {
   createReducer as createReducerBase,
   type InitializedObservable,
 } from 'synstate';
-import { type Reducer } from 'ts-type-forge';
+import type { Reducer } from 'ts-type-forge';
 import { useObservableValue } from './use-observable-value.mjs';
 
 export const createReducer = <S, A>(

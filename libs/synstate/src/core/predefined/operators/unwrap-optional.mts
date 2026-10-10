@@ -1,7 +1,7 @@
 import { Optional, type UnknownOptional } from 'ts-data-forge';
-import { type Fn } from 'ts-type-forge';
+import type { Fn } from 'ts-type-forge';
 import { map } from '../../operators/index.mjs';
-import { type KeepInitialValueOperator } from '../../types/index.mjs';
+import type { KeepInitialValueOperator } from '../../types/index.mjs';
 
 /**
  * Unwraps `Optional` values, converting `Some(value)` to `value` and `None` to `undefined`.

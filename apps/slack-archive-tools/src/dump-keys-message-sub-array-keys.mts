@@ -2,7 +2,7 @@ import type * as fsType from 'node:fs';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, hasKey, ISet, isRecord } from 'ts-data-forge';
-import { type UnknownRecord } from 'ts-type-forge';
+import type { UnknownRecord } from 'ts-type-forge';
 import { fileContentValues } from './dump-keys-common.mjs';
 import { getAllJsonFiles } from './get-all-json-files.mjs';
 

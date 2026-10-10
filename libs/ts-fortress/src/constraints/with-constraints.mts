@@ -1,6 +1,6 @@
 import { hasKey, isRecord, tp } from 'ts-data-forge';
-import { type ReadonlyRecord, type UnknownRecord } from 'ts-type-forge';
-import { type Type, type UnknownType } from '../type.mjs';
+import type { ReadonlyRecord, UnknownRecord } from 'ts-type-forge';
+import type { Type, UnknownType } from '../type.mjs';
 
 /**
  * The carrier of the constraint values a {@link Type} was created with.

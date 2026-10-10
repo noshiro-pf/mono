@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type HoursEnum, type MinutesEnum } from 'ts-type-forge';
+import type { HoursEnum, MinutesEnum } from 'ts-type-forge';
 import { HoursMinutes } from './hours-minutes.mjs';
 
 describe('HoursMinutes', () => {

@@ -1,5 +1,5 @@
 import { hasKey } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 export * from './calendar.mjs';
 export * from './obj.mjs';

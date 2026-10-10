@@ -2,7 +2,7 @@ import { Icon, IconSize } from '@blueprintjs/core';
 import { css } from '@emotion/react';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { type SafeUint } from 'ts-data-forge';
+import type { SafeUint } from 'ts-data-forge';
 import {
   higherContrastTextColorHsl,
   hslToStr,

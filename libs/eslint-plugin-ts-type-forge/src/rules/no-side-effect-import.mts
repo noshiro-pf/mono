@@ -1,4 +1,4 @@
-import { type TSESLint, type TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
 import { TS_TYPE_FORGE_MODULE } from './constants.mjs';
 

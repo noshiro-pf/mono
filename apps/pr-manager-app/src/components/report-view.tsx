@@ -1,10 +1,10 @@
-import { type ComponentChildren } from 'preact';
+import type { ComponentChildren } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import { Arr } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { formatLocalTime } from '../format.mjs';
-import { type BlockId } from '../layout.mjs';
+import type { BlockId } from '../layout.mjs';
 import { MERGED_WITHIN_DAYS, type LoadedReport } from '../load-report.mjs';
 import { Age } from './age.js';
 import { BlockLayout } from './block-layout.js';

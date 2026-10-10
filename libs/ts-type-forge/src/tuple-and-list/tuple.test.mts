@@ -1,11 +1,11 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type ChangeArrayElement,
-  type MinLengthArray,
+import type {
+  ChangeArrayElement,
+  MinLengthArray,
 } from '../branded-types/index.mjs';
-import { type DeepReadonly } from '../record/index.mjs';
-import { type FixedLengthTuple } from './length-constrained-tuple.mjs';
-import { type Tuple } from './tuple.mjs';
+import type { DeepReadonly } from '../record/index.mjs';
+import type { FixedLengthTuple } from './length-constrained-tuple.mjs';
+import type { Tuple } from './tuple.mjs';
 
 // ── butlast ─────────────────────────
 {

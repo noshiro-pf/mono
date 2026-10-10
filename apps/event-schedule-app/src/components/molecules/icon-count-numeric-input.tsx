@@ -3,7 +3,7 @@ import * as React from 'react';
 import { NumericInputView } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
 import { Num, Result } from 'ts-data-forge';
-import { type SafeUint } from 'ts-type-forge';
+import type { SafeUint } from 'ts-type-forge';
 import {
   clampAndRoundNumIcons,
   iconFilterNumericInputConfig,

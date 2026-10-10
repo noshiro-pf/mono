@@ -1,4 +1,4 @@
-import { type LambdaTerm } from '../../types/index.mjs';
+import type { LambdaTerm } from '../../types/index.mjs';
 import { isAlphaEqual } from '../is-alpha-equal.mjs';
 import { isNumber, PLUS, SUCC, toNumber } from '../parser/index.mjs';
 

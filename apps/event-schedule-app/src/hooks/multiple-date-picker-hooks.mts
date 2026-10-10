@@ -8,11 +8,11 @@ import {
   asSafeUint,
 } from 'ts-data-forge';
 import { compareYearMonthDate } from 'ts-fortress-types';
-import {
-  type DayOfWeekIndex,
-  type DeepReadonly,
-  type MonthEnum,
-  type SafeUint,
+import type {
+  DayOfWeekIndex,
+  DeepReadonly,
+  MonthEnum,
+  SafeUint,
 } from 'ts-type-forge';
 import { yearMonthDateInitialValue } from '../constants/index.mjs';
 import {

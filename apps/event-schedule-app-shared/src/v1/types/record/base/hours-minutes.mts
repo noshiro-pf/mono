@@ -1,5 +1,5 @@
 import { DateUtils } from 'ts-fortress-types';
-import { type HoursEnum, type MinutesEnum } from 'ts-type-forge';
+import type { HoursEnum, MinutesEnum } from 'ts-type-forge';
 
 export type HoursMinutes = Readonly<{
   hours: HoursEnum;

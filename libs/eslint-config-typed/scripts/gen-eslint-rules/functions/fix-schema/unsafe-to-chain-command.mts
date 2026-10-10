@@ -1,4 +1,4 @@
-import { type JSONSchema4 } from '../type.mjs';
+import type { JSONSchema4 } from '../type.mjs';
 
 /**
  * スキーマの title プロパティを "Options" に変更する。

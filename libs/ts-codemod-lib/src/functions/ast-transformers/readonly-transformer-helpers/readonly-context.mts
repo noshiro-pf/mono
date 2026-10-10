@@ -1,5 +1,5 @@
 import { SafeUint, match } from 'ts-data-forge';
-import { type SafeUintWithSmallInt, type StrictExtract } from 'ts-type-forge';
+import type { SafeUintWithSmallInt, StrictExtract } from 'ts-type-forge';
 
 /**
  * Controls whether to make a layer mutable during recursive transformation

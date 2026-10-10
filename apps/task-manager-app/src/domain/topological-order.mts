@@ -6,7 +6,7 @@ import {
   listNodes,
   type GraphNodeId,
 } from './graph-nodes.mjs';
-import { type DomainState, type NodeRef } from './types.mjs';
+import type { DomainState, NodeRef } from './types.mjs';
 
 /**
  * Every node, each after the nodes it depends on — or, when there is no such

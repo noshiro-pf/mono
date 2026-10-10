@@ -1,6 +1,6 @@
 import type * as Discord from 'discord.js';
 import { ISet, Result, tp, unknownToString } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { emojis } from '../constants.mjs';
 import { firestoreApi } from '../firebase/index.mjs';
 import {

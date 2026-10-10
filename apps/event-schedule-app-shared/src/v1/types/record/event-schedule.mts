@@ -1,6 +1,6 @@
 import { DateUtils } from 'ts-fortress-types';
-import { type MergeIntersection, type StrictPick } from 'ts-type-forge';
-import { type DatetimeSpecificationEnumType } from '../enum/index.mjs';
+import type { MergeIntersection, StrictPick } from 'ts-type-forge';
+import type { DatetimeSpecificationEnumType } from '../enum/index.mjs';
 import {
   defaultNotificationSettings,
   fillAnswerSymbol,

@@ -1,4 +1,4 @@
-import { type FirebaseError } from 'firebase/app';
+import type { FirebaseError } from 'firebase/app';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { Result, castDeepMutable } from 'ts-data-forge';
 import { fbAuth, googleAuthProvider } from '../../initialize-firebase.mjs';

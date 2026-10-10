@@ -23,7 +23,7 @@ import {
   pipe,
 } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
-import { type DeepReadonly, type ReadonlyRecord } from 'ts-type-forge';
+import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import { api } from '../../api/index.mjs';
 import { Routes, datetimeRange2str, dict } from '../../constants/index.mjs';
 import {
@@ -36,7 +36,7 @@ import {
   type AnswerSelectionReducerAction,
   type CalendarCurrentPageReducerState,
 } from '../../functions/index.mjs';
-import { type AnswerSelectionValue } from '../../types/index.mjs';
+import type { AnswerSelectionValue } from '../../types/index.mjs';
 import { Obj, mapOptional, noop } from '../../utils-ported/index.mjs';
 import { Auth } from '../auth.mjs';
 import { AnswersStore, eventSchedule$ } from '../fetching-state/index.mjs';

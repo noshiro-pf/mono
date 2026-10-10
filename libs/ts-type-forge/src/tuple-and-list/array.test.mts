@@ -1,13 +1,13 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type MinLengthArray,
-  type MutableMinLengthArray,
+import type {
+  MinLengthArray,
+  MutableMinLengthArray,
 } from '../branded-types/index.mjs';
-import {
-  type MutableNonEmptyArray,
-  type MutableNonEmptyTuple,
-  type NonEmptyArray,
-  type NonEmptyTuple,
+import type {
+  MutableNonEmptyArray,
+  MutableNonEmptyTuple,
+  NonEmptyArray,
+  NonEmptyTuple,
 } from './array.mjs';
 
 // NonEmptyArray / MutableNonEmptyArray are brand-based aliases of

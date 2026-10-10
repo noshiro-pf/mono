@@ -1,8 +1,8 @@
 import { scan, source, type InitializedObservable } from 'synstate';
-import { type FixedLengthTuple, type ReadonlyRecord } from 'ts-type-forge';
-import { type Rect } from 'ts-utils-additional';
+import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
+import type { Rect } from 'ts-utils-additional';
 import { cardPositionsReducer } from '../../state/index.mjs';
-import { type CardColor, type CardNumber } from '../../types/index.mjs';
+import type { CardColor, CardNumber } from '../../types/index.mjs';
 
 const cardPositionsAction$ = source<readonly [CardColor, CardNumber, Rect]>();
 

@@ -6,7 +6,7 @@ import {
   type IObservableValue,
 } from 'mobx';
 import { Arr } from 'ts-data-forge';
-import { type Point, type SpringAdapter } from '../../spring-demo/index.mjs';
+import type { Point, SpringAdapter } from '../../spring-demo/index.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, SPRING_FACTOR, lerp } from './shared.mjs';
 
 export const createMobXThroughputAdapter = (): SpringAdapter => {

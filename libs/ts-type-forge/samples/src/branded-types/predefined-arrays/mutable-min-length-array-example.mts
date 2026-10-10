@@ -1,4 +1,4 @@
-import { type MinLengthArray, type MutableMinLengthArray } from 'ts-type-forge';
+import type { MinLengthArray, MutableMinLengthArray } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

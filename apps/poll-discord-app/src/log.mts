@@ -1,5 +1,5 @@
 import { Json, Result } from 'ts-data-forge';
-import { type JsonValue } from 'ts-type-forge';
+import type { JsonValue } from 'ts-type-forge';
 
 export const log = (value: JsonValue, prettyPrint: boolean = true): void => {
   console.log(

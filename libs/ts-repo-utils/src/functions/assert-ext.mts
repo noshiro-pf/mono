@@ -6,7 +6,7 @@ import {
   Result,
   unknownToString,
 } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { assertPathExists } from './assert-path-exists.mjs';
 import { createResultAssert } from './create-result-assert.mjs';
 import { glob } from './glob.mjs';

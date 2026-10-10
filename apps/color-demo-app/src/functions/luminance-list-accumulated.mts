@@ -6,7 +6,7 @@ import {
   NonNegativeFiniteNumber,
   tp,
 } from 'ts-data-forge';
-import { type NonEmptyArray } from 'ts-type-forge';
+import type { NonEmptyArray } from 'ts-type-forge';
 
 export const getLuminanceListAccumulated = (
   luminanceList: NonEmptyArray<NonNegativeFiniteNumber>,

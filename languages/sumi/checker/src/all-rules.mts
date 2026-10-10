@@ -1,4 +1,4 @@
-import { type Rule } from './engine/index.mjs';
+import type { Rule } from './engine/index.mjs';
 import {
   noMutationWithoutMutPrefix,
   noNullPropagation,

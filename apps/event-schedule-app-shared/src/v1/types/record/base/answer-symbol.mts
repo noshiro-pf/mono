@@ -1,6 +1,6 @@
-import {
-  type AnswerSymbolIconId,
-  type AnswerSymbolPointEnumType,
+import type {
+  AnswerSymbolIconId,
+  AnswerSymbolPointEnumType,
 } from '../../enum/index.mjs';
 
 export type AnswerSymbol = Readonly<{

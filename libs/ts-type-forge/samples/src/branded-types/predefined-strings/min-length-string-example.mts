@@ -1,4 +1,4 @@
-import { type MinLengthString, type SupportedLength } from 'ts-type-forge';
+import type { MinLengthString, SupportedLength } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

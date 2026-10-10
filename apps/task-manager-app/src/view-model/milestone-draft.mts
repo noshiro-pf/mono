@@ -1,8 +1,8 @@
 /** A milestone as its form holds it while it is being edited; see `task-draft.mts`. */
 
 import { Result } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
-import { type Milestone } from '../domain/index.mjs';
+import type { DeepReadonly } from 'ts-type-forge';
+import type { Milestone } from '../domain/index.mjs';
 import { toDateTimeLocal } from './datetime-local.mjs';
 import { optionalDateTime } from './task-draft.mjs';
 

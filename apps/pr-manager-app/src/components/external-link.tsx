@@ -1,4 +1,4 @@
-import { type ComponentChildren } from 'preact';
+import type { ComponentChildren } from 'preact';
 import { memoNamed } from 'preact-utils';
 
 type Props = Readonly<{

@@ -1,6 +1,6 @@
 // Example: src/collections/imap.mts (toArray)
 import { IMap } from 'ts-data-forge';
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 
 if (import.meta.vitest !== undefined) {
   test('main', () => {

@@ -16,7 +16,7 @@
 
 import { MAIN_RULESET_PATH, SET_ASIDE_COMMENT_SCAN } from 'pr-report-core';
 import * as t from 'ts-fortress';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**
  * How many open pull requests one read covers. A repository with more open

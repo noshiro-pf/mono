@@ -1,4 +1,4 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 export const toClassName = (flags: ReadonlyRecord<string, boolean>): string =>
   Object.entries(flags)

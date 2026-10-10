@@ -1,9 +1,9 @@
 import { Arr, Optional, pipe } from 'ts-data-forge';
 import { createSyncChildObservable } from '../base/index.mjs';
-import {
-  type KeepInitialValueOperator,
-  type Observable,
-  type WithBufferedFromOperatorObservable,
+import type {
+  KeepInitialValueOperator,
+  Observable,
+  WithBufferedFromOperatorObservable,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
 

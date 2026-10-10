@@ -4,7 +4,7 @@
  * are stable strings, so a renderer can key on them across rebuilds.
  */
 
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { listNodes, nodeId, type GraphNodeId } from './graph-nodes.mjs';
 import {
   isTaskDependency,

@@ -1,4 +1,4 @@
-import { type ToNumber } from '../others/index.mjs';
+import type { ToNumber } from '../others/index.mjs';
 
 /**
  * Calculates the absolute value of a number literal type `N`.

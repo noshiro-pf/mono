@@ -1,4 +1,4 @@
-import { type ESLintPlugin } from '../../../types/index.mjs';
+import type { ESLintPlugin } from '../../../types/index.mjs';
 import { noExpectToStrictEqualRule } from './no-expect-to-strict-equal.mjs';
 import { preferAssertDeepStrictEqualOverDeepEqualRule } from './prefer-assert-deep-strict-equal-over-deep-equal.mjs';
 import { preferAssertIsFalseOverNegatedAssertIsTrueRule } from './prefer-assert-is-false-over-assert-negation.mjs';

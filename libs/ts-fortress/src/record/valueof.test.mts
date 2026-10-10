@@ -1,6 +1,6 @@
 import { expectType, Result } from 'ts-data-forge';
 import { number, string, undefinedType } from '../primitives/index.mjs';
-import { type Type, type TypeOf } from '../type.mjs';
+import type { Type, TypeOf } from '../type.mjs';
 import { record } from './record.mjs';
 import { valueof } from './valueof.mjs';
 

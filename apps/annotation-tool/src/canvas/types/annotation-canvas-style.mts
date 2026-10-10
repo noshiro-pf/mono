@@ -5,9 +5,9 @@
 // them, which this layer depends on. The `mut_` prefix marks the deliberate
 // mutation, as it does elsewhere in the repository.
 
-import { type Percent } from 'ts-type-forge';
-import { type Rgba } from 'ts-utils-additional';
-import { type BackgroundStyle } from './background-style.mjs';
+import type { Percent } from 'ts-type-forge';
+import type { Rgba } from 'ts-utils-additional';
+import type { BackgroundStyle } from './background-style.mjs';
 import {
   defaultBboxStyle,
   fillBboxStyle,

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { memoNamed } from 'react-utils';
 import { useObservableValue } from 'synstate-react-hooks';
 import { Arr, Uint32 } from 'ts-data-forge';
-import { type DeepReadonly, type FixedLengthTuple } from 'ts-type-forge';
+import type { DeepReadonly, FixedLengthTuple } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import { calculatedValues$, store$ } from '../../store/index.mjs';
 import { Yen } from '../../types/index.mjs';

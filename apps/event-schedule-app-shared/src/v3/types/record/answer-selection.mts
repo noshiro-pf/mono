@@ -4,9 +4,9 @@ import {
   type DatetimeRange,
   type PartialDatetimeRange,
 } from '../../../v2/index.mjs';
-import {
-  type AnswerSymbolIdWithNone,
-  type AnswerSymbolPoint,
+import type {
+  AnswerSymbolIdWithNone,
+  AnswerSymbolPoint,
 } from '../enum/index.mjs';
 
 export type AnswerSelection = Readonly<{

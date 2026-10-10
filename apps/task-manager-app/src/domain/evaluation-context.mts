@@ -1,9 +1,9 @@
-import {
-  type DomainState,
-  type Milestone,
-  type MilestoneId,
-  type Task,
-  type TaskId,
+import type {
+  DomainState,
+  Milestone,
+  MilestoneId,
+  Task,
+  TaskId,
 } from './types.mjs';
 
 /**

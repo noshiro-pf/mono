@@ -1,4 +1,4 @@
-import { type SafeUint } from 'ts-type-forge';
+import type { SafeUint } from 'ts-type-forge';
 import {
   counter,
   map,
@@ -8,7 +8,7 @@ import {
 } from '../../src/index.mjs';
 import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { testStream } from '../test-stream.mjs';
-import { type StreamTestCase } from '../typedef.mjs';
+import type { StreamTestCase } from '../typedef.mjs';
 
 const createStreams = (
   tick: number,

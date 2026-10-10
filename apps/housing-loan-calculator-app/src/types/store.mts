@@ -1,7 +1,7 @@
-import { type PercentFloat } from './percent-float.mjs';
-import { type RepaymentType } from './repayment-type.mjs';
-import { type Year } from './year.mjs';
-import { type Yen } from './yen.mjs';
+import type { PercentFloat } from './percent-float.mjs';
+import type { RepaymentType } from './repayment-type.mjs';
+import type { Year } from './year.mjs';
+import type { Yen } from './yen.mjs';
 
 export type Store = Readonly<{
   repaymentType: RepaymentType;

@@ -1,4 +1,4 @@
-import { type Database } from './database.mjs';
+import type { Database } from './database.mjs';
 
 export type AnswerType = 'fair' | 'good' | 'poor';
 

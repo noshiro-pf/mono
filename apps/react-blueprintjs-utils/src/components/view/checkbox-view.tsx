@@ -2,7 +2,7 @@
 import styled from '@emotion/styled';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { type DeepReadonly, type Mutable } from 'ts-type-forge';
+import type { DeepReadonly, Mutable } from 'ts-type-forge';
 
 type Props = DeepReadonly<{
   state: 'checked' | 'indeterminate' | 'none';

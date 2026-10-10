@@ -1,6 +1,6 @@
 import { type IMapMapped, type ISetMapped, Optional } from 'ts-data-forge';
 import { defaultIconPoint } from '../../constants/index.mjs';
-import { type AnswerSelectionValue } from '../../types/index.mjs';
+import type { AnswerSelectionValue } from '../../types/index.mjs';
 import { type Reducer, match } from '../../utils-ported/index.mjs';
 
 export type AnswerSelectionReducerAction = Readonly<

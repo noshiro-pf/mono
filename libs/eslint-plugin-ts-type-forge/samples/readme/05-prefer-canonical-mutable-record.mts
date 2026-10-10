@@ -1,10 +1,6 @@
 /* eslint-disable @stylistic/padding-line-between-statements */
 import { expectType } from 'ts-data-forge';
-import {
-  type Mutable,
-  type MutableRecord,
-  type ReadonlyRecord,
-} from 'ts-type-forge';
+import type { Mutable, MutableRecord, ReadonlyRecord } from 'ts-type-forge';
 
 type Item = Readonly<{ id: string }>;
 

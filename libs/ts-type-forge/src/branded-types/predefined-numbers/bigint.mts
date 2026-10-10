@@ -1,5 +1,5 @@
-import { type ChangeBaseBrand, type ExtendBrand } from '../brand.mjs';
-import { type Int } from './int.mjs';
+import type { ChangeBaseBrand, ExtendBrand } from '../brand.mjs';
+import type { Int } from './int.mjs';
 
 /**
  * Branded bigint type for 64-bit signed integers.

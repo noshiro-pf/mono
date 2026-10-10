@@ -7,10 +7,10 @@
  */
 
 import { Num } from 'ts-data-forge';
-import { type GraphNodeId } from '../domain/index.mjs';
-import { type Bounds } from './dag-layout.mjs';
-import { type DagDirection, type LaidOutNode } from './graph-layout.mjs';
-import { type Point } from './pan-zoom.mjs';
+import type { GraphNodeId } from '../domain/index.mjs';
+import type { Bounds } from './dag-layout.mjs';
+import type { DagDirection, LaidOutNode } from './graph-layout.mjs';
+import type { Point } from './pan-zoom.mjs';
 
 /** How long the nodes take to reach their places. */
 export const PLACEMENT_ANIMATION_MS = 700;

@@ -1,6 +1,6 @@
 import { Arr } from 'ts-data-forge';
-import { type MutableRecord } from 'ts-type-forge';
-import { type JSONSchema4 } from '../type.mjs';
+import type { MutableRecord } from 'ts-type-forge';
+import type { JSONSchema4 } from '../type.mjs';
 
 /**
  * スキーマ内の pattern プロパティを enum に変換する。

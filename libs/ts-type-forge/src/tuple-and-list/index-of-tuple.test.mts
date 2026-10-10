@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type IndexOfTuple } from './index-of-tuple.mjs';
+import type { IndexOfTuple } from './index-of-tuple.mjs';
 
 expectType<IndexOfTuple<readonly [1, 2, 3]>, 0 | 1 | 2>('=');
 

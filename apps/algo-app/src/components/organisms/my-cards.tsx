@@ -1,11 +1,11 @@
 import { styled } from 'goober';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
-import { type FixedLengthTuple } from 'ts-type-forge';
-import { type RectSize } from 'ts-utils-additional';
+import type { FixedLengthTuple } from 'ts-type-forge';
+import type { RectSize } from 'ts-utils-additional';
 import { darkGray } from '../../constants/index.mjs';
 import { cardToString } from '../../functions/index.mjs';
-import { type Card } from '../../types/index.mjs';
+import type { Card } from '../../types/index.mjs';
 import { CardComponent } from '../card/index.mjs';
 
 type Props = Readonly<{

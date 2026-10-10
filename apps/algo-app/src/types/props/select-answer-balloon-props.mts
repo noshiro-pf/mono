@@ -1,7 +1,7 @@
-import { type Rect } from 'ts-utils-additional';
-import { type CardColor } from '../card-color.mjs';
-import { type CardNumber } from '../card-number.mjs';
-import { type NWES } from '../direction.mjs';
+import type { Rect } from 'ts-utils-additional';
+import type { CardColor } from '../card-color.mjs';
+import type { CardNumber } from '../card-number.mjs';
+import type { NWES } from '../direction.mjs';
 
 export type SelectAnswerBalloonProps = Readonly<{
   anchorCardRect: Rect;

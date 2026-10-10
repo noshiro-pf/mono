@@ -1,4 +1,4 @@
-import { type InitializedObservable } from '../core/index.mjs';
+import type { InitializedObservable } from '../core/index.mjs';
 import { createState } from './create-state.mjs';
 
 /**

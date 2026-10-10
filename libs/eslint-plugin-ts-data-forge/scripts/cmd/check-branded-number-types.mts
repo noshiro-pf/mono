@@ -1,5 +1,5 @@
 import * as tsDataForge from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { brandedNumberTypeNameToFunctionName } from '../../src/rules/branded-number-types.mjs';
 
 /**

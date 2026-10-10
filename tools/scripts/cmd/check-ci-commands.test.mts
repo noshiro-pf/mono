@@ -1,5 +1,5 @@
 import dedent from 'dedent';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   buildCoverageGraph,
   collectWorkflowCommands,

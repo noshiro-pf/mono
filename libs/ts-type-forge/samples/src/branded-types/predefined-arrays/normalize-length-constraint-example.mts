@@ -1,8 +1,8 @@
-import {
-  type BoundedLengthArray,
-  type ConstrainedList,
-  type List,
-  type NormalizeLengthConstraint,
+import type {
+  BoundedLengthArray,
+  ConstrainedList,
+  List,
+  NormalizeLengthConstraint,
 } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above

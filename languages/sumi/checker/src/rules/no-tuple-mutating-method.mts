@@ -1,11 +1,11 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   isCallExpression,
   isPropertyAccessExpression,
 } from 'typescript-native/unstable/ast';
-import { type Checker, type Type } from 'typescript-native/unstable/sync';
+import type { Checker, Type } from 'typescript-native/unstable/sync';
 import { ownerOf, unwrap } from '../ast/index.mjs';
-import { type Rule } from '../engine/index.mjs';
+import type { Rule } from '../engine/index.mjs';
 
 /**
  * `mutation/no-tuple-mutating-method` — the `Array` mutators are not called on

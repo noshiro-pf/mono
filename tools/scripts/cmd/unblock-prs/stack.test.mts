@@ -10,11 +10,11 @@ import {
   stackedOnAfter,
   stackParentsOf,
 } from './stack.mjs';
-import {
-  type BaseChange,
-  type PullRequest,
-  type SkipRecord,
-  type TriageContext,
+import type {
+  BaseChange,
+  PullRequest,
+  SkipRecord,
+  TriageContext,
 } from './types.mjs';
 
 const pullRequest = (

@@ -3,7 +3,7 @@ import {
   isTypeFlagSet,
   isTypeUnknownType,
 } from '@typescript-eslint/type-utils';
-import { type TSESTree } from '@typescript-eslint/utils';
+import type { TSESTree } from '@typescript-eslint/utils';
 import { getDefaultOverrides, Immutability } from 'is-immutable-type';
 import {
   type Program,

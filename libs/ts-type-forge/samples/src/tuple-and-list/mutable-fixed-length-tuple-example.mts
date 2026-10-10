@@ -1,4 +1,4 @@
-import { type MutableFixedLengthTuple } from 'ts-type-forge';
+import type { MutableFixedLengthTuple } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

@@ -1,6 +1,6 @@
 import { Fragment } from 'preact';
 import { memoNamed } from 'preact-utils';
-import { type ClaudeSession } from '../claude-session.mjs';
+import type { ClaudeSession } from '../claude-session.mjs';
 import { ExternalLink } from './external-link.js';
 
 type Props = Readonly<{ sessions: readonly ClaudeSession[] }>;

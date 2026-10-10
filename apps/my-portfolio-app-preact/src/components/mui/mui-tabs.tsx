@@ -4,7 +4,7 @@ import { memoNamed } from 'preact-utils';
 import { useEffect, useMemo } from 'preact/hooks';
 import { useResizeObserver } from 'resize-observer-preact-hooks';
 import { Arr, asUint32 } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { mediaQueries } from '../../constants/index.mjs';
 import { useMedia } from '../../hooks/index.mjs';
 

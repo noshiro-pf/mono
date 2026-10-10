@@ -1,9 +1,9 @@
-import {
-  type BoundedLengthArray,
-  type FixedLengthArray,
-  type MaxLengthArray,
-  type MinLengthArray,
-  type NonEmptyArray,
+import type {
+  BoundedLengthArray,
+  FixedLengthArray,
+  MaxLengthArray,
+  MinLengthArray,
+  NonEmptyArray,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import {

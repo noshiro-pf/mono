@@ -1,4 +1,4 @@
-import { type None, type Some } from '../../adt-types.mjs';
+import type { None, Some } from '../../adt-types.mjs';
 
 /**
  * Represents an optional value that can either be `Some` (containing a value)

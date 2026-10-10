@@ -11,7 +11,7 @@ import {
   Result,
   unknownToString,
 } from 'ts-data-forge';
-import { type Package } from './types.mjs';
+import type { Package } from './types.mjs';
 
 const DEBUG = false as boolean;
 

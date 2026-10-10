@@ -1,5 +1,5 @@
 import { hasKey } from 'ts-data-forge';
-import { type ReadonlyRecord, type UnknownRecord } from 'ts-type-forge';
+import type { ReadonlyRecord, UnknownRecord } from 'ts-type-forge';
 
 /**
  * Whether `record` has `key`, and its value satisfies `guard`.

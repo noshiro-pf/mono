@@ -1,4 +1,4 @@
-import { type FiniteNumber, type Int } from 'ts-type-forge';
+import type { FiniteNumber, Int } from 'ts-type-forge';
 
 // Local copy of the internal (non-exported) `CastToInt` helper.
 type CastToInt<T> = T extends Int ? T : never;

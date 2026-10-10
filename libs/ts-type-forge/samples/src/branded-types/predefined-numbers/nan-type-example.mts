@@ -1,4 +1,4 @@
-import { type NaNType } from 'ts-type-forge';
+import type { NaNType } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

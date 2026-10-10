@@ -1,4 +1,4 @@
-import { type ESLintPlugin } from '../types.mjs';
+import type { ESLintPlugin } from '../types.mjs';
 import { preferIsNonNullObject } from './prefer-is-non-null-object.mjs';
 import { preferIsRecordAndHasKey } from './prefer-is-record-and-has-key.mjs';
 import { preferSafeArrayIsArray } from './prefer-safe-array-is-array.mjs';

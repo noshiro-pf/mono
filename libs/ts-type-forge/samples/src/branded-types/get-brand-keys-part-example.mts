@@ -1,4 +1,4 @@
-import { type Brand, type GetBrandKeysPart } from 'ts-type-forge';
+import type { Brand, GetBrandKeysPart } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

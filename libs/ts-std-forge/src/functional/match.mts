@@ -1,9 +1,9 @@
-import {
-  type ReadonlyRecord,
-  type RelaxedExclude,
-  type TypeEq,
-  type UnknownRecord,
-  type ValueOf,
+import type {
+  ReadonlyRecord,
+  RelaxedExclude,
+  TypeEq,
+  UnknownRecord,
+  ValueOf,
 } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { keyIsIn } from '../guard/index.mjs';

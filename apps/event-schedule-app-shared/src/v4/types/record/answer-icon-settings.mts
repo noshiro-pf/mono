@@ -1,5 +1,5 @@
-import { type DeepPartial, type ReadonlyRecord } from 'ts-type-forge';
-import { type AnswerIconId } from '../enum/index.mjs';
+import type { DeepPartial, ReadonlyRecord } from 'ts-type-forge';
+import type { AnswerIconId } from '../enum/index.mjs';
 import {
   fillAnswerIconSetting,
   type AnswerIconSetting,

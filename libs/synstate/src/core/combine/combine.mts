@@ -1,17 +1,17 @@
 import { Arr, expectType, Optional } from 'ts-data-forge';
-import { type NonEmptyTuple, type Tuple } from 'ts-type-forge';
+import type { NonEmptyTuple, Tuple } from 'ts-type-forge';
 import { createSyncChildObservable } from '../base/index.mjs';
 import { source } from '../create/index.mjs';
 import { withInitialValue } from '../operators/index.mjs';
-import {
-  type CombineObservable,
-  type CombineObservableRefined,
-  type InitializedObservable,
-  type InitializedSyncChildObservable,
-  type NonEmptyUnknownList,
-  type Observable,
-  type SyncChildObservable,
-  type Wrap,
+import type {
+  CombineObservable,
+  CombineObservableRefined,
+  InitializedObservable,
+  InitializedSyncChildObservable,
+  NonEmptyUnknownList,
+  Observable,
+  SyncChildObservable,
+  Wrap,
 } from '../types/index.mjs';
 
 /**

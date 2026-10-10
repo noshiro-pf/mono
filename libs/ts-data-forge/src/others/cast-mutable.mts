@@ -1,4 +1,4 @@
-import { type DeepMutable, type Mutable } from 'ts-type-forge';
+import type { DeepMutable, Mutable } from 'ts-type-forge';
 
 /**
  * Casts a readonly type `T` to its `Mutable<T>` equivalent.

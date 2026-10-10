@@ -1,6 +1,6 @@
-import { type DeepMutable } from 'ts-type-forge';
+import type { DeepMutable } from 'ts-type-forge';
 import { incrementPlayerIndex } from '../../functions/index.mjs';
-import { type GameState } from '../../types/index.mjs';
+import type { GameState } from '../../types/index.mjs';
 
 export const goToNextTurn = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

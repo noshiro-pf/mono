@@ -1,4 +1,4 @@
-import { type Point, type Rect } from '../../types/index.mjs';
+import type { Point, Rect } from '../../types/index.mjs';
 
 /* 点・矩形の位置を表す座標の原点を変更する */
 

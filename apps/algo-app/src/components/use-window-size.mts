@@ -1,5 +1,5 @@
 import { useMemo } from 'preact/hooks';
-import { type Rect, type RectSize } from 'ts-utils-additional';
+import type { Rect, RectSize } from 'ts-utils-additional';
 
 export const useWindowSize = (
   windowSize: Rect,

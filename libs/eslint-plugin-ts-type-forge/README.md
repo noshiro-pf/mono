@@ -227,7 +227,7 @@ sitting in a file that type-checks.
 import 'ts-type-forge';
 
 // ✅ types are reached by name
-import { type NonEmptyArray } from 'ts-type-forge';
+import type { NonEmptyArray } from 'ts-type-forge';
 ```
 
 The fix deletes the import along with its line. Only the bare specifier matches:

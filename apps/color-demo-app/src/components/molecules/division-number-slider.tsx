@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { MuiSlider } from 'react-mui-utils';
 import { memoNamed } from 'react-utils';
-import { type DivisionNumber } from '../../types/index.mjs';
+import type { DivisionNumber } from '../../types/index.mjs';
 
 type Props = Readonly<{
   divisionNumber: DivisionNumber;

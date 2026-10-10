@@ -1,9 +1,9 @@
-import { type DeprecatedInfo } from '@eslint/core';
+import type { DeprecatedInfo } from '@eslint/core';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { compile, type Options } from 'json-schema-to-typescript';
 import { Arr, castDeepMutable } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
-import { type Rule, type Rules } from '../../../src/index.mjs';
+import type { DeepReadonly } from 'ts-type-forge';
+import type { Rule, Rules } from '../../../src/index.mjs';
 import { immerCodingStyleRules } from '../../../src/plugins/immer-coding-style/rules/rules.mjs';
 import { reactCodingStyleRules } from '../../../src/plugins/react-coding-style/rules/rules.mjs';
 import { strictDependenciesRules } from '../../../src/plugins/strict-dependencies/rules/index.mjs';
@@ -39,7 +39,7 @@ import { normalizeSchemaToArray } from './normalize-schema-to-array.mjs';
 import { metaToString, rawSchemaToString } from './print/index.mjs';
 import { renameShadowedDeclarations } from './rename-shadowed-declarations.mjs';
 import { stripGeneratorBoilerplateComments } from './strip-generator-boilerplate-comments.mjs';
-import { type JSONSchema4 } from './type.mjs';
+import type { JSONSchema4 } from './type.mjs';
 
 const generatorOption: Readonly<{
   explicitRuleDefaultOption: boolean;

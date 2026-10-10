@@ -1,5 +1,5 @@
 import { memoNamed } from 'preact-utils';
-import { type TaskRow } from '../view-model/index.mjs';
+import type { TaskRow } from '../view-model/index.mjs';
 import { TaskTableRow } from './task-table-row.js';
 
 type Props = Readonly<{

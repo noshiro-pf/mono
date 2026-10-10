@@ -1,5 +1,5 @@
 import { evenChain, evenChainOf, paneNode, splitNode } from './tree.mjs';
-import { type LayoutNode, type PaneId } from './types.mjs';
+import type { LayoutNode, PaneId } from './types.mjs';
 
 export type PresetId =
   | 'columns-2'

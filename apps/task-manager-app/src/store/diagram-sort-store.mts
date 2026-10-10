@@ -5,7 +5,7 @@
  */
 
 import { createState, type InitializedObservable } from 'synstate';
-import { type SortSpec } from '../domain/index.mjs';
+import type { SortSpec } from '../domain/index.mjs';
 import { sortKeyActions, type SortKeyActions } from '../view-model/index.mjs';
 
 export type DiagramSortDeps = Readonly<{

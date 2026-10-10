@@ -9,7 +9,7 @@
  */
 
 import { Num } from 'ts-data-forge';
-import { type Point, type ViewTransform } from './pan-zoom.mjs';
+import type { Point, ViewTransform } from './pan-zoom.mjs';
 import { TILE_MARGIN } from './tile-layout.mjs';
 
 /** The shortest the scroll indicator's thumb is drawn. */

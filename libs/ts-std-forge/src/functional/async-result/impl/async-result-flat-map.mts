@@ -1,10 +1,6 @@
 import { Result, type UnknownResult } from '../../result/index.mjs';
-import { type AsyncResult } from '../async-result.mjs';
-import {
-  type UnknownAsyncResult,
-  type UnwrapErr,
-  type UnwrapOk,
-} from './types.mjs';
+import type { AsyncResult } from '../async-result.mjs';
+import type { UnknownAsyncResult, UnwrapErr, UnwrapOk } from './types.mjs';
 
 /**
  * Applies a function that returns an `AsyncResult` or a `Result` to the

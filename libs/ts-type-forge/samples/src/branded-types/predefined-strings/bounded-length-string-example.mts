@@ -1,7 +1,7 @@
-import {
-  type BoundedLengthString,
-  type MaxLengthString,
-  type MinLengthString,
+import type {
+  BoundedLengthString,
+  MaxLengthString,
+  MinLengthString,
 } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above

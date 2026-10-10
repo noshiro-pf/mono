@@ -1,7 +1,7 @@
-import {
-  type LambdaTerm,
-  type NumberTermBody,
-  type Variable,
+import type {
+  LambdaTerm,
+  NumberTermBody,
+  Variable,
 } from '../../../types/index.mjs';
 import { isVariable } from '../../is-variable.mjs';
 import { isNumber } from './is-number.mjs';

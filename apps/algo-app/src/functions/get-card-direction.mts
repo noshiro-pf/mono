@@ -1,5 +1,5 @@
-import { type FixedLengthTuple, type ReadonlyRecord } from 'ts-type-forge';
-import { type Card, type NWES } from '../types/index.mjs';
+import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
+import type { Card, NWES } from '../types/index.mjs';
 import { cardEq } from './card-eq.mjs';
 
 export const getCardDirection = (

@@ -1,23 +1,19 @@
 import { Arr, Optional } from 'ts-data-forge';
 import { unreachable } from 'ts-std-forge';
-import {
-  type MutableMap,
-  type MutableSet,
-  type ReadonlyRecord,
-} from 'ts-type-forge';
-import {
-  type ChildObservable,
-  type InitializedObservable,
-  type Observable,
-  type ObservableBase,
-  type ObservableId,
-  type ObservableKind,
-  type Operator,
-  type Subscriber,
-  type SubscriberId,
-  type Subscription,
-  type UpdateToken,
-  type WithInitialValueOperator,
+import type { MutableMap, MutableSet, ReadonlyRecord } from 'ts-type-forge';
+import type {
+  ChildObservable,
+  InitializedObservable,
+  Observable,
+  ObservableBase,
+  ObservableId,
+  ObservableKind,
+  Operator,
+  Subscriber,
+  SubscriberId,
+  Subscription,
+  UpdateToken,
+  WithInitialValueOperator,
 } from '../types/index.mjs';
 import {
   binarySearch,

@@ -1,4 +1,4 @@
-import { type Tuple } from 'ts-type-forge';
+import type { Tuple } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

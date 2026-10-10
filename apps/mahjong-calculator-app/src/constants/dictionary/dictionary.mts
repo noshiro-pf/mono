@@ -1,5 +1,5 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
-import { type Bakaze, type Jikaze } from '../../types/index.mjs';
+import type { ReadonlyRecord } from 'ts-type-forge';
+import type { Bakaze, Jikaze } from '../../types/index.mjs';
 import {
   flagOptionsDef,
   maximizeTargetDef,

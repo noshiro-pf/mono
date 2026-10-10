@@ -1,4 +1,4 @@
-import { type DeepPick } from 'ts-type-forge';
+import type { DeepPick } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

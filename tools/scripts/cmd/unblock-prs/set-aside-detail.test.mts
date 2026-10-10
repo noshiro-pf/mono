@@ -5,7 +5,7 @@ import {
   describeHold,
   describeTimeout,
 } from './set-aside-detail.mjs';
-import { type ChecksSummary } from './types.mjs';
+import type { ChecksSummary } from './types.mjs';
 
 describe(describeFailedChecks, () => {
   test('names the failed checks and keeps each run', () => {

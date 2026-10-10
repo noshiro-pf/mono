@@ -1,4 +1,4 @@
-import { type Brand, type UnwrapBrandTrueKeys } from 'ts-type-forge';
+import type { Brand, UnwrapBrandTrueKeys } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

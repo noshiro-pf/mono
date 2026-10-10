@@ -37,14 +37,14 @@ import {
   retargetedLayers,
   stackParentsOf,
 } from './stack.mjs';
-import {
-  type Advanced,
-  type AdvancePlan,
-  type PullRequest,
-  type RebaseFailure,
-  type RetargetedLayer,
-  type SkipRecords,
-  type StackedOn,
+import type {
+  Advanced,
+  AdvancePlan,
+  PullRequest,
+  RebaseFailure,
+  RetargetedLayer,
+  SkipRecords,
+  StackedOn,
 } from './types.mjs';
 import { isSafeRefName, lastLines, log, sh, stopRequested } from './util.mjs';
 import { isVersionPullRequest } from './version-pr.mjs';

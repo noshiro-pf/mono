@@ -4,7 +4,7 @@ import dedent from 'dedent';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { noTypeOnlyCodec } from './no-type-only-codec.mjs';
 
 /**

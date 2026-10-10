@@ -1,16 +1,13 @@
-import { type TypeEq } from '../../condition/index.mjs';
-import { type RelaxedExclude } from '../../others/index.mjs';
-import {
-  type Index,
-  type NegativeIndex,
-} from '../../type-level-integer/index.mjs';
-import { type NormalizeBrandUnion } from '../brand.mjs';
-import {
-  type NegativeNumber,
-  type NonNegativeNumber,
-  type NonZeroNumber,
+import type { TypeEq } from '../../condition/index.mjs';
+import type { RelaxedExclude } from '../../others/index.mjs';
+import type { Index, NegativeIndex } from '../../type-level-integer/index.mjs';
+import type { NormalizeBrandUnion } from '../brand.mjs';
+import type {
+  NegativeNumber,
+  NonNegativeNumber,
+  NonZeroNumber,
 } from './core.mjs';
-import { type Int, type IntWithSmallInt } from './int.mjs';
+import type { Int, IntWithSmallInt } from './int.mjs';
 
 /**
  * @internal Default upper bound (exclusive) for `SmallInt`-style ranges. The

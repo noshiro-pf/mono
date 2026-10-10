@@ -1,6 +1,6 @@
 import { expectType } from 'ts-data-forge';
-import { type StrictExclude } from 'ts-type-forge';
-import { type StringToUnion } from './string-to-union.mjs';
+import type { StrictExclude } from 'ts-type-forge';
+import type { StringToUnion } from './string-to-union.mjs';
 
 type PermutationStringImpl<U extends string, V extends U = U> = [U] extends [
   never,

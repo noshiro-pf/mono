@@ -1,12 +1,7 @@
 import { Result } from 'ts-data-forge';
 import { buildSourceIds, nodeId, type GraphNodeId } from './graph-nodes.mjs';
 import { topologicalOrder } from './topological-order.mjs';
-import {
-  type DomainState,
-  type MilestoneId,
-  type NodeRef,
-  type TaskId,
-} from './types.mjs';
+import type { DomainState, MilestoneId, NodeRef, TaskId } from './types.mjs';
 
 /**
  * For every node, the length of the longest chain of dependencies above it:

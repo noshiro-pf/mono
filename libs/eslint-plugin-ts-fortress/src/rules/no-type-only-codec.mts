@@ -5,7 +5,7 @@ import {
 } from '@typescript-eslint/utils';
 import * as path from 'node:path';
 import { Arr } from 'ts-data-forge';
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 import { isExportedValueUsed } from './export-usage.mjs';
 import { getTsFortressImports } from './import-utils.mjs';
 import { packageEntryPoints } from './package-entry-points.mjs';

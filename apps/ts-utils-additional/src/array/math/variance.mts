@@ -5,10 +5,7 @@ import {
   asNonNegativeFiniteNumber,
   asPositiveFiniteNumber,
 } from 'ts-data-forge';
-import {
-  type NonEmptyArray,
-  type NonNegativeFiniteNumber,
-} from 'ts-type-forge';
+import type { NonEmptyArray, NonNegativeFiniteNumber } from 'ts-type-forge';
 
 export const sqSum = (list: readonly number[]): number =>
   list.reduce((a, b) => a + b ** 2, 0);

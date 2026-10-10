@@ -1,8 +1,8 @@
 import { Optional, Result } from 'ts-data-forge';
 import { createRootObservable } from '../base/index.mjs';
-import {
-  type FromSubscribableObservable,
-  type Subscribable,
+import type {
+  FromSubscribableObservable,
+  Subscribable,
 } from '../types/index.mjs';
 
 /**

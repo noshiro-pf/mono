@@ -1,5 +1,5 @@
 import { Arr, expectType, isBigint, Result } from 'ts-data-forge';
-import { type ArrayElement, type BoolAnd, type BoolNot } from 'ts-type-forge';
+import type { ArrayElement, BoolAnd, BoolNot } from 'ts-type-forge';
 import {
   attachConstraints,
   type ConstrainedType,

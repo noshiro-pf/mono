@@ -1,6 +1,6 @@
 /** How a check verdict is shown. */
 
-import { type ChecksSummary } from 'pr-report-core';
+import type { ChecksSummary } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
 
 /**

@@ -1,6 +1,6 @@
 import { asPositiveSafeInt, Num } from 'ts-data-forge';
 import { DateUtils, type YearMonthDate, type Ymdhm } from 'ts-fortress-types';
-import { type PositiveSafeInt } from 'ts-type-forge';
+import type { PositiveSafeInt } from 'ts-type-forge';
 import { today } from '../utils/index.mjs';
 
 const ymd2DateObject = (ymd: YearMonthDate): Date =>

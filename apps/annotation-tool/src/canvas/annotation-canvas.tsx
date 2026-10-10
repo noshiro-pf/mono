@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { type Hue, type RectSize } from 'ts-utils-additional';
+import type { Hue, RectSize } from 'ts-utils-additional';
 import { SampleImage } from '../assets/index.mjs';
 import { CanvasMain } from './canvas-main.js';
 import { bgCheckerboardImg } from './img/index.mjs';

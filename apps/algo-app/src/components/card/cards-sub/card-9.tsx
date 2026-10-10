@@ -1,5 +1,5 @@
 import { memoNamed } from 'preact-utils';
-import { type CardProps } from './card-props.mjs';
+import type { CardProps } from './card-props.mjs';
 
 export const Card9 = memoNamed('Card9', ({ color, textColor }: CardProps) => (
   <>

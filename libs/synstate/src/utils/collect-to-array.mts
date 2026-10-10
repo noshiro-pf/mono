@@ -1,4 +1,4 @@
-import { type Observable } from '../core/index.mjs';
+import type { Observable } from '../core/index.mjs';
 
 export const collectToArray = <A,>(
   observable: Observable<A>,

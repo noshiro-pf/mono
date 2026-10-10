@@ -2,7 +2,7 @@
 
 import { Arr } from 'ts-data-forge';
 import { findMergeAfterCycles } from './merge-after.mjs';
-import { type TreeNode } from './types.mjs';
+import type { TreeNode } from './types.mjs';
 
 export type Forest = Readonly<{
   /** Pull requests nothing open is holding up, lowest number first. */

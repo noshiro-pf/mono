@@ -1,6 +1,6 @@
-import { type Point, type Rect } from 'ts-utils-additional';
-import { type PixiBbox } from '../types/index.mjs';
-import { type Direction } from './bbox-points.mjs';
+import type { Point, Rect } from 'ts-utils-additional';
+import type { PixiBbox } from '../types/index.mjs';
+import type { Direction } from './bbox-points.mjs';
 import { resizeRect } from './resize-rect.mjs';
 import { updatePixiBbox } from './update-pixi-bbox.mjs';
 

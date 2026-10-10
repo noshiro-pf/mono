@@ -1,10 +1,10 @@
-import { type HTMLInputProps, type InputGroupProps } from '@blueprintjs/core';
+import type { HTMLInputProps, InputGroupProps } from '@blueprintjs/core';
 import { DateInput, type DatePickerShortcut } from '@blueprintjs/datetime';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
 import { asSafeUint, castMutable, pipe } from 'ts-data-forge';
 import { DateUtils, type YearMonthDate } from 'ts-fortress-types';
-import { type SafeUint, type StrictOmit } from 'ts-type-forge';
+import type { SafeUint, StrictOmit } from 'ts-type-forge';
 import { mapOptional } from '../../utils/index.mjs';
 
 export type BpDatePickerProps = StrictOmit<

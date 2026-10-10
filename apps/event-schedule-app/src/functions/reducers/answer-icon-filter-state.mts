@@ -1,8 +1,8 @@
 import { asSafeUint, Num, pipe, SafeUint } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
-import {
-  type DetailedFilterIcon,
-  type NumIconFilterState,
+import type { DeepReadonly } from 'ts-type-forge';
+import type {
+  DetailedFilterIcon,
+  NumIconFilterState,
 } from '../../types/index.mjs';
 import {
   type MonoTypeFunction,

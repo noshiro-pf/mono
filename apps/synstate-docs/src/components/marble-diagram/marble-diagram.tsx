@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { OperatorBox } from './operator-box.jsx';
 import { Timeline } from './timeline.jsx';
-import { type TimelineDef } from './types.mjs';
+import type { TimelineDef } from './types.mjs';
 
 type Props = Readonly<{
   inputs: readonly TimelineDef[];

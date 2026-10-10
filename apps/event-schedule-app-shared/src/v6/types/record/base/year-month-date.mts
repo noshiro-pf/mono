@@ -1,6 +1,6 @@
 import { Num, isNumber, isRecord, pipe } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
-import { type DateEnum, type MonthEnum, type SafeUint } from 'ts-type-forge';
+import type { DateEnum, MonthEnum, SafeUint } from 'ts-type-forge';
 import { hasKeyValue } from '../../../../utils/index.mjs';
 
 export type YearMonthDate = Readonly<{

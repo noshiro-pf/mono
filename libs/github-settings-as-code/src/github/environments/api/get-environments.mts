@@ -1,4 +1,4 @@
-import { type EndpointKeys } from 'octokit-safe-types';
+import type { EndpointKeys } from 'octokit-safe-types';
 import { Arr } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { Result } from 'ts-repo-utils';

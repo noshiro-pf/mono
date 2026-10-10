@@ -1,11 +1,11 @@
 import { Arr, asUint32, Uint8 } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
-import {
-  type DateEnum,
-  type MonthEnum,
-  type MonthIndexEnum,
-  type SafeUint,
-  type UintRangeInclusive,
+import type {
+  DateEnum,
+  MonthEnum,
+  MonthIndexEnum,
+  SafeUint,
+  UintRangeInclusive,
 } from 'ts-type-forge';
 /**
  * ```js

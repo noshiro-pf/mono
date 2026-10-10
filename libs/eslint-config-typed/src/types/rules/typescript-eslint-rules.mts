@@ -1,6 +1,6 @@
 /* cSpell:disable */
-import { type Linter } from 'eslint';
-import { type NonEmptyTuple, type ReadonlyRecord } from 'ts-type-forge';
+import type { Linter } from 'eslint';
+import type { NonEmptyTuple, ReadonlyRecord } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],

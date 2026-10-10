@@ -1,4 +1,4 @@
-import { type TypeEq, type TypeExtends } from 'ts-type-forge';
+import type { TypeEq, TypeExtends } from 'ts-type-forge';
 // embed-sample-code-ignore-above
 
 // No import needed if using triple-slash directive

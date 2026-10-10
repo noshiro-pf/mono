@@ -1,6 +1,6 @@
-import { type UnknownResult } from '../result.mjs';
+import type { UnknownResult } from '../result.mjs';
 import { unwrapErr } from './result-unwrap-err.mjs';
-import { type UnwrapErr } from './types.mjs';
+import type { UnwrapErr } from './types.mjs';
 
 /**
  * Unwraps a `Result`, returning the error value or a default value if it is

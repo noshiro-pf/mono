@@ -1,14 +1,14 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type Int10,
-  type Int11,
-  type Int8,
-  type Int9,
-  type MillisecondsEnum,
-  type Uint10,
-  type Uint11,
-  type Uint8,
-  type Uint9,
+import type {
+  Int10,
+  Int11,
+  Int8,
+  Int9,
+  MillisecondsEnum,
+  Uint10,
+  Uint11,
+  Uint8,
+  Uint9,
 } from './int-enum.mjs';
 
 expectType<0, MillisecondsEnum>('<=');

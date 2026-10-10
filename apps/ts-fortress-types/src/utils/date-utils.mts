@@ -1,13 +1,13 @@
 import { asSafeUint } from 'ts-data-forge';
-import {
-  type DateEnum,
-  type DayOfWeekIndex,
-  type HoursEnum,
-  type Index,
-  type MinutesEnum,
-  type MonthEnum,
-  type ReadonlyRecord,
-  type SafeUint,
+import type {
+  DateEnum,
+  DayOfWeekIndex,
+  HoursEnum,
+  Index,
+  MinutesEnum,
+  MonthEnum,
+  ReadonlyRecord,
+  SafeUint,
 } from 'ts-type-forge';
 
 /**

@@ -1,5 +1,5 @@
 import { ISet } from 'ts-data-forge';
-import { type Poll, type UserId } from '../types/index.mjs';
+import type { Poll, UserId } from '../types/index.mjs';
 
 export const getUserIdsFromAnswers = (answers: Poll['answers']): ISet<UserId> =>
   ISet.create<UserId>([]).withMutations(

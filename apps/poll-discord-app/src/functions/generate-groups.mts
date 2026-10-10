@@ -1,6 +1,6 @@
 import { Arr, Num, pipe, tp } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
-import { type Group, type NumGroups } from '../types/index.mjs';
+import type { DeepReadonly } from 'ts-type-forge';
+import type { Group, NumGroups } from '../types/index.mjs';
 import { upperAlphabets } from '../utils/index.mjs';
 
 export const generateGroups = (

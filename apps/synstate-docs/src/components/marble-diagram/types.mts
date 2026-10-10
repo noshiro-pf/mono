@@ -1,4 +1,4 @@
-import { type MarbleColor } from '../constants.mjs';
+import type { MarbleColor } from '../constants.mjs';
 
 export type TimelineDef = Readonly<{
   marbles: readonly Marble[];

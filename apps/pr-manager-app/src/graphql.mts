@@ -21,7 +21,7 @@
  */
 
 import { Arr, isRecord, Json, Obj, Result } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { readRateLimit, type RateLimit } from './rate-limit.mjs';
 
 /** What these functions need of `globalThis.fetch`, and no more. */

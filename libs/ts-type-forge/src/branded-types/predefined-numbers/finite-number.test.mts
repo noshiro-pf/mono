@@ -1,13 +1,13 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type FiniteNumber,
-  type InfiniteNumber,
-  type NEGATIVE_INFINITY,
-  type NegativeFiniteNumber,
-  type NonNegativeFiniteNumber,
-  type NonZeroFiniteNumber,
-  type POSITIVE_INFINITY,
-  type PositiveFiniteNumber,
+import type {
+  FiniteNumber,
+  InfiniteNumber,
+  NEGATIVE_INFINITY,
+  NegativeFiniteNumber,
+  NonNegativeFiniteNumber,
+  NonZeroFiniteNumber,
+  POSITIVE_INFINITY,
+  PositiveFiniteNumber,
 } from './finite-number.mjs';
 
 // Test FiniteNumber

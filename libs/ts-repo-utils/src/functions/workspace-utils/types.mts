@@ -1,4 +1,4 @@
-import { type JsonValue, type ReadonlyRecord } from 'ts-type-forge';
+import type { JsonValue, ReadonlyRecord } from 'ts-type-forge';
 
 // Get all workspace packages
 export type Package = Readonly<{

@@ -1,6 +1,6 @@
 import { Arr } from 'ts-data-forge';
-import { type FixedLengthTuple } from 'ts-type-forge';
-import { type AnswerRank } from '../../types/index.mjs';
+import type { FixedLengthTuple } from 'ts-type-forge';
+import type { AnswerRank } from '../../types/index.mjs';
 import { match } from '../../utils-ported/index.mjs';
 import { commonDictionary } from './common.mjs';
 import { ymd2str } from './datetime.mjs';

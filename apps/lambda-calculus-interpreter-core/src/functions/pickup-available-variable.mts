@@ -1,6 +1,6 @@
 import { Arr } from 'ts-data-forge';
 import { ALPHABETS } from '../constants/index.mjs';
-import { type Variable } from '../types/index.mjs';
+import type { Variable } from '../types/index.mjs';
 
 export const pickUpAvailableVariable = (
   freeVariables: readonly Variable[],

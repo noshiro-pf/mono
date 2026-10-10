@@ -1,4 +1,4 @@
-import { type Min } from 'ts-type-forge';
+import type { Min } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

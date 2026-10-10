@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type Brand, type ReadonlyRecord } from 'ts-type-forge';
+import type { Brand, ReadonlyRecord } from 'ts-type-forge';
 import { array } from '../array/index.mjs';
 import { brandedString } from '../brand/index.mjs';
 import { union } from '../compose/index.mjs';
@@ -13,7 +13,7 @@ import {
   record,
   valueof,
 } from '../record/index.mjs';
-import { type Type, type TypeOf } from '../type.mjs';
+import type { Type, TypeOf } from '../type.mjs';
 import { literal } from './literal.mjs';
 import { recursion } from './recursion.mjs';
 

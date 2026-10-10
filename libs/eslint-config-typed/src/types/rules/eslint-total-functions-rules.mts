@@ -1,5 +1,5 @@
 /* cSpell:disable */
-import { type Linter } from 'eslint';
+import type { Linter } from 'eslint';
 
 /**
  * @description Bans enums.

@@ -1,4 +1,4 @@
-import { type DeepPartial } from 'ts-type-forge';
+import type { DeepPartial } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

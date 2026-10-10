@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { MuiSlider } from 'react-mui-utils';
 import { memoNamed } from 'react-utils';
-import { type Hue } from 'ts-utils-additional';
+import type { Hue } from 'ts-utils-additional';
 
 type Props = Readonly<{
   firstHue: Hue;

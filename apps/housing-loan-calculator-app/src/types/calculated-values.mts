@@ -1,5 +1,5 @@
-import { type DeepReadonly } from 'ts-type-forge';
-import { type Yen } from './yen.mjs';
+import type { DeepReadonly } from 'ts-type-forge';
+import type { Yen } from './yen.mjs';
 
 export type CalculatedValues = DeepReadonly<{
   /** 借入残高（円） */

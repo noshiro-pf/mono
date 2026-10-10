@@ -1,10 +1,10 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type JsonObject,
-  type JsonPrimitive,
-  type JsonValue,
-  type MutableJsonObject,
-  type MutableJsonValue,
+import type {
+  JsonObject,
+  JsonPrimitive,
+  JsonValue,
+  MutableJsonObject,
+  MutableJsonValue,
 } from './json.mjs';
 
 // JsonPrimitive

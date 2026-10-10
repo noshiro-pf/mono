@@ -1,4 +1,4 @@
-import { type LambdaTerm } from '../../types/index.mjs';
+import type { LambdaTerm } from '../../types/index.mjs';
 import { expandShortcuts } from './expand-shortcut.mjs';
 import { getParseTree } from './get-parse-tree.mjs';
 import { splitToTokens } from './split-to-tokens.mjs';

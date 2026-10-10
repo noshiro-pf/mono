@@ -1,15 +1,15 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type MutableRecord,
-  type ReadonlyRecord,
-  type RelaxedExclude,
-  type RelaxedExtract,
-  type RelaxedOmit,
-  type RelaxedPick,
-  type StrictExclude,
-  type StrictExtract,
-  type StrictOmit,
-  type StrictPick,
+import type {
+  MutableRecord,
+  ReadonlyRecord,
+  RelaxedExclude,
+  RelaxedExtract,
+  RelaxedOmit,
+  RelaxedPick,
+  StrictExclude,
+  StrictExtract,
+  StrictOmit,
+  StrictPick,
 } from './std.mjs';
 
 // --- StrictExtract ---

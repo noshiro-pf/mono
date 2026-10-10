@@ -1,13 +1,13 @@
 import type * as Discord from 'discord.js';
 import { type IMap, ISet, isNotUndefined, Optional } from 'ts-data-forge';
 import { emojis } from '../constants.mjs';
-import {
-  type AnswerOfDate,
-  type AnswerType,
-  type DateOption,
-  type Group,
-  type Poll,
-  type UserId,
+import type {
+  AnswerOfDate,
+  AnswerType,
+  DateOption,
+  Group,
+  Poll,
+  UserId,
 } from '../types/index.mjs';
 import { userIdToMention } from './user-id-to-mention.mjs';
 

@@ -1,4 +1,4 @@
-import { type LambdaTerm, type Variable } from '../types/index.mjs';
+import type { LambdaTerm, Variable } from '../types/index.mjs';
 import { isAbstraction, isApplication } from './is-lambda-term.mjs';
 import { isVariable } from './is-variable.mjs';
 

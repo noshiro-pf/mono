@@ -1,8 +1,8 @@
-import {
-  type DeepReadonly,
-  type FixedLengthTuple,
-  type ReadonlyRecord,
-  type UnknownRecord,
+import type {
+  DeepReadonly,
+  FixedLengthTuple,
+  ReadonlyRecord,
+  UnknownRecord,
 } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { Optional, pipe } from '../functional/index.mjs';

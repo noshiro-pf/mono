@@ -5,7 +5,7 @@
 // them, which this layer depends on. The `mut_` prefix marks the deliberate
 // mutation, as it does elsewhere in the repository.
 
-import { type Hue } from 'ts-utils-additional';
+import type { Hue } from 'ts-utils-additional';
 import { defaultIdMaker, type IdType } from './id-type.mjs';
 
 export type Label = Readonly<{

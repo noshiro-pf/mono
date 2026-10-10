@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { type DeepReadonly, type ReadonlyRecord } from 'ts-type-forge';
+import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import { buildCalleeResolver, getTsDataForgeImport } from './import-utils.mjs';
 
 type Options = readonly [];

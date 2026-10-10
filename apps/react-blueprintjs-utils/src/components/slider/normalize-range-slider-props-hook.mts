@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Num, pipe } from 'ts-data-forge';
-import { type DeepReadonly, type UintRange } from 'ts-type-forge';
+import type { DeepReadonly, UintRange } from 'ts-type-forge';
 
 export const useNormalizedRangeSliderProps = ({
   min: _min,

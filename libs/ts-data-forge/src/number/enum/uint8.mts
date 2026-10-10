@@ -1,7 +1,7 @@
-import {
-  type StrictExclude,
-  type Uint8 as TtfImported_Uint8,
-  type Uint16,
+import type {
+  StrictExclude,
+  Uint8 as TtfImported_Uint8,
+  Uint16,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';

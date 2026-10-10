@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { memoNamed } from 'react-utils';
-import { type Rect } from '../utils/index.mjs';
+import type { Rect } from '../utils/index.mjs';
 import { DivCropped } from './div-cropped.js';
 
 const Img = styled.img`

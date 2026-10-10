@@ -1,10 +1,10 @@
-import { type NonEmptyTuple } from 'ts-type-forge';
+import type { NonEmptyTuple } from 'ts-type-forge';
 import { Optional, pipe } from '../../functional/index.mjs';
-import {
-  type ArgArrayIndexWithNegative,
-  type None,
-  type SizeType,
-  type Some,
+import type {
+  ArgArrayIndexWithNegative,
+  None,
+  SizeType,
+  Some,
 } from '../../types.mjs';
 
 /**

@@ -1,4 +1,4 @@
-import { type EndpointKeys } from 'octokit-safe-types';
+import type { EndpointKeys } from 'octokit-safe-types';
 import { hasKey, isRecord } from 'ts-data-forge';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';

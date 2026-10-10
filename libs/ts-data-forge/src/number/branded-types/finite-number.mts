@@ -1,7 +1,7 @@
-import {
-  type Int,
-  type NonNegativeFiniteNumber,
-  type FiniteNumber as TtfImported_FiniteNumber,
+import type {
+  Int,
+  NonNegativeFiniteNumber,
+  FiniteNumber as TtfImported_FiniteNumber,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';

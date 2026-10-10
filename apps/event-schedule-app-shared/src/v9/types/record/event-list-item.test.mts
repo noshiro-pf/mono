@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type Answer } from './answer.mjs';
+import type { Answer } from './answer.mjs';
 import { EventListItem } from './event-list-item.mjs';
 import { EventSchedule } from './event-schedule.mjs';
 

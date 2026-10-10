@@ -4,13 +4,13 @@
  * the demo (`memory-repository.mts`). The store sees only this.
  */
 
-import { type DeepReadonly } from 'ts-type-forge';
-import { type DagLayout } from '../dag/index.mjs';
-import {
-  type DomainState,
-  type Milestone,
-  type NodeRef,
-  type Task,
+import type { DeepReadonly } from 'ts-type-forge';
+import type { DagLayout } from '../dag/index.mjs';
+import type {
+  DomainState,
+  Milestone,
+  NodeRef,
+  Task,
 } from '../domain/index.mjs';
 
 export type Repository = Readonly<{

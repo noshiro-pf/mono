@@ -1,5 +1,5 @@
 /** @internal String literal tag to identify the 'Some' variant of Optional. */
-import { type None, type Some } from '../../../adt-types.mjs';
+import type { None, Some } from '../../../adt-types.mjs';
 
 export const SomeTypeTagName: Some<unknown>['$$tag'] =
   'ts-data-forge::Optional.some';

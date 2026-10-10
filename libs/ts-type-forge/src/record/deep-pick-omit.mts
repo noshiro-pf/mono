@@ -1,4 +1,4 @@
-import { type ReadonlyRecord } from '../others/index.mjs';
+import type { ReadonlyRecord } from '../others/index.mjs';
 
 /**
  * Deeply picks a nested property from an object type along the specified key path.

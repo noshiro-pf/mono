@@ -1,4 +1,4 @@
-import { type ReadonlyTypeReferenceNode } from './is-readonly-node.mjs';
+import type { ReadonlyTypeReferenceNode } from './is-readonly-node.mjs';
 import { wrapWithParentheses } from './wrap-with-parentheses.mjs';
 
 export const unwrapReadonlyTypeArgText = (

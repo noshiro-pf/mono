@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { toArgumentText } from './ast-utils.mjs';
 import { brandedNumberTypeNameToFunctionName } from './branded-number-types.mjs';
 import {

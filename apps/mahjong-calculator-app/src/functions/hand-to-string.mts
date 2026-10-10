@@ -1,17 +1,17 @@
 import { Arr } from 'ts-data-forge';
-import {
-  type DeepReadonly,
-  type ReadonlyRecord,
-  type StrictExclude,
+import type {
+  DeepReadonly,
+  ReadonlyRecord,
+  StrictExclude,
 } from 'ts-type-forge';
 import { dict, doraHyouji2Dora, tileDef } from '../constants/index.mjs';
-import {
-  type Bakaze,
-  type Jikaze,
-  type RevealedBlock,
-  type Shanten,
-  type TileName,
-  type Turn,
+import type {
+  Bakaze,
+  Jikaze,
+  RevealedBlock,
+  Shanten,
+  TileName,
+  Turn,
 } from '../types/index.mjs';
 import { revealedBlockToTiles } from './revealed-block-to-tiles.mjs';
 

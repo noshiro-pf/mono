@@ -1,4 +1,4 @@
-import { type MutableSet } from 'ts-type-forge';
+import type { MutableSet } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

@@ -1,4 +1,4 @@
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 
 /**
  * Casts a mutable type `T` to its `Readonly<T>` equivalent.

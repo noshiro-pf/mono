@@ -2,10 +2,10 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { CheckboxView } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { dict } from '../../../constants/index.mjs';
 import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
-import { type AnswerRank } from '../../../types/index.mjs';
+import type { AnswerRank } from '../../../types/index.mjs';
 import { RankNumericInput } from '../../molecules/index.mjs';
 import { CheckboxWrapper, FilterItem } from './styled.js';
 

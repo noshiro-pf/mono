@@ -2,7 +2,7 @@ import { styled } from 'goober';
 import { createElement, Fragment } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useEffect, useMemo, useRef } from 'preact/hooks';
-import { type Rect } from 'ts-utils-additional';
+import type { Rect } from 'ts-utils-additional';
 import {
   inTurnColor,
   playerNameRectPadding,

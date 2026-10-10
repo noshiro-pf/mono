@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { hasKey, isRecord } from 'ts-data-forge';
-import { type UnknownRecord } from 'ts-type-forge';
+import type { UnknownRecord } from 'ts-type-forge';
 import {
   oxlintBinPath,
   oxlintConfigPath,

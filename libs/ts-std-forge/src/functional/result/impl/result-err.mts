@@ -1,4 +1,4 @@
-import { type Err } from '../../../adt-types.mjs';
+import type { Err } from '../../../adt-types.mjs';
 import { ErrTypeTagName } from './tag.mjs';
 
 /**

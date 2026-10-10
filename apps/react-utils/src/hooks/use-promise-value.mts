@@ -1,6 +1,6 @@
 import { useState } from 'better-react-use-state';
 import * as React from 'react';
-import { type PromiseState } from '../utils/index.mjs';
+import type { PromiseState } from '../utils/index.mjs';
 
 export const usePromiseValue = <T,>(
   promise: Readonly<Promise<T>>,

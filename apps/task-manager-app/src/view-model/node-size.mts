@@ -11,7 +11,7 @@
 
 import { Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 export const nodeSizes = ['standard', 'compact'] as const;
 

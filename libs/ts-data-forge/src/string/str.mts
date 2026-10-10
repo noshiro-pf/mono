@@ -1,10 +1,10 @@
-import {
-  type BoundedLengthString,
-  type FixedLengthString,
-  type MaxLengthString,
-  type MinLengthString,
-  type NonEmptyString,
-  type SupportedLength,
+import type {
+  BoundedLengthString,
+  FixedLengthString,
+  MaxLengthString,
+  MinLengthString,
+  NonEmptyString,
+  SupportedLength,
 } from 'ts-type-forge';
 
 /**

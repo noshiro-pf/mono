@@ -19,8 +19,8 @@ import {
   type Firestore,
 } from 'firebase/firestore';
 import { Result } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
-import { type Milestone, type Task } from '../domain/index.mjs';
+import type { DeepReadonly } from 'ts-type-forge';
+import type { Milestone, Task } from '../domain/index.mjs';
 import {
   dagLayoutFromDoc,
   dagLayoutToDoc,

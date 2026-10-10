@@ -1,6 +1,6 @@
 import { match } from 'ts-data-forge';
-import { type FixedLengthTuple } from 'ts-type-forge';
-import { type RevealedBlock, type TileName } from '../types/index.mjs';
+import type { FixedLengthTuple } from 'ts-type-forge';
+import type { RevealedBlock, TileName } from '../types/index.mjs';
 
 export const revealedBlockToTiles = (
   revealedBlock: RevealedBlock,

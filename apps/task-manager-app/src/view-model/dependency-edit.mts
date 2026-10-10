@@ -5,7 +5,7 @@
  */
 
 import { Arr, Num, Result } from 'ts-data-forge';
-import { type DeepReadonly, type StrictOmit } from 'ts-type-forge';
+import type { DeepReadonly, StrictOmit } from 'ts-type-forge';
 import {
   isGraphNodeId,
   isTaskDependency,

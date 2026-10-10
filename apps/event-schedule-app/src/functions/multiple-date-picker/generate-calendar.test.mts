@@ -1,5 +1,5 @@
 import { asSafeUint } from 'ts-data-forge';
-import { type SafeUint } from 'ts-type-forge';
+import type { SafeUint } from 'ts-type-forge';
 import { generateCalendar } from './generate-calendar.mjs';
 
 test('generate-calendar', () => {

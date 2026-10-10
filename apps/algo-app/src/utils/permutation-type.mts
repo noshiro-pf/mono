@@ -1,6 +1,6 @@
 import { Arr, ISet, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { type PermutationString } from 'ts-utils-additional';
+import type { PermutationString } from 'ts-utils-additional';
 
 const permutationStringImpl = (s: string): readonly string[] => {
   if (s.length === 0) {

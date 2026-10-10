@@ -1,4 +1,4 @@
-import { type ESLintPlugin } from '../types.mjs';
+import type { ESLintPlugin } from '../types.mjs';
 import { noSideEffectImport } from './no-side-effect-import.mjs';
 import { preferCanonicalLengthConstrainedTuple } from './prefer-canonical-length-constrained-tuple.mjs';
 import { preferCanonicalMutableRecord } from './prefer-canonical-mutable-record.mjs';

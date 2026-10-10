@@ -1,5 +1,5 @@
 import { Arr, match } from 'ts-data-forge';
-import { type FixedLengthTuple, type StrictPick } from 'ts-type-forge';
+import type { FixedLengthTuple, StrictPick } from 'ts-type-forge';
 import {
   dictionary,
   directions,
@@ -11,15 +11,15 @@ import {
   incrementPlayerIndex,
   sortCards,
 } from '../functions/index.mjs';
-import {
-  type Card,
-  type CardWithDisplayValue,
-  type CardWithVisibility,
-  type DisplayValues,
-  type GameState,
-  type NWES,
-  type PlayerIndex,
-  type VisibilityFromMe,
+import type {
+  Card,
+  CardWithDisplayValue,
+  CardWithVisibility,
+  DisplayValues,
+  GameState,
+  NWES,
+  PlayerIndex,
+  VisibilityFromMe,
 } from '../types/index.mjs';
 
 const mapPlayers6CardsToDisplayValue = ({

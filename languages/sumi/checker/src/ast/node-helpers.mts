@@ -8,9 +8,9 @@ import {
   type PropertyAccessExpression,
   type Node as TsNode,
 } from 'typescript-native/unstable/ast';
-import {
-  type Checker,
-  type Symbol as TsSymbol,
+import type {
+  Checker,
+  Symbol as TsSymbol,
 } from 'typescript-native/unstable/sync';
 
 /**

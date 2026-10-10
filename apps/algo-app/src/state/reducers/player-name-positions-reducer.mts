@@ -1,7 +1,7 @@
 import { produce } from 'immer';
-import { type ReadonlyRecord, type Reducer } from 'ts-type-forge';
-import { type Rect } from 'ts-utils-additional';
-import { type NWES } from '../../types/index.mjs';
+import type { ReadonlyRecord, Reducer } from 'ts-type-forge';
+import type { Rect } from 'ts-utils-additional';
+import type { NWES } from '../../types/index.mjs';
 
 const initialState = (): ReadonlyRecord<NWES, Rect> =>
   ({

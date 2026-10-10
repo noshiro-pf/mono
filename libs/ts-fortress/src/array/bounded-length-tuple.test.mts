@@ -1,11 +1,11 @@
 import { expectType, Result } from 'ts-data-forge';
-import {
-  type BoundedLengthTuple,
-  type MaxLengthTuple,
-  type MinLengthTuple,
+import type {
+  BoundedLengthTuple,
+  MaxLengthTuple,
+  MinLengthTuple,
 } from 'ts-type-forge';
 import { number } from '../primitives/index.mjs';
-import { type TypeOf } from '../type.mjs';
+import type { TypeOf } from '../type.mjs';
 import {
   type ValidationError,
   validationErrorsToMessages,

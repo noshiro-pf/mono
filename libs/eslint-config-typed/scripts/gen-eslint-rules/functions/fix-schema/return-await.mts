@@ -1,4 +1,4 @@
-import { type JSONSchema4 } from '../type.mjs';
+import type { JSONSchema4 } from '../type.mjs';
 
 /**
  * スキーマが `type: "string"` を持つ場合、それを除去して内容を正規化する。

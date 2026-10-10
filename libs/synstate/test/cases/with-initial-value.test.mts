@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type FixedLengthTuple, type SafeUint } from 'ts-type-forge';
+import type { FixedLengthTuple, SafeUint } from 'ts-type-forge';
 import {
   combine,
   counter,
@@ -13,7 +13,7 @@ import {
 } from '../../src/index.mjs';
 import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { testStream } from '../test-stream.mjs';
-import { type StreamTestCase } from '../typedef.mjs';
+import type { StreamTestCase } from '../typedef.mjs';
 
 /*
   Time(ms)              0       200     400     600     800     1000

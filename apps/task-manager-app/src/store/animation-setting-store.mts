@@ -5,7 +5,7 @@
  */
 
 import { createState, type InitializedObservable } from 'synstate';
-import { type AnimationSetting } from '../view-model/index.mjs';
+import type { AnimationSetting } from '../view-model/index.mjs';
 
 export type AnimationSettingDeps = Readonly<{
   initial: AnimationSetting;

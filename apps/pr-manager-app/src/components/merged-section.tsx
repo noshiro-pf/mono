@@ -1,7 +1,7 @@
 import { memoNamed } from 'preact-utils';
 import { Arr } from 'ts-data-forge';
 import { formatLocalTime } from '../format.mjs';
-import { type Merged } from '../load-report.mjs';
+import type { Merged } from '../load-report.mjs';
 import { Age } from './age.js';
 import { ExternalLink } from './external-link.js';
 import { LabelChip } from './label-chip.js';

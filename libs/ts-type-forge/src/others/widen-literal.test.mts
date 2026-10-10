@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type WidenLiteral } from './widen-literal.mjs';
+import type { WidenLiteral } from './widen-literal.mjs';
 
 // Test WidenLiteral utility type
 

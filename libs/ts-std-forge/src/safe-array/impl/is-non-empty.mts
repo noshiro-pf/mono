@@ -1,4 +1,4 @@
-import { type NonEmptyTuple } from 'ts-type-forge';
+import type { NonEmptyTuple } from 'ts-type-forge';
 
 /**
  * Type guard that checks whether an array has at least one element.

@@ -3,7 +3,7 @@ import {
   isFunctionExpression,
 } from 'typescript-native/unstable/ast';
 import { SignatureKind } from 'typescript-native/unstable/sync';
-import { type Rule } from '../engine/index.mjs';
+import type { Rule } from '../engine/index.mjs';
 
 /**
  * `functions/no-overloaded-function-expression` — a function expression is

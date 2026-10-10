@@ -1,5 +1,5 @@
 import { asUint32 } from 'ts-data-forge';
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 import { average, count, sum } from './utils.mjs';
 
 /**

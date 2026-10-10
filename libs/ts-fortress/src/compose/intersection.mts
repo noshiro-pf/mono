@@ -1,5 +1,5 @@
 import { Arr, expectType, hasKey, isRecord, Obj, Result } from 'ts-data-forge';
-import { type Intersection, type NonEmptyTuple } from 'ts-type-forge';
+import type { Intersection, NonEmptyTuple } from 'ts-type-forge';
 import {
   hasRecordInternals,
   type ExcessPropertyOption,

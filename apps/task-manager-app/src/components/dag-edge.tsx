@@ -1,5 +1,5 @@
 import { memoNamed } from 'preact-utils';
-import { type EdgeGeometry } from '../dag/index.mjs';
+import type { EdgeGeometry } from '../dag/index.mjs';
 
 type Props = Readonly<{
   edge: EdgeGeometry;

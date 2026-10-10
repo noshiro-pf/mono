@@ -1,6 +1,6 @@
 import { pipe } from 'ts-data-forge';
 import { revealedTileTypeDef, tileDef } from '../constants/index.mjs';
-import { type ApiMeldedBlock, type RevealedBlock } from '../types/index.mjs';
+import type { ApiMeldedBlock, RevealedBlock } from '../types/index.mjs';
 import { revealedBlockToTiles } from './revealed-block-to-tiles.mjs';
 
 export const revealedBlockToApiPayload = (

@@ -4,7 +4,7 @@ import {
   splitViewPagePath,
   workspaceQueryParam,
 } from '../shared/index.mjs';
-import { type WorkspaceEntry } from './registry.mjs';
+import type { WorkspaceEntry } from './registry.mjs';
 
 /** Opens one workspace in a tab of its own. */
 export const openWorkspaceInNewTab = async (

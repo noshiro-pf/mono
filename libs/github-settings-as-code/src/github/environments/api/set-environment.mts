@@ -1,7 +1,7 @@
-import { type EndpointKeys } from 'octokit-safe-types';
+import type { EndpointKeys } from 'octokit-safe-types';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';
-import { type EnvironmentSettings } from '../constants.mjs';
+import type { EnvironmentSettings } from '../constants.mjs';
 import { getDeploymentBranchPolicies } from './get-environments.mjs';
 
 /**
