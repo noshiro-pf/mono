@@ -1,21 +1,23 @@
 import {
   DEFAULT_DAG_VIEW_MODE,
   dagViewModeLabels,
+  dagViewModeStorage,
   dagViewModes,
   isArrangeable,
-  parseDagViewMode,
-  serializeDagViewMode,
 } from './dag-view-mode.mjs';
 
-describe(parseDagViewMode, () => {
-  test('round-trips with serializeDagViewMode', () => {
+describe(dagViewModeStorage.parse, () => {
+  test('round-trips with serialize', () => {
     for (const mode of dagViewModes) {
-      assert.strictEqual(parseDagViewMode(serializeDagViewMode(mode)), mode);
+      assert.strictEqual(
+        dagViewModeStorage.parse(dagViewModeStorage.serialize(mode)),
+        mode,
+      );
     }
   });
 
   test('is DAG for nothing stored', () => {
-    assert.strictEqual(parseDagViewMode(null), 'dag');
+    assert.strictEqual(dagViewModeStorage.parse(null), 'dag');
 
     assert.strictEqual(DEFAULT_DAG_VIEW_MODE, 'dag');
   });
@@ -30,7 +32,7 @@ describe(parseDagViewMode, () => {
       '1',
       '["arc"]',
     ]) {
-      assert.strictEqual(parseDagViewMode(stored), 'dag');
+      assert.strictEqual(dagViewModeStorage.parse(stored), 'dag');
     }
   });
 });
@@ -50,4 +52,10 @@ test('every mode has a label', () => {
     dagViewModes.map((mode) => dagViewModeLabels[mode]),
     ['DAG', 'アーク', 'タイル'],
   );
+});
+
+test('the stored setting keeps its key and its JSON', () => {
+  assert.strictEqual(dagViewModeStorage.key, 'task-manager-app:dag-view-mode');
+
+  assert.strictEqual(dagViewModeStorage.serialize('tile'), '"tile"');
 });

@@ -2,19 +2,21 @@ import {
   DEFAULT_NODE_SIZE,
   nodeSizeLabels,
   nodeSizes,
-  parseNodeSize,
-  serializeNodeSize,
+  nodeSizeStorage,
 } from './node-size.mjs';
 
-describe(parseNodeSize, () => {
-  test('round-trips with serializeNodeSize', () => {
+describe(nodeSizeStorage.parse, () => {
+  test('round-trips with serialize', () => {
     for (const size of nodeSizes) {
-      assert.strictEqual(parseNodeSize(serializeNodeSize(size)), size);
+      assert.strictEqual(
+        nodeSizeStorage.parse(nodeSizeStorage.serialize(size)),
+        size,
+      );
     }
   });
 
   test('is 標準 for nothing stored', () => {
-    assert.strictEqual(parseNodeSize(null), 'standard');
+    assert.strictEqual(nodeSizeStorage.parse(null), 'standard');
 
     assert.strictEqual(DEFAULT_NODE_SIZE, 'standard');
   });
@@ -29,7 +31,7 @@ describe(parseNodeSize, () => {
       '["compact"]',
       '{"size":"compact"}',
     ]) {
-      assert.strictEqual(parseNodeSize(stored), 'standard');
+      assert.strictEqual(nodeSizeStorage.parse(stored), 'standard');
     }
   });
 });
@@ -41,4 +43,10 @@ describe('the labels of the sizes', () => {
       ['標準', 'コンパクト'],
     );
   });
+});
+
+test('the stored setting keeps its key and its JSON', () => {
+  assert.strictEqual(nodeSizeStorage.key, 'task-manager-app:node-size');
+
+  assert.strictEqual(nodeSizeStorage.serialize('compact'), '"compact"');
 });

@@ -7,7 +7,7 @@
 import { Arr, Num, Result } from 'ts-data-forge';
 import { type DeepReadonly, type StrictOmit } from 'ts-type-forge';
 import {
-  isGraphNodeId,
+  GraphNodeIdCodec,
   isTaskDependency,
   listNodes,
   nodeId,
@@ -191,7 +191,7 @@ export const describeDependency = (
  * else — the placeholder, or a value that is not a node id.
  */
 export const parseSourceValue = (value: string): GraphNodeId | '' =>
-  isGraphNodeId(value) ? value : '';
+  GraphNodeIdCodec.is(value) ? value : '';
 
 /** The title of the node, or a placeholder for one that no longer exists. */
 export const nodeTitle = (state: DomainState, ref: NodeRef): string =>

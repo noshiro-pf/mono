@@ -4,26 +4,39 @@
  * reads the clock: functions that depend on the time take `now`.
  */
 
-import { type Brand, type DeepReadonly } from 'ts-type-forge';
-
-/** Whether `s` can be a {@link TaskId}: any non-empty string. */
-export const isTaskId = (s: string): s is TaskId => s !== '';
+import * as t from 'ts-fortress';
+import { type Brand } from 'ts-type-forge';
 
 /**
- * Brands `s` as a {@link TaskId}.
+ * A task's id: any non-empty string. The codec's `is` is the guard, and
+ * {@link asTaskId} brands a string that must be one.
+ */
+export const TaskIdCodec = t.brandedString({
+  typeName: 'TaskId',
+  defaultValue: '-',
+  is: (s): s is Brand<string, 'TaskId'> => s !== '',
+});
+
+/**
+ * Brands `s` as a {@link TaskId}. Not `TaskIdCodec.cast`, which throws a
+ * plain `Error`.
  *
  * @throws {TypeError} When `s` is empty.
  */
 export const asTaskId = (s: string): TaskId => {
-  if (isTaskId(s)) {
+  if (TaskIdCodec.is(s)) {
     return s;
   }
 
   throw new TypeError('A TaskId must be a non-empty string');
 };
 
-/** Whether `s` can be a {@link MilestoneId}: any non-empty string. */
-export const isMilestoneId = (s: string): s is MilestoneId => s !== '';
+/** A milestone's id: any non-empty string, as a {@link TaskId} is. */
+export const MilestoneIdCodec = t.brandedString({
+  typeName: 'MilestoneId',
+  defaultValue: '-',
+  is: (s): s is Brand<string, 'MilestoneId'> => s !== '',
+});
 
 /**
  * Brands `s` as a {@link MilestoneId}.
@@ -31,7 +44,7 @@ export const isMilestoneId = (s: string): s is MilestoneId => s !== '';
  * @throws {TypeError} When `s` is empty.
  */
 export const asMilestoneId = (s: string): MilestoneId => {
-  if (isMilestoneId(s)) {
+  if (MilestoneIdCodec.is(s)) {
     return s;
   }
 
@@ -43,14 +56,13 @@ export const isTaskDependency = (
   dependency: Dependency,
 ): dependency is TaskDependency => dependency.from.kind === 'task';
 
-export type TaskId = Brand<string, 'TaskId'>;
+export type TaskId = t.TypeOf<typeof TaskIdCodec>;
 
-export type MilestoneId = Brand<string, 'MilestoneId'>;
+export type MilestoneId = t.TypeOf<typeof MilestoneIdCodec>;
 
 /** A node of the dependency graph. */
-export type NodeRef = DeepReadonly<
-  { kind: 'task'; id: TaskId } | { kind: 'milestone'; id: MilestoneId }
->;
+export type NodeRef =
+  t.TypeOf<typeof TaskRefCodec> | t.TypeOf<typeof MilestoneRefCodec>;
 
 /**
  * How far a task has got, as set by hand (through `setProgress`, which keeps
@@ -65,7 +77,9 @@ export const progresses = [
   'done',
 ] as const;
 
-export type Progress = (typeof progresses)[number];
+export const ProgressCodec = t.enumType(progresses);
+
+export type Progress = t.TypeOf<typeof ProgressCodec>;
 
 /**
  * The status a task is shown with: its {@link Progress}, with `not-started`
@@ -79,12 +93,16 @@ export const displayStatuses = [
   'done',
 ] as const;
 
-export type DisplayStatus = (typeof displayStatuses)[number];
+export const DisplayStatusCodec = t.enumType(displayStatuses);
+
+export type DisplayStatus = t.TypeOf<typeof DisplayStatusCodec>;
 
 /** `1` is the highest priority and `5` the lowest. */
 export const priorities = [1, 2, 3, 4, 5] as const;
 
-export type Priority = (typeof priorities)[number];
+export const PriorityCodec = t.enumType(priorities);
+
+export type Priority = t.TypeOf<typeof PriorityCodec>;
 
 /**
  * What a dependency on a task waits for: `finish-to-start` for the task to be
@@ -92,7 +110,105 @@ export type Priority = (typeof priorities)[number];
  */
 export const dependencyTypes = ['finish-to-start', 'start-to-start'] as const;
 
-export type DependencyType = (typeof dependencyTypes)[number];
+export const DependencyTypeCodec = t.enumType(dependencyTypes);
+
+export type DependencyType = t.TypeOf<typeof DependencyTypeCodec>;
+
+/**
+ * A number that is neither `NaN` nor infinite: every timestamp, lag and
+ * estimate. The type stays `number`; only the codecs check it.
+ */
+export const FiniteNumberCodec = t.refine({
+  baseType: t.number(),
+  is: (n: number): n is number => Number.isFinite(n),
+  defaultValue: 0,
+  typeName: 'finite number',
+});
+
+/** A timestamp or an amount that may be missing. */
+const OptionalFiniteNumberCodec = t.nullable(FiniteNumberCodec);
+
+export const TaskRefCodec = t.record({
+  kind: t.literal('task'),
+  id: TaskIdCodec,
+});
+
+export const MilestoneRefCodec = t.record({
+  kind: t.literal('milestone'),
+  id: MilestoneIdCodec,
+});
+
+/*
+ * The two kinds of dependency go unnamed: a union whose members' names are
+ * short enough to list reports only that list for a value that matches
+ * none, while the structural names that `record` makes up are long enough
+ * for it to report how the closest member failed instead.
+ */
+
+export const TaskDependencyCodec = t.record({
+  from: TaskRefCodec,
+  type: DependencyTypeCodec,
+  lagMs: FiniteNumberCodec,
+});
+
+export const MilestoneDependencyCodec = t.record({
+  from: MilestoneRefCodec,
+  lagMs: FiniteNumberCodec,
+});
+
+/** One of the two, told apart by `from.kind`. */
+export const DependencyCodec = t.union([
+  TaskDependencyCodec,
+  MilestoneDependencyCodec,
+]);
+
+export const TaskCodec = t.record(
+  {
+    id: TaskIdCodec,
+    title: t.string(),
+    description: t.string(),
+    progress: ProgressCodec,
+    priority: PriorityCodec,
+    dueDate: OptionalFiniteNumberCodec,
+    createdAt: FiniteNumberCodec,
+    updatedAt: FiniteNumberCodec,
+    /** When the task started, while its progress is past `not-started`. */
+    startedAt: OptionalFiniteNumberCodec,
+    /** When the task was done, while its progress is `done`. */
+    completedAt: OptionalFiniteNumberCodec,
+    labels: t.array(t.string()),
+    estimateHours: OptionalFiniteNumberCodec,
+    assignees: t.array(t.string()),
+    reviewers: t.array(t.string()),
+    /** All of them must hold before the task can be worked on. */
+    dependencies: t.array(DependencyCodec),
+  },
+  { typeName: 'Task' },
+);
+
+export const MilestoneCodec = t.record(
+  {
+    id: MilestoneIdCodec,
+    title: t.string(),
+    description: t.string(),
+    createdAt: FiniteNumberCodec,
+    updatedAt: FiniteNumberCodec,
+    date: OptionalFiniteNumberCodec,
+    requiresManualCheck: t.boolean(),
+    /** Read only when `requiresManualCheck` is set. */
+    checkedAt: OptionalFiniteNumberCodec,
+    dependencies: t.array(DependencyCodec),
+  },
+  { typeName: 'Milestone' },
+);
+
+export const DomainStateCodec = t.record(
+  {
+    tasks: t.array(TaskCodec),
+    milestones: t.array(MilestoneCodec),
+  },
+  { typeName: 'DomainState' },
+);
 
 /**
  * An edge of the dependency graph, held by the dependent node. It holds once
@@ -101,37 +217,12 @@ export type DependencyType = (typeof dependencyTypes)[number];
  */
 export type Dependency = TaskDependency | MilestoneDependency;
 
-export type TaskDependency = DeepReadonly<{
-  from: { kind: 'task'; id: TaskId };
-  type: DependencyType;
-  lagMs: number;
-}>;
+export type TaskDependency = t.TypeOf<typeof TaskDependencyCodec>;
 
-export type MilestoneDependency = DeepReadonly<{
-  from: { kind: 'milestone'; id: MilestoneId };
-  lagMs: number;
-}>;
+export type MilestoneDependency = t.TypeOf<typeof MilestoneDependencyCodec>;
 
-export type Task = DeepReadonly<{
-  id: TaskId;
-  title: string;
-  description: string;
-  progress: Progress;
-  priority: Priority;
-  dueDate: number | undefined;
-  createdAt: number;
-  updatedAt: number;
-  /** When the task started, while its progress is past `not-started`. */
-  startedAt: number | undefined;
-  /** When the task was done, while its progress is `done`. */
-  completedAt: number | undefined;
-  labels: string[];
-  estimateHours: number | undefined;
-  assignees: string[];
-  reviewers: string[];
-  /** All of them must hold before the task can be worked on. */
-  dependencies: Dependency[];
-}>;
+/** A task; see {@link TaskCodec} for what its fields mean. */
+export type Task = t.TypeOf<typeof TaskCodec>;
 
 /**
  * A point that tasks can wait for, reached once every one of its components
@@ -139,21 +230,7 @@ export type Task = DeepReadonly<{
  * `checkedAt`), its `dependencies` (an aggregate) — or any combination. One
  * with none of them is reached when it is created.
  */
-export type Milestone = DeepReadonly<{
-  id: MilestoneId;
-  title: string;
-  description: string;
-  createdAt: number;
-  updatedAt: number;
-  date: number | undefined;
-  requiresManualCheck: boolean;
-  /** Read only when `requiresManualCheck` is set. */
-  checkedAt: number | undefined;
-  dependencies: Dependency[];
-}>;
+export type Milestone = t.TypeOf<typeof MilestoneCodec>;
 
 /** Everything the domain stores. Ids are assumed to be unique per kind. */
-export type DomainState = DeepReadonly<{
-  tasks: Task[];
-  milestones: Milestone[];
-}>;
+export type DomainState = t.TypeOf<typeof DomainStateCodec>;
