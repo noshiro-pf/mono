@@ -20,6 +20,7 @@ const documents = [
       '08-prefer-schema-over-guard-chain-options.mts',
       '09-no-type-only-codec.mts',
       '10-no-type-only-codec-config.mts',
+      '11-no-type-only-codec-options.mts',
     ],
   },
 ] as const;

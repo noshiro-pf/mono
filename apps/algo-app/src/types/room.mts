@@ -1,6 +1,6 @@
 import { expectType, tp } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { type StrictOmit } from 'ts-type-forge';
+import { type FixedLengthTuple, type StrictOmit } from 'ts-type-forge';
 import { cardTypeDef } from './card-type.mjs';
 import { playerTypeDef } from './player.mjs';
 import { shuffleDefType } from './shuffle-def.mjs';
@@ -45,27 +45,13 @@ const roomRemoteTypeDef = t.record(
   },
 );
 
-export const roomTypeDef = t.record(
-  {
-    ...commonRecordTypeDefs,
-    id: t.string(''),
-    playerCards: t.tuple(
-      tp(
-        playerCardsTypeDef,
-        playerCardsTypeDef,
-        playerCardsTypeDef,
-        playerCardsTypeDef,
-      ),
-    ),
-  },
-  {
-    typeName: 'Room',
-  },
-);
-
 export type RoomRemote = t.TypeOf<typeof roomRemoteTypeDef>;
 
-export type Room = t.TypeOf<typeof roomTypeDef>;
+export type Room = StrictOmit<RoomRemote, 'playerCards'> &
+  Readonly<{
+    id: string;
+    playerCards: FixedLengthTuple<4, RoomRemote['playerCards']['p0']>;
+  }>;
 
 expectType<(typeof roomStateList)[number], Room['state']>('=');
 

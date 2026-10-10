@@ -12,13 +12,11 @@ import * as t from 'ts-fortress';
  * mutation, which addresses it by node id rather than by number. It is
  * carried on the read that already happens rather than fetched again.
  */
-export const PullRequestSchema = t.record({
-  number: t.number(),
-  nodeId: t.string(),
-  isDraft: t.boolean(),
-});
-
-export type PullRequest = t.TypeOf<typeof PullRequestSchema>;
+export type PullRequest = Readonly<{
+  number: number;
+  nodeId: string;
+  isDraft: boolean;
+}>;
 
 /**
  * What `GET /repos/{owner}/{repo}/pulls[/{number}]` answers with, in the

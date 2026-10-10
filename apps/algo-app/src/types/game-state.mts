@@ -1,25 +1,9 @@
-import { expectType } from 'ts-data-forge';
-import * as t from 'ts-fortress';
 import { type FixedLengthTuple } from 'ts-type-forge';
-import {
-  cardWithVisibilityTypeDef,
-  type Card,
-  type CardWithVisibility,
-} from './card-type.mjs';
+import { type Card, type CardWithVisibility } from './card-type.mjs';
 import { type PhaseInTurn } from './phase-in-turn.mjs';
 import { type PlayerIndex } from './player-index.mjs';
 
-export const playerCardsTypeDef = t.fixedLengthTuple(
-  4,
-  t.fixedLengthTuple(6, cardWithVisibilityTypeDef),
-);
-
-type PlayerCards = t.TypeOf<typeof playerCardsTypeDef>;
-
-expectType<
-  PlayerCards,
-  FixedLengthTuple<4, FixedLengthTuple<6, CardWithVisibility>>
->('<=');
+type PlayerCards = FixedLengthTuple<4, FixedLengthTuple<6, CardWithVisibility>>;
 
 export type GameState = Readonly<{
   playerCards: PlayerCards;

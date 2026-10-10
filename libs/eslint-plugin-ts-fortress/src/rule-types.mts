@@ -53,7 +53,7 @@ namespace NoTypeOnlyCodec {
    *           "type": "string"
    *         },
    *         "uniqueItems": true,
-   *         "description": "Files whose exports are public API — for a library, the modules its package.json `exports` point at, as source files. A codec they export, directly or through re-exports, is never reported. Relative paths are resolved against the working directory ESLint runs in; pass absolute paths to make the config independent of it. Defaults to none."
+   *         "description": "Files whose exports are public API. A codec they export, directly or through re-exports, is never reported. Replaces the entry points read from the nearest package.json, for a layout they cannot be traced back to source from. Relative paths are resolved against the working directory ESLint runs in; pass absolute paths to make the config independent of it."
    *       }
    *     },
    *     "additionalProperties": false

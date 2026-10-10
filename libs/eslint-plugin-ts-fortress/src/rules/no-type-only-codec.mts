@@ -1,6 +1,5 @@
 import {
   AST_NODE_TYPES,
-  ESLintUtils,
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
@@ -9,6 +8,7 @@ import { Arr } from 'ts-data-forge';
 import { type FixedLengthTuple } from 'ts-type-forge';
 import { isExportedValueUsed } from './export-usage.mjs';
 import { getTsFortressImports } from './import-utils.mjs';
+import { packageEntryPoints } from './package-entry-points.mjs';
 
 type Options = readonly [
   Readonly<{
@@ -30,9 +30,11 @@ const TYPE_OF = 'TypeOf';
  *
  * "Never read as a value" means: no value reference in its own file outside
  * `typeof`, every import of it elsewhere `import type`, and no entry point
- * re-exporting it. The cross-file part needs type information — the importers
- * are read from the TypeScript program — and is skipped for a codec that is
- * not exported.
+ * re-exporting it. The entry points are what the nearest `package.json`
+ * publishes, traced back to source, unless the `entryPoints` option names them.
+ * The cross-file part reads the importers from the TypeScript program; without
+ * type information, or when the published entry points cannot all be traced
+ * back to source, an exported codec is left alone.
  */
 export const noTypeOnlyCodec: TSESLint.RuleModule<MessageIds, Options> = {
   meta: {
@@ -49,12 +51,12 @@ export const noTypeOnlyCodec: TSESLint.RuleModule<MessageIds, Options> = {
             items: { type: 'string' },
             uniqueItems: true,
             description: [
-              'Files whose exports are public API — for a library, the',
-              'modules its package.json `exports` point at, as source files.',
-              'A codec they export, directly or through re-exports, is never',
-              'reported. Relative paths are resolved against the working',
-              'directory ESLint runs in; pass absolute paths to make the',
-              'config independent of it. Defaults to none.',
+              'Files whose exports are public API. A codec they export,',
+              'directly or through re-exports, is never reported. Replaces',
+              'the entry points read from the nearest package.json, for a',
+              'layout they cannot be traced back to source from. Relative',
+              'paths are resolved against the working directory ESLint runs',
+              'in; pass absolute paths to make the config independent of it.',
             ].join(' '),
           },
         },
@@ -69,7 +71,7 @@ export const noTypeOnlyCodec: TSESLint.RuleModule<MessageIds, Options> = {
   create: (context) => {
     const sourceCode = context.sourceCode;
 
-    const entryPointOption = context.options[0]?.entryPoints ?? [];
+    const entryPointOption = context.options[0]?.entryPoints;
 
     return {
       Program: (program) => {
@@ -88,7 +90,8 @@ export const noTypeOnlyCodec: TSESLint.RuleModule<MessageIds, Options> = {
         const exportedNames = collectExportedValueNames(program);
 
         // Built for the first exported codec that needs it, so a file whose
-        // codecs are all used locally works without type information.
+        // codecs are all used locally reads neither the program nor a
+        // package.json.
         let mut_isUsedElsewhere: ((exportName: string) => boolean) | undefined;
 
         const isUsedElsewhere = (exportName: string): boolean => {
@@ -123,7 +126,7 @@ export const noTypeOnlyCodec: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [{ entryPoints: [] }],
+  defaultOptions: [{}],
 } as const;
 
 /** A codec and the name of the type alias derived from it. */
@@ -348,29 +351,47 @@ const isInTypeQuery = (node: TSESTree.Node): boolean =>
 
 /**
  * Whether another file of the TypeScript program reads the value this file
- * exports under a given name, or an entry point re-exports it. Throws ESLint's
- * "requires type information" error when the file was not parsed with one.
+ * exports under a given name, or an entry point re-exports it. Answers "yes"
+ * for every name when it cannot tell: when the file was parsed without type
+ * information, or when the entry points come from a package.json that cannot
+ * be traced back to source.
  */
 const buildCrossFileCheck = (
   context: Readonly<TSESLint.RuleContext<MessageIds, Options>>,
   program: TSESTree.Program,
-  entryPointOption: readonly string[],
+  entryPointOption: readonly string[] | undefined,
 ): ((exportName: string) => boolean) => {
-  const services = ESLintUtils.getParserServices(context);
+  const services = context.sourceCode.parserServices;
 
-  const tsProgram = services.program;
+  const tsProgram = services?.program ?? undefined;
 
-  const fileName = services.esTreeNodeToTSNodeMap.get(program).fileName;
+  const sourceFile =
+    tsProgram === undefined
+      ? undefined
+      : services?.esTreeNodeToTSNodeMap?.get(program);
+
+  if (tsProgram === undefined || sourceFile === undefined) {
+    return () => true;
+  }
+
+  const fileName = sourceFile.fileName;
 
   // Normalized through the program, so that they compare equal to the file
   // names it reports whatever the platform's path separator.
-  const entryPoints = new Set(
-    entryPointOption.map((entryPoint) => {
-      const absolute = path.resolve(context.cwd, entryPoint);
+  const entryPoints =
+    entryPointOption === undefined
+      ? packageEntryPoints(tsProgram, fileName)
+      : new Set(
+          entryPointOption.map((entryPoint) => {
+            const absolute = path.resolve(context.cwd, entryPoint);
 
-      return tsProgram.getSourceFile(absolute)?.fileName ?? absolute;
-    }),
-  );
+            return tsProgram.getSourceFile(absolute)?.fileName ?? absolute;
+          }),
+        );
+
+  if (entryPoints === undefined) {
+    return () => true;
+  }
 
   return (exportName) =>
     isExportedValueUsed(tsProgram, fileName, exportName, entryPoints);

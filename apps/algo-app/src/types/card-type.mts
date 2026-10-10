@@ -3,7 +3,7 @@ import { type MergeIntersection } from 'ts-type-forge';
 import { type CustomColor } from '../constants/index.mjs';
 import { cardColorTypeDef } from './card-color.mjs';
 import { cardNumberTypeDef } from './card-number.mjs';
-import { visibleToTypeDef, type VisibilityFromMe } from './visible-to.mjs';
+import { type VisibilityFromMe, type VisibleTo } from './visible-to.mjs';
 
 const def = {
   color: cardColorTypeDef,
@@ -12,21 +12,13 @@ const def = {
 
 export const cardTypeDef = t.record(def, { typeName: 'Card' });
 
-export const cardWithVisibilityTypeDef = t.record(
-  {
-    ...def,
-    visibleTo: visibleToTypeDef,
-  },
-  {
-    typeName: 'Card',
-  },
-);
-
 export type Card = t.TypeOf<typeof cardTypeDef>;
 
 export const isCard = cardTypeDef.is;
 
-export type CardWithVisibility = t.TypeOf<typeof cardWithVisibilityTypeDef>;
+export type CardWithVisibility = MergeIntersection<
+  Card & Readonly<{ visibleTo: VisibleTo }>
+>;
 
 export type CardWithHandler = MergeIntersection<
   CardWithVisibility & Readonly<{ onClick: () => void }>
