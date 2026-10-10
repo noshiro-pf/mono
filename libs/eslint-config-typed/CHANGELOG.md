@@ -1,5 +1,21 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.16.0
+
+### Minor Changes
+
+- 73de32b: Enable `security/detect-invisible-characters`, added in
+  `eslint-plugin-security` 4.1.0, as `error` alongside
+  `security/detect-bidi-characters`. It reports the Hangul fillers U+3164 and
+  U+FFA0, which render as nothing and can hide code from review.
+
+### Patch Changes
+
+- 99963b8: Allow `firebase-admin/*` imports in `import-x/no-internal-modules`, as
+  `firebase-functions/**` already is. `firebase-admin` exposes its services only
+  through those entry points (`firebase-admin/app`, `firebase-admin/firestore`).
+- 6e76d33: Update dependencies
+
 ## 5.15.1
 
 ### Patch Changes
