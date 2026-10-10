@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
 import { Arr, asSafeUint, Optional, SafeUint, tp } from 'ts-data-forge';
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 import { HistogramView } from './histogram-view.js';
 
 const domain = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;

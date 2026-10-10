@@ -1,7 +1,7 @@
 import { styled } from 'goober';
 import { memoNamed } from 'preact-utils';
 import { useObservableValue } from 'synstate-preact-hooks';
-import { type Rect } from 'ts-utils-additional';
+import type { Rect } from 'ts-utils-additional';
 import { dictionary } from '../constants/index.mjs';
 import {
   cardPositionsDispatcher,
@@ -13,7 +13,7 @@ import {
   selectAnswerBalloonProps$,
   turnPlayerHighlighterPosition$,
 } from '../store/index.mjs';
-import { type DisplayValues } from '../types/index.mjs';
+import type { DisplayValues } from '../types/index.mjs';
 import {
   ConfirmTossBalloon,
   DecidedAnswerBalloon,

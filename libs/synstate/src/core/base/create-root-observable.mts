@@ -1,5 +1,5 @@
 import { Optional } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { isRootObservable, type RootObservable } from '../types/index.mjs';
 import {
   assembleObservable,

@@ -40,7 +40,10 @@ export const typescriptEslintRules = {
   ],
   '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
   '@typescript-eslint/consistent-type-imports': [
-    // relates to import-x/consistent-type-specifier-style rule
+    // Together with @typescript-eslint/no-import-type-side-effects and
+    // import-x/no-duplicates (prefer-inline): a statement whose bindings are
+    // all types is `import type { A }`, one mixing values and types is
+    // `import { a, type B }`.
     'error',
     {
       prefer: 'type-imports',
@@ -406,8 +409,9 @@ export const typescriptEslintRules = {
   '@typescript-eslint/no-duplicate-enum-values': 'error',
   '@typescript-eslint/parameter-properties': withDefaultOption('error'),
 
-  // This rule must be enabled when the --verbatimModuleSyntax compiler option is enabled
-  '@typescript-eslint/no-import-type-side-effects': 'off',
+  // `import { type A }` leaves `import {} from '...'` behind under
+  // --verbatimModuleSyntax; write `import type { A }` instead.
+  '@typescript-eslint/no-import-type-side-effects': 'error',
 
   '@typescript-eslint/no-mixed-enums': 'error',
 

@@ -1,5 +1,5 @@
 import { orderCandidates } from './triage.mjs';
-import { type PullRequest } from './types.mjs';
+import type { PullRequest } from './types.mjs';
 
 describe(orderCandidates, () => {
   test('takes the lowest number first', () => {

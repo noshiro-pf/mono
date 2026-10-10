@@ -1,9 +1,9 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type BoundedLengthString,
-  type FixedLengthString,
-  type MaxLengthString,
-  type MinLengthString,
+import type {
+  BoundedLengthString,
+  FixedLengthString,
+  MaxLengthString,
+  MinLengthString,
 } from './length-constrained-string.mjs';
 
 // MaxLengthString

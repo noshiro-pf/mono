@@ -1,5 +1,5 @@
 import { Arr } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 const storageKey = 'serviceWorkerResetOrigins';
 

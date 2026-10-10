@@ -1,5 +1,5 @@
-import { type Reducer } from 'ts-type-forge';
-import { type GameState, type GameStateAction } from '../../types/index.mjs';
+import type { Reducer } from 'ts-type-forge';
+import type { GameState, GameStateAction } from '../../types/index.mjs';
 
 export const readonlyReducer: Reducer<
   GameState['readonly'],

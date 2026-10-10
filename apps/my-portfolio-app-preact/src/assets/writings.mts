@@ -1,5 +1,5 @@
 import { IMap, Optional } from 'ts-data-forge';
-import { type WritingsInfo } from '../types/index.mjs';
+import type { WritingsInfo } from '../types/index.mjs';
 import zennArticles from './zenn-articles.json' with { type: 'json' };
 
 export const zennArticleTitle = IMap.create(

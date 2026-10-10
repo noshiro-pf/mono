@@ -1,10 +1,6 @@
 /* eslint-disable @stylistic/padding-line-between-statements */
 import { expectType } from 'ts-data-forge';
-import {
-  type RelaxedExclude,
-  type StrictExclude,
-  type StrictOmit,
-} from 'ts-type-forge';
+import type { RelaxedExclude, StrictExclude, StrictOmit } from 'ts-type-forge';
 
 type Person = Readonly<{ name: string; email: string }>;
 

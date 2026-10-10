@@ -1,6 +1,6 @@
 import * as path from 'node:path';
 import { pipe } from 'ts-data-forge';
-import { type ConverterConfig } from './convert-dts/common.mjs';
+import type { ConverterConfig } from './convert-dts/common.mjs';
 
 /**
  * Where the official `lib.*.d.ts` files are fetched from. Defaults to the

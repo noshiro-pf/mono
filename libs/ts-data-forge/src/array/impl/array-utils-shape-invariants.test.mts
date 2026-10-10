@@ -1,11 +1,11 @@
-import {
-  type BoundedLengthArray,
-  type FixedLengthArray,
-  type FixedLengthTuple,
-  type MaxLengthArray,
-  type MaxLengthOf,
-  type MinLengthArray,
-  type MinLengthOf,
+import type {
+  BoundedLengthArray,
+  FixedLengthArray,
+  FixedLengthTuple,
+  MaxLengthArray,
+  MaxLengthOf,
+  MinLengthArray,
+  MinLengthOf,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import {

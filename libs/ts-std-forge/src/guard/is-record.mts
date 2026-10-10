@@ -1,4 +1,4 @@
-import { type MutableRecord, type UnknownRecord } from 'ts-type-forge';
+import type { MutableRecord, UnknownRecord } from 'ts-type-forge';
 import { isNonNullObject } from './is-non-null-object.mjs';
 
 /**

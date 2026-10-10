@@ -1,10 +1,10 @@
 import { Optional } from 'ts-data-forge';
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 import { createSyncChildObservable } from '../base/index.mjs';
-import {
-  type DropInitialValueOperator,
-  type Observable,
-  type PairwiseOperatorObservable,
+import type {
+  DropInitialValueOperator,
+  Observable,
+  PairwiseOperatorObservable,
 } from '../types/index.mjs';
 
 /**

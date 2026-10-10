@@ -2,7 +2,7 @@ import type * as fsType from 'node:fs';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, isRecord, Json, Result } from 'ts-data-forge';
-import { type DeepReadonly, type UnknownRecord } from 'ts-type-forge';
+import type { DeepReadonly, UnknownRecord } from 'ts-type-forge';
 
 export const fileContentValues = async (
   file: DeepReadonly<fsType.Dirent>,

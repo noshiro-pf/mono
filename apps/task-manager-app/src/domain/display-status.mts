@@ -1,6 +1,6 @@
 import { isActionable } from './dependency.mjs';
-import { type EvaluationContext } from './evaluation-context.mjs';
-import { type DisplayStatus, type Task } from './types.mjs';
+import type { EvaluationContext } from './evaluation-context.mjs';
+import type { DisplayStatus, Task } from './types.mjs';
 
 /**
  * The status `task` is shown with at `now`: `ready` or `blocked` for a task

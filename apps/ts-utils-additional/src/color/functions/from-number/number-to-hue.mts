@@ -1,5 +1,5 @@
 import { Num } from 'ts-data-forge';
-import { type Hue } from '../../types/index.mjs';
+import type { Hue } from '../../types/index.mjs';
 
 const clamp = Num.clamp(0, 359);
 

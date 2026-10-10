@@ -1,12 +1,12 @@
 import styled from '@emotion/styled';
 import { memoNamed } from 'react-utils';
-import { type UintRange } from 'ts-type-forge';
+import type { UintRange } from 'ts-type-forge';
 import { toClassName } from '../../utils/index.mjs';
 import { SliderHandle } from './handle.js';
 import { SliderProgressStyled, SliderTrackStyled } from './progress-styled.mjs';
 import { useRangeSliderInlineStyles } from './range-slider-inline-styles-hook.mjs';
 import { useRangeSliderLabels } from './range-slider-labels-hook.mjs';
-import { type SliderHandleElementAdaptor } from './slider-handle-hook.mjs';
+import type { SliderHandleElementAdaptor } from './slider-handle-hook.mjs';
 import {
   SliderLabelMaxStyled,
   SliderLabelMinStyled,

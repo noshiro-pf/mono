@@ -1,5 +1,5 @@
 import { firestorePaths, type EventSchedule } from 'event-schedule-app-shared';
-import { type Firestore } from 'firebase-admin/firestore';
+import type { Firestore } from 'firebase-admin/firestore';
 import { fillEventScheduleWithCheck, isEmailData } from './types/index.mjs';
 
 export const getEventItem = async (

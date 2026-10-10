@@ -1,4 +1,4 @@
-import { type StrictOmit } from 'ts-type-forge';
+import type { StrictOmit } from 'ts-type-forge';
 import { createTask } from './create-task.mjs';
 import { sortTasks, type SortSpec } from './sort-tasks.mjs';
 import {

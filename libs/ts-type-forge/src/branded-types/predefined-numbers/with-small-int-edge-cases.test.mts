@@ -1,15 +1,15 @@
 import { expectType } from 'ts-data-forge';
-import { type ExtendBrand } from '../brand.mjs';
-import {
-  type NegativeNumber,
-  type NonNegativeNumber,
-  type NonZeroNumber,
+import type { ExtendBrand } from '../brand.mjs';
+import type {
+  NegativeNumber,
+  NonNegativeNumber,
+  NonZeroNumber,
 } from './core.mjs';
-import { type Int, type NegativeInt, type PositiveInt } from './int.mjs';
-import { type Int16 } from './int16.mjs';
-import { type Int32 } from './int32.mjs';
-import { type SmallInt, type WithSmallInt } from './small-int.mjs';
-import { type Uint16 } from './uint16.mjs';
+import type { Int, NegativeInt, PositiveInt } from './int.mjs';
+import type { Int16 } from './int16.mjs';
+import type { Int32 } from './int32.mjs';
+import type { SmallInt, WithSmallInt } from './small-int.mjs';
+import type { Uint16 } from './uint16.mjs';
 
 // Test edge case: union of branded types
 {

@@ -16,13 +16,13 @@ import {
 } from './constants.mjs';
 import { viewPullRequest, viewReviewDecision } from './github.mjs';
 import { isSkipCiLabelled } from './labels.mjs';
-import { type Options } from './options.mjs';
+import type { Options } from './options.mjs';
 import {
   describeFailedChecks,
   describeHold,
   describeTimeout,
 } from './set-aside-detail.mjs';
-import { type PullRequest, type Watched } from './types.mjs';
+import type { PullRequest, Watched } from './types.mjs';
 import { log, pause, stopRequested } from './util.mjs';
 
 /**

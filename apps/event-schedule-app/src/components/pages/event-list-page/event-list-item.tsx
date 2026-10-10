@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { type EventListItem } from 'event-schedule-app-shared';
+import type { EventListItem } from 'event-schedule-app-shared';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
 import { Arr, Optional } from 'ts-data-forge';

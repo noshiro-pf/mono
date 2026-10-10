@@ -5,7 +5,7 @@ import {
   type AnswerId,
   type Weight,
 } from '../named-primitive-types.mjs';
-import { type AnswerSelection } from './answer-selection.mjs';
+import type { AnswerSelection } from './answer-selection.mjs';
 import {
   ANSWER_KEY_CREATED_AT,
   answerDefaultValue,

@@ -1,4 +1,4 @@
-import { type RecordLeafPathsWithIndex } from 'ts-type-forge';
+import type { RecordLeafPathsWithIndex } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

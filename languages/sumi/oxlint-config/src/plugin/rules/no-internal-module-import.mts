@@ -1,7 +1,7 @@
 import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { createRule } from './create-rule.mjs';
 import { skipTypeWrappers } from './skip-type-wrappers.mjs';
 

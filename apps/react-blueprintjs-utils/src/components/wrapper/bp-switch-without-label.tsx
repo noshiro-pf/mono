@@ -1,6 +1,6 @@
 import { Switch } from '@blueprintjs/core';
 import { memoNamed } from 'react-utils';
-import { type StrictOmit } from 'ts-type-forge';
+import type { StrictOmit } from 'ts-type-forge';
 
 export type BpSwitchWithoutLabelProps = StrictOmit<
   SwitchPropsOriginal,

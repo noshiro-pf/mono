@@ -1,31 +1,31 @@
 import { SafeNumber } from 'ts-std-forge';
-import {
-  type Decrement,
-  type FiniteNumber,
-  type Increment,
-  type Index,
-  type Int,
-  type Min,
-  type NaNType,
-  type NegativeIndex,
-  type NonNegativeNumber,
-  type NonZeroNumber,
-  type PositiveNumber,
-  type PositiveSafeIntWithSmallInt,
-  type RelaxedExclude,
-  type SmallInt,
-  type SmallUint,
-  type UnknownBrand,
+import type {
+  Decrement,
+  FiniteNumber,
+  Increment,
+  Index,
+  Int,
+  Min,
+  NaNType,
+  NegativeIndex,
+  NonNegativeNumber,
+  NonZeroNumber,
+  PositiveNumber,
+  PositiveSafeIntWithSmallInt,
+  RelaxedExclude,
+  SmallInt,
+  SmallUint,
+  UnknownBrand,
 } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { Result } from '../functional/index.mjs';
-import { type SmallPositiveInt } from '../types.mjs';
-import {
-  type AddResult,
-  type DivIntResult,
-  type DivResult,
-  type MulResult,
-  type SubResult,
+import type { SmallPositiveInt } from '../types.mjs';
+import type {
+  AddResult,
+  DivIntResult,
+  DivResult,
+  MulResult,
+  SubResult,
 } from './num-arithmetic-types.mjs';
 
 /**

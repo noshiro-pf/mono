@@ -1,5 +1,5 @@
 import { Uint32, asUint32 } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 
 export type HistoryState = DeepReadonly<{
   index: Uint32 | -1;

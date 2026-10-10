@@ -1,8 +1,8 @@
 /* cSpell:disable */
 
 import { expectType } from 'ts-data-forge';
-import { type NonEmptyString } from 'ts-type-forge';
-import { type TypeOf } from '../../../type.mjs';
+import type { NonEmptyString } from 'ts-type-forge';
+import type { TypeOf } from '../../../type.mjs';
 import { email } from './email.mjs';
 
 // https://github.com/validatorjs/validator.js/blob/13.15.15/test/validators.test.js

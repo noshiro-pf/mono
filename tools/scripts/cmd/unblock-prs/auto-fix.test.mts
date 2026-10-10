@@ -1,4 +1,4 @@
-import { type ContextState } from 'pr-report-core';
+import type { ContextState } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
 import { planAutoFix } from './auto-fix.mjs';
 

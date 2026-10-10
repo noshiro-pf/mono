@@ -1,12 +1,12 @@
-import {
-  type TernaryErr,
-  type TernaryResult,
-  type UnknownTernaryResult,
+import type {
+  TernaryErr,
+  TernaryResult,
+  UnknownTernaryResult,
 } from '../ternary-result.mjs';
 import { isOk } from './ternary-result-is-ok.mjs';
 import { isWarn } from './ternary-result-is-warn.mjs';
 import { warn } from './ternary-result-warn.mjs';
-import { type UnwrapErr, type UnwrapOk, type UnwrapWarn } from './types.mjs';
+import type { UnwrapErr, UnwrapOk, UnwrapWarn } from './types.mjs';
 
 /**
  * Applies a function returning a `TernaryResult` to the Ok variant.

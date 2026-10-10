@@ -1,11 +1,11 @@
 import { pipe, Result } from 'ts-data-forge';
-import { type Primitive, type StrictExtract } from 'ts-type-forge';
+import type { Primitive, StrictExtract } from 'ts-type-forge';
 import {
   type ConstraintsCarrier,
   propagateConstraints,
   type WithConstraints,
 } from '../constraints/index.mjs';
-import { type Type } from '../type.mjs';
+import type { Type } from '../type.mjs';
 import {
   createPrimitiveValidationError,
   createType,

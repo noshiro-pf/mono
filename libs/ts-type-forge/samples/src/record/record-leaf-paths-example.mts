@@ -1,4 +1,4 @@
-import { type RecordLeafPaths } from 'ts-type-forge';
+import type { RecordLeafPaths } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

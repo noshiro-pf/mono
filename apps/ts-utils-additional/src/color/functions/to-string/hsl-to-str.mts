@@ -5,7 +5,7 @@
 // literals, and `tsc` gives up with TS2590. The declared return type is
 // `string`, so the literal type would buy nothing anyway.
 
-import { type Hsl, type Hsla } from '../../types/index.mjs';
+import type { Hsl, Hsla } from '../../types/index.mjs';
 
 export const hslToStr = ([h, s, l]: Hsl): string => `hsl(${h}, ${s}%, ${l}%)`;
 

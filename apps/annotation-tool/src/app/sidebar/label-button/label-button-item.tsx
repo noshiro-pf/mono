@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { type SafeUint } from 'ts-data-forge';
-import { type Percent } from 'ts-type-forge';
-import { type Hsl } from 'ts-utils-additional';
-import { type Label } from '../../../canvas/index.mjs';
-import { type AppEventHandler } from '../../../types/index.mjs';
+import type { SafeUint } from 'ts-data-forge';
+import type { Percent } from 'ts-type-forge';
+import type { Hsl } from 'ts-utils-additional';
+import type { Label } from '../../../canvas/index.mjs';
+import type { AppEventHandler } from '../../../types/index.mjs';
 import { LabelButtonItemView } from './label-button-item-view.js';
 
 type Props = Readonly<{

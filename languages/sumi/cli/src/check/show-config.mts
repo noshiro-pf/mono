@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import * as path from 'node:path';
 import { hasKey, isRecord, Result } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { nativeTscPath } from './native-tsc.mjs';
 
 /** What `tsc --showConfig` resolves a project to (the parts Sumi reads). */

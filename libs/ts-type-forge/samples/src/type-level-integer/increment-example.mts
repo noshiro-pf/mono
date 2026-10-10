@@ -1,4 +1,4 @@
-import { type Increment } from 'ts-type-forge';
+import type { Increment } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

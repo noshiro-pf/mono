@@ -1,9 +1,9 @@
 import { Optional, pipe } from 'ts-data-forge';
 import { createSyncChildObservable } from '../base/index.mjs';
-import {
-  type DropInitialValueOperator,
-  type Observable,
-  type WithCurrentValueFromOperatorObservable,
+import type {
+  DropInitialValueOperator,
+  Observable,
+  WithCurrentValueFromOperatorObservable,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
 

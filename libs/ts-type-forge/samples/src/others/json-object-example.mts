@@ -1,4 +1,4 @@
-import { type JsonObject } from 'ts-type-forge';
+import type { JsonObject } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

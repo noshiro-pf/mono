@@ -5,7 +5,7 @@
 // them, which this layer depends on. The `mut_` prefix marks the deliberate
 // mutation, as it does elsewhere in the repository.
 
-import { type Point, type Rect } from 'ts-utils-additional';
+import type { Point, Rect } from 'ts-utils-additional';
 
 export type Direction = 'nw' | 'n_' | 'ne' | 'w_' | 'e_' | 'sw' | 's_' | 'se';
 

@@ -1,4 +1,4 @@
-import { type Dirent } from 'node:fs';
+import type { Dirent } from 'node:fs';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as t from 'ts-fortress';

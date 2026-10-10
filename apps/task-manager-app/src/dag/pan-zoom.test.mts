@@ -1,4 +1,4 @@
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 import {
   fitBoundsTransform,
   fitViewTransform,

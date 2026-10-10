@@ -1,15 +1,15 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type JsonPrimitive as JsonPrimitive_,
-  type JsonValue as JsonValue_,
-  type ReadonlyRecord,
+import type {
+  JsonPrimitive as JsonPrimitive_,
+  JsonValue as JsonValue_,
+  ReadonlyRecord,
 } from 'ts-type-forge';
 import { array } from '../array/index.mjs';
 import { union } from '../compose/index.mjs';
 import { recursion } from '../other-types/index.mjs';
 import { boolean, nullType, number, string } from '../primitives/index.mjs';
 import { keyValueRecord } from '../record/index.mjs';
-import { type Type, type TypeOf } from '../type.mjs';
+import type { Type, TypeOf } from '../type.mjs';
 
 export type JsonPrimitive = JsonPrimitive_;
 

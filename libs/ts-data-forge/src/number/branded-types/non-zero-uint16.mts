@@ -1,4 +1,4 @@
-import { type NonZeroUint16 as TtfImported_NonZeroUint16 } from 'ts-type-forge';
+import type { NonZeroUint16 as TtfImported_NonZeroUint16 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';
 

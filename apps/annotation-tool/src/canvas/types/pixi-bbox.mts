@@ -5,9 +5,9 @@
 // them, which this layer depends on. The `mut_` prefix marks the deliberate
 // mutation, as it does elsewhere in the repository.
 
-import { type Graphics } from 'pixi.js-legacy';
-import { type Rect, type Rgba } from 'ts-utils-additional';
-import { type IdType } from './id-type.mjs';
+import type { Graphics } from 'pixi.js-legacy';
+import type { Rect, Rgba } from 'ts-utils-additional';
+import type { IdType } from './id-type.mjs';
 
 export type PixiBbox = {
   readonly id: IdType;

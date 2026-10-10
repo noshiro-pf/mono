@@ -1,6 +1,6 @@
 import { expectType } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
-import { type SortSpec } from '../domain/index.mjs';
+import type { DeepReadonly } from 'ts-type-forge';
+import type { SortSpec } from '../domain/index.mjs';
 import {
   DEFAULT_LIST_SETTINGS,
   listSettingsStorage,

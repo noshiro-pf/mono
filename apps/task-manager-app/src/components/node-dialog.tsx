@@ -1,7 +1,7 @@
-import {
-  type GenericEventHandler,
-  type RefCallback,
-  type SubmitEventHandler,
+import type {
+  GenericEventHandler,
+  RefCallback,
+  SubmitEventHandler,
 } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { editorSignal, editorStore } from '../store/index.mjs';

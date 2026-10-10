@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type Brand, type DeepReadonly } from 'ts-type-forge';
+import type { Brand, DeepReadonly } from 'ts-type-forge';
 import {
   asMilestoneId,
   asTaskId,

@@ -1,4 +1,4 @@
-import { type Int16 as TtfImported_Int16 } from 'ts-type-forge';
+import type { Int16 as TtfImported_Int16 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';
 

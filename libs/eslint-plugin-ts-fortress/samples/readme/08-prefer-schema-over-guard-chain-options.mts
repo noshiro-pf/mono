@@ -1,4 +1,4 @@
-import { type EslintTsFortressRules } from 'eslint-plugin-ts-fortress';
+import type { EslintTsFortressRules } from 'eslint-plugin-ts-fortress';
 
 export const rules = {
   // embed-sample-code-ignore-above

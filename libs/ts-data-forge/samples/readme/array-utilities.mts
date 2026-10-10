@@ -1,5 +1,5 @@
 import { Arr, expectType, Optional } from 'ts-data-forge';
-import { type FixedLengthTuple, type MinLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple, MinLengthTuple } from 'ts-type-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {

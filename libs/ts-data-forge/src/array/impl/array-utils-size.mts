@@ -1,7 +1,7 @@
-import {
-  type IntersectBrand,
-  type NonEmptyTuple,
-  type PositiveNumber,
+import type {
+  IntersectBrand,
+  NonEmptyTuple,
+  PositiveNumber,
 } from 'ts-type-forge';
 /**
  * Returns the size (length) of an array.
@@ -22,7 +22,7 @@ import {
  * assert.isTrue(sizeOfLetters === 0);
  * ```
  */
-import { type SizeType } from '../../types.mjs';
+import type { SizeType } from '../../types.mjs';
 
 export const size = <const Ar extends readonly unknown[]>(
   array: Ar,

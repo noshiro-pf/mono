@@ -13,7 +13,7 @@ import {
 } from 'ts-data-forge';
 import { getWorkspacePackages, glob, isDirectlyExecuted } from 'ts-repo-utils';
 import { Regex } from 'ts-std-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 import { parseWorkflowTriggers } from './check-workflow-event-name.mjs';
 

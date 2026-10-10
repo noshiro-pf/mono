@@ -11,7 +11,7 @@
 
 import { Arr, Json, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { git } from '../unblock-prs/github.mjs';
 
 /** Owner and repository, as the API paths spell them. */

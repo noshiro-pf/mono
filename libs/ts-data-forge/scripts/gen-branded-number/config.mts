@@ -1,4 +1,4 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**
  * Declarative configuration for the branded-number modules under

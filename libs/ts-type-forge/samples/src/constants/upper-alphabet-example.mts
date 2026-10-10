@@ -1,4 +1,4 @@
-import { type UpperAlphabet } from 'ts-type-forge';
+import type { UpperAlphabet } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

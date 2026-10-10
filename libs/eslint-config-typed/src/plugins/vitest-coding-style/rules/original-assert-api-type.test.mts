@@ -1,7 +1,7 @@
 import { expectType } from 'ts-data-forge';
-import { type StrictExclude } from 'ts-type-forge';
+import type { StrictExclude } from 'ts-type-forge';
 // eslint-disable-next-line vitest/no-importing-vitest-globals
-import { type assert as originalAssert } from 'vitest';
+import type { assert as originalAssert } from 'vitest';
 
 test('original assert exposes only supported APIs', () => {
   // transformer-ignore-next-line

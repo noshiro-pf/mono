@@ -1,4 +1,4 @@
-import { type Optional } from '../optional.mjs';
+import type { Optional } from '../optional.mjs';
 import { none } from './optional-none.mjs';
 import { some } from './optional-some.mjs';
 

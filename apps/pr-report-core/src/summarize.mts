@@ -1,7 +1,7 @@
 /** The counts the report leads with, in one place. */
 
 import { MERGE_QUEUED_LABEL } from './labels.mjs';
-import { type ReportEntry, type Summary } from './types.mjs';
+import type { ReportEntry, Summary } from './types.mjs';
 
 /**
  * How much there is and how much of it wants attention.

@@ -1,4 +1,4 @@
-import { type InitializedObservable } from '../core/index.mjs';
+import type { InitializedObservable } from '../core/index.mjs';
 import { createReducer, type StateOptions } from './create-reducer.mjs';
 
 type Action<S> = Readonly<

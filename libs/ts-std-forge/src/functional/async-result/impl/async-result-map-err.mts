@@ -1,5 +1,5 @@
 import { Result } from '../../result/index.mjs';
-import { type AsyncResult } from '../async-result.mjs';
+import type { AsyncResult } from '../async-result.mjs';
 
 /**
  * Maps an `AsyncResult<S, E>` to `AsyncResult<S, E2>` by applying a function

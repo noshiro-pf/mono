@@ -1,4 +1,4 @@
-import { type ESLintPlugin } from '../../../types/index.mjs';
+import type { ESLintPlugin } from '../../../types/index.mjs';
 import { banUseImperativeHandleHook } from './ban-use-imperative-handle-hook.mjs';
 import { componentNameRule } from './component-name.mjs';
 import { componentVarTypeAnnotationRule } from './component-var-type-annotation.mjs';

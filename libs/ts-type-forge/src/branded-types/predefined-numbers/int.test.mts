@@ -1,20 +1,20 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type NegativeNumber,
-  type NonNegativeNumber,
-  type NonPositiveNumber,
-  type NonZeroNumber,
-  type PositiveNumber,
+import type {
+  NegativeNumber,
+  NonNegativeNumber,
+  NonPositiveNumber,
+  NonZeroNumber,
+  PositiveNumber,
 } from './core.mjs';
-import { type FiniteNumber } from './finite-number.mjs';
-import {
-  type Int,
-  type NegativeInt,
-  type NonNegativeInt,
-  type NonPositiveInt,
-  type NonZeroInt,
-  type PositiveInt,
-  type Uint,
+import type { FiniteNumber } from './finite-number.mjs';
+import type {
+  Int,
+  NegativeInt,
+  NonNegativeInt,
+  NonPositiveInt,
+  NonZeroInt,
+  PositiveInt,
+  Uint,
 } from './int.mjs';
 
 // Test Int type

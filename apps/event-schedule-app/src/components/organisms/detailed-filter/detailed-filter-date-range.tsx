@@ -1,8 +1,8 @@
 import { BpDateRangeInput, CheckboxView } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { dict } from '../../../constants/index.mjs';
-import { type AnswerFilterState } from '../../../functions/index.mjs';
+import type { AnswerFilterState } from '../../../functions/index.mjs';
 import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
 import { CheckboxWrapper, FilterItem, FilterItemContent } from './styled.js';
 

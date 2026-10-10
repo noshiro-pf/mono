@@ -1,10 +1,10 @@
 import { Optional } from 'ts-data-forge';
 import { createAsyncChildObservable } from '../base/index.mjs';
-import {
-  type DropInitialValueOperator,
-  type Observable,
-  type Subscription,
-  type SwitchMapOperatorObservable,
+import type {
+  DropInitialValueOperator,
+  Observable,
+  Subscription,
+  SwitchMapOperatorObservable,
 } from '../types/index.mjs';
 
 /**

@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { range, Result } from 'ts-data-forge';
 import { makeEmptyDir } from 'ts-repo-utils';
-import { type ReadonlyRecord, type UintRange } from 'ts-type-forge';
+import type { ReadonlyRecord, UintRange } from 'ts-type-forge';
 import { libSourceOf, type Context, type LibSource } from '../context.mjs';
 import { formatDir } from './utils/format.mjs';
 

@@ -1,6 +1,6 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import { type TSESLint } from '@typescript-eslint/utils';
+import type { TSESLint } from '@typescript-eslint/utils';
 import dedent from 'dedent';
 import { getReactMemoArrowFunction, isReactApiCall } from './shared.mjs';
 

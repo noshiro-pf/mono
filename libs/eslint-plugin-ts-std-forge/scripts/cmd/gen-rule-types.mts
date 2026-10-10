@@ -79,11 +79,11 @@ const generateFileContent = (rules: readonly RuleInfo[]): string => {
     '// (`scripts/cmd/gen-rule-types.mts`). Do not edit it manually.',
     '',
     ...(hasAnyOptions
-      ? ["import { type TSESLint } from '@typescript-eslint/utils';"]
+      ? ["import type { TSESLint } from '@typescript-eslint/utils';"]
       : []),
-    "import { type Linter } from 'eslint';",
+    "import type { Linter } from 'eslint';",
     "import { expectType } from 'ts-std-forge';",
-    "import { type tsStdForgeRules } from './rules/index.mjs';",
+    "import type { tsStdForgeRules } from './rules/index.mjs';",
     '',
     ...(hasAnyOptions
       ? [

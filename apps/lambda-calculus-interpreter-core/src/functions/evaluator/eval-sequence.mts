@@ -1,6 +1,6 @@
 import { asSafeUint, range } from 'ts-data-forge';
 import { MAX_STEPS } from '../../constants/index.mjs';
-import { type LambdaTerm } from '../../types/index.mjs';
+import type { LambdaTerm } from '../../types/index.mjs';
 import { isLambdaTerm } from '../is-lambda-term.mjs';
 import { termEq } from '../term-eq.mjs';
 import { evaluate1step } from './eval-1-step.mjs';

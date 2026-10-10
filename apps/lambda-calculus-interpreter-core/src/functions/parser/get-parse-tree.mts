@@ -7,7 +7,7 @@ import {
   Result,
   Uint32,
 } from 'ts-data-forge';
-import { type LambdaTerm } from '../../types/index.mjs';
+import type { LambdaTerm } from '../../types/index.mjs';
 import { hasMinLength } from '../../utils/index.mjs';
 import { isVariable } from '../is-variable.mjs';
 import { tokensRepresentsLambdaTerm } from './token-list-is-lambda-term.mjs';

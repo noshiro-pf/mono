@@ -1,9 +1,9 @@
-import { type UnknownRecord } from '../constants/index.mjs';
-import {
-  type MergeIntersection,
-  type StrictExclude,
-  type StrictOmit,
-  type StrictPick,
+import type { UnknownRecord } from '../constants/index.mjs';
+import type {
+  MergeIntersection,
+  StrictExclude,
+  StrictOmit,
+  StrictPick,
 } from '../others/index.mjs';
 
 /**

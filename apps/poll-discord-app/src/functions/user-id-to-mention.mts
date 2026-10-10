@@ -1,4 +1,4 @@
-import { type UserId } from '../types/index.mjs';
+import type { UserId } from '../types/index.mjs';
 
 export const userIdToMention = (userId: UserId): string =>
   `<@!${userId}>` as const;

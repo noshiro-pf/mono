@@ -1,6 +1,6 @@
-import { type Brand } from 'ts-type-forge';
+import type { Brand } from 'ts-type-forge';
 import { string } from '../primitives/index.mjs';
-import { type Type } from '../type.mjs';
+import type { Type } from '../type.mjs';
 import { brand } from './brand.mjs';
 
 export const brandedString = <K extends string>({

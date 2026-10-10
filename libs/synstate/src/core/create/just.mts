@@ -1,6 +1,6 @@
 import { Optional } from 'ts-data-forge';
 import { createRootObservable } from '../base/index.mjs';
-import { type InitializedRootObservable } from '../types/index.mjs';
+import type { InitializedRootObservable } from '../types/index.mjs';
 
 /**
  * Creates an Observable that holds a single static value and immediately

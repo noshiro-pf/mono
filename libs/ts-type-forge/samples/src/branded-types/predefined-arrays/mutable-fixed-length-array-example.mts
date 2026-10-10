@@ -1,7 +1,4 @@
-import {
-  type FixedLengthArray,
-  type MutableFixedLengthArray,
-} from 'ts-type-forge';
+import type { FixedLengthArray, MutableFixedLengthArray } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

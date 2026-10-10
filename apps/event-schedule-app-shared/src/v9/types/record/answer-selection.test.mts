@@ -1,9 +1,6 @@
 import { expectType } from 'ts-data-forge';
 import { DatetimeRange } from 'ts-fortress-types';
-import {
-  type AnswerIconIdWithNone,
-  type AnswerIconPoint,
-} from '../enum/index.mjs';
+import type { AnswerIconIdWithNone, AnswerIconPoint } from '../enum/index.mjs';
 import { AnswerSelection } from './answer-selection.mjs';
 
 describe('AnswerSelection', () => {

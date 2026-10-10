@@ -1,5 +1,5 @@
-import { type TSESLint, type TSESTree } from '@typescript-eslint/utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import type { DeepReadonly } from 'ts-type-forge';
 import { castNode, isReactApiCall } from './shared.mjs';
 
 type MessageIds = 'disallowUseImperativeHandle';

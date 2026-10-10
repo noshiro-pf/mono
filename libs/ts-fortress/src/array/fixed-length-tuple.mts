@@ -1,9 +1,6 @@
 import { Arr, memoizeFunction, Result } from 'ts-data-forge';
-import {
-  type FixedLengthTuple,
-  type StructuralPrefixLength,
-} from 'ts-type-forge';
-import { type Type } from '../type.mjs';
+import type { FixedLengthTuple, StructuralPrefixLength } from 'ts-type-forge';
+import type { Type } from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,

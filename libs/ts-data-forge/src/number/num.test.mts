@@ -1,4 +1,4 @@
-import { type FixedLengthTuple, type NonZeroNumber } from 'ts-type-forge';
+import type { FixedLengthTuple, NonZeroNumber } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { pipe, Result } from '../functional/index.mjs';
 import { asNonZeroFiniteNumber } from './branded-types/index.mjs';

@@ -1,4 +1,4 @@
-import { type NegativeInt } from 'ts-type-forge';
+import type { NegativeInt } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

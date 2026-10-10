@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, isRecord, isString, Obj, unknownToString } from 'ts-data-forge';
 import { formatFiles, glob, isDirectlyExecuted, Result } from 'ts-repo-utils';
-import { type FixedLengthTuple, type ReadonlyRecord } from 'ts-type-forge';
+import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 
 const outputPath = path.resolve(

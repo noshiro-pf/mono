@@ -1,4 +1,4 @@
-import { type None, type Some } from '../adt-types.mjs';
+import type { None, Some } from '../adt-types.mjs';
 import { expectType } from '../expect-type.mjs';
 import { unknownToString } from '../others/index.mjs';
 import { SafeNumber } from '../safe-number/index.mjs';

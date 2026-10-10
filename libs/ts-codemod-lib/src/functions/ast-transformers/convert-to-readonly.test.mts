@@ -9,7 +9,7 @@ import * as prettier from 'prettier/standalone';
 import { expectType } from 'ts-data-forge';
 // Aliased: an import named `DeepReadonly` makes `vitest/prefer-describe-function-title`
 // rewrite `describe('DeepReadonly', ...)` into a reference to this type.
-import { type DeepReadonly as TsTypeForgeDeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly as TsTypeForgeDeepReadonly } from 'ts-type-forge';
 import {
   convertToReadonlyTransformer,
   type ReadonlyTransformerOptions,

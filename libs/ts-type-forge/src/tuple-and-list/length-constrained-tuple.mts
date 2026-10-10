@@ -1,5 +1,5 @@
-import { type Mutable } from '../others/index.mjs';
-import { type MakeTuple } from './make-tuple.mjs';
+import type { Mutable } from '../others/index.mjs';
+import type { MakeTuple } from './make-tuple.mjs';
 
 /* Length-constrained tuple types (structural) */
 

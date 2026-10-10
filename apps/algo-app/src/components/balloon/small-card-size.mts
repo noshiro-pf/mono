@@ -1,4 +1,4 @@
-import { type RectSize } from 'ts-utils-additional';
+import type { RectSize } from 'ts-utils-additional';
 
 export const smallestCardSize: RectSize = { width: 30, height: 45 } as const;
 

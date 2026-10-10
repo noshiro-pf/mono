@@ -1,4 +1,4 @@
-import { type Progress, type Task } from './types.mjs';
+import type { Progress, Task } from './types.mjs';
 
 /**
  * `task` moved to `progress` at `now`, with `startedAt` and `completedAt`

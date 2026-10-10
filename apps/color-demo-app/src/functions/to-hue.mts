@@ -1,4 +1,4 @@
-import { type Hue } from 'ts-utils-additional';
+import type { Hue } from 'ts-utils-additional';
 
 const isHue = (a: number): a is Hue =>
   Number.isSafeInteger(a) && 0 <= a && a < 360;

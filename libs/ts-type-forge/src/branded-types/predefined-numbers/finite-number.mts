@@ -1,12 +1,12 @@
-import { type IntersectBrand } from '../brand.mjs';
-import { type TSTypeForgeInternals_ExtendNumberBrand } from './_number-brand-internals.mjs';
-import {
-  type NegativeNumber,
-  type NonNegativeNumber,
-  type NonPositiveNumber,
-  type NonZeroNumber,
-  type PositiveNumber,
-  type ValidNumber,
+import type { IntersectBrand } from '../brand.mjs';
+import type { TSTypeForgeInternals_ExtendNumberBrand } from './_number-brand-internals.mjs';
+import type {
+  NegativeNumber,
+  NonNegativeNumber,
+  NonPositiveNumber,
+  NonZeroNumber,
+  PositiveNumber,
+  ValidNumber,
 } from './core.mjs';
 
 /**

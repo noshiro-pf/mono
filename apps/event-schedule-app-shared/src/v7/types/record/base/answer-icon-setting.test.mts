@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type AnswerIconPoint } from '../../enum/index.mjs';
+import type { AnswerIconPoint } from '../../enum/index.mjs';
 import {
   answerIconSettingDefaultValue,
   fillAnswerIconSetting,

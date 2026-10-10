@@ -1,4 +1,4 @@
-import { type Point } from '../../../types/index.mjs';
+import type { Point } from '../../../types/index.mjs';
 
 export const updatePointElementwise = (
   from: Point,

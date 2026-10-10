@@ -17,8 +17,8 @@
  */
 
 import { Arr } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
-import { type GraphNodeId } from '../domain/index.mjs';
+import type { DeepReadonly } from 'ts-type-forge';
+import type { GraphNodeId } from '../domain/index.mjs';
 import { dragPosition } from './dag-layout.mjs';
 import {
   panBy,

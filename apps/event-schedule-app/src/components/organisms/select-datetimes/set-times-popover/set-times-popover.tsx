@@ -2,7 +2,7 @@ import { Button, PopoverNext } from '@blueprintjs/core';
 import { useBoolState } from 'better-react-use-state';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { type DayOfWeekName, type ReadonlyRecord } from 'ts-type-forge';
+import type { DayOfWeekName, ReadonlyRecord } from 'ts-type-forge';
 import { dict } from '../../../../constants/index.mjs';
 import { SetTimesPopoverContent } from './set-times-popover-content.js';
 

@@ -1,9 +1,9 @@
 import { Optional } from 'ts-data-forge';
 import { createSyncChildObservable } from '../base/index.mjs';
-import {
-  type KeepInitialValueOperator,
-  type Observable,
-  type TakeUntilOperatorObservable,
+import type {
+  KeepInitialValueOperator,
+  Observable,
+  TakeUntilOperatorObservable,
 } from '../types/index.mjs';
 
 /**

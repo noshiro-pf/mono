@@ -1,4 +1,4 @@
-import { type GenericEventHandler } from 'preact';
+import type { GenericEventHandler } from 'preact';
 import { memoNamed } from 'preact-utils';
 import {
   animationSettingSignal,

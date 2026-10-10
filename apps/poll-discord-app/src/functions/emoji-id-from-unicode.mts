@@ -1,5 +1,5 @@
 import { emojis } from '../constants.mjs';
-import { type AnswerType } from '../types/index.mjs';
+import type { AnswerType } from '../types/index.mjs';
 
 export const emojiIdFromUnicode = (unicode: string): AnswerType | undefined => {
   switch (unicode) {

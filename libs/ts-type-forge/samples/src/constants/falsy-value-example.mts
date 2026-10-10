@@ -1,4 +1,4 @@
-import { type FalsyValue } from 'ts-type-forge';
+import type { FalsyValue } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

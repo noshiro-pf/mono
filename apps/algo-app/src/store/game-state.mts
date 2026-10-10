@@ -1,7 +1,7 @@
 import { pairwise, scan, type InitializedObservable } from 'synstate';
 import { returnFalse } from '../return-boolean.mjs';
 import { gameStateReducer, initialGameState } from '../state/index.mjs';
-import { type GameState } from '../types/index.mjs';
+import type { GameState } from '../types/index.mjs';
 import { gameStateActionMerged$ } from './action.mjs';
 
 export const gameState$: InitializedObservable<GameState> =

@@ -1,5 +1,5 @@
 import { Json, Result } from 'ts-data-forge';
-import { type LambdaTerm } from '../../types/index.mjs';
+import type { LambdaTerm } from '../../types/index.mjs';
 import { isAbstraction, isApplication } from '../is-lambda-term.mjs';
 import { isVariable } from '../is-variable.mjs';
 import { termEq } from '../term-eq.mjs';

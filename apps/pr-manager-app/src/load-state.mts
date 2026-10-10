@@ -1,7 +1,7 @@
 /** How the reading is going, and what each read makes of it. */
 
 import { Result } from 'ts-data-forge';
-import { type LoadedReport } from './load-report.mjs';
+import type { LoadedReport } from './load-report.mjs';
 
 /**
  * How the reading went: what the page says around the report rather than

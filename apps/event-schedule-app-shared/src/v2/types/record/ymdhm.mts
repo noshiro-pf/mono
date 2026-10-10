@@ -1,10 +1,10 @@
 import { DateUtils } from 'ts-fortress-types';
-import {
-  type DateEnum,
-  type HoursEnum,
-  type MinutesEnum,
-  type MonthEnum,
-  type SafeUint,
+import type {
+  DateEnum,
+  HoursEnum,
+  MinutesEnum,
+  MonthEnum,
+  SafeUint,
 } from 'ts-type-forge';
 import {
   defaultHoursMinutes,

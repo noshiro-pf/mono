@@ -1,6 +1,6 @@
 import { ISet, expectType, pipe } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { type JsonObject } from 'ts-type-forge';
+import type { JsonObject } from 'ts-type-forge';
 import { userIdType, type UserId } from './branded-types.mjs';
 
 export type AnswerOfDate = Readonly<{

@@ -1,9 +1,9 @@
-import { type Result, type UnknownResult } from '../result.mjs';
+import type { Result, UnknownResult } from '../result.mjs';
 import { err } from './result-err.mjs';
 import { isOk } from './result-is-ok.mjs';
 import { ok } from './result-ok.mjs';
 import { unwrapOk } from './result-unwrap-ok.mjs';
-import { type UnwrapErr, type UnwrapOk } from './types.mjs';
+import type { UnwrapErr, UnwrapOk } from './types.mjs';
 
 /**
  * Swaps the success and error values of a `Result`.

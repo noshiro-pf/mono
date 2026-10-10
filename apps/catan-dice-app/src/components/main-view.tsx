@@ -9,8 +9,8 @@ import {
   Paper,
 } from '@mui/material';
 import { memoNamed } from 'react-utils';
-import { type SafeUint } from 'ts-data-forge';
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { SafeUint } from 'ts-data-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 import { DiceIcon, SumIcon } from '../assets/index.mjs';
 import { DiceNumber } from './dicer-number.js';
 import { Histogram } from './histogram/index.mjs';

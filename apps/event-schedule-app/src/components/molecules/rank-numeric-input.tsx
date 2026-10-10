@@ -7,7 +7,7 @@ import {
   answerRankNumericInputConfig,
   clampAndRoundAnswerRank,
 } from '../../constants/index.mjs';
-import { type AnswerRank } from '../../types/index.mjs';
+import type { AnswerRank } from '../../types/index.mjs';
 
 type Props = Readonly<{
   value: AnswerRank;

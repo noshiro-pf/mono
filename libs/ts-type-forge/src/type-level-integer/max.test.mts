@@ -1,6 +1,6 @@
 import { expectType } from 'ts-data-forge';
-import { type Index } from './index-type.mjs';
-import { type Max } from './max.mjs';
+import type { Index } from './index-type.mjs';
+import type { Max } from './max.mjs';
 
 expectType<Max<0 | 1 | 2>, 2>('=');
 

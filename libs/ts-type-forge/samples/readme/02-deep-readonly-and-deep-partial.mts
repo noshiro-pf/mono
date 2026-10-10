@@ -1,4 +1,4 @@
-import { type DeepPartial, type DeepReadonly } from 'ts-type-forge';
+import type { DeepPartial, DeepReadonly } from 'ts-type-forge';
 // embed-sample-code-ignore-above
 
 type Config = {

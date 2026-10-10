@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { asUint32, type SizeType } from 'ts-data-forge';
-import {
-  type DayOfWeekName,
-  type DeepReadonly,
-  type ReadonlyRecord,
+import type {
+  DayOfWeekName,
+  DeepReadonly,
+  ReadonlyRecord,
 } from 'ts-type-forge';
 import { yearMonthDateInitialValue } from '../../constants/index.mjs';
 import {

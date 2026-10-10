@@ -18,7 +18,7 @@ import { SKIP_CI_LABEL } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { addSkipCiLabel, listPullRequests } from './github.mjs';
 import { isMergeQueued, isSkipCiLabelled, priorityRank } from './labels.mjs';
-import { type PullRequest } from './types.mjs';
+import type { PullRequest } from './types.mjs';
 import { log } from './util.mjs';
 import { isVersionPullRequest } from './version-pr.mjs';
 

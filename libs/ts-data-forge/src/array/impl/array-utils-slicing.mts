@@ -1,13 +1,13 @@
-import {
-  type ConstrainedList,
-  type HasLengthConstraint,
-  type List,
-  type NonEmptyArray,
-  type NonEmptyTuple,
-  type StructuralPrefixLength,
+import type {
+  ConstrainedList,
+  HasLengthConstraint,
+  List,
+  NonEmptyArray,
+  NonEmptyTuple,
+  StructuralPrefixLength,
 } from 'ts-type-forge';
 import { Uint32 } from '../../number/index.mjs';
-import { type SizeType } from '../../types.mjs';
+import type { SizeType } from '../../types.mjs';
 import { isEmpty } from './array-utils-length-bounded-array-guard.mjs';
 import { size } from './array-utils-size.mjs';
 import { sliceClamped } from './array-utils-slice-clamped.mjs';

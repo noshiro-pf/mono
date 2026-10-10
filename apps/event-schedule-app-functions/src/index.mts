@@ -2,7 +2,7 @@ import { firestorePaths } from 'event-schedule-app-shared';
 import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { https, logger, region } from 'firebase-functions/v1';
-import { type MinutesEnum } from 'ts-type-forge';
+import type { MinutesEnum } from 'ts-type-forge';
 import { runtimeConfig } from './env.mjs';
 import { fetchEventListOfUserImpl } from './fetch-event-list-of-user.mjs';
 import {

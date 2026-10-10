@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable vitest/expect-expect */
 import { expectType } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 /* embed-sample-code-ignore-this-line */ // transformer-ignore-next-line append-as-const

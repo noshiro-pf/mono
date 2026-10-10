@@ -1,6 +1,6 @@
 // Example: src/string/str.mts (Str.isMinLengthString)
 import { Str } from 'ts-data-forge';
-import { type NonEmptyString } from 'ts-type-forge';
+import type { NonEmptyString } from 'ts-type-forge';
 
 if (import.meta.vitest !== undefined) {
   test('main', () => {

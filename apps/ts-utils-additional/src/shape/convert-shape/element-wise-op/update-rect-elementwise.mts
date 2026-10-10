@@ -1,4 +1,4 @@
-import { type Rect } from '../../../types/index.mjs';
+import type { Rect } from '../../../types/index.mjs';
 
 export const updateRectElementwise = (
   from: Rect,

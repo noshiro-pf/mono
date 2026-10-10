@@ -2,7 +2,7 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { type NonNegativeFiniteNumber } from 'ts-data-forge';
+import type { NonNegativeFiniteNumber } from 'ts-data-forge';
 import { hslToStr, type Hsl } from 'ts-utils-additional';
 
 type Props = Readonly<{

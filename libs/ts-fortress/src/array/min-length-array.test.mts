@@ -1,7 +1,7 @@
 import { expectType, Result } from 'ts-data-forge';
-import { type MinLengthArray } from 'ts-type-forge';
+import type { MinLengthArray } from 'ts-type-forge';
 import { number } from '../primitives/index.mjs';
-import { type TypeOf } from '../type.mjs';
+import type { TypeOf } from '../type.mjs';
 import { minLengthArray } from './min-length-array.mjs';
 
 describe(minLengthArray, () => {

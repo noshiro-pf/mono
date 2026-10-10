@@ -2,7 +2,7 @@
 import 'dotenv/config';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { type UpdateRepositoryRequest } from 'octokit-safe-types';
+import type { UpdateRepositoryRequest } from 'octokit-safe-types';
 import { Obj } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import {
@@ -10,7 +10,7 @@ import {
   isDirectlyExecuted,
   Result,
 } from 'ts-repo-utils';
-import { type StrictPick } from 'ts-type-forge';
+import type { StrictPick } from 'ts-type-forge';
 import { repositorySettingsDir, settingsJsonName } from '../constants.mjs';
 import { getRepositorySettings, updateRepository } from './api/index.mjs';
 import {

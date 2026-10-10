@@ -1,4 +1,4 @@
-import { type ValueOf } from 'ts-type-forge';
+import type { ValueOf } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

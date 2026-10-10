@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type TypeEq } from './eq.mjs';
+import type { TypeEq } from './eq.mjs';
 
 // Basic types
 expectType<TypeEq<number, string>, false>('=');

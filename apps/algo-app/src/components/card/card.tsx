@@ -2,12 +2,12 @@ import { styled } from 'goober';
 import { createElement } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useEffect, useRef } from 'preact/hooks';
-import { type Rect, type RectSize } from 'ts-utils-additional';
+import type { Rect, RectSize } from 'ts-utils-additional';
 import { outlineColorDef, type CustomColor } from '../../constants/index.mjs';
-import {
-  type CardColor,
-  type CardNumber,
-  type VisibilityFromMe,
+import type {
+  CardColor,
+  CardNumber,
+  VisibilityFromMe,
 } from '../../types/index.mjs';
 import {
   Card0,

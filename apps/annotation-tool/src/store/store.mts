@@ -4,10 +4,10 @@ import {
   createReducer,
   createState,
 } from 'synstate-react-hooks';
-import { type IdType, type Label } from '../canvas/index.mjs';
+import type { IdType, Label } from '../canvas/index.mjs';
 import { labelInit, labels } from '../constants/index.mjs';
 import { visibleLabelsReducer } from '../functions/index.mjs';
-import { type AppEventHandler } from '../types/index.mjs';
+import type { AppEventHandler } from '../types/index.mjs';
 
 // The state creators return tuples now, not objects.
 const [useSideBarIsHidden, { setTrue: hideSideBar, setFalse: showSideBar }] =

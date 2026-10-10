@@ -1,5 +1,5 @@
 import { Arr } from 'ts-data-forge';
-import { type BrandedNumberConfig } from './config.mjs';
+import type { BrandedNumberConfig } from './config.mjs';
 import { methodProse, type MethodProse } from './prose.mjs';
 
 /** Renders a complete branded-number module from its config. */
@@ -44,11 +44,11 @@ const resolveProse = (
 
 const renderImports = (config: BrandedNumberConfig): string =>
   [
-    `import { type ${config.ttfType} as TtfImported_${config.ttfType} } from 'ts-type-forge';`,
+    `import type { ${config.ttfType} as TtfImported_${config.ttfType} } from 'ts-type-forge';`,
     // Emitted as separate statements; `prettier-plugin-organize-imports` merges
     // and sorts them into the single `ts-type-forge` import.
     ...(config.extraTtfTypes ?? []).map(
-      (t) => `import { type ${t} } from 'ts-type-forge';`,
+      (t) => `import type { ${t} } from 'ts-type-forge';`,
     ),
     ...(config.extraImports ?? []),
     ...(config.numberClassParams !== undefined
@@ -199,11 +199,11 @@ const renderEnumImports = (
   enumSpec: EnumSpec,
 ): string =>
   [
-    `import { type ${config.ttfType} as TtfImported_${config.ttfType} } from 'ts-type-forge';`,
-    `import { type ${enumSpec.wideBase} } from 'ts-type-forge';`,
-    "import { type StrictExclude } from 'ts-type-forge';",
+    `import type { ${config.ttfType} as TtfImported_${config.ttfType} } from 'ts-type-forge';`,
+    `import type { ${enumSpec.wideBase} } from 'ts-type-forge';`,
+    "import type { StrictExclude } from 'ts-type-forge';",
     ...(enumSpec.hasAbs
-      ? ["import { type AbsoluteValue } from 'ts-type-forge';"]
+      ? ["import type { AbsoluteValue } from 'ts-type-forge';"]
       : []),
     "import { expectType } from '../../expect-type.mjs';",
     "import { TsDataForgeInternals } from '../refined-number-utils.mjs';",

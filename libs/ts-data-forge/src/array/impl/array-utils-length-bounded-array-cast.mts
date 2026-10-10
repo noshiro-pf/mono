@@ -1,10 +1,10 @@
-import {
-  type BoundedLengthArray,
-  type FixedLengthArray,
-  type MaxLengthArray,
-  type MinLengthArray,
-  type NonEmptyArray,
-  type SupportedLength,
+import type {
+  BoundedLengthArray,
+  FixedLengthArray,
+  MaxLengthArray,
+  MinLengthArray,
+  NonEmptyArray,
+  SupportedLength,
 } from 'ts-type-forge';
 import {
   isBoundedLengthArray,

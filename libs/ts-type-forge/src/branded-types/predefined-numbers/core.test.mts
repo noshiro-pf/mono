@@ -1,12 +1,12 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type NaNType,
-  type NegativeNumber,
-  type NonNegativeNumber,
-  type NonPositiveNumber,
-  type NonZeroNumber,
-  type PositiveNumber,
-  type ValidNumber,
+import type {
+  NaNType,
+  NegativeNumber,
+  NonNegativeNumber,
+  NonPositiveNumber,
+  NonZeroNumber,
+  PositiveNumber,
+  ValidNumber,
 } from './core.mjs';
 
 // Test NaNType

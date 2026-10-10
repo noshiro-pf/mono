@@ -1,4 +1,4 @@
-import { type TypeExtends } from './extends.mjs';
+import type { TypeExtends } from './extends.mjs';
 
 /**
  * Checks if a given type `T` is exactly the `never` type.

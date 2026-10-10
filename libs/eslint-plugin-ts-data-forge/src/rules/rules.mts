@@ -1,4 +1,4 @@
-import { type ESLintPlugin } from '../types.mjs';
+import type { ESLintPlugin } from '../types.mjs';
 import { noSideEffectImport } from './no-side-effect-import.mjs';
 import { noUnnecessaryTypeGuard } from './no-unnecessary-type-guard.mjs';
 import { preferArrIsArray } from './prefer-arr-is-array.mjs';

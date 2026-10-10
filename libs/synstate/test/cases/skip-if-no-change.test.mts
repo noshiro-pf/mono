@@ -1,4 +1,4 @@
-import { type FixedLengthTuple, type SafeUint } from 'ts-type-forge';
+import type { FixedLengthTuple, SafeUint } from 'ts-type-forge';
 import {
   counter,
   map,
@@ -9,7 +9,7 @@ import {
 } from '../../src/index.mjs';
 import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { testStream } from '../test-stream.mjs';
-import { type StreamTestCase } from '../typedef.mjs';
+import type { StreamTestCase } from '../typedef.mjs';
 
 /*
   counter         0   1   2   3   4   5   6

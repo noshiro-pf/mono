@@ -1,4 +1,4 @@
-import { type ExecException } from 'node:child_process';
+import type { ExecException } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as prettier from 'prettier';

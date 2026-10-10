@@ -1,4 +1,4 @@
-import { type ESLintPlugin } from '../../../types/index.mjs';
+import type { ESLintPlugin } from '../../../types/index.mjs';
 import { importStarRule } from './import-star.mjs';
 
 export const treeShakableRules = {

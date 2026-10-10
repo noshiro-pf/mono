@@ -1,6 +1,6 @@
 import { memoNamed } from 'preact-utils';
 import { Arr } from 'ts-data-forge';
-import { type Entry } from '../load-report.mjs';
+import type { Entry } from '../load-report.mjs';
 import { AutoMergeBadge } from './auto-merge-badge.js';
 import { ClaudeSessions } from './claude-sessions.js';
 import { CommitDivergence } from './commit-divergence.js';

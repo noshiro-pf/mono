@@ -1,5 +1,5 @@
 import { Arr, Optional, Result } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { doraHyouji2Dora } from '../constants/index.mjs';
 import { aka2Normal, hand2String, toTiles34 } from '../functions/index.mjs';
 import {
@@ -8,7 +8,7 @@ import {
   numRemainingTiles$,
   turn$,
 } from '../store/index.mjs';
-import { type NumTiles, type TileName, type Turn } from '../types/index.mjs';
+import type { NumTiles, TileName, Turn } from '../types/index.mjs';
 import { downloadFile } from '../utils/index.mjs';
 
 export const toHMRFormatText = ({

@@ -1,13 +1,13 @@
 /* cSpell:disable */
 
 import { expectType, Result } from 'ts-data-forge';
-import {
-  type BoundedLengthString,
-  type MaxLengthString,
-  type MinLengthString,
-  type NonEmptyString,
+import type {
+  BoundedLengthString,
+  MaxLengthString,
+  MinLengthString,
+  NonEmptyString,
 } from 'ts-type-forge';
-import { type Type, type TypeOf } from '../type.mjs';
+import type { Type, TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { string } from './string.mjs';
 

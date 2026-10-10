@@ -1,4 +1,4 @@
-import { type ChecksSummary } from 'pr-report-core';
+import type { ChecksSummary } from 'pr-report-core';
 import { memoNamed } from 'preact-utils';
 import {
   describeCheckBreakdown,

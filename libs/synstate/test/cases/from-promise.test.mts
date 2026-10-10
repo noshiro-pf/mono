@@ -2,7 +2,7 @@ import { Result } from 'ts-data-forge';
 import { fromPromise, type Observable } from '../../src/index.mjs';
 import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { testStream } from '../test-stream.mjs';
-import { type StreamTestCase } from '../typedef.mjs';
+import type { StreamTestCase } from '../typedef.mjs';
 
 const valueToEmit = 1;
 

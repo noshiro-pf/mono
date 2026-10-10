@@ -1,12 +1,12 @@
-import {
-  type DeepReadonly,
-  type FixedLengthTuple,
-  type MutableFixedLengthTuple,
-  type Primitive,
+import type {
+  DeepReadonly,
+  FixedLengthTuple,
+  MutableFixedLengthTuple,
+  Primitive,
 } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { isString } from '../guard/index.mjs';
-import { type MapSetKeyType } from '../types.mjs';
+import type { MapSetKeyType } from '../types.mjs';
 import { ISet } from './iset.mjs';
 
 describe('ISet.create', () => {

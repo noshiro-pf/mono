@@ -1,5 +1,5 @@
 import { Num, asPositiveFiniteNumber, type SafeUint } from 'ts-data-forge';
-import { type PercentFloat } from '../../types/index.mjs';
+import type { PercentFloat } from '../../types/index.mjs';
 
 /**
  * 元利均等返済における月々の支払い額を求める計算式．

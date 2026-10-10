@@ -1,6 +1,6 @@
 import { Optional, type UnknownOptional } from 'ts-data-forge';
 import { map } from '../../operators/index.mjs';
-import { type KeepInitialValueOperator } from '../../types/index.mjs';
+import type { KeepInitialValueOperator } from '../../types/index.mjs';
 
 /**
  * Transforms the inner value of an `Optional` type emitted by the source.

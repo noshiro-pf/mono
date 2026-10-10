@@ -1,6 +1,6 @@
 import { expectType } from 'ts-data-forge';
 import { AnswerId, Weight } from '../named-primitive-types.mjs';
-import { type AnswerSelection } from './answer-selection.mjs';
+import type { AnswerSelection } from './answer-selection.mjs';
 import { ANSWER_KEY_CREATED_AT, Answer } from './answer.mjs';
 import { User } from './base/index.mjs';
 

@@ -1,5 +1,5 @@
 import { Arr } from 'ts-data-forge';
-import { type IndexOfTuple, type UnknownRecord } from 'ts-type-forge';
+import type { IndexOfTuple, UnknownRecord } from 'ts-type-forge';
 import { union } from '../compose/index.mjs';
 import {
   attachConstraints,

@@ -1,4 +1,4 @@
-import { type BoolAnd } from 'ts-type-forge';
+import type { BoolAnd } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

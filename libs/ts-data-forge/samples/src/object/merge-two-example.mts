@@ -2,11 +2,7 @@
 /* eslint-disable vitest/expect-expect */
 // Example: src/object/object.mts (MergeTwo)
 import { expectType } from 'ts-data-forge';
-import {
-  type RelaxedExclude,
-  type StrictPick,
-  type UnknownRecord,
-} from 'ts-type-forge';
+import type { RelaxedExclude, StrictPick, UnknownRecord } from 'ts-type-forge';
 
 // Local duplicate of the internal (non-exported) `Obj.MergeTwo` type, kept here
 // only so this sample compiles. It is declared above the embed markers, so it

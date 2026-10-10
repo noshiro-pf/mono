@@ -1,5 +1,5 @@
 import { map } from '../../operators/index.mjs';
-import { type KeepInitialValueOperator } from '../../types/index.mjs';
+import type { KeepInitialValueOperator } from '../../types/index.mjs';
 
 /**
  * Maps all emitted values to a constant value, ignoring the source values.

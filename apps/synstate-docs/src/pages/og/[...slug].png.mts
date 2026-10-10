@@ -1,4 +1,4 @@
-import { type APIRoute, type GetStaticPaths } from 'astro';
+import type { APIRoute, GetStaticPaths } from 'astro';
 // @ts-expect-error -- astro:content is a virtual module available only at Astro build time
 import { getCollection } from 'astro:content';
 import { generateOgImage } from '../../lib/index.mjs';

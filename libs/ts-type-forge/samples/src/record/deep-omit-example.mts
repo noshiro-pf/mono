@@ -1,4 +1,4 @@
-import { type DeepOmit } from 'ts-type-forge';
+import type { DeepOmit } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

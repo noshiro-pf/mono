@@ -1,4 +1,4 @@
-import { type UnknownResult } from 'ts-data-forge';
+import type { UnknownResult } from 'ts-data-forge';
 
 export const wrapStartEnd = async (
   fn: () => Promise<UnknownResult>,

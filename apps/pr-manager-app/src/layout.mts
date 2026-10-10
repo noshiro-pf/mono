@@ -26,7 +26,7 @@
  */
 
 import { Arr, Num, Obj, Result } from 'ts-data-forge';
-import { type ReadonlyRecord, type StrictPick } from 'ts-type-forge';
+import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import { currentSearch, rewriteSearch } from './url.mjs';
 
 /** Said here rather than on each member, which `fix:codemod:full` drops (#2042). */

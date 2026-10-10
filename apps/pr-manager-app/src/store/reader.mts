@@ -16,23 +16,19 @@ import {
   type Observable as SynstateObservable,
 } from 'synstate';
 import { fastDeepEqual, Result, unknownToString } from 'ts-data-forge';
-import { type StrictPick } from 'ts-type-forge';
+import type { StrictPick } from 'ts-type-forge';
 import { CLOCK_TICK_MS, POLL_INTERVAL_MS } from '../constants.mjs';
-import { type Answered } from '../graphql.mjs';
-import {
-  type Entry,
-  type LoadedReport,
-  type PageSummary,
-} from '../load-report.mjs';
+import type { Answered } from '../graphql.mjs';
+import type { Entry, LoadedReport, PageSummary } from '../load-report.mjs';
 import {
   asRefreshing,
   LOADING,
   settle,
   type LoadStatus,
 } from '../load-state.mjs';
-import { type RateLimit } from '../rate-limit.mjs';
+import type { RateLimit } from '../rate-limit.mjs';
 import { sameItemsIfEqual } from '../share.mjs';
-import { type StoredToken } from '../token.mjs';
+import type { StoredToken } from '../token.mjs';
 
 export type ReaderDeps = Readonly<{
   token: InitializedObservable<StoredToken | undefined>;

@@ -1,4 +1,4 @@
-import { type RelaxedExclude } from 'ts-type-forge';
+import type { RelaxedExclude } from 'ts-type-forge';
 
 export const toCapitalCase = (str: string): string =>
   str

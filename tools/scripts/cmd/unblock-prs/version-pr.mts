@@ -23,11 +23,7 @@
 import { BLOCKS_RELEASE_LABEL } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { git } from './github.mjs';
-import {
-  type Classification,
-  type PullRequest,
-  type TriageContext,
-} from './types.mjs';
+import type { Classification, PullRequest, TriageContext } from './types.mjs';
 import { lastLines, sh } from './util.mjs';
 
 /** The branch `changesets/action` opens the version pull request from. */

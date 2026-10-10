@@ -5,7 +5,7 @@ import {
   pointerUp,
   type Gesture,
 } from './gesture.mjs';
-import { type ViewTransform } from './pan-zoom.mjs';
+import type { ViewTransform } from './pan-zoom.mjs';
 
 const identity: ViewTransform = { x: 0, y: 0, scale: 1 } as const;
 

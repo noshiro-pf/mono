@@ -1,7 +1,7 @@
 import { match, pipe } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
-import { type Rect, type RectSize } from 'ts-utils-additional';
-import { type NWES } from '../../types/index.mjs';
+import type { ReadonlyRecord } from 'ts-type-forge';
+import type { Rect, RectSize } from 'ts-utils-additional';
+import type { NWES } from '../../types/index.mjs';
 
 export const calcBalloonPosition = ({
   anchorCardRect,

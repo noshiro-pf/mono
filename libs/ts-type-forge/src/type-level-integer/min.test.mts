@@ -1,6 +1,6 @@
 import { expectType } from 'ts-data-forge';
-import { type Index } from './index-type.mjs';
-import { type Min } from './min.mjs';
+import type { Index } from './index-type.mjs';
+import type { Min } from './min.mjs';
 
 expectType<Min<0 | 1 | 2>, 0>('=');
 

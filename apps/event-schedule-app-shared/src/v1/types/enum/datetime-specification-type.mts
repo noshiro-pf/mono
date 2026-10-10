@@ -1,4 +1,4 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 export type DatetimeSpecificationEnumType =
   | 'noStartEndSpecified'

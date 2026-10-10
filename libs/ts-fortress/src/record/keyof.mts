@@ -1,9 +1,9 @@
 import { Arr, expectType, pipe } from 'ts-data-forge';
-import {
-  type IsNever,
-  type ReadonlyRecord,
-  type ToString,
-  type UnknownRecord,
+import type {
+  IsNever,
+  ReadonlyRecord,
+  ToString,
+  UnknownRecord,
 } from 'ts-type-forge';
 import { enumType } from '../enum/index.mjs';
 import { undefinedType } from '../primitives/index.mjs';

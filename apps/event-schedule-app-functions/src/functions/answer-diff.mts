@@ -1,8 +1,8 @@
-import {
-  type Answer,
-  type AnswerIconIdWithNone,
-  type AnswerIconPoint,
-  type DatetimeSpecificationEnumType,
+import type {
+  Answer,
+  AnswerIconIdWithNone,
+  AnswerIconPoint,
+  DatetimeSpecificationEnumType,
 } from 'event-schedule-app-shared';
 import { Arr, IMapMapped, ISetMapped, Optional, tp } from 'ts-data-forge';
 import { compareDatetimeRange, type DatetimeRange } from 'ts-fortress-types';

@@ -9,7 +9,7 @@ import {
   type Type,
 } from 'typescript-native/unstable/sync';
 import { unwrap } from '../ast/index.mjs';
-import { type Rule } from '../engine/index.mjs';
+import type { Rule } from '../engine/index.mjs';
 
 /**
  * `boolean/strict-logical-assignment-operands` — both operands of `&&=` and

@@ -1,5 +1,5 @@
 import { PositiveFiniteNumber, asPositiveFiniteNumber } from 'ts-data-forge';
-import { type Hsl, type Rgb } from '../../types/index.mjs';
+import type { Hsl, Rgb } from '../../types/index.mjs';
 import { hslToRgb } from '../rgb-hsl-conversion/index.mjs';
 import { relativeLuminance } from './relative-luminance.mjs';
 

@@ -1,13 +1,13 @@
-import {
-  type BoundedLengthArray,
-  type FixedLengthArray,
-  type FixedLengthTuple,
-  type MinLengthArray,
-  type NonEmptyArray,
+import type {
+  BoundedLengthArray,
+  FixedLengthArray,
+  FixedLengthTuple,
+  MinLengthArray,
+  NonEmptyArray,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { asUint32 } from '../../number/index.mjs';
-import { type SizeType } from '../../types.mjs';
+import type { SizeType } from '../../types.mjs';
 import {
   asBoundedLengthArray,
   asFixedLengthArray,

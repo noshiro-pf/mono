@@ -1,5 +1,5 @@
 import { map } from '../../operators/index.mjs';
-import { type KeepInitialValueOperator } from '../../types/index.mjs';
+import type { KeepInitialValueOperator } from '../../types/index.mjs';
 
 /**
  * Extracts a property value from each emitted object by key.

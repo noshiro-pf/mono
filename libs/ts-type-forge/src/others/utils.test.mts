@@ -1,10 +1,10 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type Intersection,
-  type Length,
-  type MergeIntersection,
-  type ToNumber,
-  type UnionToIntersection,
+import type {
+  Intersection,
+  Length,
+  MergeIntersection,
+  ToNumber,
+  UnionToIntersection,
 } from './utils.mjs';
 
 expectType<ToNumber<'1000'>, 1000>('=');

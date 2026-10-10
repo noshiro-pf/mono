@@ -1,7 +1,7 @@
-import {
-  type JsonValue,
-  type UintRangeInclusive,
-  type UnknownRecord,
+import type {
+  JsonValue,
+  UintRangeInclusive,
+  UnknownRecord,
 } from 'ts-type-forge';
 import { Arr } from '../array/index.mjs';
 import { pipe, Result } from '../functional/index.mjs';

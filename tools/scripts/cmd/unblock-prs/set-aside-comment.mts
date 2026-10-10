@@ -11,7 +11,7 @@ import {
   type SetAside,
 } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
-import { type SkipRecord } from './types.mjs';
+import type { SkipRecord } from './types.mjs';
 import { lastLines } from './util.mjs';
 
 /**

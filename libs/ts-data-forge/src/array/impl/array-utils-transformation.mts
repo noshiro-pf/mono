@@ -1,29 +1,25 @@
-import {
-  type BoundedLengthArray,
-  type ChangeArrayElement,
-  type ConstrainedList,
-  type FixedLengthTuple,
-  type HasLengthConstraint,
-  type IsFixedLengthList,
-  type NonEmptyArray,
-  type NonEmptyTuple,
-  type PositiveInt,
-  type PositiveUint32,
-  type Primitive,
-  type SafeUintWithSmallInt,
-  type SupportedLength,
-  type UnknownBrand,
-  type WithSmallInt,
+import type {
+  BoundedLengthArray,
+  ChangeArrayElement,
+  ConstrainedList,
+  FixedLengthTuple,
+  HasLengthConstraint,
+  IsFixedLengthList,
+  NonEmptyArray,
+  NonEmptyTuple,
+  PositiveInt,
+  PositiveUint32,
+  Primitive,
+  SafeUintWithSmallInt,
+  SupportedLength,
+  UnknownBrand,
+  WithSmallInt,
 } from 'ts-type-forge';
 import { IMap } from '../../collections/index.mjs';
 import { expectType } from '../../expect-type.mjs';
 import { asPositiveUint32, asUint32, Uint32 } from '../../number/index.mjs';
 import { castMutable, tp } from '../../others/index.mjs';
-import {
-  type ArrayIndex,
-  type MapSetKeyType,
-  type SizeType,
-} from '../../types.mjs';
+import type { ArrayIndex, MapSetKeyType, SizeType } from '../../types.mjs';
 import { newArray, seq } from './array-utils-creation.mjs';
 import { isNonEmpty } from './array-utils-length-bounded-array-guard.mjs';
 import { size } from './array-utils-size.mjs';

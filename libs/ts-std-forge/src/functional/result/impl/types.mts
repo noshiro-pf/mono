@@ -1,5 +1,5 @@
-import { type Err, type Ok } from '../../../adt-types.mjs';
-import { type UnknownResult } from '../result.mjs';
+import type { Err, Ok } from '../../../adt-types.mjs';
+import type { UnknownResult } from '../result.mjs';
 
 /**
  * Extracts the success value type `S` from a `Result.Ok<S>`. If the `Result`

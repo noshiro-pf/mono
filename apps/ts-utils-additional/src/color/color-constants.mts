@@ -1,6 +1,6 @@
 import { Arr } from 'ts-data-forge';
 import { toHue } from './to-hue.mjs';
-import { type Hsl, type Hue } from './types/index.mjs';
+import type { Hsl, Hue } from './types/index.mjs';
 
 export const whiteHsl: Hsl = [0, 0, 100] as const;
 

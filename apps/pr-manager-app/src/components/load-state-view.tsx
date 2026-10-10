@@ -1,5 +1,5 @@
 import { memoNamed } from 'preact-utils';
-import { type LoadStatus } from '../load-state.mjs';
+import type { LoadStatus } from '../load-state.mjs';
 import { Notice } from './notice.js';
 import { ReportView } from './report-view.js';
 

@@ -1,18 +1,18 @@
 import { Arr, Optional, createQueue, expectType } from 'ts-data-forge';
-import { type NonEmptyTuple, type Tuple } from 'ts-type-forge';
+import type { NonEmptyTuple, Tuple } from 'ts-type-forge';
 import { createSyncChildObservable } from '../base/index.mjs';
 import { source } from '../create/index.mjs';
 import { withInitialValue } from '../operators/index.mjs';
-import {
-  type InitializedObservable,
-  type InitializedSyncChildObservable,
-  type NonEmptyUnknownList,
-  type Observable,
-  type SyncChildObservable,
-  type TupleToQueueTuple,
-  type Wrap,
-  type ZipObservable,
-  type ZipObservableRefined,
+import type {
+  InitializedObservable,
+  InitializedSyncChildObservable,
+  NonEmptyUnknownList,
+  Observable,
+  SyncChildObservable,
+  TupleToQueueTuple,
+  Wrap,
+  ZipObservable,
+  ZipObservableRefined,
 } from '../types/index.mjs';
 
 /**

@@ -42,9 +42,9 @@ import {
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { type StrictPick } from 'ts-type-forge';
+import type { StrictPick } from 'ts-type-forge';
 import { parseClaudeSessions, type ClaudeSession } from './claude-session.mjs';
-import { type ReportSource } from './constants.mjs';
+import type { ReportSource } from './constants.mjs';
 import {
   askGraphql,
   type Answered,
@@ -52,7 +52,7 @@ import {
   type GraphqlAnswer,
   type GraphqlError,
 } from './graphql.mjs';
-import { type RateLimit } from './rate-limit.mjs';
+import type { RateLimit } from './rate-limit.mjs';
 import {
   CompareFieldSchema,
   ContextsFieldSchema,

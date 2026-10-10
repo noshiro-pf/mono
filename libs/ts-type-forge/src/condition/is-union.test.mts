@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type IsUnion } from './is-union.mjs';
+import type { IsUnion } from './is-union.mjs';
 
 expectType<IsUnion<never>, false>('=');
 

@@ -1,9 +1,9 @@
-import {
-  type BoundedLengthString,
-  type FixedLengthString,
-  type MaxLengthString,
-  type MinLengthString,
-  type NonEmptyString,
+import type {
+  BoundedLengthString,
+  FixedLengthString,
+  MaxLengthString,
+  MinLengthString,
+  NonEmptyString,
 } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { Str } from './str.mjs';

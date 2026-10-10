@@ -1,9 +1,9 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type FixedLengthString,
-  type MinLengthString,
+import type {
+  FixedLengthString,
+  MinLengthString,
 } from './length-constrained-string.mjs';
-import { type NonEmptyString } from './non-empty-string.mjs';
+import type { NonEmptyString } from './non-empty-string.mjs';
 
 // NonEmptyString is an alias of MinLengthString<1>
 

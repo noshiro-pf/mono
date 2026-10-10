@@ -4,7 +4,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import type * as ts from 'typescript';
 import { isTypeWrapper, skipTypeWrappers } from '../../ast-utils/index.mjs';
 import {

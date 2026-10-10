@@ -1,5 +1,5 @@
 import { Optional, type UnknownOptional } from '../../optional/index.mjs';
-import { type Result } from '../result.mjs';
+import type { Result } from '../result.mjs';
 import { err } from './result-err.mjs';
 import { ok } from './result-ok.mjs';
 

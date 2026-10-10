@@ -17,7 +17,7 @@ import { Arr, isRecord, Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { $ } from 'ts-repo-utils';
 import { projectRootPath } from '../../project-root-path.mjs';
-import { type ReviewState } from './review.mjs';
+import type { ReviewState } from './review.mjs';
 import {
   PullRequestListSchema,
   PullRequestSchema,

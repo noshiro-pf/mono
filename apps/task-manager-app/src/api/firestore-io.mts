@@ -26,7 +26,7 @@ import {
   type Firestore,
 } from 'firebase/firestore';
 import type * as t from 'ts-fortress';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 
 /** Creates or replaces the document `target` with `value`, pruned. */
 export const putDoc = <A extends DocumentData>(

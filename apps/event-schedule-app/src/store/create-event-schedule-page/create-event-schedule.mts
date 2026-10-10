@@ -24,7 +24,7 @@ import {
   createToaster,
   showToast,
 } from '../../functions/index.mjs';
-import { type EventScheduleSettingCommonState } from '../../types/index.mjs';
+import type { EventScheduleSettingCommonState } from '../../types/index.mjs';
 import {
   mapOptional,
   noop,

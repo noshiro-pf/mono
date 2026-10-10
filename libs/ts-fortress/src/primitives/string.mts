@@ -1,11 +1,11 @@
 import { Arr, expectType, isString, PositiveInt, Result } from 'ts-data-forge';
-import {
-  type ArrayElement,
-  type MaxLengthString,
-  type MinLengthString,
-  type NonEmptyString,
-  type RelaxedExclude,
-  type SupportedLength,
+import type {
+  ArrayElement,
+  MaxLengthString,
+  MinLengthString,
+  NonEmptyString,
+  RelaxedExclude,
+  SupportedLength,
 } from 'ts-type-forge';
 import {
   attachConstraints,

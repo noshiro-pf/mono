@@ -1,4 +1,4 @@
-import { type ESLintPlugin } from '../../../types/index.mjs';
+import type { ESLintPlugin } from '../../../types/index.mjs';
 import { checkDestructuringCompleteness } from './check-destructuring-completeness.mjs';
 import { jsxBooleanLogicalOperands } from './jsx-boolean-logical-operands.mjs';
 import { noNegatedComparison } from './no-negated-comparison.mjs';

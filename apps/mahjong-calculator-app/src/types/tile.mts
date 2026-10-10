@@ -1,5 +1,5 @@
-import { type UintRange } from 'ts-type-forge';
-import { type TileName } from './enum.mjs';
+import type { UintRange } from 'ts-type-forge';
+import type { TileName } from './enum.mjs';
 
 export type Tile = Readonly<{
   id: TileName;

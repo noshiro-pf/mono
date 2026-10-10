@@ -1,11 +1,8 @@
 import * as path from 'node:path';
 import { castMutable } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
-import {
-  type TestProjectConfiguration,
-  type ViteUserConfig,
-} from 'vitest/config';
-import { type InlineConfig, type ProjectConfig } from 'vitest/node';
+import type { DeepReadonly } from 'ts-type-forge';
+import type { TestProjectConfiguration, ViteUserConfig } from 'vitest/config';
+import type { InlineConfig, ProjectConfig } from 'vitest/node';
 
 /** The value of `browser.provider`, e.g. `playwright()`. */
 type BrowserProvider = NonNullable<

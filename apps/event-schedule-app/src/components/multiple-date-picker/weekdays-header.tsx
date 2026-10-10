@@ -7,7 +7,7 @@ import {
   DatePickerWeekdayStyled,
 } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { type DayOfWeekIndex } from 'ts-type-forge';
+import type { DayOfWeekIndex } from 'ts-type-forge';
 import { daysOfWeekList, mapOptional } from '../../utils-ported/index.mjs';
 
 type Props = Readonly<{ onClick?: (w: DayOfWeekIndex) => void }>;

@@ -1,5 +1,5 @@
 import * as path from 'node:path';
-import { type UserConfig } from 'vite';
+import type { UserConfig } from 'vite';
 import { makeBuildId } from '../scripts/build-id.mjs';
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
 

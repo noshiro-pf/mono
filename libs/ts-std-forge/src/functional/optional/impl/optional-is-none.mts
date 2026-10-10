@@ -1,6 +1,6 @@
-import { type UnknownOptional } from '../optional.mjs';
+import type { UnknownOptional } from '../optional.mjs';
 import { NoneTypeTagName } from './tag.mjs';
-import { type NarrowToNone } from './types.mjs';
+import type { NarrowToNone } from './types.mjs';
 
 /**
  * Checks if an {@link Optional} is {@link None}. Acts as a type guard.

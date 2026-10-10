@@ -1,4 +1,4 @@
-import { type List } from 'ts-type-forge';
+import type { List } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

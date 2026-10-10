@@ -1,6 +1,6 @@
 import { useBoolState } from 'better-preact-use-state';
 import { useMemo } from 'preact/hooks';
-import { type RectSize } from 'ts-utils-additional';
+import type { RectSize } from 'ts-utils-additional';
 import {
   darkGray,
   eyeIconColorDef,
@@ -10,7 +10,7 @@ import {
   type CustomColor,
 } from '../../constants/index.mjs';
 import { fillCardSize, flipColor } from '../../functions/index.mjs';
-import { type CardColor, type VisibilityFromMe } from '../../types/index.mjs';
+import type { CardColor, VisibilityFromMe } from '../../types/index.mjs';
 
 export const useCardAttributes = (
   color: CardColor,

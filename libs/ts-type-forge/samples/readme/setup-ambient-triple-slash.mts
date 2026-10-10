@@ -6,7 +6,7 @@
 // statement, is an ordinary comment and loads nothing — so what is checked is
 // the snippet's use of the type; that the directive really resolves the ambient
 // globals is asserted by `test/dist_/ambient/`.
-import { type UintRange } from 'ts-type-forge';
+import type { UintRange } from 'ts-type-forge';
 // embed-sample-code-ignore-above
 
 // src/globals.d.ts or any other .ts file

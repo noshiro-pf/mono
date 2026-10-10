@@ -2,9 +2,9 @@ import { styled } from 'goober';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import { match } from 'ts-data-forge';
-import { type RectSize } from 'ts-utils-additional';
+import type { RectSize } from 'ts-utils-additional';
 import { zIndex } from '../../constants/index.mjs';
-import { type DecidedAnswerBalloonProps } from '../../types/index.mjs';
+import type { DecidedAnswerBalloonProps } from '../../types/index.mjs';
 import { CardComponent } from '../card/index.mjs';
 import {
   createBalloonBody,

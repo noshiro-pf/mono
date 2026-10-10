@@ -1,5 +1,5 @@
 import { hasKey } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**
  * Looks a value up in a table of cases.

@@ -1,6 +1,6 @@
 import { hasKey } from 'ts-data-forge';
-import { type MutableRecord } from 'ts-type-forge';
-import { type JSONSchema4 } from '../type.mjs';
+import type { MutableRecord } from 'ts-type-forge';
+import type { JSONSchema4 } from '../type.mjs';
 
 /**
  * booleanObject 定義の additionalProperties を具体的なプロパティに展開する。

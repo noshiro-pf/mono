@@ -1,4 +1,4 @@
-import { type HTTPRequestMethod } from 'ts-type-forge';
+import type { HTTPRequestMethod } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

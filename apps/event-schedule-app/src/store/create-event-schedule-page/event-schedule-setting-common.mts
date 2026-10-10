@@ -17,11 +17,11 @@ import {
   validateEventSchedule,
   validateEventScheduleAll,
 } from '../../functions/index.mjs';
-import {
-  type EventScheduleSettingCommonState,
-  type EventScheduleSettingCommonStateHandler,
-  type EventScheduleValidation,
-  type NotificationSettingsWithEmail,
+import type {
+  EventScheduleSettingCommonState,
+  EventScheduleSettingCommonStateHandler,
+  EventScheduleValidation,
+  NotificationSettingsWithEmail,
 } from '../../types/index.mjs';
 import { mapOptional, omitKeys } from '../../utils-ported/index.mjs';
 import { mapNoneToUndefined } from '../../utils/index.mjs';

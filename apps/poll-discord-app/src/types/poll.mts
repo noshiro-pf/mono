@@ -1,6 +1,6 @@
 import { IMap, expectType, pipe } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { type DeepReadonly, type JsonObject } from 'ts-type-forge';
+import type { DeepReadonly, JsonObject } from 'ts-type-forge';
 import {
   answerOfDateFromJson,
   answerOfDateJsonType,

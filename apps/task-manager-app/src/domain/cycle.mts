@@ -5,7 +5,7 @@ import {
   nodeId,
   type GraphNodeId,
 } from './graph-nodes.mjs';
-import { type DomainState, type NodeRef } from './types.mjs';
+import type { DomainState, NodeRef } from './types.mjs';
 
 /**
  * A dependency cycle, or `undefined` when the graph is a DAG.

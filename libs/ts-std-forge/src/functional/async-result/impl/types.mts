@@ -1,6 +1,6 @@
-import { type Err, type Ok } from '../../../adt-types.mjs';
-import { type UnknownResult } from '../../result/index.mjs';
-import { type AsyncResult } from '../async-result.mjs';
+import type { Err, Ok } from '../../../adt-types.mjs';
+import type { UnknownResult } from '../../result/index.mjs';
+import type { AsyncResult } from '../async-result.mjs';
 
 /**
  * Base type for any `AsyncResult`, used for generic constraints. Represents

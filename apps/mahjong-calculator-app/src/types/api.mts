@@ -1,11 +1,11 @@
-import {
-  type FixedLengthTuple,
-  type MinLengthTuple,
-  type StrictExtract,
-  type UintRange,
+import type {
+  FixedLengthTuple,
+  MinLengthTuple,
+  StrictExtract,
+  UintRange,
 } from 'ts-type-forge';
-import { type NumTiles, type Turn } from './enum.mjs';
-import { type Tile } from './tile.mjs';
+import type { NumTiles, Turn } from './enum.mjs';
+import type { Tile } from './tile.mjs';
 
 export type ApiMeldedBlock = Readonly<{
   /**

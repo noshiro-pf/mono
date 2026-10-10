@@ -1,6 +1,6 @@
 import { getFirebaseConfig } from './env.mjs';
 import { createMailOptions, sendEmail } from './setup-mailer.mjs';
-import { type SendReportPayload } from './types/index.mjs';
+import type { SendReportPayload } from './types/index.mjs';
 
 export const sendReportImpl = ({ error }: SendReportPayload): Promise<void> =>
   sendEmail(

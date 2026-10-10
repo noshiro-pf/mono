@@ -5,7 +5,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { isSameReference } from './reference-utils.mjs';
 
 type Options = readonly [('always' | 'only-single-line')?];

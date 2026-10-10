@@ -3,7 +3,7 @@ import { array } from '../array/index.mjs';
 import { intersection, union } from '../compose/index.mjs';
 import { literal, recursion } from '../other-types/index.mjs';
 import { boolean, number, string } from '../primitives/index.mjs';
-import { type Type, type TypeOf } from '../type.mjs';
+import type { Type, TypeOf } from '../type.mjs';
 import {
   type ValidationError,
   validationErrorsToMessages,

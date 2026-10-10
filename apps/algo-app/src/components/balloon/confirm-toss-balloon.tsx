@@ -1,9 +1,9 @@
 import { styled } from 'goober';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
-import { type RectSize } from 'ts-utils-additional';
+import type { RectSize } from 'ts-utils-additional';
 import { dictionary, outlineColorDef } from '../../constants/index.mjs';
-import { type ConfirmTossBalloonProps } from '../../types/index.mjs';
+import type { ConfirmTossBalloonProps } from '../../types/index.mjs';
 import { Button } from '../bp/index.mjs';
 import { CardComponent } from '../card/index.mjs';
 import {

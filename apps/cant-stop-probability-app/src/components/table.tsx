@@ -4,7 +4,7 @@ import { BpButton, BpInput } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
 import { denom, separator } from '../constants/index.mjs';
 import { toPercentString } from '../functions/index.mjs';
-import { type ResultRow } from '../types/index.mjs';
+import type { ResultRow } from '../types/index.mjs';
 
 type Props = Readonly<{
   sortByDice: () => void;

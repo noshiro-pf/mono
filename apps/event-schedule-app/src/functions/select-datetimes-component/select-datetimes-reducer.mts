@@ -1,6 +1,6 @@
 import { Arr, ISetMapped, pipe, type SizeType } from 'ts-data-forge';
 import { compareDatetimeRange, TimeRange } from 'ts-fortress-types';
-import { type DayOfWeekName, type ReadonlyRecord } from 'ts-type-forge';
+import type { DayOfWeekName, ReadonlyRecord } from 'ts-type-forge';
 import { datetimeRangeInitialValue } from '../../constants/index.mjs';
 import { Obj, type Reducer } from '../../utils-ported/index.mjs';
 import { ymdFromKey, ymdToKey } from '../map-key/index.mjs';

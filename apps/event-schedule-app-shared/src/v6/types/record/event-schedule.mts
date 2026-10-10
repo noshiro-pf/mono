@@ -1,6 +1,6 @@
 import { Arr, hasKey, isNumber, isRecord, isString } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
-import { type NonEmptyArray } from 'ts-type-forge';
+import type { NonEmptyArray } from 'ts-type-forge';
 import { hasKeyValue } from '../../../utils/index.mjs';
 import {
   isDatetimeSpecificationEnumType,

@@ -1,6 +1,6 @@
 import { Arr, type Optional, type Some } from 'ts-data-forge';
 import { panic } from 'ts-std-forge';
-import { type MutableSet } from 'ts-type-forge';
+import type { MutableSet } from 'ts-type-forge';
 import {
   isChildObservable,
   isManagerObservable,

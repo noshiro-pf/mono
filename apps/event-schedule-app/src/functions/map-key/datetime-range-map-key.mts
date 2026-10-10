@@ -1,6 +1,6 @@
 import { Json, Result } from 'ts-data-forge';
 import { DatetimeRange } from 'ts-fortress-types';
-import { type Brand } from 'ts-type-forge';
+import type { Brand } from 'ts-type-forge';
 
 export type DatetimeRangeMapKey = Brand<string, 'DatetimeRangeMapKey'>;
 

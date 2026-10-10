@@ -1,6 +1,6 @@
 import { isNumber, memoizeFunction, Num, Result } from 'ts-data-forge';
-import { type StrictExclude, type Uint11, type UintRange } from 'ts-type-forge';
-import { type Type } from '../type.mjs';
+import type { StrictExclude, Uint11, UintRange } from 'ts-type-forge';
+import type { Type } from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,

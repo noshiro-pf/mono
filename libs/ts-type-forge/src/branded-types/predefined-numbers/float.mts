@@ -1,6 +1,6 @@
-import {
-  type TSTypeForgeInternals_BrandedNumberBaseType,
-  type TSTypeForgeInternals_ExtendNumberBrand,
+import type {
+  TSTypeForgeInternals_BrandedNumberBaseType,
+  TSTypeForgeInternals_ExtendNumberBrand,
 } from './_number-brand-internals.mjs';
 
 /**

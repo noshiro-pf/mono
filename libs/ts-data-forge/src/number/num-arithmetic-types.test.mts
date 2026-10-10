@@ -1,26 +1,26 @@
-import {
-  type FiniteNumber,
-  type Int,
-  type NegativeFiniteNumber,
-  type NegativeInt,
-  type NonNegativeFiniteNumber,
-  type NonPositiveInt,
-  type NonZeroInt,
-  type PositiveFiniteNumber,
-  type PositiveInt,
-  type PositiveSafeInt,
-  type SafeUint,
-  type Uint,
+import type {
+  FiniteNumber,
+  Int,
+  NegativeFiniteNumber,
+  NegativeInt,
+  NonNegativeFiniteNumber,
+  NonPositiveInt,
+  NonZeroInt,
+  PositiveFiniteNumber,
+  PositiveInt,
+  PositiveSafeInt,
+  SafeUint,
+  Uint,
 } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
-import {
-  type AddResult,
-  type DivIntResult,
-  type DivResult,
-  type LevelOf,
-  type MulResult,
-  type SignOf,
-  type SubResult,
+import type {
+  AddResult,
+  DivIntResult,
+  DivResult,
+  LevelOf,
+  MulResult,
+  SignOf,
+  SubResult,
 } from './num-arithmetic-types.mjs';
 
 describe('NumericArithmetic type-level', () => {

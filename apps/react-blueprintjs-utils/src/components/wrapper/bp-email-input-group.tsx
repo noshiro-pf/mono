@@ -2,7 +2,7 @@ import { FormGroup } from '@blueprintjs/core';
 import { useBoolState } from 'better-react-use-state';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { type Observable as SynstateObservable } from 'synstate';
+import type { Observable as SynstateObservable } from 'synstate';
 import { isEmailString } from '../../utils/index.mjs';
 import { BpInput, type BpInputProps } from './bp-input.js';
 

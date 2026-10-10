@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
 import { hslToStr } from 'ts-utils-additional';
-import { type ColorResult } from '../../types/index.mjs';
+import type { ColorResult } from '../../types/index.mjs';
 
 type Props = Readonly<{
   colorResult: ColorResult;

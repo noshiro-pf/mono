@@ -1,4 +1,4 @@
-import { type InitializedObservable } from 'synstate';
+import type { InitializedObservable } from 'synstate';
 import { createBooleanState } from 'synstate-react-hooks';
 
 export const createFormError = <T,>(

@@ -1,5 +1,5 @@
 import { ISet } from 'ts-data-forge';
-import { type FixedLengthTuple, type SafeUint } from 'ts-type-forge';
+import type { FixedLengthTuple, SafeUint } from 'ts-type-forge';
 import {
   counter,
   filter,
@@ -10,7 +10,7 @@ import {
 } from '../../src/index.mjs';
 import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { testStream } from '../test-stream.mjs';
-import { type StreamTestCase } from '../typedef.mjs';
+import type { StreamTestCase } from '../typedef.mjs';
 
 /*
   (tick)    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0

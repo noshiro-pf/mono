@@ -1,5 +1,5 @@
-import { type InitializedObservable } from '../core/index.mjs';
-import { type StateOptions } from './create-reducer.mjs';
+import type { InitializedObservable } from '../core/index.mjs';
+import type { StateOptions } from './create-reducer.mjs';
 import { createState } from './create-state.mjs';
 
 /**

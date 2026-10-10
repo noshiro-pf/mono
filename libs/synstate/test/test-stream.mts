@@ -1,5 +1,5 @@
 import { TICK } from './constants.mjs';
-import { type StreamTestCase } from './typedef.mjs';
+import type { StreamTestCase } from './typedef.mjs';
 
 export const testStream = <T,>(testCase: StreamTestCase<T>): void => {
   test(testCase.name, () =>

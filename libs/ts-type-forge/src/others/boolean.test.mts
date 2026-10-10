@@ -1,12 +1,12 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type BoolAnd,
-  type BoolEq,
-  type BoolNand,
-  type BoolNeq,
-  type BoolNor,
-  type BoolNot,
-  type BoolOr,
+import type {
+  BoolAnd,
+  BoolEq,
+  BoolNand,
+  BoolNeq,
+  BoolNor,
+  BoolNot,
+  BoolOr,
 } from './boolean.mjs';
 
 {

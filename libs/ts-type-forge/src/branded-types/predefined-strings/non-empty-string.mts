@@ -1,4 +1,4 @@
-import { type MinLengthString } from './length-constrained-string.mjs';
+import type { MinLengthString } from './length-constrained-string.mjs';
 
 /**
  * Branded string type for non-empty strings (strings with at least one

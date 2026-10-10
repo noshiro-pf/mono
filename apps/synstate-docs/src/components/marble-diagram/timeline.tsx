@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { type TimelineDef } from './types.mjs';
+import type { TimelineDef } from './types.mjs';
 
 type Props = Readonly<{
   def: TimelineDef;

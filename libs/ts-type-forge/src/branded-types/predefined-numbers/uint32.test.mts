@@ -1,11 +1,7 @@
 import { expectType } from 'ts-data-forge';
-import { type PositiveNumber } from './core.mjs';
-import { type SafeUint } from './safe-int.mjs';
-import {
-  type NonZeroUint32,
-  type PositiveUint32,
-  type Uint32,
-} from './uint32.mjs';
+import type { PositiveNumber } from './core.mjs';
+import type { SafeUint } from './safe-int.mjs';
+import type { NonZeroUint32, PositiveUint32, Uint32 } from './uint32.mjs';
 
 // Test Uint32 type
 expectType<Uint32, number>('<=');

@@ -1,4 +1,4 @@
-import { type MakeTuple } from 'ts-type-forge';
+import type { MakeTuple } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

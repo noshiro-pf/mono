@@ -1,6 +1,6 @@
 import { Arr, memoizeFunction, Result } from 'ts-data-forge';
-import { type NonEmptyArray, type NonEmptyTuple } from 'ts-type-forge';
-import { type Type } from '../type.mjs';
+import type { NonEmptyArray, NonEmptyTuple } from 'ts-type-forge';
+import type { Type } from '../type.mjs';
 import {
   createPrimitiveValidationError,
   prependIndexToValidationErrors,

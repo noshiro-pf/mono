@@ -1,4 +1,4 @@
-import { type BigUint64 } from 'ts-type-forge';
+import type { BigUint64 } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

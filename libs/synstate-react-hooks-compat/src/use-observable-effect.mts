@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { type Observable } from 'synstate';
+import type { Observable } from 'synstate';
 
 export const useObservableEffect = <A,>(
   observable$: Observable<A>,

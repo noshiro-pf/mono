@@ -1,7 +1,7 @@
-import { type Err } from '../../../adt-types.mjs';
-import { type Result, type UnknownResult } from '../result.mjs';
+import type { Err } from '../../../adt-types.mjs';
+import type { Result, UnknownResult } from '../result.mjs';
 import { isErr } from './result-is-err.mjs';
-import { type UnwrapErr, type UnwrapOk } from './types.mjs';
+import type { UnwrapErr, UnwrapOk } from './types.mjs';
 
 /**
  * Applies a function that returns a `Result` to the success value of a

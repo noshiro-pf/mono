@@ -1,6 +1,6 @@
 import { expectType, tp } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { type FixedLengthTuple, type StrictOmit } from 'ts-type-forge';
+import type { FixedLengthTuple, StrictOmit } from 'ts-type-forge';
 import { cardTypeDef } from './card-type.mjs';
 import { playerTypeDef } from './player.mjs';
 import { shuffleDefType } from './shuffle-def.mjs';

@@ -1,5 +1,5 @@
 import { Result } from 'ts-data-forge';
-import { type LicensePolicy } from '../../configs/license-policy.mjs';
+import type { LicensePolicy } from '../../configs/license-policy.mjs';
 import {
   collectViolations,
   formatReport,

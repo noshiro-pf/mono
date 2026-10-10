@@ -1,6 +1,6 @@
 import { Arr } from 'ts-data-forge';
 import { firstInReleaseOrder, releasedExcept } from './release.mjs';
-import { type PullRequest } from './types.mjs';
+import type { PullRequest } from './types.mjs';
 
 describe(releasedExcept, () => {
   test('is every other open queued pull request without skip-ci', () => {

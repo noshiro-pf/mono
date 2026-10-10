@@ -1,4 +1,4 @@
-import { type StrictOmit } from 'ts-type-forge';
+import type { StrictOmit } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

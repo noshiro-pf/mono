@@ -1,12 +1,12 @@
 import { Arr, ISet } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import {
   hasDisableNextLineComment,
   isAsConstNode,
 } from '../functions/index.mjs';
 import { replaceNodeWithDebugPrint } from '../utils/index.mjs';
-import { type TsMorphTransformer } from './types.mjs';
+import type { TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'append-as-const';
 

@@ -1,8 +1,8 @@
 import { Arr } from 'ts-data-forge';
-import {
-  type LambdaAbstraction,
-  type LambdaApplication,
-  type LambdaTerm,
+import type {
+  LambdaAbstraction,
+  LambdaApplication,
+  LambdaTerm,
 } from '../types/index.mjs';
 import { hasLength } from '../utils/index.mjs';
 import { isVariable } from './is-variable.mjs';

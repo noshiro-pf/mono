@@ -1,4 +1,4 @@
-import { type GraphNodeId } from '../domain/index.mjs';
+import type { GraphNodeId } from '../domain/index.mjs';
 import {
   arrowKeyDelta,
   defaultDirection,
@@ -9,8 +9,8 @@ import {
   placeNodes,
   positionsOf,
 } from './dag-layout.mjs';
-import { type LaidOutNode } from './graph-layout.mjs';
-import { type Point } from './pan-zoom.mjs';
+import type { LaidOutNode } from './graph-layout.mjs';
+import type { Point } from './pan-zoom.mjs';
 
 const nodeA: LaidOutNode = {
   id: 'task:a',

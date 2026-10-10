@@ -8,7 +8,7 @@ import {
   YmdhmFromDate,
   type YearMonthDate,
 } from 'ts-fortress-types';
-import { type DeepReadonly, type StrictOmit } from 'ts-type-forge';
+import type { DeepReadonly, StrictOmit } from 'ts-type-forge';
 import { mapOptional } from '../../utils/index.mjs';
 
 export type BpDateRangeInputProps = DeepReadonly<{

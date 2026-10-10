@@ -1,4 +1,4 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 export const fetchHolidaysJson = (): Promise<ReadonlyRecord<string, string>> =>
   fetch('https://holidays-jp.github.io/api/v1/date.json').then(

@@ -1,15 +1,15 @@
 import { isError } from '@sindresorhus/is';
-import { type Int, type NonEmptyTuple, type Uint } from 'ts-type-forge';
+import type { Int, NonEmptyTuple, Uint } from 'ts-type-forge';
 import { IMap } from '../../collections/index.mjs';
 import { Optional, Result } from '../../functional/index.mjs';
 import { isString, isUndefined } from '../../guard/index.mjs';
 import { asUint32, Num, Uint32 } from '../../number/index.mjs';
 import { unknownToString } from '../../others/index.mjs';
-import {
-  type ArrayIndex,
-  type MapSetKeyType,
-  type SizeType,
-  type Some,
+import type {
+  ArrayIndex,
+  MapSetKeyType,
+  SizeType,
+  Some,
 } from '../../types.mjs';
 import { isNonEmpty } from './array-utils-length-bounded-array-guard.mjs';
 

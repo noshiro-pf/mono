@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
 import { Num, isPositiveFiniteNumber } from 'ts-data-forge';
-import { type Rect } from '../utils/index.mjs';
+import type { Rect } from '../utils/index.mjs';
 
 // `Readonly`, not `DeepReadonly`: a deeply-readonly `ReactNode` is no longer
 // a `ReactNode`, and React is the one consuming these.

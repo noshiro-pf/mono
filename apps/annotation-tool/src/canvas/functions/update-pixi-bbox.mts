@@ -5,8 +5,8 @@
 // them, which this layer depends on. The `mut_` prefix marks the deliberate
 // mutation, as it does elsewhere in the repository.
 
-import { type Rect } from 'ts-utils-additional';
-import { type PixiBbox } from '../types/index.mjs';
+import type { Rect } from 'ts-utils-additional';
+import type { PixiBbox } from '../types/index.mjs';
 import { bboxPointsFromRect, foreachBboxPoints } from './bbox-points.mjs';
 import { updatePointOfBbox } from './update-pixi-bbox-point.mjs';
 import { updateRectOfBbox } from './update-pixi-bbox-rect.mjs';

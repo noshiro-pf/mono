@@ -12,7 +12,7 @@
 
 import { Arr } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { type SortSpec } from '../domain/index.mjs';
+import type { SortSpec } from '../domain/index.mjs';
 import { persistedSetting } from './persisted-setting.mjs';
 import { SortSpecCodec, uniqueSortKeys } from './sort-edit.mjs';
 

@@ -1,4 +1,4 @@
-import { type EslintTotalFunctionsRules } from '../types/index.mjs';
+import type { EslintTotalFunctionsRules } from '../types/index.mjs';
 
 export const eslintTotalFunctionsRules = {
   'total-functions/require-strict-mode': 'error',

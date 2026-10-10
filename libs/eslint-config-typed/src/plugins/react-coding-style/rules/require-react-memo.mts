@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { castNode, climbTypeWrappers, isReactApiCall } from './shared.mjs';
 
 type Options = readonly [

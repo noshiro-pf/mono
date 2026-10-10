@@ -1,5 +1,5 @@
 /* cSpell:disable */
-import { type Linter } from 'eslint';
+import type { Linter } from 'eslint';
 
 /**
  * @description Forbits non-tree-shakable access to module name space objects.

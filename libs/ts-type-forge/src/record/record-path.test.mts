@@ -1,14 +1,14 @@
 import { expectType } from 'ts-data-forge';
-import { type DeepReadonly } from './deep.mjs';
-import {
-  type RecordLeafPaths,
-  type RecordLeafPathsWithIndex,
-  type RecordPathAndValueTypeTuple,
-  type RecordPaths,
-  type RecordPathsWithIndex,
-  type RecordUpdated,
-  type RecordValueAtPath,
-  type TSTypeForgeInternals_RecordPathPrefixes,
+import type { DeepReadonly } from './deep.mjs';
+import type {
+  RecordLeafPaths,
+  RecordLeafPathsWithIndex,
+  RecordPathAndValueTypeTuple,
+  RecordPaths,
+  RecordPathsWithIndex,
+  RecordUpdated,
+  RecordValueAtPath,
+  TSTypeForgeInternals_RecordPathPrefixes,
 } from './record-path.mjs';
 
 // `RecordPathPrefixes` generates all prefixes of a tuple, including `[]`.

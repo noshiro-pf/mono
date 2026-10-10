@@ -192,7 +192,7 @@ const CountDisplay = (): React.JSX.Element => {
 
 ```tsx
 import type * as React from 'react';
-import { type Observable } from 'synstate';
+import type { Observable } from 'synstate';
 import { useObservableValue } from 'synstate-react-hooks';
 
 // Observable<string> that may not have emitted yet.

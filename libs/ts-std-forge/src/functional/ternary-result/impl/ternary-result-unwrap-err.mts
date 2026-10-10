@@ -1,6 +1,6 @@
-import { type UnknownTernaryResult } from '../ternary-result.mjs';
+import type { UnknownTernaryResult } from '../ternary-result.mjs';
 import { isErr } from './ternary-result-is-err.mjs';
-import { type UnwrapErr } from './types.mjs';
+import type { UnwrapErr } from './types.mjs';
 
 /**
  * Safely unwraps the Err value.

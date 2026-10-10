@@ -1,11 +1,7 @@
 import { AST_NODE_TYPES, ESLintUtils } from '@typescript-eslint/utils';
 import { Arr, isNonNullObject } from 'ts-data-forge';
 import { intersectionTypeParts, unionTypeParts } from 'tsutils';
-import {
-  type BigIntLiteralType,
-  type PseudoBigInt,
-  type Type,
-} from 'typescript';
+import type { BigIntLiteralType, PseudoBigInt, Type } from 'typescript';
 import { createRule } from './common.mjs';
 
 /** An ESLint rule to ban partial division. */

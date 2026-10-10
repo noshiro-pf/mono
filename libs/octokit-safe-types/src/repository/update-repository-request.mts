@@ -1,7 +1,7 @@
-import { type operations, type paths } from '@octokit/openapi-types';
+import type { operations, paths } from '@octokit/openapi-types';
 import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 
 const SecurityAndAnalysisForRequest = t.union([
   t.record({

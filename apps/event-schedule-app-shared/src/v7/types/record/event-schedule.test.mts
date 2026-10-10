@@ -1,8 +1,8 @@
 import { Arr, expectType } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
-import { type NonEmptyArray } from 'ts-type-forge';
-import { type DatetimeSpecificationEnumType } from '../enum/index.mjs';
-import { type AnswerIconSettings } from './answer-icon-settings.mjs';
+import type { NonEmptyArray } from 'ts-type-forge';
+import type { DatetimeSpecificationEnumType } from '../enum/index.mjs';
+import type { AnswerIconSettings } from './answer-icon-settings.mjs';
 import {
   answerIconSettingTypeDef,
   userDefaultValue,

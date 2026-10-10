@@ -1,13 +1,13 @@
-import {
-  type Brand,
-  type NonEmptyString,
-  type ReadonlyRecord,
-  type TypeEq,
-  type UintRangeInclusive,
+import type {
+  Brand,
+  NonEmptyString,
+  ReadonlyRecord,
+  TypeEq,
+  UintRangeInclusive,
 } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
 import { string } from '../../../primitives/index.mjs';
-import { type Type } from '../../../type.mjs';
+import type { Type } from '../../../type.mjs';
 
 export type UuidVersion = UintRangeInclusive<1, 8>;
 

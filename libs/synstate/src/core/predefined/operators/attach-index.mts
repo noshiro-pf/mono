@@ -1,6 +1,6 @@
-import { type SafeUint } from 'ts-type-forge';
+import type { SafeUint } from 'ts-type-forge';
 import { map } from '../../operators/index.mjs';
-import { type KeepInitialValueOperator } from '../../types/index.mjs';
+import type { KeepInitialValueOperator } from '../../types/index.mjs';
 
 /**
  * Attaches a sequential index to each emitted value, producing `[index, value]` tuples.

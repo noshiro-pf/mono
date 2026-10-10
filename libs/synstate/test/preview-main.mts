@@ -2,7 +2,7 @@
 
 import { ArgumentParser } from 'argparse';
 import { Arr, Num, asUint32 } from 'ts-data-forge';
-import { type DeepReadonly, type SafeUint, type Uint32 } from 'ts-type-forge';
+import type { DeepReadonly, SafeUint, Uint32 } from 'ts-type-forge';
 import {
   auditTestCases,
   combineTestCases,
@@ -34,7 +34,7 @@ import {
   zipTestCases,
 } from './cases/index.mjs';
 import { TICK } from './constants.mjs';
-import { type StreamTestCase } from './typedef.mjs';
+import type { StreamTestCase } from './typedef.mjs';
 
 const exampleList: readonly Readonly<{
   name: string;

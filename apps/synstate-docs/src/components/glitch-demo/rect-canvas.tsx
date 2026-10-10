@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from './adapters/index.mjs';
-import { type Adapter, type Point } from './types.mjs';
+import type { Adapter, Point } from './types.mjs';
 
 type Props = Readonly<{
   adapter: Adapter;

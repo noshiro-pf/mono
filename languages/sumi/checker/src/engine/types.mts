@@ -1,9 +1,9 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
-import {
-  type SourceFile,
-  type Node as TsNode,
+import type { ReadonlyRecord } from 'ts-type-forge';
+import type {
+  SourceFile,
+  Node as TsNode,
 } from 'typescript-native/unstable/ast';
-import { type Checker } from 'typescript-native/unstable/sync';
+import type { Checker } from 'typescript-native/unstable/sync';
 
 /**
  * What a rule is given for one node.

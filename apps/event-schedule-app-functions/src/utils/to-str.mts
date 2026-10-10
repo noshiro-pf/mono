@@ -1,12 +1,12 @@
-import {
-  type AnswerIconIdWithNone,
-  type AnswerIconPoint,
-  type DatetimeSpecificationEnumType,
+import type {
+  AnswerIconIdWithNone,
+  AnswerIconPoint,
+  DatetimeSpecificationEnumType,
 } from 'event-schedule-app-shared';
-import {
-  type DatetimeRange,
-  type HoursMinutes,
-  type YearMonthDate,
+import type {
+  DatetimeRange,
+  HoursMinutes,
+  YearMonthDate,
 } from 'ts-fortress-types';
 
 export const pad2 = (n: number): string => n.toString().padStart(2, '0');

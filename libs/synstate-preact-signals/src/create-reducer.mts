@@ -1,10 +1,10 @@
-import { type ReadonlySignal } from '@preact/signals';
+import type { ReadonlySignal } from '@preact/signals';
 import {
   createReducer as createReducerBase,
   type InitializedObservable,
   type StateOptions,
 } from 'synstate';
-import { type Reducer } from 'ts-type-forge';
+import type { Reducer } from 'ts-type-forge';
 import { toSignal } from './to-signal.mjs';
 
 /**

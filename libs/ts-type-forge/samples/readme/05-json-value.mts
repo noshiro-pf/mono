@@ -1,4 +1,4 @@
-import { type JsonObject, type JsonValue } from 'ts-type-forge';
+import type { JsonObject, JsonValue } from 'ts-type-forge';
 // embed-sample-code-ignore-above
 
 const jsonString =

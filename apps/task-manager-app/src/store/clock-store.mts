@@ -13,7 +13,7 @@ import {
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { type DomainState } from '../domain/index.mjs';
+import type { DomainState } from '../domain/index.mjs';
 import { nextTickDelay } from '../view-model/index.mjs';
 
 /** `H` is whatever `setTimer` hands back for `clearTimer` to take. */

@@ -5,7 +5,7 @@
 // The hidden import below stands in for the tsconfig entry, so what is checked
 // is the snippet's use of the type; that the ambient globals really resolve
 // is asserted by `test/dist_/ambient-types-option/`.
-import { type UintRange } from 'ts-type-forge';
+import type { UintRange } from 'ts-type-forge';
 // embed-sample-code-ignore-above
 
 // src/types/dice.ts

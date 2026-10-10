@@ -1,5 +1,5 @@
 import { Arr } from 'ts-data-forge';
-import { type JSONSchema4 } from './type.mjs';
+import type { JSONSchema4 } from './type.mjs';
 
 /**
  * スキーマを配列形式に正規化する。プラグイン間の型不整合を吸収する

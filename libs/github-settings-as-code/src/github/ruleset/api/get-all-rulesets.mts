@@ -7,7 +7,7 @@ import {
 import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { Result } from 'ts-repo-utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';
 

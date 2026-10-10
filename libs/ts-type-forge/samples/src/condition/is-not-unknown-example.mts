@@ -1,4 +1,4 @@
-import { type IsNotUnknown } from 'ts-type-forge';
+import type { IsNotUnknown } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

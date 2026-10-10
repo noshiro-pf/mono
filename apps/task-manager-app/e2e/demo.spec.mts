@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { Arr, Num, Result } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 
 // The in-memory demo of the dev server: no sign-in, the sample data of
 // `src/demo/sample-data.mts`, and a fresh copy on every load.

@@ -1,8 +1,4 @@
-import {
-  type Brand,
-  type ChangeBaseBrand,
-  type UnknownRecord,
-} from 'ts-type-forge';
+import type { Brand, ChangeBaseBrand, UnknownRecord } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

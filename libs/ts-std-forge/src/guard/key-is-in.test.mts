@@ -1,4 +1,4 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { keyIsIn } from './key-is-in.mjs';
 
 const f = <Key extends string, V, KeySub extends Key>(

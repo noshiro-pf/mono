@@ -6,7 +6,7 @@
  */
 
 /** Does nothing. Used where a callback is required but has nothing to do. */
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 
 export const noop = (): undefined => undefined;
 

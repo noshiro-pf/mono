@@ -1,4 +1,4 @@
-import { type MonoTypeFunction } from 'ts-type-forge';
+import type { MonoTypeFunction } from 'ts-type-forge';
 import { replaceWithNoMatchCheck } from '../functions/utils/node-utils.mjs';
 
 /**

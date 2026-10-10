@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { $, isDirectlyExecuted } from 'ts-repo-utils';
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**

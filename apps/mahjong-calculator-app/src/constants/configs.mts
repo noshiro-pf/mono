@@ -1,8 +1,8 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
-import {
-  type MaximizeTarget,
-  type RevealedBlockType,
-  type TehaiType,
+import type { ReadonlyRecord } from 'ts-type-forge';
+import type {
+  MaximizeTarget,
+  RevealedBlockType,
+  TehaiType,
 } from '../types/index.mjs';
 
 // 手牌の種類

@@ -4,7 +4,7 @@ import {
   isDemoted,
   pruneDemotions,
 } from './demotions.mjs';
-import { type Demotions, type PullRequest } from './types.mjs';
+import type { Demotions, PullRequest } from './types.mjs';
 
 describe(afterWatch, () => {
   const none: Demotions = new Map();

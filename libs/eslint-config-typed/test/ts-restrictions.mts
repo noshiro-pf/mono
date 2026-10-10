@@ -1,4 +1,4 @@
-import { type Brand } from 'ts-type-forge';
+import type { Brand } from 'ts-type-forge';
 import { noop } from './noop.mjs';
 
 const foo = {

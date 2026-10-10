@@ -1,4 +1,4 @@
-import { type Label } from 'pr-report-core';
+import type { Label } from 'pr-report-core';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import { chipColors } from '../label-color.mjs';

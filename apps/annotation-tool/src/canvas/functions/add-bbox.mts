@@ -5,17 +5,14 @@
 // them, which this layer depends on. The `mut_` prefix marks the deliberate
 // mutation, as it does elsewhere in the repository.
 
-import { type Application } from 'pixi.js-legacy';
+import type { Application } from 'pixi.js-legacy';
 import { Num } from 'ts-data-forge';
-import { type Rect, type Rgba } from 'ts-utils-additional';
-import {
-  type CanvasAppState,
-  type CanvasAppStateHandler,
-} from '../state/index.mjs';
-import {
-  type AnnotationCanvasStyle,
-  type IdType,
-  type PixiBbox,
+import type { Rect, Rgba } from 'ts-utils-additional';
+import type { CanvasAppState, CanvasAppStateHandler } from '../state/index.mjs';
+import type {
+  AnnotationCanvasStyle,
+  IdType,
+  PixiBbox,
 } from '../types/index.mjs';
 import { addBboxEventListener } from './add-bbox-event-listener.mjs';
 import { foreachBboxPoints } from './bbox-points.mjs';

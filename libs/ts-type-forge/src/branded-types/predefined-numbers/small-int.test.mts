@@ -1,16 +1,11 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type Int,
-  type IntWithSmallInt,
-  type PositiveInt,
-  type Uint,
-} from './int.mjs';
-import {
-  type ExcludeSmallInt,
-  type SmallInt,
-  type SmallUint,
-  type TSTypeForgeInternals_CastToInt,
-  type WithSmallInt,
+import type { Int, IntWithSmallInt, PositiveInt, Uint } from './int.mjs';
+import type {
+  ExcludeSmallInt,
+  SmallInt,
+  SmallUint,
+  TSTypeForgeInternals_CastToInt,
+  WithSmallInt,
 } from './small-int.mjs';
 
 // `CastToInt` keeps integer brands and zeroes out non-integer brands.

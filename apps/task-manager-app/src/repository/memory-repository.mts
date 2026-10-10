@@ -1,11 +1,11 @@
 import { Arr } from 'ts-data-forge';
-import { type DagLayout } from '../dag/index.mjs';
+import type { DagLayout } from '../dag/index.mjs';
 import { nodeId, type DomainState, type NodeRef } from '../domain/index.mjs';
-import {
-  type DagLayoutObserver,
-  type NodeCleanup,
-  type Repository,
-  type RepositoryObserver,
+import type {
+  DagLayoutObserver,
+  NodeCleanup,
+  Repository,
+  RepositoryObserver,
 } from './repository.mjs';
 
 /**

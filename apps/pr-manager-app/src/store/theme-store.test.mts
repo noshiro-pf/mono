@@ -1,5 +1,5 @@
 import { source } from 'synstate';
-import { type ColorScheme, type Theme } from '../theme.mjs';
+import type { ColorScheme, Theme } from '../theme.mjs';
 import { createThemeStore, type ThemeStore } from './theme-store.mjs';
 
 describe(createThemeStore, () => {

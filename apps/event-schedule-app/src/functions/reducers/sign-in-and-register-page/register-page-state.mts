@@ -1,4 +1,4 @@
-import { type Reducer } from '../../../utils-ported/index.mjs';
+import type { Reducer } from '../../../utils-ported/index.mjs';
 import {
   emailInputHasError,
   emailInputInitialState,
@@ -11,7 +11,7 @@ import {
   type InputState,
   type PasswordWithConfirmationState,
 } from '../input-state/index.mjs';
-import { type SignInPageStateAction } from './sign-in-page-state.mjs';
+import type { SignInPageStateAction } from './sign-in-page-state.mjs';
 
 export type RegisterPageState = Readonly<{
   username: InputState;

@@ -1,9 +1,9 @@
 import { Arr, Num } from 'ts-data-forge';
-import { type StrictOmit } from 'ts-type-forge';
+import type { StrictOmit } from 'ts-type-forge';
 import { answerIconPointConfig } from '../../constants/index.mjs';
-import {
-  type EventScheduleValidation,
-  type NotificationSettingsWithEmail,
+import type {
+  EventScheduleValidation,
+  NotificationSettingsWithEmail,
 } from '../../types/index.mjs';
 import { isEmailString } from '../../utils-ported/index.mjs';
 

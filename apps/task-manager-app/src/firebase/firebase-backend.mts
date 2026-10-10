@@ -28,7 +28,7 @@ import {
   persistentMultipleTabManager,
   type Firestore,
 } from 'firebase/firestore';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { getDocData, putDoc, type DocTarget } from '../api/index.mjs';
 import {
   personalProjectDoc,

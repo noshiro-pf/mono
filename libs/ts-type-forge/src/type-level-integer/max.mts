@@ -1,5 +1,5 @@
-import { type IsNever } from '../condition/index.mjs';
-import { type Uint10 } from '../constants/index.mjs';
+import type { IsNever } from '../condition/index.mjs';
+import type { Uint10 } from '../constants/index.mjs';
 
 /**
  * Calculates the smallest integer `M` such that all numbers in the union `N` (which must extend `Uint10`) are less than `M`.

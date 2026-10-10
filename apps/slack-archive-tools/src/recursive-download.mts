@@ -11,7 +11,7 @@ import {
   isString,
 } from 'ts-data-forge';
 import { $ } from 'ts-repo-utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { extractExt } from './extract-ext.mjs';
 import { getAllJsonFiles } from './get-all-json-files.mjs';
 import { validateJsonObject } from './validator.mjs';

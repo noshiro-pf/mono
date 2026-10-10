@@ -1,4 +1,4 @@
-import { type EslintStylisticRules } from '../types/index.mjs';
+import type { EslintStylisticRules } from '../types/index.mjs';
 
 export const eslintStylisticRules = {
   // Rules explicitly disabled by eslint-config-prettier (special handling)

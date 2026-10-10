@@ -1,4 +1,4 @@
-import { type Ok } from '../../../adt-types.mjs';
+import type { Ok } from '../../../adt-types.mjs';
 import { OkTypeTagName } from './tag.mjs';
 
 /**

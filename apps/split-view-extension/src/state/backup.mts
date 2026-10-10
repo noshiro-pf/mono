@@ -1,6 +1,6 @@
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
-import { type WorkspaceState } from '../layout/index.mjs';
+import type { ReadonlyRecord } from 'ts-type-forge';
+import type { WorkspaceState } from '../layout/index.mjs';
 import {
   addWorkspaceEntry,
   nextWorkspaceName,

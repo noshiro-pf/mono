@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { memoNamed } from 'react-utils';
 import { dict } from '../../constants/index.mjs';
-import { type EventSettingsPageDiffResult } from '../../functions/index.mjs';
+import type { EventSettingsPageDiffResult } from '../../functions/index.mjs';
 import { mapOptional } from '../../utils-ported/index.mjs';
 
 type Props = Readonly<{ diff: EventSettingsPageDiffResult }>;

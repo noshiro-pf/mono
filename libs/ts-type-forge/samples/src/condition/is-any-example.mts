@@ -1,4 +1,4 @@
-import { type IsAny } from 'ts-type-forge';
+import type { IsAny } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

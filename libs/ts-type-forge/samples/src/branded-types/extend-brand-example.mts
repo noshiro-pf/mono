@@ -1,4 +1,4 @@
-import { type Brand, type ExtendBrand } from 'ts-type-forge';
+import type { Brand, ExtendBrand } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

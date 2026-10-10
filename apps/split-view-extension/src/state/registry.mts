@@ -1,5 +1,5 @@
 import { Arr, hasKey, isRecord, Num, Result } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { defaultWorkspaceId } from '../shared/index.mjs';
 import {
   listStoredWorkspaces,

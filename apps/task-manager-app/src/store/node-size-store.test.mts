@@ -1,4 +1,4 @@
-import { type NodeSize } from '../view-model/index.mjs';
+import type { NodeSize } from '../view-model/index.mjs';
 import { createNodeSizeStore } from './node-size-store.mjs';
 
 const setup = (

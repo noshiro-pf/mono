@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { type Mutable } from 'ts-type-forge';
+import type { Mutable } from 'ts-type-forge';
 
 const Root = styled.div`
   width: 100%;

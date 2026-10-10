@@ -1,5 +1,5 @@
 import { asPositiveInt, Num } from 'ts-data-forge';
-import { type GraphNodeId } from '../domain/index.mjs';
+import type { GraphNodeId } from '../domain/index.mjs';
 import {
   cubicPoint,
   edgeGeometries,
@@ -18,7 +18,7 @@ import {
   type LaidOutNode,
   type LayoutInput,
 } from './graph-layout.mjs';
-import { type Point } from './pan-zoom.mjs';
+import type { Point } from './pan-zoom.mjs';
 
 const task = (id: string, x: number, y: number): LaidOutNode =>
   ({ id: `task:${id}`, kind: 'task', x, y, ...TASK_NODE_SIZE }) as const;

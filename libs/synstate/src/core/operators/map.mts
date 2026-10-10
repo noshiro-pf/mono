@@ -1,11 +1,11 @@
 import { Optional, SafeUint, asSafeUint, expectType } from 'ts-data-forge';
 import { createSyncChildObservable } from '../base/index.mjs';
 import { source } from '../create/index.mjs';
-import {
-  type InitializedObservable,
-  type KeepInitialValueOperator,
-  type MapOperatorObservable,
-  type Observable,
+import type {
+  InitializedObservable,
+  KeepInitialValueOperator,
+  MapOperatorObservable,
+  Observable,
 } from '../types/index.mjs';
 import { withInitialValue } from './with-initial-value.mjs';
 

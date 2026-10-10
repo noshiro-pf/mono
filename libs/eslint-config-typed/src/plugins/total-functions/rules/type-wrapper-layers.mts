@@ -1,4 +1,4 @@
-import { type TSESTree } from '@typescript-eslint/utils';
+import type { TSESTree } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
 import { isTypeWrapper } from '../../ast-utils/index.mjs';
 

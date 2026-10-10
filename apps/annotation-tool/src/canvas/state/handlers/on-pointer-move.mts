@@ -11,8 +11,8 @@ import {
   resizeBbox,
   updateBorderedRectangleGraphics,
 } from '../../functions/index.mjs';
-import { type PixiApp } from '../../types/index.mjs';
-import { type CanvasAppState } from '../canvas-state-type.mjs';
+import type { PixiApp } from '../../types/index.mjs';
+import type { CanvasAppState } from '../canvas-state-type.mjs';
 
 export const onPointerMove = (
   mut_state: CanvasAppState,

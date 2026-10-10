@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import { memoNamed } from 'react-utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 
 type Props = DeepReadonly<{
   title: string;

@@ -1,5 +1,5 @@
 import { Arr, asUint16 } from 'ts-data-forge';
-import { type NonEmptyArray } from 'ts-type-forge';
+import type { NonEmptyArray } from 'ts-type-forge';
 
 const seq = Arr.seq(asUint16(360));
 

@@ -1,4 +1,4 @@
-import { type DayOfWeekName } from 'ts-type-forge';
+import type { DayOfWeekName } from 'ts-type-forge';
 import { ymd2day } from '../utils/index.mjs';
 
 export const ymdToDayInWeek = (ymd: YearMonthDate): DayOfWeekName =>

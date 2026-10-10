@@ -1,4 +1,4 @@
-import { type EslintPreferArrowFunctionRules } from '../types/index.mjs';
+import type { EslintPreferArrowFunctionRules } from '../types/index.mjs';
 
 export const eslintPreferArrowFunctionRules = {
   'prefer-arrow-functions/prefer-arrow-functions': [

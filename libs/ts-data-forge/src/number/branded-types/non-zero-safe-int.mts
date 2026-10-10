@@ -1,7 +1,7 @@
-import {
-  type SafeInt,
-  type SafeUint,
-  type NonZeroSafeInt as TtfImported_NonZeroSafeInt,
+import type {
+  SafeInt,
+  SafeUint,
+  NonZeroSafeInt as TtfImported_NonZeroSafeInt,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';

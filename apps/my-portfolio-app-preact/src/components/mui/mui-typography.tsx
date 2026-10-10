@@ -1,6 +1,6 @@
 import { styled } from 'goober';
 import { memoNamed } from 'preact-utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 
 type Props = DeepReadonly<{
   variant: 'title' | 'subtitle1' | 'body1' | 'body2';

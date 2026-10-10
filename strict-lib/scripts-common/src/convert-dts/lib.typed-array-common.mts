@@ -1,5 +1,5 @@
 import { expectType, pipe } from 'ts-data-forge';
-import { type MonoTypeFunction, type StrictExclude } from 'ts-type-forge';
+import type { MonoTypeFunction, StrictExclude } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,

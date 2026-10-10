@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { type MutableRecord, type ReadonlyRecord } from 'ts-type-forge';
+import type { MutableRecord, ReadonlyRecord } from 'ts-type-forge';
 import { skipTypeWrappers, toArgumentText } from './ast-utils.mjs';
 import { getImportedLocalName, getTsDataForgeImport } from './import-utils.mjs';
 import { preferArrIsBoundedLengthArray } from './prefer-arr-is-bounded-length-array.mjs';

@@ -1,4 +1,4 @@
-import { type AnswerSymbolPoint } from '../../enum/index.mjs';
+import type { AnswerSymbolPoint } from '../../enum/index.mjs';
 
 export type SymbolSetting = Readonly<{
   description: string;

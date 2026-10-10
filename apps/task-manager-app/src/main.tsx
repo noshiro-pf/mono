@@ -1,7 +1,7 @@
 import { render } from 'preact';
 import { App } from './app.js';
 import './index.css';
-import { type Backend } from './repository/index.mjs';
+import type { Backend } from './repository/index.mjs';
 import { attachBackend, startStore } from './store/index.mjs';
 import { isMemoryStorageRequested } from './view-model/index.mjs';
 

@@ -1,5 +1,5 @@
 import { Arr } from 'ts-data-forge';
-import { type JSONSchema4 } from '../type.mjs';
+import type { JSONSchema4 } from '../type.mjs';
 
 /**
  * react/jsx-boolean-value のスキーマから重複した union を排除するために、空配列専用のパターンと 1 要素以上のパターンを明示する
