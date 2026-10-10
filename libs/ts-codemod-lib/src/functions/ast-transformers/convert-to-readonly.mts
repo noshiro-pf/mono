@@ -1303,6 +1303,7 @@ const transformIntersectionTypeNode = (
 /**
  * - `tr(A | B) |-> tr(A) | tr(B)`
  * - `tr(Readonly<A> | Readonly<B>) |-> Readonly<tr(A) | tr(B)>`
+ * - `tr(DeepReadonly<A> | DeepReadonly<B>) |-> DeepReadonly<tr(A) | tr(B)>`
  */
 const transformUnionTypeNode = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -1416,7 +1417,14 @@ const transformUnionOrIntersectionTypeNodeImpl = (
       others,
       (a) =>
         [
-          a.nodes.map((n) => wrapWithParentheses(n.getFullText())),
+          // `&` is deliberately not merged, unlike `Readonly<A> & Readonly<B>`
+          // above. See `mergeDeepReadonlyUnionMembers` for why.
+          operator === '|'
+            ? mergeDeepReadonlyUnionMembers(
+                a.nodes,
+                options.DeepReadonly.typeName,
+              )
+            : a.nodes.map((n) => wrapWithParentheses(n.getFullText())),
           a.firstPosition,
         ] as const,
     ),
@@ -1448,6 +1456,93 @@ const transformUnionOrIntersectionTypeNodeImpl = (
     node,
     unionToString({ types: sorted, op: operator, wrapWithReadonly: false }),
   );
+};
+
+/**
+ * - `tr(DeepReadonly<A> | B | DeepReadonly<C>) |-> DeepReadonly<A | C> | B`
+ *
+ * The merged member takes the place of the first `DeepReadonly` member.
+ *
+ * Only a union is merged, although `Readonly<A> & Readonly<B>` is merged into
+ * `Readonly<A & B>`. The two differ in kind:
+ *
+ * - `Readonly` is a homomorphic mapped type, and over type literals
+ *   `Readonly<A & B>` and `Readonly<A> & Readonly<B>` have the same properties
+ *   with the same modifiers. (That merge also takes `Readonly<T>` with any
+ *   `T`, where this does not hold for an array `T`; it is not relied on here.)
+ * - `DeepReadonly` is a conditional type that picks a branch by what `T` is
+ *   (primitive, function, Map, Set, array, object). It distributes over a union
+ *   because each member is tested on its own, but an intersection is tested as
+ *   a whole and matches every branch any one member matches: with
+ *   `F = () => void`, `F & { x: number[] }` extends a function type because `F`
+ *   does, so `DeepReadonly<F & { x: number[] }>` hits that branch and returns
+ *   the intersection unchanged, leaving `x` mutable, while `DeepReadonly<F> &
+ *   DeepReadonly<{ x: number[] }>` is `F & { readonly x: readonly number[] }`.
+ *   The codemod cannot tell whether a type argument is such a member, so it
+ *   merges no intersection.
+ *
+ * The test "premises of merging DeepReadonly members" pins both facts against
+ * ts-type-forge's `DeepReadonly`.
+ */
+const mergeDeepReadonlyUnionMembers = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  nodes: readonly tsm.TypeNode[],
+  deepReadonlyTypeName: string,
+): readonly string[] => {
+  const typeArgsOfDeepReadonly = nodes.map((n) =>
+    getDeepReadonlyTypeArg(n, deepReadonlyTypeName),
+  );
+
+  const typeArgs = typeArgsOfDeepReadonly.filter((t) => t !== undefined);
+
+  if (typeArgs.length < 2) {
+    return nodes.map((n) => wrapWithParentheses(n.getFullText()));
+  }
+
+  const firstIndex = typeArgsOfDeepReadonly.findIndex((t) => t !== undefined);
+
+  const merged = unionToString({
+    types: typeArgs.map((t_) => {
+      const t = removeParentheses(t_);
+
+      // NOTE: DeepReadonly<A | B> | DeepReadonly<C> -> DeepReadonly<A | B | C>
+      // NOTE: DeepReadonly<() => void> | DeepReadonly<B> -> DeepReadonly<(() => void) | B>
+      return t.isKind(tsm.SyntaxKind.UnionType)
+        ? t.getFullText()
+        : wrapWithParentheses(t.getFullText());
+    }),
+    op: '|',
+    wrapWithReadonly: deepReadonlyTypeName,
+  });
+
+  return nodes.flatMap((n, i) =>
+    typeArgsOfDeepReadonly[i] === undefined
+      ? [wrapWithParentheses(n.getFullText())]
+      : i === firstIndex
+        ? [merged]
+        : [],
+  );
+};
+
+/** `DeepReadonly<T>` |-> `T`, anything else |-> `undefined` */
+const getDeepReadonlyTypeArg = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: tsm.TypeNode,
+  deepReadonlyTypeName: string,
+): tsm.TypeNode | undefined => {
+  if (!node.isKind(tsm.SyntaxKind.TypeReference)) {
+    return undefined;
+  }
+
+  const typeName = node.getTypeName();
+
+  const typeArguments = node.getTypeArguments();
+
+  return typeName.isKind(tsm.SyntaxKind.Identifier) &&
+    typeName.getText() === deepReadonlyTypeName &&
+    Arr.isFixedLengthArray(1, typeArguments)
+    ? typeArguments[0]
+    : undefined;
 };
 
 const unionToString = ({

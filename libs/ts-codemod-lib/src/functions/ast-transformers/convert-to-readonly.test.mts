@@ -6,6 +6,10 @@ import dedent from 'dedent';
 import * as prettierPluginEstree from 'prettier/plugins/estree';
 import * as prettierPluginTypeScript from 'prettier/plugins/typescript';
 import * as prettier from 'prettier/standalone';
+import { expectType } from 'ts-data-forge';
+// Aliased: an import named `DeepReadonly` makes `vitest/prefer-describe-function-title`
+// rewrite `describe('DeepReadonly', ...)` into a reference to this type.
+import { type DeepReadonly as TsTypeForgeDeepReadonly } from 'ts-type-forge';
 import {
   convertToReadonlyTransformer,
   type ReadonlyTransformerOptions,
@@ -2829,6 +2833,205 @@ describe(convertToReadonlyTransformer, () => {
         `,
       },
     ])('$name', testFn);
+  });
+
+  describe('Union of DeepReadonly members', () => {
+    test.each([
+      {
+        name: 'DeepReadonly<A> | DeepReadonly<B> -> DeepReadonly<A | B>',
+        source: dedent`
+          type T = DeepReadonly<{ a: number[] }> | DeepReadonly<{ b: string[] }>;
+        `,
+        expected: dedent`
+          type T = DeepReadonly<{ a: number[] } | { b: string[] }>;
+        `,
+      },
+      {
+        name: 'Three DeepReadonly members',
+        source: dedent`
+          type T<A, B> = DeepReadonly<A> | DeepReadonly<B> | DeepReadonly<{ c: boolean[] }>;
+        `,
+        expected: dedent`
+          type T<A, B> = DeepReadonly<A | B | { c: boolean[] }>;
+        `,
+      },
+      {
+        name: 'DeepReadonly members separated by other members',
+        source: dedent`
+          type T = DeepReadonly<{ a: number[] }> | string | Map<string, number> | DeepReadonly<{ b: string[] }>;
+        `,
+        expected: dedent`
+          type T = DeepReadonly<{ a: number[] } | { b: string[] }> | ReadonlyMap<string, number> | string;
+        `,
+      },
+      {
+        name: 'A DeepReadonly member whose argument is itself a union',
+        source: dedent`
+          type T = DeepReadonly<{ a: number[] } | { b: string[] }> | DeepReadonly<{ c: boolean[] }>;
+        `,
+        expected: dedent`
+          type T = DeepReadonly<{ a: number[] } | { b: string[] } | { c: boolean[] }>;
+        `,
+      },
+      {
+        // `() => void | X` would parse as a function returning `void | X`.
+        name: 'A function type argument keeps its parentheses',
+        source: dedent`
+          type T = DeepReadonly<() => void> | DeepReadonly<{ b: string[] }>;
+        `,
+        expected: dedent`
+          type T = DeepReadonly<(() => void) | { b: string[] }>;
+        `,
+      },
+      {
+        name: 'Nested in a type literal',
+        source: dedent`
+          type T = { x: DeepReadonly<{ a: number[] }> | DeepReadonly<{ b: string[] }> };
+        `,
+        expected: dedent`
+          type T = Readonly<{ x: DeepReadonly<{ a: number[] } | { b: string[] }> }>;
+        `,
+      },
+      {
+        name: 'A single DeepReadonly member is left as written',
+        source: dedent`
+          type T = DeepReadonly<{ a: number[] }> | { b: string[] };
+        `,
+        expected: dedent`
+          type T = DeepReadonly<{ a: number[] }> | Readonly<{ b: readonly string[] }>;
+        `,
+      },
+      {
+        name: 'DeepReadonly and Readonly members are not merged',
+        source: dedent`
+          type T = DeepReadonly<{ a: number[] }> | Readonly<{ b: string[] }>;
+        `,
+        expected: dedent`
+          type T = DeepReadonly<{ a: number[] }> | Readonly<{ b: readonly string[] }>;
+        `,
+      },
+      // Unlike `Readonly<A> & Readonly<B>`, an intersection of DeepReadonly
+      // members is never merged; see `mergeDeepReadonlyUnionMembers` and the
+      // premises test below.
+      {
+        name: 'An intersection of DeepReadonly members is left as written',
+        source: dedent`
+          type T = DeepReadonly<{ a: number[] }> & DeepReadonly<{ b: string[] }>;
+        `,
+        expected: dedent`
+          type T = DeepReadonly<{ a: number[] }> & DeepReadonly<{ b: string[] }>;
+        `,
+      },
+      {
+        // The case merging would get wrong: `DeepReadonly<F & X>` is `F & X`.
+        name: 'An intersection with a function type argument is left as written',
+        source: dedent`
+          type T = DeepReadonly<() => void> & DeepReadonly<{ x: number[] }>;
+        `,
+        expected: dedent`
+          type T = DeepReadonly<() => void> & DeepReadonly<{ x: number[] }>;
+        `,
+      },
+      {
+        name: 'An intersection of generic DeepReadonly members is left as written',
+        source: dedent`
+          type T<A, B> = DeepReadonly<A> & DeepReadonly<B>;
+        `,
+        expected: dedent`
+          type T<A, B> = DeepReadonly<A> & DeepReadonly<B>;
+        `,
+      },
+      {
+        name: 'An intersection under a custom typeName is left as written',
+        source: dedent`
+          type T = DeepRO<{ a: number[] }> & DeepRO<{ b: string[] }>;
+        `,
+        expected: dedent`
+          type T = DeepRO<{ a: number[] }> & DeepRO<{ b: string[] }>;
+        `,
+        options: { DeepReadonly: { typeName: 'DeepRO' } },
+      },
+      {
+        // The union around it has one DeepReadonly member, so nothing merges.
+        name: 'An intersection of DeepReadonly members inside a union is left as written',
+        source: dedent`
+          type T = (DeepReadonly<{ a: number[] }> & DeepReadonly<{ b: string[] }>) | DeepReadonly<{ c: boolean[] }>;
+        `,
+        expected: dedent`
+          type T = (DeepReadonly<{ a: number[] }> & DeepReadonly<{ b: string[] }>) | DeepReadonly<{ c: boolean[] }>;
+        `,
+      },
+      {
+        name: 'Custom DeepReadonly typeName',
+        source: dedent`
+          type T = DeepRO<{ a: number[] }> | DeepRO<{ b: string[] }>;
+        `,
+        expected: dedent`
+          type T = DeepRO<{ a: number[] } | { b: string[] }>;
+        `,
+        options: { DeepReadonly: { typeName: 'DeepRO' } },
+      },
+      {
+        name: 'Other generic types are not merged',
+        source: dedent`
+          type T<A, B> = Partial<A> | Partial<B>;
+        `,
+        expected: dedent`
+          type T<A, B> = Partial<A> | Partial<B>;
+        `,
+      },
+    ])('$name', testFn);
+
+    // What `mergeDeepReadonlyUnionMembers` relies on. If ts-type-forge's
+    // `DeepReadonly` changes so that one of these no longer holds, revisit
+    // which operators the codemod merges.
+    test('premises of merging DeepReadonly members', () => {
+      type F = () => void;
+
+      type X = Readonly<{ x: number[] }>;
+
+      type A = Readonly<{ a: number[] }>;
+
+      type B = Readonly<{ b: string[] }>;
+
+      // `|` commutes with DeepReadonly, so merging a union is safe.
+      expectType<
+        TsTypeForgeDeepReadonly<A | B>,
+        TsTypeForgeDeepReadonly<A> | TsTypeForgeDeepReadonly<B>
+      >('=');
+
+      expectType<
+        TsTypeForgeDeepReadonly<F | X>,
+        TsTypeForgeDeepReadonly<F> | TsTypeForgeDeepReadonly<X>
+      >('=');
+
+      expectType<
+        TsTypeForgeDeepReadonly<readonly string[] | X>,
+        TsTypeForgeDeepReadonly<readonly string[]> | TsTypeForgeDeepReadonly<X>
+      >('=');
+
+      // `&` does not: an intersection is tested as a whole and matches every
+      // branch any one member matches. `F & X` hits the function branch and
+      // comes back unchanged, leaving `x` mutable.
+      expectType<TsTypeForgeDeepReadonly<F & X>, F & X>('=');
+
+      expectType<
+        TsTypeForgeDeepReadonly<F & X>,
+        TsTypeForgeDeepReadonly<F> & TsTypeForgeDeepReadonly<X>
+      >('!=');
+
+      expectType<
+        TsTypeForgeDeepReadonly<readonly string[] & X>,
+        TsTypeForgeDeepReadonly<readonly string[]> & TsTypeForgeDeepReadonly<X>
+      >('!=');
+
+      // `Readonly` over type literals does commute with `&`, which is what
+      // merging `{ a: A } & Readonly<{ b: B }>` into one `Readonly` relies on.
+      expectType<
+        Readonly<{ a: number[] } & { b: string[] }>,
+        Readonly<{ a: number[] }> & Readonly<{ b: string[] }>
+      >('~=');
+    });
   });
 
   describe('Parenthesized types', () => {
