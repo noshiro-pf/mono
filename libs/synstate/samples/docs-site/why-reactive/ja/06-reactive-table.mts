@@ -14,10 +14,10 @@ import {
 } from 'synstate';
 import { Result } from 'ts-data-forge';
 
-/* embed-sample-code-ignore-this-line */ // prettier-ignore
-/* embed-sample-code-ignore-this-line */ const renderTable = (_rows: readonly Row[]): void => {};
-/* embed-sample-code-ignore-this-line */ // prettier-ignore
-/* embed-sample-code-ignore-this-line */ const renderError = (_error: unknown): void => {};
+// embed-sample-code-ignore-below
+const renderTable = (_rows: readonly Row[]): void => {};
+const renderError = (_error: unknown): void => {};
+// embed-sample-code-ignore-above
 
 // ソース状態 — 各入力は独立した Observable
 const [filterName, setFilterName] = createState('');

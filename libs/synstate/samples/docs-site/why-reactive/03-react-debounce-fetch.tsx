@@ -4,48 +4,49 @@
 
 import * as React from 'react';
 
-/* embed-sample-code-ignore-this-line */ const Component =
-  /* embed-sample-code-ignore-this-line */ (): React.JSX.Element => {
-    // React: manual debounce + fetch + abort inside a component
-    const [query, setQuery] = React.useState('');
-    const [results, setResults] = React.useState([]);
-    const timerRef = React.useRef<number | undefined>(undefined);
-    const abortRef = React.useRef<AbortController | undefined>(undefined);
+// embed-sample-code-ignore-below
+const Component = (): React.JSX.Element => {
+  // embed-sample-code-ignore-above
+  // React: manual debounce + fetch + abort inside a component
+  const [query, setQuery] = React.useState('');
+  const [results, setResults] = React.useState([]);
+  const timerRef = React.useRef<number | undefined>(undefined);
+  const abortRef = React.useRef<AbortController | undefined>(undefined);
 
-    React.useEffect(() => {
+  React.useEffect(() => {
+    clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => {
+      // Cancel the previous in-flight request
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      fetch(`/api/search?q=${query}`, { signal: controller.signal })
+        .then((res) => res.json())
+        .then((data) => {
+          /* embed-sample-code-ignore-this-line */ // @ts-expect-error `Response.json()` is `unknown` under the strict standard library. Leaving the sample naive is the point; the line is stripped from the embedded output.
+          setResults(data);
+        })
+        .catch((error) => {
+          /* embed-sample-code-ignore-this-line */ // @ts-expect-error the `catch` callback parameter is `unknown` under the strict standard library. Leaving the sample naive is the point; the line is stripped from the embedded output.
+          if (error.name !== 'AbortError') {
+            throw error;
+          }
+        });
+    }, 300);
+
+    return () => {
       clearTimeout(timerRef.current);
-      timerRef.current = window.setTimeout(() => {
-        // Cancel the previous in-flight request
-        abortRef.current?.abort();
-        const controller = new AbortController();
-        abortRef.current = controller;
+      abortRef.current?.abort(); // Also abort on unmount
+    };
+  }, [query]);
 
-        fetch(`/api/search?q=${query}`, { signal: controller.signal })
-          .then((res) => res.json())
-          .then((data) => {
-            /* embed-sample-code-ignore-this-line */ // @ts-expect-error `Response.json()` is `unknown` under the strict standard library. Leaving the sample naive is the point; the line is stripped from the embedded output.
-            setResults(data);
-          })
-          .catch((error) => {
-            /* embed-sample-code-ignore-this-line */ // @ts-expect-error the `catch` callback parameter is `unknown` under the strict standard library. Leaving the sample naive is the point; the line is stripped from the embedded output.
-            if (error.name !== 'AbortError') {
-              throw error;
-            }
-          });
-      }, 300);
+  // embed-sample-code-ignore-below
+  // eslint-disable-next-line react-hooks/refs
+  noop(query, setQuery, results, timerRef, abortRef);
 
-      return () => {
-        clearTimeout(timerRef.current);
-        abortRef.current?.abort(); // Also abort on unmount
-      };
-    }, [query]);
-
-    // embed-sample-code-ignore-below
-    // eslint-disable-next-line react-hooks/refs
-    noop(query, setQuery, results, timerRef, abortRef);
-
-    return <div />;
-  };
+  return <div />;
+};
 
 const noop = (..._args: readonly unknown[]): void => {};
 

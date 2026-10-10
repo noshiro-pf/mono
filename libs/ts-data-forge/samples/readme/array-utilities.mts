@@ -1,8 +1,10 @@
 import { Arr, expectType, Optional } from 'ts-data-forge';
 import { type FixedLengthTuple, type MinLengthTuple } from 'ts-type-forge';
 
-/* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
-  /* embed-sample-code-ignore-this-line */ test('main', () => {
+// embed-sample-code-ignore-below
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
     const numbers: readonly number[] = [1, 2, 3, 4, 5, 2, 3] as const;
 
     // Reduction

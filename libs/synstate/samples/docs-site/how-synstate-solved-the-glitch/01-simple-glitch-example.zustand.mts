@@ -1,7 +1,9 @@
 import { createStore } from 'zustand/vanilla';
 
-/* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
-  /* embed-sample-code-ignore-this-line */ test('simple-glitch-example (Zustand)', async () => {
+// embed-sample-code-ignore-below
+if (import.meta.vitest !== undefined) {
+  test('simple-glitch-example (Zustand)', async () => {
+    // embed-sample-code-ignore-above
     // Zustand uses a single store object, similar to Redux.
     // Derived values are computed via selector functions
     // that read from the store's state snapshot.

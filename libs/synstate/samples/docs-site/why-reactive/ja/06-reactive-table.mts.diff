@@ -1,8 +1,8 @@
 --- en/06-reactive-table.mts
 +++ ja/06-reactive-table.mts
 @@ -19,15 +19,15 @@
- /* embed-sample-code-ignore-this-line */ // prettier-ignore
- /* embed-sample-code-ignore-this-line */ const renderError = (_error: unknown): void => {};
+ const renderError = (_error: unknown): void => {};
+ // embed-sample-code-ignore-above
  
 -// Source state — each input is an independent Observable
 +// ソース状態 — 各入力は独立した Observable

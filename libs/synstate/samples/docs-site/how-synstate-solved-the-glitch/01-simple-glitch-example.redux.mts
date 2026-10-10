@@ -2,8 +2,10 @@
 // embed-sample-code-ignore-above
 import { configureStore, createSelector, createSlice } from '@reduxjs/toolkit';
 
-/* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
-  /* embed-sample-code-ignore-this-line */ test('simple-glitch-example (Redux)', async () => {
+// embed-sample-code-ignore-below
+if (import.meta.vitest !== undefined) {
+  test('simple-glitch-example (Redux)', async () => {
+    // embed-sample-code-ignore-above
     // Redux uses a single immutable state tree.
     // Derived values are computed via "selectors" — pure functions
     // that read from the state snapshot.

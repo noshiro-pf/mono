@@ -1,8 +1,10 @@
 import { produce } from 'immer';
 import { castMutable } from 'ts-data-forge';
 
-/* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
-  /* embed-sample-code-ignore-this-line */ test('main', () => {
+// embed-sample-code-ignore-below
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
     // Example: Immer produce function
 
     type State = Readonly<{

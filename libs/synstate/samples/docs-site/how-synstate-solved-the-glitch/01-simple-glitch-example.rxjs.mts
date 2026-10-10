@@ -7,8 +7,10 @@ import {
   toArray,
 } from 'rxjs';
 
-/* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
-  /* embed-sample-code-ignore-this-line */ test('simple-glitch-example (RxJS)', async () => {
+// embed-sample-code-ignore-below
+if (import.meta.vitest !== undefined) {
+  test('simple-glitch-example (RxJS)', async () => {
+    // embed-sample-code-ignore-above
     const counterObservable = interval(100);
     // 0, 1, 2, 3, ...
 
