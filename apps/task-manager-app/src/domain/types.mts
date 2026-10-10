@@ -48,9 +48,9 @@ export type TaskId = Brand<string, 'TaskId'>;
 export type MilestoneId = Brand<string, 'MilestoneId'>;
 
 /** A node of the dependency graph. */
-export type NodeRef =
-  | DeepReadonly<{ kind: 'task'; id: TaskId }>
-  | DeepReadonly<{ kind: 'milestone'; id: MilestoneId }>;
+export type NodeRef = DeepReadonly<
+  { kind: 'task'; id: TaskId } | { kind: 'milestone'; id: MilestoneId }
+>;
 
 /**
  * How far a task has got, as set by hand (through `setProgress`, which keeps

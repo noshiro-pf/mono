@@ -69,9 +69,9 @@ const getTypeName = (
       const mut_parts: string[] = [];
 
       // eslint-disable-next-line functional/no-let
-      let current:
-        | DeepReadonly<TSESTree.Identifier>
-        | DeepReadonly<TSESTree.TSQualifiedName> = typeName;
+      let current: DeepReadonly<
+        TSESTree.Identifier | TSESTree.TSQualifiedName
+      > = typeName;
 
       while (current.type === AST_NODE_TYPES.TSQualifiedName) {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -176,9 +176,7 @@ export const noRestrictedCastName: TSESLint.RuleModule<MessageIds, Options> = {
     }
 
     const createFix = (
-      node:
-        | DeepReadonly<TSESTree.TSAsExpression>
-        | DeepReadonly<TSESTree.TSTypeAssertion>,
+      node: DeepReadonly<TSESTree.TSAsExpression | TSESTree.TSTypeAssertion>,
       fixWith: FixWithOption,
     ): ((fixer: TSESLint.RuleFixer) => TSESLint.RuleFix) => {
       const sourceCode = context.sourceCode;
@@ -311,9 +309,7 @@ const PARENTHESES_FREE_AS_OPERAND_TYPES: ReadonlySet<AST_NODE_TYPES> = new Set([
  * without parentheses, so that `x as T` can replace it as is.
  */
 const acceptsAnyExpression = (
-  node:
-    | DeepReadonly<TSESTree.TSAsExpression>
-    | DeepReadonly<TSESTree.TSTypeAssertion>,
+  node: DeepReadonly<TSESTree.TSAsExpression | TSESTree.TSTypeAssertion>,
 ): boolean => {
   const { parent } = node;
 
