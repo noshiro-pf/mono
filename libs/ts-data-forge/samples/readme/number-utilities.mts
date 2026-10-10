@@ -1,7 +1,9 @@
 import { Num } from 'ts-data-forge';
 
-/* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
-  /* embed-sample-code-ignore-this-line */ test('main', () => {
+// embed-sample-code-ignore-below
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
     // Basic conversions
     assert.isTrue(Num.from('123') === 123);
 

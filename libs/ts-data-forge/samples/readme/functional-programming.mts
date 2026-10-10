@@ -3,8 +3,10 @@
 
 import { match, Optional, pipe, Result } from 'ts-data-forge';
 
-/* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
-  /* embed-sample-code-ignore-this-line */ test('main', () => {
+// embed-sample-code-ignore-below
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
     // Optional for nullable values
     const maybeValue = Optional.some(42);
 

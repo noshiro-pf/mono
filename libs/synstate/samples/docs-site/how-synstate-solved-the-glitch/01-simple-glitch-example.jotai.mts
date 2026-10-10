@@ -1,7 +1,9 @@
 import { atom, createStore } from 'jotai/vanilla';
 
-/* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
-  /* embed-sample-code-ignore-this-line */ test('simple-glitch-example (Jotai)', async () => {
+// embed-sample-code-ignore-below
+if (import.meta.vitest !== undefined) {
+  test('simple-glitch-example (Jotai)', async () => {
+    // embed-sample-code-ignore-above
     // Jotai supports diamond dependencies natively through derived atoms.
     // Derived atoms are lazily evaluated — when a subscriber reads `sumAtom`,
     // it triggers recomputation of both dependencies,

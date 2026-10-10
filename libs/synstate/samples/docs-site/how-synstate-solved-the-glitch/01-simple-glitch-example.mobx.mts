@@ -1,7 +1,9 @@
 import { computed, observable, reaction, runInAction } from 'mobx';
 
-/* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
-  /* embed-sample-code-ignore-this-line */ test('simple-glitch-example (MobX)', async () => {
+// embed-sample-code-ignore-below
+if (import.meta.vitest !== undefined) {
+  test('simple-glitch-example (MobX)', async () => {
+    // embed-sample-code-ignore-above
     const state = observable({ counter: 0 });
 
     const multipliedBy10 = computed(() => state.counter * 10);

@@ -11,9 +11,11 @@ import {
   transformSourceCode,
 } from 'ts-codemod-lib';
 
-/* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
-  /* embed-sample-code-ignore-this-line */ // eslint-disable-next-line vitest/no-disabled-tests
-  /* embed-sample-code-ignore-this-line */ test.skip('transformSourceCode with glob', async () => {
+// embed-sample-code-ignore-below
+if (import.meta.vitest !== undefined) {
+  // eslint-disable-next-line vitest/no-disabled-tests
+  test.skip('transformSourceCode with glob', async () => {
+    // embed-sample-code-ignore-above
     for await (const filePath of fs.glob('test-code/**/*.{mts,tsx}')) {
       console.log(`Processing file: ${filePath}`);
 

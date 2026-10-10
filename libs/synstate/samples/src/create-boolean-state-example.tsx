@@ -2,8 +2,10 @@ import type * as React from 'react';
 import { createBooleanState } from 'synstate';
 import { useObservableValue } from 'synstate-react-hooks';
 
-/* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
-  /* embed-sample-code-ignore-this-line */ test(createBooleanState, () => {
+// embed-sample-code-ignore-below
+if (import.meta.vitest !== undefined) {
+  test(createBooleanState, () => {
+    // embed-sample-code-ignore-above
     // Menu drawer open/close state.
     // setTrue and setFalse can be passed directly as callbacks
     // — no need to create wrapper functions like `() => setState(true)`.

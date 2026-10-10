@@ -14,19 +14,19 @@ import { createState } from './create-state.mjs';
  * import { createBooleanState } from 'synstate';
  * import { useObservableValue } from 'synstate-react-hooks';
  *
- *     // Menu drawer open/close state.
- *     // setTrue and setFalse can be passed directly as callbacks
- *     // — no need to create wrapper functions like `() => setState(true)`.
- *     const [menuOpen$, { setTrue: openMenu, setFalse: closeMenu }] =
- *       createBooleanState(false);
+ * // Menu drawer open/close state.
+ * // setTrue and setFalse can be passed directly as callbacks
+ * // — no need to create wrapper functions like `() => setState(true)`.
+ * const [menuOpen$, { setTrue: openMenu, setFalse: closeMenu }] =
+ *   createBooleanState(false);
  *
- *     const SampleComponent = (): React.JSX.Element => (
- *       <MenuDrawer
- *         open={useObservableValue(menuOpen$)}
- *         onClose={closeMenu}
- *         onOpen={openMenu}
- *       />
- *     );
+ * const SampleComponent = (): React.JSX.Element => (
+ *   <MenuDrawer
+ *     open={useObservableValue(menuOpen$)}
+ *     onClose={closeMenu}
+ *     onOpen={openMenu}
+ *   />
+ * );
  * ```
  */
 

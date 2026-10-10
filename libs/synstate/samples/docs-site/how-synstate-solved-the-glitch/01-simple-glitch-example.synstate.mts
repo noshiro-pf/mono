@@ -1,7 +1,9 @@
 import { collectToArray, combine, counter, map, take } from 'synstate';
 
-/* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
-  /* embed-sample-code-ignore-this-line */ test('simple-glitch-example', async () => {
+// embed-sample-code-ignore-below
+if (import.meta.vitest !== undefined) {
+  test('simple-glitch-example', async () => {
+    // embed-sample-code-ignore-above
     const counterObservable = counter(1000 /* ms */);
     // 0, 1, 2, 3, ...
 

@@ -1,8 +1,10 @@
 /* eslint-disable vitest/expect-expect */
 import { expectType } from 'ts-data-forge';
 
-/* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
-  /* embed-sample-code-ignore-this-line */ test('main', () => {
+// embed-sample-code-ignore-below
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
     type User = Readonly<{ id: number; name: string }>;
 
     type Admin = Readonly<{ id: number; name: string; role: 'admin' }>;
