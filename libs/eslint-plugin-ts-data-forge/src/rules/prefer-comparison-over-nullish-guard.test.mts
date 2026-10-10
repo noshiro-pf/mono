@@ -169,3 +169,139 @@ describe('prefer-comparison-over-nullish-guard', () => {
     },
   );
 });
+
+describe('prefer-comparison-over-nullish-guard through type wrappers', () => {
+  tester.run(
+    'prefer-comparison-over-nullish-guard',
+    preferComparisonOverNullishGuard,
+    {
+      valid: [],
+      invalid: [
+        {
+          name: 'the call wrapped in `satisfies`, `as` or `<T>`',
+          code: dedent`
+            import { isNull, isNotUndefined } from 'ts-data-forge';
+            declare const x: string | null | undefined;
+            const a = isNull(x) satisfies boolean;
+            const b = isNotUndefined(x) as boolean;
+            const c = <boolean>isNull(x);
+          `,
+          output: dedent`
+            import { isNull, isNotUndefined } from 'ts-data-forge';
+            declare const x: string | null | undefined;
+            const a = (x === null) satisfies boolean;
+            const b = (x !== undefined) as boolean;
+            const c = <boolean>(x === null);
+          `,
+          errors: [
+            { messageId: 'preferComparison' },
+            { messageId: 'preferComparison' },
+            { messageId: 'preferComparison' },
+          ],
+        },
+        {
+          name: 'a wrapped argument is parenthesized under `===`',
+          code: dedent`
+            import { isNull } from 'ts-data-forge';
+            declare const x: unknown;
+            const a = isNull(x as string | null);
+            const b = isNull(x satisfies unknown);
+            const c = isNull(x!);
+          `,
+          output: dedent`
+            import { isNull } from 'ts-data-forge';
+            declare const x: unknown;
+            const a = (x as string | null) === null;
+            const b = (x satisfies unknown) === null;
+            const c = x! === null;
+          `,
+          errors: [
+            { messageId: 'preferComparison' },
+            { messageId: 'preferComparison' },
+            { messageId: 'preferComparison' },
+          ],
+        },
+        {
+          name: 'the guard itself reached through a wrapper',
+          code: dedent`
+            import { isNull } from 'ts-data-forge';
+            declare const x: string | null | undefined;
+            const a = (isNull as (u: unknown) => boolean)(x);
+          `,
+          output: dedent`
+            import { isNull } from 'ts-data-forge';
+            declare const x: string | null | undefined;
+            const a = x === null;
+          `,
+          errors: [{ messageId: 'preferComparison' }],
+        },
+        {
+          name: 'the namespace reached through a wrapper',
+          code: dedent`
+            import * as tf from 'ts-data-forge';
+            declare const x: string | null | undefined;
+            const b = (tf as typeof tf).isNotUndefined(x);
+          `,
+          output: dedent`
+            import * as tf from 'ts-data-forge';
+            declare const x: string | null | undefined;
+            const b = x !== undefined;
+          `,
+          errors: [{ messageId: 'preferComparison' }],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-comparison-over-nullish-guard with parenthesized operands', () => {
+  tester.run(
+    'prefer-comparison-over-nullish-guard',
+    preferComparisonOverNullishGuard,
+    {
+      valid: [],
+      invalid: [
+        {
+          name: 'bitwise operators bind looser than `===`',
+          code: dedent`
+            import { isNull } from 'ts-data-forge';
+            declare const a: number;
+            declare const b: number;
+            const p = isNull(a | b);
+            const q = isNull(a ^ b);
+            const r = isNull((a & b));
+          `,
+          output: dedent`
+            import { isNull } from 'ts-data-forge';
+            declare const a: number;
+            declare const b: number;
+            const p = (a | b) === null;
+            const q = (a ^ b) === null;
+            const r = (a & b) === null;
+          `,
+          errors: [
+            { messageId: 'preferComparison' },
+            { messageId: 'preferComparison' },
+            { messageId: 'preferComparison' },
+          ],
+        },
+        {
+          name: 'an equality argument is parenthesized for readability',
+          code: dedent`
+            import { isNotUndefined } from 'ts-data-forge';
+            declare const a: unknown;
+            declare const b: unknown;
+            const p = isNotUndefined(a === b);
+          `,
+          output: dedent`
+            import { isNotUndefined } from 'ts-data-forge';
+            declare const a: unknown;
+            declare const b: unknown;
+            const p = (a === b) !== undefined;
+          `,
+          errors: [{ messageId: 'preferComparison' }],
+        },
+      ],
+    },
+  );
+});

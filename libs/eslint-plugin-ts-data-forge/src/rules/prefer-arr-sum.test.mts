@@ -169,3 +169,100 @@ describe('prefer-arr-sum', () => {
     ],
   });
 }, 20000);
+
+describe('prefer-arr-sum through type wrappers', () => {
+  tester.run('prefer-arr-sum', preferArrSum, {
+    valid: [
+      {
+        name: 'strings cast to numbers are concatenated, not summed',
+        code: dedent`
+          declare const xs: readonly string[];
+          const sum = (xs as unknown as readonly number[]).reduce(
+            (a, b) => a + b,
+            0,
+          );
+        `,
+      },
+      {
+        name: 'a string property cast to number',
+        code: dedent`
+          declare const xs: readonly Readonly<{ n: string }>[];
+          const sum = xs.reduce(
+            (a, b) => (a.n as unknown as number) + (b.n as unknown as number),
+            0,
+          );
+        `,
+      },
+      {
+        name: 'a computed `reduce` is some other method',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const reduce: 'reduce';
+          const sum = xs[reduce]((a, b) => a + b, 0);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'the initial value or an operand wrapped',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = xs.reduce((a, b) => a + b, 0 as number);
+          const b = xs.reduce((a, b) => a + (b satisfies number), 0);
+          const c = xs!.reduce((a, b) => a! + b, 0);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = Arr.sum(xs);
+          const b = Arr.sum(xs);
+          const c = Arr.sum(xs!);
+        `,
+        errors: [
+          { messageId: 'useArrSum' },
+          { messageId: 'useArrSum' },
+          { messageId: 'useArrSum' },
+        ],
+      },
+      {
+        name: 'a property read through wrappers',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly Readonly<{ n: number }>[];
+          const sum = xs.reduce((a, b) => (a.n satisfies number) + b!.n, 0);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly Readonly<{ n: number }>[];
+          const sum = Arr.sumBy(xs, a => a.n);
+        `,
+        errors: [{ messageId: 'useArrSumBy' }],
+      },
+    ],
+  });
+}, 20000);
+
+describe('prefer-arr-sum with parenthesized operands', () => {
+  tester.run('prefer-arr-sum', preferArrSum, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a sequence array keeps its parentheses',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const log: () => void;
+          const sum = (log(), xs).reduce((a, b) => a + b, 0);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const log: () => void;
+          const sum = Arr.sum((log(), xs));
+        `,
+        errors: [{ messageId: 'useArrSum' }],
+      },
+    ],
+  });
+}, 20000);

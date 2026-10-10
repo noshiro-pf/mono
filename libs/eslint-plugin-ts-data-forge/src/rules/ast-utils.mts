@@ -5,16 +5,123 @@ import {
 } from '@typescript-eslint/utils';
 import { type DeepReadonly } from 'ts-type-forge';
 
+/**
+ * `node` with every `as`, `satisfies`, `!` and `<T>` around it taken off: the
+ * expression whose value it is. A wrapper changes no value, so a rule judges
+ * syntax on this — `xs.length > (0 as number)` compares with the literal `0`
+ * — and writes its fix from the original node so the wrapper is kept. A type
+ * is another matter: see {@link typeWrapperLayers}. See
+ * `docs/writing-lint-rules.md` at the repository root. A copy of
+ * `eslint-config-typed`'s `type-wrapper-utils.mts`, since this package is
+ * published on its own.
+ */
+export const skipTypeWrappers = <N extends TSESTree.Node>(
+  node: N,
+): N | TSESTree.Expression =>
+  isTypeWrapper(node) ? skipTypeWrappers(node.expression) : node;
+
+/**
+ * `node` and every expression inside the type wrappers around it, outermost
+ * first: `x as A as B` gives `x as A as B`, `x as A` and `x`.
+ *
+ * A conclusion a rule draws from a type — that a guard always holds, that a
+ * value is an array, that `?? 0` is dead — has to hold for the type of every
+ * layer. An assertion therefore only ever makes a rule more cautious: one
+ * that widens (`x as string | null`) is the author saying the value may be
+ * `null`, and is respected; one that narrows (`x!`, `v as string` on an
+ * `unknown`) is a claim the checker cannot verify, and the value's own type
+ * still decides.
+ */
+export const typeWrapperLayers = <N extends TSESTree.Node>(
+  node: N,
+): readonly (N | TSESTree.Expression)[] =>
+  isTypeWrapper(node)
+    ? ([node, ...typeWrapperLayers(node.expression)] as const)
+    : ([node] as const);
+
+export const isTypeWrapper = (
+  node: DeepReadonly<TSESTree.Node>,
+): node is TypeWrapper => TYPE_WRAPPERS.has(node.type);
+
+export type TypeWrapper =
+  | TSESTree.TSAsExpression
+  | TSESTree.TSNonNullExpression
+  | TSESTree.TSSatisfiesExpression
+  | TSESTree.TSTypeAssertion;
+
+const TYPE_WRAPPERS: ReadonlySet<AST_NODE_TYPES> = new Set([
+  AST_NODE_TYPES.TSAsExpression,
+  AST_NODE_TYPES.TSNonNullExpression,
+  AST_NODE_TYPES.TSSatisfiesExpression,
+  AST_NODE_TYPES.TSTypeAssertion,
+]);
+
 const isIntegerLiteral = (node: DeepReadonly<TSESTree.Expression>): boolean =>
   node.type === AST_NODE_TYPES.Literal &&
   typeof node.value === 'number' &&
   Number.isInteger(node.value);
 
+/**
+ * The source text of `node` for an argument position. A node's text never
+ * includes the parentheses the source wrote around it, so a comma (sequence)
+ * expression gets them back rather than spilling into the next argument.
+ */
+export const toArgumentText = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+): string => {
+  const text = sourceCode.getText(node);
+
+  return node.type === AST_NODE_TYPES.SequenceExpression ? `(${text})` : text;
+};
+
+/**
+ * Whether `node` is an array or a tuple at every layer of type wrappers (see
+ * {@link typeWrapperLayers}): a cast does not make a string an array, and the
+ * fix, which keeps the wrapper, has to type-check too. `false` without type
+ * information.
+ */
+export const isArrayOrTupleExpression = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  services: TSESLint.SourceCode['parserServices'],
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Expression,
+): boolean => {
+  const checker = services?.program?.getTypeChecker();
+
+  if (checker === undefined) {
+    return false;
+  }
+
+  return typeWrapperLayers(node).every((expression) => {
+    const tsNode = services?.esTreeNodeToTSNodeMap?.get(expression);
+
+    if (tsNode === undefined) {
+      return false;
+    }
+
+    const type = checker.getTypeAtLocation(tsNode);
+
+    return checker.isArrayType(type) || checker.isTupleType(type);
+  });
+};
+
+/**
+ * Whether `node`, under any type wrapper, is an integer literal or a `const`
+ * initialized with one.
+ */
 export const isIntegerLiteralOrConstant = (
   node: DeepReadonly<TSESTree.Expression>,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   sourceCode: TSESLint.SourceCode,
 ): boolean => {
+  // `(3 as number)`, `3 satisfies number` are still the bound 3.
+  if (isTypeWrapper(node)) {
+    return isIntegerLiteralOrConstant(node.expression, sourceCode);
+  }
+
   // Direct integer literal (e.g., 3)
   if (isIntegerLiteral(node)) {
     return true;
@@ -53,12 +160,40 @@ export const isIntegerLiteralOrConstant = (
   );
 };
 
-export const isLengthAccess = (
-  node: DeepReadonly<TSESTree.Expression>,
-): node is TSESTree.MemberExpression =>
-  node.type === AST_NODE_TYPES.MemberExpression &&
-  node.property.type === AST_NODE_TYPES.Identifier &&
-  node.property.name === 'length';
+/**
+ * `node` as a `<array>.length` read, looked for under any type wrapper
+ * (`(xs.length satisfies number)`, `xs.length!`), or `undefined`. The property
+ * must be written `.length`: `xs[length]` reads whatever index the variable
+ * `length` holds.
+ */
+export const asLengthAccess = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Expression,
+): TSESTree.MemberExpression | undefined => {
+  const inner = skipTypeWrappers(node);
+
+  return inner.type === AST_NODE_TYPES.MemberExpression &&
+    !inner.computed &&
+    inner.property.type === AST_NODE_TYPES.Identifier &&
+    inner.property.name === 'length'
+    ? inner
+    : undefined;
+};
+
+/**
+ * Whether two array expressions are written the same way, type wrappers aside:
+ * `xs.length >= 1 && (xs as readonly T[]).length <= 3` bounds one array.
+ */
+export const isSameArrayText = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  a: TSESTree.Expression,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  b: TSESTree.Expression,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+): boolean =>
+  sourceCode.getText(skipTypeWrappers(a)) ===
+  sourceCode.getText(skipTypeWrappers(b));
 
 type LengthComparison = Readonly<{
   array: TSESTree.Expression;
@@ -70,7 +205,9 @@ type LengthComparison = Readonly<{
  * Parses a `<array>.length <op> <bound>` comparison (in either operand order)
  * into its array expression, integer-literal/`const` `bound`, and whether it is
  * a lower (`min`) or upper (`max`) length bound. Returns `undefined` for
- * anything else.
+ * anything else. The length and the bound are read through type wrappers; the
+ * `bound` returned is the literal or constant underneath, since a wrapper such
+ * as `as number` would only widen the length a guard narrows to.
  *
  * - `xs.length >= n` / `n <= xs.length` → `min`
  * - `xs.length <= n` / `n >= xs.length` → `max`
@@ -90,13 +227,15 @@ export const parseLengthComparison = (
 
   const { left, right, operator } = node;
 
-  const lengthOnLeft = isLengthAccess(left);
+  const leftLength = asLengthAccess(left);
 
-  const lengthSide = lengthOnLeft ? left : right;
+  const lengthOnLeft = leftLength !== undefined;
+
+  const lengthSide = leftLength ?? asLengthAccess(right);
 
   const boundSide = lengthOnLeft ? right : left;
 
-  if (!isLengthAccess(lengthSide)) {
+  if (lengthSide === undefined) {
     return undefined;
   }
 
@@ -110,7 +249,11 @@ export const parseLengthComparison = (
     ? 'min'
     : 'max';
 
-  return { array: lengthSide.object, bound: boundSide, kind };
+  return {
+    array: lengthSide.object,
+    bound: skipTypeWrappers(boundSide),
+    kind,
+  };
 };
 
 /**
@@ -151,7 +294,7 @@ export const isPartOfBoundedLengthCheck = (
 
   return (
     self.kind !== other.kind &&
-    sourceCode.getText(self.array) === sourceCode.getText(other.array)
+    isSameArrayText(self.array, other.array, sourceCode)
   );
 };
 

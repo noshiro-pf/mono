@@ -1,10 +1,11 @@
+import { type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 import {
-  AST_NODE_TYPES,
-  type TSESLint,
-  type TSESTree,
-} from '@typescript-eslint/utils';
-import { type DeepReadonly } from 'ts-type-forge';
-import { isIntegerLiteralOrConstant } from './ast-utils.mjs';
+  asLengthAccess,
+  isArrayOrTupleExpression,
+  isIntegerLiteralOrConstant,
+  skipTypeWrappers,
+  toArgumentText,
+} from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -58,13 +59,16 @@ export const preferArrIsFixedLengthArray: TSESLint.RuleModule<
 
         const isNegated = node.operator === '!==';
 
-        const isLengthOnLeft = isLengthAccess(node.left);
+        // Both sides are read through type wrappers.
+        const leftLength = asLengthAccess(node.left);
 
-        const lengthSide = node[isLengthOnLeft ? 'left' : 'right'];
+        const isLengthOnLeft = leftLength !== undefined;
+
+        const lengthSide = leftLength ?? asLengthAccess(node.right);
 
         const valueSide = node[isLengthOnLeft ? 'right' : 'left'];
 
-        if (!isLengthAccess(lengthSide)) {
+        if (lengthSide === undefined) {
           return;
         }
 
@@ -73,36 +77,19 @@ export const preferArrIsFixedLengthArray: TSESLint.RuleModule<
           return;
         }
 
-        // lengthSide is MemberExpression accessing .length
         const arrayExpression = lengthSide.object;
 
         // Check if arrayExpression is actually an array type
-        if (services?.program !== undefined && services.program !== null) {
-          const checker = services.program.getTypeChecker();
-
-          const tsNode = services.esTreeNodeToTSNodeMap?.get(arrayExpression);
-
-          if (tsNode !== undefined) {
-            const type = checker.getTypeAtLocation(tsNode);
-
-            // Check if it's an array type or tuple type
-            const isArrayType =
-              checker.isArrayType(type) || checker.isTupleType(type);
-
-            if (!isArrayType) {
-              return;
-            }
-          } else {
-            return;
-          }
-        } else {
+        if (!isArrayOrTupleExpression(services, arrayExpression)) {
           return;
         }
 
         mut_nodesToFix.push({
           node,
           arrayExpression,
-          lengthExpression: valueSide,
+          // The literal or constant itself: a wrapper such as `as number`
+          // would only widen the length the guard narrows to.
+          lengthExpression: skipTypeWrappers(valueSide),
           isNegated,
         });
       },
@@ -115,7 +102,7 @@ export const preferArrIsFixedLengthArray: TSESLint.RuleModule<
           index,
           { node, arrayExpression, lengthExpression, isNegated },
         ] of mut_nodesToFix.entries()) {
-          const arrayText = sourceCode.getText(arrayExpression);
+          const arrayText = toArgumentText(arrayExpression, sourceCode);
 
           const lengthText = sourceCode.getText(lengthExpression);
 
@@ -148,10 +135,3 @@ export const preferArrIsFixedLengthArray: TSESLint.RuleModule<
   },
   defaultOptions: [],
 } as const;
-
-const isLengthAccess = (
-  node: DeepReadonly<TSESTree.Expression>,
-): node is TSESTree.MemberExpression =>
-  node.type === AST_NODE_TYPES.MemberExpression &&
-  node.property.type === AST_NODE_TYPES.Identifier &&
-  node.property.name === 'length';

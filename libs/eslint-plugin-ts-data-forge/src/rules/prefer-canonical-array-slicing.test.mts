@@ -586,3 +586,95 @@ describe('prefer-canonical-array-slicing', () => {
     ],
   });
 });
+
+describe('prefer-canonical-array-slicing through type wrappers', () => {
+  tester.run('prefer-canonical-array-slicing', preferCanonicalArraySlicing, {
+    valid: [
+      {
+        name: 'a concat argument cast away from an array may still be flattened',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const v: number | readonly number[];
+          const ys = xs.concat(v as number);
+        `,
+      },
+      {
+        name: 'a spread Set cast to an array is still a conversion',
+        code: dedent`
+          declare const s: ReadonlySet<number>;
+          const ys = [...(s as unknown as readonly number[]), 1];
+        `,
+      },
+      {
+        name: 'a receiver cast to an array is still not one',
+        code: dedent`
+          declare const s: string;
+          const ys = (s as unknown as readonly string[]).slice(1);
+        `,
+      },
+      {
+        name: 'a concat argument cast to an array is still not one',
+        code: dedent`
+          declare const s: ReadonlySet<number>;
+          const ys = [1].concat(s as unknown as readonly number[]);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a count wrapped in `as` or `satisfies`',
+        code: dedent`
+          declare const xs: readonly number[];
+          const a = xs.slice(1 as number);
+          const b = xs.slice(0 satisfies number, -1 as number);
+          const c = xs.toSpliced(2 satisfies number);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = Arr.tail(xs);
+          const b = Arr.butLast(xs);
+          const c = Arr.take(xs, 2);
+        `,
+        errors: [
+          { messageId: 'preferCanonicalArraySlicing' },
+          { messageId: 'preferCanonicalArraySlicing' },
+          { messageId: 'preferCanonicalArraySlicing' },
+        ],
+      },
+      {
+        name: 'a filter comparison on a wrapped index',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.filter((_, i) => (i satisfies number) >= 1);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ys = Arr.tail(xs);
+        `,
+        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+      },
+      {
+        name: 'a wrapped receiver and item keep their wrappers',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const v: number | undefined;
+          const ys = (xs satisfies readonly number[]).slice(1);
+          const zs = [...xs!, v!];
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const v: number | undefined;
+          const ys = Arr.tail(xs satisfies readonly number[]);
+          const zs = Arr.toPushed(xs!, v!);
+        `,
+        errors: [
+          { messageId: 'preferCanonicalArraySlicing' },
+          { messageId: 'preferCanonicalArraySlicing' },
+        ],
+      },
+    ],
+  });
+});

@@ -460,3 +460,103 @@ describe('no-unnecessary-type-guard', () => {
     ],
   });
 });
+
+describe('no-unnecessary-type-guard through type wrappers', () => {
+  tester.run('no-unnecessary-type-guard', noUnnecessaryTypeGuard, {
+    valid: [
+      {
+        name: 'isNullish on a value cast away from null',
+        code: dedent`
+          import { isNullish } from 'ts-data-forge';
+          declare const x: string | null | undefined;
+          const y = isNullish(x as string | undefined);
+        `,
+      },
+      {
+        name: 'isNonNullish on a value cast away from null',
+        code: dedent`
+          import { isNonNullish } from 'ts-data-forge';
+          declare const x: string | null | undefined;
+          const y = isNonNullish(x as string | undefined);
+        `,
+      },
+      {
+        name: 'isNonEmptyString on a string cast to NonEmptyString',
+        code: dedent`
+          import { type NonEmptyString } from 'ts-type-forge';
+          import { isNonEmptyString } from 'ts-data-forge';
+          declare const x: string | null | undefined;
+          const y = isNonEmptyString(x as NonEmptyString | null | undefined);
+        `,
+      },
+      {
+        name: 'isNull on a value whose `!` does not remove the null',
+        code: dedent`
+          import { isNull } from 'ts-data-forge';
+          declare const x: string | null;
+          const y = isNull(x!);
+        `,
+      },
+      {
+        name: 'isNull on a value widened to include null: the `as` is the author saying it may be null',
+        code: dedent`
+          import { isNull } from 'ts-data-forge';
+          declare const x: string;
+          const y = isNull(x as string | null);
+        `,
+      },
+      {
+        name: 'isNullish on a value widened to include null is not narrowed to isUndefined',
+        code: dedent`
+          import { isNullish } from 'ts-data-forge';
+          declare const x: string | undefined;
+          const y = isNullish(x as string | null | undefined);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'isNonNullish on a value whose `!` does not remove the null',
+        code: dedent`
+          import { isNonNullish, isNotNull } from 'ts-data-forge';
+          declare const x: string | null;
+          const y = isNonNullish(x!);
+        `,
+        output: dedent`
+          import { isNonNullish, isNotNull } from 'ts-data-forge';
+          declare const x: string | null;
+          const y = isNotNull(x!);
+        `,
+        errors: [{ messageId: 'replaceTypeGuard' }],
+      },
+      {
+        name: 'isNull on a value widened to exclude null still, at every layer',
+        code: dedent`
+          import { isNull } from 'ts-data-forge';
+          declare const x: string;
+          const y = isNull(x as string | undefined);
+        `,
+        output: dedent`
+          import { isNull } from 'ts-data-forge';
+          declare const x: string;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
+        name: 'isNullish replaced on the value under `satisfies`, keeping the wrapper',
+        code: dedent`
+          import { isNullish, isUndefined } from 'ts-data-forge';
+          declare const x: string | undefined;
+          const y = isNullish(x satisfies string | null | undefined);
+        `,
+        output: dedent`
+          import { isNullish, isUndefined } from 'ts-data-forge';
+          declare const x: string | undefined;
+          const y = isUndefined(x satisfies string | null | undefined);
+        `,
+        errors: [{ messageId: 'replaceTypeGuard' }],
+      },
+    ],
+  });
+});

@@ -4,6 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
+import { skipTypeWrappers, toArgumentText } from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -68,12 +69,21 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
 
         const beginExpr = declaration.init;
 
-        // Check test: i < end
+        // Check test: i < end. The loop variable and the step are read
+        // through type wrappers: `(i satisfies number) < n` tests `i`, and
+        // `i += 0 as number` still steps by 0.
         if (
           node.test?.type !== AST_NODE_TYPES.BinaryExpression ||
-          node.test.operator !== '<' ||
-          node.test.left.type !== AST_NODE_TYPES.Identifier ||
-          node.test.left.name !== varName
+          node.test.operator !== '<'
+        ) {
+          return;
+        }
+
+        const testedVariable = skipTypeWrappers(node.test.left);
+
+        if (
+          testedVariable.type !== AST_NODE_TYPES.Identifier ||
+          testedVariable.name !== varName
         ) {
           return;
         }
@@ -105,7 +115,7 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
           node.update.left.name === varName
         ) {
           // i += step
-          const stepValue = node.update.right;
+          const stepValue = skipTypeWrappers(node.update.right);
 
           if (stepValue.type === AST_NODE_TYPES.Literal) {
             const stepNum = stepValue.value;
@@ -118,15 +128,15 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
             }
           } else {
             // Variable step like i += step
-            mut_step = sourceCode.getText(stepValue);
+            mut_step = toArgumentText(node.update.right, sourceCode);
           }
         } else {
           return;
         }
 
-        const beginText = sourceCode.getText(beginExpr);
+        const beginText = toArgumentText(beginExpr, sourceCode);
 
-        const endText = sourceCode.getText(endExpr);
+        const endText = toArgumentText(endExpr, sourceCode);
 
         mut_nodesToFix.push({
           node,

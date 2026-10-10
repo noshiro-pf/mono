@@ -4,6 +4,12 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
+  asLengthAccess,
+  isArrayOrTupleExpression,
+  skipTypeWrappers,
+  toArgumentText,
+} from './ast-utils.mjs';
+import {
   buildImportFixes,
   getNamedImports,
   getTsDataForgeImport,
@@ -51,15 +57,18 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
 
         const isLengthOnLeft = node.operator === '>';
 
-        const lengthSide = node[isLengthOnLeft ? 'left' : 'right'];
+        // Both sides are read through type wrappers.
+        const lengthSide = asLengthAccess(
+          node[isLengthOnLeft ? 'left' : 'right'],
+        );
 
-        const numberSide = node[isLengthOnLeft ? 'right' : 'left'];
+        const numberSide = skipTypeWrappers(
+          node[isLengthOnLeft ? 'right' : 'left'],
+        );
 
         // Check if one side is `.length` and the other is 0
         if (
-          lengthSide.type !== AST_NODE_TYPES.MemberExpression ||
-          lengthSide.property.type !== AST_NODE_TYPES.Identifier ||
-          lengthSide.property.name !== 'length' ||
+          lengthSide === undefined ||
           numberSide.type !== AST_NODE_TYPES.Literal ||
           numberSide.value !== 0
         ) {
@@ -69,25 +78,7 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
         const arrayExpression = lengthSide.object;
 
         // Check if arrayExpression is actually an array type
-        if (services?.program !== undefined && services.program !== null) {
-          const checker = services.program.getTypeChecker();
-
-          const tsNode = services.esTreeNodeToTSNodeMap?.get(arrayExpression);
-
-          if (tsNode !== undefined) {
-            const type = checker.getTypeAtLocation(tsNode);
-
-            // Check if it's an array type or tuple type
-            const isArrayType =
-              checker.isArrayType(type) || checker.isTupleType(type);
-
-            if (!isArrayType) {
-              return;
-            }
-          } else {
-            return;
-          }
-        } else {
+        if (!isArrayOrTupleExpression(services, arrayExpression)) {
           return;
         }
 
@@ -105,7 +96,7 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
           index,
           { node, arrayExpression },
         ] of mut_nodesToFix.entries()) {
-          const arrayText = sourceCode.getText(arrayExpression);
+          const arrayText = toArgumentText(arrayExpression, sourceCode);
 
           const originalText = sourceCode.getText(node);
 
