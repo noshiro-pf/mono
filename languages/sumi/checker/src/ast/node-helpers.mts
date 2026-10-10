@@ -3,6 +3,8 @@ import {
   isInterfaceDeclaration,
   isNonNullExpression,
   isParenthesizedExpression,
+  isSatisfiesExpression,
+  isTypeAssertion,
   type PropertyAccessExpression,
   type Node as TsNode,
 } from 'typescript-native/unstable/ast';
@@ -51,10 +53,27 @@ export const ownerOf = (
     : undefined;
 };
 
-/** Parentheses, `as` and `!` say nothing about what an expression denotes. */
+/**
+ * Parentheses, `as`, `satisfies`, `<T>` and `!` say nothing about what an
+ * expression denotes (docs/writing-lint-rules.md).
+ */
+export const isTransparent = (node: TsNode): boolean =>
+  isParenthesizedExpression(node) ||
+  isAsExpression(node) ||
+  isSatisfiesExpression(node) ||
+  isTypeAssertion(node) ||
+  isNonNullExpression(node);
+
+/** The expression under any {@link isTransparent} wrappers. */
 export const unwrap = (node: TsNode): TsNode =>
   isParenthesizedExpression(node) ||
   isAsExpression(node) ||
+  isSatisfiesExpression(node) ||
+  isTypeAssertion(node) ||
   isNonNullExpression(node)
     ? unwrap(node.expression)
     : node;
+
+/** The outermost {@link isTransparent} wrapper around `node`, or `node`. */
+export const outermostWrapper = (node: TsNode): TsNode =>
+  isTransparent(node.parent) ? outermostWrapper(node.parent) : node;
