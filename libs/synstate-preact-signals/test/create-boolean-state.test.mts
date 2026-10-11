@@ -39,3 +39,23 @@ describe(createBooleanState, () => {
     assert.strictEqual(flagSignal.value, true);
   });
 });
+
+describe('createBooleanState with equals', () => {
+  test('passes on only the updates that change the state', () => {
+    const [, { state, setTrue }] = createBooleanState(false, {
+      equals: Object.is,
+    });
+
+    const mut_seen: boolean[] = [];
+
+    state.subscribe((value) => {
+      mut_seen.push(value);
+    });
+
+    setTrue();
+
+    setTrue();
+
+    assert.deepStrictEqual(mut_seen, [false, true]);
+  });
+});
