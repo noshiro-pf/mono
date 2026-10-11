@@ -1,5 +1,15 @@
 # color-demo-app
 
+## 0.0.8
+
+### Patch Changes
+
+- ts-data-forge@14.7.1
+    - react-utils@0.0.11
+    - react-mui-utils@0.0.8
+    - ts-utils-additional@0.0.4
+    - better-react-use-state@1.0.1
+
 ## 0.0.7
 
 ### Patch Changes
