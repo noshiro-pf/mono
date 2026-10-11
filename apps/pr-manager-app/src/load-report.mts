@@ -17,6 +17,7 @@ import {
   closingIssuesIn,
   closingKeywordIssuesIn,
   codeOwnerReview,
+  epochMsOf,
   MAIN_RULESET_PATH,
   parseCodeOwners,
   parseRuleset,
@@ -73,7 +74,6 @@ import {
   type OpenIssueNode,
   type OpenPullRequest,
 } from './report-query.mjs';
-import { epochMsOf } from './timestamp.mjs';
 
 /**
  * What `unblock-prs` said when it last set the pull request aside, read from

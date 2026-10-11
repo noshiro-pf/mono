@@ -109,6 +109,29 @@ export const rest = async <A,>(
   return Result.isErr(response) ? response : validate(response.value, schema);
 };
 
+/**
+ * The login the token authenticates as. Outside `rest` because the route is
+ * not under the repository.
+ */
+export const viewerLogin = async (
+  token: string,
+): Promise<Result<string, string>> => {
+  const response = await send({
+    url: 'https://api.github.com/user',
+    method: 'GET',
+    token,
+    accept: 'application/vnd.github+json',
+    body: undefined,
+  });
+
+  return Result.isErr(response)
+    ? response
+    : Result.map(
+        validate(response.value, t.record({ login: t.string() })),
+        ({ login }) => login,
+      );
+};
+
 /** What a REST call may carry besides its path. */
 export type RestOptions = Readonly<{
   query?: ReadonlyRecord<string, string>;

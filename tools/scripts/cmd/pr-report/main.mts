@@ -1,4 +1,4 @@
-import { buildReport, type PrReport } from 'pr-report-core';
+import { buildReport, type PrReport, type QueueComments } from 'pr-report-core';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { createClient, parseRepoRef } from './github.mjs';
@@ -35,6 +35,9 @@ import { readRepoRef, readRequiredContexts } from './repo-settings.mjs';
  *   queued yesterday go in.
  * - **What is open that is not a pull request** — the open issues, so that
  *   "what is there to do" does not need a second tab.
+ * - **In the JSON only, whether `unblock-prs` set each one aside and who has
+ *   claimed it** (`pr-report-core`'s `queue-comments.mts`), which is how a
+ *   session working the queue picks what to fix.
  *
  * It reads and prints. Nothing here labels, rebases, merges or comments —
  * that is `unblock-prs`, and keeping the report incapable of it is what makes
@@ -96,6 +99,13 @@ export const prReport = async (
     return issues;
   }
 
+  // Only the JSON carries these: they are what a session working the queue
+  // reads (`.claude/skills/unblock-prs/SKILL.md`), not what a person does.
+  const queue =
+    options.format === 'json'
+      ? await client.queueComments(repo.value, defaultBranch.value, facts.value)
+      : new Map<number, QueueComments>();
+
   const report = buildReport({
     repo: repo.value,
     defaultBranch: defaultBranch.value,
@@ -111,13 +121,17 @@ export const prReport = async (
     issuesLimit: options.issuesLimit,
   });
 
-  return Result.ok(print(report, options.format));
+  return Result.ok(print(report, queue, options.format));
 };
 
-const print = (report: PrReport, format: Format): string => {
+const print = (
+  report: PrReport,
+  queue: ReadonlyMap<number, QueueComments>,
+  format: Format,
+): string => {
   switch (format) {
     case 'json':
-      return JSON.stringify(serializable(report), undefined, 2);
+      return JSON.stringify(serializable(report, queue), undefined, 2);
 
     case 'markdown':
       return renderMarkdown(report);
@@ -129,14 +143,19 @@ const print = (report: PrReport, format: Format): string => {
 
 /**
  * The report with its maps turned into objects, because `JSON.stringify`
- * writes a `Map` as `{}` and would quietly drop every check verdict.
+ * writes a `Map` as `{}` and would quietly drop every check verdict, and with
+ * what the queue's comments say on each entry (absent when there is none).
  */
-const serializable = (report: PrReport): unknown =>
+const serializable = (
+  report: PrReport,
+  queue: ReadonlyMap<number, QueueComments>,
+): unknown =>
   ({
     ...report,
     entries: report.entries.map((entry) => ({
       ...entry,
       reported: Object.fromEntries(entry.reported),
+      ...queue.get(entry.number),
     })),
   }) as const;
 

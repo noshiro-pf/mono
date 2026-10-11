@@ -4,14 +4,17 @@ import {
   MERGE_QUEUED_LABEL,
   SKIP_CI_LABEL,
   stackDescendants,
+  type Claim,
 } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { autoFix } from './auto-fix.mjs';
+import { standingClaims } from './claims.mjs';
 import { STALE_STATE_PAUSE_MS } from './constants.mjs';
 import { afterWatch, followHead, pruneDemotions } from './demotions.mjs';
 import {
   checkPreflight,
+  readOwnComments,
   readSetAsideComments,
   viewPullRequest,
   writeSetAsideCommentOn,
@@ -62,10 +65,11 @@ import { watch } from './watch.mjs';
  * rebasing the one that is out-of-date with the default branch, arming its
  * auto-merge, and waiting for GitHub to merge it.
  *
- * This is the mechanical half of the `/unblock-prs` skill. The skill also
- * reads failing checks and fixes what they complain about; this script fixes
- * only the one kind that needs no reading — a fixer's diff, see step 4 — and
- * it never merges anything: auto-merge does that once the checks are green.
+ * The `/unblock-prs` skill fixes what this script sets aside — a failing check
+ * that needs reading, a conflict — after claiming it, so that this script
+ * leaves it alone meanwhile (`claims.mts`). This script fixes only the one
+ * kind that needs no reading — a fixer's diff, see step 4 — and it never
+ * merges anything: auto-merge does that once the checks are green.
  *
  * One cycle:
  *
@@ -319,6 +323,10 @@ const announceSetAside = async (
  * person ticked, is rewritten as resolved — not under `--dry-run` — and one
  * an earlier run left standing becomes a record again. Comments that cannot
  * be read leave the records as they were.
+ *
+ * The claims sessions wrote on the same pull requests are read with them,
+ * and those that still hold are returned beside the records (`claims.mts`).
+ * Comments that cannot be read hold nothing: every push is leased anyway.
  */
 const settleWithComments = async (
   skipped: SkipRecords,
@@ -326,8 +334,10 @@ const settleWithComments = async (
   baseSha: string,
   defaultBranch: string,
   dryRun: boolean,
-): Promise<SkipRecords> => {
-  const read = await readSetAsideComments(
+): Promise<
+  Readonly<{ skipped: SkipRecords; claimed: ReadonlyMap<number, Claim> }>
+> => {
+  const read = await readOwnComments(
     pullRequests
       .filter((pr) => wantsAutoRebase(pr) || skipped.has(pr.number))
       .map((pr) => pr.number),
@@ -336,10 +346,15 @@ const settleWithComments = async (
   if (Result.isErr(read)) {
     log(`Cannot read the set-aside comments: ${read.value}`);
 
-    return skipped;
+    return { skipped, claimed: new Map() };
   }
 
-  const settled = settleSkips(skipped, read.value, pullRequests, baseSha);
+  const settled = settleSkips(
+    skipped,
+    read.value.setAside,
+    pullRequests,
+    baseSha,
+  );
 
   for (const { number, databaseId, setAside, resolvedBy } of settled.resolved) {
     log(
@@ -366,7 +381,14 @@ const settleWithComments = async (
     }
   }
 
-  return settled.skipped;
+  return {
+    skipped: settled.skipped,
+    claimed: standingClaims(
+      read.value.claims,
+      pullRequests,
+      Temporal.Now.instant().epochMilliseconds,
+    ),
+  };
 };
 
 const runCycle = async (
@@ -419,7 +441,7 @@ const runCycle = async (
   // whose merge would otherwise go unrecorded.
   const tracked = await reportDeparted(before.tracked, pullRequests);
 
-  const skipped = await settleWithComments(
+  const { skipped, claimed } = await settleWithComments(
     pruneSkips(before.skipped, pullRequests, baseSha),
     pullRequests,
     baseSha,
@@ -433,6 +455,7 @@ const runCycle = async (
     defaultBranch,
     baseSha,
     skipped,
+    claimed,
     demoted,
     requiredContexts,
     reviewRequirements,
@@ -556,6 +579,7 @@ const runCycle = async (
     const behind = await restackBehind(pullRequests, defaultBranch, {
       baseSha,
       skipped: mut_skipped,
+      claimed: new Set(claimed.keys()),
       dryRun: options.dryRun,
     });
 

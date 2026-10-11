@@ -429,15 +429,11 @@ export const restackBehind = async (
   context: Readonly<{
     baseSha: string;
     skipped: SkipRecords;
+    claimed: ReadonlySet<number>;
     dryRun: boolean;
   }>,
 ): Promise<Readonly<{ skipped: SkipRecords; moved: boolean }>> => {
-  const targets = autoRebaseTargets(
-    pullRequests,
-    defaultBranch,
-    context.baseSha,
-    context.skipped,
-  );
+  const targets = autoRebaseTargets(pullRequests, defaultBranch, context);
 
   if (!Arr.isNonEmpty(targets)) {
     return { skipped: context.skipped, moved: false };

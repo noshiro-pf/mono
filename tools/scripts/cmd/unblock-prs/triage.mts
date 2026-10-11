@@ -18,6 +18,7 @@ import {
   listRequiredChecks,
   summarizeChecks,
 } from './checks.mjs';
+import { claimedNote } from './claims.mjs';
 import { UNKNOWN_STATE_RETRIES, UNKNOWN_STATE_RETRY_MS } from './constants.mjs';
 import { isDemoted } from './demotions.mjs';
 import {
@@ -270,6 +271,12 @@ const classify = async (
           : `the branch is pushed again or ${context.defaultBranch} moves`
       }`,
     };
+  }
+
+  const claimed = claimedNote(pr, context.claimed);
+
+  if (claimed !== undefined) {
+    return claimed;
   }
 
   // A layer of a stack: its turn comes when GitHub moves it onto the default

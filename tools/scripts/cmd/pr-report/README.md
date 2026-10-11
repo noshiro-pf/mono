@@ -115,7 +115,11 @@ public なので無認証でも動き、1回のレポートは匿名の 60 reque
 ### 出力先
 
 スクリプトは stdout に出すだけです。Claude の routine や `/unblock-prs` が同じ
-コマンドを実行して結果を読みます。
+コマンドを実行して結果を読みます。`--format json` の各 entry には、
+`unblock-prs` の見送りの comment と、それを直すセッションの claim が何を言って
+いるか（`setAside` / `claim`、無ければ省略）も載ります。信用するのはトークンの
+アカウントが書いた comment だけなので、トークンが無ければ載りません
+（`tools/scripts/cmd/unblock-prs/README.md`）。
 
 **GitHub Pull Requests Manager**
 （<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`）はこの
@@ -194,7 +198,11 @@ their own section instead of being drawn, since there is no position in a
 merge order to draw them at.
 
 The script only prints. A Claude routine and `/unblock-prs` run the same
-command and read what it prints.
+command and read what it prints. Each entry of `--format json` also carries
+what `unblock-prs`'s set-aside comment and a fixing session's claim say
+(`setAside` / `claim`, absent when there is none). Only comments the token's
+own account wrote are trusted, so without a token neither is there
+(`tools/scripts/cmd/unblock-prs/README.md`).
 
 The **GitHub Pull Requests Manager** page
 (<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`) does

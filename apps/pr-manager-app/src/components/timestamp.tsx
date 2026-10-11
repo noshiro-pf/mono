@@ -1,6 +1,6 @@
+import { epochMsOf } from 'pr-report-core';
 import { memoNamed } from 'preact-utils';
 import { formatLocalTime } from '../format.mjs';
-import { epochMsOf } from '../timestamp.mjs';
 import { Age } from './age.js';
 
 type Props = Readonly<{

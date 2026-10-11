@@ -44,6 +44,7 @@ const context = (
     defaultBranch: 'main',
     baseSha: 'b'.repeat(40),
     skipped: new Map(),
+    claimed: new Map(),
     demoted: new Map(),
     requiredContexts: [],
     reviewRequirements: {
@@ -307,10 +308,13 @@ const labelled = (...names: readonly string[]): PullRequest['labels'] =>
 const targets = (
   pullRequests: readonly PullRequest[],
   skipped: ReadonlyMap<number, SkipRecord> = new Map(),
+  claimed: ReadonlySet<number> = new Set(),
 ): readonly number[] =>
-  autoRebaseTargets(pullRequests, 'main', 'b'.repeat(40), skipped).map(
-    (pr) => pr.number,
-  );
+  autoRebaseTargets(pullRequests, 'main', {
+    baseSha: 'b'.repeat(40),
+    skipped,
+    claimed,
+  }).map((pr) => pr.number);
 
 describe(autoRebaseTargets, () => {
   test('takes a paused pull request labelled auto-rebase, and a paused queued one', () => {
@@ -391,6 +395,26 @@ describe(autoRebaseTargets, () => {
         ]),
       ),
       [],
+    );
+  });
+
+  test('leaves one a session has claimed, until its claim ends', () => {
+    assert.deepStrictEqual(
+      targets(
+        [
+          pullRequest({
+            number: 1,
+            labels: labelled('skip-ci', 'auto-rebase'),
+          }),
+          pullRequest({
+            number: 2,
+            labels: labelled('skip-ci', 'auto-rebase'),
+          }),
+        ],
+        new Map(),
+        new Set([1]),
+      ),
+      [2],
     );
   });
 });

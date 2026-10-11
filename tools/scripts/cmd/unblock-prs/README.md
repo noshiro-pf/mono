@@ -2,7 +2,8 @@
 
 # `unblock-prs`
 
-`pnpm run unblock-prs` — the mechanical half of the `/unblock-prs` skill.
+`pnpm run unblock-prs` — the worker that lands the merge queue. The
+`/unblock-prs` skill fixes what it sets aside, and nothing else.
 
 - [日本語](#日本語)
 - [English](#english)
@@ -188,6 +189,11 @@ PR は常に1本まで** に保ちます。`main` が動く前にマージでき
 だけ」という状態がどこにも記録されていないことから生まれます。`skip-ci` をその
 記録として使います。
 
+今の skill は見送られた PR だけを直し、push は必ず `skip-ci` を付けてから行う
+ので、この例の手順 3 は skill からは起きません。人の push や、
+`pnpm-update.yml` のようにラベル無しで開かれる PR があるので、ルールはそのまま
+です。
+
 #### ルール
 
 - **解放する前に他を止める。** PR を解放する前、つまり `skip-ci` を外す前や、ラベ
@@ -198,12 +204,12 @@ PR は常に1本まで** に保ちます。`main` が動く前にマージでき
   を開くので、ここで止まります。上の例では手順 2 で A に `skip-ci` が付き、手
   順 3 の push はチェックを全部 skip します。A はキューに戻り、B の後で rebase
   されて解放されます。
-- **解放した直後にもう一度見る。** skill が同じ瞬間に別の PR を解放していると、ど
+- **解放した直後にもう一度見る。** 人が同じ瞬間に別の PR を解放していると、ど
   ちらも相手がまだ止まっているのを見てから解放したことになります。2本とも解放
   されていたら、pick の順（`priority:high` が先、`priority:low` が後、その中
   で番号の小さい順、version PR は最後）で先の方だけを残
   し、残りに `skip-ci` を付けます。自分の PR が負けた場合は survey からやり直し
-  ます。skill も同じ規則で決めるので、両者は同じ1本に落ち着きます。
+  ます。
 
 この規則が保証するのは CI 時間だけで、マージの正しさは保証しません。それは
 ruleset（最新の `main` の上で必須チェックが全部緑）が別に保証しています。一覧
@@ -266,8 +272,12 @@ GraphQL 1回でまとめて読み、記録と突き合わせます（`skips.mts`
   残したものです。記録として引き継ぎ、試し直しません。同じ head と base の
   rebase は同じように conflict するからです。
 
-読めなければログに出して、記録はそのままで続行します。`--dry-run` では書き換え
-ません。
+同じリクエストで、セッションが書いた **claim**（「見送った PR を直すセッション
+の claim」）も読みます。まだ有効な claim は見送りの記録とは別に持ち、その PR は
+pick も「3a」の rebase もしません。
+
+読めなければログに出して、記録はそのままで続行します（claim は無いものとしま
+す）。`--dry-run` では書き換えません。
 
 #### 2. triage
 
@@ -276,7 +286,8 @@ GraphQL 1回でまとめて読み、記録と突き合わせます（`skips.mts`
 2. **範囲判定** — `merge-queued` が無ければ `ignore`（無言）。あって動かせなけ
    れば `note`（理由を出力）。
 3. **skip 記録** — 前のサイクルで諦めた PR は、当時の head と base のままなら
-   `note`。
+   `note`。**claim** — セッションが claim している PR も、誰がいつ claim した
+   かを添えて `note`。
 4. **stack** — 積まれている PR は「下の層が先」と `note`。
    **auto-merge** — 無い PR は、GitHub のネイティブ stack に入っていれば
    `note`（手でマージ）。そうでなければ先へ進み、pick されたときに張られます。
@@ -383,7 +394,8 @@ survey と違う / lease 負けで push が拒否され、remote の head が変
 - 対象: **`skip-ci` が付いていて**（push しても CI が走らない）、**
   `auto-rebase` か `merge-queued` のどちらかが付いている** PR。そのうち open、
   draft でない、同じリポジトリのブランチ、base が `main`、version PR ではない、
-  見送りの記録が今の head と `main` に対して残っていないもの。
+  見送りの記録が今の head と `main` に対して残っておらず、セッションの claim
+  も無いもの。
   `merge-queued` の PR がここまで来るのは、`Merge-After` やレビュー待ちなどで
   pick されないときです。pick される前に rebase しておいても、`skip-ci` が付
   いていれば損はありません。
@@ -599,6 +611,30 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 残します（「2」の8）。この場合 comment は書きません。承認されれば次の survey で
 動き出すからです。
 
+### 見送った PR を直すセッションの claim
+
+見送った PR は `/unblock-prs` skill が直します（PR を開いたセッションが直すこ
+ともあります）。直している間にこのスクリプトが同じ PR を試し直す（`main` が動
+いた、Retry にチェックが入った）と、同じ conflict を2か所で解くことになるので、
+直す側は先に **claim** を書きます（`pnpm run claim-pr -- <番号> --by <名前>`）。
+
+- 書式は `pr-report-core` の `claim.mts` で、1行目が
+  `<!-- unblock-prs:claim head=… by=… at=… -->` の comment です。見送りの
+  comment と同じく PR ごとに1本、書き換えて使い、自分のアカウントのものだけ
+  を読みます。`by` が同じアカウントで書く claim の書き手を区別します。
+- **有効なのは、claim した head のままで、120分以内の間だけ**です。直した
+  push で head が動けばそれだけで終わり、PR はこのスクリプトに戻ります（push
+  で戻るのは以前と同じです）。120分は push せずに止まったセッションのため
+  で、長くかかるなら同じコマンドで書き直します。諦めるときは `--release`。
+- 有効な claim がある PR は、pick も「3a」の rebase もしません。`skip-ci` を
+  付けて止めることだけは続けます（skill は `skip-ci` を付けてから push しま
+  す）。
+- `claim-pr` は、今の head と `main` に対して見送りが有効でない PR（このスク
+  リプトがまさに動かそうとしている PR）と、他の書き手の claim が有効な PR に
+  は書きません。書いた後に読み直し、同時に書いた相手に負けていれば失敗します。
+- `pnpm run pr-report -- --format json` の各 entry の `setAside` と `claim`
+  が、skill が直す PR を選ぶときに読むものです。
+
 ### ファイル構成
 
 | ファイル                | 役割                                                          |
@@ -615,6 +651,7 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `auto-fix.mts`          | fixer の差分だけの失敗を直して push                           |
 | `quiet.mts`             | 何もない時にどれだけ待つか                                    |
 | `checks.mts`            | マージが何を待っているか                                      |
+| `claims.mts`            | セッションが claim している PR を避ける                       |
 | `github.mts`            | `gh` / `git` を叩くもの全部。判断はしない                     |
 | `labels.mts`            | ラベルがその PR について何を言うか                            |
 | `skips.mts`             | 諦めた PR を何をもって覚え続けるか、comment との突き合わせ    |
@@ -828,6 +865,11 @@ and neither can see the other. Without the rule:
 Each writer was right on its own. The waste comes from "only one may run" being
 written down nowhere, and `skip-ci` is where it is now written.
 
+The skill now fixes only set-aside pull requests and always pushes under
+`skip-ci`, so step 3 no longer comes from it. A person's push and a pull
+request opened without the label, as `pnpm-update.yml` opens one, still can,
+so the rule stays.
+
 #### The rule
 
 - **Pause the others before releasing one.** That means before taking
@@ -839,13 +881,12 @@ written down nowhere, and `skip-ci` is where it is now written.
   where it gets paused. In the example, A gets `skip-ci` at step 2, so the push
   at step 3 skips every check. A is back in the queue, to be rebased and
   released after B.
-- **Look again straight after releasing.** If the skill released another pull
+- **Look again straight after releasing.** If a person released another pull
   request in the same moment, each writer saw the other still paused. When two
   are released, the one first in the pick order keeps its release
   (`priority:high` first and `priority:low` last, then the lowest number,
   the version pull request last) and the rest are paused. If the loser
-  is this run's own, it surveys again. The skill decides by the same rule, so
-  both settle on the same one.
+  is this run's own, it surveys again.
 
 The rule protects CI time, not correctness. The ruleset protects correctness
 on its own: every required check green, on the current `main`. A push in the
@@ -911,8 +952,12 @@ request shows") in one GraphQL request, and settle the records with them
   an earlier run. It is taken up as a record rather than tried again: a rebase
   of the same head onto the same base conflicts the same way.
 
-Comments that cannot be read are logged, and the records stand as they were.
-With `--dry-run` nothing is rewritten.
+The same request reads the **claims** sessions wrote ("A session's claim on a
+set-aside pull request"). Those still holding are kept beside the records, and
+the pull request is neither picked nor rebased by "3a".
+
+Comments that cannot be read are logged, and the records stand as they were
+(and nothing is claimed). With `--dry-run` nothing is rewritten.
 
 #### 2. Triage
 
@@ -923,7 +968,8 @@ With `--dry-run` nothing is rewritten.
 2. **Scope** — no `merge-queued` means `ignore`, silently. Queued but not
    actionable means a `note` naming the reason.
 3. **Skip records** — a pull request a previous cycle gave up on is a `note`
-   for as long as its head and the base are where they were.
+   for as long as its head and the base are where they were. **Claims** — one
+   a session has claimed is a `note` saying who, and since when.
 4. **Stacks** — a stacked pull request is a `note` saying the layer below goes
    first. **Auto-merge** — one without it is a `note` if it is in one of
    GitHub's native stacks (to be merged by hand); otherwise it goes on, and is
@@ -1041,8 +1087,9 @@ waiting its turn, to its own changes.
 
 - Eligible: **labelled `skip-ci`** (so the push runs no checks) **and either
   `auto-rebase` or `merge-queued`**; open, not a draft, a branch of this
-  repository, based on `main`, not the version pull request, and with no
-  set-aside record standing for its current head and `main`. A queued one gets
+  repository, based on `main`, not the version pull request, with no
+  set-aside record standing for its current head and `main`, and no session's
+  claim. A queued one gets
   here only when it cannot be picked — waiting on a `Merge-After` or its
   review — and rebasing it early under `skip-ci` costs nothing.
 - `skip-ci` leaves the merge state at `BLOCKED`, so whether it is behind is
@@ -1268,6 +1315,33 @@ same way and leaves that pull request in the queue (step 2, item 8). It writes
 no comment for it, because an approval puts it back in the running on the
 next survey.
 
+### A session's claim on a set-aside pull request
+
+What this script sets aside, the `/unblock-prs` skill fixes — and so, at
+times, does the session that opened the pull request. If this script tried
+the same pull request again meanwhile (`main` moved, the "Retry" box was
+ticked), the same conflict would be resolved in two places. So whoever fixes
+one writes a **claim** first (`pnpm run claim-pr -- <number> --by <name>`).
+
+- Its format is `claim.mts` in `pr-report-core`: a comment whose first line is
+  `<!-- unblock-prs:claim head=… by=… at=… -->`. Like the set-aside comment
+  it is one per pull request, edited in place, and only this account's count;
+  `by` tells apart the claimants writing as that one account.
+- **It holds while the head is the one it claimed, for at most 120
+  minutes.** The push carrying the fix moves the head, which ends it and hands
+  the pull request back to this script, as a push always did. The 120 minutes
+  are for a session that stopped without pushing; one that needs longer writes
+  the claim again, and one that gives up runs it with `--release`.
+- While a claim holds, the pull request is not picked and not rebased by "3a".
+  Pausing it with `skip-ci` goes on: the skill puts the label on before it
+  pushes anyway.
+- `claim-pr` refuses a pull request not set aside at its current head and
+  `main` — this script is about to move it — and one another claimant holds.
+  It reads back after writing, and fails when someone writing in the same
+  moment won.
+- `setAside` and `claim` on each entry of `pnpm run pr-report -- --format
+json` are what the skill reads to choose what to fix.
+
 ### Layout
 
 | File                    | Role                                                          |
@@ -1284,6 +1358,7 @@ next survey.
 | `auto-fix.mts`          | fixing and pushing a failure that is only a fixer's diff      |
 | `quiet.mts`             | how long to sleep when there is nothing to do                 |
 | `checks.mts`            | what the merge is waiting for                                 |
+| `claims.mts`            | keeping off the pull requests a session has claimed           |
 | `github.mts`            | everything that shells out to `gh` or `git`                   |
 | `labels.mts`            | what the labels say about a pull request                      |
 | `skips.mts`             | what the loop remembers, for how long, and what comments say  |

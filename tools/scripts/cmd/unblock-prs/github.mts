@@ -6,11 +6,13 @@
  */
 
 import {
+  parseClaimComment,
   parseSetAsideComment,
   requirementsOfRules,
   SET_ASIDE_COMMENT_SCAN,
   SKIP_CI_LABEL,
   type CheckRunReport,
+  type Claim,
   type RulesetRequirements,
 } from 'pr-report-core';
 import { Arr, isRecord, Json, Result } from 'ts-data-forge';
@@ -312,16 +314,34 @@ export const addSkipCiLabel = async (
 };
 
 /**
- * This account's set-aside comment on each of `numbers` that has one, in one
- * GraphQL request: every number goes in as a variable and each pull request
- * comes back under its own alias. `pr-report-core`'s `set-aside.mts` says
- * why only `viewerDidAuthor` counts; of several, the oldest is the one.
+ * This account's set-aside comment on each of `numbers` that has one. See
+ * {@link readOwnComments}.
  */
 export const readSetAsideComments = async (
   numbers: readonly number[],
-): Promise<Result<ReadonlyMap<number, OwnSetAsideComment>, string>> => {
+): Promise<Result<ReadonlyMap<number, OwnSetAsideComment>, string>> =>
+  Result.map(await readOwnComments(numbers), ({ setAside }) => setAside);
+
+/**
+ * This account's set-aside comment, and the standing claim a session wrote
+ * (`claims.mts`), on each of `numbers` that has one, in one GraphQL request:
+ * every number goes in as a variable and each pull request comes back under
+ * its own alias. `pr-report-core`'s `set-aside.mts` says why only
+ * `viewerDidAuthor` counts; of several of a kind, the oldest is the one.
+ */
+export const readOwnComments = async (
+  numbers: readonly number[],
+): Promise<
+  Result<
+    Readonly<{
+      setAside: ReadonlyMap<number, OwnSetAsideComment>;
+      claims: ReadonlyMap<number, Claim>;
+    }>,
+    string
+  >
+> => {
   if (!Arr.isNonEmpty(numbers)) {
-    return Result.ok(new Map());
+    return Result.ok({ setAside: new Map(), claims: new Map() });
   }
 
   const query = [
@@ -375,24 +395,47 @@ export const readSetAsideComments = async (
     return Result.err(invalid.join('\n'));
   }
 
-  return Result.ok(
-    new Map(
-      nodes.flatMap(([n, node]) => {
-        const own = Result.isOk(node)
-          ? ownSetAsideComment(node.value.comments.nodes)
-          : undefined;
+  const own = nodes.flatMap(([n, node]) =>
+    Result.isOk(node)
+      ? [
+          [
+            n,
+            node.value.comments.nodes.filter(
+              ({ viewerDidAuthor }) => viewerDidAuthor,
+            ),
+          ] as const,
+        ]
+      : [],
+  );
 
-        return own === undefined ? [] : [[n, own] as const];
+  return Result.ok({
+    setAside: new Map(
+      own.flatMap(([n, comments]) => {
+        const found = ownSetAsideComment(comments);
+
+        return found === undefined ? [] : [[n, found] as const];
       }),
     ),
-  );
+    claims: new Map(
+      own.flatMap(([n, comments]) => {
+        const says = comments
+          .flatMap(({ body }) => {
+            const claim = parseClaimComment(body);
+
+            return claim === undefined ? [] : [claim];
+          })
+          .at(0);
+
+        return says?.kind === 'standing' ? [[n, says.claim] as const] : [];
+      }),
+    ),
+  });
 };
 
 const ownSetAsideComment = (
   comments: readonly t.TypeOf<typeof CommentSchema>[],
 ): OwnSetAsideComment | undefined =>
   comments
-    .filter(({ viewerDidAuthor }) => viewerDidAuthor)
     .flatMap(({ databaseId, body }) => {
       const says = parseSetAsideComment(body);
 

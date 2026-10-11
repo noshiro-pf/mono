@@ -126,13 +126,22 @@ export const restackable = (pr: PullRequest): string | undefined =>
  * matrix. Whether it is actually behind is for the caller to ask
  * git: `skip-ci` leaves the merge state at `BLOCKED` whatever the branch is.
  * The version pull request is the release workflow's, and one this script
- * already gave up on stays given up on until its head or the base moves.
+ * already gave up on stays given up on until its head or the base moves. One
+ * a session has claimed is left to that session (`claims.mts`).
  */
 export const autoRebaseTargets = (
   pullRequests: readonly PullRequest[],
   defaultBranch: string,
-  baseSha: string,
-  skipped: ReadonlyMap<number, SkipRecord>,
+  {
+    baseSha,
+    skipped,
+    claimed,
+  }: Readonly<{
+    baseSha: string;
+    skipped: ReadonlyMap<number, SkipRecord>;
+    /** What a session has claimed (`claims.mts`). */
+    claimed: ReadonlySet<number>;
+  }>,
 ): readonly PullRequest[] =>
   pullRequests.filter((pr) => {
     const skip = skipped.get(pr.number);
@@ -144,7 +153,8 @@ export const autoRebaseTargets = (
       isSkipCiLabelled(pr) &&
       !isVersionPullRequest(pr, defaultBranch) &&
       restackable(pr) === undefined &&
-      (skip === undefined || !skipStillApplies(skip, pr, baseSha))
+      (skip === undefined || !skipStillApplies(skip, pr, baseSha)) &&
+      !claimed.has(pr.number)
     );
   });
 
