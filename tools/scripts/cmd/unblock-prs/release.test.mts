@@ -1,3 +1,4 @@
+import { Arr } from 'ts-data-forge';
 import { firstInReleaseOrder, releasedExcept } from './release.mjs';
 import { type PullRequest } from './types.mjs';
 
@@ -59,6 +60,25 @@ describe(firstInReleaseOrder, () => {
     );
   });
 
+  test('puts priority:high first and priority:low last, the version pull request included', () => {
+    const released = [
+      pullRequest({ number: 1, labels: [queued, low] }),
+      pullRequest({ number: 2 }),
+      pullRequest({
+        number: 3,
+        headRefName: 'changeset-release/main',
+        labels: [queued, high],
+      }),
+    ] as const;
+
+    assert.strictEqual(firstInReleaseOrder(released, 'main')?.number, 3);
+
+    assert.strictEqual(
+      firstInReleaseOrder(Arr.take(released, 2), 'main')?.number,
+      2,
+    );
+  });
+
   test('is undefined for nothing', () => {
     assert.isUndefined(firstInReleaseOrder([], 'main'));
   });
@@ -67,6 +87,10 @@ describe(firstInReleaseOrder, () => {
 const queued = { name: 'merge-queued' } as const;
 
 const skipCi = { name: 'skip-ci' } as const;
+
+const high = { name: 'priority:high' } as const;
+
+const low = { name: 'priority:low' } as const;
 
 const pullRequest = (
   fields: Partial<PullRequest> & Readonly<{ number: number }>,

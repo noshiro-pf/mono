@@ -1,9 +1,10 @@
 /**
- * What the four labels this script reads say about one pull request.
+ * What the labels this script reads say about one pull request.
  * `merge-queued` decides whether a pull request is looked at, `skip-ci`
  * decides whether it has been released yet, and `blocks-release` decides
- * whether the version pull request may go at all, and `auto-rebase` asks
- * for a paused pull request to be kept on the tip. The strings themselves are
+ * whether the version pull request may go at all, `auto-rebase` asks for a
+ * paused pull request to be kept on the tip, and `priority:high` /
+ * `priority:low` move one within the pick order. The strings themselves are
  * `pr-report-core`'s, because the Pull Requests Manager page reads them too.
  */
 
@@ -11,6 +12,8 @@ import {
   AUTO_REBASE_LABEL,
   BLOCKS_RELEASE_LABEL,
   MERGE_QUEUED_LABEL,
+  PRIORITY_HIGH_LABEL,
+  PRIORITY_LOW_LABEL,
   SKIP_CI_LABEL,
 } from 'pr-report-core';
 import { type PullRequest } from './types.mjs';
@@ -50,3 +53,35 @@ export const blocksRelease = (pr: PullRequest): boolean =>
 export const wantsAutoRebase = (pr: PullRequest): boolean =>
   isMergeQueued(pr) ||
   pr.labels.some((label) => label.name === AUTO_REBASE_LABEL);
+
+/**
+ * Which priority label the pull request carries: `both` is the two at once,
+ * which contradict each other and so count as neither.
+ */
+export const priorityOf = (pr: PullRequest): Priority => {
+  const high = pr.labels.some((label) => label.name === PRIORITY_HIGH_LABEL);
+
+  const low = pr.labels.some((label) => label.name === PRIORITY_LOW_LABEL);
+
+  return high ? (low ? 'both' : 'high') : low ? 'low' : 'none';
+};
+
+/**
+ * Where {@link priorityOf} puts the pull request in the pick order, as a sort
+ * key: `high` before the rest, `low` after them.
+ */
+export const priorityRank = (pr: PullRequest): 0 | 1 | 2 => {
+  switch (priorityOf(pr)) {
+    case 'high':
+      return 0;
+
+    case 'none':
+    case 'both':
+      return 1;
+
+    case 'low':
+      return 2;
+  }
+};
+
+type Priority = 'high' | 'low' | 'none' | 'both';

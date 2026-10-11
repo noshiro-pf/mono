@@ -25,7 +25,7 @@ them.
 ちた場合で、「4a」を参照）。rebase は使い捨ての `git worktree` の中で行うので、
 実行元のチェックアウトの作業ツリーには触れません。
 
-### PR 側で宣言する5つのこと
+### PR 側で宣言する6つのこと
 
 **`merge-queued` ラベル** が対象範囲そのものです。付いていない PR は何も言わず
 に無視します（例外は2つで、下の層がマージされて `main` に付け替えられた層の
@@ -142,6 +142,24 @@ PR — から行います。public repository なので、コメントではな�
 - 印を付けた PR だけが対象です（opt-in）。寝かせてあるブランチを付け忘れで動
   かしてしまわないためです。レビューを頼む直前に付ければ足ります。
 
+**`priority:high` / `priority:low` ラベル** は「pick できるものの中で優先して
+ほしい / 後回しで良い」という宣言です。
+
+- pick できる候補の中で、`priority:high` を先頭に、`priority:low` を末尾に並
+  べます。並び替えるだけで、ゲートではありません。`Merge-After`、stack、
+  `blocks-release`、レビュー待ちで止まっている PR は止まったままで、進行中の PR
+  は何が付いていても今まで通り watch します。
+- version PR にも効きます。`priority:high` を付ければ順番待ちの変更より先にリ
+  リースし、`priority:low` の付いた変更は普通の version PR より後ろ、つまり次
+  のリリースに回ります。
+- `DIRTY` と version PR を後ろに回す並びより優先し、番号順はその内側です。
+  green のまま止まった PR（「5」）を最後に回す規則だけはこれより強く、
+  `priority:high` でも最後です。
+- 解放されている PR が2本になったときにどちらを残すかも、この順で決めます。
+- 両方付いている PR は、矛盾しているのでどちらも無いものとして扱い、triage の
+  出力でそう言います。
+- GitHub にある `priority:mid` は読みません。ラベル無しと同じです。
+
 **`skip-ci` は対象範囲の判定には使いません。** キューに入った PR を一時停止さ
 せるだけで、順番が来たら外すのがこのスクリプトの仕事です。「3a」で `main` に追
 従させるかどうかの条件には使います（push しても CI が走らないことの保証として）。
@@ -182,7 +200,8 @@ PR は常に1本まで** に保ちます。`main` が動く前にマージでき
   されて解放されます。
 - **解放した直後にもう一度見る。** skill が同じ瞬間に別の PR を解放していると、ど
   ちらも相手がまだ止まっているのを見てから解放したことになります。2本とも解放
-  されていたら、pick の順（番号の小さい順、version PR は最後）で先の方だけを残
+  されていたら、pick の順（`priority:high` が先、`priority:low` が後、その中
+  で番号の小さい順、version PR は最後）で先の方だけを残
   し、残りに `skip-ci` を付けます。自分の PR が負けた場合は survey からやり直し
   ます。skill も同じ規則で決めるので、両者は同じ1本に落ち着きます。
 
@@ -320,7 +339,9 @@ version commit が「まだ消費していない changeset を含む先端」の
 
 なければ candidate の先頭に対して、次の手順を行います。並びは番号順で、後ろに回
 すものが3種類あります。`DIRTY`、その後ろに version PR、さらにその後ろに green
-のまま止まった PR（「5」）です。
+のまま止まった PR（「5」）です。green のまま止まった PR 以外は、まず
+`priority:high` / ラベル無し / `priority:low` の順に分け、その中で今の並びに
+します。
 
 1. 使い捨て worktree で `origin/main` に rebase し、`--force-with-lease`
    （survey が見た head を明示）で push。stack から降ろされた PR がマージ済みの
@@ -595,7 +616,7 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `quiet.mts`             | 何もない時にどれだけ待つか                                    |
 | `checks.mts`            | マージが何を待っているか                                      |
 | `github.mts`            | `gh` / `git` を叩くもの全部。判断はしない                     |
-| `labels.mts`            | 3つのラベルがその PR について何を言うか                       |
+| `labels.mts`            | ラベルがその PR について何を言うか                            |
 | `skips.mts`             | 諦めた PR を何をもって覚え続けるか、comment との突き合わせ    |
 | `set-aside-comment.mts` | 見送りの comment の文章                                       |
 | `demotions.mts`         | green のまま止まった PR をいつまで最後に回すか                |
@@ -626,7 +647,7 @@ review, or fix a failing check (the skill's job — except a failure that is onl
 a fixer's diff, see "4a"). The rebase happens in a throwaway `git worktree`, so
 the checkout it runs from is never touched.
 
-### The five things a pull request declares
+### The six things a pull request declares
 
 **The `merge-queued` label is the scope rule.** A pull request without it is
 passed over in silence — with two exceptions: a layer GitHub moved onto
@@ -758,6 +779,27 @@ changes and easy to review ("3a").
 - It is opt-in, so that a branch left to sleep is never moved for want of a
   label. Putting it on just before asking for a review is enough.
 
+**The `priority:high` and `priority:low` labels say which of the pickable
+pull requests to take first, and which can wait.**
+
+- Among the candidates, one labelled `priority:high` goes first and one
+  labelled `priority:low` last. It is an ordering, not a gate: what
+  `Merge-After`, a stack, `blocks-release` or a review holds stays held, and
+  one in flight is watched whatever it carries.
+- The version pull request reads it too. `priority:high` on it releases
+  before the queued changes; a change labelled `priority:low` goes after an
+  unlabelled version pull request, so into the release after.
+- It outranks the ordering that moves `DIRTY` and the version pull request
+  back, and the numbers order within it. Only the rule that puts last one that
+  sat green without merging ("5") is stronger: that one is last even with
+  `priority:high`.
+- When two pull requests are released at once, the same order says which
+  keeps its release.
+- One carrying both contradicts itself and counts as neither, and the triage
+  output says so.
+- `priority:mid`, which also exists on GitHub, is not read: it is the same as
+  no label.
+
 **`skip-ci` is not a scope rule.** It pauses a queued pull request, and taking
 it off when its turn comes is the job. It is a condition of "3a", as the
 guarantee that the push runs no checks.
@@ -799,8 +841,9 @@ written down nowhere, and `skip-ci` is where it is now written.
   released after B.
 - **Look again straight after releasing.** If the skill released another pull
   request in the same moment, each writer saw the other still paused. When two
-  are released, the one first in the pick order keeps its release (lowest
-  number, the version pull request last) and the rest are paused. If the loser
+  are released, the one first in the pick order keeps its release
+  (`priority:high` first and `priority:low` last, then the lowest number,
+  the version pull request last) and the rest are paused. If the loser
   is this run's own, it surveys again. The skill decides by the same rule, so
   both settle on the same one.
 
@@ -949,7 +992,9 @@ Arm it first if it has no auto-merge.
 
 Otherwise take the first candidate. Candidates go lowest number first, with
 three kinds moved back: `DIRTY` after the rest, the version pull request after
-that, and one that sat green without merging (step 5) last of all. Then:
+that, and one that sat green without merging (step 5) last of all. Everything
+but that last kind is first split into `priority:high`, unlabelled and
+`priority:low`, in that order, and ordered as above within each. Then:
 
 1. Rebase onto `origin/main` in a throwaway worktree and push with
    `--force-with-lease`, leased against the head the survey saw. A pull
@@ -1240,7 +1285,7 @@ next survey.
 | `quiet.mts`             | how long to sleep when there is nothing to do                 |
 | `checks.mts`            | what the merge is waiting for                                 |
 | `github.mts`            | everything that shells out to `gh` or `git`                   |
-| `labels.mts`            | what the three labels say about a pull request                |
+| `labels.mts`            | what the labels say about a pull request                      |
 | `skips.mts`             | what the loop remembers, for how long, and what comments say  |
 | `set-aside-comment.mts` | the prose of the set-aside comment                            |
 | `demotions.mts`         | how long one that sat green without merging goes last         |

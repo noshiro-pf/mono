@@ -5,6 +5,8 @@ import {
   MERGE_QUEUED_LABEL,
   parseCodeOwners,
   parseMergeAfter,
+  PRIORITY_HIGH_LABEL,
+  PRIORITY_LOW_LABEL,
   SKIP_CI_LABEL,
   stackDescendants,
   type RulesetRequirements,
@@ -25,7 +27,13 @@ import {
   readReviewStates,
   remoteSha,
 } from './github.mjs';
-import { blocksRelease, isMergeQueued, isSkipCiLabelled } from './labels.mjs';
+import {
+  blocksRelease,
+  isMergeQueued,
+  isSkipCiLabelled,
+  priorityOf,
+  priorityRank,
+} from './labels.mjs';
 import { waitingOnNote } from './merge-after.mjs';
 import { reviewHold } from './review.mjs';
 import { skipStillApplies } from './skips.mjs';
@@ -475,22 +483,29 @@ const isConflicting = (pr: PullRequest): boolean =>
 
 /**
  * The cycle's order. The declared order has already been applied, as a gate
- * rather than a sort, so this is lowest number first within four ranks:
+ * rather than a sort, so this is lowest number first within these ranks,
+ * outermost first:
  *
- * 1. The rest.
- * 2. What GitHub only *thinks* conflicts: a rebase this script is sure of is
- *    worth spending the cycle on before one it is guessing at.
- * 3. The version pull request. This is an ordering rather than the gate —
- *    `blocks-release` is the gate — so it never stops a release: it only says
- *    that when a queued change and the release are both ready, the change
- *    goes first. The alternative is releasing, then rebuilding the version
- *    pull request for a second release of the very thing that was already
- *    queued.
- * 4. What a watch has seen green and still open (`demotions.mts`), after the
- *    release too: the release is known to be able to merge, and this is
- *    known to have sat without merging.
+ * 1. What a watch has seen green and still open (`demotions.mts`) goes after
+ *    everything else, the release and `priority:high` included: everything
+ *    else is not known to sit without merging, and this is.
+ * 2. `priority:high` before the rest, `priority:low` after them
+ *    (`priorityRank`). It is a person's declaration, so it outranks the two
+ *    guesses below — and the version pull request reads it too: a release
+ *    can be declared urgent, and a change declared able to wait goes out in
+ *    the release after.
+ * 3. What GitHub only *thinks* conflicts goes after the rest: a rebase this
+ *    script is sure of is worth spending the cycle on before one it is
+ *    guessing at.
+ * 4. The version pull request goes after that. This is an ordering rather
+ *    than the gate — `blocks-release` is the gate — so it never stops a
+ *    release: it only says that when a queued change and the release are
+ *    both ready, the change goes first. The alternative is releasing, then
+ *    rebuilding the version pull request for a second release of the very
+ *    thing that was already queued.
  *
- * `toSorted` is stable, so the numbers keep their order within each rank.
+ * `toSorted` is stable, so each sort keeps the order of the one before it
+ * among equals, and the last one is the outermost.
  */
 export const orderCandidates = (
   candidates: readonly PullRequest[],
@@ -498,19 +513,23 @@ export const orderCandidates = (
 ): readonly PullRequest[] =>
   candidates
     .toSorted((a, b) => a.number - b.number)
-    .toSorted((a, b) => candidateRank(a, context) - candidateRank(b, context));
+    .toSorted((a, b) => candidateRank(a, context) - candidateRank(b, context))
+    .toSorted((a, b) => priorityRank(a) - priorityRank(b))
+    .toSorted(
+      (a, b) =>
+        Number(isDemoted(context.demoted, a)) -
+        Number(isDemoted(context.demoted, b)),
+    );
 
 const candidateRank = (
   pr: PullRequest,
-  context: Readonly<{ defaultBranch: string; demoted: Demotions }>,
+  context: Readonly<{ defaultBranch: string }>,
 ): number =>
-  isDemoted(context.demoted, pr)
-    ? 3
-    : isVersionPullRequest(pr, context.defaultBranch)
-      ? 2
-      : isConflicting(pr)
-        ? 1
-        : 0;
+  isVersionPullRequest(pr, context.defaultBranch)
+    ? 2
+    : isConflicting(pr)
+      ? 1
+      : 0;
 
 export const reportTriage = (
   triaged: Triage,
@@ -551,7 +570,7 @@ export const reportTriage = (
 
   for (const [position, pr] of triaged.candidates.entries()) {
     log(
-      `  #${pr.number}: ${position === 0 ? 'next' : `${position} ahead of it`} — ${describeAction(pr, defaultBranch, triaged)}${isDemoted(context.demoted, pr) ? ' — last, because it sat green without merging' : ''} — ${pr.title}`,
+      `  #${pr.number}: ${position === 0 ? 'next' : `${position} ahead of it`} — ${describeAction(pr, defaultBranch, triaged)}${isDemoted(context.demoted, pr) ? ' — last, because it sat green without merging' : ''}${priorityPhrase(pr)} — ${pr.title}`,
     );
   }
 };
@@ -579,6 +598,23 @@ export const describeAction = (
     triaged.toArm.has(pr.number) ? ', arm auto-merge' : '',
     isSkipCiLabelled(pr) ? `, then take ${SKIP_CI_LABEL} off it` : '',
   ].join('');
+};
+
+/** What the pull request's priority label did to its place, as a phrase. */
+const priorityPhrase = (pr: PullRequest): string => {
+  switch (priorityOf(pr)) {
+    case 'high':
+      return ` — ahead of the rest, by ${PRIORITY_HIGH_LABEL}`;
+
+    case 'low':
+      return ` — behind the rest, by ${PRIORITY_LOW_LABEL}`;
+
+    case 'both':
+      return ` — labelled both ${PRIORITY_HIGH_LABEL} and ${PRIORITY_LOW_LABEL}, so neither counts`;
+
+    case 'none':
+      return '';
+  }
 };
 
 /** Why a pull request is none of this script's business, if it is not. */
