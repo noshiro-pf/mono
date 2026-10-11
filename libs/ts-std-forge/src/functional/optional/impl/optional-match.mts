@@ -1,7 +1,7 @@
-import { type UnknownOptional } from '../optional.mjs';
+import type { UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
 import { unwrap } from './optional-unwrap.mjs';
-import { type Unwrap } from './types.mjs';
+import type { Unwrap } from './types.mjs';
 
 /**
  * Folds an {@link Optional} into a plain value by applying one of two case

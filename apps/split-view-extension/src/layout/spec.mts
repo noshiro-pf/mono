@@ -1,7 +1,7 @@
 import { Num, Result } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { clampRatio, paneNode, splitNode } from './tree.mjs';
-import { type LayoutNode, type PaneId, type SplitAxis } from './types.mjs';
+import type { LayoutNode, PaneId, SplitAxis } from './types.mjs';
 
 /**
  * A layout as a short string, for the page's URL.

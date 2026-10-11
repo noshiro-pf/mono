@@ -1,7 +1,7 @@
 import { hasKey, isRecord } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { hasKeyValue } from '../../../utils/index.mjs';
-import { type AnswerIconId } from '../enum/index.mjs';
+import type { AnswerIconId } from '../enum/index.mjs';
 import {
   fillAnswerIconSetting,
   isAnswerIconSetting,

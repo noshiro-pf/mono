@@ -1,6 +1,6 @@
 import { expectType, Result } from 'ts-data-forge';
 import { number, string } from '../primitives/index.mjs';
-import { type TypeOf } from '../type.mjs';
+import type { TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { record, strictRecord } from './record.mjs';
 

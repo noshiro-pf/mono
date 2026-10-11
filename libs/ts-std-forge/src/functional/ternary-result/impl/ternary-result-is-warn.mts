@@ -1,6 +1,6 @@
-import { type UnknownTernaryResult } from '../ternary-result.mjs';
+import type { UnknownTernaryResult } from '../ternary-result.mjs';
 import { WarnTypeTagName } from './tag.mjs';
-import { type NarrowToWarn } from './types.mjs';
+import type { NarrowToWarn } from './types.mjs';
 
 /**
  * Type guard for the Warn variant.

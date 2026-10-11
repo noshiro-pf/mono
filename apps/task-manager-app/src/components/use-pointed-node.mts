@@ -1,4 +1,4 @@
-import { type FocusEventHandler, type PointerEventHandler } from 'preact';
+import type { FocusEventHandler, PointerEventHandler } from 'preact';
 import { useCallback, useState } from 'preact/hooks';
 import { isGraphNodeId, type GraphNodeId } from '../domain/index.mjs';
 

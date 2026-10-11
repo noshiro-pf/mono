@@ -1,6 +1,6 @@
 // Example: src/string/str.mts (Str.asMaxLengthString)
 import { Str } from 'ts-data-forge';
-import { type MaxLengthString } from 'ts-type-forge';
+import type { MaxLengthString } from 'ts-type-forge';
 
 if (import.meta.vitest !== undefined) {
   test('main', () => {

@@ -1,12 +1,12 @@
-import { type GenericEventHandler, type RefCallback } from 'preact';
+import type { GenericEventHandler, RefCallback } from 'preact';
 import { memoNamed } from 'preact-utils';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   dagViewModeSignal,
   settingsPanelSignal,
   uiStore,
 } from '../store/index.mjs';
-import { type SettingsPanelPlacement } from '../view-model/index.mjs';
+import type { SettingsPanelPlacement } from '../view-model/index.mjs';
 import { AnimationSettingField } from './animation-setting-field.js';
 import {
   currentSettingsPlacement,

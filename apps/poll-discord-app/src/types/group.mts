@@ -1,5 +1,5 @@
 import * as t from 'ts-fortress';
-import { type DeepReadonly, type UpperAlphabet } from 'ts-type-forge';
+import type { DeepReadonly, UpperAlphabet } from 'ts-type-forge';
 
 export type Group = DeepReadonly<{
   no: UpperAlphabet;

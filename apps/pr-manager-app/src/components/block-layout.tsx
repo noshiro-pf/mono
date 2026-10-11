@@ -1,9 +1,9 @@
-import { type ComponentChildren } from 'preact';
+import type { ComponentChildren } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import { useObservableValue } from 'synstate-preact-hooks';
-import { type ReadonlyRecord } from 'ts-type-forge';
-import { type BlockId } from '../layout.mjs';
+import type { ReadonlyRecord } from 'ts-type-forge';
+import type { BlockId } from '../layout.mjs';
 import { layoutStore } from '../store/index.mjs';
 import { BlockColumn } from './block-column.js';
 import { ColumnDivider } from './column-divider.js';

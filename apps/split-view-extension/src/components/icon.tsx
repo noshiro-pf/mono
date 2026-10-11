@@ -1,5 +1,5 @@
 import { memoNamed } from 'react-utils';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 export type IconName =
   | 'back'

@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type IsAny, type IsNotAny } from './is-any.mjs';
+import type { IsAny, IsNotAny } from './is-any.mjs';
 
 // ── IsAny ─────────────────────────
 expectType<IsAny<any>, true>('=');

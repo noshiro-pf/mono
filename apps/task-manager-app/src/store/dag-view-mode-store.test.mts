@@ -1,4 +1,4 @@
-import { type DagViewMode } from '../view-model/index.mjs';
+import type { DagViewMode } from '../view-model/index.mjs';
 import { createDagViewModeStore } from './dag-view-mode-store.mjs';
 
 const setup = (

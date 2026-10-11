@@ -1,22 +1,22 @@
-import { type ExecOptions } from 'node:child_process';
+import type { ExecOptions } from 'node:child_process';
 import { expectType } from 'ts-data-forge';
-import {
-  type BoundedLengthArray,
-  type Brand,
-  type FixedLengthArray,
-  type HasLengthConstraint,
-  type MaxLengthArray,
-  type MaxLengthOf,
-  type MinLengthArray,
-  type MinLengthOf,
+import type {
+  BoundedLengthArray,
+  Brand,
+  FixedLengthArray,
+  HasLengthConstraint,
+  MaxLengthArray,
+  MaxLengthOf,
+  MinLengthArray,
+  MinLengthOf,
 } from '../branded-types/index.mjs';
-import { type UnknownRecord } from '../constants/index.mjs';
-import { type MutableMap, type MutableSet } from '../others/index.mjs';
-import {
-  type DeepMutable,
-  type DeepPartial,
-  type DeepReadonly,
-  type DeepRequired,
+import type { UnknownRecord } from '../constants/index.mjs';
+import type { MutableMap, MutableSet } from '../others/index.mjs';
+import type {
+  DeepMutable,
+  DeepPartial,
+  DeepReadonly,
+  DeepRequired,
 } from './deep.mjs';
 
 // Base types for testing

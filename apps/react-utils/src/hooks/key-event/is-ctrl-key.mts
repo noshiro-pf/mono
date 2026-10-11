@@ -1,5 +1,5 @@
 import { getPlatform } from '../../utils/index.mjs';
-import { type KeyboardEventType } from './key-event-type.mjs';
+import type { KeyboardEventType } from './key-event-type.mjs';
 
 export const isCtrlKey = <T = Element,>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type Answer } from './answer.mjs';
+import type { Answer } from './answer.mjs';
 import {
   eventListItemDefaultValue,
   fillEventListItem,

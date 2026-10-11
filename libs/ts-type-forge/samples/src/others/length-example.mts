@@ -1,4 +1,4 @@
-import { type Length } from 'ts-type-forge';
+import type { Length } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

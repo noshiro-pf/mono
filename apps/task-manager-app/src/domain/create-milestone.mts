@@ -1,5 +1,5 @@
-import { type StrictOmit } from 'ts-type-forge';
-import { type Milestone, type MilestoneId } from './types.mjs';
+import type { StrictOmit } from 'ts-type-forge';
+import type { Milestone, MilestoneId } from './types.mjs';
 
 /**
  * A new milestone: `id`, `title` and the creation time are required, and

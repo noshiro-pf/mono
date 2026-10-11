@@ -1,4 +1,4 @@
-import { type Reducer } from '../../../utils-ported/index.mjs';
+import type { Reducer } from '../../../utils-ported/index.mjs';
 import {
   inputHasError,
   inputInitialState,

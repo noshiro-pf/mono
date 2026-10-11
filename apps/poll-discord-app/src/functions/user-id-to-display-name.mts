@@ -1,6 +1,6 @@
 import type * as Discord from 'discord.js';
 import { IMap, Result, castMutable, unknownToString } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { toUserId, type UserId } from '../types/index.mjs';
 import { quoteIfSpaceIncluded } from './quote-if-space-included.mjs';
 

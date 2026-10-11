@@ -1,20 +1,20 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type NegativeNumber,
-  type NonNegativeNumber,
-  type NonPositiveNumber,
-  type NonZeroNumber,
-  type PositiveNumber,
+import type {
+  NegativeNumber,
+  NonNegativeNumber,
+  NonPositiveNumber,
+  NonZeroNumber,
+  PositiveNumber,
 } from './core.mjs';
-import {
-  type Int32,
-  type NegativeInt32,
-  type NonNegativeInt32,
-  type NonPositiveInt32,
-  type NonZeroInt32,
-  type PositiveInt32,
+import type {
+  Int32,
+  NegativeInt32,
+  NonNegativeInt32,
+  NonPositiveInt32,
+  NonZeroInt32,
+  PositiveInt32,
 } from './int32.mjs';
-import { type SafeInt } from './safe-int.mjs';
+import type { SafeInt } from './safe-int.mjs';
 
 // Test Int32 type
 expectType<Int32, number>('<=');

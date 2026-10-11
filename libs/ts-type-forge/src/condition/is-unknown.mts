@@ -1,5 +1,5 @@
-import { type BoolNot } from '../others/index.mjs';
-import { type IsAny } from './is-any.mjs';
+import type { BoolNot } from '../others/index.mjs';
+import type { IsAny } from './is-any.mjs';
 
 /**
  * Checks if a given type `T` is exactly the `unknown` type.

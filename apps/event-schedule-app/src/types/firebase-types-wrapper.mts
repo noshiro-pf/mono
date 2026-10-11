@@ -1,10 +1,10 @@
-import {
-  type AuthCredential as AuthCredential_,
-  type User as FireAuthUser_,
-  type OAuthCredential as OAuthCredential_,
-  type UserCredential as UserCredential_,
+import type {
+  AuthCredential as AuthCredential_,
+  User as FireAuthUser_,
+  OAuthCredential as OAuthCredential_,
+  UserCredential as UserCredential_,
 } from 'firebase/auth';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 
 export type AuthCredential = DeepReadonly<AuthCredential_>;
 

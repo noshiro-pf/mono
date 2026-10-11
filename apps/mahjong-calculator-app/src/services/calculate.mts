@@ -1,5 +1,5 @@
 import { Arr, Json, Optional, Result } from 'ts-data-forge';
-import { type JsonValue } from 'ts-type-forge';
+import type { JsonValue } from 'ts-type-forge';
 import packageJson from '../../package.json' with { type: 'json' };
 import {
   flagOptionsDef,
@@ -23,7 +23,7 @@ import {
   setResult,
   turn$,
 } from '../store/index.mjs';
-import { type ApiPayload } from '../types/index.mjs';
+import type { ApiPayload } from '../types/index.mjs';
 
 export const calculate = (): void => {
   setIsCalculating(true);

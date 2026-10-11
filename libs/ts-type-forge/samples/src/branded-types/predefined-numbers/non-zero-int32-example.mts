@@ -1,4 +1,4 @@
-import { type NonZeroInt32 } from 'ts-type-forge';
+import type { NonZeroInt32 } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

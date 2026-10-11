@@ -16,7 +16,7 @@ import {
   PRIORITY_LOW_LABEL,
   SKIP_CI_LABEL,
 } from 'pr-report-core';
-import { type PullRequest } from './types.mjs';
+import type { PullRequest } from './types.mjs';
 
 /**
  * Whether the pull request carries the `skip-ci` label, which is what this

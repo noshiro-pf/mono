@@ -1,7 +1,7 @@
 import { panic } from '../../../panic/index.mjs';
-import { type UnknownResult } from '../result.mjs';
+import type { UnknownResult } from '../result.mjs';
 import { isErr } from './result-is-err.mjs';
-import { type NarrowToErr, type UnwrapOk } from './types.mjs';
+import type { NarrowToErr, UnwrapOk } from './types.mjs';
 
 /**
  * Unwraps a `Result` inside a {@link Result.safeTry} generator body via

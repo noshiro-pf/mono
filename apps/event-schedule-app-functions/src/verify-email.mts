@@ -1,6 +1,6 @@
-import { type Firestore } from 'firebase-admin/firestore';
+import type { Firestore } from 'firebase-admin/firestore';
 import { getEmail } from './get-event-item.mjs';
-import { type VerifyEmailPayload } from './types/index.mjs';
+import type { VerifyEmailPayload } from './types/index.mjs';
 
 export const verifyEmailImpl = async (
   db: Firestore,

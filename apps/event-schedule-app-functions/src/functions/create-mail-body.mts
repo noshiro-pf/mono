@@ -1,6 +1,6 @@
-import {
-  type Answer,
-  type DatetimeSpecificationEnumType,
+import type {
+  Answer,
+  DatetimeSpecificationEnumType,
 } from 'event-schedule-app-shared';
 import { answerDiffAsString } from './answer-diff.mjs';
 

@@ -1,4 +1,4 @@
-import { type None } from '../../../adt-types.mjs';
+import type { None } from '../../../adt-types.mjs';
 import { NoneTypeTagName } from './tag.mjs';
 
 /**

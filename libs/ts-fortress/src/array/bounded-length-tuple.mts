@@ -1,11 +1,11 @@
 import { Arr, asUint32, memoizeFunction, Result } from 'ts-data-forge';
-import {
-  type BoundedLengthTuple,
-  type MaxLengthTuple,
-  type MinLengthTuple,
-  type StructuralPrefixLength,
+import type {
+  BoundedLengthTuple,
+  MaxLengthTuple,
+  MinLengthTuple,
+  StructuralPrefixLength,
 } from 'ts-type-forge';
-import { type Type } from '../type.mjs';
+import type { Type } from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,

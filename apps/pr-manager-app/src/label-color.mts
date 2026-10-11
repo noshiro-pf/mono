@@ -14,7 +14,7 @@ import {
   Num,
   type NonZeroFiniteNumber,
 } from 'ts-data-forge';
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 
 export type ChipColors = Readonly<{
   background: string;

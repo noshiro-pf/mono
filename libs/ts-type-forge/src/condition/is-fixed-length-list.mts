@@ -1,4 +1,4 @@
-import { type BoolNot } from '../others/index.mjs';
+import type { BoolNot } from '../others/index.mjs';
 
 /**
  * Checks if a given readonly array type `T` has a fixed length (i.e., is a tuple).

@@ -1,9 +1,9 @@
-import {
-  type BoundedLengthArray,
-  type FixedLengthArray,
-  type FixedLengthTuple,
-  type MinLengthArray,
-  type ReadonlyRecord,
+import type {
+  BoundedLengthArray,
+  FixedLengthArray,
+  FixedLengthTuple,
+  MinLengthArray,
+  ReadonlyRecord,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import {

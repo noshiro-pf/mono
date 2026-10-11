@@ -1,10 +1,10 @@
-import {
-  type FocusEventHandler,
-  type KeyboardEventHandler,
-  type MouseEventHandler,
-  type PointerEventHandler,
-  type RefObject,
-  type WheelEventHandler,
+import type {
+  FocusEventHandler,
+  KeyboardEventHandler,
+  MouseEventHandler,
+  PointerEventHandler,
+  RefObject,
+  WheelEventHandler,
 } from 'preact';
 import { memoNamed } from 'preact-utils';
 import {
@@ -16,7 +16,7 @@ import {
   useState,
 } from 'preact/hooks';
 import { Arr } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   anchoredTileScroll,
   arcContentBounds,

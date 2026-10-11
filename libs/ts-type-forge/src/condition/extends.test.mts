@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type TypeExtends } from './extends.mjs';
+import type { TypeExtends } from './extends.mjs';
 
 expectType<TypeExtends<string, string | number>, true>('=');
 

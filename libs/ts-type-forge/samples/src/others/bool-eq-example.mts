@@ -1,4 +1,4 @@
-import { type BoolEq } from 'ts-type-forge';
+import type { BoolEq } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

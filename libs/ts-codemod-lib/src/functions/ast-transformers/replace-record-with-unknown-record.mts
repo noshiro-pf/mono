@@ -2,7 +2,7 @@
 import { Arr } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
 import { hasDisableNextLineComment } from '../functions/index.mjs';
-import { type TsMorphTransformer } from './types.mjs';
+import type { TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'replace-record-with-unknown-record';
 

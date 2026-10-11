@@ -1,4 +1,4 @@
-import { type Mutable } from 'ts-type-forge';
+import type { Mutable } from 'ts-type-forge';
 
 /**
  * Hands the browser a URI to save.

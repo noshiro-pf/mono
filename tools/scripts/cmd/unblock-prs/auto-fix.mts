@@ -17,7 +17,7 @@ import { statesFromCheckRuns, type ContextState } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { git, listCheckRuns, remoteSha, removeWorktree } from './github.mjs';
 import { pauseAllBut } from './release.mjs';
-import { type AutoFixed, type PullRequest } from './types.mjs';
+import type { AutoFixed, PullRequest } from './types.mjs';
 import { lastLines, log, sh, stopRequested } from './util.mjs';
 
 /**

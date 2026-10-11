@@ -1,8 +1,8 @@
 import { Int } from 'ts-data-forge';
 import { brand } from '../../../brand/index.mjs';
-import {
-  type ConstrainedType,
-  type NoConstraints,
+import type {
+  ConstrainedType,
+  NoConstraints,
 } from '../../../constraints/index.mjs';
 import {
   number,

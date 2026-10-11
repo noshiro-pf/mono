@@ -1,9 +1,9 @@
-import { type Optional, type UnknownOptional } from '../optional.mjs';
+import type { Optional, UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
 import { none } from './optional-none.mjs';
 import { some } from './optional-some.mjs';
 import { unwrap } from './optional-unwrap.mjs';
-import { type Unwrap } from './types.mjs';
+import type { Unwrap } from './types.mjs';
 
 /**
  * Maps an {@link Optional}<S> to {@link Optional}<S2> by applying a function to

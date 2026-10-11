@@ -4,7 +4,7 @@ import {
   isSpreadNamedTupleMemberNode,
   isSpreadParameterNode,
 } from '../functions/index.mjs';
-import { type TsMorphTransformer } from './types.mjs';
+import type { TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'replace-any-with-unknown';
 

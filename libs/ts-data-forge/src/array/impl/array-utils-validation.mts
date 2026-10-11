@@ -1,12 +1,12 @@
-import {
-  type BoolOr,
-  type ChangeArrayElement,
-  type IsAny,
-  type IsUnknown,
-  type UnknownBrand,
+import type {
+  BoolOr,
+  ChangeArrayElement,
+  IsAny,
+  IsUnknown,
+  UnknownBrand,
 } from 'ts-type-forge';
 import { asUint32, Num } from '../../number/index.mjs';
-import { type ArrayIndex, type SizeType } from '../../types.mjs';
+import type { ArrayIndex, SizeType } from '../../types.mjs';
 
 /**
  * Type guard that checks if a value is an array.

@@ -1,17 +1,17 @@
-import { type IsUnion } from '../../condition/index.mjs';
-import { type Mutable } from '../../others/index.mjs';
-import {
-  type FixedLengthTuple,
-  type MinLengthTuple,
-  type MutableFixedLengthTuple,
-  type MutableMinLengthTuple,
+import type { IsUnion } from '../../condition/index.mjs';
+import type { Mutable } from '../../others/index.mjs';
+import type {
+  FixedLengthTuple,
+  MinLengthTuple,
+  MutableFixedLengthTuple,
+  MutableMinLengthTuple,
 } from '../../tuple-and-list/index.mjs';
-import {
-  type IndexInclusive,
-  type UintRangeInclusive,
+import type {
+  IndexInclusive,
+  UintRangeInclusive,
 } from '../../type-level-integer/index.mjs';
-import { type TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
-import { type SupportedLength } from '../supported-length.mjs';
+import type { TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
+import type { SupportedLength } from '../supported-length.mjs';
 
 /**
  * Upper bound (inclusive, `10`) of the structural tuple prefix embedded in

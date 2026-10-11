@@ -5,7 +5,7 @@
  */
 
 import { createState, type InitializedObservable } from 'synstate';
-import { type DagViewMode } from '../view-model/index.mjs';
+import type { DagViewMode } from '../view-model/index.mjs';
 
 export type DagViewModeDeps = Readonly<{
   initial: DagViewMode;

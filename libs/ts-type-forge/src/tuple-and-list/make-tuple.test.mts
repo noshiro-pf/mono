@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type MakeTuple } from './make-tuple.mjs';
+import type { MakeTuple } from './make-tuple.mjs';
 
 expectType<MakeTuple<3, unknown>, readonly [unknown, unknown, unknown]>('=');
 

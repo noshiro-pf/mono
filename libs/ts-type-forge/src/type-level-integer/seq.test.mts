@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type Seq } from './seq.mjs';
+import type { Seq } from './seq.mjs';
 
 expectType<Seq<3>, readonly [0, 1, 2]>('=');
 

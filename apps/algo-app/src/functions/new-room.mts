@@ -1,9 +1,5 @@
 import { Arr, pipe } from 'ts-data-forge';
-import {
-  type DeepReadonly,
-  type FixedLengthTuple,
-  type StrictOmit,
-} from 'ts-type-forge';
+import type { DeepReadonly, FixedLengthTuple, StrictOmit } from 'ts-type-forge';
 import { getShuffled } from 'ts-utils-additional';
 import {
   toShuffleDef,

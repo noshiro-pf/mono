@@ -1,8 +1,4 @@
-import {
-  type ExcludeSmallInt,
-  type Uint,
-  type WithSmallInt,
-} from 'ts-type-forge';
+import type { ExcludeSmallInt, Uint, WithSmallInt } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

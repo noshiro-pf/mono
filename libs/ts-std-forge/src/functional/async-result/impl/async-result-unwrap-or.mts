@@ -1,5 +1,5 @@
 import { Result } from '../../result/index.mjs';
-import { type AsyncResult } from '../async-result.mjs';
+import type { AsyncResult } from '../async-result.mjs';
 
 /**
  * Unwraps an `AsyncResult`, resolving to the success value or a default value

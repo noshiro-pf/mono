@@ -1,5 +1,5 @@
 import { Arr } from 'ts-data-forge';
-import { type BrandedNumberConfig } from './config.mjs';
+import type { BrandedNumberConfig } from './config.mjs';
 import { methodProse, type MethodProse } from './prose.mjs';
 
 /** Renders a complete branded-number module from its config. */

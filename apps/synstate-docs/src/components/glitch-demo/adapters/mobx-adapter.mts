@@ -1,5 +1,5 @@
 import { computed, observable, reaction, runInAction } from 'mobx';
-import { type Adapter, type Point } from '../types.mjs';
+import type { Adapter, Point } from '../types.mjs';
 
 export const createMobXAdapter = (): Adapter => {
   let mut_mousePos: undefined | { x: number; y: number };

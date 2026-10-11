@@ -1,4 +1,4 @@
-import { type List, type NonEmptyArray } from 'ts-type-forge';
+import type { List, NonEmptyArray } from 'ts-type-forge';
 // embed-sample-code-ignore-above
 
 type Post = Readonly<{

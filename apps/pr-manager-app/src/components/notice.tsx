@@ -1,6 +1,6 @@
-import { type ComponentChildren } from 'preact';
+import type { ComponentChildren } from 'preact';
 import { memoNamed } from 'preact-utils';
-import { type StatusRole } from '../verdict.mjs';
+import type { StatusRole } from '../verdict.mjs';
 
 type Props = Readonly<{ tone: StatusRole; children: ComponentChildren }>;
 

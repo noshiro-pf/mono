@@ -1,4 +1,4 @@
-import { type Seq } from 'ts-type-forge';
+import type { Seq } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

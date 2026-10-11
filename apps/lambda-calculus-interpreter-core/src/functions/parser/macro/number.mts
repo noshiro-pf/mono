@@ -1,4 +1,4 @@
-import { type SafeUint } from 'ts-type-forge';
+import type { SafeUint } from 'ts-type-forge';
 import { splitToTokens } from '../split-to-tokens.mjs';
 
 const numberStr = (n: SafeUint): string =>

@@ -1,6 +1,6 @@
 import { Arr } from 'ts-data-forge';
-import { type MutableRecord } from 'ts-type-forge';
-import { type JSONSchema4 } from '../type.mjs';
+import type { MutableRecord } from 'ts-type-forge';
+import type { JSONSchema4 } from '../type.mjs';
 
 /**
  * 指定したプロパティで items が配列（tuple）として定義されている場合、単一スキーマに正規化する。

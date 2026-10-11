@@ -1,5 +1,5 @@
 /* cSpell:disable */
-import { type Linter } from 'eslint';
+import type { Linter } from 'eslint';
 
 /**
  * @description Prefer the curried overload of immer produce for shorter updater definitions.

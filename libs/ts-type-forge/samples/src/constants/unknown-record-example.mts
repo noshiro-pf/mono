@@ -1,5 +1,5 @@
 import { hasKey } from 'ts-data-forge';
-import { type UnknownRecord } from 'ts-type-forge';
+import type { UnknownRecord } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

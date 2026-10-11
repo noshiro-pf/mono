@@ -1,13 +1,13 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type OptionalKeys,
-  type PartiallyNullable,
-  type PartiallyOptional,
-  type PartiallyPartial,
-  type PartiallyRequired,
-  type RequiredKeys,
-  type TSTypeForgeInternals_MapToNever,
-  type TSTypeForgeInternals_PickUndefined,
+import type {
+  OptionalKeys,
+  PartiallyNullable,
+  PartiallyOptional,
+  PartiallyPartial,
+  PartiallyRequired,
+  RequiredKeys,
+  TSTypeForgeInternals_MapToNever,
+  TSTypeForgeInternals_PickUndefined,
 } from './partial.mjs';
 
 // Base type for testing

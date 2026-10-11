@@ -1,4 +1,4 @@
-import { type Hsl, type Rgb } from '../../types/index.mjs';
+import type { Hsl, Rgb } from '../../types/index.mjs';
 
 type TestColorObject = Readonly<{
   HEX: string;

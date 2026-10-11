@@ -2,7 +2,7 @@ import { useState } from 'better-react-use-state';
 import * as React from 'react';
 import { useValueAsRef } from 'react-utils';
 import { asNonZeroFiniteNumber, Num, pipe } from 'ts-data-forge';
-import { type UintRange } from 'ts-type-forge';
+import type { UintRange } from 'ts-type-forge';
 import { noop } from '../../utils/index.mjs';
 
 type Props = Readonly<{

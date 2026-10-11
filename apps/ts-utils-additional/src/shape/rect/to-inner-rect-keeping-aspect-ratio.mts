@@ -1,5 +1,5 @@
 import { FiniteNumber, isFiniteNumber, Num } from 'ts-data-forge';
-import { type Rect, type RectSize } from '../../types/index.mjs';
+import type { Rect, RectSize } from '../../types/index.mjs';
 
 /**
  * 縦横比を維持して表示するための位置計算

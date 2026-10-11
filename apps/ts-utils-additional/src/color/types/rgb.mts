@@ -1,6 +1,6 @@
-import { type FixedLengthTuple } from 'ts-type-forge';
-import { type Alpha } from './alpha.mjs';
-import { type RgbValue as RgbV } from './rgb-value.mjs';
+import type { FixedLengthTuple } from 'ts-type-forge';
+import type { Alpha } from './alpha.mjs';
+import type { RgbValue as RgbV } from './rgb-value.mjs';
 
 export type Rgb = FixedLengthTuple<3, RgbV>;
 

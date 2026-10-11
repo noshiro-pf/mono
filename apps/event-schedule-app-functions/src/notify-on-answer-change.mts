@@ -1,5 +1,5 @@
-import { type Answer } from 'event-schedule-app-shared';
-import { type Firestore } from 'firebase-admin/firestore';
+import type { Answer } from 'event-schedule-app-shared';
+import type { Firestore } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions/v1';
 import { compareYmdhm } from 'ts-fortress-types';
 import {

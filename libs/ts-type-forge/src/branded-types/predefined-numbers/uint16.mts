@@ -1,10 +1,10 @@
 /* AUTO-GENERATED. DO NOT EDIT. Regenerate with `pnpm run build`. */
 
-import { type IntersectBrand } from '../brand.mjs';
-import { type TSTypeForgeInternals_ExtendNumberBrand } from './_number-brand-internals.mjs';
-import { type PositiveNumber } from './core.mjs';
-import { type WithSmallInt } from './small-int.mjs';
-import { type Uint32 } from './uint32.mjs';
+import type { IntersectBrand } from '../brand.mjs';
+import type { TSTypeForgeInternals_ExtendNumberBrand } from './_number-brand-internals.mjs';
+import type { PositiveNumber } from './core.mjs';
+import type { WithSmallInt } from './small-int.mjs';
+import type { Uint32 } from './uint32.mjs';
 
 /**
  * Branded numeric type for 16-bit unsigned integers.

@@ -5,11 +5,8 @@
 // them, which this layer depends on. The `mut_` prefix marks the deliberate
 // mutation, as it does elsewhere in the repository.
 
-import {
-  type CanvasAppState,
-  type CanvasAppStateHandler,
-} from '../state/index.mjs';
-import { type PixiBbox } from '../types/index.mjs';
+import type { CanvasAppState, CanvasAppStateHandler } from '../state/index.mjs';
+import type { PixiBbox } from '../types/index.mjs';
 import { foreachBboxPoints } from './bbox-points.mjs';
 
 export const addBboxEventListener = (

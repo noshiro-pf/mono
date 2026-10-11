@@ -1,10 +1,10 @@
-import {
-  type TernaryResult,
-  type UnknownTernaryResult,
+import type {
+  TernaryResult,
+  UnknownTernaryResult,
 } from '../ternary-result.mjs';
 import { isWarn } from './ternary-result-is-warn.mjs';
 import { warn } from './ternary-result-warn.mjs';
-import { type UnwrapErr, type UnwrapOk, type UnwrapWarn } from './types.mjs';
+import type { UnwrapErr, UnwrapOk, UnwrapWarn } from './types.mjs';
 
 /**
  * Maps the Warn variant while leaving Ok/Err untouched.

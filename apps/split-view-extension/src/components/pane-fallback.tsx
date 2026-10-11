@@ -1,6 +1,6 @@
 import { memoNamed } from 'react-utils';
-import { type ReadonlyRecord } from 'ts-type-forge';
-import { type UnframeableKind } from '../state/index.mjs';
+import type { ReadonlyRecord } from 'ts-type-forge';
+import type { UnframeableKind } from '../state/index.mjs';
 import { Icon } from './icon.js';
 
 type Props = Readonly<{

@@ -1,5 +1,5 @@
-import { type IsUnion } from '../condition/index.mjs';
-import { type NonEmptyTuple } from './array.mjs';
+import type { IsUnion } from '../condition/index.mjs';
+import type { NonEmptyTuple } from './array.mjs';
 
 export namespace Tuple {
   /**

@@ -1,7 +1,7 @@
 /** What the page has, and what each read makes of it. */
 
 import { Result } from 'ts-data-forge';
-import { type LoadedReport } from './load-report.mjs';
+import type { LoadedReport } from './load-report.mjs';
 
 export type LoadState = Readonly<
   | { type: 'failed'; message: string }

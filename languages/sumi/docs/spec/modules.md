@@ -19,7 +19,7 @@ import { qux } from '#internal/qux.mjs'; // `#` subpath import(package.json の 
 const lazy = await import('./lazy.mjs'); // dynamic import(制限なし — D-28)
 ```
 
-- **束縛が全部型である import 文は `import type` で書く（確定 2026-09-13 — D-59）。** 値と型が混在する文は inline 形(`import { bar, type Foo }`)でよい。これは好みの問題ではなく、拘束 compilerOption の `verbatimModuleSyntax`(常時 true — [compiler-options.md](./compiler-options.md))の帰結である:
+- **束縛が全部型である import 文は `import type` で書く（確定 2026-09-13 — D-59）。** 値と型が混在する文は inline 形(`import { bar, type Foo }`)で書き、同じモジュールを `import type` と `import` の 2 文に分けない（2026-10-10 追記、`modules/no-duplicate-import`）。これは好みの問題ではなく、拘束 compilerOption の `verbatimModuleSyntax`(常時 true — [compiler-options.md](./compiler-options.md))の帰結である:
 
     ```ts
     import { type Foo } from './dep.mjs'; // → import {} from './dep.mjs';  ← 副作用 import が残る

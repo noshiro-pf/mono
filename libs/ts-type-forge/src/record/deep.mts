@@ -1,11 +1,11 @@
-import { type Primitive } from '../constants/index.mjs';
-import {
-  type AnyFn,
-  type MutableMap,
-  type MutableSet,
-  type ReadonlyRecord,
-  type RelaxedExclude,
-  type StrictPick,
+import type { Primitive } from '../constants/index.mjs';
+import type {
+  AnyFn,
+  MutableMap,
+  MutableSet,
+  ReadonlyRecord,
+  RelaxedExclude,
+  StrictPick,
 } from '../others/index.mjs';
 
 /**

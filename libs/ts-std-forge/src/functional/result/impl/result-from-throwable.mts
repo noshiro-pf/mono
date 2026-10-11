@@ -1,7 +1,7 @@
 import { isError } from '@sindresorhus/is';
 import { unknownToString } from '../../../others/index.mjs';
 import { isPanicError } from '../../../panic/index.mjs';
-import { type Result } from '../result.mjs';
+import type { Result } from '../result.mjs';
 import { err } from './result-err.mjs';
 import { ok } from './result-ok.mjs';
 

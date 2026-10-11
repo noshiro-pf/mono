@@ -4,7 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { Arr, pipe } from 'ts-data-forge';
-import { type TypeReference } from 'typescript';
+import type { TypeReference } from 'typescript';
 import {
   skipTypeWrappers,
   toArgumentText,

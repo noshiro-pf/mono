@@ -1,4 +1,4 @@
-import { type DagLayout } from '../dag/index.mjs';
+import type { DagLayout } from '../dag/index.mjs';
 import {
   asMilestoneId,
   asTaskId,

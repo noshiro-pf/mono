@@ -1,4 +1,4 @@
-import { type MaxLengthArray, type SupportedLength } from 'ts-type-forge';
+import type { MaxLengthArray, SupportedLength } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

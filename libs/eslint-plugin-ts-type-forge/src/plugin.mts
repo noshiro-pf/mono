@@ -1,5 +1,5 @@
 import { tsTypeForgeRules } from './rules/index.mjs';
-import { type ESLintFlatConfig, type ESLintPlugin } from './types.mjs';
+import type { ESLintFlatConfig, ESLintPlugin } from './types.mjs';
 
 /**
  * Every rule this plugin ships, at `error`.

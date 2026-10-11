@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { Arr } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 
 // Writes to Firestore, so it runs against the emulators, through
 // `check:e2e:emulators`, and `check:e2e` leaves it out by this tag.

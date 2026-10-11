@@ -1,4 +1,4 @@
-import { type IndexInclusive } from '../type-level-integer/index.mjs';
+import type { IndexInclusive } from '../type-level-integer/index.mjs';
 
 /**
  * The inclusive upper bound (`2048`) of the length parameters accepted by the

@@ -3,53 +3,53 @@
 
 /// <reference types="vite/client" />
 
-import {
-  type HTMLInputProps as HTMLInputProps_,
-  type HTMLSelectProps as HTMLSelectProps_,
-  type IconName as IconName_,
-  type InputGroupProps as InputGroupProps_,
-  type Intent as Intent_,
-  type OptionProps as OptionProps_,
-  type PopperModifiers as PopperModifiers_,
-  type Toaster as Toaster_,
+import type {
+  HTMLInputProps as HTMLInputProps_,
+  HTMLSelectProps as HTMLSelectProps_,
+  IconName as IconName_,
+  InputGroupProps as InputGroupProps_,
+  Intent as Intent_,
+  OptionProps as OptionProps_,
+  PopperModifiers as PopperModifiers_,
+  Toaster as Toaster_,
 } from '@blueprintjs/core';
-import { type DateInputProps } from '@blueprintjs/datetime';
-import {
-  type AnswerIconIdWithNone as AnswerIconIdWithNone_,
-  type AnswerIconId as AnswerIconId_,
-  type AnswerIconPoint as AnswerIconPoint_,
-  type AnswerIconSetting as AnswerIconSetting_,
-  type AnswerIconSettings as AnswerIconSettings_,
-  type AnswerId as AnswerId_,
-  type AnswerSelection as AnswerSelection_,
-  type Answer as Answer_,
-  type DatetimeSpecificationEnumType as DatetimeSpecificationEnumType_,
-  type EventSchedule as EventSchedule_,
-  type NotificationSettings as NotificationSettings_,
-  type UserId as UserId_,
-  type UserName as UserName_,
-  type User as User_,
-  type Weight as Weight_,
+import type { DateInputProps } from '@blueprintjs/datetime';
+import type {
+  AnswerIconIdWithNone as AnswerIconIdWithNone_,
+  AnswerIconId as AnswerIconId_,
+  AnswerIconPoint as AnswerIconPoint_,
+  AnswerIconSetting as AnswerIconSetting_,
+  AnswerIconSettings as AnswerIconSettings_,
+  AnswerId as AnswerId_,
+  AnswerSelection as AnswerSelection_,
+  Answer as Answer_,
+  DatetimeSpecificationEnumType as DatetimeSpecificationEnumType_,
+  EventSchedule as EventSchedule_,
+  NotificationSettings as NotificationSettings_,
+  UserId as UserId_,
+  UserName as UserName_,
+  User as User_,
+  Weight as Weight_,
 } from 'event-schedule-app-shared';
-import {
-  type DatetimeRange as DatetimeRange_,
-  type DayType as DayType_,
-  type HoursMinutes as HoursMinutes_,
-  type TimeRange as TimeRange_,
-  type YearMonthDate as YearMonthDate_,
-  type Ymdhm as Ymdhm_,
+import type {
+  DatetimeRange as DatetimeRange_,
+  DayType as DayType_,
+  HoursMinutes as HoursMinutes_,
+  TimeRange as TimeRange_,
+  YearMonthDate as YearMonthDate_,
+  Ymdhm as Ymdhm_,
 } from 'ts-fortress-types';
-import { type StrictExclude } from 'ts-type-forge';
-import {
-  type AnswerSelectionMapKey as AnswerSelectionMapKey_,
-  type DatetimeRangeMapKey as DatetimeRangeMapKey_,
-  type YmdKey as YmdKey_,
+import type { StrictExclude } from 'ts-type-forge';
+import type {
+  AnswerSelectionMapKey as AnswerSelectionMapKey_,
+  DatetimeRangeMapKey as DatetimeRangeMapKey_,
+  YmdKey as YmdKey_,
 } from './functions/index.mjs';
-import {
-  type AuthCredential as AuthCredential_,
-  type FireAuthUser as FireAuthUser_,
-  type OAuthCredential as OAuthCredential_,
-  type UserCredential as UserCredential_,
+import type {
+  AuthCredential as AuthCredential_,
+  FireAuthUser as FireAuthUser_,
+  OAuthCredential as OAuthCredential_,
+  UserCredential as UserCredential_,
 } from './types/index.mjs';
 
 declare global {

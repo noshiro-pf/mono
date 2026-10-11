@@ -1,4 +1,4 @@
-import { type TernaryOk, type TernaryResult } from '../ternary-result.mjs';
+import type { TernaryOk, TernaryResult } from '../ternary-result.mjs';
 import { err } from './ternary-result-err.mjs';
 import { ok } from './ternary-result-ok.mjs';
 

@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type DateEnum, type MonthEnum, type SafeUint } from 'ts-type-forge';
+import type { DateEnum, MonthEnum, SafeUint } from 'ts-type-forge';
 import { Years } from './time-enum.mjs';
 import { YearMonthDate } from './year-month-date.mjs';
 

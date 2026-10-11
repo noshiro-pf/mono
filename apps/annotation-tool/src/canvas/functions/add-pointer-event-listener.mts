@@ -1,9 +1,6 @@
-import { type Application, type Sprite } from 'pixi.js-legacy';
+import type { Application, Sprite } from 'pixi.js-legacy';
 import { Num } from 'ts-data-forge';
-import {
-  type CanvasAppState,
-  type CanvasAppStateHandler,
-} from '../state/index.mjs';
+import type { CanvasAppState, CanvasAppStateHandler } from '../state/index.mjs';
 
 export const addGlobalPointerEventListener = (
   app: Application,

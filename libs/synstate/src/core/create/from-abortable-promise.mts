@@ -1,6 +1,6 @@
 import { Optional, Result } from 'ts-data-forge';
 import { createRootObservable } from '../base/index.mjs';
-import { type FromPromiseObservable } from '../types/index.mjs';
+import type { FromPromiseObservable } from '../types/index.mjs';
 
 /**
  * Creates an observable from a Promise factory that receives an `AbortSignal`.

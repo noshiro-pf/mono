@@ -1,4 +1,4 @@
-import { type MonthEnum } from 'ts-type-forge';
+import type { MonthEnum } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

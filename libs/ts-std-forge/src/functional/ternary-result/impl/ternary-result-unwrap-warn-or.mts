@@ -1,6 +1,6 @@
-import { type UnknownTernaryResult } from '../ternary-result.mjs';
+import type { UnknownTernaryResult } from '../ternary-result.mjs';
 import { unwrapWarn } from './ternary-result-unwrap-warn.mjs';
-import { type UnwrapWarn } from './types.mjs';
+import type { UnwrapWarn } from './types.mjs';
 
 /**
  * Returns the Warn value or the provided default.

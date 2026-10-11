@@ -1,4 +1,4 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 export type CustomColor = '#383838' | 'red' | 'rgb(48, 255, 135)';
 

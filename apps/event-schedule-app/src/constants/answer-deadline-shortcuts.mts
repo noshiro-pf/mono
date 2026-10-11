@@ -1,6 +1,6 @@
 import { pipe } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
-import { type DateEnum, type MonthEnum } from 'ts-type-forge';
+import type { DateEnum, MonthEnum } from 'ts-type-forge';
 import { idfn } from '../utils-ported/index.mjs';
 
 const createDate = (modifier: (d: Date) => Date): Date =>

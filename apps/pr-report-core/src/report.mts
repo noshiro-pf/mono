@@ -6,14 +6,14 @@ import { SKIP_CI_LABEL } from './labels.mjs';
 import { parseMergeAfter } from './merge-after.mjs';
 import { findStackParents } from './stack.mjs';
 import { buildMergeAfterForest } from './tree.mjs';
-import {
-  type MergedPullRequest,
-  type OpenIssue,
-  type PrReport,
-  type PullRequestFacts,
-  type RepoRef,
-  type ReportEntry,
-  type TreeNode,
+import type {
+  MergedPullRequest,
+  OpenIssue,
+  PrReport,
+  PullRequestFacts,
+  RepoRef,
+  ReportEntry,
+  TreeNode,
 } from './types.mjs';
 
 /**

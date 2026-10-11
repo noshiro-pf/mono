@@ -1,8 +1,4 @@
-import {
-  type MutableRecord,
-  type ReadonlyRecord,
-  type StrictOmit,
-} from 'ts-type-forge';
+import type { MutableRecord, ReadonlyRecord, StrictOmit } from 'ts-type-forge';
 
 /**
  * Month and weekday names.

@@ -1,4 +1,4 @@
-import { type MinLengthArray, type SupportedLength } from 'ts-type-forge';
+import type { MinLengthArray, SupportedLength } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

@@ -9,15 +9,15 @@ import {
   SafeUint,
   type SizeType,
 } from 'ts-data-forge';
-import {
-  type FixedLengthTuple,
-  type NonEmptyArray,
-  type NonNegativeFiniteNumber,
-  type Percent,
-  type SmallUint,
+import type {
+  FixedLengthTuple,
+  NonEmptyArray,
+  NonNegativeFiniteNumber,
+  Percent,
+  SmallUint,
 } from 'ts-type-forge';
 import { toHue } from '../../to-hue.mjs';
-import { type Hue } from '../../types/index.mjs';
+import type { Hue } from '../../types/index.mjs';
 import { hslToRgb } from '../rgb-hsl-conversion/index.mjs';
 import { getLuminanceListAccumulated } from './get-luminance-list-acc.mjs';
 import { relativeLuminance } from './relative-luminance.mjs';

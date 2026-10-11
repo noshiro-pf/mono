@@ -1,9 +1,9 @@
-import { type TSESLint, type TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import isGlob from 'is-glob';
 import mm from 'micromatch';
 import * as path from 'node:path';
 import { Arr, hasKey, isNotUndefined } from 'ts-data-forge';
-import { type DeepReadonly, type ReadonlyRecord } from 'ts-type-forge';
+import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import { resolveImportPath } from './resolve-import-path.mjs';
 
 // Forked from https://github.com/knowledge-work/eslint-plugin-strict-dependencies/blob/v1.3.27/strict-dependencies/index.js

@@ -5,7 +5,7 @@
  */
 
 import { createState, type InitializedObservable } from 'synstate';
-import { type NodeSize } from '../view-model/index.mjs';
+import type { NodeSize } from '../view-model/index.mjs';
 
 export type NodeSizeDeps = Readonly<{
   initial: NodeSize;

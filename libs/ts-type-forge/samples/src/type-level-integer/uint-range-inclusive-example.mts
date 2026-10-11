@@ -1,4 +1,4 @@
-import { type UintRangeInclusive } from 'ts-type-forge';
+import type { UintRangeInclusive } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

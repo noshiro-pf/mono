@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type IsNever } from './is-never.mjs';
+import type { IsNever } from './is-never.mjs';
 
 expectType<IsNever<never>, true>('=');
 

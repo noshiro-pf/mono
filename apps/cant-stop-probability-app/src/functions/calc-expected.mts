@@ -1,5 +1,5 @@
 import { Num } from 'ts-data-forge';
-import { type Count } from '../types/index.mjs';
+import type { Count } from '../types/index.mjs';
 
 /**
  * （計算式）

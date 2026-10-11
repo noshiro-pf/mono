@@ -4,7 +4,7 @@ import {
   observeSurvey,
   surveyFingerprint,
 } from './quiet.mjs';
-import { type PullRequest, type Quiet } from './types.mjs';
+import type { PullRequest, Quiet } from './types.mjs';
 
 const pullRequest = (
   fields: Partial<PullRequest> & Readonly<{ number: number }>,

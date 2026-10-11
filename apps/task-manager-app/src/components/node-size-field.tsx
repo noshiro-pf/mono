@@ -1,4 +1,4 @@
-import { type GenericEventHandler } from 'preact';
+import type { GenericEventHandler } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { nodeSizeSignal, nodeSizeStore } from '../store/index.mjs';
 import { nodeSizeLabels, nodeSizes } from '../view-model/index.mjs';

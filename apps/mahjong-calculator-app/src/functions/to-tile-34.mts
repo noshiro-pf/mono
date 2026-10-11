@@ -1,8 +1,8 @@
 import { Arr, castMutable } from 'ts-data-forge';
-import {
-  type FixedLengthTuple,
-  type MutableFixedLengthTuple,
-  type ReadonlyRecord,
+import type {
+  FixedLengthTuple,
+  MutableFixedLengthTuple,
+  ReadonlyRecord,
 } from 'ts-type-forge';
 import { tileDef } from '../constants/index.mjs';
 import {

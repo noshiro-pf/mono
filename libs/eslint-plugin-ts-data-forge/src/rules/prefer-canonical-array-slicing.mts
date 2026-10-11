@@ -4,7 +4,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { skipTypeWrappers, typeWrapperLayers } from './ast-utils.mjs';
 import {

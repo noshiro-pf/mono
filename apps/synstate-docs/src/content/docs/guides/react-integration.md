@@ -192,7 +192,7 @@ The second argument is a fallback used while the source has not produced a value
 
 ```tsx
 import type * as React from 'react';
-import { type Observable } from 'synstate';
+import type { Observable } from 'synstate';
 import { useObservableValue } from 'synstate-react-hooks';
 
 // Observable<string> that may not have emitted yet.

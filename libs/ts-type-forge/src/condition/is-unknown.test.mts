@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type IsNotUnknown, type IsUnknown } from './is-unknown.mjs';
+import type { IsNotUnknown, IsUnknown } from './is-unknown.mjs';
 
 // ── IsUnknown ─────────────────────────
 expectType<IsUnknown<unknown>, true>('=');

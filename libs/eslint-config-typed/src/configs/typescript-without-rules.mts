@@ -3,7 +3,7 @@ import { defaultConditionNames } from 'eslint-import-resolver-typescript';
 import globals from 'globals';
 import { Arr, Num, Result, isUint32 } from 'ts-data-forge';
 import { versionMajorMinor } from 'typescript';
-import { type FlatConfig } from '../types/index.mjs';
+import type { FlatConfig } from '../types/index.mjs';
 import { plugins } from './plugins.mjs';
 
 export const eslintConfigForTypeScriptWithoutRules = ({

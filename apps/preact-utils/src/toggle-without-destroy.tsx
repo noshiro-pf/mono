@@ -1,4 +1,4 @@
-import { type CSSProperties } from 'preact';
+import type { CSSProperties } from 'preact';
 import { memoNamed } from './memo-named.mjs';
 
 type Props = Readonly<{

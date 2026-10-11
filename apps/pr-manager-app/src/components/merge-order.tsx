@@ -1,7 +1,7 @@
-import { type TreeNode } from 'pr-report-core';
+import type { TreeNode } from 'pr-report-core';
 import { memoNamed } from 'preact-utils';
 import { Arr } from 'ts-data-forge';
-import { type Entry } from '../load-report.mjs';
+import type { Entry } from '../load-report.mjs';
 import { ExternalLink } from './external-link.js';
 import { PullRequestCard } from './pull-request-card.js';
 

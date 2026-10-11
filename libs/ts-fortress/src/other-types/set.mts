@@ -1,6 +1,6 @@
 import { isSet } from '@sindresorhus/is';
 import { Arr, memoizeFunction, Result } from 'ts-data-forge';
-import { type Type, type TypeOf, type UnknownType } from '../type.mjs';
+import type { Type, TypeOf, UnknownType } from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,

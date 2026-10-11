@@ -575,7 +575,7 @@
 - **ステータス**: 確定(2026-09-13、ユーザー了承 — issue [#1753](https://github.com/noshiro-pf/mono/issues/1753) の 2026-09-12 のコメント)
 - **判断**:
     1. **副作用 import(`import '...'`)は例外なく禁止する。** 代替は「CLI から実行する」か「関数として import して呼ぶ」。
-    2. **束縛が全部型である import 文は `import type` で書く**（名前空間なら `import type * as X`）。値と型が混在する文は inline 形(`import { bar, type Foo }`)でよい。**Sumi lint の段階から強制する。**
+    2. **束縛が全部型である import 文は `import type` で書く**（名前空間なら `import type * as X`）。値と型が混在する文は inline 形(`import { bar, type Foo }`)で書く（2026-10-10 追記 — 下の帰結）。**Sumi lint の段階から強制する。**
 - **理由**:
     - **2 は 1 の帰結であって、記法の好みではない。** 拘束 compilerOption の `verbatimModuleSyntax`（常時 true — D-40）は「書いたとおりに出す」ので、inline の型指定子だけを消して**空の import 文を残す**。実測（TypeScript 7.0.2 / 6.0.3 で同結果）:
 
@@ -594,7 +594,8 @@
     - **強制手段は 2 つとも oxlint のネイティブルールで足りる**(2026-09-13 確認、いずれも現在 off): `typescript/no-import-type-side-effects`（inline 形が全部型の場合）と `typescript/consistent-type-imports` の `prefer: "type-imports"`（名前空間を含む、型にしか使わない import 全般）。preset に 2 行足すだけで、新規実装は要らない。
     - 副作用 import の禁止は `import/no-unassigned-import` を `allow: []` で**実装済み**。対応表の該当行は 🔧（allow リストの精査待ち）から ✅ に変わる — 精査の結論が「例外を作らない」だったため。
     - **アセットの扱いは利用者向けドキュメントに書く**（implementation-plan の「Sumi sugar / refined の利用者向けドキュメント」）。規則ではなく規則に従うための作法であり、`sumi check` の対象が synstate 3 パッケージだけで apps を含まない現在は表面化していないが、apps を対象に入れた時点で最初に当たる。
-    - Sumi sugar の emit では inline / 一括どちらの形で出すかを config で選べるようにする（ユーザー要望）。**ただし束縛が全部型の文は `import type` で出す** — でなければ出力が Sumi lint を通らない（大原則: sugar の出力は Sumi lint を満たす）。
+    - **2026-10-10 追記（ユーザー要望）: 値と型が混在する文は inline 形に限り、同じモジュールを `import type` と `import` の 2 文に分けない。** これは `verbatimModuleSyntax` の帰結ではなく記法の統一で、既存ルールの組み合わせで足りる: `typescript/consistent-type-imports` の `fixStyle: "inline-type-imports"` と `import/no-duplicates` の `preferInline: true`（中立 ID `modules/no-duplicate-import`）。eslint-config-typed も同じ組み合わせ（`import-x/consistent-type-specifier-style` は off）に揃え、リポジトリ全体に適用した。
+    - Sumi sugar の emit では inline / 一括どちらの形で出すかを config で選べるようにする（ユーザー要望）。**ただし束縛が全部型の文は `import type` で出す** — でなければ出力が Sumi lint を通らない（大原則: sugar の出力は Sumi lint を満たす）。上の 2026-10-10 追記で混在する文も inline 形に決まったので、この config の選択肢は残らない。
 
 ## D-60: `sumi check` は他のリンタの disable コメントに従わず、マーカーはその next-line 指示の行を飛び越す
 

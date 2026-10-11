@@ -10,7 +10,7 @@ import {
   Immutability,
   type ImmutabilityOverrides,
 } from 'is-immutable-type';
-import { type Program, type Type, type TypeChecker } from 'typescript';
+import type { Program, Type, TypeChecker } from 'typescript';
 import { withoutTypeWrappers } from './type-wrapper-layers.mjs';
 
 type MessageId = 'errorStringGeneric';

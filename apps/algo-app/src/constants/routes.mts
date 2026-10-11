@@ -1,5 +1,5 @@
-import { type ReadonlyURLSearchParams } from 'tiny-router-observable';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { ReadonlyURLSearchParams } from 'tiny-router-observable';
+import type { DeepReadonly } from 'ts-type-forge';
 import { Router } from '../router.mjs';
 
 export const routes = {

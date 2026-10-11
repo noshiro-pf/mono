@@ -1,9 +1,9 @@
 import * as t from 'ts-fortress';
-import { type MergeIntersection } from 'ts-type-forge';
-import { type CustomColor } from '../constants/index.mjs';
+import type { MergeIntersection } from 'ts-type-forge';
+import type { CustomColor } from '../constants/index.mjs';
 import { cardColorTypeDef } from './card-color.mjs';
 import { cardNumberTypeDef } from './card-number.mjs';
-import { type VisibilityFromMe, type VisibleTo } from './visible-to.mjs';
+import type { VisibilityFromMe, VisibleTo } from './visible-to.mjs';
 
 const def = {
   color: cardColorTypeDef,

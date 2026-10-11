@@ -1,4 +1,4 @@
-import { type EslintTsFortressRules } from 'eslint-plugin-ts-fortress';
+import type { EslintTsFortressRules } from 'eslint-plugin-ts-fortress';
 import * as path from 'node:path';
 
 export const rules = {

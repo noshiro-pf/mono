@@ -1,4 +1,4 @@
-import { type PartiallyPartial } from 'ts-type-forge';
+import type { PartiallyPartial } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

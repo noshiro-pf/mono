@@ -1,4 +1,4 @@
-import { type RecordUpdated } from 'ts-type-forge';
+import type { RecordUpdated } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

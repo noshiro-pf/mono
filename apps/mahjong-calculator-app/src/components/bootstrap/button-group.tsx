@@ -3,7 +3,7 @@ import { createElement } from 'preact';
 import { memoNamed } from 'preact-utils';
 import * as Preact from 'preact/hooks';
 import { Obj } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 
 type PropsTyped<T> = DeepReadonly<{
   selectedId: T;

@@ -2,7 +2,7 @@ import { Radio, RadioGroup } from '@blueprintjs/core';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
 import { dict } from '../../constants/index.mjs';
-import { type RepaymentType } from '../../types/index.mjs';
+import type { RepaymentType } from '../../types/index.mjs';
 
 type Props = Readonly<{
   repaymentType: RepaymentType;

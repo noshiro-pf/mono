@@ -1,11 +1,11 @@
 import { expectType } from 'ts-data-forge';
-import { type MinLengthString, type NonEmptyString } from 'ts-type-forge';
-import { type TypeOf } from '../../../type.mjs';
-import { type Email } from './email.mjs';
-import { type Iso8601 } from './iso-8601.mjs';
-import { type JsonString } from './json-string.mjs';
+import type { MinLengthString, NonEmptyString } from 'ts-type-forge';
+import type { TypeOf } from '../../../type.mjs';
+import type { Email } from './email.mjs';
+import type { Iso8601 } from './iso-8601.mjs';
+import type { JsonString } from './json-string.mjs';
 import { nonEmptyString } from './non-empty-string.mjs';
-import { type Uuid, type Uuid4, type Uuid6, type Uuid7 } from './uuid.mjs';
+import type { Uuid, Uuid4, Uuid6, Uuid7 } from './uuid.mjs';
 
 describe(nonEmptyString, () => {
   const baseType = nonEmptyString();

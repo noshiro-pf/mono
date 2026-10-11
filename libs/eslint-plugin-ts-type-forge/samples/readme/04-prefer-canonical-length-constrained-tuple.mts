@@ -1,10 +1,10 @@
 /* eslint-disable @stylistic/padding-line-between-statements */
 import { expectType } from 'ts-data-forge';
-import {
-  type FixedLengthTuple,
-  type MutableMinLengthTuple,
-  type MutableNonEmptyTuple,
-  type NonEmptyTuple,
+import type {
+  FixedLengthTuple,
+  MutableMinLengthTuple,
+  MutableNonEmptyTuple,
+  NonEmptyTuple,
 } from 'ts-type-forge';
 
 {

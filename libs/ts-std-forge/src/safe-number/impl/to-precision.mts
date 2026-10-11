@@ -1,4 +1,4 @@
-import { type UintRangeInclusive } from 'ts-type-forge';
+import type { UintRangeInclusive } from 'ts-type-forge';
 
 /**
  * Formats a number to a given precision, made total by its parameter type.

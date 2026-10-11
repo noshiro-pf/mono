@@ -1,11 +1,11 @@
 import { expectType, Optional } from 'ts-data-forge';
-import {
-  type AsyncChildObservable,
-  type ChildObservable,
-  type Observable,
-  type ObservableBase,
-  type RootObservable,
-  type SyncChildObservable,
+import type {
+  AsyncChildObservable,
+  ChildObservable,
+  Observable,
+  ObservableBase,
+  RootObservable,
+  SyncChildObservable,
 } from '../types/index.mjs';
 import {
   createAsyncChildObservable,

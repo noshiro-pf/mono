@@ -1,12 +1,12 @@
 import { combine, map, type InitializedObservable } from 'synstate';
 import { getCardDirection } from '../functions/index.mjs';
 import { mapToDisplayValue } from '../state/index.mjs';
-import {
-  type CardNumber,
-  type ConfirmTossBalloonProps,
-  type DecidedAnswerBalloonProps,
-  type DisplayValues,
-  type SelectAnswerBalloonProps,
+import type {
+  CardNumber,
+  ConfirmTossBalloonProps,
+  DecidedAnswerBalloonProps,
+  DisplayValues,
+  SelectAnswerBalloonProps,
 } from '../types/index.mjs';
 import {
   onAnswerCancel,

@@ -1,4 +1,4 @@
-import { type StrictExtract } from 'ts-type-forge';
+import type { StrictExtract } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

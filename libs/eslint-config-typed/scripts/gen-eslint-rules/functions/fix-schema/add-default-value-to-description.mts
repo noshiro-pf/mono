@@ -1,5 +1,5 @@
-import { type MutableRecord } from 'ts-type-forge';
-import { type JSONSchema4 } from '../type.mjs';
+import type { MutableRecord } from 'ts-type-forge';
+import type { JSONSchema4 } from '../type.mjs';
 
 /**
  * スキーマのプロパティに default 値がある場合、description に default 値を追加する。

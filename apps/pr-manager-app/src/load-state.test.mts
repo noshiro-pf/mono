@@ -1,6 +1,6 @@
 import { Result } from 'ts-data-forge';
-import { type RelaxedExtract } from 'ts-type-forge';
-import { type LoadedReport } from './load-report.mjs';
+import type { RelaxedExtract } from 'ts-type-forge';
+import type { LoadedReport } from './load-report.mjs';
 import { asRefreshing, LOADING, merge, type LoadState } from './load-state.mjs';
 
 describe(merge, () => {

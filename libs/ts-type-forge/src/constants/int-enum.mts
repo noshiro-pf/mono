@@ -1,8 +1,5 @@
-import { type StrictExclude } from '../others/index.mjs';
-import {
-  type Index,
-  type NegativeIndex,
-} from '../type-level-integer/index.mjs';
+import type { StrictExclude } from '../others/index.mjs';
+import type { Index, NegativeIndex } from '../type-level-integer/index.mjs';
 
 /**
  * Represents an unsigned 8-bit integer.

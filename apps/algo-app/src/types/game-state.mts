@@ -1,7 +1,7 @@
-import { type FixedLengthTuple } from 'ts-type-forge';
-import { type Card, type CardWithVisibility } from './card-type.mjs';
-import { type PhaseInTurn } from './phase-in-turn.mjs';
-import { type PlayerIndex } from './player-index.mjs';
+import type { FixedLengthTuple } from 'ts-type-forge';
+import type { Card, CardWithVisibility } from './card-type.mjs';
+import type { PhaseInTurn } from './phase-in-turn.mjs';
+import type { PlayerIndex } from './player-index.mjs';
 
 type PlayerCards = FixedLengthTuple<4, FixedLengthTuple<6, CardWithVisibility>>;
 

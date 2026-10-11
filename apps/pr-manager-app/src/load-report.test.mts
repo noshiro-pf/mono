@@ -1,8 +1,8 @@
 import { writeSetAsideComment } from 'pr-report-core';
 import { isRecord, Json, Result } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { REPORT_SOURCE } from './constants.mjs';
-import { type Fetch, type FetchInit } from './graphql.mjs';
+import type { Fetch, FetchInit } from './graphql.mjs';
 import { loadReport, type LoadedReport } from './load-report.mjs';
 
 describe(loadReport, () => {

@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type IsFixedLengthList } from './is-fixed-length-list.mjs';
+import type { IsFixedLengthList } from './is-fixed-length-list.mjs';
 
 expectType<IsFixedLengthList<[]>, true>('=');
 

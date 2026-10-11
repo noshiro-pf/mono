@@ -1,4 +1,4 @@
-import { type NonPositiveFiniteNumber as TtfImported_NonPositiveFiniteNumber } from 'ts-type-forge';
+import type { NonPositiveFiniteNumber as TtfImported_NonPositiveFiniteNumber } from 'ts-type-forge';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
 export type NonPositiveFiniteNumber = TtfImported_NonPositiveFiniteNumber;

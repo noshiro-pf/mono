@@ -1,6 +1,6 @@
 import { expectType, Result } from 'ts-data-forge';
-import { type SafeInt } from 'ts-type-forge';
-import { type TypeOf } from '../../../type.mjs';
+import type { SafeInt } from 'ts-type-forge';
+import type { TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { safeInt } from './safe-int.mjs';
 

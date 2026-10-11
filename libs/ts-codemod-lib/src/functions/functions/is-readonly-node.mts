@@ -1,6 +1,6 @@
 import { Arr, expectType } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
-import { type DeepReadonly, type StrictOmit } from 'ts-type-forge';
+import type { DeepReadonly, StrictOmit } from 'ts-type-forge';
 import { isAtomicTypeNode } from './is-atomic-type-node.mjs';
 
 export const isShallowReadonlyTypeNode = (node: tsm.Node): boolean =>

@@ -1,7 +1,7 @@
-import { type IsNotFixedLengthList } from '../condition/index.mjs';
-import { type UnknownRecord } from '../constants/index.mjs';
-import { type ToNumber } from '../others/index.mjs';
-import { type IndexOfTuple, type Tuple } from '../tuple-and-list/index.mjs';
+import type { IsNotFixedLengthList } from '../condition/index.mjs';
+import type { UnknownRecord } from '../constants/index.mjs';
+import type { ToNumber } from '../others/index.mjs';
+import type { IndexOfTuple, Tuple } from '../tuple-and-list/index.mjs';
 
 /**
  * @internal Generates a union of all prefixes of a given readonly tuple

@@ -1,8 +1,8 @@
-import {
-  type NonZeroSafeInt,
-  type PositiveSafeInt,
-  type SafeUint,
-  type WithSmallInt,
+import type {
+  NonZeroSafeInt,
+  PositiveSafeInt,
+  SafeUint,
+  WithSmallInt,
 } from 'ts-type-forge';
 import { SafeInt, asSafeInt } from '../number/index.mjs';
 

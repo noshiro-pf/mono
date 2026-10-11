@@ -1,10 +1,10 @@
 import { expectType } from '../../expect-type.mjs';
 import { Optional, pipe } from '../../functional/index.mjs';
 import { asUint32 } from '../../number/index.mjs';
-import {
-  type ArgArrayIndexWithNegative,
-  type ArrayIndex,
-  type SizeType,
+import type {
+  ArgArrayIndexWithNegative,
+  ArrayIndex,
+  SizeType,
 } from '../../types.mjs';
 
 /**

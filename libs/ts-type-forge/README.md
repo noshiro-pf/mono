@@ -72,7 +72,7 @@ There are two ways to use the types provided by `ts-type-forge`:
 
     ```ts
     // src/types/dice.ts
-    import { type UintRange } from 'ts-type-forge';
+    import type { UintRange } from 'ts-type-forge';
 
     export type DiceValue = UintRange<1, 7>; // 1 | 2 | 3 | 4 | 5 | 6
     ```

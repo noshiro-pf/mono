@@ -1,16 +1,16 @@
 import { expectType } from 'ts-data-forge';
-import { type TSTypeForgeInternals_BrandEncapsulated } from './_internals.mjs';
-import {
-  type Brand,
-  type ExtendBrand,
-  type GetBrandKeysPart,
-  type GetBrandValuePart,
-  type IntersectBrand,
-  type NormalizeBrandUnion,
-  type UnwrapBrandBooleanKeys,
-  type UnwrapBrandFalseKeys,
-  type UnwrapBrandKeys,
-  type UnwrapBrandTrueKeys,
+import type { TSTypeForgeInternals_BrandEncapsulated } from './_internals.mjs';
+import type {
+  Brand,
+  ExtendBrand,
+  GetBrandKeysPart,
+  GetBrandValuePart,
+  IntersectBrand,
+  NormalizeBrandUnion,
+  UnwrapBrandBooleanKeys,
+  UnwrapBrandFalseKeys,
+  UnwrapBrandKeys,
+  UnwrapBrandTrueKeys,
 } from './brand.mjs';
 
 {

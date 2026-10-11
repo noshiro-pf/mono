@@ -1,7 +1,7 @@
 import { expectType, Result } from 'ts-data-forge';
-import { type MaxLengthArray } from 'ts-type-forge';
+import type { MaxLengthArray } from 'ts-type-forge';
 import { number } from '../primitives/index.mjs';
-import { type TypeOf } from '../type.mjs';
+import type { TypeOf } from '../type.mjs';
 import { maxLengthArray } from './max-length-array.mjs';
 
 describe(maxLengthArray, () => {

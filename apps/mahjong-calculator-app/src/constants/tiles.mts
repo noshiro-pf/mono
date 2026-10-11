@@ -1,5 +1,5 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
-import { type Tile, type TileName } from '../types/index.mjs';
+import type { ReadonlyRecord } from 'ts-type-forge';
+import type { Tile, TileName } from '../types/index.mjs';
 
 export const tileDef = {
   Manzu1: {

@@ -1,4 +1,4 @@
-import { type Brand, type NormalizeBrandUnion } from 'ts-type-forge';
+import type { Brand, NormalizeBrandUnion } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

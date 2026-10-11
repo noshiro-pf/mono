@@ -1,5 +1,5 @@
 import { memoNamed } from 'react-utils';
-import { type SafeUint } from 'ts-type-forge';
+import type { SafeUint } from 'ts-type-forge';
 import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
 import { DetailedFilterNumIcon } from './detailed-filter-num-icon.js';
 

@@ -12,14 +12,14 @@ import {
   type Observable as SynstateObservable,
 } from 'synstate';
 import { Arr, Num, SafeUint, asSafeUint, isNotUndefined } from 'ts-data-forge';
-import {
-  type DeepReadonly,
-  type NonEmptyTuple,
-  type SafeUintWithSmallInt,
+import type {
+  DeepReadonly,
+  NonEmptyTuple,
+  SafeUintWithSmallInt,
 } from 'ts-type-forge';
 import { time } from '../constants/index.mjs';
 import { returnFalse } from '../return-boolean.mjs';
-import { type Card, type GameStateAction, type NWES } from '../types/index.mjs';
+import type { Card, GameStateAction, NWES } from '../types/index.mjs';
 import { db } from './database.mjs';
 
 const autoPlaySpeedRate = 0.5;

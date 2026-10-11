@@ -1,4 +1,4 @@
-import { type HoursEnum } from 'ts-type-forge';
+import type { HoursEnum } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

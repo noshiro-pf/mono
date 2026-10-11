@@ -1,5 +1,5 @@
-import { type ToNumber } from '../others/index.mjs';
-import { type MakeTuple } from '../tuple-and-list/index.mjs';
+import type { ToNumber } from '../others/index.mjs';
+import type { MakeTuple } from '../tuple-and-list/index.mjs';
 
 /**
  * Creates a readonly tuple containing a sequence of number literals from 0 up to (but not including) `N`.

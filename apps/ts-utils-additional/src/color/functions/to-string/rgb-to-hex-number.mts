@@ -1,4 +1,4 @@
-import { type Rgb, type Rgba } from '../../types/index.mjs';
+import type { Rgb, Rgba } from '../../types/index.mjs';
 import { hexStrToNumber } from './hex-str-to-number.mjs';
 
 export const rgbToHexNumber = ([r, g, b]: Rgb): number =>

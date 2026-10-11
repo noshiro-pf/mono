@@ -1,5 +1,5 @@
 import { Arr, IMapMapped, tp } from 'ts-data-forge';
-import { type AnswerTableCellPosition } from '../../types/index.mjs';
+import type { AnswerTableCellPosition } from '../../types/index.mjs';
 import {
   answerSelectionFromMapKey,
   answerSelectionToMapKey,

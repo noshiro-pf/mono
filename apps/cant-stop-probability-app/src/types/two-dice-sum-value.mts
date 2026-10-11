@@ -1,5 +1,5 @@
 import * as t from 'ts-fortress';
-import { type DiceValue } from './dice-value.mjs';
+import type { DiceValue } from './dice-value.mjs';
 
 const twoDiceSumValueType = t.uintRangeInclusive(2, 12, { defaultValue: 2 });
 

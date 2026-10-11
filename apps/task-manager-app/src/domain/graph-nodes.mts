@@ -6,8 +6,8 @@
  */
 
 import { Arr } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
-import { type Dependency, type DomainState, type NodeRef } from './types.mjs';
+import type { DeepReadonly } from 'ts-type-forge';
+import type { Dependency, DomainState, NodeRef } from './types.mjs';
 
 /** A stable string id for a node: `task:<id>` or `milestone:<id>`. */
 export const nodeId = (ref: NodeRef): GraphNodeId =>

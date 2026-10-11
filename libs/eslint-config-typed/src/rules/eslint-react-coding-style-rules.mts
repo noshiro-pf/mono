@@ -1,4 +1,4 @@
-import { type EslintReactCodingStyleRules } from '../types/index.mjs';
+import type { EslintReactCodingStyleRules } from '../types/index.mjs';
 
 export const eslintReactCodingStyleRules = {
   // import-x/prefer-namespace-import checks similar things, but this rule enforces more strict style.

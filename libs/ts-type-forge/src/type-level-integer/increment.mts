@@ -1,4 +1,4 @@
-import { type List, type MakeTuple } from '../tuple-and-list/index.mjs';
+import type { List, MakeTuple } from '../tuple-and-list/index.mjs';
 
 /**
  * Increments a non-negative integer literal type `N` by 1.

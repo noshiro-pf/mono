@@ -1,8 +1,8 @@
 import { panic } from '../../../panic/index.mjs';
-import { type UnknownResult } from '../result.mjs';
+import type { UnknownResult } from '../result.mjs';
 import { isOk } from './result-is-ok.mjs';
 import { unwrapOk } from './result-unwrap-ok.mjs';
-import { type UnwrapOk } from './types.mjs';
+import type { UnwrapOk } from './types.mjs';
 
 /**
  * Unwraps a `Result`, returning the success value or throwing an error with

@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { pathExists } from 'ts-repo-utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 // eslint-disable-next-line import-x/no-relative-packages
 import { extractSampleCode } from '../../../tools/configs/embed-examples-utils.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';

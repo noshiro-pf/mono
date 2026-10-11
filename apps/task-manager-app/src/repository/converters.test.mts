@@ -1,5 +1,5 @@
 import { Result } from 'ts-data-forge';
-import { type DagLayout } from '../dag/index.mjs';
+import type { DagLayout } from '../dag/index.mjs';
 import {
   asMilestoneId,
   asTaskId,

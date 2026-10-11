@@ -1,5 +1,5 @@
 import { Arr, type PositiveFiniteNumber } from 'ts-data-forge';
-import { type NonEmptyArray, type Percent } from 'ts-type-forge';
+import type { NonEmptyArray, Percent } from 'ts-type-forge';
 import { contrastRatioHsl, type Hue } from 'ts-utils-additional';
 
 export const hueListToContrastRatioList = (

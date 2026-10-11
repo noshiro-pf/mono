@@ -1,5 +1,5 @@
 import { Arr } from 'ts-data-forge';
-import { type JSONSchema4 } from '../type.mjs';
+import type { JSONSchema4 } from '../type.mjs';
 
 /**
  * object-shorthand の options でオブジェクト付きの tuple が 2 要素になるように minItems を補完する

@@ -1,4 +1,4 @@
-import { type CodeOwnerReview } from 'pr-report-core';
+import type { CodeOwnerReview } from 'pr-report-core';
 import { memoNamed } from 'preact-utils';
 import { BadgeIcon } from './badge-icon.js';
 

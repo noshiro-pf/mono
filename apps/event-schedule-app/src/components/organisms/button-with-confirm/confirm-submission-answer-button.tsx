@@ -1,6 +1,6 @@
 import { ButtonNowrapStyled } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { type StrictOmit } from 'ts-type-forge';
+import type { StrictOmit } from 'ts-type-forge';
 import { dict } from '../../../constants/index.mjs';
 import { AnswerPageStore } from '../../../store/index.mjs';
 import { match } from '../../../utils-ported/index.mjs';

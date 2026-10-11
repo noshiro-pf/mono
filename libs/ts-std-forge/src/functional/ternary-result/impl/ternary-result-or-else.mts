@@ -1,7 +1,7 @@
-import { type UnknownTernaryResult } from '../ternary-result.mjs';
+import type { UnknownTernaryResult } from '../ternary-result.mjs';
 import { isOk } from './ternary-result-is-ok.mjs';
 import { isWarn } from './ternary-result-is-warn.mjs';
-import { type NarrowToOk, type NarrowToWarn } from './types.mjs';
+import type { NarrowToOk, NarrowToWarn } from './types.mjs';
 
 /**
  * Returns the original result if it is Ok, otherwise the provided fallback.

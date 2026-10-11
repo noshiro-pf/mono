@@ -1,4 +1,4 @@
-import { type FiniteNumber, type NonZeroFiniteNumber } from 'ts-type-forge';
+import type { FiniteNumber, NonZeroFiniteNumber } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

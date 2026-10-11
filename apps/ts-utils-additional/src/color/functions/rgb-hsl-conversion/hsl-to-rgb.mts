@@ -1,9 +1,4 @@
-import {
-  type Hsl,
-  type Hsla,
-  type Rgb,
-  type Rgba,
-} from '../../types/index.mjs';
+import type { Hsl, Hsla, Rgb, Rgba } from '../../types/index.mjs';
 import { numberToRgbValue } from '../from-number/index.mjs';
 
 const hue2rgb = (p: number, q: number, s: number): number => {

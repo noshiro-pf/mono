@@ -1,4 +1,4 @@
-import { type Brand, type UnwrapBrandBooleanKeys } from 'ts-type-forge';
+import type { Brand, UnwrapBrandBooleanKeys } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

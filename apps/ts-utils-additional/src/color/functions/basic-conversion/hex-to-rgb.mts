@@ -1,5 +1,5 @@
 import { Uint8 } from 'ts-data-forge';
-import { type Rgb, type RgbValue } from '../../types/index.mjs';
+import type { Rgb, RgbValue } from '../../types/index.mjs';
 
 /**
  * The caller has already matched `hex` against `/^#[0-9a-fA-F]{6}$/`, so each

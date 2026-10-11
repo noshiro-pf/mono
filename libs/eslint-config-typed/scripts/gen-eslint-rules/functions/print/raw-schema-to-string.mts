@@ -1,4 +1,4 @@
-import { type JSONSchema4 } from '../type.mjs';
+import type { JSONSchema4 } from '../type.mjs';
 
 /**
  * スキーマ定義を JSDoc コメントの code block として整形する

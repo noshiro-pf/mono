@@ -1,4 +1,4 @@
-import { type TernaryErr } from '../ternary-result.mjs';
+import type { TernaryErr } from '../ternary-result.mjs';
 import { ErrTypeTagName } from './tag.mjs';
 
 /**

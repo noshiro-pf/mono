@@ -1,10 +1,10 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type DateEnum,
-  type HoursEnum,
-  type MinutesEnum,
-  type MonthEnum,
-  type SafeUint,
+import type {
+  DateEnum,
+  HoursEnum,
+  MinutesEnum,
+  MonthEnum,
+  SafeUint,
 } from 'ts-type-forge';
 import { hoursMinutesDefaultValue } from './hours-minutes.mjs';
 import { yearMonthDateDefaultValue } from './year-month-date.mjs';

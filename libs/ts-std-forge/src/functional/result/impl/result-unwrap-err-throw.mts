@@ -1,9 +1,9 @@
 import { unknownToString } from '../../../others/index.mjs';
 import { panic } from '../../../panic/index.mjs';
 import { match } from '../../match.mjs';
-import { type UnknownResult } from '../result.mjs';
+import type { UnknownResult } from '../result.mjs';
 import { isErr } from './result-is-err.mjs';
-import { type UnwrapErr, type UnwrapOk } from './types.mjs';
+import type { UnwrapErr, UnwrapOk } from './types.mjs';
 
 /**
  * Unwraps a `Result`, returning the error value. Throws an error if the

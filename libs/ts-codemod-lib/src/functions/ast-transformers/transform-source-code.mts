@@ -1,6 +1,6 @@
 import { Arr } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
-import { type TsMorphTransformer } from './types.mjs';
+import type { TsMorphTransformer } from './types.mjs';
 
 const fileIgnorePrefixes = [
   'transformer-ignore',

@@ -1,9 +1,5 @@
 /** @internal Tag identifying the Ok variant. */
-import {
-  type TernaryErr,
-  type TernaryOk,
-  type TernaryWarn,
-} from '../ternary-result.mjs';
+import type { TernaryErr, TernaryOk, TernaryWarn } from '../ternary-result.mjs';
 
 export const OkTypeTagName: TernaryOk<unknown>['$$tag'] =
   'ts-data-forge::Result.ok';

@@ -5,7 +5,7 @@
 // them, which this layer depends on. The `mut_` prefix marks the deliberate
 // mutation, as it does elsewhere in the repository.
 
-import { type Rect } from 'ts-utils-additional';
+import type { Rect } from 'ts-utils-additional';
 
 export type CallbackFnsType = Readonly<{
   addBbox: (rect: Rect) => void;

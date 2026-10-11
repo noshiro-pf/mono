@@ -3,9 +3,9 @@ import {
   EventSchedule,
   firestorePaths,
 } from 'event-schedule-app-shared';
-import { type Firestore } from 'firebase-admin/firestore';
-import { type auth } from 'firebase-functions/v1';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { Firestore } from 'firebase-admin/firestore';
+import type { auth } from 'firebase-functions/v1';
+import type { DeepReadonly } from 'ts-type-forge';
 
 const removeAuthorIdFromEventSchedule = (
   eventSchedule: EventSchedule,

@@ -1,7 +1,7 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type SupportedLength,
-  type SupportedLengthCap,
+import type {
+  SupportedLength,
+  SupportedLengthCap,
 } from './supported-length.mjs';
 
 expectType<SupportedLengthCap, 2048>('=');

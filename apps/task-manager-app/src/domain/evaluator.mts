@@ -12,7 +12,7 @@
  */
 
 import { Arr } from 'ts-data-forge';
-import { type EvaluationContext } from './evaluation-context.mjs';
+import type { EvaluationContext } from './evaluation-context.mjs';
 import {
   isTaskDependency,
   type Dependency,

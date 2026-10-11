@@ -1,9 +1,9 @@
 import { Arr, memoizeFunction, Result } from 'ts-data-forge';
-import {
-  type TupleTypeInternals,
-  type Type,
-  type TypeOf,
-  type UnknownType,
+import type {
+  TupleTypeInternals,
+  Type,
+  TypeOf,
+  UnknownType,
 } from '../type.mjs';
 import {
   createAssertFn,

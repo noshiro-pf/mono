@@ -2,7 +2,7 @@ import { css } from '@emotion/react';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
 import { Arr } from 'ts-data-forge';
-import { type Percent } from 'ts-type-forge';
+import type { Percent } from 'ts-type-forge';
 import { hsl as toHsl, type Hue } from 'ts-utils-additional';
 import { ColorItem } from '../atoms/index.mjs';
 

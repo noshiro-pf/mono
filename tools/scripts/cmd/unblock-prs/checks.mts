@@ -6,7 +6,7 @@
 import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { git, parseJson } from './github.mjs';
-import { type ChecksSummary } from './types.mjs';
+import type { ChecksSummary } from './types.mjs';
 
 /** The fields read from `gh pr checks --json`. */
 const CheckListSchema = t.array(

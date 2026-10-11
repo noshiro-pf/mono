@@ -1,4 +1,4 @@
-import { type PositiveInt } from 'ts-type-forge';
+import type { PositiveInt } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { range } from '../../iterator/index.mjs';
 import { asNegativeInt, isNegativeInt, NegativeInt } from './negative-int.mjs';

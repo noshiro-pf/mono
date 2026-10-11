@@ -1,4 +1,4 @@
-import { type TagProps } from '@blueprintjs/core';
+import type { TagProps } from '@blueprintjs/core';
 import {
   type InitializedObservable,
   combine,
@@ -16,17 +16,13 @@ import {
   fastDeepEqual,
   isNotUndefined,
 } from 'ts-data-forge';
-import {
-  type DeepReadonly,
-  type ReadonlyRecord,
-  type SafeUint,
-} from 'ts-type-forge';
+import type { DeepReadonly, ReadonlyRecord, SafeUint } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import { AnswerFilterState } from '../../functions/index.mjs';
-import {
-  type AnswerRank,
-  type AnswersScore,
-  type DetailedFilterIcon,
+import type {
+  AnswerRank,
+  AnswersScore,
+  DetailedFilterIcon,
 } from '../../types/index.mjs';
 import { AnswersStore, eventSchedule$ } from '../fetching-state/index.mjs';
 import { AnswerFilterQueryParam } from './answer-filter-query-param.mjs';

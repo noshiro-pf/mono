@@ -1,4 +1,4 @@
-import { type UintRange } from 'ts-type-forge';
+import type { UintRange } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

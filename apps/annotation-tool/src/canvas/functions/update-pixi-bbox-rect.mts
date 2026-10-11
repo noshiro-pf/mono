@@ -1,6 +1,6 @@
 import { Rectangle, type Graphics } from 'pixi.js-legacy';
 import { rgbaToHexNumber, type Rect, type Rgba } from 'ts-utils-additional';
-import { type PixiBbox } from '../types/index.mjs';
+import type { PixiBbox } from '../types/index.mjs';
 
 export const updateBboxRect = (
   mut_graphics: Graphics,

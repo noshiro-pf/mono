@@ -1,6 +1,6 @@
 import { expectType } from 'ts-data-forge';
-import { type LambdaTerm } from './lambda-term.mjs';
-import { type NumberTerm, type NumberTermBody } from './number-term.mjs';
+import type { LambdaTerm } from './lambda-term.mjs';
+import type { NumberTerm, NumberTermBody } from './number-term.mjs';
 
 describe('test types', () => {
   test('dummy', () => {

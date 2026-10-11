@@ -1,6 +1,6 @@
 import { styled, type StyledVNode } from 'goober';
-import { type StrictPick } from 'ts-type-forge';
-import { type RectSize } from 'ts-utils-additional';
+import type { StrictPick } from 'ts-type-forge';
+import type { RectSize } from 'ts-utils-additional';
 import { balloonColor, zIndex } from '../../constants/index.mjs';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

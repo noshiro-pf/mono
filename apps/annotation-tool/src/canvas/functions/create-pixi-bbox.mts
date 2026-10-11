@@ -7,7 +7,7 @@
 
 import { Graphics } from 'pixi.js-legacy';
 import { Num } from 'ts-data-forge';
-import { type Rect, type Rgba } from 'ts-utils-additional';
+import type { Rect, Rgba } from 'ts-utils-additional';
 import { zIndex } from '../z-index.mjs';
 import {
   bboxPointsFromRect,

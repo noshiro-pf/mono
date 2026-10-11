@@ -5,8 +5,8 @@
 // them, which this layer depends on. The `mut_` prefix marks the deliberate
 // mutation, as it does elsewhere in the repository.
 
-import { type Percent } from 'ts-type-forge';
-import { type Alpha } from 'ts-utils-additional';
+import type { Percent } from 'ts-type-forge';
+import type { Alpha } from 'ts-utils-additional';
 
 export type BboxStyle = Readonly<{
   pointWidthPx: number;

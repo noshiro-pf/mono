@@ -1,4 +1,4 @@
-import { type AnswerSymbolIconId } from '../enum/index.mjs';
+import type { AnswerSymbolIconId } from '../enum/index.mjs';
 import {
   defaultDatetimeRange,
   fillDatetimeRange,

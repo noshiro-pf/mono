@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { type SplitterRect } from '../layout/index.mjs';
+import type { SplitterRect } from '../layout/index.mjs';
 
 export const Splitter = memoNamed(
   'Splitter',

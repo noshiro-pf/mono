@@ -1,4 +1,4 @@
-import { type OptionalKeys } from 'ts-type-forge';
+import type { OptionalKeys } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

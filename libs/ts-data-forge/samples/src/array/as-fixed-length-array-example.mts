@@ -1,6 +1,6 @@
 // Example: src/array/array-utils.mts (asFixedLengthArray)
 import { Arr } from 'ts-data-forge';
-import { type MaxLengthArray } from 'ts-type-forge';
+import type { MaxLengthArray } from 'ts-type-forge';
 
 if (import.meta.vitest !== undefined) {
   test('main', () => {

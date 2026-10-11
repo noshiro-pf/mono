@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import { memoNamed } from 'react-utils';
-import { type PositiveFiniteNumber } from 'ts-data-forge';
+import type { PositiveFiniteNumber } from 'ts-data-forge';
 
 type Props = Readonly<{ contrastRatioList: readonly PositiveFiniteNumber[] }>;
 

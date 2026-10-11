@@ -1,5 +1,5 @@
 /** @internal Tag identifying the Ok variant. */
-import { type Err, type Ok } from '../../../adt-types.mjs';
+import type { Err, Ok } from '../../../adt-types.mjs';
 
 export const OkTypeTagName: Ok<unknown>['$$tag'] = 'ts-data-forge::Result.ok';
 

@@ -1,5 +1,5 @@
 /* cSpell:disable */
-import { type Linter } from 'eslint';
+import type { Linter } from 'eslint';
 
 /**
  * @description Disallow `expect(X).toStrictEqual(Y)` in favor of `assert.deepStrictEqual(X, Y)`, which constrains X and Y to a single type at compile time (`toStrictEqual` type-checks neither); note that it compares structure only, so pin a prototype with `assert.instanceOf`.

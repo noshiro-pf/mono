@@ -1,4 +1,4 @@
-import { type Variable } from '../types/index.mjs';
+import type { Variable } from '../types/index.mjs';
 
 // prettier-ignore
 export const ALPHABETS = [

@@ -8,7 +8,7 @@ import {
   createEventEmitter,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { type SortSpec } from './domain/index.mjs';
+import type { SortSpec } from './domain/index.mjs';
 import {
   ANIMATION_SETTING_STORAGE_KEY,
   DAG_VIEW_MODE_STORAGE_KEY,

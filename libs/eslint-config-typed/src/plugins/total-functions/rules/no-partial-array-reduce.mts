@@ -5,7 +5,7 @@ import {
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
 import { isTupleType, isTupleTypeReference, unionTypeParts } from 'tsutils';
-import { type Type } from 'typescript';
+import type { Type } from 'typescript';
 import { createRule } from './common.mjs';
 import {
   typeWrapperLayers,

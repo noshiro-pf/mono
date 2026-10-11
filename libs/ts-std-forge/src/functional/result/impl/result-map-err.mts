@@ -1,8 +1,8 @@
-import { type Ok } from '../../../adt-types.mjs';
-import { type Result, type UnknownResult } from '../result.mjs';
+import type { Ok } from '../../../adt-types.mjs';
+import type { Result, UnknownResult } from '../result.mjs';
 import { err } from './result-err.mjs';
 import { isOk } from './result-is-ok.mjs';
-import { type UnwrapErr, type UnwrapOk } from './types.mjs';
+import type { UnwrapErr, UnwrapOk } from './types.mjs';
 
 /**
  * Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the

@@ -1,7 +1,7 @@
-import { type Ok } from '../../../adt-types.mjs';
-import { type UnknownResult } from '../result.mjs';
+import type { Ok } from '../../../adt-types.mjs';
+import type { UnknownResult } from '../result.mjs';
 import { isOk } from './result-is-ok.mjs';
-import { type UnwrapOk } from './types.mjs';
+import type { UnwrapOk } from './types.mjs';
 
 /**
  * Safely unwraps the success value, returning `undefined` for failures.

@@ -1,5 +1,5 @@
 import { Uint8 } from 'ts-data-forge';
-import { type UintRangeInclusive } from 'ts-type-forge';
+import type { UintRangeInclusive } from 'ts-type-forge';
 
 export type RgbValue = UintRangeInclusive<0, 255>;
 

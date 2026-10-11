@@ -1,7 +1,7 @@
 import { Arr } from 'ts-data-forge';
 import { buildEvaluationContext } from './evaluation-context.mjs';
 import { createEvaluator } from './evaluator.mjs';
-import { type DomainState } from './types.mjs';
+import type { DomainState } from './types.mjs';
 
 /**
  * The earliest time after `now` at which a dependency or a milestone changes

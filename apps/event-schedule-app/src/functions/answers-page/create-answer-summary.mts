@@ -7,7 +7,7 @@ import {
   pipe,
   tp,
 } from 'ts-data-forge';
-import { type DeepReadonly, type FixedLengthTuple } from 'ts-type-forge';
+import type { DeepReadonly, FixedLengthTuple } from 'ts-type-forge';
 import { answerIconPointConfig } from '../../constants/index.mjs';
 import {
   datetimeRangeFromMapKey,

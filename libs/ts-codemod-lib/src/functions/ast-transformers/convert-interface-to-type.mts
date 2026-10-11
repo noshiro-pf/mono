@@ -3,7 +3,7 @@
 import { Arr } from 'ts-data-forge';
 import type * as tsm from 'ts-morph';
 import { hasDisableNextLineComment } from '../functions/index.mjs';
-import { type TsMorphTransformer } from './types.mjs';
+import type { TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'convert-interface-to-type';
 

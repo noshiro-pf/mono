@@ -1,6 +1,6 @@
 import viteReact from '@vitejs/plugin-react';
 import * as path from 'node:path';
-import { type UserConfig } from 'vite';
+import type { UserConfig } from 'vite';
 import { appDevPort } from './app-dev-ports.mjs';
 
 /**

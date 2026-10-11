@@ -1,9 +1,6 @@
-import { type Application, type Sprite } from 'pixi.js-legacy';
-import { type RectSize } from 'ts-utils-additional';
-import {
-  type AnnotationCanvasStyle,
-  type PixiTempRect,
-} from '../types/index.mjs';
+import type { Application, Sprite } from 'pixi.js-legacy';
+import type { RectSize } from 'ts-utils-additional';
+import type { AnnotationCanvasStyle, PixiTempRect } from '../types/index.mjs';
 import {
   createBorderedRectangleGraphics,
   createDummySpriteRectangle,

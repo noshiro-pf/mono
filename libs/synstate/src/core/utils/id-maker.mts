@@ -1,7 +1,7 @@
-import {
-  type ObservableId,
-  type SubscriberId,
-  type UpdateToken,
+import type {
+  ObservableId,
+  SubscriberId,
+  UpdateToken,
 } from '../types/index.mjs';
 
 function* idMaker<T extends symbol>(): Generator<T, T, T> {

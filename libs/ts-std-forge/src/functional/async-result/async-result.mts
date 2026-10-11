@@ -1,4 +1,4 @@
-import { type Result } from '../result/index.mjs';
+import type { Result } from '../result/index.mjs';
 
 /**
  * Represents an asynchronous computation that can either succeed (`Ok`) or

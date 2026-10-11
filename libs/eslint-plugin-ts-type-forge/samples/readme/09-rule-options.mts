@@ -1,4 +1,4 @@
-import { type EslintTsTypeForgeRules } from 'eslint-plugin-ts-type-forge';
+import type { EslintTsTypeForgeRules } from 'eslint-plugin-ts-type-forge';
 
 export const rules = {
   // The README renders markdown code blocks with a four-space indent, and a

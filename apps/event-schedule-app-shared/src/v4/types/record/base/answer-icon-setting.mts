@@ -1,4 +1,4 @@
-import { type AnswerIconPoint } from '../../enum/index.mjs';
+import type { AnswerIconPoint } from '../../enum/index.mjs';
 
 export type AnswerIconSetting = Readonly<{
   description: string;

@@ -1,5 +1,5 @@
 import { memoNamed } from 'preact-utils';
-import { type StatusRole } from '../verdict.mjs';
+import type { StatusRole } from '../verdict.mjs';
 
 type Props = Readonly<{
   value: number;

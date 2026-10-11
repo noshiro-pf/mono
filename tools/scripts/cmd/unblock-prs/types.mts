@@ -2,9 +2,9 @@
 
 /** The shapes every module here passes around. */
 
-import { type RulesetRequirements, type SetAsideComment } from 'pr-report-core';
+import type { RulesetRequirements, SetAsideComment } from 'pr-report-core';
 import * as t from 'ts-fortress';
-import { type StrictPick } from 'ts-type-forge';
+import type { StrictPick } from 'ts-type-forge';
 
 /** The fields read from `gh pr list` / `gh pr view`. */
 export const PullRequestSchema = t.record({

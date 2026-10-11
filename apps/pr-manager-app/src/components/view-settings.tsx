@@ -1,4 +1,4 @@
-import { type InputEventHandler, type RefCallback } from 'preact';
+import type { InputEventHandler, RefCallback } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import { useObservableValue } from 'synstate-preact-hooks';

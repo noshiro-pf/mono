@@ -1,4 +1,4 @@
-import { type ESLintPlugin } from '../../../types/index.mjs';
+import type { ESLintPlugin } from '../../../types/index.mjs';
 import { noEnums } from './no-enums.mjs';
 import { noHiddenTypeAssertions } from './no-hidden-type-assertions.mjs';
 import { noNestedFpTsEffects } from './no-nested-fp-ts-effects.mjs';

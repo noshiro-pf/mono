@@ -1,9 +1,9 @@
 /* cSpell:disable */
-import { type Linter } from 'eslint';
-import {
-  type FixedLengthTuple,
-  type NonEmptyTuple,
-  type UnknownRecord,
+import type { Linter } from 'eslint';
+import type {
+  FixedLengthTuple,
+  NonEmptyTuple,
+  UnknownRecord,
 } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<

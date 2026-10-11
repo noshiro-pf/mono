@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type Float16, type Float32, type Float64 } from './float.mjs';
+import type { Float16, Float32, Float64 } from './float.mjs';
 
 // Test Float16 type
 expectType<Float16, number>('<=');

@@ -1,7 +1,7 @@
-import {
-  type PositiveInt,
-  type PositiveFiniteNumber as TtfImported_PositiveFiniteNumber,
-  type Uint,
+import type {
+  PositiveInt,
+  PositiveFiniteNumber as TtfImported_PositiveFiniteNumber,
+  Uint,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';

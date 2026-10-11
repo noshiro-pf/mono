@@ -1,27 +1,27 @@
-import {
-  type BoolOr,
-  type FixedLengthArray,
-  type FixedLengthTuple,
-  type Index,
-  type IsUnion,
-  type List,
-  type Min,
-  type NonEmptyArray,
-  type NonZeroSafeIntWithSmallInt,
-  type PositiveSafeIntWithSmallInt,
-  type RelaxedExclude,
-  type SafeInt,
-  type SafeIntWithSmallInt,
-  type SafeUint,
-  type SafeUintWithSmallInt,
-  type Seq,
-  type SmallUint,
-  type StructuralPrefixLength,
-  type SupportedLength,
+import type {
+  BoolOr,
+  FixedLengthArray,
+  FixedLengthTuple,
+  Index,
+  IsUnion,
+  List,
+  Min,
+  NonEmptyArray,
+  NonZeroSafeIntWithSmallInt,
+  PositiveSafeIntWithSmallInt,
+  RelaxedExclude,
+  SafeInt,
+  SafeIntWithSmallInt,
+  SafeUint,
+  SafeUintWithSmallInt,
+  Seq,
+  SmallUint,
+  StructuralPrefixLength,
+  SupportedLength,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { range as rangeIterator } from '../../iterator/index.mjs';
-import { type SizeType } from '../../types.mjs';
+import type { SizeType } from '../../types.mjs';
 
 /**
  * Creates an array of zeros with the specified length.

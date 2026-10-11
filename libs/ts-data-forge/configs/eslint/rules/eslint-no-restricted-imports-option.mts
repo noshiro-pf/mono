@@ -1,4 +1,4 @@
-import { type EslintRulesOption } from 'eslint-config-typed';
+import type { EslintRulesOption } from 'eslint-config-typed';
 
 export const restrictedImports = [
   {

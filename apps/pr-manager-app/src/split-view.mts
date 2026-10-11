@@ -1,5 +1,5 @@
-import { type StrictPick } from 'ts-type-forge';
-import { type Entry } from './load-report.mjs';
+import type { StrictPick } from 'ts-type-forge';
+import type { Entry } from './load-report.mjs';
 
 /**
  * A link that opens a pull request in `split-view-extension`: the diff on the

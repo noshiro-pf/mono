@@ -1,6 +1,6 @@
 /// <reference types="ts-type-forge/global" />
 
-import { type TypeEq } from 'ts-type-forge';
+import type { TypeEq } from 'ts-type-forge';
 
 // ts-type-forge publishes types only, so its check is a compile, not a run.
 // `tsc --noEmit` failing on any of these is the assertion.

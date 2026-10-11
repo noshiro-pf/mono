@@ -1,4 +1,4 @@
-import { type TSESLint } from '@typescript-eslint/utils';
+import type { TSESLint } from '@typescript-eslint/utils';
 import { analyzeUniformTuple, type UniformTupleShape } from './ast-utils.mjs';
 import {
   DEFAULT_MAX_TUPLE_LENGTH,

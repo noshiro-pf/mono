@@ -4,7 +4,7 @@
  * reads the clock: functions that depend on the time take `now`.
  */
 
-import { type Brand, type DeepReadonly } from 'ts-type-forge';
+import type { Brand, DeepReadonly } from 'ts-type-forge';
 
 /** Whether `s` can be a {@link TaskId}: any non-empty string. */
 export const isTaskId = (s: string): s is TaskId => s !== '';

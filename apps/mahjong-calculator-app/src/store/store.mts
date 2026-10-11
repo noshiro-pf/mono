@@ -7,11 +7,7 @@ import {
 } from 'synstate';
 import { useObservableValue } from 'synstate-preact-hooks';
 import { Arr, castMutable, Optional, type Result } from 'ts-data-forge';
-import {
-  type JsonValue,
-  type MutableRecord,
-  type ReadonlyRecord,
-} from 'ts-type-forge';
+import type { JsonValue, MutableRecord, ReadonlyRecord } from 'ts-type-forge';
 import { tileDef } from '../constants/index.mjs';
 import {
   hand2TenhoString,
@@ -19,16 +15,16 @@ import {
   revealedBlockToTiles,
   sortTiles,
 } from '../functions/index.mjs';
-import {
-  type Bakaze,
-  type DoraIndicatorPosition,
-  type Jikaze,
-  type MaximizeTarget,
-  type NumTiles,
-  type RevealedBlock,
-  type TehaiType,
-  type TileName,
-  type Turn,
+import type {
+  Bakaze,
+  DoraIndicatorPosition,
+  Jikaze,
+  MaximizeTarget,
+  NumTiles,
+  RevealedBlock,
+  TehaiType,
+  TileName,
+  Turn,
 } from '../types/index.mjs';
 import { getShuffled } from '../utils/index.mjs';
 

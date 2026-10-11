@@ -16,19 +16,19 @@
  */
 
 import { Num } from 'ts-data-forge';
-import {
-  type DeepReadonly,
-  type FixedLengthTuple,
-  type NonEmptyTuple,
+import type {
+  DeepReadonly,
+  FixedLengthTuple,
+  NonEmptyTuple,
 } from 'ts-type-forge';
-import { type GraphNodeId } from '../domain/index.mjs';
+import type { GraphNodeId } from '../domain/index.mjs';
 import {
   labelSize,
   type DagDirection,
   type LaidOutEdge,
   type LaidOutNode,
 } from './graph-layout.mjs';
-import { type Point, type Size } from './pan-zoom.mjs';
+import type { Point, Size } from './pan-zoom.mjs';
 
 /** The least distance of a control point from the end it belongs to. */
 export const MIN_CONTROL_OFFSET = 40;

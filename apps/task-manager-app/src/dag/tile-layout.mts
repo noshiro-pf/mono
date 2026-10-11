@@ -10,10 +10,10 @@
  */
 
 import { Num } from 'ts-data-forge';
-import { type GraphNodeId } from '../domain/index.mjs';
-import { type NodeSize } from '../view-model/index.mjs';
+import type { GraphNodeId } from '../domain/index.mjs';
+import type { NodeSize } from '../view-model/index.mjs';
 import { nodeBoxSize, type LaidOutNode } from './graph-layout.mjs';
-import { type Point, type Size } from './pan-zoom.mjs';
+import type { Point, Size } from './pan-zoom.mjs';
 
 /** Between two tasks, across a row and down a column. */
 export const TILE_NODE_GAP = 16;

@@ -1,5 +1,5 @@
-import { type DeepPartial, type ReadonlyRecord } from 'ts-type-forge';
-import { type AnswerSymbolId } from '../enum/index.mjs';
+import type { DeepPartial, ReadonlyRecord } from 'ts-type-forge';
+import type { AnswerSymbolId } from '../enum/index.mjs';
 import { fillSymbolSetting, type SymbolSetting } from './base/index.mjs';
 
 export type SymbolSettings = ReadonlyRecord<AnswerSymbolId, SymbolSetting>;

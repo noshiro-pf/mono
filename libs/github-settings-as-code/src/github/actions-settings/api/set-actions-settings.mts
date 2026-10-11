@@ -1,7 +1,7 @@
-import { type EndpointKeys } from 'octokit-safe-types';
+import type { EndpointKeys } from 'octokit-safe-types';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';
-import { type ActionsSettings } from '../constants.mjs';
+import type { ActionsSettings } from '../constants.mjs';
 
 /** Settings > Actions > General を JSON の内容に合わせる。 */
 export const setActionsSettings = async (

@@ -1,4 +1,4 @@
-import { type SortSpec } from '../domain/index.mjs';
+import type { SortSpec } from '../domain/index.mjs';
 import { DEFAULT_DIAGRAM_SORT } from '../view-model/index.mjs';
 import { createDiagramSortStore } from './diagram-sort-store.mjs';
 

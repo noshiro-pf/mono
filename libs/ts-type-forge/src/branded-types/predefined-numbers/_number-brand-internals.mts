@@ -1,9 +1,9 @@
-import { type RelaxedExclude } from '../../others/index.mjs';
-import {
-  type Brand,
-  type GetBrandValuePart,
-  type UnwrapBrandFalseKeys,
-  type UnwrapBrandTrueKeys,
+import type { RelaxedExclude } from '../../others/index.mjs';
+import type {
+  Brand,
+  GetBrandValuePart,
+  UnwrapBrandFalseKeys,
+  UnwrapBrandTrueKeys,
 } from '../brand.mjs';
 
 /** Recognized boolean keys for numeric brands. */

@@ -34,7 +34,7 @@ import {
   PLACEMENT_ANIMATION_MS,
   toElkGraph,
 } from '../dag/index.mjs';
-import { type Backend } from '../repository/index.mjs';
+import type { Backend } from '../repository/index.mjs';
 import { buildMilestoneRows, buildTaskRows } from '../view-model/index.mjs';
 import { createAnimationSettingStore } from './animation-setting-store.mjs';
 import { createClockStore } from './clock-store.mjs';

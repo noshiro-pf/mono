@@ -1,4 +1,4 @@
-import { type RefObject } from 'preact';
+import type { RefObject } from 'preact';
 import { memoNamed } from 'preact-utils';
 import {
   dagArrangementSignal,

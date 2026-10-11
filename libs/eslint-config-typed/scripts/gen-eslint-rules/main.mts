@@ -4,7 +4,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, Result } from 'ts-data-forge';
 import { $, glob, isDirectlyExecuted } from 'ts-repo-utils';
-import { type NonEmptyArray } from 'ts-type-forge';
+import type { NonEmptyArray } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 import {
   applyTransformationsToFile,

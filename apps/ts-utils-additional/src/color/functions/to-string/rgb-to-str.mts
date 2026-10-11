@@ -4,7 +4,7 @@
 // of three 256-member `RgbValue` unions, which is TS2590 territory for no
 // benefit — the declared return type is `string`.
 
-import { type Rgb, type Rgba } from '../../types/index.mjs';
+import type { Rgb, Rgba } from '../../types/index.mjs';
 
 export const rgbToStr = ([r, g, b]: Rgb): string => `rgb(${r}, ${g}, ${b})`;
 

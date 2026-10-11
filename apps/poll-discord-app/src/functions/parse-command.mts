@@ -1,6 +1,6 @@
 import { Num, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 import { isNumGroups, type NumGroups } from '../types/index.mjs';
 
 export const rpParseCommand = (command: string): readonly string[] =>

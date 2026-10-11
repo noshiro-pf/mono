@@ -1,13 +1,9 @@
-import { type TypeExtends } from '../condition/index.mjs';
-import { type Int11, type Uint11 } from '../constants/index.mjs';
-import { type BoolAnd, type RelaxedExclude } from '../others/index.mjs';
-import { type Abs } from './abs.mjs';
-import {
-  type Index,
-  type IndexInclusive,
-  type NegativeIndex,
-} from './index-type.mjs';
-import { type UintRange, type UintRangeInclusive } from './uint-range.mjs';
+import type { TypeExtends } from '../condition/index.mjs';
+import type { Int11, Uint11 } from '../constants/index.mjs';
+import type { BoolAnd, RelaxedExclude } from '../others/index.mjs';
+import type { Abs } from './abs.mjs';
+import type { Index, IndexInclusive, NegativeIndex } from './index-type.mjs';
+import type { UintRange, UintRangeInclusive } from './uint-range.mjs';
 
 /**
  * Creates a union of integer literals starting from `Start` (inclusive) up to

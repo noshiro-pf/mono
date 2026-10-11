@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { type PaneDropTarget } from '../layout/index.mjs';
+import type { PaneDropTarget } from '../layout/index.mjs';
 
 /**
  * What a drop would do, drawn over the pane it would do it to.

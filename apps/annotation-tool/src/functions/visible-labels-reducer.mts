@@ -1,4 +1,4 @@
-import { type Reducer } from 'ts-type-forge';
+import type { Reducer } from 'ts-type-forge';
 
 export const visibleLabelsReducer: Reducer<
   readonly boolean[],

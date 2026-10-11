@@ -5,7 +5,7 @@ import {
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
 import { unionTypeParts } from 'tsutils';
-import { type Type, type TypeChecker } from 'typescript';
+import type { Type, TypeChecker } from 'typescript';
 
 export const createRule = ESLintUtils.RuleCreator(
   () => 'https://github.com/danielnixon/eslint-plugin-total-functions',

@@ -1,4 +1,4 @@
-import { type EslintArrayFuncRules } from '../types/index.mjs';
+import type { EslintArrayFuncRules } from '../types/index.mjs';
 
 export const eslintArrayFuncRules = {
   'array-func/from-map': 'error',

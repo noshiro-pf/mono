@@ -1,5 +1,5 @@
 import { Linter } from 'eslint';
-import { type FlatConfig } from 'eslint-config-typed';
+import type { FlatConfig } from 'eslint-config-typed';
 import * as path from 'node:path';
 import { eslintConfigForSumi, sumiRules } from '../src/index.mjs';
 

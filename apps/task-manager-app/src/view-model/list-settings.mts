@@ -11,8 +11,8 @@
 
 import { Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { type DeepReadonly } from 'ts-type-forge';
-import { type SortSpec } from '../domain/index.mjs';
+import type { DeepReadonly } from 'ts-type-forge';
+import type { SortSpec } from '../domain/index.mjs';
 import { SortSpecsType, uniqueSortKeys } from './sort-edit.mjs';
 
 export const LIST_SETTINGS_STORAGE_KEY = 'task-manager-app:list-settings';

@@ -17,16 +17,16 @@ import {
 } from 'synstate';
 import { Result, unknownToString } from 'ts-data-forge';
 import { CLOCK_TICK_MS, POLL_INTERVAL_MS } from '../constants.mjs';
-import { type Answered } from '../graphql.mjs';
-import { type LoadedReport } from '../load-report.mjs';
+import type { Answered } from '../graphql.mjs';
+import type { LoadedReport } from '../load-report.mjs';
 import {
   asRefreshing,
   LOADING,
   merge,
   type LoadState,
 } from '../load-state.mjs';
-import { type RateLimit } from '../rate-limit.mjs';
-import { type StoredToken } from '../token.mjs';
+import type { RateLimit } from '../rate-limit.mjs';
+import type { StoredToken } from '../token.mjs';
 
 export type ReaderDeps = Readonly<{
   token: InitializedObservable<StoredToken | undefined>;

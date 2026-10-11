@@ -1,5 +1,5 @@
 import { expectType, Result } from 'ts-data-forge';
-import { type Type, type TypeOf } from '../type.mjs';
+import type { Type, TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { bigint } from './bigint.mjs';
 

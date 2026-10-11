@@ -5,7 +5,7 @@ import {
   Num,
   Optional,
 } from 'ts-data-forge';
-import { type NonEmptyArray } from 'ts-type-forge';
+import type { NonEmptyArray } from 'ts-type-forge';
 
 export const normalizeList = (
   list: NonEmptyArray<NonNegativeFiniteNumber>,

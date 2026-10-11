@@ -1,4 +1,4 @@
-import { type BoundedLengthTuple } from 'ts-type-forge';
+import type { BoundedLengthTuple } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

@@ -1,7 +1,7 @@
 import { Num, asSafeUint } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
-import { type MonthEnum, type SafeUint } from 'ts-type-forge';
-import { type Reducer } from '../../utils-ported/index.mjs';
+import type { MonthEnum, SafeUint } from 'ts-type-forge';
+import type { Reducer } from '../../utils-ported/index.mjs';
 
 export type CalendarCurrentPageReducerState = Readonly<{
   year: SafeUint;

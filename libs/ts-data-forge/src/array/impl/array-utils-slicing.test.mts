@@ -1,4 +1,4 @@
-import { type MinLengthArray } from 'ts-type-forge';
+import type { MinLengthArray } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { asMinLengthArray } from './array-utils-length-bounded-array-cast.mjs';
 import {

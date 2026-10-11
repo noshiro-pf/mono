@@ -1,5 +1,5 @@
 import * as Preact from 'preact/hooks';
-import { type Observable } from 'synstate';
+import type { Observable } from 'synstate';
 
 export const useObservableEffect = <A,>(
   observable$: Observable<A>,

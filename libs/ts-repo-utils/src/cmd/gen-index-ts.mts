@@ -5,8 +5,8 @@
 import * as cmd from 'cmd-ts';
 import { Arr, expectType } from 'ts-data-forge';
 // eslint-disable-next-line import-x/no-internal-modules, import-x/extensions
-import { type InputOf, type OutputOf } from 'cmd-ts/dist/esm/from.js';
-import { type NonEmptyArray } from 'ts-type-forge';
+import type { InputOf, OutputOf } from 'cmd-ts/dist/esm/from.js';
+import type { NonEmptyArray } from 'ts-type-forge';
 import { genIndex } from '../functions/index.mjs';
 import { cliVersion } from './cli-version.mjs';
 

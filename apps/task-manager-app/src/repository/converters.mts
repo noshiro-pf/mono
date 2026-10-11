@@ -19,7 +19,7 @@
 
 import { Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { type RelaxedExtract } from 'ts-type-forge';
+import type { RelaxedExtract } from 'ts-type-forge';
 import { dagDirections, type DagLayout } from '../dag/index.mjs';
 import {
   asMilestoneId,

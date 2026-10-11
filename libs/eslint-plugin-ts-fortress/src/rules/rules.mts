@@ -1,4 +1,4 @@
-import { type ESLintPlugin } from '../types.mjs';
+import type { ESLintPlugin } from '../types.mjs';
 import { noTypeOnlyCodec } from './no-type-only-codec.mjs';
 import { preferCanonicalLengthConstrainedType } from './prefer-canonical-length-constrained-type.mjs';
 import { preferNamespaceImport } from './prefer-namespace-import.mjs';

@@ -1,11 +1,11 @@
 import { expectType, Result } from 'ts-data-forge';
-import {
-  type BoundedLengthArray,
-  type MaxLengthArray,
-  type MinLengthArray,
+import type {
+  BoundedLengthArray,
+  MaxLengthArray,
+  MinLengthArray,
 } from 'ts-type-forge';
 import { number } from '../primitives/index.mjs';
-import { type TypeOf } from '../type.mjs';
+import type { TypeOf } from '../type.mjs';
 import { boundedLengthArray } from './bounded-length-array.mjs';
 
 describe(boundedLengthArray, () => {

@@ -1,6 +1,6 @@
 import { Json, Result } from 'ts-data-forge';
 import { HoursMinutes } from 'ts-fortress-types';
-import { type Brand } from 'ts-type-forge';
+import type { Brand } from 'ts-type-forge';
 
 export type HoursMinutesMapKey = Brand<string, 'HoursMinutesMapKey'>;
 

@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
 import { MuiSlider } from 'react-mui-utils';
 import { memoNamed } from 'react-utils';
-import { type Percent } from 'ts-type-forge';
-import { type Hue } from 'ts-utils-additional';
-import { type DivisionNumber } from '../../types/index.mjs';
+import type { Percent } from 'ts-type-forge';
+import type { Hue } from 'ts-utils-additional';
+import type { DivisionNumber } from '../../types/index.mjs';
 import { DivisionNumberSlider } from './division-number-slider.js';
 import { FirstHueSlider } from './first-hue-slider.js';
 

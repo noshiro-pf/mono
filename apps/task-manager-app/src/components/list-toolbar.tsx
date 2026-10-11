@@ -1,4 +1,4 @@
-import { type GenericEventHandler } from 'preact';
+import type { GenericEventHandler } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { listSettingsSignal, listSettingsStore } from '../store/index.mjs';
 import { SortEditor } from './sort-editor.js';

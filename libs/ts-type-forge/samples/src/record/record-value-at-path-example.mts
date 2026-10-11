@@ -1,4 +1,4 @@
-import { type RecordValueAtPath } from 'ts-type-forge';
+import type { RecordValueAtPath } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

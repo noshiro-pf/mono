@@ -30,7 +30,7 @@ import {
   setDoc,
   type Firestore,
 } from 'firebase/firestore';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { personalProjectDoc, type Backend } from '../repository/index.mjs';
 import { firebaseConfig } from './config.mjs';
 import { createFirestoreRepository } from './firestore-repository.mjs';

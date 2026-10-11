@@ -4,12 +4,12 @@
  * and gets the browser's.
  */
 
-import { type ReadonlyRecord } from 'ts-type-forge';
-import {
-  type DependencyType,
-  type DisplayStatus,
-  type Priority,
-  type Progress,
+import type { ReadonlyRecord } from 'ts-type-forge';
+import type {
+  DependencyType,
+  DisplayStatus,
+  Priority,
+  Progress,
 } from '../domain/index.mjs';
 
 export const MINUTE_MS = 60_000;

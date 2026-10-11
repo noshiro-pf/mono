@@ -1,5 +1,5 @@
 import { pairwise, source } from 'synstate';
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 
 if (import.meta.vitest !== undefined) {
   test(pairwise, () => {

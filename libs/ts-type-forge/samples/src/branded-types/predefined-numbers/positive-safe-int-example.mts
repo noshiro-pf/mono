@@ -1,4 +1,4 @@
-import { type PositiveSafeInt, type Uint16 } from 'ts-type-forge';
+import type { PositiveSafeInt, Uint16 } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

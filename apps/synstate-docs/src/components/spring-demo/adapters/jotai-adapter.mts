@@ -1,7 +1,7 @@
 import { atom, createStore } from 'jotai';
 import { selectAtom } from 'jotai/utils';
 import { Arr, range } from 'ts-data-forge';
-import { type Point, type SpringAdapter } from '../types.mjs';
+import type { Point, SpringAdapter } from '../types.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, LERP_FACTOR, lerp } from './shared.mjs';
 
 // selectAtom's selector receives (currentValue, prevSlice?).

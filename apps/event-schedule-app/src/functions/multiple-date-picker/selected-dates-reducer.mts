@@ -1,5 +1,5 @@
 import { Arr, ISetMapped } from 'ts-data-forge';
-import { type Reducer } from '../../utils-ported/index.mjs';
+import type { Reducer } from '../../utils-ported/index.mjs';
 import { ymdFromKey, ymdToKey } from '../map-key/index.mjs';
 
 export type SelectedDatesReducerAction = Readonly<

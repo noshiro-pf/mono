@@ -1,12 +1,12 @@
 import { createState, source, type SourceObservable } from 'synstate';
 import { Result } from 'ts-data-forge';
-import { type RelaxedExtract } from 'ts-type-forge';
+import type { RelaxedExtract } from 'ts-type-forge';
 import { CLOCK_TICK_MS, POLL_INTERVAL_MS } from '../constants.mjs';
-import { type Answered } from '../graphql.mjs';
-import { type LoadedReport } from '../load-report.mjs';
+import type { Answered } from '../graphql.mjs';
+import type { LoadedReport } from '../load-report.mjs';
 import { LOADING, type LoadState } from '../load-state.mjs';
-import { type RateLimit } from '../rate-limit.mjs';
-import { type StoredToken } from '../token.mjs';
+import type { RateLimit } from '../rate-limit.mjs';
+import type { StoredToken } from '../token.mjs';
 import { createReader, type Reader } from './reader.mjs';
 
 describe(createReader, () => {

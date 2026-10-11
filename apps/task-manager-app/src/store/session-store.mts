@@ -7,7 +7,7 @@
  */
 
 import { createState, type InitializedObservable } from 'synstate';
-import { type Backend, type Repository } from '../repository/index.mjs';
+import type { Backend, Repository } from '../repository/index.mjs';
 import { describeSignInError } from '../view-model/index.mjs';
 
 export type Session = Readonly<

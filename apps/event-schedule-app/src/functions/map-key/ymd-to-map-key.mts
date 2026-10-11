@@ -1,9 +1,9 @@
 import { asSafeUint, Num, Result } from 'ts-data-forge';
-import {
-  type Brand,
-  type DateEnum,
-  type MonthEnum,
-  type MutableFixedLengthTuple,
+import type {
+  Brand,
+  DateEnum,
+  MonthEnum,
+  MutableFixedLengthTuple,
 } from 'ts-type-forge';
 
 export type YmdKey = Brand<string, 'YmdKey'>;

@@ -1,4 +1,4 @@
-import { type HasLengthConstraint, type MinLengthArray } from 'ts-type-forge';
+import type { HasLengthConstraint, MinLengthArray } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

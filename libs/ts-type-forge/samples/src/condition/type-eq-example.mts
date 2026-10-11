@@ -1,4 +1,4 @@
-import { type TypeEq } from 'ts-type-forge';
+import type { TypeEq } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

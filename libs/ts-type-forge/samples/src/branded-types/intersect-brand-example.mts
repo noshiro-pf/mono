@@ -1,4 +1,4 @@
-import { type Brand, type IntersectBrand } from 'ts-type-forge';
+import type { Brand, IntersectBrand } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

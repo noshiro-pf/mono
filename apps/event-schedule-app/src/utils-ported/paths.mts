@@ -1,4 +1,4 @@
-import { type IsNotFixedLengthList, type UnknownRecord } from 'ts-type-forge';
+import type { IsNotFixedLengthList, UnknownRecord } from 'ts-type-forge';
 
 /**
  * Every key path into `R`, and the type of the value each one points at.

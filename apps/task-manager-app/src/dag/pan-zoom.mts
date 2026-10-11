@@ -5,7 +5,7 @@
  */
 
 import { Num } from 'ts-data-forge';
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 
 export const MIN_SCALE = 0.2;
 

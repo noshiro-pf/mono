@@ -1,4 +1,4 @@
-import { type ComponentChildren, type GenericEventHandler } from 'preact';
+import type { ComponentChildren, GenericEventHandler } from 'preact';
 import { memoNamed } from 'preact-utils';
 
 type Props = Readonly<{

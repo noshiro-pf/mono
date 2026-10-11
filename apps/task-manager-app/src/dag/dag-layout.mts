@@ -10,9 +10,9 @@
  */
 
 import { Arr, Num } from 'ts-data-forge';
-import { type GraphNodeId } from '../domain/index.mjs';
-import { type DagDirection, type LaidOutNode } from './graph-layout.mjs';
-import { type Point, type Size } from './pan-zoom.mjs';
+import type { GraphNodeId } from '../domain/index.mjs';
+import type { DagDirection, LaidOutNode } from './graph-layout.mjs';
+import type { Point, Size } from './pan-zoom.mjs';
 
 /** How far an arrow key moves a node, in graph units, and with Shift. */
 export const NUDGE_STEP = 8;

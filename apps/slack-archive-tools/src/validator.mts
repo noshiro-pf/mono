@@ -1,5 +1,5 @@
 import { Arr, Result } from 'ts-data-forge';
-import { type JsonValue } from 'ts-type-forge';
+import type { JsonValue } from 'ts-type-forge';
 import { Message } from './types.mjs';
 
 export const validateJsonObject = (

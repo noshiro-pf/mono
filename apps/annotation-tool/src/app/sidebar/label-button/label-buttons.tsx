@@ -3,9 +3,9 @@ import { css } from '@emotion/react';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
 import { asSafeUint, tp } from 'ts-data-forge';
-import { type Percent } from 'ts-type-forge';
-import { type Label } from '../../../canvas/index.mjs';
-import { type AppEventHandler } from '../../../types/index.mjs';
+import type { Percent } from 'ts-type-forge';
+import type { Label } from '../../../canvas/index.mjs';
+import type { AppEventHandler } from '../../../types/index.mjs';
 import { LabelButtonItem } from './label-button-item.js';
 
 type Props = Readonly<{

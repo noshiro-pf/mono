@@ -5,7 +5,7 @@
  * not. Separate from the layout, which does not change with any of it.
  */
 
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import {
   buildEvaluationContext,
   createEvaluator,

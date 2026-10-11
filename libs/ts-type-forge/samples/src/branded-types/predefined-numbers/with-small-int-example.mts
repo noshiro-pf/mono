@@ -1,9 +1,4 @@
-import {
-  type Int,
-  type PositiveInt,
-  type Uint,
-  type WithSmallInt,
-} from 'ts-type-forge';
+import type { Int, PositiveInt, Uint, WithSmallInt } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

@@ -1,5 +1,5 @@
 import { DateUtils, type Ymdhm } from 'ts-fortress-types';
-import { type MinutesEnum } from 'ts-type-forge';
+import type { MinutesEnum } from 'ts-type-forge';
 import { now } from '../utils/index.mjs';
 
 const ymdhm2DateObject = (ymdhm: Ymdhm): Date =>

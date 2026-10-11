@@ -1,5 +1,5 @@
 import { Arr } from 'ts-data-forge';
-import { type JSONSchema4 } from '../type.mjs';
+import type { JSONSchema4 } from '../type.mjs';
 
 /**
  * no-restricted-* 系ルールの tuple 形式のスキーマに minItems を追加し、空配列を許容しないようにする

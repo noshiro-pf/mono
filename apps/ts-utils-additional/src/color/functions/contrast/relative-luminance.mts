@@ -3,8 +3,8 @@ import {
   asNonNegativeFiniteNumber as toNN,
   asPositiveFiniteNumber as toP,
 } from 'ts-data-forge';
-import { type NonNegativeFiniteNumber } from 'ts-type-forge';
-import { type Rgb } from '../../types/index.mjs';
+import type { NonNegativeFiniteNumber } from 'ts-type-forge';
+import type { Rgb } from '../../types/index.mjs';
 
 /**
  * The relative brightness of any point in a colorspace, normalized to 0 for

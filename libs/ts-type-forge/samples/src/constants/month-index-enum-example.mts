@@ -1,4 +1,4 @@
-import { type MonthEnum, type MonthIndexEnum } from 'ts-type-forge';
+import type { MonthEnum, MonthIndexEnum } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

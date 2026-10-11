@@ -1,11 +1,7 @@
 import { ISet, isString, memoizeFunction, Result } from 'ts-data-forge';
-import {
-  type ArrayElement,
-  type NonEmptyTuple,
-  type Primitive,
-} from 'ts-type-forge';
+import type { ArrayElement, NonEmptyTuple, Primitive } from 'ts-type-forge';
 import { string } from '../primitives/index.mjs';
-import { type Type } from '../type.mjs';
+import type { Type } from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,

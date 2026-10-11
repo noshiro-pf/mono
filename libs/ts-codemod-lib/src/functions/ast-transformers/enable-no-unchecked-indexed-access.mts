@@ -1,8 +1,8 @@
 import { Arr } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { hasDisableNextLineComment } from '../functions/index.mjs';
-import { type TsMorphTransformer } from './types.mjs';
+import type { TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'enable-no-unchecked-indexed-access';
 

@@ -1,4 +1,4 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**
  * The compilerOptions Sumi locks (languages/sumi/docs/spec/compiler-options.md, D-40):

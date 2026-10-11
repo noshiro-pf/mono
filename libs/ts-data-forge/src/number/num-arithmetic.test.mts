@@ -1,9 +1,9 @@
-import {
-  type Int,
-  type NegativeInt,
-  type PositiveFiniteNumber,
-  type PositiveInt,
-  type Uint,
+import type {
+  Int,
+  NegativeInt,
+  PositiveFiniteNumber,
+  PositiveInt,
+  Uint,
 } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import {

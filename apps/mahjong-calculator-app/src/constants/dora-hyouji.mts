@@ -1,5 +1,5 @@
-import { type ReadonlyRecord, type StrictExclude } from 'ts-type-forge';
-import { type TileName } from '../types/index.mjs';
+import type { ReadonlyRecord, StrictExclude } from 'ts-type-forge';
+import type { TileName } from '../types/index.mjs';
 
 export const dora2DoraHyouji = {
   Manzu1: 'Manzu9',

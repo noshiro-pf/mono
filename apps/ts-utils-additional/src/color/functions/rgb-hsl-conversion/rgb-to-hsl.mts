@@ -4,12 +4,7 @@ import {
   asFiniteNumber,
   asPositiveFiniteNumber,
 } from 'ts-data-forge';
-import {
-  type Hsl,
-  type Hsla,
-  type Rgb,
-  type Rgba,
-} from '../../types/index.mjs';
+import type { Hsl, Hsla, Rgb, Rgba } from '../../types/index.mjs';
 import { numberToHue, numberToPercent } from '../from-number/index.mjs';
 
 export const rgbToHsl = ([r, g, b]: Rgb): Hsl => {

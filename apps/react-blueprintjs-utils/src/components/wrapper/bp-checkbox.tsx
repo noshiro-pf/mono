@@ -1,7 +1,7 @@
 import { Checkbox } from '@blueprintjs/core';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { type StrictOmit } from 'ts-type-forge';
+import type { StrictOmit } from 'ts-type-forge';
 
 export type BpCheckboxProps = StrictOmit<CheckboxPropsOriginal, 'checked'> &
   Readonly<{

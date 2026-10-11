@@ -1,28 +1,28 @@
-import {
-  type IsFixedLengthList,
-  type IsNever,
-  type TypeExtends,
+import type {
+  IsFixedLengthList,
+  IsNever,
+  TypeExtends,
 } from '../../condition/index.mjs';
-import { type BoolAnd } from '../../others/index.mjs';
-import {
-  type List,
-  type MakeTuple,
-  type TSTypeForgeInternals_PinsOneNumber as PinsOneNumber,
+import type { BoolAnd } from '../../others/index.mjs';
+import type {
+  List,
+  MakeTuple,
+  TSTypeForgeInternals_PinsOneNumber as PinsOneNumber,
 } from '../../tuple-and-list/index.mjs';
-import { type UintRangeInclusive } from '../../type-level-integer/index.mjs';
-import { type SupportedLength } from '../supported-length.mjs';
-import {
-  type ChangeArrayElement,
-  type TSTypeForgeInternals_EffectiveMaxLengthOf as EffectiveMaxLengthOf,
-  type TSTypeForgeInternals_EffectiveMinLengthOf as EffectiveMinLengthOf,
-  type HasLengthConstraint,
-  type LengthConstraintBrandOf,
+import type { UintRangeInclusive } from '../../type-level-integer/index.mjs';
+import type { SupportedLength } from '../supported-length.mjs';
+import type {
+  ChangeArrayElement,
+  TSTypeForgeInternals_EffectiveMaxLengthOf as EffectiveMaxLengthOf,
+  TSTypeForgeInternals_EffectiveMinLengthOf as EffectiveMinLengthOf,
+  HasLengthConstraint,
+  LengthConstraintBrandOf,
 } from './length-constrained-array-bounds.mjs';
-import {
-  type BoundedLengthArray,
-  type FixedLengthArray,
-  type MaxLengthArray,
-  type MinLengthArray,
+import type {
+  BoundedLengthArray,
+  FixedLengthArray,
+  MaxLengthArray,
+  MinLengthArray,
 } from './length-constrained-array.mjs';
 
 /**
