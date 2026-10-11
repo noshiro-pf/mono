@@ -282,10 +282,19 @@ a:focus-visible {
   margin-bottom: 1.5rem;
 }
 
+/*
+ * A column from the top, so that the number sits on the same line in every
+ * tile of a row: the row stretches each tile to the tallest, one whose label
+ * wraps, and a `<button>` centres what it holds in that height where a
+ * `<div>` does not.
+ */
 .stat-tile {
   background: var(--surface);
   border: 1px solid var(--border-ring);
   border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   padding: 0.75rem 0.9rem;
 }
 
