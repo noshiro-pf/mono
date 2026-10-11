@@ -85,6 +85,28 @@ describe(parseMergeAfter, () => {
   test('is empty for a body with nothing in it', () => {
     assert.deepStrictEqual(parseMergeAfter(''), []);
   });
+
+  test('does not read a reference to another repository as this one’s', () => {
+    assert.deepStrictEqual(parseMergeAfter('Merge-After: other/repo#5\n'), []);
+  });
+
+  test('does not read this repository written out by name either', () => {
+    assert.deepStrictEqual(
+      parseMergeAfter('Merge-After: noshiro-pf/mono#5\n'),
+      [],
+    );
+  });
+
+  test('reads the plain references beside one to another repository', () => {
+    assert.deepStrictEqual(
+      parseMergeAfter('Merge-After: #4, other/repo#5, #6,#7 (#8)\n'),
+      [4, 6, 7, 8],
+    );
+  });
+
+  test('does not read a number that runs on into a word', () => {
+    assert.deepStrictEqual(parseMergeAfter('Merge-After: #5a, #6\n'), [6]);
+  });
 });
 
 describe(findMergeAfterCycles, () => {

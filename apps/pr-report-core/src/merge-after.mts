@@ -13,7 +13,15 @@ import { Arr, Num, Result } from 'ts-data-forge';
  */
 const MERGE_AFTER_LINE = /^[^\S\n]*merge-after[^\S\n]*:(?<refs>[^\n]*)$/gimu;
 
-const PULL_REQUEST_REF = /#(?<number>\d+)/gu;
+/**
+ * `#N`, and only when nothing that could end a repository name comes right
+ * before the `#`: `other/repo#5` is another repository's #5, and treating it
+ * as this one's would wait for a pull request the author never named.
+ * `noshiro-pf/mono#5` is not read either, though it means this repository —
+ * the declaration takes `#N` and nothing else, so there is one way to write
+ * it.
+ */
+const PULL_REQUEST_REF = /(?<![\w./-])#(?<number>\d+)\b/gu;
 
 /** The opening or closing line of a fenced code block. */
 const FENCE_LINE = /^[^\S\n]*(?:`{3,}|~{3,})/u;
