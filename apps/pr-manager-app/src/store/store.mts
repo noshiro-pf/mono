@@ -16,6 +16,7 @@ import { toSignal } from 'synstate-preact-signals';
 import { REPORT_SOURCE } from '../constants.mjs';
 import { layoutFromLocation, saveLayout } from '../layout.mjs';
 import { loadReport } from '../load-report.mjs';
+import { readSetting, writeSetting } from '../settings-db.mjs';
 import {
   applyTheme,
   saveTheme,
@@ -25,6 +26,7 @@ import {
 } from '../theme.mjs';
 import { browserStores } from '../token.mjs';
 import { createLayoutStore } from './layout-store.mjs';
+import { createMergeOrderStore } from './merge-order-store.mjs';
 import { createReader } from './reader.mjs';
 import { createThemeStore } from './theme-store.mjs';
 import { createTokenStore } from './token-store.mjs';
@@ -54,6 +56,19 @@ export const layoutStore = createLayoutStore({
   initial: layoutFromLocation(),
   save: saveLayout,
   saveDelayMs: 300,
+});
+
+const MERGE_ORDER_VIEW_KEY = 'merge-order-view';
+
+export const mergeOrderStore = createMergeOrderStore({
+  entries: reader.entries,
+  roots: reader.roots,
+  load: () => readSetting(MERGE_ORDER_VIEW_KEY),
+  // A choice that cannot be kept still applies for as long as the page is
+  // open, which is all a reader would notice.
+  save: (view) => {
+    writeSetting(MERGE_ORDER_VIEW_KEY, view).catch(() => undefined);
+  },
 });
 
 /**
@@ -97,6 +112,13 @@ export const themeSignals = {
   system: toSignal(themeStore.system),
 } as const;
 
+export const mergeOrderSignals = {
+  view: toSignal(mergeOrderStore.view),
+  roots: toSignal(mergeOrderStore.roots),
+  shown: toSignal(mergeOrderStore.shown),
+  priorities: toSignal(mergeOrderStore.priorities),
+} as const;
+
 export const layoutSignals = {
   layout: toSignal(layoutStore.layout),
   moving: toSignal(layoutStore.moving),
@@ -117,6 +139,8 @@ export const startStore = (): (() => void) => {
 
   const stopLayout = layoutStore.start();
 
+  const stopMergeOrder = mergeOrderStore.start();
+
   return () => {
     stopToken();
 
@@ -125,6 +149,8 @@ export const startStore = (): (() => void) => {
     stopReader();
 
     stopLayout();
+
+    stopMergeOrder();
   };
 };
 

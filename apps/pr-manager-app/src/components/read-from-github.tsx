@@ -14,7 +14,7 @@ export const ReadFromGitHub = memoNamed('ReadFromGitHub', () => {
   const readAt = readerSignals.readAt.value;
 
   return (
-    <p className={'page-subtitle'}>
+    <p className={'page-subtitle read-from-github'}>
       {'Read from GitHub '}
       <Age epochMs={readAt} />
       {' · '}

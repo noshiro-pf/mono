@@ -229,6 +229,116 @@ a:focus-visible {
   color: var(--ink-primary);
 }
 
+/* The counts it used to sit above are under the merge order's title now. */
+.read-from-github {
+  margin-bottom: 1.25rem;
+}
+
+/*
+ * Under the merge order's title the counts are switches for the pull requests
+ * they count: a hidden one keeps its number but loses its fill, takes a dashed
+ * outline and is struck through, so that being off does not rest on a colour.
+ */
+.merge-order-filters {
+  margin-bottom: 1.25rem;
+}
+
+.merge-order-filters .summary-row {
+  margin-bottom: 0.75rem;
+}
+
+.stat-toggle {
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.stat-toggle:hover {
+  border-color: var(--accent);
+}
+
+.stat-toggle:focus-visible,
+.filter-chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.stat-toggle[aria-pressed='false'] {
+  background: transparent;
+  border: 1px dashed var(--baseline);
+}
+
+.stat-toggle[aria-pressed='false'] .stat-value,
+.stat-toggle[aria-pressed='false'] .stat-label {
+  color: var(--ink-muted);
+  text-decoration: line-through;
+}
+
+.merge-order-controls {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+
+/* A `<fieldset>` for the group role, with its own margin and padding taken off. */
+.filter-group {
+  align-items: center;
+  border: none;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  min-inline-size: 0;
+  padding: 0;
+}
+
+.filter-group-name {
+  color: var(--ink-secondary);
+  font-size: 0.8125rem;
+  margin-right: 0.15rem;
+}
+
+.filter-chip {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--baseline);
+  border-radius: 999px;
+  color: var(--ink-primary);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.8125rem;
+  gap: 0.35rem;
+  padding: 0.15rem 0.65rem;
+}
+
+.filter-chip:hover {
+  border-color: var(--accent);
+}
+
+.filter-chip-count {
+  color: var(--ink-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.filter-chip[aria-pressed='false'] {
+  background: transparent;
+  border-style: dashed;
+  color: var(--ink-muted);
+  text-decoration: line-through;
+}
+
+.filter-chip[aria-pressed='false'] .filter-chip-count {
+  color: var(--ink-muted);
+}
+
+.filter-shown {
+  color: var(--ink-secondary);
+  font-size: 0.8125rem;
+}
+
 /* --- sections ----------------------------------------------------------- */
 
 .section {
@@ -306,9 +416,16 @@ a:focus-visible {
   color: var(--accent);
 }
 
-/* A block given a height scrolls on its own; without one it is as tall as what it holds. */
+/*
+ * A block given a height scrolls on its own; without one it is as tall as what
+ * it holds. The padding keeps the tiles and cards off a scroll bar that is
+ * always drawn, which would otherwise touch them, and the gutter keeps the
+ * width the same whether it scrolls or not.
+ */
 .block-body[data-sized='true'] {
   overflow: auto;
+  padding-right: 0.75rem;
+  scrollbar-gutter: stable;
 }
 
 .block-body > .section:last-child {
