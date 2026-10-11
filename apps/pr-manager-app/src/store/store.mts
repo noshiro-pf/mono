@@ -25,6 +25,7 @@ import {
   themeFromLocation,
 } from '../theme.mjs';
 import { browserStores } from '../token.mjs';
+import { createHeaderStore } from './header-store.mjs';
 import { createLayoutStore } from './layout-store.mjs';
 import { createMergeOrderStore } from './merge-order-store.mjs';
 import { createReader } from './reader.mjs';
@@ -68,6 +69,15 @@ export const mergeOrderStore = createMergeOrderStore({
   // open, which is all a reader would notice.
   save: (view) => {
     writeSetting(MERGE_ORDER_VIEW_KEY, view).catch(() => undefined);
+  },
+});
+
+const HEADER_FOLDED_KEY = 'header-folded';
+
+export const headerStore = createHeaderStore({
+  load: () => readSetting(HEADER_FOLDED_KEY),
+  save: (folded) => {
+    writeSetting(HEADER_FOLDED_KEY, folded).catch(() => undefined);
   },
 });
 
@@ -119,6 +129,10 @@ export const mergeOrderSignals = {
   priorities: toSignal(mergeOrderStore.priorities),
 } as const;
 
+export const headerSignals = {
+  folded: toSignal(headerStore.folded),
+} as const;
+
 export const layoutSignals = {
   layout: toSignal(layoutStore.layout),
   moving: toSignal(layoutStore.moving),
@@ -141,6 +155,8 @@ export const startStore = (): (() => void) => {
 
   const stopMergeOrder = mergeOrderStore.start();
 
+  const stopHeader = headerStore.start();
+
   return () => {
     stopToken();
 
@@ -151,6 +167,8 @@ export const startStore = (): (() => void) => {
     stopLayout();
 
     stopMergeOrder();
+
+    stopHeader();
   };
 };
 

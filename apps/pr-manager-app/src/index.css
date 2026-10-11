@@ -192,6 +192,87 @@ a:focus-visible {
   cursor: progress;
 }
 
+/* The chevron alone, square-ish, at the height of the buttons beside it. */
+.header-fold-toggle {
+  align-items: center;
+  display: inline-flex;
+  padding-inline: 0.5rem;
+}
+
+.header-fold-toggle .badge-icon {
+  height: 1.1em;
+  width: 1.1em;
+}
+
+.header-fold-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/*
+ * Folded, the header is a toolbar that floats at the top of the window: one
+ * line on the surface, with a hairline and a shadow to lift it off the report
+ * scrolling under it, and the surface let a little through so that the
+ * report does not vanish behind it; the gap above it is the page's colour, so
+ * nothing scrolls by over it. Rounded and as wide as the page, rather
+ * than a bar from edge to edge, because the page itself is a column. The
+ * buttons keep their order and lose a little padding.
+ */
+.page[data-header='folded'] {
+  padding-top: 0.5rem;
+}
+
+.page[data-header='folded'] .page-header {
+  align-items: center;
+  backdrop-filter: blur(8px);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  /* The first shadow is the page's own colour, filling the gap above it. */
+  box-shadow:
+    0 -0.5rem 0 var(--plane),
+    0 2px 8px rgb(0 0 0 / 8%);
+  margin-bottom: 1rem;
+  padding: 0.3rem 0.35rem 0.3rem 0.85rem;
+  position: sticky;
+  top: 0.5rem;
+  z-index: 10;
+}
+
+.page[data-header='folded'] .header-actions {
+  gap: 0.5rem;
+}
+
+.page[data-header='folded'] .refresh-button,
+.page[data-header='folded'] .header-button,
+.page[data-header='folded'] .theme-switch-option {
+  font-size: 0.8125rem;
+  padding-block: 0.2rem;
+}
+
+.toolbar-title {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.75rem;
+  min-width: 0;
+}
+
+.toolbar-title .page-title {
+  font-size: 0.9375rem;
+  white-space: nowrap;
+}
+
+.toolbar-title a,
+.toolbar-read {
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.toolbar-read {
+  color: var(--ink-secondary);
+}
+
 /* --- the summary row ---------------------------------------------------- */
 
 .summary-row {

@@ -1,14 +1,21 @@
 import { memoNamed } from 'preact-utils';
 import {
   ExternalLink,
+  HeaderFoldToggle,
   LoadStateView,
   Notice,
+  ReadFromGitHub,
   ThemeSwitch,
   TokenPanel,
   ViewSettings,
 } from './components/index.mjs';
 import { REPORT_SOURCE, repositoryUrl } from './constants.mjs';
-import { reader, readerSignals, tokenSignals } from './store/index.mjs';
+import {
+  headerSignals,
+  reader,
+  readerSignals,
+  tokenSignals,
+} from './store/index.mjs';
 
 /**
  * GitHub Pull Requests Manager.
@@ -24,11 +31,18 @@ import { reader, readerSignals, tokenSignals } from './store/index.mjs';
  * page that is safe to leave open — which is what this is for, so it keeps
  * itself current rather than going stale behind a tab. When it reads is
  * `store/reader.mts`; this only draws what the store holds.
+ *
+ * The header folds into a one-line toolbar that stays at the top of the
+ * window (`HeaderFoldToggle`), for a reader who wants the room for the
+ * report: the title shrinks, the token panel and the line saying when the
+ * report was read go, and the actions stay where they were.
  */
 export const App = memoNamed('App', () => {
   const loadStatus = readerSignals.loadStatus.value;
 
   const token = tokenSignals.token.value;
+
+  const folded = headerSignals.folded.value;
 
   // Outside the JSX: `react/jsx-no-leaked-render` rewrites a `&&` in an
   // attribute into a ternary whose other arm is `null`, and `disabled` does
@@ -37,17 +51,31 @@ export const App = memoNamed('App', () => {
 
   const noToken = token === undefined;
 
+  const ready = !noToken && loadStatus.type === 'ready';
+
   return (
-    <main className={'page'}>
+    <main className={'page'} data-header={folded ? 'folded' : 'full'}>
       <header className={'page-header'}>
-        <div>
-          <h1 className={'page-title'}>{'GitHub Pull Requests Manager'}</h1>
-          <p className={'page-subtitle'}>
+        {folded ? (
+          <div className={'toolbar-title'}>
+            <h1 className={'page-title'}>{'GitHub Pull Requests Manager'}</h1>
+
             <ExternalLink href={repositoryUrl(REPORT_SOURCE)}>
               {`${REPORT_SOURCE.owner}/${REPORT_SOURCE.repo}`}
             </ExternalLink>
-          </p>
-        </div>
+
+            {ready ? <ReadFromGitHub folded /> : undefined}
+          </div>
+        ) : (
+          <div>
+            <h1 className={'page-title'}>{'GitHub Pull Requests Manager'}</h1>
+            <p className={'page-subtitle'}>
+              <ExternalLink href={repositoryUrl(REPORT_SOURCE)}>
+                {`${REPORT_SOURCE.owner}/${REPORT_SOURCE.repo}`}
+              </ExternalLink>
+            </p>
+          </div>
+        )}
 
         <div className={'header-actions'}>
           {loadStatus.type === 'ready' && loadStatus.pollError !== undefined ? (
@@ -68,10 +96,16 @@ export const App = memoNamed('App', () => {
           >
             {refreshing ? 'Reading…' : 'Refresh'}
           </button>
+
+          <HeaderFoldToggle />
         </div>
       </header>
 
-      <TokenPanel />
+      {/* Folded, the panel goes too — unless there is no token, when it is
+          the one thing the page has to ask for. */}
+      {folded && !noToken ? undefined : <TokenPanel />}
+
+      {ready && !folded ? <ReadFromGitHub folded={false} /> : undefined}
 
       {noToken ? (
         <Notice tone={'neutral'}>
