@@ -296,7 +296,15 @@ const run = (
   conclusion: string,
   checkSuiteId: number,
   id: number,
-) => ({ name, status: 'completed', conclusion, checkSuiteId, id }) as const;
+) =>
+  ({
+    name,
+    status: 'completed',
+    conclusion,
+    checkSuiteId,
+    id,
+    round: undefined,
+  }) as const;
 
 describe(statesFromCheckRuns, () => {
   test('the run in the later suite is the one that counts', () => {
@@ -471,6 +479,7 @@ const completedRun = (name: string, conclusion: string) =>
     conclusion,
     checkSuiteId: 1,
     id: 1,
+    round: undefined,
   }) as const;
 
 describe(anyRunInProgress, () => {
@@ -484,6 +493,7 @@ describe(anyRunInProgress, () => {
           conclusion: undefined,
           checkSuiteId: 2,
           id: 2,
+          round: undefined,
         },
       ]),
     );
@@ -525,6 +535,7 @@ describe('a required context in a superseded round', () => {
       name: 'code-check-result / result',
       status: 'completed',
       conclusion: 'skipped',
+      round: undefined,
     },
     {
       id: 2,
@@ -532,6 +543,7 @@ describe('a required context in a superseded round', () => {
       name: 'style-check-result / result',
       status: 'completed',
       conclusion: 'skipped',
+      round: undefined,
     },
     // The round that replaced it, still going: its aggregates have not been
     // created yet, only the jobs they wait on.
@@ -541,6 +553,7 @@ describe('a required context in a superseded round', () => {
       name: 'code-check (ws:fix:lint)',
       status: 'in_progress',
       conclusion: undefined,
+      round: undefined,
     },
   ] as const;
 
@@ -583,6 +596,7 @@ describe('a required context in a superseded round', () => {
           name: 'code-check-result / result',
           status: 'completed',
           conclusion: 'failure',
+          round: undefined,
         },
         {
           id: 5,
@@ -590,6 +604,7 @@ describe('a required context in a superseded round', () => {
           name: 'style-check-result / result',
           status: 'completed',
           conclusion: 'success',
+          round: undefined,
         },
       ]),
       paused: false,
@@ -602,5 +617,175 @@ describe('a required context in a superseded round', () => {
     assert.deepStrictEqual(summary.failed, ['code-check-result / result']);
 
     assert.deepStrictEqual(summary.passed, ['style-check-result / result']);
+  });
+});
+
+/**
+ * The state #2191 was in when the page called it failing.
+ *
+ * `skip-ci` came off, which started a round, and `merge-queued` went on a
+ * minute later, which started another and cancelled the first — whose
+ * `*-result` aggregates, `if: always()` over cancelled `needs`, concluded
+ * `failure`. The newer round was still at its matrix, so its aggregates did
+ * not exist yet, and the red of the cancelled one was the only run of each
+ * name on the commit.
+ */
+describe('a required context whose workflow has a newer round running', () => {
+  const codeCheck = 359_266_435;
+
+  const styleCheck = 331_119_616;
+
+  const strictLibGen = 357_169_060;
+
+  const required = [
+    'code-check-result / result',
+    'style-check-result / result',
+    'strict-lib-gen-result / result',
+  ] as const;
+
+  const runs = [
+    // The round `merge-queued` cancelled.
+    {
+      id: 114_375_454_394,
+      checkSuiteId: 103_247_630_670,
+      name: 'code-check-result / result',
+      status: 'completed',
+      conclusion: 'failure',
+      round: { workflowId: codeCheck, completed: true },
+    },
+    {
+      id: 114_375_454_946,
+      checkSuiteId: 103_247_630_878,
+      name: 'style-check-result / result',
+      status: 'completed',
+      conclusion: 'failure',
+      round: { workflowId: styleCheck, completed: true },
+    },
+    {
+      id: 114_375_425_586,
+      checkSuiteId: 103_247_631_174,
+      name: 'strict-lib-gen-result / result',
+      status: 'completed',
+      conclusion: 'failure',
+      round: { workflowId: strictLibGen, completed: true },
+    },
+    // The round that cancelled it. Code Check is still at its matrix.
+    {
+      id: 114_375_942_843,
+      checkSuiteId: 103_247_840_668,
+      name: 'code-check (ws:fix:lint)',
+      status: 'in_progress',
+      conclusion: undefined,
+      round: { workflowId: codeCheck, completed: false },
+    },
+    // Style Check has finished every job it has created, but the round is
+    // not over: its aggregate is created only after that.
+    {
+      id: 114_375_644_790,
+      checkSuiteId: 103_247_840_622,
+      name: 'style-check (ws:gen)',
+      status: 'completed',
+      conclusion: 'success',
+      round: { workflowId: styleCheck, completed: false },
+    },
+    // Strict Lib Generation has finished and answered for itself.
+    {
+      id: 114_375_967_721,
+      checkSuiteId: 103_247_840_662,
+      name: 'strict-lib-gen-result / result',
+      status: 'completed',
+      conclusion: 'success',
+      round: { workflowId: strictLibGen, completed: true },
+    },
+  ] as const;
+
+  test('reads the context as pending until the newer round answers it', () => {
+    const states = statesFromCheckRuns(runs);
+
+    assert.deepStrictEqual(states.get('code-check-result / result'), 'pending');
+
+    assert.deepStrictEqual(
+      states.get('style-check-result / result'),
+      'pending',
+    );
+
+    assert.deepStrictEqual(
+      states.get('strict-lib-gen-result / result'),
+      'passed',
+    );
+  });
+
+  // The regression: this said `failing`.
+  test('does not call the pull request failing', () => {
+    const summary = summarizeChecks({
+      required,
+      reported: statesFromCheckRuns(runs),
+      paused: false,
+      running: anyRunInProgress(runs),
+      baseCovered: true,
+    });
+
+    assert.deepStrictEqual(summary.verdict, 'pending');
+
+    assert.deepStrictEqual(summary.failed, []);
+
+    assert.deepStrictEqual(summary.pending, [
+      'code-check-result / result',
+      'style-check-result / result',
+    ]);
+  });
+
+  test('a round with every job it has created finished is still running', () => {
+    assert.isTrue(
+      anyRunInProgress(
+        runs.filter(({ name }) => name !== 'code-check (ws:fix:lint)'),
+      ),
+    );
+  });
+
+  // The rule is not "an older round never counts": where the newer round
+  // finished without a run of that name, GitHub answers with the older run,
+  // and so does this.
+  test('a finished round that never ran the job does not hide the older run', () => {
+    const states = statesFromCheckRuns([
+      runs[0],
+      {
+        id: 114_375_942_843,
+        checkSuiteId: 103_247_840_668,
+        name: 'code-check (ws:fix:lint)',
+        status: 'completed',
+        conclusion: 'success',
+        round: { workflowId: codeCheck, completed: true },
+      },
+    ]);
+
+    assert.deepStrictEqual(states.get('code-check-result / result'), 'failed');
+  });
+
+  // Nor "the round still running wins": GitHub resolves a context to the
+  // suite with the greatest id, and where the cancelled one has it, its red
+  // holds the merge however the other round goes.
+  test('a cancelled round with the greater id still holds the merge', () => {
+    const states = statesFromCheckRuns([
+      {
+        ...runs[0],
+        checkSuiteId: 103_247_840_669,
+      },
+      runs[3],
+    ]);
+
+    assert.deepStrictEqual(states.get('code-check-result / result'), 'failed');
+  });
+
+  test('a round of another workflow does not hold the context', () => {
+    const states = statesFromCheckRuns([
+      runs[0],
+      {
+        ...runs[3],
+        round: { workflowId: styleCheck, completed: false },
+      },
+    ]);
+
+    assert.deepStrictEqual(states.get('code-check-result / result'), 'failed');
   });
 });

@@ -28,9 +28,10 @@ const API_VERSION = '2022-11-28';
 const PAGE_SIZE = 100;
 
 /**
- * How many pages of check runs one commit may have. A bound rather than a
- * `while (true)`: a paginating loop against an answer that never says it has
- * ended is the one bug in a read-only report that costs a rate limit.
+ * How many pages of check runs, or of workflow runs, one commit may have. A
+ * bound rather than a `while (true)`: a paginating loop against an answer that
+ * never says it has ended is the one bug in a read-only report that costs a
+ * rate limit.
  */
 const MAX_CHECK_RUN_PAGES = 10;
 
@@ -122,6 +123,17 @@ const IssueListSchema = t.array(
     pull_request: t.optional(t.record({})),
   }),
 );
+
+const WorkflowRunsSchema = t.record({
+  total_count: t.number(),
+  workflow_runs: t.array(
+    t.record({
+      check_suite_id: t.union([t.number(), t.nullType]),
+      workflow_id: t.number(),
+      status: t.union([t.string(), t.nullType]),
+    }),
+  ),
+});
 
 const CombinedStatusSchema = t.record({
   statuses: t.array(t.record({ context: t.string(), state: t.string() })),
@@ -303,6 +315,7 @@ export const createClient = (
    */
   const checkRuns = async (
     prefix: string,
+    rounds: ReadonlyMap<number, CheckRunReport['round']>,
   ): Promise<Result<readonly CheckRunReport[], string>> => {
     const mut_collected: CheckRunReport[] = [];
 
@@ -323,6 +336,7 @@ export const createClient = (
           name: run.name,
           status: run.status,
           conclusion: run.conclusion ?? undefined,
+          round: rounds.get(run.check_suite.id),
         });
       }
 
@@ -340,6 +354,48 @@ export const createClient = (
   };
 
   /**
+   * Which workflow each check suite on one commit is a run of, and whether
+   * that run has finished — what the check runs do not say, and what tells
+   * a newer round still going from an unrelated suite. Empty when it cannot
+   * be read, which leaves the verdict as it was before rounds were read.
+   */
+  const workflowRounds = async (
+    repo: RepoRef,
+    sha: string,
+  ): Promise<ReadonlyMap<number, CheckRunReport['round']>> => {
+    const mut_rounds = new Map<number, CheckRunReport['round']>();
+
+    for (const page of Arr.seq(MAX_CHECK_RUN_PAGES)) {
+      const answered = await getJson(
+        `/repos/${repo.owner}/${repo.name}/actions/runs?head_sha=${sha}&per_page=${PAGE_SIZE}&page=${page + 1}`,
+        WorkflowRunsSchema,
+      );
+
+      if (Result.isErr(answered)) {
+        return new Map();
+      }
+
+      for (const run of answered.value.workflow_runs) {
+        if (run.check_suite_id !== null) {
+          mut_rounds.set(run.check_suite_id, {
+            workflowId: run.workflow_id,
+            completed: run.status === 'completed',
+          });
+        }
+      }
+
+      if (
+        Arr.isEmpty(answered.value.workflow_runs) ||
+        (page + 1) * PAGE_SIZE >= answered.value.total_count
+      ) {
+        return mut_rounds;
+      }
+    }
+
+    return new Map();
+  };
+
+  /**
    * What every context has reported on one commit, from both places GitHub
    * keeps them. The aggregate jobs are check runs; `no-skip-ci-label` is a
    * commit status, so reading only the first would report the context that
@@ -353,7 +409,7 @@ export const createClient = (
   > => {
     const prefix = `/repos/${repo.owner}/${repo.name}/commits/${sha}` as const;
 
-    const runs = await checkRuns(prefix);
+    const runs = await checkRuns(prefix, await workflowRounds(repo, sha));
 
     const statuses = await getJson(
       `${prefix}/status?per_page=${PAGE_SIZE}`,
