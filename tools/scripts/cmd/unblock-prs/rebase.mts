@@ -18,7 +18,7 @@ import {
   armAutoMerge,
   git,
   mergedHeadOf,
-  readTimeline,
+  readBaseChanges,
   remoteSha,
   removeWorktree,
   viewPullRequest,
@@ -605,17 +605,17 @@ const stackedOnMerged = async (
   pr: PullRequest,
   defaultBranch: string,
 ): Promise<MergedHead | undefined> => {
-  const events = await readTimeline(pr.number);
+  const changes = await readBaseChanges(pr.number);
 
-  if (Result.isErr(events)) {
+  if (Result.isErr(changes)) {
     log(
-      `#${pr.number}: cannot read whether it came off a stack; rebasing by patch. (${lastLines(events.value, 2)})`,
+      `#${pr.number}: cannot read whether it came off a stack; rebasing by patch. (${lastLines(changes.value, 2)})`,
     );
 
     return undefined;
   }
 
-  const from = retargetedFrom(events.value, defaultBranch);
+  const from = retargetedFrom(changes.value, defaultBranch);
 
   if (from === undefined || !isSafeRefName(from)) {
     return undefined;
@@ -744,17 +744,17 @@ const retargetedFromTimeline = async (
   pr: PullRequest,
   defaultBranch: string,
 ): Promise<string | undefined> => {
-  const events = await readTimeline(pr.number);
+  const changes = await readBaseChanges(pr.number);
 
-  if (Result.isErr(events)) {
+  if (Result.isErr(changes)) {
     log(
-      `#${pr.number}: cannot read whether it came off a stack, so not rebasing it off one. (${lastLines(events.value, 2)})`,
+      `#${pr.number}: cannot read whether it came off a stack, so not rebasing it off one. (${lastLines(changes.value, 2)})`,
     );
 
     return undefined;
   }
 
-  return retargetedFrom(events.value, defaultBranch);
+  return retargetedFrom(changes.value, defaultBranch);
 };
 
 /**
@@ -856,11 +856,24 @@ const restack = async (
  * Arms auto-merge on the pull request this cycle picked, having first asked
  * whether it is still what triage saw: open, on the default branch, queued,
  * at `head`. A head other than that is someone else moving it, as in
- * `removeSkipCiLabel`. `auto-merge.mts` says why this script is what arms it.
+ * `removeSkipCiLabel`.
  *
  * Called for one it rebases after the push and before `skip-ci` comes off, so
  * that the label holds the merge until the matrix that decides it starts; and
  * for one already up to date before it is watched.
+ *
+ * Nothing else arms one. `open-pr` opens a pull request with none, and the
+ * author queueing it with `merge-queued` is the request to land it. Arming at
+ * pick time rather than at opening is what keeps a stacked pull request
+ * unarmed while it is stacked: its base is another pull request's branch,
+ * which no ruleset covers, so armed there it would merge into that branch
+ * the moment nothing held it. It is picked only once GitHub has moved it onto
+ * the default branch, where the ruleset gates the merge.
+ *
+ * `merge-queued` is the only thing read as permission, so one that has lost
+ * its auto-merge — GitHub disarms it when the base changes, and a person may
+ * switch it off — is armed again when it is next picked. Holding one back is
+ * taking `merge-queued` off.
  */
 export const armOnPick = async (
   pr: PullRequest,

@@ -6,7 +6,6 @@
  */
 
 import {
-  MERGE_QUEUED_LABEL,
   parseSetAsideComment,
   requirementsOfRules,
   SET_ASIDE_COMMENT_SCAN,
@@ -22,10 +21,10 @@ import { type ReviewState } from './review.mjs';
 import {
   PullRequestListSchema,
   PullRequestSchema,
+  type BaseChange,
   type NativeStackEntry,
   type OwnSetAsideComment,
   type PullRequest,
-  type TimelineEvent,
 } from './types.mjs';
 import { isSafeRefName, sh } from './util.mjs';
 
@@ -441,18 +440,15 @@ export const writeSetAsideCommentOn = async (
 };
 
 /**
- * What the pull request's timeline says about its base, its auto-merge and
- * its being queued, oldest first: `stack.mts` reads which branch GitHub moved
- * it off, and `auto-merge.mts` whether a person disarmed it since it was
- * queued.
+ * Every change of the pull request's base its timeline records, oldest
+ * first; `stack.mts` reads which branch GitHub moved it off.
  *
  * GraphQL, because the REST timeline does not say which branches a change of
- * base was between. Enabling auto-merge is three event types, one per merge
- * method; a label other than `merge-queued` is dropped.
+ * base was between.
  */
-export const readTimeline = async (
+export const readBaseChanges = async (
   prNumber: number,
-): Promise<Result<readonly TimelineEvent[], string>> => {
+): Promise<Result<readonly BaseChange[], string>> => {
   const answered = await git(
     [
       'gh api graphql',
@@ -476,53 +472,23 @@ export const readTimeline = async (
   }
 
   return Result.ok(
-    parsed.value.data.repository.pullRequest.timelineItems.nodes.flatMap(
-      toTimelineEvents,
-    ),
-  );
-};
-
-const toTimelineEvents = (
-  node: t.TypeOf<typeof TimelineNodeSchema>,
-): readonly TimelineEvent[] => {
-  switch (node.__typename) {
-    case 'BaseRefChangedEvent':
-      return [
-        {
-          kind: 'base-changed',
+    parsed.value.data.repository.pullRequest.timelineItems.nodes.map(
+      (node) =>
+        ({
           from: node.previousRefName ?? '',
           to: node.currentRefName ?? '',
-        },
-      ];
-
-    case 'AutoMergeDisabledEvent':
-      return [
-        {
-          kind: 'auto-merge-disabled',
-          manually: node.reasonCode === 'manually_disabled',
-        },
-      ];
-
-    case 'LabeledEvent':
-      return node.label?.name === MERGE_QUEUED_LABEL
-        ? [{ kind: 'queued' }]
-        : [];
-
-    default:
-      return [{ kind: 'auto-merge-enabled' }];
-  }
+        }) as const,
+    ),
+  );
 };
 
 const TIMELINE_QUERY = [
   'query($owner: String!, $repo: String!, $number: Int!) {',
   '  repository(owner: $owner, name: $repo) {',
   '    pullRequest(number: $number) {',
-  '      timelineItems(last: 100, itemTypes: [BASE_REF_CHANGED_EVENT, AUTO_MERGE_ENABLED_EVENT, AUTO_SQUASH_ENABLED_EVENT, AUTO_REBASE_ENABLED_EVENT, AUTO_MERGE_DISABLED_EVENT, LABELED_EVENT]) {',
+  '      timelineItems(last: 100, itemTypes: [BASE_REF_CHANGED_EVENT]) {',
   '        nodes {',
-  '          __typename',
   '          ... on BaseRefChangedEvent { previousRefName currentRefName }',
-  '          ... on AutoMergeDisabledEvent { reasonCode }',
-  '          ... on LabeledEvent { label { name } }',
   '        }',
   '      }',
   '    }',
@@ -531,11 +497,8 @@ const TIMELINE_QUERY = [
 ].join(' ');
 
 const TimelineNodeSchema = t.record({
-  __typename: t.string(),
   previousRefName: t.optional(t.union([t.string(), t.nullType])),
   currentRefName: t.optional(t.union([t.string(), t.nullType])),
-  reasonCode: t.optional(t.union([t.string(), t.nullType])),
-  label: t.optional(t.union([t.record({ name: t.string() }), t.nullType])),
 });
 
 const TimelineSchema = t.record({

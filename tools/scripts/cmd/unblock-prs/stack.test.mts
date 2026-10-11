@@ -11,9 +11,9 @@ import {
   stackParentsOf,
 } from './stack.mjs';
 import {
+  type BaseChange,
   type PullRequest,
   type SkipRecord,
-  type TimelineEvent,
   type TriageContext,
 } from './types.mjs';
 
@@ -57,8 +57,8 @@ const context = (
     releaseBlockers: [],
   }) as const;
 
-const retarget = (from: string, to = 'main'): TimelineEvent =>
-  ({ kind: 'base-changed', from, to }) as const;
+const retarget = (from: string, to = 'main'): BaseChange =>
+  ({ from, to }) as const;
 
 describe(retargetedFrom, () => {
   test('names the branch the last change of base moved it off', () => {
@@ -81,14 +81,10 @@ describe(retargetedFrom, () => {
     );
   });
 
-  test('reads the last change of base, whatever came between', () => {
+  test('reads the last change of base, not the first', () => {
     assert.strictEqual(
       retargetedFrom(
-        [
-          retarget('feature/1', 'feature/2'),
-          { kind: 'auto-merge-enabled' },
-          retarget('feature/2'),
-        ],
+        [retarget('feature/1', 'feature/2'), retarget('feature/2')],
         'main',
       ),
       'feature/2',
