@@ -731,6 +731,9 @@ export const listCheckRuns = async (
             name: run.name,
             status: run.status,
             conclusion: run.conclusion ?? undefined,
+            // Not read: a fix is planned once the checks have failed, not
+            // while a newer round is running.
+            round: undefined,
           })),
       );
 };

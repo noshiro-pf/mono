@@ -58,7 +58,7 @@ const PAGE_INFO = 'pageInfo { hasNextPage endCursor }';
 const CONTEXT_NODES = [
   'nodes {',
   '  __typename',
-  '  ... on CheckRun { databaseId name status conclusion checkSuite { databaseId } }',
+  '  ... on CheckRun { databaseId name status conclusion checkSuite { databaseId status workflowRun { workflow { databaseId } } } }',
   '  ... on StatusContext { context state description }',
   '}',
 ].join(' ');
@@ -262,6 +262,20 @@ const ClosingIssuesSchema = t.record({ nodes: t.array(IssueSchema) });
 /** `null` for a deleted account, which GitHub calls a ghost. */
 const AuthorSchema = t.union([t.record({ login: t.string() }), t.nullType]);
 
+const CheckSuiteSchema = t.record({
+  databaseId: t.union([t.number(), t.nullType]),
+  status: t.string(),
+  // `null` for a suite another app made.
+  workflowRun: t.union([
+    t.record({
+      workflow: t.record({ databaseId: t.union([t.number(), t.nullType]) }),
+    }),
+    t.nullType,
+  ]),
+});
+
+export type CheckSuiteNode = t.TypeOf<typeof CheckSuiteSchema>;
+
 const ContextSchema = t.union([
   t.record({
     __typename: t.literal('CheckRun'),
@@ -269,10 +283,7 @@ const ContextSchema = t.union([
     name: t.string(),
     status: t.string(),
     conclusion: t.union([t.string(), t.nullType]),
-    checkSuite: t.union([
-      t.record({ databaseId: t.union([t.number(), t.nullType]) }),
-      t.nullType,
-    ]),
+    checkSuite: t.union([CheckSuiteSchema, t.nullType]),
   }),
   t.record({
     __typename: t.literal('StatusContext'),

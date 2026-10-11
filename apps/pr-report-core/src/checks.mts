@@ -27,11 +27,25 @@ import { type ChecksSummary, type ContextState } from './types.mjs';
  * that says a green one will not: `CLAUDE.md`'s "Commits and pull requests"
  * says to ignore the red the cancelled run leaves, and this is the case where
  * GitHub does not.
+ *
+ * **A run whose workflow has a newer round still going is pending.** An
+ * aggregate has no run in a round until the jobs it waits on are done, so
+ * until then the only run of its name is the previous round's — on a pull
+ * request whose label events started two rounds, the red the second left on
+ * the first (#2191). That run is what GitHub shows, but not what it will
+ * answer with: the newer round is in the suite with the greater id, and its
+ * aggregate will be the newest run of the name. Where the newer round has
+ * finished without one, the older run stands, as it does on GitHub.
  */
 export const statesFromCheckRuns = (
   runs: readonly CheckRunReport[],
 ): ReadonlyMap<string, ContextState> => {
   const mut_winner = new Map<string, CheckRunReport>();
+
+  const mut_latestRound = new Map<
+    number,
+    Readonly<{ checkSuiteId: number; completed: boolean }>
+  >();
 
   for (const run of runs) {
     const previous = mut_winner.get(run.name);
@@ -39,12 +53,37 @@ export const statesFromCheckRuns = (
     if (previous === undefined || outranks(run, previous)) {
       mut_winner.set(run.name, run);
     }
+
+    if (run.round === undefined) {
+      continue;
+    }
+
+    const latest = mut_latestRound.get(run.round.workflowId);
+
+    if (latest === undefined || run.checkSuiteId > latest.checkSuiteId) {
+      mut_latestRound.set(run.round.workflowId, {
+        checkSuiteId: run.checkSuiteId,
+        completed: run.round.completed,
+      });
+    }
   }
 
   const mut_states = new Map<string, ContextState>();
 
   for (const [name, run] of mut_winner) {
-    mut_states.set(name, classifyCheckRun(run.status, run.conclusion));
+    const latest =
+      run.round === undefined
+        ? undefined
+        : mut_latestRound.get(run.round.workflowId);
+
+    mut_states.set(
+      name,
+      latest !== undefined &&
+        latest.checkSuiteId !== run.checkSuiteId &&
+        !latest.completed
+        ? 'pending'
+        : classifyCheckRun(run.status, run.conclusion),
+    );
   }
 
   return mut_states;
@@ -59,6 +98,14 @@ export type CheckRunReport = Readonly<{
   checkSuiteId: number;
   /** Ascending, so it orders two runs of one name inside one suite. */
   id: number;
+  /**
+   * The workflow run its suite is, where it is one: the workflow, so that a
+   * newer round of it can be told from an unrelated suite, and whether the
+   * round has finished, which its runs alone do not say — an aggregate's run
+   * is created only once every job before it has completed. `undefined` for
+   * a run no workflow made, or where the workflow runs could not be read.
+   */
+  round: Readonly<{ workflowId: number; completed: boolean }> | undefined;
 }>;
 
 /**
@@ -92,15 +139,19 @@ const PASSING_CONCLUSIONS: ReadonlySet<string> = new Set([
 ]);
 
 /**
- * Whether any run on the head commit has not finished.
+ * Whether any run on the head commit has not finished, or any round has not.
  *
  * Every run, not only the required ones: the aggregates are `if: always()`
  * and have no run in the newest round until the jobs they wait on are done,
  * so "every required context has reported" is true of a commit halfway
- * through a round — with the reports coming from the round before.
+ * through a round — with the reports coming from the round before. And the
+ * round, not only its runs: between the last job finishing and the aggregate
+ * being created, every run there is has completed.
  */
 export const anyRunInProgress = (runs: readonly CheckRunReport[]): boolean =>
-  runs.some((run) => run.status !== 'completed');
+  runs.some(
+    (run) => run.status !== 'completed' || run.round?.completed === false,
+  );
 
 /**
  * Which of two runs of one name GitHub would answer with: the one in the

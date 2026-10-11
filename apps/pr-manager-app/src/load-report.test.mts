@@ -98,6 +98,56 @@ describe(loadReport, () => {
     assert.deepStrictEqual(entry.checks.passed, ['no-skip-ci-label']);
   });
 
+  // #2191: two label events started two rounds, and the second cancelled the
+  // first, whose aggregate concluded `failure` before the second had created
+  // its own. The page called it failing.
+  test('does not read a cancelled round as failing while a newer one runs', async () => {
+    const codeCheck = { workflow: { databaseId: 359_266_435 } } as const;
+
+    const { fetchImpl } = answering(
+      report([
+        pullRequest({
+          number: 7,
+          contexts: [
+            checkRun('code-check-result / result', 'COMPLETED', 'FAILURE', {
+              databaseId: 103_247_630_670,
+              status: 'COMPLETED',
+              workflowRun: codeCheck,
+            }),
+            checkRun('code-check (ws:fix:lint)', 'COMPLETED', 'SUCCESS', {
+              databaseId: 103_247_840_668,
+              status: 'IN_PROGRESS',
+              workflowRun: codeCheck,
+            }),
+            {
+              __typename: 'StatusContext',
+              context: 'no-skip-ci-label',
+              state: 'SUCCESS',
+              description: null,
+            },
+          ],
+        }),
+      ]),
+      followUpAnswer({ compare_7: { compare: { aheadBy: 1, behindBy: 0 } } }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    const entry = loaded.entries[0];
+
+    assert.isDefined(entry);
+
+    assert.strictEqual(entry.checksRunning, true);
+
+    assert.strictEqual(entry.checks.verdict, 'pending');
+
+    assert.deepStrictEqual(entry.checks.failed, []);
+
+    assert.deepStrictEqual(entry.checks.pending, [
+      'code-check-result / result',
+    ]);
+  });
+
   test('lists the open issues, and how many there are in all', async () => {
     const { fetchImpl } = answering(
       report([], [], 0, {
@@ -775,10 +825,18 @@ const followUpAnswer = (fields: ReadonlyRecord<string, unknown>): unknown =>
     data: { repository: fields },
   }) as const;
 
+/** A finished suite no workflow made, which is how a codecov run reads. */
+const NO_WORKFLOW_SUITE = {
+  databaseId: 1,
+  status: 'COMPLETED',
+  workflowRun: null,
+} as const;
+
 const checkRun = (
   checkName: string,
   runStatus: string,
   conclusion: string | null,
+  checkSuite: unknown = NO_WORKFLOW_SUITE,
 ): unknown =>
   ({
     __typename: 'CheckRun',
@@ -786,7 +844,7 @@ const checkRun = (
     name: checkName,
     status: runStatus,
     conclusion,
-    checkSuite: { databaseId: 1 },
+    checkSuite,
   }) as const;
 
 const PASSING = [

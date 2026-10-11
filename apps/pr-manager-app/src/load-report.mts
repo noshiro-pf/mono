@@ -66,6 +66,7 @@ import {
   OPEN_LIMIT,
   REPORT_QUERY,
   ReportDataSchema,
+  type CheckSuiteNode,
   type ContextNode,
   type FollowUp,
   type MergedPullRequestNode,
@@ -717,6 +718,7 @@ const factsOf = (
             conclusion: node.conclusion?.toLowerCase(),
             checkSuiteId: node.checkSuite?.databaseId ?? 0,
             id: node.databaseId ?? 0,
+            round: roundOf(node.checkSuite),
           },
         ]
       : [],
@@ -748,6 +750,15 @@ const factsOf = (
     checksRunning: anyRunInProgress(runs),
     linkedIssues: linkedIssuesOf(repo, pr, described),
   };
+};
+
+/** The workflow run a check suite is, in the shared verdict's terms. */
+const roundOf = (suite: CheckSuiteNode | null): CheckRunReport['round'] => {
+  const workflowId = suite?.workflowRun?.workflow.databaseId ?? undefined;
+
+  return suite === null || workflowId === undefined
+    ? undefined
+    : { workflowId, completed: suite.status === 'COMPLETED' };
 };
 
 /**
