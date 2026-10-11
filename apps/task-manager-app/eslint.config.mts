@@ -74,8 +74,10 @@ export default [
               name: 'firebase/firestore',
               allowImportNames: [
                 'collection',
+                'connectFirestoreEmulator',
                 'doc',
                 'initializeFirestore',
+                'memoryLocalCache',
                 'persistentLocalCache',
                 'persistentMultipleTabManager',
               ],

@@ -141,6 +141,38 @@ pnpm run check:e2e    # Playwright（デモモードで動かす）
 pnpm run build        # build/ に出力。GitHub Pages へは deploy-pages.yml が載せる
 ```
 
+### エミュレータ
+
+`pnpm run dev` の開発サーバーは、Firebase の本番プロジェクトではなく手元のエミュレータ
+（Authentication と Firestore）に接続する。先にこのディレクトリで起動しておく。
+
+```sh
+firebase emulators:start   # firebase-tools と Java 21 以上が必要
+```
+
+| エミュレータ   | ポート |
+| :------------- | :----- |
+| Authentication | 9199   |
+| Firestore      | 8180   |
+| UI             | 4100   |
+
+- ポートは `firebase.json` に書き、アプリもそこから読む。event-schedule-app の
+  エミュレータ（5002・9099・4000）と同時に起動できる番号にしてある。
+- サインインは Auth エミュレータのポップアップで仮のアカウントを作って行う。本物の
+  Google アカウントは要らず、データも本番のユーザー ID に紐づかない。
+- ルールは `firestore.rules` をそのまま読み込み、ファイルを変えると読み直される。
+- 接続先のホストはページを開いたホスト名を使う。LAN の別の端末から開くときは、
+  開発サーバーを `pnpm run dev -- --host` で、エミュレータも `firebase.json` の各項目に
+  `"host": "0.0.0.0"` を足して起動する。
+- エミュレータに接続している間、Firestore の端末内キャッシュはメモリにだけ置く。
+  IndexedDB のキャッシュはプロジェクト単位なので、本番とエミュレータのデータが
+  混ざらないようにするため。
+
+本番のプロジェクトに接続したいときは、`VITE_FIREBASE_EMULATORS` を `true` 以外にする。
+追跡されない `.env.development.local` に `VITE_FIREBASE_EMULATORS=false` と書くか、
+`VITE_FIREBASE_EMULATORS=false pnpm run dev` で起動する。本番ビルドは
+`import.meta.env.DEV` が `false` になるので、この設定に関係なくエミュレータには繋がない。
+
 ### デモモード
 
 開発サーバーで `?storage=memory` を付けて開くと、サインインせずにサンプルデータ入りの
