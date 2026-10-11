@@ -98,10 +98,17 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
 ): SyncChildObservable<A, P> => {
   const handle = createObservableBaseHandle<A>(initialValue);
 
+  /** Set once assembled; see {@link unregisterChild}. */
+  let mut_self: ChildObservable<A> | undefined = undefined;
+
   const complete = (): void => {
     onComplete?.();
 
     handle.completeBase();
+
+    if (mut_self !== undefined) {
+      unregisterChild(mut_self, parents);
+    }
 
     // propagate to parents
     for (const par of parents) {
@@ -135,6 +142,8 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
   });
 
   registerChild(observable, parents);
+
+  mut_self = observable;
 
   return observable;
 };
@@ -184,12 +193,20 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
 ): AsyncChildObservable<A, P> => {
   const handle = createObservableBaseHandle<A>(initialValue);
 
-  const { addDescendant, startUpdate } = createManagerObservableParts(handle);
+  const { addDescendant, deleteDescendant, startUpdate } =
+    createManagerObservableParts(handle);
+
+  /** Set once assembled; see {@link unregisterChild}. */
+  let mut_self: ChildObservable<A> | undefined = undefined;
 
   const complete = (): void => {
     onComplete?.();
 
     handle.completeBase();
+
+    if (mut_self !== undefined) {
+      unregisterChild(mut_self, parents);
+    }
 
     // propagate to parents
     for (const par of parents) {
@@ -220,10 +237,12 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     tryUpdate,
     tryComplete,
     complete,
-    extra: { parents, addDescendant },
+    extra: { parents, addDescendant, deleteDescendant },
   });
 
   registerChild(observable, parents);
+
+  mut_self = observable;
 
   return observable;
 };
@@ -317,6 +336,41 @@ const registerChild = <A,>(
       p.addDescendant(child);
     } else {
       // trace back dependency graph
+      mut_rest.push(...p.parents);
+    }
+  }
+};
+
+/**
+ * Undoes {@link registerChild} for a completed child: its parents forget it, and
+ * every manager it registered to stops propagating updates to it. Without this
+ * a completed node stayed reachable for as long as its root lived, and ran its
+ * `tryUpdate` on every update (#2134).
+ *
+ * A completion that happens while the child is still being constructed (from
+ * a leaf factory's `createTryUpdate`) precedes its registration, so there is
+ * nothing to undo; `mut_self` is still `undefined` then.
+ */
+const unregisterChild = <A,>(
+  child: ChildObservable<A>,
+  parents: ChildObservable<A>['parents'],
+): void => {
+  for (const p of parents) {
+    p.deleteChild(child);
+  }
+
+  const mut_rest = Array.from(parents);
+
+  while (Arr.isNonEmpty(mut_rest)) {
+    const p = mut_rest.pop();
+
+    if (p === undefined) {
+      break;
+    }
+
+    if (isManagerObservable(p)) {
+      p.deleteDescendant(child);
+    } else {
       mut_rest.push(...p.parents);
     }
   }
