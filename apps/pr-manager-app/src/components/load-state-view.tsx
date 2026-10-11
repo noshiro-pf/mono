@@ -1,22 +1,22 @@
 import { memoNamed } from 'preact-utils';
-import { type LoadState } from '../load-state.mjs';
+import { type LoadStatus } from '../load-state.mjs';
 import { Notice } from './notice.js';
 import { ReportView } from './report-view.js';
 
-type Props = Readonly<{ state: LoadState }>;
+type Props = Readonly<{ loadStatus: LoadStatus }>;
 
-/** What the state says, once there is a token to have read with. */
+/** What the status says, once there is a token to have read with. */
 export const LoadStateView = memoNamed<Props>('LoadStateView', (props) => {
-  const { state } = props;
+  const { loadStatus } = props;
 
-  switch (state.type) {
+  switch (loadStatus.type) {
     case 'loading':
       return <Notice tone={'neutral'}>{'Reading GitHub…'}</Notice>;
 
     case 'failed':
-      return <Notice tone={'critical'}>{state.message}</Notice>;
+      return <Notice tone={'critical'}>{loadStatus.message}</Notice>;
 
     case 'ready':
-      return <ReportView report={state.report} />;
+      return <ReportView />;
   }
 });

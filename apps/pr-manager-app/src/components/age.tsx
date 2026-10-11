@@ -2,7 +2,7 @@ import { computed } from '@preact/signals';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import { describeAge } from '../format.mjs';
-import { nowMsSignal } from '../store/index.mjs';
+import { readerSignals } from '../store/index.mjs';
 
 type Props = Readonly<{
   /** The instant, in milliseconds since the epoch. */
@@ -22,7 +22,7 @@ export const Age = memoNamed<Props>('Age', (props) => {
   const { epochMs } = props;
 
   const age = useMemo(
-    () => computed(() => describeAge(epochMs, nowMsSignal.value)),
+    () => computed(() => describeAge(epochMs, readerSignals.nowMs.value)),
     [epochMs],
   );
 

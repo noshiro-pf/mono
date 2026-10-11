@@ -1,14 +1,19 @@
-/** What the page has, and what each read makes of it. */
+/** How the reading is going, and what each read makes of it. */
 
 import { Result } from 'ts-data-forge';
 import { type LoadedReport } from './load-report.mjs';
 
-export type LoadState = Readonly<
+/**
+ * How the reading went: what the page says around the report rather than
+ * in it. The report itself is kept apart, part by part
+ * (`store/reader.mts`), so that a read that only brought a new report does
+ * not change this.
+ */
+export type LoadStatus = Readonly<
   | { type: 'failed'; message: string }
   | { type: 'loading' }
   | {
       type: 'ready';
-      report: LoadedReport;
       /**
        * A background read that failed, kept beside the data it did not
        * replace. Silence here would be a page that had quietly stopped being
@@ -20,17 +25,32 @@ export type LoadState = Readonly<
     }
 >;
 
-/** One value, so that a re-render does not make a new one to compare. */
-export const LOADING: LoadState = { type: 'loading' } as const;
+/** One value each, so that a read that changes nothing hands back the same. */
+export const LOADING: LoadStatus = { type: 'loading' } as const;
 
-export const asRefreshing = (state: LoadState): LoadState =>
-  state.type === 'ready' ? ({ ...state, refreshing: true } as const) : state;
+export const READY: LoadStatus = {
+  type: 'ready',
+  pollError: undefined,
+  refreshing: false,
+} as const;
+
+export const asRefreshing = (current: LoadStatus): LoadStatus =>
+  current.type === 'ready'
+    ? ({ ...current, refreshing: true } as const)
+    : current;
+
+export type Settled = Readonly<{
+  status: LoadStatus;
+  /** The report to show, or `undefined` to leave what is shown alone. */
+  report: LoadedReport | undefined;
+}>;
 
 /**
- * What a read makes of the state it found.
+ * What a read makes of the page: the status to show, and the report if it
+ * is to replace the one on screen.
  *
- * Pure, so that it can be the argument to `setState` and act on whatever is
- * current rather than on whatever was current when the request went out.
+ * Pure, so that the reader can hand it whatever is current rather than
+ * whatever was current when the request went out.
  *
  * Two rules. **A read may add to the page, and may say it failed, but may
  * not take the page away**: a read that fails leaves the last report on
@@ -40,27 +60,25 @@ export const asRefreshing = (state: LoadState): LoadState =>
  * out at once, and whichever answers last is not necessarily the one that
  * asked last.
  */
-export const merge = (
-  previous: LoadState,
+export const settle = (
+  current: LoadStatus,
+  shownReadAtMs: number,
   answer: Result<LoadedReport, string>,
   startedAtMs: number,
-): LoadState => {
-  const kept = previous.type === 'ready' ? previous : undefined;
-
-  if (kept !== undefined && kept.report.readAtEpochMs > startedAtMs) {
-    return kept;
+): Settled => {
+  if (current.type === 'ready' && shownReadAtMs > startedAtMs) {
+    return { status: current, report: undefined };
   }
 
   if (Result.isErr(answer)) {
-    return kept === undefined
-      ? { type: 'failed', message: answer.value }
-      : { ...kept, refreshing: false, pollError: answer.value };
+    return {
+      status:
+        current.type === 'ready'
+          ? { ...current, refreshing: false, pollError: answer.value }
+          : { type: 'failed', message: answer.value },
+      report: undefined,
+    };
   }
 
-  return {
-    type: 'ready',
-    report: answer.value,
-    pollError: undefined,
-    refreshing: false,
-  };
+  return { status: READY, report: answer.value };
 };

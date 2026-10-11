@@ -38,7 +38,6 @@
     "pr-report-core": "workspace:*",
     "preact-utils": "workspace:*",
     "synstate": "workspace:*",
-    "synstate-preact-hooks": "workspace:*",
     "synstate-preact-signals": "workspace:*",
     "ts-data-forge": "workspace:*",
     "ts-fortress": "workspace:*"

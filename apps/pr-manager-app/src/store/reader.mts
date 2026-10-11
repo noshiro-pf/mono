@@ -15,17 +15,23 @@ import {
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { Result, unknownToString } from 'ts-data-forge';
+import { fastDeepEqual, Result, unknownToString } from 'ts-data-forge';
+import { type StrictPick } from 'ts-type-forge';
 import { CLOCK_TICK_MS, POLL_INTERVAL_MS } from '../constants.mjs';
 import { type Answered } from '../graphql.mjs';
-import { type LoadedReport } from '../load-report.mjs';
+import {
+  type Entry,
+  type LoadedReport,
+  type PageSummary,
+} from '../load-report.mjs';
 import {
   asRefreshing,
   LOADING,
-  merge,
-  type LoadState,
+  settle,
+  type LoadStatus,
 } from '../load-state.mjs';
 import { type RateLimit } from '../rate-limit.mjs';
+import { sameItemsIfEqual } from '../share.mjs';
 import { type StoredToken } from '../token.mjs';
 
 export type ReaderDeps = Readonly<{
@@ -43,7 +49,30 @@ export type ReaderDeps = Readonly<{
 }>;
 
 export type Reader = Readonly<{
-  loadState: InitializedObservable<LoadState>;
+  /** How the reading went, which changes only when that does. */
+  loadStatus: InitializedObservable<LoadStatus>;
+  /**
+   * The report, in the parts the page draws, each its own state and passed
+   * on only when a read changed it (`equals`): a poll that found nothing new
+   * writes {@link readAt} and nothing else, and a part a read left alone
+   * keeps the object it had. The pull requests are kept one by one — each
+   * is its own card — and a part is empty while there is no report.
+   */
+  readAt: InitializedObservable<number>;
+  summary: InitializedObservable<PageSummary>;
+  entries: InitializedObservable<readonly Entry[]>;
+  /** The entries by number, for the merge order to look them up. */
+  byNumber: InitializedObservable<ReadonlyMap<number, Entry>>;
+  /**
+   * One scale for every divergence bar on the page, so that a bar on one
+   * card can be compared with a bar on another. Per-card, `-2` and `-39`
+   * would be drawn the same length, which is the one thing the bars are for.
+   */
+  scaleMax: InitializedObservable<number>;
+  roots: InitializedObservable<LoadedReport['roots']>;
+  cycles: InitializedObservable<LoadedReport['cycles']>;
+  merged: InitializedObservable<LoadedReport['merged']>;
+  issues: InitializedObservable<LoadedReport['issues']>;
   /** What GitHub last said was left of the budget. */
   rateLimit: InitializedObservable<RateLimit | undefined>;
   /**
@@ -69,14 +98,69 @@ export type Reader = Readonly<{
 export const createReader = (deps: ReaderDeps): Reader => {
   const { token, load, now, counter, isVisible, visibilityChange } = deps;
 
-  const [loadState, setLoadState, { updateState: updateLoadState }] =
-    createState<LoadState>(LOADING);
+  // Each state below is passed on only when what it is given differs from
+  // what it holds. `equals` decides that where the state is held, once, so
+  // nothing downstream has anything to compare.
+  const [
+    loadStatus,
+    setLoadStatus,
+    { updateState: updateLoadStatus, getSnapshot: getLoadStatus },
+  ] = createState<LoadStatus>(LOADING, { equals: fastDeepEqual });
 
   const [rateLimit, , { updateState: updateRateLimit }] = createState<
     RateLimit | undefined
-  >(undefined);
+  >(undefined, { equals: fastDeepEqual });
 
   const [nowMs, setNowMs] = createState(0);
+
+  const [readAt, setReadAt, { getSnapshot: getReadAt }] = createState(
+    EMPTY_PARTS.readAtEpochMs,
+    { equals: Object.is },
+  );
+
+  const [summary, setSummary] = createState(EMPTY_PARTS.summary, {
+    equals: fastDeepEqual,
+  });
+
+  // The pull requests are kept one by one, each being its own card. What
+  // `sameItemsIfEqual` makes of an answer that changed nothing is the array
+  // already held, which `equals` then stops.
+  const [entries, , { updateState: updateEntries }] = createState(
+    EMPTY_PARTS.entries,
+    { equals: Object.is },
+  );
+
+  const [roots, setRoots] = createState(EMPTY_PARTS.roots, {
+    equals: fastDeepEqual,
+  });
+
+  const [cycles, setCycles] = createState(EMPTY_PARTS.cycles, {
+    equals: fastDeepEqual,
+  });
+
+  const [merged, setMerged] = createState(EMPTY_PARTS.merged, {
+    equals: fastDeepEqual,
+  });
+
+  const [issues, setIssues] = createState(EMPTY_PARTS.issues, {
+    equals: fastDeepEqual,
+  });
+
+  const writeReport = (report: ReportParts): void => {
+    setReadAt(report.readAtEpochMs);
+
+    setSummary(report.summary);
+
+    updateEntries((held) => sameItemsIfEqual(held, report.entries));
+
+    setRoots(report.roots);
+
+    setCycles(report.cycles);
+
+    setMerged(report.merged);
+
+    setIssues(report.issues);
+  };
 
   const currentToken = (): string | undefined =>
     token.getSnapshot().value?.value;
@@ -104,7 +188,15 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
       updateRateLimit((current) => answeredLimit ?? current);
 
-      updateLoadState((current) => merge(current, result, startedAtMs));
+      const settled = settle(getLoadStatus(), getReadAt(), result, startedAtMs);
+
+      // The report before the status, so that a page shown for the first
+      // time is shown with its parts already in place.
+      if (settled.report !== undefined) {
+        writeReport(settled.report);
+      }
+
+      setLoadStatus(settled.status);
     };
 
     load(tokenValue, startedAtMs)
@@ -117,7 +209,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
   };
 
   const refresh = (): void => {
-    updateLoadState(asRefreshing);
+    updateLoadStatus(asRefreshing);
 
     read();
   };
@@ -131,7 +223,9 @@ export const createReader = (deps: ReaderDeps): Reader => {
       .pipe(skipIfNoChange())
       .subscribe((tokenValue) => {
         if (tokenValue === undefined) {
-          setLoadState(LOADING);
+          setLoadStatus(LOADING);
+
+          writeReport(EMPTY_PARTS);
         } else {
           read();
         }
@@ -184,5 +278,61 @@ export const createReader = (deps: ReaderDeps): Reader => {
     };
   };
 
-  return { loadState, rateLimit, nowMs, refresh, start };
+  return {
+    loadStatus,
+    readAt,
+    summary,
+    entries,
+    byNumber: entries.pipe(
+      map((list) => new Map(list.map((entry) => [entry.number, entry]))),
+    ),
+    scaleMax: entries.pipe(map(divergenceScale)),
+    roots,
+    cycles,
+    merged,
+    issues,
+    rateLimit,
+    nowMs,
+    refresh,
+    start,
+  };
 };
+
+/** What of a report the page draws. */
+type ReportParts = StrictPick<
+  LoadedReport,
+  | 'readAtEpochMs'
+  | 'summary'
+  | 'entries'
+  | 'roots'
+  | 'cycles'
+  | 'merged'
+  | 'issues'
+>;
+
+/** What the page shows while there is no report. */
+const EMPTY_PARTS: ReportParts = {
+  readAtEpochMs: 0,
+  summary: {
+    open: 0,
+    queued: 0,
+    draft: 0,
+    failing: 0,
+    behind: 0,
+    setAside: 0,
+    awaitingReview: 0,
+  },
+  entries: [],
+  roots: [],
+  cycles: [],
+  merged: [],
+  issues: { items: [], totalCount: 0 },
+} as const;
+
+const divergenceScale = (entries: readonly Entry[]): number =>
+  Math.max(
+    1,
+    ...entries.flatMap(({ comparison }) =>
+      comparison === undefined ? [] : [comparison.aheadBy, comparison.behindBy],
+    ),
+  );
