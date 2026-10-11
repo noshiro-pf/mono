@@ -5,6 +5,7 @@ export * from './datetime-local.mjs';
 export * from './dependency-edit.mjs';
 export * from './diagram-sort.mjs';
 export * from './draft-insight.mjs';
+export * from './emulator-mode.mjs';
 export * from './format.mjs';
 export * from './labels.mjs';
 export * from './lag.mjs';
