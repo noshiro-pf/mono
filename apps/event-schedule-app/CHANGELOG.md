@@ -1,5 +1,24 @@
 # event-schedule-app
 
+## 0.0.12
+
+### Patch Changes
+
+- Updated dependencies [1dfef75]
+- Updated dependencies [4a4def4]
+    - synstate@3.1.0
+    - synstate-react-hooks@3.1.0
+    - event-schedule-app-shared@0.0.8
+    - ts-fortress-types@0.0.9
+    - ts-data-forge@14.7.1
+    - react-blueprintjs-utils@0.0.12
+    - react-utils@0.0.11
+    - tiny-router-observable@0.0.11
+    - numeric-input-utils@0.0.7
+    - tiny-router-react-hooks@0.0.0
+    - better-react-use-state@1.0.1
+    - ts-fortress@12.1.3
+
 ## 0.0.11
 
 ### Patch Changes
