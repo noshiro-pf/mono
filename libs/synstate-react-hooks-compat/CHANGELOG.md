@@ -1,5 +1,17 @@
 # synstate-react-hooks-compat
 
+## 3.1.0
+
+### Minor Changes
+
+- 4a4def4: Add an `equals` option to `createState`, `createReducer` and `createBooleanState`. When it says the next state equals the current one, the update is not passed on — no subscriber, and nothing derived from the state, is told of it — and the current state is kept, so `setState` and the like return it. Without the option every update is passed on, as before; the next major makes `Object.is` the default.
+
+### Patch Changes
+
+- Updated dependencies [1dfef75]
+- Updated dependencies [4a4def4]
+    - synstate@3.1.0
+
 ## 3.0.6
 
 ### Patch Changes
