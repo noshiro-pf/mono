@@ -1,4 +1,7 @@
-/** GitHub's timestamps, as the numbers the page does arithmetic with. */
+/**
+ * GitHub's timestamps, as the numbers the page and the claims
+ * (`claim.mts`) do arithmetic with.
+ */
 
 import { Arr, Num, Result } from 'ts-data-forge';
 
@@ -10,7 +13,8 @@ import { Arr, Num, Result } from 'ts-data-forge';
  * Counted out field by field rather than handed to `Date`, whose parse is
  * left to the engine for anything but the exact format ECMAScript defines
  * and whose months count from zero, and rather than to `Temporal`, which not
- * every browser this page may be opened in has yet.
+ * every browser the page may be opened in has yet, nor every Node.js version
+ * this package is tested on.
  */
 export const epochMsOf = (timestamp: string): number | undefined => {
   if (!timestamp.endsWith('Z')) {

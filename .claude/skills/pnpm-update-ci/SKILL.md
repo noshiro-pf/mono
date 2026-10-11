@@ -44,7 +44,7 @@ buys a full CI matrix for a branch that is about to be thrown away.
 
 ## Before starting
 
-Read `.claude/skills/unblock-prs/SKILL.md`, "4. Fix a failing check" — the
+Read `.claude/skills/unblock-prs/SKILL.md`, "Fixing a failing check" — the
 check-name-to-command table, which checks need `pnpm run ws:build` first, and
 why a command that succeeds can still fail the job. That is the half of this
 skill that is not written here, because it is the same for every pull request.

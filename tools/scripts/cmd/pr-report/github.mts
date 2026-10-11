@@ -3,6 +3,7 @@
 import {
   anyRunInProgress,
   closingIssuesIn,
+  readQueueComments,
   reportedContexts,
   type CheckRunReport,
   type Comparison,
@@ -12,6 +13,7 @@ import {
   type MergedPullRequest,
   type OpenIssue,
   type PullRequestFacts,
+  type QueueComments,
   type RepoRef,
 } from 'pr-report-core';
 import { Arr, Json, Result } from 'ts-data-forge';
@@ -139,6 +141,14 @@ const CombinedStatusSchema = t.record({
   statuses: t.array(t.record({ context: t.string(), state: t.string() })),
 });
 
+const CommentListSchema = t.array(
+  t.record({
+    id: t.number(),
+    body: t.union([t.string(), t.nullType]),
+    user: t.union([t.record({ login: t.string() }), t.nullType]),
+  }),
+);
+
 const ClosingIssuesSchema = t.record({
   data: t.record({
     repository: t.record({
@@ -187,6 +197,17 @@ export type Client = Readonly<{
     withinDays: number,
     limit: number,
   ) => Promise<Result<readonly MergedPullRequest[], string>>;
+  /**
+   * What the queue's comments say on each of `pulls` — the set-aside comment
+   * `unblock-prs` writes and the claim of whoever is fixing it — by the
+   * token's own account, which is what both are trusted by. Empty without a
+   * token, or one whose account cannot be read.
+   */
+  queueComments: (
+    repo: RepoRef,
+    defaultBranch: string,
+    pulls: readonly PullRequestFacts[],
+  ) => Promise<ReadonlyMap<number, QueueComments>>;
   /** The open issues, most recently updated first, at most `limit`. */
   issues: (
     repo: RepoRef,
@@ -489,6 +510,53 @@ export const createClient = (
       return Result.isErr(answered)
         ? answered
         : Result.ok(answered.value.default_branch);
+    },
+
+    queueComments: async (repo, defaultBranch, pulls) => {
+      // Without a token this is refused, and nothing is trusted.
+      const viewer = await getJson('/user', t.record({ login: t.string() }));
+
+      const tip = await getJson(
+        `/repos/${repo.owner}/${repo.name}/git/ref/heads/${defaultBranch}`,
+        t.record({ object: t.record({ sha: t.string() }) }),
+      );
+
+      if (Result.isErr(viewer) || Result.isErr(tip)) {
+        return new Map();
+      }
+
+      const nowEpochMs = Temporal.Now.instant().epochMilliseconds;
+
+      const mut_read = new Map<number, QueueComments>();
+
+      for (const pr of pulls) {
+        // The first page, oldest first: each comment is edited in place, so
+        // it stays where it was first posted.
+        const listed = await getJson(
+          `/repos/${repo.owner}/${repo.name}/issues/${pr.number}/comments?per_page=${PAGE_SIZE}`,
+          CommentListSchema,
+        );
+
+        if (Result.isOk(listed)) {
+          mut_read.set(
+            pr.number,
+            readQueueComments(
+              listed.value.flatMap(({ id, body, user }) =>
+                user?.login === viewer.value.login
+                  ? [{ id, body: body ?? '' }]
+                  : [],
+              ),
+              {
+                headSha: pr.headSha,
+                baseTip: tip.value.object.sha,
+                nowEpochMs,
+              },
+            ),
+          );
+        }
+      }
+
+      return mut_read;
     },
 
     issues: async (repo, limit) => {

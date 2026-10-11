@@ -334,10 +334,11 @@ ingest the feed). Outside reports come through private vulnerability reporting
 - **The pull request stays the session's until it merges or closes.**
   Subscribe to its activity (`subscribe_pr_activity` where available) and end
   the turn to wait — do not poll. A small in-scope fix is amended onto the
-  branch's one commit; anything larger is a question. `main` moving under the
-  branch is `auto-rebase`'s to follow, not the session's: ask before rebasing.
-  So the branch may move under the session: an amend whose `--force-with-lease`
-  push is refused has lost nothing — `git fetch`, then
+  branch's one commit; anything larger is a question. Claim one `unblock-prs`
+  set aside first (`pnpm run claim-pr -- <n> --by <session URL>`); refused,
+  leave it. `main` moving under the branch is `auto-rebase`'s: ask before
+  rebasing. An amend whose `--force-with-lease` push is refused has lost
+  nothing — `git fetch`, then
   `git rebase --onto origin/<branch> <the head you knew>`, and push again.
 - **Several pull requests from one session are stacked** (`main <- A <- B`),
   likeliest merge first, unless the paths are plainly disjoint: B is opened
@@ -347,16 +348,15 @@ ingest the feed). Outside reports come through private vulnerability reporting
   and so arms it, only once A has merged and GitHub has moved B onto `main`.
   No ruleset covers a stacked base, so nothing but that keeps B out of A's
   branch: never arm or merge a layer by hand.
-- `pnpm run unblock-prs` (and the `unblock-prs` skill) lands queued pull
-  requests one at a time: scope is the `merge-queued` label, order is the
-  stack, the `Merge-After: #N` body trailer (not read inside fenced code) and
-  `blocks-release` for the release (see "Releases"), and it rebases —
-  carrying the layers above along — and arms auto-merge before removing
-  `skip-ci` so the matrix runs once. A bot that opens a pull request labels
-  it, and which label says whether it is queued: `pnpm-update.yml` opens with
-  `merge-queued`, `node-support-update.yml` with `skip-ci` — held until a
-  person queues it, as `open-pr` leaves a session's. Both arm their own
-  auto-merge, which `unblock-prs` would do anyway. Details in
+- `pnpm run unblock-prs` lands queued pull requests one at a time: scope is
+  the `merge-queued` label, order is the stack, the `Merge-After: #N` body
+  trailer (not read inside fenced code) and `blocks-release` for the release
+  (see "Releases"); it rebases — carrying the layers above along — and arms
+  auto-merge before removing `skip-ci` so the matrix runs once. The
+  `unblock-prs` skill only fixes what it sets aside. A bot's label says if it
+  is queued: `pnpm-update.yml` opens with `merge-queued`,
+  `node-support-update.yml` with `skip-ci`, held until a person queues it, as
+  `open-pr` leaves a session's. Both arm their own auto-merge. Details in
   `tools/scripts/cmd/unblock-prs/README.md`.
 
 ## Releases

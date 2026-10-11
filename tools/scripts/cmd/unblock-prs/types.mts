@@ -2,7 +2,11 @@
 
 /** The shapes every module here passes around. */
 
-import type { RulesetRequirements, SetAsideComment } from 'pr-report-core';
+import type {
+  Claim,
+  RulesetRequirements,
+  SetAsideComment,
+} from 'pr-report-core';
 import * as t from 'ts-fortress';
 import type { StrictPick } from 'ts-type-forge';
 
@@ -125,6 +129,8 @@ export type TriageBase = Readonly<{
   defaultBranch: string;
   baseSha: string;
   skipped: SkipRecords;
+  /** The claims that still hold their pull requests (`claims.mts`). */
+  claimed: ReadonlyMap<number, Claim>;
   demoted: Demotions;
   requiredContexts: readonly string[];
   reviewRequirements: ReviewRequirements;
