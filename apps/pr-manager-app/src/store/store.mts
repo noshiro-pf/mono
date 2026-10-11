@@ -36,8 +36,13 @@ export const tokenStore = createTokenStore(browserStores());
 
 export const reader = createReader({
   token: tokenStore.token,
-  load: (token, nowMs, issueCount) =>
-    loadReport(REPORT_SOURCE, { token, nowMs, issueCount }),
+  load: (token, nowMs, issueCount, onProgress) =>
+    loadReport(REPORT_SOURCE, {
+      token,
+      nowMs,
+      issueCount,
+      ...(onProgress === undefined ? {} : { onProgress }),
+    }),
   loadIssues: (token, after, first) =>
     loadIssuePage(REPORT_SOURCE, { token, after, first }),
   now: () => Date.now(),
@@ -109,6 +114,7 @@ export const readerSignals = {
   cycles: toSignal(reader.cycles),
   merged: toSignal(reader.merged),
   issues: toSignal(reader.issues),
+  reading: toSignal(reader.reading),
   moreIssues: toSignal(reader.moreIssues),
   rateLimit: toSignal(reader.rateLimit),
   nowMs: toSignal(reader.nowMs),

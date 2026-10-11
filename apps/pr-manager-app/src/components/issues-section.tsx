@@ -8,6 +8,8 @@ import { Timestamp } from './timestamp.js';
 
 type Props = Readonly<{
   issues: IssueList;
+  /** Whether the list has not been read yet. */
+  reading: boolean;
 }>;
 
 /**
@@ -25,15 +27,19 @@ type Props = Readonly<{
  */
 export const IssuesSection = memoNamed<Props>(
   'IssuesSection',
-  ({ issues: { items, totalCount, endCursor } }) => (
+  ({ issues: { items, totalCount, endCursor }, reading }) => (
     <section className={'section'}>
       <h2 className={'section-title'}>
-        {items.length < totalCount
-          ? `Open issues (${items.length} of ${totalCount}, most recently updated)`
-          : `Open issues (${totalCount})`}
+        {reading
+          ? 'Open issues'
+          : items.length < totalCount
+            ? `Open issues (${items.length} of ${totalCount}, most recently updated)`
+            : `Open issues (${totalCount})`}
       </h2>
 
-      {Arr.isEmpty(items) ? (
+      {reading ? (
+        <p className={'section-note'}>{'Reading GitHub…'}</p>
+      ) : Arr.isEmpty(items) ? (
         <p className={'section-note'}>{'No open issues.'}</p>
       ) : (
         <ul className={'issue-list'}>

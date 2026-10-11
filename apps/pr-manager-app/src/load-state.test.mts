@@ -101,4 +101,5 @@ const readAt = (readAtEpochMs: number): LoadedReport =>
     cycles: [],
     merged: [],
     issues: { items: [], totalCount: 0, endCursor: undefined },
+    reading: [],
   }) as const;

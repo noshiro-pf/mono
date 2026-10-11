@@ -9,6 +9,8 @@ import { LinkedIssues } from './linked-issues.js';
 
 type Props = Readonly<{
   merged: readonly Merged[];
+  /** Whether the list has not been read yet. */
+  reading: boolean;
   withinDays: number;
 }>;
 
@@ -21,13 +23,15 @@ type Props = Readonly<{
  */
 export const MergedSection = memoNamed<Props>(
   'MergedSection',
-  ({ merged, withinDays }) => (
+  ({ merged, reading, withinDays }) => (
     <section className={'section'}>
       <h2 className={'section-title'}>
         {`Merged in the last ${withinDays} day${withinDays === 1 ? '' : 's'}`}
       </h2>
 
-      {Arr.isEmpty(merged) ? (
+      {reading ? (
+        <p className={'section-note'}>{'Reading GitHub…'}</p>
+      ) : Arr.isEmpty(merged) ? (
         <p className={'section-note'}>{'Nothing merged in that window.'}</p>
       ) : (
         <ul className={'merged-list'}>

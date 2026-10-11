@@ -387,4 +387,5 @@ const entry = (
         } as const)
       : ({ state: 'not-required' } as const),
     claudeSessions: [],
+    reading: [],
   }) as const;

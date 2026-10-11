@@ -13,20 +13,27 @@ import {
 import { ISSUES_LIMIT, ISSUES_PAGE_SIZE } from './report-query.mjs';
 
 describe(loadReport, () => {
-  test('reads the report, then how far each head is from its base', async () => {
+  test('reads the pull requests, then how far each head is from its base', async () => {
     const { fetchImpl, sent } = answering(
       report([pullRequest({ number: 7 })]),
-      followUpAnswer({ compare_7: { compare: { aheadBy: 1, behindBy: 3 } } }),
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 3 } },
+      }),
     );
 
     const loaded = await load(fetchImpl);
 
-    assert.strictEqual(sent.length, 2);
+    const compared = named(sent, 'Compare');
 
-    assert.isTrue(sent[1]?.query.includes('compare_7: ref(') ?? false);
+    assert.strictEqual(compared.length, 1);
+
+    assert.isTrue(compared[0]?.query.includes('compare_7: ref(') ?? false);
 
     // The branch name travels as a variable, never inside the query text.
-    assert.strictEqual(sent[1]?.variables['compare_7_base'], 'refs/heads/main');
+    assert.strictEqual(
+      compared[0]?.variables['compare_7_base'],
+      'refs/heads/main',
+    );
 
     const entry = loaded.entries[0];
 
@@ -48,12 +55,205 @@ describe(loadReport, () => {
     assert.strictEqual(loaded.summary.behind, 1);
   });
 
+  test('asks for every part at once, and compares once the heads are known', async () => {
+    const { fetchImpl, asked, release } = holding(
+      report([pullRequest({ number: 7 })]),
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
+    );
+
+    const loading = loadReport(REPORT_SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl,
+    });
+
+    await ticks();
+
+    assert.deepStrictEqual(asked().toSorted(), [
+      'Checks',
+      'MergedPullRequests',
+      'OpenIssues',
+      'PullRequestDetails',
+      'PullRequests',
+    ]);
+
+    await release('PullRequests');
+
+    assert.strictEqual(asked().at(-1), 'Compare');
+
+    await release('Checks');
+
+    await release('PullRequestDetails');
+
+    await release('MergedPullRequests');
+
+    await release('OpenIssues');
+
+    await release('Compare');
+
+    const { result } = await loading;
+
+    assert.isTrue(Result.isOk(result));
+  });
+
+  test('hands over the merge order before the slower parts answer', async () => {
+    const mut_progress: LoadedReport[] = [];
+
+    const { fetchImpl, release } = holding(
+      report([
+        pullRequest({ number: 7 }),
+        pullRequest({ number: 8, baseRefName: 'branch-7' }),
+      ]),
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+        compare_8: { compare: { aheadBy: 1, behindBy: 2 } },
+      }),
+    );
+
+    const loading = loadReport(REPORT_SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl,
+      onProgress: (progress) => {
+        mut_progress.push(progress);
+      },
+    });
+
+    await ticks();
+
+    // Nothing to draw a merge order from yet.
+    assert.deepStrictEqual(mut_progress, []);
+
+    await release('PullRequests');
+
+    const drawn = mut_progress.at(-1);
+
+    assert.isDefined(drawn);
+
+    assert.deepStrictEqual(
+      drawn.roots.map(({ number, children }) => [
+        number,
+        children.map((child) => child.number),
+      ]),
+      [[7, [8]]],
+    );
+
+    assert.deepStrictEqual(drawn.entries[0]?.reading, [
+      'checks',
+      'comparison',
+      'details',
+    ]);
+
+    assert.deepStrictEqual(drawn.summary, {
+      open: 2,
+      queued: 0,
+      draft: 0,
+      failing: undefined,
+      behind: undefined,
+      setAside: undefined,
+      awaitingReview: undefined,
+    });
+
+    assert.deepStrictEqual(drawn.reading, ['merged', 'issues']);
+
+    await release('Checks');
+
+    const checked = mut_progress.at(-1);
+
+    assert.deepStrictEqual(checked?.entries[0]?.reading, [
+      'comparison',
+      'details',
+    ]);
+
+    assert.strictEqual(checked?.entries[0]?.checks.verdict, 'passed');
+
+    assert.strictEqual(checked?.summary.failing, 0);
+
+    await release('PullRequestDetails');
+
+    await release('MergedPullRequests');
+
+    await release('OpenIssues');
+
+    assert.strictEqual(mut_progress.length, 5);
+
+    await release('Compare');
+
+    const { result } = await loading;
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.deepStrictEqual(
+      result.value.entries.map(({ reading }) => reading),
+      [[], []],
+    );
+
+    assert.deepStrictEqual(result.value.reading, []);
+
+    assert.strictEqual(result.value.summary.behind, 1);
+
+    // The last part to answer is the read's own answer, not progress.
+    assert.strictEqual(mut_progress.length, 5);
+  });
+
+  test('leaves the checks being read when they are of another head', async () => {
+    const { fetchImpl } = answering(
+      {
+        ...report([pullRequest({ number: 7, headRefOid: 'pushed' })]),
+        // A push landed between the two queries.
+        ...answer('Checks', {
+          open: { nodes: [pullRequest({ number: 7, headRefOid: 'before' })] },
+        }),
+      },
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.deepStrictEqual(loaded.entries[0]?.reading, ['checks']);
+
+    assert.isUndefined(loaded.summary.failing);
+  });
+
+  test('fails the read when a part does, after handing over what answered', async () => {
+    const mut_progress: LoadedReport[] = [];
+
+    const { fetchImpl } = answering(
+      {
+        ...report([pullRequest({ number: 7 })]),
+        Checks: [{ data: null, errors: [{ message: 'Something went wrong' }] }],
+      },
+      answer('Compare', { compare_7: null }),
+    );
+
+    const { result } = await loadReport(REPORT_SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl,
+      onProgress: (progress) => {
+        mut_progress.push(progress);
+      },
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, 'Something went wrong');
+
+    assert.isTrue(Arr.isNonEmpty(mut_progress));
+  });
+
   test('reads when the head was committed, beside when anything changed', async () => {
     const { fetchImpl } = answering(
       report([
         pullRequest({ number: 7, committedDate: '2026-09-21T03:04:05Z' }),
       ]),
-      followUpAnswer({ compare_7: { compare: { aheadBy: 1, behindBy: 0 } } }),
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
     );
 
     const loaded = await load(fetchImpl);
@@ -85,7 +285,9 @@ describe(loadReport, () => {
           ],
         }),
       ]),
-      followUpAnswer({ compare_7: { compare: { aheadBy: 1, behindBy: 0 } } }),
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
     );
 
     const loaded = await load(fetchImpl);
@@ -135,7 +337,9 @@ describe(loadReport, () => {
           ],
         }),
       ]),
-      followUpAnswer({ compare_7: { compare: { aheadBy: 1, behindBy: 0 } } }),
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
     );
 
     const loaded = await load(fetchImpl);
@@ -209,28 +413,25 @@ describe(loadReport, () => {
     const loaded = await load(fetchImpl, ISSUES_LIMIT + ISSUES_PAGE_SIZE + 1);
 
     assert.deepStrictEqual(
-      Arr.tail(sent).map(({ query, variables }) => ({
-        named: query.startsWith('query OpenIssues('),
-        variables,
-      })),
+      named(sent, 'OpenIssues').map(({ variables }) => variables),
       [
         {
-          named: true,
-          variables: {
-            owner: 'noshiro-pf',
-            name: 'mono',
-            first: ISSUES_PAGE_SIZE,
-            after: 'cursor-2',
-          },
+          owner: 'noshiro-pf',
+          name: 'mono',
+          first: ISSUES_LIMIT,
+          after: null,
         },
         {
-          named: true,
-          variables: {
-            owner: 'noshiro-pf',
-            name: 'mono',
-            first: 1,
-            after: 'cursor-4',
-          },
+          owner: 'noshiro-pf',
+          name: 'mono',
+          first: ISSUES_PAGE_SIZE,
+          after: 'cursor-2',
+        },
+        {
+          owner: 'noshiro-pf',
+          name: 'mono',
+          first: 1,
+          after: 'cursor-4',
         },
       ],
     );
@@ -253,7 +454,7 @@ describe(loadReport, () => {
 
     const loaded = await load(fetchImpl, 500);
 
-    assert.strictEqual(sent.length, 2);
+    assert.strictEqual(named(sent, 'OpenIssues').length, 2);
 
     assert.deepStrictEqual(
       loaded.issues.items.map(({ number }) => number),
@@ -263,14 +464,14 @@ describe(loadReport, () => {
     assert.isUndefined(loaded.issues.endCursor);
   });
 
-  test('asks for no more open issues than the report query lists by default', async () => {
+  test('asks for no more open issues than a read lists by default', async () => {
     const { fetchImpl, sent } = answering(
       report([], [], 0, issuePage(250, [1, 2], 'cursor-2')),
     );
 
     const loaded = await load(fetchImpl);
 
-    assert.strictEqual(sent.length, 1);
+    assert.strictEqual(named(sent, 'OpenIssues').length, 1);
 
     assert.strictEqual(loaded.issues.endCursor, 'cursor-2');
   });
@@ -278,7 +479,9 @@ describe(loadReport, () => {
   test('fails the read when a page of open issues cannot be read', async () => {
     const { fetchImpl } = answering(
       report([], [], 0, issuePage(250, [1, 2], 'cursor-2')),
-      { data: { repository: { issues: { totalCount: 250 } } } },
+      {
+        OpenIssues: [{ data: { repository: { issues: { totalCount: 250 } } } }],
+      },
     );
 
     const { result } = await loadReport(REPORT_SOURCE, {
@@ -302,7 +505,7 @@ describe(loadReport, () => {
         }),
         pullRequest({ number: 8 }),
       ]),
-      followUpAnswer({ compare_7: null, compare_8: null }),
+      answer('Compare', { compare_7: null, compare_8: null }),
     );
 
     const loaded = await load(fetchImpl);
@@ -330,7 +533,7 @@ describe(loadReport, () => {
           ],
         }),
       ]),
-      followUpAnswer({ compare_7: null }),
+      answer('Compare', { compare_7: null }),
     );
 
     const loaded = await load(fetchImpl);
@@ -359,8 +562,10 @@ describe(loadReport, () => {
           contextsAfter: 'cursor-1',
         }),
       ]),
-      followUpAnswer({
+      answer('Compare', {
         compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
+      answer('MoreChecks', {
         contexts_7: {
           statusCheckRollup: {
             contexts: {
@@ -381,7 +586,10 @@ describe(loadReport, () => {
 
     const loaded = await load(fetchImpl);
 
-    assert.strictEqual(sent[1]?.variables['contexts_7_after'], 'cursor-1');
+    assert.strictEqual(
+      named(sent, 'MoreChecks')[0]?.variables['contexts_7_after'],
+      'cursor-1',
+    );
 
     assert.deepStrictEqual(loaded.entries[0]?.checks.pending, [
       'no-skip-ci-label',
@@ -393,7 +601,9 @@ describe(loadReport, () => {
       report([
         pullRequest({ number: 7, files: ['.github/workflows/release.yml'] }),
       ]),
-      followUpAnswer({ compare_7: { compare: { aheadBy: 1, behindBy: 0 } } }),
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
     );
 
     const loaded = await load(fetchImpl);
@@ -427,7 +637,7 @@ describe(loadReport, () => {
         }),
         pullRequest({ number: 9 }),
       ]),
-      followUpAnswer({
+      answer('Compare', {
         compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
         compare_8: { compare: { aheadBy: 1, behindBy: 0 } },
         compare_9: { compare: { aheadBy: 1, behindBy: 0 } },
@@ -477,7 +687,7 @@ describe(loadReport, () => {
           ],
         }),
       ]),
-      followUpAnswer({
+      answer('Compare', {
         compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
         compare_8: { compare: { aheadBy: 1, behindBy: 0 } },
         compare_9: { compare: { aheadBy: 1, behindBy: 0 } },
@@ -501,7 +711,7 @@ describe(loadReport, () => {
         pullRequest({ number: 9, baseRefName: 'branch-10' }),
         pullRequest({ number: 10, isCrossRepository: true }),
       ]),
-      followUpAnswer({
+      answer('Compare', {
         compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
         compare_8: { compare: { aheadBy: 1, behindBy: 0 } },
         compare_9: { compare: { aheadBy: 1, behindBy: 0 } },
@@ -512,7 +722,7 @@ describe(loadReport, () => {
     const loaded = await load(fetchImpl);
 
     assert.strictEqual(
-      sent[1]?.variables['compare_8_base'],
+      named(sent, 'Compare')[0]?.variables['compare_8_base'],
       'refs/heads/branch-7',
     );
 
@@ -603,17 +813,19 @@ describe(loadReport, () => {
           bodyHTML: keywordHtml('Closes', 2043),
         }),
       ]),
-      followUpAnswer({ compare_1962: null }),
-      followUpAnswer({ issue_2043: closes(2043, 'noshiro-pf/mono', 'OPEN') }),
+      answer('Compare', { compare_1962: null }),
+      answer('Issues', { issue_2043: closes(2043, 'noshiro-pf/mono', 'OPEN') }),
     );
 
     const loaded = await load(fetchImpl);
 
-    assert.strictEqual(sent.length, 3);
+    const described = named(sent, 'Issues');
 
-    assert.isTrue(sent[2]?.query.includes('issue_2043: issue(') ?? false);
+    assert.strictEqual(described.length, 1);
 
-    assert.strictEqual(sent[2]?.variables['issue_2043'], 2043);
+    assert.isTrue(described[0]?.query.includes('issue_2043: issue(') ?? false);
+
+    assert.strictEqual(described[0]?.variables['issue_2043'], 2043);
 
     assert.deepStrictEqual(loaded.entries[0]?.linkedIssues, [
       {
@@ -644,12 +856,12 @@ describe(loadReport, () => {
           ),
         ],
       ),
-      followUpAnswer({ compare_2126: null }),
+      answer('Compare', { compare_2126: null }),
     );
 
     const loaded = await load(fetchImpl);
 
-    assert.strictEqual(sent.length, 2);
+    assert.deepStrictEqual(named(sent, 'Issues'), []);
 
     assert.deepStrictEqual(
       loaded.entries[0]?.linkedIssues.map(({ number, state }) => ({
@@ -680,12 +892,12 @@ describe(loadReport, () => {
           ),
         ],
       ),
-      followUpAnswer({ issue_1995: closes(1995, 'noshiro-pf/mono') }),
+      answer('Issues', { issue_1995: closes(1995, 'noshiro-pf/mono') }),
     );
 
     const loaded = await load(fetchImpl);
 
-    assert.strictEqual(sent.length, 2);
+    assert.strictEqual(named(sent, 'Issues').length, 1);
 
     assert.deepStrictEqual(
       loaded.merged[0]?.linkedIssues.map(({ number }) => number),
@@ -702,13 +914,18 @@ describe(loadReport, () => {
           bodyHTML: keywordHtml('Closes', 2043),
         }),
       ]),
-      followUpAnswer({ compare_1962: null }),
+      answer('Compare', { compare_1962: null }),
       {
-        data: { repository: { issue_2043: null } },
-        errors: [
+        Issues: [
           {
-            message: 'Could not resolve to an Issue with the number of 2043.',
-            path: ['repository', 'issue_2043'],
+            data: { repository: { issue_2043: null } },
+            errors: [
+              {
+                message:
+                  'Could not resolve to an Issue with the number of 2043.',
+                path: ['repository', 'issue_2043'],
+              },
+            ],
           },
         ],
       },
@@ -765,21 +982,13 @@ describe(loadReport, () => {
   });
 
   test('sends the token, and reads the budget GitHub reports back', async () => {
-    const mut_headers: FetchInit['headers'][] = [];
+    const mut_remaining = [4990, 4988, 4989, 4987];
 
-    const fetchImpl: Fetch = (_, init) => {
-      mut_headers.push(init.headers);
-
-      return Promise.resolve(
-        Response.json(report([]), {
-          headers: {
-            'x-ratelimit-remaining': '4990',
-            'x-ratelimit-limit': '5000',
-            'x-ratelimit-reset': '1790000000',
-          },
-        }),
-      );
-    };
+    const { fetchImpl, sent } = answering(report([]), {}, () => ({
+      'x-ratelimit-remaining': String(mut_remaining.shift() ?? 4999),
+      'x-ratelimit-limit': '5000',
+      'x-ratelimit-reset': '1790000000',
+    }));
 
     const { rateLimit } = await loadReport(REPORT_SOURCE, {
       token: 'secret',
@@ -787,10 +996,13 @@ describe(loadReport, () => {
       fetchImpl,
     });
 
-    assert.strictEqual(mut_headers[0]?.['Authorization'], 'Bearer secret');
+    assert.isTrue(
+      sent.every(({ headers }) => headers['Authorization'] === 'Bearer secret'),
+    );
 
+    // The parts answer in no particular order; the least left is the latest.
     assert.deepStrictEqual(rateLimit, {
-      remaining: 4990,
+      remaining: 4987,
       limit: 5000,
       resetEpochMs: 1_790_000_000_000,
     });
@@ -830,7 +1042,9 @@ describe(loadIssuePage, () => {
   });
 
   test('says so when the answer is not a page of issues', async () => {
-    const { fetchImpl } = answering({ data: { repository: {} } });
+    const { fetchImpl } = answering({
+      OpenIssues: [{ data: { repository: {} } }],
+    });
 
     const { result } = await loadIssuePage(REPORT_SOURCE, {
       token: 'token',
@@ -914,44 +1128,130 @@ const load = async (
   return result.value;
 };
 
+/** What to answer each query with, by its operation name, in turn. */
+type Answers = ReadonlyRecord<string, readonly unknown[]>;
+
+type Sent = Readonly<{
+  /** The operation name, `PullRequests` for `query PullRequests(…`. */
+  operation: string;
+  query: string;
+  variables: ReadonlyRecord<string, unknown>;
+  headers: FetchInit['headers'];
+}>;
+
 /**
- * A `fetch` that answers each request with the next of `bodies`, and keeps
- * what it was asked.
+ * A `fetch` that answers each query with the next answer `parts` give for
+ * its name — `{}` once they run out — and keeps what it was asked. By name
+ * rather than by order, because the parts of a read go out together and
+ * answer in whatever order they finish.
  */
 const answering = (
-  ...bodies: readonly unknown[]
-): Readonly<{
-  fetchImpl: Fetch;
-  sent: readonly Readonly<{
-    query: string;
-    variables: ReadonlyRecord<string, unknown>;
-  }>[];
-}> => {
-  const mut_sent: Readonly<{
-    query: string;
-    variables: ReadonlyRecord<string, unknown>;
-  }>[] = [];
+  ...parts: readonly (Answers | (() => ReadonlyRecord<string, string>))[]
+): Readonly<{ fetchImpl: Fetch; sent: readonly Sent[] }> => {
+  const mut_sent: Sent[] = [];
+
+  const answers = parts.filter((part) => typeof part !== 'function');
+
+  const headersOf = parts.find((part) => typeof part === 'function');
 
   const fetchImpl: Fetch = (_, init) => {
-    const parsed = Json.parse(init.body);
+    const sent = sentOf(init);
 
-    const request = Result.isOk(parsed) ? parsed.value : undefined;
+    const answered = named(mut_sent, sent.operation).length;
 
-    const variables = isRecord(request) ? request['variables'] : undefined;
+    mut_sent.push(sent);
 
-    mut_sent.push({
-      query:
-        isRecord(request) && typeof request['query'] === 'string'
-          ? request['query']
-          : '',
-      variables: isRecord(variables) ? variables : {},
-    });
+    const body =
+      answers.flatMap((part) => part[sent.operation] ?? [])[answered] ?? {};
 
-    return Promise.resolve(Response.json(bodies[mut_sent.length - 1] ?? {}));
+    return Promise.resolve(
+      Response.json(body, {
+        ...(headersOf === undefined ? {} : { headers: headersOf() }),
+      }),
+    );
   };
 
   return { fetchImpl, sent: mut_sent };
 };
+
+const sentOf = (init: FetchInit): Sent => {
+  const parsed = Json.parse(init.body);
+
+  const request = Result.isOk(parsed) ? parsed.value : undefined;
+
+  const variables = isRecord(request) ? request['variables'] : undefined;
+
+  const query =
+    isRecord(request) && typeof request['query'] === 'string'
+      ? request['query']
+      : '';
+
+  return {
+    operation: /^query (\w+)/u.exec(query)?.[1] ?? '',
+    query,
+    variables: isRecord(variables) ? variables : {},
+    headers: init.headers,
+  };
+};
+
+/**
+ * {@link answering}, but each answer is held back until `release` is called
+ * with its query's name, so that a test can say which part answers first.
+ */
+const holding = (
+  ...parts: readonly Answers[]
+): Readonly<{
+  fetchImpl: Fetch;
+  /** The names of the queries sent so far, in the order they were sent. */
+  asked: () => readonly string[];
+  /** Answers every query sent so far as `operation`, and lets them land. */
+  release: (operation: string) => Promise<void>;
+}> => {
+  const { fetchImpl: answerNow } = answering(...parts);
+
+  const mut_held: Readonly<{ operation: string; release: () => void }>[] = [];
+
+  const fetchImpl: Fetch = async (route, init) =>
+    new Promise((resolve) => {
+      mut_held.push({
+        operation: sentOf(init).operation,
+        release: () => {
+          resolve(answerNow(route, init));
+        },
+      });
+    });
+
+  return {
+    fetchImpl,
+    asked: () => mut_held.map(({ operation }) => operation),
+    release: async (operation) => {
+      for (const held of mut_held) {
+        if (held.operation === operation) {
+          // Resolving a promise twice is no more than resolving it once.
+          held.release();
+        }
+      }
+
+      await ticks();
+    },
+  };
+};
+
+/** Lets every answer already given land, and what follows from it run. */
+const ticks = async (): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, 0);
+  });
+
+/** What was sent as `operation`, in the order it was sent. */
+const named = (sent: readonly Sent[], operation: string): readonly Sent[] =>
+  sent.filter((each) => each.operation === operation);
+
+/** One answer to the query `operation`, its fields under `repository`. */
+const answer = (
+  operation: string,
+  fields: ReadonlyRecord<string, unknown>,
+): Answers => ({ [operation]: [{ data: { repository: fields } }] }) as const;
 
 const RULESET = JSON.stringify({
   rules: [
@@ -971,23 +1271,28 @@ const RULESET = JSON.stringify({
   ],
 });
 
+/**
+ * Every query a read sends but the follow-ups, answered from one set of
+ * pull requests: each of the three that list them is handed the whole node
+ * and reads the fields it asks for.
+ */
 const report = (
   openNodes: readonly unknown[],
   mergedNodes: readonly unknown[] = [],
   totalCount: number = openNodes.length,
   issues: unknown = NO_ISSUES,
-): unknown =>
+): Answers =>
   ({
-    data: {
-      repository: {
-        defaultBranchRef: { name: 'main' },
-        ruleset: { text: RULESET },
-        codeOwners: { text: '/.github/workflows/ @noshiro-pf\n' },
-        open: { totalCount, nodes: openNodes },
-        merged: { nodes: mergedNodes },
-        issues,
-      },
-    },
+    ...answer('PullRequests', {
+      defaultBranchRef: { name: 'main' },
+      ruleset: { text: RULESET },
+      codeOwners: { text: '/.github/workflows/ @noshiro-pf\n' },
+      open: { totalCount, nodes: openNodes },
+    }),
+    ...answer('Checks', { open: { nodes: openNodes } }),
+    ...answer('PullRequestDetails', { open: { nodes: openNodes } }),
+    ...answer('MergedPullRequests', { merged: { nodes: mergedNodes } }),
+    ...issuesAnswer(issues),
   }) as const;
 
 const NO_ISSUES = {
@@ -1011,10 +1316,8 @@ const issuePage = (
     nodes: numbers.map((number) => openIssue(number, [])),
   }) as const;
 
-const issuesAnswer = (page: unknown): unknown =>
-  ({
-    data: { repository: { issues: page } },
-  }) as const;
+const issuesAnswer = (page: unknown): Answers =>
+  answer('OpenIssues', { issues: page });
 
 const openIssue = (number: number, labels: readonly string[]): unknown =>
   ({
@@ -1032,11 +1335,6 @@ const openIssue = (number: number, labels: readonly string[]): unknown =>
       })),
     },
     comments: { totalCount: 3 },
-  }) as const;
-
-const followUpAnswer = (fields: ReadonlyRecord<string, unknown>): unknown =>
-  ({
-    data: { repository: fields },
   }) as const;
 
 /** A finished suite no workflow made, which is how a codecov run reads. */

@@ -25,6 +25,7 @@ import {
   type IssueList,
   type LoadedReport,
   type PageSummary,
+  type SectionPart,
 } from '../load-report.mjs';
 import {
   asRefreshing,
@@ -39,11 +40,16 @@ import type { StoredToken } from '../token.mjs';
 
 export type ReaderDeps = Readonly<{
   token: InitializedObservable<StoredToken | undefined>;
-  /** A read of the report, listing the first `issueCount` open issues. */
+  /**
+   * A read of the report, listing the first `issueCount` open issues. When
+   * `onProgress` is given, it is handed the report as it stands each time a
+   * part of it answers before the last.
+   */
   load: (
     token: string,
     nowMs: number,
     issueCount: number,
+    onProgress: ((report: LoadedReport) => void) | undefined,
   ) => Promise<Answered<LoadedReport>>;
   /** The `first` open issues after `after`. */
   loadIssues: (
@@ -87,6 +93,8 @@ export type Reader = Readonly<{
   cycles: InitializedObservable<LoadedReport['cycles']>;
   merged: InitializedObservable<LoadedReport['merged']>;
   issues: InitializedObservable<LoadedReport['issues']>;
+  /** The sections below the merge order that have not answered yet. */
+  reading: InitializedObservable<readonly SectionPart[]>;
   /** How the last {@link loadMoreIssues} went. */
   moreIssues: InitializedObservable<MoreIssuesStatus>;
   /** What GitHub last said was left of the budget. */
@@ -175,6 +183,10 @@ export const createReader = (deps: ReaderDeps): Reader => {
     { equals: fastDeepEqual },
   );
 
+  const [reading, setReading] = createState(EMPTY_PARTS.reading, {
+    equals: fastDeepEqual,
+  });
+
   const [moreIssues, setMoreIssues, { getSnapshot: getMoreIssues }] =
     createState<MoreIssuesStatus>(MORE_ISSUES_IDLE, { equals: fastDeepEqual });
 
@@ -202,6 +214,8 @@ export const createReader = (deps: ReaderDeps): Reader => {
     if (withIssues) {
       setIssues(report.issues);
     }
+
+    setReading(report.reading);
   };
 
   const currentToken = (): string | undefined =>
@@ -217,6 +231,11 @@ export const createReader = (deps: ReaderDeps): Reader => {
     const startedAtMs = now();
 
     const issueCount = getIssueCount();
+
+    // A page with nothing on it yet is drawn as the parts of the first read
+    // answer, the merge order first; once it shows a report, a read replaces
+    // it whole, so that a poll never puts a placeholder where data was.
+    const progressive = getLoadStatus().type !== 'ready';
 
     // An answer for a token the reader has since forgotten or replaced is
     // dropped: it would put back a report they asked to take away.
@@ -245,7 +264,32 @@ export const createReader = (deps: ReaderDeps): Reader => {
       setLoadStatus(settled.status);
     };
 
-    load(tokenValue, startedAtMs, issueCount)
+    const onProgress = progressive
+      ? (partial: LoadedReport): void => {
+          if (currentToken() !== tokenValue) {
+            return;
+          }
+
+          const settled = settle(
+            getLoadStatus(),
+            getReadAt(),
+            Result.ok(partial),
+            startedAtMs,
+          );
+
+          if (settled.report === undefined) {
+            return;
+          }
+
+          setNowMs(now());
+
+          writeReport(settled.report, issueCount >= getIssueCount());
+
+          setLoadStatus(settled.status);
+        }
+      : undefined;
+
+    load(tokenValue, startedAtMs, issueCount, onProgress)
       .then(({ result, rateLimit: answeredLimit }) => {
         apply(result, answeredLimit);
       })
@@ -409,6 +453,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     cycles,
     merged,
     issues,
+    reading,
     moreIssues,
     rateLimit,
     nowMs,
@@ -428,6 +473,7 @@ type ReportParts = StrictPick<
   | 'cycles'
   | 'merged'
   | 'issues'
+  | 'reading'
 >;
 
 /** What the page shows while there is no report. */
@@ -447,6 +493,7 @@ const EMPTY_PARTS: ReportParts = {
   cycles: [],
   merged: [],
   issues: { items: [], totalCount: 0, endCursor: undefined },
+  reading: [],
 } as const;
 
 const MORE_ISSUES_IDLE: MoreIssuesStatus = { type: 'idle' } as const;

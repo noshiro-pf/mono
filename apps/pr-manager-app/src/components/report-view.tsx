@@ -40,6 +40,13 @@ export const ReportView = memoNamed('ReportView', () => {
 
   const issues = readerSignals.issues.value;
 
+  // The sections below the merge order that have not answered yet.
+  const reading = readerSignals.reading.value;
+
+  const readingMerged = reading.includes('merged');
+
+  const readingIssues = reading.includes('issues');
+
   // One object while the parts stay the same, so that `BlockLayout` is not
   // handed a new one on every render.
   const blocks = useMemo<ReadonlyRecord<BlockId, ComponentChildren>>(
@@ -69,10 +76,26 @@ export const ReportView = memoNamed('ReportView', () => {
           ) : undefined}
         </>
       ),
-      merged: <MergedSection merged={merged} withinDays={MERGED_WITHIN_DAYS} />,
-      issues: <IssuesSection issues={issues} />,
+      merged: (
+        <MergedSection
+          merged={merged}
+          reading={readingMerged}
+          withinDays={MERGED_WITHIN_DAYS}
+        />
+      ),
+      issues: <IssuesSection issues={issues} reading={readingIssues} />,
     }),
-    [entries, byNumber, scaleMax, roots, cycles, merged, issues],
+    [
+      entries,
+      byNumber,
+      scaleMax,
+      roots,
+      cycles,
+      merged,
+      issues,
+      readingMerged,
+      readingIssues,
+    ],
   );
 
   return <BlockLayout blocks={blocks} />;

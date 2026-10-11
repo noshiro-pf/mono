@@ -6,6 +6,8 @@ import { Num } from 'ts-data-forge';
 type Props = Readonly<{
   /** Absent when GitHub could not compare them. */
   comparison: Comparison | undefined;
+  /** Whether the comparison has not been read yet. */
+  reading: boolean;
   /**
    * The largest count on either side anywhere in the report, so that a bar on
    * one card can be compared with a bar on another. A per-card scale would
@@ -32,7 +34,7 @@ type Props = Readonly<{
 export const CommitDivergence = memoNamed<Props>(
   'CommitDivergence',
   (props) => {
-    const { comparison, scaleMax, baseRef } = props;
+    const { comparison, reading, scaleMax, baseRef } = props;
 
     const behind = useMemo(
       () => ({ inlineSize: share(comparison?.behindBy ?? 0, scaleMax) }),
@@ -43,6 +45,12 @@ export const CommitDivergence = memoNamed<Props>(
       () => ({ inlineSize: share(comparison?.aheadBy ?? 0, scaleMax) }),
       [comparison?.aheadBy, scaleMax],
     );
+
+    if (reading) {
+      return (
+        <span className={'divergence-unread'}>{'reading ahead/behind…'}</span>
+      );
+    }
 
     if (comparison === undefined) {
       return (

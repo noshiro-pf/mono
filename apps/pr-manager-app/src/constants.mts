@@ -14,11 +14,12 @@ export const repositoryUrl = (source: ReportSource): string =>
 /**
  * How often the page reads GitHub again while it is on screen.
  *
- * **Set by the GraphQL budget.** A read is the report query plus its
- * follow-up, about 5 points measured against this repository, and GraphQL
- * has no conditional request: a read that finds nothing new costs the same
- * as one that finds everything. Every fifteen seconds is 240 reads an hour,
- * about 1,200 of the 5,000 points an account gets — which leaves the rest
+ * **Set by the GraphQL budget.** A read is one query per part of the page
+ * and a follow-up, about 9 points against this repository by GitHub's
+ * formula, and GraphQL has no conditional request: a read that finds
+ * nothing new costs the same as one that finds everything. Every fifteen
+ * seconds is 240 reads an hour, about 2,000 of the 5,000 points an account
+ * gets — which leaves the rest
  * for everything else that account does with GraphQL, `gh` included.
  *
  * **Refresh** is not bound by this. It reads at once, because a reader who

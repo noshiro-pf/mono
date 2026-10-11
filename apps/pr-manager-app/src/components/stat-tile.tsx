@@ -2,7 +2,8 @@ import { memoNamed } from 'preact-utils';
 import type { StatusRole } from '../verdict.mjs';
 
 type Props = Readonly<{
-  value: number;
+  /** `undefined` while what it counts is still being read. */
+  value: number | undefined;
   label: string;
   /**
    * Left off unless the number says something is wrong. A tile that is
@@ -29,7 +30,7 @@ export const StatTile = memoNamed<Props>(
   ({ value, label, tone, onToggle, pressed = true }) =>
     onToggle === undefined ? (
       <div className={'stat-tile'} data-status={tone}>
-        <span className={'stat-value'}>{value}</span>
+        <span className={'stat-value'}>{value ?? READING}</span>
         <span className={'stat-label'}>{label}</span>
       </div>
     ) : (
@@ -45,8 +46,11 @@ export const StatTile = memoNamed<Props>(
         type={'button'}
         onClick={onToggle}
       >
-        <span className={'stat-value'}>{value}</span>
+        <span className={'stat-value'}>{value ?? READING}</span>
         <span className={'stat-label'}>{label}</span>
       </button>
     ),
 );
+
+/** What a count reads while it is not known yet. */
+const READING = '…';
