@@ -84,6 +84,11 @@ Sorted by priority, the pull requests at each level of the tree are ordered
 by the highest priority in them or anywhere below them, since landing a high
 one means landing what holds it up first; none sits between mid and low.
 
+The counts and the switches below them **stay in view while the merge order
+scrolls under them** — under the toolbar when the header is folded — and
+leave with the merge order once it has scrolled past. On a screen too small
+to spare the room, they scroll away with it.
+
 What is hidden gives its place to what is shown below it, so a pull request
 waiting on a hidden one is drawn where that one was. And a pull request
 under more than one predecessor is expanded wherever it now comes first.

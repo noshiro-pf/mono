@@ -1,4 +1,5 @@
 import { memoNamed } from 'preact-utils';
+import { useMemo } from 'preact/hooks';
 import {
   ExternalLink,
   HeaderFoldToggle,
@@ -7,6 +8,7 @@ import {
   ReadFromGitHub,
   ThemeSwitch,
   TokenPanel,
+  useBorderBoxHeight,
   ViewSettings,
 } from './components/index.mjs';
 import { REPORT_SOURCE, repositoryUrl } from './constants.mjs';
@@ -35,7 +37,11 @@ import {
  * The header folds into a one-line toolbar that stays at the top of the
  * window (`HeaderFoldToggle`), for a reader who wants the room for the
  * report: the title shrinks, the token panel and the line saying when the
- * report was read go, and the actions stay where they were.
+ * report was read go, and the actions stay where they were. Its height is
+ * handed to the stylesheet as `--header-height`, which is how far below the
+ * top of the window the merge order's counts stop when they stay in view
+ * under it (`index.css`): the toolbar wraps onto a second line on a narrow
+ * screen, so that is not a length the stylesheet could know.
  */
 export const App = memoNamed('App', () => {
   const loadStatus = readerSignals.loadStatus.value;
@@ -53,9 +59,20 @@ export const App = memoNamed('App', () => {
 
   const ready = !noToken && loadStatus.type === 'ready';
 
+  const [headerRef, headerHeight] = useBorderBoxHeight<HTMLElement>();
+
+  const style = useMemo(
+    () => ({ '--header-height': `${headerHeight}px` }),
+    [headerHeight],
+  );
+
   return (
-    <main className={'page'} data-header={folded ? 'folded' : 'full'}>
-      <header className={'page-header'}>
+    <main
+      className={'page'}
+      data-header={folded ? 'folded' : 'full'}
+      style={style}
+    >
+      <header ref={headerRef} className={'page-header'}>
         {folded ? (
           <div className={'toolbar-title'}>
             <h1 className={'page-title'}>{'GitHub Pull Requests Manager'}</h1>

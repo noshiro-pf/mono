@@ -29,6 +29,7 @@ export * from './state-badge.js';
 export * from './theme-switch.js';
 export * from './timestamp.js';
 export * from './token-panel.js';
+export * from './use-border-box-height.mjs';
 export * from './verdict-badge.js';
 export * from './view-settings-row.js';
 export * from './view-settings.js';
