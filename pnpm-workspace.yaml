@@ -100,6 +100,20 @@ update:
     # review; it is not something a nightly dependency bump should carry.
     - pixi.js-legacy
 
+    # firebase 13's packages (`@firebase/app`, `@firebase/firestore`, ...)
+    # declare `engines.node >=24.12.0`, while `targets.minimum` is 22, so
+    # `pnpm install --engine-strict` fails on the minimum Node (#2154). Moving
+    # the floor is a decision of its own, and the port to 13 waits for it
+    # (#2217).
+    - firebase
+
+    # preact 11 changes the type `useRef` returns and when effects clean up
+    # on unmount, which breaks `apps/resize-observer-preact-hooks`'s types and
+    # `libs/synstate-preact-hooks`'s browser tests (#2154). The port, and what
+    # the published hooks' `preact: ">=10.0.0"` peer range should say, is
+    # #2218.
+    - preact
+
 minimumReleaseAge: 10080 # = 7 days
 
 # 除外は「方針」ではなく「一時的な waiver」として書く。名前だけで書くと、その
