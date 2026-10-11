@@ -1,4 +1,8 @@
-import { findMergeAfterCycles, parseMergeAfter } from './merge-after.mjs';
+import {
+  findMergeAfterCycles,
+  parseMergeAfter,
+  parseStartAfter,
+} from './merge-after.mjs';
 
 describe(parseMergeAfter, () => {
   test('reads one reference from a trailer', () => {
@@ -106,6 +110,30 @@ describe(parseMergeAfter, () => {
 
   test('does not read a number that runs on into a word', () => {
     assert.deepStrictEqual(parseMergeAfter('Merge-After: #5a, #6\n'), [6]);
+  });
+});
+
+describe(parseStartAfter, () => {
+  test('reads its own trailer as Merge-After is read', () => {
+    assert.deepStrictEqual(
+      parseStartAfter(
+        'Waits for the parser.\n\nStart-After: #2162 #2207\nstart-after: other/repo#5, #2162\n',
+      ),
+      [2162, 2207],
+    );
+  });
+
+  test('and not the other one’s', () => {
+    assert.deepStrictEqual(parseStartAfter('Merge-After: #1901\n'), []);
+
+    assert.deepStrictEqual(parseMergeAfter('Start-After: #1901\n'), []);
+  });
+
+  test('ignores a declaration inside a fenced code block', () => {
+    assert.deepStrictEqual(
+      parseStartAfter(['```md', 'Start-After: #2113', '```', ''].join('\n')),
+      [],
+    );
   });
 });
 

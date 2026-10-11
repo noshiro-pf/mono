@@ -10,7 +10,7 @@ type Props = Readonly<{
    * a caller passing one is a caller reaching across this boundary to style
    * what is on the other side of it.
    */
-  variant?: 'pull-request-title' | 'split-view';
+  variant?: 'issue-dag-link' | 'pull-request-title' | 'split-view';
   /** `open` / `closed` / `unknown`, for the linked issue chips. */
   dataState?: string;
   title?: string;

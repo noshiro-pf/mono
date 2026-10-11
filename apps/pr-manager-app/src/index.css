@@ -140,11 +140,13 @@ a:focus-visible {
 
 /*
  * A segmented control: one outline around both looks, a hairline between
- * them, and the pressed one filled. A `<fieldset>` for the group role, with
+ * them, and the pressed one filled — the theme's, and the issues block's
+ * choice between the list and the DAG. A `<fieldset>` for the group role, with
  * its own margin and padding taken off. Each option is laid out like a badge, the
  * glyph and the word beside it.
  */
-.theme-switch {
+.theme-switch,
+.view-switch {
   border: 1px solid var(--baseline);
   border-radius: var(--radius);
   display: inline-flex;
@@ -154,7 +156,8 @@ a:focus-visible {
   padding: 0;
 }
 
-.theme-switch-option {
+.theme-switch-option,
+.view-switch-option {
   align-items: center;
   background: var(--surface);
   border: none;
@@ -167,22 +170,26 @@ a:focus-visible {
   padding: 0.35rem 0.75rem;
 }
 
-.theme-switch-option + .theme-switch-option {
+.theme-switch-option + .theme-switch-option,
+.view-switch-option + .view-switch-option {
   border-left: 1px solid var(--baseline);
 }
 
-.theme-switch-option:hover:not([aria-pressed='true']) {
+.theme-switch-option:hover:not([aria-pressed='true']),
+.view-switch-option:hover:not([aria-pressed='true']) {
   color: var(--accent);
 }
 
-.theme-switch-option[aria-pressed='true'] {
+.theme-switch-option[aria-pressed='true'],
+.view-switch-option[aria-pressed='true'] {
   background: var(--hairline);
   color: var(--ink-primary);
   cursor: default;
   font-weight: 600;
 }
 
-.theme-switch-option:focus-visible {
+.theme-switch-option:focus-visible,
+.view-switch-option:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
@@ -1025,6 +1032,217 @@ a:focus-visible {
 .poll-error {
   color: var(--status-critical);
   font-size: 0.8125rem;
+}
+
+/* --- the issues as a DAG ---------------------------------------------- */
+
+.issues-toolbar {
+  margin: 0 0 0.75rem;
+}
+
+.view-switch-option {
+  font-size: 0.8125rem;
+  padding: 0.25rem 0.75rem;
+}
+
+/*
+ * The colours of where a node stands, as the task manager's DAG has them:
+ * green for what can be started, amber and dashed for what waits, blue for
+ * what is being worked on, grey for what is over. A tint of the colour
+ * fills the shape and the colour itself draws its outline; the words are in
+ * the legend and the tooltip, so the colour never says it alone.
+ */
+.issue-dag {
+  --dag-good: light-dark(#1c6e42, #3fb27f);
+  --dag-waiting: light-dark(#935610, #f0b35a);
+  --dag-attention: light-dark(#b4501f, #ec835a);
+  --dag-critical: var(--status-critical);
+  --dag-progress: var(--accent);
+  --dag-over: var(--ink-muted);
+}
+
+.issue-dag-legend {
+  color: var(--ink-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  gap: 0.35rem 1rem;
+  list-style: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+}
+
+.issue-dag-legend li {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.issue-dag-swatch {
+  --dag-colour: var(--baseline);
+
+  background: color-mix(in srgb, var(--dag-colour) 16%, var(--surface));
+  border: 1.5px solid var(--dag-colour);
+  border-radius: 3px;
+  display: inline-block;
+  height: 0.75rem;
+  width: 1.25rem;
+}
+
+.issue-dag-swatch[data-shape='issue'] {
+  border-radius: 999px;
+}
+
+.issue-dag-swatch[data-shape='pull-request'] {
+  background: color-mix(in srgb, var(--ink-secondary) 45%, var(--surface));
+  border: 0;
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+}
+
+.issue-dag-swatch[data-edge='closes'] {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  border-top: 2px dashed var(--dag-progress);
+  height: 0;
+}
+
+.issue-dag-scroll {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  max-height: 70vh;
+  overflow: auto;
+}
+
+.issue-dag-svg {
+  display: block;
+  font-family: var(--font-sans);
+}
+
+.issue-dag-edge {
+  fill: none;
+  stroke: var(--ink-secondary);
+  stroke-width: 1.5;
+}
+
+.issue-dag-edge[data-settled='true'] {
+  stroke: var(--baseline);
+}
+
+.issue-dag-edge[data-kind='closes'] {
+  stroke: var(--dag-progress);
+  stroke-dasharray: 5 4;
+}
+
+.issue-dag-arrow {
+  fill: var(--ink-secondary);
+}
+
+.issue-dag-group-label {
+  fill: var(--ink-secondary);
+  font-size: 12px;
+}
+
+.issue-dag-link {
+  cursor: pointer;
+  outline: none;
+}
+
+.issue-dag-node {
+  --dag-colour: var(--baseline);
+}
+
+.issue-dag-shape {
+  fill: color-mix(in srgb, var(--dag-colour) 14%, var(--surface));
+  stroke: var(--dag-colour);
+  stroke-width: 1.5;
+}
+
+.issue-dag-title {
+  fill: var(--ink-primary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.issue-dag-link:hover .issue-dag-shape {
+  fill: color-mix(in srgb, var(--dag-colour) 28%, var(--surface));
+}
+
+.issue-dag-link:hover .issue-dag-title {
+  text-decoration: underline;
+}
+
+.issue-dag-link:focus-visible .issue-dag-shape {
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+
+.issue-dag [data-state='free'],
+.issue-dag [data-state='ready'] {
+  --dag-colour: var(--dag-good);
+}
+
+/* What has just become startable stands out from what always was. */
+.issue-dag-node[data-state='ready'] .issue-dag-shape {
+  stroke-width: 3;
+}
+
+.issue-dag [data-state='in-progress'] {
+  --dag-colour: var(--dag-progress);
+}
+
+.issue-dag [data-state='blocked'] {
+  --dag-colour: var(--dag-waiting);
+}
+
+.issue-dag-node[data-state='blocked'] .issue-dag-shape {
+  stroke-dasharray: 5 3;
+}
+
+.issue-dag-swatch[data-state='blocked'] {
+  border-style: dashed;
+}
+
+.issue-dag [data-state='attention'] {
+  --dag-colour: var(--dag-attention);
+}
+
+.issue-dag [data-state='cycle'] {
+  --dag-colour: var(--dag-critical);
+}
+
+/*
+ * An open pull request is work under way; an open issue past the end of the
+ * list is drawn neutral, its own declarations unread.
+ */
+.issue-dag [data-state='open'][data-kind='pull-request'] {
+  --dag-colour: var(--dag-progress);
+}
+
+.issue-dag [data-state='done'],
+.issue-dag [data-state='abandoned'],
+.issue-dag [data-state='unknown'] {
+  --dag-colour: var(--dag-over);
+}
+
+.issue-dag-node[data-state='done'] .issue-dag-title,
+.issue-dag-node[data-state='abandoned'] .issue-dag-title,
+.issue-dag-node[data-state='unknown'] .issue-dag-title {
+  fill: var(--ink-secondary);
+}
+
+.issue-dag-node[data-state='abandoned'] .issue-dag-title {
+  text-decoration: line-through;
+}
+
+.issue-dag-node[data-state='abandoned'] .issue-dag-shape,
+.issue-dag-node[data-state='unknown'] .issue-dag-shape {
+  stroke-dasharray: 2 3;
+}
+
+.issue-dag-swatch[data-state='abandoned'],
+.issue-dag-swatch[data-state='unknown'] {
+  border-style: dashed;
 }
 
 /* --- the token panel ---------------------------------------------------- */

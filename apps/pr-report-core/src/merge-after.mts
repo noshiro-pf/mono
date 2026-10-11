@@ -1,17 +1,10 @@
 /**
  * The order the pull requests declare, read from `Merge-After:` trailers in
- * their bodies.
+ * their bodies, and the order the issues declare, read from `Start-After:`
+ * in theirs.
  */
 
 import { Arr, Num, Result } from 'ts-data-forge';
-
-/**
- * `Merge-After: #1901, #1903` in a pull request body, anywhere in it, on as
- * many lines as it likes. Only this exact trailer is read — a sentence
- * mentioning another pull request is prose, and treating it as a declaration
- * would make every cross-reference a merge constraint.
- */
-const MERGE_AFTER_LINE = /^[^\S\n]*merge-after[^\S\n]*:(?<refs>[^\n]*)$/gimu;
 
 /**
  * `#N`, and only when nothing that could end a repository name comes right
@@ -21,7 +14,12 @@ const MERGE_AFTER_LINE = /^[^\S\n]*merge-after[^\S\n]*:(?<refs>[^\n]*)$/gimu;
  * the declaration takes `#N` and nothing else, so there is one way to write
  * it.
  */
-const PULL_REQUEST_REF = /(?<![\w./-])#(?<number>\d+)\b/gu;
+const NUMBER_REF = /(?<![\w./-])#(?<number>\d+)\b/gu;
+
+const DECLARATION_LINE = {
+  'merge-after': /^[^\S\n]*merge-after[^\S\n]*:(?<refs>[^\n]*)$/gimu,
+  'start-after': /^[^\S\n]*start-after[^\S\n]*:(?<refs>[^\n]*)$/gimu,
+} as const;
 
 /** The opening or closing line of a fenced code block. */
 const FENCE_LINE = /^[^\S\n]*(?:`{3,}|~{3,})/u;
@@ -35,17 +33,35 @@ const FENCE_LINE = /^[^\S\n]*(?:`{3,}|~{3,})/u;
  * closed, simply never appears in the open list and so constrains nothing.
  */
 export const parseMergeAfter = (body: string): readonly number[] =>
+  parseDeclaration(body, 'merge-after');
+
+/**
+ * The numbers an issue body declares it waits for before it is started,
+ * read exactly as {@link parseMergeAfter} reads its trailer
+ * (`docs/issue-start-after.md`).
+ */
+export const parseStartAfter = (body: string): readonly number[] =>
+  parseDeclaration(body, 'start-after');
+
+/**
+ * `<Key>: #1901, #1903` in a body, anywhere in it, on as many lines as it
+ * likes. Only this exact trailer is read — a sentence mentioning another pull
+ * request is prose, and treating it as a declaration would make every
+ * cross-reference a constraint.
+ */
+const parseDeclaration = (
+  body: string,
+  key: 'merge-after' | 'start-after',
+): readonly number[] =>
   Arr.uniq(
     outsideCodeFences(body)
-      .matchAll(MERGE_AFTER_LINE)
+      .matchAll(DECLARATION_LINE[key])
       .flatMap((line) =>
-        (line.groups?.['refs'] ?? '')
-          .matchAll(PULL_REQUEST_REF)
-          .flatMap((ref) => {
-            const parsed = Num.safeParseInt(ref.groups?.['number'] ?? '');
+        (line.groups?.['refs'] ?? '').matchAll(NUMBER_REF).flatMap((ref) => {
+          const parsed = Num.safeParseInt(ref.groups?.['number'] ?? '');
 
-            return Result.isOk(parsed) ? [parsed.value] : [];
-          }),
+          return Result.isOk(parsed) ? [parsed.value] : [];
+        }),
       )
       .toArray(),
   );
