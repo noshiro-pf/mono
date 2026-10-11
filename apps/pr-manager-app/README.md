@@ -122,6 +122,20 @@ change so that a drag does not rewrite the address bar on every pointer move.
 A URL edited by hand still opens: unknown blocks are dropped, missing ones put
 back, and numbers clamped.
 
+## Folding the header
+
+The chevron at the end of the header's buttons **folds the header into a
+toolbar**, for more of the report on screen: the title, the repository and
+how long ago the report was read share one line with the buttons, which stay
+in their order, and the token panel and the line with the exact time of
+reading go (the time is in the tooltip). Folded, the toolbar stays at the top
+of the window while the report scrolls under it; the same chevron unfolds it.
+Without a token the token panel stays, folded or not, since the page reads
+nothing until it has one.
+
+It starts unfolded, and whether it is folded is kept in IndexedDB beside the
+merge order's filters, for the same reason.
+
 ## Opening a pull request in a split view
 
 Each card has a **⧉ split view** link beside the title, which opens the pull
@@ -235,14 +249,15 @@ An answer for a token that has since been cleared or replaced is dropped, so
 `reader.mts` holds what was read and decides when to read, `token-store.mts`
 the token and its form, `theme-store.mts` light or dark, `layout-store.mts`
 the layout and the drags and dialog that change it, `merge-order-store.mts`
-what the merge order shows and the tree that leaves. Each takes what it
+what the merge order shows and the tree that leaves, `header-store.mts`
+whether the header is folded. Each takes what it
 touches in the browser as an argument — the timers as synstate `counter`s and
 the DOM events as observables — which is what lets a test drive them with a
 `source`, and `store.mts` hands them the real ones. What is kept outside the
 page follows a store by subscription: storage follows the token, the URL
 and `<html>` follow the theme, the URL follows the layout (through
-`debounce`), IndexedDB follows the merge order's filters once what it held
-has been read, and the Layout dialog opens and closes as the store says.
+`debounce`), IndexedDB follows the merge order's filters and the folded
+header once what it held has been read, and the Layout dialog opens and closes as the store says.
 
 **The components read the stores only through Preact signals**, which
 `store.mts` makes from them with `synstate-preact-signals`' `toSignal`, and

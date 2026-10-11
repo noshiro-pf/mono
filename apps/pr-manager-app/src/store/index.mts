@@ -1,3 +1,4 @@
+export * from './header-store.mjs';
 export * from './layout-store.mjs';
 export * from './merge-order-store.mjs';
 export * from './reader.mjs';

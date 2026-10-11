@@ -8,6 +8,7 @@ export * from './column-divider.js';
 export * from './commit-divergence.js';
 export * from './cycles-section.js';
 export * from './external-link.js';
+export * from './header-fold-toggle.js';
 export * from './issues-section.js';
 export * from './label-chip.js';
 export * from './layout-block.js';

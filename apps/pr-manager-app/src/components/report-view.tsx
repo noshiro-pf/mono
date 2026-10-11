@@ -13,7 +13,6 @@ import { IssuesSection } from './issues-section.js';
 import { MergeOrderFilters } from './merge-order-filters.js';
 import { MergeOrder } from './merge-order.js';
 import { MergedSection } from './merged-section.js';
-import { ReadFromGitHub } from './read-from-github.js';
 
 /**
  * A report that loaded: the three blocks — the queue under the counts that
@@ -23,7 +22,7 @@ import { ReadFromGitHub } from './read-from-github.js';
  * Each part is its own signal, which the store changes only when a read
  * changed that part (`store/reader.mts`), so a poll that found nothing new
  * renders none of this. The time of reading, which every read does change,
- * is read by the one line that shows it.
+ * is not here but in the header (`read-from-github.tsx`).
  */
 export const ReportView = memoNamed('ReportView', () => {
   const entries = readerSignals.entries.value;
@@ -78,13 +77,7 @@ export const ReportView = memoNamed('ReportView', () => {
     [entries, byNumber, scaleMax, roots, cycles, merged, issues],
   );
 
-  return (
-    <>
-      <ReadFromGitHub />
-
-      <BlockLayout blocks={blocks} />
-    </>
-  );
+  return <BlockLayout blocks={blocks} />;
 });
 
 const REPO_URL = repositoryUrl(REPORT_SOURCE);
