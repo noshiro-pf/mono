@@ -142,6 +142,8 @@ export const eslintRulesByRuleId: ReadonlyMap<string, readonly string[]> =
     ],
 
     // readonly
+    // `append-as-const` is a codemod, not a lint rule; nothing to switch off.
+    ['readonly/require-as-const', []],
     ['readonly/require-readonly-type', []],
     [
       'readonly/require-readonly-parameter',

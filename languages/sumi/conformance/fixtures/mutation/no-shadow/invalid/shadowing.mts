@@ -1,5 +1,5 @@
 // @sumi-expect-error mutation/no-shadow
-const Array = [1];
+const Array = [1] as const;
 
 const total = 1;
 
