@@ -1,7 +1,10 @@
 import { memoNamed } from 'preact-utils';
 import { Arr } from 'ts-data-forge';
 import type { IssueList } from '../load-report.mjs';
+import { issuesViewSignals } from '../store/index.mjs';
 import { ExternalLink } from './external-link.js';
+import { IssueDag } from './issue-dag.js';
+import { IssuesViewSwitch } from './issues-view-switch.js';
 import { LabelChip } from './label-chip.js';
 import { LoadMoreIssues } from './load-more-issues.js';
 import { Timestamp } from './timestamp.js';
@@ -24,6 +27,9 @@ type Props = Readonly<{
  * The list starts at the most recently updated few and goes on a page at a
  * time from the button under it, which is there until every open issue is
  * listed.
+ *
+ * Or, switched to it, the DAG of what each waits for (`issue-dag.tsx`), for
+ * which every open issue is read (`issues-view-store.mts`).
  */
 export const IssuesSection = memoNamed<Props>(
   'IssuesSection',
@@ -37,8 +43,14 @@ export const IssuesSection = memoNamed<Props>(
             : `Open issues (${totalCount})`}
       </h2>
 
+      <div className={'issues-toolbar'}>
+        <IssuesViewSwitch />
+      </div>
+
       {reading ? (
         <p className={'section-note'}>{'Reading GitHub…'}</p>
+      ) : issuesViewSignals.view.value === 'dag' ? (
+        <IssueDag />
       ) : Arr.isEmpty(items) ? (
         <p className={'section-note'}>{'No open issues.'}</p>
       ) : (

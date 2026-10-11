@@ -904,7 +904,12 @@ const readAt = (readAtEpochMs: number): LoadedReport =>
     roots: [],
     cycles: [],
     merged: [],
-    issues: { items: [], totalCount: 0, endCursor: undefined },
+    issues: {
+      items: [],
+      totalCount: 0,
+      endCursor: undefined,
+      referenced: [],
+    },
     reading: [],
   }) as const;
 
@@ -932,7 +937,9 @@ const issueList = (
       createdAt: '2026-09-20T00:00:00Z',
       updatedAt: '2026-09-23T00:00:00Z',
       comments: 0,
+      startAfter: [],
     })),
     totalCount: 200,
     endCursor,
+    referenced: [],
   }) as const;

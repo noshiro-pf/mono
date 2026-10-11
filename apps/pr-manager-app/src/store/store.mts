@@ -13,7 +13,7 @@ import {
   type Observable as SynstateObservable,
 } from 'synstate';
 import { toSignal } from 'synstate-preact-signals';
-import { REPORT_SOURCE } from '../constants.mjs';
+import { REPORT_SOURCE, repositoryUrl } from '../constants.mjs';
 import { layoutFromLocation, saveLayout } from '../layout.mjs';
 import { loadIssuePage, loadReport } from '../load-report.mjs';
 import { readSetting, writeSetting } from '../settings-db.mjs';
@@ -26,6 +26,7 @@ import {
 } from '../theme.mjs';
 import { browserStores } from '../token.mjs';
 import { createHeaderStore } from './header-store.mjs';
+import { createIssuesViewStore } from './issues-view-store.mjs';
 import { createLayoutStore } from './layout-store.mjs';
 import { createMergeOrderStore } from './merge-order-store.mjs';
 import { createReader } from './reader.mjs';
@@ -89,6 +90,20 @@ export const headerStore = createHeaderStore({
   },
 });
 
+const ISSUES_VIEW_KEY = 'issues-view';
+
+export const issuesViewStore = createIssuesViewStore({
+  issues: reader.issues,
+  entries: reader.entries,
+  repoUrl: repositoryUrl(REPORT_SOURCE),
+  load: () => readSetting(ISSUES_VIEW_KEY),
+  save: (view) => {
+    writeSetting(ISSUES_VIEW_KEY, view).catch(() => undefined);
+  },
+  moreIssues: reader.moreIssues,
+  loadMoreIssues: reader.loadMoreIssues,
+});
+
 /**
  * Everything a component reads, as Preact signals, and the only way a
  * component reads the stores.
@@ -143,6 +158,12 @@ export const headerSignals = {
   folded: toSignal(headerStore.folded),
 } as const;
 
+export const issuesViewSignals = {
+  view: toSignal(issuesViewStore.view),
+  graph: toSignal(issuesViewStore.graph),
+  layout: toSignal(issuesViewStore.layout),
+} as const;
+
 export const layoutSignals = {
   layout: toSignal(layoutStore.layout),
   moving: toSignal(layoutStore.moving),
@@ -167,6 +188,8 @@ export const startStore = (): (() => void) => {
 
   const stopHeader = headerStore.start();
 
+  const stopIssuesView = issuesViewStore.start();
+
   return () => {
     stopToken();
 
@@ -179,6 +202,8 @@ export const startStore = (): (() => void) => {
     stopMergeOrder();
 
     stopHeader();
+
+    stopIssuesView();
   };
 };
 

@@ -67,7 +67,7 @@ const OPEN_ISSUE_PAGE = [
   'totalCount',
   PAGE_INFO,
   'nodes {',
-  '  number title url createdAt updatedAt',
+  '  number title body url createdAt updatedAt',
   '  author { login }',
   `  ${LABELS}`,
   '  comments { totalCount }',
@@ -319,6 +319,45 @@ export const issuesQuery = (
 export const issueAlias = (number: number): string =>
   `issue_${number}` as const;
 
+/**
+ * One query for what the open issues' `Start-After:` declarations name that
+ * is not itself a listed issue: what has closed or merged, an open pull
+ * request, and an open issue past the end of the list. Issues and pull
+ * requests share their numbers, so one field answers for either. The aliases
+ * are `ref_N`, which is what {@link referenceAlias} reads them back by.
+ */
+export const referencesQuery = (
+  numbers: readonly number[],
+): Readonly<{
+  query: string;
+  variables: ReadonlyRecord<string, number>;
+}> =>
+  ({
+    query: [
+      `query References(${['$owner: String!', '$name: String!', ...numbers.map((number) => `$${referenceAlias(number)}: Int!`)].join(', ')}) {`,
+      '  repository(owner: $owner, name: $name) {',
+      ...numbers.map((number) => {
+        const alias = referenceAlias(number);
+
+        return `    ${alias}: issueOrPullRequest(number: $${alias}) { ${REFERENCE_FIELDS} }`;
+      }),
+      '  }',
+      '}',
+    ].join('\n'),
+    variables: Object.fromEntries(
+      numbers.map((number) => [referenceAlias(number), number]),
+    ),
+  }) as const;
+
+export const referenceAlias = (number: number): string =>
+  `ref_${number}` as const;
+
+const REFERENCE_FIELDS = [
+  '__typename',
+  '... on Issue { number title url state stateReason }',
+  '... on PullRequest { number title url state merged }',
+].join(' ');
+
 const PageInfoSchema = t.record({
   hasNextPage: t.boolean(),
   endCursor: t.union([t.string(), t.nullType]),
@@ -492,6 +531,8 @@ export type MergedPullRequestNode = t.TypeOf<typeof MergedPullRequestSchema>;
 const OpenIssueSchema = t.record({
   number: t.number(),
   title: t.string(),
+  /** Where `Start-After:` is read from. */
+  body: t.string(),
   url: t.string(),
   createdAt: t.string(),
   updatedAt: t.string(),
@@ -513,6 +554,26 @@ export type OpenIssuePage = t.TypeOf<typeof OpenIssuePageSchema>;
 export const OpenIssuesDataSchema = t.record({
   repository: t.record({ issues: OpenIssuePageSchema }),
 });
+
+/** What `issueOrPullRequest` answers, by the kind it turned out to be. */
+export const ReferenceSchema = t.union([
+  t.record({
+    __typename: t.literal('Issue'),
+    number: t.number(),
+    title: t.string(),
+    url: t.string(),
+    state: t.string(),
+    stateReason: t.union([t.string(), t.nullType]),
+  }),
+  t.record({
+    __typename: t.literal('PullRequest'),
+    number: t.number(),
+    title: t.string(),
+    url: t.string(),
+    state: t.string(),
+    merged: t.boolean(),
+  }),
+]);
 
 /** `null` when the path is not on the default branch. */
 const BlobSchema = t.union([t.record({ text: t.string() }), t.nullType]);

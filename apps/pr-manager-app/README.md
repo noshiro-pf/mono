@@ -45,6 +45,17 @@ Below that, what merged in the last week, and the open issues, most recently
 updated first: thirty, then a hundred more each time the button under the list
 is pressed, until every open one is listed.
 
+**List / DAG**, above the issues, draws them instead as the graph of what each
+waits for, read from the `Start-After:` lines in their bodies
+(`docs/issue-start-after.md`). An issue is a rounded box and a pull request a
+hexagon; an edge runs from what is waited for to what waits. Green is an issue
+that can be started (a thick border when it waited and need not any more),
+brown and dashed one that waits, blue an open pull request and the issues it
+closes, grey what is done. Each node shows its title and opens its page on
+GitHub. The DAG reads every open issue, a page after the other, since an issue
+left off the graph would be drawn as if it declared nothing. The choice is
+kept in the browser.
+
 It **only reads**. Nothing here labels, rebases, merges or comments — that is
 `pnpm run unblock-prs`, run by a person — and a page that cannot do any of it
 is a page that is safe to leave open.
@@ -249,8 +260,8 @@ Every fifteen seconds is 240 reads an hour, about 2,000 of the 5,000 points an
 account gets, which leaves the rest for whatever else that account does with
 GraphQL — `gh` included, since the budget is the account's.
 
-**A page of open issues listed with the button is read again by every read
-after it**, one query a page, about a point each by GitHub's formula, so the
+**A page of open issues listed with the button, or read for the DAG, is read
+again by every read after it**, one query a page, about a point each by GitHub's formula, so the
 list stays as current as the rest of the page. Reloading the page, or a new
 token, goes back to the first thirty. The press itself reads only the page it
 adds, rather than the whole report again, and a poll already out when it was

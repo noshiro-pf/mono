@@ -27,6 +27,8 @@ import {
   parseCodeOwners,
   parseRuleset,
   parseSetAsideComment,
+  parseStartAfter,
+  referenceStatusOf,
   reportedContexts,
   setAsideStillApplies,
   summarize,
@@ -40,6 +42,7 @@ import {
   type OpenIssue,
   type PrReport,
   type PullRequestFacts,
+  type ReferenceStatus,
   type RepoRef,
   type ReportEntry,
   type RulesetRequirements,
@@ -79,6 +82,9 @@ import {
   OpenIssuesDataSchema,
   PULL_REQUESTS_QUERY,
   PullRequestsDataSchema,
+  referenceAlias,
+  ReferenceSchema,
+  referencesQuery,
   type CheckSuiteNode,
   type ContextNode,
   type FollowUp,
@@ -174,11 +180,36 @@ export type LoadedReport = Readonly<{
 
 /** The open issues the page lists, and where the list stops. */
 export type IssueList = Readonly<{
-  items: readonly OpenIssue[];
+  items: readonly IssueItem[];
   /** How many are open in all, so that a cut list can say so. */
   totalCount: number;
   /** Where the next page starts; `undefined` once every one is listed. */
   endCursor: string | undefined;
+  /**
+   * What the items' `Start-After:` declarations name that was read for
+   * them, lowest number first; a number GitHub would not describe is not in
+   * it.
+   */
+  referenced: readonly ReferencedItem[];
+}>;
+
+/** One open issue, as the page lists it. */
+export type IssueItem = OpenIssue &
+  Readonly<{
+    /** What its `Start-After:` names (`docs/issue-start-after.md`). */
+    startAfter: readonly number[];
+  }>;
+
+/**
+ * Something a `Start-After:` names that is not a listed issue, as GitHub
+ * described it.
+ */
+export type ReferencedItem = Readonly<{
+  number: number;
+  kind: 'issue' | 'pull-request';
+  title: string;
+  url: string;
+  status: ReferenceStatus;
 }>;
 
 /**
@@ -358,6 +389,14 @@ export const loadIssuePage = async (
 ): Promise<Answered<IssueList>> => {
   const { token, after, first, fetchImpl } = request;
 
+  const ask: Ask = async (query, bound = {}) =>
+    askGraphql({
+      query,
+      variables: { owner: source.owner, name: source.repo, ...bound },
+      token,
+      ...(fetchImpl === undefined ? {} : { fetchImpl }),
+    });
+
   const answered = await askGraphql({
     query: OPEN_ISSUES_QUERY,
     variables: {
@@ -382,19 +421,23 @@ export const loadIssuePage = async (
     return { rateLimit, result: Result.err(unexpectedShape(validated.value)) };
   }
 
-  return {
+  return withReferences({
+    list: issueListOf(validated.value.repository.issues),
     rateLimit,
-    result: Result.ok(issueListOf(validated.value.repository.issues)),
-  };
+    ask,
+  });
 };
 
 /**
  * `page` put after `held`. An issue already listed is not listed again: the
  * list is by last update, and one updated between the two reads can be met
- * in both.
+ * in both. What either read for the declarations is kept, the page's
+ * description of a number winning, being the newer.
  */
 export const appendIssues = (held: IssueList, page: IssueList): IssueList => {
   const listed = new Set(held.items.map(({ number }) => number));
+
+  const described = new Set(page.referenced.map(({ number }) => number));
 
   return {
     items: [
@@ -403,6 +446,10 @@ export const appendIssues = (held: IssueList, page: IssueList): IssueList => {
     ],
     totalCount: page.totalCount,
     endCursor: page.endCursor,
+    referenced: [
+      ...held.referenced.filter(({ number }) => !described.has(number)),
+      ...page.referenced,
+    ].toSorted((a, b) => a.number - b.number),
   };
 };
 
@@ -816,6 +863,87 @@ const readIssues = async ({
 };
 
 /**
+ * `list` with what its declarations name described: one query for every
+ * number named that is not an item of `list`, and none when there is no such
+ * number. Each page is described as it is read (`loadIssuePage`), so a
+ * number an earlier page lists may be asked about again; that costs a field,
+ * where finding out would cost the read its independence.
+ */
+const withReferences = async ({
+  list,
+  rateLimit,
+  ask,
+}: Readonly<{
+  list: IssueList;
+  rateLimit: RateLimit | undefined;
+  ask: Ask;
+}>): Promise<Answered<IssueList>> => {
+  const listed = new Set(list.items.map(({ number }) => number));
+
+  const numbers = Arr.uniq(list.items.flatMap(({ startAfter }) => startAfter))
+    .filter((number) => !listed.has(number))
+    .toSorted((a, b) => a - b);
+
+  if (!Arr.isNonEmpty(numbers)) {
+    return { rateLimit, result: Result.ok(list) };
+  }
+
+  const { query, variables } = referencesQuery(numbers);
+
+  const answered = await ask(query, variables);
+
+  const latestLimit = answered.rateLimit ?? rateLimit;
+
+  if (Result.isErr(answered.result)) {
+    return { rateLimit: latestLimit, result: answered.result };
+  }
+
+  const field = fieldsOf(answered.result.value.data);
+
+  return {
+    rateLimit: latestLimit,
+    result: Result.ok({
+      ...list,
+      referenced: numbers.flatMap((number): readonly ReferencedItem[] => {
+        const validated = ReferenceSchema.validate(
+          field(referenceAlias(number)),
+        );
+
+        return Result.isOk(validated) ? [referencedOf(validated.value)] : [];
+      }),
+    }),
+  };
+};
+
+/** Where one named item stands, in `pr-report-core`'s terms. */
+const referencedOf = (
+  node: t.TypeOf<typeof ReferenceSchema>,
+): ReferencedItem =>
+  node.__typename === 'Issue'
+    ? ({
+        number: node.number,
+        kind: 'issue',
+        title: node.title,
+        url: node.url,
+        status: referenceStatusOf({
+          kind: 'issue',
+          state: node.state,
+          stateReason: node.stateReason ?? undefined,
+        }),
+      } as const)
+    : ({
+        number: node.number,
+        kind: 'pull-request',
+        title: node.title,
+        url: node.url,
+        status: referenceStatusOf({
+          kind: 'pull-request',
+          state: node.state,
+          merged: node.merged,
+        }),
+      } as const);
+
+/**
  * `listed` and the pages after it, until they have asked for `count` or
  * listed every open issue. One page at a time, because each page starts
  * where the last ended.
@@ -1191,6 +1319,7 @@ const NO_ISSUES: IssueList = {
   items: [],
   totalCount: 0,
   endCursor: undefined,
+  referenced: [],
 } as const;
 
 const summaryOf = (entries: readonly Entry[]): PageSummary => {
@@ -1399,9 +1528,10 @@ const issueListOf = (page: OpenIssuePage): IssueList =>
     items: page.nodes.map(issueOf),
     totalCount: page.totalCount,
     endCursor: nextCursor(page.pageInfo),
+    referenced: [],
   }) as const;
 
-const issueOf = (issue: OpenIssueNode): OpenIssue =>
+const issueOf = (issue: OpenIssueNode): IssueItem =>
   ({
     number: issue.number,
     title: issue.title,
@@ -1411,6 +1541,7 @@ const issueOf = (issue: OpenIssueNode): OpenIssue =>
     createdAt: issue.createdAt,
     updatedAt: issue.updatedAt,
     comments: issue.comments.totalCount,
+    startAfter: parseStartAfter(issue.body),
   }) as const;
 
 /** What GitHub calls an account that has been deleted. */

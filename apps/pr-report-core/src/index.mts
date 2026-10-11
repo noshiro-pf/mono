@@ -9,6 +9,7 @@ export * from './report.mjs';
 export * from './ruleset.mjs';
 export * from './set-aside.mjs';
 export * from './stack.mjs';
+export * from './start-after.mjs';
 export * from './summarize.mjs';
 export * from './timestamp.mjs';
 export * from './tree.mjs';

@@ -492,7 +492,12 @@ const EMPTY_PARTS: ReportParts = {
   roots: [],
   cycles: [],
   merged: [],
-  issues: { items: [], totalCount: 0, endCursor: undefined },
+  issues: {
+    items: [],
+    totalCount: 0,
+    endCursor: undefined,
+    referenced: [],
+  },
   reading: [],
 } as const;
 

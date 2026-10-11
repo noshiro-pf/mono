@@ -9,6 +9,7 @@ import {
   loadReport,
   type IssueList,
   type LoadedReport,
+  type ReferencedItem,
 } from './load-report.mjs';
 import { ISSUES_LIMIT, ISSUES_PAGE_SIZE } from './report-query.mjs';
 
@@ -387,6 +388,7 @@ describe(loadReport, () => {
         createdAt: '2026-09-20T00:00:00Z',
         updatedAt: '2026-09-23T00:00:00Z',
         comments: 3,
+        startAfter: [],
       },
       {
         number: 1976,
@@ -397,6 +399,7 @@ describe(loadReport, () => {
         createdAt: '2026-09-20T00:00:00Z',
         updatedAt: '2026-09-23T00:00:00Z',
         comments: 3,
+        startAfter: [],
       },
     ]);
 
@@ -492,6 +495,145 @@ describe(loadReport, () => {
     });
 
     assert.isTrue(Result.isErr(result));
+  });
+
+  test('reads Start-After out of the issue bodies, and asks once for what they name that is not listed', async () => {
+    const { fetchImpl, sent } = answering(
+      report([], [], 0, {
+        ...NO_ISSUES,
+        totalCount: 3,
+        nodes: [
+          openIssue(2225, [], 'Moves the hosting.\n\nStart-After: #2162\n'),
+          openIssue(2162, []),
+          openIssue(2224, [], 'Start-After: #2139, #7, #9999\n'),
+        ],
+      }),
+      {
+        References: [
+          {
+            data: {
+              repository: {
+                ref_7: {
+                  __typename: 'PullRequest',
+                  number: 7,
+                  title: 'Pull request 7',
+                  url: 'https://github.com/noshiro-pf/mono/pull/7',
+                  state: 'OPEN',
+                  merged: false,
+                },
+                ref_2139: {
+                  __typename: 'Issue',
+                  number: 2139,
+                  title: 'Issue 2139',
+                  url: 'https://github.com/noshiro-pf/mono/issues/2139',
+                  state: 'CLOSED',
+                  stateReason: 'NOT_PLANNED',
+                },
+                ref_9999: null,
+              },
+            },
+            errors: [
+              {
+                message:
+                  'Could not resolve to an issue or pull request with the number of 9999.',
+                path: ['repository', 'ref_9999'],
+              },
+            ],
+          },
+        ],
+      },
+    );
+
+    const loaded = await load(fetchImpl);
+
+    // The listed issue was read already.
+    assert.deepStrictEqual(
+      named(sent, 'References').map(({ variables }) => variables),
+      [
+        {
+          owner: 'noshiro-pf',
+          name: 'mono',
+          ref_7: 7,
+          ref_2139: 2139,
+          ref_9999: 9999,
+        },
+      ],
+    );
+
+    assert.deepStrictEqual(
+      loaded.issues.items.map(({ number, startAfter }) => [number, startAfter]),
+      [
+        [2225, [2162]],
+        [2162, []],
+        [2224, [2139, 7, 9999]],
+      ],
+    );
+
+    // What GitHub would not describe is left out, and drawn as unknown.
+    assert.deepStrictEqual(loaded.issues.referenced, [
+      {
+        number: 7,
+        kind: 'pull-request',
+        title: 'Pull request 7',
+        url: 'https://github.com/noshiro-pf/mono/pull/7',
+        status: 'waiting',
+      },
+      {
+        number: 2139,
+        kind: 'issue',
+        title: 'Issue 2139',
+        url: 'https://github.com/noshiro-pf/mono/issues/2139',
+        status: 'abandoned',
+      },
+    ]);
+  });
+
+  test('reads a merged pull request a declaration names', async () => {
+    const { fetchImpl } = answering(
+      report([], [], 0, {
+        ...NO_ISSUES,
+        totalCount: 1,
+        nodes: [openIssue(2214, [], 'Start-After: #2207')],
+      }),
+      answer('References', {
+        ref_2207: {
+          __typename: 'PullRequest',
+          number: 2207,
+          title: 'Pull request 2207',
+          url: 'https://github.com/noshiro-pf/mono/pull/2207',
+          state: 'MERGED',
+          merged: true,
+        },
+      }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.deepStrictEqual(loaded.issues.referenced, [
+      {
+        number: 2207,
+        kind: 'pull-request',
+        title: 'Pull request 2207',
+        url: 'https://github.com/noshiro-pf/mono/pull/2207',
+        status: 'done',
+      },
+    ]);
+  });
+
+  test('asks nothing more when every declaration names a listed issue', async () => {
+    const { fetchImpl, sent } = answering(
+      report([], [], 0, {
+        ...NO_ISSUES,
+        totalCount: 2,
+        nodes: [openIssue(2, [], 'Start-After: #1'), openIssue(1, [])],
+      }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.deepStrictEqual(named(sent, 'References'), []);
+
+    assert.deepStrictEqual(loaded.issues.referenced, []);
   });
 
   test('reads the Claude Code sessions out of the body', async () => {
@@ -1060,6 +1202,28 @@ describe(loadIssuePage, () => {
 });
 
 describe(appendIssues, () => {
+  test('keeps what either read described, the page winning', () => {
+    const appended = appendIssues(
+      {
+        ...issueList([1], 10, 'cursor-1'),
+        referenced: [referenced(5, 'waiting'), referenced(8, 'done')],
+      },
+      {
+        ...issueList([2], 10, 'cursor-2'),
+        referenced: [referenced(3, 'done'), referenced(5, 'done')],
+      },
+    );
+
+    assert.deepStrictEqual(
+      appended.referenced.map((item) => [item.number, item.status]),
+      [
+        [3, 'done'],
+        [5, 'done'],
+        [8, 'done'],
+      ],
+    );
+  });
+
   test('puts the page after the list, and takes its count and cursor', () => {
     const appended = appendIssues(
       issueList([1, 2], 10, 'cursor-2'),
@@ -1093,9 +1257,23 @@ const issueList = (
       createdAt: '2026-09-20T00:00:00Z',
       updatedAt: '2026-09-23T00:00:00Z',
       comments: 0,
+      startAfter: [],
     })),
     totalCount,
     endCursor,
+    referenced: [],
+  }) as const;
+
+const referenced = (
+  number: number,
+  itemStatus: ReferencedItem['status'],
+): ReferencedItem =>
+  ({
+    number,
+    kind: 'issue',
+    title: `Issue ${number}`,
+    url: `https://github.com/noshiro-pf/mono/issues/${number}`,
+    status: itemStatus,
   }) as const;
 
 const refusingTheToken: Fetch = () =>
@@ -1319,10 +1497,15 @@ const issuePage = (
 const issuesAnswer = (page: unknown): Answers =>
   answer('OpenIssues', { issues: page });
 
-const openIssue = (number: number, labels: readonly string[]): unknown =>
+const openIssue = (
+  number: number,
+  labels: readonly string[],
+  body: string = '',
+): unknown =>
   ({
     number,
     title: `Issue ${number}`,
+    body,
     url: `https://github.com/noshiro-pf/mono/issues/${number}`,
     createdAt: '2026-09-20T00:00:00Z',
     updatedAt: '2026-09-23T00:00:00Z',
