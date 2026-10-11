@@ -19,4 +19,4 @@ type SlugType = t.TypeOf<typeof Slug>;
 // `NonEmptyString`, `MinLengthString<6>` and `MaxLengthString<32>`
 
 // embed-sample-code-ignore-below
-export { type SlugType };
+export type { SlugType };
