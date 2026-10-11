@@ -1,5 +1,5 @@
 import { buildEntries } from './report.mjs';
-import { type ContextState, type PullRequestFacts } from './types.mjs';
+import type { ContextState, PullRequestFacts } from './types.mjs';
 
 const facts = (
   number: number,

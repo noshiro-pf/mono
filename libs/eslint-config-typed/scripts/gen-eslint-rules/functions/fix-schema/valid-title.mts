@@ -1,7 +1,7 @@
 import { isTruthy } from '@sindresorhus/is';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
-import { type MutableRecord } from 'ts-type-forge';
-import { type JSONSchema4 } from '../type.mjs';
+import type { MutableRecord } from 'ts-type-forge';
+import type { JSONSchema4 } from '../type.mjs';
 
 /**
  * patternProperties の `^must(?:Not)?Match$` を明示的な `mustMatch` と `mustNotMatch` プロパティに変換する。

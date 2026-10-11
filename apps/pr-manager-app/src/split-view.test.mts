@@ -1,5 +1,5 @@
-import { type LinkedIssue } from 'pr-report-core';
-import { type ClaudeSession } from './claude-session.mjs';
+import type { LinkedIssue } from 'pr-report-core';
+import type { ClaudeSession } from './claude-session.mjs';
 import { splitViewUrl } from './split-view.mjs';
 
 describe(splitViewUrl, () => {

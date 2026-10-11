@@ -1,6 +1,6 @@
-import { type Ok } from '../../../adt-types.mjs';
+import type { Ok } from '../../../adt-types.mjs';
 import { isPanicError } from '../../../panic/index.mjs';
-import { type Result } from '../result.mjs';
+import type { Result } from '../result.mjs';
 import { err } from './result-err.mjs';
 import { ok } from './result-ok.mjs';
 

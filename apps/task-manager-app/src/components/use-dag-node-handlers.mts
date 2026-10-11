@@ -1,4 +1,4 @@
-import { type KeyboardEventHandler } from 'preact';
+import type { KeyboardEventHandler } from 'preact';
 import { useCallback } from 'preact/hooks';
 import { arrowKeyDelta } from '../dag/index.mjs';
 import { nodeId, type NodeRef } from '../domain/index.mjs';

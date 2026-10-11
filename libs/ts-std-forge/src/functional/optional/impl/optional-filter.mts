@@ -1,9 +1,9 @@
-import { type Optional, type UnknownOptional } from '../optional.mjs';
+import type { Optional, UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
 import { none } from './optional-none.mjs';
 import { some } from './optional-some.mjs';
 import { unwrap } from './optional-unwrap.mjs';
-import { type Unwrap } from './types.mjs';
+import type { Unwrap } from './types.mjs';
 
 /**
  * Filters an `Optional` based on a predicate. If the `Optional` is `Some` and

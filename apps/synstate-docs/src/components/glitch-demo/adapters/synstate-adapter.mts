@@ -1,5 +1,5 @@
 import { combine, map, source } from 'synstate';
-import { type Adapter, type Point, type Subscription } from '../types.mjs';
+import type { Adapter, Point, Subscription } from '../types.mjs';
 
 export const createSynStateAdapter = (): Adapter => {
   let mut_mousePos: ReturnType<typeof source<Point>> | undefined;

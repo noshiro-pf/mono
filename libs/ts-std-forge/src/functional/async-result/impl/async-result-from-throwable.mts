@@ -1,6 +1,6 @@
 import { isPanicError } from '../../../panic/index.mjs';
 import { Result } from '../../result/index.mjs';
-import { type AsyncResult } from '../async-result.mjs';
+import type { AsyncResult } from '../async-result.mjs';
 
 /**
  * Wraps a function returning a `Promise` in an `AsyncResult`. Both a

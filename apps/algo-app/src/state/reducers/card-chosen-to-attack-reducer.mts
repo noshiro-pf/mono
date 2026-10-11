@@ -1,6 +1,6 @@
-import { type Reducer } from 'ts-type-forge';
+import type { Reducer } from 'ts-type-forge';
 import { cardEq } from '../../functions/index.mjs';
-import { type GameState, type GameStateAction } from '../../types/index.mjs';
+import type { GameState, GameStateAction } from '../../types/index.mjs';
 
 export const cardChosenToAttackReducer: Reducer<
   GameState['cardChosenToAttack'],

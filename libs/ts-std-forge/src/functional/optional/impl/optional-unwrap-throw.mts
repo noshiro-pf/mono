@@ -1,7 +1,7 @@
 import { panic } from '../../../panic/index.mjs';
-import { type UnknownOptional } from '../optional.mjs';
+import type { UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
-import { type Unwrap } from './types.mjs';
+import type { Unwrap } from './types.mjs';
 
 /**
  * Unwraps an `Optional`, returning the contained value. Throws an error if

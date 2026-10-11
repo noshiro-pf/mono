@@ -1,4 +1,4 @@
-import { type ReadonlySignal } from '@preact/signals';
+import type { ReadonlySignal } from '@preact/signals';
 import {
   createBooleanState as createBooleanStateBase,
   type InitializedObservable,

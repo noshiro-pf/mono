@@ -1,10 +1,10 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type Mutable,
-  type MutableMap,
-  type MutableSet,
-  type ToMutableMap,
-  type ToMutableSet,
+import type {
+  Mutable,
+  MutableMap,
+  MutableSet,
+  ToMutableMap,
+  ToMutableSet,
 } from './mutable.mjs';
 
 // Test Mutable utility type

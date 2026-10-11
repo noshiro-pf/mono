@@ -1,4 +1,4 @@
-import { type useBoolState } from 'better-react-use-state';
+import type { useBoolState } from 'better-react-use-state';
 
 export type Setters = Readonly<{
   // embed-sample-code-ignore-above

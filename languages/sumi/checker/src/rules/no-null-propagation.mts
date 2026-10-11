@@ -4,7 +4,7 @@ import {
   type Node as TsNode,
 } from 'typescript-native/unstable/ast';
 import { TypeFlags, type Type } from 'typescript-native/unstable/sync';
-import { type Rule } from '../engine/index.mjs';
+import type { Rule } from '../engine/index.mjs';
 
 /**
  * `null/no-null-propagation` — a declaration's type does not include `null`

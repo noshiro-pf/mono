@@ -6,7 +6,7 @@ import {
   dict,
   notificationSettingsWithEmailDefaultValue,
 } from '../../constants/index.mjs';
-import { type NotificationSettingsWithEmail } from '../../types/index.mjs';
+import type { NotificationSettingsWithEmail } from '../../types/index.mjs';
 import { AnswerDeadlineDatepicker } from './answer-deadline.js';
 import { AnswerIconSettingsComponent } from './icon-settings/index.mjs';
 import { NotificationSettingsComponent } from './notification-settings.js';

@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type UpperAlphabet } from './alphabet.mjs';
+import type { UpperAlphabet } from './alphabet.mjs';
 
 // prettier-ignore
 expectType<UpperAlphabet,

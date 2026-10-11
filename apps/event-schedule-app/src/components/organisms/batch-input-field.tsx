@@ -9,7 +9,7 @@ import {
 import { memoNamed } from 'react-utils';
 import { createState as createStateBase } from 'synstate';
 import { createState } from 'synstate-react-hooks';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import { match } from '../../utils-ported/index.mjs';
 import {

@@ -1,7 +1,7 @@
 // eslint-disable import-x/no-internal-modules
-import {
-  type RuleListener,
-  type RuleModule,
+import type {
+  RuleListener,
+  RuleModule,
 } from '@typescript-eslint/utils/ts-eslint';
 import { createRule } from './common.mjs';
 

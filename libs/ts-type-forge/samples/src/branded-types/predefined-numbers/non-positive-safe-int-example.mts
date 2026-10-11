@@ -1,4 +1,4 @@
-import { type NonPositiveSafeInt } from 'ts-type-forge';
+import type { NonPositiveSafeInt } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

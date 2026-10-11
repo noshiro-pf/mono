@@ -1,6 +1,6 @@
 import { useState } from 'better-preact-use-state';
 import * as Preact from 'preact/hooks';
-import { type PromiseState } from '../utils/index.mjs';
+import type { PromiseState } from '../utils/index.mjs';
 
 export const usePromiseValue = <T,>(
   promise: Readonly<Promise<T>>,

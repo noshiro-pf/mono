@@ -1,6 +1,6 @@
-import {
-  type NegativeInt as TtfImported_NegativeInt,
-  type WithSmallInt,
+import type {
+  NegativeInt as TtfImported_NegativeInt,
+  WithSmallInt,
 } from 'ts-type-forge';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';
 import { PositiveInt } from './positive-int.mjs';

@@ -1,4 +1,4 @@
-import { type Comparison } from 'pr-report-core';
+import type { Comparison } from 'pr-report-core';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import { Num } from 'ts-data-forge';

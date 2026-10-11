@@ -1,5 +1,5 @@
 import { Result } from 'ts-data-forge';
-import { type LoadedReport } from './load-report.mjs';
+import type { LoadedReport } from './load-report.mjs';
 import {
   asRefreshing,
   LOADING,

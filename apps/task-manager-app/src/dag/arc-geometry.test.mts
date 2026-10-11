@@ -1,5 +1,5 @@
-import { type GraphNodeId } from '../domain/index.mjs';
-import { type ArcEdge } from './arc-edges.mjs';
+import type { GraphNodeId } from '../domain/index.mjs';
+import type { ArcEdge } from './arc-edges.mjs';
 import {
   ARC_BULGE,
   arcContentBounds,
@@ -8,7 +8,7 @@ import {
   type ArcGeometry,
 } from './arc-geometry.mjs';
 import { cubicPoint } from './edge-geometry.mjs';
-import { type LaidOutNode } from './graph-layout.mjs';
+import type { LaidOutNode } from './graph-layout.mjs';
 
 const WIDTH = 100;
 

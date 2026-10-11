@@ -1,7 +1,7 @@
-import {
-  type GenericEventHandler,
-  type InputEventHandler,
-  type SubmitEventHandler,
+import type {
+  GenericEventHandler,
+  InputEventHandler,
+  SubmitEventHandler,
 } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { POLL_INTERVAL_MS } from '../constants.mjs';

@@ -1,17 +1,17 @@
-import {
-  type IndexOfTuple,
-  type IntersectBrand,
-  type IsFixedLengthList,
-  type NegativeIndexOfTuple,
-  type NegativeInt32,
-  type NormalizeBrandUnion,
-  type PositiveInt,
-  type PositiveNumber,
-  type Primitive,
-  type SafeInt,
-  type SafeUint,
-  type Uint32,
-  type WithSmallInt,
+import type {
+  IndexOfTuple,
+  IntersectBrand,
+  IsFixedLengthList,
+  NegativeIndexOfTuple,
+  NegativeInt32,
+  NormalizeBrandUnion,
+  PositiveInt,
+  PositiveNumber,
+  Primitive,
+  SafeInt,
+  SafeUint,
+  Uint32,
+  WithSmallInt,
 } from 'ts-type-forge';
 
 export type SmallPositiveInt = WithSmallInt<PositiveInt>;

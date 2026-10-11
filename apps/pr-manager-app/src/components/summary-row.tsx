@@ -1,5 +1,5 @@
 import { memoNamed } from 'preact-utils';
-import { type PageSummary } from '../load-report.mjs';
+import type { PageSummary } from '../load-report.mjs';
 import { StatTile } from './stat-tile.js';
 
 type Props = Readonly<{ summary: PageSummary }>;

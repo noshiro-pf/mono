@@ -17,6 +17,7 @@ export const tsTypeForgeImportedTypes = [
 ] as const;
 
 /** 上記の型をすべて import する文 */
-export const tsTypeForgeImportStatement = `import { ${tsTypeForgeImportedTypes
-  .map((t) => `type ${t}`)
-  .join(', ')} } from 'ts-type-forge';` as const;
+export const tsTypeForgeImportStatement =
+  `import type { ${tsTypeForgeImportedTypes.join(
+    ', ',
+  )} } from 'ts-type-forge';` as const;

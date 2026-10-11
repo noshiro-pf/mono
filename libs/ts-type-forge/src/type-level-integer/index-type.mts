@@ -1,5 +1,5 @@
-import { type RelaxedExclude } from '../others/index.mjs';
-import { type IndexOfTuple, type MakeTuple } from '../tuple-and-list/index.mjs';
+import type { RelaxedExclude } from '../others/index.mjs';
+import type { IndexOfTuple, MakeTuple } from '../tuple-and-list/index.mjs';
 
 /**
  * Creates a union of non-negative integer literals from 0 up to (but not including) `N`.

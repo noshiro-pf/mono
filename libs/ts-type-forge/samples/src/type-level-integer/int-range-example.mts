@@ -1,4 +1,4 @@
-import { type IntRange } from 'ts-type-forge';
+import type { IntRange } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

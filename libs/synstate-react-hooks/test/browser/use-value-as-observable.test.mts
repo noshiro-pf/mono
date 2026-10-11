@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react';
-import { type Observable } from 'synstate';
+import type { Observable } from 'synstate';
 import { useValueAsObservable } from '../../src/index.mjs';
 
 describe(useValueAsObservable, () => {

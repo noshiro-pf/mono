@@ -1,4 +1,4 @@
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 
 /**
  * Narrows an array to a tuple of exactly `n` elements.

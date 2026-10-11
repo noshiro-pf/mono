@@ -5,8 +5,8 @@
  */
 
 import { Arr } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
-import { type GraphNodeId } from '../domain/index.mjs';
+import type { DeepReadonly } from 'ts-type-forge';
+import type { GraphNodeId } from '../domain/index.mjs';
 
 /** The highlight around `pointed`; `undefined` while nothing is pointed at. */
 export const arcHighlight = (

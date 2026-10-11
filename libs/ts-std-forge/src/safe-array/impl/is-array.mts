@@ -1,4 +1,4 @@
-import { type BoolOr, type IsAny, type IsUnknown } from 'ts-type-forge';
+import type { BoolOr, IsAny, IsUnknown } from 'ts-type-forge';
 
 /**
  * Type guard that checks whether a value is an array.

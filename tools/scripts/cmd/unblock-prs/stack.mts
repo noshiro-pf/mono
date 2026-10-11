@@ -46,15 +46,15 @@
 import { findStackParents } from 'pr-report-core';
 import { isMergeQueued, isSkipCiLabelled, wantsAutoRebase } from './labels.mjs';
 import { skipStillApplies } from './skips.mjs';
-import {
-  type BaseChange,
-  type Classification,
-  type NativeStackEntry,
-  type PullRequest,
-  type RetargetedLayer,
-  type SkipRecord,
-  type StackedOn,
-  type TriageContext,
+import type {
+  BaseChange,
+  Classification,
+  NativeStackEntry,
+  PullRequest,
+  RetargetedLayer,
+  SkipRecord,
+  StackedOn,
+  TriageContext,
 } from './types.mjs';
 import { isSafeRefName } from './util.mjs';
 import { isVersionPullRequest } from './version-pr.mjs';

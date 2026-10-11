@@ -1,4 +1,4 @@
-import { type RectSize } from '../../../types/index.mjs';
+import type { RectSize } from '../../../types/index.mjs';
 
 export const updateRectSizeElementwise = (
   from: RectSize,

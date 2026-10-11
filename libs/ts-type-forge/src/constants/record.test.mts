@@ -1,6 +1,6 @@
 import { expectType } from 'ts-data-forge';
-import { type ReadonlyRecord } from '../others/index.mjs';
-import { type UnknownRecord } from './record.mjs';
+import type { ReadonlyRecord } from '../others/index.mjs';
+import type { UnknownRecord } from './record.mjs';
 
 // Test that UnknownRecord is properly defined
 expectType<UnknownRecord, ReadonlyRecord<string, unknown>>('=');

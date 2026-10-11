@@ -1,7 +1,7 @@
 /* eslint-disable vitest/expect-expect */
 // Example: src/functional/optional.mts (Optional.isNone)
 import { expectType, Optional } from 'ts-std-forge';
-import { type None } from '../../../../src/adt-types.mjs';
+import type { None } from '../../../../src/adt-types.mjs';
 
 if (import.meta.vitest !== undefined) {
   test('main', () => {

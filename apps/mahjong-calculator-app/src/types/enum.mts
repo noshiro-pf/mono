@@ -1,5 +1,5 @@
 import * as t from 'ts-fortress';
-import { type UintRange } from 'ts-type-forge';
+import type { UintRange } from 'ts-type-forge';
 
 export type Bakaze = 'Nan' | 'Ton';
 

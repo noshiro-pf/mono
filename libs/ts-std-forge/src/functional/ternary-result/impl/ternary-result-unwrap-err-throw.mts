@@ -1,9 +1,9 @@
 import { unknownToString } from '../../../others/index.mjs';
 import { panic } from '../../../panic/index.mjs';
-import { type UnknownTernaryResult } from '../ternary-result.mjs';
+import type { UnknownTernaryResult } from '../ternary-result.mjs';
 import { isErr } from './ternary-result-is-err.mjs';
 import { isWarn } from './ternary-result-is-warn.mjs';
-import { type UnwrapErr, type UnwrapOk, type UnwrapWarn } from './types.mjs';
+import type { UnwrapErr, UnwrapOk, UnwrapWarn } from './types.mjs';
 import { variantName } from './variant-name.mjs';
 
 /**

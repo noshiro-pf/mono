@@ -1,5 +1,5 @@
 import { memoNamed } from 'preact-utils';
-import { type SetAsideView } from '../load-report.mjs';
+import type { SetAsideView } from '../load-report.mjs';
 import { BadgeIcon } from './badge-icon.js';
 
 type Props = Readonly<{ setAside: SetAsideView | undefined; baseRef: string }>;

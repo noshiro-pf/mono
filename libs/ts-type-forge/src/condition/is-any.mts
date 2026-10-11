@@ -1,4 +1,4 @@
-import { type BoolNot } from '../others/index.mjs';
+import type { BoolNot } from '../others/index.mjs';
 
 /**
  * Checks if a given type `T` is exactly the `any` type.

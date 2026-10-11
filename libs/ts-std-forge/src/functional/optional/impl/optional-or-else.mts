@@ -1,6 +1,6 @@
-import { type Optional, type UnknownOptional } from '../optional.mjs';
+import type { Optional, UnknownOptional } from '../optional.mjs';
 import { isNone } from './optional-is-none.mjs';
-import { type Unwrap } from './types.mjs';
+import type { Unwrap } from './types.mjs';
 
 /**
  * Returns the `Optional` if it is `Some`, otherwise returns the alternative.

@@ -1,12 +1,12 @@
 import { Arr, Num } from 'ts-data-forge';
 import { clampRatio } from './tree.mjs';
-import {
-  type LayoutNode,
-  type NodePath,
-  type PaneDropZone,
-  type PaneId,
-  type Rect,
-  type SplitAxis,
+import type {
+  LayoutNode,
+  NodePath,
+  PaneDropZone,
+  PaneId,
+  Rect,
+  SplitAxis,
 } from './types.mjs';
 
 export type PaneRect = Readonly<{ paneId: PaneId; rect: Rect }>;

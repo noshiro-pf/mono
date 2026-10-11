@@ -1,5 +1,5 @@
 import * as PreactCompat from 'preact/compat';
-import { type InitializedObservable, type Observable } from 'synstate';
+import type { InitializedObservable, Observable } from 'synstate';
 import { Optional } from 'ts-data-forge';
 
 export function useObservableValue<A, B = A>(

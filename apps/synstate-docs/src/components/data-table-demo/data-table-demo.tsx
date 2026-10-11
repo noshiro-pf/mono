@@ -8,7 +8,7 @@ import {
 } from 'synstate';
 import { useObservableValue } from 'synstate-react-hooks';
 import { Arr, asPositiveInt16, Num, Result } from 'ts-data-forge';
-import { type PositiveInt16, type ReadonlyRecord } from 'ts-type-forge';
+import type { PositiveInt16, ReadonlyRecord } from 'ts-type-forge';
 import { sampleCsvRows } from './sample-data.mjs';
 
 // ---------------------------------------------------------------------------

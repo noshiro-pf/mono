@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type FalsyValue } from './falsy-value.mjs';
+import type { FalsyValue } from './falsy-value.mjs';
 
 // Test that all expected falsy values are part of FalsyValue
 expectType<false, FalsyValue>('<=');

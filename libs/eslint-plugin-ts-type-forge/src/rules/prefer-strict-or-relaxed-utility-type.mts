@@ -1,4 +1,4 @@
-import { type TSESLint } from '@typescript-eslint/utils';
+import type { TSESLint } from '@typescript-eslint/utils';
 import {
   DEFAULT_IMPORT_STYLE,
   IMPORT_STYLE_SCHEMA_PROPERTY,

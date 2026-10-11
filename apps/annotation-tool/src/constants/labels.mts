@@ -1,7 +1,7 @@
 import { Arr } from 'ts-data-forge';
-import { type FixedLengthTuple, type Percent } from 'ts-type-forge';
+import type { FixedLengthTuple, Percent } from 'ts-type-forge';
 import { pickupHighContrastHues, type Hue } from 'ts-utils-additional';
-import { type Label } from '../canvas/index.mjs';
+import type { Label } from '../canvas/index.mjs';
 
 export const [
   //

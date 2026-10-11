@@ -1,8 +1,8 @@
 import { memoNamed } from 'preact-utils';
-import {
-  type HighlightState,
-  type LaidOutNode,
-  type MilestoneNodeView,
+import type {
+  HighlightState,
+  LaidOutNode,
+  MilestoneNodeView,
 } from '../dag/index.mjs';
 import { useDagNodeHandlers } from './use-dag-node-handlers.mjs';
 

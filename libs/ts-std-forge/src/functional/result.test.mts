@@ -1,4 +1,4 @@
-import { type Err, type Ok } from '../adt-types.mjs';
+import type { Err, Ok } from '../adt-types.mjs';
 import { expectType } from '../expect-type.mjs';
 import { SafeNumber } from '../safe-number/index.mjs';
 import { Optional } from './optional/index.mjs';

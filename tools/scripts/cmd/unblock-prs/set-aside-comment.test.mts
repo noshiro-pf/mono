@@ -3,7 +3,7 @@ import {
   resolvedCommentBody,
   setAsideCommentBody,
 } from './set-aside-comment.mjs';
-import { type SkipRecord } from './types.mjs';
+import type { SkipRecord } from './types.mjs';
 
 describe(setAsideCommentBody, () => {
   test('writes a record the script and the page read back', () => {

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { type DeepReadonly, type UintRange } from 'ts-type-forge';
+import type { DeepReadonly, UintRange } from 'ts-type-forge';
 import { useNormalizedRangeSliderProps } from './normalize-range-slider-props-hook.mjs';
 import { useOnRangeChangeHandlerHook } from './on-range-change-handler-hook.mjs';
 import { RangeSliderView } from './range-slider-view.js';

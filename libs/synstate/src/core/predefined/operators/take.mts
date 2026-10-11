@@ -1,6 +1,6 @@
-import { type PositiveSafeIntWithSmallInt } from 'ts-type-forge';
+import type { PositiveSafeIntWithSmallInt } from 'ts-type-forge';
 import { takeWhile } from '../../operators/index.mjs';
-import { type DropInitialValueOperator } from '../../types/index.mjs';
+import type { DropInitialValueOperator } from '../../types/index.mjs';
 
 /**
  * Takes only the first `n` emissions from the source observable, then completes.

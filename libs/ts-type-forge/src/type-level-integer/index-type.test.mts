@@ -1,9 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type Index,
-  type IndexInclusive,
-  type NegativeIndex,
-} from './index-type.mjs';
+import type { Index, IndexInclusive, NegativeIndex } from './index-type.mjs';
 
 // --- Index ---
 expectType<Index<3>, 0 | 1 | 2>('=');

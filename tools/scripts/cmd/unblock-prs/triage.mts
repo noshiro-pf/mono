@@ -12,7 +12,7 @@ import {
   type RulesetRequirements,
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
-import { type StrictPick } from 'ts-type-forge';
+import type { StrictPick } from 'ts-type-forge';
 import {
   isMergeableState,
   listRequiredChecks,
@@ -38,14 +38,14 @@ import { waitingOnNote } from './merge-after.mjs';
 import { reviewHold } from './review.mjs';
 import { skipStillApplies } from './skips.mjs';
 import { nativeStackNote, stackedNote, stackParentsOf } from './stack.mjs';
-import {
-  type Classification,
-  type Demotions,
-  type PullRequest,
-  type Survey,
-  type Triage,
-  type TriageBase,
-  type TriageContext,
+import type {
+  Classification,
+  Demotions,
+  PullRequest,
+  Survey,
+  Triage,
+  TriageBase,
+  TriageContext,
 } from './types.mjs';
 import {
   isSafeRefName,

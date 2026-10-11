@@ -1,11 +1,11 @@
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { nodeId } from './graph-nodes.mjs';
-import {
-  type Dependency,
-  type DomainState,
-  type Milestone,
-  type NodeRef,
-  type Task,
+import type {
+  Dependency,
+  DomainState,
+  Milestone,
+  NodeRef,
+  Task,
 } from './types.mjs';
 
 /**

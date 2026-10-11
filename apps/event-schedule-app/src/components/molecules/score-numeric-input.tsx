@@ -7,7 +7,7 @@ import {
   answersScoreNumericInputConfig,
   clampAndRoundAnswersScore,
 } from '../../constants/index.mjs';
-import { type AnswersScore } from '../../types/index.mjs';
+import type { AnswersScore } from '../../types/index.mjs';
 
 type Props = Readonly<{
   score: AnswersScore;

@@ -16,11 +16,7 @@
  * a pull request that was waiting on something which has since cleared.
  */
 
-import {
-  type Demotions,
-  type PullRequest,
-  type WatchOutcome,
-} from './types.mjs';
+import type { Demotions, PullRequest, WatchOutcome } from './types.mjs';
 
 /**
  * Whether the pull request is demoted. A head other than the one recorded is

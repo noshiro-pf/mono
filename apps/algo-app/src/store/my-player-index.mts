@@ -1,5 +1,5 @@
 import { combine, map, type InitializedObservable } from 'synstate';
-import { type PlayerIndex } from '../types/index.mjs';
+import type { PlayerIndex } from '../types/index.mjs';
 import { db } from './database.mjs';
 import { myName$ } from './my-name.mjs';
 

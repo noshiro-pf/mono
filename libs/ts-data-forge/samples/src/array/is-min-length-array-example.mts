@@ -1,6 +1,6 @@
 // Example: src/array/array-utils.mts (isMinLengthArray)
 import { Arr } from 'ts-data-forge';
-import { type MinLengthArray } from 'ts-type-forge';
+import type { MinLengthArray } from 'ts-type-forge';
 
 if (import.meta.vitest !== undefined) {
   test('main', () => {

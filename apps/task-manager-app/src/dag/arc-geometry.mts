@@ -17,9 +17,9 @@
  */
 
 import { Num } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
-import { type GraphNodeId } from '../domain/index.mjs';
-import { type ArcEdge } from './arc-edges.mjs';
+import type { DeepReadonly } from 'ts-type-forge';
+import type { GraphNodeId } from '../domain/index.mjs';
+import type { ArcEdge } from './arc-edges.mjs';
 import { nodesBounds, type Bounds } from './dag-layout.mjs';
 import {
   centredBox,
@@ -28,7 +28,7 @@ import {
   type CubicSegment,
 } from './edge-geometry.mjs';
 import { labelSize, type LaidOutNode } from './graph-layout.mjs';
-import { type Point, type Size } from './pan-zoom.mjs';
+import type { Point, Size } from './pan-zoom.mjs';
 
 /**
  * How far right the control points are, as a share of the vertical distance

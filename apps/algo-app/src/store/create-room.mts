@@ -1,6 +1,6 @@
 import { source } from 'synstate';
 import { createBooleanState } from 'synstate-preact-hooks';
-import { type Room } from '../types/index.mjs';
+import type { Room } from '../types/index.mjs';
 import { db } from './database.mjs';
 import { setMyName } from './my-name.mjs';
 

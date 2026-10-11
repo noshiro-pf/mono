@@ -1,11 +1,11 @@
 import { expectType, Result } from 'ts-data-forge';
-import { type UnknownRecord } from 'ts-type-forge';
+import type { UnknownRecord } from 'ts-type-forge';
 import { array } from '../array/index.mjs';
 import { uintRange } from '../enum/index.mjs';
 import { literal } from '../other-types/index.mjs';
 import { number } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
-import { type TypeOf } from '../type.mjs';
+import type { TypeOf } from '../type.mjs';
 import {
   type ValidationError,
   validationErrorsToMessages,

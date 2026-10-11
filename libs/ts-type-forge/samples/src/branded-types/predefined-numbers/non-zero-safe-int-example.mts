@@ -1,4 +1,4 @@
-import { type NonZeroSafeInt, type SafeInt } from 'ts-type-forge';
+import type { NonZeroSafeInt, SafeInt } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

@@ -1,6 +1,6 @@
-import { type Uint11 } from '../constants/index.mjs';
-import { type RelaxedExclude } from '../others/index.mjs';
-import { type Index, type IndexInclusive } from './index-type.mjs';
+import type { Uint11 } from '../constants/index.mjs';
+import type { RelaxedExclude } from '../others/index.mjs';
+import type { Index, IndexInclusive } from './index-type.mjs';
 
 /**
  * Creates a union of non-negative integer literals starting from `Start` (inclusive) up to `End` (exclusive).

@@ -6,7 +6,7 @@ import { formatUncommittedFiles, isDirectlyExecuted } from 'ts-repo-utils';
 import { clearJsonFilesIn } from '../clear-json-files.mjs';
 import { settingsJsonName, variablesDir } from '../constants.mjs';
 import { listRepoVariables } from './api/index.mjs';
-import { type RepositoryVariables } from './constants.mjs';
+import type { RepositoryVariables } from './constants.mjs';
 
 /**
  * repository variable の現在値を宣言ファイルへ撮り直す。

@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type HTTPRequestMethod } from './web.mjs';
+import type { HTTPRequestMethod } from './web.mjs';
 
 // Test that all standard HTTP methods are part of HTTPRequestMethod
 expectType<'GET', HTTPRequestMethod>('<=');

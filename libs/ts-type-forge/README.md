@@ -72,7 +72,7 @@ There are two ways to use the types provided by `ts-type-forge`:
 
     ```ts
     // src/types/dice.ts
-    import { type UintRange } from 'ts-type-forge';
+    import type { UintRange } from 'ts-type-forge';
 
     export type DiceValue = UintRange<1, 7>; // 1 | 2 | 3 | 4 | 5 | 6
     ```
@@ -624,10 +624,10 @@ For detailed information on all types, see the [Full API Reference](https://nosh
     - [NegativeSafeIntWithSmallInt](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/safe-int.mts#L147)
     - [NonPositiveSafeIntWithSmallInt](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/safe-int.mts#L153)
 - src/branded-types/predefined-numbers/small-int.mts
-    - [SmallInt](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/small-int.mts#L44)
-    - [SmallUint](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/small-int.mts#L72)
-    - [WithSmallInt](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/small-int.mts#L100)
-    - [ExcludeSmallInt](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/small-int.mts#L135)
+    - [SmallInt](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/small-int.mts#L41)
+    - [SmallUint](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/small-int.mts#L69)
+    - [WithSmallInt](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/small-int.mts#L97)
+    - [ExcludeSmallInt](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/small-int.mts#L132)
 - src/branded-types/predefined-numbers/uint16.mts
     - [Uint16](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/uint16.mts#L22)
     - [PositiveUint16](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/uint16.mts#L40)
@@ -676,25 +676,25 @@ For detailed information on all types, see the [Full API Reference](https://nosh
 - src/constants/falsy-value.mts
     - [FalsyValue](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/falsy-value.mts#L43)
 - src/constants/int-enum.mts
-    - [Uint8](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L23)
-    - [Uint9](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L40)
-    - [Uint10](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L58)
-    - [Uint11](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L67)
-    - [Int8](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L73)
-    - [Int9](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L79)
-    - [Int10](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L85)
-    - [Int11](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L94)
-    - [MonthEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L128)
-    - [MonthIndexEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L150)
-    - [DateEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L156)
-    - [DayOfWeekIndex](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L162)
-    - [DayOfWeekName](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L168)
-    - [HoursEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L199)
-    - [MinutesEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L205)
-    - [SecondsEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L211)
-    - [MillisecondsEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L217)
-    - [Sexagesimal](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L223)
-    - [Percent](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L252)
+    - [Uint8](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L20)
+    - [Uint9](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L37)
+    - [Uint10](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L55)
+    - [Uint11](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L64)
+    - [Int8](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L70)
+    - [Int9](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L76)
+    - [Int10](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L82)
+    - [Int11](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L91)
+    - [MonthEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L125)
+    - [MonthIndexEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L147)
+    - [DateEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L153)
+    - [DayOfWeekIndex](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L159)
+    - [DayOfWeekName](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L165)
+    - [HoursEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L196)
+    - [MinutesEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L202)
+    - [SecondsEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L208)
+    - [MillisecondsEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L214)
+    - [Sexagesimal](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L220)
+    - [Percent](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L249)
 - src/constants/primitive.mts
     - [Primitive](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/primitive.mts#L23)
 - src/constants/record.mts
@@ -837,8 +837,8 @@ For detailed information on all types, see the [Full API Reference](https://nosh
     - [IndexInclusive](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/type-level-integer/index-type.mts#L33)
     - [NegativeIndex](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/type-level-integer/index-type.mts#L51)
 - src/type-level-integer/int-range.mts
-    - [IntRange](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/type-level-integer/int-range.mts#L34)
-    - [IntRangeInclusive](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/type-level-integer/int-range.mts#L83)
+    - [IntRange](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/type-level-integer/int-range.mts#L30)
+    - [IntRangeInclusive](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/type-level-integer/int-range.mts#L79)
 - src/type-level-integer/max.mts
     - [Max](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/type-level-integer/max.mts#L18)
 - src/type-level-integer/min.mts

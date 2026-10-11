@@ -1,5 +1,5 @@
 import { memoNamed } from 'preact-utils';
-import { type DisplayStatus } from '../domain/index.mjs';
+import type { DisplayStatus } from '../domain/index.mjs';
 import { displayStatusLabels } from '../view-model/index.mjs';
 
 type Props = Readonly<{

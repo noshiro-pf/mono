@@ -1,4 +1,4 @@
-import { type EventListItem } from 'event-schedule-app-shared';
+import type { EventListItem } from 'event-schedule-app-shared';
 import {
   combine,
   createEventEmitter,

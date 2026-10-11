@@ -1,6 +1,6 @@
-import { type UnknownResult } from '../result.mjs';
+import type { UnknownResult } from '../result.mjs';
 import { isOk } from './result-is-ok.mjs';
-import { type UnwrapErr, type UnwrapOk } from './types.mjs';
+import type { UnwrapErr, UnwrapOk } from './types.mjs';
 
 /**
  * Folds a `Result` into a plain value by applying one of two case handlers:

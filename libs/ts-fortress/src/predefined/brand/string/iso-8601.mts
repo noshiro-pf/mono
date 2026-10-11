@@ -1,12 +1,8 @@
-import {
-  type Brand,
-  type NonEmptyString,
-  type StrictOmit,
-} from 'ts-type-forge';
+import type { Brand, NonEmptyString, StrictOmit } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
 import { boolean, string } from '../../../primitives/index.mjs';
 import { record } from '../../../record/index.mjs';
-import { type Type } from '../../../type.mjs';
+import type { Type } from '../../../type.mjs';
 
 // A valid ISO 8601 string always begins with a 4-digit year, so `Iso8601` is
 // branded on top of `NonEmptyString` and is assignable to it.

@@ -1,12 +1,12 @@
 import * as path from 'node:path';
 import { Result, unknownToString } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
-import {
-  type SourceFile,
-  type Node as TsNode,
+import type { ReadonlyRecord } from 'ts-type-forge';
+import type {
+  SourceFile,
+  Node as TsNode,
 } from 'typescript-native/unstable/ast';
 import { API, type Checker } from 'typescript-native/unstable/sync';
-import { type CheckerDiagnostic, type Rule } from './types.mjs';
+import type { CheckerDiagnostic, Rule } from './types.mjs';
 
 /**
  * Runs every rule over one project, in one pass.

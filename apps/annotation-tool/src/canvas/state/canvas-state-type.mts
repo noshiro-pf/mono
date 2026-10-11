@@ -5,11 +5,11 @@
 // them, which this layer depends on. The `mut_` prefix marks the deliberate
 // mutation, as it does elsewhere in the repository.
 
-import { type Sprite } from 'pixi.js-legacy';
-import { type Mutable } from 'ts-type-forge';
-import { type Point, type Rect } from 'ts-utils-additional';
-import { type Direction } from '../functions/index.mjs';
-import { type PixiBbox, type PixiTempRect } from '../types/index.mjs';
+import type { Sprite } from 'pixi.js-legacy';
+import type { Mutable } from 'ts-type-forge';
+import type { Point, Rect } from 'ts-utils-additional';
+import type { Direction } from '../functions/index.mjs';
+import type { PixiBbox, PixiTempRect } from '../types/index.mjs';
 
 export type CanvasAppState = {
   pointerPos: Mutable<Point>;

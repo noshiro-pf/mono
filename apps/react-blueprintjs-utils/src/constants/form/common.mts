@@ -1,5 +1,5 @@
 import { css } from '@emotion/react';
-import { type MutableRecord, type ReadonlyRecord } from 'ts-type-forge';
+import type { MutableRecord, ReadonlyRecord } from 'ts-type-forge';
 import { hexToRgba } from '../../utils/index.mjs';
 import { buttonColorDisabled } from '../button/index.mjs';
 import {

@@ -1,6 +1,6 @@
-import { type GraphNodeId } from '../domain/index.mjs';
-import { type LaidOutNode } from './graph-layout.mjs';
-import { type Point } from './pan-zoom.mjs';
+import type { GraphNodeId } from '../domain/index.mjs';
+import type { LaidOutNode } from './graph-layout.mjs';
+import type { Point } from './pan-zoom.mjs';
 import {
   easeOutCubic,
   initialGridPositions,

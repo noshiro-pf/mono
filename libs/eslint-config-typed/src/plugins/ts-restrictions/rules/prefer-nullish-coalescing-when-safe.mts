@@ -6,7 +6,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
-import { type DeepReadonly, type ReadonlyRecord } from 'ts-type-forge';
+import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { skipTypeWrappers } from '../../ast-utils/index.mjs';
 

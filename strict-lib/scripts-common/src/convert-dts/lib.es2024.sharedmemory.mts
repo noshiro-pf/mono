@@ -1,10 +1,10 @@
 import { pipe } from 'ts-data-forge';
-import { type MonoTypeFunction } from 'ts-type-forge';
+import type { MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
 } from '../functions/utils/node-utils.mjs';
-import { type ConverterOptions } from './common.mjs';
+import type { ConverterOptions } from './common.mjs';
 
 export const convertLibEs2024Sharedmemory =
   ({ brandedNumber }: ConverterOptions): MonoTypeFunction<string> =>

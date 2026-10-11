@@ -1,4 +1,4 @@
-import { type RequiredKeys } from 'ts-type-forge';
+import type { RequiredKeys } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

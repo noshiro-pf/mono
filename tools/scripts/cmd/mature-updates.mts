@@ -6,7 +6,6 @@ import { fileURLToPath } from 'node:url';
 // prefers: Node erases the former and keeps the latter as a bare
 // `import {} from 'ts-type-forge'`, which fails to resolve before
 // `pnpm install`. The test's runtime-import check guards this.
-// eslint-disable-next-line import-x/consistent-type-specifier-style -- see above.
 import type { ReadonlyRecord, StrictOmit } from 'ts-type-forge';
 
 /**

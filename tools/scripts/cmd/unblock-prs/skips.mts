@@ -8,7 +8,7 @@ import {
   setAsideStillApplies,
   type SetAside,
 } from 'pr-report-core';
-import { type ResolvedBy } from './set-aside-comment.mjs';
+import type { ResolvedBy } from './set-aside-comment.mjs';
 import {
   SKIP_REASONS,
   type OwnSetAsideComment,

@@ -1,5 +1,5 @@
 import { Arr } from 'ts-data-forge';
-import { type StrictOmit } from 'ts-type-forge';
+import type { StrictOmit } from 'ts-type-forge';
 import { createMilestone } from './create-milestone.mjs';
 import { createTask } from './create-task.mjs';
 import {

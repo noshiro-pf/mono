@@ -5,19 +5,19 @@
 // them, which this layer depends on. The `mut_` prefix marks the deliberate
 // mutation, as it does elsewhere in the repository.
 
-import { type Point, type Rgba } from 'ts-utils-additional';
+import type { Point, Rgba } from 'ts-utils-additional';
 import {
   turnOffHighlight,
   turnOnHighlight,
   type Direction,
 } from '../functions/index.mjs';
-import {
-  type AnnotationCanvasStyle,
-  type IdType,
-  type PixiApp,
-  type PixiBbox,
+import type {
+  AnnotationCanvasStyle,
+  IdType,
+  PixiApp,
+  PixiBbox,
 } from '../types/index.mjs';
-import { type CanvasAppState } from './canvas-state-type.mjs';
+import type { CanvasAppState } from './canvas-state-type.mjs';
 import {
   onPointerDown,
   onPointerDownOnBackground,

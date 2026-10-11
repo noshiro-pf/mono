@@ -1,5 +1,5 @@
-import { type FixedLengthTuple } from 'ts-type-forge';
-import { type TwoDiceSumValue } from '../types/index.mjs';
+import type { FixedLengthTuple } from 'ts-type-forge';
+import type { TwoDiceSumValue } from '../types/index.mjs';
 import { twoDiceSumSet } from './two-dice-sum-set.mjs';
 
 const values: readonly TwoDiceSumValue[] = twoDiceSumSet().toArray();

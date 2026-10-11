@@ -1,15 +1,15 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type DeepReadonly,
-  type FixedLengthTuple,
-  type MutableFixedLengthTuple,
+import type {
+  DeepReadonly,
+  FixedLengthTuple,
+  MutableFixedLengthTuple,
 } from 'ts-type-forge';
-import {
-  type LambdaAbstraction,
-  type LambdaApplication,
-  type LambdaTerm,
+import type {
+  LambdaAbstraction,
+  LambdaApplication,
+  LambdaTerm,
 } from './lambda-term.mjs';
-import { type Variable } from './variable.mjs';
+import type { Variable } from './variable.mjs';
 
 describe('test types', () => {
   test('dummy', () => {

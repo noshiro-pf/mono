@@ -3,7 +3,7 @@ import { AUTO_REBASE_LABEL, SKIP_CI_LABEL } from 'pr-report-core';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { log } from '../unblock-prs/util.mjs';
-import { type ApiContext } from './api.mjs';
+import type { ApiContext } from './api.mjs';
 import {
   addLabel,
   containsBase,

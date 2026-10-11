@@ -1,6 +1,6 @@
-import { type StrictOmit } from 'ts-type-forge';
+import type { StrictOmit } from 'ts-type-forge';
 import { hasConstraints } from '../constraints/index.mjs';
-import { type Type, type UnknownType } from '../type.mjs';
+import type { Type, UnknownType } from '../type.mjs';
 
 /**
  * Converts a Type to an optional property type.

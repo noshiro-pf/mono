@@ -1,10 +1,10 @@
 import { Arr, Num } from 'ts-data-forge';
-import {
-  type LayoutNode,
-  type NodePath,
-  type PaneDropSide,
-  type PaneId,
-  type SplitAxis,
+import type {
+  LayoutNode,
+  NodePath,
+  PaneDropSide,
+  PaneId,
+  SplitAxis,
 } from './types.mjs';
 
 export const paneNode = (paneId: PaneId): LayoutNode =>

@@ -1,9 +1,9 @@
-import {
-  type BoundedLengthArray,
-  type FixedLengthTuple,
-  type MinLengthArray,
-  type NonEmptyArray,
-  type NonEmptyTuple,
+import type {
+  BoundedLengthArray,
+  FixedLengthTuple,
+  MinLengthArray,
+  NonEmptyArray,
+  NonEmptyTuple,
 } from 'ts-type-forge';
 import { IMap } from '../../collections/index.mjs';
 import { expectType } from '../../expect-type.mjs';

@@ -1,4 +1,4 @@
-import { type Float32 } from 'ts-type-forge';
+import type { Float32 } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

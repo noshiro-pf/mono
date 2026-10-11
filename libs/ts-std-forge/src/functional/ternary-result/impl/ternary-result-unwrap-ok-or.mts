@@ -1,6 +1,6 @@
-import { type UnknownTernaryResult } from '../ternary-result.mjs';
+import type { UnknownTernaryResult } from '../ternary-result.mjs';
 import { unwrapOk } from './ternary-result-unwrap-ok.mjs';
-import { type UnwrapOk } from './types.mjs';
+import type { UnwrapOk } from './types.mjs';
 
 /**
  * Returns the Ok value or the provided default.

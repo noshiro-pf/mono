@@ -14,7 +14,7 @@
  */
 
 import * as t from 'ts-fortress';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { persistedSetting } from './persisted-setting.mjs';
 
 export const dagViewModes = ['dag', 'arc', 'tile'] as const;

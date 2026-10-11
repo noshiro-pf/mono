@@ -1,8 +1,8 @@
-import {
-  type TernaryErr,
-  type TernaryOk,
-  type TernaryWarn,
-  type UnknownTernaryResult,
+import type {
+  TernaryErr,
+  TernaryOk,
+  TernaryWarn,
+  UnknownTernaryResult,
 } from '../ternary-result.mjs';
 
 /**

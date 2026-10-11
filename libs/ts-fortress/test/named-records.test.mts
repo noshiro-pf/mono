@@ -1,5 +1,5 @@
 import { asInt, expectType, Result } from 'ts-data-forge';
-import { type Int, type UnknownRecord } from 'ts-type-forge';
+import type { Int, UnknownRecord } from 'ts-type-forge';
 import {
   array,
   int,

@@ -1,4 +1,4 @@
-import { type CheckerDiagnostic } from '@sumi-lang/checker';
+import type { CheckerDiagnostic } from '@sumi-lang/checker';
 import {
   parseMarkers,
   toRuleId,

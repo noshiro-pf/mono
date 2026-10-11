@@ -1,9 +1,9 @@
 import { useState } from 'better-react-use-state';
 import { memoNamed, useDebounce } from 'react-utils';
-import { type Percent } from 'ts-type-forge';
-import { type Hue } from 'ts-utils-additional';
+import type { Percent } from 'ts-type-forge';
+import type { Hue } from 'ts-utils-additional';
 import { calcAll } from '../../../functions/index.mjs';
-import { type DivisionNumber } from '../../../types/index.mjs';
+import type { DivisionNumber } from '../../../types/index.mjs';
 import { LuminanceVisualizerView } from './luminance-visualizer-view.js';
 
 const saturationInit = 80;

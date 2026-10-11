@@ -1,8 +1,8 @@
 import { firestorePaths, type EventSchedule } from 'event-schedule-app-shared';
-import { type Firestore } from 'firebase-admin/firestore';
+import type { Firestore } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions/v1';
 import { Arr, tp } from 'ts-data-forge';
-import { type MinutesEnum, type ReadonlyRecord } from 'ts-type-forge';
+import type { MinutesEnum, ReadonlyRecord } from 'ts-type-forge';
 import {
   createMailBodyForAnswerDeadline,
   createMailBodyForAnswerResult,

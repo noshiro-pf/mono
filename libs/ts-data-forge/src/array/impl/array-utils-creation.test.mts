@@ -1,8 +1,8 @@
-import {
-  type FixedLengthTuple,
-  type SafeInt,
-  type SafeUint,
-  type SmallUint,
+import type {
+  FixedLengthTuple,
+  SafeInt,
+  SafeUint,
+  SmallUint,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { range as rangeIterator } from '../../iterator/index.mjs';
@@ -12,7 +12,7 @@ import {
   asSafeUint,
   asUint32,
 } from '../../number/index.mjs';
-import { type SizeType } from '../../types.mjs';
+import type { SizeType } from '../../types.mjs';
 import {
   copy,
   create,

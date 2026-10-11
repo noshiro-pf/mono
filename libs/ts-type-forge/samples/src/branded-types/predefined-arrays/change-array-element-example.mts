@@ -1,7 +1,7 @@
-import {
-  type ChangeArrayElement,
-  type FixedLengthArray,
-  type MinLengthArray,
+import type {
+  ChangeArrayElement,
+  FixedLengthArray,
+  MinLengthArray,
 } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above

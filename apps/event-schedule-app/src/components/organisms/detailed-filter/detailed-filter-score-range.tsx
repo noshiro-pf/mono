@@ -2,14 +2,14 @@ import { css } from '@emotion/react';
 import * as React from 'react';
 import { BpRangeSlider, CheckboxView } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import {
   answersScoreNumericInputConfig,
   clampAndRoundAnswersScore,
   dict,
 } from '../../../constants/index.mjs';
 import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
-import { type AnswersScore } from '../../../types/index.mjs';
+import type { AnswersScore } from '../../../types/index.mjs';
 import { ScoreNumericInput } from '../../molecules/index.mjs';
 import {
   CheckboxWrapper,

@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Result } from 'ts-data-forge';
 import { makeEmptyDir } from 'ts-repo-utils';
-import { type Context } from '../context.mjs';
+import type { Context } from '../context.mjs';
 import { transformDeclarationFile } from './codemod/transform-dts.mjs';
 
 /**

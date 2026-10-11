@@ -1,4 +1,4 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { resolveImportPath } from './resolve-import-path.mjs';
 

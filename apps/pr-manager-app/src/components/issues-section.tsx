@@ -1,4 +1,4 @@
-import { type OpenIssue } from 'pr-report-core';
+import type { OpenIssue } from 'pr-report-core';
 import { memoNamed } from 'preact-utils';
 import { Arr } from 'ts-data-forge';
 import { ExternalLink } from './external-link.js';

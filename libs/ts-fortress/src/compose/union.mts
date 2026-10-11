@@ -1,9 +1,5 @@
 import { Arr, expectType, memoizeFunction, Result } from 'ts-data-forge';
-import {
-  type ArrayElement,
-  type NonEmptyTuple,
-  type StrictPick,
-} from 'ts-type-forge';
+import type { ArrayElement, NonEmptyTuple, StrictPick } from 'ts-type-forge';
 import {
   flattenShapeStructure,
   hasRecordInternals,

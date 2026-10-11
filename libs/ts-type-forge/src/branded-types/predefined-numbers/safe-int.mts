@@ -1,16 +1,16 @@
 /* AUTO-GENERATED. DO NOT EDIT. Regenerate with `pnpm run build`. */
 
-import { type IntersectBrand } from '../brand.mjs';
-import { type TSTypeForgeInternals_ExtendNumberBrand } from './_number-brand-internals.mjs';
-import {
-  type NegativeNumber,
-  type NonNegativeNumber,
-  type NonPositiveNumber,
-  type NonZeroNumber,
-  type PositiveNumber,
+import type { IntersectBrand } from '../brand.mjs';
+import type { TSTypeForgeInternals_ExtendNumberBrand } from './_number-brand-internals.mjs';
+import type {
+  NegativeNumber,
+  NonNegativeNumber,
+  NonPositiveNumber,
+  NonZeroNumber,
+  PositiveNumber,
 } from './core.mjs';
-import { type Int } from './int.mjs';
-import { type WithSmallInt } from './small-int.mjs';
+import type { Int } from './int.mjs';
+import type { WithSmallInt } from './small-int.mjs';
 
 /**
  * Branded numeric type for safe integers.

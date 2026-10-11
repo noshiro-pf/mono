@@ -1,8 +1,8 @@
-import {
-  type BoundedLengthTuple,
-  type FixedLengthTuple,
-  type MaxLengthTuple,
-  type MinLengthTuple,
+import type {
+  BoundedLengthTuple,
+  FixedLengthTuple,
+  MaxLengthTuple,
+  MinLengthTuple,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import {

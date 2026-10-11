@@ -1,4 +1,4 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { isRunningLow, readRateLimit, type RateLimit } from './rate-limit.mjs';
 
 const headers = (entries: ReadonlyRecord<string, string>): Headers =>

@@ -1,5 +1,5 @@
 import { Arr } from 'ts-data-forge';
-import { type Type } from 'typescript';
+import type { Type } from 'typescript';
 import { typeSymbolName } from './common.mjs';
 
 // Note: `Lazy` deliberately excluded even though it has the same signature as `IO`, its semantics

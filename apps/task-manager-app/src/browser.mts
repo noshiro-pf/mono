@@ -8,7 +8,7 @@ import {
   createEventEmitter,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { type PersistedSetting } from './view-model/index.mjs';
+import type { PersistedSetting } from './view-model/index.mjs';
 
 /** The setting stored on this device, or its default. */
 export const loadSetting = <A,>(setting: PersistedSetting<A>): A =>

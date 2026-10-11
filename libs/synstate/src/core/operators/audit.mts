@@ -1,10 +1,10 @@
 import { Optional } from 'ts-data-forge';
 import { createAsyncChildObservable } from '../base/index.mjs';
-import {
-  type AuditOperatorObservable,
-  type KeepInitialValueOperator,
-  type Observable,
-  type TimerId,
+import type {
+  AuditOperatorObservable,
+  KeepInitialValueOperator,
+  Observable,
+  TimerId,
 } from '../types/index.mjs';
 
 /**

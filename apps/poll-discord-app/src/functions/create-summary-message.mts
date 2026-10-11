@@ -1,7 +1,7 @@
 import { EmbedBuilder, type EmbedField } from 'discord.js';
 import { type IMap, castMutable } from 'ts-data-forge';
 import { embedMessageColor, footerText } from '../constants.mjs';
-import { type Group, type Poll, type UserId } from '../types/index.mjs';
+import type { Group, Poll, UserId } from '../types/index.mjs';
 import {
   gpCreateSummaryField,
   rpCreateSummaryField,

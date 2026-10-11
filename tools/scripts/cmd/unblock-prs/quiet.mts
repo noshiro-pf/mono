@@ -5,9 +5,9 @@
  */
 
 import { isRecord } from 'ts-data-forge';
-import { type StrictPick } from 'ts-type-forge';
-import { type Options } from './options.mjs';
-import { type Quiet, type Survey } from './types.mjs';
+import type { StrictPick } from 'ts-type-forge';
+import type { Options } from './options.mjs';
+import type { Quiet, Survey } from './types.mjs';
 
 export const initialQuiet: Quiet = {
   fingerprint: undefined,

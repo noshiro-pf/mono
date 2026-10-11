@@ -3,7 +3,7 @@ import * as React from 'react';
 import { memoNamed } from 'react-utils';
 import { asSafeUint, castMutable, pipe } from 'ts-data-forge';
 import { DateUtils, type Ymdhm } from 'ts-fortress-types';
-import { type SafeUint, type StrictOmit } from 'ts-type-forge';
+import type { SafeUint, StrictOmit } from 'ts-type-forge';
 import { mapOptional } from '../../utils/index.mjs';
 
 export type BpDatetimePickerProps = StrictOmit<

@@ -1,11 +1,10 @@
 import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-// A top-level `import type`, not the inline `import { type … }` the lint
-// prefers: Node erases the former and keeps the latter as a bare
-// `import {} from 'ts-type-forge'`, which fails to resolve before
-// `pnpm install`. The test's runtime-import check guards this.
-// eslint-disable-next-line import-x/consistent-type-specifier-style -- see above.
+// A top-level `import type`, not the inline `import { type … }`: Node erases
+// the former and keeps the latter as a bare `import {} from 'ts-type-forge'`,
+// which fails to resolve before `pnpm install`. The test's runtime-import
+// check guards this.
 import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**

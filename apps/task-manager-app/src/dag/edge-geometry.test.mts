@@ -1,4 +1,4 @@
-import { type GraphNodeId } from '../domain/index.mjs';
+import type { GraphNodeId } from '../domain/index.mjs';
 import {
   cubicPoint,
   edgeGeometries,
@@ -11,7 +11,7 @@ import {
   type LaidOutEdge,
   type LaidOutNode,
 } from './graph-layout.mjs';
-import { type Point } from './pan-zoom.mjs';
+import type { Point } from './pan-zoom.mjs';
 
 const task = (id: string, x: number, y: number): LaidOutNode =>
   ({

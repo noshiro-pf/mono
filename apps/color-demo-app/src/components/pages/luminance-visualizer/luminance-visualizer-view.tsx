@@ -2,13 +2,10 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Paper } from '@mui/material';
 import { memoNamed } from 'react-utils';
-import { type NonNegativeFiniteNumber } from 'ts-data-forge';
-import { type Percent } from 'ts-type-forge';
-import { type Hsl, type Hue } from 'ts-utils-additional';
-import {
-  type ColorResult,
-  type DivisionNumber,
-} from '../../../types/index.mjs';
+import type { NonNegativeFiniteNumber } from 'ts-data-forge';
+import type { Percent } from 'ts-type-forge';
+import type { Hsl, Hue } from 'ts-utils-additional';
+import type { ColorResult, DivisionNumber } from '../../../types/index.mjs';
 import { AllSliders, ContrastRatioList } from '../../molecules/index.mjs';
 import {
   ColorList,

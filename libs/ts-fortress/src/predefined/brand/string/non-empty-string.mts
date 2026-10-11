@@ -1,8 +1,8 @@
 import { isNonEmptyString } from 'ts-data-forge';
-import { type NonEmptyString, type StrictOmit } from 'ts-type-forge';
-import {
-  type ConstrainedType,
-  type NoConstraints,
+import type { NonEmptyString, StrictOmit } from 'ts-type-forge';
+import type {
+  ConstrainedType,
+  NoConstraints,
 } from '../../../constraints/index.mjs';
 import {
   string,

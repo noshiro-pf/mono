@@ -1,9 +1,8 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr } from 'ts-data-forge';
-import { Result, type UnknownResult } from 'ts-data-forge';
+import { Arr, Result, type UnknownResult } from 'ts-data-forge';
 import { $, glob, makeEmptyDir } from 'ts-repo-utils';
-import { type Context } from '../context.mjs';
+import type { Context } from '../context.mjs';
 import { formatDir } from './utils/format.mjs';
 import { wrapStartEnd } from './utils/wrap-start-end.mjs';
 

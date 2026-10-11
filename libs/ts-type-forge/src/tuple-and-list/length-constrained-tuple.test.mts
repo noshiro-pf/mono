@@ -1,12 +1,12 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type BoundedLengthTuple,
-  type FixedLengthTuple,
-  type MaxLengthTuple,
-  type MinLengthTuple,
-  type MutableBoundedLengthTuple,
-  type MutableFixedLengthTuple,
-  type MutableMaxLengthTuple,
+import type {
+  BoundedLengthTuple,
+  FixedLengthTuple,
+  MaxLengthTuple,
+  MinLengthTuple,
+  MutableBoundedLengthTuple,
+  MutableFixedLengthTuple,
+  MutableMaxLengthTuple,
 } from './length-constrained-tuple.mjs';
 
 expectType<[0, 0], MutableFixedLengthTuple<2, 0>>('=');

@@ -1,13 +1,13 @@
 import { expectType } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
-import { type MergeIntersection, type StrictPick } from 'ts-type-forge';
+import type { MergeIntersection, StrictPick } from 'ts-type-forge';
 import {
   ANSWER_KEY_CREATED_AT,
   fillAnswerSelection,
   type AnswerSelection,
   type PartialAnswerSelection,
 } from '../../../v4/index.mjs';
-import { type AnswerId, type Weight } from '../named-primitive-types.mjs';
+import type { AnswerId, Weight } from '../named-primitive-types.mjs';
 import {
   fillUser,
   userDefaultValue,

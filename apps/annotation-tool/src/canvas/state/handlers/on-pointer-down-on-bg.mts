@@ -1,10 +1,7 @@
 import { rectFrom2Points } from 'ts-utils-additional';
 import { updateBorderedRectangleGraphics } from '../../functions/index.mjs';
-import {
-  type AnnotationCanvasStyle,
-  type PixiApp,
-} from '../../types/index.mjs';
-import { type CanvasAppState } from '../canvas-state-type.mjs';
+import type { AnnotationCanvasStyle, PixiApp } from '../../types/index.mjs';
+import type { CanvasAppState } from '../canvas-state-type.mjs';
 
 export const onPointerDownOnBackground = (
   state: CanvasAppState,

@@ -14,16 +14,16 @@
  */
 
 import * as t from 'ts-fortress';
-import { type DeepReadonly, type StrictPick } from 'ts-type-forge';
-import {
-  type DependencyGraph,
-  type DependencyGraphEdge,
-  type GraphNodeId,
-  type NodeRef,
+import type { DeepReadonly, StrictPick } from 'ts-type-forge';
+import type {
+  DependencyGraph,
+  DependencyGraphEdge,
+  GraphNodeId,
+  NodeRef,
 } from '../domain/index.mjs';
 import { formatLag, type NodeSize } from '../view-model/index.mjs';
-import { type ElkExtendedEdge, type ElkNode } from './elk.mjs';
-import { type Size } from './pan-zoom.mjs';
+import type { ElkExtendedEdge, ElkNode } from './elk.mjs';
+import type { Size } from './pan-zoom.mjs';
 import { textWidthUnits } from './truncate.mjs';
 
 /** 「標準」: a title, and a line of status and priority under it. */

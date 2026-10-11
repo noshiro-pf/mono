@@ -1,8 +1,8 @@
 import { createElement } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { Obj } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
-import { type Jikaze } from '../../types/index.mjs';
+import type { DeepReadonly } from 'ts-type-forge';
+import type { Jikaze } from '../../types/index.mjs';
 import { ButtonGroupTyped } from '../bootstrap/index.mjs';
 
 const jikazeButtons = [

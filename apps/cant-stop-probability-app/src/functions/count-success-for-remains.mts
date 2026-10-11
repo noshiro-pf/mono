@@ -1,6 +1,6 @@
 import { asSafeUint, ISet, type SafeUint } from 'ts-data-forge';
 import { diceValueList } from '../constants/index.mjs';
-import { type TwoDiceSumValue } from '../types/index.mjs';
+import type { TwoDiceSumValue } from '../types/index.mjs';
 import { possibleTwoDiceSums } from './possible-two-dice-sums.mjs';
 
 // 踏破されていない列のいずれかが出る場合の数

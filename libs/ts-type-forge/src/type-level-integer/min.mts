@@ -1,5 +1,5 @@
-import { type IsNever } from '../condition/index.mjs';
-import { type Uint10 } from '../constants/index.mjs';
+import type { IsNever } from '../condition/index.mjs';
+import type { Uint10 } from '../constants/index.mjs';
 
 /**
  * Calculates the minimum value within a union of non-negative integer literals `N` (which must extend `Uint10`).

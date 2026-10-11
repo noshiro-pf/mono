@@ -1,6 +1,6 @@
-import {
-  type BoundedLengthArray,
-  type MutableBoundedLengthArray,
+import type {
+  BoundedLengthArray,
+  MutableBoundedLengthArray,
 } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above

@@ -4,12 +4,12 @@ import {
   EventSchedule,
   firestorePaths,
 } from 'event-schedule-app-shared';
-import { type Firestore } from 'firebase-admin/firestore';
+import type { Firestore } from 'firebase-admin/firestore';
 import { https } from 'firebase-functions/v1';
 import { Arr, IMap, Optional, pipe, tp } from 'ts-data-forge';
 import { compareYearMonthDate } from 'ts-fortress-types';
-import { type StrictPick } from 'ts-type-forge';
-import { type FetchEventListOfUserPayload } from './types/index.mjs';
+import type { StrictPick } from 'ts-type-forge';
+import type { FetchEventListOfUserPayload } from './types/index.mjs';
 import { today } from './utils/index.mjs';
 
 /**

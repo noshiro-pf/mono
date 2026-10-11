@@ -1,4 +1,4 @@
-import { type Point } from '../types.mjs';
+import type { Point } from '../types.mjs';
 
 // LERP = "Linear Interpolation"
 export const LERP_FACTOR = 0.3;

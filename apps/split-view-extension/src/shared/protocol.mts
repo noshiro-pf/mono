@@ -1,5 +1,5 @@
 import { hasKey, isRecord } from 'ts-data-forge';
-import { type UnknownRecord } from 'ts-type-forge';
+import type { UnknownRecord } from 'ts-type-forge';
 
 /**
  * Tags every `postMessage` the split view sends or accepts.

@@ -1,8 +1,8 @@
 /* Array utilities */
 
-import {
-  type MinLengthArray,
-  type MutableMinLengthArray,
+import type {
+  MinLengthArray,
+  MutableMinLengthArray,
 } from '../branded-types/index.mjs';
 
 /**

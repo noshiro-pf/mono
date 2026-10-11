@@ -7,10 +7,10 @@ import {
   type WithInitialValueOperator,
 } from 'synstate';
 import { Arr, range } from 'ts-data-forge';
-import {
-  type Point,
-  type SpringAdapter,
-  type Subscription,
+import type {
+  Point,
+  SpringAdapter,
+  Subscription,
 } from '../../spring-demo/index.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, SPRING_FACTOR, lerp } from './shared.mjs';
 

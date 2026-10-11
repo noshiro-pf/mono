@@ -1,6 +1,6 @@
 import dedent from 'dedent';
 import { pipe } from 'ts-data-forge';
-import { type MonoTypeFunction } from 'ts-type-forge';
+import type { MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,

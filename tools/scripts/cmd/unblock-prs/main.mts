@@ -44,15 +44,15 @@ import { describeFailedChecks } from './set-aside-detail.mjs';
 import { newSkips, pruneSkips, settleSkips, withSkip } from './skips.mjs';
 import { stackedOnAfter, stackParentsOf } from './stack.mjs';
 import { describeAction, reportTriage, survey, triage } from './triage.mjs';
-import {
-  type CycleResult,
-  type Demotions,
-  type LoopState,
-  type PullRequest,
-  type SkipRecord,
-  type SkipRecords,
-  type Watched,
-  type WatchOutcome,
+import type {
+  CycleResult,
+  Demotions,
+  LoopState,
+  PullRequest,
+  SkipRecord,
+  SkipRecords,
+  Watched,
+  WatchOutcome,
 } from './types.mjs';
 import { installStopHandlers, log, pause, stopRequested } from './util.mjs';
 import { watch } from './watch.mjs';

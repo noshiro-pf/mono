@@ -1,8 +1,8 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
-import { type UnknownRecord } from 'ts-type-forge';
-import { type Plugin as VitePlugin } from 'vite';
+import type { UnknownRecord } from 'ts-type-forge';
+import type { Plugin as VitePlugin } from 'vite';
 
 /**
  * Gives a Chrome extension's built manifest the version in its `package.json`.

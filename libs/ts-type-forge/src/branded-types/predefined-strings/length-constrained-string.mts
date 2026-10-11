@@ -1,8 +1,8 @@
-import { type IsUnion } from '../../condition/index.mjs';
-import { type MinLengthTuple } from '../../tuple-and-list/index.mjs';
-import { type IndexInclusive } from '../../type-level-integer/index.mjs';
-import { type TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
-import { type SupportedLength } from '../supported-length.mjs';
+import type { IsUnion } from '../../condition/index.mjs';
+import type { MinLengthTuple } from '../../tuple-and-list/index.mjs';
+import type { IndexInclusive } from '../../type-level-integer/index.mjs';
+import type { TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
+import type { SupportedLength } from '../supported-length.mjs';
 
 /**
  * Branded string type for strings with at most `MaxLength` characters.

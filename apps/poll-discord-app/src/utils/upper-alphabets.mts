@@ -1,4 +1,4 @@
-import { type UpperAlphabet } from 'ts-type-forge';
+import type { UpperAlphabet } from 'ts-type-forge';
 
 /**
  * The 26 capital letters, in order.

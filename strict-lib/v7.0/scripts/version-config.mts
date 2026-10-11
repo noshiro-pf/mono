@@ -1,4 +1,4 @@
-import { type VersionConfig } from 'strict-ts-lib-scripts-common/context';
+import type { VersionConfig } from 'strict-ts-lib-scripts-common/context';
 
 export const versionConfig = {
   libName: 'strict-ts-lib-v7.0',

@@ -2,14 +2,14 @@ import { styled } from 'goober';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import { Arr } from 'ts-data-forge';
-import { type FixedLengthTuple } from 'ts-type-forge';
-import { type Rect, type RectSize } from 'ts-utils-additional';
+import type { FixedLengthTuple } from 'ts-type-forge';
+import type { Rect, RectSize } from 'ts-utils-additional';
 import { zIndex } from '../../constants/index.mjs';
 import { cardToString } from '../../functions/index.mjs';
-import {
-  type CardColor,
-  type CardNumber,
-  type CardWithDisplayValue,
+import type {
+  CardColor,
+  CardNumber,
+  CardWithDisplayValue,
 } from '../../types/index.mjs';
 import { CardComponent } from '../card/index.mjs';
 

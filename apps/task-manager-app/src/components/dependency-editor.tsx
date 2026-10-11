@@ -1,7 +1,7 @@
-import { type GenericEventHandler } from 'preact';
+import type { GenericEventHandler } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { Arr } from 'ts-data-forge';
-import { type Dependency, type NodeRef } from '../domain/index.mjs';
+import type { Dependency, NodeRef } from '../domain/index.mjs';
 import { domainSignal, editorStore } from '../store/index.mjs';
 import {
   dependencySourceOptions,

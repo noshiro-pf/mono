@@ -1,6 +1,6 @@
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 import { dist } from '../../num/index.mjs';
-import { type Point, type Rect } from '../../types/index.mjs';
+import type { Point, Rect } from '../../types/index.mjs';
 
 export const rectFromXYs = (
   xs: FixedLengthTuple<2, number>,

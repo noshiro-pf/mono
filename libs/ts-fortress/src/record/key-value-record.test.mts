@@ -1,8 +1,8 @@
 import { expectType, Result } from 'ts-data-forge';
-import { type ReadonlyRecord, type UnknownRecord } from 'ts-type-forge';
+import type { ReadonlyRecord, UnknownRecord } from 'ts-type-forge';
 import { literal } from '../other-types/index.mjs';
 import { number, string } from '../primitives/index.mjs';
-import { type TypeOf } from '../type.mjs';
+import type { TypeOf } from '../type.mjs';
 import {
   type ValidationError,
   validationErrorsToMessages,

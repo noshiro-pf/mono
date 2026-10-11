@@ -1,4 +1,4 @@
-import { type TypeExtends, type UnknownRecord } from 'ts-type-forge';
+import type { TypeExtends, UnknownRecord } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

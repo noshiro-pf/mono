@@ -1,4 +1,4 @@
-import { type IdType } from '../canvas/index.mjs';
+import type { IdType } from '../canvas/index.mjs';
 
 export type AppEventHandler = Readonly<{
   expandLabelList: () => void;

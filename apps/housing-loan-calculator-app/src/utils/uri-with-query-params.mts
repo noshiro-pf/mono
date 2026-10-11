@@ -1,6 +1,6 @@
 import { withSlash } from 'tiny-router-observable';
 import { Arr } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 
 export const uriWithQueryParams = (
   uri: string,

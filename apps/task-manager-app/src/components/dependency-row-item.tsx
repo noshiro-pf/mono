@@ -1,4 +1,4 @@
-import { type GenericEventHandler } from 'preact';
+import type { GenericEventHandler } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useCallback } from 'preact/hooks';
 import { dependencyTypes } from '../domain/index.mjs';

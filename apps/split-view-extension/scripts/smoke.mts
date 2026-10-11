@@ -4,7 +4,7 @@ import * as http from 'node:http';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { Arr, Num } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 /**

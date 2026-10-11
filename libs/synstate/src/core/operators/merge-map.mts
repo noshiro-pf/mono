@@ -1,10 +1,10 @@
 import { Arr, Optional } from 'ts-data-forge';
 import { createAsyncChildObservable } from '../base/index.mjs';
-import {
-  type DropInitialValueOperator,
-  type MergeMapOperatorObservable,
-  type Observable,
-  type Subscription,
+import type {
+  DropInitialValueOperator,
+  MergeMapOperatorObservable,
+  Observable,
+  Subscription,
 } from '../types/index.mjs';
 
 /**

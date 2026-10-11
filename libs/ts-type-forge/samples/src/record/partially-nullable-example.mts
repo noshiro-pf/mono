@@ -1,4 +1,4 @@
-import { type PartiallyNullable } from 'ts-type-forge';
+import type { PartiallyNullable } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

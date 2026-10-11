@@ -1,6 +1,6 @@
-import { type Percent } from 'ts-type-forge';
-import { type Alpha } from './alpha.mjs';
-import { type Hue } from './hue.mjs';
+import type { Percent } from 'ts-type-forge';
+import type { Alpha } from './alpha.mjs';
+import type { Hue } from './hue.mjs';
 
 type P = Percent;
 

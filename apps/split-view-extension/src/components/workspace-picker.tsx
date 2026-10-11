@@ -1,9 +1,6 @@
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import {
-  type WorkspaceEntry,
-  type WorkspaceRegistry,
-} from '../state/index.mjs';
+import type { WorkspaceEntry, WorkspaceRegistry } from '../state/index.mjs';
 import { Icon } from './icon.js';
 
 type Props = Readonly<{

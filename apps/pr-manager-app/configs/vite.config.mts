@@ -1,9 +1,5 @@
 import { Arr } from 'ts-data-forge';
-import {
-  type PluginOption,
-  type UserConfig,
-  type Plugin as VitePlugin,
-} from 'vite';
+import type { PluginOption, UserConfig, Plugin as VitePlugin } from 'vite';
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
 // eslint-disable-next-line import-x/no-relative-packages
 import { defineViteAppConfig } from '../../../tools/configs/vite-app-config.mjs';

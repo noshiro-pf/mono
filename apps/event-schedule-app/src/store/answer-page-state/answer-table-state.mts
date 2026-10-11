@@ -12,7 +12,7 @@ import {
   tp,
 } from 'ts-data-forge';
 import { compareYearMonthDate } from 'ts-fortress-types';
-import { type DeepReadonly, type FixedLengthTuple } from 'ts-type-forge';
+import type { DeepReadonly, FixedLengthTuple } from 'ts-type-forge';
 import { answerTableColor, datetimeRange2str } from '../../constants/index.mjs';
 import {
   createAnswerSelectionMapFromAnswers,
@@ -22,9 +22,9 @@ import {
   datetimeRangeFromMapKey,
   datetimeRangeToMapKey,
 } from '../../functions/index.mjs';
-import {
-  type AnswerTableCell,
-  type AnswerTableCellPosition,
+import type {
+  AnswerTableCell,
+  AnswerTableCellPosition,
 } from '../../types/index.mjs';
 import { mapOptional, match } from '../../utils-ported/index.mjs';
 import { ymd2day } from '../../utils/index.mjs';

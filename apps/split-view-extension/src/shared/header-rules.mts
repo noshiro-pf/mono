@@ -1,5 +1,5 @@
 import { castMutable } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { eventLogSessionKey } from './constants.mjs';
 
 // Neither `window.navigator`, `globalThis.navigator` nor a bare `navigator`

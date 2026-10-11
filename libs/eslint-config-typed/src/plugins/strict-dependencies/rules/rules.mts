@@ -1,4 +1,4 @@
-import { type ESLintPlugin } from '../../../types/index.mjs';
+import type { ESLintPlugin } from '../../../types/index.mjs';
 import { strictDependenciesRule } from './strict-dependencies.mjs';
 
 export const strictDependenciesRules = {

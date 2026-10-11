@@ -1,7 +1,7 @@
 import { CheckboxView } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { type SafeUint } from 'ts-type-forge';
-import { type DetailedFilterIcon } from '../../../types/index.mjs';
+import type { SafeUint } from 'ts-type-forge';
+import type { DetailedFilterIcon } from '../../../types/index.mjs';
 import { match } from '../../../utils-ported/index.mjs';
 import { CustomIcon } from '../../atoms/index.mjs';
 import { IconCountNumericInput } from '../../molecules/index.mjs';

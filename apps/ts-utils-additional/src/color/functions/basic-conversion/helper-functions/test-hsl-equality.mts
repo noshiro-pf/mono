@@ -1,5 +1,5 @@
 import { dist } from '../../../../num/index.mjs';
-import { type Hsl } from '../../../types/index.mjs';
+import type { Hsl } from '../../../types/index.mjs';
 import { epsilon } from '../color-test-values.mjs';
 
 export const testHslEquality = (

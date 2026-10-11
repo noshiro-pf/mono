@@ -1,4 +1,4 @@
-import { type LambdaTerm } from '../../../types/index.mjs';
+import type { LambdaTerm } from '../../../types/index.mjs';
 import { splitToTokens } from '../split-to-tokens.mjs';
 
 const plusStr: string =

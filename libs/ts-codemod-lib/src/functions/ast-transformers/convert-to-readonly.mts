@@ -8,11 +8,11 @@ import {
   pipe,
 } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
-import {
-  type DeepReadonly,
-  type SafeUintWithSmallInt,
-  type StrictExclude,
-  type StrictExtract,
+import type {
+  DeepReadonly,
+  SafeUintWithSmallInt,
+  StrictExclude,
+  StrictExtract,
 } from 'ts-type-forge';
 import {
   hasCallOrConstructSignature,
@@ -36,7 +36,7 @@ import {
   nextReadonlyContext,
   type ReadonlyContext,
 } from './readonly-transformer-helpers/index.mjs';
-import { type TsMorphTransformer } from './types.mjs';
+import type { TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'convert-to-readonly';
 

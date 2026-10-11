@@ -1,4 +1,4 @@
-import { type IsNotFixedLengthList } from 'ts-type-forge';
+import type { IsNotFixedLengthList } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

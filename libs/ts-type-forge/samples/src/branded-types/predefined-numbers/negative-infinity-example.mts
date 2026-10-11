@@ -1,4 +1,4 @@
-import { type FiniteNumber, type NEGATIVE_INFINITY } from 'ts-type-forge';
+import type { FiniteNumber, NEGATIVE_INFINITY } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

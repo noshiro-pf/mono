@@ -1,4 +1,4 @@
-import { type BrandedNumberConfig } from './config.mjs';
+import type { BrandedNumberConfig } from './config.mjs';
 
 export type ParamDoc = Readonly<{ name: string; desc: string }>;
 

@@ -1,11 +1,11 @@
 import { pipe } from 'ts-data-forge';
-import { type MonoTypeFunction } from 'ts-type-forge';
+import type { MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
   replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import { type ConverterOptions } from './common.mjs';
+import type { ConverterOptions } from './common.mjs';
 
 export const convertLibEs2017Date =
   ({ brandedNumber }: ConverterOptions): MonoTypeFunction<string> =>

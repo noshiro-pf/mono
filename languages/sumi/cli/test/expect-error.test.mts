@@ -1,5 +1,5 @@
-import { type CheckerDiagnostic } from '@sumi-lang/checker';
-import { type OxlintDiagnostic } from '@sumi-lang/oxlint-config';
+import type { CheckerDiagnostic } from '@sumi-lang/checker';
+import type { OxlintDiagnostic } from '@sumi-lang/oxlint-config';
 import dedent from 'dedent';
 import * as fs from 'node:fs';
 import * as os from 'node:os';

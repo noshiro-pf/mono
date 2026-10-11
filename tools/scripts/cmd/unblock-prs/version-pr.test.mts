@@ -1,4 +1,4 @@
-import { type PullRequest, type TriageContext } from './types.mjs';
+import type { PullRequest, TriageContext } from './types.mjs';
 import {
   isVersionPullRequest,
   releaseBlockers,

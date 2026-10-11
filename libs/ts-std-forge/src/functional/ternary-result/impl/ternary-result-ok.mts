@@ -1,4 +1,4 @@
-import { type TernaryOk } from '../ternary-result.mjs';
+import type { TernaryOk } from '../ternary-result.mjs';
 import { OkTypeTagName } from './tag.mjs';
 
 /**

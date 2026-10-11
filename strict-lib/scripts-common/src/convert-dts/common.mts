@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import dedent from 'dedent';
 import { expectType } from 'ts-data-forge';
-import { type MonoTypeFunction, type ReadonlyRecord } from 'ts-type-forge';
+import type { MonoTypeFunction, ReadonlyRecord } from 'ts-type-forge';
 import { generateKeyValueRecordFromKeys } from '../functions/utils/node-utils.mjs';
 
 export type ConverterConfig = Readonly<{

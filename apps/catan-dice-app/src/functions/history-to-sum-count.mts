@@ -1,5 +1,5 @@
 import { Arr, SafeUint, asSafeUint, castMutable } from 'ts-data-forge';
-import { type FixedLengthTuple, type Mutable } from 'ts-type-forge';
+import type { FixedLengthTuple, Mutable } from 'ts-type-forge';
 import { add1, type HistoryState } from '../type/index.mjs';
 
 export const historyToSumCount = (

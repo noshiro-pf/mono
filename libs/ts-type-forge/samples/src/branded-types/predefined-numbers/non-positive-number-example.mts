@@ -1,4 +1,4 @@
-import { type NonPositiveNumber } from 'ts-type-forge';
+import type { NonPositiveNumber } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

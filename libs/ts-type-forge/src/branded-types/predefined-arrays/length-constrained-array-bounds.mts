@@ -1,23 +1,23 @@
-import {
-  type IsFixedLengthList,
-  type IsNever,
-  type TypeExtends,
+import type {
+  IsFixedLengthList,
+  IsNever,
+  TypeExtends,
 } from '../../condition/index.mjs';
-import {
-  type BoolAnd,
-  type BoolNot,
-  type BoolOr,
-  type RelaxedExclude,
-  type StrictPick,
+import type {
+  BoolAnd,
+  BoolNot,
+  BoolOr,
+  RelaxedExclude,
+  StrictPick,
 } from '../../others/index.mjs';
-import {
-  type FixedLengthTuple,
-  type MinLengthTuple,
+import type {
+  FixedLengthTuple,
+  MinLengthTuple,
 } from '../../tuple-and-list/index.mjs';
-import { type UintRangeInclusive } from '../../type-level-integer/index.mjs';
-import {
-  type MaxLengthArray,
-  type StructuralPrefixCap,
+import type { UintRangeInclusive } from '../../type-level-integer/index.mjs';
+import type {
+  MaxLengthArray,
+  StructuralPrefixCap,
 } from './length-constrained-array.mjs';
 
 /**

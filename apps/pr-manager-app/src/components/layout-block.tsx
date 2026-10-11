@@ -1,4 +1,4 @@
-import { type ComponentChildren, type PointerEventHandler } from 'preact';
+import type { ComponentChildren, PointerEventHandler } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useCallback, useMemo, useRef } from 'preact/hooks';
 import {

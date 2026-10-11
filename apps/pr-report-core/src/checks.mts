@@ -1,7 +1,7 @@
 /** What the checks on a head commit add up to. */
 
 import { Arr } from 'ts-data-forge';
-import { type ChecksSummary, type ContextState } from './types.mjs';
+import type { ChecksSummary, ContextState } from './types.mjs';
 
 /**
  * What every context reported, from a head commit's check runs.

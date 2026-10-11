@@ -1,5 +1,5 @@
 /* cSpell:disable */
-import { type Linter } from 'eslint';
+import type { Linter } from 'eslint';
 
 /**
  * @description Detects potentially unsafe regular expressions, which may take a very long time to run, blocking the event loop.

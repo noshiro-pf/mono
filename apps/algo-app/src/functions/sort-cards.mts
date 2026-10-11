@@ -1,6 +1,6 @@
 import { Arr } from 'ts-data-forge';
-import { type FixedLengthTuple } from 'ts-type-forge';
-import { type Card } from '../types/index.mjs';
+import type { FixedLengthTuple } from 'ts-type-forge';
+import type { Card } from '../types/index.mjs';
 
 export const sortCards = <C extends Card>(
   cards: FixedLengthTuple<6, C>,

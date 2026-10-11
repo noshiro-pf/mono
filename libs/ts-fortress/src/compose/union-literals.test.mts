@@ -1,6 +1,6 @@
 import { expectType, Result } from 'ts-data-forge';
 import { literal } from '../other-types/index.mjs';
-import { type TypeOf } from '../type.mjs';
+import type { TypeOf } from '../type.mjs';
 import {
   type ValidationError,
   validationErrorsToMessages,

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 const isModifiedEvent = (
   ev: ReadonlyRecord<'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey', boolean>,

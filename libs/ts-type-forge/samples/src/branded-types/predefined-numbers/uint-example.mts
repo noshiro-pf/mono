@@ -1,4 +1,4 @@
-import { type Uint } from 'ts-type-forge';
+import type { Uint } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

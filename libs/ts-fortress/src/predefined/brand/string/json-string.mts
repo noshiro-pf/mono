@@ -1,8 +1,8 @@
 import { isNonNullObject } from 'ts-data-forge';
-import { type Brand, type NonEmptyString } from 'ts-type-forge';
+import type { Brand, NonEmptyString } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
 import { string } from '../../../primitives/index.mjs';
-import { type Type } from '../../../type.mjs';
+import type { Type } from '../../../type.mjs';
 
 // A valid JSON string (an object or array literal) is always non-empty, so
 // `JsonString` is branded on top of `NonEmptyString` and is assignable to it.

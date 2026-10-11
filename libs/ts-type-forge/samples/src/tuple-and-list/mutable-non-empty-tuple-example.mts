@@ -1,4 +1,4 @@
-import { type MutableNonEmptyTuple } from 'ts-type-forge';
+import type { MutableNonEmptyTuple } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

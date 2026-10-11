@@ -1,8 +1,8 @@
 import { Fragment, type ComponentChildren } from 'preact';
 import { memoNamed } from 'preact-utils';
-import { type ReadonlyRecord } from 'ts-type-forge';
-import { type BlockId, type ColumnIndex, type Layout } from '../layout.mjs';
-import { type Moving } from '../store/index.mjs';
+import type { ReadonlyRecord } from 'ts-type-forge';
+import type { BlockId, ColumnIndex, Layout } from '../layout.mjs';
+import type { Moving } from '../store/index.mjs';
 import { LayoutBlock } from './layout-block.js';
 
 type Props = Readonly<{

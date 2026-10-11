@@ -1,7 +1,7 @@
 import { produce } from 'immer';
-import { type Reducer } from 'ts-type-forge';
+import type { Reducer } from 'ts-type-forge';
 import { cardEq } from '../functions/index.mjs';
-import { type GameState, type GameStateAction } from '../types/index.mjs';
+import type { GameState, GameStateAction } from '../types/index.mjs';
 import { faceUpCard, goToNextTurn, tossCard } from './draft-modifier/index.mjs';
 import {
   answerSelectedReducer,

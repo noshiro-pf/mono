@@ -10,9 +10,9 @@ import {
 } from 'ts-data-forge';
 import { YearMonthDate } from 'ts-fortress-types';
 import { Routes } from '../../constants/index.mjs';
-import {
-  type AnswerFilterState,
-  type AnswerFilterStateAction,
+import type {
+  AnswerFilterState,
+  AnswerFilterStateAction,
 } from '../../functions/index.mjs';
 import {
   isAnswerRank,

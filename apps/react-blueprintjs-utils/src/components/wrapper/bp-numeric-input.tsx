@@ -3,7 +3,7 @@ import { useState } from 'better-react-use-state';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
 import { Num } from 'ts-data-forge';
-import { type StrictOmit } from 'ts-type-forge';
+import type { StrictOmit } from 'ts-type-forge';
 
 export type BpNumericInputProps = StrictOmit<
   NumericInputPropsOriginal,

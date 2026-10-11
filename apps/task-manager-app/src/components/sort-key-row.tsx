@@ -1,6 +1,6 @@
 import { memoNamed } from 'preact-utils';
 import { useCallback } from 'preact/hooks';
-import { type SortSpec } from '../domain/index.mjs';
+import type { SortSpec } from '../domain/index.mjs';
 import {
   sortKeyLabels,
   sortOrderLabels,

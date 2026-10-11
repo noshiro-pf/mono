@@ -4,9 +4,9 @@
  */
 
 import { Arr } from 'ts-data-forge';
-import { type EvaluationContext } from './evaluation-context.mjs';
+import type { EvaluationContext } from './evaluation-context.mjs';
 import { createEvaluator } from './evaluator.mjs';
-import { type Dependency, type Milestone, type Task } from './types.mjs';
+import type { Dependency, Milestone, Task } from './types.mjs';
 
 /** From when `dependency` holds, or `undefined` if it does not at `now`. */
 export const satisfiedSince = (

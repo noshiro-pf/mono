@@ -1,4 +1,4 @@
-import { type RelaxedOmit } from 'ts-type-forge';
+import type { RelaxedOmit } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

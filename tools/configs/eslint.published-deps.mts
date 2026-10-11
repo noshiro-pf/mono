@@ -1,5 +1,5 @@
 import typescriptEslintParser from '@typescript-eslint/parser';
-import { type FlatConfig } from 'eslint-config-typed';
+import type { FlatConfig } from 'eslint-config-typed';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
 /* eslint-disable-next-line import-x/no-rename-default */
 import eslintPluginImportX from 'eslint-plugin-import-x';

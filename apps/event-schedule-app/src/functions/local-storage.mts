@@ -1,10 +1,6 @@
 import { EventSchedule } from 'event-schedule-app-shared';
 import { Json, Result } from 'ts-data-forge';
-import {
-  type DeepReadonly,
-  type ReadonlyRecord,
-  type StrictPick,
-} from 'ts-type-forge';
+import type { DeepReadonly, ReadonlyRecord, StrictPick } from 'ts-type-forge';
 
 type EventSchedulePicked = StrictPick<
   EventSchedule,

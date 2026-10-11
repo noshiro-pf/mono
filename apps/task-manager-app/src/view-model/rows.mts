@@ -5,7 +5,7 @@
  * clock, so a component only draws.
  */
 
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import {
   buildEvaluationContext,
   createEvaluator,
@@ -17,7 +17,7 @@ import {
   type Milestone,
   type Task,
 } from '../domain/index.mjs';
-import { type ListSettings } from './list-settings.mjs';
+import type { ListSettings } from './list-settings.mjs';
 
 export const buildTaskRows = (
   state: DomainState,

@@ -654,10 +654,9 @@ const buildImports = (members: readonly Member[]): string => {
       const named = referenced
         .filter((symbol) => (symbolModules[symbol] ?? '') === specifier)
         .toSorted((a, b) => a.localeCompare(b))
-        .map((symbol) => `type ${symbol}`)
         .join(', ');
 
-      return `import { ${named} } from '${specifier}';`;
+      return `import type { ${named} } from '${specifier}';`;
     })
     .join('\n');
 };

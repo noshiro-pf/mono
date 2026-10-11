@@ -1,15 +1,15 @@
 import { expectType, Result } from 'ts-data-forge';
-import {
-  type Int,
-  type NegativeFiniteNumber,
-  type NegativeInt,
-  type NegativeSafeInt,
-  type NonPositiveFiniteNumber,
-  type NonPositiveInt,
-  type NonPositiveSafeInt,
-  type Uint,
+import type {
+  Int,
+  NegativeFiniteNumber,
+  NegativeInt,
+  NegativeSafeInt,
+  NonPositiveFiniteNumber,
+  NonPositiveInt,
+  NonPositiveSafeInt,
+  Uint,
 } from 'ts-type-forge';
-import { type TypeOf } from '../../../type.mjs';
+import type { TypeOf } from '../../../type.mjs';
 import { int } from './int.mjs';
 import { negativeFiniteNumber } from './negative-finite-number.mjs';
 import { negativeInt } from './negative-int.mjs';

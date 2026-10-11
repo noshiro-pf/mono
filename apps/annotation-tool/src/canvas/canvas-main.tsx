@@ -22,11 +22,7 @@ import {
   defaultCanvasAppState,
   type CanvasAppState,
 } from './state/index.mjs';
-import {
-  type AnnotationCanvasStyle,
-  type IdType,
-  type PixiApp,
-} from './types/index.mjs';
+import type { AnnotationCanvasStyle, IdType, PixiApp } from './types/index.mjs';
 import { zIndex } from './z-index.mjs';
 
 // Pixi.js global settings

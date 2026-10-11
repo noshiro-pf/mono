@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type UintRange, type UintRangeInclusive } from './uint-range.mjs';
+import type { UintRange, UintRangeInclusive } from './uint-range.mjs';
 
 expectType<UintRange<0, 3>, 0 | 1 | 2>('=');
 

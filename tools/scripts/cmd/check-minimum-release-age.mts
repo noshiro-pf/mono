@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, Num, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**

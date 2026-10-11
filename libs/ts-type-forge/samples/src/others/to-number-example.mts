@@ -1,4 +1,4 @@
-import { type ToNumber } from 'ts-type-forge';
+import type { ToNumber } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

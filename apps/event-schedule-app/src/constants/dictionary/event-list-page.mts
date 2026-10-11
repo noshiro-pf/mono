@@ -1,4 +1,4 @@
-import { type SafeUint } from 'ts-type-forge';
+import type { SafeUint } from 'ts-type-forge';
 
 export const eventListPageDictionary = {
   title: '日程調整一覧',

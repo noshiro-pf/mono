@@ -3,7 +3,7 @@ import {
   ASTUtils,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { isTypeWrapper, skipTypeWrappers } from '../../ast-utils/index.mjs';
 
 /**

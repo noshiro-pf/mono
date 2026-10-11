@@ -1,6 +1,6 @@
 import { expectType, Result } from 'ts-data-forge';
-import { type StrictExclude } from 'ts-type-forge';
-import { type DagLayout } from '../dag/index.mjs';
+import type { StrictExclude } from 'ts-type-forge';
+import type { DagLayout } from '../dag/index.mjs';
 import {
   asMilestoneId,
   asTaskId,

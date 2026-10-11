@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Arr, asSafeUint, range } from 'ts-data-forge';
-import { type SafeUint } from 'ts-type-forge';
+import type { SafeUint } from 'ts-type-forge';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from './adapters/index.mjs';
-import { type Point, type SpringAdapter } from './types.mjs';
+import type { Point, SpringAdapter } from './types.mjs';
 
 type Props = Readonly<{
   adapter: SpringAdapter;

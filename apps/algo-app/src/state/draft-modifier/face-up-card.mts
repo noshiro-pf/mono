@@ -1,6 +1,6 @@
-import { type DeepMutable } from 'ts-type-forge';
+import type { DeepMutable } from 'ts-type-forge';
 import { cardEq } from '../../functions/index.mjs';
-import { type Card, type GameState } from '../../types/index.mjs';
+import type { Card, GameState } from '../../types/index.mjs';
 
 export const faceUpCard = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

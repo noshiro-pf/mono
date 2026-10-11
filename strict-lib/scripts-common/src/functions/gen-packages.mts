@@ -4,7 +4,7 @@ import { Json, Num, Result, pipe } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { makeEmptyDir, pathExists } from 'ts-repo-utils';
 import { libSourceOf, type Context } from '../context.mjs';
-import { type ConverterConfig } from '../convert-dts/common.mjs';
+import type { ConverterConfig } from '../convert-dts/common.mjs';
 import { typeUtilsName } from '../convert-dts/constants.mjs';
 import { formatDir } from './utils/format.mjs';
 import { replaceWithNoMatchCheck } from './utils/node-utils.mjs';

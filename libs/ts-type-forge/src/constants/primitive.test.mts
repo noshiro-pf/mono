@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type Primitive } from './primitive.mjs';
+import type { Primitive } from './primitive.mjs';
 
 // Test that all primitive types are part of Primitive
 expectType<bigint, Primitive>('<=');

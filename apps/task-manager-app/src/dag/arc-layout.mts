@@ -9,10 +9,10 @@
  * nobody moves a node: the stored arrangement is the DAG's only.
  */
 
-import { type GraphNodeId } from '../domain/index.mjs';
-import { type NodeSize } from '../view-model/index.mjs';
+import type { GraphNodeId } from '../domain/index.mjs';
+import type { NodeSize } from '../view-model/index.mjs';
 import { nodeBoxSize, type LaidOutNode } from './graph-layout.mjs';
-import { type Point, type Size } from './pan-zoom.mjs';
+import type { Point, Size } from './pan-zoom.mjs';
 
 /** Between two tasks of the column. */
 export const ARC_NODE_GAP = 16;

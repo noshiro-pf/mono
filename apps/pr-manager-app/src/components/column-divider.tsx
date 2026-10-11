@@ -1,4 +1,4 @@
-import { type PointerEventHandler } from 'preact';
+import type { PointerEventHandler } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { DEFAULT_LAYOUT, splitAt } from '../layout.mjs';
 import { layoutStore } from '../store/index.mjs';

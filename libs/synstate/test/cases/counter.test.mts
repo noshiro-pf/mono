@@ -1,7 +1,7 @@
 import { counter, take, type Observable } from '../../src/index.mjs';
 import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { testStream } from '../test-stream.mjs';
-import { type StreamTestCase } from '../typedef.mjs';
+import type { StreamTestCase } from '../typedef.mjs';
 
 const createStreams = (
   tick: number,

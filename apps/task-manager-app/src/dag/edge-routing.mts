@@ -24,7 +24,7 @@
  */
 
 import { Arr, Num } from 'ts-data-forge';
-import { type GraphNodeId } from '../domain/index.mjs';
+import type { GraphNodeId } from '../domain/index.mjs';
 import {
   axesOf,
   boxOf,
@@ -45,7 +45,7 @@ import {
   type LaidOutEdge,
   type LaidOutNode,
 } from './graph-layout.mjs';
-import { type Point } from './pan-zoom.mjs';
+import type { Point } from './pan-zoom.mjs';
 
 /** How close to a node, other than its own two, an edge may come. */
 export const OBSTACLE_MARGIN = 12;

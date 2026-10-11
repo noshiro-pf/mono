@@ -7,13 +7,13 @@
 
 import { rectFrom2Points, type Rgba } from 'ts-utils-additional';
 import { addBboxToCanvas } from '../../functions/index.mjs';
-import {
-  type AnnotationCanvasStyle,
-  type IdType,
-  type PixiApp,
+import type {
+  AnnotationCanvasStyle,
+  IdType,
+  PixiApp,
 } from '../../types/index.mjs';
-import { type CanvasAppState } from '../canvas-state-type.mjs';
-import { type CanvasAppStateHandler } from '../state-handler-main.mjs';
+import type { CanvasAppState } from '../canvas-state-type.mjs';
+import type { CanvasAppStateHandler } from '../state-handler-main.mjs';
 
 export const onPointerUpOnBackground = (
   mut_state: CanvasAppState,

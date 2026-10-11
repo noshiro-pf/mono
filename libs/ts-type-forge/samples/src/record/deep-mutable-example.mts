@@ -1,4 +1,4 @@
-import { type DeepMutable } from 'ts-type-forge';
+import type { DeepMutable } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

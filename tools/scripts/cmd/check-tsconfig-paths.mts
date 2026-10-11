@@ -9,7 +9,7 @@ import {
   unknownToString,
 } from 'ts-data-forge';
 import { glob, isDirectlyExecuted } from 'ts-repo-utils';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { projectRootPath } from '../project-root-path.mjs';
 

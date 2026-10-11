@@ -8,7 +8,7 @@ import {
   type Subscription,
 } from 'rxjs';
 import { Arr, range } from 'ts-data-forge';
-import { type Point, type SpringAdapter } from '../types.mjs';
+import type { Point, SpringAdapter } from '../types.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, LERP_FACTOR, lerp } from './shared.mjs';
 
 const springOperator = (startPos: Point): OperatorFunction<Point, Point> =>

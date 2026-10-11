@@ -1,6 +1,6 @@
-import { type UnknownTernaryResult } from '../ternary-result.mjs';
+import type { UnknownTernaryResult } from '../ternary-result.mjs';
 import { ErrTypeTagName } from './tag.mjs';
-import { type NarrowToErr } from './types.mjs';
+import type { NarrowToErr } from './types.mjs';
 
 /**
  * Type guard for the Err variant.

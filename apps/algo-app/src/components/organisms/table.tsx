@@ -2,13 +2,13 @@ import { styled } from 'goober';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import { Num, asPositiveFiniteNumber } from 'ts-data-forge';
-import { type Rect, type RectSize } from 'ts-utils-additional';
+import type { Rect, RectSize } from 'ts-utils-additional';
 import { playerNameRectSize } from '../../constants/index.mjs';
-import {
-  type CardColor,
-  type CardNumber,
-  type DisplayValues,
-  type NWES,
+import type {
+  CardColor,
+  CardNumber,
+  DisplayValues,
+  NWES,
 } from '../../types/index.mjs';
 import { PlayerCardsArea } from './player-cards-area.js';
 import { PlayerName } from './player-name.js';

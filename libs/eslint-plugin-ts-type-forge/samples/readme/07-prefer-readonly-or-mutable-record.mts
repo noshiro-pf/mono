@@ -1,6 +1,6 @@
 /* eslint-disable @stylistic/padding-line-between-statements */
 import { expectType } from 'ts-data-forge';
-import { type MutableRecord, type ReadonlyRecord } from 'ts-type-forge';
+import type { MutableRecord, ReadonlyRecord } from 'ts-type-forge';
 
 {
   // embed-sample-code-ignore-above

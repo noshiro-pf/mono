@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { memoNamed } from 'react-utils';
 import { dict, errorFontColor } from '../../constants/index.mjs';
-import { type EventScheduleValidation } from '../../types/index.mjs';
+import type { EventScheduleValidation } from '../../types/index.mjs';
 import { Description } from '../atoms/index.mjs';
 
 const dc = dict.eventSettingsPage;

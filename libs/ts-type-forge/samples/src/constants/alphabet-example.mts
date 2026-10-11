@@ -1,4 +1,4 @@
-import { type Alphabet } from 'ts-type-forge';
+import type { Alphabet } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

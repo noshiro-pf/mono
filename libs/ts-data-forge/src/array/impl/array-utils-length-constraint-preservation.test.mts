@@ -1,10 +1,10 @@
-import {
-  type BoundedLengthArray,
-  type FixedLengthArray,
-  type FixedLengthTuple,
-  type MaxLengthArray,
-  type MinLengthArray,
-  type Seq,
+import type {
+  BoundedLengthArray,
+  FixedLengthArray,
+  FixedLengthTuple,
+  MaxLengthArray,
+  MinLengthArray,
+  Seq,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { copy, create, seq, zeros } from './array-utils-creation.mjs';

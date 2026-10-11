@@ -2,8 +2,8 @@ import { Result } from 'ts-data-forge';
 import { dependencyDepth } from './dependency-depth.mjs';
 import { displayStatus } from './display-status.mjs';
 import { buildEvaluationContext } from './evaluation-context.mjs';
-import { type SortContext } from './sort-tasks.mjs';
-import { type DisplayStatus, type DomainState, type TaskId } from './types.mjs';
+import type { SortContext } from './sort-tasks.mjs';
+import type { DisplayStatus, DomainState, TaskId } from './types.mjs';
 
 /**
  * What `sortTasks` needs to sort the tasks of `state` by status and by

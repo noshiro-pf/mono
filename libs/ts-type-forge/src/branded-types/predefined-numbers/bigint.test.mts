@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type BigInt64, type BigUint64 } from './bigint.mjs';
+import type { BigInt64, BigUint64 } from './bigint.mjs';
 
 // Test BigInt64 type
 expectType<BigInt64, bigint>('<=');

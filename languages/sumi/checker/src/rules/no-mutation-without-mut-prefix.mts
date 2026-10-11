@@ -16,9 +16,9 @@ import {
   type PropertyAccessExpression,
   type Node as TsNode,
 } from 'typescript-native/unstable/ast';
-import { type Checker } from 'typescript-native/unstable/sync';
+import type { Checker } from 'typescript-native/unstable/sync';
 import { ownerOf, unwrap } from '../ast/index.mjs';
-import { type Rule, type RuleContext } from '../engine/index.mjs';
+import type { Rule, RuleContext } from '../engine/index.mjs';
 
 /**
  * `mutation/no-mutation-without-mut-prefix` — a destructive operation is

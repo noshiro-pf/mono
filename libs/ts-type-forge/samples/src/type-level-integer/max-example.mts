@@ -1,4 +1,4 @@
-import { type Max } from 'ts-type-forge';
+import type { Max } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

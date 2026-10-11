@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, isNotUndefined, Result, unknownToString } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { glob } from './glob.mjs';
 

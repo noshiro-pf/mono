@@ -1,4 +1,4 @@
-import { type ValidationErrorDetails } from 'ts-fortress';
+import type { ValidationErrorDetails } from 'ts-fortress';
 
 // embed-sample-code-ignore-above
 type ValidationError = Readonly<{

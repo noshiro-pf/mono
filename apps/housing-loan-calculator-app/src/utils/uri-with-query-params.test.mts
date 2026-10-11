@@ -1,4 +1,4 @@
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { uriWithQueryParams } from './uri-with-query-params.mjs';
 
 const testUri = (

@@ -1,5 +1,5 @@
-import { type DeepReadonly } from 'ts-type-forge';
-import { type ProductsInfo } from '../types/index.mjs';
+import type { DeepReadonly } from 'ts-type-forge';
+import type { ProductsInfo } from '../types/index.mjs';
 import {
   AnnotationToolAppImage,
   CantStopProbabilityAppImage,

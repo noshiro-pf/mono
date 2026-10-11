@@ -16,11 +16,7 @@ import {
   getWorkspacePackages,
   isDirectlyExecuted,
 } from 'ts-repo-utils';
-import {
-  type JsonValue,
-  type MutableRecord,
-  type ReadonlyRecord,
-} from 'ts-type-forge';
+import type { JsonValue, MutableRecord, ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**

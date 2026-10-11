@@ -1,4 +1,4 @@
-import { type Type } from '../type.mjs';
+import type { Type } from '../type.mjs';
 import { createAssertFn } from './create-assert-fn.mjs';
 import { createCastFn } from './create-cast-fn.mjs';
 import { createIsFn } from './create-is-fn.mjs';

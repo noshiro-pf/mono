@@ -1,4 +1,4 @@
-import { type MaxLengthTuple } from 'ts-type-forge';
+import type { MaxLengthTuple } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

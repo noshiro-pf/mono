@@ -1,11 +1,11 @@
 import { isKeyofNotificationSettings } from 'event-schedule-app-shared';
 import { Arr, ISetMapped, expectType, fastDeepEqual } from 'ts-data-forge';
-import {
-  type DeepReadonly,
-  type ReadonlyRecord,
-  type RelaxedExclude,
-  type StrictExclude,
-  type StrictPick,
+import type {
+  DeepReadonly,
+  ReadonlyRecord,
+  RelaxedExclude,
+  StrictExclude,
+  StrictPick,
 } from 'ts-type-forge';
 import { dict, hm2str, ymd2str, ymdhm2str } from '../constants/index.mjs';
 import {

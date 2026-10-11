@@ -1,4 +1,4 @@
-import { type ReadonlyRecord, type UnknownRecord } from 'ts-type-forge';
+import type { ReadonlyRecord, UnknownRecord } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { hasKey } from './has-key.mjs';
 import { isRecord } from './is-record.mjs';

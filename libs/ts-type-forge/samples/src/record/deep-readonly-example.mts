@@ -1,4 +1,4 @@
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

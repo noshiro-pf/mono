@@ -10,7 +10,7 @@ import {
   Obj,
   Result,
 } from 'ts-data-forge';
-import { type JsonValue, type ReadonlyRecord } from 'ts-type-forge';
+import type { JsonValue, ReadonlyRecord } from 'ts-type-forge';
 import { glob } from '../glob.mjs';
 import {
   defaultDependencyFields,

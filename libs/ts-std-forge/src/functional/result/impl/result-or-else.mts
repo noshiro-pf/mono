@@ -1,6 +1,6 @@
-import { type UnknownResult } from '../result.mjs';
+import type { UnknownResult } from '../result.mjs';
 import { isOk } from './result-is-ok.mjs';
-import { type NarrowToOk } from './types.mjs';
+import type { NarrowToOk } from './types.mjs';
 
 /**
  * Returns the `Result` if it is `Ok`, otherwise returns the alternative.

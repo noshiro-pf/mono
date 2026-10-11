@@ -1,18 +1,18 @@
 import { expectType } from 'ts-data-forge';
-import { type MinLengthTuple } from '../../tuple-and-list/index.mjs';
-import { type TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
-import {
-  type ChangeArrayElement,
-  type HasLengthConstraint,
-  type LengthConstraintBrandOf,
-  type MaxLengthOf,
-  type MinLengthOf,
+import type { MinLengthTuple } from '../../tuple-and-list/index.mjs';
+import type { TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
+import type {
+  ChangeArrayElement,
+  HasLengthConstraint,
+  LengthConstraintBrandOf,
+  MaxLengthOf,
+  MinLengthOf,
 } from './length-constrained-array-bounds.mjs';
-import {
-  type BoundedLengthArray,
-  type FixedLengthArray,
-  type MaxLengthArray,
-  type MinLengthArray,
+import type {
+  BoundedLengthArray,
+  FixedLengthArray,
+  MaxLengthArray,
+  MinLengthArray,
 } from './length-constrained-array.mjs';
 
 /* HasLengthConstraint */

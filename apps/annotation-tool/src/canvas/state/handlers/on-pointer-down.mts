@@ -5,7 +5,7 @@
 // them, which this layer depends on. The `mut_` prefix marks the deliberate
 // mutation, as it does elsewhere in the repository.
 
-import { type CanvasAppState } from '../canvas-state-type.mjs';
+import type { CanvasAppState } from '../canvas-state-type.mjs';
 
 export const onPointerDown = (mut_state: CanvasAppState): void => {
   mut_state.dragStartPoint = mut_state.pointerPos;

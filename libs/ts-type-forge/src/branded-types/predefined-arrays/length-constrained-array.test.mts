@@ -1,19 +1,19 @@
 import { expectType } from 'ts-data-forge';
-import {
-  type FixedLengthTuple,
-  type MutableFixedLengthTuple,
+import type {
+  FixedLengthTuple,
+  MutableFixedLengthTuple,
 } from '../../tuple-and-list/index.mjs';
-import { type MaxLengthString } from '../predefined-strings/index.mjs';
-import { type SupportedLength } from '../supported-length.mjs';
-import {
-  type BoundedLengthArray,
-  type FixedLengthArray,
-  type MaxLengthArray,
-  type MinLengthArray,
-  type MutableBoundedLengthArray,
-  type MutableFixedLengthArray,
-  type MutableMaxLengthArray,
-  type MutableMinLengthArray,
+import type { MaxLengthString } from '../predefined-strings/index.mjs';
+import type { SupportedLength } from '../supported-length.mjs';
+import type {
+  BoundedLengthArray,
+  FixedLengthArray,
+  MaxLengthArray,
+  MinLengthArray,
+  MutableBoundedLengthArray,
+  MutableFixedLengthArray,
+  MutableMaxLengthArray,
+  MutableMinLengthArray,
 } from './length-constrained-array.mjs';
 
 // MaxLengthArray

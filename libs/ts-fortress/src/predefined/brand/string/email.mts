@@ -1,7 +1,7 @@
-import { type Brand, type NonEmptyString } from 'ts-type-forge';
+import type { Brand, NonEmptyString } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
 import { string } from '../../../primitives/index.mjs';
-import { type Type } from '../../../type.mjs';
+import type { Type } from '../../../type.mjs';
 
 // A valid e-mail address is always non-empty, so `Email` is branded on top of
 // `NonEmptyString` and is assignable to it.

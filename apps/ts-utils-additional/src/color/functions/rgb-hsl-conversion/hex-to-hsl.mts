@@ -1,4 +1,4 @@
-import { type Hsl } from '../../types/index.mjs';
+import type { Hsl } from '../../types/index.mjs';
 import { hexToRgb } from '../basic-conversion/index.mjs';
 import { rgbToHsl } from './rgb-to-hsl.mjs';
 

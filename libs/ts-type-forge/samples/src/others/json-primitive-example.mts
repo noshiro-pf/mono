@@ -1,4 +1,4 @@
-import { type JsonPrimitive } from 'ts-type-forge';
+import type { JsonPrimitive } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

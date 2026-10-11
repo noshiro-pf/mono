@@ -1,6 +1,6 @@
 /* cSpell:disable */
-import { type Linter } from 'eslint';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { Linter } from 'eslint';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 namespace StrictDependencies {
   /**

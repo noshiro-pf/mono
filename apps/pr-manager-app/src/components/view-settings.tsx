@@ -1,5 +1,5 @@
 import { effect } from '@preact/signals';
-import { type InputEventHandler, type RefCallback } from 'preact';
+import type { InputEventHandler, RefCallback } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import { Arr } from 'ts-data-forge';

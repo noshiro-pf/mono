@@ -1,4 +1,4 @@
-import { type BivariantHack } from 'ts-type-forge';
+import type { BivariantHack } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

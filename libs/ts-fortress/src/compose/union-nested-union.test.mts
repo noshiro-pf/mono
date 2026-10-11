@@ -2,7 +2,7 @@ import { Result } from 'ts-data-forge';
 import { literal, recursion } from '../other-types/index.mjs';
 import { nullType, number, string } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
-import { type Type } from '../type.mjs';
+import type { Type } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { union } from './union.mjs';
 

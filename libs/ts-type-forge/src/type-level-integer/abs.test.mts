@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type Abs } from './abs.mjs';
+import type { Abs } from './abs.mjs';
 
 expectType<Abs<0>, 0>('=');
 

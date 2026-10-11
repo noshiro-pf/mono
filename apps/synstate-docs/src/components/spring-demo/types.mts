@@ -1,4 +1,4 @@
-import { type SafeUint } from 'ts-type-forge';
+import type { SafeUint } from 'ts-type-forge';
 
 export type Point = Readonly<{ x: number; y: number }>;
 

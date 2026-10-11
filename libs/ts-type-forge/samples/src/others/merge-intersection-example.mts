@@ -1,4 +1,4 @@
-import { type MergeIntersection } from 'ts-type-forge';
+import type { MergeIntersection } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

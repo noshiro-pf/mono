@@ -1,6 +1,6 @@
 // Example: src/object/object.mts (filter)
 import { Obj, isString } from 'ts-data-forge';
-import { type UnknownRecord } from 'ts-type-forge';
+import type { UnknownRecord } from 'ts-type-forge';
 
 if (import.meta.vitest !== undefined) {
   test('main', () => {

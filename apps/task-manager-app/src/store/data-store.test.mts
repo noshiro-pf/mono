@@ -1,12 +1,12 @@
 import { createState } from 'synstate';
-import { type DagLayout } from '../dag/index.mjs';
+import type { DagLayout } from '../dag/index.mjs';
 import { asTaskId, createTask, type DomainState } from '../domain/index.mjs';
 import {
   createMemoryRepository,
   type Repository,
 } from '../repository/index.mjs';
 import { createDataStore, EMPTY_STATE } from './data-store.mjs';
-import { type Session } from './session-store.mjs';
+import type { Session } from './session-store.mjs';
 
 const a = createTask({ id: asTaskId('a'), title: 'A', now: 0 });
 

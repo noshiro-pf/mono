@@ -5,7 +5,7 @@ import {
 } from 'event-schedule-app-shared';
 import { Arr, pipe } from 'ts-data-forge';
 import { DateUtils, TimeRange, YmdhmFromDate } from 'ts-fortress-types';
-import { type DateEnum, type NonEmptyArray } from 'ts-type-forge';
+import type { DateEnum, NonEmptyArray } from 'ts-type-forge';
 import { defaultIconPoint } from './default-icon-point.mjs';
 import { dict } from './dictionary/index.mjs';
 

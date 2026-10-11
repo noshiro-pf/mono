@@ -1,13 +1,13 @@
 import { expectType } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
-import { type AnswerIconId } from '../enum/index.mjs';
+import type { ReadonlyRecord } from 'ts-type-forge';
+import type { AnswerIconId } from '../enum/index.mjs';
 import {
   answerIconSettingsDefaultValue,
   fillAnswerIconSettings,
   isAnswerIconSettings,
   type AnswerIconSettings,
 } from './answer-icon-settings.mjs';
-import { type AnswerIconSetting } from './base/index.mjs';
+import type { AnswerIconSetting } from './base/index.mjs';
 
 describe('AnswerIconSettings', () => {
   expectType<

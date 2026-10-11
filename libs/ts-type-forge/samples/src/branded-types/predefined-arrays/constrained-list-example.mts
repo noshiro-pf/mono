@@ -1,7 +1,7 @@
-import {
-  type BoundedLengthArray,
-  type ConstrainedList,
-  type MinLengthArray,
+import type {
+  BoundedLengthArray,
+  ConstrainedList,
+  MinLengthArray,
 } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above

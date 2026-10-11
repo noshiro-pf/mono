@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { memoNamed } from 'react-utils';
 import { useObservableValue } from 'synstate-react-hooks';
-import { type RectSize } from 'ts-utils-additional';
+import type { RectSize } from 'ts-utils-additional';
 import {
   AnnotationCanvas,
   defaultAnnotationCanvasStyle,

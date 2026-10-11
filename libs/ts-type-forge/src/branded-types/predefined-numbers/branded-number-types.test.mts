@@ -1,46 +1,46 @@
 import { expectType } from 'ts-data-forge';
-import { type TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
-import { type IntersectBrand, type NormalizeBrandUnion } from '../brand.mjs';
-import { type BigInt64, type BigUint64 } from './bigint.mjs';
-import {
-  type NaNType,
-  type NegativeNumber,
-  type NonNegativeNumber,
-  type NonPositiveNumber,
-  type NonZeroNumber,
-  type PositiveNumber,
-  type ValidNumber,
+import type { TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
+import type { IntersectBrand, NormalizeBrandUnion } from '../brand.mjs';
+import type { BigInt64, BigUint64 } from './bigint.mjs';
+import type {
+  NaNType,
+  NegativeNumber,
+  NonNegativeNumber,
+  NonPositiveNumber,
+  NonZeroNumber,
+  PositiveNumber,
+  ValidNumber,
 } from './core.mjs';
-import {
-  type FiniteNumber,
-  type InfiniteNumber,
-  type NEGATIVE_INFINITY,
-  type NegativeFiniteNumber,
-  type NonNegativeFiniteNumber,
-  type NonZeroFiniteNumber,
-  type POSITIVE_INFINITY,
-  type PositiveFiniteNumber,
+import type {
+  FiniteNumber,
+  InfiniteNumber,
+  NEGATIVE_INFINITY,
+  NegativeFiniteNumber,
+  NonNegativeFiniteNumber,
+  NonZeroFiniteNumber,
+  POSITIVE_INFINITY,
+  PositiveFiniteNumber,
 } from './finite-number.mjs';
-import { type Float16, type Float32, type Float64 } from './float.mjs';
-import {
-  type Int,
-  type NegativeInt,
-  type NonZeroInt,
-  type PositiveInt,
-  type Uint,
+import type { Float16, Float32, Float64 } from './float.mjs';
+import type {
+  Int,
+  NegativeInt,
+  NonZeroInt,
+  PositiveInt,
+  Uint,
 } from './int.mjs';
-import { type Int16, type NegativeInt16 } from './int16.mjs';
-import { type Int32, type NegativeInt32 } from './int32.mjs';
-import {
-  type NegativeSafeInt,
-  type NonZeroSafeInt,
-  type PositiveSafeInt,
-  type SafeInt,
-  type SafeUint,
+import type { Int16, NegativeInt16 } from './int16.mjs';
+import type { Int32, NegativeInt32 } from './int32.mjs';
+import type {
+  NegativeSafeInt,
+  NonZeroSafeInt,
+  PositiveSafeInt,
+  SafeInt,
+  SafeUint,
 } from './safe-int.mjs';
-import { type SmallInt, type WithSmallInt } from './small-int.mjs';
-import { type Uint16 } from './uint16.mjs';
-import { type Uint32 } from './uint32.mjs';
+import type { SmallInt, WithSmallInt } from './small-int.mjs';
+import type { Uint16 } from './uint16.mjs';
+import type { Uint32 } from './uint32.mjs';
 
 {
   expectType<

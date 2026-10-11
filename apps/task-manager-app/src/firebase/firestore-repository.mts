@@ -14,7 +14,7 @@
 
 import { collection, doc, type Firestore } from 'firebase/firestore';
 import { Result } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import {
   commitBatch,
   putDoc,
@@ -22,12 +22,7 @@ import {
   watchDoc,
   type DocTarget,
 } from '../api/index.mjs';
-import {
-  type Milestone,
-  type MilestoneId,
-  type Task,
-  type TaskId,
-} from '../domain/index.mjs';
+import type { Milestone, MilestoneId, Task, TaskId } from '../domain/index.mjs';
 import {
   DagLayoutDocCodec,
   dagLayoutFromDoc,

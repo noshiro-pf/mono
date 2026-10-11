@@ -80,15 +80,15 @@ const generateFileContent = (rules: readonly RuleInfo[]): string => {
     '// (`scripts/cmd/gen-rule-types.mts`). Do not edit it manually.',
     '',
     ...(hasAnyOptions
-      ? ["import { type TSESLint } from '@typescript-eslint/utils';"]
+      ? ["import type { TSESLint } from '@typescript-eslint/utils';"]
       : []),
-    "import { type Linter } from 'eslint';",
+    "import type { Linter } from 'eslint';",
     // `ReadonlyRecord` is only referenced by the no-option `…RulesOption` form
     // emitted below, so it must not be imported when some rule takes options.
     Arr.isEmpty(optionRules)
-      ? "import { type ReadonlyRecord, type TypeEq } from 'ts-type-forge';"
-      : "import { type TypeEq } from 'ts-type-forge';",
-    "import { type tsFortressRules } from './rules/index.mjs';",
+      ? "import type { ReadonlyRecord, TypeEq } from 'ts-type-forge';"
+      : "import type { TypeEq } from 'ts-type-forge';",
+    "import type { tsFortressRules } from './rules/index.mjs';",
     '',
     ...(hasAnyOptions
       ? [

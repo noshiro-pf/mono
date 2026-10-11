@@ -5,11 +5,7 @@
  */
 
 import { Arr } from 'ts-data-forge';
-import {
-  type Classification,
-  type PullRequest,
-  type TriageContext,
-} from './types.mjs';
+import type { Classification, PullRequest, TriageContext } from './types.mjs';
 
 /**
  * The pull requests this one declared it must merge after that have not

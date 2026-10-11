@@ -1,10 +1,10 @@
 import { Optional } from 'ts-data-forge';
 import { createSyncChildObservable } from '../base/index.mjs';
-import {
-  type KeepInitialValueOperator,
-  type Observable,
-  type ThrottleOperatorObservable,
-  type TimerId,
+import type {
+  KeepInitialValueOperator,
+  Observable,
+  ThrottleOperatorObservable,
+  TimerId,
 } from '../types/index.mjs';
 
 /**

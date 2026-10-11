@@ -1,4 +1,4 @@
-import { type ToString } from 'ts-type-forge';
+import type { ToString } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

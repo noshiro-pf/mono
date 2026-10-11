@@ -1,6 +1,6 @@
-import { type IsFixedLengthList } from '../condition/index.mjs';
-import { type NonEmptyTuple } from './array.mjs';
-import { type Tuple } from './tuple.mjs';
+import type { IsFixedLengthList } from '../condition/index.mjs';
+import type { NonEmptyTuple } from './array.mjs';
+import type { Tuple } from './tuple.mjs';
 
 export namespace List {
   /**

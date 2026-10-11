@@ -1,4 +1,4 @@
-import { type MutableMap } from 'ts-type-forge';
+import type { MutableMap } from 'ts-type-forge';
 
 type User = Readonly<{ id: number; name: string }>;
 

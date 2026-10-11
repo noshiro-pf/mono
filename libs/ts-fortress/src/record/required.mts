@@ -1,10 +1,10 @@
 import { Obj, expectType } from 'ts-data-forge';
-import {
-  type ArrayElement,
-  type NonEmptyTuple,
-  type PartiallyRequired,
-  type TypeEq,
-  type UnknownRecord,
+import type {
+  ArrayElement,
+  NonEmptyTuple,
+  PartiallyRequired,
+  TypeEq,
+  UnknownRecord,
 } from 'ts-type-forge';
 import {
   flattenShapeStructure,

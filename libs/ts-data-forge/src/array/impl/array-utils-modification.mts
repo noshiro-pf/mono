@@ -1,18 +1,18 @@
-import {
-  type ChangeArrayElement,
-  type ConstrainedList,
-  type FixedLengthTuple,
-  type Increment,
-  type IsFixedLengthList,
-  type NonEmptyArray,
-  type UnknownBrand,
+import type {
+  ChangeArrayElement,
+  ConstrainedList,
+  FixedLengthTuple,
+  Increment,
+  IsFixedLengthList,
+  NonEmptyArray,
+  UnknownBrand,
 } from 'ts-type-forge';
 import { asPositiveUint32 } from '../../number/index.mjs';
 import { castMutable } from '../../others/index.mjs';
-import {
-  type ArgArrayIndex,
-  type ArgArrayIndexWithNegative,
-  type SizeType,
+import type {
+  ArgArrayIndex,
+  ArgArrayIndexWithNegative,
+  SizeType,
 } from '../../types.mjs';
 import { copy, create } from './array-utils-creation.mjs';
 

@@ -4,7 +4,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, Result } from 'ts-data-forge';
 import { $, glob, isDirectlyExecuted } from 'ts-repo-utils';
-import { type NonEmptyArray } from 'ts-type-forge';
+import type { NonEmptyArray } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 import {
   applyTransformationsToFile,
@@ -121,10 +121,10 @@ const restoreTsTypeForgeImport = async (
 
 /** 既存の ts-type-forge の import 文（prettier により複数行になりうる） */
 const tsTypeForgeImportPattern =
-  /import\s*\{[^}]*\}\s*from\s*'ts-type-forge';/u;
+  /import[\s\w]*\{[^}]*\}\s*from\s*'ts-type-forge';/u;
 
 /** ts-type-forge の import 文を挿入する位置の目印 */
-const eslintImportPattern = /import\s*\{[^}]*\}\s*from\s*'eslint';/u;
+const eslintImportPattern = /import[\s\w]*\{[^}]*\}\s*from\s*'eslint';/u;
 
 const fmt = async (targetFileNames?: NonEmptyArray<string>): Promise<void> => {
   console.info('formatting code ...');

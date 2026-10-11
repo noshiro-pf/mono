@@ -1,6 +1,6 @@
 import { expectType } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
-import { type MergeIntersection, type StrictPick } from 'ts-type-forge';
+import type { MergeIntersection, StrictPick } from 'ts-type-forge';
 import {
   defaultAnswerIconSetting,
   defaultNotificationSettings,

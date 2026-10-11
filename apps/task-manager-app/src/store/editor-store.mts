@@ -13,11 +13,7 @@
 
 import { createState, type InitializedObservable } from 'synstate';
 import { Result } from 'ts-data-forge';
-import {
-  type DeepReadonly,
-  type RelaxedExclude,
-  type StrictOmit,
-} from 'ts-type-forge';
+import type { DeepReadonly, RelaxedExclude, StrictOmit } from 'ts-type-forge';
 import {
   asMilestoneId,
   asTaskId,

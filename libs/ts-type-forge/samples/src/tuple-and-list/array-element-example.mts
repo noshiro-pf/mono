@@ -1,4 +1,4 @@
-import { type ArrayElement } from 'ts-type-forge';
+import type { ArrayElement } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

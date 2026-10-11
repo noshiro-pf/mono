@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/prefer-global-this */
 import { createState, map, type InitializedObservable } from 'synstate';
 import { castMutable, pipe } from 'ts-data-forge';
-import { type DeepReadonly, type StrictOmit } from 'ts-type-forge';
+import type { DeepReadonly, StrictOmit } from 'ts-type-forge';
 
 /**
  * @param sortParams - Sort query params by key. Default is true.

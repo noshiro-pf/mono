@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   getArgumentText,
   getValueType,

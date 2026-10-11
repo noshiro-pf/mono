@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @stylistic/padding-line-between-statements */
 import { expectType } from 'ts-data-forge';
-import {
-  type FixedLengthTuple,
-  type MaxLengthTuple,
-  type NonEmptyArray,
+import type {
+  FixedLengthTuple,
+  MaxLengthTuple,
+  NonEmptyArray,
 } from 'ts-type-forge';
 // embed-sample-code-ignore-above
 import * as t from 'ts-fortress';

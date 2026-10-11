@@ -1,5 +1,5 @@
 import { BehaviorSubject, combineLatest, map, type Subscription } from 'rxjs';
-import { type Adapter, type Point } from '../types.mjs';
+import type { Adapter, Point } from '../types.mjs';
 
 export const createRxJSAdapter = (): Adapter => {
   let mut_mousePos$: BehaviorSubject<Point> | undefined;

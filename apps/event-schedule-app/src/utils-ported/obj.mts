@@ -1,6 +1,6 @@
 import { Arr, hasKey, Obj as ObjBase } from 'ts-data-forge';
-import { type ReadonlyRecord, type UnknownRecord } from 'ts-type-forge';
-import { type Paths, type RecordValueAtPath } from './paths.mjs';
+import type { ReadonlyRecord, UnknownRecord } from 'ts-type-forge';
+import type { Paths, RecordValueAtPath } from './paths.mjs';
 
 /**
  * Whether `record` has `key`, and its value satisfies `guard`.

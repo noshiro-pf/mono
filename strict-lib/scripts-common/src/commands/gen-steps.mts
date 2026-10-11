@@ -1,7 +1,7 @@
 import { chdir } from 'node:process';
-import { type UnknownResult } from 'ts-data-forge';
+import type { UnknownResult } from 'ts-data-forge';
 import { $ } from 'ts-repo-utils';
-import { type Context } from '../context.mjs';
+import type { Context } from '../context.mjs';
 import { fetchLibFiles } from '../functions/fetch-lib-files.mjs';
 import { genCodemodFixed } from '../functions/gen-codemod-fixed.mjs';
 import { genDiff, prepareCopiedForDiff } from '../functions/gen-diff.mjs';

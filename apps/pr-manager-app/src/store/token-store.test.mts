@@ -1,4 +1,4 @@
-import { type KeyValueStore, type TokenStores } from '../token.mjs';
+import type { KeyValueStore, TokenStores } from '../token.mjs';
 import { createTokenStore } from './token-store.mjs';
 
 describe(createTokenStore, () => {

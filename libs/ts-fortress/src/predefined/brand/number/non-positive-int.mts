@@ -1,9 +1,9 @@
 import { isNonPositiveInt } from 'ts-data-forge';
-import { type NonPositiveInt } from 'ts-type-forge';
+import type { NonPositiveInt } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
-import {
-  type ConstrainedType,
-  type NoConstraints,
+import type {
+  ConstrainedType,
+  NoConstraints,
 } from '../../../constraints/index.mjs';
 import {
   number,

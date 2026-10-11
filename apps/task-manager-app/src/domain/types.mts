@@ -5,7 +5,7 @@
  */
 
 import * as t from 'ts-fortress';
-import { type Brand } from 'ts-type-forge';
+import type { Brand } from 'ts-type-forge';
 
 /**
  * A task's id: any non-empty string. The codec's `is` is the guard, and

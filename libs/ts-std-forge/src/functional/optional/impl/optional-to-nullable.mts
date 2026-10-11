@@ -1,7 +1,7 @@
-import { type UnknownOptional } from '../optional.mjs';
+import type { UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
 import { unwrap } from './optional-unwrap.mjs';
-import { type Unwrap } from './types.mjs';
+import type { Unwrap } from './types.mjs';
 
 /**
  * Converts an `Optional` to a nullable value.

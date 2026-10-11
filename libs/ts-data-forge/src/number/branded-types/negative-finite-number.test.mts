@@ -1,7 +1,7 @@
-import {
-  type NegativeInt,
-  type NonPositiveInt,
-  type PositiveFiniteNumber,
+import type {
+  NegativeInt,
+  NonPositiveInt,
+  PositiveFiniteNumber,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { range } from '../../iterator/index.mjs';

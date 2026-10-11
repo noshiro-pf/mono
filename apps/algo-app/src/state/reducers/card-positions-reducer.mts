@@ -1,11 +1,7 @@
 import { produce } from 'immer';
-import {
-  type FixedLengthTuple,
-  type ReadonlyRecord,
-  type Reducer,
-} from 'ts-type-forge';
-import { type Rect } from 'ts-utils-additional';
-import { type CardColor, type CardNumber } from '../../types/index.mjs';
+import type { FixedLengthTuple, ReadonlyRecord, Reducer } from 'ts-type-forge';
+import type { Rect } from 'ts-utils-additional';
+import type { CardColor, CardNumber } from '../../types/index.mjs';
 
 const defaultPosition = (): Rect =>
   ({ top: 0, left: 0, width: 0, height: 0 }) as const;

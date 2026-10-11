@@ -7,11 +7,11 @@ import {
   DayPickerStyled,
 } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { type Observable as SynstateObservable } from 'synstate';
-import { type IMapMapped } from 'ts-data-forge';
-import {
-  type CalendarCurrentPageReducerState,
-  type YmdKey,
+import type { Observable as SynstateObservable } from 'synstate';
+import type { IMapMapped } from 'ts-data-forge';
+import type {
+  CalendarCurrentPageReducerState,
+  YmdKey,
 } from '../../functions/index.mjs';
 import { useMultipleDatePickerState } from '../../hooks/index.mjs';
 import { DatepickerNav } from './navigation.js';

@@ -9,19 +9,19 @@ import {
   Result,
   tp,
 } from 'ts-data-forge';
-import {
-  type MergeIntersection,
-  type StrictExclude,
-  type TypeEq,
-  type UnknownRecord,
+import type {
+  MergeIntersection,
+  StrictExclude,
+  TypeEq,
+  UnknownRecord,
 } from 'ts-type-forge';
-import {
-  type ExcessPropertyOption,
-  type RecordTypeInternals,
-  type Type,
-  type TypeOf,
-  type UnknownShape,
-  type WithShape,
+import type {
+  ExcessPropertyOption,
+  RecordTypeInternals,
+  Type,
+  TypeOf,
+  UnknownShape,
+  WithShape,
 } from '../type.mjs';
 import {
   createAssertFn,

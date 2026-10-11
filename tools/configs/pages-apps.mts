@@ -1,6 +1,6 @@
 import * as path from 'node:path';
 import { hasKey, isRecord } from 'ts-data-forge';
-import { type FixedLengthTuple } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 
 /**
  * The apps published as part of the GitHub Pages site, and the directory each

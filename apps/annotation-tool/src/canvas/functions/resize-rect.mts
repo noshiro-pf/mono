@@ -1,5 +1,5 @@
 import { normalizeRect, type Point, type Rect } from 'ts-utils-additional';
-import { type Direction } from './bbox-points.mjs';
+import type { Direction } from './bbox-points.mjs';
 
 const resizeRectSub = (
   rectPrevious: Rect,

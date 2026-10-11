@@ -1,4 +1,4 @@
-import { type NonNegativeInt32 } from 'ts-type-forge';
+import type { NonNegativeInt32 } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

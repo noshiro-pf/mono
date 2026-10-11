@@ -1,5 +1,5 @@
 /* eslint-disable import-x/first */
-import { type Endpoints } from '@octokit/types';
+import type { Endpoints } from '@octokit/types';
 
 type GetRepositoryEndpoint = Endpoints['GET /repos/{owner}/{repo}'];
 

@@ -1,4 +1,4 @@
-import { type Result } from '../result.mjs';
+import type { Result } from '../result.mjs';
 import { isOk } from './result-is-ok.mjs';
 import { ok } from './result-ok.mjs';
 

@@ -8,7 +8,7 @@
  */
 
 import { castDeepMutable } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 // eslint-disable-next-line import-x/no-internal-modules, import-x/extensions -- elkjs has no `exports` map, and its browser build is reachable only by this path (`main` is the Node build).
 import type * as ElkApi from 'elkjs/lib/elk.bundled.js';
 

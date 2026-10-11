@@ -1,11 +1,7 @@
 import { asSafeUint } from 'ts-data-forge';
-import { type MutableRecord } from 'ts-type-forge';
+import type { MutableRecord } from 'ts-type-forge';
 import { diceValueList } from '../constants/index.mjs';
-import {
-  type Count,
-  type DiceValue,
-  type TwoDiceSumValue,
-} from '../types/index.mjs';
+import type { Count, DiceValue, TwoDiceSumValue } from '../types/index.mjs';
 import { possibleTwoDiceSumPairs } from './possible-two-dice-sum-pair.mjs';
 
 /** Which counter a single roll of four dice contributes to. */

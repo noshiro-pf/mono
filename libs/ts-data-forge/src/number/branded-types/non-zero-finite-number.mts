@@ -1,8 +1,8 @@
-import {
-  type Int,
-  type NonZeroInt,
-  type PositiveFiniteNumber,
-  type NonZeroFiniteNumber as TtfImported_NonZeroFiniteNumber,
+import type {
+  Int,
+  NonZeroInt,
+  PositiveFiniteNumber,
+  NonZeroFiniteNumber as TtfImported_NonZeroFiniteNumber,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';

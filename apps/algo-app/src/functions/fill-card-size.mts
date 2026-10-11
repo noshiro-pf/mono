@@ -1,4 +1,4 @@
-import { type RectSize } from 'ts-utils-additional';
+import type { RectSize } from 'ts-utils-additional';
 import { defaultCardSize } from '../constants/index.mjs';
 
 export const fillCardSize = (size: Partial<RectSize> | undefined): RectSize =>

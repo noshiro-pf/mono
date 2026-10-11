@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type Decrement, type Increment } from './increment.mjs';
+import type { Decrement, Increment } from './increment.mjs';
 
 expectType<Increment<3>, 4>('=');
 

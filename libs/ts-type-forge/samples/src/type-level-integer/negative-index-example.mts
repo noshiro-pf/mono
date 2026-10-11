@@ -1,4 +1,4 @@
-import { type NegativeIndex } from 'ts-type-forge';
+import type { NegativeIndex } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

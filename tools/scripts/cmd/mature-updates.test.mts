@@ -8,7 +8,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as util from 'node:util';
 import { Arr, isNonNullObject } from 'ts-data-forge';
-import { type ReadonlyRecord, type StrictPick } from 'ts-type-forge';
+import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import {
   compareVersions,
   parseActionPinLine,

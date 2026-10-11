@@ -5,8 +5,8 @@
 // them, which this layer depends on. The `mut_` prefix marks the deliberate
 // mutation, as it does elsewhere in the repository.
 
-import { type Graphics } from 'pixi.js-legacy';
-import { type Rect, type Rgba } from 'ts-utils-additional';
+import type { Graphics } from 'pixi.js-legacy';
+import type { Rect, Rgba } from 'ts-utils-additional';
 
 export type PixiTempRect = Readonly<{
   rect: Rect;

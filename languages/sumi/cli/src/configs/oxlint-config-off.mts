@@ -1,5 +1,5 @@
 import { oxlintCodeToRuleId } from '@sumi-lang/oxlint-config';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**
  * `eslint(no-var)` → `no-var`, `typescript(no-explicit-any)` →

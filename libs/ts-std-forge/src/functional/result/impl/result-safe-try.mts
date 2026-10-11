@@ -1,7 +1,7 @@
-import { type Err } from '../../../adt-types.mjs';
+import type { Err } from '../../../adt-types.mjs';
 import { hasKey, isRecord } from '../../../guard/index.mjs';
-import { type Result, type UnknownResult } from '../result.mjs';
-import { type UnwrapErr, type UnwrapOk } from './types.mjs';
+import type { Result, UnknownResult } from '../result.mjs';
+import type { UnwrapErr, UnwrapOk } from './types.mjs';
 
 /**
  * Runs a generator body in which `yield* Result.safeUnwrap(...)` unwraps `Ok`
