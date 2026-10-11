@@ -49,3 +49,17 @@ export const BLOCKS_RELEASE_LABEL = 'blocks-release';
  * moved onto the default branch.
  */
 export const AUTO_REBASE_LABEL = 'auto-rebase';
+
+/**
+ * The labels that move a pull request within `unblock-prs`'s pick order:
+ * among the ones it may pick, those labelled `priority:high` go first and
+ * those labelled `priority:low` last, the version pull request included.
+ * They decide nothing else — what `Merge-After:`, a stack or
+ * `blocks-release` holds back stays held, and a pull request already in
+ * flight is watched whatever it carries. One carrying both counts as
+ * neither. `priority:mid`, which also exists on GitHub, is not read: it is
+ * the same as carrying neither.
+ */
+export const PRIORITY_HIGH_LABEL = 'priority:high';
+
+export const PRIORITY_LOW_LABEL = 'priority:low';

@@ -17,7 +17,7 @@
 import { SKIP_CI_LABEL } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { addSkipCiLabel, listPullRequests } from './github.mjs';
-import { isMergeQueued, isSkipCiLabelled } from './labels.mjs';
+import { isMergeQueued, isSkipCiLabelled, priorityRank } from './labels.mjs';
 import { type PullRequest } from './types.mjs';
 import { log } from './util.mjs';
 import { isVersionPullRequest } from './version-pr.mjs';
@@ -87,16 +87,17 @@ export const releasedExcept = (
   );
 
 /**
- * Which of several released pull requests keeps its release: the lowest
- * number, the version pull request last — the order candidates are picked
- * in, so that the skill, reading the same rule, settles it the same way.
+ * Which of several released pull requests keeps its release: `priority:high`
+ * first and `priority:low` last, then the lowest number with the version pull
+ * request last — the order candidates are picked in, so that the skill,
+ * reading the same rule, settles it the same way.
  */
 export const firstInReleaseOrder = (
   released: readonly PullRequest[],
   defaultBranch: string,
 ): PullRequest | undefined => {
   const rank = (pr: PullRequest): number =>
-    isVersionPullRequest(pr, defaultBranch) ? 1 : 0;
+    priorityRank(pr) * 2 + (isVersionPullRequest(pr, defaultBranch) ? 1 : 0);
 
   const sorted = released.toSorted((a, b) =>
     rank(a) === rank(b) ? a.number - b.number : rank(a) - rank(b),

@@ -99,7 +99,8 @@ not do, and made safe where they overlap:
   (`POST /issues/{n}/labels`) on every other released one: set-aside ones,
   drafts and ones without auto-merge included. Then run the report again.
   Another released one means someone released it in the same moment, and the
-  one first in the pick order (lowest number, the version PR last) keeps its
+  one first in the pick order (`priority:high` first and `priority:low`
+  last, then the lowest number, the version PR last) keeps its
   release: put `skip-ci` on the rest, yours included if it lost, and go back
   to step 1. While watching, the same: of the ones in flight the first in the
   pick order is kept, and every other released one is paused —
@@ -178,8 +179,11 @@ conflict is a conflict.
 Only when nothing is in flight (step 1). Take whichever PR the user named;
 otherwise the one the worker would take, so that both of you choose the same
 one: among those with `behindBy > 0` or carrying `skip-ci`, with `blockedBy`
-empty and no `unblock-prs` failure on the head that still applies, the lowest
-number, the version PR last. The worker also puts last one GitHub calls
+empty and no `unblock-prs` failure on the head that still applies, those
+labelled `priority:high` first and `priority:low` last (both at once count
+as neither, and `priority:mid` as no label), and within each the lowest
+number, the version PR last. The labels order and never gate: what
+`blockedBy` holds stays held. The worker also puts last one GitHub calls
 `DIRTY`, which the report does not carry; where that makes the two differ, the
 lease settles it. Everything else waits, untouched. A PR sitting at `BEHIND`
 costs nothing.

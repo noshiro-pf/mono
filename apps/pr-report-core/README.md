@@ -37,8 +37,8 @@ order and the counts a report leads with cannot differ between the two.
 - **`set-aside.mts`** — the comment `unblock-prs` leaves on a pull request it
   passes over: the hidden record it starts with and the retry box it ends
   with, which the script and the page read back, and how long it applies.
-- **`labels.mts`** — `skip-ci`, `merge-queued`, `blocks-release` and
-  `auto-rebase`. They
+- **`labels.mts`** — `skip-ci`, `merge-queued`, `blocks-release`,
+  `auto-rebase`, `priority:high` and `priority:low`. They
   exist only on GitHub, so these strings and the ones in
   `.github/workflows/` are the whole of their declaration.
 
