@@ -57,9 +57,15 @@ export const AUTO_REBASE_LABEL = 'auto-rebase';
  * They decide nothing else — what `Merge-After:`, a stack or
  * `blocks-release` holds back stays held, and a pull request already in
  * flight is watched whatever it carries. One carrying both counts as
- * neither. `priority:mid`, which also exists on GitHub, is not read: it is
- * the same as carrying neither.
+ * neither. {@link PRIORITY_MID_LABEL} is not read there: it is the same as
+ * carrying neither.
  */
 export const PRIORITY_HIGH_LABEL = 'priority:high';
 
 export const PRIORITY_LOW_LABEL = 'priority:low';
+
+/**
+ * Also on GitHub, and read only by the Pull Requests Manager page, which
+ * filters and sorts the merge order by all three.
+ */
+export const PRIORITY_MID_LABEL = 'priority:mid';

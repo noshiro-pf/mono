@@ -68,10 +68,36 @@ cycle waits, in the end, for itself, so there is no place in an order to draw
 it. The cycles are named in their own section below the tree instead, and a
 pull request waiting on nothing but a cycle member is drawn as a root.
 
+## Filtering and sorting the merge order
+
+The merge order leads with the counts — open, queued, draft, failing, behind
+base, set aside, awaiting code owner — and **each count but `open` is a
+switch** for the pull requests it counts. A pull request under any count
+switched off is hidden, whatever else it is, so switching off `queued`
+leaves what is still waiting for a review. One under none of them is always
+shown.
+
+Below them, the `priority:high`, `priority:mid` and `priority:low` labels are
+switches too, with **none** for a pull request carrying no one of them (or
+more than one), and the order is either the merge order or **priority**.
+Sorted by priority, the pull requests at each level of the tree are ordered
+by the highest priority in them or anywhere below them, since landing a high
+one means landing what holds it up first; none sits between mid and low.
+
+What is hidden gives its place to what is shown below it, so a pull request
+waiting on a hidden one is drawn where that one was. And a pull request
+under more than one predecessor is expanded wherever it now comes first.
+
+Everything is shown, in merge order, until the reader changes it; the choice
+is kept in the browser's IndexedDB, in a database of the page's own name, so
+it is there on the next visit. Not in the URL like the layout and the theme:
+it is a working choice made again and again rather than a way of looking at
+the page worth sharing in a link.
+
 ## Layout
 
-The page is three blocks under the counts: the merge order (with any cycles
-under it), what merged, and the open issues. **Layout**, beside the theme
+The page is three blocks: the merge order (with its counts above it and any
+cycles under it), what merged, and the open issues. **Layout**, beside the theme
 button, arranges them:
 
 - **One column or two.** Two need a screen at least 60rem wide; on a narrower
@@ -208,13 +234,15 @@ An answer for a token that has since been cleared or replaced is dropped, so
 **The state is in synstate stores** under `src/store/`, not in the components:
 `reader.mts` holds what was read and decides when to read, `token-store.mts`
 the token and its form, `theme-store.mts` light or dark, `layout-store.mts`
-the layout and the drags and dialog that change it. Each takes what it
+the layout and the drags and dialog that change it, `merge-order-store.mts`
+what the merge order shows and the tree that leaves. Each takes what it
 touches in the browser as an argument — the timers as synstate `counter`s and
 the DOM events as observables — which is what lets a test drive them with a
 `source`, and `store.mts` hands them the real ones. What is kept outside the
 page follows a store by subscription: storage follows the token, the URL
 and `<html>` follow the theme, the URL follows the layout (through
-`debounce`), and the Layout dialog opens and closes as the store says.
+`debounce`), IndexedDB follows the merge order's filters once what it held
+has been read, and the Layout dialog opens and closes as the store says.
 
 **The components read the stores only through Preact signals**, which
 `store.mts` makes from them with `synstate-preact-signals`' `toSignal`, and
