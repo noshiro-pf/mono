@@ -220,4 +220,5 @@ const entry = (number: number, labels: readonly string[]): Entry =>
     setAside: undefined,
     codeOwnerReview: { state: 'not-required' },
     claudeSessions: [],
+    reading: [],
   }) as const;

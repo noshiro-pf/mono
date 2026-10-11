@@ -47,7 +47,7 @@ export const MergeOrderFilters = memoNamed('MergeOrderFilters', () => {
             key={filter}
             label={STATUS_NAMES[filter]}
             pressed={!view.hiddenStatuses.includes(filter)}
-            tone={summary[filter] > 0 ? STATUS_TONES[filter] : undefined}
+            tone={(summary[filter] ?? 0) > 0 ? STATUS_TONES[filter] : undefined}
             value={summary[filter]}
             onToggle={toggleStatus[filter]}
           />

@@ -7,8 +7,8 @@
  * against its base and the two kinds of check — so a page that polled
  * twenty pull requests over REST would spend 5,000 an hour in well under an
  * hour. GraphQL charges a query by the size of what it asks for, and one
- * query asks for every open pull request at once: measured against this
- * repository, 4 points for the whole report.
+ * query asks about every open pull request at once: against this
+ * repository, about 9 points for the whole report, a handful of queries.
  *
  * What it costs is the token. GraphQL answers nobody without one, which is
  * why the page asks for one before it reads anything.

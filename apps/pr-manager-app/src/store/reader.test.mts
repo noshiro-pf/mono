@@ -41,6 +41,92 @@ describe(createReader, () => {
     assert.strictEqual(reader.nowMs.getSnapshot().value, 1_500);
   });
 
+  test('draws the first read part by part, as its parts answer', async () => {
+    const { reader, loads, clock } = setup(TOKEN_A);
+
+    // The read starts at the instant its report is said to be read at.
+    clock.set(1_000);
+
+    reader.start();
+
+    const onProgress = loads[0]?.onProgress;
+
+    assert.isDefined(onProgress);
+
+    clock.set(1_200);
+
+    onProgress({ ...readAt(1_000), reading: ['merged', 'issues'] });
+
+    assert.deepStrictEqual(shown(reader), { status: READY, readAt: 1_000 });
+
+    assert.deepStrictEqual(reader.reading.getSnapshot().value, [
+      'merged',
+      'issues',
+    ]);
+
+    assert.strictEqual(reader.nowMs.getSnapshot().value, 1_200);
+
+    await answer(
+      loads,
+      0,
+      Result.ok({ ...readAt(1_000), merged: [MERGED] }),
+      LIMIT,
+    );
+
+    assert.deepStrictEqual(reader.reading.getSnapshot().value, []);
+
+    assert.deepStrictEqual(reader.merged.getSnapshot().value, [MERGED]);
+  });
+
+  test('replaces a report on screen whole, never part by part', async () => {
+    const { reader, loads, timers } = setup(TOKEN_A);
+
+    reader.start();
+
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    reader.refresh();
+
+    assert.deepStrictEqual(
+      loads.map(({ onProgress }) => onProgress === undefined),
+      [false, true, true],
+    );
+  });
+
+  test('says a part failed beside the parts that answered', async () => {
+    const { reader, loads, clock } = setup(TOKEN_A);
+
+    clock.set(1_000);
+
+    reader.start();
+
+    loads[0]?.onProgress?.({ ...readAt(1_000), reading: ['merged'] });
+
+    await answer(loads, 0, Result.err('refused'), LIMIT);
+
+    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, {
+      type: 'ready',
+      pollError: 'refused',
+      refreshing: false,
+    });
+
+    assert.deepStrictEqual(reader.reading.getSnapshot().value, ['merged']);
+  });
+
+  test('drops the parts of a read for a token since forgotten', () => {
+    const { reader, loads, setToken } = setup(TOKEN_A);
+
+    reader.start();
+
+    setToken(undefined);
+
+    loads[0]?.onProgress?.(readAt(1_000));
+
+    assert.deepStrictEqual(shown(reader), { status: LOADING, readAt: 0 });
+  });
+
   test('keeps the last rate limit when an answer carries none', async () => {
     const { reader, loads, timers } = setup(TOKEN_A);
 
@@ -584,6 +670,7 @@ type PendingLoad = Readonly<{
   token: string;
   nowMs: number;
   issueCount: number;
+  onProgress: ((report: LoadedReport) => void) | undefined;
   resolve: (answered: Answered<LoadedReport>) => void;
   reject: (error: unknown) => void;
 }>;
@@ -661,12 +748,13 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
 
   const reader = createReader({
     token,
-    load: (tokenValue, nowMs, issueCount) =>
+    load: (tokenValue, nowMs, issueCount, onProgress) =>
       new Promise((resolve, reject) => {
         mut_loads.push({
           token: tokenValue,
           nowMs,
           issueCount,
+          onProgress,
           resolve,
           reject,
         });
@@ -769,6 +857,7 @@ const recordWrites = (reader: Reader): (() => readonly string[]) => {
     cycles: reader.cycles,
     merged: reader.merged,
     issues: reader.issues,
+    reading: reader.reading,
     rateLimit: reader.rateLimit,
   } as const;
 
@@ -816,6 +905,7 @@ const readAt = (readAtEpochMs: number): LoadedReport =>
     cycles: [],
     merged: [],
     issues: { items: [], totalCount: 0, endCursor: undefined },
+    reading: [],
   }) as const;
 
 const withIssues = (

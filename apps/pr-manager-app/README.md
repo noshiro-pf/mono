@@ -204,16 +204,29 @@ contexts, the merge order, the counts — is `pr-report-core`, the same code
 `pnpm run pr-report` decides it with, so the page and the command cannot
 disagree about a pull request. Which contexts are required, and which paths
 need a code owner, are read from `repo-settings/rulesets/main.json` and
-`.github/CODEOWNERS` on the default branch, in the same query.
+`.github/CODEOWNERS` on the default branch, in the query that lists the pull
+requests.
 
 **GraphQL, because of how GitHub charges.** REST charges a request, and one
 pull request takes three — the comparison against its base and the two kinds
 of check — so polling twenty of them would spend an hour's 5,000 in minutes.
-GraphQL charges a query by the size of what it asks for, and one query asks
-for everything: measured against this repository, **about 5 points and 5
-seconds a read**, the report query and one follow-up for ahead / behind
-together. The follow-up is separate because it can only name the heads once
-the first answer has.
+GraphQL charges a query by the size of what it asks for, and a handful of
+queries covers every open pull request: **about 9 points a read** by GitHub's
+formula.
+
+**One query per part of the page, all sent at once**, because GitHub answers
+a query only once all of it is ready. Measured against this repository, the
+one query that used to ask for everything took about four and a half seconds,
+and the comparison after it three quarters of a second more, with nothing on
+the page until both were back. Apart, the pull requests the merge order is
+drawn from answer in about a second, and the first read draws the merge order
+then; the verdicts (about three seconds — each check run is followed to the
+workflow it belongs to), the distance from the base, the badges read from the
+details, and the merged and issue sections each fill in as their own query
+answers, saying "reading" until then. Only the comparison waits, because it
+can name the heads only once the pull requests are in. A read that comes
+after the page shows a report replaces it whole, so a poll never puts a
+"reading" back where there was data.
 
 **The issues a pull request closes are GitHub's reading of its body.**
 `closingIssuesReferences` links a closing keyword only on a pull request into
@@ -232,7 +245,7 @@ back to, so the next read is fifteen seconds after that one.
 
 **The interval is set by the budget.** GraphQL has no conditional request, so
 a read that finds nothing new costs the same as one that finds everything.
-Every fifteen seconds is 240 reads an hour, about 1,200 of the 5,000 points an
+Every fifteen seconds is 240 reads an hour, about 2,000 of the 5,000 points an
 account gets, which leaves the rest for whatever else that account does with
 GraphQL — `gh` included, since the budget is the account's.
 

@@ -7,7 +7,10 @@ import {
 } from '../verdict.mjs';
 import { BadgeIcon } from './badge-icon.js';
 
-type Props = Readonly<{ checks: ChecksSummary }>;
+type Props = Readonly<{
+  /** `undefined` while the check results are still being read. */
+  checks: ChecksSummary | undefined;
+}>;
 
 /**
  * The verdict of the contexts the ruleset requires, as an icon and a word,
@@ -20,6 +23,20 @@ type Props = Readonly<{ checks: ChecksSummary }>;
  */
 export const VerdictBadge = memoNamed<Props>('VerdictBadge', (props) => {
   const { checks } = props;
+
+  if (checks === undefined) {
+    return (
+      <span
+        className={'badge'}
+        data-status={'neutral'}
+        title={'The check results have not been read yet.'}
+      >
+        <BadgeIcon path={presentVerdict('pending').icon} />
+
+        {'reading checks…'}
+      </span>
+    );
+  }
 
   const verdict = presentVerdict(checks.verdict);
 

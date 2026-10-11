@@ -1,17 +1,17 @@
 /**
  * What the page asks GitHub, and the shape it expects back.
  *
- * Two kinds of query. **The report query** asks for everything that can be
- * asked for at once: every open pull request with its labels, reviews,
- * changed files, check results and recent comments, what merged recently,
- * the open issues, and the two files
- * on the default branch that say what a pull request is required to have —
- * the ruleset and `CODEOWNERS`. **A follow-up** asks for what could only be
- * named after that answer: how far each head is from its base, and the next
- * page of any list that did not fit in one.
+ * **One query per part of the page**, sent together rather than as one
+ * query, because GitHub answers a query only once all of it is ready, and
+ * the parts take very different times. Measured against this repository:
+ * the pull requests the merge order is drawn from take about a second; their check results about three; the one
+ * query that asked for everything took four and a half, and the page drew
+ * nothing until then. Apart, the merge order is on screen after the first,
+ * and each badge and section fills in as its own query answers.
  *
- * Measured against this repository: 4 points and about four seconds for the
- * report query, and about one point for the follow-up that always runs.
+ * **A follow-up** asks for what could only be named after an answer: how
+ * far each head is from its base, once the heads are known, and the next
+ * page of any list that did not fit in one.
  */
 
 import { MAIN_RULESET_PATH, SET_ASIDE_COMMENT_SCAN } from 'pr-report-core';
@@ -35,8 +35,8 @@ export const OPEN_LIMIT = 50;
 const MERGED_SCAN = 30;
 
 /**
- * How many open issues the report query lists, most recently updated first
- * — the same number `pnpm run pr-report` defaults to. Enough to see what is
+ * How many open issues a read lists, most recently updated first — the
+ * same number `pnpm run pr-report` defaults to. Enough to see what is
  * open without the section becoming the page; the rest are a page of
  * {@link ISSUES_PAGE_SIZE} each, read when the reader asks for them.
  */
@@ -82,29 +82,83 @@ const CONTEXT_NODES = [
   '}',
 ].join(' ');
 
-/** The report query. `HEAD` is the default branch. */
-export const REPORT_QUERY = [
-  'query PullRequestsManager($owner: String!, $name: String!) {',
+/** The open pull requests, in the order every query that lists them uses. */
+const OPEN_PULLS =
+  `open: pullRequests(states: OPEN, first: ${OPEN_LIMIT}, orderBy: { field: CREATED_AT, direction: ASC })` as const;
+
+/**
+ * The open pull requests as the merge order draws them — what each is, the
+ * branch it is of, its labels, what its body declares — and the two files on
+ * the default branch (`HEAD`) that say what a pull request is required to
+ * have. The one query the page waits for before it draws anything.
+ */
+export const PULL_REQUESTS_QUERY = [
+  'query PullRequests($owner: String!, $name: String!) {',
   '  repository(owner: $owner, name: $name) {',
   '    defaultBranchRef { name }',
   `    ruleset: object(expression: "HEAD:${MAIN_RULESET_PATH}") { ... on Blob { text } }`,
   `    codeOwners: object(expression: "HEAD:${CODE_OWNERS_PATH}") { ... on Blob { text } }`,
-  `    open: pullRequests(states: OPEN, first: ${OPEN_LIMIT}, orderBy: { field: CREATED_AT, direction: ASC }) {`,
+  `    ${OPEN_PULLS} {`,
   '      totalCount',
   '      nodes {',
-  '        number title body bodyHTML isDraft url updatedAt',
+  '        number title body isDraft url updatedAt',
   '        author { login }',
   '        autoMergeRequest { enabledAt }',
   '        headRefName headRefOid baseRefName isCrossRepository',
   '        baseRef { target { oid } }',
   `        ${LABELS}`,
+  '        commits(last: 1) { nodes { commit { committedDate } } }',
+  '      }',
+  '    }',
+  '  }',
+  '}',
+].join('\n');
+
+/**
+ * What every context reported on each open pull request's head. Its own
+ * query because it is the slowest part by far: each check run is followed to
+ * the workflow it belongs to, which is what tells a superseded round from the
+ * current one.
+ */
+export const CHECKS_QUERY = [
+  'query Checks($owner: String!, $name: String!) {',
+  '  repository(owner: $owner, name: $name) {',
+  `    ${OPEN_PULLS} {`,
+  '      nodes {',
+  '        number headRefOid',
+  `        commits(last: 1) { nodes { commit { statusCheckRollup { contexts(first: ${PAGE_SIZE}) { ${PAGE_INFO} ${CONTEXT_NODES} } } } } }`,
+  '      }',
+  '    }',
+  '  }',
+  '}',
+].join('\n');
+
+/**
+ * What only the badges and the linked issues on each card are read from: the
+ * issues the body closes, the reviews and the changed files a code owner's
+ * approval is decided over, and the recent comments a set-aside record is
+ * found among.
+ */
+export const DETAILS_QUERY = [
+  'query PullRequestDetails($owner: String!, $name: String!) {',
+  '  repository(owner: $owner, name: $name) {',
+  `    ${OPEN_PULLS} {`,
+  '      nodes {',
+  '        number bodyHTML',
   `        ${CLOSING_ISSUES}`,
   '        latestOpinionatedReviews(first: 20, writersOnly: true) { nodes { state author { login } } }',
   `        files(first: ${PAGE_SIZE}) { ${PAGE_INFO} nodes { path } }`,
-  `        commits(last: 1) { nodes { commit { committedDate statusCheckRollup { contexts(first: ${PAGE_SIZE}) { ${PAGE_INFO} ${CONTEXT_NODES} } } } } }`,
   `        comments(last: ${SET_ASIDE_COMMENT_SCAN}) { nodes { url body viewerDidAuthor } }`,
   '      }',
   '    }',
+  '  }',
+  '}',
+].join('\n');
+
+/** The pull requests that merged lately, for the section below the queue. */
+export const MERGED_QUERY = [
+  'query MergedPullRequests($owner: String!, $name: String!) {',
+  '  repository(owner: $owner, name: $name) {',
   `    merged: pullRequests(states: MERGED, first: ${MERGED_SCAN}, orderBy: { field: UPDATED_AT, direction: DESC }) {`,
   '      nodes {',
   '        number title bodyHTML url mergedAt headRefName baseRefName',
@@ -113,25 +167,16 @@ export const REPORT_QUERY = [
   `        ${CLOSING_ISSUES}`,
   '      }',
   '    }',
-  `    issues(states: OPEN, first: ${ISSUES_LIMIT}, orderBy: { field: UPDATED_AT, direction: DESC }) {`,
-  '      totalCount',
-  '      nodes {',
-  '        number title url createdAt updatedAt',
-  '        author { login }',
-  `        ${LABELS}`,
-  '        comments { totalCount }',
-  '      }',
-  '    }',
   '  }',
   '}',
 ].join('\n');
 
 /**
- * The open issues after `$after`, `$first` of them, in the order the report
- * query lists them — the next page of that list.
+ * `$first` open issues, most recently updated first: the first of them when
+ * `$after` is `null`, and otherwise the page after that cursor.
  */
 export const OPEN_ISSUES_QUERY = [
-  'query OpenIssues($owner: String!, $name: String!, $first: Int!, $after: String!) {',
+  'query OpenIssues($owner: String!, $name: String!, $first: Int!, $after: String) {',
   '  repository(owner: $owner, name: $name) {',
   `    issues(${OPEN_ISSUES_ORDER}, first: $first, after: $after) { ${OPEN_ISSUE_PAGE} }`,
   '  }',
@@ -156,6 +201,14 @@ export type FollowUp = Readonly<
 >;
 
 /**
+ * What a follow-up query is called, after what it asks: how far each head is
+ * from its base, or the rest of the check results or of the changed files.
+ * Named apart because they go out at different moments, and a name is what
+ * tells them apart in the browser's network panel.
+ */
+export type FollowUpName = 'Compare' | 'MoreChecks' | 'MoreFiles';
+
+/**
  * One query for a list of follow-ups, with every value that came from
  * GitHub passed as a variable rather than written into the query text: a
  * branch name is chosen by whoever opened the pull request.
@@ -164,6 +217,7 @@ export type FollowUp = Readonly<
  * request number, which is what {@link followUpAlias} reads them back by.
  */
 export const followUpQuery = (
+  operationName: FollowUpName,
   followUps: readonly FollowUp[],
 ): Readonly<{
   query: string;
@@ -173,7 +227,7 @@ export const followUpQuery = (
 
   return {
     query: [
-      `query FollowUp(${['$owner: String!', '$name: String!', ...parts.flatMap(({ declarations }) => declarations)].join(', ')}) {`,
+      `query ${operationName}(${['$owner: String!', '$name: String!', ...parts.flatMap(({ declarations }) => declarations)].join(', ')}) {`,
       '  repository(owner: $owner, name: $name) {',
       ...parts.map(({ field }) => `    ${field}`),
       '  }',
@@ -342,12 +396,11 @@ const RollupSchema = t.union([
   t.nullType,
 ]);
 
-const OpenPullRequestSchema = t.record({
+const PullRequestSchema = t.record({
   number: t.number(),
   title: t.string(),
+  /** Where `Merge-After:` and the `Claude-Session:` trailers are read from. */
   body: t.string(),
-  /** Where GitHub marks the closing keywords it read in `body`. */
-  bodyHTML: t.string(),
   isDraft: t.boolean(),
   url: t.string(),
   updatedAt: t.string(),
@@ -367,22 +420,42 @@ const OpenPullRequestSchema = t.record({
     t.nullType,
   ]),
   labels: LabelsSchema,
-  closingIssuesReferences: ClosingIssuesSchema,
-  latestOpinionatedReviews: t.record({
-    nodes: t.array(t.record({ state: t.string(), author: AuthorSchema })),
-  }),
-  files: FilesPageSchema,
   commits: t.record({
     nodes: t.array(
       t.record({
         commit: t.record({
           /** When the head commit was made: the branch's last push, nearly. */
           committedDate: t.string(),
-          statusCheckRollup: RollupSchema,
         }),
       }),
     ),
   }),
+});
+
+export type OpenPullRequest = t.TypeOf<typeof PullRequestSchema>;
+
+const PullRequestChecksSchema = t.record({
+  number: t.number(),
+  /** The head the checks are of, which a push can move between two queries. */
+  headRefOid: t.string(),
+  commits: t.record({
+    nodes: t.array(
+      t.record({ commit: t.record({ statusCheckRollup: RollupSchema }) }),
+    ),
+  }),
+});
+
+export type PullRequestChecks = t.TypeOf<typeof PullRequestChecksSchema>;
+
+const PullRequestDetailsSchema = t.record({
+  number: t.number(),
+  /** Where GitHub marks the closing keywords it read in `body`. */
+  bodyHTML: t.string(),
+  closingIssuesReferences: ClosingIssuesSchema,
+  latestOpinionatedReviews: t.record({
+    nodes: t.array(t.record({ state: t.string(), author: AuthorSchema })),
+  }),
+  files: FilesPageSchema,
   /**
    * Where `unblock-prs` says why it set the pull request aside, among the
    * rest. `pr-report-core`'s `set-aside.mts` says why only the ones the
@@ -399,7 +472,7 @@ const OpenPullRequestSchema = t.record({
   }),
 });
 
-export type OpenPullRequest = t.TypeOf<typeof OpenPullRequestSchema>;
+export type PullRequestDetails = t.TypeOf<typeof PullRequestDetailsSchema>;
 
 const MergedPullRequestSchema = t.record({
   number: t.number(),
@@ -444,7 +517,7 @@ export const OpenIssuesDataSchema = t.record({
 /** `null` when the path is not on the default branch. */
 const BlobSchema = t.union([t.record({ text: t.string() }), t.nullType]);
 
-export const ReportDataSchema = t.record({
+export const PullRequestsDataSchema = t.record({
   repository: t.record({
     /** `null` only for a repository with no commits, and so no pull requests. */
     defaultBranchRef: t.union([t.record({ name: t.string() }), t.nullType]),
@@ -452,10 +525,26 @@ export const ReportDataSchema = t.record({
     codeOwners: BlobSchema,
     open: t.record({
       totalCount: t.number(),
-      nodes: t.array(OpenPullRequestSchema),
+      nodes: t.array(PullRequestSchema),
     }),
+  }),
+});
+
+export const ChecksDataSchema = t.record({
+  repository: t.record({
+    open: t.record({ nodes: t.array(PullRequestChecksSchema) }),
+  }),
+});
+
+export const DetailsDataSchema = t.record({
+  repository: t.record({
+    open: t.record({ nodes: t.array(PullRequestDetailsSchema) }),
+  }),
+});
+
+export const MergedDataSchema = t.record({
+  repository: t.record({
     merged: t.record({ nodes: t.array(MergedPullRequestSchema) }),
-    issues: OpenIssuePageSchema,
   }),
 });
 

@@ -29,6 +29,11 @@ type Props = Readonly<{
  * written in. Which branch, and how far from its base. When did it last
  * move. What has been said about it — the labels, and
  * the names of any checks that are red.
+ *
+ * The card is drawn as soon as the pull request is read; the verdict, the
+ * distance from the base and the badges read from its details come by
+ * queries of their own, and say they are being read until they answer
+ * (`entry.reading`).
  */
 export const PullRequestCard = memoNamed<Props>(
   'PullRequestCard',
@@ -36,10 +41,14 @@ export const PullRequestCard = memoNamed<Props>(
     <article className={'pull-request'}>
       <div className={'pull-request-badges'}>
         <StateBadge isDraft={entry.isDraft} />
-        <VerdictBadge checks={entry.checks} />
+        <VerdictBadge
+          checks={entry.reading.includes('checks') ? undefined : entry.checks}
+        />
         <AutoMergeBadge armed={entry.autoMerge} />
         <SetAsideBadge baseRef={entry.baseRef} setAside={entry.setAside} />
-        <ReviewBadge review={entry.codeOwnerReview} />
+        {entry.reading.includes('details') ? undefined : (
+          <ReviewBadge review={entry.codeOwnerReview} />
+        )}
       </div>
 
       <div className={'pull-request-heading'}>
@@ -84,6 +93,7 @@ export const PullRequestCard = memoNamed<Props>(
         <CommitDivergence
           baseRef={entry.baseRef}
           comparison={entry.comparison}
+          reading={entry.reading.includes('comparison')}
           scaleMax={scaleMax}
         />
       </div>
