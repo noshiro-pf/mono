@@ -319,9 +319,39 @@ a:focus-visible {
  * Under the merge order's title the counts are switches for the pull requests
  * they count: a hidden one keeps its number but loses its fill, takes a dashed
  * outline and is struck through, so that being off does not rest on a colour.
+ *
+ * They stay in view while the merge order scrolls under them, and leave with
+ * it, since what holds them is its section: a little below the top of the
+ * window, as the toolbar is, and under the toolbar when the header is folded (`--header-height` is the toolbar's,
+ * measured in `app.tsx`), and at the top of a block given a height, which is
+ * what scrolls then. The page's colour behind them, and the first shadow
+ * filling the gap above them, so that nothing scrolls by over them; a
+ * hairline under them once they have stopped, where the browser can say so.
+ * Not on a screen too small to give them the room: there they would be most
+ * of what is left of it.
  */
 .merge-order-filters {
-  margin-bottom: 1.25rem;
+  background: var(--plane);
+  box-shadow: 0 -0.5rem 0 var(--plane);
+  container-type: scroll-state;
+  margin-bottom: 0.5rem;
+  position: sticky;
+  top: 0.5rem;
+  z-index: 5;
+}
+
+.page[data-header='folded'] .merge-order-filters {
+  top: calc(var(--header-height, 0px) + 1rem);
+}
+
+.block-body[data-sized='true'] .merge-order-filters {
+  top: 0;
+}
+
+@media (width < 40rem), (height < 36rem) {
+  .merge-order-filters {
+    position: static;
+  }
 }
 
 .merge-order-filters .summary-row {
@@ -358,9 +388,17 @@ a:focus-visible {
 
 .merge-order-controls {
   align-items: center;
+  border-bottom: 1px solid transparent;
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1.25rem;
+  padding-bottom: 0.75rem;
+}
+
+@container scroll-state(stuck: top) {
+  .merge-order-controls {
+    border-bottom-color: var(--hairline);
+  }
 }
 
 /* A `<fieldset>` for the group role, with its own margin and padding taken off. */
