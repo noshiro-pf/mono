@@ -49,4 +49,4 @@ type ApiResponse = JsonObject &
   }>;
 
 // embed-sample-code-ignore-below
-export { type ApiResponse };
+export type { ApiResponse };

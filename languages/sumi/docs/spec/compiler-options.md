@@ -71,7 +71,7 @@ TS では同じ字面のコードでも tsconfig 次第で意味と安全性が�
 - **強制手段（実装済み 2026-09-08、D-46）**: `@sumi-lang/cli/tsconfig.base.json` が上の draft を base tsconfig として配布し、プロジェクトは `extends` する。`sumi check` は native tsc の `--showConfig` で実効 compilerOptions を取って拘束項目（`languages/sumi/cli/src/locked-compiler-options.mts` が単一の真実。この表とはテストで同期）と比較し、違反があれば型検査・lint を走らせずに止まる。不在の boolean は `false`（TS の既定）として受け入れ、`allowUnusedLabels` / `allowUnreachableCode` だけは明示必須（不在は「suggestion」の意味）、`strict` 系サブフラグの個別 `false` は `strict` の違反、enum 値は大文字小文字を無視する。
 - **`strict` の中身は固定点ではない**（TS のバージョンで増える）。言語仕様としては「その時点の TS バージョンにおける全 strict フラグ有効」と定義し、TS のバージョン自体も言語バージョンに紐付ける。対応表は書かず、**preset / チェッカーの `peerDependencies` が対応する TS の範囲の単一の真実**(D-34)。
 - **`exactOptionalPropertyTypes` を有効化しない**ことは、「プロパティ不存在」と「`undefined` が入っている」を型レベルで区別しない、という言語仕様上の選択でもある。「値がない」表現を `undefined` に一本化する方針([null-undefined.md](./null-undefined.md))の下では、この 2 状態の区別を増やさないことはむしろ一貫している（`Object.keys` 等で観測すれば実行時には区別が残る点は注意）。
-- `erasableSyntaxOnly` / `verbatimModuleSyntax` は mono の現行値(false)より厳しい設定を採る(D-4 と [modules.md](./modules.md) のサブセット制約であり、型チェックの厳密度の話ではないため mono 追従の対象外)。
+- `erasableSyntaxOnly` は mono の現行値(false)より厳しい設定を採る（D-4 のサブセット制約であり、型チェックの厳密度の話ではないため mono 追従の対象外）。`verbatimModuleSyntax` は mono 共通設定も 2026-10-11 に true に揃えた（[modules.md](./modules.md) の型 import 記法をリポジトリ全体に適用したため）。
 - `allowJs` / `checkJs` は mono では true だが、この言語のプロジェクトには JS ファイルが存在しないため false とする（確定 2026-09-05 — D-27）。
 - `skipLibCheck` は妥協ではなく境界の定義: 組み込み層の型は strict-ts-lib が置き換え、サードパーティの `.d.ts` の内部整合性はこの言語の検査対象外。
 

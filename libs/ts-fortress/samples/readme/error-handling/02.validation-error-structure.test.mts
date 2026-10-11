@@ -10,4 +10,4 @@ type ValidationError = Readonly<{
 }>;
 
 // embed-sample-code-ignore-below
-export { type ValidationError };
+export type { ValidationError };
