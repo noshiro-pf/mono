@@ -217,8 +217,8 @@ particular to it. Here is only what a session has to act on.
 - **A push to `main` runs the check workflows too.** A merged tree that
   already has a verdict costs one gate job; one that has none, as a bypass
   merge can land, is checked in full. Nothing needs running by hand.
-- **`skip-ci`** skips every check and boots no runner; the `no-skip-ci-label`
-  status (`skip-ci-label.yml`) is the only thing holding the merge while it is
+- **`skip-ci`** skips the check workflows (the lint jobs still run); the
+  `no-skip-ci-label` status (`skip-ci-label.yml`) holds the merge while it is
   on. Taking it off is what starts the checks. Any label event re-runs them,
   so add other labels before pushing or after the checks report.
 - `skip-ci`, `merge-queued`, `blocks-release` and `auto-rebase` exist only
@@ -324,8 +324,8 @@ ingest the feed). Outside reports come through private vulnerability reporting
   GitHub's API and answers 404 from anywhere else, so it would be a code path
   dead everywhere the command normally runs.
 - **The `opened` run the label cancels leaves red `*-result` checks and "check
-  failed" notifications naming nothing — ignore them**, the `labeled` run
-  supersedes them.
+  failed" notifications naming nothing — ignore them**; they stay until
+  `skip-ci` comes off, and `pr-report` marks them stale.
 - Taking `skip-ci` off is how CI is asked for, and `unblock-prs` takes it off
   only from a pull request labelled `merge-queued`. **Queueing one is that
   label alone** — `unblock-prs` arms auto-merge in its turn — and it is the

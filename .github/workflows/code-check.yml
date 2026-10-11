@@ -247,7 +247,12 @@ jobs:
       - gates
       - build
       - code-check
-    if: always()
+    # Not on a label event while `skip-ci` is on, so that putting the label on
+    # supersedes no verdict — "A label event under `skip-ci`" in README.md.
+    if: >-
+      always() &&
+      !((github.event.action == 'labeled' || github.event.action == 'unlabeled') &&
+        contains(github.event.pull_request.labels.*.name, 'skip-ci'))
     uses: ./.github/workflows/check-result.yml
     with:
       needs: ${{ toJSON(needs) }}

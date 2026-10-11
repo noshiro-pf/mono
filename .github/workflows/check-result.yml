@@ -21,8 +21,10 @@ jobs:
   # The skips live here, on the called job, and not on the calling one: a
   # calling job that GitHub skips reports a check run under its own name
   # alone, and `<caller> / result` — the required context — would then never
-  # arrive at all. So the caller always calls, and this job skips, which
-  # reports that context as `skipped` without booting a runner.
+  # arrive at all. So the caller calls, and this job skips, which reports
+  # that context as `skipped` without booting a runner. The one exception is
+  # a label event under `skip-ci`, where the caller skips on purpose to leave
+  # the last verdict standing — README.md, "A label event under `skip-ci`".
   #
   # `always()`, because without a status function the job carries an implicit
   # `success()`, and a cancelled run would then read `skipped` — satisfied —
