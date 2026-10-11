@@ -1,4 +1,5 @@
 import { Arr, expectType, Int, isNumber, Result } from 'ts-data-forge';
+import { panic } from 'ts-std-forge';
 import {
   type ArrayElement,
   type BoolAnd,
@@ -64,7 +65,7 @@ export function number(
   const defaultValueConstraintsCheck = constraintsPredicate(defaultValue);
 
   if (Result.isErr(defaultValueConstraintsCheck)) {
-    throw new Error(
+    panic(
       defaultValueErrorMessage(
         defaultValue,
         defaultValueConstraintsCheck.value,

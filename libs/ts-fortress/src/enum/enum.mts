@@ -62,14 +62,18 @@ export function enumType<const Values extends NonEmptyTuple<Primitive>>(
   const typeName = options?.typeName ?? 'enum';
 
   const getDefaultValue = memoizeFunction(
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     (): T => options?.defaultValue ?? (values[0] as ArrayElement<Values>),
   );
 
   const validate: Type<T>['validate'] = (a) =>
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     valueSet.has(a as Primitive)
-      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      ? // `a` is one of `values` here.
+        // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Result.ok(a as T)
       : Result.err([
           {

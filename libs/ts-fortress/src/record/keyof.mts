@@ -1,4 +1,5 @@
 import { Arr, expectType, pipe } from 'ts-data-forge';
+import { panic } from 'ts-std-forge';
 import {
   type IsNever,
   type ReadonlyRecord,
@@ -23,11 +24,10 @@ export const keyof = <const R extends UnknownRecord>(
   >,
 ): KeyofType<R> => {
   if (!hasRecordInternals(recordType)) {
-    throw new Error(
-      `Expected a record type but received: ${recordType.typeName}`,
-    );
+    panic(`Expected a record type but received: ${recordType.typeName}`);
   }
 
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return pipe(getKeysFromStructure(recordType.shapeStructure)).map((keys) =>
     Arr.isNonEmpty(keys)

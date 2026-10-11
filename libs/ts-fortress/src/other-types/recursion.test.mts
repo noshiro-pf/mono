@@ -1,3 +1,6 @@
+// @sumi-expect-error-file null/no-null-in-type
+// @sumi-expect-error-file null/no-null-literal
+// @sumi-expect-error-file null/no-null-propagation
 import { expectType } from 'ts-data-forge';
 import { type Brand, type ReadonlyRecord } from 'ts-type-forge';
 import { array } from '../array/index.mjs';
@@ -335,6 +338,7 @@ describe('recursive', () => {
         value: number(0),
         // eslint-disable-next-line unicorn/no-unused-properties
         metadata: string(''),
+        // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion, unicorn/no-unused-properties
         children: array({} as Type<unknown>), // Placeholder for recursion
       } as const;
@@ -470,6 +474,7 @@ describe('recursive', () => {
       const ConfigShape = {
         name: string(),
         value: number(0),
+        // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         nested: union([nullType, {} as Type<Config>]),
       } as const;

@@ -69,6 +69,7 @@ export const record = <
 
   const getDefaultValue = memoizeFunction(
     (): V =>
+      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       Object.fromEntries(
         Object.entries(shape).map(([key, value]) =>
@@ -146,14 +147,18 @@ export const record = <
 
       return Arr.isNonEmpty(allErrors)
         ? Result.err(allErrors)
-        : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        : // No errors, so the value is of the validated type.
+          // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           Result.ok(a as V);
     }
 
     // ep === 'allow'
     return Arr.isNonEmpty(defaultErrors)
       ? Result.err(defaultErrors)
-      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      : // No errors, so the value is of the validated type.
+        // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Result.ok(a as V);
   };
 
@@ -163,6 +168,7 @@ export const record = <
     }
 
     // fill always produces shape-only values (strips excess)
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return Object.fromEntries(
       Object.entries(shape).map(([k, v]) => {
@@ -186,6 +192,7 @@ export const record = <
 
     // prune keeps only the value paths represented by the shape;
     // unlike fill, it never fills in missing keys with default values
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return Obj.filterMap(shape, (v, k) => {
       // Only optional keys can be absent in the input; required keys are

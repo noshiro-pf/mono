@@ -1,3 +1,6 @@
+// @sumi-expect-error-file null/no-null-in-type
+// @sumi-expect-error-file null/no-null-literal
+// @sumi-expect-error-file null/no-null-propagation
 import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../type.mjs';
 import { nullType } from './null.mjs';
