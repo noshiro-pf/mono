@@ -196,9 +196,9 @@ that asked last.
 
 The "read 3 minutes ago" line, and every other age on the page, is measured
 against a clock of its own that ticks every second while the tab is shown, so
-a tab that stopped reading does not go on looking fresh. The ages are Preact
-signals (`synstate-preact-signals`) bound to their text nodes, so a tick
-rewrites those and renders no component.
+a tab that stopped reading does not go on looking fresh. The ages are
+signals bound to their text nodes (below), so a tick rewrites those and
+renders no component.
 
 An answer for a token that has since been cleared or replaced is dropped, so
 **Clear** empties the page even while a read is still out.
@@ -212,8 +212,24 @@ the DOM events as observables — which is what lets a test drive them with a
 `source`, and `store.mts` hands them the real ones. What is kept outside the
 page follows a store by subscription: storage follows the token, the URL
 and `<html>` follow the theme, the URL follows the layout (through
-`debounce`), and the Layout dialog opens and closes as the store says. The components only read the stores and call
-their actions.
+`debounce`), and the Layout dialog opens and closes as the store says.
+
+**The components read the stores only through Preact signals**, which
+`store.mts` makes from them with `synstate-preact-signals`' `toSignal`, and
+change them only by calling their actions. Reading a signal's `.value` in a
+render renders that component again when it changes; handing the signal
+itself to JSX as a child or a DOM attribute rewrites that one node and
+renders nothing, which is how the ages keep up with the clock.
+
+Nothing is made of a signal on the way to the view: what a component needs,
+the store derives, and **the store writes only what changed**. GitHub answers
+every read with the whole report, so what changed is found once, where the
+answer is written: `reader.mts` keeps the status and each part of the report
+the page draws as a state of its own, made with synstate's `createState` and
+an `equals`, which passes an update on only when it differs from what the
+state holds. The pull requests are compared one by one, matched by number
+(`share.mts`). A poll that found nothing new writes the time of reading and
+nothing else, so nothing downstream has anything to compare.
 
 ## The token
 

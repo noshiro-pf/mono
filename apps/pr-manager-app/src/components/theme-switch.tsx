@@ -1,6 +1,5 @@
 import { memoNamed } from 'preact-utils';
-import { useObservableValue } from 'synstate-preact-hooks';
-import { themeStore } from '../store/index.mjs';
+import { themeSignals, themeStore } from '../store/index.mjs';
 import { effectiveTheme, type ColorScheme } from '../theme.mjs';
 import { BadgeIcon } from './badge-icon.js';
 
@@ -13,9 +12,9 @@ import { BadgeIcon } from './badge-icon.js';
  * the URL keeps it, unless it is what the system shows anyway.
  */
 export const ThemeSwitch = memoNamed('ThemeSwitch', () => {
-  const theme = useObservableValue(themeStore.theme);
+  const theme = themeSignals.theme.value;
 
-  const system = useObservableValue(themeStore.system);
+  const system = themeSignals.system.value;
 
   const shown = effectiveTheme(theme, system);
 

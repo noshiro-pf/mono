@@ -1,10 +1,9 @@
 import { type ComponentChildren } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
-import { useObservableValue } from 'synstate-preact-hooks';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import { type BlockId } from '../layout.mjs';
-import { layoutStore } from '../store/index.mjs';
+import { layoutSignals } from '../store/index.mjs';
 import { BlockColumn } from './block-column.js';
 import { ColumnDivider } from './column-divider.js';
 
@@ -24,9 +23,9 @@ type Props = Readonly<{
 export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
   const { blocks } = props;
 
-  const layout = useObservableValue(layoutStore.layout);
+  const layout = layoutSignals.layout.value;
 
-  const moving = useObservableValue(layoutStore.moving);
+  const moving = layoutSignals.moving.value;
 
   const style = useMemo(
     () =>

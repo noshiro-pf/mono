@@ -17,6 +17,7 @@ export * from './merge-order.js';
 export * from './merged-section.js';
 export * from './notice.js';
 export * from './pull-request-card.js';
+export * from './read-from-github.js';
 export * from './report-view.js';
 export * from './review-badge.js';
 export * from './set-aside-badge.js';

@@ -1815,9 +1815,6 @@ importers:
       synstate:
         specifier: workspace:*
         version: link:../../libs/synstate
-      synstate-preact-hooks:
-        specifier: workspace:*
-        version: link:../../libs/synstate-preact-hooks
       synstate-preact-signals:
         specifier: workspace:*
         version: link:../../libs/synstate-preact-signals
