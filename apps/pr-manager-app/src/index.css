@@ -992,6 +992,36 @@ a:focus-visible {
   color: var(--ink-secondary);
 }
 
+/* The button under the open issues that lists the next page of them. */
+.load-more {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.load-more-button {
+  background: var(--surface);
+  border: 1px solid var(--baseline);
+  border-radius: var(--radius);
+  color: var(--ink-primary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.875rem;
+  padding: 0.35rem 0.85rem;
+}
+
+.load-more-button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.load-more-button:disabled {
+  color: var(--ink-muted);
+  cursor: progress;
+}
+
 .poll-error {
   color: var(--status-critical);
   font-size: 0.8125rem;

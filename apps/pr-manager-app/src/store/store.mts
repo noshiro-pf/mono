@@ -15,7 +15,7 @@ import {
 import { toSignal } from 'synstate-preact-signals';
 import { REPORT_SOURCE } from '../constants.mjs';
 import { layoutFromLocation, saveLayout } from '../layout.mjs';
-import { loadReport } from '../load-report.mjs';
+import { loadIssuePage, loadReport } from '../load-report.mjs';
 import { readSetting, writeSetting } from '../settings-db.mjs';
 import {
   applyTheme,
@@ -36,7 +36,10 @@ export const tokenStore = createTokenStore(browserStores());
 
 export const reader = createReader({
   token: tokenStore.token,
-  load: (token, nowMs) => loadReport(REPORT_SOURCE, { token, nowMs }),
+  load: (token, nowMs, issueCount) =>
+    loadReport(REPORT_SOURCE, { token, nowMs, issueCount }),
+  loadIssues: (token, after, first) =>
+    loadIssuePage(REPORT_SOURCE, { token, after, first }),
   now: () => Date.now(),
   counter: (ms) => counter(ms),
   isVisible: () => document.visibilityState === 'visible',
@@ -106,6 +109,7 @@ export const readerSignals = {
   cycles: toSignal(reader.cycles),
   merged: toSignal(reader.merged),
   issues: toSignal(reader.issues),
+  moreIssues: toSignal(reader.moreIssues),
   rateLimit: toSignal(reader.rateLimit),
   nowMs: toSignal(reader.nowMs),
 } as const;

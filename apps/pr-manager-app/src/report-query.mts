@@ -35,11 +35,15 @@ export const OPEN_LIMIT = 50;
 const MERGED_SCAN = 30;
 
 /**
- * How many open issues are listed, most recently updated first — the same
- * number `pnpm run pr-report` defaults to. Enough to see what is open
- * without the section becoming the page.
+ * How many open issues the report query lists, most recently updated first
+ * — the same number `pnpm run pr-report` defaults to. Enough to see what is
+ * open without the section becoming the page; the rest are a page of
+ * {@link ISSUES_PAGE_SIZE} each, read when the reader asks for them.
  */
 export const ISSUES_LIMIT = 30;
+
+/** How many more open issues each page after the first reads: GitHub's most. */
+export const ISSUES_PAGE_SIZE = 100;
 
 /** One page of a list inside a pull request. */
 const PAGE_SIZE = 100;
@@ -54,6 +58,21 @@ const CLOSING_ISSUES =
   `closingIssuesReferences(first: 10) { nodes { ${ISSUE_FIELDS} } }` as const;
 
 const PAGE_INFO = 'pageInfo { hasNextPage endCursor }';
+
+/** The open issues, newest update first, in either query that lists them. */
+const OPEN_ISSUES_ORDER =
+  'states: OPEN, orderBy: { field: UPDATED_AT, direction: DESC }';
+
+const OPEN_ISSUE_PAGE = [
+  'totalCount',
+  PAGE_INFO,
+  'nodes {',
+  '  number title url createdAt updatedAt',
+  '  author { login }',
+  `  ${LABELS}`,
+  '  comments { totalCount }',
+  '}',
+].join(' ');
 
 const CONTEXT_NODES = [
   'nodes {',
@@ -103,6 +122,18 @@ export const REPORT_QUERY = [
   '        comments { totalCount }',
   '      }',
   '    }',
+  '  }',
+  '}',
+].join('\n');
+
+/**
+ * The open issues after `$after`, `$first` of them, in the order the report
+ * query lists them — the next page of that list.
+ */
+export const OPEN_ISSUES_QUERY = [
+  'query OpenIssues($owner: String!, $name: String!, $first: Int!, $after: String!) {',
+  '  repository(owner: $owner, name: $name) {',
+  `    issues(${OPEN_ISSUES_ORDER}, first: $first, after: $after) { ${OPEN_ISSUE_PAGE} }`,
   '  }',
   '}',
 ].join('\n');
@@ -398,6 +429,18 @@ const OpenIssueSchema = t.record({
 
 export type OpenIssueNode = t.TypeOf<typeof OpenIssueSchema>;
 
+const OpenIssuePageSchema = t.record({
+  totalCount: t.number(),
+  pageInfo: PageInfoSchema,
+  nodes: t.array(OpenIssueSchema),
+});
+
+export type OpenIssuePage = t.TypeOf<typeof OpenIssuePageSchema>;
+
+export const OpenIssuesDataSchema = t.record({
+  repository: t.record({ issues: OpenIssuePageSchema }),
+});
+
 /** `null` when the path is not on the default branch. */
 const BlobSchema = t.union([t.record({ text: t.string() }), t.nullType]);
 
@@ -412,10 +455,7 @@ export const ReportDataSchema = t.record({
       nodes: t.array(OpenPullRequestSchema),
     }),
     merged: t.record({ nodes: t.array(MergedPullRequestSchema) }),
-    issues: t.record({
-      totalCount: t.number(),
-      nodes: t.array(OpenIssueSchema),
-    }),
+    issues: OpenIssuePageSchema,
   }),
 });
 

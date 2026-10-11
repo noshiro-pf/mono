@@ -42,7 +42,8 @@ nothing on GitHub's own list shows:
   bypass instead.
 
 Below that, what merged in the last week, and the open issues, most recently
-updated first (thirty at most, said so when there are more).
+updated first: thirty, then a hundred more each time the button under the list
+is pressed, until every open one is listed.
 
 It **only reads**. Nothing here labels, rebases, merges or comments — that is
 `pnpm run unblock-prs`, run by a person — and a page that cannot do any of it
@@ -234,6 +235,13 @@ a read that finds nothing new costs the same as one that finds everything.
 Every fifteen seconds is 240 reads an hour, about 1,200 of the 5,000 points an
 account gets, which leaves the rest for whatever else that account does with
 GraphQL — `gh` included, since the budget is the account's.
+
+**A page of open issues listed with the button is read again by every read
+after it**, one query a page, about a point each by GitHub's formula, so the
+list stays as current as the rest of the page. Reloading the page, or a new
+token, goes back to the first thirty. The press itself reads only the page it
+adds, rather than the whole report again, and a poll already out when it was
+pressed does not take that page away.
 
 A read may add to the page and may say it failed, but **may not take the page
 away**: a read that fails leaves the last report on screen with a note beside

@@ -70,9 +70,7 @@ export const ReportView = memoNamed('ReportView', () => {
         </>
       ),
       merged: <MergedSection merged={merged} withinDays={MERGED_WITHIN_DAYS} />,
-      issues: (
-        <IssuesSection issues={issues.items} totalCount={issues.totalCount} />
-      ),
+      issues: <IssuesSection issues={issues} />,
     }),
     [entries, byNumber, scaleMax, roots, cycles, merged, issues],
   );

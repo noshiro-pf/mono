@@ -13,6 +13,7 @@ export * from './issues-section.js';
 export * from './label-chip.js';
 export * from './layout-block.js';
 export * from './linked-issues.js';
+export * from './load-more-issues.js';
 export * from './load-state-view.js';
 export * from './merge-order-filters.js';
 export * from './merge-order.js';
