@@ -1,58 +1,35 @@
 /**
  * How the list is shown — the sort keys (edited as `sort-edit.mts` says),
  * and whether done tasks are hidden — and how that is kept in
- * `localStorage` between visits.
+ * `localStorage` between visits, on this device only.
  *
- * Every app under `noshiro-pf.github.io` shares that storage, hence the
- * prefixed key. What is read back is validated, and anything that is not
- * settings (an older format, a hand edit) gives the defaults rather than an
- * error: these are preferences, not data.
+ * Kept as every setting is (`persisted-setting.mts`): anything stored that
+ * is not settings gives the defaults, and settings that are partly broken
+ * keep what is fine — a sort that is not a list falls back to the default
+ * sort and leaves hide-done as it was, and the other way round.
  */
 
-import { Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { type DeepReadonly } from 'ts-type-forge';
-import { type SortSpec } from '../domain/index.mjs';
-import { SortSpecsType, uniqueSortKeys } from './sort-edit.mjs';
+import { persistedSetting } from './persisted-setting.mjs';
+import { SortSpecCodec, uniqueSortKeys } from './sort-edit.mjs';
 
-export const LIST_SETTINGS_STORAGE_KEY = 'task-manager-app:list-settings';
+export const ListSettingsCodec = t.record({
+  sort: t.array(SortSpecCodec, {
+    defaultValue: [
+      { key: 'status', order: 'asc' },
+      { key: 'priority', order: 'asc' },
+      { key: 'dueDate', order: 'asc' },
+    ] as const,
+  }),
+  hideDone: t.boolean(false),
+});
 
-export const DEFAULT_LIST_SETTINGS: ListSettings = {
-  sort: [
-    { key: 'status', order: 'asc' },
-    { key: 'priority', order: 'asc' },
-    { key: 'dueDate', order: 'asc' },
-  ],
-  hideDone: false,
-} as const;
+export type ListSettings = t.TypeOf<typeof ListSettingsCodec>;
 
-/** The stored settings, or the defaults when there are none to read. */
-export const parseListSettings = (stored: string | null): ListSettings => {
-  if (stored === null) {
-    return DEFAULT_LIST_SETTINGS;
-  }
+export const DEFAULT_LIST_SETTINGS: ListSettings =
+  ListSettingsCodec.defaultValue;
 
-  const parsed = Result.flatMap(Json.parse(stored), (json) =>
-    ListSettingsType.validate(json),
-  );
-
-  return Result.isOk(parsed)
-    ? {
-        sort: uniqueSortKeys(parsed.value.sort),
-        hideDone: parsed.value.hideDone,
-      }
-    : DEFAULT_LIST_SETTINGS;
-};
-
-export const serializeListSettings = (settings: ListSettings): string =>
-  JSON.stringify(settings);
-
-export type ListSettings = DeepReadonly<{
-  sort: SortSpec[];
-  hideDone: boolean;
-}>;
-
-const ListSettingsType = t.record({
-  sort: SortSpecsType,
-  hideDone: t.boolean(),
+export const listSettingsStorage = persistedSetting(ListSettingsCodec, {
+  key: 'task-manager-app:list-settings',
+  normalize: ({ sort, hideDone }) => ({ sort: uniqueSortKeys(sort), hideDone }),
 });

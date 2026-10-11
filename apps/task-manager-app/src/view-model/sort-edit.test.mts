@@ -1,4 +1,5 @@
-import { Arr } from 'ts-data-forge';
+import { Arr, expectType } from 'ts-data-forge';
+import type * as t from 'ts-fortress';
 import { sortKeys, type SortSpec } from '../domain/index.mjs';
 import {
   addSortKey,
@@ -6,6 +7,7 @@ import {
   removeSortKey,
   sortKeyActions,
   sortKeyLabels,
+  SortSpecCodec,
   toggleSortOrder,
   uniqueSortKeys,
   unusedSortKeys,
@@ -145,5 +147,17 @@ describe('the labels of the keys', () => {
         '見積',
       ],
     );
+  });
+});
+
+describe(SortSpecCodec.is, () => {
+  test('is the sort key of the domain', () => {
+    expectType<t.TypeOf<typeof SortSpecCodec>, SortSpec>('=');
+
+    assert.isTrue(SortSpecCodec.is({ key: 'depth', order: 'desc' }));
+
+    assert.isFalse(SortSpecCodec.is({ key: 'depth', order: 'down' }));
+
+    assert.isFalse(SortSpecCodec.is({ key: 'colour', order: 'asc' }));
   });
 });

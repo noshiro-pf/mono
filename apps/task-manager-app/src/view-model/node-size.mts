@@ -5,41 +5,29 @@
  * visits, on this device only. The boxes themselves are
  * `dag/graph-layout.mts`'s (`nodeBoxSize`).
  *
- * Validated on read as the animation setting is (`animation-setting.mts`):
- * anything that is not a size gives 「標準」.
+ * Kept as every setting is (`persisted-setting.mts`): anything stored that
+ * is not a size gives 「標準」.
  */
 
-import { Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { type ReadonlyRecord } from 'ts-type-forge';
+import { persistedSetting } from './persisted-setting.mjs';
 
 export const nodeSizes = ['standard', 'compact'] as const;
 
-export type NodeSize = (typeof nodeSizes)[number];
+export const NodeSizeCodec = t.enumType(nodeSizes, {
+  defaultValue: 'standard',
+});
 
-export const NODE_SIZE_STORAGE_KEY = 'task-manager-app:node-size';
+export type NodeSize = t.TypeOf<typeof NodeSizeCodec>;
 
-export const DEFAULT_NODE_SIZE: NodeSize = 'standard';
+export const DEFAULT_NODE_SIZE: NodeSize = NodeSizeCodec.defaultValue;
+
+export const nodeSizeStorage = persistedSetting(NodeSizeCodec, {
+  key: 'task-manager-app:node-size',
+});
 
 export const nodeSizeLabels = {
   standard: '標準',
   compact: 'コンパクト',
 } as const satisfies ReadonlyRecord<NodeSize, string>;
-
-/** The stored size, or 「標準」 when there is none to read. */
-export const parseNodeSize = (stored: string | null): NodeSize => {
-  if (stored === null) {
-    return DEFAULT_NODE_SIZE;
-  }
-
-  const parsed = Result.flatMap(Json.parse(stored), (json) =>
-    NodeSizeType.validate(json),
-  );
-
-  return Result.isOk(parsed) ? parsed.value : DEFAULT_NODE_SIZE;
-};
-
-export const serializeNodeSize = (size: NodeSize): string =>
-  JSON.stringify(size);
-
-const NodeSizeType = t.enumType(nodeSizes);

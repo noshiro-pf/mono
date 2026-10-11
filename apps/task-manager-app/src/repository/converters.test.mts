@@ -1,4 +1,5 @@
-import { Result } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
+import { type StrictExclude } from 'ts-type-forge';
 import { type DagLayout } from '../dag/index.mjs';
 import {
   asMilestoneId,
@@ -9,14 +10,31 @@ import {
   type Task,
 } from '../domain/index.mjs';
 import {
+  DagLayoutDocCodec,
   dagLayoutFromDoc,
   dagLayoutToDoc,
+  MilestoneDocCodec,
   milestoneFromDoc,
   milestoneToDoc,
   personalProjectDoc,
+  TaskDocCodec,
   taskFromDoc,
   taskToDoc,
+  type DagLayoutDoc,
+  type MilestoneDoc,
+  type TaskDoc,
 } from './converters.mjs';
+
+// Each document as `api/firestore-io.mts` writes it: pruned to its codec.
+
+const writtenTask = (task: Task): TaskDoc =>
+  TaskDocCodec.prune(taskToDoc(task));
+
+const writtenMilestone = (milestone: Milestone): MilestoneDoc =>
+  MilestoneDocCodec.prune(milestoneToDoc(milestone));
+
+const writtenLayout = (layout: DagLayout, updatedAt: number): DagLayoutDoc =>
+  DagLayoutDocCodec.prune(dagLayoutToDoc(layout, updatedAt));
 
 const fullTask: Task = createTask({
   id: asTaskId('t1'),
@@ -66,12 +84,32 @@ const fullMilestone: Milestone = createMilestone({
 });
 
 describe(taskToDoc, () => {
+  test('writes a missing value as null in the type, too', () => {
+    expectType<TaskDoc['dueDate'], number | null>('=');
+
+    expectType<TaskDoc['startedAt'], number | null>('=');
+
+    expectType<TaskDoc['completedAt'], number | null>('=');
+
+    expectType<TaskDoc['estimateHours'], number | null>('=');
+
+    expectType<MilestoneDoc['date'], number | null>('=');
+
+    expectType<MilestoneDoc['checkedAt'], number | null>('=');
+
+    expectType<keyof TaskDoc, StrictExclude<keyof Task, 'id'>>('=');
+
+    expectType<keyof MilestoneDoc, StrictExclude<keyof Milestone, 'id'>>('=');
+
+    assert.notProperty(writtenTask(emptyTask), 'id');
+  });
+
   test('drops the id, which is the document id', () => {
-    assert.notProperty(taskToDoc(fullTask), 'id');
+    assert.notProperty(writtenTask(fullTask), 'id');
   });
 
   test('writes a missing value as null, never as undefined', () => {
-    const doc = taskToDoc(emptyTask);
+    const doc = writtenTask(emptyTask);
 
     assert.isNull(doc.dueDate);
 
@@ -87,9 +125,102 @@ describe(taskToDoc, () => {
   });
 
   test('writes a dependency on a milestone without a type', () => {
-    assert.deepStrictEqual(taskToDoc(fullTask).dependencies[1], {
-      from: { kind: 'milestone', id: 'm0' },
+    assert.deepStrictEqual(writtenTask(fullTask).dependencies[1], {
+      from: { kind: 'milestone', id: asMilestoneId('m0') },
       lagMs: 0,
+    });
+  });
+});
+
+describe('what is written', () => {
+  test('a task carrying fields the domain does not know, at any depth, leaves them out', () => {
+    const strayTask = {
+      ...fullTask,
+      projectId: 'p',
+      dependencies: [
+        {
+          from: { kind: 'task', id: asTaskId('t0'), title: 'T0' },
+          type: 'start-to-start',
+          lagMs: 3_600_000,
+          note: 'x',
+        },
+        // A dependency on a milestone has no type, not even a stray one.
+        {
+          from: { kind: 'milestone', id: asMilestoneId('m0') },
+          type: 'finish-to-start',
+          lagMs: 0,
+        },
+      ],
+    } as const;
+
+    const task: Task = strayTask;
+
+    assert.deepStrictEqual(writtenTask(task), writtenTask(fullTask));
+
+    assert.deepStrictEqual(Object.keys(writtenTask(task)), [
+      'title',
+      'description',
+      'progress',
+      'priority',
+      'dueDate',
+      'createdAt',
+      'updatedAt',
+      'startedAt',
+      'completedAt',
+      'labels',
+      'estimateHours',
+      'assignees',
+      'reviewers',
+      'dependencies',
+    ]);
+  });
+
+  test('a milestone carrying fields the domain does not know leaves them out', () => {
+    const strayMilestone = {
+      ...fullMilestone,
+      reached: true,
+      dependencies: [
+        {
+          from: { kind: 'task', id: asTaskId('t1'), extra: 1 },
+          type: 'finish-to-start',
+          lagMs: 0,
+          note: 'x',
+        },
+      ],
+    } as const;
+
+    const milestone: Milestone = strayMilestone;
+
+    assert.deepStrictEqual(
+      writtenMilestone(milestone),
+      writtenMilestone(fullMilestone),
+    );
+
+    assert.notProperty(writtenMilestone(milestone), 'reached');
+
+    assert.notProperty(writtenMilestone(milestone), 'id');
+  });
+
+  test('a layout whose points carry more than a position leaves the rest out', () => {
+    const node = {
+      x: 24,
+      y: -8,
+      width: 184,
+      height: 56,
+      kind: 'task',
+    } as const;
+
+    const layout: DagLayout = {
+      direction: 'down',
+      positions: new Map([['task:a', node]]),
+    } as const;
+
+    const strayLayout = { ...layout, zoom: 2 } as const;
+
+    assert.deepStrictEqual(writtenLayout(strayLayout, 1234), {
+      direction: 'down',
+      positions: { 'task:a': { x: 24, y: -8 } },
+      updatedAt: 1234,
     });
   });
 });
@@ -97,38 +228,83 @@ describe(taskToDoc, () => {
 describe(taskFromDoc, () => {
   test('round-trips a task with every field set', () => {
     assert.deepStrictEqual(
-      taskFromDoc('t1', taskToDoc(fullTask)),
+      taskFromDoc('t1', writtenTask(fullTask)),
       Result.ok(fullTask),
     );
   });
 
   test('round-trips a task with every optional field missing', () => {
     assert.deepStrictEqual(
-      taskFromDoc('t2', taskToDoc(emptyTask)),
+      taskFromDoc('t2', writtenTask(emptyTask)),
       Result.ok(emptyTask),
     );
   });
 
   test('round-trips through a structured clone, as the wire does', () => {
     assert.deepStrictEqual(
-      taskFromDoc('t1', structuredClone(taskToDoc(fullTask))),
+      taskFromDoc('t1', structuredClone(writtenTask(fullTask))),
       Result.ok(fullTask),
     );
   });
 
   test('ignores fields it does not know, which a newer version may write', () => {
     assert.deepStrictEqual(
-      taskFromDoc('t2', { ...taskToDoc(emptyTask), projectId: 'p' }),
+      taskFromDoc('t2', { ...writtenTask(emptyTask), projectId: 'p' }),
       Result.ok(emptyTask),
     );
   });
 
   test('rejects an empty id', () => {
-    assert.isTrue(Result.isErr(taskFromDoc('', taskToDoc(emptyTask))));
+    assert.isTrue(Result.isErr(taskFromDoc('', writtenTask(emptyTask))));
+  });
+
+  test('ignores fields it does not know inside a dependency too', () => {
+    const doc = writtenTask(fullTask);
+
+    assert.deepStrictEqual(
+      taskFromDoc('t1', {
+        ...doc,
+        dependencies: doc.dependencies.map((dependency) => ({
+          ...dependency,
+          note: 'x',
+          from: { ...dependency.from, projectId: 'p' },
+        })),
+      }),
+      Result.ok(fullTask),
+    );
+  });
+
+  test('takes the id from the document id, not from a field', () => {
+    assert.deepStrictEqual(
+      taskFromDoc('t2', { ...writtenTask(emptyTask), id: 'other' }),
+      Result.ok(emptyTask),
+    );
+  });
+
+  test('needs a lag on a dependency on a milestone, but no type', () => {
+    const doc = writtenTask(fullTask);
+
+    assert.isTrue(
+      Result.isErr(
+        taskFromDoc('t1', {
+          ...doc,
+          dependencies: [{ from: { kind: 'milestone', id: 'm0' } }],
+        }),
+      ),
+    );
+
+    assert.isTrue(
+      Result.isOk(
+        taskFromDoc('t1', {
+          ...doc,
+          dependencies: [{ from: { kind: 'milestone', id: 'm0' }, lagMs: 0 }],
+        }),
+      ),
+    );
   });
 
   test('rejects what is not a task', () => {
-    const doc = taskToDoc(fullTask);
+    const doc = writtenTask(fullTask);
 
     for (const broken of [
       undefined,
@@ -163,7 +339,7 @@ describe(taskFromDoc, () => {
 describe(milestoneFromDoc, () => {
   test('round-trips a milestone with every field set', () => {
     assert.deepStrictEqual(
-      milestoneFromDoc('m1', milestoneToDoc(fullMilestone)),
+      milestoneFromDoc('m1', writtenMilestone(fullMilestone)),
       Result.ok(fullMilestone),
     );
   });
@@ -175,7 +351,7 @@ describe(milestoneFromDoc, () => {
       now: 0,
     });
 
-    const doc = milestoneToDoc(milestone);
+    const doc = writtenMilestone(milestone);
 
     assert.isNull(doc.date);
 
@@ -185,7 +361,7 @@ describe(milestoneFromDoc, () => {
   });
 
   test('rejects what is not a milestone', () => {
-    const doc = milestoneToDoc(fullMilestone);
+    const doc = writtenMilestone(fullMilestone);
 
     for (const broken of [
       null,
@@ -219,7 +395,7 @@ describe(dagLayoutToDoc, () => {
   } as const;
 
   test('writes the positions as a map keyed by node id', () => {
-    assert.deepStrictEqual(dagLayoutToDoc(layout, 1234), {
+    assert.deepStrictEqual(writtenLayout(layout, 1234), {
       direction: 'down',
       positions: {
         'task:a': { x: 24, y: -8 },
@@ -231,7 +407,7 @@ describe(dagLayoutToDoc, () => {
 
   test('round-trips, through a structured clone as the wire does', () => {
     assert.deepStrictEqual(
-      dagLayoutFromDoc(structuredClone(dagLayoutToDoc(layout, 1234))),
+      dagLayoutFromDoc(structuredClone(writtenLayout(layout, 1234))),
       Result.ok(layout),
     );
   });
@@ -243,7 +419,7 @@ describe(dagLayoutToDoc, () => {
     } as const;
 
     assert.deepStrictEqual(
-      dagLayoutFromDoc(dagLayoutToDoc(empty, 0)),
+      dagLayoutFromDoc(writtenLayout(empty, 0)),
       Result.ok(empty),
     );
   });

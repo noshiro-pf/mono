@@ -23,15 +23,19 @@ import {
 } from 'firebase/auth';
 import {
   doc,
-  getDoc,
   initializeFirestore,
   persistentLocalCache,
   persistentMultipleTabManager,
-  setDoc,
   type Firestore,
 } from 'firebase/firestore';
 import { type DeepReadonly } from 'ts-type-forge';
-import { personalProjectDoc, type Backend } from '../repository/index.mjs';
+import { getDocData, putDoc, type DocTarget } from '../api/index.mjs';
+import {
+  personalProjectDoc,
+  ProjectDocCodec,
+  type Backend,
+  type ProjectDoc,
+} from '../repository/index.mjs';
 import { firebaseConfig } from './config.mjs';
 import { createFirestoreRepository } from './firestore-repository.mjs';
 
@@ -96,11 +100,12 @@ const ensurePersonalProject = async (
   firestore: DeepReadonly<Firestore>,
   uid: string,
 ): Promise<void> => {
-  const project = doc(firestore, 'projects', uid);
+  const project: DocTarget<ProjectDoc> = {
+    ref: doc(firestore, 'projects', uid),
+    codec: ProjectDocCodec,
+  } as const;
 
-  const snapshot = await getDoc(project);
-
-  if (!snapshot.exists()) {
-    await setDoc(project, personalProjectDoc(uid, Date.now()));
+  if ((await getDocData(project.ref)) === undefined) {
+    await putDoc(project, personalProjectDoc(uid, Date.now()));
   }
 };

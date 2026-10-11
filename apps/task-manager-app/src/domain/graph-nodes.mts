@@ -6,6 +6,7 @@
  */
 
 import { Arr } from 'ts-data-forge';
+import * as t from 'ts-fortress';
 import { type DeepReadonly } from 'ts-type-forge';
 import { type Dependency, type DomainState, type NodeRef } from './types.mjs';
 
@@ -13,10 +14,15 @@ import { type Dependency, type DomainState, type NodeRef } from './types.mjs';
 export const nodeId = (ref: NodeRef): GraphNodeId =>
   `${ref.kind}:${ref.id}` as const;
 
-/** Whether `value` is a node id: `task:` or `milestone:` and an id. */
-export const isGraphNodeId = (value: string): value is GraphNodeId =>
-  (value.startsWith('task:') && value.length > 'task:'.length) ||
-  (value.startsWith('milestone:') && value.length > 'milestone:'.length);
+/** A node id: `task:` or `milestone:` and a non-empty id. */
+export const GraphNodeIdCodec = t.refine({
+  baseType: t.string(),
+  is: (value: string): value is GraphNodeId =>
+    (value.startsWith('task:') && value.length > 'task:'.length) ||
+    (value.startsWith('milestone:') && value.length > 'milestone:'.length),
+  defaultValue: 'task:-',
+  typeName: 'GraphNodeId',
+});
 
 /** Every node: the tasks in input order, then the milestones. */
 export const listNodes = (state: DomainState): readonly GraphNodeEntry[] =>

@@ -10,6 +10,7 @@ import { Arr } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import {
+  SortKeyCodec,
   sortKeys,
   type SortKey,
   type SortOrder,
@@ -111,10 +112,8 @@ export const sortKeyActions = (
     },
   }) as const;
 
-/** A list of sort keys as stored, for validating what is read back. */
-export const SortSpecsType = t.array(
-  t.record({
-    key: t.enumType(sortKeys),
-    order: t.enumType(['asc', 'desc']),
-  }),
-);
+/** A sort key as stored, for validating what is read back. */
+export const SortSpecCodec = t.record({
+  key: SortKeyCodec,
+  order: t.enumType(['asc', 'desc']),
+});

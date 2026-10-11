@@ -1,6 +1,6 @@
 import { type FocusEventHandler, type PointerEventHandler } from 'preact';
 import { useCallback, useState } from 'preact/hooks';
-import { isGraphNodeId, type GraphNodeId } from '../domain/index.mjs';
+import { GraphNodeIdCodec, type GraphNodeId } from '../domain/index.mjs';
 
 /**
  * The node of the canvas the reader is pointing at — under the pointer, or
@@ -63,5 +63,5 @@ export const nodeIdOf = (
   const id =
     element instanceof SVGElement ? element.dataset['nodeId'] : undefined;
 
-  return id !== undefined && isGraphNodeId(id) ? id : undefined;
+  return id !== undefined && GraphNodeIdCodec.is(id) ? id : undefined;
 };

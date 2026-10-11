@@ -181,4 +181,11 @@ projects/{projectId}/settings/dagLayout        DAG の向きとノードの位�
 
 初回サインイン時に、自分の uid を id とする個人プロジェクトを作る。画面は今のところ
 この 1 つだけを使う。値のない項目は `null` で保存し、読み込んだ文書はすべて検証して、
-不正なものは警告を出して読み飛ばす（`src/repository/converters.mts`）。
+不正なものは警告を出して読み飛ばす（`src/repository/converters.mts`）。Firestore への
+読み書きはすべて `src/api/` を通し、書き込む文書はそこで codec の `prune` にかけて、
+codec にない項目を書かない（`src/api/firestore-io.mts`。ほかの場所からの読み書きは
+ESLint が拒む）。
+
+端末ごとの表示設定は `localStorage` に JSON で保存する。読み込むときに検証し、
+読めないものは既定値に戻すが、一部の項目だけが壊れているときはその項目だけを既定値に
+戻して残りを使う（`src/view-model/persisted-setting.mts`）。

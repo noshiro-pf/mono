@@ -12,6 +12,7 @@ export * from './list-settings.mjs';
 export * from './milestone-draft.mjs';
 export * from './next-tick.mjs';
 export * from './node-size.mjs';
+export * from './persisted-setting.mjs';
 export * from './rows.mjs';
 export * from './settings-panel.mjs';
 export * from './sign-in-error.mjs';
