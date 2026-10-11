@@ -308,8 +308,8 @@ ingest the feed). Outside reports come through private vulnerability reporting
   `required_approving_review_count: 0`, so outside `.github/CODEOWNERS` paths
   an armed green branch merges with nothing else to clear, and a stacked one,
   onto a branch no ruleset covers, merges into the layer below at once.
-  `unblock-prs` arms a `merge-queued` pull request when it picks it, and not a
-  second time after a person switches it off. Run the local checks first and
+  `unblock-prs` arms a `merge-queued` pull request whenever it picks it; to
+  hold one back, take `merge-queued` off. Run the local checks first and
   say in the description which ones — while the label is on they are the only
   checks the branch gets. Details in `tools/scripts/cmd/open-pr/README.md`.
 - **A Claude Code session names itself in the description**, on a line of its

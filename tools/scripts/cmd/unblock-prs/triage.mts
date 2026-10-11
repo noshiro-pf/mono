@@ -11,7 +11,6 @@ import {
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import { type StrictPick } from 'ts-type-forge';
-import { armsOnPick } from './auto-merge.mjs';
 import {
   isMergeableState,
   listRequiredChecks,
@@ -24,7 +23,6 @@ import {
   readBranchRules,
   readNativeStack,
   readReviewStates,
-  readTimeline,
   remoteSha,
 } from './github.mjs';
 import { blocksRelease, isMergeQueued, isSkipCiLabelled } from './labels.mjs';
@@ -206,8 +204,8 @@ export const triage = async (
       base,
     ),
     // Anything this cycle may pick — a candidate, or one in flight — that
-    // has no auto-merge yet. `classify` has already set aside the ones a
-    // person disarmed.
+    // has no auto-merge yet, however it came to have none: `merge-queued`
+    // is the one thing that says whether a pull request may merge.
     toArm: new Set(
       classified.flatMap(({ pr, result }) =>
         (result.kind === 'candidate' || result.kind === 'in-flight') &&
@@ -278,20 +276,14 @@ const classify = async (
 
   // Nothing here merges anything — auto-merge does, once the checks are
   // green — but this script is what arms it, when it picks a queued pull
-  // request (`auto-merge.mts`). One a person disarmed after queueing it is
-  // passed over until they queue it again, and one in a native stack, which
-  // GitHub will not let anything arm, until someone merges it by hand.
+  // request (`armOnPick` in `rebase.mts`). One in a native stack, which
+  // GitHub will not let anything arm, is passed over until someone merges it
+  // by hand.
   if (!isRecord(pr.autoMergeRequest)) {
     const nativeStacked = await inNativeStack(pr);
 
     if (nativeStacked !== undefined) {
       return nativeStacked;
-    }
-
-    const disarmed = await disarmedByHand(pr);
-
-    if (disarmed !== undefined) {
-      return disarmed;
     }
   }
 
@@ -376,32 +368,6 @@ const inNativeStack = async (
   }
 
   return nativeStackNote(pr, entry.value);
-};
-
-/**
- * The note to report instead of picking a queued pull request without
- * auto-merge, when a person switched it off after queueing it; `undefined`
- * when this script may arm it. A timeline that cannot be read is not taken as
- * permission.
- */
-const disarmedByHand = async (
-  pr: PullRequest,
-): Promise<Classification | undefined> => {
-  const events = await readTimeline(pr.number);
-
-  if (Result.isErr(events)) {
-    return {
-      kind: 'note',
-      note: `#${pr.number}: no auto-merge, and could not read whether someone switched it off (${lastLines(events.value, 2)})`,
-    };
-  }
-
-  return armsOnPick(events.value)
-    ? undefined
-    : {
-        kind: 'note',
-        note: `#${pr.number}: auto-merge was switched off by hand after it was queued; take ${MERGE_QUEUED_LABEL} off and put it back to queue it again`,
-      };
 };
 
 /**

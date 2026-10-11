@@ -19,8 +19,9 @@ the worker, since arming is GraphQL, which the proxy refuses, and this skill
 never arms anything anyway. A PR without the label is none of this skill's
 business however ready it looks — pass it over in silence. A PR with the label
 that cannot be acted on (a draft, a base that is neither `main` nor another
-open PR's branch, auto-merge switched off by hand) is reported, because the
-label asked for something and the answer is no. A PR stacked on another waits for it
+open PR's branch) is reported, because the label asked for something and the
+answer is no. Auto-merge switched off is not one of these: the label is the
+only permission the worker reads, and it arms the PR again when it picks it. A PR stacked on another waits for it
 — see "Stacked pull requests" below.
 
 **`skip-ci` does not put a PR out of scope; taking it off is the job.** It

@@ -174,7 +174,8 @@ export type Triage = Readonly<{
   candidates: readonly PullRequest[];
   /**
    * The candidates and the pull requests in flight that have no auto-merge
-   * yet, which this script arms when it picks them. See `auto-merge.mts`.
+   * yet, which this script arms when it picks them. See `armOnPick` in
+   * `rebase.mts`.
    */
   toArm: ReadonlySet<number>;
   /** Which open pull request each stacked one is on: child → parent. */
@@ -196,16 +197,10 @@ export type Triage = Readonly<{
 }>;
 
 /**
- * What a pull request's timeline says about its base, its auto-merge and its
- * being queued, in the order it happened. `stack.mts` reads the base changes
- * and `auto-merge.mts` the rest.
+ * One change of a pull request's base, from its timeline. `stack.mts` reads
+ * the last of them to tell which branch GitHub moved a layer off.
  */
-export type TimelineEvent = Readonly<
-  | { kind: 'auto-merge-disabled'; manually: boolean }
-  | { kind: 'auto-merge-enabled' }
-  | { kind: 'base-changed'; from: string; to: string }
-  | { kind: 'queued' }
->;
+export type BaseChange = Readonly<{ from: string; to: string }>;
 
 /**
  * A pull request's place in one of GitHub's native stacks, which `stack.mts`

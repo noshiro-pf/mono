@@ -14,7 +14,7 @@
  *    unprotected branch, so armed it would land in the layer below rather
  *    than on the default branch. Nothing arms it — `open-pr` arms nothing,
  *    and this script arms a pull request only when it picks it
- *    (`auto-merge.mts`), which a stacked one never is.
+ *    (`armOnPick` in `rebase.mts`), which a stacked one never is.
  * 2. **The layer below moves.** When this script rebases a pull request, it
  *    replays every layer stacked on it onto the new head with
  *    `git rebase --onto <new head> <old head>`, which carries exactly the
@@ -47,13 +47,13 @@ import { findStackParents } from 'pr-report-core';
 import { isMergeQueued, isSkipCiLabelled, wantsAutoRebase } from './labels.mjs';
 import { skipStillApplies } from './skips.mjs';
 import {
+  type BaseChange,
   type Classification,
   type NativeStackEntry,
   type PullRequest,
   type RetargetedLayer,
   type SkipRecord,
   type StackedOn,
-  type TimelineEvent,
   type TriageContext,
 } from './types.mjs';
 import { isSafeRefName } from './util.mjs';
@@ -64,14 +64,12 @@ import { isVersionPullRequest } from './version-pr.mjs';
  * moved it off that branch and onto the default one.
  */
 export const retargetedFrom = (
-  events: readonly TimelineEvent[],
+  changes: readonly BaseChange[],
   defaultBranch: string,
 ): string | undefined => {
-  const last = events.findLast((event) => event.kind === 'base-changed');
+  const last = changes.at(-1);
 
-  return last?.kind === 'base-changed' &&
-    last.to === defaultBranch &&
-    last.from !== defaultBranch
+  return last?.to === defaultBranch && last.from !== defaultBranch
     ? last.from
     : undefined;
 };

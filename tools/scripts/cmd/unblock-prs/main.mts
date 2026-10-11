@@ -1,6 +1,10 @@
 // cspell:ignore retargeted
 
-import { SKIP_CI_LABEL, stackDescendants } from 'pr-report-core';
+import {
+  MERGE_QUEUED_LABEL,
+  SKIP_CI_LABEL,
+  stackDescendants,
+} from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { autoFix } from './auto-fix.mjs';
@@ -68,19 +72,19 @@ import { watch } from './watch.mjs';
  * 1. List the open pull requests labelled `merge-queued` whose base is the
  *    default branch. Everything else is not this script's business: an
  *    unlabelled pull request is passed over in silence, and a labelled one
- *    that cannot be acted on — a draft, auto-merge switched off by hand after
- *    it was queued, a base that is neither the default
+ *    that cannot be acted on — a draft, a base that is neither the default
  *    branch nor another open pull request's — is reported, because the label
  *    asked for something and the answer is no. A stacked one waits for the
  *    layer below it (`stack.mts`). Auto-merge is this script's to arm, when
- *    it picks a pull request (`auto-merge.mts`). Drafts and anything a
- *    previous cycle gave up on are set aside, and so is one whose review
- *    holds its merge — a code owner has not approved it, or a conversation
- *    is unresolved — because no check reports that, and releasing it would
- *    only run a matrix to sit green. The one thing done without the label
- *    comes first: a layer GitHub moved onto the default branch when the one
- *    below it merged, still carrying that one's commits, is rebased off them
- *    and the list read again (`stack.mts`).
+ *    it picks a pull request (`armOnPick` in `rebase.mts`), whether or not
+ *    it was armed before: the label is the only permission read. Drafts and
+ *    anything a previous cycle gave up on are set aside, and so is one whose
+ *    review holds its merge — a code owner has not approved it, or a
+ *    conversation is unresolved — because no check reports that, and
+ *    releasing it would only run a matrix to sit green. The one thing done
+ *    without the label comes first: a layer GitHub moved onto the default
+ *    branch when the one below it merged, still carrying that one's commits,
+ *    is rebased off them and the list read again (`stack.mts`).
  * 2. If one of them is already up to date and its checks are running, or it
  *    is clean and about to merge, watch that one instead of rebasing another:
  *    the merge will move `main` and put every other branch back to `BEHIND`,
@@ -816,7 +820,9 @@ const applyWatchOutcome = (
       return skipped;
 
     case 'auto-merge-disabled':
-      log(`#${pr.number}: auto-merge was switched off; leaving it alone.`);
+      log(
+        `#${pr.number}: auto-merge was switched off; it is armed again when next picked, unless ${MERGE_QUEUED_LABEL} comes off.`,
+      );
 
       return skipped;
 
