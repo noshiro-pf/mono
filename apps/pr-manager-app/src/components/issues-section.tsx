@@ -1,14 +1,13 @@
-import type { OpenIssue } from 'pr-report-core';
 import { memoNamed } from 'preact-utils';
 import { Arr } from 'ts-data-forge';
+import type { IssueList } from '../load-report.mjs';
 import { ExternalLink } from './external-link.js';
 import { LabelChip } from './label-chip.js';
+import { LoadMoreIssues } from './load-more-issues.js';
 import { Timestamp } from './timestamp.js';
 
 type Props = Readonly<{
-  issues: readonly OpenIssue[];
-  /** How many are open in all, which the list may be a part of. */
-  totalCount: number;
+  issues: IssueList;
 }>;
 
 /**
@@ -19,22 +18,26 @@ type Props = Readonly<{
  * Rows rather than the cards the pull requests get — an issue has no branch,
  * no checks and no place in a merge order, and a card shaped like a pull
  * request's would spend most of its height saying so.
+ *
+ * The list starts at the most recently updated few and goes on a page at a
+ * time from the button under it, which is there until every open issue is
+ * listed.
  */
 export const IssuesSection = memoNamed<Props>(
   'IssuesSection',
-  ({ issues, totalCount }) => (
+  ({ issues: { items, totalCount, endCursor } }) => (
     <section className={'section'}>
       <h2 className={'section-title'}>
-        {issues.length < totalCount
-          ? `Open issues (${issues.length} of ${totalCount}, most recently updated)`
+        {items.length < totalCount
+          ? `Open issues (${items.length} of ${totalCount}, most recently updated)`
           : `Open issues (${totalCount})`}
       </h2>
 
-      {Arr.isEmpty(issues) ? (
+      {Arr.isEmpty(items) ? (
         <p className={'section-note'}>{'No open issues.'}</p>
       ) : (
         <ul className={'issue-list'}>
-          {issues.map((issue) => (
+          {items.map((issue) => (
             <li key={issue.number} className={'issue-item'}>
               <div className={'pull-request-heading'}>
                 <span
@@ -63,6 +66,10 @@ export const IssuesSection = memoNamed<Props>(
             </li>
           ))}
         </ul>
+      )}
+
+      {endCursor === undefined ? undefined : (
+        <LoadMoreIssues notListed={totalCount - items.length} />
       )}
     </section>
   ),

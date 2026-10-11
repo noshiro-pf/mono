@@ -19,7 +19,13 @@ import { fastDeepEqual, Result, unknownToString } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { CLOCK_TICK_MS, POLL_INTERVAL_MS } from '../constants.mjs';
 import type { Answered } from '../graphql.mjs';
-import type { Entry, LoadedReport, PageSummary } from '../load-report.mjs';
+import {
+  appendIssues,
+  type Entry,
+  type IssueList,
+  type LoadedReport,
+  type PageSummary,
+} from '../load-report.mjs';
 import {
   asRefreshing,
   LOADING,
@@ -27,12 +33,24 @@ import {
   type LoadStatus,
 } from '../load-state.mjs';
 import type { RateLimit } from '../rate-limit.mjs';
+import { ISSUES_LIMIT, ISSUES_PAGE_SIZE } from '../report-query.mjs';
 import { sameItemsIfEqual } from '../share.mjs';
 import type { StoredToken } from '../token.mjs';
 
 export type ReaderDeps = Readonly<{
   token: InitializedObservable<StoredToken | undefined>;
-  load: (token: string, nowMs: number) => Promise<Answered<LoadedReport>>;
+  /** A read of the report, listing the first `issueCount` open issues. */
+  load: (
+    token: string,
+    nowMs: number,
+    issueCount: number,
+  ) => Promise<Answered<LoadedReport>>;
+  /** The `first` open issues after `after`. */
+  loadIssues: (
+    token: string,
+    after: string,
+    first: number,
+  ) => Promise<Answered<IssueList>>;
   now: () => number;
   /**
    * synstate's `counter`: `0` at once, then `1, 2, …` every `ms`, until it is
@@ -69,6 +87,8 @@ export type Reader = Readonly<{
   cycles: InitializedObservable<LoadedReport['cycles']>;
   merged: InitializedObservable<LoadedReport['merged']>;
   issues: InitializedObservable<LoadedReport['issues']>;
+  /** How the last {@link loadMoreIssues} went. */
+  moreIssues: InitializedObservable<MoreIssuesStatus>;
   /** What GitHub last said was left of the budget. */
   rateLimit: InitializedObservable<RateLimit | undefined>;
   /**
@@ -87,12 +107,24 @@ export type Reader = Readonly<{
    * is still out, so a double click is one read.
    */
   refresh: () => void;
+  /**
+   * Lists the next {@link ISSUES_PAGE_SIZE} open issues, and every read
+   * after it lists them too, until the token changes. The page is read on
+   * its own rather than by a read of the whole report, which would take as
+   * long as Refresh does.
+   */
+  loadMoreIssues: () => void;
   /** Starts reading, and returns what stops it. */
   start: () => () => void;
 }>;
 
+export type MoreIssuesStatus = Readonly<
+  { type: 'idle' } | { type: 'loading' } | { type: 'failed'; message: string }
+>;
+
 export const createReader = (deps: ReaderDeps): Reader => {
-  const { token, load, now, counter, isVisible, visibilityChange } = deps;
+  const { token, load, loadIssues, now, counter, isVisible, visibilityChange } =
+    deps;
 
   // Each state below is passed on only when what it is given differs from
   // what it holds. `equals` decides that where the state is held, once, so
@@ -138,11 +170,23 @@ export const createReader = (deps: ReaderDeps): Reader => {
     equals: fastDeepEqual,
   });
 
-  const [issues, setIssues] = createState(EMPTY_PARTS.issues, {
-    equals: fastDeepEqual,
-  });
+  const [issues, setIssues, { getSnapshot: getIssues }] = createState(
+    EMPTY_PARTS.issues,
+    { equals: fastDeepEqual },
+  );
 
-  const writeReport = (report: ReportParts): void => {
+  const [moreIssues, setMoreIssues, { getSnapshot: getMoreIssues }] =
+    createState<MoreIssuesStatus>(MORE_ISSUES_IDLE, { equals: fastDeepEqual });
+
+  // How many open issues each read lists. Raised by `loadMoreIssues`, and
+  // put back when the token changes.
+  const [, setIssueCount, { getSnapshot: getIssueCount }] =
+    createState(ISSUES_LIMIT);
+
+  const writeReport = (
+    report: ReportParts,
+    withIssues: boolean = true,
+  ): void => {
     setReadAt(report.readAtEpochMs);
 
     setSummary(report.summary);
@@ -155,7 +199,9 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
     setMerged(report.merged);
 
-    setIssues(report.issues);
+    if (withIssues) {
+      setIssues(report.issues);
+    }
   };
 
   const currentToken = (): string | undefined =>
@@ -169,6 +215,8 @@ export const createReader = (deps: ReaderDeps): Reader => {
     }
 
     const startedAtMs = now();
+
+    const issueCount = getIssueCount();
 
     // An answer for a token the reader has since forgotten or replaced is
     // dropped: it would put back a report they asked to take away.
@@ -187,15 +235,17 @@ export const createReader = (deps: ReaderDeps): Reader => {
       const settled = settle(getLoadStatus(), getReadAt(), result, startedAtMs);
 
       // The report before the status, so that a page shown for the first
-      // time is shown with its parts already in place.
+      // time is shown with its parts already in place. Its issues are left
+      // out when it was asked for before `loadMoreIssues` added a page: it
+      // lists fewer than the page now shows, and would take that page away.
       if (settled.report !== undefined) {
-        writeReport(settled.report);
+        writeReport(settled.report, issueCount >= getIssueCount());
       }
 
       setLoadStatus(settled.status);
     };
 
-    load(tokenValue, startedAtMs)
+    load(tokenValue, startedAtMs, issueCount)
       .then(({ result, rateLimit: answeredLimit }) => {
         apply(result, answeredLimit);
       })
@@ -210,6 +260,61 @@ export const createReader = (deps: ReaderDeps): Reader => {
     read();
   };
 
+  const loadMoreIssues = (): void => {
+    const tokenValue = currentToken();
+
+    const after = getIssues().endCursor;
+
+    if (
+      tokenValue === undefined ||
+      after === undefined ||
+      getMoreIssues().type === 'loading'
+    ) {
+      return;
+    }
+
+    setMoreIssues(MORE_ISSUES_LOADING);
+
+    const apply = (
+      result: Result<IssueList, string>,
+      answeredLimit: RateLimit | undefined,
+    ): void => {
+      if (currentToken() !== tokenValue) {
+        return;
+      }
+
+      updateRateLimit((last) => answeredLimit ?? last);
+
+      if (Result.isErr(result)) {
+        setMoreIssues({ type: 'failed', message: result.value });
+
+        return;
+      }
+
+      // Raised only now, so that a read that went out before the page came
+      // back is not taken for one that lists it.
+      setIssueCount(getIssueCount() + ISSUES_PAGE_SIZE);
+
+      // A read that answered meanwhile has listed these already, from where
+      // its own list ended; the page goes only where it was asked for.
+      const current = getIssues();
+
+      if (current.endCursor === after) {
+        setIssues(appendIssues(current, result.value));
+      }
+
+      setMoreIssues(MORE_ISSUES_IDLE);
+    };
+
+    loadIssues(tokenValue, after, ISSUES_PAGE_SIZE)
+      .then(({ result, rateLimit: answeredLimit }) => {
+        apply(result, answeredLimit);
+      })
+      .catch((error: unknown) => {
+        apply(Result.err(unknownToString(error)), undefined);
+      });
+  };
+
   const start = (): (() => void) => {
     // The first read, and a read on every change of token, which is how a
     // reader finds out whether GitHub takes the one they pasted. Moving the
@@ -218,6 +323,10 @@ export const createReader = (deps: ReaderDeps): Reader => {
       .pipe(map((stored) => stored?.value))
       .pipe(skipIfNoChange())
       .subscribe((tokenValue) => {
+        setIssueCount(ISSUES_LIMIT);
+
+        setMoreIssues(MORE_ISSUES_IDLE);
+
         if (tokenValue === undefined) {
           setLoadStatus(LOADING);
 
@@ -300,9 +409,11 @@ export const createReader = (deps: ReaderDeps): Reader => {
     cycles,
     merged,
     issues,
+    moreIssues,
     rateLimit,
     nowMs,
     refresh,
+    loadMoreIssues,
     start,
   };
 };
@@ -335,8 +446,12 @@ const EMPTY_PARTS: ReportParts = {
   roots: [],
   cycles: [],
   merged: [],
-  issues: { items: [], totalCount: 0 },
+  issues: { items: [], totalCount: 0, endCursor: undefined },
 } as const;
+
+const MORE_ISSUES_IDLE: MoreIssuesStatus = { type: 'idle' } as const;
+
+const MORE_ISSUES_LOADING: MoreIssuesStatus = { type: 'loading' } as const;
 
 const divergenceScale = (entries: readonly Entry[]): number =>
   Math.max(

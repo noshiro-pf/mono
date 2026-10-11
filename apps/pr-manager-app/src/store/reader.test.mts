@@ -2,9 +2,10 @@ import { createState, source, type SourceObservable } from 'synstate';
 import { Result } from 'ts-data-forge';
 import { CLOCK_TICK_MS, POLL_INTERVAL_MS } from '../constants.mjs';
 import type { Answered } from '../graphql.mjs';
-import type { LoadedReport, Merged } from '../load-report.mjs';
+import type { IssueList, LoadedReport, Merged } from '../load-report.mjs';
 import { LOADING, READY, type LoadStatus } from '../load-state.mjs';
 import type { RateLimit } from '../rate-limit.mjs';
+import { ISSUES_LIMIT, ISSUES_PAGE_SIZE } from '../report-query.mjs';
 import type { StoredToken } from '../token.mjs';
 import { createReader, type Reader } from './reader.mjs';
 
@@ -404,7 +405,172 @@ describe(createReader, () => {
 
     assert.strictEqual(timers.running(POLL_INTERVAL_MS), 0);
   });
+
+  describe('loadMoreIssues', () => {
+    test('lists the next page, and every read after lists it too', async () => {
+      const { reader, loads, issueLoads, timers } = setup(TOKEN_A);
+
+      reader.start();
+
+      assert.strictEqual(loads[0]?.issueCount, ISSUES_LIMIT);
+
+      await answer(loads, 0, Result.ok(withIssues(1_000, [1], 'c1')), LIMIT);
+
+      reader.loadMoreIssues();
+
+      assert.deepStrictEqual(
+        issueLoads.map(({ token, after, first }) => ({ token, after, first })),
+        [{ token: 'a', after: 'c1', first: ISSUES_PAGE_SIZE }],
+      );
+
+      assert.deepStrictEqual(reader.moreIssues.getSnapshot().value, {
+        type: 'loading',
+      });
+
+      await answerIssues(issueLoads, 0, Result.ok(issueList([2], 'c2')));
+
+      assert.deepStrictEqual(listed(reader), [1, 2]);
+
+      assert.strictEqual(reader.issues.getSnapshot().value.endCursor, 'c2');
+
+      assert.deepStrictEqual(reader.moreIssues.getSnapshot().value, {
+        type: 'idle',
+      });
+
+      timers.fire(POLL_INTERVAL_MS);
+
+      assert.strictEqual(loads[1]?.issueCount, ISSUES_LIMIT + ISSUES_PAGE_SIZE);
+    });
+
+    test('asks once while a page is out', async () => {
+      const { reader, loads, issueLoads } = setup(TOKEN_A);
+
+      reader.start();
+
+      await answer(loads, 0, Result.ok(withIssues(1_000, [1], 'c1')), LIMIT);
+
+      reader.loadMoreIssues();
+
+      reader.loadMoreIssues();
+
+      assert.strictEqual(issueLoads.length, 1);
+    });
+
+    test('asks nothing once every open issue is listed', async () => {
+      const { reader, loads, issueLoads } = setup(TOKEN_A);
+
+      reader.start();
+
+      await answer(
+        loads,
+        0,
+        Result.ok(withIssues(1_000, [1], undefined)),
+        LIMIT,
+      );
+
+      reader.loadMoreIssues();
+
+      assert.strictEqual(issueLoads.length, 0);
+    });
+
+    // The failure this is here to prevent: a poll that went out before the
+    // button was pressed answered after the page did, and took the page away
+    // again until the next poll.
+    test('a read asked before the press leaves the page it added', async () => {
+      const { reader, loads, issueLoads, timers, clock } = setup(TOKEN_A);
+
+      reader.start();
+
+      await answer(loads, 0, Result.ok(withIssues(1_000, [1], 'c1')), LIMIT);
+
+      clock.set(1_500);
+
+      timers.fire(POLL_INTERVAL_MS);
+
+      reader.loadMoreIssues();
+
+      await answerIssues(issueLoads, 0, Result.ok(issueList([2], 'c2')));
+
+      await answer(loads, 1, Result.ok(withIssues(2_000, [1], 'c1')), LIMIT);
+
+      assert.deepStrictEqual(listed(reader), [1, 2]);
+
+      assert.strictEqual(reader.readAt.getSnapshot().value, 2_000);
+    });
+
+    test('a page a newer read already listed is dropped', async () => {
+      const { reader, loads, issueLoads, timers, clock } = setup(TOKEN_A);
+
+      reader.start();
+
+      await answer(loads, 0, Result.ok(withIssues(1_000, [1], 'c1')), LIMIT);
+
+      reader.loadMoreIssues();
+
+      await answerIssues(issueLoads, 0, Result.ok(issueList([2], 'c2')));
+
+      reader.loadMoreIssues();
+
+      clock.set(1_500);
+
+      timers.fire(POLL_INTERVAL_MS);
+
+      await answer(
+        loads,
+        1,
+        Result.ok(withIssues(2_000, [3, 1, 2, 4], 'c4')),
+        LIMIT,
+      );
+
+      await answerIssues(issueLoads, 1, Result.ok(issueList([4], 'c4')));
+
+      assert.deepStrictEqual(listed(reader), [3, 1, 2, 4]);
+    });
+
+    test('says why a page could not be read, and keeps the list', async () => {
+      const { reader, loads, issueLoads } = setup(TOKEN_A);
+
+      reader.start();
+
+      await answer(loads, 0, Result.ok(withIssues(1_000, [1], 'c1')), LIMIT);
+
+      reader.loadMoreIssues();
+
+      await answerIssues(issueLoads, 0, Result.err('network'));
+
+      assert.deepStrictEqual(reader.moreIssues.getSnapshot().value, {
+        type: 'failed',
+        message: 'network',
+      });
+
+      assert.deepStrictEqual(listed(reader), [1]);
+    });
+
+    test('a new token lists the first page again', async () => {
+      const { reader, loads, issueLoads, setToken } = setup(TOKEN_A);
+
+      reader.start();
+
+      await answer(loads, 0, Result.ok(withIssues(1_000, [1], 'c1')), LIMIT);
+
+      reader.loadMoreIssues();
+
+      setToken(TOKEN_B);
+
+      assert.strictEqual(loads.at(-1)?.issueCount, ISSUES_LIMIT);
+
+      await answerIssues(issueLoads, 0, Result.ok(issueList([2], 'c2')));
+
+      assert.deepStrictEqual(listed(reader), [1]);
+
+      assert.deepStrictEqual(reader.moreIssues.getSnapshot().value, {
+        type: 'idle',
+      });
+    });
+  });
 });
+
+const TOKEN_B: StoredToken = { value: 'b', store: 'session' } as const;
 
 const TOKEN_A: StoredToken = { value: 'a', store: 'session' } as const;
 
@@ -417,13 +583,22 @@ const LIMIT: RateLimit = {
 type PendingLoad = Readonly<{
   token: string;
   nowMs: number;
+  issueCount: number;
   resolve: (answered: Answered<LoadedReport>) => void;
   reject: (error: unknown) => void;
+}>;
+
+type PendingIssueLoad = Readonly<{
+  token: string;
+  after: string;
+  first: number;
+  resolve: (answered: Answered<IssueList>) => void;
 }>;
 
 type Setup = Readonly<{
   reader: Reader;
   loads: readonly PendingLoad[];
+  issueLoads: readonly PendingIssueLoad[];
   clock: Readonly<{ set: (nowMs: number) => void }>;
   visibility: Readonly<{
     /** Changes what `isVisible` answers, without the event. */
@@ -450,6 +625,8 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
   const [token, setToken] = createState<StoredToken | undefined>(initialToken);
 
   const mut_loads: PendingLoad[] = [];
+
+  const mut_issueLoads: PendingIssueLoad[] = [];
 
   const mut_clock = { nowMs: 0 };
 
@@ -484,9 +661,19 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
 
   const reader = createReader({
     token,
-    load: (tokenValue, nowMs) =>
+    load: (tokenValue, nowMs, issueCount) =>
       new Promise((resolve, reject) => {
-        mut_loads.push({ token: tokenValue, nowMs, resolve, reject });
+        mut_loads.push({
+          token: tokenValue,
+          nowMs,
+          issueCount,
+          resolve,
+          reject,
+        });
+      }),
+    loadIssues: (tokenValue, after, first) =>
+      new Promise((resolve) => {
+        mut_issueLoads.push({ token: tokenValue, after, first, resolve });
       }),
     now: () => mut_clock.nowMs,
     counter: (ms) => {
@@ -503,6 +690,7 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
   return {
     reader,
     loads: mut_loads,
+    issueLoads: mut_issueLoads,
     clock: {
       set: (nowMs: number) => {
         mut_clock.nowMs = nowMs;
@@ -541,6 +729,19 @@ const answer = async (
 
   await settle();
 };
+
+const answerIssues = async (
+  issueLoads: readonly PendingIssueLoad[],
+  index: number,
+  result: Result<IssueList, string>,
+): Promise<void> => {
+  issueLoads[index]?.resolve({ result, rateLimit: undefined });
+
+  await settle();
+};
+
+const listed = (reader: Reader): readonly number[] =>
+  reader.issues.getSnapshot().value.items.map(({ number }) => number);
 
 const shown = (
   reader: Reader,
@@ -614,5 +815,34 @@ const readAt = (readAtEpochMs: number): LoadedReport =>
     roots: [],
     cycles: [],
     merged: [],
-    issues: { items: [], totalCount: 0 },
+    issues: { items: [], totalCount: 0, endCursor: undefined },
+  }) as const;
+
+const withIssues = (
+  readAtEpochMs: number,
+  numbers: readonly number[],
+  endCursor: string | undefined,
+): LoadedReport =>
+  ({
+    ...readAt(readAtEpochMs),
+    issues: issueList(numbers, endCursor),
+  }) as const;
+
+const issueList = (
+  numbers: readonly number[],
+  endCursor: string | undefined,
+): IssueList =>
+  ({
+    items: numbers.map((number) => ({
+      number,
+      title: `Issue ${number}`,
+      author: 'someone',
+      url: `https://github.com/noshiro-pf/mono/issues/${number}`,
+      labels: [],
+      createdAt: '2026-09-20T00:00:00Z',
+      updatedAt: '2026-09-23T00:00:00Z',
+      comments: 0,
+    })),
+    totalCount: 200,
+    endCursor,
   }) as const;

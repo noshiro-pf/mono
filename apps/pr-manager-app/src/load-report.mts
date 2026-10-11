@@ -62,9 +62,12 @@ import {
   followUpQuery,
   issueAlias,
   ISSUES_LIMIT,
+  ISSUES_PAGE_SIZE,
   IssueSchema,
   issuesQuery,
+  OPEN_ISSUES_QUERY,
   OPEN_LIMIT,
+  OpenIssuesDataSchema,
   REPORT_QUERY,
   ReportDataSchema,
   type CheckSuiteNode,
@@ -72,6 +75,7 @@ import {
   type FollowUp,
   type MergedPullRequestNode,
   type OpenIssueNode,
+  type OpenIssuePage,
   type OpenPullRequest,
 } from './report-query.mjs';
 
@@ -120,11 +124,17 @@ export type LoadedReport = Readonly<{
   cycles: PrReport['cycles'];
   /** Merged within {@link MERGED_WITHIN_DAYS}, newest first. */
   merged: readonly Merged[];
-  /**
-   * The open issues, most recently updated first, at most `ISSUES_LIMIT`;
-   * `totalCount` is how many are open in all, so a cut list can say so.
-   */
-  issues: Readonly<{ items: readonly OpenIssue[]; totalCount: number }>;
+  /** The open issues, most recently updated first. */
+  issues: IssueList;
+}>;
+
+/** The open issues the page lists, and where the list stops. */
+export type IssueList = Readonly<{
+  items: readonly OpenIssue[];
+  /** How many are open in all, so that a cut list can say so. */
+  totalCount: number;
+  /** Where the next page starts; `undefined` once every one is listed. */
+  endCursor: string | undefined;
 }>;
 
 /**
@@ -140,6 +150,11 @@ export type LoadRequest = Readonly<{
   token: string;
   /** The instant "merged in the last week" is measured back from. */
   nowMs: number;
+  /**
+   * How many open issues to list. The report query reads
+   * {@link ISSUES_LIMIT}; more than that are the pages after it.
+   */
+  issueCount?: number;
   fetchImpl?: Fetch;
 }>;
 
@@ -150,14 +165,16 @@ export type LoadRequest = Readonly<{
  * first follow-up always runs, because how far each head is from its base
  * can only be asked once the heads are known; any more are a list that did
  * not fit in one page, which is rare and bounded by
- * {@link MAX_FOLLOW_UP_ROUNDS}. Last, and only when a body closes an issue
- * GitHub has not linked, one more for what those issues are called.
+ * {@link MAX_FOLLOW_UP_ROUNDS}. Then, only when a body closes an issue
+ * GitHub has not linked, one more for what those issues are called. Last,
+ * only when more open issues are asked for than the report query lists, the
+ * pages that list them.
  */
 export const loadReport = async (
   source: ReportSource,
   request: LoadRequest,
 ): Promise<Answered<LoadedReport>> => {
-  const { token, nowMs, fetchImpl } = request;
+  const { token, nowMs, issueCount = ISSUES_LIMIT, fetchImpl } = request;
 
   const repo: RepoRef = { owner: source.owner, name: source.repo } as const;
 
@@ -236,10 +253,28 @@ export const loadReport = async (
     },
   });
 
-  const { rateLimit } = described;
-
   if (Result.isErr(described.result)) {
-    return { rateLimit, result: described.result };
+    return { rateLimit: described.rateLimit, result: described.result };
+  }
+
+  const listed = await listIssuesUpTo({
+    listed: issueListOf(issues),
+    covered: ISSUES_LIMIT,
+    count: issueCount,
+    rateLimit: described.rateLimit,
+    ask: async (after, pageSize) =>
+      loadIssuePage(source, {
+        token,
+        after,
+        first: pageSize,
+        ...(fetchImpl === undefined ? {} : { fetchImpl }),
+      }),
+  });
+
+  const { rateLimit } = listed;
+
+  if (Result.isErr(listed.result)) {
+    return { rateLimit, result: listed.result };
   }
 
   return {
@@ -254,11 +289,137 @@ export const loadReport = async (
         codeOwners,
         pulls,
         merged,
-        issues,
+        issues: listed.result.value,
         described: described.result.value,
       }),
     ),
   };
+};
+
+export type IssuePageRequest = Readonly<{
+  token: string;
+  /** The `endCursor` of the list the page goes after. */
+  after: string;
+  /** How many to read, at most {@link ISSUES_PAGE_SIZE}. */
+  first: number;
+  fetchImpl?: Fetch;
+}>;
+
+/**
+ * The open issues after `after`, in the order the report lists them: the
+ * next page of {@link LoadedReport.issues}, to be put after it with
+ * {@link appendIssues}.
+ */
+export const loadIssuePage = async (
+  source: ReportSource,
+  request: IssuePageRequest,
+): Promise<Answered<IssueList>> => {
+  const { token, after, first, fetchImpl } = request;
+
+  const answered = await askGraphql({
+    query: OPEN_ISSUES_QUERY,
+    variables: { owner: source.owner, name: source.repo, first, after },
+    token,
+    ...(fetchImpl === undefined ? {} : { fetchImpl }),
+  });
+
+  const { rateLimit } = answered;
+
+  if (Result.isErr(answered.result)) {
+    return { rateLimit, result: answered.result };
+  }
+
+  const validated = OpenIssuesDataSchema.validate(answered.result.value.data);
+
+  if (Result.isErr(validated)) {
+    return {
+      rateLimit,
+      result: Result.err(
+        `GitHub's answer is not the shape this page expects:\n${t.validationErrorsToMessages(validated.value).join('\n')}`,
+      ),
+    };
+  }
+
+  return {
+    rateLimit,
+    result: Result.ok(issueListOf(validated.value.repository.issues)),
+  };
+};
+
+/**
+ * `page` put after `held`. An issue already listed is not listed again: the
+ * list is by last update, and one updated between the two reads can be met
+ * in both.
+ */
+export const appendIssues = (held: IssueList, page: IssueList): IssueList => {
+  const listed = new Set(held.items.map(({ number }) => number));
+
+  return {
+    items: [
+      ...held.items,
+      ...page.items.filter(({ number }) => !listed.has(number)),
+    ],
+    totalCount: page.totalCount,
+    endCursor: page.endCursor,
+  };
+};
+
+/**
+ * `listed` and the pages after it, until they have asked for `count` or
+ * listed every open issue. One page at a time, because each page starts
+ * where the last ended.
+ *
+ * Counted in what was asked for rather than what came back: an issue the
+ * token may not see comes back as nothing (`withoutNullNodes`), and a list
+ * one short of `count` would otherwise ask for one more page on every read.
+ */
+const listIssuesUpTo = async ({
+  listed,
+  covered,
+  count,
+  rateLimit,
+  ask,
+}: Readonly<{
+  listed: IssueList;
+  /** How many issues the reads that made `listed` asked for. */
+  covered: number;
+  count: number;
+  rateLimit: RateLimit | undefined;
+  ask: (after: string, size: number) => Promise<Answered<IssueList>>;
+}>): Promise<Answered<IssueList>> => {
+  const wanted = count - covered;
+
+  if (listed.endCursor === undefined || wanted <= 0) {
+    return { rateLimit, result: Result.ok(listed) };
+  }
+
+  const pageSize = Math.min(wanted, ISSUES_PAGE_SIZE);
+
+  const answered = await ask(listed.endCursor, pageSize);
+
+  const latestLimit = answered.rateLimit ?? rateLimit;
+
+  if (Result.isErr(answered.result)) {
+    return { rateLimit: latestLimit, result: answered.result };
+  }
+
+  const page = answered.result.value;
+
+  // A page that ends where it started would be asked for again, forever.
+  const appended = appendIssues(
+    listed,
+    page.endCursor === listed.endCursor
+      ? { ...page, endCursor: undefined }
+      : page,
+  );
+
+  return listIssuesUpTo({
+    listed: appended,
+    covered: covered + pageSize,
+    count,
+    rateLimit: latestLimit,
+    ask,
+  });
 };
 
 /**
@@ -393,7 +554,7 @@ const readReportData = (
     codeOwners: readonly CodeOwnersRule[];
     openPulls: readonly OpenPullRequest[];
     merged: readonly MergedPullRequestNode[];
-    issues: Readonly<{ nodes: readonly OpenIssueNode[]; totalCount: number }>;
+    issues: OpenIssuePage;
   }>,
   string
 > => {
@@ -631,7 +792,7 @@ const assemble = ({
   codeOwners: readonly CodeOwnersRule[];
   pulls: readonly PullState[];
   merged: readonly MergedPullRequestNode[];
-  issues: Readonly<{ nodes: readonly OpenIssueNode[]; totalCount: number }>;
+  issues: IssueList;
   described: ReadonlyMap<number, LinkedIssue>;
 }>): LoadedReport => {
   const report = buildEntries({
@@ -691,10 +852,7 @@ const assemble = ({
       .filter(({ mergedAtEpochMs }) => mergedAtEpochMs >= cutoff)
       .toSorted((a, b) => b.mergedAtEpochMs - a.mergedAtEpochMs)
       .slice(0, MERGED_LIMIT),
-    issues: {
-      items: issues.nodes.slice(0, ISSUES_LIMIT).map(issueOf),
-      totalCount: issues.totalCount,
-    },
+    issues,
   };
 };
 
@@ -870,6 +1028,13 @@ const mergedOf = (
     mergedAtEpochMs,
     labels: labelsOf(pr.labels.nodes),
     linkedIssues: linkedIssuesOf(repo, pr, described),
+  }) as const;
+
+const issueListOf = (page: OpenIssuePage): IssueList =>
+  ({
+    items: page.nodes.map(issueOf),
+    totalCount: page.totalCount,
+    endCursor: nextCursor(page.pageInfo),
   }) as const;
 
 const issueOf = (issue: OpenIssueNode): OpenIssue =>

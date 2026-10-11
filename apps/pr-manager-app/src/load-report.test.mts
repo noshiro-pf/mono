@@ -1,9 +1,16 @@
 import { writeSetAsideComment } from 'pr-report-core';
-import { isRecord, Json, Result } from 'ts-data-forge';
+import { Arr, isRecord, Json, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { REPORT_SOURCE } from './constants.mjs';
 import type { Fetch, FetchInit } from './graphql.mjs';
-import { loadReport, type LoadedReport } from './load-report.mjs';
+import {
+  appendIssues,
+  loadIssuePage,
+  loadReport,
+  type IssueList,
+  type LoadedReport,
+} from './load-report.mjs';
+import { ISSUES_LIMIT, ISSUES_PAGE_SIZE } from './report-query.mjs';
 
 describe(loadReport, () => {
   test('reads the report, then how far each head is from its base', async () => {
@@ -152,6 +159,7 @@ describe(loadReport, () => {
     const { fetchImpl } = answering(
       report([], [], 0, {
         totalCount: 42,
+        pageInfo: { hasNextPage: true, endCursor: 'cursor-2' },
         nodes: [
           openIssue(2036, ['pr-manager-app']),
           // An issue the token may not see.
@@ -187,6 +195,100 @@ describe(loadReport, () => {
         comments: 3,
       },
     ]);
+
+    assert.strictEqual(loaded.issues.endCursor, 'cursor-2');
+  });
+
+  test('lists more open issues when asked for more, a page at a time', async () => {
+    const { fetchImpl, sent } = answering(
+      report([], [], 0, issuePage(250, [1, 2], 'cursor-2')),
+      issuesAnswer(issuePage(250, [3, 4], 'cursor-4')),
+      issuesAnswer(issuePage(250, [5], 'cursor-5')),
+    );
+
+    const loaded = await load(fetchImpl, ISSUES_LIMIT + ISSUES_PAGE_SIZE + 1);
+
+    assert.deepStrictEqual(
+      Arr.tail(sent).map(({ query, variables }) => ({
+        named: query.startsWith('query OpenIssues('),
+        variables,
+      })),
+      [
+        {
+          named: true,
+          variables: {
+            owner: 'noshiro-pf',
+            name: 'mono',
+            first: ISSUES_PAGE_SIZE,
+            after: 'cursor-2',
+          },
+        },
+        {
+          named: true,
+          variables: {
+            owner: 'noshiro-pf',
+            name: 'mono',
+            first: 1,
+            after: 'cursor-4',
+          },
+        },
+      ],
+    );
+
+    assert.deepStrictEqual(
+      loaded.issues.items.map(({ number }) => number),
+      [1, 2, 3, 4, 5],
+    );
+
+    assert.deepStrictEqual(loaded.issues.totalCount, 250);
+
+    assert.strictEqual(loaded.issues.endCursor, 'cursor-5');
+  });
+
+  test('stops at the last open issue, however many were asked for', async () => {
+    const { fetchImpl, sent } = answering(
+      report([], [], 0, issuePage(3, [1, 2], 'cursor-2')),
+      issuesAnswer(issuePage(3, [3], undefined)),
+    );
+
+    const loaded = await load(fetchImpl, 500);
+
+    assert.strictEqual(sent.length, 2);
+
+    assert.deepStrictEqual(
+      loaded.issues.items.map(({ number }) => number),
+      [1, 2, 3],
+    );
+
+    assert.isUndefined(loaded.issues.endCursor);
+  });
+
+  test('asks for no more open issues than the report query lists by default', async () => {
+    const { fetchImpl, sent } = answering(
+      report([], [], 0, issuePage(250, [1, 2], 'cursor-2')),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.strictEqual(sent.length, 1);
+
+    assert.strictEqual(loaded.issues.endCursor, 'cursor-2');
+  });
+
+  test('fails the read when a page of open issues cannot be read', async () => {
+    const { fetchImpl } = answering(
+      report([], [], 0, issuePage(250, [1, 2], 'cursor-2')),
+      { data: { repository: { issues: { totalCount: 250 } } } },
+    );
+
+    const { result } = await loadReport(REPORT_SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      issueCount: 100,
+      fetchImpl,
+    });
+
+    assert.isTrue(Result.isErr(result));
   });
 
   test('reads the Claude Code sessions out of the body', async () => {
@@ -695,6 +797,93 @@ describe(loadReport, () => {
   });
 });
 
+describe(loadIssuePage, () => {
+  test('reads the open issues after a cursor', async () => {
+    const { fetchImpl, sent } = answering(
+      issuesAnswer(issuePage(250, [31, 32], 'cursor-32')),
+    );
+
+    const { result } = await loadIssuePage(REPORT_SOURCE, {
+      token: 'token',
+      after: 'cursor-30',
+      first: 100,
+      fetchImpl,
+    });
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.deepStrictEqual(sent[0]?.variables, {
+      owner: 'noshiro-pf',
+      name: 'mono',
+      first: 100,
+      after: 'cursor-30',
+    });
+
+    assert.deepStrictEqual(
+      result.value.items.map(({ number }) => number),
+      [31, 32],
+    );
+
+    assert.strictEqual(result.value.totalCount, 250);
+
+    assert.strictEqual(result.value.endCursor, 'cursor-32');
+  });
+
+  test('says so when the answer is not a page of issues', async () => {
+    const { fetchImpl } = answering({ data: { repository: {} } });
+
+    const { result } = await loadIssuePage(REPORT_SOURCE, {
+      token: 'token',
+      after: 'cursor-30',
+      first: 100,
+      fetchImpl,
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, 'not the shape this page expects');
+  });
+});
+
+describe(appendIssues, () => {
+  test('puts the page after the list, and takes its count and cursor', () => {
+    const appended = appendIssues(
+      issueList([1, 2], 10, 'cursor-2'),
+      issueList([2, 3], 9, 'cursor-3'),
+    );
+
+    // #2 was updated between the reads and met in both.
+    assert.deepStrictEqual(
+      appended.items.map(({ number }) => number),
+      [1, 2, 3],
+    );
+
+    assert.strictEqual(appended.totalCount, 9);
+
+    assert.strictEqual(appended.endCursor, 'cursor-3');
+  });
+});
+
+const issueList = (
+  numbers: readonly number[],
+  totalCount: number,
+  endCursor: string | undefined,
+): IssueList =>
+  ({
+    items: numbers.map((number) => ({
+      number,
+      title: `Issue ${number}`,
+      author: 'someone',
+      url: `https://github.com/noshiro-pf/mono/issues/${number}`,
+      labels: [],
+      createdAt: '2026-09-20T00:00:00Z',
+      updatedAt: '2026-09-23T00:00:00Z',
+      comments: 0,
+    })),
+    totalCount,
+    endCursor,
+  }) as const;
+
 const refusingTheToken: Fetch = () =>
   Promise.resolve(new Response('', { status: 401 }));
 
@@ -709,10 +898,14 @@ const refusingTheQuery: Fetch = () =>
 /** 2026-09-24T00:00:00Z. */
 const NOW_MS = 1_790_208_000_000;
 
-const load = async (fetchImpl: Fetch): Promise<LoadedReport> => {
+const load = async (
+  fetchImpl: Fetch,
+  issueCount?: number,
+): Promise<LoadedReport> => {
   const { result } = await loadReport(REPORT_SOURCE, {
     token: 'token',
     nowMs: NOW_MS,
+    ...(issueCount === undefined ? {} : { issueCount }),
     fetchImpl,
   });
 
@@ -782,10 +975,7 @@ const report = (
   openNodes: readonly unknown[],
   mergedNodes: readonly unknown[] = [],
   totalCount: number = openNodes.length,
-  issues: Readonly<{
-    totalCount: number;
-    nodes: readonly unknown[];
-  }> = NO_ISSUES,
+  issues: unknown = NO_ISSUES,
 ): unknown =>
   ({
     data: {
@@ -800,7 +990,31 @@ const report = (
     },
   }) as const;
 
-const NO_ISSUES = { totalCount: 0, nodes: [] } as const;
+const NO_ISSUES = {
+  totalCount: 0,
+  pageInfo: { hasNextPage: false, endCursor: null },
+  nodes: [],
+} as const;
+
+/** A page of open issues, the last one when `endCursor` is `undefined`. */
+const issuePage = (
+  totalCount: number,
+  numbers: readonly number[],
+  endCursor: string | undefined,
+): unknown =>
+  ({
+    totalCount,
+    pageInfo: {
+      hasNextPage: endCursor !== undefined,
+      endCursor: endCursor ?? null,
+    },
+    nodes: numbers.map((number) => openIssue(number, [])),
+  }) as const;
+
+const issuesAnswer = (page: unknown): unknown =>
+  ({
+    data: { repository: { issues: page } },
+  }) as const;
 
 const openIssue = (number: number, labels: readonly string[]): unknown =>
   ({
