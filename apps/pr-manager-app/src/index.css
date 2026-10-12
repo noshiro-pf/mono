@@ -1108,6 +1108,10 @@ a:focus-visible {
 /* --- the issues as a DAG ---------------------------------------------- */
 
 .issues-toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   margin: 0 0 0.75rem;
 }
 

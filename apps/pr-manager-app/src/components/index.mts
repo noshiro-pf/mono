@@ -9,6 +9,7 @@ export * from './commit-divergence.js';
 export * from './cycles-section.js';
 export * from './external-link.js';
 export * from './header-fold-toggle.js';
+export * from './issue-dag-done-toggle.js';
 export * from './issue-dag-legend.js';
 export * from './issue-dag-node.js';
 export * from './issue-dag-states.mjs';
