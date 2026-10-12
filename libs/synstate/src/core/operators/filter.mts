@@ -1,6 +1,8 @@
 import {
   asSafeUint,
   expectType,
+  isNotUndefined,
+  isString,
   Optional,
   pipe,
   SafeUint,
@@ -69,8 +71,9 @@ export function filter<A, B extends A>(
 ): DropInitialValueOperator<A, B>;
 
 // A type-guard predicate and a boolean one are both functions at run time, so
-// this set only refines the return type; it awaits the single-signature
-// rewrite (#1952).
+// this set only refines the return type (#1952). It stays overloaded because
+// one signature with a union parameter infers `unknown` for a generic guard
+// such as `isNotUndefined`; see the type test below.
 // @sumi-expect-error functions/no-refinement-overload
 export function filter<A>(
   predicate: (value: A, index: SafeUint | -1) => boolean,
@@ -142,5 +145,39 @@ if (import.meta.vitest !== undefined) {
     const _d = m.pipe(filter((x) => x % 2 === 0));
 
     expectType<typeof _d, Observable<number>>('=');
+  }
+
+  {
+    const s = source<number | undefined>();
+
+    const _guarded = s.pipe(filter((x): x is number => x !== undefined));
+
+    expectType<typeof _guarded, Observable<number>>('=');
+
+    const _inferred = s.pipe(filter((x) => x !== undefined));
+
+    expectType<typeof _inferred, Observable<number>>('=');
+
+    // A generic guard is what a single signature with a union parameter
+    // loses (it infers `unknown`), and why this set stays overloaded.
+    const _generic = s.pipe(filter(isNotUndefined));
+
+    expectType<typeof _generic, Observable<number>>('=');
+
+    const _withIndex = s.pipe(filter((x, i) => i === -1 || x === 0));
+
+    expectType<typeof _withIndex, Observable<number | undefined>>('=');
+  }
+
+  {
+    const _d = source<unknown>().pipe(filter(isString));
+
+    expectType<typeof _d, Observable<string>>('=');
+
+    const _standalone = filter((x: number) => x > 0);
+
+    expectType<typeof _standalone, DropInitialValueOperator<number, number>>(
+      '=',
+    );
   }
 }

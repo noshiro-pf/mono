@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/preact';
 import { source } from 'synstate';
+import { expectType } from 'ts-data-forge';
 import { useObservableValue } from '../../src/index.mjs';
 
 describe(useObservableValue, () => {
@@ -7,6 +8,8 @@ describe(useObservableValue, () => {
     const count$ = source<number>(0);
 
     const { result } = renderHook(() => useObservableValue(count$));
+
+    expectType<typeof result.current, number>('=');
 
     assert.strictEqual(result.current, 0);
 
@@ -28,6 +31,8 @@ describe(useObservableValue, () => {
 
     const { result } = renderHook(() => useObservableValue(count$, -1));
 
+    expectType<typeof result.current, number>('=');
+
     assert.strictEqual(result.current, -1);
 
     await act(() => {
@@ -41,6 +46,8 @@ describe(useObservableValue, () => {
     const count$ = source<number>();
 
     const { result } = renderHook(() => useObservableValue(count$));
+
+    expectType<typeof result.current, number | undefined>('=');
 
     assert.strictEqual(result.current, undefined);
 
