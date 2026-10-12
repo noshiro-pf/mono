@@ -8,6 +8,7 @@ import {
   listRunningChecks,
   summarizeChecks,
   type ReportedCheck,
+  type RunningCheck,
 } from './checks.mjs';
 import {
   BLOCKED_GREEN_POLLS_BEFORE_GIVING_UP,
@@ -195,7 +196,7 @@ const readChecks = async (
   Result<
     Readonly<{
       required: readonly ReportedCheck[];
-      running: readonly string[];
+      running: readonly RunningCheck[];
     }>,
     string
   >
