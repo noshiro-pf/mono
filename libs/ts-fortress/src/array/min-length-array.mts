@@ -31,6 +31,10 @@ export function minLengthArray<N extends SupportedLength, A>(
 
 // For bounds outside `SupportedLength` (`0..2048`) the length cannot be encoded in the brand,
 // so the result length is left unconstrained (`readonly A[]`).
+// A length inside the supported range is also a `number`: nothing at run
+// time tells the clauses apart, so the set only refines the return type
+// (#1952).
+// @sumi-expect-error functions/no-refinement-overload
 export function minLengthArray<A>(
   minLength: number,
   elementType: Type<A>,

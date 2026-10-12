@@ -66,6 +66,14 @@ export const ownerOf = (
  * expression denotes. Judge the syntax, and ask the type, of what is
  * underneath (docs/writing-lint-rules.md at the repository root).
  */
+export const isTransparent = (node: TsNode): boolean =>
+  isParenthesizedExpression(node) ||
+  isAsExpression(node) ||
+  isSatisfiesExpression(node) ||
+  isTypeAssertion(node) ||
+  isNonNullExpression(node);
+
+/** The expression under any {@link isTransparent} wrappers. */
 export const unwrap = (node: TsNode): TsNode =>
   isParenthesizedExpression(node) ||
   isAsExpression(node) ||
@@ -105,3 +113,7 @@ const memberSymbolOf = (
     access.name.text,
   );
 };
+
+/** The outermost {@link isTransparent} wrapper around `node`, or `node`. */
+export const outermostWrapper = (node: TsNode): TsNode =>
+  isTransparent(node.parent) ? outermostWrapper(node.parent) : node;

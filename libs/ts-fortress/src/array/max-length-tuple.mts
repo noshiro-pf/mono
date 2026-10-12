@@ -25,6 +25,10 @@ export function maxLengthTuple<N extends StructuralPrefixLength, A>(
 
 // For sizes outside `StructuralPrefixLength` (`0..10`) the exact length cannot be encoded in the type,
 // so the result length is left unconstrained (`readonly A[]`).
+// A length inside the supported range is also a `number`: nothing at run
+// time tells the clauses apart, so the set only refines the return type
+// (#1952).
+// @sumi-expect-error functions/no-refinement-overload
 export function maxLengthTuple<A>(
   size: number,
   elementType: Type<A>,

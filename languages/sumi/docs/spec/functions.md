@@ -39,13 +39,13 @@ named function 宣言なら実装シグネチャとオーバーロードシグ�
 
 値の側の書き方の中身 — 節ごとの関数に分け、`function` 宣言を公開面にし、節から宣言への向きで代入検査する — は [overload-design.md](../overload-design.md)「オーバーロードが必要なときの書き方」にある。lint が現在強制するのは下の表の記法までで、検査行の有無はまだ強制していない。検査行を要求するルールは [#1953](https://github.com/noshiro-pf/mono/issues/1953)（判定は tsc に任せ、lint は行の有無と向きだけを見る）。**振り分け（分岐）の正しさはどちらでも保証しない。** narrowing により節の引数型に合わない呼び出しは型エラーになるが、TypeScript のオーバーロード解決と実行時の分岐が同じ節を選ぶことや、変換を挟んで別の節を呼ぶ誤りは検査されない。
 
-| 書く場所           | 合法な記法                                                       | 禁止する記法                                                                                  | 強制                                                                                                     |
-| :----------------- | :--------------------------------------------------------------- | :-------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------- |
-| 値（実装）         | `function` 宣言のシグネチャ列挙(記法 (1))                        | 呼び出しシグネチャを 2 本以上持つ型を文脈型にした関数式 — 型リテラル、交差型、alias、`typeof` | `functions/no-overloaded-function-expression`(checker)                                                   |
-| 型                 | 関数型の交差 `((a: string) => string) & ((a: number) => number)` | 型リテラル / interface の呼び出しシグネチャ・構築シグネチャのメンバー                         | `functions/no-call-signature-member`                                                                     |
-| 呼び出し可能 + 値  | `((v: number) => string) & Readonly<{ label: string }>`          | `{ (v: number): string; readonly label: string }`                                             | 同上                                                                                                     |
-| オーバーロード集合 | 隣接し、1 つのシグネチャで言い換えられないもの                   | 間に文を挟む / 戻り値型が同じで 1 引数の型か省略可能性だけが違う組                            | `functions/adjacent-overload-signatures` / `functions/unified-signatures`                                |
-| 〃（意味の条件）   | 節が実行時に判別可能で互いに素                                   | 精密化（本体が 1 つしかありえないもの）                                                       | `functions/no-refinement-overload`(**未実装** — [#1952](https://github.com/noshiro-pf/mono/issues/1952)) |
+| 書く場所           | 合法な記法                                                       | 禁止する記法                                                                                  | 強制                                                                      |
+| :----------------- | :--------------------------------------------------------------- | :-------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------ |
+| 値（実装）         | `function` 宣言のシグネチャ列挙(記法 (1))                        | 呼び出しシグネチャを 2 本以上持つ型を文脈型にした関数式 — 型リテラル、交差型、alias、`typeof` | `functions/no-overloaded-function-expression`(checker)                    |
+| 型                 | 関数型の交差 `((a: string) => string) & ((a: number) => number)` | 型リテラル / interface の呼び出しシグネチャ・構築シグネチャのメンバー                         | `functions/no-call-signature-member`                                      |
+| 呼び出し可能 + 値  | `((v: number) => string) & Readonly<{ label: string }>`          | `{ (v: number): string; readonly label: string }`                                             | 同上                                                                      |
+| オーバーロード集合 | 隣接し、1 つのシグネチャで言い換えられないもの                   | 間に文を挟む / 戻り値型が同じで 1 引数の型か省略可能性だけが違う組                            | `functions/adjacent-overload-signatures` / `functions/unified-signatures` |
+| 〃（意味の条件）   | 節が実行時に判別可能で互いに素                                   | 精密化（本体が 1 つしかありえないもの）                                                       | `functions/no-refinement-overload`(@sumi-lang/checker — 2026-09-30 実装)  |
 
 ```ts
 // ✅ 値: function 宣言
