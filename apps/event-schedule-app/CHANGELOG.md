@@ -1,5 +1,15 @@
 # event-schedule-app
 
+## 0.0.13
+
+### Patch Changes
+
+- Updated dependencies [7fcbc3b]
+    - ts-fortress@12.2.0
+    - event-schedule-app-shared@0.0.9
+    - ts-fortress-types@0.0.10
+    - react-blueprintjs-utils@0.0.13
+
 ## 0.0.12
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # cant-stop-probability-app
 
+## 0.0.12
+
+### Patch Changes
+
+- Updated dependencies [7fcbc3b]
+    - ts-fortress@12.2.0
+    - react-blueprintjs-utils@0.0.13
+
 ## 0.0.11
 
 ### Patch Changes

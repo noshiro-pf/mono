@@ -1,5 +1,12 @@
 # slack-archive-tools
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies [7fcbc3b]
+    - ts-fortress@12.2.0
+
 ## 0.0.6
 
 ### Patch Changes
