@@ -391,41 +391,86 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
-.stat-toggle[data-mode='hide'][aria-pressed='false'] {
+.stat-toggle[aria-pressed='false'] {
   background: transparent;
   border: 1px dashed var(--baseline);
 }
 
-.stat-toggle[data-mode='hide'][aria-pressed='false'] .stat-value,
-.stat-toggle[data-mode='hide'][aria-pressed='false'] .stat-label {
+.stat-toggle[aria-pressed='false'] .stat-value,
+.stat-toggle[aria-pressed='false'] .stat-label {
   color: var(--ink-muted);
   text-decoration: line-through;
 }
 
 /*
- * Showing only, a picked count is filled and outlined in the accent, and
- * once one is, the counts left unpicked fade: what they count is off screen,
- * but not struck through, since pressing one adds it rather than undoing a
- * hide. The outline is a pixel wider than the hairline, and the padding a
- * pixel narrower, so that the number does not move.
+ * A switch tile and its `only` switch, which sits over the tile's top right
+ * corner, clear of the number, and is always drawn: the page is opened on
+ * phones, where nothing hovers. Its pill is small, so the area it answers to
+ * reaches a little past it.
  */
-.stat-toggle[data-mode='only'][aria-pressed='true'] {
+.stat-cell {
+  display: flex;
+  position: relative;
+}
+
+.stat-cell > .stat-toggle {
+  flex: 1;
+}
+
+.stat-only {
+  background: var(--surface);
+  border: 1px solid var(--baseline);
+  border-radius: 999px;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  padding: 0.15rem 0.5rem;
+  position: absolute;
+  right: 0.45rem;
+  top: 0.45rem;
+}
+
+.stat-only::after {
+  content: '';
+  inset: -0.4rem;
+  position: absolute;
+}
+
+.stat-only:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.stat-only:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.stat-only[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/*
+ * A picked count is filled and outlined in the accent, and once one is, the
+ * counts neither picked nor hidden fade: what they count is off screen, but
+ * not struck through, since that is what hiding looks like. The outline is
+ * a pixel wider than the hairline, and the padding a pixel narrower, so that
+ * the number does not move.
+ */
+.stat-toggle[data-only='true'] {
   background: color-mix(in srgb, var(--accent) 12%, var(--surface));
   border: 2px solid var(--accent);
   padding: calc(0.75rem - 1px) calc(0.9rem - 1px);
 }
 
 .summary-row[data-picking='true']
-  .stat-toggle[data-mode='only'][aria-pressed='false']
+  .stat-toggle[data-only='false'][aria-pressed='true']
   :is(.stat-value, .stat-label) {
   color: var(--ink-muted);
-}
-
-.status-mode {
-  align-items: center;
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
 }
 
 .merge-order-controls {
