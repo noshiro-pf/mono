@@ -1,5 +1,9 @@
 import * as PreactCompat from 'preact/compat';
-import type { InitializedObservable, Observable } from 'synstate';
+import type {
+  InitializedObservable,
+  Observable,
+  ObservableValue,
+} from 'synstate';
 import { Optional } from 'ts-data-forge';
 
 export function useObservableValue<A, B = A>(
@@ -7,15 +11,11 @@ export function useObservableValue<A, B = A>(
   initialValue: B,
 ): A | B;
 
-export function useObservableValue<A>(observable$: InitializedObservable<A>): A;
-
-// An `InitializedObservable` is also an `Observable`: nothing at run time tells
-// the two one-argument clauses apart, so they only refine the return type
-// (#1952).
-// @sumi-expect-error functions/no-refinement-overload
-export function useObservableValue<A>(
-  observable$: Observable<A>,
-): A | undefined;
+export function useObservableValue<O extends Observable<unknown>>(
+  observable$: O,
+): O extends InitializedObservable<infer A>
+  ? A
+  : ObservableValue<O> | undefined;
 
 export function useObservableValue<A, B = A>(
   observable$: Observable<A>,
