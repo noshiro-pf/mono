@@ -136,8 +136,12 @@ Three mechanisms, in the order they matter:
 - **Clicks on those links are left to the browser.** GitHub navigates between
   its own pages without loading a document, and would use the route it holds
   for the link rather than the address in the attribute — which would undo the
-  rewrite at the moment it matters. The extension stops the click from reaching
-  GitHub's handler, so the anchor does what an anchor does.
+  rewrite at the moment it matters. The "Refresh" button a diff shows once the
+  pull request has been pushed to is one such link: its route is the page's
+  bare path, so GitHub's own handling reloads the diff in place without the
+  defaults. The extension stops the click on the window, in the capture phase,
+  before any of GitHub's handlers hears of it, so the anchor does what an
+  anchor does: that refresh loads the diff again, with the defaults.
 - **The page it lands on is redirected**, if the rules want something else of
   it. The content script runs at `document_start`, before the document is
   parsed, so the load it abandons has barely begun. This also covers the
