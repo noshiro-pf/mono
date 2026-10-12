@@ -1,5 +1,15 @@
 # synstate-preact-hooks
 
+## 3.1.1
+
+### Patch Changes
+
+- 01e41a5: `useObservableValue` is declared with one one-argument signature where it had
+  two that only refined the return type. Inference is unchanged: it still
+  returns `A` for an initialized observable and `A | undefined` otherwise, and
+  the two-argument form is untouched.
+- synstate@3.1.0
+
 ## 3.1.0
 
 ### Minor Changes
