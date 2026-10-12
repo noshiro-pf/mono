@@ -7365,6 +7365,23 @@ namespace NoUnsafeDeclarationMerging {
 }
 
 /**
+ * @description Disallow assigning non-enum values to enum typed locations
+ * @link https://typescript-eslint.io/rules/no-unsafe-enum-assignment
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | deprecated           | false   |
+ *  | recommended          | strict  |
+ *  | requiresTypeChecking | true    |
+ *  ```
+ */
+namespace NoUnsafeEnumAssignment {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Disallow comparing an enum value with a non-enum value
  * @link https://typescript-eslint.io/rules/no-unsafe-enum-comparison
  *
@@ -10503,6 +10520,7 @@ export type TypeScriptEslintRules = Readonly<{
   '@typescript-eslint/no-unsafe-assignment': NoUnsafeAssignment.RuleEntry;
   '@typescript-eslint/no-unsafe-call': NoUnsafeCall.RuleEntry;
   '@typescript-eslint/no-unsafe-declaration-merging': NoUnsafeDeclarationMerging.RuleEntry;
+  '@typescript-eslint/no-unsafe-enum-assignment': NoUnsafeEnumAssignment.RuleEntry;
   '@typescript-eslint/no-unsafe-enum-comparison': NoUnsafeEnumComparison.RuleEntry;
   '@typescript-eslint/no-unsafe-function-type': NoUnsafeFunctionType.RuleEntry;
   '@typescript-eslint/no-unsafe-member-access': NoUnsafeMemberAccess.RuleEntry;

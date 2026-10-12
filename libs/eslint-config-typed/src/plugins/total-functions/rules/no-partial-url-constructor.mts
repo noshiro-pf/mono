@@ -122,13 +122,4 @@ export const noPartialUrlConstructor = createRule({
   defaultOptions: [],
 } as const);
 
-const isValidUrl = (s: string, base?: string): boolean => {
-  try {
-    // eslint-disable-next-line no-new
-    new URL(s, base);
-
-    return true;
-  } catch {
-    return false;
-  }
-};
+const isValidUrl = (s: string, base?: string): boolean => URL.canParse(s, base);

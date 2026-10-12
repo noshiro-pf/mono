@@ -32,7 +32,7 @@
     "event-schedule-app-shared": "workspace:*",
     "firebase-admin": "^14.5.0",
     "firebase-functions": "^7.4.0",
-    "nodemailer": "^10.0.13",
+    "nodemailer": "^10.0.14",
     "ts-data-forge": "workspace:*",
     "ts-fortress": "workspace:*",
     "ts-fortress-types": "workspace:*"

@@ -108,7 +108,14 @@ export const eslintUnicornRules = {
   ],
   'unicorn/prefer-code-point': 'error',
   'unicorn/prefer-date-now': 'error',
-  'unicorn/prefer-default-parameters': 'error',
+  /**
+   * Off since v77, which reports any binding whose every use is `x ?? lit` or
+   * `x || lit` and suggests a default instead. A default replaces `undefined`
+   * only, and the rule reads no types, so it also reports values that may be
+   * `null` (a GitHub API `body`, a child process's exit `code`). Reassigning a
+   * parameter, the case it used to cover, is `no-param-reassign`'s.
+   */
+  'unicorn/prefer-default-parameters': 'off',
   'unicorn/prefer-export-from': withDefaultOption('error'),
   'unicorn/prefer-includes': 'error',
 
@@ -404,7 +411,14 @@ export const eslintUnicornRules = {
   'unicorn/no-top-level-assignment-in-function': 'error',
   'unicorn/no-transition-all': 'error',
   'unicorn/no-uncalled-method': 'error',
-  'unicorn/no-unnecessary-array-flat-map': 'error',
+  /**
+   * Off since v77, which also reports the array around a kept element in the
+   * filter-and-map idiom `xs.flatMap((x) => (keep(x) ? [f(x)] : []))` and
+   * wants the bare element instead. Both branches returning an array is what
+   * says the callback is filtering here, so the rewrite reads worse, and it
+   * has no fix and no option to leave that part out.
+   */
+  'unicorn/no-unnecessary-array-flat-map': 'off',
   'unicorn/no-unnecessary-boolean-comparison': 'error',
   'unicorn/no-unnecessary-fetch-options': 'error',
   'unicorn/no-unnecessary-string-trim': 'error',
@@ -440,9 +454,6 @@ export const eslintUnicornRules = {
   'unicorn/prefer-dom-node-replace-children': 'error',
   'unicorn/prefer-else-if': 'error',
   'unicorn/prefer-error-is-error': 'error',
-  // This rule only supports the `css/css` language, so enabling it in a
-  // JavaScript/TypeScript config makes ESLint fail to start.
-  'unicorn/prefer-explicit-viewport-units': 'off',
   'unicorn/prefer-flat-math-min-max': 'error',
   'unicorn/prefer-group-by': 'error',
   'unicorn/prefer-has-check': 'error',
@@ -455,7 +466,7 @@ export const eslintUnicornRules = {
   'unicorn/prefer-promise-with-resolvers': 'error',
   'unicorn/prefer-regexp-escape': 'error',
   'unicorn/prefer-set-methods': 'error',
-  'unicorn/prefer-simplified-conditions': 'error',
+  'unicorn/prefer-simplified-conditions': withDefaultOption('error'),
   'unicorn/prefer-single-replace': 'error',
   'unicorn/prefer-then-catch': 'error',
   'unicorn/prefer-toggle-attribute': 'error',
@@ -463,7 +474,6 @@ export const eslintUnicornRules = {
   'unicorn/prefer-url-can-parse': 'error',
   'unicorn/prefer-url-search-parameters': 'error',
   'unicorn/prefer-while-loop-condition': 'error',
-  'unicorn/require-frontmatter-fields': withDefaultOption('error'),
 
   // For browser environment only
   'unicorn/no-document-cookie': 'error',
@@ -519,6 +529,19 @@ export const eslintUnicornRules = {
   'unicorn/prevent-abbreviations': 0,
   'unicorn/no-unused-array-method-return': 0, // replaced by unicorn/no-unused-builtin-method-return in v75
 
+  // Moved out to a CSS-only plugin in v77.
+  'unicorn/no-deprecated-css-features': 0,
+  'unicorn/no-duplicate-css-selectors': 0,
+  'unicorn/no-duplicate-font-family-names': 0,
+  'unicorn/no-invalid-media-features': 0,
+  'unicorn/no-nesting-with-mixed-specificity': 0,
+  'unicorn/no-redundant-nested-style-rules': 0,
+  'unicorn/no-unknown-css-annotations': 0,
+  'unicorn/no-unknown-pseudo-selectors': 0,
+  'unicorn/no-unscoped-css-nesting-selector': 0,
+  'unicorn/prefer-explicit-viewport-units': 0,
+  'unicorn/prefer-media-feature-range-syntax': 0,
+
   // Added in v73.
 
   /**
@@ -571,16 +594,46 @@ export const eslintUnicornRules = {
    */
   'unicorn/prefer-uint8array-hex': 'off',
 
-  // These rules only support the `css/css` language, so enabling them in a
-  // JavaScript/TypeScript config makes ESLint fail to start.
-  'unicorn/no-deprecated-css-features': 'off',
-  'unicorn/no-duplicate-css-selectors': 'off',
-  'unicorn/no-duplicate-font-family-names': 'off',
-  'unicorn/no-invalid-media-features': 'off',
-  'unicorn/no-nesting-with-mixed-specificity': 'off',
-  'unicorn/no-redundant-nested-style-rules': 'off',
-  'unicorn/no-unknown-css-annotations': 'off',
-  'unicorn/no-unknown-pseudo-selectors': 'off',
-  'unicorn/no-unscoped-css-nesting-selector': 'off',
-  'unicorn/prefer-media-feature-range-syntax': 'off',
+  // Added in v77.
+
+  'unicorn/no-conflicting-constraints': 'error',
+  'unicorn/no-incomplete-accessor-override': 'error',
+  'unicorn/no-ineffective-csp-directives': 'error',
+  'unicorn/no-invalid-boolean-attribute-value': 'error',
+  'unicorn/no-invalid-dom-token': 'error',
+  'unicorn/no-invalid-integrity': 'error',
+  'unicorn/no-invalid-intl-options': 'error',
+  'unicorn/no-invalid-property-descriptor': 'error',
+  'unicorn/no-invalid-response-options': 'error',
+  'unicorn/no-invalid-style-set-property': 'error',
+  'unicorn/no-invalid-temporal-arithmetic': 'error',
+  'unicorn/no-invalid-url-protocol-comparison': 'error',
+  'unicorn/no-prevent-default-in-passive-listener': 'error',
+  /**
+   * Off. It judges a parameter by the callers it sees today, so it reports
+   * the parameters samples and test fixtures exist to show, and a helper
+   * called twice with the same argument loses one.
+   */
+  'unicorn/no-unnecessary-parameters': 'off',
+  'unicorn/no-unsafe-json-serialization': 'error',
+  'unicorn/no-url-in-search-params': 'error',
+  'unicorn/prefer-escaped-irregular-whitespace': 'error',
+  'unicorn/prefer-literal-ascii': 'error',
+  'unicorn/prefer-promise-static-methods': 'error',
+  'unicorn/prefer-short-escape-sequences': 'error',
+  'unicorn/require-text-decoder-streaming': 'error',
+
+  /** Layout, and Prettier already removes leading empty lines. */
+  'unicorn/no-leading-empty-lines': 'off',
+
+  // These rules support only JSON, YAML, TOML, CSS or Markdown, so enabling
+  // them in a JavaScript/TypeScript config makes ESLint fail to start.
+  // require-frontmatter-fields has been Markdown-only since v77.
+  'unicorn/require-frontmatter-fields': 'off',
+  'unicorn/comma-spacing': 'off',
+  'unicorn/indent': 'off',
+  'unicorn/key-name-casing': 'off',
+  'unicorn/no-empty-link-text': 'off',
+  'unicorn/no-javascript-url': 'off',
+  'unicorn/no-loss-of-precision': 'off',
 } as const satisfies EslintUnicornRules;
