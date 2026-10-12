@@ -7,14 +7,13 @@ import {
   DEFAULT_MERGE_ORDER_VIEW,
   isShown,
   parseMergeOrderView,
-  pressStatus,
   priorityOf,
   STATUS_FILTERS,
   statusesOf,
+  toggleOnly,
   togglePriority,
   toggleStatus,
   withSort,
-  withStatusMode,
   type MergeOrderView,
 } from './merge-order-view.mjs';
 
@@ -195,9 +194,9 @@ describe(isShown, () => {
     assert.isTrue(isShown(entry(2, { labels: [label('priority:mid')] }), view));
   });
 
-  test('showing only some statuses shows a pull request under any of them, whatever else it is, and nothing under none', () => {
-    const view = pressStatus(
-      pressStatus(withStatusMode(DEFAULT_MERGE_ORDER_VIEW, 'only'), 'failing'),
+  test('with some statuses picked, a pull request under any of them is shown, whatever else it is, and one under none is not', () => {
+    const view = toggleOnly(
+      toggleOnly(DEFAULT_MERGE_ORDER_VIEW, 'failing'),
       'draft',
     );
 
@@ -217,35 +216,26 @@ describe(isShown, () => {
     assert.isFalse(isShown(entry(4), view));
   });
 
-  test('showing only, with nothing picked yet, shows everything', () => {
-    assert.isTrue(
-      isShown(entry(1), withStatusMode(DEFAULT_MERGE_ORDER_VIEW, 'only')),
-    );
-  });
-
-  test('showing only sets the hidden statuses aside, and the priorities still apply', () => {
-    const view = pressStatus(
-      withStatusMode(
-        togglePriority(
-          toggleStatus(DEFAULT_MERGE_ORDER_VIEW, 'failing'),
-          'low',
-        ),
-        'only',
-      ),
-      'failing',
+  test('a hidden status still hides what is picked, and the priorities still apply', () => {
+    const view = togglePriority(
+      toggleStatus(toggleOnly(DEFAULT_MERGE_ORDER_VIEW, 'failing'), 'queued'),
+      'low',
     );
 
     assert.isTrue(isShown(entry(1, { verdict: 'failing' }), view));
 
     assert.isFalse(
       isShown(
-        entry(2, { labels: [label('priority:low')], verdict: 'failing' }),
+        entry(2, { labels: [label('merge-queued')], verdict: 'failing' }),
         view,
       ),
     );
 
     assert.isFalse(
-      isShown(entry(3, { verdict: 'failing' }), withStatusMode(view, 'hide')),
+      isShown(
+        entry(3, { labels: [label('priority:low')], verdict: 'failing' }),
+        view,
+      ),
     );
   });
 });
@@ -323,33 +313,41 @@ describe(toggleStatus, () => {
   });
 });
 
-describe(pressStatus, () => {
-  test('hides and shows while hiding, and picks and unpicks while showing only, each leaving the other alone', () => {
-    const hiding = pressStatus(DEFAULT_MERGE_ORDER_VIEW, 'queued');
-
-    assert.deepStrictEqual(hiding.hiddenStatuses, ['queued']);
-
-    assert.deepStrictEqual(hiding.onlyStatuses, []);
-
-    const picking = pressStatus(
-      pressStatus(withStatusMode(hiding, 'only'), 'failing'),
+describe(toggleOnly, () => {
+  test('picks and unpicks, keeping the list in its own order', () => {
+    const picked = toggleOnly(
+      toggleOnly(DEFAULT_MERGE_ORDER_VIEW, 'failing'),
       'queued',
     );
 
-    assert.deepStrictEqual(picking.onlyStatuses, ['queued', 'failing']);
+    assert.deepStrictEqual(picked.onlyStatuses, ['queued', 'failing']);
 
-    assert.deepStrictEqual(picking.hiddenStatuses, ['queued']);
-
-    assert.deepStrictEqual(pressStatus(picking, 'queued').onlyStatuses, [
+    assert.deepStrictEqual(toggleOnly(picked, 'queued').onlyStatuses, [
       'failing',
     ]);
+  });
+
+  test('picking a hidden status shows it, and hiding a picked one unpicks it', () => {
+    const picked = toggleOnly(
+      toggleStatus(DEFAULT_MERGE_ORDER_VIEW, 'failing'),
+      'failing',
+    );
+
+    assert.deepStrictEqual(picked.hiddenStatuses, []);
+
+    assert.deepStrictEqual(picked.onlyStatuses, ['failing']);
+
+    const hidden = toggleStatus(picked, 'failing');
+
+    assert.deepStrictEqual(hidden.hiddenStatuses, ['failing']);
+
+    assert.deepStrictEqual(hidden.onlyStatuses, []);
   });
 });
 
 describe(parseMergeOrderView, () => {
   test('reads back what was saved', () => {
     const view: MergeOrderView = {
-      statusMode: 'only',
       hiddenStatuses: ['queued', 'draft'],
       onlyStatuses: ['failing'],
       hiddenPriorities: ['low'],
@@ -369,7 +367,6 @@ describe(parseMergeOrderView, () => {
 
     assert.deepStrictEqual(
       parseMergeOrderView({
-        statusMode: 'some',
         hiddenStatuses: ['queued', 'gone', 3, 'queued'],
         onlyStatuses: 'failing',
         hiddenPriorities: 'low',
@@ -378,7 +375,7 @@ describe(parseMergeOrderView, () => {
       { ...DEFAULT_MERGE_ORDER_VIEW, hiddenStatuses: ['queued'] },
     );
 
-    // Saved before there was anything but hiding.
+    // Saved before anything could be picked.
     assert.deepStrictEqual(
       parseMergeOrderView({
         hiddenStatuses: ['draft'],
@@ -386,6 +383,18 @@ describe(parseMergeOrderView, () => {
         sort: 'order',
       }),
       { ...DEFAULT_MERGE_ORDER_VIEW, hiddenStatuses: ['draft'] },
+    );
+
+    // Saved while the counts had a mode switch: the mode is dropped.
+    assert.deepStrictEqual(
+      parseMergeOrderView({
+        statusMode: 'only',
+        hiddenStatuses: [],
+        onlyStatuses: ['failing'],
+        hiddenPriorities: [],
+        sort: 'order',
+      }),
+      { ...DEFAULT_MERGE_ORDER_VIEW, onlyStatuses: ['failing'] },
     );
   });
 });
