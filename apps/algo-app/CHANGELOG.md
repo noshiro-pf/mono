@@ -1,5 +1,12 @@
 # algo-app
 
+## 0.0.9
+
+### Patch Changes
+
+- Updated dependencies [7fcbc3b]
+    - ts-fortress@12.2.0
+
 ## 0.0.8
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # pr-manager-app
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [7fcbc3b]
+    - ts-fortress@12.2.0
+    - pr-report-core@0.0.1
+
 ## 0.0.3
 
 ### Patch Changes

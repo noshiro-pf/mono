@@ -1,5 +1,11 @@
 # react-blueprintjs-utils
 
+## 0.0.13
+
+### Patch Changes
+
+- ts-fortress-types@0.0.10
+
 ## 0.0.12
 
 ### Patch Changes
