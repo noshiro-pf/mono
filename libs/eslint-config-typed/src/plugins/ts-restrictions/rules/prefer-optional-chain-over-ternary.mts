@@ -81,7 +81,8 @@ export const preferOptionalChainOverTernary: TSESLint.RuleModule<
     /** Whether the type of `node` may hold a value with one of `flags`. */
     const mayHold = (
       node: DeepReadonly<TSESTree.Node>,
-      flags: ts.TypeFlags,
+      // A union of `ts.TypeFlags` bits, which is a `number` rather than a member.
+      flags: number,
     ): boolean =>
       !strictNullChecks ||
       typeMayHold(
@@ -339,7 +340,7 @@ const outermostWrapperOf = (
 const typeMayHold = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   type: ts.Type,
-  flags: ts.TypeFlags,
+  flags: number,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   checker: ts.TypeChecker,
 ): boolean => {

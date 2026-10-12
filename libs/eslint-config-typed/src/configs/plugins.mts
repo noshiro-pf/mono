@@ -9,7 +9,6 @@ import eslintPluginArrayFunc from 'eslint-plugin-array-func';
 
 import eslintPluginFunctional from 'eslint-plugin-functional';
 
-// @ts-expect-error no type definition
 import eslintPluginSecurity from 'eslint-plugin-security';
 
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
@@ -126,7 +125,7 @@ export const plugins: ReadonlyRecord<
   'react-refresh': eslintPluginReactRefresh,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'react-perf': eslintPluginReactPerf,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
   security: eslintPluginSecurity,
   'testing-library': eslintPluginTestingLibrary,
   unicorn: eslintPluginUnicorn,

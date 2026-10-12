@@ -21,6 +21,8 @@ describe(unknownToString, () => {
 
     expect(unknownToString(value)).toBe('123n');
 
+    // Shows what JSON.stringify loses, for contrast.
+    // eslint-disable-next-line unicorn/no-unsafe-json-serialization
     expect(() => JSON.stringify(value)).toThrow(
       'Do not know how to serialize a BigInt',
     );
@@ -35,6 +37,8 @@ describe(unknownToString, () => {
   test('undefined', () => {
     expect(unknownToString(undefined)).toBe('undefined');
 
+    // Shows what JSON.stringify loses, for contrast.
+    // eslint-disable-next-line unicorn/no-unsafe-json-serialization
     expect(JSON.stringify(undefined)).toBeUndefined();
   });
 
@@ -49,6 +53,8 @@ describe(unknownToString, () => {
 
     expect(unknownToString(value)).toBe('Symbol(sym)');
 
+    // Shows what JSON.stringify loses, for contrast.
+    // eslint-disable-next-line unicorn/no-unsafe-json-serialization
     expect(JSON.stringify(value)).toBeUndefined();
   });
 
@@ -58,6 +64,8 @@ describe(unknownToString, () => {
 
       expect(unknownToString(fn)).toBe('() => 0');
 
+      // Shows what JSON.stringify loses, for contrast.
+      // eslint-disable-next-line unicorn/no-unsafe-json-serialization
       expect(JSON.stringify(fn)).toBeUndefined();
     });
 
@@ -66,6 +74,8 @@ describe(unknownToString, () => {
 
       expect(unknownToString(fn)).toBe('(args) => ({ ret: args })');
 
+      // Shows what JSON.stringify loses, for contrast.
+      // eslint-disable-next-line unicorn/no-unsafe-json-serialization
       expect(JSON.stringify(fn)).toBeUndefined();
     });
   });

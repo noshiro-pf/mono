@@ -417,6 +417,7 @@ export const typescriptEslintRules = {
 
   '@typescript-eslint/no-duplicate-type-constituents':
     withDefaultOption('error'),
+  '@typescript-eslint/no-unsafe-enum-assignment': 'error',
   '@typescript-eslint/no-unsafe-enum-comparison': 'error',
 
   '@typescript-eslint/class-methods-use-this': [

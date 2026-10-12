@@ -37,7 +37,7 @@
     "better-preact-use-state": "workspace:*",
     "firebase": "^12.19.0",
     "goober": "^2.1.19",
-    "immer": "^11.1.18",
+    "immer": "^11.1.21",
     "preact-utils": "workspace:*",
     "resize-observer-preact-hooks": "workspace:*",
     "synstate": "workspace:*",

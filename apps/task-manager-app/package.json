@@ -36,9 +36,9 @@
     "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
   },
   "dependencies": {
-    "@blueprintjs/core": "^6.20.0",
-    "@blueprintjs/datetime": "^6.2.6",
-    "date-fns": "^2.30.0",
+    "@blueprintjs/core": "^6.21.0",
+    "@blueprintjs/datetime": "^6.3.0",
+    "date-fns": "^4.4.0",
     "elkjs": "^0.12.0",
     "firebase": "^12.19.0",
     "preact-utils": "workspace:*",
