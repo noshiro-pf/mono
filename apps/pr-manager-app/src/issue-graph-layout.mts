@@ -35,6 +35,12 @@ export const NODE_WIDTH = 208;
 
 export const NODE_HEIGHT = 44;
 
+/**
+ * How far a node's priority pill (`issue-dag-node.tsx`) reaches above its
+ * top edge, which the label over the grid keeps clear of.
+ */
+export const PRIORITY_OVERHANG = 7;
+
 export type LaidOutNode = Readonly<{
   number: number;
   /** The top-left corner. */
@@ -104,7 +110,10 @@ export const layoutIssueGraph = (graph: IssueGraph): IssueGraphLayout => {
   );
 
   const unconnectedLabel = Arr.isNonEmpty(unconnected)
-    ? ({ x: PADDING, y: mut_top + LABEL_HEIGHT - 6 } as const)
+    ? ({
+        x: PADDING,
+        y: mut_top + LABEL_HEIGHT - PRIORITY_OVERHANG - 6,
+      } as const)
     : undefined;
 
   if (Arr.isNonEmpty(unconnected)) {
@@ -155,7 +164,7 @@ const COMPONENT_GAP = 32;
 
 const PADDING = 16;
 
-const LABEL_HEIGHT = 24;
+const LABEL_HEIGHT = 24 + PRIORITY_OVERHANG;
 
 const MIN_GRID_COLUMNS = 3;
 

@@ -1316,6 +1316,79 @@ a:focus-visible {
   border-style: dashed;
 }
 
+/*
+ * Priority. A high one gets a second outline in the node's own colour, and a
+ * low one is faint until pointed at, so neither changes what the colour
+ * says. The pill is in ink, strongest for high, so that it never reads as
+ * one of the colours above; its word says which.
+ */
+.issue-dag-ring {
+  fill: none;
+  stroke: var(--dag-colour);
+  stroke-width: 1.5;
+}
+
+.issue-dag-node[data-state='blocked'] .issue-dag-ring {
+  stroke-dasharray: 5 3;
+}
+
+.issue-dag-node[data-priority='low'] {
+  opacity: 0.5;
+}
+
+.issue-dag-swatch[data-priority] {
+  --dag-colour: var(--ink-secondary);
+
+  border-radius: 999px;
+}
+
+.issue-dag-swatch[data-priority='high'] {
+  outline: 1.5px solid var(--dag-colour);
+  outline-offset: 1.5px;
+}
+
+.issue-dag-swatch[data-priority='low'] {
+  opacity: 0.5;
+}
+
+.issue-dag-link:hover .issue-dag-node,
+.issue-dag-link:focus-visible .issue-dag-node {
+  opacity: 1;
+}
+
+.issue-dag-priority rect {
+  fill: var(--surface);
+  stroke: var(--ink-secondary);
+  stroke-width: 1;
+}
+
+.issue-dag-priority text {
+  fill: var(--ink-secondary);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.issue-dag-priority[data-priority='high'] rect {
+  fill: var(--ink-primary);
+  stroke: var(--ink-primary);
+}
+
+.issue-dag-priority[data-priority='high'] text {
+  fill: var(--surface);
+}
+
+.issue-dag-priority[data-priority='mid'] rect {
+  stroke: var(--ink-primary);
+}
+
+.issue-dag-priority[data-priority='mid'] text {
+  fill: var(--ink-primary);
+}
+
+.issue-dag-priority[data-priority='low'] rect {
+  stroke: var(--baseline);
+}
+
 /* --- the token panel ---------------------------------------------------- */
 
 /*
