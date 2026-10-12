@@ -1,5 +1,12 @@
 # my-portfolio-app-preact
 
+## 0.0.9
+
+### Patch Changes
+
+- Updated dependencies [01e41a5]
+    - synstate-preact-hooks@3.1.1
+
 ## 0.0.8
 
 ### Patch Changes

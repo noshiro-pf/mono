@@ -1,5 +1,14 @@
 # event-schedule-app
 
+## 0.0.14
+
+### Patch Changes
+
+- Updated dependencies [01e41a5]
+    - synstate-react-hooks@3.1.1
+    - react-blueprintjs-utils@0.0.14
+    - synstate@3.1.0
+
 ## 0.0.13
 
 ### Patch Changes
