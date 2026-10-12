@@ -401,6 +401,30 @@ const main = async (): Promise<void> => {
       `1 page load, at ${origin}/jumped/mono/pull/1/files?w=1&show-viewed-files=false#diff-abc`,
     );
 
+    console.log('the refresh the site does in place');
+
+    // `/refreshing/` is the fixture that behaves like GitHub's "Refresh"
+    // button, shown on a diff once the pull request has been pushed to: a link
+    // whose route is the page's bare path, handled by a router that has the
+    // click before the anchor does. Kept from it, the click goes where the
+    // rewritten attribute says, which is a load of the diff with the defaults.
+    //
+    // Opened with the defaults already on, so that the two loads counted are
+    // the visit and the refresh; in place, the refresh is no load at all, and
+    // the address alone would not show it, since the extension writes the
+    // defaults back onto the bare path the router left.
+    await visit(
+      `${origin}/refreshing/mono/pull/1/files?w=1&show-viewed-files=false`,
+    );
+
+    await page.locator('#refresh').click();
+
+    check(
+      'the refresh is a load of the diff with the defaults on',
+      `${String(mut_documentLoads.length)} page loads, at ${await settleUntil((url) => url.includes('show-viewed-files'))}`,
+      `2 page loads, at ${origin}/refreshing/mono/pull/1/files?w=1&show-viewed-files=false`,
+    );
+
     // A split-view pane is a frame, which a content script is not injected
     // into unless it asks. The frame opens the bare diff, so this is the
     // redirect and the write-back both, inside it.
@@ -444,8 +468,9 @@ const loopWatchMs = 2500;
  *
  * Enough of a pull request page to click through: the tab links the extension
  * rewrites, two it must leave alone, the branches links whose treatment depends
- * on the page they are read from, and — under `/stripped/` and `/jumped/` —
- * the address-bar rewriting the real site does. `/frame-host` is a page
+ * on the page they are read from, and — under `/stripped/`, `/jumped/` and
+ * `/refreshing/` — the address-bar rewriting and the in-place navigation the
+ * real site does. `/frame-host` is a page
  * holding a diff in a frame, as a split view does.
  */
 const fixtureFor = (url: string): string => {
@@ -480,6 +505,12 @@ const fixtureFor = (url: string): string => {
       : '',
     pathname.startsWith('/jumped/')
       ? `<script>${jumpToFileScript}</script>`
+      : '',
+    pathname.startsWith('/refreshing/')
+      ? [
+          `<a id="refresh" href="${pathname}">Refresh</a>`,
+          `<script>${refreshInPlaceScript}</script>`,
+        ].join('\n')
       : '',
   ].join('\n');
 };
@@ -519,6 +550,24 @@ const jumpToFileScript = [
   'setInterval(() => {',
   "  document.getElementById('feed').append(document.createElement('span'));",
   '}, 200);',
+].join('\n');
+
+/**
+ * What GitHub's "Refresh" button on a diff does: it is a link to the page's
+ * own path, query and fragment dropped, and the router navigates there in
+ * place. The router has the click before the anchor does, as a listener on the
+ * document in the capture phase, so one on the anchor never hears of it.
+ *
+ * It navigates to the route it holds — the path — and not to the anchor's
+ * `href`, which is the whole of why a rewritten attribute alone does nothing.
+ */
+const refreshInPlaceScript = [
+  "document.addEventListener('click', (event) => {",
+  "  if (!(event.target instanceof Element) || event.target.closest('#refresh') === null) return;",
+  '  event.preventDefault();',
+  "  history.pushState(null, '', location.pathname);",
+  "  document.getElementById('feed').append(document.createElement('span'));",
+  '}, true);',
 ].join('\n');
 
 const assertBuildIsPresent = (): void => {

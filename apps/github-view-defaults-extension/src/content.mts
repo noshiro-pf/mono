@@ -61,9 +61,6 @@ const { document: mut_page } = globalThis;
  */
 const evaluated = new WeakSet<Element>();
 
-/** Anchors already carrying the click listener. One per node, for its life. */
-const listening = new WeakSet<Element>();
-
 /**
  * The pages this document has already acted on, by path.
  *
@@ -108,6 +105,8 @@ const mut_ownTitle: {
 } = { last: undefined };
 
 const main = (): void => {
+  listenForClicks();
+
   applyPreferredUrlToThisPage();
 
   patchNewAnchors();
@@ -233,7 +232,7 @@ const patchNewAnchors = (): void => {
 };
 
 /**
- * Gives one anchor the address the rules want, and the listener that keeps it.
+ * Gives one anchor the address the rules want.
  *
  * It takes an `Element` and asks what it is, rather than being handed an
  * `HTMLAnchorElement`, because neither caller has one: `a[href]` also matches
@@ -259,20 +258,6 @@ const patchAnchor = (element: Element): void => {
     // and this one is not a mutation as far as the lint rules are concerned.
     element.setAttribute('href', next);
   }
-
-  if (
-    !isSettledLink(element.href, browserLocation.origin, browserLocation.href)
-  ) {
-    return;
-  }
-
-  if (listening.has(element)) {
-    return;
-  }
-
-  listening.add(element);
-
-  element.addEventListener('click', suppressClientSideNavigation);
 };
 
 /**
@@ -281,27 +266,57 @@ const patchAnchor = (element: Element): void => {
  *
  * Without this the rewrite is undone at the moment it matters: GitHub handles
  * the click itself, and navigates to the route it holds for that link rather
- * than to the address in the attribute. Stopping the event here leaves the
- * anchor's default behavior, which is a plain navigation to the `href` as
- * written.
+ * than to the address in the attribute. Its "Refresh" button on a diff that
+ * has been pushed to is the plainest case — a link whose route is the page's
+ * bare path, which the router reloads in place with the defaults gone. Stopping
+ * the event leaves the anchor's default behavior, which is a plain navigation
+ * to the `href` as written.
  *
- * It listens in the bubble phase, not the capture phase, because the click
- * target is a descendant of the anchor — GitHub's tab holds an icon and a
- * counter — and a capture-phase listener would stop the event before it ever
- * reached that descendant.
+ * **One listener, on the window, in the capture phase, registered at
+ * `document_start`**, which makes it the first to hear of every click on the
+ * page, before any of GitHub's scripts has run. A listener on each anchor in
+ * the bubble phase was what this was at first, and it hears of a click only
+ * after everything that listens on the way down: the "Refresh" button reloaded
+ * in place under it. Stopped here, the click reaches nothing on the page, not
+ * even the icon inside a tab it landed on; the anchor still follows its `href`,
+ * because that is the browser's default action and nothing is left that could
+ * prevent it.
  *
- * The `href` is read again on every click rather than remembered, because
- * GitHub recycles anchor nodes: suppressing navigation for a link that is no
- * longer ours would turn one of its client-side navigations into a full reload.
+ * The anchor is patched again here, before it is judged, because the click is
+ * the last moment its `href` can be made right: the observer gives a new anchor
+ * its address a microtask after it appears, and a re-render may since have set
+ * the attribute back.
+ *
+ * The `href` is read on every click rather than remembered, because GitHub
+ * recycles anchor nodes: suppressing navigation for a link that is no longer
+ * ours would turn one of its client-side navigations into a full reload.
  */
+const listenForClicks = (): void => {
+  addEventListener('click', suppressClientSideNavigation, {
+    capture: true,
+  });
+};
+
 const suppressClientSideNavigation = (clickEvent: Event): void => {
-  const anchor = clickEvent.currentTarget;
+  // `composedPath` rather than `target.closest`, so that an anchor holding the
+  // click target inside a shadow root is still found.
+  const anchor = clickEvent
+    .composedPath()
+    .find((node) => node instanceof HTMLAnchorElement);
+
+  if (!(anchor instanceof HTMLAnchorElement)) {
+    return;
+  }
+
+  patchAnchor(anchor);
 
   if (
-    anchor instanceof HTMLAnchorElement &&
     isSettledLink(anchor.href, browserLocation.origin, browserLocation.href)
   ) {
-    clickEvent.stopPropagation();
+    // `stopImmediatePropagation` rather than `stopPropagation`: a listener the
+    // page adds to the window in the capture phase would otherwise still run,
+    // since it is on the same node as this one.
+    clickEvent.stopImmediatePropagation();
   }
 };
 
