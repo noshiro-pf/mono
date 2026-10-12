@@ -186,3 +186,28 @@ export const buildIssueGraph = ({
 
   return { nodes, edges };
 };
+
+/**
+ * The graph without what is done — closed as completed, or merged — and
+ * without the edges that run from it, which are the waits already over.
+ *
+ * What closed unfinished stays: the issue waiting on it needs a look, and
+ * the node is why. The graph given is handed back when nothing in it is
+ * done, so a graph that is not changed by this is not laid out again.
+ */
+export const omitDone = (graph: IssueGraph): IssueGraph => {
+  const done = new Set(
+    graph.nodes
+      .filter(({ state }) => state === 'done')
+      .map(({ number }) => number),
+  );
+
+  return done.size === 0
+    ? graph
+    : {
+        nodes: graph.nodes.filter(({ number }) => !done.has(number)),
+        edges: graph.edges.filter(
+          ({ from, to }) => !done.has(from) && !done.has(to),
+        ),
+      };
+};

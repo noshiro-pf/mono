@@ -53,8 +53,11 @@ that can be started (a thick border when it waited and need not any more),
 brown and dashed one that waits, blue an open pull request and the issues it
 closes, grey what is done. Each node shows its title and opens its page on
 GitHub. The DAG reads every open issue, a page after the other, since an issue
-left off the graph would be drawn as if it declared nothing. The choice is
-kept in the browser.
+left off the graph would be drawn as if it declared nothing. In the DAG, the
+**Done** chip beside the switch starts pressed; unpressed, it leaves out the
+issues closed as completed and the merged pull requests, with the waits on
+them that are over, so that only what is left to do is laid out. Both choices
+are kept in the browser.
 
 It **only reads**. Nothing here labels, rebases, merges or comments — that is
 `pnpm run unblock-prs`, run by a person — and a page that cannot do any of it

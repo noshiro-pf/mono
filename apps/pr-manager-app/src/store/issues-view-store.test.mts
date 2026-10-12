@@ -168,8 +168,105 @@ describe(createIssuesViewStore, () => {
     assert.strictEqual(loadMoreCalls(), 0);
   });
 
+  test('shows what is done until told to hide it, and takes the saved choice once read', async () => {
+    const { store, savedHideDone, resolveLoadHideDone } = setup();
+
+    store.start();
+
+    assert.isFalse(store.hideDone.getSnapshot().value);
+
+    assert.deepStrictEqual(savedHideDone, []);
+
+    resolveLoadHideDone(true);
+
+    await settle();
+
+    assert.isTrue(store.hideDone.getSnapshot().value);
+
+    store.toggleHideDone();
+
+    assert.isFalse(store.hideDone.getSnapshot().value);
+
+    assert.deepStrictEqual(savedHideDone.at(-1), false);
+  });
+
+  test('a toggle made before the saved choice is read is kept, and saved', async () => {
+    const { store, savedHideDone, resolveLoadHideDone } = setup();
+
+    store.start();
+
+    store.toggleHideDone();
+
+    resolveLoadHideDone(false);
+
+    await settle();
+
+    assert.isTrue(store.hideDone.getSnapshot().value);
+
+    assert.deepStrictEqual(savedHideDone.at(-1), true);
+  });
+
+  test('anything saved but true, or nothing readable, shows what is done', async () => {
+    const { store, rejectLoadHideDone } = setup();
+
+    store.start();
+
+    rejectLoadHideDone();
+
+    await settle();
+
+    assert.isFalse(store.hideDone.getSnapshot().value);
+
+    const other = setup();
+
+    other.store.start();
+
+    other.resolveLoadHideDone('yes');
+
+    await settle();
+
+    assert.isFalse(other.store.hideDone.getSnapshot().value);
+  });
+
+  test('hiding what is done takes it out of the graph and its layout, and counts it either way', () => {
+    const { store, setIssues } = setup();
+
+    setIssues({
+      items: [issueItem(5, [3, 4])],
+      totalCount: 1,
+      endCursor: undefined,
+      referenced: [referencedIssue(3, 'done'), referencedIssue(4, 'abandoned')],
+    });
+
+    assert.deepStrictEqual(
+      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
+      [3, 4, 5],
+    );
+
+    assert.strictEqual(store.doneCount.getSnapshot().value, 1);
+
+    store.toggleHideDone();
+
+    assert.deepStrictEqual(
+      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
+      [4, 5],
+    );
+
+    assert.deepStrictEqual(
+      store.layout.getSnapshot().value.nodes.map(({ number }) => number),
+      [4, 5],
+    );
+
+    assert.strictEqual(store.doneCount.getSnapshot().value, 1);
+
+    store.toggleHideDone();
+
+    assert.strictEqual(store.graph.getSnapshot().value.nodes.length, 3);
+  });
+
   test('stopped before the read answers, it neither applies nor saves', async () => {
-    const { store, saved, resolveLoad } = setup();
+    const { store, saved, savedHideDone, resolveLoad, resolveLoadHideDone } =
+      setup();
 
     const stopStore = store.start();
 
@@ -177,19 +274,28 @@ describe(createIssuesViewStore, () => {
 
     resolveLoad('dag');
 
+    resolveLoadHideDone(true);
+
     await settle();
 
     assert.strictEqual(store.view.getSnapshot().value, 'list');
 
+    assert.isFalse(store.hideDone.getSnapshot().value);
+
     assert.deepStrictEqual(saved, []);
+
+    assert.deepStrictEqual(savedHideDone, []);
   });
 });
 
 const setup = (): Readonly<{
   store: ReturnType<typeof createIssuesViewStore>;
   saved: readonly IssuesView[];
+  savedHideDone: readonly boolean[];
   resolveLoad: (stored: unknown) => void;
   rejectLoad: () => void;
+  resolveLoadHideDone: (stored: unknown) => void;
+  rejectLoadHideDone: () => void;
   setIssues: (next: LoadedReport['issues']) => void;
   setEntries: (next: readonly Entry[]) => void;
   setMoreIssues: (next: MoreIssuesStatus) => void;
@@ -199,7 +305,11 @@ const setup = (): Readonly<{
 
   const mut_loadMore = { calls: 0 };
 
+  const mut_savedHideDone: boolean[] = [];
+
   const { promise, resolve, reject } = Promise.withResolvers<unknown>();
+
+  const hideDoneRead = Promise.withResolvers<unknown>();
 
   const [issues, setIssues] = createState<LoadedReport['issues']>({
     items: [],
@@ -222,6 +332,10 @@ const setup = (): Readonly<{
     save: (view) => {
       mut_saved.push(view);
     },
+    loadHideDone: () => hideDoneRead.promise,
+    saveHideDone: (hide) => {
+      mut_savedHideDone.push(hide);
+    },
     moreIssues,
     loadMoreIssues: () => {
       mut_loadMore.calls += 1;
@@ -231,9 +345,14 @@ const setup = (): Readonly<{
   return {
     store,
     saved: mut_saved,
+    savedHideDone: mut_savedHideDone,
     resolveLoad: resolve,
     rejectLoad: () => {
       reject(new Error('blocked'));
+    },
+    resolveLoadHideDone: hideDoneRead.resolve,
+    rejectLoadHideDone: () => {
+      hideDoneRead.reject(new Error('blocked'));
     },
     setIssues,
     setEntries,
@@ -265,6 +384,18 @@ const issueItem = (
     updatedAt: '2026-09-23T00:00:00Z',
     comments: 0,
     startAfter,
+  }) as const;
+
+const referencedIssue = (
+  number: number,
+  itemStatus: LoadedReport['issues']['referenced'][number]['status'],
+): LoadedReport['issues']['referenced'][number] =>
+  ({
+    number,
+    kind: 'issue',
+    title: `Issue ${number}`,
+    url: `https://github.com/o/r/issues/${number}`,
+    status: itemStatus,
   }) as const;
 
 const settle = async (): Promise<void> => {

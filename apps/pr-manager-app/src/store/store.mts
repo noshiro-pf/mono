@@ -92,6 +92,8 @@ export const headerStore = createHeaderStore({
 
 const ISSUES_VIEW_KEY = 'issues-view';
 
+const ISSUES_DAG_HIDE_DONE_KEY = 'issues-dag-hide-done';
+
 export const issuesViewStore = createIssuesViewStore({
   issues: reader.issues,
   entries: reader.entries,
@@ -99,6 +101,10 @@ export const issuesViewStore = createIssuesViewStore({
   load: () => readSetting(ISSUES_VIEW_KEY),
   save: (view) => {
     writeSetting(ISSUES_VIEW_KEY, view).catch(() => undefined);
+  },
+  loadHideDone: () => readSetting(ISSUES_DAG_HIDE_DONE_KEY),
+  saveHideDone: (hide) => {
+    writeSetting(ISSUES_DAG_HIDE_DONE_KEY, hide).catch(() => undefined);
   },
   moreIssues: reader.moreIssues,
   loadMoreIssues: reader.loadMoreIssues,
@@ -160,8 +166,10 @@ export const headerSignals = {
 
 export const issuesViewSignals = {
   view: toSignal(issuesViewStore.view),
+  hideDone: toSignal(issuesViewStore.hideDone),
   graph: toSignal(issuesViewStore.graph),
   layout: toSignal(issuesViewStore.layout),
+  doneCount: toSignal(issuesViewStore.doneCount),
 } as const;
 
 export const layoutSignals = {

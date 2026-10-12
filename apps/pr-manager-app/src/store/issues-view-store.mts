@@ -9,6 +9,10 @@
  * overwrites what was saved, and a choice made in that moment is kept over
  * it.
  *
+ * The DAG can leave out what is done (`omitDone`), so that what is left to
+ * do is all it lays out. That switch is kept the same way, under its own
+ * key, and starts off: the DAG shows everything until told otherwise.
+ *
  * The DAG reads every open issue: while it is shown, each page that is
  * left is asked for as soon as the one before has come in, because a graph
  * of the most recently updated thirty draws an edge to an issue it does not
@@ -16,9 +20,9 @@
  * for again on its own; the button under the block is still there for that.
  *
  * The graph the DAG draws, and where each of its nodes goes, are derived
- * here from the report, and passed on only when they changed: a poll that
- * moved a pull request's checks changes the entries, not the graph, and lays
- * nothing out again.
+ * here from the report and that switch, and passed on only when they
+ * changed: a poll that moved a pull request's checks changes the entries,
+ * not the graph, and lays nothing out again.
  */
 
 import {
@@ -29,12 +33,12 @@ import {
   type InitializedObservable,
   type Subscription,
 } from 'synstate';
-import { fastDeepEqual } from 'ts-data-forge';
+import { Arr, fastDeepEqual } from 'ts-data-forge';
 import {
   layoutIssueGraph,
   type IssueGraphLayout,
 } from '../issue-graph-layout.mjs';
-import { buildIssueGraph, type IssueGraph } from '../issue-graph.mjs';
+import { buildIssueGraph, omitDone, type IssueGraph } from '../issue-graph.mjs';
 import type { Entry, LoadedReport } from '../load-report.mjs';
 import type { MoreIssuesStatus } from './reader.mjs';
 
@@ -50,6 +54,9 @@ export type IssuesViewDeps = Readonly<{
   /** What was saved, as it was saved; it rejects when nothing can be read. */
   load: () => Promise<unknown>;
   save: (view: IssuesView) => void;
+  /** Whether the DAG left out what is done, as it was saved. */
+  loadHideDone: () => Promise<unknown>;
+  saveHideDone: (hide: boolean) => void;
   /** How the last page of open issues asked for went. */
   moreIssues: InitializedObservable<MoreIssuesStatus>;
   /** Asks for the next page of open issues. */
@@ -58,9 +65,15 @@ export type IssuesViewDeps = Readonly<{
 
 export type IssuesViewStore = Readonly<{
   view: InitializedObservable<IssuesView>;
+  /** Whether the DAG leaves out what is done. */
+  hideDone: InitializedObservable<boolean>;
+  /** The graph the DAG draws: without what is done, when that is hidden. */
   graph: InitializedObservable<IssueGraph>;
   layout: InitializedObservable<IssueGraphLayout>;
+  /** How many nodes are done, whether or not they are drawn. */
+  doneCount: InitializedObservable<number>;
   choose: (view: IssuesView) => void;
+  toggleHideDone: () => void;
   /** Reads what was saved, then saves every change; returns what stops it. */
   start: () => () => void;
 }>;
@@ -70,19 +83,31 @@ export const createIssuesViewStore = (
 ): IssuesViewStore => {
   const [view, setView] = createState<IssuesView>('list');
 
-  // Whether the reader has chosen yet.
-  const mut_reader = { changed: false };
+  const [hideDone, setHideDone, { updateState: updateHideDone }] =
+    createState(false);
+
+  // Whether the reader has chosen yet, for each.
+  const mut_reader = { changedView: false, changedHideDone: false };
 
   const choose = (next: IssuesView): void => {
-    mut_reader.changed = true;
+    mut_reader.changedView = true;
 
     setView(next);
   };
 
+  const toggleHideDone = (): void => {
+    mut_reader.changedHideDone = true;
+
+    updateHideDone((current) => !current);
+  };
+
   const start = (): (() => void) => {
-    const mut_run: { stopped: boolean; saving: Subscription | undefined } = {
+    const mut_run: {
+      stopped: boolean;
+      saving: readonly Subscription[];
+    } = {
       stopped: false,
-      saving: undefined,
+      saving: [],
     };
 
     const reading = combine([view, deps.issues, deps.moreIssues]).subscribe(
@@ -97,34 +122,60 @@ export const createIssuesViewStore = (
       },
     );
 
-    const resume = (stored: unknown): void => {
-      if (mut_run.stopped) {
-        return;
-      }
+    const resume =
+      (apply: (stored: unknown) => void, saving: () => Subscription) =>
+      (stored: unknown): void => {
+        if (mut_run.stopped) {
+          return;
+        }
 
-      if (!mut_reader.changed) {
-        setView(stored === 'dag' ? 'dag' : 'list');
-      }
+        apply(stored);
 
-      mut_run.saving = view.subscribe(deps.save);
-    };
+        mut_run.saving = Arr.toPushed(mut_run.saving, saving());
+      };
 
     deps
       .load()
       .catch(() => undefined)
-      .then(resume)
+      .then(
+        resume(
+          (stored) => {
+            if (!mut_reader.changedView) {
+              setView(stored === 'dag' ? 'dag' : 'list');
+            }
+          },
+          () => view.subscribe(deps.save),
+        ),
+      )
+      .catch(() => undefined);
+
+    deps
+      .loadHideDone()
+      .catch(() => undefined)
+      .then(
+        resume(
+          (stored) => {
+            if (!mut_reader.changedHideDone) {
+              setHideDone(stored === true);
+            }
+          },
+          () => hideDone.subscribe(deps.saveHideDone),
+        ),
+      )
       .catch(() => undefined);
 
     return () => {
       mut_run.stopped = true;
 
-      mut_run.saving?.unsubscribe();
+      for (const subscription of mut_run.saving) {
+        subscription.unsubscribe();
+      }
 
       reading.unsubscribe();
     };
   };
 
-  const graph = combine([deps.issues, deps.entries])
+  const fullGraph = combine([deps.issues, deps.entries])
     .pipe(
       map(([issues, entries]) =>
         buildIssueGraph({
@@ -137,7 +188,26 @@ export const createIssuesViewStore = (
     )
     .pipe(skipIfNoChange(fastDeepEqual));
 
+  const graph = combine([fullGraph, hideDone])
+    .pipe(map(([full, hide]) => (hide ? omitDone(full) : full)))
+    .pipe(skipIfNoChange(fastDeepEqual));
+
   const layout = graph.pipe(map(layoutIssueGraph));
 
-  return { view, graph, layout, choose, start };
+  const doneCount = fullGraph
+    .pipe(
+      map(({ nodes }) => nodes.filter(({ state }) => state === 'done').length),
+    )
+    .pipe(skipIfNoChange());
+
+  return {
+    view,
+    hideDone,
+    graph,
+    layout,
+    doneCount,
+    choose,
+    toggleHideDone,
+    start,
+  };
 };

@@ -1,5 +1,9 @@
 import type { Label } from 'pr-report-core';
-import { buildIssueGraph, type OpenPullRequestFacts } from './issue-graph.mjs';
+import {
+  buildIssueGraph,
+  omitDone,
+  type OpenPullRequestFacts,
+} from './issue-graph.mjs';
 import type { IssueItem, ReferencedItem } from './load-report.mjs';
 
 describe(buildIssueGraph, () => {
@@ -202,6 +206,53 @@ describe(buildIssueGraph, () => {
       graph.nodes.map(({ state }) => state),
       ['cycle', 'cycle'],
     );
+  });
+});
+
+describe(omitDone, () => {
+  test('takes out what is done, and every edge that runs from it or to it', () => {
+    const graph = build({
+      issues: [issue(5, [3, 4]), issue(6, [5])],
+      referenced: [
+        referencedItem(3, 'pull-request', 'done'),
+        referencedItem(4, 'issue', 'done'),
+      ],
+      pulls: [pull(8, [6])],
+    });
+
+    const shown = omitDone(graph);
+
+    assert.deepStrictEqual(
+      shown.nodes.map(({ number, state }) => [number, state]),
+      [
+        [5, 'ready'],
+        [6, 'blocked'],
+        [8, 'open'],
+      ],
+    );
+
+    assert.deepStrictEqual(
+      shown.edges.map(({ from, to, kind }) => [from, to, kind]),
+      [
+        [5, 6, 'start-after'],
+        [6, 8, 'closes'],
+      ],
+    );
+  });
+
+  test('keeps what closed without being done, since what waits on it needs a look', () => {
+    const graph = build({
+      issues: [issue(5, [4])],
+      referenced: [referencedItem(4, 'issue', 'abandoned')],
+    });
+
+    assert.deepStrictEqual(omitDone(graph), graph);
+  });
+
+  test('hands back the graph it was given when nothing in it is done', () => {
+    const graph = build({ issues: [issue(1, []), issue(2, [1])] });
+
+    assert.strictEqual(omitDone(graph), graph);
   });
 });
 

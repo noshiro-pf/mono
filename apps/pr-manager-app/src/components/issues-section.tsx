@@ -3,6 +3,7 @@ import { Arr } from 'ts-data-forge';
 import type { IssueList } from '../load-report.mjs';
 import { issuesViewSignals } from '../store/index.mjs';
 import { ExternalLink } from './external-link.js';
+import { IssueDagDoneToggle } from './issue-dag-done-toggle.js';
 import { IssueDag } from './issue-dag.js';
 import { IssuesViewSwitch } from './issues-view-switch.js';
 import { LabelChip } from './label-chip.js';
@@ -29,7 +30,8 @@ type Props = Readonly<{
  * listed.
  *
  * Or, switched to it, the DAG of what each waits for (`issue-dag.tsx`), for
- * which every open issue is read (`issues-view-store.mts`).
+ * which every open issue is read (`issues-view-store.mts`), with a switch
+ * beside the List / DAG one for whether it draws what is done.
  */
 export const IssuesSection = memoNamed<Props>(
   'IssuesSection',
@@ -45,6 +47,10 @@ export const IssuesSection = memoNamed<Props>(
 
       <div className={'issues-toolbar'}>
         <IssuesViewSwitch />
+
+        {issuesViewSignals.view.value === 'dag' ? (
+          <IssueDagDoneToggle />
+        ) : undefined}
       </div>
 
       {reading ? (
