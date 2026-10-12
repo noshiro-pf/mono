@@ -64,7 +64,6 @@ export const required = <
   ) satisfies UnknownShape;
 
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return record(requiredShape, {
     typeName: typeNameFilled,
     excessProperty: options?.excessProperty ?? recordType.excessProperty,
@@ -91,14 +90,12 @@ type RequiredValue<
 const makeRequired = <T extends UnknownType>(t: T): RequiredPropertyType<T> => {
   if (!isOptionalProperty(t)) {
     // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return t as RequiredPropertyType<T>;
   }
 
   const { optional: _, ...rest } = t;
 
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return rest as RequiredPropertyType<T>;
 };
 

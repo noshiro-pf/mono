@@ -52,6 +52,5 @@ export const binarySearch = <N extends number>(
   }
 
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return mut_mid as NegativeInt32 | Uint32;
 };

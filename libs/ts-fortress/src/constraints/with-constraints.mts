@@ -106,7 +106,6 @@ export const attachConstraints = <A, C>(
   // a spread would call it here — which for a recursive type never
   // terminates — and freeze whatever it returned into a plain value.
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   Object.defineProperties(
     {},
     {
@@ -132,7 +131,6 @@ export const propagateConstraints = <A, C>(
   source: Partial<WithConstraints<C>>,
 ): Type<A> & ConstraintsCarrier<C> =>
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   (source.constraints === undefined
     ? target
     : attachConstraints(target, source.constraints)) as Type<A> &
@@ -152,7 +150,6 @@ export const fillConstraints = <
   const source: Partial<All> | undefined = constraints;
 
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return Object.fromEntries(
     allKeys.map((key) => tp(key, source?.[key])),
   ) as FillConstraints<All, C>;

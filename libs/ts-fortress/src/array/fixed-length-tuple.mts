@@ -31,7 +31,6 @@ export const fixedLengthTuple = <N extends StructuralPrefixLength, A>(
     (): T =>
       options?.defaultValue ??
       // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       (Arr.create(size, elementType.defaultValue) as T),
   );
 
@@ -81,7 +80,6 @@ export const fixedLengthTuple = <N extends StructuralPrefixLength, A>(
       ? getDefaultValue()
       : // TODO: remove as
         // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (Arr.map(
           Arr.seq(size),
           (i) => elementType.fill(a[i]) satisfies A,
@@ -89,7 +87,6 @@ export const fixedLengthTuple = <N extends StructuralPrefixLength, A>(
 
   const prune = (a: T): T =>
     // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     Arr.map(a, (el) => elementType.prune(el)) as T;
 
   return {

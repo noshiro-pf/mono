@@ -9,7 +9,6 @@ function* idMaker<T extends symbol>(): Generator<T, T, T> {
 
   while (true) {
     // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     yield Symbol(mut_i.toString()) as T;
 
     mut_i += 1;

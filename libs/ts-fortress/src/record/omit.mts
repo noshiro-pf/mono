@@ -38,7 +38,6 @@ export const omit = <
   }
 
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return record(Obj.omit(shape, keysToOmit), {
     typeName:
       options?.typeName ??

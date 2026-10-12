@@ -51,7 +51,6 @@ export const map = <A, B>(
   mapFn: (x: A, index: SafeUint | -1) => B,
 ): KeepInitialValueOperator<A, B> =>
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
     createMapObservable(parentObservable, mapFn)) as KeepInitialValueOperator<
     A,

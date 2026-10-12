@@ -47,5 +47,4 @@ export const unwrapResultOk = <
   R extends UnknownResult,
 >(): KeepInitialValueOperator<R, Result.UnwrapOk<R> | undefined> =>
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   map(Result.unwrapOk as Fn<R, Result.UnwrapOk<R> | undefined>);

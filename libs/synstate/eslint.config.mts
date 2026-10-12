@@ -1,3 +1,4 @@
+import { eslintConfigOffForSumiCheck } from '@sumi-lang/cli';
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
@@ -112,5 +113,14 @@ export default [
         },
       ],
     }),
+  },
+
+  // src/ is what `pnpm run check:sumi` checks (tsconfig.sumi.json), so the
+  // ESLint rules Sumi covers are turned off there and a diagnostic is
+  // answered by its `@sumi-expect-error` marker alone (D-46). Last, to win
+  // the merge.
+  {
+    ...eslintConfigOffForSumiCheck,
+    files: ['src/**'],
   },
 ] satisfies readonly FlatConfig[];

@@ -161,7 +161,6 @@ export const createInitializedSyncChildObservable = <
     // `getSnapshot` always returns `Some` here: `initialValue` is a `Some` and
     // `setNext` only ever stores a `Some`.
     // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     observable as InitializedSyncChildObservable<A, P>
   );
 };

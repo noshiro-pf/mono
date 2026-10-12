@@ -313,7 +313,6 @@ const validateConstraints = (
     ? Result.err(result2.value)
     : // Both constraints are valid.
       // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       Result.ok(constraints as Constraints);
 };
 

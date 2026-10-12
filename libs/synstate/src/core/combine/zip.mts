@@ -68,7 +68,6 @@ export const zip = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): ZipObservableRefined<OS> =>
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   createZipObservable(parents) as unknown as ZipObservableRefined<OS>;
 
 const createZipObservable = <const A extends NonEmptyUnknownList>(
@@ -119,7 +118,6 @@ const createZipObservable = <const A extends NonEmptyUnknownList>(
           // `Arr.map` has a single result element type, so it reports
           // `A[number] | undefined` per position rather than `A[P]`.
           // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
 
         setNext(nextValue, updateToken);

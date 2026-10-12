@@ -63,7 +63,6 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
     (): DefaultSource =>
       options?.defaultType ??
       // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       (types[0] as DefaultSource),
   );
 
@@ -98,7 +97,6 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
   const validate: Type<T>['validate'] = (a) => {
     if (memberTypes.some((t) => t.is(a))) {
       // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return Result.ok(a as T);
     }
 
@@ -191,7 +189,6 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
       ? a
       : // A member of the union prunes to a member of the union.
         // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (matched.prune(a) as T);
   };
 
@@ -221,7 +218,6 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
       ? 'reject'
       : 'allow';
 
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return {
       ...baseType,
       shapeStructure: Arr.isFixedLengthTuple(1, shapeStructures)

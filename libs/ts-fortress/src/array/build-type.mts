@@ -33,7 +33,6 @@ export const validateElements = <A,>(
     ? Result.err(errors)
     : // No errors, so the value is of the validated type.
       // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       Result.ok(a as readonly A[]);
 };
 
@@ -78,6 +77,5 @@ export const buildType = <Elm, T extends readonly Elm[] = readonly Elm[]>({
   // cannot be proven structurally, so it is asserted here once, on behalf of
   // every length-constrained array validator, instead of at each call site.
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return base as Type<T>;
 };
