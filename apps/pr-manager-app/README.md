@@ -84,10 +84,14 @@ pull request waiting on nothing but a cycle member is drawn as a root.
 
 The merge order leads with the counts — open, queued, draft, failing, behind
 base, set aside, awaiting code owner — and **each count but `open` is a
-switch** for the pull requests it counts. A pull request under any count
-switched off is hidden, whatever else it is, so switching off `queued`
-leaves what is still waiting for a review. One under none of them is always
-shown.
+switch** for the pull requests it counts, in one of two modes picked above
+them. **Hide it**, the default: a pull request under any count switched off
+is hidden, whatever else it is, so switching off `queued` leaves what is
+still waiting for a review, and one under none of them is always shown.
+**Show only it**: clicking a count picks it, and only a pull request under a
+picked count is shown, whatever else it is, so picking `failing` leaves what
+is failing, queued or not; with nothing picked, everything is. Each mode
+keeps its own choice, so switching back finds the other as it was left.
 
 Below them, the `priority:high`, `priority:mid` and `priority:low` labels are
 switches too, with **none** for a pull request carrying no one of them (or

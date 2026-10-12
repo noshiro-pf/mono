@@ -1,4 +1,5 @@
 import { memoNamed } from 'preact-utils';
+import type { StatusMode } from '../merge-order-view.mjs';
 import type { StatusRole } from '../verdict.mjs';
 
 type Props = Readonly<{
@@ -12,11 +13,12 @@ type Props = Readonly<{
    */
   tone?: StatusRole;
   /**
-   * Given, the tile is a switch (`aria-pressed`) for what it counts, and
-   * `pressed` is whether that is shown.
+   * Given, the tile is a switch (`aria-pressed`) for what it counts. Hiding,
+   * `pressed` is whether that is shown; showing only, whether it is picked.
    */
   onToggle?: () => void;
   pressed?: boolean;
+  mode?: StatusMode;
 }>;
 
 /**
@@ -27,7 +29,7 @@ type Props = Readonly<{
  */
 export const StatTile = memoNamed<Props>(
   'StatTile',
-  ({ value, label, tone, onToggle, pressed = true }) =>
+  ({ value, label, tone, onToggle, pressed = true, mode = 'hide' }) =>
     onToggle === undefined ? (
       <div className={'stat-tile'} data-status={tone}>
         <span className={'stat-value'}>{value ?? READING}</span>
@@ -37,12 +39,9 @@ export const StatTile = memoNamed<Props>(
       <button
         aria-pressed={pressed}
         className={'stat-tile stat-toggle'}
+        data-mode={mode}
         data-status={tone}
-        title={
-          pressed
-            ? `Shown. Press to hide the pull requests that are ${label}.`
-            : `Hidden. Press to show the pull requests that are ${label}.`
-        }
+        title={TITLES[mode][pressed ? 'pressed' : 'released'](label)}
         type={'button'}
         onClick={onToggle}
       >
@@ -51,6 +50,21 @@ export const StatTile = memoNamed<Props>(
       </button>
     ),
 );
+
+const TITLES = {
+  hide: {
+    pressed: (label: string) =>
+      `Shown. Click to hide the pull requests that are ${label}.`,
+    released: (label: string) =>
+      `Hidden. Click to show the pull requests that are ${label}.`,
+  },
+  only: {
+    pressed: (label: string) =>
+      `Picked. Click to stop showing the pull requests that are ${label}.`,
+    released: (label: string) =>
+      `Click to show only the pull requests that are ${label}, and any others picked.`,
+  },
+} as const;
 
 /** What a count reads while it is not known yet. */
 const READING = '…';

@@ -1,13 +1,15 @@
 import { memoNamed } from 'preact-utils';
-import { Obj } from 'ts-data-forge';
+import { Arr, Obj } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
+  isPressed,
   PRIORITIES,
   STATUS_FILTERS,
   STATUS_NAMES,
   type MergeOrderSort,
   type Priority,
   type StatusFilter,
+  type StatusMode,
 } from '../merge-order-view.mjs';
 import {
   mergeOrderSignals,
@@ -18,7 +20,8 @@ import type { StatusRole } from '../verdict.mjs';
 import { StatTile } from './stat-tile.js';
 
 /**
- * What the merge order leads with: the counts, each a switch for the pull
+ * What the merge order leads with: whether pressing a count hides what it
+ * counts or shows only that, the counts, each a switch for the pull
  * requests it counts, then the priorities, which are switches too, and the
  * order. What a switch does is `merge-order-view.mts`; the choice is kept
  * across visits (`settings-db.mts`).
@@ -40,16 +43,48 @@ export const MergeOrderFilters = memoNamed('MergeOrderFilters', () => {
 
   return (
     <div className={'merge-order-filters'}>
-      <div className={'summary-row'}>
+      <div className={'status-mode'}>
+        <span className={'filter-group-name'}>{'click a count to'}</span>
+        <fieldset aria-label={'Status mode'} className={'theme-switch'}>
+          <button
+            aria-pressed={view.statusMode === 'hide'}
+            className={'theme-switch-option'}
+            title={'Clicking a count hides the pull requests it counts.'}
+            type={'button'}
+            onClick={hideByStatus}
+          >
+            {'hide it'}
+          </button>
+          <button
+            aria-pressed={view.statusMode === 'only'}
+            className={'theme-switch-option'}
+            title={
+              'Clicking a count picks it, and only the pull requests under a picked count are shown.'
+            }
+            type={'button'}
+            onClick={showOnlyByStatus}
+          >
+            {'show only it'}
+          </button>
+        </fieldset>
+      </div>
+
+      <div
+        className={'summary-row'}
+        data-picking={
+          view.statusMode === 'only' && Arr.isNonEmpty(view.onlyStatuses)
+        }
+      >
         <StatTile label={'open'} value={summary.open} />
         {STATUS_FILTERS.map((filter) => (
           <StatTile
             key={filter}
             label={STATUS_NAMES[filter]}
-            pressed={!view.hiddenStatuses.includes(filter)}
+            mode={view.statusMode}
+            pressed={isPressed(view, filter)}
             tone={(summary[filter] ?? 0) > 0 ? STATUS_TONES[filter] : undefined}
             value={summary[filter]}
-            onToggle={toggleStatus[filter]}
+            onToggle={pressStatus[filter]}
           />
         ))}
       </div>
@@ -125,17 +160,25 @@ const PRIORITY_NAMES = {
   none: 'none',
 } as const satisfies ReadonlyRecord<Priority, string>;
 
-const toggleStatus = Obj.fromEntries(
+const pressStatus = Obj.fromEntries(
   STATUS_FILTERS.map(
     (filter) =>
       [
         filter,
         () => {
-          mergeOrderStore.toggleStatus(filter);
+          mergeOrderStore.pressStatus(filter);
         },
       ] as const,
   ),
 );
+
+const statusModeTo = (statusMode: StatusMode) => (): void => {
+  mergeOrderStore.setStatusMode(statusMode);
+};
+
+const hideByStatus = statusModeTo('hide');
+
+const showOnlyByStatus = statusModeTo('only');
 
 const togglePriority = Obj.fromEntries(
   PRIORITIES.map(

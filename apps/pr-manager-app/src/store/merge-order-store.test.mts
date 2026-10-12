@@ -26,7 +26,7 @@ describe(createMergeOrderStore, () => {
 
     assert.deepStrictEqual(store.view.getSnapshot().value, STORED);
 
-    store.toggleStatus('draft');
+    store.pressStatus('draft');
 
     assert.deepStrictEqual(saved.at(-1), {
       ...STORED,
@@ -116,7 +116,7 @@ describe(createMergeOrderStore, () => {
       none: 1,
     });
 
-    store.toggleStatus('queued');
+    store.pressStatus('queued');
 
     assert.deepStrictEqual(
       store.roots.getSnapshot().value.map(({ number }) => number),
@@ -124,11 +124,26 @@ describe(createMergeOrderStore, () => {
     );
 
     assert.strictEqual(store.shown.getSnapshot().value, 1);
+
+    store.setStatusMode('only');
+
+    assert.strictEqual(store.shown.getSnapshot().value, 2);
+
+    store.pressStatus('queued');
+
+    assert.deepStrictEqual(
+      store.roots.getSnapshot().value.map(({ number }) => number),
+      [1],
+    );
+
+    assert.strictEqual(store.shown.getSnapshot().value, 1);
   });
 });
 
 const STORED: MergeOrderView = {
+  statusMode: 'hide',
   hiddenStatuses: ['queued', 'draft'],
+  onlyStatuses: [],
   hiddenPriorities: [],
   sort: 'order',
 } as const;
