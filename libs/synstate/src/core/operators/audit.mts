@@ -105,7 +105,6 @@ export const audit = <A,>(
   milliSeconds: number,
 ): KeepInitialValueOperator<A, A> =>
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
     createAuditObservable(
       parentObservable,

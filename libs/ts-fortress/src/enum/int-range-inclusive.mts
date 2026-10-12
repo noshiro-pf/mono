@@ -59,7 +59,6 @@ const intRangeInclusiveImpl = <Start extends Int11, End extends Int11>(
 
   const getDefaultValue = memoizeFunction(
     // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     (): T => options?.defaultValue ?? (start as T),
   );
 
@@ -85,7 +84,6 @@ const intRangeInclusiveImpl = <Start extends Int11, End extends Int11>(
     }
 
     // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return Result.ok(a as T);
   };
 

@@ -64,7 +64,6 @@ const uintRangeImpl = <
 
   const getDefaultValue = memoizeFunction(
     // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     (): T => options?.defaultValue ?? (start as T),
   );
 
@@ -90,7 +89,6 @@ const uintRangeImpl = <
     }
 
     // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return Result.ok(a as T);
   };
 

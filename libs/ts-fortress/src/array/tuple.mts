@@ -79,7 +79,6 @@ export const tuple = <const A extends readonly UnknownType[]>(
       ? Result.err(errors)
       : // No errors, so the value is of the validated type.
         // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Result.ok(a as T);
   };
 
@@ -88,12 +87,10 @@ export const tuple = <const A extends readonly UnknownType[]>(
       ? getDefaultValue()
       : // Each element is filled by its own member type.
         // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (types.map((t, i) => t.fill(a[i])) as MapTuple<A>);
 
   const prune = (a: T): T => Arr.map(types, (t, i) => t.prune(a[i]));
 
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return {
     typeName,
     get defaultValue() {

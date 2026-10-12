@@ -394,7 +394,6 @@ export const assembleObservable = <
   function pipe<B>(operator: Operator<A, B>): Observable<B> {
     return operator(
       // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       mut_observable as unknown as InitializedObservable<A>,
     );
   }

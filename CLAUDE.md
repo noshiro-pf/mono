@@ -222,9 +222,8 @@ particular to it. Here is only what a session has to act on.
   on. Taking it off is what starts the checks. Any label event re-runs them,
   so add other labels before pushing or after the checks report.
 - `skip-ci`, `merge-queued`, `blocks-release` and `auto-rebase` exist only
-  on GitHub; the
-  strings are in the workflows and `apps/pr-report-core/src/labels.mts`.
-  Change them everywhere or nowhere.
+  on GitHub; the strings are in the workflows and
+  `apps/pr-report-core/src/labels.mts`. Change them everywhere or nowhere.
 - **A tree already checked is not checked again** — after a rebase that
   changes no content, on another pull request, on `main` — failure included.
   Re-examine a reused failure with "Re-run all jobs", not "Re-run failed jobs".
@@ -265,7 +264,8 @@ leaves the verbatim texts under `docs/` alone.
 - After code changes, run `pnpm run fmt` and the checks the diff touches, and
   fix what they report. **No file-level `eslint-disable`, no turning rules off
   in `eslint.config.mts`, and `eslint-disable-next-line` only as a last
-  resort** — the rules below say what the intended fix is.
+  resort** — the rules below say what the intended fix is. The one rule-off is
+  `eslintConfigOffForSumiCheck`, over what `check:sumi` reads.
 - Pushing the session's own branch and opening its pull request is the work.
   **Without explicit instruction, never**: push to any other branch (`main`
   refuses direct pushes anyway); force-push or rebase a branch whose pull

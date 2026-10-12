@@ -80,7 +80,6 @@ export const mergeRecords = <
     });
 
     // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return merged as MergeRecordsType<Types>;
   }
 
@@ -91,7 +90,6 @@ export const mergeRecords = <
   );
 
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return union(variants as NonEmptyTuple<Type<UnknownRecord>>, {
     typeName: typeNameFilled,
   }) as MergeRecordsType<Types>;

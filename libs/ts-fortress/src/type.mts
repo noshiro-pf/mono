@@ -160,7 +160,6 @@ export const flattenShapeStructure = (
           undefined
         : // No part is a union here.
           // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           Obj.merge(...(parts as readonly UnknownShape[]));
     }
     case 'union': {

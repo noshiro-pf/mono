@@ -40,7 +40,6 @@ export const valueof = <const R extends UnknownRecord>(
   // two assertions below are that gap, and they are the whole of it.
   if (Arr.isMinLengthTuple(2, types)) {
     // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return union(types, {
       typeName: options?.typeName ?? `ValueOf<${recordType.typeName}>`,
     }) as ValueOfType<R>;
@@ -49,11 +48,9 @@ export const valueof = <const R extends UnknownRecord>(
   return Arr.isNonEmpty(types)
     ? // The only member type.
       // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       (types[0] as ValueOfType<R>)
     : // types is empty
       // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       (undefinedType satisfies Type<undefined> as ValueOfType<R>);
 };
 

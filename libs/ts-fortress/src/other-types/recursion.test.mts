@@ -339,7 +339,7 @@ describe('recursive', () => {
         // eslint-disable-next-line unicorn/no-unused-properties
         metadata: string(''),
         // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion, unicorn/no-unused-properties
+        // eslint-disable-next-line unicorn/no-unused-properties
         children: array({} as Type<unknown>), // Placeholder for recursion
       } as const;
 
@@ -475,7 +475,6 @@ describe('recursive', () => {
         name: string(),
         value: number(0),
         // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         nested: union([nullType, {} as Type<Config>]),
       } as const;
 

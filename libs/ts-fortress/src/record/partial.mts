@@ -63,7 +63,6 @@ export const partial = <
   ) satisfies UnknownShape;
 
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return record(partialShape, {
     typeName: typeNameFilled,
     excessProperty: options?.excessProperty ?? recordType.excessProperty,

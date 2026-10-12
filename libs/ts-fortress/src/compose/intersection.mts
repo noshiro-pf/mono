@@ -58,7 +58,6 @@ export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
       ? Result.err(errors)
       : // No errors, so the value is of the validated type.
         // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Result.ok(a as T);
   };
 
@@ -90,7 +89,6 @@ export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
       ? 'reject'
       : 'allow';
 
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return {
       ...baseType,
       // A value path is represented by a record intersection if it is
@@ -99,7 +97,6 @@ export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
       // (`hasRecordInternals`), so each pruned result is a record.
       prune: (a: T): T =>
         // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         types.map((t) => t.prune(a)).reduce(mergePruned, {}) as T,
       shapeStructure: Arr.isFixedLengthTuple(1, shapeStructures)
         ? shapeStructures[0]

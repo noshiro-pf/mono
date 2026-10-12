@@ -28,7 +28,6 @@ export const keyof = <const R extends UnknownRecord>(
   }
 
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return pipe(getKeysFromStructure(recordType.shapeStructure)).map((keys) =>
     Arr.isNonEmpty(keys)
       ? (enumType(keys, {
