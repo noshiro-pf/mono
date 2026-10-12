@@ -391,15 +391,41 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
-.stat-toggle[aria-pressed='false'] {
+.stat-toggle[data-mode='hide'][aria-pressed='false'] {
   background: transparent;
   border: 1px dashed var(--baseline);
 }
 
-.stat-toggle[aria-pressed='false'] .stat-value,
-.stat-toggle[aria-pressed='false'] .stat-label {
+.stat-toggle[data-mode='hide'][aria-pressed='false'] .stat-value,
+.stat-toggle[data-mode='hide'][aria-pressed='false'] .stat-label {
   color: var(--ink-muted);
   text-decoration: line-through;
+}
+
+/*
+ * Showing only, a picked count is filled and outlined in the accent, and
+ * once one is, the counts left unpicked fade: what they count is off screen,
+ * but not struck through, since pressing one adds it rather than undoing a
+ * hide. The outline is a pixel wider than the hairline, and the padding a
+ * pixel narrower, so that the number does not move.
+ */
+.stat-toggle[data-mode='only'][aria-pressed='true'] {
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  border: 2px solid var(--accent);
+  padding: calc(0.75rem - 1px) calc(0.9rem - 1px);
+}
+
+.summary-row[data-picking='true']
+  .stat-toggle[data-mode='only'][aria-pressed='false']
+  :is(.stat-value, .stat-label) {
+  color: var(--ink-muted);
+}
+
+.status-mode {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .merge-order-controls {

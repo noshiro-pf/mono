@@ -28,13 +28,15 @@ import {
   DEFAULT_MERGE_ORDER_VIEW,
   isShown,
   parseMergeOrderView,
+  pressStatus,
   togglePriority,
-  toggleStatus,
   withSort,
+  withStatusMode,
   type MergeOrderSort,
   type MergeOrderView,
   type Priority,
   type StatusFilter,
+  type StatusMode,
 } from '../merge-order-view.mjs';
 
 export type MergeOrderDeps = Readonly<{
@@ -52,7 +54,9 @@ export type MergeOrderStore = Readonly<{
   /** How many of the open pull requests the view shows. */
   shown: InitializedObservable<number>;
   priorities: InitializedObservable<ReadonlyRecord<Priority, number>>;
-  toggleStatus: (filter: StatusFilter) => void;
+  /** Hides or shows the status, or picks it, as the mode says. */
+  pressStatus: (filter: StatusFilter) => void;
+  setStatusMode: (statusMode: StatusMode) => void;
   togglePriority: (priority: Priority) => void;
   setSort: (sort: MergeOrderSort) => void;
   /** Reads what was saved, then saves every change; returns what stops it. */
@@ -127,8 +131,11 @@ export const createMergeOrderStore = (
     priorities: deps.entries
       .pipe(map(countPriorities))
       .pipe(skipIfNoChange(fastDeepEqual)),
-    toggleStatus: (filter) => {
-      change((current) => toggleStatus(current, filter));
+    pressStatus: (filter) => {
+      change((current) => pressStatus(current, filter));
+    },
+    setStatusMode: (statusMode) => {
+      change((current) => withStatusMode(current, statusMode));
     },
     togglePriority: (priority) => {
       change((current) => togglePriority(current, priority));

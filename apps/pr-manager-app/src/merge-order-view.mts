@@ -1,10 +1,16 @@
 /**
  * Which pull requests the merge order shows, and in what order.
  *
- * **The statuses** are the counts the merge order leads with, each a switch:
- * a pull request under any status switched off is hidden, whatever else it
- * is, so switching off `queued` leaves what is still waiting to be looked
- * at. A pull request under none of them is always shown.
+ * **The statuses** are the counts the merge order leads with, each a switch,
+ * in one of two modes. Hiding, a pull request under any status switched off
+ * is hidden, whatever else it is, so switching off `queued` leaves what is
+ * still waiting to be looked at, and one under none of them is always shown.
+ * Showing only, a pull request is shown when it is under any status picked,
+ * whatever else it is, and one under none of them is hidden; with nothing
+ * picked yet, everything is. "Only failing" is not a set of statuses
+ * switched off, which is why it is a mode: hiding the rest would still show
+ * what is under none of them, and hide what is failing and also queued.
+ * Each mode keeps its own choice, so going back to hiding finds it as it was.
  *
  * **The priorities** are the `priority:*` labels, and "none" for a pull
  * request carrying no one of them; it is hidden when its priority is
@@ -64,18 +70,26 @@ export const PRIORITIES = [
 
 export type MergeOrderSort = 'order' | 'priority';
 
+/** What pressing a status does: switch it off, or pick it to show alone. */
+export type StatusMode = 'hide' | 'only';
+
 export type MergeOrderView = Readonly<{
+  statusMode: StatusMode;
   /**
    * What is switched off rather than on, so that a status added later is
    * shown to a reader whose choice was saved before it existed.
    */
   hiddenStatuses: readonly StatusFilter[];
+  /** What is picked while showing only; set aside while hiding. */
+  onlyStatuses: readonly StatusFilter[];
   hiddenPriorities: readonly Priority[];
   sort: MergeOrderSort;
 }>;
 
 export const DEFAULT_MERGE_ORDER_VIEW: MergeOrderView = {
+  statusMode: 'hide',
   hiddenStatuses: [],
+  onlyStatuses: [],
   hiddenPriorities: [],
   sort: 'order',
 } as const;
@@ -95,7 +109,7 @@ export const priorityOf = (labels: readonly Label[]): Priority => {
 
 export const isShown = (entry: Entry, view: MergeOrderView): boolean =>
   !view.hiddenPriorities.includes(priorityOf(entry.labels)) &&
-  statusesOf(entry).every((filter) => !view.hiddenStatuses.includes(filter));
+  shownByStatus(statusesOf(entry), view);
 
 /** The merge order as the view shows it. */
 export const arrangeMergeOrder = (
@@ -248,6 +262,32 @@ export const toggleStatus = (
     hiddenStatuses: toggled(STATUS_FILTERS, view.hiddenStatuses, filter),
   }) as const;
 
+/** Whether the status `filter` is drawn as pressed in the current mode. */
+export const isPressed = (
+  view: MergeOrderView,
+  filter: StatusFilter,
+): boolean =>
+  view.statusMode === 'only'
+    ? view.onlyStatuses.includes(filter)
+    : !view.hiddenStatuses.includes(filter);
+
+/** What pressing the status `filter` does, in the current mode. */
+export const pressStatus = (
+  view: MergeOrderView,
+  filter: StatusFilter,
+): MergeOrderView =>
+  view.statusMode === 'only'
+    ? ({
+        ...view,
+        onlyStatuses: toggled(STATUS_FILTERS, view.onlyStatuses, filter),
+      } as const)
+    : toggleStatus(view, filter);
+
+export const withStatusMode = (
+  view: MergeOrderView,
+  statusMode: StatusMode,
+): MergeOrderView => ({ ...view, statusMode }) as const;
+
 export const togglePriority = (
   view: MergeOrderView,
   priority: Priority,
@@ -273,9 +313,17 @@ export const parseMergeOrderView = (stored: unknown): MergeOrderView => {
   }
 
   return {
+    statusMode:
+      hasKey(stored, 'statusMode') && stored.statusMode === 'only'
+        ? 'only'
+        : 'hide',
     hiddenStatuses: known(
       STATUS_FILTERS,
       hasKey(stored, 'hiddenStatuses') ? stored.hiddenStatuses : undefined,
+    ),
+    onlyStatuses: known(
+      STATUS_FILTERS,
+      hasKey(stored, 'onlyStatuses') ? stored.onlyStatuses : undefined,
     ),
     hiddenPriorities: known(
       PRIORITIES,
@@ -287,6 +335,15 @@ export const parseMergeOrderView = (stored: unknown): MergeOrderView => {
         : 'order',
   };
 };
+
+const shownByStatus = (
+  statuses: readonly StatusFilter[],
+  view: MergeOrderView,
+): boolean =>
+  view.statusMode === 'only'
+    ? !Arr.isNonEmpty(view.onlyStatuses) ||
+      statuses.some((filter) => view.onlyStatuses.includes(filter))
+    : statuses.every((filter) => !view.hiddenStatuses.includes(filter));
 
 /** The same tests `summarize` and `load-report.mts` count with. */
 const STATUS_TESTS = {
