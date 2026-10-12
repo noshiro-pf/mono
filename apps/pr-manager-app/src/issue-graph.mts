@@ -8,12 +8,14 @@
  * waited for to what waits — a `Start-After:` — or from an issue to a pull
  * request that closes it, which is the work on that issue under way. How an
  * issue stands is `pr-report-core`'s `decideStartStates`; this adds where
- * everything else stands, and whether a startable issue is being worked on.
+ * everything else stands, whether a startable issue is being worked on, and
+ * the `priority:*` label of what the page read the labels of.
  */
 
 import { decideStartStates, type StartState } from 'pr-report-core';
 import type { StrictPick } from 'ts-type-forge';
 import type { Entry, IssueItem, ReferencedItem } from './load-report.mjs';
+import { priorityOf, type Priority } from './merge-order-view.mjs';
 
 /**
  * How a node is drawn.
@@ -34,6 +36,11 @@ export type IssueGraphNode = Readonly<{
   title: string;
   url: string;
   state: IssueNodeState;
+  /**
+   * The one `priority:*` label it carries. Only a listed issue and an open
+   * pull request have their labels read; anything else is `none`.
+   */
+  priority: Priority;
 }>;
 
 export type IssueGraphEdge = Readonly<{
@@ -59,7 +66,7 @@ export type IssueGraph = Readonly<{
 
 export type OpenPullRequestFacts = StrictPick<
   Entry,
-  'linkedIssues' | 'number' | 'title' | 'url'
+  'labels' | 'linkedIssues' | 'number' | 'title' | 'url'
 >;
 
 export const buildIssueGraph = ({
@@ -109,6 +116,7 @@ export const buildIssueGraph = ({
         (state === 'free' || state === 'ready') && worked.has(issue.number)
           ? 'in-progress'
           : state,
+      priority: priorityOf(issue.labels),
     };
   });
 
@@ -128,6 +136,7 @@ export const buildIssueGraph = ({
         title: pull.title,
         url: pull.url,
         state: 'open',
+        priority: priorityOf(pull.labels),
       };
     }
 
@@ -140,6 +149,7 @@ export const buildIssueGraph = ({
           title: '',
           url: `${repoUrl}/issues/${number}`,
           state: 'unknown',
+          priority: 'none',
         }
       : {
           number,
@@ -147,6 +157,7 @@ export const buildIssueGraph = ({
           title: item.title,
           url: item.url,
           state: item.status === 'waiting' ? 'open' : item.status,
+          priority: 'none',
         };
   });
 

@@ -17,6 +17,8 @@ export const IssueDagLegend = memoNamed<Props>(
 
     const closes = graph.edges.some(({ kind }) => kind === 'closes');
 
+    const priorities = new Set(graph.nodes.map(({ priority }) => priority));
+
     // An open pull request is drawn as work under way and an open issue
     // neutral, so `open` is keyed once for each that is drawn.
     const openKinds = (['pull-request', 'issue'] as const).filter((kind) =>
@@ -62,6 +64,18 @@ export const IssueDagLegend = memoNamed<Props>(
           <li>
             <span className={'issue-dag-swatch'} data-edge={'closes'} />
             {'Closed by'}
+          </li>
+        ) : undefined}
+        {priorities.has('high') ? (
+          <li>
+            <span className={'issue-dag-swatch'} data-priority={'high'} />
+            {'High priority'}
+          </li>
+        ) : undefined}
+        {priorities.has('low') ? (
+          <li>
+            <span className={'issue-dag-swatch'} data-priority={'low'} />
+            {'Low priority'}
           </li>
         ) : undefined}
       </ul>

@@ -1,3 +1,4 @@
+import type { Label } from 'pr-report-core';
 import { buildIssueGraph, type OpenPullRequestFacts } from './issue-graph.mjs';
 import type { IssueItem, ReferencedItem } from './load-report.mjs';
 
@@ -98,6 +99,7 @@ describe(buildIssueGraph, () => {
         title: 'Issue 5',
         url: 'https://github.com/o/r/issues/5',
         state: 'attention',
+        priority: 'none',
       },
       {
         number: 9,
@@ -105,6 +107,7 @@ describe(buildIssueGraph, () => {
         title: '',
         url: 'https://github.com/o/r/issues/9',
         state: 'unknown',
+        priority: 'none',
       },
     ]);
   });
@@ -168,6 +171,30 @@ describe(buildIssueGraph, () => {
     );
   });
 
+  test('carries the priority label of a listed issue and of an open pull request', () => {
+    const graph = build({
+      issues: [
+        issue(1, [], ['priority:high']),
+        issue(2, [1], ['bug', 'priority:low']),
+        issue(3, [4]),
+      ],
+      referenced: [referencedItem(4, 'issue', 'waiting')],
+      pulls: [pull(7, [1], ['priority:mid'])],
+    });
+
+    assert.deepStrictEqual(
+      graph.nodes.map(({ number, priority }) => [number, priority]),
+      [
+        [1, 'high'],
+        [2, 'low'],
+        [3, 'none'],
+        // What a declaration names past the list: its labels are not read.
+        [4, 'none'],
+        [7, 'mid'],
+      ],
+    );
+  });
+
   test('marks the issues on a cycle', () => {
     const graph = build({ issues: [issue(1, [2]), issue(2, [1])] });
 
@@ -191,13 +218,17 @@ const build = ({
 }>): ReturnType<typeof buildIssueGraph> =>
   buildIssueGraph({ repoUrl: REPO_URL, issues, referenced, pulls });
 
-const issue = (number: number, startAfter: readonly number[]): IssueItem =>
+const issue = (
+  number: number,
+  startAfter: readonly number[],
+  labelNames: readonly string[] = [],
+): IssueItem =>
   ({
     number,
     title: `Issue ${number}`,
     author: 'someone',
     url: `${REPO_URL}/issues/${number}`,
-    labels: [],
+    labels: labelNames.map(label),
     createdAt: '2026-09-20T00:00:00Z',
     updatedAt: '2026-09-23T00:00:00Z',
     comments: 0,
@@ -220,11 +251,13 @@ const referencedItem = (
 const pull = (
   number: number,
   closes: readonly number[],
+  labelNames: readonly string[] = [],
 ): OpenPullRequestFacts =>
   ({
     number,
     title: `Pull request ${number}`,
     url: `${REPO_URL}/pull/${number}`,
+    labels: labelNames.map(label),
     linkedIssues: closes.map((issueNumber) => ({
       number: issueNumber,
       title: '',
@@ -232,3 +265,6 @@ const pull = (
       state: 'open',
     })),
   }) as const;
+
+const label = (labelName: string): Label =>
+  ({ name: labelName, color: 'ededed', description: '' }) as const;

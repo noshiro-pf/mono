@@ -6,6 +6,7 @@ import {
   levelColumn,
   NODE_HEIGHT,
   NODE_WIDTH,
+  PRIORITY_OVERHANG,
 } from './issue-graph-layout.mjs';
 import type { IssueGraph, IssueGraphEdge } from './issue-graph.mjs';
 
@@ -160,6 +161,9 @@ describe(layoutIssueGraph, () => {
 
     assert.isTrue(grid.every(({ y }) => y > label.y));
 
+    // Clear of the priority pill over the first row, descenders included.
+    assert.isTrue(grid.every(({ y }) => y - PRIORITY_OVERHANG - label.y >= 4));
+
     // Three to a row at the least.
     assert.deepStrictEqual(
       grid.map(({ y }) => y === grid[0]?.y),
@@ -205,6 +209,7 @@ const graph = (
       title: `Issue ${number}`,
       url: `https://github.com/o/r/issues/${number}`,
       state: 'free',
+      priority: 'none',
     })),
     edges,
   }) as const;
