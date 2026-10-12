@@ -1,0 +1,7 @@
+{
+  // A project with deliberate violations, for seeing what `sumi check`
+  // reports: `pnpm run sumi:demo`. Excluded from this package's own tsconfig
+  // and ESLint, like the conformance fixtures.
+  "extends": "../../tsconfig.base.json",
+  "include": ["**/*.mts"]
+}
