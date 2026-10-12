@@ -28,6 +28,7 @@ export const keyValueRecord = <K extends Type<string>, V extends UnknownType>(
 
   const typeName = options?.typeName ?? 'key-value-record';
 
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   const defaultValue = {} as T;
 
@@ -89,18 +90,23 @@ export const keyValueRecord = <K extends Type<string>, V extends UnknownType>(
 
     return Arr.isNonEmpty(errors)
       ? Result.err(errors)
-      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      : // No errors, so the value is of the validated type.
+        // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Result.ok(a as T);
   };
 
   const fill: Type<T>['fill'] = (a) =>
     isRecord(a)
-      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      ? // Only the entries both types accept are kept.
+        // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (Obj.filter(a, (v, k) => keyType.is(k) && valueType.is(v)) as T)
       : defaultValue;
 
   // Keys not matching keyType are excess paths; values are pruned recursively.
   const prune = (a: T): T =>
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     Obj.filterMap(a, (v, k) =>
       keyType.is(k) ? Optional.some(valueType.prune(v)) : Optional.none,

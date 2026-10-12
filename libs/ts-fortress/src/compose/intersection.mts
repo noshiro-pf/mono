@@ -56,7 +56,9 @@ export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
 
     return Arr.isNonEmpty(errors)
       ? Result.err(errors)
-      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      : // No errors, so the value is of the validated type.
+        // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Result.ok(a as T);
   };
 
@@ -96,6 +98,7 @@ export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
       // see `mergePruned`). All members are record types here
       // (`hasRecordInternals`), so each pruned result is a record.
       prune: (a: T): T =>
+        // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         types.map((t) => t.prune(a)).reduce(mergePruned, {}) as T,
       shapeStructure: Arr.isFixedLengthTuple(1, shapeStructures)

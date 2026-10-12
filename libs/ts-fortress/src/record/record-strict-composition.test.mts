@@ -365,7 +365,7 @@ describe('record strict composition tests', () => {
       },
     );
 
-    const mergedType = mergeRecords([strictRecord1 as any, strictRecord2]);
+    const mergedType = mergeRecords([strictRecord1, strictRecord2]);
 
     test('accepts valid data when all merged shape keys are present (mergeRecords merges shapes then delegates to record)', () => {
       const validData = {
