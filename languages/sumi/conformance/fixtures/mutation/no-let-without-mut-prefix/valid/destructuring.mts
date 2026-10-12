@@ -1,6 +1,6 @@
 const pair: readonly [number, number] = [1, 2];
 
-const point = { x: 1, y: 2 };
+const point: Readonly<{ x: number; y: number }> = { x: 1, y: 2 };
 
 let [mut_first, mut_second] = pair;
 

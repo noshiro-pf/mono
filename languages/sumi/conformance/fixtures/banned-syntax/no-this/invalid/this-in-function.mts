@@ -6,4 +6,4 @@ export const counter = {
     // @sumi-expect-error banned-syntax/no-this
     return this.value;
   },
-};
+} as const;
