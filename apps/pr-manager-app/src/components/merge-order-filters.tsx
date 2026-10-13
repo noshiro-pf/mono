@@ -24,10 +24,11 @@ import { StatTile } from './stat-tile.js';
  * across visits (`settings-db.mts`).
  *
  * `open` is the one count that is not a switch: hiding every open pull
- * request is not a view of them. The first five counts are
- * `pr-report-core`'s, the same `pnpm run pr-report` leads with; `set aside`
- * and `awaiting code owner` are what stops a pull request that is otherwise
- * ready, and are only this page's.
+ * request is not a view of them. The first four counts are
+ * `pr-report-core`'s, the same `pnpm run pr-report` leads with, less its
+ * `draft`, which is not drawn: a draft is always shown, and its card's badge
+ * says so. `set aside` and `awaiting code owner` are what stops a pull
+ * request that is otherwise ready, and are only this page's.
  */
 export const MergeOrderFilters = memoNamed('MergeOrderFilters', () => {
   const summary = readerSignals.summary.value;
@@ -116,7 +117,6 @@ export const MergeOrderFilters = memoNamed('MergeOrderFilters', () => {
 
 const STATUS_TONES = {
   queued: undefined,
-  draft: undefined,
   failing: 'critical',
   behind: undefined,
   setAside: 'critical',

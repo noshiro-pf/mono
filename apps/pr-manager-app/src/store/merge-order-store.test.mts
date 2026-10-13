@@ -26,7 +26,7 @@ describe(createMergeOrderStore, () => {
 
     assert.deepStrictEqual(store.view.getSnapshot().value, STORED);
 
-    store.toggleStatus('draft');
+    store.toggleStatus('behind');
 
     assert.deepStrictEqual(saved.at(-1), {
       ...STORED,
@@ -137,7 +137,7 @@ describe(createMergeOrderStore, () => {
 });
 
 const STORED: MergeOrderView = {
-  hiddenStatuses: ['queued', 'draft'],
+  hiddenStatuses: ['queued', 'behind'],
   onlyStatuses: [],
   hiddenPriorities: [],
   sort: 'order',
