@@ -21,6 +21,9 @@
  * What is hidden gives its place to what is shown below it, so the tree
  * stays a tree. Everything is shown, in merge order, by default; what the
  * reader changes is kept (`settings-db.mts`).
+ *
+ * A draft is not one of the statuses: it is always shown, and its badge on
+ * the card says what it is. A choice saved while it was one drops it.
  */
 
 import {
@@ -37,11 +40,10 @@ import type { Entry, PageSummary } from './load-report.mjs';
 
 /** Named after the count of {@link PageSummary} each one is. */
 export type StatusFilter =
-  'queued' | 'draft' | 'failing' | 'behind' | 'setAside' | 'awaitingReview';
+  'queued' | 'failing' | 'behind' | 'setAside' | 'awaitingReview';
 
 export const STATUS_FILTERS = [
   'queued',
-  'draft',
   'failing',
   'behind',
   'setAside',
@@ -51,7 +53,6 @@ export const STATUS_FILTERS = [
 /** What each status is called on the page. */
 export const STATUS_NAMES = {
   queued: 'queued',
-  draft: 'draft',
   failing: 'failing',
   behind: 'behind base',
   setAside: 'set aside',
@@ -324,7 +325,6 @@ const shownByStatus = (
 const STATUS_TESTS = {
   queued: (entry) =>
     entry.labels.some((label) => label.name === MERGE_QUEUED_LABEL),
-  draft: (entry) => entry.isDraft,
   failing: (entry) => entry.checks.verdict === 'failing',
   behind: (entry) => (entry.comparison?.behindBy ?? 0) > 0,
   setAside: (entry) => entry.setAside?.current === true,

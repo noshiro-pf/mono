@@ -123,7 +123,7 @@ describe(statusesOf, () => {
 
     assert.deepStrictEqual(entries.map(statusesOf), [
       ['queued'],
-      ['draft'],
+      [],
       ['failing', 'behind'],
       ['setAside'],
       ['awaitingReview'],
@@ -197,7 +197,7 @@ describe(isShown, () => {
   test('with some statuses picked, a pull request under any of them is shown, whatever else it is, and one under none is not', () => {
     const view = toggleOnly(
       toggleOnly(DEFAULT_MERGE_ORDER_VIEW, 'failing'),
-      'draft',
+      'setAside',
     );
 
     assert.isTrue(
@@ -207,7 +207,7 @@ describe(isShown, () => {
       ),
     );
 
-    assert.isTrue(isShown(entry(2, { isDraft: true }), view));
+    assert.isTrue(isShown(entry(2, { setAside: true }), view));
 
     assert.isFalse(
       isShown(entry(3, { labels: [label('merge-queued')] }), view),
@@ -348,7 +348,7 @@ describe(toggleOnly, () => {
 describe(parseMergeOrderView, () => {
   test('reads back what was saved', () => {
     const view: MergeOrderView = {
-      hiddenStatuses: ['queued', 'draft'],
+      hiddenStatuses: ['queued', 'behind'],
       onlyStatuses: ['failing'],
       hiddenPriorities: ['low'],
       sort: 'priority',
@@ -378,11 +378,22 @@ describe(parseMergeOrderView, () => {
     // Saved before anything could be picked.
     assert.deepStrictEqual(
       parseMergeOrderView({
-        hiddenStatuses: ['draft'],
+        hiddenStatuses: ['behind'],
         hiddenPriorities: [],
         sort: 'order',
       }),
-      { ...DEFAULT_MERGE_ORDER_VIEW, hiddenStatuses: ['draft'] },
+      { ...DEFAULT_MERGE_ORDER_VIEW, hiddenStatuses: ['behind'] },
+    );
+
+    // Saved while a draft was a status: it is dropped, and drafts are shown.
+    assert.deepStrictEqual(
+      parseMergeOrderView({
+        hiddenStatuses: ['queued', 'draft'],
+        onlyStatuses: ['draft'],
+        hiddenPriorities: [],
+        sort: 'order',
+      }),
+      { ...DEFAULT_MERGE_ORDER_VIEW, hiddenStatuses: ['queued'] },
     );
 
     // Saved while the counts had a mode switch: the mode is dropped.
