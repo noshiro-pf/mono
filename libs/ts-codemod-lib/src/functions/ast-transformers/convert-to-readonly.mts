@@ -27,12 +27,12 @@ import {
   shouldAvoidParenthesesForReadonly,
   unwrapReadonlyTypeArgText,
   wrapWithParentheses,
-  type ReadonlyTypeReferenceNode,
 } from '../functions/index.mjs';
 import { replaceNodeWithDebugPrint } from '../utils/index.mjs';
 import {
   groupUnionIntersectionTypes,
   invalidDeepReadonlyTypeName,
+  isMergeableReadonlyTypeReferenceNode,
   nextReadonlyContext,
   type ReadonlyContext,
 } from './readonly-transformer-helpers/index.mjs';
@@ -657,16 +657,24 @@ const transformTypeReferenceNode = (
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const T = removeParentheses(node.getTypeArguments()[0]!);
 
+    // `T` with the parentheses that `Readonly<...>` made unnecessary and its
+    // position may need (`Readonly<A | B>[]` -> `(A | B)[]`).
+    const unwrappedText =
+      T.isKind(tsm.SyntaxKind.UnionType) ||
+      T.isKind(tsm.SyntaxKind.IntersectionType)
+        ? wrapWithParentheses(T.getFullText())
+        : T.getFullText();
+
     // DeepReadonly<Readonly<T>> -> DeepReadonly<T>
     if (readonlyContext.type === 'DeepReadonly') {
-      options.replaceNode(node, T.getFullText());
+      options.replaceNode(node, unwrappedText);
 
       return;
     }
 
     // Readonly<{ ... }>[I] -> { ... }[I]
     if (readonlyContext.indexedAccessDepth > 0) {
-      options.replaceNode(node, T.getFullText());
+      options.replaceNode(node, unwrappedText);
 
       return;
     }
@@ -739,11 +747,14 @@ const transformTypeReferenceNode = (
 
     // T = A | B | C
     // T = A & B & C
+    //
+    // The union or intersection has already put back under `Readonly` every
+    // member that still needs it, so this one is redundant.
     if (
       T.isKind(tsm.SyntaxKind.UnionType) ||
       T.isKind(tsm.SyntaxKind.IntersectionType)
     ) {
-      options.replaceNode(node, T.getFullText());
+      options.replaceNode(node, unwrappedText);
 
       return;
     }
@@ -1286,7 +1297,8 @@ const transformConstructorParameter = (
 
 /**
  * - `tr(A & B) -> tr(A) & tr(B)`
- * - `tr(Readonly<A> & Readonly<B>) -> Readonly<tr(A) & tr(B)>`
+ * - `tr(Readonly<A> & Readonly<B>) -> Readonly<tr(A) & tr(B)>`, when `A` and `B`
+ *   are type literals (see `isMergeableReadonlyTypeReferenceNode`)
  */
 const transformIntersectionTypeNode = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -1341,14 +1353,23 @@ const transformUnionOrIntersectionTypeNodeImpl = (
   const newTypes = node.getTypeNodes();
 
   const { primitives, arraysAndTuples, typeLiterals, others } =
-    groupUnionIntersectionTypes(newTypes);
+    groupUnionIntersectionTypes(newTypes, {
+      operator,
+      // `Readonly<A & { b: B }>`: `A` stays under the `Readonly`, which the
+      // handler of `Readonly` then takes off as redundant.
+      underReadonly:
+        readonlyContext.type === 'Readonly' &&
+        readonlyContext.indexedAccessDepth === 0 &&
+        isTypeArgumentOfReadonly(node),
+      deepReadonlyTypeName: options.DeepReadonly.typeName,
+    });
 
   options.debugPrint({ primitives, arraysAndTuples, typeLiterals, others });
 
   // Separate empty type literals from non-empty ones when ignoreEmptyObjectTypes is true
   const isEmptyTypeLiteral = (
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-    n: tsm.TypeLiteralNode | ReadonlyTypeReferenceNode,
+    n: tsm.TypeNode,
   ): boolean =>
     n.isKind(tsm.SyntaxKind.TypeLiteral) && Arr.isEmpty(n.getMembers());
 
@@ -1370,10 +1391,13 @@ const transformUnionOrIntersectionTypeNodeImpl = (
       : ([
           unionToString({
             types: nonEmptyTypeLiterals.map((n) =>
-              isReadonlyTypeReferenceNode(n)
+              isMergeableReadonlyTypeReferenceNode(n, operator)
                 ? // NOTE: Readonly<A & B> -> (A & B)
                   unwrapReadonlyTypeArgText(n)
-                : (n satisfies tsm.TypeLiteralNode).getFullText(),
+                : n.isKind(tsm.SyntaxKind.TypeLiteral)
+                  ? n.getFullText()
+                  : // A member kept under `Readonly`; see `underReadonly`
+                    wrapWithParentheses(n.getFullText()),
             ),
             op: operator,
             wrapWithReadonly:
@@ -1468,8 +1492,9 @@ const transformUnionOrIntersectionTypeNodeImpl = (
  *
  * - `Readonly` is a homomorphic mapped type, and over type literals
  *   `Readonly<A & B>` and `Readonly<A> & Readonly<B>` have the same properties
- *   with the same modifiers. (That merge also takes `Readonly<T>` with any
- *   `T`, where this does not hold for an array `T`; it is not relied on here.)
+ *   with the same modifiers. That does not hold for an array `A`, so an
+ *   intersection merges only `Readonly<T>` whose `T` is known to be a type
+ *   literal; see `isMergeableReadonlyTypeReferenceNode`.
  * - `DeepReadonly` is a conditional type that picks a branch by what `T` is
  *   (primitive, function, Map, Set, array, object). It distributes over a union
  *   because each member is tested on its own, but an intersection is tested as
@@ -1521,6 +1546,21 @@ const mergeDeepReadonlyUnionMembers = (
       : i === firstIndex
         ? [merged]
         : [],
+  );
+};
+
+/** Whether `node` is the type argument of `Readonly<...>`, parentheses aside. */
+const isTypeArgumentOfReadonly = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: tsm.TypeNode,
+): boolean => {
+  const parent = node.getParent();
+
+  return (
+    parent !== undefined &&
+    (parent.isKind(tsm.SyntaxKind.ParenthesizedType)
+      ? isTypeArgumentOfReadonly(parent)
+      : isReadonlyTypeReferenceNode(parent))
   );
 };
 

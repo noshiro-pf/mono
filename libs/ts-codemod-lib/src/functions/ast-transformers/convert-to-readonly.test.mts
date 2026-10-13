@@ -3034,6 +3034,219 @@ describe(convertToReadonlyTransformer, () => {
     });
   });
 
+  describe('Readonly over a union or intersection', () => {
+    test.each(
+      [
+        // A member whose readonly-ness the codemod cannot see stays under the
+        // `Readonly` it was written under.
+        {
+          name: 'An alias in an intersection under Readonly stays under it',
+          source: dedent`
+            type X<A> = Readonly<A & { b: string[] }>;
+          `,
+          expected: dedent`
+            type X<A> = Readonly<A & { b: readonly string[] }>;
+          `,
+        },
+        {
+          name: 'An alias in a union under Readonly stays under it',
+          source: dedent`
+            type X<A> = Readonly<A | { b: string[] }>;
+          `,
+          expected: dedent`
+            type X<A> = Readonly<A | { b: readonly string[] }>;
+          `,
+        },
+        {
+          name: 'An intersection of aliases under Readonly is left as written',
+          source: dedent`
+            type X<A, B> = Readonly<A & B>;
+          `,
+          expected: dedent`
+            type X<A, B> = Readonly<A & B>;
+          `,
+        },
+        {
+          name: 'A nested union under Readonly stays under it',
+          source: dedent`
+            type X<A, B> = Readonly<(A | B) & { c: string[] }>;
+          `,
+          expected: dedent`
+            type X<A, B> = Readonly<(A | B) & { c: readonly string[] }>;
+          `,
+        },
+        {
+          name: 'Members readonly on their own are still taken out',
+          source: dedent`
+            type X<A> = Readonly<number | string[] | DeepReadonly<A> | Map<string, A> | { b: string }>;
+          `,
+          expected: dedent`
+            type X<A> = number | readonly string[] | DeepReadonly<A> | ReadonlyMap<string, A> | Readonly<{ b: string }>;
+          `,
+        },
+        {
+          // `Readonly` would drop the call signature.
+          name: 'A function type is still taken out',
+          source: dedent`
+            type X = Readonly<(() => void) & { b: string }>;
+          `,
+          expected: dedent`
+            type X = (() => void) & Readonly<{ b: string }>;
+          `,
+        },
+
+        // #2231: what replaces `Readonly<…>` keeps the parentheses its
+        // position needs.
+        {
+          name: 'Readonly of an intersection with an alias as an array element under readonly',
+          source: dedent`
+            type A = Readonly<{ a: string }>;
+            export type X = readonly Readonly<A & { b: string }>[];
+          `,
+          expected: dedent`
+            type A = Readonly<{ a: string }>;
+            export type X = readonly Readonly<A & { b: string }>[];
+          `,
+        },
+        {
+          name: 'Readonly of an intersection with an alias as an array element',
+          source: dedent`
+            type A = Readonly<{ a: string }>;
+            export type X = Readonly<A & { b: string }>[];
+          `,
+          expected: dedent`
+            type A = Readonly<{ a: string }>;
+            export type X = readonly Readonly<A & { b: string }>[];
+          `,
+        },
+        {
+          name: 'Readonly of a union with an alias as an array element',
+          source: dedent`
+            type X<A> = Readonly<A | { b: string }>[];
+          `,
+          expected: dedent`
+            type X<A> = readonly Readonly<A | { b: string }>[];
+          `,
+        },
+        {
+          name: 'Readonly of an intersection with an alias in ReadonlyArray',
+          source: dedent`
+            type X<A> = ReadonlyArray<Readonly<A & { b: string }>>;
+          `,
+          expected: dedent`
+            type X<A> = readonly Readonly<A & { b: string }>[];
+          `,
+        },
+        {
+          name: 'A Readonly that is taken off as an array element',
+          source: dedent`
+            type X = Readonly<number | readonly string[]>[];
+          `,
+          expected: dedent`
+            type X = readonly (number | readonly string[])[];
+          `,
+        },
+        {
+          name: 'A Readonly that is taken off under readonly',
+          source: dedent`
+            type X = readonly Readonly<number & { b: string }>[];
+          `,
+          expected: dedent`
+            type X = readonly (number & Readonly<{ b: string }>)[];
+          `,
+        },
+        {
+          name: 'A Readonly that is taken off as an intersection member',
+          source: dedent`
+            type X = { a: string } & Readonly<number | { b: string }>;
+          `,
+          expected: dedent`
+            type X = Readonly<{ a: string }> & (number | Readonly<{ b: string }>);
+          `,
+        },
+
+        // #2169: `Readonly<A> & Readonly<B>` is merged only when both are
+        // object types, because `Readonly<string[] & X>` leaves the array
+        // mutable.
+        {
+          name: 'An intersection of Readonly aliases is not merged',
+          source: dedent`
+            type X<A, B> = Readonly<A> & Readonly<B>;
+          `,
+          expected: dedent`
+            type X<A, B> = Readonly<A> & Readonly<B>;
+          `,
+        },
+        {
+          name: 'A Readonly alias is not merged with a type literal',
+          source: dedent`
+            type X<A> = Readonly<A> & { b: string[] };
+          `,
+          expected: dedent`
+            type X<A> = Readonly<A> & Readonly<{ b: readonly string[] }>;
+          `,
+        },
+        {
+          name: 'Readonly type literals in an intersection are merged',
+          source: dedent`
+            type X = Readonly<{ a: string } | { c: string }> & Readonly<{ b: string }>;
+          `,
+          expected: dedent`
+            type X = Readonly<({ a: string } | { c: string }) & { b: string }>;
+          `,
+        },
+        {
+          // A mapped type over anything but `keyof T` is an object type.
+          name: 'Mapped types in an intersection under Readonly are merged',
+          source: dedent`
+            type X<S, K extends keyof S> = Readonly<{ [k in K]?: S[k] } & { [k in Exclude<keyof S, K>]: S[k] }>;
+          `,
+          expected: dedent`
+            type X<S, K extends keyof S> = Readonly<{ [k in K]?: S[k] } & { [k in Exclude<keyof S, K>]: S[k] }>;
+          `,
+        },
+        {
+          // `{ [k in keyof T]: T[k] }` maps an array `T` to an array.
+          name: 'A homomorphic mapped type in an intersection is not merged',
+          source: dedent`
+            type X<T> = Readonly<{ [k in keyof T]: T[k] }> & Readonly<{ b: string }>;
+          `,
+          expected: dedent`
+            type X<T> = Readonly<{ [k in keyof T]: T[k] }> & Readonly<{ b: string }>;
+          `,
+        },
+        {
+          name: 'A union of Readonly aliases is still merged',
+          source: dedent`
+            type X<A, B> = Readonly<A> | Readonly<B>;
+          `,
+          expected: dedent`
+            type X<A, B> = Readonly<A | B>;
+          `,
+        },
+      ].flatMap((c) => [
+        c,
+        // The output is a fixed point: running the codemod again keeps it,
+        // readonly-ness included.
+        { ...c, name: `${c.name} (fixed point)`, source: c.expected },
+      ]),
+    )('$name', testFn);
+
+    // What merging `Readonly` members relies on.
+    test('premises of merging Readonly members', () => {
+      type X = { x: number };
+
+      // `Readonly` distributes over `|`, so merging a union is safe.
+      expectType<Readonly<string[] | X>, readonly string[] | Readonly<X>>('=');
+
+      // It does not over `&` with an array member: the merged form leaves the
+      // array mutable.
+      expectType<Readonly<string[] & X>, readonly string[] & Readonly<X>>('<=');
+
+      expectType<Readonly<string[] & X>, readonly string[] & Readonly<X>>('!=');
+    });
+  });
+
   describe('Parenthesized types', () => {
     test.each([
       {

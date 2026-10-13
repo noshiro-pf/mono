@@ -11,9 +11,30 @@ import {
   type ReadonlyTypeReferenceNode,
 } from '../../functions/index.mjs';
 
+/**
+ * Sorts the members of a union or intersection into the groups
+ * `convert-to-readonly` writes back separately.
+ *
+ * `typeLiterals` is the group joined and wrapped in a single `Readonly<...>`.
+ * It takes type literals, the `Readonly<...>` members that may be merged (see
+ * `isMergeableReadonlyTypeReferenceNode`), and, when the union or intersection
+ * is itself the argument of a `Readonly<...>` (`underReadonly`), every other
+ * member that `Readonly` still means something to (see `staysOutsideReadonly`):
+ * taking such a member out of the `Readonly` it was written under would drop
+ * its readonly-ness.
+ */
 export const groupUnionIntersectionTypes = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   types: readonly tsm.TypeNode[],
+  {
+    operator,
+    underReadonly,
+    deepReadonlyTypeName,
+  }: Readonly<{
+    operator: '&' | '|';
+    underReadonly: boolean;
+    deepReadonlyTypeName: string;
+  }>,
 ): Readonly<{
   primitives:
     | Readonly<{
@@ -37,7 +58,7 @@ export const groupUnionIntersectionTypes = (
   typeLiterals:
     | Readonly<{
         firstPosition: number;
-        nodes: readonly (tsm.TypeLiteralNode | ReadonlyTypeReferenceNode)[];
+        nodes: readonly tsm.TypeNode[];
       }>
     | undefined;
 
@@ -71,7 +92,7 @@ export const groupUnionIntersectionTypes = (
     typeLiterals:
       | Readonly<{
           firstPosition: number;
-          nodes: (tsm.TypeLiteralNode | ReadonlyTypeReferenceNode)[];
+          nodes: tsm.TypeNode[];
         }>
       | undefined;
 
@@ -130,7 +151,8 @@ export const groupUnionIntersectionTypes = (
     if (
       (t.isKind(tsm.SyntaxKind.TypeLiteral) &&
         !hasCallOrConstructSignature(t)) ||
-      isReadonlyTypeReferenceNode(t)
+      isMergeableReadonlyTypeReferenceNode(t, operator) ||
+      (underReadonly && !staysOutsideReadonly(t, deepReadonlyTypeName))
     ) {
       if (mut_grouped.typeLiterals === undefined) {
         mut_grouped.typeLiterals = {
@@ -156,4 +178,103 @@ export const groupUnionIntersectionTypes = (
   }
 
   return mut_grouped;
+};
+
+/**
+ * Whether a `Readonly<T>` member of a union or intersection may be merged with
+ * the others into one `Readonly<...>`.
+ *
+ * - In a union, any `T`: `Readonly` distributes over `|`, so `Readonly<A> |
+ *   Readonly<B>` and `Readonly<A | B>` are the same type.
+ * - In an intersection, only a `T` known to be an object type (see
+ *   `isObjectTypeLiteral`). Over object types `Readonly<A> & Readonly<B>` and
+ *   `Readonly<A & B>` agree, but `Readonly` maps an array to a readonly array
+ *   only when its argument _is_ an array, so `Readonly<string[] & X>` leaves the
+ *   array mutable where `Readonly<string[]> & Readonly<X>` does not. A type
+ *   parameter or an alias may be such an array.
+ */
+export const isMergeableReadonlyTypeReferenceNode = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: tsm.TypeNode,
+  operator: '&' | '|',
+): node is ReadonlyTypeReferenceNode =>
+  isReadonlyTypeReferenceNode(node) &&
+  (operator === '|' || isObjectTypeLiteral(node.getTypeArguments()[0]));
+
+/**
+ * A type literal or a mapped type known to be an object type, or a union,
+ * intersection or `Readonly<...>` of them.
+ */
+const isObjectTypeLiteral = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: tsm.TypeNode,
+): boolean => {
+  const t = removeParentheses(node);
+
+  if (t.isKind(tsm.SyntaxKind.TypeLiteral)) {
+    return true;
+  }
+
+  // A mapped type is an object type unless it maps over `keyof T`, which maps
+  // an array `T` to an array.
+  if (t.isKind(tsm.SyntaxKind.MappedType)) {
+    const constraint = t.getTypeParameter().getConstraint();
+
+    return !(
+      constraint?.isKind(tsm.SyntaxKind.TypeOperator) === true &&
+      constraint.getOperator() === tsm.SyntaxKind.KeyOfKeyword
+    );
+  }
+
+  if (isReadonlyTypeReferenceNode(t)) {
+    return isObjectTypeLiteral(t.getTypeArguments()[0]);
+  }
+
+  if (
+    t.isKind(tsm.SyntaxKind.UnionType) ||
+    t.isKind(tsm.SyntaxKind.IntersectionType)
+  ) {
+    return t.getTypeNodes().every(isObjectTypeLiteral);
+  }
+
+  return false;
+};
+
+/**
+ * Whether a member of a union or intersection under `Readonly<...>` may be
+ * taken out of it as it is.
+ *
+ * - A function or constructor type, or a type literal with a call or construct
+ *   signature, loses its signatures under `Readonly`; see
+ *   `hasCallOrConstructSignature`.
+ * - `keyof T` and `unique symbol` are not object types.
+ * - `DeepReadonly<T>`, `ReadonlyMap`, `ReadonlySet` and `ReadonlyRecord` are
+ *   readonly already.
+ */
+const staysOutsideReadonly = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: tsm.TypeNode,
+  deepReadonlyTypeName: string,
+): boolean => {
+  if (
+    node.isKind(tsm.SyntaxKind.FunctionType) ||
+    node.isKind(tsm.SyntaxKind.ConstructorType) ||
+    node.isKind(tsm.SyntaxKind.TypeLiteral) ||
+    node.isKind(tsm.SyntaxKind.TypeOperator)
+  ) {
+    return true;
+  }
+
+  if (node.isKind(tsm.SyntaxKind.TypeReference)) {
+    const typeName = node.getTypeName().getText();
+
+    return (
+      typeName === deepReadonlyTypeName ||
+      typeName === 'ReadonlyMap' ||
+      typeName === 'ReadonlySet' ||
+      typeName === 'ReadonlyRecord'
+    );
+  }
+
+  return false;
 };
