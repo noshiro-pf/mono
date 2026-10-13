@@ -48,12 +48,12 @@ const transformedCode = transformSourceCode(originalCode, isTsx, [
 const expected = dedent`
   import { type UnknownRecord } from "ts-type-forge";
 
-  export type A = Readonly< {
+  export type A = Readonly<{
     name?: string;
-    point: (readonly  [x: number, y: number, z?: number]);
-    meta: Readonly< {
+    point: (readonly [x: number, y: number, z?: number]);
+    meta: Readonly<{
         description?: string;
-        tags: (readonly  string[]);
+        tags: (readonly string[]);
         attributes: UnknownRecord;
         data?: unknown;
       }>;

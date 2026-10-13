@@ -3247,6 +3247,167 @@ describe(convertToReadonlyTransformer, () => {
     });
   });
 
+  describe('Comments in front of a member', () => {
+    // `replaceWithText` overwrites a node from `getStart()`, so a comment in
+    // front of it stays where it is. Text built for the replacement must carry
+    // the comments after that point — those in front of each member and those
+    // in front of the `|` / `&` separating them — and none before it.
+    test.each([
+      {
+        name: 'JSDoc on each member of a union with a leading `|`',
+        source: dedent`
+          export type ProbeStore =
+            /** Kept until the browser is closed. */
+            | 'session'
+            /** Kept until it is forgotten. */
+            | 'device';
+        `,
+        // Prettier itself moves the second comment to the end of the line
+        // before it; here it stays in front of its member.
+        expected: dedent`
+          export type ProbeStore =
+            | /** Kept until the browser is closed. */ 'session'
+            | /** Kept until it is forgotten. */ 'device';
+        `,
+      },
+      {
+        name: 'Line comments on each member of a union with a leading `|`',
+        source: dedent`
+          type T =
+            // first
+            | 'a'
+            // second
+            | 'b'
+            // third
+            | 'c';
+        `,
+        expected: dedent`
+          type T =
+            // first
+            | 'a'
+            // second
+            | 'b'
+            // third
+            | 'c';
+        `,
+      },
+      {
+        name: 'Comments on each member of a union without a leading `|`',
+        source: dedent`
+          type T = /** a */ 'a' | /** b */ 'b';
+        `,
+        expected: dedent`
+          type T = /** a */ 'a' | /** b */ 'b';
+        `,
+      },
+      {
+        name: 'A comment after `|` stays with the member after it',
+        source: dedent`
+          type T = 'a' | // about b
+            'b';
+        `,
+        expected: dedent`
+          type T = 'a' | // about b
+            'b';
+        `,
+      },
+      ...toUnionAndIntersectionTestCase({
+        title: (op) => `Comments on members of an ${op} that are converted`,
+        testCase: (op) => ({
+          source: dedent`
+            type T =
+              /** list */
+              ${op} number[]
+              /** object */
+              ${op} { a: number[] };
+          `,
+          // The comment on the object moves inside the `Readonly` around it.
+          expected: dedent`
+            type T =
+              /** list */
+              ${op} readonly number[]
+              ${op} Readonly</** object */ { a: readonly number[] }>;
+          `,
+        }),
+      }),
+      ...toUnionAndIntersectionTestCase({
+        title: (op) =>
+          `Comments on Readonly members of an ${op} that are merged`,
+        testCase: (op) => ({
+          source: dedent`
+            type T = /** a */ Readonly<{ a: number }> ${op} /** b */ Readonly<{ b: number }>;
+          `,
+          expected: dedent`
+            type T = /** a */ Readonly<{ a: number } ${op} /** b */ { b: number }>;
+          `,
+        }),
+      }),
+      {
+        name: 'Comments on DeepReadonly members that are merged',
+        source: dedent`
+          type T = /** a */ DeepReadonly<{ a: number[] }> | /** b */ DeepReadonly<{ b: string[] }>;
+        `,
+        expected: dedent`
+          type T = /** a */ DeepReadonly<{ a: number[] } | /** b */ { b: string[] }>;
+        `,
+      },
+      {
+        name: 'A comment in front of a union inside parentheses',
+        source: dedent`
+          type T = (/** a */ 'a' | 'b')[];
+        `,
+        expected: dedent`
+          type T = /** a */ readonly ('a' | 'b')[];
+        `,
+      },
+      {
+        name: 'Comments around parentheses that Readonly<T> unwraps',
+        source: dedent`
+          type T = Readonly</** a */ (/** b */ number[])>;
+        `,
+        expected: dedent`
+          type T = /** a */ /** b */ readonly number[];
+        `,
+      },
+      {
+        name: 'Comments around parentheses in a rest element',
+        source: dedent`
+          type T = [string, ...(/** a */ readonly number[])];
+        `,
+        expected: dedent`
+          type T = readonly [string, .../** a */ number[]];
+        `,
+      },
+      {
+        name: 'A comment in front of an array type',
+        source: dedent`
+          type T = /** c */ number[];
+        `,
+        expected: dedent`
+          type T = /** c */ readonly number[];
+        `,
+      },
+      {
+        name: 'A comment in front of a tuple type',
+        source: dedent`
+          type T = /** c */ [number, string];
+        `,
+        expected: dedent`
+          type T = /** c */ readonly [number, string];
+        `,
+      },
+      {
+        name: 'A comment in front of a type literal',
+        source: dedent`
+          type T = /** c */ { a: number };
+        `,
+        expected: dedent`
+          type T = /** c */ Readonly<{ a: number }>;
+        `,
+      },
+    ])('$name', testFn);
+  });
+
   describe('Parenthesized types', () => {
     test.each([
       {
@@ -4090,7 +4251,7 @@ describe(convertToReadonlyTransformer, () => {
           type /* Block Comment */ WithComments = Readonly<{
             prop1: readonly string[]; // Trailing comment
             /* Another block */
-            prop2: /* member type comment */ readonly /* member type inner comment */ number[];
+            prop2: /* member type comment */ /* member type inner comment */ readonly number[];
             /* End block */
           }>;
         `,
@@ -4891,11 +5052,10 @@ const toUnionAndIntersectionTestCase = ({
 
 describe('idempotency', () => {
   test('a union whose members carry leading whitespace reaches a fixed point', () => {
-    // The members are read with `getFullText()`, which includes the whitespace
-    // in front of each one, and joined with a separator that adds its own. Left
-    // alone the two compound, and a file with `// prettier-ignore` on a long
-    // union grows by one space per member on every run — nothing downstream
-    // normalizes it back.
+    // Whitespace in front of a member, joined with a separator that adds its
+    // own, compounds when left alone, and a file with `// prettier-ignore` on a
+    // long union grows by one space per member on every run — nothing
+    // downstream normalizes it back.
     const code = [
       '// prettier-ignore',
       'export type P = ',
@@ -4912,5 +5072,46 @@ describe('idempotency', () => {
     ]);
 
     expect(twice).toBe(once);
+  });
+
+  test('comments on union members survive rounds of the codemod and Prettier', async () => {
+    // `fix:codemod` runs the codemod and then Prettier, which takes off the
+    // parentheses the codemod puts around a union, so every run starts again
+    // from the unparenthesized form. A comment lost in one round or copied in
+    // the next shows up only across several of them.
+    const code = dedent`
+      export type ProbeStore =
+        /** Kept until the browser is closed. */
+        | 'session'
+        /** Kept until it is forgotten. */
+        | 'device';
+    `;
+
+    const round = async (src: string): Promise<string> =>
+      prettier.format(
+        transformSourceCode(src, false, [convertToReadonlyTransformer()]),
+        {
+          parser: 'typescript',
+          plugins: [prettierPluginTypeScript, prettierPluginEstree],
+        },
+      );
+
+    const round1 = await round(code);
+
+    const round2 = await round(round1);
+
+    const round3 = await round(round2);
+
+    expect(round1).toBe(
+      `${dedent`
+        export type ProbeStore =
+          /** Kept until the browser is closed. */
+          "session" | /** Kept until it is forgotten. */ "device";
+      `}\n`,
+    );
+
+    expect(round2).toBe(round1);
+
+    expect(round3).toBe(round1);
   });
 });
