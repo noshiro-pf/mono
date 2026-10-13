@@ -1,4 +1,9 @@
-import { DEFAULT_LAYOUT, withColumns, type Layout } from '../layout.mjs';
+import {
+  DEFAULT_LAYOUT,
+  withColumns,
+  withMode,
+  type Layout,
+} from '../layout.mjs';
 import { createLayoutStore, type LayoutStore } from './layout-store.mjs';
 
 describe(createLayoutStore, () => {
@@ -52,6 +57,65 @@ describe(createLayoutStore, () => {
 
     assert.deepStrictEqual(store.layout.getSnapshot().value.heights, {
       open: 360,
+    });
+  });
+
+  test('a boundary drag shares the height between two blocks', () => {
+    const { store } = setup(withMode(DEFAULT_LAYOUT, 'fill'));
+
+    store.startBoundaryResize({
+      upper: 'merged',
+      lower: 'issues',
+      fromY: 100,
+      upperHeight: 200,
+      lowerHeight: 200,
+      upperShare: 100,
+      lowerShare: 100,
+    });
+
+    store.resizeTo(150);
+
+    assert.deepStrictEqual(store.layout.getSnapshot().value.shares, {
+      merged: 125,
+      issues: 75,
+    });
+
+    store.endResize();
+
+    store.resizeTo(300);
+
+    assert.deepStrictEqual(store.layout.getSnapshot().value.shares, {
+      merged: 125,
+      issues: 75,
+    });
+
+    store.evenShares(['merged', 'issues']);
+
+    assert.deepStrictEqual(store.layout.getSnapshot().value.shares, {
+      merged: 100,
+      issues: 100,
+    });
+  });
+
+  test('the mode follows the layout, and emits only when it changes', () => {
+    const { store } = setup(DEFAULT_LAYOUT);
+
+    const mut_modes: string[] = [];
+
+    store.mode.subscribe((mode) => {
+      mut_modes.push(mode);
+    });
+
+    store.setMode('fill');
+
+    store.setShare('open', 50);
+
+    store.setMode('natural');
+
+    assert.deepStrictEqual(mut_modes, ['natural', 'fill', 'natural']);
+
+    assert.deepStrictEqual(store.layout.getSnapshot().value.shares, {
+      open: 50,
     });
   });
 

@@ -133,6 +133,13 @@ button, arranges them:
 - **A height of its own.** A block's bottom edge is dragged to give it one,
   and it then scrolls by itself; a double click there gives the natural
   height back.
+- **Or fill the window.** The page is then as tall as the window and never
+  scrolls: what the header leaves is shared out among each column's blocks,
+  and only a block scrolls, inside itself. A block's bottom edge is the line
+  between it and the block below, dragged to move height from one to the
+  other and double-clicked to even them; the dialog shows each block's part
+  of its column and changes it with buttons. The heights given in the other
+  mode are kept for the way back.
 
 Everything the pointer does on the page can be done in the Layout dialog with
 a keyboard, which is why the drag surfaces themselves are pointer-only. The
@@ -141,7 +148,9 @@ its own ghost image and does not work with touch.
 
 **The layout is kept in the URL**, as the theme is, so a bookmark opens the
 same way: `cols=2`, `left=open.merged`, `right=issues`, `split=40` (the left
-column's share, in percent) and `h.open=480` (a height, in pixels). Only what
+column's share, in percent), `h.open=480` (a height, in pixels), `mode=fill`
+and `s.open=150` (a block's share of its column, a weight against 100 for
+each block without one). Only what
 differs from one column in the usual order is written, a moment after the last
 change so that a drag does not rewrite the address bar on every pointer move.
 A URL edited by hand still opens: unknown blocks are dropped, missing ones put

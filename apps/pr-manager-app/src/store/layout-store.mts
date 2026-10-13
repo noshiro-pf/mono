@@ -1,6 +1,7 @@
 /**
  * The layout of the page's blocks, and what is going on with it: the block
- * being dragged, the height being dragged, and whether the settings are open.
+ * being dragged, the height or the line between two blocks being dragged,
+ * and whether the settings are open.
  *
  * What each change does to a layout is `layout.mts`; this holds the current
  * one and, once started, hands it to `save` — which in the browser writes it
@@ -9,15 +10,27 @@
  * that calls `history.replaceState` that often.
  */
 
-import { createState, debounce, type InitializedObservable } from 'synstate';
+import {
+  createState,
+  debounce,
+  map,
+  skipIfNoChange,
+  type InitializedObservable,
+} from 'synstate';
 import {
   DEFAULT_LAYOUT,
   moveBlock,
+  withBoundaryAt,
   withColumns,
+  withEvenShares,
   withHeight,
+  withMode,
+  withShare,
   withSplit,
   type BlockId,
+  type BoundaryDrag,
   type DropTarget,
+  type HeightMode,
   type Layout,
 } from '../layout.mjs';
 
@@ -34,21 +47,34 @@ export type Moving = Readonly<{
   target: DropTarget | undefined;
 }>;
 
-/** A height drag: whose, and where it started. */
-export type Resizing = Readonly<{
-  block: BlockId;
-  fromY: number;
-  fromHeight: number;
-}>;
+/**
+ * A height drag — whose, and where it started — in the `natural` mode, or the
+ * line between two blocks being dragged in the `fill` mode.
+ */
+export type Resizing = Readonly<
+  | {
+      type: 'height';
+      block: BlockId;
+      fromY: number;
+      fromHeight: number;
+    }
+  | { type: 'boundary'; drag: BoundaryDrag }
+>;
 
 export type LayoutStore = Readonly<{
   layout: InitializedObservable<Layout>;
+  /** The layout's mode, for what reads nothing else of it. */
+  mode: InitializedObservable<HeightMode>;
   moving: InitializedObservable<Moving | undefined>;
   resizing: InitializedObservable<Resizing | undefined>;
   settingsOpen: InitializedObservable<boolean>;
   setColumns: (columns: 1 | 2) => void;
   setSplit: (split: number) => void;
   setHeight: (block: BlockId, height: number | undefined) => void;
+  setMode: (mode: HeightMode) => void;
+  setShare: (block: BlockId, share: number | undefined) => void;
+  /** Gives the blocks the same height each, out of what they had. */
+  evenShares: (blocks: readonly BlockId[]) => void;
   move: (block: BlockId, target: DropTarget) => void;
   reset: () => void;
   startMove: (block: BlockId) => void;
@@ -58,6 +84,7 @@ export type LayoutStore = Readonly<{
   cancelMove: () => void;
   /** `height` is the block's as drawn when the drag starts. */
   startResize: (block: BlockId, y: number, height: number) => void;
+  startBoundaryResize: (drag: BoundaryDrag) => void;
   resizeTo: (y: number) => void;
   endResize: () => void;
   openSettings: () => void;
@@ -84,11 +111,23 @@ export const createLayoutStore = (deps: LayoutDeps): LayoutStore => {
     updateLayout((current) => withHeight(current, block, height));
   };
 
-  const resizeHeightTo = (y: number): void => {
+  const resizeToY = (y: number): void => {
     const current = getResizing();
 
-    if (current !== undefined) {
-      setHeight(current.block, current.fromHeight + y - current.fromY);
+    if (current === undefined) {
+      return;
+    }
+
+    switch (current.type) {
+      case 'height':
+        setHeight(current.block, current.fromHeight + y - current.fromY);
+
+        break;
+
+      case 'boundary':
+        updateLayout((latest) => withBoundaryAt(latest, current.drag, y));
+
+        break;
     }
   };
 
@@ -128,6 +167,7 @@ export const createLayoutStore = (deps: LayoutDeps): LayoutStore => {
 
   return {
     layout,
+    mode: layout.pipe(map((current) => current.mode)).pipe(skipIfNoChange()),
     moving,
     resizing,
     settingsOpen,
@@ -138,6 +178,15 @@ export const createLayoutStore = (deps: LayoutDeps): LayoutStore => {
       updateLayout((current) => withSplit(current, split));
     },
     setHeight,
+    setMode: (mode) => {
+      updateLayout((current) => withMode(current, mode));
+    },
+    setShare: (block, share) => {
+      updateLayout((current) => withShare(current, block, share));
+    },
+    evenShares: (blocks) => {
+      updateLayout((current) => withEvenShares(current, blocks));
+    },
     move,
     reset: () => {
       setLayout(DEFAULT_LAYOUT);
@@ -151,9 +200,12 @@ export const createLayoutStore = (deps: LayoutDeps): LayoutStore => {
       setMoving(undefined);
     },
     startResize: (block, y, height) => {
-      setResizing({ block, fromY: y, fromHeight: height });
+      setResizing({ type: 'height', block, fromY: y, fromHeight: height });
     },
-    resizeTo: resizeHeightTo,
+    startBoundaryResize: (drag) => {
+      setResizing({ type: 'boundary', drag });
+    },
+    resizeTo: resizeToY,
     endResize: () => {
       setResizing(undefined);
     },

@@ -14,6 +14,7 @@ import {
 import { REPORT_SOURCE, repositoryUrl } from './constants.mjs';
 import {
   headerSignals,
+  layoutSignals,
   reader,
   readerSignals,
   tokenSignals,
@@ -42,6 +43,9 @@ import {
  * top of the window the merge order's counts stop when they stay in view
  * under it (`index.css`): the toolbar wraps onto a second line on a narrow
  * screen, so that is not a length the stylesheet could know.
+ *
+ * In the layout's `fill` mode (`layout.mts`) the page is as tall as the
+ * window and does not scroll; the blocks share what the header leaves.
  */
 export const App = memoNamed('App', () => {
   const loadStatus = readerSignals.loadStatus.value;
@@ -49,6 +53,8 @@ export const App = memoNamed('App', () => {
   const token = tokenSignals.token.value;
 
   const folded = headerSignals.folded.value;
+
+  const layoutMode = layoutSignals.mode.value;
 
   // Outside the JSX: `react/jsx-no-leaked-render` rewrites a `&&` in an
   // attribute into a ternary whose other arm is `null`, and `disabled` does
@@ -70,6 +76,7 @@ export const App = memoNamed('App', () => {
     <main
       className={'page'}
       data-header={folded ? 'folded' : 'full'}
+      data-mode={layoutMode}
       style={style}
     >
       <header ref={headerRef} className={'page-header'}>

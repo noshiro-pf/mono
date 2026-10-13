@@ -19,6 +19,9 @@ type Props = Readonly<{
  * so the divider's own width comes out of both sides; on a screen too narrow
  * for two, the stylesheet stacks them into one (the grid template is then
  * ignored, which is why it can be an inline style).
+ *
+ * In the `fill` mode the layout takes the height the page leaves it, and each
+ * column shares that out among its blocks (`index.css`).
  */
 export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
   const { blocks } = props;
@@ -41,6 +44,7 @@ export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
     <div
       className={'block-layout'}
       data-columns={layout.columns}
+      data-mode={layout.mode}
       data-moving={moving !== undefined}
       style={style}
     >
@@ -49,7 +53,9 @@ export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
         column={0}
         heights={layout.heights}
         ids={layout.left}
+        mode={layout.mode}
         moving={moving}
+        shares={layout.shares}
       />
 
       {layout.columns === 2 ? (
@@ -61,7 +67,9 @@ export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
             column={1}
             heights={layout.heights}
             ids={layout.right}
+            mode={layout.mode}
             moving={moving}
+            shares={layout.shares}
           />
         </>
       ) : undefined}

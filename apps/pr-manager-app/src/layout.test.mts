@@ -1,14 +1,21 @@
 import {
   DEFAULT_LAYOUT,
+  DEFAULT_SHARE,
   dropIndex,
   layoutFromSearch,
   moveBlock,
   nearestDropTarget,
   searchWithLayout,
+  sharePercents,
   splitAt,
+  withBoundaryAt,
   withColumns,
+  withEvenShares,
   withHeight,
+  withMode,
+  withShare,
   withSplit,
+  type BoundaryDrag,
   type Layout,
 } from './layout.mjs';
 
@@ -30,8 +37,20 @@ describe(layoutFromSearch, () => {
         right: ['open', 'merged'],
         split: 35,
         heights: { open: 480 },
+        mode: 'natural',
+        shares: {},
       },
     );
+  });
+
+  test('reads the fill mode and the shares', () => {
+    const read = layoutFromSearch('?mode=fill&s.open=250&s.issues=37.25');
+
+    assert.strictEqual(read.mode, 'fill');
+
+    assert.deepStrictEqual(read.shares, { open: 250, issues: 37.3 });
+
+    assert.strictEqual(layoutFromSearch('?mode=bogus').mode, 'natural');
   });
 
   test('drops unknown and repeated blocks, and puts back the missing ones', () => {
@@ -95,6 +114,8 @@ describe(searchWithLayout, () => {
       right: ['issues', 'open'],
       split: 42,
       heights: { issues: 300, open: 640 },
+      mode: 'fill',
+      shares: { merged: 60, open: 140.5 },
     } as const;
 
     assert.deepStrictEqual(
@@ -187,6 +208,125 @@ describe(withHeight, () => {
       withHeight(withHeight(DEFAULT_LAYOUT, 'open', 300), 'open', undefined)
         .heights,
       {},
+    );
+  });
+});
+
+describe(withMode, () => {
+  test('switches the mode, and keeps the heights and the shares for the way back', () => {
+    const sized = withShare(
+      withHeight(DEFAULT_LAYOUT, 'open', 300),
+      'open',
+      50,
+    );
+
+    const filled = withMode(sized, 'fill');
+
+    assert.strictEqual(filled.mode, 'fill');
+
+    assert.deepStrictEqual(withMode(filled, 'natural'), sized);
+  });
+
+  test('writes the mode and the shares into the query string', () => {
+    assert.strictEqual(
+      searchWithLayout(
+        '',
+        withShare(withMode(DEFAULT_LAYOUT, 'fill'), 'merged', 50),
+      ),
+      '?mode=fill&s.merged=50',
+    );
+  });
+});
+
+describe(withShare, () => {
+  test('sets, rounds and clamps a share, and clears it', () => {
+    assert.deepStrictEqual(withShare(DEFAULT_LAYOUT, 'open', 33.333).shares, {
+      open: 33.3,
+    });
+
+    assert.deepStrictEqual(withShare(DEFAULT_LAYOUT, 'open', 1).shares, {
+      open: 10,
+    });
+
+    assert.deepStrictEqual(withShare(DEFAULT_LAYOUT, 'open', 5000).shares, {
+      open: 1000,
+    });
+
+    assert.deepStrictEqual(
+      withShare(withShare(DEFAULT_LAYOUT, 'open', 50), 'open', undefined)
+        .shares,
+      {},
+    );
+  });
+});
+
+describe(withEvenShares, () => {
+  test('gives the blocks the mean of their shares, which keeps their total', () => {
+    const layout = withShare(
+      withShare(DEFAULT_LAYOUT, 'open', 300),
+      'merged',
+      100,
+    );
+
+    assert.deepStrictEqual(withEvenShares(layout, ['open', 'merged']).shares, {
+      open: 200,
+      merged: 200,
+    });
+  });
+});
+
+describe(sharePercents, () => {
+  test('is each block’s part of its column, in whole percent', () => {
+    const layout = withShare(DEFAULT_LAYOUT, 'open', 2 * DEFAULT_SHARE);
+
+    assert.deepStrictEqual(
+      sharePercents(layout, ['open', 'merged', 'issues']),
+      [50, 25, 25],
+    );
+
+    assert.deepStrictEqual(sharePercents(DEFAULT_LAYOUT, ['issues']), [100]);
+
+    assert.deepStrictEqual(sharePercents(DEFAULT_LAYOUT, []), []);
+  });
+});
+
+describe(withBoundaryAt, () => {
+  const drag: BoundaryDrag = {
+    upper: 'open',
+    lower: 'merged',
+    fromY: 500,
+    upperHeight: 300,
+    lowerHeight: 300,
+    upperShare: 100,
+    lowerShare: 100,
+  } as const;
+
+  test('moves the line between two blocks with the pointer, and keeps their total', () => {
+    assert.deepStrictEqual(withBoundaryAt(DEFAULT_LAYOUT, drag, 560).shares, {
+      open: 120,
+      merged: 80,
+    });
+
+    assert.deepStrictEqual(withBoundaryAt(DEFAULT_LAYOUT, drag, 410).shares, {
+      open: 70,
+      merged: 130,
+    });
+  });
+
+  test('leaves each block at least the least height', () => {
+    const { shares } = withBoundaryAt(DEFAULT_LAYOUT, drag, 2000);
+
+    assert.deepStrictEqual(shares, { open: 173.3, merged: 26.7 });
+  });
+
+  test('changes nothing for blocks not drawn', () => {
+    assert.deepStrictEqual(
+      withBoundaryAt(
+        DEFAULT_LAYOUT,
+        { ...drag, upperHeight: 0, lowerHeight: 0 },
+        560,
+      ),
+      DEFAULT_LAYOUT,
     );
   });
 });
