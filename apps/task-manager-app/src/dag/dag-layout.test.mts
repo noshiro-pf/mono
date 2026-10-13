@@ -3,13 +3,15 @@ import {
   arrowKeyDelta,
   defaultDirection,
   dragPosition,
+  moveNodesTo,
   nodesBounds,
   NUDGE_STEP,
   NUDGE_STEP_LARGE,
+  PLACEMENT_GAP,
   placeNodes,
   positionsOf,
 } from './dag-layout.mjs';
-import type { LaidOutNode } from './graph-layout.mjs';
+import type { LaidOutEdge, LaidOutNode } from './graph-layout.mjs';
 import type { Point } from './pan-zoom.mjs';
 
 const nodeA: LaidOutNode = {
@@ -30,13 +32,20 @@ const nodeM: LaidOutNode = {
   height: 40,
 } as const;
 
+const edgeAM: LaidOutEdge = {
+  id: 'a->m',
+  from: 'task:a',
+  to: 'milestone:m',
+  label: '',
+} as const;
+
 describe(placeNodes, () => {
   test('puts a node where it was put by hand, and the rest where ELK did', () => {
     const positions: ReadonlyMap<GraphNodeId, Point> = new Map([
       ['task:a', { x: -10, y: 300 }],
     ]);
 
-    assert.deepStrictEqual(placeNodes([nodeA, nodeM], positions), [
+    assert.deepStrictEqual(placeNodes([nodeA, nodeM], [], positions), [
       { ...nodeA, x: -10, y: 300 },
       nodeM,
     ]);
@@ -47,7 +56,74 @@ describe(placeNodes, () => {
       ['task:gone', { x: 1, y: 2 }],
     ]);
 
-    assert.deepStrictEqual(placeNodes([nodeA], positions), [nodeA]);
+    assert.deepStrictEqual(placeNodes([nodeA], [], positions), [nodeA]);
+  });
+
+  test('is ELK’s layout as it is while no node was put anywhere', () => {
+    const over = { ...nodeM, x: 30, y: 30 } as const;
+
+    assert.deepStrictEqual(placeNodes([nodeA, over], [], new Map()), [
+      nodeA,
+      over,
+    ]);
+  });
+
+  test('moves a node put nowhere off a node put by hand, to the nearest place clear of it', () => {
+    const positions: ReadonlyMap<GraphNodeId, Point> = new Map([
+      ['task:a', { x: 200, y: 30 }],
+    ]);
+
+    // Above `a`, as close as `PLACEMENT_GAP` allows: closer than below,
+    // to the left or to the right.
+    assert.deepStrictEqual(placeNodes([nodeA, nodeM], [], positions), [
+      { ...nodeA, x: 200, y: 30 },
+      { ...nodeM, x: 200, y: 30 - nodeM.height - PLACEMENT_GAP },
+    ]);
+  });
+
+  test('moves a node put nowhere as far as the nodes it is joined to were moved', () => {
+    const positions: ReadonlyMap<GraphNodeId, Point> = new Map([
+      ['task:a', { x: 24, y: 324 }],
+    ]);
+
+    assert.deepStrictEqual(placeNodes([nodeA, nodeM], [edgeAM], positions), [
+      { ...nodeA, x: 24, y: 324 },
+      { ...nodeM, x: 200, y: 330 },
+    ]);
+  });
+
+  test('keeps the nodes put nowhere clear of each other, below on a tie', () => {
+    const first: LaidOutNode = { ...nodeA, id: 'task:b', x: 0, y: 0 } as const;
+
+    const second: LaidOutNode = {
+      ...nodeA,
+      id: 'task:c',
+      x: 50,
+      y: 0,
+    } as const;
+
+    const positions: ReadonlyMap<GraphNodeId, Point> = new Map([
+      ['task:gone', { x: 1, y: 2 }],
+    ]);
+
+    assert.deepStrictEqual(placeNodes([first, second], [], positions), [
+      first,
+      { ...second, y: first.height + PLACEMENT_GAP },
+    ]);
+  });
+});
+
+describe(moveNodesTo, () => {
+  test('moves the nodes `positions` has, and leaves the rest', () => {
+    const positions: ReadonlyMap<GraphNodeId, Point> = new Map([
+      ['task:a', { x: -10, y: 300 }],
+      ['task:gone', { x: 1, y: 2 }],
+    ]);
+
+    assert.deepStrictEqual(moveNodesTo([nodeA, nodeM], positions), [
+      { ...nodeA, x: -10, y: 300 },
+      nodeM,
+    ]);
   });
 });
 

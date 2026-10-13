@@ -4,6 +4,7 @@ import {
   ARC_NODE_GAP,
   COMPACT_MILESTONE_NODE_SIZE,
   COMPACT_TASK_NODE_SIZE,
+  PLACEMENT_GAP,
   TASK_NODE_SIZE,
   TILE_NODE_GAP,
   type DagDirection,
@@ -41,6 +42,14 @@ const two: DomainState = {
   tasks: Arr.toPushed(
     one.tasks,
     createTask({ id: asTaskId('b'), title: 'B', now: 0 }),
+  ),
+  milestones: [],
+} as const;
+
+const three: DomainState = {
+  tasks: Arr.toPushed(
+    two.tasks,
+    createTask({ id: asTaskId('c'), title: 'C', now: 0 }),
   ),
   milestones: [],
 } as const;
@@ -704,6 +713,119 @@ describe(createDagLayoutStore, () => {
           positions: positions([['task:a', { x: 0, y: 0 }]]),
         },
       ]);
+    });
+  });
+
+  describe('a node added', () => {
+    test('lays the DAG out again when it was as 自動整列 left it', async () => {
+      const { store, deferred, clock, saved, setState } = await shown();
+
+      store.autoArrange();
+
+      const fits = store.fitRequests.getSnapshot().value;
+
+      setState(three);
+
+      deferred.resolve(1, 300);
+
+      await settle();
+
+      assert.deepStrictEqual(saved.at(-1), {
+        direction: 'right',
+        positions: positions([
+          ['task:a', { x: 0, y: 0 }],
+          ['task:b', { x: 300, y: 0 }],
+          ['task:c', { x: 600, y: 0 }],
+        ]),
+      });
+
+      // From where they were, as for 自動整列.
+      assert.deepStrictEqual(animated(store)?.get('task:b'), { x: 100, y: 0 });
+
+      assert.strictEqual(store.fitRequests.getSnapshot().value, fits + 1);
+
+      clock.advance(ANIMATION_MS);
+
+      assert.isUndefined(animated(store));
+    });
+
+    test('lays it out again for a node removed, too', async () => {
+      const { store, deferred, saved, setState } = await shown();
+
+      store.autoArrange();
+
+      setState(one);
+
+      deferred.resolve(1, 300);
+
+      await settle();
+
+      assert.deepStrictEqual(saved.at(-1), {
+        direction: 'right',
+        positions: positions([['task:a', { x: 0, y: 0 }]]),
+      });
+    });
+
+    test('writes nothing while nothing was ever saved', async () => {
+      const { deferred, saved, setState } = await shown();
+
+      setState(three);
+
+      deferred.resolve(1, 300);
+
+      await settle();
+
+      assert.deepStrictEqual(saved, []);
+    });
+
+    test('once a node was moved by hand, is put clear of the others and saved, the rest staying', async () => {
+      const { store, deferred, saved, setState } = await shown();
+
+      store.autoArrange();
+
+      store.moveNode('task:b', { x: 300, y: 0 });
+
+      const fits = store.fitRequests.getSnapshot().value;
+
+      setState(three);
+
+      // ELK puts `c` at (200, 0), over `b`.
+      deferred.resolve(1);
+
+      await settle();
+
+      assert.deepStrictEqual(saved.at(-1), {
+        direction: 'right',
+        positions: positions([
+          ['task:a', { x: 0, y: 0 }],
+          ['task:b', { x: 300, y: 0 }],
+          ['task:c', { x: 200, y: TASK_NODE_SIZE.height + PLACEMENT_GAP }],
+        ]),
+      });
+
+      assert.isUndefined(animated(store));
+
+      assert.strictEqual(store.fitRequests.getSnapshot().value, fits);
+    });
+
+    test('does not lay the DAG out again for a new direction', async () => {
+      const { store, deferred, saved } = await shown();
+
+      store.autoArrange();
+
+      store.setDirection('down');
+
+      deferred.resolve(1);
+
+      await settle();
+
+      assert.deepStrictEqual(saved.at(-1), {
+        direction: 'down',
+        positions: positions([
+          ['task:a', { x: 0, y: 0 }],
+          ['task:b', { x: 100, y: 0 }],
+        ]),
+      });
     });
   });
 

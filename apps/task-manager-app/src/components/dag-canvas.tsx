@@ -29,6 +29,7 @@ import {
   highlightOf,
   IDLE_GESTURE,
   interpolateTransform,
+  moveNodesTo,
   nodesBounds,
   placeNodes,
   pointerDown,
@@ -199,8 +200,9 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
 
   // At the current size, which a layout still being made at it may not be.
   const placed = useMemo(
-    () => placeNodes(resizeNodes(layout.nodes, nodeSize), positions),
-    [layout.nodes, nodeSize, positions],
+    () =>
+      placeNodes(resizeNodes(layout.nodes, nodeSize), layout.edges, positions),
+    [layout.nodes, layout.edges, nodeSize, positions],
   );
 
   // While they move, the nodes moving, wherever they are going; otherwise
@@ -208,7 +210,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
   const shown = useMemo(
     () =>
       animated !== undefined
-        ? placeNodes(placed, animated).filter(({ id }) => animated.has(id))
+        ? moveNodesTo(placed, animated).filter(({ id }) => animated.has(id))
         : mode === 'arc'
           ? arcNodes
           : mode === 'tile'
