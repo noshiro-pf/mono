@@ -540,6 +540,55 @@ describe(convertToReadonlyTransformer, () => {
             type T = readonly Readonly<{ x: 1 } | { y: 2 }>[]
           `,
         },
+        {
+          name: 'DeepReadonly wrapped with `Readonly`',
+          source: dedent`
+            type T = Readonly<DeepReadonly<{ a: number[] }>>
+          `,
+          expected: dedent`
+            type T = DeepReadonly<{ a: number[] }>
+          `, // Readonly<DeepReadonly<T>> -> DeepReadonly<T>
+        },
+        {
+          name: 'Parenthesized DeepReadonly wrapped with `Readonly`',
+          source: dedent`
+            type T = Readonly<(DeepReadonly<{ a: number[] }>)>
+          `,
+          expected: dedent`
+            type T = DeepReadonly<{ a: number[] }>
+          `,
+        },
+        {
+          name: 'Generic DeepReadonly wrapped with `Readonly`',
+          source: dedent`
+            type T<A> = Readonly<DeepReadonly<A>>
+          `,
+          expected: dedent`
+            type T<A> = DeepReadonly<A>
+          `,
+        },
+        {
+          name: 'DeepReadonly wrapped with `Readonly` under a custom typeName',
+          source: dedent`
+            type T = Readonly<DeepRO<{ a: number[] }>>
+          `,
+          expected: dedent`
+            type T = DeepRO<{ a: number[] }>
+          `,
+          options: { DeepReadonly: { typeName: 'DeepRO' } },
+        },
+        {
+          // `DeepReadonly` is not the configured name here, so it is an
+          // ordinary generic and the `Readonly` around it stays.
+          name: 'A type named DeepReadonly is not unwrapped under a custom typeName',
+          source: dedent`
+            type T<A> = Readonly<DeepReadonly<A>>
+          `,
+          expected: dedent`
+            type T<A> = Readonly<DeepReadonly<A>>
+          `,
+          options: { DeepReadonly: { typeName: 'DeepRO' } },
+        },
       ])('$name', testFn);
     });
 
@@ -2774,7 +2823,7 @@ describe(convertToReadonlyTransformer, () => {
           type NestedIntersection = ({ a: string; } & { b: number; }) & { c: boolean[]; };
         `,
         expected: dedent`
-          type NestedIntersection = Readonly<({ a: string; } & { b: number; }) & { c: readonly boolean[]; }>;
+          type NestedIntersection = Readonly<{ a: string; } & { b: number; } & { c: readonly boolean[]; }>;
         `,
       },
       {
@@ -2830,6 +2879,52 @@ describe(convertToReadonlyTransformer, () => {
         `,
         expected: dedent`
           type ReadonlyUnion = Readonly<{ a: readonly string[]; } | { b: readonly number[]; }>;
+        `,
+      },
+      {
+        name: 'Readonly members whose argument is a union are merged without parentheses',
+        source: dedent`
+          type T = Readonly<{ a: number } | { b: number }> | Readonly<{ c: number }>;
+        `,
+        expected: dedent`
+          type T = Readonly<{ a: number } | { b: number } | { c: number }>;
+        `,
+      },
+      {
+        name: 'Readonly members whose argument is a parenthesized union are merged without parentheses',
+        source: dedent`
+          type T = Readonly<{ a: number }> | Readonly<({ b: number } | { c: number })>;
+        `,
+        expected: dedent`
+          type T = Readonly<{ a: number } | { b: number } | { c: number }>;
+        `,
+      },
+      {
+        name: 'Readonly members whose argument is an intersection are merged without parentheses',
+        source: dedent`
+          type T = Readonly<{ a: number } & { b: number }> & Readonly<{ c: number }>;
+        `,
+        expected: dedent`
+          type T = Readonly<{ a: number } & { b: number } & { c: number }>;
+        `,
+      },
+      {
+        // An intersection argument spliced into a union keeps its parentheses.
+        name: 'An intersection argument merged into a union of Readonly members keeps its parentheses',
+        source: dedent`
+          type T = Readonly<{ a: number } & { b: number }> | Readonly<{ c: number }>;
+        `,
+        expected: dedent`
+          type T = Readonly<({ a: number } & { b: number }) | { c: number }>;
+        `,
+      },
+      {
+        name: 'A union argument merged into an intersection of Readonly members keeps its parentheses',
+        source: dedent`
+          type T = Readonly<{ a: number } | { b: number }> & Readonly<{ c: number }>;
+        `,
+        expected: dedent`
+          type T = Readonly<({ a: number } | { b: number }) & { c: number }>;
         `,
       },
     ])('$name', testFn);
@@ -3367,6 +3462,24 @@ describe(convertToReadonlyTransformer, () => {
         `,
         expected: dedent`
           type T = /** a */ /** b */ readonly number[];
+        `,
+      },
+      {
+        name: 'Comments around a DeepReadonly argument that Readonly<T> unwraps',
+        source: dedent`
+          type T = Readonly</** a */ (/** b */ DeepReadonly<{ a: number[] }>)>;
+        `,
+        expected: dedent`
+          type T = /** a */ /** b */ DeepReadonly<{ a: number[] }>;
+        `,
+      },
+      {
+        name: 'Comments around a union argument spliced into a merged union',
+        source: dedent`
+          type T = Readonly</** a */ (/** b */ { a: number } | { b: number })> | Readonly<{ c: number }>;
+        `,
+        expected: dedent`
+          type T = /** a */ /** b */ Readonly<{ a: number } | { b: number } | { c: number }>;
         `,
       },
       {

@@ -27,6 +27,7 @@ import {
   shouldAvoidParenthesesForReadonly,
   unwrapReadonlyTypeArgText,
   wrapWithParentheses,
+  type ReadonlyTypeReferenceNode,
 } from '../functions/index.mjs';
 import { replaceNodeWithDebugPrint } from '../utils/index.mjs';
 import {
@@ -693,6 +694,15 @@ const transformTypeReferenceNode = (
 
     // Readonly<Readonly<T>> -> Readonly<T>
     if (isReadonlyTypeReferenceNode(T)) {
+      options.replaceNode(node, TText);
+
+      return;
+    }
+
+    // Readonly<DeepReadonly<T>> -> DeepReadonly<T>
+    if (
+      getDeepReadonlyTypeArg(T, options.DeepReadonly.typeName) !== undefined
+    ) {
       options.replaceNode(node, TText);
 
       return;
@@ -1422,8 +1432,9 @@ const transformUnionOrIntersectionTypeNodeImpl = (
               withLeadingComments(
                 n,
                 isMergeableReadonlyTypeReferenceNode(n, operator)
-                  ? // NOTE: Readonly<A & B> -> (A & B)
-                    unwrapReadonlyTypeArgText(n)
+                  ? // NOTE: Readonly<A & B> -> (A & B) (spliced into `|`)
+                    // NOTE: Readonly<A | B> -> A | B (spliced into `|`)
+                    readonlyTypeArgTextSplicedInto(n, operator)
                   : n.isKind(tsm.SyntaxKind.TypeLiteral)
                     ? n.getText()
                     : // A member kept under `Readonly`; see `underReadonly`
@@ -1659,6 +1670,32 @@ const leadingCommentsOfMember = (
       ?.getEnd() ?? node.getStart(),
     member.getStart(),
   );
+
+/**
+ * `Readonly<T>` |-> the text of `T`, to be spliced into a union (`|`) or an
+ * intersection (`&`) of the members it is merged with.
+ *
+ * `T` is wrapped in parentheses for precedence safety (a function type
+ * argument needs them), unless it is a union spliced into a union or an
+ * intersection spliced into an intersection, which needs none.
+ */
+const readonlyTypeArgTextSplicedInto = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: ReadonlyTypeReferenceNode,
+  operator: '&' | '|',
+): string => {
+  const typeArgument = node.getTypeArguments()[0];
+
+  const T = removeParentheses(typeArgument);
+
+  return T.isKind(
+    operator === '|'
+      ? tsm.SyntaxKind.UnionType
+      : tsm.SyntaxKind.IntersectionType,
+  )
+    ? textWithoutParentheses(typeArgument, T)
+    : unwrapReadonlyTypeArgText(node);
+};
 
 /**
  * The text of `inner`, a type `removeParentheses` took out of `outer`, with
