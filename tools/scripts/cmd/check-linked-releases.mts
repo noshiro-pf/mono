@@ -130,11 +130,12 @@ export const checkLinkedReleases = ({
 };
 
 /**
- * The `linked` groups of a changesets config. A config without the key has
- * none; one whose key is not a list of lists of strings is an error.
+ * The `fixed` or `linked` groups of a changesets config. A config without the
+ * key has none; one whose key is not a list of lists of strings is an error.
  */
-export const parseLinkedGroups = (
+export const parseReleaseGroups = (
   config: string,
+  key: 'fixed' | 'linked',
 ): Result<readonly (readonly string[])[], string> => {
   const parsed = Json.parse(config);
 
@@ -142,25 +143,25 @@ export const parseLinkedGroups = (
     return Result.err(`${CONFIG_FILE} is not a JSON object.`);
   }
 
-  if (!hasKey(parsed.value, 'linked')) {
+  if (!hasKey(parsed.value, key)) {
     return Result.ok([]);
   }
 
-  const { linked } = parsed.value;
+  const groups = parsed.value[key];
 
   if (
-    !Arr.isArray(linked) ||
-    !linked.every(
+    !Arr.isArray(groups) ||
+    !groups.every(
       (group): group is readonly string[] =>
         Arr.isArray(group) && group.every(isString),
     )
   ) {
     return Result.err(
-      `${CONFIG_FILE}: "linked" is not a list of lists of package names.`,
+      `${CONFIG_FILE}: "${key}" is not a list of lists of package names.`,
     );
   }
 
-  return Result.ok(linked);
+  return Result.ok(groups);
 };
 
 const CONFIG_FILE = '.changeset/config.json';
@@ -192,7 +193,7 @@ if (isDirectlyExecuted(import.meta.url)) {
     readVersions(),
   ])
     .then(([changesets, config, versions]) =>
-      Result.flatMap(parseLinkedGroups(config), (linked) =>
+      Result.flatMap(parseReleaseGroups(config, 'linked'), (linked) =>
         checkLinkedReleases({ changesets, linked, versions }),
       ),
     )

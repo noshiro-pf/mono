@@ -225,7 +225,7 @@ type Summary = Readonly<{
   reminders: readonly string[];
 }>;
 
-type Bump = 'major' | 'minor' | 'patch';
+export type Bump = 'major' | 'minor' | 'patch';
 
 const STOCK_FILE_NAME = 'NEXT_MAJOR.md';
 

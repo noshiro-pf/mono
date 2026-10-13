@@ -2,24 +2,33 @@ import { Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   checkLinkedReleases,
-  parseLinkedGroups,
+  parseReleaseGroups,
 } from './check-linked-releases.mjs';
 import type { ChangesetFile } from './check-next-major.mjs';
 
-describe('parseLinkedGroups', () => {
+describe('parseReleaseGroups', () => {
   test('reads the groups', () => {
     assert.deepStrictEqual(
-      parseLinkedGroups('{ "linked": [["a", "b"], ["c"]] }'),
+      parseReleaseGroups('{ "linked": [["a", "b"], ["c"]] }', 'linked'),
       Result.ok([['a', 'b'], ['c']]),
     );
   });
 
+  test('reads the key asked for', () => {
+    assert.deepStrictEqual(
+      parseReleaseGroups('{ "fixed": [["a-*"]], "linked": [["b"]] }', 'fixed'),
+      Result.ok([['a-*']]),
+    );
+  });
+
   test('reads no group from a config without the key', () => {
-    assert.deepStrictEqual(parseLinkedGroups('{}'), Result.ok([]));
+    assert.deepStrictEqual(parseReleaseGroups('{}', 'linked'), Result.ok([]));
   });
 
   test('rejects a key of another shape', () => {
-    assert.isTrue(Result.isErr(parseLinkedGroups('{ "linked": ["a", "b"] }')));
+    assert.isTrue(
+      Result.isErr(parseReleaseGroups('{ "linked": ["a", "b"] }', 'linked')),
+    );
   });
 });
 
