@@ -100,84 +100,92 @@ chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => {
 });
 
 if (SPLIT_VIEW_DIAGNOSTICS) {
-  /**
-   * Everything the diagnostics panel needs in order to answer "did a rule act on
-   * that request?" without anyone having to reproduce the failure twice.
-   *
-   * `onRuleMatchedDebug` fires for every rule this extension matches (unpacked
-   * extensions with `declarativeNetRequestFeedback` only), and the navigation
-   * events say what each pane's frame actually tried to load and what became of
-   * it. Between them, a pane that will not load is either a request no rule
-   * touched, or a request that was modified and still refused.
-   */
-  chrome.declarativeNetRequest.onRuleMatchedDebug.addListener((info) => {
-    appendEvent({
-      kind: 'rule-matched',
-      ruleId: info.rule.ruleId,
-      ruleset: info.rule.rulesetId,
-      tabId: info.request.tabId,
-      type: info.request.type,
-      url: info.request.url,
-    }).catch(console.error);
-  });
-}
-
-if (SPLIT_VIEW_DIAGNOSTICS) {
-  /**
-   * The network layer, observed read-only.
-   *
-   * `webRequest` here is a *diagnostic*, not part of how the split view works:
-   * it is the only way to see what Chrome attributes a pane's request to
-   * (`initiator`, `tabId`, `type`) and which framing headers are on the response
-   * by the time it arrives. A pane that will not load is then answerable rather
-   * than arguable. It can be dropped once the cause is known — see `docs/development.md`.
-   */
-  chrome.webRequest.onBeforeRequest.addListener(
-    (details) => {
-      logFrameEvent('request', details, undefined, {
-        type: details.type,
-        initiator: details.initiator ?? '(none)',
+  // A debugging API the browser does not offer throws here. Uncaught, that
+  // would stop the worker's module halfway through its first run: the
+  // listeners above would stay registered, but every function they call is
+  // declared further down and would never be assigned, so the GitHub button
+  // would fail with "<name> is not a function". The diagnostics are an extra;
+  // losing them must not take the worker with them.
+  try {
+    /**
+     * Everything the diagnostics panel needs in order to answer "did a rule act on
+     * that request?" without anyone having to reproduce the failure twice.
+     *
+     * `onRuleMatchedDebug` fires for every rule this extension matches (unpacked
+     * extensions with `declarativeNetRequestFeedback` only), and the navigation
+     * events say what each pane's frame actually tried to load and what became of
+     * it. Between them, a pane that will not load is either a request no rule
+     * touched, or a request that was modified and still refused.
+     */
+    chrome.declarativeNetRequest.onRuleMatchedDebug.addListener((info) => {
+      appendEvent({
+        kind: 'rule-matched',
+        ruleId: info.rule.ruleId,
+        ruleset: info.rule.rulesetId,
+        tabId: info.request.tabId,
+        type: info.request.type,
+        url: info.request.url,
       }).catch(console.error);
-    },
-    { urls: ['<all_urls>'], types: ['sub_frame'] },
-  );
+    });
 
-  chrome.webRequest.onHeadersReceived.addListener(
-    (details) => {
-      const headers = details.responseHeaders ?? [];
+    /**
+     * The network layer, observed read-only.
+     *
+     * `webRequest` here is a *diagnostic*, not part of how the split view works:
+     * it is the only way to see what Chrome attributes a pane's request to
+     * (`initiator`, `tabId`, `type`) and which framing headers are on the response
+     * by the time it arrives. A pane that will not load is then answerable rather
+     * than arguable. It can be dropped once the cause is known — see `docs/development.md`.
+     */
+    chrome.webRequest.onBeforeRequest.addListener(
+      (details) => {
+        logFrameEvent('request', details, undefined, {
+          type: details.type,
+          initiator: details.initiator ?? '(none)',
+        }).catch(console.error);
+      },
+      { urls: ['<all_urls>'], types: ['sub_frame'] },
+    );
 
-      const named = (wanted: string): string =>
-        headers
-          .filter((header) => header.name.toLowerCase() === wanted)
-          .map((header) => (header.value ?? '').slice(0, 60))
-          .join(' | ');
+    chrome.webRequest.onHeadersReceived.addListener(
+      (details) => {
+        const headers = details.responseHeaders ?? [];
 
-      logFrameEvent('headers', details, undefined, {
-        status: details.statusCode,
-        xFrameOptions: named('x-frame-options'),
-        csp: named('content-security-policy').includes('frame-ancestors')
-          ? 'has frame-ancestors'
-          : named('content-security-policy'),
-        cspCount: headers.filter(
-          (header) => header.name.toLowerCase() === 'content-security-policy',
-        ).length,
-      }).catch(console.error);
-    },
-    { urls: ['<all_urls>'], types: ['sub_frame'] },
-    ['responseHeaders'],
-  );
+        const named = (wanted: string): string =>
+          headers
+            .filter((header) => header.name.toLowerCase() === wanted)
+            .map((header) => (header.value ?? '').slice(0, 60))
+            .join(' | ');
 
-  chrome.webNavigation.onCommitted.addListener((details) => {
-    if (details.frameId !== 0) {
-      logFrameEvent('committed', details).catch(console.error);
-    }
-  });
+        logFrameEvent('headers', details, undefined, {
+          status: details.statusCode,
+          xFrameOptions: named('x-frame-options'),
+          csp: named('content-security-policy').includes('frame-ancestors')
+            ? 'has frame-ancestors'
+            : named('content-security-policy'),
+          cspCount: headers.filter(
+            (header) => header.name.toLowerCase() === 'content-security-policy',
+          ).length,
+        }).catch(console.error);
+      },
+      { urls: ['<all_urls>'], types: ['sub_frame'] },
+      ['responseHeaders'],
+    );
 
-  chrome.webNavigation.onErrorOccurred.addListener((details) => {
-    if (details.frameId !== 0) {
-      logFrameEvent('error', details, details.error).catch(console.error);
-    }
-  });
+    chrome.webNavigation.onCommitted.addListener((details) => {
+      if (details.frameId !== 0) {
+        logFrameEvent('committed', details).catch(console.error);
+      }
+    });
+
+    chrome.webNavigation.onErrorOccurred.addListener((details) => {
+      if (details.frameId !== 0) {
+        logFrameEvent('error', details, details.error).catch(console.error);
+      }
+    });
+  } catch (error) {
+    console.error('Split View: the diagnostics could not be started.', error);
+  }
 }
 
 /**
