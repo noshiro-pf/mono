@@ -16,6 +16,12 @@
  * reader changes something nothing is written, and the direction follows the
  * screen. A drag is saved when it is dropped; the arrow keys, after a pause.
  *
+ * The exception is a DAG that 「自動整列」 left as it was: when a node or an
+ * edge is added or removed, and nothing has moved since, ELK's layout of the
+ * changed graph is applied as 「自動整列」 applies it, so that it stays laid
+ * out. Otherwise a node new to the graph is put beside the nodes it is
+ * joined to and clear of every other (`placeNodes`), and saved there.
+ *
  * The nodes move to their places in a short animation, which is never
  * saved: from a grid, in the order they were made, the first time the DAG
  * is shown with something in it; from where they were, after 「自動整列」 or
@@ -293,6 +299,12 @@ export const createDagLayoutStore = <H, F>(
 
   let mut_requestedKey: string | undefined = undefined;
 
+  /**
+   * The direction and the node size the layout on screen was made in;
+   * `undefined` while there is none.
+   */
+  let mut_shownMadeFor: LayoutMadeFor | undefined = undefined;
+
   let mut_arrangeRequested = false;
 
   let mut_nudgeTimer: H | undefined = undefined;
@@ -324,17 +336,35 @@ export const createDagLayoutStore = <H, F>(
   };
 
   /**
+   * Every node of the layout on screen, at the current size — which the
+   * layout may not have been made at yet — where the DAG draws it with
+   * `positions` stored (`placeNodes`).
+   */
+  const placedWith = (
+    positions: ReadonlyMap<GraphNodeId, Point>,
+  ): readonly LaidOutNode[] => {
+    const shown = shownAutoLayout();
+
+    return placeNodes(
+      resizeNodes(shown?.nodes ?? [], mut_nodeSize),
+      shown?.edges ?? [],
+      positions,
+    );
+  };
+
+  /**
    * `next` with a position for every node there is: where it was put, or
-   * where ELK has it. Positions of nodes that are gone are dropped here.
+   * where the DAG draws it. Positions of nodes that are gone are dropped
+   * here.
    */
   const frozen = (next: DagLayout): DagLayout => {
-    const auto = positionsOf(shownAutoLayout()?.nodes ?? []);
+    const drawn = positionsOf(placedWith(next.positions));
 
     return {
       direction: next.direction,
       positions: new Map(
         listNodes(deps.state.getSnapshot().value).flatMap(({ id }) => {
-          const position = next.positions.get(id) ?? auto.get(id);
+          const position = next.positions.get(id) ?? drawn.get(id);
 
           return position === undefined ? [] : [[id, position] as const];
         }),
@@ -342,16 +372,9 @@ export const createDagLayoutStore = <H, F>(
     };
   };
 
-  /**
-   * Every node there is, where the DAG draws it when nothing is moving, at
-   * the current size — which the layout on screen may not have been made
-   * at yet.
-   */
+  /** Every node there is, where the DAG draws it when nothing is moving. */
   const placed = (): readonly LaidOutNode[] =>
-    placeNodes(
-      resizeNodes(shownAutoLayout()?.nodes ?? [], mut_nodeSize),
-      getArrangement().positions,
-    );
+    placedWith(getArrangement().positions);
 
   /**
    * The tasks `ids` where 「アーク」 or 「タイル」 draws them at `size`: what
@@ -583,6 +606,45 @@ export const createDagLayoutStore = <H, F>(
     }
 
     updateFitRequests((count) => count + 1);
+  };
+
+  /**
+   * The graph laid out as `laidOut` after a change to its structure, the
+   * direction and the node size staying as they were for `previous`, the
+   * layout on screen until now. If the DAG was drawn as ELK laid out
+   * `previous` — no node moved since 「自動整列」, or since the last such
+   * change — it is laid out again, as 「自動整列」 does. Otherwise every node
+   * new to the graph that was never put anywhere is saved where the DAG
+   * draws it, clear of the others (`placeNodes`), so that it stays there
+   * however ELK lays out the graph next. Nothing is written while nothing
+   * ever was.
+   */
+  const followStructure = (
+    previous: GraphLayout,
+    laidOut: GraphLayout,
+  ): void => {
+    const { positions } = getArrangement();
+
+    if (positions.size === 0) {
+      return;
+    }
+
+    if (
+      samePositions(
+        positionsOf(placeNodes(previous.nodes, previous.edges, positions)),
+        positionsOf(previous.nodes),
+      )
+    ) {
+      mut_arrangeRequested = true;
+
+      return;
+    }
+
+    const known = new Set(previous.nodes.map(({ id }) => id));
+
+    if (laidOut.nodes.some(({ id }) => !known.has(id) && !positions.has(id))) {
+      commit(getArrangement());
+    }
   };
 
   /**
@@ -845,7 +907,21 @@ export const createDagLayoutStore = <H, F>(
             return;
           }
 
+          const previous = shownAutoLayout();
+
+          const previousMadeFor = mut_shownMadeFor;
+
           setAutoLayout({ type: 'ready', layout: laidOut });
+
+          mut_shownMadeFor = { direction, size };
+
+          if (
+            previous !== undefined &&
+            previousMadeFor?.direction === direction &&
+            previousMadeFor.size === size
+          ) {
+            followStructure(previous, laidOut);
+          }
 
           applyArrangeIfRequested(laidOut);
 
@@ -861,6 +937,8 @@ export const createDagLayoutStore = <H, F>(
           mut_arrangeRequested = false;
 
           mut_resizedFrom = undefined;
+
+          mut_shownMadeFor = undefined;
 
           setAutoLayout({ type: 'error', message: unknownToString(error) });
         });
@@ -954,6 +1032,12 @@ export const createDagLayoutStore = <H, F>(
     start,
   };
 };
+
+/** What, besides the graph, a layout was made for. */
+type LayoutMadeFor = Readonly<{
+  direction: DagDirection;
+  size: NodeSize;
+}>;
 
 /** The opacities of the nodes that fade, at the start and at the end. */
 type Fade = Readonly<{

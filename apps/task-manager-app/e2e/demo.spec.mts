@@ -342,6 +342,88 @@ const edgesThroughNodes = async (
     ).flat();
   }, margin);
 
+/**
+ * Every two nodes whose boxes overlap, as drawn: none. Read from the SVG
+ * itself, as `edgesThroughNodes` reads it.
+ */
+const overlappingNodes = async (
+  page: DeepReadonly<Page>,
+): Promise<readonly string[]> =>
+  page.getByTestId('dag-canvas').evaluate((canvas) => {
+    const boxes = Array.from(
+      canvas.querySelectorAll('[data-e2e="dag-node"]'),
+      (node) => {
+        const shape = node.querySelector('.dag-node-shape');
+
+        const moved =
+          node instanceof SVGGraphicsElement
+            ? node.transform.baseVal.consolidate()?.matrix
+            : undefined;
+
+        const box =
+          shape instanceof SVGGraphicsElement ? shape.getBBox() : undefined;
+
+        const x = (moved?.e ?? 0) + (box?.x ?? 0);
+
+        const y = (moved?.f ?? 0) + (box?.y ?? 0);
+
+        return {
+          id: node instanceof SVGElement ? node.dataset['nodeId'] : undefined,
+          left: x,
+          upper: y,
+          right: x + (box?.width ?? 0),
+          lower: y + (box?.height ?? 0),
+        };
+      },
+    );
+
+    return boxes.flatMap((a, index) =>
+      boxes
+        .slice(index + 1)
+        .filter(
+          (b) =>
+            a.left < b.right &&
+            b.left < a.right &&
+            a.upper < b.lower &&
+            b.upper < a.lower,
+        )
+        .map((b) => [a.id, b.id].join(' ')),
+    );
+  });
+
+/** Each node's id and `transform`, by id. */
+const positionsById = async (
+  page: DeepReadonly<Page>,
+): Promise<readonly Readonly<{ id: string; transform: string }>[]> =>
+  page.getByTestId('dag-node').evaluateAll((nodes) =>
+    nodes
+      .map((node) => ({
+        id: node instanceof SVGElement ? (node.dataset['nodeId'] ?? '') : '',
+        transform: node.getAttribute('transform') ?? '',
+      }))
+      .toSorted((a, b) => a.id.localeCompare(b.id)),
+  );
+
+/** Adds a task titled `title` from the header, and waits for the DAG. */
+const addTask = async (
+  page: DeepReadonly<Page>,
+  title: string,
+): Promise<void> => {
+  await page.getByTestId('add-task').click();
+
+  const dialog = page.getByTestId('node-dialog');
+
+  await dialog.getByTestId('title-input').fill(title);
+
+  await dialog.getByTestId('save').click();
+
+  await expect.soft(dialog).toBeHidden();
+
+  await expect
+    .soft(page.getByTestId('dag-canvas'))
+    .toHaveAttribute('data-animating', 'false');
+};
+
 const routedEdgeCount = async (page: DeepReadonly<Page>): Promise<number> =>
   page
     .getByTestId('dag-edge')
@@ -573,6 +655,58 @@ test(
       .toBe(true);
 
     await expect.soft(design).not.toHaveAttribute('transform', down);
+  },
+);
+
+test(
+  'puts a new task clear of the other nodes, arranged or dragged',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto(DEMO);
+
+    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+
+    await showDag(page);
+
+    await arrange(page, 'right');
+
+    // Arranged: laid out again with the new task in it.
+    await addTask(page, '新しいタスク 1');
+
+    await expect.soft(page.getByTestId('dag-node')).toHaveCount(10);
+
+    expect.soft(await overlappingNodes(page)).toStrictEqual([]);
+
+    // Dragged: the new task is put clear of the rest, which stay.
+    const node = dagNode(page, /画面を実装する/u);
+
+    const box = await node.boundingBox();
+
+    const startX = (box?.x ?? 0) + (box?.width ?? 0) / 2;
+
+    const startY = (box?.y ?? 0) + (box?.height ?? 0) / 2;
+
+    await page.mouse.move(startX, startY);
+
+    await page.mouse.down();
+
+    await page.mouse.move(startX + 40, startY + 120, { steps: 10 });
+
+    await page.mouse.up();
+
+    const before = await positionsById(page);
+
+    await addTask(page, '新しいタスク 2');
+
+    await expect.soft(page.getByTestId('dag-node')).toHaveCount(11);
+
+    expect.soft(await overlappingNodes(page)).toStrictEqual([]);
+
+    const after = await positionsById(page);
+
+    expect
+      .soft(after.filter(({ id }) => before.some((known) => known.id === id)))
+      .toStrictEqual(before);
   },
 );
 

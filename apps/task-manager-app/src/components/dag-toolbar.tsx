@@ -18,7 +18,11 @@ type Props = Readonly<{
  * First, the view mode. Then, in the mode the reader arranges (「DAG」),
  * which way the graph grows — the side edges leave and enter nodes by, and
  * the direction 「自動整列」 lays it out in — and 「自動整列」 itself, which
- * puts every node back where ELK does. Choosing the direction moves nothing.
+ * puts every node back where ELK does, and lays the graph out again as it
+ * changes until a node is moved (`dag-layout-store.mts`). A button rather
+ * than a switch: whether the DAG is so laid out is read from where the
+ * nodes are, and a drag is what turns it off. Choosing the direction moves
+ * nothing.
  * At the right end, 「表示設定」, which opens the settings that apply to
  * every mode (`dag-settings-panel.tsx`). One row at 390px in every mode
  * (`index.css`).
