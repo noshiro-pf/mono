@@ -10,6 +10,7 @@ import {
   unknownToString,
 } from 'ts-data-forge';
 import { glob, isDirectlyExecuted } from 'ts-repo-utils';
+import type { NonEmptyTuple } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -72,15 +73,7 @@ export const checkNextMajor = ({
   changesets: readonly ChangesetFile[];
   stocks: readonly StockFile[];
 }>): Result<Summary, string> => {
-  const bumps = changesets.flatMap(({ file, content }) =>
-    Array.from(parseChangesetBumps(content), ([name, bump]) => ({
-      file,
-      name,
-      bump,
-    })),
-  );
-
-  const results = stocks.map((stock) => checkStock(stock, bumps));
+  const results = checkStocks({ changesets, stocks });
 
   const violations = results.flatMap(({ violation }) =>
     violation === undefined ? [] : [violation],
@@ -106,6 +99,21 @@ export const checkNextMajor = ({
     ),
   });
 };
+
+/**
+ * The undecided items of every package with a breaking release pending,
+ * whether or not the check passes: they are what `release.yml` lists on the
+ * version pull request, where the release is decided.
+ */
+export const listReminders = (
+  input: Readonly<{
+    changesets: readonly ChangesetFile[];
+    stocks: readonly StockFile[];
+  }>,
+): readonly Reminder[] =>
+  checkStocks(input).flatMap(({ reminder }) =>
+    reminder === undefined ? [] : [reminder],
+  );
 
 /**
  * The packages a changeset's front matter names, with their bump. A file
@@ -214,15 +222,29 @@ export type StockFile = Readonly<{
   manifest: Readonly<{ name: string; version: string }> | undefined;
 }>;
 
+/** A package's undecided items, while a breaking release of it is pending. */
+export type Reminder = Readonly<{
+  /** The `NEXT_MAJOR.md`, relative to the repository root. */
+  file: string;
+  name: string;
+  /** The version the breaking release starts from. */
+  version: string;
+  /** The changeset giving the breaking bump. */
+  changeset: string;
+  bump: Bump;
+  /** The first line of each undecided item. */
+  items: NonEmptyTuple<string>;
+}>;
+
 type Summary = Readonly<{
   stocks: number;
   decided: number;
   undecided: number;
   /**
-   * The undecided items of packages with a breaking release pending, one
-   * paragraph per package. They hold nothing, so they are only reported.
+   * The undecided items of packages with a breaking release pending. They
+   * hold nothing, so they are only reported.
    */
-  reminders: readonly string[];
+  reminders: readonly Reminder[];
 }>;
 
 export type Bump = 'major' | 'minor' | 'patch';
@@ -262,6 +284,24 @@ const isBump = (value: string | undefined): value is Bump =>
 export const isBreaking = (bump: Bump, version: string): boolean =>
   bump === 'major' || (bump === 'minor' && version.startsWith('0.'));
 
+const checkStocks = ({
+  changesets,
+  stocks,
+}: Readonly<{
+  changesets: readonly ChangesetFile[];
+  stocks: readonly StockFile[];
+}>): readonly ReturnType<typeof checkStock>[] => {
+  const bumps = changesets.flatMap(({ file, content }) =>
+    Array.from(parseChangesetBumps(content), ([name, bump]) => ({
+      file,
+      name,
+      bump,
+    })),
+  );
+
+  return stocks.map((stock) => checkStock(stock, bumps));
+};
+
 const checkStock = (
   { file, content, manifest }: StockFile,
   bumps: readonly Readonly<{ file: string; name: string; bump: Bump }>[],
@@ -269,7 +309,7 @@ const checkStock = (
   decided: number;
   undecided: number;
   violation: string | undefined;
-  reminder: string | undefined;
+  reminder: Reminder | undefined;
 }> => {
   const items = listStockItems(content);
 
@@ -312,36 +352,25 @@ const checkStock = (
     return { ...counts, violation: undefined, reminder: undefined };
   }
 
-  const releasing = [
-    `${file}: ${pending.file} releases`,
-    `${manifest.name}@${manifest.version} with a breaking "${pending.bump}" bump.`,
-  ] as const;
-
-  const undecidedLines = Arr.isNonEmpty(undecided)
-    ? ([
-        '',
-        'Undecided, and not holding it — decide each now: move it above the',
-        '"Undecided" heading to make it with this release, delete it if it will',
-        'not be made, or leave it for a later one:',
-        '',
-        ...undecided.map(({ text }) => `  - ${text}`),
-      ] as const)
-    : ([] as const);
+  const reminder: Reminder | undefined = Arr.isNonEmpty(undecided)
+    ? ({
+        file,
+        name: manifest.name,
+        version: manifest.version,
+        changeset: pending.file,
+        bump: pending.bump,
+        items: Arr.map(undecided, ({ text }) => text),
+      } as const)
+    : undefined;
 
   if (!Arr.isNonEmpty(decided)) {
-    return {
-      ...counts,
-      violation: undefined,
-      reminder: Arr.isNonEmpty(undecidedLines)
-        ? [...releasing, ...undecidedLines].join('\n')
-        : undefined,
-    };
+    return { ...counts, violation: undefined, reminder };
   }
 
   return {
     ...counts,
     violation: [
-      ...releasing,
+      ...releasingLines(file, pending, manifest),
       '',
       'These are still waiting for it:',
       '',
@@ -351,11 +380,43 @@ const checkStock = (
       'the item. Deleting an item without making the change only moves it to',
       'nowhere; if the release really has to go without one, move it under',
       '"Undecided" — which is for the author to decide.',
-      ...undecidedLines,
+      ...(reminder === undefined
+        ? []
+        : Arr.toUnshifted('')(undecidedLines(reminder))),
     ].join('\n'),
-    reminder: undefined,
+    reminder,
   };
 };
+
+const releasingLines = (
+  file: string,
+  pending: Readonly<{ file: string; bump: Bump }>,
+  manifest: Readonly<{ name: string; version: string }>,
+): readonly string[] =>
+  [
+    `${file}: ${pending.file} releases`,
+    `${manifest.name}@${manifest.version} with a breaking "${pending.bump}" bump.`,
+  ] as const;
+
+const undecidedLines = ({ items }: Reminder): readonly string[] =>
+  [
+    'Undecided, and not holding it — decide each now: move it above the',
+    '"Undecided" heading to make it with this release, delete it if it will',
+    'not be made, or leave it for a later one:',
+    '',
+    ...items.map((text) => `  - ${text}`),
+  ] as const;
+
+const formatReminder = (reminder: Reminder): string =>
+  [
+    ...releasingLines(
+      reminder.file,
+      { file: reminder.changeset, bump: reminder.bump },
+      reminder,
+    ),
+    '',
+    ...undecidedLines(reminder),
+  ].join('\n');
 
 export const readChangesets = async (): Promise<readonly ChangesetFile[]> => {
   const files = await glob(`${CHANGESET_DIR_NAME}/*.md`, {
@@ -377,7 +438,7 @@ export const readChangesets = async (): Promise<readonly ChangesetFile[]> => {
   );
 };
 
-const readStocks = async (): Promise<readonly StockFile[]> => {
+export const readStocks = async (): Promise<readonly StockFile[]> => {
   const files = await glob(`**/${STOCK_FILE_NAME}`, {
     cwd: projectRootPath,
     ignore: ['**/node_modules/**', '**/dist/**', 'experimental/**'],
@@ -441,7 +502,7 @@ if (isDirectlyExecuted(import.meta.url)) {
   }
 
   for (const reminder of result.value.reminders) {
-    console.warn(`${reminder}\n`);
+    console.warn(`${formatReminder(reminder)}\n`);
   }
 
   console.info(

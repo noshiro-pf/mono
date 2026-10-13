@@ -149,7 +149,16 @@ describe('checkNextMajor', () => {
 
     assert.lengthOf(result.value.reminders, 1);
 
-    assert.include(result.value.reminders[0], '  - Drop the `baz` re-export.');
+    assert.deepStrictEqual(result.value.reminders, [
+      {
+        file: 'libs/pkg/NEXT_MAJOR.md',
+        name: 'pkg',
+        version: '1.2.3',
+        changeset: '.changeset/major.md',
+        bump: 'major',
+        items: ['Drop the `baz` re-export.'],
+      },
+    ]);
   });
 
   test('reminds of nothing while no breaking release is pending', () => {
