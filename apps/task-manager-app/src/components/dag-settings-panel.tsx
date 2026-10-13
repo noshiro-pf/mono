@@ -8,6 +8,7 @@ import {
 } from '../store/index.mjs';
 import type { SettingsPanelPlacement } from '../view-model/index.mjs';
 import { AnimationSettingField } from './animation-setting-field.js';
+import { closeOnBackdropClick } from './close-on-backdrop-click.mjs';
 import {
   currentSettingsPlacement,
   DAG_SETTINGS_BUTTON_ID,
@@ -76,7 +77,10 @@ const followOpen: RefCallback<HTMLDialogElement> = (dialog) => {
     return undefined;
   }
 
-  dialog.addEventListener('click', onBackdropClick);
+  const stopClosingOnBackdropClick = closeOnBackdropClick(
+    dialog,
+    uiStore.closeSettings,
+  );
 
   addEventListener('resize', onResize);
 
@@ -99,7 +103,7 @@ const followOpen: RefCallback<HTMLDialogElement> = (dialog) => {
 
     removeEventListener('resize', onResize);
 
-    dialog.removeEventListener('click', onBackdropClick);
+    stopClosingOnBackdropClick();
   };
 };
 
@@ -124,16 +128,6 @@ const onCancel: GenericEventHandler<HTMLDialogElement> = (cancelled) => {
   cancelled.preventDefault();
 
   uiStore.closeSettings();
-};
-
-/**
- * The content fills the dialog, so a click whose target is the dialog
- * itself landed on the backdrop around it: outside the panel.
- */
-const onBackdropClick = (clicked: MouseEvent): void => {
-  if (clicked.target === clicked.currentTarget) {
-    uiStore.closeSettings();
-  }
 };
 
 const TITLE_ID = 'dag-settings-title';

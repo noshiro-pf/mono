@@ -167,6 +167,50 @@ test('moves a task’s progress', { tag: '@smoke' }, async ({ page }) => {
     .toContainText('作業中');
 });
 
+test(
+  'keeps the dialog open when a drag from inside it ends outside',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto(DEMO);
+
+    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+
+    await page
+      .getByTestId('task-row')
+      .filter({ hasText: '画面を実装する' })
+      .click();
+
+    const dialog = page.getByTestId('node-dialog');
+
+    const title = dialog.getByTestId('title-input');
+
+    await title.fill('画面を実装し直す');
+
+    const box = await title.boundingBox();
+
+    // Selecting the title's text, and letting go over the backdrop.
+    await page.mouse.move(
+      (box?.x ?? 0) + (box?.width ?? 0) - 4,
+      (box?.y ?? 0) + (box?.height ?? 0) / 2,
+    );
+
+    await page.mouse.down();
+
+    await page.mouse.move(2, 2, { steps: 10 });
+
+    await page.mouse.up();
+
+    await expect.soft(dialog).toBeVisible();
+
+    await expect.soft(title).toHaveValue('画面を実装し直す');
+
+    // A click on the backdrop itself still closes it.
+    await page.mouse.click(2, 2);
+
+    await expect.soft(dialog).toBeHidden();
+  },
+);
+
 /** Where the node is in the graph, from its `translate(x y)`. */
 const positionOf = async (
   node: Locator,

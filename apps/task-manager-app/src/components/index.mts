@@ -1,5 +1,6 @@
 export * from './animation-setting-field.js';
 export * from './app-header.js';
+export * from './close-on-backdrop-click.mjs';
 export * from './dag-arc-edge.js';
 export * from './dag-canvas.js';
 export * from './dag-edge.js';

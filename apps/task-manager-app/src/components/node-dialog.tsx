@@ -5,6 +5,7 @@ import type {
 } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { editorSignal, editorStore } from '../store/index.mjs';
+import { closeOnBackdropClick } from './close-on-backdrop-click.mjs';
 import { DeleteControls } from './delete-controls.js';
 import { MilestoneForm } from './milestone-form.js';
 import { TaskForm } from './task-form.js';
@@ -101,7 +102,10 @@ const followOpen: RefCallback<HTMLDialogElement> = (dialog) => {
     return undefined;
   }
 
-  dialog.addEventListener('click', onBackdropClick);
+  const stopClosingOnBackdropClick = closeOnBackdropClick(
+    dialog,
+    editorStore.close,
+  );
 
   const subscription = editorStore.editor.subscribe((editor) => {
     if (editor.type !== 'closed' && !dialog.open) {
@@ -114,7 +118,7 @@ const followOpen: RefCallback<HTMLDialogElement> = (dialog) => {
   return () => {
     subscription.unsubscribe();
 
-    dialog.removeEventListener('click', onBackdropClick);
+    stopClosingOnBackdropClick();
   };
 };
 
@@ -123,18 +127,6 @@ const onCancel: GenericEventHandler<HTMLDialogElement> = (cancelled) => {
   cancelled.preventDefault();
 
   editorStore.close();
-};
-
-/**
- * The form fills the dialog, so a click whose target is the dialog itself
- * landed on the backdrop around it. Listened to on the element rather than
- * through JSX: the backdrop is a pointer convenience, and Escape is how a
- * keyboard closes the dialog.
- */
-const onBackdropClick = (clicked: MouseEvent): void => {
-  if (clicked.target === clicked.currentTarget) {
-    editorStore.close();
-  }
 };
 
 /**
