@@ -59,8 +59,8 @@ export type ReaderDeps = Readonly<{
   ) => Promise<Answered<IssueList>>;
   now: () => number;
   /**
-   * synstate's `counter`: `0` at once, then `1, 2, …` every `ms`, until it is
-   * completed. A test hands in a `source` it drives itself.
+   * synstate's `counter` without its initial `0`: `1, 2, …` every `ms`, until
+   * it is completed. A test hands in a `source` it drives itself.
    */
   counter: (ms: number) => SynstateObservable<number>;
   isVisible: () => boolean;
@@ -421,7 +421,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     // Nor is there anyone to read the ages to, and coming back moves the
     // clock at once.
     const clockSubscription = clock
-      .pipe(filter((tick) => tick > 0 && isVisible()))
+      .pipe(filter(() => isVisible()))
       .subscribe(() => {
         setNowMs(now());
       });
@@ -516,15 +516,14 @@ const divergenceScale = (entries: readonly Entry[]): number =>
 type PollTimer = Readonly<{ stop: () => void }>;
 
 /**
- * Reads on every tick of `poll`. A counter's `0` comes at once rather than
- * after an interval, and whoever starts the timer has just read, so only
- * what follows it is a tick.
+ * Reads on every tick of `poll`. Whoever starts the timer has just read, so
+ * the first tick comes one interval later.
  */
 const pollEvery = (
   poll: SynstateObservable<number>,
   read: () => void,
 ): PollTimer => {
-  const subscription = poll.pipe(filter((tick) => tick > 0)).subscribe(() => {
+  const subscription = poll.subscribe(() => {
     read();
   });
 

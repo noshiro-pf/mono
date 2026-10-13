@@ -6,8 +6,15 @@ title: counter
 
 {/* jsdoc-description */}
 Creates an observable that emits incremental numbers at a specified interval.
-Starts with 0 immediately after subscription, then emits 1, 2, 3, ... every interval.
+Emits 0 in the macrotask right after `start()` (which runs at creation
+unless `startManually` is set), then 1, 2, 3, ... every interval. A
+subscriber added after that 0 has been emitted does not receive it.
 {/* /jsdoc-description */}
+
+## Options
+
+- `startManually` (default `false`): wait for `start()` instead of starting at creation.
+- `emitInitial` (default `true`): set to `false` to skip the 0 emitted right after `start()`, so the first value is 1, one interval later. `counter(ms)` corresponds to RxJS `timer(0, ms)`; `counter(ms, { emitInitial: false })` corresponds to `interval(ms)`.
 
 ## Example
 

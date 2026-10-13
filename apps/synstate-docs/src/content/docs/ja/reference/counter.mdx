@@ -7,9 +7,15 @@ title: counter
 {/* jsdoc-description */}
 
 指定された間隔でインクリメントされる数値を発行する Observable を作成します。
-サブスクリプション直後に 0 を発行し、その後一定間隔で 1, 2, 3, ... と発行します。
+`start()` 直後のマクロタスクで 0 を発行し（`startManually` を指定しなければ生成時に `start()` されます）、その後一定間隔で 1, 2, 3, ... と発行します。
+0 が発行された後に subscribe したものは 0 を受け取りません。
 
 {/* /jsdoc-description */}
+
+## オプション
+
+- `startManually`（既定 `false`）: 生成時ではなく `start()` の呼び出しで開始します。
+- `emitInitial`（既定 `true`）: `false` にすると `start()` 直後の 0 を発行せず、1 インターバル後の 1 から発行します。`counter(ms)` は RxJS の `timer(0, ms)`、`counter(ms, { emitInitial: false })` は `interval(ms)` に当たります。
 
 ## 使用例
 

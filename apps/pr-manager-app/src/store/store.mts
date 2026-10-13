@@ -47,7 +47,7 @@ export const reader = createReader({
   loadIssues: (token, after, first) =>
     loadIssuePage(REPORT_SOURCE, { token, after, first }),
   now: () => Date.now(),
-  counter: (ms) => counter(ms),
+  counter: (ms) => counter(ms, { emitInitial: false }),
   isVisible: () => document.visibilityState === 'visible',
   visibilityChange: fromEvent(document, 'visibilitychange'),
 });
