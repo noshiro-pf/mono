@@ -3,9 +3,11 @@ import type { InputEventHandler, RefCallback } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import { Arr } from 'ts-data-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   MAX_SPLIT,
   MIN_SPLIT,
+  sharePercents,
   type BlockId,
   type ColumnIndex,
 } from '../layout.mjs';
@@ -14,8 +16,8 @@ import { ViewSettingsRow } from './view-settings-row.js';
 
 /**
  * The "Layout" button and the dialog it opens: one column or two, how wide
- * each is, the order of the blocks and their heights, and a way back to the
- * usual layout.
+ * each is, whether the page scrolls or fills the window, the order of the
+ * blocks and their heights or shares, and a way back to the usual layout.
  *
  * Everything the pointer does on the page can be done here with a keyboard,
  * which is what lets the drag surfaces there be pointer-only. A native
@@ -38,6 +40,19 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
           ]
         : [[0, layout.left]],
     [layout.columns, layout.left, layout.right],
+  );
+
+  // What part of its column each block is given in the `fill` mode.
+  const percents = useMemo<Partial<ReadonlyRecord<BlockId, number>>>(
+    () =>
+      Object.fromEntries(
+        columns.flatMap(([, ids]) => {
+          const shares = sharePercents(layout, ids);
+
+          return ids.map((id, index) => [id, shares[index] ?? 0] as const);
+        }),
+      ),
+    [columns, layout],
   );
 
   return (
@@ -98,6 +113,30 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
           ) : undefined}
         </fieldset>
 
+        <fieldset className={'view-settings-group'}>
+          <legend>{'Height'}</legend>
+
+          <label className={'view-settings-choice'}>
+            <input
+              checked={layout.mode === 'natural'}
+              name={'mode'}
+              type={'radio'}
+              onChange={naturalMode}
+            />
+            {'As tall as the blocks, and the page scrolls'}
+          </label>
+
+          <label className={'view-settings-choice'}>
+            <input
+              checked={layout.mode === 'fill'}
+              name={'mode'}
+              type={'radio'}
+              onChange={fillMode}
+            />
+            {'Fill the window, and each block scrolls'}
+          </label>
+        </fieldset>
+
         {columns.map(([column, ids]) => (
           <fieldset key={column} className={'view-settings-group'}>
             <legend>
@@ -120,6 +159,9 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
                     height={layout.heights[id]}
                     id={id}
                     index={index}
+                    mode={layout.mode}
+                    percent={percents[id] ?? 0}
+                    share={layout.shares[id]}
                     twoColumns={layout.columns === 2}
                   />
                 ))}
@@ -130,7 +172,7 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
 
         <p className={'section-note'}>
           {
-            'On the page: drag a block by the ⠿ at its top right, and its height by its bottom edge — a double click there gives the natural height back. With two columns, drag the line between them. The layout is kept in the URL.'
+            'On the page: drag a block by the ⠿ at its top right, and its height by its bottom edge — a double click there gives the natural height back, or, when the blocks fill the window, evens it with the block below. With two columns, drag the line between them. The layout is kept in the URL.'
           }
         </p>
 
@@ -183,6 +225,14 @@ const oneColumn = (): void => {
 
 const twoColumns = (): void => {
   layoutStore.setColumns(2);
+};
+
+const naturalMode = (): void => {
+  layoutStore.setMode('natural');
+};
+
+const fillMode = (): void => {
+  layoutStore.setMode('fill');
 };
 
 const onSplitInput: InputEventHandler<HTMLInputElement> = (changed) => {

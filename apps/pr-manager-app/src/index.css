@@ -681,6 +681,83 @@ a:focus-visible {
   width: 2px;
 }
 
+/*
+ * Filling the window: the page is as tall as the window and does not scroll;
+ * the header and what is under it keep their heights, and the layout takes
+ * the rest. Each column is as tall as the layout — side by side as a grid row
+ * of that height, stacked as a share of it each — and shares that out among
+ * its blocks by the `flex-grow` the component writes, from nothing, so that
+ * their heights are in the ratio of their shares whatever they hold. Only a
+ * block body scrolls. A window too short to give the blocks any room makes
+ * the page taller than it, and that alone scrolls.
+ */
+.page[data-mode='fill'] {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 30rem;
+  padding-bottom: 1rem;
+}
+
+.page[data-mode='fill'] > * {
+  flex-shrink: 0;
+}
+
+.block-layout[data-mode='fill'] {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  /* Between stacked columns; side by side there is one row and no gap. */
+  row-gap: 1.25rem;
+  min-height: 0;
+}
+
+@media (width >= 60rem) {
+  .block-layout[data-mode='fill'][data-columns='2'] {
+    align-items: stretch;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+  }
+}
+
+.block-layout[data-mode='fill'] .block-column {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.block-layout[data-mode='fill'] .layout-block {
+  display: flex;
+  flex-basis: 0;
+  flex-direction: column;
+  flex-shrink: 1;
+  min-height: 0;
+}
+
+.block-layout[data-mode='fill'] .block-body {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.block-layout[data-mode='fill'] .drop-marker {
+  flex-shrink: 0;
+}
+
+.block-layout[data-mode='fill'] .block-edge {
+  flex-shrink: 0;
+}
+
+/* The last block of a column has nothing to share its height with. */
+.block-edge[data-inert] {
+  cursor: auto;
+  margin-bottom: 0;
+}
+
+.block-edge[data-inert]:hover {
+  border-top-color: transparent;
+}
+
 /* --- the layout settings ------------------------------------------------ */
 
 .view-settings {
