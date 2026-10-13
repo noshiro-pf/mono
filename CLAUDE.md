@@ -504,12 +504,12 @@ stage tables (`gen:deps-graph`).
 ## Coding style
 
 ESLint enforces the syntax rules and names them in its output; what follows is
-the intended fix where the error does not say.
+the intended fix where the error does not say. The examples behind these
+rules and those under "Testing" are in `docs/typescript-coding-rules.md`.
 
 - **Immutability by default**: `readonly` arrays and properties, `as const`,
-  `DeepReadonly` for deep nesting, functions returning immutable data. A
-  mutable `[string, number]` reversed in place keeps its type while its
-  contents change; `readonly` forces `toReversed()`, whose type is honest.
+  `DeepReadonly` for deep nesting, functions returning immutable data (a
+  mutable tuple reversed in place keeps a type its contents no longer have).
   Where mutation is unavoidable, prefix the binding `mut_`
   (`functional/no-let`, `functional/immutable-data`).
 - **Type safety**: never `as any`, `as never`, `@ts-ignore`; type guards over
