@@ -52,6 +52,11 @@
  * same animation — in 「DAG」 once ELK has laid it out, and only the nodes
  * ELK places: a node put somewhere stays where it was put, its top-left
  * corner where it was — and asks for a fit. Nothing is saved for it.
+ *
+ * The nodes `hidden` (`dag/hidden-nodes.mts`) are drawn in no mode: ELK lays
+ * out the rest, and 「アーク」 and 「タイル」 place the rest, which move to
+ * their new places when that changes as when the order does. Where a hidden
+ * node was put is kept, and saved with the rest, for when it is shown again.
  */
 
 import {
@@ -80,6 +85,7 @@ import {
   samePositions,
   startFrameBudget,
   tileDiagramNodes,
+  withoutNodes,
   type DagDirection,
   type DagLayout,
   type FrameBudget,
@@ -156,6 +162,8 @@ export type DagLayoutDeps<H, F> = Readonly<{
   stateTime: InitializedObservable<number>;
   /** How big the nodes are drawn, in every mode. */
   nodeSize: InitializedObservable<NodeSize>;
+  /** The nodes of `state` drawn in no mode. */
+  hidden: InitializedObservable<ReadonlySet<GraphNodeId>>;
 }>;
 
 export type DagLayoutStore = Readonly<{
@@ -248,12 +256,20 @@ export const createDagLayoutStore = <H, F>(
   const [tileWidth, setTileWidthState, { getSnapshot: getTileWidth }] =
     createState<number | undefined>(undefined);
 
-  /** The tasks of 「アーク」 and 「タイル」, in their order. */
+  /**
+   * The tasks of 「アーク」 and 「タイル」, in their order — sorted with every
+   * node there, for the status each has.
+   */
   const diagramOrder = combine([
     deps.state,
     deps.diagramSort,
     deps.stateTime,
-  ]).pipe(map(([state, sort, now]) => diagramTaskIds(state, sort, now)));
+    deps.hidden,
+  ]).pipe(
+    map(([state, sort, now, hidden]) =>
+      diagramTaskIds(state, sort, now).filter((id) => !hidden.has(id)),
+    ),
+  );
 
   const arcNodes = combine([diagramOrder, deps.nodeSize]).pipe(
     map(([ids, size]) => arcDiagramNodes(ids, size)),
@@ -798,14 +814,19 @@ export const createDagLayoutStore = <H, F>(
       arrangement,
       deps.active,
       deps.nodeSize,
-    ]).subscribe(([state, { direction }, active, size]) => {
+      deps.hidden,
+    ]).subscribe(([state, { direction }, active, size, hidden]) => {
       if (!active) {
         finishAnimation();
 
         return;
       }
 
-      const input = layoutInput(buildDependencyGraph(state), direction, size);
+      const input = layoutInput(
+        buildDependencyGraph(withoutNodes(state, hidden)),
+        direction,
+        size,
+      );
 
       const key = layoutKey(input);
 

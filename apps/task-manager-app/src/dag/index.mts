@@ -10,6 +10,7 @@ export * from './elk.mjs';
 export * from './frame-budget.mjs';
 export * from './gesture.mjs';
 export * from './graph-layout.mjs';
+export * from './hidden-nodes.mjs';
 export * from './node-views.mjs';
 export * from './pan-zoom.mjs';
 export * from './placement-animation.mjs';

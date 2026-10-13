@@ -168,6 +168,7 @@ const setup = (
     nodeSize?: NodeSize;
     diagramSort?: readonly SortSpec[];
     stateTime?: number;
+    hidden?: ReadonlySet<GraphNodeId>;
   }> = {},
 ): Readonly<{
   store: DagLayoutStore;
@@ -181,6 +182,7 @@ const setup = (
   setDiagramSort: (next: readonly SortSpec[]) => void;
   setNodeSize: (next: NodeSize) => void;
   setStateTime: (next: number) => void;
+  setHidden: (next: ReadonlySet<GraphNodeId>) => void;
   deferred: ReturnType<typeof deferredLayout>;
   timer: ReturnType<typeof manualTimer>;
   clock: ReturnType<typeof manualClock>;
@@ -225,6 +227,10 @@ const setup = (
     options.nodeSize ?? 'standard',
   );
 
+  const [hidden, setHidden] = createState<ReadonlySet<GraphNodeId>>(
+    options.hidden ?? new Set(),
+  );
+
   const mut_saved: DagLayout[] = [];
 
   const store = createDagLayoutStore({
@@ -252,6 +258,7 @@ const setup = (
     diagramSort,
     stateTime,
     nodeSize,
+    hidden,
   });
 
   store.start();
@@ -287,6 +294,9 @@ const setup = (
     },
     setStateTime: (next) => {
       setStateTime(next);
+    },
+    setHidden: (next) => {
+      setHidden(next);
     },
     deferred,
     timer,
@@ -2234,6 +2244,154 @@ describe(createDagLayoutStore, () => {
       assert.deepStrictEqual(
         store.tileNodes.getSnapshot().value.map(({ id }) => id),
         ['task:x', 'task:y'],
+      );
+    });
+  });
+
+  describe('the nodes left out', () => {
+    test('are not laid out, and are once they are drawn again', () => {
+      const { deferred, setHidden } = setup({
+        state: two,
+        hidden: new Set(['task:b']),
+      });
+
+      assert.deepStrictEqual(
+        deferred.requests[0]?.nodes.map(({ id }) => id),
+        ['task:a'],
+      );
+
+      setHidden(new Set());
+
+      assert.deepStrictEqual(
+        deferred.requests[1]?.nodes.map(({ id }) => id),
+        ['task:a', 'task:b'],
+      );
+    });
+
+    test('keep where they were put, and it is saved with the rest', async () => {
+      const { store, saved, deferred, setHidden } = await shown();
+
+      store.moveNode('task:b', { x: 5, y: 5 });
+
+      setHidden(new Set(['task:b']));
+
+      deferred.resolve(1);
+
+      await settle();
+
+      store.moveNode('task:a', { x: 1, y: 1 });
+
+      assert.deepStrictEqual(
+        saved.at(-1)?.positions,
+        positions([
+          ['task:a', { x: 1, y: 1 }],
+          ['task:b', { x: 5, y: 5 }],
+        ]),
+      );
+
+      setHidden(new Set());
+
+      deferred.resolve(2);
+
+      await settle();
+
+      assert.deepStrictEqual(
+        store.arrangement.getSnapshot().value.positions.get('task:b'),
+        { x: 5, y: 5 },
+      );
+    });
+
+    test('are not in アーク, and the rest move up to fill the gap', async () => {
+      const { store, clock, saved, setViewMode, setHidden } =
+        await shownWithWidth(TASK_NODE_SIZE.width, { state: mixed });
+
+      setViewMode('arc');
+
+      clock.advance(ANIMATION_MS);
+
+      // By title: y (Alpha), then x (Zeta).
+      setHidden(new Set(['task:y']));
+
+      assert.deepStrictEqual(
+        animated(store),
+        positions([
+          ['task:x', { x: 0, y: TASK_NODE_SIZE.height + ARC_NODE_GAP }],
+        ]),
+      );
+
+      clock.advance(ANIMATION_MS);
+
+      assert.deepStrictEqual(
+        arcColumn(store),
+        positions([['task:x', { x: 0, y: 0 }]]),
+      );
+
+      assert.deepStrictEqual(saved, []);
+    });
+
+    test('are not in タイル', async () => {
+      const { store, clock, setViewMode, setHidden } = await shownWithWidth(
+        TASK_NODE_SIZE.width,
+        { state: mixed },
+      );
+
+      setViewMode('tile');
+
+      clock.advance(ANIMATION_MS);
+
+      setHidden(new Set(['task:y']));
+
+      clock.advance(ANIMATION_MS);
+
+      assert.deepStrictEqual(
+        tilePlaces(store),
+        positions([['task:x', { x: 0, y: 0 }]]),
+      );
+    });
+
+    test('still count for the order by status', async () => {
+      // y waits for x, which is done: ready, as is z, after y by title —
+      // and blocked, after z, were x not counted.
+      const done: DomainState = {
+        tasks: [
+          createTask({
+            id: asTaskId('x'),
+            title: 'X',
+            now: 0,
+            progress: 'done',
+            startedAt: 0,
+            completedAt: 0,
+          }),
+          createTask({
+            id: asTaskId('y'),
+            title: 'Y',
+            now: 0,
+            dependencies: [
+              {
+                from: { kind: 'task', id: asTaskId('x') },
+                type: 'finish-to-start',
+                lagMs: 0,
+              },
+            ],
+          }),
+          createTask({ id: asTaskId('z'), title: 'Z', now: 0 }),
+        ],
+        milestones: [],
+      } as const;
+
+      const { store } = await shownWithWidth(TASK_NODE_SIZE.width, {
+        state: done,
+        hidden: new Set(['task:x']),
+        viewMode: 'arc',
+        diagramSort: [
+          { key: 'status', order: 'asc' },
+          { key: 'title', order: 'asc' },
+        ],
+      });
+
+      assert.deepStrictEqual(
+        store.arcNodes.getSnapshot().value.map(({ id }) => id),
+        ['task:y', 'task:z'],
       );
     });
   });

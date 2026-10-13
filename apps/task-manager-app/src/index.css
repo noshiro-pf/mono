@@ -670,6 +670,10 @@ fieldset {
   font-weight: 600;
 }
 
+.settings-switch {
+  margin: 0;
+}
+
 .settings-hint {
   margin: 0;
   color: var(--muted);

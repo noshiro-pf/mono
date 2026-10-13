@@ -1,10 +1,28 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import {
+  test as base,
+  expect,
+  type Locator,
+  type Page,
+} from '@playwright/test';
 import { Arr, Num, Result } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 
 // The in-memory demo of the dev server: no sign-in, the sample data of
 // `src/demo/sample-data.mts`, and a fresh copy on every load.
 const DEMO = '/mono/task-manager/?storage=memory';
+
+// The graph screen draws the sample data's done task too, as these tests
+// measure the whole graph; hiding it, the default, is
+// `dag-show-done.spec.mts`'s.
+const test = base.extend({
+  page: async ({ page }, provide) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('task-manager-app:dag-show-done', 'true');
+    });
+
+    await provide(page);
+  },
+});
 
 test('lists the tasks and milestones', { tag: '@smoke' }, async ({ page }) => {
   await page.goto(DEMO);
