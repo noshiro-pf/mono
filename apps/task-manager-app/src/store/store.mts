@@ -9,7 +9,7 @@
  */
 
 import { computed } from '@preact/signals';
-import { map } from 'synstate';
+import { combine, map } from 'synstate';
 import { toSignal } from 'synstate-preact-signals';
 import {
   fromEvent,
@@ -22,15 +22,18 @@ import {
   buildNodeViews,
   defaultDirection,
   fromElkGraph,
+  hiddenNodeIds,
   layoutWithElk,
   PLACEMENT_ANIMATION_MS,
   toElkGraph,
+  withoutNodes,
 } from '../dag/index.mjs';
 import type { Backend } from '../repository/index.mjs';
 import {
   animationSettingStorage,
   buildMilestoneRows,
   buildTaskRows,
+  dagShowDoneStorage,
   dagViewModeStorage,
   diagramSortStorage,
   listSettingsStorage,
@@ -39,6 +42,7 @@ import {
 import { createAnimationSettingStore } from './animation-setting-store.mjs';
 import { createClockStore } from './clock-store.mjs';
 import { createDagLayoutStore } from './dag-layout-store.mjs';
+import { createDagShowDoneStore } from './dag-show-done-store.mjs';
 import { createDagViewModeStore } from './dag-view-mode-store.mjs';
 import { createDataStore } from './data-store.mjs';
 import { createDiagramSortStore } from './diagram-sort-store.mjs';
@@ -127,6 +131,17 @@ export const diagramSortStore = createDiagramSortStore({
   save: saveSetting(diagramSortStorage),
 });
 
+export const dagShowDoneStore = createDagShowDoneStore({
+  initial: loadSetting(dagShowDoneStorage),
+  save: saveSetting(dagShowDoneStorage),
+});
+
+/** The nodes the graph screen leaves out (`dag/hidden-nodes.mts`). */
+const dagHiddenNodes = combine([
+  dataStore.state,
+  dagShowDoneStore.showDone,
+]).pipe(map(([state, showDone]) => hiddenNodeIds(state, showDone)));
+
 export const dagLayoutStore = createDagLayoutStore({
   state: dataStore.state,
   stored: dataStore.dagLayout,
@@ -157,6 +172,7 @@ export const dagLayoutStore = createDagLayoutStore({
   diagramSort: diagramSortStore.sort,
   stateTime: clockStore.now,
   nodeSize: nodeSizeStore.size,
+  hidden: dagHiddenNodes,
 });
 
 export const sessionSignal = toSignal(sessionStore.session);
@@ -188,6 +204,10 @@ export const dagViewModeSignal = toSignal(dagViewModeStore.mode);
 export const nodeSizeSignal = toSignal(nodeSizeStore.size);
 
 export const diagramSortSignal = toSignal(diagramSortStore.sort);
+
+export const dagShowDoneSignal = toSignal(dagShowDoneStore.showDone);
+
+export const dagHiddenNodesSignal = toSignal(dagHiddenNodes);
 
 export const dagAutoLayoutSignal = toSignal(dagLayoutStore.autoLayout);
 
@@ -223,7 +243,9 @@ export const nodeViewsSignal = computed(() =>
   buildNodeViews(domainSignal.value, nowSignal.value),
 );
 
-export const arcEdgesSignal = computed(() => arcEdges(domainSignal.value));
+export const arcEdgesSignal = computed(() =>
+  arcEdges(withoutNodes(domainSignal.value, dagHiddenNodesSignal.value)),
+);
 
 /**
  * Starts the timers and the listeners. Called once, from `main.tsx`, before
@@ -242,6 +264,7 @@ export const startStore = (): (() => void) => {
     dagViewModeStore.start(),
     nodeSizeStore.start(),
     diagramSortStore.start(),
+    dagShowDoneStore.start(),
     dagLayoutStore.start(),
   ] as const;
 

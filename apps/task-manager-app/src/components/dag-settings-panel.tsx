@@ -13,13 +13,14 @@ import {
   currentSettingsPlacement,
   DAG_SETTINGS_BUTTON_ID,
 } from './dag-settings-button.js';
+import { DagShowDoneField } from './dag-show-done-field.js';
 import { DiagramSortField } from './diagram-sort-field.js';
 import { NodeSizeField } from './node-size-field.js';
 
 /**
  * 「表示設定」: the settings of the graph screen, each a section of the
- * panel's body — the node size and the animation, which apply to every view
- * mode, and the order of 「アーク」 and 「タイル」, shown in those two only:
+ * panel's body — whether the done tasks are drawn, the node size and the
+ * animation, which apply to every view mode, and the order of 「アーク」 and 「タイル」, shown in those two only:
  * in 「DAG」 the reader places the nodes, and an order would change nothing.
  *
  * A native `<dialog>` opened modal, so that the focus goes into it and stays
@@ -61,6 +62,7 @@ export const DagSettingsPanel = memoNamed('DagSettingsPanel', () => {
           </button>
         </div>
         <div className={'settings-panel-body'}>
+          <DagShowDoneField />
           <NodeSizeField />
           {ordered ? <DiagramSortField /> : undefined}
           <AnimationSettingField />

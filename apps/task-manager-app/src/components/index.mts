@@ -7,6 +7,7 @@ export * from './dag-edge.js';
 export * from './dag-milestone-node.js';
 export * from './dag-settings-button.js';
 export * from './dag-settings-panel.js';
+export * from './dag-show-done-field.js';
 export * from './dag-task-node.js';
 export * from './dag-toolbar.js';
 export * from './dag-view-mode-switch.js';
