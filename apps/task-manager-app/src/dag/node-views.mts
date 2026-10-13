@@ -1,8 +1,9 @@
 /**
  * What each node of the DAG shows at a time: its title cut to fit, both a
- * standard node and a compact one (`view-model/node-size.mts`), and the
- * state that colours it — a task's display status, a milestone's reached or
- * not. Separate from the layout, which does not change with any of it.
+ * standard node and a compact one (`view-model/node-size.mts`), the state
+ * that colours it — a task's display status, a milestone's reached or not —
+ * and a task's due date and priority. Separate from the layout, which does
+ * not change with any of it.
  */
 
 import type { DeepReadonly } from 'ts-type-forge';
@@ -19,12 +20,19 @@ import {
   type Priority,
   type TaskId,
 } from '../domain/index.mjs';
-import { displayStatusLabels, priorityLabels } from '../view-model/index.mjs';
+import {
+  displayStatusLabels,
+  formatDateTime,
+  formatShortDateTime,
+  priorityLabels,
+} from '../view-model/index.mjs';
 import { truncateToUnits } from './truncate.mjs';
 
+/** `timeZone` is for the tests; the page passes none and gets the browser's. */
 export const buildNodeViews = (
   state: DomainState,
   now: number,
+  timeZone?: string,
 ): ReadonlyMap<GraphNodeId, NodeView> => {
   const context = buildEvaluationContext(state);
 
@@ -37,6 +45,12 @@ export const buildNodeViews = (
       const shown = displayStatus(task, context, now);
 
       const warning = isStartedWithUnmetDependencies(task, context, now);
+
+      const { dueDate } = task;
+
+      // As the list marks it (`view-model/rows.mts`).
+      const overdue =
+        task.progress !== 'done' && dueDate !== undefined && dueDate < now;
 
       return [
         nodeId(ref),
@@ -53,10 +67,19 @@ export const buildNodeViews = (
           ),
           status: shown,
           priority: task.priority,
+          due:
+            dueDate === undefined
+              ? '期限なし'
+              : `${overdue ? '期限切れ' : '期限'} ${formatShortDateTime(dueDate, now, timeZone)}`,
+          overdue,
           warning,
           ariaLabel: [
             `タスク「${task.title}」`,
             `状態: ${displayStatusLabels[shown]}`,
+            ...(dueDate === undefined
+              ? []
+              : [`期限: ${formatDateTime(dueDate, timeZone)}`]),
+            ...(overdue ? ['期限切れ'] : []),
             `優先度: ${priorityLabels[task.priority]}`,
             ...(warning ? ['依存が未解消のまま開始'] : []),
           ].join(' '),
@@ -118,6 +141,10 @@ export type TaskNodeView = DeepReadonly<{
   compactTitle: string;
   status: DisplayStatus;
   priority: Priority;
+  /** `期限 10/09 12:05`, `期限切れ 10/09 12:05` or `期限なし`: a node's second line. */
+  due: string;
+  /** Past its due date and not done. */
+  overdue: boolean;
   /** Started while a dependency does not hold. */
   warning: boolean;
   ariaLabel: string;

@@ -801,6 +801,11 @@ fieldset {
   font-size: 11px;
 }
 
+.dag-node-meta.overdue {
+  fill: var(--danger);
+  font-weight: 600;
+}
+
 .dag-node-warning {
   fill: var(--danger);
   font-size: 13px;
@@ -830,6 +835,91 @@ fieldset {
 .dag-task.status-done .dag-node-shape {
   fill: var(--status-done-tint);
   stroke: var(--status-done);
+}
+
+/*
+ * Priority, as the issue DAG of `pr-manager-app` draws it: 「最高」 gets a
+ * second outline in the status colour, 「低」 and 「最低」 are faint until
+ * pointed at, focused or highlighted, so neither changes what the colour
+ * says. The pill is in ink, strongest for 「最高」, so that it never reads as
+ * a status colour; its word says which. 「中」, the default, has none.
+ */
+.dag-task.status-ready {
+  --node-colour: var(--status-ready);
+}
+
+.dag-task.status-blocked {
+  --node-colour: var(--status-blocked);
+}
+
+.dag-task.status-in-progress {
+  --node-colour: var(--status-in-progress);
+}
+
+.dag-task.status-in-review {
+  --node-colour: var(--status-in-review);
+}
+
+.dag-task.status-done {
+  --node-colour: var(--status-done);
+}
+
+.dag-node-ring {
+  fill: none;
+  stroke: var(--node-colour);
+  stroke-width: 1.5;
+}
+
+.dag-task.status-blocked .dag-node-ring {
+  stroke-dasharray: 4 3;
+}
+
+.dag-task[data-priority='4'] .dag-node-body {
+  opacity: 0.6;
+}
+
+.dag-task[data-priority='5'] .dag-node-body {
+  opacity: 0.4;
+}
+
+.dag-task:hover .dag-node-body,
+.dag-task:focus-visible .dag-node-body,
+.dag-task.dragging .dag-node-body,
+.dag-task[data-highlight='on'] .dag-node-body {
+  opacity: 1;
+}
+
+.dag-node-priority rect {
+  fill: var(--surface);
+  stroke: var(--muted);
+  stroke-width: 1;
+}
+
+.dag-node-priority text {
+  fill: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.dag-task[data-priority='1'] .dag-node-priority rect {
+  fill: var(--text);
+  stroke: var(--text);
+}
+
+.dag-task[data-priority='1'] .dag-node-priority text {
+  fill: var(--surface);
+}
+
+.dag-task[data-priority='2'] .dag-node-priority rect {
+  stroke: var(--text);
+}
+
+.dag-task[data-priority='2'] .dag-node-priority text {
+  fill: var(--text);
+}
+
+.dag-task[data-priority='5'] .dag-node-priority rect {
+  stroke: var(--hairline);
 }
 
 .dag-milestone .dag-node-shape {

@@ -76,6 +76,19 @@ export const formatLag = (lagMs: number): string => {
 export const formatDateTime = (epochMs: number, timeZone?: string): string =>
   dateTimeFormat(timeZone).format(epochMs);
 
+/**
+ * `10/09 12:05` within the year of `now`, and `2027/01/05` outside it — short
+ * enough for the second line of a DAG node.
+ */
+export const formatShortDateTime = (
+  epochMs: number,
+  now: number,
+  timeZone?: string,
+): string =>
+  yearFormat(timeZone).format(epochMs) === yearFormat(timeZone).format(now)
+    ? monthDayTimeFormat(timeZone).format(epochMs)
+    : dateFormat(timeZone).format(epochMs);
+
 /** `3時間`, `1.5時間`, or nothing without an estimate. */
 export const formatEstimate = (hours: number | undefined): string =>
   hours === undefined ? '' : (`${hours}時間` as const);
@@ -92,5 +105,31 @@ const dateTimeFormat = (timeZone: string | undefined): Intl.DateTimeFormat =>
     hour: '2-digit',
     minute: '2-digit',
     hourCycle: 'h23',
+    ...(timeZone === undefined ? {} : { timeZone }),
+  });
+
+const monthDayTimeFormat = (
+  timeZone: string | undefined,
+): Intl.DateTimeFormat =>
+  new Intl.DateTimeFormat('ja-JP', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+    ...(timeZone === undefined ? {} : { timeZone }),
+  });
+
+const dateFormat = (timeZone: string | undefined): Intl.DateTimeFormat =>
+  new Intl.DateTimeFormat('ja-JP', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    ...(timeZone === undefined ? {} : { timeZone }),
+  });
+
+const yearFormat = (timeZone: string | undefined): Intl.DateTimeFormat =>
+  new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
     ...(timeZone === undefined ? {} : { timeZone }),
   });

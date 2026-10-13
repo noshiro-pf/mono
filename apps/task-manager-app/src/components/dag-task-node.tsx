@@ -4,7 +4,7 @@ import type {
   LaidOutNode,
   TaskNodeView,
 } from '../dag/index.mjs';
-import { displayStatusLabels, priorityLabels } from '../view-model/index.mjs';
+import { priorityLabels } from '../view-model/index.mjs';
 import { useDagNodeHandlers } from './use-dag-node-handlers.mjs';
 
 type Props = Readonly<{
@@ -23,19 +23,21 @@ type Props = Readonly<{
 }>;
 
 /**
- * A task: a rounded rectangle in the colour of its status, with its title,
- * status and priority — or, compact, its title alone, with the status and
- * priority in its tooltip; the colour, the border and the warning say as
- * much either way. Focusable; Enter or Space opens it as a tap does, and in
- * 「DAG」 the arrow keys move it.
+ * A task: a rounded rectangle in the colour of its status, with its title and
+ * due date — or, compact, its title alone, with the due date and priority in
+ * its tooltip; the colour and the border say whether it can start either way.
+ * Its priority is drawn as the issue DAG of `pr-manager-app` draws one: a
+ * pill across the top edge for any but 「中」, the default; a second outline
+ * around 「最高」; and 「低」 and 「最低」 faint until pointed at.
+ * Focusable; Enter or Space opens it as a tap does, and in 「DAG」 the arrow
+ * keys move it.
  */
 export const DagTaskNode = memoNamed<Props>('DagTaskNode', (props) => {
   const { node, view, dragging, movable, highlight, opacity, compact } = props;
 
   const { openNode, onKeyDown } = useDagNodeHandlers(view.ref, movable);
 
-  const meta =
-    `${displayStatusLabels[view.status]}・優先度 ${priorityLabels[view.priority]}` as const;
+  const rx = compact ? 6 : 8;
 
   return (
     // An SVG has no <button>: the group takes its role, focus and keys.
@@ -46,6 +48,7 @@ export const DagTaskNode = memoNamed<Props>('DagTaskNode', (props) => {
       data-e2e={'dag-node'}
       data-highlight={highlight}
       data-node-id={node.id}
+      data-priority={view.priority}
       opacity={opacity}
       role={'button'}
       // Lower case: Preact sets an SVG element's props as attributes, and
@@ -56,43 +59,95 @@ export const DagTaskNode = memoNamed<Props>('DagTaskNode', (props) => {
       onClick={openNode}
       onKeyDown={onKeyDown}
     >
-      <title>{compact ? `${view.title}\n${meta}` : view.title}</title>
-      <rect
-        className={'dag-node-shape'}
-        height={node.height}
-        rx={compact ? 6 : 8}
-        width={node.width}
-      />
-      {compact ? (
-        <text
-          className={'dag-node-title'}
-          dominantBaseline={'central'}
-          x={10}
-          y={node.height / 2}
-        >
-          {view.compactTitle}
-        </text>
-      ) : (
-        <>
-          <text className={'dag-node-title'} x={12} y={22}>
-            {view.shortTitle}
+      <title>
+        {compact
+          ? `${view.title}\n${view.due}・優先度 ${priorityLabels[view.priority]}`
+          : view.title}
+      </title>
+      <g className={'dag-node-body'}>
+        {view.priority === 1 ? (
+          <rect
+            className={'dag-node-ring'}
+            height={node.height + 2 * RING_GAP}
+            rx={rx + RING_GAP}
+            width={node.width + 2 * RING_GAP}
+            x={-RING_GAP}
+            y={-RING_GAP}
+          />
+        ) : undefined}
+        <rect
+          className={'dag-node-shape'}
+          height={node.height}
+          rx={rx}
+          width={node.width}
+        />
+        {compact ? (
+          <text
+            className={'dag-node-title'}
+            dominantBaseline={'central'}
+            x={10}
+            y={node.height / 2}
+          >
+            {view.compactTitle}
           </text>
-          <text className={'dag-node-meta'} x={12} y={42}>
-            {meta}
+        ) : (
+          <>
+            <text className={'dag-node-title'} x={12} y={22}>
+              {view.shortTitle}
+            </text>
+            <text
+              className={`dag-node-meta${view.overdue ? ' overdue' : ''}`}
+              x={12}
+              y={42}
+            >
+              {view.due}
+            </text>
+          </>
+        )}
+        {view.warning ? (
+          <text
+            className={'dag-node-warning'}
+            dominantBaseline={compact ? 'central' : undefined}
+            textAnchor={'end'}
+            x={node.width - (compact ? 8 : 10)}
+            y={compact ? node.height / 2 : 42}
+          >
+            {'⚠'}
           </text>
-        </>
-      )}
-      {view.warning ? (
-        <text
-          className={'dag-node-warning'}
-          dominantBaseline={compact ? 'central' : undefined}
-          textAnchor={'end'}
-          x={node.width - (compact ? 8 : 10)}
-          y={compact ? node.height / 2 : 42}
-        >
-          {'⚠'}
-        </text>
-      ) : undefined}
+        ) : undefined}
+        {view.priority === 3 ? undefined : (
+          <g
+            className={'dag-node-priority'}
+            transform={`translate(${node.width - PRIORITY_INSET - PRIORITY_WIDTH} ${-PRIORITY_HEIGHT / 2})`}
+          >
+            <rect
+              height={PRIORITY_HEIGHT}
+              rx={PRIORITY_HEIGHT / 2}
+              width={PRIORITY_WIDTH}
+            />
+            <text
+              dominantBaseline={'central'}
+              textAnchor={'middle'}
+              x={PRIORITY_WIDTH / 2}
+              y={PRIORITY_HEIGHT / 2}
+            >
+              {priorityLabels[view.priority]}
+            </text>
+          </g>
+        )}
+      </g>
     </g>
   );
 });
+
+/** Between a 「最高」 task's shape and its second outline. */
+const RING_GAP = 4;
+
+/** Wide enough for 「最高」 in 10px bold. */
+const PRIORITY_WIDTH = 32;
+
+/** Centred on the top edge, so half of it stands above the node. */
+const PRIORITY_HEIGHT = 14;
+
+/** From the right end, clear of the rounded corner. */
+const PRIORITY_INSET = 10;
