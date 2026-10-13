@@ -26,51 +26,63 @@ const jaRefDir = path.resolve(
 
 const srcSamplesDir = path.resolve(synstateSamplesRoot, 'src');
 
-/** Maps reference page slug → sample file name */
-const referencePageSamples: DeepReadonly<[slug: string, sampleFile: string][]> =
+/**
+ * Maps reference page slug → sample file names, one per code block of the
+ * page in order.
+ */
+const referencePageSamples: DeepReadonly<
+  [slug: string, ...sampleFiles: string[]][]
+> = [
+  ['attach-index', 'attach-index-example.mts'],
+  ['audit', 'audit-example.mts'],
+  ['combine', 'combine-example.mts'],
+  ['counter', 'counter-example.mts'],
+  ['create-boolean-state', 'create-boolean-state-example.tsx'],
+  ['create-event-emitter', 'create-void-event-emitter-example.mts'],
   [
-    ['attach-index', 'attach-index-example.mts'],
-    ['audit', 'audit-example.mts'],
-    ['combine', 'combine-example.mts'],
-    ['counter', 'counter-example.mts'],
-    ['create-boolean-state', 'create-boolean-state-example.tsx'],
-    ['create-event-emitter', 'create-void-event-emitter-example.mts'],
-    ['create-reducer', 'create-reducer-example.mts'],
-    ['create-state', 'create-state-example.mts'],
-    ['create-value-emitter', 'create-event-emitter-example.mts'],
-    ['debounce', 'debounce-example.mts'],
-    ['filter', 'filter-example.mts'],
-    ['from-promise', 'from-promise-example.mts'],
-    ['from-subscribable', 'from-subscribable-example.mts'],
-    ['get-key', 'get-key-example.mts'],
-    ['map', 'map-example.mts'],
-    ['map-optional', 'map-optional-example.mts'],
-    ['map-result-err', 'map-result-err-example.mts'],
-    ['map-result-ok', 'map-result-ok-example.mts'],
-    ['map-to', 'map-to-example.mts'],
-    ['merge', 'merge-example.mts'],
-    ['merge-map', 'merge-map-example.mts'],
-    ['pairwise', 'pairwise-example.mts'],
-    ['scan', 'scan-example.mts'],
-    ['skip', 'skip-example.mts'],
-    ['skip-if-no-change', 'skip-if-no-change-example.mts'],
-    ['skip-until', 'skip-until-example.mts'],
-    ['skip-while', 'skip-while-example.mts'],
-    ['source', 'source-example.mts'],
-    ['switch-map', 'switch-map-example.mts'],
-    ['take', 'take-example.mts'],
-    ['take-until', 'take-until-example.mts'],
-    ['take-while', 'take-while-example.mts'],
-    ['throttle', 'throttle-example.mts'],
-    ['timer', 'timer-example.mts'],
-    ['unwrap-optional', 'unwrap-optional-example.mts'],
-    ['unwrap-result-err', 'unwrap-result-err-example.mts'],
-    ['unwrap-result-ok', 'unwrap-result-ok-example.mts'],
-    ['with-buffered', 'with-buffered-from-example.mts'],
-    ['with-current-value-from', 'with-current-value-from-example.mts'],
-    ['with-initial-value', 'with-initial-value-example.mts'],
-    ['zip', 'zip-example.mts'],
-  ] as const;
+    'create-reducer',
+    'create-reducer-example.mts',
+    'create-reducer-equals-example.mts',
+  ],
+  [
+    'create-state',
+    'create-state-example.mts',
+    'create-state-equals-example.mts',
+  ],
+  ['create-value-emitter', 'create-event-emitter-example.mts'],
+  ['debounce', 'debounce-example.mts'],
+  ['filter', 'filter-example.mts'],
+  ['from-promise', 'from-promise-example.mts'],
+  ['from-subscribable', 'from-subscribable-example.mts'],
+  ['get-key', 'get-key-example.mts'],
+  ['map', 'map-example.mts'],
+  ['map-optional', 'map-optional-example.mts'],
+  ['map-result-err', 'map-result-err-example.mts'],
+  ['map-result-ok', 'map-result-ok-example.mts'],
+  ['map-to', 'map-to-example.mts'],
+  ['merge', 'merge-example.mts'],
+  ['merge-map', 'merge-map-example.mts'],
+  ['pairwise', 'pairwise-example.mts'],
+  ['scan', 'scan-example.mts'],
+  ['skip', 'skip-example.mts'],
+  ['skip-if-no-change', 'skip-if-no-change-example.mts'],
+  ['skip-until', 'skip-until-example.mts'],
+  ['skip-while', 'skip-while-example.mts'],
+  ['source', 'source-example.mts'],
+  ['switch-map', 'switch-map-example.mts'],
+  ['take', 'take-example.mts'],
+  ['take-until', 'take-until-example.mts'],
+  ['take-while', 'take-while-example.mts'],
+  ['throttle', 'throttle-example.mts'],
+  ['timer', 'timer-example.mts'],
+  ['unwrap-optional', 'unwrap-optional-example.mts'],
+  ['unwrap-result-err', 'unwrap-result-err-example.mts'],
+  ['unwrap-result-ok', 'unwrap-result-ok-example.mts'],
+  ['with-buffered', 'with-buffered-from-example.mts'],
+  ['with-current-value-from', 'with-current-value-from-example.mts'],
+  ['with-initial-value', 'with-initial-value-example.mts'],
+  ['zip', 'zip-example.mts'],
+] as const;
 
 const referenceDocuments: DeepReadonly<
   {
@@ -79,7 +91,7 @@ const referenceDocuments: DeepReadonly<
     sampleCodeFiles: string[];
   }[]
 > = await Promise.all(
-  referencePageSamples.map(async ([slug, sampleFile]) => {
+  referencePageSamples.map(async ([slug, ...sampleFiles]) => {
     const mdxPath = path.resolve(refDir, `${slug}.mdx`);
 
     const mdxExists = await pathExists(mdxPath);
@@ -87,7 +99,7 @@ const referenceDocuments: DeepReadonly<
     return {
       mdPath: mdxExists ? mdxPath : path.resolve(refDir, `${slug}.md`),
       samplesDir: srcSamplesDir,
-      sampleCodeFiles: [sampleFile],
+      sampleCodeFiles: sampleFiles,
     };
   }),
 );
@@ -101,7 +113,7 @@ const jaReferenceDocuments: DeepReadonly<
     sampleCodeFiles: string[];
   }[]
 > = await Promise.all(
-  referencePageSamples.map(async ([slug, sampleFile]) => {
+  referencePageSamples.map(async ([slug, ...sampleFiles]) => {
     const mdxPath = path.resolve(jaRefDir, `${slug}.mdx`);
 
     const mdxExists = await pathExists(mdxPath);
@@ -109,7 +121,7 @@ const jaReferenceDocuments: DeepReadonly<
     return {
       mdPath: mdxExists ? mdxPath : path.resolve(jaRefDir, `${slug}.md`),
       samplesDir: srcSamplesDir,
-      sampleCodeFiles: [sampleFile],
+      sampleCodeFiles: sampleFiles,
     };
   }),
 );

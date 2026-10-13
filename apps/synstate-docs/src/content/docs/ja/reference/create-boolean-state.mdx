@@ -33,6 +33,12 @@ const SampleComponent = (): React.JSX.Element => (
 );
 ```
 
+## 等しい更新を伝えない（`equals`）
+
+第 2 引数で [`createState`](../create-state/#等しい更新を伝えないequals) と同じ `equals` オプションを指定できます。
+
+`equals` を省略すると、等しいかどうかにかかわらずすべての更新が伝わります。次のメジャーバージョンで既定値は `Object.is` になる予定です。すべての更新を伝え続けるには `equals: () => false` を渡してください。
+
 {/* source-link */}
 [View source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/utils/create-boolean-state.mts)
 {/* /source-link */}

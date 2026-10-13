@@ -60,7 +60,7 @@ const debouncedInput$ = input$.pipe(debounce(300));
 
 ### `createState` / `createBooleanState` / `createReducer`
 
-Signal-returning wrappers for synstate's state creation utilities. Instead of returning a hook (like `synstate-preact-hooks`), these return a `ReadonlySignal`.
+Signal-returning wrappers for synstate's state creation utilities. Instead of returning a hook (like `synstate-preact-hooks`), these return a `ReadonlySignal`. Their options, such as `equals`, are passed to synstate as they are.
 
 ```tsx
 import type * as Preact from 'preact';

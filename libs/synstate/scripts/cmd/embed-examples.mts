@@ -15,6 +15,8 @@ const documents = [
       '03-react-18-example.tsx',
       '04-react-example.tsx',
       '05-simple-state-with-additional-api.mts',
+      '../src/create-state-equals-example.mts',
+      '../src/create-reducer-equals-example.mts',
       '06-global-counter.tsx',
       '07-todo-reducer.tsx',
       '08-dark-mode.tsx',

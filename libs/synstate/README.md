@@ -280,6 +280,62 @@ assert.strictEqual(initialState, 0);
 assert.deepStrictEqual(stateHistory, [0, 1, 3, 0]);
 ```
 
+### Skipping Updates Equal to the Current State (`equals`)
+
+`createState`, `createReducer` and `createBooleanState` take an `equals` option. When it says the next state is the same as the current one, the update is not passed on: no subscriber, and nothing derived from the state, is told of it, and the current state is kept. Decide this where the state is held rather than downstream with `skipIfNoChange`, because an update passed on reaches whatever reads the state directly before any operator can thin it out.
+
+```tsx
+const [filters, setFilters] = createState(
+    { label: 'bug', page: 1 },
+    { equals: fastDeepEqual },
+);
+
+const before = filters.getSnapshot().value;
+
+// Derived state is recomputed only when the state really changes.
+const query = filters.pipe(
+    map(({ label, page }) => `label:${label} page:${page}`),
+);
+
+const queryHistory: string[] = [];
+
+query.subscribe((value: string) => {
+    queryHistory.push(value);
+});
+
+setFilters({ label: 'bug', page: 1 }); // equal: nothing is passed on
+
+assert.strictEqual(filters.getSnapshot().value, before);
+
+setFilters({ label: 'bug', page: 2 });
+
+assert.deepStrictEqual(queryHistory, ['label:bug page:1', 'label:bug page:2']);
+```
+
+The same option is the third argument of `createReducer`:
+
+```tsx
+const [count, dispatch] = createReducer(
+    (s, action: Readonly<{ type: 'add'; amount: number }>) => s + action.amount,
+    0,
+    { equals: Object.is },
+);
+
+const countHistory: number[] = [];
+
+count.subscribe((value: number) => {
+    countHistory.push(value);
+});
+
+dispatch({ type: 'add', amount: 0 }); // 0 again: nothing is passed on
+
+dispatch({ type: 'add', amount: 2 });
+
+assert.deepStrictEqual(countHistory, [0, 2]);
+```
+
+When `equals` is omitted, every update is passed on, equal or not. The next major version will make `Object.is` the default; pass `equals: () => false` to keep passing on every update.
+
 ### Global Counter State (React)
 
 ```tsx
@@ -589,6 +645,8 @@ SynState provides simple, intuitive APIs for managing application state:
 - **`createState`**: Create state with InitializedObservable and setter
 - **`createReducer`**: Create state by reducer and initial value
 - **`createBooleanState`**: Specialized state for boolean values
+
+Each takes an `equals` option to skip updates equal to the current state (see [the example above](#skipping-updates-equal-to-the-current-state-equals)).
 
 ### Event System
 

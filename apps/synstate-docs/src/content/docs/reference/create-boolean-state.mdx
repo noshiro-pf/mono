@@ -31,6 +31,12 @@ const SampleComponent = (): React.JSX.Element => (
 );
 ```
 
+## Skipping equal updates (`equals`)
+
+The second argument takes the same `equals` option as [`createState`](../create-state/#skipping-equal-updates-equals).
+
+When `equals` is omitted, every update is passed on, equal or not. The next major version will make `Object.is` the default; pass `equals: () => false` to keep passing on every update.
+
 {/* source-link */}
 [View source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/utils/create-boolean-state.mts)
 {/* /source-link */}

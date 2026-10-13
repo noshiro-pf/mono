@@ -43,6 +43,34 @@ dispatch({ type: 'decrement' });
 assert.deepStrictEqual(stateHistory, [0, 1, 2, 1]);
 ```
 
+## Skipping equal updates (`equals`)
+
+The third argument takes an `equals` option.
+
+```tsx
+const [count, dispatch] = createReducer(
+    (s, action: Readonly<{ type: 'add'; amount: number }>) => s + action.amount,
+    0,
+    { equals: Object.is },
+);
+
+const countHistory: number[] = [];
+
+count.subscribe((value: number) => {
+    countHistory.push(value);
+});
+
+dispatch({ type: 'add', amount: 0 }); // 0 again: nothing is passed on
+
+dispatch({ type: 'add', amount: 2 });
+
+assert.deepStrictEqual(countHistory, [0, 2]);
+```
+
+`equals` is called with the current and the next state. When it returns `true`, the update is not passed on: no subscriber, and nothing derived from the state, is told of it, and the current state is kept along with its identity (`dispatch` returns the current state rather than the next). Decide this where the state is held rather than downstream with [`skipIfNoChange`](../skip-if-no-change/): an update passed on here reaches whatever reads the state directly before any operator can thin it out.
+
+When `equals` is omitted, every update is passed on, equal or not. The next major version will make `Object.is` the default; pass `equals: () => false` to keep passing on every update.
+
 {/* source-link */}
 [View source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/utils/create-reducer.mts)
 {/* /source-link */}
