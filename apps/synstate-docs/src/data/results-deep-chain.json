@@ -2,7 +2,25 @@
   "kind": "series",
   "meta": {
     "updates": null,
-    "timeoutMs": 5000
+    "timeoutMs": 5000,
+    "environment": {
+      "runner": "github-actions",
+      "runnerImage": "ubuntu24",
+      "node": "v26.10.0",
+      "platform": "Linux 6.17.0-1022-azure",
+      "arch": "x64",
+      "cpu": "Intel(R) Xeon(R) 6973P-C",
+      "measuredOn": "2026-10-12",
+      "libraries": {
+        "synstate": "3.1.0",
+        "rxjs": "7.8.2",
+        "jotai": "3.0.1",
+        "mobx": "7.0.6",
+        "@reduxjs/toolkit": "2.13.0",
+        "zustand": "5.0.15",
+        "valtio": "2.3.2"
+      }
+    }
   },
   "xLabels": [
     "K=100, M=50",
@@ -17,19 +35,19 @@
   "series": [
     {
       "label": "SynState",
-      "values": [0.8, 2.3, 4.6, 0.9, 4.3, 8.2, 8.7, 15.1]
+      "values": [0.9, 2.4, 4.3, 0.9, 4.6, 8, 8.2, 16.3]
     },
     {
       "label": "RxJS",
-      "values": [3, 17.3, 35.2, 20.7, 99.5, 186.5, 516.5, 1042.4]
+      "values": [3.5, 16.5, 31, 22.1, 153.8, 250, 554.5, 1161.6]
     },
     {
       "label": "Jotai",
-      "values": [11.4, 48, 95.6, 20, 94.9, 195.4, 198.6, 399]
+      "values": [15.8, 59, 128.4, 25.9, 126.4, 251.8, 256.6, 504.8]
     },
     {
       "label": "MobX",
-      "values": [14.1, 66.7, 133, 24.8, 125.3, 253, 248.4, 504.2]
+      "values": [20.7, 92.7, 170.6, 27.7, 157.9, 329.7, 259.9, 532.6]
     }
   ]
 }

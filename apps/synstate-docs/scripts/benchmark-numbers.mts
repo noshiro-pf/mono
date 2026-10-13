@@ -42,15 +42,22 @@ import {
  */
 export const benchmarkNumbers = (): ReadonlyRecord<string, string> =>
   ({
-    // Where the numbers on this page were measured. Three bare facts rather
-    // than a sentence: a marker's value is written once and spliced into both
+    // Where the numbers on this page were measured. Bare facts rather than a
+    // sentence: a marker's value is written once and spliced into both
     // language versions, so it must carry no English of its own.
     'environment/runner': environmentFact((e) =>
       e.runner === 'github-actions'
         ? `GitHub Actions ${e.runnerImage ?? 'standard runner'}`
-        : e.cpu,
+        : 'local',
     ),
+    'environment/os': environmentFact((e) => `${e.platform} (${e.arch})`),
+    'environment/cpu': environmentFact((e) => e.cpu),
     'environment/node': environmentFact((e) => e.node),
+    'environment/libraries': environmentFact((e) =>
+      Object.entries(e.libraries)
+        .map(([name, version]) => `${name} ${version}`)
+        .join(', '),
+    ),
     'environment/measured-on': environmentFact((e) => e.measuredOn),
 
     // Scenario: Derived Chain / Diamond Dependency
@@ -151,8 +158,11 @@ type RecordedEnvironment = Readonly<{
   runner: string;
   runnerImage: string | null;
   node: string;
+  platform: string;
+  arch: string;
   cpu: string;
   measuredOn: string;
+  libraries: ReadonlyRecord<string, string>;
 }>;
 
 type ResultsMeta = Readonly<{
