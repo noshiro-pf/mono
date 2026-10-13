@@ -259,7 +259,7 @@ const isBump = (value: string | undefined): value is Bump =>
  * `0.x` package signals a breaking change with its minor, and changesets
  * would take a `major` there to `1.0.0`, which is breaking as well.
  */
-const isBreaking = (bump: Bump, version: string): boolean =>
+export const isBreaking = (bump: Bump, version: string): boolean =>
   bump === 'major' || (bump === 'minor' && version.startsWith('0.'));
 
 const checkStock = (
@@ -357,7 +357,7 @@ const checkStock = (
   };
 };
 
-const readChangesets = async (): Promise<readonly ChangesetFile[]> => {
+export const readChangesets = async (): Promise<readonly ChangesetFile[]> => {
   const files = await glob(`${CHANGESET_DIR_NAME}/*.md`, {
     cwd: projectRootPath,
   });
