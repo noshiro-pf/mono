@@ -3,6 +3,7 @@ import {
   formatDateTime,
   formatEstimate,
   formatLag,
+  formatShortDateTime,
   HOUR_MS,
   MINUTE_MS,
 } from './format.mjs';
@@ -52,6 +53,43 @@ describe(formatDateTime, () => {
     assert.strictEqual(
       formatDateTime(1_791_515_100_000 /* 2026-10-09T03:05:00Z */, 'UTC'),
       '2026/10/09 03:05',
+    );
+  });
+});
+
+describe(formatShortDateTime, () => {
+  const at = 1_791_515_100_000; /* 2026-10-09T03:05:00Z */
+
+  test('leaves the year out within the year of now', () => {
+    assert.strictEqual(
+      formatShortDateTime(at, at + 30 * DAY_MS, 'Asia/Tokyo'),
+      '10/09 12:05',
+    );
+  });
+
+  test('writes the year, and leaves the time out, in another year', () => {
+    assert.strictEqual(
+      formatShortDateTime(at, at + 365 * DAY_MS, 'Asia/Tokyo'),
+      '2026/10/09',
+    );
+  });
+
+  test('reads the year in the given time zone', () => {
+    // 2026-12-31T16:00:00Z, 2027-01-01 01:00 in Tokyo.
+    const newYearInTokyo = 1_798_732_800_000;
+
+    assert.strictEqual(
+      formatShortDateTime(newYearInTokyo, newYearInTokyo, 'Asia/Tokyo'),
+      '01/01 01:00',
+    );
+
+    assert.strictEqual(
+      formatShortDateTime(
+        newYearInTokyo,
+        1_798_804_800_000 /* 2027-01-01T12:00:00Z */,
+        'UTC',
+      ),
+      '2026/12/31',
     );
   });
 });

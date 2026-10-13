@@ -5,6 +5,7 @@ import {
   createTask,
   type DomainState,
 } from '../domain/index.mjs';
+import { DAY_MS } from '../view-model/index.mjs';
 import { buildNodeViews } from './node-views.mjs';
 import { textWidthUnits } from './truncate.mjs';
 
@@ -26,6 +27,7 @@ const state: DomainState = {
       title: 'B',
       now: 0,
       priority: 1,
+      dueDate: 1_791_515_100_000 /* 2026-10-09T03:05:00Z */,
       progress: 'in-progress',
       startedAt: 10,
       dependencies: [{ from: { kind: 'milestone', id: m }, lagMs: 0 }],
@@ -52,8 +54,8 @@ describe(buildNodeViews, () => {
     ]);
   });
 
-  test('describes a task by its status, priority and warning', () => {
-    const view = buildNodeViews(state, 100).get('task:b');
+  test('describes a task by its status, due date, priority and warning', () => {
+    const view = buildNodeViews(state, 100, 'Asia/Tokyo').get('task:b');
 
     assert.deepStrictEqual(view, {
       kind: 'task',
@@ -63,9 +65,67 @@ describe(buildNodeViews, () => {
       compactTitle: 'B',
       status: 'in-progress',
       priority: 1,
+      due: '期限 2026/10/09',
+      overdue: false,
       warning: true,
-      ariaLabel: 'タスク「B」 状態: 作業中 優先度: 最高 依存が未解消のまま開始',
+      ariaLabel:
+        'タスク「B」 状態: 作業中 期限: 2026/10/09 12:05 優先度: 最高 依存が未解消のまま開始',
     });
+  });
+
+  test('writes the due date short, and marks it once it has passed', () => {
+    const dueDate = 1_791_515_100_000; /* 2026-10-09T03:05:00Z */
+
+    const before = buildNodeViews(state, dueDate - DAY_MS, 'Asia/Tokyo').get(
+      'task:b',
+    );
+
+    assert.isTrue(before?.kind === 'task');
+
+    assert.strictEqual(before.due, '期限 10/09 12:05');
+
+    assert.isFalse(before.overdue);
+
+    const after = buildNodeViews(state, dueDate + 1, 'Asia/Tokyo').get(
+      'task:b',
+    );
+
+    assert.isTrue(after?.kind === 'task');
+
+    assert.strictEqual(after.due, '期限切れ 10/09 12:05');
+
+    assert.isTrue(after.overdue);
+
+    assert.isTrue(after.ariaLabel.includes(' 期限切れ '));
+  });
+
+  test('says so when a task has no due date, and never marks a done one', () => {
+    const view = buildNodeViews(state, 100).get('task:a');
+
+    assert.isTrue(view?.kind === 'task');
+
+    assert.strictEqual(view.due, '期限なし');
+
+    assert.isFalse(view.ariaLabel.includes('期限'));
+
+    const done = buildNodeViews(
+      {
+        ...state,
+        tasks: state.tasks.map((task) => ({
+          ...task,
+          progress: 'done',
+          startedAt: 10,
+          completedAt: 20,
+        })),
+      },
+      1_791_515_100_000 + DAY_MS,
+    ).get('task:b');
+
+    assert.isTrue(done?.kind === 'task');
+
+    assert.isFalse(done.overdue);
+
+    assert.isTrue(done.due.startsWith('期限 '));
   });
 
   test('cuts a long title to fit the node', () => {

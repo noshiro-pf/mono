@@ -58,6 +58,91 @@ test('draws the DAG and opens a node', { tag: '@smoke' }, async ({ page }) => {
 });
 
 test(
+  'writes a task’s due date under its title and draws its priority',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto(DEMO);
+
+    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+
+    await showDag(page);
+
+    const task = (title: string): Locator =>
+      page
+        .getByTestId('dag-node')
+        .and(page.getByRole('button', { name: `タスク「${title}」` }));
+
+    const drawn = async (
+      title: string,
+    ): Promise<
+      Readonly<{
+        meta: string;
+        overdue: boolean;
+        badge: string | undefined;
+        ring: boolean;
+        opacity: string;
+      }>
+    > =>
+      task(title).evaluate((node) => {
+        const meta = node.querySelector('.dag-node-meta');
+
+        const body = node.querySelector('.dag-node-body');
+
+        return {
+          meta: meta?.textContent ?? '',
+          overdue: meta?.classList.contains('overdue') ?? false,
+          badge: node.querySelector(':scope .dag-node-priority text')
+            ?.textContent,
+          ring: node.querySelector('.dag-node-ring') !== null,
+          opacity: body === null ? '' : getComputedStyle(body).opacity,
+        };
+      });
+
+    // The status is left to the colour: the second line is the due date.
+    expect.soft(await drawn('画面を実装する')).toStrictEqual({
+      // Without the year within this year, and without the time outside it.
+      meta: expect.stringMatching(
+        /^期限 (?:\d\d\/\d\d \d\d:\d\d|\d{4}\/\d\d\/\d\d)$/u,
+      ),
+      overdue: false,
+      badge: '高',
+      ring: false,
+      opacity: '1',
+    });
+
+    expect.soft(await drawn('API を実装する')).toStrictEqual({
+      meta: expect.stringMatching(/^期限切れ /u),
+      overdue: true,
+      badge: '最高',
+      ring: true,
+      opacity: '1',
+    });
+
+    expect.soft(await drawn('結合テスト')).toMatchObject({
+      badge: undefined,
+      ring: false,
+      opacity: '1',
+    });
+
+    expect.soft(await drawn('利用者向けドキュメントを書く')).toMatchObject({
+      badge: '低',
+      opacity: '0.6',
+    });
+
+    // Faint until pointed at.
+    await task('利用者向けドキュメントを書く').hover();
+
+    await expect
+      .poll(async () => {
+        const { opacity } = await drawn('利用者向けドキュメントを書く');
+
+        return opacity;
+      })
+      .toBe('1');
+  },
+);
+
+test(
   'saves a dependency typed into a row, without 「依存を追加」',
   { tag: '@smoke' },
   async ({ page }) => {
@@ -1674,7 +1759,9 @@ test(
       .soft(
         await moved.evaluate((node) => ({
           tooltip: node.querySelector('title')?.textContent,
-          lines: node.querySelectorAll('text').length,
+          // The lines of text, not the priority's pill.
+          lines: node.querySelectorAll('text:not(.dag-node-priority text)')
+            .length,
         })),
       )
       .toStrictEqual({
