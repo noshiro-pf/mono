@@ -2,6 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as zlib from 'node:zlib';
 import { Arr, Num } from 'ts-data-forge';
+import { extensionIcon, extensionIconPaneBoundsOf } from '../src/index.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 /**
@@ -9,9 +10,10 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
  *
  * PNG, because that is the only thing the manifest's `icons` takes, and drawn
  * here rather than kept as four hand-made files so that the shape has one
- * definition. There is no image library in the dependency tree and no need for
- * one: the icon is a rounded square with four panes in it, which is arithmetic,
- * and `node:zlib` is the only thing a PNG needs beyond that.
+ * definition — `extensionIcon`, which the tab's favicon draws too. There is
+ * no image library in the dependency tree and no need for one: the icon is a
+ * rounded square with four panes in it, which is arithmetic, and `node:zlib`
+ * is the only thing a PNG needs beyond that.
  *
  * The four panes are the layout the extension opens in, and they are what has
  * to survive being drawn at 16px — hence 2x2 rather than anything cleverer,
@@ -37,20 +39,7 @@ const iconSizes = [16, 32, 48, 128] as const;
 
 const iconsPath = path.resolve(workspaceRootPath, 'public', 'icons');
 
-/** The blue the interface uses for anything active. */
-const background = [79, 127, 217] as const;
-
-const pane = [255, 255, 255] as const;
-
-/** How far the rounded square is inset, and how round it is, in unit space. */
-const squareInset = 0.02;
-
-const squareRadius = 0.2;
-
-/** Where the four panes sit inside it, and how far apart. */
-const paneInset = 0.2;
-
-const paneGutter = 0.07;
+const { background, pane, squareInset, squareRadius } = extensionIcon;
 
 /** Subsamples per axis. Enough to make a curve at 16px look like one. */
 const samples = 4;
@@ -120,7 +109,7 @@ const colourAt = (
     return [0, 0, 0, 0];
   }
 
-  const panes = paneBoundsOf(size);
+  const panes = extensionIconPaneBoundsOf(size);
 
   return isInPane(panes, px) && isInPane(panes, py)
     ? [pane[0], pane[1], pane[2], 255]
@@ -146,25 +135,6 @@ const isInRoundedSquare = (size: number, px: number, py: number): boolean => {
   const cy = Math.min(Math.max(py, low + radius), high - radius);
 
   return (px - cx) ** 2 + (py - cy) ** 2 <= radius ** 2;
-};
-
-/**
- * Where the four panes start and end, in whole pixels.
- *
- * Snapped, because the alternative is what 16px looked like when this was
- * fractions of a unit square: a one-pixel gutter spread across two pixels at
- * half strength, and four panes that read as one grey smudge.
- */
-const paneBoundsOf = (
-  size: number,
-): readonly [number, number, number, number] => {
-  const inset = Math.max(1, Math.round(paneInset * size));
-
-  const gutter = Math.max(1, Math.round(paneGutter * size));
-
-  const span = Math.max(1, Math.floor(Num.div(size - 2 * inset - gutter, 2)));
-
-  return [inset, inset + span, size - inset - span, size - inset];
 };
 
 /** Whether one axis falls inside either of the two panes along it. */
