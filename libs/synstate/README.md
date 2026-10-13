@@ -606,7 +606,7 @@ For complex scenarios, SynState provides observable-based APIs:
 - `source<T>()`: Create a new observable source (Almost equivalent to RxJS `subject`)
 - `fromPromise(promise)`: Create observable from promise
 - `fromSubscribable()`: Create observable from any subscribable object
-- `counter(ms)`: Emit values at intervals (Almost equivalent to RxJS `interval`)
+- `counter(ms)`: Emit 0 at once, then 1, 2, … at intervals (Almost equivalent to RxJS `timer(0, ms)`; `counter(ms, { emitInitial: false })` is almost equivalent to `interval(ms)`)
 - `timer(delay)`: Emit after delay
 
 #### Operators

@@ -203,8 +203,6 @@ describe(createReader, () => {
 
     assert.strictEqual(timers.running(POLL_INTERVAL_MS), 1);
 
-    timers.emitFirst(POLL_INTERVAL_MS);
-
     assert.strictEqual(loads.length, 2);
 
     timers.fire(POLL_INTERVAL_MS);
@@ -438,22 +436,6 @@ describe(createReader, () => {
       type: 'failed',
       message: 'boom',
     });
-  });
-
-  test("a counter's first emission, at once, is not a tick", () => {
-    const { reader, loads, clock, timers } = setup(TOKEN_A);
-
-    reader.start();
-
-    timers.emitFirst(POLL_INTERVAL_MS);
-
-    clock.set(5_000);
-
-    timers.emitFirst(CLOCK_TICK_MS);
-
-    assert.strictEqual(loads.length, 1);
-
-    assert.strictEqual(reader.nowMs.getSnapshot().value, 0);
   });
 
   test('stop ends the timers and the listeners', () => {
@@ -700,7 +682,6 @@ type Setup = Readonly<{
   timers: Readonly<{
     /** Ticks the newest timer of this interval. */
     fire: (ms: number) => void;
-    emitFirst: (ms: number) => void;
     /** How many timers of this interval were ever asked for. */
     started: (ms: number) => number;
     /** How many timers of this interval are not yet completed. */
@@ -787,12 +768,8 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
     visibility: mut_visibility,
     setToken,
     timers: {
-      // A counter's first emission is `0`, at once; a tick is the next one.
       fire: (ms: number) => {
         countersOf(ms).at(-1)?.next(1);
-      },
-      emitFirst: (ms: number) => {
-        countersOf(ms).at(-1)?.next(0);
       },
       started: (ms: number) => countersOf(ms).length,
       running: (ms: number) =>

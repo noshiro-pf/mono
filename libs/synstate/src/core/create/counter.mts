@@ -4,10 +4,17 @@ import type { CounterObservable, TimerId } from '../types/index.mjs';
 
 /**
  * Creates an observable that emits incremental numbers at a specified interval.
- * Starts with 0 immediately after subscription, then emits 1, 2, 3, ... every interval.
+ * Emits 0 in the macrotask right after `start()` (which runs at creation
+ * unless `startManually` is set), then 1, 2, 3, ... every interval. A
+ * subscriber added after that 0 has been emitted does not receive it.
  *
  * @param intervalMilliSeconds - The interval duration in milliseconds
- * @param startManually - If true, waits for manual start (default: false)
+ * @param options - Optional settings
+ * @param options.startManually - If true, waits for `start()` instead of
+ *   starting at creation (default: false)
+ * @param options.emitInitial - If false, skips the 0 emitted right after
+ *   `start()`, so the first value is 1, one interval later — like RxJS
+ *   `interval` rather than `timer(0, ms)` (default: true)
  * @returns An observable that emits sequential numbers
  *
  * @example
@@ -49,6 +56,7 @@ export const counter = (
   intervalMilliSeconds: number,
   options?: Readonly<{
     startManually?: boolean;
+    emitInitial?: boolean;
   }>,
 ): CounterObservable => {
   let mut_counter: SafeUint = asSafeUint(0);
@@ -60,13 +68,13 @@ export const counter = (
   let mut_isStarted = false;
 
   const resetTimer = (): void => {
-    if (mut_timerId0 === undefined || mut_timerId === undefined) {
-      return;
+    if (mut_timerId0 !== undefined) {
+      clearTimeout(mut_timerId0);
     }
 
-    clearInterval(mut_timerId0);
-
-    clearInterval(mut_timerId);
+    if (mut_timerId !== undefined) {
+      clearInterval(mut_timerId);
+    }
   };
 
   const observable = createRootObservable<
@@ -90,9 +98,11 @@ export const counter = (
           return;
         }
 
-        mut_timerId0 = setTimeout(() => {
-          startUpdate(mut_counter);
-        }, 0);
+        if (options?.emitInitial ?? true) {
+          mut_timerId0 = setTimeout(() => {
+            startUpdate(mut_counter);
+          }, 0);
+        }
 
         mut_timerId = setInterval(() => {
           mut_counter = SafeUint.add(1, mut_counter);
