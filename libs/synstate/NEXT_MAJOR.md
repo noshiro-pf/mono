@@ -9,7 +9,9 @@
     on every update as before.
 
     `synstate-preact-signals`, `synstate-preact-hooks`, `synstate-react-hooks`
-    and `synstate-react-hooks-compat` pass `equals` through and depend on this
-    exact version, so the change reaches their users too; each of them carries
-    the same item and changes in its own major, released together with this
-    one.
+    and `synstate-react-hooks-compat` pass `equals` through, so the change
+    reaches their users too: the signal, the components using the hook and
+    the subscribers of `state` are not told of such an update. Name all five
+    packages with `major` in the changeset that makes it, so that its text
+    reaches each changelog; `check:prose:linked-releases` holds the release
+    until it does.
