@@ -3,9 +3,9 @@ import { memoNamed } from 'preact-utils';
 import { dagShowDoneSignal, dagShowDoneStore } from '../store/index.mjs';
 
 /**
- * Whether the done tasks are drawn, in every view mode: off unless turned
- * on, and then they and the edges from them are left out
- * (`dag/hidden-nodes.mts`). Kept on this device, apart from the list's
+ * Whether the done tasks and the reached milestones are drawn, in every view
+ * mode: off unless turned on, and then they and the edges from them are left
+ * out (`dag/hidden-nodes.mts`). Kept on this device, apart from the list's
  * 「完了を隠す」.
  */
 export const DagShowDoneField = memoNamed('DagShowDoneField', () => (
@@ -20,11 +20,11 @@ export const DagShowDoneField = memoNamed('DagShowDoneField', () => (
         onChange={onShowDoneChange}
       />
       <span className={'bp6-control-indicator'} />
-      {'完了済みのタスクを表示'}
+      {'完了済みのタスク・到達済みのマイルストーンを表示'}
     </label>
     <p className={'settings-hint'} id={HINT_ID}>
       {
-        'オフのあいだは、完了したタスクとそこからの依存の線を描きません。リストの「完了を隠す」とは別の設定です。'
+        'オフのあいだは、完了したタスクと到達したマイルストーン、そこからの依存の線を描きません。リストの「完了を隠す」とは別の設定です。'
       }
     </p>
   </div>
