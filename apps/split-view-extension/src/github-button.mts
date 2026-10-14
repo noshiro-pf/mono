@@ -40,8 +40,8 @@ const main = (): void => {
 
   mut_button.title = [
     'Open this pull request in Split View: the diff beside the conversation,',
-    'and the issue it closes beside that.',
-    'Ctrl+click or middle-click opens it behind this tab.',
+    'and the issue it closes beside that. This tab is closed once it opens.',
+    'Ctrl+click or middle-click opens it behind this tab and keeps this tab.',
   ].join('\n');
 
   const style = new CSSStyleSheet();
@@ -66,6 +66,10 @@ const main = (): void => {
   // loading a document, so it is the history entry that is watched.
   browserNavigation.addEventListener('currententrychange', showOnPullRequests);
 
+  /**
+   * A plain click replaces this tab with the split view; one that opens it
+   * behind keeps this tab, as the user is evidently staying on it.
+   */
   const openThisPullRequest = (active: boolean): void => {
     const pullRequest = pullRequestOf(document.location.href);
 
@@ -75,7 +79,7 @@ const main = (): void => {
 
     mut_button.disabled = true;
 
-    openPullRequest(pullRequest, active)
+    openPullRequest(pullRequest, { active, closeOpener: active })
       .catch(console.error)
       .finally(() => {
         mut_button.disabled = false;
@@ -104,7 +108,10 @@ const main = (): void => {
     const pullRequest = pullRequestOf(message.url);
 
     if (pullRequest !== undefined) {
-      openPullRequest(pullRequest, true).catch(console.error);
+      openPullRequest(pullRequest, {
+        active: true,
+        closeOpener: false,
+      }).catch(console.error);
     }
   });
 };
@@ -121,7 +128,7 @@ const main = (): void => {
  */
 const openPullRequest = async (
   pullRequest: PullRequest,
-  active: boolean,
+  { active, closeOpener }: Readonly<{ active: boolean; closeOpener: boolean }>,
 ): Promise<void> => {
   const conversation = await readConversation(pullRequest);
 
@@ -137,6 +144,7 @@ const openPullRequest = async (
       (onScreen ? pullRequestTitleOf(document.title) : undefined),
     issueUrl: conversation?.issueUrl,
     active,
+    closeOpener,
   } as const;
 
   await chrome.runtime.sendMessage(message);

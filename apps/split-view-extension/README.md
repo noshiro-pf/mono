@@ -173,7 +173,9 @@ links do: the diff, without whitespace changes or the files already marked
 viewed, beside the conversation at 7:3 — and when the pull request closes an
 issue, the right half shared with that issue. Everything is at 100%, except
 the conversation and the issue when they share the right half, which are at
-75% so that more of each fits. `Ctrl`+click or a middle click opens it behind the current tab.
+75% so that more of each fits. The pull request's own tab is closed once the
+split view has opened, so the split view takes its place; `Ctrl`+click or a
+middle click opens it behind the current tab instead, and keeps that tab.
 
 A link to a pull request — on GitHub, in a mail, in a chat — has **Open pull
 request in Split View** in its context menu, and so does a pull request's own

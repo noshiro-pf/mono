@@ -220,7 +220,11 @@ const openSplitView = async (): Promise<void> => {
 
 /**
  * Opens a pull request in a split view, in a new tab beside the one it was
- * asked from.
+ * asked from, and closes that one when the message asks for it.
+ *
+ * The tab is closed only after the split view's tab has been created, so a
+ * failure to open leaves the user where they were; the closed tab is in
+ * Chrome's recently closed list like any other.
  *
  * The addresses were read off a web page, so they are checked again here:
  * nothing but a pull request on github.com is opened, and nothing but an issue
@@ -254,6 +258,10 @@ const openPullRequest = async (
           index: openerTab.index + 1,
         }),
   });
+
+  if (message.closeOpener && openerTab?.id !== undefined) {
+    await chrome.tabs.remove(openerTab.id);
+  }
 };
 
 /** What of the tab a pull request was asked from the new tab is put beside. */
@@ -300,6 +308,7 @@ const openPullRequestFromMenu = async (
       title: undefined,
       issueUrl: undefined,
       active: true,
+      closeOpener: false,
     },
     tab,
   );

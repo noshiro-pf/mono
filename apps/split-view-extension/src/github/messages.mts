@@ -26,6 +26,13 @@ export type GitHubMessage = Readonly<
       issueUrl: string | undefined;
       /** `false` for a Ctrl+click or a middle click: open it behind this tab. */
       active: boolean;
+      /**
+       * `true` for a plain click on the button: the split view takes the place
+       * of the tab it was asked from, which is closed once the split view's tab
+       * exists. `false` for everything that keeps the tab — opening behind it,
+       * and the context menu, whose link may be on any page at all.
+       */
+      closeOpener: boolean;
     }
   | {
       tag: typeof githubMessageTag;
@@ -65,6 +72,8 @@ export const asGitHubMessage = (value: unknown): GitHubMessage | undefined => {
 
   return hasKey(value, 'active') &&
     typeof value.active === 'boolean' &&
+    hasKey(value, 'closeOpener') &&
+    typeof value.closeOpener === 'boolean' &&
     isOptionalString(title) &&
     isOptionalString(issueUrl)
     ? {
@@ -74,6 +83,7 @@ export const asGitHubMessage = (value: unknown): GitHubMessage | undefined => {
         title,
         issueUrl,
         active: value.active,
+        closeOpener: value.closeOpener,
       }
     : undefined;
 };
