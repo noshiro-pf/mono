@@ -12,6 +12,7 @@ import {
   MERGE_QUEUED_LABEL,
   SKIP_CI_LABEL,
   stackDescendants,
+  type QueueOwner,
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import {
@@ -40,6 +41,7 @@ import {
 import type {
   Advanced,
   AdvancePlan,
+  BranchOf,
   PullRequest,
   RebaseFailure,
   RetargetedLayer,
@@ -80,7 +82,7 @@ type RebaseTarget = Readonly<{
  * is what the `removeWorktree` before `git worktree add` is for.
  */
 const rebaseAndPush = async (
-  pr: PullRequest,
+  pr: BranchOf,
   target: RebaseTarget,
 ): Promise<Result<Rebased, RebaseFailure>> => {
   const branch = pr.headRefName;
@@ -135,7 +137,7 @@ const rebaseAndPush = async (
  * caller's next line always runs.
  */
 const rebaseInWorktree = async (
-  pr: PullRequest,
+  pr: BranchOf,
   target: RebaseTarget,
   worktreeDir: string,
 ): Promise<Result<Rebased, RebaseFailure>> => {
@@ -221,29 +223,54 @@ const rebaseInWorktree = async (
     });
   }
 
+  const pushed = await pushLeased(branch, sha, pr.headRefOid, worktreeDir);
+
+  if (Result.isErr(pushed)) {
+    return Result.err({
+      reason: 'push-failed',
+      detail: `push refused: ${lastLines(pushed.value, 5)}`,
+      output: pushed.value,
+    });
+  }
+
+  return Result.ok(
+    pushed.value === 'moved'
+      ? { kind: 'moved' }
+      : { kind: 'rebased', head: sha },
+  );
+};
+
+/**
+ * Force-pushes `sha` to `branch`, leased against `lease`: `moved` when the
+ * lease lost to someone else's push, an error when the push was refused for
+ * any other reason. The worker's rebases and restacks push through here, and
+ * so does `push-fixed-pr`, which a session runs.
+ */
+export const pushLeased = async (
+  branch: string,
+  sha: string,
+  lease: string,
+  cwd?: string,
+): Promise<Result<'moved' | 'pushed', string>> => {
   // The lease names the SHA the survey saw, not the remote-tracking ref: a
   // bare `--force-with-lease` compares against whatever the last fetch
   // left, which is exactly the race this is meant to lose safely.
   const pushed = await git(
-    `git push --force-with-lease=${sh(`${branch}:${pr.headRefOid}`)} origin ${sh(`${sha}:refs/heads/${branch}`)}`,
-    worktreeDir,
+    `git push --force-with-lease=${sh(`${branch}:${lease}`)} origin ${sh(`${sha}:refs/heads/${branch}`)}`,
+    cwd,
   );
 
-  if (Result.isErr(pushed)) {
-    // A lease that lost is someone else pushing in the time the rebase took,
-    // and that is not a reason to set the pull request aside.
-    const remoteHeadNow = await remoteSha(branch);
-
-    return Result.isOk(remoteHeadNow) && remoteHeadNow.value !== pr.headRefOid
-      ? Result.ok({ kind: 'moved' })
-      : Result.err({
-          reason: 'push-failed',
-          detail: `push refused: ${lastLines(pushed.value, 5)}`,
-          output: pushed.value,
-        });
+  if (Result.isOk(pushed)) {
+    return Result.ok('pushed');
   }
 
-  return Result.ok({ kind: 'rebased', head: sha });
+  // A lease that lost is someone else pushing in the time the rebase took,
+  // and that is not a reason to set the pull request aside.
+  const remoteHeadNow = await remoteSha(branch);
+
+  return Result.isOk(remoteHeadNow) && remoteHeadNow.value !== lease
+    ? Result.ok('moved')
+    : Result.err(pushed.value);
 };
 
 type Rebased = Readonly<{ kind: 'moved' } | { kind: 'rebased'; head: string }>;
@@ -429,7 +456,7 @@ export const restackBehind = async (
   context: Readonly<{
     baseSha: string;
     skipped: SkipRecords;
-    claimed: ReadonlySet<number>;
+    owners: ReadonlyMap<number, QueueOwner>;
     dryRun: boolean;
   }>,
 ): Promise<Readonly<{ skipped: SkipRecords; moved: boolean }>> => {
@@ -785,12 +812,13 @@ const carries = async (
  * one that replaced it, lowest layer first so that each finds its own new
  * base already pushed. A layer that cannot be moved, or that someone else
  * moved first, is reported and left where it is, and so is everything on
- * it; none of this stops `pr` itself, whose turn it is.
+ * it; none of this stops `pr` itself, whose turn it is. `push-fixed-pr`
+ * carries a session's layers along through here too.
  */
-const restack = async (
-  pr: PullRequest,
+export const restack = async (
+  pr: BranchOf,
   head: string,
-  descendants: readonly PullRequest[],
+  descendants: readonly BranchOf[],
 ): Promise<void> => {
   const mut_moved = new Map<string, Readonly<{ from: string; to: string }>>([
     [pr.headRefName, { from: pr.headRefOid, to: head }],

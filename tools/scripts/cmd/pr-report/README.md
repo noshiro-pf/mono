@@ -119,7 +119,11 @@ public なので無認証でも動き、1回のレポートは匿名の 60 reque
 `unblock-prs` の見送りの comment と、それを直すセッションの claim が何を言って
 いるか（`setAside` / `claim`、無ければ省略）も載ります。信用するのはトークンの
 アカウントが書いた comment だけなので、トークンが無ければ載りません
-（`tools/scripts/cmd/unblock-prs/README.md`）。
+（`tools/scripts/cmd/unblock-prs/README.md`）。キューにある PR には、次に動かす
+担当者（`owner`: `worker` / `skill` / `human` / `none`）も載ります。決めるのは
+`pr-report-core` の `queueOwner` で、worker も `claim-pr` / `push-fixed-pr` /
+`report-unowned-prs` も `queue.mts` を通して同じ値を読みます。comment が読め
+なかった PR には載りません。
 
 **GitHub Pull Requests Manager**
 （<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`）はこの
@@ -202,7 +206,11 @@ command and read what it prints. Each entry of `--format json` also carries
 what `unblock-prs`'s set-aside comment and a fixing session's claim say
 (`setAside` / `claim`, absent when there is none). Only comments the token's
 own account wrote are trusted, so without a token neither is there
-(`tools/scripts/cmd/unblock-prs/README.md`).
+(`tools/scripts/cmd/unblock-prs/README.md`). A pull request in the queue also
+carries who moves it next (`owner`: `worker`, `skill`, `human` or `none`),
+decided by `pr-report-core`'s `queueOwner`, which the worker, `claim-pr`,
+`push-fixed-pr` and `report-unowned-prs` read through `queue.mts` too. It is
+absent on one whose comments could not be read.
 
 The **GitHub Pull Requests Manager** page
 (<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`) does

@@ -83,6 +83,23 @@ export const resolveRepo = async (): Promise<Result<Repo, string>> => {
  * naming the status and what GitHub said about it, because "403" on its own
  * sends the reader to the wrong place.
  */
+/** The token and the repository, for a command that calls {@link rest}. */
+export const resolveApiContext = async (): Promise<
+  Result<ApiContext, string>
+> => {
+  const token = await resolveToken();
+
+  if (Result.isErr(token)) {
+    return token;
+  }
+
+  const repo = await resolveRepo();
+
+  return Result.isErr(repo)
+    ? repo
+    : Result.ok({ repo: repo.value, token: token.value });
+};
+
 export const rest = async <A,>(
   context: ApiContext,
   method: 'GET' | 'PATCH' | 'POST',

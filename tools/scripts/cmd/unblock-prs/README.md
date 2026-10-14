@@ -275,6 +275,10 @@ GraphQL 1回でまとめて読み、記録と突き合わせます（`skips.mts`
 - まだ有効なのにこのプロセスが記録を持っていない comment は、前のプロセスが
   残したものです。記録として引き継ぎ、試し直しません。同じ head と base の
   rebase は同じように conflict するからです。
+- 逆に、このプロセスが記録を持っているのに、それを言う comment が無い（書き込
+  みに失敗した）PR には comment を書き直します（`unannouncedSkips`）。放って
+  おくと、このスクリプトは見送り中として扱い、comment を読む skill は担当者を
+  `worker` と読むので、互いに相手に任せたままになります。
 
 同じリクエストで、セッションが書いた **claim**（「見送った PR を直すセッション
 の claim」）も読みます。まだ有効な claim は見送りの記録とは別に持ち、その PR は
@@ -289,9 +293,9 @@ pick も「3a」の rebase もしません。
    作り、閉路を検出（ version PR の body だけは読みません — 上書きされるので）。
 2. **範囲判定** — `merge-queued` が無ければ `ignore`（無言）。あって動かせなけ
    れば `note`（理由を出力）。
-3. **skip 記録** — 前のサイクルで諦めた PR は、当時の head と base のままなら
-   `note`。**claim** — セッションが claim している PR も、誰がいつ claim した
-   かを添えて `note`。
+3. **担当者** — 担当者（「担当者（owner）」）が `worker` でない PR は、担当者と
+   理由を添えて `note`。見送りの記録が head に残っている PR と、セッションが
+   claim している PR がこれにあたります。
 4. **stack** — 積まれている PR は「下の層が先」と `note`。
    **auto-merge** — 無い PR は、GitHub のネイティブ stack に入っていれば
    `note`（手でマージ）。そうでなければ先へ進み、pick されたときに張られます。
@@ -407,8 +411,7 @@ survey と違う / lease 負けで push が拒否され、remote の head が変
 - 対象: **`skip-ci` が付いていて**（push しても CI が走らない）、**
   `auto-rebase` か `merge-queued` のどちらかが付いている** PR。そのうち open、
   draft でない、同じリポジトリのブランチ、base が `main`、version PR ではない、
-  見送りの記録が今の head と `main` に対して残っておらず、セッションの claim
-  も無いもの。
+  担当者が `worker` のもの（見送りの記録も、セッションの claim も無いもの）。
   `merge-queued` の PR がここまで来るのは、`Merge-After` やレビュー待ちなどで
   pick されないときです。pick される前に rebase しておいても、`skip-ci` が付
   いていれば損はありません。
@@ -651,11 +654,41 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 - 有効な claim がある PR は、pick も「3a」の rebase もしません。`skip-ci` を
   付けて止めることだけは続けます（skill は `skip-ci` を付けてから push しま
   す）。
-- `claim-pr` は、今の head と `main` に対して見送りが有効でない PR（このスク
-  リプトがまさに動かそうとしている PR）と、他の書き手の claim が有効な PR に
-  は書きません。書いた後に読み直し、同時に書いた相手に負けていれば失敗します。
-- `pnpm run pr-report -- --format json` の各 entry の `setAside` と `claim`
-  が、skill が直す PR を選ぶときに読むものです。
+- `claim-pr` は、担当者が skill でない PR（このスクリプトがまさに動かそうとし
+  ている PR や、人の手が要る PR）と、他の書き手の claim が有効な PR には書き
+  ません。書いた後に読み直し、同時に書いた相手に負けていれば失敗します。
+- `pnpm run pr-report -- --format json` の各 entry の `owner` が、skill が直す
+  PR を選ぶときに読むものです。
+
+### 担当者（owner）
+
+キューにある PR（`merge-queued`、または `skip-ci` と `auto-rebase`）には、次に
+動かす担当者が必ず1つ決まります。決めるのは `pr-report-core` の
+`queue-owner.mts` の `queueOwner` だけで、このスクリプト（`owner.mts`）も
+`pr-report` / `claim-pr` / `push-fixed-pr` / `report-unowned-prs`
+（`pr-report/queue.mts`）も同じ関数に同じ事実を渡して読みます。#2267 では、こ
+のスクリプトと skill がそれぞれ別の読み方の `main` で見送りの有効性を判定し、
+互いに相手の担当だと判断して誰も動かしませんでした。
+
+| `owner`  | 次に動かすもの                                                                                            |
+| :------- | :-------------------------------------------------------------------------------------------------------- |
+| `worker` | このスクリプト。順番待ち、stack の上の層、見送りが解消済み                                                |
+| `skill`  | skill（`unblock-prs` か `pnpm-update-ci`）。claim 中、または `rebase-failed` / `checks-failed` で見送り中 |
+| `human`  | 人。draft、fork、閉路、bypass merge 待ち、設定や権限で止まっている見送り                                  |
+| `none`   | 誰でもない。規則の想定外の状態で、ツールのバグ                                                            |
+
+- **読むのは comment と PR だけで、base の先端は読みません。** 見送りの
+  comment が受け渡しの印です。このスクリプトが「解消済み」に書き換える（head
+  が動いた、再試行を頼まれた、base に紐付く理由で `main` が動いた）までは
+  skill か人の担当です。このスクリプトが止まっていても、担当者が誰でもなくなる
+  ことはありません。
+- 見送りの理由ごとの担当者は `setAsideOwner` が網羅します。理由の一覧
+  （`SET_ASIDE_REASONS`）もそこにあり、このスクリプトはそれを使うので、担当者
+  の無い理由を書くことはできません（コンパイルが通りません）。`none` になるの
+  は、このファイルの知らない理由が comment にあるときです。
+- `none` は `pnpm run report-unowned-prs` が issue にします（PR ごとに1本、
+  本文の隠し行で既存の issue を見つけます）。`/unblock-prs` skill が毎回実行
+  します。
 
 ### ファイル構成
 
@@ -673,7 +706,8 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `auto-fix.mts`          | fixer の差分だけの失敗を直して push                           |
 | `quiet.mts`             | 何もない時にどれだけ待つか                                    |
 | `checks.mts`            | マージが何を待っているか                                      |
-| `claims.mts`            | セッションが claim している PR を避ける                       |
+| `claims.mts`            | セッションの claim のうち有効なもの                           |
+| `owner.mts`             | 各 PR の担当者（`pr-report-core` の `queueOwner`）            |
 | `github.mts`            | `gh` / `git` を叩くもの全部。判断はしない                     |
 | `labels.mts`            | ラベルがその PR について何を言うか                            |
 | `skips.mts`             | 諦めた PR を何をもって覚え続けるか、comment との突き合わせ    |
@@ -977,6 +1011,10 @@ request shows") in one GraphQL request, and settle the records with them
 - A comment still standing that this process holds no record for was left by
   an earlier run. It is taken up as a record rather than tried again: a rebase
   of the same head onto the same base conflicts the same way.
+- A record this process holds that no comment says — the write failed — has
+  its comment written again (`unannouncedSkips`). Left alone, this script
+  holds the pull request aside while the skill, which reads the comment, reads
+  its owner as `worker`, and each leaves it to the other.
 
 The same request reads the **claims** sessions wrote ("A session's claim on a
 set-aside pull request"). Those still holding are kept beside the records, and
@@ -993,9 +1031,9 @@ Comments that cannot be read are logged, and the records stand as they were
    it.
 2. **Scope** — no `merge-queued` means `ignore`, silently. Queued but not
    actionable means a `note` naming the reason.
-3. **Skip records** — a pull request a previous cycle gave up on is a `note`
-   for as long as its head and the base are where they were. **Claims** — one
-   a session has claimed is a `note` saying who, and since when.
+3. **Owner** — one whose owner ("Who owns a pull request in the queue") is not
+   `worker` is a `note` naming its owner and why: one set aside at its head,
+   and one a session has claimed.
 4. **Stacks** — a stacked pull request is a `note` saying the layer below goes
    first. **Auto-merge** — one without it is a `note` if it is in one of
    GitHub's native stacks (to be merged by hand); otherwise it goes on, and is
@@ -1122,9 +1160,9 @@ waiting its turn, to its own changes.
 
 - Eligible: **labelled `skip-ci`** (so the push runs no checks) **and either
   `auto-rebase` or `merge-queued`**; open, not a draft, a branch of this
-  repository, based on `main`, not the version pull request, with no
-  set-aside record standing for its current head and `main`, and no session's
-  claim. A queued one gets
+  repository, based on `main`, not the version pull request, and whose owner
+  is `worker` — no set-aside standing at its head, and no session's claim. A
+  queued one gets
   here only when it cannot be picked — waiting on a `Merge-After` or its
   review — and rebasing it early under `skip-ci` costs nothing.
 - `skip-ci` leaves the merge state at `BLOCKED`, so whether it is behind is
@@ -1380,12 +1418,43 @@ one writes a **claim** first (`pnpm run claim-pr -- <number> --by <name>`).
 - While a claim holds, the pull request is not picked and not rebased by "3a".
   Pausing it with `skip-ci` goes on: the skill puts the label on before it
   pushes anyway.
-- `claim-pr` refuses a pull request not set aside at its current head and
-  `main` — this script is about to move it — and one another claimant holds.
+- `claim-pr` refuses a pull request whose owner is not a skill — this script
+  is about to move it, or a person has to — and one another claimant holds.
   It reads back after writing, and fails when someone writing in the same
   moment won.
-- `setAside` and `claim` on each entry of `pnpm run pr-report -- --format
-json` are what the skill reads to choose what to fix.
+- `owner` on each entry of `pnpm run pr-report -- --format json` is what the
+  skill reads to choose what to fix.
+
+### Who owns a pull request in the queue
+
+Every pull request in the queue (`merge-queued`, or `skip-ci` with
+`auto-rebase`) has exactly one owner, who moves it next. Only
+`pr-report-core`'s `queueOwner` (`queue-owner.mts`) decides it, and this
+script (`owner.mts`), `pr-report`, `claim-pr`, `push-fixed-pr` and
+`report-unowned-prs` (`pr-report/queue.mts`) all pass it the same facts.
+This script and the skill used to judge whether a set-aside still stood
+against their own reading of `main`, and when the readings differed each found
+the pull request the other's and nobody moved it (#2267).
+
+| `owner`  | who moves it next                                                                                    |
+| :------- | :--------------------------------------------------------------------------------------------------- |
+| `worker` | this script: waiting its turn, a layer of a stack, a set-aside resolved                              |
+| `skill`  | a skill (`unblock-prs` or `pnpm-update-ci`): claimed, or set aside `rebase-failed` / `checks-failed` |
+| `human`  | a person: a draft, a fork, a cycle, a bypass merge, a setting or a permission                        |
+| `none`   | nobody: a state the rules do not cover, which is a bug in the tooling                                |
+
+- **It reads the comments and the pull request, never the tip of the base.**
+  The set-aside comment is the hand-off: until this script rewrites it as
+  resolved — the head moved, a retry was asked for, or `main` moved under a
+  reason tied to the base — the pull request is a skill's or a person's. A
+  stopped script leaves it so, rather than nobody's.
+- `setAsideOwner` gives every reason an owner. The list of reasons
+  (`SET_ASIDE_REASONS`) is beside it and this script writes from it, so a
+  reason with no owner does not compile. `none` is a reason in a comment that
+  module does not know.
+- `pnpm run report-unowned-prs` files an issue for each `none`, one per pull
+  request, found again by a hidden line in its body. The `/unblock-prs` skill
+  runs it every round.
 
 ### Layout
 
@@ -1403,7 +1472,8 @@ json` are what the skill reads to choose what to fix.
 | `auto-fix.mts`          | fixing and pushing a failure that is only a fixer's diff      |
 | `quiet.mts`             | how long to sleep when there is nothing to do                 |
 | `checks.mts`            | what the merge is waiting for                                 |
-| `claims.mts`            | keeping off the pull requests a session has claimed           |
+| `claims.mts`            | the claims sessions wrote that still hold                     |
+| `owner.mts`             | who owns each pull request (`pr-report-core`'s `queueOwner`)  |
 | `github.mts`            | everything that shells out to `gh` or `git`                   |
 | `labels.mts`            | what the labels say about a pull request                      |
 | `skips.mts`             | what the loop remembers, for how long, and what comments say  |

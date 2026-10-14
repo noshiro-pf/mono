@@ -1,5 +1,5 @@
 import type { Claim } from 'pr-report-core';
-import { claimedNote, standingClaims } from './claims.mjs';
+import { standingClaims } from './claims.mjs';
 import type { PullRequest } from './types.mjs';
 
 const HEAD = 'c'.repeat(40);
@@ -60,19 +60,5 @@ describe(standingClaims, () => {
       ),
       new Map(),
     );
-  });
-});
-
-describe(claimedNote, () => {
-  test('says who holds a claimed pull request', () => {
-    const note = claimedNote(pullRequest(1), new Map([[1, CLAIM]]));
-
-    assert.strictEqual(note?.kind, 'note');
-
-    assert.include(note?.kind === 'note' ? note.note : '', CLAIM.by);
-  });
-
-  test('says nothing about one nobody holds', () => {
-    assert.isUndefined(claimedNote(pullRequest(2), new Map([[1, CLAIM]])));
   });
 });

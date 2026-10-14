@@ -44,7 +44,13 @@ import {
   setAsideCommentBody,
 } from './set-aside-comment.mjs';
 import { describeFailedChecks } from './set-aside-detail.mjs';
-import { newSkips, pruneSkips, settleSkips, withSkip } from './skips.mjs';
+import {
+  newSkips,
+  pruneSkips,
+  settleSkips,
+  unannouncedSkips,
+  withSkip,
+} from './skips.mjs';
 import { stackedOnAfter, stackParentsOf } from './stack.mjs';
 import {
   bypassPhrase,
@@ -391,6 +397,18 @@ const settleWithComments = async (
     }
   }
 
+  // A record whose comment never got written is one every other reader of
+  // the queue takes for the worker's while this run holds it aside.
+  const unannounced = unannouncedSkips(settled.skipped, read.value.setAside);
+
+  if (!dryRun && Arr.isNonEmpty(unannounced)) {
+    log(
+      `Writing the set-aside comment again on ${unannounced.map(({ number }) => `#${number}`).join(', ')}, which no comment says.`,
+    );
+
+    await announceSetAside(unannounced, defaultBranch);
+  }
+
   return {
     skipped: settled.skipped,
     claimed: standingClaims(
@@ -591,7 +609,7 @@ const runCycle = async (
     const behind = await restackBehind(pullRequests, defaultBranch, {
       baseSha,
       skipped: mut_skipped,
-      claimed: new Set(claimed.keys()),
+      owners: triaged.owners,
       dryRun: options.dryRun,
     });
 
