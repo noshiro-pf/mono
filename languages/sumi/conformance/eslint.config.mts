@@ -5,6 +5,7 @@ import {
   eslintConfigForVitest,
   type FlatConfig,
 } from 'eslint-config-typed';
+import { eslintConfigOffForOxlint } from '../../../tools/configs/oxlint-rules.mjs';
 
 const thisDir = import.meta.dirname;
 
@@ -30,4 +31,7 @@ export default [
       'import-x/no-default-export': 'off',
     }),
   },
+
+  // Last, so that nothing above turns these back on.
+  eslintConfigOffForOxlint,
 ] satisfies readonly FlatConfig[];

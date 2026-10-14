@@ -13,7 +13,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build --config ./configs/vite.config.mts",
-    "check:lint": "eslint .",
+    "check:lint": "oxlint . && eslint .",
     "check:test": "vitest --config ./configs/vitest.config.mts run",
     "check:test:cov": "vitest --config ./configs/vitest.config.mts run --coverage",
     "check:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
@@ -21,7 +21,7 @@
     "fix:fmt": "pnpm run z:format-uncommitted --cwd .",
     "fix:fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
     "fix:fmt:full": "prettier --write .",
-    "fix:lint": "eslint . --fix",
+    "fix:lint": "oxlint . --fix && eslint . --fix",
     "fmt": "pnpm run fix:fmt",
     "gen": "run-s gen:index",
     "gen:index": "run-s gen:index:src fix:fmt",

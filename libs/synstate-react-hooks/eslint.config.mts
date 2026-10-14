@@ -11,6 +11,7 @@ import {
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
+import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
 
 export default [
   ...eslintConfigForTypeScript({
@@ -103,4 +104,7 @@ export default [
     ...eslintConfigOffForSumiCheck,
     files: ['src/**'],
   },
+
+  // Last, so that nothing above turns these back on.
+  eslintConfigOffForOxlint,
 ] satisfies readonly FlatConfig[];

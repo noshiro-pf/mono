@@ -376,6 +376,9 @@ importers:
       oxfmt:
         specifier: 'catalog:'
         version: 0.71.0
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.86.0(oxlint-tsgolint@7.0.2003)
       playwright:
         specifier: 'catalog:'
         version: 1.63.0

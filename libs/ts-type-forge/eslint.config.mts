@@ -10,6 +10,7 @@ import {
   type EslintTsDataForgeRules,
 } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
+import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
 import { workspaceRootPath } from './scripts/workspace-root-path.mjs';
 
 /**
@@ -205,4 +206,7 @@ export default [
       'ts-data-forge/prefer-num-safe-parse-float': 'off',
     } satisfies Partial<EslintTsDataForgeRules>,
   },
+
+  // Last, so that nothing above turns these back on.
+  eslintConfigOffForOxlint,
 ] satisfies readonly FlatConfig[];

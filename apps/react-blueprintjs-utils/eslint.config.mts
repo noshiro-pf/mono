@@ -6,6 +6,7 @@ import {
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
+import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
 
 const thisDir = import.meta.dirname;
 
@@ -43,4 +44,7 @@ export default [
       'ts-restrictions/check-destructuring-completeness': 'off',
     }),
   },
+
+  // Last, so that nothing above turns these back on.
+  eslintConfigOffForOxlint,
 ] satisfies readonly FlatConfig[];

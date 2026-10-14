@@ -4,6 +4,7 @@ import {
   type FlatConfig,
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
+import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
 
 const thisDir = import.meta.dirname;
 
@@ -27,4 +28,7 @@ export default [
   // this deliberately: the globals the browser rules guard against — `name`,
   // `top`, `close`, `status` — are ordinary identifiers there.
   eslintConfigForBrowser(['src/**/*.mts']),
+
+  // Last, so that nothing above turns these back on.
+  eslintConfigOffForOxlint,
 ] satisfies readonly FlatConfig[];
