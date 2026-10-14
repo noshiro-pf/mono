@@ -655,15 +655,27 @@ const transformTypeReferenceNode = (
     );
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const T = removeParentheses(node.getTypeArguments()[0]!);
+    const typeArgument = node.getTypeArguments()[0]!;
+
+    const T = removeParentheses(typeArgument);
+
+    // The comments in front of the type argument and inside its parentheses,
+    // which `T.getFullText()` would leave behind with the parentheses.
+    const commentsInFrontOfT = commentsBetween(
+      node.getSourceFile(),
+      typeArgument.getPos(),
+      T.getStart(),
+    );
+
+    const TText = `${commentsInFrontOfT}${T.getText()}` as const;
 
     // `T` with the parentheses that `Readonly<...>` made unnecessary and its
     // position may need (`Readonly<A | B>[]` -> `(A | B)[]`).
     const unwrappedText =
       T.isKind(tsm.SyntaxKind.UnionType) ||
       T.isKind(tsm.SyntaxKind.IntersectionType)
-        ? wrapWithParentheses(T.getFullText())
-        : T.getFullText();
+        ? wrapWithParentheses(TText)
+        : TText;
 
     // DeepReadonly<Readonly<T>> -> DeepReadonly<T>
     if (readonlyContext.type === 'DeepReadonly') {
@@ -681,14 +693,14 @@ const transformTypeReferenceNode = (
 
     // Readonly<Readonly<T>> -> Readonly<T>
     if (isReadonlyTypeReferenceNode(T)) {
-      options.replaceNode(node, T.getFullText());
+      options.replaceNode(node, TText);
 
       return;
     }
 
     // Readonly<number> -> number
     if (isAtomicTypeNode(T)) {
-      options.replaceNode(node, T.getFullText());
+      options.replaceNode(node, TText);
 
       return;
     }
@@ -704,11 +716,11 @@ const transformTypeReferenceNode = (
       if (Arr.isFixedLengthArray(2, recordTypeArguments)) {
         options.replaceNode(
           node,
-          readonlyRecordText(
+          `${commentsInFrontOfT}${readonlyRecordText(
             recordTypeArguments[0].getFullText(),
             recordTypeArguments[1].getFullText(),
             options,
-          ),
+          )}`,
         );
 
         return;
@@ -724,7 +736,7 @@ const transformTypeReferenceNode = (
       T.isKind(tsm.SyntaxKind.ArrayType) ||
       T.isKind(tsm.SyntaxKind.TupleType)
     ) {
-      const readonlyText = `readonly ${T.getFullText()}` as const;
+      const readonlyText = `readonly ${TText}` as const;
 
       options.replaceNode(
         node,
@@ -740,7 +752,7 @@ const transformTypeReferenceNode = (
     // Readonly<readonly E[]> -> readonly E[]
     // Readonly<readonly [E1, E2, E3]> -> readonly [E1, E2, E3]
     if (isReadonlyTupleOrArrayTypeNode(T)) {
-      options.replaceNode(node, T.getFullText());
+      options.replaceNode(node, TText);
 
       return;
     }
@@ -894,7 +906,7 @@ const transformArrayTypeNode = (
         readonlyContext.indexedAccessDepth === 0 &&
         !isConditionalTypeDistributionGuard(node)
       ) {
-        const readonlyText = `readonly ${node.getFullText()}` as const;
+        const readonlyText = `readonly ${node.getText()}` as const;
 
         options.replaceNode(
           node,
@@ -946,7 +958,7 @@ const transformTupleTypeNode = (
         readonlyContext.indexedAccessDepth === 0 &&
         !isConditionalTypeDistributionGuard(node)
       ) {
-        const readonlyText = `readonly ${node.getFullText()}` as const;
+        const readonlyText = `readonly ${node.getText()}` as const;
 
         options.replaceNode(
           node,
@@ -980,12 +992,22 @@ const transformRestTypeNode = (
 
   // `tr("...readonly E[]") |-> ...tr(E)[]`
   // `tr("...readonly [E1, E2]") |-> ...[tr(E1), tr(E2)]`
-  if (isReadonlyArrayTypeNode(R) || isReadonlyTupleTypeNode(R)) {
-    options.replaceNode(
-      node,
-      `...${R.getTypeNode().getFullText()}` /* = tr(E)[] or [tr(E1), tr(E2)] */,
-    );
+  if (!isReadonlyArrayTypeNode(R) && !isReadonlyTupleTypeNode(R)) {
+    return;
   }
+
+  // The comments in front of `R` and inside the parentheses around it, which
+  // `R.getTypeNode().getFullText()` does not reach.
+  const commentsInFrontOfR = commentsBetween(
+    node.getSourceFile(),
+    node.getTypeNode().getPos(),
+    R.getStart(),
+  );
+
+  options.replaceNode(
+    node,
+    `...${commentsInFrontOfR}${R.getTypeNode().getFullText()}` /* = tr(E)[] or [tr(E1), tr(E2)] */,
+  );
 };
 
 /**
@@ -1072,7 +1094,7 @@ const transformTypeLiteralNode = (
 
   if (wrappingApplies && !skipWrapping) {
     // `{ readonly x: X, readonly y: Y } |-> Readonly<{ x: X, y: Y }>`
-    options.replaceNode(node, `Readonly<${node.getFullText()}>`);
+    options.replaceNode(node, `Readonly<${node.getText()}>`);
   }
 };
 
@@ -1352,6 +1374,12 @@ const transformUnionOrIntersectionTypeNodeImpl = (
 
   const newTypes = node.getTypeNodes();
 
+  const withLeadingComments = (
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    member: tsm.TypeNode,
+    memberText: string,
+  ): string => `${leadingCommentsOfMember(node, member)}${memberText}` as const;
+
   const { primitives, arraysAndTuples, typeLiterals, others } =
     groupUnionIntersectionTypes(newTypes, {
       operator,
@@ -1391,13 +1419,16 @@ const transformUnionOrIntersectionTypeNodeImpl = (
       : ([
           unionToString({
             types: nonEmptyTypeLiterals.map((n) =>
-              isMergeableReadonlyTypeReferenceNode(n, operator)
-                ? // NOTE: Readonly<A & B> -> (A & B)
-                  unwrapReadonlyTypeArgText(n)
-                : n.isKind(tsm.SyntaxKind.TypeLiteral)
-                  ? n.getFullText()
-                  : // A member kept under `Readonly`; see `underReadonly`
-                    wrapWithParentheses(n.getFullText()),
+              withLeadingComments(
+                n,
+                isMergeableReadonlyTypeReferenceNode(n, operator)
+                  ? // NOTE: Readonly<A & B> -> (A & B)
+                    unwrapReadonlyTypeArgText(n)
+                  : n.isKind(tsm.SyntaxKind.TypeLiteral)
+                    ? n.getText()
+                    : // A member kept under `Readonly`; see `underReadonly`
+                      wrapWithParentheses(n.getText()),
+              ),
             ),
             op: operator,
             wrapWithReadonly:
@@ -1410,11 +1441,19 @@ const transformUnionOrIntersectionTypeNodeImpl = (
   const sorted: readonly string[] = [
     mapNullable(
       primitives,
-      (a) => [a.nodes.map((n) => n.getFullText()), a.firstPosition] as const,
+      (a) =>
+        [
+          a.nodes.map((n) => withLeadingComments(n, n.getText())),
+          a.firstPosition,
+        ] as const,
     ),
     mapNullable(
       arraysAndTuples,
-      (a) => [a.nodes.map((n) => n.getFullText()), a.firstPosition] as const,
+      (a) =>
+        [
+          a.nodes.map((n) => withLeadingComments(n, n.getText())),
+          a.firstPosition,
+        ] as const,
     ),
     nonEmptyTypeLiterals !== undefined && Arr.isNonEmpty(nonEmptyTypeLiterals)
       ? mapNullable(
@@ -1427,7 +1466,7 @@ const transformUnionOrIntersectionTypeNodeImpl = (
           typeLiterals,
           (a) =>
             [
-              emptyTypeLiterals.map((n) => n.getFullText()),
+              emptyTypeLiterals.map((n) => withLeadingComments(n, n.getText())),
               // Use a position after non-empty type literals if they exist
               a.firstPosition +
                 (nonEmptyTypeLiterals !== undefined &&
@@ -1447,8 +1486,11 @@ const transformUnionOrIntersectionTypeNodeImpl = (
             ? mergeDeepReadonlyUnionMembers(
                 a.nodes,
                 options.DeepReadonly.typeName,
+                withLeadingComments,
               )
-            : a.nodes.map((n) => wrapWithParentheses(n.getFullText())),
+            : a.nodes.map((n) =>
+                withLeadingComments(n, wrapWithParentheses(n.getText())),
+              ),
           a.firstPosition,
         ] as const,
     ),
@@ -1513,28 +1555,52 @@ const mergeDeepReadonlyUnionMembers = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   nodes: readonly tsm.TypeNode[],
   deepReadonlyTypeName: string,
+  withLeadingComments: (
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    member: tsm.TypeNode,
+    memberText: string,
+  ) => string,
 ): readonly string[] => {
   const typeArgsOfDeepReadonly = nodes.map((n) =>
     getDeepReadonlyTypeArg(n, deepReadonlyTypeName),
   );
 
-  const typeArgs = typeArgsOfDeepReadonly.filter((t) => t !== undefined);
+  const asIs = (
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    n: tsm.TypeNode,
+  ): string => withLeadingComments(n, wrapWithParentheses(n.getText()));
 
-  if (typeArgs.length < 2) {
-    return nodes.map((n) => wrapWithParentheses(n.getFullText()));
+  if (typeArgsOfDeepReadonly.filter((t) => t !== undefined).length < 2) {
+    return nodes.map(asIs);
   }
 
   const firstIndex = typeArgsOfDeepReadonly.findIndex((t) => t !== undefined);
 
   const merged = unionToString({
-    types: typeArgs.map((t_) => {
+    // A member's comments move inside, onto its type argument:
+    // `/** a */ DeepReadonly<A> | /** b */ DeepReadonly<B>`
+    // -> `DeepReadonly</** a */ A | /** b */ B>`
+    types: nodes.flatMap((n, i) => {
+      const t_ = typeArgsOfDeepReadonly[i];
+
+      if (t_ === undefined) {
+        return [];
+      }
+
       const t = removeParentheses(t_);
 
       // NOTE: DeepReadonly<A | B> | DeepReadonly<C> -> DeepReadonly<A | B | C>
       // NOTE: DeepReadonly<() => void> | DeepReadonly<B> -> DeepReadonly<(() => void) | B>
-      return t.isKind(tsm.SyntaxKind.UnionType)
-        ? t.getFullText()
-        : wrapWithParentheses(t.getFullText());
+      const tText = textWithoutParentheses(t_, t);
+
+      return [
+        withLeadingComments(
+          n,
+          t.isKind(tsm.SyntaxKind.UnionType)
+            ? tText
+            : wrapWithParentheses(tText),
+        ),
+      ];
     }),
     op: '|',
     wrapWithReadonly: deepReadonlyTypeName,
@@ -1542,7 +1608,7 @@ const mergeDeepReadonlyUnionMembers = (
 
   return nodes.flatMap((n, i) =>
     typeArgsOfDeepReadonly[i] === undefined
-      ? [wrapWithParentheses(n.getFullText())]
+      ? [asIs(n)]
       : i === firstIndex
         ? [merged]
         : [],
@@ -1562,6 +1628,98 @@ const isTypeArgumentOfReadonly = (
       ? isTypeArgumentOfReadonly(parent)
       : isReadonlyTypeReferenceNode(parent))
   );
+};
+
+/**
+ * The comments in front of a union or intersection member, for the text that
+ * replaces the whole type.
+ *
+ * `replaceWithText` overwrites a node from its `getStart()`, so whatever lies
+ * in front of that stays in the file by itself. With no leading `|` / `&`, the
+ * first member starts there too, and its comments are the type's: repeating
+ * them in the replacement would copy them once per run. Every other member
+ * has a separator in front of it, and a comment before the separator belongs
+ * to no member's full text, so it is gone once the separator is rewritten. It
+ * goes with the member after it, like the comments after the separator.
+ *
+ * `member` may be the type inside a member's parentheses; the comments inside
+ * them are collected too, and the parentheses are not.
+ */
+const leadingCommentsOfMember = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: tsm.IntersectionTypeNode | tsm.UnionTypeNode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  member: tsm.TypeNode,
+): string =>
+  commentsBetween(
+    node.getSourceFile(),
+    node
+      .getTypeNodes()
+      .findLast((m) => m.getEnd() <= member.getStart())
+      ?.getEnd() ?? node.getStart(),
+    member.getStart(),
+  );
+
+/**
+ * The text of `inner`, a type `removeParentheses` took out of `outer`, with
+ * the comments in `outer`'s full text in front of it — before the parentheses
+ * and inside them — and without the parentheses.
+ *
+ * `inner.getFullText()` would drop those before the parentheses, which are
+ * as much a part of `outer` as the rest of it.
+ */
+const textWithoutParentheses = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  outer: tsm.TypeNode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  inner: tsm.TypeNode,
+): string =>
+  `${commentsBetween(outer.getSourceFile(), outer.getPos(), inner.getStart())}${inner.getText()}` as const;
+
+/**
+ * The comments in `[from, to)` of a source file, each followed by what keeps
+ * the next token off it, and nothing else in that range — no whitespace, and
+ * no token such as a separator or a parenthesis.
+ */
+const commentsBetween = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceFile: tsm.SourceFile,
+  from: number,
+  to: number,
+): string => {
+  if (to <= from) {
+    return '';
+  }
+
+  const scanner = tsm.ts.createScanner(
+    tsm.ts.ScriptTarget.Latest,
+    false,
+    tsm.ts.LanguageVariant.Standard,
+    sourceFile.getFullText(),
+    undefined,
+    from,
+    to - from,
+  );
+
+  const mut_comments: string[] = [];
+
+  while (scanner.scan() !== tsm.ts.SyntaxKind.EndOfFileToken) {
+    const token = scanner.getToken();
+
+    // A line comment runs to the end of the line, so it takes one along.
+    const separator =
+      token === tsm.ts.SyntaxKind.SingleLineCommentTrivia
+        ? '\n'
+        : token === tsm.ts.SyntaxKind.MultiLineCommentTrivia
+          ? ' '
+          : undefined;
+
+    if (separator !== undefined) {
+      mut_comments.push(`${scanner.getTokenText()}${separator}`);
+    }
+  }
+
+  return mut_comments.join('');
 };
 
 /** `DeepReadonly<T>` |-> `T`, anything else |-> `undefined` */
@@ -1594,12 +1752,11 @@ const unionToString = ({
   op: '&' | '|';
   wrapWithReadonly: boolean | string;
 }>): string => {
-  // The members arrive as `getFullText()`, which carries the whitespace in
-  // front of each one, and they are joined with a separator that supplies its
-  // own space. Left alone, that whitespace accumulates: every run of the
-  // transformer adds one more space before every member but the first, so a
-  // file never reaches a fixed point. Comments live in the same trivia and are
-  // not whitespace, so trimming keeps them.
+  // The members are joined with a separator that supplies its own space, so
+  // whitespace left at a member's edge would accumulate: every run of the
+  // transformer would add one more space before every member but the first,
+  // and a file would never reach a fixed point. Trimming keeps the comments in
+  // front of a member, which are not whitespace.
   const types = typesRaw.map((s) => s.trim());
 
   return unionToStringImpl({ types, op, wrapWithReadonly });
