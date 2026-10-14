@@ -1,10 +1,8 @@
 import {
   DEFAULT_LAYOUT,
   DEFAULT_SHARE,
-  dropIndex,
   layoutFromSearch,
   moveBlock,
-  nearestDropTarget,
   searchWithLayout,
   sharePercents,
   splitAt,
@@ -341,18 +339,6 @@ describe(withSplit, () => {
   });
 });
 
-describe(dropIndex, () => {
-  test('counts the blocks whose middle is above the pointer', () => {
-    assert.strictEqual(dropIndex([100, 300, 500], 50), 0);
-
-    assert.strictEqual(dropIndex([100, 300, 500], 200), 1);
-
-    assert.strictEqual(dropIndex([100, 300, 500], 900), 3);
-
-    assert.strictEqual(dropIndex([], 900), 0);
-  });
-});
-
 describe(splitAt, () => {
   test('is where the pointer is across the layout, in percent', () => {
     assert.strictEqual(splitAt(300, { left: 100, width: 800 }), 25);
@@ -360,68 +346,5 @@ describe(splitAt, () => {
 
   test('is nothing for a layout with no width', () => {
     assert.isUndefined(splitAt(300, { left: 100, width: 0 }));
-  });
-});
-
-describe(nearestDropTarget, () => {
-  const left = {
-    column: 0,
-    left: 0,
-    right: 400,
-    top: 0,
-    bottom: 1000,
-    midpoints: [100, 500],
-  } as const;
-
-  const right = {
-    column: 1,
-    left: 420,
-    right: 800,
-    top: 0,
-    bottom: 600,
-    midpoints: [300],
-  } as const;
-
-  test('is in the column under the pointer, after the blocks above it', () => {
-    assert.deepStrictEqual(nearestDropTarget([left, right], 200, 300), {
-      column: 0,
-      index: 1,
-    });
-
-    assert.deepStrictEqual(nearestDropTarget([left, right], 600, 50), {
-      column: 1,
-      index: 0,
-    });
-  });
-
-  test('is in the nearest column when the pointer is beside or below them', () => {
-    assert.deepStrictEqual(nearestDropTarget([left, right], 900, 700), {
-      column: 1,
-      index: 1,
-    });
-
-    // Stacked, as on a narrow screen: the same sideways, apart downwards.
-    assert.deepStrictEqual(
-      nearestDropTarget(
-        [
-          left,
-          {
-            ...right,
-            left: 0,
-            right: 400,
-            top: 1020,
-            bottom: 1600,
-            midpoints: [1400],
-          },
-        ],
-        200,
-        1300,
-      ),
-      { column: 1, index: 0 },
-    );
-  });
-
-  test('is nothing without columns', () => {
-    assert.isUndefined(nearestDropTarget([], 0, 0));
   });
 });

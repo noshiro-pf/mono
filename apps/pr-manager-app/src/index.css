@@ -607,46 +607,15 @@ a:focus-visible {
   min-width: 0;
 }
 
-.block-layout[data-moving='true'] {
-  cursor: grabbing;
-  user-select: none;
-}
-
-.layout-block {
-  position: relative;
-}
-
-.layout-block[data-dragging='true'] {
-  opacity: 0.45;
-}
-
-.block-handle {
-  color: var(--ink-muted);
-  cursor: grab;
-  line-height: 1.6;
-  padding: 0 0.3rem;
-  position: absolute;
-  right: 0;
-  top: 0;
-  touch-action: none;
-  user-select: none;
-  /* Over the section titles, which stay in view where it is. */
-  z-index: 6;
-}
-
-.block-handle:hover {
-  color: var(--accent);
-}
-
 /*
  * A block given a height scrolls on its own; without one it is as tall as what
- * it holds. The padding keeps the tiles and cards off a scroll bar that is
- * always drawn, which would otherwise touch them, and the gutter keeps the
- * width the same whether it scrolls or not.
+ * it holds. The padding keeps the cards' borders off a scroll bar that is
+ * always drawn, and the gutter keeps the width the same whether it scrolls or
+ * not.
  */
 .block-body[data-sized='true'] {
   overflow: auto;
-  padding-right: 0.75rem;
+  padding-right: 0.25rem;
   scrollbar-gutter: stable;
 }
 
@@ -664,13 +633,6 @@ a:focus-visible {
 
 .block-edge:hover {
   border-top-color: var(--accent);
-}
-
-.drop-marker {
-  background: var(--accent);
-  border-radius: 2px;
-  height: 3px;
-  margin: 0 0 0.75rem;
 }
 
 .column-divider {
@@ -754,10 +716,6 @@ a:focus-visible {
 .block-layout[data-mode='fill'] .block-body {
   flex: 1 1 0;
   min-height: 0;
-}
-
-.block-layout[data-mode='fill'] .drop-marker {
-  flex-shrink: 0;
 }
 
 .block-layout[data-mode='fill'] .block-edge {

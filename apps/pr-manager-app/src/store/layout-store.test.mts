@@ -133,53 +133,6 @@ describe(createLayoutStore, () => {
     assert.isFalse(store.settingsOpen.getSnapshot().value);
   });
 
-  test('a drag shows where the block would land, and moves it on drop', () => {
-    const { store } = setup(DEFAULT_LAYOUT);
-
-    store.startMove('issues');
-
-    store.moveOver({ column: 0, index: 0 });
-
-    assert.deepStrictEqual(store.moving.getSnapshot().value, {
-      block: 'issues',
-      target: { column: 0, index: 0 },
-    });
-
-    store.drop();
-
-    assert.isUndefined(store.moving.getSnapshot().value);
-
-    assert.deepStrictEqual(store.layout.getSnapshot().value.left, [
-      'issues',
-      'open',
-      'merged',
-    ]);
-  });
-
-  test('a drag dropped nowhere, or cancelled, moves nothing', () => {
-    const { store } = setup(DEFAULT_LAYOUT);
-
-    store.startMove('issues');
-
-    store.drop();
-
-    store.startMove('open');
-
-    store.moveOver({ column: 0, index: 3 });
-
-    store.cancelMove();
-
-    assert.deepStrictEqual(store.layout.getSnapshot().value, DEFAULT_LAYOUT);
-  });
-
-  test('moveOver without a drag does nothing', () => {
-    const { store } = setup(DEFAULT_LAYOUT);
-
-    store.moveOver({ column: 0, index: 0 });
-
-    assert.isUndefined(store.moving.getSnapshot().value);
-  });
-
   test('reset puts the default back', () => {
     const { store } = setup(withColumns(DEFAULT_LAYOUT, 2));
 

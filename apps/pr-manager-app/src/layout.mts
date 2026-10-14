@@ -97,7 +97,8 @@ export type BoundaryDrag = Readonly<{
   lowerShare: number;
 }>;
 
-export type DropTarget = Readonly<{ column: ColumnIndex; index: number }>;
+/** Where a block is put: a column, and a place among the blocks there. */
+export type BlockPlace = Readonly<{ column: ColumnIndex; index: number }>;
 
 export const DEFAULT_LAYOUT: Layout = {
   columns: 1,
@@ -266,7 +267,7 @@ export const withColumns = (layout: Layout, columns: 1 | 2): Layout => {
 export const moveBlock = (
   layout: Layout,
   block: BlockId,
-  target: DropTarget,
+  target: BlockPlace,
 ): Layout => {
   const left = layout.left.filter((id) => id !== block);
 
@@ -406,14 +407,6 @@ export const withSplit = (layout: Layout, split: number): Layout =>
   }) as const;
 
 /**
- * Where a dragged block lands in a column: after every block whose middle is
- * above the pointer. `midpoints` are the other blocks' vertical centres, top
- * down, in the same coordinates as `y`.
- */
-export const dropIndex = (midpoints: readonly number[], y: number): number =>
-  midpoints.filter((middle) => middle < y).length;
-
-/**
  * The split a pointer at `x` asks for, across a layout whose box starts at
  * `left`. Unclamped; {@link withSplit} clamps. Nothing for a layout with no
  * width, which is one not drawn.
@@ -423,44 +416,6 @@ export const splitAt = (
   box: Readonly<{ left: number; width: number }>,
 ): number | undefined =>
   Num.isNonZero(box.width) ? Num.div(x - box.left, box.width) * 100 : undefined;
-
-/** A column as drawn, in the same coordinates as the pointer. */
-export type ColumnBox = Readonly<{
-  column: ColumnIndex;
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
-  /** The vertical centres of its blocks, the dragged one left out. */
-  midpoints: readonly number[];
-}>;
-
-/**
- * Where a block dragged to (`x`, `y`) lands: in the column under the pointer
- * — the nearest one when it is between, beside or below them, measured both
- * ways because on a narrow screen the two are stacked and equally near
- * sideways — after every block there whose middle is above it.
- */
-export const nearestDropTarget = (
-  columns: readonly ColumnBox[],
-  x: number,
-  y: number,
-): DropTarget | undefined => {
-  const nearest = columns
-    .map((box) => ({
-      box,
-      distance: Math.hypot(
-        Math.max(0, box.left - x, x - box.right),
-        Math.max(0, box.top - y, y - box.bottom),
-      ),
-    }))
-    .toSorted((a, b) => a.distance - b.distance)
-    .at(0)?.box;
-
-  return nearest === undefined
-    ? undefined
-    : { column: nearest.column, index: dropIndex(nearest.midpoints, y) };
-};
 
 const PARAM = {
   columns: 'cols',

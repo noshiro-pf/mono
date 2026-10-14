@@ -129,8 +129,9 @@ button, arranges them:
 - **One column or two.** Two need a screen at least 60rem wide; on a narrower
   one they stack whatever the layout says. The line between them is dragged to
   share the width, and double-clicked to even it.
-- **The order**, and which column each block is in. A block is dragged by the
-  ⠿ at its top right; a line shows where it will land.
+- **The order**, and which column each block is in, with the dialog's
+  buttons alone: an order set once and seldom changed is not worth a drag
+  surface on every block.
 - **A height of its own.** A block's bottom edge is dragged to give it one,
   and it then scrolls by itself; a double click there gives the natural
   height back.
