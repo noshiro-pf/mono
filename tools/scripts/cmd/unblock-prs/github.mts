@@ -28,7 +28,7 @@ import {
   type OwnSetAsideComment,
   type PullRequest,
 } from './types.mjs';
-import { isSafeRefName, sh } from './util.mjs';
+import { headShaFromListing, isSafeRefName, sh } from './util.mjs';
 
 const PR_JSON_FIELDS =
   'number,id,title,body,state,headRefName,headRefOid,baseRefName,isCrossRepository,isDraft,mergeStateStatus,autoMergeRequest,labels';
@@ -109,18 +109,25 @@ export const viewReviewDecision = async (
   return Result.isErr(viewed) ? viewed : Result.ok(viewed.value.trim());
 };
 
+/**
+ * The tip of `branch` on `origin`, by its whole ref name
+ * (`headShaFromListing`): the default branch read as the version pull
+ * request's branch is a set-aside recorded against a base that never moves.
+ */
 export const remoteSha = async (
   branch: string,
 ): Promise<Result<string, string>> => {
-  const listed = await git(`git ls-remote --heads origin ${sh(branch)}`);
+  const listed = await git(
+    `git ls-remote origin ${sh(`refs/heads/${branch}`)}`,
+  );
 
   if (Result.isErr(listed)) {
     return listed;
   }
 
-  const sha = listed.value.trim().split(/\s+/u, 1)[0];
+  const sha = headShaFromListing(listed.value, branch);
 
-  return sha === undefined || sha === ''
+  return sha === undefined
     ? Result.err(`origin has no branch named ${branch}`)
     : Result.ok(sha);
 };
