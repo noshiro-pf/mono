@@ -374,7 +374,11 @@ export const eslintUnicornRules = {
   'unicorn/consistent-conditional-object-spread': 'off',
   'unicorn/consistent-tuple-labels': 'error',
   'unicorn/default-export-style': withDefaultOption('error'),
-  'unicorn/logical-assignment-operators': withDefaultOption('error'),
+  'unicorn/logical-assignment-operators': [
+    'error',
+    'always',
+    { enforceForIfStatements: true },
+  ],
   // Successor of `unicorn/prevent-abbreviations`, which is disabled below for
   // the same reason: it renames established identifiers such as `i`, `fn` and
   // `val` throughout the codebase.
@@ -440,7 +444,7 @@ export const eslintUnicornRules = {
   'unicorn/no-useless-override': 'error',
   'unicorn/no-useless-re-export': 'error',
   'unicorn/no-xor-as-exponentiation': 'error',
-  'unicorn/operator-assignment': withDefaultOption('error'),
+  'unicorn/operator-assignment': ['error', 'always'],
   'unicorn/prefer-abort-signal-any': 'error',
   'unicorn/prefer-abort-signal-timeout': 'error',
   'unicorn/prefer-aggregate-error': 'error',

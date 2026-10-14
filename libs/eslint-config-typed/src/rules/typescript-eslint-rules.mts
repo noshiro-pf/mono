@@ -106,7 +106,7 @@ export const typescriptEslintRules = {
       ignoreVoidReturningFunctions: false,
     },
   ],
-  '@typescript-eslint/no-dupe-class-members': 'error',
+  '@typescript-eslint/no-dupe-class-members': 'off', // ts(2393) & ts(2300)
   '@typescript-eslint/no-dynamic-delete': 'error',
   '@typescript-eslint/no-empty-function': 'off', // disabled
   '@typescript-eslint/no-explicit-any': [
