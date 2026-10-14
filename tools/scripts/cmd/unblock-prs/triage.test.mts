@@ -1,4 +1,4 @@
-import { orderCandidates } from './triage.mjs';
+import { describeAction, orderCandidates } from './triage.mjs';
 import type { PullRequest } from './types.mjs';
 
 describe(orderCandidates, () => {
@@ -115,6 +115,38 @@ describe(orderCandidates, () => {
         ),
       ),
       [1, 2],
+    );
+  });
+});
+
+describe(describeAction, () => {
+  test('arms what it picks', () => {
+    assert.strictEqual(
+      describeAction(pullRequest({ number: 1 }), 'main', {
+        stackParents: new Map(),
+        toArm: new Set([1]),
+        bypass: new Map(),
+      }),
+      'rebase onto main, arm auto-merge',
+    );
+  });
+
+  test('leaves auto-merge off one that needs a bypass merge, and still runs its checks', () => {
+    assert.strictEqual(
+      describeAction(
+        pullRequest({
+          number: 1,
+          labels: [queued, { name: 'skip-ci' }],
+          autoMergeRequest: null,
+        }),
+        'main',
+        {
+          stackParents: new Map(),
+          toArm: new Set(),
+          bypass: new Map([[1, 'the author is the only owner']]),
+        },
+      ),
+      'rebase onto main, leave auto-merge off (the author is the only owner, so it needs a bypass merge), then take skip-ci off it',
     );
   });
 });

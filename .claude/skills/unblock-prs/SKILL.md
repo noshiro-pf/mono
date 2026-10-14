@@ -56,9 +56,9 @@ as neither), and the lowest number first within each. When there are none,
 end without a report.
 
 A pull request set aside for any other reason (`not-merging`, `arm-failed`,
-`unlabel-failed`, `push-failed`, `watch-timeout`, `already-in-base`) is
-something to name in the report, not to fix: what holds it is a setting, a
-permission or a review, and the comment says which.
+`unlabel-failed`, `push-failed`, `watch-timeout`, `already-in-base`,
+`awaiting-bypass`) is something to name in the report, not to fix: what holds
+it is a setting, a permission or a review, and the comment says which.
 
 ## 2. Claim it
 

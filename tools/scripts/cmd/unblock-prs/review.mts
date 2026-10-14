@@ -12,6 +12,14 @@
  * picking, and leaves a pull request they hold in the queue with a note,
  * until an approval or a resolved conversation changes the answer.
  *
+ * Except when nothing can change it: GitHub does not let an author approve
+ * their own pull request, so one whose waiting paths only its author owns
+ * merges by a ruleset bypass or not at all. Holding that one would hold it
+ * for ever, with `skip-ci` on and no verdict for whoever makes the bypass
+ * merge to go by. So it is released and watched like any other, with
+ * auto-merge left off — it could never fire — until its checks report, and
+ * then left for that person (`awaiting-bypass`).
+ *
  * GitHub will not say this itself: `reviewDecision` describes branch
  * protection, not a ruleset, and is `null` for every pull request here. The
  * code-owner half is `pr-report-core`'s `codeOwnerReview`, worked out from
@@ -23,7 +31,6 @@ import {
   type CodeOwnersRule,
   type RulesetRequirements,
 } from 'pr-report-core';
-import { Arr } from 'ts-data-forge';
 
 /** What is read about one pull request to decide. */
 export type ReviewState = Readonly<{
@@ -43,15 +50,19 @@ export type ReviewRules = Readonly<{
 }>;
 
 /**
- * Why the review holds the pull request, as a phrase, or `undefined` when it
- * holds nothing. What cannot be told for sure — changed files past what
- * could be read — holds nothing: the watch still catches a pull request that
- * goes green and does not merge, and `demotions.mts` is what follows.
+ * What the review does to the pull request: `held` waits for an approval or
+ * a resolved conversation, `bypass` waits for nobody — only its author owns
+ * what is waiting — and `undefined` holds nothing. What cannot be told for
+ * sure — changed files past what could be read — holds nothing: the watch
+ * still catches a pull request that goes green and does not merge, and
+ * `demotions.mts` is what follows.
  */
+export type ReviewHold = Readonly<{ kind: 'bypass' | 'held'; reason: string }>;
+
 export const reviewHold = (
   state: ReviewState,
   rules: ReviewRules,
-): string | undefined => {
+): ReviewHold | undefined => {
   const codeOwners = codeOwnerReview({
     required: rules.requireCodeOwnerReview,
     rules: rules.codeOwners,
@@ -61,23 +72,38 @@ export const reviewHold = (
     author: state.author,
   });
 
-  const reasons = [
-    codeOwners.state === 'required'
-      ? [
-          `waiting for ${codeOwners.owners.map((owner) => `@${owner}`).join(' or ')} to approve ${describePaths(codeOwners.paths)}`,
-          // GitHub does not let an author approve their own pull request, so
-          // this one waits for a bypass merge, not for time.
-          codeOwners.authorOwns
-            ? ' — which the author owns, and may not approve'
-            : '',
-        ].join('')
-      : undefined,
+  const conversations =
     rules.requireConversationResolution && state.unresolvedConversations > 0
-      ? `${state.unresolvedConversations} unresolved review ${state.unresolvedConversations === 1 ? 'conversation' : 'conversations'}`
-      : undefined,
-  ].filter((reason) => reason !== undefined);
+      ? (`${state.unresolvedConversations} unresolved review ${state.unresolvedConversations === 1 ? 'conversation' : 'conversations'}` as const)
+      : undefined;
 
-  return Arr.isNonEmpty(reasons) ? reasons.join('; ') : undefined;
+  if (codeOwners.state !== 'required') {
+    return conversations === undefined
+      ? undefined
+      : { kind: 'held', reason: conversations };
+  }
+
+  const onlyTheAuthor = codeOwners.owners.every(
+    (owner) => owner.toLowerCase() === state.author.toLowerCase(),
+  );
+
+  if (onlyTheAuthor && conversations === undefined) {
+    return {
+      kind: 'bypass',
+      reason: `${codeOwners.owners.map((owner) => `@${owner}`).join(', ')} is the only owner of ${describePaths(codeOwners.paths)} and its author, who may not approve it`,
+    };
+  }
+
+  return {
+    kind: 'held',
+    reason: [
+      `waiting for ${codeOwners.owners.map((owner) => `@${owner}`).join(' or ')} to approve ${describePaths(codeOwners.paths)}`,
+      codeOwners.authorOwns
+        ? ' — which the author owns, and may not approve'
+        : '',
+      conversations === undefined ? '' : `; ${conversations}`,
+    ].join(''),
+  };
 };
 
 /** How many waiting paths are named before the rest are counted. */

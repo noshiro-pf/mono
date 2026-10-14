@@ -46,7 +46,13 @@ import {
 import { describeFailedChecks } from './set-aside-detail.mjs';
 import { newSkips, pruneSkips, settleSkips, withSkip } from './skips.mjs';
 import { stackedOnAfter, stackParentsOf } from './stack.mjs';
-import { describeAction, reportTriage, survey, triage } from './triage.mjs';
+import {
+  bypassPhrase,
+  describeAction,
+  reportTriage,
+  survey,
+  triage,
+} from './triage.mjs';
 import type {
   CycleResult,
   Demotions,
@@ -85,7 +91,11 @@ import { watch } from './watch.mjs';
  *    anything a previous cycle gave up on are set aside, and so is one whose
  *    review holds its merge — a code owner has not approved it, or a
  *    conversation is unresolved — because no check reports that, and
- *    releasing it would only run a matrix to sit green. The one thing done
+ *    releasing it would only run a matrix to sit green. One whose waiting
+ *    paths only its author owns is the exception, since no approval will
+ *    ever come: it is released and watched with auto-merge left off, and
+ *    once its checks are green it is set aside `awaiting-bypass` for a
+ *    person to merge by a ruleset bypass (`review.mts`). The one thing done
  *    without the label comes first: a layer GitHub moved onto the default
  *    branch when the one below it merged, still carrying that one's commits,
  *    is rebased off them and the list read again (`stack.mts`).
@@ -508,8 +518,10 @@ const runCycle = async (
   if (watched !== undefined) {
     const arm = triaged.toArm.has(watched.number);
 
+    const bypassReason = triaged.bypass.get(watched.number);
+
     log(
-      `#${watched.number} is up to date (${watched.mergeStateStatus}); ${arm ? 'arming auto-merge and ' : ''}watching it rather than rebasing another.`,
+      `#${watched.number} is up to date (${watched.mergeStateStatus}); ${arm ? 'arming auto-merge and ' : ''}watching it rather than rebasing another${bypassPhrase(bypassReason)}.`,
     );
 
     if (options.dryRun) {
@@ -553,7 +565,7 @@ const runCycle = async (
     const { ended, head } = await watchAndFix(
       watched,
       watched.headRefOid,
-      { defaultBranch, requiredContexts },
+      { defaultBranch, requiredContexts, bypassReason },
       options,
     );
 
@@ -687,7 +699,11 @@ const runCycle = async (
     const { ended, head } = await watchAndFix(
       target,
       advancedHead,
-      { defaultBranch, requiredContexts },
+      {
+        defaultBranch,
+        requiredContexts,
+        bypassReason: triaged.bypass.get(target.number),
+      },
       options,
     );
 
@@ -729,6 +745,8 @@ const watchAndFix = async (
   context: Readonly<{
     defaultBranch: string;
     requiredContexts: readonly string[];
+    /** Set for one only a ruleset bypass merges; see `watch`. */
+    bypassReason: string | undefined;
   }>,
   options: Options,
 ): Promise<Readonly<{ ended: Watched; head: string }>> => {
@@ -737,6 +755,7 @@ const watchAndFix = async (
     expectedHead,
     context.requiredContexts,
     options,
+    context.bypassReason,
   );
 
   if (
@@ -764,7 +783,13 @@ const watchAndFix = async (
       );
 
       return {
-        ended: await watch(pr, fixed.head, context.requiredContexts, options),
+        ended: await watch(
+          pr,
+          fixed.head,
+          context.requiredContexts,
+          options,
+          context.bypassReason,
+        ),
         head: fixed.head,
       };
   }
@@ -875,6 +900,19 @@ const applyWatchOutcome = (
         reason: 'checks-failed',
         detail: ended.detail ?? 'a required check failed',
         failedChecks: ended.failedChecks,
+      });
+
+    case 'awaiting-bypass':
+      log(
+        `#${pr.number}: green, and left for a ruleset bypass merge; nothing here takes it further until the branch is pushed again or a retry is asked for.`,
+      );
+
+      return withSkip(skipped, {
+        number: pr.number,
+        headSha: pr.headRefOid,
+        baseSha,
+        reason: 'awaiting-bypass',
+        detail: ended.detail ?? 'every required check is green',
       });
 
     case 'not-merging':

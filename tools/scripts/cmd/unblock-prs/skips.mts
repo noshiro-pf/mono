@@ -35,7 +35,10 @@ import {
  * `checks-failed` is deliberately not tied to the base. Rebasing it would put
  * the same failing matrix through again, and fixing the failure is the
  * skill's job, not this script's — the push that carries the fix is what
- * clears it.
+ * clears it. Nor is `awaiting-bypass`: the bypass merge it waits for does not
+ * wait for the base, and a rebase each time anything else merged would run
+ * the matrix again for nothing. Its comment's retry box is how a person asks
+ * for a run on the current tip.
  *
  * The rule is `pr-report-core`'s `setAsideApplies`, because the Pull Requests
  * Manager page applies the same rule to the comment this script leaves on

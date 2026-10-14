@@ -149,4 +149,15 @@ describe(setAsideStillApplies, () => {
       ),
     );
   });
+
+  // Green and waiting for a bypass merge: a rebase would only run the same
+  // matrix again, for a merge that does not wait for the base.
+  test('outlives a moved base when it waits for a bypass merge', () => {
+    assert.isTrue(
+      setAsideStillApplies(
+        { reason: 'awaiting-bypass', baseSha: BASE },
+        'b'.repeat(40),
+      ),
+    );
+  });
 });

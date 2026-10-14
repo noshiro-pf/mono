@@ -36,7 +36,7 @@ import {
   priorityRank,
 } from './labels.mjs';
 import { waitingOnNote } from './merge-after.mjs';
-import { reviewHold } from './review.mjs';
+import { reviewHold, type ReviewHold } from './review.mjs';
 import { skipStillApplies } from './skips.mjs';
 import { nativeStackNote, stackedNote, stackParentsOf } from './stack.mjs';
 import type {
@@ -192,16 +192,24 @@ export const triage = async (
   );
 
   const classified = beforeReview.map(({ pr, result }) => {
-    const reason = holds.get(pr.number);
+    const hold = holds.get(pr.number);
 
     return {
       pr,
       result:
-        reason === undefined
-          ? result
-          : ({ kind: 'held', reason } satisfies Classification),
+        hold?.kind === 'held'
+          ? ({ kind: 'held', reason: hold.reason } satisfies Classification)
+          : result,
     };
   });
+
+  // Released and watched as ever, but never armed: auto-merge would wait for
+  // an approval nobody may give. See `review.mts`.
+  const bypass: ReadonlyMap<number, string> = new Map(
+    Array.from(holds).flatMap(([prNumber, hold]) =>
+      hold.kind === 'bypass' ? [[prNumber, hold.reason] as const] : [],
+    ),
+  );
 
   return {
     cycles,
@@ -218,11 +226,13 @@ export const triage = async (
     toArm: new Set(
       classified.flatMap(({ pr, result }) =>
         (result.kind === 'candidate' || result.kind === 'in-flight') &&
-        !isRecord(pr.autoMergeRequest)
+        !isRecord(pr.autoMergeRequest) &&
+        !bypass.has(pr.number)
           ? [pr.number]
           : [],
       ),
     ),
+    bypass,
     stackParents,
     inFlight: classified
       .filter(({ result }) => result.kind === 'in-flight')
@@ -397,15 +407,15 @@ const shouldAskReview = (pr: PullRequest, result: Classification): boolean =>
   (result.kind === 'in-flight' && !isMergeableState(pr.mergeStateStatus));
 
 /**
- * Why each pull request's review holds it, by number, for those it holds —
- * `review.mts` says what is asked and why. One request covers all of them.
- * A request that fails holds nothing, which is how this script behaved
- * before it asked.
+ * What each pull request's review does to it, by number, for those it does
+ * anything to — `review.mts` says what is asked and why. One request covers
+ * all of them. A request that fails holds nothing, which is how this script
+ * behaved before it asked.
  */
 const readReviewHolds = async (
   entries: readonly Readonly<{ pr: PullRequest }>[],
   context: TriageContext,
-): Promise<ReadonlyMap<number, string>> => {
+): Promise<ReadonlyMap<number, ReviewHold>> => {
   const { requireCodeOwnerReview, requireConversationResolution } =
     context.reviewRequirements;
 
@@ -565,6 +575,12 @@ export const reportTriage = (
     log(`  ${held}`);
   }
 
+  for (const [prNumber, reason] of triaged.bypass) {
+    log(
+      `  #${prNumber}: only a ruleset bypass merges it — ${reason}; its checks are run, and auto-merge is left off`,
+    );
+  }
+
   for (const note of triaged.notes) {
     log(`  ${note}`);
   }
@@ -586,7 +602,7 @@ export const reportTriage = (
 export const describeAction = (
   pr: PullRequest,
   defaultBranch: string,
-  triaged: StrictPick<Triage, 'stackParents' | 'toArm'>,
+  triaged: StrictPick<Triage, 'bypass' | 'stackParents' | 'toArm'>,
 ): string => {
   if (isVersionPullRequest(pr, defaultBranch)) {
     return `take ${SKIP_CI_LABEL} off it — the release workflow owns the branch`;
@@ -603,9 +619,16 @@ export const describeAction = (
       ? `, carry ${above.map((n) => `#${n}`).join(', ')} stacked on it along`
       : '',
     triaged.toArm.has(pr.number) ? ', arm auto-merge' : '',
+    bypassPhrase(triaged.bypass.get(pr.number)),
     isSkipCiLabelled(pr) ? `, then take ${SKIP_CI_LABEL} off it` : '',
   ].join('');
 };
+
+/** What is done instead of arming one only a bypass merges, as a phrase. */
+export const bypassPhrase = (reason: string | undefined): string =>
+  reason === undefined
+    ? ''
+    : (`, leave auto-merge off (${reason}, so it needs a bypass merge)` as const);
 
 /** What the pull request's priority label did to its place, as a phrase. */
 const priorityPhrase = (pr: PullRequest): string => {

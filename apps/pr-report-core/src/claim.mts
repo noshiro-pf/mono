@@ -3,14 +3,15 @@
  * writer of the queue can read it.
  *
  * `unblock-prs` leaves a set-aside pull request alone until its head moves —
- * or, for every reason but `checks-failed`, until the base does, when it
- * tries the rebase again. A session fixing that pull request is then racing
- * the script, and a second session, or the one that opened the pull request
- * and is woken by the set-aside comment, may be fixing the same failure. The
- * leases on every push keep any of them from overwriting another's work, but
- * not from doing it twice. So whoever starts on one says so first in a
- * comment whose first line is a hidden record this module writes and reads,
- * and everyone else — the script included — leaves that pull request to it.
+ * or, for every reason but `checks-failed` and `awaiting-bypass`, until the
+ * base does, when it tries the rebase again. A session fixing that pull
+ * request is then racing the script, and a second session, or the one that
+ * opened the pull request and is woken by the set-aside comment, may be
+ * fixing the same failure. The leases on every push keep any of them from
+ * overwriting another's work, but not from doing it twice. So whoever starts
+ * on one says so first in a comment whose first line is a hidden record this
+ * module writes and reads, and everyone else — the script included — leaves
+ * that pull request to it.
  *
  * **It lasts while the head is the one it claimed**, and for at most
  * {@link CLAIM_LIFETIME_MINUTES}. The push that carries the fix moves the head

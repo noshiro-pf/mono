@@ -1,6 +1,11 @@
 import dedent from 'dedent';
 import { parseCodeOwners } from 'pr-report-core';
-import { reviewHold, type ReviewRules, type ReviewState } from './review.mjs';
+import {
+  reviewHold,
+  type ReviewHold,
+  type ReviewRules,
+  type ReviewState,
+} from './review.mjs';
 
 describe(reviewHold, () => {
   test('holds nothing when the review is done', () => {
@@ -12,21 +17,56 @@ describe(reviewHold, () => {
   });
 
   test('holds a pull request an owner has not approved', () => {
-    assert.strictEqual(
+    assert.deepStrictEqual(
       reviewHold(state(), rules()),
-      'waiting for @owner to approve .github/workflows/ci.yml',
+      held('waiting for @owner to approve .github/workflows/ci.yml'),
     );
   });
 
-  test('says when the author is the owner, who cannot approve it', () => {
-    assert.strictEqual(
+  // GitHub does not let an author approve their own pull request, so when the
+  // author is the only owner nothing will ever approve it: it merges by a
+  // ruleset bypass or not at all, and what the bypass wants is a green head.
+  test('leaves one only its author owns to a bypass merge', () => {
+    assert.deepStrictEqual(
       reviewHold(state({ author: 'Owner' }), rules()),
-      'waiting for @owner to approve .github/workflows/ci.yml — which the author owns, and may not approve',
+      bypass(
+        '@owner is the only owner of .github/workflows/ci.yml and its author, who may not approve it',
+      ),
+    );
+  });
+
+  test('holds one the author owns beside someone who may approve it', () => {
+    assert.deepStrictEqual(
+      reviewHold(
+        state({ author: 'Owner' }),
+        rules({
+          codeOwners: parseCodeOwners(dedent`
+            /.github/workflows/ @owner @other
+          `),
+        }),
+      ),
+      held(
+        'waiting for @owner or @other to approve .github/workflows/ci.yml — which the author owns, and may not approve',
+      ),
+    );
+  });
+
+  // A conversation is something a person can resolve, so it holds the pull
+  // request as ever; the bypass is for what nobody can clear.
+  test('holds one only its author owns while a conversation is open', () => {
+    assert.deepStrictEqual(
+      reviewHold(
+        state({ author: 'owner', unresolvedConversations: 1 }),
+        rules(),
+      ),
+      held(
+        'waiting for @owner to approve .github/workflows/ci.yml — which the author owns, and may not approve; 1 unresolved review conversation',
+      ),
     );
   });
 
   test('names a few of the waiting paths and counts the rest', () => {
-    assert.strictEqual(
+    assert.deepStrictEqual(
       reviewHold(
         state({
           files: [
@@ -38,32 +78,36 @@ describe(reviewHold, () => {
         }),
         rules(),
       ),
-      'waiting for @owner to approve .github/workflows/a.yml, .github/workflows/b.yml and 2 more',
+      held(
+        'waiting for @owner to approve .github/workflows/a.yml, .github/workflows/b.yml and 2 more',
+      ),
     );
   });
 
   test('holds a pull request with an unresolved conversation', () => {
-    assert.strictEqual(
+    assert.deepStrictEqual(
       reviewHold(
         state({ approvers: ['owner'], unresolvedConversations: 2 }),
         rules(),
       ),
-      '2 unresolved review conversations',
+      held('2 unresolved review conversations'),
     );
 
-    assert.strictEqual(
+    assert.deepStrictEqual(
       reviewHold(
         state({ approvers: ['owner'], unresolvedConversations: 1 }),
         rules(),
       ),
-      '1 unresolved review conversation',
+      held('1 unresolved review conversation'),
     );
   });
 
   test('says both when both hold it', () => {
-    assert.strictEqual(
+    assert.deepStrictEqual(
       reviewHold(state({ unresolvedConversations: 1 }), rules()),
-      'waiting for @owner to approve .github/workflows/ci.yml; 1 unresolved review conversation',
+      held(
+        'waiting for @owner to approve .github/workflows/ci.yml; 1 unresolved review conversation',
+      ),
     );
   });
 
@@ -91,6 +135,12 @@ describe(reviewHold, () => {
     );
   });
 });
+
+const held = (reason: string): ReviewHold =>
+  ({ kind: 'held', reason }) as const;
+
+const bypass = (reason: string): ReviewHold =>
+  ({ kind: 'bypass', reason }) as const;
 
 const rules = (overrides: Partial<ReviewRules> = {}): ReviewRules =>
   ({

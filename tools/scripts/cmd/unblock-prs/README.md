@@ -262,8 +262,8 @@ GraphQL 1回でまとめて読み、記録と突き合わせます（`skips.mts`
 `settleSkips`）。
 
 - comment が見送った head から branch が動いた、または見送った base から
-  `main` が動いた（`checks-failed` を除く）なら、comment を1行の「解消済み」に
-  書き換えます。
+  `main` が動いた（`checks-failed` と `awaiting-bypass` を除く）なら、comment
+  を1行の「解消済み」に書き換えます。
 - 「再試行」のチェックボックスに人がチェックを入れていたら、comment を
   「解消済み」に書き換え、その PR の見送りの記録を捨てます。今回の triage は
   見送られていなかったものとしてその PR を扱います。また失敗すれば、また
@@ -324,6 +324,15 @@ pick も「3a」の rebase もしません。
       Manager と同じ `pr-report-core` の `codeOwnerReview` です。作者自身が所有
       者なら、作者は自分の PR を承認できないので、そう出力します。
     - **未解決の会話** — 1件でもあれば。
+
+    例外は、承認待ちのパスの所有者が**作者だけ**の PR です（未解決の会話が無
+    い場合）。作者は自分の PR を承認できないので、承認は永遠に来ず、ruleset
+    bypass でマージするしかありません。held にすると `skip-ci` が付いたまま
+    になり、bypass merge の判断材料になるチェック結果が一度も出ないので、held
+    にはしません。ほかの PR と同じく rebase、`skip-ci` 外し、watch まで進めます
+    が、**auto-merge は arm しません**（承認が来ないので発火しないため）。
+    green になったら `awaiting-bypass` で見送り、bypass merge を人に頼む
+    comment を書きます。
 
     チェックでは分からない理由でマージできない PR を解放すると、マトリクスを
     1回丸ごと使い、watch の間キューを止めます。しかも `main` が動くたびに
@@ -417,19 +426,22 @@ survey と違う / lease 負けで push が拒否され、remote の head が変
 `--poll-interval`（既定30秒）待ってから、マージするか「しない」と確定するまで
 ポーリングします。各回で次の順に判定し、該当した時点で抜けます。
 
-| 条件                              | 結果                          |
-| :-------------------------------- | :---------------------------- |
-| `gh pr view` 失敗                 | 連続5回で `error`、未満は継続 |
-| `MERGED`                          | `merged`                      |
-| `OPEN` でない                     | `closed`                      |
-| auto-merge が外れた               | `auto-merge-disabled`         |
-| `skip-ci` が再付与された          | `skip-ci-labelled`            |
-| head が push したものと違う       | `head-moved`                  |
-| `BEHIND` / `DIRTY`                | `behind-again`                |
-| 必須チェックが fail / cancel      | `checks-failed`               |
-| 全 green が規定回数続く           | `not-merging`                 |
-| `--watch-timeout`（既定90分）超過 | `timeout`                     |
-| SIGINT / SIGTERM                  | `stopped`                     |
+| 条件                               | 結果                          |
+| :--------------------------------- | :---------------------------- |
+| `gh pr view` 失敗                  | 連続5回で `error`、未満は継続 |
+| `MERGED`                           | `merged`                      |
+| `OPEN` でない                      | `closed`                      |
+| auto-merge が外れた（※）           | `auto-merge-disabled`         |
+| `skip-ci` が再付与された           | `skip-ci-labelled`            |
+| head が push したものと違う        | `head-moved`                  |
+| `BEHIND` / `DIRTY`                 | `behind-again`                |
+| 必須チェックが fail / cancel       | `checks-failed`               |
+| 全 green（bypass merge 待ちの PR） | `awaiting-bypass`             |
+| 全 green が規定回数続く            | `not-merging`                 |
+| `--watch-timeout`（既定90分）超過  | `timeout`                     |
+| SIGINT / SIGTERM                   | `stopped`                     |
+
+※ bypass merge 待ちの PR（「2」の8）は arm していないので、この行は見ません。
 
 順序には意味があります。ラベルの再付与やブランチの移動をチェック結果より先に
 見るのは、その状態の PR のチェックを読んでも意味がないからです。
@@ -512,12 +524,16 @@ matrix の job まで読みます。失敗した job が **すべて** `code-che
 | `not-merging`                     |      ✓      |          ✓          |
 | `watch-timeout`                   |      ✓      |          ✓          |
 | `checks-failed`                   |      ✓      |   **✗（意図的）**   |
+| `awaiting-bypass`                 |      ✓      |   **✗（意図的）**   |
 
 衝突の判定がキャッシュされないのはこのためです。衝突していた相手のコミットが
 base の移動と一緒に消えたかもしれないので、`main` が動けば記録は捨てられ、次の
-サイクルで再試行されます。`checks-failed` だけが base に紐付いていません —
+サイクルで再試行されます。`checks-failed` は base に紐付いていません —
 rebase しても同じマトリクスが同じように落ちるだけで、直すのは人間の仕事だから
-です。
+です。`awaiting-bypass` も同じく base に紐付けません。待っている bypass merge
+は base の移動を待たないので、他の PR がマージされるたびに rebase してマトリク
+スを回し直しても無駄になるだけです。最新の `main` の上で確かめ直したいときは、
+comment の再試行ボックスにチェックを入れます。
 
 `not-merging` の PR は、記録が消えた後も **candidate の最後**（version PR より
 後ろ）に回されます。`main` が動けば記録は消えて `BEHIND` の candidate に戻り
@@ -593,10 +609,11 @@ auto-merge、draft、本文）、レビュー待ちの理由、`main` の tip �
 - **GitHub の `mergeable` ではなくこちら**を見るのは、あれが merge の可否で、
   このスクリプトがするのは rebase だからです（`DIRTY` を信用しない理由と同じ）。
 - **解けたら1行の「解消済み」に書き換えます。** head か base が動いた（
-  `checks-failed` は head だけ — `skips.mts` と同じ規則を `pr-report-core` の
-  `setAsideApplies` で共有しています）、または再試行を頼まれたときです。消さ
-  ないのは、timeline で経緯を追えるようにするためです。ページは、head が動いた
-  comment は表示せず、base が動いたものは灰色の古い記録として表示します。
+  `checks-failed` と `awaiting-bypass` は head だけ — `skips.mts` と同じ規則を
+  `pr-report-core` の `setAsideApplies` で共有しています）、または再試行を頼ま
+  れたときです。消さないのは、timeline で経緯を追えるようにするためです。ペー
+  ジは、head が動いた comment は表示せず、base が動いたものは灰色の古い記録と
+  して表示します。
 - マージは止めません。
 - 書くのは新しく見送ったときだけで、同じ状態のまま見送り続けている間は書き直し
   ません。`--dry-run` では書きません。書けなかったときはその旨をログに出して
@@ -609,7 +626,8 @@ auto-merge、draft、本文）、レビュー待ちの理由、`main` の tip �
 code owner の承認待ちで止まっている PR は、変更したパスと `.github/CODEOWNERS`
 からページが自分で判定します。このスクリプトも同じ判定で、その PR を解放せずに
 残します（「2」の8）。この場合 comment は書きません。承認されれば次の survey で
-動き出すからです。
+動き出すからです。所有者が作者だけの PR はその例外で、チェックを回して green に
+なった時点で `awaiting-bypass` の comment を書きます。
 
 ### 見送った PR を直すセッションの claim
 
@@ -942,8 +960,8 @@ request shows") in one GraphQL request, and settle the records with them
 (`settleSkips` in `skips.mts`):
 
 - A comment set aside at a head the branch has moved from, or against a base
-  `main` has moved from (except `checks-failed`), is rewritten as one resolved
-  line.
+  `main` has moved from (except `checks-failed` and `awaiting-bypass`), is
+  rewritten as one resolved line.
 - A comment whose "Retry" box a person ticked is rewritten as resolved, and
   that pull request's record is dropped: this cycle's triage treats it as if
   it had never been set aside. One that fails again is set aside again, and
@@ -1009,6 +1027,15 @@ merge-base` says whether the branch was built on the current tip of the
       code the Pull Requests Manager uses. When the author owns the path it
       says so, since an author may not approve their own pull request.
     - **An unresolved conversation**, any at all.
+
+    The exception is a pull request whose waiting paths **only its author**
+    owns, with no conversation open. No approval will ever come, so it merges
+    by a ruleset bypass or not at all, and holding it would leave it under
+    `skip-ci` with no verdict for whoever makes that merge. So it is not
+    held: it is rebased, released and watched like any other, but **never
+    armed** — auto-merge would wait for the same approval — and once its
+    checks are green it is set aside `awaiting-bypass`, with a comment asking
+    a person for the bypass merge.
 
     Releasing a pull request that cannot merge for a reason no check reports
     runs a whole matrix and holds the queue for the length of a watch. And
@@ -1113,19 +1140,23 @@ After one `--poll-interval` (30s by default), poll until it merges or until
 something says it will not. Each poll tests these in order and leaves on the
 first that matches:
 
-| Condition                     | Outcome                              |
-| :---------------------------- | :----------------------------------- |
-| `gh pr view` failed           | `error` after 5 in a row, else retry |
-| `MERGED`                      | `merged`                             |
-| not `OPEN`                    | `closed`                             |
-| auto-merge switched off       | `auto-merge-disabled`                |
-| `skip-ci` went back on        | `skip-ci-labelled`                   |
-| head is not the commit pushed | `head-moved`                         |
-| `BEHIND` / `DIRTY`            | `behind-again`                       |
-| a required check failed       | `checks-failed`                      |
-| green for the whole budget    | `not-merging`                        |
-| past `--watch-timeout` (90m)  | `timeout`                            |
-| SIGINT / SIGTERM              | `stopped`                            |
+| Condition                          | Outcome                              |
+| :--------------------------------- | :----------------------------------- |
+| `gh pr view` failed                | `error` after 5 in a row, else retry |
+| `MERGED`                           | `merged`                             |
+| not `OPEN`                         | `closed`                             |
+| auto-merge switched off (\*)       | `auto-merge-disabled`                |
+| `skip-ci` went back on             | `skip-ci-labelled`                   |
+| head is not the commit pushed      | `head-moved`                         |
+| `BEHIND` / `DIRTY`                 | `behind-again`                       |
+| a required check failed            | `checks-failed`                      |
+| green, and only a bypass merges it | `awaiting-bypass`                    |
+| green for the whole budget         | `not-merging`                        |
+| past `--watch-timeout` (90m)       | `timeout`                            |
+| SIGINT / SIGTERM                   | `stopped`                            |
+
+(\*) Not read for one only a bypass merges (step 2, item 8), which is never
+armed.
 
 The order matters: a pull request whose label went back on, or whose branch
 moved, is one whose check results say nothing.
@@ -1210,11 +1241,16 @@ A verdict lasts as long as the state it was reached in.
 | `not-merging`                     |         ✓         |             ✓             |
 | `watch-timeout`                   |         ✓         |             ✓             |
 | `checks-failed`                   |         ✓         |    **✗ (deliberate)**     |
+| `awaiting-bypass`                 |         ✓         |    **✗ (deliberate)**     |
 
 So a conflict verdict is never cached across a base that moved: the commit it
 conflicted with may have gone with it. `checks-failed` is the exception —
 rebasing would put the same failing matrix through again, and fixing the
 failure is a person's job, so the push that carries the fix is what clears it.
+`awaiting-bypass` is not tied to the base either: the bypass merge it waits for
+does not wait for the base, and rebasing it each time anything else merged
+would run the matrix again for nothing. Its comment's retry box is how a person
+asks for a run on the current `main`.
 
 A `not-merging` pull request is also **picked last** from then on, after the
 version pull request, and this outlives the record. `main` moving clears the
@@ -1294,9 +1330,9 @@ the terminal the script ran in.
   merge conflicts and this script rebases — the same reason it does not take
   `DIRTY` at its word.
 - **Once it no longer applies it is rewritten as one resolved line**: the
-  head or the base moved (the head alone for `checks-failed`, by the rule
-  `skips.mts` uses too, shared as `setAsideApplies` in `pr-report-core`), or
-  a retry was asked for. It is kept rather than deleted, so the timeline
+  head or the base moved (the head alone for `checks-failed` and
+  `awaiting-bypass`, by the rule `skips.mts` uses too, shared as
+  `setAsideApplies` in `pr-report-core`), or a retry was asked for. It is kept rather than deleted, so the timeline
   keeps what happened. The page shows nothing for a comment whose head has
   moved, and a moved base as a grey, older record.
 - It holds no merge.
@@ -1313,7 +1349,8 @@ A pull request waiting for a code owner the page works out for itself, from
 the paths it changes and `.github/CODEOWNERS`. This script works it out the
 same way and leaves that pull request in the queue (step 2, item 8). It writes
 no comment for it, because an approval puts it back in the running on the
-next survey.
+next survey. The exception is one only its author owns, whose checks are run
+and which gets an `awaiting-bypass` comment once they are green.
 
 ### A session's claim on a set-aside pull request
 

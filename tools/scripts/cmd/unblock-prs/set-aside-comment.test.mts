@@ -57,6 +57,29 @@ describe(setAsideCommentBody, () => {
     assert.include(body, 'until the branch is pushed again: rebasing it');
   });
 
+  test('asks for a bypass merge of a green one, and says a moved base does not clear it', () => {
+    const body = setAsideCommentBody(
+      skip({
+        reason: 'awaiting-bypass',
+        detail:
+          'every required check is green; @owner is the only owner of .github/workflows/ci.yml and its author, who may not approve it',
+      }),
+      'main',
+    );
+
+    assert.include(body, '(`awaiting-bypass`): every required check is green');
+
+    assert.include(
+      body,
+      "Nothing but a ruleset bypass merges it, which is a person's to do; auto-merge was left off.",
+    );
+
+    assert.include(
+      body,
+      'It stays aside until the branch is pushed again: rebasing it would only put the same checks through again. Tick the retry box to have it rebased and checked on the current `main`.',
+    );
+  });
+
   test('folds what the command printed away, in a fence nothing inside closes', () => {
     const body = setAsideCommentBody(
       skip({ output: 'CONFLICT (content): ```\nhint: @someone' }),
