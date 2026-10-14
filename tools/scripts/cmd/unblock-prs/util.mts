@@ -41,6 +41,21 @@ export const isSafeRefName = (name: string): boolean =>
 export const sh = (value: string): string =>
   `'${value.replaceAll("'", String.raw`'\''`)}'` as const;
 
+/**
+ * The SHA `git ls-remote` lists for `branch`, by its whole ref name. A ref
+ * pattern given to `ls-remote` matches on the tail of the name, so
+ * `ls-remote origin main` lists `refs/heads/changeset-release/main` too, and
+ * first; the first line is not the branch asked for.
+ */
+export const headShaFromListing = (
+  listing: string,
+  branch: string,
+): string | undefined =>
+  listing
+    .split('\n')
+    .map((line) => line.trim().split(/\s+/u))
+    .find(([, ref]) => ref === `refs/heads/${branch}`)?.[0];
+
 export const lastLines = (text: string, count: number): string =>
   text.trim().split('\n').slice(-count).join('\n');
 

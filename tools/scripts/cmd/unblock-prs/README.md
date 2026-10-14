@@ -232,7 +232,11 @@ ruleset（最新の `main` の上で必須チェックが全部緑）が別に�
 `origin/main` の SHA と、`main` に適用されている rule を取得します。rule から
 読むのは、必須の status check の一覧と、レビューへの2つの要件（code owner の承
 認、会話の解決）です。宣言ファイルではなく GitHub が実際に適用しているものを読
-みます。
+みます。`origin/main` の SHA は ref 名全体（`refs/heads/main`）で読みます。
+`git ls-remote origin main` は名前の末尾で一致させるので
+`changeset-release/main` も拾い、しかもそちらが先に並びます。version PR の
+head を `main` と取り違えると、見送りの記録が動かない base に紐付き、`main` が
+動いても再試行されません。
 
 #### 1a. 付け替えられた層の積み直し
 
@@ -928,7 +932,11 @@ GitHub is still computing is never read as up to date. The tip of
 `origin/main` is read too, and so are the rules GitHub applies to `main`: the
 contexts they require, and whether they require a code owner's approval and
 every conversation resolved. These are the rules GitHub enforces, not the ones
-declared under `repo-settings/`.
+declared under `repo-settings/`. The tip is read by its whole ref name
+(`refs/heads/main`): `git ls-remote origin main` matches on the tail of the
+name, so it lists `changeset-release/main` too, and first. Read as `main`, the
+version pull request's head ties each set-aside to a base that never moves,
+and nothing is tried again when `main` does.
 
 #### 1a. Restack the layers GitHub moved
 
