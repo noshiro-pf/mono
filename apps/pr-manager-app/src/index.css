@@ -1247,11 +1247,11 @@ a:focus-visible {
   width: 1.25rem;
 }
 
-.issue-dag-swatch[data-shape='issue'] {
+.issue-dag-swatch[data-shape='pull-request'] {
   border-radius: 999px;
 }
 
-.issue-dag-swatch[data-shape='pull-request'] {
+.issue-dag-swatch[data-shape='issue'] {
   background: color-mix(in srgb, var(--ink-secondary) 45%, var(--surface));
   border: 0;
   clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
