@@ -2,6 +2,7 @@ export * from './arc-edges.mjs';
 export * from './arc-geometry.mjs';
 export * from './arc-highlight.mjs';
 export * from './arc-layout.mjs';
+export * from './connect-handle.mjs';
 export * from './dag-layout.mjs';
 export * from './diagram-order.mjs';
 export * from './edge-geometry.mjs';

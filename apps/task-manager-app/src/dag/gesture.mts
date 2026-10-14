@@ -12,8 +12,9 @@
  *
  * A node being dragged follows the pointer (`nodeDrag`) and is dropped where
  * it is when that pointer lifts — the one moment its position is saved. A
- * second finger turns the press into a pinch, which leaves the node where it
- * was.
+ * press on a node's handle draws an arrow from it instead (`connectDrag`),
+ * which ends where the pointer lifts. A second finger turns either press
+ * into a pinch, which leaves the node where it was and draws nothing.
  */
 
 import { Arr } from 'ts-data-forge';
@@ -21,6 +22,7 @@ import type { DeepReadonly } from 'ts-type-forge';
 import type { GraphNodeId } from '../domain/index.mjs';
 import { dragPosition } from './dag-layout.mjs';
 import {
+  contentPointAt,
   panBy,
   pinchViewTransform,
   type Point,
@@ -34,17 +36,18 @@ export const IDLE_GESTURE: Gesture = {
   start: undefined,
   dragging: false,
   nodeDrag: undefined,
+  connectDrag: undefined,
 } as const;
 
 /**
- * A pointer went down — on the node `grab`, which may then be dragged, or on
- * the background.
+ * A pointer went down — on what `grab` says, a node to drag or a handle to
+ * draw an arrow from, or on the background.
  */
 export const pointerDown = (
   gesture: Gesture,
   pointer: TrackedPointer,
   transform: ViewTransform,
-  grab?: NodeGrab,
+  grab?: Grab,
 ): Gesture => {
   const pointers = Arr.toPushed(
     gesture.pointers.filter(({ id }) => id !== pointer.id),
@@ -59,6 +62,7 @@ export const pointerDown = (
     dragging:
       pinching || (Arr.isNonEmpty(gesture.pointers) && gesture.dragging),
     nodeDrag: undefined,
+    connectDrag: undefined,
   };
 };
 
@@ -110,6 +114,24 @@ export const pointerMove = (
 
   const dragging = gesture.dragging || Math.hypot(dx, dy) > DRAG_THRESHOLD_PX;
 
+  if (start.grab?.kind === 'connect') {
+    return {
+      gesture: {
+        ...gesture,
+        pointers,
+        dragging,
+        connectDrag: dragging
+          ? {
+              from: start.grab.from,
+              anchor: start.grab.anchor,
+              to: contentPointAt(start.transform, first),
+            }
+          : undefined,
+      },
+      transform: undefined,
+    };
+  }
+
   if (start.grab !== undefined) {
     return {
       gesture: {
@@ -140,15 +162,21 @@ export const pointerMove = (
 
 /**
  * The pointer `id` lifted, with `transform` on screen, and the node it
- * dropped if it was dragging one. A pinch that loses a finger becomes a pan
- * from where it is.
+ * dropped if it was dragging one, or the arrow it drew if it was drawing
+ * one. A pinch that loses a finger becomes a pan from where it is.
  */
 export const pointerUp = (
   gesture: Gesture,
   id: number,
   transform: ViewTransform,
-): Readonly<{ gesture: Gesture; dropped: NodeDrag | undefined }> => {
+): Readonly<{
+  gesture: Gesture;
+  dropped: NodeDrag | undefined;
+  connected: ConnectDrag | undefined;
+}> => {
   const pointers = gesture.pointers.filter((tracked) => tracked.id !== id);
+
+  const lifted = gesture.pointers.some((tracked) => tracked.id === id);
 
   return {
     gesture: {
@@ -158,20 +186,47 @@ export const pointerUp = (
         : undefined,
       dragging: gesture.dragging,
       nodeDrag: undefined,
+      connectDrag: undefined,
     },
-    dropped: gesture.pointers.some((tracked) => tracked.id === id)
-      ? gesture.nodeDrag
-      : undefined,
+    dropped: lifted ? gesture.nodeDrag : undefined,
+    connected: lifted ? gesture.connectDrag : undefined,
   };
 };
 
 export type TrackedPointer = Readonly<{ id: number }> & Point;
 
+/** What a pointer went down on that a move drags. */
+export type Grab = NodeGrab | ConnectGrab;
+
 /** The node a pointer went down on, and where it was then. */
-export type NodeGrab = Readonly<{ id: GraphNodeId; origin: Point }>;
+export type NodeGrab = Readonly<{
+  kind: 'node';
+  id: GraphNodeId;
+  origin: Point;
+}>;
+
+/**
+ * The handle of the node `from` a pointer went down on, at `anchor` on its
+ * outline, in content coordinates.
+ */
+export type ConnectGrab = Readonly<{
+  kind: 'connect';
+  from: GraphNodeId;
+  anchor: Point;
+}>;
 
 /** Where a node being dragged is. */
 export type NodeDrag = Readonly<{ id: GraphNodeId; position: Point }>;
+
+/**
+ * An arrow being drawn from the handle of `from` at `anchor` to the pointer
+ * at `to`, both in content coordinates.
+ */
+export type ConnectDrag = Readonly<{
+  from: GraphNodeId;
+  anchor: Point;
+  to: Point;
+}>;
 
 export type Gesture = DeepReadonly<{
   /** At most two: a third finger is not part of the gesture. */
@@ -180,11 +235,12 @@ export type Gesture = DeepReadonly<{
     | {
         transform: ViewTransform;
         pointers: TrackedPointer[];
-        /** The node being pressed, which a move drags; none for a pinch. */
-        grab: NodeGrab | undefined;
+        /** What is being pressed, which a move drags; none for a pinch. */
+        grab: Grab | undefined;
       }
     | undefined;
   /** Moved past the threshold, or pinched, since the last press began. */
   dragging: boolean;
   nodeDrag: NodeDrag | undefined;
+  connectDrag: ConnectDrag | undefined;
 }>;

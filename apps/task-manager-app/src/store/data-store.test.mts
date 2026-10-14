@@ -1,6 +1,12 @@
 import { createState } from 'synstate';
 import type { DagLayout } from '../dag/index.mjs';
-import { asTaskId, createTask, type DomainState } from '../domain/index.mjs';
+import {
+  asMilestoneId,
+  asTaskId,
+  createMilestone,
+  createTask,
+  type DomainState,
+} from '../domain/index.mjs';
 import {
   createMemoryRepository,
   type Repository,
@@ -22,6 +28,8 @@ const b = createTask({
     },
   ],
 });
+
+const m = createMilestone({ id: asMilestoneId('m'), title: 'M', now: 0 });
 
 const initial: DomainState = { tasks: [a, b], milestones: [] } as const;
 
@@ -104,6 +112,60 @@ describe(createDataStore, () => {
 
     assert.deepStrictEqual(store.state.getSnapshot().value.tasks, [
       { ...b, dependencies: [], updatedAt: 1000 },
+    ]);
+  });
+
+  test('adds a dependency, onto the node as stored', async () => {
+    const { store, setSession, errors } = setup();
+
+    setSession(signedIn(createMemoryRepository(initial)));
+
+    // a now depends on m, which depends on nothing.
+    store.putMilestone(m);
+
+    await Promise.resolve();
+
+    store.addDependency(
+      { kind: 'task', id: asTaskId('a') },
+      { kind: 'milestone', id: asMilestoneId('m') },
+    );
+
+    await Promise.resolve();
+
+    assert.deepStrictEqual(store.state.getSnapshot().value.tasks[0], {
+      ...a,
+      dependencies: [
+        { from: { kind: 'milestone', id: asMilestoneId('m') }, lagMs: 0 },
+      ],
+      updatedAt: 1000,
+    });
+
+    assert.deepStrictEqual(errors, []);
+  });
+
+  test('reports a dependency it refuses, and writes nothing', async () => {
+    const { store, setSession, errors } = setup();
+
+    setSession(signedIn(createMemoryRepository(initial)));
+
+    // b already depends on a: once more is a duplicate, the other way a cycle.
+    store.addDependency(
+      { kind: 'task', id: asTaskId('b') },
+      { kind: 'task', id: asTaskId('a') },
+    );
+
+    store.addDependency(
+      { kind: 'task', id: asTaskId('a') },
+      { kind: 'task', id: asTaskId('b') },
+    );
+
+    await Promise.resolve();
+
+    assert.deepStrictEqual(store.state.getSnapshot().value, initial);
+
+    assert.deepStrictEqual(errors, [
+      '依存を追加できませんでした（すでに依存しています）。',
+      '依存を追加できませんでした（循環する依存になります）。',
     ]);
   });
 

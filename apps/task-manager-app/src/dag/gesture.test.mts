@@ -107,7 +107,11 @@ describe(pointerUp, () => {
 });
 
 describe('dragging a node', () => {
-  const grab = { id: 'task:a', origin: { x: 100, y: 40 } } as const;
+  const grab = {
+    kind: 'node',
+    id: 'task:a',
+    origin: { x: 100, y: 40 },
+  } as const;
 
   const zoomed: ViewTransform = { x: 0, y: 0, scale: 2 } as const;
 
@@ -199,5 +203,92 @@ describe('dragging a node', () => {
     assert.isUndefined(panned.gesture.nodeDrag);
 
     assert.isUndefined(pointerUp(panned.gesture, 1, zoomed).dropped);
+  });
+});
+
+describe('drawing an arrow from a handle', () => {
+  const grab = {
+    kind: 'connect',
+    from: 'task:a',
+    anchor: { x: 100, y: 20 },
+  } as const;
+
+  // Content (0, 0) at screen (10, 0), drawn twice as large.
+  const zoomed: ViewTransform = { x: 10, y: 0, scale: 2 } as const;
+
+  const pressed = pointerDown(
+    IDLE_GESTURE,
+    { id: 1, x: 210, y: 40 },
+    zoomed,
+    grab,
+  );
+
+  test('draws nothing for a small wobble', () => {
+    const { gesture, transform } = pointerMove(pressed, {
+      id: 1,
+      x: 212,
+      y: 42,
+    });
+
+    assert.isUndefined(gesture.connectDrag);
+
+    assert.isUndefined(transform);
+  });
+
+  test('draws to the pointer, in content coordinates, and neither pans nor drags', () => {
+    const { gesture, transform } = pointerMove(pressed, {
+      id: 1,
+      x: 410,
+      y: 100,
+    });
+
+    assert.isUndefined(transform);
+
+    assert.isUndefined(gesture.nodeDrag);
+
+    assert.isTrue(gesture.dragging);
+
+    assert.deepStrictEqual(gesture.connectDrag, {
+      from: 'task:a',
+      anchor: { x: 100, y: 20 },
+      to: { x: 200, y: 50 },
+    });
+  });
+
+  test('ends where the pointer lifts, once', () => {
+    const moved = pointerMove(pressed, { id: 1, x: 410, y: 100 }).gesture;
+
+    const { gesture, connected, dropped } = pointerUp(moved, 1, zoomed);
+
+    assert.deepStrictEqual(connected, {
+      from: 'task:a',
+      anchor: { x: 100, y: 20 },
+      to: { x: 200, y: 50 },
+    });
+
+    assert.isUndefined(dropped);
+
+    assert.isUndefined(gesture.connectDrag);
+
+    // The click that follows is still swallowed.
+    assert.isTrue(gesture.dragging);
+  });
+
+  test('draws nothing for a tap', () => {
+    assert.isUndefined(pointerUp(pressed, 1, zoomed).connected);
+  });
+
+  test('gives way to a pinch when a second finger comes down', () => {
+    const moved = pointerMove(pressed, { id: 1, x: 410, y: 100 }).gesture;
+
+    const pinching = pointerDown(moved, { id: 2, x: 500, y: 100 }, zoomed);
+
+    assert.isUndefined(pinching.connectDrag);
+
+    const { gesture } = pointerMove(pinching, { id: 2, x: 600, y: 100 });
+
+    assert.isUndefined(gesture.connectDrag);
+
+    assert.isUndefined(pointerUp(gesture, 2, zoomed).connected);
   });
 });

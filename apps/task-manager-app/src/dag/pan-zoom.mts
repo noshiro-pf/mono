@@ -164,6 +164,13 @@ export const pinchViewTransform = (
   };
 };
 
+/** The content point drawn at the screen point `on`: the reverse of the rule. */
+export const contentPointAt = (transform: ViewTransform, on: Point): Point =>
+  ({
+    x: ratioOf(on.x - transform.x, transform.scale),
+    y: ratioOf(on.y - transform.y, transform.scale),
+  }) as const;
+
 /**
  * How much one wheel event zooms: a `deltaY` away from the reader zooms in.
  * Exponential, so a turn in and the same turn out cancel. `deltaMode` is the

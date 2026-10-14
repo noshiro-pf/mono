@@ -1,5 +1,6 @@
 import type { FixedLengthTuple } from 'ts-type-forge';
 import {
+  contentPointAt,
   fitBoundsTransform,
   fitViewTransform,
   fitWidthTopTransform,
@@ -264,5 +265,17 @@ describe(wheelZoomFactor, () => {
 
   test('is symmetric, so in and out by the same amount cancel', () => {
     assert.closeTo(wheelZoomFactor(120) * wheelZoomFactor(-120), 1, 1e-12);
+  });
+});
+
+describe(contentPointAt, () => {
+  test('is the content point drawn there', () => {
+    const transform: ViewTransform = { x: 30, y: -10, scale: 2 } as const;
+
+    const content = contentPointAt(transform, { x: 50, y: 20 });
+
+    assert.deepStrictEqual(content, { x: 10, y: 15 });
+
+    assert.deepStrictEqual(toScreen(transform, content.x, content.y), [50, 20]);
   });
 });

@@ -15,7 +15,7 @@ import {
   useRef,
   useState,
 } from 'preact/hooks';
-import { Arr } from 'ts-data-forge';
+import { Arr, Num } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   anchoredTileScroll,
@@ -23,6 +23,9 @@ import {
   arcGeometries,
   arcHighlight,
   clampTileScroll,
+  connectHandleAt,
+  contentPointAt,
+  dropTargetAt,
   edgeGeometries,
   fitBoundsTransform,
   fitWidthTopTransform,
@@ -52,14 +55,18 @@ import {
   zoomAt,
   type ArcGeometry,
   type Bounds,
+  type ConnectDrag,
+  type ConnectHandle,
+  type ConnectReach,
   type EdgeGeometry,
   type Gesture,
+  type Grab,
   type GraphLayout,
   type LaidOutNode,
   type NodeDrag,
-  type NodeGrab,
   type ViewTransform,
 } from '../dag/index.mjs';
+import { dependencyRefusal, nodeRefOf } from '../domain/index.mjs';
 import {
   animationSettingSignal,
   arcEdgesSignal,
@@ -72,6 +79,8 @@ import {
   dagLayoutStore,
   dagViewModeSignal,
   dagViewModeStore,
+  dataStore,
+  domainSignal,
   nodeSizeSignal,
   nodeViewsSignal,
   reducedMotionSignal,
@@ -83,6 +92,10 @@ import {
   type DagViewMode,
 } from '../view-model/index.mjs';
 import { DagArcEdge } from './dag-arc-edge.js';
+import {
+  DagConnectOverlay,
+  type ConnectTarget,
+} from './dag-connect-overlay.js';
 import { DagEdge } from './dag-edge.js';
 import { DagMilestoneNode } from './dag-milestone-node.js';
 import { DagTaskNode } from './dag-task-node.js';
@@ -107,6 +120,15 @@ type Props = Readonly<{
  * says whether the press moved, and a click after a drag is swallowed before
  * it reaches the node. `touch-action: none` (`index.css`) keeps the browser
  * from scrolling or zooming the page instead.
+ *
+ * In 「DAG」, a mouse or pen near a node's outline — within
+ * {@link HANDLE_REACH_PX}, outside the node or just inside — shows a handle
+ * there (`dag/connect-handle.mts`), and a drag from it draws an arrow
+ * instead of moving the node. Dropped on another node, the arrow makes that node depend
+ * on the one it was drawn from (`dataStore.addDependency`), unless that
+ * would be refused — a dependency already there, or a cycle — which the
+ * node it is over shows before the drop, and a notice says after it. A
+ * touch has no pointer to come near with, and so no handle.
  *
  * While the nodes move to their places (`dagLayoutStore.animatedPositions`)
  * the edges are plain curves, and they are routed round the nodes once the
@@ -197,6 +219,31 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
   const mut_transform = useRef<ViewTransform>(INITIAL);
 
   const [dragged, setDragged] = useState<NodeDrag | undefined>(undefined);
+
+  // The handle under a mouse or pen, which a press draws an arrow from.
+  const [handle, setHandle] = useState<ConnectHandle | undefined>(undefined);
+
+  const mut_handle = useRef<ConnectHandle | undefined>(undefined);
+
+  const showHandle = useCallback((next: ConnectHandle | undefined) => {
+    const current = mut_handle.current;
+
+    if (
+      current?.id === next?.id &&
+      current?.at.x === next?.at.x &&
+      current?.at.y === next?.at.y
+    ) {
+      return;
+    }
+
+    mut_handle.current = next;
+
+    setHandle(next);
+  }, []);
+
+  const [connecting, setConnecting] = useState<ConnectDrag | undefined>(
+    undefined,
+  );
 
   // At the current size, which a layout still being made at it may not be.
   const placed = useMemo(
@@ -294,6 +341,48 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
   useEffect(() => {
     mut_placed.current = arrangeable ? placed : [];
   }, [arrangeable, placed]);
+
+  // The nodes a handle can be on: those that can be grabbed, once they are
+  // where they are drawn.
+  const mut_connectable = useRef<readonly LaidOutNode[]>([]);
+
+  useEffect(() => {
+    mut_connectable.current =
+      arrangeable && animated === undefined ? placed : [];
+
+    if (!arrangeable || animated !== undefined) {
+      showHandle(undefined);
+    }
+  }, [arrangeable, animated, placed, showHandle]);
+
+  const domain = domainSignal.value;
+
+  // The node the arrow being drawn is over, other than the one it is drawn
+  // from, and whether a dependency on that one would be refused.
+  const connectTarget = useMemo((): ConnectTarget | undefined => {
+    if (connecting === undefined) {
+      return undefined;
+    }
+
+    const id = dropTargetAt(placed, connecting.to, reachAt(transform.scale));
+
+    const node =
+      id === connecting.from
+        ? undefined
+        : placed.find((placedNode) => placedNode.id === id);
+
+    return node === undefined
+      ? undefined
+      : {
+          node,
+          refused:
+            dependencyRefusal(
+              domain,
+              nodeRefOf(node.id),
+              nodeRefOf(connecting.from),
+            ) !== undefined,
+        };
+  }, [connecting, placed, transform.scale, domain]);
 
   // What `fit` shows all of, in the way the mode is read.
   const fitTarget = useMemo(
@@ -584,21 +673,56 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
       // Every node where it is going, before one of them is grabbed.
       dagLayoutStore.finishAnimation();
 
+      const pressedHandle = mut_handle.current;
+
+      const grab: Grab | undefined =
+        pressedHandle !== undefined &&
+        pressed.pointerType !== 'touch' &&
+        !Arr.isNonEmpty(mut_gesture.current.pointers)
+          ? ({
+              kind: 'connect',
+              from: pressedHandle.id,
+              anchor: pressedHandle.at,
+            } as const)
+          : grabOf(pressed.target, mut_placed.current);
+
+      if (grab?.kind !== 'connect') {
+        showHandle(undefined);
+      }
+
       mut_gesture.current = pointerDown(
         mut_gesture.current,
         pointerOf(pressed),
         mut_transform.current,
-        grabOf(pressed.target, mut_placed.current),
+        grab,
       );
 
       setDragged(undefined);
+
+      setConnecting(undefined);
     },
-    [],
+    [showHandle],
   );
 
   const onPointerMove = useCallback<PointerEventHandler<SVGSVGElement>>(
     (moved) => {
       const before = mut_gesture.current;
+
+      // Nothing pressed: a mouse or pen hovering, which may be near an
+      // outline.
+      if (!Arr.isNonEmpty(before.pointers)) {
+        showHandle(
+          moved.pointerType === 'touch'
+            ? undefined
+            : connectHandleAt(
+                mut_connectable.current,
+                contentPointAt(mut_transform.current, pointerOf(moved)),
+                reachAt(mut_transform.current.scale),
+              ),
+        );
+
+        return;
+      }
 
       const next = pointerMove(before, pointerOf(moved));
 
@@ -612,6 +736,10 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
 
       if (next.gesture.nodeDrag !== before.nodeDrag) {
         setDragged(next.gesture.nodeDrag);
+      }
+
+      if (next.gesture.connectDrag !== before.connectDrag) {
+        setConnecting(next.gesture.connectDrag);
       }
 
       if (next.transform === undefined) {
@@ -629,12 +757,12 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
         scrollTileTo(tileScrollOf(next.transform, topInset()));
       }
     },
-    [mode, show, scrollTileTo, topInset],
+    [mode, show, scrollTileTo, topInset, showHandle],
   );
 
   const onPointerEnd = useCallback<PointerEventHandler<SVGSVGElement>>(
     (ended) => {
-      const { gesture, dropped } = pointerUp(
+      const { gesture, dropped, connected } = pointerUp(
         mut_gesture.current,
         ended.pointerId,
         mut_transform.current,
@@ -647,9 +775,41 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
         dagLayoutStore.moveNode(dropped.id, dropped.position);
       }
 
+      const target =
+        connected === undefined || ended.type !== 'pointerup'
+          ? undefined
+          : dropTargetAt(
+              mut_placed.current,
+              connected.to,
+              reachAt(mut_transform.current.scale),
+            );
+
+      // Dropped back on the node it was drawn from: nothing.
+      if (
+        connected !== undefined &&
+        target !== undefined &&
+        target !== connected.from
+      ) {
+        dataStore.addDependency(nodeRefOf(target), nodeRefOf(connected.from));
+      }
+
       setDragged(undefined);
+
+      setConnecting(undefined);
+
+      // Shown again by the next move, where the pointer is then.
+      showHandle(undefined);
     },
-    [],
+    [showHandle],
+  );
+
+  const onPointerLeaveCanvas = useCallback<PointerEventHandler<SVGSVGElement>>(
+    (left) => {
+      onPointerLeave(left);
+
+      showHandle(undefined);
+    },
+    [onPointerLeave, showHandle],
   );
 
   const onClickCapture = useCallback<MouseEventHandler<SVGSVGElement>>(
@@ -808,6 +968,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
       <svg
         className={'dag-svg'}
         data-animating={animated !== undefined}
+        data-connect={handle !== undefined || connecting !== undefined}
         data-e2e={'dag-canvas'}
         data-mode={mode}
         data-motion={motion}
@@ -817,7 +978,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
         onKeyDown={onKeyDown}
         onPointerCancel={onPointerEnd}
         onPointerDown={onPointerDown}
-        onPointerLeave={onPointerLeave}
+        onPointerLeave={onPointerLeaveCanvas}
         onPointerMove={onPointerMove}
         onPointerOver={onPointerOver}
         onPointerUp={onPointerEnd}
@@ -848,6 +1009,28 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
               className={'dag-arrow-highlight'}
               d={'M 0 0 L 10 5 L 0 10 z'}
             />
+          </marker>
+          <marker
+            id={'dag-arrow-connect'}
+            markerHeight={8}
+            markerWidth={8}
+            orient={'auto-start-reverse'}
+            refX={9}
+            refY={5}
+            viewBox={'0 0 10 10'}
+          >
+            <path className={'dag-arrow-connect'} d={'M 0 0 L 10 5 L 0 10 z'} />
+          </marker>
+          <marker
+            id={'dag-arrow-refused'}
+            markerHeight={8}
+            markerWidth={8}
+            orient={'auto-start-reverse'}
+            refX={9}
+            refY={5}
+            viewBox={'0 0 10 10'}
+          >
+            <path className={'dag-arrow-refused'} d={'M 0 0 L 10 5 L 0 10 z'} />
           </marker>
           {clipTop === undefined ? undefined : (
             <clipPath id={'dag-tile-clip'}>
@@ -907,6 +1090,14 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
                 />
               );
             })}
+            {arrangeable ? (
+              <DagConnectOverlay
+                connecting={connecting}
+                handle={connecting === undefined ? handle : undefined}
+                scale={drawnTransform.scale}
+                target={connectTarget}
+              />
+            ) : undefined}
           </g>
         </g>
       </svg>
@@ -983,12 +1174,28 @@ type TileFrame = Readonly<{ topInset: number; viewport: number }>;
 
 /** What the canvas shows, for a screen reader. */
 const captions = {
-  dag: '依存関係グラフ。ノードを選ぶと詳細を開きます。ノードはドラッグか矢印キーで動かせます。背景のドラッグで移動、ホイールかピンチで拡大縮小できます。',
+  dag: '依存関係グラフ。ノードを選ぶと詳細を開きます。ノードはドラッグか矢印キーで動かせます。ノードの縁の丸からほかのノードへドラッグすると、ドロップしたノードがそのノードに依存します。背景のドラッグで移動、ホイールかピンチで拡大縮小できます。',
   arc: 'アークダイアグラム。タスクをタイトル順に縦に並べ、依存を右側の弧で示します。破線はマイルストーンを経由する依存です。タスクを選ぶと詳細を開きます。ドラッグで移動、ホイールかピンチで拡大縮小できます。',
   tile: 'タスクをタイトル順に左上から横に並べ、幅に収まらない分は次の行に折り返します。依存は示しません。タスクを選ぶと詳細を開きます。ホイール、ドラッグ、Page Up・Page Down・Home・End キーで縦にスクロールできます。',
 } as const satisfies ReadonlyRecord<DagViewMode, string>;
 
 const BUTTON_ZOOM = 1.25;
+
+/**
+ * How near a node's outline, on the screen, a mouse or pen shows its handle
+ * — outside the node, where an arrow dropped still joins it, and inside it,
+ * where the rest is for moving it.
+ */
+const HANDLE_REACH_PX = { outside: 10, inside: 5 } as const;
+
+/** {@link HANDLE_REACH_PX} in content coordinates, at the zoom `scale`. */
+const reachAt = (scale: number): ConnectReach =>
+  Num.isNonZero(scale)
+    ? ({
+        outside: Num.div(HANDLE_REACH_PX.outside, scale),
+        inside: Num.div(HANDLE_REACH_PX.inside, scale),
+      } as const)
+    : HANDLE_REACH_PX;
 
 /**
  * How long routing the edges for one move of a drag may take before the
@@ -1021,7 +1228,7 @@ const pointerOf = (
 const grabOf = (
   target: EventTarget | null,
   nodes: readonly LaidOutNode[],
-): NodeGrab | undefined => {
+): Grab | undefined => {
   const id = nodeIdOf(target);
 
   if (id === undefined) {
@@ -1032,5 +1239,5 @@ const grabOf = (
 
   return node === undefined
     ? undefined
-    : { id, origin: { x: node.x, y: node.y } };
+    : { kind: 'node', id, origin: { x: node.x, y: node.y } };
 };
