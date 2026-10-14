@@ -29,6 +29,7 @@ import {
   toElkGraph,
   withoutNodes,
 } from '../dag/index.mjs';
+import { nodeRefOf } from '../domain/index.mjs';
 import type { Backend } from '../repository/index.mjs';
 import {
   animationSettingStorage,
@@ -48,6 +49,7 @@ import { createDagViewModeStore } from './dag-view-mode-store.mjs';
 import { createDataStore } from './data-store.mjs';
 import { createDiagramSortStore } from './diagram-sort-store.mjs';
 import { createEditorStore } from './editor-store.mjs';
+import { createGroupEditorStore } from './group-editor-store.mjs';
 import { createListSettingsStore } from './list-settings-store.mjs';
 import { createMediaStore } from './media-store.mjs';
 import { createNodeSizeStore } from './node-size-store.mjs';
@@ -95,6 +97,14 @@ export const editorStore = createEditorStore({
   putTask: dataStore.putTask,
   putMilestone: dataStore.putMilestone,
   deleteNode: dataStore.deleteNode,
+});
+
+export const groupEditorStore = createGroupEditorStore({
+  groups: dataStore.groups,
+  now: () => Date.now(),
+  newId: () => crypto.randomUUID(),
+  putGroup: dataStore.putGroup,
+  deleteGroup: dataStore.deleteGroup,
 });
 
 export const listSettingsStore = createListSettingsStore({
@@ -177,11 +187,17 @@ export const dagLayoutStore = createDagLayoutStore({
   stateTime: clockStore.now,
   nodeSize: nodeSizeStore.size,
   hidden: dagHiddenNodes,
+  groups: dataStore.groups,
+  setGroup: (id, groupId) => {
+    dataStore.setNodeGroup(nodeRefOf(id), groupId);
+  },
 });
 
 export const sessionSignal = toSignal(sessionStore.session);
 
 export const domainSignal = toSignal(dataStore.state);
+
+export const groupsSignal = toSignal(dataStore.groups);
 
 export const dataStatusSignal = toSignal(dataStore.status);
 
@@ -194,6 +210,8 @@ export const noticeSignal = toSignal(uiStore.notice);
 export const settingsPanelSignal = toSignal(uiStore.settingsPanel);
 
 export const editorSignal = toSignal(editorStore.editor);
+
+export const groupEditorSignal = toSignal(groupEditorStore.editor);
 
 export const listSettingsSignal = toSignal(listSettingsStore.settings);
 
@@ -234,6 +252,8 @@ export const dagAnimationProgressSignal = toSignal(
 export const arcNodesSignal = toSignal(dagLayoutStore.arcNodes);
 
 export const tileNodesSignal = toSignal(dagLayoutStore.tileNodes);
+
+export const dagMembershipSignal = toSignal(dagLayoutStore.membership);
 
 export const taskRowsSignal = computed(() =>
   buildTaskRows(domainSignal.value, nowSignal.value, listSettingsSignal.value),

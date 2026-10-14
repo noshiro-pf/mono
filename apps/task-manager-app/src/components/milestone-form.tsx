@@ -15,6 +15,7 @@ import {
 } from '../view-model/index.mjs';
 import { DateTimeField } from './date-time-field.js';
 import { DependencyEditor } from './dependency-editor.js';
+import { GroupField } from './group-field.js';
 import { MilestoneExplanation } from './milestone-explanation.js';
 import { MilestoneReachState } from './milestone-reach-state.js';
 
@@ -23,10 +24,10 @@ type Props = Readonly<{
 }>;
 
 /**
- * A milestone's fields: what a milestone is, its title, then the conditions
- * under which it is reached — its date, its manual check (resolved and
- * reopened here) and its dependencies — with whether it is reached as
- * drafted and what it still waits for, and its description last.
+ * A milestone's fields: what a milestone is, its title and its group, then
+ * the conditions under which it is reached — its date, its manual check
+ * (resolved and reopened here) and its dependencies — with whether it is
+ * reached as drafted and what it still waits for, and its description last.
  */
 export const MilestoneForm = memoNamed<Props>('MilestoneForm', (props) => {
   const { editor } = props;
@@ -57,6 +58,7 @@ export const MilestoneForm = memoNamed<Props>('MilestoneForm', (props) => {
             onInput={onTitle}
           />
         </label>
+        <GroupField value={draft.groupId} onChange={onGroup} />
       </div>
       <fieldset className={'condition-group'}>
         <legend>{'到達条件（すべて満たすと到達）'}</legend>
@@ -136,6 +138,10 @@ export const MilestoneForm = memoNamed<Props>('MilestoneForm', (props) => {
 
 const onTitle: GenericEventHandler<HTMLInputElement> = (changed) => {
   editorStore.updateMilestoneDraft({ title: changed.currentTarget.value });
+};
+
+const onGroup: GenericEventHandler<HTMLSelectElement> = (changed) => {
+  editorStore.updateMilestoneDraft({ groupId: changed.currentTarget.value });
 };
 
 const onDate = (date: string): void => {

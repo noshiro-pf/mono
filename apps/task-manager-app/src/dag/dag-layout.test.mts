@@ -1,4 +1,4 @@
-import type { GraphNodeId } from '../domain/index.mjs';
+import { asGroupId, type GraphNodeId } from '../domain/index.mjs';
 import {
   arrowKeyDelta,
   defaultDirection,
@@ -90,6 +90,22 @@ describe(placeNodes, () => {
       { ...nodeA, x: 24, y: 324 },
       { ...nodeM, x: 200, y: 330 },
     ]);
+  });
+
+  test('moves a node put nowhere as far as the nodes of its group were moved', () => {
+    const positions: ReadonlyMap<GraphNodeId, Point> = new Map([
+      ['task:a', { x: 24, y: 324 }],
+    ]);
+
+    assert.deepStrictEqual(
+      placeNodes([nodeA, nodeM], [], positions, [
+        { id: asGroupId('g'), members: ['task:a', 'milestone:m'] },
+      ]),
+      [
+        { ...nodeA, x: 24, y: 324 },
+        { ...nodeM, x: 200, y: 330 },
+      ],
+    );
   });
 
   test('keeps the nodes put nowhere clear of each other, below on a tie', () => {

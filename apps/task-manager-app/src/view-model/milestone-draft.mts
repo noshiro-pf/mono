@@ -4,7 +4,7 @@ import { Result } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import type { Milestone } from '../domain/index.mjs';
 import { toDateTimeLocal } from './datetime-local.mjs';
-import { optionalDateTime } from './task-draft.mjs';
+import { groupIdOfDraft, optionalDateTime } from './task-draft.mjs';
 
 export const milestoneToDraft = (
   milestone: Milestone,
@@ -19,6 +19,7 @@ export const milestoneToDraft = (
         : toDateTimeLocal(milestone.date, timeZone),
     requiresManualCheck: milestone.requiresManualCheck,
     checkedAt: milestone.checkedAt,
+    groupId: milestone.groupId ?? '',
   }) as const;
 
 /**
@@ -52,6 +53,7 @@ export const applyMilestoneDraft = (
     date: date.value,
     requiresManualCheck: draft.requiresManualCheck,
     checkedAt: draft.requiresManualCheck ? draft.checkedAt : undefined,
+    groupId: groupIdOfDraft(draft.groupId),
     updatedAt: now,
   });
 };
@@ -64,4 +66,6 @@ export type MilestoneDraft = DeepReadonly<{
   requiresManualCheck: boolean;
   /** Set by the 「解消」 button, cleared by 「未解消に戻す」. */
   checkedAt: number | undefined;
+  /** As a task's. */
+  groupId: string;
 }>;

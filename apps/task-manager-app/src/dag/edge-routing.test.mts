@@ -257,7 +257,7 @@ const layeredGraph = (
         : [edge(from.id, to.id, random() < 0.2 ? 'SS +1日' : '')];
     });
 
-  return { direction: 'right', nodes, edges };
+  return { direction: 'right', nodes, edges, groups: [] };
 };
 
 /** Three tasks: A before B, and C after both. */
@@ -272,6 +272,7 @@ const repro = (direction: DagDirection): LayoutInput =>
       edge('task:a', 'task:c'),
       edge('task:b', 'task:c'),
     ],
+    groups: [],
   }) as const;
 
 describe(routeEdges, () => {

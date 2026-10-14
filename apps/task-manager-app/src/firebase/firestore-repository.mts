@@ -1,8 +1,9 @@
 /**
  * The {@link Repository} of one project in Cloud Firestore:
- * `projects/{projectId}/tasks/{taskId}` and
- * `projects/{projectId}/milestones/{milestoneId}`, each document a record
- * without its id, and the DAG's layout in
+ * `projects/{projectId}/tasks/{taskId}`,
+ * `projects/{projectId}/milestones/{milestoneId}` and
+ * `projects/{projectId}/groups/{groupId}`, each document a record without
+ * its id, and the DAG's layout in
  * `projects/{projectId}/settings/dagLayout` (`repository/converters.mts`).
  * Every read and write goes through `api/firestore-io.mts`, which prunes
  * each document written to its codec.
@@ -22,11 +23,20 @@ import {
   watchDoc,
   type DocTarget,
 } from '../api/index.mjs';
-import type { Milestone, MilestoneId, Task, TaskId } from '../domain/index.mjs';
+import type {
+  GroupId,
+  Milestone,
+  MilestoneId,
+  Task,
+  TaskId,
+} from '../domain/index.mjs';
 import {
   DagLayoutDocCodec,
   dagLayoutFromDoc,
   dagLayoutToDoc,
+  GroupDocCodec,
+  groupFromDoc,
+  groupToDoc,
   MilestoneDocCodec,
   milestoneFromDoc,
   milestoneToDoc,
@@ -35,6 +45,7 @@ import {
   taskFromDoc,
   taskToDoc,
   type DagLayoutDoc,
+  type GroupDoc,
   type MilestoneDoc,
   type Repository,
   type TaskDoc,
@@ -47,6 +58,8 @@ export const createFirestoreRepository = (
   const tasks = collection(firestore, 'projects', projectId, 'tasks');
 
   const milestones = collection(firestore, 'projects', projectId, 'milestones');
+
+  const groups = collection(firestore, 'projects', projectId, 'groups');
 
   const collectionOf = (kind: 'task' | 'milestone'): typeof tasks =>
     kind === 'task' ? tasks : milestones;
@@ -61,6 +74,12 @@ export const createFirestoreRepository = (
     ({
       ref: doc(milestones, id),
       codec: MilestoneDocCodec,
+    }) as const;
+
+  const groupDoc = (id: GroupId): DocTarget<GroupDoc> =>
+    ({
+      ref: doc(groups, id),
+      codec: GroupDocCodec,
     }) as const;
 
   const dagLayout: DocTarget<DagLayoutDoc> = {
@@ -112,6 +131,26 @@ export const createFirestoreRepository = (
     deleteNode: (ref, { updatedTasks, updatedMilestones }) =>
       commitBatch(firestore, (batch) => {
         batch.delete(doc(collectionOf(ref.kind), ref.id));
+
+        for (const task of updatedTasks) {
+          batch.set(taskDoc(task.id), taskToDoc(task));
+        }
+
+        for (const milestone of updatedMilestones) {
+          batch.set(milestoneDoc(milestone.id), milestoneToDoc(milestone));
+        }
+      }),
+    subscribeGroups: (observer) =>
+      watchCollection(groups, {
+        next: (docs) => {
+          observer.next(readValidDocs(docs, groupFromDoc, warn));
+        },
+        error: observer.error,
+      }),
+    putGroup: (group) => putDoc(groupDoc(group.id), groupToDoc(group)),
+    deleteGroup: (id, { updatedTasks, updatedMilestones }) =>
+      commitBatch(firestore, (batch) => {
+        batch.delete(doc(groups, id));
 
         for (const task of updatedTasks) {
           batch.set(taskDoc(task.id), taskToDoc(task));

@@ -332,6 +332,51 @@ const positionOf = async (
 const dagNode = (page: DeepReadonly<Page>, title: RegExp): Locator =>
   page.getByTestId('dag-node').and(page.getByRole('button', { name: title }));
 
+/** Drags `node` by its centre until the centre is at `to`, and drops it. */
+const dragNodeTo = async (
+  page: DeepReadonly<Page>,
+  node: Locator,
+  to: Readonly<{ x: number; y: number }>,
+): Promise<void> => {
+  const box = await node.boundingBox();
+
+  const startX = (box?.x ?? 0) + (box?.width ?? 0) / 2;
+
+  const startY = (box?.y ?? 0) + (box?.height ?? 0) / 2;
+
+  await page.mouse.move(startX, startY);
+
+  await page.mouse.down();
+
+  await page.mouse.move(Num.div(startX + to.x, 2), Num.div(startY + to.y, 2), {
+    steps: 5,
+  });
+
+  await page.mouse.move(to.x, to.y, { steps: 5 });
+
+  await page.mouse.up();
+};
+
+/** The group `node`'s dialog says it is in, or `''` for none. */
+const groupOfNode = async (
+  page: DeepReadonly<Page>,
+  node: Locator,
+): Promise<string> => {
+  await node.click();
+
+  const select = page.getByTestId('node-dialog').getByTestId('group-select');
+
+  await expect.soft(select).toBeVisible();
+
+  const value = await select.inputValue();
+
+  await page.keyboard.press('Escape');
+
+  await expect.soft(page.getByTestId('node-dialog')).toBeHidden();
+
+  return value;
+};
+
 /** Shows the DAG and waits for its nodes to have moved into place. */
 const showDag = async (page: DeepReadonly<Page>): Promise<void> => {
   await page.getByTestId('view-dag').click();
@@ -667,6 +712,93 @@ test(
     await node.click();
 
     await expect.soft(page.getByTestId('node-dialog')).toBeVisible();
+  },
+);
+
+test(
+  'puts a node into a group by dragging it into the frame, and out again',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto(DEMO);
+
+    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+
+    await showDag(page);
+
+    const frame = page.getByTestId('dag-group');
+
+    await expect.soft(frame).toHaveCount(1);
+
+    await expect
+      .soft(page.getByTestId('dag-group-header'))
+      .toHaveAccessibleName('グループ「実装」');
+
+    const node = dagNode(page, /仕様をまとめる/u);
+
+    expect.soft(await groupOfNode(page, node)).toBe('');
+
+    const into = await frame.boundingBox();
+
+    await dragNodeTo(page, node, {
+      x: (into?.x ?? 0) + (into?.width ?? 0) / 2,
+      y: (into?.y ?? 0) + (into?.height ?? 0) / 2,
+    });
+
+    expect.soft(await groupOfNode(page, node)).toBe('implementation');
+
+    // The frame now goes round it too.
+    const grown = await frame.boundingBox();
+
+    const box = await node.boundingBox();
+
+    expect.soft(box?.x ?? 0).toBeGreaterThanOrEqual(grown?.x ?? 0);
+
+    expect
+      .soft((box?.x ?? 0) + (box?.width ?? 0))
+      .toBeLessThanOrEqual((grown?.x ?? 0) + (grown?.width ?? 0));
+
+    await dragNodeTo(page, node, {
+      x: (grown?.x ?? 0) + (grown?.width ?? 0) / 2,
+      y: (grown?.y ?? 0) + (grown?.height ?? 0) + 200,
+    });
+
+    expect.soft(await groupOfNode(page, node)).toBe('');
+  },
+);
+
+test(
+  'creates a group from the header, and deletes it from its title',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto(DEMO);
+
+    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+
+    await showDag(page);
+
+    await page.getByTestId('add-group').click();
+
+    await page.getByTestId('group-title-input').fill('検証');
+
+    await page.getByTestId('save-group').click();
+
+    await expect.soft(page.getByTestId('group-dialog')).toBeHidden();
+
+    const created = page
+      .getByTestId('dag-group-header')
+      .and(page.getByRole('button', { name: 'グループ「検証」' }));
+
+    await expect.soft(created).toBeVisible();
+
+    await created.click();
+
+    await page.getByTestId('delete-group').click();
+
+    await page.getByTestId('confirm-delete-group').click();
+
+    await expect.soft(created).toHaveCount(0);
+
+    await expect.soft(page.getByTestId('dag-group')).toHaveCount(1);
   },
 );
 

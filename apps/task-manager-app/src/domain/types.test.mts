@@ -1,6 +1,7 @@
 import { expectType } from 'ts-data-forge';
 import type { Brand, DeepReadonly } from 'ts-type-forge';
 import {
+  asGroupId,
   asMilestoneId,
   asTaskId,
   DependencyCodec,
@@ -9,6 +10,7 @@ import {
   DisplayStatusCodec,
   displayStatuses,
   DomainStateCodec,
+  GroupIdCodec,
   MilestoneIdCodec,
   priorities,
   PriorityCodec,
@@ -19,6 +21,8 @@ import {
   type DependencyType,
   type DisplayStatus,
   type DomainState,
+  type Group,
+  type GroupId,
   type Milestone,
   type MilestoneDependency,
   type MilestoneId,
@@ -77,6 +81,34 @@ describe('milestone ids', () => {
 
   test('asMilestoneId throws on the empty string', () => {
     expect(() => asMilestoneId('')).toThrow(TypeError);
+  });
+});
+
+describe('group ids', () => {
+  test('GroupIdCodec accepts a non-empty string only', () => {
+    assert.isTrue(GroupIdCodec.is('g'));
+
+    assert.isFalse(GroupIdCodec.is(''));
+
+    assert.isFalse(GroupIdCodec.is(null));
+  });
+
+  test('asGroupId brands a non-empty string, distinct from the node ids', () => {
+    const id = asGroupId('group-1');
+
+    expectType<typeof id, GroupId>('=');
+
+    expectType<GroupId, Brand<string, 'GroupId'>>('=');
+
+    expectType<GroupId, TaskId>('!=');
+
+    expectType<GroupId, MilestoneId>('!=');
+
+    assert.strictEqual(id, 'group-1');
+  });
+
+  test('asGroupId throws on the empty string', () => {
+    expect(() => asGroupId('')).toThrow(TypeError);
   });
 });
 
@@ -198,6 +230,7 @@ describe('the record types', () => {
         assignees: string[];
         reviewers: string[];
         dependencies: Dependency[];
+        groupId: GroupId | undefined;
       }>
     >('=');
 
@@ -213,6 +246,17 @@ describe('the record types', () => {
         requiresManualCheck: boolean;
         checkedAt: number | undefined;
         dependencies: Dependency[];
+        groupId: GroupId | undefined;
+      }>
+    >('=');
+
+    expectType<
+      Group,
+      DeepReadonly<{
+        id: GroupId;
+        title: string;
+        createdAt: number;
+        updatedAt: number;
       }>
     >('=');
 

@@ -51,6 +51,26 @@ export const asMilestoneId = (s: string): MilestoneId => {
   throw new TypeError('A MilestoneId must be a non-empty string');
 };
 
+/** A group's id: any non-empty string, as a {@link TaskId} is. */
+export const GroupIdCodec = t.brandedString({
+  typeName: 'GroupId',
+  defaultValue: '-',
+  is: (s): s is Brand<string, 'GroupId'> => s !== '',
+});
+
+/**
+ * Brands `s` as a {@link GroupId}.
+ *
+ * @throws {TypeError} When `s` is empty.
+ */
+export const asGroupId = (s: string): GroupId => {
+  if (GroupIdCodec.is(s)) {
+    return s;
+  }
+
+  throw new TypeError('A GroupId must be a non-empty string');
+};
+
 /** Whether `dependency` is on a task, and so has a type. */
 export const isTaskDependency = (
   dependency: Dependency,
@@ -59,6 +79,8 @@ export const isTaskDependency = (
 export type TaskId = t.TypeOf<typeof TaskIdCodec>;
 
 export type MilestoneId = t.TypeOf<typeof MilestoneIdCodec>;
+
+export type GroupId = t.TypeOf<typeof GroupIdCodec>;
 
 /** A node of the dependency graph. */
 export type NodeRef =
@@ -182,6 +204,8 @@ export const TaskCodec = t.record(
     reviewers: t.array(t.string()),
     /** All of them must hold before the task can be worked on. */
     dependencies: t.array(DependencyCodec),
+    /** The group the task is drawn in; one that does not exist is none. */
+    groupId: t.nullable(GroupIdCodec),
   },
   { typeName: 'Task' },
 );
@@ -198,8 +222,25 @@ export const MilestoneCodec = t.record(
     /** Read only when `requiresManualCheck` is set. */
     checkedAt: OptionalFiniteNumberCodec,
     dependencies: t.array(DependencyCodec),
+    /** As a task's. */
+    groupId: t.nullable(GroupIdCodec),
   },
   { typeName: 'Milestone' },
+);
+
+/**
+ * Tasks and milestones drawn together in one frame on the DAG. A node is
+ * in one group at most — its own `groupId` says which — and a group has no
+ * part in what holds: it depends on nothing, and nothing depends on it.
+ */
+export const GroupCodec = t.record(
+  {
+    id: GroupIdCodec,
+    title: t.string(),
+    createdAt: FiniteNumberCodec,
+    updatedAt: FiniteNumberCodec,
+  },
+  { typeName: 'Group' },
 );
 
 export const DomainStateCodec = t.record(
@@ -231,6 +272,9 @@ export type Task = t.TypeOf<typeof TaskCodec>;
  * with none of them is reached when it is created.
  */
 export type Milestone = t.TypeOf<typeof MilestoneCodec>;
+
+/** A group of nodes; see {@link GroupCodec}. */
+export type Group = t.TypeOf<typeof GroupCodec>;
 
 /** Everything the domain stores. Ids are assumed to be unique per kind. */
 export type DomainState = t.TypeOf<typeof DomainStateCodec>;

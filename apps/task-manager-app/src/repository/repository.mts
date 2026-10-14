@@ -1,6 +1,6 @@
 /**
- * Where the tasks and milestones of one project are kept, with the layout of
- * its DAG: Firestore when signed in (`firebase/`), memory in the tests and
+ * Where the tasks and milestones of one project are kept, with their groups
+ * and the layout of its DAG: Firestore when signed in (`firebase/`), memory in the tests and
  * the demo (`memory-repository.mts`). The store sees only this.
  */
 
@@ -8,6 +8,8 @@ import type { DeepReadonly } from 'ts-type-forge';
 import type { DagLayout } from '../dag/index.mjs';
 import type {
   DomainState,
+  Group,
+  GroupId,
   Milestone,
   NodeRef,
   Task,
@@ -31,6 +33,19 @@ export type Repository = Readonly<{
    */
   deleteNode: (ref: NodeRef, cleanup: NodeCleanup) => Promise<void>;
   /**
+   * Hands `observer.next` every group once they have loaded, in creation
+   * order, and again on every change after, local writes included. Returns
+   * what stops it.
+   */
+  subscribeGroups: (observer: GroupsObserver) => () => void;
+  /** Creates or replaces the group with its id. */
+  putGroup: (group: Group) => Promise<void>;
+  /**
+   * Deletes the group `id` and writes the nodes `cleanup` names — those
+   * that were in it (see `removeGroup`) — all together.
+   */
+  deleteGroup: (id: GroupId, cleanup: NodeCleanup) => Promise<void>;
+  /**
    * Hands `observer.next` the DAG's layout once it has loaded — `undefined`
    * if there is none, or the stored one is invalid — and again on every
    * change after, local writes included. Returns what stops it.
@@ -42,6 +57,11 @@ export type Repository = Readonly<{
 
 export type RepositoryObserver = Readonly<{
   next: (state: DomainState) => void;
+  error: (error: unknown) => void;
+}>;
+
+export type GroupsObserver = Readonly<{
+  next: (groups: readonly Group[]) => void;
   error: (error: unknown) => void;
 }>;
 

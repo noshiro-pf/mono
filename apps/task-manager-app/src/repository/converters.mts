@@ -20,7 +20,8 @@
  * the only functions that write (`api/firestore-io.mts`).
  *
  * The DAG's layout (`projects/{projectId}/settings/dagLayout`) holds the
- * positions as a map from node id to point. A position of a node that no
+ * positions as a map from node id to point, and those of the groups' frames
+ * as one from group id to point. A position of a node or a group that no
  * longer exists is read like any other and left unused.
  */
 
@@ -30,10 +31,13 @@ import { DagDirectionCodec, type DagLayout } from '../dag/index.mjs';
 import {
   FiniteNumberCodec,
   GraphNodeIdCodec,
+  GroupCodec,
+  GroupIdCodec,
   MilestoneCodec,
   MilestoneIdCodec,
   TaskCodec,
   TaskIdCodec,
+  type Group,
   type Milestone,
   type Task,
 } from '../domain/index.mjs';
@@ -45,6 +49,7 @@ export const taskToDoc = (task: Task): TaskDoc =>
     startedAt: task.startedAt ?? null,
     completedAt: task.completedAt ?? null,
     estimateHours: task.estimateHours ?? null,
+    groupId: task.groupId ?? null,
   }) as const;
 
 export const milestoneToDoc = (milestone: Milestone): MilestoneDoc =>
@@ -52,7 +57,10 @@ export const milestoneToDoc = (milestone: Milestone): MilestoneDoc =>
     ...milestone,
     date: milestone.date ?? null,
     checkedAt: milestone.checkedAt ?? null,
+    groupId: milestone.groupId ?? null,
   }) as const;
+
+export const groupToDoc = (group: Group): GroupDoc => group;
 
 /** The task stored as document `id`, or why it is not one. */
 export const taskFromDoc = (
@@ -72,6 +80,7 @@ export const taskFromDoc = (
       startedAt: doc.startedAt ?? undefined,
       completedAt: doc.completedAt ?? undefined,
       estimateHours: doc.estimateHours ?? undefined,
+      groupId: doc.groupId ?? undefined,
     }),
   );
 };
@@ -91,7 +100,22 @@ export const milestoneFromDoc = (
       id,
       date: doc.date ?? undefined,
       checkedAt: doc.checkedAt ?? undefined,
+      groupId: doc.groupId ?? undefined,
     }),
+  );
+};
+
+/** The group stored as document `id`, or why it is not one. */
+export const groupFromDoc = (
+  id: string,
+  data: unknown,
+): Result<Group, readonly string[]> => {
+  if (!GroupIdCodec.is(id)) {
+    return Result.err(['empty document id']);
+  }
+
+  return Result.map(validate(GroupDocCodec, data), (doc) =>
+    GroupCodec.prune({ ...doc, id }),
   );
 };
 
@@ -102,6 +126,7 @@ export const dagLayoutToDoc = (
   ({
     direction: layout.direction,
     positions: Object.fromEntries(layout.positions),
+    groupPositions: Object.fromEntries(layout.groupPositions),
     updatedAt,
   }) as const;
 
@@ -114,6 +139,11 @@ export const dagLayoutFromDoc = (
     positions: new Map(
       Object.entries(doc.positions).flatMap(([id, { x, y }]) =>
         GraphNodeIdCodec.is(id) ? [[id, { x, y }] as const] : [],
+      ),
+    ),
+    groupPositions: new Map(
+      Object.entries(doc.groupPositions ?? {}).flatMap(([id, { x, y }]) =>
+        GroupIdCodec.is(id) ? [[id, { x, y }] as const] : [],
       ),
     ),
   }));
@@ -134,12 +164,20 @@ export type TaskDoc = t.TypeOf<typeof TaskDocCodec>;
 
 export type MilestoneDoc = t.TypeOf<typeof MilestoneDocCodec>;
 
+export type GroupDoc = t.TypeOf<typeof GroupDocCodec>;
+
 export type DagLayoutDoc = t.TypeOf<typeof DagLayoutDocCodec>;
 
 export type ProjectDoc = t.TypeOf<typeof ProjectDocCodec>;
 
 /** What is `undefined` in the domain is `null` in a document. */
 const NullableFiniteNumberCodec = t.union([FiniteNumberCodec, t.nullType]);
+
+/**
+ * A group a node is in, `null` for none. Missing in what versions before
+ * groups wrote, which is read as none.
+ */
+const NullableGroupIdCodec = t.optional(t.union([GroupIdCodec, t.nullType]));
 
 /**
  * A task without its id, a missing value `null`. The dependencies are the
@@ -152,6 +190,7 @@ export const TaskDocCodec = t.record(
     startedAt: NullableFiniteNumberCodec,
     completedAt: NullableFiniteNumberCodec,
     estimateHours: NullableFiniteNumberCodec,
+    groupId: NullableGroupIdCodec,
   },
   { typeName: 'TaskDoc' },
 );
@@ -162,17 +201,24 @@ export const MilestoneDocCodec = t.record(
     ...Obj.omit(MilestoneCodec.shape, ['id']),
     date: NullableFiniteNumberCodec,
     checkedAt: NullableFiniteNumberCodec,
+    groupId: NullableGroupIdCodec,
   },
   { typeName: 'MilestoneDoc' },
 );
 
+/** A group without its id. */
+export const GroupDocCodec = t.record(Obj.omit(GroupCodec.shape, ['id']), {
+  typeName: 'GroupDoc',
+});
+
+const PointCodec = t.record({ x: FiniteNumberCodec, y: FiniteNumberCodec });
+
 export const DagLayoutDocCodec = t.record(
   {
     direction: DagDirectionCodec,
-    positions: t.keyValueRecord(
-      GraphNodeIdCodec,
-      t.record({ x: FiniteNumberCodec, y: FiniteNumberCodec }),
-    ),
+    positions: t.keyValueRecord(GraphNodeIdCodec, PointCodec),
+    /** Missing in what versions before groups wrote. */
+    groupPositions: t.optional(t.keyValueRecord(GroupIdCodec, PointCodec)),
     updatedAt: FiniteNumberCodec,
   },
   { typeName: 'DagLayoutDoc' },

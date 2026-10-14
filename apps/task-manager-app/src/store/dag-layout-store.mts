@@ -63,6 +63,15 @@
  * out the rest, and 「アーク」 and 「タイル」 place the rest, which move to
  * their new places when that changes as when the order does. Where a hidden
  * node was put is kept, and saved with the rest, for when it is shown again.
+ *
+ * The groups (`dag/group-frames.mts`) are drawn in 「DAG」 alone, as frames
+ * round their nodes: ELK lays each one out as a whole, and a new node is put
+ * beside the others of its group. Every change to the arrangement saves
+ * where each frame is, which is where an empty one stays. A node dropped
+ * into another frame, or out of every frame, is moved to that group, or to
+ * none (`dropNode`), and a frame dragged by its title moves its nodes with
+ * it (`moveGroup`). A node moved to another group in its dialog is put
+ * again, as a new node is, beside the others of its new group.
  */
 
 import {
@@ -76,6 +85,10 @@ import {
   arcDiagramNodes,
   diagramTaskIds,
   easeOutCubic,
+  framePositions,
+  groupFrames,
+  groupMembership,
+  groupsByMember,
   initialGridPositions,
   interpolateOpacities,
   interpolatePositions,
@@ -83,6 +96,7 @@ import {
   layoutInput,
   layoutKey,
   nodesBounds,
+  placeEmptyGroups,
   placeNodes,
   positionsOf,
   recordFrame,
@@ -91,12 +105,14 @@ import {
   samePositions,
   startFrameBudget,
   tileDiagramNodes,
+  withMemberMoved,
   withoutNodes,
   type DagDirection,
   type DagLayout,
   type FrameBudget,
   type GraphLayout,
   type LaidOutNode,
+  type LayoutGroup,
   type LayoutInput,
   type Point,
 } from '../dag/index.mjs';
@@ -106,6 +122,8 @@ import {
   nodeId,
   type DomainState,
   type GraphNodeId,
+  type Group,
+  type GroupId,
   type SortSpec,
 } from '../domain/index.mjs';
 import {
@@ -170,6 +188,10 @@ export type DagLayoutDeps<H, F> = Readonly<{
   nodeSize: InitializedObservable<NodeSize>;
   /** The nodes of `state` drawn in no mode. */
   hidden: InitializedObservable<ReadonlySet<GraphNodeId>>;
+  /** The groups the nodes of `state` may be in. */
+  groups: InitializedObservable<readonly Group[]>;
+  /** Moves the node `id` into the group `groupId`, or into none. */
+  setGroup: (id: GraphNodeId, groupId: GroupId | undefined) => void;
 }>;
 
 export type DagLayoutStore = Readonly<{
@@ -213,8 +235,28 @@ export type DagLayoutStore = Readonly<{
   setTileWidth: (available: number) => void;
   /** Puts every node moving to its place there at once. */
   finishAnimation: () => void;
+  /**
+   * Every group, with the nodes in it that are drawn
+   * (`dag/group-frames.mts`).
+   */
+  membership: InitializedObservable<readonly LayoutGroup[]>;
   /** A node dropped at `position`, which is saved at once. */
   moveNode: (id: GraphNodeId, position: Point) => void;
+  /**
+   * A node dropped at `position` into the group `into`, or into none: saved
+   * at once, and moved to that group if it was not in it. The frame of the
+   * group it leaves stays where it was if nothing is left in it.
+   */
+  dropNode: (
+    id: GraphNodeId,
+    position: Point,
+    into: GroupId | undefined,
+  ) => void;
+  /**
+   * The frame of the group `id` dragged to `position`, its top-left
+   * corner: its nodes moved as far, and saved at once.
+   */
+  moveGroup: (id: GroupId, position: Point) => void;
   /** A node moved by `delta` with the keys, saved after a pause. */
   nudgeNode: (id: GraphNodeId, delta: Point) => void;
   /** Saves the direction; no node moves. */
@@ -277,6 +319,10 @@ export const createDagLayoutStore = <H, F>(
     ),
   );
 
+  const membership = combine([deps.state, deps.groups, deps.hidden]).pipe(
+    map(([state, groups, hidden]) => groupMembership(state, groups, hidden)),
+  );
+
   const arcNodes = combine([diagramOrder, deps.nodeSize]).pipe(
     map(([ids, size]) => arcDiagramNodes(ids, size)),
   );
@@ -324,6 +370,13 @@ export const createDagLayoutStore = <H, F>(
   /** Whether the nodes have been shown moving to their places yet. */
   let mut_introduced = false;
 
+  /**
+   * The group each node dropped into another one was moved to, until the
+   * graph is laid out with it there: a node that changes group otherwise is
+   * put again (`followStructure`).
+   */
+  const mut_dropped = new Map<GraphNodeId, GroupId | undefined>();
+
   /** The automatic layout on screen: the current one, or the one before. */
   const shownAutoLayout = (): GraphLayout | undefined => {
     const current = getAutoLayout();
@@ -349,25 +402,66 @@ export const createDagLayoutStore = <H, F>(
       resizeNodes(shown?.nodes ?? [], mut_nodeSize),
       shown?.edges ?? [],
       positions,
+      membership.getSnapshot().value,
     );
   };
 
   /**
-   * `next` with a position for every node there is: where it was put, or
-   * where the DAG draws it. Positions of nodes that are gone are dropped
-   * here.
+   * The frame of every group of `members` round `nodes`, an empty one where
+   * `stored` has it, or where ELK put it (`placeEmptyGroups`).
    */
-  const frozen = (next: DagLayout): DagLayout => {
-    const drawn = positionsOf(placedWith(next.positions));
+  const framesWith = (
+    nodes: readonly LaidOutNode[],
+    members: readonly LayoutGroup[],
+    stored: ReadonlyMap<GroupId, Point>,
+  ): ReadonlyMap<GroupId, Point> =>
+    framePositions(
+      groupFrames(
+        nodes,
+        members,
+        placeEmptyGroups(
+          members,
+          shownAutoLayout()?.groups ?? [],
+          nodes,
+          stored,
+        ),
+      ),
+    );
+
+  /**
+   * `next` with a position for every node there is: where it was put, or
+   * where the DAG draws it now — or, for the nodes `replaced`, where it
+   * draws them with `next`; and for every group of `members` — those there
+   * are, unless given — where its frame is drawn. Positions of nodes and
+   * groups that are gone are dropped here.
+   */
+  const frozen = (
+    next: DagLayout,
+    members: readonly LayoutGroup[] = membership.getSnapshot().value,
+    replaced: ReadonlySet<GraphNodeId> = new Set(),
+  ): DagLayout => {
+    const drawnNow = positionsOf(placed());
+
+    const drawnNext = positionsOf(placedWith(next.positions));
+
+    const nodePositions = new Map(
+      listNodes(deps.state.getSnapshot().value).flatMap(({ id }) => {
+        const position =
+          next.positions.get(id) ??
+          (replaced.has(id) ? undefined : drawnNow.get(id)) ??
+          drawnNext.get(id);
+
+        return position === undefined ? [] : [[id, position] as const];
+      }),
+    );
 
     return {
       direction: next.direction,
-      positions: new Map(
-        listNodes(deps.state.getSnapshot().value).flatMap(({ id }) => {
-          const position = next.positions.get(id) ?? drawn.get(id);
-
-          return position === undefined ? [] : [[id, position] as const];
-        }),
+      positions: nodePositions,
+      groupPositions: framesWith(
+        placedWith(nodePositions),
+        members,
+        next.groupPositions,
       ),
     };
   };
@@ -570,10 +664,14 @@ export const createDagLayoutStore = <H, F>(
     mut_nudgeTimer = undefined;
   };
 
-  const commit = (next: DagLayout): void => {
+  const commit = (
+    next: DagLayout,
+    members?: readonly LayoutGroup[],
+    replaced?: ReadonlySet<GraphNodeId>,
+  ): void => {
     cancelNudge();
 
-    const saved = frozen(next);
+    const saved = frozen(next, members, replaced);
 
     setArrangement(saved);
 
@@ -592,6 +690,9 @@ export const createDagLayoutStore = <H, F>(
     commit({
       direction: getArrangement().direction,
       positions: positionsOf(laidOut.nodes),
+      groupPositions: new Map(
+        laidOut.groups.map(({ id, x, y }) => [id, { x, y }]),
+      ),
     });
 
     // Outside the DAG, nothing on screen has moved.
@@ -616,14 +717,15 @@ export const createDagLayoutStore = <H, F>(
    * change — it is laid out again, as 「自動整列」 does. Otherwise every node
    * new to the graph that was never put anywhere is saved where the DAG
    * draws it, clear of the others (`placeNodes`), so that it stays there
-   * however ELK lays out the graph next. Nothing is written while nothing
-   * ever was.
+   * however ELK lays out the graph next — and so is every node that moved
+   * to another group, other than by a drop, put again as if it were new.
+   * So is a new group's frame. Nothing is written while nothing ever was.
    */
   const followStructure = (
     previous: GraphLayout,
     laidOut: GraphLayout,
   ): void => {
-    const { positions } = getArrangement();
+    const { direction, positions, groupPositions } = getArrangement();
 
     if (positions.size === 0) {
       return;
@@ -642,7 +744,50 @@ export const createDagLayoutStore = <H, F>(
 
     const known = new Set(previous.nodes.map(({ id }) => id));
 
-    if (laidOut.nodes.some(({ id }) => !known.has(id) && !positions.has(id))) {
+    const wasIn = groupsByMember(previous.groups);
+
+    const isIn = groupsByMember(laidOut.groups);
+
+    const regrouped = laidOut.nodes.flatMap(({ id }) => {
+      if (!known.has(id) || wasIn.get(id) === isIn.get(id)) {
+        return [];
+      }
+
+      const dropped = mut_dropped.has(id);
+
+      const droppedInto = mut_dropped.get(id);
+
+      if (dropped && droppedInto === isIn.get(id)) {
+        mut_dropped.delete(id);
+
+        return [];
+      }
+
+      return [id];
+    });
+
+    if (Arr.isNonEmpty(regrouped)) {
+      const forgotten = new Set(regrouped);
+
+      commit(
+        {
+          direction,
+          positions: new Map(
+            Array.from(positions).filter(([id]) => !forgotten.has(id)),
+          ),
+          groupPositions,
+        },
+        undefined,
+        forgotten,
+      );
+
+      return;
+    }
+
+    if (
+      laidOut.nodes.some(({ id }) => !known.has(id) && !positions.has(id)) ||
+      laidOut.groups.some(({ id }) => !groupPositions.has(id))
+    ) {
       commit(getArrangement());
     }
   };
@@ -790,6 +935,86 @@ export const createDagLayoutStore = <H, F>(
     commit({
       direction: current.direction,
       positions: withPosition(current.positions, id, position),
+      groupPositions: current.groupPositions,
+    });
+  };
+
+  const dropNode = (
+    id: GraphNodeId,
+    position: Point,
+    into: GroupId | undefined,
+  ): void => {
+    const members = membership.getSnapshot().value;
+
+    const from = groupsByMember(members).get(id);
+
+    if (from === into) {
+      moveNode(id, position);
+
+      return;
+    }
+
+    const current = getArrangement();
+
+    const nodes = placed();
+
+    // Where the group it leaves was, for it to stay there if it is empty.
+    const left =
+      from === undefined
+        ? undefined
+        : framesWith(nodes, members, current.groupPositions).get(from);
+
+    commit(
+      {
+        direction: current.direction,
+        positions: withPosition(current.positions, id, position),
+        groupPositions:
+          from === undefined || left === undefined
+            ? current.groupPositions
+            : new Map([...current.groupPositions, [from, left]]),
+      },
+      withMemberMoved(members, id, into),
+    );
+
+    mut_dropped.set(id, into);
+
+    deps.setGroup(id, into);
+  };
+
+  const moveGroup = (id: GroupId, position: Point): void => {
+    const current = getArrangement();
+
+    const nodes = placed();
+
+    const members = membership.getSnapshot().value;
+
+    const from = framesWith(nodes, members, current.groupPositions).get(id);
+
+    const group = members.find((candidate) => candidate.id === id);
+
+    if (from === undefined || group === undefined) {
+      return;
+    }
+
+    const dx = position.x - from.x;
+
+    const dy = position.y - from.y;
+
+    const inGroup = new Set(group.members);
+
+    const moved: readonly (readonly [GraphNodeId, Point])[] = nodes
+      .filter((node) => inGroup.has(node.id))
+      .map((node) => [node.id, { x: node.x + dx, y: node.y + dy }] as const);
+
+    const nodePositions: readonly (readonly [GraphNodeId, Point])[] = [
+      ...current.positions,
+      ...moved,
+    ] as const;
+
+    commit({
+      direction: current.direction,
+      positions: new Map(nodePositions),
+      groupPositions: new Map([...current.groupPositions, [id, position]]),
     });
   };
 
@@ -808,6 +1033,7 @@ export const createDagLayoutStore = <H, F>(
         x: from.x + delta.x,
         y: from.y + delta.y,
       }),
+      groupPositions: current.groupPositions,
     });
 
     cancelNudge();
@@ -826,7 +1052,11 @@ export const createDagLayoutStore = <H, F>(
       return;
     }
 
-    commit({ direction, positions: current.positions });
+    commit({
+      direction,
+      positions: current.positions,
+      groupPositions: current.groupPositions,
+    });
   };
 
   const autoArrange = (): void => {
@@ -877,7 +1107,8 @@ export const createDagLayoutStore = <H, F>(
       deps.active,
       deps.nodeSize,
       deps.hidden,
-    ]).subscribe(([state, { direction }, active, size, hidden]) => {
+      membership,
+    ]).subscribe(([state, { direction }, active, size, hidden, groups]) => {
       if (!active) {
         finishAnimation();
 
@@ -888,6 +1119,7 @@ export const createDagLayoutStore = <H, F>(
         buildDependencyGraph(withoutNodes(state, hidden)),
         direction,
         size,
+        groups,
       );
 
       const key = layoutKey(input);
@@ -1023,9 +1255,12 @@ export const createDagLayoutStore = <H, F>(
     animationProgress,
     arcNodes,
     tileNodes,
+    membership,
     setTileWidth,
     finishAnimation,
     moveNode,
+    dropNode,
+    moveGroup,
     nudgeNode,
     setDirection,
     autoArrange,
@@ -1084,7 +1319,12 @@ const onlyOf = (
 const initialArrangement = (
   stored: DagLayout | undefined,
   defaultDirection: DagDirection,
-): DagLayout => stored ?? { direction: defaultDirection, positions: new Map() };
+): DagLayout =>
+  stored ?? {
+    direction: defaultDirection,
+    positions: new Map(),
+    groupPositions: new Map(),
+  };
 
 const withPosition = (
   positions: ReadonlyMap<GraphNodeId, Point>,

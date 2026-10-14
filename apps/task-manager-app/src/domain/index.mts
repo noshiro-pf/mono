@@ -10,6 +10,7 @@ export * from './evaluation-context.mjs';
 export * from './evaluator.mjs';
 export * from './graph-nodes.mjs';
 export * from './next-change-at.mjs';
+export * from './regroup.mjs';
 export * from './remove-node.mjs';
 export * from './set-progress.mjs';
 export * from './sort-tasks.mjs';
