@@ -21,9 +21,10 @@ type Props = Readonly<{
 
 /**
  * One issue or pull request: its title, in the colour of where it stands
- * (`index.css`), and a link to it on GitHub. An issue is a rounded box and a
- * pull request a box with pointed ends, so the two read apart before the
- * colour does. Its `priority:*` label is a word on a pill across the top
+ * (`index.css`), and a link to it on GitHub. An issue is a box with pointed
+ * ends and a pull request a rounded box, so the two read apart before the
+ * colour does — the issue angular, as the problem it raises, and the pull
+ * request rounded, as what settles it. Its `priority:*` label is a word on a pill across the top
  * edge, in ink rather than a colour, since the shape and the colour already
  * say what it is and where it stands; a high one also gets a second outline
  * around the shape, and a low one is drawn faint. The number, the state and
@@ -58,7 +59,8 @@ export const IssueDagNode = memoNamed<Props>(
           data-state={node.state}
           transform={`translate(${x} ${y})`}
         >
-          {node.priority !== 'high' ? undefined : node.kind === 'issue' ? (
+          {node.priority !== 'high' ? undefined : node.kind ===
+            'pull-request' ? (
             <rect
               className={'issue-dag-ring'}
               height={NODE_HEIGHT + 2 * RING_GAP}
@@ -68,9 +70,9 @@ export const IssueDagNode = memoNamed<Props>(
               y={-RING_GAP}
             />
           ) : (
-            <polygon className={'issue-dag-ring'} points={PULL_REQUEST_RING} />
+            <polygon className={'issue-dag-ring'} points={ISSUE_RING} />
           )}
-          {node.kind === 'issue' ? (
+          {node.kind === 'pull-request' ? (
             <rect
               className={'issue-dag-shape'}
               height={NODE_HEIGHT}
@@ -78,10 +80,7 @@ export const IssueDagNode = memoNamed<Props>(
               width={NODE_WIDTH}
             />
           ) : (
-            <polygon
-              className={'issue-dag-shape'}
-              points={PULL_REQUEST_SHAPE}
-            />
+            <polygon className={'issue-dag-shape'} points={ISSUE_SHAPE} />
           )}
           <text className={'issue-dag-title'} textAnchor={'middle'}>
             {lines.map((line, index) => (
@@ -127,11 +126,11 @@ export const IssueDagNode = memoNamed<Props>(
   },
 );
 
-/** How far a pull request's pointed ends reach in. */
+/** How far an issue's pointed ends reach in. */
 const POINT_INSET = 12;
 
 /** Clockwise on the page, from the top-left corner. */
-const PULL_REQUEST_POINTS = [
+const ISSUE_POINTS = [
   [POINT_INSET, 0],
   [NODE_WIDTH - POINT_INSET, 0],
   [NODE_WIDTH, NODE_HEIGHT / 2],
@@ -194,11 +193,9 @@ const offsetPolygon = (
   });
 };
 
-const PULL_REQUEST_SHAPE = toPoints(PULL_REQUEST_POINTS);
+const ISSUE_SHAPE = toPoints(ISSUE_POINTS);
 
-const PULL_REQUEST_RING = toPoints(
-  offsetPolygon(PULL_REQUEST_POINTS, RING_GAP),
-);
+const ISSUE_RING = toPoints(offsetPolygon(ISSUE_POINTS, RING_GAP));
 
 /** What a line of 12px text holds inside the pointed ends, in narrow characters. */
 const TITLE_UNITS = 26;
