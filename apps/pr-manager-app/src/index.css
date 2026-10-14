@@ -733,6 +733,12 @@ a:focus-visible {
 .block-body[data-sized='true']:has(> .section > .issue-dag) {
   display: flex;
   flex-direction: column;
+  /*
+   * Its graph scrolls inside its own box, so the block keeps no room for a
+   * scroll bar it does not draw, and no padding to keep anything off one.
+   */
+  padding-right: 0;
+  scrollbar-gutter: auto;
 }
 
 .block-body[data-sized='true'] > .section:has(> .issue-dag) {
