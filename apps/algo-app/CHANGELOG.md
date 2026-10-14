@@ -1,5 +1,15 @@
 # algo-app
 
+## 0.0.11
+
+### Patch Changes
+
+- Updated dependencies [18c78df]
+    - synstate@3.2.0
+    - preact-utils@0.0.9
+    - tiny-router-observable@0.0.12
+    - synstate-preact-hooks@3.2.0
+
 ## 0.0.10
 
 ### Patch Changes

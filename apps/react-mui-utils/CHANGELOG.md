@@ -1,5 +1,12 @@
 # react-mui-utils
 
+## 0.0.9
+
+### Patch Changes
+
+- react-utils@0.0.12
+    - react-utils-styled@0.0.12
+
 ## 0.0.8
 
 ### Patch Changes

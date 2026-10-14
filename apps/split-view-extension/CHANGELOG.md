@@ -1,5 +1,17 @@
 # split-view-extension
 
+## 0.5.0
+
+### Minor Changes
+
+- aba0fe9: Close the pull request's tab once **⧉ Split view** has opened it in a split view, so the split view takes its place instead of leaving a second tab behind. `Ctrl`+click or a middle click still opens the split view behind the current tab and keeps that tab, and the context menu never closes a tab.
+
+### Patch Changes
+
+- 7079150: Fix the **⧉ Split view** button on GitHub doing nothing in a development build when the browser lacks one of the debugging APIs the diagnostics listen to. The service worker stopped halfway through starting up, so the button's click failed with "Could not establish connection" and then "F is not a function". The diagnostics are now skipped in such a browser, with an error in the worker's console, and the rest of the worker starts as usual.
+- d0d70d5: Draw a split view's tab favicon as the extension's icon with the split view's number on a badge in its corner, as an extension's toolbar icon carries one. The coloured square with a number it showed before looked like Google Calendar's tab icon, and the two were hard to tell apart in the tab strip.
+- react-utils@0.0.12
+
 ## 0.4.2
 
 ### Patch Changes
