@@ -54,8 +54,11 @@ export const ReportView = memoNamed('ReportView', () => {
       open: (
         <>
           <section className={'section'}>
-            <h2 className={'section-title'}>{'Merge order'}</h2>
-            <MergeOrderFilters />
+            {/* One sticky head: the counts stay in view under the title. */}
+            <div className={'section-head'}>
+              <h2 className={'section-title'}>{'Merge order'}</h2>
+              <MergeOrderFilters />
+            </div>
             {!Arr.isNonEmpty(entries) ? (
               <p className={'section-note'}>{'No open pull requests.'}</p>
             ) : Arr.isNonEmpty(roots) ? (

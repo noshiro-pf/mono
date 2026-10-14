@@ -10,7 +10,9 @@ import { IssueDagNode } from './issue-dag-node.js';
  * a dashed line from an issue to an open pull request that closes it. Each
  * node is a link to its page on GitHub. Where everything goes is
  * `issue-graph-layout.mts`; this only draws it, in a box that scrolls when
- * the graph is wider or taller than the block.
+ * the graph is wider or taller than it. In a block that scrolls on its own
+ * the box takes what room the block has (`index.css`); elsewhere it is at
+ * most 70% of the window's height.
  */
 export const IssueDag = memoNamed('IssueDag', () => {
   const graph = issuesViewSignals.graph.value;
