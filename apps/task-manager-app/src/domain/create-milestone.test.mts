@@ -15,6 +15,7 @@ describe(createMilestone, () => {
         requiresManualCheck: false,
         checkedAt: undefined,
         dependencies: [],
+        groupId: undefined,
       },
     );
   });

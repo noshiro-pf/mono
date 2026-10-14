@@ -2,20 +2,35 @@
  * What the in-memory demo starts with: a small release plan with a bit of
  * everything — a chain of finish-to-start dependencies, a start-to-start one
  * with a lag, a date gate, a milestone that needs a manual check, a task in
- * review and one done.
+ * review and one done, and a group of two tasks with edges in and out.
  */
 
 import {
+  asGroupId,
   asMilestoneId,
   asTaskId,
   createMilestone,
   createTask,
   type DomainState,
+  type Group,
 } from '../domain/index.mjs';
 
 const HOUR_MS = 3_600_000;
 
 const DAY_MS = 86_400_000;
+
+const SAMPLE_GROUP_ID = asGroupId('implementation');
+
+/** The groups of {@link sampleState}. */
+export const sampleGroups = (now: number): readonly Group[] =>
+  [
+    {
+      id: SAMPLE_GROUP_ID,
+      title: '実装',
+      createdAt: now - 7 * DAY_MS,
+      updatedAt: now - 7 * DAY_MS,
+    },
+  ] as const;
 
 export const sampleState = (now: number): DomainState => {
   const ids = {
@@ -73,6 +88,7 @@ export const sampleState = (now: number): DomainState => {
         dueDate: now - HOUR_MS,
         labels: ['実装'],
         estimateHours: 12,
+        groupId: SAMPLE_GROUP_ID,
         dependencies: [
           {
             from: { kind: 'task', id: ids.spec },
@@ -89,6 +105,7 @@ export const sampleState = (now: number): DomainState => {
         dueDate: now + 5 * DAY_MS,
         labels: ['実装', 'UI'],
         estimateHours: 16,
+        groupId: SAMPLE_GROUP_ID,
         dependencies: [
           {
             from: { kind: 'task', id: ids.design },

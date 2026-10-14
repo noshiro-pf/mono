@@ -4,6 +4,9 @@ import {
   ARC_NODE_GAP,
   COMPACT_MILESTONE_NODE_SIZE,
   COMPACT_TASK_NODE_SIZE,
+  EMPTY_GROUP_SIZE,
+  GROUP_HEADER,
+  GROUP_PADDING,
   PLACEMENT_GAP,
   TASK_NODE_SIZE,
   TILE_NODE_GAP,
@@ -14,12 +17,17 @@ import {
   type Point,
 } from '../dag/index.mjs';
 import {
+  asGroupId,
   asMilestoneId,
   asTaskId,
   createMilestone,
   createTask,
+  nodeRefOf,
+  regroupNode,
   type DomainState,
   type GraphNodeId,
+  type Group,
+  type GroupId,
   type SortSpec,
 } from '../domain/index.mjs';
 import {
@@ -75,6 +83,13 @@ const laidOut = (input: LayoutInput | undefined, step: number): GraphLayout =>
       y: input?.direction === 'down' ? index * step : 0,
     })),
     edges: input?.edges ?? [],
+    // Every group's box at the origin: only an empty one's is read.
+    groups: (input?.groups ?? []).map((group) => ({
+      ...group,
+      x: 0,
+      y: 0,
+      ...EMPTY_GROUP_SIZE,
+    })),
   }) as const;
 
 /** A layout function whose results are released by hand. */
@@ -178,6 +193,7 @@ const setup = (
     diagramSort?: readonly SortSpec[];
     stateTime?: number;
     hidden?: ReadonlySet<GraphNodeId>;
+    groups?: readonly Group[];
   }> = {},
 ): Readonly<{
   store: DagLayoutStore;
@@ -192,6 +208,9 @@ const setup = (
   setNodeSize: (next: NodeSize) => void;
   setStateTime: (next: number) => void;
   setHidden: (next: ReadonlySet<GraphNodeId>) => void;
+  setGroups: (next: readonly Group[]) => void;
+  /** Every node moved to a group, in order, and the group. */
+  regrouped: readonly (readonly [GraphNodeId, GroupId | undefined])[];
   deferred: ReturnType<typeof deferredLayout>;
   timer: ReturnType<typeof manualTimer>;
   clock: ReturnType<typeof manualClock>;
@@ -240,7 +259,13 @@ const setup = (
     options.hidden ?? new Set(),
   );
 
+  const [groups, setGroups] = createState<readonly Group[]>(
+    options.groups ?? [],
+  );
+
   const mut_saved: DagLayout[] = [];
+
+  const mut_regrouped: (readonly [GraphNodeId, GroupId | undefined])[] = [];
 
   const store = createDagLayoutStore({
     state,
@@ -268,6 +293,35 @@ const setup = (
     stateTime,
     nodeSize,
     hidden,
+    groups,
+    setGroup: (id, groupId) => {
+      mut_regrouped.push([id, groupId]);
+
+      // As the repository does: the write comes back.
+      const current = state.getSnapshot().value;
+
+      const next = regroupNode(current, nodeRefOf(id), groupId, 0);
+
+      if (next !== undefined) {
+        setState(
+          next.kind === 'task'
+            ? {
+                tasks: current.tasks.map((task) =>
+                  task.id === next.task.id ? next.task : task,
+                ),
+                milestones: current.milestones,
+              }
+            : {
+                tasks: current.tasks,
+                milestones: current.milestones.map((milestone) =>
+                  milestone.id === next.milestone.id
+                    ? next.milestone
+                    : milestone,
+                ),
+              },
+        );
+      }
+    },
   });
 
   store.start();
@@ -307,6 +361,10 @@ const setup = (
     setHidden: (next) => {
       setHidden(next);
     },
+    setGroups: (next) => {
+      setGroups(next);
+    },
+    regrouped: mut_regrouped,
     deferred,
     timer,
     clock,
@@ -513,7 +571,11 @@ describe(createDagLayoutStore, () => {
 
     test('is the stored one once there is one', () => {
       const { store, setDefaultDirection } = setup({
-        stored: { direction: 'down', positions: new Map() },
+        stored: {
+          direction: 'down',
+          positions: new Map(),
+          groupPositions: new Map(),
+        },
       });
 
       setDefaultDirection('right');
@@ -530,6 +592,7 @@ describe(createDagLayoutStore, () => {
         stored: {
           direction: 'right',
           positions: positions([['task:b', { x: 500, y: 60 }]]),
+          groupPositions: new Map(),
         },
       });
 
@@ -547,6 +610,7 @@ describe(createDagLayoutStore, () => {
             ['task:a', { x: 0, y: 0 }],
             ['task:b', { x: 500, y: 60 }],
           ]),
+          groupPositions: new Map(),
         },
       ]);
 
@@ -573,6 +637,7 @@ describe(createDagLayoutStore, () => {
             ['task:a', { x: 0, y: 0 }],
             ['task:b', { x: 40, y: 300 }],
           ]),
+          groupPositions: new Map(),
         },
       ]);
 
@@ -584,6 +649,7 @@ describe(createDagLayoutStore, () => {
         stored: {
           direction: 'right',
           positions: positions([['task:gone', { x: 1, y: 1 }]]),
+          groupPositions: new Map(),
         },
       });
 
@@ -623,6 +689,7 @@ describe(createDagLayoutStore, () => {
         {
           direction: 'right',
           positions: positions([['task:a', { x: 8, y: 40 }]]),
+          groupPositions: new Map(),
         },
       ]);
 
@@ -638,7 +705,11 @@ describe(createDagLayoutStore, () => {
 
       store.nudgeNode('task:a', { x: 8, y: 0 });
 
-      setStored({ direction: 'right', positions: new Map() });
+      setStored({
+        direction: 'right',
+        positions: new Map(),
+        groupPositions: new Map(),
+      });
 
       timer.fire();
 
@@ -654,6 +725,7 @@ describe(createDagLayoutStore, () => {
       const elsewhere: DagLayout = {
         direction: 'down',
         positions: positions([['task:a', { x: 3, y: 4 }]]),
+        groupPositions: new Map(),
       } as const;
 
       setStored(elsewhere);
@@ -672,6 +744,7 @@ describe(createDagLayoutStore, () => {
             ['task:a', { x: 900, y: 900 }],
             ['task:b', { x: -50, y: 20 }],
           ]),
+          groupPositions: new Map(),
         },
       });
 
@@ -690,6 +763,7 @@ describe(createDagLayoutStore, () => {
             ['task:a', { x: 0, y: 0 }],
             ['task:b', { x: 0, y: 100 }],
           ]),
+          groupPositions: new Map(),
         },
       ]);
 
@@ -711,6 +785,7 @@ describe(createDagLayoutStore, () => {
         {
           direction: 'right',
           positions: positions([['task:a', { x: 0, y: 0 }]]),
+          groupPositions: new Map(),
         },
       ]);
     });
@@ -737,6 +812,7 @@ describe(createDagLayoutStore, () => {
           ['task:b', { x: 300, y: 0 }],
           ['task:c', { x: 600, y: 0 }],
         ]),
+        groupPositions: new Map(),
       });
 
       // From where they were, as for 自動整列.
@@ -763,6 +839,7 @@ describe(createDagLayoutStore, () => {
       assert.deepStrictEqual(saved.at(-1), {
         direction: 'right',
         positions: positions([['task:a', { x: 0, y: 0 }]]),
+        groupPositions: new Map(),
       });
     });
 
@@ -801,6 +878,7 @@ describe(createDagLayoutStore, () => {
           ['task:b', { x: 300, y: 0 }],
           ['task:c', { x: 200, y: TASK_NODE_SIZE.height + PLACEMENT_GAP }],
         ]),
+        groupPositions: new Map(),
       });
 
       assert.isUndefined(animated(store));
@@ -825,6 +903,7 @@ describe(createDagLayoutStore, () => {
           ['task:a', { x: 0, y: 0 }],
           ['task:b', { x: 100, y: 0 }],
         ]),
+        groupPositions: new Map(),
       });
     });
   });
@@ -928,6 +1007,7 @@ describe(createDagLayoutStore, () => {
             ['task:a', { x: 900, y: 900 }],
             ['task:b', { x: -50, y: 20 }],
           ]),
+          groupPositions: new Map(),
         },
       });
 
@@ -957,6 +1037,7 @@ describe(createDagLayoutStore, () => {
           ['task:a', { x: 300, y: 300 }],
           ['task:b', { x: 600, y: 300 }],
         ]),
+        groupPositions: new Map(),
       });
 
       assert.deepStrictEqual(
@@ -995,6 +1076,7 @@ describe(createDagLayoutStore, () => {
         stored: {
           direction: 'right',
           positions: positions([['task:a', { x: 900, y: 900 }]]),
+          groupPositions: new Map(),
         },
       });
 
@@ -1041,6 +1123,7 @@ describe(createDagLayoutStore, () => {
       setStored({
         direction: 'right',
         positions: positions([['task:a', { x: 300, y: 300 }]]),
+        groupPositions: new Map(),
       });
 
       store.autoArrange();
@@ -1067,6 +1150,7 @@ describe(createDagLayoutStore, () => {
       setStored({
         direction: 'right',
         positions: positions([['task:a', { x: 300, y: 300 }]]),
+        groupPositions: new Map(),
       });
 
       store.autoArrange();
@@ -1100,6 +1184,7 @@ describe(createDagLayoutStore, () => {
       setStored({
         direction: 'right',
         positions: positions([['task:a', { x: 300, y: 300 }]]),
+        groupPositions: new Map(),
       });
 
       assert.isDefined(animated(store));
@@ -1199,6 +1284,7 @@ describe(createDagLayoutStore, () => {
         stored: {
           direction: 'right',
           positions: positions([['task:a', { x: 900, y: 900 }]]),
+          groupPositions: new Map(),
         },
       });
 
@@ -1458,6 +1544,7 @@ describe(createDagLayoutStore, () => {
       setStored({
         direction: 'right',
         positions: positions([['task:x', { x: 500, y: 500 }]]),
+        groupPositions: new Map(),
       });
 
       assert.isUndefined(animated(store));
@@ -1583,6 +1670,7 @@ describe(createDagLayoutStore, () => {
       const stored: DagLayout = {
         direction: 'right',
         positions: positions([['task:y', { x: 500, y: 40 }]]),
+        groupPositions: new Map(),
       } as const;
 
       const { store, deferred, clock, saved, setNodeSize } = await shown({
@@ -1622,6 +1710,7 @@ describe(createDagLayoutStore, () => {
           ['task:a', { x: 10, y: 10 }],
           ['task:b', { x: 300, y: 10 }],
         ]),
+        groupPositions: new Map(),
       } as const;
 
       const { store, deferred, clock, saved, setNodeSize } = await shown({
@@ -2515,6 +2604,222 @@ describe(createDagLayoutStore, () => {
         store.arcNodes.getSnapshot().value.map(({ id }) => id),
         ['task:y', 'task:z'],
       );
+    });
+  });
+
+  describe('the groups', () => {
+    const g = asGroupId('g');
+
+    const h = asGroupId('h');
+
+    const groupG: Group = {
+      id: g,
+      title: 'G',
+      createdAt: 0,
+      updatedAt: 0,
+    } as const;
+
+    const groupH: Group = {
+      id: h,
+      title: 'H',
+      createdAt: 1,
+      updatedAt: 1,
+    } as const;
+
+    /** `a` in `g`; `b` and `c` in none. */
+    const grouped: DomainState = {
+      tasks: [
+        createTask({ id: asTaskId('a'), title: 'A', now: 0, groupId: g }),
+        createTask({ id: asTaskId('b'), title: 'B', now: 0 }),
+        createTask({ id: asTaskId('c'), title: 'C', now: 0 }),
+      ],
+      milestones: [],
+    } as const;
+
+    /** Laid out with every node where ELK has it, and that saved. */
+    const arranged = async (): Promise<ReturnType<typeof setup>> => {
+      const result = setup({ state: grouped, groups: [groupG] });
+
+      result.deferred.resolve(0);
+
+      await settle();
+
+      result.clock.advance(ANIMATION_MS);
+
+      result.store.autoArrange();
+
+      return result;
+    };
+
+    test('lists each group with the nodes in it that are drawn', () => {
+      const { store, setHidden } = setup({ state: grouped, groups: [groupG] });
+
+      assert.deepStrictEqual(store.membership.getSnapshot().value, [
+        { id: g, members: ['task:a'] },
+      ]);
+
+      setHidden(new Set(['task:a']));
+
+      assert.deepStrictEqual(store.membership.getSnapshot().value, [
+        { id: g, members: [] },
+      ]);
+    });
+
+    test('has ELK lay each group out with its nodes', () => {
+      const { deferred } = setup({ state: grouped, groups: [groupG] });
+
+      assert.deepStrictEqual(deferred.requests[0]?.groups, [
+        { id: g, members: ['task:a'] },
+      ]);
+    });
+
+    test('saves where each frame is, with every change', async () => {
+      const { store, saved } = await arranged();
+
+      store.moveNode('task:a', { x: 10, y: 10 });
+
+      assert.deepStrictEqual(
+        saved.at(-1)?.groupPositions,
+        new Map([[g, { x: 10 - GROUP_PADDING, y: 10 - GROUP_HEADER }]]),
+      );
+    });
+
+    test('moves a node dropped into a frame into its group, and keeps it where it was dropped', async () => {
+      const { store, deferred, saved, regrouped } = await arranged();
+
+      store.dropNode('task:b', { x: 50, y: 0 }, g);
+
+      assert.deepStrictEqual(regrouped, [['task:b', g]]);
+
+      assert.deepStrictEqual(saved.at(-1)?.positions.get('task:b'), {
+        x: 50,
+        y: 0,
+      });
+
+      // The frame round both, as the drop leaves them.
+      assert.deepStrictEqual(saved.at(-1)?.groupPositions.get(g), {
+        x: -GROUP_PADDING,
+        y: -GROUP_HEADER,
+      });
+
+      assert.deepStrictEqual(deferred.requests.at(-1)?.groups, [
+        { id: g, members: ['task:a', 'task:b'] },
+      ]);
+
+      const writes = saved.length;
+
+      deferred.resolve(deferred.requests.length - 1);
+
+      await settle();
+
+      // Not put again, nor laid out again: it is where it was dropped.
+      assert.strictEqual(saved.length, writes);
+
+      assert.deepStrictEqual(
+        store.arrangement.getSnapshot().value.positions.get('task:b'),
+        { x: 50, y: 0 },
+      );
+    });
+
+    test('moves a node dropped outside every frame into none', async () => {
+      const { store, regrouped } = await arranged();
+
+      store.dropNode('task:a', { x: 0, y: 500 }, undefined);
+
+      assert.deepStrictEqual(regrouped, [['task:a', undefined]]);
+
+      assert.deepStrictEqual(store.membership.getSnapshot().value, [
+        { id: g, members: [] },
+      ]);
+    });
+
+    test('leaves the frame a node was dropped out of where it was, once empty', async () => {
+      const { store, saved } = await arranged();
+
+      store.dropNode('task:a', { x: 0, y: 500 }, undefined);
+
+      assert.deepStrictEqual(saved.at(-1)?.groupPositions.get(g), {
+        x: -GROUP_PADDING,
+        y: -GROUP_HEADER,
+      });
+    });
+
+    test('moves nothing into another group for a drop in the same one', async () => {
+      const { store, saved, regrouped } = await arranged();
+
+      store.dropNode('task:a', { x: 20, y: 0 }, g);
+
+      assert.deepStrictEqual(regrouped, []);
+
+      assert.deepStrictEqual(saved.at(-1)?.positions.get('task:a'), {
+        x: 20,
+        y: 0,
+      });
+    });
+
+    test('moves a frame dragged by its title, with its nodes, and saves', async () => {
+      const { store, saved } = await arranged();
+
+      store.moveGroup(g, { x: 100 - GROUP_PADDING, y: 100 - GROUP_HEADER });
+
+      assert.deepStrictEqual(saved.at(-1)?.positions.get('task:a'), {
+        x: 100,
+        y: 100,
+      });
+
+      // The others stay.
+      assert.deepStrictEqual(saved.at(-1)?.positions.get('task:b'), {
+        x: 100,
+        y: 0,
+      });
+    });
+
+    test('moves an empty frame dragged by its title', async () => {
+      const { store, saved } = await arranged();
+
+      store.dropNode('task:a', { x: 0, y: 500 }, undefined);
+
+      store.moveGroup(g, { x: 300, y: 300 });
+
+      assert.deepStrictEqual(saved.at(-1)?.groupPositions.get(g), {
+        x: 300,
+        y: 300,
+      });
+    });
+
+    test('puts a node moved to another group in its dialog beside that group', async () => {
+      const { store, deferred, saved, setState } = await arranged();
+
+      store.moveNode('task:b', { x: 900, y: 900 });
+
+      setState({
+        tasks: grouped.tasks.map((task) =>
+          task.id === asTaskId('b') ? { ...task, groupId: g } : task,
+        ),
+        milestones: [],
+      });
+
+      deferred.resolve(deferred.requests.length - 1);
+
+      await settle();
+
+      // Where ELK has it, beside `a`, and clear of `a` and `c`.
+      assert.deepStrictEqual(saved.at(-1)?.positions.get('task:b'), {
+        x: 100,
+        y: TASK_NODE_SIZE.height + PLACEMENT_GAP,
+      });
+    });
+
+    test('saves where a new group’s frame is drawn, once something was saved', async () => {
+      const { deferred, saved, setGroups } = await arranged();
+
+      setGroups([groupG, groupH]);
+
+      deferred.resolve(deferred.requests.length - 1);
+
+      await settle();
+
+      assert.isDefined(saved.at(-1)?.groupPositions.get(h));
     });
   });
 });

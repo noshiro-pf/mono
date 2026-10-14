@@ -126,6 +126,7 @@ describe('the DAG layout of a memory repository', () => {
   const layout: DagLayout = {
     direction: 'down',
     positions: new Map([['task:a', { x: 1, y: 2 }]]),
+    groupPositions: new Map(),
   } as const;
 
   const recordLayouts = (): Readonly<{

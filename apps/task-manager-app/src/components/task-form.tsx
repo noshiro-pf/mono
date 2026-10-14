@@ -18,6 +18,7 @@ import {
 } from '../view-model/index.mjs';
 import { DateTimeField } from './date-time-field.js';
 import { DependencyEditor } from './dependency-editor.js';
+import { GroupField } from './group-field.js';
 import { HtmlSelect } from './html-select.js';
 import { LabelChips } from './label-chips.js';
 import { StatusBadge } from './status-badge.js';
@@ -112,6 +113,7 @@ export const TaskForm = memoNamed<Props>('TaskForm', (props) => {
             onInput={onEstimate}
           />
         </label>
+        <GroupField value={draft.groupId} onChange={onGroup} />
         <label className={'bp6-label field field-wide'}>
           {'ラベル（カンマ区切り）'}
           <input
@@ -180,6 +182,10 @@ const onDueDate = (dueDate: string): void => {
 
 const onEstimate: GenericEventHandler<HTMLInputElement> = (changed) => {
   editorStore.updateTaskDraft({ estimateHours: changed.currentTarget.value });
+};
+
+const onGroup: GenericEventHandler<HTMLSelectElement> = (changed) => {
+  editorStore.updateTaskDraft({ groupId: changed.currentTarget.value });
 };
 
 const onLabels: GenericEventHandler<HTMLInputElement> = (changed) => {

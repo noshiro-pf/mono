@@ -1,5 +1,6 @@
 import { Result } from 'ts-data-forge';
 import {
+  asGroupId,
   asMilestoneId,
   createMilestone,
   type Milestone,
@@ -26,6 +27,7 @@ describe(milestoneToDraft, () => {
       date: '2026-10-09T12:00',
       requiresManualCheck: true,
       checkedAt: undefined,
+      groupId: '',
     });
   });
 });
@@ -53,6 +55,7 @@ describe(applyMilestoneDraft, () => {
           date: '',
           requiresManualCheck: true,
           checkedAt: 40_000,
+          groupId: 'g',
         },
         now,
         timeZone,
@@ -63,6 +66,7 @@ describe(applyMilestoneDraft, () => {
         description: 'v1',
         date: undefined,
         checkedAt: 40_000,
+        groupId: asGroupId('g'),
         updatedAt: now,
       }),
     );

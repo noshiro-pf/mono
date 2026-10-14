@@ -1,5 +1,9 @@
 import { memoNamed } from 'preact-utils';
-import { editorStore, sessionStore } from '../store/index.mjs';
+import {
+  editorStore,
+  groupEditorStore,
+  sessionStore,
+} from '../store/index.mjs';
 import { ViewSwitch } from './view-switch.js';
 
 type Props = Readonly<{
@@ -29,6 +33,15 @@ export const AppHeader = memoNamed<Props>('AppHeader', (props) => {
           onClick={editorStore.createMilestone}
         >
           {'＋マイルストーン'}
+        </button>
+        {/* Drawn in 「DAG」 alone, and chosen in a node's dialog in any view. */}
+        <button
+          className={'bp6-button'}
+          data-e2e={'add-group'}
+          type={'button'}
+          onClick={groupEditorStore.create}
+        >
+          {'＋グループ'}
         </button>
         <button
           className={'bp6-button bp6-minimal'}

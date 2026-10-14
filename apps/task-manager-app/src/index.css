@@ -40,6 +40,8 @@
   --status-done-tint: #edeff2;
   --milestone: #8a5a00;
   --milestone-tint: #fff3d6;
+  --group: #4f5b6b;
+  --group-tint: rgb(95 107 124 / 8%);
 
   --header-height: 56px;
   --tap: 36px;
@@ -64,6 +66,8 @@
   --status-done-tint: #2f343c;
   --milestone: #fbb360;
   --milestone-tint: #3d2c0b;
+  --group: #c5cbd3;
+  --group-tint: rgb(171 179 191 / 10%);
 }
 
 @media (pointer: coarse) {
@@ -819,6 +823,54 @@ fieldset {
   font-weight: 600;
 }
 
+/*
+ * A group: a tinted frame under its nodes, its title along the top. While
+ * a node is dragged, the frame it would go into is outlined in the focus
+ * colour, and the one it would leave dashed.
+ */
+.dag-group-frame {
+  fill: var(--group-tint);
+  stroke: var(--group);
+  stroke-width: 1.5;
+}
+
+.dag-group.empty .dag-group-frame {
+  stroke-dasharray: 6 4;
+}
+
+.dag-group[data-drop='into'] .dag-group-frame {
+  stroke: var(--focus);
+  stroke-width: 2.5;
+}
+
+.dag-group[data-drop='leave'] .dag-group-frame {
+  stroke-dasharray: 6 4;
+}
+
+.dag-group.dragging {
+  opacity: 0.85;
+}
+
+.dag-group-header {
+  cursor: grab;
+  outline: none;
+}
+
+.dag-group-header-area {
+  fill: transparent;
+}
+
+.dag-group-header:focus-visible .dag-group-header-area {
+  stroke: var(--focus);
+  stroke-width: 2;
+}
+
+.dag-group-title {
+  fill: var(--group);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .dag-node {
   cursor: pointer;
   outline: none;
@@ -1036,6 +1088,10 @@ fieldset {
 .node-dialog-footer .bp6-dialog-footer-actions {
   display: flex;
   gap: 8px;
+}
+
+.group-dialog {
+  width: min(440px, calc(100vw - 32px));
 }
 
 @media (max-width: 599px) {

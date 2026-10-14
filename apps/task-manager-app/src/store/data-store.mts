@@ -1,5 +1,6 @@
 /**
- * The tasks and milestones of the signed-in user, and the writes to them.
+ * The tasks, milestones and groups of the signed-in user, and the writes to
+ * them.
  *
  * Follows the session: signing in subscribes to that user's repository,
  * signing out drops it and empties the state. Writes go to the repository
@@ -17,9 +18,13 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 import type { DagLayout } from '../dag/index.mjs';
 import {
   addDependency,
+  regroupNode,
+  removeGroup,
   removeNode,
   type DependencyRefusal,
   type DomainState,
+  type Group,
+  type GroupId,
   type Milestone,
   type NodeRef,
   type Task,
@@ -40,6 +45,8 @@ export type DataStore = Readonly<{
   /** Empty until loaded, and while nobody is signed in. */
   state: InitializedObservable<DomainState>;
   status: InitializedObservable<DataStatus>;
+  /** The project's groups, in creation order; none while signed out. */
+  groups: InitializedObservable<readonly Group[]>;
   /** The project's DAG layout; `undefined` while it has none. */
   dagLayout: InitializedObservable<DagLayout | undefined>;
   putTask: (task: Task) => void;
@@ -51,6 +58,11 @@ export type DataStore = Readonly<{
    * reports why it does not.
    */
   addDependency: (dependent: NodeRef, source: NodeRef) => void;
+  putGroup: (group: Group) => void;
+  /** Deletes the group, and takes its nodes out of it, in one write. */
+  deleteGroup: (id: GroupId) => void;
+  /** Moves the node `ref` into the group `groupId`, or into none. */
+  setNodeGroup: (ref: NodeRef, groupId: GroupId | undefined) => void;
   putDagLayout: (layout: DagLayout) => void;
   /** Starts following the session, and returns what stops it. */
   start: () => () => void;
@@ -67,6 +79,8 @@ export const createDataStore = (deps: DataDeps): DataStore => {
   const [dagLayout, setDagLayout] = createState<DagLayout | undefined>(
     undefined,
   );
+
+  const [groups, setGroups] = createState<readonly Group[]>([]);
 
   let mut_repository: Repository | undefined = undefined;
 
@@ -114,6 +128,8 @@ export const createDataStore = (deps: DataDeps): DataStore => {
 
       setDagLayout(undefined);
 
+      setGroups([]);
+
       if (session.type !== 'signed-in') {
         setDataStatus('idle');
 
@@ -145,10 +161,19 @@ export const createDataStore = (deps: DataDeps): DataStore => {
         },
       });
 
+      const stopGroups = session.repository.subscribeGroups({
+        next: setGroups,
+        error: (error) => {
+          deps.reportError('グループを読み込めませんでした。', error);
+        },
+      });
+
       mut_stopRepository = () => {
         stopState();
 
         stopLayout();
+
+        stopGroups();
       };
     });
 
@@ -162,6 +187,7 @@ export const createDataStore = (deps: DataDeps): DataStore => {
   return {
     state,
     status: dataStatus,
+    groups,
     dagLayout,
     putTask: (task) => {
       write('タスクを保存', (repository) => repository.putTask(task));
@@ -196,6 +222,27 @@ export const createDataStore = (deps: DataDeps): DataStore => {
           repository.putMilestone(updated.milestone),
         );
       }
+    },
+    putGroup: (group) => {
+      write('グループを保存', (repository) => repository.putGroup(group));
+    },
+    deleteGroup: (id) => {
+      write('グループを削除', (repository) =>
+        repository.deleteGroup(id, removeGroup(getState(), id, deps.now())),
+      );
+    },
+    setNodeGroup: (ref, groupId) => {
+      const regrouped = regroupNode(getState(), ref, groupId, deps.now());
+
+      if (regrouped === undefined) {
+        return;
+      }
+
+      write('グループを変更', (repository) =>
+        regrouped.kind === 'task'
+          ? repository.putTask(regrouped.task)
+          : repository.putMilestone(regrouped.milestone),
+      );
     },
     putDagLayout: (layout) => {
       write('DAG の配置を保存', (repository) =>

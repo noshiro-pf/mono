@@ -1,5 +1,6 @@
 import { Result } from 'ts-data-forge';
 import {
+  asGroupId,
   asMilestoneId,
   asTaskId,
   createTask,
@@ -33,6 +34,7 @@ describe(taskToDraft, () => {
       dueDate: '2026-10-09T12:00',
       labels: 'docs, ui',
       estimateHours: '1.5',
+      groupId: '',
     });
   });
 
@@ -65,6 +67,7 @@ describe(applyTaskDraft, () => {
       dueDate: '2026-10-10T09:30',
       labels: 'a、b',
       estimateHours: ' 3 ',
+      groupId: 'g',
     };
 
     assert.deepStrictEqual(
@@ -77,6 +80,7 @@ describe(applyTaskDraft, () => {
         dueDate: 1_791_592_200_000 /* 2026-10-10T00:30:00Z */,
         labels: ['a', 'b'],
         estimateHours: 3,
+        groupId: asGroupId('g'),
         updatedAt: now,
       }),
     );

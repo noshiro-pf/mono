@@ -8,7 +8,9 @@
 import { Num, Result } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import {
+  GroupIdCodec,
   setProgress,
+  type GroupId,
   type Priority,
   type Progress,
   type Task,
@@ -31,6 +33,7 @@ export const taskToDraft = (task: Task, timeZone?: string): TaskDraft =>
       task.estimateHours === undefined
         ? ('' as const)
         : String(task.estimateHours),
+    groupId: task.groupId ?? '',
   }) as const;
 
 /**
@@ -71,6 +74,7 @@ export const applyTaskDraft = (
     dueDate: dueDate.value,
     labels: parseLabels(draft.labels),
     estimateHours: estimateHours.value,
+    groupId: groupIdOfDraft(draft.groupId),
     updatedAt: now,
   });
 };
@@ -86,6 +90,8 @@ export type TaskDraft = DeepReadonly<{
   labels: string;
   /** Empty for none. */
   estimateHours: string;
+  /** The id of the group the task is in; empty for none. */
+  groupId: string;
 }>;
 
 /** An empty field is `undefined`; anything else has to be a date and time. */
@@ -101,6 +107,10 @@ export const optionalDateTime = (
 
   return epochMs === undefined ? Result.err(undefined) : Result.ok(epochMs);
 };
+
+/** The group a draft's `groupId` field names; none for an empty one. */
+export const groupIdOfDraft = (value: string): GroupId | undefined =>
+  GroupIdCodec.is(value) ? value : undefined;
 
 const optionalNonNegativeNumber = (
   value: string,

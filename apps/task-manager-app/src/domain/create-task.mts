@@ -4,7 +4,7 @@ import type { Task, TaskId } from './types.mjs';
 /**
  * A new task: `id`, `title` and the creation time are required, and every
  * other field defaults to an empty or neutral value — `not-started`, priority
- * `3`, no dates, no people, no dependencies.
+ * `3`, no dates, no people, no dependencies, no group.
  */
 export const createTask = ({
   id,
@@ -41,6 +41,7 @@ const defaults = {
   assignees: [],
   reviewers: [],
   dependencies: [],
+  groupId: undefined,
 } as const satisfies StrictOmit<
   Task,
   'id' | 'title' | 'createdAt' | 'updatedAt'

@@ -25,15 +25,21 @@ import {
   clampTileScroll,
   connectHandleAt,
   contentPointAt,
+  dropTarget,
   dropTargetAt,
   edgeGeometries,
   fitBoundsTransform,
   fitWidthTopTransform,
+  groupFrames,
+  groupIdOfKey,
+  groupKey,
+  groupsByMember,
   highlightOf,
   IDLE_GESTURE,
   interpolateTransform,
   moveNodesTo,
   nodesBounds,
+  placeEmptyGroups,
   placeNodes,
   pointerDown,
   pointerMove,
@@ -62,11 +68,19 @@ import {
   type Gesture,
   type Grab,
   type GraphLayout,
+  type GroupFrame,
   type LaidOutNode,
   type NodeDrag,
   type ViewTransform,
 } from '../dag/index.mjs';
-import { dependencyRefusal, nodeRefOf } from '../domain/index.mjs';
+import {
+  dependencyRefusal,
+  GraphNodeIdCodec,
+  GroupIdCodec,
+  nodeRefOf,
+  type GraphNodeId,
+  type GroupId,
+} from '../domain/index.mjs';
 import {
   animationSettingSignal,
   arcEdgesSignal,
@@ -77,10 +91,12 @@ import {
   dagArrangementSignal,
   dagFitRequestsSignal,
   dagLayoutStore,
+  dagMembershipSignal,
   dagViewModeSignal,
   dagViewModeStore,
   dataStore,
   domainSignal,
+  groupsSignal,
   nodeSizeSignal,
   nodeViewsSignal,
   reducedMotionSignal,
@@ -97,6 +113,7 @@ import {
   type ConnectTarget,
 } from './dag-connect-overlay.js';
 import { DagEdge } from './dag-edge.js';
+import { DagGroupFrame } from './dag-group-frame.js';
 import { DagMilestoneNode } from './dag-milestone-node.js';
 import { DagTaskNode } from './dag-task-node.js';
 import { nodeIdOf, usePointedNode } from './use-pointed-node.mjs';
@@ -118,7 +135,14 @@ type Props = Readonly<{
  *
  * A tap on a node opens it, a drag that starts on one moves it: `gesture`
  * says whether the press moved, and a click after a drag is swallowed before
- * it reaches the node. `touch-action: none` (`index.css`) keeps the browser
+ * it reaches the node.
+ *
+ * In 「DAG」 the groups are frames under the nodes (`dag/group-frames.mts`).
+ * A node dropped with its centre in a frame goes into that group, and one
+ * dropped outside every frame into none; while it is dragged, the frames
+ * stay as they were when it was picked up, the one it would go into and the
+ * one it would leave marked. A frame dragged by its title moves with its
+ * nodes, and a tap on the title opens the group. `touch-action: none` (`index.css`) keeps the browser
  * from scrolling or zooming the page instead.
  *
  * In 「DAG」, a mouse or pen near a node's outline — within
@@ -171,7 +195,11 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
 
   const views = nodeViewsSignal.value;
 
-  const { direction, positions } = dagArrangementSignal.value;
+  const { direction, positions, groupPositions } = dagArrangementSignal.value;
+
+  const membership = dagMembershipSignal.value;
+
+  const groups = groupsSignal.value;
 
   const fitRequests = dagFitRequestsSignal.value;
 
@@ -248,9 +276,45 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
   // At the current size, which a layout still being made at it may not be.
   const placed = useMemo(
     () =>
-      placeNodes(resizeNodes(layout.nodes, nodeSize), layout.edges, positions),
-    [layout.nodes, layout.edges, nodeSize, positions],
+      placeNodes(
+        resizeNodes(layout.nodes, nodeSize),
+        layout.edges,
+        positions,
+        membership,
+      ),
+    [layout.nodes, layout.edges, nodeSize, positions, membership],
   );
+
+  // Where the empty frames are when nothing moves.
+  const emptyAt = useMemo(
+    () => placeEmptyGroups(membership, layout.groups, placed, groupPositions),
+    [membership, layout.groups, placed, groupPositions],
+  );
+
+  // The frames as they are when nothing moves, and while a node is dragged.
+  const settledFrames = useMemo(
+    (): readonly GroupFrame[] =>
+      arrangeable ? groupFrames(placed, membership, emptyAt) : [],
+    [arrangeable, placed, membership, emptyAt],
+  );
+
+  // How far the group being dragged by its title has moved, and its nodes.
+  const groupDrag = useMemo((): GroupDrag | undefined => {
+    const id = dragged === undefined ? undefined : groupIdOfKey(dragged.id);
+
+    const from = settledFrames.find((frame) => frame.id === id);
+
+    return dragged === undefined || from === undefined
+      ? undefined
+      : {
+          id: from.id,
+          dx: dragged.position.x - from.x,
+          dy: dragged.position.y - from.y,
+          members: new Set(
+            membership.find((group) => group.id === from.id)?.members,
+          ),
+        };
+  }, [dragged, settledFrames, membership]);
 
   // While they move, the nodes moving, wherever they are going; otherwise
   // the nodes of the mode, where it draws them.
@@ -267,9 +331,79 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
               : placed.map((node) =>
                   node.id === dragged.id
                     ? { ...node, x: dragged.position.x, y: dragged.position.y }
-                    : node,
+                    : groupDrag?.members.has(node.id) === true
+                      ? {
+                          ...node,
+                          x: node.x + groupDrag.dx,
+                          y: node.y + groupDrag.dy,
+                        }
+                      : node,
                 ),
-    [placed, dragged, animated, mode, arcNodes, tileNodes],
+    [placed, dragged, groupDrag, animated, mode, arcNodes, tileNodes],
+  );
+
+  // Drawn while the DAG is, and not while the view changes mode: round the
+  // nodes moving, or the group dragged, and otherwise as they are.
+  const shownFrames = useMemo((): readonly GroupFrame[] => {
+    if (!arrangeable || opacities !== undefined) {
+      return [];
+    }
+
+    if (animated !== undefined) {
+      return groupFrames(shown, membership, emptyAt);
+    }
+
+    if (groupDrag === undefined) {
+      return settledFrames;
+    }
+
+    const from = emptyAt.get(groupDrag.id);
+
+    return groupFrames(
+      shown,
+      membership,
+      from === undefined
+        ? emptyAt
+        : new Map([
+            ...emptyAt,
+            [
+              groupDrag.id,
+              { x: from.x + groupDrag.dx, y: from.y + groupDrag.dy },
+            ],
+          ]),
+    );
+  }, [
+    arrangeable,
+    opacities,
+    animated,
+    groupDrag,
+    settledFrames,
+    shown,
+    membership,
+    emptyAt,
+  ]);
+
+  // The group a node being dragged would be dropped into, and the one it
+  // is in.
+  const dropTargets = useMemo((): NodeDropTargets | undefined => {
+    const node =
+      dragged === undefined || groupDrag !== undefined
+        ? undefined
+        : shown.find(({ id }) => id === dragged.id);
+
+    if (node === undefined) {
+      return undefined;
+    }
+
+    return {
+      into: dropTarget(settledFrames, node),
+      from: groupsByMember(membership).get(node.id),
+    };
+  }, [dragged, groupDrag, shown, settledFrames, membership]);
+
+  const titles = useMemo(
+    () => new Map(groups.map(({ id, title }) => [id, title])),
+    [groups],
   );
 
   // The edges as they are when nothing moves.
@@ -317,11 +451,12 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
     }
 
     if (mut_slowDrag.current) {
-      return withCurvesOf(
-        settled,
-        edgeGeometries(direction, shown, layout.edges),
-        dragged.id,
-      );
+      const curves = edgeGeometries(direction, shown, layout.edges);
+
+      // A group's nodes all move: every edge is a curve.
+      return GraphNodeIdCodec.is(dragged.id)
+        ? withCurvesOf(settled, curves, dragged.id)
+        : curves;
     }
 
     const started = performance.now();
@@ -335,12 +470,16 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
 
   // Read by a press on a node, which should not have to be made again
   // whenever a node moves: the nodes that can be grabbed, none outside the
-  // mode the reader arranges.
+  // mode the reader arranges, and the frames, which are read at the drop.
   const mut_placed = useRef<readonly LaidOutNode[]>(placed);
+
+  const mut_frames = useRef<readonly GroupFrame[]>(settledFrames);
 
   useEffect(() => {
     mut_placed.current = arrangeable ? placed : [];
-  }, [arrangeable, placed]);
+
+    mut_frames.current = settledFrames;
+  }, [arrangeable, placed, settledFrames]);
 
   // The nodes a handle can be on: those that can be grabbed, once they are
   // where they are drawn.
@@ -394,8 +533,11 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
           }
         : mode === 'tile'
           ? { kind: 'top' }
-          : { kind: 'whole', bounds: nodesBounds(placed, GRAPH_MARGIN) },
-    [mode, placed, arcNodes, settledArcs],
+          : {
+              kind: 'whole',
+              bounds: nodesBounds([...placed, ...settledFrames], GRAPH_MARGIN),
+            },
+    [mode, placed, settledFrames, arcNodes, settledArcs],
   );
 
   const mut_fitTarget = useRef<FitTarget>(fitTarget);
@@ -684,7 +826,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
               from: pressedHandle.id,
               anchor: pressedHandle.at,
             } as const)
-          : grabOf(pressed.target, mut_placed.current);
+          : grabOf(pressed.target, mut_placed.current, mut_frames.current);
 
       if (grab?.kind !== 'connect') {
         showHandle(undefined);
@@ -772,7 +914,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
 
       // A cancelled pointer (the system took it over) drops nothing.
       if (dropped !== undefined && ended.type === 'pointerup') {
-        dagLayoutStore.moveNode(dropped.id, dropped.position);
+        dropDragged(dropped, mut_placed.current, mut_frames.current);
       }
 
       const target =
@@ -1042,6 +1184,24 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
           <g
             transform={`translate(${drawnTransform.x} ${drawnTransform.y}) scale(${drawnTransform.scale})`}
           >
+            {shownFrames.map((frame) => (
+              <DagGroupFrame
+                key={frame.id}
+                dragging={frame.id === groupDrag?.id}
+                drop={
+                  dropTargets === undefined ||
+                  dropTargets.into === dropTargets.from
+                    ? undefined
+                    : frame.id === dropTargets.into
+                      ? 'into'
+                      : frame.id === dropTargets.from
+                        ? 'leave'
+                        : undefined
+                }
+                frame={frame}
+                title={titles.get(frame.id) ?? ''}
+              />
+            ))}
             {edgesHidden ? undefined : (
               // Mounted afresh when they come back, which fades them in.
               <g className={'dag-edges'}>
@@ -1161,6 +1321,23 @@ const ARC_MIN_SCALE = 0.5;
 /** Between the toolbar and the top of 「アーク」 fitted below it. */
 const TOOLBAR_CLEARANCE = 8;
 
+/** The group dragged by its title: how far, and the nodes moving with it. */
+type GroupDrag = Readonly<{
+  id: GroupId;
+  dx: number;
+  dy: number;
+  members: ReadonlySet<GraphNodeId>;
+}>;
+
+/**
+ * The group a node being dragged would go into if dropped now, and the one
+ * it is in; `undefined` for none.
+ */
+type NodeDropTargets = Readonly<{
+  into: GroupId | undefined;
+  from: GroupId | undefined;
+}>;
+
 /** What `fit` shows: all of it, its width from the top, or the top. */
 type FitTarget = Readonly<
   { kind: 'whole' | 'width'; bounds: Bounds } | { kind: 'top' }
@@ -1223,16 +1400,29 @@ const pointerOf = (
 
 /**
  * The node under a press, by the `data-node-id` of the element it landed in,
- * and where that node is; `undefined` on the background.
+ * and where that node is, or the group whose title it landed on, by its
+ * `data-group-id`, and where its frame is; `undefined` on the background,
+ * inside a frame included.
  */
 const grabOf = (
   target: EventTarget | null,
   nodes: readonly LaidOutNode[],
+  drawnFrames: readonly GroupFrame[],
 ): Grab | undefined => {
   const id = nodeIdOf(target);
 
   if (id === undefined) {
-    return undefined;
+    const group = groupIdOf(target);
+
+    const frame = drawnFrames.find((candidate) => candidate.id === group);
+
+    return frame === undefined
+      ? undefined
+      : {
+          kind: 'node',
+          id: groupKey(frame.id),
+          origin: { x: frame.x, y: frame.y },
+        };
   }
 
   const node = nodes.find((placedNode) => placedNode.id === id);
@@ -1240,4 +1430,46 @@ const grabOf = (
   return node === undefined
     ? undefined
     : { kind: 'node', id, origin: { x: node.x, y: node.y } };
+};
+
+/** The group whose title `target` is part of, by its `data-group-id`. */
+const groupIdOf = (target: EventTarget | null): GroupId | undefined => {
+  const element =
+    target instanceof Element ? target.closest('[data-group-id]') : null;
+
+  const id =
+    element instanceof SVGElement ? element.dataset['groupId'] : undefined;
+
+  return id !== undefined && GroupIdCodec.is(id) ? id : undefined;
+};
+
+/**
+ * What a drag ends with: a frame dragged by its title moves there with its
+ * nodes; a node is put there, in the group of the frame it was dropped in,
+ * of those it was picked up among, or in none.
+ */
+const dropDragged = (
+  dropped: NodeDrag,
+  nodes: readonly LaidOutNode[],
+  drawnFrames: readonly GroupFrame[],
+): void => {
+  const group = groupIdOfKey(dropped.id);
+
+  if (group !== undefined) {
+    dagLayoutStore.moveGroup(group, dropped.position);
+
+    return;
+  }
+
+  const node = nodes.find(({ id }) => id === dropped.id);
+
+  if (node === undefined || !GraphNodeIdCodec.is(dropped.id)) {
+    return;
+  }
+
+  dagLayoutStore.dropNode(
+    dropped.id,
+    dropped.position,
+    dropTarget(drawnFrames, { ...node, ...dropped.position }),
+  );
 };

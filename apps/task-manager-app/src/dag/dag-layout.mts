@@ -6,16 +6,22 @@
  *
  * A node is drawn where it was put, and where ELK puts it if it never was.
  * Once some node was put somewhere, a node that never was — one added since
- * the last arrangement — is put next to the nodes it is joined to, as ELK
- * has it, and moved clear of every other node (`placeNodes`).
+ * the last arrangement — is put next to the nodes it is joined to and those
+ * in its group, as ELK has it, and moved clear of every other node
+ * (`placeNodes`).
+ *
+ * The frames of the groups are drawn round their nodes (`group-frames.mts`),
+ * and only where an empty one is drawn is stored.
  */
 
 import { Arr, Num } from 'ts-data-forge';
-import type { GraphNodeId } from '../domain/index.mjs';
+import type { FixedLengthTuple } from 'ts-type-forge';
+import type { GraphNodeId, GroupId } from '../domain/index.mjs';
 import type {
   DagDirection,
   LaidOutEdge,
   LaidOutNode,
+  LayoutGroup,
 } from './graph-layout.mjs';
 import type { Point, Size } from './pan-zoom.mjs';
 
@@ -38,18 +44,19 @@ export const PLACEMENT_GAP = 28;
  * `auto`, each node moved to its stored position if it has one. While no
  * position is stored, every node stays where ELK has it; once one is, a
  * node with none is first moved as far as, on average, the nodes `edges`
- * join it to were moved from where ELK has them, so that it keeps its place
- * beside them; then, if it comes within `PLACEMENT_GAP` of another node, to
- * the nearest place that does not, below rather than above on a tie. The
- * nodes are taken in the order of `auto`, each one placed clear of those
- * placed before it.
+ * join it to, and the others of its group of `groups`, were moved from
+ * where ELK has them, so that it keeps its place beside them; then, if it
+ * comes within `PLACEMENT_GAP` of another node, to the nearest place that
+ * does not, below rather than above on a tie. The nodes are taken in the
+ * order of `auto`, each one placed clear of those placed before it.
  */
 export const placeNodes = (
   auto: readonly LaidOutNode[],
   edges: readonly LaidOutEdge[],
   positions: ReadonlyMap<GraphNodeId, Point>,
+  groups: readonly LayoutGroup[] = [],
 ): readonly LaidOutNode[] =>
-  positions.size === 0 ? auto : placeEach(auto, edges, positions);
+  positions.size === 0 ? auto : placeEach(auto, edges, positions, groups);
 
 /** `nodes`, each one `positions` has moved there; the rest where they are. */
 export const moveNodesTo = (
@@ -112,9 +119,9 @@ export const arrowKeyDelta = (
   }
 };
 
-/** The box around every node, `margin` wider on each side; empty for none. */
+/** The box around every box, `margin` wider on each side; empty for none. */
 export const nodesBounds = (
-  nodes: readonly LaidOutNode[],
+  nodes: readonly Bounds[],
   margin: number,
 ): Bounds => {
   if (!Arr.isNonEmpty(nodes)) {
@@ -137,38 +144,18 @@ export const nodesBounds = (
   };
 };
 
-export type DagLayout = Readonly<{
-  direction: DagDirection;
-  /** The top-left corner of each node put somewhere, in graph units. */
-  positions: ReadonlyMap<GraphNodeId, Point>;
-}>;
-
-export type Bounds = Point & Size;
-
-/** Whether a box the size of `node`, at `at`, comes within `gap` of `other`. */
-const isWithin = (
-  at: Point,
-  node: LaidOutNode,
-  other: LaidOutNode,
-  gap: number,
-): boolean =>
-  at.x < other.x + other.width + gap &&
-  other.x < at.x + node.width + gap &&
-  at.y < other.y + other.height + gap &&
-  other.y < at.y + node.height + gap;
-
 /**
- * `node` where it is if no node of `others` comes within `gap` of it, and
+ * `node` where it is if no box of `others` comes within `gap` of it, and
  * otherwise at the nearest place none does. The nearest such place is one
- * where the node, along one of its sides, is `gap` from a side of another
- * node, so only those places, and the node's own, are tried. The one past
- * every other node always is clear.
+ * where the box, along one of its sides, is `gap` from a side of another,
+ * so only those places, and the box's own, are tried. The one past every
+ * other box always is clear.
  */
-const clearOf = (
-  node: LaidOutNode,
-  others: readonly LaidOutNode[],
+export const clearOf = <B extends Bounds>(
+  node: B,
+  others: readonly Bounds[],
   gap: number,
-): LaidOutNode => {
+): B => {
   const clear = (at: Point): boolean =>
     others.every((other) => !isWithin(at, node, other, gap));
 
@@ -209,6 +196,26 @@ const clearOf = (
   return nearest === undefined ? node : { ...node, ...nearest };
 };
 
+export type DagLayout = Readonly<{
+  direction: DagDirection;
+  /** The top-left corner of each node put somewhere, in graph units. */
+  positions: ReadonlyMap<GraphNodeId, Point>;
+  /**
+   * The top-left corner of each group's frame when the arrangement last
+   * changed: where it is drawn while it is empty (`group-frames.mts`).
+   */
+  groupPositions: ReadonlyMap<GroupId, Point>;
+}>;
+
+export type Bounds = Point & Size;
+
+/** Whether a box the size of `node`, at `at`, comes within `gap` of `other`. */
+const isWithin = (at: Point, node: Size, other: Bounds, gap: number): boolean =>
+  at.x < other.x + other.width + gap &&
+  other.x < at.x + node.width + gap &&
+  at.y < other.y + other.height + gap &&
+  other.y < at.y + node.height + gap;
+
 /** The mean of `shifts`; none for none. */
 const averageShift = (shifts: readonly Point[]): Point =>
   Arr.isNonEmpty(shifts)
@@ -224,12 +231,25 @@ const averageShift = (shifts: readonly Point[]): Point =>
       } as const)
     : ({ x: 0, y: 0 } as const);
 
-/** Every node `edges` join each node to, either way. */
+/**
+ * Every node `edges` join each node to, either way, and every other node of
+ * its group of `groups`.
+ */
 const neighborsOf = (
   edges: readonly LaidOutEdge[],
-): ReadonlyMap<GraphNodeId, readonly GraphNodeId[]> =>
-  edges.reduce<ReadonlyMap<GraphNodeId, readonly GraphNodeId[]>>(
-    (acc, { from, to }) =>
+  groups: readonly LayoutGroup[],
+): ReadonlyMap<GraphNodeId, readonly GraphNodeId[]> => {
+  const pairs: readonly FixedLengthTuple<2, GraphNodeId>[] = [
+    ...edges.map(({ from, to }) => [from, to] as const),
+    ...groups.flatMap(({ members }) =>
+      members.flatMap((member, index) =>
+        members.slice(index + 1).map((other) => [member, other] as const),
+      ),
+    ),
+  ] as const;
+
+  return pairs.reduce<ReadonlyMap<GraphNodeId, readonly GraphNodeId[]>>(
+    (acc, [from, to]) =>
       new Map([
         ...acc,
         [from, Arr.toPushed(acc.get(from) ?? [], to)],
@@ -237,6 +257,7 @@ const neighborsOf = (
       ]),
     new Map(),
   );
+};
 
 /**
  * `auto`, each node `positions` has moved there, and the rest put clear of
@@ -246,6 +267,7 @@ const placeEach = (
   auto: readonly LaidOutNode[],
   edges: readonly LaidOutEdge[],
   positions: ReadonlyMap<GraphNodeId, Point>,
+  groups: readonly LayoutGroup[],
 ): readonly LaidOutNode[] => {
   if (auto.every(({ id }) => positions.has(id))) {
     return moveNodesTo(auto, positions);
@@ -253,7 +275,7 @@ const placeEach = (
 
   const autoAt = positionsOf(auto);
 
-  const neighbors = neighborsOf(edges);
+  const neighbors = neighborsOf(edges, groups);
 
   const mut_placed = new Map<GraphNodeId, LaidOutNode>(
     moveNodesTo(

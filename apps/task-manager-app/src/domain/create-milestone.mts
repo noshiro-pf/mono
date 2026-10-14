@@ -4,7 +4,8 @@ import type { Milestone, MilestoneId } from './types.mjs';
 /**
  * A new milestone: `id`, `title` and the creation time are required, and
  * every other field defaults to an empty value — no date, no manual check,
- * no dependencies, which makes a milestone that is reached at once.
+ * no dependencies and no group, which makes a milestone that is reached
+ * at once.
  */
 export const createMilestone = ({
   id,
@@ -35,6 +36,7 @@ const defaults = {
   requiresManualCheck: false,
   checkedAt: undefined,
   dependencies: [],
+  groupId: undefined,
 } as const satisfies StrictOmit<
   Milestone,
   'id' | 'title' | 'createdAt' | 'updatedAt'

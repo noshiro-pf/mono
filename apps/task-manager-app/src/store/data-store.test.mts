@@ -1,11 +1,13 @@
 import { createState } from 'synstate';
 import type { DagLayout } from '../dag/index.mjs';
 import {
+  asGroupId,
   asMilestoneId,
   asTaskId,
   createMilestone,
   createTask,
   type DomainState,
+  type Group,
 } from '../domain/index.mjs';
 import {
   createMemoryRepository,
@@ -205,10 +207,87 @@ describe(createDataStore, () => {
     ]);
   });
 
+  describe('the groups', () => {
+    const g = asGroupId('g');
+
+    const group: Group = {
+      id: g,
+      title: '実装',
+      createdAt: 0,
+      updatedAt: 0,
+    } as const;
+
+    test('are none until somebody signs in, and that project’s after', () => {
+      const { store, setSession } = setup();
+
+      assert.deepStrictEqual(store.groups.getSnapshot().value, []);
+
+      setSession(signedIn(createMemoryRepository(initial, undefined, [group])));
+
+      assert.deepStrictEqual(store.groups.getSnapshot().value, [group]);
+
+      setSession({ type: 'signed-out', error: undefined, signingIn: false });
+
+      assert.deepStrictEqual(store.groups.getSnapshot().value, []);
+    });
+
+    test('puts a group, and a node into it and out again', async () => {
+      const { store, setSession } = setup();
+
+      setSession(signedIn(createMemoryRepository(initial)));
+
+      store.putGroup(group);
+
+      store.setNodeGroup({ kind: 'task', id: asTaskId('a') }, g);
+
+      await Promise.resolve();
+
+      assert.deepStrictEqual(store.groups.getSnapshot().value, [group]);
+
+      assert.deepStrictEqual(store.state.getSnapshot().value.tasks[0], {
+        ...a,
+        groupId: g,
+        updatedAt: 1000,
+      });
+
+      store.setNodeGroup({ kind: 'task', id: asTaskId('a') }, undefined);
+
+      await Promise.resolve();
+
+      assert.isUndefined(store.state.getSnapshot().value.tasks[0]?.groupId);
+    });
+
+    test('deletes a group, keeping its nodes in none', async () => {
+      const { store, setSession } = setup();
+
+      setSession(
+        signedIn(
+          createMemoryRepository(
+            { ...initial, tasks: [{ ...a, groupId: g }, b] },
+            undefined,
+            [group],
+          ),
+        ),
+      );
+
+      store.deleteGroup(g);
+
+      await Promise.resolve();
+
+      assert.deepStrictEqual(store.groups.getSnapshot().value, []);
+
+      assert.deepStrictEqual(store.state.getSnapshot().value.tasks, [
+        { ...a, groupId: undefined, updatedAt: 1000 },
+        b,
+      ]);
+    });
+  });
+
   describe('the DAG layout', () => {
     const layout: DagLayout = {
       direction: 'down',
       positions: new Map([['task:a', { x: 1, y: 2 }]]),
+      groupPositions: new Map(),
     } as const;
 
     test('is none until somebody signs in, and that project’s after', () => {

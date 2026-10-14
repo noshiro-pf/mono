@@ -2,10 +2,13 @@ import { expectType, Result } from 'ts-data-forge';
 import type { StrictExclude } from 'ts-type-forge';
 import type { DagLayout } from '../dag/index.mjs';
 import {
+  asGroupId,
   asMilestoneId,
   asTaskId,
   createMilestone,
   createTask,
+  type Group,
+  type GroupId,
   type Milestone,
   type Task,
 } from '../domain/index.mjs';
@@ -13,6 +16,9 @@ import {
   DagLayoutDocCodec,
   dagLayoutFromDoc,
   dagLayoutToDoc,
+  GroupDocCodec,
+  groupFromDoc,
+  groupToDoc,
   MilestoneDocCodec,
   milestoneFromDoc,
   milestoneToDoc,
@@ -21,6 +27,7 @@ import {
   taskFromDoc,
   taskToDoc,
   type DagLayoutDoc,
+  type GroupDoc,
   type MilestoneDoc,
   type TaskDoc,
 } from './converters.mjs';
@@ -32,6 +39,9 @@ const writtenTask = (task: Task): TaskDoc =>
 
 const writtenMilestone = (milestone: Milestone): MilestoneDoc =>
   MilestoneDocCodec.prune(milestoneToDoc(milestone));
+
+const writtenGroup = (value: Group): GroupDoc =>
+  GroupDocCodec.prune(groupToDoc(value));
 
 const writtenLayout = (layout: DagLayout, updatedAt: number): DagLayoutDoc =>
   DagLayoutDocCodec.prune(dagLayoutToDoc(layout, updatedAt));
@@ -58,6 +68,7 @@ const fullTask: Task = createTask({
     },
     { from: { kind: 'milestone', id: asMilestoneId('m0') }, lagMs: 0 },
   ],
+  groupId: asGroupId('g1'),
 });
 
 const emptyTask: Task = createTask({
@@ -81,7 +92,15 @@ const fullMilestone: Milestone = createMilestone({
       lagMs: 0,
     },
   ],
+  groupId: asGroupId('g1'),
 });
+
+const group: Group = {
+  id: asGroupId('g1'),
+  title: 'バックエンド',
+  createdAt: 1000,
+  updatedAt: 2000,
+} as const;
 
 describe(taskToDoc, () => {
   test('writes a missing value as null in the type, too', () => {
@@ -96,6 +115,11 @@ describe(taskToDoc, () => {
     expectType<MilestoneDoc['date'], number | null>('=');
 
     expectType<MilestoneDoc['checkedAt'], number | null>('=');
+
+    // Optional, for what versions before groups wrote, but always written.
+    expectType<TaskDoc['groupId'], GroupId | null | undefined>('=');
+
+    expectType<MilestoneDoc['groupId'], GroupId | null | undefined>('=');
 
     expectType<keyof TaskDoc, StrictExclude<keyof Task, 'id'>>('=');
 
@@ -118,6 +142,8 @@ describe(taskToDoc, () => {
     assert.isNull(doc.completedAt);
 
     assert.isNull(doc.estimateHours);
+
+    assert.isNull(doc.groupId);
 
     const values: readonly unknown[] = Object.values(doc);
 
@@ -172,6 +198,7 @@ describe('what is written', () => {
       'assignees',
       'reviewers',
       'dependencies',
+      'groupId',
     ]);
   });
 
@@ -213,6 +240,7 @@ describe('what is written', () => {
     const layout: DagLayout = {
       direction: 'down',
       positions: new Map([['task:a', node]]),
+      groupPositions: new Map(),
     } as const;
 
     const strayLayout = { ...layout, zoom: 2 } as const;
@@ -220,6 +248,7 @@ describe('what is written', () => {
     assert.deepStrictEqual(writtenLayout(strayLayout, 1234), {
       direction: 'down',
       positions: { 'task:a': { x: 24, y: -8 } },
+      groupPositions: {},
       updatedAt: 1234,
     });
   });
@@ -256,6 +285,25 @@ describe(taskFromDoc, () => {
 
   test('rejects an empty id', () => {
     assert.isTrue(Result.isErr(taskFromDoc('', writtenTask(emptyTask))));
+  });
+
+  test('reads a task written before groups as in none', () => {
+    const { groupId, ...before } = writtenTask(fullTask);
+
+    assert.strictEqual(groupId, asGroupId('g1'));
+
+    assert.deepStrictEqual(
+      taskFromDoc('t1', before),
+      Result.ok({ ...fullTask, groupId: undefined }),
+    );
+  });
+
+  test('rejects an empty group id', () => {
+    assert.isTrue(
+      Result.isErr(
+        taskFromDoc('t1', { ...writtenTask(fullTask), groupId: '' }),
+      ),
+    );
   });
 
   test('ignores fields it does not know inside a dependency too', () => {
@@ -374,6 +422,35 @@ describe(milestoneFromDoc, () => {
   });
 });
 
+describe(groupFromDoc, () => {
+  test('round-trips a group, its id the document id', () => {
+    const doc = writtenGroup(group);
+
+    assert.notProperty(doc, 'id');
+
+    assert.deepStrictEqual(groupFromDoc('g1', doc), Result.ok(group));
+  });
+
+  test('ignores fields it does not know', () => {
+    assert.deepStrictEqual(
+      groupFromDoc('g1', { ...writtenGroup(group), color: 'red' }),
+      Result.ok(group),
+    );
+  });
+
+  test('rejects an empty id, and what is not a group', () => {
+    assert.isTrue(Result.isErr(groupFromDoc('', writtenGroup(group))));
+
+    for (const broken of [
+      null,
+      { ...writtenGroup(group), title: 1 },
+      { ...writtenGroup(group), createdAt: undefined },
+    ]) {
+      assert.isTrue(Result.isErr(groupFromDoc('g1', broken)));
+    }
+  });
+});
+
 describe(personalProjectDoc, () => {
   test('is owned by, and has as its only member, the user it is for', () => {
     assert.deepStrictEqual(personalProjectDoc('uid-1', 1234), {
@@ -392,15 +469,18 @@ describe(dagLayoutToDoc, () => {
       ['task:a', { x: 24, y: -8 }],
       ['milestone:m', { x: 300.5, y: 40 }],
     ]),
+    groupPositions: new Map([[asGroupId('g1'), { x: 8, y: 16 }]]),
   } as const;
 
-  test('writes the positions as a map keyed by node id', () => {
-    assert.deepStrictEqual(writtenLayout(layout, 1234), {
+  test('writes the positions as maps keyed by node id and group id', () => {
+    // As data: a group id is a key only once branded.
+    assert.deepStrictEqual<unknown>(writtenLayout(layout, 1234), {
       direction: 'down',
       positions: {
         'task:a': { x: 24, y: -8 },
         'milestone:m': { x: 300.5, y: 40 },
       },
+      groupPositions: { g1: { x: 8, y: 16 } },
       updatedAt: 1234,
     });
   });
@@ -416,6 +496,7 @@ describe(dagLayoutToDoc, () => {
     const empty: DagLayout = {
       direction: 'right',
       positions: new Map(),
+      groupPositions: new Map(),
     } as const;
 
     assert.deepStrictEqual(
@@ -438,6 +519,17 @@ describe(dagLayoutFromDoc, () => {
     );
   });
 
+  test('reads a layout written before groups as having no group placed', () => {
+    assert.deepStrictEqual(
+      dagLayoutFromDoc(doc),
+      Result.ok({
+        direction: 'right',
+        positions: new Map([['task:a', { x: 1, y: 2 }]]),
+        groupPositions: new Map(),
+      }),
+    );
+  });
+
   test('rejects what is not a layout', () => {
     for (const broken of [
       undefined,
@@ -451,6 +543,7 @@ describe(dagLayoutFromDoc, () => {
       { ...doc, positions: { 'task:a': { x: Number.NaN, y: 2 } } },
       { ...doc, positions: { project: { x: 1, y: 2 } } },
       { ...doc, positions: { 'task:': { x: 1, y: 2 } } },
+      { ...doc, groupPositions: { g: { x: 1 } } },
       { ...doc, updatedAt: null },
     ]) {
       assert.isTrue(Result.isErr(dagLayoutFromDoc(broken)));

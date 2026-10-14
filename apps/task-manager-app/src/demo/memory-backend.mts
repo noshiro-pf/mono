@@ -1,8 +1,8 @@
 /**
  * The {@link Backend} of the in-memory demo (`?storage=memory`, development
  * builds only): signed in from the start as a demo user, with the sample
- * data in memory. Signing out and in again keeps the data; reloading the
- * page starts over.
+ * data and its groups in memory. Signing out and in again keeps the data;
+ * reloading the page starts over.
  */
 
 import { createState } from 'synstate';
@@ -11,13 +11,17 @@ import {
   type Backend,
   type BackendSession,
 } from '../repository/index.mjs';
-import { sampleState } from './sample-data.mjs';
+import { sampleGroups, sampleState } from './sample-data.mjs';
 
 export const createMemoryBackend = (now: number): Backend => {
   const signedIn: BackendSession = {
     type: 'signed-in',
     userName: 'デモ',
-    repository: createMemoryRepository(sampleState(now)),
+    repository: createMemoryRepository(
+      sampleState(now),
+      undefined,
+      sampleGroups(now),
+    ),
   } as const;
 
   const [session, setSession] = createState<BackendSession>(signedIn);

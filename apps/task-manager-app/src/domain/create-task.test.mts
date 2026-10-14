@@ -21,6 +21,7 @@ describe(createTask, () => {
         assignees: [],
         reviewers: [],
         dependencies: [],
+        groupId: undefined,
       },
     );
   });

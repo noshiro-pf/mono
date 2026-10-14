@@ -14,13 +14,15 @@
  * it is when that pointer lifts — the one moment its position is saved. A
  * press on a node's handle draws an arrow from it instead (`connectDrag`),
  * which ends where the pointer lifts. A second finger turns either press
- * into a pinch, which leaves the node where it was and draws nothing.
+ * into a pinch, which leaves the node where it was and draws nothing. A
+ * group's frame, grabbed by its title, is dragged as a node is.
  */
 
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import type { GraphNodeId } from '../domain/index.mjs';
 import { dragPosition } from './dag-layout.mjs';
+import type { GroupKey } from './group-frames.mjs';
 import {
   contentPointAt,
   panBy,
@@ -198,10 +200,13 @@ export type TrackedPointer = Readonly<{ id: number }> & Point;
 /** What a pointer went down on that a move drags. */
 export type Grab = NodeGrab | ConnectGrab;
 
-/** The node a pointer went down on, and where it was then. */
+/**
+ * The node a pointer went down on, or the group by its key, and where it
+ * was then: the node's top-left corner, or the frame's.
+ */
 export type NodeGrab = Readonly<{
   kind: 'node';
-  id: GraphNodeId;
+  id: GraphNodeId | GroupKey;
   origin: Point;
 }>;
 
@@ -215,8 +220,11 @@ export type ConnectGrab = Readonly<{
   anchor: Point;
 }>;
 
-/** Where a node being dragged is. */
-export type NodeDrag = Readonly<{ id: GraphNodeId; position: Point }>;
+/** Where a node or a group's frame being dragged is. */
+export type NodeDrag = Readonly<{
+  id: GraphNodeId | GroupKey;
+  position: Point;
+}>;
 
 /**
  * An arrow being drawn from the handle of `from` at `anchor` to the pointer

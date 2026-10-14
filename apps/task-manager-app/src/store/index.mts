@@ -6,6 +6,7 @@ export * from './dag-view-mode-store.mjs';
 export * from './data-store.mjs';
 export * from './diagram-sort-store.mjs';
 export * from './editor-store.mjs';
+export * from './group-editor-store.mjs';
 export * from './list-settings-store.mjs';
 export * from './media-store.mjs';
 export * from './node-size-store.mjs';

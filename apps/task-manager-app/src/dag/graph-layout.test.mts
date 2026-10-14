@@ -1,4 +1,6 @@
+import { Arr } from 'ts-data-forge';
 import {
+  asGroupId,
   asMilestoneId,
   asTaskId,
   buildDependencyGraph,
@@ -22,12 +24,21 @@ import {
   TASK_NODE_SIZE,
   toElkGraph,
 } from './graph-layout.mjs';
+import {
+  EMPTY_GROUP_SIZE,
+  GROUP_HEADER,
+  GROUP_PADDING,
+} from './group-frames.mjs';
 
 const a = asTaskId('a');
 
 const b = asTaskId('b');
 
 const m = asMilestoneId('m');
+
+const g = asGroupId('g');
+
+const h = asGroupId('h');
 
 const state: DomainState = {
   tasks: [
@@ -90,6 +101,7 @@ describe(layoutInput, () => {
         { id: 'task:b#0', from: 'task:a', to: 'task:b', label: 'SS +3日' },
         { id: 'milestone:m#0', from: 'task:b', to: 'milestone:m', label: '' },
       ],
+      groups: [],
     });
   });
 
@@ -113,6 +125,40 @@ describe(layoutInput, () => {
     ]);
 
     assert.deepStrictEqual(compact.edges, standard.edges);
+  });
+});
+
+describe('layoutInput, with groups', () => {
+  test('keeps each group with the members that are nodes, each in the first group listing it', () => {
+    const input = layoutInput(
+      buildDependencyGraph(state),
+      'right',
+      'standard',
+      [
+        { id: g, members: ['task:a', 'task:gone', 'task:b'] },
+        { id: h, members: ['task:b', 'milestone:m'] },
+      ],
+    );
+
+    assert.deepStrictEqual(input.groups, [
+      { id: g, members: ['task:a', 'task:b'] },
+      { id: h, members: ['milestone:m'] },
+    ]);
+  });
+
+  test('changes the key when a node changes group', () => {
+    const graph = buildDependencyGraph(state);
+
+    assert.notStrictEqual(
+      layoutKey(
+        layoutInput(graph, 'right', 'standard', [{ id: g, members: [] }]),
+      ),
+      layoutKey(
+        layoutInput(graph, 'right', 'standard', [
+          { id: g, members: ['task:a'] },
+        ]),
+      ),
+    );
   });
 });
 
@@ -264,6 +310,65 @@ describe(toElkGraph, () => {
   });
 });
 
+describe('toElkGraph, with groups', () => {
+  test('puts the members of a group inside it, with room for its title, and an empty one as a box', () => {
+    const graph = toElkGraph(
+      layoutInput(buildDependencyGraph(state), 'right', 'standard', [
+        { id: g, members: ['task:a', 'task:b'] },
+        { id: h, members: [] },
+      ]),
+    );
+
+    assert.strictEqual(
+      graph.layoutOptions?.['elk.hierarchyHandling'],
+      'INCLUDE_CHILDREN',
+    );
+
+    assert.deepStrictEqual(
+      graph.children?.map(({ id, children, width, height }) => [
+        id,
+        children?.map((child) => child.id),
+        width,
+        height,
+      ]),
+      [
+        [
+          'milestone:m',
+          undefined,
+          MILESTONE_NODE_SIZE.width,
+          MILESTONE_NODE_SIZE.height,
+        ],
+        ['group:g', ['task:a', 'task:b'], undefined, undefined],
+        ['group:h', undefined, EMPTY_GROUP_SIZE.width, EMPTY_GROUP_SIZE.height],
+      ],
+    );
+
+    assert.strictEqual(
+      graph.children?.[1]?.layoutOptions?.['elk.padding'],
+      `[top=${GROUP_HEADER},left=${GROUP_PADDING},bottom=${GROUP_PADDING},right=${GROUP_PADDING}]`,
+    );
+
+    // The edges stay at the top, in and out of the group alike.
+    assert.deepStrictEqual(
+      graph.edges?.map(({ sources, targets }) => [sources, targets]),
+      [
+        [['task:a'], ['task:b']],
+        [['task:b'], ['milestone:m']],
+      ],
+    );
+  });
+
+  test('lays out the hierarchy only when some node is in a group', () => {
+    assert.isUndefined(
+      toElkGraph(
+        layoutInput(buildDependencyGraph(state), 'right', 'standard', [
+          { id: h, members: [] },
+        ]),
+      ).layoutOptions?.['elk.hierarchyHandling'],
+    );
+  });
+});
+
 describe(fromElkGraph, () => {
   test('reads the positions back from what ELK laid out', async () => {
     const input = layoutInput(buildDependencyGraph(state), 'right', 'standard');
@@ -351,6 +456,64 @@ describe(fromElkGraph, () => {
     assert.deepStrictEqual(
       compact.nodes.map(({ width, height }) => ({ width, height })),
       compactInput.nodes.map(({ width, height }) => ({ width, height })),
+    );
+  });
+
+  test('places the members of a group where they are in the graph, inside its box', async () => {
+    const tasks = Arr.toPushed(
+      state.tasks,
+      createTask({
+        id: asTaskId('c'),
+        title: 'C',
+        now: 0,
+        dependencies: [
+          { from: { kind: 'task', id: a }, type: 'finish-to-start', lagMs: 0 },
+        ],
+      }),
+    );
+
+    const input = layoutInput(
+      buildDependencyGraph({ ...state, tasks }),
+      'right',
+      'standard',
+      [
+        { id: g, members: ['task:a', 'task:c'] },
+        { id: h, members: [] },
+      ],
+    );
+
+    const layout = fromElkGraph(input, await layoutWithElk(toElkGraph(input)));
+
+    const [groupG, groupH] = layout.groups;
+
+    assert.isDefined(groupG);
+
+    assert.isDefined(groupH);
+
+    assert.deepStrictEqual(groupG.members, ['task:a', 'task:c']);
+
+    assert.deepStrictEqual(
+      layout.nodes
+        .filter(
+          (node) =>
+            groupG.x <= node.x &&
+            groupG.y <= node.y &&
+            node.x + node.width <= groupG.x + groupG.width &&
+            node.y + node.height <= groupG.y + groupG.height,
+        )
+        .map(({ id }) => id),
+      ['task:a', 'task:c'],
+    );
+
+    const memberA = layout.nodes.find(({ id }) => id === 'task:a');
+
+    assert.isDefined(memberA);
+
+    assert.isAtLeast(memberA.y - groupG.y, GROUP_HEADER);
+
+    assert.deepStrictEqual(
+      [groupH.width, groupH.height],
+      [EMPTY_GROUP_SIZE.width, EMPTY_GROUP_SIZE.height],
     );
   });
 
