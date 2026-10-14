@@ -105,9 +105,10 @@ by the highest priority in them or anywhere below them, since landing a high
 one means landing what holds it up first; none sits between mid and low.
 
 The counts and the switches below them **stay in view while the merge order
-scrolls under them** — under the toolbar when the header is folded — and
-leave with the merge order once it has scrolled past. On a screen too small
-to spare the room, they scroll away with it.
+scrolls under them**, with its title — under the toolbar when the header is
+folded — and leave with the merge order once it has scrolled past. On a
+screen too small to spare the room, they scroll away with it, and only the
+title stays. Every other section's title stays in view the same way.
 
 What is hidden gives its place to what is shown below it, so a pull request
 waiting on a hidden one is drawn where that one was. And a pull request

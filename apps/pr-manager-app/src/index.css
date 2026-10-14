@@ -335,39 +335,9 @@ a:focus-visible {
  * Under the merge order's title the counts are switches for the pull requests
  * they count: a hidden one keeps its number but loses its fill, takes a dashed
  * outline and is struck through, so that being off does not rest on a colour.
- *
- * They stay in view while the merge order scrolls under them, and leave with
- * it, since what holds them is its section: a little below the top of the
- * window, as the toolbar is, and under the toolbar when the header is folded (`--header-height` is the toolbar's,
- * measured in `app.tsx`), and at the top of a block given a height, which is
- * what scrolls then. The page's colour behind them, and the first shadow
- * filling the gap above them, so that nothing scrolls by over them; a
- * hairline under them once they have stopped, where the browser can say so.
- * Not on a screen too small to give them the room: there they would be most
- * of what is left of it.
  */
 .merge-order-filters {
-  background: var(--plane);
-  box-shadow: 0 -0.5rem 0 var(--plane);
-  container-type: scroll-state;
   margin-bottom: 0.5rem;
-  position: sticky;
-  top: 0.5rem;
-  z-index: 5;
-}
-
-.page[data-header='folded'] .merge-order-filters {
-  top: calc(var(--header-height, 0px) + 1rem);
-}
-
-.block-body[data-sized='true'] .merge-order-filters {
-  top: 0;
-}
-
-@media (width < 40rem), (height < 36rem) {
-  .merge-order-filters {
-    position: static;
-  }
 }
 
 .merge-order-filters .summary-row {
@@ -547,6 +517,50 @@ a:focus-visible {
 
 /* --- sections ----------------------------------------------------------- */
 
+/*
+ * Each section's title stays in view while the section scrolls under it, and
+ * leaves with it, since what holds it is its section; the merge order's
+ * counts stay with its title, in one head. A little below the top of the
+ * window, as the toolbar is, and under the toolbar when the header is folded
+ * (`--header-height` is the toolbar's, measured in `app.tsx`), and at the top
+ * of a block given a height or filling the window, which is what scrolls
+ * then. The page's colour behind it, and the first shadow filling the gap
+ * above it, so that nothing scrolls by over it; under the merge order's
+ * controls a hairline once they have stopped, where the browser can say so.
+ * The counts are not kept in view on a screen too small to give them the
+ * room — there they would be most of what is left of it — but the title is.
+ */
+.section > .section-title,
+.section-head {
+  background: var(--plane);
+  box-shadow: 0 -0.5rem 0 var(--plane);
+  position: sticky;
+  top: 0.5rem;
+  z-index: 5;
+}
+
+.section-head {
+  container-type: scroll-state;
+}
+
+.page[data-header='folded'] :is(.section > .section-title, .section-head) {
+  top: calc(var(--header-height, 0px) + 1rem);
+}
+
+.block-body[data-sized='true'] :is(.section > .section-title, .section-head) {
+  top: 0;
+}
+
+@media (width < 40rem), (height < 36rem) {
+  .section-head {
+    position: static;
+  }
+
+  .section-head > .section-title {
+    position: sticky;
+  }
+}
+
 .section {
   margin-bottom: 2rem;
 }
@@ -616,6 +630,8 @@ a:focus-visible {
   top: 0;
   touch-action: none;
   user-select: none;
+  /* Over the section titles, which stay in view where it is. */
+  z-index: 6;
 }
 
 .block-handle:hover {
@@ -746,6 +762,38 @@ a:focus-visible {
 
 .block-layout[data-mode='fill'] .block-edge {
   flex-shrink: 0;
+}
+
+/*
+ * The issue DAG, in a block that scrolls, takes the room the block has: the
+ * section is a column as tall as the block, and the graph's box what its
+ * title and switches leave, scrolling the graph inside itself — rather than a
+ * fixed share of the window, which left the block's room unused or made it
+ * scroll a box inside a box. A block too short for a usable box scrolls as a
+ * whole.
+ */
+.block-body[data-sized='true']:has(> .section > .issue-dag) {
+  display: flex;
+  flex-direction: column;
+}
+
+.block-body[data-sized='true'] > .section:has(> .issue-dag) {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
+.block-body[data-sized='true'] > .section > .issue-dag {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-height: 8rem;
+}
+
+.block-body[data-sized='true'] .issue-dag-scroll {
+  flex: 1 1 0;
+  max-height: none;
+  min-height: 0;
 }
 
 /* The last block of a column has nothing to share its height with. */
