@@ -29,12 +29,18 @@ import { log, pause, stopRequested } from './util.mjs';
  * Polls one pull request until it merges or until something says it will not.
  * `expectedHead` is the commit the checks are expected on; a different head
  * means someone else pushed, and the survey has to start over.
+ *
+ * `bypassReason` is set for a pull request only a ruleset bypass merges
+ * (`review.mts`). It has no auto-merge to lose, and nothing will merge it on
+ * green, so the watch ends at the verdict: failed as for any other, or green
+ * and `awaiting-bypass`, with the reason for the comment to say.
  */
 export const watch = async (
   pr: PullRequest,
   expectedHead: string,
   requiredContexts: readonly string[],
   options: Options,
+  bypassReason: string | undefined,
 ): Promise<Watched> => {
   const deadline = Date.now() + options.watchTimeoutMin * 60_000;
 
@@ -73,7 +79,7 @@ export const watch = async (
       return { outcome: 'closed' };
     }
 
-    if (!isRecord(current.autoMergeRequest)) {
+    if (bypassReason === undefined && !isRecord(current.autoMergeRequest)) {
       return { outcome: 'auto-merge-disabled' };
     }
 
@@ -131,6 +137,15 @@ export const watch = async (
       log(
         `#${pr.number}: ${current.mergeStateStatus}, waiting on ${describeWaitingOn(summary)}`,
       );
+    } else if (bypassReason !== undefined) {
+      log(
+        `#${pr.number}: all ${summary.total} required checks green; it waits for a bypass merge.`,
+      );
+
+      return {
+        outcome: 'awaiting-bypass',
+        detail: `every required check is green; ${bypassReason}`,
+      };
     } else {
       mut_greenPolls += 1;
 

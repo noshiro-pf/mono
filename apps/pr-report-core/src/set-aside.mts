@@ -149,14 +149,18 @@ export const setAsideApplies = (
  *
  * Every reason clears when the base moves, because a moved base is the one
  * thing the script knows how to act on — a rebase that conflicted may not
- * any more — except `checks-failed`: rebasing it would put the same failing
- * matrix through again, and the push that carries the fix is what clears it.
+ * any more — except two whose head a rebase would only put through the same
+ * matrix again: `checks-failed`, which the push that carries the fix clears,
+ * and `awaiting-bypass`, green and waiting for a ruleset bypass merge, which
+ * does not wait for the base.
  */
 export const setAsideStillApplies = (
   setAside: Readonly<{ reason: string; baseSha: string }>,
   baseTip: string,
 ): boolean =>
-  setAside.reason === 'checks-failed' || setAside.baseSha === baseTip;
+  setAside.reason === 'checks-failed' ||
+  setAside.reason === 'awaiting-bypass' ||
+  setAside.baseSha === baseTip;
 
 /** The first line starts with this, so the comment is found by it. */
 const MARKER = '<!-- unblock-prs:set-aside';

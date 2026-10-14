@@ -40,6 +40,7 @@ export const PullRequestListSchema = t.array(PullRequestSchema);
 export const SKIP_REASONS = [
   'already-in-base',
   'arm-failed',
+  'awaiting-bypass',
   'checks-failed',
   'not-merging',
   'push-failed',
@@ -53,8 +54,11 @@ export type SkipReason = (typeof SKIP_REASONS)[number];
 /**
  * Why a pull request is being left alone, and the state it was in at the
  * time. A record stops applying as soon as that state changes: a push to the
- * branch clears every reason, and every reason but `checks-failed` also
- * clears when the base moves. See `skipStillApplies`.
+ * branch clears every reason, and every reason but `checks-failed` and
+ * `awaiting-bypass` also clears when the base moves. `awaiting-bypass` is the
+ * one that is not a failure: every required check is green on a pull request
+ * nothing but a ruleset bypass will merge, and what is left is a person's
+ * (`review.mts`). See `skipStillApplies`.
  */
 export type SkipRecord = Readonly<{
   number: number;
@@ -186,6 +190,12 @@ export type Triage = Readonly<{
   toArm: ReadonlySet<number>;
   /** Which open pull request each stacked one is on: child → parent. */
   stackParents: ReadonlyMap<number, number>;
+  /**
+   * The candidates and the pull requests in flight that only a ruleset bypass
+   * will merge, with why (`review.mts`): their checks are run all the same,
+   * and they are never armed.
+   */
+  bypass: ReadonlyMap<number, string>;
   /** Up to date with checks still running, or clean and about to merge. */
   inFlight: readonly PullRequest[];
   /** Up to date, but a required check has failed. */
@@ -222,6 +232,7 @@ export type NativeStackEntry = Readonly<{
 
 export type WatchOutcome =
   | 'auto-merge-disabled'
+  | 'awaiting-bypass'
   | 'behind-again'
   | 'checks-failed'
   | 'closed'
