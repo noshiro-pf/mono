@@ -1,3 +1,4 @@
+export * from './add-dependency.mjs';
 export * from './create-milestone.mjs';
 export * from './create-task.mjs';
 export * from './cycle.mjs';

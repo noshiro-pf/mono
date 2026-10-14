@@ -6,6 +6,7 @@ import {
   GraphNodeIdCodec,
   listNodes,
   nodeId,
+  nodeRefOf,
 } from './graph-nodes.mjs';
 import { asMilestoneId, asTaskId, type DomainState } from './types.mjs';
 
@@ -58,6 +59,19 @@ describe(nodeId, () => {
       nodeId({ kind: 'task', id: asTaskId('x') }),
       nodeId({ kind: 'milestone', id: asMilestoneId('x') }),
     );
+  });
+});
+
+describe(nodeRefOf, () => {
+  test('is the reverse of nodeId', () => {
+    assert.deepStrictEqual(nodeRefOf('task:a'), { kind: 'task', id: a });
+
+    assert.deepStrictEqual(nodeRefOf('milestone:m:1'), {
+      kind: 'milestone',
+      id: asMilestoneId('m:1'),
+    });
+
+    assert.strictEqual(nodeId(nodeRefOf('task:x:y')), 'task:x:y');
   });
 });
 

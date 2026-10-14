@@ -8,11 +8,26 @@
 import { Arr } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { DeepReadonly } from 'ts-type-forge';
-import type { Dependency, DomainState, NodeRef } from './types.mjs';
+import {
+  asMilestoneId,
+  asTaskId,
+  type Dependency,
+  type DomainState,
+  type NodeRef,
+} from './types.mjs';
 
 /** A stable string id for a node: `task:<id>` or `milestone:<id>`. */
 export const nodeId = (ref: NodeRef): GraphNodeId =>
   `${ref.kind}:${ref.id}` as const;
+
+/** The node `id` names: the reverse of {@link nodeId}. */
+export const nodeRefOf = (id: GraphNodeId): NodeRef =>
+  id.startsWith('task:')
+    ? ({ kind: 'task', id: asTaskId(id.slice('task:'.length)) } as const)
+    : ({
+        kind: 'milestone',
+        id: asMilestoneId(id.slice('milestone:'.length)),
+      } as const);
 
 /** A node id: `task:` or `milestone:` and a non-empty id. */
 export const GraphNodeIdCodec = t.refine({

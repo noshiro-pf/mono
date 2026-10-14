@@ -733,6 +733,57 @@ fieldset {
   fill: var(--focus);
 }
 
+/*
+ * Drawing a dependency: the handle on a node's outline, the arrow from it
+ * and the node it would join, in the danger colour where that is refused.
+ * The pointer's own events find the nodes, so none of it takes them.
+ */
+.dag-svg[data-connect='true'],
+.dag-svg[data-connect='true'] .dag-node {
+  cursor: crosshair;
+}
+
+.dag-connect {
+  pointer-events: none;
+}
+
+.dag-connect-handle {
+  fill: var(--surface);
+  stroke: var(--focus);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.dag-connect-line {
+  stroke: var(--focus);
+  stroke-width: 2;
+}
+
+.dag-arrow-connect {
+  fill: var(--focus);
+}
+
+.dag-arrow-refused {
+  fill: var(--danger);
+}
+
+.dag-connect-target {
+  fill: none;
+  stroke: var(--focus);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.dag-connect[data-refused='true'] .dag-connect-line,
+.dag-connect[data-refused='true'] .dag-connect-target {
+  stroke: var(--danger);
+  stroke-dasharray: 6 4;
+}
+
+.dag-connect[data-refused='true'] .dag-connect-handle {
+  stroke: var(--danger);
+}
+
 .dag-node[data-highlight='on'] .dag-node-shape {
   stroke-width: 3;
 }
