@@ -1,5 +1,12 @@
 # synstate-preact-signals
 
+## 3.2.0
+
+### Patch Changes
+
+- Updated dependencies [18c78df]
+    - synstate@3.2.0
+
 ## 2.1.0
 
 ### Minor Changes

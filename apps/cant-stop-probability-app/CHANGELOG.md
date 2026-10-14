@@ -1,5 +1,15 @@
 # cant-stop-probability-app
 
+## 0.0.14
+
+### Patch Changes
+
+- Updated dependencies [18c78df]
+    - synstate@3.2.0
+    - react-blueprintjs-utils@0.0.15
+    - react-utils@0.0.12
+    - synstate-react-hooks@3.2.0
+
 ## 0.0.13
 
 ### Patch Changes

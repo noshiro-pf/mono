@@ -1,5 +1,22 @@
 ## [2.2.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.4...v2.2.5) (2026-08-09)
 
+## 3.4.2
+
+### Patch Changes
+
+- a69cd41: `convert-to-readonly` no longer breaks or weakens `Readonly<...>` over a union or intersection.
+
+    - `Readonly<A & { b: string }>[]` and `readonly Readonly<A & { b: string }>[]` no longer stop the run with "Error replacing tree!" when the `Readonly` is taken off: what replaces it keeps the parentheses its position needs.
+    - A member such as a type parameter or an alias stays under the `Readonly` it was written under, so `Readonly<A & B>` is no longer rewritten into a mutable `A & B`.
+    - `Readonly<A> & Readonly<B>` is merged into `Readonly<A & B>` only when `A` and `B` are known to be object types: type literals, or mapped types that do not map over `keyof T`. `Readonly<string[] & X>` leaves the array mutable, so merging a type parameter or an alias that may be an array removed the readonly-ness the codemod is meant to add. Unions are merged as before.
+
+- 09b273e: `convert-to-readonly` no longer loses or copies comments around the types it
+  rewrites. A comment in front of the `|` or `&` between union or intersection
+  members used to be dropped, and a comment in front of a rewritten type was
+  written a second time inside it, so with Prettier in between it doubled on
+  every run. Each comment is now kept exactly once; one in front of a member
+  that is merged into a `Readonly<…>` or `DeepReadonly<…>` moves inside it.
+
 ## 3.4.1
 
 ### Patch Changes
