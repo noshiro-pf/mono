@@ -35,6 +35,7 @@
     "check:prose": "pnpm run '/check:prose:.*/'",
     "check:prose:claude-md-references": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-claude-md-references.mts",
     "check:prose:claude-md-size": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-claude-md-size.mts",
+    "check:prose:dependent-releases": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-dependent-releases.mts",
     "check:prose:japanese-parentheses": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-japanese-parentheses.mts",
     "check:prose:linked-releases": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-linked-releases.mts",
     "check:prose:markdownlint-config": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-markdownlint-config.mts",
