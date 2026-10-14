@@ -2,6 +2,7 @@ import {
   allBranchesSegment,
   diffViewDefaults,
   isSettledLink,
+  keptUrlOfHistoryWrite,
   managedPagePathOf,
   overviewParam,
   preferredUrlOfLink,
@@ -213,6 +214,105 @@ describe('restoredUrlOfPage', () => {
     assert.deepStrictEqual(
       restoredUrlOfPage(`${pageOrigin}/noshiro-pf/mono/pull/1`, pageOrigin),
       undefined,
+    );
+  });
+});
+
+describe('keptUrlOfHistoryWrite', () => {
+  const diff = `${pageOrigin}/noshiro-pf/mono/pull/2089/changes` as const;
+
+  const settled = `${diff}?show-viewed-files=false&w=1` as const;
+
+  test('keeps the query when the site writes the bare path, again and again', () => {
+    // What GitHub does to a diff reloaded with the defaults on. Asked of the
+    // write rather than after it, the same write twice is answered twice.
+    for (const _ of [1, 2]) {
+      assert.deepStrictEqual(
+        keptUrlOfHistoryWrite(
+          '/noshiro-pf/mono/pull/2089/changes',
+          settled,
+          pageOrigin,
+        ),
+        `${diff}?show-viewed-files=false&w=1`,
+      );
+    }
+  });
+
+  test('keeps it beside the fragment of the file the site jumps to', () => {
+    assert.deepStrictEqual(
+      keptUrlOfHistoryWrite(`${diff}#diff-d2fbcdbd`, settled, pageOrigin),
+      `${diff}?show-viewed-files=false&w=1#diff-d2fbcdbd`,
+    );
+  });
+
+  test('puts back only the one the write drops', () => {
+    assert.deepStrictEqual(
+      keptUrlOfHistoryWrite(`${diff}?w=1`, settled, pageOrigin),
+      `${diff}?w=1&show-viewed-files=false`,
+    );
+  });
+
+  test('carries the value the address had, not the default', () => {
+    // `w=0` is GitHub's own control, chosen on this page.
+    assert.deepStrictEqual(
+      keptUrlOfHistoryWrite(diff, `${diff}?w=0`, pageOrigin),
+      `${diff}?w=0`,
+    );
+  });
+
+  test('leaves a write that says the parameters itself alone', () => {
+    assert.deepStrictEqual(
+      keptUrlOfHistoryWrite(
+        `${diff}?w=0&show-viewed-files=false`,
+        settled,
+        pageOrigin,
+      ),
+      undefined,
+    );
+  });
+
+  test('adds nothing the address did not carry', () => {
+    assert.deepStrictEqual(
+      keptUrlOfHistoryWrite(`${diff}#diff-abc`, diff, pageOrigin),
+      undefined,
+    );
+  });
+
+  test('leaves a navigation to another page alone', () => {
+    assert.deepStrictEqual(
+      keptUrlOfHistoryWrite('/noshiro-pf/mono/pull/2089', settled, pageOrigin),
+      undefined,
+    );
+
+    assert.deepStrictEqual(
+      keptUrlOfHistoryWrite(
+        '/noshiro-pf/mono/pull/2090/changes',
+        settled,
+        pageOrigin,
+      ),
+      undefined,
+    );
+  });
+
+  test('leaves a page no rule speaks for alone', () => {
+    assert.deepStrictEqual(
+      keptUrlOfHistoryWrite(
+        '/noshiro-pf/mono/pull/1',
+        `${pageOrigin}/noshiro-pf/mono/pull/1?w=1`,
+        pageOrigin,
+      ),
+      undefined,
+    );
+  });
+
+  test('keeps the overview mark on the overview', () => {
+    assert.deepStrictEqual(
+      keptUrlOfHistoryWrite(
+        '/noshiro-pf/mono/branches',
+        `${pageOrigin}/noshiro-pf/mono/branches?overview=1`,
+        pageOrigin,
+      ),
+      `${pageOrigin}/noshiro-pf/mono/branches?overview=1`,
     );
   });
 });

@@ -161,10 +161,20 @@ a logged-out session, `?w=1&show-viewed-files=false` becomes `?w=1` a moment
 after the page loads. An extension that read that as "the defaults are gone"
 and redirected would load the page again, forever. So the paths already dealt
 with are remembered for the life of the document, and parameters coming off
-one of them afterwards are put back with `history.replaceState` — the address
-changes, the page does not. Each address GitHub writes is answered once: if it
-writes the same one again after that, it is insisting, and the address is left
-as GitHub wants it rather than fought over.
+one of them afterwards are kept on the address rather than reloaded.
+
+**GitHub's own writes to the address keep the parameters.** The content script
+runs in the page's world rather than an isolated one, and before any of
+GitHub's scripts it wraps `history.pushState` and `history.replaceState`: a
+write that stays on the same page and drops a parameter the address carried
+gets it back, with the value it had, before the write happens. GitHub can write the
+bare path of a diff more than once after a reload, so answering each write
+after it had happened — once per address, so as not to fight over it — left the
+second one standing and the address without the defaults. Amended as it is
+made, the write leaves nothing to fight over. A write to another page is left
+as it is, and a parameter the address never had is not added; that is the
+redirect's job. Anything that still takes them off is put back with
+`history.replaceState` as the observer notices it.
 
 `src/page-url.mts` holds the address rules and touches no DOM — which URLs
 count and what the extension wants of them — and `src/page-title.mts` holds the

@@ -1,6 +1,7 @@
 import { numberedTitleOf } from './page-title.mjs';
 import {
   isSettledLink,
+  keptUrlOfHistoryWrite,
   managedPagePathOf,
   preferredUrlOfLink,
   preferredUrlOfPage,
@@ -9,7 +10,10 @@ import {
 
 /**
  * The content script, injected into github.com at `document_start`, in every
- * frame — a split-view pane showing a diff is a page like any other.
+ * frame — a split-view pane showing a diff is a page like any other — and in
+ * the page's own world rather than an isolated one, because the third thing
+ * below is done to the page's own `history`. It uses no extension API, so the
+ * isolated world would buy it nothing.
  *
  * It does three things about addresses, and the second is what makes the first
  * almost never happen:
@@ -22,9 +26,9 @@ import {
  *   want. A "Files changed" tab clicked from the conversation view then
  *   navigates straight to the settled URL, and the redirect above has nothing
  *   to do.
- * - **It puts the defaults back on the address** when the site takes them off
- *   a page already showing them, without loading it again. See
- *   `restoreAddress`.
+ * - **It keeps the defaults on the address** when the site rewrites the
+ *   address of a page already showing them, without loading it again. See
+ *   `keepParamsOnHistoryWrites`, and `restoreAddress` behind it.
  *
  * `document_start` is what makes the redirect cheap: the script runs before the
  * document is parsed, so the load it abandons is a response that had barely
@@ -43,6 +47,10 @@ const { location: browserLocation } = globalThis;
 
 // The same for `history`, which is what writes an address without loading it.
 const { history: browserHistory } = globalThis;
+
+// And once more as mutable, for the one place its methods are replaced — the
+// same trick as `mut_page` below.
+const { history: mut_history } = globalThis;
 
 // `document.title = …` is a mutation the lint rules reject unless the object it
 // is reached through is named as mutable — the same trick as `mut_page` in
@@ -105,6 +113,8 @@ const mut_ownTitle: {
 } = { last: undefined };
 
 const main = (): void => {
+  keepParamsOnHistoryWrites();
+
   listenForClicks();
 
   applyPreferredUrlToThisPage();
@@ -158,8 +168,57 @@ const applyPreferredUrlToThisPage = (): void => {
 };
 
 /**
+ * Makes every `pushState` and `replaceState` the site calls keep the parameters
+ * the address it replaces carried — see `keptUrlOfHistoryWrite`.
+ *
+ * **This is what keeps the defaults on a reloaded diff.** GitHub rewrites the
+ * address of a diff without its query, and not once: after a reload of
+ * `/changes?show-viewed-files=false&w=1` it can write the bare path more than
+ * once. `restoreAddress` answers a write only after it has happened, and only
+ * once for each address, so the second write of the same bare path stood. A
+ * write amended as it is made leaves nothing to answer: the address never
+ * stops saying what the page shows, and there is no second write to fight
+ * over.
+ *
+ * Installed on the `history` object itself, before any of GitHub's scripts has
+ * run — `document_start` in the page's world — so that every write the site
+ * makes through it goes through this. The arguments are otherwise passed on as
+ * they came; the state object in particular is GitHub's router's, which keeps
+ * its place in the history there.
+ */
+const keepParamsOnHistoryWrites = (): void => {
+  for (const method of ['pushState', 'replaceState'] as const) {
+    const write = browserHistory[method].bind(browserHistory);
+
+    Object.defineProperty(mut_history, method, {
+      configurable: true,
+      writable: true,
+      value: (
+        data: unknown,
+        unused: string,
+        url?: Readonly<URL> | string | null,
+      ) => {
+        const kept =
+          url === undefined || url === null
+            ? undefined
+            : keptUrlOfHistoryWrite(
+                String(url),
+                browserLocation.href,
+                browserLocation.origin,
+              );
+
+        write(data, unused, kept ?? url);
+      },
+    });
+  }
+};
+
+/**
  * Writes the defaults back onto the address of a page already acted on, when
  * the site has taken them off, without loading anything.
+ *
+ * The fallback behind `keepParamsOnHistoryWrites`, for an address that lost
+ * them some other way.
  *
  * GitHub takes them off a diff it has already applied them to — to normalize
  * its address, and to point at the first file not yet marked viewed, as

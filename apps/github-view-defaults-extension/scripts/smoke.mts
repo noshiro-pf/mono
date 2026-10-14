@@ -366,24 +366,33 @@ const main = async (): Promise<void> => {
     // `show-viewed-files` from its own address and keeps mutating the DOM.
     await visit(`${origin}/stripped/mono/pull/1/files`);
 
-    check(
-      'the site gets its address back',
-      await settleUntil((url) => !url.includes('show-viewed-files')),
-      `${origin}/stripped/mono/pull/1/files?w=1`,
-    );
-
     // Long enough for a dozen of the fixture's rewrites. A loop shows up here
     // as a count of page loads that keeps climbing: the address the extension
     // asked for, taken off again, asked for again.
     await page.waitForTimeout(loopWatchMs);
 
-    // The extension writes the parameter back once, in place, and the fixture
-    // takes it off again, to the same address. That second time is the site
-    // insisting, and it is left there rather than fought over.
+    // Every one of those rewrites names the same address without the
+    // parameter — what GitHub does to a reloaded diff — and every one is
+    // amended as it is made, so the address never loses it, and nothing is
+    // loaded again to put it back.
     check(
-      'and the defaults are neither loaded again nor fought over',
+      'the site keeps the defaults through every rewrite, with no load',
       `${String(mut_documentLoads.length)} page loads, at ${page.url()}`,
-      `2 page loads, at ${origin}/stripped/mono/pull/1/files?w=1`,
+      `2 page loads, at ${origin}/stripped/mono/pull/1/files?w=1&show-viewed-files=false`,
+    );
+
+    // The reload itself: the address it reloads is the one with both
+    // defaults, so it is one load and no redirect.
+    mut_documentLoads.length = 0;
+
+    await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+
+    await page.waitForTimeout(loopWatchMs);
+
+    check(
+      'and a reload keeps them too',
+      `${String(mut_documentLoads.length)} page load, at ${page.url()}`,
+      `1 page load, at ${origin}/stripped/mono/pull/1/files?w=1&show-viewed-files=false`,
     );
 
     console.log('the address bar the site sends to a file');
