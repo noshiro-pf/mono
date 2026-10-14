@@ -28,8 +28,6 @@ export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
 
   const layout = layoutSignals.layout.value;
 
-  const moving = layoutSignals.moving.value;
-
   const style = useMemo(
     () =>
       layout.columns === 2
@@ -45,16 +43,13 @@ export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
       className={'block-layout'}
       data-columns={layout.columns}
       data-mode={layout.mode}
-      data-moving={moving !== undefined}
       style={style}
     >
       <BlockColumn
         blocks={blocks}
-        column={0}
         heights={layout.heights}
         ids={layout.left}
         mode={layout.mode}
-        moving={moving}
         shares={layout.shares}
       />
 
@@ -64,11 +59,9 @@ export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
 
           <BlockColumn
             blocks={blocks}
-            column={1}
             heights={layout.heights}
             ids={layout.right}
             mode={layout.mode}
-            moving={moving}
             shares={layout.shares}
           />
         </>

@@ -175,7 +175,6 @@ export const issuesViewSignals = {
 export const layoutSignals = {
   layout: toSignal(layoutStore.layout),
   mode: toSignal(layoutStore.mode),
-  moving: toSignal(layoutStore.moving),
   settingsOpen: toSignal(layoutStore.settingsOpen),
 } as const;
 
