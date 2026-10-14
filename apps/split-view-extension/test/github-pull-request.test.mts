@@ -223,6 +223,7 @@ describe('asGitHubMessage', () => {
         title: 'Fix the thing',
         issueUrl: 'https://github.com/noshiro-pf/mono/issues/2079',
         active: false,
+        closeOpener: false,
         extra: true,
       }),
       {
@@ -232,6 +233,7 @@ describe('asGitHubMessage', () => {
         title: 'Fix the thing',
         issueUrl: 'https://github.com/noshiro-pf/mono/issues/2079',
         active: false,
+        closeOpener: false,
       },
     );
   });
@@ -243,6 +245,7 @@ describe('asGitHubMessage', () => {
         kind: 'open',
         url: 'https://github.com/noshiro-pf/mono/pull/2085',
         active: true,
+        closeOpener: true,
       }),
       {
         tag: githubMessageTag,
@@ -251,6 +254,7 @@ describe('asGitHubMessage', () => {
         title: undefined,
         issueUrl: undefined,
         active: true,
+        closeOpener: true,
       },
     );
   });
@@ -274,10 +278,31 @@ describe('asGitHubMessage', () => {
     for (const value of [
       undefined,
       'open',
-      { tag: 'other', kind: 'open', url: 'x', active: true },
-      { tag: githubMessageTag, kind: 'open', url: 1, active: true },
-      { tag: githubMessageTag, kind: 'open', url: 'x' },
-      { tag: githubMessageTag, kind: 'open', url: 'x', active: true, title: 1 },
+      { tag: 'other', kind: 'open', url: 'x', active: true, closeOpener: true },
+      {
+        tag: githubMessageTag,
+        kind: 'open',
+        url: 1,
+        active: true,
+        closeOpener: true,
+      },
+      { tag: githubMessageTag, kind: 'open', url: 'x', closeOpener: true },
+      { tag: githubMessageTag, kind: 'open', url: 'x', active: true },
+      {
+        tag: githubMessageTag,
+        kind: 'open',
+        url: 'x',
+        active: true,
+        closeOpener: 1,
+      },
+      {
+        tag: githubMessageTag,
+        kind: 'open',
+        url: 'x',
+        active: true,
+        closeOpener: true,
+        title: 1,
+      },
       { tag: githubMessageTag, kind: 'close', url: 'x' },
     ]) {
       assert.isUndefined(asGitHubMessage(value));
