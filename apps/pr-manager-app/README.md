@@ -132,16 +132,16 @@ button, arranges them:
 - **The order**, and which column each block is in, with the dialog's
   buttons alone: an order set once and seldom changed is not worth a drag
   surface on every block.
-- **A height of its own.** A block's bottom edge is dragged to give it one,
-  and it then scrolls by itself; a double click there gives the natural
-  height back.
+- **A height of its own.** The line under a block, drawn as the one between
+  the columns is, is dragged to give it one, and it then scrolls by itself; a
+  double click there gives the natural height back.
 - **Or fill the window.** The page is then as tall as the window and never
   scrolls: what the header leaves is shared out among each column's blocks,
-  and only a block scrolls, inside itself. A block's bottom edge is the line
-  between it and the block below, dragged to move height from one to the
-  other and double-clicked to even them; the dialog shows each block's part
-  of its column and changes it with buttons. The heights given in the other
-  mode are kept for the way back.
+  and only a block scrolls, inside itself. The line between a block and the
+  one below is dragged to move height from one to the other and
+  double-clicked to even them, and the last block of a column reaches its end;
+  the dialog shows each block's part of its column and changes it with
+  buttons. The heights given in the other mode are kept for the way back.
 
 Everything the pointer does on the page can be done in the Layout dialog with
 a keyboard, which is why the drag surfaces themselves are pointer-only. The

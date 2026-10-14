@@ -14,8 +14,8 @@ type Props = Readonly<{
   /** Present in the `fill` mode only, and then always. */
   share: number | undefined;
   /**
-   * In the `fill` mode, the block under this one, whose height its bottom
-   * edge shares; absent for the last of a column, whose edge does nothing.
+   * In the `fill` mode, the block under this one, whose height the line
+   * between them shares; absent for the last of a column, which has none.
    */
   next: BlockId | undefined;
   /** The share of {@link Props.next}. */
@@ -24,17 +24,19 @@ type Props = Readonly<{
 }>;
 
 /**
- * One block: what it holds, and a bottom edge to drag its height by (a double
- * click there gives the natural height back). In the `fill` mode the edge is
- * the line between this block and the next, and moves height from one to the
- * other (a double click evens the two). Where a block goes is the Layout
- * dialog's: an order set once and seldom changed has no need of a drag.
+ * One block: what it holds, and the line under it to drag its height by (a
+ * double click there gives the natural height back), drawn as the line
+ * between two columns is. In the `fill` mode the line is the one between this
+ * block and the next, and moves height from one to the other (a double click
+ * evens the two); the last block of a column has none, and reaches the
+ * column's end. Where a block goes is the Layout dialog's: an order set once
+ * and seldom changed has no need of a drag.
  *
  * **Pointer events, not the HTML drag and drop API**, which draws its own
  * ghost image and does not work with touch. The pointer is captured where the
  * drag starts, so one that leaves the window still ends where it is released.
  *
- * The edge is pointer-only, and hidden from assistive technology for it: the
+ * The line is pointer-only, and hidden from assistive technology for it: the
  * layout settings change a block's height with buttons, which is the
  * keyboard's way to the same thing.
  */
@@ -47,7 +49,7 @@ export const LayoutBlock = memoNamed<Props>('LayoutBlock', (props) => {
   /** Only to measure the block, and find the next one, when the line moves. */
   const blockRef = useRef<HTMLDivElement>(null);
 
-  const onEdgeDown = useCallback<PointerEventHandler<HTMLDivElement>>(
+  const onDividerDown = useCallback<PointerEventHandler<HTMLDivElement>>(
     (pressed) => {
       if (pressed.button !== 0) {
         return;
@@ -107,7 +109,7 @@ export const LayoutBlock = memoNamed<Props>('LayoutBlock', (props) => {
     [id, share, next, nextShare],
   );
 
-  const onEdgeDoubleClick = useCallback((): void => {
+  const onDividerDoubleClick = useCallback((): void => {
     if (share === undefined) {
       layoutStore.setHeight(id, undefined);
     } else if (next !== undefined) {
@@ -126,7 +128,7 @@ export const LayoutBlock = memoNamed<Props>('LayoutBlock', (props) => {
   );
 
   // The last block of a column in the `fill` mode has nothing to share with.
-  const inertEdge = share !== undefined && next === undefined;
+  const divided = share === undefined || next !== undefined;
 
   return (
     <div
@@ -144,24 +146,22 @@ export const LayoutBlock = memoNamed<Props>('LayoutBlock', (props) => {
         {children}
       </div>
 
-      {inertEdge ? (
-        <div aria-hidden={'true'} className={'block-edge'} data-inert />
-      ) : (
+      {divided ? (
         <div
           aria-hidden={'true'}
-          className={'block-edge'}
+          className={'row-divider'}
           title={
             share === undefined
               ? 'Drag to set the height; double-click for the natural height'
               : 'Drag to share the height with the block below; double-click to even them'
           }
-          onDblClick={onEdgeDoubleClick}
-          onLostPointerCapture={onEdgeUp}
-          onPointerDown={onEdgeDown}
-          onPointerMove={onEdgeMove}
-          onPointerUp={onEdgeUp}
+          onDblClick={onDividerDoubleClick}
+          onLostPointerCapture={onDividerUp}
+          onPointerDown={onDividerDown}
+          onPointerMove={onDividerMove}
+          onPointerUp={onDividerUp}
         />
-      )}
+      ) : undefined}
     </div>
   );
 });
@@ -169,10 +169,10 @@ export const LayoutBlock = memoNamed<Props>('LayoutBlock', (props) => {
 // Outside the component, since none of them reads its props: one function
 // each serves every render, with no `useCallback` to keep it stable.
 
-const onEdgeMove: PointerEventHandler<HTMLDivElement> = (moved) => {
+const onDividerMove: PointerEventHandler<HTMLDivElement> = (moved) => {
   layoutStore.resizeTo(moved.clientY);
 };
 
-const onEdgeUp = (): void => {
+const onDividerUp = (): void => {
   layoutStore.endResize();
 };
