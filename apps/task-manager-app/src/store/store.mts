@@ -9,7 +9,7 @@
  */
 
 import { computed } from '@preact/signals';
-import { combine, map } from 'synstate';
+import { combine, map, skipIfNoChange } from 'synstate';
 import { toSignal } from 'synstate-preact-signals';
 import {
   fromEvent,
@@ -25,6 +25,7 @@ import {
   hiddenNodeIds,
   layoutWithElk,
   PLACEMENT_ANIMATION_MS,
+  sameNodeIds,
   toElkGraph,
   withoutNodes,
 } from '../dag/index.mjs';
@@ -139,8 +140,11 @@ export const dagShowDoneStore = createDagShowDoneStore({
 /** The nodes the graph screen leaves out (`dag/hidden-nodes.mts`). */
 const dagHiddenNodes = combine([
   dataStore.state,
+  clockStore.now,
   dagShowDoneStore.showDone,
-]).pipe(map(([state, showDone]) => hiddenNodeIds(state, showDone)));
+])
+  .pipe(map(([state, now, showDone]) => hiddenNodeIds(state, now, showDone)))
+  .pipe(skipIfNoChange(sameNodeIds));
 
 export const dagLayoutStore = createDagLayoutStore({
   state: dataStore.state,

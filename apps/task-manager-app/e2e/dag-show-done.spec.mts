@@ -60,7 +60,9 @@ test(
     await expect.soft(showDone).not.toBeChecked();
 
     // By its label, as a reader would: the switch's knob covers the box.
-    await page.getByText('完了済みのタスクを表示').click();
+    await page
+      .getByText('完了済みのタスク・到達済みのマイルストーンを表示')
+      .click();
 
     await expect.soft(showDone).toBeChecked();
 
