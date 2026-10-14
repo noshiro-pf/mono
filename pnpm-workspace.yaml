@@ -4,7 +4,7 @@
 # Only devDependencies use the catalog: a published package's dependencies and
 # peerDependencies are its own API surface, so their ranges stay literal.
 catalog:
-  '@playwright/test': 1.63.0
+  '@playwright/test': 1.64.0
   '@preact/signals': 2.11.3
   '@reduxjs/toolkit': 2.13.0
   '@testing-library/dom': 10.4.2
@@ -13,9 +13,9 @@ catalog:
   '@types/node': 26.6.4
   '@types/react': 19.3.0
   '@types/react-dom': 19.3.0
-  '@typescript-eslint/parser': 8.71.0
-  '@typescript-eslint/rule-tester': 8.71.0
-  '@vitejs/plugin-react': 6.1.1
+  '@typescript-eslint/parser': 8.71.1
+  '@typescript-eslint/rule-tester': 8.71.1
+  '@vitejs/plugin-react': 6.1.2
   '@vitest/browser-playwright': 5.0.3
   '@vitest/coverage-v8': 5.0.3
   '@vitest/ui': 5.0.3
@@ -31,10 +31,10 @@ catalog:
   markdownlint-cli2: 0.23.3
   mobx: 7.0.6
   npm-run-all2: 9.0.3
-  oxfmt: 0.71.0
-  oxlint: 1.86.0
+  oxfmt: 0.72.0
+  oxlint: 1.87.0
   oxlint-tsgolint: 7.0.2003
-  playwright: 1.63.0
+  playwright: 1.64.0
   preact: 10.29.8
   prettier: 3.9.9
   prettier-plugin-organize-imports: 4.3.0
@@ -47,7 +47,7 @@ catalog:
   typedoc-github-theme: 0.4.0
   typescript: 6.0.3
   valtio: 2.3.2
-  vite: 8.3.2
+  vite: 8.3.3
   vitest: 5.0.3
   zustand: 5.0.15
 

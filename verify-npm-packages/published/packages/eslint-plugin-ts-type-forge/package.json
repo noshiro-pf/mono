@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "eslint": ">=9.0.0",
-    "eslint-plugin-ts-type-forge": "0.8.5",
+    "eslint-plugin-ts-type-forge": "0.8.6",
     "typescript": ">=5.0.0"
   }
 }

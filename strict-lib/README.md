@@ -156,7 +156,7 @@ through your linter if it is type-aware: it may be on a different TypeScript.
   the range it was generated for, and mixing them does not work — the lib
   files reference each other by names that come and go between minors, so
   `strict-ts-lib-v5.6` under TypeScript 6 fails with `TS2727: Cannot find lib
-definition for 'es2022.sharedmemory'`. The one exception is
+  definition for 'es2022.sharedmemory'`. The one exception is
   `strict-ts-lib-v7.0`, whose range also covers TypeScript 6 — through the
   linker, since TypeScript 6 ignores `paths`.
 - **`<5.0`** — Not supported.
