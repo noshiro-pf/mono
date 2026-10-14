@@ -123,6 +123,60 @@ export const restoredUrlOfPage = (
 };
 
 /**
+ * The address a write the page makes to its own history should carry instead
+ * of `written`, or `undefined` when `written` can stand.
+ *
+ * This is asked of every `history.pushState` and `history.replaceState` the
+ * site makes, before the write happens. GitHub writes the address of a diff
+ * over and over while it is open — when it normalizes the parameters off, when
+ * it jumps to the first file not yet viewed, when it moves the fragment along
+ * with the scroll — and each write drops the query. Answering each one after
+ * the fact is a tug of war over the address bar; answering it in the write
+ * itself is not, because the address never says anything else.
+ *
+ * Only a write that keeps the page — same origin, same path — is amended, and
+ * only with what the address it replaces already carried: a parameter the
+ * current address has and `written` does not is put back with the value it had.
+ * So `w=0` chosen with GitHub's own control is kept as `w=0`, a parameter the
+ * address never had is not added — that is the redirect's job, which loads the
+ * page with it — and a navigation to another page is left exactly as written.
+ */
+export const keptUrlOfHistoryWrite = (
+  written: string,
+  currentHref: string,
+  pageOrigin: string,
+): string | undefined => {
+  const current = managedPageOf(currentHref, pageOrigin);
+
+  if (current === undefined) {
+    return undefined;
+  }
+
+  const next = parseUrl(written, currentHref);
+
+  if (
+    next?.origin !== current.url.origin ||
+    next.pathname !== current.url.pathname
+  ) {
+    return undefined;
+  }
+
+  const currentParams = new URLSearchParams(current.url.search);
+
+  const nextParams = new URLSearchParams(next.search);
+
+  // In the order the current address has them, so that it reads afterwards
+  // exactly as it did before.
+  const carried = Array.from(currentParams).filter(
+    ([key]) => current.rule.keptParams.includes(key) && !nextParams.has(key),
+  );
+
+  return !Arr.isNonEmpty(carried)
+    ? undefined
+    : `${next.origin}${next.pathname}${searchWithAll(next.search, carried)}${next.hash}`;
+};
+
+/**
  * What a link on the page at `pageHref` should point at, or `undefined` when it
  * already points there.
  *
@@ -206,6 +260,12 @@ type PageRule = Readonly<{
   path: RegExp;
 
   /**
+   * The query parameters a write to the history of this page must not drop.
+   * See `keptUrlOfHistoryWrite`.
+   */
+  keptParams: readonly string[];
+
+  /**
    * What the address should be, or `undefined` when it is already right.
    *
    * `readFrom` is the page an anchor carrying this address sits on, and
@@ -256,6 +316,8 @@ const pageRules: readonly PageRule[] = [
   {
     path: pullRequestDiffPath,
 
+    keptParams: diffViewDefaults.map(([key]) => key),
+
     preferredUrl: (url) => {
       const missing = missingDefaultsIn(url.search);
 
@@ -282,6 +344,8 @@ const pageRules: readonly PageRule[] = [
 
   {
     path: branchesPath,
+
+    keptParams: [overviewParam[0]],
 
     preferredUrl: (url, readFrom) => {
       if (!branchesOverviewPath.test(url.pathname)) {
@@ -375,12 +439,15 @@ const isTabOfSameBranchesPage = (
  * `href` parsed into the parts a rule reads, or `undefined` for one the URL
  * parser rejects: an attribute can hold anything, and a scan that gave up on
  * the first odd one would leave every later anchor on the page unpatched.
+ *
+ * `base` resolves a relative `href`, as the address a history write names
+ * usually is.
  */
-const parseUrl = (href: string): PageUrl | undefined => {
+const parseUrl = (href: string, base?: string): PageUrl | undefined => {
   try {
     // Named rather than destructured: `origin` on its own shadows the browser
     // global of that name, which the lint rules will not have.
-    const url = new URL(href);
+    const url = new URL(href, base);
 
     return {
       origin: url.origin,
@@ -400,15 +467,19 @@ const parseUrl = (href: string): PageUrl | undefined => {
  * its own: re-serializing through `URLSearchParams` would rewrite escapes
  * GitHub wrote, turning a `%20` into a `+`.
  */
-const searchWith = (
+const searchWith = (search: string, param: readonly [string, string]): string =>
+  searchWithAll(search, [param]);
+
+/** `searchWith`, for several parameters at once. */
+const searchWithAll = (
   search: string,
-  [key, value]: readonly [string, string],
+  params: readonly (readonly [string, string])[],
 ): string => {
-  const params = new URLSearchParams([[key, value]]);
+  const added = new URLSearchParams(params.map(([key, value]) => [key, value]));
 
-  const added = params.toString();
-
-  return search === '' ? `?${added}` : `${search}&${added}`;
+  return search === ''
+    ? `?${added.toString()}`
+    : `${search}&${added.toString()}`;
 };
 
 /** Which of the defaults a query string does not already speak for. */
