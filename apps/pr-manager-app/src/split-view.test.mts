@@ -91,7 +91,7 @@ describe(splitViewUrl, () => {
     ]);
   });
 
-  test('puts the session beside the conversation stacked over the issue', () => {
+  test('puts the issue beside the conversation stacked over the session', () => {
     const params = paramsOf(
       splitViewUrl({
         ...pullRequest,
@@ -104,9 +104,9 @@ describe(splitViewUrl, () => {
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,
-      'https://claude.ai/code/session_01First',
-      pullRequestUrl,
       'https://github.com/noshiro-pf/mono/issues/1880',
+      pullRequestUrl,
+      'https://claude.ai/code/session_01First',
     ]);
   });
 
@@ -127,7 +127,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    assert.deepStrictEqual(all.getAll('zoom'), ['1', '1', '0.75', '0.75']);
+    assert.deepStrictEqual(all.getAll('zoom'), ['1', '0.75', '0.75', '1']);
 
     const sessionOnly = paramsOf(
       splitViewUrl({
