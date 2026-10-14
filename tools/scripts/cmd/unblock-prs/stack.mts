@@ -43,16 +43,15 @@
  * branch — so one is reported rather than picked, and merged by hand.
  */
 
-import { findStackParents } from 'pr-report-core';
+import { findStackParents, type QueueOwner } from 'pr-report-core';
 import { isMergeQueued, isSkipCiLabelled, wantsAutoRebase } from './labels.mjs';
-import { skipStillApplies } from './skips.mjs';
 import type {
   BaseChange,
+  BranchOf,
   Classification,
   NativeStackEntry,
   PullRequest,
   RetargetedLayer,
-  SkipRecord,
   StackedOn,
   TriageContext,
 } from './types.mjs';
@@ -110,7 +109,7 @@ export const nativeStackNote = (
  * `undefined` when it can. A fork's branch is not this repository's to push
  * to, whatever its name.
  */
-export const restackable = (pr: PullRequest): string | undefined =>
+export const restackable = (pr: BranchOf): string | undefined =>
   pr.state !== 'OPEN'
     ? (`it is ${pr.state}` as const)
     : pr.isCrossRepository
@@ -125,38 +124,30 @@ export const restackable = (pr: PullRequest): string | undefined =>
  * (`wantsAutoRebase`) and is paused by `skip-ci`, so the push costs no
  * matrix. Whether it is actually behind is for the caller to ask
  * git: `skip-ci` leaves the merge state at `BLOCKED` whatever the branch is.
- * The version pull request is the release workflow's, and one this script
- * already gave up on stays given up on until its head or the base moves. One
- * a session has claimed is left to that session (`claims.mts`).
+ * The version pull request is the release workflow's. Only the worker's own
+ * are moved (`owner.mts`): one set aside or claimed is a skill's or a
+ * person's until its comment is resolved or the claim ends.
  */
 export const autoRebaseTargets = (
   pullRequests: readonly PullRequest[],
   defaultBranch: string,
   {
-    baseSha,
-    skipped,
-    claimed,
+    owners,
   }: Readonly<{
-    baseSha: string;
-    skipped: ReadonlyMap<number, SkipRecord>;
-    /** What a session has claimed (`claims.mts`). */
-    claimed: ReadonlySet<number>;
+    /** Who moves each queued pull request next (`owner.mts`). */
+    owners: ReadonlyMap<number, QueueOwner>;
   }>,
 ): readonly PullRequest[] =>
-  pullRequests.filter((pr) => {
-    const skip = skipped.get(pr.number);
-
-    return (
+  pullRequests.filter(
+    (pr) =>
       pr.baseRefName === defaultBranch &&
       !pr.isDraft &&
       wantsAutoRebase(pr) &&
       isSkipCiLabelled(pr) &&
       !isVersionPullRequest(pr, defaultBranch) &&
       restackable(pr) === undefined &&
-      (skip === undefined || !skipStillApplies(skip, pr, baseSha)) &&
-      !claimed.has(pr.number)
-    );
-  });
+      owners.get(pr.number)?.owner === 'worker',
+  );
 
 /** Which open pull request each stacked one is on: child → parent. */
 export const stackParentsOf = (

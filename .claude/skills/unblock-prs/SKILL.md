@@ -1,6 +1,6 @@
 ---
 name: unblock-prs
-description: Fix the pull requests `pnpm run unblock-prs` set aside — a failing check on a queued one, a rebase that conflicted on a queued or `auto-rebase` one — one at a time, claimed first and pushed under `skip-ci`, and leave every rebase, release, watch and merge to that script. Use when asked to unblock the open PRs, fix what the merge queue set aside, fix a failing check on a queued PR, or resolve a conflict the script could not; run it under `/loop` beside the script.
+description: Fix the queued pull requests whose owner is this skill — set aside by `pnpm run unblock-prs` for a failing check or a rebase that conflicted — one at a time, claimed first and pushed with the worker's own push, and file an issue for any whose owner is nobody; leave every other rebase, release, watch and merge to that script. Use when asked to unblock the open PRs, fix what the merge queue set aside, fix a failing check on a queued PR, or resolve a conflict the script could not; run it under `/loop` beside the script.
 ---
 
 # Fix what the merge queue set aside
@@ -14,51 +14,68 @@ with one it **sets it aside** and says why in a comment on it. **This skill
 fixes those pull requests and does nothing else**, so that the two never do
 the same thing.
 
-**Never**, because each is the worker's or nobody's:
+**Every queued pull request has exactly one owner**, and every tool reads it
+from one function — `apps/pr-report-core/src/queue-owner.mts`, through
+`tools/scripts/cmd/pr-report/queue.mts` here and through
+`tools/scripts/cmd/unblock-prs/owner.mts` in the worker — so the two cannot
+disagree about whose a pull request is:
 
-- rebase a pull request that is not set aside, call `update-branch`, take
-  `skip-ci` off, put `skip-ci` on any pull request but the one being pushed,
-  or watch CI;
+| `owner`  | who moves it next                                                    |
+| :------- | :------------------------------------------------------------------- |
+| `worker` | the worker: in the queue, waiting its turn, or stacked               |
+| `skill`  | a skill (`owner.skill`): set aside `rebase-failed` / `checks-failed` |
+| `human`  | a person: a draft, a bypass merge, a setting or permission, a cycle  |
+| `none`   | nobody — a bug in the queue's tooling, filed as an issue (step 1)    |
+
+The set-aside comment is the hand-off, not the tip of `main`: it stays the
+skill's until the worker rewrites it as resolved, so a stopped worker leaves
+it here rather than nowhere.
+
+**Never**, because each is the worker's or a person's:
+
+- act on a pull request whose `owner` is not `skill` with `skill:
+unblock-prs`; call `update-branch`, take `skip-ci` off, put `skip-ci` on any
+  pull request but the one being pushed, or watch CI;
 - merge, arm or disarm auto-merge, approve, or tick the "Retry" box in a
   set-aside comment;
+- push with `git push`: `pnpm run push-fixed-pr` is the worker's own push and
+  restack (step 4);
 - run `gh` (`CLAUDE.md`, "Session rules"). Everything below is
-  `pnpm run pr-report`, `pnpm run claim-pr`, git, or the REST API as
+  `pnpm run pr-report`, `claim-pr`, `push-fixed-pr`, `report-unowned-prs`,
+  git in a worktree, or the REST API as
   `.claude/skills/references/github-api.md` describes.
 
 Invoking this skill is the explicit instruction `CLAUDE.md` asks for before
-pushing: to the branch of a pull request this run has claimed, with
-`--force-with-lease`, and to the layers stacked on it. Nothing else.
+pushing: to the branch of a pull request this run has claimed, through
+`push-fixed-pr`, which carries the layers stacked on it along. Nothing else.
 
 ## 1. Survey
 
 ```bash
+pnpm run report-unowned-prs
 pnpm run pr-report -- --format json
 ```
 
-Each entry in `entries` carries `setAside` and `claim` when the worker's
-account has written them (the token has to be that account; without one both
-are absent and there is nothing to do). A pull request is this skill's when:
+`report-unowned-prs` files an issue for each queued pull request whose owner
+is `none`, once per pull request, and says which it filed or had filed
+already. Name them in the report; do not fix the pull request by hand, since
+what to do with it is what the issue asks.
 
-- `setAside.applies` is true — standing, at the current head and `main`, and
-  no retry asked for — and `setAside.says.setAside.reason` is
-    - `checks-failed` on one labelled `merge-queued`, or
-    - `rebase-failed` on one labelled `merge-queued`, or labelled
-      `auto-rebase` and `skip-ci`;
-- `claim.applies` is not true, unless `claim.says.claim.by` is this run's
-  claimant;
-- and it is none of these: `chore/pnpm-update` (`pnpm-update-ci` fixes that
-  one, and `pnpm-update.yml` rebuilds it), `changeset-release/main`
-  (`release.yml` rebuilds it), a draft, a fork's branch (`fromFork`), or a
-  layer of a stack (`stackedOn` set — its turn comes after the layer below).
+Each entry in `entries` of the report carries `owner` when the token is the
+worker's account (without one it is absent and there is nothing to do; a
+missing `owner` on one entry means its comments could not be read). This
+skill's pull requests are those whose `owner.owner` is `skill` and
+`owner.skill` is `unblock-prs`, and whose `claim` is not someone else's
+standing claim (`claim.applies` and `claim.says.claim.by` another claimant).
+`setAside.says.setAside.reason` says what to do with it: `rebase-failed` or
+`checks-failed`.
 
 Take them `priority:high` first and `priority:low` last (both at once count
 as neither), and the lowest number first within each. When there are none,
 end without a report.
 
-A pull request set aside for any other reason (`not-merging`, `arm-failed`,
-`unlabel-failed`, `push-failed`, `watch-timeout`, `already-in-base`,
-`awaiting-bypass`) is something to name in the report, not to fix: what holds
-it is a setting, a permission or a review, and the comment says which.
+Those whose `owner.owner` is `human` are something to name in the report,
+with `owner.reason`, not to fix.
 
 ## 2. Claim it
 
@@ -67,8 +84,8 @@ pnpm run claim-pr -- <number> --by <claimant>
 ```
 
 `<claimant>` is this session's URL when you know it, otherwise one word made
-up once for this run; the same one throughout. A refusal means someone else
-holds it, or the worker is about to act on it: take the next one.
+up once for this run; the same one throughout. It is refused unless the
+owner is a skill and no one else holds it: take the next one.
 
 The claim (`apps/pr-report-core/src/claim.mts`) is what keeps the worker from
 retrying the pull request while you work — it would when `main` moves or the
@@ -79,8 +96,7 @@ when you give up without pushing.
 
 ## 3. Fix it, in a throwaway worktree
 
-Note the pull request's `headSha`. Work in a worktree of your own, never the
-checkout you were started in:
+Work in a worktree of your own, never the checkout you were started in:
 
 ```bash
 git fetch origin main <branch>
@@ -100,18 +116,17 @@ what conflicts, and leave the pull request.
   check" below), amend it onto the branch's one commit, and run
   `pnpm run fmt`.
 
-## 4. Push it under `skip-ci`
+## 4. Push it with `push-fixed-pr`
 
-1. If the pull request has no `skip-ci`, put it on first
-   (`POST /repos/noshiro-pf/mono/issues/<number>/labels`). One set aside
-   `checks-failed` usually has it off, and a push without it would start a
-   full matrix beside the one the worker is running.
-2. `git push --force-with-lease="<branch>:<headSha>" origin "HEAD:<branch>"`.
-3. Carry the layers stacked on it along, lowest first — the entries whose
-   `stackedOn` is this pull request, then theirs: in a worktree of each,
-   `git rebase --onto <new head> <its parent's old head>`, then push leased
-   against its own old head. A layer that does not contain its parent's old
-   head is not yours to guess at: report it.
+```bash
+pnpm run push-fixed-pr -- <number> --by <claimant> --head "$(git -C <dir> rev-parse HEAD)"
+```
+
+It is the worker's own code (`pushLeased` and `restack` in
+`tools/scripts/cmd/unblock-prs/rebase.mts`): it refuses unless the owner is a
+skill and the claim is yours, puts `skip-ci` on first when it is off, pushes
+leased against the claimed head, and carries the layers stacked on it along,
+lowest first, logging any it cannot move.
 
 **A refused push** means someone moved the branch. Release the claim, throw
 the work away, and survey again; do not push again against a fresh lease.
@@ -126,9 +141,9 @@ again and comes back here.
 
 Remove the worktree, and go back to step 1 for the next one. At the end, one
 line per pull request: what was done (conflict resolved and pushed / failure
-fixed and pushed / left, and why), and the set-aside ones that are not this
-skill's, with their reason. Do not say a pushed fix works: the worker's run
-of the checks says that.
+fixed and pushed / left, and why), the `human` ones with their reason, and
+the issues `report-unowned-prs` filed or found. Do not say a pushed fix
+works: the worker's run of the checks says that.
 
 ## Running it all the time
 

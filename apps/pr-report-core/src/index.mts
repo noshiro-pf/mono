@@ -5,6 +5,7 @@ export * from './code-owners.mjs';
 export * from './labels.mjs';
 export * from './merge-after.mjs';
 export * from './queue-comments.mjs';
+export * from './queue-owner.mjs';
 export * from './report.mjs';
 export * from './ruleset.mjs';
 export * from './set-aside.mjs';

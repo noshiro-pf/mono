@@ -4,8 +4,10 @@
 
 import type {
   Claim,
+  QueueOwner,
   RulesetRequirements,
   SetAsideComment,
+  SetAsideReason,
 } from 'pr-report-core';
 import * as t from 'ts-fortress';
 import type { StrictPick } from 'ts-type-forge';
@@ -37,19 +39,26 @@ export type PullRequest = t.TypeOf<typeof PullRequestSchema>;
 
 export const PullRequestListSchema = t.array(PullRequestSchema);
 
-export const SKIP_REASONS = [
-  'already-in-base',
-  'arm-failed',
-  'awaiting-bypass',
-  'checks-failed',
-  'not-merging',
-  'push-failed',
-  'rebase-failed',
-  'unlabel-failed',
-  'watch-timeout',
-] as const;
+/**
+ * What moving a branch reads of its pull request, which `push-fixed-pr` fills
+ * in from the REST API rather than from `gh`.
+ */
+export type BranchOf = StrictPick<
+  PullRequest,
+  | 'baseRefName'
+  | 'headRefName'
+  | 'headRefOid'
+  | 'isCrossRepository'
+  | 'number'
+  | 'state'
+>;
 
-export type SkipReason = (typeof SKIP_REASONS)[number];
+/**
+ * Why a pull request was set aside: `pr-report-core`'s list, where each
+ * reason is given its owner (`queue-owner.mts`), so that a reason this
+ * script writes is one every reader knows.
+ */
+export type SkipReason = SetAsideReason;
 
 /**
  * Why a pull request is being left alone, and the state it was in at the
@@ -158,6 +167,8 @@ export type TriageContext = TriageBase &
      * version pull request for as long as they are open.
      */
     releaseBlockers: readonly PullRequest[];
+    /** Who moves each queued pull request next (`owner.mts`). */
+    owners: ReadonlyMap<number, QueueOwner>;
   }>;
 
 /** What one survey says about one pull request. */
@@ -210,6 +221,11 @@ export type Triage = Readonly<{
   notes: readonly string[];
   /** The `Merge-After` cycles, each starting at its lowest number. */
   cycles: readonly (readonly number[])[];
+  /**
+   * Who moves each queued pull request next (`owner.mts`), the same answer
+   * `pr-report` gives the skill. "3a" moves only the worker's.
+   */
+  owners: ReadonlyMap<number, QueueOwner>;
 }>;
 
 /**

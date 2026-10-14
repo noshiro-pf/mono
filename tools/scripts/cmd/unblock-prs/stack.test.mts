@@ -1,5 +1,7 @@
 // cspell:ignore retarget retargeted
 
+import type { Claim } from 'pr-report-core';
+import { ownerOf } from './owner.mjs';
 import {
   autoRebaseTargets,
   nativeStackNote,
@@ -16,6 +18,8 @@ import type {
   SkipRecord,
   TriageContext,
 } from './types.mjs';
+
+const NOW = Temporal.Instant.from('2026-10-15T00:30:00Z').epochMilliseconds;
 
 const pullRequest = (
   fields: Partial<PullRequest> & Readonly<{ number: number }>,
@@ -45,6 +49,7 @@ const context = (
     baseSha: 'b'.repeat(40),
     skipped: new Map(),
     claimed: new Map(),
+    owners: new Map(),
     demoted: new Map(),
     requiredContexts: [],
     reviewRequirements: {
@@ -308,12 +313,23 @@ const labelled = (...names: readonly string[]): PullRequest['labels'] =>
 const targets = (
   pullRequests: readonly PullRequest[],
   skipped: ReadonlyMap<number, SkipRecord> = new Map(),
-  claimed: ReadonlySet<number> = new Set(),
+  claimed: ReadonlyMap<number, Claim> = new Map(),
 ): readonly number[] =>
   autoRebaseTargets(pullRequests, 'main', {
-    baseSha: 'b'.repeat(40),
-    skipped,
-    claimed,
+    owners: new Map(
+      pullRequests.flatMap((pr) => {
+        const owner = ownerOf(pr, {
+          defaultBranch: 'main',
+          skipped,
+          claimed,
+          stackParents: new Map(),
+          cyclic: new Set(),
+          nowEpochMs: NOW,
+        });
+
+        return owner === undefined ? [] : [[pr.number, owner] as const];
+      }),
+    ),
   }).map((pr) => pr.number);
 
 describe(autoRebaseTargets, () => {
@@ -372,7 +388,7 @@ describe(autoRebaseTargets, () => {
     );
   });
 
-  test('leaves one this script gave up on at this head and base', () => {
+  test('leaves one set aside at its head, whatever the base', () => {
     const given = pullRequest({
       number: 1,
       labels: labelled('skip-ci', 'auto-rebase'),
@@ -412,7 +428,16 @@ describe(autoRebaseTargets, () => {
           }),
         ],
         new Map(),
-        new Set([1]),
+        new Map([
+          [
+            1,
+            {
+              headSha: pullRequest({ number: 1 }).headRefOid,
+              by: 'unblock-wren',
+              at: '2026-10-15T00:00:00Z',
+            },
+          ],
+        ]),
       ),
       [2],
     );

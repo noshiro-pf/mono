@@ -1,5 +1,5 @@
 import type { SetAside } from 'pr-report-core';
-import { newSkips, settleSkips, withSkip } from './skips.mjs';
+import { newSkips, settleSkips, unannouncedSkips, withSkip } from './skips.mjs';
 import type {
   OwnSetAsideComment,
   PullRequest,
@@ -38,6 +38,52 @@ describe(newSkips, () => {
         changed,
       ]);
     }
+  });
+});
+
+describe(unannouncedSkips, () => {
+  const none: SkipRecords = new Map();
+
+  const record = skip({ headSha: HEAD, baseSha: BASE });
+
+  test('names a record whose comment was never written, or says otherwise', () => {
+    // The worker holds it aside while the comment the skill reads does not:
+    // each would leave it to the other until the comment is written.
+    assert.deepStrictEqual(
+      unannouncedSkips(withSkip(none, record), comments()),
+      [record],
+    );
+
+    assert.deepStrictEqual(
+      unannouncedSkips(
+        withSkip(none, record),
+        comments([7, { databaseId: 0, says: { kind: 'resolved' } }]),
+      ),
+      [record],
+    );
+
+    assert.deepStrictEqual(
+      unannouncedSkips(
+        withSkip(none, record),
+        comments([
+          7,
+          standingComment({
+            setAside: { ...SET_ASIDE, reason: 'checks-failed' },
+          }),
+        ]),
+      ),
+      [record],
+    );
+  });
+
+  test('passes over a record its comment says', () => {
+    assert.deepStrictEqual(
+      unannouncedSkips(
+        withSkip(none, record),
+        comments([7, standingComment()]),
+      ),
+      [],
+    );
   });
 });
 

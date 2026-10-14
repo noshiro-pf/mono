@@ -4,18 +4,17 @@
  */
 
 import {
+  isSetAsideReason,
   setAsideApplies,
   setAsideStillApplies,
   type SetAside,
 } from 'pr-report-core';
 import type { ResolvedBy } from './set-aside-comment.mjs';
-import {
-  SKIP_REASONS,
-  type OwnSetAsideComment,
-  type PullRequest,
-  type SkipReason,
-  type SkipRecord,
-  type SkipRecords,
+import type {
+  OwnSetAsideComment,
+  PullRequest,
+  SkipRecord,
+  SkipRecords,
 } from './types.mjs';
 
 /**
@@ -93,6 +92,26 @@ export const newSkips = (
   });
 
 /**
+ * The records no comment says: never written, because the write failed, or
+ * written over since. Until it is written the worker holds the pull request
+ * aside while every other reader of the queue (`owner.mts`) reads it as the
+ * worker's, and each leaves it to the other; so the loop writes these again.
+ */
+export const unannouncedSkips = (
+  skipped: SkipRecords,
+  comments: ReadonlyMap<number, OwnSetAsideComment>,
+): readonly SkipRecord[] =>
+  Array.from(skipped.values()).filter((skip) => {
+    const says = comments.get(skip.number)?.says;
+
+    return (
+      says?.kind !== 'standing' ||
+      says.setAside.headSha !== skip.headSha ||
+      says.setAside.reason !== skip.reason
+    );
+  });
+
+/**
  * What this account's set-aside comments on the open pull requests say, laid
  * over the records: the comments to rewrite as resolved, and the records to
  * act from.
@@ -149,7 +168,7 @@ export const settleSkips = (
   const taken = judged.flatMap(({ number, setAside, resolvedBy }) =>
     resolvedBy === undefined &&
     !skipped.has(number) &&
-    isSkipReason(setAside.reason)
+    isSetAsideReason(setAside.reason)
       ? [
           {
             number,
@@ -185,8 +204,3 @@ export type Resolution = Readonly<{
 
 /** What the log says about a record taken up from a comment. */
 const TAKEN_UP_DETAIL = 'set aside by an earlier run, as its comment says';
-
-const isSkipReason = (reason: string): reason is SkipReason =>
-  KNOWN_REASONS.has(reason);
-
-const KNOWN_REASONS: ReadonlySet<string> = new Set(SKIP_REASONS);

@@ -1,8 +1,11 @@
 import {
+  queueOwner,
   readQueueComments,
   writeClaimComment,
   writeReleasedClaimComment,
   writeSetAsideComment,
+  type QueueComments,
+  type QueueOwner,
 } from 'pr-report-core';
 import { decideClaim, parseClaimArgs } from './claim-pr.mjs';
 
@@ -28,9 +31,36 @@ const read = (
     { headSha: HEAD, baseTip: BASE, nowEpochMs: NOW },
   );
 
+/** The owner `claim-pr` reads, from the same comments, for a queued pull request. */
+const ownerOf = (queue: QueueComments): QueueOwner | undefined =>
+  queueOwner({
+    number: 2267,
+    labels: ['merge-queued', 'skip-ci'],
+    isDraft: false,
+    fromFork: false,
+    headRef: 'fix/a-thing',
+    headSha: HEAD,
+    baseRef: 'main',
+    defaultBranch: 'main',
+    stackedOn: undefined,
+    inCycle: false,
+    setAside: queue.setAside?.says,
+    claim: queue.claim?.says,
+    nowEpochMs: NOW,
+  });
+
+const decide = (
+  by: string,
+  ...bodies: readonly string[]
+): ReturnType<typeof decideClaim> => {
+  const queue = read(...bodies);
+
+  return decideClaim(ownerOf(queue), queue, by);
+};
+
 describe(decideClaim, () => {
   test('claims a set-aside pull request nobody holds, as a new comment', () => {
-    assert.deepStrictEqual(decideClaim(read(SET_ASIDE), 'me'), {
+    assert.deepStrictEqual(decide('me', SET_ASIDE), {
       kind: 'write',
       commentId: undefined,
     });
@@ -38,41 +68,72 @@ describe(decideClaim, () => {
 
   test('writes over a claim that has ended', () => {
     assert.deepStrictEqual(
-      decideClaim(read(SET_ASIDE, writeReleasedClaimComment('gone')), 'me'),
+      decide('me', SET_ASIDE, writeReleasedClaimComment('gone')),
       { kind: 'write', commentId: 2 },
     );
   });
 
   test('renews its own claim in place', () => {
-    assert.deepStrictEqual(
-      decideClaim(read(SET_ASIDE, claimedBy('me')), 'me'),
-      {
-        kind: 'write',
-        commentId: 2,
-      },
-    );
+    assert.deepStrictEqual(decide('me', SET_ASIDE, claimedBy('me')), {
+      kind: 'write',
+      commentId: 2,
+    });
   });
 
   test('refuses one someone else holds', () => {
-    const decided = decideClaim(read(SET_ASIDE, claimedBy('other')), 'me');
+    const decided = decide('me', SET_ASIDE, claimedBy('other'));
 
     assert.strictEqual(decided.kind, 'refuse');
   });
 
-  test('refuses one that is not set aside at its head and base', () => {
-    // The script is about to act on it, or already did: nothing to take over.
-    assert.strictEqual(decideClaim(read(), 'me').kind, 'refuse');
+  test('claims one set aside at its head after the base moved', () => {
+    // #2267: the set-aside comment is the hand-off, whatever the tip of the
+    // default branch is read as. Until the worker rewrites it as resolved it
+    // is the skill's.
+    assert.deepStrictEqual(
+      decide(
+        'me',
+        writeSetAsideComment(
+          { reason: 'rebase-failed', headSha: HEAD, baseSha: 'b'.repeat(40) },
+          'prose',
+        ),
+      ),
+      { kind: 'write', commentId: undefined },
+    );
+  });
+
+  test('refuses one that is the worker’s or a person’s', () => {
+    // Nothing set aside, or set aside at a head that has moved: the worker
+    // is about to act on it, or already did.
+    assert.strictEqual(decide('me').kind, 'refuse');
 
     assert.strictEqual(
-      decideClaim(
-        read(
-          writeSetAsideComment(
-            { reason: 'rebase-failed', headSha: HEAD, baseSha: 'b'.repeat(40) },
-            'prose',
-          ),
-        ),
+      decide(
         'me',
+        writeSetAsideComment(
+          { reason: 'rebase-failed', headSha: 'd'.repeat(40), baseSha: BASE },
+          'prose',
+        ),
       ).kind,
+      'refuse',
+    );
+
+    // Only a bypass merge clears it, which no session makes.
+    assert.strictEqual(
+      decide(
+        'me',
+        writeSetAsideComment(
+          { reason: 'awaiting-bypass', headSha: HEAD, baseSha: BASE },
+          'prose',
+        ),
+      ).kind,
+      'refuse',
+    );
+  });
+
+  test('refuses one whose owner could not be read', () => {
+    assert.strictEqual(
+      decideClaim(undefined, read(SET_ASIDE), 'me').kind,
       'refuse',
     );
   });

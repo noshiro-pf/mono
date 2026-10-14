@@ -9,6 +9,7 @@ import {
   PRIORITY_LOW_LABEL,
   SKIP_CI_LABEL,
   stackDescendants,
+  type QueueOwner,
   type RulesetRequirements,
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
@@ -18,7 +19,6 @@ import {
   listRequiredChecks,
   summarizeChecks,
 } from './checks.mjs';
-import { claimedNote } from './claims.mjs';
 import { UNKNOWN_STATE_RETRIES, UNKNOWN_STATE_RETRY_MS } from './constants.mjs';
 import { isDemoted } from './demotions.mjs';
 import {
@@ -36,8 +36,8 @@ import {
   priorityRank,
 } from './labels.mjs';
 import { waitingOnNote } from './merge-after.mjs';
+import { ownerNote, ownerOf } from './owner.mjs';
 import { reviewHold, type ReviewHold } from './review.mjs';
-import { skipStillApplies } from './skips.mjs';
 import { nativeStackNote, stackedNote, stackParentsOf } from './stack.mjs';
 import type {
   Classification,
@@ -173,13 +173,35 @@ export const triage = async (
 
   const cycles = findMergeAfterCycles(dependencies);
 
+  const cyclic: ReadonlySet<number> = new Set(cycles.flat());
+
+  // Who moves each one next, by the rule every reader of the queue shares
+  // (`owner.mts`). Only the worker's are triaged further.
+  const nowEpochMs = Temporal.Now.instant().epochMilliseconds;
+
+  const owners: ReadonlyMap<number, QueueOwner> = new Map(
+    sorted.flatMap((pr) => {
+      const owner = ownerOf(pr, {
+        defaultBranch: base.defaultBranch,
+        skipped: base.skipped,
+        claimed: base.claimed,
+        stackParents,
+        cyclic,
+        nowEpochMs,
+      });
+
+      return owner === undefined ? [] : [[pr.number, owner] as const];
+    }),
+  );
+
   const context: TriageContext = {
     ...base,
     openNumbers: new Set(sorted.map((pr) => pr.number)),
     dependencies,
     stackParents,
-    cyclic: new Set(cycles.flat()),
+    cyclic,
     releaseBlockers: sorted.filter(blocksRelease),
+    owners,
   } as const;
 
   const beforeReview = await Promise.all(
@@ -213,6 +235,7 @@ export const triage = async (
 
   return {
     cycles,
+    owners,
     inScope: classified.filter(({ result }) => result.kind !== 'ignore').length,
     candidates: orderCandidates(
       classified
@@ -270,23 +293,12 @@ const classify = async (
       : { kind: 'ignore' };
   }
 
-  const skip = context.skipped.get(pr.number);
+  // A pull request set aside, or claimed, is a skill's or a person's until
+  // its comment is resolved; the same answer the skill reads (`owner.mts`).
+  const owned = ownerNote(pr, context.owners.get(pr.number), context.skipped);
 
-  if (skip !== undefined && skipStillApplies(skip, pr, context.baseSha)) {
-    return {
-      kind: 'note',
-      note: `#${pr.number}: skipped (${skip.reason}: ${skip.detail}) until ${
-        skip.reason === 'checks-failed'
-          ? 'the branch is pushed again'
-          : `the branch is pushed again or ${context.defaultBranch} moves`
-      }`,
-    };
-  }
-
-  const claimed = claimedNote(pr, context.claimed);
-
-  if (claimed !== undefined) {
-    return claimed;
+  if (owned !== undefined) {
+    return owned;
   }
 
   // A layer of a stack: its turn comes when GitHub moves it onto the default

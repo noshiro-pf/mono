@@ -5,6 +5,7 @@ import {
   writeClaimComment,
   writeReleasedClaimComment,
   type QueueComments,
+  type QueueOwner,
 } from 'pr-report-core';
 import { Arr, Num, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
@@ -16,6 +17,7 @@ import {
   viewerLogin,
   type ApiContext,
 } from './open-pr/api.mjs';
+import { readQueueState } from './pr-report/queue.mjs';
 
 /**
  * Claims a pull request `unblock-prs` set aside, before fixing it, so that the
@@ -27,9 +29,10 @@ import {
  * pnpm run claim-pr -- 2154 --by <session URL> --release  # give it up
  * ```
  *
- * A claim is refused for a pull request that is not set aside at its current
- * head and base — the script is about to act on it, or is acting — and for
- * one someone else holds. A push to the branch ends the claim by itself;
+ * A claim is refused for a pull request whose owner (`pr-report-core`'s
+ * `queue-owner.mts`, read through `pr-report/queue.mts` as every other
+ * command reads it) is not a skill — the worker is about to act on it, or a
+ * person has to — and for one someone else holds. A push to the branch ends the claim by itself;
  * `--release` is for giving up without one. It prints what it did, and exits
  * 1 when it did not get the claim.
  *
@@ -69,21 +72,25 @@ export const claimPr = async (
 };
 
 /**
- * What to do about a claim by `by`, given what the comments say now: write it
- * (over `commentId` when there is one to edit in place), or refuse and why.
+ * What to do about a claim by `by`, given who owns the pull request and what
+ * its comments say now: write it (over `commentId` when there is one to edit
+ * in place), or refuse and why.
  */
 export const decideClaim = (
+  owner: QueueOwner | undefined,
   queue: QueueComments,
   by: string,
 ): Readonly<
   | { kind: 'write'; commentId: number | undefined }
   | { kind: 'refuse'; reason: string }
 > => {
-  if (queue.setAside?.applies !== true) {
+  if (owner?.owner !== 'skill') {
     return {
       kind: 'refuse',
       reason:
-        "it is not set aside at its current head and base, so it is unblock-prs's to move",
+        owner === undefined
+          ? 'who owns it could not be read'
+          : `it is the ${owner.owner}'s (${owner.reason}), not a skill's`,
     };
   }
 
@@ -144,7 +151,17 @@ const claim = async (
   viewer: string,
   before: PullRequestState,
 ): Promise<Result<string, string>> => {
-  const decided = decideClaim(before.queue, args.by);
+  const state = await readQueueState();
+
+  if (Result.isErr(state)) {
+    return Result.err(`cannot read the queue: ${state.value}`);
+  }
+
+  const decided = decideClaim(
+    state.value.owners.get(args.number),
+    before.queue,
+    args.by,
+  );
 
   if (decided.kind === 'refuse') {
     return Result.err(`#${args.number} not claimed: ${decided.reason}.`);
