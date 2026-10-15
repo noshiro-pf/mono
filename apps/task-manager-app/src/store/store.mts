@@ -15,6 +15,8 @@ import {
   fromEvent,
   loadSetting,
   mediaQuery,
+  readLocationSearch,
+  replaceLocationSearch,
   saveSetting,
 } from '../browser.mjs';
 import {
@@ -41,6 +43,7 @@ import {
   isArrangeable,
   listSettingsStorage,
   nodeSizeStorage,
+  parseViewQuery,
 } from '../view-model/index.mjs';
 import { createAnimationSettingStore } from './animation-setting-store.mjs';
 import { createBulkEditStore } from './bulk-edit-store.mjs';
@@ -58,6 +61,7 @@ import { createMediaStore } from './media-store.mjs';
 import { createNodeSizeStore } from './node-size-store.mjs';
 import { createSessionStore } from './session-store.mjs';
 import { createUiStore } from './ui-store.mjs';
+import { createViewQuerySync } from './view-query-sync.mjs';
 
 /**
  * Below this width the list is cards, and the DAG runs top to bottom until
@@ -67,7 +71,13 @@ export const NARROW_QUERY = '(max-width: 599px)';
 
 export const sessionStore = createSessionStore();
 
-export const uiStore = createUiStore({ initialView: 'list' });
+/**
+ * What the URL asked to show when the page loaded: the screen, and the
+ * graph's mode, which wins over the one kept on this device.
+ */
+const initialViewQuery = parseViewQuery(readLocationSearch());
+
+export const uiStore = createUiStore({ initialView: initialViewQuery.view });
 
 export const dataStore = createDataStore({
   session: sessionStore.session,
@@ -131,7 +141,7 @@ export const animationSettingStore = createAnimationSettingStore({
 });
 
 export const dagViewModeStore = createDagViewModeStore({
-  initial: loadSetting(dagViewModeStorage),
+  initial: initialViewQuery.mode ?? loadSetting(dagViewModeStorage),
   save: saveSetting(dagViewModeStorage),
 });
 
@@ -194,6 +204,13 @@ export const dagLayoutStore = createDagLayoutStore({
   setGroup: (id, groupId) => {
     dataStore.setNodeGroup(nodeRefOf(id), groupId);
   },
+});
+
+const viewQuerySync = createViewQuerySync({
+  view: uiStore.view,
+  mode: dagViewModeStore.mode,
+  read: readLocationSearch,
+  write: replaceLocationSearch,
 });
 
 export const dagSelectionStore = createDagSelectionStore({
@@ -310,6 +327,7 @@ export const startStore = (): (() => void) => {
     dagShowDoneStore.start(),
     dagLayoutStore.start(),
     dagSelectionStore.start(),
+    viewQuerySync.start(),
   ] as const;
 
   // Blueprint's dark styles hang off `.bp6-dark` on an ancestor.

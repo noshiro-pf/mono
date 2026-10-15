@@ -15,3 +15,4 @@ export * from './node-size-store.mjs';
 export * from './session-store.mjs';
 export * from './store.mjs';
 export * from './ui-store.mjs';
+export * from './view-query-sync.mjs';

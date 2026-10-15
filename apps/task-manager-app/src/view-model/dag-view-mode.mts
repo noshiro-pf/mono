@@ -4,7 +4,8 @@
  * dependencies as arcs beside it (`dag/arc-layout.mts`); or 「タイル」, the
  * tasks alone in rows across the screen with no edges, scrolled down
  * (`dag/tile-layout.mts`) — and how the choice is kept in `localStorage`
- * between visits, on this device only.
+ * between visits, on this device only. The URL says it too while the graph
+ * is shown (`view-query.mts`), and what it says wins when the page loads.
  *
  * A mode is added by adding it to {@link dagViewModes} and
  * {@link dagViewModeLabels}: the switch in the toolbar lists them all, and

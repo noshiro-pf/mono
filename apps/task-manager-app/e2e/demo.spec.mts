@@ -1133,8 +1133,8 @@ test(
 
     expect.soft(await sawAnimation(page)).toBe(false);
 
-    // Kept on this device: not even the first showing moves after a reload.
-    await page.reload();
+    // Kept on this device: not even the first showing moves on a new visit.
+    await page.goto(DEMO);
 
     await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
@@ -1190,6 +1190,61 @@ const showMode = async (
   await expect
     .soft(page.getByTestId('dag-canvas'))
     .toHaveAttribute('data-animating', 'false');
+};
+
+test(
+  'keeps the screen and the graph’s mode in the URL through a reload',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto(DEMO);
+
+    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+
+    // The list, the default, writes nothing.
+    expect.soft(searchOf(page)).toBe('?storage=memory');
+
+    await showDag(page);
+
+    await showMode(page, 'arc');
+
+    expect.soft(searchOf(page)).toBe('?storage=memory&view=dag&mode=arc');
+
+    await page.reload();
+
+    await expect.soft(page.getByTestId('dag-canvas')).toBeVisible();
+
+    await expect
+      .soft(page.getByTestId('dag-mode-arc'))
+      .toHaveAttribute('aria-pressed', 'true');
+
+    // Back on the list, the URL says nothing again.
+    await page.getByTestId('view-list').click();
+
+    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+
+    expect.soft(searchOf(page)).toBe('?storage=memory');
+
+    // A link to the graph in another mode wins over the one kept.
+    await page.goto(`${DEMO}&view=dag&mode=tile`);
+
+    await expect
+      .soft(page.getByTestId('dag-mode-tile'))
+      .toHaveAttribute('aria-pressed', 'true');
+
+    // What it does not know is the list, and taken out of the URL.
+    await page.goto(`${DEMO}&view=board&mode=dag`);
+
+    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+
+    expect.soft(searchOf(page)).toBe('?storage=memory');
+  },
+);
+
+/** The page's URL's query, `?` and all. */
+const searchOf = (page: DeepReadonly<Page>): string => {
+  const url = new URL(page.url());
+
+  return url.search;
 };
 
 /** How many of `locator` have `data-highlight` set to each value. */
@@ -1390,8 +1445,8 @@ test(
       .soft(page.getByTestId('node-dialog').getByTestId('title-input'))
       .toHaveValue('画面を実装する');
 
-    // Kept on this device.
-    await page.reload();
+    // Kept on this device: a new visit, without the URL's view.
+    await page.goto(DEMO);
 
     await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
@@ -1739,8 +1794,8 @@ test(
       .soft(page.getByTestId('node-dialog').getByTestId('title-input'))
       .toHaveValue('画面を実装する');
 
-    // Kept on this device.
-    await page.reload();
+    // Kept on this device: a new visit, without the URL's view.
+    await page.goto(DEMO);
 
     await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
@@ -2043,8 +2098,8 @@ test(
 
     await page.setViewportSize({ width: 1280, height: 720 });
 
-    // Kept on this device.
-    await page.reload();
+    // Kept on this device: a new visit, without the URL's view.
+    await page.goto(DEMO);
 
     await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
@@ -2230,8 +2285,8 @@ test(
     // The tasks moved there.
     expect.soft(await sawAnimation(page)).toBe(true);
 
-    // Kept on this device.
-    await page.reload();
+    // Kept on this device: a new visit, without the URL's view.
+    await page.goto(DEMO);
 
     await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
