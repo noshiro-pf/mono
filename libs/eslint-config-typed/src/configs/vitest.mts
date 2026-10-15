@@ -16,5 +16,8 @@ export const eslintConfigForVitest = (files?: readonly string[]): FlatConfig =>
     rules: defineKnownRules({
       ...eslintVitestRules,
       ...eslintVitestCodingStyleRules,
+
+      // vitest/unbound-method extends it and reports the same calls.
+      '@typescript-eslint/unbound-method': 'off',
     }),
   }) as const;

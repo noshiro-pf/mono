@@ -161,12 +161,14 @@ export const eslintRules = {
 
   'constructor-super': 'off', // ts(2335) & ts(2377)
   'getter-return': 'off', // ts(2378)
+  'no-class-assign': 'off', // ts(2629)
   'no-const-assign': 'off', // ts(2588)
   'no-dupe-args': 'off', // ts(2300)
   'no-dupe-class-members': 'off', // ts(2393) & ts(2300)
   'no-dupe-keys': 'off', // ts(1117)
   'no-func-assign': 'off', // ts(2539)
   'no-import-assign': 'off', // ts(2539) & ts(2540)
+  'no-new-native-nonconstructor': 'off', // ts(7009)
   'no-obj-calls': 'off', // ts(2349)
   'no-redeclare': 'off', // ts(2451)
   'no-setter-return': 'off', // ts(2408)
@@ -174,6 +176,7 @@ export const eslintRules = {
   'no-undef': 'off', // ts(2304)
   'no-unreachable': 'off', // ts(7027)
   'no-unsafe-negation': 'off', // ts(2365) & ts(2360) & ts(2358)
+  'no-with': 'off', // ts(1101) & ts(2410)
   'no-var': 'error', // ts transpiles let/const to var, so no need for vars any more
   'prefer-const': withDefaultOption('error'), // ts provides better types with const
   'prefer-rest-params': 'error', // ts provides better types with rest args over arguments
@@ -194,6 +197,7 @@ export const eslintRules = {
   'no-shadow': 'off',
   'no-throw-literal': 'off',
   'no-unused-expressions': 'off',
+  'no-unused-private-class-members': 'off',
   'no-unused-vars': 'off',
   'no-use-before-define': 'off',
   'no-useless-constructor': 'off',
@@ -250,11 +254,7 @@ export const eslintRules = {
   'id-denylist': withDefaultOption('error'),
   'id-length': 'off', // disabled
   'id-match': 'off', // in favor of unicorn/id-match
-  'logical-assignment-operators': [
-    'error',
-    'always',
-    { enforceForIfStatements: true },
-  ],
+  'logical-assignment-operators': 'off', // in favor of unicorn/logical-assignment-operators
   'max-classes-per-file': 'off', // disabled
   'max-depth': 'off', // disabled
   'max-lines-per-function': 'off', // disabled
@@ -268,7 +268,6 @@ export const eslintRules = {
   'no-bitwise': 'off', // disabled
   'no-caller': 'error',
   'no-case-declarations': 'error',
-  'no-class-assign': 'error',
   'no-compare-neg-zero': 'error',
   'no-cond-assign': withDefaultOption('error'),
   'no-console': 'off', // disabled
@@ -328,7 +327,6 @@ export const eslintRules = {
   'no-negated-condition': 'off', // Covered by unicorn/no-negated-condition
   'no-nested-ternary': 'off', // Covered by unicorn/no-nested-ternary
   'no-new-func': 'error',
-  'no-new-native-nonconstructor': 'error',
   'no-new-wrappers': 'off', // Covered by unicorn/new-for-builtins
   'no-new': 'error',
   'no-nonoctal-decimal-escape': 'error',
@@ -384,21 +382,19 @@ export const eslintRules = {
     { disallowArithmeticOperators: true },
   ],
   'no-unused-labels': 'error',
-  'no-unused-private-class-members': 'error',
   'no-useless-backreference': 'error',
   'no-useless-call': 'error',
   'no-useless-catch': 'error',
   'no-useless-computed-key': ['error', { enforceForClassMembers: true }],
-  'no-useless-concat': 'error',
+  'no-useless-concat': 'off', // in favor of unicorn/no-useless-concat
   'no-useless-escape': withDefaultOption('error'),
   'no-useless-rename': withDefaultOption('error'),
   'no-useless-return': 'error',
   'no-void': ['error', { allowAsStatement: false }],
   'no-warning-comments': 'off', // disabled
-  'no-with': 'error',
   'object-shorthand': withDefaultOption('error'),
   'one-var': 'off', // disabled
-  'operator-assignment': ['error', 'always'],
+  'operator-assignment': 'off', // in favor of unicorn/operator-assignment
   'prefer-arrow-callback': [
     'error',
     { allowNamedFunctions: false, allowUnboundThis: false },
