@@ -40,3 +40,4 @@ export * from './use-border-box-height.mjs';
 export * from './verdict-badge.js';
 export * from './view-settings-row.js';
 export * from './view-settings.js';
+export * from './workflow-runs-section.js';

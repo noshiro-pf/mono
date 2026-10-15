@@ -1,9 +1,9 @@
 /**
- * How the page's three blocks are laid out, and how that is kept in the URL.
+ * How the page's four blocks are laid out, and how that is kept in the URL.
  *
- * **The blocks** are the merge order (with the cycles under it), what merged,
- * and the open issues. They can be put in one column or two, in any order,
- * and with two the divider between them moves.
+ * **The blocks** are the merge order (with the cycles under it), the workflow
+ * runs still going, what merged, and the open issues. They can be put in one
+ * column or two, in any order, and with two the divider between them moves.
  *
  * **Their heights** are one of two modes. In `natural`, the page is as tall
  * as its blocks: each can be given a height, and then scrolls on its own,
@@ -41,10 +41,16 @@ import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import { currentSearch, rewriteSearch } from './url.mjs';
 
 /** Said here rather than on each member, which `fix:codemod:full` drops (#2042). */
-export type BlockId = 'open' | 'merged' | 'issues';
+export type BlockId = 'open' | 'runs' | 'merged' | 'issues';
 
+/**
+ * The usual order. The runs come next to the merge order, being the CI the
+ * pull requests in it wait for, and before what merged: what is going on now
+ * before what is over.
+ */
 export const BLOCK_IDS = [
   'open',
+  'runs',
   'merged',
   'issues',
 ] as const satisfies readonly BlockId[];
@@ -52,6 +58,7 @@ export const BLOCK_IDS = [
 /** What each block is called in the view settings. */
 export const BLOCK_NAMES = {
   open: 'Merge order',
+  runs: 'Running workflows',
   merged: 'Merged',
   issues: 'Open issues',
 } as const satisfies ReadonlyRecord<BlockId, string>;

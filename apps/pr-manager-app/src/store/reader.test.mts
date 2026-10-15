@@ -7,6 +7,7 @@ import { LOADING, READY, type LoadStatus } from '../load-state.mjs';
 import type { RateLimit } from '../rate-limit.mjs';
 import { ISSUES_LIMIT, ISSUES_PAGE_SIZE } from '../report-query.mjs';
 import type { StoredToken } from '../token.mjs';
+import type { WorkflowRunList } from '../workflow-runs.mjs';
 import { createReader, type Reader } from './reader.mjs';
 
 describe(createReader, () => {
@@ -438,6 +439,133 @@ describe(createReader, () => {
     });
   });
 
+  test('reads the workflow runs beside the report, on every read', async () => {
+    const { reader, loads, runsLoads, timers } = setup(TOKEN_A);
+
+    reader.start();
+
+    assert.deepStrictEqual(
+      runsLoads.map((l) => l.token),
+      ['a'],
+    );
+
+    assert.deepStrictEqual(reader.runs.getSnapshot().value, {
+      type: 'reading',
+    });
+
+    await answerRuns(runsLoads, 0, Result.ok(RUNS));
+
+    // The runs do not wait for the report, nor the report for them.
+    assert.deepStrictEqual(shown(reader), { status: LOADING, readAt: 0 });
+
+    assert.deepStrictEqual(reader.runs.getSnapshot().value, {
+      type: 'ready',
+      list: RUNS,
+      error: undefined,
+    });
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    assert.strictEqual(loads.length, 2);
+
+    assert.strictEqual(runsLoads.length, 2);
+  });
+
+  test('a read of the runs that fails keeps the list and says so, and leaves the report alone', async () => {
+    const { reader, loads, runsLoads, timers, clock } = setup(TOKEN_A);
+
+    reader.start();
+
+    await answerRuns(runsLoads, 0, Result.err('refused'));
+
+    assert.deepStrictEqual(reader.runs.getSnapshot().value, {
+      type: 'failed',
+      message: 'refused',
+    });
+
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
+
+    assert.deepStrictEqual(shown(reader), { status: READY, readAt: 1_000 });
+
+    clock.set(2_000);
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    await answerRuns(runsLoads, 1, Result.ok(RUNS));
+
+    clock.set(3_000);
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    await answerRuns(runsLoads, 2, Result.err('spent'));
+
+    assert.deepStrictEqual(reader.runs.getSnapshot().value, {
+      type: 'ready',
+      list: RUNS,
+      error: 'spent',
+    });
+
+    assert.deepStrictEqual(shown(reader), { status: READY, readAt: 1_000 });
+  });
+
+  test('an older read of the runs never replaces a newer one', async () => {
+    const { reader, runsLoads, timers, clock } = setup(TOKEN_A);
+
+    clock.set(1_000);
+
+    reader.start();
+
+    clock.set(2_000);
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    await answerRuns(runsLoads, 1, Result.ok(NO_RUNS));
+
+    await answerRuns(runsLoads, 0, Result.ok(RUNS));
+
+    assert.deepStrictEqual(reader.runs.getSnapshot().value, {
+      type: 'ready',
+      list: NO_RUNS,
+      error: undefined,
+    });
+  });
+
+  test('forgetting the token puts the runs back to reading, and drops a read still out', async () => {
+    const { reader, runsLoads, setToken } = setup(TOKEN_A);
+
+    reader.start();
+
+    await answerRuns(runsLoads, 0, Result.ok(RUNS));
+
+    setToken(undefined);
+
+    assert.deepStrictEqual(reader.runs.getSnapshot().value, {
+      type: 'reading',
+    });
+
+    setToken(TOKEN_B);
+
+    setToken(undefined);
+
+    await answerRuns(runsLoads, 1, Result.ok(RUNS));
+
+    assert.deepStrictEqual(reader.runs.getSnapshot().value, {
+      type: 'reading',
+    });
+  });
+
+  test('a read of the runs that throws is a failure, not an unhandled rejection', async () => {
+    const { reader, runsLoads } = setup(TOKEN_A);
+
+    reader.start();
+
+    runsLoads[0]?.reject(new Error('boom'));
+
+    await settle();
+
+    assert.strictEqual(reader.runs.getSnapshot().value.type, 'failed');
+  });
+
   test('stop ends the timers and the listeners', () => {
     const { reader, loads, timers, visibility, setToken } = setup(TOKEN_A);
 
@@ -657,6 +785,12 @@ type PendingLoad = Readonly<{
   reject: (error: unknown) => void;
 }>;
 
+type PendingRunsLoad = Readonly<{
+  token: string;
+  resolve: (result: Result<WorkflowRunList, string>) => void;
+  reject: (error: unknown) => void;
+}>;
+
 type PendingIssueLoad = Readonly<{
   token: string;
   after: string;
@@ -667,6 +801,7 @@ type PendingIssueLoad = Readonly<{
 type Setup = Readonly<{
   reader: Reader;
   loads: readonly PendingLoad[];
+  runsLoads: readonly PendingRunsLoad[];
   issueLoads: readonly PendingIssueLoad[];
   clock: Readonly<{ set: (nowMs: number) => void }>;
   visibility: Readonly<{
@@ -693,6 +828,8 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
   const [token, setToken] = createState<StoredToken | undefined>(initialToken);
 
   const mut_loads: PendingLoad[] = [];
+
+  const mut_runsLoads: PendingRunsLoad[] = [];
 
   const mut_issueLoads: PendingIssueLoad[] = [];
 
@@ -740,6 +877,10 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
           reject,
         });
       }),
+    loadRuns: (tokenValue) =>
+      new Promise((resolve, reject) => {
+        mut_runsLoads.push({ token: tokenValue, resolve, reject });
+      }),
     loadIssues: (tokenValue, after, first) =>
       new Promise((resolve) => {
         mut_issueLoads.push({ token: tokenValue, after, first, resolve });
@@ -759,6 +900,7 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
   return {
     reader,
     loads: mut_loads,
+    runsLoads: mut_runsLoads,
     issueLoads: mut_issueLoads,
     clock: {
       set: (nowMs: number) => {
@@ -791,6 +933,16 @@ const answer = async (
   rateLimit: RateLimit | undefined,
 ): Promise<void> => {
   loads[index]?.resolve({ result, rateLimit });
+
+  await settle();
+};
+
+const answerRuns = async (
+  runsLoads: readonly PendingRunsLoad[],
+  index: number,
+  result: Result<WorkflowRunList, string>,
+): Promise<void> => {
+  runsLoads[index]?.resolve(result);
 
   await settle();
 };
@@ -849,6 +1001,26 @@ const recordWrites = (reader: Reader): (() => readonly string[]) => {
 
   return () => mut_written.toSorted();
 };
+
+const RUNS: WorkflowRunList = {
+  runs: [
+    {
+      id: 1,
+      workflow: 'code-check',
+      title: 'feat: something',
+      runNumber: 12,
+      url: 'https://github.com/noshiro-pf/mono/actions/runs/1',
+      event: 'pull_request',
+      branch: 'feat/something',
+      actor: 'noshiro-pf',
+      state: 'in_progress',
+      createdAt: '2026-10-15T10:00:00Z',
+    },
+  ],
+  totalCount: 1,
+} as const;
+
+const NO_RUNS: WorkflowRunList = { runs: [], totalCount: 0 } as const;
 
 const MERGED: Merged = {
   number: 7,

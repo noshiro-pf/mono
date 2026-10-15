@@ -27,12 +27,12 @@ describe(layoutFromSearch, () => {
   test('reads two columns, their blocks, the split and the heights', () => {
     assert.deepStrictEqual(
       layoutFromSearch(
-        '?cols=2&left=issues&right=open.merged&split=35&h.open=480',
+        '?cols=2&left=issues&right=open.runs.merged&split=35&h.open=480',
       ),
       {
         columns: 2,
         left: ['issues'],
-        right: ['open', 'merged'],
+        right: ['open', 'runs', 'merged'],
         split: 35,
         heights: { open: 480 },
         mode: 'natural',
@@ -55,14 +55,27 @@ describe(layoutFromSearch, () => {
     assert.deepStrictEqual(layoutFromSearch('?left=merged.bogus.merged').left, [
       'merged',
       'open',
+      'runs',
       'issues',
     ]);
+  });
+
+  test('a URL written before the runs block puts it at the end of the left column', () => {
+    assert.deepStrictEqual(
+      layoutFromSearch('?cols=2&left=open.merged&right=issues'),
+      {
+        ...DEFAULT_LAYOUT,
+        columns: 2,
+        left: ['open', 'merged', 'runs'],
+        right: ['issues'],
+      },
+    );
   });
 
   test('one column holds every block, whatever `right` says', () => {
     assert.deepStrictEqual(layoutFromSearch('?left=issues&right=open'), {
       ...DEFAULT_LAYOUT,
-      left: ['issues', 'open', 'merged'],
+      left: ['issues', 'open', 'runs', 'merged'],
     });
   });
 
@@ -90,7 +103,10 @@ describe(searchWithLayout, () => {
     assert.strictEqual(searchWithLayout('', DEFAULT_LAYOUT), '');
 
     assert.strictEqual(
-      searchWithLayout('?cols=2&left=open&right=merged.issues', DEFAULT_LAYOUT),
+      searchWithLayout(
+        '?cols=2&left=open&right=runs.merged.issues',
+        DEFAULT_LAYOUT,
+      ),
       '',
     );
   });
@@ -101,14 +117,14 @@ describe(searchWithLayout, () => {
         '?theme=dark',
         withSplit(withColumns(DEFAULT_LAYOUT, 2), 60),
       ),
-      '?theme=dark&cols=2&left=open&right=merged.issues&split=60',
+      '?theme=dark&cols=2&left=open&right=runs.merged.issues&split=60',
     );
   });
 
   test('reads back what it wrote', () => {
     const layout: Layout = {
       columns: 2,
-      left: ['merged'],
+      left: ['merged', 'runs'],
       right: ['issues', 'open'],
       split: 42,
       heights: { issues: 300, open: 640 },
@@ -129,7 +145,7 @@ describe(withColumns, () => {
       ...DEFAULT_LAYOUT,
       columns: 2,
       left: ['open'],
-      right: ['merged', 'issues'],
+      right: ['runs', 'merged', 'issues'],
     });
   });
 
@@ -138,7 +154,7 @@ describe(withColumns, () => {
       ...DEFAULT_LAYOUT,
       columns: 2,
       left: ['open', 'issues'],
-      right: ['merged'],
+      right: ['runs', 'merged'],
     } as const;
 
     assert.deepStrictEqual(withColumns(withColumns(two, 2), 2), two);
@@ -151,11 +167,11 @@ describe(withColumns, () => {
           ...DEFAULT_LAYOUT,
           columns: 2,
           left: ['issues'],
-          right: ['open', 'merged'],
+          right: ['open', 'runs', 'merged'],
         },
         1,
       ),
-      { ...DEFAULT_LAYOUT, left: ['issues', 'open', 'merged'] },
+      { ...DEFAULT_LAYOUT, left: ['issues', 'open', 'runs', 'merged'] },
     );
   });
 });
@@ -164,12 +180,12 @@ describe(moveBlock, () => {
   test('moves within a column', () => {
     assert.deepStrictEqual(
       moveBlock(DEFAULT_LAYOUT, 'issues', { column: 0, index: 0 }).left,
-      ['issues', 'open', 'merged'],
+      ['issues', 'open', 'runs', 'merged'],
     );
 
     assert.deepStrictEqual(
       moveBlock(DEFAULT_LAYOUT, 'open', { column: 0, index: 2 }).left,
-      ['merged', 'issues', 'open'],
+      ['runs', 'merged', 'open', 'issues'],
     );
   });
 
@@ -180,14 +196,17 @@ describe(moveBlock, () => {
 
     assert.deepStrictEqual(
       [moved.left, moved.right],
-      [['open', 'issues'], ['merged']],
+      [
+        ['open', 'issues'],
+        ['runs', 'merged'],
+      ],
     );
   });
 
   test('an index past the end is the end, and one column has only a left', () => {
     assert.deepStrictEqual(
       moveBlock(DEFAULT_LAYOUT, 'open', { column: 1, index: 9 }),
-      { ...DEFAULT_LAYOUT, left: ['merged', 'issues', 'open'] },
+      { ...DEFAULT_LAYOUT, left: ['runs', 'merged', 'issues', 'open'] },
     );
   });
 });

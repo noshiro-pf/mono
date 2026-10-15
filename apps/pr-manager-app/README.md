@@ -41,9 +41,17 @@ nothing on GitHub's own list shows:
   owner it can never be approved, and the badge says it needs a ruleset
   bypass instead.
 
-Below that, what merged in the last week, and the open issues, most recently
-updated first: thirty, then a hundred more each time the button under the list
-is pressed, until every open one is listed.
+Below that, the workflow runs still going, what merged in the last week, and
+the open issues, most recently updated first: thirty, then a hundred more each
+time the button under the list is pressed, until every open one is listed.
+
+**Running workflows** lists what the Actions tab shows filtered to
+`is:in_progress is:queued is:waiting is:action_required is:neutral is:stale`,
+newest first, and its title links to that filter on GitHub: each run's state,
+its title, the workflow and run number, what started it, its branch, when it
+started and who started it. It is read beside the report rather than as a part
+of it, so a read of it that fails says so in its own block and leaves the
+merge order as it was.
 
 **List / DAG**, above the issues, draws them instead as the graph of what each
 waits for, read from the `Start-After:` lines in their bodies
@@ -128,8 +136,9 @@ the page worth sharing in a link.
 
 ## Layout
 
-The page is three blocks: the merge order (with its counts above it and any
-cycles under it), what merged, and the open issues. **Layout**, beside the theme
+The page is four blocks: the merge order (with its counts above it and any
+cycles under it), the workflow runs still going, what merged, and the open
+issues. **Layout**, beside the theme
 button, arranges them:
 
 - **One column or two.** Two need a screen at least 60rem wide; on a narrower
@@ -263,6 +272,14 @@ answers, saying "reading" until then. Only the comparison waits, because it
 can name the heads only once the pull requests are in. A read that comes
 after the page shows a report replaces it whole, so a poll never puts a
 "reading" back where there was data.
+
+**The workflow runs are REST's**, because GraphQL cannot list a repository's
+runs by state. REST lists them by one state at a time, so a read of them is
+six requests, against REST's budget rather than GraphQL's — the two are
+separate. Each goes out as `no-cache`, so the browser asks GitHub whether the
+answer it kept has changed, and GitHub does not count a `304` against the
+budget: a state with nothing in it costs nothing after the first read. The
+header's budget is GraphQL's alone.
 
 **The issues a pull request closes are GitHub's reading of its body.**
 `closingIssuesReferences` links a closing keyword only on a pull request into
