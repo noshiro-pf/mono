@@ -28,11 +28,12 @@ import { OfTotal, StatTile } from './stat-tile.js';
  * how many there are in all beside it in small: the list is what a reader
  * counts against, and the whole is still a glance away. `open` is the one
  * count that is not a switch: hiding every open pull request is not a view
- * of them. The first four counts are `pr-report-core`'s, the same
- * `pnpm run pr-report` leads with, less its `draft`, which is not drawn: a
- * draft is always shown, and its card's badge says so. `set aside` and
- * `awaiting code owner` are what stops a pull request that is otherwise
- * ready, and are only this page's.
+ * of them. The first three counts are `pr-report-core`'s, the same
+ * `pnpm run pr-report` leads with, less its `draft` and `behind`, which are
+ * not drawn: a draft is always shown, and its card's badge says so, and how
+ * far behind the base a pull request is is its card's ahead / behind bar.
+ * `set aside` and `awaiting code owner` are what stops a pull request that
+ * is otherwise ready, and are only this page's.
  */
 export const MergeOrderFilters = memoNamed('MergeOrderFilters', () => {
   const summary = readerSignals.summary.value;
@@ -129,7 +130,6 @@ export const MergeOrderFilters = memoNamed('MergeOrderFilters', () => {
 const STATUS_TONES = {
   queued: undefined,
   failing: 'critical',
-  behind: undefined,
   setAside: 'critical',
   awaitingReview: 'warning',
 } as const satisfies ReadonlyRecord<StatusFilter, StatusRole | undefined>;

@@ -23,7 +23,8 @@
  * reader changes is kept (`settings-db.mts`).
  *
  * A draft is not one of the statuses: it is always shown, and its badge on
- * the card says what it is. A choice saved while it was one drops it.
+ * the card says what it is. Nor is being behind the base, which the card's
+ * ahead / behind bar says. A choice saved while either was one drops it.
  */
 
 import {
@@ -39,13 +40,11 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 import type { Entry, PageSummary } from './load-report.mjs';
 
 /** Named after the count of {@link PageSummary} each one is. */
-export type StatusFilter =
-  'queued' | 'failing' | 'behind' | 'setAside' | 'awaitingReview';
+export type StatusFilter = 'queued' | 'failing' | 'setAside' | 'awaitingReview';
 
 export const STATUS_FILTERS = [
   'queued',
   'failing',
-  'behind',
   'setAside',
   'awaitingReview',
 ] as const satisfies readonly (StatusFilter & keyof PageSummary)[];
@@ -54,7 +53,6 @@ export const STATUS_FILTERS = [
 export const STATUS_NAMES = {
   queued: 'queued',
   failing: 'failing',
-  behind: 'behind base',
   setAside: 'set aside',
   awaitingReview: 'awaiting code owner',
 } as const satisfies ReadonlyRecord<StatusFilter, string>;
@@ -276,7 +274,6 @@ export const countView = (
     statuses: {
       queued: underStatus('queued'),
       failing: underStatus('failing'),
-      behind: underStatus('behind'),
       setAside: underStatus('setAside'),
       awaitingReview: underStatus('awaitingReview'),
     },
@@ -379,7 +376,6 @@ const STATUS_TESTS = {
   queued: (entry) =>
     entry.labels.some((label) => label.name === MERGE_QUEUED_LABEL),
   failing: (entry) => entry.checks.verdict === 'failing',
-  behind: (entry) => (entry.comparison?.behindBy ?? 0) > 0,
   setAside: (entry) => entry.setAside?.current === true,
   awaitingReview: (entry) => entry.codeOwnerReview.state === 'required',
 } as const satisfies ReadonlyRecord<StatusFilter, (entry: Entry) => boolean>;

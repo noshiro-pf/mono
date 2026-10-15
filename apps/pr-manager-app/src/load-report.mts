@@ -147,8 +147,6 @@ export type PageSummary = Readonly<{
   queued: number;
   draft: number;
   failing: number | undefined;
-  /** Behind the base, which the ruleset refuses to merge. */
-  behind: number | undefined;
   /** Set aside by `unblock-prs`, against the base as it is now. */
   setAside: number | undefined;
   /** Waiting for a code owner to approve. */
@@ -1333,7 +1331,6 @@ const summaryOf = (entries: readonly Entry[]): PageSummary => {
     queued: counted.queued,
     draft: counted.draft,
     failing: once('checks', () => counted.failing),
-    behind: once('comparison', () => counted.behind),
     setAside: once(
       'details',
       () => entries.filter((entry) => entry.setAside?.current === true).length,

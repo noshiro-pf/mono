@@ -52,8 +52,6 @@ describe(loadReport, () => {
       notRun: [],
       required: 2,
     });
-
-    assert.strictEqual(loaded.summary.behind, 1);
   });
 
   test('asks for every part at once, and compares once the heads are known', async () => {
@@ -152,7 +150,6 @@ describe(loadReport, () => {
       queued: 0,
       draft: 0,
       failing: undefined,
-      behind: undefined,
       setAside: undefined,
       awaitingReview: undefined,
     });
@@ -193,7 +190,10 @@ describe(loadReport, () => {
 
     assert.deepStrictEqual(result.value.reading, []);
 
-    assert.strictEqual(result.value.summary.behind, 1);
+    assert.deepStrictEqual(
+      result.value.entries.map(({ comparison }) => comparison?.behindBy),
+      [0, 2],
+    );
 
     // The last part to answer is the read's own answer, not progress.
     assert.strictEqual(mut_progress.length, 5);
