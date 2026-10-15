@@ -8,6 +8,7 @@ import {
 } from 'eslint-config-typed';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
+import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
 import { workspaceRootPath } from './scripts/workspace-root-path.mjs';
 
 export default [
@@ -121,4 +122,7 @@ export default [
       'import-x/no-anonymous-default-export': 'off',
     }),
   },
+
+  // Last, so that nothing above turns these back on.
+  eslintConfigOffForOxlint,
 ] satisfies readonly FlatConfig[];

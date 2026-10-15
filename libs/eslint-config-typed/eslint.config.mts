@@ -13,6 +13,7 @@ import {
   eslintPluginTsTypeForge,
   type EslintTsTypeForgeRules,
 } from 'eslint-plugin-ts-type-forge';
+import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
 
 const thisDir = import.meta.dirname;
 
@@ -228,4 +229,7 @@ export default [
       ],
     }),
   },
+
+  // Last, so that nothing above turns these back on.
+  eslintConfigOffForOxlint,
 ] satisfies readonly FlatConfig[];

@@ -8,6 +8,7 @@ import {
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
+import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
 import { workspaceRootPath } from './scripts/workspace-root-path.mjs';
 
 export default [
@@ -87,4 +88,7 @@ export default [
     ...eslintConfigOffForSumiCheck,
     files: ['src/**'],
   },
+
+  // Last, so that nothing above turns these back on.
+  eslintConfigOffForOxlint,
 ] satisfies readonly FlatConfig[];
