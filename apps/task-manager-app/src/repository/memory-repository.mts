@@ -80,6 +80,11 @@ export const createMemoryRepository = (
         milestones: upsert(mut_state.milestones, milestone),
       }),
     deleteNode: (ref, cleanup) => update(withDeleted(mut_state, ref, cleanup)),
+    putNodes: ({ updatedTasks, updatedMilestones }) =>
+      update({
+        tasks: upsertAll(mut_state.tasks, updatedTasks),
+        milestones: upsertAll(mut_state.milestones, updatedMilestones),
+      }),
     subscribeGroups: (observer) => {
       mut_groupObservers.add(observer);
 

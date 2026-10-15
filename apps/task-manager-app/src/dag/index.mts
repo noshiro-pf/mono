@@ -13,6 +13,7 @@ export * from './gesture.mjs';
 export * from './graph-layout.mjs';
 export * from './group-frames.mjs';
 export * from './hidden-nodes.mjs';
+export * from './lasso.mjs';
 export * from './node-views.mjs';
 export * from './pan-zoom.mjs';
 export * from './placement-animation.mjs';

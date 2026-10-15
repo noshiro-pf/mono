@@ -389,3 +389,93 @@ describe(cancelConnect, () => {
     assert.strictEqual(cancelConnect(IDLE_GESTURE), IDLE_GESTURE);
   });
 });
+
+describe('drawing a lasso', () => {
+  const grab = { kind: 'lasso' } as const;
+
+  // Content (0, 0) at screen (10, 0), drawn twice as large.
+  const zoomed: ViewTransform = { x: 10, y: 0, scale: 2 } as const;
+
+  const pressed = pointerDown(
+    IDLE_GESTURE,
+    { id: 1, x: 10, y: 0 },
+    zoomed,
+    grab,
+  );
+
+  test('draws nothing for a small wobble, so a tap stays a tap', () => {
+    const { gesture, transform } = pointerMove(pressed, { id: 1, x: 12, y: 2 });
+
+    assert.isUndefined(gesture.lasso);
+
+    assert.isUndefined(transform);
+
+    assert.isFalse(gesture.dragging);
+  });
+
+  test('draws from where it was pressed through every move, in content coordinates, and does not pan', () => {
+    const first = pointerMove(pressed, { id: 1, x: 210, y: 0 });
+
+    const second = pointerMove(first.gesture, { id: 1, x: 210, y: 100 });
+
+    assert.isUndefined(first.transform);
+
+    assert.isUndefined(second.transform);
+
+    assert.isTrue(second.gesture.dragging);
+
+    assert.deepStrictEqual(second.gesture.lasso, [
+      { x: 0, y: 0 },
+      { x: 100, y: 0 },
+      { x: 100, y: 50 },
+    ]);
+
+    assert.isUndefined(second.gesture.nodeDrag);
+  });
+
+  test('ends where the pointer lifts, once', () => {
+    const moved = pointerMove(
+      pointerMove(pressed, { id: 1, x: 210, y: 0 }).gesture,
+      { id: 1, x: 210, y: 100 },
+    ).gesture;
+
+    const { gesture, lassoed, dropped } = pointerUp(moved, 1, zoomed);
+
+    assert.deepStrictEqual(lassoed, [
+      { x: 0, y: 0 },
+      { x: 100, y: 0 },
+      { x: 100, y: 50 },
+    ]);
+
+    assert.isUndefined(dropped);
+
+    assert.isUndefined(gesture.lasso);
+
+    // The click that follows is still swallowed.
+    assert.isTrue(gesture.dragging);
+  });
+
+  test('draws nothing for a tap', () => {
+    assert.isUndefined(pointerUp(pressed, 1, zoomed).lassoed);
+  });
+
+  test('gives way to a pinch when a second finger comes down', () => {
+    const moved = pointerMove(pressed, { id: 1, x: 210, y: 0 }).gesture;
+
+    const pinching = pointerDown(moved, { id: 2, x: 300, y: 100 }, zoomed);
+
+    assert.isUndefined(pinching.lasso);
+
+    const { gesture, transform } = pointerMove(pinching, {
+      id: 2,
+      x: 400,
+      y: 100,
+    });
+
+    assert.isDefined(transform);
+
+    assert.isUndefined(gesture.lasso);
+
+    assert.isUndefined(pointerUp(gesture, 2, zoomed).lassoed);
+  });
+});

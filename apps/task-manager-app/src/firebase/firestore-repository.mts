@@ -140,6 +140,16 @@ export const createFirestoreRepository = (
           batch.set(milestoneDoc(milestone.id), milestoneToDoc(milestone));
         }
       }),
+    putNodes: ({ updatedTasks, updatedMilestones }) =>
+      commitBatch(firestore, (batch) => {
+        for (const task of updatedTasks) {
+          batch.set(taskDoc(task.id), taskToDoc(task));
+        }
+
+        for (const milestone of updatedMilestones) {
+          batch.set(milestoneDoc(milestone.id), milestoneToDoc(milestone));
+        }
+      }),
     subscribeGroups: (observer) =>
       watchCollection(groups, {
         next: (docs) => {

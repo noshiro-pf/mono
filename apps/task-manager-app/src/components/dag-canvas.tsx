@@ -38,8 +38,10 @@ import {
   highlightOf,
   IDLE_GESTURE,
   interpolateTransform,
+  lassoPathData,
   moveNodesTo,
   nodesBounds,
+  nodesInLasso,
   placeEmptyGroups,
   placeNodes,
   pointerDown,
@@ -94,6 +96,8 @@ import {
   dagFitRequestsSignal,
   dagLayoutStore,
   dagMembershipSignal,
+  dagSelectionSignal,
+  dagSelectionStore,
   dagViewModeSignal,
   dagViewModeStore,
   dataStore,
@@ -164,6 +168,14 @@ type Props = Readonly<{
  * button has the focus, so Delete or Backspace deletes it too, and Escape, a
  * click anywhere else or anything that moves the edge leaves it as it is.
  *
+ * In 「DAG」, a drag on the background with Shift held — or with
+ * 「なげなわ」 on, which a touch needs — draws a lasso (`dag/lasso.mts`)
+ * instead of panning, and the nodes it closes round are selected
+ * (`dagSelectionStore`) in place of what was; a tap on the background, or
+ * Escape, selects none. A drag that starts on a selected node moves every
+ * selected node with it, each staying in its group, whose frame follows
+ * it; 「一括編集」 (`dag-selection-bar.tsx`) is what moves them to another.
+ *
  * While the nodes move to their places (`dagLayoutStore.animatedPositions`)
  * the edges are plain curves, and they are routed round the nodes once the
  * nodes are there; a press or a key on the canvas puts them there at once.
@@ -208,6 +220,13 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
   const { direction, positions, groupPositions } = dagArrangementSignal.value;
 
   const membership = dagMembershipSignal.value;
+
+  const selectedIds = dagSelectionSignal.value;
+
+  const selection = useMemo(
+    (): ReadonlySet<GraphNodeId> => new Set(selectedIds),
+    [selectedIds],
+  );
 
   const groups = groupsSignal.value;
 
@@ -288,6 +307,21 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
     undefined,
   );
 
+  // 「なげなわ」: whether a drag on the background draws a lasso, as one
+  // with Shift does, rather than panning.
+  const [lassoTool, setLassoTool] = useState(false);
+
+  const mut_lassoTool = useRef(false);
+
+  const toggleLassoTool = useCallback(() => {
+    mut_lassoTool.current = !mut_lassoTool.current;
+
+    setLassoTool(mut_lassoTool.current);
+  }, []);
+
+  // The lasso being drawn, in content coordinates.
+  const [lasso, setLasso] = useState<readonly Point[] | undefined>(undefined);
+
   // At the current size, which a layout still being made at it may not be.
   const placed = useMemo(
     () =>
@@ -331,6 +365,32 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
         };
   }, [dragged, settledFrames, membership]);
 
+  // How far the nodes selected have moved, while one of them is dragged
+  // with another selected.
+  const selectionDrag = useMemo((): MovingNodes | undefined => {
+    const id = dragged?.id;
+
+    const from =
+      id === undefined ||
+      !GraphNodeIdCodec.is(id) ||
+      !selection.has(id) ||
+      selection.size < 2
+        ? undefined
+        : placed.find((node) => node.id === id);
+
+    return dragged === undefined || from === undefined
+      ? undefined
+      : {
+          dx: dragged.position.x - from.x,
+          dy: dragged.position.y - from.y,
+          members: selection,
+        };
+  }, [dragged, selection, placed]);
+
+  // The nodes moving with the one dragged: those of its group, or those
+  // selected.
+  const moving = groupDrag ?? selectionDrag;
+
   // While they move, the nodes moving, wherever they are going; otherwise
   // the nodes of the mode, where it draws them.
   const shown = useMemo(
@@ -346,15 +406,15 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
               : placed.map((node) =>
                   node.id === dragged.id
                     ? { ...node, x: dragged.position.x, y: dragged.position.y }
-                    : groupDrag?.members.has(node.id) === true
+                    : moving?.members.has(node.id) === true
                       ? {
                           ...node,
-                          x: node.x + groupDrag.dx,
-                          y: node.y + groupDrag.dy,
+                          x: node.x + moving.dx,
+                          y: node.y + moving.dy,
                         }
                       : node,
                 ),
-    [placed, dragged, groupDrag, animated, mode, arcNodes, tileNodes],
+    [placed, dragged, moving, animated, mode, arcNodes, tileNodes],
   );
 
   // Drawn while the DAG is, and not while the view changes mode: round the
@@ -364,7 +424,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
       return [];
     }
 
-    if (animated !== undefined) {
+    if (animated !== undefined || selectionDrag !== undefined) {
       return groupFrames(shown, membership, emptyAt);
     }
 
@@ -391,6 +451,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
     arrangeable,
     opacities,
     animated,
+    selectionDrag,
     groupDrag,
     settledFrames,
     shown,
@@ -402,7 +463,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
   // is in.
   const dropTargets = useMemo((): NodeDropTargets | undefined => {
     const node =
-      dragged === undefined || groupDrag !== undefined
+      dragged === undefined || moving !== undefined
         ? undefined
         : shown.find(({ id }) => id === dragged.id);
 
@@ -414,7 +475,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
       into: dropTarget(settledFrames, node),
       from: groupsByMember(membership).get(node.id),
     };
-  }, [dragged, groupDrag, shown, settledFrames, membership]);
+  }, [dragged, moving, shown, settledFrames, membership]);
 
   const titles = useMemo(
     () => new Map(groups.map(({ id, title }) => [id, title])),
@@ -468,8 +529,9 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
     if (mut_slowDrag.current) {
       const curves = edgeGeometries(direction, shown, layout.edges);
 
-      // A group's nodes all move: every edge is a curve.
-      return GraphNodeIdCodec.is(dragged.id)
+      // A group's nodes, or the selected ones, all move: every edge is a
+      // curve.
+      return selectionDrag === undefined && GraphNodeIdCodec.is(dragged.id)
         ? withCurvesOf(settled, curves, dragged.id)
         : curves;
     }
@@ -481,7 +543,24 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
     mut_slowDrag.current = performance.now() - started > DRAG_ROUTING_BUDGET_MS;
 
     return routed;
-  }, [arrangeable, animated, dragged, direction, shown, layout.edges, settled]);
+  }, [
+    arrangeable,
+    animated,
+    dragged,
+    selectionDrag,
+    direction,
+    shown,
+    layout.edges,
+    settled,
+  ]);
+
+  // While a lasso is drawn, the nodes it closes round so far, which are
+  // drawn selected in place of those that are.
+  const drawnSelection = useMemo(
+    (): ReadonlySet<GraphNodeId> =>
+      lasso === undefined ? selection : new Set(nodesInLasso(placed, lasso)),
+    [lasso, selection, placed],
+  );
 
   // The edge selected, while it is drawn as it was when clicked: not once
   // it is gone or has moved, nor while anything is dragged or moves.
@@ -542,11 +621,16 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
 
   const mut_frames = useRef<readonly GroupFrame[]>(settledFrames);
 
+  // And the nodes selected, which a drop of one of them moves.
+  const mut_selection = useRef<ReadonlySet<GraphNodeId>>(selection);
+
   useEffect(() => {
     mut_placed.current = arrangeable ? placed : [];
 
     mut_frames.current = settledFrames;
-  }, [arrangeable, placed, settledFrames]);
+
+    mut_selection.current = selection;
+  }, [arrangeable, placed, settledFrames, selection]);
 
   // The nodes a handle can be on: those that can be grabbed, once they are
   // where they are drawn.
@@ -884,16 +968,22 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
 
       const pressedHandle = mut_handle.current;
 
+      const first = !Arr.isNonEmpty(mut_gesture.current.pointers);
+
       const grab: Grab | undefined =
-        pressedHandle !== undefined &&
-        pressed.pointerType !== 'touch' &&
-        !Arr.isNonEmpty(mut_gesture.current.pointers)
+        first && pressedHandle !== undefined && pressed.pointerType !== 'touch'
           ? ({
               kind: 'connect',
               from: pressedHandle.id,
               anchor: pressedHandle.at,
             } as const)
-          : grabOf(pressed.target, mut_placed.current, mut_frames.current);
+          : (grabOf(pressed.target, mut_placed.current, mut_frames.current) ??
+            // The background, in the mode the reader arranges.
+            (first &&
+            Arr.isNonEmpty(mut_placed.current) &&
+            (pressed.shiftKey || mut_lassoTool.current)
+              ? ({ kind: 'lasso' } as const)
+              : undefined));
 
       if (grab?.kind !== 'connect') {
         showHandle(undefined);
@@ -909,6 +999,8 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
       setDragged(undefined);
 
       setConnecting(undefined);
+
+      setLasso(undefined);
     },
     [showHandle],
   );
@@ -951,6 +1043,10 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
         setConnecting(next.gesture.connectDrag);
       }
 
+      if (next.gesture.lasso !== before.lasso) {
+        setLasso(next.gesture.lasso);
+      }
+
       if (next.transform === undefined) {
         return;
       }
@@ -971,8 +1067,10 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
 
   const onPointerEnd = useCallback<PointerEventHandler<SVGSVGElement>>(
     (ended) => {
-      const { gesture, dropped, connected } = pointerUp(
-        mut_gesture.current,
+      const before = mut_gesture.current;
+
+      const { gesture, dropped, connected, lassoed } = pointerUp(
+        before,
         ended.pointerId,
         mut_transform.current,
       );
@@ -981,7 +1079,28 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
 
       // A cancelled pointer (the system took it over) drops nothing.
       if (dropped !== undefined && ended.type === 'pointerup') {
-        dropDragged(dropped, mut_placed.current, mut_frames.current);
+        dropDragged(
+          dropped,
+          mut_placed.current,
+          mut_frames.current,
+          mut_selection.current,
+        );
+      }
+
+      if (lassoed !== undefined && ended.type === 'pointerup') {
+        dagSelectionStore.select(nodesInLasso(mut_placed.current, lassoed));
+      }
+
+      // A tap on the background selects none.
+      if (
+        ended.type === 'pointerup' &&
+        !before.dragging &&
+        (before.start?.grab === undefined ||
+          before.start.grab.kind === 'lasso') &&
+        Arr.isFixedLengthArray(1, before.pointers) &&
+        before.pointers.some(({ id }) => id === ended.pointerId)
+      ) {
+        dagSelectionStore.clear();
       }
 
       const target =
@@ -1005,6 +1124,8 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
       setDragged(undefined);
 
       setConnecting(undefined);
+
+      setLasso(undefined);
 
       // Shown again by the next move, where the pointer is then.
       showHandle(undefined);
@@ -1142,8 +1263,22 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
     (pressed) => {
       dagLayoutStore.finishAnimation();
 
-      if (pressed.key === ' ') {
-        pressed.preventDefault();
+      switch (pressed.key) {
+        case ' ':
+          pressed.preventDefault();
+
+          break;
+
+        // Unless it gives up an arrow being drawn, which is all it does then.
+        case 'Escape':
+          if (mut_gesture.current.start?.grab?.kind !== 'connect') {
+            dagSelectionStore.clear();
+          }
+
+          break;
+
+        default:
+          break;
       }
 
       const frame = mode === 'tile' ? measureTile() : undefined;
@@ -1243,6 +1378,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
         data-animating={animated !== undefined}
         data-connect={handle !== undefined || connecting !== undefined}
         data-e2e={'dag-canvas'}
+        data-lasso={arrangeable && lassoTool}
         data-mode={mode}
         data-motion={motion}
         onBlurCapture={onBlurCapture}
@@ -1356,7 +1492,11 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
             {shown.map((node) => {
               const view = views.get(node.id);
 
-              const isDragged = node.id === dragged?.id;
+              const isDragged =
+                node.id === dragged?.id ||
+                selectionDrag?.members.has(node.id) === true;
+
+              const isSelected = arrangeable && drawnSelection.has(node.id);
 
               const nodeHighlight = highlightOf(highlight?.nodes, node.id);
 
@@ -1371,6 +1511,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
                   movable={arrangeable}
                   node={node}
                   opacity={opacity}
+                  selected={isSelected}
                   view={view}
                 />
               ) : (
@@ -1382,6 +1523,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
                   movable={arrangeable}
                   node={node}
                   opacity={opacity}
+                  selected={isSelected}
                   view={view}
                 />
               );
@@ -1393,6 +1535,13 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
                 scale={drawnTransform.scale}
                 onDelete={deleteSelectedEdge}
                 onDismiss={dismissSelectedEdge}
+              />
+            )}
+            {lasso === undefined ? undefined : (
+              <path
+                className={'dag-lasso'}
+                d={lassoPathData(lasso)}
+                data-e2e={'dag-lasso'}
               />
             )}
             {arrangeable ? (
@@ -1415,6 +1564,20 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
         />
       )}
       <div ref={controlsRef} className={'dag-controls'}>
+        {arrangeable ? (
+          <button
+            aria-pressed={lassoTool}
+            className={`bp6-button ${lassoTool ? 'bp6-active' : ''}`}
+            data-e2e={'dag-lasso-tool'}
+            title={
+              '背景のドラッグで囲んだノードを選びます（Shift を押しながらのドラッグでも選べます）'
+            }
+            type={'button'}
+            onClick={toggleLassoTool}
+          >
+            {'なげなわ'}
+          </button>
+        ) : undefined}
         {mode === 'tile' ? undefined : (
           <>
             <button
@@ -1466,13 +1629,15 @@ const ARC_MIN_SCALE = 0.5;
 /** Between the toolbar and the top of 「アーク」 fitted below it. */
 const TOOLBAR_CLEARANCE = 8;
 
-/** The group dragged by its title: how far, and the nodes moving with it. */
-type GroupDrag = Readonly<{
-  id: GroupId;
+/** Nodes moving with the one dragged: how far, and which. */
+type MovingNodes = Readonly<{
   dx: number;
   dy: number;
   members: ReadonlySet<GraphNodeId>;
 }>;
+
+/** The group dragged by its title: how far, and the nodes moving with it. */
+type GroupDrag = MovingNodes & Readonly<{ id: GroupId }>;
 
 /**
  * The group a node being dragged would go into if dropped now, and the one
@@ -1503,7 +1668,7 @@ type TileFrame = Readonly<{ topInset: number; viewport: number }>;
 
 /** What the canvas shows, for a screen reader. */
 const captions = {
-  dag: '依存関係グラフ。ノードを選ぶと詳細を開きます。ノードはドラッグか矢印キーで動かせます。ノードの縁の丸からほかのノードへドラッグすると、ドロップしたノードがそのノードに依存します。依存の矢印を選ぶと、削除ボタンか Delete キーで削除できます。背景のドラッグで移動、ホイールかピンチで拡大縮小できます。',
+  dag: '依存関係グラフ。ノードを選ぶと詳細を開きます。ノードはドラッグか矢印キーで動かせます。ノードの縁の丸からほかのノードへドラッグすると、ドロップしたノードがそのノードに依存します。依存の矢印を選ぶと、削除ボタンか Delete キーで削除できます。背景のドラッグで移動、ホイールかピンチで拡大縮小できます。Shift を押しながら、または「なげなわ」をオンにして背景をドラッグすると、囲んだノードを選び、まとめて動かしたり一括編集したりできます。',
   arc: 'アークダイアグラム。タスクをタイトル順に縦に並べ、依存を右側の弧で示します。破線はマイルストーンを経由する依存です。タスクを選ぶと詳細を開きます。ドラッグで移動、ホイールかピンチで拡大縮小できます。',
   tile: 'タスクをタイトル順に左上から横に並べ、幅に収まらない分は次の行に折り返します。依存は示しません。タスクを選ぶと詳細を開きます。ホイール、ドラッグ、Page Up・Page Down・Home・End キーで縦にスクロールできます。',
 } as const satisfies ReadonlyRecord<DagViewMode, string>;
@@ -1597,13 +1762,15 @@ const groupIdOf = (target: EventTarget | null): GroupId | undefined => {
 
 /**
  * What a drag ends with: a frame dragged by its title moves there with its
- * nodes; a node is put there, in the group of the frame it was dropped in,
- * of those it was picked up among, or in none.
+ * nodes; a node `selected` with others moves as far with them, each in its
+ * group; any other node is put there, in the group of the frame it was
+ * dropped in, of those it was picked up among, or in none.
  */
 const dropDragged = (
   dropped: NodeDrag,
   nodes: readonly LaidOutNode[],
   drawnFrames: readonly GroupFrame[],
+  selected: ReadonlySet<GraphNodeId>,
 ): void => {
   const group = groupIdOfKey(dropped.id);
 
@@ -1616,6 +1783,15 @@ const dropDragged = (
   const node = nodes.find(({ id }) => id === dropped.id);
 
   if (node === undefined || !GraphNodeIdCodec.is(dropped.id)) {
+    return;
+  }
+
+  if (selected.has(dropped.id) && selected.size > 1) {
+    dagLayoutStore.moveNodes(Array.from(selected), {
+      x: dropped.position.x - node.x,
+      y: dropped.position.y - node.y,
+    });
+
     return;
   }
 

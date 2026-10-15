@@ -692,6 +692,44 @@ fieldset {
   gap: 8px;
 }
 
+/*
+ * The nodes selected, and what can be done with them: at the bottom left,
+ * and on a phone above the buttons at the bottom right, which leave it no
+ * room beside them.
+ */
+.dag-selection-bar {
+  position: absolute;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  left: max(12px, env(safe-area-inset-left));
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 4px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  background: var(--surface);
+}
+
+@media (max-width: 599px) {
+  .dag-selection-bar {
+    bottom: calc(max(12px, env(safe-area-inset-bottom)) + var(--tap) + 8px);
+  }
+}
+
+/* The lasso being drawn, and the canvas while 「なげなわ」 is on. */
+.dag-lasso {
+  fill: rgb(45 114 210 / 8%);
+  stroke: var(--focus);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.dag-svg[data-lasso='true'] {
+  cursor: crosshair;
+}
+
 /* 「タイル」's scroll indicator: a thin thumb on the right, never in the way. */
 .dag-scroll-thumb {
   position: absolute;
@@ -941,6 +979,16 @@ fieldset {
   filter: drop-shadow(0 4px 8px rgb(0 0 0 / 25%));
 }
 
+/*
+ * Selected by the lasso: outlined in the focus colour, dashed, so that it
+ * reads apart from the focus ring.
+ */
+.dag-node.selected .dag-node-shape {
+  stroke: var(--focus);
+  stroke-width: 3;
+  stroke-dasharray: 6 3;
+}
+
 .dag-node:focus-visible .dag-node-shape {
   stroke: var(--focus);
   stroke-width: 3;
@@ -1145,6 +1193,25 @@ fieldset {
 
 .group-dialog {
   width: min(440px, calc(100vw - 32px));
+}
+
+.bulk-edit-dialog {
+  width: min(520px, calc(100vw - 32px));
+}
+
+/* The labels to take off: a tick box for each, as many to a row as fit. */
+.bulk-remove-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.bulk-remove-labels legend {
+  margin-bottom: 4px;
+  padding: 0;
 }
 
 @media (max-width: 599px) {

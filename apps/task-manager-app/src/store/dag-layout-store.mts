@@ -257,6 +257,11 @@ export type DagLayoutStore = Readonly<{
    * corner: its nodes moved as far, and saved at once.
    */
   moveGroup: (id: GroupId, position: Point) => void;
+  /**
+   * The nodes `ids` — those selected — dragged together by `delta`: saved
+   * at once, each staying in its group, whose frame follows it.
+   */
+  moveNodes: (ids: readonly GraphNodeId[], delta: Point) => void;
   /** A node moved by `delta` with the keys, saved after a pause. */
   nudgeNode: (id: GraphNodeId, delta: Point) => void;
   /** Saves the direction; no node moves. */
@@ -1018,6 +1023,30 @@ export const createDagLayoutStore = <H, F>(
     });
   };
 
+  const moveNodes = (ids: readonly GraphNodeId[], delta: Point): void => {
+    const current = getArrangement();
+
+    const moving = new Set(ids);
+
+    const moved: readonly (readonly [GraphNodeId, Point])[] = placed()
+      .filter((node) => moving.has(node.id))
+      .map(
+        (node) =>
+          [node.id, { x: node.x + delta.x, y: node.y + delta.y }] as const,
+      );
+
+    const nodePositions: readonly (readonly [GraphNodeId, Point])[] = [
+      ...current.positions,
+      ...moved,
+    ] as const;
+
+    commit({
+      direction: current.direction,
+      positions: new Map(nodePositions),
+      groupPositions: current.groupPositions,
+    });
+  };
+
   const nudgeNode = (id: GraphNodeId, delta: Point): void => {
     const from = positionOf(id);
 
@@ -1261,6 +1290,7 @@ export const createDagLayoutStore = <H, F>(
     moveNode,
     dropNode,
     moveGroup,
+    moveNodes,
     nudgeNode,
     setDirection,
     autoArrange,

@@ -15,7 +15,10 @@
  * press on a node's handle draws an arrow from it instead (`connectDrag`),
  * which ends where the pointer lifts. A second finger turns either press
  * into a pinch, which leaves the node where it was and draws nothing. A
- * group's frame, grabbed by its title, is dragged as a node is.
+ * group's frame, grabbed by its title, is dragged as a node is. A press
+ * the canvas says draws a lasso (`lasso.mts`) draws one from where it went
+ * down through every point it moves to (`lasso`), which ends where the
+ * pointer lifts; a second finger turns it into a pinch as well.
  *
  * An arrow being drawn can be given up before it is dropped
  * ({@link cancelConnect}, on Escape): the rest of that press then draws,
@@ -43,11 +46,13 @@ export const IDLE_GESTURE: Gesture = {
   dragging: false,
   nodeDrag: undefined,
   connectDrag: undefined,
+  lasso: undefined,
 } as const;
 
 /**
- * A pointer went down — on what `grab` says, a node to drag or a handle to
- * draw an arrow from, or on the background.
+ * A pointer went down — on what `grab` says, a node to drag, a handle to
+ * draw an arrow from or the background to draw a lasso on, or on the
+ * background to pan.
  */
 export const pointerDown = (
   gesture: Gesture,
@@ -69,6 +74,7 @@ export const pointerDown = (
       pinching || (Arr.isNonEmpty(gesture.pointers) && gesture.dragging),
     nodeDrag: undefined,
     connectDrag: undefined,
+    lasso: undefined,
   };
 };
 
@@ -142,6 +148,23 @@ export const pointerMove = (
     };
   }
 
+  if (start.grab?.kind === 'lasso') {
+    return {
+      gesture: {
+        ...gesture,
+        pointers,
+        dragging,
+        lasso: dragging
+          ? Arr.toPushed(
+              gesture.lasso ?? [contentPointAt(start.transform, startFirst)],
+              contentPointAt(start.transform, first),
+            )
+          : undefined,
+      },
+      transform: undefined,
+    };
+  }
+
   if (start.grab !== undefined) {
     return {
       gesture: {
@@ -192,8 +215,9 @@ export const cancelConnect = (gesture: Gesture): Gesture => {
 
 /**
  * The pointer `id` lifted, with `transform` on screen, and the node it
- * dropped if it was dragging one, or the arrow it drew if it was drawing
- * one. A pinch that loses a finger becomes a pan from where it is.
+ * dropped if it was dragging one, the arrow it drew if it was drawing one,
+ * or the lasso it drew. A pinch that loses a finger becomes a pan from
+ * where it is.
  */
 export const pointerUp = (
   gesture: Gesture,
@@ -203,6 +227,7 @@ export const pointerUp = (
   gesture: Gesture;
   dropped: NodeDrag | undefined;
   connected: ConnectDrag | undefined;
+  lassoed: readonly Point[] | undefined;
 }> => {
   const pointers = gesture.pointers.filter((tracked) => tracked.id !== id);
 
@@ -217,16 +242,18 @@ export const pointerUp = (
       dragging: gesture.dragging,
       nodeDrag: undefined,
       connectDrag: undefined,
+      lasso: undefined,
     },
     dropped: lifted ? gesture.nodeDrag : undefined,
     connected: lifted ? gesture.connectDrag : undefined,
+    lassoed: lifted ? gesture.lasso : undefined,
   };
 };
 
 export type TrackedPointer = Readonly<{ id: number }> & Point;
 
 /** What a pointer went down on that a move drags. */
-export type Grab = NodeGrab | ConnectGrab;
+export type Grab = NodeGrab | ConnectGrab | LassoGrab;
 
 /**
  * The node a pointer went down on, or the group by its key, and where it
@@ -247,6 +274,9 @@ export type ConnectGrab = Readonly<{
   from: GraphNodeId;
   anchor: Point;
 }>;
+
+/** The background, pressed to draw a lasso on rather than to pan. */
+export type LassoGrab = Readonly<{ kind: 'lasso' }>;
 
 /** A press whose arrow was given up, which a move no longer drags. */
 type Cancelled = Readonly<{ kind: 'cancelled' }>;
@@ -282,6 +312,11 @@ export type Gesture = DeepReadonly<{
   dragging: boolean;
   nodeDrag: NodeDrag | undefined;
   connectDrag: ConnectDrag | undefined;
+  /**
+   * The lasso being drawn, in content coordinates: where the press went
+   * down, then every point it has moved to.
+   */
+  lasso: Point[] | undefined;
 }>;
 
 const CANCELLED: Cancelled = { kind: 'cancelled' } as const;

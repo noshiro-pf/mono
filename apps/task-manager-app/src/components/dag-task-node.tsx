@@ -12,6 +12,8 @@ type Props = Readonly<{
   view: TaskNodeView;
   /** Being dragged, and drawn lifted. */
   dragging: boolean;
+  /** Selected by the lasso, and drawn outlined. */
+  selected: boolean;
   /** Moved by the arrow keys: in the view modes the reader arranges. */
   movable: boolean;
   /** Brought forward or dimmed by the arc diagram's highlight. */
@@ -33,7 +35,16 @@ type Props = Readonly<{
  * keys move it.
  */
 export const DagTaskNode = memoNamed<Props>('DagTaskNode', (props) => {
-  const { node, view, dragging, movable, highlight, opacity, compact } = props;
+  const {
+    node,
+    view,
+    dragging,
+    selected,
+    movable,
+    highlight,
+    opacity,
+    compact,
+  } = props;
 
   const { openNode, onKeyDown } = useDagNodeHandlers(view.ref, movable);
 
@@ -44,11 +55,12 @@ export const DagTaskNode = memoNamed<Props>('DagTaskNode', (props) => {
     // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
     <g
       aria-label={view.ariaLabel}
-      className={`dag-node dag-task status-${view.status}${compact ? ' compact' : ''}${dragging ? ' dragging' : ''}`}
+      className={`dag-node dag-task status-${view.status}${compact ? ' compact' : ''}${dragging ? ' dragging' : ''}${selected ? ' selected' : ''}`}
       data-e2e={'dag-node'}
       data-highlight={highlight}
       data-node-id={node.id}
       data-priority={view.priority}
+      data-selected={selected}
       opacity={opacity}
       role={'button'}
       // Lower case: Preact sets an SVG element's props as attributes, and

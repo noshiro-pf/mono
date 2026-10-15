@@ -1,5 +1,6 @@
 export * from './animation-setting-field.js';
 export * from './app-header.js';
+export * from './bulk-edit-dialog.js';
 export * from './close-on-backdrop-click.mjs';
 export * from './dag-arc-edge.js';
 export * from './dag-canvas.js';
@@ -8,6 +9,7 @@ export * from './dag-edge-delete.js';
 export * from './dag-edge.js';
 export * from './dag-group-frame.js';
 export * from './dag-milestone-node.js';
+export * from './dag-selection-bar.js';
 export * from './dag-settings-button.js';
 export * from './dag-settings-panel.js';
 export * from './dag-show-done-field.js';

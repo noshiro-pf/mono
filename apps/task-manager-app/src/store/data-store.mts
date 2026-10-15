@@ -13,11 +13,12 @@
  */
 
 import { createState, type InitializedObservable } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { DagLayout } from '../dag/index.mjs';
 import {
   addDependency,
+  editNodes,
   regroupNode,
   removeDependency,
   removeGroup,
@@ -27,6 +28,7 @@ import {
   type Group,
   type GroupId,
   type Milestone,
+  type NodeEdit,
   type NodeRef,
   type Task,
 } from '../domain/index.mjs';
@@ -69,6 +71,11 @@ export type DataStore = Readonly<{
   deleteGroup: (id: GroupId) => void;
   /** Moves the node `ref` into the group `groupId`, or into none. */
   setNodeGroup: (ref: NodeRef, groupId: GroupId | undefined) => void;
+  /**
+   * Makes `edit` to every node `refs` names, as `editNodes` says, in one
+   * write; writes nothing when nothing changes.
+   */
+  editNodes: (refs: readonly NodeRef[], edit: NodeEdit) => void;
   putDagLayout: (layout: DagLayout) => void;
   /** Starts following the session, and returns what stops it. */
   start: () => () => void;
@@ -269,6 +276,18 @@ export const createDataStore = (deps: DataDeps): DataStore => {
           ? repository.putTask(regrouped.task)
           : repository.putMilestone(regrouped.milestone),
       );
+    },
+    editNodes: (refs, edit) => {
+      const edited = editNodes(getState(), refs, edit, deps.now());
+
+      if (
+        !Arr.isNonEmpty(edited.updatedTasks) &&
+        !Arr.isNonEmpty(edited.updatedMilestones)
+      ) {
+        return;
+      }
+
+      write('まとめて保存', (repository) => repository.putNodes(edited));
     },
     putDagLayout: (layout) => {
       write('DAG の配置を保存', (repository) =>

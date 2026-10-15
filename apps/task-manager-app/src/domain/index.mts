@@ -6,6 +6,7 @@ export * from './dependency-depth.mjs';
 export * from './dependency-graph.mjs';
 export * from './dependency.mjs';
 export * from './display-status.mjs';
+export * from './edit-nodes.mjs';
 export * from './evaluation-context.mjs';
 export * from './evaluator.mjs';
 export * from './graph-nodes.mjs';

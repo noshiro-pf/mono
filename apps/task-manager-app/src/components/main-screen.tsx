@@ -1,6 +1,7 @@
 import { memoNamed } from 'preact-utils';
 import { viewSignal } from '../store/index.mjs';
 import { AppHeader } from './app-header.js';
+import { BulkEditDialog } from './bulk-edit-dialog.js';
 import { DagView } from './dag-view.js';
 import { GroupDialog } from './group-dialog.js';
 import { ListView } from './list-view.js';
@@ -13,7 +14,7 @@ type Props = Readonly<{
 
 /**
  * The app once signed in: the header, the list or the DAG, and the dialogs
- * of a node and of a group.
+ * of a node, of a group, and of 「一括編集」.
  */
 export const MainScreen = memoNamed<Props>('MainScreen', (props) => {
   const { userName } = props;
@@ -25,6 +26,7 @@ export const MainScreen = memoNamed<Props>('MainScreen', (props) => {
       {viewSignal.value === 'list' ? <ListView /> : <DagView />}
       <NodeDialog />
       <GroupDialog />
+      <BulkEditDialog />
     </div>
   );
 });

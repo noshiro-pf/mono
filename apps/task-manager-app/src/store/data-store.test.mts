@@ -294,6 +294,72 @@ describe(createDataStore, () => {
       assert.isUndefined(store.state.getSnapshot().value.tasks[0]?.groupId);
     });
 
+    test('edits several nodes in one write, and writes nothing when nothing changes', async () => {
+      const { store, setSession } = setup();
+
+      const repository = createMemoryRepository({
+        ...initial,
+        milestones: [m],
+      });
+
+      let mut_writes = 0;
+
+      setSession(
+        signedIn({
+          ...repository,
+          putNodes: (nodes) => {
+            mut_writes += 1;
+
+            return repository.putNodes(nodes);
+          },
+        }),
+      );
+
+      const refs = [
+        { kind: 'task', id: asTaskId('a') },
+        { kind: 'task', id: asTaskId('b') },
+        { kind: 'milestone', id: asMilestoneId('m') },
+      ] as const;
+
+      store.editNodes(refs, {
+        progress: 'in-progress',
+        addLabels: ['x'],
+        removeLabels: [],
+        group: { to: g },
+      });
+
+      await Promise.resolve();
+
+      assert.strictEqual(mut_writes, 1);
+
+      const { tasks, milestones } = store.state.getSnapshot().value;
+
+      assert.deepStrictEqual(
+        tasks.map(({ progress, labels, groupId }) => ({
+          progress,
+          labels,
+          groupId,
+        })),
+        [
+          { progress: 'in-progress', labels: ['x'], groupId: g },
+          { progress: 'in-progress', labels: ['x'], groupId: g },
+        ],
+      );
+
+      assert.strictEqual(milestones[0]?.groupId, g);
+
+      store.editNodes(refs, {
+        progress: 'in-progress',
+        addLabels: ['x'],
+        removeLabels: [],
+        group: undefined,
+      });
+
+      await Promise.resolve();
+
+      assert.strictEqual(mut_writes, 1);
+    });
+
     test('deletes a group, keeping its nodes in none', async () => {
       const { store, setSession } = setup();
 
