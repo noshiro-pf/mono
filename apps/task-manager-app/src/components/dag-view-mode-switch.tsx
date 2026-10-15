@@ -5,7 +5,7 @@ import { dagViewModeLabels, dagViewModes } from '../view-model/index.mjs';
 
 /**
  * How the graph is drawn: one button per view mode, the pressed one is the
- * mode shown. Kept on this device. A mode added to `dagViewModes` gets its
+ * mode shown. Kept on this device, and in the URL. A mode added to `dagViewModes` gets its
  * button here with nothing else to do.
  */
 export const DagViewModeSwitch = memoNamed('DagViewModeSwitch', () => {

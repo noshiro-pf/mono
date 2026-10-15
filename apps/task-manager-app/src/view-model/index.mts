@@ -21,3 +21,4 @@ export * from './sign-in-error.mjs';
 export * from './sort-edit.mjs';
 export * from './storage-mode.mjs';
 export * from './task-draft.mjs';
+export * from './view-query.mjs';

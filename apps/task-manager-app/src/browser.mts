@@ -21,6 +21,36 @@ export const saveSetting =
     writeStorage(setting.key, setting.serialize(value));
   };
 
+// Neither `window.location`, `globalThis.location` nor a bare `location`
+// satisfies the lint rules together; destructuring once names each something
+// that is none of the three — the same as in `pr-manager-app/src/url.mts`.
+const { location: browserLocation, history: browserHistory } = globalThis;
+
+/** The URL's query, `?` and all, or nothing. */
+export const readLocationSearch = (): string => browserLocation.search;
+
+/**
+ * Puts `search` in place of the URL's query, keeping the rest of the URL
+ * and adding no entry to the history.
+ */
+export const replaceLocationSearch = (search: string): void => {
+  const { pathname, hash } = browserLocation;
+
+  // The whole path, not just the query: `replaceState` with an empty URL
+  // resolves to the current one, so taking out the last parameter would
+  // otherwise change nothing.
+  try {
+    browserHistory.replaceState(
+      browserHistory.state,
+      '',
+      `${pathname}${search}${hash}`,
+    );
+  } catch {
+    // Safari refuses after too many calls in a row; a reload then shows
+    // the screen the URL last said, which is all that is lost.
+  }
+};
+
 /**
  * A DOM event as an observable, listened to for as long as the page is
  * open — which is as long as anything in the store lives.

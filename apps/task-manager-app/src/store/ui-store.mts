@@ -6,9 +6,7 @@
  */
 
 import { createState, type InitializedObservable } from 'synstate';
-import type { SettingsPanelPlacement } from '../view-model/index.mjs';
-
-export type View = 'list' | 'dag';
+import type { SettingsPanelPlacement, View } from '../view-model/index.mjs';
 
 export type UiDeps = Readonly<{
   initialView: View;

@@ -74,8 +74,9 @@ test(
 
     await expect.soft(page.getByTestId('dag-edge')).toHaveCount(10);
 
-    // Kept on this device.
-    await page.reload();
+    // Kept on this device: a new visit, which the URL does not open on the
+    // graph.
+    await page.goto(DEMO);
 
     await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
