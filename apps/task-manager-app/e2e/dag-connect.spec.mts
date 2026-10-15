@@ -157,6 +157,62 @@ test(
   },
 );
 
+test(
+  'deletes a dependency from the button on an edge clicked',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await showDag(page);
+
+    const edge = dagEdge(page, 'milestone:freeze', 'milestone:release');
+
+    await expect.soft(page.getByTestId('dag-edge-delete')).toHaveCount(0);
+
+    await clickEdge(page, edge);
+
+    await expect.soft(edge).toHaveAttribute('data-selected', 'true');
+
+    // Escape leaves it as it is.
+    await page.keyboard.press('Escape');
+
+    await expect.soft(edge).toHaveAttribute('data-selected', 'false');
+
+    await expect.soft(page.getByTestId('dag-edge-delete')).toHaveCount(0);
+
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(7);
+
+    await clickEdge(page, edge);
+
+    await page.getByTestId('dag-edge-delete').click();
+
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(6);
+
+    expect
+      .soft(await edgeEnds(page))
+      .not.toContain('milestone:freeze -> milestone:release');
+
+    await expect.soft(page.getByTestId('node-dialog')).toBeHidden();
+  },
+);
+
+test(
+  'deletes the edge selected with the Delete key',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await showDag(page);
+
+    await clickEdge(
+      page,
+      dagEdge(page, 'milestone:freeze', 'milestone:release'),
+    );
+
+    await expect.soft(page.getByTestId('dag-edge-delete')).toBeFocused();
+
+    await page.keyboard.press('Delete');
+
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(6);
+  },
+);
+
 const showDag = async (page: DeepReadonly<Page>): Promise<void> => {
   await page.goto(DEMO);
 
@@ -180,6 +236,31 @@ const edgeEnds = async (page: DeepReadonly<Page>): Promise<readonly string[]> =>
           : '',
       ),
     );
+
+const dagEdge = (page: DeepReadonly<Page>, from: string, to: string): Locator =>
+  page.locator(`[data-e2e="dag-edge"][data-from="${from}"][data-to="${to}"]`);
+
+/** A click on the middle of an edge's line, not of its bounding box. */
+const clickEdge = async (
+  page: DeepReadonly<Page>,
+  edge: Locator,
+): Promise<void> => {
+  const point = await edge.getByTestId('dag-edge-hit').evaluate((path) => {
+    if (!(path instanceof SVGPathElement)) {
+      return { x: 0, y: 0 };
+    }
+
+    const middle = path.getPointAtLength(path.getTotalLength() / 2);
+
+    const matrix = path.getScreenCTM();
+
+    const on = matrix === null ? middle : middle.matrixTransform(matrix);
+
+    return { x: on.x, y: on.y };
+  });
+
+  await page.mouse.click(point.x, point.y);
+};
 
 const dagNode = (page: DeepReadonly<Page>, title: RegExp): Locator =>
   page.getByTestId('dag-node').and(page.getByRole('button', { name: title }));

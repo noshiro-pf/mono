@@ -145,6 +145,43 @@ describe(createDataStore, () => {
     assert.deepStrictEqual(errors, []);
   });
 
+  test('removes a dependency', async () => {
+    const { store, setSession, errors } = setup();
+
+    setSession(signedIn(createMemoryRepository(initial)));
+
+    store.removeDependency(
+      { kind: 'task', id: asTaskId('b') },
+      { kind: 'task', id: asTaskId('a') },
+    );
+
+    await Promise.resolve();
+
+    assert.deepStrictEqual(store.state.getSnapshot().value.tasks, [
+      a,
+      { ...b, dependencies: [], updatedAt: 1000 },
+    ]);
+
+    assert.deepStrictEqual(errors, []);
+  });
+
+  test('writes nothing for a dependency that is not there', async () => {
+    const { store, setSession, errors } = setup();
+
+    setSession(signedIn(createMemoryRepository(initial)));
+
+    store.removeDependency(
+      { kind: 'task', id: asTaskId('a') },
+      { kind: 'task', id: asTaskId('b') },
+    );
+
+    await Promise.resolve();
+
+    assert.deepStrictEqual(store.state.getSnapshot().value, initial);
+
+    assert.deepStrictEqual(errors, []);
+  });
+
   test('reports a dependency it refuses, and writes nothing', async () => {
     const { store, setSession, errors } = setup();
 

@@ -3,6 +3,8 @@ import type { EdgeGeometry } from '../dag/index.mjs';
 
 type Props = Readonly<{
   edge: EdgeGeometry;
+  /** Clicked, and showing the button that deletes it (`dag-canvas.tsx`). */
+  selected: boolean;
 }>;
 
 /**
@@ -11,9 +13,13 @@ type Props = Readonly<{
  * an arrowhead, which the marker turns along the path's last tangent —
  * straight into the node. Its label, `SS` for start-to-start and the lag,
  * sits on the middle of the path.
+ *
+ * A wider, unpainted stroke along the path takes the pointer, so that the
+ * line is easy to point at: pointed at, it is drawn in the focus colour, and
+ * clicked, it is selected (`dag-canvas.tsx`) and stays so.
  */
 export const DagEdge = memoNamed<Props>('DagEdge', (props) => {
-  const { edge } = props;
+  const { edge, selected } = props;
 
   const { path, labelBox, label, from, to, routed } = edge;
 
@@ -21,8 +27,10 @@ export const DagEdge = memoNamed<Props>('DagEdge', (props) => {
     <g
       className={'dag-edge'}
       data-e2e={'dag-edge'}
+      data-edge-id={edge.id}
       data-from={from}
       data-routed={routed}
+      data-selected={selected}
       data-to={to}
     >
       <path
@@ -30,6 +38,7 @@ export const DagEdge = memoNamed<Props>('DagEdge', (props) => {
         d={path}
         markerEnd={'url(#dag-arrow)'}
       />
+      <path className={'dag-edge-hit'} d={path} data-e2e={'dag-edge-hit'} />
       {labelBox === undefined ? undefined : (
         <g className={'dag-edge-label'}>
           <rect
