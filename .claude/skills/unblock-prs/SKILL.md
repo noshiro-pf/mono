@@ -1,6 +1,6 @@
 ---
 name: unblock-prs
-description: Fix the queued pull requests whose owner is this skill — set aside by `pnpm run unblock-prs` for a failing check or a rebase that conflicted — one at a time, claimed first and pushed with the worker's own push, and file an issue for any whose owner is nobody; leave every other rebase, release, watch and merge to that script. Use when asked to unblock the open PRs, fix what the merge queue set aside, fix a failing check on a queued PR, or resolve a conflict the script could not; run it under `/loop` beside the script.
+description: Fix the queued pull requests whose owner is this skill — set aside by `pnpm run unblock-prs` for a failing check or a rebase that conflicted, the dependency update (`chore/pnpm-update`) included — one at a time, claimed first and pushed with the worker's own push, and file an issue for any whose owner is nobody; leave every other rebase, release, watch and merge to that script. Use when asked to unblock the open PRs, look after the pnpm-update pull request, fix what the merge queue set aside, fix a failing check on a queued PR, or resolve a conflict the script could not; run it under `/loop` beside the script.
 ---
 
 # Fix what the merge queue set aside
@@ -20,12 +20,12 @@ from one function — `apps/pr-report-core/src/queue-owner.mts`, through
 `tools/scripts/cmd/unblock-prs/owner.mts` in the worker — so the two cannot
 disagree about whose a pull request is:
 
-| `owner`  | who moves it next                                                    |
-| :------- | :------------------------------------------------------------------- |
-| `worker` | the worker: in the queue, waiting its turn, or stacked               |
-| `skill`  | a skill (`owner.skill`): set aside `rebase-failed` / `checks-failed` |
-| `human`  | a person: a draft, a bypass merge, a setting or permission, a cycle  |
-| `none`   | nobody — a bug in the queue's tooling, filed as an issue (step 1)    |
+| `owner`  | who moves it next                                                   |
+| :------- | :------------------------------------------------------------------ |
+| `worker` | the worker: in the queue, waiting its turn, or stacked              |
+| `skill`  | this skill: claimed, or set aside `rebase-failed` / `checks-failed` |
+| `human`  | a person: a draft, a bypass merge, a setting or permission, a cycle |
+| `none`   | nobody — a bug in the queue's tooling, filed as an issue (step 1)   |
 
 The set-aside comment is the hand-off, not the tip of `main`: it stays the
 skill's until the worker rewrites it as resolved, so a stopped worker leaves
@@ -33,21 +33,23 @@ it here rather than nowhere.
 
 **Never**, because each is the worker's or a person's:
 
-- act on a pull request whose `owner` is not `skill` with `skill:
-unblock-prs`; call `update-branch`, take `skip-ci` off, put `skip-ci` on any
-  pull request but the one being pushed, or watch CI;
+- act on a pull request whose `owner` is not `skill`; call `update-branch`,
+  take `skip-ci` off, put `skip-ci` on any pull request but the one being
+  pushed, or watch CI;
 - merge, arm or disarm auto-merge, approve, or tick the "Retry" box in a
   set-aside comment;
 - push with `git push`: `pnpm run push-fixed-pr` is the worker's own push and
   restack (step 4);
 - run `gh` (`CLAUDE.md`, "Session rules"). Everything below is
-  `pnpm run pr-report`, `claim-pr`, `push-fixed-pr`, `report-unowned-prs`,
-  git in a worktree, or the REST API as
+  `pnpm run pr-report`, `claim-pr`, `push-fixed-pr`, `rebuild-pnpm-update`,
+  `report-unowned-prs`, git in a worktree, or the REST API as
   `.claude/skills/references/github-api.md` describes.
 
 Invoking this skill is the explicit instruction `CLAUDE.md` asks for before
 pushing: to the branch of a pull request this run has claimed, through
-`push-fixed-pr`, which carries the layers stacked on it along. Nothing else.
+`push-fixed-pr`, which carries the layers stacked on it along — and, for the
+dependency update, to have `pnpm-update.yml` rebuild it through
+`rebuild-pnpm-update`. Nothing else.
 
 ## 1. Survey
 
@@ -64,8 +66,9 @@ what to do with it is what the issue asks.
 Each entry in `entries` of the report carries `owner` when the token is the
 worker's account (without one it is absent and there is nothing to do; a
 missing `owner` on one entry means its comments could not be read). This
-skill's pull requests are those whose `owner.owner` is `skill` and
-`owner.skill` is `unblock-prs`, and whose `claim` is not someone else's
+skill's pull requests are those whose `owner.owner` is `skill` — the
+dependency update (`chore/pnpm-update`) as much as any other — and whose
+`claim` is not someone else's
 standing claim (`claim.applies` and `claim.says.claim.by` another claimant).
 `setAside.says.setAside.reason` says what to do with it: `rebase-failed` or
 `checks-failed`.
@@ -112,6 +115,14 @@ what conflicts, and leave the pull request.
 - `rebase-failed` — the rebase is the whole job. On an `auto-rebase` pull
   request that is not queued, do nothing more: its checks are not this run's
   business until someone queues it.
+- `rebase-failed` on **the dependency update** (`headRef` is
+  `chore/pnpm-update`) — no worktree and no rebase. The branch is generated,
+  lockfile and all, so the conflict is resolved by generating it again from
+  the tip: `pnpm run rebuild-pnpm-update -- <number> --by <claimant>`. It
+  starts `pnpm-update.yml`, whose force-push at the end is the hand-back, as
+  step 4's push is for any other; skip step 4. Refused for want of
+  `actions: write`, say so, release the claim and leave it. `push-fixed-pr`
+  refuses a hand resolution of it.
 - `checks-failed` — reproduce the failure and fix it ("Fixing a failing
   check" below), amend it onto the branch's one commit, and run
   `pnpm run fmt`.
@@ -202,8 +213,31 @@ Two things about reproducing the rest:
   green run of the command with a dirty tree afterwards is still a failure.
 
 Reproduce locally before pushing — a speculative fix costs another full matrix
-when the worker releases it. Fix the cause: `CLAUDE.md` rules hold, so no
+when the worker releases it.
+
+**First ask whether the branch is broken at all.** A required context can be
+red with nothing wrong in it: the run the `opened` event starts is cancelled by
+a later one, and GitHub sometimes answers the context with the cancelled run.
+When the newest run of the failing context is green and only an older suite is
+red, re-run that suite (`.claude/skills/references/github-api.md`, "A stale red
+that is holding the merge") instead of pushing anything; without
+`actions: write`, say so and leave it. Fix the cause: `CLAUDE.md` rules hold, so no
 file-level `eslint-disable`, no loosening `eslint.config.mts`, no `as any`.
+
+**Leave a decision to a person.** A failure whose fix is a choice — a
+dependency's breaking change that wants a design call, a test whose expected
+value could reasonably go either way — is not this skill's. Leave one comment
+on the pull request, in Japanese, saying what is broken and what the choice
+is, release the claim, and name it in the report. **`check:root:licenses`
+failing is always one of these**, usually on the dependency update: an update
+brought in a license `tools/configs/license-policy.mts` does not let through.
+An exception added to turn it green is the check switched off; say which
+package, which version, and from which license to which.
+
+On the dependency update, a fix lasts only until `pnpm-update.yml` next
+rebuilds the branch from `main`, and goes with the update when it merges, so
+code adapting to a new version of a dependency is still made there, on the
+branch.
 
 `code-check` and `node-version-compatibility` jobs gate on
 `z:check-should-run:code-checks`, and `style-check` jobs on

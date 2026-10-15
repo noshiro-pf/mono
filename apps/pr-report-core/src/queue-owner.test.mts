@@ -82,7 +82,6 @@ describe(queueOwner, () => {
       queueOwner({ ...queued, setAside: standing('rebase-failed') }),
       {
         owner: 'skill',
-        skill: 'unblock-prs',
         reason: 'set aside `rebase-failed` at its head; the skill fixes it',
       },
     );
@@ -163,7 +162,6 @@ describe(queueOwner, () => {
       }),
       {
         owner: 'skill',
-        skill: 'unblock-prs',
         reason: 'claimed by unblock-wren at 2026-10-14T23:30:00Z',
       },
     );
@@ -179,16 +177,25 @@ describe(queueOwner, () => {
     );
   });
 
-  test('gives the dependency update’s failure to pnpm-update-ci, and its conflict to a person', () => {
+  test('gives the dependency update’s failure and its conflict to the skill', () => {
     const update = { ...queued, headRef: 'chore/pnpm-update' } as const;
 
-    expect(
+    assert.deepStrictEqual(
       queueOwner({ ...update, setAside: standing('checks-failed') }),
-    ).toMatchObject({ owner: 'skill', skill: 'pnpm-update-ci' });
+      {
+        owner: 'skill',
+        reason: 'set aside `checks-failed` at its head; the skill fixes it',
+      },
+    );
 
-    assert.strictEqual(
-      queueOwner({ ...update, setAside: standing('rebase-failed') })?.owner,
-      'human',
+    // Not rebased by hand: the skill has `pnpm-update.yml` rebuild it.
+    assert.deepStrictEqual(
+      queueOwner({ ...update, setAside: standing('rebase-failed') }),
+      {
+        owner: 'skill',
+        reason:
+          'set aside `rebase-failed` at its head; the skill has `pnpm-update.yml` rebuild it from main',
+      },
     );
   });
 

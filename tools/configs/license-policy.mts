@@ -42,7 +42,7 @@
  * - **When the check fails on the `pnpm-update` pull request, the fix is a
  *   pull request to `main` editing this file**, by a person who has read the
  *   license. `chore/pnpm-update` is rebuilt from `main` on every run, so an
- *   edit made there is gone by the next one; and the `pnpm-update-ci` routine
+ *   edit made there is gone by the next one; and the `/unblock-prs` skill
  *   is told to leave this failure alone, because an exception added in order
  *   to turn the check green is the check switched off.
  *

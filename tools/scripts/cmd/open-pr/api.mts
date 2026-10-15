@@ -266,7 +266,8 @@ const messageFrom = (body: string): string => {
 };
 
 const validate = <A,>(body: string, schema: t.Type<A>): Result<A, string> => {
-  const parsed = Json.parse(body);
+  // `204 No Content`, which a workflow dispatch answers, is no JSON at all.
+  const parsed = body === '' ? Result.ok(undefined) : Json.parse(body);
 
   if (Result.isErr(parsed)) {
     return Result.err(`invalid JSON from GitHub: ${parsed.value}`);
