@@ -1,0 +1,127 @@
+---
+title: How Observables Work
+description: A SynState Observable runs no watcher in the background. `subscribe` registers a function and `next` calls the registered functions synchronously — explained with a minimal Observable that has only those two methods.
+sidebar:
+    order: 2
+---
+
+It is easy to picture an Observable as something alive: a watcher routine that keeps an eye on a value, a loop that polls for changes, or a scheduler that decides when to notify. SynState's Observable is none of these. **Nothing runs in the background.** `subscribe` adds a function to a list, and `next` calls the functions in that list, synchronously, before it returns. An Observable is an abstraction over wiring callers to callees, and the wiring is fixed statically, when the Observable graph is built.
+
+## A Minimal Observable
+
+The following Observable has only `subscribe` and `next`. It differs from SynState's implementation in the details, but not in how it works:
+
+```tsx
+type Subscription = Readonly<{ unsubscribe: () => void }>;
+
+type MiniObservable<A> = Readonly<{
+    subscribe: (onNext: (value: A) => void) => Subscription;
+    next: (value: A) => void;
+}>;
+
+const createObservable = <A,>(): MiniObservable<A> => {
+    // The whole "reactive machinery": a list of functions.
+    const mut_subscribers = new Set<(value: A) => void>();
+
+    return {
+        subscribe: (onNext) => {
+            mut_subscribers.add(onNext); // Remember the function. That's all.
+
+            return {
+                unsubscribe: () => {
+                    mut_subscribers.delete(onNext);
+                },
+            };
+        },
+
+        next: (value) => {
+            // Call every registered function, right here, synchronously.
+            for (const onNext of mut_subscribers) {
+                onNext(value);
+            }
+        },
+    };
+};
+
+const count = createObservable<number>();
+
+// A derived value is one more registered function that calls `next`.
+const doubled = createObservable<number>();
+
+count.subscribe((n) => {
+    doubled.next(n * 2);
+});
+
+const mut_log: string[] = [];
+
+const subscription = doubled.subscribe((n) => {
+    mut_log.push(`doubled: ${n}`);
+});
+
+mut_log.push('before next');
+
+count.next(1);
+
+mut_log.push('after next');
+
+// The subscriber ran inside `count.next(1)`, before it returned.
+assert.deepStrictEqual(mut_log, ['before next', 'doubled: 2', 'after next']);
+
+subscription.unsubscribe();
+
+count.next(2);
+
+// Removed from the list, so never called again.
+assert.deepStrictEqual(mut_log, ['before next', 'doubled: 2', 'after next']);
+```
+
+`subscribe` does not start anything. It stores a function and returns a way to remove it. `next` is an ordinary function call that loops over the stored functions. There is no queue, no timer and no microtask in between, so the log shows the subscriber running **inside** `count.next(1)`, between `'before next'` and `'after next'`. A function removed by `unsubscribe` is simply no longer in the list.
+
+`doubled` shows that a derived value is the same mechanism once more: a function registered on `count` that calls `doubled.next`. Calling `count.next(1)` calls that function, which calls `doubled.next(2)`, which calls the logging function — one synchronous chain of plain function calls, laid out when `subscribe` was called.
+
+## SynState Behaves the Same Way
+
+The same graph written with SynState gives the same log:
+
+```tsx
+import { map, source } from 'synstate';
+
+const count = source<number>();
+
+const doubled = count.pipe(map((n) => n * 2));
+
+const mut_log: string[] = [];
+
+const subscription = doubled.subscribe((n) => {
+    mut_log.push(`doubled: ${n}`);
+});
+
+mut_log.push('before next');
+
+count.next(1);
+
+mut_log.push('after next');
+
+assert.deepStrictEqual(mut_log, ['before next', 'doubled: 2', 'after next']);
+
+subscription.unsubscribe();
+```
+
+What SynState adds to the minimal version does not change the picture:
+
+- An Observable also holds its current value (`getSnapshot()`), and a new subscriber receives it immediately.
+- Derived Observables such as `map` and `combine` are not chained through `subscribe`. When one is created, it registers an update function with the root it descends from, and the root keeps those functions in a list sorted by depth. `next` on the root walks that list once, in order, which is how SynState avoids glitches ([How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/)). The list is built when the graph is built, and walking it is still a synchronous loop.
+- Completion (`complete`) is handled as well.
+
+The core is [`createObservableBaseHandle`](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/base/create-observable-base.mts): `subscribe` adds to a `Map` of subscribers, and `setNext` stores the value and calls each subscriber in a `for` loop.
+
+## Where the Asynchronous Part Comes From
+
+If propagation is synchronous, how do `timer`, `counter`, `fromPromise` or `debounce` work? They are the **callers** of `next`. A time-based source is an Observable whose update is started from a `setTimeout` / `setInterval` callback; `fromPromise` starts it from a promise callback; an asynchronous operator such as `debounce` or `switchMap` starts a new propagation of its own from such a callback, or, for `switchMap`, from a subscriber of its inner Observable. The timer belongs to the JavaScript runtime, not to the Observable, and once the callback starts the update, everything downstream runs synchronously exactly as above.
+
+A few consequences follow directly:
+
+- **An idle graph costs nothing.** No `next` call, no code running.
+- **The new state is readable immediately.** After `next` returns, `getSnapshot()` on any Observable in the graph returns the updated value.
+- **Each `next` is one complete propagation.** SynState does not batch several `next` calls into one update.
+- **Subscribers run on the caller's stack.** A slow subscriber delays the return of `next`, and an exception thrown by a subscriber propagates to the code that called `next`.

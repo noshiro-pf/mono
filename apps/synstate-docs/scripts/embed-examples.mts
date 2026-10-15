@@ -309,6 +309,34 @@ const documents: DeepReadonly<
   {
     mdPath: path.resolve(
       workspaceRootPath,
+      'src/content/docs/internals/how-observables-work.mdx',
+    ),
+    samplesDir: path.resolve(
+      synstateSamplesRoot,
+      'docs-site/how-observables-work',
+    ),
+    sampleCodeFiles: [
+      '01-minimal-observable.mts',
+      '02-synstate-is-synchronous.mts',
+    ],
+  },
+  {
+    mdPath: path.resolve(
+      workspaceRootPath,
+      `${jaDocsBase}/internals/how-observables-work.mdx`,
+    ),
+    samplesDir: path.resolve(
+      synstateSamplesRoot,
+      'docs-site/how-observables-work',
+    ),
+    sampleCodeFiles: [
+      '01-minimal-observable.mts',
+      '02-synstate-is-synchronous.mts',
+    ],
+  },
+  {
+    mdPath: path.resolve(
+      workspaceRootPath,
       'src/content/docs/internals/how-synstate-solved-the-glitch.mdx',
     ),
     samplesDir: path.resolve(
