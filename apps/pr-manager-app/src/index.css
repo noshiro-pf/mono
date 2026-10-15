@@ -426,10 +426,10 @@ a:focus-visible {
 
 /*
  * A picked count is filled and outlined in the accent, and once one is, the
- * counts neither picked nor hidden fade: what they count is off screen, but
- * not struck through, since that is what hiding looks like. The outline is
- * a pixel wider than the hairline, and the padding a pixel narrower, so that
- * the number does not move.
+ * counts neither picked nor hidden fade: it is no longer they that decide
+ * what is listed, but they are not struck through, since that is what hiding
+ * looks like. The outline is a pixel wider than the hairline, and the padding
+ * a pixel narrower, so that the number does not move.
  */
 .stat-toggle[data-only='true'] {
   background: color-mix(in srgb, var(--accent) 12%, var(--surface));
@@ -510,9 +510,28 @@ a:focus-visible {
   color: var(--ink-muted);
 }
 
-.filter-shown {
+/*
+ * How many there are in all, after a count that leaves some out: small and
+ * quiet, so that the count the list agrees with stays the one that is read.
+ */
+.count-total {
   color: var(--ink-secondary);
   font-size: 0.8125rem;
+  font-weight: 400;
+}
+
+.stat-value .count-total {
+  font-size: 0.875rem;
+  margin-left: 0.1rem;
+}
+
+/* Faded or struck through with the count it follows. */
+.stat-toggle[aria-pressed='false'] .count-total,
+.summary-row[data-picking='true']
+  .stat-toggle[data-only='false'][aria-pressed='true']
+  .count-total,
+.filter-chip[aria-pressed='false'] .count-total {
+  color: inherit;
 }
 
 /* --- sections ----------------------------------------------------------- */

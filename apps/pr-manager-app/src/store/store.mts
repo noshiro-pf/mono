@@ -156,8 +156,7 @@ export const themeSignals = {
 export const mergeOrderSignals = {
   view: toSignal(mergeOrderStore.view),
   roots: toSignal(mergeOrderStore.roots),
-  shown: toSignal(mergeOrderStore.shown),
-  priorities: toSignal(mergeOrderStore.priorities),
+  counts: toSignal(mergeOrderStore.counts),
 } as const;
 
 export const headerSignals = {

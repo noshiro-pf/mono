@@ -97,7 +97,7 @@ describe(createMergeOrderStore, () => {
     assert.deepStrictEqual(saved, []);
   });
 
-  test('derives the tree, the shown count and the priority counts from the report and the view', () => {
+  test('derives the tree and the counts from the report and the view', () => {
     const { store, setEntries } = setup();
 
     setEntries([entry(1, ['merge-queued']), entry(2, ['priority:high'])]);
@@ -107,13 +107,16 @@ describe(createMergeOrderStore, () => {
       [1, 2],
     );
 
-    assert.strictEqual(store.shown.getSnapshot().value, 2);
+    assert.deepStrictEqual(store.counts.getSnapshot().value.open, {
+      shown: 2,
+      total: 2,
+    });
 
-    assert.deepStrictEqual(store.priorities.getSnapshot().value, {
-      high: 1,
-      mid: 0,
-      low: 0,
-      none: 1,
+    assert.deepStrictEqual(store.counts.getSnapshot().value.priorities, {
+      high: { shown: 1, total: 1 },
+      mid: { shown: 0, total: 0 },
+      low: { shown: 0, total: 0 },
+      none: { shown: 1, total: 1 },
     });
 
     store.toggleStatus('queued');
@@ -123,7 +126,15 @@ describe(createMergeOrderStore, () => {
       [2],
     );
 
-    assert.strictEqual(store.shown.getSnapshot().value, 1);
+    assert.deepStrictEqual(store.counts.getSnapshot().value.open, {
+      shown: 1,
+      total: 2,
+    });
+
+    assert.deepStrictEqual(store.counts.getSnapshot().value.priorities.none, {
+      shown: 0,
+      total: 1,
+    });
 
     store.toggleOnly('queued');
 
@@ -132,7 +143,15 @@ describe(createMergeOrderStore, () => {
       [1],
     );
 
-    assert.strictEqual(store.shown.getSnapshot().value, 1);
+    assert.deepStrictEqual(store.counts.getSnapshot().value.open, {
+      shown: 1,
+      total: 2,
+    });
+
+    assert.deepStrictEqual(store.counts.getSnapshot().value.priorities.high, {
+      shown: 0,
+      total: 1,
+    });
   });
 });
 
