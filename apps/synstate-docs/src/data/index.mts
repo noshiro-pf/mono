@@ -1,6 +1,9 @@
 /**
- * The committed measurements, written by
- * `pnpm --filter @synstate/docs run benchmark`.
+ * The committed measurements: a baseline `synstate-benchmark.yml` measured
+ * on its pinned runner, committed from its artifact. The workflow fails on
+ * `main` once a later baseline has drifted from them beyond run-to-run noise
+ * (`scripts/benchmark/check-drift.mts`).
+ * `pnpm --filter @synstate/docs run benchmark` writes the same files locally.
  *
  * A barrel because the readers are elsewhere in the package — the chart
  * components under `src/components/`, the prose numbers under `scripts/` — and

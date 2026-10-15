@@ -12,6 +12,8 @@ on:
       - main
     paths:
       - 'libs/synstate/src/**'
+      # A release bumps the version, which is part of the baseline key.
+      - 'libs/synstate/package.json'
       - 'libs/synstate/samples/docs-site/benchmark/**'
       - 'apps/synstate-docs/scripts/benchmark/**'
       - 'apps/synstate-docs/src/data/**'
@@ -25,6 +27,7 @@ on:
       - reopened
     paths:
       - 'libs/synstate/src/**'
+      - 'libs/synstate/package.json'
       - 'libs/synstate/samples/docs-site/benchmark/**'
       - 'apps/synstate-docs/scripts/benchmark/**'
       - 'apps/synstate-docs/src/data/**'
@@ -90,6 +93,10 @@ jobs:
         with:
           path: baseline
           key: ${{ steps.key.outputs.value }}
+
+      # `Measure` overwrites them, and they are what is judged below.
+      - name: Keep the committed tables
+        run: cp -R apps/synstate-docs/src/data committed
 
       - name: Build
         run: pnpm run ws:build
@@ -165,3 +172,71 @@ jobs:
         with:
           path: baseline
           key: ${{ steps.key.outputs.value }}
+
+      # The published tables are judged against the measurement CI keeps for
+      # these versions: the cached baseline, or on `main` with none yet the one
+      # just taken and stored. Not byte for byte, and not in milliseconds:
+      # `check-drift.mts` divides out the runner instance and calls drift only
+      # a change of a library relative to the others beyond what unchanged
+      # code moves by between runs. So a dependency bump that moves nothing
+      # keeps the published tables, and one that does moves them.
+      - name: Judge the committed tables
+        id: committed
+        if: >-
+          steps.baseline.outputs.cache-hit == 'true' ||
+          (github.ref == 'refs/heads/main' && github.event_name != 'pull_request')
+        run: |
+          set -euo pipefail
+          reference="$(pwd)/${{ case(steps.baseline.outputs.cache-hit == 'true', 'baseline', 'apps/synstate-docs/src/data') }}"
+          echo "reference=${reference}" >>"${GITHUB_OUTPUT}"
+          pnpm --filter @synstate/docs run --silent z:benchmark:check-drift \
+            "${reference}" \
+            "$(pwd)/committed" \
+            >>"${GITHUB_STEP_SUMMARY}"
+
+      # Information for a pull request that changes SynState itself: whether
+      # this branch moved it by more than noise against the baseline.
+      - name: Judge this branch's measurement
+        id: branch
+        if: >-
+          github.event_name == 'pull_request' &&
+          steps.baseline.outputs.cache-hit == 'true'
+        run: |
+          set -euo pipefail
+          pnpm --filter @synstate/docs run --silent z:benchmark:check-drift \
+            "$(pwd)/apps/synstate-docs/src/data" \
+            "$(pwd)/baseline" \
+            >>"${GITHUB_STEP_SUMMARY}"
+
+      - name: Warn that this branch moved the numbers
+        if: steps.branch.outputs.drifted == 'true'
+        run: echo '::warning title=Benchmark moved::This branch moved a library beyond run-to-run noise against the baseline. The job summary has the table.'
+
+      # What to commit when the tables have drifted: the reference itself, so
+      # that the next run judges the tables equal to it.
+      - name: Upload the tables to commit
+        if: steps.committed.outputs.drifted == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: synstate-benchmark-to-commit-${{ github.run_id }}
+          path: ${{ steps.committed.outputs.reference }}
+          if-no-files-found: error
+
+      # Red only on `main`. A pull request that bumps a compared library has no
+      # baseline to commit until it merges and `main` measures one, so failing
+      # it would hold every dependency update on a commit it cannot make; it
+      # gets a warning instead. A red run on `main` is the signal that the
+      # published tables no longer describe these versions. Committing the
+      # artifact is the fix; re-running `benchmark` locally is not, because a
+      # local machine is not the pinned runner.
+      - name: Fail when the published tables have drifted
+        if: steps.committed.outputs.drifted == 'true'
+        run: |
+          set -euo pipefail
+          message='The committed tables in apps/synstate-docs/src/data have drifted from the CI measurement for these library versions. Replace them with the files of the synstate-benchmark-to-commit-${{ github.run_id }} artifact, then run pnpm --filter @synstate/docs run gen:benchmark-doc and pnpm run fmt, and commit the result.'
+          if [ "${GITHUB_EVENT_NAME}" = 'pull_request' ]; then
+            echo "::warning title=Benchmark tables drifted::${message}"
+          else
+            echo "::error title=Benchmark tables drifted::${message}"
+            exit 1
+          fi
