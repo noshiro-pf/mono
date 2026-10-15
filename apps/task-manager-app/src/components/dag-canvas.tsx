@@ -72,6 +72,7 @@ import {
   type GroupFrame,
   type LaidOutNode,
   type NodeDrag,
+  type Point,
   type ViewTransform,
 } from '../dag/index.mjs';
 import {
@@ -113,6 +114,7 @@ import {
   DagConnectOverlay,
   type ConnectTarget,
 } from './dag-connect-overlay.js';
+import { DagEdgeDelete } from './dag-edge-delete.js';
 import { DagEdge } from './dag-edge.js';
 import { DagGroupFrame } from './dag-group-frame.js';
 import { DagMilestoneNode } from './dag-milestone-node.js';
@@ -155,6 +157,12 @@ type Props = Readonly<{
  * node it is over shows before the drop, and a notice says after it.
  * Escape gives the arrow up before it is dropped, wherever the focus is. A
  * touch has no pointer to come near with, and so no handle.
+ *
+ * In 「DAG」, an edge pointed at is drawn in the focus colour, and a click on
+ * it selects it and shows a button there (`dag-edge-delete.tsx`) that
+ * deletes the dependency it stands for (`dataStore.removeDependency`); the
+ * button has the focus, so Delete or Backspace deletes it too, and Escape, a
+ * click anywhere else or anything that moves the edge leaves it as it is.
  *
  * While the nodes move to their places (`dagLayoutStore.animatedPositions`)
  * the edges are plain curves, and they are routed round the nodes once the
@@ -272,6 +280,11 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
   }, []);
 
   const [connecting, setConnecting] = useState<ConnectDrag | undefined>(
+    undefined,
+  );
+
+  // The edge clicked, as it was drawn then, and where.
+  const [selectedEdge, setSelectedEdge] = useState<SelectedEdge | undefined>(
     undefined,
   );
 
@@ -469,6 +482,58 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
 
     return routed;
   }, [arrangeable, animated, dragged, direction, shown, layout.edges, settled]);
+
+  // The edge selected, while it is drawn as it was when clicked: not once
+  // it is gone or has moved, nor while anything is dragged or moves.
+  const selected = useMemo(() => {
+    if (
+      selectedEdge === undefined ||
+      edgesHidden ||
+      animated !== undefined ||
+      dragged !== undefined ||
+      connecting !== undefined
+    ) {
+      return undefined;
+    }
+
+    const edge = edges.find(({ id }) => id === selectedEdge.id);
+
+    return edge?.path === selectedEdge.path
+      ? { edge, at: selectedEdge.at }
+      : undefined;
+  }, [selectedEdge, edgesHidden, animated, dragged, connecting, edges]);
+
+  const selectedEdgeId = selected?.edge.id;
+
+  // Read by a click, which finds the edge it was on among them.
+  const mut_edges = useRef<readonly EdgeGeometry[]>(edges);
+
+  useEffect(() => {
+    mut_edges.current = edges;
+  }, [edges]);
+
+  const selectedFrom = selected?.edge.from;
+
+  const selectedTo = selected?.edge.to;
+
+  const deleteSelectedEdge = useCallback(() => {
+    setSelectedEdge(undefined);
+
+    if (selectedFrom === undefined || selectedTo === undefined) {
+      return;
+    }
+
+    dataStore.removeDependency(nodeRefOf(selectedTo), nodeRefOf(selectedFrom));
+  }, [selectedFrom, selectedTo]);
+
+  const dismissSelectedEdge = useCallback(() => {
+    setSelectedEdge(undefined);
+  }, []);
+
+  const deleteLabel =
+    selectedFrom === undefined || selectedTo === undefined
+      ? ''
+      : (`「${views.get(selectedTo)?.title ?? ''}」の「${views.get(selectedFrom)?.title ?? ''}」への依存を削除` as const);
 
   // Read by a press on a node, which should not have to be made again
   // whenever a node moves: the nodes that can be grabbed, none outside the
@@ -986,6 +1051,40 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
     [onPointerLeave, showHandle],
   );
 
+  // A click that was not a drag, which the capture above lets through: on
+  // an edge, it selects it; anywhere else, it leaves none selected.
+  const onClick = useCallback<MouseEventHandler<SVGSVGElement>>((clicked) => {
+    const element =
+      clicked.target instanceof Element
+        ? clicked.target.closest('[data-edge-id]')
+        : null;
+
+    const id =
+      element instanceof SVGElement ? element.dataset['edgeId'] : undefined;
+
+    const edge =
+      id === undefined
+        ? undefined
+        : mut_edges.current.find((candidate) => candidate.id === id);
+
+    if (edge === undefined) {
+      setSelectedEdge(undefined);
+
+      return;
+    }
+
+    const bounds = clicked.currentTarget.getBoundingClientRect();
+
+    setSelectedEdge({
+      id: edge.id,
+      path: edge.path,
+      at: contentPointAt(mut_drawnTransform.current, {
+        x: clicked.clientX - bounds.left,
+        y: clicked.clientY - bounds.top,
+      }),
+    });
+  }, []);
+
   const onClickCapture = useCallback<MouseEventHandler<SVGSVGElement>>(
     (clicked) => {
       if (!mut_gesture.current.dragging) {
@@ -1147,6 +1246,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
         data-mode={mode}
         data-motion={motion}
         onBlurCapture={onBlurCapture}
+        onClick={onClick}
         onClickCapture={onClickCapture}
         onFocusCapture={onFocusIn}
         onKeyDown={onKeyDown}
@@ -1238,7 +1338,11 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
               // Mounted afresh when they come back, which fades them in.
               <g className={'dag-edges'}>
                 {edges.map((edge) => (
-                  <DagEdge key={edge.id} edge={edge} />
+                  <DagEdge
+                    key={edge.id}
+                    edge={edge}
+                    selected={edge.id === selectedEdgeId}
+                  />
                 ))}
                 {settledArcs.map((arc) => (
                   <DagArcEdge
@@ -1282,6 +1386,15 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
                 />
               );
             })}
+            {selected === undefined ? undefined : (
+              <DagEdgeDelete
+                at={selected.at}
+                label={deleteLabel}
+                scale={drawnTransform.scale}
+                onDelete={deleteSelectedEdge}
+                onDismiss={dismissSelectedEdge}
+              />
+            )}
             {arrangeable ? (
               <DagConnectOverlay
                 connecting={connecting}
@@ -1370,6 +1483,13 @@ type NodeDropTargets = Readonly<{
   from: GroupId | undefined;
 }>;
 
+/**
+ * The edge clicked: its id, its path then — for it to stop being selected
+ * once it is drawn anywhere else — and where it was clicked, in content
+ * coordinates.
+ */
+type SelectedEdge = Readonly<{ id: string; path: string; at: Point }>;
+
 /** What `fit` shows: all of it, its width from the top, or the top. */
 type FitTarget = Readonly<
   { kind: 'whole' | 'width'; bounds: Bounds } | { kind: 'top' }
@@ -1383,7 +1503,7 @@ type TileFrame = Readonly<{ topInset: number; viewport: number }>;
 
 /** What the canvas shows, for a screen reader. */
 const captions = {
-  dag: '依存関係グラフ。ノードを選ぶと詳細を開きます。ノードはドラッグか矢印キーで動かせます。ノードの縁の丸からほかのノードへドラッグすると、ドロップしたノードがそのノードに依存します。背景のドラッグで移動、ホイールかピンチで拡大縮小できます。',
+  dag: '依存関係グラフ。ノードを選ぶと詳細を開きます。ノードはドラッグか矢印キーで動かせます。ノードの縁の丸からほかのノードへドラッグすると、ドロップしたノードがそのノードに依存します。依存の矢印を選ぶと、削除ボタンか Delete キーで削除できます。背景のドラッグで移動、ホイールかピンチで拡大縮小できます。',
   arc: 'アークダイアグラム。タスクをタイトル順に縦に並べ、依存を右側の弧で示します。破線はマイルストーンを経由する依存です。タスクを選ぶと詳細を開きます。ドラッグで移動、ホイールかピンチで拡大縮小できます。',
   tile: 'タスクをタイトル順に左上から横に並べ、幅に収まらない分は次の行に折り返します。依存は示しません。タスクを選ぶと詳細を開きます。ホイール、ドラッグ、Page Up・Page Down・Home・End キーで縦にスクロールできます。',
 } as const satisfies ReadonlyRecord<DagViewMode, string>;

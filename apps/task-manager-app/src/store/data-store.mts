@@ -19,6 +19,7 @@ import type { DagLayout } from '../dag/index.mjs';
 import {
   addDependency,
   regroupNode,
+  removeDependency,
   removeGroup,
   removeNode,
   type DependencyRefusal,
@@ -58,6 +59,11 @@ export type DataStore = Readonly<{
    * reports why it does not.
    */
   addDependency: (dependent: NodeRef, source: NodeRef) => void;
+  /**
+   * Takes out every dependency of `dependent` on `source`; writes nothing
+   * when there is none.
+   */
+  removeDependency: (dependent: NodeRef, source: NodeRef) => void;
   putGroup: (group: Group) => void;
   /** Deletes the group, and takes its nodes out of it, in one write. */
   deleteGroup: (id: GroupId) => void;
@@ -214,6 +220,26 @@ export const createDataStore = (deps: DataDeps): DataStore => {
       }
 
       const updated = result.value;
+
+      if (updated.kind === 'task') {
+        write('タスクを保存', (repository) => repository.putTask(updated.task));
+      } else {
+        write('マイルストーンを保存', (repository) =>
+          repository.putMilestone(updated.milestone),
+        );
+      }
+    },
+    removeDependency: (dependent, source) => {
+      const updated = removeDependency(
+        getState(),
+        dependent,
+        source,
+        deps.now(),
+      );
+
+      if (updated === undefined) {
+        return;
+      }
 
       if (updated.kind === 'task') {
         write('タスクを保存', (repository) => repository.putTask(updated.task));

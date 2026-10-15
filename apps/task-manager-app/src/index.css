@@ -713,6 +713,59 @@ fieldset {
   fill: var(--edge);
 }
 
+/*
+ * An edge of 「DAG」 takes the pointer along a wider, unpainted stroke, and
+ * is drawn in the focus colour while pointed at — not while an arrow is
+ * drawn or a node dragged — and while it is selected.
+ */
+.dag-edge-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 12;
+  vector-effect: non-scaling-stroke;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.dag-svg[data-connect='true'] .dag-edge-hit {
+  cursor: crosshair;
+}
+
+.dag-svg:not([data-connect='true']) .dag-edge:hover .dag-edge-line,
+.dag-edge[data-selected='true'] .dag-edge-line {
+  stroke: var(--focus);
+  stroke-width: 2.5;
+  marker-end: url('#dag-arrow-highlight');
+}
+
+/* The button on a selected edge that deletes it. */
+.dag-edge-delete {
+  cursor: pointer;
+}
+
+.dag-edge-delete:focus {
+  outline: none;
+}
+
+.dag-edge-delete-circle {
+  fill: var(--surface);
+  stroke: var(--danger);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.dag-edge-delete:focus-visible .dag-edge-delete-circle {
+  stroke-width: 3;
+}
+
+.dag-edge-delete-cross {
+  fill: none;
+  stroke: var(--danger);
+  stroke-width: 2;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
 /* 「アーク」: a dependency through milestones is dashed. */
 .dag-arc.derived .dag-edge-line {
   stroke-dasharray: 6 4;
