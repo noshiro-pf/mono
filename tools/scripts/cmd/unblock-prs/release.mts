@@ -1,20 +1,24 @@
 /**
- * Holding the queue to one released pull request.
+ * Keeping to one released pull request without touching any other.
  *
  * A pull request labelled `merge-queued` without `skip-ci` is released: a push
  * to it, or the label coming off, runs the full matrix. Only one of them can
  * merge before `main` moves and puts the rest back to `BEHIND`, so a second
- * released pull request is a matrix run to be thrown away. Whatever releases
- * one — this script, the skill, a person — first puts `skip-ci` on every other,
- * and looks again afterwards, because two writers releasing in the same moment
- * each saw the other still paused.
+ * released pull request is a matrix run to be thrown away.
  *
- * The case it exists for: A fails and is set aside with its label off, this
- * script releases B, and the skill pushes A's fix — two matrices, one of them
- * wasted. The README, "One released pull request at a time", walks through it.
+ * **This script puts `skip-ci` on a pull request only to give back the label
+ * it has just taken off**, yielding to another released in the same moment,
+ * and on no other pull request. It used to pause every other released one before releasing its own, which
+ * labelled pull requests nobody had handed it — the dependency update the bot
+ * opens released, one a person had just released on purpose. Now it keeps the
+ * rule from its own side only: triage watches one already in flight rather
+ * than picking another, and once its own is released it looks again, and when
+ * another of its pull requests was released in the same moment and goes
+ * first, it pauses its own ({@link yieldsTo}). A pull request someone else
+ * releases runs, and what that costs is a matrix, not a wrong merge.
  */
 
-import { SKIP_CI_LABEL } from 'pr-report-core';
+import { SKIP_CI_LABEL, type QueueOwner } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { addSkipCiLabel, listPullRequests } from './github.mjs';
 import { isMergeQueued, isSkipCiLabelled, priorityRank } from './labels.mjs';
@@ -23,32 +27,14 @@ import { log } from './util.mjs';
 import { isVersionPullRequest } from './version-pr.mjs';
 
 /**
- * Puts `skip-ci` on every released pull request but `keep`. Called before
- * `keep` is released, and while it is the one being watched, which is what
- * catches a pull request opened already released — `pnpm-update.yml` opens
- * its own that way. A label that could not be added is logged and nothing
- * more: what it costs is a matrix, not a wrong merge.
- */
-export const pauseAllBut = async (keep: number): Promise<void> => {
-  const listed = await listPullRequests();
-
-  if (Result.isErr(listed)) {
-    log(`Cannot list pull requests to pause the others: ${listed.value}`);
-
-    return;
-  }
-
-  await pause(releasedExcept(listed.value, keep));
-};
-
-/**
- * Looks again once `target` has been released, and settles two releases made
- * in the same moment the way both writers settle them: the one first in
- * {@link firstInReleaseOrder} keeps its release and every other is paused.
- * Resolves to whether that one is `target`.
+ * Looks again once `target` has been released, and when another pull request
+ * the worker owns was released in the same moment and goes first, pauses
+ * `target` — the one pull request this may label. Resolves to whether
+ * `target` keeps its release.
  */
 export const settleAfterRelease = async (
   target: PullRequest,
+  owners: ReadonlyMap<number, QueueOwner>,
   defaultBranch: string,
 ): Promise<'kept' | 'yielded'> => {
   const listed = await listPullRequests();
@@ -59,13 +45,48 @@ export const settleAfterRelease = async (
     return 'kept';
   }
 
-  const released = releasedExcept(listed.value, undefined);
+  const first = yieldsTo(target, listed.value, owners, defaultBranch);
 
-  const keep = firstInReleaseOrder(released, defaultBranch) ?? target;
+  if (first === undefined) {
+    return 'kept';
+  }
 
-  await pause(released.filter((pr) => pr.number !== keep.number));
+  const added = await addSkipCiLabel(target.number);
 
-  return keep.number === target.number ? 'kept' : 'yielded';
+  log(
+    Result.isErr(added)
+      ? `#${target.number}: cannot put ${SKIP_CI_LABEL} back on it to let #${first.number} go first: ${added.value}`
+      : `#${target.number}: put ${SKIP_CI_LABEL} back on it; #${first.number} was released in the same moment and goes first.`,
+  );
+
+  return Result.isErr(added) ? 'kept' : 'yielded';
+};
+
+/**
+ * The pull request `target` should step back for, if any: another released
+ * one the worker owns that goes first in {@link firstInReleaseOrder}. One set
+ * aside or claimed is a skill's or a person's and runs nothing until its fix
+ * is pushed, so it holds nothing back; counting it would stall the queue
+ * behind a pull request nobody is about to run.
+ */
+export const yieldsTo = (
+  target: PullRequest,
+  pullRequests: readonly PullRequest[],
+  owners: ReadonlyMap<number, QueueOwner>,
+  defaultBranch: string,
+): PullRequest | undefined => {
+  const others = releasedExcept(pullRequests, target.number).filter(
+    (pr) => owners.get(pr.number)?.owner === 'worker',
+  );
+
+  const first = firstInReleaseOrder(
+    Arr.toUnshifted(target)(others),
+    defaultBranch,
+  );
+
+  return first === undefined || first.number === target.number
+    ? undefined
+    : first;
 };
 
 /**
@@ -104,16 +125,4 @@ export const firstInReleaseOrder = (
   );
 
   return Arr.isNonEmpty(sorted) ? sorted[0] : undefined;
-};
-
-const pause = async (pullRequests: readonly PullRequest[]): Promise<void> => {
-  for (const pr of pullRequests) {
-    const added = await addSkipCiLabel(pr.number);
-
-    log(
-      Result.isErr(added)
-        ? `#${pr.number}: cannot put ${SKIP_CI_LABEL} on it: ${added.value}`
-        : `#${pr.number}: put ${SKIP_CI_LABEL} on it; one queued pull request is released at a time.`,
-    );
-  }
 };

@@ -196,25 +196,26 @@ PR は常に1本まで** に保ちます。`main` が動く前にマージでき
 
 #### ルール
 
-- **解放する前に他を止める。** PR を解放する前、つまり `skip-ci` を外す前や、ラベ
-  ルの無い PR を rebase して push する前に、他の open な `merge-queued` PR で
-  `skip-ci` の無いもの全部に `skip-ci` を付けます。in flight の PR を watch す
-  る前も同じです。見送った PR も、draft も、auto-merge の無いものも対象です。
-  どれも push されれば CI が走るからです。`pnpm-update.yml` はラベル無しで PR
-  を開くので、ここで止まります。上の例では手順 2 で A に `skip-ci` が付き、手
-  順 3 の push はチェックを全部 skip します。A はキューに戻り、B の後で rebase
-  されて解放されます。
-- **解放した直後にもう一度見る。** 人が同じ瞬間に別の PR を解放していると、ど
-  ちらも相手がまだ止まっているのを見てから解放したことになります。2本とも解放
-  されていたら、pick の順（`priority:high` が先、`priority:low` が後、その中
-  で番号の小さい順、version PR は最後）で先の方だけを残
-  し、残りに `skip-ci` を付けます。自分の PR が負けた場合は survey からやり直し
-  ます。
+**このスクリプトが `skip-ci` を付けるのは、自分で外したばかりのラベルを戻して、
+同時に解放された別の PR に譲るときだけです。** 他の PR には付けません。以前は解放する前に他の解放済み PR 全部に `skip-ci` を付け
+ていましたが、bot が解放済みで開く依存更新 PR や、人が意図して解放した PR まで
+止めてしまうので、やめました。
+
+- **in flight の PR があれば、他を pick しない。** triage が in flight と判断
+  した PR があれば、それを watch して rebase も解放もしません（「3」）。
+- **解放した直後にもう一度見る。** 同じ瞬間に、担当者が `worker` の別の PR も
+  解放されていて、そちらが pick の順（`priority:high` が先、`priority:low` が
+  後、その中で番号の小さい順、version PR は最後）で先なら、**自分の PR に**
+  `skip-ci` を付け直して譲り、survey からやり直します（`release.mts` の
+  `yieldsTo`）。見送り中・claim 中の PR（skill か人の担当）は、直した push まで
+  CI を走らせないので数えません。数えると、誰も走らせない PR の後ろでキューが
+  止まります。
+- 人や bot が解放した PR はそのまま走ります。無駄になりうるのはマトリクス1回分
+  で、誤ったマージは起きません。上の例の手順 3 は、skill が push の前に自分の
+  PR に `skip-ci` を付けるので起きません。
 
 この規則が保証するのは CI 時間だけで、マージの正しさは保証しません。それは
-ruleset（最新の `main` の上で必須チェックが全部緑）が別に保証しています。一覧
-を読んでからラベルを付けるまでの数秒の間に誰かが push すると、2本目の実行は起
-こりえます。ただし直後の見直しで片方が止められます。
+ruleset（最新の `main` の上で必須チェックが全部緑）が別に保証しています。
 
 ### 起動時
 
@@ -497,8 +498,7 @@ matrix の job まで読みます。失敗した job が **すべて** `code-che
 2. 失敗したコマンドを、生成系 → その他 → フォーマッタの順に実行し、最後に
    `fix:fmt:diff` を実行します。
 3. 差分があれば PR の1コミットに `--amend` し、失敗した head を lease にして
-   `--force-with-lease` で push します。push は解放と同じ扱いなので、その前に
-   他の PR を止めます。
+   `--force-with-lease` で push します。
 4. 新しい head を watch します。**次の PR は pick しません。**
 
 次の場合は何もせず、理由をログに出して従来通り `checks-failed` として見送り
@@ -656,9 +656,8 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
   push で head が動けばそれだけで終わり、PR はこのスクリプトに戻ります（push
   で戻るのは以前と同じです）。120分は push せずに止まったセッションのため
   で、長くかかるなら同じコマンドで書き直します。諦めるときは `--release`。
-- 有効な claim がある PR は、pick も「3a」の rebase もしません。`skip-ci` を
-  付けて止めることだけは続けます（skill は `skip-ci` を付けてから push しま
-  す）。
+- 有効な claim がある PR は、pick も「3a」の rebase もせず、ラベルにも触りま
+  せん（skill は自分で `skip-ci` を付けてから push します）。
 - `claim-pr` は、担当者が skill でない PR（このスクリプトがまさに動かそうとし
   ている PR や、人の手が要る PR）と、他の書き手の claim が有効な PR には書き
   ません。書いた後に読み直し、同時に書いた相手に負けていれば失敗します。
@@ -938,26 +937,30 @@ so the rule stays.
 
 #### The rule
 
-- **Pause the others before releasing one.** That means before taking
-  `skip-ci` off, before rebasing and pushing a pull request that has no label,
-  and before watching the one in flight. Every other open `merge-queued` pull
-  request without `skip-ci` gets the label. Set-aside ones, drafts and ones
-  without auto-merge are included, because each runs a matrix when pushed to.
-  `pnpm-update.yml` opens its pull request without the label, and this is
-  where it gets paused. In the example, A gets `skip-ci` at step 2, so the push
-  at step 3 skips every check. A is back in the queue, to be rebased and
-  released after B.
-- **Look again straight after releasing.** If a person released another pull
-  request in the same moment, each writer saw the other still paused. When two
-  are released, the one first in the pick order keeps its release
-  (`priority:high` first and `priority:low` last, then the lowest number,
-  the version pull request last) and the rest are paused. If the loser
-  is this run's own, it surveys again.
+**This script puts `skip-ci` on a pull request only to give back the label it
+has just taken off, yielding to another released in the same moment.** It
+puts it on no other pull request. It used to pause every other released pull request before releasing its own,
+which stopped pull requests nobody had handed it: the dependency update the
+bot opens released, and one a person had released on purpose.
+
+- **Pick nothing while one is in flight.** When triage finds a pull request
+  in flight, this script watches it and rebases and releases nothing else
+  ("3").
+- **Look again straight after releasing.** When another pull request the
+  worker owns was released in the same moment and comes first in the pick
+  order (`priority:high` first and `priority:low` last, then the lowest
+  number, the version pull request last), this script puts `skip-ci` back on
+  **its own** and surveys again (`yieldsTo` in `release.mts`). A set-aside or
+  claimed pull request, a skill's or a person's, runs nothing until its fix is
+  pushed, so it does not count; counting it would stall the queue behind a
+  pull request nobody is about to run.
+- A pull request a person or a bot released runs as released. What that can
+  cost is a matrix, not a wrong merge. Step 3 of the example no longer
+  happens, because the skill puts `skip-ci` on its own pull request before it
+  pushes.
 
 The rule protects CI time, not correctness. The ruleset protects correctness
-on its own: every required check green, on the current `main`. A push in the
-seconds between reading the list and adding a label can still start a second
-run, and the look afterwards pauses one of the two.
+on its own: every required check green, on the current `main`.
 
 ### At startup
 
@@ -1263,8 +1266,7 @@ and only then:
 2. Run the failed commands, generators first and formatters last, then
    `fix:fmt:diff`.
 3. If anything changed, amend it onto the pull request's one commit and push
-   with `--force-with-lease` against the head that failed. The push is a
-   release, so the others are paused first.
+   with `--force-with-lease` against the head that failed.
 4. Watch the new head. **The next pull request is not picked.**
 
 Nothing is done, and the pull request is set aside as `checks-failed` as
@@ -1430,9 +1432,9 @@ one writes a **claim** first (`pnpm run claim-pr -- <number> --by <name>`).
   the pull request back to this script, as a push always did. The 120 minutes
   are for a session that stopped without pushing; one that needs longer writes
   the claim again, and one that gives up runs it with `--release`.
-- While a claim holds, the pull request is not picked and not rebased by "3a".
-  Pausing it with `skip-ci` goes on: the skill puts the label on before it
-  pushes anyway.
+- While a claim holds, the pull request is not picked, not rebased by "3a",
+  and its labels are left alone: the skill puts `skip-ci` on before it
+  pushes.
 - `claim-pr` refuses a pull request whose owner is not a skill — this script
   is about to move it, or a person has to — and one another claimant holds.
   It reads back after writing, and fails when someone writing in the same

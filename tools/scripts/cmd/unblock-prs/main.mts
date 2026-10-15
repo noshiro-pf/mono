@@ -33,11 +33,7 @@ import {
   restackBehind,
   restackRetargeted,
 } from './rebase.mjs';
-import {
-  firstInReleaseOrder,
-  pauseAllBut,
-  settleAfterRelease,
-} from './release.mjs';
+import { firstInReleaseOrder, settleAfterRelease } from './release.mjs';
 import {
   describeResolvedBy,
   resolvedCommentBody,
@@ -211,12 +207,11 @@ import { watch } from './watch.mjs';
  * its `skip-ci` off. Everything that declared `Merge-After` on it then waits,
  * because it has not merged, which is what a declared order is for.
  *
- * **One queued pull request is released at a time.** Before releasing one,
- * and while watching the one in flight, every other open `merge-queued` pull
- * request without `skip-ci` is given the label, set-aside ones included: a
- * second released pull request is a matrix run to be thrown away. After
- * releasing, it looks again, because the skill may have released another in
- * the same moment; the one first in the pick order keeps its release.
+ * **One queued pull request is released at a time, from this side only.**
+ * Nothing is picked while one is in flight, and after releasing it looks
+ * again: when another the worker owns was released in the same moment and
+ * goes first, it gives back the `skip-ci` it has just taken off its own. It
+ * puts the label on no other pull request (`release.mts`).
  *
  * ## Where the rest of it is
  *
@@ -530,7 +525,8 @@ const runCycle = async (
   }
 
   // Normally the only one. Two are what a pull request opened already
-  // released looks like, and the one that is not first is paused below.
+  // released looks like; the first is watched, and the other runs as it was
+  // released, since nothing here labels a pull request it did not pick.
   const watched = firstInReleaseOrder(triaged.inFlight, defaultBranch);
 
   if (watched !== undefined) {
@@ -545,8 +541,6 @@ const runCycle = async (
     if (options.dryRun) {
       return { state: state(mut_skipped), next: 'stop', settled: skipped };
     }
-
-    await pauseAllBut(watched.number);
 
     // Before the watch, which reads a pull request without auto-merge as one
     // someone switched it off on.
@@ -641,10 +635,6 @@ const runCycle = async (
       `#${target.number} (${target.headRefName}) is next: ${describeAction(target, defaultBranch, triaged)}.`,
     );
 
-    // Before the push or the label removal that starts its matrix, so that
-    // at no point are two queued pull requests released.
-    await pauseAllBut(target.number);
-
     const advanced = await advance(target, defaultBranch, {
       arm: triaged.toArm.has(target.number),
       descendants: stackDescendants(
@@ -698,7 +688,10 @@ const runCycle = async (
     // The rebase is this run's, not the author's, so a demotion goes with it.
     const demotedNow = followHead(demoted, target.number, advancedHead);
 
-    if ((await settleAfterRelease(target, defaultBranch)) === 'yielded') {
+    if (
+      (await settleAfterRelease(target, triaged.owners, defaultBranch)) ===
+      'yielded'
+    ) {
       log(
         `#${target.number} was released at the same moment as another, which goes first; paused it again.`,
       );

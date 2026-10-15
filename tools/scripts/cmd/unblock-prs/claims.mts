@@ -7,10 +7,9 @@
  * rebase again while the session is resolving the same conflict, and a
  * ticked retry box would do the same for any reason. So while a claim holds,
  * the pull request is a skill's (`owner.mts`): not picked and not kept on the
- * tip ("3a"). The session's
- * push ends the claim and hands the pull request back, as the push alone
- * always did. Pausing it with `skip-ci` is still done: the session pushes
- * under the label anyway.
+ * tip ("3a"), and its labels are left alone — the session pushes under
+ * `skip-ci` itself. The session's push ends the claim and hands the pull
+ * request back, as the push alone always did.
  */
 
 import { claimApplies, type Claim } from 'pr-report-core';

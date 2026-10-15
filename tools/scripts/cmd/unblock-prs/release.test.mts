@@ -1,5 +1,6 @@
+import type { QueueOwner } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
-import { firstInReleaseOrder, releasedExcept } from './release.mjs';
+import { firstInReleaseOrder, releasedExcept, yieldsTo } from './release.mjs';
 import type { PullRequest } from './types.mjs';
 
 describe(releasedExcept, () => {
@@ -81,6 +82,57 @@ describe(firstInReleaseOrder, () => {
 
   test('is undefined for nothing', () => {
     assert.isUndefined(firstInReleaseOrder([], 'main'));
+  });
+});
+
+describe(yieldsTo, () => {
+  const target = pullRequest({ number: 7, labels: [queued] });
+
+  const worker: QueueOwner = {
+    owner: 'worker',
+    reason: 'in the queue',
+  } as const;
+
+  const skill: QueueOwner = {
+    owner: 'skill',
+    reason: 'set aside `checks-failed` at its head',
+  } as const;
+
+  test('yields to a worker’s pull request released in the same moment that goes first', () => {
+    const other = pullRequest({ number: 3, labels: [queued] });
+
+    assert.strictEqual(
+      yieldsTo(target, [target, other], new Map([[3, worker]]), 'main')?.number,
+      3,
+    );
+  });
+
+  test('keeps its release against one that goes after it', () => {
+    const other = pullRequest({ number: 12, labels: [queued] });
+
+    assert.isUndefined(
+      yieldsTo(target, [target, other], new Map([[12, worker]]), 'main'),
+    );
+  });
+
+  test('does not count one set aside with its label off, which runs nothing', () => {
+    // A pull request whose checks failed stays released; it is the skill's
+    // until its fix is pushed, and holding the queue for it would stall it.
+    const other = pullRequest({ number: 3, labels: [queued] });
+
+    assert.isUndefined(
+      yieldsTo(target, [target, other], new Map([[3, skill]]), 'main'),
+    );
+
+    assert.isUndefined(yieldsTo(target, [target, other], new Map(), 'main'));
+  });
+
+  test('does not count one paused by skip-ci', () => {
+    const other = pullRequest({ number: 3, labels: [queued, skipCi] });
+
+    assert.isUndefined(
+      yieldsTo(target, [target, other], new Map([[3, worker]]), 'main'),
+    );
   });
 });
 
