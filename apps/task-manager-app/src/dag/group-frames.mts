@@ -232,24 +232,8 @@ export const dropTarget = (
   )?.id;
 };
 
-/** The top-left corner of each of `drawn`. */
-export const framePositions = (
-  drawn: readonly GroupFrame[],
-): ReadonlyMap<GroupId, Point> =>
-  new Map(drawn.map(({ id, x, y }) => [id, { x, y }]));
-
-/** A group's frame, its top-left corner at `(x, y)`. */
-export type GroupFrame = Readonly<{ id: GroupId; empty: boolean } & Bounds>;
-
-export type GroupKey = `group:${string}`;
-
-const GROUP_KEY_PREFIX = 'group:';
-
-/** How wide a narrow character of a frame's title is drawn. */
-const FRAME_TITLE_UNIT_WIDTH = 7;
-
 /** The frame round `nodes`, or none for none. */
-const frameAround = (nodes: readonly LaidOutNode[]): Bounds | undefined => {
+export const frameAround = (nodes: readonly Bounds[]): Bounds | undefined => {
   if (!Arr.isNonEmpty(nodes)) {
     return undefined;
   }
@@ -269,3 +253,19 @@ const frameAround = (nodes: readonly LaidOutNode[]): Bounds | undefined => {
     height: maxY - minY + GROUP_HEADER + GROUP_PADDING,
   };
 };
+
+/** The top-left corner of each of `drawn`. */
+export const framePositions = (
+  drawn: readonly GroupFrame[],
+): ReadonlyMap<GroupId, Point> =>
+  new Map(drawn.map(({ id, x, y }) => [id, { x, y }]));
+
+/** A group's frame, its top-left corner at `(x, y)`. */
+export type GroupFrame = Readonly<{ id: GroupId; empty: boolean } & Bounds>;
+
+export type GroupKey = `group:${string}`;
+
+const GROUP_KEY_PREFIX = 'group:';
+
+/** How wide a narrow character of a frame's title is drawn. */
+const FRAME_TITLE_UNIT_WIDTH = 7;

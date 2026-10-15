@@ -1,13 +1,11 @@
 /**
  * The dependency graph laid out by ELK's layered algorithm: what goes in
  * (`layoutInput`, then `toElkGraph`) and what comes back (`fromElkGraph`) —
- * the position of every node, and the box of every group. A group is a node
- * of ELK's with its members inside it (`elk.hierarchyHandling`), so that
- * they are laid out together and nothing else among them; an empty one, a
- * box of its own. The edges go in at the top whichever groups their ends
- * are in, which ELK takes when it lays out the whole hierarchy at once. Edges are drawn by `edge-routing.mts` from
- * wherever the nodes end up, so ELK's routes are not read; the edges and
- * their labels go in so that it leaves room for them.
+ * the position of every node, and the box of every group. ELK lays out the
+ * nodes alone, an empty group as a box of its own, and the groups are made
+ * room for afterwards (`clearOfFrames`). Edges are drawn by
+ * `edge-routing.mts` from wherever the nodes end up, so ELK's routes are not
+ * read; the edges and their labels go in so that it leaves room for them.
  *
  * Nodes have a fixed size per kind and per the reader's node size
  * (`nodeBoxSize`), and their titles are cut to fit (`truncate.mts`), so the
@@ -28,12 +26,9 @@ import type {
   NodeRef,
 } from '../domain/index.mjs';
 import { formatLag, type NodeSize } from '../view-model/index.mjs';
+import { PLACEMENT_GAP, type Bounds } from './dag-layout.mjs';
 import type { ElkExtendedEdge, ElkNode } from './elk.mjs';
-import {
-  EMPTY_GROUP_SIZE,
-  GROUP_HEADER,
-  GROUP_PADDING,
-} from './group-frames.mjs';
+import { EMPTY_GROUP_SIZE, frameAround } from './group-frames.mjs';
 import type { Point, Size } from './pan-zoom.mjs';
 import { textWidthUnits } from './truncate.mjs';
 
@@ -124,11 +119,32 @@ export const layoutInput = (
 export const layoutKey = (input: LayoutInput): string => JSON.stringify(input);
 
 export const toElkGraph = (input: LayoutInput): ElkNode => {
-  const nodeBoxes = new Map(
-    input.nodes.map(({ id, width, height }) => [id, { id, width, height }]),
+  const groupOf = new Map(
+    input.groups.flatMap(({ id, members }) =>
+      members.map((member) => [member, id] as const),
+    ),
   );
 
-  const grouped = new Set(input.groups.flatMap(({ members }) => members));
+  const membersOf = new Map(
+    input.groups.map(({ id, members }) => [id, members] as const),
+  );
+
+  const nodeBoxes = new Map(input.nodes.map((node) => [node.id, node]));
+
+  // Each group's members one after another, where its first one is: in the
+  // order of the model, which ELK keeps where it costs no crossing, they
+  // tend to come out side by side, which keeps the frames small.
+  const ordered = input.nodes.flatMap(({ id }): readonly GraphNodeId[] => {
+    const group = groupOf.get(id);
+
+    if (group === undefined) {
+      return [id];
+    }
+
+    const members = membersOf.get(group) ?? [];
+
+    return members[0] === id ? members : [];
+  });
 
   return {
     id: 'root',
@@ -153,33 +169,16 @@ export const toElkGraph = (input: LayoutInput): ElkNode => {
       // 10–20 % shorter for as many crossings.
       'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
       'elk.padding': '[top=24,left=24,bottom=24,right=24]',
-      // The groups laid out with the rest, not each one on its own: the
-      // edges in and out of a group are what places it among the others.
-      ...(grouped.size === 0
-        ? {}
-        : { 'elk.hierarchyHandling': 'INCLUDE_CHILDREN' }),
     },
     children: [
-      ...input.nodes.filter(({ id }) => !grouped.has(id)).map(elkBox),
-      ...input.groups.map(({ id, members }): ElkNode => {
-        const children = members.flatMap((member) => {
-          const box = nodeBoxes.get(member);
+      ...ordered.flatMap((id) => {
+        const box = nodeBoxes.get(id);
 
-          return box === undefined ? [] : [elkBox(box)];
-        });
-
-        return Arr.isEmpty(children)
-          ? { id: elkGroupId(id), ...EMPTY_GROUP_SIZE }
-          : {
-              id: elkGroupId(id),
-              layoutOptions: {
-                ...spacingOptions,
-                // Room inside the frame, as `groupFrame` draws it.
-                'elk.padding': `[top=${GROUP_HEADER},left=${GROUP_PADDING},bottom=${GROUP_PADDING},right=${GROUP_PADDING}]`,
-              },
-              children,
-            };
+        return box === undefined ? [] : [elkBox(box)];
       }),
+      ...input.groups
+        .filter(({ members }) => Arr.isEmpty(members))
+        .map(({ id }) => elkBox({ id: elkGroupId(id), ...EMPTY_GROUP_SIZE })),
     ],
     edges: input.edges.map(({ id, from, to, label }): ElkExtendedEdge => ({
       id,
@@ -191,36 +190,20 @@ export const toElkGraph = (input: LayoutInput): ElkNode => {
 };
 
 /**
- * The positions ELK chose, in the order of `input`, a group's members where
- * they are in the graph rather than in the group. A node or a group ELK did
- * not place (which it does not do) is at the origin rather than dropped.
+ * The positions ELK chose, in the order of `input`, then moved apart across
+ * the layers until nothing is inside a frame but its members
+ * (`clearOfFrames`). A node or a group ELK did not place (which it does not
+ * do) is at the origin rather than dropped.
  */
 export const fromElkGraph = (
   input: LayoutInput,
   laidOut: DeepReadonly<ElkNode>,
 ): GraphLayout => {
   const placed = new Map(
-    (laidOut.children ?? []).flatMap((child) =>
-      Arr.toUnshifted([
-        child.id,
-        { x: child.x ?? 0, y: child.y ?? 0, child },
-      ] as const)(
-        (child.children ?? []).map(
-          (grandchild) =>
-            [
-              grandchild.id,
-              {
-                x: (child.x ?? 0) + (grandchild.x ?? 0),
-                y: (child.y ?? 0) + (grandchild.y ?? 0),
-                child: grandchild,
-              },
-            ] as const,
-        ),
-      ),
-    ),
+    (laidOut.children ?? []).map((child) => [child.id, child] as const),
   );
 
-  return {
+  return clearOfFrames(input.direction, {
     nodes: input.nodes.map((node) => {
       const at = placed.get(node.id);
 
@@ -230,13 +213,139 @@ export const fromElkGraph = (
     groups: input.groups.map((group) => {
       const at = placed.get(elkGroupId(group.id));
 
+      return { ...group, x: at?.x ?? 0, y: at?.y ?? 0, ...EMPTY_GROUP_SIZE };
+    }),
+  });
+};
+
+/**
+ * `layout` with its nodes and groups moved across the layers — down when
+ * the graph grows to the right, to the right when it grows down — so that
+ * no frame of a group (`frameAround`) comes within `PLACEMENT_GAP` of a
+ * node or a frame it does not hold, and each group's box is its frame. Two
+ * nodes, or a node and an empty group, are kept as far apart as they were.
+ *
+ * A frame and the nodes in it move as one, and so does each node in no
+ * group. Taken from the top (from the left), each moves just past those
+ * before it in its way, so nothing moves along the layers and no edge turns
+ * back, and what ELK put clear of the rest stays where it is.
+ *
+ * ELK is not given the groups to lay out (`elk.hierarchyHandling`), since
+ * it then lays the inside of each group out first: one that a dependency
+ * leaves and comes back into is in its own way, and ELK turns that edge
+ * back.
+ */
+export const clearOfFrames = (
+  direction: DagDirection,
+  layout: GraphLayout,
+): GraphLayout => {
+  const nodesById = new Map(layout.nodes.map((node) => [node.id, node]));
+
+  const grouped = new Set(layout.groups.flatMap(({ members }) => members));
+
+  const blocks: readonly Block[] = [
+    ...layout.groups.map((group): Block => {
+      const members = group.members.flatMap((member) => {
+        const node = nodesById.get(member);
+
+        return node === undefined ? [] : [node];
+      });
+
+      const frame = frameAround(members);
+
       return {
-        ...group,
-        x: at?.x ?? 0,
-        y: at?.y ?? 0,
-        width: at?.child.width ?? EMPTY_GROUP_SIZE.width,
-        height: at?.child.height ?? EMPTY_GROUP_SIZE.height,
+        key: elkGroupId(group.id),
+        nodes: members.map(({ id }) => id),
+        bounds: frame ?? group,
+        frame: frame !== undefined,
       };
+    }),
+    ...layout.nodes
+      .filter(({ id }) => !grouped.has(id))
+      .map((node): Block => ({
+        key: node.id,
+        nodes: [node.id],
+        bounds: node,
+        frame: false,
+      })),
+  ] as const;
+
+  const across = direction === 'right' ? 'y' : 'x';
+
+  const along = direction === 'right' ? 'x' : 'y';
+
+  const acrossSize = direction === 'right' ? 'height' : 'width';
+
+  const alongSize = direction === 'right' ? 'width' : 'height';
+
+  const mut_moved: (Block & Readonly<{ at: number }>)[] = [];
+
+  const mut_shifts = new Map<string, number>();
+
+  for (const block of blocks.toSorted((a, b) =>
+    a.bounds[across] !== b.bounds[across]
+      ? a.bounds[across] - b.bounds[across]
+      : a.bounds[along] - b.bounds[along],
+  )) {
+    const { bounds } = block;
+
+    const start = Math.max(
+      bounds[across],
+      ...mut_moved
+        .filter(
+          (other) =>
+            other.bounds[along] < bounds[along] + bounds[alongSize] &&
+            bounds[along] < other.bounds[along] + other.bounds[alongSize],
+        )
+        .map((other) => {
+          const end = other.bounds[across] + other.bounds[acrossSize];
+
+          // Two nodes no closer than ELK put them, which is less apart
+          // than `PLACEMENT_GAP` between the parts of a graph that no
+          // edge joins.
+          const gap =
+            block.frame || other.frame
+              ? PLACEMENT_GAP
+              : Math.min(PLACEMENT_GAP, bounds[across] - end);
+
+          return other.at + other.bounds[acrossSize] + gap;
+        }),
+    );
+
+    mut_moved.push({ ...block, at: start });
+
+    mut_shifts.set(block.key, start - bounds[across]);
+
+    for (const id of block.nodes) {
+      mut_shifts.set(id, start - bounds[across]);
+    }
+  }
+
+  const moved = <P extends Point>(at: P, key: string): P => {
+    const shift = mut_shifts.get(key) ?? 0;
+
+    return shift === 0 ? at : { ...at, [across]: at[across] + shift };
+  };
+
+  const nodes = layout.nodes.map((node) => moved(node, node.id));
+
+  const movedById = new Map(nodes.map((node) => [node.id, node]));
+
+  return {
+    nodes,
+    edges: layout.edges,
+    groups: layout.groups.map((group) => {
+      const frame = frameAround(
+        group.members.flatMap((member) => {
+          const node = movedById.get(member);
+
+          return node === undefined ? [] : [node];
+        }),
+      );
+
+      return frame === undefined
+        ? moved(group, elkGroupId(group.id))
+        : { ...group, ...frame };
     }),
   };
 };
@@ -268,8 +377,8 @@ export type LayoutGroup = DeepReadonly<{
 }>;
 
 /**
- * A group, and the box ELK gave it, its top-left corner at `(x, y)`: round
- * its members, or for none, a box of its own.
+ * A group, and its box, its top-left corner at `(x, y)`: its frame round its
+ * members, or for none, the box ELK gave it.
  */
 export type LaidOutGroup = LayoutGroup & DeepReadonly<Point & Size>;
 
@@ -286,10 +395,7 @@ export type LaidOutEdge = DeepReadonly<{
   label: string;
 }>;
 
-/**
- * How far apart ELK keeps what it lays out, in the graph and in each group
- * alike: an option of a node of ELK's is read for what is inside it.
- */
+/** How far apart ELK keeps what it lays out. */
 const spacingOptions = {
   'elk.spacing.nodeNode': '28',
   'elk.layered.spacing.nodeNodeBetweenLayers': '56',
@@ -305,6 +411,17 @@ const spacingOptions = {
 
 /** The id of a group among ELK's nodes, apart from every node's. */
 const elkGroupId = (id: GroupId): string => `group:${id}` as const;
+
+/**
+ * What `clearOfFrames` moves as one: a group's frame round its members, a
+ * group with none, or a node in none.
+ */
+type Block = Readonly<{
+  key: string;
+  nodes: readonly GraphNodeId[];
+  bounds: Bounds;
+  frame: boolean;
+}>;
 
 /** What ELK is given of a node: its id and its size. */
 const elkBox = ({
