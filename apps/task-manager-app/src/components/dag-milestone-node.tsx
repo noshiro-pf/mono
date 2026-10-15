@@ -11,6 +11,8 @@ type Props = Readonly<{
   view: MilestoneNodeView;
   /** Being dragged, and drawn lifted. */
   dragging: boolean;
+  /** Selected by the lasso, and drawn outlined. */
+  selected: boolean;
   /** Moved by the arrow keys: in the view modes the reader arranges. */
   movable: boolean;
   /** Brought forward or dimmed by the arc diagram's highlight. */
@@ -30,8 +32,16 @@ type Props = Readonly<{
 export const DagMilestoneNode = memoNamed<Props>(
   'DagMilestoneNode',
   (props) => {
-    const { node, view, dragging, movable, highlight, opacity, compact } =
-      props;
+    const {
+      node,
+      view,
+      dragging,
+      selected,
+      movable,
+      highlight,
+      opacity,
+      compact,
+    } = props;
 
     const { openNode, onKeyDown } = useDagNodeHandlers(view.ref, movable);
 
@@ -55,10 +65,11 @@ export const DagMilestoneNode = memoNamed<Props>(
       // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
       <g
         aria-label={view.ariaLabel}
-        className={`dag-node dag-milestone ${view.reached ? 'reached' : 'pending'}${compact ? ' compact' : ''}${dragging ? ' dragging' : ''}`}
+        className={`dag-node dag-milestone ${view.reached ? 'reached' : 'pending'}${compact ? ' compact' : ''}${dragging ? ' dragging' : ''}${selected ? ' selected' : ''}`}
         data-e2e={'dag-node'}
         data-highlight={highlight}
         data-node-id={node.id}
+        data-selected={selected}
         opacity={opacity}
         role={'button'}
         // Lower case: Preact sets an SVG element's props as attributes, and

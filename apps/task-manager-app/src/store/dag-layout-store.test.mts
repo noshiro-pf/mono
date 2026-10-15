@@ -644,6 +644,28 @@ describe(createDagLayoutStore, () => {
       assert.deepStrictEqual(store.arrangement.getSnapshot().value, saved[0]);
     });
 
+    test('dragged with others selected, moves them all as far and writes once', async () => {
+      const { store, deferred, saved } = setup({ state: three });
+
+      deferred.resolve(0);
+
+      await settle();
+
+      store.moveNodes(['task:a', 'task:c'], { x: 10, y: 50 });
+
+      assert.deepStrictEqual(saved, [
+        {
+          direction: 'right',
+          positions: positions([
+            ['task:a', { x: 10, y: 50 }],
+            ['task:b', { x: 100, y: 0 }],
+            ['task:c', { x: 210, y: 50 }],
+          ]),
+          groupPositions: new Map(),
+        },
+      ]);
+    });
+
     test('drops the positions of nodes that no longer exist', async () => {
       const { store, deferred, saved } = setup({
         stored: {

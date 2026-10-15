@@ -38,12 +38,15 @@ import {
   dagShowDoneStorage,
   dagViewModeStorage,
   diagramSortStorage,
+  isArrangeable,
   listSettingsStorage,
   nodeSizeStorage,
 } from '../view-model/index.mjs';
 import { createAnimationSettingStore } from './animation-setting-store.mjs';
+import { createBulkEditStore } from './bulk-edit-store.mjs';
 import { createClockStore } from './clock-store.mjs';
 import { createDagLayoutStore } from './dag-layout-store.mjs';
+import { createDagSelectionStore } from './dag-selection-store.mjs';
 import { createDagShowDoneStore } from './dag-show-done-store.mjs';
 import { createDagViewModeStore } from './dag-view-mode-store.mjs';
 import { createDataStore } from './data-store.mjs';
@@ -193,6 +196,18 @@ export const dagLayoutStore = createDagLayoutStore({
   },
 });
 
+export const dagSelectionStore = createDagSelectionStore({
+  state: dataStore.state,
+  hidden: dagHiddenNodes,
+  active: combine([uiStore.view, dagViewModeStore.mode]).pipe(
+    map(([view, mode]) => view === 'dag' && isArrangeable(mode)),
+  ),
+});
+
+export const bulkEditStore = createBulkEditStore({
+  editNodes: dataStore.editNodes,
+});
+
 export const sessionSignal = toSignal(sessionStore.session);
 
 export const domainSignal = toSignal(dataStore.state);
@@ -255,6 +270,10 @@ export const tileNodesSignal = toSignal(dagLayoutStore.tileNodes);
 
 export const dagMembershipSignal = toSignal(dagLayoutStore.membership);
 
+export const dagSelectionSignal = toSignal(dagSelectionStore.selected);
+
+export const bulkEditSignal = toSignal(bulkEditStore.editor);
+
 export const taskRowsSignal = computed(() =>
   buildTaskRows(domainSignal.value, nowSignal.value, listSettingsSignal.value),
 );
@@ -290,6 +309,7 @@ export const startStore = (): (() => void) => {
     diagramSortStore.start(),
     dagShowDoneStore.start(),
     dagLayoutStore.start(),
+    dagSelectionStore.start(),
   ] as const;
 
   // Blueprint's dark styles hang off `.bp6-dark` on an ancestor.

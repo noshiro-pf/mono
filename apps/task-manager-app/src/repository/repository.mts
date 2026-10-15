@@ -33,6 +33,11 @@ export type Repository = Readonly<{
    */
   deleteNode: (ref: NodeRef, cleanup: NodeCleanup) => Promise<void>;
   /**
+   * Creates or replaces every task and milestone `nodes` names, all
+   * together: those edited at once (see `editNodes`).
+   */
+  putNodes: (nodes: NodeCleanup) => Promise<void>;
+  /**
    * Hands `observer.next` every group once they have loaded, in creation
    * order, and again on every change after, local writes included. Returns
    * what stops it.

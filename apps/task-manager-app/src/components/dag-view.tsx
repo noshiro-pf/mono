@@ -3,13 +3,15 @@ import { useRef } from 'preact/hooks';
 import { Arr } from 'ts-data-forge';
 import { dagAutoLayoutSignal, domainSignal } from '../store/index.mjs';
 import { DagCanvas } from './dag-canvas.js';
+import { DagSelectionBar } from './dag-selection-bar.js';
 import { DagSettingsPanel } from './dag-settings-panel.js';
 import { DagToolbar } from './dag-toolbar.js';
 
 /**
  * The dependency graph, as the reader arranged it over ELK's layout or in
- * another view mode, with the toolbar over it and the 「表示設定」 panel
- * the toolbar opens. While a new layout is
+ * another view mode, with the toolbar over it, the 「表示設定」 panel
+ * the toolbar opens, and the nodes selected with what can be done with
+ * them (`dag-selection-bar.tsx`). While a new layout is
  * computed the previous one stays up; before the first, a message says so.
  */
 export const DagView = memoNamed('DagView', () => {
@@ -51,6 +53,7 @@ export const DagView = memoNamed('DagView', () => {
         <>
           <DagToolbar toolbarRef={toolbarRef} />
           <DagCanvas layout={layout} toolbarRef={toolbarRef} />
+          <DagSelectionBar />
           <DagSettingsPanel />
         </>
       )}
