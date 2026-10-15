@@ -158,9 +158,9 @@ export const licensePolicy = {
     },
     {
       license: 'WTFPL',
-      packages: ['@azu/style-format'],
+      packages: ['@azu/style-format', '@cspell/dict-django'],
       reason:
-        'Asks for nothing, but is not OSI-approved and has no warranty disclaimer, so it is on no standard allow-list and does not belong on this one as a class. A `textlint` formatter’s dependency; tooling only.',
+        'Asks for nothing, but is not OSI-approved and has no warranty disclaimer, so it is on no standard allow-list and does not belong on this one as a class. A `textlint` formatter’s dependency, and a word list cspell loads when it runs (whose LICENSE file was already WTFPL; 4.1.7 corrected a `license` field that said MIT). Tooling only, unmodified, not redistributed.',
     },
   ],
 } as const satisfies LicensePolicy;
