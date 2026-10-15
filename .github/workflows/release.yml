@@ -67,6 +67,22 @@ jobs:
       - name: Set up pnpm, Node.js and the dependencies
         uses: ./.github/actions/setup
 
+      # version PR に載せる `NEXT_MAJOR.md` の Undecided 候補（
+      # `tools/scripts/cmd/next-major-reminder.mts` ）。`changesets/action` が
+      # `.changeset/` を消費する前の main の tree を読むので、ここで作る。投稿は
+      # 鍵を持つ `remind` job がファイルとして受け取るだけで、tree からは何も
+      # 実行しない。候補が無ければ空のファイルで、それは「コメントを消す」の意味。
+      - name: List the undecided NEXT_MAJOR.md candidates
+        run: pnpm run z:next-major-reminder "${RUNNER_TEMP}/next-major-reminder.md"
+
+      - name: Upload the candidate list
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: next-major-reminder
+          path: ${{ runner.temp }}/next-major-reminder.md
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Build all packages
         run: pnpm run ws:build
 
@@ -115,6 +131,9 @@ jobs:
     # 順序に注意: この `environment` を main に入れてから npm 側の
     # Environment 欄を埋めること。逆順にすると次の release が落ちる。
     environment: release
+
+    outputs:
+      pr-number: ${{ steps.changesets.outputs.pr-number }}
 
     permissions:
       packages: write
@@ -225,3 +244,70 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           PR_NUMBER: ${{ steps.changesets.outputs.pr-number }}
         run: gh pr edit "$PR_NUMBER" --add-label skip-ci
+
+  # version PR に、破壊的リリースが残す `NEXT_MAJOR.md` の Undecided 候補を
+  # コメント 1 件で知らせる。リリースを決める（ `merge-queued` を付ける）のは
+  # その PR の上なので、決める場所に一覧を置く。本文でなくコメントなのは、
+  # `changesets/action` が push のたびに title と body を上書きするため。
+  #
+  # GitHub はコメントの編集では通知を送らないので、一覧が変わったときだけ古い
+  # ものを消して新しく投稿する。変わらなければ何もしない（ version PR は main
+  # に何か入るたびに作り直されるので、毎回投稿すると通知が埋もれる）。一覧が
+  # 空になれば消す。
+  #
+  # `release` の鍵からも npm の OIDC からも切り離すため別 job にし、
+  # `GITHUB_TOKEN` の `pull-requests: write` だけを持つ。そのトークンで書いた
+  # コメントは workflow を起こさない。checkout もしない — `build` job が
+  # 作ったファイルを本文として読むだけで、実行するのはこの `run:` だけ。
+  remind:
+    name: Remind of undecided NEXT_MAJOR.md candidates
+    needs: release
+    if: needs.release.outputs.pr-number != ''
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: write # to post and delete the comment
+
+    steps:
+      - name: Download the candidate list
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: next-major-reminder
+          path: ${{ runner.temp }}
+
+      # マーカーは `next-major-reminder.mts` の `REMINDER_MARKER` と揃える。
+      # リポジトリは公開で、誰でもマーカー付きのコメントを書けるので、この
+      # workflow（ `github-actions[bot]` ）が書いたものだけを数える。
+      - name: Keep one comment listing them
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ needs.release.outputs.pr-number }}
+          MARKER: '<!-- next-major:reminder -->'
+        run: |
+          set -euo pipefail
+          body_file="${RUNNER_TEMP}/next-major-reminder.md"
+          comments="repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments"
+
+          gh api --paginate "${comments}?per_page=100" \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith(env.MARKER))) | .id' \
+            > "${RUNNER_TEMP}/reminder-ids.txt"
+          mapfile -t ids < "${RUNNER_TEMP}/reminder-ids.txt"
+
+          # `$(...)` drops trailing newlines on both sides of the comparison.
+          if [[ -s "$body_file" && "${#ids[@]}" -eq 1 ]] &&
+            [[ "$(gh api "repos/${GITHUB_REPOSITORY}/issues/comments/${ids[0]}" --jq .body)" == "$(cat "$body_file")" ]]; then
+            echo "The list is unchanged; leaving comment ${ids[0]} as it is."
+            exit 0
+          fi
+
+          for id in "${ids[@]}"; do
+            gh api --method DELETE "repos/${GITHUB_REPOSITORY}/issues/comments/${id}"
+            echo "Deleted comment ${id}."
+          done
+
+          if [[ -s "$body_file" ]]; then
+            gh api --method POST "$comments" -F "body=@${body_file}" --jq .html_url
+          else
+            echo "No breaking release has undecided candidates."
+          fi
