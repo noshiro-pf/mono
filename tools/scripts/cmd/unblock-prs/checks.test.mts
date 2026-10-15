@@ -1,4 +1,9 @@
-import { describeWaitingOn, summarizeChecks } from './checks.mjs';
+import {
+  describeWaitingOn,
+  summarizeChecks,
+  type ReportedCheck,
+  type RunningCheck,
+} from './checks.mjs';
 
 describe(summarizeChecks, () => {
   const required = ['code-check-result / result', 'no-skip-ci-label'] as const;
@@ -35,7 +40,7 @@ describe(summarizeChecks, () => {
         check('no-skip-ci-label'),
       ],
       required,
-      ['code-check (ws:fix:lint)'],
+      [running('code-check (ws:fix:lint)')],
     );
 
     assert.strictEqual(summary.status, 'pending');
@@ -55,7 +60,10 @@ describe(summarizeChecks, () => {
         check('no-skip-ci-label'),
       ],
       required,
-      ['code-check-result / result', 'code-check (ws:fix:lint)'],
+      [
+        running('code-check-result / result'),
+        running('code-check (ws:fix:lint)'),
+      ],
     );
 
     assert.deepStrictEqual(summary.pending, ['code-check-result / result']);
@@ -67,7 +75,57 @@ describe(summarizeChecks, () => {
     const summary = summarizeChecks(
       [check('code-check-result / result', 'fail'), check('no-skip-ci-label')],
       required,
-      ['code-check (ws:fix:lint)'],
+      [running('code-check (ws:fix:lint)')],
+    );
+
+    assert.strictEqual(summary.status, 'failed');
+  });
+
+  test('fails on a required check that failed in the round still running', () => {
+    const summary = summarizeChecks(
+      [
+        check('code-check-result / result', 'fail', '2026-10-12T15:20:45Z'),
+        check('no-skip-ci-label'),
+      ],
+      required,
+      [running('code-check (ws:fix:lint)', '2026-10-12T15:20:14Z')],
+    );
+
+    assert.strictEqual(summary.status, 'failed');
+
+    assert.deepStrictEqual(
+      summary.failed.map(({ name }) => name),
+      ['code-check-result / result'],
+    );
+  });
+
+  // #2246: the round `skip-ci` cancelled when the pull request was opened
+  // left the aggregates red, and `skip-ci` came off the same head.
+  test('waits on a required check that failed before the round still running began', () => {
+    const summary = summarizeChecks(
+      [
+        check('code-check-result / result', 'cancel', '2026-10-12T12:13:37Z'),
+        check('no-skip-ci-label'),
+      ],
+      required,
+      [running('code-check (ws:fix:lint)', '2026-10-12T15:20:14Z')],
+    );
+
+    assert.strictEqual(summary.status, 'pending');
+
+    assert.deepStrictEqual(summary.failed, []);
+
+    assert.deepStrictEqual(summary.pending, ['code-check-result / result']);
+  });
+
+  test('fails on a red left by the round before once nothing runs', () => {
+    const summary = summarizeChecks(
+      [
+        check('code-check-result / result', 'fail', '2026-10-12T12:13:37Z'),
+        check('no-skip-ci-label'),
+      ],
+      required,
+      [],
     );
 
     assert.strictEqual(summary.status, 'failed');
@@ -85,9 +143,16 @@ describe(summarizeChecks, () => {
 const check = (
   name: string,
   bucket: string = 'pass',
-): Readonly<{ name: string; bucket: string; link: string }> =>
+  /** When it finished, which is also taken as when it started. */
+  completedAt: string = '',
+): ReportedCheck =>
   ({
     name,
     bucket,
     link: '',
+    startedAt: completedAt,
+    completedAt,
   }) as const;
+
+const running = (name: string, startedAt: string = ''): RunningCheck =>
+  ({ name, startedAt }) as const;

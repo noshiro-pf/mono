@@ -17,6 +17,7 @@ import type { StrictPick } from 'ts-type-forge';
 import {
   isMergeableState,
   listRequiredChecks,
+  listRunningChecks,
   summarizeChecks,
 } from './checks.mjs';
 import { UNKNOWN_STATE_RETRIES, UNKNOWN_STATE_RETRY_MS } from './constants.mjs';
@@ -490,9 +491,23 @@ const classifyByChecks = async (
     };
   }
 
-  // Checks still running only decide between pending and passed, and both
-  // are in flight here, so they are not asked for.
-  const summary = summarizeChecks(checks.value, context.requiredContexts, []);
+  // Pending and passed are both in flight here, but a red left by the round
+  // before is not a failure while this round runs, and the checks still
+  // running are what tell the two apart.
+  const running = await listRunningChecks(pr.number);
+
+  if (Result.isErr(running)) {
+    return {
+      kind: 'note',
+      note: `#${pr.number}: could not read checks: ${running.value}`,
+    };
+  }
+
+  const summary = summarizeChecks(
+    checks.value,
+    context.requiredContexts,
+    running.value,
+  );
 
   // Pending — including a required context that has not reported at all — or
   // green and about to merge. A green one that stays open is caught by the

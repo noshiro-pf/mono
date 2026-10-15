@@ -15,10 +15,19 @@ const CheckListSchema = t.array(
     /** `pass` | `fail` | `pending` | `skipping` | `cancel` */
     bucket: t.string(),
     link: t.string(),
+    /** ISO 8601; GitHub's zero time before the check has started. */
+    startedAt: t.string(),
+    /** ISO 8601; GitHub's zero time before the check has finished. */
+    completedAt: t.string(),
   }),
 );
 
 export type ReportedCheck = t.TypeOf<typeof CheckListSchema>[number];
+
+/** A check on the head that has not finished, and when it started. */
+export type RunningCheck = Readonly<{ name: string; startedAt: string }>;
+
+const CHECK_FIELDS = 'name,bucket,link,startedAt,completedAt';
 
 /**
  * The checks that gate the merge, as GitHub reports them for the head commit.
@@ -29,7 +38,7 @@ export const listRequiredChecks = async (
   prNumber: number,
 ): Promise<Result<readonly ReportedCheck[], string>> => {
   const listed = await git(
-    `gh pr checks ${prNumber} --required --json name,bucket,link`,
+    `gh pr checks ${prNumber} --required --json ${CHECK_FIELDS}`,
   );
 
   if (Result.isErr(listed)) {
@@ -48,12 +57,13 @@ export const listRequiredChecks = async (
  * are done, so until then `--required` answers with the round before. When
  * that round was the one `skip-ci` skipped, every aggregate reads `skipped`
  * and the commit looks green halfway through its matrix. Anything still
- * running is what says the round is not over.
+ * running is what says the round is not over, and when it started is what
+ * tells a failure of the round before from one of this round.
  */
 export const listRunningChecks = async (
   prNumber: number,
-): Promise<Result<readonly string[], string>> => {
-  const listed = await git(`gh pr checks ${prNumber} --json name,bucket,link`);
+): Promise<Result<readonly RunningCheck[], string>> => {
+  const listed = await git(`gh pr checks ${prNumber} --json ${CHECK_FIELDS}`);
 
   if (Result.isErr(listed)) {
     return listed.value.includes('no checks reported') ? Result.ok([]) : listed;
@@ -62,7 +72,7 @@ export const listRunningChecks = async (
   return Result.map(parseJson(listed.value, CheckListSchema), (checks) =>
     checks
       .filter((check) => check.bucket === 'pending')
-      .map((check) => check.name),
+      .map(({ name, startedAt }) => ({ name, startedAt })),
   );
 };
 
@@ -73,26 +83,55 @@ export const listRunningChecks = async (
  * reported yet, and GitHub will not merge until it does. `running` is every
  * check on the head that has not finished ({@link listRunningChecks}); while
  * it is not empty the required ones may be the round before speaking, so
- * they can fail the pull request but not pass it.
+ * they cannot pass the pull request.
+ *
+ * Nor can they fail it when they finished before the round still running
+ * began: the round `skip-ci` cancelled, as `open-pr` opens every pull request
+ * under it, leaves its aggregates red, and reading that red as this round's
+ * set a pull request aside while its first real round was under way (#2246).
+ * Such a failure waits for the round to end, as a check not yet reported
+ * does. A failure of this round finished after it began, and still fails the
+ * pull request at once.
  */
 export const summarizeChecks = (
   checks: readonly ReportedCheck[],
   requiredContexts: readonly string[],
-  running: readonly string[],
+  running: readonly RunningCheck[],
 ): ChecksSummary => {
-  const failed = checks
-    .filter((check) => check.bucket === 'fail' || check.bucket === 'cancel')
+  const roundStartedMs = earliestStart(running);
+
+  const isOfRoundBefore = (check: ReportedCheck): boolean => {
+    const completedMs = epochMs(check.completedAt);
+
+    return (
+      roundStartedMs !== undefined &&
+      completedMs !== undefined &&
+      completedMs < roundStartedMs
+    );
+  };
+
+  const failures = checks.filter(
+    (check) => check.bucket === 'fail' || check.bucket === 'cancel',
+  );
+
+  const failed = failures
+    .filter((check) => !isOfRoundBefore(check))
     .map(({ name, link }) => ({ name, link }));
 
-  const pending = checks
-    .filter((check) => check.bucket === 'pending')
-    .map((check) => check.name);
+  const pending = [
+    ...checks
+      .filter((check) => check.bucket === 'pending')
+      .map((check) => check.name),
+    ...failures.filter(isOfRoundBefore).map((check) => check.name),
+  ] as const;
 
   const reported = new Set(checks.map((check) => check.name));
 
   const missing = requiredContexts.filter((context) => !reported.has(context));
 
-  const stillRunning = running.filter((name) => !pending.includes(name));
+  const stillRunning = running
+    .map(({ name }) => name)
+    .filter((name) => !pending.includes(name));
 
   const status = Arr.isNonEmpty(failed)
     ? 'failed'
@@ -131,3 +170,28 @@ export const isMergeableState = (mergeStateStatus: string): boolean =>
   mergeStateStatus === 'CLEAN' ||
   mergeStateStatus === 'HAS_HOOKS' ||
   mergeStateStatus === 'UNSTABLE';
+
+/**
+ * When the earliest check still running started, in milliseconds; `undefined`
+ * when nothing is running or no start time can be read.
+ */
+const earliestStart = (
+  running: readonly RunningCheck[],
+): number | undefined => {
+  const starts = running.flatMap(({ startedAt }) => {
+    const ms = epochMs(startedAt);
+
+    return ms === undefined ? [] : [ms];
+  });
+
+  return Arr.isNonEmpty(starts) ? Math.min(...starts) : undefined;
+};
+
+/** An ISO 8601 instant in milliseconds; `undefined` when it is not one. */
+const epochMs = (iso: string): number | undefined => {
+  try {
+    return Temporal.Instant.from(iso).epochMilliseconds;
+  } catch {
+    return undefined;
+  }
+};

@@ -320,7 +320,8 @@ pick も「3a」の rebase もしません。
       えさせます。ただし確実な `BEHIND` より後ろに並べます。
     - `CLEAN` / `UNSTABLE` / `HAS_HOOKS` → **in-flight**。
     - `BLOCKED` → 必須チェックを読み、失敗なら **failing**、未完なら
-      **in-flight**。
+      **in-flight**。新しい round が実行中なら、前の round が残した赤も未完と
+      数えます。
 8. **レビュー待ち** — **candidate** になった PR と、`BLOCKED` のまま
    **in-flight** になった PR について、レビューがマージを止めていないかを
    GraphQL 1回でまとめて読みます。止めていれば **held**（理由を出力）にして、
@@ -463,7 +464,11 @@ survey と違う / lease 負けで push が拒否され、remote の head が変
 持たないので、その間 `--required` は前の round の結果を返します。前の round が
 `skip-ci` で飛ばされたものなら集約は全部 `skipped` で、マトリクスの途中なのに
 green に見えます（#2069 はこれで `not-merging` になりました）。fail はこの間も
-すぐ判定します。
+すぐ判定しますが、実行中のうち最も早く始まったものより前に終わった fail は前の
+round のものとして、round が終わるまで待ちます。`open-pr` が開いた直後に
+`skip-ci` で止めた round は集約を赤く残すので、それを今の round の fail と読むと、
+最初の本番の round の途中で脇に置いてしまいます（#2246 はこれで `checks-failed`
+になりました）。
 
 全部 green なのにマージされない場合は rebase では直せないので、連続 green 回
 数で打ち切ります。原因のうち未解決の会話と code owner の承認不足は triage が先
@@ -1064,7 +1069,8 @@ merge-base` says whether the branch was built on the current tip of the
       exclude. The rebase answers it; it is only ordered last.
     - `CLEAN` / `UNSTABLE` / `HAS_HOOKS` → **in flight**.
     - `BLOCKED` → read the required checks: **failing** if one failed,
-      **in flight** if they are still running.
+      **in flight** if they are still running — a red left by the round before
+      included, while the checks on the head say a new round is running.
 8. **Its review** — for every **candidate**, and every **in flight** that
    GitHub still calls `BLOCKED`, one GraphQL request reads whether its review
    holds the merge. If it does, the pull request is **held**, with the reason
@@ -1223,7 +1229,11 @@ aggregate has no run in a new round until the jobs it waits on are done, so
 until then `--required` answers with the round before, and when that round
 was the one `skip-ci` skipped, every aggregate reads `skipped` and the commit
 looks green halfway through its matrix (#2069 was set aside `not-merging` so).
-A failure is still acted on at once.
+A failure is still acted on at once, unless it finished before the earliest
+check still running started: that one is the round before, and waits for the
+round to end. The round `skip-ci` cancels as `open-pr` opens a pull request
+leaves its aggregates red, and reading that red as this round's set the first
+real round aside halfway through (#2246 was set aside `checks-failed` so).
 
 A pull request that is green and still open is held by something a rebase
 cannot fix, so it is given a budget of consecutive green polls. An unresolved
