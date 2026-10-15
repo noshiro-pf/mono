@@ -12,6 +12,15 @@
     />
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!--
+      For iOS's "Add to Home Screen", which does not read the SVG favicon and
+      without a touch icon draws the title's first letter instead. The PNG is
+      favicon.svg's drawing on a full square, since iOS rounds the corners
+      itself and fills transparency with black. The title meta is the name
+      proposed under the icon; the home screen cuts off much longer ones.
+    -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="DAG Tasks" />
     <title>タスク管理</title>
   </head>
   <body>
