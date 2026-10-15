@@ -1384,8 +1384,15 @@ details[open] > .milestone-explanation-summary {
 /* On its own line under the rows, so it never moves sideways. */
 .dependency-actions {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
   justify-content: flex-start;
   margin-top: 12px;
+}
+
+.dependency-show-done.bp6-control {
+  margin-bottom: 0;
 }
 
 /* One column on a phone. */

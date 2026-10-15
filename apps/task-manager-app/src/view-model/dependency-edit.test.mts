@@ -15,10 +15,12 @@ import {
   parseSourceValue,
   removeRow,
   rowsFromDependencies,
+  shownSourceOptions,
   updateRow,
   validateRows,
   validDependencies,
   type DependencyRow,
+  type SourceOption,
 } from './dependency-edit.mjs';
 import { DAY_MS, HOUR_MS } from './format.mjs';
 
@@ -42,6 +44,17 @@ const state: DomainState = {
   ],
   milestones: [createMilestone({ id: m, title: 'M', now: 0 })],
 } as const;
+
+/** {@link state} with A done. */
+const withADone: DomainState = {
+  ...state,
+  tasks: state.tasks.map((task) =>
+    task.id === a ? { ...task, progress: 'done' } : task,
+  ),
+} as const;
+
+const values = (shown: readonly SourceOption[]): readonly string[] =>
+  shown.map(({ value }) => value);
 
 const onM: Dependency = {
   from: { kind: 'milestone', id: m },
@@ -294,14 +307,64 @@ describe(dependencySourceOptions, () => {
     assert.deepStrictEqual(
       dependencySourceOptions(state, { kind: 'task', id: a }),
       [
-        { value: 'task:b', label: 'タスク: B', ref: { kind: 'task', id: b } },
+        {
+          value: 'task:b',
+          label: 'タスク: B',
+          ref: { kind: 'task', id: b },
+          done: false,
+        },
         {
           value: 'milestone:m',
           label: 'マイルストーン: M',
           ref: { kind: 'milestone', id: m },
+          done: false,
         },
       ],
     );
+  });
+
+  test('marks a done task, in its label too', () => {
+    assert.deepStrictEqual(
+      dependencySourceOptions(withADone, { kind: 'task', id: b }),
+      [
+        {
+          value: 'task:a',
+          label: 'タスク: A（完了）',
+          ref: { kind: 'task', id: a },
+          done: true,
+        },
+        {
+          value: 'milestone:m',
+          label: 'マイルストーン: M',
+          ref: { kind: 'milestone', id: m },
+          done: false,
+        },
+      ],
+    );
+  });
+});
+
+describe(shownSourceOptions, () => {
+  const options = dependencySourceOptions(withADone, {
+    kind: 'milestone',
+    id: m,
+  });
+
+  test('leaves out the done tasks', () => {
+    assert.deepStrictEqual(values(shownSourceOptions(options, false, '')), [
+      'task:b',
+    ]);
+  });
+
+  test('keeps a done task the row has chosen', () => {
+    assert.deepStrictEqual(
+      values(shownSourceOptions(options, false, 'task:a')),
+      ['task:a', 'task:b'],
+    );
+  });
+
+  test('offers every option when asked to', () => {
+    assert.strictEqual(shownSourceOptions(options, true, ''), options);
   });
 });
 
