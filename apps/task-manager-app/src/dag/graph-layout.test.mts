@@ -9,10 +9,13 @@ import {
   type DomainState,
 } from '../domain/index.mjs';
 import { DAY_MS } from '../view-model/index.mjs';
+import { PLACEMENT_GAP, type Bounds } from './dag-layout.mjs';
 import { layoutWithElk } from './elk.mjs';
 import {
+  clearOfFrames,
   COMPACT_MILESTONE_NODE_SIZE,
   COMPACT_TASK_NODE_SIZE,
+  dagDirections,
   edgeLabel,
   fromElkGraph,
   labelSize,
@@ -23,6 +26,8 @@ import {
   resizeNodes,
   TASK_NODE_SIZE,
   toElkGraph,
+  type LaidOutNode,
+  type LayoutGroup,
 } from './graph-layout.mjs';
 import {
   EMPTY_GROUP_SIZE,
@@ -311,60 +316,42 @@ describe(toElkGraph, () => {
 });
 
 describe('toElkGraph, with groups', () => {
-  test('puts the members of a group inside it, with room for its title, and an empty one as a box', () => {
+  test('gives ELK the members of a group one after another, among the other nodes, and an empty group as a box', () => {
     const graph = toElkGraph(
       layoutInput(buildDependencyGraph(state), 'right', 'standard', [
-        { id: g, members: ['task:a', 'task:b'] },
+        { id: g, members: ['task:a', 'milestone:m'] },
         { id: h, members: [] },
       ]),
     );
 
-    assert.strictEqual(
-      graph.layoutOptions?.['elk.hierarchyHandling'],
-      'INCLUDE_CHILDREN',
-    );
+    assert.isUndefined(graph.layoutOptions?.['elk.hierarchyHandling']);
 
     assert.deepStrictEqual(
       graph.children?.map(({ id, children, width, height }) => [
         id,
-        children?.map((child) => child.id),
+        children,
         width,
         height,
       ]),
       [
+        ['task:a', undefined, TASK_NODE_SIZE.width, TASK_NODE_SIZE.height],
         [
           'milestone:m',
           undefined,
           MILESTONE_NODE_SIZE.width,
           MILESTONE_NODE_SIZE.height,
         ],
-        ['group:g', ['task:a', 'task:b'], undefined, undefined],
+        ['task:b', undefined, TASK_NODE_SIZE.width, TASK_NODE_SIZE.height],
         ['group:h', undefined, EMPTY_GROUP_SIZE.width, EMPTY_GROUP_SIZE.height],
       ],
     );
 
-    assert.strictEqual(
-      graph.children?.[1]?.layoutOptions?.['elk.padding'],
-      `[top=${GROUP_HEADER},left=${GROUP_PADDING},bottom=${GROUP_PADDING},right=${GROUP_PADDING}]`,
-    );
-
-    // The edges stay at the top, in and out of the group alike.
     assert.deepStrictEqual(
       graph.edges?.map(({ sources, targets }) => [sources, targets]),
       [
         [['task:a'], ['task:b']],
         [['task:b'], ['milestone:m']],
       ],
-    );
-  });
-
-  test('lays out the hierarchy only when some node is in a group', () => {
-    assert.isUndefined(
-      toElkGraph(
-        layoutInput(buildDependencyGraph(state), 'right', 'standard', [
-          { id: h, members: [] },
-        ]),
-      ).layoutOptions?.['elk.hierarchyHandling'],
     );
   });
 });
@@ -493,15 +480,7 @@ describe(fromElkGraph, () => {
     assert.deepStrictEqual(groupG.members, ['task:a', 'task:c']);
 
     assert.deepStrictEqual(
-      layout.nodes
-        .filter(
-          (node) =>
-            groupG.x <= node.x &&
-            groupG.y <= node.y &&
-            node.x + node.width <= groupG.x + groupG.width &&
-            node.y + node.height <= groupG.y + groupG.height,
-        )
-        .map(({ id }) => id),
+      layout.nodes.filter((node) => inside(node, groupG)).map(({ id }) => id),
       ['task:a', 'task:c'],
     );
 
@@ -516,6 +495,122 @@ describe(fromElkGraph, () => {
       [EMPTY_GROUP_SIZE.width, EMPTY_GROUP_SIZE.height],
     );
   });
+
+  test.each(dagDirections)(
+    'keeps every edge going forward, %s, when a dependency leaves a group and comes back into it',
+    async (direction) => {
+      // a → b → c → d, with a, c and d in the group and b not: one ELK is
+      // given the group of lays its inside out first, and turns an edge back.
+      const chain = ['a', 'b', 'c', 'd'] as const;
+
+      const tasks = chain.map((id, index) =>
+        createTask({
+          id: asTaskId(id),
+          title: id,
+          now: 0,
+          dependencies:
+            index === 0
+              ? []
+              : [
+                  {
+                    from: {
+                      kind: 'task',
+                      id: asTaskId(chain[index - 1] ?? id),
+                    },
+                    type: 'finish-to-start',
+                    lagMs: 0,
+                  },
+                ],
+        }),
+      );
+
+      const input = layoutInput(
+        buildDependencyGraph({ tasks, milestones: [] }),
+        direction,
+        'standard',
+        [{ id: g, members: ['task:a', 'task:c', 'task:d'] }],
+      );
+
+      const layout = fromElkGraph(
+        input,
+        await layoutWithElk(toElkGraph(input)),
+      );
+
+      const along = (id: string): number => {
+        const node = layout.nodes.find((n) => n.id === id);
+
+        assert.isDefined(node);
+
+        return direction === 'right' ? node.x : node.y;
+      };
+
+      assert.isBelow(along('task:a'), along('task:b'));
+
+      assert.isBelow(along('task:b'), along('task:c'));
+
+      assert.isBelow(along('task:c'), along('task:d'));
+
+      const [group] = layout.groups;
+
+      assert.isDefined(group);
+
+      assert.deepStrictEqual(
+        layout.nodes
+          .filter((node) => overlaps(node, group))
+          .map(({ id }) => id),
+        ['task:a', 'task:c', 'task:d'],
+      );
+    },
+  );
+
+  test.each(dagDirections)(
+    'moves nothing but a neighbor a little, %s, when a node with no dependency goes into a group of its own',
+    async (direction) => {
+      const tasks = Arr.toPushed(
+        state.tasks,
+        createTask({ id: asTaskId('z'), title: 'Z', now: 0 }),
+      );
+
+      const graph = buildDependencyGraph({ ...state, tasks });
+
+      const nodesWith = async (
+        groups: readonly LayoutGroup[],
+      ): Promise<readonly LaidOutNode[]> => {
+        const input = layoutInput(graph, direction, 'standard', groups);
+
+        return fromElkGraph(input, await layoutWithElk(toElkGraph(input)))
+          .nodes;
+      };
+
+      const before = await nodesWith([]);
+
+      const after = await nodesWith([{ id: g, members: ['task:z'] }]);
+
+      const across = direction === 'right' ? 'y' : 'x';
+
+      const along = direction === 'right' ? 'x' : 'y';
+
+      assert.deepStrictEqual(
+        after.map((node) => node[along]),
+        before.map((node) => node[along]),
+      );
+
+      // The node put in the group stays; one ELK put close by moves out of
+      // the way of the frame round it, by no more than the frame's room.
+      assert.deepStrictEqual(
+        after.find(({ id }) => id === 'task:z'),
+        before.find(({ id }) => id === 'task:z'),
+      );
+
+      for (const [index, node] of after.entries()) {
+        const moved = node[across] - (before[index]?.[across] ?? Number.NaN);
+
+        assert.isAtLeast(moved, 0);
+
+        assert.isAtMost(moved, GROUP_HEADER + PLACEMENT_GAP);
+      }
+    },
+  );
 
   test('lays out nothing as nothing', async () => {
     const input = layoutInput(
@@ -539,3 +634,127 @@ describe(labelSize, () => {
     assert.strictEqual(labelSize('SS').height, labelSize('+1日').height);
   });
 });
+
+describe(clearOfFrames, () => {
+  const box = (id: string, x: number, y: number): LaidOutNode =>
+    ({
+      id: `task:${id}`,
+      kind: 'task',
+      x,
+      y,
+      ...TASK_NODE_SIZE,
+    }) as const;
+
+  // Two members in a column with a node between them, and one node below.
+  const layout = {
+    nodes: [
+      box('a', 0, 0),
+      box('b', 0, 100),
+      box('c', 0, 200),
+      box('d', 0, 300),
+      box('e', 400, 100),
+    ],
+    edges: [],
+    groups: [
+      { id: g, members: ['task:a', 'task:c'], x: 0, y: 0, width: 0, height: 0 },
+    ],
+  } as const;
+
+  test('moves what is inside a frame and not in its group past it, and what comes after past that', () => {
+    const moved = clearOfFrames('right', layout);
+
+    const [group] = moved.groups;
+
+    assert.isDefined(group);
+
+    // The frame round the members, which are where they were.
+    assert.deepStrictEqual(group, {
+      id: g,
+      members: ['task:a', 'task:c'],
+      x: -GROUP_PADDING,
+      y: -GROUP_HEADER,
+      width: TASK_NODE_SIZE.width + 2 * GROUP_PADDING,
+      height: 200 + TASK_NODE_SIZE.height + GROUP_HEADER + GROUP_PADDING,
+    });
+
+    const [, nodeB, , nodeD, nodeE] = moved.nodes;
+
+    const below = group.y + group.height + PLACEMENT_GAP;
+
+    // Down past the frame, and the next one down past it in turn.
+    assert.deepStrictEqual(
+      [nodeB?.x, nodeB?.y, nodeD?.x, nodeD?.y],
+      [0, below, 0, below + TASK_NODE_SIZE.height + PLACEMENT_GAP],
+    );
+
+    // Nothing in its way, in a layer of its own.
+    assert.strictEqual(nodeE, layout.nodes[4]);
+  });
+
+  test('moves to the right when the graph grows down', () => {
+    const moved = clearOfFrames('down', {
+      ...layout,
+      nodes: [box('a', 0, 0), box('b', 100, 0), box('c', 200, 0)],
+    });
+
+    const [group] = moved.groups;
+
+    assert.isDefined(group);
+
+    assert.deepStrictEqual(
+      moved.nodes.map(({ x, y }) => [x, y]),
+      [
+        [0, 0],
+        [group.x + group.width + PLACEMENT_GAP, 0],
+        [200, 0],
+      ],
+    );
+  });
+
+  test('keeps nodes no closer than ELK did, closer than a frame', () => {
+    // ELK puts the parts of a graph that no edge joins 20 apart.
+    const apart = {
+      nodes: [box('a', 0, 0), box('b', 0, TASK_NODE_SIZE.height + 20)],
+      edges: [],
+      groups: [{ id: h, members: [], x: 400, y: 0, ...EMPTY_GROUP_SIZE }],
+    } as const;
+
+    assert.deepStrictEqual(clearOfFrames('right', apart), apart);
+  });
+
+  test('moves a group as one, past what comes before it', () => {
+    const moved = clearOfFrames('right', {
+      nodes: [box('a', 0, 0), box('b', 0, 60), box('c', 0, 100)],
+      edges: [],
+      groups: [
+        {
+          id: g,
+          members: ['task:b', 'task:c'],
+          x: 0,
+          y: 0,
+          width: 0,
+          height: 0,
+        },
+      ],
+    });
+
+    const shift = TASK_NODE_SIZE.height + PLACEMENT_GAP + GROUP_HEADER - 60;
+
+    assert.deepStrictEqual(
+      moved.nodes.map(({ y }) => y),
+      [0, 60 + shift, 100 + shift],
+    );
+  });
+});
+
+const inside = (node: Bounds, frame: Bounds): boolean =>
+  frame.x <= node.x &&
+  frame.y <= node.y &&
+  node.x + node.width <= frame.x + frame.width &&
+  node.y + node.height <= frame.y + frame.height;
+
+const overlaps = (node: Bounds, frame: Bounds): boolean =>
+  node.x < frame.x + frame.width &&
+  frame.x < node.x + node.width &&
+  node.y < frame.y + frame.height &&
+  frame.y < node.y + node.height;
