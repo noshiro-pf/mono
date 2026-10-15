@@ -15,7 +15,7 @@ type Props = Readonly<{
 /**
  * One column of blocks, each handed what its mode reads: a height in the
  * `natural` mode, and in the `fill` mode its share and the block under it,
- * which its bottom edge shares the height with.
+ * which the line between them shares the height with.
  */
 export const BlockColumn = memoNamed<Props>('BlockColumn', (props) => {
   const { ids, blocks, heights, mode, shares } = props;

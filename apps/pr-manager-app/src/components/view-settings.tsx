@@ -172,7 +172,7 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
 
         <p className={'section-note'}>
           {
-            'On the page: drag the bottom edge of a block to set its height — a double click there gives the natural height back, or, when the blocks fill the window, evens it with the block below. With two columns, drag the line between them. The layout is kept in the URL.'
+            'On the page: drag the line under a block to set its height — a double click there gives the natural height back, or, when the blocks fill the window, evens it with the block below. With two columns, drag the line between them. The layout is kept in the URL.'
           }
         </p>
 

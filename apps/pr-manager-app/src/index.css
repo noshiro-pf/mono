@@ -619,44 +619,68 @@ a:focus-visible {
   scrollbar-gutter: stable;
 }
 
+/* A block reaches the line under it, which keeps the gap. */
 .block-body > .section:last-child {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
 }
 
-.block-edge {
-  border-top: 2px solid transparent;
-  cursor: ns-resize;
-  height: 0.6rem;
-  margin-bottom: 1.25rem;
+/*
+ * The lines between blocks, side by side and one above the other, are drawn
+ * alike: a hairline in the middle of a band the width of the gap, which the
+ * pointer finds easily, and in the accent, thicker, under the pointer.
+ */
+.column-divider,
+.row-divider {
+  position: relative;
   touch-action: none;
 }
 
-.block-edge:hover {
-  border-top-color: var(--accent);
+.column-divider::before,
+.row-divider::before {
+  background: var(--hairline);
+  content: '';
+  position: absolute;
+}
+
+.column-divider:hover::before,
+.row-divider:hover::before {
+  background: var(--accent);
 }
 
 .column-divider {
   align-self: stretch;
   cursor: col-resize;
-  position: relative;
-  touch-action: none;
   width: 1.25rem;
 }
 
 .column-divider::before {
-  background: var(--hairline);
   bottom: 0;
-  content: '';
   left: calc(50% - 0.5px);
-  position: absolute;
   top: 0;
   width: 1px;
 }
 
 .column-divider:hover::before {
-  background: var(--accent);
   left: calc(50% - 1px);
   width: 2px;
+}
+
+.row-divider {
+  cursor: row-resize;
+  flex-shrink: 0;
+  height: 1.25rem;
+}
+
+.row-divider::before {
+  height: 1px;
+  left: 0;
+  right: 0;
+  top: calc(50% - 0.5px);
+}
+
+.row-divider:hover::before {
+  height: 2px;
+  top: calc(50% - 1px);
 }
 
 /*
@@ -718,10 +742,6 @@ a:focus-visible {
   min-height: 0;
 }
 
-.block-layout[data-mode='fill'] .block-edge {
-  flex-shrink: 0;
-}
-
 /*
  * The issue DAG, in a block that scrolls, takes the room the block has: the
  * section is a column as tall as the block, and the graph's box what its
@@ -758,16 +778,6 @@ a:focus-visible {
   flex: 1 1 0;
   max-height: none;
   min-height: 0;
-}
-
-/* The last block of a column has nothing to share its height with. */
-.block-edge[data-inert] {
-  cursor: auto;
-  margin-bottom: 0;
-}
-
-.block-edge[data-inert]:hover {
-  border-top-color: transparent;
 }
 
 /* --- the layout settings ------------------------------------------------ */
