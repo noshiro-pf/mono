@@ -40,14 +40,14 @@ test(
       )
       .toHaveAccessibleName(/状態: 着手可/u);
 
-    // In 「アーク」 too: five tasks, and the arcs between them alone.
+    // In 「アーク」 too: the eight nodes left, and the DAG's seven edges.
     await page.getByTestId('dag-mode-arc').click();
 
     await expect.soft(canvas).toHaveAttribute('data-animating', 'false');
 
-    await expect.soft(nodes).toHaveCount(5);
+    await expect.soft(nodes).toHaveCount(8);
 
-    await expect.soft(page.getByTestId('dag-arc')).toHaveCount(4);
+    await expect.soft(page.getByTestId('dag-arc')).toHaveCount(7);
 
     await page.getByTestId('dag-mode-dag').click();
 

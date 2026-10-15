@@ -804,13 +804,8 @@ fieldset {
   vector-effect: non-scaling-stroke;
 }
 
-/* 「アーク」: a dependency through milestones is dashed. */
-.dag-arc.derived .dag-edge-line {
-  stroke-dasharray: 6 4;
-}
-
 /*
- * The highlight of 「アーク」: what the pointed or focused task is joined to
+ * The highlight of 「アーク」: what the pointed or focused node is joined to
  * comes forward, the rest dims. Eased when the reader's setting animates,
  * and not while the nodes move, whose opacity a tween sets frame by frame.
  */

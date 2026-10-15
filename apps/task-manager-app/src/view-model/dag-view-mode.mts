@@ -1,8 +1,8 @@
 /**
  * How the graph screen draws the graph — 「DAG」, every node where it was
- * put; 「アーク」, the tasks alone in one column with their dependencies as
- * arcs beside it (`dag/arc-layout.mts`); or 「タイル」, the tasks alone in
- * rows across the screen with no edges, scrolled down
+ * put; 「アーク」, the tasks and the milestones in one column with their
+ * dependencies as arcs beside it (`dag/arc-layout.mts`); or 「タイル」, the
+ * tasks alone in rows across the screen with no edges, scrolled down
  * (`dag/tile-layout.mts`) — and how the choice is kept in `localStorage`
  * between visits, on this device only.
  *

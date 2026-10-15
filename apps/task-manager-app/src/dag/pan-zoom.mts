@@ -88,6 +88,27 @@ export const fitBoundsTransform = (
 };
 
 /**
+ * {@link fitBoundsTransform} into the part of the view below `topInset`:
+ * all of `bounds` in sight, clear of what covers the top of the view, such
+ * as the toolbar over the arc diagram.
+ */
+export const fitBelowTransform = (
+  bounds: Point & Size,
+  view: Size,
+  options: Readonly<{ padding: number; topInset: number }>,
+): ViewTransform => {
+  const { padding, topInset } = options;
+
+  const fitted = fitBoundsTransform(
+    bounds,
+    { width: view.width, height: Math.max(0, view.height - topInset) },
+    padding,
+  );
+
+  return { ...fitted, y: fitted.y + topInset };
+};
+
+/**
  * `bounds` as wide as the view less `padding` on each side, and no larger
  * than its natural size, with its top `topInset` below the view's: for content
  * that is long rather than wide, such as the arc diagram's column, which is

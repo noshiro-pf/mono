@@ -30,15 +30,13 @@ const column = (count: number): readonly LaidOutNode[] =>
 const edge = (
   from: number,
   to: number,
-  options: Readonly<{ derived?: boolean; label?: string }> = {},
+  options: Readonly<{ label?: string }> = {},
 ): ArcEdge =>
   ({
     id: `${from}-${to}`,
     from: `task:${from}`,
     to: `task:${to}`,
-    derived: options.derived ?? false,
     label: options.label ?? '',
-    via: [],
     ariaLabel: `${from} → ${to}`,
   }) as const;
 
@@ -201,7 +199,7 @@ describe(arcGeometries, () => {
   test('labels the apex, and only a labelled arc', () => {
     const arcs = arcGeometries(column(4), [
       edge(0, 3, { label: 'SS +3日' }),
-      edge(1, 2, { derived: true }),
+      edge(1, 2),
     ]);
 
     const labelled = byId(arcs, '0-3');
@@ -214,25 +212,48 @@ describe(arcGeometries, () => {
 
     assert.closeTo(box.y + box.height / 2, labelled.apex.y, 1e-9);
 
-    const derived = byId(arcs, '1-2');
-
-    assert.strictEqual(derived?.derived, true);
-
-    assert.isUndefined(derived?.labelBox);
+    assert.isUndefined(byId(arcs, '1-2')?.labelBox);
   });
 
-  test('keeps the edge’s ends, kind and names', () => {
-    const [arc] = arcGeometries(column(2), [edge(1, 0, { derived: true })]);
+  test('keeps the edge’s ends and names', () => {
+    const [arc] = arcGeometries(column(2), [edge(1, 0)]);
 
     assert.strictEqual(arc?.from, 'task:1');
 
     assert.strictEqual(arc?.to, 'task:0');
 
-    assert.strictEqual(arc?.derived, true);
-
     assert.strictEqual(arc?.ariaLabel, '1 → 0');
 
     assert.match(arc?.path ?? '', /^M [\d.]+ [\d.]+ C /u);
+  });
+
+  test('meets a milestone on its hexagon, which narrows away from the middle', () => {
+    // `task:1` a milestone, its right corner level with the tasks' sides.
+    const nodes = column(3).map((node) =>
+      node.id === 'task:1'
+        ? ({ ...node, id: 'milestone:1', kind: 'milestone' } as const)
+        : node,
+    );
+
+    const arcs = arcGeometries(nodes, [
+      { ...edge(0, 1), to: 'milestone:1' },
+      { ...edge(1, 2), from: 'milestone:1' },
+    ]);
+
+    const ends = arcs.map((arc) =>
+      arc.from === 'milestone:1' ? arc.segment.start : arc.segment.end,
+    );
+
+    assert.lengthOf(ends, 2);
+
+    const middle = STEP + HEIGHT / 2;
+
+    for (const end of ends) {
+      assert.notStrictEqual(end.y, middle);
+
+      // On the slanted side: as far in from the corner as from the middle.
+      assert.closeTo(WIDTH - end.x, Math.abs(end.y - middle), 1e-9);
+    }
   });
 
   test('drops an edge whose node is not drawn', () => {

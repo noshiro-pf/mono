@@ -42,11 +42,9 @@ const milestone = (
     dependencies,
   });
 
-/** `from>to`, and `*` for a derived edge. */
+/** `from>to` for every arc. */
 const pairs = (state: DomainState): readonly string[] =>
-  arcEdges(state).map(
-    ({ from, to, derived }) => `${from}>${to}${derived ? '*' : ''}`,
-  );
+  arcEdges(state).map(({ from, to }) => `${from}>${to}`);
 
 describe(arcEdges, () => {
   test('keeps a dependency between two tasks, with its label', () => {
@@ -59,21 +57,17 @@ describe(arcEdges, () => {
     });
 
     assert.deepStrictEqual(
-      edges.map(({ from, to, derived, label, via, ariaLabel }) => ({
+      edges.map(({ from, to, label, ariaLabel }) => ({
         from,
         to,
-        derived,
         label,
-        via,
         ariaLabel,
       })),
       [
         {
           from: 'task:a',
           to: 'task:b',
-          derived: false,
           label: 'SS +3日',
-          via: [],
           ariaLabel: 'A → B（開始後・+3日）',
         },
       ],
@@ -91,147 +85,48 @@ describe(arcEdges, () => {
     assert.strictEqual(edge?.ariaLabel, 'A → B（完了後）');
   });
 
-  test('derives an edge through a milestone, without a label', () => {
-    const edges = arcEdges({
-      tasks: [task('a'), task('c', [onMilestone('m')])],
-      milestones: [milestone('m', [onTask('a')])],
-    });
-
-    assert.deepStrictEqual(
-      edges.map(({ from, to, derived, label, via, ariaLabel }) => ({
-        from,
-        to,
-        derived,
-        label,
-        via,
-        ariaLabel,
-      })),
-      [
-        {
-          from: 'task:a',
-          to: 'task:c',
-          derived: true,
-          label: '',
-          via: ['milestone:m'],
-          ariaLabel: 'A → C（マイルストーン M 経由）',
-        },
-      ],
-    );
-  });
-
-  test('follows a chain of milestones, naming them from the source', () => {
-    const [edge] = arcEdges({
-      tasks: [task('a'), task('c', [onMilestone('m1')])],
-      milestones: [
-        milestone('m1', [onMilestone('m2')]),
-        milestone('m2', [onMilestone('m3')]),
-        milestone('m3', [onTask('a')]),
-      ],
-    });
-
-    assert.deepStrictEqual(edge?.via, [
-      'milestone:m3',
-      'milestone:m2',
-      'milestone:m1',
-    ]);
-
-    assert.strictEqual(
-      edge?.ariaLabel,
-      'A → C（マイルストーン M3 → M2 → M1 経由）',
-    );
-  });
-
-  test('reaches every task behind a milestone that depends on a task and a milestone', () => {
-    assert.deepStrictEqual(
-      pairs({
-        tasks: [task('a'), task('b'), task('c', [onMilestone('m1')])],
-        milestones: [
-          milestone('m1', [onTask('a'), onMilestone('m2')]),
-          milestone('m2', [onTask('b')]),
-        ],
-      }),
-      ['task:a>task:c*', 'task:b>task:c*'],
-    );
-  });
-
-  test('stops at the first task: what a task behind it waits for is its own', () => {
-    assert.deepStrictEqual(
-      pairs({
-        tasks: [
-          task('a'),
-          task('b', [onTask('a')]),
-          task('c', [onMilestone('m')]),
-        ],
-        milestones: [milestone('m', [onTask('b')])],
-      }),
-      ['task:a>task:b', 'task:b>task:c*'],
-    );
-  });
-
-  test('derives nothing a direct dependency already draws', () => {
-    assert.deepStrictEqual(
-      pairs({
-        tasks: [task('a'), task('c', [onTask('a'), onMilestone('m')])],
-        milestones: [milestone('m', [onTask('a')])],
-      }),
-      ['task:a>task:c'],
-    );
-  });
-
-  test('derives each pair once, however many paths lead there', () => {
-    const edges = arcEdges({
-      tasks: [task('a'), task('c', [onMilestone('m1'), onMilestone('m2')])],
-      milestones: [
-        milestone('m1', [onTask('a'), onMilestone('m2')]),
-        milestone('m2', [onTask('a')]),
-      ],
-    });
-
-    assert.deepStrictEqual(
-      edges.map(({ from, to, via }) => ({ from, to, via })),
-      [{ from: 'task:a', to: 'task:c', via: ['milestone:m1'] }],
-    );
-  });
-
-  test('ignores milestones no task waits for, and dependencies on nothing', () => {
-    assert.deepStrictEqual(
-      pairs({
-        tasks: [task('a'), task('b', [onTask('gone'), onMilestone('gone')])],
-        milestones: [milestone('m', [onTask('a')])],
-      }),
-      [],
-    );
-  });
-
-  test('terminates on a cycle of milestones, which the editor never saves', () => {
+  test('draws the dependencies on and of milestones, as the DAG does', () => {
     assert.deepStrictEqual(
       pairs({
         tasks: [task('a'), task('c', [onMilestone('m1')])],
         milestones: [
-          milestone('m1', [onMilestone('m2')]),
-          milestone('m2', [onMilestone('m1'), onTask('a')]),
+          milestone('m1', [onTask('a'), onMilestone('m2')]),
+          milestone('m2'),
         ],
       }),
-      ['task:a>task:c*'],
+      [
+        'milestone:m1>task:c',
+        'task:a>milestone:m1',
+        'milestone:m2>milestone:m1',
+      ],
     );
   });
 
-  test('draws no edge from a task to itself, even through a cycle', () => {
+  test('names a dependency on a milestone without a kind', () => {
+    const [edge] = arcEdges({
+      tasks: [task('c', [onMilestone('m')])],
+      milestones: [milestone('m')],
+    });
+
+    assert.strictEqual(edge?.ariaLabel, 'M → C');
+  });
+
+  test('draws nothing for a dependency on a node not drawn', () => {
     assert.deepStrictEqual(
       pairs({
-        tasks: [task('a', [onMilestone('m')])],
-        milestones: [milestone('m', [onTask('a')])],
+        tasks: [task('a'), task('b', [onTask('gone'), onMilestone('gone')])],
+        milestones: [],
       }),
       [],
     );
   });
 
-  test('has ids unique across direct and derived edges', () => {
+  test('has unique ids', () => {
     const edges = arcEdges({
       tasks: [
         task('a'),
         task('b', [onTask('a')]),
-        task('c', [onMilestone('m')]),
+        task('c', [onMilestone('m'), onTask('a')]),
       ],
       milestones: [milestone('m', [onTask('a'), onTask('b')])],
     });
@@ -242,6 +137,6 @@ describe(arcEdges, () => {
 
     assert.strictEqual(unique.size, ids.length);
 
-    assert.strictEqual(ids.length, 3);
+    assert.strictEqual(ids.length, 5);
   });
 });

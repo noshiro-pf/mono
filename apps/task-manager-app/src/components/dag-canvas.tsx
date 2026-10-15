@@ -29,6 +29,7 @@ import {
   dropTarget,
   dropTargetAt,
   edgeGeometries,
+  fitBelowTransform,
   fitBoundsTransform,
   fitWidthTopTransform,
   groupFrames,
@@ -184,12 +185,14 @@ type Props = Readonly<{
  * draws them as plain curves and leaves the others as they were, and the
  * drop routes them all.
  *
- * In 「アーク」 the tasks are in a column (`dagLayoutStore.arcNodes`) with
- * arcs beside it (`dag/arc-geometry.mts`), and do not move: a press on one
- * pans as one on the background does, and a tap still opens it. Pointing at
- * a task, or focusing it, brings its arcs and the tasks at their other ends
- * forward and dims the rest (`dag/arc-highlight.mts`). The view fits the
- * width and starts at the top, below the toolbar, and is read by panning.
+ * In 「アーク」 the tasks and the milestones are in a column
+ * (`dagLayoutStore.arcNodes`) with arcs beside it (`dag/arc-geometry.mts`),
+ * and do not move: a press on one pans as one on the background does, and a
+ * tap still opens it. Pointing at a node, or focusing it, brings its arcs
+ * and the nodes at their other ends forward and dims the rest
+ * (`dag/arc-highlight.mts`). The view fits the width and starts at the top,
+ * below the toolbar, and is read by panning; 「全体表示」 shows the whole
+ * column instead.
  *
  * In 「タイル」 the tasks are in rows across the canvas
  * (`dagLayoutStore.tileNodes`), with no edges, at zoom 1, and the view is
@@ -816,6 +819,29 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
         break;
     }
   }, [show, topInset, remeasureTile, scrollTileTo]);
+
+  // 「全体表示」: all of it in sight. 「アーク」 is otherwise fitted by its
+  // width, which leaves a long column to be panned down; the button shows
+  // the whole column, below the toolbar, however small that makes it.
+  const fitAll = useCallback(() => {
+    const element = wrapper.current;
+
+    const target = mut_fitTarget.current;
+
+    if (element === null || target.kind !== 'width') {
+      fit();
+
+      return;
+    }
+
+    show(
+      fitBelowTransform(
+        target.bounds,
+        { width: element.clientWidth, height: element.clientHeight },
+        { padding: FIT_PADDING, topInset: topInset() },
+      ),
+    );
+  }, [fit, show, topInset]);
 
   // Where the view was when the mode changed, for it to follow the nodes
   // from there to the fit of the new mode at their pace; `undefined` when
@@ -1604,7 +1630,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
           className={'bp6-button'}
           data-e2e={'dag-fit'}
           type={'button'}
-          onClick={fit}
+          onClick={fitAll}
         >
           {'全体表示'}
         </button>
@@ -1669,7 +1695,7 @@ type TileFrame = Readonly<{ topInset: number; viewport: number }>;
 /** What the canvas shows, for a screen reader. */
 const captions = {
   dag: '依存関係グラフ。ノードを選ぶと詳細を開きます。ノードはドラッグか矢印キーで動かせます。ノードの縁の丸からほかのノードへドラッグすると、ドロップしたノードがそのノードに依存します。依存の矢印を選ぶと、削除ボタンか Delete キーで削除できます。背景のドラッグで移動、ホイールかピンチで拡大縮小できます。Shift を押しながら、または「なげなわ」をオンにして背景をドラッグすると、囲んだノードを選び、まとめて動かしたり一括編集したりできます。',
-  arc: 'アークダイアグラム。タスクをタイトル順に縦に並べ、依存を右側の弧で示します。破線はマイルストーンを経由する依存です。タスクを選ぶと詳細を開きます。ドラッグで移動、ホイールかピンチで拡大縮小できます。',
+  arc: 'アークダイアグラム。タスクをタイトル順に縦に並べ、マイルストーンをそれを待つタスクの上に入れて、依存を右側の弧で示します。ノードを選ぶと詳細を開きます。ドラッグで移動、ホイールかピンチで拡大縮小できます。',
   tile: 'タスクをタイトル順に左上から横に並べ、幅に収まらない分は次の行に折り返します。依存は示しません。タスクを選ぶと詳細を開きます。ホイール、ドラッグ、Page Up・Page Down・Home・End キーで縦にスクロールできます。',
 } as const satisfies ReadonlyRecord<DagViewMode, string>;
 

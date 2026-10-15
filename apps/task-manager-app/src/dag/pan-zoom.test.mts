@@ -1,6 +1,7 @@
 import type { FixedLengthTuple } from 'ts-type-forge';
 import {
   contentPointAt,
+  fitBelowTransform,
   fitBoundsTransform,
   fitViewTransform,
   fitWidthTopTransform,
@@ -123,6 +124,46 @@ describe(fitBoundsTransform, () => {
     assert.deepStrictEqual(toScreen(fitted, -100, 50), [0, 125]);
 
     assert.deepStrictEqual(toScreen(fitted, 900, 550), [500, 375]);
+  });
+});
+
+describe(fitBelowTransform, () => {
+  test('fits all of a long column into the view below the inset', () => {
+    const fitted = fitBelowTransform(
+      { x: -10, y: -20, width: 400, height: 2000 },
+      { width: 500, height: 560 },
+      { padding: 0, topInset: 60 },
+    );
+
+    // The height decides: 500 below the inset for 2000.
+    assert.strictEqual(fitted.scale, 0.25);
+
+    // The top at the inset, the bottom at the bottom, centred across.
+    assert.deepStrictEqual(toScreen(fitted, -10, -20), [200, 60]);
+
+    assert.deepStrictEqual(toScreen(fitted, 390, 1980), [300, 560]);
+  });
+
+  test('centres what fits below the inset, at its natural size', () => {
+    const fitted = fitBelowTransform(
+      { x: 0, y: 0, width: 200, height: 100 },
+      { width: 1000, height: 860 },
+      { padding: 16, topInset: 60 },
+    );
+
+    assert.strictEqual(fitted.scale, 1);
+
+    assert.deepStrictEqual(toScreen(fitted, 0, 0), [400, 410]);
+  });
+
+  test('stops at the least scale', () => {
+    const fitted = fitBelowTransform(
+      { x: 0, y: 0, width: 200, height: 100_000 },
+      { width: 1000, height: 860 },
+      { padding: 16, topInset: 60 },
+    );
+
+    assert.strictEqual(fitted.scale, MIN_SCALE);
   });
 });
 
