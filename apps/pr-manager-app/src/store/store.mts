@@ -25,6 +25,7 @@ import {
   themeFromLocation,
 } from '../theme.mjs';
 import { browserStores } from '../token.mjs';
+import { loadWorkflowRuns } from '../workflow-runs.mjs';
 import { createHeaderStore } from './header-store.mjs';
 import { createIssuesViewStore } from './issues-view-store.mjs';
 import { createLayoutStore } from './layout-store.mjs';
@@ -44,6 +45,7 @@ export const reader = createReader({
       issueCount,
       ...(onProgress === undefined ? {} : { onProgress }),
     }),
+  loadRuns: (token) => loadWorkflowRuns(REPORT_SOURCE, { token }),
   loadIssues: (token, after, first) =>
     loadIssuePage(REPORT_SOURCE, { token, after, first }),
   now: () => Date.now(),
@@ -136,6 +138,7 @@ export const readerSignals = {
   merged: toSignal(reader.merged),
   issues: toSignal(reader.issues),
   reading: toSignal(reader.reading),
+  runs: toSignal(reader.runs),
   moreIssues: toSignal(reader.moreIssues),
   rateLimit: toSignal(reader.rateLimit),
   nowMs: toSignal(reader.nowMs),

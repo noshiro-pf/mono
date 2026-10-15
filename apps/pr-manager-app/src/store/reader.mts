@@ -37,6 +37,7 @@ import type { RateLimit } from '../rate-limit.mjs';
 import { ISSUES_LIMIT, ISSUES_PAGE_SIZE } from '../report-query.mjs';
 import { sameItemsIfEqual } from '../share.mjs';
 import type { StoredToken } from '../token.mjs';
+import type { WorkflowRunList } from '../workflow-runs.mjs';
 
 export type ReaderDeps = Readonly<{
   token: InitializedObservable<StoredToken | undefined>;
@@ -51,6 +52,12 @@ export type ReaderDeps = Readonly<{
     issueCount: number,
     onProgress: ((report: LoadedReport) => void) | undefined,
   ) => Promise<Answered<LoadedReport>>;
+  /**
+   * The workflow runs still going (`workflow-runs.mts`), read beside the
+   * report on every read rather than as a part of it: a different API, with
+   * its own budget, whose failure is no reason to say the report failed.
+   */
+  loadRuns: (token: string) => Promise<Result<WorkflowRunList, string>>;
   /** The `first` open issues after `after`. */
   loadIssues: (
     token: string,
@@ -95,6 +102,8 @@ export type Reader = Readonly<{
   issues: InitializedObservable<LoadedReport['issues']>;
   /** The sections below the merge order that have not answered yet. */
   reading: InitializedObservable<readonly SectionPart[]>;
+  /** The workflow runs still going, as the last read of them left them. */
+  runs: InitializedObservable<RunsStatus>;
   /** How the last {@link loadMoreIssues} went. */
   moreIssues: InitializedObservable<MoreIssuesStatus>;
   /** What GitHub last said was left of the budget. */
@@ -126,13 +135,37 @@ export type Reader = Readonly<{
   start: () => () => void;
 }>;
 
+/**
+ * The workflow runs, held by the same two rules as the report
+ * (`load-state.mts`): a read that fails keeps the list on screen and says so
+ * beside it, and an older read never replaces a newer one.
+ */
+export type RunsStatus = Readonly<
+  | { type: 'reading' }
+  | { type: 'failed'; message: string }
+  | {
+      type: 'ready';
+      list: WorkflowRunList;
+      /** The last read failing, while the list is the one before it. */
+      error: string | undefined;
+    }
+>;
+
 export type MoreIssuesStatus = Readonly<
   { type: 'idle' } | { type: 'loading' } | { type: 'failed'; message: string }
 >;
 
 export const createReader = (deps: ReaderDeps): Reader => {
-  const { token, load, loadIssues, now, counter, isVisible, visibilityChange } =
-    deps;
+  const {
+    token,
+    load,
+    loadRuns,
+    loadIssues,
+    now,
+    counter,
+    isVisible,
+    visibilityChange,
+  } = deps;
 
   // Each state below is passed on only when what it is given differs from
   // what it holds. `equals` decides that where the state is held, once, so
@@ -186,6 +219,14 @@ export const createReader = (deps: ReaderDeps): Reader => {
   const [reading, setReading] = createState(EMPTY_PARTS.reading, {
     equals: fastDeepEqual,
   });
+
+  const [runs, setRuns, { updateState: updateRuns }] = createState<RunsStatus>(
+    RUNS_READING,
+    { equals: fastDeepEqual },
+  );
+
+  // When the read of the runs on screen started; `0` while none is.
+  let mut_runsShownFromMs = 0;
 
   const [moreIssues, setMoreIssues, { getSnapshot: getMoreIssues }] =
     createState<MoreIssuesStatus>(MORE_ISSUES_IDLE, { equals: fastDeepEqual });
@@ -289,6 +330,24 @@ export const createReader = (deps: ReaderDeps): Reader => {
         }
       : undefined;
 
+    const applyRuns = (result: Result<WorkflowRunList, string>): void => {
+      if (currentToken() !== tokenValue || startedAtMs < mut_runsShownFromMs) {
+        return;
+      }
+
+      if (Result.isOk(result)) {
+        mut_runsShownFromMs = startedAtMs;
+      }
+
+      updateRuns((held) => settleRuns(held, result));
+    };
+
+    loadRuns(tokenValue)
+      .then(applyRuns)
+      .catch((error: unknown) => {
+        applyRuns(Result.err(unknownToString(error)));
+      });
+
     load(tokenValue, startedAtMs, issueCount, onProgress)
       .then(({ result, rateLimit: answeredLimit }) => {
         apply(result, answeredLimit);
@@ -375,6 +434,10 @@ export const createReader = (deps: ReaderDeps): Reader => {
           setLoadStatus(LOADING);
 
           writeReport(EMPTY_PARTS);
+
+          setRuns(RUNS_READING);
+
+          mut_runsShownFromMs = 0;
         } else {
           read();
         }
@@ -454,6 +517,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     merged,
     issues,
     reading,
+    runs,
     moreIssues,
     rateLimit,
     nowMs,
@@ -500,6 +564,19 @@ const EMPTY_PARTS: ReportParts = {
   },
   reading: [],
 } as const;
+
+const RUNS_READING: RunsStatus = { type: 'reading' } as const;
+
+/** What a read of the runs makes of the ones held. */
+const settleRuns = (
+  held: RunsStatus,
+  answer: Result<WorkflowRunList, string>,
+): RunsStatus =>
+  Result.isOk(answer)
+    ? ({ type: 'ready', list: answer.value, error: undefined } as const)
+    : held.type === 'ready'
+      ? ({ ...held, error: answer.value } as const)
+      : ({ type: 'failed', message: answer.value } as const);
 
 const MORE_ISSUES_IDLE: MoreIssuesStatus = { type: 'idle' } as const;
 

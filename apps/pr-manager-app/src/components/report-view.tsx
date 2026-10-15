@@ -13,11 +13,13 @@ import { IssuesSection } from './issues-section.js';
 import { MergeOrderFilters } from './merge-order-filters.js';
 import { MergeOrder } from './merge-order.js';
 import { MergedSection } from './merged-section.js';
+import { WorkflowRunsSection } from './workflow-runs-section.js';
 
 /**
- * A report that loaded: the three blocks — the queue under the counts that
- * filter it, what landed, and what is open that is not a pull request — laid
- * out as the reader arranged them (`layout.mts`).
+ * A report that loaded: the four blocks — the queue under the counts that
+ * filter it, the workflow runs still going, what landed, and what is open
+ * that is not a pull request — laid out as the reader arranged them
+ * (`layout.mts`).
  *
  * Each part is its own signal, which the store changes only when a read
  * changed that part (`store/reader.mts`), so a poll that found nothing new
@@ -39,6 +41,9 @@ export const ReportView = memoNamed('ReportView', () => {
   const merged = readerSignals.merged.value;
 
   const issues = readerSignals.issues.value;
+
+  // Read beside the report rather than as a part of it (`store/reader.mts`).
+  const runs = readerSignals.runs.value;
 
   // The sections below the merge order that have not answered yet.
   const reading = readerSignals.reading.value;
@@ -79,6 +84,7 @@ export const ReportView = memoNamed('ReportView', () => {
           ) : undefined}
         </>
       ),
+      runs: <WorkflowRunsSection runs={runs} />,
       merged: (
         <MergedSection
           merged={merged}
@@ -96,6 +102,7 @@ export const ReportView = memoNamed('ReportView', () => {
       cycles,
       merged,
       issues,
+      runs,
       readingMerged,
       readingIssues,
     ],
