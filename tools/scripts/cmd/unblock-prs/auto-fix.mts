@@ -16,7 +16,6 @@ import * as path from 'node:path';
 import { statesFromCheckRuns, type ContextState } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { git, listCheckRuns, remoteSha, removeWorktree } from './github.mjs';
-import { pauseAllBut } from './release.mjs';
 import type { AutoFixed, PullRequest } from './types.mjs';
 import { lastLines, log, sh, stopRequested } from './util.mjs';
 
@@ -301,10 +300,6 @@ const fixInWorktree = async (
   }
 
   const sha = newHead.value.trim();
-
-  // The push is a release like any other: another queued pull request may
-  // have been released while the fixers ran.
-  await pauseAllBut(pr.number);
 
   const branch = pr.headRefName;
 
