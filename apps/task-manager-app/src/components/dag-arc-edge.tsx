@@ -8,25 +8,22 @@ type Props = Readonly<{
 }>;
 
 /**
- * A dependency in 「アーク」: an arc beside the column from the task depended
- * on to the task that waits (`dag/arc-geometry.mts`), ending in an arrowhead
- * pointing into it. Solid for a dependency of one task on the other, with
- * its label (`SS`, the lag) at the apex; dashed, and unlabelled, for one
- * that goes through milestones, which its name lists. The name is both its
- * `aria-label` and its `<title>`, the tooltip.
+ * A dependency in 「アーク」: an arc beside the column from the node depended
+ * on to the node that waits (`dag/arc-geometry.mts`), ending in an arrowhead
+ * pointing into it, with its label (`SS`, the lag) at the apex. The name is
+ * both its `aria-label` and its `<title>`, the tooltip.
  */
 export const DagArcEdge = memoNamed<Props>('DagArcEdge', (props) => {
   const { arc, highlight } = props;
 
-  const { path, labelBox, label, from, to, derived, ariaLabel } = arc;
+  const { path, labelBox, label, from, to, ariaLabel } = arc;
 
   return (
     // An SVG has no <img>: the group is one, named by its label.
     // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
     <g
       aria-label={ariaLabel}
-      className={`dag-edge dag-arc${derived ? ' derived' : ''}`}
-      data-derived={derived}
+      className={'dag-edge dag-arc'}
       data-e2e={'dag-arc'}
       data-from={from}
       data-highlight={highlight}

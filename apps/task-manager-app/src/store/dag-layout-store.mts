@@ -36,19 +36,20 @@
  * better served by the end state at once.
  *
  * The view mode (`view-model/dag-view-mode.mts`) says where the nodes are
- * drawn: in 「DAG」 as above; in 「アーク」 the tasks alone, in a column in
- * the order `diagramSort` gives (`arcNodes`); in 「タイル」 the tasks alone,
- * in that order, in rows as wide as the canvas (`tileNodes`), which the
- * canvas reports (`setTileWidth`) — a new width moves them to their new
- * rows in the same animation. The order is worked out again whenever the
- * order chosen, the data or the time (`stateTime`, for an order by status)
- * changes; in 「アーク」 and 「タイル」, a new order moves the tasks to their
- * new places in the same animation, which asks for no fit and writes
- * nothing. Changing the mode moves the tasks from where
- * they are drawn to where the other mode has them, in the same animation,
- * while the nodes one of the two modes does not draw — the milestones —
- * stay where the DAG has them and fade out or in (`animatedOpacities`); a
- * node neither draws is left out. Nothing is saved for it, and outside
+ * drawn: in 「DAG」 as above; in 「アーク」 the tasks, in a column in the
+ * order `diagramSort` gives, with the milestones among them (`arcNodes`,
+ * `dag/arc-layout.mts`); in 「タイル」 the tasks alone, in that order, in
+ * rows as wide as the canvas (`tileNodes`), which the canvas reports
+ * (`setTileWidth`) — a new width moves them to their new rows in the same
+ * animation. The order is worked out again whenever the order chosen, the
+ * data or the time (`stateTime`, for an order by status) changes; in
+ * 「アーク」 and 「タイル」, a new order moves the nodes to their new places
+ * in the same animation, which asks for no fit and writes nothing.
+ * Changing the mode moves the nodes from where they are drawn to where the
+ * other mode has them, in the same animation, while the nodes one of the
+ * two modes does not draw — the milestones, in 「タイル」 — stay where the
+ * other draws them and fade out or in (`animatedOpacities`); a node neither
+ * draws is left out. Nothing is saved for it, and outside
  * 「DAG」 the arrangement is kept but not drawn: a layout saved elsewhere
  * moves nothing on screen until the reader comes back to it.
  *
@@ -82,6 +83,7 @@ import {
 } from 'synstate';
 import { Arr, Num, unknownToString } from 'ts-data-forge';
 import {
+  arcDiagramIds,
   arcDiagramNodes,
   diagramTaskIds,
   easeOutCubic,
@@ -220,7 +222,7 @@ export type DagLayoutStore = Readonly<{
    * `undefined` otherwise: for a view that follows them.
    */
   animationProgress: InitializedObservable<number | undefined>;
-  /** Every task where 「アーク」 draws it, in the column's order. */
+  /** Every node where 「アーク」 draws it, in the column's order. */
   arcNodes: InitializedObservable<readonly LaidOutNode[]>;
   /**
    * Every task where 「タイル」 draws it, row by row; none until the canvas
@@ -324,11 +326,21 @@ export const createDagLayoutStore = <H, F>(
     ),
   );
 
+  /**
+   * The nodes of 「アーク」, in their order: the tasks in `diagramOrder`,
+   * and the milestones among them.
+   */
+  const arcOrder = combine([diagramOrder, deps.state, deps.hidden]).pipe(
+    map(([ids, state, hidden]) =>
+      arcDiagramIds(ids, withoutNodes(state, hidden)),
+    ),
+  );
+
   const membership = combine([deps.state, deps.groups, deps.hidden]).pipe(
     map(([state, groups, hidden]) => groupMembership(state, groups, hidden)),
   );
 
-  const arcNodes = combine([diagramOrder, deps.nodeSize]).pipe(
+  const arcNodes = combine([arcOrder, deps.nodeSize]).pipe(
     map(([ids, size]) => arcDiagramNodes(ids, size)),
   );
 
@@ -341,6 +353,8 @@ export const createDagLayoutStore = <H, F>(
   let mut_nodeSize = deps.nodeSize.getSnapshot().value;
 
   let mut_diagramOrder = diagramOrder.getSnapshot().value;
+
+  let mut_arcOrder = arcOrder.getSnapshot().value;
 
   /**
    * Where the DAG drew the nodes before the node size changed, while the
@@ -476,7 +490,7 @@ export const createDagLayoutStore = <H, F>(
     placedWith(getArrangement().positions);
 
   /**
-   * The tasks `ids` where 「アーク」 or 「タイル」 draws them at `size`: what
+   * The nodes `ids` where 「アーク」 or 「タイル」 draws them at `size`: what
    * they drew before a change of size or of order, and after it.
    */
   const diagramNodesAt = (
@@ -799,7 +813,7 @@ export const createDagLayoutStore = <H, F>(
 
   /**
    * From where `previous` draws the nodes to where `next` does. A node only
-   * one of them draws stays where the DAG has it, and fades out or in; a
+   * one of them draws stays where that one draws it, and fades out or in; a
    * node neither draws is not drawn.
    */
   const switchMode = (previous: DagViewMode, next: DagViewMode): void => {
@@ -816,9 +830,11 @@ export const createDagLayoutStore = <H, F>(
       (id) => either(id) && !(before.has(id) && after.has(id)),
     );
 
+    // A node fading out stays where it was drawn, and one fading in is
+    // already where it is going.
     animate(
-      onlyOf(overriding(dag, before), either),
-      onlyOf(overriding(dag, after), either),
+      onlyOf(overriding(overriding(dag, after), before), either),
+      onlyOf(overriding(overriding(dag, before), after), either),
       {
         from: new Map(fading.map((id) => [id, before.has(id) ? 1 : 0])),
         to: new Map(fading.map((id) => [id, after.has(id) ? 1 : 0])),
@@ -844,7 +860,8 @@ export const createDagLayoutStore = <H, F>(
       return;
     }
 
-    const ids = diagramOrder.getSnapshot().value;
+    const ids = (mut_viewMode === 'arc' ? arcOrder : diagramOrder).getSnapshot()
+      .value;
 
     const before = positionsOf(diagramNodesAt(mut_viewMode, ids, previous));
 
@@ -858,22 +875,21 @@ export const createDagLayoutStore = <H, F>(
   };
 
   /**
-   * From where 「アーク」 or 「タイル」 drew the tasks in the `previous`
-   * order to where they are in the `next`. The view stays where it is.
+   * From where `mode` drew the nodes in the `previous` order to where they
+   * are in the `next`, if `mode` is shown. The view stays where it is.
    */
   const reorder = (
+    mode: 'arc' | 'tile',
     previous: readonly GraphNodeId[],
     next: readonly GraphNodeId[],
   ): void => {
-    if (mut_viewMode === 'dag' || !onScreen()) {
+    if (mut_viewMode !== mode || !onScreen()) {
       return;
     }
 
-    const before = positionsOf(
-      diagramNodesAt(mut_viewMode, previous, mut_nodeSize),
-    );
+    const before = positionsOf(diagramNodesAt(mode, previous, mut_nodeSize));
 
-    const after = positionsOf(diagramNodesAt(mut_viewMode, next, mut_nodeSize));
+    const after = positionsOf(diagramNodesAt(mode, next, mut_nodeSize));
 
     if (!samePositions(before, after)) {
       animate(before, after);
@@ -1253,7 +1269,19 @@ export const createDagLayoutStore = <H, F>(
 
       mut_diagramOrder = ids;
 
-      reorder(previous, ids);
+      reorder('tile', previous, ids);
+    });
+
+    const arcOrderSubscription = arcOrder.subscribe((ids) => {
+      if (sameDiagramOrder(ids, mut_arcOrder)) {
+        return;
+      }
+
+      const previous = mut_arcOrder;
+
+      mut_arcOrder = ids;
+
+      reorder('arc', previous, ids);
     });
 
     return () => {
@@ -1262,6 +1290,8 @@ export const createDagLayoutStore = <H, F>(
       finishAnimation();
 
       diagramOrderSubscription.unsubscribe();
+
+      arcOrderSubscription.unsubscribe();
 
       nodeSizeSubscription.unsubscribe();
 

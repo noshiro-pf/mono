@@ -1,6 +1,6 @@
 /**
- * The arcs of the arc diagram as curves: from the right side of the task
- * depended on to the right side of the task that waits, bulging to the
+ * The arcs of the arc diagram as curves: from the right side of the node
+ * depended on to the right side of the node that waits, bulging to the
  * right, as in a classic arc diagram with its nodes in a column.
  *
  * Each arc is one cubic Bézier curve whose control points lie level with its
@@ -10,7 +10,9 @@
  * target, and it approximates a semicircle on the line between its ends.
  *
  * Every arc at a node meets its right side at its own point, spread along
- * it in an order that nests the arcs on each side rather than crossing them
+ * it — on a milestone, on the slanted sides of its hexagon, which come in
+ * as far from its right corner as they are from its middle — in an order
+ * that nests the arcs on each side rather than crossing them
  * (`compareSlots`). Arcs whose spans overlap without one taking in the other
  * still cross, as they must. The longest come first, so that drawn in order
  * the short ones stay on top and visible.
@@ -39,11 +41,11 @@ import type { Point, Size } from './pan-zoom.mjs';
  */
 export const ARC_BULGE = 2 / 3;
 
-/** The least `h`, so that an arc between adjacent tasks still reads as one. */
+/** The least `h`, so that an arc between adjacent nodes still reads as one. */
 export const MIN_ARC_BULGE = 24;
 
 /**
- * Every arc of `edges` both of whose tasks are among `nodes`, the longest
+ * Every arc of `edges` both of whose nodes are among `nodes`, the longest
  * first.
  */
 export const arcGeometries = (
@@ -103,7 +105,6 @@ export const arcGeometries = (
         id: edge.id,
         from: edge.from,
         to: edge.to,
-        derived: edge.derived,
         label: edge.label,
         ariaLabel: edge.ariaLabel,
         segment,
@@ -159,7 +160,6 @@ export type ArcGeometry = DeepReadonly<{
   id: string;
   from: GraphNodeId;
   to: GraphNodeId;
-  derived: boolean;
   label: string;
   ariaLabel: string;
   /** From the source's right side to the target's. */
@@ -208,7 +208,11 @@ const offsetOf = ({ node, other }: SlotEnd): number =>
 /** `1 / x`, and `0` — between the negatives and the positives — for `0`. */
 const inverse = (x: number): number => (Num.isNonZero(x) ? Num.div(1, x) : 0);
 
-/** The `index`th of `count` points evenly spread down `node`'s right side. */
+/**
+ * The `index`th of `count` points evenly spread down `node`'s right side:
+ * for a milestone, on its hexagon (`dag-milestone-node.tsx`), whose sides
+ * slant in at 45° from the corner in the middle.
+ */
 const rightSidePoint = (
   node: LaidOutNode,
   index: number,
@@ -216,14 +220,14 @@ const rightSidePoint = (
 ): Point => {
   const places = count + 1;
 
-  return {
-    x: node.x + node.width,
-    y:
-      node.y +
-      (Num.isNonZero(places)
-        ? Num.div(node.height * (index + 1), places)
-        : node.height / 2),
-  };
+  const down = Num.isNonZero(places)
+    ? Num.div(node.height * (index + 1), places)
+    : node.height / 2;
+
+  const inset =
+    node.kind === 'milestone' ? Math.abs(down - node.height / 2) : 0;
+
+  return { x: node.x + node.width - inset, y: node.y + down };
 };
 
 const centreRight = (node: LaidOutNode): Point => rightSidePoint(node, 0, 1);

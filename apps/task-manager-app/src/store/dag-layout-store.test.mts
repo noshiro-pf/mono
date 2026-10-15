@@ -7,6 +7,7 @@ import {
   EMPTY_GROUP_SIZE,
   GROUP_HEADER,
   GROUP_PADDING,
+  MILESTONE_NODE_SIZE,
   PLACEMENT_GAP,
   TASK_NODE_SIZE,
   TILE_NODE_GAP,
@@ -444,7 +445,7 @@ const tilePlaces = (store: DagLayoutStore): ReadonlyMap<GraphNodeId, Point> =>
     store.tileNodes.getSnapshot().value.map(({ id, x, y }) => [id, { x, y }]),
   );
 
-/** Where 「アーク」 draws each task when nothing moves. */
+/** Where 「アーク」 draws each node when nothing moves. */
 const arcColumn = (store: DagLayoutStore): ReadonlyMap<GraphNodeId, Point> =>
   new Map(
     store.arcNodes.getSnapshot().value.map(({ id, x, y }) => [id, { x, y }]),
@@ -1324,7 +1325,8 @@ describe(createDagLayoutStore, () => {
 
   describe('the view mode', () => {
     // ELK's places for `mixed`: x (0, 0), y (100, 0), m (200, 0). The
-    // column, by title: y (Alpha) at the top, x (Zeta) below it.
+    // column, by title: y (Alpha) at the top, x (Zeta) below it, and m,
+    // joined to neither, at the end, its right side lined up with theirs.
     const dagPlaces = positions([
       ['task:x', { x: 0, y: 0 }],
       ['task:y', { x: 100, y: 0 }],
@@ -1334,9 +1336,10 @@ describe(createDagLayoutStore, () => {
     const arcPlaces = positions([
       ['task:y', { x: 0, y: 0 }],
       ['task:x', { x: 0, y: 72 }],
+      ['milestone:m', { x: 16, y: 144 }],
     ]);
 
-    test('puts the tasks alone in a column, in the order given', () => {
+    test('puts the tasks and the milestones in a column, in the order given', () => {
       const { store } = setup({ state: mixed });
 
       assert.deepStrictEqual(
@@ -1349,7 +1352,7 @@ describe(createDagLayoutStore, () => {
       );
     });
 
-    test('switched to アーク, moves the tasks to the column and fades the milestones out', async () => {
+    test('switched to アーク, moves every node to the column, fading none', async () => {
       const { store, clock, saved, setViewMode } = await shown({
         state: mixed,
       });
@@ -1358,10 +1361,11 @@ describe(createDagLayoutStore, () => {
 
       setViewMode('arc');
 
-      // From where they are drawn, the milestone staying where it is.
+      // From where they are drawn.
       assert.deepStrictEqual(animated(store), dagPlaces);
 
-      assert.deepStrictEqual(opacities(store), new Map([['milestone:m', 1]]));
+      // Still a change of mode, for the view, with nothing to fade.
+      assert.deepStrictEqual(opacities(store), new Map());
 
       assert.strictEqual(store.fitRequests.getSnapshot().value, fits + 1);
 
@@ -1375,18 +1379,13 @@ describe(createDagLayoutStore, () => {
 
       assert.isBelow(middleX.y, 72);
 
-      assert.strictEqual(
-        animated(store)?.get('milestone:m')?.x,
-        dagPlaces.get('milestone:m')?.x,
-      );
+      const middleM = animated(store)?.get('milestone:m');
 
-      const fading = opacities(store)?.get('milestone:m');
+      assert.isDefined(middleM);
 
-      assert.isDefined(fading);
+      assert.isAbove(middleM.x, 16);
 
-      assert.isAbove(fading, 0);
-
-      assert.isBelow(fading, 1);
+      assert.isBelow(middleM.x, 200);
 
       clock.advance(ANIMATION_MS / 2);
 
@@ -1396,11 +1395,13 @@ describe(createDagLayoutStore, () => {
 
       assert.isFalse(clock.pending());
 
+      assert.deepStrictEqual(arcColumn(store), arcPlaces);
+
       // Nothing is written for a change of mode.
       assert.deepStrictEqual(saved, []);
     });
 
-    test('switched back to DAG, moves the tasks back and fades the milestones in', async () => {
+    test('switched back to DAG, moves every node back', async () => {
       const { store, clock, saved, setViewMode } = await shown({
         state: mixed,
       });
@@ -1418,11 +1419,11 @@ describe(createDagLayoutStore, () => {
         positions([
           ['task:x', { x: 0, y: 72 }],
           ['task:y', { x: 0, y: 0 }],
-          ['milestone:m', { x: 200, y: 0 }],
+          ['milestone:m', { x: 16, y: 144 }],
         ]),
       );
 
-      assert.deepStrictEqual(opacities(store), new Map([['milestone:m', 0]]));
+      assert.deepStrictEqual(opacities(store), new Map());
 
       clock.advance(ANIMATION_MS);
 
@@ -1530,7 +1531,7 @@ describe(createDagLayoutStore, () => {
       assert.isFalse(clock.pending());
     });
 
-    test('first shown in アーク, moves the tasks alone from a grid into the column', async () => {
+    test('first shown in アーク, moves the nodes from a grid into the column', async () => {
       const { store, deferred, clock } = setup({
         state: mixed,
         viewMode: 'arc',
@@ -1544,7 +1545,7 @@ describe(createDagLayoutStore, () => {
 
       assert.deepStrictEqual(
         new Set(first?.keys()),
-        new Set(['task:x', 'task:y']),
+        new Set(['task:x', 'task:y', 'milestone:m']),
       );
 
       clock.advance(ANIMATION_MS);
@@ -1791,6 +1792,13 @@ describe(createDagLayoutStore, () => {
         positions([
           ['task:y', { x: 0, y: 0 }],
           ['task:x', { x: 0, y: TASK_NODE_SIZE.height + ARC_NODE_GAP }],
+          [
+            'milestone:m',
+            {
+              x: TASK_NODE_SIZE.width - MILESTONE_NODE_SIZE.width,
+              y: 2 * (TASK_NODE_SIZE.height + ARC_NODE_GAP),
+            },
+          ],
         ]),
       );
 
@@ -1813,6 +1821,11 @@ describe(createDagLayoutStore, () => {
             'task:x',
             COMPACT_TASK_NODE_SIZE.height + ARC_NODE_GAP,
             COMPACT_TASK_NODE_SIZE.height,
+          ],
+          [
+            'milestone:m',
+            2 * (COMPACT_TASK_NODE_SIZE.height + ARC_NODE_GAP),
+            COMPACT_MILESTONE_NODE_SIZE.height,
           ],
         ],
       );
@@ -1967,7 +1980,7 @@ describe(createDagLayoutStore, () => {
 
       assert.deepStrictEqual(
         store.arcNodes.getSnapshot().value.map(({ id }) => id),
-        ['task:x', 'task:y'],
+        ['task:x', 'task:y', 'milestone:m'],
       );
     });
 
@@ -2049,7 +2062,7 @@ describe(createDagLayoutStore, () => {
       );
     });
 
-    test('switched from アーク, moves the tasks alone, and no milestone shows', async () => {
+    test('switched from アーク, moves the tasks and fades the milestones out', async () => {
       const { store, clock, saved, setViewMode } =
         await shownWithWidth(twoColumns);
 
@@ -2064,19 +2077,19 @@ describe(createDagLayoutStore, () => {
         positions([
           ['task:y', { x: 0, y: 0 }],
           ['task:x', { x: 0, y: 72 }],
+          ['milestone:m', { x: 16, y: 144 }],
         ]),
       );
 
-      // Still a change of mode, for the view, with nothing to fade.
-      assert.deepStrictEqual(opacities(store), new Map());
+      assert.deepStrictEqual(opacities(store), new Map([['milestone:m', 1]]));
 
       clock.advance(ANIMATION_MS / 2);
 
-      const middle = animated(store);
-
-      assert.isDefined(middle);
-
-      assert.isFalse(middle.has('milestone:m'));
+      // Staying where 「アーク」 has it while it fades.
+      assert.deepStrictEqual(animated(store)?.get('milestone:m'), {
+        x: 16,
+        y: 144,
+      });
 
       clock.advance(ANIMATION_MS / 2);
 
@@ -2086,8 +2099,10 @@ describe(createDagLayoutStore, () => {
 
       assert.deepStrictEqual(
         new Set(animated(store)?.keys()),
-        new Set(['task:x', 'task:y']),
+        new Set(['task:x', 'task:y', 'milestone:m']),
       );
+
+      assert.deepStrictEqual(opacities(store), new Map([['milestone:m', 0]]));
 
       clock.advance(ANIMATION_MS);
 
@@ -2226,17 +2241,24 @@ describe(createDagLayoutStore, () => {
 
   describe('the order of アーク and タイル', () => {
     // `mixed` by title: y (Alpha), then x (Zeta); the other way round by
-    // title descending.
+    // title descending. Either way, m, joined to neither, is last.
     const arcStep = TASK_NODE_SIZE.height + ARC_NODE_GAP;
+
+    const lastMilestone = [
+      'milestone:m',
+      { x: TASK_NODE_SIZE.width - MILESTONE_NODE_SIZE.width, y: 2 * arcStep },
+    ] as const;
 
     const byTitle = positions([
       ['task:y', { x: 0, y: 0 }],
       ['task:x', { x: 0, y: arcStep }],
+      lastMilestone,
     ]);
 
     const byTitleDescending = positions([
       ['task:x', { x: 0, y: 0 }],
       ['task:y', { x: 0, y: arcStep }],
+      lastMilestone,
     ]);
 
     const titleDescending = [{ key: 'title', order: 'desc' }] as const;
@@ -2427,7 +2449,18 @@ describe(createDagLayoutStore, () => {
         ],
       });
 
-      assert.deepStrictEqual(arcColumn(store), byTitleDescending);
+      // The gate just above y, which waits for it.
+      const milestoneX = TASK_NODE_SIZE.width - MILESTONE_NODE_SIZE.width;
+
+      const belowGate = MILESTONE_NODE_SIZE.height + ARC_NODE_GAP;
+
+      const blocked = positions([
+        ['task:x', { x: 0, y: 0 }],
+        ['milestone:gate', { x: milestoneX, y: arcStep }],
+        ['task:y', { x: 0, y: arcStep + belowGate }],
+      ]);
+
+      assert.deepStrictEqual(arcColumn(store), blocked);
 
       setStateTime(2000);
 
@@ -2435,11 +2468,18 @@ describe(createDagLayoutStore, () => {
 
       setStateTime(6000);
 
-      assert.deepStrictEqual(animated(store), byTitleDescending);
+      assert.deepStrictEqual(animated(store), blocked);
 
       clock.advance(ANIMATION_MS);
 
-      assert.deepStrictEqual(arcColumn(store), byTitle);
+      assert.deepStrictEqual(
+        arcColumn(store),
+        positions([
+          ['milestone:gate', { x: milestoneX, y: 0 }],
+          ['task:y', { x: 0, y: belowGate }],
+          ['task:x', { x: 0, y: belowGate + arcStep }],
+        ]),
+      );
 
       assert.deepStrictEqual(saved, []);
     });
@@ -2545,10 +2585,15 @@ describe(createDagLayoutStore, () => {
       // By title: y (Alpha), then x (Zeta).
       setHidden(new Set(['task:y']));
 
+      const step = TASK_NODE_SIZE.height + ARC_NODE_GAP;
+
+      const milestoneX = TASK_NODE_SIZE.width - MILESTONE_NODE_SIZE.width;
+
       assert.deepStrictEqual(
         animated(store),
         positions([
-          ['task:x', { x: 0, y: TASK_NODE_SIZE.height + ARC_NODE_GAP }],
+          ['task:x', { x: 0, y: step }],
+          ['milestone:m', { x: milestoneX, y: 2 * step }],
         ]),
       );
 
@@ -2556,7 +2601,10 @@ describe(createDagLayoutStore, () => {
 
       assert.deepStrictEqual(
         arcColumn(store),
-        positions([['task:x', { x: 0, y: 0 }]]),
+        positions([
+          ['task:x', { x: 0, y: 0 }],
+          ['milestone:m', { x: milestoneX, y: step }],
+        ]),
       );
 
       assert.deepStrictEqual(saved, []);

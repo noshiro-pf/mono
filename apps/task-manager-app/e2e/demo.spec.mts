@@ -1153,26 +1153,8 @@ const highlightCounts = async (
   );
 };
 
-/** How many of the arcs are derived through milestones, and how many not. */
-const arcKinds = async (
-  page: DeepReadonly<Page>,
-): Promise<Readonly<{ direct: number; derived: number }>> => {
-  const derived = await page
-    .getByTestId('dag-arc')
-    .evaluateAll((arcs) =>
-      arcs.map(
-        (arc) => arc instanceof SVGElement && arc.dataset['derived'] === 'true',
-      ),
-    );
-
-  return {
-    direct: derived.filter((each) => !each).length,
-    derived: derived.filter((each) => each).length,
-  };
-};
-
 test(
-  'draws the tasks alone as an arc diagram, and keeps the mode',
+  'draws the tasks and the milestones as an arc diagram, and keeps the mode',
   { tag: '@smoke' },
   async ({ page }) => {
     await page.goto(DEMO);
@@ -1185,22 +1167,10 @@ test(
 
     await showMode(page, 'arc');
 
-    // The tasks alone, and nothing to arrange.
+    // Every node, and nothing to arrange.
     const nodes = page.getByTestId('dag-node');
 
-    await expect.soft(nodes).toHaveCount(6);
-
-    expect
-      .soft(
-        await nodes.evaluateAll((elements) =>
-          elements.every(
-            (element) =>
-              element instanceof SVGElement &&
-              element.dataset['nodeId']?.startsWith('task:') === true,
-          ),
-        ),
-      )
-      .toBe(true);
+    await expect.soft(nodes).toHaveCount(9);
 
     await expect.soft(page.getByTestId('dag-arrange')).toHaveCount(0);
 
@@ -1208,8 +1178,8 @@ test(
 
     await expect.soft(page.getByTestId('dag-settings')).toBeVisible();
 
-    // One column, top to bottom by title, as the page's own collator sorts.
-    const column = await nodes.evaluateAll((elements) =>
+    // One column, top to bottom.
+    const drawn = await nodes.evaluateAll((elements) =>
       elements.map((element) => {
         const moved =
           element instanceof SVGGraphicsElement
@@ -1218,17 +1188,34 @@ test(
 
         return {
           title: element.querySelector('title')?.textContent ?? '',
+          isTask:
+            element instanceof SVGElement &&
+            element.dataset['nodeId']?.startsWith('task:') === true,
           x: moved?.e ?? Number.NaN,
           y: moved?.f ?? Number.NaN,
         };
       }),
     );
 
-    const columns = new Set(column.map(({ x }) => x));
+    const column = drawn.toSorted((a, b) => a.y - b.y);
 
-    expect.soft(columns.size).toBe(1);
+    const tasks = column.filter(({ isTask }) => isTask);
 
-    const titles = column.map(({ title }) => title);
+    const milestones = column.filter(({ isTask }) => !isTask);
+
+    // The tasks lined up, the narrower milestones' right sides with theirs.
+    const taskXs = new Set(tasks.map(({ x }) => x));
+
+    const milestoneXs = new Set(milestones.map(({ x }) => x));
+
+    expect.soft(taskXs.size).toBe(1);
+
+    expect.soft(milestoneXs.size).toBe(1);
+
+    expect.soft(milestones[0]?.x).toBeGreaterThan(tasks[0]?.x ?? 0);
+
+    // The tasks by title, as the page's own collator sorts.
+    const titles = tasks.map(({ title }) => title);
 
     const sorted = await page.evaluate((unsorted) => {
       const collator = new Intl.Collator('ja');
@@ -1236,23 +1223,31 @@ test(
       return unsorted.toSorted(collator.compare);
     }, titles);
 
-    expect
-      .soft(column.toSorted((a, b) => a.y - b.y).map(({ title }) => title))
-      .toStrictEqual(sorted);
+    expect.soft(titles).toStrictEqual(sorted);
 
-    // Five dependencies between tasks, and two through 「実装完了」.
+    // 「実装完了」 just above 結合テスト, which waits for it; 「リリース承認」,
+    // which no node waits for, just below 結合テスト, which it waits for,
+    // and 「コードフリーズ」, which only it waits for, just above it.
+    const order = column.map(({ title }) => title);
+
+    const testAt = order.indexOf('結合テスト');
+
+    expect
+      .soft(order.slice(testAt - 1, testAt + 3))
+      .toStrictEqual([
+        '実装完了',
+        '結合テスト',
+        'コードフリーズ',
+        'リリース承認',
+      ]);
+
+    // Every dependency, as the DAG draws it.
     const arcs = page.getByTestId('dag-arc');
 
-    await expect.soft(arcs).toHaveCount(7);
-
-    expect.soft(await arcKinds(page)).toStrictEqual({ direct: 5, derived: 2 });
+    await expect.soft(arcs).toHaveCount(10);
 
     await expect
-      .soft(
-        page.getByRole('img', {
-          name: 'API を実装する → 結合テスト（マイルストーン 実装完了 経由）',
-        }),
-      )
+      .soft(page.getByRole('img', { name: '実装完了 → 結合テスト' }))
       .toHaveCount(1);
 
     await expect
@@ -1263,7 +1258,7 @@ test(
       )
       .toHaveCount(1);
 
-    // Pointing at a task brings its three arcs and the three tasks at their
+    // Pointing at a task brings its three arcs and the three nodes at their
     // other ends forward, and dims the rest.
     const ui = dagNode(page, /画面を実装する/u);
 
@@ -1276,14 +1271,14 @@ test(
       .toStrictEqual(
         new Map([
           ['on', 3],
-          ['dim', 4],
+          ['dim', 7],
         ]),
       );
 
     expect.soft(await highlightCounts(nodes)).toStrictEqual(
       new Map([
         ['on', 4],
-        ['dim', 2],
+        ['dim', 5],
       ]),
     );
 
@@ -1292,7 +1287,7 @@ test(
 
     await expect
       .poll(async () => highlightCounts(arcs))
-      .toStrictEqual(new Map([['none', 7]]));
+      .toStrictEqual(new Map([['none', 10]]));
 
     // So does the keyboard focus.
     await dagNode(page, /利用者向けドキュメント/u).focus();
@@ -1302,7 +1297,7 @@ test(
       .toStrictEqual(
         new Map([
           ['on', 1],
-          ['dim', 6],
+          ['dim', 9],
         ]),
       );
 
@@ -1349,7 +1344,7 @@ test(
       .soft(page.getByTestId('dag-mode-arc'))
       .toHaveAttribute('aria-pressed', 'true');
 
-    await expect.soft(nodes).toHaveCount(6);
+    await expect.soft(nodes).toHaveCount(9);
 
     // Back to the DAG, every node where it was.
     await showMode(page, 'dag');
@@ -1357,6 +1352,61 @@ test(
     await expect.soft(nodes).toHaveCount(9);
 
     expect.soft(await allPositions(page)).toStrictEqual(dagPositions);
+  },
+);
+
+test(
+  '「全体表示」 shows the whole arc diagram, not only its top',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    // Too low for the column at the scale 「アーク」 is first shown at.
+    await page.setViewportSize({ width: 1000, height: 360 });
+
+    await page.goto(DEMO);
+
+    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+
+    await showDag(page);
+
+    await showMode(page, 'arc');
+
+    const canvasBox = await page.getByTestId('dag-canvas').boundingBox();
+
+    const toolbarBox = await page.getByTestId('dag-toolbar').boundingBox();
+
+    // Whether each task is all in sight, between the toolbar and the bottom.
+    const inView = async (): Promise<readonly boolean[]> => {
+      const nodes = await page.getByTestId('dag-node').all();
+
+      return Promise.all(
+        nodes.map(async (node) => {
+          const box = await node.boundingBox();
+
+          return (
+            box !== null &&
+            canvasBox !== null &&
+            toolbarBox !== null &&
+            box.y >= toolbarBox.y + toolbarBox.height &&
+            box.y + box.height <= canvasBox.y + canvasBox.height
+          );
+        }),
+      );
+    };
+
+    // The top of the column, the rest to be panned down to.
+    const before = await inView();
+
+    expect.soft(before.includes(false)).toBe(true);
+
+    await page.getByTestId('dag-fit').click();
+
+    await expect
+      .poll(async () => {
+        const after = await inView();
+
+        return after.every((seen) => seen);
+      })
+      .toBe(true);
   },
 );
 
@@ -1648,9 +1698,9 @@ test(
     // Back to the arcs, and to the DAG.
     await showMode(page, 'arc');
 
-    await expect.soft(nodes).toHaveCount(6);
+    await expect.soft(nodes).toHaveCount(9);
 
-    await expect.soft(page.getByTestId('dag-arc')).toHaveCount(7);
+    await expect.soft(page.getByTestId('dag-arc')).toHaveCount(10);
 
     await showMode(page, 'dag');
 
@@ -1912,7 +1962,7 @@ test(
       .soft(Arr.tail(ys).map((y, index) => y - (ys[index] ?? 0)))
       .toStrictEqual(Arr.tail(ys).map(() => 48));
 
-    await expect.soft(page.getByTestId('dag-arc')).toHaveCount(7);
+    await expect.soft(page.getByTestId('dag-arc')).toHaveCount(10);
 
     // タイル: narrower, so more to a row.
     await showMode(page, 'tile');
@@ -1998,14 +2048,20 @@ const expectedOrder = async (
   );
 
 /**
- * The titles of the nodes drawn, row by row and left to right: down the
- * column in 「アーク」, along the rows in 「タイル」.
+ * The titles of the tasks drawn, row by row and left to right: down the
+ * column in 「アーク」, the milestones there left out, along the rows in
+ * 「タイル」.
  */
 const drawnOrder = async (
   page: DeepReadonly<Page>,
 ): Promise<readonly string[]> =>
   page.getByTestId('dag-node').evaluateAll((nodes) =>
     nodes
+      .filter(
+        (node) =>
+          node instanceof SVGElement &&
+          node.dataset['nodeId']?.startsWith('task:') === true,
+      )
       .map((node) => {
         const moved =
           node instanceof SVGGraphicsElement
