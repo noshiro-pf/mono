@@ -1,0 +1,127 @@
+---
+title: Observable の仕組み
+description: SynState の Observable は裏で値を監視するルーチンを走らせているわけではなく、`subscribe` で関数を登録し、`next` が登録された関数を同期的に呼び出すだけの仕組みです。`subscribe` と `next` だけを持つ最小の Observable で説明します。
+sidebar:
+    order: 2
+---
+
+Observable というと、値を見張り続ける watcher ルーチンや、変化をポーリングするループ、通知のタイミングを決めるスケジューラのような「生きているもの」を想像しがちです。SynState の Observable はそのどれでもありません。**裏で動いているものは何もありません。** `subscribe` はリストに関数を追加し、`next` はそのリストの関数を同期的に呼び出してから return します。Observable は「呼び出し元と呼び出し先の紐付け」の抽象化であり、その紐付けは Observable のグラフを組み立てた時点で静的に決まります。
+
+## 最小の Observable
+
+次の Observable は `subscribe` と `next` だけを持ちます。細部は SynState の実装と異なりますが、仕組みは同じです：
+
+```tsx
+type Subscription = Readonly<{ unsubscribe: () => void }>;
+
+type MiniObservable<A> = Readonly<{
+    subscribe: (onNext: (value: A) => void) => Subscription;
+    next: (value: A) => void;
+}>;
+
+const createObservable = <A,>(): MiniObservable<A> => {
+    // The whole "reactive machinery": a list of functions.
+    const mut_subscribers = new Set<(value: A) => void>();
+
+    return {
+        subscribe: (onNext) => {
+            mut_subscribers.add(onNext); // Remember the function. That's all.
+
+            return {
+                unsubscribe: () => {
+                    mut_subscribers.delete(onNext);
+                },
+            };
+        },
+
+        next: (value) => {
+            // Call every registered function, right here, synchronously.
+            for (const onNext of mut_subscribers) {
+                onNext(value);
+            }
+        },
+    };
+};
+
+const count = createObservable<number>();
+
+// A derived value is one more registered function that calls `next`.
+const doubled = createObservable<number>();
+
+count.subscribe((n) => {
+    doubled.next(n * 2);
+});
+
+const mut_log: string[] = [];
+
+const subscription = doubled.subscribe((n) => {
+    mut_log.push(`doubled: ${n}`);
+});
+
+mut_log.push('before next');
+
+count.next(1);
+
+mut_log.push('after next');
+
+// The subscriber ran inside `count.next(1)`, before it returned.
+assert.deepStrictEqual(mut_log, ['before next', 'doubled: 2', 'after next']);
+
+subscription.unsubscribe();
+
+count.next(2);
+
+// Removed from the list, so never called again.
+assert.deepStrictEqual(mut_log, ['before next', 'doubled: 2', 'after next']);
+```
+
+`subscribe` は何も起動しません。関数を保存し、それを取り除く手段を返すだけです。`next` は保存された関数をループで呼ぶ、ごく普通の関数呼び出しです。間にキューもタイマーもマイクロタスクも挟まらないので、ログを見ると subscriber は `'before next'` と `'after next'` の間、つまり `count.next(1)` の**内側**で実行されています。`unsubscribe` で取り除かれた関数は、単にリストにもう存在しません。
+
+`doubled` は、派生値も同じ仕組みの繰り返しであることを示しています。`count` に登録された「`doubled.next` を呼ぶ関数」にすぎません。`count.next(1)` はその関数を呼び、それが `doubled.next(2)` を呼び、それがログを取る関数を呼びます。`subscribe` を呼んだ時点で敷かれた、ただの関数呼び出しの同期的な連鎖です。
+
+## SynState も同じように振る舞う
+
+同じグラフを SynState で書くと、同じログになります：
+
+```tsx
+import { map, source } from 'synstate';
+
+const count = source<number>();
+
+const doubled = count.pipe(map((n) => n * 2));
+
+const mut_log: string[] = [];
+
+const subscription = doubled.subscribe((n) => {
+    mut_log.push(`doubled: ${n}`);
+});
+
+mut_log.push('before next');
+
+count.next(1);
+
+mut_log.push('after next');
+
+assert.deepStrictEqual(mut_log, ['before next', 'doubled: 2', 'after next']);
+
+subscription.unsubscribe();
+```
+
+SynState が最小版に加えているものも、この構図を変えません：
+
+- Observable は現在値も保持しており（`getSnapshot()`）、新しい subscriber にはそれがすぐに渡されます。
+- `map` や `combine` のような派生 Observable は `subscribe` で連鎖しているわけではありません。生成時に、自分の祖先にあたるルートに更新関数を登録し、ルートはそれらを深さ順にソートしたリストとして保持します。ルートの `next` はそのリストを先頭から一度だけ順に辿り、これによって SynState はグリッチを回避しています（[SynState がグリッチを解決した方法](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/)）。リストはグラフの構築時に作られ、それを辿るのはやはり同期的なループです。
+- 完了処理（`complete`）も扱います。
+
+中核は [`createObservableBaseHandle`](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/base/create-observable-base.mts) です。`subscribe` は subscriber の `Map` に追加し、`setNext` は値を保存して各 subscriber を `for` ループで呼び出します。
+
+## 非同期性はどこから来るのか
+
+伝搬が同期的なら、`timer`、`counter`、`fromPromise`、`debounce` はどうやって動いているのでしょうか。これらは `next` を**呼ぶ側**です。時間に基づくソースは、`setTimeout` / `setInterval` のコールバックから更新が開始される Observable です。`fromPromise` は Promise のコールバックから開始します。`debounce` や `switchMap` のような非同期演算子は、そうしたコールバック（`switchMap` の場合は内側の Observable の subscriber）から自分自身の伝搬を開始します。タイマーは Observable ではなく JavaScript ランタイムが持っており、コールバックが更新を開始した時点から先は、上で見たとおりすべて同期的に実行されます。
+
+ここから次のことが直接導かれます：
+
+- **何もしていないグラフのコストはゼロです。** `next` が呼ばれなければ、どのコードも動きません。
+- **新しい状態はすぐに読めます。** `next` が return した後は、グラフ内のどの Observable の `getSnapshot()` も更新後の値を返します。
+- **`next` 1 回が 1 回の完結した伝搬です。** SynState は複数の `next` 呼び出しを 1 回の更新にまとめません。
+- **subscriber は呼び出し元のスタック上で実行されます。** 遅い subscriber は `next` の return を遅らせ、subscriber が投げた例外は `next` を呼んだコードに伝わります。
