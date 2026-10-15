@@ -11,6 +11,9 @@ import type { DeepReadonly } from 'ts-type-forge';
 // `src/demo/sample-data.mts`, and a fresh copy on every load.
 const DEMO = '/mono/task-manager/?storage=memory';
 
+// The sample data's done task, as the 依存先 choices name it.
+const SPEC_OPTION = 'タスク: 仕様をまとめる（完了）';
+
 // The graph screen draws the sample data's done task too, as these tests
 // measure the whole graph; hiding it, the default, is
 // `dag-show-done.spec.mts`'s.
@@ -216,6 +219,60 @@ test(
     await expect.soft(dialog).toBeVisible();
 
     await expect.soft(source).toBeFocused();
+  },
+);
+
+test(
+  'offers a done task as a 依存先 only when asked to',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto(DEMO);
+
+    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+
+    const dialog = page.getByTestId('node-dialog');
+
+    // 画面設計 already waits for 仕様をまとめる, which is done.
+    await page.getByTestId('task-row').filter({ hasText: '画面設計' }).click();
+
+    const kept = dialog.getByTestId('dependency-source').first();
+
+    await expect.soft(kept).toHaveValue('task:spec');
+
+    await expect
+      .soft(kept.getByRole('option', { name: SPEC_OPTION }))
+      .toHaveCount(1);
+
+    await dialog.getByRole('button', { name: 'キャンセル' }).click();
+
+    await expect.soft(dialog).toBeHidden();
+
+    await page
+      .getByTestId('task-row')
+      .filter({ hasText: '結合テスト' })
+      .click();
+
+    await dialog.getByTestId('dependency-add').click();
+
+    const added = dialog
+      .getByTestId('dependency-row')
+      .last()
+      .getByTestId('dependency-source');
+
+    const spec = added.getByRole('option', { name: SPEC_OPTION });
+
+    await expect.soft(spec).toHaveCount(0);
+
+    const showDone = dialog.getByTestId('dependency-show-done');
+
+    await expect.soft(showDone).not.toBeChecked();
+
+    // By its label, as a reader would: the switch's knob covers the box.
+    await dialog.getByText('完了したタスクも選択肢に出す').click();
+
+    await expect.soft(showDone).toBeChecked();
+
+    await expect.soft(spec).toHaveCount(1);
   },
 );
 

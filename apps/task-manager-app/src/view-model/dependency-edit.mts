@@ -17,6 +17,7 @@ import {
   type DomainState,
   type GraphNodeId,
   type NodeRef,
+  type TaskId,
 } from '../domain/index.mjs';
 import { dependencyTypeLabels, formatLag } from './format.mjs';
 import { lagFromParts, lagToParts } from './lag.mjs';
@@ -156,21 +157,50 @@ export const dependenciesFromRows = (
     : Result.ok(validDependencies(checks));
 };
 
-/** Every node but `dependent`, as the options of a `<select>`. */
+/**
+ * Every node but `dependent`, as the options of a `<select>`. A done task is
+ * marked as such, for {@link shownSourceOptions} to leave out.
+ */
 export const dependencySourceOptions = (
   state: DomainState,
   dependent: NodeRef,
 ): readonly SourceOption[] => {
   const dependentId = nodeId(dependent);
 
+  const doneTaskIds: ReadonlySet<TaskId> = new Set(
+    state.tasks
+      .filter(({ progress }) => progress === 'done')
+      .map(({ id }) => id),
+  );
+
   return listNodes(state)
     .filter(({ id }) => id !== dependentId)
-    .map(({ id, ref }) => ({
-      value: id,
-      label: `${ref.kind === 'task' ? 'タスク' : 'マイルストーン'}: ${nodeTitle(state, ref)}`,
-      ref,
-    }));
+    .map(({ id, ref }) => {
+      const done = ref.kind === 'task' && doneTaskIds.has(ref.id);
+
+      return {
+        value: id,
+        label: `${ref.kind === 'task' ? 'タスク' : 'マイルストーン'}: ${nodeTitle(state, ref)}${done ? '（完了）' : ''}`,
+        ref,
+        done,
+      };
+    });
 };
+
+/**
+ * The options one row's `<select>` offers: without the done tasks unless
+ * `showDone` — a task that is done rarely starts to be waited for — but
+ * always with the one the row has chosen, so that a dependency on a task
+ * since done still reads as what it is.
+ */
+export const shownSourceOptions = (
+  options: readonly SourceOption[],
+  showDone: boolean,
+  selected: DependencyRow['source'],
+): readonly SourceOption[] =>
+  showDone
+    ? options
+    : options.filter(({ value, done }) => !done || value === selected);
 
 /** `A の完了後 +2日`: what the dependency waits for. */
 export const describeDependency = (
@@ -227,6 +257,8 @@ export type SourceOption = DeepReadonly<{
   value: GraphNodeId;
   label: string;
   ref: NodeRef;
+  /** A task that is done; a milestone never is. */
+  done: boolean;
 }>;
 
 /**
