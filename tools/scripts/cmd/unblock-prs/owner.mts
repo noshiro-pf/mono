@@ -79,7 +79,7 @@ export const ownerNote = (
 
   const whose =
     owner.owner === 'skill'
-      ? (`the ${owner.skill} skill's` as const)
+      ? "the /unblock-prs skill's"
       : owner.owner === 'human'
         ? "a person's"
         : "nobody's — a bug";

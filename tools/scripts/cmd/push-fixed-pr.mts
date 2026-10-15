@@ -1,4 +1,5 @@
 import {
+  PNPM_UPDATE_BRANCH,
   SKIP_CI_LABEL,
   stackDescendants,
   type QueueComments,
@@ -162,6 +163,20 @@ export const decidePush = ({
 
   if (head === entry.headSha) {
     return { kind: 'refuse', reason: `${head} is already its head` };
+  }
+
+  // A generated branch, lockfile and all: its conflict is resolved by
+  // generating it again from the tip, not by a rebase resolved by hand.
+  if (
+    entry.headRef === PNPM_UPDATE_BRANCH &&
+    comments?.setAside?.says.kind === 'standing' &&
+    comments.setAside.says.setAside.reason === 'rebase-failed'
+  ) {
+    return {
+      kind: 'refuse',
+      reason:
+        'a conflict on the dependency update is resolved by building it again: pnpm run rebuild-pnpm-update',
+    };
   }
 
   const parents: ReadonlyMap<number, number> = new Map(

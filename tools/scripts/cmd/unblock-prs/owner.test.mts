@@ -59,7 +59,6 @@ describe(ownerOf, () => {
       ownerOf(pullRequest(), context({ skipped: new Map([[2267, SKIP]]) })),
       {
         owner: 'skill',
-        skill: 'unblock-prs',
         reason: 'set aside `rebase-failed` at its head; the skill fixes it',
       },
     );
@@ -90,7 +89,7 @@ describe(ownerNote, () => {
       ),
       {
         kind: 'note',
-        note: "#2267: the unblock-prs skill's (set aside `rebase-failed` at its head; the skill fixes it); set aside: conflicts in a.mts",
+        note: "#2267: the /unblock-prs skill's (set aside `rebase-failed` at its head; the skill fixes it); set aside: conflicts in a.mts",
       },
     );
   });

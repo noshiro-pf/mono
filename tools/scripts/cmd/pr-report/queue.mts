@@ -15,10 +15,10 @@ import { readRepoRef, readRequiredContexts } from './repo-settings.mjs';
  * `queue-owner.mts`), from what `pr-report` reads.
  *
  * Every command a session runs on the queue decides through here — the
- * `owner` in `pr-report --format json`, `claim-pr`, `push-fixed-pr` and
- * `report-unowned-prs` — so none of them can come to a different answer
- * from the others, and the worker asks the same function with the same
- * facts read through `gh`.
+ * `owner` in `pr-report --format json`, `claim-pr`, `push-fixed-pr`,
+ * `rebuild-pnpm-update` and `report-unowned-prs` — so none of them can come
+ * to a different answer from the others, and the worker asks the same
+ * function with the same facts read through `gh`.
  */
 export const ownersOf = (
   decided: DecidedEntries,

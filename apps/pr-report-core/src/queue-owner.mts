@@ -38,13 +38,15 @@ import type { ReportEntry } from './types.mjs';
 
 export const QUEUE_OWNERS = ['worker', 'skill', 'human', 'none'] as const;
 
-/** The skills a queued pull request can be handed to. */
-export type QueueSkill = 'pnpm-update-ci' | 'unblock-prs';
-
-export type QueueOwner = Readonly<
-  | { owner: 'human' | 'none' | 'worker'; reason: string }
-  | { owner: 'skill'; skill: QueueSkill; reason: string }
->;
+/**
+ * `skill` is the `/unblock-prs` skill, which fixes every queued pull request
+ * the worker sets aside — the dependency update's (`chore/pnpm-update`)
+ * included.
+ */
+export type QueueOwner = Readonly<{
+  owner: 'human' | 'none' | 'skill' | 'worker';
+  reason: string;
+}>;
 
 /** Every reason the worker writes into a set-aside comment. */
 export const SET_ASIDE_REASONS = [
@@ -164,7 +166,6 @@ export const queueOwner = (pr: QueueOwnerInput): QueueOwner | undefined => {
   ) {
     return {
       owner: 'skill',
-      skill: skillFor(pr),
       reason: `claimed by ${pr.claim.claim.by} at ${pr.claim.claim.at}`,
     };
   }
@@ -213,7 +214,13 @@ export const queueOwner = (pr: QueueOwnerInput): QueueOwner | undefined => {
   const handedOff = skillHandOff(pr, setAside.reason, queued);
 
   return handedOff === undefined
-    ? { owner: 'skill', skill: skillFor(pr), reason: `${said}; ${why}` }
+    ? {
+        owner: 'skill',
+        reason:
+          setAside.reason === 'rebase-failed' && isPnpmUpdate(pr)
+            ? `${said}; the skill has \`pnpm-update.yml\` rebuild it from main`
+            : `${said}; ${why}`,
+      }
     : { owner: 'human', reason: `${said}: ${handedOff}` };
 };
 
@@ -267,10 +274,14 @@ export const isSetAsideReason = (reason: string): reason is SetAsideReason =>
 
 const KNOWN_REASONS: ReadonlySet<string> = new Set(SET_ASIDE_REASONS);
 
-const PNPM_UPDATE_BRANCH = 'chore/pnpm-update';
+/**
+ * The dependency update, which `pnpm-update.yml` builds from the default
+ * branch: a conflict on it is resolved by building it again, not by a rebase.
+ */
+export const PNPM_UPDATE_BRANCH = 'chore/pnpm-update';
 
-const skillFor = (pr: QueueOwnerInput): QueueSkill =>
-  pr.headRef === PNPM_UPDATE_BRANCH ? 'pnpm-update-ci' : 'unblock-prs';
+const isPnpmUpdate = (pr: QueueOwnerInput): boolean =>
+  pr.headRef === PNPM_UPDATE_BRANCH;
 
 /**
  * Why nothing in the queue can move `pr` until a person does something, if
@@ -288,8 +299,9 @@ const unmovableReason = (pr: QueueOwnerInput): string | undefined =>
           : undefined;
 
 /**
- * Why a skill's reason goes to a person instead, for the pull requests whose
- * branches something else rebuilds.
+ * Why a skill's reason goes to a person instead: the version pull request,
+ * which `release.yml` rebuilds and no session pushes to, and a failure on one
+ * no longer queued, whose checks are nobody's business until it is.
  */
 const skillHandOff = (
   pr: QueueOwnerInput,
@@ -298,8 +310,6 @@ const skillHandOff = (
 ): string | undefined =>
   pr.headRef === `changeset-release/${pr.defaultBranch}`
     ? 'the version pull request, which `release.yml` rebuilds; look at the run'
-    : reason === 'rebase-failed' && pr.headRef === PNPM_UPDATE_BRANCH
-      ? '`pnpm-update.yml` rebuilds the branch; run it to rebuild it now'
-      : reason === 'checks-failed' && !queued
-        ? 'no longer queued; queue it again to have it fixed'
-        : undefined;
+    : reason === 'checks-failed' && !queued
+      ? 'no longer queued; queue it again to have it fixed'
+      : undefined;

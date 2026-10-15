@@ -673,7 +673,7 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `owner`  | 次に動かすもの                                                                                            |
 | :------- | :-------------------------------------------------------------------------------------------------------- |
 | `worker` | このスクリプト。順番待ち、stack の上の層、見送りが解消済み                                                |
-| `skill`  | skill（`unblock-prs` か `pnpm-update-ci`）。claim 中、または `rebase-failed` / `checks-failed` で見送り中 |
+| `skill`  | `/unblock-prs` skill。claim 中、または `rebase-failed` / `checks-failed` で見送り中（依存更新 PR も含む） |
 | `human`  | 人。draft、fork、閉路、bypass merge 待ち、設定や権限で止まっている見送り                                  |
 | `none`   | 誰でもない。規則の想定外の状態で、ツールのバグ                                                            |
 
@@ -686,6 +686,11 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
   （`SET_ASIDE_REASONS`）もそこにあり、このスクリプトはそれを使うので、担当者
   の無い理由を書くことはできません（コンパイルが通りません）。`none` になるの
   は、このファイルの知らない理由が comment にあるときです。
+- 依存更新 PR（`chore/pnpm-update`）も他の PR と同じく skill の担当です。
+  ただし `rebase-failed` は rebase で解かず、`pnpm run rebuild-pnpm-update` で
+  `pnpm-update.yml` に `main` の先端から作り直させます。lockfile を含めて生成
+  されるブランチなので、手で解いた conflict は `minimumReleaseAge` の下で解決
+  されたことを誰も確かめていないからです。
 - `none` は `pnpm run report-unowned-prs` が issue にします（PR ごとに1本、
   本文の隠し行で既存の issue を見つけます）。`/unblock-prs` skill が毎回実行
   します。
@@ -1436,12 +1441,12 @@ This script and the skill used to judge whether a set-aside still stood
 against their own reading of `main`, and when the readings differed each found
 the pull request the other's and nobody moved it (#2267).
 
-| `owner`  | who moves it next                                                                                    |
-| :------- | :--------------------------------------------------------------------------------------------------- |
-| `worker` | this script: waiting its turn, a layer of a stack, a set-aside resolved                              |
-| `skill`  | a skill (`unblock-prs` or `pnpm-update-ci`): claimed, or set aside `rebase-failed` / `checks-failed` |
-| `human`  | a person: a draft, a fork, a cycle, a bypass merge, a setting or a permission                        |
-| `none`   | nobody: a state the rules do not cover, which is a bug in the tooling                                |
+| `owner`  | who moves it next                                                                                                 |
+| :------- | :---------------------------------------------------------------------------------------------------------------- |
+| `worker` | this script: waiting its turn, a layer of a stack, a set-aside resolved                                           |
+| `skill`  | the `/unblock-prs` skill: claimed, or set aside `rebase-failed` / `checks-failed`, the dependency update included |
+| `human`  | a person: a draft, a fork, a cycle, a bypass merge, a setting or a permission                                     |
+| `none`   | nobody: a state the rules do not cover, which is a bug in the tooling                                             |
 
 - **It reads the comments and the pull request, never the tip of the base.**
   The set-aside comment is the hand-off: until this script rewrites it as
@@ -1452,6 +1457,11 @@ the pull request the other's and nobody moved it (#2267).
   (`SET_ASIDE_REASONS`) is beside it and this script writes from it, so a
   reason with no owner does not compile. `none` is a reason in a comment that
   module does not know.
+- The dependency update (`chore/pnpm-update`) is the skill's like any other,
+  except that a `rebase-failed` on it is not rebased:
+  `pnpm run rebuild-pnpm-update` has `pnpm-update.yml` build it again from the
+  tip of `main`. The branch is generated, lockfile and all, and nothing checks
+  that a conflict resolved by hand was resolved under `minimumReleaseAge`.
 - `pnpm run report-unowned-prs` files an issue for each `none`, one per pull
   request, found again by a hidden line in its body. The `/unblock-prs` skill
   runs it every round.

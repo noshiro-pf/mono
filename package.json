@@ -81,6 +81,7 @@
     "pr-report": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/pr-report/main.mts",
     "prepare": "pnpm run z:link-strict-lib",
     "push-fixed-pr": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/push-fixed-pr.mts",
+    "rebuild-pnpm-update": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/rebuild-pnpm-update.mts",
     "repo-settings:apply": "pnpm run z:repo-settings apply",
     "repo-settings:backup": "pnpm run z:repo-settings backup",
     "report-unowned-prs": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/report-unowned-prs.mts",

@@ -172,6 +172,31 @@ describe(decidePush, () => {
     assert.strictEqual(decide([entry()]).kind, 'refuse');
   });
 
+  test('refuses a conflict on the dependency update, which is rebuilt instead', () => {
+    const update = entry({ headRef: 'chore/pnpm-update' });
+
+    const decided = decide([update], SET_ASIDE, claimedBy('me'));
+
+    assert.strictEqual(decided.kind, 'refuse');
+
+    assert.include(
+      decided.kind === 'refuse' ? decided.reason : '',
+      'rebuild-pnpm-update',
+    );
+
+    assert.strictEqual(
+      decide(
+        [update],
+        writeSetAsideComment(
+          { reason: 'checks-failed', headSha: HEAD, baseSha: 'a'.repeat(40) },
+          'prose',
+        ),
+        claimedBy('me'),
+      ).kind,
+      'push',
+    );
+  });
+
   test('refuses one that is not open', () => {
     assert.strictEqual(decide([], SET_ASIDE, claimedBy('me')).kind, 'refuse');
   });
