@@ -104,6 +104,12 @@ Sorted by priority, the pull requests at each level of the tree are ordered
 by the highest priority in them or anywhere below them, since landing a high
 one means landing what holds it up first; none sits between mid and low.
 
+**Every number is what the list below shows**, and when the switches leave
+some out, how many there are in all follows it in small: `2 of 8` open,
+`1 of 3` queued. A count or a priority switched off reads how many switching
+it back on would show, struck through, rather than the nothing the list has
+of it.
+
 The counts and the switches below them **stay in view while the merge order
 scrolls under them**, with its title — under the toolbar when the header is
 folded — and leave with the merge order once it has scrolled past. On a

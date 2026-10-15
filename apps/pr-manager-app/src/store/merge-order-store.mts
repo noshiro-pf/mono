@@ -20,18 +20,17 @@ import {
   type Subscription,
 } from 'synstate';
 import { fastDeepEqual } from 'ts-data-forge';
-import type { ReadonlyRecord } from 'ts-type-forge';
 import type { Entry, LoadedReport } from '../load-report.mjs';
 import {
   arrangeMergeOrder,
-  countPriorities,
+  countView,
   DEFAULT_MERGE_ORDER_VIEW,
-  isShown,
   parseMergeOrderView,
   toggleOnly,
   togglePriority,
   toggleStatus,
   withSort,
+  type MergeOrderCounts,
   type MergeOrderSort,
   type MergeOrderView,
   type Priority,
@@ -50,9 +49,8 @@ export type MergeOrderStore = Readonly<{
   view: InitializedObservable<MergeOrderView>;
   /** The merge order with what the view hides taken out, in its order. */
   roots: InitializedObservable<LoadedReport['roots']>;
-  /** How many of the open pull requests the view shows. */
-  shown: InitializedObservable<number>;
-  priorities: InitializedObservable<ReadonlyRecord<Priority, number>>;
+  /** What the counts and the priorities read, as the view leaves them. */
+  counts: InitializedObservable<MergeOrderCounts>;
   toggleStatus: (filter: StatusFilter) => void;
   toggleOnly: (filter: StatusFilter) => void;
   togglePriority: (priority: Priority) => void;
@@ -118,16 +116,8 @@ export const createMergeOrderStore = (
         ),
       )
       .pipe(skipIfNoChange(fastDeepEqual)),
-    shown: combine([deps.entries, view])
-      .pipe(
-        map(
-          ([entries, current]) =>
-            entries.filter((entry) => isShown(entry, current)).length,
-        ),
-      )
-      .pipe(skipIfNoChange()),
-    priorities: deps.entries
-      .pipe(map(countPriorities))
+    counts: combine([deps.entries, view])
+      .pipe(map(([entries, current]) => countView(entries, current)))
       .pipe(skipIfNoChange(fastDeepEqual)),
     toggleStatus: (filter) => {
       change((current) => toggleStatus(current, filter));

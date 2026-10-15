@@ -15,7 +15,7 @@ import {
   readerSignals,
 } from '../store/index.mjs';
 import type { StatusRole } from '../verdict.mjs';
-import { StatTile } from './stat-tile.js';
+import { OfTotal, StatTile } from './stat-tile.js';
 
 /**
  * What the merge order leads with: the counts, each a switch for the pull
@@ -23,21 +23,23 @@ import { StatTile } from './stat-tile.js';
  * priorities, which are switches too, and the order. What a switch does is `merge-order-view.mts`; the choice is kept
  * across visits (`settings-db.mts`).
  *
- * `open` is the one count that is not a switch: hiding every open pull
- * request is not a view of them. The first four counts are
- * `pr-report-core`'s, the same `pnpm run pr-report` leads with, less its
- * `draft`, which is not drawn: a draft is always shown, and its card's badge
- * says so. `set aside` and `awaiting code owner` are what stops a pull
- * request that is otherwise ready, and are only this page's.
+ * Each number is what the list below shows (`countView` in
+ * `merge-order-view.mts`), and, when the switches leave some of them out,
+ * how many there are in all beside it in small: the list is what a reader
+ * counts against, and the whole is still a glance away. `open` is the one
+ * count that is not a switch: hiding every open pull request is not a view
+ * of them. The first four counts are `pr-report-core`'s, the same
+ * `pnpm run pr-report` leads with, less its `draft`, which is not drawn: a
+ * draft is always shown, and its card's badge says so. `set aside` and
+ * `awaiting code owner` are what stops a pull request that is otherwise
+ * ready, and are only this page's.
  */
 export const MergeOrderFilters = memoNamed('MergeOrderFilters', () => {
   const summary = readerSignals.summary.value;
 
   const view = mergeOrderSignals.view.value;
 
-  const shown = mergeOrderSignals.shown.value;
-
-  const priorities = mergeOrderSignals.priorities.value;
+  const counts = mergeOrderSignals.counts.value;
 
   return (
     <div className={'merge-order-filters'}>
@@ -45,19 +47,30 @@ export const MergeOrderFilters = memoNamed('MergeOrderFilters', () => {
         className={'summary-row'}
         data-picking={Arr.isNonEmpty(view.onlyStatuses)}
       >
-        <StatTile label={'open'} value={summary.open} />
-        {STATUS_FILTERS.map((filter) => (
-          <StatTile
-            key={filter}
-            label={STATUS_NAMES[filter]}
-            only={view.onlyStatuses.includes(filter)}
-            pressed={!view.hiddenStatuses.includes(filter)}
-            tone={(summary[filter] ?? 0) > 0 ? STATUS_TONES[filter] : undefined}
-            value={summary[filter]}
-            onOnly={toggleOnly[filter]}
-            onToggle={toggleStatus[filter]}
-          />
-        ))}
+        <StatTile
+          label={'open'}
+          total={counts.open.total}
+          value={counts.open.shown}
+        />
+        {STATUS_FILTERS.map((filter) => {
+          // Not known while what it is counted from is still being read.
+          const count =
+            summary[filter] === undefined ? undefined : counts.statuses[filter];
+
+          return (
+            <StatTile
+              key={filter}
+              label={STATUS_NAMES[filter]}
+              only={view.onlyStatuses.includes(filter)}
+              pressed={!view.hiddenStatuses.includes(filter)}
+              tone={(count?.shown ?? 0) > 0 ? STATUS_TONES[filter] : undefined}
+              total={count?.total}
+              value={count?.shown}
+              onOnly={toggleOnly[filter]}
+              onToggle={toggleStatus[filter]}
+            />
+          );
+        })}
       </div>
 
       <div className={'merge-order-controls'}>
@@ -73,7 +86,11 @@ export const MergeOrderFilters = memoNamed('MergeOrderFilters', () => {
             >
               {PRIORITY_NAMES[priority]}
               <span className={'filter-chip-count'}>
-                {priorities[priority]}
+                {counts.priorities[priority].shown}
+                <OfTotal
+                  shown={counts.priorities[priority].shown}
+                  total={counts.priorities[priority].total}
+                />
               </span>
             </button>
           ))}
@@ -101,12 +118,6 @@ export const MergeOrderFilters = memoNamed('MergeOrderFilters', () => {
             {'priority'}
           </button>
         </fieldset>
-
-        {shown < summary.open ? (
-          <span className={'filter-shown'}>
-            {`showing ${shown} of ${summary.open}`}
-          </span>
-        ) : undefined}
       </div>
     </div>
   );

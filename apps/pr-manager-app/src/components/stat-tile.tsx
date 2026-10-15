@@ -1,9 +1,13 @@
 import { memoNamed } from 'preact-utils';
+import type { StrictPick } from 'ts-type-forge';
+import type { Count } from '../merge-order-view.mjs';
 import type { StatusRole } from '../verdict.mjs';
 
 type Props = Readonly<{
   /** `undefined` while what it counts is still being read. */
   value: number | undefined;
+  /** How many there are in all, drawn small beside `value` when it differs. */
+  total?: number;
   label: string;
   /**
    * Left off unless the number says something is wrong. A tile that is
@@ -38,10 +42,19 @@ type Props = Readonly<{
  */
 export const StatTile = memoNamed<Props>(
   'StatTile',
-  ({ value, label, tone, onToggle, pressed = true, onOnly, only = false }) =>
+  ({
+    value,
+    total,
+    label,
+    tone,
+    onToggle,
+    pressed = true,
+    onOnly,
+    only = false,
+  }) =>
     onToggle === undefined ? (
       <div className={'stat-tile'} data-status={tone}>
-        <span className={'stat-value'}>{value ?? READING}</span>
+        <StatValue total={total} value={value} />
         <span className={'stat-label'}>{label}</span>
       </div>
     ) : (
@@ -59,7 +72,7 @@ export const StatTile = memoNamed<Props>(
           type={'button'}
           onClick={onToggle}
         >
-          <span className={'stat-value'}>{value ?? READING}</span>
+          <StatValue total={total} value={value} />
           <span className={'stat-label'}>{label}</span>
         </button>
         {onOnly === undefined ? undefined : (
@@ -80,6 +93,28 @@ export const StatTile = memoNamed<Props>(
         )}
       </div>
     ),
+);
+
+/**
+ * ` of N` after a count that leaves some out, and nothing after one that
+ * does not.
+ */
+export const OfTotal = memoNamed<Count>('OfTotal', ({ shown, total }) =>
+  shown === total ? undefined : (
+    <span className={'count-total'}>{` of ${total}`}</span>
+  ),
+);
+
+const StatValue = memoNamed<StrictPick<Props, 'value' | 'total'>>(
+  'StatValue',
+  ({ value, total }) => (
+    <span className={'stat-value'}>
+      {value ?? READING}
+      {value === undefined || total === undefined ? undefined : (
+        <OfTotal shown={value} total={total} />
+      )}
+    </span>
+  ),
 );
 
 /** What a count reads while it is not known yet. */

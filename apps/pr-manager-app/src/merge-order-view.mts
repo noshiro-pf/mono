@@ -236,17 +236,57 @@ export const arrangeForest = (
   return ordered(shownAmong(roots.map((node) => node.number))).map(visit);
 };
 
-export const countPriorities = (
+/** How many of a kind the list shows, and how many there are. */
+export type Count = Readonly<{ shown: number; total: number }>;
+
+/** The counts the merge order leads with, as the view leaves them. */
+export type MergeOrderCounts = Readonly<{
+  open: Count;
+  statuses: ReadonlyRecord<StatusFilter, Count>;
+  priorities: ReadonlyRecord<Priority, Count>;
+}>;
+
+/**
+ * What each count reads: how many the list shows, of how many are open.
+ *
+ * A count is also a switch, and one switched off would read nothing at all
+ * if it counted the list alone, which is no help to whoever is deciding
+ * whether to switch it back on. So each kind is counted with its own switch
+ * on, and every other as it is: switched on, that is how many of the list
+ * are under it; switched off, how many switching it on would bring back.
+ */
+export const countView = (
   entries: readonly Entry[],
-): ReadonlyRecord<Priority, number> => {
-  const priorities = entries.map((entry) => priorityOf(entry.labels));
+  view: MergeOrderView,
+): MergeOrderCounts => {
+  const underStatus = (filter: StatusFilter): Count =>
+    countUnder(entries, STATUS_TESTS[filter], {
+      ...view,
+      hiddenStatuses: view.hiddenStatuses.filter((each) => each !== filter),
+    });
+
+  const underPriority = (which: Priority): Count =>
+    countUnder(entries, (entry) => priorityOf(entry.labels) === which, {
+      ...view,
+      hiddenPriorities: view.hiddenPriorities.filter((each) => each !== which),
+    });
 
   return {
-    high: priorities.filter((p) => p === 'high').length,
-    mid: priorities.filter((p) => p === 'mid').length,
-    low: priorities.filter((p) => p === 'low').length,
-    none: priorities.filter((p) => p === 'none').length,
-  };
+    open: countUnder(entries, () => true, view),
+    statuses: {
+      queued: underStatus('queued'),
+      failing: underStatus('failing'),
+      behind: underStatus('behind'),
+      setAside: underStatus('setAside'),
+      awaitingReview: underStatus('awaitingReview'),
+    },
+    priorities: {
+      high: underPriority('high'),
+      mid: underPriority('mid'),
+      low: underPriority('low'),
+      none: underPriority('none'),
+    },
+  } as const;
 };
 
 export const toggleStatus = (
@@ -311,6 +351,19 @@ export const parseMergeOrderView = (stored: unknown): MergeOrderView => {
         ? 'priority'
         : 'order',
   };
+};
+
+const countUnder = (
+  entries: readonly Entry[],
+  under: (entry: Entry) => boolean,
+  view: MergeOrderView,
+): Count => {
+  const all = entries.filter(under);
+
+  return {
+    shown: all.filter((entry) => isShown(entry, view)).length,
+    total: all.length,
+  } as const;
 };
 
 const shownByStatus = (

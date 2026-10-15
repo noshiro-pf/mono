@@ -3,7 +3,7 @@ import type { Entry } from './load-report.mjs';
 import {
   arrangeForest,
   arrangeMergeOrder,
-  countPriorities,
+  countView,
   DEFAULT_MERGE_ORDER_VIEW,
   isShown,
   parseMergeOrderView,
@@ -285,16 +285,87 @@ describe(arrangeMergeOrder, () => {
   });
 });
 
-describe(countPriorities, () => {
-  test('counts each priority, none included', () => {
+describe(countView, () => {
+  const entries = [
+    entry(1, { labels: [label('merge-queued'), label('priority:high')] }),
+    entry(2, {
+      labels: [label('merge-queued')],
+      verdict: 'failing',
+    }),
+    entry(3, { verdict: 'failing', labels: [label('priority:low')] }),
+    entry(4, { behindBy: 2, labels: [label('priority:high')] }),
+    entry(5),
+  ] as const;
+
+  test('with everything shown, each count is its total', () => {
+    const counts = countView(entries, DEFAULT_MERGE_ORDER_VIEW);
+
+    assert.deepStrictEqual(counts.open, { shown: 5, total: 5 });
+
+    assert.deepStrictEqual(counts.statuses, {
+      queued: { shown: 2, total: 2 },
+      failing: { shown: 2, total: 2 },
+      behind: { shown: 1, total: 1 },
+      setAside: { shown: 0, total: 0 },
+      awaitingReview: { shown: 0, total: 0 },
+    });
+
+    assert.deepStrictEqual(counts.priorities, {
+      high: { shown: 2, total: 2 },
+      mid: { shown: 0, total: 0 },
+      low: { shown: 1, total: 1 },
+      none: { shown: 2, total: 2 },
+    });
+  });
+
+  test('a switched-on count is how many of the list are under it', () => {
+    const view = toggleOnly(DEFAULT_MERGE_ORDER_VIEW, 'failing');
+
+    const counts = countView(entries, view);
+
+    const listed = entries.filter((each) => isShown(each, view));
+
+    assert.deepStrictEqual(counts.open, { shown: listed.length, total: 5 });
+
     assert.deepStrictEqual(
-      countPriorities([
-        entry(1, { labels: [label('priority:high')] }),
-        entry(2, { labels: [label('priority:high')] }),
-        entry(3),
-      ]),
-      { high: 2, mid: 0, low: 0, none: 1 },
+      STATUS_FILTERS.map((filter) => counts.statuses[filter].shown),
+      STATUS_FILTERS.map(
+        (filter) =>
+          listed.filter((each) => statusesOf(each).includes(filter)).length,
+      ),
     );
+
+    assert.deepStrictEqual(counts.statuses.queued, { shown: 1, total: 2 });
+
+    assert.deepStrictEqual(counts.priorities, {
+      high: { shown: 0, total: 2 },
+      mid: { shown: 0, total: 0 },
+      low: { shown: 1, total: 1 },
+      none: { shown: 1, total: 2 },
+    });
+  });
+
+  test('a switched-off count is how many switching it back on would show', () => {
+    const view = togglePriority(
+      toggleStatus(DEFAULT_MERGE_ORDER_VIEW, 'queued'),
+      'low',
+    );
+
+    const counts = countView(entries, view);
+
+    assert.deepStrictEqual(counts.open, { shown: 2, total: 5 });
+
+    // #1 and #2; neither has the hidden priority.
+    assert.deepStrictEqual(counts.statuses.queued, { shown: 2, total: 2 });
+
+    // #3 is low, and #2 is queued.
+    assert.deepStrictEqual(counts.statuses.failing, { shown: 0, total: 2 });
+
+    // #3; switching low back on still leaves the queued ones hidden.
+    assert.deepStrictEqual(counts.priorities.low, { shown: 1, total: 1 });
+
+    // #4; #1 is queued.
+    assert.deepStrictEqual(counts.priorities.high, { shown: 1, total: 2 });
   });
 });
 
