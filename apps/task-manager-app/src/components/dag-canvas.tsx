@@ -22,6 +22,7 @@ import {
   arcContentBounds,
   arcGeometries,
   arcHighlight,
+  cancelConnect,
   clampTileScroll,
   connectHandleAt,
   contentPointAt,
@@ -151,7 +152,8 @@ type Props = Readonly<{
  * instead of moving the node. Dropped on another node, the arrow makes that node depend
  * on the one it was drawn from (`dataStore.addDependency`), unless that
  * would be refused — a dependency already there, or a cycle — which the
- * node it is over shows before the drop, and a notice says after it. A
+ * node it is over shows before the drop, and a notice says after it.
+ * Escape gives the arrow up before it is dropped, wherever the focus is. A
  * touch has no pointer to come near with, and so no handle.
  *
  * While the nodes move to their places (`dagLayoutStore.animatedPositions`)
@@ -944,6 +946,36 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
     },
     [showHandle],
   );
+
+  // Escape while an arrow is drawn gives it up. Listened for on the window,
+  // since the focus need not be on the canvas then.
+  const drawingArrow = connecting !== undefined;
+
+  useEffect(() => {
+    if (!drawingArrow) {
+      return undefined;
+    }
+
+    const onEscape = (pressed: KeyboardEvent): void => {
+      if (pressed.key !== 'Escape') {
+        return;
+      }
+
+      pressed.preventDefault();
+
+      mut_gesture.current = cancelConnect(mut_gesture.current);
+
+      setConnecting(undefined);
+
+      showHandle(undefined);
+    };
+
+    addEventListener('keydown', onEscape);
+
+    return () => {
+      removeEventListener('keydown', onEscape);
+    };
+  }, [drawingArrow, showHandle]);
 
   const onPointerLeaveCanvas = useCallback<PointerEventHandler<SVGSVGElement>>(
     (left) => {

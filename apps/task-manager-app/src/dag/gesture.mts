@@ -16,6 +16,10 @@
  * which ends where the pointer lifts. A second finger turns either press
  * into a pinch, which leaves the node where it was and draws nothing. A
  * group's frame, grabbed by its title, is dragged as a node is.
+ *
+ * An arrow being drawn can be given up before it is dropped
+ * ({@link cancelConnect}, on Escape): the rest of that press then draws,
+ * drags and pans nothing, and its release connects nothing.
  */
 
 import { Arr } from 'ts-data-forge';
@@ -116,6 +120,10 @@ export const pointerMove = (
 
   const dragging = gesture.dragging || Math.hypot(dx, dy) > DRAG_THRESHOLD_PX;
 
+  if (start.grab?.kind === 'cancelled') {
+    return { gesture: { ...gesture, pointers }, transform: undefined };
+  }
+
   if (start.grab?.kind === 'connect') {
     return {
       gesture: {
@@ -159,6 +167,26 @@ export const pointerMove = (
   return {
     gesture: { ...gesture, pointers, dragging },
     transform: dragging ? panBy(start.transform, dx, dy) : undefined,
+  };
+};
+
+/**
+ * Gives up the arrow being drawn, or about to be by a press on a handle:
+ * until the pointer lifts it draws nothing, and the click after the release
+ * is swallowed. Anything else is left as it is.
+ */
+export const cancelConnect = (gesture: Gesture): Gesture => {
+  const { start } = gesture;
+
+  if (start?.grab?.kind !== 'connect') {
+    return gesture;
+  }
+
+  return {
+    ...gesture,
+    start: { ...start, grab: CANCELLED },
+    dragging: true,
+    connectDrag: undefined,
   };
 };
 
@@ -220,6 +248,9 @@ export type ConnectGrab = Readonly<{
   anchor: Point;
 }>;
 
+/** A press whose arrow was given up, which a move no longer drags. */
+type Cancelled = Readonly<{ kind: 'cancelled' }>;
+
 /** Where a node or a group's frame being dragged is. */
 export type NodeDrag = Readonly<{
   id: GraphNodeId | GroupKey;
@@ -244,7 +275,7 @@ export type Gesture = DeepReadonly<{
         transform: ViewTransform;
         pointers: TrackedPointer[];
         /** What is being pressed, which a move drags; none for a pinch. */
-        grab: Grab | undefined;
+        grab: Grab | Cancelled | undefined;
       }
     | undefined;
   /** Moved past the threshold, or pinched, since the last press began. */
@@ -252,3 +283,5 @@ export type Gesture = DeepReadonly<{
   nodeDrag: NodeDrag | undefined;
   connectDrag: ConnectDrag | undefined;
 }>;
+
+const CANCELLED: Cancelled = { kind: 'cancelled' } as const;

@@ -109,6 +109,54 @@ test(
   },
 );
 
+test(
+  'gives up an arrow being drawn on Escape',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await showDag(page);
+
+    const from = await edgePoint(dagNode(page, /画面設計/u));
+
+    const to = await centreOf(dagNode(page, /利用者向けドキュメント/u));
+
+    await page.mouse.move(from.x, from.y);
+
+    await page.mouse.down();
+
+    await page.mouse.move(to.x, to.y, { steps: 10 });
+
+    await expect.soft(page.getByTestId('dag-connect')).toHaveCount(1);
+
+    await page.keyboard.press('Escape');
+
+    await expect.soft(page.getByTestId('dag-connect')).toHaveCount(0);
+
+    // Moving on and lifting over the node draws and adds nothing.
+    await page.mouse.move(to.x + 5, to.y + 5, { steps: 3 });
+
+    await expect.soft(page.getByTestId('dag-connect')).toHaveCount(0);
+
+    await page.mouse.up();
+
+    await expect.soft(page.getByTestId('node-dialog')).toBeHidden();
+
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(7);
+
+    expect.soft(await edgeEnds(page)).not.toContain('task:design -> task:docs');
+
+    // The next arrow is drawn as before.
+    await page.mouse.move(from.x, from.y);
+
+    await page.mouse.down();
+
+    await page.mouse.move(to.x, to.y, { steps: 10 });
+
+    await page.mouse.up();
+
+    await expect.soft(page.getByTestId('dag-edge')).toHaveCount(8);
+  },
+);
+
 const showDag = async (page: DeepReadonly<Page>): Promise<void> => {
   await page.goto(DEMO);
 

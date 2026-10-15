@@ -1,4 +1,5 @@
 import {
+  cancelConnect,
   IDLE_GESTURE,
   pointerDown,
   pointerMove,
@@ -290,5 +291,101 @@ describe('drawing an arrow from a handle', () => {
     assert.isUndefined(gesture.connectDrag);
 
     assert.isUndefined(pointerUp(gesture, 2, zoomed).connected);
+  });
+});
+
+describe(cancelConnect, () => {
+  const grab = {
+    kind: 'connect',
+    from: 'task:a',
+    anchor: { x: 100, y: 20 },
+  } as const;
+
+  const pressed = pointerDown(
+    IDLE_GESTURE,
+    { id: 1, x: 10, y: 10 },
+    identity,
+    grab,
+  );
+
+  const drawing = pointerMove(pressed, { id: 1, x: 200, y: 100 }).gesture;
+
+  test('takes the arrow away', () => {
+    assert.isUndefined(cancelConnect(drawing).connectDrag);
+  });
+
+  test('draws nothing more, and neither pans nor drags, while the pointer is still down', () => {
+    const { gesture, transform } = pointerMove(cancelConnect(drawing), {
+      id: 1,
+      x: 300,
+      y: 150,
+    });
+
+    assert.isUndefined(gesture.connectDrag);
+
+    assert.isUndefined(gesture.nodeDrag);
+
+    assert.isUndefined(transform);
+  });
+
+  test('connects nothing when the pointer lifts, and swallows the click after', () => {
+    const moved = pointerMove(cancelConnect(drawing), {
+      id: 1,
+      x: 300,
+      y: 150,
+    }).gesture;
+
+    const { gesture, connected } = pointerUp(moved, 1, identity);
+
+    assert.isUndefined(connected);
+
+    assert.isTrue(gesture.dragging);
+  });
+
+  test('swallows the click after a press on the handle not yet moved', () => {
+    const { gesture, connected } = pointerUp(
+      cancelConnect(pressed),
+      1,
+      identity,
+    );
+
+    assert.isUndefined(connected);
+
+    assert.isTrue(gesture.dragging);
+  });
+
+  test('draws again from the next press', () => {
+    const next = pointerDown(
+      pointerUp(cancelConnect(drawing), 1, identity).gesture,
+      { id: 1, x: 10, y: 10 },
+      identity,
+      grab,
+    );
+
+    assert.isDefined(
+      pointerMove(next, { id: 1, x: 200, y: 100 }).gesture.connectDrag,
+    );
+  });
+
+  test('leaves a node being dragged, a pan, and no press as they are', () => {
+    const nodeDrag = pointerMove(
+      pointerDown(IDLE_GESTURE, { id: 1, x: 10, y: 10 }, identity, {
+        kind: 'node',
+        id: 'task:a',
+        origin: { x: 0, y: 0 },
+      }),
+      { id: 1, x: 200, y: 100 },
+    ).gesture;
+
+    const pan = pointerMove(
+      pointerDown(IDLE_GESTURE, { id: 1, x: 10, y: 10 }, identity),
+      { id: 1, x: 200, y: 100 },
+    ).gesture;
+
+    assert.strictEqual(cancelConnect(nodeDrag), nodeDrag);
+
+    assert.strictEqual(cancelConnect(pan), pan);
+
+    assert.strictEqual(cancelConnect(IDLE_GESTURE), IDLE_GESTURE);
   });
 });
