@@ -659,10 +659,19 @@ a:focus-visible {
  * it holds. The padding keeps the cards' borders off a scroll bar that is
  * always drawn, and the gutter keeps the width the same whether it scrolls or
  * not.
+ *
+ * Positioned, so that it is the containing block of what it holds that is
+ * placed absolutely (`.visually-hidden` among them): a scroll box clips and
+ * scrolls only what has it, or something inside it, for a containing block.
+ * Without, a run's hidden word further down a block than the window reaches
+ * is placed against the page instead, and the page grows to hold it — the
+ * empty space under a page that fills the window, or under the blocks in the
+ * other mode.
  */
 .block-body[data-sized='true'] {
   overflow: auto;
   padding-right: 0.25rem;
+  position: relative;
   scrollbar-gutter: stable;
 }
 
