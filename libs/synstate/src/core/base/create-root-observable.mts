@@ -71,16 +71,6 @@ export const createRootObservable = <
     handle.completeBase();
   };
 
-  // A root without a teardown (`source`, `createState`, `just`) releases
-  // nothing by completing, so a child completing never completes it (#2133).
-  const autoComplete = onComplete !== undefined;
-
-  const tryComplete = (): void => {
-    if (autoComplete && !handle.hasSubscriber() && !handle.hasActiveChild()) {
-      complete();
-    }
-  };
-
   // A root created while an update propagates (inside a `switchMap`
   // projection, say) may emit synchronously while `init` runs, as
   // `fromSubscribable` does for a synchronous source. Nothing is derived from
@@ -113,11 +103,10 @@ export const createRootObservable = <
     depth: 0,
     handle,
     tryUpdate: createTryUpdateNotImplemented,
-    tryComplete,
+    tryComplete: tryCompleteRoot,
     complete,
     // A root has no parents to keep out of it.
     dispose: complete,
-    autoComplete,
     extra: {
       ...extension,
       addDescendant,
@@ -135,6 +124,13 @@ export const createRootObservable = <
  */
 export const writeDuringPropagationWarning =
   'synstate: an observable was written to (next / setState / dispatch) while an update was propagating, so subscribers can see intermediate states. Derive the value with map / combine instead of writing from a subscriber or a projection.';
+
+/**
+ * `tryComplete` is how a completed parent reaches its children. A root has no
+ * parents, and a child completing never completes it (#2133), so only its own
+ * `complete()` ends it.
+ */
+const tryCompleteRoot = (): void => {};
 
 if (import.meta.vitest !== undefined) {
   test('isRootObservable', () => {

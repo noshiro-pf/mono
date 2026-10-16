@@ -9,7 +9,7 @@ import {
 } from '../src/index.mjs';
 
 describe('completing a derived observable', () => {
-  test('does not complete an upstream state that holds no resource (#2133)', () => {
+  test('does not complete an upstream state (#2133)', () => {
     const [count$, setCount] = createState(0);
 
     const doubled$ = count$.pipe(map((x) => x * 2));
@@ -33,7 +33,7 @@ describe('completing a derived observable', () => {
     assert.deepStrictEqual(mut_got, [5, 6]);
   });
 
-  test('does not complete a shared derived observable that holds no resource', () => {
+  test('does not complete a shared derived observable', () => {
     const s = source<number>(0);
 
     const shared$ = s.pipe(map((x) => x + 1));
@@ -57,7 +57,7 @@ describe('completing a derived observable', () => {
     assert.deepStrictEqual(mut_got, [1, 2]);
   });
 
-  test('still stops a root with a teardown once nothing uses it', () => {
+  test('does not complete an unused root with a teardown', () => {
     const counter$ = counter(10, { startManually: true });
 
     const derived$ = counter$.pipe(map((x) => x * 2));
@@ -66,12 +66,16 @@ describe('completing a derived observable', () => {
 
     leaf$.complete();
 
-    assert.isTrue(derived$.isCompleted);
+    assert.isFalse(derived$.isCompleted);
 
-    assert.isTrue(counter$.isCompleted);
+    assert.isFalse(counter$.isCompleted);
+
+    counter$.complete();
+
+    assert.isTrue(derived$.isCompleted);
   });
 
-  test('still stops an operator with a teardown once nothing uses it', () => {
+  test('does not complete an unused operator with a teardown', () => {
     const s = source<number>(0);
 
     const debounced$ = s.pipe(debounce(10));
@@ -80,9 +84,11 @@ describe('completing a derived observable', () => {
 
     leaf$.complete();
 
-    assert.isTrue(debounced$.isCompleted);
+    assert.isFalse(debounced$.isCompleted);
 
     assert.isFalse(s.isCompleted);
+
+    debounced$.complete();
   });
 
   test('does not stop a root with a teardown that is still used', () => {

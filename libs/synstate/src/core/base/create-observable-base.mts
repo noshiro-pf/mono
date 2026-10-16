@@ -447,7 +447,6 @@ type AssembleObservableArgs<
   tryComplete: () => void;
   complete: () => void;
   dispose: () => void;
-  autoComplete: boolean;
   /**
    * Kind-specific public members (`parents`, `addDescendant`) and leaf
    * extensions (`next`, `start`). They are merged here, in the one place the
@@ -478,7 +477,6 @@ export const assembleObservable = <
   tryComplete,
   complete,
   dispose,
-  autoComplete,
   extra,
 }: AssembleObservableArgs<A, Kind, Extra>): Extra &
   ObservableBase<A> &
@@ -531,8 +529,6 @@ export const assembleObservable = <
     hasChild: false,
 
     hasActiveChild: handle.hasActiveChild,
-
-    autoComplete,
 
     tryUpdate,
 

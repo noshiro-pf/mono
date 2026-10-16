@@ -28,12 +28,14 @@ describe('takeUntil releases the notifier', () => {
     assert.isFalse(notifier$.hasSubscriber);
   });
 
-  test('when the downstream completes', () => {
+  test('not when the downstream completes', () => {
     const notifier$ = source<undefined>();
 
     const num$ = source<number>();
 
-    const taken$ = num$.pipe(takeUntil(notifier$)).pipe(take(1));
+    const result$ = num$.pipe(takeUntil(notifier$));
+
+    const taken$ = result$.pipe(take(1));
 
     taken$.subscribe(() => {});
 
@@ -44,7 +46,10 @@ describe('takeUntil releases the notifier', () => {
 
     assert.isTrue(taken$.isCompleted);
 
-    assert.isFalse(notifier$.hasSubscriber);
+    // Completion flows only downstream, so `takeUntil` is still running.
+    assert.isFalse(result$.isCompleted);
+
+    assert.isTrue(notifier$.hasSubscriber);
   });
 
   test('when the notifier emits', () => {
