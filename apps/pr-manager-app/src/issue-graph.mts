@@ -15,7 +15,7 @@
 import { decideStartStates, type StartState } from 'pr-report-core';
 import type { StrictPick } from 'ts-type-forge';
 import type { Entry, IssueItem, ReferencedItem } from './load-report.mjs';
-import { priorityOf, type Priority } from './merge-order-view.mjs';
+import { priorityOf, type Priority } from './priority.mjs';
 
 /**
  * How a node is drawn.

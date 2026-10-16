@@ -13,11 +13,15 @@
  * do is all it lays out. That switch is kept the same way, under its own
  * key, and starts off: the DAG shows everything until told otherwise.
  *
- * The DAG reads every open issue: while it is shown, each page that is
- * left is asked for as soon as the one before has come in, because a graph
- * of the most recently updated thirty draws an edge to an issue it does not
- * list as if that issue declared nothing. A page that failed is not asked
- * for again on its own; the button under the block is still there for that.
+ * Every open issue is read, in either view: the first thirty come with the
+ * report, so that the block has something to show as soon as the rest of
+ * the page does, and each page that is left is asked for as soon as the one
+ * before has come in. The DAG needs all of them, because a graph of the most
+ * recently updated thirty draws an edge to an issue it does not list as if
+ * that issue declared nothing; and the list's priorities and labels
+ * (`issues-list-store.mts`) would otherwise filter and sort a page rather
+ * than what is open. A page that failed is not asked for again on its own;
+ * the button under the block is still there for that.
  *
  * How large the DAG is drawn (`dag-zoom.mts`) starts at the natural size
  * on every visit and is not kept: a zoom is for the graph in front of the
@@ -134,13 +138,9 @@ export const createIssuesViewStore = (
       saving: [],
     };
 
-    const reading = combine([view, deps.issues, deps.moreIssues]).subscribe(
-      ([shown, issues, more]) => {
-        if (
-          shown === 'dag' &&
-          issues.endCursor !== undefined &&
-          more.type === 'idle'
-        ) {
+    const reading = combine([deps.issues, deps.moreIssues]).subscribe(
+      ([issues, more]) => {
+        if (issues.endCursor !== undefined && more.type === 'idle') {
           deps.loadMoreIssues();
         }
       },

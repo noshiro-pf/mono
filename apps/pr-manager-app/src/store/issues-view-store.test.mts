@@ -103,15 +103,11 @@ describe(createIssuesViewStore, () => {
     assert.strictEqual(mut_graphs.length, drawn);
   });
 
-  test('in the DAG, reads every page of the open issues, one page at a time', async () => {
+  test('in either view, reads every page of the open issues, one page at a time', async () => {
     const { store, resolveLoad, setIssues, setMoreIssues, loadMoreCalls } =
       setup();
 
     store.start();
-
-    resolveLoad('dag');
-
-    await settle();
 
     assert.strictEqual(loadMoreCalls(), 0);
 
@@ -129,31 +125,27 @@ describe(createIssuesViewStore, () => {
 
     assert.strictEqual(loadMoreCalls(), 2);
 
+    resolveLoad('dag');
+
+    await settle();
+
+    setMoreIssues({ type: 'loading' });
+
+    setIssues(issueList('page-3'));
+
+    setMoreIssues({ type: 'idle' });
+
+    assert.strictEqual(loadMoreCalls(), 3);
+
     setIssues(issueList(undefined));
 
-    assert.strictEqual(loadMoreCalls(), 2);
-  });
-
-  test('switched to the DAG with pages left, starts reading them', () => {
-    const { store, setIssues, loadMoreCalls } = setup();
-
-    store.start();
-
-    setIssues(issueList('page-1'));
-
-    assert.strictEqual(loadMoreCalls(), 0);
-
-    store.choose('dag');
-
-    assert.strictEqual(loadMoreCalls(), 1);
+    assert.strictEqual(loadMoreCalls(), 3);
   });
 
   test('reads no further on its own after a page failed, or once stopped', () => {
     const { store, setIssues, setMoreIssues, loadMoreCalls } = setup();
 
     const stopStore = store.start();
-
-    store.choose('dag');
 
     setMoreIssues({ type: 'failed', message: 'HTTP 502' });
 

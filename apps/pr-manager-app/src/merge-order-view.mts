@@ -27,17 +27,16 @@
  * ahead / behind bar says. A choice saved while either was one drops it.
  */
 
-import {
-  MERGE_QUEUED_LABEL,
-  PRIORITY_HIGH_LABEL,
-  PRIORITY_LOW_LABEL,
-  PRIORITY_MID_LABEL,
-  type Label,
-  type TreeNode,
-} from 'pr-report-core';
+import { MERGE_QUEUED_LABEL, type TreeNode } from 'pr-report-core';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { Entry, PageSummary } from './load-report.mjs';
+import {
+  PRIORITIES,
+  PRIORITY_RANK,
+  priorityOf,
+  type Priority,
+} from './priority.mjs';
 
 /** Named after the count of {@link PageSummary} each one is. */
 export type StatusFilter = 'queued' | 'failing' | 'setAside' | 'awaitingReview';
@@ -56,16 +55,6 @@ export const STATUS_NAMES = {
   setAside: 'set aside',
   awaitingReview: 'awaiting code owner',
 } as const satisfies ReadonlyRecord<StatusFilter, string>;
-
-export type Priority = 'high' | 'mid' | 'low' | 'none';
-
-/** In the order the switches are drawn. */
-export const PRIORITIES = [
-  'high',
-  'mid',
-  'low',
-  'none',
-] as const satisfies readonly Priority[];
 
 export type MergeOrderSort = 'order' | 'priority';
 
@@ -91,15 +80,6 @@ export const DEFAULT_MERGE_ORDER_VIEW: MergeOrderView = {
 /** The statuses the pull request is counted under, in their own order. */
 export const statusesOf = (entry: Entry): readonly StatusFilter[] =>
   STATUS_FILTERS.filter((filter) => STATUS_TESTS[filter](entry));
-
-/** The one `priority:*` label it carries; none, or several, is `none`. */
-export const priorityOf = (labels: readonly Label[]): Priority => {
-  const carried = PRIORITY_LABELS.filter(([, labelName]) =>
-    labels.some((label) => label.name === labelName),
-  );
-
-  return Arr.isFixedLengthArray(1, carried) ? carried[0][0] : 'none';
-};
 
 export const isShown = (entry: Entry, view: MergeOrderView): boolean =>
   !view.hiddenPriorities.includes(priorityOf(entry.labels)) &&
@@ -380,22 +360,8 @@ const STATUS_TESTS = {
   awaitingReview: (entry) => entry.codeOwnerReview.state === 'required',
 } as const satisfies ReadonlyRecord<StatusFilter, (entry: Entry) => boolean>;
 
-const PRIORITY_LABELS = [
-  ['high', PRIORITY_HIGH_LABEL],
-  ['mid', PRIORITY_MID_LABEL],
-  ['low', PRIORITY_LOW_LABEL],
-] as const satisfies readonly (readonly [Priority, string])[];
-
-/** Lower first. No priority is between mid and low. */
-const PRIORITY_RANK = {
-  high: 0,
-  mid: 1,
-  none: 2,
-  low: 3,
-} as const satisfies ReadonlyRecord<Priority, number>;
-
 /** `all` with `item` flipped in or out of `current`, in the order of `all`. */
-const toggled = <T extends string>(
+export const toggled = <T extends string>(
   all: readonly T[],
   current: readonly T[],
   item: T,
@@ -403,7 +369,7 @@ const toggled = <T extends string>(
   all.filter((each) => (each === item) !== current.includes(each));
 
 /** The names in `all` that `stored` lists, in the order of `all`. */
-const known = <T extends string>(
+export const known = <T extends string>(
   all: readonly T[],
   stored: unknown,
 ): readonly T[] =>

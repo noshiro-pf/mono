@@ -1367,6 +1367,53 @@ a:focus-visible {
 }
 
 /*
+ * The list's priorities, labels and order, laid out as the merge order's
+ * controls are, above the list and under the List / DAG switch.
+ */
+.issues-list-controls {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin: 0 0 0.75rem;
+}
+
+/*
+ * A label is a pick, not a switch for hiding: unpressed is how it starts,
+ * drawn as any chip, and pressed is filled with the accent, as the merge
+ * order's `only` is.
+ */
+.label-pick[aria-pressed='false'] {
+  background: var(--surface);
+  border-style: solid;
+  color: var(--ink-primary);
+  text-decoration: none;
+}
+
+.label-pick[aria-pressed='false'] .filter-chip-count {
+  color: var(--ink-secondary);
+}
+
+.label-pick[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.label-pick[aria-pressed='true'] .filter-chip-count,
+.label-pick[aria-pressed='true'] .count-total {
+  color: inherit;
+}
+
+.label-pick-dot {
+  border: 1px solid var(--hairline);
+  border-radius: 50%;
+  display: inline-block;
+  height: 0.6rem;
+  width: 0.6rem;
+}
+
+/*
  * The colours of where a node stands, as the task manager's DAG has them:
  * green for what can be started, amber and dashed for what waits, blue for
  * what is being worked on, grey for what is over. A tint of the colour
