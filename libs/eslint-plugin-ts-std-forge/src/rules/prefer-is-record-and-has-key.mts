@@ -3,19 +3,17 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import {
+  buildNamedImportFix,
+  getArgumentText,
+  getImportDeclarations,
+  getNamedImports,
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
 import { SafeArray } from 'ts-std-forge';
 import * as ts from 'typescript';
-import {
-  getArgumentText,
-  getValueType,
-  isIdentifierNamed,
-  skipTypeWrappers,
-} from './ast-utils.mjs';
-import {
-  buildImportFixes,
-  getNamedImports,
-  getTsStdForgeImport,
-} from './import-utils.mjs';
+import { getValueType, isIdentifierNamed } from './ast-utils.mjs';
+import { TS_STD_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -44,7 +42,10 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
 
       const program = sourceCode.ast;
 
-      const tsStdForgeImport = getTsStdForgeImport(program);
+      const tsStdForgeImports = getImportDeclarations(
+        program,
+        TS_STD_FORGE_MODULE,
+      );
 
       const checker = sourceCode.parserServices?.program?.getTypeChecker();
 
@@ -139,7 +140,7 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
         },
 
         'Program:exit': () => {
-          const namedImports = getNamedImports(tsStdForgeImport);
+          const namedImports = getNamedImports(tsStdForgeImports);
 
           const rewrites = mut_nodesToFix.map((entry) => ({
             ...entry,
@@ -184,7 +185,12 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
                 // otherwise and only one of them would survive a pass.
                 const importFixes =
                   index === 0 && importsToAdd.length > 0
-                    ? buildImportFixes(fixer, program, importsToAdd)
+                    ? buildNamedImportFix(
+                        fixer,
+                        program,
+                        TS_STD_FORGE_MODULE,
+                        importsToAdd,
+                      )
                     : [];
 
                 return [...importFixes, fixer.replaceText(node, replacement)];

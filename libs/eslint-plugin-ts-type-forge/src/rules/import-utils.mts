@@ -1,41 +1,7 @@
-import {
-  AST_NODE_TYPES,
-  type TSESLint,
-  type TSESTree,
-} from '@typescript-eslint/utils';
+import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
 import { TS_TYPE_FORGE_MODULE } from './constants.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
-
-/** Every `import ... from 'ts-type-forge'` declaration in the file. */
-export const getTsTypeForgeImports = (
-  program: TSESTree.Program,
-): readonly TSESTree.ImportDeclaration[] =>
-  program.body.filter(
-    (node): node is TSESTree.ImportDeclaration =>
-      node.type === AST_NODE_TYPES.ImportDeclaration &&
-      node.source.value === TS_TYPE_FORGE_MODULE,
-  );
-
-/**
- * Returns the in-scope local name a given ts-type-forge export is imported as
- * (handling aliases such as `import type { NonEmptyArray as NEA }` → `'NEA'`),
- * or `undefined` when it is not imported. Used so autofixes reference the
- * binding that actually exists rather than the canonical name.
- */
-export const getImportedLocalName = (
-  importDeclarations: readonly TSESTree.ImportDeclaration[],
-  importedName: string,
-): string | undefined =>
-  importDeclarations
-    .flatMap((declaration) => declaration.specifiers)
-    .find(
-      (specifier) =>
-        specifier.type === AST_NODE_TYPES.ImportSpecifier &&
-        (specifier.imported.type === AST_NODE_TYPES.Identifier
-          ? specifier.imported.name
-          : specifier.imported.value) === importedName,
-    )?.local.name;
 
 /**
  * Whether the file already binds `name` to something that is not the
@@ -44,6 +10,9 @@ export const getImportedLocalName = (
  * `name` must bail out in that case, because the rewritten type would resolve
  * to the wrong declaration. (ts-type-forge's own sources, which declare
  * `NonEmptyArray` themselves, are the motivating example.)
+ *
+ * Not `hasForeignBinding` from eslint-rule-forge: `resolveTypeName` decides
+ * once per file, with no node to read a scope at.
  */
 export const hasConflictingDeclaration = (
   program: TSESTree.Program,
@@ -65,23 +34,6 @@ export const hasConflictingDeclaration = (
       name,
     );
   });
-
-/**
- * Inserts `import { type <name> } from 'ts-type-forge';` at the top of the
- * file. Placement is deliberately naive: prettier-plugin-organize-imports (or
- * any equivalent) merges and sorts it afterwards.
- */
-export const buildTypeImportFix = (
-  fixer: TSESLint.RuleFixer,
-  program: TSESTree.Program,
-  name: string,
-): readonly TSESLint.RuleFix[] =>
-  [
-    fixer.insertTextBefore(
-      program,
-      `import { type ${name} } from '${TS_TYPE_FORGE_MODULE}';\n`,
-    ),
-  ] as const;
 
 const declaresName = (
   node: TSESTree.Node | null | undefined,

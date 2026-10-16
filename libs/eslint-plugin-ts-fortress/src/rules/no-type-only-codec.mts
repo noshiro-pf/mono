@@ -3,11 +3,12 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { getImportDeclarations } from 'eslint-rule-forge';
 import * as path from 'node:path';
 import { Arr } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
+import { TS_FORTRESS_MODULE } from './constants.mjs';
 import { isExportedValueUsed } from './export-usage.mjs';
-import { getTsFortressImports } from './import-utils.mjs';
 import { packageEntryPoints } from './package-entry-points.mjs';
 
 type Options = readonly [
@@ -75,7 +76,9 @@ export const noTypeOnlyCodec: TSESLint.RuleModule<MessageIds, Options> = {
 
     return {
       Program: (program) => {
-        const isTypeOf = buildTypeOfMatcher(getTsFortressImports(program));
+        const isTypeOf = buildTypeOfMatcher(
+          getImportDeclarations(program, TS_FORTRESS_MODULE),
+        );
 
         if (isTypeOf === undefined) {
           return;

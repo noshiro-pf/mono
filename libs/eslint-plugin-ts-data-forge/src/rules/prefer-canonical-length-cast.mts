@@ -4,8 +4,12 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { skipTypeWrappers } from './ast-utils.mjs';
-import { getImportedLocalName, getTsDataForgeImport } from './import-utils.mjs';
+import {
+  getImportDeclarations,
+  getImportedLocalName,
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -143,7 +147,7 @@ export const preferCanonicalLengthCast: TSESLint.RuleModule<
     const sourceCode = context.sourceCode;
 
     const arrLocalName = getImportedLocalName(
-      getTsDataForgeImport(sourceCode.ast),
+      getImportDeclarations(sourceCode.ast, TS_DATA_FORGE_MODULE),
       'Arr',
     );
 

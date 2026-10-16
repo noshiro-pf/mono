@@ -5,13 +5,13 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { skipTypeWrappers } from 'eslint-rule-forge';
 import {
   getTypeImmutability,
   Immutability,
   type ImmutabilityOverrides,
 } from 'is-immutable-type';
 import type { Program, Type, TypeChecker } from 'typescript';
-import { withoutTypeWrappers } from './type-wrapper-layers.mjs';
 
 type MessageId = 'errorStringGeneric';
 
@@ -128,7 +128,7 @@ export const createNoUnsafeAssignmentRule =
         return;
       }
 
-      const sourceNode = withoutTypeWrappers(node.expression);
+      const sourceNode = skipTypeWrappers(node.expression);
 
       const destinationType = checker.getTypeAtLocation(
         parserServices.esTreeNodeToTSNodeMap.get(node.typeAnnotation),

@@ -3,9 +3,9 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
-import { isTypeWrapper, skipTypeWrappers } from '../../ast-utils/index.mjs';
 
 /**
  * Converts a `DeepReadonly` AST node back to the plain node type expected by

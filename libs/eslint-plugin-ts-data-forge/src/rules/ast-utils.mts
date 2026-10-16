@@ -1,81 +1,20 @@
 import {
   AST_NODE_TYPES,
+  ASTUtils,
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import {
+  isTypeWrapper,
+  skipTypeWrappers,
+  typeWrapperLayers,
+} from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
-
-/**
- * `node` with every `as`, `satisfies`, `!` and `<T>` around it taken off: the
- * expression whose value it is. A wrapper changes no value, so a rule judges
- * syntax on this — `xs.length > (0 as number)` compares with the literal `0`
- * — and writes its fix from the original node so the wrapper is kept. A type
- * is another matter: see {@link typeWrapperLayers}. See
- * `docs/writing-lint-rules.md` at the repository root. A copy of
- * `eslint-config-typed`'s `type-wrapper-utils.mts`, since this package is
- * published on its own.
- */
-export const skipTypeWrappers = <N extends TSESTree.Node>(
-  node: N,
-): N | TSESTree.Expression =>
-  isTypeWrapper(node) ? skipTypeWrappers(node.expression) : node;
-
-/**
- * `node` and every expression inside the type wrappers around it, outermost
- * first: `x as A as B` gives `x as A as B`, `x as A` and `x`.
- *
- * A conclusion a rule draws from a type — that a guard always holds, that a
- * value is an array, that `?? 0` is dead — has to hold for the type of every
- * layer. An assertion therefore only ever makes a rule more cautious: one
- * that widens (`x as string | null`) is the author saying the value may be
- * `null`, and is respected; one that narrows (`x!`, `v as string` on an
- * `unknown`) is a claim the checker cannot verify, and the value's own type
- * still decides.
- */
-export const typeWrapperLayers = <N extends TSESTree.Node>(
-  node: N,
-): readonly (N | TSESTree.Expression)[] =>
-  isTypeWrapper(node)
-    ? ([node, ...typeWrapperLayers(node.expression)] as const)
-    : ([node] as const);
-
-export const isTypeWrapper = (
-  node: DeepReadonly<TSESTree.Node>,
-): node is TypeWrapper => TYPE_WRAPPERS.has(node.type);
-
-export type TypeWrapper =
-  | TSESTree.TSAsExpression
-  | TSESTree.TSNonNullExpression
-  | TSESTree.TSSatisfiesExpression
-  | TSESTree.TSTypeAssertion;
-
-const TYPE_WRAPPERS: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.TSAsExpression,
-  AST_NODE_TYPES.TSNonNullExpression,
-  AST_NODE_TYPES.TSSatisfiesExpression,
-  AST_NODE_TYPES.TSTypeAssertion,
-]);
 
 const isIntegerLiteral = (node: DeepReadonly<TSESTree.Expression>): boolean =>
   node.type === AST_NODE_TYPES.Literal &&
   typeof node.value === 'number' &&
   Number.isInteger(node.value);
-
-/**
- * The source text of `node` for an argument position. A node's text never
- * includes the parentheses the source wrote around it, so a comma (sequence)
- * expression gets them back rather than spilling into the next argument.
- */
-export const toArgumentText = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceCode: TSESLint.SourceCode,
-): string => {
-  const text = sourceCode.getText(node);
-
-  return node.type === AST_NODE_TYPES.SequenceExpression ? `(${text})` : text;
-};
 
 /**
  * Whether `node` is an array or a tuple at every layer of type wrappers (see
@@ -135,9 +74,9 @@ export const isIntegerLiteralOrConstant = (
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   const scope = sourceCode.getScope(node as TSESTree.Node);
 
-  const variable = findVariable(scope, node.name);
+  const variable = ASTUtils.findVariable(scope, node.name);
 
-  if (variable === undefined) {
+  if (variable === null) {
     return false;
   }
 
@@ -309,16 +248,3 @@ const isVariableDefinition = (
   def: TSESLint.Scope.Definition,
 ): def is TSESLint.Scope.Definition & VariableDefinition =>
   (def.type as string) === 'Variable';
-
-const findVariable = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  scope: TSESLint.Scope.Scope,
-  name: string,
-): TSESLint.Scope.Variable | undefined => {
-  const variable = scope.set.get(name);
-
-  return (
-    variable ??
-    (scope.upper === null ? undefined : findVariable(scope.upper, name))
-  );
-};

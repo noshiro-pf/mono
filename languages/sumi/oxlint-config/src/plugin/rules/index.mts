@@ -22,4 +22,3 @@ export * from './no-using.mjs';
 export * from './prefer-arrow-function.mjs';
 export * from './require-as-const.mjs';
 export * from './require-readonly-type.mjs';
-export * from './skip-type-wrappers.mjs';

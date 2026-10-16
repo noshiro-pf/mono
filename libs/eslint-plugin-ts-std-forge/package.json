@@ -57,6 +57,7 @@
   },
   "dependencies": {
     "@typescript-eslint/utils": "^8.71.1",
+    "eslint-rule-forge": "workspace:^",
     "ts-std-forge": "workspace:*",
     "ts-type-forge": "workspace:~"
   },

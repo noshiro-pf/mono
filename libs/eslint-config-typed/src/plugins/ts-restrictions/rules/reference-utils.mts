@@ -3,8 +3,8 @@ import {
   ASTUtils,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
-import { isTypeWrapper, skipTypeWrappers } from '../../ast-utils/index.mjs';
 
 /**
  * Whether two expressions name the same variable or property, as `x.y` and

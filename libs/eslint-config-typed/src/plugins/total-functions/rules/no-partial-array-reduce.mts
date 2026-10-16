@@ -3,14 +3,11 @@ import {
   ESLintUtils,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { skipTypeWrappers, typeWrapperLayers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import { isTupleType, isTupleTypeReference, unionTypeParts } from 'tsutils';
 import type { Type } from 'typescript';
 import { createRule } from './common.mjs';
-import {
-  typeWrapperLayers,
-  withoutTypeWrappers,
-} from './type-wrapper-layers.mjs';
 
 /**
  * An ESLint rule to ban partial Array.prototype.reduce().
@@ -52,13 +49,13 @@ export const noPartialArrayReduce = createRule({
         // `xs.reduce!(f)` and `(xs.reduce satisfies unknown)(f)` call the
         // same method.
 
-        const callee = withoutTypeWrappers(node.callee);
+        const callee = skipTypeWrappers(node.callee);
 
         if (callee.type !== AST_NODE_TYPES.MemberExpression) {
           return;
         }
 
-        const object = withoutTypeWrappers(callee.object);
+        const object = skipTypeWrappers(callee.object);
 
         // Non-empty array literal are safe.
 

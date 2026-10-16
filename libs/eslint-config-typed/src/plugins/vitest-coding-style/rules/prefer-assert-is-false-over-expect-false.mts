@@ -3,9 +3,9 @@ import {
   ESLintUtils,
   type TSESLint,
 } from '@typescript-eslint/utils';
+import { getArgumentText, skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
-import { argumentText, withoutTypeWrappers } from './type-wrappers.mjs';
 import { getVitestReceiver } from './vitest-binding.mjs';
 
 type MessageIds = 'preferAssertIsFalseOverExpectFalse';
@@ -43,13 +43,13 @@ export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
 
     return {
       CallExpression: (node) => {
-        const callee = withoutTypeWrappers(node.callee);
+        const callee = skipTypeWrappers(node.callee);
 
         if (callee.type !== AST_NODE_TYPES.MemberExpression) {
           return;
         }
 
-        const expectCall = withoutTypeWrappers(callee.object);
+        const expectCall = skipTypeWrappers(callee.object);
 
         const [rawExpected] = node.arguments;
 
@@ -57,7 +57,7 @@ export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
           rawExpected === undefined ||
           rawExpected.type === AST_NODE_TYPES.SpreadElement
             ? rawExpected
-            : withoutTypeWrappers(rawExpected);
+            : skipTypeWrappers(rawExpected);
 
         if (
           expectCall.type === AST_NODE_TYPES.CallExpression &&
@@ -84,7 +84,7 @@ export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
           }
 
           const argText =
-            arg === undefined ? '' : argumentText(context.sourceCode.text, arg);
+            arg === undefined ? '' : getArgumentText(context.sourceCode, arg);
 
           context.report({
             node,

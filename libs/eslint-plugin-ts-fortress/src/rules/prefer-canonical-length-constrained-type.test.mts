@@ -165,6 +165,36 @@ describe('prefer-canonical-length-constrained-type', () => {
           errors: [{ messageId: 'useCanonicalType' }],
         },
         {
+          name: 'reads the namespace object through a type wrapper',
+          code: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = (t as typeof t).minLengthArray(1, t.string());
+          `,
+          output: dedent`
+            import * as t from 'ts-fortress';
+
+            const T = (t as typeof t).nonEmptyArray(t.string());
+          `,
+          errors: [{ messageId: 'useCanonicalType' }],
+        },
+        {
+          name: 'reads a namespace import from a second declaration',
+          code: dedent`
+            import type { Type } from 'ts-fortress';
+            import * as t from 'ts-fortress';
+
+            const T = t.minLengthArray(1, t.string());
+          `,
+          output: dedent`
+            import type { Type } from 'ts-fortress';
+            import * as t from 'ts-fortress';
+
+            const T = t.nonEmptyArray(t.string());
+          `,
+          errors: [{ messageId: 'useCanonicalType' }],
+        },
+        {
           name: 'keeps a typeName-only options object',
           code: dedent`
             import * as t from 'ts-fortress';
@@ -394,9 +424,7 @@ describe('prefer-canonical-length-constrained-type', () => {
             const C = boundedLengthTuple(0, 5, string());
           `,
           output: dedent`
-            import { nonEmptyArray } from 'ts-fortress';
-            import { fixedLengthTuple } from 'ts-fortress';
-            import { maxLengthTuple } from 'ts-fortress';
+            import { nonEmptyArray, fixedLengthTuple, maxLengthTuple } from 'ts-fortress';
             import { boundedLengthTuple, minLengthArray, string } from 'ts-fortress';
 
             const A = nonEmptyArray(string());

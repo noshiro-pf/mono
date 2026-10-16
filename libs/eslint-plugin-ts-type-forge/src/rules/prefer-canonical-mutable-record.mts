@@ -3,16 +3,17 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import {
+  getImportDeclarations,
+  getImportedLocalName,
+  isLocallyBound,
+} from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
-import { isLocallyBound } from './ast-utils.mjs';
+import { TS_TYPE_FORGE_MODULE } from './constants.mjs';
 import {
   DEFAULT_IMPORT_STYLE,
   IMPORT_STYLE_SCHEMA_PROPERTY,
 } from './import-style.mjs';
-import {
-  getImportedLocalName,
-  getTsTypeForgeImports,
-} from './import-utils.mjs';
 import { reportTypeRewrites, type TypeRewrite } from './rewrite-rule-utils.mjs';
 
 type Options = readonly [
@@ -69,7 +70,10 @@ export const preferCanonicalMutableRecord: TSESLint.RuleModule<
 
     const sourceCode = context.sourceCode;
 
-    const tsTypeForgeImports = getTsTypeForgeImports(sourceCode.ast);
+    const tsTypeForgeImports = getImportDeclarations(
+      sourceCode.ast,
+      TS_TYPE_FORGE_MODULE,
+    );
 
     /**
      * Whether this reference denotes the ts-type-forge type `canonicalName` —

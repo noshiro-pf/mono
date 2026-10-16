@@ -3,12 +3,13 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { skipTypeWrappers } from './ast-utils.mjs';
 import {
-  buildImportFixes,
+  buildNamedImportFix,
+  getImportDeclarations,
   getNamedImports,
-  getTsStdForgeImport,
-} from './import-utils.mjs';
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
+import { TS_STD_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -34,7 +35,10 @@ export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
 
     const program = sourceCode.ast;
 
-    const tsStdForgeImport = getTsStdForgeImport(program);
+    const tsStdForgeImports = getImportDeclarations(
+      program,
+      TS_STD_FORGE_MODULE,
+    );
 
     const mut_nodesToFix: {
       node: TSESTree.LogicalExpression;
@@ -53,7 +57,7 @@ export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
       },
       'Program:exit': () => {
         const hasIsNonNullObjectImport =
-          getNamedImports(tsStdForgeImport).includes('isNonNullObject');
+          getNamedImports(tsStdForgeImports).includes('isNonNullObject');
 
         // The import fix lives on the first report only:
         // `insertTextBefore(program, …)` produces overlapping ranges
@@ -72,7 +76,9 @@ export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
 
               const importFixes =
                 index === 0 && !hasIsNonNullObjectImport
-                  ? buildImportFixes(fixer, program, ['isNonNullObject'])
+                  ? buildNamedImportFix(fixer, program, TS_STD_FORGE_MODULE, [
+                      'isNonNullObject',
+                    ])
                   : [];
 
               return [...importFixes, fixer.replaceText(node, replacement)];

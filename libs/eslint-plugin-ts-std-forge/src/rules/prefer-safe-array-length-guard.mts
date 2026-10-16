@@ -3,17 +3,16 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import type { ReadonlyRecord } from 'ts-type-forge';
 import {
+  buildNamedImportFix,
   getArgumentText,
-  getValueType,
-  skipTypeWrappers,
-} from './ast-utils.mjs';
-import {
-  buildImportFixes,
+  getImportDeclarations,
   getNamedImports,
-  getTsStdForgeImport,
-} from './import-utils.mjs';
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
+import { getValueType } from './ast-utils.mjs';
+import { TS_STD_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -82,7 +81,10 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
 
     const program = sourceCode.ast;
 
-    const tsStdForgeImport = getTsStdForgeImport(program);
+    const tsStdForgeImports = getImportDeclarations(
+      program,
+      TS_STD_FORGE_MODULE,
+    );
 
     const checker = sourceCode.parserServices?.program?.getTypeChecker();
 
@@ -130,7 +132,7 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
       },
       'Program:exit': () => {
         const hasSafeArrayImport =
-          getNamedImports(tsStdForgeImport).includes('SafeArray');
+          getNamedImports(tsStdForgeImports).includes('SafeArray');
 
         // The import fix lives on the first report only:
         // `insertTextBefore(program, …)` produces overlapping ranges
@@ -155,7 +157,9 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
 
               const importFixes =
                 index === 0 && !hasSafeArrayImport
-                  ? buildImportFixes(fixer, program, ['SafeArray'])
+                  ? buildNamedImportFix(fixer, program, TS_STD_FORGE_MODULE, [
+                      'SafeArray',
+                    ])
                   : [];
 
               return [...importFixes, fixer.replaceText(node, replacement)];

@@ -4,8 +4,8 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { skipTypeWrappers } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
-import { skipTypeWrappers } from '../../ast-utils/index.mjs';
 import {
   createIsArrayOrTupleType,
   matchArrayFromCall,

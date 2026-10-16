@@ -3,9 +3,9 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { getImportDeclarations, hasForeignBinding } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import { TS_FORTRESS_MODULE } from './constants.mjs';
-import { getTsFortressImports, hasForeignBinding } from './import-utils.mjs';
 
 type Options = readonly [
   Readonly<{
@@ -91,7 +91,10 @@ export const preferNamespaceImport: TSESLint.RuleModule<MessageIds, Options> = {
       // has to see every ts-fortress import at once to know whether there is a
       // namespace to merge into, and which declaration becomes it.
       'Program:exit': () => {
-        const declarations = getTsFortressImports(sourceCode.ast);
+        const declarations = getImportDeclarations(
+          sourceCode.ast,
+          TS_FORTRESS_MODULE,
+        );
 
         const reported = declarations.filter(
           (declaration) => !isNamespaceOnly(declaration),
@@ -299,7 +302,7 @@ const buildReferenceRewrite = (
     identifier.type !== AST_NODE_TYPES.Identifier ||
     // The namespace name has to mean the namespace import at every site the fix
     // writes it; a binding of the same name in scope would capture it instead.
-    hasForeignBinding(sourceCode, identifier, namespaceName)
+    hasForeignBinding(sourceCode, identifier, namespaceName, TS_FORTRESS_MODULE)
   ) {
     return undefined;
   }

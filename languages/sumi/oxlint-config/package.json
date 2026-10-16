@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "@typescript-eslint/utils": "^8.71.1",
+    "eslint-rule-forge": "workspace:*",
     "oxlint": "catalog:",
     "oxlint-tsgolint": "catalog:",
     "ts-data-forge": "workspace:*",

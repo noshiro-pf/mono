@@ -4,9 +4,9 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { isTypeWrapper, skipTypeWrappers } from '../../ast-utils/index.mjs';
 import { jsxValuePositionOf, type JsxValuePosition } from './jsx-utils.mjs';
 
 type Options = readonly [];

@@ -4,15 +4,14 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
-  getRangeWithParens,
-  isIdentifierNamed,
-  skipTypeWrappers,
-} from './ast-utils.mjs';
-import {
-  buildImportFixes,
+  buildNamedImportFix,
+  getImportDeclarations,
   getNamedImports,
-  getTsStdForgeImport,
-} from './import-utils.mjs';
+  getRangeWithParens,
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
+import { isIdentifierNamed } from './ast-utils.mjs';
+import { TS_STD_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -39,7 +38,10 @@ export const preferSafeArrayIsArray: TSESLint.RuleModule<MessageIds, Options> =
 
       const program = sourceCode.ast;
 
-      const tsStdForgeImport = getTsStdForgeImport(program);
+      const tsStdForgeImports = getImportDeclarations(
+        program,
+        TS_STD_FORGE_MODULE,
+      );
 
       const mut_nodesToFix: TSESTree.CallExpression[] = [];
 
@@ -53,7 +55,7 @@ export const preferSafeArrayIsArray: TSESLint.RuleModule<MessageIds, Options> =
         },
         'Program:exit': () => {
           const hasSafeArrayImport =
-            getNamedImports(tsStdForgeImport).includes('SafeArray');
+            getNamedImports(tsStdForgeImports).includes('SafeArray');
 
           // The import fix lives on the first report only:
           // `insertTextBefore(program, …)` produces overlapping ranges
@@ -67,7 +69,9 @@ export const preferSafeArrayIsArray: TSESLint.RuleModule<MessageIds, Options> =
               fix: (fixer) => {
                 const importFixes =
                   index === 0 && !hasSafeArrayImport
-                    ? buildImportFixes(fixer, program, ['SafeArray'])
+                    ? buildNamedImportFix(fixer, program, TS_STD_FORGE_MODULE, [
+                        'SafeArray',
+                      ])
                     : [];
 
                 // Only the callee is replaced, type wrappers included, along

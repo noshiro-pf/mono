@@ -3,14 +3,15 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import {
+  buildNamedImportFix,
+  getImportDeclarations,
+  getNamedImports,
+  typeWrapperLayers,
+} from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
-import { typeWrapperLayers } from './ast-utils.mjs';
-import {
-  buildImportFixes,
-  getNamedImports,
-  getTsDataForgeImport,
-} from './import-utils.mjs';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -39,7 +40,10 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
 
       const program = sourceCode.ast;
 
-      const tsDataForgeImport = getTsDataForgeImport(program);
+      const tsDataForgeImports = getImportDeclarations(
+        program,
+        TS_DATA_FORGE_MODULE,
+      );
 
       const services = sourceCode.parserServices;
 
@@ -141,7 +145,7 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
         },
 
         'Program:exit': () => {
-          const namedImports = getNamedImports(tsDataForgeImport);
+          const namedImports = getNamedImports(tsDataForgeImports);
 
           const rewrites = mut_nodesToFix.map((entry) => ({
             ...entry,
@@ -186,10 +190,10 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
                 // otherwise and only one of them would survive a pass.
                 const importFixes =
                   index === 0 && importsToAdd.length > 0
-                    ? buildImportFixes(
+                    ? buildNamedImportFix(
                         fixer,
                         program,
-                        tsDataForgeImport,
+                        TS_DATA_FORGE_MODULE,
                         importsToAdd,
                       )
                     : [];

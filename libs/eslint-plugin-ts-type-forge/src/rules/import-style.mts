@@ -1,10 +1,7 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { getImportDeclarations, getImportedLocalName } from 'eslint-rule-forge';
 import { TS_TYPE_FORGE_MODULE } from './constants.mjs';
-import {
-  getImportedLocalName,
-  getTsTypeForgeImports,
-  hasConflictingDeclaration,
-} from './import-utils.mjs';
+import { hasConflictingDeclaration } from './import-utils.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
@@ -46,7 +43,7 @@ export const resolveTypeName = (
   importStyle: ImportStyle,
 ): Readonly<{ localName: string; needsImport: boolean }> | undefined => {
   const importedLocalName = getImportedLocalName(
-    getTsTypeForgeImports(program),
+    getImportDeclarations(program, TS_TYPE_FORGE_MODULE),
     canonicalName,
   );
 

@@ -3022,6 +3022,9 @@ importers:
       '@typescript-eslint/utils':
         specifier: ^8.71.1
         version: 8.71.1(eslint@10.12.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      eslint-rule-forge:
+        specifier: workspace:*
+        version: link:../../../libs/eslint-rule-forge
       oxlint:
         specifier: 'catalog:'
         version: 1.87.0(oxlint-tsgolint@7.0.2003)
@@ -3251,6 +3254,9 @@ importers:
       eslint-plugin-unicorn:
         specifier: ^77.0.0
         version: 77.0.0(eslint@10.12.0(jiti@2.7.0)(supports-color@7.2.0))
+      eslint-rule-forge:
+        specifier: workspace:^
+        version: link:../eslint-rule-forge
       globals:
         specifier: ^17.13.0
         version: 17.13.0
@@ -3369,6 +3375,9 @@ importers:
       eslint:
         specifier: '>=9.0.0'
         version: 10.12.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-rule-forge:
+        specifier: workspace:^
+        version: link:../eslint-rule-forge
       ts-data-forge:
         specifier: workspace:*
         version: link:../ts-data-forge
@@ -3418,6 +3427,9 @@ importers:
       eslint:
         specifier: '>=9.0.0'
         version: 10.12.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-rule-forge:
+        specifier: workspace:^
+        version: link:../eslint-rule-forge
       ts-data-forge:
         specifier: workspace:~
         version: link:../ts-data-forge
@@ -3470,6 +3482,9 @@ importers:
       eslint:
         specifier: '>=9.0.0'
         version: 10.12.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-rule-forge:
+        specifier: workspace:^
+        version: link:../eslint-rule-forge
       ts-std-forge:
         specifier: workspace:*
         version: link:../ts-std-forge
@@ -3519,6 +3534,9 @@ importers:
       eslint:
         specifier: '>=9.0.0'
         version: 10.12.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-rule-forge:
+        specifier: workspace:^
+        version: link:../eslint-rule-forge
       ts-data-forge:
         specifier: workspace:~
         version: link:../ts-data-forge
@@ -3556,6 +3574,52 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.9)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
+
+  libs/eslint-rule-forge:
+    dependencies:
+      '@typescript-eslint/utils':
+        specifier: ^8.71.1
+        version: 8.71.1(eslint@10.12.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      ts-type-forge:
+        specifier: workspace:~
+        version: link:../ts-type-forge
+      typescript:
+        specifier: '>=5.0.0 <7.0.0'
+        version: 6.0.3
+    devDependencies:
+      '@typescript-eslint/rule-tester':
+        specifier: 'catalog:'
+        version: 8.71.1(eslint@10.12.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      dedent:
+        specifier: 'catalog:'
+        version: 1.7.2(babel-plugin-macros@3.1.0)
+      eslint:
+        specifier: 'catalog:'
+        version: 10.12.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.9
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.9)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.9)
+      ts-data-forge:
+        specifier: workspace:*
+        version: link:../ts-data-forge
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils

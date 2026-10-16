@@ -3,10 +3,10 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import type * as ts from 'typescript';
-import { skipTypeWrappers } from '../../ast-utils/index.mjs';
 
 type Options = readonly [
   Readonly<{

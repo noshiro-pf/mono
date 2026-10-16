@@ -1,6 +1,6 @@
 import { type TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { isTypeWrapper, type TypeWrapper } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
-import { isTypeWrapper, type TypeWrapper } from '../../ast-utils/index.mjs';
 
 type MessageIds = 'non-tree-shakable-access';
 
@@ -70,9 +70,10 @@ const checkModuleNamespaceUsage = (
 
 /** `node`, or the outermost of the type wrappers directly around it. */
 const outermostTypeWrapper = (
-  node:
-    DeepReadonly<TSESTree.Identifier | TSESTree.JSXIdentifier> | TypeWrapper,
-): DeepReadonly<TSESTree.Identifier | TSESTree.JSXIdentifier> | TypeWrapper =>
+  node: DeepReadonly<
+    TSESTree.Identifier | TSESTree.JSXIdentifier | TypeWrapper
+  >,
+): DeepReadonly<TSESTree.Identifier | TSESTree.JSXIdentifier | TypeWrapper> =>
   isTypeWrapper(node.parent) ? outermostTypeWrapper(node.parent) : node;
 
 const isTreeShakingSafeReference = (

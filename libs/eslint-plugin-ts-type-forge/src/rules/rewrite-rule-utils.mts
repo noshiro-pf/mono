@@ -1,7 +1,8 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { buildNamedImportFix } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
+import { TS_TYPE_FORGE_MODULE } from './constants.mjs';
 import { resolveTypeName, type ImportStyle } from './import-style.mjs';
-import { buildTypeImportFix } from './import-utils.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
@@ -57,7 +58,9 @@ export const reportTypeRewrites = <MessageIds extends string>(
         Arr.toPushed(
           index === 0
             ? importNames.flatMap((name) =>
-                buildTypeImportFix(fixer, program, name),
+                buildNamedImportFix(fixer, program, TS_TYPE_FORGE_MODULE, [
+                  `type ${name}`,
+                ]),
               )
             : [],
           fixer.replaceText(rewrite.node, replacement),

@@ -1,8 +1,8 @@
 import { ESLintUtils } from '@typescript-eslint/utils';
+import { typeWrapperLayers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import { createRule } from './common.mjs';
 import { fpTsEffectType } from './fp-ts.mjs';
-import { typeWrapperLayers } from './type-wrapper-layers.mjs';
 
 /**
  * An ESLint rule to ban interpretation (execution) of fp-ts effects.

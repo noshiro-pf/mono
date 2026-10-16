@@ -3,19 +3,18 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import {
+  buildNamedImportFix,
+  getArgumentText,
+  getImportDeclarations,
+  getNamedImports,
+  skipTypeWrappers,
+  typeWrapperLayers,
+} from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import * as ts from 'typescript';
-import {
-  skipTypeWrappers,
-  toArgumentText,
-  typeWrapperLayers,
-} from './ast-utils.mjs';
-import {
-  buildImportFixes,
-  getNamedImports,
-  getTsDataForgeImport,
-} from './import-utils.mjs';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -179,7 +178,10 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
 
     const program = sourceCode.ast;
 
-    const tsDataForgeImport = getTsDataForgeImport(program);
+    const tsDataForgeImports = getImportDeclarations(
+      program,
+      TS_DATA_FORGE_MODULE,
+    );
 
     const services = sourceCode.parserServices;
 
@@ -343,10 +345,9 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
         mut_lastReads,
       );
 
-      const arrayText = toArgumentText(
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      const arrayText = getArgumentText(
+        sourceCode, // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (call.callee as TSESTree.MemberExpression).object,
-        sourceCode,
       );
 
       // A node's text never includes the parentheses the source put around it:
@@ -358,7 +359,7 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
           ? `(${elementText})`
           : elementText;
 
-      return `Arr.scan(${arrayText}, (${parameterText}) => ${bodyText}, ${toArgumentText(seed, sourceCode)})`;
+      return `Arr.scan(${arrayText}, (${parameterText}) => ${bodyText}, ${getArgumentText(sourceCode, seed)})`;
     };
 
     /**
@@ -493,7 +494,8 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
       // been seen by the time its `map` is judged, whichever order the traversal
       // reached them in.
       'Program:exit': () => {
-        const hasArrImport = getNamedImports(tsDataForgeImport).includes('Arr');
+        const hasArrImport =
+          getNamedImports(tsDataForgeImports).includes('Arr');
 
         // The import is inserted once per pass: two fixes writing the same
         // insertion point would otherwise produce it twice.
@@ -514,9 +516,12 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
                 ? undefined
                 : (fixer) => [
                     ...(call === mut_importNeededBy
-                      ? buildImportFixes(fixer, program, tsDataForgeImport, [
-                          'Arr',
-                        ])
+                      ? buildNamedImportFix(
+                          fixer,
+                          program,
+                          TS_DATA_FORGE_MODULE,
+                          ['Arr'],
+                        )
                       : []),
                     fixer.replaceText(call, replacement),
                   ],

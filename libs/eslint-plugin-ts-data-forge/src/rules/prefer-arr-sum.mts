@@ -3,18 +3,17 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import {
+  buildNamedImportFix,
+  getArgumentText,
+  getImportDeclarations,
+  getNamedImports,
+  skipTypeWrappers,
+  typeWrapperLayers,
+} from 'eslint-rule-forge';
 import { Arr, pipe } from 'ts-data-forge';
 import type { TypeReference } from 'typescript';
-import {
-  skipTypeWrappers,
-  toArgumentText,
-  typeWrapperLayers,
-} from './ast-utils.mjs';
-import {
-  buildImportFixes,
-  getNamedImports,
-  getTsDataForgeImport,
-} from './import-utils.mjs';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -41,7 +40,10 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
 
     const program = sourceCode.ast;
 
-    const tsDataForgeImport = getTsDataForgeImport(program);
+    const tsDataForgeImports = getImportDeclarations(
+      program,
+      TS_DATA_FORGE_MODULE,
+    );
 
     const services = context.sourceCode.parserServices;
 
@@ -264,14 +266,14 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
         }
       },
       'Program:exit': () => {
-        const namedImports = getNamedImports(tsDataForgeImport);
+        const namedImports = getNamedImports(tsDataForgeImports);
 
         const hasArrImport = namedImports.includes('Arr');
 
         for (const [index, nodeInfo] of mut_nodesToFix.entries()) {
-          const arrayText = toArgumentText(
-            nodeInfo.arrayExpression,
+          const arrayText = getArgumentText(
             sourceCode,
+            nodeInfo.arrayExpression,
           );
 
           context.report({
@@ -289,7 +291,9 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
 
               const importFixes =
                 index === 0 && !hasArrImport
-                  ? buildImportFixes(fixer, program, tsDataForgeImport, ['Arr'])
+                  ? buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
+                      'Arr',
+                    ])
                   : [];
 
               return [

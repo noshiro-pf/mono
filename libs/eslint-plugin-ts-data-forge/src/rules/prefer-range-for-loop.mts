@@ -3,13 +3,15 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { Arr } from 'ts-data-forge';
-import { skipTypeWrappers, toArgumentText } from './ast-utils.mjs';
 import {
-  buildImportFixes,
+  buildNamedImportFix,
+  getArgumentText,
+  getImportDeclarations,
   getNamedImports,
-  getTsDataForgeImport,
-} from './import-utils.mjs';
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
+import { Arr } from 'ts-data-forge';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -35,7 +37,10 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
 
     const program = sourceCode.ast;
 
-    const tsDataForgeImport = getTsDataForgeImport(program);
+    const tsDataForgeImports = getImportDeclarations(
+      program,
+      TS_DATA_FORGE_MODULE,
+    );
 
     const mut_nodesToFix: {
       node: TSESTree.ForStatement;
@@ -128,15 +133,15 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
             }
           } else {
             // Variable step like i += step
-            mut_step = toArgumentText(node.update.right, sourceCode);
+            mut_step = getArgumentText(sourceCode, node.update.right);
           }
         } else {
           return;
         }
 
-        const beginText = toArgumentText(beginExpr, sourceCode);
+        const beginText = getArgumentText(sourceCode, beginExpr);
 
-        const endText = toArgumentText(endExpr, sourceCode);
+        const endText = getArgumentText(sourceCode, endExpr);
 
         mut_nodesToFix.push({
           node,
@@ -147,7 +152,7 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
         });
       },
       'Program:exit': () => {
-        const namedImports = getNamedImports(tsDataForgeImport);
+        const namedImports = getNamedImports(tsDataForgeImports);
 
         const hasRangeImport = namedImports.includes('range');
 
@@ -175,7 +180,7 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
 
               const importFixes =
                 index === 0 && !hasRangeImport
-                  ? buildImportFixes(fixer, program, tsDataForgeImport, [
+                  ? buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
                       'range',
                     ])
                   : [];

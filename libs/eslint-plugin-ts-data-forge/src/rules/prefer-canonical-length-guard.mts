@@ -3,9 +3,14 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import {
+  getArgumentText,
+  getImportDeclarations,
+  getImportedLocalName,
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
 import type { MutableRecord, ReadonlyRecord } from 'ts-type-forge';
-import { skipTypeWrappers, toArgumentText } from './ast-utils.mjs';
-import { getImportedLocalName, getTsDataForgeImport } from './import-utils.mjs';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 import { preferArrIsBoundedLengthArray } from './prefer-arr-is-bounded-length-array.mjs';
 import { preferArrIsFixedLengthArray } from './prefer-arr-is-fixed-length-array.mjs';
 import { preferArrIsMaxLengthArray } from './prefer-arr-is-max-length-array.mjs';
@@ -117,7 +122,7 @@ export const preferCanonicalLengthGuard: TSESLint.RuleModule<
     const sourceCode = context.sourceCode;
 
     const arrLocalName = getImportedLocalName(
-      getTsDataForgeImport(sourceCode.ast),
+      getImportDeclarations(sourceCode.ast, TS_DATA_FORGE_MODULE),
       'Arr',
     );
 
@@ -154,7 +159,7 @@ export const preferCanonicalLengthGuard: TSESLint.RuleModule<
             return;
           }
 
-          const arrayText = toArgumentText(array, sourceCode);
+          const arrayText = getArgumentText(sourceCode, array);
 
           context.report({
             node,

@@ -3,6 +3,7 @@ import {
   ESLintUtils,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { skipTypeWrappers, typeWrapperLayers } from 'eslint-rule-forge';
 import {
   isTypeAssignableToString,
   isTypeFlagSet,
@@ -10,10 +11,6 @@ import {
 } from 'tsutils';
 import { type Type, TypeFlags } from 'typescript';
 import { createRule } from './common.mjs';
-import {
-  typeWrapperLayers,
-  withoutTypeWrappers,
-} from './type-wrapper-layers.mjs';
 
 /**
  * An ESLint rule to ban partial String.prototype.normalize().
@@ -53,7 +50,7 @@ export const noPartialStringNormalize = createRule({
         // `s.normalize!(f)` and `(s.normalize satisfies unknown)(f)` call the
         // same method.
 
-        const callee = withoutTypeWrappers(node.callee);
+        const callee = skipTypeWrappers(node.callee);
 
         if (callee.type !== AST_NODE_TYPES.MemberExpression) {
           return;
@@ -121,7 +118,7 @@ export const noPartialStringNormalize = createRule({
         const argument =
           rawArgument.type === AST_NODE_TYPES.SpreadElement
             ? rawArgument
-            : withoutTypeWrappers(rawArgument);
+            : skipTypeWrappers(rawArgument);
 
         const safeValues = new Set(['NFC', 'NFD', 'NFKC', 'NFKD']);
 
