@@ -337,6 +337,43 @@ describe(createIssuesViewStore, () => {
     assert.isFalse(store.dagFitted.getSnapshot().value);
   });
 
+  test('the fit arranges what has no edge for the box, a zoom keeps that arrangement, and 100% puts the default back', () => {
+    const { store, setIssues } = setup();
+
+    setIssues({
+      items: [
+        issueItem(1, []),
+        issueItem(2, [1]),
+        ...Array.from({ length: 12 }, (_, index) => issueItem(index + 3, [])),
+      ],
+      totalCount: 14,
+      endCursor: undefined,
+      referenced: [],
+    });
+
+    const natural = store.layout.getSnapshot().value;
+
+    // Wide and short: twelve under the pair, three to a row, would be small.
+    store.setDagBox({ width: natural.width * 3, height: natural.height / 3 });
+
+    store.fitDag();
+
+    const fitted = store.layout.getSnapshot().value;
+
+    assert.notDeepEqual(fitted.nodes, natural.nodes);
+
+    // The default arrangement would be held to a third by the box's height.
+    assert.isAbove(store.dagScale.getSnapshot().value, 0.34);
+
+    store.zoomIn();
+
+    assert.deepStrictEqual(store.layout.getSnapshot().value, fitted);
+
+    store.resetZoom();
+
+    assert.deepStrictEqual(store.layout.getSnapshot().value, natural);
+  });
+
   test('stopped before the read answers, it neither applies nor saves', async () => {
     const { store, saved, savedHideDone, resolveLoad, resolveLoadHideDone } =
       setup();

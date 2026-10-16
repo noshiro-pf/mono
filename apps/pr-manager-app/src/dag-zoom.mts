@@ -8,6 +8,12 @@
  */
 
 import { Num } from 'ts-data-forge';
+import {
+  placeGrid,
+  placementsFor,
+  type ConnectedLayout,
+  type GridPlacement,
+} from './issue-graph-layout.mjs';
 
 /** The scales a zoom in or out moves between, smallest first. */
 export const ZOOM_STEPS = [
@@ -51,6 +57,34 @@ export const fitScale = (content: Size, box: Size): number => {
   );
 
   return Math.max(MIN_SCALE, Math.floor(scale * 1000) / 1000);
+};
+
+/**
+ * Where the nodes with no edge go for the fit: of every placement
+ * (`placementsFor`), the one that lets the whole graph be drawn the largest
+ * in `box` — a wide box takes them in longer rows, beside the connected
+ * parts or around them, and a tall one in shorter rows under them. The
+ * first is the
+ * default, which is kept while nothing does better, so that a graph that
+ * already fits at its natural size is drawn as it always is.
+ */
+export const fitPlacement = (
+  parts: ConnectedLayout,
+  box: Size,
+): GridPlacement => {
+  const [first, ...rest] = placementsFor(parts);
+
+  const scaleOf = (placement: GridPlacement): number =>
+    fitScale(placeGrid(parts, placement), box);
+
+  return rest.reduce(
+    (best, placement) => {
+      const scale = scaleOf(placement);
+
+      return scale > best.scale ? { placement, scale } : best;
+    },
+    { placement: first, scale: scaleOf(first) },
+  ).placement;
 };
 
 /** The next step above `scale`, or {@link MAX_SCALE} when there is none. */

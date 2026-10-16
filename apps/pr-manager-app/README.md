@@ -81,7 +81,12 @@ to do is laid out. Both choices are kept in the browser. At the other end of
 the row, **−** and **+** zoom the graph out and in a step at a time about the
 middle of its box, **Fit** draws all of it in the box (never larger than its
 natural size, and following the box and the graph as they change until the
-next zoom), and **100%** puts it back at its natural size. The zoom starts at
+next zoom), and **100%** puts it back at its natural size. To use the room it
+has, Fit also rearranges the issues with no dependency either way: in longer
+or shorter rows, under the rest of the graph, beside it, or filling the room to
+its right before going on under it, whichever draws the whole graph the
+largest. A zoom from there keeps that arrangement; 100% puts
+them back under the rest. The zoom starts at
 100% on every visit.
 
 It **only reads**. Nothing here labels, rebases, merges or comments — that is

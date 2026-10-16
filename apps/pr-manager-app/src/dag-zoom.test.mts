@@ -1,5 +1,6 @@
 import {
   centreAt,
+  fitPlacement,
   fitScale,
   MAX_SCALE,
   MIN_SCALE,
@@ -7,6 +8,12 @@ import {
   zoomInFrom,
   zoomOutFrom,
 } from './dag-zoom.mjs';
+import {
+  layoutConnected,
+  placeGrid,
+  placementsFor,
+} from './issue-graph-layout.mjs';
+import type { IssueGraph } from './issue-graph.mjs';
 
 describe(fitScale, () => {
   test('shrinks a graph larger than the box until all of it is in the box', () => {
@@ -142,3 +149,50 @@ describe(scrollToCentre, () => {
     );
   });
 });
+
+describe(fitPlacement, () => {
+  test('arranges what has no edge so that the whole graph is drawn the largest the box allows', () => {
+    const parts = layoutConnected(chainAndFree(3, 24));
+
+    const box = { width: 2400, height: 400 } as const;
+
+    const best = fitScale(placeGrid(parts, fitPlacement(parts, box)), box);
+
+    const scales = placementsFor(parts).map((placement) =>
+      fitScale(placeGrid(parts, placement), box),
+    );
+
+    assert.strictEqual(best, Math.max(...scales));
+
+    // Under the chain, three or so to a row, it would be tall and small.
+    assert.isAbove(best, scales[0] ?? 1);
+  });
+
+  test('keeps the default arrangement while that already fits at its natural size', () => {
+    const parts = layoutConnected(chainAndFree(2, 4));
+
+    assert.deepStrictEqual(
+      fitPlacement(parts, { width: 4000, height: 4000 }),
+      placementsFor(parts)[0],
+    );
+  });
+});
+
+/** A chain of `chain` issues, and `free` more with no edge at all. */
+const chainAndFree = (chain: number, free: number): IssueGraph =>
+  ({
+    nodes: Array.from({ length: chain + free }, (_, index) => ({
+      number: index + 1,
+      kind: 'issue',
+      title: `Issue ${index + 1}`,
+      url: `https://github.com/o/r/issues/${index + 1}`,
+      state: 'free',
+      priority: 'none',
+    })),
+    edges: Array.from({ length: chain - 1 }, (_, index) => ({
+      from: index + 1,
+      to: index + 2,
+      kind: 'start-after',
+      settled: false,
+    })),
+  }) as const;

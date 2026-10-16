@@ -11,7 +11,10 @@
  *
  * 1. **Components.** Each connected part is laid out on its own and the parts
  *    stacked, largest first; the nodes with no edge at all go last, in a grid
- *    under a label, rather than one long column.
+ *    under a label, rather than one long column. Where that grid goes, under
+ *    the parts or beside them and how many to a row, is chosen apart from
+ *    the rest (`placeGrid`), so that the fit can try every arrangement for
+ *    its box (`dag-zoom.mts`) without laying the parts out again.
  * 2. **Columns.** A node's column is one past the furthest of what it waits
  *    for, then moved as far right as what waits for it allows, so a node
  *    sits next to what it leads to. An edge that would run back on a cycle
@@ -27,8 +30,8 @@
  * the drawing depends on the structure alone.
  */
 
-import { Arr, Num } from 'ts-data-forge';
-import type { ReadonlyRecord } from 'ts-type-forge';
+import { Arr, asUint32, Num } from 'ts-data-forge';
+import type { NonEmptyTuple, ReadonlyRecord } from 'ts-type-forge';
 import type { IssueGraph, IssueGraphEdge } from './issue-graph.mjs';
 
 export const NODE_WIDTH = 208;
@@ -64,6 +67,42 @@ export type IssueGraphLayout = Readonly<{
 }>;
 
 export const layoutIssueGraph = (graph: IssueGraph): IssueGraphLayout => {
+  const parts = layoutConnected(graph);
+
+  return placeGrid(parts, defaultPlacement(parts));
+};
+
+/**
+ * The connected parts laid out, stacked from the top, and what is left for
+ * the grid: everything that does not depend on where the grid goes, which is
+ * the costly part, so that the grid can be tried in several places
+ * (`placeGrid`) without laying the rest out again.
+ */
+export type ConnectedLayout = Readonly<{
+  nodes: readonly LaidOutNode[];
+  edges: readonly LaidOutEdge[];
+  /** How wide the widest part is, the padding left out; 0 for none. */
+  width: number;
+  /** Where something under the parts starts: below the last and its gap. */
+  top: number;
+  /** The nodes with no edge, lowest number first. */
+  unconnected: readonly number[];
+}>;
+
+/**
+ * Where the nodes with no edge go, in rows `columns` wide: `under` the
+ * connected parts; `beside` them, to their right from the top; or `around`
+ * them, filling the columns to their right from the top while the parts
+ * take the left of the rows, then going on under them as wide as the rest.
+ * The columns of `around` are counted from the left edge of the drawing, so
+ * that those to the right of the parts line up with those under them.
+ */
+export type GridPlacement = Readonly<{
+  columns: number;
+  side: 'under' | 'beside' | 'around';
+}>;
+
+export const layoutConnected = (graph: IssueGraph): ConnectedLayout => {
   // A node that names itself is a cycle the node's colour already says; it
   // has no other end to draw a path to.
   const edges = graph.edges.filter(({ from, to }) => from !== to);
@@ -76,7 +115,8 @@ export const layoutIssueGraph = (graph: IssueGraph): IssueGraphLayout => {
 
   const unconnected = groups
     .filter((group) => Arr.isFixedLengthArray(1, group))
-    .flat();
+    .flat()
+    .toSorted((a, b) => a - b);
 
   const mut_nodes: LaidOutNode[] = [];
 
@@ -104,49 +144,193 @@ export const layoutIssueGraph = (graph: IssueGraph): IssueGraphLayout => {
     mut_width = Math.max(mut_width, part.width);
   }
 
-  const columns = Math.min(
-    MAX_GRID_COLUMNS,
-    Math.max(MIN_GRID_COLUMNS, columnsIn(mut_width)),
+  return {
+    nodes: mut_nodes,
+    edges: mut_edges,
+    width: mut_width,
+    top: mut_top,
+    unconnected,
+  };
+};
+
+/**
+ * The grid under the connected parts, as many to a row as the widest of them
+ * has columns — at least {@link MIN_GRID_COLUMNS}, so that a short graph
+ * does not leave a long column, and at most {@link MAX_GRID_COLUMNS}.
+ */
+export const defaultPlacement = (parts: ConnectedLayout): GridPlacement =>
+  ({
+    columns: Math.min(
+      MAX_GRID_COLUMNS,
+      Math.max(MIN_GRID_COLUMNS, columnsIn(parts.width)),
+    ),
+    side: 'under',
+  }) as const;
+
+/**
+ * Every placement worth trying for `parts`, the default first: under them,
+ * each width of grid from one node to all of them in a row; beside them,
+ * the same; and around them, each width that leaves a column to their right,
+ * while the parts are tall enough for a row beside them. Nothing is beside
+ * or around parts that are not there.
+ */
+export const placementsFor = (
+  parts: ConnectedLayout,
+): NonEmptyTuple<GridPlacement> => {
+  const first = defaultPlacement(parts);
+
+  const count = parts.unconnected.length;
+
+  const widths = Arr.seq(asUint32(count)).map((index) => index + 1);
+
+  const taken = columnsIn(parts.width);
+
+  const others: readonly GridPlacement[] = [
+    ...widths.map((columns) => ({ columns, side: 'under' }) as const),
+    ...(parts.width > 0
+      ? widths.map((columns) => ({ columns, side: 'beside' }) as const)
+      : ([] as const)),
+    ...(parts.width > 0 && rowsBeside(parts) > 0
+      ? widths.map(
+          (columns) => ({ columns: taken + columns, side: 'around' }) as const,
+        )
+      : ([] as const)),
+  ] as const;
+
+  return Arr.toUnshifted(first)(
+    others.filter(
+      ({ columns, side }) => columns !== first.columns || side !== first.side,
+    ),
   );
+};
 
-  const unconnectedLabel = Arr.isNonEmpty(unconnected)
-    ? ({
-        x: PADDING,
-        y: mut_top + LABEL_HEIGHT - PRIORITY_OVERHANG - 6,
-      } as const)
-    : undefined;
+/** The whole drawing: `parts`, and the nodes with no edge where `placement` puts them. */
+export const placeGrid = (
+  parts: ConnectedLayout,
+  placement: GridPlacement,
+): IssueGraphLayout => {
+  const connectedBottom = parts.width > 0 ? parts.top - COMPONENT_GAP : PADDING;
 
-  if (Arr.isNonEmpty(unconnected)) {
-    mut_top += LABEL_HEIGHT;
-
-    const sorted = unconnected.toSorted((a, b) => a - b);
-
-    const gridTop = mut_top;
-
-    const cells = sorted.map((number, index) => ({
-      number,
-      x: PADDING + (index % columns) * COLUMN_PITCH,
-      y: gridTop + rowOf(index, columns) * (NODE_HEIGHT + NODE_GAP),
-    }));
-
-    mut_nodes.push(...cells);
-
-    mut_top =
-      Math.max(...cells.map(({ y }) => y)) + NODE_HEIGHT + COMPONENT_GAP;
-
-    mut_width = Math.max(
-      mut_width,
-      Math.min(columns, sorted.length) * COLUMN_PITCH - LAYER_GAP,
-    );
+  if (!Arr.isNonEmpty(parts.unconnected)) {
+    return {
+      nodes: parts.nodes.toSorted((a, b) => a.number - b.number),
+      edges: parts.edges,
+      unconnectedLabel: undefined,
+      width: parts.width + 2 * PADDING,
+      height: Math.max(connectedBottom + PADDING, 2 * PADDING),
+    };
   }
 
+  const { label, slotAt } = gridOf(parts, placement);
+
+  const cells = parts.unconnected.map((number, index) => ({
+    number,
+    ...slotAt(index),
+  }));
+
   return {
-    nodes: mut_nodes.toSorted((a, b) => a.number - b.number),
-    edges: mut_edges,
-    unconnectedLabel,
-    width: mut_width + 2 * PADDING,
-    height: Math.max(mut_top - COMPONENT_GAP + PADDING, 2 * PADDING),
+    nodes: [...parts.nodes, ...cells].toSorted((a, b) => a.number - b.number),
+    edges: parts.edges,
+    unconnectedLabel: label,
+    width:
+      Math.max(PADDING + parts.width, ...cells.map(({ x }) => x + NODE_WIDTH)) +
+      PADDING,
+    height:
+      Math.max(connectedBottom, ...cells.map(({ y }) => y + NODE_HEIGHT)) +
+      PADDING,
   };
+};
+
+/**
+ * Where the label over the grid goes, and the `index`th cell of it, for
+ * `placement`. A placement that has no room for what it asks — beside or
+ * around parts that are not there, around parts too short for a row beside
+ * them or with no column to their right — is the grid under them.
+ */
+const gridOf = (
+  parts: ConnectedLayout,
+  { columns, side }: GridPlacement,
+): Readonly<{
+  label: Readonly<{ x: number; y: number }>;
+  slotAt: (index: number) => Readonly<{ x: number; y: number }>;
+}> => {
+  const perRow = Math.max(1, columns);
+
+  const taken = columnsIn(parts.width);
+
+  const besideRows = rowsBeside(parts);
+
+  const placed =
+    parts.width === 0 ||
+    (side === 'around' && (besideRows === 0 || perRow <= taken))
+      ? 'under'
+      : side;
+
+  const labelAt = (
+    x: number,
+    gridLabelTop: number,
+  ): Readonly<{ x: number; y: number }> =>
+    ({ x, y: gridLabelTop + LABEL_HEIGHT - PRIORITY_OVERHANG - 6 }) as const;
+
+  const rowStep = NODE_HEIGHT + NODE_GAP;
+
+  switch (placed) {
+    case 'under':
+      return {
+        label: labelAt(PADDING, parts.top),
+        slotAt: (index) => ({
+          x: PADDING + (index % perRow) * COLUMN_PITCH,
+          y: parts.top + LABEL_HEIGHT + rowOf(index, perRow) * rowStep,
+        }),
+      };
+
+    case 'beside': {
+      const left = PADDING + parts.width + LAYER_GAP;
+
+      return {
+        label: labelAt(left, PADDING),
+        slotAt: (index) => ({
+          x: left + (index % perRow) * COLUMN_PITCH,
+          y: PADDING + LABEL_HEIGHT + rowOf(index, perRow) * rowStep,
+        }),
+      };
+    }
+
+    case 'around': {
+      const right = perRow - taken;
+
+      const besideCount = besideRows * right;
+
+      return {
+        label: labelAt(PADDING + taken * COLUMN_PITCH, PADDING),
+        slotAt: (index) => {
+          if (index < besideCount) {
+            return {
+              x: PADDING + (taken + (index % right)) * COLUMN_PITCH,
+              y: PADDING + LABEL_HEIGHT + rowOf(index, right) * rowStep,
+            };
+          }
+
+          const under = index - besideCount;
+
+          return {
+            x: PADDING + (under % perRow) * COLUMN_PITCH,
+            y: parts.top + rowOf(under, perRow) * rowStep,
+          };
+        },
+      };
+    }
+  }
+};
+
+/**
+ * How many rows of the grid fit to the right of the connected parts, under a
+ * label level with their top, and ending above where they end.
+ */
+const rowsBeside = (parts: ConnectedLayout): number => {
+  const room = parts.top - COMPONENT_GAP - (PADDING + LABEL_HEIGHT) + NODE_GAP;
+
+  return parts.width > 0 && room > 0 ? rowOf(room, NODE_HEIGHT + NODE_GAP) : 0;
 };
 
 /** Between one column and the next, room for the curves. */

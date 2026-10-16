@@ -1,11 +1,16 @@
+import { Arr } from 'ts-data-forge';
 import {
   assignColumns,
   connectedGroups,
   countCrossings,
+  defaultPlacement,
+  layoutConnected,
   layoutIssueGraph,
   levelColumn,
   NODE_HEIGHT,
   NODE_WIDTH,
+  placeGrid,
+  placementsFor,
   PRIORITY_OVERHANG,
 } from './issue-graph-layout.mjs';
 import type { IssueGraph, IssueGraphEdge } from './issue-graph.mjs';
@@ -192,6 +197,185 @@ describe(layoutIssueGraph, () => {
 
     // It leaves 2 from its left side, toward 1.
     assert.isTrue(back.path.startsWith(`M ${two.x} `));
+  });
+});
+
+describe(placeGrid, () => {
+  test('is the layout drawn by default when handed the default placement', () => {
+    const issues = graph([1, 2, 3, 4, 5, 6], [edge(1, 2)]);
+
+    const parts = layoutConnected(issues);
+
+    assert.deepStrictEqual(
+      placeGrid(parts, defaultPlacement(parts)),
+      layoutIssueGraph(issues),
+    );
+  });
+
+  test('lays the grid out as many to a row as it is told', () => {
+    const parts = layoutConnected(graph([1, 2, 3, 4, 5, 6], [edge(1, 2)]));
+
+    const layout = placeGrid(parts, { columns: 2, side: 'under' });
+
+    const grid = layout.nodes.filter(({ number }) => number > 2);
+
+    assert.deepStrictEqual(
+      grid.map(({ y }) => y === grid[0]?.y),
+      [true, true, false, false],
+    );
+
+    assert.strictEqual(Arr.uniq(grid.map(({ x }) => x)).length, 2);
+  });
+
+  test('beside the connected parts, puts the grid and its label to their right, from the top', () => {
+    const parts = layoutConnected(graph([1, 2, 3, 4, 5, 6], [edge(1, 2)]));
+
+    const layout = placeGrid(parts, { columns: 1, side: 'beside' });
+
+    const connectedRight = Math.max(
+      ...layout.nodes
+        .filter(({ number }) => number <= 2)
+        .map(({ x }) => x + NODE_WIDTH),
+    );
+
+    const grid = layout.nodes.filter(({ number }) => number > 2);
+
+    const label = layout.unconnectedLabel;
+
+    assert.isDefined(label);
+
+    assert.isTrue(grid.every(({ x }) => x === label.x));
+
+    assert.isTrue(label.x > connectedRight);
+
+    // Level with the top of the connected parts, as the label under them
+    // is with the space under them.
+    assert.strictEqual(
+      Math.min(...grid.map(({ y }) => y)),
+      Math.min(...layout.nodes.map(({ y }) => y)) + 31,
+    );
+
+    assert.isTrue(label.y < Math.min(...grid.map(({ y }) => y)));
+
+    assert.strictEqual(
+      layout.width,
+      Math.max(...layout.nodes.map(({ x }) => x)) + NODE_WIDTH + 16,
+    );
+
+    assert.strictEqual(
+      layout.height,
+      Math.max(...layout.nodes.map(({ y }) => y)) + NODE_HEIGHT + 16,
+    );
+  });
+});
+
+describe('placeGrid around the connected parts', () => {
+  // One issue four wait for: a part two columns wide and four rows tall.
+  const fan = graph(
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+    [edge(1, 2), edge(1, 3), edge(1, 4), edge(1, 5)],
+  );
+
+  test('fills the columns to the right of the parts first, then goes on under them, in the same columns', () => {
+    const parts = layoutConnected(fan);
+
+    const layout = placeGrid(parts, { columns: 4, side: 'around' });
+
+    const connected = layout.nodes.filter(({ number }) => number <= 5);
+
+    const grid = layout.nodes.filter(({ number }) => number > 5);
+
+    const connectedRight = Math.max(
+      ...connected.map(({ x }) => x + NODE_WIDTH),
+    );
+
+    const connectedBottom = Math.max(
+      ...connected.map(({ y }) => y + NODE_HEIGHT),
+    );
+
+    const [first, second, third] = grid;
+
+    assert.isDefined(first);
+
+    assert.isDefined(second);
+
+    assert.isDefined(third);
+
+    // Two to a row beside the part, from its top.
+    assert.isTrue(first.x > connectedRight);
+
+    assert.strictEqual(second.y, first.y);
+
+    assert.isBelow(first.y, connectedBottom);
+
+    const beside = grid.filter(({ y }) => y < connectedBottom);
+
+    const under = grid.filter(({ y }) => y >= connectedBottom);
+
+    assert.isTrue(Arr.isNonEmpty(under));
+
+    assert.isTrue(beside.every(({ x }) => x > connectedRight));
+
+    assert.isTrue(beside.every(({ y }) => y + NODE_HEIGHT <= connectedBottom));
+
+    // Under them, from the left edge of the drawing.
+    assert.strictEqual(Math.min(...under.map(({ x }) => x)), 16);
+
+    // One set of columns for both.
+    assert.strictEqual(Arr.uniq(grid.map(({ x }) => x)).length, 4);
+
+    // Nothing drawn over anything else.
+    assert.isTrue(
+      layout.nodes.every((a, ia) =>
+        layout.nodes.every(
+          (b, ib) =>
+            ia === ib ||
+            Math.abs(a.x - b.x) >= NODE_WIDTH ||
+            Math.abs(a.y - b.y) >= NODE_HEIGHT,
+        ),
+      ),
+    );
+  });
+
+  test('is offered for a part tall enough, and is the grid under it when there is no column to its right', () => {
+    const parts = layoutConnected(fan);
+
+    assert.isTrue(placementsFor(parts).some(({ side }) => side === 'around'));
+
+    assert.deepStrictEqual(
+      placeGrid(parts, { columns: 2, side: 'around' }),
+      placeGrid(parts, { columns: 2, side: 'under' }),
+    );
+  });
+});
+
+describe(placementsFor, () => {
+  test('starts with the default, and offers every width of grid, under and beside', () => {
+    const parts = layoutConnected(graph([1, 2, 3, 4, 5], [edge(1, 2)]));
+
+    const placements = placementsFor(parts);
+
+    assert.deepStrictEqual(placements[0], defaultPlacement(parts));
+
+    assert.strictEqual(placements.length, 6);
+
+    assert.strictEqual(
+      Arr.uniq(placements.map((p) => JSON.stringify(p))).length,
+      6,
+    );
+  });
+
+  test('offers nothing beside or around when nothing is connected, and only the default when nothing is not', () => {
+    assert.isTrue(
+      placementsFor(layoutConnected(graph([1, 2, 3], []))).every(
+        ({ side }) => side === 'under',
+      ),
+    );
+
+    assert.strictEqual(
+      placementsFor(layoutConnected(graph([1, 2], [edge(1, 2)]))).length,
+      1,
+    );
   });
 });
 
