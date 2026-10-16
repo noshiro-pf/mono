@@ -27,6 +27,9 @@ import { packPath, stageForStore, stagingPath } from './store-package.mjs';
  * every upload against the public half it has on file.
  */
 const main = (): void => {
+  // Before the key, so a missing browser fails without asking `pass` first.
+  const chrome = playwrightChromium();
+
   const key = readSigningKey();
 
   try {
@@ -45,7 +48,7 @@ const main = (): void => {
 
     fs.rmSync(crxPath, { force: true });
 
-    execFileSync(chromium.executablePath(), [
+    execFileSync(chrome, [
       '--no-sandbox',
       `--pack-extension=${stagingPath}`,
       `--pack-extension-key=${key.path}`,
@@ -58,6 +61,31 @@ const main = (): void => {
   } finally {
     key.forget();
   }
+};
+
+/**
+ * The Chromium binary of the installed `@playwright/test`.
+ *
+ * `executablePath()` names where that version's browser revision would be,
+ * whether or not it has been downloaded — and after a Playwright update it has
+ * not been yet. `launch()` checks this and says what to run; calling the binary
+ * directly does not, and fails with a bare `spawnSync ... ENOENT`, so the check
+ * is made here.
+ */
+const playwrightChromium = (): string => {
+  const executable = chromium.executablePath();
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  if (!fs.existsSync(executable)) {
+    throw new Error(
+      [
+        `Playwright's Chromium is not installed: ${executable} does not exist.`,
+        'Download the revision this Playwright version expects with `pnpm exec playwright install chromium`.',
+      ].join('\n'),
+    );
+  }
+
+  return executable;
 };
 
 type SigningKey = Readonly<{
