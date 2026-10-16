@@ -1,5 +1,11 @@
 # eslint-plugin-ts-fortress
 
+## 1.3.3
+
+### Patch Changes
+
+- 01d19b3: Recognize a call through a namespace import written with a type wrapper, such as `(t as typeof t).minLengthArray(1, …)`. A fix that adds several imports now writes them as one `import { … } from 'ts-fortress';` line. The rule helpers now come from the new `eslint-rule-forge` package instead of a copy in this one.
+
 ## 1.3.2
 
 ### Patch Changes

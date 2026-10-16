@@ -1,5 +1,12 @@
 # eslint-plugin-ts-type-forge
 
+## 0.8.8
+
+### Patch Changes
+
+- 01d19b3: Take the shared rule helpers (type wrappers, parentheses, import resolution) from the new `eslint-rule-forge` package instead of a copy in this one. The rules behave as before.
+- ts-type-forge@9.2.2
+
 ## 0.8.7
 
 ### Patch Changes

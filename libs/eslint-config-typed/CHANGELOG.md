@@ -1,5 +1,11 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.17.4
+
+### Patch Changes
+
+- 01d19b3: Take the shared rule helpers (type wrappers, parentheses, import resolution) from the new `eslint-rule-forge` package instead of a copy in this one. The rules behave as before.
+
 ## 5.17.3
 
 ### Patch Changes
