@@ -23,12 +23,11 @@ import {
   arcEdges,
   buildNodeViews,
   defaultDirection,
-  fromElkGraph,
   hiddenNodeIds,
+  layOutGraph,
   layoutWithElk,
   PLACEMENT_ANIMATION_MS,
   sameNodeIds,
-  toElkGraph,
   withoutNodes,
 } from '../dag/index.mjs';
 import { nodeRefOf } from '../domain/index.mjs';
@@ -174,8 +173,7 @@ export const dagLayoutStore = createDagLayoutStore({
   stored: dataStore.dagLayout,
   defaultDirection: narrowStore.matches.pipe(map(defaultDirection)),
   active: uiStore.view.pipe(map((view) => view === 'dag')),
-  layout: async (input) =>
-    fromElkGraph(input, await layoutWithElk(toElkGraph(input))),
+  layout: async (input) => layOutGraph(input, layoutWithElk),
   save: dataStore.putDagLayout,
   nudgeDelayMs: 600,
   setTimer: (callback, delayMs) => setTimeout(callback, delayMs),

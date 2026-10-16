@@ -7,6 +7,7 @@ import {
   createMilestone,
   createTask,
   type DomainState,
+  type GraphNodeId,
 } from '../domain/index.mjs';
 import { DAY_MS } from '../view-model/index.mjs';
 import { PLACEMENT_GAP, type Bounds } from './dag-layout.mjs';
@@ -19,6 +20,7 @@ import {
   edgeLabel,
   fromElkGraph,
   labelSize,
+  layOutGraph,
   layoutInput,
   layoutKey,
   MILESTONE_NODE_SIZE,
@@ -44,6 +46,9 @@ const m = asMilestoneId('m');
 const g = asGroupId('g');
 
 const h = asGroupId('h');
+
+/** More than `elk.spacing.edgeLabel`, less than any node. */
+const LABEL_ROOM = 8;
 
 const state: DomainState = {
   tasks: [
@@ -612,6 +617,77 @@ describe(fromElkGraph, () => {
     },
   );
 
+  test.each(dagDirections)(
+    'puts the two ends of a labelled edge in adjacent layers, %s, leaving no layer inside a group that holds them',
+    async (direction) => {
+      // b waits for x, and for a to start with a lag: given a layer of its
+      // own, the label made one between a and b, which x went into, and x,
+      // moved out of the frame round a and b, left that layer empty.
+      const x = asTaskId('x');
+
+      const nodesWith = async (
+        type: 'finish-to-start' | 'start-to-start',
+        lagMs: number,
+      ): Promise<readonly LaidOutNode[]> => {
+        const tasks = [
+          createTask({ id: x, title: 'X', now: 0 }),
+          createTask({ id: a, title: 'A', now: 0 }),
+          createTask({
+            id: b,
+            title: 'B',
+            now: 0,
+            dependencies: [
+              {
+                from: { kind: 'task', id: x },
+                type: 'finish-to-start',
+                lagMs: 0,
+              },
+              { from: { kind: 'task', id: a }, type, lagMs },
+            ],
+          }),
+        ] as const;
+
+        const input = layoutInput(
+          buildDependencyGraph({ tasks, milestones: [] }),
+          direction,
+          'standard',
+          [{ id: g, members: ['task:a', 'task:b'] }],
+        );
+
+        return fromElkGraph(input, await layoutWithElk(toElkGraph(input)))
+          .nodes;
+      };
+
+      const along = direction === 'right' ? 'x' : 'y';
+
+      const alongSize = direction === 'right' ? 'width' : 'height';
+
+      const gapBetweenAAndB = (nodes: readonly LaidOutNode[]): number => {
+        const [, nodeA, nodeB] = nodes;
+
+        assert.isDefined(nodeA);
+
+        assert.isDefined(nodeB);
+
+        return nodeB[along] - (nodeA[along] + nodeA[alongSize]);
+      };
+
+      const unlabelled = gapBetweenAAndB(await nodesWith('finish-to-start', 0));
+
+      const labelled = gapBetweenAAndB(
+        await nodesWith('start-to-start', 3 * DAY_MS),
+      );
+
+      // Wider by the label, and the little room ELK keeps round it.
+      assert.isAbove(labelled, unlabelled);
+
+      assert.isAtMost(
+        labelled,
+        unlabelled + labelSize('SS +3日')[alongSize] + LABEL_ROOM,
+      );
+    },
+  );
+
   test('lays out nothing as nothing', async () => {
     const input = layoutInput(
       buildDependencyGraph({ tasks: [], milestones: [] }),
@@ -625,6 +701,115 @@ describe(fromElkGraph, () => {
 
     assert.deepStrictEqual(layout.edges, []);
   });
+});
+
+describe(layOutGraph, () => {
+  // p and q depend on nothing and s on r, all in the group; u, v and w
+  // depend on nothing, and z on y, in none.
+  const tasks = [
+    ['p'],
+    ['q'],
+    ['u'],
+    ['v'],
+    ['r'],
+    ['s', 'r'],
+    ['w'],
+    ['y'],
+    ['z', 'y'],
+  ] as const satisfies readonly (readonly [string, string?])[];
+
+  const graph = buildDependencyGraph({
+    tasks: tasks.map(([id, from]: readonly [string, string?]) =>
+      createTask({
+        id: asTaskId(id),
+        title: id,
+        now: 0,
+        dependencies:
+          from === undefined
+            ? []
+            : [
+                {
+                  from: { kind: 'task', id: asTaskId(from) },
+                  type: 'finish-to-start',
+                  lagMs: 0,
+                },
+              ],
+      }),
+    ),
+    milestones: [],
+  });
+
+  const members: readonly GraphNodeId[] = [
+    'task:p',
+    'task:q',
+    'task:r',
+    'task:s',
+  ] as const;
+
+  test.each(dagDirections)(
+    'makes the frame of a group of nodes no edge joins no larger, %s, than its members laid out alone',
+    async (direction) => {
+      const input = layoutInput(graph, direction, 'standard', [
+        { id: g, members },
+      ]);
+
+      const layout = await layOutGraph(input, layoutWithElk);
+
+      const [group] = layout.groups;
+
+      assert.isDefined(group);
+
+      assert.deepStrictEqual(
+        layout.nodes
+          .filter((node) => overlaps(node, group))
+          .map(({ id }) => id),
+        Array.from(members),
+      );
+
+      // Without the other nodes, there is nothing to move out of the frame.
+      const alone = layoutInput(
+        {
+          nodes: graph.nodes.filter(({ id }) => members.includes(id)),
+          edges: graph.edges.filter(({ to }) => members.includes(to)),
+        },
+        direction,
+        'standard',
+        [{ id: g, members }],
+      );
+
+      const [groupAlone] = fromElkGraph(
+        alone,
+        await layoutWithElk(toElkGraph(alone)),
+      ).groups;
+
+      assert.deepStrictEqual(
+        [group.width, group.height],
+        [groupAlone?.width, groupAlone?.height],
+      );
+
+      // And every node clear of every other.
+      for (const [index, node] of layout.nodes.entries()) {
+        for (const other of layout.nodes.slice(index + 1)) {
+          assert.isFalse(overlaps(node, other));
+        }
+      }
+    },
+  );
+
+  test.each(dagDirections)(
+    'lays out as ELK does at once, %s, when no group holds nodes no edge joins',
+    async (direction) => {
+      const input = layoutInput(graph, direction, 'standard', [
+        { id: g, members: ['task:r', 'task:s'] },
+        { id: h, members: [] },
+      ]);
+
+      assert.deepStrictEqual(
+        await layOutGraph(input, layoutWithElk),
+        fromElkGraph(input, await layoutWithElk(toElkGraph(input))),
+      );
+    },
+  );
 });
 
 describe(labelSize, () => {

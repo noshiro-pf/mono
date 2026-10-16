@@ -151,10 +151,8 @@ export const toElkGraph = (input: LayoutInput): ElkNode => {
     layoutOptions: {
       ...spacingOptions,
       'elk.algorithm': 'layered',
-      'elk.direction':
-        input.direction === 'right' ? ('RIGHT' as const) : ('DOWN' as const),
+      'elk.direction': elkDirection(input.direction),
       'elk.edgeRouting': 'ORTHOGONAL',
-      'elk.edgeLabels.inline': 'false',
       // Fewer crossings for more time, which stays well under a second at a
       // hundred nodes: 30 crossed a sixth fewer edges there than the
       // default 7, and 100 no fewer again.
@@ -168,7 +166,7 @@ export const toElkGraph = (input: LayoutInput): ElkNode => {
       // needs routing round a node, and at a hundred nodes the edges are
       // 10–20 % shorter for as many crossings.
       'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
-      'elk.padding': '[top=24,left=24,bottom=24,right=24]',
+      'elk.padding': ELK_PADDING,
     },
     children: [
       ...ordered.flatMap((id) => {
@@ -184,7 +182,22 @@ export const toElkGraph = (input: LayoutInput): ElkNode => {
       id,
       sources: [from],
       targets: [to],
-      labels: label === '' ? [] : [{ text: label, ...labelSize(label) }],
+      // At the head, which ELK makes room for between the two layers. In the
+      // middle, it would be a node of a layer of its own, which every
+      // labelled edge would skip: a layer between two members of a group
+      // that only what is not in it could go into, to be moved out of the
+      // frame (`clearOfFrames`) and leave the layer empty inside it. Where
+      // the label is drawn, `edge-routing.mts` decides.
+      labels:
+        label === ''
+          ? []
+          : [
+              {
+                text: label,
+                ...labelSize(label),
+                layoutOptions: { 'elk.edgeLabels.placement': 'HEAD' },
+              },
+            ],
     })),
   } as const;
 };
@@ -216,6 +229,96 @@ export const fromElkGraph = (
       return { ...group, x: at?.x ?? 0, y: at?.y ?? 0, ...EMPTY_GROUP_SIZE };
     }),
   });
+};
+
+/**
+ * `input` laid out by `elk` (`toElkGraph`, then `fromElkGraph`).
+ *
+ * ELK lays out each part of a graph that no edge joins to the rest on its
+ * own, and packs the parts in rows. A group with members in more than one
+ * part has its frame drawn round the rows of other parts between them,
+ * which `clearOfFrames` then moves out of the frame, leaving the rows empty
+ * inside it. So when a group joins parts no edge does, each set of nodes
+ * that edges and groups join is laid out on its own, and those are packed
+ * as ELK packs the parts of a graph, as boxes, `PLACEMENT_GAP` apart so
+ * that no frame comes closer than that to what it does not hold.
+ */
+export const layOutGraph = async (
+  input: LayoutInput,
+  elk: (graph: DeepReadonly<ElkNode>) => Promise<ElkNode>,
+): Promise<GraphLayout> => {
+  const parts = partsJoinedByGroups(input);
+
+  if (parts === undefined) {
+    return fromElkGraph(input, await elk(toElkGraph(input)));
+  }
+
+  const laidOutParts = await Promise.all(
+    parts.map(async (part) => fromElkGraph(part, await elk(toElkGraph(part)))),
+  );
+
+  const extents = laidOutParts.map(extentOf);
+
+  const packed = await elk({
+    id: 'root',
+    layoutOptions: {
+      'elk.algorithm': 'layered',
+      'elk.direction': elkDirection(input.direction),
+      'elk.padding': ELK_PADDING,
+      'elk.spacing.componentComponent': String(PLACEMENT_GAP),
+    },
+    children: extents.map((extent, index) =>
+      elkBox({ id: partId(index), width: extent.width, height: extent.height }),
+    ),
+  });
+
+  const placed = new Map(
+    (packed.children ?? []).map((child) => [child.id, child] as const),
+  );
+
+  const shifted = laidOutParts.map((part, index) => {
+    const extent = extents[index];
+
+    const at = placed.get(partId(index));
+
+    const dx = (at?.x ?? 0) - (extent?.x ?? 0);
+
+    const dy = (at?.y ?? 0) - (extent?.y ?? 0);
+
+    const shift = <P extends Point>(point: P): P =>
+      ({
+        ...point,
+        x: point.x + dx,
+        y: point.y + dy,
+      }) as const;
+
+    return {
+      nodes: part.nodes.map(shift),
+      groups: part.groups.map(shift),
+    } as const;
+  });
+
+  const nodesById = new Map(
+    shifted.flatMap(({ nodes }) => nodes.map((node) => [node.id, node])),
+  );
+
+  const groupsById = new Map(
+    shifted.flatMap(({ groups }) => groups.map((group) => [group.id, group])),
+  );
+
+  return {
+    nodes: input.nodes.flatMap(({ id }) => {
+      const node = nodesById.get(id);
+
+      return node === undefined ? [] : [node];
+    }),
+    edges: input.edges,
+    groups: input.groups.flatMap(({ id }) => {
+      const group = groupsById.get(id);
+
+      return group === undefined ? [] : [group];
+    }),
+  };
 };
 
 /**
@@ -408,6 +511,106 @@ const spacingOptions = {
   'elk.layered.spacing.edgeEdgeBetweenLayers': '16',
   'elk.spacing.edgeLabel': '4',
 } as const;
+
+const ELK_PADDING = '[top=24,left=24,bottom=24,right=24]';
+
+const elkDirection = (direction: DagDirection): 'RIGHT' | 'DOWN' =>
+  direction === 'right' ? 'RIGHT' : 'DOWN';
+
+/**
+ * The parts of `input` that neither an edge nor a group joins to the rest,
+ * each with its nodes, edges and groups in the order of `input`, and an
+ * empty group a part of its own after them; or `undefined` when no group
+ * joins two parts that no edge does.
+ */
+const partsJoinedByGroups = (
+  input: LayoutInput,
+): readonly LayoutInput[] | undefined => {
+  const mut_parent = new Map<GraphNodeId, GraphNodeId>();
+
+  const root = (id: GraphNodeId): GraphNodeId => {
+    const up = mut_parent.get(id);
+
+    return up === undefined ? id : root(up);
+  };
+
+  /** Whether `a` and `b` were apart until now. */
+  const join = (a: GraphNodeId, b: GraphNodeId): boolean => {
+    const rootOfA = root(a);
+
+    const rootOfB = root(b);
+
+    if (rootOfA === rootOfB) {
+      return false;
+    }
+
+    mut_parent.set(rootOfB, rootOfA);
+
+    return true;
+  };
+
+  for (const { from, to } of input.edges) {
+    join(from, to);
+  }
+
+  let mut_joinedByGroup = false;
+
+  for (const { members } of input.groups) {
+    const [first, ...rest] = members;
+
+    if (first !== undefined) {
+      for (const member of rest) {
+        if (join(first, member)) {
+          mut_joinedByGroup = true;
+        }
+      }
+    }
+  }
+
+  if (!mut_joinedByGroup) {
+    return undefined;
+  }
+
+  const roots = Arr.uniq(input.nodes.map(({ id }) => root(id)));
+
+  return [
+    ...roots.map((key): LayoutInput => ({
+      direction: input.direction,
+      nodes: input.nodes.filter(({ id }) => root(id) === key),
+      edges: input.edges.filter(({ from }) => root(from) === key),
+      groups: input.groups.filter(
+        ({ members }) => members[0] !== undefined && root(members[0]) === key,
+      ),
+    })),
+    ...input.groups
+      .filter(({ members }) => Arr.isEmpty(members))
+      .map((group): LayoutInput => ({
+        direction: input.direction,
+        nodes: [],
+        edges: [],
+        groups: [group],
+      })),
+  ];
+};
+
+/** The box round every node and group of `layout`. */
+const extentOf = (layout: GraphLayout): Bounds => {
+  const boxes: readonly Bounds[] = [...layout.nodes, ...layout.groups] as const;
+
+  const x = Math.min(...boxes.map((box) => box.x));
+
+  const y = Math.min(...boxes.map((box) => box.y));
+
+  return {
+    x,
+    y,
+    width: Math.max(...boxes.map((box) => box.x + box.width)) - x,
+    height: Math.max(...boxes.map((box) => box.y + box.height)) - y,
+  };
+};
+
+/** The id of a part of the graph among the boxes ELK packs. */
+const partId = (index: number): string => `part:${index}` as const;
 
 /** The id of a group among ELK's nodes, apart from every node's. */
 const elkGroupId = (id: GroupId): string => `group:${id}` as const;
