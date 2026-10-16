@@ -62,6 +62,50 @@
   color-scheme: dark;
 }
 
+/*
+ * Scroll bars. Several blocks scroll side by side, so each bar is drawn quiet:
+ * no arrows, no track, a narrow rounded thumb in the hairline step that takes
+ * the muted ink under the pointer. Still always drawn, so that a block shows
+ * it scrolls before it is touched.
+ *
+ * Blink and WebKit get `::-webkit-scrollbar`, which is also what keeps the bar
+ * drawn where the system would overlay and hide it (macOS). Setting
+ * `scrollbar-width` or `scrollbar-color` there would switch those
+ * pseudo-elements off, so the standard properties are for the browsers
+ * without them (Firefox) only.
+ */
+::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-clip: padding-box;
+  background-color: var(--baseline);
+  border: 2px solid transparent;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--ink-muted);
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-color: var(--baseline) transparent;
+    scrollbar-width: thin;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
