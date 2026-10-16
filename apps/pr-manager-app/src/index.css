@@ -1279,8 +1279,8 @@ a:focus-visible {
 /*
  * A run in progress or queued, drawn as GitHub's Actions tab draws it: a
  * turning ring and a dot, in the status amber. Sized in `em` to sit on the
- * title's line; the ring stops for a reader who asked for less motion, where
- * the gap in it still says "not done".
+ * title's line. The ring turns even for a reader who asked for less motion:
+ * GitHub's turns too, and one that holds still reads as a page that froze.
  */
 .run-state-icon {
   align-self: center;
@@ -1319,12 +1319,6 @@ a:focus-visible {
 @keyframes run-state-turn {
   to {
     transform: rotate(1turn);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .run-state-icon[data-kind='running'] svg {
-    animation: none;
   }
 }
 
