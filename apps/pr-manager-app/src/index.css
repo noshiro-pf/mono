@@ -948,6 +948,11 @@ a:focus-visible {
   min-width: 7.5rem;
 }
 
+.view-settings-block[data-hidden='true'] .view-settings-name {
+  color: var(--ink-secondary);
+  text-decoration: line-through;
+}
+
 .view-settings-height {
   color: var(--ink-secondary);
   font-size: 0.8125rem;

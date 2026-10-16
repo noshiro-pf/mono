@@ -25,6 +25,7 @@ import {
   withEvenLine,
   withEvenShares,
   withHeight,
+  withHidden,
   withLineAt,
   withMode,
   withShare,
@@ -76,6 +77,8 @@ export type LayoutStore = Readonly<{
   setShare: (block: BlockId, share: number | undefined) => void;
   /** Gives the blocks the same height each, out of what they had. */
   evenShares: (blocks: readonly BlockId[]) => void;
+  /** Hides a block, or shows it again where it was; see `withHidden`. */
+  setHidden: (block: BlockId, hidden: boolean) => void;
   move: (block: BlockId, target: BlockPlace) => void;
   reset: () => void;
   /** `height` is the block's as drawn when the drag starts. */
@@ -159,6 +162,9 @@ export const createLayoutStore = (deps: LayoutDeps): LayoutStore => {
     },
     evenShares: (blocks) => {
       updateLayout((current) => withEvenShares(current, blocks));
+    },
+    setHidden: (block, hidden) => {
+      updateLayout((current) => withHidden(current, block, hidden));
     },
     move: (block, target) => {
       updateLayout((current) => moveBlock(current, block, target));

@@ -1,4 +1,5 @@
 import {
+  BLOCK_IDS,
   columnsOf,
   columnWidths,
   DEFAULT_LAYOUT,
@@ -7,12 +8,14 @@ import {
   moveBlock,
   searchWithLayout,
   sharePercents,
+  shownOf,
   splitAt,
   withBoundaryAt,
   withColumns,
   withEvenLine,
   withEvenShares,
   withHeight,
+  withHidden,
   withLineAt,
   withMode,
   withShare,
@@ -43,6 +46,7 @@ describe(layoutFromSearch, () => {
         heights: { open: 480 },
         mode: 'natural',
         shares: {},
+        hidden: [],
       },
     );
   });
@@ -161,6 +165,15 @@ describe(layoutFromSearch, () => {
     });
   });
 
+  test('reads the hidden blocks, once each and in the usual order', () => {
+    assert.deepStrictEqual(
+      layoutFromSearch('?hide=issues.bogus.runs.issues').hidden,
+      ['runs', 'issues'],
+    );
+
+    assert.deepStrictEqual(layoutFromSearch('?hide=').hidden, []);
+  });
+
   test('an empty number is no number', () => {
     assert.deepStrictEqual(
       layoutFromSearch('?cols=2&split=&h.open='),
@@ -214,6 +227,7 @@ describe(searchWithLayout, () => {
       heights: { issues: 300, open: 640 },
       mode: 'fill',
       shares: { merged: 60, open: 140.5 },
+      hidden: ['runs', 'issues'],
     } as const;
 
     assert.deepStrictEqual(
@@ -233,6 +247,18 @@ describe(searchWithLayout, () => {
       layoutFromSearch(searchWithLayout('', three)),
       three,
     );
+  });
+
+  test('writes the hidden blocks, and nothing when none is', () => {
+    assert.strictEqual(
+      searchWithLayout(
+        '?hide=open',
+        withHidden(DEFAULT_LAYOUT, 'merged', true),
+      ),
+      '?hide=merged',
+    );
+
+    assert.strictEqual(searchWithLayout('?hide=open', DEFAULT_LAYOUT), '');
   });
 
   test('writes three columns and the lines between them', () => {
@@ -622,5 +648,64 @@ describe(splitAt, () => {
 
   test('is nothing for a layout with no width', () => {
     assert.isUndefined(splitAt(300, { left: 100, width: 0 }));
+  });
+});
+
+describe(withHidden, () => {
+  test('hides a block and shows it again, in the usual order', () => {
+    const hidden = withHidden(
+      withHidden(DEFAULT_LAYOUT, 'issues', true),
+      'open',
+      true,
+    );
+
+    assert.deepStrictEqual(hidden.hidden, ['open', 'issues']);
+
+    assert.deepStrictEqual(withHidden(hidden, 'issues', true), hidden);
+
+    assert.deepStrictEqual(withHidden(hidden, 'open', false).hidden, [
+      'issues',
+    ]);
+  });
+
+  test('leaves the block its place, height and share', () => {
+    const sized = withShare(
+      withHeight(withColumns(DEFAULT_LAYOUT, 3), 'runs', 300),
+      'runs',
+      50,
+    );
+
+    const hidden = withHidden(sized, 'runs', true);
+
+    assert.deepStrictEqual(
+      [hidden.middle, hidden.heights, hidden.shares],
+      [sized.middle, sized.heights, sized.shares],
+    );
+
+    assert.deepStrictEqual(withHidden(hidden, 'runs', false), sized);
+  });
+
+  test('keeps the hidden blocks across moves and column changes', () => {
+    const hidden = withHidden(DEFAULT_LAYOUT, 'merged', true);
+
+    assert.deepStrictEqual(withColumns(hidden, 3).hidden, ['merged']);
+
+    assert.deepStrictEqual(
+      moveBlock(hidden, 'merged', { column: 0, index: 0 }).hidden,
+      ['merged'],
+    );
+  });
+});
+
+describe(shownOf, () => {
+  test('is the blocks not hidden, in the order given', () => {
+    const hidden = withHidden(DEFAULT_LAYOUT, 'runs', true);
+
+    assert.deepStrictEqual(shownOf(hidden, ['issues', 'runs', 'open']), [
+      'issues',
+      'open',
+    ]);
+
+    assert.deepStrictEqual(shownOf(DEFAULT_LAYOUT, BLOCK_IDS), BLOCK_IDS);
   });
 });

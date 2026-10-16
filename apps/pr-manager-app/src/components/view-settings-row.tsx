@@ -24,18 +24,32 @@ type Props = Readonly<{
   share: number | undefined;
   /** What part of its column the share comes to, in percent. */
   percent: number;
+  /** Not drawn on the page; its height or share is kept, but not offered. */
+  hidden: boolean;
 }>;
 
 /**
  * One block in the layout settings, with a button for each thing the pointer
  * can do to it on the page: up, down, across to the column on its left or
  * its right, and its height — or, when the blocks fill the window, its share
- * of it. A button that could do nothing is left out rather than disabled, so
+ * of it — and one to hide it or show it again. A hidden block can still be
+ * moved, so that it comes back where it is wanted, but its size is not
+ * offered until it is shown. A button that could do nothing is left out rather than disabled, so
  * tabbing along the row stops only where something can happen.
  */
 export const ViewSettingsRow = memoNamed<Props>('ViewSettingsRow', (props) => {
-  const { id, column, index, count, columns, mode, height, share, percent } =
-    props;
+  const {
+    id,
+    column,
+    index,
+    count,
+    columns,
+    mode,
+    height,
+    share,
+    percent,
+    hidden,
+  } = props;
 
   const blockName = BLOCK_NAMES[id];
 
@@ -86,8 +100,12 @@ export const ViewSettingsRow = memoNamed<Props>('ViewSettingsRow', (props) => {
     layoutStore.setShare(id, undefined);
   }, [id]);
 
+  const toggleHidden = useCallback((): void => {
+    layoutStore.setHidden(id, !hidden);
+  }, [id, hidden]);
+
   return (
-    <li className={'view-settings-block'}>
+    <li className={'view-settings-block'} data-hidden={hidden}>
       <span className={'view-settings-name'}>{blockName}</span>
 
       {index > 0 ? (
@@ -138,7 +156,9 @@ export const ViewSettingsRow = memoNamed<Props>('ViewSettingsRow', (props) => {
         </button>
       ) : undefined}
 
-      {mode === 'fill' ? (
+      {hidden ? (
+        <span className={'view-settings-height'}>{'hidden'}</span>
+      ) : mode === 'fill' ? (
         <>
           <span
             className={'view-settings-height'}
@@ -225,6 +245,15 @@ export const ViewSettingsRow = memoNamed<Props>('ViewSettingsRow', (props) => {
           </button>
         </>
       )}
+
+      <button
+        aria-label={`${hidden ? 'Show' : 'Hide'} ${blockName}`}
+        className={'view-settings-small'}
+        type={'button'}
+        onClick={toggleHidden}
+      >
+        {hidden ? 'Show' : 'Hide'}
+      </button>
     </li>
   );
 });
