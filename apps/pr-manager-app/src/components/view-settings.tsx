@@ -5,8 +5,11 @@ import { useMemo } from 'preact/hooks';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
+  columnsOf,
+  columnWidths,
   MAX_SPLIT,
   MIN_SPLIT,
+  MIN_THIRD_WIDTH,
   sharePercents,
   type BlockId,
   type ColumnIndex,
@@ -15,8 +18,8 @@ import { layoutSignals, layoutStore } from '../store/index.mjs';
 import { ViewSettingsRow } from './view-settings-row.js';
 
 /**
- * The "Layout" button and the dialog it opens: one column or two, how wide
- * each is, whether the page scrolls or fills the window, the order of the
+ * The "Layout" button and the dialog it opens: one column, two or three, how
+ * wide each is, whether the page scrolls or fills the window, the order of the
  * blocks and their heights or shares, and a way back to the usual layout.
  *
  * Everything the pointer does on the page can be done here with a keyboard,
@@ -33,14 +36,13 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
     readonly (readonly [ColumnIndex, readonly BlockId[]])[]
   >(
     () =>
-      layout.columns === 2
-        ? [
-            [0, layout.left],
-            [1, layout.right],
-          ]
-        : [[0, layout.left]],
-    [layout.columns, layout.left, layout.right],
+      columnsOf(layout).map(
+        (ids, index) => [COLUMN_INDICES[index] ?? 0, ids] as const,
+      ),
+    [layout],
   );
+
+  const widths = useMemo(() => columnWidths(layout), [layout]);
 
   // What part of its column each block is given in the `fill` mode.
   const percents = useMemo<Partial<ReadonlyRecord<BlockId, number>>>(
@@ -98,6 +100,16 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
             {'Two, on a screen wide enough for them'}
           </label>
 
+          <label className={'view-settings-choice'}>
+            <input
+              checked={layout.columns === 3}
+              name={'columns'}
+              type={'radio'}
+              onChange={threeColumns}
+            />
+            {'Three, on a screen wide enough for them'}
+          </label>
+
           {layout.columns === 2 ? (
             <label className={'view-settings-choice'} htmlFor={SPLIT_ID}>
               {`Left column ${layout.split}%`}
@@ -110,6 +122,41 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
                 onInput={onSplitInput}
               />
             </label>
+          ) : undefined}
+
+          {layout.columns === 3 ? (
+            <>
+              <label className={'view-settings-choice'} htmlFor={FIRST_LINE_ID}>
+                {`Left column ${widths[0] ?? 0}%`}
+                <input
+                  id={FIRST_LINE_ID}
+                  max={layout.lines[1] - MIN_THIRD_WIDTH}
+                  min={MIN_THIRD_WIDTH}
+                  type={'range'}
+                  value={layout.lines[0]}
+                  onInput={onFirstLineInput}
+                />
+              </label>
+
+              <label
+                className={'view-settings-choice'}
+                htmlFor={SECOND_LINE_ID}
+              >
+                {`Right column ${widths[2] ?? 0}%`}
+                <input
+                  id={SECOND_LINE_ID}
+                  max={100 - layout.lines[0] - MIN_THIRD_WIDTH}
+                  min={MIN_THIRD_WIDTH}
+                  type={'range'}
+                  value={100 - layout.lines[1]}
+                  onInput={onSecondLineInput}
+                />
+              </label>
+
+              <p className={'section-note'}>
+                {`The middle column has the rest, ${widths[1] ?? 0}%.`}
+              </p>
+            </>
           ) : undefined}
         </fieldset>
 
@@ -144,7 +191,9 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
                 ? 'Blocks, top down'
                 : column === 0
                   ? 'Left column'
-                  : 'Right column'}
+                  : column === 1 && layout.columns === 3
+                    ? 'Middle column'
+                    : 'Right column'}
             </legend>
 
             {Arr.isEmpty(ids) ? (
@@ -155,6 +204,7 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
                   <ViewSettingsRow
                     key={id}
                     column={column}
+                    columns={layout.columns}
                     count={ids.length}
                     height={layout.heights[id]}
                     id={id}
@@ -162,7 +212,6 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
                     mode={layout.mode}
                     percent={percents[id] ?? 0}
                     share={layout.shares[id]}
-                    twoColumns={layout.columns === 2}
                   />
                 ))}
               </ol>
@@ -172,7 +221,7 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
 
         <p className={'section-note'}>
           {
-            'On the page: drag the line under a block to set its height — a double click there gives the natural height back, or, when the blocks fill the window, evens it with the block below. With two columns, drag the line between them. The layout is kept in the URL.'
+            'On the page: drag the line under a block to set its height — a double click there gives the natural height back, or, when the blocks fill the window, evens it with the block below. With two or three columns, drag the lines between them. The layout is kept in the URL.'
           }
         </p>
 
@@ -227,6 +276,10 @@ const twoColumns = (): void => {
   layoutStore.setColumns(2);
 };
 
+const threeColumns = (): void => {
+  layoutStore.setColumns(3);
+};
+
 const naturalMode = (): void => {
   layoutStore.setMode('natural');
 };
@@ -239,6 +292,22 @@ const onSplitInput: InputEventHandler<HTMLInputElement> = (changed) => {
   layoutStore.setSplit(changed.currentTarget.valueAsNumber);
 };
 
+const onFirstLineInput: InputEventHandler<HTMLInputElement> = (changed) => {
+  layoutStore.setLine(0, changed.currentTarget.valueAsNumber);
+};
+
+// The right column's slider counts from the right, so that more is wider for
+// both: the line it moves is 100 less its value.
+const onSecondLineInput: InputEventHandler<HTMLInputElement> = (changed) => {
+  layoutStore.setLine(1, 100 - changed.currentTarget.valueAsNumber);
+};
+
+const COLUMN_INDICES = [0, 1, 2] as const satisfies readonly ColumnIndex[];
+
 const TITLE_ID = 'view-settings-title';
 
 const SPLIT_ID = 'view-settings-split';
+
+const FIRST_LINE_ID = 'view-settings-first-line';
+
+const SECOND_LINE_ID = 'view-settings-second-line';

@@ -2,7 +2,7 @@ import type { ComponentChildren } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import type { BlockId } from '../layout.mjs';
+import { columnWidths, type BlockId } from '../layout.mjs';
 import { layoutSignals } from '../store/index.mjs';
 import { BlockColumn } from './block-column.js';
 import { ColumnDivider } from './column-divider.js';
@@ -13,12 +13,12 @@ type Props = Readonly<{
 }>;
 
 /**
- * The page's blocks, in one column or two, as `layout.mts` describes.
+ * The page's blocks, in one column, two or three, as `layout.mts` describes.
  *
- * With two, the columns share the width by fractions rather than percentages,
- * so the divider's own width comes out of both sides; on a screen too narrow
- * for two, the stylesheet stacks them into one (the grid template is then
- * ignored, which is why it can be an inline style).
+ * With more than one, the columns share the width by fractions rather than
+ * percentages, so the dividers' own widths come out of every column; on a
+ * screen too narrow for them, the stylesheet stacks them into one (the grid
+ * template is then ignored, which is why it can be an inline style).
  *
  * In the `fill` mode the layout takes the height the page leaves it, and each
  * column shares that out among its blocks (`index.css`).
@@ -28,14 +28,18 @@ export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
 
   const layout = layoutSignals.layout.value;
 
+  const widths = useMemo(() => columnWidths(layout), [layout]);
+
   const style = useMemo(
     () =>
-      layout.columns === 2
+      widths.length > 1
         ? {
-            gridTemplateColumns: `minmax(0, ${layout.split}fr) auto minmax(0, ${100 - layout.split}fr)`,
+            gridTemplateColumns: widths
+              .map((width) => `minmax(0, ${width}fr)`)
+              .join(' auto '),
           }
         : undefined,
-    [layout.columns, layout.split],
+    [widths],
   );
 
   return (
@@ -53,9 +57,23 @@ export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
         shares={layout.shares}
       />
 
-      {layout.columns === 2 ? (
+      {layout.columns === 3 ? (
         <>
-          <ColumnDivider />
+          <ColumnDivider line={0} />
+
+          <BlockColumn
+            blocks={blocks}
+            heights={layout.heights}
+            ids={layout.middle}
+            mode={layout.mode}
+            shares={layout.shares}
+          />
+        </>
+      ) : undefined}
+
+      {layout.columns === 1 ? undefined : (
+        <>
+          <ColumnDivider line={layout.columns === 3 ? 1 : 0} />
 
           <BlockColumn
             blocks={blocks}
@@ -65,7 +83,7 @@ export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
             shares={layout.shares}
           />
         </>
-      ) : undefined}
+      )}
     </div>
   );
 });

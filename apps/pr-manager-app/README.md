@@ -141,9 +141,10 @@ cycles under it), the workflow runs still going, what merged, and the open
 issues. **Layout**, beside the theme
 button, arranges them:
 
-- **One column or two.** Two need a screen at least 60rem wide; on a narrower
-  one they stack whatever the layout says. The line between them is dragged to
-  share the width, and double-clicked to even it.
+- **One column, two or three.** Two need a screen at least 60rem wide, and
+  three 80rem; on a narrower one they stack whatever the layout says. A line
+  between two columns is dragged to share the width, and double-clicked to
+  even the two beside it; with three, the third keeps its width.
 - **The order**, and which column each block is in, with the dialog's
   buttons alone: an order set once and seldom changed is not worth a drag
   surface on every block.
@@ -164,11 +165,13 @@ drags are pointer events rather than the HTML drag and drop API, which draws
 its own ghost image and does not work with touch.
 
 **The layout is kept in the URL**, as the theme is, so a bookmark opens the
-same way: `cols=2`, `left=open.merged`, `right=issues`, `split=40` (the left
-column's share, in percent), `h.open=480` (a height, in pixels), `mode=fill`
-and `s.open=150` (a block's share of its column, a weight against 100 for
-each block without one). Only what
-differs from one column in the usual order is written, a moment after the last
+same way: `cols=2` or `cols=3`, `left=open.merged`, `middle=runs` (with
+three), `right=issues`, `split=40` (the left column's share of two, in
+percent), `lines=25-70` (where the two lines between three columns are, in
+percent from the left), `h.open=480` (a height, in pixels), `mode=fill` and
+`s.open=150` (a block's share of its column, a weight against 100 for each
+block without one). Only what differs from one column in the usual order is
+written, a moment after the last
 change so that a drag does not rewrite the address bar on every pointer move.
 A URL edited by hand still opens: unknown blocks are dropped, missing ones put
 back, and numbers clamped.

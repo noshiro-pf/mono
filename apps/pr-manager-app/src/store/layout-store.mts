@@ -22,16 +22,20 @@ import {
   moveBlock,
   withBoundaryAt,
   withColumns,
+  withEvenLine,
   withEvenShares,
   withHeight,
+  withLineAt,
   withMode,
   withShare,
   withSplit,
   type BlockId,
   type BlockPlace,
   type BoundaryDrag,
+  type ColumnCount,
   type HeightMode,
   type Layout,
+  type LineIndex,
 } from '../layout.mjs';
 
 export type LayoutDeps = Readonly<{
@@ -61,8 +65,12 @@ export type LayoutStore = Readonly<{
   mode: InitializedObservable<HeightMode>;
   resizing: InitializedObservable<Resizing | undefined>;
   settingsOpen: InitializedObservable<boolean>;
-  setColumns: (columns: 1 | 2) => void;
+  setColumns: (columns: ColumnCount) => void;
   setSplit: (split: number) => void;
+  /** Moves the line between two columns; see `withLineAt`. */
+  setLine: (line: LineIndex, at: number) => void;
+  /** Evens the two columns beside the line. */
+  evenLine: (line: LineIndex) => void;
   setHeight: (block: BlockId, height: number | undefined) => void;
   setMode: (mode: HeightMode) => void;
   setShare: (block: BlockId, share: number | undefined) => void;
@@ -135,6 +143,12 @@ export const createLayoutStore = (deps: LayoutDeps): LayoutStore => {
     },
     setSplit: (split) => {
       updateLayout((current) => withSplit(current, split));
+    },
+    setLine: (line, at) => {
+      updateLayout((current) => withLineAt(current, line, at));
+    },
+    evenLine: (line) => {
+      updateLayout((current) => withEvenLine(current, line));
     },
     setHeight,
     setMode: (mode) => {

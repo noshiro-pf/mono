@@ -3,7 +3,8 @@
  *
  * **The blocks** are the merge order (with the cycles under it), the workflow
  * runs still going, what merged, and the open issues. They can be put in one
- * column or two, in any order, and with two the divider between them moves.
+ * column, two or three, in any order, and the dividers between the columns
+ * move.
  *
  * **Their heights** are one of two modes. In `natural`, the page is as tall
  * as its blocks: each can be given a height, and then scrolls on its own,
@@ -20,12 +21,17 @@
  * differs from {@link DEFAULT_LAYOUT} is written, so a page laid out the
  * usual way has a URL that says nothing about it:
  *
- * - `cols=2`: two columns. Absent is one; alone, it splits the blocks as
- *   the settings would.
- * - `left=open.merged`, `right=issues`: the blocks in each column, top down,
- *   joined with `.`, which `URLSearchParams` does not escape. With one column
- *   only `left` is written, and only when it is not the usual order.
- * - `split=40`: the left column's share of the width, in percent.
+ * - `cols=2`, `cols=3`: two or three columns. Absent is one; alone, it
+ *   splits the blocks as the settings would.
+ * - `left=open.merged`, `middle=runs`, `right=issues`: the blocks in each
+ *   column, top down, joined with `.`, which `URLSearchParams` does not
+ *   escape. With one column only `left` is written, and only when it is not
+ *   the usual order; `middle` only with three.
+ * - `split=40`: with two columns, the left one's share of the width, in
+ *   percent.
+ * - `lines=25-70`: with three columns, where the two lines between them are,
+ *   in percent of the width from the left. Joined with `-` rather than `.`,
+ *   which would read as a decimal point.
  * - `h.open=480`: a block's height, in CSS pixels.
  * - `mode=fill`: the window-filling mode. Absent is `natural`.
  * - `s.open=150`: a block's share, against {@link DEFAULT_SHARE} for the
@@ -37,7 +43,11 @@
  */
 
 import { Arr, asPositiveInt, Num, Obj, Result } from 'ts-data-forge';
-import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
+import type {
+  FixedLengthTuple,
+  ReadonlyRecord,
+  StrictPick,
+} from 'ts-type-forge';
 import { currentSearch, rewriteSearch } from './url.mjs';
 
 /** Said here rather than on each member, which `fix:codemod:full` drops (#2042). */
@@ -66,16 +76,35 @@ export const BLOCK_NAMES = {
 /** See the top of this file. */
 export type HeightMode = 'natural' | 'fill';
 
-/** `0` is the left column, `1` the right. */
-export type ColumnIndex = 0 | 1;
+export type ColumnCount = 1 | 2 | 3;
+
+/**
+ * `0` is the left column, then the middle one with three, and the right
+ * one: `1` with two columns, `2` with three.
+ */
+export type ColumnIndex = 0 | 1 | 2;
+
+/** `0` is the line left of the middle column, `1` the one right of it. */
+export type LineIndex = 0 | 1;
 
 export type Layout = Readonly<{
-  columns: 1 | 2;
-  /** Top down. With one column this is every block, and `right` is empty. */
+  columns: ColumnCount;
+  /**
+   * Top down. With one column `left` is every block and the others are
+   * empty; `middle` is empty but with three.
+   */
   left: readonly BlockId[];
+  middle: readonly BlockId[];
   right: readonly BlockId[];
-  /** The left column's share of the width, in percent. */
+  /** With two columns, the left one's share of the width, in percent. */
   split: number;
+  /**
+   * With three columns, where the lines between them are, in percent of the
+   * width from the left; in order, and every column at least
+   * {@link MIN_THIRD_WIDTH} wide. Kept apart from {@link Layout.split}, so
+   * that going from two columns to three and back finds each where it was.
+   */
+  lines: FixedLengthTuple<2, number>;
   /**
    * In CSS pixels. A block without one is as tall as what it holds. Read in
    * the `natural` mode only.
@@ -110,8 +139,10 @@ export type BlockPlace = Readonly<{ column: ColumnIndex; index: number }>;
 export const DEFAULT_LAYOUT: Layout = {
   columns: 1,
   left: BLOCK_IDS,
+  middle: [],
   right: [],
   split: 50,
+  lines: [33, 67],
   heights: {},
   mode: 'natural',
   shares: {},
@@ -125,6 +156,9 @@ export const MIN_SPLIT = 20;
 
 export const MAX_SPLIT = 80;
 
+/** The least width a column of three is given, in percent. */
+export const MIN_THIRD_WIDTH = 15;
+
 export const DEFAULT_SHARE = 100;
 
 export const MIN_SHARE = 10;
@@ -137,9 +171,11 @@ export const MIN_FILL_HEIGHT = 80;
 export const layoutFromSearch = (search: string): Layout => {
   const params = new URLSearchParams(search);
 
-  const columns = params.get(PARAM.columns) === '2' ? 2 : 1;
+  const columns = columnsParam(params.get(PARAM.columns));
 
   const split = numberParam(params.get(PARAM.split));
+
+  const lines = linesParam(params.get(PARAM.lines));
 
   const heights = Object.fromEntries(
     BLOCK_IDS.flatMap((id) => {
@@ -161,9 +197,11 @@ export const layoutFromSearch = (search: string): Layout => {
     ...arrange(
       columns,
       blockList(params.get(PARAM.left)),
+      blockList(params.get(PARAM.middle)),
       blockList(params.get(PARAM.right)),
     ),
     split: split === undefined ? DEFAULT_LAYOUT.split : clampSplit(split),
+    lines: lines === undefined ? DEFAULT_LAYOUT.lines : clampLines(lines),
     heights,
     mode:
       params.get(PARAM.mode) === 'fill'
@@ -172,10 +210,13 @@ export const layoutFromSearch = (search: string): Layout => {
     shares,
   } as const;
 
-  // `?cols=2` alone, as typed by hand, splits the columns the way the
-  // settings would rather than leaving the right one empty.
-  return columns === 2 && !params.has(PARAM.left) && !params.has(PARAM.right)
-    ? withColumns({ ...read, columns: 1 }, 2)
+  // `?cols=2` or `?cols=3` alone, as typed by hand, splits the columns the
+  // way the settings would rather than leaving the others empty.
+  return columns !== 1 &&
+    !params.has(PARAM.left) &&
+    !params.has(PARAM.middle) &&
+    !params.has(PARAM.right)
+    ? withColumns({ ...read, columns: 1 }, columns)
     : read;
 };
 
@@ -186,8 +227,10 @@ export const searchWithLayout = (search: string, layout: Layout): string => {
   for (const param of [
     PARAM.columns,
     PARAM.left,
+    PARAM.middle,
     PARAM.right,
     PARAM.split,
+    PARAM.lines,
     PARAM.mode,
     ...BLOCK_IDS.map(heightParam),
     ...BLOCK_IDS.map(shareParam),
@@ -195,18 +238,28 @@ export const searchWithLayout = (search: string, layout: Layout): string => {
     params.delete(param);
   }
 
-  if (layout.columns === 2) {
-    params.set(PARAM.columns, '2');
+  if (layout.columns === 1) {
+    if (!Arr.eq(layout.left, DEFAULT_LAYOUT.left)) {
+      params.set(PARAM.left, layout.left.join(SEPARATOR));
+    }
+  } else {
+    params.set(PARAM.columns, String(layout.columns));
 
     params.set(PARAM.left, layout.left.join(SEPARATOR));
+
+    if (layout.columns === 3) {
+      params.set(PARAM.middle, layout.middle.join(SEPARATOR));
+    }
 
     params.set(PARAM.right, layout.right.join(SEPARATOR));
-  } else if (!Arr.eq(layout.left, DEFAULT_LAYOUT.left)) {
-    params.set(PARAM.left, layout.left.join(SEPARATOR));
   }
 
   if (layout.split !== DEFAULT_LAYOUT.split) {
     params.set(PARAM.split, String(layout.split));
+  }
+
+  if (!Arr.eq(layout.lines, DEFAULT_LAYOUT.lines)) {
+    params.set(PARAM.lines, layout.lines.join(LINE_SEPARATOR));
   }
 
   for (const id of BLOCK_IDS) {
@@ -245,56 +298,102 @@ export const saveLayout = (layout: Layout): void => {
 
 /**
  * Two columns from one put the first block on the left and the rest on the
- * right, which is the split that leaves the merge order the most room; two
- * that both hold something are left as they are. One from two is the left
- * column, then the right.
+ * right, which is the split that leaves the merge order the most room; three
+ * from one put the last block on the right as well, and the rest between.
+ * Columns that already hold something are kept: three from two keep the left
+ * column and split the right one's last block off it, and two from three put
+ * the middle column at the top of the right one. Fewer from more otherwise
+ * keep the order left to right, and the same number is left as it is.
  */
-export const withColumns = (layout: Layout, columns: 1 | 2): Layout => {
+export const withColumns = (layout: Layout, columns: ColumnCount): Layout => {
+  const { left, middle, right } = layout;
+
   if (columns === 1) {
-    return { ...layout, ...arrange(1, layout.left, layout.right) };
+    return { ...layout, ...arrange(1, left, middle, right) };
   }
 
-  if (layout.columns === 2 && Arr.isNonEmpty(layout.left)) {
-    return layout;
+  if (Arr.isNonEmpty(left)) {
+    if (layout.columns === columns) {
+      return layout;
+    }
+
+    if (layout.columns === 3) {
+      return { ...layout, ...arrange(2, left, [], [...middle, ...right]) };
+    }
+
+    if (layout.columns === 2) {
+      return { ...layout, ...arrange(3, left, ...lastApart(right)) };
+    }
   }
 
-  const [first, ...rest] = [...layout.left, ...layout.right] as const;
+  const [first, ...rest] = [...left, ...middle, ...right] as const;
 
-  return {
-    ...layout,
-    ...arrange(2, first === undefined ? [] : [first], rest),
-  };
+  const firstOnly = first === undefined ? ([] as const) : ([first] as const);
+
+  return columns === 2
+    ? { ...layout, ...arrange(2, firstOnly, [], rest) }
+    : { ...layout, ...arrange(3, firstOnly, ...lastApart(rest)) };
+};
+
+/** The blocks of each column drawn, left to right. */
+export const columnsOf = (layout: Layout): readonly (readonly BlockId[])[] => {
+  switch (layout.columns) {
+    case 1:
+      return [layout.left];
+
+    case 2:
+      return [layout.left, layout.right];
+
+    case 3:
+      return [layout.left, layout.middle, layout.right];
+  }
+};
+
+/** The width of each column drawn, left to right, in percent. */
+export const columnWidths = (layout: Layout): readonly number[] => {
+  switch (layout.columns) {
+    case 1:
+      return [100];
+
+    case 2:
+      return [layout.split, 100 - layout.split];
+
+    case 3: {
+      const [first, second] = layout.lines;
+
+      return [first, second - first, 100 - second];
+    }
+  }
 };
 
 /**
  * Takes `block` out of wherever it is and puts it at `target`, whose index
- * counts the blocks already there without it. With one column there is only
- * the left.
+ * counts the blocks already there without it. A column past the last drawn
+ * is the last: with one column there is only the left, and with two `1` and
+ * `2` are both the right.
  */
 export const moveBlock = (
   layout: Layout,
   block: BlockId,
   target: BlockPlace,
 ): Layout => {
-  const left = layout.left.filter((id) => id !== block);
+  const without = columnsOf(layout).map((ids) =>
+    ids.filter((id) => id !== block),
+  );
 
-  const right = layout.right.filter((id) => id !== block);
+  const column = Math.min(target.column, without.length - 1);
 
-  const column = layout.columns === 1 ? 0 : target.column;
+  const placed = without.map((ids, index) => {
+    if (index !== column) {
+      return ids;
+    }
 
-  const into = column === 0 ? left : right;
+    const at = Math.max(0, Math.min(target.index, ids.length));
 
-  const index = Math.max(0, Math.min(target.index, into.length));
+    return [...ids.slice(0, at), block, ...ids.slice(at)] as const;
+  });
 
-  const placed = [
-    ...into.slice(0, index),
-    block,
-    ...into.slice(index),
-  ] as const;
-
-  return column === 0
-    ? { ...layout, left: placed, right }
-    : { ...layout, left, right: placed };
+  return { ...layout, ...placedColumns(layout.columns, placed) };
 };
 
 /** `undefined` gives the block back its natural height. */
@@ -414,6 +513,53 @@ export const withSplit = (layout: Layout, split: number): Layout =>
   }) as const;
 
 /**
+ * Moves the line between two columns to `at`, in percent of the width: with
+ * two columns that is the split, and with three one of the lines, the other
+ * staying where it is and every column keeping {@link MIN_THIRD_WIDTH}.
+ */
+export const withLineAt = (
+  layout: Layout,
+  line: LineIndex,
+  at: number,
+): Layout => {
+  if (layout.columns !== 3) {
+    return withSplit(layout, at);
+  }
+
+  const [first, second] = layout.lines;
+
+  return {
+    ...layout,
+    lines:
+      line === 0
+        ? [clampBetween(at, MIN_THIRD_WIDTH, second - MIN_THIRD_WIDTH), second]
+        : [
+            first,
+            clampBetween(at, first + MIN_THIRD_WIDTH, 100 - MIN_THIRD_WIDTH),
+          ],
+  };
+};
+
+/**
+ * Gives the two columns beside a line the same width, out of what they had
+ * between them, which leaves the third of three as it was. With two columns,
+ * it evens the split.
+ */
+export const withEvenLine = (layout: Layout, line: LineIndex): Layout => {
+  if (layout.columns !== 3) {
+    return withSplit(layout, DEFAULT_LAYOUT.split);
+  }
+
+  const [first, second] = layout.lines;
+
+  return withLineAt(
+    layout,
+    line,
+    line === 0 ? Num.div(second, 2) : Num.div(first + 100, 2),
+  );
+};
+
+/**
  * The split a pointer at `x` asks for, across a layout whose box starts at
  * `left`. Unclamped; {@link withSplit} clamps. Nothing for a layout with no
  * width, which is one not drawn.
@@ -427,12 +573,34 @@ export const splitAt = (
 const PARAM = {
   columns: 'cols',
   left: 'left',
+  middle: 'middle',
   right: 'right',
   split: 'split',
+  lines: 'lines',
   mode: 'mode',
 } as const;
 
 const SEPARATOR = '.';
+
+const LINE_SEPARATOR = '-';
+
+const columnsParam = (raw: string | null): ColumnCount =>
+  raw === '3' ? 3 : raw === '2' ? 2 : 1;
+
+/** Two numbers, or none. */
+const linesParam = (
+  raw: string | null,
+): FixedLengthTuple<2, number> | undefined => {
+  if (raw === null) {
+    return undefined;
+  }
+
+  const [first, second, ...rest] = raw.split(LINE_SEPARATOR).map(numberParam);
+
+  return first === undefined || second === undefined || Arr.isNonEmpty(rest)
+    ? undefined
+    : [first, second];
+};
 
 const heightParam = (id: BlockId): string => `h.${id}` as const;
 
@@ -455,35 +623,107 @@ const isBlockId = (value: string): value is BlockId =>
 const blockList = (raw: string | null): readonly BlockId[] =>
   raw === null ? ([] as const) : raw.split(SEPARATOR).filter(isBlockId);
 
+type Columns = StrictPick<Layout, 'columns' | 'left' | 'middle' | 'right'>;
+
 /**
  * Every block exactly once: the first mention wins, and what is not
- * mentioned goes to the end of the left column.
+ * mentioned goes to the end of the left column. With fewer than three
+ * columns, the middle's blocks go to the top of the right one, as
+ * {@link withColumns} puts them; with one, every block is on the left.
  */
 const arrange = (
-  columns: 1 | 2,
+  columns: ColumnCount,
   left: readonly BlockId[],
+  middle: readonly BlockId[],
   right: readonly BlockId[],
-): StrictPick<Layout, 'columns' | 'left' | 'right'> => {
-  const ordered = Arr.uniq([...left, ...right]);
+): Columns => {
+  const ordered = Arr.uniq([...left, ...middle, ...right]);
 
   const missing = BLOCK_IDS.filter((id) => !ordered.includes(id));
 
   if (columns === 1) {
-    return { columns, left: [...ordered, ...missing], right: [] };
+    return { columns, left: [...ordered, ...missing], middle: [], right: [] };
   }
 
   const leftOnly = Arr.uniq(left);
 
-  const rightOnly = Arr.uniq(right).filter((id) => !leftOnly.includes(id));
+  if (columns === 2) {
+    return {
+      columns,
+      left: [...leftOnly, ...missing],
+      middle: [],
+      right: Arr.uniq([...middle, ...right]).filter(
+        (id) => !leftOnly.includes(id),
+      ),
+    };
+  }
 
-  return { columns, left: [...leftOnly, ...missing], right: rightOnly };
+  const middleOnly = Arr.uniq(middle).filter((id) => !leftOnly.includes(id));
+
+  return {
+    columns,
+    left: [...leftOnly, ...missing],
+    middle: middleOnly,
+    right: Arr.uniq(right).filter(
+      (id) => !leftOnly.includes(id) && !middleOnly.includes(id),
+    ),
+  };
+};
+
+/** The blocks but the last, and the last on its own. */
+const lastApart = (
+  ids: readonly BlockId[],
+): FixedLengthTuple<2, readonly BlockId[]> => {
+  const last = ids.at(-1);
+
+  return last === undefined
+    ? [[], []]
+    : [ids.filter((id) => id !== last), [last]];
+};
+
+/** The columns {@link columnsOf} gave, with their blocks changed. */
+const placedColumns = (
+  columns: ColumnCount,
+  placed: readonly (readonly BlockId[])[],
+): Columns => {
+  const [left = [], second = [], third = []] = placed;
+
+  switch (columns) {
+    case 1:
+      return { columns, left, middle: [], right: [] };
+
+    case 2:
+      return { columns, left, middle: [], right: second };
+
+    case 3:
+      return { columns, left, middle: second, right: third };
+  }
 };
 
 const clampHeight = (height: number): number =>
   Math.round(Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, height)));
 
 const clampSplit = (split: number): number =>
-  Math.round(Math.min(MAX_SPLIT, Math.max(MIN_SPLIT, split)));
+  clampBetween(split, MIN_SPLIT, MAX_SPLIT);
+
+/** In order, and every column at least {@link MIN_THIRD_WIDTH} wide. */
+const clampLines = (
+  lines: FixedLengthTuple<2, number>,
+): FixedLengthTuple<2, number> => {
+  const [lower, upper] =
+    lines[0] <= lines[1] ? lines : ([lines[1], lines[0]] as const);
+
+  const first = clampBetween(lower, MIN_THIRD_WIDTH, 100 - 2 * MIN_THIRD_WIDTH);
+
+  return [
+    first,
+    clampBetween(upper, first + MIN_THIRD_WIDTH, 100 - MIN_THIRD_WIDTH),
+  ];
+};
+
+/** Rounded to a whole number, then kept between `min` and `max`. */
+const clampBetween = (value: number, min: number, max: number): number =>
+  Math.min(max, Math.max(min, Math.round(value)));
 
 /** To a tenth: fine enough for a drag to follow the pointer. */
 const roundShare = (share: number): number => Math.round(share * 10) / 10;

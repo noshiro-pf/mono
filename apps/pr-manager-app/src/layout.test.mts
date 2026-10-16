@@ -1,4 +1,6 @@
 import {
+  columnsOf,
+  columnWidths,
   DEFAULT_LAYOUT,
   DEFAULT_SHARE,
   layoutFromSearch,
@@ -8,8 +10,10 @@ import {
   splitAt,
   withBoundaryAt,
   withColumns,
+  withEvenLine,
   withEvenShares,
   withHeight,
+  withLineAt,
   withMode,
   withShare,
   withSplit,
@@ -32,12 +36,71 @@ describe(layoutFromSearch, () => {
       {
         columns: 2,
         left: ['issues'],
+        middle: [],
         right: ['open', 'runs', 'merged'],
         split: 35,
+        lines: DEFAULT_LAYOUT.lines,
         heights: { open: 480 },
         mode: 'natural',
         shares: {},
       },
+    );
+  });
+
+  test('reads three columns, their blocks and the lines between them', () => {
+    assert.deepStrictEqual(
+      layoutFromSearch(
+        '?cols=3&left=open&middle=runs.merged&right=issues&lines=25-70',
+      ),
+      {
+        ...DEFAULT_LAYOUT,
+        columns: 3,
+        left: ['open'],
+        middle: ['runs', 'merged'],
+        right: ['issues'],
+        lines: [25, 70],
+      },
+    );
+  });
+
+  test('`cols=3` alone splits the blocks as the settings would', () => {
+    assert.deepStrictEqual(
+      layoutFromSearch('?cols=3'),
+      withColumns(DEFAULT_LAYOUT, 3),
+    );
+  });
+
+  test('two columns put what `middle` says at the top of the right one', () => {
+    assert.deepStrictEqual(
+      layoutFromSearch('?cols=2&left=open&middle=runs&right=merged.issues'),
+      {
+        ...DEFAULT_LAYOUT,
+        columns: 2,
+        left: ['open'],
+        right: ['runs', 'merged', 'issues'],
+      },
+    );
+  });
+
+  test('puts the lines in order and leaves each of three columns its least width', () => {
+    assert.deepStrictEqual(
+      layoutFromSearch('?cols=3&lines=70-25').lines,
+      [25, 70],
+    );
+
+    assert.deepStrictEqual(
+      layoutFromSearch('?cols=3&lines=2-5').lines,
+      [15, 30],
+    );
+
+    assert.deepStrictEqual(
+      layoutFromSearch('?cols=3&lines=50-52').lines,
+      [50, 65],
+    );
+
+    assert.deepStrictEqual(
+      layoutFromSearch('?cols=3&lines=40').lines,
+      DEFAULT_LAYOUT.lines,
     );
   });
 
@@ -125,8 +188,10 @@ describe(searchWithLayout, () => {
     const layout: Layout = {
       columns: 2,
       left: ['merged', 'runs'],
+      middle: [],
       right: ['issues', 'open'],
       split: 42,
+      lines: [30, 60],
       heights: { issues: 300, open: 640 },
       mode: 'fill',
       shares: { merged: 60, open: 140.5 },
@@ -135,6 +200,26 @@ describe(searchWithLayout, () => {
     assert.deepStrictEqual(
       layoutFromSearch(searchWithLayout('?theme=light', layout)),
       layout,
+    );
+
+    const three: Layout = {
+      ...layout,
+      columns: 3,
+      left: ['merged'],
+      middle: ['runs', 'open'],
+      right: ['issues'],
+    } as const;
+
+    assert.deepStrictEqual(
+      layoutFromSearch(searchWithLayout('', three)),
+      three,
+    );
+  });
+
+  test('writes three columns and the lines between them', () => {
+    assert.strictEqual(
+      searchWithLayout('', withLineAt(withColumns(DEFAULT_LAYOUT, 3), 0, 25)),
+      '?cols=3&left=open&middle=runs.merged&right=issues&lines=25-67',
     );
   });
 });
@@ -158,6 +243,50 @@ describe(withColumns, () => {
     } as const;
 
     assert.deepStrictEqual(withColumns(withColumns(two, 2), 2), two);
+  });
+
+  test('splits one column into three, the first block on the left and the last on the right', () => {
+    assert.deepStrictEqual(withColumns(DEFAULT_LAYOUT, 3), {
+      ...DEFAULT_LAYOUT,
+      columns: 3,
+      left: ['open'],
+      middle: ['runs', 'merged'],
+      right: ['issues'],
+    });
+  });
+
+  test('two into three keeps the left column and splits the last block off the right', () => {
+    assert.deepStrictEqual(withColumns(withColumns(DEFAULT_LAYOUT, 2), 3), {
+      ...DEFAULT_LAYOUT,
+      columns: 3,
+      left: ['open'],
+      middle: ['runs', 'merged'],
+      right: ['issues'],
+    });
+  });
+
+  test('three into two puts the middle column at the top of the right one', () => {
+    const three: Layout = {
+      ...DEFAULT_LAYOUT,
+      columns: 3,
+      left: ['issues'],
+      middle: ['merged'],
+      right: ['open', 'runs'],
+    } as const;
+
+    assert.deepStrictEqual(withColumns(three, 2), {
+      ...DEFAULT_LAYOUT,
+      columns: 2,
+      left: ['issues'],
+      right: ['merged', 'open', 'runs'],
+    });
+
+    assert.deepStrictEqual(withColumns(three, 1), {
+      ...DEFAULT_LAYOUT,
+      left: ['issues', 'merged', 'open', 'runs'],
+    });
+
+    assert.deepStrictEqual(withColumns(three, 3), three);
   });
 
   test('joins two into one, left then right', () => {
@@ -200,6 +329,24 @@ describe(moveBlock, () => {
         ['open', 'issues'],
         ['runs', 'merged'],
       ],
+    );
+  });
+
+  test('moves into the middle column, and two columns have no middle', () => {
+    const three = withColumns(DEFAULT_LAYOUT, 3);
+
+    const moved = moveBlock(three, 'issues', { column: 1, index: 0 });
+
+    assert.deepStrictEqual(
+      [moved.left, moved.middle, moved.right],
+      [['open'], ['issues', 'runs', 'merged'], []],
+    );
+
+    const two = withColumns(DEFAULT_LAYOUT, 2);
+
+    assert.deepStrictEqual(
+      moveBlock(two, 'open', { column: 2, index: 0 }).right,
+      ['open', 'runs', 'merged', 'issues'],
     );
   });
 
@@ -355,6 +502,85 @@ describe(withSplit, () => {
     assert.strictEqual(withSplit(DEFAULT_LAYOUT, 5).split, 20);
 
     assert.strictEqual(withSplit(DEFAULT_LAYOUT, 95).split, 80);
+  });
+});
+
+describe(withLineAt, () => {
+  const three = withColumns(DEFAULT_LAYOUT, 3);
+
+  test('moves one line of three columns and leaves the other where it was', () => {
+    assert.deepStrictEqual(withLineAt(three, 0, 40.4).lines, [40, 67]);
+
+    assert.deepStrictEqual(withLineAt(three, 1, 80).lines, [33, 80]);
+  });
+
+  test('leaves each of three columns its least width', () => {
+    assert.deepStrictEqual(withLineAt(three, 0, 90).lines, [52, 67]);
+
+    assert.deepStrictEqual(withLineAt(three, 0, 0).lines, [15, 67]);
+
+    assert.deepStrictEqual(withLineAt(three, 1, 10).lines, [33, 48]);
+
+    assert.deepStrictEqual(withLineAt(three, 1, 100).lines, [33, 85]);
+  });
+
+  test('with two columns, is the split', () => {
+    const two = withColumns(DEFAULT_LAYOUT, 2);
+
+    assert.deepStrictEqual(withLineAt(two, 0, 30), withSplit(two, 30));
+  });
+});
+
+describe(withEvenLine, () => {
+  test('evens the two columns beside the line, and leaves the third as it was', () => {
+    const three = withLineAt(
+      withLineAt(withColumns(DEFAULT_LAYOUT, 3), 1, 80),
+      0,
+      20,
+    );
+
+    assert.deepStrictEqual(withEvenLine(three, 0).lines, [40, 80]);
+
+    assert.deepStrictEqual(withEvenLine(three, 1).lines, [20, 60]);
+  });
+
+  test('with two columns, evens the split', () => {
+    const two = withSplit(withColumns(DEFAULT_LAYOUT, 2), 30);
+
+    assert.strictEqual(withEvenLine(two, 0).split, 50);
+  });
+});
+
+describe(columnsOf, () => {
+  test('is the blocks of each column drawn, left to right', () => {
+    assert.deepStrictEqual(columnsOf(DEFAULT_LAYOUT), [DEFAULT_LAYOUT.left]);
+
+    assert.deepStrictEqual(columnsOf(withColumns(DEFAULT_LAYOUT, 2)), [
+      ['open'],
+      ['runs', 'merged', 'issues'],
+    ]);
+
+    assert.deepStrictEqual(columnsOf(withColumns(DEFAULT_LAYOUT, 3)), [
+      ['open'],
+      ['runs', 'merged'],
+      ['issues'],
+    ]);
+  });
+});
+
+describe(columnWidths, () => {
+  test('is the width of each column drawn, in percent', () => {
+    assert.deepStrictEqual(columnWidths(DEFAULT_LAYOUT), [100]);
+
+    assert.deepStrictEqual(
+      columnWidths(withSplit(withColumns(DEFAULT_LAYOUT, 2), 40)),
+      [40, 60],
+    );
+
+    assert.deepStrictEqual(
+      columnWidths(withLineAt(withColumns(DEFAULT_LAYOUT, 3), 0, 25)),
+      [25, 42, 33],
+    );
   });
 });
 
