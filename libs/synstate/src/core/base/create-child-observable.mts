@@ -101,13 +101,12 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
   /** Set once assembled; see {@link unregisterChild}. */
   let mut_self: ChildObservable<A> | undefined = undefined;
 
-  const autoComplete =
-    onComplete !== undefined || parents.some((p) => p.autoComplete);
-
-  const dispose = (): void => {
-    // A completed node is reached again through every parent and child that
-    // completes after it; running again would repeat the teardown and the
-    // ancestor walk in `unregisterChild` for each of them.
+  // Completing never reaches the parents: an upstream observable may be
+  // shared, and only whoever owns it decides when it ends (#2133).
+  const complete = (): void => {
+    // A completed node is reached again through every parent that completes
+    // after it; running again would repeat the teardown and the ancestor walk
+    // in `unregisterChild`.
     if (handle.isCompleted()) {
       return;
     }
@@ -121,31 +120,11 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
     }
   };
 
-  const complete = (): void => {
-    if (handle.isCompleted()) {
-      return;
-    }
-
-    dispose();
-
-    // propagate to parents
-    for (const par of parents) {
-      par.tryComplete();
-    }
-  };
-
+  // Called by a parent that has completed.
   const tryComplete = (): void => {
-    if (handle.isCompleted()) {
-      return;
+    if (!handle.isCompleted() && parents.every((p) => p.isCompleted)) {
+      complete();
     }
-
-    tryCompleteChild({
-      hasSubscriber: handle.hasSubscriber(),
-      hasActiveChild: handle.hasActiveChild(),
-      autoComplete,
-      parents,
-      complete,
-    });
   };
 
   const tryUpdate = createTryUpdate({
@@ -161,8 +140,7 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
     tryUpdate,
     tryComplete,
     complete,
-    dispose,
-    autoComplete,
+    dispose: complete,
     extra: { parents },
   });
 
@@ -223,13 +201,12 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
   /** Set once assembled; see {@link unregisterChild}. */
   let mut_self: ChildObservable<A> | undefined = undefined;
 
-  const autoComplete =
-    onComplete !== undefined || parents.some((p) => p.autoComplete);
-
-  const dispose = (): void => {
-    // A completed node is reached again through every parent and child that
-    // completes after it; running again would repeat the teardown and the
-    // ancestor walk in `unregisterChild` for each of them.
+  // Completing never reaches the parents: an upstream observable may be
+  // shared, and only whoever owns it decides when it ends (#2133).
+  const complete = (): void => {
+    // A completed node is reached again through every parent that completes
+    // after it; running again would repeat the teardown and the ancestor walk
+    // in `unregisterChild`.
     if (handle.isCompleted()) {
       return;
     }
@@ -243,31 +220,11 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     }
   };
 
-  const complete = (): void => {
-    if (handle.isCompleted()) {
-      return;
-    }
-
-    dispose();
-
-    // propagate to parents
-    for (const par of parents) {
-      par.tryComplete();
-    }
-  };
-
+  // Called by a parent that has completed.
   const tryComplete = (): void => {
-    if (handle.isCompleted()) {
-      return;
+    if (!handle.isCompleted() && parents.every((p) => p.isCompleted)) {
+      complete();
     }
-
-    tryCompleteChild({
-      hasSubscriber: handle.hasSubscriber(),
-      hasActiveChild: handle.hasActiveChild(),
-      autoComplete,
-      parents,
-      complete,
-    });
   };
 
   const tryUpdate = createTryUpdate({
@@ -284,8 +241,7 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     tryUpdate,
     tryComplete,
     complete,
-    dispose,
-    autoComplete,
+    dispose: complete,
     extra: { parents, addDescendant, deleteDescendant },
   });
 
@@ -422,36 +378,5 @@ const unregisterChild = <A,>(
     } else {
       mut_rest.push(...p.parents);
     }
-  }
-};
-
-const tryCompleteChild = <A,>({
-  hasSubscriber,
-  hasActiveChild,
-  autoComplete,
-  parents,
-  complete,
-}: Readonly<{
-  hasSubscriber: boolean;
-  hasActiveChild: boolean;
-  autoComplete: boolean;
-  parents: ChildObservable<A>['parents'];
-  complete: () => void;
-}>): void => {
-  // If there is no working parent node
-  if (parents.every((r) => r.isCompleted)) {
-    complete();
-
-    return;
-  }
-
-  // If there are no active child node, and completing releases something
-  if (autoComplete && !hasSubscriber && !hasActiveChild) {
-    complete();
-  }
-
-  // propagate to parents
-  for (const par of parents) {
-    par.tryComplete();
   }
 };

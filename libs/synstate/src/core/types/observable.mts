@@ -35,26 +35,15 @@ type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
   hasChild: boolean;
   hasActiveChild: () => boolean;
 
-  /**
-   * Whether this observable completes itself once nothing uses it any more —
-   * once it has neither subscribers nor live children when one of its children
-   * completes. True when completing it would release something: it has a
-   * teardown of its own (a timer, an inner subscription) or a parent with
-   * `autoComplete`. A `source` or `createState` and everything derived from
-   * it alone are never completed this way, so completing a derived observable
-   * cannot end a state that something else may still read (#2133).
-   */
-  autoComplete: boolean;
-
   tryUpdate: (updateToken: UpdateToken) => void;
   tryComplete: () => void;
   complete: () => void;
 
   /**
-   * Completes this observable and takes it out of the graph, without telling
-   * its parents: unlike `complete()`, it never completes an upstream
-   * observable, whatever its `autoComplete`. Its descendants are completed as
-   * by `complete()` once none of their parents is live.
+   * Completes this observable and takes it out of the graph, for whoever owns
+   * it (a scope) to release it. Neither this nor `complete()` reaches upstream:
+   * a child completing never completes its parents, which may be shared
+   * (#2133). Its descendants complete once none of their parents is live.
    */
   dispose: () => void;
   subscribe: (onNext: (v: A) => void, onComplete?: () => void) => Subscription;
