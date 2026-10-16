@@ -59,7 +59,8 @@ export const createRootObservable = <
 ): Extension & RootObservable<A> => {
   const handle = createObservableBaseHandle<A>(initialValue);
 
-  const { addDescendant, startUpdate } = createManagerObservableParts(handle);
+  const { addDescendant, deleteDescendant, startUpdate } =
+    createManagerObservableParts(handle);
 
   const complete = (): void => {
     onComplete?.();
@@ -89,6 +90,7 @@ export const createRootObservable = <
     extra: {
       ...extension,
       addDescendant,
+      deleteDescendant,
     },
   });
 };
