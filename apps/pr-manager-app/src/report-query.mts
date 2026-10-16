@@ -134,10 +134,12 @@ export const CHECKS_QUERY = [
 ].join('\n');
 
 /**
- * What only the badges and the linked issues on each card are read from: the
- * issues the body closes, the reviews and the changed files a code owner's
- * approval is decided over, and the recent comments a set-aside record is
- * found among.
+ * What only the badges, the linked issues on each card and the queue are
+ * read from: the issues the body closes, the reviews and the changed files a
+ * code owner's approval is decided over, the recent comments a set-aside
+ * record or a claim is found among, and what the queue's order turns on —
+ * whether a merge would conflict, the unresolved conversations, and a place
+ * in one of GitHub's native stacks (`queue-view.mts`).
  */
 export const DETAILS_QUERY = [
   'query PullRequestDetails($owner: String!, $name: String!) {',
@@ -149,6 +151,8 @@ export const DETAILS_QUERY = [
   '        latestOpinionatedReviews(first: 20, writersOnly: true) { nodes { state author { login } } }',
   `        files(first: ${PAGE_SIZE}) { ${PAGE_INFO} nodes { path } }`,
   `        comments(last: ${SET_ASIDE_COMMENT_SCAN}) { nodes { url body viewerDidAuthor } }`,
+  '        mergeable stackEntry { position stack { number size } }',
+  `        reviewThreads(first: ${PAGE_SIZE}) { nodes { isResolved } }`,
   '      }',
   '    }',
   '  }',
@@ -508,6 +512,23 @@ const PullRequestDetailsSchema = t.record({
         viewerDidAuthor: t.boolean(),
       }),
     ),
+  }),
+  /**
+   * `CONFLICTING` when a merge into the base would conflict, which the queue
+   * orders after the rest as `unblock-prs` orders `DIRTY`. GitHub's
+   * `mergeStateStatus` would say it outright, but is a preview field.
+   */
+  mergeable: t.string(),
+  /** Its place in one of GitHub's native stacks, which nothing arms. */
+  stackEntry: t.union([
+    t.record({
+      position: t.number(),
+      stack: t.record({ number: t.number(), size: t.number() }),
+    }),
+    t.nullType,
+  ]),
+  reviewThreads: t.record({
+    nodes: t.array(t.record({ isResolved: t.boolean() })),
   }),
 });
 

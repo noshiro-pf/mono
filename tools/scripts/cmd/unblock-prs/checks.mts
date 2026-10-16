@@ -165,12 +165,6 @@ export const describeWaitingOn = (summary: ChecksSummary): string => {
   return Arr.isNonEmpty(waiting) ? waiting.join(', ') : 'checks to be reported';
 };
 
-/** Merge states in which GitHub itself says nothing holds the merge. */
-export const isMergeableState = (mergeStateStatus: string): boolean =>
-  mergeStateStatus === 'CLEAN' ||
-  mergeStateStatus === 'HAS_HOOKS' ||
-  mergeStateStatus === 'UNSTABLE';
-
 /**
  * When the earliest check still running started, in milliseconds; `undefined`
  * when nothing is running or no start time can be read.

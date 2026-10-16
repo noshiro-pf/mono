@@ -1,11 +1,11 @@
 import dedent from 'dedent';
-import { parseCodeOwners } from 'pr-report-core';
+import { parseCodeOwners } from './code-owners.mjs';
 import {
   reviewHold,
   type ReviewHold,
   type ReviewRules,
   type ReviewState,
-} from './review.mjs';
+} from './review-hold.mjs';
 
 describe(reviewHold, () => {
   test('holds nothing when the review is done', () => {

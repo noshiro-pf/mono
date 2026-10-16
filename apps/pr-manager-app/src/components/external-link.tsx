@@ -11,10 +11,18 @@ type Props = Readonly<{
    * what is on the other side of it.
    */
   variant?:
-    'issue-dag-link' | 'pull-request-title' | 'section-link' | 'split-view';
+    | 'issue-dag-link'
+    | 'pull-request-title'
+    | 'queue-link'
+    | 'section-link'
+    | 'split-view';
   /** `open` / `closed` / `unknown`, for the linked issue chips. */
   dataState?: string;
   title?: string;
+  /** Pointed at or focused, for a tooltip drawn apart from the link. */
+  onEnter?: () => void;
+  /** No longer pointed at, or no longer focused. */
+  onLeave?: () => void;
 }>;
 
 /**
@@ -32,7 +40,7 @@ type Props = Readonly<{
  */
 export const ExternalLink = memoNamed<Props>(
   'ExternalLink',
-  ({ href, children, variant, dataState, title }) => (
+  ({ href, children, variant, dataState, title, onEnter, onLeave }) => (
     <a
       className={variant}
       data-state={dataState}
@@ -40,6 +48,10 @@ export const ExternalLink = memoNamed<Props>(
       rel={'noreferrer'}
       target={'_blank'}
       title={title}
+      onBlur={onLeave}
+      onFocus={onEnter}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
     >
       {children}
     </a>

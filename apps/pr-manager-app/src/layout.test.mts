@@ -37,7 +37,7 @@ describe(layoutFromSearch, () => {
         columns: 2,
         left: ['issues'],
         middle: [],
-        right: ['open', 'runs', 'merged'],
+        right: ['open', 'queue', 'runs', 'merged'],
         split: 35,
         lines: DEFAULT_LAYOUT.lines,
         heights: { open: 480 },
@@ -55,7 +55,7 @@ describe(layoutFromSearch, () => {
       {
         ...DEFAULT_LAYOUT,
         columns: 3,
-        left: ['open'],
+        left: ['open', 'queue'],
         middle: ['runs', 'merged'],
         right: ['issues'],
         lines: [25, 70],
@@ -76,7 +76,7 @@ describe(layoutFromSearch, () => {
       {
         ...DEFAULT_LAYOUT,
         columns: 2,
-        left: ['open'],
+        left: ['open', 'queue'],
         right: ['runs', 'merged', 'issues'],
       },
     );
@@ -118,9 +118,28 @@ describe(layoutFromSearch, () => {
     assert.deepStrictEqual(layoutFromSearch('?left=merged.bogus.merged').left, [
       'merged',
       'open',
+      'queue',
       'runs',
       'issues',
     ]);
+  });
+
+  // It is a strip about the pull requests in the merge order, so a URL
+  // written before it puts it under that, in whichever column it is.
+  test('a URL written before the queue block puts it under the merge order', () => {
+    assert.deepStrictEqual(
+      layoutFromSearch(
+        '?cols=3&left=issues&middle=open.runs&right=merged&lines=25-70',
+      ),
+      {
+        ...DEFAULT_LAYOUT,
+        columns: 3,
+        left: ['issues'],
+        middle: ['open', 'queue', 'runs'],
+        right: ['merged'],
+        lines: [25, 70],
+      },
+    );
   });
 
   test('a URL written before the runs block puts it at the end of the left column', () => {
@@ -129,7 +148,7 @@ describe(layoutFromSearch, () => {
       {
         ...DEFAULT_LAYOUT,
         columns: 2,
-        left: ['open', 'merged', 'runs'],
+        left: ['open', 'queue', 'merged', 'runs'],
         right: ['issues'],
       },
     );
@@ -138,7 +157,7 @@ describe(layoutFromSearch, () => {
   test('one column holds every block, whatever `right` says', () => {
     assert.deepStrictEqual(layoutFromSearch('?left=issues&right=open'), {
       ...DEFAULT_LAYOUT,
-      left: ['issues', 'open', 'runs', 'merged'],
+      left: ['issues', 'open', 'queue', 'runs', 'merged'],
     });
   });
 
@@ -167,7 +186,7 @@ describe(searchWithLayout, () => {
 
     assert.strictEqual(
       searchWithLayout(
-        '?cols=2&left=open&right=runs.merged.issues',
+        '?cols=2&left=open.queue&right=runs.merged.issues',
         DEFAULT_LAYOUT,
       ),
       '',
@@ -180,7 +199,7 @@ describe(searchWithLayout, () => {
         '?theme=dark',
         withSplit(withColumns(DEFAULT_LAYOUT, 2), 60),
       ),
-      '?theme=dark&cols=2&left=open&right=runs.merged.issues&split=60',
+      '?theme=dark&cols=2&left=open.queue&right=runs.merged.issues&split=60',
     );
   });
 
@@ -189,7 +208,7 @@ describe(searchWithLayout, () => {
       columns: 2,
       left: ['merged', 'runs'],
       middle: [],
-      right: ['issues', 'open'],
+      right: ['issues', 'open', 'queue'],
       split: 42,
       lines: [30, 60],
       heights: { issues: 300, open: 640 },
@@ -206,7 +225,7 @@ describe(searchWithLayout, () => {
       ...layout,
       columns: 3,
       left: ['merged'],
-      middle: ['runs', 'open'],
+      middle: ['runs', 'open', 'queue'],
       right: ['issues'],
     } as const;
 
@@ -219,17 +238,17 @@ describe(searchWithLayout, () => {
   test('writes three columns and the lines between them', () => {
     assert.strictEqual(
       searchWithLayout('', withLineAt(withColumns(DEFAULT_LAYOUT, 3), 0, 25)),
-      '?cols=3&left=open&middle=runs.merged&right=issues&lines=25-67',
+      '?cols=3&left=open.queue&middle=runs.merged&right=issues&lines=25-67',
     );
   });
 });
 
 describe(withColumns, () => {
-  test('splits one column into two, the first block on the left', () => {
+  test('splits one column into two, the first block on the left with the queue under it', () => {
     assert.deepStrictEqual(withColumns(DEFAULT_LAYOUT, 2), {
       ...DEFAULT_LAYOUT,
       columns: 2,
-      left: ['open'],
+      left: ['open', 'queue'],
       right: ['runs', 'merged', 'issues'],
     });
   });
@@ -249,7 +268,7 @@ describe(withColumns, () => {
     assert.deepStrictEqual(withColumns(DEFAULT_LAYOUT, 3), {
       ...DEFAULT_LAYOUT,
       columns: 3,
-      left: ['open'],
+      left: ['open', 'queue'],
       middle: ['runs', 'merged'],
       right: ['issues'],
     });
@@ -259,7 +278,7 @@ describe(withColumns, () => {
     assert.deepStrictEqual(withColumns(withColumns(DEFAULT_LAYOUT, 2), 3), {
       ...DEFAULT_LAYOUT,
       columns: 3,
-      left: ['open'],
+      left: ['open', 'queue'],
       middle: ['runs', 'merged'],
       right: ['issues'],
     });
@@ -271,19 +290,19 @@ describe(withColumns, () => {
       columns: 3,
       left: ['issues'],
       middle: ['merged'],
-      right: ['open', 'runs'],
+      right: ['open', 'queue', 'runs'],
     } as const;
 
     assert.deepStrictEqual(withColumns(three, 2), {
       ...DEFAULT_LAYOUT,
       columns: 2,
       left: ['issues'],
-      right: ['merged', 'open', 'runs'],
+      right: ['merged', 'open', 'queue', 'runs'],
     });
 
     assert.deepStrictEqual(withColumns(three, 1), {
       ...DEFAULT_LAYOUT,
-      left: ['issues', 'merged', 'open', 'runs'],
+      left: ['issues', 'merged', 'open', 'queue', 'runs'],
     });
 
     assert.deepStrictEqual(withColumns(three, 3), three);
@@ -296,11 +315,14 @@ describe(withColumns, () => {
           ...DEFAULT_LAYOUT,
           columns: 2,
           left: ['issues'],
-          right: ['open', 'runs', 'merged'],
+          right: ['open', 'queue', 'runs', 'merged'],
         },
         1,
       ),
-      { ...DEFAULT_LAYOUT, left: ['issues', 'open', 'runs', 'merged'] },
+      {
+        ...DEFAULT_LAYOUT,
+        left: ['issues', 'open', 'queue', 'runs', 'merged'],
+      },
     );
   });
 });
@@ -309,12 +331,12 @@ describe(moveBlock, () => {
   test('moves within a column', () => {
     assert.deepStrictEqual(
       moveBlock(DEFAULT_LAYOUT, 'issues', { column: 0, index: 0 }).left,
-      ['issues', 'open', 'runs', 'merged'],
+      ['issues', 'open', 'queue', 'runs', 'merged'],
     );
 
     assert.deepStrictEqual(
-      moveBlock(DEFAULT_LAYOUT, 'open', { column: 0, index: 2 }).left,
-      ['runs', 'merged', 'open', 'issues'],
+      moveBlock(DEFAULT_LAYOUT, 'open', { column: 0, index: 3 }).left,
+      ['queue', 'runs', 'merged', 'open', 'issues'],
     );
   });
 
@@ -326,7 +348,7 @@ describe(moveBlock, () => {
     assert.deepStrictEqual(
       [moved.left, moved.right],
       [
-        ['open', 'issues'],
+        ['open', 'issues', 'queue'],
         ['runs', 'merged'],
       ],
     );
@@ -339,7 +361,7 @@ describe(moveBlock, () => {
 
     assert.deepStrictEqual(
       [moved.left, moved.middle, moved.right],
-      [['open'], ['issues', 'runs', 'merged'], []],
+      [['open', 'queue'], ['issues', 'runs', 'merged'], []],
     );
 
     const two = withColumns(DEFAULT_LAYOUT, 2);
@@ -353,7 +375,10 @@ describe(moveBlock, () => {
   test('an index past the end is the end, and one column has only a left', () => {
     assert.deepStrictEqual(
       moveBlock(DEFAULT_LAYOUT, 'open', { column: 1, index: 9 }),
-      { ...DEFAULT_LAYOUT, left: ['runs', 'merged', 'issues', 'open'] },
+      {
+        ...DEFAULT_LAYOUT,
+        left: ['queue', 'runs', 'merged', 'issues', 'open'],
+      },
     );
   });
 });
@@ -449,6 +474,12 @@ describe(sharePercents, () => {
     );
 
     assert.deepStrictEqual(sharePercents(DEFAULT_LAYOUT, ['issues']), [100]);
+
+    // The queue is one row of boxes, and needs a fraction of a list's height.
+    assert.deepStrictEqual(
+      sharePercents(DEFAULT_LAYOUT, ['open', 'queue']),
+      [67, 33],
+    );
 
     assert.deepStrictEqual(sharePercents(DEFAULT_LAYOUT, []), []);
   });
@@ -556,12 +587,12 @@ describe(columnsOf, () => {
     assert.deepStrictEqual(columnsOf(DEFAULT_LAYOUT), [DEFAULT_LAYOUT.left]);
 
     assert.deepStrictEqual(columnsOf(withColumns(DEFAULT_LAYOUT, 2)), [
-      ['open'],
+      ['open', 'queue'],
       ['runs', 'merged', 'issues'],
     ]);
 
     assert.deepStrictEqual(columnsOf(withColumns(DEFAULT_LAYOUT, 3)), [
-      ['open'],
+      ['open', 'queue'],
       ['runs', 'merged'],
       ['issues'],
     ]);

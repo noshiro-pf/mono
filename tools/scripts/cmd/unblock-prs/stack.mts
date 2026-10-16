@@ -43,19 +43,22 @@
  * branch — so one is reported rather than picked, and merged by hand.
  */
 
-import { findStackParents, type QueueOwner } from 'pr-report-core';
+import {
+  findStackParents,
+  isSafeRefName,
+  type NativeStackEntry,
+  type QueueOwner,
+} from 'pr-report-core';
 import { isMergeQueued, isSkipCiLabelled, wantsAutoRebase } from './labels.mjs';
 import type {
   BaseChange,
   BranchOf,
   Classification,
-  NativeStackEntry,
   PullRequest,
   RetargetedLayer,
   StackedOn,
   TriageContext,
 } from './types.mjs';
-import { isSafeRefName } from './util.mjs';
 import { isVersionPullRequest } from './version-pr.mjs';
 
 /**
@@ -90,19 +93,16 @@ export const stackedNote = (
 
 /**
  * What to report instead of picking a pull request in one of GitHub's native
- * stacks, which GitHub will not let this script arm; `undefined` for one in
- * none.
+ * stacks, which GitHub will not let this script arm.
  */
 export const nativeStackNote = (
   pr: PullRequest,
-  entry: NativeStackEntry | undefined,
-): Classification | undefined =>
-  entry === undefined
-    ? undefined
-    : ({
-        kind: 'note',
-        note: `#${pr.number}: layer ${entry.position} of ${entry.size} of GitHub's native stack #${entry.stack}, on which GitHub refuses auto-merge; merge it by hand (a stack made by the base alone needs no native stack)`,
-      } as const);
+  entry: NativeStackEntry,
+): Classification =>
+  ({
+    kind: 'note',
+    note: `#${pr.number}: layer ${entry.position} of ${entry.size} of GitHub's native stack #${entry.stack}, on which GitHub refuses auto-merge; merge it by hand (a stack made by the base alone needs no native stack)`,
+  }) as const;
 
 /**
  * Why a layer cannot be carried along when the one below it moves, or

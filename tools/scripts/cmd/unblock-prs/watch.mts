@@ -1,9 +1,9 @@
 /** Polling one pull request until it merges, or until it will not. */
 
+import { isMergeableState } from 'pr-report-core';
 import { isRecord, Result } from 'ts-data-forge';
 import {
   describeWaitingOn,
-  isMergeableState,
   listRequiredChecks,
   listRunningChecks,
   summarizeChecks,
@@ -32,9 +32,10 @@ import { log, pause, stopRequested } from './util.mjs';
  * means someone else pushed, and the survey has to start over.
  *
  * `bypassReason` is set for a pull request only a ruleset bypass merges
- * (`review.mts`). It has no auto-merge to lose, and nothing will merge it on
- * green, so the watch ends at the verdict: failed as for any other, or green
- * and `awaiting-bypass`, with the reason for the comment to say.
+ * (`pr-report-core`'s `review-hold.mts`). It has no auto-merge to lose, and
+ * nothing will merge it on green, so the watch ends at the verdict: failed as
+ * for any other, or green and `awaiting-bypass`, with the reason for the
+ * comment to say.
  */
 export const watch = async (
   pr: PullRequest,

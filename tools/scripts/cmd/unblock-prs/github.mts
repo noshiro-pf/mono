@@ -6,6 +6,7 @@
  */
 
 import {
+  isSafeRefName,
   parseClaimComment,
   parseSetAsideComment,
   requirementsOfRules,
@@ -13,22 +14,22 @@ import {
   SKIP_CI_LABEL,
   type CheckRunReport,
   type Claim,
+  type NativeStackEntry,
+  type ReviewState,
   type RulesetRequirements,
 } from 'pr-report-core';
 import { Arr, isRecord, Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { $ } from 'ts-repo-utils';
 import { projectRootPath } from '../../project-root-path.mjs';
-import type { ReviewState } from './review.mjs';
 import {
   PullRequestListSchema,
   PullRequestSchema,
   type BaseChange,
-  type NativeStackEntry,
   type OwnSetAsideComment,
   type PullRequest,
 } from './types.mjs';
-import { headShaFromListing, isSafeRefName, sh } from './util.mjs';
+import { headShaFromListing, sh } from './util.mjs';
 
 const PR_JSON_FIELDS =
   'number,id,title,body,state,headRefName,headRefOid,baseRefName,isCrossRepository,isDraft,mergeStateStatus,autoMergeRequest,labels';
@@ -162,10 +163,10 @@ export const readBranchRules = async (
 };
 
 /**
- * `CODEOWNERS` on the default branch, and what `review.mts` reads about each
- * of `numbers`, in one GraphQL request. `undefined` for a repository without
- * `.github/CODEOWNERS` — the one place the Pull Requests Manager reads it
- * from too.
+ * `CODEOWNERS` on the default branch, and what `pr-report-core`'s
+ * `review-hold.mts` reads about each of `numbers`, in one GraphQL request.
+ * `undefined` for a repository without `.github/CODEOWNERS` — the one place the
+ * Pull Requests Manager reads it from too.
  *
  * Every number goes in as a variable, and each pull request comes back under
  * its own alias.

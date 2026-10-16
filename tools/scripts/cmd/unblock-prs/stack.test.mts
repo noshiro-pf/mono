@@ -59,6 +59,7 @@ const context = (
     openNumbers: new Set(),
     dependencies: new Map(),
     stackParents,
+    cycles: [],
     cyclic,
     releaseBlockers: [],
   }) as const;
@@ -149,10 +150,6 @@ describe(restackable, () => {
 });
 
 describe(nativeStackNote, () => {
-  test('is nothing for a pull request in no native stack', () => {
-    assert.isUndefined(nativeStackNote(pullRequest({ number: 2 }), undefined));
-  });
-
   test('says why one in a native stack is not armed, and what to do', () => {
     // GitHub keeps the layer in the stack after the one below it merged and
     // it was moved onto `main`, and refuses auto-merge for as long.

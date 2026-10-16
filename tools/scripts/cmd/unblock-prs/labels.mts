@@ -12,9 +12,10 @@ import {
   AUTO_REBASE_LABEL,
   BLOCKS_RELEASE_LABEL,
   MERGE_QUEUED_LABEL,
-  PRIORITY_HIGH_LABEL,
-  PRIORITY_LOW_LABEL,
+  priorityOfLabels,
+  priorityRankOfLabels,
   SKIP_CI_LABEL,
+  type QueuePriority,
 } from 'pr-report-core';
 import type { PullRequest } from './types.mjs';
 
@@ -55,33 +56,15 @@ export const wantsAutoRebase = (pr: PullRequest): boolean =>
   pr.labels.some((label) => label.name === AUTO_REBASE_LABEL);
 
 /**
- * Which priority label the pull request carries: `both` is the two at once,
- * which contradict each other and so count as neither.
+ * Which priority label the pull request carries (`priorityOfLabels`): `both`
+ * is the two at once, which contradict each other and so count as neither.
  */
-export const priorityOf = (pr: PullRequest): Priority => {
-  const high = pr.labels.some((label) => label.name === PRIORITY_HIGH_LABEL);
-
-  const low = pr.labels.some((label) => label.name === PRIORITY_LOW_LABEL);
-
-  return high ? (low ? 'both' : 'high') : low ? 'low' : 'none';
-};
+export const priorityOf = (pr: PullRequest): QueuePriority =>
+  priorityOfLabels(pr.labels.map(({ name }) => name));
 
 /**
  * Where {@link priorityOf} puts the pull request in the pick order, as a sort
  * key: `high` before the rest, `low` after them.
  */
-export const priorityRank = (pr: PullRequest): 0 | 1 | 2 => {
-  switch (priorityOf(pr)) {
-    case 'high':
-      return 0;
-
-    case 'none':
-    case 'both':
-      return 1;
-
-    case 'low':
-      return 2;
-  }
-};
-
-type Priority = 'high' | 'low' | 'none' | 'both';
+export const priorityRank = (pr: PullRequest): 0 | 1 | 2 =>
+  priorityRankOfLabels(pr.labels.map(({ name }) => name));

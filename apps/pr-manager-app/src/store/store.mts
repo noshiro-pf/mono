@@ -147,6 +147,7 @@ export const readerSignals = {
   roots: toSignal(reader.roots),
   cycles: toSignal(reader.cycles),
   merged: toSignal(reader.merged),
+  queue: toSignal(reader.queue),
   issues: toSignal(reader.issues),
   reading: toSignal(reader.reading),
   runs: toSignal(reader.runs),

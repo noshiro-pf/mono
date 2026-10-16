@@ -99,6 +99,7 @@ export type Reader = Readonly<{
   roots: InitializedObservable<LoadedReport['roots']>;
   cycles: InitializedObservable<LoadedReport['cycles']>;
   merged: InitializedObservable<LoadedReport['merged']>;
+  queue: InitializedObservable<LoadedReport['queue']>;
   issues: InitializedObservable<LoadedReport['issues']>;
   /** The sections below the merge order that have not answered yet. */
   reading: InitializedObservable<readonly SectionPart[]>;
@@ -211,6 +212,10 @@ export const createReader = (deps: ReaderDeps): Reader => {
     equals: fastDeepEqual,
   });
 
+  const [queue, setQueue] = createState(EMPTY_PARTS.queue, {
+    equals: fastDeepEqual,
+  });
+
   const [issues, setIssues, { getSnapshot: getIssues }] = createState(
     EMPTY_PARTS.issues,
     { equals: fastDeepEqual },
@@ -251,6 +256,8 @@ export const createReader = (deps: ReaderDeps): Reader => {
     setCycles(report.cycles);
 
     setMerged(report.merged);
+
+    setQueue(report.queue);
 
     if (withIssues) {
       setIssues(report.issues);
@@ -515,6 +522,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     roots,
     cycles,
     merged,
+    queue,
     issues,
     reading,
     runs,
@@ -536,6 +544,7 @@ type ReportParts = StrictPick<
   | 'roots'
   | 'cycles'
   | 'merged'
+  | 'queue'
   | 'issues'
   | 'reading'
 >;
@@ -555,6 +564,7 @@ const EMPTY_PARTS: ReportParts = {
   roots: [],
   cycles: [],
   merged: [],
+  queue: undefined,
   issues: {
     items: [],
     totalCount: 0,

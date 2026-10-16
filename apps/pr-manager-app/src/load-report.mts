@@ -59,6 +59,7 @@ import {
   type Fetch,
   type GraphqlAnswer,
 } from './graphql.mjs';
+import { queueViewOf, type QueuePull, type QueueView } from './queue-view.mjs';
 import type { RateLimit } from './rate-limit.mjs';
 import {
   CHECKS_QUERY,
@@ -169,6 +170,12 @@ export type LoadedReport = Readonly<{
   merged: readonly Merged[];
   /** The open issues, most recently updated first. */
   issues: IssueList;
+  /**
+   * `unblock-prs`'s queue (`queue-view.mts`), or `undefined` until the
+   * checks, the comparisons and the details have all answered: a queue drawn
+   * from some of them would put a pull request in a place it is not in.
+   */
+  queue: QueueView | undefined;
   /**
    * The sections not read yet. A listed section's list is empty because it
    * has not answered, not because there is nothing in it.
@@ -1297,6 +1304,28 @@ const assemble = ({
     cycles: report.cycles,
     merged: known.merged ?? [],
     issues: known.issues ?? NO_ISSUES,
+    queue:
+      known.checks === undefined ||
+      known.comparisons === undefined ||
+      known.details === undefined
+        ? undefined
+        : queueViewOf({
+            defaultBranch,
+            nowEpochMs: nowMs,
+            rules: {
+              requireCodeOwnerReview: requirements.requireCodeOwnerReview,
+              requireConversationResolution:
+                requirements.requireConversationResolution,
+              codeOwners,
+            },
+            pulls: report.entries.flatMap((entry) => {
+              const parts = byNumber.get(entry.number);
+
+              return parts?.details === undefined
+                ? []
+                : [queuePullOf(entry, parts.pr, parts.details)];
+            }),
+          }),
     reading: [
       ...(known.merged === undefined ? (['merged'] as const) : []),
       ...(known.issues === undefined ? (['issues'] as const) : []),
@@ -1493,6 +1522,41 @@ const setAsideOf = (
     retry,
     url: found.url,
     current: baseTip !== undefined && setAsideStillApplies(setAside, baseTip),
+  };
+};
+
+/** What the queue reads of one pull request (`queue-view.mts`). */
+const queuePullOf = (
+  entry: ReportEntry,
+  pr: OpenPullRequest,
+  details: DetailsPart,
+): QueuePull => {
+  const { node } = details;
+
+  return {
+    entry,
+    baseTip: pr.baseRef?.target?.oid ?? '',
+    mergeable: node.mergeable,
+    nativeStack:
+      node.stackEntry === null
+        ? undefined
+        : {
+            stack: node.stackEntry.stack.number,
+            position: node.stackEntry.position,
+            size: node.stackEntry.stack.size,
+          },
+    review: {
+      author: entry.author,
+      approvers: approversOf(node),
+      files: details.files,
+      filesComplete: details.filesComplete,
+      unresolvedConversations: node.reviewThreads.nodes.filter(
+        ({ isResolved }) => !isResolved,
+      ).length,
+    },
+    ownComments: node.comments.nodes
+      .filter(({ viewerDidAuthor }) => viewerDidAuthor)
+      .map(({ body }) => body),
   };
 };
 

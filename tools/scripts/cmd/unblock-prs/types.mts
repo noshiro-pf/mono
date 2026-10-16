@@ -4,6 +4,7 @@
 
 import type {
   Claim,
+  QueueContext,
   QueueOwner,
   RulesetRequirements,
   SetAsideComment,
@@ -67,7 +68,7 @@ export type SkipReason = SetAsideReason;
  * `awaiting-bypass` also clears when the base moves. `awaiting-bypass` is the
  * one that is not a failure: every required check is green on a pull request
  * nothing but a ruleset bypass will merge, and what is left is a person's
- * (`review.mts`). See `skipStillApplies`.
+ * (`pr-report-core`'s `review-hold.mts`). See `skipStillApplies`.
  */
 export type SkipRecord = Readonly<{
   number: number;
@@ -100,7 +101,10 @@ export type OwnSetAsideComment = Readonly<{
  */
 export type Demotions = ReadonlyMap<number, string>;
 
-/** What the ruleset asks of a review, read by `review.mts`. */
+/**
+ * What the ruleset asks of a review, read by `pr-report-core`'s
+ * `review-hold.mts`.
+ */
 export type ReviewRequirements = StrictPick<
   RulesetRequirements,
   'requireCodeOwnerReview' | 'requireConversationResolution'
@@ -149,27 +153,12 @@ export type TriageBase = Readonly<{
   reviewRequirements: ReviewRequirements;
 }>;
 
-export type TriageContext = TriageBase &
-  Readonly<{
-    /** The numbers of the pull requests that are open right now. */
-    openNumbers: ReadonlySet<number>;
-    /**
-     * What each pull request must merge after: what it declared, and the one
-     * it is stacked on.
-     */
-    dependencies: ReadonlyMap<number, readonly number[]>;
-    /** Which open pull request each stacked one is on: child → parent. */
-    stackParents: ReadonlyMap<number, number>;
-    /** Every number that sits on a `Merge-After` cycle. */
-    cyclic: ReadonlySet<number>;
-    /**
-     * The open pull requests labelled `blocks-release`, which hold the
-     * version pull request for as long as they are open.
-     */
-    releaseBlockers: readonly PullRequest[];
-    /** Who moves each queued pull request next (`owner.mts`). */
-    owners: ReadonlyMap<number, QueueOwner>;
-  }>;
+/**
+ * What triage decides each pull request against: the survey, and what the
+ * open pull requests say about one another (`pr-report-core`'s
+ * `queue-order.mts`).
+ */
+export type TriageContext = TriageBase & QueueContext;
 
 /** What one survey says about one pull request. */
 export type Classification = Readonly<
@@ -203,8 +192,8 @@ export type Triage = Readonly<{
   stackParents: ReadonlyMap<number, number>;
   /**
    * The candidates and the pull requests in flight that only a ruleset bypass
-   * will merge, with why (`review.mts`): their checks are run all the same,
-   * and they are never armed.
+   * will merge, with why (`pr-report-core`'s `review-hold.mts`): their checks
+   * are run all the same, and they are never armed.
    */
   bypass: ReadonlyMap<number, string>;
   /** Up to date with checks still running, or clean and about to merge. */
@@ -233,18 +222,6 @@ export type Triage = Readonly<{
  * the last of them to tell which branch GitHub moved a layer off.
  */
 export type BaseChange = Readonly<{ from: string; to: string }>;
-
-/**
- * A pull request's place in one of GitHub's native stacks, which `stack.mts`
- * says this script does not land.
- */
-export type NativeStackEntry = Readonly<{
-  /** The stack's number, from the same sequence as the pull requests'. */
-  stack: number;
-  /** 1 for the layer on the base branch, 2 for the one on it, and so on. */
-  position: number;
-  size: number;
-}>;
 
 export type WatchOutcome =
   | 'auto-merge-disabled'

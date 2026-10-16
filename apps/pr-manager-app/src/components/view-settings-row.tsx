@@ -2,7 +2,7 @@ import { memoNamed } from 'preact-utils';
 import { useCallback } from 'preact/hooks';
 import {
   BLOCK_NAMES,
-  DEFAULT_SHARE,
+  defaultShareOf,
   type BlockId,
   type ColumnCount,
   type ColumnIndex,
@@ -75,11 +75,11 @@ export const ViewSettingsRow = memoNamed<Props>('ViewSettingsRow', (props) => {
   }, [id]);
 
   const less = useCallback((): void => {
-    layoutStore.setShare(id, (share ?? DEFAULT_SHARE) - SHARE_STEP);
+    layoutStore.setShare(id, (share ?? defaultShareOf(id)) - SHARE_STEP);
   }, [id, share]);
 
   const more = useCallback((): void => {
-    layoutStore.setShare(id, (share ?? DEFAULT_SHARE) + SHARE_STEP);
+    layoutStore.setShare(id, (share ?? defaultShareOf(id)) + SHARE_STEP);
   }, [id, share]);
 
   const usual = useCallback((): void => {

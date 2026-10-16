@@ -41,6 +41,20 @@ nothing on GitHub's own list shows:
   owner it can never be approved, and the badge says it needs a ruleset
   bypass instead.
 
+**The queue** `pnpm run unblock-prs` works through is drawn under the merge
+order, as one row of boxes: the pull request it is running at the head, by
+the base it merges into, with a turning ring; then the ones it would pick
+next, in the order it would pick them; then the ones whose turn has not come,
+in a dashed box saying what they wait for (`after #N`, `review`,
+`native stack`). Every box is the same width however many there are, so the
+whole queue is always in view, and carries the priority on a pill as the DAG's
+nodes do; hovering one shows its title. What is set aside, claimed, a draft or
+otherwise not the worker's to move is drawn outside the row, with why in a word
+and whose it is. It is decided by the code the worker decides with
+(`queue-order.mts` in `pr-report-core`), from what the page reads; what one run
+of the worker has seen green without merging, and so put last, lives in that
+run's memory and is not shown.
+
 Below that, the workflow runs still going, what merged in the last week, and
 the open issues, most recently updated first. Every open issue is read: the
 first thirty come with the rest of the page, and the others follow a hundred at
@@ -158,9 +172,11 @@ the page worth sharing in a link.
 
 ## Layout
 
-The page is four blocks: the merge order (with its counts above it and any
-cycles under it), the workflow runs still going, what merged, and the open
-issues. **Layout**, beside the theme
+The page is five blocks: the merge order (with its counts above it and any
+cycles under it), the queue, the workflow runs still going, what merged, and
+the open issues. The queue stays under the merge order when the columns are
+split, and a URL written before it had a block puts it there; in the `fill`
+mode its share starts at half the others', being one row. **Layout**, beside the theme
 button, arranges them:
 
 - **One column, two or three.** Two need a screen at least 60rem wide, and
@@ -192,7 +208,7 @@ three), `right=issues`, `split=40` (the left column's share of two, in
 percent), `lines=25-70` (where the two lines between three columns are, in
 percent from the left), `h.open=480` (a height, in pixels), `mode=fill` and
 `s.open=150` (a block's share of its column, a weight against 100 for each
-block without one). Only what differs from one column in the usual order is
+block without one, 50 for the queue). Only what differs from one column in the usual order is
 written, a moment after the last
 change so that a drag does not rewrite the address bar on every pointer move.
 A URL edited by hand still opens: unknown blocks are dropped, missing ones put
