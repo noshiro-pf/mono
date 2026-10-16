@@ -124,7 +124,7 @@ describe(statusesOf, () => {
     assert.deepStrictEqual(entries.map(statusesOf), [
       ['queued'],
       [],
-      ['failing', 'behind'],
+      ['failing'],
       ['setAside'],
       ['awaitingReview'],
       [],
@@ -305,7 +305,6 @@ describe(countView, () => {
     assert.deepStrictEqual(counts.statuses, {
       queued: { shown: 2, total: 2 },
       failing: { shown: 2, total: 2 },
-      behind: { shown: 1, total: 1 },
       setAside: { shown: 0, total: 0 },
       awaitingReview: { shown: 0, total: 0 },
     });
@@ -419,7 +418,7 @@ describe(toggleOnly, () => {
 describe(parseMergeOrderView, () => {
   test('reads back what was saved', () => {
     const view: MergeOrderView = {
-      hiddenStatuses: ['queued', 'behind'],
+      hiddenStatuses: ['queued', 'setAside'],
       onlyStatuses: ['failing'],
       hiddenPriorities: ['low'],
       sort: 'priority',
@@ -449,11 +448,23 @@ describe(parseMergeOrderView, () => {
     // Saved before anything could be picked.
     assert.deepStrictEqual(
       parseMergeOrderView({
-        hiddenStatuses: ['behind'],
+        hiddenStatuses: ['setAside'],
         hiddenPriorities: [],
         sort: 'order',
       }),
-      { ...DEFAULT_MERGE_ORDER_VIEW, hiddenStatuses: ['behind'] },
+      { ...DEFAULT_MERGE_ORDER_VIEW, hiddenStatuses: ['setAside'] },
+    );
+
+    // Saved while behind base was a status: it is dropped, and what is
+    // behind is shown.
+    assert.deepStrictEqual(
+      parseMergeOrderView({
+        hiddenStatuses: ['queued', 'behind'],
+        onlyStatuses: ['behind'],
+        hiddenPriorities: [],
+        sort: 'order',
+      }),
+      { ...DEFAULT_MERGE_ORDER_VIEW, hiddenStatuses: ['queued'] },
     );
 
     // Saved while a draft was a status: it is dropped, and drafts are shown.
