@@ -449,12 +449,15 @@ namespace NoHooks {
    *     "additionalProperties": false,
    *     "properties": {
    *       "allow": {
-   *         "contains": [
-   *           "beforeAll",
-   *           "beforeEach",
-   *           "afterAll",
-   *           "afterEach"
-   *         ],
+   *         "items": {
+   *           "enum": [
+   *             "beforeAll",
+   *             "beforeEach",
+   *             "afterAll",
+   *             "afterEach"
+   *           ],
+   *           "type": "string"
+   *         },
    *         "type": "array"
    *       }
    *     },
@@ -464,7 +467,7 @@ namespace NoHooks {
    * ```
    */
   export type Options = Readonly<{
-    allow?: readonly unknown[];
+    allow?: readonly ('beforeAll' | 'beforeEach' | 'afterAll' | 'afterEach')[];
   }>;
 
   export type RuleEntry =

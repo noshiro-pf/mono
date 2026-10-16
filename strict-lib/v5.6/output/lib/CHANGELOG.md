@@ -67,7 +67,7 @@
     **A replacement callback's trailing arguments are `string | undefined`, not
     `unknown`.** `String.prototype.replace` / `replaceAll` and the
     `[Symbol.replace]` they dispatch to typed the captured groups `readonly
-unknown[]`, which forced every caller to narrow with `isString` before using a
+  unknown[]`, which forced every caller to narrow with `isString` before using a
     group that the pattern shows can never be absent. They are now
     `readonly (string | undefined)[]` — the type of a capture group — so contextual
     typing gives `string | undefined` and a `?? ''` or a `!== undefined` check is

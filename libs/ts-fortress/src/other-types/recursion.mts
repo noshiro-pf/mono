@@ -94,7 +94,7 @@ import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
  * const OddNumber: t.Type<OddNumber> = t.recursion('OddNumber', () =>
  *   t.record({
  *     type: t.literal('odd'),
- *     next: t.union([t.nullType, {} as t.Type<EvenNumber>]),
+ *     next: t.union([t.nullType, EvenNumber]),
  *   }),
  * );
  *
