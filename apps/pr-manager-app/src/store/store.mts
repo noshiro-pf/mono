@@ -27,6 +27,7 @@ import {
 import { browserStores } from '../token.mjs';
 import { loadWorkflowRuns } from '../workflow-runs.mjs';
 import { createHeaderStore } from './header-store.mjs';
+import { createIssuesListStore } from './issues-list-store.mjs';
 import { createIssuesViewStore } from './issues-view-store.mjs';
 import { createLayoutStore } from './layout-store.mjs';
 import { createMergeOrderStore } from './merge-order-store.mjs';
@@ -89,6 +90,16 @@ export const headerStore = createHeaderStore({
   load: () => readSetting(HEADER_FOLDED_KEY),
   save: (folded) => {
     writeSetting(HEADER_FOLDED_KEY, folded).catch(() => undefined);
+  },
+});
+
+const ISSUES_LIST_VIEW_KEY = 'issues-list-view';
+
+export const issuesListStore = createIssuesListStore({
+  issues: reader.issues,
+  load: () => readSetting(ISSUES_LIST_VIEW_KEY),
+  save: (view) => {
+    writeSetting(ISSUES_LIST_VIEW_KEY, view).catch(() => undefined);
   },
 });
 
@@ -176,6 +187,12 @@ export const issuesViewSignals = {
   dagFitted: toSignal(issuesViewStore.dagFitted),
 } as const;
 
+export const issuesListSignals = {
+  view: toSignal(issuesListStore.view),
+  items: toSignal(issuesListStore.items),
+  counts: toSignal(issuesListStore.counts),
+} as const;
+
 export const layoutSignals = {
   layout: toSignal(layoutStore.layout),
   mode: toSignal(layoutStore.mode),
@@ -202,6 +219,8 @@ export const startStore = (): (() => void) => {
 
   const stopIssuesView = issuesViewStore.start();
 
+  const stopIssuesList = issuesListStore.start();
+
   return () => {
     stopToken();
 
@@ -216,6 +235,8 @@ export const startStore = (): (() => void) => {
     stopHeader();
 
     stopIssuesView();
+
+    stopIssuesList();
   };
 };
 

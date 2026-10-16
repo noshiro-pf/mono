@@ -1,4 +1,5 @@
 export * from './header-store.mjs';
+export * from './issues-list-store.mjs';
 export * from './issues-view-store.mjs';
 export * from './layout-store.mjs';
 export * from './merge-order-store.mjs';

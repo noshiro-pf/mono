@@ -42,8 +42,21 @@ nothing on GitHub's own list shows:
   bypass instead.
 
 Below that, the workflow runs still going, what merged in the last week, and
-the open issues, most recently updated first: thirty, then a hundred more each
-time the button under the list is pressed, until every open one is listed.
+the open issues, most recently updated first. Every open issue is read: the
+first thirty come with the rest of the page, and the others follow a hundred at
+a time, each page added to the list as it comes in. A page that fails leaves a
+button under the list to ask for it again.
+
+**The open issues can be narrowed and sorted.** The `priority:high`,
+`priority:mid` and `priority:low` labels are switches, with **none** for an
+issue carrying no one of them (or more than one), as they are in the merge
+order. Every other label an open issue carries is a pick: once any is picked,
+only the issues carrying one picked are listed, still not those whose priority
+is switched off. The order is **updated** or **priority**: high first, none
+between mid and low, and the most recently updated first within each. Each
+switch and pick counts what the list shows of it, as the merge order's do, and
+the choice is kept in the browser. They apply to the list; the DAG draws every
+issue.
 
 **Running workflows** lists what the Actions tab shows filtered to
 `is:in_progress is:queued is:waiting is:action_required is:neutral is:stale`,
@@ -61,9 +74,7 @@ rounded box, the problem angular and what settles it round; an edge runs from
 what is waited for to what waits. Green is an issue that can be started (a thick
 border when it waited and need not any more), brown and dashed one that waits,
 blue an open pull request and the issues it closes, grey what is done. Each node
-shows its title and opens its page on GitHub. The DAG reads every open issue, a
-page after the other, since an issue left off the graph would be drawn as if it
-declared nothing. In the DAG, the **Done** chip beside the switch starts
+shows its title and opens its page on GitHub. In the DAG, the **Done** chip beside the switch starts
 pressed; unpressed, it leaves out the issues closed as completed and the merged
 pull requests, with the waits on them that are over, so that only what is left
 to do is laid out. Both choices are kept in the browser. At the other end of
@@ -311,12 +322,12 @@ Every fifteen seconds is 240 reads an hour, about 2,000 of the 5,000 points an
 account gets, which leaves the rest for whatever else that account does with
 GraphQL — `gh` included, since the budget is the account's.
 
-**A page of open issues listed with the button, or read for the DAG, is read
-again by every read after it**, one query a page, about a point each by GitHub's formula, so the
-list stays as current as the rest of the page. Reloading the page, or a new
-token, goes back to the first thirty. The press itself reads only the page it
-adds, rather than the whole report again, and a poll already out when it was
-pressed does not take that page away.
+**Every page of open issues is read again by every read after it**, one query
+a page, about a point each by GitHub's formula, so the list stays as current
+as the rest of the page. Reloading the page, or a new token, starts again from
+the first thirty, and reads the rest after them. Each page after the first is
+read on its own, rather than by a read of the whole report again, and a poll
+already out when it was asked for does not take that page away.
 
 A read may add to the page and may say it failed, but **may not take the page
 away**: a read that fails leaves the last report on screen with a note beside

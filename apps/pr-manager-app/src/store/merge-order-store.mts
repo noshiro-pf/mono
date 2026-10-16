@@ -33,9 +33,9 @@ import {
   type MergeOrderCounts,
   type MergeOrderSort,
   type MergeOrderView,
-  type Priority,
   type StatusFilter,
 } from '../merge-order-view.mjs';
+import type { Priority } from '../priority.mjs';
 
 export type MergeOrderDeps = Readonly<{
   entries: InitializedObservable<readonly Entry[]>;

@@ -15,6 +15,7 @@ export * from './issue-dag-node.js';
 export * from './issue-dag-states.mjs';
 export * from './issue-dag-zoom.js';
 export * from './issue-dag.js';
+export * from './issues-list-filters.js';
 export * from './issues-section.js';
 export * from './issues-view-switch.js';
 export * from './label-chip.js';

@@ -2,13 +2,12 @@ import { memoNamed } from 'preact-utils';
 import { Arr, Obj } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
-  PRIORITIES,
   STATUS_FILTERS,
   STATUS_NAMES,
   type MergeOrderSort,
-  type Priority,
   type StatusFilter,
 } from '../merge-order-view.mjs';
+import { PRIORITIES, type Priority } from '../priority.mjs';
 import {
   mergeOrderSignals,
   mergeOrderStore,

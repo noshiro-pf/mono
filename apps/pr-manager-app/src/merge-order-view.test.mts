@@ -7,7 +7,6 @@ import {
   DEFAULT_MERGE_ORDER_VIEW,
   isShown,
   parseMergeOrderView,
-  priorityOf,
   STATUS_FILTERS,
   statusesOf,
   toggleOnly,
@@ -135,28 +134,6 @@ describe(statusesOf, () => {
     assert.deepStrictEqual(
       statusesOf(entry(1, { setAside: true, setAsideCurrent: false })),
       [],
-    );
-  });
-});
-
-describe(priorityOf, () => {
-  test('reads the one priority label a pull request carries', () => {
-    assert.strictEqual(priorityOf([label('priority:high')]), 'high');
-
-    assert.strictEqual(
-      priorityOf([label('skip-ci'), label('priority:mid')]),
-      'mid',
-    );
-
-    assert.strictEqual(priorityOf([label('priority:low')]), 'low');
-  });
-
-  test('none, or more than one, is no priority', () => {
-    assert.strictEqual(priorityOf([]), 'none');
-
-    assert.strictEqual(
-      priorityOf([label('priority:high'), label('priority:low')]),
-      'none',
     );
   });
 });
