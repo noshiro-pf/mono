@@ -264,6 +264,87 @@ describe(createIssuesViewStore, () => {
     assert.strictEqual(store.graph.getSnapshot().value.nodes.length, 3);
   });
 
+  test('draws the DAG at its natural size until told otherwise, and steps a zoom in and out', () => {
+    const { store } = setup();
+
+    assert.strictEqual(store.dagScale.getSnapshot().value, 1);
+
+    assert.isFalse(store.dagFitted.getSnapshot().value);
+
+    store.zoomIn();
+
+    assert.strictEqual(store.dagScale.getSnapshot().value, 1.1);
+
+    store.zoomOut();
+
+    store.zoomOut();
+
+    assert.strictEqual(store.dagScale.getSnapshot().value, 0.9);
+
+    store.resetZoom();
+
+    assert.strictEqual(store.dagScale.getSnapshot().value, 1);
+  });
+
+  test('the fit puts the whole graph in the box, and follows the box and the graph until a zoom', () => {
+    const { store, setIssues } = setup();
+
+    setIssues({
+      items: [issueItem(1, []), issueItem(2, [1]), issueItem(3, [2])],
+      totalCount: 3,
+      endCursor: undefined,
+      referenced: [],
+    });
+
+    const { width, height } = store.layout.getSnapshot().value;
+
+    store.setDagBox({ width: width / 2, height: height * 4 });
+
+    store.fitDag();
+
+    assert.isTrue(store.dagFitted.getSnapshot().value);
+
+    assert.strictEqual(store.dagScale.getSnapshot().value, 0.5);
+
+    store.setDagBox({ width: width / 4, height: height * 4 });
+
+    assert.strictEqual(store.dagScale.getSnapshot().value, 0.25);
+
+    // One more column makes the graph wider, and the fit smaller.
+    setIssues({
+      items: [
+        issueItem(1, []),
+        issueItem(2, [1]),
+        issueItem(3, [2]),
+        issueItem(4, [3]),
+      ],
+      totalCount: 4,
+      endCursor: undefined,
+      referenced: [],
+    });
+
+    assert.isBelow(store.dagScale.getSnapshot().value, 0.25);
+
+    // A zoom starts from the fit, and leaves it.
+    store.zoomIn();
+
+    assert.isFalse(store.dagFitted.getSnapshot().value);
+
+    assert.strictEqual(store.dagScale.getSnapshot().value, 0.25);
+
+    store.setDagBox({ width: width * 4, height: height * 4 });
+
+    assert.strictEqual(store.dagScale.getSnapshot().value, 0.25);
+
+    store.fitDag();
+
+    assert.strictEqual(store.dagScale.getSnapshot().value, 1);
+
+    store.resetZoom();
+
+    assert.isFalse(store.dagFitted.getSnapshot().value);
+  });
+
   test('stopped before the read answers, it neither applies nor saves', async () => {
     const { store, saved, savedHideDone, resolveLoad, resolveLoadHideDone } =
       setup();

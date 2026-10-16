@@ -176,7 +176,7 @@ a:focus-visible {
 }
 
 .theme-switch-option:hover:not([aria-pressed='true']),
-.view-switch-option:hover:not([aria-pressed='true']) {
+.view-switch-option:hover:not([aria-pressed='true'], :disabled) {
   color: var(--accent);
 }
 
@@ -1327,6 +1327,34 @@ a:focus-visible {
 .view-switch-option {
   font-size: 0.8125rem;
   padding: 0.25rem 0.75rem;
+}
+
+/*
+ * The zoom, at the far end of the row from the switches: the scale it draws
+ * at between the two buttons that change it, in figures that keep their
+ * width as it changes, and the fit and the natural size beside them.
+ */
+.issue-dag-zoom {
+  display: inline-flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.issue-dag-zoom-level {
+  align-items: center;
+  border-inline: 1px solid var(--baseline);
+  color: var(--ink-primary);
+  display: inline-flex;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  justify-content: center;
+  min-width: 3.5rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.view-switch-option:disabled {
+  color: var(--ink-muted);
+  cursor: default;
 }
 
 /*

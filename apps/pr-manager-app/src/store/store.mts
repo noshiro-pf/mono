@@ -172,6 +172,8 @@ export const issuesViewSignals = {
   graph: toSignal(issuesViewStore.graph),
   layout: toSignal(issuesViewStore.layout),
   doneCount: toSignal(issuesViewStore.doneCount),
+  dagScale: toSignal(issuesViewStore.dagScale),
+  dagFitted: toSignal(issuesViewStore.dagFitted),
 } as const;
 
 export const layoutSignals = {
