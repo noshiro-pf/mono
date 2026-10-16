@@ -1,4 +1,4 @@
-import { wrapTitle } from './node-title.mjs';
+import { numberPillWidth, wrapTitle } from './node-title.mjs';
 
 describe(wrapTitle, () => {
   test('keeps a title that fits on one line', () => {
@@ -38,5 +38,13 @@ describe(wrapTitle, () => {
 
   test('is no lines for an empty title', () => {
     assert.deepStrictEqual(wrapTitle('  ', 9, 2), []);
+  });
+});
+
+describe(numberPillWidth, () => {
+  test('holds `#` and every digit, with the same room either side', () => {
+    assert.strictEqual(numberPillWidth(98), 12 + 3 * 6.2);
+
+    assert.strictEqual(numberPillWidth(2241), 12 + 5 * 6.2);
   });
 });

@@ -1730,6 +1730,20 @@ a:focus-visible {
   stroke: var(--baseline);
 }
 
+/* Quieter than any priority: it names the node rather than ranking it. */
+.issue-dag-number rect {
+  fill: var(--surface);
+  stroke: var(--baseline);
+  stroke-width: 1;
+}
+
+.issue-dag-number text {
+  fill: var(--ink-secondary);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
 /* --- the token panel ---------------------------------------------------- */
 
 /*
