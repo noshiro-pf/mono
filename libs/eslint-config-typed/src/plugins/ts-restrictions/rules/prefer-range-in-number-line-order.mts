@@ -4,9 +4,9 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { getRangeWithParens, skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly, FixedLengthTuple } from 'ts-type-forge';
-import { skipTypeWrappers } from '../../ast-utils/index.mjs';
 
 type Options = readonly [];
 
@@ -71,30 +71,6 @@ export const preferRangeInNumberLineOrder: TSESLint.RuleModule<
       b: DeepReadonly<TSESTree.Expression>,
     ): boolean =>
       tokensOf(skipTypeWrappers(a)) === tokensOf(skipTypeWrappers(b));
-
-    /** The range of `node` with the parentheses written around it. */
-    const parenthesizedRange = (
-      node: DeepReadonly<TSESTree.Node>,
-    ): FixedLengthTuple<2, number> => {
-      const depthFrom = (known: number): number =>
-        ASTUtils.isParenthesized(known + 1, asNode(node), sourceCode)
-          ? depthFrom(known + 1)
-          : known;
-
-      const depth = depthFrom(0);
-
-      if (depth === 0) {
-        return node.range;
-      }
-
-      const open = sourceCode.getTokenBefore(asNode(node), { skip: depth - 1 });
-
-      const close = sourceCode.getTokenAfter(asNode(node), { skip: depth - 1 });
-
-      return open === null || close === null
-        ? node.range
-        : ([open.range[0], close.range[1]] as const);
-    };
 
     /**
      * The text of one side of `node`, with the parentheses and comments
@@ -192,9 +168,9 @@ export const preferRangeInNumberLineOrder: TSESLint.RuleModule<
 
       // What the two operands read as once fixed, with whatever wraps the
       // comparisons (parentheses, `satisfies boolean`) kept in place.
-      const [start] = parenthesizedRange(outerFirst);
+      const [start] = getRangeWithParens(sourceCode, outerFirst);
 
-      const [, end] = parenthesizedRange(outerSecond);
+      const [, end] = getRangeWithParens(sourceCode, outerSecond);
 
       const replacement = [
         sourceCode.text.slice(start, first.range[0]),

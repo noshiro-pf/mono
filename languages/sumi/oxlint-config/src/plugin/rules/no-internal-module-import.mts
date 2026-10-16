@@ -1,9 +1,9 @@
 import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
+import { skipTypeWrappers } from 'eslint-rule-forge';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { DeepReadonly } from 'ts-type-forge';
 import { createRule } from './create-rule.mjs';
-import { skipTypeWrappers } from './skip-type-wrappers.mjs';
 
 /**
  * `modules/no-internal-module-import` — a module is addressed by its public

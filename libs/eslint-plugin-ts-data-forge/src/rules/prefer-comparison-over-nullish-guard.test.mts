@@ -50,6 +50,22 @@ describe('prefer-comparison-over-nullish-guard', () => {
       ],
       invalid: [
         {
+          name: 'the guard imported by a second ts-data-forge declaration',
+          code: dedent`
+            import type { Optional } from 'ts-data-forge';
+            import { isUndefined } from 'ts-data-forge';
+            declare const x: string | undefined;
+            const y = isUndefined(x);
+          `,
+          output: dedent`
+            import type { Optional } from 'ts-data-forge';
+            import { isUndefined } from 'ts-data-forge';
+            declare const x: string | undefined;
+            const y = x === undefined;
+          `,
+          errors: [{ messageId: 'preferComparison' }],
+        },
+        {
           name: 'isNotUndefined with explicit argument',
           code: dedent`
             import { isNotUndefined } from 'ts-data-forge';

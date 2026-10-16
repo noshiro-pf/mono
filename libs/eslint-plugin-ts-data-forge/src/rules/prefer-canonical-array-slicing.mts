@@ -4,14 +4,16 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import {
+  buildNamedImportFix,
+  getImportDeclarations,
+  getImportedLocalName,
+  skipTypeWrappers,
+  typeWrapperLayers,
+} from 'eslint-rule-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { skipTypeWrappers, typeWrapperLayers } from './ast-utils.mjs';
-import {
-  buildImportFixes,
-  getImportedLocalName,
-  getTsDataForgeImport,
-} from './import-utils.mjs';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
@@ -188,7 +190,10 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
 
     const program = sourceCode.ast;
 
-    const tsDataForgeImport = getTsDataForgeImport(program);
+    const tsDataForgeImports = getImportDeclarations(
+      program,
+      TS_DATA_FORGE_MODULE,
+    );
 
     const parserServices = ESLintUtils.getParserServices(context);
 
@@ -199,11 +204,14 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
      * (possibly aliased), a namespace import member, or the canonical `Arr`
      * (added by the import fix when nothing is imported yet).
      */
-    const arrLocalName = getImportedLocalName(tsDataForgeImport, 'Arr');
+    const arrLocalName = getImportedLocalName(tsDataForgeImports, 'Arr');
 
-    const namespaceLocalName = tsDataForgeImport?.specifiers.find(
-      (specifier) => specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier,
-    )?.local.name;
+    const namespaceLocalName = tsDataForgeImports
+      .flatMap((declaration) => declaration.specifiers)
+      .find(
+        (specifier) =>
+          specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier,
+      )?.local.name;
 
     const arrRef =
       arrLocalName ??
@@ -837,7 +845,9 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
             fix: (fixer) => {
               const importFixes =
                 index === 0 && needsArrImport
-                  ? buildImportFixes(fixer, program, tsDataForgeImport, ['Arr'])
+                  ? buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
+                      'Arr',
+                    ])
                   : [];
 
               return [

@@ -1,10 +1,7 @@
 import { AST_NODE_TYPES, ESLintUtils } from '@typescript-eslint/utils';
+import { skipTypeWrappers, typeWrapperLayers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import { createRule, typeSymbolName } from './common.mjs';
-import {
-  typeWrapperLayers,
-  withoutTypeWrappers,
-} from './type-wrapper-layers.mjs';
 
 /**
  * An ESLint rule to ban the partial URL construction.
@@ -73,7 +70,7 @@ export const noPartialUrlConstructor = createRule({
               return undefined;
             }
 
-            const value = withoutTypeWrappers(argument);
+            const value = skipTypeWrappers(argument);
 
             return value.type === AST_NODE_TYPES.Literal &&
               typeof value.value === 'string'

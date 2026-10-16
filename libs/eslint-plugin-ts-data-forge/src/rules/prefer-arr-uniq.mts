@@ -1,16 +1,20 @@
 import {
   AST_NODE_TYPES,
+  ASTUtils,
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import {
+  buildNamedImportFix,
+  getArgumentText,
+  getImportDeclarations,
+  getImportedLocalName,
+  skipTypeWrappers,
+  typeWrapperLayers,
+} from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
-import { skipTypeWrappers, typeWrapperLayers } from './ast-utils.mjs';
-import {
-  buildImportFixes,
-  getImportedLocalName,
-  getTsDataForgeImport,
-} from './import-utils.mjs';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -47,7 +51,10 @@ export const preferArrUniq: TSESLint.RuleModule<MessageIds, Options> = {
 
     const program = sourceCode.ast;
 
-    const tsDataForgeImport = getTsDataForgeImport(program);
+    const tsDataForgeImports = getImportDeclarations(
+      program,
+      TS_DATA_FORGE_MODULE,
+    );
 
     const services = sourceCode.parserServices;
 
@@ -150,7 +157,7 @@ export const preferArrUniq: TSESLint.RuleModule<MessageIds, Options> = {
         check(node, element.argument);
       },
       'Program:exit': () => {
-        const arrLocalName = getImportedLocalName(tsDataForgeImport, 'Arr');
+        const arrLocalName = getImportedLocalName(tsDataForgeImports, 'Arr');
 
         const arrName = arrLocalName ?? 'Arr';
 
@@ -162,16 +169,18 @@ export const preferArrUniq: TSESLint.RuleModule<MessageIds, Options> = {
         for (const match of mut_matches) {
           const arrayText = sourceCode.getText(match.arrayExpression);
 
-          const argumentText =
-            match.arrayExpression.type === AST_NODE_TYPES.SequenceExpression
-              ? `(${arrayText})`
-              : arrayText;
+          const argumentText = getArgumentText(
+            sourceCode,
+            match.arrayExpression,
+          );
 
           const buildFix =
             (withImport: boolean): TSESLint.ReportFixFunction =>
             (fixer) => [
               ...(withImport && arrLocalName === undefined
-                ? buildImportFixes(fixer, program, tsDataForgeImport, ['Arr'])
+                ? buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
+                    'Arr',
+                  ])
                 : []),
               fixer.replaceText(match.node, `${arrName}.uniq(${argumentText})`),
             ];
@@ -254,23 +263,10 @@ const isGlobal = (
   node: TSESTree.Node,
   name: string,
 ): boolean => {
-  const variable = findVariable(sourceCode.getScope(node), name);
+  const variable = ASTUtils.findVariable(sourceCode.getScope(node), name);
 
   // Globals from the TypeScript lib are implicit variables with no definition.
-  return variable === undefined || variable.defs.length === 0;
-};
-
-const findVariable = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  scope: TSESLint.Scope.Scope,
-  name: string,
-): TSESLint.Scope.Variable | undefined => {
-  const variable = scope.set.get(name);
-
-  return (
-    variable ??
-    (scope.upper === null ? undefined : findVariable(scope.upper, name))
-  );
+  return variable === null || variable.defs.length === 0;
 };
 
 /**

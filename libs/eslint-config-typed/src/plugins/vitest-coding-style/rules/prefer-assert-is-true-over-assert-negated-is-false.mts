@@ -1,6 +1,6 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
+import { getArgumentText, skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
-import { argumentText, withoutTypeWrappers } from './type-wrappers.mjs';
 import { getVitestReceiver } from './vitest-binding.mjs';
 
 type MessageIds = 'preferAssertIsTrueOverNegatedAssertIsFalse';
@@ -32,7 +32,7 @@ export const preferAssertIsTrueOverNegatedAssertIsFalseRule: TSESLint.RuleModule
   defaultOptions: [],
   create: (context) => ({
     CallExpression: (node) => {
-      const callee = withoutTypeWrappers(node.callee);
+      const callee = skipTypeWrappers(node.callee);
 
       if (
         callee.type === AST_NODE_TYPES.MemberExpression &&
@@ -49,14 +49,14 @@ export const preferAssertIsTrueOverNegatedAssertIsFalseRule: TSESLint.RuleModule
         const negation =
           arg.type === AST_NODE_TYPES.SpreadElement
             ? arg
-            : withoutTypeWrappers(arg);
+            : skipTypeWrappers(arg);
 
         if (
           negation.type === AST_NODE_TYPES.UnaryExpression &&
           negation.operator === '!'
         ) {
-          const targetText = argumentText(
-            context.sourceCode.text,
+          const targetText = getArgumentText(
+            context.sourceCode,
             negation.argument,
           );
 

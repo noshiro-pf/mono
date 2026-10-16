@@ -4,6 +4,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { getRangeWithParens, parenthesesDepth } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import { isSameReference } from './reference-utils.mjs';
@@ -75,41 +76,6 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
 
     const isOnlySingleLine = context.options[0] === 'only-single-line';
 
-    /** The range of `node` together with any parentheses around it. */
-    const parenthesizedRange = (
-      node: DeepReadonly<TSESTree.Node>,
-    ): TSESTree.Range => {
-      const depth = parenthesisDepth(node);
-
-      if (depth === 0) {
-        return [node.range[0], node.range[1]];
-      }
-
-      const opening = sourceCode.getTokenBefore(asNode(node), {
-        skip: depth - 1,
-      });
-
-      const closing = sourceCode.getTokenAfter(asNode(node), {
-        skip: depth - 1,
-      });
-
-      return opening === null || closing === null
-        ? [node.range[0], node.range[1]]
-        : [opening.range[0], closing.range[1]];
-    };
-
-    const parenthesisDepth = (node: DeepReadonly<TSESTree.Node>): number => {
-      let mut_depth = 0;
-
-      while (
-        ASTUtils.isParenthesized(mut_depth + 1, asNode(node), sourceCode)
-      ) {
-        mut_depth += 1;
-      }
-
-      return mut_depth;
-    };
-
     /** The text of `node` as an operand of `?:`, parenthesized if need be. */
     const operandText = (
       node: DeepReadonly<TSESTree.Node> | undefined,
@@ -118,9 +84,12 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
         return 'undefined';
       }
 
-      const text = sourceCode.text.slice(...parenthesizedRange(node));
+      const text = sourceCode.text.slice(
+        ...getRangeWithParens(sourceCode, node),
+      );
 
-      return parenthesisDepth(node) === 0 && LOW_PRECEDENCE_TYPES.has(node.type)
+      return parenthesesDepth(sourceCode, node) === 0 &&
+        LOW_PRECEDENCE_TYPES.has(node.type)
         ? `(${text})`
         : text;
     };
@@ -228,7 +197,7 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
         return undefined;
       }
 
-      const [left] = parenthesizedRange(head.left);
+      const [left] = getRangeWithParens(sourceCode, head.left);
 
       return {
         prefix: `${sourceCode.text.slice(left, head.left.range[1])} ${head.operator} `,
@@ -442,7 +411,7 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
                       hasOtherWrites ? 'let' : 'const',
                     ),
                 fixer.replaceTextRange(
-                  parenthesizedRange(init),
+                  getRangeWithParens(sourceCode, init),
                   `${operandText(node.test)} ? ${operandText(right)} : ${operandText(init)}`,
                 ),
                 fixer.replaceTextRange(

@@ -3,12 +3,13 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { skipTypeWrappers } from './ast-utils.mjs';
 import {
-  buildImportFixes,
+  buildNamedImportFix,
+  getImportDeclarations,
   getNamedImports,
-  getTsDataForgeImport,
-} from './import-utils.mjs';
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -34,7 +35,10 @@ export const preferArrIsArray: TSESLint.RuleModule<MessageIds, Options> = {
 
     const program = sourceCode.ast;
 
-    const tsDataForgeImport = getTsDataForgeImport(program);
+    const tsDataForgeImports = getImportDeclarations(
+      program,
+      TS_DATA_FORGE_MODULE,
+    );
 
     const mut_nodesToFix: TSESTree.CallExpression[] = [];
 
@@ -48,7 +52,8 @@ export const preferArrIsArray: TSESLint.RuleModule<MessageIds, Options> = {
       },
       'Program:exit': () => {
         // Check if Arr is already imported
-        const hasArrImport = getNamedImports(tsDataForgeImport).includes('Arr');
+        const hasArrImport =
+          getNamedImports(tsDataForgeImports).includes('Arr');
 
         // Note: We add import only for the first node to avoid conflicts when
         // multiple fixes try to insert at the same position. This means if the
@@ -70,7 +75,9 @@ export const preferArrIsArray: TSESLint.RuleModule<MessageIds, Options> = {
               // Add import only for the first node and only if not already imported
               const importFixes =
                 index === 0 && !hasArrImport
-                  ? buildImportFixes(fixer, program, tsDataForgeImport, ['Arr'])
+                  ? buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
+                      'Arr',
+                    ])
                   : [];
 
               return [...importFixes, fixer.replaceText(callee, 'Arr.isArray')];

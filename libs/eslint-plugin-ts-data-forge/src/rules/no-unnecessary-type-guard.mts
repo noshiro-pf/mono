@@ -4,15 +4,16 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
-import * as ts from 'typescript';
-import { typeWrapperLayers } from './ast-utils.mjs';
 import {
   buildCalleeResolver,
-  buildImportFixes,
+  buildNamedImportFix,
+  getImportDeclarations,
   getImportedLocalName,
-  getTsDataForgeImport,
-} from './import-utils.mjs';
+  typeWrapperLayers,
+} from 'eslint-rule-forge';
+import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
+import * as ts from 'typescript';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [
   Readonly<{
@@ -169,9 +170,12 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
 
       const ignored = new Set(options?.ignore);
 
-      const tsDataForgeImport = getTsDataForgeImport(program);
+      const tsDataForgeImports = getImportDeclarations(
+        program,
+        TS_DATA_FORGE_MODULE,
+      );
 
-      const resolveGuard = buildCalleeResolver(tsDataForgeImport);
+      const resolveGuard = buildCalleeResolver(tsDataForgeImports);
 
       const buildReplaceFix =
         (
@@ -191,7 +195,7 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
           // alias), rename to its in-scope local name. Otherwise add a new
           // import and rename to the canonical name.
           const localName = getImportedLocalName(
-            tsDataForgeImport,
+            tsDataForgeImports,
             replacement,
           );
 
@@ -200,7 +204,7 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
           }
 
           return [
-            ...buildImportFixes(fixer, program, tsDataForgeImport, [
+            ...buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
               replacement,
             ]),
             fixer.replaceText(propertyNode, replacement),

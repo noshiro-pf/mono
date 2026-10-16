@@ -34,6 +34,20 @@ ruleTester.run('prefer-arr-is-array', preferArrIsArray, {
       errors: [{ messageId: 'useArrIsArray' }],
     },
     {
+      name: 'Arr imported by a second ts-data-forge declaration is not imported again',
+      code: dedent`
+        import type { Optional } from 'ts-data-forge';
+        import { Arr } from 'ts-data-forge';
+        const result = Array.isArray(value);
+      `,
+      output: dedent`
+        import type { Optional } from 'ts-data-forge';
+        import { Arr } from 'ts-data-forge';
+        const result = Arr.isArray(value);
+      `,
+      errors: [{ messageId: 'useArrIsArray' }],
+    },
+    {
       name: 'Replace Array.isArray with Arr.isArray when Arr is already imported',
       code: dedent`
         import { Arr } from 'ts-data-forge';

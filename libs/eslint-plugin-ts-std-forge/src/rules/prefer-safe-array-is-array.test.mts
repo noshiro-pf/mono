@@ -46,6 +46,20 @@ ruleTester.run('prefer-safe-array-is-array', preferSafeArrayIsArray, {
       errors: [{ messageId: 'useSafeArrayIsArray' }],
     },
     {
+      name: 'Sees SafeArray imported by a second ts-std-forge declaration',
+      code: dedent`
+        import type { Result } from 'ts-std-forge';
+        import { SafeArray } from 'ts-std-forge';
+        const result = Array.isArray(value);
+      `,
+      output: dedent`
+        import type { Result } from 'ts-std-forge';
+        import { SafeArray } from 'ts-std-forge';
+        const result = SafeArray.isArray(value);
+      `,
+      errors: [{ messageId: 'useSafeArrayIsArray' }],
+    },
+    {
       name: 'Replace multiple Array.isArray calls, importing once',
       code: dedent`
         const result1 = Array.isArray(value1);

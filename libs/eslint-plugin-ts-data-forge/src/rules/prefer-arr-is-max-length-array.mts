@@ -1,17 +1,18 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import {
+  buildNamedImportFix,
+  getArgumentText,
+  getImportDeclarations,
+  getNamedImports,
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
+import {
   asLengthAccess,
   isArrayOrTupleExpression,
   isIntegerLiteralOrConstant,
   isPartOfBoundedLengthCheck,
-  skipTypeWrappers,
-  toArgumentText,
 } from './ast-utils.mjs';
-import {
-  buildImportFixes,
-  getNamedImports,
-  getTsDataForgeImport,
-} from './import-utils.mjs';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -40,7 +41,10 @@ export const preferArrIsMaxLengthArray: TSESLint.RuleModule<
 
     const program = sourceCode.ast;
 
-    const tsDataForgeImport = getTsDataForgeImport(program);
+    const tsDataForgeImports = getImportDeclarations(
+      program,
+      TS_DATA_FORGE_MODULE,
+    );
 
     const services = context.sourceCode.parserServices;
 
@@ -99,7 +103,7 @@ export const preferArrIsMaxLengthArray: TSESLint.RuleModule<
         });
       },
       'Program:exit': () => {
-        const namedImports = getNamedImports(tsDataForgeImport);
+        const namedImports = getNamedImports(tsDataForgeImports);
 
         const hasArrImport = namedImports.includes('Arr');
 
@@ -107,7 +111,7 @@ export const preferArrIsMaxLengthArray: TSESLint.RuleModule<
           index,
           { node, arrayExpression, lengthExpression },
         ] of mut_nodesToFix.entries()) {
-          const arrayText = toArgumentText(arrayExpression, sourceCode);
+          const arrayText = getArgumentText(sourceCode, arrayExpression);
 
           const lengthText = sourceCode.getText(lengthExpression);
 
@@ -126,7 +130,9 @@ export const preferArrIsMaxLengthArray: TSESLint.RuleModule<
 
               const importFixes =
                 index === 0 && !hasArrImport
-                  ? buildImportFixes(fixer, program, tsDataForgeImport, ['Arr'])
+                  ? buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
+                      'Arr',
+                    ])
                   : [];
 
               return [...importFixes, fixer.replaceText(node, replacement)];

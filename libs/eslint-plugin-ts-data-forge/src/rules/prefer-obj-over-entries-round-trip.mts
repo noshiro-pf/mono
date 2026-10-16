@@ -3,14 +3,16 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { Arr } from 'ts-data-forge';
-import type { ReadonlyRecord } from 'ts-type-forge';
 import {
-  buildImportFixes,
+  buildNamedImportFix,
+  getArgumentText,
+  getImportDeclarations,
   getImportedLocalName,
   getNamedImports,
-  getTsDataForgeImport,
-} from './import-utils.mjs';
+} from 'eslint-rule-forge';
+import { Arr } from 'ts-data-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
@@ -91,7 +93,10 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
 
     const program = sourceCode.ast;
 
-    const tsDataForgeImport = getTsDataForgeImport(program);
+    const tsDataForgeImports = getImportDeclarations(
+      program,
+      TS_DATA_FORGE_MODULE,
+    );
 
     const mut_roundTrips: {
       node: TSESTree.CallExpression;
@@ -146,7 +151,7 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
         body.test,
       );
 
-      const someText = `${optionalName}.some(${argumentText(sourceCode.getText(body.kept), body.kept)})`;
+      const someText = `${optionalName}.some(${getArgumentText(sourceCode, body.kept)})`;
 
       const noneText = `${optionalName}.none`;
 
@@ -167,12 +172,13 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
       },
 
       'Program:exit': () => {
-        const namedImports = getNamedImports(tsDataForgeImport);
+        const namedImports = getNamedImports(tsDataForgeImports);
 
-        const objName = getImportedLocalName(tsDataForgeImport, 'Obj') ?? 'Obj';
+        const objName =
+          getImportedLocalName(tsDataForgeImports, 'Obj') ?? 'Obj';
 
         const optionalName =
-          getImportedLocalName(tsDataForgeImport, 'Optional') ?? 'Optional';
+          getImportedLocalName(tsDataForgeImports, 'Optional') ?? 'Optional';
 
         const needsOptional = mut_roundTrips.some(
           ({ roundTrip }) => roundTrip.body.kind === 'optional',
@@ -191,19 +197,16 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
             node,
             messageId: MESSAGE_ID_OF[roundTrip.method],
             fix: (fixer) => {
-              const recordText = argumentText(
-                sourceCode.getText(roundTrip.record),
-                roundTrip.record,
-              );
+              const recordText = getArgumentText(sourceCode, roundTrip.record);
 
               const replacement = `${objName}.${roundTrip.method}(${recordText}, ${buildParams(roundTrip)} => ${buildCallbackBody(roundTrip, optionalName)})`;
 
               const importFixes =
                 index === 0 && missingImports.length > 0
-                  ? buildImportFixes(
+                  ? buildNamedImportFix(
                       fixer,
                       program,
-                      tsDataForgeImport,
+                      TS_DATA_FORGE_MODULE,
                       missingImports,
                     )
                   : [];
@@ -550,12 +553,6 @@ const conditionalTestText = (
   node: TSESTree.Expression,
 ): string =>
   NEEDS_PARENS_AS_TEST.has(node.type) ? (`(${text})` as const) : text;
-
-/** A comma expression would read as another argument without parentheses. */
-const argumentText = (text: string, node: TSESTree.Expression): string =>
-  node.type === AST_NODE_TYPES.SequenceExpression
-    ? (`(${text})` as const)
-    : text;
 
 /**
  * A concise arrow body cannot start with `{`, nor hold a bare comma. The text

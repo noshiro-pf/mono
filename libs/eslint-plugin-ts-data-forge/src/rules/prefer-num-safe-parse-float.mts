@@ -3,13 +3,15 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import * as ts from 'typescript';
-import { toArgumentText, typeWrapperLayers } from './ast-utils.mjs';
 import {
-  buildImportFixes,
+  buildNamedImportFix,
+  getArgumentText,
+  getImportDeclarations,
   getNamedImports,
-  getTsDataForgeImport,
-} from './import-utils.mjs';
+  typeWrapperLayers,
+} from 'eslint-rule-forge';
+import * as ts from 'typescript';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -62,7 +64,10 @@ export const preferNumSafeParseFloat: TSESLint.RuleModule<MessageIds, Options> =
 
       const program = sourceCode.ast;
 
-      const tsDataForgeImport = getTsDataForgeImport(program);
+      const tsDataForgeImports = getImportDeclarations(
+        program,
+        TS_DATA_FORGE_MODULE,
+      );
 
       const services = context.sourceCode.parserServices;
 
@@ -145,7 +150,7 @@ export const preferNumSafeParseFloat: TSESLint.RuleModule<MessageIds, Options> =
           mut_nodesToFix.push({ node, argExpression: firstArg });
         },
         'Program:exit': () => {
-          const namedImports = getNamedImports(tsDataForgeImport);
+          const namedImports = getNamedImports(tsDataForgeImports);
 
           const missingImports = (['Num', 'Result'] as const).filter(
             (name) => !namedImports.includes(name),
@@ -155,7 +160,7 @@ export const preferNumSafeParseFloat: TSESLint.RuleModule<MessageIds, Options> =
             index,
             { node, argExpression },
           ] of mut_nodesToFix.entries()) {
-            const argText = toArgumentText(argExpression, sourceCode);
+            const argText = getArgumentText(sourceCode, argExpression);
 
             const originalText = sourceCode.getText(node);
 
@@ -171,10 +176,10 @@ export const preferNumSafeParseFloat: TSESLint.RuleModule<MessageIds, Options> =
 
                 const importFixes =
                   index === 0 && missingImports.length > 0
-                    ? buildImportFixes(
+                    ? buildNamedImportFix(
                         fixer,
                         program,
-                        tsDataForgeImport,
+                        TS_DATA_FORGE_MODULE,
                         missingImports,
                       )
                     : [];

@@ -1,6 +1,6 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
+import { skipTypeWrappers } from 'eslint-rule-forge';
 import { createRule } from './create-rule.mjs';
-import { skipTypeWrappers } from './skip-type-wrappers.mjs';
 
 /**
  * The built-ins that have both a `new` form and a call form whose call form

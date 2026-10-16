@@ -1,5 +1,5 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
-import { skipTypeWrappers } from '../../ast-utils/index.mjs';
+import { skipTypeWrappers } from 'eslint-rule-forge';
 import { isReactApiCall } from './shared.mjs';
 
 type ComponentNameOption = Readonly<{

@@ -3,14 +3,15 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import type { DeepReadonly } from 'ts-type-forge';
-import { toArgumentText } from './ast-utils.mjs';
-import { brandedNumberTypeNameToFunctionName } from './branded-number-types.mjs';
 import {
-  buildImportFixes,
+  buildNamedImportFix,
+  getArgumentText,
+  getImportDeclarations,
   getNamedImports,
-  getTsDataForgeImport,
-} from './import-utils.mjs';
+} from 'eslint-rule-forge';
+import type { DeepReadonly } from 'ts-type-forge';
+import { brandedNumberTypeNameToFunctionName } from './branded-number-types.mjs';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -36,7 +37,10 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
 
     const program = sourceCode.ast;
 
-    const tsDataForgeImport = getTsDataForgeImport(program);
+    const tsDataForgeImports = getImportDeclarations(
+      program,
+      TS_DATA_FORGE_MODULE,
+    );
 
     const mut_nodesToFix: {
       node: TSESTree.TSAsExpression | TSESTree.TSTypeAssertion;
@@ -66,7 +70,7 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
       TSAsExpression: collect,
       TSTypeAssertion: collect,
       'Program:exit': () => {
-        const namedImports = getNamedImports(tsDataForgeImport);
+        const namedImports = getNamedImports(tsDataForgeImports);
 
         // Group nodes by function name to handle imports efficiently
         const functionNameToNodes = Map.groupBy(
@@ -87,14 +91,17 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
                 functionName,
               },
               fix: (fixer) => {
-                const replacement = `${functionName}(${toArgumentText(node.expression, sourceCode)})`;
+                const replacement = `${functionName}(${getArgumentText(sourceCode, node.expression)})`;
 
                 // Add import only for the first node of this function and only if not already imported
                 const importFixes =
                   index === 0 && !hasImport
-                    ? buildImportFixes(fixer, program, tsDataForgeImport, [
-                        functionName,
-                      ])
+                    ? buildNamedImportFix(
+                        fixer,
+                        program,
+                        TS_DATA_FORGE_MODULE,
+                        [functionName],
+                      )
                     : [];
 
                 return [...importFixes, fixer.replaceText(node, replacement)];

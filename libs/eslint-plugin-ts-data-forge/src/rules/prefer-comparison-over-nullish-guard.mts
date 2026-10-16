@@ -3,8 +3,9 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { buildCalleeResolver, getImportDeclarations } from 'eslint-rule-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
-import { buildCalleeResolver, getTsDataForgeImport } from './import-utils.mjs';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -121,7 +122,7 @@ export const preferComparisonOverNullishGuard: TSESLint.RuleModule<
     const sourceCode = context.sourceCode;
 
     const resolveGuard = buildCalleeResolver(
-      getTsDataForgeImport(sourceCode.ast),
+      getImportDeclarations(sourceCode.ast, TS_DATA_FORGE_MODULE),
     );
 
     return {

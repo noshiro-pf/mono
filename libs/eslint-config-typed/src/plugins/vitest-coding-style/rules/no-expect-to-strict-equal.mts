@@ -3,8 +3,8 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { getArgumentText, skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
-import { argumentText, withoutTypeWrappers } from './type-wrappers.mjs';
 
 type MessageIds = 'useAssert';
 
@@ -54,13 +54,13 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
 
     return {
       CallExpression: (node) => {
-        const callee = withoutTypeWrappers(node.callee);
+        const callee = skipTypeWrappers(node.callee);
 
         if (node.optional || !isToStrictEqualMember(callee)) {
           return;
         }
 
-        const expectCall = withoutTypeWrappers(callee.object);
+        const expectCall = skipTypeWrappers(callee.object);
 
         if (!isExpectCall(expectCall)) {
           return;
@@ -79,9 +79,9 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
 
         const expectedArgument = node.arguments[0];
 
-        const actualText = argumentText(sourceCode.text, actualArgument);
+        const actualText = getArgumentText(sourceCode, actualArgument);
 
-        const expectedText = argumentText(sourceCode.text, expectedArgument);
+        const expectedText = getArgumentText(sourceCode, expectedArgument);
 
         const typeArgumentText = getTypeArgumentText(node, sourceCode);
 
@@ -123,7 +123,7 @@ const isExpectCall = (
     return false;
   }
 
-  const callee = withoutTypeWrappers(node.callee);
+  const callee = skipTypeWrappers(node.callee);
 
   return callee.type === AST_NODE_TYPES.Identifier && callee.name === 'expect';
 };

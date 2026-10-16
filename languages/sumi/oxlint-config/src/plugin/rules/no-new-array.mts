@@ -1,6 +1,6 @@
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import { skipTypeWrappers } from 'eslint-rule-forge';
 import { createRule } from './create-rule.mjs';
-import { skipTypeWrappers } from './skip-type-wrappers.mjs';
 
 /**
  * `banned-syntax/no-new-array` — `new Array(...)` in every form is banned

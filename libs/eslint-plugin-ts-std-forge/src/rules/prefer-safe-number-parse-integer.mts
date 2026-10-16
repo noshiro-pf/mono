@@ -3,18 +3,16 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import * as ts from 'typescript';
 import {
+  buildNamedImportFix,
   getArgumentText,
-  getValueType,
-  isIdentifierNamed,
-  skipTypeWrappers,
-} from './ast-utils.mjs';
-import {
-  buildImportFixes,
+  getImportDeclarations,
   getNamedImports,
-  getTsStdForgeImport,
-} from './import-utils.mjs';
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
+import * as ts from 'typescript';
+import { getValueType, isIdentifierNamed } from './ast-utils.mjs';
+import { TS_STD_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -66,7 +64,10 @@ export const preferSafeNumberParseInteger: TSESLint.RuleModule<
 
     const program = sourceCode.ast;
 
-    const tsStdForgeImport = getTsStdForgeImport(program);
+    const tsStdForgeImports = getImportDeclarations(
+      program,
+      TS_STD_FORGE_MODULE,
+    );
 
     const mut_nodesToFix: {
       node: TSESTree.CallExpression;
@@ -130,7 +131,7 @@ export const preferSafeNumberParseInteger: TSESLint.RuleModule<
         mut_nodesToFix.push({ node, argExpression: firstArg });
       },
       'Program:exit': () => {
-        const namedImports = getNamedImports(tsStdForgeImport);
+        const namedImports = getNamedImports(tsStdForgeImports);
 
         const missingImports = (['Result', 'SafeNumber'] as const).filter(
           (name) => !namedImports.includes(name),
@@ -154,7 +155,12 @@ export const preferSafeNumberParseInteger: TSESLint.RuleModule<
 
               const importFixes =
                 index === 0 && missingImports.length > 0
-                  ? buildImportFixes(fixer, program, missingImports)
+                  ? buildNamedImportFix(
+                      fixer,
+                      program,
+                      TS_STD_FORGE_MODULE,
+                      missingImports,
+                    )
                   : [];
 
               return [...importFixes, fixer.replaceText(node, core)];

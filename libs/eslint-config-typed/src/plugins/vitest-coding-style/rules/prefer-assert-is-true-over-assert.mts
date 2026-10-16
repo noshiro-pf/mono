@@ -1,6 +1,6 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
+import { skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
-import { withoutTypeWrappers } from './type-wrappers.mjs';
 import { getVitestReceiver } from './vitest-binding.mjs';
 
 type MessageIds = 'preferAssertIsTrueOverAssert';
@@ -64,7 +64,7 @@ export const preferAssertIsTrueOverAssertRule: TSESLint.RuleModule<
 
       // assert.isOk(X) -> assert.isTrue(X)
 
-      const callee = withoutTypeWrappers(node.callee);
+      const callee = skipTypeWrappers(node.callee);
 
       if (callee.type === AST_NODE_TYPES.MemberExpression) {
         const receiver = getVitestReceiver(

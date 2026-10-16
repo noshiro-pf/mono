@@ -4,16 +4,14 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
-  asLengthAccess,
-  isArrayOrTupleExpression,
-  skipTypeWrappers,
-  toArgumentText,
-} from './ast-utils.mjs';
-import {
-  buildImportFixes,
+  buildNamedImportFix,
+  getArgumentText,
+  getImportDeclarations,
   getNamedImports,
-  getTsDataForgeImport,
-} from './import-utils.mjs';
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
+import { asLengthAccess, isArrayOrTupleExpression } from './ast-utils.mjs';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -39,7 +37,10 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
 
     const program = sourceCode.ast;
 
-    const tsDataForgeImport = getTsDataForgeImport(program);
+    const tsDataForgeImports = getImportDeclarations(
+      program,
+      TS_DATA_FORGE_MODULE,
+    );
 
     const services = context.sourceCode.parserServices;
 
@@ -88,7 +89,7 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
         });
       },
       'Program:exit': () => {
-        const namedImports = getNamedImports(tsDataForgeImport);
+        const namedImports = getNamedImports(tsDataForgeImports);
 
         const hasArrImport = namedImports.includes('Arr');
 
@@ -96,7 +97,7 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
           index,
           { node, arrayExpression },
         ] of mut_nodesToFix.entries()) {
-          const arrayText = toArgumentText(arrayExpression, sourceCode);
+          const arrayText = getArgumentText(sourceCode, arrayExpression);
 
           const originalText = sourceCode.getText(node);
 
@@ -112,7 +113,9 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
 
               const importFixes =
                 index === 0 && !hasArrImport
-                  ? buildImportFixes(fixer, program, tsDataForgeImport, ['Arr'])
+                  ? buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
+                      'Arr',
+                    ])
                   : [];
 
               return [...importFixes, fixer.replaceText(node, replacement)];

@@ -3,12 +3,13 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { skipTypeWrappers } from './ast-utils.mjs';
 import {
-  buildImportFixes,
+  buildNamedImportFix,
+  getImportDeclarations,
   getNamedImports,
-  getTsDataForgeImport,
-} from './import-utils.mjs';
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
+import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -34,7 +35,10 @@ export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
 
     const program = sourceCode.ast;
 
-    const tsDataForgeImport = getTsDataForgeImport(program);
+    const tsDataForgeImports = getImportDeclarations(
+      program,
+      TS_DATA_FORGE_MODULE,
+    );
 
     const mut_nodesToFix: {
       node: TSESTree.LogicalExpression;
@@ -54,7 +58,7 @@ export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
       'Program:exit': () => {
         // Check if isNonNullObject is already imported
         const hasIsNonNullObjectImport =
-          getNamedImports(tsDataForgeImport).includes('isNonNullObject');
+          getNamedImports(tsDataForgeImports).includes('isNonNullObject');
 
         // Note: We add import only for the first node to avoid conflicts when
         // multiple fixes try to insert at the same position. This means if the
@@ -73,7 +77,7 @@ export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
               // Add import only for the first node and only if not already imported
               const importFixes =
                 index === 0 && !hasIsNonNullObjectImport
-                  ? buildImportFixes(fixer, program, tsDataForgeImport, [
+                  ? buildNamedImportFix(fixer, program, TS_DATA_FORGE_MODULE, [
                       'isNonNullObject',
                     ])
                   : [];

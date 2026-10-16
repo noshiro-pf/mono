@@ -4,6 +4,14 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import {
+  buildCalleeResolver,
+  buildNamedImportFix,
+  getImportDeclarations,
+  getImportedLocalName,
+  hasForeignBinding,
+  parenthesesDepth,
+} from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import {
   ARRAY_FN,
@@ -14,14 +22,8 @@ import {
   MIN_LENGTH_TUPLE_FN,
   NON_EMPTY_ARRAY_FN,
   STRUCTURAL_PREFIX_CAP,
+  TS_FORTRESS_MODULE,
 } from './constants.mjs';
-import {
-  buildCalleeResolver,
-  buildImportsFix,
-  getImportedLocalName,
-  getTsFortressImports,
-  hasForeignBinding,
-} from './import-utils.mjs';
 
 type Options = readonly [];
 
@@ -137,7 +139,10 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
 
     const program = sourceCode.ast;
 
-    const tsFortressImports = getTsFortressImports(program);
+    const tsFortressImports = getImportDeclarations(
+      program,
+      TS_FORTRESS_MODULE,
+    );
 
     const resolveCallee = buildCalleeResolver(tsFortressImports);
 
@@ -196,7 +201,12 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
           propertyNode: resolved.propertyNode,
           isNamespace: false,
           rewrite,
-          localName: hasForeignBinding(sourceCode, node, localName)
+          localName: hasForeignBinding(
+            sourceCode,
+            node,
+            localName,
+            TS_FORTRESS_MODULE,
+          )
             ? undefined
             : localName,
           needsImport: importedLocalName === undefined,
@@ -213,7 +223,7 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
             .map((match) => match.rewrite.to),
         );
 
-        // Every missing import rides on a single report; see `buildImportsFix`.
+        // Every missing import rides on a single report; see `buildNamedImportFix`.
         const importFixIndex = reportable.findIndex(
           (match) => match.needsImport,
         );
@@ -236,7 +246,12 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
             },
             fix: (fixer) => [
               ...(index === importFixIndex
-                ? buildImportsFix(fixer, program, namesNeedingImport)
+                ? buildNamedImportFix(
+                    fixer,
+                    program,
+                    TS_FORTRESS_MODULE,
+                    namesNeedingImport,
+                  )
                 : []),
               fixer.replaceText(propertyNode, localName),
               ...dropBoundsFix(fixer, node, rewrite, sourceCode),
@@ -342,7 +357,7 @@ const dropBoundsFix = (
       return [];
     }
 
-    const depth = parenthesesDepth(dropped, sourceCode);
+    const depth = parenthesesDepth(sourceCode, dropped);
 
     const first = sourceCode.getFirstToken(dropped);
 
@@ -361,16 +376,6 @@ const dropBoundsFix = (
       ? []
       : [fixer.removeRange([start.range[0], end.range[0]])];
   });
-
-/** How many pairs of parentheses the source puts around `node`. */
-const parenthesesDepth = (
-  node: TSESTree.Node,
-  sourceCode: TSESLint.SourceCode,
-  depth: number = 0,
-): number =>
-  ASTUtils.isParenthesized(depth + 1, node, sourceCode)
-    ? parenthesesDepth(node, sourceCode, depth + 1)
-    : depth;
 
 /**
  * A non-negative integer literal's value, or `undefined` for anything else —

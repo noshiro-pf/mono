@@ -4,9 +4,8 @@ import {
   TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
-import { isTypeWrapper } from '../../ast-utils/index.mjs';
-import { withoutTypeWrappers } from './type-wrappers.mjs';
 
 /**
  * The identifier a `<receiver>.<method>(...)` call is made on, when that
@@ -49,7 +48,7 @@ export const getVitestReceiver = (
   node: TSESTree.Node,
   expectedName: 'assert' | 'expect',
 ): TSESTree.Identifier | undefined => {
-  const receiver = isTypeWrapper(node) ? withoutTypeWrappers(node) : node;
+  const receiver = skipTypeWrappers(node);
 
   if (receiver.type !== AST_NODE_TYPES.Identifier) {
     return undefined;

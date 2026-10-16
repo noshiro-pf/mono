@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { isTypeWrapper, skipTypeWrappers } from './ast-utils.mjs';
+import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
 import { TS_FORTRESS_MODULE } from './constants.mjs';
 
 type Options = readonly [

@@ -33,9 +33,11 @@
 
 避け方:
 
-- **構文を見る前、型を聞く前に剥がす。** ESLint のルールでは
-  `libs/eslint-config-typed/src/plugins/ast-utils/type-wrapper-utils.mts`
-  の `skipTypeWrappers` を使う。同じ参照かどうかは、
+- **構文を見る前、型を聞く前に剥がす。** ESLint のルールと Sumi の oxlint JS
+  plugin では `eslint-rule-forge`（`libs/eslint-rule-forge`）の
+  `skipTypeWrappers` を使う。ラッパーの各層の型を聞くなら `typeWrapperLayers`
+  を使う。公開しているプラグインもこれを `dependencies` に持つので、ヘルパーを
+  パッケージへコピーせず、足りないものはこのパッケージに足す。同じ参照かどうかは、
   `ts-restrictions/rules/reference-utils.mts` の `isSameReference` がラッパー越しに比べる。
 - **位置を判定するときも剥がす。** 「JSX の中か」「呼び出しの callee か」のように
   親をたどる判定では、親がラッパーならさらにその上を見る（`jsx-utils.mts` の
@@ -54,8 +56,9 @@ ESTree には括弧のノードがない。`sourceCode.getText(node)` は、ソ�
 文字列に括弧は要らない」という判定は誤りである。`(a || b) ? false : c` を
 `!${getText(test)} && c` と組み立てると、`!a || b && c` になって意味が変わる。
 差し込む先の優先順位で括弧が要るなら、ソースに括弧があったかどうかにかかわらず付ける。
-ソースの括弧ごと扱いたいときは、`ASTUtils.isParenthesized` と
-`getTokenBefore` / `getTokenAfter` でその範囲を求める。
+ソースの括弧ごと扱いたいときは、`eslint-rule-forge` の `parenthesesDepth` と
+`getRangeWithParens` で深さと範囲を求める。呼び出しの引数に差し込む文字列は
+`getArgumentText` で作る。カンマ式 `(a, b)` が 2 つの引数にならないよう括弧を付ける。
 
 TypeScript の AST は逆で、括弧が `ParenthesizedExpression` というノードとして残る。
 構文を判定する前に、型ラッパーと一緒に剥がす（Sumi の checker の

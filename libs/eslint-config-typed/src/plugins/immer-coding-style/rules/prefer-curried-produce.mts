@@ -3,9 +3,9 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr, castDeepMutable, hasKey, isRecord } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
-import { skipTypeWrappers } from '../../ast-utils/index.mjs';
 
 type MessageIds = 'useCurriedProduce';
 
