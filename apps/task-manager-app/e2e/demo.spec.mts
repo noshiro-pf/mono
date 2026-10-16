@@ -1004,7 +1004,18 @@ test(
 
     expect.soft(await edgesThroughNodes(page, 11)).toStrictEqual([]);
 
-    // Dropped across a long edge, which then goes round it.
+    // Dropped across a long edge, which then goes round it: 「実装完了」 moved
+    // down first, since arranged, the edge runs close past 「画面を実装する」
+    // and leaves no room beside it for a node.
+    const review = dagNode(page, /実装完了/u);
+
+    const reviewBox = await review.boundingBox();
+
+    await dragNodeTo(page, review, {
+      x: (reviewBox?.x ?? 0) + (reviewBox?.width ?? 0) / 2,
+      y: (reviewBox?.y ?? 0) + (reviewBox?.height ?? 0) / 2 + 180,
+    });
+
     await dragOntoEdge(page, /利用者向けドキュメント/u, {
       from: 'task:api',
       to: 'milestone:review',
