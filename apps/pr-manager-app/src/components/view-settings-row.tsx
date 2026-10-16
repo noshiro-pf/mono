@@ -4,6 +4,7 @@ import {
   BLOCK_NAMES,
   DEFAULT_SHARE,
   type BlockId,
+  type ColumnCount,
   type ColumnIndex,
   type HeightMode,
 } from '../layout.mjs';
@@ -15,7 +16,7 @@ type Props = Readonly<{
   /** Its place in its column, and how many the column holds. */
   index: number;
   count: number;
-  twoColumns: boolean;
+  columns: ColumnCount;
   mode: HeightMode;
   /** Read in the `natural` mode only. */
   height: number | undefined;
@@ -27,12 +28,13 @@ type Props = Readonly<{
 
 /**
  * One block in the layout settings, with a button for each thing the pointer
- * can do to it on the page: up, down, across to the other column, and its
- * height — or, when the blocks fill the window, its share of it. A button that could do nothing is left out rather than disabled,
- * so tabbing along the row stops only where something can happen.
+ * can do to it on the page: up, down, across to the column on its left or
+ * its right, and its height — or, when the blocks fill the window, its share
+ * of it. A button that could do nothing is left out rather than disabled, so
+ * tabbing along the row stops only where something can happen.
  */
 export const ViewSettingsRow = memoNamed<Props>('ViewSettingsRow', (props) => {
-  const { id, column, index, count, twoColumns, mode, height, share, percent } =
+  const { id, column, index, count, columns, mode, height, share, percent } =
     props;
 
   const blockName = BLOCK_NAMES[id];
@@ -45,9 +47,17 @@ export const ViewSettingsRow = memoNamed<Props>('ViewSettingsRow', (props) => {
     layoutStore.move(id, { column, index: index + 1 });
   }, [id, column, index]);
 
-  const across = useCallback((): void => {
-    layoutStore.move(id, { column: column === 0 ? 1 : 0, index: 0 });
+  const toLeft = useCallback((): void => {
+    layoutStore.move(id, { column: column === 2 ? 1 : 0, index: 0 });
   }, [id, column]);
+
+  const toRight = useCallback((): void => {
+    layoutStore.move(id, { column: column === 0 ? 1 : 2, index: 0 });
+  }, [id, column]);
+
+  const leftName = column === 2 && columns === 3 ? 'middle' : 'left';
+
+  const rightName = column === 0 && columns === 3 ? 'middle' : 'right';
 
   const shorter = useCallback((): void => {
     layoutStore.setHeight(id, (height ?? FIRST_HEIGHT) - HEIGHT_STEP);
@@ -104,15 +114,27 @@ export const ViewSettingsRow = memoNamed<Props>('ViewSettingsRow', (props) => {
         </button>
       ) : undefined}
 
-      {twoColumns ? (
+      {column > 0 ? (
         <button
-          aria-label={`Move ${blockName} to the ${column === 0 ? 'right' : 'left'} column`}
+          aria-label={`Move ${blockName} to the ${leftName} column`}
           className={'view-settings-move'}
-          title={column === 0 ? 'To the right column' : 'To the left column'}
+          title={`To the ${leftName} column`}
           type={'button'}
-          onClick={across}
+          onClick={toLeft}
         >
-          {column === 0 ? '→' : '←'}
+          {'←'}
+        </button>
+      ) : undefined}
+
+      {column < columns - 1 ? (
+        <button
+          aria-label={`Move ${blockName} to the ${rightName} column`}
+          className={'view-settings-move'}
+          title={`To the ${rightName} column`}
+          type={'button'}
+          onClick={toRight}
+        >
+          {'→'}
         </button>
       ) : undefined}
 

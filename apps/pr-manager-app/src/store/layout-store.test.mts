@@ -143,6 +143,20 @@ describe(createLayoutStore, () => {
     assert.deepStrictEqual(store.layout.getSnapshot().value, DEFAULT_LAYOUT);
   });
 
+  test('the line between two of three columns moves with the pointer, and a double click evens them', () => {
+    const { store } = setup(withColumns(DEFAULT_LAYOUT, 3));
+
+    store.setLine(1, 80);
+
+    store.setLine(0, 20);
+
+    assert.deepStrictEqual(store.layout.getSnapshot().value.lines, [20, 80]);
+
+    store.evenLine(0);
+
+    assert.deepStrictEqual(store.layout.getSnapshot().value.lines, [40, 80]);
+  });
+
   test('stop ends the saving, a change still waiting included', async () => {
     const { store, saved } = setup(DEFAULT_LAYOUT);
 

@@ -611,12 +611,17 @@ a:focus-visible {
 /* --- the blocks and their layout --------------------------------------- */
 
 /*
- * Two columns take a wider page, since the point of them is a screen that has
- * room; below 60rem they stack into one whatever the layout says, which is why
- * the grid template the component writes inline is harmless there.
+ * Two or three columns take a wider page, since the point of them is a screen
+ * that has room; below 60rem for two, and 80rem for three, they stack into one
+ * whatever the layout says, which is why the grid template the component
+ * writes inline is harmless there.
  */
 .page:has(.block-layout[data-columns='2']) {
   max-width: 120rem;
+}
+
+.page:has(.block-layout[data-columns='3']) {
+  max-width: 180rem;
 }
 
 @media (width >= 60rem) {
@@ -626,8 +631,21 @@ a:focus-visible {
   }
 }
 
+@media (width >= 80rem) {
+  .block-layout[data-columns='3'] {
+    align-items: start;
+    display: grid;
+  }
+}
+
 @media (width < 60rem) {
   .column-divider {
+    display: none;
+  }
+}
+
+@media (width < 80rem) {
+  .block-layout[data-columns='3'] > .column-divider {
     display: none;
   }
 }
@@ -745,6 +763,14 @@ a:focus-visible {
 
 @media (width >= 60rem) {
   .block-layout[data-mode='fill'][data-columns='2'] {
+    align-items: stretch;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+  }
+}
+
+@media (width >= 80rem) {
+  .block-layout[data-mode='fill'][data-columns='3'] {
     align-items: stretch;
     display: grid;
     grid-template-rows: minmax(0, 1fr);
