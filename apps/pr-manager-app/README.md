@@ -66,7 +66,12 @@ page after the other, since an issue left off the graph would be drawn as if it
 declared nothing. In the DAG, the **Done** chip beside the switch starts
 pressed; unpressed, it leaves out the issues closed as completed and the merged
 pull requests, with the waits on them that are over, so that only what is left
-to do is laid out. Both choices are kept in the browser.
+to do is laid out. Both choices are kept in the browser. At the other end of
+the row, **−** and **+** zoom the graph out and in a step at a time about the
+middle of its box, **Fit** draws all of it in the box (never larger than its
+natural size, and following the box and the graph as they change until the
+next zoom), and **100%** puts it back at its natural size. The zoom starts at
+100% on every visit.
 
 It **only reads**. Nothing here labels, rebases, merges or comments — that is
 `pnpm run unblock-prs`, run by a person — and a page that cannot do any of it

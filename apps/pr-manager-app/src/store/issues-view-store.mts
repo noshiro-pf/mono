@@ -19,6 +19,13 @@
  * list as if that issue declared nothing. A page that failed is not asked
  * for again on its own; the button under the block is still there for that.
  *
+ * How large the DAG is drawn (`dag-zoom.mts`) starts at the natural size
+ * on every visit and is not kept: a zoom is for the graph in front of the
+ * reader, which the next visit may not have. The fit is a way of drawing
+ * rather than a scale, so that it keeps the whole graph in the box as the
+ * box is resized and as the graph gains or loses nodes, until a zoom or the
+ * natural size is chosen; a zoom from the fit starts at the scale it had.
+ *
  * The graph the DAG draws, and where each of its nodes goes, are derived
  * here from the report and that switch, and passed on only when they
  * changed: a poll that moved a pull request's checks changes the entries,
@@ -34,6 +41,7 @@ import {
   type Subscription,
 } from 'synstate';
 import { Arr, fastDeepEqual } from 'ts-data-forge';
+import { fitScale, zoomInFrom, zoomOutFrom, type Size } from '../dag-zoom.mjs';
 import {
   layoutIssueGraph,
   type IssueGraphLayout,
@@ -72,8 +80,20 @@ export type IssuesViewStore = Readonly<{
   layout: InitializedObservable<IssueGraphLayout>;
   /** How many nodes are done, whether or not they are drawn. */
   doneCount: InitializedObservable<number>;
+  /** What the layout's units are multiplied by to draw the DAG. */
+  dagScale: InitializedObservable<number>;
+  /** Whether the DAG is drawn to fit its box, whatever the scale that takes. */
+  dagFitted: InitializedObservable<boolean>;
   choose: (view: IssuesView) => void;
   toggleHideDone: () => void;
+  /** The room the DAG's box has for the graph, as last measured. */
+  setDagBox: (box: Size) => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  /** Draws the whole graph in the box, and keeps it there. */
+  fitDag: () => void;
+  /** Back to the natural size. */
+  resetZoom: () => void;
   /** Reads what was saved, then saves every change; returns what stops it. */
   start: () => () => void;
 }>;
@@ -85,6 +105,10 @@ export const createIssuesViewStore = (
 
   const [hideDone, setHideDone, { updateState: updateHideDone }] =
     createState(false);
+
+  const [zoom, setZoom] = createState<DagZoom>({ type: 'scale', scale: 1 });
+
+  const [dagBox, setDagBox] = createState<Size>({ width: 0, height: 0 });
 
   // Whether the reader has chosen yet, for each.
   const mut_reader = { changedView: false, changedHideDone: false };
@@ -194,6 +218,22 @@ export const createIssuesViewStore = (
 
   const layout = graph.pipe(map(layoutIssueGraph));
 
+  const dagScale = combine([zoom, layout, dagBox])
+    .pipe(
+      map(([current, laidOut, box]) =>
+        current.type === 'fit' ? fitScale(laidOut, box) : current.scale,
+      ),
+    )
+    .pipe(skipIfNoChange());
+
+  const dagFitted = zoom
+    .pipe(map(({ type }) => type === 'fit'))
+    .pipe(skipIfNoChange());
+
+  const zoomBy = (step: (scale: number) => number) => (): void => {
+    setZoom({ type: 'scale', scale: step(dagScale.getSnapshot().value) });
+  };
+
   const doneCount = fullGraph
     .pipe(
       map(({ nodes }) => nodes.filter(({ state }) => state === 'done').length),
@@ -206,8 +246,21 @@ export const createIssuesViewStore = (
     graph,
     layout,
     doneCount,
+    dagScale,
+    dagFitted,
     choose,
     toggleHideDone,
+    setDagBox,
+    zoomIn: zoomBy(zoomInFrom),
+    zoomOut: zoomBy(zoomOutFrom),
+    fitDag: () => {
+      setZoom({ type: 'fit' });
+    },
+    resetZoom: () => {
+      setZoom({ type: 'scale', scale: 1 });
+    },
     start,
   };
 };
+
+type DagZoom = Readonly<{ type: 'fit' } | { type: 'scale'; scale: number }>;

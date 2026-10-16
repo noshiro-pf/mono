@@ -4,6 +4,7 @@ import type { IssueList } from '../load-report.mjs';
 import { issuesViewSignals } from '../store/index.mjs';
 import { ExternalLink } from './external-link.js';
 import { IssueDagDoneToggle } from './issue-dag-done-toggle.js';
+import { IssueDagZoom } from './issue-dag-zoom.js';
 import { IssueDag } from './issue-dag.js';
 import { IssuesViewSwitch } from './issues-view-switch.js';
 import { LabelChip } from './label-chip.js';
@@ -31,7 +32,8 @@ type Props = Readonly<{
  *
  * Or, switched to it, the DAG of what each waits for (`issue-dag.tsx`), for
  * which every open issue is read (`issues-view-store.mts`), with a switch
- * beside the List / DAG one for whether it draws what is done.
+ * beside the List / DAG one for whether it draws what is done, and the zoom
+ * at the other end of the row.
  */
 export const IssuesSection = memoNamed<Props>(
   'IssuesSection',
@@ -51,6 +53,8 @@ export const IssuesSection = memoNamed<Props>(
         {issuesViewSignals.view.value === 'dag' ? (
           <IssueDagDoneToggle />
         ) : undefined}
+
+        {issuesViewSignals.view.value === 'dag' ? <IssueDagZoom /> : undefined}
       </div>
 
       {reading ? (

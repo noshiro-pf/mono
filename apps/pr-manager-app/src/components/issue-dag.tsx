@@ -3,6 +3,7 @@ import { Arr } from 'ts-data-forge';
 import { issuesViewSignals } from '../store/index.mjs';
 import { IssueDagLegend } from './issue-dag-legend.js';
 import { IssueDagNode } from './issue-dag-node.js';
+import { useDagBox } from './use-dag-box.mjs';
 
 /**
  * The open issues as a graph of what each waits for, read left to right:
@@ -13,15 +14,25 @@ import { IssueDagNode } from './issue-dag-node.js';
  * the graph is wider or taller than it. In a block that scrolls on its own
  * the box takes what room the block has (`index.css`); elsewhere it is at
  * most 70% of the window's height.
+ *
+ * Drawn at the scale the zoom above it chose (`issue-dag-zoom.tsx`): the
+ * `viewBox` stays the layout's, and the size the SVG takes on the page is
+ * what is scaled, so that the box scrolls over the graph at any size.
+ * Rounded down to whole pixels, which a fit relies on to leave the box no
+ * scroll bar to draw.
  */
 export const IssueDag = memoNamed('IssueDag', () => {
   const graph = issuesViewSignals.graph.value;
 
+  const scale = issuesViewSignals.dagScale.value;
+
+  const layout = issuesViewSignals.layout.value;
+
+  const box = useDagBox(scale, layout);
+
   if (!Arr.isNonEmpty(graph.nodes)) {
     return <p className={'section-note'}>{'No open issues.'}</p>;
   }
-
-  const layout = issuesViewSignals.layout.value;
 
   const byNumber = new Map(graph.nodes.map((node) => [node.number, node]));
 
@@ -29,12 +40,12 @@ export const IssueDag = memoNamed('IssueDag', () => {
     <div className={'issue-dag'}>
       <IssueDagLegend graph={graph} />
 
-      <div className={'issue-dag-scroll'}>
+      <div ref={box.ref} className={'issue-dag-scroll'} onScroll={box.onScroll}>
         <svg
           className={'issue-dag-svg'}
-          height={layout.height}
+          height={Math.floor(layout.height * scale)}
           viewBox={`0 0 ${layout.width} ${layout.height}`}
-          width={layout.width}
+          width={Math.floor(layout.width * scale)}
         >
           <title>{'Open issues and what each waits for'}</title>
 
