@@ -8,7 +8,7 @@ import {
   PRIORITY_OVERHANG,
 } from '../issue-graph-layout.mjs';
 import type { IssueGraphNode } from '../issue-graph.mjs';
-import { wrapTitle } from '../node-title.mjs';
+import { numberPillWidth, wrapTitle } from '../node-title.mjs';
 import { ExternalLink } from './external-link.js';
 import { describeNode } from './issue-dag-states.mjs';
 
@@ -24,12 +24,14 @@ type Props = Readonly<{
  * (`index.css`), and a link to it on GitHub. An issue is a box with pointed
  * ends and a pull request a rounded box, so the two read apart before the
  * colour does — the issue angular, as the problem it raises, and the pull
- * request rounded, as what settles it. Its `priority:*` label is a word on a pill across the top
- * edge, in ink rather than a colour, since the shape and the colour already
- * say what it is and where it stands; a high one also gets a second outline
- * around the shape, and a low one is drawn faint. The number, the state and
- * the priority are in the tooltip, which is also what a screen reader
- * announces.
+ * request rounded, as what settles it. Its number is on a pill across the
+ * left of the top edge, and its `priority:*` label a word on a pill across the
+ * right, both in ink rather than a colour, since the shape and the colour
+ * already say what it is and where it stands; the number is the quieter of
+ * the two, as what identifies a node rather than what ranks it. A high one
+ * also gets a second outline around the shape, and a low one is drawn faint.
+ * The number, the state and the priority are in the tooltip, which is also
+ * what a screen reader announces.
  */
 export const IssueDagNode = memoNamed<Props>(
   'IssueDagNode',
@@ -45,6 +47,8 @@ export const IssueDagNode = memoNamed<Props>(
     );
 
     const description = describeNode(node);
+
+    const numberWidth = numberPillWidth(node.number);
 
     return (
       <ExternalLink
@@ -99,6 +103,24 @@ export const IssueDagNode = memoNamed<Props>(
               </tspan>
             ))}
           </text>
+          <g
+            className={'issue-dag-number'}
+            transform={`translate(${NUMBER_X} ${-PRIORITY_HEIGHT / 2})`}
+          >
+            <rect
+              height={PRIORITY_HEIGHT}
+              rx={PRIORITY_HEIGHT / 2}
+              width={numberWidth}
+            />
+            <text
+              dominantBaseline={'central'}
+              textAnchor={'middle'}
+              x={numberWidth / 2}
+              y={PRIORITY_HEIGHT / 2}
+            >
+              {`#${node.number}`}
+            </text>
+          </g>
           {node.priority === 'none' ? undefined : (
             <g
               className={'issue-dag-priority'}
@@ -209,6 +231,9 @@ const PRIORITY_WIDTH = 36;
 
 /** Centred on the top edge. */
 const PRIORITY_HEIGHT = 2 * PRIORITY_OVERHANG;
+
+/** Where the straight part of the top edge starts, for either shape. */
+const NUMBER_X = NODE_HEIGHT / 2;
 
 /** Inside the straight part of the top edge, for either shape. */
 const PRIORITY_X = NODE_WIDTH - NODE_HEIGHT / 2 - PRIORITY_WIDTH;

@@ -59,6 +59,20 @@ export const wrapTitle = (
   return mut_lines;
 };
 
+/**
+ * How wide the pill that carries `#number` over a node's top edge is drawn:
+ * its digits in 10px bold, which `font-variant-numeric: tabular-nums` makes
+ * as wide as one another, with the same room either side.
+ */
+export const numberPillWidth = (number: number): number =>
+  2 * NUMBER_PILL_PADDING + NUMBER_CHAR_WIDTH * `#${number}`.length;
+
+/** Between the pill's ends and its text. */
+const NUMBER_PILL_PADDING = 6;
+
+/** A digit, or `#`, in 10px bold tabular figures. */
+const NUMBER_CHAR_WIDTH = 6.2;
+
 /** How far into a line a space has to be for the line to break there. */
 const WORD_BREAK_FROM = 0.6;
 
