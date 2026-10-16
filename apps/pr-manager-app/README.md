@@ -47,8 +47,9 @@ time the button under the list is pressed, until every open one is listed.
 
 **Running workflows** lists what the Actions tab shows filtered to
 `is:in_progress is:queued is:waiting is:action_required is:neutral is:stale`,
-newest first, and its title links to that filter on GitHub: each run's state,
-its title, the workflow and run number, what started it, its branch, when it
+newest first, and its title links to that filter on GitHub: each run's state
+(drawn as GitHub draws it, a turning ring for one in progress and a dot for
+one queued, and a badge for the rarer states), its title, the workflow and run number, what started it, its branch, when it
 started and who started it. It is read beside the report rather than as a part
 of it, so a read of it that fails says so in its own block and leaves the
 merge order as it was.

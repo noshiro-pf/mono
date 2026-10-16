@@ -10,6 +10,7 @@ import {
   type WorkflowRunList,
 } from '../workflow-runs.mjs';
 import { ExternalLink } from './external-link.js';
+import { RunStateIcon } from './run-state-icon.js';
 import { Timestamp } from './timestamp.js';
 
 type Props = Readonly<{ runs: RunsStatus }>;
@@ -53,12 +54,7 @@ export const WorkflowRunsSection = memoNamed<Props>(
               {runs.list.runs.map((run) => (
                 <li key={run.id} className={'run-item'}>
                   <div className={'pull-request-heading'}>
-                    <span
-                      className={'badge'}
-                      data-status={STATE_PRESENTATION[run.state].status}
-                    >
-                      {STATE_PRESENTATION[run.state].label}
-                    </span>
+                    <RunStateMark state={run.state} />
 
                     <ExternalLink href={run.url} variant={'pull-request-title'}>
                       {run.title}
@@ -91,6 +87,28 @@ export const WorkflowRunsSection = memoNamed<Props>(
   ),
 );
 
+/**
+ * A run's state: the icon the Actions tab draws, for the two states that are
+ * most of what this block lists, and a badge with the word for the rest,
+ * which are rare enough that a word reads better than a glyph to learn.
+ */
+const RunStateMark = memoNamed<Readonly<{ state: RunState }>>(
+  'RunStateMark',
+  ({ state }) => {
+    const { label, status: role } = STATE_PRESENTATION[state];
+
+    return state === 'in_progress' ? (
+      <RunStateIcon kind={'running'} label={label} />
+    ) : state === 'queued' ? (
+      <RunStateIcon kind={'queued'} label={label} />
+    ) : (
+      <span className={'badge'} data-status={role}>
+        {label}
+      </span>
+    );
+  },
+);
+
 const ACTIONS_URL = actionsQueryUrl(REPORT_SOURCE);
 
 const titleOf = ({ runs, totalCount }: WorkflowRunList): string =>
@@ -99,9 +117,9 @@ const titleOf = ({ runs, totalCount }: WorkflowRunList): string =>
     : (`Running workflows (${runs.length})` as const);
 
 /**
- * A word for each state, and the colour the verdict badges give the same
- * thing: running is a wait, and a run waiting for an approval or a person is
- * one too; queued is nothing yet, and a neutral or stale run is over.
+ * A word for each state — the badge's, or the icon's label — and the colour
+ * the verdict badges give the same thing: a run waiting for an approval or a
+ * person is a wait, and a neutral or stale run is over.
  */
 const STATE_PRESENTATION = {
   in_progress: { label: 'running', status: 'warning' },

@@ -29,6 +29,7 @@ export * from './pull-request-card.js';
 export * from './read-from-github.js';
 export * from './report-view.js';
 export * from './review-badge.js';
+export * from './run-state-icon.js';
 export * from './set-aside-badge.js';
 export * from './split-view-link.js';
 export * from './stat-tile.js';
