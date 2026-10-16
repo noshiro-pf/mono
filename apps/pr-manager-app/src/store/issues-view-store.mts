@@ -29,6 +29,10 @@
  * rather than a scale, so that it keeps the whole graph in the box as the
  * box is resized and as the graph gains or loses nodes, until a zoom or the
  * natural size is chosen; a zoom from the fit starts at the scale it had.
+ * The fit also chooses where the nodes with no edge go (`fitPlacement`):
+ * in rows as long, and under, beside or around the rest, as lets the whole graph
+ * be drawn the largest. A zoom from the fit keeps that arrangement, and the
+ * natural size puts them back in the default one.
  *
  * The graph the DAG draws, and where each of its nodes goes, are derived
  * here from the report and that switch, and passed on only when they
@@ -45,9 +49,18 @@ import {
   type Subscription,
 } from 'synstate';
 import { Arr, fastDeepEqual } from 'ts-data-forge';
-import { fitScale, zoomInFrom, zoomOutFrom, type Size } from '../dag-zoom.mjs';
 import {
-  layoutIssueGraph,
+  fitPlacement,
+  fitScale,
+  zoomInFrom,
+  zoomOutFrom,
+  type Size,
+} from '../dag-zoom.mjs';
+import {
+  defaultPlacement,
+  layoutConnected,
+  placeGrid,
+  type GridPlacement,
   type IssueGraphLayout,
 } from '../issue-graph-layout.mjs';
 import { buildIssueGraph, omitDone, type IssueGraph } from '../issue-graph.mjs';
@@ -216,7 +229,26 @@ export const createIssuesViewStore = (
     .pipe(map(([full, hide]) => (hide ? omitDone(full) : full)))
     .pipe(skipIfNoChange(fastDeepEqual));
 
-  const layout = graph.pipe(map(layoutIssueGraph));
+  const parts = graph.pipe(map(layoutConnected));
+
+  // While fitted, where the nodes with no edge go follows the box; a zoom
+  // from the fit keeps where they went, so that the graph only grows or
+  // shrinks, and 100% puts them back under the rest.
+  const [kept, setKept] = createState<GridPlacement | undefined>(undefined);
+
+  const placement = combine([parts, zoom, dagBox, kept])
+    .pipe(
+      map(([laidOut, current, box, held]) =>
+        current.type === 'fit'
+          ? fitPlacement(laidOut, box)
+          : (held ?? defaultPlacement(laidOut)),
+      ),
+    )
+    .pipe(skipIfNoChange(fastDeepEqual));
+
+  const layout = combine([parts, placement]).pipe(
+    map(([laidOut, placed]) => placeGrid(laidOut, placed)),
+  );
 
   const dagScale = combine([zoom, layout, dagBox])
     .pipe(
@@ -231,6 +263,8 @@ export const createIssuesViewStore = (
     .pipe(skipIfNoChange());
 
   const zoomBy = (step: (scale: number) => number) => (): void => {
+    setKept(placement.getSnapshot().value);
+
     setZoom({ type: 'scale', scale: step(dagScale.getSnapshot().value) });
   };
 
@@ -257,6 +291,8 @@ export const createIssuesViewStore = (
       setZoom({ type: 'fit' });
     },
     resetZoom: () => {
+      setKept(undefined);
+
       setZoom({ type: 'scale', scale: 1 });
     },
     start,
