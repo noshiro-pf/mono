@@ -97,10 +97,11 @@ import { watch } from './watch.mjs';
  *    paths only its author owns is the exception, since no approval will
  *    ever come: it is released and watched with auto-merge left off, and
  *    once its checks are green it is set aside `awaiting-bypass` for a
- *    person to merge by a ruleset bypass (`review.mts`). The one thing done
- *    without the label comes first: a layer GitHub moved onto the default
- *    branch when the one below it merged, still carrying that one's commits,
- *    is rebased off them and the list read again (`stack.mts`).
+ *    person to merge by a ruleset bypass (`pr-report-core`'s
+ *    `review-hold.mts`). The one thing done without the label comes first:
+ *    a layer GitHub moved onto the default branch when the one below it
+ *    merged, still carrying that one's commits, is rebased off them and the
+ *    list read again (`stack.mts`).
  * 2. If one of them is already up to date and its checks are running, or it
  *    is clean and about to merge, watch that one instead of rebasing another:
  *    the merge will move `main` and put every other branch back to `BEHIND`,
@@ -219,7 +220,8 @@ import { watch } from './watch.mjs';
  * in:
  *
  * - `triage.mts` — what one survey says about each pull request, and why.
- * - `review.mts` — whether a pull request's own review holds its merge.
+ * - `pr-report-core`'s `review-hold.mts` — whether a pull request's own review
+ *   holds its merge.
  * - `merge-after.mts` — the declared order: the trailer parser and the cycle
  *   detection.
  * - `stack.mts` — stacked pull requests: when they wait, when they are armed,

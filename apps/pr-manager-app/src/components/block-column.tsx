@@ -1,7 +1,7 @@
 import type { ComponentChildren } from 'preact';
 import { memoNamed } from 'preact-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { DEFAULT_SHARE, type BlockId, type Layout } from '../layout.mjs';
+import { defaultShareOf, type BlockId, type Layout } from '../layout.mjs';
 import { LayoutBlock } from './layout-block.js';
 
 type Props = Readonly<{
@@ -35,10 +35,10 @@ export const BlockColumn = memoNamed<Props>('BlockColumn', (props) => {
             next={fill ? below : undefined}
             nextShare={
               fill && below !== undefined
-                ? (shares[below] ?? DEFAULT_SHARE)
+                ? (shares[below] ?? defaultShareOf(below))
                 : undefined
             }
-            share={fill ? (shares[id] ?? DEFAULT_SHARE) : undefined}
+            share={fill ? (shares[id] ?? defaultShareOf(id)) : undefined}
           >
             {blocks[id]}
           </LayoutBlock>

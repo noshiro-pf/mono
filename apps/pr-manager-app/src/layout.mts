@@ -1,8 +1,9 @@
 /**
- * How the page's four blocks are laid out, and how that is kept in the URL.
+ * How the page's five blocks are laid out, and how that is kept in the URL.
  *
- * **The blocks** are the merge order (with the cycles under it), the workflow
- * runs still going, what merged, and the open issues. They can be put in one
+ * **The blocks** are the merge order (with the cycles under it), the queue
+ * `unblock-prs` works through, the workflow runs still going, what merged,
+ * and the open issues. They can be put in one
  * column, two or three, in any order, and the dividers between the columns
  * move.
  *
@@ -51,15 +52,17 @@ import type {
 import { currentSearch, rewriteSearch } from './url.mjs';
 
 /** Said here rather than on each member, which `fix:codemod:full` drops (#2042). */
-export type BlockId = 'open' | 'runs' | 'merged' | 'issues';
+export type BlockId = 'open' | 'queue' | 'runs' | 'merged' | 'issues';
 
 /**
- * The usual order. The runs come next to the merge order, being the CI the
- * pull requests in it wait for, and before what merged: what is going on now
- * before what is over.
+ * The usual order. The queue comes under the merge order, being a strip that
+ * says which of the pull requests above goes next; the runs come next, being
+ * the CI those pull requests wait for, and before what merged: what is going
+ * on now before what is over.
  */
 export const BLOCK_IDS = [
   'open',
+  'queue',
   'runs',
   'merged',
   'issues',
@@ -68,6 +71,7 @@ export const BLOCK_IDS = [
 /** What each block is called in the view settings. */
 export const BLOCK_NAMES = {
   open: 'Merge order',
+  queue: 'Queue',
   runs: 'Running workflows',
   merged: 'Merged',
   issues: 'Open issues',
@@ -113,7 +117,7 @@ export type Layout = Readonly<{
   mode: HeightMode;
   /**
    * What part of its column's height a block is given, against the others'.
-   * One without is {@link DEFAULT_SHARE}. Read in the `fill` mode only.
+   * One without is {@link defaultShareOf} it. Read in the `fill` mode only.
    */
   shares: Partial<ReadonlyRecord<BlockId, number>>;
 }>;
@@ -160,6 +164,16 @@ export const MAX_SPLIT = 80;
 export const MIN_THIRD_WIDTH = 15;
 
 export const DEFAULT_SHARE = 100;
+
+/**
+ * The share a block has until it is given one: {@link DEFAULT_SHARE}, but for
+ * the queue, which is one row of boxes and needs a fraction of the height a
+ * list does.
+ */
+export const defaultShareOf = (block: BlockId): number =>
+  block === 'queue' ? QUEUE_SHARE : DEFAULT_SHARE;
+
+const QUEUE_SHARE = 50;
 
 export const MIN_SHARE = 10;
 
@@ -298,7 +312,9 @@ export const saveLayout = (layout: Layout): void => {
 
 /**
  * Two columns from one put the first block on the left and the rest on the
- * right, which is the split that leaves the merge order the most room; three
+ * right, which is the split that leaves the merge order the most room — the
+ * queue staying under it when it follows it, since it is a strip about the
+ * pull requests above; three
  * from one put the last block on the right as well, and the rest between.
  * Columns that already hold something are kept: three from two keep the left
  * column and split the right one's last block off it, and two from three put
@@ -326,13 +342,11 @@ export const withColumns = (layout: Layout, columns: ColumnCount): Layout => {
     }
   }
 
-  const [first, ...rest] = [...left, ...middle, ...right] as const;
-
-  const firstOnly = first === undefined ? ([] as const) : ([first] as const);
+  const [lead, rest] = leadApart([...left, ...middle, ...right]);
 
   return columns === 2
-    ? { ...layout, ...arrange(2, firstOnly, [], rest) }
-    : { ...layout, ...arrange(3, firstOnly, ...lastApart(rest)) };
+    ? { ...layout, ...arrange(2, lead, [], rest) }
+    : { ...layout, ...arrange(3, lead, ...lastApart(rest)) };
 };
 
 /** The blocks of each column drawn, left to right. */
@@ -417,7 +431,7 @@ export const withMode = (layout: Layout, mode: HeightMode): Layout =>
     mode,
   }) as const;
 
-/** `undefined` gives the block back {@link DEFAULT_SHARE}. */
+/** `undefined` gives the block back {@link defaultShareOf} it. */
 export const withShare = (
   layout: Layout,
   block: BlockId,
@@ -433,7 +447,7 @@ export const withShare = (
 };
 
 export const shareOf = (layout: Layout, block: BlockId): number =>
-  layout.shares[block] ?? DEFAULT_SHARE;
+  layout.shares[block] ?? defaultShareOf(block);
 
 /**
  * Gives `blocks` the mean of their shares: the same height each, out of what
@@ -627,9 +641,11 @@ type Columns = StrictPick<Layout, 'columns' | 'left' | 'middle' | 'right'>;
 
 /**
  * Every block exactly once: the first mention wins, and what is not
- * mentioned goes to the end of the left column. With fewer than three
- * columns, the middle's blocks go to the top of the right one, as
- * {@link withColumns} puts them; with one, every block is on the left.
+ * mentioned goes to the end of the left column — but for the queue, which
+ * goes under the merge order, wherever that is, being a strip about the pull
+ * requests in it. With fewer than three columns, the middle's blocks go to
+ * the top of the right one, as {@link withColumns} puts them; with one, every
+ * block is on the left.
  */
 const arrange = (
   columns: ColumnCount,
@@ -637,9 +653,42 @@ const arrange = (
   middle: readonly BlockId[],
   right: readonly BlockId[],
 ): Columns => {
-  const ordered = Arr.uniq([...left, ...middle, ...right]);
+  const mentioned = Arr.uniq([...left, ...middle, ...right]);
 
-  const missing = BLOCK_IDS.filter((id) => !ordered.includes(id));
+  const placed = arrangeMentioned(
+    columns,
+    left,
+    middle,
+    right,
+    BLOCK_IDS.filter((id) => id !== 'queue' && !mentioned.includes(id)),
+  );
+
+  return mentioned.includes('queue') ? placed : withQueueUnderOpen(placed);
+};
+
+/** The queue put under the merge order, or at the end of the left column. */
+const withQueueUnderOpen = (placed: Columns): Columns =>
+  [placed.left, placed.middle, placed.right].some((ids) => ids.includes('open'))
+    ? ({
+        ...placed,
+        left: queueUnderOpen(placed.left),
+        middle: queueUnderOpen(placed.middle),
+        right: queueUnderOpen(placed.right),
+      } as const)
+    : ({ ...placed, left: Arr.toPushed(placed.left, 'queue') } as const);
+
+const queueUnderOpen = (ids: readonly BlockId[]): readonly BlockId[] =>
+  ids.flatMap((id) => (id === 'open' ? (['open', 'queue'] as const) : [id]));
+
+/** {@link arrange}, with `missing` going to the end of the left column. */
+const arrangeMentioned = (
+  columns: ColumnCount,
+  left: readonly BlockId[],
+  middle: readonly BlockId[],
+  right: readonly BlockId[],
+  missing: readonly BlockId[],
+): Columns => {
+  const ordered = Arr.uniq([...left, ...middle, ...right]);
 
   if (columns === 1) {
     return { columns, left: [...ordered, ...missing], middle: [], right: [] };
@@ -668,6 +717,25 @@ const arrange = (
       (id) => !leftOnly.includes(id) && !middleOnly.includes(id),
     ),
   };
+};
+
+/**
+ * The first block, with the queue when it comes right after the merge
+ * order, and the rest.
+ */
+const leadApart = (
+  ids: readonly BlockId[],
+): FixedLengthTuple<2, readonly BlockId[]> => {
+  const [first, second] = ids;
+
+  const lead =
+    first === undefined
+      ? ([] as const)
+      : first === 'open' && second === 'queue'
+        ? ([first, second] as const)
+        : ([first] as const);
+
+  return [lead, ids.slice(lead.length)];
 };
 
 /** The blocks but the last, and the last on its own. */

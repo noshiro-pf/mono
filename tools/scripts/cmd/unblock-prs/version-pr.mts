@@ -20,94 +20,77 @@
  *   release workflow's, and the only thing to do here is wait for it.
  */
 
-import { BLOCKS_RELEASE_LABEL } from 'pr-report-core';
-import { Arr, Result } from 'ts-data-forge';
+import { BLOCKS_RELEASE_LABEL, isVersionBranch } from 'pr-report-core';
+import { Result } from 'ts-data-forge';
 import { git } from './github.mjs';
 import type { Classification, PullRequest, TriageContext } from './types.mjs';
 import { lastLines, sh } from './util.mjs';
 
-/** The branch `changesets/action` opens the version pull request from. */
-export const versionBranchName = (defaultBranch: string): string =>
-  `changeset-release/${defaultBranch}` as const;
-
 /**
- * Whether this is the version pull request, by the branch it comes from.
- *
- * The branch name is the only stable handle on it: the title and body are
- * rewritten on every run and the number changes with every release, because
- * each one is a new pull request opened after the last was merged.
+ * Whether this is the version pull request, by the branch it comes from
+ * (`isVersionBranch`).
  */
 export const isVersionPullRequest = (
   pr: PullRequest,
   defaultBranch: string,
-): boolean => pr.headRefName === versionBranchName(defaultBranch);
+): boolean => isVersionBranch(pr.headRefName, defaultBranch);
 
 /**
- * Why the version pull request is not being picked this cycle, if it is not.
- *
- * Two things hold it, and both are reported rather than acted on. Nothing
- * here can clear either: a `blocks-release` pull request ends when a person
- * merges or closes it, and a branch built on a stale tip is rebuilt by the
- * release workflow's next run.
+ * What to report while pull requests labelled `blocks-release` are open.
+ * Nothing here can clear it: a `blocks-release` pull request ends when a
+ * person merges or closes it.
  */
-export const versionPullRequestHold = async (
+export const releaseBlockedNote = (
   pr: PullRequest,
-  context: TriageContext,
-): Promise<Classification | undefined> => {
-  const blockers = releaseBlockers(pr, context);
-
-  if (Arr.isNonEmpty(blockers)) {
-    return {
-      kind: 'note',
-      note: `#${pr.number}: ${BLOCKS_RELEASE_LABEL} on ${blockers
-        .map(
-          (blocker) => `#${blocker.number}${blocker.isDraft ? ' (draft)' : ''}`,
-        )
-        .join(', ')} — still open, so the release waits`,
-    };
-  }
-
-  const rebuilt = await isRebuiltOnBaseTip(pr, context);
-
-  if (Result.isErr(rebuilt)) {
-    return {
-      kind: 'note',
-      note: `#${pr.number}: cannot tell whether it was rebuilt on ${context.baseSha.slice(0, 10)}: ${rebuilt.value}`,
-    };
-  }
-
-  return rebuilt.value
-    ? undefined
-    : {
-        kind: 'note',
-        note: `#${pr.number}: built before ${context.defaultBranch} reached ${context.baseSha.slice(0, 10)}; waiting for the release workflow to rebuild it`,
-      };
-};
+  by: readonly Readonly<{ number: number; isDraft: boolean }>[],
+): Classification =>
+  ({
+    kind: 'note',
+    note: `#${pr.number}: ${BLOCKS_RELEASE_LABEL} on ${by
+      .map(
+        (blocker) => `#${blocker.number}${blocker.isDraft ? ' (draft)' : ''}`,
+      )
+      .join(', ')} — still open, so the release waits`,
+  }) as const;
 
 /**
- * The open pull requests that declared the release must wait for them.
- *
- * The version pull request is never one of its own blockers: the label on it
- * would otherwise hold it for as long as it existed, with nothing able to
- * take it off — the same shape as a `Merge-After` cycle, and not worth a
- * second way of saying so.
+ * What to report while the branch was built on a stale tip, which the
+ * release workflow's next run rebuilds.
  */
-export const releaseBlockers = (
+export const releaseStaleNote = (
   pr: PullRequest,
-  context: TriageContext,
-): readonly PullRequest[] =>
-  context.releaseBlockers.filter((blocker) => blocker.number !== pr.number);
+  context: Readonly<{ defaultBranch: string; baseSha: string }>,
+): Classification =>
+  ({
+    kind: 'note',
+    note: `#${pr.number}: built before ${context.defaultBranch} reached ${context.baseSha.slice(0, 10)}; waiting for the release workflow to rebuild it`,
+  }) as const;
 
 /**
  * Whether the branch was built on the current tip of the base — the question
- * `mergeStateStatus` is asked everywhere else here, asked of git instead.
+ * `mergeStateStatus` is asked everywhere else here, asked of git instead —
+ * or, when git cannot say, the note to report.
  *
  * GitHub's answer is computed asynchronously and cached, and being wrong
  * about this one releases a set the branch was built before, so it is worth
  * a fetch. `git merge-base` rather than `--is-ancestor`, whose "no" is an
  * exit status this module could not tell apart from a git that failed.
  */
-const isRebuiltOnBaseTip = async (
+export const isRebuiltOnBaseTip = async (
+  pr: PullRequest,
+  context: TriageContext,
+): Promise<Result<boolean, Classification>> => {
+  const answered = await mergeBaseIsTip(pr, context);
+
+  return Result.isErr(answered)
+    ? Result.err({
+        kind: 'note',
+        note: `#${pr.number}: cannot tell whether it was rebuilt on ${context.baseSha.slice(0, 10)}: ${answered.value}`,
+      })
+    : answered;
+};
+
+const mergeBaseIsTip = async (
   pr: PullRequest,
   context: TriageContext,
 ): Promise<Result<boolean, string>> => {

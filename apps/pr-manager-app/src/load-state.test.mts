@@ -105,5 +105,6 @@ const readAt = (readAtEpochMs: number): LoadedReport =>
       endCursor: undefined,
       referenced: [],
     },
+    queue: undefined,
     reading: [],
   }) as const;

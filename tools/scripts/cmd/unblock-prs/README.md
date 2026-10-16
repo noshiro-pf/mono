@@ -704,13 +704,12 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | ファイル                | 役割                                                          |
 | :---------------------- | :------------------------------------------------------------ |
 | `main.mts`              | ループ本体とコマンドライン（入口）                            |
-| `triage.mts`            | 1回の survey が各 PR について何を言うか                       |
+| `triage.mts`            | 1回の survey が各 PR について何を言うか（判定の読み込み）     |
 | `merge-after.mts`       | 宣言された順序が pick に何を言うか                            |
 | `stack.mts`             | stacked PR — いつ待たせ、いつ張り、何を運ぶか、いつ積み直すか |
 | `version-pr.mts`        | version PR と、それを止めているもの                           |
 | `rebase.mts`            | ブランチを動かす — worktree 内の rebase と `skip-ci` 除去     |
 | `release.mts`           | 解放されている PR を1本に保つ                                 |
-| `review.mts`            | レビューがマージを止めているか                                |
 | `watch.mts`             | 1本をマージまでポーリング                                     |
 | `auto-fix.mts`          | fixer の差分だけの失敗を直して push                           |
 | `quiet.mts`             | 何もない時にどれだけ待つか                                    |
@@ -728,9 +727,11 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `util.mts`              | quoting、ログ、停止シグナル                                   |
 
 トレーラのパーサと閉路検出、どの PR がどの PR に積まれているか、ラベルの文字列、
-`CODEOWNERS` の判定、見送りの comment の隠しコメントとチェックボックスの書式
-は、同じ宣言を読む Pull Requests Manager と共有するため `apps/pr-report-core`
-にあります。
+`CODEOWNERS` の判定、見送りの comment の隠しコメントとチェックボックスの書式、
+そして triage の判定そのもの（各 PR が queue のどこにいるか、レビューが止めているか、
+候補をどの順に pick するか: `queue-order.mts` と `review-hold.mts`）は、
+同じ queue を描く Pull Requests Manager と共有するため `apps/pr-report-core`
+にあります。`triage.mts` はその判定が求めるものを `gh` / `git` で読むだけです。
 
 `index.mts` はありません。`ws:gen` は workspace メンバーしか歩かず `tools/` は
 意図的にメンバーではないので、手で維持するだけの barrel になります。
@@ -1483,13 +1484,12 @@ the pull request the other's and nobody moved it (#2267).
 | File                    | Role                                                          |
 | :---------------------- | :------------------------------------------------------------ |
 | `main.mts`              | the loop and the command line (entry point)                   |
-| `triage.mts`            | what one survey says about each pull request, and why         |
+| `triage.mts`            | what one survey says about each pull request (the reading)    |
 | `merge-after.mts`       | what the declared order says about picking                    |
 | `stack.mts`             | stacked pull requests — when they wait, arm, move and restack |
 | `version-pr.mts`        | the version pull request, and what holds it back              |
 | `rebase.mts`            | moving a branch — the worktree rebase, the label removal      |
 | `release.mts`           | holding the queue to one released pull request                |
-| `review.mts`            | whether a pull request's review holds its merge               |
 | `watch.mts`             | polling one pull request until it merges, or will not         |
 | `auto-fix.mts`          | fixing and pushing a failure that is only a fixer's diff      |
 | `quiet.mts`             | how long to sleep when there is nothing to do                 |
@@ -1507,9 +1507,13 @@ the pull request the other's and nobody moved it (#2267).
 | `util.mts`              | quoting, logging, the stop signal                             |
 
 The trailer parser, the cycle detection, which pull request is stacked on
-which, the label strings, the `CODEOWNERS` rules and the set-aside comment's
-hidden record and task box are in `apps/pr-report-core`, shared with the Pull
-Requests Manager page, which reads the same declarations.
+which, the label strings, the `CODEOWNERS` rules, the set-aside comment's
+hidden record and task box, and triage's decisions themselves — where each
+pull request stands in the queue, whether its review holds it, and the order
+candidates are picked in (`queue-order.mts` and `review-hold.mts`) — are in
+`apps/pr-report-core`, shared with the Pull Requests Manager page, which draws
+the same queue. `triage.mts` only reads, through `gh` and `git`, what those
+decisions ask for.
 
 There is no `index.mts`: `ws:gen` only walks workspace members and `tools/` is
 deliberately not one, so a barrel here would be hand-maintained for nothing.

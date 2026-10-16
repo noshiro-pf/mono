@@ -22,15 +22,15 @@
  *
  * GitHub will not say this itself: `reviewDecision` describes branch
  * protection, not a ruleset, and is `null` for every pull request here. The
- * code-owner half is `pr-report-core`'s `codeOwnerReview`, worked out from
- * `CODEOWNERS` exactly as the Pull Requests Manager page works it out.
+ * code-owner half is {@link codeOwnerReview}, worked out from `CODEOWNERS`.
+ *
+ * Here rather than in `unblock-prs` because the Pull Requests Manager page
+ * draws the queue the worker picks from, and a pull request this holds is not
+ * in the running there either (`queue-order.mts`).
  */
 
-import {
-  codeOwnerReview,
-  type CodeOwnersRule,
-  type RulesetRequirements,
-} from 'pr-report-core';
+import { codeOwnerReview, type CodeOwnersRule } from './code-owners.mjs';
+import type { RulesetRequirements } from './ruleset.mjs';
 
 /** What is read about one pull request to decide. */
 export type ReviewState = Readonly<{

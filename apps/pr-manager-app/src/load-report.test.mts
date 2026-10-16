@@ -156,6 +156,8 @@ describe(loadReport, () => {
 
     assert.deepStrictEqual(drawn.reading, ['merged', 'issues']);
 
+    assert.isUndefined(drawn.queue);
+
     await release('Checks');
 
     const checked = mut_progress.at(-1);
@@ -197,6 +199,65 @@ describe(loadReport, () => {
 
     // The last part to answer is the read's own answer, not progress.
     assert.strictEqual(mut_progress.length, 5);
+
+    // Drawn only once the comparisons have answered: a queue drawn without
+    // them would put a head behind its base in the wrong place.
+    assert.isUndefined(mut_progress.at(-1)?.queue);
+
+    assert.isDefined(result.value.queue);
+  });
+
+  test("draws unblock-prs's queue from what the parts read", async () => {
+    const { fetchImpl } = answering(
+      report([
+        pullRequest({ number: 7, labels: ['merge-queued', 'skip-ci'] }),
+        pullRequest({
+          number: 8,
+          labels: ['merge-queued', 'skip-ci', 'priority:high'],
+          mergeable: 'CONFLICTING',
+        }),
+        pullRequest({ number: 9, labels: ['merge-queued'] }),
+        pullRequest({
+          number: 10,
+          headRefOid: HEAD,
+          labels: ['merge-queued', 'skip-ci'],
+          comments: [setAsideComment(BASE_TIP)],
+        }),
+        pullRequest({ number: 11 }),
+      ]),
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 3 } },
+        compare_8: { compare: { aheadBy: 1, behindBy: 0 } },
+        compare_9: { compare: { aheadBy: 1, behindBy: 0 } },
+        compare_10: { compare: { aheadBy: 1, behindBy: 0 } },
+        compare_11: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
+    );
+
+    const { queue } = await load(fetchImpl);
+
+    assert.deepStrictEqual(
+      queue?.slots.map(({ number, kind, note, priority }) => [
+        number,
+        kind,
+        note,
+        priority,
+      ]),
+      [
+        [9, 'running', undefined, 'none'],
+        [8, 'next', 'conflicts', 'high'],
+        [7, 'next', undefined, 'none'],
+      ],
+    );
+
+    assert.deepStrictEqual(
+      queue?.outside.map(({ number, reason, owner }) => [
+        number,
+        reason,
+        owner,
+      ]),
+      [[10, 'conflict', 'skill']],
+    );
   });
 
   test('leaves the checks being read when they are of another head', async () => {
@@ -1591,6 +1652,8 @@ const pullRequest = ({
   closingIssues = [],
   headRefOid = `sha-${number}`,
   comments = [],
+  labels = [],
+  mergeable = 'MERGEABLE',
 }: Readonly<{
   number: number;
   contexts?: readonly unknown[];
@@ -1604,6 +1667,8 @@ const pullRequest = ({
   closingIssues?: readonly unknown[];
   headRefOid?: string;
   comments?: readonly unknown[];
+  labels?: readonly string[];
+  mergeable?: string;
 }>): unknown =>
   ({
     number,
@@ -1620,7 +1685,13 @@ const pullRequest = ({
     baseRefName,
     isCrossRepository,
     baseRef: { target: { oid: BASE_TIP } },
-    labels: { nodes: [] },
+    labels: {
+      nodes: labels.map((labelName) => ({
+        name: labelName,
+        color: 'ededed',
+        description: null,
+      })),
+    },
     closingIssuesReferences: { nodes: closingIssues },
     latestOpinionatedReviews: { nodes: [] },
     files: {
@@ -1646,6 +1717,9 @@ const pullRequest = ({
       ],
     },
     comments: { nodes: comments },
+    mergeable,
+    stackEntry: null,
+    reviewThreads: { nodes: [] },
   }) as const;
 
 const merged = (

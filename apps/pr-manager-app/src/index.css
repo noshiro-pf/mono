@@ -1003,6 +1003,373 @@ a:focus-visible {
   margin-top: 0.6rem;
 }
 
+/* --- the queue ---------------------------------------------------------- */
+
+/*
+ * One row of boxes, every box the same width however many there are, so the
+ * whole queue is in view; each box is a size container, and the number in it
+ * is sized to the box. The running one is filled with the accent; one whose
+ * turn has not come is a dashed box in the DAG's waiting amber, and one with
+ * a check failed the same in red. What is not the worker's to move is outside
+ * the row in the attention orange, as a set-aside badge is.
+ */
+.queue-section {
+  --queue-frame: light-dark(#a9a8a1, #5a5955);
+  --queue-divider: light-dark(#d6d5ce, #3a3a37);
+  --queue-waiting: light-dark(#935610, #f0b35a);
+  --queue-outside: light-dark(#b4501f, #ec835a);
+}
+
+.queue-counts {
+  color: var(--ink-secondary);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  margin-left: 0.75rem;
+}
+
+.queue-row {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.queue-base {
+  color: var(--ink-muted);
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  /* Level with the middle of the boxes, which start below the pills. */
+  line-height: 3.75rem;
+  margin-top: 0.5rem;
+}
+
+.queue-track {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.queue {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  /* Room for the priority pills across the top edge. */
+  padding: 0.5rem 0 0;
+}
+
+.queue-slot {
+  container-type: inline-size;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.queue-slot > .queue-link {
+  align-items: center;
+  border-block: 1.5px solid var(--queue-frame);
+  border-left: 1px solid var(--queue-divider);
+  color: var(--ink-primary);
+  display: flex;
+  flex-direction: column;
+  height: 3.75rem;
+  justify-content: center;
+  position: relative;
+  text-decoration: none;
+}
+
+.queue-slot:first-child > .queue-link {
+  border-left: 1.5px solid var(--queue-frame);
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+
+.queue-slot:last-child > .queue-link {
+  border-right: 1.5px solid var(--queue-frame);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.queue-slot:only-child > .queue-link {
+  border-radius: var(--radius);
+}
+
+/* The box drawn inside a place, which is what its kind colours. */
+.queue-slot > .queue-link::before {
+  border: 1.2px solid transparent;
+  border-radius: 5px;
+  content: '';
+  inset: 3px;
+  position: absolute;
+}
+
+.queue-slot > .queue-link:hover::before,
+.queue-slot > .queue-link:focus-visible::before {
+  background: color-mix(in srgb, var(--ink-primary) 8%, transparent);
+  border-color: var(--ink-secondary);
+}
+
+.queue-slot > .queue-link:focus-visible {
+  outline: none;
+}
+
+.queue-slot[data-kind='running'] > .queue-link {
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.queue-slot[data-kind='waiting'] > .queue-link::before {
+  background: color-mix(in srgb, var(--queue-waiting) 8%, transparent);
+  border: 1.2px dashed var(--queue-waiting);
+}
+
+.queue-slot[data-kind='failing'] > .queue-link::before {
+  background: color-mix(in srgb, var(--status-critical) 8%, transparent);
+  border: 1.2px dashed var(--status-critical);
+}
+
+.queue-slot[data-priority='low'] .queue-number {
+  opacity: 0.5;
+}
+
+.queue-number {
+  align-items: center;
+  display: inline-flex;
+  font-size: clamp(0.5625rem, 19cqi, 0.875rem);
+  font-weight: 600;
+  gap: 0.35em;
+  max-width: 100%;
+  position: relative;
+  white-space: nowrap;
+}
+
+.queue-note {
+  color: var(--ink-muted);
+  font-size: clamp(0.5rem, 14cqi, 0.65625rem);
+  max-width: calc(100% - 8px);
+  overflow: hidden;
+  position: relative;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.queue-slot[data-kind='waiting'] .queue-note {
+  color: var(--queue-waiting);
+}
+
+.queue-slot[data-kind='failing'] .queue-note {
+  color: var(--status-critical);
+}
+
+.queue-place {
+  color: var(--ink-muted);
+  font-size: clamp(0.5625rem, 15cqi, 0.6875rem);
+  margin-top: 0.3rem;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.queue-slot[data-kind='running'] .queue-place {
+  color: var(--status-warning);
+}
+
+.queue-slot:nth-child(1 of :not([data-kind='running'])) .queue-place {
+  color: var(--ink-secondary);
+}
+
+/* The DAG's pill, across the top edge of the place. */
+.queue-priority {
+  background: var(--surface);
+  border: 1px solid var(--ink-secondary);
+  border-radius: 999px;
+  color: var(--ink-secondary);
+  font-size: 0.625rem;
+  font-weight: 600;
+  left: 50%;
+  line-height: 0.75rem;
+  padding: 0 0.5em;
+  position: absolute;
+  top: -0.45rem;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+.queue-priority[data-priority='high'] {
+  background: var(--ink-primary);
+  border-color: var(--ink-primary);
+  color: var(--surface);
+}
+
+.queue-priority[data-priority='mid'] {
+  border-color: var(--ink-primary);
+  color: var(--ink-primary);
+}
+
+.queue-priority[data-priority='low'] {
+  border-color: var(--baseline);
+}
+
+/*
+ * The title on hover or focus, under the row: from its start for a box in the
+ * first half, and to its end for one in the second, and never wider than the
+ * row (`queue-tip.tsx`).
+ */
+.queue-tip {
+  background: light-dark(#fff, #2b2b29);
+  border: 1px solid light-dark(#d6d5ce, #454542);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 35%);
+  color: var(--ink-primary);
+  font-size: 0.78125rem;
+  font-weight: 400;
+  line-height: 1.35;
+  max-width: min(40rem, 100%);
+  padding: 0.375rem 0.5625rem;
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  white-space: normal;
+  width: max-content;
+  z-index: 10;
+}
+
+.queue-tip[data-side='start'] {
+  left: 0;
+}
+
+.queue-tip[data-side='end'] {
+  right: 0;
+}
+
+/* Above the row of what is outside the queue, which ends the block. */
+.queue-foot .queue-tip {
+  bottom: calc(100% + 0.25rem);
+  top: auto;
+}
+
+.queue-tip-number {
+  color: var(--ink-secondary);
+}
+
+.queue-tip-detail {
+  color: var(--ink-muted);
+  display: block;
+  font-size: 0.71875rem;
+  margin-top: 0.125rem;
+}
+
+.queue-foot {
+  align-items: center;
+  position: relative;
+  border-top: 1px dashed var(--hairline);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+}
+
+.queue-outside {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.queue-outside-label {
+  color: var(--queue-outside);
+  font-size: 0.75rem;
+}
+
+.queue-outside-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.queue-outside-node > .queue-link {
+  align-items: center;
+  background: color-mix(in srgb, var(--queue-outside) 12%, var(--surface));
+  border: 1.5px dashed var(--queue-outside);
+  border-radius: var(--radius);
+  color: var(--ink-primary);
+  display: flex;
+  flex-direction: column;
+  min-width: 5.75rem;
+  padding: 0.25rem 0.625rem;
+  text-decoration: none;
+}
+
+.queue-outside-node > .queue-link:hover,
+.queue-outside-node > .queue-link:focus-visible {
+  background: color-mix(in srgb, var(--queue-outside) 22%, var(--surface));
+}
+
+.queue-outside-node .queue-number {
+  font-size: 0.84375rem;
+}
+
+.queue-outside-node .queue-note {
+  color: var(--queue-outside);
+  font-size: 0.65625rem;
+  max-width: none;
+}
+
+.queue-legend {
+  color: var(--ink-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.71875rem;
+  gap: 0.35rem 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.queue-legend li {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.queue-swatch {
+  border-radius: 3px;
+  display: inline-block;
+  height: 0.75rem;
+  width: 1.125rem;
+}
+
+.queue-swatch[data-kind='waiting'] {
+  background: color-mix(in srgb, var(--queue-waiting) 8%, var(--surface));
+  border: 1px dashed var(--queue-waiting);
+}
+
+.queue-swatch[data-kind='outside'] {
+  background: color-mix(in srgb, var(--queue-outside) 12%, var(--surface));
+  border: 1px dashed var(--queue-outside);
+}
+
+.queue-swatch[data-kind='priority'] {
+  border: 1px solid var(--ink-secondary);
+  border-radius: 999px;
+  width: 1.5rem;
+}
+
+.queue-swatch[data-priority='high'] {
+  background: var(--ink-primary);
+  border-color: var(--ink-primary);
+}
+
+.queue-swatch[data-priority='mid'] {
+  border-color: var(--ink-primary);
+}
+
+.queue-swatch[data-priority='low'] {
+  border-color: var(--baseline);
+}
+
 /* --- one pull request --------------------------------------------------- */
 
 .pull-request {

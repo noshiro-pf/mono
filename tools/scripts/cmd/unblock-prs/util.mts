@@ -29,14 +29,6 @@ const stopController = new AbortController();
  */
 export const stopRequested = (): boolean => stopController.signal.aborted;
 
-/**
- * A ref name this script is willing to put on a command line. Everything is
- * single-quoted anyway; this is a second guard, and it also keeps a name
- * starting with `-` from being read as an option.
- */
-export const isSafeRefName = (name: string): boolean =>
-  /^[\w./+-]+$/u.test(name) && !name.startsWith('-');
-
 /** Single-quotes a string for a POSIX shell. */
 export const sh = (value: string): string =>
   `'${value.replaceAll("'", String.raw`'\''`)}'` as const;

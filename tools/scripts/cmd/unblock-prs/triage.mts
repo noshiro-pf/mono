@@ -1,21 +1,28 @@
 /** What one survey says about each pull request, and why. */
 
 import {
-  findMergeAfterCycles,
+  asksReview,
   MERGE_QUEUED_LABEL,
+  orderCandidates as orderQueueCandidates,
   parseCodeOwners,
-  parseMergeAfter,
   PRIORITY_HIGH_LABEL,
   PRIORITY_LOW_LABEL,
+  queueGraph,
+  queueStanding,
+  reviewHold,
   SKIP_CI_LABEL,
   stackDescendants,
+  withReviewHold,
+  type QueueFacts,
   type QueueOwner,
+  type QueueReads,
+  type QueueStanding,
+  type ReviewHold,
   type RulesetRequirements,
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import {
-  isMergeableState,
   listRequiredChecks,
   listRunningChecks,
   summarizeChecks,
@@ -29,18 +36,12 @@ import {
   readReviewStates,
   remoteSha,
 } from './github.mjs';
-import {
-  blocksRelease,
-  isMergeQueued,
-  isSkipCiLabelled,
-  priorityOf,
-  priorityRank,
-} from './labels.mjs';
+import { isSkipCiLabelled, priorityOf } from './labels.mjs';
 import { waitingOnNote } from './merge-after.mjs';
 import { ownerNote, ownerOf } from './owner.mjs';
-import { reviewHold, type ReviewHold } from './review.mjs';
-import { nativeStackNote, stackedNote, stackParentsOf } from './stack.mjs';
+import { nativeStackNote, stackedNote } from './stack.mjs';
 import type {
+  ChecksSummary,
   Classification,
   Demotions,
   PullRequest,
@@ -49,14 +50,13 @@ import type {
   TriageBase,
   TriageContext,
 } from './types.mjs';
+import { lastLines, log, pause, stopRequested } from './util.mjs';
 import {
-  isSafeRefName,
-  lastLines,
-  log,
-  pause,
-  stopRequested,
-} from './util.mjs';
-import { isVersionPullRequest, versionPullRequestHold } from './version-pr.mjs';
+  isRebuiltOnBaseTip,
+  isVersionPullRequest,
+  releaseBlockedNote,
+  releaseStaleNote,
+} from './version-pr.mjs';
 
 /**
  * Lists the open pull requests, re-listing a few times while GitHub is still
@@ -116,10 +116,11 @@ export const survey = async (
  * What the rules on the default branch require, as GitHub applies them.
  *
  * The required contexts are what let "green" mean the whole list rather than
- * the part of it that has reported. A required context with no check run on
- * the head commit is not pending in `gh pr checks` — it is absent from it —
- * so a pull request three minutes into a twenty-five minute matrix looks
- * finished without them. The review rules are what `review.mts` asks about.
+ * the part of it that has reported. A required context with no check run on the
+ * head commit is not pending in `gh pr checks` — it is absent from it — so a
+ * pull request three minutes into a twenty-five minute matrix looks finished
+ * without them. The review rules are what `pr-report-core`'s `review-hold.mts`
+ * asks about.
  *
  * Rules that cannot be read require nothing: the watch falls back to judging
  * by what has reported, on a longer leash, and no review holds anything.
@@ -148,33 +149,20 @@ export const triage = async (
 ): Promise<Triage> => {
   const sorted = pullRequests.toSorted((a, b) => a.number - b.number);
 
-  const stackParents = stackParentsOf(sorted, base.defaultBranch);
-
-  const dependencies: ReadonlyMap<number, readonly number[]> = new Map(
-    sorted.map((pr) => {
-      const parent = stackParents.get(pr.number);
-
-      return [
-        pr.number,
-        // The version pull request declares nothing: its body is rewritten
-        // on every push to the base, so a trailer written there would hold
-        // for a cycle or two and then silently stop. `blocks-release`, on
-        // the pull requests it is waiting for, is how an order is declared
-        // on it. Other pull requests may still name *it*. A stacked pull
-        // request waits for the layer below it whether or not it says so.
-        isVersionPullRequest(pr, base.defaultBranch)
-          ? []
-          : Arr.uniq([
-              ...(parent === undefined ? [] : [parent]),
-              ...parseMergeAfter(pr.body),
-            ]),
-      ] as const;
-    }),
+  // The stacks, the declared order and what holds the release, as every
+  // reader of the queue reads them (`pr-report-core`'s `queue-order.mts`).
+  const graph = queueGraph(
+    sorted.map((pr) => ({
+      number: pr.number,
+      body: pr.body,
+      isDraft: pr.isDraft,
+      labels: pr.labels.map(({ name }) => name),
+      headRef: pr.headRefName,
+      baseRef: pr.baseRefName,
+      fromFork: pr.isCrossRepository,
+    })),
+    base.defaultBranch,
   );
-
-  const cycles = findMergeAfterCycles(dependencies);
-
-  const cyclic: ReadonlySet<number> = new Set(cycles.flat());
 
   // Who moves each one next, by the rule every reader of the queue shares
   // (`owner.mts`). Only the worker's are triaged further.
@@ -186,8 +174,8 @@ export const triage = async (
         defaultBranch: base.defaultBranch,
         skipped: base.skipped,
         claimed: base.claimed,
-        stackParents,
-        cyclic,
+        stackParents: graph.stackParents,
+        cyclic: graph.cyclic,
         nowEpochMs,
       });
 
@@ -195,39 +183,33 @@ export const triage = async (
     }),
   );
 
-  const context: TriageContext = {
-    ...base,
-    openNumbers: new Set(sorted.map((pr) => pr.number)),
-    dependencies,
-    stackParents,
-    cyclic,
-    releaseBlockers: sorted.filter(blocksRelease),
-    owners,
-  } as const;
+  const context: TriageContext = { ...base, ...graph, owners } as const;
 
   const beforeReview = await Promise.all(
-    sorted.map(async (pr) => ({ pr, result: await classify(pr, context) })),
+    sorted.map(async (pr) => ({ pr, ...(await settle(pr, context)) })),
   );
 
   const holds = await readReviewHolds(
-    beforeReview.filter(({ pr, result }) => shouldAskReview(pr, result)),
+    beforeReview.filter(({ pr, standing }) =>
+      asksReview(standing, pr.mergeStateStatus),
+    ),
     context,
   );
 
-  const classified = beforeReview.map(({ pr, result }) => {
-    const hold = holds.get(pr.number);
-
-    return {
-      pr,
-      result:
-        hold?.kind === 'held'
-          ? ({ kind: 'held', reason: hold.reason } satisfies Classification)
-          : result,
-    };
-  });
+  const classified = beforeReview.map(({ pr, standing, unread, summary }) => ({
+    pr,
+    result:
+      unread ??
+      classification(
+        pr,
+        withReviewHold(standing, pr.mergeStateStatus, holds.get(pr.number)),
+        summary,
+        context,
+      ),
+  }));
 
   // Released and watched as ever, but never armed: auto-merge would wait for
-  // an approval nobody may give. See `review.mts`.
+  // an approval nobody may give. See `review-hold.mts` in `pr-report-core`.
   const bypass: ReadonlyMap<number, string> = new Map(
     Array.from(holds).flatMap(([prNumber, hold]) =>
       hold.kind === 'bypass' ? [[prNumber, hold.reason] as const] : [],
@@ -235,7 +217,7 @@ export const triage = async (
   );
 
   return {
-    cycles,
+    cycles: graph.cycles,
     owners,
     inScope: classified.filter(({ result }) => result.kind !== 'ignore').length,
     candidates: orderCandidates(
@@ -257,7 +239,7 @@ export const triage = async (
       ),
     ),
     bypass,
-    stackParents,
+    stackParents: graph.stackParents,
     inFlight: classified
       .filter(({ result }) => result.kind === 'in-flight')
       .map(({ pr }) => pr),
@@ -277,124 +259,150 @@ export const triage = async (
   };
 };
 
-const classify = async (
+/** What `queueStanding` decides from, as `gh` returned it. */
+const factsOf = (pr: PullRequest): QueueFacts =>
+  ({
+    number: pr.number,
+    state: pr.state,
+    labels: pr.labels.map(({ name }) => name),
+    isDraft: pr.isDraft,
+    headRef: pr.headRefName,
+    baseRef: pr.baseRefName,
+    mergeState: pr.mergeStateStatus,
+    autoMerge: isRecord(pr.autoMergeRequest),
+  }) as const;
+
+/** Where a pull request stands, with what was read on the way to it. */
+type Settled = Readonly<{
+  standing: QueueStanding;
+  /** The note to report instead, when something it needed could not be read. */
+  unread: Classification | undefined;
+  /** The checks, when they were read. */
+  summary: ChecksSummary | undefined;
+}>;
+
+/**
+ * Asks `queueStanding` where `pr` stands, reading what it asks for — and
+ * only that, since each read is a request — until it can say.
+ */
+const settle = async (
   pr: PullRequest,
   context: TriageContext,
-): Promise<Classification> => {
-  const outOfScope = outOfScopeReason(pr, context);
+  reads: QueueReads = {},
+  summary?: ChecksSummary,
+): Promise<Settled> => {
+  const standing = queueStanding(factsOf(pr), context, reads);
 
-  if (outOfScope !== undefined) {
-    // `merge-queued` is an explicit request, so anything that answers it with
-    // "no" is worth saying out loud — a queued pull request left as a draft,
-    // or without auto-merge, would otherwise sit in the queue forever with
-    // nothing saying why. A pull request that never asked is passed over in
-    // silence.
-    return isMergeQueued(pr)
-      ? { kind: 'note', note: `#${pr.number}: ${outOfScope}` }
-      : { kind: 'ignore' };
+  if (standing.kind !== 'needs') {
+    return { standing, unread: undefined, summary };
   }
 
-  // A pull request set aside, or claimed, is a skill's or a person's until
-  // its comment is resolved; the same answer the skill reads (`owner.mts`).
-  const owned = ownerNote(pr, context.owners.get(pr.number), context.skipped);
+  switch (standing.read) {
+    case 'nativeStack':
+      return settle(
+        pr,
+        context,
+        { ...reads, nativeStack: (await inNativeStack(pr)) ?? 'none' },
+        summary,
+      );
 
-  if (owned !== undefined) {
-    return owned;
-  }
+    case 'rebuiltOnTip': {
+      const rebuilt = await isRebuiltOnBaseTip(pr, context);
 
-  // A layer of a stack: its turn comes when GitHub moves it onto the default
-  // branch, which is when the one below it merges. Until then there is
-  // nothing to rebase it onto but that layer, which this script does when it
-  // moves that layer. See `stack.mts`.
-  const parent = context.stackParents.get(pr.number);
-
-  if (parent !== undefined) {
-    return stackedNote(pr, parent, context);
-  }
-
-  // Nothing here merges anything — auto-merge does, once the checks are
-  // green — but this script is what arms it, when it picks a queued pull
-  // request (`armOnPick` in `rebase.mts`). One in a native stack, which
-  // GitHub will not let anything arm, is passed over until someone merges it
-  // by hand.
-  if (!isRecord(pr.autoMergeRequest)) {
-    const nativeStacked = await inNativeStack(pr);
-
-    if (nativeStacked !== undefined) {
-      return nativeStacked;
-    }
-  }
-
-  // The version pull request is derived state, rebuilt from the tip of the
-  // base and force-pushed by the release workflow on every push to it, so
-  // nothing here rebases it: that would be two things force-pushing one
-  // branch, and a rebase puts the old version commit on a tip carrying a
-  // changeset it never consumed — a release missing the change the queue was
-  // assembled for. Taking `skip-ci` off is the whole of what it can be given.
-  if (isVersionPullRequest(pr, context.defaultBranch)) {
-    const held = await versionPullRequestHold(pr, context);
-
-    if (held !== undefined) {
-      return held;
+      return Result.isErr(rebuilt)
+        ? { standing, unread: rebuilt.value, summary }
+        : settle(
+            pr,
+            context,
+            { ...reads, rebuiltOnTip: rebuilt.value },
+            summary,
+          );
     }
 
-    // Nothing holds it. Paused means there is a label to take off; otherwise
-    // it is already on its way and auto-merge owns it, exactly as with
-    // anything else that is up to date.
-    return isSkipCiLabelled(pr)
-      ? { kind: 'candidate' }
-      : classifyByChecks(pr, context);
+    case 'checksFailed': {
+      const checks = await readChecks(pr, context);
+
+      return Result.isErr(checks)
+        ? { standing, unread: checks.value, summary }
+        : settle(
+            pr,
+            context,
+            { ...reads, checksFailed: checks.value.status === 'failed' },
+            checks.value,
+          );
+    }
   }
+};
 
-  // `skip-ci` makes the merge state say nothing useful: `no-skip-ci-label` is
-  // pending, so the pull request is `BLOCKED` however ready it is, and checks
-  // that were skipped look exactly like checks still running. Taking the
-  // label off is the action, so this is a candidate whatever GitHub says
-  // about it.
-  if (isSkipCiLabelled(pr)) {
-    return waitingOnNote(pr, context) ?? { kind: 'candidate' };
-  }
+/** What triage reports for a standing, in the words this script logs. */
+const classification = (
+  pr: PullRequest,
+  standing: QueueStanding,
+  summary: ChecksSummary | undefined,
+  context: TriageContext,
+): Classification => {
+  switch (standing.kind) {
+    case 'ignore':
+    case 'candidate':
+    case 'in-flight':
+      return { kind: standing.kind };
 
-  switch (pr.mergeStateStatus) {
-    // `DIRTY` is a candidate too, rather than something handed straight back.
-    // It answers a different question from the one this script asks: whether
-    // *merging* the branch into the base conflicts, three-way from the merge
-    // base, where a rebase replays each commit onto the current tip and drops
-    // the ones already upstream. And it is an asynchronously computed, cached
-    // answer, so it is regularly stale — a force-push, or a base that has
-    // just moved, leaves the old verdict standing. Both are common enough
-    // here that taking `DIRTY` at its word set branches aside for conflicts
-    // they did not have. So try the rebase and let it answer: when the
-    // conflict is real, the rebase is aborted, the worktree thrown away and
-    // the pull request skipped exactly as before.
-    case 'BEHIND':
-    case 'DIRTY':
-      return waitingOnNote(pr, context) ?? { kind: 'candidate' };
+    case 'held':
+      return { kind: 'held', reason: standing.reason };
 
-    case 'CLEAN':
-    case 'HAS_HOOKS':
-    case 'UNSTABLE':
-      return { kind: 'in-flight' };
+    case 'unactionable':
+      return { kind: 'note', note: `#${pr.number}: ${standing.reason}` };
 
-    case 'BLOCKED':
-      return classifyByChecks(pr, context);
+    case 'owned':
+      return (
+        ownerNote(pr, standing.owner, context.skipped) ?? {
+          kind: 'note',
+          note: `#${pr.number}: ${standing.owner.reason}`,
+        }
+      );
 
-    default:
+    case 'stacked':
+      return stackedNote(pr, standing.on, context);
+
+    case 'native-stack':
+      return nativeStackNote(pr, standing.entry);
+
+    case 'waiting':
+      return waitingOnNote(pr, standing.on, standing.cyclic);
+
+    case 'release-blocked':
+      return releaseBlockedNote(pr, standing.by);
+
+    case 'release-stale':
+      return releaseStaleNote(pr, context);
+
+    case 'merge-state':
       return {
         kind: 'note',
-        note: `#${pr.number}: merge state ${pr.mergeStateStatus}`,
+        note: `#${pr.number}: merge state ${standing.state}`,
+      };
+
+    case 'failing':
+      return summary === undefined
+        ? { kind: 'note', note: `#${pr.number}: failing` }
+        : { kind: 'failing', summary };
+
+    case 'needs':
+      return {
+        kind: 'note',
+        note: `#${pr.number}: could not read ${standing.read}`,
       };
   }
 };
 
 /**
- * The note to report instead of picking a pull request in one of GitHub's
- * native stacks (`stack.mts`). One whose stack cannot be read is picked, and
- * GitHub's refusal to arm it, should it come, sets it aside.
+ * The pull request's place in one of GitHub's native stacks (`stack.mts`),
+ * if it is in one. One whose stack cannot be read is taken to be in none,
+ * and GitHub's refusal to arm it, should it come, sets it aside.
  */
 const inNativeStack = async (
   pr: PullRequest,
-): Promise<Classification | undefined> => {
+): Promise<QueueReads['nativeStack']> => {
   const entry = await readNativeStack(pr.number);
 
   if (Result.isErr(entry)) {
@@ -405,25 +413,14 @@ const inNativeStack = async (
     return undefined;
   }
 
-  return nativeStackNote(pr, entry.value);
+  return entry.value;
 };
 
 /**
- * Whether what triage decided about a pull request is worth asking its
- * review about: one it is about to pick, or one it is about to watch while
- * GitHub still calls it `BLOCKED`. A merge state GitHub already calls
- * mergeable is its own answer that nothing but the checks is left, so that
- * one is watched as ever.
- */
-const shouldAskReview = (pr: PullRequest, result: Classification): boolean =>
-  result.kind === 'candidate' ||
-  (result.kind === 'in-flight' && !isMergeableState(pr.mergeStateStatus));
-
-/**
  * What each pull request's review does to it, by number, for those it does
- * anything to — `review.mts` says what is asked and why. One request covers
- * all of them. A request that fails holds nothing, which is how this script
- * behaved before it asked.
+ * anything to — `review-hold.mts` in `pr-report-core` says what is asked and
+ * why. One request covers all of them. A request that fails holds nothing,
+ * which is how this script behaved before it asked.
  */
 const readReviewHolds = async (
   entries: readonly Readonly<{ pr: PullRequest }>[],
@@ -471,24 +468,21 @@ const readReviewHolds = async (
 };
 
 /**
- * What a pull request nothing here can move is doing: waiting on its checks,
- * or held by one that failed.
- *
- * Reached from `BLOCKED`, and from the version pull request whatever its
- * merge state — with the branch already on the tip of the base and no label
- * to take off, there is nothing left to do to either but watch.
+ * The required checks of a pull request nothing here can move — waiting on
+ * its checks, or held by one that failed — or the note to report when they
+ * cannot be read.
  */
-const classifyByChecks = async (
+const readChecks = async (
   pr: PullRequest,
   context: TriageContext,
-): Promise<Classification> => {
+): Promise<Result<ChecksSummary, Classification>> => {
   const checks = await listRequiredChecks(pr.number);
 
   if (Result.isErr(checks)) {
-    return {
+    return Result.err({
       kind: 'note',
       note: `#${pr.number}: could not read checks: ${checks.value}`,
-    };
+    });
   }
 
   // Pending and passed are both in flight here, but a red left by the round
@@ -497,83 +491,37 @@ const classifyByChecks = async (
   const running = await listRunningChecks(pr.number);
 
   if (Result.isErr(running)) {
-    return {
+    return Result.err({
       kind: 'note',
       note: `#${pr.number}: could not read checks: ${running.value}`,
-    };
+    });
   }
 
-  const summary = summarizeChecks(
-    checks.value,
-    context.requiredContexts,
-    running.value,
+  return Result.ok(
+    summarizeChecks(checks.value, context.requiredContexts, running.value),
   );
-
-  // Pending — including a required context that has not reported at all — or
-  // green and about to merge. A green one that stays open is caught by the
-  // watch.
-  return summary.status === 'failed'
-    ? { kind: 'failing', summary }
-    : { kind: 'in-flight' };
 };
 
 /**
  * Whether GitHub says merging this pull request into the base conflicts. It
- * is a candidate all the same — see the `DIRTY` case in `classify` — but a
- * less promising one, so it is reported and ordered apart from the rest.
+ * is a candidate all the same — see `queueStanding` — but a less promising
+ * one, so it is reported and ordered apart from the rest.
  */
 const isConflicting = (pr: PullRequest): boolean =>
   pr.mergeStateStatus === 'DIRTY';
 
 /**
- * The cycle's order. The declared order has already been applied, as a gate
- * rather than a sort, so this is lowest number first within these ranks,
- * outermost first:
- *
- * 1. What a watch has seen green and still open (`demotions.mts`) goes after
- *    everything else, the release and `priority:high` included: everything
- *    else is not known to sit without merging, and this is.
- * 2. `priority:high` before the rest, `priority:low` after them
- *    (`priorityRank`). It is a person's declaration, so it outranks the two
- *    guesses below — and the version pull request reads it too: a release
- *    can be declared urgent, and a change declared able to wait goes out in
- *    the release after.
- * 3. What GitHub only *thinks* conflicts goes after the rest: a rebase this
- *    script is sure of is worth spending the cycle on before one it is
- *    guessing at.
- * 4. The version pull request goes after that. This is an ordering rather
- *    than the gate — `blocks-release` is the gate — so it never stops a
- *    release: it only says that when a queued change and the release are
- *    both ready, the change goes first. The alternative is releasing, then
- *    rebuilding the version pull request for a second release of the very
- *    thing that was already queued.
- *
- * `toSorted` is stable, so each sort keeps the order of the one before it
- * among equals, and the last one is the outermost.
+ * The cycle's order: `pr-report-core`'s `orderCandidates`, which says why,
+ * with what this run has demoted (`demotions.mts`).
  */
 export const orderCandidates = (
   candidates: readonly PullRequest[],
   context: Readonly<{ defaultBranch: string; demoted: Demotions }>,
 ): readonly PullRequest[] =>
-  candidates
-    .toSorted((a, b) => a.number - b.number)
-    .toSorted((a, b) => candidateRank(a, context) - candidateRank(b, context))
-    .toSorted((a, b) => priorityRank(a) - priorityRank(b))
-    .toSorted(
-      (a, b) =>
-        Number(isDemoted(context.demoted, a)) -
-        Number(isDemoted(context.demoted, b)),
-    );
-
-const candidateRank = (
-  pr: PullRequest,
-  context: Readonly<{ defaultBranch: string }>,
-): number =>
-  isVersionPullRequest(pr, context.defaultBranch)
-    ? 2
-    : isConflicting(pr)
-      ? 1
-      : 0;
+  orderQueueCandidates(candidates, factsOf, {
+    defaultBranch: context.defaultBranch,
+    demoted: (pr) => isDemoted(context.demoted, pr),
+  });
 
 export const reportTriage = (
   triaged: Triage,
@@ -672,35 +620,4 @@ const priorityPhrase = (pr: PullRequest): string => {
     case 'none':
       return '';
   }
-};
-
-/** Why a pull request is none of this script's business, if it is not. */
-const outOfScopeReason = (
-  pr: PullRequest,
-  context: TriageContext,
-): string | undefined => {
-  if (pr.state !== 'OPEN') {
-    return `state is ${pr.state}`;
-  }
-
-  // First, so that everything after it is a reason reported only for a pull
-  // request that asked. `merge-queued` is the whole of the scope rule: it is
-  // the author saying this one is reviewed and is to be landed, which is a
-  // different statement from auto-merge, and one no bot makes by accident.
-  if (!isMergeQueued(pr)) {
-    return `not labelled ${MERGE_QUEUED_LABEL}`;
-  }
-
-  // A base that is neither the default branch nor another open pull
-  // request's branch is one nothing here knows how to land on. A stacked one
-  // whose parent has just merged reads this way for the moment before GitHub
-  // moves it.
-  return pr.isDraft
-    ? 'draft'
-    : pr.baseRefName !== context.defaultBranch &&
-        !context.stackParents.has(pr.number)
-      ? `base is ${pr.baseRefName}, which no open pull request is from`
-      : !isSafeRefName(pr.headRefName)
-        ? `branch name ${JSON.stringify(pr.headRefName)} will not be passed to a shell`
-        : undefined;
 };

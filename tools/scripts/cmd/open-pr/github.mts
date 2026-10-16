@@ -1,10 +1,11 @@
 /** Everything that talks to GitHub or to `git`, and nothing that decides. */
 
 import dedent from 'dedent';
+import { isSafeRefName } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { git } from '../unblock-prs/github.mjs';
-import { isSafeRefName, sh } from '../unblock-prs/util.mjs';
+import { sh } from '../unblock-prs/util.mjs';
 import {
   graphql,
   resolveRepo,

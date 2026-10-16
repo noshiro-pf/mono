@@ -9,6 +9,7 @@
 import * as os from 'node:os';
 import * as path from 'node:path';
 import {
+  isSafeRefName,
   MERGE_QUEUED_LABEL,
   SKIP_CI_LABEL,
   stackDescendants,
@@ -48,7 +49,7 @@ import type {
   SkipRecords,
   StackedOn,
 } from './types.mjs';
-import { isSafeRefName, lastLines, log, sh, stopRequested } from './util.mjs';
+import { lastLines, log, sh, stopRequested } from './util.mjs';
 import { isVersionPullRequest } from './version-pr.mjs';
 
 /**

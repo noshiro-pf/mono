@@ -13,12 +13,14 @@ import { IssuesSection } from './issues-section.js';
 import { MergeOrderFilters } from './merge-order-filters.js';
 import { MergeOrder } from './merge-order.js';
 import { MergedSection } from './merged-section.js';
+import { QueueSection } from './queue-section.js';
 import { WorkflowRunsSection } from './workflow-runs-section.js';
 
 /**
- * A report that loaded: the four blocks — the queue under the counts that
- * filter it, the workflow runs still going, what landed, and what is open
- * that is not a pull request — laid out as the reader arranged them
+ * A report that loaded: the five blocks — the merge order under the counts
+ * that filter it, the queue `unblock-prs` works through, the workflow runs
+ * still going, what landed, and what is open that is not a pull request —
+ * laid out as the reader arranged them
  * (`layout.mts`).
  *
  * Each part is its own signal, which the store changes only when a read
@@ -39,6 +41,8 @@ export const ReportView = memoNamed('ReportView', () => {
   const cycles = readerSignals.cycles.value;
 
   const merged = readerSignals.merged.value;
+
+  const queue = readerSignals.queue.value;
 
   const issues = readerSignals.issues.value;
 
@@ -84,6 +88,7 @@ export const ReportView = memoNamed('ReportView', () => {
           ) : undefined}
         </>
       ),
+      queue: <QueueSection queue={queue} />,
       runs: <WorkflowRunsSection runs={runs} />,
       merged: (
         <MergedSection
@@ -100,6 +105,7 @@ export const ReportView = memoNamed('ReportView', () => {
       scaleMax,
       roots,
       cycles,
+      queue,
       merged,
       issues,
       runs,
