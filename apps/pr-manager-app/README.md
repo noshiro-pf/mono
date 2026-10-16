@@ -196,6 +196,10 @@ button, arranges them:
   double-clicked to even them, and the last block of a column reaches its end;
   the dialog shows each block's part of its column and changes it with
   buttons. The heights given in the other mode are kept for the way back.
+- **Hide a block** with its button in the dialog. It keeps its place, its
+  height and its share, and showing it again puts it back there; the blocks
+  around it share out the column as if it were not there. A column whose
+  blocks are all hidden keeps its width.
 
 Everything the pointer does on the page can be done in the Layout dialog with
 a keyboard, which is why the drag surfaces themselves are pointer-only. The
@@ -208,7 +212,7 @@ three), `right=issues`, `split=40` (the left column's share of two, in
 percent), `lines=25-70` (where the two lines between three columns are, in
 percent from the left), `h.open=480` (a height, in pixels), `mode=fill` and
 `s.open=150` (a block's share of its column, a weight against 100 for each
-block without one, 50 for the queue). Only what differs from one column in the usual order is
+block without one, 50 for the queue) and `hide=runs.merged` (the blocks hidden). Only what differs from one column in the usual order is
 written, a moment after the last
 change so that a drag does not rewrite the address bar on every pointer move.
 A URL edited by hand still opens: unknown blocks are dropped, missing ones put

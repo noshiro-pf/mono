@@ -5,7 +5,9 @@
  * `unblock-prs` works through, the workflow runs still going, what merged,
  * and the open issues. They can be put in one
  * column, two or three, in any order, and the dividers between the columns
- * move.
+ * move. Any of them can be hidden: a hidden block keeps its place, its height
+ * and its share, so showing it again puts it back where it was, and the
+ * blocks around it share out the column as if it were not there.
  *
  * **Their heights** are one of two modes. In `natural`, the page is as tall
  * as its blocks: each can be given a height, and then scrolls on its own,
@@ -37,6 +39,7 @@
  * - `mode=fill`: the window-filling mode. Absent is `natural`.
  * - `s.open=150`: a block's share, against {@link DEFAULT_SHARE} for the
  *   blocks without one.
+ * - `hide=runs.merged`: the blocks hidden, in the usual order.
  *
  * Reading forgives: an unknown or repeated block is dropped, a missing one is
  * put back at the end of the left column, and a number out of range is
@@ -120,6 +123,11 @@ export type Layout = Readonly<{
    * One without is {@link defaultShareOf} it. Read in the `fill` mode only.
    */
   shares: Partial<ReadonlyRecord<BlockId, number>>;
+  /**
+   * The blocks not drawn, in the order of {@link BLOCK_IDS}. Each is still in
+   * `left`, `middle` or `right`, which is where showing it puts it back.
+   */
+  hidden: readonly BlockId[];
 }>;
 
 /**
@@ -150,6 +158,7 @@ export const DEFAULT_LAYOUT: Layout = {
   heights: {},
   mode: 'natural',
   shares: {},
+  hidden: [],
 } as const;
 
 export const MIN_HEIGHT = 120;
@@ -222,6 +231,7 @@ export const layoutFromSearch = (search: string): Layout => {
         ? ('fill' as const)
         : ('natural' as const),
     shares,
+    hidden: hiddenInOrder(blockList(params.get(PARAM.hidden))),
   } as const;
 
   // `?cols=2` or `?cols=3` alone, as typed by hand, splits the columns the
@@ -246,6 +256,7 @@ export const searchWithLayout = (search: string, layout: Layout): string => {
     PARAM.split,
     PARAM.lines,
     PARAM.mode,
+    PARAM.hidden,
     ...BLOCK_IDS.map(heightParam),
     ...BLOCK_IDS.map(shareParam),
   ]) {
@@ -294,6 +305,10 @@ export const searchWithLayout = (search: string, layout: Layout): string => {
     if (share !== undefined) {
       params.set(shareParam(id), String(share));
     }
+  }
+
+  if (Arr.isNonEmpty(layout.hidden)) {
+    params.set(PARAM.hidden, layout.hidden.join(SEPARATOR));
   }
 
   const written = params.toString();
@@ -362,6 +377,30 @@ export const columnsOf = (layout: Layout): readonly (readonly BlockId[])[] => {
       return [layout.left, layout.middle, layout.right];
   }
 };
+
+/** Of `ids`, the blocks drawn: those {@link Layout.hidden} does not name. */
+export const shownOf = (
+  layout: Layout,
+  ids: readonly BlockId[],
+): readonly BlockId[] => ids.filter((id) => !layout.hidden.includes(id));
+
+/**
+ * Hides `block`, or shows it again where it was. Its place, height and share
+ * are left as they were.
+ */
+export const withHidden = (
+  layout: Layout,
+  block: BlockId,
+  hidden: boolean,
+): Layout =>
+  ({
+    ...layout,
+    hidden: hiddenInOrder(
+      hidden
+        ? Arr.toPushed(layout.hidden, block)
+        : layout.hidden.filter((id) => id !== block),
+    ),
+  }) as const;
 
 /** The width of each column drawn, left to right, in percent. */
 export const columnWidths = (layout: Layout): readonly number[] => {
@@ -592,6 +631,7 @@ const PARAM = {
   split: 'split',
   lines: 'lines',
   mode: 'mode',
+  hidden: 'hide',
 } as const;
 
 const SEPARATOR = '.';
@@ -636,6 +676,10 @@ const isBlockId = (value: string): value is BlockId =>
 
 const blockList = (raw: string | null): readonly BlockId[] =>
   raw === null ? ([] as const) : raw.split(SEPARATOR).filter(isBlockId);
+
+/** Each once, in the order of {@link BLOCK_IDS}, so a URL has one spelling. */
+const hiddenInOrder = (ids: readonly BlockId[]): readonly BlockId[] =>
+  BLOCK_IDS.filter((id) => ids.includes(id));
 
 type Columns = StrictPick<Layout, 'columns' | 'left' | 'middle' | 'right'>;
 

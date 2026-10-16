@@ -11,6 +11,7 @@ import {
   MIN_SPLIT,
   MIN_THIRD_WIDTH,
   sharePercents,
+  shownOf,
   type BlockId,
   type ColumnIndex,
 } from '../layout.mjs';
@@ -20,7 +21,7 @@ import { ViewSettingsRow } from './view-settings-row.js';
 /**
  * The "Layout" button and the dialog it opens: one column, two or three, how
  * wide each is, whether the page scrolls or fills the window, the order of the
- * blocks and their heights or shares, and a way back to the usual layout.
+ * blocks, which of them are shown, and their heights or shares, and a way back to the usual layout.
  *
  * Everything the pointer does on the page can be done here with a keyboard,
  * which is what lets the drag surfaces there be pointer-only. A native
@@ -49,9 +50,11 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
     () =>
       Object.fromEntries(
         columns.flatMap(([, ids]) => {
-          const shares = sharePercents(layout, ids);
+          const shown = shownOf(layout, ids);
 
-          return ids.map((id, index) => [id, shares[index] ?? 0] as const);
+          const shares = sharePercents(layout, shown);
+
+          return shown.map((id, index) => [id, shares[index] ?? 0] as const);
         }),
       ),
     [columns, layout],
@@ -207,6 +210,7 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
                     columns={layout.columns}
                     count={ids.length}
                     height={layout.heights[id]}
+                    hidden={layout.hidden.includes(id)}
                     id={id}
                     index={index}
                     mode={layout.mode}
@@ -221,7 +225,7 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
 
         <p className={'section-note'}>
           {
-            'On the page: drag the line under a block to set its height — a double click there gives the natural height back, or, when the blocks fill the window, evens it with the block below. With two or three columns, drag the lines between them. The layout is kept in the URL.'
+            'A hidden block keeps its place and its size, and comes back there when shown. On the page: drag the line under a block to set its height — a double click there gives the natural height back, or, when the blocks fill the window, evens it with the block below. With two or three columns, drag the lines between them. The layout is kept in the URL.'
           }
         </p>
 

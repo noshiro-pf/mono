@@ -2,7 +2,7 @@ import type { ComponentChildren } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { columnWidths, type BlockId } from '../layout.mjs';
+import { columnWidths, shownOf, type BlockId } from '../layout.mjs';
 import { layoutSignals } from '../store/index.mjs';
 import { BlockColumn } from './block-column.js';
 import { ColumnDivider } from './column-divider.js';
@@ -20,6 +20,10 @@ type Props = Readonly<{
  * screen too narrow for them, the stylesheet stacks them into one (the grid
  * template is then ignored, which is why it can be an inline style).
  *
+ * A hidden block is left out of its column altogether, so the blocks around
+ * it share the column as if it were not there; a column whose blocks are all
+ * hidden keeps its width, empty.
+ *
  * In the `fill` mode the layout takes the height the page leaves it, and each
  * column shares that out among its blocks (`index.css`).
  */
@@ -29,6 +33,12 @@ export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
   const layout = layoutSignals.layout.value;
 
   const widths = useMemo(() => columnWidths(layout), [layout]);
+
+  const left = useMemo(() => shownOf(layout, layout.left), [layout]);
+
+  const middle = useMemo(() => shownOf(layout, layout.middle), [layout]);
+
+  const right = useMemo(() => shownOf(layout, layout.right), [layout]);
 
   const style = useMemo(
     () =>
@@ -52,7 +62,7 @@ export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
       <BlockColumn
         blocks={blocks}
         heights={layout.heights}
-        ids={layout.left}
+        ids={left}
         mode={layout.mode}
         shares={layout.shares}
       />
@@ -64,7 +74,7 @@ export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
           <BlockColumn
             blocks={blocks}
             heights={layout.heights}
-            ids={layout.middle}
+            ids={middle}
             mode={layout.mode}
             shares={layout.shares}
           />
@@ -78,7 +88,7 @@ export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
           <BlockColumn
             blocks={blocks}
             heights={layout.heights}
-            ids={layout.right}
+            ids={right}
             mode={layout.mode}
             shares={layout.shares}
           />
