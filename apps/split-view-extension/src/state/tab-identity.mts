@@ -89,12 +89,13 @@ export const applyTabIdentity = (
 };
 
 /**
- * The favicon for a position, as a PNG data URL: the extension's icon with the
- * number on a badge in its corner, as an extension's toolbar icon carries one.
+ * The favicon for a position, as a PNG data URL: the extension's icon in the
+ * position's colour, its panes faded, and the number large across the middle.
  *
- * The icon rather than a plain square with the number in it, because a
- * coloured square with a number is also what Google Calendar's tab shows, and
- * the two could not be told apart in a tab strip.
+ * The number on the icon rather than on a badge in its corner, because a badge
+ * is what a count of unread notifications looks like. The panes kept, faintly,
+ * because a coloured square with a number and nothing else is also what Google
+ * Calendar's tab shows, and the two could not be told apart in a tab strip.
  */
 export const faviconDataUri = (position: number): string | undefined => {
   const mut_canvas = mut_page.createElement('canvas');
@@ -109,30 +110,17 @@ export const faviconDataUri = (position: number): string | undefined => {
     return undefined;
   }
 
-  const { label, fontPx, icon, badge, cutout } = faviconLayoutOf(position);
+  const { label, fontPx, outlinePx, icon } = faviconLayoutOf(position);
 
-  mut_context.fillStyle = rgbOf(extensionIcon.background);
+  const accent = accentColorOf(position);
+
+  mut_context.fillStyle = accent;
 
   mut_context.fill(roundRectPathOf(extensionIconSquareOf(icon)));
 
-  mut_context.fillStyle = rgbOf(extensionIcon.pane);
+  mut_context.fillStyle = rgbOf(extensionIcon.pane, paneAlpha);
 
   mut_context.fill(extensionIconPanesPathOf(icon));
-
-  // Cleared rather than outlined in a fixed colour: the tab strip behind the
-  // gap may be light or dark, and the gap is what keeps a badge in the same
-  // blue as the icon from merging into it.
-  mut_context.globalCompositeOperation = 'destination-out';
-
-  mut_context.fill(roundRectPathOf(cutout));
-
-  mut_context.globalCompositeOperation = 'source-over';
-
-  mut_context.fillStyle = accentColorOf(position);
-
-  mut_context.fill(roundRectPathOf(badge));
-
-  mut_context.fillStyle = '#ffffff';
 
   mut_context.font = `700 ${String(fontPx)}px system-ui, sans-serif`;
 
@@ -145,17 +133,28 @@ export const faviconDataUri = (position: number): string | undefined => {
   // amount that depends on the platform's font.
   const metrics = mut_context.measureText(label);
 
-  mut_context.fillText(
-    label,
-    badge.x + Num.div(badge.width, 2),
-    badge.y +
-      Num.div(
-        badge.height +
-          metrics.actualBoundingBoxAscent -
-          metrics.actualBoundingBoxDescent,
-        2,
-      ),
+  const x = Num.div(faviconPx, 2);
+
+  const y = Num.div(
+    faviconPx +
+      metrics.actualBoundingBoxAscent -
+      metrics.actualBoundingBoxDescent,
+    2,
   );
+
+  // An outline in the square's own colour, so that where a digit crosses a
+  // faded pane its edge still meets the colour it is legible against.
+  mut_context.lineJoin = 'round';
+
+  mut_context.lineWidth = outlinePx;
+
+  mut_context.strokeStyle = accent;
+
+  mut_context.strokeText(label, x, y);
+
+  mut_context.fillStyle = '#ffffff';
+
+  mut_context.fillText(label, x, y);
 
   return mut_canvas.toDataURL('image/png');
 };
@@ -166,48 +165,28 @@ export const faviconPx = 32;
 /**
  * Where the favicon's parts go, for a position.
  *
- * The icon is drawn smaller than the favicon and in its top left corner, and
- * the badge overhangs it in the bottom right, so that at one digit the badge
- * hides only the pane under it and the other three still read as the icon.
- * More digits widen the badge leftwards and shrink the number, the badge never
- * leaving the favicon.
+ * The icon fills the favicon and the number is centred on it. More digits
+ * shrink the number, so that three still fit inside the rounded square.
  */
 export const faviconLayoutOf = (
   position: number,
 ): Readonly<{
   label: string;
   fontPx: number;
+  outlinePx: number;
   icon: IconPlacement;
-  badge: RoundRect;
-  cutout: RoundRect;
 }> => {
   const label = String(Math.max(1, Math.round(position)));
 
-  const { width, fontPx } =
-    badgeSizes[Math.min(label.length, badgeSizes.length) - 1] ?? badgeSizes[0];
-
-  const radius = Num.div(badgeHeight, 2);
-
-  const badge = {
-    x: faviconPx - width,
-    y: faviconPx - badgeHeight,
-    width,
-    height: badgeHeight,
-    radius,
-  } as const;
+  const fontPx =
+    fontPxByDigits[Math.min(label.length, fontPxByDigits.length) - 1] ??
+    fontPxByDigits[0];
 
   return {
     label,
     fontPx,
-    icon: { x: 0, y: 0, size: iconPx },
-    badge,
-    cutout: {
-      x: badge.x - badgeGap,
-      y: badge.y - badgeGap,
-      width: badge.width + 2 * badgeGap,
-      height: badge.height + 2 * badgeGap,
-      radius: radius + badgeGap,
-    },
+    outlinePx: 3,
+    icon: { x: 0, y: 0, size: faviconPx },
   };
 };
 
@@ -224,20 +203,14 @@ type RoundRect = Readonly<{
 
 const faviconLinkId = 'split-view-favicon';
 
-/** The icon under the badge, in canvas pixels. */
-const iconPx = 22;
-
-const badgeHeight = 20;
-
-/** The cleared ring around the badge, in canvas pixels. */
-const badgeGap = 2;
-
 /** By the number of digits: one, two, and anything longer. */
-const badgeSizes = [
-  { width: badgeHeight, fontPx: 18 },
-  { width: 28, fontPx: 15 },
-  { width: faviconPx, fontPx: 12 },
-] as const;
+const fontPxByDigits = [24, 18, 13] as const;
+
+/**
+ * How much of the panes shows through. Enough to read as the extension's icon
+ * at 16px, little enough that the number in front of them is what is read.
+ */
+const paneAlpha = 0.32;
 
 const accentColors = [
   '#4f7fd9',
@@ -300,5 +273,8 @@ const roundRectPathOf = ({
   return mut_path;
 };
 
-const rgbOf = ([r, g, b]: readonly [number, number, number]): string =>
-  `rgb(${String(r)} ${String(g)} ${String(b)})` as const;
+const rgbOf = (
+  [r, g, b]: readonly [number, number, number],
+  alpha: number,
+): string =>
+  `rgb(${String(r)} ${String(g)} ${String(b)} / ${String(alpha)})` as const;

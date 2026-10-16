@@ -4,10 +4,10 @@ import { Num } from 'ts-data-forge';
  * The extension's icon, in unit space: a rounded square in the blue the
  * interface uses for anything active, with four white panes in it.
  *
- * Drawn in two places — into `public/icons/` by `scripts/gen-icons.mts`, and
- * under the number in a split view's favicon by `src/state/tab-identity.mts` —
- * so that the tab shows the icon the toolbar does, and the shape has one
- * definition.
+ * Drawn in two places — into `public/icons/` by `scripts/gen-icons.mts`, and,
+ * in another colour and with its panes faded, under the number in a split
+ * view's favicon by `src/state/tab-identity.mts` — so that the tab shows the
+ * shape the toolbar does, and the shape has one definition.
  */
 export const extensionIcon = {
   background: [79, 127, 217],
