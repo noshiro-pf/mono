@@ -10,8 +10,8 @@ type Props = Readonly<{
 /**
  * A workflow run's state as the Actions tab draws it: a ring turning for one
  * in progress, a dot for one queued. Both in the status amber, which is what
- * GitHub gives them, and the ring holds still for a reader who asked for
- * less motion (`index.css`).
+ * GitHub gives them. The ring turns whatever the reader's motion setting
+ * (`index.css`).
  *
  * The glyph is `aria-hidden` and the word is beside it, hidden from sight
  * rather than from a screen reader, as a badge's word is beside its icon
