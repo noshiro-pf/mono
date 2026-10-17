@@ -57,6 +57,14 @@ type ChildObservableConfigBase<P extends NonEmptyUnknownList> = Readonly<{
    * `override complete() { teardown(); super.complete(); }`.
    */
   onComplete?: () => void;
+
+  /**
+   * Whether this observable can emit nothing more although some parent is
+   * still live, asked whenever a parent completes. `true` completes it then,
+   * as all parents completing does (`zip` once a completed source's queue is
+   * empty).
+   */
+  canEmitNoMore?: () => boolean;
 }>;
 
 export type ChildObservableConfig<
@@ -91,6 +99,7 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
     depth = 1 + maxDepth(parents),
     initialValue,
     onComplete,
+    canEmitNoMore,
   }: ChildObservableConfig<A, P>,
   createTryUpdate: (
     tools: SyncChildObservableTools<A>,
@@ -140,6 +149,7 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
     }
 
     tryCompleteChild({
+      canEmitNoMore,
       hasSubscriber: handle.hasSubscriber(),
       hasActiveChild: handle.hasActiveChild(),
       autoComplete,
@@ -210,6 +220,7 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     depth = 1 + maxDepth(parents),
     initialValue,
     onComplete,
+    canEmitNoMore,
   }: ChildObservableConfig<A, P>,
   createTryUpdate: (
     tools: AsyncChildObservableTools<A>,
@@ -262,6 +273,7 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     }
 
     tryCompleteChild({
+      canEmitNoMore,
       hasSubscriber: handle.hasSubscriber(),
       hasActiveChild: handle.hasActiveChild(),
       autoComplete,
@@ -426,20 +438,22 @@ const unregisterChild = <A,>(
 };
 
 const tryCompleteChild = <A,>({
+  canEmitNoMore,
   hasSubscriber,
   hasActiveChild,
   autoComplete,
   parents,
   complete,
 }: Readonly<{
+  canEmitNoMore: (() => boolean) | undefined;
   hasSubscriber: boolean;
   hasActiveChild: boolean;
   autoComplete: boolean;
   parents: ChildObservable<A>['parents'];
   complete: () => void;
 }>): void => {
-  // If there is no working parent node
-  if (parents.every((r) => r.isCompleted)) {
+  // If there is no working parent node, or no value can come from the live ones
+  if (parents.every((r) => r.isCompleted) || canEmitNoMore?.() === true) {
     complete();
 
     return;

@@ -10,6 +10,7 @@ import type {
   Observable,
   SyncChildObservable,
   TupleToQueueTuple,
+  UpdateToken,
   Wrap,
   ZipObservable,
   ZipObservableRefined,
@@ -18,7 +19,9 @@ import type {
 /**
  * Combines multiple observables by pairing their emissions by index.
  * Waits for all sources to emit their nth value before emitting the nth tuple.
- * Completes when any source completes.
+ * Completes once a completed source has no value left to pair, as RxJS's
+ * `zip` does: at once if it completes with nothing queued, otherwise after
+ * the tuple that takes its last queued value.
  *
  * @template OS - Tuple type of source observables
  * @param parents - Array of observables to zip
@@ -35,7 +38,7 @@ import type {
  * //  Explanation:
  * //  - zip pairs values by their index from multiple sources
  * //  - Waits for all sources to emit at the same index
- * //  - Completes when any source completes
+ * //  - Completes once a completed source has no value left to pair
  *
  * const [letters$, setLetter] = createState<string>('A');
  *
@@ -95,19 +98,43 @@ const createZipObservable = <const A extends NonEmptyUnknownList>(
 
   const queues: TupleToQueueTuple<A> = Arr.map(parents, () => createQueue());
 
+  // The token of each parent's latest value that zip has taken in, so that a
+  // value a parent emits in the update it completes in — its `tryComplete`
+  // reaches zip before its `tryUpdate` does — still counts as queued.
+  const mut_takenTokens: UpdateToken[] = Array.from(
+    parents,
+    (p) => p.updateToken,
+  );
+
+  // No tuple can be completed any more once a completed source has nothing
+  // left to pair (#2343).
+  const canEmitNoMore = (): boolean =>
+    parents.some(
+      (par, index) =>
+        par.isCompleted &&
+        queues[index]?.isEmpty === true &&
+        (par.updateToken === mut_takenTokens[index] ||
+          Optional.isNone(par.getSnapshot())),
+    );
+
   return createSyncChildObservable<A, A>(
     {
       parents,
       initialValue,
+      canEmitNoMore,
     },
-    ({ setNext }) =>
+    ({ setNext, complete }) =>
       (updateToken) => {
         for (const [index, par] of parents.entries()) {
           const sn = par.getSnapshot();
 
-          if (par.updateToken === updateToken && Optional.isSome(sn)) {
-            queues[index]?.enqueue(sn.value);
+          if (!(par.updateToken === updateToken && Optional.isSome(sn))) {
+            continue;
           }
+
+          queues[index]?.enqueue(sn.value);
+
+          mut_takenTokens[index] = updateToken;
         }
 
         if (queues.some((list) => list.isEmpty)) {
@@ -121,6 +148,10 @@ const createZipObservable = <const A extends NonEmptyUnknownList>(
           Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
 
         setNext(nextValue, updateToken);
+
+        if (canEmitNoMore()) {
+          complete();
+        }
       },
   );
 };
