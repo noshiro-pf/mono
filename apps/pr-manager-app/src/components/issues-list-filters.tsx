@@ -1,3 +1,4 @@
+import type { InputEventHandler } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import { Arr, Obj } from 'ts-data-forge';
@@ -8,7 +9,8 @@ import { issuesListSignals, issuesListStore } from '../store/index.mjs';
 import { OfTotal } from './stat-tile.js';
 
 /**
- * What the list of open issues leads with: the priorities, switches as the
+ * What the list of open issues leads with: a search of the titles, matched
+ * as it is typed whatever the case, and not kept across visits; the priorities, switches as the
  * merge order's are (`merge-order-filters.tsx`); the labels, each a pick;
  * and the order. What each does is `issues-list-view.mts`; the choice is
  * kept across visits (`settings-db.mts`).
@@ -24,6 +26,16 @@ export const IssuesListFilters = memoNamed('IssuesListFilters', () => {
 
   return (
     <div className={'issues-list-controls'}>
+      <input
+        aria-label={'Search issue titles'}
+        autoComplete={'off'}
+        className={'issues-search'}
+        placeholder={'Search titles'}
+        type={'search'}
+        value={issuesListSignals.query.value}
+        onInput={onQueryInput}
+      />
+
       <fieldset aria-label={'Priority'} className={'filter-group'}>
         <span className={'filter-group-name'}>{'priority'}</span>
         {PRIORITIES.map((priority) => (
@@ -144,6 +156,10 @@ const togglePriority = Obj.fromEntries(
       ] as const,
   ),
 );
+
+const onQueryInput: InputEventHandler<HTMLInputElement> = (typed) => {
+  issuesListStore.setQuery(typed.currentTarget.value);
+};
 
 const sortBy = (sort: IssueSort) => (): void => {
   issuesListStore.setSort(sort);

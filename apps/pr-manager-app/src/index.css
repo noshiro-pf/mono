@@ -1788,6 +1788,18 @@ a:focus-visible {
   margin: 0 0 0.75rem;
 }
 
+.issues-search {
+  background: var(--surface);
+  border: 1px solid var(--baseline);
+  border-radius: var(--radius);
+  color: var(--ink-primary);
+  font: inherit;
+  font-size: 0.8125rem;
+  inline-size: 16rem;
+  max-inline-size: 100%;
+  padding: 0.3rem 0.6rem;
+}
+
 /*
  * A label is a pick, not a switch for hiding: unpressed is how it starts,
  * drawn as any chip, and pressed is filled with the accent, as the merge

@@ -13,6 +13,12 @@
  * question a reader brings to the list is "what bugs are open", not "what
  * is open that is not a bug".
  *
+ * **The search** is what the reader types: an issue is shown only when its
+ * title holds it, whatever the case, and still not when its priority or its
+ * labels leave it out. It narrows the list there and then, so it is not kept
+ * across visits as the rest of the view is: it is held beside the view
+ * (`issues-list-store.mts`) rather than in it.
+ *
  * Sorted by priority, high comes first and "none" between mid and low, the
  * most recently updated first within each; otherwise the list is in the
  * order it is read, most recently updated first. Everything is shown, by
@@ -70,17 +76,33 @@ export type IssuesListCounts = Readonly<{
   labels: readonly LabelCount[];
 }>;
 
-export const isIssueShown = (issue: IssueItem, view: IssuesListView): boolean =>
+export const isIssueShown = (
+  issue: IssueItem,
+  view: IssuesListView,
+  query: string = '',
+): boolean =>
   !view.hiddenPriorities.includes(priorityOf(issue.labels)) &&
   (!Arr.isNonEmpty(view.onlyLabels) ||
-    issue.labels.some((label) => view.onlyLabels.includes(label.name)));
+    issue.labels.some((label) => view.onlyLabels.includes(label.name))) &&
+  matchesIssueTitle(issue, query);
 
-/** The list as the view shows it. */
+/**
+ * Whether the title holds what was typed, whatever the case; the spaces
+ * around it are not read, and nothing typed matches everything.
+ */
+export const matchesIssueTitle = (issue: IssueItem, query: string): boolean => {
+  const typed = query.trim().toLowerCase();
+
+  return typed === '' || issue.title.toLowerCase().includes(typed);
+};
+
+/** The list as the view and the search show it. */
 export const arrangeIssues = (
   items: readonly IssueItem[],
   view: IssuesListView,
+  query: string = '',
 ): readonly IssueItem[] => {
-  const shown = items.filter((issue) => isIssueShown(issue, view));
+  const shown = items.filter((issue) => isIssueShown(issue, view, query));
 
   // `toSorted` is stable, so each priority keeps the order it was read in.
   return view.sort === 'priority'
@@ -99,17 +121,26 @@ export const arrangeIssues = (
  * itself on and every other as it is: a priority switched off reads how many
  * switching it back on would show, and a label how many picking it would
  * add — which, picked or not, is every issue carrying it whose priority is
- * shown.
+ * shown. The search narrows what each shows, never its whole: the whole is
+ * what is open, so that the counts say how much the search leaves out.
  */
 export const countIssues = (
   items: readonly IssueItem[],
   view: IssuesListView,
+  query: string = '',
 ): IssuesListCounts => {
   const underPriority = (which: Priority): Count =>
-    countUnder(items, (issue) => priorityOf(issue.labels) === which, {
-      ...view,
-      hiddenPriorities: view.hiddenPriorities.filter((each) => each !== which),
-    });
+    countUnder(
+      items,
+      (issue) => priorityOf(issue.labels) === which,
+      {
+        ...view,
+        hiddenPriorities: view.hiddenPriorities.filter(
+          (each) => each !== which,
+        ),
+      },
+      query,
+    );
 
   const colors = new Map(
     items
@@ -123,7 +154,7 @@ export const countIssues = (
   );
 
   return {
-    open: countUnder(items, () => true, view),
+    open: countUnder(items, () => true, view, query),
     priorities: {
       high: underPriority('high'),
       mid: underPriority('mid'),
@@ -138,6 +169,7 @@ export const countIssues = (
         items,
         (issue) => issue.labels.some((label) => label.name === labelName),
         { ...view, onlyLabels: [] },
+        query,
       ),
     })),
   } as const;
@@ -206,11 +238,12 @@ const countUnder = (
   items: readonly IssueItem[],
   under: (issue: IssueItem) => boolean,
   view: IssuesListView,
+  query: string,
 ): Count => {
   const all = items.filter(under);
 
   return {
-    shown: all.filter((issue) => isIssueShown(issue, view)).length,
+    shown: all.filter((issue) => isIssueShown(issue, view, query)).length,
     total: all.length,
   } as const;
 };

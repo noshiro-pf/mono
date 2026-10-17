@@ -133,6 +133,35 @@ describe(createIssuesListStore, () => {
       },
     ]);
   });
+
+  test('the search narrows the list and the counts, and is not saved', async () => {
+    const { store, saved, setIssues, resolveLoad } = setup();
+
+    store.start();
+
+    resolveLoad(undefined);
+
+    await settle();
+
+    setIssues([issue(1, []), issue(2, []), issue(12, [])]);
+
+    store.setQuery('ISSUE 1');
+
+    assert.strictEqual(store.query.getSnapshot().value, 'ISSUE 1');
+
+    assert.deepStrictEqual(numbersShown(store), [1, 12]);
+
+    assert.deepStrictEqual(store.counts.getSnapshot().value.open, {
+      shown: 2,
+      total: 3,
+    });
+
+    assert.deepStrictEqual(saved, [DEFAULT_ISSUES_LIST_VIEW]);
+
+    store.setQuery('');
+
+    assert.deepStrictEqual(numbersShown(store), [1, 2, 12]);
+  });
 });
 
 const STORED: IssuesListView = {

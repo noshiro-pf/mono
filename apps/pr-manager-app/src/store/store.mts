@@ -190,6 +190,7 @@ export const issuesViewSignals = {
 
 export const issuesListSignals = {
   view: toSignal(issuesListStore.view),
+  query: toSignal(issuesListStore.query),
   items: toSignal(issuesListStore.items),
   counts: toSignal(issuesListStore.counts),
 } as const;

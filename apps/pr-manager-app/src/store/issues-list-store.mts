@@ -8,6 +8,9 @@
  * with what was saved; only then is anything handed to `save`, so the
  * default never overwrites a saved choice; and a choice the reader made in
  * that moment is kept over the saved one.
+ *
+ * The search is held beside the view, not in it, and so is never saved: it
+ * starts empty on every visit.
  */
 
 import {
@@ -43,13 +46,19 @@ export type IssuesListDeps = Readonly<{
 
 export type IssuesListStore = Readonly<{
   view: InitializedObservable<IssuesListView>;
-  /** The open issues with what the view hides taken out, in its order. */
+  /** What the reader typed to search the titles by; empty is no search. */
+  query: InitializedObservable<string>;
+  /**
+   * The open issues with what the view and the search hide taken out, in
+   * the view's order.
+   */
   items: InitializedObservable<readonly IssueItem[]>;
   /** What the priorities and the labels read, as the view leaves them. */
   counts: InitializedObservable<IssuesListCounts>;
   togglePriority: (priority: Priority) => void;
   toggleLabel: (labelName: string) => void;
   setSort: (sort: IssueSort) => void;
+  setQuery: (query: string) => void;
   /** Reads what was saved, then saves every change; returns what stops it. */
   start: () => () => void;
 }>;
@@ -59,6 +68,8 @@ export const createIssuesListStore = (
 ): IssuesListStore => {
   const [view, setView, { updateState: updateView }] =
     createState<IssuesListView>(DEFAULT_ISSUES_LIST_VIEW);
+
+  const [query, setQuery] = createState<string>('');
 
   // Whether the reader has chosen anything yet.
   const mut_reader = { changed: false };
@@ -102,13 +113,22 @@ export const createIssuesListStore = (
 
   return {
     view,
+    query,
     // Passed on only when it changed: a poll that moved nothing of the
     // issues lays nothing out again.
-    items: combine([deps.issues, view])
-      .pipe(map(([issues, current]) => arrangeIssues(issues.items, current)))
+    items: combine([deps.issues, view, query])
+      .pipe(
+        map(([issues, current, typed]) =>
+          arrangeIssues(issues.items, current, typed),
+        ),
+      )
       .pipe(skipIfNoChange(fastDeepEqual)),
-    counts: combine([deps.issues, view])
-      .pipe(map(([issues, current]) => countIssues(issues.items, current)))
+    counts: combine([deps.issues, view, query])
+      .pipe(
+        map(([issues, current, typed]) =>
+          countIssues(issues.items, current, typed),
+        ),
+      )
       .pipe(skipIfNoChange(fastDeepEqual)),
     togglePriority: (priority) => {
       change((current) => toggleIssuePriority(current, priority));
@@ -119,6 +139,7 @@ export const createIssuesListStore = (
     setSort: (sort) => {
       change((current) => withIssueSort(current, sort));
     },
+    setQuery,
     start,
   };
 };
