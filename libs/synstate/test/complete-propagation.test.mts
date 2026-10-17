@@ -1,5 +1,12 @@
 import { Optional } from 'ts-data-forge';
-import { counter, createState, debounce, map, source } from '../src/index.mjs';
+import {
+  combine,
+  counter,
+  createState,
+  debounce,
+  map,
+  source,
+} from '../src/index.mjs';
 
 describe('completing a derived observable', () => {
   test('does not complete an upstream state that holds no resource (#2133)', () => {
@@ -182,5 +189,73 @@ describe('dispose', () => {
 
     // Only the initial value: the pending 1 was cancelled.
     assert.deepStrictEqual(mut_got, [0]);
+  });
+});
+
+describe('a child created under completed parents (#2248)', () => {
+  test('completes at creation and keeps the value computed from the final parent value', () => {
+    const s = source<number>(0);
+
+    s.next(5);
+
+    s.complete();
+
+    const d = s.pipe(map((x) => x * 100));
+
+    assert.isTrue(d.isCompleted);
+
+    assert.deepStrictEqual(d.getSnapshot(), Optional.some(500));
+
+    const mut_got: string[] = [];
+
+    d.subscribe(
+      (v) => {
+        mut_got.push(`next ${v}`);
+      },
+      () => {
+        mut_got.push('complete');
+      },
+    );
+
+    // A completed observable emits its final value, then completes.
+    assert.deepStrictEqual(mut_got, ['next 500', 'complete']);
+  });
+
+  test('is not registered to the completed parent', () => {
+    const s = source<number>(0);
+
+    s.complete();
+
+    s.pipe(map((x) => x + 1));
+
+    assert.isFalse(s.hasChild);
+  });
+
+  test('completes an async child at creation', () => {
+    const s = source<number>(0);
+
+    s.complete();
+
+    const d = s.pipe(debounce(10));
+
+    assert.isTrue(d.isCompleted);
+
+    assert.isFalse(s.hasChild);
+  });
+
+  test('does not complete a child that still has a live parent', () => {
+    const live$ = source<number>(1);
+
+    const completed$ = source<number>(2);
+
+    completed$.complete();
+
+    const sum$ = combine([live$, completed$]).pipe(map(([a, b]) => a + b));
+
+    assert.isFalse(sum$.isCompleted);
+
+    live$.next(10);
+
+    assert.deepStrictEqual(sum$.getSnapshot(), Optional.some(12));
   });
 });
