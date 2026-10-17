@@ -17,6 +17,7 @@ import type {
 } from '../types/index.mjs';
 import {
   binarySearch,
+  getCurrentScopeInternals,
   issueObservableId,
   issueSubscriberId,
   issueUpdateToken,
@@ -546,9 +547,24 @@ export const assembleObservable = <
     pipe,
   };
 
+  /**
+   * Set when a scope adopted this observable at creation. Completing — by the
+   * scope's dispose or on its own — releases it, so that a long-lived scope
+   * whose nodes come and go does not keep the completed ones.
+   */
+  let mut_releaseFromScope: (() => void) | undefined = undefined;
+
   handle.attach({
     setIsCompleted: (value) => {
       mut_observable.isCompleted = value;
+
+      if (!value || mut_releaseFromScope === undefined) {
+        return;
+      }
+
+      mut_releaseFromScope();
+
+      mut_releaseFromScope = undefined;
     },
 
     setUpdateToken: (value) => {
@@ -563,6 +579,15 @@ export const assembleObservable = <
       mut_observable.hasChild = value;
     },
   });
+
+  // Joins the scope whose `run` is executing (`createScope`), if any. A node
+  // that completed while it was built (`just`, a child of completed parents)
+  // has nothing left to release.
+  const scope = getCurrentScopeInternals();
+
+  if (scope !== undefined && !mut_observable.isCompleted) {
+    mut_releaseFromScope = scope.adopt(mut_observable);
+  }
 
   return mut_observable;
 };
