@@ -11,7 +11,11 @@ import * as ts from 'typescript';
 
 type Options = readonly [];
 
-type MessageIds = 'useFunctionDirectly' | 'useCurriedForm';
+type MessageIds =
+  | 'useFunctionDirectly'
+  | 'useCurriedForm'
+  | 'mayNeedGlobalReceiver'
+  | 'replaceWithFunction';
 
 /**
  * Replaces a redundant arrow wrapper around a function call with a point-free
@@ -29,6 +33,15 @@ type MessageIds = 'useFunctionDirectly' | 'useCurriedForm';
  * The arrow's single parameter must appear exactly once, as the first argument
  * of the call, so dropping the wrapper is behavior-preserving.
  *
+ * A global the host provides (`requestAnimationFrame`, `setTimeout`, `fetch`
+ * in the default libraries) may have to be called on `globalThis` — passed as
+ * an object's property, it throws `Illegal invocation` — so `(a) => f(a)` is
+ * left alone for one. ECMAScript's own global functions (`parseFloat`,
+ * `String`, `Boolean`, ...) do not read `this` and are fixed as usual. Any
+ * other global ambient declaration (a `.d.ts` outside the default libraries,
+ * `declare global`) cannot be judged, so it is reported with a suggestion
+ * rather than fixed.
+ *
  * The callee is judged through type wrappers, by the type of its value (a cast
  * cannot lend it a curried signature), and the fix keeps the wrappers,
  * parenthesizing a callee that needs it: `(c ? g : h)(a, 1)` → `(c ? g : h)(1)`.
@@ -41,12 +54,17 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
         'Replace a redundant arrow wrapper with the function itself (`(a) => f(a)` → `f`) or, when the callee has a curried version, its curried form (`(a) => f(a, ...rest)` → `f(...rest)`).',
     },
     fixable: 'code',
+    hasSuggestions: true,
     schema: [],
     messages: {
       useFunctionDirectly:
         'Replace the redundant arrow wrapper `{{original}}` with `{{replacement}}`.',
       useCurriedForm:
         'Replace the arrow wrapper `{{original}}` with the curried call `{{replacement}}`.',
+      mayNeedGlobalReceiver:
+        'The arrow wrapper `{{original}}` is redundant unless `{{replacement}}` has to be called on `globalThis`; it is a global ambient declaration, so this cannot be decided here.',
+      replaceWithFunction:
+        'Replace `{{original}}` with `{{replacement}}` (only if `{{replacement}}` does not need `globalThis` as its receiver).',
     },
   },
 
@@ -107,6 +125,47 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
       (callee.type === AST_NODE_TYPES.MemberExpression &&
         !callee.optional &&
         isNamespaceObject(callee.object));
+
+    /**
+     * How `(a) => f(a)` → `f` may be applied to an identifier callee `f`,
+     * depending on whether it is a global ambient declaration and whether a
+     * host provides it. See {@link preferCurriedCall}.
+     */
+    const classifyGlobalCallee = (
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      callee: TSESTree.Identifier,
+    ): 'fix' | 'suggest' | 'skip' => {
+      const symbol = checker.getSymbolAtLocation(
+        services.esTreeNodeToTSNodeMap.get(callee),
+      );
+
+      if (symbol === undefined) {
+        return 'fix';
+      }
+
+      const resolved =
+        (symbol.flags & ts.SymbolFlags.Alias) !== 0
+          ? checker.getAliasedSymbol(symbol)
+          : symbol;
+
+      const declarations = resolved.declarations ?? [];
+
+      if (!declarations.some(isGlobalAmbientDeclaration)) {
+        return 'fix';
+      }
+
+      if (
+        declarations.some((declaration) =>
+          services.program.isSourceFileDefaultLibrary(
+            declaration.getSourceFile(),
+          ),
+        )
+      ) {
+        return ECMASCRIPT_GLOBAL_FUNCTIONS.has(resolved.name) ? 'fix' : 'skip';
+      }
+
+      return 'suggest';
+    };
 
     /**
      * `true` when the arrow's single parameter is referenced exactly once, at
@@ -192,6 +251,37 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
             return;
           }
 
+          const applicability =
+            callee.type === AST_NODE_TYPES.Identifier
+              ? classifyGlobalCallee(callee)
+              : 'fix';
+
+          if (applicability === 'skip') {
+            return;
+          }
+
+          if (applicability === 'suggest') {
+            const data = {
+              original: sourceCode.getText(node),
+              replacement: calleeText,
+            } as const;
+
+            context.report({
+              node,
+              messageId: 'mayNeedGlobalReceiver',
+              data,
+              suggest: [
+                {
+                  messageId: 'replaceWithFunction',
+                  data,
+                  fix: (fixer) => fixer.replaceText(node, calleeText),
+                },
+              ],
+            });
+
+            return;
+          }
+
           context.report({
             node,
             messageId: 'useFunctionDirectly',
@@ -242,6 +332,31 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
   },
   defaultOptions: [],
 } as const;
+
+/**
+ * `true` for a declaration in the global scope that the program only declares
+ * (a host or another script provides the value): one at the top level of a
+ * declaration file that is not a module, or inside `declare global`.
+ */
+const isGlobalAmbientDeclaration = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  declaration: ts.Declaration,
+): boolean => {
+  const statement = ts.isVariableDeclaration(declaration)
+    ? declaration.parent.parent
+    : declaration;
+
+  const container = statement.parent;
+
+  if (ts.isSourceFile(container)) {
+    return container.isDeclarationFile && !ts.isExternalModule(container);
+  }
+
+  return (
+    ts.isModuleBlock(container) &&
+    (container.parent.flags & ts.NodeFlags.GlobalAugmentation) !== 0
+  );
+};
 
 /**
  * `true` when every call signature of `type` accepts at most one argument, so
@@ -419,6 +534,66 @@ const isPureExpression = (node: DeepReadonly<TSESTree.Node>): boolean => {
 
   return false;
 };
+
+/**
+ * The function-valued properties of ECMAScript's global object, which read
+ * no `this` and so may be passed as values. `eval` is left out: passing it
+ * turns a direct `eval` into an indirect one.
+ */
+const ECMASCRIPT_GLOBAL_FUNCTIONS: ReadonlySet<string> = new Set([
+  'AggregateError',
+  'Array',
+  'ArrayBuffer',
+  'BigInt',
+  'BigInt64Array',
+  'BigUint64Array',
+  'Boolean',
+  'DataView',
+  'Date',
+  'Error',
+  'EvalError',
+  'FinalizationRegistry',
+  'Float16Array',
+  'Float32Array',
+  'Float64Array',
+  'Function',
+  'Int16Array',
+  'Int32Array',
+  'Int8Array',
+  'Iterator',
+  'Map',
+  'Number',
+  'Object',
+  'Promise',
+  'Proxy',
+  'RangeError',
+  'ReferenceError',
+  'RegExp',
+  'Set',
+  'SharedArrayBuffer',
+  'String',
+  'Symbol',
+  'SyntaxError',
+  'TypeError',
+  'URIError',
+  'Uint16Array',
+  'Uint32Array',
+  'Uint8Array',
+  'Uint8ClampedArray',
+  'WeakMap',
+  'WeakRef',
+  'WeakSet',
+  'decodeURI',
+  'decodeURIComponent',
+  'encodeURI',
+  'encodeURIComponent',
+  'escape',
+  'isFinite',
+  'isNaN',
+  'parseFloat',
+  'parseInt',
+  'unescape',
+]);
 
 /**
  * Callee kinds whose source text can be followed by an argument list without

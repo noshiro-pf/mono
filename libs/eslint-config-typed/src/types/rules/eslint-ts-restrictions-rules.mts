@@ -314,11 +314,12 @@ namespace NoUnnecessaryCoalesceUndefined {
  * @description Replace a redundant arrow wrapper with the function itself (`(a) => f(a)` → `f`) or, when the callee has a curried version, its curried form (`(a) => f(a, ...rest)` → `f(...rest)`).
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace PreferCurriedCall {
