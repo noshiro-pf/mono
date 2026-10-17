@@ -1,13 +1,15 @@
 /**
  * The screen shown — the list or the graph — and, on the graph's screen, its
- * view mode (`dag-view-mode.mts`), as the URL's query: `?view=dag&mode=arc`.
+ * view mode (`dag-view-mode.mts`), as the URL's query: `?view=list`, `?mode=arc`.
  * Read when the page loads, so that a reload, or a link, opens the screen
  * that was shown, and written as either changes (`store/view-query-sync.mts`).
  *
- * The list, the default, is written as no parameter at all, and the mode
- * only beside the graph. A value the page does not know is read as no value:
- * the list for the screen, and for the mode the one kept on this device.
- * Every other parameter (`?storage=memory`) is left where it is.
+ * The graph, the default, is written as no `view` at all, and the mode only
+ * when the graph is shown; `?view=dag`, from a link made before the graph was
+ * the default, is read and then taken out. A value the page does not know is
+ * read as no value: the graph for the screen, and for the mode the one kept
+ * on this device. Every other parameter (`?storage=memory`) is left where it
+ * is.
  */
 
 import { dagViewModes, type DagViewMode } from './dag-view-mode.mjs';
@@ -16,7 +18,7 @@ export const views = ['list', 'dag'] as const;
 
 export type View = (typeof views)[number];
 
-export const DEFAULT_VIEW: View = 'list';
+export const DEFAULT_VIEW: View = 'dag';
 
 export type ViewQuery = Readonly<{
   view: View;
@@ -51,7 +53,7 @@ export const withViewQuery = (search: string, shown: ViewQuery): string => {
 
   const view = shown.view === DEFAULT_VIEW ? undefined : shown.view;
 
-  const mode = view === undefined ? undefined : shown.mode;
+  const mode = shown.view === 'dag' ? shown.mode : undefined;
 
   if (
     (params.get(VIEW_KEY) ?? undefined) === view &&

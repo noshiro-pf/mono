@@ -7,20 +7,25 @@ describe(parseViewQuery, () => {
       mode: 'arc',
     });
 
-    assert.deepStrictEqual(parseViewQuery('?storage=memory&view=dag'), {
-      view: 'dag',
+    assert.deepStrictEqual(parseViewQuery('?storage=memory&view=list'), {
+      view: 'list',
       mode: undefined,
+    });
+
+    assert.deepStrictEqual(parseViewQuery('?storage=memory&mode=tile'), {
+      view: 'dag',
+      mode: 'tile',
     });
   });
 
-  test('gives the list for no screen, or one it does not know', () => {
+  test('gives the graph for no screen, or one it does not know', () => {
     assert.deepStrictEqual(parseViewQuery(''), {
-      view: 'list',
+      view: 'dag',
       mode: undefined,
     });
 
-    assert.deepStrictEqual(parseViewQuery('?view=DAG&mode=arc'), {
-      view: 'list',
+    assert.deepStrictEqual(parseViewQuery('?view=LIST&mode=arc'), {
+      view: 'dag',
       mode: 'arc',
     });
   });
@@ -34,52 +39,62 @@ describe(parseViewQuery, () => {
 });
 
 describe(withViewQuery, () => {
-  test('writes the graph’s screen and mode, keeping the other parameters', () => {
+  test('writes the graph’s mode alone, keeping the other parameters', () => {
     assert.strictEqual(
       withViewQuery('?storage=memory', { view: 'dag', mode: 'tile' }),
-      '?storage=memory&view=dag&mode=tile',
+      '?storage=memory&mode=tile',
     );
 
     assert.strictEqual(
-      withViewQuery('?view=dag&mode=dag&storage=memory', {
+      withViewQuery('?mode=dag&storage=memory', {
         view: 'dag',
         mode: 'arc',
       }),
-      '?view=dag&mode=arc&storage=memory',
+      '?mode=arc&storage=memory',
     );
   });
 
-  test('writes nothing for the list, the default', () => {
+  test('takes out the graph’s screen, the default, from an older link', () => {
     assert.strictEqual(
-      withViewQuery('?storage=memory&view=dag&mode=arc', {
+      withViewQuery('?view=dag&mode=arc&storage=memory', {
+        view: 'dag',
+        mode: 'arc',
+      }),
+      '?mode=arc&storage=memory',
+    );
+  });
+
+  test('writes the list, and no mode beside it', () => {
+    assert.strictEqual(
+      withViewQuery('?storage=memory&mode=arc', {
         view: 'list',
         mode: 'arc',
       }),
-      '?storage=memory',
+      '?storage=memory&view=list',
     );
 
     assert.strictEqual(
       withViewQuery('?view=dag&mode=arc', { view: 'list', mode: 'arc' }),
-      '',
+      '?view=list',
     );
   });
 
   test('replaces what it does not know', () => {
     assert.strictEqual(
-      withViewQuery('?view=board&mode=x', { view: 'list', mode: 'dag' }),
-      '',
+      withViewQuery('?view=board&mode=x', { view: 'dag', mode: 'dag' }),
+      '?mode=dag',
     );
   });
 
   test('leaves a URL that already says it as it is', () => {
     assert.strictEqual(
-      withViewQuery('?flag&view=dag&mode=arc', { view: 'dag', mode: 'arc' }),
-      '?flag&view=dag&mode=arc',
+      withViewQuery('?flag&mode=arc', { view: 'dag', mode: 'arc' }),
+      '?flag&mode=arc',
     );
 
     assert.strictEqual(
-      withViewQuery('?flag', { view: 'list', mode: 'arc' }),
-      '?flag',
+      withViewQuery('?flag&view=list', { view: 'list', mode: 'arc' }),
+      '?flag&view=list',
     );
   });
 });

@@ -9,7 +9,10 @@ import type { DeepReadonly } from 'ts-type-forge';
 
 // The in-memory demo of the dev server: no sign-in, the sample data of
 // `src/demo/sample-data.mts`, and a fresh copy on every load.
+// It opens on the graph, the default; `LIST` opens it on the list.
 const DEMO = '/mono/task-manager/?storage=memory';
+
+const LIST = `${DEMO}&view=list`;
 
 // The sample data's done task, as the 依存先 choices name it.
 const SPEC_OPTION = 'タスク: 仕様をまとめる（完了）';
@@ -28,7 +31,7 @@ const test = base.extend({
 });
 
 test('lists the tasks and milestones', { tag: '@smoke' }, async ({ page }) => {
-  await page.goto(DEMO);
+  await page.goto(LIST);
 
   await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
@@ -40,9 +43,7 @@ test('lists the tasks and milestones', { tag: '@smoke' }, async ({ page }) => {
 test('draws the DAG and opens a node', { tag: '@smoke' }, async ({ page }) => {
   await page.goto(DEMO);
 
-  await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-  await showDag(page);
+  await settled(page);
 
   await expect.soft(page.getByTestId('dag-node')).toHaveCount(9);
 
@@ -66,9 +67,7 @@ test(
   async ({ page }) => {
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     const task = (title: string): Locator =>
       page
@@ -151,9 +150,7 @@ test(
   async ({ page }) => {
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     const milestone = (title: string): Locator =>
       page
@@ -195,7 +192,7 @@ test(
   'saves a dependency typed into a row, without 「依存を追加」',
   { tag: '@smoke' },
   async ({ page }) => {
-    await page.goto(DEMO);
+    await page.goto(LIST);
 
     await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
@@ -233,7 +230,7 @@ test(
   'shows why a row would close a cycle, and does not save it',
   { tag: '@smoke' },
   async ({ page }) => {
-    await page.goto(DEMO);
+    await page.goto(LIST);
 
     await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
@@ -272,7 +269,7 @@ test(
   'offers a done task as a 依存先 only when asked to',
   { tag: '@smoke' },
   async ({ page }) => {
-    await page.goto(DEMO);
+    await page.goto(LIST);
 
     await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
@@ -323,7 +320,7 @@ test(
 );
 
 test('picks and clears a date', { tag: '@smoke' }, async ({ page }) => {
-  await page.goto(DEMO);
+  await page.goto(LIST);
 
   await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
@@ -346,7 +343,7 @@ test('picks and clears a date', { tag: '@smoke' }, async ({ page }) => {
 });
 
 test('moves a task’s progress', { tag: '@smoke' }, async ({ page }) => {
-  await page.goto(DEMO);
+  await page.goto(LIST);
 
   await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
@@ -377,7 +374,7 @@ test(
   'keeps the dialog open when a drag from inside it ends outside',
   { tag: '@smoke' },
   async ({ page }) => {
-    await page.goto(DEMO);
+    await page.goto(LIST);
 
     await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
@@ -480,13 +477,18 @@ const groupOfNode = async (
   return value;
 };
 
+/** Waits for the DAG's nodes to have moved into place. */
+const settled = async (page: DeepReadonly<Page>): Promise<void> => {
+  await expect
+    .soft(page.getByTestId('dag-canvas'))
+    .toHaveAttribute('data-animating', 'false');
+};
+
 /** Shows the DAG and waits for its nodes to have moved into place. */
 const showDag = async (page: DeepReadonly<Page>): Promise<void> => {
   await page.getByTestId('view-dag').click();
 
-  await expect
-    .soft(page.getByTestId('dag-canvas'))
-    .toHaveAttribute('data-animating', 'false');
+  await settled(page);
 };
 
 /** 「自動整列」 growing `direction`, and the nodes moved into place. */
@@ -768,9 +770,7 @@ test(
   async ({ page }) => {
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     const node = dagNode(page, /画面を実装する/u);
 
@@ -824,9 +824,7 @@ test(
   async ({ page }) => {
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     const frame = page.getByTestId('dag-group');
 
@@ -875,9 +873,7 @@ test(
   async ({ page }) => {
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     await page.getByTestId('add-group').click();
 
@@ -911,9 +907,7 @@ test(
   async ({ page }) => {
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     const spec = dagNode(page, /仕様をまとめる/u);
 
@@ -984,9 +978,7 @@ test(
   async ({ page }) => {
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     await arrange(page, 'right');
 
@@ -1036,9 +1028,7 @@ test(
   async ({ page }) => {
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     // The sample data has the case that went wrong: 「API を実装する」 before
     // 「画面を実装する」, and 「実装完了」 after both.
@@ -1081,9 +1071,7 @@ test(
 
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     expect.soft(await sawAnimation(page)).toBe(true);
 
@@ -1112,9 +1100,7 @@ test(
 
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     await expect.soft(page.getByTestId('dag-node')).toHaveCount(9);
 
@@ -1178,9 +1164,7 @@ test(
 
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     await chooseAnimation(page, 'off');
 
@@ -1193,9 +1177,7 @@ test(
     // Kept on this device: not even the first showing moves on a new visit.
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     await expect.soft(page.getByTestId('dag-node')).toHaveCount(9);
 
@@ -1217,9 +1199,7 @@ test(
 
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     await expect.soft(page.getByTestId('dag-node')).toHaveCount(9);
 
@@ -1255,16 +1235,14 @@ test(
   async ({ page }) => {
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+    await settled(page);
 
-    // The list, the default, writes nothing.
-    expect.soft(searchOf(page)).toBe('?storage=memory');
-
-    await showDag(page);
+    // The graph, the default, writes its mode alone.
+    expect.soft(searchOf(page)).toBe('?storage=memory&mode=dag');
 
     await showMode(page, 'arc');
 
-    expect.soft(searchOf(page)).toBe('?storage=memory&view=dag&mode=arc');
+    expect.soft(searchOf(page)).toBe('?storage=memory&mode=arc');
 
     await page.reload();
 
@@ -1274,26 +1252,33 @@ test(
       .soft(page.getByTestId('dag-mode-arc'))
       .toHaveAttribute('aria-pressed', 'true');
 
-    // Back on the list, the URL says nothing again.
+    // The list says so, and no mode.
     await page.getByTestId('view-list').click();
 
     await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
-    expect.soft(searchOf(page)).toBe('?storage=memory');
+    expect.soft(searchOf(page)).toBe('?storage=memory&view=list');
 
-    // A link to the graph in another mode wins over the one kept.
+    await page.reload();
+
+    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+
+    // A link to the graph in another mode wins over the one kept, and one
+    // made while the list was the default still opens the graph.
     await page.goto(`${DEMO}&view=dag&mode=tile`);
 
     await expect
       .soft(page.getByTestId('dag-mode-tile'))
       .toHaveAttribute('aria-pressed', 'true');
 
-    // What it does not know is the list, and taken out of the URL.
-    await page.goto(`${DEMO}&view=board&mode=dag`);
+    expect.soft(searchOf(page)).toBe('?storage=memory&mode=tile');
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+    // What it does not know is the graph, and taken out of the URL.
+    await page.goto(`${DEMO}&view=board&mode=x`);
 
-    expect.soft(searchOf(page)).toBe('?storage=memory');
+    await expect.soft(page.getByTestId('dag-canvas')).toBeVisible();
+
+    expect.soft(searchOf(page)).toBe('?storage=memory&mode=tile');
   },
 );
 
@@ -1328,9 +1313,7 @@ test(
   async ({ page }) => {
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     const dagPositions = await allPositions(page);
 
@@ -1505,9 +1488,7 @@ test(
     // Kept on this device: a new visit, without the URL's view.
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     await expect
       .soft(page.getByTestId('dag-mode-arc'))
@@ -1533,9 +1514,7 @@ test(
 
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     await showMode(page, 'arc');
 
@@ -1711,9 +1690,7 @@ test(
   async ({ page }) => {
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     await showMode(page, 'tile');
 
@@ -1854,9 +1831,7 @@ test(
     // Kept on this device: a new visit, without the URL's view.
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     await expect
       .soft(page.getByTestId('dag-mode-tile'))
@@ -1929,9 +1904,7 @@ test(
   async ({ page }) => {
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     const button = page.getByTestId('dag-settings');
 
@@ -2017,9 +1990,7 @@ test(
 
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     expect.soft(await toolbarRows(page)).toBe(1);
 
@@ -2055,9 +2026,7 @@ test(
   async ({ page }) => {
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     // Standard: tasks and milestones alike 56 high.
     expect.soft(await nodeHeights(page)).toStrictEqual([56]);
@@ -2158,9 +2127,7 @@ test(
     // Kept on this device: a new visit, without the URL's view.
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     expect.soft(await nodeHeights(page)).toStrictEqual([32]);
 
@@ -2266,9 +2233,7 @@ test(
 
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     // Not in 「DAG」, where the reader places the nodes.
     await openSettings(page);
@@ -2345,9 +2310,7 @@ test(
     // Kept on this device: a new visit, without the URL's view.
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await showDag(page);
+    await settled(page);
 
     expect.soft(await drawnOrder(page)).toStrictEqual(byPriority);
 
@@ -2427,7 +2390,7 @@ test(
   'sorts the list with its own keys, apart from the diagrams’ order',
   { tag: '@smoke' },
   async ({ page }) => {
-    await page.goto(DEMO);
+    await page.goto(LIST);
 
     await expect.soft(page.getByTestId('list-view')).toBeVisible();
 
@@ -2514,9 +2477,7 @@ test.describe('on a touch screen', () => {
     async ({ page }) => {
       await page.goto(DEMO);
 
-      await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-      await showDag(page);
+      await settled(page);
 
       await showMode(page, 'tile');
 
