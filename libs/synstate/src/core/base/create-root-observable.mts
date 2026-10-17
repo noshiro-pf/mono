@@ -68,16 +68,6 @@ export const createRootObservable = <
     handle.completeBase();
   };
 
-  // A root without a teardown (`source`, `createState`, `just`) releases
-  // nothing by completing, so a child completing never completes it (#2133).
-  const autoComplete = onComplete !== undefined;
-
-  const tryComplete = (): void => {
-    if (autoComplete && !handle.hasSubscriber() && !handle.hasActiveChild()) {
-      complete();
-    }
-  };
-
   const extension: Extension = init({
     startUpdate,
     isCompleted: handle.isCompleted,
@@ -89,11 +79,10 @@ export const createRootObservable = <
     depth: 0,
     handle,
     tryUpdate: createTryUpdateNotImplemented,
-    tryComplete,
+    tryComplete: tryCompleteRoot,
     complete,
     // A root has no parents to keep out of it.
     dispose: complete,
-    autoComplete,
     extra: {
       ...extension,
       addDescendant,
@@ -101,6 +90,13 @@ export const createRootObservable = <
     },
   });
 };
+
+/**
+ * `tryComplete` is how a completed parent reaches its children. A root has no
+ * parents, and a child completing never completes it (#2133), so only its own
+ * `complete()` ends it.
+ */
+const tryCompleteRoot = (): void => {};
 
 if (import.meta.vitest !== undefined) {
   test('isRootObservable', () => {
