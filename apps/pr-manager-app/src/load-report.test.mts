@@ -437,7 +437,7 @@ describe(loadReport, () => {
 
     const loaded = await load(fetchImpl);
 
-    assert.deepStrictEqual(loaded.issues.totalCount, 42);
+    assert.strictEqual(loaded.issues.totalCount, 42);
 
     assert.deepStrictEqual(loaded.issues.items, [
       {
@@ -505,7 +505,7 @@ describe(loadReport, () => {
       [1, 2, 3, 4, 5],
     );
 
-    assert.deepStrictEqual(loaded.issues.totalCount, 250);
+    assert.strictEqual(loaded.issues.totalCount, 250);
 
     assert.strictEqual(loaded.issues.endCursor, 'cursor-5');
   });

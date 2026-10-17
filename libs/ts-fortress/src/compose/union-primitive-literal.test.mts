@@ -145,13 +145,13 @@ describe('union - primitive and literal', () => {
     test('noop - string', () => {
       const x: unknown = 'world';
 
-      assert.deepStrictEqual(targetType.fill(x), 'world');
+      assert.strictEqual(targetType.fill(x), 'world');
     });
 
     test('noop - number', () => {
       const x: unknown = 7;
 
-      assert.deepStrictEqual(targetType.fill(x), 7);
+      assert.strictEqual(targetType.fill(x), 7);
     });
 
     test('fill with the default value', () => {

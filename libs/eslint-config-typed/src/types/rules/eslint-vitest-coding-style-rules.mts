@@ -32,6 +32,22 @@ namespace PreferAssertDeepStrictEqualOverDeepEqual {
 }
 
 /**
+ * @description Prefer assert.strictEqual(X, Y) over assert.deepStrictEqual(X, Y) when X and Y are primitives (only a suggestion when both may be NaN or a zero, which the two compare differently).
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  ```
+ */
+namespace PreferAssertStrictEqualForPrimitives {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Prefer assert.isTrue(X) over assert(X), assert.isOk(X), assert.ok(X).
  *
  *  ```md
@@ -124,6 +140,7 @@ namespace PreferAssertIsTrueOverNegatedAssertIsFalse {
 export type EslintVitestCodingStyleRules = Readonly<{
   'vitest-coding-style/no-expect-to-strict-equal': NoExpectToStrictEqual.RuleEntry;
   'vitest-coding-style/prefer-assert-deep-strict-equal-over-deep-equal': PreferAssertDeepStrictEqualOverDeepEqual.RuleEntry;
+  'vitest-coding-style/prefer-assert-strict-equal-for-primitives': PreferAssertStrictEqualForPrimitives.RuleEntry;
   'vitest-coding-style/prefer-assert-is-true-over-assert': PreferAssertIsTrueOverAssert.RuleEntry;
   'vitest-coding-style/prefer-assert-is-false-over-assert-not-ok': PreferAssertIsFalseOverAssertNotOk.RuleEntry;
   'vitest-coding-style/prefer-assert-is-true-over-expect-true': PreferAssertIsTrueOverExpectTrue.RuleEntry;

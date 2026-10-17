@@ -16,9 +16,9 @@ if (import.meta.vitest !== undefined) {
 
       const atMost5: MaxLengthArray<5, number> = input; // OK (3 <= 5)
 
-      assert.deepStrictEqual(rgb[0], 255);
+      assert.strictEqual(rgb[0], 255);
 
-      assert.deepStrictEqual(atMost5.length, 3);
+      assert.strictEqual(atMost5.length, 3);
     }
 
     // curried version

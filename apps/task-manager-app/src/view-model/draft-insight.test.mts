@@ -35,7 +35,7 @@ describe(taskDraftInsight, () => {
       },
     );
 
-    assert.deepStrictEqual(
+    assert.strictEqual(
       taskDraftInsight(
         state,
         a,

@@ -41,14 +41,14 @@ const trimBlankLines = (text: string): string =>
 const stripKeepingLines = (source: string): string => {
   const stripped = strip(source);
 
-  assert.deepStrictEqual(lineCount(stripped), lineCount(source));
+  assert.strictEqual(lineCount(stripped), lineCount(source));
 
   return trimBlankLines(stripped);
 };
 
 describe(stripDevOnlyCode, () => {
   test('removes an in-source test block and the imports only it used', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       stripKeepingLines(
         dedent`
           import { source } from './source.mjs';
@@ -83,7 +83,7 @@ describe(stripDevOnlyCode, () => {
   });
 
   test('removes expectType statements and the block they emptied', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       stripKeepingLines(
         dedent`
           import { expectType } from './expect-type.mjs';
@@ -105,7 +105,7 @@ describe(stripDevOnlyCode, () => {
   });
 
   test('removes expectType inside a function body and keeps the rest', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       stripKeepingLines(
         dedent`
           import { expectType } from 'ts-data-forge';
@@ -127,7 +127,7 @@ describe(stripDevOnlyCode, () => {
   });
 
   test('removes a loop and an if whose bodies became empty', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       stripKeepingLines(
         dedent`
           export const xs = [1, 2, 3];
@@ -154,11 +154,11 @@ describe(stripDevOnlyCode, () => {
       };
     `;
 
-    assert.deepStrictEqual(stripKeepingLines(source), source);
+    assert.strictEqual(stripKeepingLines(source), source);
   });
 
   test('empties the then-branch but keeps an if that has an else', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       stripKeepingLines(
         dedent`
           export const f = (c) => {
@@ -183,7 +183,7 @@ describe(stripDevOnlyCode, () => {
   });
 
   test('unwraps identity casts, keeping the parentheses only where needed', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       stripKeepingLines(
         dedent`
           import { castDeepMutable, castMutable, Result } from 'ts-data-forge';
@@ -215,7 +215,7 @@ describe(stripDevOnlyCode, () => {
     // what the output keeps. `ts-data-forge@14.6.3` shipped `Arr.scan` and
     // `Arr.fill` calling `newArray`, `asPositiveUint32` and `copy` with the
     // imports for them deleted.
-    assert.deepStrictEqual(
+    assert.strictEqual(
       stripKeepingLines(
         dedent`
           import { asPositiveUint32, castMutable, newArray } from 'x';
@@ -240,7 +240,7 @@ describe(stripDevOnlyCode, () => {
       export const d = (xs) => xs.map(castMutable);
     `;
 
-    assert.deepStrictEqual(stripKeepingLines(source), source);
+    assert.strictEqual(stripKeepingLines(source), source);
   });
 
   test("keeps the cast's own import when another use of it survives", () => {
@@ -250,7 +250,7 @@ describe(stripDevOnlyCode, () => {
     // stay imported. What removes it in the ordinary case is the one general
     // rule — an import binding nothing in the output refers to any more goes
     // — which is also what removes `expectType`'s import above.
-    assert.deepStrictEqual(
+    assert.strictEqual(
       stripKeepingLines(
         dedent`
           import { castMutable, newArray } from 'x';
@@ -267,7 +267,7 @@ describe(stripDevOnlyCode, () => {
   });
 
   test('prunes a middle and a last import specifier', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       stripKeepingLines(
         dedent`
           import { a, expectType, b } from 'x';
@@ -286,7 +286,7 @@ describe(stripDevOnlyCode, () => {
   });
 
   test('prunes a specifier from a multi-line import list', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       stripKeepingLines(
         dedent`
           import {
@@ -315,11 +315,11 @@ describe(stripDevOnlyCode, () => {
       export const o = { a };
     `;
 
-    assert.deepStrictEqual(stripKeepingLines(source), source);
+    assert.strictEqual(stripKeepingLines(source), source);
   });
 
   test('keeps the file header when the first statement is removed', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       stripKeepingLines(
         dedent`
           // cspell:ignore foo
@@ -340,11 +340,11 @@ describe(stripDevOnlyCode, () => {
       export const x = 1;
     `;
 
-    assert.deepStrictEqual(strip(source), source);
+    assert.strictEqual(strip(source), source);
   });
 
   test('keeps every line break, so the source map stays valid by line', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       strip(
         dedent`
           import { expectType } from 'x';
@@ -368,7 +368,7 @@ describe(stripDevOnlyCode, () => {
 
     assert.isTrue(Result.isErr(result));
 
-    assert.deepStrictEqual(
+    assert.strictEqual(
       result.value,
       'file.mjs:1:24: a call to `expectType` is not a statement on its own and cannot be removed',
     );
@@ -385,7 +385,7 @@ describe(stripDevOnlyCode, () => {
 
     assert.isTrue(Result.isErr(result));
 
-    assert.deepStrictEqual(
+    assert.strictEqual(
       result.value,
       'file.mjs:1:23: `import.meta.vitest` is used outside an `if (import.meta.vitest !== undefined) { ... }` guard',
     );
@@ -404,7 +404,7 @@ describe(stripDevOnlyCode, () => {
 
     assert.isTrue(Result.isOk(result));
 
-    assert.deepStrictEqual(
+    assert.strictEqual(
       trimBlankLines(result.value),
       dedent`
         export const y = 1;
@@ -413,7 +413,7 @@ describe(stripDevOnlyCode, () => {
   });
 
   test('keeps positions right in text with astral characters', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       stripKeepingLines(
         dedent`
           import { expectType } from 'x';
@@ -437,13 +437,13 @@ describe('removeComments', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    assert.deepStrictEqual(lineCount(result.value), lineCount(source));
+    assert.strictEqual(lineCount(result.value), lineCount(source));
 
     return result.value;
   };
 
   test('removes JSDoc, block and trailing comments', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       stripComments(
         dedent`
           /**
@@ -477,7 +477,7 @@ describe('removeComments', () => {
       '//# sourceMappingURL=file.mjs.map',
     ].join('\n');
 
-    assert.deepStrictEqual(
+    assert.strictEqual(
       stripComments(source),
       [
         '#!/usr/bin/env node',
@@ -494,7 +494,7 @@ describe('removeComments', () => {
       export const re = /\/[a-z]+/u;
     `;
 
-    assert.deepStrictEqual(stripComments(source), source);
+    assert.strictEqual(stripComments(source), source);
   });
 
   test('leaves the comments alone when the option is not set', () => {
@@ -503,7 +503,7 @@ describe('removeComments', () => {
       export const a = 1;
     `;
 
-    assert.deepStrictEqual(strip(source), source);
+    assert.strictEqual(strip(source), source);
   });
 });
 
@@ -552,12 +552,12 @@ describe(stripDevOnlyCodeInDir, () => {
 
       assert.deepStrictEqual(result.value, { changedFiles: 1 });
 
-      assert.deepStrictEqual(
+      assert.strictEqual(
         await readTestFile(path.join(testDir, 'a.mjs')),
         '\n\n',
       );
 
-      assert.deepStrictEqual(
+      assert.strictEqual(
         await readTestFile(path.join(testDir, 'nested', 'b.mjs')),
         'export const b = 1;\n',
       );
@@ -575,7 +575,7 @@ describe(stripDevOnlyCodeInDir, () => {
 
       assert.isTrue(Result.isErr(result));
 
-      assert.deepStrictEqual(
+      assert.strictEqual(
         result.value,
         'nested/bad.mjs:1:24: a call to `expectType` is not a statement on its own and cannot be removed',
       );

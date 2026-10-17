@@ -7,12 +7,15 @@ import { preferAssertIsFalseOverExpectFalseRule } from './prefer-assert-is-false
 import { preferAssertIsTrueOverNegatedAssertIsFalseRule } from './prefer-assert-is-true-over-assert-negated-is-false.mjs';
 import { preferAssertIsTrueOverAssertRule } from './prefer-assert-is-true-over-assert.mjs';
 import { preferAssertIsTrueOverExpectTrueRule } from './prefer-assert-is-true-over-expect-true.mjs';
+import { preferAssertStrictEqualForPrimitivesRule } from './prefer-assert-strict-equal-for-primitives.mjs';
 
 export const vitestCodingStyleRules = {
   'no-expect-to-strict-equal': noExpectToStrictEqualRule,
 
   'prefer-assert-deep-strict-equal-over-deep-equal':
     preferAssertDeepStrictEqualOverDeepEqualRule,
+  'prefer-assert-strict-equal-for-primitives':
+    preferAssertStrictEqualForPrimitivesRule,
 
   'prefer-assert-is-true-over-assert': preferAssertIsTrueOverAssertRule,
   'prefer-assert-is-false-over-assert-not-ok':

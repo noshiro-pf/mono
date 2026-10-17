@@ -24,7 +24,7 @@ if (import.meta.vitest !== undefined) {
       enableNoUncheckedIndexedAccessTransformer(),
     ]);
 
-    assert.deepStrictEqual(
+    assert.strictEqual(
       after.trim(),
       dedent`
         declare const xs: readonly number[];

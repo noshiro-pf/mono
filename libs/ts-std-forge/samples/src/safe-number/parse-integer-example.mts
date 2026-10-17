@@ -8,7 +8,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(Result.isOk(okResult));
 
-    assert.deepStrictEqual(okResult.value, -12);
+    assert.strictEqual(okResult.value, -12);
 
     const errResult = SafeNumber.parseInteger('123abc');
 

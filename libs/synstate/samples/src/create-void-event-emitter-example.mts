@@ -14,13 +14,13 @@ if (import.meta.vitest !== undefined) {
 
     emitClick(); // logs: Clicked!
 
-    assert.deepStrictEqual(mut_clickCount.value, 1);
+    assert.strictEqual(mut_clickCount.value, 1);
 
     emitClick();
 
     emitClick();
 
-    assert.deepStrictEqual(mut_clickCount.value, 3);
+    assert.strictEqual(mut_clickCount.value, 3);
 
     // embed-sample-code-ignore-below
   });

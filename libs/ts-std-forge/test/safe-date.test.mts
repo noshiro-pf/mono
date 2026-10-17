@@ -6,7 +6,7 @@ describe('SafeDate.toISOString', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    assert.deepStrictEqual(result.value, '1970-01-01T00:00:00.000Z');
+    assert.strictEqual(result.value, '1970-01-01T00:00:00.000Z');
   });
 
   test('returns a tagged Err for an invalid date', () => {

@@ -33,7 +33,7 @@ const toIntegerOrInfinity = (value: number): number =>
  *
  * assert.isTrue(Result.isOk(okResult));
  *
- * assert.deepStrictEqual(okResult.value, 'ababab');
+ * assert.strictEqual(okResult.value, 'ababab');
  *
  * const errResult = SafeString.repeat('ab', -1);
  *

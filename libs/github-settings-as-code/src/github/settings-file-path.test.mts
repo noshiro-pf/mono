@@ -13,47 +13,44 @@ const outcomeOf = (name: string): string => {
 
 describe(settingsFilePath, () => {
   test('names a file directly under the directory it was given', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       settingsFilePath(dir, 'release'),
       path.join(dir, 'release.json'),
     );
   });
 
   test('keeps the characters a name is allowed to carry', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       settingsFilePath(dir, 'main-no-bypass'),
       path.join(dir, 'main-no-bypass.json'),
     );
 
-    assert.deepStrictEqual(
+    assert.strictEqual(
       settingsFilePath(dir, 'Production (US East)'),
       path.join(dir, 'Production (US East).json'),
     );
   });
 
   test('rejects a name that would resolve above the directory', () => {
-    assert.deepStrictEqual(outcomeOf('../release'), 'rejected');
+    assert.strictEqual(outcomeOf('../release'), 'rejected');
 
-    assert.deepStrictEqual(outcomeOf('../../../../tmp/elsewhere'), 'rejected');
+    assert.strictEqual(outcomeOf('../../../../tmp/elsewhere'), 'rejected');
   });
 
   test('rejects a name carrying a separator, rather than nesting it', () => {
-    assert.deepStrictEqual(outcomeOf('production/us-east'), 'rejected');
+    assert.strictEqual(outcomeOf('production/us-east'), 'rejected');
 
-    assert.deepStrictEqual(
-      outcomeOf(String.raw`production\us-east`),
-      'rejected',
-    );
+    assert.strictEqual(outcomeOf(String.raw`production\us-east`), 'rejected');
   });
 
   test('rejects the names that are not file names at all', () => {
-    assert.deepStrictEqual(outcomeOf(''), 'rejected');
+    assert.strictEqual(outcomeOf(''), 'rejected');
 
-    assert.deepStrictEqual(outcomeOf('.'), 'rejected');
+    assert.strictEqual(outcomeOf('.'), 'rejected');
 
-    assert.deepStrictEqual(outcomeOf('..'), 'rejected');
+    assert.strictEqual(outcomeOf('..'), 'rejected');
 
-    assert.deepStrictEqual(outcomeOf('release\u{0}'), 'rejected');
+    assert.strictEqual(outcomeOf('release\u{0}'), 'rejected');
   });
 
   test('says which name it refused', () => {

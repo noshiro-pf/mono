@@ -55,7 +55,7 @@ describe('the repository-variables schema', () => {
 
 describe(assertVariableNamesAreValid, () => {
   test('accepts the names GitHub accepts', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       outcomeOf({
         REPO_AUTOMATION_BOT_CLIENT_ID: 'x',
         lowercase_is_allowed: 'x',
@@ -67,25 +67,25 @@ describe(assertVariableNamesAreValid, () => {
   });
 
   test('rejects a name starting with a digit', () => {
-    assert.deepStrictEqual(outcomeOf({ '1ST_PLACE': 'x' }), 'rejected');
+    assert.strictEqual(outcomeOf({ '1ST_PLACE': 'x' }), 'rejected');
   });
 
   test('rejects a name carrying a character GitHub does not allow', () => {
-    assert.deepStrictEqual(outcomeOf({ 'WITH-HYPHEN': 'x' }), 'rejected');
+    assert.strictEqual(outcomeOf({ 'WITH-HYPHEN': 'x' }), 'rejected');
 
-    assert.deepStrictEqual(outcomeOf({ 'WITH SPACE': 'x' }), 'rejected');
+    assert.strictEqual(outcomeOf({ 'WITH SPACE': 'x' }), 'rejected');
 
-    assert.deepStrictEqual(outcomeOf({ 'WITH.DOT': 'x' }), 'rejected');
+    assert.strictEqual(outcomeOf({ 'WITH.DOT': 'x' }), 'rejected');
   });
 
   test('rejects the reserved GITHUB_ prefix, in any case', () => {
-    assert.deepStrictEqual(outcomeOf({ GITHUB_TOKEN: 'x' }), 'rejected');
+    assert.strictEqual(outcomeOf({ GITHUB_TOKEN: 'x' }), 'rejected');
 
-    assert.deepStrictEqual(outcomeOf({ github_token: 'x' }), 'rejected');
+    assert.strictEqual(outcomeOf({ github_token: 'x' }), 'rejected');
   });
 
   test('rejects an empty name', () => {
-    assert.deepStrictEqual(outcomeOf({ '': 'x' }), 'rejected');
+    assert.strictEqual(outcomeOf({ '': 'x' }), 'rejected');
   });
 
   test('names every offender, so one run fixes the file', () => {

@@ -16,9 +16,9 @@ if (import.meta.vitest !== undefined) {
 
       const nonEmpty: MinLengthArray<1, number> = input; // OK (3 >= 1)
 
-      assert.deepStrictEqual(history[0], 0);
+      assert.strictEqual(history[0], 0);
 
-      assert.deepStrictEqual(nonEmpty[0], 0);
+      assert.strictEqual(nonEmpty[0], 0);
     }
 
     // curried version

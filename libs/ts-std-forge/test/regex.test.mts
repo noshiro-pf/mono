@@ -16,13 +16,13 @@ describe('Regex.create', () => {
 
     assert.isTrue(Result.isErr(result));
 
-    assert.deepStrictEqual(result.value.kind, 'invalid-regexp');
+    assert.strictEqual(result.value.kind, 'invalid-regexp');
 
     // Pattern validity is the engine's own grammar check, so it is not
     // pre-validated. Classification is conservative: only a caught
     // SyntaxError (the spec-mandated type for parse failures) is labeled
     // 'invalid-regexp'; any other throw would fall back to 'unexpected'.
-    assert.deepStrictEqual(result.value.cause.name, 'SyntaxError');
+    assert.strictEqual(result.value.cause.name, 'SyntaxError');
   });
 
   test('returns a tagged Err for invalid flags', () => {
@@ -30,6 +30,6 @@ describe('Regex.create', () => {
 
     assert.isTrue(Result.isErr(result));
 
-    assert.deepStrictEqual(result.value.kind, 'invalid-regexp');
+    assert.strictEqual(result.value.kind, 'invalid-regexp');
   });
 });

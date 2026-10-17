@@ -24,7 +24,7 @@ import { Result } from '../../functional/index.mjs';
  *
  * assert.isTrue(Result.isErr(errResult));
  *
- * assert.deepStrictEqual(errResult.value.kind, 'invalid-regexp');
+ * assert.strictEqual(errResult.value.kind, 'invalid-regexp');
  * ```
  *
  * @param pattern The regular expression pattern.

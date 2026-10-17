@@ -26,7 +26,7 @@ describe(createIssuesViewStore, () => {
 
     assert.strictEqual(store.view.getSnapshot().value, 'list');
 
-    assert.deepStrictEqual(saved.at(-1), 'list');
+    assert.strictEqual(saved.at(-1), 'list');
   });
 
   test('a choice made before the saved value is read is kept, and saved', async () => {
@@ -42,7 +42,7 @@ describe(createIssuesViewStore, () => {
 
     assert.strictEqual(store.view.getSnapshot().value, 'dag');
 
-    assert.deepStrictEqual(saved.at(-1), 'dag');
+    assert.strictEqual(saved.at(-1), 'dag');
   });
 
   test('anything saved but a view it knows leaves the list', async () => {
@@ -70,7 +70,7 @@ describe(createIssuesViewStore, () => {
 
     store.choose('dag');
 
-    assert.deepStrictEqual(saved.at(-1), 'dag');
+    assert.strictEqual(saved.at(-1), 'dag');
   });
 
   test('builds the graph from the issues, and passes it on only when it changed', () => {
@@ -179,7 +179,7 @@ describe(createIssuesViewStore, () => {
 
     assert.isFalse(store.hideDone.getSnapshot().value);
 
-    assert.deepStrictEqual(savedHideDone.at(-1), false);
+    assert.strictEqual(savedHideDone.at(-1), false);
   });
 
   test('a toggle made before the saved choice is read is kept, and saved', async () => {
@@ -195,7 +195,7 @@ describe(createIssuesViewStore, () => {
 
     assert.isTrue(store.hideDone.getSnapshot().value);
 
-    assert.deepStrictEqual(savedHideDone.at(-1), true);
+    assert.strictEqual(savedHideDone.at(-1), true);
   });
 
   test('anything saved but true, or nothing readable, shows what is done', async () => {

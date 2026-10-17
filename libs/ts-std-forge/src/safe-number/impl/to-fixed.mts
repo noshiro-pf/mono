@@ -15,7 +15,7 @@ import type { UintRangeInclusive } from 'ts-type-forge';
  * @example
  *
  * ```ts
- * assert.deepStrictEqual(SafeNumber.toFixed(1.005, 2), '1.00');
+ * assert.strictEqual(SafeNumber.toFixed(1.005, 2), '1.00');
  * ```
  *
  * @param value The number to format.

@@ -16,9 +16,9 @@ if (import.meta.vitest !== undefined) {
 
       const relaxed: MaxLengthArray<16, string> = input; // OK (8 <= 16)
 
-      assert.deepStrictEqual(tags.length, 3);
+      assert.strictEqual(tags.length, 3);
 
-      assert.deepStrictEqual(relaxed.length, 3);
+      assert.strictEqual(relaxed.length, 3);
     }
 
     // curried version

@@ -166,10 +166,7 @@ describe('engines', () => {
     // A failed JS-plugin load or a missing tsgolint prints to stderr and
     // yields no diagnostics at all — which would make every invalid fixture
     // fail confusingly, so it is asserted first.
-    assert.deepStrictEqual(
-      run.stderr.replaceAll(/^warning:.*$/gmu, '').trim(),
-      '',
-    );
+    assert.strictEqual(run.stderr.replaceAll(/^warning:.*$/gmu, '').trim(), '');
   });
 
   test('the compiler reported nothing outside the fixtures', () => {

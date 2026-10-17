@@ -14,12 +14,9 @@
  * @example
  *
  * ```ts
- * assert.deepStrictEqual(
- *   SafeString.fromPrimitive(Symbol('tag')),
- *   'Symbol(tag)',
- * );
+ * assert.strictEqual(SafeString.fromPrimitive(Symbol('tag')), 'Symbol(tag)');
  *
- * assert.deepStrictEqual(SafeString.fromPrimitive(10n), '10');
+ * assert.strictEqual(SafeString.fromPrimitive(10n), '10');
  * ```
  *
  * @param value The primitive to stringify.

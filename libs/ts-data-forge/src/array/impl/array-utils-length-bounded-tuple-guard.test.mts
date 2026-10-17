@@ -381,7 +381,7 @@ describe('Arr structural tuple length guards', () => {
       // The structural prefix makes the first element defined.
       const first: number = values[0];
 
-      assert.deepStrictEqual(first, 1);
+      assert.strictEqual(first, 1);
     });
 
     test('rejects an empty array', () => {

@@ -20,7 +20,7 @@ describe(createHeaderStore, () => {
 
     assert.isFalse(store.folded.getSnapshot().value);
 
-    assert.deepStrictEqual(saved.at(-1), false);
+    assert.strictEqual(saved.at(-1), false);
   });
 
   test('a toggle made before the saved value is read is kept, and saved', async () => {
@@ -36,7 +36,7 @@ describe(createHeaderStore, () => {
 
     assert.isTrue(store.folded.getSnapshot().value);
 
-    assert.deepStrictEqual(saved.at(-1), true);
+    assert.strictEqual(saved.at(-1), true);
   });
 
   test('anything saved but a boolean leaves it unfolded', async () => {
@@ -64,7 +64,7 @@ describe(createHeaderStore, () => {
 
     store.toggle();
 
-    assert.deepStrictEqual(saved.at(-1), true);
+    assert.strictEqual(saved.at(-1), true);
   });
 
   test('stopped before the read answers, it neither applies nor saves', async () => {

@@ -25,7 +25,7 @@ import { Result } from '../../functional/index.mjs';
  *
  * assert.isTrue(Result.isOk(okResult));
  *
- * assert.deepStrictEqual(okResult.value, 16);
+ * assert.strictEqual(okResult.value, 16);
  *
  * const errResult = SafeNumber.parse('12px');
  *
