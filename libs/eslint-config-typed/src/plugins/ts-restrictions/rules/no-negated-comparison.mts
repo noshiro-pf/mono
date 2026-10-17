@@ -4,15 +4,15 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
+import { skipTypeWrappers } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
-import type * as ts from 'typescript';
 import {
   type ComparisonExpression,
   invertedComparisonText,
   isComparison,
   isExactlyInvertible,
 } from './comparison-utils.mjs';
+import { createGetLayerTypes } from './type-layer-utils.mjs';
 
 type Options = readonly [];
 
@@ -29,9 +29,11 @@ type MessageIds =
  * with `NaN` is `false` — `!(x >= 0)` holds for `NaN` and `x < 0` does not —
  * and a check written that way may be relying on it.
  *
- * The comparison is found, and its operands' types are read, through any
- * `as`, `satisfies` or `!`: `!((a === b) satisfies boolean)` is `a !== b`, and
- * a `number` cast to a brand that excludes `NaN` may still be one.
+ * The comparison is found through any `as`, `satisfies` or `!`:
+ * `!((a === b) satisfies boolean)` is `a !== b`. An operand's type has to
+ * exclude `NaN` at every wrapper layer: a `number` cast to a brand that
+ * excludes it may still be one, and a cast widening such a brand to `number`
+ * is the author saying it may be.
  *
  * `!!(a === b)` is a conversion to boolean, not a negation, and is left alone.
  * A comment the fix would drop leaves the report without a fix.
@@ -62,12 +64,7 @@ export const noNegatedComparison: TSESLint.RuleModule<MessageIds, Options> = {
 
     const checker = services.program.getTypeChecker();
 
-    const getType = (node: DeepReadonly<TSESTree.Node>): ts.Type =>
-      checker.getTypeAtLocation(
-        services.esTreeNodeToTSNodeMap.get(
-          asNode(isTypeWrapper(node) ? skipTypeWrappers(node) : node),
-        ),
-      );
+    const getLayerTypes = createGetLayerTypes(services);
 
     /** A comment between the `!` and the comparison, which the fix drops. */
     const hasCommentOutside = (
@@ -124,7 +121,7 @@ export const noNegatedComparison: TSESLint.RuleModule<MessageIds, Options> = {
         : (fixer: TSESLint.RuleFixer): TSESLint.RuleFix =>
             fixer.replaceText(asNode(node), replacement);
 
-      if (isExactlyInvertible(comparison, getType, checker)) {
+      if (isExactlyInvertible(comparison, getLayerTypes, checker)) {
         context.report({
           node: asNode(node),
           messageId: 'negatedComparison',

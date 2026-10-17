@@ -297,6 +297,16 @@ describe('prefer-optional-chain-over-ternary through type wrappers', () => {
                 : x?.b;
           `,
         },
+        {
+          name: 'a cast widening the checked value to include `null` is the author saying it may be `null`',
+          code: dedent`
+            declare const x: Readonly<{ b: number }> | undefined;
+            const y =
+              (x as Readonly<{ b: number }> | null | undefined) === undefined
+                ? undefined
+                : x?.b;
+          `,
+        },
       ],
       invalid: [
         {
@@ -334,6 +344,25 @@ describe('prefer-optional-chain-over-ternary through type wrappers', () => {
           `,
           errors: [
             { messageId: 'preferOptionalChain' },
+            { messageId: 'preferOptionalChain' },
+            { messageId: 'preferOptionalChain' },
+          ],
+        },
+        {
+          name: 'a strict check whose other nullish value no layer holds',
+          code: dedent`
+            type B = Readonly<{ b: number }>;
+            declare const x: B | undefined;
+            const y = (x as B | undefined) === undefined ? undefined : x.b;
+            const z = (x satisfies B | undefined) !== undefined ? x.b : undefined;
+          `,
+          output: dedent`
+            type B = Readonly<{ b: number }>;
+            declare const x: B | undefined;
+            const y = x?.b;
+            const z = x?.b;
+          `,
+          errors: [
             { messageId: 'preferOptionalChain' },
             { messageId: 'preferOptionalChain' },
           ],

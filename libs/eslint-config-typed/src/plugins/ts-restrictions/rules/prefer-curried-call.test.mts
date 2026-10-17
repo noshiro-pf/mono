@@ -247,6 +247,21 @@ describe('prefer-curried-call through type wrappers', () => {
           [1, 2].map((a) => g(a, h() as number));
         `,
       },
+      {
+        name: 'a cast widening a unary callee is the author saying it may read more arguments',
+        code: dedent`
+          declare const u: (a: string) => number;
+          ['1', '2'].map((a) => (u as (a: string, radix?: number) => number)(a));
+        `,
+      },
+      {
+        name: 'a cast widening a curried callee to one without a curried signature',
+        code: dedent`
+          ${bothDecl}
+          declare const g: Both;
+          [1, 2].map((a) => (g as (a: number, b: number) => number)(a, 1));
+        `,
+      },
     ],
     invalid: [
       {
@@ -287,6 +302,27 @@ describe('prefer-curried-call through type wrappers', () => {
           declare const u: (a: number) => number;
           [1, 2].map((g satisfies Both)(1));
           [1, 2].map(u satisfies (a: number) => number);
+        `,
+        errors: [
+          { messageId: 'useCurriedForm' },
+          { messageId: 'useFunctionDirectly' },
+        ],
+      },
+      {
+        name: 'a callee that is curried or unary at every layer',
+        code: dedent`
+          ${bothDecl}
+          declare const g: Both;
+          declare const u: (a: number) => number;
+          [1, 2].map((a) => (g as Both)(a, 1));
+          [1, 2].map((a) => (u as (a: number) => number)(a));
+        `,
+        output: dedent`
+          ${bothDecl}
+          declare const g: Both;
+          declare const u: (a: number) => number;
+          [1, 2].map((g as Both)(1));
+          [1, 2].map(u as (a: number) => number);
         `,
         errors: [
           { messageId: 'useCurriedForm' },

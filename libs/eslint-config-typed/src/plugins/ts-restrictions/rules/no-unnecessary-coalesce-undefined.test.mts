@@ -184,6 +184,13 @@ describe('no-unnecessary-coalesce-undefined through type wrappers', () => {
             const f = (undefined: number) => x ?? (undefined as unknown as undefined);
           `,
         },
+        {
+          name: 'a cast widening the left-hand side to include `null` is the author saying it may be `null`',
+          code: dedent`
+            declare const x: string | undefined;
+            const y = (x as string | null | undefined) ?? undefined;
+          `,
+        },
       ],
       invalid: [
         {

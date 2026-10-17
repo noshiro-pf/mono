@@ -8,6 +8,7 @@ import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
+import { createGetLayerTypes } from './type-layer-utils.mjs';
 
 type Options = readonly [];
 
@@ -42,8 +43,10 @@ type MessageIds =
  * `declare global`) cannot be judged, so it is reported with a suggestion
  * rather than fixed.
  *
- * The callee is judged through type wrappers, by the type of its value (a cast
- * cannot lend it a curried signature), and the fix keeps the wrappers,
+ * The callee is found through type wrappers and judged by its type at every
+ * layer: a cast cannot lend it a curried signature, and one widening it to a
+ * type that takes more arguments is the author saying it may read them. The
+ * fix keeps the wrappers,
  * parenthesizing a callee that needs it: `(c ? g : h)(a, 1)` → `(c ? g : h)(1)`.
  */
 export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
@@ -75,11 +78,7 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
 
     const checker = services.program.getTypeChecker();
 
-    const getType = (
-      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      node: TSESTree.Node,
-    ): ts.Type =>
-      checker.getTypeAtLocation(services.esTreeNodeToTSNodeMap.get(node));
+    const getLayerTypes = createGetLayerTypes(services);
 
     /**
      * `true` when `node` refers to a module/namespace object (e.g. a namespace
@@ -238,16 +237,21 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
           return;
         }
 
-        // The value's own type: `(f as unknown as Curried)` is still `f`.
         const callee = asNode(skipTypeWrappers(call.callee));
 
-        const calleeType = getType(callee);
+        // The callee's type at every type-wrapper layer:
+        // `(f as unknown as Curried)` is still `f`, and a cast to a type that
+        // takes more arguments is the author saying `f` may read them.
+        const calleeTypes = getLayerTypes(call.callee);
 
         const calleeText = sourceCode.getText(call.callee);
 
         if (Arr.isEmpty(restArgs)) {
           // `(a) => f(a)` → `f`
-          if (!isEtaSafeCallee(callee) || !isEffectivelyUnary(calleeType)) {
+          if (
+            !isEtaSafeCallee(callee) ||
+            !calleeTypes.every(isEffectivelyUnary)
+          ) {
             return;
           }
 
@@ -301,7 +305,9 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
         // remaining arguments to be free of observable side effects.
         if (
           !restArgs.every(isPureExpression) ||
-          !hasCurriedSignature(calleeType, restArgs.length)
+          calleeTypes.some(
+            (calleeType) => !hasCurriedSignature(calleeType, restArgs.length),
+          )
         ) {
           return;
         }

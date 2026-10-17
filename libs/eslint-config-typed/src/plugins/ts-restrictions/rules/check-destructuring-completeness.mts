@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { skipTypeWrappers } from 'eslint-rule-forge';
+import { skipTypeWrappers, typeWrapperLayers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import type * as ts from 'typescript';
@@ -176,22 +176,30 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
         return;
       }
 
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      const tsNode = esTreeNodeToTSNodeMap.get(tsSourceNode as never);
-
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (tsNode === undefined) {
-        return;
-      }
-
       // Destructuring `null` / `undefined` throws, so only the non-nullable
       // part of the type can be destructured: `props!` with a nullable
       // `props` reads the properties of the rest.
-      const type = typeChecker.getNonNullableType(
-        typeChecker.getTypeAtLocation(tsNode),
-      );
+      const layerProps = typeWrapperLayers(tsSourceNode).map((layer) => {
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        const tsNode = esTreeNodeToTSNodeMap.get(layer as never);
 
-      const objectProps = getObjectTypeProperties(type);
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        return tsNode === undefined
+          ? []
+          : getObjectTypeProperties(
+              typeChecker.getNonNullableType(
+                typeChecker.getTypeAtLocation(tsNode),
+              ),
+            );
+      });
+
+      // A property is missing only when the type has it at every type-wrapper
+      // layer: a cast does not add one the value lacks, and a cast widening
+      // the value (`props as Pick<Props, 'a'>`) is the author saying the rest
+      // are not there.
+      const objectProps = (layerProps[0] ?? []).filter((prop) =>
+        layerProps.every((props) => props.includes(prop)),
+      );
 
       const collected = collectDestructuredPropNames(objectPattern.properties);
 
@@ -235,9 +243,7 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
           return;
         }
 
-        // The value's own type: a cast to a narrower type does not make the
-        // properties it leaves out go away.
-        checkObjectPatternCompleteness(node.id, skipTypeWrappers(node.init));
+        checkObjectPatternCompleteness(node.id, node.init);
       },
       ArrowFunctionExpression: (node) => {
         if (!alwaysCheckReactComponentProps) {

@@ -505,6 +505,21 @@ describe('prefer-nullish-coalescing-when-safe through type wrappers', () => {
             (s as 'a' | undefined) ||= 'b';
           `,
         },
+        {
+          name: 'a cast widening the left side to `string` is the author saying it may be `""`',
+          code: dedent`
+            declare const a: 'a' | undefined;
+            const r = (a as string | undefined) || 'x';
+          `,
+        },
+        {
+          name: 'a fallback whose type only matches before a widening cast',
+          code: dedent`
+            declare const s: string | undefined;
+            declare const e: '';
+            const r = s || (e as string);
+          `,
+        },
       ],
       invalid: [
         {
@@ -551,6 +566,42 @@ describe('prefer-nullish-coalescing-when-safe through type wrappers', () => {
             s! ??= '';
           `,
           errors: [{ messageId: 'preferNullishCoalescingAssignment' }],
+        },
+        {
+          name: 'a left side whose falsy values are harmless at every layer',
+          code: dedent`
+            declare const a: 'a' | undefined;
+            const r = (a as 'a' | 'b' | undefined) || 'x';
+          `,
+          output: dedent`
+            declare const a: 'a' | undefined;
+            const r = (a as 'a' | 'b' | undefined) ?? 'x';
+          `,
+          errors: [{ messageId: 'preferNullishCoalescing' }],
+        },
+        {
+          name: 'a cast widening a never-nullish left side to a nullable one keeps the fallback',
+          code: dedent`
+            declare const a: 'a';
+            const r = (a as 'a' | undefined) || 'x';
+          `,
+          output: dedent`
+            declare const a: 'a';
+            const r = (a as 'a' | undefined) ?? 'x';
+          `,
+          errors: [{ messageId: 'preferNullishCoalescing' }],
+        },
+        {
+          name: 'a literal fallback is its value whatever it is cast to',
+          code: dedent`
+            declare const s: string | undefined;
+            const r = s || ('' as string);
+          `,
+          output: dedent`
+            declare const s: string | undefined;
+            const r = s ?? ('' as string);
+          `,
+          errors: [{ messageId: 'preferNullishCoalescing' }],
         },
       ],
     },

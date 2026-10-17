@@ -9,6 +9,7 @@ import { skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
+import { createGetLayerTypes } from './type-layer-utils.mjs';
 
 type Options = readonly [];
 
@@ -124,16 +125,19 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
 
     const checker = parserServices.program.getTypeChecker();
 
-    /** Summarizes the possible falsy values of an expression's type. */
+    const getLayerTypes = createGetLayerTypes(parserServices);
+
+    /**
+     * Summarizes the possible falsy values of an expression's type at every
+     * type-wrapper layer together, as if they were one union: `m.get(k)!` may
+     * still be `undefined`, `(s as 'a') || 'x'` may still see `''`, and
+     * `(a as string) || 'x'` is the author saying an `'a'` may be `''`.
+     */
     const summarizeExpressionType = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       node: TSESTree.Expression,
     ): TypeSummary | 'unsafe' =>
-      summarizeType(
-        checker.getTypeAtLocation(
-          parserServices.esTreeNodeToTSNodeMap.get(node),
-        ),
-      );
+      combineUnionSummaries(getLayerTypes(node).map(summarizeType));
 
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     const summarizeType = (type: ts.Type): TypeSummary | 'unsafe' => {
@@ -311,17 +315,27 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
       wrappedRight: TSESTree.Expression,
       tag: FalsyValueTag,
     ): boolean => {
-      // `'' satisfies string` is the literal `''` all the same.
       const right = asNode(skipTypeWrappers(wrappedRight));
 
       if (!isSideEffectFreeSimpleExpression(right)) {
         return false;
       }
 
-      const rightType = checker.getTypeAtLocation(
-        parserServices.esTreeNodeToTSNodeMap.get(right),
-      );
+      // A literal is its value whatever it is cast to (`'' as string` is
+      // `''`); any other expression has to have the literal's type at every
+      // layer (`e as string` is the author saying `e` may be another string).
+      return (
+        right.type === AST_NODE_TYPES.Identifier
+          ? getLayerTypes(wrappedRight)
+          : getLayerTypes(right)
+      ).every((rightType) => isFalsyLiteralType(rightType, tag));
+    };
 
+    const isFalsyLiteralType = (
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      rightType: ts.Type,
+      tag: FalsyValueTag,
+    ): boolean => {
       if (rightType.isUnion()) {
         return false;
       }
@@ -379,11 +393,7 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
           return;
         }
 
-        // The value's own type: `m.get(k)!` may still be `undefined`, and
-        // `(s as 'a') || 'x'` may still see `''`.
-        const left = asNode(skipTypeWrappers(node.left));
-
-        const summary = summarizeExpressionType(left);
+        const summary = summarizeExpressionType(node.left);
 
         if (summary === 'unsafe') {
           return;
@@ -494,11 +504,7 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
           return;
         }
 
-        // The value's own type: `m.get(k)!` may still be `undefined`, and
-        // `(s as 'a') || 'x'` may still see `''`.
-        const left = asNode(skipTypeWrappers(node.left));
-
-        const summary = summarizeExpressionType(left);
+        const summary = summarizeExpressionType(node.left);
 
         if (summary === 'unsafe') {
           return;
@@ -521,7 +527,7 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
         // so only plain identifier targets are rewritten there.
         if (
           summary.falsyValues.size > 0 &&
-          left.type !== AST_NODE_TYPES.Identifier
+          skipTypeWrappers(node.left).type !== AST_NODE_TYPES.Identifier
         ) {
           return;
         }

@@ -170,6 +170,14 @@ describe('jsx-boolean-logical-operands through type wrappers', () => {
           const e = <input disabled={(a satisfies boolean) || b} />;
         `,
       },
+      {
+        name: 'operands that are booleans at every layer',
+        filename: 'file.tsx',
+        code: dedent`
+          declare const t: true, b: boolean;
+          const e = <input disabled={(t as boolean) || (b as boolean)} />;
+        `,
+      },
     ],
     invalid: [
       {
@@ -228,6 +236,24 @@ describe('jsx-boolean-logical-operands through type wrappers', () => {
         `,
         output: null,
         errors: [{ messageId: 'nonBooleanLeft' }],
+      },
+      {
+        name: 'a cast widening a boolean is the author saying it may be something else',
+        filename: 'file.tsx',
+        code: dedent`
+          declare const a: boolean, b: boolean;
+          const e = <div>{(a as boolean | number) && <span />}</div>;
+          const f = <input disabled={a && (b as boolean | number)} />;
+        `,
+        output: dedent`
+          declare const a: boolean, b: boolean;
+          const e = <div>{(a as boolean | number) && <span />}</div>;
+          const f = <input disabled={a ? (b as boolean | number) : false} />;
+        `,
+        errors: [
+          { messageId: 'nonBooleanLeft' },
+          { messageId: 'booleanOperands' },
+        ],
       },
     ],
   });

@@ -277,6 +277,30 @@ describe('prefer-logical-over-boolean-ternary through type wrappers', () => {
             const e = <input disabled={a ? false : (n as unknown as boolean)} />;
           `,
         },
+        {
+          name: 'a cast widening a boolean is the author saying it may be something else',
+          code: dedent`
+            declare const a: boolean, b: boolean;
+            const x = (a as boolean | number) ? true : b;
+            const y = (a as boolean | number) ? b : false;
+          `,
+        },
+        {
+          name: 'a cast widening a never-NaN brand to `number` keeps the comparison',
+          code: dedent`
+            type ValidNumber = number & Readonly<{ NaNValue: false }>;
+            declare const v: ValidNumber, b: boolean;
+            const x = (v as number) < 1 ? false : b;
+          `,
+        },
+        {
+          name: 'in JSX, a cast widening the other branch makes it not a boolean',
+          filename: 'file.tsx',
+          code: dedent`
+            declare const a: boolean, b: boolean;
+            const e = <input disabled={a ? false : (b as boolean | number)} />;
+          `,
+        },
       ],
       invalid: [
         {
@@ -332,6 +356,23 @@ describe('prefer-logical-over-boolean-ternary through type wrappers', () => {
             const x = !(a satisfies boolean) && b;
           `,
           errors: [{ messageId: 'preferLogical' }],
+        },
+        {
+          name: 'a test that is a boolean at every layer',
+          code: dedent`
+            declare const a: true, b: boolean;
+            const x = (a satisfies boolean) ? true : b;
+            const y = (a as boolean) ? b : false;
+          `,
+          output: dedent`
+            declare const a: true, b: boolean;
+            const x = a satisfies boolean || b;
+            const y = a as boolean && b;
+          `,
+          errors: [
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+          ],
         },
       ],
     },

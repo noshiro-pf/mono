@@ -10,6 +10,7 @@ import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { isSameReference } from './reference-utils.mjs';
+import { createGetLayerTypes } from './type-layer-utils.mjs';
 
 type Options = readonly [];
 
@@ -31,7 +32,8 @@ type MessageIds = 'preferOptionalChain';
  * `x === null || x === undefined`. A single strict check does when the type of
  * `x` rules the other value out: `x === undefined` for `B | undefined`, not
  * for `B | null | undefined`. `any`, `unknown` and an unconstrained type
- * parameter rule nothing out.
+ * parameter rule nothing out, and the type has to rule it out at every
+ * `as`, `satisfies` or `!` around `x`.
  *
  * The other branch must be `undefined` itself — `x == null ? null : x.b`
  * yields `null`, which `x?.b` would not — and the access must start from the
@@ -78,20 +80,21 @@ export const preferOptionalChainOverTernary: TSESLint.RuleModule<
     const strictNullChecks =
       compilerOptions.strictNullChecks ?? compilerOptions.strict ?? false;
 
-    /** Whether the type of `node` may hold a value with one of `flags`. */
+    const getLayerTypes = createGetLayerTypes(services);
+
+    /**
+     * Whether `node` may hold a value with one of `flags` at any of its
+     * type-wrapper layers: `(x as B | undefined)` does not make the `null` a
+     * `B | null | undefined` holds go away, and `(x as B | null | undefined)`
+     * is the author saying a `B | undefined` may be `null`.
+     */
     const mayHold = (
       node: DeepReadonly<TSESTree.Node>,
       // A union of `ts.TypeFlags` bits, which is a `number` rather than a member.
       flags: number,
     ): boolean =>
       !strictNullChecks ||
-      typeMayHold(
-        checker.getTypeAtLocation(
-          services.esTreeNodeToTSNodeMap.get(asNode(node)),
-        ),
-        flags,
-        checker,
-      );
+      getLayerTypes(node).some((type) => typeMayHold(type, flags, checker));
 
     /**
      * What `test` checks: the value, and whether the test is true exactly
@@ -127,11 +130,7 @@ export const preferOptionalChainOverTernary: TSESLint.RuleModule<
           ? ts.TypeFlags.Undefined | ts.TypeFlags.Void
           : ts.TypeFlags.Null;
 
-      // The value's own type: `(x as B | undefined) === undefined` does not
-      // make the `null` a `B | null | undefined` holds go away.
-      return mayHold(skipTypeWrappers(value), other)
-        ? undefined
-        : { value, nullishWhenTrue };
+      return mayHold(value, other) ? undefined : { value, nullishWhenTrue };
     };
 
     const replacementOf = (

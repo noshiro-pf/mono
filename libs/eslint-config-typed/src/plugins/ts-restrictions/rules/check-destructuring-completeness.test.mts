@@ -303,10 +303,30 @@ describe('check-destructuring-completeness through type wrappers', () => {
             };
           `,
         },
+        {
+          name: 'a cast widening the props is the author saying only those are there',
+          code: dedent`
+            type Props = { a: number; b: string; c: boolean };
+            const MyComponent = (props: Props) => {
+              const { a, b } = props as Pick<Props, 'a' | 'b'>;
+              return <div>{a}{b}</div>;
+            };
+          `,
+        },
+        {
+          name: 'a cast does not add properties the value does not have',
+          code: dedent`
+            type Props = { a: number; b: string; c: boolean };
+            const MyComponent = (props: Pick<Props, 'a' | 'b'>) => {
+              const { a, b } = props as unknown as Props;
+              return <div>{a}{b}</div>;
+            };
+          `,
+        },
       ],
       invalid: [
         {
-          name: 'props wrapped in `satisfies`, `!` or `as`',
+          name: 'props wrapped in `satisfies`, `!` or `as` with every layer holding the property',
           code: dedent`
             type Props = { a: number; b: string; c: boolean };
             const A = (props: Props) => {
@@ -318,7 +338,7 @@ describe('check-destructuring-completeness through type wrappers', () => {
               return <div>{a}{b}</div>;
             };
             const C = (props: Props) => {
-              const { a, b } = props as Pick<Props, 'a' | 'b'>;
+              const { a, b } = props as Props;
               return <div>{a}{b}</div>;
             };
           `,
