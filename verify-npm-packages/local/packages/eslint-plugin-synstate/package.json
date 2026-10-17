@@ -1,0 +1,11 @@
+{
+  "name": "verify-eslint-plugin-synstate",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "eslint": ">=9.0.0",
+    "eslint-plugin-synstate": "file:../../../.tarballs/eslint-plugin-synstate.tgz",
+    "typescript": ">=5.0.0 <7.0.0"
+  }
+}
