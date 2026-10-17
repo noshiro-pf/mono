@@ -3,6 +3,7 @@ import { createRootObservable } from '../base/index.mjs';
 import type {
   FromSubscribableObservable,
   Subscribable,
+  Subscription,
 } from '../types/index.mjs';
 
 /**
@@ -65,11 +66,25 @@ import type {
  */
 export const fromSubscribable = <A, E = unknown>(
   subscribable: Subscribable<A>,
-): FromSubscribableObservable<A, E> =>
-  createRootObservable<Result<A, E>>(
-    { initialValue: Optional.none },
-    ({ startUpdate, complete }) => {
-      subscribable.subscribe(
+): FromSubscribableObservable<A, E> => {
+  let mut_subscription: Subscription | undefined = undefined;
+
+  // Set once the subscribable has completed: its subscription is over, so
+  // completing this observable must not unsubscribe from it again.
+  let mut_isSourceCompleted = false;
+
+  const unsubscribe = (): void => {
+    if (!mut_isSourceCompleted) {
+      mut_subscription?.unsubscribe();
+    }
+
+    mut_subscription = undefined;
+  };
+
+  return createRootObservable<Result<A, E>>(
+    { initialValue: Optional.none, onComplete: unsubscribe },
+    ({ startUpdate, isCompleted, complete }) => {
+      const subscription = subscribable.subscribe(
         (nextValue) => {
           startUpdate(Result.ok(nextValue));
         },
@@ -82,10 +97,23 @@ export const fromSubscribable = <A, E = unknown>(
           );
         },
         () => {
+          mut_isSourceCompleted = true;
+
           complete();
         },
       );
 
+      // `subscribe` may have completed this observable before returning
+      // the subscription, so `unsubscribe` above had nothing to release.
+      if (isCompleted()) {
+        if (!mut_isSourceCompleted) {
+          subscription.unsubscribe();
+        }
+      } else {
+        mut_subscription = subscription;
+      }
+
       return {};
     },
   );
+};
