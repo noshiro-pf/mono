@@ -3,6 +3,7 @@ import { createSyncChildObservable } from '../base/index.mjs';
 import type {
   KeepInitialValueOperator,
   Observable,
+  Subscription,
   WithBufferedFromOperatorObservable,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
@@ -86,6 +87,8 @@ const createWithBufferedFromObservable = <A, B>(
     mut_bufferedValues = [];
   };
 
+  let mut_subscription: Subscription | undefined = undefined;
+
   const result = createSyncChildObservable<
     readonly [A, readonly B[]],
     readonly [A]
@@ -104,6 +107,11 @@ const createWithBufferedFromObservable = <A, B>(
               Optional.isNone(me) ? [] : [me.value],
             ] as const),
       ).value,
+      onComplete: () => {
+        mut_subscription?.unsubscribe();
+
+        clearBuffer();
+      },
     },
     ({ setNext }) =>
       (updateToken) => {
@@ -122,9 +130,13 @@ const createWithBufferedFromObservable = <A, B>(
       },
   );
 
-  observable.subscribe((value) => {
-    mut_bufferedValues = Arr.toPushed(mut_bufferedValues, value);
-  });
+  // A child completed at creation has already run `onComplete`; subscribing
+  // after it would leave a subscription nothing releases.
+  if (!result.isCompleted) {
+    mut_subscription = observable.subscribe((value) => {
+      mut_bufferedValues = Arr.toPushed(mut_bufferedValues, value);
+    });
+  }
 
   return result;
 };
