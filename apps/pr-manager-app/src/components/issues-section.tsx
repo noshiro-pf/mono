@@ -20,7 +20,9 @@ type Props = Readonly<{
 
 /**
  * What is open that is not a pull request, most recently updated first, or
- * by priority, and narrowed by priority and label (`issues-list-filters.tsx`).
+ * by priority, and narrowed by priority, label and a search of the titles
+ * (`issues-list-filters.tsx`). The DAG is not narrowed by any of them: what
+ * an issue waits for is drawn whole.
  *
  * Last, because it is the one section that is not about the queue: a reader
  * asks "what is in flight" first and "what is waiting to be started" second.
@@ -78,7 +80,9 @@ export const IssuesSection = memoNamed<Props>(
           <p className={'section-note'}>{'No open issues.'}</p>
         ) : Arr.isEmpty(shown) ? (
           <p className={'section-note'}>
-            {'No open issue has the priorities and labels picked.'}
+            {issuesListSignals.query.value.trim() === ''
+              ? 'No open issue has the priorities and labels picked.'
+              : 'No open issue with the priorities and labels picked has a title matching the search.'}
           </p>
         ) : (
           <ul className={'issue-list'}>

@@ -4,6 +4,7 @@ import {
   countIssues,
   DEFAULT_ISSUES_LIST_VIEW,
   isIssueShown,
+  matchesIssueTitle,
   parseIssuesListView,
   toggleIssuePriority,
   toggleLabel,
@@ -56,6 +57,37 @@ describe(isIssueShown, () => {
   });
 });
 
+describe(matchesIssueTitle, () => {
+  test('nothing typed, or only spaces, matches every issue', () => {
+    assert.isTrue(matchesIssueTitle(titled(1, 'Anything'), ''));
+
+    assert.isTrue(matchesIssueTitle(titled(1, 'Anything'), ' '.repeat(3)));
+  });
+
+  test('matches a part of the title, whatever its case', () => {
+    const each = titled(1, 'Show the DAG zoom in the toolbar');
+
+    assert.isTrue(matchesIssueTitle(each, 'dag'));
+
+    assert.isTrue(matchesIssueTitle(each, 'ZOOM IN'));
+
+    assert.isTrue(matchesIssueTitle(each, '  toolbar '));
+
+    assert.isFalse(matchesIssueTitle(each, 'zoom out'));
+  });
+
+  test('reads the title only, not the number or the labels', () => {
+    const each = {
+      ...titled(12, 'Fix the header'),
+      labels: [label('bug')],
+    } as const;
+
+    assert.isFalse(matchesIssueTitle(each, '12'));
+
+    assert.isFalse(matchesIssueTitle(each, 'bug'));
+  });
+});
+
 describe(arrangeIssues, () => {
   test('by default, the issues as they were read: most recently updated first', () => {
     assert.deepStrictEqual(
@@ -85,9 +117,56 @@ describe(arrangeIssues, () => {
 
     assert.deepStrictEqual(numbersOf(arrangeIssues(ISSUES, view)), [6, 2]);
   });
+
+  test('leaves out what the search does not match, with the view as well', () => {
+    const items = [
+      titled(1, 'Header search'),
+      { ...titled(2, 'Search issues'), labels: [label('priority:low')] },
+      titled(3, 'Zoom'),
+    ] as const;
+
+    assert.deepStrictEqual(
+      numbersOf(arrangeIssues(items, DEFAULT_ISSUES_LIST_VIEW, 'SEARCH')),
+      [1, 2],
+    );
+
+    assert.deepStrictEqual(
+      numbersOf(
+        arrangeIssues(
+          items,
+          toggleIssuePriority(DEFAULT_ISSUES_LIST_VIEW, 'low'),
+          'search',
+        ),
+      ),
+      [1],
+    );
+  });
 });
 
 describe(countIssues, () => {
+  test('a search narrows what each count shows, not its whole', () => {
+    const items = [
+      titled(1, 'Header search'),
+      { ...titled(2, 'Search issues'), labels: [label('bug')] },
+      { ...titled(3, 'Zoom'), labels: [label('bug')] },
+    ] as const;
+
+    const counts = countIssues(items, DEFAULT_ISSUES_LIST_VIEW, 'search');
+
+    assert.deepStrictEqual(counts.open, { shown: 2, total: 3 });
+
+    assert.deepStrictEqual(counts.priorities.none, { shown: 2, total: 3 });
+
+    assert.deepStrictEqual(counts.labels, [
+      {
+        name: 'bug',
+        color: 'd73a4a',
+        picked: false,
+        count: { shown: 1, total: 2 },
+      },
+    ]);
+  });
+
   test('with nothing hidden, every count is its whole', () => {
     const counts = countIssues(ISSUES, DEFAULT_ISSUES_LIST_VIEW);
 
@@ -245,6 +324,9 @@ const issue = (number: number, labelNames: readonly string[]): IssueItem =>
     comments: 0,
     startAfter: [],
   }) as const;
+
+const titled = (number: number, title: string): IssueItem =>
+  ({ ...issue(number, []), title }) as const;
 
 const label = (labelName: string): Label =>
   ({
