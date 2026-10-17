@@ -146,6 +146,52 @@ test(
 );
 
 test(
+  'writes a milestone’s date under its title, and in its tooltip when compact',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto(DEMO);
+
+    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+
+    await showDag(page);
+
+    const milestone = (title: string): Locator =>
+      page
+        .getByTestId('dag-node')
+        .and(page.getByRole('button', { name: `マイルストーン「${title}」` }));
+
+    const meta = async (title: string): Promise<string | undefined> =>
+      milestone(title).evaluate(
+        (node) => node.querySelector('.dag-node-meta')?.textContent,
+      );
+
+    // A date gate: its date under the title, as a task's due date is.
+    expect
+      .soft(await meta('コードフリーズ'))
+      .toMatch(/^日時 (?:\d\d\/\d\d \d\d:\d\d|\d{4}\/\d\d\/\d\d)$/u);
+
+    await expect
+      .soft(milestone('コードフリーズ'))
+      .toHaveAccessibleName(/ 日時: \d{4}\/\d\d\/\d\d \d\d:\d\d/u);
+
+    // No date: the title alone.
+    expect.soft(await meta('リリース承認')).toBeUndefined();
+
+    await chooseNodeSize(page, 'compact');
+
+    expect.soft(await meta('コードフリーズ')).toBeUndefined();
+
+    expect
+      .soft(
+        await milestone('コードフリーズ').evaluate(
+          (node) => node.querySelector(':scope > title')?.textContent,
+        ),
+      )
+      .toMatch(/^コードフリーズ\n日時 /u);
+  },
+);
+
+test(
   'saves a dependency typed into a row, without 「依存を追加」',
   { tag: '@smoke' },
   async ({ page }) => {
@@ -2013,8 +2059,8 @@ test(
 
     await showDag(page);
 
-    // Standard: tasks 56 high, milestones 44.
-    expect.soft(await nodeHeights(page)).toStrictEqual([44, 56]);
+    // Standard: tasks and milestones alike 56 high.
+    expect.soft(await nodeHeights(page)).toStrictEqual([56]);
 
     await showMode(page, 'tile');
 
@@ -2131,7 +2177,7 @@ test(
 
     await chooseNodeSize(page, 'standard');
 
-    await expect.poll(async () => nodeHeights(page)).toStrictEqual([44, 56]);
+    await expect.poll(async () => nodeHeights(page)).toStrictEqual([56]);
   },
 );
 
