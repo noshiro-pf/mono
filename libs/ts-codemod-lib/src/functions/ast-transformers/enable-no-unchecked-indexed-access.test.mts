@@ -481,6 +481,42 @@ describe(enableNoUncheckedIndexedAccessTransformer, () => {
     ])('$name', testFn);
   });
 
+  describe('objects judged by the type the access reads, through type wrappers', () => {
+    test.each([
+      {
+        name: 'as to an element type without undefined needs the assertion',
+        source: 'console.log((sparse as readonly number[])[0].toFixed());',
+        expected: 'console.log((sparse as readonly number[])[0]!.toFixed());',
+      },
+      {
+        name: 'as to an element type with undefined needs none',
+        source:
+          'console.log((xs as readonly (number | undefined)[])[0]?.toFixed());',
+        expected:
+          'console.log((xs as readonly (number | undefined)[])[0]?.toFixed());',
+      },
+      {
+        name: 'angle-bracket assertion to an element type without undefined',
+        source: 'console.log((<readonly number[]>sparse)[0].toFixed());',
+        expected: 'console.log((<readonly number[]>sparse)[0]!.toFixed());',
+      },
+      {
+        name: 'satisfies keeps the type of the object it wraps',
+        source:
+          'console.log((xs satisfies readonly (number | undefined)[])[0].toFixed());',
+        expected:
+          'console.log((xs satisfies readonly (number | undefined)[])[0]!.toFixed());',
+      },
+      {
+        name: 'non-null assertion on the object',
+        source:
+          'declare const maybe: readonly number[] | undefined; console.log(maybe![0].toFixed());',
+        expected:
+          'declare const maybe: readonly number[] | undefined; console.log(maybe![0]!.toFixed());',
+      },
+    ])('$name', testFn);
+  });
+
   describe('applyLevel: "avoidWhereUndefinedIsAllowed"', () => {
     test.each([
       {

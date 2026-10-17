@@ -169,6 +169,10 @@ const collectAssertionPositions = (
       noUncheckedIndexedAccess: true,
     });
 
+    // The type asked is the access's own, so an `as`, `satisfies` or `!` on
+    // its object is already in it. That is the type the option's error is
+    // reported against, and the `!` appended has no run-time effect for the
+    // unwrapped object to contradict.
     const widened = candidates.filter(
       (node) =>
         typeIncludesUndefined(node.getType()) &&

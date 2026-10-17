@@ -199,7 +199,10 @@ const transformNode = (
   }
 
   // Skip already type asserted nodes
-  if (tsm.Node.isAsExpression(node) && !isAsConstNode(node)) {
+  if (
+    (tsm.Node.isAsExpression(node) || tsm.Node.isTypeAssertion(node)) &&
+    !isConstAssertionNode(node)
+  ) {
     return;
   }
 
@@ -308,8 +311,21 @@ const transformNode = (
     return;
   }
 
+  // `<const>x` is handled as the `x as const` it means. Appending `as const`
+  // to `x` in place would read as `(<const>x) as const`, and every position
+  // that reaches here already takes an `as` expression.
+  if (tsm.Node.isTypeAssertion(node) && isConstAssertionNode(node)) {
+    const asConstText = `${node.getExpression().getText()} as const` as const;
+
+    options.debugPrint(`${node.getText()} -> ${asConstText}`);
+
+    transformNode(node.replaceWithText(asConstText), context, options);
+
+    return;
+  }
+
   // `as const` node
-  if (isAsConstNode(node)) {
+  if (isConstAssertionNode(node)) {
     if (context.isDirectUnderConstInitializer) {
       // In const variable declarations, remove `as const` first and then re-append it later if needed
 
@@ -424,7 +440,9 @@ const removeAsConstInConstTypeParameterArgs = (
 
     // Cheap syntactic pre-check before touching the type checker
     if (
-      args.every((arg) => !isAsConstNode(skipParenthesizedExpressions(arg)))
+      args.every(
+        (arg) => !isConstAssertionNode(skipParenthesizedExpressions(arg)),
+      )
     ) {
       continue;
     }
@@ -487,7 +505,7 @@ const removeAsConstArgsOfCall = (
     // `f(([1] as const))` is the same argument as `f([1] as const)`.
     const asConst = skipParenthesizedExpressions(argument);
 
-    if (!isAsConstNode(asConst)) {
+    if (!isConstAssertionNode(asConst)) {
       continue;
     }
 
@@ -517,6 +535,31 @@ const removeAsConstArgsOfCall = (
   }
 };
 
+/**
+ * `x as const`, or `<const>x`, the angle-bracket spelling TypeScript treats
+ * identically (outside `.tsx`, where it does not parse).
+ */
+const isConstAssertionNode = (
+  node: tsm.Node,
+): node is tsm.AsExpression | tsm.TypeAssertion => {
+  if (isAsConstNode(node)) {
+    return true;
+  }
+
+  if (!tsm.Node.isTypeAssertion(node)) {
+    return false;
+  }
+
+  const typeNode = node.getTypeNode();
+
+  return (
+    typeNode !== undefined &&
+    typeNode.isKind(tsm.SyntaxKind.TypeReference) &&
+    typeNode.getTypeName().getText() === 'const' &&
+    Arr.isEmpty(typeNode.getTypeArguments())
+  );
+};
+
 /** `node` with the parentheses written around it taken off. */
 const skipParenthesizedExpressions = (node: tsm.Node): tsm.Node =>
   tsm.Node.isParenthesizedExpression(node)
@@ -541,6 +584,11 @@ const resolveSingleSignatureCallTarget = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   call: tsm.CallExpression,
 ): ResolvedCallTarget | undefined => {
+  // The callee's type is read as the call sees it, after any `as`,
+  // `satisfies` or `!` around it: that is the signature the argument is
+  // inferred against, and an `as const` has no run-time effect for an inner
+  // layer to contradict.
+  //
   // 0 signatures: the callee is unresolved (e.g. imported, since each file
   // is transformed in an isolated single-file project).
   // 2+ signatures: overloads, where removing `as const` could change which
