@@ -187,16 +187,21 @@ describe('prefer-logical-over-boolean-ternary', () => {
           errors: [{ messageId: 'preferLogical' }],
         },
         {
-          name: 'a logical test is negated in parentheses',
+          name: 'a logical test is negated by De Morgan',
           code: dedent`
             declare const a: boolean, b: boolean, c: string;
             const x = a || b ? false : c;
+            const y = a && b ? c : true;
           `,
           output: dedent`
             declare const a: boolean, b: boolean, c: string;
-            const x = !(a || b) && c;
+            const x = !a && !b && c;
+            const y = !a || !b || c;
           `,
-          errors: [{ messageId: 'preferLogical' }],
+          errors: [
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+          ],
         },
         {
           name: 'operands of lower precedence are parenthesized',
@@ -397,7 +402,7 @@ describe('prefer-logical-over-boolean-ternary with parenthesized operands', () =
           `,
           output: dedent`
             declare const a: boolean, b: boolean, c: boolean;
-            const w = !(a || b) && c;
+            const w = !a && !b && c;
             const x = (a || b) && c;
             const y = !a && (b || c);
             const z = !a || b || c;

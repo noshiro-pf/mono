@@ -163,10 +163,14 @@ const readJson = (filePath: string): unknown => {
 const subpathTargets = (
   manifest: ReadonlyRecord<string, unknown>,
 ): readonly (readonly string[])[] => {
-  const legacyTargets = LEGACY_ENTRY_FIELDS.flatMap((field) => {
-    const value = manifest[field];
+  const legacyTargets = Arr.generate(function* () {
+    for (const field of LEGACY_ENTRY_FIELDS) {
+      const value = manifest[field];
 
-    return typeof value === 'string' ? [value] : [];
+      if (typeof value === 'string') {
+        yield value;
+      }
+    }
   });
 
   const exportsField = manifest['exports'];
@@ -210,12 +214,16 @@ const resolveTarget = (
   );
 
   if (!relative.includes('*')) {
-    return candidates.flatMap((candidate) => {
-      const sourceFile = program.getSourceFile(
-        path.resolve(packageDirectory, candidate),
-      );
+    return Arr.generate(function* () {
+      for (const candidate of candidates) {
+        const sourceFile = program.getSourceFile(
+          path.resolve(packageDirectory, candidate),
+        );
 
-      return sourceFile === undefined ? [] : [sourceFile.fileName];
+        if (sourceFile !== undefined) {
+          yield sourceFile.fileName;
+        }
+      }
     });
   }
 

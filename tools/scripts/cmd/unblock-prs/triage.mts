@@ -169,17 +169,21 @@ export const triage = async (
   const nowEpochMs = Temporal.Now.instant().epochMilliseconds;
 
   const owners: ReadonlyMap<number, QueueOwner> = new Map(
-    sorted.flatMap((pr) => {
-      const owner = ownerOf(pr, {
-        defaultBranch: base.defaultBranch,
-        skipped: base.skipped,
-        claimed: base.claimed,
-        stackParents: graph.stackParents,
-        cyclic: graph.cyclic,
-        nowEpochMs,
-      });
+    Arr.generate(function* () {
+      for (const pr of sorted) {
+        const owner = ownerOf(pr, {
+          defaultBranch: base.defaultBranch,
+          skipped: base.skipped,
+          claimed: base.claimed,
+          stackParents: graph.stackParents,
+          cyclic: graph.cyclic,
+          nowEpochMs,
+        });
 
-      return owner === undefined ? [] : [[pr.number, owner] as const];
+        if (owner !== undefined) {
+          yield [pr.number, owner] as const;
+        }
+      }
     }),
   );
 
@@ -211,9 +215,13 @@ export const triage = async (
   // Released and watched as ever, but never armed: auto-merge would wait for
   // an approval nobody may give. See `review-hold.mts` in `pr-report-core`.
   const bypass: ReadonlyMap<number, string> = new Map(
-    Array.from(holds).flatMap(([prNumber, hold]) =>
-      hold.kind === 'bypass' ? [[prNumber, hold.reason] as const] : [],
-    ),
+    Arr.generate(function* () {
+      for (const [prNumber, hold] of Array.from(holds)) {
+        if (hold.kind === 'bypass') {
+          yield [prNumber, hold.reason] as const;
+        }
+      }
+    }),
   );
 
   return {
@@ -230,32 +238,44 @@ export const triage = async (
     // has no auto-merge yet, however it came to have none: `merge-queued`
     // is the one thing that says whether a pull request may merge.
     toArm: new Set(
-      classified.flatMap(({ pr, result }) =>
-        (result.kind === 'candidate' || result.kind === 'in-flight') &&
-        !isRecord(pr.autoMergeRequest) &&
-        !bypass.has(pr.number)
-          ? [pr.number]
-          : [],
-      ),
+      Arr.generate(function* () {
+        for (const { pr, result } of classified) {
+          if (
+            (result.kind === 'candidate' || result.kind === 'in-flight') &&
+            !isRecord(pr.autoMergeRequest) &&
+            !bypass.has(pr.number)
+          ) {
+            yield pr.number;
+          }
+        }
+      }),
     ),
     bypass,
     stackParents: graph.stackParents,
     inFlight: classified
       .filter(({ result }) => result.kind === 'in-flight')
       .map(({ pr }) => pr),
-    held: classified.flatMap(({ pr, result }) =>
-      result.kind === 'held'
-        ? [
-            `#${pr.number}: held by its review — ${result.reason}; nothing is run until that changes`,
-          ]
-        : [],
-    ),
-    failing: classified.flatMap(({ pr, result }) =>
-      result.kind === 'failing' ? [{ pr, summary: result.summary }] : [],
-    ),
-    notes: classified.flatMap(({ result }) =>
-      result.kind === 'note' ? [result.note] : [],
-    ),
+    held: Arr.generate(function* () {
+      for (const { pr, result } of classified) {
+        if (result.kind === 'held') {
+          yield `#${pr.number}: held by its review — ${result.reason}; nothing is run until that changes`;
+        }
+      }
+    }),
+    failing: Arr.generate(function* () {
+      for (const { pr, result } of classified) {
+        if (result.kind === 'failing') {
+          yield { pr, summary: result.summary };
+        }
+      }
+    }),
+    notes: Arr.generate(function* () {
+      for (const { result } of classified) {
+        if (result.kind === 'note') {
+          yield result.note;
+        }
+      }
+    }),
   };
 };
 
@@ -459,10 +479,14 @@ const readReviewHolds = async (
   } as const;
 
   return new Map(
-    Array.from(read.value.states).flatMap(([prNumber, state]) => {
-      const hold = reviewHold(state, rules);
+    Arr.generate(function* () {
+      for (const [prNumber, state] of Array.from(read.value.states)) {
+        const hold = reviewHold(state, rules);
 
-      return hold === undefined ? [] : [[prNumber, hold] as const];
+        if (hold !== undefined) {
+          yield [prNumber, hold] as const;
+        }
+      }
     }),
   );
 };

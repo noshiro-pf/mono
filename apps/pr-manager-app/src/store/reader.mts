@@ -15,7 +15,7 @@ import {
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { fastDeepEqual, Result, unknownToString } from 'ts-data-forge';
+import { Arr, fastDeepEqual, Result, unknownToString } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { CLOCK_TICK_MS, POLL_INTERVAL_MS } from '../constants.mjs';
 import type { Answered } from '../graphql.mjs';
@@ -595,9 +595,17 @@ const MORE_ISSUES_LOADING: MoreIssuesStatus = { type: 'loading' } as const;
 const divergenceScale = (entries: readonly Entry[]): number =>
   Math.max(
     1,
-    ...entries.flatMap(({ comparison }) =>
-      comparison === undefined ? [] : [comparison.aheadBy, comparison.behindBy],
-    ),
+    ...Arr.generate(function* () {
+      for (const { comparison } of entries) {
+        if (comparison === undefined) {
+          continue;
+        }
+
+        yield comparison.aheadBy;
+
+        yield comparison.behindBy;
+      }
+    }),
   );
 
 type PollTimer = Readonly<{ stop: () => void }>;

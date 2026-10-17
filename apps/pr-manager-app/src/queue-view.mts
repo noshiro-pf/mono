@@ -170,9 +170,13 @@ export const queueViewOf = ({
     ...graph,
     defaultBranch,
     owners: new Map(
-      owned.flatMap(({ pull, owner }) =>
-        owner === undefined ? [] : [[pull.entry.number, owner] as const],
-      ),
+      Arr.generate(function* () {
+        for (const { pull, owner } of owned) {
+          if (owner !== undefined) {
+            yield [pull.entry.number, owner] as const;
+          }
+        }
+      }),
     ),
   } as const;
 
@@ -213,28 +217,33 @@ export const queueViewOf = ({
       ({ pull, facts, standing }) =>
         slotOf(pull, facts, standing, defaultBranch),
     ),
-    outside: byNumber.flatMap(
-      ({ pull, standing, owner, claimed, setAsideReason }) =>
-        standing.kind === 'owned' || standing.kind === 'unactionable'
-          ? [
-              outsideOf(pull, {
-                owner: standing.kind === 'owned' ? standing.owner : owner,
-                reason:
-                  standing.kind === 'unactionable'
-                    ? unactionableWord(pull.entry, defaultBranch)
-                    : claimed
-                      ? 'claimed'
-                      : setAsideReason !== undefined
-                        ? setAsideWord(setAsideReason)
-                        : ownedWord(pull.entry, graph.cyclic),
-                detail:
-                  standing.kind === 'unactionable'
-                    ? standing.reason
-                    : standing.owner.reason,
-              }),
-            ]
-          : [],
-    ),
+    outside: Arr.generate(function* () {
+      for (const {
+        pull,
+        standing,
+        owner,
+        claimed,
+        setAsideReason,
+      } of byNumber) {
+        if (standing.kind === 'owned' || standing.kind === 'unactionable') {
+          yield outsideOf(pull, {
+            owner: standing.kind === 'owned' ? standing.owner : owner,
+            reason:
+              standing.kind === 'unactionable'
+                ? unactionableWord(pull.entry, defaultBranch)
+                : claimed
+                  ? 'claimed'
+                  : setAsideReason !== undefined
+                    ? setAsideWord(setAsideReason)
+                    : ownedWord(pull.entry, graph.cyclic),
+            detail:
+              standing.kind === 'unactionable'
+                ? standing.reason
+                : standing.owner.reason,
+          });
+        }
+      }
+    }),
   };
 };
 

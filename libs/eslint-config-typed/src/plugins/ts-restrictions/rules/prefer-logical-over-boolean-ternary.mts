@@ -4,16 +4,18 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
+import {
+  createGetLayerTypes,
+  isComparison,
+  isTypeWrapper,
+  needsParenthesesAsOperandOf,
+  negationOf,
+  skipTypeWrappers,
+  type NegationContext,
+} from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
-import {
-  invertedComparisonText,
-  isComparison,
-  isExactlyInvertible,
-} from './comparison-utils.mjs';
 import { jsxValuePositionOf } from './jsx-utils.mjs';
-import { createGetLayerTypes } from './type-layer-utils.mjs';
 
 type Options = readonly [];
 
@@ -34,10 +36,11 @@ type MessageIds = 'preferLogical';
  * `false`: `0 ? b : false` is `false`, while `0 && b` is `0`. The type decides,
  * and anything not known to be a boolean is left alone.
  *
- * The negation is written the short way where there is one: `!a` → `a` (when
- * `a` is a boolean), `a === b` → `a !== b`, and a relational comparison is
- * inverted when no operand can be `NaN`. A relational comparison that may be
- * `NaN` has no exact short negation, so that ternary is left alone.
+ * The negation is written the short way where there is one (`negationOf` from
+ * eslint-rule-forge): `!a` → `a` (when `a` is a boolean), `a === b` →
+ * `a !== b`, a relational comparison inverted when no operand can be `NaN`,
+ * and `a || b` → `!a && !b`. A relational comparison that may be `NaN` has no
+ * exact short negation, so that ternary is left alone.
  *
  * A literal is read through any `as`, `satisfies` or `!`:
  * `(false satisfies boolean)` is `false`. A type has to be a boolean at every
@@ -91,7 +94,9 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
       node: DeepReadonly<TSESTree.Node>,
       operator: '&&' | '||',
     ): string =>
-      bindsLooserThan(node, operator) ? `(${textOf(node)})` : textOf(node);
+      needsParenthesesAsOperandOf(node, operator)
+        ? `(${textOf(node)})`
+        : textOf(node);
 
     const isBoolean = (wrapped: DeepReadonly<TSESTree.Expression>): boolean => {
       const node = skipTypeWrappers(wrapped);
@@ -109,33 +114,21 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
       );
     };
 
+    const negationContext: NegationContext = {
+      sourceCode,
+      checker,
+      getLayerTypes,
+      isBoolean,
+    };
+
     /**
      * The negation of `node`, as an operand of `&&` or `||` — or `undefined`
      * when the only exact one is `!!a` or a `NaN`-unsafe inversion.
      */
-    const negationOf = (
+    const negationOfTest = (
       node: DeepReadonly<TSESTree.Expression>,
       operator: '&&' | '||',
-    ): string | undefined => {
-      if (
-        node.type === AST_NODE_TYPES.UnaryExpression &&
-        node.operator === '!'
-      ) {
-        return isBoolean(node.argument)
-          ? operand(node.argument, operator)
-          : undefined;
-      }
-
-      if (isComparison(node)) {
-        return isExactlyInvertible(node, getLayerTypes, checker)
-          ? invertedComparisonText(node, sourceCode)
-          : undefined;
-      }
-
-      return BINDS_AS_TIGHT_AS_UNARY.has(node.type)
-        ? `!${textOf(node)}`
-        : `!(${textOf(node)})`;
-    };
+    ): string | undefined => negationOf(node, negationContext, operator);
 
     const replacementOf = (
       node: DeepReadonly<TSESTree.ConditionalExpression>,
@@ -160,7 +153,7 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
           ? isBoolean(test)
             ? operand(test, '||')
             : undefined
-          : negationOf(test, '||');
+          : negationOfTest(test, '||');
       }
 
       const other = consequentValue === undefined ? consequent : alternate;
@@ -176,7 +169,7 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
       }
 
       if (consequentValue === false) {
-        const negation = negationOf(test, '&&');
+        const negation = negationOfTest(test, '&&');
 
         return negation === undefined
           ? undefined
@@ -190,7 +183,7 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
       }
 
       if (alternateValue === true) {
-        const negation = negationOf(test, '||');
+        const negation = negationOfTest(test, '||');
 
         return negation === undefined
           ? undefined
@@ -231,42 +224,6 @@ const booleanLiteralValue = (
     ? value.value
     : undefined;
 };
-
-/** Whether `node`, as an operand of `operator`, needs parentheses. */
-const bindsLooserThan = (
-  node: DeepReadonly<TSESTree.Node>,
-  operator: '&&' | '||',
-): boolean =>
-  node.type === AST_NODE_TYPES.LogicalExpression
-    ? node.operator === '??' || (operator === '&&' && node.operator === '||')
-    : LOOSER_THAN_LOGICAL.has(node.type);
-
-const LOOSER_THAN_LOGICAL: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.ArrowFunctionExpression,
-  AST_NODE_TYPES.AssignmentExpression,
-  AST_NODE_TYPES.ConditionalExpression,
-  AST_NODE_TYPES.SequenceExpression,
-  AST_NODE_TYPES.YieldExpression,
-]);
-
-/** Expressions `!` can be put in front of without parentheses. */
-const BINDS_AS_TIGHT_AS_UNARY: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.ArrayExpression,
-  AST_NODE_TYPES.AwaitExpression,
-  AST_NODE_TYPES.CallExpression,
-  AST_NODE_TYPES.ChainExpression,
-  AST_NODE_TYPES.Identifier,
-  AST_NODE_TYPES.Literal,
-  AST_NODE_TYPES.MemberExpression,
-  AST_NODE_TYPES.MetaProperty,
-  AST_NODE_TYPES.NewExpression,
-  AST_NODE_TYPES.ObjectExpression,
-  AST_NODE_TYPES.TaggedTemplateExpression,
-  AST_NODE_TYPES.TemplateLiteral,
-  AST_NODE_TYPES.ThisExpression,
-  AST_NODE_TYPES.TSNonNullExpression,
-  AST_NODE_TYPES.UnaryExpression,
-]);
 
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const constituentsOf = (type: ts.Type): readonly ts.Type[] =>

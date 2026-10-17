@@ -1,6 +1,6 @@
 import { ESLintUtils, type TSESLint } from '@typescript-eslint/utils';
+import { createGetLayerTypes } from 'eslint-rule-forge';
 import * as ts from 'typescript';
-import { createGetLayerTypes } from './type-layer-utils.mjs';
 
 type Options = readonly [];
 

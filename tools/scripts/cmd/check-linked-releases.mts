@@ -81,14 +81,18 @@ export const checkLinkedReleases = ({
       ];
     }
 
-    const breaking = group.flatMap((name) => {
-      const version = versions.get(name) ?? '';
+    const breaking = Arr.generate(function* () {
+      for (const name of group) {
+        const version = versions.get(name) ?? '';
 
-      const pending = bumps.find(
-        (bump) => bump.name === name && isBreaking(bump.bump, version),
-      );
+        const pending = bumps.find(
+          (bump) => bump.name === name && isBreaking(bump.bump, version),
+        );
 
-      return pending === undefined ? [] : [pending];
+        if (pending !== undefined) {
+          yield pending;
+        }
+      }
     });
 
     const left = group.filter((name) =>
@@ -175,13 +179,17 @@ const readVersions = async (): Promise<ReadonlyMap<string, string>> => {
   const packages = await getWorkspacePackages(projectRootPath);
 
   return new Map(
-    packages.flatMap((pkg) =>
-      isRecord(pkg.packageJson) &&
-      hasKey(pkg.packageJson, 'version') &&
-      isString(pkg.packageJson.version)
-        ? [[pkg.name, pkg.packageJson.version] as const]
-        : [],
-    ),
+    Arr.generate(function* () {
+      for (const pkg of packages) {
+        if (
+          isRecord(pkg.packageJson) &&
+          hasKey(pkg.packageJson, 'version') &&
+          isString(pkg.packageJson.version)
+        ) {
+          yield [pkg.name, pkg.packageJson.version] as const;
+        }
+      }
+    }),
   );
 };
 

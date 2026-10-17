@@ -25,7 +25,7 @@
  * longer exists is read like any other and left unused.
  */
 
-import { Obj, Result } from 'ts-data-forge';
+import { Arr, Obj, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { DagDirectionCodec, type DagLayout } from '../dag/index.mjs';
 import {
@@ -137,14 +137,22 @@ export const dagLayoutFromDoc = (
   Result.map(validate(DagLayoutDocCodec, data), (doc) => ({
     direction: doc.direction,
     positions: new Map(
-      Object.entries(doc.positions).flatMap(([id, { x, y }]) =>
-        GraphNodeIdCodec.is(id) ? [[id, { x, y }] as const] : [],
-      ),
+      Arr.generate(function* () {
+        for (const [id, { x, y }] of Object.entries(doc.positions)) {
+          if (GraphNodeIdCodec.is(id)) {
+            yield [id, { x, y }] as const;
+          }
+        }
+      }),
     ),
     groupPositions: new Map(
-      Object.entries(doc.groupPositions ?? {}).flatMap(([id, { x, y }]) =>
-        GroupIdCodec.is(id) ? [[id, { x, y }] as const] : [],
-      ),
+      Arr.generate(function* () {
+        for (const [id, { x, y }] of Object.entries(doc.groupPositions ?? {})) {
+          if (GroupIdCodec.is(id)) {
+            yield [id, { x, y }] as const;
+          }
+        }
+      }),
     ),
   }));
 

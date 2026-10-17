@@ -9,6 +9,7 @@ import {
   setAsideStillApplies,
   type SetAside,
 } from 'pr-report-core';
+import { Arr } from 'ts-data-forge';
 import type { ResolvedBy } from './set-aside-comment.mjs';
 import type {
   OwnSetAsideComment,
@@ -160,37 +161,45 @@ export const settleSkips = (
   });
 
   const retried = new Set(
-    judged.flatMap(({ number, resolvedBy }) =>
-      resolvedBy === 'retry' ? [number] : [],
-    ),
+    Arr.generate(function* () {
+      for (const { number, resolvedBy } of judged) {
+        if (resolvedBy === 'retry') {
+          yield number;
+        }
+      }
+    }),
   );
 
-  const taken = judged.flatMap(({ number, setAside, resolvedBy }) =>
-    resolvedBy === undefined &&
-    !skipped.has(number) &&
-    isSetAsideReason(setAside.reason)
-      ? [
-          {
-            number,
-            headSha: setAside.headSha,
-            baseSha: setAside.baseSha,
-            reason: setAside.reason,
-            detail: TAKEN_UP_DETAIL,
-          } as const,
-        ]
-      : [],
-  );
+  const taken = Arr.generate(function* () {
+    for (const { number, setAside, resolvedBy } of judged) {
+      if (
+        resolvedBy === undefined &&
+        !skipped.has(number) &&
+        isSetAsideReason(setAside.reason)
+      ) {
+        yield {
+          number,
+          headSha: setAside.headSha,
+          baseSha: setAside.baseSha,
+          reason: setAside.reason,
+          detail: TAKEN_UP_DETAIL,
+        } as const;
+      }
+    }
+  });
 
   return {
     skipped: taken.reduce(
       withSkip,
       new Map(Array.from(skipped).filter(([number]) => !retried.has(number))),
     ),
-    resolved: judged.flatMap(({ number, databaseId, setAside, resolvedBy }) =>
-      resolvedBy === undefined
-        ? []
-        : [{ number, databaseId, setAside, resolvedBy }],
-    ),
+    resolved: Arr.generate(function* () {
+      for (const { number, databaseId, setAside, resolvedBy } of judged) {
+        if (resolvedBy !== undefined) {
+          yield { number, databaseId, setAside, resolvedBy };
+        }
+      }
+    }),
   };
 };
 

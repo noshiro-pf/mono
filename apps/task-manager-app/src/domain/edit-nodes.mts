@@ -24,28 +24,50 @@ export const editNodes = (
   now: number,
 ): EditNodesResult => {
   const taskIds = new Set(
-    refs.flatMap((ref) => (ref.kind === 'task' ? [ref.id] : [])),
+    Arr.generate(function* () {
+      for (const ref of refs) {
+        if (ref.kind === 'task') {
+          yield ref.id;
+        }
+      }
+    }),
   );
 
   const milestoneIds = new Set(
-    refs.flatMap((ref) => (ref.kind === 'milestone' ? [ref.id] : [])),
+    Arr.generate(function* () {
+      for (const ref of refs) {
+        if (ref.kind === 'milestone') {
+          yield ref.id;
+        }
+      }
+    }),
   );
 
   return {
-    updatedTasks: state.tasks
-      .filter(({ id }) => taskIds.has(id))
-      .flatMap((task) => {
+    updatedTasks: Arr.generate(function* () {
+      for (const task of state.tasks) {
+        if (!taskIds.has(task.id)) {
+          continue;
+        }
+
         const edited = editTask(task, edit, now);
 
-        return edited === task ? [] : [edited];
-      }),
-    updatedMilestones: state.milestones
-      .filter(({ id }) => milestoneIds.has(id))
-      .flatMap((milestone) =>
-        edit.group === undefined || milestone.groupId === edit.group.to
-          ? []
-          : [{ ...milestone, groupId: edit.group.to, updatedAt: now }],
-      ),
+        if (edited !== task) {
+          yield edited;
+        }
+      }
+    }),
+    updatedMilestones: Arr.generate(function* () {
+      for (const milestone of state.milestones) {
+        if (
+          milestoneIds.has(milestone.id) &&
+          edit.group !== undefined &&
+          milestone.groupId !== edit.group.to
+        ) {
+          yield { ...milestone, groupId: edit.group.to, updatedAt: now };
+        }
+      }
+    }),
   };
 };
 

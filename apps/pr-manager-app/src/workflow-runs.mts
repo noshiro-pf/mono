@@ -124,9 +124,13 @@ export const loadWorkflowRuns = async (
     return failure;
   }
 
-  const lists = answers.flatMap((answer) =>
-    Result.isOk(answer) ? [answer.value] : [],
-  );
+  const lists = Arr.generate(function* () {
+    for (const answer of answers) {
+      if (Result.isOk(answer)) {
+        yield answer.value;
+      }
+    }
+  });
 
   // A run that changed state between two of the requests can be met in
   // both; it is listed once, under the first state that found it.

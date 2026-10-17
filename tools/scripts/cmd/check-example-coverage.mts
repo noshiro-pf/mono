@@ -57,13 +57,21 @@ export const checkExampleCoverage = async (): Promise<
     return Result.err(firstError.value);
   }
 
-  const results = perPackage.flatMap((result) =>
-    Result.isErr(result) ? [] : [result.value],
-  );
+  const results = Arr.generate(function* () {
+    for (const result of perPackage) {
+      if (!Result.isErr(result)) {
+        yield result.value;
+      }
+    }
+  });
 
-  const violations = results.flatMap(({ violation }) =>
-    violation === undefined ? [] : [violation],
-  );
+  const violations = Arr.generate(function* () {
+    for (const { violation } of results) {
+      if (violation !== undefined) {
+        yield violation;
+      }
+    }
+  });
 
   if (Arr.isNonEmpty(violations)) {
     return Result.err(

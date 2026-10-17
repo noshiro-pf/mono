@@ -100,15 +100,15 @@ const listLintedPackages = async (): Promise<readonly string[]> => {
 const checkPackage = async (dir: string): Promise<PackageResult> => {
   const scripts = await readScripts(dir);
 
-  const scriptViolations = Object.entries(lintScriptPrefixes).flatMap(
-    ([name, prefix]) => {
+  const scriptViolations = Arr.generate(function* () {
+    for (const [name, prefix] of Object.entries(lintScriptPrefixes)) {
       const script: unknown = scripts[name];
 
-      return isString(script) && script.startsWith(prefix)
-        ? []
-        : [`${dir}/package.json: "${name}" must start with \`${prefix}\`.`];
-    },
-  );
+      if (!isString(script) || !script.startsWith(prefix)) {
+        yield `${dir}/package.json: "${name}" must start with \`${prefix}\`.`;
+      }
+    }
+  });
 
   const configModule: unknown = await import(
     pathToFileURL(path.join(projectRootPath, dir, 'eslint.config.mts')).href

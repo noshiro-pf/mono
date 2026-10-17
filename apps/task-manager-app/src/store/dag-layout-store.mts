@@ -464,13 +464,17 @@ export const createDagLayoutStore = <H, F>(
     const drawnNext = positionsOf(placedWith(next.positions));
 
     const nodePositions = new Map(
-      listNodes(deps.state.getSnapshot().value).flatMap(({ id }) => {
-        const position =
-          next.positions.get(id) ??
-          (replaced.has(id) ? undefined : drawnNow.get(id)) ??
-          drawnNext.get(id);
+      Arr.generate(function* () {
+        for (const { id } of listNodes(deps.state.getSnapshot().value)) {
+          const position =
+            next.positions.get(id) ??
+            (replaced.has(id) ? undefined : drawnNow.get(id)) ??
+            drawnNext.get(id);
 
-        return position === undefined ? [] : [[id, position] as const];
+          if (position !== undefined) {
+            yield [id, position] as const;
+          }
+        }
       }),
     );
 

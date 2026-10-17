@@ -541,11 +541,13 @@ export const createClient = (
           mut_read.set(
             pr.number,
             readQueueComments(
-              listed.value.flatMap(({ id, body, user }) =>
-                user?.login === viewer.value.login
-                  ? [{ id, body: body ?? '' }]
-                  : [],
-              ),
+              Arr.generate(function* () {
+                for (const { id, body, user } of listed.value) {
+                  if (user?.login === viewer.value.login) {
+                    yield { id, body: body ?? '' };
+                  }
+                }
+              }),
               {
                 headSha: pr.headSha,
                 baseTip: tip.value.object.sha,

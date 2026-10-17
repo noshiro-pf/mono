@@ -30,16 +30,20 @@ export const connectHandleAt = (
   point: Point,
   reach: ConnectReach,
 ): ConnectHandle | undefined => {
-  const near = nodes.flatMap((node) => {
-    const outline = outlineOf(node);
+  const near = Arr.generate(function* () {
+    for (const node of nodes) {
+      const outline = outlineOf(node);
 
-    const onOutline = nearestOnOutline(outline, point);
+      const onOutline = nearestOnOutline(outline, point);
 
-    const limit = isInside(outline, point)
-      ? Math.min(reach.inside, node.height * INSIDE_REACH_SHARE)
-      : reach.outside;
+      const limit = isInside(outline, point)
+        ? Math.min(reach.inside, node.height * INSIDE_REACH_SHARE)
+        : reach.outside;
 
-    return onOutline.distance <= limit ? [{ id: node.id, ...onOutline }] : [];
+      if (onOutline.distance <= limit) {
+        yield { id: node.id, ...onOutline };
+      }
+    }
   });
 
   if (!Arr.isNonEmpty(near)) {

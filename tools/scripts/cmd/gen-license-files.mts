@@ -135,15 +135,18 @@ export const genLicenseFiles = async (): Promise<
 export const collectLicenseTargets = (
   manifests: readonly PackageManifest[],
 ): readonly LicenseTarget[] =>
-  manifests
-    .filter(({ dir }) => !isRoot(dir) && !isExperimental(dir))
-    .filter(({ isPrivate }) => !isPrivate)
-    .flatMap(({ dir, license }) =>
-      license === undefined
-        ? []
-        : [{ path: `${dir}/${LICENSE_FILE}`, license }],
-    )
-    .toSorted((a, b) => compareStrings(a.path, b.path));
+  Arr.generate(function* () {
+    for (const { dir, isPrivate, license } of manifests) {
+      if (
+        !isPrivate &&
+        license !== undefined &&
+        !isRoot(dir) &&
+        !isExperimental(dir)
+      ) {
+        yield { path: `${dir}/${LICENSE_FILE}`, license };
+      }
+    }
+  }).toSorted((a, b) => compareStrings(a.path, b.path));
 
 /**
  * Every way the declarations and the files fail to be one statement.

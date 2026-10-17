@@ -290,12 +290,17 @@ const collectExportedValueNames = (
       }
 
       if (statement.declaration !== null) {
-        return statement.declaration.type === AST_NODE_TYPES.VariableDeclaration
-          ? statement.declaration.declarations.flatMap((declarator) =>
-              declarator.id.type === AST_NODE_TYPES.Identifier
-                ? [[declarator.id.name, declarator.id.name] as const]
-                : [],
-            )
+        // A const, so that its narrowing reaches into the generator function.
+        const { declaration } = statement;
+
+        return declaration.type === AST_NODE_TYPES.VariableDeclaration
+          ? Arr.generate(function* () {
+              for (const declarator of declaration.declarations) {
+                if (declarator.id.type === AST_NODE_TYPES.Identifier) {
+                  yield [declarator.id.name, declarator.id.name] as const;
+                }
+              }
+            })
           : [];
       }
 
@@ -304,18 +309,18 @@ const collectExportedValueNames = (
         return [];
       }
 
-      return statement.specifiers.flatMap((specifier) =>
-        specifier.exportKind === 'type'
-          ? []
-          : [
-              [
-                specifier.local.name,
-                specifier.exported.type === AST_NODE_TYPES.Identifier
-                  ? specifier.exported.name
-                  : specifier.exported.value,
-              ] as const,
-            ],
-      );
+      return Arr.generate(function* () {
+        for (const specifier of statement.specifiers) {
+          if (specifier.exportKind !== 'type') {
+            yield [
+              specifier.local.name,
+              specifier.exported.type === AST_NODE_TYPES.Identifier
+                ? specifier.exported.name
+                : specifier.exported.value,
+            ] as const;
+          }
+        }
+      });
     },
   );
 

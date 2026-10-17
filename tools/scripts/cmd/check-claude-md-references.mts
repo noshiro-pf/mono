@@ -71,14 +71,15 @@ export const checkClaudeMdReferences = async (): Promise<
 
 /** The headings of `CLAUDE.md`, in the order they are written. */
 export const collectHeadings = (claudeMd: string): readonly string[] =>
-  claudeMd
-    .split('\n')
-    .flatMap((line) => {
+  Arr.generate(function* () {
+    for (const line of claudeMd.split('\n')) {
       const heading = HEADING.exec(line)?.groups?.['heading'];
 
-      return heading === undefined ? [] : [heading.trim()];
-    })
-    .toSorted();
+      if (heading !== undefined) {
+        yield heading.trim();
+      }
+    }
+  }).toSorted();
 
 /**
  * Every section of `CLAUDE.md` that `fileText` claims to send a reader to.
@@ -96,19 +97,21 @@ export const collectCitations = (
     quotedRunFrom(flattened.slice(match.index + match[0].length)),
   );
 
-  const named = [
-    Array.from(flattened.matchAll(CITATION_LEADING)),
-    Array.from(flattened.matchAll(CITATION_JAPANESE)),
-    options.selfReferences === true
-      ? Array.from(flattened.matchAll(CITATION_SELF))
-      : [],
-  ]
-    .flat()
-    .flatMap((match) => {
+  const named = Arr.generate(function* () {
+    for (const match of [
+      Array.from(flattened.matchAll(CITATION_LEADING)),
+      Array.from(flattened.matchAll(CITATION_JAPANESE)),
+      options.selfReferences === true
+        ? Array.from(flattened.matchAll(CITATION_SELF))
+        : [],
+    ].flat()) {
       const heading = match.groups?.['heading'];
 
-      return heading === undefined ? [] : [heading];
-    });
+      if (heading !== undefined) {
+        yield heading;
+      }
+    }
+  });
 
   return [trailing, named].flat().map((heading) => heading.trim());
 };

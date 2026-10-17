@@ -172,10 +172,14 @@ export const describeWaitingOn = (summary: ChecksSummary): string => {
 const earliestStart = (
   running: readonly RunningCheck[],
 ): number | undefined => {
-  const starts = running.flatMap(({ startedAt }) => {
-    const ms = epochMs(startedAt);
+  const starts = Arr.generate(function* () {
+    for (const { startedAt } of running) {
+      const ms = epochMs(startedAt);
 
-    return ms === undefined ? [] : [ms];
+      if (ms !== undefined) {
+        yield ms;
+      }
+    }
   });
 
   return Arr.isNonEmpty(starts) ? Math.min(...starts) : undefined;

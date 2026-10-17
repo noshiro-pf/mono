@@ -15,7 +15,7 @@
  * (`edge-routing.mts`), which is how the edges are drawn.
  */
 
-import { Num } from 'ts-data-forge';
+import { Arr, Num } from 'ts-data-forge';
 import type {
   DeepReadonly,
   FixedLengthTuple,
@@ -46,12 +46,16 @@ export const edgeGeometries = (
 
   const byId = new Map(nodes.map((node) => [node.id, node]));
 
-  const placed = edges.flatMap((edge) => {
-    const from = byId.get(edge.from);
+  const placed = Arr.generate(function* () {
+    for (const edge of edges) {
+      const from = byId.get(edge.from);
 
-    const to = byId.get(edge.to);
+      const to = byId.get(edge.to);
 
-    return from === undefined || to === undefined ? [] : [{ edge, from, to }];
+      if (from !== undefined && to !== undefined) {
+        yield { edge, from, to };
+      }
+    }
   });
 
   const outSlots = slotsBySide(

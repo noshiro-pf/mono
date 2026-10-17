@@ -75,18 +75,24 @@ export const presentVerdict = (
 
 /** `1✗ 1… 7✓`, leaving out whichever states nothing is in. */
 export const describeCheckCounts = (checks: ChecksSummary): string =>
-  partsOf(checks)
-    .flatMap(({ glyph, names }) =>
-      Arr.isEmpty(names) ? [] : [`${names.length}${glyph}`],
-    )
-    .join(' ');
+  Arr.generate(function* () {
+    for (const { glyph, names } of partsOf(checks)) {
+      if (!Arr.isEmpty(names)) {
+        yield `${names.length}${glyph}`;
+      }
+    }
+  }).join(' ');
 
 /** The same, spelled out with the names, for the hover. */
 export const describeCheckBreakdown = (checks: ChecksSummary): string =>
   Arr.toUnshifted(`over the ${checks.required} contexts the ruleset requires:`)(
-    partsOf(checks).flatMap(({ label, names }) =>
-      Arr.isEmpty(names) ? [] : [`${label} — ${names.join(', ')}`],
-    ),
+    Arr.generate(function* () {
+      for (const { label, names } of partsOf(checks)) {
+        if (!Arr.isEmpty(names)) {
+          yield `${label} — ${names.join(', ')}`;
+        }
+      }
+    }),
   ).join('\n');
 
 type Part = Readonly<{

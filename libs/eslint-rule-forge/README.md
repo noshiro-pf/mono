@@ -87,6 +87,27 @@ assertion (`x as string | null`) then makes the rule more cautious, and a
 narrowing one (`x!`, `v as string` on an `unknown`), which the checker cannot
 verify, changes nothing.
 
+## Negation
+
+Writing the negation of a condition the short way, as a fix that removes a
+ternary or turns a filter into a loop has to.
+
+| Helper                        | What it gives                                                                                                             |
+| :---------------------------- | :------------------------------------------------------------------------------------------------------------------------ |
+| `negationOf`                  | `a !== b` for `a === b`, `!a && !b` for `a \|\| b`, `a` for `!a` (when a boolean), else `!a`; parenthesized as an operand |
+| `prefixedNegationOf`          | `!a`, `!f(x)`, `!(a === b)`: a `!` in front, with parentheses only when it needs them                                     |
+| `isComparison`                | whether a node is an equality or a relational comparison                                                                  |
+| `isExactlyInvertible`         | whether inverting a comparison's operator is its exact negation: always for an equality, for `<` only without `NaN`       |
+| `invertedComparisonText`      | the comparison's source with its operator inverted                                                                        |
+| `needsParenthesesAsOperandOf` | whether a node needs parentheses as an operand of `&&` or `\|\|`                                                          |
+| `createGetLayerTypes`         | a function giving a node's type at every type-wrapper layer, which the checks above ask                                   |
+
+`negationOf` gives `undefined` when the only exact negation is `!!a` (for an
+`a` that may not be a boolean) or `!(a < b)` (for operands that may be `NaN`),
+so that a rule can choose between `prefixedNegationOf` and giving up. Where
+only the truthiness of the negation is read, such as the test of an `if`, its
+context may call every node a boolean.
+
 ## Parentheses
 
 The range and the text of a node leave out the parentheses written around it.

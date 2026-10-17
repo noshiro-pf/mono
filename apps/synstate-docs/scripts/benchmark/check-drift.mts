@@ -128,10 +128,14 @@ const judgeScenario = (
     };
   }
 
-  const changes = labelsOf(reference).flatMap((label) => {
-    const change = changeOf(label, reference, committed);
+  const changes = Arr.generate(function* () {
+    for (const label of labelsOf(reference)) {
+      const change = changeOf(label, reference, committed);
 
-    return change === undefined ? [] : [{ label, change }];
+      if (change !== undefined) {
+        yield { label, change };
+      }
+    }
   });
 
   const machine = median(changes.map((c) => c.change));
@@ -173,14 +177,16 @@ const changeOf = (
   reference: Results,
   committed: Results,
 ): number | undefined => {
-  const logs = pointsOf(reference).flatMap((point) => {
-    const r = valueAt(reference, label, point);
+  const logs = Arr.generate(function* () {
+    for (const point of pointsOf(reference)) {
+      const r = valueAt(reference, label, point);
 
-    const c = valueAt(committed, label, point);
+      const c = valueAt(committed, label, point);
 
-    return r === undefined || c === undefined || r <= 0 || !Num.isNonZero(c)
-      ? []
-      : [Math.log(Num.div(r, c))];
+      if (r !== undefined && c !== undefined && r > 0 && Num.isNonZero(c)) {
+        yield Math.log(Num.div(r, c));
+      }
+    }
   });
 
   return Arr.isNonEmpty(logs)

@@ -90,11 +90,13 @@ export const buildCoverageGraph = (
     ),
   );
 
-  const packageScriptNames = manifests.flatMap(({ directory, scripts }) =>
-    directory === ROOT_DIRECTORY
-      ? []
-      : [{ directory, names: Object.keys(scripts) }],
-  );
+  const packageScriptNames = Arr.generate(function* () {
+    for (const { directory, scripts } of manifests) {
+      if (directory !== ROOT_DIRECTORY) {
+        yield { directory, names: Object.keys(scripts) };
+      }
+    }
+  });
 
   const derived = manifests.flatMap(({ directory, scripts }) => {
     const siblingNames = Object.keys(scripts);
@@ -124,16 +126,16 @@ export const buildCoverageGraph = (
   });
 
   const declared = DECLARED_COVERAGE.flatMap(({ from, to }) =>
-    manifests.flatMap(({ directory, scripts }) =>
-      hasKey(scripts, from) && hasKey(scripts, to)
-        ? [
-            {
-              from: toCommandId(directory, from),
-              to: toCommandId(directory, to),
-            },
-          ]
-        : [],
-    ),
+    Arr.generate(function* () {
+      for (const { directory, scripts } of manifests) {
+        if (hasKey(scripts, from) && hasKey(scripts, to)) {
+          yield {
+            from: toCommandId(directory, from),
+            to: toCommandId(directory, to),
+          };
+        }
+      }
+    }),
   );
 
   const mut_edges = new Map<CommandId, Set<CommandId>>();
@@ -783,11 +785,13 @@ const readCheckWorkflows = async (): Promise<
   return failed !== undefined
     ? Result.err(failed.value)
     : Result.ok(
-        results.flatMap((result) =>
-          Result.isErr(result) || result.value === undefined
-            ? []
-            : [result.value],
-        ),
+        Arr.generate(function* () {
+          for (const result of results) {
+            if (!Result.isErr(result) && result.value !== undefined) {
+              yield result.value;
+            }
+          }
+        }),
       );
 };
 
@@ -828,20 +832,26 @@ export const collectWorkflowCommands = (
   workflowFile: string,
 ): readonly string[] => {
   const matrixKeys = new Set(
-    Array.from(workflowFile.matchAll(MATRIX_COMMAND)).flatMap((matched) => {
-      const key = matched.groups?.['key'];
+    Arr.generate(function* () {
+      for (const matched of Array.from(workflowFile.matchAll(MATRIX_COMMAND))) {
+        const key = matched.groups?.['key'];
 
-      return key === undefined ? [] : [key];
+        if (key !== undefined) {
+          yield key;
+        }
+      }
     }),
   );
 
-  const literals = Array.from(workflowFile.matchAll(LITERAL_COMMAND)).flatMap(
-    (matched) => {
+  const literals = Arr.generate(function* () {
+    for (const matched of Array.from(workflowFile.matchAll(LITERAL_COMMAND))) {
       const scriptName = matched.groups?.['scriptName'];
 
-      return scriptName === undefined ? [] : [scriptName];
-    },
-  );
+      if (scriptName !== undefined) {
+        yield scriptName;
+      }
+    }
+  });
 
   const fromMatrix = Array.from(matrixKeys).flatMap((key) =>
     collectMatrixEntries(workflowFile, key),

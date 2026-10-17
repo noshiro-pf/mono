@@ -220,14 +220,16 @@ export const workspaceEntryOf = (
  */
 export const nextWorkspaceName = (registry: WorkspaceRegistry): string => {
   const used = new Set(
-    registry.entries.flatMap((entry) => {
-      const matched = defaultNamePattern.exec(entry.name);
+    Arr.generate(function* () {
+      for (const entry of registry.entries) {
+        const matched = defaultNamePattern.exec(entry.name);
 
-      const digits = matched?.[1];
+        const digits = matched?.[1];
 
-      return digits === undefined
-        ? []
-        : [Result.unwrapOkOr(Num.safeParseInt(digits), Number.NaN)];
+        if (digits !== undefined) {
+          yield Result.unwrapOkOr(Num.safeParseInt(digits), Number.NaN);
+        }
+      }
     }),
   );
 

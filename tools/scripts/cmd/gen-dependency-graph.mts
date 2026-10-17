@@ -287,22 +287,20 @@ const render = (
     '| パッケージ | 種別 | 内部依存 |',
     '| :--- | :--- | :--- |',
     ...packages.flatMap((pkg) => {
-      const rows = (
-        [
+      const rows = Arr.generate(function* () {
+        for (const [kind, deps] of [
           ['dep', pkg.runtime],
           ['peer', pkg.peer],
           ['dev', pkg.dev],
-        ] as const
-      ).flatMap(([kind, deps]) => {
-        const edges = internal(deps, names);
+        ] as const) {
+          const edges = internal(deps, names);
 
-        return Arr.isNonEmpty(edges)
-          ? [
-              `| \`${pkg.name}\` | ${kind} | ${edges
-                .map(([name, spec]) => `\`${name}\`&nbsp;\`${spec}\``)
-                .join('<br>')} |`,
-            ]
-          : [];
+          if (Arr.isNonEmpty(edges)) {
+            yield `| \`${pkg.name}\` | ${kind} | ${edges
+              .map(([name, spec]) => `\`${name}\`&nbsp;\`${spec}\``)
+              .join('<br>')} |`;
+          }
+        }
       });
 
       return Arr.isNonEmpty(rows) ? rows : [`| \`${pkg.name}\` | — | — |`];

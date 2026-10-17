@@ -29,19 +29,19 @@ export type CodeOwnersRule = Readonly<{
 }>;
 
 export const parseCodeOwners = (text: string): readonly CodeOwnersRule[] =>
-  text.split('\n').flatMap((line) => {
-    const [pattern, ...owners] = stripComment(line).trim().split(/\s+/u);
+  Arr.generate(function* () {
+    for (const line of text.split('\n')) {
+      const [pattern, ...owners] = stripComment(line).trim().split(/\s+/u);
 
-    return pattern === undefined || pattern === ''
-      ? []
-      : [
-          {
-            pattern,
-            owners: owners.map((owner) =>
-              owner.startsWith('@') ? owner.slice(1) : owner,
-            ),
-          },
-        ];
+      if (pattern !== undefined && pattern !== '') {
+        yield {
+          pattern,
+          owners: owners.map((owner) =>
+            owner.startsWith('@') ? owner.slice(1) : owner,
+          ),
+        };
+      }
+    }
   });
 
 /**
@@ -171,13 +171,17 @@ export const codeOwnerReview = ({
 
   const approved = new Set(approvers.map((login) => login.toLowerCase()));
 
-  const waiting = files.flatMap((path) => {
-    const owners = ownersOf(path, rules);
+  const waiting = Arr.generate(function* () {
+    for (const path of files) {
+      const owners = ownersOf(path, rules);
 
-    return Arr.isNonEmpty(owners) &&
-      owners.every((owner) => !approved.has(owner.toLowerCase()))
-      ? [{ path, owners }]
-      : [];
+      if (
+        Arr.isNonEmpty(owners) &&
+        owners.every((owner) => !approved.has(owner.toLowerCase()))
+      ) {
+        yield { path, owners };
+      }
+    }
   });
 
   if (Arr.isNonEmpty(waiting)) {
