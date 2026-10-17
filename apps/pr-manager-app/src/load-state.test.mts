@@ -94,6 +94,7 @@ const readAt = (readAtEpochMs: number): LoadedReport =>
       failing: 0,
       setAside: 0,
       awaitingReview: 0,
+      pending: 0,
     },
     entries: [],
     roots: [],

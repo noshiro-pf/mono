@@ -103,13 +103,15 @@ describe(statusesOf, () => {
       entry(3, { verdict: 'failing', behindBy: 2 }),
       entry(4, { setAside: true }),
       entry(5, { awaitingReview: true }),
-      entry(6),
+      entry(6, { labels: [label('pending')] }),
+      entry(7),
     ] as const;
 
     const summary = {
       ...summarize(entries),
       setAside: 1,
       awaitingReview: 1,
+      pending: 1,
     } as const;
 
     assert.deepStrictEqual(
@@ -126,6 +128,7 @@ describe(statusesOf, () => {
       ['failing'],
       ['setAside'],
       ['awaitingReview'],
+      ['pending'],
       [],
     ]);
   });
@@ -161,6 +164,21 @@ describe(isShown, () => {
     assert.isTrue(isShown(entry(2, { verdict: 'failing' }), view));
 
     assert.isTrue(isShown(entry(3), view));
+  });
+
+  test('switching pending off hides what carries the label, queued or not', () => {
+    const view = toggleStatus(DEFAULT_MERGE_ORDER_VIEW, 'pending');
+
+    assert.isFalse(isShown(entry(1, { labels: [label('pending')] }), view));
+
+    assert.isFalse(
+      isShown(
+        entry(2, { labels: [label('pending'), label('merge-queued')] }),
+        view,
+      ),
+    );
+
+    assert.isTrue(isShown(entry(3, { labels: [label('merge-queued')] }), view));
   });
 
   test('a pull request whose priority is hidden is hidden', () => {
@@ -284,6 +302,7 @@ describe(countView, () => {
       failing: { shown: 2, total: 2 },
       setAside: { shown: 0, total: 0 },
       awaitingReview: { shown: 0, total: 0 },
+      pending: { shown: 0, total: 0 },
     });
 
     assert.deepStrictEqual(counts.priorities, {

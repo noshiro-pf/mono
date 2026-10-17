@@ -130,10 +130,12 @@ pull request waiting on nothing but a cycle member is drawn as a root.
 ## Filtering and sorting the merge order
 
 The merge order leads with the counts — open, queued, failing, set aside,
-awaiting code owner — and **each count but `open` is a switch** for the pull
-requests it counts: clicking one hides them, whatever else they are, so
-switching off `queued` leaves what is still waiting for a review, and one
-under none of the counts is always shown. Each also carries an **only** button
+awaiting code owner, pending — and **each count but `open` is a switch** for
+the pull requests it counts: clicking one hides them, whatever else they are,
+so switching off `queued` leaves what is still waiting for a review, switching
+off `pending` leaves out what carries the `pending` label an author puts on a
+pull request they are holding back, and one under none of the counts is
+always shown. Each also carries an **only** button
 in its corner: once any is picked, only a pull request under a picked count is
 shown, whatever else it is, so picking `failing` leaves what is failing,
 queued or not. A count switched off still hides what it counts, and a count is

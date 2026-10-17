@@ -27,7 +27,11 @@
  * ahead / behind bar says. A choice saved while either was one drops it.
  */
 
-import { MERGE_QUEUED_LABEL, type TreeNode } from 'pr-report-core';
+import {
+  MERGE_QUEUED_LABEL,
+  PENDING_LABEL,
+  type TreeNode,
+} from 'pr-report-core';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { Entry, PageSummary } from './load-report.mjs';
@@ -39,13 +43,15 @@ import {
 } from './priority.mjs';
 
 /** Named after the count of {@link PageSummary} each one is. */
-export type StatusFilter = 'queued' | 'failing' | 'setAside' | 'awaitingReview';
+export type StatusFilter =
+  'queued' | 'failing' | 'setAside' | 'awaitingReview' | 'pending';
 
 export const STATUS_FILTERS = [
   'queued',
   'failing',
   'setAside',
   'awaitingReview',
+  'pending',
 ] as const satisfies readonly (StatusFilter & keyof PageSummary)[];
 
 /** What each status is called on the page. */
@@ -54,6 +60,7 @@ export const STATUS_NAMES = {
   failing: 'failing',
   setAside: 'set aside',
   awaitingReview: 'awaiting code owner',
+  pending: 'pending',
 } as const satisfies ReadonlyRecord<StatusFilter, string>;
 
 export type MergeOrderSort = 'order' | 'priority';
@@ -256,6 +263,7 @@ export const countView = (
       failing: underStatus('failing'),
       setAside: underStatus('setAside'),
       awaitingReview: underStatus('awaitingReview'),
+      pending: underStatus('pending'),
     },
     priorities: {
       high: underPriority('high'),
@@ -358,6 +366,8 @@ const STATUS_TESTS = {
   failing: (entry) => entry.checks.verdict === 'failing',
   setAside: (entry) => entry.setAside?.current === true,
   awaitingReview: (entry) => entry.codeOwnerReview.state === 'required',
+  pending: (entry) =>
+    entry.labels.some((label) => label.name === PENDING_LABEL),
 } as const satisfies ReadonlyRecord<StatusFilter, (entry: Entry) => boolean>;
 
 /** `all` with `item` flipped in or out of `current`, in the order of `all`. */
