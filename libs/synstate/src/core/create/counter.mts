@@ -1,4 +1,5 @@
 import { asSafeUint, Optional, SafeUint } from 'ts-data-forge';
+import type { PositiveSafeIntWithSmallInt } from 'ts-type-forge';
 import { createRootObservable } from '../base/index.mjs';
 import type { CounterObservable, TimerId } from '../types/index.mjs';
 
@@ -15,6 +16,10 @@ import type { CounterObservable, TimerId } from '../types/index.mjs';
  * @param options.emitInitial - If false, skips the 0 emitted right after
  *   `start()`, so the first value is 1, one interval later — like RxJS
  *   `interval` rather than `timer(0, ms)` (default: true)
+ * @param options.times - If set, completes right after the `times`-th
+ *   emission and clears its timers. Completion does not travel upstream, so
+ *   `counter(ms).pipe(take(n))` leaves the counter running; pass `times` to
+ *   the counter instead (default: unlimited)
  * @returns An observable that emits sequential numbers
  *
  * @example
@@ -57,6 +62,7 @@ export const counter = (
   options?: Readonly<{
     startManually?: boolean;
     emitInitial?: boolean;
+    times?: PositiveSafeIntWithSmallInt;
   }>,
 ): CounterObservable => {
   let mut_counter: SafeUint = asSafeUint(0);
@@ -66,6 +72,8 @@ export const counter = (
   let mut_timerId: TimerId | undefined = undefined;
 
   let mut_isStarted = false;
+
+  let mut_emittedCount = 0;
 
   const resetTimer = (): void => {
     if (mut_timerId0 !== undefined) {
@@ -82,7 +90,7 @@ export const counter = (
     Readonly<{ start: () => void }>
   >(
     { initialValue: Optional.none, onComplete: resetTimer },
-    ({ startUpdate, isCompleted }) => ({
+    ({ startUpdate, isCompleted, complete }) => ({
       start: () => {
         if (mut_isStarted) {
           console.warn('cannot start twice');
@@ -98,16 +106,29 @@ export const counter = (
           return;
         }
 
+        const emit = (value: SafeUint): void => {
+          startUpdate(value);
+
+          mut_emittedCount += 1;
+
+          if (
+            options?.times !== undefined &&
+            mut_emittedCount >= options.times
+          ) {
+            complete();
+          }
+        };
+
         if (options?.emitInitial ?? true) {
           mut_timerId0 = setTimeout(() => {
-            startUpdate(mut_counter);
+            emit(mut_counter);
           }, 0);
         }
 
         mut_timerId = setInterval(() => {
           mut_counter = SafeUint.add(1, mut_counter);
 
-          startUpdate(mut_counter);
+          emit(mut_counter);
         }, intervalMilliSeconds);
       },
     }),
