@@ -125,15 +125,42 @@ describe('prefer-is-record-and-has-key through type wrappers', () => {
         errors: [{ messageId: 'useHasKey' }],
       },
       {
-        name: 'reads `!` on an optional record as the record it asserts',
+        // `Object.hasOwn(undefined, 'a')` throws; `isRecord` answers false.
+        name: 'keeps isRecord for `!` on an optional record, which leaves undefined in place',
         code: dedent`
           declare const obj: Readonly<Record<string, unknown>> | undefined;
           const ok = Object.hasOwn(obj!, 'a');
         `,
         output: dedent`
-          import { hasKey } from 'ts-std-forge';
+          import { isRecord, hasKey } from 'ts-std-forge';
           declare const obj: Readonly<Record<string, unknown>> | undefined;
-          const ok = hasKey(obj!, 'a');
+          const ok = (isRecord(obj!) && hasKey(obj!, 'a'));
+        `,
+        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+      },
+      {
+        name: 'keeps isRecord for a record widened by `as` to one that may be an array',
+        code: dedent`
+          declare const obj: Readonly<Record<string, unknown>>;
+          const ok = Object.hasOwn(obj as Readonly<Record<string, unknown>> | readonly string[], 'a');
+        `,
+        output: dedent`
+          import { isRecord, hasKey } from 'ts-std-forge';
+          declare const obj: Readonly<Record<string, unknown>>;
+          const ok = (isRecord(obj as Readonly<Record<string, unknown>> | readonly string[]) && hasKey(obj as Readonly<Record<string, unknown>> | readonly string[], 'a'));
+        `,
+        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+      },
+      {
+        name: 'drops isRecord for a record that is a record at every layer',
+        code: dedent`
+          declare const obj: Readonly<Record<string, unknown>>;
+          const ok = Object.hasOwn(obj! as Readonly<Record<string, unknown>>, 'a');
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-std-forge';
+          declare const obj: Readonly<Record<string, unknown>>;
+          const ok = hasKey(obj! as Readonly<Record<string, unknown>>, 'a');
         `,
         errors: [{ messageId: 'useHasKey' }],
       },

@@ -11,7 +11,7 @@ import {
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import * as ts from 'typescript';
-import { getValueType, isIdentifierNamed } from './ast-utils.mjs';
+import { isIdentifierNamed, typeHoldsAtEveryLayer } from './ast-utils.mjs';
 import { TS_STD_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
@@ -118,13 +118,13 @@ export const preferSafeNumberParseInteger: TSESLint.RuleModule<
           }
         }
 
-        // The argument must be a `string` so the autofix is type-safe against
-        // `SafeNumber.parseInteger(value: string)`, and that of the value, not
-        // of a cast: `parseInt(1e21 as unknown as string)` is 1, the rewrite
-        // 1e21. Without type information, skip.
-        const argType = getValueType(sourceCode, firstArg);
-
-        if (argType === undefined || !isStringType(argType)) {
+        // The argument must be a `string` at every layer of type wrappers:
+        // the value's own type is what `parseInt` sees at run time
+        // (`parseInt(1e21 as unknown as string)` is 1, the rewrite 1e21), and
+        // the type a wrapper states is what the fix, which keeps the wrapper,
+        // hands `SafeNumber.parseInteger(value: string)`. Without type
+        // information, skip.
+        if (!typeHoldsAtEveryLayer(sourceCode, firstArg, isStringType)) {
           return;
         }
 

@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
+import { skipTypeWrappers, typeWrapperLayers } from 'eslint-rule-forge';
 import type * as ts from 'typescript';
 
 /**
@@ -23,36 +23,35 @@ export const isIdentifierNamed = (
 };
 
 /**
- * The type of the value `node` evaluates to, asked of the expression inside
- * its type wrappers rather than of the cast, or `undefined` without type
- * information. A `!` among the wrappers still takes `null` and `undefined`
- * out, since that much the source asserts about the value itself.
+ * Whether `holds` is true of the type of every layer of type wrappers around
+ * `node` (see {@link typeWrapperLayers}), outermost to innermost; `false`
+ * without type information. A widening cast (`s as string | number`) is the
+ * author saying the value may be more than it is, and is respected; a
+ * narrowing one (`s!`, `v as unknown as string`) cannot vouch for what the
+ * value's own type does not, and the fix, which keeps the wrapper, has to
+ * type-check at every layer too.
  */
-export const getValueType = (
+export const typeHoldsAtEveryLayer = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   sourceCode: TSESLint.SourceCode,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: TSESTree.Node,
-): ts.Type | undefined => {
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  holds: (type: ts.Type, typeChecker: ts.TypeChecker) => boolean,
+): boolean => {
   const services = sourceCode.parserServices;
 
   const checker = services?.program?.getTypeChecker();
 
-  const tsNode = services?.esTreeNodeToTSNodeMap?.get(skipTypeWrappers(node));
-
-  if (checker === undefined || tsNode === undefined) {
-    return undefined;
+  if (checker === undefined) {
+    return false;
   }
 
-  const type = checker.getTypeAtLocation(tsNode);
+  return typeWrapperLayers(node).every((layer) => {
+    const tsNode = services?.esTreeNodeToTSNodeMap?.get(layer);
 
-  return hasNonNullAssertion(node) ? checker.getNonNullableType(type) : type;
+    return (
+      tsNode !== undefined && holds(checker.getTypeAtLocation(tsNode), checker)
+    );
+  });
 };
-
-const hasNonNullAssertion = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
-): boolean =>
-  isTypeWrapper(node) &&
-  (node.type === AST_NODE_TYPES.TSNonNullExpression ||
-    hasNonNullAssertion(node.expression));
