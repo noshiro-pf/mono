@@ -13,7 +13,7 @@ if (import.meta.vitest !== undefined) {
     //  Explanation:
     //  - zip pairs values by their index from multiple sources
     //  - Waits for all sources to emit at the same index
-    //  - Completes when any source completes
+    //  - Completes once a completed source has no value left to pair
 
     const [letters$, setLetter] = createState<string>('A');
 
