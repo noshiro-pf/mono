@@ -53,15 +53,15 @@ issue #2131 とライフサイクル仕様で決まったもの。実装はこ�
 
 synstate-dom の実装に先立って、または並行して synstate に入れる。詳細はライフサイクル仕様。
 
-| 変更                                                                                    | synstate-dom が必要とする理由                                                 | 状態                   |
-| :-------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------- | :--------------------- |
-| 完了したノードを親の子リストと伝播順から外す。子リストを `Set`、伝播順を depth バケツに | 行の破棄でノードが残らないこと。行数分のノードを O(1) 近くで作れること        | #2138（patch）         |
-| `dispose()`（上流に伝えない完了）。子の `complete()` で上流を連鎖完了させる動作はなくす | スコープが所有ノードを、共有の上流を止めずに破棄すること                      | #2153（minor）         |
-| スコープ API（`createScope`・`run`・`getCurrentScope`・`onScopeDispose`・`untracked`）  | マウントと破棄の単位。`assembleObservable` が生成時に現在のスコープへ登録する | 未着手（minor）        |
-| switchMap / mergeMap が所有しない内側を完了させない                                     | 共有の Observable を返す切り替えで、その Observable が死なないこと            | 未着手（不具合修正）   |
-| 完了済みの親に pipe した子を生成と同時に完了させる                                      | 完了済みの Observable を束縛したときに「一度だけ書く」と判定できること        | #2248                  |
-| Observable に実行時の目印（symbol）を付ける                                             | `Constant` と Observable を実行時に区別すること（「4.1」）                    | 未着手（#2117 と調整） |
-| 伝播中の書き込み（購読者の中の `setState`）は即時に伝播させ、その挙動をテストで固定する | イベントハンドラ以外から状態を書く束縛があったときの順序を保証すること        | 未着手                 |
+| 変更                                                                                    | synstate-dom が必要とする理由                                                    | 状態                   |
+| :-------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------- | :--------------------- |
+| 完了したノードを親の子リストと伝播順から外す。子リストを `Set`、伝播順を depth バケツに | 行の破棄でノードが残らないこと。行数分のノードを O(1) 近くで作れること           | #2138（patch）         |
+| `dispose()`（上流に伝えない完了）。子の `complete()` で上流を連鎖完了させる動作はなくす | スコープが所有ノードを、共有の上流を止めずに破棄すること                         | #2153（minor）         |
+| スコープ API（`createScope`・`run`・`getCurrentScope`・`onScopeDispose`・`untracked`）  | マウントと破棄の単位。`assembleObservable` が生成時に現在のスコープへ登録する    | #2334（minor）         |
+| switchMap / mergeMap が所有しない内側を完了させない                                     | 共有の Observable を返す切り替えで、その Observable が死なないこと               | #2335（patch）         |
+| 完了済みの親に pipe した子を生成と同時に完了させる                                      | 完了済みの Observable を束縛したときに「一度だけ書く」と判定できること           | #2248                  |
+| Observable に実行時の目印（symbol）を付ける                                             | `Constant` と Observable を実行時に区別すること（「4.1」）                       | 未着手（#2117 と調整） |
+| 伝播中の書き込み（購読者や operator の中での `next` / `setState`）に warning を出す     | synstate-dom 自身が伝播中に書き込まないことをテストで確かめられること（「8.4」） | #2336（minor）         |
 
 スコープ API の形（ライフサイクル仕様 6.1）:
 
@@ -364,13 +364,14 @@ export declare const view: <A, T>(
 - `items: Bindable<readonly T[]>`、`key: (item: T, index: number) => unknown`（必須）、子は `(item$: InitializedObservable<T>, index$: InitializedObservable<number>) => JSX.Element`。
 - 配列を渡す props は `items` とする。Solid は `each` だが、`<For each={todos$}>` は英語として「for each todos」と読めてしまうため、渡すものを表す名詞にした。
 - `key` は React と同じく必須にする。位置で対応づけたいときは `key={(_, i) => i}` と明示する。位置で対応づける専用の `Index` は用意しない。
-- 行ごとに `createScope(マウント時のスコープ)` を作り、その `run` の中で `createState(item)` と `createState(index)` を作って子の関数を 1 回呼ぶ。行の中は細粒度のまま更新される。
-- 配列が更新されたら:
-    1. 既存のキーの行には `setItem(item)` と `setIndex(i)` を流すだけで、子の関数は呼ばない。
+- `For` はマウント時のスコープで、`items` から「キー → `{ item, index }`」の Map を作るノード（`entries$`）を 1 つ作る。
+- 行ごとに `createScope(マウント時のスコープ)` を作り、その `run` の中で `item$` と `index$` を `entries$` から派生させて（自分のキーの要素を取り出す `map` と `skipIfNoChange()`）、子の関数を 1 回呼ぶ。行の中は細粒度のまま更新される。
+- 配列が更新されたら（`For` は `entries$` を購読して行の増減と DOM を扱う）:
+    1. 既存のキーの行は、`entries$` の子として通常の伝播で `item$` と `index$` が更新される。`For` は何もしない。子の関数も呼ばない。
     2. 新しいキーは上の手順で行を作る。
-    3. 消えたキーの行はスコープを dispose し、DOM を外す。
+    3. 消えたキーの行はスコープを dispose し、DOM を外す。その行の `item$` / `index$` がこの更新で走っても、キーが見つからないときは前回の値のままにする（流さない）。
     4. DOM の並べ替えは最長増加部分列（LIS）で移動を最小にする。
-- 行の `setItem` / `setIndex` は伝播中に呼ばれる書き込みになり、「3」のとおり即時に伝播する。
+- `For` は伝播中に state へ書き込まない（`setItem` / `setIndex` のような行ごとの state は持たない）。伝播中の書き込みは synstate が warning を出す正しくない書き方なので（#2336）、synstate-dom 自身もそれをしない。1 回の更新で全行の `item$` / `index$` が走る計算量は O(n) で、行ごとに書き込む方式と同じ。
 - 同じキーが配列に 2 つ以上ある場合は React にならい、`console.error` でキーを示す。動作は保証しないが、壊れないように 2 つ目以降は毎回新しい行として作り直す。
 
 ### 8.5 動作の時系列
@@ -443,13 +444,13 @@ unmount();
 | 3   | 記述のマウント        | `If` が root を保持して `hasItems$` を購読する。現在値は false なので S_else = `createScope(root)` を作り、その run で `<p>` をマウントする。`If` の購読解除は root に登録する                                                                                                                                   | root、S_else（run の間） |
 | 4   | `render` が戻る       | `App` が再び呼ばれることはない                                                                                                                                                                                                                                                                                   | なし                     |
 | 5   | `setItems([a])`       | `hasItems$` が true になる。`If` は `S_else.dispose()` で `<p>` を外し、S_then = `createScope(root)` の run で `<ul>` と `For` をマウントする。`For` は S_then を保持し、`items$` の現在値 `[a]` から S_a = `createScope(S_then)` の行を作る。行の `ItemRow` が作る map・combine と Text の購読解除は S_a に入る | S_then、S_a（run の間）  |
-| 6   | `setItems([a, b])`    | `hasItems$` は true のままなので `If` は何もしない。`For` は a に `setItem`・`setIndex(0)` を流すだけで、b には #5 と同じ手順で S_b = `createScope(S_then)` を作る                                                                                                                                               | S_b（run の間）          |
+| 6   | `setItems([a, b])`    | `hasItems$` は true のままなので `If` は何もしない。a の `item$`・`index$` は `entries$` から通常の伝播で更新され（値が同じなので流れない）、b には #5 と同じ手順で S_b = `createScope(S_then)` を作る                                                                                                           | S_b（run の間）          |
 | 7   | `setTaxRate(0.08)`    | 通常の伝播で両行の価格が更新される。スコープは関係しない                                                                                                                                                                                                                                                         | なし                     |
-| 8   | `setItems([b])`       | b は `setIndex(0)` で番号が 1. になる。a は `S_a.dispose()` で Text の購読を外し、末端から dispose する。`taxRate$` は子を 1 つ失うだけで残る                                                                                                                                                                    | なし                     |
+| 8   | `setItems([b])`       | b の `index$` が `entries$` から 0 を受け取り、番号が 1. になる。a は `S_a.dispose()` で Text の購読を外し、末端から dispose する。`taxRate$` は子を 1 つ失うだけで残る                                                                                                                                          | なし                     |
 | 9   | `setItems([])`        | `hasItems$` が false になる。`If` は `S_then.dispose()` を呼ぶ。子スコープ S_b、`For` の `items$` 購読、`<ul>` がまとめて外れる。続いて新しい S_else で `<p>` をマウントする                                                                                                                                     | S_else（run の間）       |
 | 10  | `unmount()`           | root が S_else、`If` の購読、`hasItems$` を破棄し、DOM を外す。`items$` と `taxRate$` は残る                                                                                                                                                                                                                     | なし                     |
 
-表の #5 では、`items$` の伝播の途中で `If` が `For` をマウントし、`For` が `items$` を購読する。伝播中に作られたノードと購読の扱いは #2138 で今と同じにしてあり、購読は現在値（`[a]`）を同期で受け取る。この順序をブラウザテストで固定する
+表の #5 では、`items$` の伝播の途中で `If` が `For` をマウントし、`For` が `entries$` を作って購読する。伝播中に作られたノードと購読の扱いは #2138 で今と同じにしてあり、購読は現在値（`[a]`）を同期で受け取る。この順序をブラウザテストで固定する
 
 ### 8.6 `Portal`
 
@@ -492,7 +493,7 @@ TDD で、テストを先に書いて失敗を確認してから実装する。
     - 束縛: 属性・プロパティ・テキスト・`class`・`style`・イベントの初期値と更新。`Constant` と完了済み Observable は購読しないこと。
     - props: 自作コンポーネントで props を分割代入しても、渡した Observable の更新が DOM に届くこと（「13」）。
     - `If`: 選ばれなかった分岐のコンポーネントが呼ばれないこと。切り替えで前の分岐のスコープが dispose されること。
-    - `For`: 追加・削除・並べ替えで既存行の子の関数が再実行されず、DOM ノードが同一であること。LIS による移動回数。
+    - `For`: 追加・削除・並べ替えで既存行の子の関数が再実行されず、DOM ノードが同一であること。LIS による移動回数。伝播中の書き込みの warning（#2336）が出ないこと。
     - リーク: マウントとアンマウントを繰り返しても、グローバルな state の子の数と購読者の数が元に戻ること（`hasChild` など synstate が公開する観測手段で確かめる）。
 - **ベンチマーク**: js-framework-benchmark の操作（1,000 / 10,000 行の作成、部分更新、入れ替え、削除）で Solid、VanJS、Preact + Signals と比べる。
 - **遅延評価の要否の確認**: synstate の既存ベンチマークに「グローバルに定義したが束縛していない派生」と「コンポーネント内で作って束縛した派生」の 2 ケースを足し、「8.7」のガイドラインで MobX との差が消えるかを確かめる。
@@ -531,7 +532,7 @@ libs/synstate-dom/
 
 ### 実装の順序
 
-1. synstate: スコープ API と生成時の登録、switchMap の所有判定、Observable の symbol 目印（「3」）。
+1. synstate: スコープ API と生成時の登録（#2334）、switchMap の所有判定（#2335）、Observable の symbol 目印（「3」）。
 2. synstate-dom の骨格（`package.json`、設定、空の entry point）。
 3. `constant`・`Bindable`・補助関数と型テスト。
 4. `Mountable`・`jsx-runtime`・`render`・要素のマウント。
@@ -545,7 +546,7 @@ libs/synstate-dom/
 ### synstate 側
 
 - 約 1,000 段を超えるチェーンの complete でスタックが溢れる件（UI ではその深さにならないので後回し）。
-- 伝播中の書き込みをバッチにまとめる最適化（React の batching に当たるもの）は、即時伝播で性能の問題が見えたら設計する。
+- 伝播中の書き込みは queue にもバッチにもせず、即時に伝播させたうえで warning を出す（#2336）。書き込みは Observable の派生に書き換えるよう促す。
 
 ### synstate-dom 側
 
