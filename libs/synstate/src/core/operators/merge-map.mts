@@ -98,9 +98,6 @@ import type {
  *   'C3',
  * ]);
  * ```
- *
- * @note To improve code readability, consider using `createState` instead of `mergeMap`,
- * subscribing to `parentObservable` and calling `setState` within it.
  */
 export const mergeMap =
   <A, B>(

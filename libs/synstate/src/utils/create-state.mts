@@ -88,6 +88,13 @@ const reducer = <S,>(state: S, action: Action<S>): S => {
  *   'label:bug page:2',
  * ]);
  * ```
+ *
+ * @note Do not call `setState`, `updateState` or `resetState` from a subscriber or a projection while another
+ * update is propagating: the write propagates immediately, so subscribers can
+ * see an intermediate state, and it logs a `console.warn` (once per
+ * observable). Derive the value from its source instead —
+ * `const b$ = a$.pipe(map((a) => a * 2))` rather than
+ * `a$.subscribe((a) => { setB(a * 2); })`.
  */
 export const createState = <S,>(
   initialState: S,

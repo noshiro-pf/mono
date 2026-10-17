@@ -52,6 +52,36 @@ const reset = resetState();
 console.log(reset); // 0
 ```
 
+## Do Not Write to State While an Update Propagates
+
+Because updates are synchronous, a `setState` (or `updateState`, `resetState`, `dispatch`, `next`) called from a subscriber or from a projection such as `map` runs while the update that triggered it is still propagating. The write still propagates immediately, but other subscribers can see an intermediate state, and writing back to the state being propagated can recurse without end. SynState logs a `console.warn` the first time each state is written to this way.
+
+```ts
+const [a$, setA] = createState(0);
+
+const [b$, setB] = createState(0);
+
+// ❌ Writes to b$ while a$ is propagating
+a$.subscribe((a) => {
+    setB(a * 2);
+});
+
+setA(1); // console.warn: synstate: an observable was written to ...
+```
+
+Derive the value from its source instead. The derived observable is part of the graph, so it is updated without glitches and shows up in the debugger:
+
+```ts
+const [a$, setA] = createState(0);
+
+// ✅ b$ is derived from a$
+const b$ = a$.pipe(map((a) => a * 2));
+
+setA(1);
+```
+
+If a slow side effect or an `await` stands between the source and the value, make that part of the graph too, with `fromPromise`, `switchMap` and similar operators. Writes from event handlers, timers and `queueMicrotask` callbacks run outside propagation and are not affected.
+
 ## Design Choice: Separate `setState` and `updateState`
 
 In React's `useState`, the setter function accepts both a direct value and an updater function (overloaded):

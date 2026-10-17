@@ -286,6 +286,16 @@ export const createObservableBaseHandle = <A,>(
 };
 
 /**
+ * How many `startUpdate` calls are running, across every observable. A root
+ * written to while this is non-zero is written to from inside a subscriber or
+ * a projection, which {@link isPropagating} lets it detect (#2336).
+ */
+const mut_propagation = { depth: 0 };
+
+/** Whether some observable's update is propagating right now. */
+export const isPropagating = (): boolean => mut_propagation.depth > 0;
+
+/**
  * The extra members every manager observable — a root or an async child — owns:
  * the depth-ordered descendant list and the update propagation that walks it.
  */
@@ -389,10 +399,20 @@ export const createManagerObservableParts = <A,>(
   const startUpdate = (nextValue: A): void => {
     const updateToken = issueUpdateToken();
 
-    handle.setNext(nextValue, updateToken);
+    mut_propagation.depth += 1;
 
-    for (const p of getPropagationOrder()) {
-      p.tryUpdate(updateToken);
+    // A subscriber or projection may throw, and the depth has to come back
+    // down regardless, or every later write would warn. The exception itself
+    // is not caught: it reaches the caller of `next` as it always has.
+    // @sumi-expect-error exceptions/no-try
+    try {
+      handle.setNext(nextValue, updateToken);
+
+      for (const p of getPropagationOrder()) {
+        p.tryUpdate(updateToken);
+      }
+    } finally {
+      mut_propagation.depth -= 1;
     }
   };
 
