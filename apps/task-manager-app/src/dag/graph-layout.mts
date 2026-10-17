@@ -35,7 +35,11 @@ import { textWidthUnits } from './truncate.mjs';
 /** 「標準」: a title, and a line of status and priority under it. */
 export const TASK_NODE_SIZE = { width: 184, height: 56 } as const;
 
-export const MILESTONE_NODE_SIZE = { width: 168, height: 44 } as const;
+/**
+ * A title, and its date under it: as high as a task, so that a date given
+ * or taken away changes no layout.
+ */
+export const MILESTONE_NODE_SIZE = { width: 168, height: 56 } as const;
 
 /** 「コンパクト」: the title alone, on one line. */
 export const COMPACT_TASK_NODE_SIZE = { width: 148, height: 32 } as const;

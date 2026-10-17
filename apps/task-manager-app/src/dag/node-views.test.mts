@@ -200,7 +200,39 @@ describe(buildNodeViews, () => {
       compactTitle: 'M',
       reached: false,
       awaitingCheck: true,
+      date: undefined,
       ariaLabel: 'マイルストーン「M」 未到達 解消待ち',
     });
+  });
+
+  test("writes a milestone's date short, as a task's due date is", () => {
+    const date = 1_791_515_100_000; /* 2026-10-09T03:05:00Z */
+
+    const dated: DomainState = {
+      ...state,
+      milestones: state.milestones.map((milestone) => ({
+        ...milestone,
+        date,
+      })),
+    } as const;
+
+    const before = buildNodeViews(dated, date - DAY_MS, 'Asia/Tokyo').get(
+      'milestone:m',
+    );
+
+    assert.isTrue(before?.kind === 'milestone');
+
+    assert.strictEqual(before.date, '日時 10/09 12:05');
+
+    assert.strictEqual(
+      before.ariaLabel,
+      'マイルストーン「M」 未到達 日時: 2026/10/09 12:05 解消待ち',
+    );
+
+    const nextYear = buildNodeViews(dated, 0, 'Asia/Tokyo').get('milestone:m');
+
+    assert.isTrue(nextYear?.kind === 'milestone');
+
+    assert.strictEqual(nextYear.date, '日時 2026/10/09');
   });
 });

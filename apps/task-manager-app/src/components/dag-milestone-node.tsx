@@ -19,15 +19,16 @@ type Props = Readonly<{
   highlight: HighlightState;
   /** While it fades out of or into a view mode; `undefined` for opaque. */
   opacity: number | undefined;
-  /** 「コンパクト」: a smaller hexagon, its title cut shorter. */
+  /** 「コンパクト」: a smaller hexagon, its title alone and cut shorter. */
   compact: boolean;
 }>;
 
 /**
  * A milestone: a hexagon, filled once reached and outlined (dashed) before,
- * so it reads as a point to wait for rather than work to do; smaller when
- * compact, its title cut shorter. Opened and
- * moved as a task is (`use-dag-node-handlers.mts`).
+ * so it reads as a point to wait for rather than work to do, with its title
+ * and, if it has one, its date under it; smaller when compact, its title cut
+ * shorter and its date in its tooltip. Opened and moved as a task is
+ * (`use-dag-node-handlers.mts`).
  */
 export const DagMilestoneNode = memoNamed<Props>(
   'DagMilestoneNode',
@@ -46,6 +47,8 @@ export const DagMilestoneNode = memoNamed<Props>(
     const { openNode, onKeyDown } = useDagNodeHandlers(view.ref, movable);
 
     const { width, height } = node;
+
+    const withDate = !compact && view.date !== undefined;
 
     const inset = height / 2;
 
@@ -80,18 +83,36 @@ export const DagMilestoneNode = memoNamed<Props>(
         onClick={openNode}
         onKeyDown={onKeyDown}
       >
-        <title>{view.title}</title>
+        <title>
+          {compact && view.date !== undefined
+            ? `${view.title}\n${view.date}`
+            : view.title}
+        </title>
         <polygon className={'dag-node-shape'} points={hexagon} />
         <text
           className={'dag-node-title'}
           dominantBaseline={'central'}
           textAnchor={'middle'}
           x={width / 2}
-          y={height / 2}
+          y={withDate ? height / 2 - LINE_OFFSET : height / 2}
         >
           {`${view.awaitingCheck ? '☐ ' : ''}${compact ? view.compactTitle : view.shortTitle}`}
         </text>
+        {withDate ? (
+          <text
+            className={'dag-node-meta'}
+            dominantBaseline={'central'}
+            textAnchor={'middle'}
+            x={width / 2}
+            y={height / 2 + LINE_OFFSET}
+          >
+            {view.date}
+          </text>
+        ) : undefined}
       </g>
     );
   },
 );
+
+/** From the middle of a standard node to the middle of each of its lines. */
+const LINE_OFFSET = 9;

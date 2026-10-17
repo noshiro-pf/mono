@@ -2,8 +2,8 @@
  * What each node of the DAG shows at a time: its title cut to fit, both a
  * standard node and a compact one (`view-model/node-size.mts`), the state
  * that colours it — a task's display status, a milestone's reached or not —
- * and a task's due date and priority. Separate from the layout, which does
- * not change with any of it.
+ * a task's due date and priority, and a milestone's date. Separate from the
+ * layout, which does not change with any of it.
  */
 
 import type { DeepReadonly } from 'ts-type-forge';
@@ -97,6 +97,8 @@ export const buildNodeViews = (
       const awaitingCheck =
         milestone.requiresManualCheck && milestone.checkedAt === undefined;
 
+      const { date } = milestone;
+
       return [
         nodeId(ref),
         {
@@ -112,9 +114,16 @@ export const buildNodeViews = (
           ),
           reached,
           awaitingCheck,
+          date:
+            date === undefined
+              ? undefined
+              : `日時 ${formatShortDateTime(date, now, timeZone)}`,
           ariaLabel: [
             `マイルストーン「${milestone.title}」`,
             reached ? '到達済み' : '未到達',
+            ...(date === undefined
+              ? []
+              : [`日時: ${formatDateTime(date, timeZone)}`]),
             ...(awaitingCheck ? ['解消待ち'] : []),
           ].join(' '),
         },
@@ -159,6 +168,11 @@ export type MilestoneNodeView = DeepReadonly<{
   compactTitle: string;
   reached: boolean;
   awaitingCheck: boolean;
+  /**
+   * `日時 10/09 12:05`, the date it waits for, as a task's due date is
+   * written: a node's second line; `undefined` without one.
+   */
+  date: string | undefined;
   ariaLabel: string;
 }>;
 
