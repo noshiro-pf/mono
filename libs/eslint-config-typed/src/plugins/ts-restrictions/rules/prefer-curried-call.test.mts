@@ -322,3 +322,84 @@ describe('prefer-curried-call with parenthesized operands', () => {
     ],
   });
 });
+
+describe('prefer-curried-call with a global callee', () => {
+  tester.run('prefer-curried-call', preferCurriedCall, {
+    valid: [
+      {
+        name: 'a host function from the default libraries keeps its wrapper (it needs `globalThis` as its receiver)',
+        code: dedent`
+          /// <reference lib="dom" />
+          declare const callbacks: readonly FrameRequestCallback[];
+          const ids = callbacks.map((callback) => requestAnimationFrame(callback));
+          const scheduler = {
+            requestFrame: (callback: FrameRequestCallback) =>
+              requestAnimationFrame(callback),
+          };
+          const handles = [1, 2].map((handle) => clearTimeout(handle));
+        `,
+      },
+      {
+        name: 'a host function stays wrapped through a type wrapper',
+        code: dedent`
+          /// <reference lib="dom" />
+          declare const callbacks: readonly FrameRequestCallback[];
+          const ids = callbacks.map((callback) =>
+            (requestAnimationFrame as (c: FrameRequestCallback) => number)(
+              callback,
+            ),
+          );
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'an ECMAScript global function is fixed',
+        code: dedent`
+          declare const xs: readonly string[];
+          const ys = xs.map((a) => parseFloat(a));
+          const zs = xs.filter((a) => Boolean(a));
+          const ws = xs.map((a) => encodeURIComponent(a));
+        `,
+        output: dedent`
+          declare const xs: readonly string[];
+          const ys = xs.map(parseFloat);
+          const zs = xs.filter(Boolean);
+          const ws = xs.map(encodeURIComponent);
+        `,
+        errors: [
+          { messageId: 'useFunctionDirectly' },
+          { messageId: 'useFunctionDirectly' },
+          { messageId: 'useFunctionDirectly' },
+        ],
+      },
+      {
+        name: 'a global declared in `declare global` is only suggested',
+        code: dedent`
+          export {};
+          declare global {
+            function hostUnary(a: number): boolean;
+          }
+          const ys = [1, 2].map((a) => hostUnary(a));
+        `,
+        errors: [
+          {
+            messageId: 'mayNeedGlobalReceiver',
+            suggestions: [
+              {
+                messageId: 'replaceWithFunction',
+                output: dedent`
+                  export {};
+                  declare global {
+                    function hostUnary(a: number): boolean;
+                  }
+                  const ys = [1, 2].map(hostUnary);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+});
