@@ -1,5 +1,14 @@
 # task-manager-app
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [16f5b5e]
+    - synstate@3.3.0
+    - preact-utils@0.0.11
+    - synstate-preact-signals@3.3.0
+
 ## 0.0.4
 
 ### Patch Changes
