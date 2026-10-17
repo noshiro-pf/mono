@@ -69,3 +69,11 @@ export const PRIORITY_LOW_LABEL = 'priority:low';
  * filters and sorts the merge order by all three.
  */
 export const PRIORITY_MID_LABEL = 'priority:mid';
+
+/**
+ * The label that says the author is holding a pull request back for now.
+ * Also on GitHub, and read only by the Pull Requests Manager page, whose
+ * merge order counts it and can hide what carries it. It asks nothing of
+ * `unblock-prs`: what is held is simply not labelled `merge-queued`.
+ */
+export const PENDING_LABEL = 'pending';

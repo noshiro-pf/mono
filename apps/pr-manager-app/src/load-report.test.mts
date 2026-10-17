@@ -152,6 +152,7 @@ describe(loadReport, () => {
       failing: undefined,
       setAside: undefined,
       awaitingReview: undefined,
+      pending: 0,
     });
 
     assert.deepStrictEqual(drawn.reading, ['merged', 'issues']);

@@ -28,6 +28,7 @@ import {
   parseRuleset,
   parseSetAsideComment,
   parseStartAfter,
+  PENDING_LABEL,
   referenceStatusOf,
   reportedContexts,
   setAsideStillApplies,
@@ -152,6 +153,8 @@ export type PageSummary = Readonly<{
   setAside: number | undefined;
   /** Waiting for a code owner to approve. */
   awaitingReview: number | undefined;
+  /** Labelled `pending`: the author holding it back for now. */
+  pending: number;
 }>;
 
 /** The sections below the merge order, each read by a query of its own. */
@@ -1370,6 +1373,9 @@ const summaryOf = (entries: readonly Entry[]): PageSummary => {
         entries.filter((entry) => entry.codeOwnerReview.state === 'required')
           .length,
     ),
+    pending: entries.filter((entry) =>
+      entry.labels.some((label) => label.name === PENDING_LABEL),
+    ).length,
   };
 };
 

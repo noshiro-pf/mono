@@ -32,7 +32,9 @@ import { OfTotal, StatTile } from './stat-tile.js';
  * not drawn: a draft is always shown, and its card's badge says so, and how
  * far behind the base a pull request is is its card's ahead / behind bar.
  * `set aside` and `awaiting code owner` are what stops a pull request that
- * is otherwise ready, and are only this page's.
+ * is otherwise ready, and are only this page's, as is `pending`, the
+ * `pending` label an author puts on what they are holding back, which is
+ * the count to switch off to leave it out.
  */
 export const MergeOrderFilters = memoNamed('MergeOrderFilters', () => {
   const summary = readerSignals.summary.value;
@@ -131,6 +133,7 @@ const STATUS_TONES = {
   failing: 'critical',
   setAside: 'critical',
   awaitingReview: 'warning',
+  pending: undefined,
 } as const satisfies ReadonlyRecord<StatusFilter, StatusRole | undefined>;
 
 const PRIORITY_NAMES = {
