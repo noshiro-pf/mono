@@ -10,10 +10,6 @@ test(
   async ({ page }) => {
     await page.goto(DEMO);
 
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await page.getByTestId('view-dag').click();
-
     const canvas = page.getByTestId('dag-canvas');
 
     await expect.soft(canvas).toHaveAttribute('data-animating', 'false');
@@ -74,13 +70,8 @@ test(
 
     await expect.soft(page.getByTestId('dag-edge')).toHaveCount(10);
 
-    // Kept on this device: a new visit, which the URL does not open on the
-    // graph.
+    // Kept on this device: a new visit, whose URL names no mode.
     await page.goto(DEMO);
-
-    await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-    await page.getByTestId('view-dag').click();
 
     await expect.soft(canvas).toHaveAttribute('data-animating', 'false');
 

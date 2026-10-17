@@ -1,9 +1,11 @@
+import type { View } from '../view-model/index.mjs';
 import { createDagViewModeStore } from './dag-view-mode-store.mjs';
 import { createUiStore } from './ui-store.mjs';
 import { createViewQuerySync } from './view-query-sync.mjs';
 
 const setup = (
   search: string,
+  initialView: View = 'dag',
 ): Readonly<{
   ui: ReturnType<typeof createUiStore>;
   mode: ReturnType<typeof createDagViewModeStore>;
@@ -14,7 +16,7 @@ const setup = (
 
   let mut_search = search;
 
-  const ui = createUiStore({ initialView: 'list' });
+  const ui = createUiStore({ initialView });
 
   const mode = createDagViewModeStore({
     initial: 'dag',
@@ -39,27 +41,27 @@ describe(createViewQuerySync, () => {
   test('writes the screen and the graph’s mode as they change', () => {
     const { ui, mode, written } = setup('?storage=memory');
 
-    ui.setView('dag');
+    ui.setView('list');
 
     mode.set('arc');
 
-    ui.setView('list');
+    ui.setView('dag');
 
     assert.deepStrictEqual(written, [
-      '?storage=memory&view=dag&mode=dag',
-      '?storage=memory&view=dag&mode=arc',
-      '?storage=memory',
+      '?storage=memory&mode=dag',
+      '?storage=memory&view=list',
+      '?storage=memory&mode=arc',
     ]);
   });
 
   test('takes out what the URL said that is not shown', () => {
-    const { written } = setup('?view=board');
+    const { written } = setup('?view=board&mode=x');
 
-    assert.deepStrictEqual(written, ['']);
+    assert.deepStrictEqual(written, ['?mode=dag']);
   });
 
   test('writes nothing when the URL already says it', () => {
-    const { mode, written } = setup('?storage=memory');
+    const { mode, written } = setup('?storage=memory&view=list', 'list');
 
     mode.set('tile');
 
@@ -67,11 +69,11 @@ describe(createViewQuerySync, () => {
   });
 
   test('stops writing once stopped', () => {
-    const { ui, written, stopSync } = setup('');
+    const { ui, written, stopSync } = setup('?mode=dag');
 
     stopSync();
 
-    ui.setView('dag');
+    ui.setView('list');
 
     assert.deepStrictEqual(written, []);
   });

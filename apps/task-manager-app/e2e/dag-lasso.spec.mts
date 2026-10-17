@@ -158,10 +158,6 @@ test(
 const showDag = async (page: DeepReadonly<Page>): Promise<void> => {
   await page.goto(DEMO);
 
-  await expect.soft(page.getByTestId('list-view')).toBeVisible();
-
-  await page.getByTestId('view-dag').click();
-
   await expect
     .soft(page.getByTestId('dag-canvas'))
     .toHaveAttribute('data-animating', 'false');
