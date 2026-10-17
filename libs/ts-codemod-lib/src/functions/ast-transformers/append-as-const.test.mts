@@ -894,6 +894,125 @@ describe(appendAsConstTransformer, () => {
     ])('$name', testFn);
   });
 
+  describe('Callee judged by its type at the call, through type wrappers', () => {
+    test.each([
+      {
+        name: 'widening as to a const type parameter signature should remove as const',
+        source: dedent`
+          const g = <T,>(x: T): T => x;
+          const a = (g as <const T>(x: T) => T)([1, 2] as const);
+        `,
+        expected: dedent`
+          const g = <T,>(x: T): T => x;
+          const a = (g as <const T>(x: T) => T)([1, 2]);
+        `,
+      },
+      {
+        name: 'as to a non-const type parameter signature should keep as const',
+        source: dedent`
+          const g = <const T,>(x: T): T => x;
+          const a = (g as <T>(x: T) => T)([1, 2] as const);
+        `,
+        expected: dedent`
+          const g = <const T,>(x: T): T => x;
+          const a = (g as <T>(x: T) => T)([1, 2] as const);
+        `,
+      },
+      {
+        name: 'satisfies keeps the callee type, so as const should be removed',
+        source: dedent`
+          const g = <const T,>(x: T): T => x;
+          const a = (g satisfies unknown)([1, 2] as const);
+        `,
+        expected: dedent`
+          const g = <const T,>(x: T): T => x;
+          const a = (g satisfies unknown)([1, 2]);
+        `,
+      },
+      {
+        name: 'non-null asserted callee should remove as const',
+        source: dedent`
+          declare const g: (<const T>(x: T) => T) | undefined;
+          const a = g!([1, 2] as const);
+        `,
+        expected: dedent`
+          declare const g: (<const T>(x: T) => T) | undefined;
+          const a = g!([1, 2]);
+        `,
+      },
+      {
+        name: 'parenthesized callee should remove as const',
+        source: dedent`
+          const g = <const T,>(x: T): T => x;
+          const a = ((g))([1, 2] as const);
+        `,
+        expected: dedent`
+          const g = <const T,>(x: T): T => x;
+          const a = ((g))([1, 2]);
+        `,
+      },
+    ])('$name', testFn);
+  });
+
+  describe('Angle-bracket const assertions (<const>x)', () => {
+    test.each([
+      {
+        name: 'should be removed inside an array literal that gets as const',
+        source: 'const c = [<const>[1], 2];',
+        expected: 'const c = [[1], 2] as const;',
+      },
+      {
+        name: 'should be removed inside an object literal that gets as const',
+        source: 'const o = { a: <const>[1] };',
+        expected: 'const o = { a: [1] } as const;',
+      },
+      {
+        name: 'should be spelled as const on a const initializer',
+        source: 'const b = <const>[1, 2];',
+        expected: 'const b = [1, 2] as const;',
+      },
+      {
+        name: 'should be removed from a primitive const initializer',
+        source: "const s = <const>'a';",
+        expected: "const s = 'a';",
+      },
+      {
+        name: 'should be removed inside an outer as const',
+        source: 'const n = [<const>[1], 2] as const;',
+        expected: 'const n = [[1], 2] as const;',
+      },
+      {
+        name: 'const type parameter should remove it from an argument',
+        source: dedent`
+          function f<const T>(x: T): T { return x; }
+          const a = f(<const>[1, 2]);
+          const b = f((<const>[1, 2]));
+        `,
+        expected: dedent`
+          function f<const T>(x: T): T { return x; }
+          const a = f([1, 2]);
+          const b = f([1, 2]);
+        `,
+      },
+      {
+        name: 'non-const type parameter should keep it in an argument',
+        source: dedent`
+          function g<T>(x: T): T { return x; }
+          const a = g(<const>[1, 2]);
+        `,
+        expected: dedent`
+          function g<T>(x: T): T { return x; }
+          const a = g(<const>[1, 2]);
+        `,
+      },
+      {
+        name: 'other angle-bracket assertions should be left as they are',
+        source: 'const d = <readonly number[]>[1, 2];',
+        expected: 'const d = <readonly number[]>[1, 2];',
+      },
+    ])('$name', testFn);
+  });
+
   describe('ignorePrefixes option (mut_ prefix)', () => {
     test.each([
       {
