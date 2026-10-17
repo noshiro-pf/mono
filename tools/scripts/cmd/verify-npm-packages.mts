@@ -701,6 +701,9 @@ const notYetPublished: ReadonlySet<string> = new Set([
   // each copied moved into one package (#2180). Delete this entry after its
   // first manual publish (libs/first-release.md).
   'eslint-rule-forge',
+  // Added with its first rule, `no-unbounded-counter-pipe`. Delete this entry
+  // after its first manual publish (libs/first-release.md).
+  'eslint-plugin-synstate',
 ]);
 
 /**
