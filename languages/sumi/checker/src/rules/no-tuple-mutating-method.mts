@@ -4,7 +4,7 @@ import {
   isPropertyAccessExpression,
 } from 'typescript-native/unstable/ast';
 import type { Checker, Type } from 'typescript-native/unstable/sync';
-import { ownerOf, unwrap } from '../ast/index.mjs';
+import { ownersOf, unwrap, wrapperLayers } from '../ast/index.mjs';
 import type { Rule } from '../engine/index.mjs';
 
 /**
@@ -85,15 +85,22 @@ export const noTupleMutatingMethod: Rule = {
 
     // `Array` rather than `ReadonlyArray`: a readonly tuple does not have
     // these members at all, so tsc has already refused the call.
-    if (ownerOf(checker, callee) !== 'Array') {
+    if (!ownersOf(checker, callee).includes('Array')) {
       return;
     }
 
-    // The value's type, not the cast's: `(t as X[]).push(3)` still grows the
-    // tuple `t` is.
-    const receiverType = checker.getTypeAtLocation(unwrap(callee.expression));
+    // A tuple at any layer of the receiver (see `wrapperLayers`):
+    // `(t as X[]).push(3)` still grows the tuple `t` is, and
+    // `(xs as [X, X]).push(3)` is the author saying `xs` is one.
+    const isTupleAtSomeLayer = wrapperLayers(callee.expression).some(
+      (layer) => {
+        const type = checker.getTypeAtLocation(layer);
 
-    if (receiverType === undefined || !isTupleTyped(checker, receiverType)) {
+        return type !== undefined && isTupleTyped(checker, type);
+      },
+    );
+
+    if (!isTupleAtSomeLayer) {
       return;
     }
 

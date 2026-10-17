@@ -20,7 +20,7 @@ import {
   type Node as TsNode,
 } from 'typescript-native/unstable/ast';
 import { SymbolFlags, type Checker } from 'typescript-native/unstable/sync';
-import { outermostWrapper, unwrap } from '../ast/index.mjs';
+import { outermostWrapper, unwrap, wrapperLayers } from '../ast/index.mjs';
 import type { Rule } from '../engine/index.mjs';
 
 /**
@@ -106,13 +106,22 @@ export const restrictCastMutable: Rule = {
 
     const expected = checker.getContextualType(call);
 
-    const actual = checker.getTypeAtLocation(unwrap(argument));
+    if (expected === undefined) {
+      return;
+    }
 
-    if (
-      expected !== undefined &&
-      actual !== undefined &&
-      checker.isTypeAssignableTo(actual, expected)
-    ) {
+    // Unnecessary only if every layer of the argument is accepted as it is
+    // (see `wrapperLayers`): `castMutable(xs as readonly T[])` is the author
+    // saying the value is readonly, and without the cast it would not pass.
+    const isAcceptedAtEveryLayer = wrapperLayers(argument).every((layer) => {
+      const actual = checker.getTypeAtLocation(layer);
+
+      return (
+        actual !== undefined && checker.isTypeAssignableTo(actual, expected)
+      );
+    });
+
+    if (isAcceptedAtEveryLayer) {
       report(call, 'unnecessary', { name });
     }
   },

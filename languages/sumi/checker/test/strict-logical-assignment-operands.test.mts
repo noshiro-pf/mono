@@ -104,6 +104,44 @@ describe(`${strictLogicalAssignmentOperands.ruleId} through type wrappers`, () =
           { messageId: 'nonBooleanOperand', line: 10 },
         ],
       },
+      {
+        // An operand is boolean only when it is boolean at every layer: a
+        // widening `as` is the author saying it may be something else.
+        name: 'a boolean widened by `as` is not boolean',
+        code: dedent`
+          export const widened = (flag: boolean): boolean => {
+            let mut_w = flag;
+
+            (mut_w as boolean | undefined) ||= true;
+
+            return mut_w;
+          };
+        `,
+        errors: [{ messageId: 'nonBooleanOperand', line: 4 }],
+      },
+      {
+        name: 'no layer of the operand is boolean',
+        code: dedent`
+          export const wrapped = (
+            name: string,
+            count: number,
+          ): readonly unknown[] => {
+            let mut_name = name;
+            let mut_count = count;
+
+            (mut_name as string | undefined) ||= 'x';
+            (mut_count satisfies number) &&= count as unknown as number;
+            mut_name ||= <string>name!;
+
+            return [mut_name, mut_count];
+          };
+        `,
+        errors: [
+          { messageId: 'nonBooleanOperand', line: 8 },
+          { messageId: 'nonBooleanOperand', line: 9 },
+          { messageId: 'nonBooleanOperand', line: 10 },
+        ],
+      },
     ],
   });
 });

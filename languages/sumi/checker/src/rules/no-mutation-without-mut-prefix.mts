@@ -17,7 +17,7 @@ import {
   type Node as TsNode,
 } from 'typescript-native/unstable/ast';
 import type { Checker } from 'typescript-native/unstable/sync';
-import { ownerOf, unwrap } from '../ast/index.mjs';
+import { ownersOf, unwrap } from '../ast/index.mjs';
 import type { Rule, RuleContext } from '../engine/index.mjs';
 
 /**
@@ -146,7 +146,13 @@ export const noMutationWithoutMutPrefix: Rule = {
       return;
     }
 
-    const owner = ownerOf(checker, callee);
+    // A mutator if any layer of the receiver says so (see `wrapperLayers`):
+    // `(xs as { push: … }).push(1)` still mutates the array `xs` is.
+    const owner = ownersOf(checker, callee).find(
+      (candidate) =>
+        candidate !== undefined &&
+        mutatorsByOwner.get(candidate)?.has(method) === true,
+    );
 
     const alternative =
       owner === undefined ? undefined : mutatorsByOwner.get(owner)?.get(method);
@@ -467,11 +473,12 @@ const isFreshValue = (
     return false;
   }
 
-  const owner = ownerOf(checker, callee);
-
-  return (
-    owner !== undefined &&
-    (freshValueMembersByOwner.get(owner)?.has(callee.name.text) ?? false)
+  // Fresh only if every layer of the receiver says so: the exemption spares
+  // a report, so no layer may contradict it (see `wrapperLayers`).
+  return ownersOf(checker, callee).every(
+    (owner) =>
+      owner !== undefined &&
+      (freshValueMembersByOwner.get(owner)?.has(callee.name.text) ?? false),
   );
 };
 

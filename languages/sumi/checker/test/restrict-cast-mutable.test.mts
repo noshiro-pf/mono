@@ -134,3 +134,38 @@ describe(restrictCastMutable.ruleId, () => {
     ],
   });
 });
+
+describe(`${restrictCastMutable.ruleId} through type wrappers`, () => {
+  testRule(restrictCastMutable, {
+    valid: [
+      {
+        // The cast is unnecessary only if every layer of the argument is
+        // accepted as it is: a widening `as` is the author saying the value is
+        // readonly, and without the cast it would not type-check.
+        name: 'a mutable value widened to readonly by `as`',
+        code: dedent`
+          ${castMutableDeclaration}
+
+          declare const takesWidened: (xs: string[]) => number;
+
+          export const widened = (xs: string[]): number =>
+            takesWidened(castMutable(xs as readonly string[]));
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'every layer of the argument is accepted as it is',
+        code: dedent`
+          ${castMutableDeclaration}
+
+          declare const takesEveryLayer: (xs: readonly string[]) => number;
+
+          export const everyLayer = (xs: readonly string[]): number =>
+            takesEveryLayer(castMutable((xs satisfies readonly string[])!));
+        `,
+        errors: [{ messageId: 'unnecessary', line: 9 }],
+      },
+    ],
+  });
+});

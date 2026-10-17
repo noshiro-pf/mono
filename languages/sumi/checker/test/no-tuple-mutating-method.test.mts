@@ -170,11 +170,13 @@ describe(`${noTupleMutatingMethod.ruleId} through type wrappers`, () => {
   testRule(noTupleMutatingMethod, {
     valid: [
       {
-        name: 'an array cast to a tuple is still an array',
+        name: 'an array at every layer',
         code: dedent`
-          const mut_grow: number[] = [1, 2];
-          (mut_grow as [number, number]).push(3);
-          export const grow = mut_grow;
+          const mut_arr: number[] = [1, 2];
+          (mut_arr as number[]).push(3);
+          (mut_arr satisfies readonly number[]).reverse();
+          mut_arr!.sort();
+          export const arr = mut_arr;
         `,
       },
     ],
@@ -195,18 +197,39 @@ describe(`${noTupleMutatingMethod.ruleId} through type wrappers`, () => {
         ],
       },
       {
-        name: 'a tuple cast to an array is still a tuple',
+        // The receiver is a tuple if any layer of it is one: a cast to an
+        // array does not stop the call growing the tuple underneath, and a
+        // cast to a tuple is the author saying the value is one.
+        name: 'a tuple at some layer',
         code: dedent`
-          const mut_q: [number, string] = [1, 'a'];
-          (mut_q as (number | string)[]).push(3);
-          (<(number | string)[]>mut_q).reverse();
-          (mut_q satisfies (number | string)[]).sort();
-          export const q = mut_q;
+          const mut_widened: [number, string] = [1, 'a'];
+          (mut_widened as (number | string)[]).push(3);
+          (<(number | string)[]>mut_widened).reverse();
+          const mut_grow: number[] = [1, 2];
+          (mut_grow as [number, number]).push(3);
+          export const widened = [mut_widened, mut_grow] as const;
         `,
         errors: [
           { messageId: 'lengthChanged', line: 2 },
           { messageId: 'positionsRewritten', line: 3 },
+          { messageId: 'lengthChanged', line: 5 },
+        ],
+      },
+      {
+        name: 'a tuple at every layer',
+        code: dedent`
+          const mut_q: [number, string] = [1, 'a'];
+          (mut_q satisfies (number | string)[]).sort();
+          (mut_q as [number, string]).push(3);
+          (<[number, string]>mut_q).reverse();
+          mut_q!.pop();
+          export const q = mut_q;
+        `,
+        errors: [
+          { messageId: 'positionsRewritten', line: 2 },
+          { messageId: 'lengthChanged', line: 3 },
           { messageId: 'positionsRewritten', line: 4 },
+          { messageId: 'lengthChanged', line: 5 },
         ],
       },
     ],
