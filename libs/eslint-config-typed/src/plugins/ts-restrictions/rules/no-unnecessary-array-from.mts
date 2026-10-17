@@ -11,6 +11,7 @@ import {
   matchArrayFromCall,
   toMemberObjectText,
 } from './array-type-utils.mjs';
+import { createGetLayerTypes } from './type-layer-utils.mjs';
 
 type Options = readonly [];
 
@@ -97,6 +98,8 @@ export const noUnnecessaryArrayFrom: TSESLint.RuleModule<MessageIds, Options> =
 
       const isArrayOrTupleType = createIsArrayOrTupleType(checker);
 
+      const getLayerTypes = createGetLayerTypes(parserServices);
+
       return {
         CallExpression: (node) => {
           // Match `<object>.<method>(...)` where `<method>` is a non-mutating
@@ -123,26 +126,16 @@ export const noUnnecessaryArrayFrom: TSESLint.RuleModule<MessageIds, Options> =
           }
 
           // The argument must already be an array (not a `Set` / `Map` / iterable
-          // that genuinely needs `Array.from()` to become an array). The
-          // value's own type is asked: `s as unknown as number[]` is still a
-          // `Set`.
-          const argType = checker.getTypeAtLocation(
-            parserServices.esTreeNodeToTSNodeMap.get(
-              asNode(skipTypeWrappers(arg)),
-            ),
-          );
-
-          if (!isArrayOrTupleType(argType)) {
+          // that genuinely needs `Array.from()` to become an array) at every
+          // type-wrapper layer: `s as unknown as number[]` is still a `Set`, and
+          // `xs as Iterable<number>` is the author saying it may not be an array.
+          if (!getLayerTypes(arg).every(isArrayOrTupleType)) {
             return;
           }
 
           // Guard against a shadowed `Array` binding whose `.from()` does not
           // return an array: the real `Array.from(arrayLike)` is always an array.
-          const innerType = checker.getTypeAtLocation(
-            parserServices.esTreeNodeToTSNodeMap.get(inner),
-          );
-
-          if (!isArrayOrTupleType(innerType)) {
+          if (!getLayerTypes(callee.object).every(isArrayOrTupleType)) {
             return;
           }
 

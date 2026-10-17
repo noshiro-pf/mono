@@ -30,13 +30,36 @@
 キャスト後の型である。`(n as unknown as boolean) ? true : b` の条件は `boolean` と
 答えるが、値は数値のままである。修正が型に依存するルールでは、これで修正が挙動を
 変える。この例を `n || b` に書き換えると、結果は `true` ではなく `n` になる。
+逆に、剥がした中身の型だけを聞くと、作者が書いた `as` を無視することになる。
+`isNull(x as string | null)` は、`x` が `string` でも `false` に畳んではいけない。
+
+境界は次のとおりである。
+
+- **A. 構文（値・参照・リテラル）は、常にラッパー越しに見る。** ラッパーは値を
+  変えない。`xs.length > (0 as number)` は `0` との比較である。
+  `xs.length > (n as 0)` のように型だけが `0` と言っているものは、値とはみなさない。
+- **B. 型による結論は、ラッパーのすべての層の型で成り立つときだけ出す。**
+  `x as unknown as T` なら `x as unknown as T`・`x as unknown`・`x` の 3 層で、
+  途中の `unknown` も数える。アサーションは判定を慎重な側にしか動かさない。
+    - 広げる `as`（`x as string | null`）は、作者の主張として尊重する。
+    - 狭めるアサーション（`x!`、`unknown` からのキャスト）は値を保証しないので、
+      値そのものの型が決める。
+    - 層によって結論が分かれるなら、報告しない（修正しない）。「〜に置き換える」
+      という結論は、ある層で出したものがすべての層で成り立つなら使ってよい。
+    - 危険を報告するルール（`total-functions` の `no-partial-*` など）では、
+      慎重な側は逆になる。どれかの層で危険なら報告する。
+
+このリポジトリでは `!` と狭める `as` は lint エラー
+（`@typescript-eslint/no-non-null-assertion`、`total-functions/no-unsafe-type-assertion`）
+なので、B と「外側の型だけで判定する」案の違いは、それらを disable した箇所にしか
+出ない。
 
 避け方:
 
-- **構文を見る前、型を聞く前に剥がす。** ESLint のルールと Sumi の oxlint JS
+- **構文を見る前に剥がし、型は層ごとに聞く。** ESLint のルールと Sumi の oxlint JS
   plugin では `eslint-rule-forge`（`libs/eslint-rule-forge`）の
-  `skipTypeWrappers` を使う。ラッパーの各層の型を聞くなら `typeWrapperLayers`
-  を使う。公開しているプラグインもこれを `dependencies` に持つので、ヘルパーを
+  `skipTypeWrappers` で剥がし、`typeWrapperLayers` で各層を得て型を聞く。
+  公開しているプラグインもこれを `dependencies` に持つので、ヘルパーを
   パッケージへコピーせず、足りないものはこのパッケージに足す。同じ参照かどうかは、
   `ts-restrictions/rules/reference-utils.mts` の `isSameReference` がラッパー越しに比べる。
 - **位置を判定するときも剥がす。** 「JSX の中か」「呼び出しの callee か」のように
@@ -72,6 +95,9 @@ TypeScript の AST は逆で、括弧が `ParenthesizedExpression` というノ�
 - `satisfies` で包んだもの: リテラル、比べる値、式全体。報告され、修正でラッパーが残ること。
 - `as` で型を偽ったもの: 修正が型に依存するなら、報告しない（または修正しない）ことを
   `valid` で固定する。
+- `as` で型を広げたもの（`b as boolean | number`、`x as string | null`）: 結論が
+  変わるなら報告しないことを `valid` で、すべての層で結論が同じなら報告することを
+  `invalid` で固定する。
 - `!` を付けたもの。
 - 親の位置で判定するなら、式全体をラッパーで包んだもの。
 - ソースで括弧に囲まれたオペランド: 修正の出力で、必要な括弧が残ること。

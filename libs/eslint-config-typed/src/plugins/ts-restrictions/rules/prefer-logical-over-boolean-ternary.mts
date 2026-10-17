@@ -13,6 +13,7 @@ import {
   isExactlyInvertible,
 } from './comparison-utils.mjs';
 import { jsxValuePositionOf } from './jsx-utils.mjs';
+import { createGetLayerTypes } from './type-layer-utils.mjs';
 
 type Options = readonly [];
 
@@ -38,9 +39,11 @@ type MessageIds = 'preferLogical';
  * inverted when no operand can be `NaN`. A relational comparison that may be
  * `NaN` has no exact short negation, so that ternary is left alone.
  *
- * A literal and a type are read through any `as`, `satisfies` or `!`:
- * `(false satisfies boolean)` is `false`, and `(n as unknown as boolean)` is
- * still the number it was, so `a ? true : b` is left alone for it.
+ * A literal is read through any `as`, `satisfies` or `!`:
+ * `(false satisfies boolean)` is `false`. A type has to be a boolean at every
+ * wrapper layer: `(n as unknown as boolean)` is still the number it was, and
+ * `(a as boolean | number)` is the author saying it may be a number, so
+ * `x ? true : b` is left alone for either.
  *
  * A ternary whose branches are both bare boolean literals is
  * `no-unneeded-ternary`'s. When a wrapper hides one of them from it, this rule
@@ -74,13 +77,7 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
 
     const checker = services.program.getTypeChecker();
 
-    /** The type of the value, through any `as`, `satisfies` or `!`. */
-    const getType = (node: DeepReadonly<TSESTree.Node>): ts.Type =>
-      checker.getTypeAtLocation(
-        services.esTreeNodeToTSNodeMap.get(
-          asNode(isTypeWrapper(node) ? skipTypeWrappers(node) : node),
-        ),
-      );
+    const getLayerTypes = createGetLayerTypes(services);
 
     const textOf = (node: DeepReadonly<TSESTree.Node>): string =>
       sourceCode.getText(asNode(node));
@@ -106,9 +103,9 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
           (isComparison(node) ||
             node.operator === 'in' ||
             node.operator === 'instanceof')) ||
-        constituentsOf(getType(node)).every(
-          (type) => (type.flags & ts.TypeFlags.BooleanLike) !== 0,
-        )
+        getLayerTypes(wrapped)
+          .flatMap(constituentsOf)
+          .every((type) => (type.flags & ts.TypeFlags.BooleanLike) !== 0)
       );
     };
 
@@ -130,7 +127,7 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
       }
 
       if (isComparison(node)) {
-        return isExactlyInvertible(node, getType, checker)
+        return isExactlyInvertible(node, getLayerTypes, checker)
           ? invertedComparisonText(node, sourceCode)
           : undefined;
       }

@@ -4,10 +4,11 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
+import { isTypeWrapper } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { jsxValuePositionOf, type JsxValuePosition } from './jsx-utils.mjs';
+import { createGetLayerTypes } from './type-layer-utils.mjs';
 
 type Options = readonly [];
 
@@ -36,8 +37,9 @@ type MessageIds = 'booleanOperands' | 'nonBooleanLeft';
  * An operand is "in JSX" when its value can come out of the braces: the
  * expression in `{…}` itself, a branch of a ternary there, or an operand of a
  * longer `&&` / `||` / `??` chain. The test of a ternary is not. An operand is
- * judged by the type of its value, through any `as`, `satisfies` or `!`: a cast
- * to `boolean` does not make a number one. This replaces
+ * a boolean only when it is one at every `as`, `satisfies` or `!` around it: a
+ * cast to `boolean` does not make a number one, and a cast widening a boolean
+ * to `boolean | number` is the author saying it may be a number. This replaces
  * `react/jsx-no-leaked-render`, which reported every `&&` alike, whatever its
  * operands were.
  */
@@ -68,13 +70,14 @@ export const jsxBooleanLogicalOperands: TSESLint.RuleModule<
 
     const checker = services.program.getTypeChecker();
 
+    const getLayerTypes = createGetLayerTypes(services);
+
+    /**
+     * Whether `node` is a boolean at every type-wrapper layer: neither
+     * `(n as unknown as boolean)` nor `(b as boolean | number)` is one.
+     */
     const isBoolean = (node: DeepReadonly<TSESTree.Expression>): boolean =>
-      typeIsBoolean(
-        checker.getTypeAtLocation(
-          services.esTreeNodeToTSNodeMap.get(asNode(skipTypeWrappers(node))),
-        ),
-        checker,
-      );
+      getLayerTypes(node).every((type) => typeIsBoolean(type, checker));
 
     const textOf = (node: DeepReadonly<TSESTree.Node>): string =>
       sourceCode.getText(asNode(node));

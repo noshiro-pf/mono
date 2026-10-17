@@ -1,11 +1,6 @@
-import {
-  ESLintUtils,
-  type TSESLint,
-  type TSESTree,
-} from '@typescript-eslint/utils';
-import { isTypeWrapper } from 'eslint-rule-forge';
-import type { DeepReadonly } from 'ts-type-forge';
+import { ESLintUtils, type TSESLint } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
+import { createGetLayerTypes } from './type-layer-utils.mjs';
 
 type Options = readonly [];
 
@@ -105,14 +100,7 @@ export const noStringSpread: TSESLint.RuleModule<MessageIds, Options> = {
       return (type.flags & ts.TypeFlags.StringLike) !== 0;
     };
 
-    const isStringLikeTypedNode = (
-      node: DeepReadonly<TSESTree.Expression>,
-    ): boolean =>
-      isStringLikeType(
-        checker.getTypeAtLocation(
-          parserServices.esTreeNodeToTSNodeMap.get(asNode(node)),
-        ),
-      );
+    const getLayerTypes = createGetLayerTypes(parserServices);
 
     return {
       // `SpreadElement` covers every value-spread position: array literals
@@ -120,7 +108,9 @@ export const noStringSpread: TSESLint.RuleModule<MessageIds, Options> = {
       // (`{...x}`). Destructuring rest (`[a, ...rest]`, `{ ...rest }`) is a
       // `RestElement` / `RestType` and is intentionally not matched.
       SpreadElement: (node) => {
-        if (!someLayerIs(node.argument, isStringLikeTypedNode)) {
+        // A string at any type-wrapper layer is reported: `(s as
+        // Iterable<string>)` still spreads `s`.
+        if (!getLayerTypes(node.argument).some(isStringLikeType)) {
           return;
         }
 
@@ -133,19 +123,3 @@ export const noStringSpread: TSESLint.RuleModule<MessageIds, Options> = {
   },
   defaultOptions: [],
 } as const;
-
-/**
- * Whether `predicate` holds for `node` or for any expression inside the type
- * wrappers around it: `(s as Iterable<string>)` is asked about both itself and
- * `s`.
- */
-const someLayerIs = (
-  node: DeepReadonly<TSESTree.Expression>,
-  predicate: (layer: DeepReadonly<TSESTree.Expression>) => boolean,
-): boolean =>
-  predicate(node) ||
-  (isTypeWrapper(node) && someLayerIs(node.expression, predicate));
-
-const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  node as T;

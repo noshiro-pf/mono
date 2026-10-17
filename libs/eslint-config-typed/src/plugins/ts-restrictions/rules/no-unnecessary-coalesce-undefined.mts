@@ -7,6 +7,7 @@ import {
 import { skipTypeWrappers } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
+import { createGetLayerTypes } from './type-layer-utils.mjs';
 
 type Options = readonly [];
 
@@ -75,6 +76,8 @@ export const noUnnecessaryCoalesceUndefined: TSESLint.RuleModule<
 
     const checker = parserServices.program.getTypeChecker();
 
+    const getLayerTypes = createGetLayerTypes(parserServices);
+
     /**
      * Returns `true` if the given type can be `null` (it is `null`, a union
      * containing `null`, or a permissive type such as `any` / `unknown`).
@@ -129,17 +132,12 @@ export const noUnnecessaryCoalesceUndefined: TSESLint.RuleModule<
           return;
         }
 
-        // The value's own type: `x!` and `(x as string)` may still be `null`.
-        const leftTsNode = parserServices.esTreeNodeToTSNodeMap.get(
-          asNode(skipTypeWrappers(node.left)),
-        );
-
-        const leftType = checker.getTypeAtLocation(leftTsNode);
-
         // The `?? undefined` is meaningful only when the left-hand side can be
         // `null` (it normalizes `null` to `undefined`). If `null` is not part
-        // of the type, the operator is a no-op and should be removed.
-        if (typeIncludesNull(leftType)) {
+        // of the type at any type-wrapper layer, the operator is a no-op and
+        // should be removed: `x!` and `(x as string)` may still be `null`, and
+        // `(x as string | null)` is the author saying it may be.
+        if (getLayerTypes(node.left).some(typeIncludesNull)) {
           return;
         }
 

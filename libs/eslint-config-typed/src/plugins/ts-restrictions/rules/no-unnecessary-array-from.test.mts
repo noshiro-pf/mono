@@ -302,8 +302,27 @@ describe('no-unnecessary-array-from through type wrappers', () => {
           const y = (Array.from(xs) as unknown as readonly number[]).map((x) => x * 2);
         `,
       },
+      {
+        name: 'a cast widening an array to an iterable is the author saying it may not be an array',
+        code: dedent`
+          declare const xs: readonly number[];
+          const y = Array.from(xs as Iterable<number>).map((x) => x * 2);
+        `,
+      },
     ],
     invalid: [
+      {
+        name: 'an argument that is an array at every layer',
+        code: dedent`
+          declare const xs: number[];
+          const y = Array.from(xs as readonly number[]).map((x) => x * 2);
+        `,
+        output: dedent`
+          declare const xs: number[];
+          const y = (xs as readonly number[]).map((x) => x * 2);
+        `,
+        errors: [{ messageId: 'unnecessaryArrayFrom' }],
+      },
       {
         name: 'the `Array.from()` call is wrapped in `satisfies` or `!`',
         code: dedent`

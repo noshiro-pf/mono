@@ -39,10 +39,15 @@ export const isComparison = (
  * sides are strings (compared as strings), or both are numeric values that are
  * never `NaN` — number literals, `bigint`, booleans, and number brands that
  * declare `NaNValue: false` (`ValidNumber`, `Int`, `FiniteNumber`, …).
+ *
+ * `getLayerTypes` gives an operand's type at each of its type-wrapper layers,
+ * and every one of them has to say so: `(v as number) < 1` may be `NaN` even
+ * when `v` is a `ValidNumber`, and `(n as ValidNumber) < 1` still may when `n`
+ * is a `number`.
  */
 export const isExactlyInvertible = (
   node: ComparisonExpression,
-  getType: (target: DeepReadonly<TSESTree.Node>) => ts.Type,
+  getLayerTypes: (target: DeepReadonly<TSESTree.Node>) => readonly ts.Type[],
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   checker: ts.TypeChecker,
 ): boolean => {
@@ -50,9 +55,10 @@ export const isExactlyInvertible = (
     return true;
   }
 
-  const sides = [getType(node.left), getType(node.right)].flatMap(
-    constituentsOf,
-  );
+  const sides = [
+    ...getLayerTypes(node.left),
+    ...getLayerTypes(node.right),
+  ].flatMap(constituentsOf);
 
   return (
     sides.every((type) => (type.flags & ts.TypeFlags.StringLike) !== 0) ||

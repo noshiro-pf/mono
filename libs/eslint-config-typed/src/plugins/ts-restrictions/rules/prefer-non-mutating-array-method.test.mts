@@ -241,8 +241,27 @@ describe('prefer-non-mutating-array-method through type wrappers', () => {
           const y = Array.from(xs).fill(f() as number);
         `,
       },
+      {
+        name: 'a cast widening an array to an iterable is the author saying it may not be an array',
+        code: dedent`
+          declare const xs: readonly number[];
+          const y = Array.from(xs as Iterable<number>).sort();
+        `,
+      },
     ],
     invalid: [
+      {
+        name: 'an argument that is an array at every layer',
+        code: dedent`
+          declare const xs: number[];
+          const y = Array.from(xs as readonly number[]).sort();
+        `,
+        output: dedent`
+          declare const xs: number[];
+          const y = (xs as readonly number[]).toSorted();
+        `,
+        errors: [{ messageId: 'preferNonMutatingMethod' }],
+      },
       {
         name: 'the `Array.from()` call is wrapped in `as` or `!`',
         code: dedent`

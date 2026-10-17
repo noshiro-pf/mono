@@ -345,6 +345,49 @@ describe('no-negated-comparison through type wrappers', () => {
           },
         ],
       },
+      {
+        name: 'a cast widening a never-NaN brand to `number` is the author saying it may be NaN',
+        code: dedent`
+          type ValidNumber = number & Readonly<{ NaNValue: false }>;
+          declare const v: ValidNumber;
+          const x = !((v as number) < 1);
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'negatedComparisonMaybeNaN',
+            suggestions: [
+              {
+                messageId: 'invertComparison',
+                output: dedent`
+                  type ValidNumber = number & Readonly<{ NaNValue: false }>;
+                  declare const v: ValidNumber;
+                  const x = (v as number) >= 1;
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'operands that cannot be NaN at any layer are still fixed',
+        code: dedent`
+          type ValidNumber = number & Readonly<{ NaNValue: false }>;
+          declare const v: ValidNumber, a: 'x' | 'y', b: string;
+          const x = !((v satisfies number) < 1);
+          const y = !((a as string) < b);
+        `,
+        output: dedent`
+          type ValidNumber = number & Readonly<{ NaNValue: false }>;
+          declare const v: ValidNumber, a: 'x' | 'y', b: string;
+          const x = (v satisfies number) >= 1;
+          const y = (a as string) >= b;
+        `,
+        errors: [
+          { messageId: 'negatedComparison' },
+          { messageId: 'negatedComparison' },
+        ],
+      },
     ],
   });
 });
