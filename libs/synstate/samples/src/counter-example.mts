@@ -32,11 +32,11 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(Arr.isMinLengthArray(3, valueHistory));
 
-    assert.deepStrictEqual(valueHistory[0], 0);
+    assert.strictEqual(valueHistory[0], 0);
 
-    assert.deepStrictEqual(valueHistory[1], 1);
+    assert.strictEqual(valueHistory[1], 1);
 
-    assert.deepStrictEqual(valueHistory[2], 2);
+    assert.strictEqual(valueHistory[2], 2);
 
     // embed-sample-code-ignore-below
   });

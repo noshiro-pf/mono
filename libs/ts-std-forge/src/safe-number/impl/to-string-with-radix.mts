@@ -14,7 +14,7 @@ import type { UintRangeInclusive } from 'ts-type-forge';
  * @example
  *
  * ```ts
- * assert.deepStrictEqual(SafeNumber.toStringWithRadix(255, 16), 'ff');
+ * assert.strictEqual(SafeNumber.toStringWithRadix(255, 16), 'ff');
  * ```
  *
  * @param value The number to convert.

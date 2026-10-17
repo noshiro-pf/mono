@@ -87,14 +87,14 @@ describe(buildMergeAfterForest, () => {
 
     // The subtree is drawn under the first parent only; the second is a
     // pointer, so a diamond does not double every branch below it.
-    assert.deepStrictEqual(under(1)[0]?.repeated, false);
+    assert.strictEqual(under(1)[0]?.repeated, false);
 
     assert.deepStrictEqual(
       under(1)[0]?.children.map((c) => c.number),
       [4],
     );
 
-    assert.deepStrictEqual(under(2)[0]?.repeated, true);
+    assert.strictEqual(under(2)[0]?.repeated, true);
 
     assert.deepStrictEqual(under(2)[0]?.children, []);
   });

@@ -18,7 +18,7 @@ export type NormalizationForm = 'NFC' | 'NFD' | 'NFKC' | 'NFKD';
  *
  * ```ts
  * // NFD decomposes U+00C5 into U+0041 + U+030A.
- * assert.deepStrictEqual(SafeString.normalize('\u{C5}', 'NFD'), 'A\u{30A}');
+ * assert.strictEqual(SafeString.normalize('\u{C5}', 'NFD'), 'A\u{30A}');
  * ```
  *
  * @param value The string to normalize.

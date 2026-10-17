@@ -38,9 +38,9 @@ import type {
  *
  *   const nonEmpty: MinLengthArray<1, number> = input; // OK (3 >= 1)
  *
- *   assert.deepStrictEqual(history[0], 0);
+ *   assert.strictEqual(history[0], 0);
  *
- *   assert.deepStrictEqual(nonEmpty[0], 0);
+ *   assert.strictEqual(nonEmpty[0], 0);
  * }
  *
  * // curried version
@@ -122,9 +122,9 @@ const hasMinLength = (
  *
  *   const relaxed: MaxLengthArray<16, string> = input; // OK (8 <= 16)
  *
- *   assert.deepStrictEqual(tags.length, 3);
+ *   assert.strictEqual(tags.length, 3);
  *
- *   assert.deepStrictEqual(relaxed.length, 3);
+ *   assert.strictEqual(relaxed.length, 3);
  * }
  *
  * // curried version
@@ -207,9 +207,9 @@ const hasMaxLength = (
  *
  *   const relaxed: BoundedLengthArray<0, 100, number> = input; // OK ([1, 5] ⊆ [0, 100])
  *
- *   assert.deepStrictEqual(selection[0], 1);
+ *   assert.strictEqual(selection[0], 1);
  *
- *   assert.deepStrictEqual(relaxed.length, 3);
+ *   assert.strictEqual(relaxed.length, 3);
  * }
  *
  * // curried version
@@ -306,9 +306,9 @@ const hasBoundedLength = (
  *
  *   const atMost5: MaxLengthArray<5, number> = input; // OK (3 <= 5)
  *
- *   assert.deepStrictEqual(rgb[0], 255);
+ *   assert.strictEqual(rgb[0], 255);
  *
- *   assert.deepStrictEqual(atMost5.length, 3);
+ *   assert.strictEqual(atMost5.length, 3);
  * }
  *
  * // curried version

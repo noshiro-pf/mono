@@ -108,6 +108,13 @@ describe('vitest-coding-style', () => {
     assert.deepStrictEqual(a, b);
   });
 
+  test('prefer-assert-strict-equal-for-primitives', () => {
+    // eslint-disable-next-line vitest-coding-style/prefer-assert-strict-equal-for-primitives
+    assert.deepStrictEqual(typeof foo, 'boolean');
+
+    assert.strictEqual(typeof foo, 'boolean');
+  });
+
   test('prefer-assert-is-false-over-negated-assert-is-true', () => {
     // eslint-disable-next-line vitest-coding-style/prefer-assert-is-false-over-negated-assert-is-true
     assert.isTrue(!foo);

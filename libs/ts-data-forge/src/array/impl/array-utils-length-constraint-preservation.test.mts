@@ -39,7 +39,7 @@ describe('map preserves length constraints', () => {
     // The structural prefix survives, so in-range access is not `undefined`.
     const first: string = result[0];
 
-    assert.deepStrictEqual(first, '#0');
+    assert.strictEqual(first, '#0');
 
     assert.deepStrictEqual<readonly string[]>(result, ['#0', '#1', '#2', '#3']);
   });
@@ -56,7 +56,7 @@ describe('map preserves length constraints', () => {
 
     const length: 3 = result.length;
 
-    assert.deepStrictEqual(length, 3);
+    assert.strictEqual(length, 3);
   });
 
   test('a minimum above the structural prefix cap survives, clamped like MinLengthArray itself', () => {
@@ -199,7 +199,7 @@ describe('other length-preserving utilities preserve length constraints', () => 
     // The structural prefix survives the reversal too.
     const first: number = result[0];
 
-    assert.deepStrictEqual(first, 4);
+    assert.strictEqual(first, 4);
 
     assert.deepStrictEqual<readonly number[]>(result, [4, 3, 2, 1]);
   });
@@ -242,7 +242,7 @@ describe('partition reports the bounds of each chunk', () => {
 
     const first: 1 | 2 | 3 | 4 | 5 = firstChunk[0];
 
-    assert.deepStrictEqual(first, 1);
+    assert.strictEqual(first, 1);
 
     assert.deepStrictEqual<readonly (readonly number[])[]>(result, [
       [1, 2],
@@ -262,7 +262,7 @@ describe('creation utilities report an exact length past their tuple range', () 
 
     expectType<typeof result, FixedLengthArray<12, 'x'>>('~=');
 
-    assert.deepStrictEqual(result.length, 12);
+    assert.strictEqual(result.length, 12);
   });
 
   test('a length still inside the tuple range keeps its exact tuple type', () => {
@@ -280,8 +280,8 @@ describe('creation utilities report an exact length past their tuple range', () 
 
     expectType<typeof seq12, Seq<12>>('=');
 
-    assert.deepStrictEqual(zeros12.length, 12);
+    assert.strictEqual(zeros12.length, 12);
 
-    assert.deepStrictEqual(seq12.length, 12);
+    assert.strictEqual(seq12.length, 12);
   });
 });

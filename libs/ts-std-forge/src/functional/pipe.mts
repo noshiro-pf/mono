@@ -97,7 +97,7 @@ type PipeBase<A> = Readonly<{
    *   .map((value) => value * 3)
    *   .map((value) => `value: ${value}`);
    *
-   * assert.deepStrictEqual(result.value, 'value: 6');
+   * assert.strictEqual(result.value, 'value: 6');
    * ```
    *
    * @template B The type of the new value.
@@ -120,7 +120,7 @@ type PipeMapNullable<A> = Readonly<{
    *   .mapNullable((value) => value.toUpperCase())
    *   .mapNullable((value) => value.slice(0, 2));
    *
-   * assert.deepStrictEqual(result.value, 'HE');
+   * assert.strictEqual(result.value, 'HE');
    *
    * const empty = pipe<string | undefined>(undefined).mapNullable((value) =>
    *   value.toUpperCase(),

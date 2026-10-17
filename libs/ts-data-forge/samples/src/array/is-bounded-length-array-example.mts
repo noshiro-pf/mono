@@ -16,9 +16,9 @@ if (import.meta.vitest !== undefined) {
 
       const relaxed: BoundedLengthArray<0, 100, number> = input; // OK ([1, 5] ⊆ [0, 100])
 
-      assert.deepStrictEqual(selection[0], 1);
+      assert.strictEqual(selection[0], 1);
 
-      assert.deepStrictEqual(relaxed.length, 3);
+      assert.strictEqual(relaxed.length, 3);
     }
 
     // curried version

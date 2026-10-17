@@ -70,7 +70,7 @@ describe('the ruleset schema', () => {
     assert.isTrue(Arr.isNonEmpty(files));
 
     for (const [name, content] of files) {
-      assert.deepStrictEqual(
+      assert.strictEqual(
         outcomeOf(name, RulesetPicked.validate(content)),
         name,
       );
@@ -84,7 +84,7 @@ describe('the ruleset schema', () => {
 
     const declared = RulesetPicked.validate(files[0][1]);
 
-    assert.deepStrictEqual(outcomeOf(files[0][0], declared), files[0][0]);
+    assert.strictEqual(outcomeOf(files[0][0], declared), files[0][0]);
 
     if (Result.isErr(declared)) {
       return;

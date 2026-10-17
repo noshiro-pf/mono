@@ -820,7 +820,7 @@ describe('Optional test', () => {
 
       expectType<typeof result, number>('=');
 
-      assert.deepStrictEqual(result, 42);
+      assert.strictEqual(result, 42);
     });
 
     test('should apply the none case for None', () => {
@@ -829,7 +829,7 @@ describe('Optional test', () => {
         none: () => 'none',
       });
 
-      assert.deepStrictEqual(result, 'none');
+      assert.strictEqual(result, 'none');
     });
 
     test('should support Optional union inputs', () => {
@@ -842,7 +842,7 @@ describe('Optional test', () => {
 
       expectType<typeof result, string>('=');
 
-      assert.deepStrictEqual(result, 'value: 3');
+      assert.strictEqual(result, 'value: 3');
     });
 
     test('curried version should work', () => {
@@ -855,9 +855,9 @@ describe('Optional test', () => {
 
       expectType<typeof result, string>('=');
 
-      assert.deepStrictEqual(result, 'value: 3');
+      assert.strictEqual(result, 'value: 3');
 
-      assert.deepStrictEqual(matcher(Optional.none), 'none');
+      assert.strictEqual(matcher(Optional.none), 'none');
     });
 
     test('curried version should compose with Array.map and pipe', () => {
@@ -875,7 +875,7 @@ describe('Optional test', () => {
 
       const single: Optional<number> = Optional.some(3);
 
-      assert.deepStrictEqual(pipe(single).map(matcher).value, 'some:3');
+      assert.strictEqual(pipe(single).map(matcher).value, 'some:3');
     });
 
     test('should apply the some case for Some(undefined)', () => {
@@ -886,7 +886,7 @@ describe('Optional test', () => {
         none: () => 'none',
       });
 
-      assert.deepStrictEqual(result, 'some: undefined');
+      assert.strictEqual(result, 'some: undefined');
     });
   });
 });

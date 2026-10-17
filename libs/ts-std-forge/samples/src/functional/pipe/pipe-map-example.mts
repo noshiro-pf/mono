@@ -8,7 +8,7 @@ if (import.meta.vitest !== undefined) {
       .map((value) => value * 3)
       .map((value) => `value: ${value}`);
 
-    assert.deepStrictEqual(result.value, 'value: 6');
+    assert.strictEqual(result.value, 'value: 6');
 
     // embed-sample-code-ignore-below
   });

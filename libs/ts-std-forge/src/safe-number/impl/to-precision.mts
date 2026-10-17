@@ -13,7 +13,7 @@ import type { UintRangeInclusive } from 'ts-type-forge';
  * @example
  *
  * ```ts
- * assert.deepStrictEqual(SafeNumber.toPrecision(123.456, 4), '123.5');
+ * assert.strictEqual(SafeNumber.toPrecision(123.456, 4), '123.5');
  * ```
  *
  * @param value The number to format.

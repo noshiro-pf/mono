@@ -50,6 +50,7 @@ describe('Num.safeParseFloat is SafeNumber.parse plus a brand', () => {
 
       assert.strictEqual(Result.isOk(viaNum), Result.isOk(viaSafeNumber));
 
+      // eslint-disable-next-line vitest-coding-style/prefer-assert-strict-equal-for-primitives -- the sweep has '-0', which only deepStrictEqual tells apart from 0
       assert.deepStrictEqual(
         Result.unwrapOkOr(viaNum, undefined),
         Result.unwrapOkOr(viaSafeNumber, undefined),
@@ -81,6 +82,7 @@ describe('Num.safeParseInt is SafeNumber.parseInteger plus a brand', () => {
 
       assert.strictEqual(Result.isOk(viaNum), Result.isOk(viaSafeNumber));
 
+      // eslint-disable-next-line vitest-coding-style/prefer-assert-strict-equal-for-primitives -- the sweep has '-0', which only deepStrictEqual tells apart from 0
       assert.deepStrictEqual(
         Result.unwrapOkOr(viaNum, undefined),
         Result.unwrapOkOr(viaSafeNumber, undefined),

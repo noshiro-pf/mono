@@ -96,9 +96,11 @@ test('the two agree on `Map`, `Set`, `NaN` and `-0`', () => {
   assert.deepStrictEqual(new Set([1]), new Set([1]));
 
   // `NaN` is equal to itself, and `0` is not equal to `-0`, in both.
+  // eslint-disable-next-line vitest-coding-style/prefer-assert-strict-equal-for-primitives -- pins the NaN case itself
   assert.deepStrictEqual(Number.NaN, Number.NaN);
 
   assert.throws(() => {
+    // eslint-disable-next-line vitest-coding-style/prefer-assert-strict-equal-for-primitives -- pins the -0 case itself
     assert.deepStrictEqual(0, -0);
   });
 
@@ -110,7 +112,7 @@ test('`assert.deepStrictEqual` type-checks its two arguments; `toStrictEqual` do
   // arguments to one type parameter, so a mismatched pair does not compile.
   assert.throws(() => {
     // @ts-expect-error `'1'` is not assignable to the `number` inferred from `1`
-    assert.deepStrictEqual(1, '1');
+    assert.deepStrictEqual(1, '1'); // eslint-disable-line vitest-coding-style/prefer-assert-strict-equal-for-primitives -- this test is about deepStrictEqual
   });
 
   // `toStrictEqual: <E>(expected: E) => void` leaves `E` unconstrained, so the

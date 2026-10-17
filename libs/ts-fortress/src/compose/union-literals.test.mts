@@ -102,7 +102,7 @@ describe('union - literals only', () => {
     test('noop', () => {
       const x: unknown = 'blue';
 
-      assert.deepStrictEqual(targetType.fill(x), 'blue');
+      assert.strictEqual(targetType.fill(x), 'blue');
     });
 
     test('fill with the default value', () => {

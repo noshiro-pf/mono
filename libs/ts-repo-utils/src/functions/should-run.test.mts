@@ -159,7 +159,7 @@ describe('should-run', () => {
         },
       );
 
-      assert.deepStrictEqual(contents, 'should_run=false\n');
+      assert.strictEqual(contents, 'should_run=false\n');
     });
   });
 

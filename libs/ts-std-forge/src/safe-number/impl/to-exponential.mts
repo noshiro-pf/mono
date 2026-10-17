@@ -15,7 +15,7 @@ import type { UintRangeInclusive } from 'ts-type-forge';
  * @example
  *
  * ```ts
- * assert.deepStrictEqual(SafeNumber.toExponential(123456, 2), '1.23e+5');
+ * assert.strictEqual(SafeNumber.toExponential(123456, 2), '1.23e+5');
  * ```
  *
  * @param value The number to format.

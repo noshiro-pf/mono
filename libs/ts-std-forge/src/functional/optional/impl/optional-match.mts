@@ -20,16 +20,16 @@ import type { Unwrap } from './types.mjs';
  *   none: () => 0,
  * });
  *
- * assert.deepStrictEqual(doubledOrZero, 42);
+ * assert.strictEqual(doubledOrZero, 42);
  *
  * const matcher = Optional.match({
  *   some: (value: number) => `value: ${value}`,
  *   none: () => 'none',
  * });
  *
- * assert.deepStrictEqual(matcher(Optional.some(3)), 'value: 3');
+ * assert.strictEqual(matcher(Optional.some(3)), 'value: 3');
  *
- * assert.deepStrictEqual(matcher(Optional.none), 'none');
+ * assert.strictEqual(matcher(Optional.none), 'none');
  * ```
  *
  * @template O The input `UnknownOptional` type.

@@ -11,19 +11,19 @@ const specialValues = [
 
 describe('SafeNumber.toFixed', () => {
   test('returns the fixed-point representation', () => {
-    assert.deepStrictEqual(SafeNumber.toFixed(1.005, 2), '1.00');
+    assert.strictEqual(SafeNumber.toFixed(1.005, 2), '1.00');
   });
 
   test('accepts the boundary digits 0 and 100', () => {
-    assert.deepStrictEqual(SafeNumber.toFixed(1, 0), '1');
+    assert.strictEqual(SafeNumber.toFixed(1, 0), '1');
 
-    assert.deepStrictEqual(SafeNumber.toFixed(1, 100), (1).toFixed(100));
+    assert.strictEqual(SafeNumber.toFixed(1, 100), (1).toFixed(100));
   });
 
   test.each(specialValues.map((value) => ({ value })))(
     'toFixed($value, 2) matches the raw API (non-finite values do not throw)',
     ({ value }) => {
-      assert.deepStrictEqual(SafeNumber.toFixed(value, 2), value.toFixed(2));
+      assert.strictEqual(SafeNumber.toFixed(value, 2), value.toFixed(2));
     },
   );
 
@@ -41,20 +41,17 @@ describe('SafeNumber.toFixed', () => {
 
 describe('SafeNumber.toExponential', () => {
   test('returns the exponential representation with explicit digits', () => {
-    assert.deepStrictEqual(SafeNumber.toExponential(123456, 2), '1.23e+5');
+    assert.strictEqual(SafeNumber.toExponential(123456, 2), '1.23e+5');
   });
 
   test('uses as many digits as necessary when digits are omitted', () => {
-    assert.deepStrictEqual(SafeNumber.toExponential(123456), '1.23456e+5');
+    assert.strictEqual(SafeNumber.toExponential(123456), '1.23456e+5');
   });
 
   test('accepts the boundary digits 0 and 100', () => {
-    assert.deepStrictEqual(
-      SafeNumber.toExponential(1, 0),
-      (1).toExponential(0),
-    );
+    assert.strictEqual(SafeNumber.toExponential(1, 0), (1).toExponential(0));
 
-    assert.deepStrictEqual(
+    assert.strictEqual(
       SafeNumber.toExponential(1, 100),
       (1).toExponential(100),
     );
@@ -63,7 +60,7 @@ describe('SafeNumber.toExponential', () => {
   test.each(specialValues.map((value) => ({ value })))(
     'toExponential($value, 2) matches the raw API',
     ({ value }) => {
-      assert.deepStrictEqual(
+      assert.strictEqual(
         SafeNumber.toExponential(value, 2),
         value.toExponential(2),
       );
@@ -80,22 +77,19 @@ describe('SafeNumber.toExponential', () => {
 
 describe('SafeNumber.toPrecision', () => {
   test('returns the formatted representation', () => {
-    assert.deepStrictEqual(SafeNumber.toPrecision(123.456, 4), '123.5');
+    assert.strictEqual(SafeNumber.toPrecision(123.456, 4), '123.5');
   });
 
   test('accepts the boundary precisions 1 and 100', () => {
-    assert.deepStrictEqual(SafeNumber.toPrecision(1, 1), '1');
+    assert.strictEqual(SafeNumber.toPrecision(1, 1), '1');
 
-    assert.deepStrictEqual(
-      SafeNumber.toPrecision(1, 100),
-      (1).toPrecision(100),
-    );
+    assert.strictEqual(SafeNumber.toPrecision(1, 100), (1).toPrecision(100));
   });
 
   test.each(specialValues.map((value) => ({ value })))(
     'toPrecision($value, 4) matches the raw API',
     ({ value }) => {
-      assert.deepStrictEqual(
+      assert.strictEqual(
         SafeNumber.toPrecision(value, 4),
         value.toPrecision(4),
       );
@@ -112,19 +106,19 @@ describe('SafeNumber.toPrecision', () => {
 
 describe('SafeNumber.toStringWithRadix', () => {
   test('returns the representation in the given radix', () => {
-    assert.deepStrictEqual(SafeNumber.toStringWithRadix(255, 16), 'ff');
+    assert.strictEqual(SafeNumber.toStringWithRadix(255, 16), 'ff');
   });
 
   test('accepts the boundary radixes 2 and 36', () => {
-    assert.deepStrictEqual(SafeNumber.toStringWithRadix(5, 2), '101');
+    assert.strictEqual(SafeNumber.toStringWithRadix(5, 2), '101');
 
-    assert.deepStrictEqual(SafeNumber.toStringWithRadix(35, 36), 'z');
+    assert.strictEqual(SafeNumber.toStringWithRadix(35, 36), 'z');
   });
 
   test.each(specialValues.map((value) => ({ value })))(
     'toStringWithRadix($value, 16) matches the raw API',
     ({ value }) => {
-      assert.deepStrictEqual(
+      assert.strictEqual(
         SafeNumber.toStringWithRadix(value, 16),
         value.toString(16),
       );
@@ -151,7 +145,7 @@ describe('SafeNumber.parse', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    assert.deepStrictEqual(result.value, expected);
+    assert.strictEqual(result.value, expected);
   });
 
   test.each([
@@ -191,7 +185,7 @@ describe('SafeNumber.parseInteger', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    assert.deepStrictEqual(result.value, expected);
+    assert.strictEqual(result.value, expected);
   });
 
   test.each([

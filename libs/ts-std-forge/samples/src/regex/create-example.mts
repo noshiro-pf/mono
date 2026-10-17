@@ -12,7 +12,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(Result.isErr(errResult));
 
-    assert.deepStrictEqual(errResult.value.kind, 'invalid-regexp');
+    assert.strictEqual(errResult.value.kind, 'invalid-regexp');
 
     // embed-sample-code-ignore-below
   });

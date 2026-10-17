@@ -50,11 +50,11 @@ import type { CounterObservable, TimerId } from '../types/index.mjs';
  *
  * assert.isTrue(Arr.isMinLengthArray(3, valueHistory));
  *
- * assert.deepStrictEqual(valueHistory[0], 0);
+ * assert.strictEqual(valueHistory[0], 0);
  *
- * assert.deepStrictEqual(valueHistory[1], 1);
+ * assert.strictEqual(valueHistory[1], 1);
  *
- * assert.deepStrictEqual(valueHistory[2], 2);
+ * assert.strictEqual(valueHistory[2], 2);
  * ```
  */
 export const counter = (

@@ -12,4 +12,5 @@ export const eslintVitestCodingStyleRules = {
   'vitest-coding-style/prefer-assert-is-true-over-expect-true': 'error',
   'vitest-coding-style/prefer-assert-is-true-over-negated-assert-is-false':
     'error',
+  'vitest-coding-style/prefer-assert-strict-equal-for-primitives': 'error',
 } as const satisfies EslintVitestCodingStyleRules;

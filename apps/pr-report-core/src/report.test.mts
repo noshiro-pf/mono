@@ -65,7 +65,7 @@ describe(buildEntries, () => {
 
     assert.deepStrictEqual(entries[1]?.blockedBy, [1]);
 
-    assert.deepStrictEqual(roots[0]?.children.length, 1);
+    assert.strictEqual(roots[0]?.children.length, 1);
   });
 
   test('a stack and a declaration both constrain', () => {
@@ -83,7 +83,7 @@ describe(buildEntries, () => {
     // has, its base names a branch nothing open heads.
     const { entries, roots } = decide([facts(2, { baseRef: 'branch-1' })]);
 
-    assert.deepStrictEqual(entries[0]?.stackedOn, undefined);
+    assert.strictEqual(entries[0]?.stackedOn, undefined);
 
     assert.deepStrictEqual(
       roots.map(({ number }) => number),

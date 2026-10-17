@@ -22,7 +22,7 @@ describe('SafeString.fromCodePoint', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    assert.deepStrictEqual(result.value, 'a😀');
+    assert.strictEqual(result.value, 'a😀');
   });
 
   test('returns Ok for no arguments (empty string)', () => {
@@ -30,7 +30,7 @@ describe('SafeString.fromCodePoint', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    assert.deepStrictEqual(result.value, '');
+    assert.strictEqual(result.value, '');
   });
 
   test('returns a tagged Err for a code point above 0x10FFFF', () => {
@@ -84,11 +84,11 @@ describe('SafeString.fromCodePoint', () => {
 
       const result = SafeString.fromCodePoint(codePoint);
 
-      assert.deepStrictEqual(Result.isErr(result), thrown);
+      assert.strictEqual(Result.isErr(result), thrown);
 
       // Every engine throw must be classified in advance — 'unexpected'
       // never appears for a spec-defined condition.
-      assert.deepStrictEqual(
+      assert.strictEqual(
         Result.isErr(result) && result.value.kind !== 'unexpected',
         thrown,
       );
@@ -100,12 +100,12 @@ describe('SafeString.normalize', () => {
   test('returns the normalized string with the default form (NFC)', () => {
     // NFC composes U+0041 + U+030A into U+00C5 (written as escapes, because
     // source literals in the two normalization forms look identical).
-    assert.deepStrictEqual(SafeString.normalize('A\u{30A}'), '\u{C5}');
+    assert.strictEqual(SafeString.normalize('A\u{30A}'), '\u{C5}');
   });
 
   test('returns the normalized string for an explicit form', () => {
     // NFD decomposes U+00C5 into U+0041 + U+030A.
-    assert.deepStrictEqual(SafeString.normalize('\u{C5}', 'NFD'), 'A\u{30A}');
+    assert.strictEqual(SafeString.normalize('\u{C5}', 'NFD'), 'A\u{30A}');
   });
 
   test('throws like the raw API when the type-level guard is bypassed', () => {
@@ -125,7 +125,7 @@ describe('SafeString.repeat', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    assert.deepStrictEqual(result.value, 'ababab');
+    assert.strictEqual(result.value, 'ababab');
   });
 
   test('returns Ok for count 0 (empty string)', () => {
@@ -133,7 +133,7 @@ describe('SafeString.repeat', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    assert.deepStrictEqual(result.value, '');
+    assert.strictEqual(result.value, '');
   });
 
   test('returns a tagged Err for a negative count', () => {
@@ -160,7 +160,7 @@ describe('SafeString.repeat', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    assert.deepStrictEqual(result.value, '');
+    assert.strictEqual(result.value, '');
   });
 
   test('returns the unexpected fallback when the result would exceed the engine string-length limit', () => {
@@ -171,7 +171,7 @@ describe('SafeString.repeat', () => {
 
     assert.isTrue(Result.isErr(result));
 
-    assert.deepStrictEqual(result.value.kind, 'unexpected');
+    assert.strictEqual(result.value.kind, 'unexpected');
   });
 
   test.each([
@@ -189,11 +189,11 @@ describe('SafeString.repeat', () => {
 
     const result = SafeString.repeat('ab', count);
 
-    assert.deepStrictEqual(Result.isErr(result), thrown);
+    assert.strictEqual(Result.isErr(result), thrown);
 
     // Every engine throw must be classified in advance — 'unexpected' never
     // appears for a spec-defined condition.
-    assert.deepStrictEqual(
+    assert.strictEqual(
       Result.isErr(result) && result.value.kind !== 'unexpected',
       thrown,
     );
@@ -208,13 +208,10 @@ describe('SafeString.fromPrimitive', () => {
     { value: 10n, expected: '10' },
     { value: undefined, expected: 'undefined' },
   ])('fromPrimitive($value) returns $expected', ({ value, expected }) => {
-    assert.deepStrictEqual(SafeString.fromPrimitive(value), expected);
+    assert.strictEqual(SafeString.fromPrimitive(value), expected);
   });
 
   test('stringifies a symbol, which a template literal cannot', () => {
-    assert.deepStrictEqual(
-      SafeString.fromPrimitive(Symbol('tag')),
-      'Symbol(tag)',
-    );
+    assert.strictEqual(SafeString.fromPrimitive(Symbol('tag')), 'Symbol(tag)');
   });
 });

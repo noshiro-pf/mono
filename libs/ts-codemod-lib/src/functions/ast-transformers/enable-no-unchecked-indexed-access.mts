@@ -56,7 +56,7 @@ const TRANSFORMER_NAME = 'enable-no-unchecked-indexed-access';
  *   enableNoUncheckedIndexedAccessTransformer(),
  * ]);
  *
- * assert.deepStrictEqual(
+ * assert.strictEqual(
  *   after.trim(),
  *   dedent`
  *     declare const xs: readonly number[];

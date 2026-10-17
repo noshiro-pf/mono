@@ -1029,7 +1029,7 @@ describe('Result test', () => {
 
       expectType<typeof result, number>('=');
 
-      assert.deepStrictEqual(result, 42);
+      assert.strictEqual(result, 42);
     });
 
     test('should apply the err case for Err', () => {
@@ -1038,7 +1038,7 @@ describe('Result test', () => {
         err: (error) => `error: ${error}`,
       });
 
-      assert.deepStrictEqual(result, 'error: failure');
+      assert.strictEqual(result, 'error: failure');
     });
 
     test('should support Result union inputs', () => {
@@ -1055,7 +1055,7 @@ describe('Result test', () => {
 
       expectType<typeof folded, number>('=');
 
-      assert.deepStrictEqual(folded, 3);
+      assert.strictEqual(folded, 3);
     });
 
     test('curried version should work', () => {
@@ -1064,9 +1064,9 @@ describe('Result test', () => {
         err: (error: string) => error.length,
       });
 
-      assert.deepStrictEqual(matcher(Result.ok(1)), 2);
+      assert.strictEqual(matcher(Result.ok(1)), 2);
 
-      assert.deepStrictEqual(matcher(Result.err('oops')), 4);
+      assert.strictEqual(matcher(Result.err('oops')), 4);
     });
 
     test('curried version should compose with Array.map and pipe', () => {
@@ -1084,7 +1084,7 @@ describe('Result test', () => {
 
       const single: Result<number, string> = Result.ok(3);
 
-      assert.deepStrictEqual(pipe(single).map(matcher).value, 'ok:3');
+      assert.strictEqual(pipe(single).map(matcher).value, 'ok:3');
     });
   });
 
@@ -1102,7 +1102,7 @@ describe('Result test', () => {
 
       assert.isTrue(Result.isErr(result));
 
-      assert.deepStrictEqual(result.value, 'missing');
+      assert.strictEqual(result.value, 'missing');
     });
 
     test('should convert Some(undefined) to Ok(undefined), not Err', () => {
@@ -1112,7 +1112,7 @@ describe('Result test', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      assert.deepStrictEqual(result.value, undefined);
+      assert.strictEqual(result.value, undefined);
     });
 
     test('should support Optional union inputs', () => {

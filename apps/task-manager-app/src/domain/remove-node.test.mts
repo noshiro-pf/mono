@@ -150,7 +150,7 @@ describe(removeNode, () => {
       [b],
     );
 
-    assert.deepStrictEqual(result.state.milestones.length, 1);
+    assert.strictEqual(result.state.milestones.length, 1);
 
     assert.deepStrictEqual(result.updatedTasks, []);
   });

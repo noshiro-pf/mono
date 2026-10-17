@@ -24,7 +24,7 @@ describe(asFixedLengthTuple, () => {
 
     const red: number = casted[0];
 
-    assert.deepStrictEqual(red, 255);
+    assert.strictEqual(red, 255);
   });
 
   test('is the same value it was handed', () => {
@@ -69,7 +69,7 @@ describe(asMinLengthTuple, () => {
 
     const first: number = casted[0];
 
-    assert.deepStrictEqual(first, 0);
+    assert.strictEqual(first, 0);
   });
 
   test('throws when the array is too short', () => {
@@ -168,7 +168,7 @@ describe(asNonEmptyTuple, () => {
 
     const first: number = casted[0];
 
-    assert.deepStrictEqual(first, 1);
+    assert.strictEqual(first, 1);
   });
 
   test('throws when the array is empty', () => {
@@ -190,7 +190,7 @@ describe('tuple casts preserve the input type, like their branded counterparts',
 
     const length: 5 = casted.length;
 
-    assert.deepStrictEqual(length, 5);
+    assert.strictEqual(length, 5);
 
     assert.deepStrictEqual<readonly number[]>(casted, [1, 2, 3, 4, 5]);
   });
@@ -202,6 +202,6 @@ describe('tuple casts preserve the input type, like their branded counterparts',
 
     const first: 1 = casted[0];
 
-    assert.deepStrictEqual(first, 1);
+    assert.strictEqual(first, 1);
   });
 });

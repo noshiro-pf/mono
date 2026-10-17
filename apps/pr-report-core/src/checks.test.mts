@@ -11,12 +11,9 @@ import {
 
 describe(classifyCheckRun, () => {
   test('an unfinished run is pending whatever it last concluded', () => {
-    assert.deepStrictEqual(classifyCheckRun('queued', undefined), 'pending');
+    assert.strictEqual(classifyCheckRun('queued', undefined), 'pending');
 
-    assert.deepStrictEqual(
-      classifyCheckRun('in_progress', 'failure'),
-      'pending',
-    );
+    assert.strictEqual(classifyCheckRun('in_progress', 'failure'), 'pending');
   });
 
   // The gated jobs skip on `skip-ci` and on a diff the workflow does not
@@ -25,11 +22,11 @@ describe(classifyCheckRun, () => {
   // but it is reported as what it was, because folding it into `passed` is
   // what let a failing pull request show a tick.
   test('a skipped job is reported as skipped, not as passed', () => {
-    assert.deepStrictEqual(classifyCheckRun('completed', 'skipped'), 'skipped');
+    assert.strictEqual(classifyCheckRun('completed', 'skipped'), 'skipped');
 
-    assert.deepStrictEqual(classifyCheckRun('completed', 'neutral'), 'passed');
+    assert.strictEqual(classifyCheckRun('completed', 'neutral'), 'passed');
 
-    assert.deepStrictEqual(classifyCheckRun('completed', 'success'), 'passed');
+    assert.strictEqual(classifyCheckRun('completed', 'success'), 'passed');
   });
 
   test('anything else that finished is a failure', () => {
@@ -40,23 +37,20 @@ describe(classifyCheckRun, () => {
       'stale',
       'timed_out',
     ]) {
-      assert.deepStrictEqual(
-        classifyCheckRun('completed', conclusion),
-        'failed',
-      );
+      assert.strictEqual(classifyCheckRun('completed', conclusion), 'failed');
     }
   });
 });
 
 describe(classifyCommitStatus, () => {
   test('reads the four states a commit status has', () => {
-    assert.deepStrictEqual(classifyCommitStatus('success'), 'passed');
+    assert.strictEqual(classifyCommitStatus('success'), 'passed');
 
-    assert.deepStrictEqual(classifyCommitStatus('pending'), 'pending');
+    assert.strictEqual(classifyCommitStatus('pending'), 'pending');
 
-    assert.deepStrictEqual(classifyCommitStatus('failure'), 'failed');
+    assert.strictEqual(classifyCommitStatus('failure'), 'failed');
 
-    assert.deepStrictEqual(classifyCommitStatus('error'), 'failed');
+    assert.strictEqual(classifyCommitStatus('error'), 'failed');
   });
 });
 
@@ -75,9 +69,9 @@ describe(summarizeChecks, () => {
       baseCovered: true,
     });
 
-    assert.deepStrictEqual(summary.verdict, 'passed');
+    assert.strictEqual(summary.verdict, 'passed');
 
-    assert.deepStrictEqual(summary.required, 2);
+    assert.strictEqual(summary.required, 2);
   });
 
   test('a required context with nothing reported is missing, not passed', () => {
@@ -91,7 +85,7 @@ describe(summarizeChecks, () => {
       baseCovered: true,
     });
 
-    assert.deepStrictEqual(summary.verdict, 'pending');
+    assert.strictEqual(summary.verdict, 'pending');
 
     assert.deepStrictEqual(summary.missing, ['no-skip-ci-label']);
 
@@ -110,7 +104,7 @@ describe(summarizeChecks, () => {
       baseCovered: true,
     });
 
-    assert.deepStrictEqual(summary.verdict, 'failing');
+    assert.strictEqual(summary.verdict, 'failing');
 
     assert.deepStrictEqual(summary.failed, ['code-check-result / result']);
   });
@@ -132,7 +126,7 @@ describe(summarizeChecks, () => {
       baseCovered: true,
     });
 
-    assert.deepStrictEqual(summary.verdict, 'paused');
+    assert.strictEqual(summary.verdict, 'paused');
 
     assert.deepStrictEqual(summary.failed, ['code-check-result / result']);
 
@@ -151,7 +145,7 @@ describe(summarizeChecks, () => {
       baseCovered: true,
     });
 
-    assert.deepStrictEqual(summary.verdict, 'passed');
+    assert.strictEqual(summary.verdict, 'passed');
 
     assert.deepStrictEqual(summary.passed, ['no-skip-ci-label']);
 
@@ -170,7 +164,7 @@ describe(summarizeChecks, () => {
       baseCovered: true,
     });
 
-    assert.deepStrictEqual(summary.verdict, 'pending');
+    assert.strictEqual(summary.verdict, 'pending');
 
     // Nothing required is pending: what is running is something else.
     assert.deepStrictEqual(summary.pending, []);
@@ -188,7 +182,7 @@ describe(summarizeChecks, () => {
       baseCovered: true,
     });
 
-    assert.deepStrictEqual(summary.verdict, 'failing');
+    assert.strictEqual(summary.verdict, 'failing');
   });
 
   test('a context nothing requires is not counted', () => {
@@ -204,7 +198,7 @@ describe(summarizeChecks, () => {
       baseCovered: true,
     });
 
-    assert.deepStrictEqual(summary.verdict, 'passed');
+    assert.strictEqual(summary.verdict, 'passed');
 
     assert.deepStrictEqual(summary.failed, []);
   });
@@ -228,13 +222,13 @@ describe(summarizeChecks, () => {
         baseCovered: false,
       });
 
-      assert.deepStrictEqual(summary.verdict, 'passed');
+      assert.strictEqual(summary.verdict, 'passed');
 
       assert.deepStrictEqual(summary.notRun, ['Validate PR title']);
 
       assert.deepStrictEqual(summary.missing, []);
 
-      assert.deepStrictEqual(summary.required, 3);
+      assert.strictEqual(summary.required, 3);
     });
 
     test('while nothing required has reported, everything is still coming', () => {
@@ -248,7 +242,7 @@ describe(summarizeChecks, () => {
         baseCovered: false,
       });
 
-      assert.deepStrictEqual(summary.verdict, 'pending');
+      assert.strictEqual(summary.verdict, 'pending');
 
       assert.deepStrictEqual(summary.missing, withLint);
 
@@ -267,7 +261,7 @@ describe(summarizeChecks, () => {
         baseCovered: false,
       });
 
-      assert.deepStrictEqual(summary.verdict, 'failing');
+      assert.strictEqual(summary.verdict, 'failing');
 
       assert.deepStrictEqual(summary.pending, ['no-skip-ci-label']);
     });
@@ -325,7 +319,7 @@ describe(statesFromCheckRuns, () => {
       ),
     ]);
 
-    assert.deepStrictEqual(states.get('code-check-result / result'), 'passed');
+    assert.strictEqual(states.get('code-check-result / result'), 'passed');
   });
 
   test('a stale red in a later suite still holds the merge', () => {
@@ -349,7 +343,7 @@ describe(statesFromCheckRuns, () => {
       ),
     ]);
 
-    assert.deepStrictEqual(
+    assert.strictEqual(
       states.get('test-node-versions-result / result'),
       'failed',
     );
@@ -366,15 +360,9 @@ describe(statesFromCheckRuns, () => {
       run('style-check-result / result', 'failure', 96_234_480_277, 1),
     ]);
 
-    assert.deepStrictEqual(
-      forwards.get('style-check-result / result'),
-      'passed',
-    );
+    assert.strictEqual(forwards.get('style-check-result / result'), 'passed');
 
-    assert.deepStrictEqual(
-      backwards.get('style-check-result / result'),
-      'passed',
-    );
+    assert.strictEqual(backwards.get('style-check-result / result'), 'passed');
   });
 
   test('a re-run inside one suite is told apart by its id', () => {
@@ -383,7 +371,7 @@ describe(statesFromCheckRuns, () => {
       run('code-check (check:knip)', 'success', 96_234_480_526, 2),
     ]);
 
-    assert.deepStrictEqual(states.get('code-check (check:knip)'), 'passed');
+    assert.strictEqual(states.get('code-check (check:knip)'), 'passed');
   });
 
   test('a name reported once is left as it is', () => {
@@ -391,7 +379,7 @@ describe(statesFromCheckRuns, () => {
       run('coverage-main', 'skipped', 96_234_480_526, 106_166_639_842),
     ]);
 
-    assert.deepStrictEqual(states.get('coverage-main'), 'skipped');
+    assert.strictEqual(states.get('coverage-main'), 'skipped');
   });
 });
 
@@ -399,43 +387,31 @@ describe(combineContextStates, () => {
   test('a red check run is not covered by a green status of the same name', () => {
     // GitHub: "If a check and a commit status have the same name, both must
     // pass when that name is required."
-    assert.deepStrictEqual(combineContextStates('failed', 'passed'), 'failed');
+    assert.strictEqual(combineContextStates('failed', 'passed'), 'failed');
 
-    assert.deepStrictEqual(combineContextStates('passed', 'failed'), 'failed');
+    assert.strictEqual(combineContextStates('passed', 'failed'), 'failed');
   });
 
   test('one still running holds the pair', () => {
-    assert.deepStrictEqual(
-      combineContextStates('passed', 'pending'),
-      'pending',
-    );
+    assert.strictEqual(combineContextStates('passed', 'pending'), 'pending');
 
-    assert.deepStrictEqual(combineContextStates('failed', 'pending'), 'failed');
+    assert.strictEqual(combineContextStates('failed', 'pending'), 'failed');
   });
 
   test('both green is green', () => {
-    assert.deepStrictEqual(combineContextStates('passed', 'passed'), 'passed');
+    assert.strictEqual(combineContextStates('passed', 'passed'), 'passed');
   });
 
   test('a skip beside a pass is still said to be a skip', () => {
     // Both count as met, so neither holds the pair; but "passed" would claim
     // that something ran and went green, which of the two only one did.
-    assert.deepStrictEqual(
-      combineContextStates('skipped', 'passed'),
-      'skipped',
-    );
+    assert.strictEqual(combineContextStates('skipped', 'passed'), 'skipped');
 
-    assert.deepStrictEqual(
-      combineContextStates('passed', 'skipped'),
-      'skipped',
-    );
+    assert.strictEqual(combineContextStates('passed', 'skipped'), 'skipped');
 
-    assert.deepStrictEqual(
-      combineContextStates('skipped', 'pending'),
-      'pending',
-    );
+    assert.strictEqual(combineContextStates('skipped', 'pending'), 'pending');
 
-    assert.deepStrictEqual(combineContextStates('skipped', 'failed'), 'failed');
+    assert.strictEqual(combineContextStates('skipped', 'failed'), 'failed');
   });
 });
 
@@ -558,7 +534,7 @@ describe('a required context in a superseded round', () => {
   ] as const;
 
   test('reads a skip as a skip rather than as a pass', () => {
-    assert.deepStrictEqual(
+    assert.strictEqual(
       statesFromCheckRuns(runs).get('code-check-result / result'),
       'skipped',
     );
@@ -574,7 +550,7 @@ describe('a required context in a superseded round', () => {
       baseCovered: true,
     });
 
-    assert.deepStrictEqual(summary.verdict, 'pending');
+    assert.strictEqual(summary.verdict, 'pending');
 
     assert.deepStrictEqual(summary.passed, []);
 
@@ -612,7 +588,7 @@ describe('a required context in a superseded round', () => {
       baseCovered: true,
     });
 
-    assert.deepStrictEqual(summary.verdict, 'failing');
+    assert.strictEqual(summary.verdict, 'failing');
 
     assert.deepStrictEqual(summary.failed, ['code-check-result / result']);
 
@@ -702,17 +678,11 @@ describe('a required context whose workflow has a newer round running', () => {
   test('reads the context as pending until the newer round answers it', () => {
     const states = statesFromCheckRuns(runs);
 
-    assert.deepStrictEqual(states.get('code-check-result / result'), 'pending');
+    assert.strictEqual(states.get('code-check-result / result'), 'pending');
 
-    assert.deepStrictEqual(
-      states.get('style-check-result / result'),
-      'pending',
-    );
+    assert.strictEqual(states.get('style-check-result / result'), 'pending');
 
-    assert.deepStrictEqual(
-      states.get('strict-lib-gen-result / result'),
-      'passed',
-    );
+    assert.strictEqual(states.get('strict-lib-gen-result / result'), 'passed');
   });
 
   // The regression: this said `failing`.
@@ -725,7 +695,7 @@ describe('a required context whose workflow has a newer round running', () => {
       baseCovered: true,
     });
 
-    assert.deepStrictEqual(summary.verdict, 'pending');
+    assert.strictEqual(summary.verdict, 'pending');
 
     assert.deepStrictEqual(summary.failed, []);
 
@@ -759,7 +729,7 @@ describe('a required context whose workflow has a newer round running', () => {
       },
     ]);
 
-    assert.deepStrictEqual(states.get('code-check-result / result'), 'failed');
+    assert.strictEqual(states.get('code-check-result / result'), 'failed');
   });
 
   // Nor "the round still running wins": GitHub resolves a context to the
@@ -774,7 +744,7 @@ describe('a required context whose workflow has a newer round running', () => {
       runs[3],
     ]);
 
-    assert.deepStrictEqual(states.get('code-check-result / result'), 'failed');
+    assert.strictEqual(states.get('code-check-result / result'), 'failed');
   });
 
   test('a round of another workflow does not hold the context', () => {
@@ -786,6 +756,6 @@ describe('a required context whose workflow has a newer round running', () => {
       },
     ]);
 
-    assert.deepStrictEqual(states.get('code-check-result / result'), 'failed');
+    assert.strictEqual(states.get('code-check-result / result'), 'failed');
   });
 });

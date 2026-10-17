@@ -642,16 +642,17 @@ This type definition provides overridden `Chai.Assert` type:
 - Convert arg types to be readonly
 - Replace `Object` with `object`
 
-| Included rules                                       | Description                                                                                   |
-| :--------------------------------------------------- | :-------------------------------------------------------------------------------------------- |
-| `no-expect-to-strict-equal`                          | Forbid `expect(x).toStrictEqual(y)`; prefer `assert.deepStrictEqual(x, y)`                    |
-| `prefer-assert-deep-strict-equal-over-deep-equal`    | Replace `assert.deepEqual(x)` with `assert.deepStrictEqual(x)`                                |
-| `prefer-assert-is-true-over-assert`                  | Canonicalize `assert(x)` / `assert.isOk(x)` / `assert.ok(x)` to `assert.isTrue(x)`            |
-| `prefer-assert-is-false-over-assert-not-ok`          | Canonicalize `assert.isNotOk(x)` / `assert.notOk(x)` to `assert.isFalse(x)`                   |
-| `prefer-assert-is-false-over-negated-assert-is-true` | Rewrite `assert.isTrue(!x)` to `assert.isFalse(x)`                                            |
-| `prefer-assert-is-true-over-negated-assert-is-false` | Rewrite `assert.isFalse(!x)` to `assert.isTrue(x)`                                            |
-| `prefer-assert-is-true-over-expect-true`             | Rewrite `expect(x).toBe(true)` to `assert.isTrue(x)` (only when `x` is boolean; type-aware)   |
-| `prefer-assert-is-false-over-expect-false`           | Rewrite `expect(x).toBe(false)` to `assert.isFalse(x)` (only when `x` is boolean; type-aware) |
+| Included rules                                       | Description                                                                                                                                                      |
+| :--------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `no-expect-to-strict-equal`                          | Forbid `expect(x).toStrictEqual(y)`; prefer `assert.deepStrictEqual(x, y)`                                                                                       |
+| `prefer-assert-deep-strict-equal-over-deep-equal`    | Replace `assert.deepEqual(x)` with `assert.deepStrictEqual(x)`                                                                                                   |
+| `prefer-assert-strict-equal-for-primitives`          | Replace `assert.deepStrictEqual(x, y)` with `assert.strictEqual(x, y)` when both are primitives (type-aware; only a suggestion when both may be `NaN` or a zero) |
+| `prefer-assert-is-true-over-assert`                  | Canonicalize `assert(x)` / `assert.isOk(x)` / `assert.ok(x)` to `assert.isTrue(x)`                                                                               |
+| `prefer-assert-is-false-over-assert-not-ok`          | Canonicalize `assert.isNotOk(x)` / `assert.notOk(x)` to `assert.isFalse(x)`                                                                                      |
+| `prefer-assert-is-false-over-negated-assert-is-true` | Rewrite `assert.isTrue(!x)` to `assert.isFalse(x)`                                                                                                               |
+| `prefer-assert-is-true-over-negated-assert-is-false` | Rewrite `assert.isFalse(!x)` to `assert.isTrue(x)`                                                                                                               |
+| `prefer-assert-is-true-over-expect-true`             | Rewrite `expect(x).toBe(true)` to `assert.isTrue(x)` (only when `x` is boolean; type-aware)                                                                      |
+| `prefer-assert-is-false-over-expect-false`           | Rewrite `expect(x).toBe(false)` to `assert.isFalse(x)` (only when `x` is boolean; type-aware)                                                                    |
 
 Why `assert.deepStrictEqual` rather than `expect(x).toStrictEqual(y)`, given
 that only the latter compares prototypes: it is the only one of the two that
