@@ -1,4 +1,5 @@
 import { Arr } from 'ts-data-forge';
+import { map } from '../operators/index.mjs';
 import { counter } from './counter.mjs';
 
 describe(counter, () => {
@@ -188,6 +189,87 @@ describe(counter, () => {
     vi.runAllTimers();
 
     assert.deepStrictEqual(mut_history, []);
+
+    vi.useRealTimers();
+  });
+
+  test.each([
+    { emitInitial: true, expected: [0, 1, 2] },
+    { emitInitial: false, expected: [1, 2, 3] },
+  ] as const)(
+    'times: 3, emitInitial: $emitInitial completes right after the third emission',
+    ({ emitInitial, expected }) => {
+      vi.useFakeTimers();
+
+      const counter$ = counter(100, { times: 3, emitInitial });
+
+      const mut_history: number[] = [];
+
+      counter$.subscribe((n) => {
+        mut_history.push(n);
+      });
+
+      vi.advanceTimersToNextTimer().advanceTimersToNextTimer();
+
+      assert.deepStrictEqual<readonly number[]>(
+        mut_history,
+        Arr.take(expected, 2),
+      );
+
+      assert.isFalse(counter$.isCompleted);
+
+      vi.advanceTimersToNextTimer();
+
+      assert.deepStrictEqual<readonly number[]>(mut_history, expected);
+
+      assert.isTrue(counter$.isCompleted);
+
+      assert.strictEqual(vi.getTimerCount(), 0);
+
+      vi.useRealTimers();
+    },
+  );
+
+  test('times: 1 emits only the 0 and clears the interval', () => {
+    vi.useFakeTimers();
+
+    const counter$ = counter(100, { times: 1 });
+
+    const mut_history: number[] = [];
+
+    counter$.subscribe((n) => {
+      mut_history.push(n);
+    });
+
+    vi.advanceTimersToNextTimer();
+
+    assert.deepStrictEqual(mut_history, [0]);
+
+    assert.isTrue(counter$.isCompleted);
+
+    assert.strictEqual(vi.getTimerCount(), 0);
+
+    vi.useRealTimers();
+  });
+
+  test('times completes the downstream after the last value reaches it', () => {
+    vi.useFakeTimers();
+
+    const counter$ = counter(100, { times: 2 });
+
+    const doubled$ = counter$.pipe(map((n) => n * 2));
+
+    const mut_history: number[] = [];
+
+    doubled$.subscribe((n) => {
+      mut_history.push(n);
+    });
+
+    vi.advanceTimersToNextTimer().advanceTimersToNextTimer();
+
+    assert.deepStrictEqual(mut_history, [0, 2]);
+
+    assert.isTrue(doubled$.isCompleted);
 
     vi.useRealTimers();
   });

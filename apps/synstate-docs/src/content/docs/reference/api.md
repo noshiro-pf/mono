@@ -31,7 +31,7 @@ For complex scenarios, SynState provides observable-based APIs:
 - [`just(value)`](../just/): Create an Observable that holds a single static value and immediately completes. Useful as a synchronous fallback inside `switchMap`.
 - [`fromPromise(promise)`](../from-promise/): Create observable from promise.
 - [`fromSubscribable()`](../from-subscribable/): Create observable from any subscribable object.
-- [`counter(ms)`](../counter/): Emit 0 at once, then 1, 2, … at intervals (almost equivalent to RxJS `timer(0, ms)`; with `{ emitInitial: false }`, almost equivalent to `interval(ms)`).
+- [`counter(ms)`](../counter/): Emit 0 at once, then 1, 2, … at intervals (almost equivalent to RxJS `timer(0, ms)`; with `{ emitInitial: false }`, almost equivalent to `interval(ms)`; `{ times: n }` completes it after `n` values).
 - [`timer(delay)`](../timer/): Emit after delay.
 
 ### Combination
