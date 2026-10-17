@@ -1,5 +1,12 @@
 # synstate-preact-signals
 
+## 3.3.0
+
+### Patch Changes
+
+- Updated dependencies [16f5b5e]
+    - synstate@3.3.0
+
 ## 3.2.1
 
 ### Patch Changes
