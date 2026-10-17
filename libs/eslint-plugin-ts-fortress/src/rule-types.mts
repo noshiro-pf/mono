@@ -5,7 +5,7 @@
 
 import type { TSESLint } from '@typescript-eslint/utils';
 import type { Linter } from 'eslint';
-import type { TypeEq } from 'ts-type-forge';
+import { expectType } from 'ts-data-forge';
 import type { tsFortressRules } from './rules/index.mjs';
 
 type SpreadOptionsIfIsArray<
@@ -188,11 +188,7 @@ export type EslintTsFortressRulesOption = Readonly<{
 
 // If this assertion fails to type-check, this generated file has drifted from
 // the actual plugin rules — re-run `pnpm run gen:rule-types`.
-type AssertTrue<B extends true> = B;
-
-export type RuleNamesAreInSync = AssertTrue<
-  TypeEq<
-    keyof EslintTsFortressRules,
-    `ts-fortress/${keyof typeof tsFortressRules}`
-  >
->;
+expectType<
+  keyof EslintTsFortressRules,
+  `ts-fortress/${keyof typeof tsFortressRules}`
+>('=');

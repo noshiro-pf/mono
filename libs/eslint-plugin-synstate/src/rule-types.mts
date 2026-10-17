@@ -5,6 +5,7 @@
 
 import type { Linter } from 'eslint';
 import { expectType } from 'ts-std-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import type { synstateRules } from './rules/index.mjs';
 
 /**
@@ -26,7 +27,7 @@ export type EslintSynstateRules = Readonly<{
   'synstate/no-unbounded-counter-pipe': NoUnboundedCounterPipe.RuleEntry;
 }>;
 
-export type EslintSynstateRulesOption = Readonly<{}>;
+export type EslintSynstateRulesOption = ReadonlyRecord<never, never>;
 
 // If this assertion fails to type-check, this generated file has drifted from
 // the actual plugin rules — re-run `pnpm run gen:rule-types`.

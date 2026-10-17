@@ -5,6 +5,7 @@
 
 import type { Linter } from 'eslint';
 import { expectType } from 'ts-std-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import type { tsStdForgeRules } from './rules/index.mjs';
 
 /**
@@ -106,7 +107,7 @@ export type EslintTsStdForgeRules = Readonly<{
   'ts-std-forge/prefer-safe-number-parse-integer': PreferSafeNumberParseInteger.RuleEntry;
 }>;
 
-export type EslintTsStdForgeRulesOption = Readonly<{}>;
+export type EslintTsStdForgeRulesOption = ReadonlyRecord<never, never>;
 
 // If this assertion fails to type-check, this generated file has drifted from
 // the actual plugin rules — re-run `pnpm run gen:rule-types`.
