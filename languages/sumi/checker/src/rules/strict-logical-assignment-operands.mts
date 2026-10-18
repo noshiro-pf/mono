@@ -8,7 +8,7 @@ import {
   type Checker,
   type Type,
 } from 'typescript-native/unstable/sync';
-import { unwrap } from '../ast/index.mjs';
+import { wrapperLayers } from '../ast/index.mjs';
 import type { Rule } from '../engine/index.mjs';
 
 /**
@@ -76,8 +76,14 @@ const operatorText = (
 
 /**
  * Whether the operand's type is boolean, `true`, `false`, or a union of
- * those. `TypeFlags.BooleanLike` covers the literal types as well as
- * `boolean` itself, which TypeScript models as their union.
+ * those, at every layer of its type wrappers. `TypeFlags.BooleanLike` covers
+ * the literal types as well as `boolean` itself, which TypeScript models as
+ * their union.
+ *
+ * The operand is reported if any layer is not boolean (see `wrapperLayers`):
+ * `(flag as boolean | undefined) ||= x` is the author saying the operand may
+ * be `undefined`, and `maybe! ||= x` or `n as unknown as boolean` asserts what
+ * the value's own type does not say.
  */
 const isBooleanTyped = (
   // `Checker` and `Node` are TypeScript's own interfaces, declared mutable;
@@ -86,18 +92,17 @@ const isBooleanTyped = (
   checker: Checker,
 
   operand: TsNode,
-): boolean => {
-  // The type of the value, not of a cast or a `!` around it: neither makes a
-  // `boolean | undefined` any less able to be `undefined`.
-  const type = checker.getTypeAtLocation(unwrap(operand));
+): boolean =>
+  wrapperLayers(operand).every((layer) => {
+    const type = checker.getTypeAtLocation(layer);
 
-  return (
-    type !== undefined &&
-    (type.isUnionType()
-      ? type.getTypes().every(isBooleanLike)
-      : isBooleanLike(type))
-  );
-};
+    return (
+      type !== undefined &&
+      (type.isUnionType()
+        ? type.getTypes().every(isBooleanLike)
+        : isBooleanLike(type))
+    );
+  });
 
 const isBooleanLike = (type: Type): boolean =>
   (type.flags & TypeFlags.BooleanLike) !== 0;

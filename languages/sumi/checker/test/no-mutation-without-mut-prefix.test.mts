@@ -316,16 +316,44 @@ describe(`${noMutationWithoutMutPrefix.ruleId} through type wrappers`, () => {
         ],
       },
       {
+        // A call mutates if any layer of the receiver resolves the method to a
+        // built-in mutator: a cast to a type of one's own does not stop
+        // `push` growing the array underneath.
         name: 'a receiver cast to a type whose method is not a built-in’s',
         code: dedent`
+          const zs: number[] = [];
+          (zs as { push: (...items: number[]) => number }).push(1);
+          (<{ sort: () => unknown }>zs).sort();
+          export const zsOut = zs;
+        `,
+        errors: [
+          { messageId: 'mutatingCall', line: 2 },
+          { messageId: 'mutatingCall', line: 3 },
+        ],
+      },
+      {
+        // The fresh-value exemption spares a report, so it holds only when
+        // every layer of the receiver says the call copies.
+        name: 'a copy only some layer of the receiver vouches for',
+        code: dedent`
+          declare const holder: { slice: () => number[] };
+          export const copied = (holder as unknown as number[]).slice().push(1);
+        `,
+        errors: [{ messageId: 'mutatingCall', line: 2 }],
+      },
+      {
+        name: 'a receiver whose method is the built-in’s at every layer',
+        code: dedent`
           const ys: number[] = [];
-          (ys as { push: (...items: number[]) => number }).push(1);
-          (<{ sort: () => unknown }>ys).sort();
+          (ys as number[]).push(1);
+          (<number[]>ys).sort();
+          ys!.reverse();
           export const ysOut = ys;
         `,
         errors: [
           { messageId: 'mutatingCall', line: 2 },
           { messageId: 'mutatingCall', line: 3 },
+          { messageId: 'mutatingCall', line: 4 },
         ],
       },
     ],
