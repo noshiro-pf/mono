@@ -3,6 +3,7 @@ import {
   editorStore,
   groupEditorStore,
   sessionStore,
+  signOutStateSignal,
 } from '../store/index.mjs';
 import { ViewSwitch } from './view-switch.js';
 
@@ -45,11 +46,14 @@ export const AppHeader = memoNamed<Props>('AppHeader', (props) => {
         </button>
         <button
           className={'bp6-button bp6-minimal'}
+          disabled={signOutStateSignal.value !== 'idle'}
           title={`${userName} としてサインイン中`}
           type={'button'}
           onClick={sessionStore.signOut}
         >
-          {'サインアウト'}
+          {signOutStateSignal.value === 'waiting'
+            ? 'サインアウト中…'
+            : 'サインアウト'}
         </button>
       </div>
     </header>

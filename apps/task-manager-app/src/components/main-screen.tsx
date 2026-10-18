@@ -7,6 +7,7 @@ import { GroupDialog } from './group-dialog.js';
 import { ListView } from './list-view.js';
 import { NodeDialog } from './node-dialog.js';
 import { NoticeBar } from './notice-bar.js';
+import { UnsentWritesBar } from './unsent-writes-bar.js';
 
 type Props = Readonly<{
   userName: string;
@@ -22,6 +23,7 @@ export const MainScreen = memoNamed<Props>('MainScreen', (props) => {
   return (
     <div className={'main-screen'}>
       <AppHeader userName={userName} />
+      <UnsentWritesBar />
       <NoticeBar />
       {viewSignal.value === 'list' ? <ListView /> : <DagView />}
       <NodeDialog />

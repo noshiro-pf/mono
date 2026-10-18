@@ -253,6 +253,8 @@ export const bulkEditStore = createBulkEditStore({
 
 export const sessionSignal = toSignal(sessionStore.session);
 
+export const signOutStateSignal = toSignal(sessionStore.signOutState);
+
 export const domainSignal = toSignal(dataStore.state);
 
 export const groupsSignal = toSignal(dataStore.groups);

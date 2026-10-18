@@ -88,8 +88,17 @@ export type Backend = Readonly<{
    */
   watchSession: (listener: (session: BackendSession) => void) => () => void;
   signIn: () => Promise<void>;
-  signOut: () => Promise<void>;
+  /**
+   * Signs out, and removes what this device kept of the data. Writes made
+   * offline are sent first; when they cannot be, nothing happens and
+   * `'unsent-writes'` says so, unless `discardUnsentWrites` gives them up.
+   */
+  signOut: (
+    options: Readonly<{ discardUnsentWrites: boolean }>,
+  ) => Promise<SignOutResult>;
 }>;
+
+export type SignOutResult = 'signed-out' | 'unsent-writes';
 
 export type BackendSession = Readonly<
   | { type: 'signed-out' }
