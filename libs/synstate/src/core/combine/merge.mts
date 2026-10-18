@@ -58,9 +58,6 @@ import type {
  *
  * assert.deepStrictEqual(valueHistory, ['c1', 'k1', 'c2', 'k2']);
  * ```
- *
- * @note To improve code readability, consider using `createState` instead of `merge`,
- * subscribing to `parents` and calling `setState` within it.
  */
 export const merge = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,

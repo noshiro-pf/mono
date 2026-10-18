@@ -67,6 +67,13 @@ import { source, type InitializedObservable } from '../core/index.mjs';
  *
  * assert.deepStrictEqual(countHistory, [0, 2]);
  * ```
+ *
+ * @note Do not call `dispatch` from a subscriber or a projection while another
+ * update is propagating: the write propagates immediately, so subscribers can
+ * see an intermediate state, and it logs a `console.warn` (once per
+ * observable). Derive the value from its source instead —
+ * `const b$ = a$.pipe(map((a) => a * 2))` rather than
+ * `a$.subscribe((a) => { setB(a * 2); })`.
  */
 export const createReducer = <S, A>(
   reducer: Reducer<S, A>,

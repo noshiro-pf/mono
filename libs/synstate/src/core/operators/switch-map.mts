@@ -96,9 +96,6 @@ import type {
  *   'C3',
  * ]);
  * ```
- *
- * @note To improve code readability, consider using `createState` instead of `switchMap`,
- * subscribe to `parentObservable` and call `setState` within it.
  */
 export const switchMap =
   <A, B>(

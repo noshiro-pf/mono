@@ -43,6 +43,13 @@ import type {
  *
  * assert.deepStrictEqual(valueHistory, [1, 2, 3]);
  * ```
+ *
+ * @note Do not call `next` from a subscriber or a projection while another
+ * update is propagating: the write propagates immediately, so subscribers can
+ * see an intermediate state, and it logs a `console.warn` (once per
+ * observable). Derive the value from its source instead —
+ * `const b$ = a$.pipe(map((a) => a * 2))` rather than
+ * `a$.subscribe((a) => { setB(a * 2); })`.
  */
 export function source<const A>(
   initialValue: A,
