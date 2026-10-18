@@ -1,3 +1,4 @@
+export * from './activity-store.mjs';
 export * from './header-store.mjs';
 export * from './issues-list-store.mjs';
 export * from './issues-view-store.mjs';

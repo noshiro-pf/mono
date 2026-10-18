@@ -10,6 +10,7 @@ import {
   TokenPanel,
   useBorderBoxHeight,
   ViewSettings,
+  WeeklyActivity,
 } from './components/index.mjs';
 import { REPORT_SOURCE, repositoryUrl } from './constants.mjs';
 import {
@@ -107,6 +108,8 @@ export const App = memoNamed('App', () => {
               {'last refresh failed'}
             </span>
           ) : undefined}
+
+          <WeeklyActivity />
 
           <ViewSettings />
 

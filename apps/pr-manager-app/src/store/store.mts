@@ -25,7 +25,9 @@ import {
   themeFromLocation,
 } from '../theme.mjs';
 import { browserStores } from '../token.mjs';
+import { loadWeeklyActivity } from '../weekly-activity.mjs';
 import { loadWorkflowRuns } from '../workflow-runs.mjs';
+import { createActivityStore } from './activity-store.mjs';
 import { createHeaderStore } from './header-store.mjs';
 import { createIssuesListStore } from './issues-list-store.mjs';
 import { createIssuesViewStore } from './issues-view-store.mjs';
@@ -123,6 +125,19 @@ export const issuesViewStore = createIssuesViewStore({
   loadMoreIssues: reader.loadMoreIssues,
 });
 
+export const activityStore = createActivityStore({
+  token: tokenStore.token,
+  load: (token, nowMs) => loadWeeklyActivity(REPORT_SOURCE, { token, nowMs }),
+  now: () => Date.now(),
+  setTimer: (delayMs, run) => {
+    const timer = setTimeout(run, delayMs);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  },
+});
+
 /**
  * Everything a component reads, as Preact signals, and the only way a
  * component reads the stores.
@@ -201,6 +216,11 @@ export const layoutSignals = {
   settingsOpen: toSignal(layoutStore.settingsOpen),
 } as const;
 
+export const activitySignals = {
+  open: toSignal(activityStore.open),
+  status: toSignal(activityStore.status),
+} as const;
+
 /**
  * Starts the timers and the listeners. Called once, from `main.tsx`, before
  * the first render: the theme is written to `<html>` as it starts, so a page
@@ -223,6 +243,8 @@ export const startStore = (): (() => void) => {
 
   const stopIssuesList = issuesListStore.start();
 
+  const stopActivity = activityStore.start();
+
   return () => {
     stopToken();
 
@@ -239,6 +261,8 @@ export const startStore = (): (() => void) => {
     stopIssuesView();
 
     stopIssuesList();
+
+    stopActivity();
   };
 };
 

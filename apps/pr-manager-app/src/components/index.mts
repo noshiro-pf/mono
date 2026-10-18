@@ -48,4 +48,5 @@ export * from './use-dag-box.mjs';
 export * from './verdict-badge.js';
 export * from './view-settings-row.js';
 export * from './view-settings.js';
+export * from './weekly-activity.js';
 export * from './workflow-runs-section.js';
