@@ -199,8 +199,8 @@ type Props = Readonly<{
  * (`dagLayoutStore.tileNodes`), with no edges, at zoom 1, and the view is
  * only scrolled down and up (`dag/tile-scroll.mts`): by the wheel, a drag
  * anywhere — on a task too, which a tap still opens — and Page Up, Page
- * Down, Home and End while a task has the focus, which also scrolls the
- * focused task into view. The canvas reports its width
+ * Down, Home and End, with the focus on a task, on the canvas, which takes
+ * it in this mode, or nowhere; a task given the focus is scrolled into view. The canvas reports its width
  * (`dagLayoutStore.setTileWidth`); when it changes, the tasks move to their
  * new rows and the view follows them, keeping the first task of the first
  * row in view where it was. A thin thumb on the right says how far down the
@@ -397,12 +397,26 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
   // selected.
   const moving = groupDrag ?? selectionDrag;
 
+  // Every node some mode draws: those of the DAG, and those 「アーク」 and
+  // 「タイル」 draw before ELK has laid them out.
+  const anyMode = useMemo(() => {
+    const known = new Set(placed.map(({ id }) => id));
+
+    return [
+      ...placed,
+      ...Arr.uniqBy(
+        [...arcNodes, ...tileNodes].filter(({ id }) => !known.has(id)),
+        ({ id }) => id,
+      ),
+    ];
+  }, [placed, arcNodes, tileNodes]);
+
   // While they move, the nodes moving, wherever they are going; otherwise
   // the nodes of the mode, where it draws them.
   const shown = useMemo(
     () =>
       animated !== undefined
-        ? moveNodesTo(placed, animated).filter(({ id }) => animated.has(id))
+        ? moveNodesTo(anyMode, animated).filter(({ id }) => animated.has(id))
         : mode === 'arc'
           ? arcNodes
           : mode === 'tile'
@@ -420,7 +434,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
                         }
                       : node,
                 ),
-    [placed, dragged, moving, animated, mode, arcNodes, tileNodes],
+    [anyMode, placed, dragged, moving, animated, mode, arcNodes, tileNodes],
   );
 
   // Drawn while the DAG is, and not while the view changes mode: round the
@@ -1285,9 +1299,65 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
     [mode, show, scrollTileTo, tileOffset, measureTile],
   );
 
-  // The canvas itself takes no keys; the nodes do. This puts the nodes
-  // where they are going, keeps a key pressed on a node from scrolling the
-  // page behind the dialog it opens, and in 「タイル」 scrolls the rows.
+  /**
+   * In 「タイル」, the rows scrolled as `key` says (`tileKeyScroll`); whether
+   * it said anything.
+   */
+  const scrollTileByKey = useCallback(
+    (key: string): boolean => {
+      const frame = mode === 'tile' ? measureTile() : undefined;
+
+      const target =
+        frame === undefined
+          ? undefined
+          : tileKeyScroll(
+              key,
+              tileOffset(),
+              frame.viewport,
+              tileContentHeight(dagLayoutStore.tileNodes.getSnapshot().value),
+            );
+
+      if (target === undefined) {
+        return false;
+      }
+
+      scrollTileTo(target);
+
+      return true;
+    },
+    [mode, measureTile, tileOffset, scrollTileTo],
+  );
+
+  // A key with the focus nowhere — on the page itself, as it is when the
+  // page opens — scrolls 「タイル」 as one on the canvas does.
+  useEffect(() => {
+    if (mode !== 'tile') {
+      return undefined;
+    }
+
+    const onDocumentKeyDown = (pressed: KeyboardEvent): void => {
+      if (
+        pressed.defaultPrevented ||
+        pressed.target !== document.body ||
+        !scrollTileByKey(pressed.key)
+      ) {
+        return;
+      }
+
+      pressed.preventDefault();
+    };
+
+    document.addEventListener('keydown', onDocumentKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', onDocumentKeyDown);
+    };
+  }, [mode, scrollTileByKey]);
+
+  // The keys of the nodes, and in 「タイル」 those of the canvas, which
+  // takes the focus there. This puts the nodes where they are going, keeps a
+  // key pressed on a node from scrolling the page behind the dialog it
+  // opens, and in 「タイル」 scrolls the rows.
   const onKeyDown = useCallback<KeyboardEventHandler<SVGSVGElement>>(
     (pressed) => {
       dagLayoutStore.finishAnimation();
@@ -1310,27 +1380,11 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
           break;
       }
 
-      const frame = mode === 'tile' ? measureTile() : undefined;
-
-      const target =
-        frame === undefined
-          ? undefined
-          : tileKeyScroll(
-              pressed.key,
-              tileOffset(),
-              frame.viewport,
-              tileContentHeight(dagLayoutStore.tileNodes.getSnapshot().value),
-            );
-
-      if (target === undefined) {
-        return;
+      if (scrollTileByKey(pressed.key)) {
+        pressed.preventDefault();
       }
-
-      pressed.preventDefault();
-
-      scrollTileTo(target);
     },
-    [mode, measureTile, tileOffset, scrollTileTo],
+    [scrollTileByKey],
   );
 
   // In 「タイル」, a task given the focus — by Tab — is scrolled into view.
@@ -1403,6 +1457,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
     <figure ref={wrapper} className={'dag-canvas'}>
       <figcaption className={'visually-hidden'}>{captions[mode]}</figcaption>
       <svg
+        aria-label={mode === 'tile' ? captions.tile : undefined}
         className={'dag-svg'}
         data-animating={animated !== undefined}
         data-connect={handle !== undefined || connecting !== undefined}
@@ -1410,6 +1465,11 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
         data-lasso={arrangeable && lassoTool}
         data-mode={mode}
         data-motion={motion}
+        // In 「タイル」, focusable — by Tab, or by a press on it — as a
+        // scrolled box is, so that its keys work with no task focused. Lower
+        // case: an SVG attribute `tabIndex` is not `tabindex`.
+        // eslint-disable-next-line react/no-unknown-property
+        tabindex={mode === 'tile' ? 0 : undefined}
         onBlurCapture={onBlurCapture}
         onClick={onClick}
         onClickCapture={onClickCapture}

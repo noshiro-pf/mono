@@ -357,10 +357,13 @@ export const createDagLayoutStore = <H, F>(
   let mut_arcOrder = arcOrder.getSnapshot().value;
 
   /**
-   * Where the DAG drew the nodes before the node size changed, while the
-   * layout at the new size is computed; `undefined` otherwise.
+   * Where the nodes of the DAG move from once the layout being computed is
+   * there, and `undefined` while none waits for it: where the DAG drew them
+   * before the node size changed, or where the view drew them as it was
+   * switched to the DAG — before ELK had laid it out once, or while it lays
+   * out a node added since, or the graph at a new size.
    */
-  let mut_resizedFrom: ReadonlyMap<GraphNodeId, Point> | undefined = undefined;
+  let mut_awaitingFrom: ReadonlyMap<GraphNodeId, Point> | undefined = undefined;
 
   let mut_requestedKey: string | undefined = undefined;
 
@@ -819,6 +822,12 @@ export const createDagLayoutStore = <H, F>(
    * From where `previous` draws the nodes to where `next` does. A node only
    * one of them draws stays where that one draws it, and fades out or in; a
    * node neither draws is not drawn.
+   *
+   * The exception is the DAG while ELK lays it out — for the first time, or
+   * with a node added, or at a new size: a node of `previous` the DAG does
+   * not draw yet is one it will draw, and stays where it is, not faded,
+   * until the layout is there; the nodes then move to it from where this
+   * left them (`moveAwaited`).
    */
   const switchMode = (previous: DagViewMode, next: DagViewMode): void => {
     const dag = positionsOf(placed());
@@ -827,23 +836,34 @@ export const createDagLayoutStore = <H, F>(
 
     const after = positionsOf(drawnIn(next));
 
+    const awaiting = next === 'dag' && getAutoLayout().type === 'computing';
+
     const either = (id: GraphNodeId): boolean =>
       before.has(id) || after.has(id);
 
-    const fading = Array.from(dag.keys()).filter(
-      (id) => either(id) && !(before.has(id) && after.has(id)),
+    const fading = Arr.uniq([
+      ...dag.keys(),
+      ...before.keys(),
+      ...after.keys(),
+    ]).filter(
+      (id) =>
+        either(id) &&
+        !(before.has(id) && after.has(id)) &&
+        !(awaiting && before.has(id)),
     );
+
+    const to = onlyOf(overriding(overriding(dag, before), after), either);
 
     // A node fading out stays where it was drawn, and one fading in is
     // already where it is going.
-    animate(
-      onlyOf(overriding(overriding(dag, after), before), either),
-      onlyOf(overriding(overriding(dag, before), after), either),
-      {
-        from: new Map(fading.map((id) => [id, before.has(id) ? 1 : 0])),
-        to: new Map(fading.map((id) => [id, after.has(id) ? 1 : 0])),
-      },
-    );
+    animate(onlyOf(overriding(overriding(dag, after), before), either), to, {
+      from: new Map(fading.map((id) => [id, before.has(id) ? 1 : 0])),
+      to: new Map(fading.map((id) => [id, after.has(id) ? 1 : 0])),
+    });
+
+    if (awaiting) {
+      mut_awaitingFrom = to;
+    }
 
     updateFitRequests((count) => count + 1);
   };
@@ -851,7 +871,7 @@ export const createDagLayoutStore = <H, F>(
   /**
    * From where the nodes were drawn at `previous` to where they are at
    * `next`: at once in 「アーク」 and 「タイル」, and in 「DAG」 once ELK has
-   * laid it out at the new size (`moveResized`).
+   * laid it out at the new size (`moveAwaited`).
    */
   const resize = (previous: NodeSize, next: NodeSize): void => {
     if (!onScreen()) {
@@ -859,7 +879,7 @@ export const createDagLayoutStore = <H, F>(
     }
 
     if (mut_viewMode === 'dag') {
-      mut_resizedFrom = positionsOf(placed());
+      mut_awaitingFrom = positionsOf(placed());
 
       return;
     }
@@ -900,15 +920,15 @@ export const createDagLayoutStore = <H, F>(
     }
   };
 
-  /** The DAG laid out at a new size: its nodes moved there. */
-  const moveResized = (): void => {
-    const before = mut_resizedFrom;
+  /** The layout `mut_awaitingFrom` waited for: the nodes moved there. */
+  const moveAwaited = (): void => {
+    const before = mut_awaitingFrom;
 
     if (before === undefined) {
       return;
     }
 
-    mut_resizedFrom = undefined;
+    mut_awaitingFrom = undefined;
 
     if (!onScreen() || !isArrangeable(mut_viewMode)) {
       return;
@@ -1206,7 +1226,7 @@ export const createDagLayoutStore = <H, F>(
 
           applyArrangeIfRequested(laidOut);
 
-          moveResized();
+          moveAwaited();
 
           introduce();
         })
@@ -1217,12 +1237,24 @@ export const createDagLayoutStore = <H, F>(
 
           mut_arrangeRequested = false;
 
-          mut_resizedFrom = undefined;
+          mut_awaitingFrom = undefined;
 
           mut_shownMadeFor = undefined;
 
           setAutoLayout({ type: 'error', message: unknownToString(error) });
         });
+    });
+
+    // In 「アーク」 and 「タイル」, the nodes are shown moving into place as
+    // soon as there are any, without waiting for ELK to lay out the DAG.
+    const diagramSubscription = combine([
+      deps.active,
+      arcNodes,
+      tileNodes,
+    ]).subscribe(([active]) => {
+      if (active && !isArrangeable(mut_viewMode)) {
+        introduce();
+      }
     });
 
     // Turned off, or less motion asked for, in the middle of one.
@@ -1300,6 +1332,8 @@ export const createDagLayoutStore = <H, F>(
       nodeSizeSubscription.unsubscribe();
 
       viewModeSubscription.unsubscribe();
+
+      diagramSubscription.unsubscribe();
 
       storedSubscription.unsubscribe();
 

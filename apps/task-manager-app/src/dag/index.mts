@@ -6,6 +6,8 @@ export * from './connect-handle.mjs';
 export * from './dag-layout.mjs';
 export * from './diagram-order.mjs';
 export * from './edge-geometry.mjs';
+export * from './edge-labels.mjs';
+export * from './edge-lanes.mjs';
 export * from './edge-routing.mjs';
 export * from './elk.mjs';
 export * from './frame-budget.mjs';

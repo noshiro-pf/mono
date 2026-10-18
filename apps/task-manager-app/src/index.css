@@ -547,6 +547,16 @@ fieldset {
   cursor: grabbing;
 }
 
+/* 「タイル」 takes the focus, for its keys: a ring inside its edge. */
+.dag-svg:focus {
+  outline: none;
+}
+
+.dag-svg:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
 /*
  * Over the canvas, across its top; first in the tab order, before the nodes.
  * As wide as the canvas, for 「表示設定」 to sit at the right end, and
@@ -654,6 +664,11 @@ fieldset {
 
 .settings-panel::backdrop {
   background: transparent;
+}
+
+/* Focused when it opens, so that Tab goes on to its first control. */
+.settings-panel:focus-visible {
+  outline: none;
 }
 
 .settings-panel[data-placement='sheet'] {
