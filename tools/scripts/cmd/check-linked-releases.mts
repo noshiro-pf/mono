@@ -46,8 +46,8 @@ import {
  *   `changeset` would reject only when it next runs — at release time — and a
  *   glob would silently take in a package added later.
  *
- * It is a `check:prose` guard for the reason `check:prose:next-major` is: a
- * changeset is Markdown, and `code-check.yml` skips a diff of Markdown alone.
+ * It is a `check:prose` guard because a changeset is Markdown, and
+ * `code-check.yml` skips a diff of Markdown alone.
  */
 export const checkLinkedReleases = ({
   changesets,

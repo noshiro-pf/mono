@@ -67,15 +67,16 @@ jobs:
       - name: Set up pnpm, Node.js and the dependencies
         uses: ./.github/actions/setup
 
-      # version PR に載せる `NEXT_MAJOR.md` の Undecided 候補（
+      # version PR に載せる `NEXT_MAJOR.md` の未適用の項目（リリースを止める
+      # decided と、決めるべき Undecided 候補 —
       # `tools/scripts/cmd/next-major-reminder.mts` ）。`changesets/action` が
       # `.changeset/` を消費する前の main の tree を読むので、ここで作る。投稿は
       # 鍵を持つ `remind` job がファイルとして受け取るだけで、tree からは何も
-      # 実行しない。候補が無ければ空のファイルで、それは「コメントを消す」の意味。
-      - name: List the undecided NEXT_MAJOR.md candidates
+      # 実行しない。項目が無ければ空のファイルで、それは「コメントを消す」の意味。
+      - name: List the open NEXT_MAJOR.md items
         run: pnpm run z:next-major-reminder "${RUNNER_TEMP}/next-major-reminder.md"
 
-      - name: Upload the candidate list
+      - name: Upload the item list
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: next-major-reminder
@@ -245,9 +246,11 @@ jobs:
           PR_NUMBER: ${{ steps.changesets.outputs.pr-number }}
         run: gh pr edit "$PR_NUMBER" --add-label skip-ci
 
-  # version PR に、破壊的リリースが残す `NEXT_MAJOR.md` の Undecided 候補を
-  # コメント 1 件で知らせる。リリースを決める（ `merge-queued` を付ける）のは
-  # その PR の上なので、決める場所に一覧を置く。本文でなくコメントなのは、
+  # version PR に、破壊的リリースが残す `NEXT_MAJOR.md` の項目をコメント 1 件で
+  # 知らせる。decided の項目は `check:prose:next-major` がこの PR で落ちる理由
+  # で、破壊的な changeset が main に入った時点から何を待っているかを見せる。
+  # Undecided の候補は止めないが、リリースを決める（ `merge-queued` を付ける）
+  # のはその PR の上なので、決める場所に一覧を置く。本文でなくコメントなのは、
   # `changesets/action` が push のたびに title と body を上書きするため。
   #
   # GitHub はコメントの編集では通知を送らないので、一覧が変わったときだけ古い
@@ -260,7 +263,7 @@ jobs:
   # コメントは workflow を起こさない。checkout もしない — `build` job が
   # 作ったファイルを本文として読むだけで、実行するのはこの `run:` だけ。
   remind:
-    name: Remind of undecided NEXT_MAJOR.md candidates
+    name: Remind of open NEXT_MAJOR.md items
     needs: release
     if: needs.release.outputs.pr-number != ''
     timeout-minutes: 5
@@ -270,7 +273,7 @@ jobs:
       pull-requests: write # to post and delete the comment
 
     steps:
-      - name: Download the candidate list
+      - name: Download the item list
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: next-major-reminder
@@ -309,5 +312,5 @@ jobs:
           if [[ -s "$body_file" ]]; then
             gh api --method POST "$comments" -F "body=@${body_file}" --jq .html_url
           else
-            echo "No breaking release has undecided candidates."
+            echo "No breaking release has items open."
           fi
