@@ -20,11 +20,15 @@ on:
       - 'pnpm-lock.yaml'
       - '.github/workflows/synstate-benchmark.yml'
 
+  # `labeled` / `unlabeled` so that `skip-ci` stops the measurement and taking
+  # it off starts it, as in the check workflows.
   pull_request:
     types:
       - opened
       - synchronize
       - reopened
+      - labeled
+      - unlabeled
     paths:
       - 'libs/synstate/src/**'
       - 'libs/synstate/package.json'
@@ -44,6 +48,15 @@ permissions: {}
 
 jobs:
   benchmark:
+    # Not while `skip-ci` is on, and on a label event only when that label is
+    # `skip-ci` coming off: another label changes nothing measured. The run a
+    # label event starts still cancels the one in flight, which is how putting
+    # `skip-ci` on stops the `opened` run.
+    if: >-
+      github.event_name != 'pull_request' ||
+      (!contains(github.event.pull_request.labels.*.name, 'skip-ci') &&
+        ((github.event.action != 'labeled' && github.event.action != 'unlabeled') ||
+          github.event.label.name == 'skip-ci'))
     # Pinned, not `ubuntu-latest`. Comparability is the entire point: these
     # numbers are published, and a table measured on one image beside a table
     # measured on the next is the confusion this workflow exists to end. When
