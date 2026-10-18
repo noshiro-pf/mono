@@ -18,8 +18,30 @@ const thisDir = import.meta.dirname;
 
 const TYPES_RULES_DIR = path.resolve(projectRootPath, 'src/types/rules');
 
-const eslintConfigPath = path.resolve(thisDir, './eslint.config.gen.mts');
+const preCodemodLintConfigPath = path.resolve(
+  thisDir,
+  './oxlint.config.pre-codemod.mts',
+);
 
+const postCodemodLintConfigPath = path.resolve(
+  thisDir,
+  './oxlint.config.post-codemod.mts',
+);
+
+const tsconfigPath = path.resolve(thisDir, './tsconfig.gen.json');
+
+/**
+ * The lint passes sit on either side of the one codemod pass, because the
+ * rules depend on it in opposite directions:
+ *
+ * - `consistent-indexed-object-style` rewrites index signatures into the
+ *   built-in `Record`, which the codemod then turns into `ReadonlyRecord`, so
+ *   it runs before;
+ * - `prefer-canonical-length-constrained-tuple` rewrites `readonly [T, T]`
+ *   into `FixedLengthTuple<2, T>`, which needs the `readonly` the codemod adds
+ *   — before it, the rule writes `MutableFixedLengthTuple`, which the codemod
+ *   does not convert — so it runs after.
+ */
 export const generateRulesType = async (
   targetFileNames?: NonEmptyArray<string>,
 ): Promise<void> => {
@@ -34,49 +56,29 @@ export const generateRulesType = async (
   }
 
   {
+    console.info('running `oxlint --fix` (pre codemod) ...');
+
+    await lintFix(preCodemodLintConfigPath, targetFileNames);
+
     console.info('running codemod...');
 
     await applyTypeTransformationsForTargets(targetFileNames);
 
-    await fmt(targetFileNames);
-  }
-
-  {
-    console.info('running `lint --fix` ...');
-
-    // `eslint --fix` exits non-zero whenever any problem is left unfixed, which
-    // is not a reason to abort: the formatting below still has to run, or the
-    // generated files are left in a half-formatted state.
-    const result = await lintFix(targetFileNames);
-
-    if (result.type === 'error') {
-      console.warn('`lint --fix` reported problems:');
-
-      console.warn(result.error);
-    }
-
-    // `eslint --fix` can introduce new usages of ts-type-forge types, so the
-    // import has to be restored before organize-imports prunes it for the last
-    // time.
+    // The codemod can introduce ts-type-forge type usages of its own (e.g.
+    // `ReadonlyRecord`), so restore the import before organize-imports prunes
+    // it.
     await restoreTsTypeForgeImport(targetFileNames);
 
     await fmt(targetFileNames);
   }
 
   {
-    // `@typescript-eslint/consistent-indexed-object-style` rewrites index
-    // signatures into the built-in `Record` during `eslint --fix`, which
-    // re-introduces `Readonly<Record<...>>` after the codemod above has
-    // already run. Run the codemod once more so the generated files end up in
-    // the codemod's record style (`ReadonlyRecord`) and regeneration stays a
-    // fixed point of `fix:codemod:full`.
-    console.info('running codemod (post `lint --fix`)...');
+    console.info('running `oxlint --fix` (post codemod) ...');
 
-    await applyTypeTransformationsForTargets(targetFileNames);
+    await lintFix(postCodemodLintConfigPath, targetFileNames);
 
-    // The codemod can introduce ts-type-forge type usages of its own (e.g.
-    // `ReadonlyRecord`), so restore the import again before organize-imports
-    // prunes it for the last time.
+    // The ts-type-forge rules introduce usages of its types, so the import has
+    // to be restored before organize-imports prunes it for the last time.
     await restoreTsTypeForgeImport(targetFileNames);
 
     await fmt(targetFileNames);
@@ -178,36 +180,84 @@ const generate = async (
   return { type: 'ok' };
 };
 
+/**
+ * `oxlint --fix` until nothing is left to fix.
+ *
+ * One oxlint run applies one round of fixes, where `eslint --fix` repeats
+ * them up to ten times, so a fix that only becomes possible after another
+ * (a tuple inside a tuple, a blank line next to a rewritten statement) waits
+ * for the next run. A run that changes no file ends the loop; the problems it
+ * still reports are only warned about, because the formatting that follows
+ * has to run either way, or the generated files are left half-formatted.
+ */
 const lintFix = async (
+  configPath: string,
   targetFileNames?: NonEmptyArray<string>,
-): Promise<Readonly<{ type: 'error'; error: unknown } | { type: 'ok' }>> => {
+): Promise<void> => {
   const globResult = await glob(`${TYPES_RULES_DIR}/*.mts`);
 
   if (Result.isErr(globResult)) {
-    return { type: 'error', error: globResult.value };
+    console.error(globResult.value);
+
+    return;
   }
 
-  const targetFiles = filterTargetFiles(globResult.value, targetFileNames);
+  // The barrel is `gen:index`'s, which writes it without blank lines.
+  const targetFiles = filterTargetFiles(
+    globResult.value,
+    targetFileNames,
+  ).filter((filePath) => path.basename(filePath) !== 'index.mts');
 
   if (Arr.isEmpty(targetFiles)) {
     console.warn('No files to lint');
 
-    return { type: 'ok' };
+    return;
   }
 
-  const result = await $(
-    `TIMING=1 eslint ${[
-      '--no-ignore',
-      '--fix',
-      '--config',
-      eslintConfigPath,
-    ].join(' ')} ${targetFiles.join(' ')}`,
-  );
+  const command = [
+    'oxlint',
+    '--config',
+    configPath,
+    '--tsconfig',
+    tsconfigPath,
+    '--fix',
+    ...targetFiles,
+  ].join(' ');
 
-  return Result.isErr(result) && result.value.code !== 0
-    ? { type: 'error', error: result.value.stderr }
-    : { type: 'ok' };
+  for (const _ of Arr.seq(maxLintFixRuns)) {
+    const before = await readContents(targetFiles);
+
+    const result = await $(command, { silent: true });
+
+    if (Result.isOk(result)) {
+      return;
+    }
+
+    const after = await readContents(targetFiles);
+
+    if (Arr.eq(before, after)) {
+      console.warn('`oxlint --fix` left problems it cannot fix:');
+
+      console.warn(result.value.stdout);
+
+      return;
+    }
+  }
+
+  console.warn(
+    `\`oxlint --fix\` was still fixing after ${maxLintFixRuns} runs.`,
+  );
 };
+
+const maxLintFixRuns = 10;
+
+const readContents = (
+  filePaths: readonly string[],
+): Promise<readonly string[]> =>
+  Promise.all(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    filePaths.map((filePath) => fs.readFile(filePath, 'utf8')),
+  );
 
 /** 生成対象として指定されたファイル名だけに絞り込む（未指定なら全件） */
 const filterTargetFiles = (

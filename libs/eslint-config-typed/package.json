@@ -137,6 +137,8 @@
     "json-schema": "0.4.0",
     "json-schema-to-typescript": "16.0.0",
     "npm-run-all2": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",

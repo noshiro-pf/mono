@@ -17,11 +17,16 @@ comment:
   layout: 'reach, diff, flags, components, files'
   behavior: default
   require_changes: false
+  # A pull request's coverage arrives in one upload per
+  # `ws:check:test:cov:shard-*` entry of code-check.yml; a comment written
+  # before the last would compare the base against part of the suite. Keep
+  # this equal to the number of shards.
+  after_n_builds: 3
 
 # One component per package, so that a repository-wide number is not the only
 # thing on offer. `pnpm run ws:check:test:cov` writes a coverage report per package
-# and the workflow uploads them in a single step; components split that back
-# apart by path, which flags could not do without one upload per package.
+# and the workflow uploads them from each of its shards; components split that
+# back apart by path, which flags could not do without one upload per package.
 #
 # The paths below assume Codecov sees `libs/<pkg>/src/...`. It does: each
 # lcov.info records paths relative to its own package, and the uploader

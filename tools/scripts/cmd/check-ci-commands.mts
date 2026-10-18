@@ -488,6 +488,15 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
     // `verify-published-packages.yml` is what checks the result.
   },
   {
+    directory: ROOT_DIRECTORY,
+    scriptName: 'ws:check:lint',
+    // `code-check.yml` runs `ws:fix:lint` as two halves,
+    // `ws:fix:lint:apps` and `ws:fix:lint:non-apps`, which between them reach
+    // every package's `fix:lint` — and through it `check:lint`. Neither half
+    // covers the root command on its own, so no `DECLARED_COVERAGE` edge says
+    // so; that the halves partition the packages is in their filters.
+  },
+  {
     // Every package that defines one.
     scriptName: 'check-all',
     // The per-package aggregate. Everything in it is covered by the root

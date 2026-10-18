@@ -141,11 +141,24 @@ jobs:
           # until it was moved out, so that the twelve other entries here,
           # which only need `dist/`, stop paying for it.
           - ws:check:dist
-          - ws:fix:lint
+          # `ws:fix:lint` in two halves, `apps/` and the rest, each with
+          # `--no-sort`: in one job it was the second-longest entry, and pnpm's
+          # topological order kept it at one package in flight for minutes
+          # while the packages everything depends on were linted. No lint
+          # waits on another package's — siblings resolve to `dist/`.
+          - ws:fix:lint:apps
+          - ws:fix:lint:non-apps
           # The Sumi lint check of the dogfood packages (`check:sumi` scripts).
           - ws:check:sumi
           - ws:check:test:browser
-          - ws:check:test:cov
+          # `ws:check:test:cov` in three shards, because one package at a time
+          # (`--workspace-concurrency=1`) made it the longest entry by minutes.
+          # The first two name the slowest suites; the third is everything
+          # else by excluding them, so a new package lands there. Each shard
+          # uploads its own reports and Codecov merges them (`codecov.yml`).
+          - ws:check:test:cov:shard-1
+          - ws:check:test:cov:shard-2
+          - ws:check:test:cov:shard-3
           - ws:check:e2e
           - fix:codemod:full
           - check:knip
@@ -165,7 +178,7 @@ jobs:
       # run in one, so their coverage would otherwise be reported as zero.
       # `ws:check:e2e` drives one, which is the whole point of it.
       - name: Install Playwright Browsers
-        if: matrix.command == 'ws:check:test:browser' || matrix.command == 'ws:check:test:cov' || matrix.command == 'ws:check:e2e'
+        if: matrix.command == 'ws:check:test:browser' || startsWith(matrix.command, 'ws:check:test:cov') || matrix.command == 'ws:check:e2e'
         run: pnpm exec playwright install chromium
 
       - name: Download the build output
@@ -189,15 +202,16 @@ jobs:
         run: pnpm run z:assert-repo-is-clean
 
       - name: Upload coverage reports to Codecov
-        if: matrix.command == 'ws:check:test:cov'
+        if: startsWith(matrix.command, 'ws:check:test:cov')
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
 
   # What a push to main runs when the matrix above reused a verdict: its
-  # `ws:check:test:cov` entry and nothing else, so that Codecov has a report
-  # on the base commit to compare a pull request's against. The upload is the
-  # point of this job, so a verdict cannot stand in for it. When the matrix
-  # does run on a push — no verdict matched, or the gate failed to answer —
-  # its own `ws:check:test:cov` entry uploads, and this job stays out of it.
+  # `ws:check:test:cov` shards, as the one command they split, and nothing
+  # else, so that Codecov has a report on the base commit to compare a pull
+  # request's against. The upload is the point of this job, so a verdict
+  # cannot stand in for it. When the matrix does run on a push — no verdict
+  # matched, or the gate failed to answer — its own shards upload, and this
+  # job stays out of it.
   #
   # A job of its own rather than a step condition inside the matrix job,
   # because a matrix entry that boots a runner and skips every step still
