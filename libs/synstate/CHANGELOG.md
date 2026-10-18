@@ -1,5 +1,21 @@
 # synstate
 
+## 3.4.0
+
+### Minor Changes
+
+- 355ee36: `counter(ms, { times: n })` completes right after its `n`-th value and clears its timers. Completion does not travel upstream, so `counter(ms).pipe(take(n))` leaves the counter running; `times` is the way to stop it.
+- 3659166: `next` on a source with an initial value returns the value held after the call: the value passed, or, once the source is completed, the value it already holds. `dispatch` of `createReducer`, and `setState`, `updateState`, `resetState` and `toggle` of `createState` and `createBooleanState`, return what `next` returns, so after completion they give the state held instead of a value that was never applied.
+- 93fca29: Warn (`console.warn`, once per observable) when a root observable is written to — `next`, `setState`, `dispatch` and the like — from a subscriber or a projection while another update is still propagating. The write still propagates immediately, as before; derive the value from its source (`map`, `combine`, …) instead. Writes from event handlers, timers and microtasks are unaffected, as is a root created during propagation emitting while it is created.
+
+### Patch Changes
+
+- 3294b9b: A child observable created from parents that have all completed now completes at creation. It keeps the value computed from the parents' final values, and is no longer registered to the completed parents.
+- 37d8fcf: `fromSubscribable` now unsubscribes from the wrapped subscribable when the observable completes or is disposed, instead of keeping the subscription alive. It does not unsubscribe when the subscribable completed first. Like `timer` and `counter`, it is now also completed when a child completes and nothing else uses it.
+- 6fad4fe: `takeUntil` and `skipUntil` now unsubscribe from their notifier. `takeUntil` releases it when the result completes for any reason (the notifier, the parent, a finished downstream, or `complete()`); `skipUntil` releases it on the notifier's first emission, or when the result completes before that. Both now complete, like other operators with a teardown, when their last downstream completes and nothing else subscribes to them.
+- 63f9924: `withBufferedFrom` (and its alias `withBuffered`) now unsubscribes from the buffered observable and empties its buffer when the result completes or is disposed. Before, the subscription was kept and values kept piling up in a buffer nobody read. Like other operators that hold a resource (`debounce`, `switchMap`, ...), the result now also completes when a child of it completes and it has no subscriber or other active child left.
+- fa894b6: `zip` completes once a completed source has no value left to pair, as its documentation says and as RxJS's `zip` does: at once if that source completes with nothing queued, otherwise right after the tuple that takes its last queued value. It used to wait until every source had completed.
+
 ## 3.3.0
 
 ### Minor Changes

@@ -1,5 +1,35 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.18.0
+
+### Minor Changes
+
+- 85b40dd: Add `vitest-coding-style/prefer-assert-strict-equal-for-primitives`, enabled by `eslintConfigForVitest`, which rewrites `assert.deepStrictEqual(X, Y)` to `assert.strictEqual(X, Y)` when the types of `X` and `Y` are primitives. The two compare numbers differently — `deepStrictEqual` treats `NaN` as equal to itself and `-0` as unequal to `0` — so when both arguments may be `NaN` or a zero the rule offers a suggestion instead of a fix.
+
+### Patch Changes
+
+- 52ba89d: `ts-restrictions/prefer-curried-call` no longer rewrites `(a) => f(a)` to `f` when `f` is a global the host provides, such as `requestAnimationFrame`, `setTimeout` or `fetch` from the default libraries, which can throw `Illegal invocation` once detached from `globalThis`. ECMAScript's own global functions (`parseFloat`, `Boolean`, ...) are still fixed, and any other global ambient declaration is reported with a suggestion instead of an automatic fix.
+- b5d3469: The type-aware `ts-restrictions` rules now draw a conclusion from a type only
+  when it holds at every type-wrapper layer (`as`, `satisfies`, `!`, `<T>`),
+  instead of asking only the innermost expression. A cast widening a value is
+  taken as the author saying it may hold more, so these are no longer reported
+  or fixed:
+
+    - `(b as boolean | number) ? true : c` in `prefer-logical-over-boolean-ternary`,
+      and a `(b as boolean | number)` operand in `jsx-boolean-logical-operands`;
+    - `!((v as number) < 1)` on a `ValidNumber` in `no-negated-comparison`, which
+      now offers the inversion as a suggestion;
+    - a strict check on `(x as B | null | undefined)` in
+      `prefer-optional-chain-over-ternary`;
+    - `(a as string | undefined) || 'x'` on an `'a' | undefined` in
+      `prefer-nullish-coalescing-when-safe`, and `(x as T | null) ?? undefined` in
+      `no-unnecessary-coalesce-undefined`;
+    - `Array.from(xs as Iterable<T>)` in `no-unnecessary-array-from` and
+      `prefer-non-mutating-array-method`;
+    - a callee widened to take more arguments in `prefer-curried-call`;
+    - a property a cast leaves out (`props as Pick<Props, 'a'>`) in
+      `check-destructuring-completeness`.
+
 ## 5.17.4
 
 ### Patch Changes

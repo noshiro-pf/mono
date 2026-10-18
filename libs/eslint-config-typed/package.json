@@ -1,6 +1,6 @@
 {
   "name": "eslint-config-typed",
-  "version": "5.17.4",
+  "version": "5.18.0",
   "private": false,
   "keywords": [
     "typescript"
