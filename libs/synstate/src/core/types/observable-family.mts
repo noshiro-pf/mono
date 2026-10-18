@@ -20,7 +20,11 @@ import type { NonEmptyUnknownList } from './types.mjs';
 // RootObservable
 
 export type InitializedSourceObservable<A> = Readonly<{
-  next: (value: A) => void;
+  /**
+   * Passes `value` on and returns it. Once completed, passes nothing on and
+   * returns the value held.
+   */
+  next: (value: A) => A;
 }> &
   InitializedRootObservable<A>;
 

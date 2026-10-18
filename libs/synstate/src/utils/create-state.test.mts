@@ -34,6 +34,26 @@ describe(createState, () => {
     assert.deepStrictEqual(seen, [0, 1]);
   });
 
+  test('once the state is completed, setState, updateState and resetState return the current value', () => {
+    const [state, setState, { updateState, resetState, getSnapshot }] =
+      createState(0);
+
+    setState(1);
+
+    state.complete();
+
+    assert.strictEqual(setState(2), 1);
+
+    assert.strictEqual(
+      updateState((current) => current + 1),
+      1,
+    );
+
+    assert.strictEqual(resetState(), 1);
+
+    assert.strictEqual(getSnapshot(), 1);
+  });
+
   // What `equals` is for: whatever reads the state, directly or through
   // anything derived from it, is told only of a real change, and an equal
   // value written over the current one leaves the object that is there.

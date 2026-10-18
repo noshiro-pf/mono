@@ -65,6 +65,18 @@ describe(createReducer, () => {
 
     assert.deepStrictEqual(mut_asked, [[0, 5]]);
   });
+
+  test('once the state is completed, a dispatch returns the current state', () => {
+    const [state, dispatch, { getSnapshot }] = createReducer(keepOrAdd, 0);
+
+    dispatch({ type: 'add', amount: 1 });
+
+    state.complete();
+
+    assert.strictEqual(dispatch({ type: 'add', amount: 2 }), 1);
+
+    assert.strictEqual(getSnapshot(), 1);
+  });
 });
 
 type Count = Readonly<{ count: number }>;
