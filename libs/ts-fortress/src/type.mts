@@ -8,7 +8,9 @@ import type { ValidationError } from './utils/index.mjs';
  * - `is` : Type guard function
  * - `assertIs` : Type assertion function
  * - `cast` : Cast function (returns the original value, no transformation)
- * - `fill` : Default value filling function
+ * - `fill` : Default value filling function (turns any input into a value of
+ *   type `A`, keeping the valid parts and replacing the rest with defaults;
+ *   `array` can drop invalid elements instead, see its `onInvalidElement`)
  * - `prune` : Excess property pruning function (recursively removes value
  *   paths that are not represented by the type; unlike `fill`, it never fills
  *   in default values)

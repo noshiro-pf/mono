@@ -21,6 +21,25 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
+/**
+ * Creates a `Type` for a value that is of at least one of `types`.
+ *
+ * How each operation picks a member:
+ *
+ * - `is` / `validate` accept a value that any member accepts.
+ * - `prune` prunes with the first member, in declaration order (a directly
+ *   nested union contributing its members in place), whose `is` accepts the
+ *   value. When members overlap — one accepts every value of another, such as
+ *   a record without `excessProperty: 'reject'` and the same record with an
+ *   extra key — the result therefore depends on the order: `union([point2d,
+ *   point3d]).prune({ x, y, z })` drops `z`, and `union([point3d, point2d])`
+ *   keeps it. Put the more specific member first.
+ * - `fill` returns a value that is already a member as it is, and otherwise
+ *   repairs it with `defaultType`, or the first member when none is given. A
+ *   member's own repair rules, such as `array`'s `onInvalidElement: 'drop'`,
+ *   therefore apply to a non-member value only through that default source,
+ *   and inside an element type they apply as usual.
+ */
 export const union = <const Types extends NonEmptyTuple<UnknownType>>(
   types: Types,
   options?: Partial<
