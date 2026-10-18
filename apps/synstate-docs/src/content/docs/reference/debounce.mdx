@@ -10,6 +10,9 @@ import { colors } from '../../../components/constants.mjs';
 {/* jsdoc-description */}
 Delays emissions from the source observable until a specified time has passed without another emission.
 Useful for handling user input events like typing or scrolling.
+
+Completing it, or its source completing, passes on the value its timer is
+still holding before the completion; `dispose()` drops that value.
 {/* /jsdoc-description */}
 
 ## Marble Diagram

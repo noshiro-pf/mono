@@ -11,6 +11,9 @@ import { colors } from '../../../components/constants.mjs';
 Ignores source values for duration milliseconds, then emits the most recent value from the source Observable, then repeats this process.
 
 Unlike `throttle` which emits the first value, `audit` emits the last value.
+
+Completing it, or its source completing, passes on the value its timer is
+still holding before the completion; `dispose()` drops that value.
 {/* /jsdoc-description */}
 
 ## Marble Diagram
