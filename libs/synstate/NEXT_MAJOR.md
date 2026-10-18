@@ -1,18 +1,5 @@
 # Next major
 
-- Stop completing upstream observables when a child completes, and drop
-  `autoComplete`.
-
-    A child's `complete()` then no longer calls `tryComplete` on its parents,
-    and an observable completes only when it is completed itself or when all
-    of its parents have completed. An unused upstream with a teardown
-    (`counter`, `timer`, `debounce`, `switchMap`, …) keeps running until its
-    owner completes or disposes it, so `counter(1000).pipe(take(3))` no
-    longer stops the counter. `complete()` and `dispose()` are then the same
-    with respect to parents. This is what the `synstate-dom` spec
-    (`libs/synstate-dom/SPEC.md`) assumes: lifetimes belong to scopes, not
-    to whichever consumer finishes last.
-
 - Complete `take(n)` right after its `n`th emission.
 
     `take(n)` now completes only when the `n + 1`th value arrives, so

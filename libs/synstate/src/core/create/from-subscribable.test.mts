@@ -71,7 +71,7 @@ describe(fromSubscribable, () => {
     expect(unsubscribe).not.toHaveBeenCalled();
   });
 
-  test('a child that completes with nothing else using it unsubscribes from the subscribable', () => {
+  test('a child that completes leaves the subscribable subscribed until the observable is completed', () => {
     const { subscribable, emit, unsubscribe } = createManualSubscribable();
 
     const observable$ = fromSubscribable(subscribable);
@@ -86,7 +86,12 @@ describe(fromSubscribable, () => {
 
     assert.isTrue(taken$.isCompleted);
 
-    assert.isTrue(observable$.isCompleted);
+    // Completion flows only downstream.
+    assert.isFalse(observable$.isCompleted);
+
+    expect(unsubscribe).not.toHaveBeenCalled();
+
+    observable$.complete();
 
     expect(unsubscribe).toHaveBeenCalledExactlyOnceWith();
   });
