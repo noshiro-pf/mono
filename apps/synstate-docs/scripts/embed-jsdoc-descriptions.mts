@@ -81,7 +81,7 @@ const jsdocMappings: DeepReadonly<
   ['skip-while', 'src/core/operators/skip-while.mts', 'skipWhile'],
   ['source', 'src/core/create/source.mts', 'source'],
   ['switch-map', 'src/core/operators/switch-map.mts', 'switchMap'],
-  ['take', 'src/core/predefined/operators/take.mts', 'take'],
+  ['take', 'src/core/operators/take.mts', 'take'],
   ['take-until', 'src/core/operators/take-until.mts', 'takeUntil'],
   ['take-while', 'src/core/operators/take-while.mts', 'takeWhile'],
   ['throttle', 'src/core/operators/throttle.mts', 'throttle'],

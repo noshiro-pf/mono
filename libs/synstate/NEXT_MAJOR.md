@@ -1,14 +1,5 @@
 # Next major
 
-- Complete `take(n)` right after its `n`th emission.
-
-    `take(n)` now completes only when the `n + 1`th value arrives, so
-    `counter(1000).pipe(take(3))` stays open after emitting three values
-    until the counter ticks again, and over a source that emits exactly `n`
-    times it stays open until that source completes. It will complete in the same update as its
-    `n`th emission, after passing that value on. The initial value is still
-    not counted: `take` counts emissions, not states.
-
 - Pass on a pending value when `debounce` or `audit` completes, and drop it
   when it is disposed.
 

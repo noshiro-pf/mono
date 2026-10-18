@@ -1,5 +1,5 @@
 import { Result } from 'ts-data-forge';
-import { take } from '../predefined/index.mjs';
+import { take } from '../operators/index.mjs';
 import type { Subscribable } from '../types/index.mjs';
 import { fromSubscribable } from './from-subscribable.mjs';
 

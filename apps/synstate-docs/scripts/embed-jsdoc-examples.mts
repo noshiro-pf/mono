@@ -95,7 +95,7 @@ const jsdocExampleMappings: DeepReadonly<
   ['src/core/operators/skip-while.mts', 'skipWhile', 'skip-while-example.mts'],
   ['src/core/create/source.mts', 'source', 'source-example.mts'],
   ['src/core/operators/switch-map.mts', 'switchMap', 'switch-map-example.mts'],
-  ['src/core/predefined/operators/take.mts', 'take', 'take-example.mts'],
+  ['src/core/operators/take.mts', 'take', 'take-example.mts'],
   ['src/core/operators/take-until.mts', 'takeUntil', 'take-until-example.mts'],
   ['src/core/operators/take-while.mts', 'takeWhile', 'take-while-example.mts'],
   ['src/core/operators/throttle.mts', 'throttle', 'throttle-example.mts'],

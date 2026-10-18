@@ -7,10 +7,10 @@ if (import.meta.vitest !== undefined) {
     //  Timeline:
     //
     //  num$    1     2     3     4 (ignored)
-    //  taken$  1     2     3     | (completes)
+    //  taken$  1     2     3|(completes)
     //
     //  Explanation:
-    //  - take emits only the first n values, then completes
+    //  - take emits only the first n values, completing with the nth
     //  - Subsequent emissions from the source are ignored
 
     const num$ = source<number>();
@@ -31,6 +31,8 @@ if (import.meta.vitest !== undefined) {
     num$.next(3);
 
     assert.deepStrictEqual(valueHistory, [1, 2, 3]);
+
+    assert.isTrue(taken$.isCompleted);
 
     num$.next(4); // ignored (already completed)
 

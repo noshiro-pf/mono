@@ -210,6 +210,8 @@ export type PairwiseOperatorObservable<A> = SyncChildObservable<
   readonly [A]
 >;
 
+export type TakeOperatorObservable<A> = SyncChildObservable<A, readonly [A]>;
+
 export type TakeWhileOperatorObservable<A> = SyncChildObservable<
   A,
   readonly [A]

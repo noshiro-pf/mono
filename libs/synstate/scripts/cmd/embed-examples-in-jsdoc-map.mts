@@ -91,6 +91,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/skip-if-no-change-example.mts'],
   },
   {
+    sourcePath: 'src/core/operators/take.mts',
+    sampleFiles: ['samples/src/take-example.mts'],
+  },
+  {
     sourcePath: 'src/core/operators/take-until.mts',
     sampleFiles: ['samples/src/take-until-example.mts'],
   },
@@ -188,10 +192,6 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
   {
     sourcePath: 'src/core/predefined/operators/skip.mts',
     sampleFiles: ['samples/src/skip-example.mts'],
-  },
-  {
-    sourcePath: 'src/core/predefined/operators/take.mts',
-    sampleFiles: ['samples/src/take-example.mts'],
   },
   {
     sourcePath: 'src/core/predefined/operators/unwrap-optional.mts',
