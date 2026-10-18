@@ -567,7 +567,9 @@ job to serve them would cost more than it saves.
 ## `skip-ci` and `no-skip-ci-label`
 
 `skip-ci` on a pull request skips the five check workflows; every gated job
-carries the label condition and boots no runner. The three
+carries the label condition and boots no runner. `synstate-benchmark.yml`
+carries it too, and listens for `labeled` / `unlabeled` so that taking the
+label off starts it as it starts the checks. The three
 `lint-pull-request.yml` jobs run regardless (see "A label event under
 `skip-ci`"). GitHub has no label-based merge block, so on its own the
 label would leave a pull request that nothing checked looking exactly like one
