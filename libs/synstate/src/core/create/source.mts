@@ -58,19 +58,27 @@ export function source<const A>(
 export function source<const A>(): SourceObservable<A>;
 
 export function source<const A>(...args: readonly A[]): SourceObservable<A> {
-  return createRootObservable<A, Readonly<{ next: (nextValue: A) => void }>>(
+  return createRootObservable<
+    A,
+    Readonly<{ next: (nextValue: A) => A | undefined }>
+  >(
     {
       initialValue: Arr.isNonEmpty(args)
         ? Optional.some(args[0])
         : Optional.none,
     },
-    ({ startUpdate, isCompleted }) => ({
+    ({ startUpdate, getSnapshot, isCompleted }) => ({
+      // Returns the value held after the call: `nextValue`, or, once
+      // completed, the value already there — `undefined` only on a source
+      // that never had one, whose `next` is typed `void`.
       next: (nextValue: A) => {
         if (isCompleted()) {
-          return;
+          return Optional.unwrap(getSnapshot());
         }
 
         startUpdate(nextValue);
+
+        return nextValue;
       },
     }),
   );

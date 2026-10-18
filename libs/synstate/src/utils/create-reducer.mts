@@ -11,7 +11,9 @@ import { source, type InitializedObservable } from '../core/index.mjs';
  * @param initialState - The initial value of the state
  * @param options - {@link StateOptions}: `equals`, to pass on only the
  *   dispatches that change the state
- * @returns A 3-element tuple: `[state, dispatch, { getSnapshot, initialState }]`
+ * @returns A 3-element tuple: `[state, dispatch, { getSnapshot, initialState }]`.
+ *   `dispatch` returns the state it leaves; once `state` is completed, that
+ *   is the state held.
  *
  * @example
  * ```ts
@@ -96,13 +98,10 @@ export const createReducer = <S, A>(
 
     const nextState = reducer(currentState, action);
 
-    if (equals?.(currentState, nextState) === true) {
-      return currentState;
-    }
-
-    state.next(nextState);
-
-    return nextState;
+    // Once completed, `next` keeps the state held and returns it.
+    return equals?.(currentState, nextState) === true
+      ? currentState
+      : state.next(nextState);
   };
 
   const getSnapshot = (): S => state.getSnapshot().value;

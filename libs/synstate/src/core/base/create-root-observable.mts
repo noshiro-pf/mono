@@ -18,6 +18,8 @@ export type RootObservableTools<A> = Readonly<{
   /** Emits `nextValue` and propagates the update to all descendants. */
   startUpdate: (nextValue: A) => void;
 
+  getSnapshot: () => Optional<A>;
+
   isCompleted: () => boolean;
 
   /** Completes this observable (leaf teardown included). */
@@ -99,6 +101,7 @@ export const createRootObservable = <
 
   const extension: Extension = init({
     startUpdate: startUpdateWithWarning,
+    getSnapshot: handle.getSnapshot,
     isCompleted: handle.isCompleted,
     complete,
   });
