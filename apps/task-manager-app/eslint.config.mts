@@ -74,6 +74,7 @@ export default [
             {
               name: 'firebase/firestore',
               allowImportNames: [
+                'clearIndexedDbPersistence',
                 'collection',
                 'connectFirestoreEmulator',
                 'doc',
@@ -81,6 +82,8 @@ export default [
                 'memoryLocalCache',
                 'persistentLocalCache',
                 'persistentMultipleTabManager',
+                'terminate',
+                'waitForPendingWrites',
               ],
               allowTypeImports: true,
               message: firestoreMessage,

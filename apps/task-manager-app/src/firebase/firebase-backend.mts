@@ -12,6 +12,14 @@
  * so the data opens without a network and writes made offline are sent
  * when it is back.
  *
+ * **Signing out deletes that cache**, which would otherwise leave the data
+ * readable on a shared device. An instance can delete its cache only once
+ * it has been terminated, and a terminated one cannot be used again, so
+ * every sign-out — here, in another tab, or the one a page starts with —
+ * terminates the instance, deletes the cache and starts a new one, which a
+ * sign-in waits for. Another tab still holding the cache terminates its own
+ * instance when asked to delete it.
+ *
  * **Emulators**: a development build connects Auth and Firestore to the
  * local emulators unless told otherwise (`emulator-mode.mts`). It then keeps
  * the Firestore cache in memory: the IndexedDB cache is keyed by project,
@@ -29,12 +37,15 @@ import {
   signOut,
 } from 'firebase/auth';
 import {
+  clearIndexedDbPersistence,
   connectFirestoreEmulator,
   doc,
   initializeFirestore,
   memoryLocalCache,
   persistentLocalCache,
   persistentMultipleTabManager,
+  terminate,
+  waitForPendingWrites,
   type Firestore,
 } from 'firebase/firestore';
 import type { DeepReadonly } from 'ts-type-forge';
@@ -49,6 +60,12 @@ import {
 import { emulatorEndpoints } from '../view-model/index.mjs';
 import { firebaseConfig } from './config.mjs';
 import { createFirestoreRepository } from './firestore-repository.mjs';
+
+/**
+ * How long a sign-out waits for the writes made offline to be sent.
+ * `waitForPendingWrites` never settles while offline.
+ */
+const PENDING_WRITES_TIMEOUT_MS = 5000;
 
 export const createFirebaseBackend = (): Backend => {
   const app = initializeApp(firebaseConfig);
@@ -66,26 +83,45 @@ export const createFirebaseBackend = (): Backend => {
 
   const auth = getAuth(app);
 
-  const firestore = initializeFirestore(app, {
-    localCache:
-      emulators === undefined
-        ? persistentLocalCache({
-            tabManager: persistentMultipleTabManager(),
-          })
-        : memoryLocalCache(),
-  });
-
   if (emulators !== undefined) {
     connectAuthEmulator(auth, emulators.authUrl, { disableWarnings: true });
 
-    connectFirestoreEmulator(
-      firestore,
-      emulators.firestore.host,
-      emulators.firestore.port,
-    );
-
     console.info('Using the Firebase emulators', emulators);
   }
+
+  const createFirestore = (): Firestore => {
+    const firestore = initializeFirestore(app, {
+      localCache:
+        emulators === undefined
+          ? persistentLocalCache({
+              tabManager: persistentMultipleTabManager(),
+            })
+          : memoryLocalCache(),
+    });
+
+    if (emulators !== undefined) {
+      connectFirestoreEmulator(
+        firestore,
+        emulators.firestore.host,
+        emulators.firestore.port,
+      );
+    }
+
+    return firestore;
+  };
+
+  const deleteCache = async (
+    firestore: DeepReadonly<Firestore>,
+  ): Promise<void> => {
+    await terminate(firestore);
+
+    if (emulators === undefined) {
+      await clearIndexedDbPersistence(firestore);
+    }
+  };
+
+  /** Replaced, once its cache is deleted, on every sign-out. */
+  let mut_firestore: Promise<Firestore> = Promise.resolve(createFirestore());
 
   return {
     watchSession: (listener) => {
@@ -99,18 +135,32 @@ export const createFirebaseBackend = (): Backend => {
         if (user === null) {
           listener({ type: 'signed-out' });
 
+          mut_firestore = mut_firestore
+            .then(deleteCache)
+            .catch((error: unknown) => {
+              console.warn('Could not delete the Firestore cache', error);
+            })
+            .then(createFirestore);
+
           return;
         }
 
         const generation = mut_generation;
 
-        ensurePersonalProject(firestore, user.uid)
+        mut_firestore
+          .then(async (firestore) => {
+            await ensurePersonalProject(firestore, user.uid);
+
+            return firestore;
+          })
           .catch((error: unknown) => {
             // Offline on the very first sign-in, or the rules not deployed:
             // the listeners report what this means for the data.
             console.warn('Could not set up the personal project', error);
+
+            return mut_firestore;
           })
-          .finally(() => {
+          .then((firestore) => {
             if (generation === mut_generation) {
               listener({
                 type: 'signed-in',
@@ -118,13 +168,30 @@ export const createFirebaseBackend = (): Backend => {
                 repository: createFirestoreRepository(firestore, user.uid),
               });
             }
+          })
+          .catch((error: unknown) => {
+            console.error('Could not start Firestore', error);
           });
       });
     },
     signIn: async () => {
       await signInWithPopup(auth, new GoogleAuthProvider());
     },
-    signOut: () => signOut(auth),
+    signOut: async ({ discardUnsentWrites }) => {
+      if (
+        !discardUnsentWrites &&
+        !(await settlesWithin(
+          waitForPendingWrites(await mut_firestore),
+          PENDING_WRITES_TIMEOUT_MS,
+        ))
+      ) {
+        return 'unsent-writes';
+      }
+
+      await signOut(auth);
+
+      return 'signed-out';
+    },
   };
 };
 
@@ -146,3 +213,17 @@ const ensurePersonalProject = async (
     await putDoc(project, personalProjectDoc(uid, Date.now()));
   }
 };
+
+/** Whether `promise` resolves within `ms`; a rejection is thrown. */
+const settlesWithin = (
+  promise: Promise<unknown>,
+  ms: number,
+): Promise<boolean> =>
+  Promise.race([
+    promise.then(() => true),
+    new Promise<boolean>((resolve) => {
+      setTimeout(() => {
+        resolve(false);
+      }, ms);
+    }),
+  ]);

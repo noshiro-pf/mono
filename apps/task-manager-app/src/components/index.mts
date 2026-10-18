@@ -49,6 +49,7 @@ export * from './task-card.js';
 export * from './task-form.js';
 export * from './task-table-row.js';
 export * from './task-table.js';
+export * from './unsent-writes-bar.js';
 export * from './use-dag-node-handlers.mjs';
 export * from './use-pointed-node.mjs';
 export * from './view-switch.js';

@@ -206,6 +206,13 @@ fieldset {
     max(12px, env(safe-area-inset-left));
 }
 
+.unsent-writes-actions {
+  display: flex;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  gap: 4px;
+}
+
 /* The list. */
 
 .list-view {

@@ -42,7 +42,7 @@ export const createMemoryBackend = (now: number): Backend => {
     signOut: () => {
       setSession({ type: 'signed-out' });
 
-      return Promise.resolve();
+      return Promise.resolve('signed-out');
     },
   };
 };

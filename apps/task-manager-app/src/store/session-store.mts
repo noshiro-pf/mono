@@ -25,18 +25,33 @@ export type Session = Readonly<
     }
 >;
 
+/**
+ * Where a sign-out stands: none in progress, waiting for the writes made
+ * offline to be sent, or stopped because they could not be, until somebody
+ * either gives them up or keeps them.
+ */
+export type SignOutState = 'idle' | 'waiting' | 'unsent-writes';
+
 export type SessionStore = Readonly<{
   session: InitializedObservable<Session>;
+  signOutState: InitializedObservable<SignOutState>;
   /** Starts following `backend`, and returns what stops it. */
   attach: (backend: Backend) => () => void;
   signIn: () => void;
   signOut: () => void;
+  /** Signs out after all, giving up the writes that could not be sent. */
+  discardUnsentWritesAndSignOut: () => void;
+  /** Stays signed in, keeping the writes that could not be sent. */
+  cancelSignOut: () => void;
 }>;
 
 export const createSessionStore = (): SessionStore => {
   const [session, setSession, { getSnapshot }] = createState<Session>({
     type: 'starting',
   });
+
+  const [signOutState, setSignOutState, { getSnapshot: getSignOutState }] =
+    createState<SignOutState>('idle');
 
   let mut_backend: Backend | undefined = undefined;
 
@@ -76,11 +91,52 @@ export const createSessionStore = (): SessionStore => {
     });
   };
 
-  const signOut = (): void => {
-    mut_backend?.signOut().catch((error: unknown) => {
-      console.error('Signing out failed', error);
-    });
+  const runSignOut = (discardUnsentWrites: boolean): void => {
+    const backend = mut_backend;
+
+    if (backend === undefined) {
+      return;
+    }
+
+    setSignOutState('waiting');
+
+    backend
+      .signOut({ discardUnsentWrites })
+      .then((result) => {
+        setSignOutState(result === 'unsent-writes' ? 'unsent-writes' : 'idle');
+      })
+      .catch((error: unknown) => {
+        console.error('Signing out failed', error);
+
+        setSignOutState('idle');
+      });
   };
 
-  return { session, attach, signIn, signOut };
+  const signOut = (): void => {
+    if (getSignOutState() === 'idle') {
+      runSignOut(false);
+    }
+  };
+
+  const discardUnsentWritesAndSignOut = (): void => {
+    if (getSignOutState() === 'unsent-writes') {
+      runSignOut(true);
+    }
+  };
+
+  const cancelSignOut = (): void => {
+    if (getSignOutState() === 'unsent-writes') {
+      setSignOutState('idle');
+    }
+  };
+
+  return {
+    session,
+    signOutState,
+    attach,
+    signIn,
+    signOut,
+    discardUnsentWritesAndSignOut,
+    cancelSignOut,
+  };
 };
