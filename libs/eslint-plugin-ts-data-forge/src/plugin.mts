@@ -13,6 +13,7 @@ const recommendedRules = {
   'ts-data-forge/prefer-canonical-array-slicing': 'error',
   'ts-data-forge/prefer-canonical-length-cast': 'error',
   'ts-data-forge/prefer-canonical-length-guard': 'error',
+  'ts-data-forge/prefer-arr-generate': 'error',
   'ts-data-forge/prefer-arr-is-array': 'error',
   'ts-data-forge/prefer-arr-scan': 'error',
   'ts-data-forge/prefer-arr-sum': 'error',

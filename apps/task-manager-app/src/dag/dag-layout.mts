@@ -290,14 +290,16 @@ const placeEach = (
     }
 
     const shift = averageShift(
-      (neighbors.get(node.id) ?? []).flatMap((id) => {
-        const from = autoAt.get(id);
+      Arr.generate(function* () {
+        for (const id of neighbors.get(node.id) ?? []) {
+          const from = autoAt.get(id);
 
-        const to = mut_placed.get(id);
+          const to = mut_placed.get(id);
 
-        return from === undefined || to === undefined
-          ? []
-          : [{ x: to.x - from.x, y: to.y - from.y }];
+          if (from !== undefined && to !== undefined) {
+            yield { x: to.x - from.x, y: to.y - from.y };
+          }
+        }
       }),
     );
 

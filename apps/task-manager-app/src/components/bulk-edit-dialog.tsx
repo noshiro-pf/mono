@@ -41,7 +41,13 @@ export const BulkEditDialog = memoNamed('BulkEditDialog', () => {
   const taskIds = new Set(
     editor.type === 'closed'
       ? []
-      : editor.refs.flatMap((ref) => (ref.kind === 'task' ? [ref.id] : [])),
+      : Arr.generate(function* () {
+          for (const ref of editor.refs) {
+            if (ref.kind === 'task') {
+              yield ref.id;
+            }
+          }
+        }),
   );
 
   const milestoneCount =

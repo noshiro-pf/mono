@@ -4,11 +4,14 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
+import {
+  createGetLayerTypes,
+  isTypeWrapper,
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { createGetLayerTypes } from './type-layer-utils.mjs';
 
 type Options = readonly [];
 

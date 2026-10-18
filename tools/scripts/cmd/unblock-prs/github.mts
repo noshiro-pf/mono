@@ -238,20 +238,26 @@ export const readReviewStates = async (
     (n) => [n, ReviewStateNodeSchema.validate(repository[`pr_${n}`])] as const,
   );
 
-  const invalid = nodes.flatMap(([n, node]) =>
-    Result.isErr(node)
-      ? [`#${n}: ${t.validationErrorsToMessages(node.value).join('\n')}`]
-      : [],
-  );
+  const invalid = Arr.generate(function* () {
+    for (const [n, node] of nodes) {
+      if (Result.isErr(node)) {
+        yield `#${n}: ${t.validationErrorsToMessages(node.value).join('\n')}`;
+      }
+    }
+  });
 
   if (Arr.isNonEmpty(invalid)) {
     return Result.err(invalid.join('\n'));
   }
 
   const states: ReadonlyMap<number, ReviewState> = new Map(
-    nodes.flatMap(([n, node]) =>
-      Result.isOk(node) ? [[n, reviewStateOf(node.value)] as const] : [],
-    ),
+    Arr.generate(function* () {
+      for (const [n, node] of nodes) {
+        if (Result.isOk(node)) {
+          yield [n, reviewStateOf(node.value)] as const;
+        }
+      }
+    }),
   );
 
   return Result.ok({
@@ -300,10 +306,13 @@ const reviewStateOf = (
 ): ReviewState =>
   ({
     author: node.author?.login ?? '',
-    approvers: node.latestOpinionatedReviews.nodes.flatMap(
-      ({ state, author }) =>
-        state === 'APPROVED' && author !== null ? [author.login] : [],
-    ),
+    approvers: Arr.generate(function* () {
+      for (const { state, author } of node.latestOpinionatedReviews.nodes) {
+        if (state === 'APPROVED' && author !== null) {
+          yield author.login;
+        }
+      }
+    }),
     files: node.files.nodes.map(({ path }) => path),
     filesComplete: !node.files.pageInfo.hasNextPage,
     unresolvedConversations: node.reviewThreads.nodes.filter(
@@ -393,48 +402,60 @@ export const readOwnComments = async (
     (n) => [n, CommentsNodeSchema.validate(repository[`pr_${n}`])] as const,
   );
 
-  const invalid = nodes.flatMap(([n, node]) =>
-    Result.isErr(node)
-      ? [`#${n}: ${t.validationErrorsToMessages(node.value).join('\n')}`]
-      : [],
-  );
+  const invalid = Arr.generate(function* () {
+    for (const [n, node] of nodes) {
+      if (Result.isErr(node)) {
+        yield `#${n}: ${t.validationErrorsToMessages(node.value).join('\n')}`;
+      }
+    }
+  });
 
   if (Arr.isNonEmpty(invalid)) {
     return Result.err(invalid.join('\n'));
   }
 
-  const own = nodes.flatMap(([n, node]) =>
-    Result.isOk(node)
-      ? [
-          [
-            n,
-            node.value.comments.nodes.filter(
-              ({ viewerDidAuthor }) => viewerDidAuthor,
-            ),
-          ] as const,
-        ]
-      : [],
-  );
+  const own = Arr.generate(function* () {
+    for (const [n, node] of nodes) {
+      if (Result.isOk(node)) {
+        yield [
+          n,
+          node.value.comments.nodes.filter(
+            ({ viewerDidAuthor }) => viewerDidAuthor,
+          ),
+        ] as const;
+      }
+    }
+  });
 
   return Result.ok({
     setAside: new Map(
-      own.flatMap(([n, comments]) => {
-        const found = ownSetAsideComment(comments);
+      Arr.generate(function* () {
+        for (const [n, comments] of own) {
+          const found = ownSetAsideComment(comments);
 
-        return found === undefined ? [] : [[n, found] as const];
+          if (found !== undefined) {
+            yield [n, found] as const;
+          }
+        }
       }),
     ),
     claims: new Map(
-      own.flatMap(([n, comments]) => {
-        const says = comments
-          .flatMap(({ body }) => {
-            const claim = parseClaimComment(body);
+      Arr.generate(function* () {
+        for (const [n, comments] of own) {
+          const says = Arr.generate(function* () {
+            for (const { body } of comments) {
+              const claim = parseClaimComment(body);
 
-            return claim === undefined ? [] : [claim];
-          })
-          .at(0);
+              if (claim !== undefined) {
+                yield claim;
+              }
+            }
+          }).at(0);
 
-        return says?.kind === 'standing' ? [[n, says.claim] as const] : [];
+          if (says?.kind === 'standing') {
+            yield [n, says.claim] as const;
+          }
+        }
       }),
     ),
   });
@@ -443,15 +464,15 @@ export const readOwnComments = async (
 const ownSetAsideComment = (
   comments: readonly t.TypeOf<typeof CommentSchema>[],
 ): OwnSetAsideComment | undefined =>
-  comments
-    .flatMap(({ databaseId, body }) => {
+  Arr.generate(function* () {
+    for (const { databaseId, body } of comments) {
       const says = parseSetAsideComment(body);
 
-      return databaseId === null || says === undefined
-        ? []
-        : [{ databaseId, says }];
-    })
-    .at(0);
+      if (databaseId !== null && says !== undefined) {
+        yield { databaseId, says };
+      }
+    }
+  }).at(0);
 
 const CommentSchema = t.record({
   databaseId: t.union([t.number(), t.nullType]),

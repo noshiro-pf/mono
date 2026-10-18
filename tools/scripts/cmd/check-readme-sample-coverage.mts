@@ -47,9 +47,13 @@ export const checkReadmeSampleCoverage = async (): Promise<
 
   const results = await Promise.all(packageDirs.map(checkPackage));
 
-  const violations = results.flatMap(({ violation }) =>
-    violation === undefined ? [] : [violation],
-  );
+  const violations = Arr.generate(function* () {
+    for (const { violation } of results) {
+      if (violation !== undefined) {
+        yield violation;
+      }
+    }
+  });
 
   if (Arr.isNonEmpty(violations)) {
     return Result.err(

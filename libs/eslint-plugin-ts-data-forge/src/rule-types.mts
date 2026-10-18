@@ -73,6 +73,21 @@ namespace PreferCanonicalLengthCast {
 }
 
 /**
+ * @description Replace the filter-and-map idiom `xs.flatMap((x) => (cond ? [f(x)] : []))` with a loop in `Arr.generate` from ts-data-forge.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferArrGenerate {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Replace `Array.isArray` with `Arr.isArray` from ts-data-forge.
  *
  *  ```md
@@ -314,6 +329,7 @@ export type EslintTsDataForgeRules = Readonly<{
   'ts-data-forge/prefer-canonical-array-slicing': PreferCanonicalArraySlicing.RuleEntry;
   'ts-data-forge/prefer-canonical-length-guard': PreferCanonicalLengthGuard.RuleEntry;
   'ts-data-forge/prefer-canonical-length-cast': PreferCanonicalLengthCast.RuleEntry;
+  'ts-data-forge/prefer-arr-generate': PreferArrGenerate.RuleEntry;
   'ts-data-forge/prefer-arr-is-array': PreferArrIsArray.RuleEntry;
   'ts-data-forge/prefer-arr-scan': PreferArrScan.RuleEntry;
   'ts-data-forge/prefer-arr-sum': PreferArrSum.RuleEntry;

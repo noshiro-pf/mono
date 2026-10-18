@@ -75,9 +75,13 @@ export const checkNextMajor = ({
 }>): Result<Summary, string> => {
   const results = checkStocks({ changesets, stocks });
 
-  const violations = results.flatMap(({ violation }) =>
-    violation === undefined ? [] : [violation],
-  );
+  const violations = Arr.generate(function* () {
+    for (const { violation } of results) {
+      if (violation !== undefined) {
+        yield violation;
+      }
+    }
+  });
 
   if (Arr.isNonEmpty(violations)) {
     return Result.err(
@@ -94,9 +98,13 @@ export const checkNextMajor = ({
     stocks: stocks.length,
     decided: results.reduce((sum, { decided }) => sum + decided, 0),
     undecided: results.reduce((sum, { undecided }) => sum + undecided, 0),
-    reminders: results.flatMap(({ reminder }) =>
-      reminder === undefined ? [] : [reminder],
-    ),
+    reminders: Arr.generate(function* () {
+      for (const { reminder } of results) {
+        if (reminder !== undefined) {
+          yield reminder;
+        }
+      }
+    }),
   });
 };
 
@@ -111,9 +119,13 @@ export const listReminders = (
     stocks: readonly StockFile[];
   }>,
 ): readonly Reminder[] =>
-  checkStocks(input).flatMap(({ reminder }) =>
-    reminder === undefined ? [] : [reminder],
-  );
+  Arr.generate(function* () {
+    for (const { reminder } of checkStocks(input)) {
+      if (reminder !== undefined) {
+        yield reminder;
+      }
+    }
+  });
 
 /**
  * The packages a changeset's front matter names, with their bump. A file
@@ -137,14 +149,18 @@ export const parseChangesetBumps = (
   }
 
   return new Map(
-    lines.slice(1, end).flatMap((line) => {
-      const match = FRONT_MATTER_ENTRY.exec(line);
+    Arr.generate(function* () {
+      for (const line of lines.slice(1, end)) {
+        const match = FRONT_MATTER_ENTRY.exec(line);
 
-      const name = match?.[1];
+        const name = match?.[1];
 
-      const bump = match?.[2];
+        const bump = match?.[2];
 
-      return isString(name) && isBump(bump) ? [[name, bump] as const] : [];
+        if (isString(name) && isBump(bump)) {
+          yield [name, bump] as const;
+        }
+      }
     }),
   );
 };

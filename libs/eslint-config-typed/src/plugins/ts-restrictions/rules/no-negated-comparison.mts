@@ -4,15 +4,15 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { skipTypeWrappers } from 'eslint-rule-forge';
-import type { DeepReadonly } from 'ts-type-forge';
 import {
-  type ComparisonExpression,
+  createGetLayerTypes,
   invertedComparisonText,
   isComparison,
   isExactlyInvertible,
-} from './comparison-utils.mjs';
-import { createGetLayerTypes } from './type-layer-utils.mjs';
+  skipTypeWrappers,
+  type ComparisonExpression,
+} from 'eslint-rule-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 
 type Options = readonly [];
 

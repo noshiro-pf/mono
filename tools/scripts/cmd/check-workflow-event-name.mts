@@ -101,17 +101,17 @@ export const collectEventNameViolations = (
     ] as const;
   }
 
-  return triggers.comparedEventNames.flatMap((eventName) =>
-    triggers.triggerEvents.includes(eventName)
-      ? []
-      : [
-          [
-            `\`github.event_name\` is compared against '${eventName}', which is`,
-            'not a trigger of this workflow, so the comparison is constant.',
-            `Its triggers are: ${triggers.triggerEvents.join(', ')}.`,
-          ].join(' '),
-        ],
-  );
+  return Arr.generate(function* () {
+    for (const eventName of triggers.comparedEventNames) {
+      if (!triggers.triggerEvents.includes(eventName)) {
+        yield [
+          `\`github.event_name\` is compared against '${eventName}', which is`,
+          'not a trigger of this workflow, so the comparison is constant.',
+          `Its triggers are: ${triggers.triggerEvents.join(', ')}.`,
+        ].join(' ');
+      }
+    }
+  });
 };
 
 export type WorkflowTriggers = Readonly<{
@@ -167,22 +167,30 @@ const collectTriggerEvents = (lines: readonly string[]): readonly string[] => {
 
   const block = endIndex === -1 ? rest : rest.slice(0, endIndex);
 
-  return block.flatMap((line) => {
-    const matched = /^ {2}(?<eventName>[a-z_]+):/u.exec(line);
+  return Arr.generate(function* () {
+    for (const line of block) {
+      const matched = /^ {2}(?<eventName>[a-z_]+):/u.exec(line);
 
-    const eventName = matched?.groups?.['eventName'];
+      const eventName = matched?.groups?.['eventName'];
 
-    return eventName === undefined ? [] : [eventName];
+      if (eventName !== undefined) {
+        yield eventName;
+      }
+    }
   });
 };
 
 const collectComparedEventNames = (workflowFile: string): readonly string[] => {
   const matches = Array.from(workflowFile.matchAll(EVENT_NAME_COMPARISON));
 
-  return matches.flatMap((matched) => {
-    const eventName = matched.groups?.['eventName'];
+  return Arr.generate(function* () {
+    for (const matched of matches) {
+      const eventName = matched.groups?.['eventName'];
 
-    return eventName === undefined ? [] : [eventName];
+      if (eventName !== undefined) {
+        yield eventName;
+      }
+    }
   });
 };
 
@@ -211,9 +219,13 @@ const readWorkflows = async (
   return firstError !== undefined
     ? Result.err(firstError.value)
     : Result.ok(
-        results.flatMap((result) =>
-          Result.isErr(result) ? [] : [result.value],
-        ),
+        Arr.generate(function* () {
+          for (const result of results) {
+            if (!Result.isErr(result)) {
+              yield result.value;
+            }
+          }
+        }),
       );
 };
 

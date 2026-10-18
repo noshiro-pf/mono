@@ -297,9 +297,13 @@ const readPullRequest = async (
   return Result.ok({
     headSha: pr.value.head.sha,
     queue: readQueueComments(
-      comments.value.flatMap(({ id, body, user }) =>
-        user?.login === viewer ? [{ id, body: body ?? '' }] : [],
-      ),
+      Arr.generate(function* () {
+        for (const { id, body, user } of comments.value) {
+          if (user?.login === viewer) {
+            yield { id, body: body ?? '' };
+          }
+        }
+      }),
       {
         headSha: pr.value.head.sha,
         baseTip: tip.value.object.sha,

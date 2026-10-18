@@ -124,10 +124,14 @@ export const planUnownedReports = (
     openIssues.find(({ body }) => body.includes(markerOf(pr)))?.number;
 
   return {
-    reported: unowned.flatMap(({ entry }) => {
-      const issue = issueOf(entry.number);
+    reported: Arr.generate(function* () {
+      for (const { entry } of unowned) {
+        const issue = issueOf(entry.number);
 
-      return issue === undefined ? [] : [{ pr: entry.number, issue }];
+        if (issue !== undefined) {
+          yield { pr: entry.number, issue };
+        }
+      }
     }),
     toFile: unowned
       .filter(({ entry }) => issueOf(entry.number) === undefined)

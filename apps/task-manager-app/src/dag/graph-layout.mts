@@ -173,10 +173,14 @@ export const toElkGraph = (input: LayoutInput): ElkNode => {
       'elk.padding': ELK_PADDING,
     },
     children: [
-      ...ordered.flatMap((id) => {
-        const box = nodeBoxes.get(id);
+      ...Arr.generate(function* () {
+        for (const id of ordered) {
+          const box = nodeBoxes.get(id);
 
-        return box === undefined ? [] : [elkBox(box)];
+          if (box !== undefined) {
+            yield elkBox(box);
+          }
+        }
       }),
       ...input.groups
         .filter(({ members }) => Arr.isEmpty(members))
@@ -311,16 +315,24 @@ export const layOutGraph = async (
   );
 
   return {
-    nodes: input.nodes.flatMap(({ id }) => {
-      const node = nodesById.get(id);
+    nodes: Arr.generate(function* () {
+      for (const { id } of input.nodes) {
+        const node = nodesById.get(id);
 
-      return node === undefined ? [] : [node];
+        if (node !== undefined) {
+          yield node;
+        }
+      }
     }),
     edges: input.edges,
-    groups: input.groups.flatMap(({ id }) => {
-      const group = groupsById.get(id);
+    groups: Arr.generate(function* () {
+      for (const { id } of input.groups) {
+        const group = groupsById.get(id);
 
-      return group === undefined ? [] : [group];
+        if (group !== undefined) {
+          yield group;
+        }
+      }
     }),
   };
 };
@@ -352,10 +364,14 @@ export const clearOfFrames = (
 
   const blocks: readonly Block[] = [
     ...layout.groups.map((group): Block => {
-      const members = group.members.flatMap((member) => {
-        const node = nodesById.get(member);
+      const members = Arr.generate(function* () {
+        for (const member of group.members) {
+          const node = nodesById.get(member);
 
-        return node === undefined ? [] : [node];
+          if (node !== undefined) {
+            yield node;
+          }
+        }
       });
 
       const frame = frameAround(members);
@@ -443,10 +459,14 @@ export const clearOfFrames = (
     edges: layout.edges,
     groups: layout.groups.map((group) => {
       const frame = frameAround(
-        group.members.flatMap((member) => {
-          const node = movedById.get(member);
+        Arr.generate(function* () {
+          for (const member of group.members) {
+            const node = movedById.get(member);
 
-          return node === undefined ? [] : [node];
+            if (node !== undefined) {
+              yield node;
+            }
+          }
         }),
       );
 

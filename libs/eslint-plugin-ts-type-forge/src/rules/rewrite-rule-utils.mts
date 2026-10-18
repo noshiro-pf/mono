@@ -33,12 +33,20 @@ export const reportTypeRewrites = <MessageIds extends string>(
 
   const program = sourceCode.ast;
 
-  const resolved = rewrites.flatMap((rewrite) => {
-    const target = resolveTypeName(program, rewrite.canonicalName, importStyle);
+  const resolved = Arr.generate(function* () {
+    for (const rewrite of rewrites) {
+      const target = resolveTypeName(
+        program,
+        rewrite.canonicalName,
+        importStyle,
+      );
 
-    // The name is already bound to something else in this file, so the rewrite
-    // would resolve to the wrong declaration.
-    return target === undefined ? [] : [{ rewrite, target }];
+      // The name is already bound to something else in this file, so the rewrite
+      // would resolve to the wrong declaration.
+      if (target !== undefined) {
+        yield { rewrite, target };
+      }
+    }
   });
 
   const importNames = Arr.uniq(

@@ -202,19 +202,19 @@ const refusal = (response: Response): string =>
 
 const readErrors = (value: unknown): readonly GraphqlError[] =>
   Arr.isArray(value)
-    ? value.flatMap((error) =>
-        isRecord(error) && typeof error['message'] === 'string'
-          ? [
-              {
-                message: error['message'],
-                path: Arr.isArray(error['path'])
-                  ? error['path'].filter(
-                      (step): step is number | string =>
-                        typeof step === 'number' || typeof step === 'string',
-                    )
-                  : [],
-              },
-            ]
-          : [],
-      )
+    ? Arr.generate(function* () {
+        for (const error of value) {
+          if (isRecord(error) && typeof error['message'] === 'string') {
+            yield {
+              message: error['message'],
+              path: Arr.isArray(error['path'])
+                ? error['path'].filter(
+                    (step): step is number | string =>
+                      typeof step === 'number' || typeof step === 'string',
+                  )
+                : [],
+            };
+          }
+        }
+      })
     : ([] as const);

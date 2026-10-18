@@ -35,23 +35,23 @@ export const closingIssuesIn = (
 ): readonly LinkedIssue[] => {
   const own = `${repo.owner}/${repo.name}`.toLowerCase();
 
-  return nodes.flatMap((node) =>
-    node?.repository.nameWithOwner.toLowerCase() !== own
-      ? []
-      : [
-          {
-            number: node.number,
-            title: node.title,
-            url: node.url,
-            state:
-              node.state === 'OPEN'
-                ? 'open'
-                : node.state === 'CLOSED'
-                  ? 'closed'
-                  : 'unknown',
-          },
-        ],
-  );
+  return Arr.generate(function* () {
+    for (const node of nodes) {
+      if (node?.repository.nameWithOwner.toLowerCase() === own) {
+        yield {
+          number: node.number,
+          title: node.title,
+          url: node.url,
+          state:
+            node.state === 'OPEN'
+              ? 'open'
+              : node.state === 'CLOSED'
+                ? 'closed'
+                : 'unknown',
+        };
+      }
+    }
+  });
 };
 
 /**

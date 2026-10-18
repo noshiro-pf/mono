@@ -184,22 +184,26 @@ export const collectViolations = (
     ];
   });
 
-  const stale = policy.exceptions.flatMap(({ license, packages }) =>
-    packages.flatMap((pattern): readonly Violation[] =>
-      installed.some(
-        (entry) =>
-          entry.license === license &&
-          matchesPackagePattern(pattern, entry.name),
-      )
-        ? []
-        : [
-            {
-              subject: `exception '${pattern}' (${license})`,
-              message: REASONS['stale-exception'],
-            },
-          ],
-    ),
-  );
+  const stale = Arr.generate<Violation>(function* () {
+    for (const { license, packages } of policy.exceptions) {
+      for (const pattern of packages) {
+        if (
+          installed.every(
+            (entry) =>
+              !(
+                entry.license === license &&
+                matchesPackagePattern(pattern, entry.name)
+              ),
+          )
+        ) {
+          yield {
+            subject: `exception '${pattern}' (${license})`,
+            message: REASONS['stale-exception'],
+          };
+        }
+      }
+    }
+  });
 
   return [...notLetThrough, ...stale];
 };

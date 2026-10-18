@@ -68,9 +68,13 @@ export const checkJapaneseParentheses = async (
     return Result.err(firstError.value);
   }
 
-  const visited = results.flatMap((result) =>
-    Result.isErr(result) ? [] : [result.value],
-  );
+  const visited = Arr.generate(function* () {
+    for (const result of results) {
+      if (!Result.isErr(result)) {
+        yield result.value;
+      }
+    }
+  });
 
   const offending = visited.filter(({ violations }) =>
     Arr.isNonEmpty(violations),
@@ -345,23 +349,23 @@ const scanLine = (
   line: string,
   lineNumber: number,
 ): readonly ParenthesisViolation[] =>
-  Array.from(line.matchAll(HALFWIDTH_PAIR)).flatMap((matched) => {
-    const column = matched.index;
+  Arr.generate(function* () {
+    for (const matched of Array.from(line.matchAll(HALFWIDTH_PAIR))) {
+      const column = matched.index;
 
-    const pair = matched[0];
+      const pair = matched[0];
 
-    const inner = matched.groups?.['inner'] ?? '';
+      const inner = matched.groups?.['inner'] ?? '';
 
-    return enclosesJapaneseProse(line, column, pair, inner)
-      ? [
-          {
-            line: lineNumber,
-            column: column + 1,
-            matched: pair,
-            lineText: line,
-          },
-        ]
-      : [];
+      if (enclosesJapaneseProse(line, column, pair, inner)) {
+        yield {
+          line: lineNumber,
+          column: column + 1,
+          matched: pair,
+          lineText: line,
+        };
+      }
+    }
   });
 
 const enclosesJapaneseProse = (

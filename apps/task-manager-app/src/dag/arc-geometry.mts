@@ -18,7 +18,7 @@
  * the short ones stay on top and visible.
  */
 
-import { Num } from 'ts-data-forge';
+import { Arr, Num } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import type { GraphNodeId } from '../domain/index.mjs';
 import type { ArcEdge } from './arc-edges.mjs';
@@ -54,12 +54,16 @@ export const arcGeometries = (
 ): readonly ArcGeometry[] => {
   const byId = new Map(nodes.map((node) => [node.id, node]));
 
-  const placed = edges.flatMap((edge) => {
-    const from = byId.get(edge.from);
+  const placed = Arr.generate(function* () {
+    for (const edge of edges) {
+      const from = byId.get(edge.from);
 
-    const to = byId.get(edge.to);
+      const to = byId.get(edge.to);
 
-    return from === undefined || to === undefined ? [] : [{ edge, from, to }];
+      if (from !== undefined && to !== undefined) {
+        yield { edge, from, to };
+      }
+    }
   });
 
   const ends = placed.flatMap(({ edge, from, to }) => [

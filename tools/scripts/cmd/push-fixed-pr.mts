@@ -180,9 +180,13 @@ export const decidePush = ({
   }
 
   const parents: ReadonlyMap<number, number> = new Map(
-    entries.flatMap((e) =>
-      e.stackedOn === undefined ? [] : [[e.number, e.stackedOn] as const],
-    ),
+    Arr.generate(function* () {
+      for (const e of entries) {
+        if (e.stackedOn !== undefined) {
+          yield [e.number, e.stackedOn] as const;
+        }
+      }
+    }),
   );
 
   return {
@@ -209,10 +213,18 @@ export const parsePushArgs = (args: readonly string[]): PushArgs | string => {
   const head = flagValue('--head');
 
   const flagged = new Set(
-    ['--by', '--head'].flatMap((flag) => {
-      const at = args.indexOf(flag);
+    Arr.generate(function* () {
+      for (const flag of ['--by', '--head']) {
+        const at = args.indexOf(flag);
 
-      return at === -1 ? [] : [at, at + 1];
+        if (at === -1) {
+          continue;
+        }
+
+        yield at;
+
+        yield at + 1;
+      }
     }),
   );
 

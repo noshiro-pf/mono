@@ -4,6 +4,7 @@
  * whoever is fixing it writes (`claim.mts`).
  */
 
+import { Arr } from 'ts-data-forge';
 import {
   claimApplies,
   parseClaimComment,
@@ -52,21 +53,25 @@ export const readQueueComments = (
     nowEpochMs: number;
   }>,
 ): QueueComments => {
-  const setAside = comments
-    .flatMap(({ id, body }) => {
+  const setAside = Arr.generate(function* () {
+    for (const { id, body } of comments) {
       const says = parseSetAsideComment(body);
 
-      return says === undefined ? [] : [{ commentId: id, says }];
-    })
-    .at(0);
+      if (says !== undefined) {
+        yield { commentId: id, says };
+      }
+    }
+  }).at(0);
 
-  const claim = comments
-    .flatMap(({ id, body }) => {
+  const claim = Arr.generate(function* () {
+    for (const { id, body } of comments) {
       const says = parseClaimComment(body);
 
-      return says === undefined ? [] : [{ commentId: id, says }];
-    })
-    .at(0);
+      if (says !== undefined) {
+        yield { commentId: id, says };
+      }
+    }
+  }).at(0);
 
   return {
     setAside:

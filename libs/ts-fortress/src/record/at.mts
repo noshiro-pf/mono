@@ -138,10 +138,14 @@ export function at(
 
   const shapes = expandShapeStructure(type.shapeStructure);
 
-  const memberTypes: readonly Type<unknown>[] = shapes.flatMap((shape) => {
-    const memberType = shape[keyOrIndex];
+  const memberTypes: readonly Type<unknown>[] = Arr.generate(function* () {
+    for (const shape of shapes) {
+      const memberType = shape[keyOrIndex];
 
-    return memberType === undefined ? [] : [memberType];
+      if (memberType !== undefined) {
+        yield memberType;
+      }
+    }
   });
 
   // If the key is optional in any member, the accessed value may be undefined,

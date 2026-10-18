@@ -1,6 +1,7 @@
 import type { ESLintPlugin } from '../types.mjs';
 import { noSideEffectImport } from './no-side-effect-import.mjs';
 import { noUnnecessaryTypeGuard } from './no-unnecessary-type-guard.mjs';
+import { preferArrGenerate } from './prefer-arr-generate.mjs';
 import { preferArrIsArray } from './prefer-arr-is-array.mjs';
 import { preferArrScan } from './prefer-arr-scan.mjs';
 import { preferArrSum } from './prefer-arr-sum.mjs';
@@ -21,6 +22,7 @@ export const tsDataForgeRules = {
   'prefer-canonical-array-slicing': preferCanonicalArraySlicing,
   'prefer-canonical-length-guard': preferCanonicalLengthGuard,
   'prefer-canonical-length-cast': preferCanonicalLengthCast,
+  'prefer-arr-generate': preferArrGenerate,
   'prefer-arr-is-array': preferArrIsArray,
   'prefer-arr-scan': preferArrScan,
   'prefer-arr-sum': preferArrSum,

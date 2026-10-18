@@ -188,21 +188,27 @@ export const collectViolations = (
           },
         ] as const)),
 
-    ...settings.excludeEntries.flatMap((entry) => {
-      const problem = classifyExcludeEntry(entry);
+    ...Arr.generate(function* () {
+      for (const entry of settings.excludeEntries) {
+        const problem = classifyExcludeEntry(entry);
 
-      return problem === undefined
-        ? []
-        : [{ subject: `'${entry}'`, message: REASONS[problem] }];
+        if (problem !== undefined) {
+          yield { subject: `'${entry}'`, message: REASONS[problem] };
+        }
+      }
     }),
 
-    ...settings.excludeEntries.flatMap((entry) =>
-      settings.waiverReasons.some((reason) =>
-        reasonCoversEntry(reason.target, entry),
-      )
-        ? []
-        : [{ subject: `'${entry}'`, message: REASONS['no-reason'] }],
-    ),
+    ...Arr.generate(function* () {
+      for (const entry of settings.excludeEntries) {
+        if (
+          settings.waiverReasons.every(
+            (reason) => !reasonCoversEntry(reason.target, entry),
+          )
+        ) {
+          yield { subject: `'${entry}'`, message: REASONS['no-reason'] };
+        }
+      }
+    }),
 
     ...settings.waiverReasons.flatMap((reason) => {
       const subject = `\`# waiver: ${reason.target}\``;

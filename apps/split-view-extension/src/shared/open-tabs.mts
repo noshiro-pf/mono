@@ -1,4 +1,4 @@
-import { isString } from 'ts-data-forge';
+import { Arr, isString } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { splitViewOpenTabKeyPrefix } from './constants.mjs';
 
@@ -77,11 +77,17 @@ export const openSplitViewTabsFrom = (
   stored: ReadonlyRecord<string, unknown>,
 ): OpenSplitViewTabs =>
   Object.fromEntries(
-    Object.entries(stored).flatMap(([key, workspaceId]) =>
-      key.startsWith(splitViewOpenTabKeyPrefix) && isString(workspaceId)
-        ? ([
-            [key.slice(splitViewOpenTabKeyPrefix.length), workspaceId],
-          ] as const)
-        : [],
-    ),
+    Arr.generate(function* () {
+      for (const [key, workspaceId] of Object.entries(stored)) {
+        if (
+          key.startsWith(splitViewOpenTabKeyPrefix) &&
+          isString(workspaceId)
+        ) {
+          yield [
+            key.slice(splitViewOpenTabKeyPrefix.length),
+            workspaceId,
+          ] as const;
+        }
+      }
+    }),
   );

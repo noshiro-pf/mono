@@ -1,6 +1,7 @@
 // cspell:ignore retarget retargeted
 
 import type { Claim } from 'pr-report-core';
+import { Arr } from 'ts-data-forge';
 import { ownerOf } from './owner.mjs';
 import {
   autoRebaseTargets,
@@ -314,17 +315,21 @@ const targets = (
 ): readonly number[] =>
   autoRebaseTargets(pullRequests, 'main', {
     owners: new Map(
-      pullRequests.flatMap((pr) => {
-        const owner = ownerOf(pr, {
-          defaultBranch: 'main',
-          skipped,
-          claimed,
-          stackParents: new Map(),
-          cyclic: new Set(),
-          nowEpochMs: NOW,
-        });
+      Arr.generate(function* () {
+        for (const pr of pullRequests) {
+          const owner = ownerOf(pr, {
+            defaultBranch: 'main',
+            skipped,
+            claimed,
+            stackParents: new Map(),
+            cyclic: new Set(),
+            nowEpochMs: NOW,
+          });
 
-        return owner === undefined ? [] : [[pr.number, owner] as const];
+          if (owner !== undefined) {
+            yield [pr.number, owner] as const;
+          }
+        }
       }),
     ),
   }).map((pr) => pr.number);

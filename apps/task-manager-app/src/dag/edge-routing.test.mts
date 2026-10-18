@@ -1,4 +1,4 @@
-import { asPositiveInt, Num } from 'ts-data-forge';
+import { Arr, asPositiveInt, Num } from 'ts-data-forge';
 import type { GraphNodeId } from '../domain/index.mjs';
 import {
   cubicPoint,
@@ -245,17 +245,20 @@ const layeredGraph = (
       .map((pair) => [`${pair[0]} ${pair[1]}`, pair] as const),
   );
 
-  const edges = Array.from(unique.values())
-    .slice(0, edgeCount)
-    .flatMap(([fromIndex, toIndex]) => {
+  const edges = Arr.generate(function* () {
+    for (const [fromIndex, toIndex] of Array.from(unique.values()).slice(
+      0,
+      edgeCount,
+    )) {
       const from = nodes[fromIndex];
 
       const to = nodes[toIndex];
 
-      return from === undefined || to === undefined
-        ? []
-        : [edge(from.id, to.id, random() < 0.2 ? 'SS +1日' : '')];
-    });
+      if (from !== undefined && to !== undefined) {
+        yield edge(from.id, to.id, random() < 0.2 ? 'SS +1日' : '');
+      }
+    }
+  });
 
   return { direction: 'right', nodes, edges, groups: [] };
 };

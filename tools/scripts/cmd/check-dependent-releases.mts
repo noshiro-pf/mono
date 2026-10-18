@@ -170,18 +170,18 @@ export const checkDependentReleases = ({
       : 'review');
 
   // The edges whose dependency breaks and whose dependent says nothing of it.
-  const unannounced = edges.flatMap((edge) => {
-    const pending = findBreaking(edge.dependency, bumps, groups, versions);
+  const unannounced = Arr.generate(function* () {
+    for (const edge of edges) {
+      const pending = findBreaking(edge.dependency, bumps, groups, versions);
 
-    return !Arr.isNonEmpty(pending) || ownBreaking(edge.dependent)
-      ? []
-      : [
-          {
-            ...edge,
-            exposure: exposureOf(edge.dependency, edge.dependent),
-            pending,
-          },
-        ];
+      if (Arr.isNonEmpty(pending) && !ownBreaking(edge.dependent)) {
+        yield {
+          ...edge,
+          exposure: exposureOf(edge.dependency, edge.dependent),
+          pending,
+        };
+      }
+    }
   });
 
   const violations = [

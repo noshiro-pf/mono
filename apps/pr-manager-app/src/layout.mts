@@ -201,18 +201,26 @@ export const layoutFromSearch = (search: string): Layout => {
   const lines = linesParam(params.get(PARAM.lines));
 
   const heights = Object.fromEntries(
-    BLOCK_IDS.flatMap((id) => {
-      const height = numberParam(params.get(heightParam(id)));
+    Arr.generate(function* () {
+      for (const id of BLOCK_IDS) {
+        const height = numberParam(params.get(heightParam(id)));
 
-      return height === undefined ? [] : [[id, clampHeight(height)] as const];
+        if (height !== undefined) {
+          yield [id, clampHeight(height)] as const;
+        }
+      }
     }),
   );
 
   const shares = Object.fromEntries(
-    BLOCK_IDS.flatMap((id) => {
-      const share = numberParam(params.get(shareParam(id)));
+    Arr.generate(function* () {
+      for (const id of BLOCK_IDS) {
+        const share = numberParam(params.get(shareParam(id)));
 
-      return share === undefined ? [] : [[id, clampShare(share)] as const];
+        if (share !== undefined) {
+          yield [id, clampShare(share)] as const;
+        }
+      }
     }),
   );
 

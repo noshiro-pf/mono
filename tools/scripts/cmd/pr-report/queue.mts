@@ -6,7 +6,7 @@ import {
   type QueueOwner,
   type RepoRef,
 } from 'pr-report-core';
-import { Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import { createClient, parseRepoRef } from './github.mjs';
 import { readRepoRef, readRequiredContexts } from './repo-settings.mjs';
 
@@ -27,21 +27,25 @@ export const ownersOf = (
   nowEpochMs: number,
 ): ReadonlyMap<number, QueueOwner> =>
   new Map(
-    decided.entries.flatMap((entry) => {
-      // A pull request whose comments could not be read has no owner rather
-      // than the worker's: nothing is known of a set-aside on it.
-      const comments = queue.get(entry.number);
+    Arr.generate(function* () {
+      for (const entry of decided.entries) {
+        // A pull request whose comments could not be read has no owner rather
+        // than the worker's: nothing is known of a set-aside on it.
+        const comments = queue.get(entry.number);
 
-      const owner =
-        comments === undefined
-          ? undefined
-          : queueOwnerOfEntry(entry, comments, {
-              defaultBranch,
-              cycles: decided.cycles,
-              nowEpochMs,
-            });
+        const owner =
+          comments === undefined
+            ? undefined
+            : queueOwnerOfEntry(entry, comments, {
+                defaultBranch,
+                cycles: decided.cycles,
+                nowEpochMs,
+              });
 
-      return owner === undefined ? [] : [[entry.number, owner] as const];
+        if (owner !== undefined) {
+          yield [entry.number, owner] as const;
+        }
+      }
     }),
   );
 

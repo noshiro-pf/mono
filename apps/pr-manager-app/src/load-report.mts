@@ -808,12 +808,15 @@ const readMerged = async (
 
   const cutoff = nowMs - MERGED_WITHIN_DAYS * MS_PER_DAY;
 
-  const inWindow = validated.value.repository.merged.nodes
-    .flatMap((pr) => {
+  const inWindow = Arr.generate(function* () {
+    for (const pr of validated.value.repository.merged.nodes) {
       const mergedAtEpochMs = epochMsOf(pr.mergedAt);
 
-      return mergedAtEpochMs === undefined ? [] : [{ pr, mergedAtEpochMs }];
-    })
+      if (mergedAtEpochMs !== undefined) {
+        yield { pr, mergedAtEpochMs };
+      }
+    }
+  })
     .filter(({ mergedAtEpochMs }) => mergedAtEpochMs >= cutoff)
     .toSorted((a, b) => b.mergedAtEpochMs - a.mergedAtEpochMs)
     .slice(0, MERGED_LIMIT);
@@ -912,12 +915,16 @@ const withReferences = async ({
     rateLimit: latestLimit,
     result: Result.ok({
       ...list,
-      referenced: numbers.flatMap((number): readonly ReferencedItem[] => {
-        const validated = ReferenceSchema.validate(
-          field(referenceAlias(number)),
-        );
+      referenced: Arr.generate<ReferencedItem>(function* () {
+        for (const number of numbers) {
+          const validated = ReferenceSchema.validate(
+            field(referenceAlias(number)),
+          );
 
-        return Result.isOk(validated) ? [referencedOf(validated.value)] : [];
+          if (Result.isOk(validated)) {
+            yield referencedOf(validated.value);
+          }
+        }
       }),
     }),
   };
@@ -1172,10 +1179,14 @@ const describeIssues = async ({
 
   const field = fieldsOf(answered.result.value.data);
 
-  const nodes = numbers.flatMap((number) => {
-    const validated = IssueSchema.validate(field(issueAlias(number)));
+  const nodes = Arr.generate(function* () {
+    for (const number of numbers) {
+      const validated = IssueSchema.validate(field(issueAlias(number)));
 
-    return Result.isOk(validated) ? [validated.value] : [];
+      if (Result.isOk(validated)) {
+        yield validated.value;
+      }
+    }
   });
 
   return {
@@ -1321,12 +1332,14 @@ const assemble = ({
                 requirements.requireConversationResolution,
               codeOwners,
             },
-            pulls: report.entries.flatMap((entry) => {
-              const parts = byNumber.get(entry.number);
+            pulls: Arr.generate(function* () {
+              for (const entry of report.entries) {
+                const parts = byNumber.get(entry.number);
 
-              return parts?.details === undefined
-                ? []
-                : [queuePullOf(entry, parts.pr, parts.details)];
+                if (parts?.details !== undefined) {
+                  yield queuePullOf(entry, parts.pr, parts.details);
+                }
+              }
             }),
           }),
     reading: [
@@ -1387,28 +1400,30 @@ const factsOf = (
 ): PullRequestFacts => {
   const contexts = checks?.contexts ?? [];
 
-  const runs: readonly CheckRunReport[] = contexts.flatMap((node) =>
-    node.__typename === 'CheckRun'
-      ? [
-          {
-            name: node.name,
-            // The REST spelling, which is what the shared verdict is written
-            // against: GraphQL says `COMPLETED` where REST says `completed`.
-            status: node.status.toLowerCase(),
-            conclusion: node.conclusion?.toLowerCase(),
-            checkSuiteId: node.checkSuite?.databaseId ?? 0,
-            id: node.databaseId ?? 0,
-            round: roundOf(node.checkSuite),
-          },
-        ]
-      : [],
-  );
+  const runs: readonly CheckRunReport[] = Arr.generate(function* () {
+    for (const node of contexts) {
+      if (node.__typename === 'CheckRun') {
+        yield {
+          name: node.name,
+          // The REST spelling, which is what the shared verdict is written
+          // against: GraphQL says `COMPLETED` where REST says `completed`.
+          status: node.status.toLowerCase(),
+          conclusion: node.conclusion?.toLowerCase(),
+          checkSuiteId: node.checkSuite?.databaseId ?? 0,
+          id: node.databaseId ?? 0,
+          round: roundOf(node.checkSuite),
+        };
+      }
+    }
+  });
 
-  const statuses = contexts.flatMap((node) =>
-    node.__typename === 'StatusContext'
-      ? [{ context: node.context, state: statusState(node.state) }]
-      : [],
-  );
+  const statuses = Arr.generate(function* () {
+    for (const node of contexts) {
+      if (node.__typename === 'StatusContext') {
+        yield { context: node.context, state: statusState(node.state) };
+      }
+    }
+  });
 
   return {
     number: pr.number,
@@ -1503,14 +1518,19 @@ const setAsideOf = (
   pr: OpenPullRequest,
   details: DetailsPart,
 ): SetAsideView | undefined => {
-  const found = details.node.comments.nodes
-    .filter(({ viewerDidAuthor }) => viewerDidAuthor)
-    .flatMap(({ url, body }) => {
+  const found = Arr.generate(function* () {
+    for (const { viewerDidAuthor, url, body } of details.node.comments.nodes) {
+      if (!viewerDidAuthor) {
+        continue;
+      }
+
       const says = parseSetAsideComment(body);
 
-      return says === undefined ? [] : [{ url, says }];
-    })
-    .at(0);
+      if (says !== undefined) {
+        yield { url, says };
+      }
+    }
+  }).at(0);
 
   if (
     found?.says.kind !== 'standing' ||
@@ -1567,9 +1587,13 @@ const queuePullOf = (
 };
 
 const approversOf = (details: PullRequestDetails): readonly string[] =>
-  details.latestOpinionatedReviews.nodes.flatMap(({ state, author }) =>
-    state === 'APPROVED' && author !== null ? [author.login] : [],
-  );
+  Arr.generate(function* () {
+    for (const { state, author } of details.latestOpinionatedReviews.nodes) {
+      if (state === 'APPROVED' && author !== null) {
+        yield author.login;
+      }
+    }
+  });
 
 const mergedOf = (
   repo: RepoRef,

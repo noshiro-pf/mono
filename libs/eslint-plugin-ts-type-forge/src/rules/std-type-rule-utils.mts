@@ -60,31 +60,28 @@ export const reportStdTypeReference = <MessageIds extends string>(
     node: typeName,
     messageId: messageIds.report,
     data: { name: stdName, alternatives: formatAlternatives(candidates) },
-    suggest: candidates.flatMap((candidate) => {
-      const target = resolveTypeName(program, candidate, importStyle);
+    suggest: Arr.generate(function* () {
+      for (const candidate of candidates) {
+        const target = resolveTypeName(program, candidate, importStyle);
 
-      // The replacement name is already bound to something else in this file,
-      // so rewriting to it would resolve to the wrong declaration.
-      return target === undefined
-        ? []
-        : [
-            {
-              messageId: messageIds.suggestion,
-              data: { name: stdName, replacement: target.localName },
-              fix: (fixer: TSESLint.RuleFixer): readonly TSESLint.RuleFix[] =>
-                Arr.toPushed(
-                  target.needsImport
-                    ? buildNamedImportFix(
-                        fixer,
-                        program,
-                        TS_TYPE_FORGE_MODULE,
-                        [`type ${candidate}`],
-                      )
-                    : [],
-                  fixer.replaceText(typeName, target.localName),
-                ),
-            },
-          ];
+        // The replacement name is already bound to something else in this file,
+        // so rewriting to it would resolve to the wrong declaration.
+        if (target !== undefined) {
+          yield {
+            messageId: messageIds.suggestion,
+            data: { name: stdName, replacement: target.localName },
+            fix: (fixer: TSESLint.RuleFixer): readonly TSESLint.RuleFix[] =>
+              Arr.toPushed(
+                target.needsImport
+                  ? buildNamedImportFix(fixer, program, TS_TYPE_FORGE_MODULE, [
+                      `type ${candidate}`,
+                    ])
+                  : [],
+                fixer.replaceText(typeName, target.localName),
+              ),
+          };
+        }
+      }
     }),
   });
 };

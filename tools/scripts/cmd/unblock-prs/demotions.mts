@@ -16,6 +16,7 @@
  * a pull request that was waiting on something which has since cleared.
  */
 
+import { Arr } from 'ts-data-forge';
 import type { Demotions, PullRequest, WatchOutcome } from './types.mjs';
 
 /**
@@ -62,7 +63,11 @@ export const pruneDemotions = (
   pullRequests: readonly PullRequest[],
 ): Demotions =>
   new Map(
-    pullRequests.flatMap((pr) =>
-      isDemoted(demoted, pr) ? [[pr.number, pr.headRefOid] as const] : [],
-    ),
+    Arr.generate(function* () {
+      for (const pr of pullRequests) {
+        if (isDemoted(demoted, pr)) {
+          yield [pr.number, pr.headRefOid] as const;
+        }
+      }
+    }),
   );

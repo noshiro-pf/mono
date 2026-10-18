@@ -135,7 +135,13 @@ export const validateRows = (
 export const validDependencies = (
   checks: readonly RowCheck[],
 ): readonly Dependency[] =>
-  checks.flatMap((check) => (check.status === 'ok' ? [check.dependency] : []));
+  Arr.generate(function* () {
+    for (const check of checks) {
+      if (check.status === 'ok') {
+        yield check.dependency;
+      }
+    }
+  });
 
 /**
  * What saving the rows writes: their dependencies, or the rows that are

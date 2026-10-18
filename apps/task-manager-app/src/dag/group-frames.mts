@@ -134,10 +134,14 @@ export const groupFrames = (
   const byId = new Map(nodes.map((node) => [node.id, node]));
 
   return groups.flatMap(({ id, members }): readonly GroupFrame[] => {
-    const drawn = members.flatMap((member) => {
-      const node = byId.get(member);
+    const drawn = Arr.generate(function* () {
+      for (const member of members) {
+        const node = byId.get(member);
 
-      return node === undefined ? [] : [node];
+        if (node !== undefined) {
+          yield node;
+        }
+      }
     });
 
     const around = frameAround(drawn);

@@ -1,3 +1,4 @@
+import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import { nodeId } from './graph-nodes.mjs';
 import type {
@@ -75,12 +76,20 @@ export const removeNode = (
         ({ milestone, updated }) => updated ?? milestone,
       ),
     },
-    updatedTasks: tasks.flatMap(({ updated }) =>
-      updated === undefined ? [] : [updated],
-    ),
-    updatedMilestones: milestones.flatMap(({ updated }) =>
-      updated === undefined ? [] : [updated],
-    ),
+    updatedTasks: Arr.generate(function* () {
+      for (const { updated } of tasks) {
+        if (updated !== undefined) {
+          yield updated;
+        }
+      }
+    }),
+    updatedMilestones: Arr.generate(function* () {
+      for (const { updated } of milestones) {
+        if (updated !== undefined) {
+          yield updated;
+        }
+      }
+    }),
   };
 };
 
