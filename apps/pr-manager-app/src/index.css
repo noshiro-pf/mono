@@ -49,6 +49,14 @@
   --diverge-ahead: light-dark(#2a78d6, #3987e5);
   --diverge-behind: light-dark(#e34948, #e66767);
 
+  /*
+   * The week's activity (`weekly-activity.tsx`): two categories side by side,
+   * merged in GitHub's purple for a merged pull request, closed in the blue
+   * of the accent.
+   */
+  --activity-merged: light-dark(#8250df, #a371f7);
+  --activity-closed: light-dark(#2a78d6, #3987e5);
+
   --radius: 8px;
   --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -161,6 +169,7 @@ a:focus-visible {
 .header-actions {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
 }
 
@@ -986,6 +995,89 @@ a:focus-visible {
   display: flex;
   gap: 0.75rem;
   justify-content: space-between;
+}
+
+/* --- the week's activity ------------------------------------------------- */
+
+.weekly-activity {
+  min-width: min(28rem, 92vw);
+}
+
+.weekly-activity-table {
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin: 0 0 0.75rem;
+  width: 100%;
+}
+
+.weekly-activity-table th,
+.weekly-activity-table td {
+  border-bottom: 1px solid var(--hairline);
+  padding: 0.3rem 0.5rem;
+  text-align: left;
+}
+
+.weekly-activity-table thead th {
+  color: var(--ink-secondary);
+  font-weight: 500;
+}
+
+.weekly-activity-table tbody th {
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.weekly-activity-table tfoot th,
+.weekly-activity-total {
+  border-bottom: none;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.weekly-activity-cell {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.weekly-activity-count {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  min-width: 1.75rem;
+  text-align: right;
+}
+
+/* One scale for both columns, so the track is the same length in each. */
+.weekly-activity-track {
+  display: block;
+  flex: 1 1 auto;
+  height: 0.5rem;
+  min-width: 3rem;
+}
+
+.weekly-activity-bar {
+  border-radius: 2px;
+  display: block;
+  height: 100%;
+}
+
+.weekly-activity-bar[data-kind='merged'] {
+  background: var(--activity-merged);
+}
+
+.weekly-activity-bar[data-kind='closed'] {
+  background: var(--activity-closed);
+}
+
+.weekly-activity-actions {
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* "Try again", when there is one, goes to the other end from "Done". */
+.weekly-activity-actions > :not(:last-child) {
+  margin-right: auto;
 }
 
 /* --- the merge order ---------------------------------------------------- */
