@@ -168,6 +168,7 @@ DAG（右へ）。自動整列した状態。ノードはドラッグで動か�
 pnpm run dev          # http://localhost:5195/mono/task-manager/
 pnpm run check:test   # 単体テスト
 pnpm run check:e2e    # Playwright（デモモードで動かす）
+pnpm run test:rules   # firestore.rules のテスト（エミュレータを起動して走らせる）
 pnpm run build        # build/ に出力。GitHub Pages へは deploy-pages.yml が載せる
 ```
 
@@ -203,6 +204,28 @@ firebase emulators:start   # firebase-tools と Java 21 以上が必要
 `VITE_FIREBASE_EMULATORS=false pnpm run dev` で起動する。本番ビルドは
 `import.meta.env.DEV` が `false` になるので、この設定に関係なくエミュレータには繋がない。
 
+### ルールのテスト
+
+`pnpm run test:rules` は `firestore.rules` を Firestore エミュレータに読み込み、
+`@firebase/rules-unit-testing` で `test/` のテストを走らせる。確かめていること:
+
+- 自分の個人プロジェクト（id が自分の uid）は、文書ができる前から読め、配下の
+  `tasks`・`milestones`・`groups`・`settings` を読み書きでき、自分だけがメンバーの
+  形でだけ作れる。
+- メンバーになっているプロジェクトは読み書きできる。
+- 他人のプロジェクト、サインインしていないアクセス、Google 以外のプロバイダの
+  トークン、プロジェクトの一覧・更新・削除、ほかのコレクションは拒まれる。
+
+`emulators:exec` が空のエミュレータを起動し、テストが終われば止める。Java 21 以上が
+要り、`firebase-tools` は `pnpm dlx` で取るので入れておく必要はない。`firebase.json` の
+ポートを使うため、`firebase emulators:start` を動かしているときは先に止める。
+ほかのテストと同じく `ws:build` のあとに走らせる。
+
+このスクリプトは `check:*` に入れていない。どの CI のランナーにも Java と
+エミュレータを用意していないため、`check:` にすると CI で走らないチェックになる
+（`check:root:ci-commands` がそれを指摘する）。`firestore.rules` を変えたときは
+手元で走らせてからデプロイする。
+
 ### デモモード
 
 開発サーバーで `?storage=memory` を付けて開くと、サインインせずにサンプルデータ入りの
@@ -218,8 +241,8 @@ firebase emulators:start   # firebase-tools と Java 21 以上が必要
 Firebase プロジェクトは `task-manager-app-d0cae`（`.firebaserc`）。次はリポジトリの
 CI では行われないので、オーナーが手で行う。
 
-1. **セキュリティルールのデプロイ**: このディレクトリで
-   `firebase deploy --only firestore:rules`。`firestore.rules` を変更しただけでは
+1. **セキュリティルールのデプロイ**: `pnpm run test:rules` が通ることを確かめてから、
+   このディレクトリで `firebase deploy --only firestore:rules`。`firestore.rules` を変更しただけでは
    反映されない。`firebase-tools` は依存に入れていないので、手元に入れて使う。
 2. **承認済みドメイン**: Authentication → 設定 → 承認済みドメインに `localhost` と
    `noshiro-pf.github.io` を入れる。
