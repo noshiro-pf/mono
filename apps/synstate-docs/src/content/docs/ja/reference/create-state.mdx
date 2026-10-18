@@ -71,7 +71,7 @@ assert.deepStrictEqual(queryHistory, ['label:bug page:1', 'label:bug page:2']);
 
 `equals` は現在の状態と次の状態を受け取ります。`true` を返すと、その更新は伝わりません。購読者にも、状態から派生したものにも通知されず、現在の状態がその同一性ごと保たれます（`setState`・`updateState`・`resetState` は次の状態ではなく現在の状態を返します）。下流の [`skipIfNoChange`](../skip-if-no-change/) ではなく状態を持つ側で決めるのは、ここで伝わった更新は、オペレーターが間引く前に状態を直接読むものへ届いてしまうためです。
 
-`equals` を省略すると、等しいかどうかにかかわらずすべての更新が伝わります。次のメジャーバージョンで既定値は `Object.is` になる予定です。すべての更新を伝え続けるには `equals: () => false` を渡してください。
+`equals` の既定値は `Object.is` で、すでに持っている値を書き込んでも何も伝わりません。等しいかどうかにかかわらずすべての更新を伝えるには `equals: () => false` を渡してください。
 
 {/* source-link */}
 [View source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/utils/create-state.mts)

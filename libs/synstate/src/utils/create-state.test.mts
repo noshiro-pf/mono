@@ -1,20 +1,8 @@
 import { createState } from './create-state.mjs';
 
 describe(createState, () => {
-  test('passes on every update when no `equals` is given, equal or not', () => {
-    const [state, setState] = createState(0);
-
-    const seen = record(state);
-
-    setState(0);
-
-    assert.deepStrictEqual(seen, [0, 0]);
-  });
-
-  test('with `equals`, setState, updateState and resetState do not pass on a value equal to the current one', () => {
-    const [state, setState, { updateState, resetState }] = createState(0, {
-      equals: Object.is,
-    });
+  test('setState, updateState and resetState do not pass on a value `Object.is`-equal to the current one when no `equals` is given', () => {
+    const [state, setState, { updateState, resetState }] = createState(0);
 
     const seen = record(state);
 
@@ -52,6 +40,16 @@ describe(createState, () => {
     assert.strictEqual(resetState(), 1);
 
     assert.strictEqual(getSnapshot(), 1);
+  });
+
+  test('passes on every update, equal or not, with `equals: () => false`', () => {
+    const [state, setState] = createState(0, { equals: () => false });
+
+    const seen = record(state);
+
+    setState(0);
+
+    assert.deepStrictEqual(seen, [0, 0]);
   });
 
   // What `equals` is for: whatever reads the state, directly or through
