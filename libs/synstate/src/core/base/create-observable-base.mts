@@ -2,10 +2,8 @@ import { Arr, Optional } from 'ts-data-forge';
 import { unreachable } from 'ts-std-forge';
 import type { MutableMap, MutableSet, ReadonlyRecord } from 'ts-type-forge';
 import type {
-  ChildObservable,
   InitializedObservable,
   Observable,
-  ObservableBase,
   ObservableId,
   ObservableKind,
   Operator,
@@ -23,6 +21,10 @@ import {
   issueUpdateToken,
   toSubscriber,
 } from '../utils/index.mjs';
+import type {
+  ChildObservableNode,
+  ObservableBaseNode,
+} from './observable-node.mjs';
 
 /**
  * The mutable core shared by every observable, expressed as closures instead of
@@ -71,13 +73,13 @@ export type ObservableBaseHandle<A> = Readonly<{
    */
   attach: (writers: ObservableStateWriters) => void;
 
-  addChild: <B>(child: ChildObservable<B>) => void;
+  addChild: <B>(child: ChildObservableNode<B>) => void;
 
   /**
    * Forgets `child`, which a completed child calls on each of its parents so
    * that nothing keeps a reference to it (#2134).
    */
-  deleteChild: <B>(child: ChildObservable<B>) => void;
+  deleteChild: <B>(child: ChildObservableNode<B>) => void;
 
   getSnapshot: () => Optional<A>;
 
@@ -124,7 +126,7 @@ export const createObservableBaseHandle = <A,>(
 
   // A set, not an array: a completed child removes itself, and that has to be
   // O(1) for a UI that creates and completes derived nodes on every mount.
-  const mut_children: MutableSet<ChildObservable<unknown>> = new Set();
+  const mut_children: MutableSet<ChildObservableNode<unknown>> = new Set();
 
   const mut_subscribers: MutableMap<SubscriberId, Subscriber<A>> = new Map();
 
@@ -171,13 +173,13 @@ export const createObservableBaseHandle = <A,>(
     mut_writers?.setHasSubscriber(mut_subscribers.size > 0);
   };
 
-  const addChild = <B,>(child: ChildObservable<B>): void => {
+  const addChild = <B,>(child: ChildObservableNode<B>): void => {
     mut_children.add(child);
 
     mut_writers?.setHasChild(true);
   };
 
-  const deleteChild = <B,>(child: ChildObservable<B>): void => {
+  const deleteChild = <B,>(child: ChildObservableNode<B>): void => {
     mut_children.delete(child);
 
     mut_writers?.setHasChild(mut_children.size > 0);
@@ -329,13 +331,13 @@ const flushAfterPropagation = (): void => {
  * the depth-ordered descendant list and the update propagation that walks it.
  */
 export type ManagerObservableParts<A> = Readonly<{
-  addDescendant: <B>(child: ChildObservable<B>) => void;
+  addDescendant: <B>(child: ChildObservableNode<B>) => void;
 
   /**
    * Takes `child` out of the propagation order, which a completed child calls
    * on every manager it registered to (#2134).
    */
-  deleteDescendant: <B>(child: ChildObservable<B>) => void;
+  deleteDescendant: <B>(child: ChildObservableNode<B>) => void;
 
   /** Emits `nextValue` and propagates the update to all descendants. */
   startUpdate: (nextValue: A) => void;
@@ -360,21 +362,24 @@ export const createManagerObservableParts = <A,>(
 ): ManagerObservableParts<A> => {
   const mut_buckets: MutableMap<
     number,
-    MutableSet<ChildObservable<unknown>>
+    MutableSet<ChildObservableNode<unknown>>
   > = new Map();
 
   /** The keys of `mut_buckets`, ascending. */
   let mut_depths: readonly number[] = [];
 
   /** `undefined` while stale. */
-  let mut_propagationOrder: readonly ChildObservable<unknown>[] | undefined =
-    [];
+  let mut_propagationOrder:
+    readonly ChildObservableNode<unknown>[] | undefined = [];
 
-  const addDescendant = <B,>(child: ChildObservable<B>): void => {
+  const addDescendant = <B,>(child: ChildObservableNode<B>): void => {
     const mut_bucket = mut_buckets.get(child.depth);
 
     if (mut_bucket === undefined) {
-      mut_buckets.set(child.depth, new Set<ChildObservable<unknown>>([child]));
+      mut_buckets.set(
+        child.depth,
+        new Set<ChildObservableNode<unknown>>([child]),
+      );
 
       mut_depths = Arr.toInserted(
         mut_depths,
@@ -392,7 +397,7 @@ export const createManagerObservableParts = <A,>(
     mut_propagationOrder = undefined;
   };
 
-  const deleteDescendant = <B,>(child: ChildObservable<B>): void => {
+  const deleteDescendant = <B,>(child: ChildObservableNode<B>): void => {
     // An emptied bucket stays, so that its depth is not inserted again.
     const mut_bucket = mut_buckets.get(child.depth);
 
@@ -401,12 +406,12 @@ export const createManagerObservableParts = <A,>(
     }
   };
 
-  const getPropagationOrder = (): readonly ChildObservable<unknown>[] => {
+  const getPropagationOrder = (): readonly ChildObservableNode<unknown>[] => {
     if (mut_propagationOrder !== undefined) {
       return mut_propagationOrder;
     }
 
-    const mut_order: ChildObservable<unknown>[] = [];
+    const mut_order: ChildObservableNode<unknown>[] = [];
 
     for (const depth of mut_depths) {
       const bucket = mut_buckets.get(depth);
@@ -510,12 +515,11 @@ export const assembleObservable = <
   complete,
   dispose,
   extra,
-}: AssembleObservableArgs<A, Kind, Extra>): Extra &
-  ObservableBase<A> &
-  Readonly<{
-    kind: Kind;
-    depth: AssembleObservableArgs<A, Kind, Extra>['depth'];
-  }> => {
+}: AssembleObservableArgs<A, Kind, Extra>): AssembledObservable<
+  A,
+  Kind,
+  Extra
+> => {
   function pipe<B>(
     operator: WithInitialValueOperator<A, B>,
   ): InitializedObservable<B>;
@@ -617,5 +621,22 @@ export const assembleObservable = <
     mut_releaseFromScope = scope.adopt(mut_observable);
   }
 
-  return mut_observable;
+  return (
+    // The literal lacks only the brand of the public types, which exists in
+    // the types alone; this is the one place an observable is created, so it
+    // is the one place the brand is granted.
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+    mut_observable as unknown as AssembledObservable<A, Kind, Extra>
+  );
 };
+
+type AssembledObservable<
+  A,
+  Kind extends ObservableKind,
+  Extra extends ReadonlyRecord<string, unknown>,
+> = Extra &
+  ObservableBaseNode<A> &
+  Readonly<{
+    kind: Kind;
+    depth: AssembleObservableArgs<A, Kind, Extra>['depth'];
+  }>;

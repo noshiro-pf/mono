@@ -18,25 +18,39 @@ import type { NonEmptyUnknownList, Subscription } from './types.mjs';
  * ```
  */
 
+/**
+ * Makes the public observable types impossible to satisfy with an object
+ * literal. Every observable is built by a synstate factory, which gives it the
+ * internal members propagation reads; an imitation passed to an operator would
+ * lack them and fail at run time instead of at compile time. It exists only in
+ * the types.
+ */
+declare const observableBrand: unique symbol;
+
 type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
+  [observableBrand]: true;
+
   id: ObservableId;
   kind: Kind;
 
-  // reactive dependency tree structure
+  /**
+   * One more than the deepest observable this one is derived from; 0 for a
+   * root. An update reaches observables in ascending depth, so every parent
+   * has emitted before its child reads it.
+   */
   depth: Kind extends 'root' ? 0 : number;
-  addChild: <B>(child: ChildObservable<B>) => void;
-  deleteChild: <B>(child: ChildObservable<B>) => void;
 
-  // state
   getSnapshot: () => Optional<A>;
   isCompleted: boolean;
-  updateToken: UpdateToken;
-  hasSubscriber: boolean;
-  hasChild: boolean;
-  hasActiveChild: () => boolean;
 
-  tryUpdate: (updateToken: UpdateToken) => void;
-  tryComplete: () => void;
+  /**
+   * The token of the update in which this observable last emitted. A child's
+   * `tryUpdate` receives the token of the update now propagating; a parent
+   * whose token differs did not emit in it. The token is opaque: compare it,
+   * store it, or pass it on to `setNext`.
+   */
+  updateToken: UpdateToken;
+
   complete: () => void;
 
   /**
@@ -88,15 +102,6 @@ namespace ObservableTypeConverter {
     Readonly<{
       parents: Wrap<P>;
     }>;
-
-  export type ToManager<
-    A,
-    O extends CreateObservableType<A, 'async child' | 'root'>,
-  > = O &
-    Readonly<{
-      addDescendant: <B>(child: ChildObservable<B>) => void;
-      deleteDescendant: <B>(child: ChildObservable<B>) => void;
-    }>;
 }
 
 export type SyncChildObservable<
@@ -116,9 +121,10 @@ export type InitializedSyncChildObservable<
 export type AsyncChildObservable<
   A,
   P extends NonEmptyUnknownList = NonEmptyUnknownList,
-> = ObservableTypeConverter.ToManager<
+> = ObservableTypeConverter.ToChild<
   A,
-  ObservableTypeConverter.ToChild<A, CreateObservableType<A, 'async child'>, P>
+  CreateObservableType<A, 'async child'>,
+  P
 >;
 
 export type InitializedAsyncChildObservable<
@@ -131,10 +137,7 @@ export type ChildObservable<
   P extends NonEmptyUnknownList = NonEmptyUnknownList,
 > = AsyncChildObservable<A, P> | SyncChildObservable<A, P>;
 
-export type RootObservable<A> = ObservableTypeConverter.ToManager<
-  A,
-  CreateObservableType<A, 'root'>
->;
+export type RootObservable<A> = CreateObservableType<A, 'root'>;
 
 export type InitializedRootObservable<A> =
   ObservableTypeConverter.ToInitialized<A, RootObservable<A>>;
@@ -201,9 +204,33 @@ export type WrapInitialized<A extends readonly unknown[]> = Readonly<{
 // type GetDestTypeOfOperator<Op extends Operator<unknown, unknown>> =
 //   Op extends Operator<unknown, infer B> ? B : never;
 
-expectType<keyof AsyncChildObservable<unknown>, 'addDescendant'>('>=');
+// Only the members meant for users are public; the rest live on the
+// internal node types in `core/base` (#2117).
+expectType<
+  keyof Observable<unknown>,
+  | typeof observableBrand
+  | 'id'
+  | 'kind'
+  | 'depth'
+  | 'getSnapshot'
+  | 'isCompleted'
+  | 'updateToken'
+  | 'complete'
+  | 'dispose'
+  | 'subscribe'
+  | 'pipe'
+>('=');
 
-expectType<keyof RootObservable<unknown>, 'addDescendant'>('>=');
+expectType<
+  keyof ChildObservable<unknown>,
+  keyof Observable<unknown> | 'parents'
+>('=');
+
+// Everything but the brand is not enough to pass for an observable.
+expectType<
+  StrictOmit<RootObservable<unknown>, typeof observableBrand>,
+  Observable<unknown>
+>('!<=');
 
 expectType<RootObservable<unknown>['depth'], 0>('=');
 

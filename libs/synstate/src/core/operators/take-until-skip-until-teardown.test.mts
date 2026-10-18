@@ -1,3 +1,4 @@
+import { toNode } from '../base/index.mjs';
 import { source } from '../create/index.mjs';
 import { skipUntil } from './skip-until.mjs';
 import { takeUntil } from './take-until.mjs';
@@ -9,11 +10,11 @@ describe('takeUntil releases the notifier', () => {
 
     const result$ = source<number>().pipe(takeUntil(notifier$));
 
-    assert.isTrue(notifier$.hasSubscriber);
+    assert.isTrue(toNode(notifier$).hasSubscriber);
 
     result$.complete();
 
-    assert.isFalse(notifier$.hasSubscriber);
+    assert.isFalse(toNode(notifier$).hasSubscriber);
   });
 
   test('when the parent completes', () => {
@@ -25,7 +26,7 @@ describe('takeUntil releases the notifier', () => {
 
     num$.complete();
 
-    assert.isFalse(notifier$.hasSubscriber);
+    assert.isFalse(toNode(notifier$).hasSubscriber);
   });
 
   test('not when the downstream completes', () => {
@@ -49,7 +50,7 @@ describe('takeUntil releases the notifier', () => {
     // Completion flows only downstream, so `takeUntil` is still running.
     assert.isFalse(result$.isCompleted);
 
-    assert.isTrue(notifier$.hasSubscriber);
+    assert.isTrue(toNode(notifier$).hasSubscriber);
   });
 
   test('when the notifier emits', () => {
@@ -61,7 +62,7 @@ describe('takeUntil releases the notifier', () => {
 
     assert.isTrue(result$.isCompleted);
 
-    assert.isFalse(notifier$.hasSubscriber);
+    assert.isFalse(toNode(notifier$).hasSubscriber);
   });
 
   test('when the notifier has already emitted', () => {
@@ -71,7 +72,7 @@ describe('takeUntil releases the notifier', () => {
 
     assert.isTrue(result$.isCompleted);
 
-    assert.isFalse(notifier$.hasSubscriber);
+    assert.isFalse(toNode(notifier$).hasSubscriber);
   });
 });
 
@@ -93,7 +94,7 @@ describe('skipUntil releases the notifier', () => {
 
     notifier$.next(undefined);
 
-    assert.isFalse(notifier$.hasSubscriber);
+    assert.isFalse(toNode(notifier$).hasSubscriber);
 
     num$.next(2);
 
@@ -113,7 +114,7 @@ describe('skipUntil releases the notifier', () => {
       mut_history.push(x);
     });
 
-    assert.isFalse(notifier$.hasSubscriber);
+    assert.isFalse(toNode(notifier$).hasSubscriber);
 
     num$.next(1);
 
@@ -127,6 +128,6 @@ describe('skipUntil releases the notifier', () => {
 
     result$.complete();
 
-    assert.isFalse(notifier$.hasSubscriber);
+    assert.isFalse(toNode(notifier$).hasSubscriber);
   });
 });

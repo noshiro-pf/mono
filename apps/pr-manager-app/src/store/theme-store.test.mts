@@ -1,4 +1,4 @@
-import { source } from 'synstate';
+import { source, type Observable as SynstateObservable } from 'synstate';
 import type { ColorScheme, Theme } from '../theme.mjs';
 import { createThemeStore, type ThemeStore } from './theme-store.mjs';
 
@@ -67,23 +67,23 @@ const setup = (initial: Theme, initialSystem: ColorScheme): Setup => {
 
   const mut_saved: Theme[] = [];
 
-  const change = source<undefined>();
+  const change = createListenedSource();
 
   const mut_system = {
     value: initialSystem,
     set: (next: ColorScheme) => {
       mut_system.value = next;
 
-      change.next(undefined);
+      change.next();
     },
-    listening: () => change.hasSubscriber,
+    listening: change.listening,
   };
 
   const store = createThemeStore({
     initial,
     system: {
       get: () => mut_system.value,
-      change,
+      change: change.observable,
     },
     apply: (theme) => {
       mut_applied.push(theme);
@@ -99,4 +99,47 @@ const setup = (initial: Theme, initialSystem: ColorScheme): Setup => {
     saved: mut_saved,
     system: mut_system,
   } as const;
+};
+
+/**
+ * A source that counts who listens to it. Whether anyone subscribes is not on
+ * synstate's public types (#2117), so the double keeps the count itself.
+ */
+const createListenedSource = (): Readonly<{
+  observable: SynstateObservable<undefined>;
+  next: () => void;
+  listening: () => boolean;
+}> => {
+  const change = source<undefined>();
+
+  const mut_count = { value: 0 };
+
+  return {
+    observable: {
+      ...change,
+      subscribe: (onNext, onComplete) => {
+        mut_count.value += 1;
+
+        const subscription = change.subscribe(onNext, onComplete);
+
+        const mut_active = { value: true };
+
+        return {
+          unsubscribe: () => {
+            if (mut_active.value) {
+              mut_active.value = false;
+
+              mut_count.value -= 1;
+            }
+
+            subscription.unsubscribe();
+          },
+        };
+      },
+    },
+    next: () => {
+      change.next(undefined);
+    },
+    listening: () => mut_count.value > 0,
+  };
 };
