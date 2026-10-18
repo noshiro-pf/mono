@@ -67,8 +67,12 @@ export const createMobXThroughputAdapter = (): SpringAdapter => {
         }),
       );
     },
+    // In an action, as MobX's `enforceActions` asks of any write to an
+    // observed value.
     onMouseMove: (pos) => {
-      mut_head?.set(pos);
+      runInAction(() => {
+        mut_head?.set(pos);
+      });
     },
     cleanup: () => {
       for (const dispose of mut_disposers) {
