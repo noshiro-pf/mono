@@ -1,4 +1,5 @@
 export * from './animation-setting.mjs';
+export * from './dag-filter.mjs';
 export * from './dag-show-done.mjs';
 export * from './dag-view-mode.mjs';
 export * from './date-input-value.mjs';

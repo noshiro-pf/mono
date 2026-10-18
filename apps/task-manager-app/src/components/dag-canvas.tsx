@@ -97,6 +97,7 @@ import {
   dagFitRequestsSignal,
   dagLayoutStore,
   dagMembershipSignal,
+  dagOutsideNodesSignal,
   dagSelectionSignal,
   dagSelectionStore,
   dagViewModeSignal,
@@ -225,6 +226,8 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
   const membership = dagMembershipSignal.value;
 
   const selectedIds = dagSelectionSignal.value;
+
+  const outside = dagOutsideNodesSignal.value;
 
   const selection = useMemo(
     (): ReadonlySet<GraphNodeId> => new Set(selectedIds),
@@ -1537,6 +1540,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
                   movable={arrangeable}
                   node={node}
                   opacity={opacity}
+                  outside={outside.has(node.id)}
                   selected={isSelected}
                   view={view}
                 />
@@ -1549,6 +1553,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
                   movable={arrangeable}
                   node={node}
                   opacity={opacity}
+                  outside={outside.has(node.id)}
                   selected={isSelected}
                   view={view}
                 />

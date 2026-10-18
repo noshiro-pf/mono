@@ -9,6 +9,7 @@ import {
 import type { SettingsPanelPlacement } from '../view-model/index.mjs';
 import { AnimationSettingField } from './animation-setting-field.js';
 import { closeOnBackdropClick } from './close-on-backdrop-click.mjs';
+import { DagFilterField } from './dag-filter-field.js';
 import {
   currentSettingsPlacement,
   DAG_SETTINGS_BUTTON_ID,
@@ -19,7 +20,8 @@ import { NodeSizeField } from './node-size-field.js';
 
 /**
  * 「表示設定」: the settings of the graph screen, each a section of the
- * panel's body — whether the done tasks are drawn, the node size and the
+ * panel's body — first what is drawn: the filter by group and label, and
+ * whether the done tasks are drawn, the node size and the
  * animation, which apply to every view mode, and the order of 「アーク」 and 「タイル」, shown in those two only:
  * in 「DAG」 the reader places the nodes, and an order would change nothing.
  *
@@ -62,6 +64,7 @@ export const DagSettingsPanel = memoNamed('DagSettingsPanel', () => {
           </button>
         </div>
         <div className={'settings-panel-body'}>
+          <DagFilterField />
           <DagShowDoneField />
           <NodeSizeField />
           {ordered ? <DiagramSortField /> : undefined}

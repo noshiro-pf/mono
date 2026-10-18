@@ -569,7 +569,39 @@ fieldset {
 }
 
 .dag-settings-button {
+  position: relative;
   margin-left: auto;
+}
+
+/* While the graph is filtered: a dot at the button's top right. */
+.dag-settings-filtered {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--focus);
+}
+
+/* The groups or the labels of 「絞り込み」, inside its fieldset. */
+.dag-filter-choices {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.dag-filter-kind {
+  padding: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.dag-filter-choice {
+  margin: 0;
+  overflow-wrap: anywhere;
 }
 
 /*
@@ -812,6 +844,14 @@ fieldset {
 .dag-node[data-highlight='dim'],
 .dag-edge[data-highlight='dim'] {
   opacity: 0.2;
+}
+
+/*
+ * Outside the filter, drawn for what the nodes in it are joined to: the
+ * parts faint rather than the node, whose own opacity a tween may set.
+ */
+.dag-node[data-outside='true'] > * {
+  opacity: 0.4;
 }
 
 .dag-arc[data-highlight='on'] .dag-edge-line {

@@ -1,4 +1,6 @@
+import { asGroupId } from '../domain/index.mjs';
 import type { View } from '../view-model/index.mjs';
+import { createDagFilterStore } from './dag-filter-store.mjs';
 import { createDagViewModeStore } from './dag-view-mode-store.mjs';
 import { createUiStore } from './ui-store.mjs';
 import { createViewQuerySync } from './view-query-sync.mjs';
@@ -9,6 +11,7 @@ const setup = (
 ): Readonly<{
   ui: ReturnType<typeof createUiStore>;
   mode: ReturnType<typeof createDagViewModeStore>;
+  filter: ReturnType<typeof createDagFilterStore>;
   written: readonly string[];
   stopSync: () => void;
 }> => {
@@ -23,9 +26,14 @@ const setup = (
     save: () => {},
   });
 
+  const filter = createDagFilterStore({
+    initial: { groups: [], labels: [] },
+  });
+
   const stopSync = createViewQuerySync({
     view: ui.view,
     mode: mode.mode,
+    filter: filter.filter,
     read: () => mut_search,
     write: (next) => {
       mut_search = next;
@@ -34,7 +42,7 @@ const setup = (
     },
   }).start();
 
-  return { ui, mode, written: mut_written, stopSync };
+  return { ui, mode, filter, written: mut_written, stopSync };
 };
 
 describe(createViewQuerySync, () => {
@@ -66,6 +74,25 @@ describe(createViewQuerySync, () => {
     mode.set('tile');
 
     assert.deepStrictEqual(written, []);
+  });
+
+  test('writes the graph’s filter while the graph is shown', () => {
+    const { ui, filter, written } = setup('?mode=dag');
+
+    filter.toggleGroup(asGroupId('g1'));
+
+    filter.toggleLabel(undefined);
+
+    ui.setView('list');
+
+    ui.setView('dag');
+
+    assert.deepStrictEqual(written, [
+      '?mode=dag&group=g1',
+      '?mode=dag&group=g1&label=',
+      '?view=list',
+      '?mode=dag&group=g1&label=',
+    ]);
   });
 
   test('stops writing once stopped', () => {

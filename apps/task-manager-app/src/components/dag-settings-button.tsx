@@ -1,6 +1,12 @@
 import { memoNamed } from 'preact-utils';
-import { narrowStore, settingsPanelSignal, uiStore } from '../store/index.mjs';
 import {
+  dagFilterSignal,
+  narrowStore,
+  settingsPanelSignal,
+  uiStore,
+} from '../store/index.mjs';
+import {
+  isDagFilterEmpty,
   settingsPanelPlacement,
   type SettingsPanelPlacement,
 } from '../view-model/index.mjs';
@@ -10,26 +16,41 @@ import {
  * panel of the settings that apply to every view mode
  * (`dag-settings-panel.tsx`), which gives the focus back to it on closing.
  * A gear, and its name beside it where there is room; on a narrow screen
- * the name is for assistive technology alone (`index.css`).
+ * the name is for assistive technology alone (`index.css`). While the
+ * graph is filtered (`dag-filter-field.tsx`), a dot on it says so, since
+ * nothing else on the screen does.
  */
-export const DagSettingsButton = memoNamed('DagSettingsButton', () => (
-  <button
-    aria-expanded={settingsPanelSignal.value !== undefined}
-    aria-haspopup={'dialog'}
-    className={'bp6-button dag-settings-button'}
-    data-e2e={'dag-settings'}
-    id={DAG_SETTINGS_BUTTON_ID}
-    type={'button'}
-    onClick={openSettings}
-  >
-    <span aria-hidden className={'bp6-icon bp6-icon-cog'}>
-      <svg data-icon={'cog'} height={16} viewBox={'0 0 16 16'} width={16}>
-        <path d={COG_16} fillRule={'evenodd'} />
-      </svg>
-    </span>
-    <span className={'dag-settings-button-text'}>{'表示設定'}</span>
-  </button>
-));
+export const DagSettingsButton = memoNamed('DagSettingsButton', () => {
+  const filtered = !isDagFilterEmpty(dagFilterSignal.value);
+
+  return (
+    <button
+      aria-expanded={settingsPanelSignal.value !== undefined}
+      aria-haspopup={'dialog'}
+      className={'bp6-button dag-settings-button'}
+      data-e2e={'dag-settings'}
+      id={DAG_SETTINGS_BUTTON_ID}
+      type={'button'}
+      onClick={openSettings}
+    >
+      <span aria-hidden className={'bp6-icon bp6-icon-cog'}>
+        <svg data-icon={'cog'} height={16} viewBox={'0 0 16 16'} width={16}>
+          <path d={COG_16} fillRule={'evenodd'} />
+        </svg>
+      </span>
+      <span className={'dag-settings-button-text'}>{'表示設定'}</span>
+      {filtered ? (
+        <span
+          className={'dag-settings-filtered'}
+          data-e2e={'dag-filtered'}
+          title={'絞り込み中'}
+        >
+          <span className={'visually-hidden'}>{'（絞り込み中）'}</span>
+        </span>
+      ) : undefined}
+    </button>
+  );
+});
 
 /** For the panel, to hang from it and to give the focus back to it. */
 export const DAG_SETTINGS_BUTTON_ID = 'dag-settings-button';
