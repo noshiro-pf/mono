@@ -176,9 +176,16 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
     extra: { parents },
   });
 
-  registerChild(observable, parents);
+  // Completed parents never update again, so a child created under them is
+  // complete from the start; registering it would only leave a reference in
+  // each parent (#2248).
+  if (parents.every((p) => p.isCompleted)) {
+    dispose();
+  } else {
+    registerChild(observable, parents);
 
-  mut_self = observable;
+    mut_self = observable;
+  }
 
   return observable;
 };
@@ -301,9 +308,16 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     extra: { parents, addDescendant, deleteDescendant },
   });
 
-  registerChild(observable, parents);
+  // Completed parents never update again, so a child created under them is
+  // complete from the start; registering it would only leave a reference in
+  // each parent (#2248).
+  if (parents.every((p) => p.isCompleted)) {
+    dispose();
+  } else {
+    registerChild(observable, parents);
 
-  mut_self = observable;
+    mut_self = observable;
+  }
 
   return observable;
 };
