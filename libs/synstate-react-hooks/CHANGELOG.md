@@ -1,5 +1,19 @@
 # synstate-react-hooks
 
+## 3.4.0
+
+### Patch Changes
+
+- Updated dependencies [3294b9b]
+- Updated dependencies [355ee36]
+- Updated dependencies [3659166]
+- Updated dependencies [37d8fcf]
+- Updated dependencies [6fad4fe]
+- Updated dependencies [93fca29]
+- Updated dependencies [63f9924]
+- Updated dependencies [fa894b6]
+    - synstate@3.4.0
+
 ## 3.3.0
 
 ### Patch Changes
