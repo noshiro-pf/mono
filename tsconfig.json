@@ -15,6 +15,10 @@
     "node_modules",
     "**/node_modules",
     "**/dist",
+    // `./**/configs/**` means a package's `configs/`, not a `src/configs/`
+    // (eslint-config-typed, @sumi-lang/cli) that the package's own
+    // `check:types` already checks under its own settings.
+    "**/src",
     // Legacy monorepo contents, outside the pnpm workspace. Its dependencies
     // are never installed, so the `./**/configs/**/*.ts` include above would
     // otherwise surface hundreds of unresolvable-import errors.

@@ -3339,6 +3339,12 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.3
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.87.0(oxlint-tsgolint@7.0.2003)
+      oxlint-tsgolint:
+        specifier: 'catalog:'
+        version: 7.0.2003
       prettier:
         specifier: 'catalog:'
         version: 3.9.9

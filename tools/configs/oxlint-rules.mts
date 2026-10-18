@@ -321,7 +321,6 @@ export const oxlintConfig = {
     'apps/synstate-docs/src/content.config.ts',
     'languages/sumi/cli/demo/**',
     'languages/sumi/conformance/fixtures/**',
-    'libs/eslint-config-typed/scripts/gen-eslint-rules/eslint.config.gen.mts',
     'libs/ts-codemod-lib/test-code/**',
     'libs/ts-type-forge/configs/minimal-lib.d.mts',
     'libs/ts-type-forge/src/entry-point.mts',
