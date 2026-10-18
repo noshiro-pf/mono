@@ -1,6 +1,6 @@
 import { AlertWithMaxWidth } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { mapOptional } from '../../../utils-ported/index.mjs';
+import { mapNullable } from 'ts-data-forge';
 import { Description } from '../../atoms/index.mjs';
 
 type Props = Readonly<{
@@ -43,7 +43,7 @@ export const ConfirmDialog = memoNamed<Props>(
       onConfirm={onConfirm}
     >
       <p>{message}</p>
-      {mapOptional(description, (s) => (
+      {mapNullable(description, (s) => (
         <Description text={s} />
       ))}
     </AlertWithMaxWidth>

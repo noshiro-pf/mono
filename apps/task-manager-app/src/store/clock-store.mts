@@ -9,7 +9,13 @@
  */
 
 import {
+  createEventEmitter,
   createState,
+  empty,
+  map,
+  merge,
+  switchMap,
+  withInitialValue,
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
@@ -34,38 +40,57 @@ export type ClockStore = Readonly<{
 }>;
 
 export const createClockStore = <H,>(deps: ClockDeps<H>): ClockStore => {
-  const [now, setNow] = createState(deps.now());
+  // While `start` has been called and its stop has not. The listeners are
+  // derived from it, so that stopping disposes them.
+  const [started, setStarted] = createState(false);
+
+  const [timerFired, fireTimer] = createEventEmitter();
+
+  // Once on starting, then on every change of the state and every wake. Read
+  // as part of the update that asks for it, rather than written from a
+  // subscriber of it, which would be a write while that update propagates.
+  const listened = started.pipe(
+    switchMap((isStarted) =>
+      isStarted
+        ? merge([deps.state, deps.wake]).pipe(withInitialValue(undefined))
+        : empty<unknown>(),
+    ),
+  );
+
+  const now = merge([timerFired, listened])
+    .pipe(map(() => deps.now()))
+    .pipe(withInitialValue(deps.now()));
 
   const start = (): (() => void) => {
     let mut_timer: H | undefined = undefined;
 
-    const tick = (): void => {
+    const clearTimer = (): void => {
       if (mut_timer !== undefined) {
         deps.clearTimer(mut_timer);
       }
 
-      const current = deps.now();
-
-      setNow(current);
-
-      mut_timer = deps.setTimer(
-        tick,
-        nextTickDelay(deps.state.getSnapshot().value, current, deps.maxDelayMs),
-      );
+      mut_timer = undefined;
     };
 
-    const stateSubscription = deps.state.subscribe(tick);
+    setStarted(true);
 
-    const wakeSubscription = deps.wake.subscribe(tick);
+    // Subscribed after starting, so that its first call is the time just
+    // read rather than the one the store was made with.
+    const nowSubscription = now.subscribe((current) => {
+      clearTimer();
+
+      mut_timer = deps.setTimer(
+        fireTimer,
+        nextTickDelay(deps.state.getSnapshot().value, current, deps.maxDelayMs),
+      );
+    });
 
     return () => {
-      stateSubscription.unsubscribe();
+      nowSubscription.unsubscribe();
 
-      wakeSubscription.unsubscribe();
+      setStarted(false);
 
-      if (mut_timer !== undefined) {
-        deps.clearTimer(mut_timer);
-      }
+      clearTimer();
     };
   };
 

@@ -1,6 +1,7 @@
 import { pipe } from 'ts-data-forge';
 import { compareHm } from 'ts-fortress-types';
-import { Obj, type Reducer } from '../../utils-ported/index.mjs';
+import type { Reducer } from 'ts-type-forge';
+import { Obj } from '../../utils-ported/index.mjs';
 
 type Action = Readonly<
   | { type: 'end' | 'start'; hm: HoursMinutes }

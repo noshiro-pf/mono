@@ -5,7 +5,7 @@ import {
   createState,
   map,
 } from 'synstate';
-import { Arr, pipe } from 'ts-data-forge';
+import { Arr, Obj, mapNullable, pipe } from 'ts-data-forge';
 import {
   answerDeadlineInitialValue,
   datetimeRangeListInitialValue,
@@ -23,7 +23,6 @@ import type {
   EventScheduleValidation,
   NotificationSettingsWithEmail,
 } from '../../types/index.mjs';
-import { mapOptional, omitKeys } from '../../utils-ported/index.mjs';
 import { mapNoneToUndefined } from '../../utils/index.mjs';
 import { Auth } from '../auth.mjs';
 import { createToggleSectionState } from '../utils/index.mjs';
@@ -102,7 +101,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
       eventScheduleInitialValue.notificationSettings !== 'none',
     initialState: pipe(
       mapNoneToUndefined(eventScheduleInitialValue.notificationSettings),
-    ).map((__v) => mapOptional(__v, (a) => ({ ...a, email: '' }))).value,
+    ).mapNullable((a) => ({ ...a, email: '' })).value,
     valueToBeSetWhenTurnedOff: () => undefined,
     valueToBeSetWhenTurnedOn: () =>
       initialNotificationSettingsWithEmailFilled$.getSnapshot().value,
@@ -193,11 +192,11 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
             notificationSettings:
               notificationSettingsWithEmail === undefined
                 ? 'none'
-                : omitKeys(notificationSettingsWithEmail, ['email']),
+                : Obj.omit(notificationSettingsWithEmail, ['email']),
             timezoneOffsetMinutes:
               EventSchedule.defaultValue.timezoneOffsetMinutes,
             author: {
-              id: mapOptional(fireAuthUser?.uid, UserId.cast) ?? null,
+              id: mapNullable(fireAuthUser?.uid, UserId.cast) ?? null,
               name: UserName.cast(fireAuthUser?.displayName ?? ''),
             },
             archivedBy: [],

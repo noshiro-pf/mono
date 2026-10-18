@@ -6,6 +6,10 @@
 
 import {
   createState,
+  empty,
+  map,
+  switchMap,
+  withInitialValue,
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
@@ -33,8 +37,20 @@ export type ThemeStore = Readonly<{
 export const createThemeStore = (deps: ThemeDeps): ThemeStore => {
   const [theme, setTheme] = createState<Theme>(deps.initial);
 
-  const [system, setSystem, { getSnapshot: getSystem }] =
-    createState<ColorScheme>(deps.system.get());
+  // Listened to only while started; switching away disposes the listener.
+  const [started, setStarted] = createState(false);
+
+  const system = started
+    .pipe(
+      switchMap((isStarted) =>
+        isStarted
+          ? deps.system.change.pipe(map(() => deps.system.get()))
+          : empty<ColorScheme>(),
+      ),
+    )
+    .pipe(withInitialValue(deps.system.get()));
+
+  const getSystem = (): ColorScheme => system.getSnapshot().value;
 
   const choose = (picked: ColorScheme): void => {
     setTheme(chosenTheme(picked, getSystem()));
@@ -47,14 +63,12 @@ export const createThemeStore = (deps: ThemeDeps): ThemeStore => {
       deps.save(next);
     });
 
-    const systemSubscription = deps.system.change.subscribe(() => {
-      setSystem(deps.system.get());
-    });
+    setStarted(true);
 
     return () => {
       themeSubscription.unsubscribe();
 
-      systemSubscription.unsubscribe();
+      setStarted(false);
     };
   };
 

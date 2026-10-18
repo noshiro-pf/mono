@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import type { IMapMapped } from 'ts-data-forge';
+import { type IMapMapped, match } from 'ts-data-forge';
 import {
   calendarDateColor,
   dict,
@@ -8,7 +8,6 @@ import {
   ymd2dayStr,
   ymd2str,
 } from '../../../constants/index.mjs';
-import { match } from '../../../utils-ported/index.mjs';
 import { ymd2day } from '../../../utils/index.mjs';
 
 const dc = dict.common.date;

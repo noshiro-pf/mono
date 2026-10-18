@@ -12,12 +12,11 @@ import {
 } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
 import { useObservableValue } from 'synstate-react-hooks';
-import type { IMapMapped } from 'ts-data-forge';
+import { mapNullable, match, type IMapMapped } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
 import { theNameIsAlreadyUsedFn } from '../../../functions/index.mjs';
 import { useFormError } from '../../../hooks/index.mjs';
 import { AnswerPageStore, Auth } from '../../../store/index.mjs';
-import { mapOptional, match } from '../../../utils-ported/index.mjs';
 import { Description } from '../../atoms/index.mjs';
 import {
   AnswerIconFairPointInput,
@@ -144,7 +143,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
             `}
           >
             <thead>
-              {mapOptional(iconHeader, (a) => (
+              {mapNullable(iconHeader, (a) => (
                 <tr>
                   {batchInputFieldIsOpen ? (
                     <th>

@@ -8,14 +8,6 @@
 /** Does nothing. Used where a callback is required but has nothing to do. */
 import type { FixedLengthTuple } from 'ts-type-forge';
 
-export const noop = (): undefined => undefined;
-
-/** Applies `fn` unless the value is absent. */
-export const mapOptional = <A, B>(
-  value: A | null | undefined,
-  fn: (v: A) => B,
-): B | undefined => (value == null ? undefined : fn(value));
-
 /** Whether the string looks like an email address. */
 export const isEmailString = (str: string): boolean =>
   // eslint-disable-next-line require-unicode-regexp, security/detect-unsafe-regex, no-useless-escape

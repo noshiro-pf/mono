@@ -1,6 +1,7 @@
 import { pipe } from 'ts-data-forge';
+import type { Reducer } from 'ts-type-forge';
 import { dict } from '../../../constants/index.mjs';
-import { type Reducer, isEmailString } from '../../../utils-ported/index.mjs';
+import { isEmailString } from '../../../utils-ported/index.mjs';
 
 export type EmailInputState = Readonly<{
   inputValue: string;

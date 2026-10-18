@@ -1,8 +1,8 @@
 import { css } from '@emotion/react';
 import { memoNamed } from 'react-utils';
+import { mapNullable } from 'ts-data-forge';
 import { dict } from '../../constants/index.mjs';
 import type { EventSettingsPageDiffResult } from '../../functions/index.mjs';
-import { mapOptional } from '../../utils-ported/index.mjs';
 
 type Props = Readonly<{ diff: EventSettingsPageDiffResult }>;
 
@@ -45,7 +45,7 @@ export const EventScheduleDiff = memoNamed<Props>(
         </div>
         <ul data-e2e={'diff-ul'}>
           {list1.map((li) =>
-            mapOptional(diff[li], (s) => (
+            mapNullable(diff[li], (s) => (
               <li key={li}>
                 {dc.items[li]}
                 {s}
@@ -54,7 +54,7 @@ export const EventScheduleDiff = memoNamed<Props>(
           )}
 
           {/* datetimeRangeList */}
-          {mapOptional(diff.datetimeRangeList, (list) => (
+          {mapNullable(diff.datetimeRangeList, (list) => (
             <>
               <li>{dc.items.datetimeRangeList.title}</li>
               <ul>
@@ -75,7 +75,7 @@ export const EventScheduleDiff = memoNamed<Props>(
           ))}
 
           {/* notificationSettings */}
-          {mapOptional(diff.notificationSettings, (list) => (
+          {mapNullable(diff.notificationSettings, (list) => (
             <>
               <li>{dc.items.notificationSettings.title}</li>
               <ul>
@@ -87,7 +87,7 @@ export const EventScheduleDiff = memoNamed<Props>(
           ))}
 
           {list2.map((li) =>
-            mapOptional(diff[li], (s) => (
+            mapNullable(diff[li], (s) => (
               <li key={li}>
                 {dc.items[li]}
                 {s}
@@ -103,7 +103,7 @@ export const EventScheduleDiff = memoNamed<Props>(
             <li>
               {dc.items.answerIcons.title}
               <ul>
-                {mapOptional(diff.answerIcons.good.description, (s) => (
+                {mapNullable(diff.answerIcons.good.description, (s) => (
                   <li>
                     {dc.items.answerIcons.good.title}
                     <ul>
@@ -120,13 +120,13 @@ export const EventScheduleDiff = memoNamed<Props>(
                   <li>
                     {dc.items.answerIcons.fair.title}
                     <ul>
-                      {mapOptional(diff.answerIcons.fair.description, (s) => (
+                      {mapNullable(diff.answerIcons.fair.description, (s) => (
                         <li>
                           {dc.items.answerIcons.fair.description}
                           {s}
                         </li>
                       ))}
-                      {mapOptional(diff.answerIcons.fair.point, (s) => (
+                      {mapNullable(diff.answerIcons.fair.point, (s) => (
                         <li>
                           {dc.items.answerIcons.fair.point}
                           {s}
@@ -136,7 +136,7 @@ export const EventScheduleDiff = memoNamed<Props>(
                   </li>
                 )}
 
-                {mapOptional(diff.answerIcons.poor.description, (s) => (
+                {mapNullable(diff.answerIcons.poor.description, (s) => (
                   <li>
                     {dc.items.answerIcons.poor.title}
                     <ul>

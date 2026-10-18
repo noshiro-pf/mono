@@ -1,6 +1,5 @@
 import { EmailAuthProvider } from 'firebase/auth';
-import { type InitializedObservable, combine, map } from 'synstate';
-import { createBooleanState, createReducer } from 'synstate-react-hooks';
+import { type InitializedObservable, combine, filter, map } from 'synstate';
 import { Result } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { dict } from '../../constants/index.mjs';
@@ -11,6 +10,10 @@ import {
   updatePasswordPageInitialState,
   updatePasswordPageStateReducer,
 } from '../../functions/index.mjs';
+import {
+  createReducerWithActions,
+  createToggleState,
+} from '../../utils/index.mjs';
 import { Auth } from '../auth.mjs';
 import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state.mjs';
 
@@ -18,9 +21,14 @@ const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-const [, dispatch, { state: formState$ }] = createReducer(
+const dialogClosed$ = UpdateUserInfoDialogStore.openingDialogType$.pipe(
+  filter((openingDialog) => openingDialog === undefined),
+);
+
+const [, dispatch, { state: formState$ }] = createReducerWithActions(
   updatePasswordPageStateReducer,
   updatePasswordPageInitialState,
+  [dialogClosed$.pipe(map(() => ({ type: 'reset' }) as const))],
 );
 
 const enterButtonDisabled$ = formState$.pipe(
@@ -40,23 +48,11 @@ const newPasswordFormIntent$: InitializedObservable<Intent> = formState$.pipe(
   ),
 );
 
-const [
-  ,
-  {
-    state: oldPasswordIsOpen$,
-    setFalse: hideOldPassword,
-    toggle: toggleOldPasswordLock,
-  },
-] = createBooleanState(false);
+const { state: oldPasswordIsOpen$, toggle: toggleOldPasswordLock } =
+  createToggleState([dialogClosed$]);
 
-const [
-  ,
-  {
-    state: newPasswordIsOpen$,
-    setFalse: hideNewPassword,
-    toggle: toggleNewPasswordLock,
-  },
-] = createBooleanState(false);
+const { state: newPasswordIsOpen$, toggle: toggleNewPasswordLock } =
+  createToggleState([dialogClosed$]);
 
 const state = combine([
   formState$,
@@ -194,22 +190,6 @@ const inputNewPasswordHandler = (value: string): void => {
 const inputNewPasswordConfirmationHandler = (value: string): void => {
   dispatch({ type: 'inputNewPasswordConfirmation', payload: value });
 };
-
-const resetAllDialogState = (): void => {
-  dispatch({ type: 'reset' });
-
-  hideOldPassword();
-
-  hideNewPassword();
-};
-
-/* subscriptions */
-
-UpdateUserInfoDialogStore.openingDialogType$.subscribe((openingDialog) => {
-  if (openingDialog === undefined) {
-    resetAllDialogState();
-  }
-});
 
 export const UpdatePasswordPageStore = {
   state,

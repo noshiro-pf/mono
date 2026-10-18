@@ -5,7 +5,7 @@ import type { StrictOmit } from 'ts-type-forge';
 
 export type BpSelectProps = StrictOmit<HTMLSelectPropsOriginal, 'options'> &
   Readonly<{
-    onValueChange: (value: string) => void;
+    onValueChange?: (value: string) => void;
     options: Readonly<HTMLSelectPropsOriginal['options']>;
   }>;
 
@@ -17,7 +17,7 @@ export const BpSelect = memoNamed<BpSelectProps>(
     const onChangeHandler = React.useCallback(
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       (ev: React.ChangeEvent<HTMLSelectElement>) => {
-        onValueChange(ev.target.value);
+        onValueChange?.(ev.target.value);
       },
       [onValueChange],
     );

@@ -44,7 +44,7 @@ type RequiredProps = Readonly<{
 
 // Hoisted so the default is not a new function on every render
 // (`react-perf/jsx-no-new-function-as-prop`).
-const noop = (): void => undefined;
+const ignoreClick = (): void => {};
 
 type Props = Partial<OptionalProps> & RequiredProps;
 
@@ -74,7 +74,7 @@ export const CardComponent = memoNamed<Props>(
     showOutline = 'never',
     outlineColor = outlineColorDef.green,
     isClickable = false,
-    onClick = noop,
+    onClick = ignoreClick,
     windowSize,
     onBoundingClientRectChange,
   }: Props) => {

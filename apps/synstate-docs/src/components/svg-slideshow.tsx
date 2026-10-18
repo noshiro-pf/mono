@@ -51,7 +51,7 @@ export const SvgSlideshow = React.memo<Props>((props) => {
           disabled={isFirst}
           style={isFirst ? buttonDisabledStyle : buttonEnabledStyle}
           type={'button'}
-          onClick={isFirst ? noop : goFirst}
+          onClick={isFirst ? undefined : goFirst}
         >
           &#9664;&#9664;
         </button>
@@ -60,7 +60,7 @@ export const SvgSlideshow = React.memo<Props>((props) => {
           disabled={isFirst}
           style={isFirst ? buttonDisabledStyle : buttonEnabledStyle}
           type={'button'}
-          onClick={isFirst ? noop : goPrev}
+          onClick={isFirst ? undefined : goPrev}
         >
           &#9664; {'Prev'}
         </button>
@@ -70,7 +70,7 @@ export const SvgSlideshow = React.memo<Props>((props) => {
           disabled={isLast}
           style={isLast ? buttonDisabledStyle : buttonEnabledStyle}
           type={'button'}
-          onClick={isLast ? noop : goNext}
+          onClick={isLast ? undefined : goNext}
         >
           {'Next '}&#9654;
         </button>
@@ -79,7 +79,7 @@ export const SvgSlideshow = React.memo<Props>((props) => {
           disabled={isLast}
           style={isLast ? buttonDisabledStyle : buttonEnabledStyle}
           type={'button'}
-          onClick={isLast ? noop : goLast}
+          onClick={isLast ? undefined : goLast}
         >
           &#9654;&#9654;
         </button>
@@ -141,5 +141,3 @@ const counterStyle: React.CSSProperties = {
   minWidth: '4rem',
   textAlign: 'center',
 } as const;
-
-const noop = (): void => {};

@@ -9,7 +9,13 @@
 import {
   combine,
   createState,
+  createValueEmitter,
+  empty,
+  filter,
   map,
+  merge,
+  switchMap,
+  withInitialValue,
   type InitializedObservable,
 } from 'synstate';
 import { Arr } from 'ts-data-forge';
@@ -40,7 +46,25 @@ export type DagSelectionStore = Readonly<{
 export const createDagSelectionStore = (
   deps: DagSelectionDeps,
 ): DagSelectionStore => {
-  const [chosen, setChosen] = createState<readonly GraphNodeId[]>([]);
+  // While `start` has been called and its stop has not; `active` is
+  // followed only then.
+  const [started, setStarted] = createState(false);
+
+  const [chose, setChosen] = createValueEmitter<readonly GraphNodeId[]>();
+
+  const dropped = started.pipe(
+    switchMap((isStarted) =>
+      isStarted
+        ? deps.active
+            .pipe(filter((active) => !active))
+            .pipe(map(() => NONE_CHOSEN))
+        : empty<readonly GraphNodeId[]>(),
+    ),
+  );
+
+  // Dropped as part of the update that turns `active` off, rather than by a
+  // subscriber of it, which would be a write while that update propagates.
+  const chosen = merge([chose, dropped]).pipe(withInitialValue(NONE_CHOSEN));
 
   const selected = combine([chosen, deps.state, deps.hidden]).pipe(
     map(([ids, state, hidden]) => {
@@ -53,7 +77,7 @@ export const createDagSelectionStore = (
   );
 
   const clear = (): void => {
-    setChosen([]);
+    setChosen(NONE_CHOSEN);
   };
 
   return {
@@ -63,15 +87,13 @@ export const createDagSelectionStore = (
     },
     clear,
     start: () => {
-      const subscription = deps.active.subscribe((active) => {
-        if (!active) {
-          clear();
-        }
-      });
+      setStarted(true);
 
       return () => {
-        subscription.unsubscribe();
+        setStarted(false);
       };
     },
   };
 };
+
+const NONE_CHOSEN: readonly GraphNodeId[] = [] as const;

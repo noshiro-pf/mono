@@ -111,6 +111,28 @@ One component per file.
       (`@typescript-eslint/require-array-sort-compare`).
     - No operations that easily throw, such as a `reduce` without an initial
       value or an unchecked division (see "Troubleshooting").
+- Branching on a kind
+    - When a reducer or any other function branches on the kind of its input
+      (an action's `type`, a string literal union), name every kind as a
+      case of its own. An `if` or a ternary that tests one kind and leaves
+      the rest to `else` does not say which kinds `else` was meant for, and
+      a kind added later lands there silently.
+    - For a string literal union, use `match` from ts-data-forge with every
+      member as a key: it fails to type-check when a member is missing or
+      an extra key is given, and needs no default.
+
+        ```ts
+        (isOn: boolean, action: 'reset' | 'toggle') =>
+            match(action, { toggle: !isOn, reset: false });
+        ```
+
+    - For a discriminated union whose cases read their own payload, use
+      `switch` with a `case` for every member and no `default`
+      (`@typescript-eslint/switch-exhaustiveness-check`): `match` looks a
+      value up and cannot narrow `action` inside a case. Where a set of
+      kinds is handed on whole, such as another reducer's actions, wrap it
+      as one kind (`{ type: 'filter'; action: FilterAction }`) rather than
+      listing its members.
 - Operators
     - No `+foo` or `'' + foo` for coercion (`no-implicit-coercion`), and no
       `'1' + 2` (`@typescript-eslint/restrict-plus-operands`).

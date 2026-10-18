@@ -1,11 +1,11 @@
 import {
   type InitializedObservable,
   combine,
+  filter,
   map,
   withCurrentValueFrom,
 } from 'synstate';
-import { createReducer } from 'synstate-react-hooks';
-import { Result } from 'ts-data-forge';
+import { Result, isNotUndefined } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { dict } from '../../constants/index.mjs';
 import {
@@ -15,6 +15,7 @@ import {
   updateDisplayNamePageInitialState,
   updateDisplayNamePageStateReducer,
 } from '../../functions/index.mjs';
+import { createReducerWithActions } from '../../utils/index.mjs';
 import { Auth } from '../auth.mjs';
 import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state.mjs';
 
@@ -22,9 +23,35 @@ const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-const [, dispatch, { state: formState$ }] = createReducer(
+/** Cleared when the dialog closes, and filled in when this one opens. */
+const dialogActions$ = UpdateUserInfoDialogStore.openingDialogType$
+  .pipe(withCurrentValueFrom(Auth.fireAuthUser$))
+  .pipe(
+    map(([openingDialog, fireAuthUser]) => {
+      switch (openingDialog) {
+        case undefined:
+          return { type: 'reset' } as const;
+
+        case 'updateDisplayName':
+          return {
+            type: 'inputDisplayName',
+            payload: fireAuthUser?.displayName ?? '',
+          } as const;
+
+        case 'deleteAccount':
+        case 'deleteAccountCreatedWithGoogle':
+        case 'updateEmail':
+        case 'updatePassword':
+          return undefined;
+      }
+    }),
+  )
+  .pipe(filter(isNotUndefined));
+
+const [, dispatch, { state: formState$ }] = createReducerWithActions(
   updateDisplayNamePageStateReducer,
   updateDisplayNamePageInitialState,
+  [dialogActions$],
 );
 
 const enterButtonDisabled$ = formState$.pipe(
@@ -105,37 +132,6 @@ const enterClickHandler = (): void => {
 const inputDisplayNameHandler = (value: string): void => {
   dispatch({ type: 'inputDisplayName', payload: value });
 };
-
-const resetAllDialogState = (): void => {
-  dispatch({ type: 'reset' });
-};
-
-/* subscriptions */
-
-UpdateUserInfoDialogStore.openingDialogType$
-  .pipe(withCurrentValueFrom(Auth.fireAuthUser$))
-  .subscribe(([openingDialog, fireAuthUser]) => {
-    switch (openingDialog) {
-      case undefined:
-        resetAllDialogState();
-
-        break;
-
-      case 'updateDisplayName':
-        dispatch({
-          type: 'inputDisplayName',
-          payload: fireAuthUser?.displayName ?? '',
-        });
-
-        break;
-
-      case 'deleteAccount':
-      case 'deleteAccountCreatedWithGoogle':
-      case 'updateEmail':
-      case 'updatePassword':
-        break;
-    }
-  });
 
 export const UpdateDisplayNamePageStore = {
   state,

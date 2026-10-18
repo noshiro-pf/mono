@@ -1,5 +1,4 @@
-import { type InitializedObservable, combine, map } from 'synstate';
-import { createBooleanState, createReducer } from 'synstate-react-hooks';
+import { type InitializedObservable, combine, filter, map } from 'synstate';
 import { Result } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { dict } from '../../constants/index.mjs';
@@ -10,6 +9,7 @@ import {
   emailInputStateReducer,
   showToast,
 } from '../../functions/index.mjs';
+import { createReducerWithActions } from '../../utils/index.mjs';
 import { Auth } from '../auth.mjs';
 import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state.mjs';
 
@@ -17,9 +17,14 @@ const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-const [, dispatch, { state: formState$ }] = createReducer(
+const dialogClosed$ = UpdateUserInfoDialogStore.openingDialogType$.pipe(
+  filter((openingDialog) => openingDialog === undefined),
+);
+
+const [, dispatch, { state: formState$ }] = createReducerWithActions(
   emailInputStateReducer,
   emailInputInitialState,
+  [dialogClosed$.pipe(map(() => ({ type: 'reset' }) as const))],
 );
 
 const enterButtonDisabled$ = combine([formState$, Auth.fireAuthUser$]).pipe(
@@ -28,14 +33,20 @@ const enterButtonDisabled$ = combine([formState$, Auth.fireAuthUser$]).pipe(
   ),
 );
 
-const [
-  ,
-  {
-    state: isWaitingResponseState,
-    setFalse: setFalseIsWaitingResponse,
-    setTrue: setTrueIsWaitingResponse,
-  },
-] = createBooleanState(false);
+const [, dispatchIsWaitingResponse, { state: isWaitingResponseState }] =
+  createReducerWithActions(
+    (_: boolean, isWaitingResponse: boolean) => isWaitingResponse,
+    false,
+    [dialogClosed$.pipe(map(() => false))],
+  );
+
+const setTrueIsWaitingResponse = (): void => {
+  dispatchIsWaitingResponse(true);
+};
+
+const setFalseIsWaitingResponse = (): void => {
+  dispatchIsWaitingResponse(false);
+};
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.pipe(
   map((st) => (st.error === undefined ? 'primary' : 'danger')),
@@ -155,20 +166,6 @@ const enterClickHandler = (): void => {
 const inputEmailHandler = (value: string): void => {
   dispatch({ type: 'input', payload: value });
 };
-
-const resetAllDialogState = (): void => {
-  dispatch({ type: 'reset' });
-
-  setFalseIsWaitingResponse();
-};
-
-/* subscriptions */
-
-UpdateUserInfoDialogStore.openingDialogType$.subscribe((openingDialog) => {
-  if (openingDialog === undefined) {
-    resetAllDialogState();
-  }
-});
 
 export const DeleteAccountCreatedWithGoogleStore = {
   state,

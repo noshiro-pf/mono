@@ -1,19 +1,21 @@
 import {
-  combine,
   createEventEmitter,
   createState,
+  debounce,
   filter,
+  map,
   merge,
   throttle,
   unwrapResultOk,
+  withCurrentValueFrom,
   withInitialValue,
   type InitializedObservable,
 } from 'synstate';
-import { createBooleanState } from 'synstate-react-hooks';
+import { useObservableValue } from 'synstate-react-hooks';
 import { Result, isNotUndefined } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { fetchThrottleTime } from '../../constants/index.mjs';
-import { noop } from '../../utils-ported/index.mjs';
+import { createReducerWithActions } from '../../utils/index.mjs';
 import { Router } from '../router.mjs';
 import { EventScheduleStore } from './event-schedule.mjs';
 
@@ -35,11 +37,37 @@ const [answersResult$, setAnswersResult] = createState<
 
 const result$ = answersResult$;
 
-const [useRefreshButtonIsLoading, { setState: setRefreshButtonIsLoading }] =
-  createBooleanState(false);
+// Read on request (the first is made below), and again whenever the page moves
+// to another event.
+const fetchAnswersStarted$ = merge([
+  fetchAnswersThrottled$,
+  refetchAnswersAfterWrite$,
+  Router.eventId$,
+])
+  .pipe(withCurrentValueFrom(Router.eventId$))
+  .pipe(map(([_, eventId]) => eventId))
+  .pipe(filter(isNotUndefined));
 
-const [useRefreshButtonIsDisabled, { setState: setRefreshButtonIsDisabled }] =
-  createBooleanState(false);
+const [useRefreshButtonIsLoading, setRefreshButtonIsLoading] =
+  createReducerWithActions(
+    (_: boolean, isLoading: boolean) => isLoading,
+    false,
+    [
+      fetchAnswersStarted$.pipe(map(() => true)),
+      answersResult$.pipe(map(() => false)),
+    ],
+  );
+
+/** Disabled for `fetchThrottleTime` after each read the button can ask for. */
+const refreshButtonIsDisabled$ = merge([
+  fetchAnswersThrottled$.pipe(map(() => true)),
+  fetchAnswersThrottled$
+    .pipe(debounce(fetchThrottleTime))
+    .pipe(map(() => false)),
+]).pipe(withInitialValue(false));
+
+const useRefreshButtonIsDisabled = (): boolean =>
+  useObservableValue(refreshButtonIsDisabled$);
 
 const refreshAnswers = (): void => {
   EventScheduleStore.fetchEventSchedule();
@@ -51,24 +79,13 @@ const refreshAnswers = (): void => {
 
 /* subscriptions */
 
-combine([
-  merge([fetchAnswersThrottled$, refetchAnswersAfterWrite$]),
-  Router.eventId$,
-]).subscribe(([_, eventId]) => {
-  if (eventId === undefined) {
-    return;
-  }
-
-  setRefreshButtonIsLoading(true);
-
+fetchAnswersStarted$.subscribe((eventId) => {
   api.answers
     .fetchList(eventId)
     .then((result) => {
       setAnswersResult(result);
-
-      setRefreshButtonIsLoading(false);
     })
-    .catch(noop);
+    .catch(() => {});
 });
 
 result$.subscribe((e) => {
@@ -78,21 +95,9 @@ result$.subscribe((e) => {
   }
 });
 
-{
-  let mut_timer: TimerId | undefined = undefined;
-
-  fetchAnswersThrottled$.subscribe(() => {
-    if (mut_timer !== undefined) {
-      clearTimeout(mut_timer);
-    }
-
-    setRefreshButtonIsDisabled(true);
-
-    mut_timer = setTimeout(() => {
-      setRefreshButtonIsDisabled(false);
-    }, fetchThrottleTime);
-  });
-}
+// The first read, asked for as the page's own requests are, so that the
+// throttle drops the one the page makes as it mounts.
+fetchAnswers();
 
 const answers$: InitializedObservable<readonly Answer[] | undefined> = result$
   .pipe(filter(isNotUndefined))

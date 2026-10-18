@@ -3,12 +3,19 @@
  *
  * Read from storage once, when the store is made, so that a reader who
  * ticked "remember" does not have to paste it again. After that the store
- * is the one copy that is changed, and storage follows it: `start`
- * subscribes to `token` and writes each change through `token.mts`, so no
- * action has to remember to write both.
+ * is the one copy that is changed, and storage follows it: once started,
+ * each change of `token` is written through `token.mts`, so no action has
+ * to remember to write both.
  */
 
-import { createState, type InitializedObservable } from 'synstate';
+import {
+  createState,
+  empty,
+  map,
+  switchMap,
+  withInitialValue,
+  type InitializedObservable,
+} from 'synstate';
 import { Result } from 'ts-data-forge';
 import {
   forgetToken,
@@ -43,7 +50,21 @@ export const createTokenStore = (stores: TokenStores): TokenStore => {
     readToken(stores),
   );
 
-  const [saveError, setSaveError] = createState<string | undefined>(undefined);
+  // Written to storage only while started; switching away stops it.
+  const [started, setStarted] = createState(false);
+
+  // What writing each change of `token` to storage said. The first one is the
+  // value just read from storage, and writing it back is a write of what is
+  // already there.
+  const saveError = started
+    .pipe(
+      switchMap((isStarted) =>
+        isStarted
+          ? token.pipe(map((next) => persist(next, stores)))
+          : empty<string | undefined>(),
+      ),
+    )
+    .pipe(withInitialValue(undefined));
 
   const [typed, setTypedState, { getSnapshot: getTyped }] = createState('');
 
@@ -82,24 +103,10 @@ export const createTokenStore = (stores: TokenStores): TokenStore => {
   };
 
   const start = (): (() => void) => {
-    // The first call is the value just read from storage, and writing it
-    // back is a write of what is already there.
-    const subscription = token.subscribe((next) => {
-      if (next === undefined) {
-        forgetToken(stores);
-
-        setSaveError(undefined);
-
-        return;
-      }
-
-      const saved = saveToken(next, stores);
-
-      setSaveError(Result.isErr(saved) ? saved.value : undefined);
-    });
+    setStarted(true);
 
     return () => {
-      subscription.unsubscribe();
+      setStarted(false);
     };
   };
 
@@ -114,4 +121,20 @@ export const createTokenStore = (stores: TokenStores): TokenStore => {
     forget,
     start,
   };
+};
+
+/** Writes `next` to storage, and returns what went wrong, if anything. */
+const persist = (
+  next: StoredToken | undefined,
+  stores: TokenStores,
+): string | undefined => {
+  if (next === undefined) {
+    forgetToken(stores);
+
+    return undefined;
+  }
+
+  const saved = saveToken(next, stores);
+
+  return Result.isErr(saved) ? saved.value : undefined;
 };

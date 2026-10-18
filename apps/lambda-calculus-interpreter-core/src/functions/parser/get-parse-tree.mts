@@ -8,7 +8,6 @@ import {
   Uint32,
 } from 'ts-data-forge';
 import type { LambdaTerm } from '../../types/index.mjs';
-import { hasMinLength } from '../../utils/index.mjs';
 import { isVariable } from '../is-variable.mjs';
 import { tokensRepresentsLambdaTerm } from './token-list-is-lambda-term.mjs';
 
@@ -31,7 +30,7 @@ export const getParseTree = (
 
   /* (lambda x.e)? */
   if (
-    hasMinLength(tokens, 6) &&
+    Arr.isMinLengthTuple(6, tokens) &&
     tokens[0] === '(' &&
     tokens[1] === 'lambda' &&
     isVariable(tokens[2]) &&
@@ -46,7 +45,7 @@ export const getParseTree = (
 
   /* (e e)? */
   if (
-    hasMinLength(tokens, 3) &&
+    Arr.isMinLengthTuple(3, tokens) &&
     tokens[0] === '(' &&
     Optional.toNullable(Arr.last(tokens)) === ')'
   ) {

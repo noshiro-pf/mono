@@ -1,7 +1,12 @@
-import { type IMapMapped, type ISetMapped, Optional } from 'ts-data-forge';
+import {
+  type IMapMapped,
+  type ISetMapped,
+  Optional,
+  match,
+} from 'ts-data-forge';
+import type { Reducer } from 'ts-type-forge';
 import { defaultIconPoint } from '../../constants/index.mjs';
 import type { AnswerSelectionValue } from '../../types/index.mjs';
-import { type Reducer, match } from '../../utils-ported/index.mjs';
 
 export type AnswerSelectionReducerAction = Readonly<
   | {
@@ -48,7 +53,7 @@ export const answerSelectionReducer: Reducer<
           )
         : state.set(action.datetimeRange, {
             iconId: action.icon,
-            point: match(action.icon, defaultIconPoint),
+            point: defaultIconPoint[action.icon],
             comment: '',
           });
 
@@ -98,7 +103,7 @@ export const answerSelectionReducer: Reducer<
               }
             : {
                 iconId: action.icon,
-                point: match(action.icon, defaultIconPoint),
+                point: defaultIconPoint[action.icon],
                 comment: Optional.toNullable(state.get(d))?.comment ?? '',
               },
         })),

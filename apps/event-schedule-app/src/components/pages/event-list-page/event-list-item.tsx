@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import type { EventListItem } from 'event-schedule-app-shared';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { Arr, Optional } from 'ts-data-forge';
+import { Arr, match, Optional } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
 import {
   dict,
@@ -14,7 +14,6 @@ import {
 } from '../../../constants/index.mjs';
 import { eventIsAfterDeadline } from '../../../functions/index.mjs';
 import { Router } from '../../../store/index.mjs';
-import { match } from '../../../utils-ported/index.mjs';
 import { SectionTitle } from '../../atoms/index.mjs';
 import { ArchiveEventButton } from '../../organisms/index.mjs';
 

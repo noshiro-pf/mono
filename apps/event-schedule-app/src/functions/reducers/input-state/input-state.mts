@@ -1,5 +1,5 @@
 import { pipe } from 'ts-data-forge';
-import type { Reducer } from '../../../utils-ported/index.mjs';
+import type { Reducer } from 'ts-type-forge';
 
 export type InputState = Readonly<{
   inputValue: string;

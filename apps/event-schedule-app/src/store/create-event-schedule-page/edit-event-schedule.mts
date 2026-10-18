@@ -18,7 +18,6 @@ import {
   showToast,
   type EventSettingsPageDiffResult,
 } from '../../functions/index.mjs';
-import { noop } from '../../utils-ported/index.mjs';
 import { AnswersStore, EventScheduleStore } from '../fetching-state/index.mjs';
 import { Router } from '../router.mjs';
 import { createEventScheduleSettingStore } from './event-schedule-setting-common.mjs';
@@ -207,7 +206,7 @@ const saveToDatabase = async (): Promise<void> => {
 const onEditEventClickPromise = saveToDatabase;
 
 const onEditEventClick = (): void => {
-  saveToDatabase().catch(noop);
+  saveToDatabase().catch(() => {});
 };
 
 const [

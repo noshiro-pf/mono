@@ -20,6 +20,7 @@ import {
   Result,
   fastDeepEqual,
   isNotUndefined,
+  mapNullable,
   pipe,
 } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
@@ -37,7 +38,8 @@ import {
   type CalendarCurrentPageReducerState,
 } from '../../functions/index.mjs';
 import type { AnswerSelectionValue } from '../../types/index.mjs';
-import { Obj, mapOptional, noop } from '../../utils-ported/index.mjs';
+import { Obj } from '../../utils-ported/index.mjs';
+import { createReducerWithActions } from '../../utils/index.mjs';
 import { Auth } from '../auth.mjs';
 import { AnswersStore, eventSchedule$ } from '../fetching-state/index.mjs';
 import { Router } from '../router.mjs';
@@ -64,15 +66,51 @@ const [
   { getSnapshot: getAnswerBeingEditedSectionStateSnapshot },
 ] = createState<'creating' | 'editing' | 'hidden'>('hidden');
 
+const emptyAnswerSelection$: InitializedObservable<Answer> = eventSchedule$
+  .pipe(filter(isNotUndefined))
+  .pipe(
+    map((e) => ({
+      ...Answer.defaultValue,
+      selection: e.datetimeRangeList.map(
+        (d) =>
+          ({
+            datetimeRange: d,
+            iconId: 'none',
+            point: 0,
+            comment: '',
+          }) as const,
+      ),
+    })),
+  )
+  .pipe(skipIfNoChange(fastDeepEqual))
+  .pipe(withInitialValue(Answer.defaultValue));
+
+const [resetAnswerBeingEditedAction$, resetAnswerBeingEdited] =
+  createEventEmitter();
+
 const [
   useAnswerBeingEdited,
-  setAnswerBeingEdited,
-  {
-    state: answerBeingEdited$,
-    getSnapshot: getAnswerBeingEditedSnapshot,
-    updateState: updateAnswerBeingEdited,
-  },
-] = createState(Answer.defaultValue);
+  updateAnswerBeingEdited,
+  { state: answerBeingEdited$, getSnapshot: getAnswerBeingEditedSnapshot },
+] = createReducerWithActions(
+  (answer: Answer, update: (prev: Answer) => Answer) => update(answer),
+  Answer.defaultValue,
+  [
+    // Cleared to the event's empty answer by `resetAnswerBeingEdited`, and
+    // again whenever the event changes after that.
+    combine([emptyAnswerSelection$, resetAnswerBeingEditedAction$]).pipe(
+      map(
+        ([emptyAnswer]) =>
+          (_: Answer) =>
+            emptyAnswer,
+      ),
+    ),
+  ],
+);
+
+const setAnswerBeingEdited = (answer: Answer): void => {
+  updateAnswerBeingEdited(() => answer);
+};
 
 const setAnswerBeingEditedSectionState = (
   nextState: 'creating' | 'editing' | 'hidden',
@@ -88,12 +126,9 @@ const setAnswerBeingEditedSectionState = (
 
   updateAnswerBeingEdited((ans) => ({
     ...ans,
-    user: { ...ans.user, id: mapOptional(user?.uid, UserId.cast) ?? null },
+    user: { ...ans.user, id: mapNullable(user?.uid, UserId.cast) ?? null },
   }));
 };
-
-const [resetAnswerBeingEditedAction$, resetAnswerBeingEdited] =
-  createEventEmitter();
 
 const [
   useCheckboxesState,
@@ -147,25 +182,6 @@ const setYearMonth$: SynstateObservable<CalendarCurrentPageReducerState> =
       ),
     )
     .pipe(filter(isNotUndefined));
-
-const emptyAnswerSelection$: InitializedObservable<Answer> = eventSchedule$
-  .pipe(filter(isNotUndefined))
-  .pipe(
-    map((e) => ({
-      ...Answer.defaultValue,
-      selection: e.datetimeRangeList.map(
-        (d) =>
-          ({
-            datetimeRange: d,
-            iconId: 'none',
-            point: 0,
-            comment: '',
-          }) as const,
-      ),
-    })),
-  )
-  .pipe(skipIfNoChange(fastDeepEqual))
-  .pipe(withInitialValue(Answer.defaultValue));
 
 const theNameIsAlreadyUsed$: InitializedObservable<boolean> = combine([
   AnswersStore.answers$,
@@ -476,16 +492,10 @@ const toggleProtectedSectionImpl = (user: FireAuthUser | undefined): void => {
   updateAnswerBeingEdited((ans) => ({
     ...ans,
     user: Obj.update(ans.user, 'id', (uid) =>
-      uid === null ? (mapOptional(user?.uid, UserId.cast) ?? null) : null,
+      uid === null ? (mapNullable(user?.uid, UserId.cast) ?? null) : null,
     ),
   }));
 };
-
-/* subscriptions */
-
-combine([emptyAnswerSelection$, resetAnswerBeingEditedAction$])
-  .pipe(map(([x, _]) => x))
-  .subscribe(setAnswerBeingEdited);
 
 /* callbacks using subscribed values */
 
@@ -513,7 +523,7 @@ const onSubmitAnswerClick = (): void => {
     Router.eventId$.getSnapshot().value,
     getAnswerBeingEditedSnapshot(),
     getAnswerBeingEditedSectionStateSnapshot(),
-  ).catch(noop);
+  ).catch(() => {});
 };
 
 const onSubmitEmptyAnswerClick = (): Promise<void> =>
@@ -561,8 +571,8 @@ const iconHeader$: InitializedObservable<
     >
   | undefined
 > = eventSchedule$.pipe(
-  map((e) =>
-    mapOptional(e, (eventSchedule) => ({
+  map(
+    mapNullable((eventSchedule) => ({
       good: {
         iconDescription: eventSchedule.answerIcons.good.description,
         onClick: () => {
@@ -615,7 +625,7 @@ const answerBeingEditedList$: InitializedObservable<
 > = combine([eventSchedule$, answerSelectionMap$]).pipe(
   map(
     ([e, answerSelectionMap]) =>
-      mapOptional(e, (eventSchedule) =>
+      mapNullable(e, (eventSchedule) =>
         eventSchedule.datetimeRangeList.map(
           (d) =>
             ({

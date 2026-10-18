@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { noop, NumericInputView } from 'react-blueprintjs-utils';
+import { NumericInputView } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
 import { InputGroupView } from './components/index.mjs';
 
@@ -24,16 +24,16 @@ export const App = memoNamed('App', () => (
 
     <h2>{'InputGroup'}</h2>
     <MarginBox>
-      <InputGroupView value={'aaa'} onChange={noop} />
+      <InputGroupView value={'aaa'} onChange={ignoreChange} />
     </MarginBox>
     <MarginBox>
-      <InputGroupView disabled value={'aaa'} onChange={noop} />
+      <InputGroupView disabled value={'aaa'} onChange={ignoreChange} />
     </MarginBox>
     <MarginBox>
       <InputGroupView
         placeholder={'placeholder'}
         value={undefined}
-        onChange={noop}
+        onChange={ignoreChange}
       />
     </MarginBox>
   </div>
@@ -46,3 +46,6 @@ const MarginBox = styled.div`
     margin: 10px;
   }
 `;
+
+/** These inputs are controlled and fixed, so a change is dropped. */
+const ignoreChange = (): void => {};

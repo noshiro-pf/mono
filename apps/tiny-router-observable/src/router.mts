@@ -59,14 +59,35 @@ export type Router = Readonly<{
   }>;
 }>;
 
+export type RouterOptions = Readonly<{
+  /**
+   * The path to replace `pathname` with, or `undefined` to keep it. It is
+   * applied to every URL before `state` shows it — the first one included —
+   * so that nobody has to redirect from a subscriber of `state`, which would
+   * be a write while its update propagates.
+   */
+  redirect?: (pathname: string) => string | undefined;
+}>;
+
 /**
  * Creates pathname Observable and queryParams Observable, and starts listening
  * URL changes.
  */
-export const createRouter = (): Router => {
+export const createRouter = (routerOptions?: RouterOptions): Router => {
   const getCurrentUrl = (): URL => new URL(window.location.href);
 
-  const [url$, setUrl] = createState<URL>(getCurrentUrl());
+  /** The current URL, redirected first if `routerOptions.redirect` asks for it. */
+  const readUrl = (): URL => {
+    const to = routerOptions?.redirect?.(window.location.pathname);
+
+    if (to !== undefined) {
+      window.history.replaceState({}, '', withSlash(to));
+    }
+
+    return getCurrentUrl();
+  };
+
+  const [url$, setUrl] = createState<URL>(readUrl());
 
   const state = url$.pipe(
     map((a) => ({
@@ -77,7 +98,7 @@ export const createRouter = (): Router => {
   );
 
   const updateState = (): void => {
-    setUrl(getCurrentUrl());
+    setUrl(readUrl());
   };
 
   const updateQueryParams = (

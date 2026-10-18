@@ -9,7 +9,6 @@ import {
   BpTimePicker,
 } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { noop } from '../../utils-ported/index.mjs';
 import { clog } from '../../utils/index.mjs';
 import {
   CalendarIcon,
@@ -107,7 +106,7 @@ export const UiPartsTest = memoNamed('UiPartsTest', () => {
         />
       </PadWrapper>
       <PadWrapper>
-        <BpSelect options={options} onValueChange={noop} />
+        <BpSelect options={options} />
       </PadWrapper>
       <PadWrapper>
         <BpSwitch

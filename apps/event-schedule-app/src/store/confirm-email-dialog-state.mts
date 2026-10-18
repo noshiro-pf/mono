@@ -1,5 +1,10 @@
-import { type InitializedObservable, combine, map } from 'synstate';
-import { createBooleanState, createReducer } from 'synstate-react-hooks';
+import {
+  type InitializedObservable,
+  combine,
+  filter,
+  map,
+  merge,
+} from 'synstate';
 import { Result } from 'ts-data-forge';
 import { api } from '../api/index.mjs';
 import { dict } from '../constants/index.mjs';
@@ -10,6 +15,7 @@ import {
   createToaster,
   showToast,
 } from '../functions/index.mjs';
+import { createReducerWithActions } from '../utils/index.mjs';
 import { EditEventScheduleStore } from './create-event-schedule-page/index.mjs';
 import { eventSchedule$ } from './fetching-state/index.mjs';
 import { Router } from './router.mjs';
@@ -18,10 +24,31 @@ const dc = dict.answerPage.eventInfo.verifyEmailDialog;
 
 const toast = createToaster();
 
+const leftEditPage$ = Router.isRoute.editPage$.pipe(
+  filter((isEditPage) => !isEditPage),
+);
+
+const [, dispatchEmailIsVerified, { state: emailIsVerified$ }] =
+  createReducerWithActions((_: boolean, verified: boolean) => verified, false, [
+    leftEditPage$.pipe(map(() => false)),
+  ]);
+
+const isOpen$ = combine([emailIsVerified$, eventSchedule$]).pipe(
+  map(
+    ([verified, eventSchedule]) =>
+      eventSchedule?.notificationSettings !== 'none' && !verified,
+  ),
+);
+
 const [, dispatch, { state: formState$, getSnapshot: getFormStateSnapshot }] =
-  createReducer(
+  createReducerWithActions(
     confirmEmailDialogFormStateReducer,
     confirmEmailDialogFormInitialState,
+    [
+      merge([leftEditPage$, isOpen$.pipe(filter((isOpen) => !isOpen))]).pipe(
+        map(() => ({ type: 'reset' }) as const),
+      ),
+    ],
   );
 
 const enterButtonDisabled$ = formState$.pipe(
@@ -30,18 +57,6 @@ const enterButtonDisabled$ = formState$.pipe(
 
 const emailFormIntent$: InitializedObservable<Intent> = formState$.pipe(
   map((st) => (st.email.error === undefined ? 'primary' : 'danger')),
-);
-
-// `createBooleanState` returns `[useCurrentValue, utils]`; only the utils are
-// wanted here, and they carry the `state` / `setTrue` / `resetState` this file
-// already used.
-const [, emailIsVerified] = createBooleanState(false);
-
-const isOpen$ = combine([emailIsVerified.state, eventSchedule$]).pipe(
-  map(
-    ([verified, eventSchedule]) =>
-      eventSchedule?.notificationSettings !== 'none' && !verified,
-  ),
 );
 
 const state = combine([
@@ -91,7 +106,7 @@ const submit = async (eventId: string, email: string): Promise<void> => {
 
       showToast({ toast, message: dc.success, intent: 'success' });
 
-      emailIsVerified.setTrue();
+      dispatchEmailIsVerified(true);
 
       break;
   }
@@ -129,26 +144,6 @@ const inputEmailHandler = (value: string): void => {
 const resetInput = (): void => {
   dispatch({ type: 'reset' });
 };
-
-const resetAllState = (): void => {
-  resetInput();
-
-  emailIsVerified.resetState();
-};
-
-/* subscriptions */
-
-Router.isRoute.editPage$.subscribe((isEditPage) => {
-  if (!isEditPage) {
-    resetAllState();
-  }
-});
-
-isOpen$.subscribe((isOpen) => {
-  if (!isOpen) {
-    resetInput();
-  }
-});
 
 export const ConfirmEmailDialogStore = {
   state,

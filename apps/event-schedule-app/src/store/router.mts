@@ -10,7 +10,10 @@ import { createRouter } from 'tiny-router-observable';
 import { Optional } from 'ts-data-forge';
 import { Routes } from '../constants/index.mjs';
 
-const router_ = createRouter();
+const router_ = createRouter({
+  redirect: (pathname) =>
+    Optional.toNullable(Routes.redirectRules.get(pathname)),
+});
 
 const pathSegments$: InitializedObservable<readonly string[]> =
   router_.state.pipe(map((state) => state.pathSegments));
@@ -86,11 +89,3 @@ export const Router = {
     };
   },
 } as const;
-
-Router.state.subscribe(({ pathname }) => {
-  const to = Optional.toNullable(Routes.redirectRules.get(pathname));
-
-  if (to !== undefined) {
-    Router.redirect(to);
-  }
-});

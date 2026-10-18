@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { SwitchWithoutLabelStyled } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { mapOptional } from '../../utils-ported/index.mjs';
+import { mapNullable } from 'ts-data-forge';
 import { Description } from '../atoms/index.mjs';
 
 type Props = Readonly<{
@@ -41,7 +41,7 @@ export const ParagraphWithSwitch = memoNamed<Props>(
           onChange={onToggle}
         />
       </div>
-      {mapOptional(
+      {mapNullable(
         description,
         // eslint-disable-next-line react/no-array-index-key
         (s) => s.map((d, i) => <Description key={i} text={d} />),

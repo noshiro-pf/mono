@@ -15,8 +15,8 @@ import {
   DatePickerDayWrapperStyled,
 } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
+import { match } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
-import { match, noop } from '../../utils-ported/index.mjs';
 
 type Props = Readonly<{
   ymd: YearMonthDate;
@@ -90,7 +90,7 @@ export const DatePickerDate = memoNamed<Props>(
         role={'gridcell'}
         tabIndex={-1}
         title={holidayJpName}
-        onClick={outside ? noop : onClick}
+        onClick={outside ? undefined : onClick}
       >
         <DatePickerDayWrapperStyled>{ymd.date}</DatePickerDayWrapperStyled>
       </DatePickerDayResolved>

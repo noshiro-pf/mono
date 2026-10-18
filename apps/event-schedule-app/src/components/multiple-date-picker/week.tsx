@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { DatePickerWeekStyled } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { mapOptional } from '../../utils-ported/index.mjs';
+import { mapNullable } from 'ts-data-forge';
 import { DatePickerDate } from './date-picker-day.js';
 
 type Props = Readonly<{
@@ -24,7 +24,7 @@ export const Week = memoNamed<Props>(
         week.map((d, index) => ({
           value: d,
           index,
-          handler: mapOptional(onClick, (f) => () => {
+          handler: mapNullable(onClick, (f) => () => {
             f(d.ymd);
           }),
         })),

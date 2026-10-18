@@ -1,8 +1,8 @@
 import { Arr, ISetMapped, pipe, type SizeType } from 'ts-data-forge';
 import { compareDatetimeRange, TimeRange } from 'ts-fortress-types';
-import type { DayOfWeekName, ReadonlyRecord } from 'ts-type-forge';
+import type { DayOfWeekName, ReadonlyRecord, Reducer } from 'ts-type-forge';
 import { datetimeRangeInitialValue } from '../../constants/index.mjs';
-import { Obj, type Reducer } from '../../utils-ported/index.mjs';
+import { Obj } from '../../utils-ported/index.mjs';
 import { ymdFromKey, ymdToKey } from '../map-key/index.mjs';
 import { ymdToDayInWeek } from '../ymd-to-day-in-week.mjs';
 import { timeRangeReducer } from './time-range-reducer.mjs';

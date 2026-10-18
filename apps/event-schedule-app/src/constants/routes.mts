@@ -1,5 +1,4 @@
-import { IMap } from 'ts-data-forge';
-import { hasLength } from '../utils-ported/index.mjs';
+import { Arr, IMap } from 'ts-data-forge';
 
 const pathSegment = {
   createPage: 'create',
@@ -60,26 +59,31 @@ const routes = {
 
 const isRoute = {
   createPage: (pathSegments: readonly string[]): boolean =>
-    hasLength(pathSegments, 1) && pathSegments[0] === pathSegment.createPage,
+    Arr.isFixedLengthTuple(1, pathSegments) &&
+    pathSegments[0] === pathSegment.createPage,
 
   /** PathSegments[1] is `event-id` */
   answerPage: (pathSegments: readonly string[]): boolean =>
-    hasLength(pathSegments, 2) && pathSegments[0] === pathSegment.answerPage,
+    Arr.isFixedLengthTuple(2, pathSegments) &&
+    pathSegments[0] === pathSegment.answerPage,
 
   /** PathSegments[1] is `event-id` */
   editPage: (pathSegments: readonly string[]): boolean =>
-    hasLength(pathSegments, 3) &&
+    Arr.isFixedLengthTuple(3, pathSegments) &&
     pathSegments[0] === pathSegment.answerPage &&
     pathSegments[2] === pathSegment.editPageSuffix,
 
   eventListPage: (pathSegments: readonly string[]): boolean =>
-    hasLength(pathSegments, 1) && pathSegments[0] === pathSegment.eventListPage,
+    Arr.isFixedLengthTuple(1, pathSegments) &&
+    pathSegments[0] === pathSegment.eventListPage,
 
   registerPage: (pathSegments: readonly string[]): boolean =>
-    hasLength(pathSegments, 1) && pathSegments[0] === pathSegment.registerUser,
+    Arr.isFixedLengthTuple(1, pathSegments) &&
+    pathSegments[0] === pathSegment.registerUser,
 
   signInPage: (pathSegments: readonly string[]): boolean =>
-    hasLength(pathSegments, 1) && pathSegments[0] === pathSegment.signIn,
+    Arr.isFixedLengthTuple(1, pathSegments) &&
+    pathSegments[0] === pathSegment.signIn,
 } as const;
 
 const redirectRules = IMap.create<string, string>([['/', routes.createPage]]);

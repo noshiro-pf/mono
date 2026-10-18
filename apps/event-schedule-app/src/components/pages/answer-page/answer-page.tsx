@@ -12,7 +12,7 @@ import * as React from 'react';
 import { AlertWithMaxWidth, BpSwitch } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
 import { useObservableValue } from 'synstate-react-hooks';
-import { castMutable } from 'ts-data-forge';
+import { castMutable, match } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
 import { eventIsAfterDeadline } from '../../../functions/index.mjs';
 import {
@@ -28,7 +28,6 @@ import {
   eventSchedule$,
   holidaysJpDefinition$,
 } from '../../../store/index.mjs';
-import { match } from '../../../utils-ported/index.mjs';
 import { toClassName } from '../../../utils/index.mjs';
 import {
   CustomIcon,

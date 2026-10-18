@@ -9,7 +9,6 @@ import {
   type YearMonthDate,
 } from 'ts-fortress-types';
 import type { DeepReadonly, StrictOmit } from 'ts-type-forge';
-import { mapOptional } from '../../utils/index.mjs';
 
 export type BpDateRangeInputProps = DeepReadonly<{
   dateRange: {
@@ -53,27 +52,23 @@ export const BpDateRangeInput = memoNamed<BpDateRangeInputProps>(
       () =>
         castMutable(
           tp(
-            pipe(dateRange.start).map((__v) =>
-              mapOptional(__v, (d) =>
-                DateUtils.toDate(
-                  Ymdhm2Date({
-                    ...d,
-                    hours: 0,
-                    minutes: 0,
-                  }),
-                ),
+            pipe(dateRange.start).mapNullable((d) =>
+              DateUtils.toDate(
+                Ymdhm2Date({
+                  ...d,
+                  hours: 0,
+                  minutes: 0,
+                }),
               ),
             ).value ?? null,
 
-            pipe(dateRange.end).map((__v) =>
-              mapOptional(__v, (d) =>
-                DateUtils.toDate(
-                  Ymdhm2Date({
-                    ...d,
-                    hours: 0,
-                    minutes: 0,
-                  }),
-                ),
+            pipe(dateRange.end).mapNullable((d) =>
+              DateUtils.toDate(
+                Ymdhm2Date({
+                  ...d,
+                  hours: 0,
+                  minutes: 0,
+                }),
               ),
             ).value ?? null,
           ),
@@ -84,15 +79,13 @@ export const BpDateRangeInput = memoNamed<BpDateRangeInputProps>(
     const minDate: Date | undefined = React.useMemo(
       () =>
         castMutable(
-          pipe(_minDate).map((__v) =>
-            mapOptional(__v, (d) =>
-              DateUtils.toDate(
-                Ymdhm2Date({
-                  ...d,
-                  hours: 0,
-                  minutes: 0,
-                }),
-              ),
+          pipe(_minDate).mapNullable((d) =>
+            DateUtils.toDate(
+              Ymdhm2Date({
+                ...d,
+                hours: 0,
+                minutes: 0,
+              }),
             ),
           ).value,
         ),
@@ -102,15 +95,13 @@ export const BpDateRangeInput = memoNamed<BpDateRangeInputProps>(
     const maxDate: Date | undefined = React.useMemo(
       () =>
         castMutable(
-          pipe(_maxDate).map((__v) =>
-            mapOptional(__v, (d) =>
-              DateUtils.toDate(
-                Ymdhm2Date({
-                  ...d,
-                  hours: 0,
-                  minutes: 0,
-                }),
-              ),
+          pipe(_maxDate).mapNullable((d) =>
+            DateUtils.toDate(
+              Ymdhm2Date({
+                ...d,
+                hours: 0,
+                minutes: 0,
+              }),
             ),
           ).value,
         ),
@@ -120,8 +111,8 @@ export const BpDateRangeInput = memoNamed<BpDateRangeInputProps>(
     const onChange = React.useCallback(
       ([start, end]: Readonly<DateRange>) => {
         onDateRangeChange({
-          start: pipe(start).map((v) => mapOptional(v, YmdhmFromDate)).value,
-          end: pipe(end).map((v) => mapOptional(v, YmdhmFromDate)).value,
+          start: pipe(start).mapNullable(YmdhmFromDate).value,
+          end: pipe(end).mapNullable(YmdhmFromDate).value,
         });
       },
       [onDateRangeChange],

@@ -1,4 +1,5 @@
 import {
+  Arr,
   ISet,
   Num,
   Result,
@@ -20,7 +21,6 @@ import {
   type AnswerRank,
   type AnswersScore,
 } from '../../types/index.mjs';
-import { hasLength, mapOptional } from '../../utils-ported/index.mjs';
 import { Router } from '../router.mjs';
 
 const keyDef = Routes.queryParamKey.answerTableState;
@@ -58,7 +58,7 @@ const ymd2str = ({ year, month, date }: YearMonthDate): string =>
 const ymdFromStr = (ymdStr: string): YearMonthDate | undefined => {
   const res = ymdStr.split('-');
 
-  if (!hasLength(res, 3)) {
+  if (!Arr.isFixedLengthTuple(3, res)) {
     return undefined;
   }
 
@@ -120,7 +120,7 @@ const rangeFromStr = (
 ): Readonly<{ a: string; b: string }> | undefined => {
   const res = rangeStr.split(Routes.queryParamValue.rangeDelim);
 
-  return hasLength(res, 2) ? { a: res[0], b: res[1] } : undefined;
+  return Arr.isFixedLengthTuple(2, res) ? { a: res[0], b: res[1] } : undefined;
 };
 
 const filledDateOnlyToStr = (value: boolean): string =>
@@ -292,76 +292,60 @@ const restoreFromQueryParams = (
     type: 'setFromUrlQueryParams',
     values: {
       dateRange: pipe(queryParams.get(keyDef.date))
-        .map((__v) => mapOptional(__v, rangeFromStr))
-        .map((__v) =>
-          mapOptional(__v, (range) => ({
-            start: ymdFromStr(range.a),
-            end: ymdFromStr(range.b),
-          })),
-        ).value ?? { start: undefined, end: undefined },
+        .mapNullable(rangeFromStr)
+        .mapNullable((range) => ({
+          start: ymdFromStr(range.a),
+          end: ymdFromStr(range.b),
+        })).value ?? { start: undefined, end: undefined },
 
-      dayOfWeek: pipe(queryParams.get(keyDef.dayOfWeek)).map((__v) =>
-        mapOptional(__v, dayOfWeekFromStr),
+      dayOfWeek: pipe(queryParams.get(keyDef.dayOfWeek)).mapNullable(
+        dayOfWeekFromStr,
       ).value,
 
-      rank: pipe(queryParams.get(keyDef.rank)).map((__v) =>
-        mapOptional(__v, parseRank),
-      ).value,
+      rank: pipe(queryParams.get(keyDef.rank)).mapNullable(parseRank).value,
 
       scoreRange: pipe(queryParams.get(keyDef.score))
-        .map((__v) => mapOptional(__v, rangeFromStr))
-        .map((__v) =>
-          mapOptional(__v, (range) => ({
-            min: parseScore(range.a),
-            max: parseScore(range.b),
-          })),
-        ).value ?? { min: undefined, max: undefined },
+        .mapNullable(rangeFromStr)
+        .mapNullable((range) => ({
+          min: parseScore(range.a),
+          max: parseScore(range.b),
+        })).value ?? { min: undefined, max: undefined },
 
-      filledDateOnly: pipe(queryParams.get(keyDef.filledDateOnly)).map((__v) =>
-        mapOptional(__v, filledDateOnlyFromStr),
+      filledDateOnly: pipe(queryParams.get(keyDef.filledDateOnly)).mapNullable(
+        filledDateOnlyFromStr,
       ).value,
 
       iconState: {
         good: pipe(queryParams.get(keyDef.good))
-          .map((__v) => mapOptional(__v, rangeFromStr))
-          .map((__v) =>
-            mapOptional(__v, (range) => ({
-              min: parseSafeUint(range.a),
-              max: parseSafeUint(range.b),
-            })),
-          ).value ?? { min: undefined, max: undefined },
+          .mapNullable(rangeFromStr)
+          .mapNullable((range) => ({
+            min: parseSafeUint(range.a),
+            max: parseSafeUint(range.b),
+          })).value ?? { min: undefined, max: undefined },
         fair: pipe(queryParams.get(keyDef.fair))
-          .map((__v) => mapOptional(__v, rangeFromStr))
-          .map((__v) =>
-            mapOptional(__v, (range) => ({
-              min: parseSafeUint(range.a),
-              max: parseSafeUint(range.b),
-            })),
-          ).value ?? { min: undefined, max: undefined },
+          .mapNullable(rangeFromStr)
+          .mapNullable((range) => ({
+            min: parseSafeUint(range.a),
+            max: parseSafeUint(range.b),
+          })).value ?? { min: undefined, max: undefined },
         poor: pipe(queryParams.get(keyDef.poor))
-          .map((__v) => mapOptional(__v, rangeFromStr))
-          .map((__v) =>
-            mapOptional(__v, (range) => ({
-              min: parseSafeUint(range.a),
-              max: parseSafeUint(range.b),
-            })),
-          ).value ?? { min: undefined, max: undefined },
+          .mapNullable(rangeFromStr)
+          .mapNullable((range) => ({
+            min: parseSafeUint(range.a),
+            max: parseSafeUint(range.b),
+          })).value ?? { min: undefined, max: undefined },
         goodPlusFair: pipe(queryParams.get(keyDef.goodPlusFair))
-          .map((__v) => mapOptional(__v, rangeFromStr))
-          .map((__v) =>
-            mapOptional(__v, (range) => ({
-              min: parseSafeUint(range.a),
-              max: parseSafeUint(range.b),
-            })),
-          ).value ?? { min: undefined, max: undefined },
+          .mapNullable(rangeFromStr)
+          .mapNullable((range) => ({
+            min: parseSafeUint(range.a),
+            max: parseSafeUint(range.b),
+          })).value ?? { min: undefined, max: undefined },
         fairPlusPoor: pipe(queryParams.get(keyDef.fairPlusPoor))
-          .map((__v) => mapOptional(__v, rangeFromStr))
-          .map((__v) =>
-            mapOptional(__v, (range) => ({
-              min: parseSafeUint(range.a),
-              max: parseSafeUint(range.b),
-            })),
-          ).value ?? { min: undefined, max: undefined },
+          .mapNullable(rangeFromStr)
+          .mapNullable((range) => ({
+            min: parseSafeUint(range.a),
+            max: parseSafeUint(range.b),
+          })).value ?? { min: undefined, max: undefined },
       },
     },
   });

@@ -1,6 +1,5 @@
 import { EmailAuthProvider } from 'firebase/auth';
-import { type InitializedObservable, combine, map } from 'synstate';
-import { createBooleanState, createReducer } from 'synstate-react-hooks';
+import { type InitializedObservable, combine, filter, map } from 'synstate';
 import { Result } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { dict } from '../../constants/index.mjs';
@@ -11,6 +10,10 @@ import {
   deleteAccountPageStateReducer,
   showToast,
 } from '../../functions/index.mjs';
+import {
+  createReducerWithActions,
+  createToggleState,
+} from '../../utils/index.mjs';
 import { Auth } from '../auth.mjs';
 import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state.mjs';
 
@@ -18,9 +21,14 @@ const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-const [, dispatch, { state: formState$ }] = createReducer(
+const dialogClosed$ = UpdateUserInfoDialogStore.openingDialogType$.pipe(
+  filter((openingDialog) => openingDialog === undefined),
+);
+
+const [, dispatch, { state: formState$ }] = createReducerWithActions(
   deleteAccountPageStateReducer,
   deleteAccountPageInitialState,
+  [dialogClosed$.pipe(map(() => ({ type: 'reset' }) as const))],
 );
 
 const enterButtonDisabled$ = formState$.pipe(
@@ -35,14 +43,8 @@ const passwordFormIntent$: InitializedObservable<Intent> = formState$.pipe(
   map((st) => (st.password.error === undefined ? 'primary' : 'danger')),
 );
 
-const [
-  ,
-  {
-    state: passwordIsOpenState$,
-    setFalse: hidePassword,
-    toggle: togglePasswordLock,
-  },
-] = createBooleanState(false);
+const { state: passwordIsOpenState$, toggle: togglePasswordLock } =
+  createToggleState([dialogClosed$]);
 
 const state = combine([
   formState$,
@@ -168,20 +170,6 @@ const inputEmailHandler = (value: string): void => {
 const inputPasswordHandler = (value: string): void => {
   dispatch({ type: 'inputPassword', payload: value });
 };
-
-const resetAllDialogState = (): void => {
-  dispatch({ type: 'reset' });
-
-  hidePassword();
-};
-
-/* subscriptions */
-
-UpdateUserInfoDialogStore.openingDialogType$.subscribe((openingDialog) => {
-  if (openingDialog === undefined) {
-    resetAllDialogState();
-  }
-});
 
 export const DeleteAccountPageStore = {
   state,

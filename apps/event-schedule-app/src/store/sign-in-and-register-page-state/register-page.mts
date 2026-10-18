@@ -1,5 +1,4 @@
-import { type InitializedObservable, combine, map } from 'synstate';
-import { createBooleanState, createReducer } from 'synstate-react-hooks';
+import { type InitializedObservable, combine, filter, map } from 'synstate';
 import { Optional, Result } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { Routes, dict } from '../../constants/index.mjs';
@@ -10,6 +9,10 @@ import {
   registerPageStateReducer,
   showToast,
 } from '../../functions/index.mjs';
+import {
+  createReducerWithActions,
+  createToggleState,
+} from '../../utils/index.mjs';
 import { Router } from '../router.mjs';
 import { GoogleSignInStore } from './google-sign-in-state.mjs';
 
@@ -17,9 +20,12 @@ const dc = dict.register;
 
 const toast = createToaster();
 
-const [, dispatch, { state: formState$ }] = createReducer(
+const left$ = Router.isRoute.registerPage$.pipe(filter((isPage) => !isPage));
+
+const [, dispatch, { state: formState$ }] = createReducerWithActions(
   registerPageStateReducer,
   registerPageInitialState,
+  [left$.pipe(map(() => ({ type: 'reset' }) as const))],
 );
 
 const enterButtonDisabled$ = formState$.pipe(
@@ -43,14 +49,8 @@ const passwordFormIntent$: InitializedObservable<Intent> = formState$.pipe(
   ),
 );
 
-const [
-  ,
-  {
-    state: passwordIsOpen$,
-    setFalse: hidePassword,
-    toggle: togglePasswordLock,
-  },
-] = createBooleanState(false);
+const { state: passwordIsOpen$, toggle: togglePasswordLock } =
+  createToggleState([left$]);
 
 const state = combine([
   formState$,
@@ -194,18 +194,6 @@ const enterClickHandler = (): void => {
     console.error,
   );
 };
-
-const resetAllState = (): void => {
-  dispatch({ type: 'reset' });
-
-  hidePassword();
-};
-
-Router.isRoute.registerPage$.subscribe((isRegisterPage) => {
-  if (!isRegisterPage) {
-    resetAllState();
-  }
-});
 
 export const RegisterPageStore = {
   state,
