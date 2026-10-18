@@ -20,7 +20,10 @@
  * at right angles to the sides, as the arrowhead expects. Where nodes stand
  * too close together for that, it squeezes between them along narrower
  * lines ({@link ROUTING_PASSES}); where they touch or overlap, there is no
- * way round, and it keeps its curve.
+ * way round, and it keeps its curve. Edges routed along the same line are
+ * then drawn side by side rather than on top of each other
+ * (`edge-lanes.mts`), and every label is put where it covers no node, and
+ * as few edges as it can (`edge-labels.mts`).
  */
 
 import { Arr, Num } from 'ts-data-forge';
@@ -39,6 +42,8 @@ import {
   type CubicSegments,
   type EdgeGeometry,
 } from './edge-geometry.mjs';
+import { placeLabels } from './edge-labels.mjs';
+import { orderPorts, separateLanes } from './edge-lanes.mjs';
 import {
   labelSize,
   type DagDirection,
@@ -64,7 +69,7 @@ export const routeEdges = (
   const blocked = curves.map((curve) => runsThroughNode(curve, nodes));
 
   if (!blocked.includes(true)) {
-    return curves;
+    return placeLabels(curves, nodes);
   }
 
   const axes = axesOf(direction);
@@ -103,48 +108,69 @@ export const routeEdges = (
     ),
   }));
 
-  const routed: ReadonlyMap<number, EdgeGeometry> = new Map(
-    requests.flatMap((request) => {
-      for (const pass of passes) {
-        const found = pass.search(
-          {
-            main: request.fromBox.mainEnd + pass.stub,
-            cross: request.start.cross,
-          },
-          {
-            main: request.toBox.mainStart - pass.stub,
-            cross: request.end.cross,
-          },
-        );
+  const found = requests.flatMap((request) => {
+    for (const pass of passes) {
+      const path = pass.search(
+        {
+          main: request.fromBox.mainEnd + pass.stub,
+          cross: request.start.cross,
+        },
+        {
+          main: request.toBox.mainStart - pass.stub,
+          cross: request.end.cross,
+        },
+      );
 
-        if (found !== undefined) {
-          const corners = simplify([request.start, ...found, request.end]);
+      if (path !== undefined) {
+        const corners = simplify([request.start, ...path, request.end]);
 
-          drawn.addPolyline(corners);
+        drawn.addPolyline(corners);
 
-          return [
-            [
-              request.index,
-              routedGeometry(
-                request.curve,
-                corners,
-                axes,
-                nodes.filter(
-                  ({ id }) =>
-                    id !== request.curve.from && id !== request.curve.to,
-                ),
-                pass.clearance,
-              ),
-            ] as const,
-          ];
-        }
+        return [{ request, corners, clearance: pass.clearance }] as const;
       }
+    }
 
-      return [];
-    }),
+    return [];
+  });
+
+  const ported = orderPorts(
+    found.map(({ request, corners }) => ({
+      from: request.curve.from,
+      to: request.curve.to,
+      corners,
+    })),
+    new Map(nodes.map((node) => [node.id, boxOf(node, axes)])),
+    CHECK_MARGIN,
   );
 
-  return curves.map((curve, index) => routed.get(index) ?? curve);
+  const separated = separateLanes(
+    found.map(({ request, corners }, index) => ({
+      id: request.curve.id,
+      corners: ported[index] ?? corners,
+    })),
+    nodes.map((node) => boxOf(node, axes)),
+    CHECK_MARGIN,
+  );
+
+  const routed: ReadonlyMap<number, EdgeGeometry> = new Map(
+    found.map(({ request, corners, clearance }, index) => [
+      request.index,
+      routedGeometry(
+        request.curve,
+        separated[index] ?? corners,
+        axes,
+        nodes.filter(
+          ({ id }) => id !== request.curve.from && id !== request.curve.to,
+        ),
+        clearance,
+      ),
+    ]),
+  );
+
+  return placeLabels(
+    curves.map((curve, index) => routed.get(index) ?? curve),
+    nodes,
+  );
 };
 
 /**

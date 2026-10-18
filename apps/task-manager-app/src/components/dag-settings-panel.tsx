@@ -27,7 +27,9 @@ import { NodeSizeField } from './node-size-field.js';
  *
  * A native `<dialog>` opened modal, so that the focus goes into it and stays
  * there, and Escape, the close button and a press outside it close it, the
- * focus going back to the button. A popover hanging from the button on a
+ * focus going back to the button. The focus goes to the panel itself, which
+ * draws no ring, rather than to its first button: the close button would
+ * otherwise open with a ring round it, as if it were the one thing to do. A popover hanging from the button on a
  * wide screen, a sheet across the bottom on a narrow one
  * (`view-model/settings-panel.mts`), placed again when the screen changes
  * size. Whether and where it is open is the UI store's: the element follows
@@ -46,6 +48,7 @@ export const DagSettingsPanel = memoNamed('DagSettingsPanel', () => {
       data-e2e={'dag-settings-panel'}
       data-placement={placement?.kind}
       style={styleOf(placement)}
+      tabIndex={-1}
       onCancel={onCancel}
     >
       <div className={'settings-panel-content'}>
@@ -92,6 +95,8 @@ const followOpen: RefCallback<HTMLDialogElement> = (dialog) => {
   const subscription = uiStore.settingsPanel.subscribe((placement) => {
     if (placement !== undefined && !dialog.open) {
       dialog.showModal();
+
+      dialog.focus();
     } else if (placement === undefined && dialog.open) {
       dialog.close();
 

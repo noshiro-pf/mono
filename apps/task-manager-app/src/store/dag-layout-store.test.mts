@@ -439,6 +439,12 @@ const readyLayout = (store: DagLayoutStore): GraphLayout | undefined => {
   return current.type === 'ready' ? current.layout : undefined;
 };
 
+/** Where each node of `layout` is. */
+const positionsOfLayout = (
+  layout: GraphLayout | undefined,
+): ReadonlyMap<GraphNodeId, Point> =>
+  new Map((layout?.nodes ?? []).map(({ id, x, y }) => [id, { x, y }]));
+
 /** Where 「タイル」 draws each task when nothing moves. */
 const tilePlaces = (store: DagLayoutStore): ReadonlyMap<GraphNodeId, Point> =>
   new Map(
@@ -1531,21 +1537,153 @@ describe(createDagLayoutStore, () => {
       assert.isFalse(clock.pending());
     });
 
-    test('first shown in アーク, moves the nodes from a grid into the column', async () => {
+    test('first shown in アーク, moves the nodes from a grid into the column without waiting for ELK', () => {
       const { store, deferred, clock } = setup({
         state: mixed,
         viewMode: 'arc',
       });
 
-      deferred.resolve(0);
-
-      await settle();
+      // ELK has not answered yet.
+      assert.strictEqual(
+        store.autoLayout.getSnapshot().value.type,
+        'computing',
+      );
 
       const first = animated(store);
 
       assert.deepStrictEqual(
         new Set(first?.keys()),
         new Set(['task:x', 'task:y', 'milestone:m']),
+      );
+
+      clock.advance(ANIMATION_MS);
+
+      assert.isUndefined(animated(store));
+
+      assert.deepStrictEqual(arcColumn(store), arcPlaces);
+
+      // Its answer moves nothing in アーク.
+      deferred.resolve(0);
+
+      assert.isUndefined(animated(store));
+    });
+
+    test('first shown in アーク, waits for the data', () => {
+      const { store, setState } = setup({
+        state: { tasks: [], milestones: [] },
+        viewMode: 'arc',
+      });
+
+      assert.isUndefined(animated(store));
+
+      setState(mixed);
+
+      assert.deepStrictEqual(
+        new Set(animated(store)?.keys()),
+        new Set(['task:x', 'task:y', 'milestone:m']),
+      );
+    });
+
+    test('switched to DAG before ELK has laid it out once, moves the nodes from the column once it has', async () => {
+      const { store, deferred, clock, setViewMode } = setup({
+        state: mixed,
+        viewMode: 'arc',
+      });
+
+      clock.advance(ANIMATION_MS);
+
+      setViewMode('dag');
+
+      // Nothing to go to yet: they stay, fading none, where they are.
+      assert.deepStrictEqual(animated(store), arcPlaces);
+
+      assert.deepStrictEqual(opacities(store), new Map());
+
+      clock.advance(ANIMATION_MS);
+
+      deferred.resolve(0);
+
+      await settle();
+
+      assert.deepStrictEqual(animated(store), arcPlaces);
+
+      clock.advance(ANIMATION_MS);
+
+      assert.isUndefined(animated(store));
+
+      assert.deepStrictEqual(positionsOfLayout(readyLayout(store)), dagPlaces);
+    });
+
+    test('switched to アーク while a task added is laid out, fades that task in with the others', async () => {
+      const { store, deferred, setState, setViewMode } = await shown({
+        state: mixed,
+      });
+
+      const added: DomainState = {
+        tasks: Arr.toPushed(
+          mixed.tasks,
+          createTask({ id: asTaskId('n'), title: 'New', now: 0 }),
+        ),
+        milestones: mixed.milestones,
+      } as const;
+
+      setState(added);
+
+      // Laid out again, and not yet there.
+      assert.strictEqual(deferred.requests.length, 2);
+
+      setViewMode('arc');
+
+      const column = arcColumn(store);
+
+      assert.deepStrictEqual(
+        animated(store)?.get('task:n'),
+        column.get('task:n'),
+      );
+
+      assert.deepStrictEqual(opacities(store), new Map([['task:n', 0]]));
+    });
+
+    test('switched to DAG while a task added is laid out, moves it there from the column once it is', async () => {
+      const { store, clock, deferred, setState, setViewMode } = await shown({
+        state: mixed,
+      });
+
+      setViewMode('arc');
+
+      clock.advance(ANIMATION_MS);
+
+      const added: DomainState = {
+        tasks: Arr.toPushed(
+          mixed.tasks,
+          createTask({ id: asTaskId('n'), title: 'New', now: 0 }),
+        ),
+        milestones: mixed.milestones,
+      } as const;
+
+      setState(added);
+
+      const column = arcColumn(store);
+
+      setViewMode('dag');
+
+      // Not faded out: the DAG draws it once it is laid out.
+      assert.deepStrictEqual(
+        animated(store)?.get('task:n'),
+        column.get('task:n'),
+      );
+
+      assert.deepStrictEqual(opacities(store), new Map());
+
+      clock.advance(ANIMATION_MS);
+
+      deferred.resolve(1);
+
+      await settle();
+
+      assert.deepStrictEqual(
+        animated(store)?.get('task:n'),
+        column.get('task:n'),
       );
 
       clock.advance(ANIMATION_MS);
@@ -1925,6 +2063,53 @@ describe(createDagLayoutStore, () => {
         ],
       );
     });
+
+    test('resized in アーク and switched to DAG before ELK is done, moves the nodes when it is', async () => {
+      const { store, deferred, clock, setViewMode, setNodeSize } = await shown({
+        state: mixed,
+      });
+
+      setViewMode('arc');
+
+      clock.advance(ANIMATION_MS);
+
+      setNodeSize('compact');
+
+      clock.advance(ANIMATION_MS);
+
+      setViewMode('dag');
+
+      clock.advance(ANIMATION_MS);
+
+      assert.isUndefined(animated(store));
+
+      deferred.resolve(1, 60);
+
+      await settle();
+
+      // From where the DAG drew them, ELK's old places, to its new ones.
+      assert.deepStrictEqual(
+        animated(store),
+        positions([
+          ['task:x', { x: 0, y: 0 }],
+          ['task:y', { x: 100, y: 0 }],
+          ['milestone:m', { x: 200, y: 0 }],
+        ]),
+      );
+
+      clock.advance(ANIMATION_MS);
+
+      assert.isUndefined(animated(store));
+
+      assert.deepStrictEqual(
+        positionsOfLayout(readyLayout(store)),
+        positions([
+          ['task:x', { x: 0, y: 0 }],
+          ['task:y', { x: 60, y: 0 }],
+          ['milestone:m', { x: 120, y: 0 }],
+        ]),
+      );
+    });
   });
 
   describe('タイル', () => {
@@ -2212,15 +2397,11 @@ describe(createDagLayoutStore, () => {
       assert.deepStrictEqual(tilePlaces(store), inOneColumn);
     });
 
-    test('first shown in タイル, waits for the width, then moves the tasks alone from a grid', async () => {
-      const { store, deferred, clock } = setup({
+    test('first shown in タイル, waits for the width and not for ELK, then moves the tasks alone from a grid', () => {
+      const { store, clock } = setup({
         state: mixed,
         viewMode: 'tile',
       });
-
-      deferred.resolve(0);
-
-      await settle();
 
       assert.isUndefined(animated(store));
 

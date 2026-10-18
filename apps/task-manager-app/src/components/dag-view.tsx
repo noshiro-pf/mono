@@ -1,7 +1,12 @@
 import { memoNamed } from 'preact-utils';
 import { useRef } from 'preact/hooks';
 import { Arr } from 'ts-data-forge';
-import { dagAutoLayoutSignal, domainSignal } from '../store/index.mjs';
+import type { GraphLayout } from '../dag/index.mjs';
+import {
+  dagAutoLayoutSignal,
+  dagViewModeSignal,
+  domainSignal,
+} from '../store/index.mjs';
 import { DagCanvas } from './dag-canvas.js';
 import { DagSelectionBar } from './dag-selection-bar.js';
 import { DagSettingsPanel } from './dag-settings-panel.js';
@@ -12,7 +17,8 @@ import { DagToolbar } from './dag-toolbar.js';
  * another view mode, with the toolbar over it, the 「表示設定」 panel
  * the toolbar opens, and the nodes selected with what can be done with
  * them (`dag-selection-bar.tsx`). While a new layout is
- * computed the previous one stays up; before the first, a message says so.
+ * computed the previous one stays up; before the first, a message says so
+ * in 「DAG」, while 「アーク」 and 「タイル」, which need none, are drawn.
  */
 export const DagView = memoNamed('DagView', () => {
   const layoutState = dagAutoLayoutSignal.value;
@@ -21,12 +27,17 @@ export const DagView = memoNamed('DagView', () => {
 
   const toolbarRef = useRef<HTMLDivElement>(null);
 
-  const layout =
+  const laidOut =
     layoutState.type === 'ready'
       ? layoutState.layout
       : layoutState.type === 'computing'
         ? layoutState.previous
         : undefined;
+
+  const layout =
+    laidOut === undefined && dagViewModeSignal.value !== 'dag'
+      ? NOT_LAID_OUT
+      : laidOut;
 
   return (
     <main
@@ -60,3 +71,6 @@ export const DagView = memoNamed('DagView', () => {
     </main>
   );
 });
+
+/** The DAG before ELK has laid it out: nothing, for the modes drawn without. */
+const NOT_LAID_OUT: GraphLayout = { nodes: [], edges: [], groups: [] } as const;

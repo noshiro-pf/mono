@@ -1854,6 +1854,58 @@ test(
   },
 );
 
+test(
+  'scrolls 「タイル」 with the keys with no task focused',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    // Short enough for the rows to be scrolled.
+    await page.setViewportSize({ width: 390, height: 500 });
+
+    await page.goto(DEMO);
+
+    await settled(page);
+
+    await showMode(page, 'tile');
+
+    const atTop = await tileTop(page);
+
+    // The focus nowhere, as when the page opens.
+    await page.evaluate(() => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    });
+
+    await page.keyboard.press('End');
+
+    await expect.poll(async () => tileTop(page)).toBeLessThan(atTop);
+
+    await page.keyboard.press('Home');
+
+    await expect.poll(async () => tileTop(page)).toBe(atTop);
+
+    // The canvas takes the focus, and its keys.
+    const canvas = page.getByTestId('dag-canvas');
+
+    await canvas.focus();
+
+    await expect.soft(canvas).toBeFocused();
+
+    await page.keyboard.press('PageDown');
+
+    await expect.poll(async () => tileTop(page)).toBeLessThan(atTop);
+
+    await page.keyboard.press('PageUp');
+
+    await expect.poll(async () => tileTop(page)).toBe(atTop);
+
+    // In the other modes it takes none: its nodes do.
+    await showMode(page, 'dag');
+
+    await expect.soft(canvas).not.toHaveAttribute('tabindex');
+  },
+);
+
 /** The heights of the nodes' shapes, in graph units, without repeats. */
 const nodeHeights = async (
   page: DeepReadonly<Page>,
@@ -1935,14 +1987,13 @@ test(
       .soft(Math.round((panelBox?.x ?? 0) + (panelBox?.width ?? 0)))
       .toBe(Math.round((buttonBox?.x ?? 0) + (buttonBox?.width ?? 0)));
 
-    // The focus goes into it, and back to the button.
-    expect
-      .soft(
-        await panel.evaluate((dialog) =>
-          dialog.contains(document.activeElement),
-        ),
-      )
-      .toBe(true);
+    // The focus goes into it — to the panel itself, not to its close
+    // button, which Tab goes on to — and back to the button.
+    await expect.soft(panel).toBeFocused();
+
+    await page.keyboard.press('Tab');
+
+    await expect.soft(page.getByTestId('dag-settings-close')).toBeFocused();
 
     await closeSettings(page);
 
