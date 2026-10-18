@@ -30,7 +30,7 @@ export default [
   eslintPluginTsFortress.configs.recommended,
 
   ...eslintConfigForPreact(),
-  eslintConfigForVitest(['src/**']),
+  eslintConfigForVitest(['src/**', 'test/**']),
   eslintConfigForPlaywright(['e2e/**']),
 
   {

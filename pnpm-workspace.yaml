@@ -107,6 +107,10 @@ update:
     # (#2217).
     - firebase
 
+    # `@firebase/rules-unit-testing` 6 needs firebase 13 as a peer, so it
+    # moves with firebase above (#2217).
+    - '@firebase/rules-unit-testing'
+
     # preact 11 changes the type `useRef` returns and when effects clean up
     # on unmount, which breaks `apps/resize-observer-preact-hooks`'s types and
     # `libs/synstate-preact-hooks`'s browser tests (#2154). The port, and what
