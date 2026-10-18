@@ -4,6 +4,7 @@ import type {
   DropInitialValueOperator,
   Observable,
   SkipUntilOperatorObservable,
+  Subscription,
 } from '../types/index.mjs';
 
 /**
@@ -65,12 +66,28 @@ const createSkipUntilObservable = <A,>(
   parentObservable: Observable<A>,
   notifier: Observable<unknown>,
 ): SkipUntilOperatorObservable<A> => {
-  let mut_isSkipping = true;
+  // A notifier that already holds a value, or has completed, would call
+  // `stopSkipping` inside `subscribe`, before the subscription is stored.
+  let mut_isSkipping =
+    Optional.isNone(notifier.getSnapshot()) && !notifier.isCompleted;
+
+  let mut_subscription: Subscription | undefined = undefined;
+
+  const stopSkipping = (): void => {
+    mut_isSkipping = false;
+
+    mut_subscription?.unsubscribe();
+
+    mut_subscription = undefined;
+  };
 
   const observable = createSyncChildObservable<A, readonly [A]>(
     {
       parents: [parentObservable],
       initialValue: Optional.none,
+      onComplete: () => {
+        mut_subscription?.unsubscribe();
+      },
     },
     ({ setNext }) =>
       (updateToken) => {
@@ -88,14 +105,9 @@ const createSkipUntilObservable = <A,>(
       },
   );
 
-  notifier.subscribe(
-    () => {
-      mut_isSkipping = false;
-    },
-    () => {
-      mut_isSkipping = false;
-    },
-  );
+  if (mut_isSkipping) {
+    mut_subscription = notifier.subscribe(stopSkipping, stopSkipping);
+  }
 
   return observable;
 };

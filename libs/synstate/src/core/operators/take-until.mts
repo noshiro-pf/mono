@@ -3,6 +3,7 @@ import { createSyncChildObservable } from '../base/index.mjs';
 import type {
   KeepInitialValueOperator,
   Observable,
+  Subscription,
   TakeUntilOperatorObservable,
 } from '../types/index.mjs';
 
@@ -68,10 +69,15 @@ const createTakeUntilObservable = <A,>(
   parentObservable: Observable<A>,
   notifier: Observable<unknown>,
 ): TakeUntilOperatorObservable<A> => {
+  let mut_subscription: Subscription | undefined = undefined;
+
   const observable = createSyncChildObservable<A, readonly [A]>(
     {
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
+      onComplete: () => {
+        mut_subscription?.unsubscribe();
+      },
     },
     ({ setNext }) =>
       (updateToken) => {
@@ -88,7 +94,7 @@ const createTakeUntilObservable = <A,>(
       },
   );
 
-  notifier.subscribe(
+  const subscription = notifier.subscribe(
     () => {
       observable.complete();
     },
@@ -96,6 +102,14 @@ const createTakeUntilObservable = <A,>(
       observable.complete();
     },
   );
+
+  // A notifier that already holds a value completes `observable` inside
+  // `subscribe`, before `onComplete` can see the subscription.
+  if (observable.isCompleted) {
+    subscription.unsubscribe();
+  } else {
+    mut_subscription = subscription;
+  }
 
   return observable;
 };
