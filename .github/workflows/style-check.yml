@@ -57,6 +57,13 @@ jobs:
     # 9m31s and 9m44s under a 10-minute cap — see "The work" in README.md.
     timeout-minutes: 25
 
+    # The commit `check:prose:next-major` compares each package's version
+    # with: a version pull request is the one tree that raises a version past
+    # its base. On `main` it is the commit before the push; a manual run
+    # compares the tree with itself.
+    env:
+      NEXT_MAJOR_BASE: ${{ case(github.event_name == 'pull_request', github.event.pull_request.base.sha, github.event_name == 'push', github.event.before, github.sha) }}
+
     strategy:
       fail-fast: false
       matrix:
@@ -125,6 +132,11 @@ jobs:
       - name: Build all packages
         if: matrix.command == 'ws:doc' || matrix.command == 'ws:gen'
         run: pnpm run ws:build
+
+      # The checkout is one commit deep; `git show` needs the base as well.
+      - name: Fetch the base `check:prose:next-major` compares with
+        if: matrix.command == 'check:prose'
+        run: git fetch --no-tags --depth=1 origin "${NEXT_MAJOR_BASE}"
 
       - name: Run "${{ matrix.command }}"
         run: pnpm run ${{ matrix.command }}

@@ -70,8 +70,8 @@ import {
  * dependency of a checked package, or one that says what detection already
  * finds.
  *
- * It is a `check:prose` guard for the reason `check:prose:next-major` is: a
- * changeset is Markdown, and `code-check.yml` skips a diff of Markdown alone.
+ * It is a `check:prose` guard because a changeset is Markdown, and
+ * `code-check.yml` skips a diff of Markdown alone.
  * It reads `src/` as syntax only, so it needs no build.
  */
 export const checkDependentReleases = ({

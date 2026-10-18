@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import {
@@ -6,11 +7,11 @@ import {
   isRecord,
   isString,
   Json,
+  Num,
   Result,
   unknownToString,
 } from 'ts-data-forge';
 import { glob, isDirectlyExecuted } from 'ts-repo-utils';
-import type { NonEmptyTuple } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -48,32 +49,42 @@ import { projectRootPath } from '../project-root-path.mjs';
  * change that may or may not be made, or that waits on other work. It does
  * not hold a release — "not this time" is a candidate's normal answer, and
  * holding every breaking release on a question would only teach people to
- * delete it — but it is listed whenever a breaking release is pending, which
- * is the moment to decide. Deciding is moving it above the heading, or
- * deleting it when the answer is no.
+ * delete it — but it is listed on the version pull request, which is the
+ * moment to decide. Deciding is moving it above the heading, or deleting it
+ * when the answer is no.
  *
  * The check fails when
  *
- * - a changeset in `.changeset/` releases a package with a breaking bump —
- *   `major`, or `minor` while the package is still `0.x` — and that package's
- *   `NEXT_MAJOR.md` still has decided items: the release would go out without
- *   them, and the next chance is another breaking release;
+ * - the tree raises a package's version past `NEXT_MAJOR_BASE` with a
+ *   breaking release — a new major, or a new minor while the package is still
+ *   `0.x` — and that package's `NEXT_MAJOR.md` still has decided items: the
+ *   release would go out without them, and the next chance is another
+ *   breaking release;
  * - a `NEXT_MAJOR.md` has no items, or does not sit beside a `package.json`
  *   naming a package, so that nothing would ever hold a release for it.
  *
- * Because it fails on whichever comes second — the breaking changeset or the
- * item — the invariant holds on `main` in either order. It is a `check:prose`
- * guard because what it reads is Markdown: `code-check.yml` skips a diff that
- * touches only `**.md`, which is exactly what a changeset is.
+ * Only the version pull request raises a version, so the first case holds
+ * that and nothing else. A breaking changeset may reach `main` ahead of the
+ * pull requests that apply the remaining items — a stack of them, applying
+ * one item each, is the usual shape — and the release waits for them there.
+ * `next-major-reminder.mts` lists what it is waiting for on the version pull
+ * request from the moment the changeset lands.
+ *
+ * `NEXT_MAJOR_BASE` is the commit the versions are compared with: the base of
+ * the pull request in CI, which `style-check.yml` fetches and sets, and
+ * otherwise the merge base of `HEAD` and `origin/main`. It is a `check:prose`
+ * guard because what it reads is Markdown and `package.json`, and the version
+ * pull request touches only those.
  */
 export const checkNextMajor = ({
-  changesets,
   stocks,
+  baseVersions,
 }: Readonly<{
-  changesets: readonly ChangesetFile[];
   stocks: readonly StockFile[];
+  /** The version of each package at the base, by name. */
+  baseVersions: ReadonlyMap<string, string>;
 }>): Result<Summary, string> => {
-  const results = checkStocks({ changesets, stocks });
+  const results = stocks.map((stock) => checkStock(stock, baseVersions));
 
   const violations = Arr.generate(function* () {
     for (const { violation } of results) {
@@ -98,34 +109,61 @@ export const checkNextMajor = ({
     stocks: stocks.length,
     decided: results.reduce((sum, { decided }) => sum + decided, 0),
     undecided: results.reduce((sum, { undecided }) => sum + undecided, 0),
-    reminders: Arr.generate(function* () {
-      for (const { reminder } of results) {
-        if (reminder !== undefined) {
-          yield reminder;
-        }
-      }
-    }),
   });
 };
 
 /**
- * The undecided items of every package with a breaking release pending,
- * whether or not the check passes: they are what `release.yml` lists on the
- * version pull request, where the release is decided.
+ * The open items of every package a changeset gives a breaking bump: what
+ * `release.yml` lists on the version pull request, read from `main` before
+ * `changeset version` consumes `.changeset/`.
  */
-export const listReminders = (
-  input: Readonly<{
-    changesets: readonly ChangesetFile[];
-    stocks: readonly StockFile[];
-  }>,
-): readonly Reminder[] =>
-  Arr.generate(function* () {
-    for (const { reminder } of checkStocks(input)) {
-      if (reminder !== undefined) {
-        yield reminder;
+export const listReminders = ({
+  changesets,
+  stocks,
+}: Readonly<{
+  changesets: readonly ChangesetFile[];
+  stocks: readonly StockFile[];
+}>): readonly Reminder[] => {
+  const bumps = changesets.flatMap(({ file, content }) =>
+    Array.from(parseChangesetBumps(content), ([name, bump]) => ({
+      file,
+      name,
+      bump,
+    })),
+  );
+
+  return Arr.generate(function* () {
+    for (const { file, content, manifest } of stocks) {
+      if (manifest === undefined) {
+        continue;
+      }
+
+      // Several changesets may name the package; any breaking one is enough.
+      const pending = bumps.find(
+        ({ name, bump }) =>
+          name === manifest.name && isBreaking(bump, manifest.version),
+      );
+
+      const items = listStockItems(content);
+
+      if (pending !== undefined && Arr.isNonEmpty(items)) {
+        yield {
+          file,
+          name: manifest.name,
+          version: manifest.version,
+          changeset: pending.file,
+          bump: pending.bump,
+          decided: items
+            .filter((item) => !item.undecided)
+            .map(({ text }) => text),
+          undecided: items
+            .filter((item) => item.undecided)
+            .map(({ text }) => text),
+        } as const;
       }
     }
   });
+};
 
 /**
  * The packages a changeset's front matter names, with their bump. A file
@@ -238,7 +276,7 @@ export type StockFile = Readonly<{
   manifest: Readonly<{ name: string; version: string }> | undefined;
 }>;
 
-/** A package's undecided items, while a breaking release of it is pending. */
+/** A package's open items, while a changeset gives it a breaking bump. */
 export type Reminder = Readonly<{
   /** The `NEXT_MAJOR.md`, relative to the repository root. */
   file: string;
@@ -248,19 +286,16 @@ export type Reminder = Readonly<{
   /** The changeset giving the breaking bump. */
   changeset: string;
   bump: Bump;
+  /** The first line of each decided item, which holds the release. */
+  decided: readonly string[];
   /** The first line of each undecided item. */
-  items: NonEmptyTuple<string>;
+  undecided: readonly string[];
 }>;
 
 type Summary = Readonly<{
   stocks: number;
   decided: number;
   undecided: number;
-  /**
-   * The undecided items of packages with a breaking release pending. They
-   * hold nothing, so they are only reported.
-   */
-  reminders: readonly Reminder[];
 }>;
 
 export type Bump = 'major' | 'minor' | 'patch';
@@ -289,6 +324,9 @@ const HEADING = /^\s{0,3}#{1,6}\s+(.*?)\s*#*\s*$/u;
 /** A list item at column 0, capturing its text. */
 const TOP_LEVEL_LIST_ITEM = /^(?:[-*+]|\d+[.)])\s+(.*)$/u;
 
+/** The start of a semver version, capturing its major and minor. */
+const VERSION = /^(\d+)\.(\d+)\.\d/u;
+
 const isBump = (value: string | undefined): value is Bump =>
   value === 'major' || value === 'minor' || value === 'patch';
 
@@ -300,42 +338,54 @@ const isBump = (value: string | undefined): value is Bump =>
 export const isBreaking = (bump: Bump, version: string): boolean =>
   bump === 'major' || (bump === 'minor' && version.startsWith('0.'));
 
-const checkStocks = ({
-  changesets,
-  stocks,
-}: Readonly<{
-  changesets: readonly ChangesetFile[];
-  stocks: readonly StockFile[];
-}>): readonly ReturnType<typeof checkStock>[] => {
-  const bumps = changesets.flatMap(({ file, content }) =>
-    Array.from(parseChangesetBumps(content), ([name, bump]) => ({
-      file,
-      name,
-      bump,
-    })),
-  );
+/**
+ * Whether moving a package from `from` to `to` breaks its consumers, by the
+ * rule `isBreaking` applies to a bump. A version that is not `x.y.z` is not
+ * judged.
+ */
+export const isBreakingRelease = (from: string, to: string): boolean => {
+  const before = parseVersion(from);
 
-  return stocks.map((stock) => checkStock(stock, bumps));
+  const after = parseVersion(to);
+
+  if (before === undefined || after === undefined) {
+    return false;
+  }
+
+  return (
+    after.major > before.major ||
+    (before.major === 0 && after.major === 0 && after.minor > before.minor)
+  );
+};
+
+const parseVersion = (
+  version: string,
+): Readonly<{ major: number; minor: number }> | undefined => {
+  const match = VERSION.exec(version);
+
+  return match?.[1] === undefined || match[2] === undefined
+    ? undefined
+    : {
+        major: Result.unwrapOkOr(Num.safeParseFloat(match[1]), Number.NaN),
+        minor: Result.unwrapOkOr(Num.safeParseFloat(match[2]), Number.NaN),
+      };
 };
 
 const checkStock = (
   { file, content, manifest }: StockFile,
-  bumps: readonly Readonly<{ file: string; name: string; bump: Bump }>[],
+  baseVersions: ReadonlyMap<string, string>,
 ): Readonly<{
   decided: number;
   undecided: number;
   violation: string | undefined;
-  reminder: Reminder | undefined;
 }> => {
   const items = listStockItems(content);
 
   const decided = items.filter((item) => !item.undecided);
 
-  const undecided = items.filter((item) => item.undecided);
-
   const counts = {
     decided: decided.length,
-    undecided: undecided.length,
+    undecided: items.length - decided.length,
   } as const;
 
   if (manifest === undefined) {
@@ -346,7 +396,6 @@ const checkStock = (
         "release would ever be held for it. Move it into the package's",
         'directory.',
       ].join('\n'),
-      reminder: undefined,
     };
   }
 
@@ -354,85 +403,36 @@ const checkStock = (
     return {
       ...counts,
       violation: `${file}: has no items left. Delete it.`,
-      reminder: undefined,
     };
   }
 
-  // Several changesets may name the package; any breaking one is enough.
-  const pending = bumps.find(
-    ({ name, bump }) =>
-      name === manifest.name && isBreaking(bump, manifest.version),
-  );
+  const baseVersion = baseVersions.get(manifest.name);
 
-  if (pending === undefined) {
-    return { ...counts, violation: undefined, reminder: undefined };
-  }
-
-  const reminder: Reminder | undefined = Arr.isNonEmpty(undecided)
-    ? ({
-        file,
-        name: manifest.name,
-        version: manifest.version,
-        changeset: pending.file,
-        bump: pending.bump,
-        items: Arr.map(undecided, ({ text }) => text),
-      } as const)
-    : undefined;
-
-  if (!Arr.isNonEmpty(decided)) {
-    return { ...counts, violation: undefined, reminder };
+  if (
+    baseVersion === undefined ||
+    !isBreakingRelease(baseVersion, manifest.version) ||
+    !Arr.isNonEmpty(decided)
+  ) {
+    return { ...counts, violation: undefined };
   }
 
   return {
     ...counts,
     violation: [
-      ...releasingLines(file, pending, manifest),
-      '',
-      'These are still waiting for it:',
+      `${file}: this tree releases ${manifest.name}@${manifest.version}, a breaking`,
+      `release from ${baseVersion}. These are still waiting for it:`,
       '',
       ...decided.map(({ text }) => `  - ${text}`),
       '',
-      "Make each change, move the item's text into that changeset, and delete",
-      'the item. Deleting an item without making the change only moves it to',
-      'nowhere; if the release really has to go without one, move it under',
-      '"Undecided" — which is for the author to decide.',
-      ...(reminder === undefined
-        ? []
-        : Arr.toUnshifted('')(undecidedLines(reminder))),
+      'Merge the pull requests making them first; release.yml then rebuilds',
+      "this one. Making a change is moving the item's text into the changeset",
+      'that releases it and deleting the item; deleting it without making the',
+      'change only moves it to nowhere. If the release really has to go',
+      'without one, move it under "Undecided" — which is for the author to',
+      'decide.',
     ].join('\n'),
-    reminder,
   };
 };
-
-const releasingLines = (
-  file: string,
-  pending: Readonly<{ file: string; bump: Bump }>,
-  manifest: Readonly<{ name: string; version: string }>,
-): readonly string[] =>
-  [
-    `${file}: ${pending.file} releases`,
-    `${manifest.name}@${manifest.version} with a breaking "${pending.bump}" bump.`,
-  ] as const;
-
-const undecidedLines = ({ items }: Reminder): readonly string[] =>
-  [
-    'Undecided, and not holding it — decide each now: move it above the',
-    '"Undecided" heading to make it with this release, delete it if it will',
-    'not be made, or leave it for a later one:',
-    '',
-    ...items.map((text) => `  - ${text}`),
-  ] as const;
-
-const formatReminder = (reminder: Reminder): string =>
-  [
-    ...releasingLines(
-      reminder.file,
-      { file: reminder.changeset, bump: reminder.bump },
-      reminder,
-    ),
-    '',
-    ...undecidedLines(reminder),
-  ].join('\n');
 
 export const readChangesets = async (): Promise<readonly ChangesetFile[]> => {
   const files = await glob(`${CHANGESET_DIR_NAME}/*.md`, {
@@ -478,6 +478,80 @@ export const readStocks = async (): Promise<readonly StockFile[]> => {
   );
 };
 
+/**
+ * The version of each stocked package at `base`, by name. A package whose
+ * `package.json` the base does not have is left out: its first release is
+ * manual (`libs/first-release.md`).
+ */
+const readBaseVersions = (
+  base: string,
+  stocks: readonly StockFile[],
+): ReadonlyMap<string, string> =>
+  new Map(
+    Arr.generate(function* () {
+      for (const { file } of stocks) {
+        const shown = spawnSync(
+          'git',
+          [
+            'show',
+            `${base}:${path.posix.join(path.posix.dirname(file), 'package.json')}`,
+          ],
+          { cwd: projectRootPath, encoding: 'utf8' },
+        );
+
+        const manifest =
+          shown.status === 0 ? parseManifest(shown.stdout) : undefined;
+
+        if (manifest !== undefined) {
+          yield [manifest.name, manifest.version] as const;
+        }
+      }
+    }),
+  );
+
+/**
+ * The commit the versions are compared with: `NEXT_MAJOR_BASE`, or the merge
+ * base of `HEAD` and `origin/main`. A base that is not in the clone is an
+ * error rather than a base with no packages, which would pass every release.
+ */
+const resolveBase = (): string => {
+  const fromEnv = process.env['NEXT_MAJOR_BASE'];
+
+  if (fromEnv !== undefined && fromEnv !== '') {
+    const verified = spawnSync(
+      'git',
+      // `^0` peels to the commit, and fails on anything that is not one.
+      ['rev-parse', '--verify', '--quiet', `${fromEnv}^0`],
+      { cwd: projectRootPath, encoding: 'utf8' },
+    );
+
+    if (verified.status !== 0) {
+      throw new Error(
+        `NEXT_MAJOR_BASE is ${fromEnv}, which is not a commit in this clone. Fetch it first.`,
+      );
+    }
+
+    return fromEnv;
+  }
+
+  const mergeBase = spawnSync('git', ['merge-base', 'HEAD', 'origin/main'], {
+    cwd: projectRootPath,
+    encoding: 'utf8',
+  });
+
+  if (mergeBase.status !== 0) {
+    throw new Error(
+      [
+        'Could not find the commit to compare versions with: NEXT_MAJOR_BASE is',
+        `not set, and \`git merge-base HEAD origin/main\` failed: ${mergeBase.stderr.trim()}`,
+        'Fetch origin/main, or set NEXT_MAJOR_BASE to the base of the change.',
+      ].join('\n'),
+    );
+  }
+
+  return mergeBase.stdout.trim();
+};
+
 const readManifest = async (
   manifestPath: string,
 ): Promise<StockFile['manifest']> => {
@@ -486,11 +560,11 @@ const readManifest = async (
     fs.readFile(manifestPath, 'utf8'),
   );
 
-  if (Result.isErr(content)) {
-    return undefined;
-  }
+  return Result.isErr(content) ? undefined : parseManifest(content.value);
+};
 
-  const parsed = Json.parse(content.value);
+const parseManifest = (content: string): StockFile['manifest'] => {
+  const parsed = Json.parse(content);
 
   if (
     Result.isErr(parsed) ||
@@ -507,8 +581,18 @@ const readManifest = async (
 };
 
 if (isDirectlyExecuted(import.meta.url)) {
-  const result = await Promise.all([readChangesets(), readStocks()])
-    .then(([changesets, stocks]) => checkNextMajor({ changesets, stocks }))
+  const result = await readStocks()
+    .then((stocks) => {
+      const base = resolveBase();
+
+      return Result.map(
+        checkNextMajor({
+          stocks,
+          baseVersions: readBaseVersions(base, stocks),
+        }),
+        (summary) => ({ ...summary, base }),
+      );
+    })
     .catch((error: unknown) => Result.err(unknownToString(error)));
 
   if (Result.isErr(result)) {
@@ -517,11 +601,7 @@ if (isDirectlyExecuted(import.meta.url)) {
     process.exit(1);
   }
 
-  for (const reminder of result.value.reminders) {
-    console.warn(`${formatReminder(reminder)}\n`);
-  }
-
   console.info(
-    `${result.value.stocks} ${STOCK_FILE_NAME} file(s), ${result.value.decided} decided and ${result.value.undecided} undecided item(s) waiting; no breaking release leaves a decided one behind.`,
+    `${result.value.stocks} ${STOCK_FILE_NAME} file(s), ${result.value.decided} decided and ${result.value.undecided} undecided item(s) waiting; no release since ${result.value.base} leaves a decided one behind.`,
   );
 }

@@ -10,14 +10,16 @@ import {
 
 /**
  * Writes the comment `release.yml` keeps on the version pull request while a
- * breaking release has undecided `NEXT_MAJOR.md` items, or an empty file when
+ * breaking release has `NEXT_MAJOR.md` items open, or an empty file when
  * there is none.
  *
- * `check:prose:next-major` lets such a release through and lists the
- * candidates in its log, which nobody opens. The version pull request is
- * where the release is decided — adding `merge-queued` to it is the decision
- * — so that is where they are listed. A comment, not the body: the body is
- * rewritten by `changesets/action` on every push to `main`.
+ * The decided items hold the version pull request — `check:prose:next-major`
+ * fails on it — and are listed from the moment the breaking changeset lands,
+ * so that what the release waits for is in sight before anyone queues it. The
+ * undecided ones hold nothing, and the version pull request is where the
+ * release is decided — adding `merge-queued` to it is the decision — so that
+ * is where they are listed. A comment, not the body: the body is rewritten by
+ * `changesets/action` on every push to `main`.
  *
  * Run it on a checkout of `main`, before `changeset version` has consumed
  * `.changeset/`. It writes a file and nothing else: the job running it holds
@@ -32,24 +34,39 @@ export const formatReminderComment = (
     ? [
         REMINDER_MARKER,
         '',
-        // One line: a comment renders each line break.
-        [
-          'A breaking release in this pull request leaves `NEXT_MAJOR.md` candidates undecided.',
-          'They do not hold it; decide each before adding `merge-queued`:',
-          'move it above the "Undecided" heading to make it with this release,',
-          'delete it if it will not be made, or leave it for a later major.',
-        ].join(' '),
+        'A breaking release in this pull request has `NEXT_MAJOR.md` items open.',
         ...reminders.flatMap(
-          ({ file, name, version, changeset, bump, items }) => [
+          ({ file, name, version, changeset, bump, decided, undecided }) => [
             '',
             `**\`${name}@${version}\`**, given \`${bump}\` by \`${changeset}\`; in \`${file}\`:`,
-            '',
-            ...items.map((text) => `- ${text}`),
+            ...itemLines(DECIDED_LINE, decided),
+            ...itemLines(UNDECIDED_LINE, undecided),
           ],
         ),
         '',
       ].join('\n')
     : undefined;
+
+const itemLines = (
+  lead: string,
+  items: readonly string[],
+): readonly string[] =>
+  Arr.isNonEmpty(items)
+    ? (['', lead, '', ...items.map((text) => `- ${text}`)] as const)
+    : ([] as const);
+
+// One line each: a comment renders each line break.
+const DECIDED_LINE = [
+  'Decided, and holding this pull request: `check:prose:next-major` fails on it',
+  'until each change is made and its item deleted.',
+  'Moving an item under the "Undecided" heading releases without it.',
+].join(' ');
+
+const UNDECIDED_LINE = [
+  'Undecided, and not holding it: decide each before adding `merge-queued` —',
+  'move it above the "Undecided" heading to make it with this release,',
+  'delete it if it will not be made, or leave it for a later major.',
+].join(' ');
 
 /**
  * The first line of the comment, by which `release.yml` finds the one it
@@ -82,7 +99,6 @@ if (isDirectlyExecuted(import.meta.url)) {
   await fs.writeFile(output, result.value ?? '');
 
   console.info(
-    result.value ??
-      'No breaking release has undecided candidates; wrote an empty file.',
+    result.value ?? 'No breaking release has items open; wrote an empty file.',
   );
 }

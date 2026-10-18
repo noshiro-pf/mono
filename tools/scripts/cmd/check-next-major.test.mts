@@ -2,9 +2,9 @@ import dedent from 'dedent';
 import { Result } from 'ts-data-forge';
 import {
   checkNextMajor,
+  isBreakingRelease,
   listStockItems,
   parseChangesetBumps,
-  type ChangesetFile,
   type StockFile,
 } from './check-next-major.mjs';
 
@@ -111,74 +111,81 @@ describe('listStockItems', () => {
   });
 });
 
+describe('isBreakingRelease', () => {
+  test('is a release that raises the major', () => {
+    assert.isTrue(isBreakingRelease('1.2.3', '2.0.0'));
+
+    assert.isTrue(isBreakingRelease('0.5.1', '1.0.0'));
+  });
+
+  test('is a release that raises the minor of a 0.x package', () => {
+    assert.isTrue(isBreakingRelease('0.5.1', '0.6.0'));
+  });
+
+  test('is not a minor or patch release of a 1.x package', () => {
+    assert.isFalse(isBreakingRelease('1.2.3', '1.3.0'));
+
+    assert.isFalse(isBreakingRelease('1.2.3', '1.2.4'));
+  });
+
+  test('is not a patch release of a 0.x package', () => {
+    assert.isFalse(isBreakingRelease('0.5.1', '0.5.2'));
+  });
+
+  test('is not an unchanged or lowered version', () => {
+    assert.isFalse(isBreakingRelease('1.2.3', '1.2.3'));
+
+    assert.isFalse(isBreakingRelease('2.0.0', '1.2.3'));
+  });
+
+  test('is not a version it cannot read', () => {
+    assert.isFalse(isBreakingRelease('1.2.3', 'next'));
+  });
+});
+
 describe('checkNextMajor', () => {
-  test('passes items no breaking release is waiting on', () => {
+  test('passes items while the version is unchanged', () => {
     const result = checkNextMajor({
-      changesets: [changeset('minor'), changeset('major', 'other')],
       stocks: [stock('1.2.3')],
+      baseVersions: new Map([['pkg', '1.2.3']]),
     });
 
     assert.deepStrictEqual(
       result,
-      Result.ok({ stocks: 1, decided: 1, undecided: 0, reminders: [] }),
+      Result.ok({ stocks: 1, decided: 1, undecided: 0 }),
     );
   });
 
-  test('fails a major bump that would leave items behind, and lists them', () => {
+  test('passes items a non-breaking release leaves behind', () => {
     const result = checkNextMajor({
-      changesets: [changeset('patch'), changeset('major')],
-      stocks: [stock('1.2.3')],
+      stocks: [stock('1.3.0')],
+      baseVersions: new Map([['pkg', '1.2.3']]),
+    });
+
+    assert.isTrue(Result.isOk(result));
+  });
+
+  test('fails a major release that would leave items behind, and lists them', () => {
+    const result = checkNextMajor({
+      stocks: [stock('2.0.0')],
+      baseVersions: new Map([['pkg', '1.2.3']]),
     });
 
     assert.isTrue(Result.isErr(result));
 
-    assert.include(result.value, '.changeset/major.md releases\npkg@1.2.3');
+    assert.include(
+      result.value,
+      'libs/pkg/NEXT_MAJOR.md: this tree releases pkg@2.0.0, a breaking\nrelease from 1.2.3.',
+    );
 
     assert.include(result.value, '  - Rename `foo` to `bar`.');
   });
 
-  test('lets a major bump through undecided items, and reminds of them', () => {
+  test('fails on the decided items only, and leaves out the undecided', () => {
     const result = checkNextMajor({
-      changesets: [changeset('major')],
-      stocks: [stock('1.2.3', UNDECIDED_ONLY)],
-    });
-
-    assert.isTrue(Result.isOk(result));
-
-    assert.strictEqual(result.value.undecided, 1);
-
-    assert.lengthOf(result.value.reminders, 1);
-
-    assert.deepStrictEqual(result.value.reminders, [
-      {
-        file: 'libs/pkg/NEXT_MAJOR.md',
-        name: 'pkg',
-        version: '1.2.3',
-        changeset: '.changeset/major.md',
-        bump: 'major',
-        items: ['Drop the `baz` re-export.'],
-      },
-    ]);
-  });
-
-  test('reminds of nothing while no breaking release is pending', () => {
-    const result = checkNextMajor({
-      changesets: [changeset('minor')],
-      stocks: [stock('1.2.3', UNDECIDED_ONLY)],
-    });
-
-    assert.deepStrictEqual(
-      result,
-      Result.ok({ stocks: 1, decided: 0, undecided: 1, reminders: [] }),
-    );
-  });
-
-  test('fails on the decided items only, and lists the undecided apart', () => {
-    const result = checkNextMajor({
-      changesets: [changeset('major')],
       stocks: [
         stock(
-          '1.2.3',
+          '2.0.0',
           dedent`
             # Next major
 
@@ -190,34 +197,41 @@ describe('checkNextMajor', () => {
           `,
         ),
       ],
+      baseVersions: new Map([['pkg', '1.2.3']]),
     });
 
     assert.isTrue(Result.isErr(result));
 
-    const [decided, undecided] = result.value.split('Undecided, and not', 2);
+    assert.include(result.value, '  - Rename `foo` to `bar`.');
 
-    assert.include(decided, '  - Rename `foo` to `bar`.');
-
-    assert.notInclude(decided, 'baz');
-
-    assert.include(undecided, '  - Drop the `baz` re-export.');
+    assert.notInclude(result.value, 'baz');
   });
 
-  test('treats a minor bump of a 0.x package as breaking', () => {
+  test('lets a major release through undecided items', () => {
     const result = checkNextMajor({
-      changesets: [changeset('minor')],
-      stocks: [stock('0.5.1')],
+      stocks: [stock('2.0.0', UNDECIDED_ONLY)],
+      baseVersions: new Map([['pkg', '1.2.3']]),
+    });
+
+    assert.deepStrictEqual(
+      result,
+      Result.ok({ stocks: 1, decided: 0, undecided: 1 }),
+    );
+  });
+
+  test('fails a minor release of a 0.x package that would leave items behind', () => {
+    const result = checkNextMajor({
+      stocks: [stock('0.6.0')],
+      baseVersions: new Map([['pkg', '0.5.1']]),
     });
 
     assert.isTrue(Result.isErr(result));
-
-    assert.include(result.value, 'breaking "minor" bump');
   });
 
-  test('passes a patch bump of a 0.x package', () => {
+  test('passes a package the base does not have', () => {
     const result = checkNextMajor({
-      changesets: [changeset('patch')],
-      stocks: [stock('0.5.1')],
+      stocks: [stock('1.0.0')],
+      baseVersions: new Map(),
     });
 
     assert.isTrue(Result.isOk(result));
@@ -225,8 +239,8 @@ describe('checkNextMajor', () => {
 
   test('fails a file with no items left', () => {
     const result = checkNextMajor({
-      changesets: [],
       stocks: [stock('1.2.3', '# Next major\n')],
+      baseVersions: new Map([['pkg', '1.2.3']]),
     });
 
     assert.isTrue(Result.isErr(result));
@@ -236,8 +250,8 @@ describe('checkNextMajor', () => {
 
   test('fails a file with no package beside it', () => {
     const result = checkNextMajor({
-      changesets: [],
       stocks: [{ ...stock('1.2.3'), manifest: undefined }],
+      baseVersions: new Map(),
     });
 
     assert.isTrue(Result.isErr(result));
@@ -254,12 +268,6 @@ const stock = (
     file: 'libs/pkg/NEXT_MAJOR.md',
     content,
     manifest: { name: 'pkg', version },
-  }) as const;
-
-const changeset = (bump: string, name = 'pkg'): ChangesetFile =>
-  ({
-    file: `.changeset/${bump}.md`,
-    content: `---\n'${name}': ${bump}\n---\n\nSomething.\n`,
   }) as const;
 
 const UNDECIDED_ONLY = dedent`
