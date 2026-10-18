@@ -7,8 +7,8 @@ import { createState } from './create-state.mjs';
  * Extends `createState` with boolean-specific helpers like `toggle`, `setTrue`, and `setFalse`.
  *
  * @param initialState - The initial boolean value
- * @param options - {@link StateOptions}: `equals`, to pass on only the
- *   updates that change the state
+ * @param options - {@link StateOptions}: `equals` (default `Object.is`),
+ *   to pass on only the updates that change the state
  * @returns A 2-element tuple: `[state, { setTrue, setFalse, toggle, setState, updateState, resetState, getSnapshot, initialState }]`
  *
  * @example

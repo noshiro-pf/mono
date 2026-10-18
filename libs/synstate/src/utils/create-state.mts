@@ -28,8 +28,8 @@ const reducer = <S,>(state: S, action: Action<S>): S => {
  *
  * @template S - The type of the state
  * @param initialState - The initial value of the state
- * @param options - {@link StateOptions}: `equals`, to pass on only the
- *   updates that change the state
+ * @param options - {@link StateOptions}: `equals` (default `Object.is`),
+ *   to pass on only the updates that change the state
  * @returns A 3-element tuple: `[state, setState, { updateState, resetState, getSnapshot, initialState }]`
  *
  * @example

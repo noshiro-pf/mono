@@ -2,22 +2,8 @@ import type { FixedLengthTuple } from 'ts-type-forge';
 import { createReducer } from './create-reducer.mjs';
 
 describe(createReducer, () => {
-  test('passes on every dispatch when no `equals` is given, equal or not', () => {
-    const [state, dispatch] = createReducer(keepOrAdd, 0);
-
-    const seen = record(state);
-
-    dispatch({ type: 'keep' });
-
-    dispatch({ type: 'add', amount: 1 });
-
-    assert.deepStrictEqual(seen, [0, 0, 1]);
-  });
-
-  test('with `equals`, does not pass on a dispatch whose next state is equal to the current one', () => {
-    const [state, dispatch, { getSnapshot }] = createReducer(keepOrAdd, 0, {
-      equals: Object.is,
-    });
+  test('does not pass on a dispatch whose next state is `Object.is`-equal to the current one when no `equals` is given', () => {
+    const [state, dispatch, { getSnapshot }] = createReducer(keepOrAdd, 0);
 
     const seen = record(state);
 
@@ -30,6 +16,37 @@ describe(createReducer, () => {
     assert.deepStrictEqual(seen, [0, 1]);
 
     assert.strictEqual(getSnapshot(), 1);
+  });
+
+  test('compares with `Object.is` by default, so `NaN` equals itself and `-0` differs from `0`', () => {
+    const [state, dispatch] = createReducer(
+      (_current: number, next: number) => next,
+      0,
+    );
+
+    const seen = record(state);
+
+    dispatch(-0);
+
+    dispatch(Number.NaN);
+
+    dispatch(Number.NaN);
+
+    assert.deepStrictEqual(seen, [0, -0, Number.NaN]);
+  });
+
+  test('passes on every dispatch, equal or not, with `equals: () => false`', () => {
+    const [state, dispatch] = createReducer(keepOrAdd, 0, {
+      equals: () => false,
+    });
+
+    const seen = record(state);
+
+    dispatch({ type: 'keep' });
+
+    dispatch({ type: 'add', amount: 1 });
+
+    assert.deepStrictEqual(seen, [0, 0, 1]);
   });
 
   test('keeps the current object when `equals` finds the next one equal to it', () => {

@@ -1,21 +1,5 @@
 # Next major
 
-- Make `Object.is` the default `equals` of `createState`, `createReducer` and
-  `createBooleanState`.
-
-    An update whose next state is `Object.is`-equal to the current one is then
-    not passed on: no subscriber, and nothing derived from the state, is told
-    of it, and the current state is kept. Pass `equals: () => false` to pass
-    on every update as before.
-
-    `synstate-preact-signals`, `synstate-preact-hooks`, `synstate-react-hooks`
-    and `synstate-react-hooks-compat` pass `equals` through, so the change
-    reaches their users too: the signal, the components using the hook and
-    the subscribers of `state` are not told of such an update. Name all five
-    packages with `major` in the changeset that makes it, so that its text
-    reaches each changelog; `check:prose:linked-releases` holds the release
-    until it does.
-
 - Stop completing upstream observables when a child completes, and drop
   `autoComplete`.
 

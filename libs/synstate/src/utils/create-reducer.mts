@@ -9,8 +9,8 @@ import { source, type InitializedObservable } from '../core/index.mjs';
  * @template A - The type of actions
  * @param reducer - A pure function that takes current state and action, returns new state
  * @param initialState - The initial value of the state
- * @param options - {@link StateOptions}: `equals`, to pass on only the
- *   dispatches that change the state
+ * @param options - {@link StateOptions}: `equals` (default `Object.is`),
+ *   to pass on only the dispatches that change the state
  * @returns A 3-element tuple: `[state, dispatch, { getSnapshot, initialState }]`.
  *   `dispatch` returns the state it leaves; once `state` is completed, that
  *   is the state held.
@@ -54,7 +54,7 @@ import { source, type InitializedObservable } from '../core/index.mjs';
  *   (s, action: Readonly<{ type: 'add'; amount: number }>) =>
  *     s + action.amount,
  *   0,
- *   { equals: Object.is },
+ *   { equals: () => false },
  * );
  *
  * const countHistory: number[] = [];
@@ -63,11 +63,11 @@ import { source, type InitializedObservable } from '../core/index.mjs';
  *   countHistory.push(value);
  * });
  *
- * dispatch({ type: 'add', amount: 0 }); // 0 again: nothing is passed on
+ * dispatch({ type: 'add', amount: 0 }); // 0 again, passed on all the same
  *
  * dispatch({ type: 'add', amount: 2 });
  *
- * assert.deepStrictEqual(countHistory, [0, 2]);
+ * assert.deepStrictEqual(countHistory, [0, 0, 2]);
  * ```
  *
  * @note Do not call `dispatch` from a subscriber or a projection while another
@@ -91,7 +91,7 @@ export const createReducer = <S, A>(
 ] => {
   const state = source<S>(initialState);
 
-  const equals = options?.equals;
+  const equals = options?.equals ?? Object.is;
 
   const dispatch = (action: A): S => {
     const currentState = state.getSnapshot().value;
@@ -99,7 +99,7 @@ export const createReducer = <S, A>(
     const nextState = reducer(currentState, action);
 
     // Once completed, `next` keeps the state held and returns it.
-    return equals?.(currentState, nextState) === true
+    return equals(currentState, nextState)
       ? currentState
       : state.next(nextState);
   };
@@ -124,8 +124,8 @@ export type StateOptions<S> = Readonly<{
    * `skipIfNoChange`: an update passed on here reaches whatever reads the
    * state directly before any operator can thin it out.
    *
-   * When omitted, every update is passed on, equal or not. That default is
-   * stocked in `NEXT_MAJOR.md` to become `Object.is`.
+   * Defaults to `Object.is`, so writing the value already held passes
+   * nothing on. Pass `() => false` to pass on every update, equal or not.
    *
    * @param current - The state held now
    * @param next - The state the update would set
