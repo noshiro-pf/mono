@@ -132,6 +132,20 @@ describe('prefer-safe-number-parse through type wrappers', () => {
           const n = parseFloat(x! as string);
         `,
       },
+      {
+        name: 'ignores a string widened by `as` to a type Number() reads otherwise',
+        code: dedent`
+          declare const s: string;
+          const n = Number(s as string | boolean);
+        `,
+      },
+      {
+        name: 'ignores `!` on an optional string, which leaves undefined in place',
+        code: dedent`
+          declare const s: string | undefined;
+          const n = parseFloat(s!);
+        `,
+      },
     ],
     invalid: [
       {
@@ -166,15 +180,15 @@ describe('prefer-safe-number-parse through type wrappers', () => {
         ],
       },
       {
-        name: 'reads `!` on an optional string as the string it asserts',
+        name: 'rewrites a string that is a string at every layer',
         code: dedent`
-          declare const s: string | undefined;
-          const n = parseFloat(s!);
+          declare const s: string;
+          const n = parseFloat(s! as string);
         `,
         output: dedent`
           import { Result, SafeNumber } from 'ts-std-forge';
-          declare const s: string | undefined;
-          const n = Result.unwrapOkOr(SafeNumber.parse(s!), Number.NaN);
+          declare const s: string;
+          const n = Result.unwrapOkOr(SafeNumber.parse(s! as string), Number.NaN);
         `,
         errors: [{ messageId: 'useSafeNumberParse' }],
       },

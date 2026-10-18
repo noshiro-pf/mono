@@ -168,6 +168,20 @@ describe('prefer-safe-array-length-guard through type wrappers', () => {
           const ok = xs.length > (2 as const);
         `,
       },
+      {
+        name: 'an array widened by `as` to one that may be a string',
+        code: dedent`
+          declare const xs: readonly string[];
+          const ok = (xs as readonly string[] | string).length > 0;
+        `,
+      },
+      {
+        name: '`!` on an optional array, which leaves undefined in place',
+        code: dedent`
+          declare const xs: readonly number[] | undefined;
+          const ok = xs!.length !== 0;
+        `,
+      },
     ],
     invalid: [
       {
@@ -210,15 +224,15 @@ describe('prefer-safe-array-length-guard through type wrappers', () => {
         errors: [{ messageId: 'useIsEmpty' }],
       },
       {
-        name: 'keeps a wrapper on the array and reads `!` as the array it asserts',
+        name: 'keeps a wrapper on an array that is an array at every layer',
         code: dedent`
-          declare const xs: readonly number[] | undefined;
-          const ok = xs!.length !== 0;
+          declare const xs: readonly number[];
+          const ok = (xs! as readonly number[]).length !== 0;
         `,
         output: dedent`
           import { SafeArray } from 'ts-std-forge';
-          declare const xs: readonly number[] | undefined;
-          const ok = SafeArray.isNonEmpty(xs!);
+          declare const xs: readonly number[];
+          const ok = SafeArray.isNonEmpty(xs! as readonly number[]);
         `,
         errors: [{ messageId: 'useIsNonEmpty' }],
       },

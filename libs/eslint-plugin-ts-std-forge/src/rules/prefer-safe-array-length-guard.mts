@@ -11,7 +11,7 @@ import {
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { getValueType } from './ast-utils.mjs';
+import { typeHoldsAtEveryLayer } from './ast-utils.mjs';
 import { TS_STD_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
@@ -86,29 +86,24 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
       TS_STD_FORGE_MODULE,
     );
 
-    const checker = sourceCode.parserServices?.program?.getTypeChecker();
-
     /**
      * Whether `expression` is an array or tuple. Without type information the
      * answer is no: `.length` is also a string's, a function's and a
-     * `TypedArray`'s, and none of those can be handed to the guard. The type is
-     * the value's, not a cast's: a string cast to an array is still a string.
+     * `TypedArray`'s, and none of those can be handed to the guard. It has to
+     * be one at every layer of type wrappers: a string cast to an array is
+     * still a string, and the fix, which keeps the wrapper, hands the guard
+     * the type the outermost layer states.
      */
     const isArrayLike = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       expression: TSESTree.Expression,
-    ): boolean => {
-      if (checker === undefined) {
-        return false;
-      }
-
-      const type = getValueType(sourceCode, expression);
-
-      return (
-        type !== undefined &&
-        (checker.isArrayType(type) || checker.isTupleType(type))
+    ): boolean =>
+      typeHoldsAtEveryLayer(
+        sourceCode,
+        expression,
+        (type, checker) =>
+          checker.isArrayType(type) || checker.isTupleType(type),
       );
-    };
 
     const mut_nodesToFix: {
       node: TSESTree.BinaryExpression;

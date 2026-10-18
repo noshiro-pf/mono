@@ -12,7 +12,7 @@ import {
 } from 'eslint-rule-forge';
 import { SafeArray } from 'ts-std-forge';
 import * as ts from 'typescript';
-import { getValueType, isIdentifierNamed } from './ast-utils.mjs';
+import { isIdentifierNamed, typeHoldsAtEveryLayer } from './ast-utils.mjs';
 import { TS_STD_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
@@ -47,27 +47,22 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
         TS_STD_FORGE_MODULE,
       );
 
-      const checker = sourceCode.parserServices?.program?.getTypeChecker();
-
       /**
        * Whether the `isRecord(...)` half of the rewrite would be dead code
        * because the object already satisfies `hasKey`'s
-       * `R extends UnknownRecord` constraint. Without type information nothing
-       * is known, so the guard is kept. The type is the value's, not a cast's:
-       * an array cast to a record is still rejected by `isRecord`.
+       * `R extends UnknownRecord` constraint, at every layer of type
+       * wrappers: an array cast to a record is still rejected by `isRecord`,
+       * and a record widened to one that may be an array is the author saying
+       * it may need the guard. Without type information nothing is known, so
+       * the guard is kept.
        */
       const isKnownRecord = (
         // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
         expression: TSESTree.Expression,
-      ): boolean => {
-        if (checker === undefined) {
-          return false;
-        }
-
-        const type = getValueType(sourceCode, expression);
-
-        return type !== undefined && isAlreadyRecordType(checker, type);
-      };
+      ): boolean =>
+        typeHoldsAtEveryLayer(sourceCode, expression, (type, checker) =>
+          isAlreadyRecordType(checker, type),
+        );
 
       const mut_nodesToFix: {
         node: TSESTree.CallExpression | TSESTree.BinaryExpression;
