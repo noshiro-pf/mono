@@ -23,6 +23,7 @@ import {
   arcEdges,
   buildNodeViews,
   defaultDirection,
+  filterNodes,
   hiddenNodeIds,
   layOutGraph,
   layoutWithElk,
@@ -30,7 +31,7 @@ import {
   sameNodeIds,
   withoutNodes,
 } from '../dag/index.mjs';
-import { nodeRefOf } from '../domain/index.mjs';
+import { nodeRefOf, type GraphNodeId } from '../domain/index.mjs';
 import type { Backend } from '../repository/index.mjs';
 import {
   animationSettingStorage,
@@ -42,11 +43,13 @@ import {
   isArrangeable,
   listSettingsStorage,
   nodeSizeStorage,
+  parseDagFilterQuery,
   parseViewQuery,
 } from '../view-model/index.mjs';
 import { createAnimationSettingStore } from './animation-setting-store.mjs';
 import { createBulkEditStore } from './bulk-edit-store.mjs';
 import { createClockStore } from './clock-store.mjs';
+import { createDagFilterStore } from './dag-filter-store.mjs';
 import { createDagLayoutStore } from './dag-layout-store.mjs';
 import { createDagSelectionStore } from './dag-selection-store.mjs';
 import { createDagShowDoneStore } from './dag-show-done-store.mjs';
@@ -159,13 +162,34 @@ export const dagShowDoneStore = createDagShowDoneStore({
   save: saveSetting(dagShowDoneStorage),
 });
 
-/** The nodes the graph screen leaves out (`dag/hidden-nodes.mts`). */
-const dagHiddenNodes = combine([
+export const dagFilterStore = createDagFilterStore({
+  initial: parseDagFilterQuery(readLocationSearch()),
+});
+
+/**
+ * What the graph screen leaves out (`dag/hidden-nodes.mts`) and what its
+ * filter leaves of the rest (`dag/node-filter.mts`).
+ */
+const dagFilteredNodes = combine([
   dataStore.state,
+  dataStore.groups,
   clockStore.now,
   dagShowDoneStore.showDone,
-])
-  .pipe(map(([state, now, showDone]) => hiddenNodeIds(state, now, showDone)))
+  dagFilterStore.filter,
+]).pipe(
+  map(([state, groups, now, showDone, filter]) =>
+    filterNodes(state, groups, filter, hiddenNodeIds(state, now, showDone)),
+  ),
+);
+
+/** The nodes the graph screen draws in no mode. */
+const dagHiddenNodes = dagFilteredNodes
+  .pipe(map(({ hidden }) => hidden))
+  .pipe(skipIfNoChange(sameNodeIds));
+
+/** The nodes drawn faint, outside the filter but joined to what is in it. */
+const dagOutsideNodes = dagFilteredNodes
+  .pipe(map(({ outside }) => outside))
   .pipe(skipIfNoChange(sameNodeIds));
 
 export const dagLayoutStore = createDagLayoutStore({
@@ -207,13 +231,17 @@ export const dagLayoutStore = createDagLayoutStore({
 const viewQuerySync = createViewQuerySync({
   view: uiStore.view,
   mode: dagViewModeStore.mode,
+  filter: dagFilterStore.filter,
   read: readLocationSearch,
   write: replaceLocationSearch,
 });
 
 export const dagSelectionStore = createDagSelectionStore({
   state: dataStore.state,
-  hidden: dagHiddenNodes,
+  // The nodes outside the filter are there to be seen, not edited with it.
+  hidden: combine([dagHiddenNodes, dagOutsideNodes]).pipe(
+    map(([hidden, outside]): ReadonlySet<GraphNodeId> => hidden.union(outside)),
+  ),
   active: combine([uiStore.view, dagViewModeStore.mode]).pipe(
     map(([view, mode]) => view === 'dag' && isArrangeable(mode)),
   ),
@@ -260,6 +288,10 @@ export const diagramSortSignal = toSignal(diagramSortStore.sort);
 export const dagShowDoneSignal = toSignal(dagShowDoneStore.showDone);
 
 export const dagHiddenNodesSignal = toSignal(dagHiddenNodes);
+
+export const dagFilterSignal = toSignal(dagFilterStore.filter);
+
+export const dagOutsideNodesSignal = toSignal(dagOutsideNodes);
 
 export const dagAutoLayoutSignal = toSignal(dagLayoutStore.autoLayout);
 

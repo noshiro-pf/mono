@@ -17,6 +17,11 @@ type Props = Readonly<{
   movable: boolean;
   /** Brought forward or dimmed by the arc diagram's highlight. */
   highlight: HighlightState;
+  /**
+   * Outside the filter, and drawn faint: there only as what a node in it
+   * waits for or is waited for by (`dag/node-filter.mts`).
+   */
+  outside: boolean;
   /** While it fades out of or into a view mode; `undefined` for opaque. */
   opacity: number | undefined;
   /** 「コンパクト」: a smaller hexagon, its title alone and cut shorter. */
@@ -40,6 +45,7 @@ export const DagMilestoneNode = memoNamed<Props>(
       selected,
       movable,
       highlight,
+      outside,
       opacity,
       compact,
     } = props;
@@ -72,6 +78,7 @@ export const DagMilestoneNode = memoNamed<Props>(
         data-e2e={'dag-node'}
         data-highlight={highlight}
         data-node-id={node.id}
+        data-outside={outside}
         data-selected={selected}
         opacity={opacity}
         role={'button'}

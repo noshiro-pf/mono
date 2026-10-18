@@ -7,6 +7,7 @@ export * from './dag-canvas.js';
 export * from './dag-connect-overlay.js';
 export * from './dag-edge-delete.js';
 export * from './dag-edge.js';
+export * from './dag-filter-field.js';
 export * from './dag-group-frame.js';
 export * from './dag-milestone-node.js';
 export * from './dag-selection-bar.js';

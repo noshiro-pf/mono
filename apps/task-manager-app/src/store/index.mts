@@ -1,6 +1,7 @@
 export * from './animation-setting-store.mjs';
 export * from './bulk-edit-store.mjs';
 export * from './clock-store.mjs';
+export * from './dag-filter-store.mjs';
 export * from './dag-layout-store.mjs';
 export * from './dag-selection-store.mjs';
 export * from './dag-show-done-store.mjs';
