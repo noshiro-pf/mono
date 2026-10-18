@@ -254,6 +254,39 @@ assert.deepStrictEqual(UserWithMetadata.defaultValue, {
 } satisfies t.TypeOf<typeof UserWithMetadata>);
 ```
 
+### Dropping invalid array elements
+
+`fill` keeps an array's valid elements and, by default, replaces each invalid one with its filled value. When repairing stored data such as settings, an element that no longer makes sense is usually better removed than turned into a default unrelated to what was saved; `t.array(elementType, { onInvalidElement: 'drop' })` does that:
+
+```tsx
+import * as t from 'ts-fortress';
+
+const SortSpec = t.record({
+    key: t.enumType(['title', 'priority']),
+    order: t.enumType(['asc', 'desc']),
+});
+
+const saved = [
+    { key: 'colour', order: 'desc' }, // a key that no longer exists
+    { key: 'priority', order: 'asc' },
+] as const;
+
+// By default, an invalid element is replaced with its filled value,
+// so the unknown key turns into the default key 'title'
+assert.deepStrictEqual(t.array(SortSpec).fill(saved), [
+    { key: 'title', order: 'desc' },
+    { key: 'priority', order: 'asc' },
+]);
+
+// With onInvalidElement: 'drop', it is removed instead
+assert.deepStrictEqual(
+    t.array(SortSpec, { onInvalidElement: 'drop' }).fill(saved),
+    [{ key: 'priority', order: 'asc' }],
+);
+```
+
+An element is judged as a whole by the element type's `is`, so a nested record or array with one wrong part is dropped rather than repaired. The option changes `fill` only: `prune` takes a value that is already of the type, so it never meets an invalid element.
+
 ## Primitive Constraints
 
 `t.string()`, `t.number()`, and `t.bigint()` accept optional constraint objects that refine both runtime validation and the inferred TypeScript type. Constraints are verified when the schema is created—invalid defaults throw immediately—and on every `is()`, `validate()`, and `cast()` call.

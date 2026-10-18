@@ -14,6 +14,7 @@ const documents = [
       'default-values-and-data-filling/convenient-default-values/01.test.mts',
       'default-values-and-data-filling/convenient-default-values/02.test.mts',
       'default-values-and-data-filling/convenient-default-values/03.test.mts',
+      'default-values-and-data-filling/drop-invalid-array-elements/01.test.mts',
       'primitive-constraints/string-constraints.mts',
       'primitive-constraints/number-constraints.mts',
       'primitive-constraints/bigint-constraints.mts',
