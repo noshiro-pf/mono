@@ -1,7 +1,7 @@
 import { source } from '../create/index.mjs';
-import { take } from '../predefined/index.mjs';
 import { skipUntil } from './skip-until.mjs';
 import { takeUntil } from './take-until.mjs';
+import { take } from './take.mjs';
 
 describe('takeUntil releases the notifier', () => {
   test('when the result is completed before the notifier emits', () => {

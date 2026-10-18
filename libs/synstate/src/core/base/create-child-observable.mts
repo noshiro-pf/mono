@@ -19,6 +19,7 @@ import {
   assembleObservable,
   createManagerObservableParts,
   createObservableBaseHandle,
+  runAfterPropagation,
 } from './create-observable-base.mjs';
 
 /**
@@ -34,6 +35,12 @@ export type SyncChildObservableTools<A> = Readonly<{
 
   /** Completes this observable (leaf teardown included). */
   complete: () => void;
+
+  /**
+   * Completes this observable once the update now propagating has reached
+   * every descendant, so that they see the value just passed on first.
+   */
+  completeAfterPropagation: () => void;
 }>;
 
 /**
@@ -145,6 +152,9 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
     setNext: handle.setNext,
     getSnapshot: handle.getSnapshot,
     complete,
+    completeAfterPropagation: () => {
+      runAfterPropagation(complete);
+    },
   });
 
   const observable: SyncChildObservable<A, P> = assembleObservable({
@@ -258,6 +268,9 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     setNext: handle.setNext,
     getSnapshot: handle.getSnapshot,
     complete,
+    completeAfterPropagation: () => {
+      runAfterPropagation(complete);
+    },
     startUpdate,
   });
 

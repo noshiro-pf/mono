@@ -297,6 +297,34 @@ const mut_propagation = { depth: 0 };
 export const isPropagating = (): boolean => mut_propagation.depth > 0;
 
 /**
+ * Work deferred by {@link runAfterPropagation}, run once the outermost
+ * `startUpdate` has reached every descendant.
+ */
+const mut_afterPropagation: (() => void)[] = [];
+
+/**
+ * Runs `task` once the update now propagating has reached every descendant, or
+ * at once when none is. A child that completes itself in its `tryUpdate`
+ * completes its children with it, before they have seen the value it has just
+ * passed on (`take`).
+ */
+export const runAfterPropagation = (task: () => void): void => {
+  if (isPropagating()) {
+    mut_afterPropagation.push(task);
+  } else {
+    task();
+  }
+};
+
+const flushAfterPropagation = (): void => {
+  // A deferred task may start an update of its own, which flushes what that
+  // update defers before this loop moves on.
+  while (Arr.isNonEmpty(mut_afterPropagation)) {
+    mut_afterPropagation.shift()?.();
+  }
+};
+
+/**
  * The extra members every manager observable — a root or an async child — owns:
  * the depth-ordered descendant list and the update propagation that walks it.
  */
@@ -414,6 +442,10 @@ export const createManagerObservableParts = <A,>(
       }
     } finally {
       mut_propagation.depth -= 1;
+
+      if (mut_propagation.depth === 0) {
+        flushAfterPropagation();
+      }
     }
   };
 
