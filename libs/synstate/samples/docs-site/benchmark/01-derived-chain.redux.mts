@@ -3,6 +3,7 @@ import {
   configureStore,
   createSelector,
   createSlice,
+  lruMemoize,
 } from '@reduxjs/toolkit';
 
 // embed-sample-code-ignore-above
@@ -26,11 +27,20 @@ export const runBenchmark = (n: number): number => {
   const selectCounter = (state: Readonly<{ value: number }>): number =>
     state.value;
 
-  const selectDoubled = createSelector(selectCounter, (counter) => counter * 2);
+  // `lruMemoize`, not the default `weakMapMemoize`. Every input here is a new
+  // number that never repeats, and `weakMapMemoize` keeps every distinct
+  // primitive it has seen: one round would cache 100,000 results it never
+  // hits, and that memory and GC would be measured as Redux's cost.
+  const selectDoubled = createSelector(
+    selectCounter,
+    (counter) => counter * 2,
+    { memoize: lruMemoize },
+  );
 
   const selectQuadrupled = createSelector(
     selectDoubled,
     (doubled) => doubled * 2,
+    { memoize: lruMemoize },
   );
 
   let mut_lastValue = selectQuadrupled(store.getState());
