@@ -1,15 +1,22 @@
 import { Arr, Optional } from 'ts-data-forge';
 import { createAsyncChildObservable } from '../base/index.mjs';
+import { createScope, getCurrentScope } from '../scope/index.mjs';
 import type {
   DropInitialValueOperator,
   MergeMapOperatorObservable,
   Observable,
+  Scope,
   Subscription,
 } from '../types/index.mjs';
 
 /**
  * Projects each source value to an observable and merges all inner observables.
  * Unlike `switchMap`, does not cancel previous inner observables.
+ *
+ * Each projection runs in a scope of its own (see `createScope`): what it
+ * creates is disposed when `mergeMap` completes. An observable it only
+ * returns — one created outside the projection and shared with others — is
+ * unsubscribed and left running.
  *
  * @template A - The type of values from the source
  * @template B - The type of values from the projected observable
@@ -116,7 +123,12 @@ const createMergeMapObservable = <A, B>(
   parentObservable: Observable<A>,
   mapToObservable: (curr: A) => Observable<B>,
 ): MergeMapOperatorObservable<A, B> => {
-  let mut_observables: readonly Observable<B>[] = [];
+  // The scope the operator was created in, so that each inner scope is
+  // disposed with it; the projection itself runs during propagation, when the
+  // current scope is whatever happens to be running.
+  const ownerScope = getCurrentScope();
+
+  let mut_innerScopes: readonly Scope[] = [];
 
   let mut_subscriptions: readonly Subscription[] = [];
 
@@ -129,8 +141,8 @@ const createMergeMapObservable = <A, B>(
           s.unsubscribe();
         }
 
-        for (const o of mut_observables) {
-          o.complete();
+        for (const scope of mut_innerScopes) {
+          scope.dispose();
         }
       },
     },
@@ -145,9 +157,11 @@ const createMergeMapObservable = <A, B>(
           return; // skip update
         }
 
-        const observable = mapToObservable(sn.value);
+        const innerScope = createScope(ownerScope);
 
-        mut_observables = Arr.toPushed(mut_observables, observable);
+        mut_innerScopes = Arr.toPushed(mut_innerScopes, innerScope);
+
+        const observable = innerScope.run(() => mapToObservable(sn.value));
 
         const subscription = observable.subscribe((curr) => {
           startUpdate(curr);

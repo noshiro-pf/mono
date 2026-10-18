@@ -1,8 +1,10 @@
 import { Optional } from 'ts-data-forge';
 import { createAsyncChildObservable } from '../base/index.mjs';
+import { createScope, getCurrentScope } from '../scope/index.mjs';
 import type {
   DropInitialValueOperator,
   Observable,
+  Scope,
   Subscription,
   SwitchMapOperatorObservable,
 } from '../types/index.mjs';
@@ -10,6 +12,11 @@ import type {
 /**
  * Projects each source value to an observable, subscribes to it, and emits its values.
  * When a new value arrives from the source, the previous inner observable is unsubscribed.
+ *
+ * The projection runs in a scope of its own (see `createScope`): what it
+ * creates is disposed when the next value switches away from it and when
+ * `switchMap` completes. An observable it only returns — one created outside
+ * the projection and shared with others — is unsubscribed and left running.
  *
  * @template A - The type of values from the source
  * @template B - The type of values from the projected observable
@@ -108,7 +115,12 @@ const createSwitchMapObservable = <A, B>(
   parentObservable: Observable<A>,
   mapToObservable: (curr: A) => Observable<B>,
 ): SwitchMapOperatorObservable<A, B> => {
-  let mut_observable: Observable<B> | undefined = undefined;
+  // The scope the operator was created in, so that each inner scope is
+  // disposed with it; the projection itself runs during propagation, when the
+  // current scope is whatever happens to be running.
+  const ownerScope = getCurrentScope();
+
+  let mut_innerScope: Scope | undefined = undefined;
 
   let mut_subscription: Subscription | undefined = undefined;
 
@@ -119,7 +131,7 @@ const createSwitchMapObservable = <A, B>(
       onComplete: () => {
         mut_subscription?.unsubscribe();
 
-        mut_observable?.complete();
+        mut_innerScope?.dispose();
       },
     },
     ({ startUpdate }) =>
@@ -133,13 +145,15 @@ const createSwitchMapObservable = <A, B>(
           return; // skip update
         }
 
-        mut_observable?.complete();
-
         mut_subscription?.unsubscribe();
 
-        const observable = mapToObservable(sn.value);
+        mut_innerScope?.dispose();
 
-        mut_observable = observable;
+        const innerScope = createScope(ownerScope);
+
+        mut_innerScope = innerScope;
+
+        const observable = innerScope.run(() => mapToObservable(sn.value));
 
         const subscription = observable.subscribe((curr) => {
           startUpdate(curr);

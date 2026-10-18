@@ -10,6 +10,11 @@ import { colors } from '../../../components/constants.mjs';
 {/* jsdoc-description */}
 Projects each source value to an observable, subscribes to it, and emits its values.
 When a new value arrives from the source, the previous inner observable is unsubscribed.
+
+The projection runs in a scope of its own (see `createScope`): what it
+creates is disposed when the next value switches away from it and when
+`switchMap` completes. An observable it only returns — one created outside
+the projection and shared with others — is unsubscribed and left running.
 {/* /jsdoc-description */}
 
 ## Marble Diagram
