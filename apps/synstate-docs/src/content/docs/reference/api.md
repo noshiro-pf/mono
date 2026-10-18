@@ -88,6 +88,17 @@ For complex scenarios, SynState provides observable-based APIs:
 - [`withCurrentValueFrom(observable)`](../with-current-value-from/): Sample current value from another observable (alias: `withLatestFrom`).
 - [`withInitialValue(value)`](../with-initial-value/): Provide an initial value for uninitialized observable.
 
+### Scopes (for library authors)
+
+For libraries built on SynState, such as a UI binding that mounts and unmounts parts of a page. Application state defined at module level belongs to no scope and needs none of this.
+
+- `createScope(parent?)`: Create a scope. Observables created synchronously inside `scope.run(body)` belong to it, and `scope.dispose()` disposes them without completing the shared observables they were derived from. With `parent`, it is disposed together with the parent.
+- `getCurrentScope()`: The scope whose `run` is executing, if any. Take it while still synchronous and wrap work after an `await` in its `run`, since only what is created synchronously joins a scope.
+- `onScopeDispose(cleanup)`: Call `cleanup` when the current scope is disposed.
+- `untracked(body)`: Call `body` with no current scope, so that what it creates outlives the surrounding scope.
+
+`dispose()` disposes the child scopes, then calls the `onScopeDispose` functions, then disposes the owned observables, each newest first. `run` on a disposed scope warns and owns nothing it creates.
+
 ### Utilities
 
 - `isChildObservable(obs)`: Check if observable is a child observable.
