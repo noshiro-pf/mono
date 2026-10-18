@@ -82,6 +82,24 @@ export type ChildObservableConfig<
     initialValue: Optional<A>;
   }>;
 
+/**
+ * An async child can also hold a value it has not passed on yet (`debounce`'s
+ * pending value), which completing should not lose.
+ */
+export type AsyncChildObservableConfig<
+  A,
+  P extends NonEmptyUnknownList,
+> = ChildObservableConfig<A, P> &
+  Readonly<{
+    /**
+     * Run at the beginning of `complete()`, before `onComplete`, and never by
+     * `dispose()`: passes on what this observable still holds through
+     * `startUpdate`, so that its subscribers see it before they see the
+     * completion. A disposed observable has no one left to tell.
+     */
+    flush?: (startUpdate: (nextValue: A) => void) => void;
+  }>;
+
 export type InitializedChildObservableConfig<
   A,
   P extends NonEmptyUnknownList,
@@ -220,7 +238,8 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     initialValue,
     onComplete,
     canEmitNoMore,
-  }: ChildObservableConfig<A, P>,
+    flush,
+  }: AsyncChildObservableConfig<A, P>,
   createTryUpdate: (
     tools: AsyncChildObservableTools<A>,
   ) => (updateToken: UpdateToken) => void,
@@ -233,9 +252,9 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
   /** Set once assembled; see {@link unregisterChild}. */
   let mut_self: ChildObservable<A> | undefined = undefined;
 
-  // Completing never reaches the parents: an upstream observable may be
-  // shared, and only whoever owns it decides when it ends (#2133).
-  const complete = (): void => {
+  // Neither this nor `complete` reaches the parents: an upstream observable
+  // may be shared, and only whoever owns it decides when it ends (#2133).
+  const dispose = (): void => {
     // A completed node is reached again through every parent that completes
     // after it; running again would repeat the teardown and the ancestor walk
     // in `unregisterChild`.
@@ -250,6 +269,17 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     if (mut_self !== undefined) {
       unregisterChild(mut_self, parents);
     }
+  };
+
+  // Unlike `dispose`, passes on what this observable still holds first.
+  const complete = (): void => {
+    if (handle.isCompleted()) {
+      return;
+    }
+
+    flush?.(startUpdate);
+
+    dispose();
   };
 
   // Called by a parent that has completed.
@@ -281,7 +311,7 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     tryUpdate,
     tryComplete,
     complete,
-    dispose: complete,
+    dispose,
     extra: { parents, addDescendant, deleteDescendant },
   });
 

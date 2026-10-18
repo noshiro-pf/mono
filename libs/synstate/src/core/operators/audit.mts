@@ -12,6 +12,9 @@ import type {
  *
  * Unlike `throttle` which emits the first value, `audit` emits the last value.
  *
+ * Completing it, or its source completing, passes on the value its timer is
+ * still holding before the completion; `dispose()` drops that value.
+ *
  * @template A - The type of values from the source
  * @param milliSeconds - The audit time window in milliseconds
  * @returns An operator that audits emissions from the observable
@@ -115,13 +118,27 @@ const createAuditObservable = <A,>(
   parentObservable: Observable<A>,
   milliSeconds: number,
 ): AuditOperatorObservable<A> => {
+  /** Set while a window is open; its end passes on the latest value. */
   let mut_timerId: TimerId | undefined = undefined;
 
-  let mut_isSkipping = false;
-
   const resetTimer = (): void => {
-    if (mut_timerId !== undefined) {
-      clearTimeout(mut_timerId);
+    if (mut_timerId === undefined) {
+      return;
+    }
+
+    clearTimeout(mut_timerId);
+
+    mut_timerId = undefined;
+  };
+
+  /** Ends the open window, passing on the latest value of the source. */
+  const emitLatest = (startUpdate: (nextValue: A) => void): void => {
+    mut_timerId = undefined;
+
+    const sn = parentObservable.getSnapshot();
+
+    if (Optional.isSome(sn)) {
+      startUpdate(sn.value);
     }
   };
 
@@ -130,11 +147,20 @@ const createAuditObservable = <A,>(
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
       onComplete: resetTimer,
+      flush: (startUpdate) => {
+        if (mut_timerId === undefined) {
+          return;
+        }
+
+        clearTimeout(mut_timerId);
+
+        emitLatest(startUpdate);
+      },
     },
     ({ startUpdate }) =>
       (updateToken) => {
         if (
-          mut_isSkipping ||
+          mut_timerId !== undefined ||
           parentObservable.updateToken !== updateToken ||
           Optional.isNone(parentObservable.getSnapshot())
         ) {
@@ -142,18 +168,8 @@ const createAuditObservable = <A,>(
         }
 
         // set timer
-        mut_isSkipping = true;
-
         mut_timerId = setTimeout(() => {
-          const sn = parentObservable.getSnapshot();
-
-          if (Optional.isNone(sn)) {
-            return;
-          }
-
-          startUpdate(sn.value);
-
-          mut_isSkipping = false;
+          emitLatest(startUpdate);
         }, milliSeconds);
       },
   );

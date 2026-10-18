@@ -44,6 +44,8 @@ type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
    * it (a scope) to release it. Neither this nor `complete()` reaches upstream:
    * a child completing never completes its parents, which may be shared
    * (#2133). Its descendants complete once none of their parents is live.
+   * Unlike `complete()`, it passes on nothing the observable still holds: a
+   * `debounce` or `audit` drops its pending value instead of emitting it.
    */
   dispose: () => void;
   subscribe: (onNext: (v: A) => void, onComplete?: () => void) => Subscription;

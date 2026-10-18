@@ -11,6 +11,9 @@ import type {
  * Delays emissions from the source observable until a specified time has passed without another emission.
  * Useful for handling user input events like typing or scrolling.
  *
+ * Completing it, or its source completing, passes on the value its timer is
+ * still holding before the completion; `dispose()` drops that value.
+ *
  * @template A - The type of values from the source
  * @param milliSeconds - The debounce duration in milliseconds
  * @returns An operator that debounces the observable
@@ -108,10 +111,17 @@ const createDebounceObservable = <A,>(
 ): DebounceOperatorObservable<A> => {
   let mut_timerId: TimerId | undefined = undefined;
 
+  /** The value the running timer will pass on. */
+  let mut_pending: Optional<A> = Optional.none;
+
   const resetTimer = (): void => {
     if (mut_timerId !== undefined) {
       clearTimeout(mut_timerId);
+
+      mut_timerId = undefined;
     }
+
+    mut_pending = Optional.none;
   };
 
   return createAsyncChildObservable(
@@ -119,6 +129,15 @@ const createDebounceObservable = <A,>(
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
       onComplete: resetTimer,
+      flush: (startUpdate) => {
+        const pending = mut_pending;
+
+        resetTimer();
+
+        if (Optional.isSome(pending)) {
+          startUpdate(pending.value);
+        }
+      },
     },
     ({ startUpdate }) =>
       (updateToken) => {
@@ -133,11 +152,13 @@ const createDebounceObservable = <A,>(
 
         resetTimer();
 
+        mut_pending = sn;
+
         // set timer
         mut_timerId = setTimeout(() => {
-          if (Optional.isNone(sn)) {
-            return;
-          }
+          mut_timerId = undefined;
+
+          mut_pending = Optional.none;
 
           startUpdate(sn.value);
         }, milliSeconds);
