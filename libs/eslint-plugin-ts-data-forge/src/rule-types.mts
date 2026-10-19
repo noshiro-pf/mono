@@ -163,7 +163,7 @@ namespace PreferAsInt {
 }
 
 /**
- * @description Replace `typeof u === "object" && u !== null` with `isNonNullObject(u)` from ts-data-forge.
+ * @description Replace `typeof u === "object" && u !== null`, in either order and anywhere in an `&&` chain, with `isNonNullObject(u)` from ts-data-forge.
  *
  *  ```md
  *  | key        | value      |
