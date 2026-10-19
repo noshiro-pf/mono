@@ -219,6 +219,14 @@ describe('prefer-arr-is-min-length-array through type wrappers', () => {
           const ok = xs.length >= 1 && (xs as readonly number[]).length <= 3;
         `,
       },
+      {
+        name: 'one half of a bounded pair, either half wrapped as a whole',
+        code: dedent`
+          declare const xs: readonly number[];
+          const a = (xs.length >= 1 satisfies boolean) && xs.length <= 3;
+          const b = xs.length >= 1 && (xs.length <= 3 as boolean);
+        `,
+      },
     ],
     invalid: [
       {

@@ -675,6 +675,61 @@ describe('prefer-canonical-array-slicing through type wrappers', () => {
           { messageId: 'preferCanonicalArraySlicing' },
         ],
       },
+      {
+        name: 'a filter callback whose body is wrapped',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.filter((_, i) => (i >= 1) satisfies boolean);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ys = Arr.tail(xs);
+        `,
+        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+      },
+      {
+        name: 'a wrapped `xs.length - N`, and a wrapped `.length` or receiver inside it',
+        code: dedent`
+          declare const xs: readonly number[];
+          const a = xs.slice(0, (xs.length - 1) as number);
+          const b = xs.slice(0, (xs as readonly number[]).length - 1);
+          const c = xs.filter((_, i) => i < (xs.length satisfies number) - 2);
+          const d = xs.toSpliced(0, xs!.length - 2);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = Arr.butLast(xs);
+          const b = Arr.butLast(xs);
+          const c = Arr.skipLast(xs, 2);
+          const d = Arr.takeLast(xs, 2);
+        `,
+        errors: [
+          { messageId: 'preferCanonicalArraySlicing' },
+          { messageId: 'preferCanonicalArraySlicing' },
+          { messageId: 'preferCanonicalArraySlicing' },
+          { messageId: 'preferCanonicalArraySlicing' },
+        ],
+      },
+      {
+        name: 'a wrapped receiver compared with its own `.length`',
+        code: dedent`
+          declare const xs: readonly number[];
+          const a = (xs satisfies readonly number[]).slice(0, xs.length - 1);
+          const b = xs.toSpliced((xs.length as number), 0, 1);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = Arr.butLast(xs satisfies readonly number[]);
+          const b = Arr.toPushed(xs, 1);
+        `,
+        errors: [
+          { messageId: 'preferCanonicalArraySlicing' },
+          { messageId: 'preferCanonicalArraySlicing' },
+        ],
+      },
     ],
   });
 });
