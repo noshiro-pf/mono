@@ -1,0 +1,33 @@
+# lychee's configuration for `.github/workflows/link-check.yml`, which checks
+# the external URLs in the SynState docs. Links to this repository's own
+# files are `check:prose:mono-links`'s, which reads the tracked tree and needs
+# no network.
+
+# Only web URLs. The docs site's pages link to each other by route
+# (`/mono/synstate/…`, `../map/`), which are paths of the built site rather
+# than of the tree; `root_dir` turns the root-relative ones into file paths,
+# and this drops every file path.
+scheme = ["https", "http"]
+
+# Retried before a URL counts as broken, so that a server's one bad second
+# fails nothing.
+max_retries = 3
+retry_wait_time = 5
+timeout = 30
+
+# 429 is a host asking for fewer requests, not saying the page is gone.
+accept = ["200..=299", "429"]
+
+exclude = [
+    # `check:prose:mono-links` resolves these against the tree. An issue or
+    # pull request link here does not break.
+    '^https://github\.com/noshiro-pf/mono([/.#?]|$)',
+    # npm answers every client that is not a browser with 403, whatever the
+    # page.
+    '^https://(www\.)?npmjs\.com/',
+    # The ACM Digital Library answers a runner with 403 (a bot check).
+    '^https://dl\.acm\.org/',
+    # Google Docs answers a client with no Google sign-in with 401, which
+    # cannot tell a page that is gone from one shared with sign-in only.
+    '^https://docs\.google\.com/',
+]
