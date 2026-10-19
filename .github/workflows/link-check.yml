@@ -1,0 +1,83 @@
+name: Link Check
+
+# The external URLs in the SynState docs, checked with lychee. Links to this
+# repository's own files are not checked here: `check:prose:mono-links`
+# resolves them against the tree in `style-check.yml`, which is required.
+#
+# This workflow reports no required status check, because its verdict is a
+# function of other people's servers as well as of the tree: a site that is
+# down for an hour would hold every merge for that hour. So it carries a
+# `paths` filter (see "Triggers" in README.md for why the check workflows
+# carry none), and a pull request that adds a dead URL is told so without
+# being held by it.
+#
+# Nor does it follow `skip-ci`: it runs no repository code, installs nothing
+# and takes seconds, and while the label is on it is the only thing that can
+# say a URL the pull request adds is dead. Label events are left out of the
+# triggers for the same reason; another run would ask the same servers the
+# same thing.
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths:
+      - 'apps/synstate-docs/**.md'
+      - 'apps/synstate-docs/**.mdx'
+      - 'libs/synstate*/**.md'
+      - 'libs/eslint-plugin-synstate/**.md'
+      - 'tools/configs/lychee.toml'
+      - '.github/workflows/link-check.yml'
+
+  # A URL dies without a commit here, so `main` is asked again every week. A
+  # failed run mails whoever last changed this schedule.
+  schedule:
+    - cron: '0 0 * * 1'
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request', github.event.pull_request.number, github.ref) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions: {}
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    permissions:
+      # The checkout, and the token lychee sends to github.com, which raises
+      # its rate limit there from 60 requests an hour to 1,000.
+      contents: read
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
+          persist-credentials: false
+
+      # The tracked files only, as `check:prose:mono-links` reads them, and the
+      # same scope. The changelogs are left out: they link to commits and pull
+      # requests here, which `lychee.toml` excludes anyway.
+      - name: List the files to check
+        run: |
+          git ls-files -- \
+            'apps/synstate-docs/*.md' 'apps/synstate-docs/*.mdx' \
+            'libs/synstate*/*.md' 'libs/eslint-plugin-synstate/*.md' |
+            grep -v '/CHANGELOG\.md$' > "${RUNNER_TEMP}/link-check-files.txt"
+          wc -l < "${RUNNER_TEMP}/link-check-files.txt"
+
+      - name: Check the links
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: >-
+            --no-progress
+            --config tools/configs/lychee.toml
+            --root-dir ${{ github.workspace }}
+            --files-from ${{ runner.temp }}/link-check-files.txt
+          # The report goes to the job summary; a file would only be an
+          # artifact nobody downloads.
+          output: ${{ runner.temp }}/lychee/out.md

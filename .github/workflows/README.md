@@ -27,6 +27,7 @@ GitHub shows a `.github/README.md` in place of the root one.
 | `node-support-update.yml`        | schedule                                       | none; opens `chore/node-support-update` |
 | `deploy-pages.yml`               | `push` to `main`                               | none                                    |
 | `synstate-benchmark.yml`         | `push` to `main`, pull requests, path-filtered | none; a measurement, not a verdict      |
+| `link-check.yml`                 | pull requests, path-filtered; schedule         | none; other people's servers decide it  |
 
 The required contexts are listed in `repo-settings/rulesets/main.json`. Every
 one of them is either an aggregate job (see "The aggregate job") or a job that
@@ -92,8 +93,9 @@ on:
 - **No `paths` filter.** A workflow a path filter skips reports no status at
   all, and a required context that never arrives blocks the merge forever.
   The diff question is answered by the gate, after the workflow has started.
-  `synstate-benchmark.yml` carries one because it reports no required
-  context; a benchmark on a shared runner is a measurement, not a verdict.
+  `synstate-benchmark.yml` and `link-check.yml` carry one because they report
+  no required context: a benchmark on a shared runner is a measurement, and
+  whether an external URL answers is not a property of the tree.
 
 ### Concurrency
 
