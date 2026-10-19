@@ -221,26 +221,27 @@ When an observable is created via `.pipe()` or a combinator (`combine`, `merge`,
 - **Root observables**: `depth = 0`.
 - **Child observables**: `depth = 1 + max(parent depths)`.
 
-Each root observable maintains a flat array called `propagationOrder` — a list of all its descendants, kept in **ascending depth order** via binary search insertion at construction time. When a source emits, propagation is a simple linear scan through this pre-sorted array:
+Each root observable maintains a flat array called `propagationOrder` — a list of all its descendants, kept in **ascending depth order**. Descendants are registered by depth when they are constructed, and the flat array is rebuilt only when the graph has changed since the last update. When a source emits, propagation is a simple linear scan through this sorted array:
 
 ```ts
-// Simplified from RootObservableClass
-startUpdate(nextValue) {
+// Simplified from createManagerObservableParts
+const startUpdate = (nextValue: A): void => {
     const updateToken = issueUpdateToken();
-    this.setNext(nextValue, updateToken);
 
-    // propagationOrder is pre-sorted by depth (ascending)
-    for (const child of this.propagationOrder) {
+    handle.setNext(nextValue, updateToken);
+
+    // propagationOrder is sorted by depth (ascending)
+    for (const child of getPropagationOrder()) {
         child.tryUpdate(updateToken);
     }
-}
+};
 ```
 
 This is a key architectural difference from RxJS. In RxJS, each observable is responsible for updating its own value and propagating to its children — propagation is distributed across the graph. In SynState, a **manager observable** centrally manages the update of all its descendants in a single loop. This centralized control is what makes depth-ordered propagation possible without a priority queue.
 
 SynState's Observable types are `RootObservable`, `SyncChildObservable`, and `AsyncChildObservable`. Of these, `RootObservable` and `AsyncChildObservable` act as managers. A `RootObservable` is the entry point of a graph, while an `AsyncChildObservable` is created by time-shifting operators such as [`debounce`](/mono/synstate/reference/debounce/) — since their emissions are asynchronous and cannot be coordinated by the upstream root, they take over as managers for their own downstream subgraph.
 
-Because the array is sorted by depth, every parent is guaranteed to have been updated before any of its children — the same correctness guarantee as the priority queue approach, but with **$O(n)$ propagation cost** and **zero runtime allocation**. The only cost paid is at construction time ($O(\log n)$ binary search insertion), which is a one-time operation.
+Because the array is sorted by depth, every parent is guaranteed to have been updated before any of its children — the same correctness guarantee as the priority queue approach, but with **$O(n)$ propagation cost** and **no allocation per update** while the graph stays the same. The ordering work is paid when the graph changes (an $O(\log n)$ binary search insertion for a new depth, and one rebuild of the array at the next update), not on every emission.
 
 <SynStatePropagationOrderSlideshow />
 
@@ -304,7 +305,7 @@ When `A` emits an **even** value (e.g., `2`), all nodes update: `B` becomes `20`
 SynState solves this by giving every update cycle a unique identity — an **update token**. The token is a `Symbol` created at the start of each cycle via `issueUpdateToken()`, and it flows through the graph as follows:
 
 1. The manager creates a fresh token and stamps itself via `setNext(value, token)`.
-2. The same token is passed to every descendant's `tryUpdate(token)` method during the linear scan.
+2. The same token is passed to every descendant's `tryUpdate(token)` during the linear scan.
 3. When a child successfully updates, it calls `setNext(newValue, token)`, stamping itself with the current cycle's token.
 4. When a child **skips** (e.g., `filter`'s predicate returns `false`), it does **not** call `setNext` — so its `updateToken` remains the token from a **previous** cycle.
 
@@ -313,33 +314,43 @@ This creates a simple invariant: **a node's `updateToken` equals the current cyc
 - **Single-parent operators** (e.g., `map`, `scan`): Check `parent.updateToken === token`. If the parent's token doesn't match, the parent was skipped — so the child skips too.
 - **Multi-parent operators** (e.g., `combine`): Check whether **at least one** parent's token matches. If all parents were skipped, `combine` skips. If at least one updated, `combine` re-evaluates using the latest snapshot from every parent (whether updated in this cycle or not).
 
-```ts
-// Simplified from CombineObservableClass
-override tryUpdate(updateToken: UpdateToken): void {
-    // Skip only if ALL parents were skipped in this cycle
-    if (this.parents.every((o) => o.updateToken !== updateToken)) return;
+Operators are built with `createSyncChildObservable`, which takes the parents and a callback. The callback receives the node's own tools, such as `setNext`, and returns its `tryUpdate`, which keeps the parents it reads in its closure:
 
-    const parentValues = this.parents.map((a) => a.getSnapshot());
-    // ... emit combined value ...
-}
+```ts
+// Simplified from combine
+createSyncChildObservable(
+    { parents, initialValue },
+    ({ setNext }) =>
+        (updateToken) => {
+            // Skip only if ALL parents were skipped in this cycle
+            if (parents.every((o) => o.updateToken !== updateToken)) {
+                return;
+            }
+
+            const parentValues = parents.map((a) => a.getSnapshot());
+            // ... emit the combined value with setNext(..., updateToken) ...
+        },
+);
 ```
 
 ```ts
-// Simplified from FilterObservableClass
-override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+// Simplified from filter
+createSyncChildObservable(
+    { parents: [parentObservable], initialValue },
+    ({ setNext }) =>
+        (updateToken) => {
+            if (parentObservable.updateToken !== updateToken) {
+                return; // parent was skipped → skip this node too
+            }
 
-    if (par.updateToken !== updateToken) {
-        return; // parent was skipped → skip this node too
-    }
+            const sn = parentObservable.getSnapshot();
 
-    const sn = par.getSnapshot();
-
-    if (this.predicate(sn.value)) {
-        this.setNext(sn.value, updateToken); // stamp with token → "I updated"
-    }
-    // If predicate fails: no setNext → updateToken stays stale → descendants know to skip
-}
+            if (Optional.isSome(sn) && predicate(sn.value)) {
+                setNext(sn.value, updateToken); // stamp with token → "I updated"
+            }
+            // If predicate fails: no setNext → updateToken stays stale → descendants know to skip
+        },
+);
 ```
 
 Because each node's skip-or-update decision is a constant-time token comparison, the overall cost of a single update cycle remains **$O(n)$** where $n$ is the number of descendants — and each node pays **amortized $O(1)$** per cycle.
