@@ -1468,7 +1468,6 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
         // In 「タイル」, focusable — by Tab, or by a press on it — as a
         // scrolled box is, so that its keys work with no task focused. Lower
         // case: an SVG attribute `tabIndex` is not `tabindex`.
-        // eslint-disable-next-line react/no-unknown-property
         tabindex={mode === 'tile' ? 0 : undefined}
         onBlurCapture={onBlurCapture}
         onClick={onClick}

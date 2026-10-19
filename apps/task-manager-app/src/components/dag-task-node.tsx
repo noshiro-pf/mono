@@ -72,7 +72,6 @@ export const DagTaskNode = memoNamed<Props>('DagTaskNode', (props) => {
       role={'button'}
       // Lower case: Preact sets an SVG element's props as attributes, and
       // an SVG attribute `tabIndex` is not `tabindex` — no focus at all.
-      // eslint-disable-next-line react/no-unknown-property
       tabindex={0}
       transform={`translate(${node.x} ${node.y})`}
       onClick={openNode}
