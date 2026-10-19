@@ -1,12 +1,9 @@
 import { Optional } from 'ts-data-forge';
-import {
-  combine,
-  counter,
-  createState,
-  debounce,
-  map,
-  source,
-} from '../src/index.mjs';
+import { createState } from '../../utils/index.mjs';
+import { combine } from '../combine/index.mjs';
+import { counter, source } from '../create/index.mjs';
+import { debounce, map } from '../operators/index.mjs';
+import { toNode } from './observable-node.mjs';
 
 describe('completing a derived observable', () => {
   test('does not complete an upstream state (#2133)', () => {
@@ -136,7 +133,7 @@ describe('dispose', () => {
 
     derived$.dispose();
 
-    assert.isFalse(s.hasChild);
+    assert.isFalse(toNode(s).hasChild);
 
     mut_calls = 0;
 
@@ -234,7 +231,7 @@ describe('a child created under completed parents (#2248)', () => {
 
     s.pipe(map((x) => x + 1));
 
-    assert.isFalse(s.hasChild);
+    assert.isFalse(toNode(s).hasChild);
   });
 
   test('completes an async child at creation', () => {
@@ -246,7 +243,7 @@ describe('a child created under completed parents (#2248)', () => {
 
     assert.isTrue(d.isCompleted);
 
-    assert.isFalse(s.hasChild);
+    assert.isFalse(toNode(s).hasChild);
   });
 
   test('does not complete a child that still has a live parent', () => {

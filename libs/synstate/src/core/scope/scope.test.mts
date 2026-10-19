@@ -1,6 +1,7 @@
 // cspell:ignore unstub
 import { expectType } from 'ts-data-forge';
 import type { Mock } from 'vitest';
+import { toNode } from '../base/index.mjs';
 import { source } from '../create/index.mjs';
 import { map } from '../operators/index.mjs';
 import type { Scope } from '../types/index.mjs';
@@ -82,7 +83,7 @@ describe(createScope, () => {
 
     assert.isFalse(store$.isCompleted);
 
-    assert.isFalse(store$.hasChild);
+    assert.isFalse(toNode(store$).hasChild);
 
     store$.next(2);
 

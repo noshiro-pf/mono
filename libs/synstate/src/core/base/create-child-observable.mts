@@ -1,18 +1,15 @@
 import { Arr, type Optional, type Some } from 'ts-data-forge';
 import { panic } from 'ts-std-forge';
 import type { MutableSet } from 'ts-type-forge';
-import {
-  isChildObservable,
-  isManagerObservable,
-  type AsyncChildObservable,
-  type ChildObservable,
-  type InitializedSyncChildObservable,
-  type NonEmptyUnknownList,
-  type Observable,
-  type ObservableId,
-  type SyncChildObservable,
-  type UpdateToken,
-  type Wrap,
+import type {
+  AsyncChildObservable,
+  InitializedSyncChildObservable,
+  NonEmptyUnknownList,
+  Observable,
+  ObservableId,
+  SyncChildObservable,
+  UpdateToken,
+  Wrap,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
 import {
@@ -21,11 +18,16 @@ import {
   createObservableBaseHandle,
   runAfterPropagation,
 } from './create-observable-base.mjs';
+import {
+  toNode,
+  type AsyncChildObservableNode,
+  type ChildObservableNode,
+  type SyncChildObservableNode,
+} from './observable-node.mjs';
 
 /**
- * The internal tools a sync-child leaf factory (`map`, `filter`, `zip`, …)
- * receives — the replacement for the `protected` methods a subclass of
- * `SyncChildObservableClass` used to inherit.
+ * The tools a sync-child factory (`map`, `filter`, `zip`, …) receives: what
+ * only the observable being created may do to itself.
  */
 export type SyncChildObservableTools<A> = Readonly<{
   /** Emits `nextValue` under `updateToken` and notifies subscribers. */
@@ -44,8 +46,8 @@ export type SyncChildObservableTools<A> = Readonly<{
 }>;
 
 /**
- * The internal tools an async-child leaf factory (`debounce`, `switchMap`, …)
- * receives. Async children additionally start their own update propagation.
+ * The tools an async-child factory (`debounce`, `switchMap`, …) receives.
+ * Async children additionally start their own update propagation.
  */
 export type AsyncChildObservableTools<A> = Readonly<{
   /** Emits `nextValue` and propagates the update to all descendants. */
@@ -56,6 +58,13 @@ export type AsyncChildObservableTools<A> = Readonly<{
 type ChildObservableConfigBase<P extends NonEmptyUnknownList> = Readonly<{
   parents: Wrap<P>;
 
+  /**
+   * Defaults to one more than the deepest parent. An update reaches
+   * observables in ascending depth, so an observable `tryUpdate` reads with
+   * `getSnapshot` without being its child (`withCurrentValueFrom`'s second
+   * source) has to be shallower than this one too, or this one reads its value
+   * from before the update: pass `1 + Math.max(...)` over both then.
+   */
   depth?: number;
 
   /**
@@ -109,14 +118,17 @@ export type InitializedChildObservableConfig<
   }>;
 
 /**
- * Creates a sync-child observable — the classless replacement for extending
- * `SyncChildObservableClass`.
+ * Creates a sync-child observable: one derived from `parents` that emits, if
+ * at all, in the same update as they do. `map`, `filter`, `combine` and the
+ * other synchronous operators are built with it.
  *
- * `createTryUpdate` receives the internal tools and returns the `tryUpdate`
- * implementation (the former `override tryUpdate`). It runs during
- * construction, before the observable is registered to its parents; leaf
- * state can live either in the enclosing factory scope or inside the
- * `createTryUpdate` closure.
+ * `createTryUpdate` receives the tools and returns `tryUpdate`, which is
+ * called with the token of every update that reaches this observable. A
+ * parent that did not emit in that update has a different `updateToken`; to
+ * emit, call `setNext` with the token received.
+ * `createTryUpdate` runs during construction, before the observable is
+ * registered to its parents, so the operator's state can live either in the
+ * enclosing factory or inside the `createTryUpdate` closure.
  */
 export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
   {
@@ -133,7 +145,7 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
   const handle = createObservableBaseHandle<A>(initialValue);
 
   /** Set once assembled; see {@link unregisterChild}. */
-  let mut_self: ChildObservable<A> | undefined = undefined;
+  let mut_self: ChildObservableNode<A> | undefined = undefined;
 
   // Completing never reaches the parents: an upstream observable may be
   // shared, and only whoever owns it decides when it ends (#2133).
@@ -175,7 +187,7 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
     },
   });
 
-  const observable: SyncChildObservable<A, P> = assembleObservable({
+  const observable: SyncChildObservableNode<A, P> = assembleObservable({
     kind: 'sync child',
     depth,
     handle,
@@ -227,9 +239,11 @@ export const createInitializedSyncChildObservable = <
 };
 
 /**
- * Creates an async-child observable — the classless replacement for extending
- * `AsyncChildObservableClass`. See {@link createSyncChildObservable} for the
- * `createTryUpdate` contract.
+ * Creates an async-child observable: one derived from `parents` that may emit
+ * later, in an update of its own, through `startUpdate` (`debounce`,
+ * `switchMap`). It may also emit synchronously with `setNext`, as a sync child
+ * does. See {@link createSyncChildObservable} for the `createTryUpdate`
+ * contract.
  */
 export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
   {
@@ -250,7 +264,7 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     createManagerObservableParts(handle);
 
   /** Set once assembled; see {@link unregisterChild}. */
-  let mut_self: ChildObservable<A> | undefined = undefined;
+  let mut_self: ChildObservableNode<A> | undefined = undefined;
 
   // Neither this nor `complete` reaches the parents: an upstream observable
   // may be shared, and only whoever owns it decides when it ends (#2133).
@@ -304,7 +318,7 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     startUpdate,
   });
 
-  const observable: AsyncChildObservable<A, P> = assembleObservable({
+  const observable: AsyncChildObservableNode<A, P> = assembleObservable({
     kind: 'async child',
     depth,
     handle,
@@ -354,7 +368,7 @@ const hasCircularDependencyFrom = (
 
   mut_inPath.add(node.id);
 
-  if (isChildObservable(node)) {
+  if (node.kind !== 'root') {
     for (const parent of node.parents) {
       if (hasCircularDependencyFrom(parent, mut_visited, mut_inPath)) {
         return true;
@@ -368,7 +382,7 @@ const hasCircularDependencyFrom = (
 };
 
 const detectCircularDependency = (
-  child: ChildObservable<unknown>,
+  child: ChildObservableNode<unknown>,
   parents: readonly Observable<unknown>[],
 ): void => {
   const mut_visited = new Set<ObservableId>();
@@ -395,30 +409,32 @@ const detectCircularDependency = (
  * from inside the constructor instead).
  */
 const registerChild = <A,>(
-  child: ChildObservable<A>,
-  parents: ChildObservable<A>['parents'],
+  child: ChildObservableNode<A>,
+  parents: readonly Observable<unknown>[],
 ): void => {
   detectCircularDependency(child, parents);
 
   for (const p of parents) {
-    p.addChild(child);
+    toNode(p).addChild(child);
   }
 
   // register child to all reachable ManagerObservables
   const mut_rest = Array.from(parents);
 
   while (Arr.isNonEmpty(mut_rest)) {
-    const p = mut_rest.pop();
+    const popped = mut_rest.pop();
 
-    if (p === undefined) {
+    if (popped === undefined) {
       break;
     }
 
-    if (isManagerObservable(p)) {
-      p.addDescendant(child);
-    } else {
+    const p = toNode(popped);
+
+    if (p.kind === 'sync child') {
       // trace back dependency graph
       mut_rest.push(...p.parents);
+    } else {
+      p.addDescendant(child);
     }
   }
 };
@@ -434,26 +450,28 @@ const registerChild = <A,>(
  * nothing to undo; `mut_self` is still `undefined` then.
  */
 const unregisterChild = <A,>(
-  child: ChildObservable<A>,
-  parents: ChildObservable<A>['parents'],
+  child: ChildObservableNode<A>,
+  parents: readonly Observable<unknown>[],
 ): void => {
   for (const p of parents) {
-    p.deleteChild(child);
+    toNode(p).deleteChild(child);
   }
 
   const mut_rest = Array.from(parents);
 
   while (Arr.isNonEmpty(mut_rest)) {
-    const p = mut_rest.pop();
+    const popped = mut_rest.pop();
 
-    if (p === undefined) {
+    if (popped === undefined) {
       break;
     }
 
-    if (isManagerObservable(p)) {
-      p.deleteDescendant(child);
-    } else {
+    const p = toNode(popped);
+
+    if (p.kind === 'sync child') {
       mut_rest.push(...p.parents);
+    } else {
+      p.deleteDescendant(child);
     }
   }
 };

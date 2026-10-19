@@ -1,13 +1,10 @@
 import { Optional } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
-import {
-  combine,
-  createState,
-  map,
-  source,
-  switchMap,
-  takeWhile,
-} from '../src/index.mjs';
+import { createState } from '../../utils/index.mjs';
+import { combine } from '../combine/index.mjs';
+import { source } from '../create/index.mjs';
+import { map, switchMap, takeWhile } from '../operators/index.mjs';
+import { toNode } from './observable-node.mjs';
 
 describe('a completed observable leaves the propagation graph', () => {
   test('completed derived observables stop computing (#2134)', () => {
@@ -97,7 +94,7 @@ describe('a completed observable leaves the propagation graph', () => {
 
     assert.isTrue(leaf.isCompleted);
 
-    assert.isFalse(s.hasChild);
+    assert.isFalse(toNode(s).hasChild);
 
     mut_calls = 0;
 
@@ -142,13 +139,13 @@ describe('a completed observable leaves the propagation graph', () => {
 
     const d = s.pipe(map((x) => x));
 
-    assert.isTrue(s.hasChild);
+    assert.isTrue(toNode(s).hasChild);
 
     d.complete();
 
-    assert.isFalse(s.hasChild);
+    assert.isFalse(toNode(s).hasChild);
 
-    assert.isFalse(s.hasActiveChild());
+    assert.isFalse(toNode(s).hasActiveChild());
   });
 
   test('a node with another live parent keeps updating', () => {

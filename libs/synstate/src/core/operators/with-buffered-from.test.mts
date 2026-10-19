@@ -1,3 +1,4 @@
+import { toNode } from '../base/index.mjs';
 import { source } from '../create/index.mjs';
 import { withBufferedFrom } from './with-buffered-from.mjs';
 
@@ -9,13 +10,13 @@ describe('withBufferedFrom teardown', () => {
 
     const result$ = trigger$.pipe(withBufferedFrom(data$));
 
-    assert.isTrue(data$.hasSubscriber);
+    assert.isTrue(toNode(data$).hasSubscriber);
 
     result$.complete();
 
     assert.isTrue(result$.isCompleted);
 
-    assert.isFalse(data$.hasSubscriber);
+    assert.isFalse(toNode(data$).hasSubscriber);
   });
 
   test('unsubscribes from the buffered observable when the parent completes', () => {
@@ -29,7 +30,7 @@ describe('withBufferedFrom teardown', () => {
 
     assert.isTrue(result$.isCompleted);
 
-    assert.isFalse(data$.hasSubscriber);
+    assert.isFalse(toNode(data$).hasSubscriber);
   });
 
   test('keeps buffering while subscribed', () => {
