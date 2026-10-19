@@ -6,12 +6,7 @@ import type {
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { range as rangeIterator } from '../../iterator/index.mjs';
-import {
-  asNonZeroSafeInt,
-  asSafeInt,
-  asSafeUint,
-  asUint32,
-} from '../../number/index.mjs';
+import { asNonZeroSafeInt, asSafeUint, asUint32 } from '../../number/index.mjs';
 import type { SizeType } from '../../types.mjs';
 import {
   copy,
@@ -380,18 +375,26 @@ describe('Arr creations', () => {
       const result = range(5, 0, -1);
 
       assert.deepStrictEqual(result, [
-        asSafeInt(5),
-        asSafeInt(4),
-        asSafeInt(3),
-        asSafeInt(2),
-        asSafeInt(1),
+        asSafeUint(5),
+        asSafeUint(4),
+        asSafeUint(3),
+        asSafeUint(2),
+        asSafeUint(1),
       ]);
+    });
+
+    test('a negative step from non-negative bounds gives SafeUint', () => {
+      const result = range(asSafeUint(5), asSafeUint(1), asNonZeroSafeInt(-2));
+
+      expectType<typeof result, readonly SafeUint[]>('=');
+
+      assert.deepStrictEqual(result, [asSafeUint(5), asSafeUint(3)]);
     });
 
     test('start > end, step < 0, not reaching end', () => {
       const result = range(5, 1, -2);
 
-      assert.deepStrictEqual(result, [asSafeInt(5), asSafeInt(3)]);
+      assert.deepStrictEqual(result, [asSafeUint(5), asSafeUint(3)]);
     });
 
     test('start < end, step < 0 (empty result)', () => {
@@ -419,12 +422,12 @@ describe('Arr creations', () => {
         asNonZeroSafeInt(step),
       );
 
-      expectType<typeof result, readonly SafeInt[]>('=');
+      expectType<typeof result, readonly SafeUint[]>('=');
 
       assert.deepStrictEqual(result, [
-        asSafeInt(1),
-        asSafeInt(2),
-        asSafeInt(3),
+        asSafeUint(1),
+        asSafeUint(2),
+        asSafeUint(3),
       ]);
     });
 

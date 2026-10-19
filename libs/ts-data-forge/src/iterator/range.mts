@@ -1,9 +1,4 @@
-import type {
-  NonZeroSafeInt,
-  PositiveSafeInt,
-  SafeUint,
-  WithSmallInt,
-} from 'ts-type-forge';
+import type { NonZeroSafeInt, SafeUint, WithSmallInt } from 'ts-type-forge';
 import { SafeInt, asSafeInt } from '../number/index.mjs';
 
 /**
@@ -18,8 +13,9 @@ import { SafeInt, asSafeInt } from '../number/index.mjs';
  *
  * The function has two overloaded signatures:
  *
- * 1. For non-negative ranges: accepts SafeUint parameters and optional positive
- *    step
+ * 1. For non-negative ranges: accepts SafeUint parameters and an optional
+ *    non-zero step. Every value lies between `start` and `end`, so a negative
+ *    step still yields only non-negative numbers
  * 2. For general ranges: accepts SafeInt parameters and optional non-zero step
  *
  * **Generator Behavior:**
@@ -75,7 +71,7 @@ export function range(
   start: WithSmallInt<SafeUint, MaxInt>,
   end: WithSmallInt<SafeUint, MaxInt>,
   // eslint-disable-next-line @typescript-eslint/unified-signatures
-  step?: WithSmallInt<PositiveSafeInt, MaxInt>,
+  step?: WithSmallInt<NonZeroSafeInt, MaxInt>,
 ): Generator<SafeUint, void, unknown>;
 
 export function range(
