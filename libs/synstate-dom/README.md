@@ -1,0 +1,17 @@
+# synstate-dom
+
+A compiler-free, fine-grained UI library that binds [synstate](https://github.com/noshiro-pf/mono/tree/main/libs/synstate) observables directly to the DOM.
+
+> [!WARNING]
+> Under development and not published yet. The design is in [`SPEC.md`](./SPEC.md) (Japanese); this README grows as the implementation catches up.
+
+## What is implemented
+
+- `Constant<T>` and `constant(value)`: a value written once and never updated.
+- `Bindable<T>`: what a slot that takes data accepts, `InitializedObservable<T> | Constant<T> | View<T>`. A plain value is a type error.
+- `view(source, fn)`: an observable and a light transformation, bound without creating a node in the graph.
+- `mapBindable`, `derive` and `toObservable`: helpers for a component that receives a `Bindable`. Constants stay constants and never enter the graph.
+
+## Naming
+
+The library's own props and parameters carry no `$` suffix (`cond`, `items`, `value`): they take a `Bindable`, which may be a constant or a view as well as an observable, and the type already says which. The samples name variables that hold an observable with a `$` suffix (`count$`, `item$`), as the synstate documentation does, to tell them from plain values at a glance. Nothing enforces it; whether a component's own props carry the suffix is up to its author.

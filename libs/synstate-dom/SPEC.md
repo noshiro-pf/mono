@@ -4,7 +4,7 @@
 
 synstate の Observable を JSX の属性・子要素・props にそのまま渡し、DOM に直接束縛する UI ライブラリの実装仕様。コンパイラも仮想 DOM も持たない。
 
-- 状態: 仕様のみ。`package.json` はまだ無く、ワークスペースのメンバーではない。最初の実装 PR がパッケージの骨格（「10. パッケージ構成」）を足す。
+- 状態: 実装中。パッケージの骨格と「4. 定数と `Bindable`」まで実装済み。公開の準備が整うまで `package.json` は `"private": true` にしてある。
 - 出典: 設計の起点は issue [#2131](https://github.com/noshiro-pf/mono/issues/2131)、synstate 側のライフサイクル（complete・dispose・スコープ）は「synstate ライフサイクル仕様」で確定した内容。本書は両者を UI ライブラリの実装の視点で 1 つにまとめたもので、食い違う箇所は本書で決め、その旨を書く。
 
 ## 1. 目的と範囲
@@ -296,8 +296,9 @@ declare const viewTag: unique symbol;
 
 export type View<T> = Readonly<{
     [viewTag]: true;
-    source: InitializedObservable<unknown>;
-    fn: (value: never) => T;
+    open: <R>(
+        use: <A>(source: InitializedObservable<A>, fn: (value: A) => T) => R,
+    ) => R;
 }>;
 
 export declare const view: <A, T>(
@@ -307,7 +308,8 @@ export declare const view: <A, T>(
 ```
 
 - 入力が 1 つなら購読者の中で変換しても不整合は起きず、ノード生成のコストを省ける。`map` と `pipe` を import して `count$.pipe(map(fn))` と書くより短い。
-- 束縛処理は `source` を購読し、値が来るたびに `fn` を通してから書き込む。購読は束縛と同じくスコープに属する。
+- 束縛処理は `open` で `source` と `fn` を取り出し、`source` を購読して、値が来るたびに `fn` を通してから書き込む。購読は束縛と同じくスコープに属する。
+- `source` と `fn` をプロパティとして持たせると、`source` の値の型を消すために `fn` の引数を `never` にするしかなく、呼ぶ側で `as never` が要る。`open` に渡すコールバックを値の型について総称的にすれば、`source` と `fn` の型が対応したまま取り出せるので、型アサーションが要らない。
 - `fn` は値が来るたびに呼ばれる。同じ `View` を 2 か所に渡すと 2 回呼ばれる（ノードを作らないので結果を共有しない）。重い変換や複数の束縛先で共有する値は `pipe(map(...))` でノードにする。
 - `[obs, fn]` のタプルを直接渡す形は採らない（型検査を保てる方法がないことを確認して決定）。props の型は要素ごとに固定なので、タプルの第 0 要素の型から第 1 要素の引数の型を推論させられない。引数を `unknown` にすると `(n: number) => …` が代入できず、`never` にすると誤った型の関数も通ってしまう（TypeScript で確認済み）。関数 `view` なら型引数 `A` で 2 つを結び付けられる。
 
