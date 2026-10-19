@@ -1,10 +1,10 @@
 # synstate-dom 実装仕様
 
-<!-- cspell:ignore jsxs Bindable bindable Mountable mountable thenable teardown Voby Sinuous Leptos snabbdom hydration -->
+<!-- cspell:ignore Bindable bindable Mountable mountable thenable teardown Voby Sinuous Leptos snabbdom hydration -->
 
 synstate の Observable を JSX の属性・子要素・props にそのまま渡し、DOM に直接束縛する UI ライブラリの実装仕様。コンパイラも仮想 DOM も持たない。
 
-- 状態: 実装中。パッケージの骨格と「4. 定数と `Bindable`」まで実装済み。公開の準備が整うまで `package.json` は `"private": true` にしてある。
+- 状態: 実装中。パッケージの骨格、「4. 定数と `Bindable`」、「6. JSX ランタイムと `Mountable`」（要素は `ref` と子要素のみ）まで実装済み。公開の準備が整うまで `package.json` は `"private": true` にしてある。
 - 出典: 設計の起点は issue [#2131](https://github.com/noshiro-pf/mono/issues/2131)、synstate 側のライフサイクル（complete・dispose・スコープ）は「synstate ライフサイクル仕様」で確定した内容。本書は両者を UI ライブラリの実装の視点で 1 つにまとめたもので、食い違う箇所は本書で決め、その旨を書く。
 
 ## 1. 目的と範囲
