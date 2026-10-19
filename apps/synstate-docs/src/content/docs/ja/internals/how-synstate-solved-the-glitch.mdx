@@ -221,26 +221,27 @@ Observable が `.pipe()` またはコンビネータ（`combine`、`merge`、`zi
 - **ルート Observable**： `depth = 0`.
 - **子 Observable**： `depth = 1 + max(parent depths)`.
 
-各ルート Observable は `propagationOrder` と呼ばれるフラット配列を保持します。これはすべての子孫のリストで、構築時の二分探索挿入により**深さの昇順**で保持されます。ソースが発行すると、伝搬はこの事前ソート済み配列に対するシンプルな線形走査です：
+各ルート Observable は `propagationOrder` と呼ばれるフラット配列を保持します。これはすべての子孫のリストで、**深さの昇順**で保持されます。子孫は構築時に深さごとに登録され、フラット配列は前回の更新以降にグラフが変化したときだけ作り直されます。ソースが発行すると、伝搬はこのソート済み配列に対するシンプルな線形走査です：
 
 ```ts
-// Simplified from RootObservableClass
-startUpdate(nextValue) {
+// Simplified from createManagerObservableParts
+const startUpdate = (nextValue: A): void => {
     const updateToken = issueUpdateToken();
-    this.setNext(nextValue, updateToken);
 
-    // propagationOrder is pre-sorted by depth (ascending)
-    for (const child of this.propagationOrder) {
+    handle.setNext(nextValue, updateToken);
+
+    // propagationOrder is sorted by depth (ascending)
+    for (const child of getPropagationOrder()) {
         child.tryUpdate(updateToken);
     }
-}
+};
 ```
 
 これは RxJS との重要なアーキテクチャの違いです。RxJS では、各 Observable が自身の値を更新し子に伝搬する責任を持ちます — 伝搬はグラフ全体に分散しています。SynState では、**マネージャー Observable** がすべての子孫の更新を単一のループで中央集権的に管理します。この集中管理方式が、優先度キューなしでの深さ順伝搬を可能にしています。
 
 SynState の Observable 型は `RootObservable`、`SyncChildObservable`、`AsyncChildObservable` です。このうち、`RootObservable` と `AsyncChildObservable` がマネージャーとして機能します。`RootObservable` はグラフのエントリーポイントであり、`AsyncChildObservable` は [`debounce`](/mono/synstate/ja/reference/debounce/) のような時間シフト演算子によって作成されます。その発行は非同期であり上流のルートによって調整できないため、自身の下流サブグラフのマネージャーとして引き継ぎます。
 
-配列は深さでソートされているため、すべての親がその子のいずれよりも先に更新されることが保証されます。これは優先度キューアプローチと同じ正確性の保証ですが、**$O(n)$ の伝搬コスト**で**ランタイムアロケーションがゼロ**です。かかるコストは構築時の $O(\log n)$ 二分探索挿入のみで、これは一回限りの操作です。
+配列は深さでソートされているため、すべての親がその子のいずれよりも先に更新されることが保証されます。これは優先度キューアプローチと同じ正確性の保証ですが、**$O(n)$ の伝搬コスト**でグラフが変わらない限り**更新ごとのアロケーションはありません**。順序付けのコストはグラフが変化したとき（新しい深さに対する $O(\log n)$ の二分探索挿入と、次の更新での配列の作り直し 1 回）に払われ、発行のたびには払われません。
 
 <SynStatePropagationOrderSlideshow />
 
@@ -304,7 +305,7 @@ const resultE = collectToArray(E.pipe(take(4)));
 SynState はこれを、各更新サイクルに一意のアイデンティティ — **更新トークン** — を与えることで解決します。トークンは各サイクルの開始時に `issueUpdateToken()` で作成される `Symbol` であり、以下のようにグラフを流れます：
 
 1. マネージャーが新しいトークンを作成し、`setNext(value, token)` で自身にスタンプを押します。
-2. 同じトークンが線形スキャン中にすべての子孫の `tryUpdate(token)` メソッドに渡されます。
+2. 同じトークンが線形スキャン中にすべての子孫の `tryUpdate(token)` に渡されます。
 3. 子が正常に更新されると、`setNext(newValue, token)` を呼び出し、現在のサイクルのトークンで自身にスタンプを押します。
 4. 子が**スキップ**した場合（例： `filter` の述語が `false` を返す）、`setNext` を呼び出し**ません** — そのため `updateToken` は**前の**サイクルのトークンのままです。
 
@@ -313,33 +314,43 @@ SynState はこれを、各更新サイクルに一意のアイデンティテ�
 - **単一親演算子**（例： `map`、`scan`）： `parent.updateToken === token` をチェック。親のトークンが一致しない場合、親はスキップされたので子もスキップします。
 - **複数親演算子**（例： `combine`）： **少なくとも1つ**の親のトークンが一致するかをチェック。すべての親がスキップされた場合、`combine` もスキップします。少なくとも1つが更新された場合、`combine` はすべての親（このサイクルで更新されたかどうかにかかわらず）の最新のスナップショットを使用して再評価します。
 
-```ts
-// Simplified from CombineObservableClass
-override tryUpdate(updateToken: UpdateToken): void {
-    // Skip only if ALL parents were skipped in this cycle
-    if (this.parents.every((o) => o.updateToken !== updateToken)) return;
+演算子は `createSyncChildObservable` で作られます。これは親とコールバックを受け取り、コールバックは `setNext` などそのノード自身のツールを受け取って `tryUpdate` を返します。`tryUpdate` は読み取る親をクロージャに保持します：
 
-    const parentValues = this.parents.map((a) => a.getSnapshot());
-    // ... emit combined value ...
-}
+```ts
+// Simplified from combine
+createSyncChildObservable(
+    { parents, initialValue },
+    ({ setNext }) =>
+        (updateToken) => {
+            // Skip only if ALL parents were skipped in this cycle
+            if (parents.every((o) => o.updateToken !== updateToken)) {
+                return;
+            }
+
+            const parentValues = parents.map((a) => a.getSnapshot());
+            // ... emit the combined value with setNext(..., updateToken) ...
+        },
+);
 ```
 
 ```ts
-// Simplified from FilterObservableClass
-override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+// Simplified from filter
+createSyncChildObservable(
+    { parents: [parentObservable], initialValue },
+    ({ setNext }) =>
+        (updateToken) => {
+            if (parentObservable.updateToken !== updateToken) {
+                return; // parent was skipped → skip this node too
+            }
 
-    if (par.updateToken !== updateToken) {
-        return; // parent was skipped → skip this node too
-    }
+            const sn = parentObservable.getSnapshot();
 
-    const sn = par.getSnapshot();
-
-    if (this.predicate(sn.value)) {
-        this.setNext(sn.value, updateToken); // stamp with token → "I updated"
-    }
-    // If predicate fails: no setNext → updateToken stays stale → descendants know to skip
-}
+            if (Optional.isSome(sn) && predicate(sn.value)) {
+                setNext(sn.value, updateToken); // stamp with token → "I updated"
+            }
+            // If predicate fails: no setNext → updateToken stays stale → descendants know to skip
+        },
+);
 ```
 
 各ノードのスキップ/更新の判断が定数時間のトークン比較で済むため、単一の更新サイクルの全体コストは **$O(n)$**（$n$ は子孫の数）のままです。各ノードのコストは**サイクルあたり償却 $O(1)$** です。
