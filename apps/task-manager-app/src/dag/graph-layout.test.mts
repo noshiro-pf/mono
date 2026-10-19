@@ -108,8 +108,20 @@ describe(layoutInput, () => {
         { id: 'milestone:m', kind: 'milestone', ...MILESTONE_NODE_SIZE },
       ],
       edges: [
-        { id: 'task:b#0', from: 'task:a', to: 'task:b', label: 'SS +3日' },
-        { id: 'milestone:m#0', from: 'task:b', to: 'milestone:m', label: '' },
+        {
+          id: 'task:b#0',
+          from: 'task:a',
+          to: 'task:b',
+          label: 'SS +3日',
+          implied: false,
+        },
+        {
+          id: 'milestone:m#0',
+          from: 'task:b',
+          to: 'milestone:m',
+          label: '',
+          implied: false,
+        },
       ],
       groups: [],
     });

@@ -17,11 +17,15 @@ type Props = Readonly<{
  * A wider, unpainted stroke along the path takes the pointer, so that the
  * line is easy to point at: pointed at, it is drawn in the focus colour, and
  * clicked, it is selected (`dag-canvas.tsx`) and stays so.
+ *
+ * An `implied` edge, the order in time of two milestones, is drawn dashed
+ * and with nothing to point at: it is no dependency, so there is nothing to
+ * delete.
  */
 export const DagEdge = memoNamed<Props>('DagEdge', (props) => {
   const { edge, selected } = props;
 
-  const { path, labelBox, label, from, to, routed } = edge;
+  const { path, labelBox, label, from, to, routed, implied } = edge;
 
   return (
     <g
@@ -29,6 +33,7 @@ export const DagEdge = memoNamed<Props>('DagEdge', (props) => {
       data-e2e={'dag-edge'}
       data-edge-id={edge.id}
       data-from={from}
+      data-implied={implied}
       data-routed={routed}
       data-selected={selected}
       data-to={to}
@@ -38,7 +43,9 @@ export const DagEdge = memoNamed<Props>('DagEdge', (props) => {
         d={path}
         markerEnd={'url(#dag-arrow)'}
       />
-      <path className={'dag-edge-hit'} d={path} data-e2e={'dag-edge-hit'} />
+      {implied ? undefined : (
+        <path className={'dag-edge-hit'} d={path} data-e2e={'dag-edge-hit'} />
+      )}
       {labelBox === undefined ? undefined : (
         <g className={'dag-edge-label'}>
           <rect

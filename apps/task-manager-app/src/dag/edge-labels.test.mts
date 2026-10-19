@@ -16,6 +16,7 @@ const edge = (from: string, to: string, label: string): LaidOutEdge =>
     from: `task:${from}`,
     to: `task:${to}`,
     label,
+    implied: false,
   }) as const;
 
 const overlaps = (a: Point & Size, b: Point & Size): boolean =>

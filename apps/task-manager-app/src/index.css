@@ -806,6 +806,18 @@ fieldset {
 }
 
 /*
+ * The order in time of two milestones, which is no dependency: dashed, and
+ * nothing to point at or select.
+ */
+.dag-edge[data-implied='true'] {
+  pointer-events: none;
+}
+
+.dag-edge[data-implied='true'] .dag-edge-line {
+  stroke-dasharray: 4 4;
+}
+
+/*
  * An edge of 「DAG」 takes the pointer along a wider, unpainted stroke, and
  * is drawn in the focus colour while pointed at — not while an arrow is
  * drawn or a node dragged — and while it is selected.

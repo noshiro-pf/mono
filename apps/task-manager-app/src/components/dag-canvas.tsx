@@ -1231,7 +1231,7 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
         ? undefined
         : mut_edges.current.find((candidate) => candidate.id === id);
 
-    if (edge === undefined) {
+    if (edge === undefined || edge.implied) {
       setSelectedEdge(undefined);
 
       return;
