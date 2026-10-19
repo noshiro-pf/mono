@@ -89,94 +89,6 @@ export const preferredUrlOfPage = (
 ): string | undefined => preferredUrl(href, pageOrigin, undefined);
 
 /**
- * The address to write back over this page's own, without loading anything,
- * or `undefined` when there is nothing to put back.
- *
- * This is asked of a page the extension has already acted on, when the site
- * has since rewritten its address bar. GitHub does that twice over on a diff:
- * it normalizes a parameter off once it has read it, and on a pull request
- * with files already marked viewed it scrolls to the first one that is not and
- * writes `/changes#diff-…` with no query at all. The page is still showing
- * what the defaults asked for, so this is not a redirect: the address is only
- * made to say so again, which is what a reload, a bookmark, or a split-view
- * pane saving where it is reads.
- *
- * Only an answer that keeps the path qualifies. One that names another page —
- * the branch overview sent to the list — cannot be written in place, because
- * the address would then describe a page other than the one on screen.
- */
-export const restoredUrlOfPage = (
-  href: string,
-  pageOrigin: string,
-): string | undefined => {
-  const page = managedPageOf(href, pageOrigin);
-
-  if (page === undefined) {
-    return undefined;
-  }
-
-  const next = page.rule.preferredUrl(page.url, undefined);
-
-  const nextPath = next === undefined ? undefined : parseUrl(next)?.pathname;
-
-  return nextPath === page.url.pathname ? next : undefined;
-};
-
-/**
- * The address a write the page makes to its own history should carry instead
- * of `written`, or `undefined` when `written` can stand.
- *
- * This is asked of every `history.pushState` and `history.replaceState` the
- * site makes, before the write happens. GitHub writes the address of a diff
- * over and over while it is open — when it normalizes the parameters off, when
- * it jumps to the first file not yet viewed, when it moves the fragment along
- * with the scroll — and each write drops the query. Answering each one after
- * the fact is a tug of war over the address bar; answering it in the write
- * itself is not, because the address never says anything else.
- *
- * Only a write that keeps the page — same origin, same path — is amended, and
- * only with what the address it replaces already carried: a parameter the
- * current address has and `written` does not is put back with the value it had.
- * So `w=0` chosen with GitHub's own control is kept as `w=0`, a parameter the
- * address never had is not added — that is the redirect's job, which loads the
- * page with it — and a navigation to another page is left exactly as written.
- */
-export const keptUrlOfHistoryWrite = (
-  written: string,
-  currentHref: string,
-  pageOrigin: string,
-): string | undefined => {
-  const current = managedPageOf(currentHref, pageOrigin);
-
-  if (current === undefined) {
-    return undefined;
-  }
-
-  const next = parseUrl(written, currentHref);
-
-  if (
-    next?.origin !== current.url.origin ||
-    next.pathname !== current.url.pathname
-  ) {
-    return undefined;
-  }
-
-  const currentParams = new URLSearchParams(current.url.search);
-
-  const nextParams = new URLSearchParams(next.search);
-
-  // In the order the current address has them, so that it reads afterwards
-  // exactly as it did before.
-  const carried = Array.from(currentParams).filter(
-    ([key]) => current.rule.keptParams.includes(key) && !nextParams.has(key),
-  );
-
-  return !Arr.isNonEmpty(carried)
-    ? undefined
-    : `${next.origin}${next.pathname}${searchWithAll(next.search, carried)}${next.hash}`;
-};
-
-/**
  * What a link on the page at `pageHref` should point at, or `undefined` when it
  * already points there.
  *
@@ -202,6 +114,10 @@ export const preferredUrlOfLink = (
  *
  * This is what the click handler asks. See `content.mts` for why a click on
  * such a link is left to the browser.
+ *
+ * A link to the page it is on is never settled, so that the site keeps its
+ * click: that is GitHub's "Refresh" button on a diff that has been pushed to,
+ * which GitHub refreshes in place.
  */
 export const isSettledLink = (
   href: string,
@@ -209,7 +125,9 @@ export const isSettledLink = (
   pageHref: string,
 ): boolean =>
   preferredUrlOfLink(href, pageOrigin, pageHref) === undefined &&
-  managedPagePathOf(href, pageOrigin) !== undefined;
+  managedPagePathOf(href, pageOrigin) !== undefined &&
+  managedPagePathOf(href, pageOrigin) !==
+    managedPagePathOf(pageHref, pageOrigin);
 
 /**
  * Which page `href` is, or `undefined` when it is not one these rules speak
@@ -258,12 +176,6 @@ type PageUrl = Readonly<{
 type PageRule = Readonly<{
   /** Which paths it speaks for. Matched against the pathname alone. */
   path: RegExp;
-
-  /**
-   * The query parameters a write to the history of this page must not drop.
-   * See `keptUrlOfHistoryWrite`.
-   */
-  keptParams: readonly string[];
 
   /**
    * What the address should be, or `undefined` when it is already right.
@@ -316,8 +228,6 @@ const pageRules: readonly PageRule[] = [
   {
     path: pullRequestDiffPath,
 
-    keptParams: diffViewDefaults.map(([key]) => key),
-
     preferredUrl: (url) => {
       const missing = missingDefaultsIn(url.search);
 
@@ -344,8 +254,6 @@ const pageRules: readonly PageRule[] = [
 
   {
     path: branchesPath,
-
-    keptParams: [overviewParam[0]],
 
     preferredUrl: (url, readFrom) => {
       if (!branchesOverviewPath.test(url.pathname)) {
@@ -439,15 +347,12 @@ const isTabOfSameBranchesPage = (
  * `href` parsed into the parts a rule reads, or `undefined` for one the URL
  * parser rejects: an attribute can hold anything, and a scan that gave up on
  * the first odd one would leave every later anchor on the page unpatched.
- *
- * `base` resolves a relative `href`, as the address a history write names
- * usually is.
  */
-const parseUrl = (href: string, base?: string): PageUrl | undefined => {
+const parseUrl = (href: string): PageUrl | undefined => {
   try {
     // Named rather than destructured: `origin` on its own shadows the browser
     // global of that name, which the lint rules will not have.
-    const url = new URL(href, base);
+    const url = new URL(href);
 
     return {
       origin: url.origin,
@@ -467,15 +372,11 @@ const parseUrl = (href: string, base?: string): PageUrl | undefined => {
  * its own: re-serializing through `URLSearchParams` would rewrite escapes
  * GitHub wrote, turning a `%20` into a `+`.
  */
-const searchWith = (search: string, param: readonly [string, string]): string =>
-  searchWithAll(search, [param]);
-
-/** `searchWith`, for several parameters at once. */
-const searchWithAll = (
+const searchWith = (
   search: string,
-  params: readonly (readonly [string, string])[],
+  [key, value]: readonly [string, string],
 ): string => {
-  const added = new URLSearchParams(params.map(([key, value]) => [key, value]));
+  const added = new URLSearchParams({ [key]: value });
 
   return search === ''
     ? `?${added.toString()}`

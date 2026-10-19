@@ -20,11 +20,8 @@ import { distPath } from './store-package.mjs';
  * parameters in and then strips `show-viewed-files` back off its own address
  * bar, while going on mutating the DOM. An extension that reads that as "the
  * defaults are gone" redirects forever; the check is that the page is loaded
- * twice — asked for, and redirected once — and then no more. A second fixture
- * does what the site does on a pull request with files already marked viewed —
- * drops the whole query for a fragment naming the first file that is not — and
- * the check is that the address gets the defaults back with no load at all,
- * in the tab and in a frame.
+ * twice — asked for, and redirected once — and then no more, and that a reload
+ * of the address the site left is redirected once, in the tab and in a frame.
  *
  * It needs a headed browser, because Chromium loads no extensions in the
  * headless shell. On a machine with no display:
@@ -371,18 +368,17 @@ const main = async (): Promise<void> => {
     // asked for, taken off again, asked for again.
     await page.waitForTimeout(loopWatchMs);
 
-    // Every one of those rewrites names the same address without the
-    // parameter — what GitHub does to a reloaded diff — and every one is
-    // amended as it is made, so the address never loses it, and nothing is
-    // loaded again to put it back.
+    // The page was loaded with the defaults once, so the parameter the site
+    // took off stays off, and nothing is loaded again to put it back.
     check(
-      'the site keeps the defaults through every rewrite, with no load',
+      'the site takes a default off, and the page is not loaded again',
       `${String(mut_documentLoads.length)} page loads, at ${page.url()}`,
-      `2 page loads, at ${origin}/stripped/mono/pull/1/files?w=1&show-viewed-files=false`,
+      `2 page loads, at ${origin}/stripped/mono/pull/1/files?w=1`,
     );
 
-    // The reload itself: the address it reloads is the one with both
-    // defaults, so it is one load and no redirect.
+    // The reload is a new document at the address the site left, so it is
+    // redirected once, as any other arrival would be — and then the site takes
+    // the parameter off again, and that is all.
     mut_documentLoads.length = 0;
 
     await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
@@ -390,59 +386,53 @@ const main = async (): Promise<void> => {
     await page.waitForTimeout(loopWatchMs);
 
     check(
-      'and a reload keeps them too',
-      `${String(mut_documentLoads.length)} page load, at ${page.url()}`,
-      `1 page load, at ${origin}/stripped/mono/pull/1/files?w=1&show-viewed-files=false`,
-    );
-
-    console.log('the address bar the site sends to a file');
-
-    // `/jumped/` is the fixture that behaves like GitHub on a pull request with
-    // files already marked viewed: once, it drops the query for a fragment
-    // naming the first file that is not.
-    await visit(
-      `${origin}/jumped/mono/pull/1/files?w=1&show-viewed-files=false`,
-    );
-
-    check(
-      'the defaults are written back beside the fragment, without a load',
-      `${String(mut_documentLoads.length)} page load, at ${await settleUntil((url) => url.includes('#'))}`,
-      `1 page load, at ${origin}/jumped/mono/pull/1/files?w=1&show-viewed-files=false#diff-abc`,
+      'and a reload of that address is redirected once',
+      `${String(mut_documentLoads.length)} page loads, at ${page.url()}`,
+      `2 page loads, at ${origin}/stripped/mono/pull/1/files?w=1`,
     );
 
     console.log('the refresh the site does in place');
 
     // `/refreshing/` is the fixture that behaves like GitHub's "Refresh"
     // button, shown on a diff once the pull request has been pushed to: a link
-    // whose route is the page's bare path, handled by a router that has the
-    // click before the anchor does. Kept from it, the click goes where the
-    // rewritten attribute says, which is a load of the diff with the defaults.
-    //
-    // Opened with the defaults already on, so that the two loads counted are
-    // the visit and the refresh; in place, the refresh is no load at all, and
-    // the address alone would not show it, since the extension writes the
-    // defaults back onto the bare path the router left.
+    // to the page's own bare path, handled by a router that refreshes it in
+    // place. A link to the page it is on is left to the site, so the refresh
+    // is no load at all and leaves the bare path the router wrote.
     await visit(
       `${origin}/refreshing/mono/pull/1/files?w=1&show-viewed-files=false`,
     );
 
     await page.locator('#refresh').click();
 
+    const refreshedUrl = await settleUntil((url) => !url.includes('?'));
+
     check(
-      'the refresh is a load of the diff with the defaults on',
+      'the refresh is left to the site, in place',
+      `${String(mut_documentLoads.length)} page load, at ${refreshedUrl}`,
+      `1 page load, at ${origin}/refreshing/mono/pull/1/files`,
+    );
+
+    // Reloading that page is what brings the defaults back: a new document at
+    // the bare path, redirected once.
+    mut_documentLoads.length = 0;
+
+    await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+
+    check(
+      'and a reload after it brings the defaults back',
       `${String(mut_documentLoads.length)} page loads, at ${await settleUntil((url) => url.includes('show-viewed-files'))}`,
       `2 page loads, at ${origin}/refreshing/mono/pull/1/files?w=1&show-viewed-files=false`,
     );
 
     // A split-view pane is a frame, which a content script is not injected
     // into unless it asks. The frame opens the bare diff, so this is the
-    // redirect and the write-back both, inside it.
+    // redirect, inside it.
     await visit(`${origin}/frame-host`);
 
     check(
-      'and the same happens inside a frame',
-      await settleFrameUntil((url) => url.includes('#')),
-      `${origin}/jumped/mono/pull/1/files?w=1&show-viewed-files=false#diff-abc`,
+      'and the redirect happens inside a frame',
+      await settleFrameUntil((url) => url.includes('show-viewed-files')),
+      `${origin}/noshiro-pf/mono/pull/1/files?w=1&show-viewed-files=false`,
     );
   } finally {
     await context.close();
@@ -477,7 +467,7 @@ const loopWatchMs = 2500;
  *
  * Enough of a pull request page to click through: the tab links the extension
  * rewrites, two it must leave alone, the branches links whose treatment depends
- * on the page they are read from, and — under `/stripped/`, `/jumped/` and
+ * on the page they are read from, and — under `/stripped/` and
  * `/refreshing/` — the address-bar rewriting and the in-place navigation the
  * real site does. `/frame-host` is a page
  * holding a diff in a frame, as a split view does.
@@ -490,7 +480,7 @@ const fixtureFor = (url: string): string => {
       '<!doctype html>',
       '<meta charset="utf-8">',
       '<title>frame host fixture</title>',
-      `<iframe name="${frameName}" src="/jumped/mono/pull/1/files"></iframe>`,
+      `<iframe name="${frameName}" src="/noshiro-pf/mono/pull/1/files"></iframe>`,
     ].join('\n');
   }
 
@@ -511,9 +501,6 @@ const fixtureFor = (url: string): string => {
     '<div id="feed"></div>',
     pathname.startsWith('/stripped/')
       ? `<script>${addressRewritingScript}</script>`
-      : '',
-    pathname.startsWith('/jumped/')
-      ? `<script>${jumpToFileScript}</script>`
       : '',
     pathname.startsWith('/refreshing/')
       ? [
@@ -542,21 +529,6 @@ const addressRewritingScript = [
   "    url.searchParams.delete('show-viewed-files');",
   "    history.replaceState(null, '', url.toString());",
   '  }',
-  "  document.getElementById('feed').append(document.createElement('span'));",
-  '}, 200);',
-].join('\n');
-
-/**
- * What GitHub does to the address of a diff whose files are partly marked
- * viewed: it scrolls to the first one that is not, and writes its anchor as the
- * fragment with the query gone. Once, and then it goes on mutating the DOM.
- */
-const jumpToFileScript = [
-  'setTimeout(() => {',
-  "  history.replaceState(null, '', location.pathname + '#diff-abc');",
-  "  document.getElementById('feed').append(document.createElement('span'));",
-  '}, 200);',
-  'setInterval(() => {',
   "  document.getElementById('feed').append(document.createElement('span'));",
   '}, 200);',
 ].join('\n');

@@ -42,7 +42,9 @@ export type ShortcutKeyEvent = Readonly<{
   ctrlKey: boolean;
   metaKey: boolean;
   shiftKey: boolean;
+  key: string;
   code: string;
+  defaultPrevented: boolean;
   preventDefault: () => void;
 }>;
 
@@ -69,6 +71,37 @@ export const workspaceShortcutCodeOf = (
     ? keyEvent.code
     : undefined;
 
+/**
+ * Whether a keydown is the browser's reload: `Ctrl+R` (`Cmd+R` on macOS) or
+ * `F5`, with `Shift` or `Ctrl` for the hard reload or without.
+ *
+ * Pressed inside a pane, Chrome would reload the whole tab — every pane, and
+ * the split view with them — so the frame agent takes it and reloads its own
+ * pane instead. Chrome lets a page keep this one from the browser with
+ * `preventDefault`, even from inside a cross-origin frame; `Ctrl+W` and
+ * `Ctrl+T` it does not.
+ *
+ * The letter is read from `key`, as Chrome reads it, so that on Dvorak it is
+ * the key that types R, and the one that types P stays print. Only a layout
+ * that types no Latin letter there falls back to `code`, the physical key,
+ * which is what Chrome does too.
+ */
+export const isReloadShortcut = (keyEvent: ShortcutKeyEvent): boolean => {
+  if (keyEvent.altKey) {
+    return false;
+  }
+
+  if (keyEvent.code === 'F5') {
+    return !keyEvent.metaKey;
+  }
+
+  const isR = latinLetterPattern.test(keyEvent.key)
+    ? keyEvent.key.toLowerCase() === 'r'
+    : keyEvent.code === 'KeyR';
+
+  return isR && (keyEvent.ctrlKey || keyEvent.metaKey);
+};
+
 /** The 1-based workspace position a shortcut names. */
 export const workspacePositionFromCode = (code: string): number | undefined => {
   const digit = digitCodePattern.exec(code)?.[1];
@@ -79,3 +112,5 @@ export const workspacePositionFromCode = (code: string): number | undefined => {
 };
 
 const digitCodePattern = /^Digit([1-9])$/u;
+
+const latinLetterPattern = /^[a-z]$/iu;

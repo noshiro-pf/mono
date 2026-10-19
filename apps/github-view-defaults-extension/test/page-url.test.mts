@@ -2,12 +2,10 @@ import {
   allBranchesSegment,
   diffViewDefaults,
   isSettledLink,
-  keptUrlOfHistoryWrite,
   managedPagePathOf,
   overviewParam,
   preferredUrlOfLink,
   preferredUrlOfPage,
-  restoredUrlOfPage,
 } from '../src/index.mjs';
 
 const pageOrigin = 'https://github.com';
@@ -152,171 +150,6 @@ describe('preferredUrlOf, on a pull request diff', () => {
   });
 });
 
-describe('restoredUrlOfPage', () => {
-  test('puts the defaults back on a diff the site sent to one of its files', () => {
-    // What GitHub leaves when it scrolls a diff to the first file not yet
-    // marked viewed: the fragment on, the query off.
-    assert.deepStrictEqual(
-      restoredUrlOfPage(
-        `${pageOrigin}/noshiro-pf/mono/pull/2089/changes#diff-d2fbcdbd`,
-        pageOrigin,
-      ),
-      `${pageOrigin}/noshiro-pf/mono/pull/2089/changes?w=1&show-viewed-files=false#diff-d2fbcdbd`,
-    );
-  });
-
-  test('puts back only the one the site took off', () => {
-    assert.deepStrictEqual(
-      restoredUrlOfPage(
-        `${pageOrigin}/noshiro-pf/mono/pull/1/files?w=1`,
-        pageOrigin,
-      ),
-      `${pageOrigin}/noshiro-pf/mono/pull/1/files?w=1&show-viewed-files=false`,
-    );
-  });
-
-  test('leaves a diff alone when its address still says both', () => {
-    assert.deepStrictEqual(
-      restoredUrlOfPage(
-        `${pageOrigin}/noshiro-pf/mono/pull/1/changes?show-viewed-files=false&w=1#diff-abc`,
-        pageOrigin,
-      ),
-      undefined,
-    );
-  });
-
-  test('never overrules what the address says', () => {
-    // GitHub's own controls write these; putting the default back would undo
-    // the click.
-    assert.deepStrictEqual(
-      restoredUrlOfPage(
-        `${pageOrigin}/noshiro-pf/mono/pull/1/files?w=0&show-viewed-files=true`,
-        pageOrigin,
-      ),
-      undefined,
-    );
-  });
-
-  test('does not send the branch overview to the list in place', () => {
-    // That answer names another page, and an address changed without loading
-    // it would describe a page that is not the one on screen.
-    assert.deepStrictEqual(
-      restoredUrlOfPage(`${pageOrigin}/noshiro-pf/mono/branches`, pageOrigin),
-      undefined,
-    );
-
-    assert.isDefined(
-      preferredUrlOfPage(`${pageOrigin}/noshiro-pf/mono/branches`, pageOrigin),
-    );
-  });
-
-  test('leaves a page no rule speaks for alone', () => {
-    assert.deepStrictEqual(
-      restoredUrlOfPage(`${pageOrigin}/noshiro-pf/mono/pull/1`, pageOrigin),
-      undefined,
-    );
-  });
-});
-
-describe('keptUrlOfHistoryWrite', () => {
-  const diff = `${pageOrigin}/noshiro-pf/mono/pull/2089/changes` as const;
-
-  const settled = `${diff}?show-viewed-files=false&w=1` as const;
-
-  test('keeps the query when the site writes the bare path, again and again', () => {
-    // What GitHub does to a diff reloaded with the defaults on. Asked of the
-    // write rather than after it, the same write twice is answered twice.
-    for (const _ of [1, 2]) {
-      assert.deepStrictEqual(
-        keptUrlOfHistoryWrite(
-          '/noshiro-pf/mono/pull/2089/changes',
-          settled,
-          pageOrigin,
-        ),
-        `${diff}?show-viewed-files=false&w=1`,
-      );
-    }
-  });
-
-  test('keeps it beside the fragment of the file the site jumps to', () => {
-    assert.deepStrictEqual(
-      keptUrlOfHistoryWrite(`${diff}#diff-d2fbcdbd`, settled, pageOrigin),
-      `${diff}?show-viewed-files=false&w=1#diff-d2fbcdbd`,
-    );
-  });
-
-  test('puts back only the one the write drops', () => {
-    assert.deepStrictEqual(
-      keptUrlOfHistoryWrite(`${diff}?w=1`, settled, pageOrigin),
-      `${diff}?w=1&show-viewed-files=false`,
-    );
-  });
-
-  test('carries the value the address had, not the default', () => {
-    // `w=0` is GitHub's own control, chosen on this page.
-    assert.deepStrictEqual(
-      keptUrlOfHistoryWrite(diff, `${diff}?w=0`, pageOrigin),
-      `${diff}?w=0`,
-    );
-  });
-
-  test('leaves a write that says the parameters itself alone', () => {
-    assert.deepStrictEqual(
-      keptUrlOfHistoryWrite(
-        `${diff}?w=0&show-viewed-files=false`,
-        settled,
-        pageOrigin,
-      ),
-      undefined,
-    );
-  });
-
-  test('adds nothing the address did not carry', () => {
-    assert.deepStrictEqual(
-      keptUrlOfHistoryWrite(`${diff}#diff-abc`, diff, pageOrigin),
-      undefined,
-    );
-  });
-
-  test('leaves a navigation to another page alone', () => {
-    assert.deepStrictEqual(
-      keptUrlOfHistoryWrite('/noshiro-pf/mono/pull/2089', settled, pageOrigin),
-      undefined,
-    );
-
-    assert.deepStrictEqual(
-      keptUrlOfHistoryWrite(
-        '/noshiro-pf/mono/pull/2090/changes',
-        settled,
-        pageOrigin,
-      ),
-      undefined,
-    );
-  });
-
-  test('leaves a page no rule speaks for alone', () => {
-    assert.deepStrictEqual(
-      keptUrlOfHistoryWrite(
-        '/noshiro-pf/mono/pull/1',
-        `${pageOrigin}/noshiro-pf/mono/pull/1?w=1`,
-        pageOrigin,
-      ),
-      undefined,
-    );
-  });
-
-  test('keeps the overview mark on the overview', () => {
-    assert.deepStrictEqual(
-      keptUrlOfHistoryWrite(
-        '/noshiro-pf/mono/branches',
-        `${pageOrigin}/noshiro-pf/mono/branches?overview=1`,
-        pageOrigin,
-      ),
-      `${pageOrigin}/noshiro-pf/mono/branches?overview=1`,
-    );
-  });
-});
-
 describe('managedPagePathOf', () => {
   test('is the path, whatever the query says', () => {
     // The point of the path alone: these three are one page, and the extension
@@ -416,6 +249,30 @@ describe('isSettledLink', () => {
     ],
   ])('is %s for %s', (expected, _name, href) => {
     assert.deepStrictEqual(isSettledLink(href, pageOrigin, somePage), expected);
+  });
+
+  test('is false for a link to the page it is on', () => {
+    // GitHub's "Refresh" button on a diff that has been pushed to: a link to
+    // the page's own path, which GitHub refreshes in place.
+    const diff = `${pageOrigin}/noshiro-pf/mono/pull/1938/files` as const;
+
+    const settled = `${diff}?w=1&show-viewed-files=false` as const;
+
+    assert.isFalse(isSettledLink(settled, pageOrigin, settled));
+
+    assert.isFalse(isSettledLink(settled, pageOrigin, diff));
+
+    assert.isFalse(isSettledLink(`${settled}#diff-abc`, pageOrigin, settled));
+  });
+
+  test('is true for another diff of the same pull request', () => {
+    assert.isTrue(
+      isSettledLink(
+        `${pageOrigin}/noshiro-pf/mono/pull/1938/files/abc..def?w=1&show-viewed-files=false`,
+        pageOrigin,
+        `${pageOrigin}/noshiro-pf/mono/pull/1938/files?w=1&show-viewed-files=false`,
+      ),
+    );
   });
 
   test('is false for the bare overview even in the branches page tab bar', () => {

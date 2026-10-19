@@ -56,13 +56,6 @@ The tab title is changed on these pages and no others:
   page with `w=0` or `show-viewed-files=true` on it; forcing the defaults back
   would leave no way to look at what the extension hides. A link somebody
   shared with `w=0` on it keeps it, too.
-- **The address goes on saying it.** GitHub takes the parameters back off a
-  diff it has opened with them — and on a pull request with files already
-  marked viewed it jumps to the first one that is not, leaving
-  `/changes#diff-…` with no query at all. The extension writes the missing ones
-  back onto the address, beside the fragment, without loading the page again,
-  so a reload, a bookmark or a split view saving where its pane is still opens
-  the diff the same way.
 - **Inside a frame too.** A diff in a pane of a split view
   ([`split-view-extension`](../split-view-extension/README.md)) is treated as it
   would be in a tab of its own.
@@ -136,12 +129,13 @@ Three mechanisms, in the order they matter:
 - **Clicks on those links are left to the browser.** GitHub navigates between
   its own pages without loading a document, and would use the route it holds
   for the link rather than the address in the attribute — which would undo the
-  rewrite at the moment it matters. The "Refresh" button a diff shows once the
-  pull request has been pushed to is one such link: its route is the page's
-  bare path, so GitHub's own handling reloads the diff in place without the
-  defaults. The extension stops the click on the window, in the capture phase,
-  before any of GitHub's handlers hears of it, so the anchor does what an
-  anchor does: that refresh loads the diff again, with the defaults.
+  rewrite at the moment it matters. The extension stops the click on the
+  window, in the capture phase, before any of GitHub's handlers hears of it, so
+  the anchor does what an anchor does. A link to the page it is on is the
+  exception and is left to GitHub: that is the "Refresh" button a diff shows
+  once the pull request has been pushed to, which GitHub refreshes in place and
+  which leaves the bare path on the address. Reloading the page brings the
+  defaults back, through the redirect below.
 - **The page it lands on is redirected**, if the rules want something else of
   it. The content script runs at `document_start`, before the document is
   parsed, so the load it abandons has barely begun. This also covers the
@@ -161,20 +155,8 @@ a logged-out session, `?w=1&show-viewed-files=false` becomes `?w=1` a moment
 after the page loads. An extension that read that as "the defaults are gone"
 and redirected would load the page again, forever. So the paths already dealt
 with are remembered for the life of the document, and parameters coming off
-one of them afterwards are kept on the address rather than reloaded.
-
-**GitHub's own writes to the address keep the parameters.** The content script
-runs in the page's world rather than an isolated one, and before any of
-GitHub's scripts it wraps `history.pushState` and `history.replaceState`: a
-write that stays on the same page and drops a parameter the address carried
-gets it back, with the value it had, before the write happens. GitHub can write the
-bare path of a diff more than once after a reload, so answering each write
-after it had happened — once per address, so as not to fight over it — left the
-second one standing and the address without the defaults. Amended as it is
-made, the write leaves nothing to fight over. A write to another page is left
-as it is, and a parameter the address never had is not added; that is the
-redirect's job. Anything that still takes them off is put back with
-`history.replaceState` as the observer notices it.
+one of them afterwards are left off rather than reloaded; the next document
+loaded from that address — a reload, a bookmark — is redirected like any other.
 
 `src/page-url.mts` holds the address rules and touches no DOM — which URLs
 count and what the extension wants of them — and `src/page-title.mts` holds the
