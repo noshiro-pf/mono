@@ -262,10 +262,10 @@ leaves the verbatim texts under `docs/` alone.
 ## Session rules
 
 - After code changes, run `pnpm run fmt` and the checks the diff touches, and
-  fix what they report. **No file-level `eslint-disable`, no turning rules off
-  in `eslint.config.mts`, and `eslint-disable-next-line` only as a last
-  resort** — the rules below say what the intended fix is. The one rule-off is
-  `eslintConfigOffForSumiCheck`, over what `check:sumi` reads.
+  fix what they report. **Before turning a lint rule off, try fixing the
+  code**; the rules below say the intended fix. Where a rule's premise fails
+  (code run by `page.evaluate`), turn it off narrowly with a reason, by
+  `eslint-disable-next-line` or a `files` override, not by reworking the rule.
 - Pushing the session's own branch and opening its pull request is the work.
   **Without explicit instruction, never**: push to any other branch (`main`
   refuses direct pushes anyway); force-push or rebase a branch whose pull
