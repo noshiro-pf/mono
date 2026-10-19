@@ -1,3 +1,4 @@
+export * from './authoring.mjs';
 export * from './combine/index.mjs';
 export * from './create/index.mjs';
 export * from './operators/index.mjs';

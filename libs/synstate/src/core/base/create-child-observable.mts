@@ -129,6 +129,46 @@ export type InitializedChildObservableConfig<
  * `createTryUpdate` runs during construction, before the observable is
  * registered to its parents, so the operator's state can live either in the
  * enclosing factory or inside the `createTryUpdate` closure.
+ *
+ * @example
+ *
+ * ```ts
+ * // A custom operator, written as `map((x) => x * 2)` is.
+ * const double = (src: Observable<number>): Observable<number> =>
+ *   createSyncChildObservable(
+ *     { parents: [src], initialValue: Optional.none },
+ *     ({ setNext }) =>
+ *       (updateToken) => {
+ *         const sn = src.getSnapshot();
+ *
+ *         if (src.updateToken !== updateToken || Optional.isNone(sn)) {
+ *           return; // `src` did not emit in this update
+ *         }
+ *
+ *         setNext(sn.value * 2, updateToken);
+ *       },
+ *   );
+ *
+ * const num$ = source<number>();
+ *
+ * const pair$ = combine([num$, double(num$)]);
+ *
+ * const valueHistory: FixedLengthTuple<2, number>[] = [];
+ *
+ * pair$.subscribe((pair) => {
+ *   valueHistory.push(pair);
+ * });
+ *
+ * num$.next(1);
+ *
+ * num$.next(2);
+ *
+ * // `double` joins the same update as `num$`, so `combine` sees no [2, 2].
+ * assert.deepStrictEqual(valueHistory, [
+ *   [1, 2],
+ *   [2, 4],
+ * ]);
+ * ```
  */
 export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
   {
