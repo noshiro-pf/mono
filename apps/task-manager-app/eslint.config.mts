@@ -5,12 +5,13 @@ import {
   eslintConfigForPreact,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
+  mergeRestrictedImportsOptions,
+  restrictedImportsOptionsForPreact,
   type FlatConfig,
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
-import { Arr, hasKey, isRecord } from 'ts-data-forge';
 import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
 
 const thisDir = import.meta.dirname;
@@ -59,18 +60,14 @@ export default [
     // name is allowed here only if it neither reads nor writes.
     //
     // A rule's options are replaced, not merged, by a later config, so the
-    // paths `eslintConfigForPreact` restricts are carried over
-    // (`inheritedRestrictedPaths`). `@typescript-eslint/no-restricted-imports`
-    // would have sidestepped that, but it is deprecated, and
-    // `defineKnownRules` accepts it only turned off.
+    // ones `eslintConfigForPreact` set are merged in again.
     files: ['src/**'],
     ignores: ['src/api/**'],
-    rules: {
+    rules: defineKnownRules({
       'no-restricted-imports': [
         'error',
-        {
+        mergeRestrictedImportsOptions(restrictedImportsOptionsForPreact, {
           paths: [
-            ...inheritedRestrictedPaths(eslintConfigForPreact()),
             {
               name: 'firebase/firestore',
               allowImportNames: [
@@ -99,9 +96,9 @@ export default [
               message: firestoreMessage,
             },
           ],
-        },
+        }),
       ],
-    },
+    }),
   },
 
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),
@@ -116,27 +113,3 @@ export default [
   // Last, so that nothing above turns these back on.
   eslintConfigOffForOxlint,
 ] satisfies readonly FlatConfig[];
-
-/**
- * The `paths` of every `no-restricted-imports` entry in `configs`, so a
- * config that sets the rule again can keep them.
- */
-function inheritedRestrictedPaths(
-  configs: readonly FlatConfig[],
-): readonly unknown[] {
-  return configs.flatMap(({ rules }) => {
-    const entry: unknown = rules?.['no-restricted-imports'];
-
-    if (!Arr.isArray(entry)) {
-      return [];
-    }
-
-    const options: unknown = entry[1];
-
-    return isRecord(options) &&
-      hasKey(options, 'paths') &&
-      Arr.isArray(options.paths)
-      ? options.paths
-      : [];
-  });
-}

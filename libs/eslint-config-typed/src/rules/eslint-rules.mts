@@ -1,4 +1,5 @@
 import { Arr } from 'ts-data-forge';
+import type { StrictExclude } from 'ts-type-forge';
 import { allExtensionsRegexUnionStr } from '../constants/index.mjs';
 import {
   withDefaultOption,
@@ -128,6 +129,53 @@ export const restrictedSyntax = [
   // },
 ] as const satisfies EslintRulesOption['no-restricted-syntax'];
 
+/**
+ * The object form of the `no-restricted-imports` options, with `patterns`
+ * written as objects so that options can be concatenated
+ * (`mergeRestrictedImportsOptions`). A string pattern is `{ group: [it] }`.
+ */
+export type RestrictedImportsOptions = Readonly<{
+  paths?: NonNullable<RestrictedImportsObjectOptions['paths']>;
+  patterns?: StrictExclude<
+    NonNullable<RestrictedImportsObjectOptions['patterns']>,
+    readonly string[]
+  >;
+}>;
+
+/** The options are either a list of paths or a 1-tuple of this object. */
+type RestrictedImportsObjectOptions =
+  EslintRulesOption['no-restricted-imports'] extends infer O
+    ? O extends readonly [infer Options]
+      ? Options
+      : never
+    : never;
+
+/** The options `eslintRules` sets `no-restricted-imports` with. */
+export const restrictedImportsOptions = {
+  patterns: [
+    {
+      regex: String.raw`^(\.\/|\.\.\/)+index\.(${allExtensionsRegexUnionStr})$`,
+      message:
+        'Do not specify index.mjs directly by relative path, but import it by module name (e.g. ./X/index.mjs).',
+    },
+  ],
+} as const satisfies RestrictedImportsOptions;
+
+/**
+ * Concatenates the `paths` and the `patterns` of `options`, in order.
+ *
+ * A config that sets `no-restricted-imports` replaces the options an earlier
+ * config set, so one that adds a restriction has to set the earlier ones
+ * again: `['error', mergeRestrictedImportsOptions(restrictedImportsOptionsForPreact, mine)]`.
+ */
+export const mergeRestrictedImportsOptions = (
+  ...options: readonly RestrictedImportsOptions[]
+): RestrictedImportsOptions =>
+  ({
+    paths: options.flatMap((o) => o.paths ?? []),
+    patterns: options.flatMap((o) => o.patterns ?? []),
+  }) as const;
+
 /** @link https://github.com/eslint/eslint/blob/main/conf/eslint-all.js */
 export const eslintRules = {
   /**
@@ -209,18 +257,7 @@ export const eslintRules = {
   'no-loop-func': 'error',
 
   // Note: If paths with the same name are defined multiple times, later definitions may overwrite earlier ones
-  'no-restricted-imports': [
-    'error',
-    {
-      patterns: [
-        {
-          regex: String.raw`^(\.\/|\.\.\/)+index\.(${allExtensionsRegexUnionStr})$`,
-          message:
-            'Do not specify index.mjs directly by relative path, but import it by module name (e.g. ./X/index.mjs).',
-        },
-      ],
-    },
-  ],
+  'no-restricted-imports': ['error', restrictedImportsOptions],
 
   'accessor-pairs': withDefaultOption('error'),
 
