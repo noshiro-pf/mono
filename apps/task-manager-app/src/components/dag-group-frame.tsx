@@ -70,7 +70,6 @@ export const DagGroupFrame = memoNamed<Props>('DagGroupFrame', (props) => {
         data-group-id={frame.id}
         role={'button'}
         // Lower case, as on a node (`dag-task-node.tsx`).
-        // eslint-disable-next-line react/no-unknown-property
         tabindex={0}
         onClick={openGroup}
         onKeyDown={onKeyDown}
