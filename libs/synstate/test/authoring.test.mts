@@ -88,29 +88,19 @@ const createEmitter = (): Emitter &
   };
 };
 
-const fromEvent = (emitter: Emitter): RootObservable<string> => {
-  const mut_listener: { current: ((type: string) => void) | undefined } = {
-    current: undefined,
-  };
-
-  return createRootObservable<string>(
-    {
-      initialValue: Optional.none,
-      onComplete: () => {
-        if (mut_listener.current !== undefined) {
-          emitter.removeListener(mut_listener.current);
-        }
-      },
-    },
-    ({ startUpdate }) => {
-      mut_listener.current = startUpdate;
-
+const fromEvent = (emitter: Emitter): RootObservable<string> =>
+  createRootObservable<string>(
+    { initialValue: Optional.none },
+    ({ startUpdate, onComplete }) => {
       emitter.addListener(startUpdate);
+
+      onComplete(() => {
+        emitter.removeListener(startUpdate);
+      });
 
       return {};
     },
   );
-};
 
 describe('custom operators and creators', () => {
   test('a custom sync operator updates in the same update as its parent', () => {
@@ -213,6 +203,58 @@ describe('custom operators and creators', () => {
     emitter.emit('click');
 
     assert.deepStrictEqual(mut_types, ['click']);
+  });
+
+  test('teardowns registered in init run once, in the order registered', () => {
+    const mut_calls: string[] = [];
+
+    const obs$ = createRootObservable<number>(
+      { initialValue: Optional.none },
+      ({ onComplete }) => {
+        onComplete(() => {
+          mut_calls.push('first');
+        });
+
+        onComplete(() => {
+          mut_calls.push('second');
+        });
+
+        return {};
+      },
+    );
+
+    assert.deepStrictEqual(mut_calls, []);
+
+    obs$.complete();
+
+    obs$.complete();
+
+    obs$.dispose();
+
+    assert.deepStrictEqual(mut_calls, ['first', 'second']);
+  });
+
+  test('a teardown registered after completion runs at once', () => {
+    const mut_calls: string[] = [];
+
+    const obs$ = createRootObservable<number>(
+      { initialValue: Optional.none },
+      ({ complete, onComplete }) => {
+        // As a synchronous source does: it completes before `init` gets to
+        // register the teardown.
+        complete();
+
+        onComplete(() => {
+          mut_calls.push('teardown');
+        });
+
+        return {};
+      },
+    );
+
+    assert.deepStrictEqual(mut_calls, ['teardown']);
+
+    assert.isTrue(obs$.isCompleted);
   });
 
   test('the public types carry only the members meant for users', () => {

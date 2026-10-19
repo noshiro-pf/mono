@@ -24,17 +24,19 @@ export type RootObservableTools<A> = Readonly<{
 
   /** Completes this observable (leaf teardown included). */
   complete: () => void;
+
+  /**
+   * Registers a teardown (clear timers, abort requests, remove listeners, …)
+   * to run at the beginning of `complete()`, in the order registered. Called
+   * from `init`, it lets the teardown close over what `init` creates.
+   * Registered once the observable has completed — `init` may complete it
+   * synchronously first — the teardown runs at once.
+   */
+  onComplete: (teardown: () => void) => void;
 }>;
 
 export type RootObservableConfig<A> = Readonly<{
   initialValue: Optional<A>;
-
-  /**
-   * Leaf teardown (clear timers, abort requests, …), run at the beginning of
-   * `complete()` — the closure replacement for
-   * `override complete() { teardown(); super.complete(); }`.
-   */
-  onComplete?: () => void;
 }>;
 
 /**
@@ -57,7 +59,7 @@ export const createRootObservable = <
     never
   >,
 >(
-  { initialValue, onComplete }: RootObservableConfig<A>,
+  { initialValue }: RootObservableConfig<A>,
   init: (tools: RootObservableTools<A>) => Extension,
 ): Extension & RootObservable<A> => {
   const handle = createObservableBaseHandle<A>(initialValue);
@@ -65,10 +67,26 @@ export const createRootObservable = <
   const { addDescendant, deleteDescendant, startUpdate } =
     createManagerObservableParts(handle);
 
+  const mut_teardowns: (() => void)[] = [];
+
   const complete = (): void => {
-    onComplete?.();
+    if (handle.isCompleted()) {
+      return;
+    }
+
+    for (const teardown of mut_teardowns) {
+      teardown();
+    }
 
     handle.completeBase();
+  };
+
+  const addTeardown = (teardown: () => void): void => {
+    if (handle.isCompleted()) {
+      teardown();
+    } else {
+      mut_teardowns.push(teardown);
+    }
   };
 
   // A root created while an update propagates (inside a `switchMap`
@@ -94,6 +112,7 @@ export const createRootObservable = <
     getSnapshot: handle.getSnapshot,
     isCompleted: handle.isCompleted,
     complete,
+    onComplete: addTeardown,
   });
 
   mut_isInitializing = false;

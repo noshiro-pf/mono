@@ -55,30 +55,34 @@ export const timer = (
   };
 
   const observable = createRootObservable<0, Readonly<{ start: () => void }>>(
-    { initialValue: Optional.none, onComplete: resetTimer },
-    ({ startUpdate, isCompleted, complete }) => ({
-      start: () => {
-        if (mut_isStarted) {
-          console.warn('cannot start twice');
+    { initialValue: Optional.none },
+    ({ startUpdate, isCompleted, complete, onComplete }) => {
+      onComplete(resetTimer);
 
-          return;
-        }
+      return {
+        start: () => {
+          if (mut_isStarted) {
+            console.warn('cannot start twice');
 
-        mut_isStarted = true;
+            return;
+          }
 
-        if (isCompleted()) {
-          console.warn('cannot restart stopped TimerObservable');
+          mut_isStarted = true;
 
-          return;
-        }
+          if (isCompleted()) {
+            console.warn('cannot restart stopped TimerObservable');
 
-        mut_timerId = setTimeout(() => {
-          startUpdate(0);
+            return;
+          }
 
-          complete();
-        }, milliSeconds);
-      },
-    }),
+          mut_timerId = setTimeout(() => {
+            startUpdate(0);
+
+            complete();
+          }, milliSeconds);
+        },
+      };
+    },
   );
 
   if (!(options?.startManually ?? false)) {
