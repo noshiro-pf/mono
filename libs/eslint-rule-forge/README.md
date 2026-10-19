@@ -118,6 +118,22 @@ The range and the text of a node leave out the parentheses written around it.
 | `getRangeWithParens` | the node's range including them                                     |
 | `getArgumentText`    | the node's text for an argument list, `(a, b)` kept as one argument |
 
+## Code that runs in the browser
+
+Playwright and Puppeteer serialize the function given to `page.evaluate`,
+`locator.evaluate`, `page.waitForFunction` and the like, and run it in the
+page, where the file's imports do not exist. A fix that calls an imported
+library there passes the type checker and fails at runtime.
+
+| Helper                          | What it gives                                                                        |
+| :------------------------------ | :----------------------------------------------------------------------------------- |
+| `isInBrowserEvaluatedFunction`  | whether a node is inside such a function, behind any type wrapper or parentheses     |
+| `skipBrowserEvaluatedFunctions` | the rule with every node inside such a function kept from its listeners, not visited |
+
+`skipBrowserEvaluatedFunctions` keeps the nodes from the listeners rather than
+dropping the reports, so that a rule which puts its import fix on the first
+report it collects still has that report to put it on.
+
 ## Imports and bindings
 
 | Helper                  | What it gives                                                                                        |
