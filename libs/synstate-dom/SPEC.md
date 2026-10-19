@@ -4,7 +4,7 @@
 
 synstate の Observable を JSX の属性・子要素・props にそのまま渡し、DOM に直接束縛する UI ライブラリの実装仕様。コンパイラも仮想 DOM も持たない。
 
-- 状態: 実装中。パッケージの骨格、「4. 定数と `Bindable`」、「6. JSX ランタイムと `Mountable`」（要素は `ref` と子要素のみ）まで実装済み。公開の準備が整うまで `package.json` は `"private": true` にしてある。
+- 状態: 実装中。パッケージの骨格、「4. 定数と `Bindable`」、「5. JSX の型」、「6. JSX ランタイムと `Mountable`」、「7. 束縛」まで実装済み。公開の準備が整うまで `package.json` は `"private": true` にしてある。
 - 出典: 設計の起点は issue [#2131](https://github.com/noshiro-pf/mono/issues/2131)、synstate 側のライフサイクル（complete・dispose・スコープ）は「synstate ライフサイクル仕様」で確定した内容。本書は両者を UI ライブラリの実装の視点で 1 つにまとめたもので、食い違う箇所は本書で決め、その旨を書く。
 
 ## 1. 目的と範囲
@@ -171,6 +171,8 @@ type ElementProps<E extends Element> = Readonly<
 - **イベント** は `on` + `HTMLElementEventMap` のキーを PascalCase にしたもの（`onClick`）。引数は `ev: HTMLElementEventMap[K] & Readonly<{ currentTarget: E }>`。値は関数のみで Observable は受け付けない（決定事項 4 の例外）。
 - **`ref`** は要素を作った直後、子をマウントする前に 1 回呼ぶ。
 - 真偽属性（`disabled` など）は `Bindable<boolean>` で受け、`false` で属性を外す。
+- **イベントの props 名**は、イベント名が小文字の 1 語（`pointerdown`）で単語の境目が分からないので、イベント名から props 名（`onPointerDown`）への対応表を型で持つ。表が `HTMLElementEventMap` と `SVGElementEventMap` のキーをすべて覆うことはテストで確かめる。実行時は props 名を小文字にすればイベント名に戻るので、表を読まない。
+- **SVG** の要素は `SVGElementTagNameMap` のうち HTML に無いタグを SVG の名前空間で作る。`a`・`script`・`style`・`title` は HTML にもあるので、どこに書いても HTML の要素になる。SVG のプロパティは `SVGAnimatedLength` などで属性の型を読み取れないので、受け付ける属性は一覧で持つ。
 
 生成した型がエディタの補完と型検査で重すぎないかを、最初の実装で `tsc --extendedDiagnostics` で測る。
 

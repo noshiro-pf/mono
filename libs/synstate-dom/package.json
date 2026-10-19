@@ -57,7 +57,7 @@
     "fmt": "pnpm run fix:fmt",
     "gen": "run-s gen:index",
     "gen:index": "run-s gen:index:src fix:fmt",
-    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude jsx-runtime.mts --exclude jsx-dev-runtime.mts --exclude \"internal/**\"",
+    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude jsx-runtime.mts --exclude jsx-dev-runtime.mts --exclude \"bind/**\" --exclude \"internal/**\"",
     "test": "pnpm run check:test",
     "test:cov:ui": "vite preview --outDir ./coverage",
     "test:ui": "pnpm run z:vitest:node --ui",

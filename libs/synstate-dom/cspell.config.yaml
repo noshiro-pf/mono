@@ -7,3 +7,5 @@ import:
 words:
   - jsxdev
   - jsxs
+  - mpath
+  - unstub
