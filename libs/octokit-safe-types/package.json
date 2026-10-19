@@ -102,7 +102,7 @@
     "pnpm": ">=9.0.0"
   },
   "volta": {
-    "node": "26.11.1"
+    "node": "26.12.0"
   },
   "publishConfig": {
     "access": "public",
