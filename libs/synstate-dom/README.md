@@ -14,6 +14,7 @@ A compiler-free, fine-grained UI library that binds [synstate](https://github.co
 - The JSX runtime (`"jsx": "react-jsx"`, `"jsxImportSource": "synstate-dom"`): a JSX expression is a lazy `Mountable` description, and a component is called once, when it is mounted.
 - `render(App, container)`: mounts `App` in a root scope and returns the function that unmounts it.
 - Element props: attributes and DOM properties typed from `lib.dom.d.ts` (`Bindable<T>` of each writable primitive property), `aria-*` and `data-*`, `class` as a string or a `{ name: Bindable<boolean> }` object, `style` as a string or a per-property object, and `onClick`-style event handlers. SVG elements are created in the SVG namespace and take a fixed list of attributes.
+- `If`, `MatchOptional` and `MatchResult`: mount one branch at a time in a scope of its own, rebuilt only when the condition or the tag changes.
 
 ## Naming
 
