@@ -7,9 +7,7 @@ import * as prettierPluginEstree from 'prettier/plugins/estree';
 import * as prettierPluginTypeScript from 'prettier/plugins/typescript';
 import * as prettier from 'prettier/standalone';
 import { expectType } from 'ts-data-forge';
-// Aliased: an import named `DeepReadonly` makes `vitest/prefer-describe-function-title`
-// rewrite `describe('DeepReadonly', ...)` into a reference to this type.
-import type { DeepReadonly as TsTypeForgeDeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import {
   convertToReadonlyTransformer,
   type ReadonlyTransformerOptions,
@@ -3090,34 +3088,25 @@ describe(convertToReadonlyTransformer, () => {
       type B = Readonly<{ b: string[] }>;
 
       // `|` commutes with DeepReadonly, so merging a union is safe.
-      expectType<
-        TsTypeForgeDeepReadonly<A | B>,
-        TsTypeForgeDeepReadonly<A> | TsTypeForgeDeepReadonly<B>
-      >('=');
+      expectType<DeepReadonly<A | B>, DeepReadonly<A> | DeepReadonly<B>>('=');
+
+      expectType<DeepReadonly<F | X>, DeepReadonly<F> | DeepReadonly<X>>('=');
 
       expectType<
-        TsTypeForgeDeepReadonly<F | X>,
-        TsTypeForgeDeepReadonly<F> | TsTypeForgeDeepReadonly<X>
-      >('=');
-
-      expectType<
-        TsTypeForgeDeepReadonly<readonly string[] | X>,
-        TsTypeForgeDeepReadonly<readonly string[]> | TsTypeForgeDeepReadonly<X>
+        DeepReadonly<readonly string[] | X>,
+        DeepReadonly<readonly string[]> | DeepReadonly<X>
       >('=');
 
       // `&` does not: an intersection is tested as a whole and matches every
       // branch any one member matches. `F & X` hits the function branch and
       // comes back unchanged, leaving `x` mutable.
-      expectType<TsTypeForgeDeepReadonly<F & X>, F & X>('=');
+      expectType<DeepReadonly<F & X>, F & X>('=');
+
+      expectType<DeepReadonly<F & X>, DeepReadonly<F> & DeepReadonly<X>>('!=');
 
       expectType<
-        TsTypeForgeDeepReadonly<F & X>,
-        TsTypeForgeDeepReadonly<F> & TsTypeForgeDeepReadonly<X>
-      >('!=');
-
-      expectType<
-        TsTypeForgeDeepReadonly<readonly string[] & X>,
-        TsTypeForgeDeepReadonly<readonly string[]> & TsTypeForgeDeepReadonly<X>
+        DeepReadonly<readonly string[] & X>,
+        DeepReadonly<readonly string[]> & DeepReadonly<X>
       >('!=');
 
       // `Readonly` over type literals does commute with `&`, which is what

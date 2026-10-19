@@ -13,6 +13,16 @@ export const eslintConfigForVitest = (files?: readonly string[]): FlatConfig =>
         // ...vitest.environments.env.globals,
       },
     },
+    settings: {
+      vitest: {
+        // Lets the rules read types. Without it,
+        // `vitest/prefer-describe-function-title` takes any import named as a
+        // `describe` title for a function, a type-only one included, and
+        // autofixes the string into a reference to it. Needs type-aware
+        // linting, which `vitest/unbound-method` needs anyway.
+        typecheck: true,
+      },
+    },
     rules: defineKnownRules({
       ...eslintVitestRules,
       ...eslintVitestCodingStyleRules,
