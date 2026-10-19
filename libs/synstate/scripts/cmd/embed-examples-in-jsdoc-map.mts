@@ -23,6 +23,11 @@ type SourceFileMapping = Readonly<{
  * The script will replace each ```ts block sequentially with the corresponding sample code.
  */
 export const sourceFileMappings: readonly SourceFileMapping[] = [
+  // Authoring
+  {
+    sourcePath: 'src/core/base/create-child-observable.mts',
+    sampleFiles: ['samples/src/create-sync-child-observable-example.mts'],
+  },
   // State management
   {
     sourcePath: 'src/core/create/source.mts',
