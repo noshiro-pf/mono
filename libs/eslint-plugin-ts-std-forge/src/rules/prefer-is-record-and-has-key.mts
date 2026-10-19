@@ -64,6 +64,24 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
           isAlreadyRecordType(checker, type),
         );
 
+      /**
+       * Whether the object may be an array at some layer of type wrappers.
+       * `isRecord` rejects an array, so `'0' in xs` would turn from `true` to
+       * `false`; a widening cast to a type that may be an array is the author
+       * saying it may be one. Without type information nothing is known, and
+       * the rule reports as it always has.
+       */
+      const mayBeArray = (
+        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+        expression: TSESTree.Expression,
+      ): boolean =>
+        sourceCode.parserServices?.program != null &&
+        !typeHoldsAtEveryLayer(
+          sourceCode,
+          expression,
+          (type, checker) => !mayBeArrayType(checker, type),
+        );
+
       const mut_nodesToFix: {
         node: TSESTree.CallExpression | TSESTree.BinaryExpression;
         objExpression: TSESTree.Expression;
@@ -100,7 +118,8 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
           // Type guard: ensure arguments are Expressions (not SpreadElement)
           if (
             objArg.type === AST_NODE_TYPES.SpreadElement ||
-            keyArg.type === AST_NODE_TYPES.SpreadElement
+            keyArg.type === AST_NODE_TYPES.SpreadElement ||
+            mayBeArray(objArg)
           ) {
             return;
           }
@@ -123,7 +142,10 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
           const objExpression = node.right;
 
           // Type guard: ensure keyExpression is Expression (not PrivateIdentifier)
-          if (keyExpression.type === AST_NODE_TYPES.PrivateIdentifier) {
+          if (
+            keyExpression.type === AST_NODE_TYPES.PrivateIdentifier ||
+            mayBeArray(objExpression)
+          ) {
             return;
           }
 
@@ -137,25 +159,40 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
         'Program:exit': () => {
           const namedImports = getNamedImports(tsStdForgeImports);
 
-          const rewrites = mut_nodesToFix.map((entry) => ({
-            ...entry,
+          const rewrites = mut_nodesToFix.map((entry) => {
             // A record-typed object makes the `isRecord(...)` conjunct always
             // true, so it is left out of the replacement entirely.
-            needsIsRecord: !isKnownRecord(entry.objExpression),
-          }));
+            const needsIsRecord = !isKnownRecord(entry.objExpression);
 
-          const importsToAdd: readonly string[] = [
-            ...(rewrites.some(({ needsIsRecord }) => needsIsRecord) &&
-            !namedImports.includes('isRecord')
-              ? ['isRecord']
-              : []),
-            ...(namedImports.includes('hasKey') ? [] : ['hasKey']),
-          ];
+            return {
+              ...entry,
+              needsIsRecord,
+              // `isRecord(obj) && hasKey(obj, key)` evaluates `obj` twice.
+              fixable: !needsIsRecord || isSideEffectFree(entry.objExpression),
+            };
+          });
 
-          for (const [
-            index,
-            { node, objExpression, keyExpression, needsIsRecord },
-          ] of rewrites.entries()) {
+          const fixableRewrites = rewrites.filter(({ fixable }) => fixable);
+
+          const importsToAdd: readonly string[] = SafeArray.isEmpty(
+            fixableRewrites,
+          )
+            ? []
+            : [
+                ...(fixableRewrites.some(
+                  ({ needsIsRecord }) => needsIsRecord,
+                ) && !namedImports.includes('isRecord')
+                  ? ['isRecord']
+                  : []),
+                ...(namedImports.includes('hasKey') ? [] : ['hasKey']),
+              ];
+
+          const importCarrier = fixableRewrites[0];
+
+          for (const rewrite of rewrites) {
+            const { node, objExpression, keyExpression, needsIsRecord } =
+              rewrite;
+
             const objText = getArgumentText(sourceCode, objExpression);
 
             const keyText = getArgumentText(sourceCode, keyExpression);
@@ -170,26 +207,32 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
                 objName: objText,
                 keyName: keyText,
               },
-              fix: (fixer) => {
-                const replacement = needsIsRecord
-                  ? `(isRecord(${objText}) && hasKey(${objText}, ${keyText}))`
-                  : `hasKey(${objText}, ${keyText})`;
+              fix: !rewrite.fixable
+                ? undefined
+                : (fixer) => {
+                    const replacement = needsIsRecord
+                      ? `(isRecord(${objText}) && hasKey(${objText}, ${keyText}))`
+                      : `hasKey(${objText}, ${keyText})`;
 
-                // All import fixes have to live on the first report:
-                // `insertTextBefore(program, …)` produces overlapping ranges
-                // otherwise and only one of them would survive a pass.
-                const importFixes =
-                  index === 0 && importsToAdd.length > 0
-                    ? buildNamedImportFix(
-                        fixer,
-                        program,
-                        TS_STD_FORGE_MODULE,
-                        importsToAdd,
-                      )
-                    : [];
+                    // All import fixes have to live on the first fixable
+                    // report: `insertTextBefore(program, …)` produces
+                    // overlapping ranges otherwise and only one of them would
+                    // survive a pass.
+                    const importFixes =
+                      rewrite === importCarrier && importsToAdd.length > 0
+                        ? buildNamedImportFix(
+                            fixer,
+                            program,
+                            TS_STD_FORGE_MODULE,
+                            importsToAdd,
+                          )
+                        : [];
 
-                return [...importFixes, fixer.replaceText(node, replacement)];
-              },
+                    return [
+                      ...importFixes,
+                      fixer.replaceText(node, replacement),
+                    ];
+                  },
             });
           }
         },
@@ -197,6 +240,56 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
     },
     defaultOptions: [],
   } as const;
+
+/**
+ * Whether reading `node` again has no side effects: a variable, `this`, or a
+ * non-computed property chain on one, type wrappers aside.
+ */
+const isSideEffectFree = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  wrapped: TSESTree.Node,
+): boolean => {
+  const node = skipTypeWrappers(wrapped);
+
+  return (
+    node.type === AST_NODE_TYPES.Identifier ||
+    node.type === AST_NODE_TYPES.ThisExpression ||
+    (node.type === AST_NODE_TYPES.MemberExpression &&
+      !node.computed &&
+      isSideEffectFree(node.object))
+  );
+};
+
+/**
+ * Whether a value of `type` may be an array or a tuple: some member of a union
+ * or an intersection is one, or the constraint of a deferred type is.
+ * `object` and `unknown` say nothing either way and are not counted.
+ */
+const mayBeArrayType = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+): boolean => {
+  if (type.isUnionOrIntersection()) {
+    return type.types.some((member) => mayBeArrayType(checker, member));
+  }
+
+  if (
+    (type.flags &
+      (ts.TypeFlags.TypeParameter |
+        ts.TypeFlags.IndexedAccess |
+        ts.TypeFlags.Conditional |
+        ts.TypeFlags.Substitution)) !==
+    0
+  ) {
+    const constraint = checker.getBaseConstraintOfType(type);
+
+    return constraint !== undefined && mayBeArrayType(checker, constraint);
+  }
+
+  return checker.isArrayType(type) || checker.isTupleType(type);
+};
 
 /**
  * Whether `type` already satisfies `hasKey`'s `R extends UnknownRecord`

@@ -84,21 +84,6 @@ describe('prefer-is-record-and-has-key through type wrappers', () => {
     valid: [],
     invalid: [
       {
-        // `isRecord` rejects an array, so dropping it on the cast's word
-        // would turn `false` into `true`.
-        name: 'keeps isRecord for an array cast to a record',
-        code: dedent`
-          declare const arr: string[];
-          const ok = Object.hasOwn(arr as unknown as Record<string, unknown>, '0');
-        `,
-        output: dedent`
-          import { isRecord, hasKey } from 'ts-std-forge';
-          declare const arr: string[];
-          const ok = (isRecord(arr as unknown as Record<string, unknown>) && hasKey(arr as unknown as Record<string, unknown>, '0'));
-        `,
-        errors: [{ messageId: 'useIsRecordAndHasKey' }],
-      },
-      {
         name: 'keeps isRecord for an unknown value cast to a record in `in`',
         code: dedent`
           declare const u: unknown;
@@ -139,19 +124,6 @@ describe('prefer-is-record-and-has-key through type wrappers', () => {
         errors: [{ messageId: 'useIsRecordAndHasKey' }],
       },
       {
-        name: 'keeps isRecord for a record widened by `as` to one that may be an array',
-        code: dedent`
-          declare const obj: Readonly<Record<string, unknown>>;
-          const ok = Object.hasOwn(obj as Readonly<Record<string, unknown>> | readonly string[], 'a');
-        `,
-        output: dedent`
-          import { isRecord, hasKey } from 'ts-std-forge';
-          declare const obj: Readonly<Record<string, unknown>>;
-          const ok = (isRecord(obj as Readonly<Record<string, unknown>> | readonly string[]) && hasKey(obj as Readonly<Record<string, unknown>> | readonly string[], 'a'));
-        `,
-        errors: [{ messageId: 'useIsRecordAndHasKey' }],
-      },
-      {
         name: 'drops isRecord for a record that is a record at every layer',
         code: dedent`
           declare const obj: Readonly<Record<string, unknown>>;
@@ -186,34 +158,39 @@ describe('prefer-is-record-and-has-key with parenthesized operands', () => {
     valid: [],
     invalid: [
       {
-        name: 'keeps the parentheses of a sequence object in `in`',
+        name: 'a sequence object in `in`, read twice by the fix, gets no fix',
         code: dedent`
           declare const a: number;
           declare const o: unknown;
           const ok = 'k' in (a, o);
         `,
-        output: dedent`
-          import { isRecord, hasKey } from 'ts-std-forge';
-          declare const a: number;
-          declare const o: unknown;
-          const ok = (isRecord((a, o)) && hasKey((a, o), 'k'));
-        `,
+        output: null,
         errors: [{ messageId: 'useIsRecordAndHasKey' }],
       },
       {
-        name: 'keeps the parentheses of a sequence object in Object.hasOwn',
+        name: 'a sequence object in Object.hasOwn, read twice by the fix, gets no fix',
         code: dedent`
           declare const a: number;
           declare const o: unknown;
           const ok = Object.hasOwn((a, o), 'k');
         `,
-        output: dedent`
-          import { isRecord, hasKey } from 'ts-std-forge';
-          declare const a: number;
-          declare const o: unknown;
-          const ok = (isRecord((a, o)) && hasKey((a, o), 'k'));
-        `,
+        output: null,
         errors: [{ messageId: 'useIsRecordAndHasKey' }],
+      },
+      {
+        name: 'keeps the parentheses of a sequence object read once',
+        code: dedent`
+          declare const a: number;
+          declare const o: Readonly<Record<string, unknown>>;
+          const ok = 'k' in (a, o);
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-std-forge';
+          declare const a: number;
+          declare const o: Readonly<Record<string, unknown>>;
+          const ok = hasKey((a, o), 'k');
+        `,
+        errors: [{ messageId: 'useHasKey' }],
       },
       {
         name: 'keeps the parentheses of a sequence key',
@@ -229,6 +206,89 @@ describe('prefer-is-record-and-has-key with parenthesized operands', () => {
           const ok = hasKey(o, (a, 'k'));
         `,
         errors: [{ messageId: 'useHasKey' }],
+      },
+    ],
+  });
+});
+
+describe('prefer-is-record-and-has-key where the rewrite would change behavior', () => {
+  tester.run('prefer-is-record-and-has-key', preferIsRecordAndHasKey, {
+    valid: [
+      {
+        // `isRecord` rejects an array, so `'0' in xs` would turn false.
+        name: 'an array',
+        code: dedent`
+          declare const xs: readonly number[];
+          const a = '0' in xs;
+          const b = Object.hasOwn(xs, 'length');
+        `,
+      },
+      {
+        name: 'a union with an array',
+        code: dedent`
+          declare const v: Readonly<Record<string, unknown>> | readonly number[];
+          const ok = 'k' in v;
+        `,
+      },
+      {
+        name: 'an array cast to a record',
+        code: dedent`
+          declare const arr: readonly string[];
+          const ok = Object.hasOwn(arr as unknown as Record<string, unknown>, '0');
+        `,
+      },
+      {
+        name: 'a record widened by `as` to one that may be an array: the author says it may be one',
+        code: dedent`
+          declare const obj: Readonly<Record<string, unknown>>;
+          const ok = Object.hasOwn(obj as Readonly<Record<string, unknown>> | readonly string[], 'a');
+        `,
+      },
+    ],
+    invalid: [
+      {
+        // `isRecord(…) && hasKey(…)` would evaluate the object twice.
+        name: 'an object with side effects is reported without a fix',
+        code: dedent`
+          declare const getObj: () => object;
+          declare const log: () => void;
+          declare const o: object;
+          const a = 'k' in getObj();
+          const b = Object.hasOwn(getObj(), 'k');
+          const c = 'k' in (log(), o);
+        `,
+        output: null,
+        errors: [
+          { messageId: 'useIsRecordAndHasKey' },
+          { messageId: 'useIsRecordAndHasKey' },
+          { messageId: 'useIsRecordAndHasKey' },
+        ],
+      },
+      {
+        name: 'an object with side effects is fixed when isRecord is dropped: it is read once',
+        code: dedent`
+          declare const getRec: () => Readonly<Record<string, unknown>>;
+          const ok = 'k' in getRec();
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-std-forge';
+          declare const getRec: () => Readonly<Record<string, unknown>>;
+          const ok = hasKey(getRec(), 'k');
+        `,
+        errors: [{ messageId: 'useHasKey' }],
+      },
+      {
+        name: 'a reference read through type wrappers is still read without side effects',
+        code: dedent`
+          declare const o: { readonly p: object };
+          const ok = 'k' in (o.p satisfies object);
+        `,
+        output: dedent`
+          import { isRecord, hasKey } from 'ts-std-forge';
+          declare const o: { readonly p: object };
+          const ok = (isRecord(o.p satisfies object) && hasKey(o.p satisfies object, 'k'));
+        `,
+        errors: [{ messageId: 'useIsRecordAndHasKey' }],
       },
     ],
   });
