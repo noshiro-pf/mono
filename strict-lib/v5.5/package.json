@@ -11,7 +11,7 @@
     "gen:lib-files": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen-lib-files.mts",
     "gen:packages": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen-packages.mts",
     "gen:with-codemod-fixed": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen-with-codemod-fixed.mts",
-    "check:types": "tsc -p tsconfig.lib-check.json && tsc -p tsconfig.lib-check.webworker.json && tsc -p tsconfig.lib-files-check.json && tsc -p tsconfig.lib-files-check.branded.json"
+    "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && tsc -p tsconfig.lib-check.json && tsc -p tsconfig.lib-check.webworker.json && tsc -p tsconfig.lib-files-check.json && tsc -p tsconfig.lib-files-check.branded.json"
   },
   "devDependencies": {
     "@typescript/lib-decorators": "file:output/lib/libs/decorators",

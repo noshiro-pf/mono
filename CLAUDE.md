@@ -151,12 +151,12 @@ terminates. `build` and `doc` write untracked output. Consequences:
   `check:prose:*` script is in CI with no other wiring. `check:prose` must
   stay buildless.
 
-Main entry points: `ws:build`, `ws:gen` (needs `ws:build`), `ws:check:types`,
-`ws:fix:lint`, `ws:check:test[:cov|:browser]`, `ws:check:e2e`,
-`ws:check:dist` (needs `ws:build`), `ws:check:ext`, `ws:check:sumi`,
-`ws:doc`, `check:cspell`, `check:md`, `check:prose`, `check:root`,
-`check:knip` (needs `ws:build`), `check:published-deps`, `gen:deps-graph`,
-`fmt` / `fix:fmt:diff` / `fix:fmt:full`, `fix:codemod[:diff|:full]`.
+Main entry points: `ws:build`, `ws:gen`, `ws:check:types`, `ws:fix:lint`,
+`ws:check:test[:cov|:browser]`, `ws:check:e2e`, `ws:check:dist`,
+`ws:check:ext`, `ws:check:sumi`, `ws:doc`, `check:cspell`, `check:md`,
+`check:prose`, `check:root`, `check:knip`, `check:published-deps`,
+`gen:deps-graph`, `fmt`, `fix:fmt[:diff|:full]`, `fix:codemod[:diff|:full]`.
+A missing `dist/` is named by the check that needs it; **a stale one is not**.
 
 **Run the checks the diff touches, not `check-all`.** `check-all` is a human
 aid: what it skips and where it is narrower than CI is listed at the end of
@@ -416,9 +416,9 @@ cannot decide:
   that `src/` imports only what consumers get; its blind spot is `@types/*`,
   so when a runtime dependency has no types put its `@types` package in
   `dependencies` by hand.
-- `check:knip` covers declared-but-unused (needs `ws:build`). A dependency
-  named as a string in a config (the Prettier plugins) is invisible to it; put
-  it in `ignoreDependencies` with the reason. `knip.jsonc` says where a new
+- `check:knip` covers declared-but-unused. A dependency named as a string in
+  a config (the Prettier plugins) is invisible to it; put it in
+  `ignoreDependencies` with the reason. `knip.jsonc` says where a new
   entry goes; `check:root:knip-config` reads the result.
 - `verify-npm-packages/` keeps its rules in its own `README.md` — which part
   is hand-written, and which of the two commands reads what. It needs
