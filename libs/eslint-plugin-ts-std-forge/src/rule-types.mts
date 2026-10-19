@@ -9,7 +9,7 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 import type { tsStdForgeRules } from './rules/index.mjs';
 
 /**
- * @description Replace `typeof u === "object" && u !== null` with `isNonNullObject(u)` from ts-std-forge.
+ * @description Replace `typeof u === "object" && u !== null`, in either order and anywhere in an `&&` chain, with `isNonNullObject(u)` from ts-std-forge.
  *
  *  ```md
  *  | key        | value      |

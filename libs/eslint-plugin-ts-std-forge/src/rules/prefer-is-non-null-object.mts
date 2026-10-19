@@ -7,6 +7,8 @@ import {
   buildNamedImportFix,
   getImportDeclarations,
   getNamedImports,
+  getRangeWithParens,
+  parenthesesDepth,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import { TS_STD_FORGE_MODULE } from './constants.mjs';
@@ -20,7 +22,7 @@ export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
     type: 'suggestion',
     docs: {
       description:
-        'Replace `typeof u === "object" && u !== null` with `isNonNullObject(u)` from ts-std-forge.',
+        'Replace `typeof u === "object" && u !== null`, in either order and anywhere in an `&&` chain, with `isNonNullObject(u)` from ts-std-forge.',
     },
     fixable: 'code',
     schema: [],
@@ -40,20 +42,16 @@ export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
       TS_STD_FORGE_MODULE,
     );
 
-    const mut_nodesToFix: {
-      node: TSESTree.LogicalExpression;
-      identifierName: string;
-    }[] = [];
+    const mut_pairsToFix: NonNullObjectPair[] = [];
 
     return {
       LogicalExpression: (node) => {
-        const identifierName = getNonNullObjectIdentifierName(node);
-
-        if (identifierName === undefined) {
+        // A chain is read once, from its outermost `&&`.
+        if (node.operator !== '&&' || isChainOperand(sourceCode, node)) {
           return;
         }
 
-        mut_nodesToFix.push({ node, identifierName });
+        mut_pairsToFix.push(...findNonNullObjectPairs(sourceCode, node));
       },
       'Program:exit': () => {
         const hasIsNonNullObjectImport =
@@ -66,10 +64,13 @@ export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
         // with it.
         for (const [
           index,
-          { node, identifierName },
-        ] of mut_nodesToFix.entries()) {
+          { range, identifierName },
+        ] of mut_pairsToFix.entries()) {
           context.report({
-            node,
+            loc: {
+              start: sourceCode.getLocFromIndex(range[0]),
+              end: sourceCode.getLocFromIndex(range[1]),
+            },
             messageId: 'useIsNonNullObject',
             fix: (fixer) => {
               const replacement = `isNonNullObject(${identifierName})`;
@@ -81,7 +82,10 @@ export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
                     ])
                   : [];
 
-              return [...importFixes, fixer.replaceText(node, replacement)];
+              return [
+                ...importFixes,
+                fixer.replaceTextRange(range, replacement),
+              ];
             },
           });
         }
@@ -91,41 +95,124 @@ export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
   defaultOptions: [],
 } as const;
 
+/**
+ * A `typeof u === 'object'` and a `u !== null` next to each other in an `&&`
+ * chain, as the source range from the first to the second (parentheses
+ * included) and the name of `u`.
+ */
+type NonNullObjectPair = Readonly<{
+  range: TSESTree.Range;
+  identifierName: string;
+}>;
+
+/**
+ * Whether `node` is an operand of an enclosing `&&` chain: a `&&` written
+ * directly under another one, without parentheses.
+ */
+const isChainOperand = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.LogicalExpression,
+): boolean =>
+  node.parent.type === AST_NODE_TYPES.LogicalExpression &&
+  node.parent.operator === '&&' &&
+  parenthesesDepth(sourceCode, node) === 0;
+
+/**
+ * Every non-overlapping pair in the `&&` chain `node` heads, left to right. The
+ * two halves may come in either order, and the pair may have operands before
+ * and after it: `a && u !== null && typeof u === 'object' && b`. They have to
+ * be next to each other, so that the pair is one range of the source.
+ */
+const findNonNullObjectPairs = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.LogicalExpression,
+): readonly NonNullObjectPair[] => {
+  const operands = chainOperands(sourceCode, node);
+
+  const pairsFrom = (index: number): readonly NonNullObjectPair[] => {
+    const first = operands[index];
+
+    const second = operands[index + 1];
+
+    if (first === undefined || second === undefined) {
+      return [];
+    }
+
+    const identifierName =
+      pairIdentifierName(first, second) ?? pairIdentifierName(second, first);
+
+    return identifierName === undefined
+      ? pairsFrom(index + 1)
+      : [
+          {
+            range: [
+              getRangeWithParens(sourceCode, first)[0],
+              getRangeWithParens(sourceCode, second)[1],
+            ],
+            identifierName,
+          },
+          ...pairsFrom(index + 2),
+        ];
+  };
+
+  return pairsFrom(0);
+};
+
+/**
+ * The operands of the `&&` chain `node`, left to right. A parenthesized `&&`
+ * is one operand: its halves cannot be replaced without its parentheses.
+ */
+const chainOperands = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.LogicalExpression,
+): readonly TSESTree.Expression[] =>
+  [node.left, node.right].flatMap((operand) =>
+    operand.type === AST_NODE_TYPES.LogicalExpression &&
+    operand.operator === '&&' &&
+    parenthesesDepth(sourceCode, operand) === 0
+      ? chainOperands(sourceCode, operand)
+      : [operand],
+  );
+
 // Every operand below is read through its type wrappers: `typeof (u satisfies
 // unknown) === 'object' && u! !== null` is the same check.
 
-const getNonNullObjectIdentifierName = (
+/**
+ * The name of `u` when `typeofCheck` is `typeof u === 'object'` and
+ * `nullCheck` is `u !== null` for the same `u`.
+ */
+const pairIdentifierName = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.LogicalExpression,
+  typeofCheck: TSESTree.Expression,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  nullCheck: TSESTree.Expression,
 ): string | undefined => {
-  if (node.operator !== '&&') {
-    return undefined;
-  }
-
-  const leftIdentifierName = getTypeofObjectIdentifierName(
-    skipTypeWrappers(node.left),
+  const identifierName = getTypeofObjectIdentifierName(
+    skipTypeWrappers(typeofCheck),
   );
 
-  const rightIdentifierName = getNonNullCheckIdentifierName(
-    skipTypeWrappers(node.right),
-  );
-
-  return leftIdentifierName === undefined ||
-    rightIdentifierName === undefined ||
-    leftIdentifierName !== rightIdentifierName
-    ? undefined
-    : leftIdentifierName;
+  return identifierName !== undefined &&
+    identifierName ===
+      getNonNullCheckIdentifierName(skipTypeWrappers(nullCheck))
+    ? identifierName
+    : undefined;
 };
 
+/** `u` of `typeof u === 'object'`, in either operand order. */
 const getTypeofObjectIdentifierName = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: TSESTree.Node,
 ): string | undefined => {
-  if (node.type !== AST_NODE_TYPES.BinaryExpression) {
-    return undefined;
-  }
-
-  if (node.operator !== '===') {
+  if (
+    node.type !== AST_NODE_TYPES.BinaryExpression ||
+    node.operator !== '==='
+  ) {
     return undefined;
   }
 
@@ -133,31 +220,39 @@ const getTypeofObjectIdentifierName = (
 
   const right = skipTypeWrappers(node.right);
 
+  const typeofSide = isLiteralOf(right, 'object')
+    ? left
+    : isLiteralOf(left, 'object')
+      ? right
+      : undefined;
+
   if (
-    left.type !== AST_NODE_TYPES.UnaryExpression ||
-    left.operator !== 'typeof' ||
-    right.type !== AST_NODE_TYPES.Literal ||
-    right.value !== 'object'
+    typeofSide?.type !== AST_NODE_TYPES.UnaryExpression ||
+    typeofSide.operator !== 'typeof'
   ) {
     return undefined;
   }
 
-  const argument = skipTypeWrappers(left.argument);
+  const argument = skipTypeWrappers(typeofSide.argument);
 
   return argument.type === AST_NODE_TYPES.Identifier
     ? argument.name
     : undefined;
 };
 
+/**
+ * `u` of `u !== null`, in either operand order. `u != null` also excludes
+ * `undefined`, which `typeof u === 'object'` has already excluded, so it is
+ * the same check here.
+ */
 const getNonNullCheckIdentifierName = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: TSESTree.Node,
 ): string | undefined => {
-  if (node.type !== AST_NODE_TYPES.BinaryExpression) {
-    return undefined;
-  }
-
-  if (node.operator !== '!==') {
+  if (
+    node.type !== AST_NODE_TYPES.BinaryExpression ||
+    (node.operator !== '!==' && node.operator !== '!=')
+  ) {
     return undefined;
   }
 
@@ -165,9 +260,17 @@ const getNonNullCheckIdentifierName = (
 
   const right = skipTypeWrappers(node.right);
 
-  return left.type !== AST_NODE_TYPES.Identifier ||
-    right.type !== AST_NODE_TYPES.Literal ||
-    right.value !== null
-    ? undefined
-    : left.name;
+  const checked = isLiteralOf(right, null)
+    ? left
+    : isLiteralOf(left, null)
+      ? right
+      : undefined;
+
+  return checked?.type === AST_NODE_TYPES.Identifier ? checked.name : undefined;
 };
+
+const isLiteralOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+  value: string | null,
+): boolean => node.type === AST_NODE_TYPES.Literal && node.value === value;
