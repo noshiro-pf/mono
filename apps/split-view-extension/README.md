@@ -71,6 +71,7 @@ a tab of its own.
 | resize                               | drag a divider                                                                   |
 | move a pane                          | drag the grip at the left of its toolbar (`Escape` cancels)                      |
 | zoom one pane                        | `−` / `+` in its toolbar, or `Ctrl` + wheel over it                              |
+| reload one pane                      | its reload button, or `Ctrl+R` / `F5` with the focus in it                       |
 | add a split view (in a new tab)      | `＋` at the top left                                                             |
 | open one from a link                 | `split.html?layout=r70pp&url=…&url=…` — see [Open from a URL](#open-from-a-url)  |
 | open a GitHub pull request in one    | **⧉ Split view** on its page — see [GitHub pull requests](#github-pull-requests) |

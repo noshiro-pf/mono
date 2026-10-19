@@ -1,5 +1,6 @@
 import {
   createPane,
+  isReloadShortcut,
   paneNode,
   splitNode,
   tabLabelOf,
@@ -18,7 +19,30 @@ const keyEvent = (
     ctrlKey: modifiers?.ctrl ?? false,
     metaKey: modifiers?.meta ?? false,
     shiftKey: modifiers?.shift ?? false,
+    key: code,
     code,
+    defaultPrevented: false,
+    preventDefault: () => undefined,
+  }) as const;
+
+const reloadKey = (
+  key: string,
+  code: string,
+  modifiers?: Readonly<{
+    alt?: boolean;
+    ctrl?: boolean;
+    meta?: boolean;
+    shift?: boolean;
+  }>,
+): Parameters<typeof isReloadShortcut>[0] =>
+  ({
+    altKey: modifiers?.alt ?? false,
+    ctrlKey: modifiers?.ctrl ?? false,
+    metaKey: modifiers?.meta ?? false,
+    shiftKey: modifiers?.shift ?? false,
+    key,
+    code,
+    defaultPrevented: false,
     preventDefault: () => undefined,
   }) as const;
 
@@ -65,6 +89,58 @@ describe('workspaceShortcutCodeOf', () => {
 
     // What `Alt+1` types on macOS, which is why the test is on `code`.
     assert.deepStrictEqual(workspaceShortcutCodeOf(keyEvent('¡')), undefined);
+  });
+});
+
+describe('isReloadShortcut', () => {
+  test('takes Ctrl+R, and Cmd+R on macOS', () => {
+    assert.isTrue(isReloadShortcut(reloadKey('r', 'KeyR', { ctrl: true })));
+
+    assert.isTrue(isReloadShortcut(reloadKey('r', 'KeyR', { meta: true })));
+  });
+
+  test('takes the hard reload too', () => {
+    assert.isTrue(
+      isReloadShortcut(reloadKey('R', 'KeyR', { ctrl: true, shift: true })),
+    );
+
+    assert.isTrue(isReloadShortcut(reloadKey('F5', 'F5', { ctrl: true })));
+  });
+
+  test('takes F5, with Shift or without', () => {
+    assert.isTrue(isReloadShortcut(reloadKey('F5', 'F5')));
+
+    assert.isTrue(isReloadShortcut(reloadKey('F5', 'F5', { shift: true })));
+  });
+
+  test('takes no R without Ctrl or Cmd, and none with Alt', () => {
+    assert.isFalse(isReloadShortcut(reloadKey('r', 'KeyR')));
+
+    assert.isFalse(isReloadShortcut(reloadKey('r', 'KeyR', { alt: true })));
+
+    assert.isFalse(
+      isReloadShortcut(reloadKey('r', 'KeyR', { ctrl: true, alt: true })),
+    );
+
+    assert.isFalse(isReloadShortcut(reloadKey('F5', 'F5', { alt: true })));
+  });
+
+  test('takes no other key', () => {
+    assert.isFalse(isReloadShortcut(reloadKey('t', 'KeyT', { ctrl: true })));
+
+    assert.isFalse(isReloadShortcut(reloadKey('F6', 'F6')));
+  });
+
+  // Chrome reads the letter a Latin layout types, and falls back to the
+  // physical key only for a layout that types no Latin letter.
+  test('follows the letter the layout types', () => {
+    // Dvorak: R is where QWERTY has O, and QWERTY's R types P.
+    assert.isTrue(isReloadShortcut(reloadKey('r', 'KeyO', { ctrl: true })));
+
+    assert.isFalse(isReloadShortcut(reloadKey('p', 'KeyR', { ctrl: true })));
+
+    // Russian: the R key types к.
+    assert.isTrue(isReloadShortcut(reloadKey('к', 'KeyR', { ctrl: true })));
   });
 });
 

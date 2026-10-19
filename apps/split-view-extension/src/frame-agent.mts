@@ -1,6 +1,7 @@
 import { Arr } from 'ts-data-forge';
 import {
   asPageToFrameMessage,
+  isReloadShortcut,
   paneFrameNamePrefix,
   splitViewMessageTag,
   workspaceShortcutCodeOf,
@@ -145,14 +146,32 @@ const main = (): void => {
   });
 
   /**
-   * Forwards the split view's own shortcuts to the page.
+   * Forwards the split view's own shortcuts to the page, and makes the
+   * browser's reload reload this pane rather than the tab.
    *
    * `Alt+1..9` switches split views, and the focus is inside a pane most of the
    * time — where the page's own `keydown` listener never sees the key, because
    * a key event does not cross a frame boundary. A frame that has not been
    * assigned a pane stays silent, as it does for everything else.
+   *
+   * The reload is the same one the pane's toolbar button asks of this frame.
+   * A site that binds `Ctrl+R` itself and has already taken the key keeps it:
+   * this listener is on the window, in the bubble phase, so it hears of the key
+   * after the site's own.
    */
   addEventListener('keydown', (keyboardEvent: ShortcutKeyEvent) => {
+    if (
+      mut_paneId !== undefined &&
+      !keyboardEvent.defaultPrevented &&
+      isReloadShortcut(keyboardEvent)
+    ) {
+      keyboardEvent.preventDefault();
+
+      runCommand('reload');
+
+      return;
+    }
+
     const code = workspaceShortcutCodeOf(keyboardEvent);
 
     if (

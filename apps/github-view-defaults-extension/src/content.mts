@@ -1,21 +1,18 @@
 import { numberedTitleOf } from './page-title.mjs';
 import {
   isSettledLink,
-  keptUrlOfHistoryWrite,
   managedPagePathOf,
   preferredUrlOfLink,
   preferredUrlOfPage,
-  restoredUrlOfPage,
 } from './page-url.mjs';
 
 /**
  * The content script, injected into github.com at `document_start`, in every
  * frame — a split-view pane showing a diff is a page like any other — and in
- * the page's own world rather than an isolated one, because the third thing
- * below is done to the page's own `history`. It uses no extension API, so the
- * isolated world would buy it nothing.
+ * the page's own world. It uses no extension API, so an isolated world would
+ * buy it nothing.
  *
- * It does three things about addresses, and the second is what makes the first
+ * It does two things about addresses, and the second is what makes the first
  * almost never happen:
  *
  * - **It redirects the page it lands on**, when that page is one the rules
@@ -26,9 +23,6 @@ import {
  *   want. A "Files changed" tab clicked from the conversation view then
  *   navigates straight to the settled URL, and the redirect above has nothing
  *   to do.
- * - **It keeps the defaults on the address** when the site rewrites the
- *   address of a page already showing them, without loading it again. See
- *   `keepParamsOnHistoryWrites`, and `restoreAddress` behind it.
  *
  * `document_start` is what makes the redirect cheap: the script runs before the
  * document is parsed, so the load it abandons is a response that had barely
@@ -44,13 +38,6 @@ import {
 // it something that is none of the three; the same dance as `browserHistory`
 // in `split-view-extension`'s frame agent.
 const { location: browserLocation } = globalThis;
-
-// The same for `history`, which is what writes an address without loading it.
-const { history: browserHistory } = globalThis;
-
-// And once more as mutable, for the one place its methods are replaced — the
-// same trick as `mut_page` below.
-const { history: mut_history } = globalThis;
 
 // `document.title = …` is a mutation the lint rules reject unless the object it
 // is reached through is named as mutable — the same trick as `mut_page` in
@@ -80,19 +67,11 @@ const evaluated = new WeakSet<Element>();
  * again — forever.
  *
  * So a page is loaded with the defaults once. If they come off afterwards,
- * they are written back onto the address in place — see `restoreAddress` —
- * and never by loading the page again.
+ * the address is left as the site wrote it, and the page is not loaded again;
+ * the next document loaded from that address — a reload, a bookmark — is
+ * redirected like any other.
  */
 const mut_settledPages = new Set<string>();
-
-/**
- * The addresses the site wrote that `restoreAddress` has already written over.
- *
- * A site that writes the same address a second time after it was restored is
- * insisting on it, and answering again would be a tug of war over the address
- * bar for the life of the page. Each address the site writes is answered once.
- */
-const mut_restoredAddresses = new Set<string>();
 
 /**
  * The title this script last wrote, the title it was written over, and the
@@ -113,8 +92,6 @@ const mut_ownTitle: {
 } = { last: undefined };
 
 const main = (): void => {
-  keepParamsOnHistoryWrites();
-
   listenForClicks();
 
   applyPreferredUrlToThisPage();
@@ -146,16 +123,14 @@ const applyPreferredUrlToThisPage = (): void => {
     // It arrived the way the rules want it — because a rewritten link brought
     // us here, because the redirect below has just happened and this is the new
     // document, or because the rule decided to leave it be. Either way this
-    // page is not loaded again; if GitHub takes the defaults off its address
-    // from here, `restoreAddress` writes them back in place.
+    // page is not loaded again, even if GitHub takes the defaults off its
+    // address from here.
     mut_settledPages.add(page);
 
     return;
   }
 
   if (mut_settledPages.has(page)) {
-    restoreAddress();
-
     return;
   }
 
@@ -165,88 +140,6 @@ const applyPreferredUrlToThisPage = (): void => {
   // the user looked at, so it does not belong in the history. Going back from
   // here should leave the pull request, not bounce through a redirect.
   browserLocation.replace(next);
-};
-
-/**
- * Makes every `pushState` and `replaceState` the site calls keep the parameters
- * the address it replaces carried — see `keptUrlOfHistoryWrite`.
- *
- * **This is what keeps the defaults on a reloaded diff.** GitHub rewrites the
- * address of a diff without its query, and not once: after a reload of
- * `/changes?show-viewed-files=false&w=1` it can write the bare path more than
- * once. `restoreAddress` answers a write only after it has happened, and only
- * once for each address, so the second write of the same bare path stood. A
- * write amended as it is made leaves nothing to answer: the address never
- * stops saying what the page shows, and there is no second write to fight
- * over.
- *
- * Installed on the `history` object itself, before any of GitHub's scripts has
- * run — `document_start` in the page's world — so that every write the site
- * makes through it goes through this. The arguments are otherwise passed on as
- * they came; the state object in particular is GitHub's router's, which keeps
- * its place in the history there.
- */
-const keepParamsOnHistoryWrites = (): void => {
-  for (const method of ['pushState', 'replaceState'] as const) {
-    const write = browserHistory[method].bind(browserHistory);
-
-    Object.defineProperty(mut_history, method, {
-      configurable: true,
-      writable: true,
-      value: (
-        data: unknown,
-        unused: string,
-        url?: Readonly<URL> | string | null,
-      ) => {
-        const kept =
-          url === undefined || url === null
-            ? undefined
-            : keptUrlOfHistoryWrite(
-                String(url),
-                browserLocation.href,
-                browserLocation.origin,
-              );
-
-        write(data, unused, kept ?? url);
-      },
-    });
-  }
-};
-
-/**
- * Writes the defaults back onto the address of a page already acted on, when
- * the site has taken them off, without loading anything.
- *
- * The fallback behind `keepParamsOnHistoryWrites`, for an address that lost
- * them some other way.
- *
- * GitHub takes them off a diff it has already applied them to — to normalize
- * its address, and to point at the first file not yet marked viewed, as
- * `/changes#diff-…` with no query. The page goes on showing the diff the way
- * the defaults asked, but the address no longer says so, and a reload, a
- * bookmark or a split-view pane saving where it is then reopens it without
- * them.
- *
- * `replaceState` fires no event and GitHub's router does not look, so the page
- * is left as it is; the state object is carried over because that router keeps
- * its place in the history there.
- */
-const restoreAddress = (): void => {
-  const current = browserLocation.href;
-
-  if (mut_restoredAddresses.has(current)) {
-    return;
-  }
-
-  const next = restoredUrlOfPage(current, browserLocation.origin);
-
-  if (next === undefined) {
-    return;
-  }
-
-  mut_restoredAddresses.add(current);
-
-  browserHistory.replaceState(browserHistory.state, '', next);
 };
 
 /**
@@ -325,18 +218,20 @@ const patchAnchor = (element: Element): void => {
  *
  * Without this the rewrite is undone at the moment it matters: GitHub handles
  * the click itself, and navigates to the route it holds for that link rather
- * than to the address in the attribute. Its "Refresh" button on a diff that
- * has been pushed to is the plainest case — a link whose route is the page's
- * bare path, which the router reloads in place with the defaults gone. Stopping
- * the event leaves the anchor's default behavior, which is a plain navigation
- * to the `href` as written.
+ * than to the address in the attribute. Stopping the event leaves the anchor's
+ * default behavior, which is a plain navigation to the `href` as written.
+ *
+ * A link to the page it is on is left to GitHub — see `isSettledLink`. That is
+ * its "Refresh" button on a diff that has been pushed to, which GitHub
+ * refreshes in place, leaving the bare path on the address; a reload of the
+ * page then brings the defaults back through the redirect.
  *
  * **One listener, on the window, in the capture phase, registered at
  * `document_start`**, which makes it the first to hear of every click on the
  * page, before any of GitHub's scripts has run. A listener on each anchor in
  * the bubble phase was what this was at first, and it hears of a click only
- * after everything that listens on the way down: the "Refresh" button reloaded
- * in place under it. Stopped here, the click reaches nothing on the page, not
+ * after everything that listens on the way down, GitHub's router among them.
+ * Stopped here, the click reaches nothing on the page, not
  * even the icon inside a tab it landed on; the anchor still follows its `href`,
  * because that is the browser's default action and nothing is left that could
  * prevent it.
@@ -401,7 +296,7 @@ const watchForChanges = (): void => {
     //
     // Most of what this catches is not a navigation at all but GitHub tidying
     // its own address bar, which is why `mut_settledPages` guards the answer:
-    // a page already loaded is only given its address back, not reloaded.
+    // a page already loaded is not loaded again.
     if (currentHref !== mut_lastHref) {
       mut_lastHref = currentHref;
 
