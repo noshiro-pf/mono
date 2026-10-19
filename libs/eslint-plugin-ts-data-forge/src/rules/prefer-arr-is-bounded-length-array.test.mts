@@ -188,6 +188,25 @@ describe('prefer-arr-is-bounded-length-array through type wrappers', () => {
             { messageId: 'useIsBoundedLengthArray' },
           ],
         },
+        {
+          name: 'either comparison wrapped as a whole',
+          code: dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly number[];
+            const a = (xs.length >= 1 satisfies boolean) && xs.length <= 3;
+            const b = xs.length >= 1 && (xs.length <= 3 as boolean);
+          `,
+          output: dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly number[];
+            const a = Arr.isBoundedLengthArray(1, 3, xs);
+            const b = Arr.isBoundedLengthArray(1, 3, xs);
+          `,
+          errors: [
+            { messageId: 'useIsBoundedLengthArray' },
+            { messageId: 'useIsBoundedLengthArray' },
+          ],
+        },
       ],
     },
   );

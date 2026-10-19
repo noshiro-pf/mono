@@ -84,23 +84,32 @@ const asNegatedPositiveIntegerLiteral = (
 
 /**
  * Whether re-reading the expression is free of side effects (a plain variable
- * or a non-computed property chain). Required for patterns that reference the
- * receiver twice, such as `xs.filter((_, i) => i < xs.length - 1)`.
+ * or a non-computed property chain, type wrappers aside). Required for
+ * patterns that reference the receiver twice, such as
+ * `xs.filter((_, i) => i < xs.length - 1)`.
  */
-const isSimpleReference = (node: TSESTree.Node): boolean =>
-  node.type === AST_NODE_TYPES.Identifier ||
-  node.type === AST_NODE_TYPES.ThisExpression ||
-  (node.type === AST_NODE_TYPES.MemberExpression &&
-    !node.computed &&
-    node.property.type === AST_NODE_TYPES.Identifier &&
-    isSimpleReference(node.object));
+const isSimpleReference = (wrapped: TSESTree.Node): boolean => {
+  const node = skipTypeWrappers(wrapped);
 
-const rootIdentifierName = (node: TSESTree.Node): string | undefined =>
-  node.type === AST_NODE_TYPES.Identifier
+  return (
+    node.type === AST_NODE_TYPES.Identifier ||
+    node.type === AST_NODE_TYPES.ThisExpression ||
+    (node.type === AST_NODE_TYPES.MemberExpression &&
+      !node.computed &&
+      node.property.type === AST_NODE_TYPES.Identifier &&
+      isSimpleReference(node.object))
+  );
+};
+
+const rootIdentifierName = (wrapped: TSESTree.Node): string | undefined => {
+  const node = skipTypeWrappers(wrapped);
+
+  return node.type === AST_NODE_TYPES.Identifier
     ? node.name
     : node.type === AST_NODE_TYPES.MemberExpression
       ? rootIdentifierName(node.object)
       : undefined;
+};
 
 type ComparisonOperator = '!==' | '<' | '<=' | '>' | '>=';
 
@@ -338,26 +347,41 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
       });
     };
 
-    /** Matches `<xsText>.length` (non-computed). */
+    /**
+     * Matches `<receiver>.length` (non-computed), type wrappers aside on the
+     * access, on its object and on the receiver:
+     * `(xs as readonly T[]).length` reads the length of `xs`.
+     */
     const isReceiverLengthAccess = (
-      node: TSESTree.Node,
-      receiverText: string,
-    ): boolean =>
-      node.type === AST_NODE_TYPES.MemberExpression &&
-      !node.computed &&
-      node.property.type === AST_NODE_TYPES.Identifier &&
-      node.property.name === 'length' &&
-      sourceCode.getText(node.object) === receiverText;
+      wrapped: TSESTree.Node,
+      receiver: TSESTree.Expression,
+    ): boolean => {
+      const node = skipTypeWrappers(wrapped);
 
-    /** Matches `<xsText>.length - M` (M ≥ 1) and returns `M`. */
+      return (
+        node.type === AST_NODE_TYPES.MemberExpression &&
+        !node.computed &&
+        node.property.type === AST_NODE_TYPES.Identifier &&
+        node.property.name === 'length' &&
+        sourceCode.getText(skipTypeWrappers(node.object)) ===
+          sourceCode.getText(skipTypeWrappers(receiver))
+      );
+    };
+
+    /**
+     * Matches `<receiver>.length - M` (M ≥ 1), under any type wrapper, and
+     * returns `M`.
+     */
     const matchLengthMinus = (
-      node: TSESTree.Node,
-      receiverText: string,
+      wrapped: TSESTree.Node,
+      receiver: TSESTree.Expression,
     ): number | undefined => {
+      const node = skipTypeWrappers(wrapped);
+
       if (
         node.type !== AST_NODE_TYPES.BinaryExpression ||
         node.operator !== '-' ||
-        !isReceiverLengthAccess(node.left, receiverText)
+        !isReceiverLengthAccess(node.left, receiver)
       ) {
         return undefined;
       }
@@ -375,7 +399,6 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
     const classifyFilterCallback = (
       callback: TSESTree.CallExpressionArgument,
       receiver: TSESTree.Expression,
-      receiverText: string,
     ): CopyOp | undefined => {
       if (
         callback.type !== AST_NODE_TYPES.ArrowFunctionExpression ||
@@ -409,7 +432,8 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
         return undefined;
       }
 
-      const body = callback.body;
+      // `(i >= 1) satisfies boolean` is still the comparison.
+      const body = skipTypeWrappers(callback.body);
 
       if (
         body.type !== AST_NODE_TYPES.BinaryExpression ||
@@ -456,7 +480,7 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
         return undefined;
       }
 
-      const m = matchLengthMinus(other, receiverText);
+      const m = matchLengthMinus(other, receiver);
 
       return m === undefined ? undefined : classifyLengthComparison(op, m);
     };
@@ -512,7 +536,7 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
           return undefined;
         }
 
-        const m = matchLengthMinus(end, sourceCode.getText(receiver));
+        const m = matchLengthMinus(end, receiver);
 
         return m === undefined ? undefined : normalizeCountedOp('skipLast', m);
       }
@@ -523,7 +547,6 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
     const classifyToSplicedArgs = (
       args: readonly TSESTree.CallExpressionArgument[],
       receiver: TSESTree.Expression,
-      receiverText: string,
     ): CopyOp | undefined => {
       if (args.length === 1) {
         const [start] = args;
@@ -572,7 +595,7 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
           return undefined;
         }
 
-        const m = matchLengthMinus(deleteCount, receiverText);
+        const m = matchLengthMinus(deleteCount, receiver);
 
         return m === undefined ? undefined : normalizeCountedOp('takeLast', m);
       }
@@ -598,7 +621,7 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
         // `xs.toSpliced(xs.length, 0, item)` appends → toPushed.
         if (
           isSimpleReference(receiver) &&
-          isReceiverLengthAccess(start, receiverText)
+          isReceiverLengthAccess(start, receiver)
         ) {
           return { fn: 'toPushed', itemText: toArgText(item) };
         }
@@ -702,8 +725,6 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
           return;
         }
 
-        const receiverText = sourceCode.getText(receiver);
-
         switch (methodName) {
           case 'slice': {
             const op = classifySliceArgs(node.arguments, receiver);
@@ -716,11 +737,7 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
           }
 
           case 'toSpliced': {
-            const op = classifyToSplicedArgs(
-              node.arguments,
-              receiver,
-              receiverText,
-            );
+            const op = classifyToSplicedArgs(node.arguments, receiver);
 
             if (op !== undefined) {
               report(node, op, toArgText(receiver));
@@ -736,7 +753,7 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
               return;
             }
 
-            const op = classifyFilterCallback(callback, receiver, receiverText);
+            const op = classifyFilterCallback(callback, receiver);
 
             if (op !== undefined) {
               report(node, op, toArgText(receiver));

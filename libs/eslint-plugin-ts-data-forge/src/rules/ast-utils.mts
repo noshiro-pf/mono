@@ -144,7 +144,8 @@ type LengthComparison = Readonly<{
  * Parses a `<array>.length <op> <bound>` comparison (in either operand order)
  * into its array expression, integer-literal/`const` `bound`, and whether it is
  * a lower (`min`) or upper (`max`) length bound. Returns `undefined` for
- * anything else. The length and the bound are read through type wrappers; the
+ * anything else. The comparison, the length and the bound are read through
+ * type wrappers; the
  * `bound` returned is the literal or constant underneath, since a wrapper such
  * as `as number` would only widen the length a guard narrows to.
  *
@@ -153,10 +154,12 @@ type LengthComparison = Readonly<{
  */
 export const parseLengthComparison = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Expression,
+  wrapped: TSESTree.Expression,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   sourceCode: TSESLint.SourceCode,
 ): LengthComparison | undefined => {
+  const node = skipTypeWrappers(wrapped);
+
   if (
     node.type !== AST_NODE_TYPES.BinaryExpression ||
     (node.operator !== '>=' && node.operator !== '<=')
@@ -201,6 +204,8 @@ export const parseLengthComparison = (
  * together form the `Arr.isBoundedLengthArray` pattern handled by
  * `prefer-arr-is-bounded-length-array`. The single-bound rules skip such
  * operands so the bounded rule rewrites the whole `&&` instead of the parts.
+ * A comparison wrapped as a whole (`(xs.length >= 1 satisfies boolean) && …`)
+ * is still the operand.
  */
 export const isPartOfBoundedLengthCheck = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -208,10 +213,12 @@ export const isPartOfBoundedLengthCheck = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   sourceCode: TSESLint.SourceCode,
 ): boolean => {
-  const { parent } = node;
+  const operand = outermostTypeWrapper(node);
+
+  const { parent } = operand;
 
   if (
-    parent.type !== AST_NODE_TYPES.LogicalExpression ||
+    parent?.type !== AST_NODE_TYPES.LogicalExpression ||
     parent.operator !== '&&'
   ) {
     return false;
@@ -223,7 +230,7 @@ export const isPartOfBoundedLengthCheck = (
     return false;
   }
 
-  const sibling = parent.left === node ? parent.right : parent.left;
+  const sibling = parent.left === operand ? parent.right : parent.left;
 
   const other = parseLengthComparison(sibling, sourceCode);
 
@@ -236,6 +243,15 @@ export const isPartOfBoundedLengthCheck = (
     isSameArrayText(self.array, other.array, sourceCode)
   );
 };
+
+/** The outermost of the type wrappers around `node`, or `node` itself. */
+const outermostTypeWrapper = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+): TSESTree.Node =>
+  node.parent !== undefined && isTypeWrapper(node.parent)
+    ? outermostTypeWrapper(node.parent)
+    : node;
 
 type VariableDefinition = Readonly<{
   type: string;
