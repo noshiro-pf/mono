@@ -1,5 +1,12 @@
-import { expectType, type Optional, type Some } from 'ts-data-forge';
+import {
+  expectType,
+  hasKey,
+  isRecord,
+  type Optional,
+  type Some,
+} from 'ts-data-forge';
 import type { FixedLengthTuple, StrictOmit } from 'ts-type-forge';
+import { observableBrand } from '../utils/index.mjs';
 import type { ObservableId, UpdateToken } from './id.mjs';
 import type { ObservableKind } from './observable-kind.mjs';
 import type { NonEmptyUnknownList, Subscription } from './types.mjs';
@@ -17,15 +24,6 @@ import type { NonEmptyUnknownList, Subscription } from './types.mjs';
  *   +- RootObservableType     /                       /
  * ```
  */
-
-/**
- * Makes the public observable types impossible to satisfy with an object
- * literal. Every observable is built by a synstate factory, which gives it the
- * internal members propagation reads; an imitation passed to an operator would
- * lack them and fail at run time instead of at compile time. It exists only in
- * the types.
- */
-declare const observableBrand: unique symbol;
 
 type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
   [observableBrand]: true;
@@ -173,6 +171,27 @@ export type Operator<A, B> =
   | WithInitialValueOperator<A, B>
   | DropInitialValueOperator<A, B>
   | KeepInitialValueOperator<A, B>;
+
+/**
+ * Tells an observable made by synstate from any other value, by the brand
+ * every observable carries. Checking for a `subscribe` method instead would
+ * also accept plain values that happen to have one.
+ *
+ * @example
+ *
+ * ```ts
+ * const [count$] = createState(0);
+ *
+ * assert.isTrue(isObservable(count$));
+ *
+ * // A `subscribe` method alone does not make an observable.
+ * assert.isFalse(isObservable({ subscribe: () => {} }));
+ *
+ * assert.isFalse(isObservable(0));
+ * ```
+ */
+export const isObservable = (value: unknown): value is Observable<unknown> =>
+  isRecord(value) && hasKey(value, observableBrand);
 
 export const isManagerObservable = <A,>(
   obs: Observable<A>,
