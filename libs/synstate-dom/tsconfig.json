@@ -23,5 +23,5 @@
       "synstate-dom/jsx-dev-runtime": ["./src/jsx-dev-runtime.mts"]
     }
   },
-  "include": ["./src", "./test", "./scripts", "./configs"]
+  "include": ["./samples", "./src", "./test", "./scripts", "./configs"]
 }

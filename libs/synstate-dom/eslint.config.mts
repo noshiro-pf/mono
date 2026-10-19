@@ -3,6 +3,7 @@ import {
   eslintConfigForNodeJs,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
+  eslintImportsRules,
   typescriptEslintRules,
   type FlatConfig,
 } from 'eslint-config-typed';
@@ -47,6 +48,23 @@ export default [
               '@typescript-eslint/prefer-readonly-parameter-types'
             ][1].allow,
             { from: 'lib', name: ['ChildNode', 'Comment', 'Node', 'Text'] },
+          ],
+        },
+      ],
+    }),
+  },
+
+  {
+    files: ['test/**'],
+    rules: defineKnownRules({
+      // `samples.test.tsx` runs the README samples, which are modules of
+      // their own rather than part of the package.
+      'import-x/no-internal-modules': [
+        'error',
+        {
+          allow: [
+            ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
+            '**/samples/readme/*',
           ],
         },
       ],
