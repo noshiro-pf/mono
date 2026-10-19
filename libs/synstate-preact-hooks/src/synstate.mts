@@ -23,6 +23,7 @@ export {
   getKey,
   isChildObservable,
   isManagerObservable,
+  isObservable,
   isRootObservable,
   just,
   map,

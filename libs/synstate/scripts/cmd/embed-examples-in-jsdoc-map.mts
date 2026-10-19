@@ -28,6 +28,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sourcePath: 'src/core/base/create-child-observable.mts',
     sampleFiles: ['samples/src/create-sync-child-observable-example.mts'],
   },
+  {
+    sourcePath: 'src/core/types/observable.mts',
+    sampleFiles: ['samples/src/is-observable-example.mts'],
+  },
   // State management
   {
     sourcePath: 'src/core/create/source.mts',

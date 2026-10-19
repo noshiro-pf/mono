@@ -19,6 +19,7 @@ import {
   issueObservableId,
   issueSubscriberId,
   issueUpdateToken,
+  observableBrand,
   toSubscriber,
 } from '../utils/index.mjs';
 import type {
@@ -543,6 +544,8 @@ export const assembleObservable = <
   // through an accessor is most of what the change buys.
   const mut_observable = {
     ...extra,
+
+    [observableBrand]: true,
 
     id: handle.id,
 
