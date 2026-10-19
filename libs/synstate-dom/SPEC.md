@@ -4,7 +4,7 @@
 
 synstate の Observable を JSX の属性・子要素・props にそのまま渡し、DOM に直接束縛する UI ライブラリの実装仕様。コンパイラも仮想 DOM も持たない。
 
-- 状態: 実装中。パッケージの骨格、「4. 定数と `Bindable`」、「5. JSX の型」、「6. JSX ランタイムと `Mountable`」、「7. 束縛」、「8.2 `If`」、「8.3 `Match` 系」まで実装済み。公開の準備が整うまで `package.json` は `"private": true` にしてある。
+- 状態: 実装中。パッケージの骨格、「4. 定数と `Bindable`」、「5. JSX の型」、「6. JSX ランタイムと `Mountable`」、「7. 束縛」、「8.2 `If`」、「8.3 `Match` 系」、「8.4 `For`」、「8.6 `Portal`」まで実装済み。公開の準備が整うまで `package.json` は `"private": true` にしてある。
 - 出典: 設計の起点は issue [#2131](https://github.com/noshiro-pf/mono/issues/2131)、synstate 側のライフサイクル（complete・dispose・スコープ）は「synstate ライフサイクル仕様」で確定した内容。本書は両者を UI ライブラリの実装の視点で 1 つにまとめたもので、食い違う箇所は本書で決め、その旨を書く。
 
 ## 1. 目的と範囲
@@ -201,7 +201,8 @@ type MountedNodes = Node | readonly Node[];
 `synstate-dom/jsx-runtime` と `synstate-dom/jsx-dev-runtime` から export する。
 
 - `jsx(type, props, key)` は `Mountable` を返すだけで、DOM もコンポーネントの呼び出しも行わない。
-- `type` が文字列なら要素の記述、関数ならコンポーネントの記述。`key` は使わない（`For` は `key` 関数を props で受ける）。
+- `type` が文字列なら要素の記述、関数ならコンポーネントの記述。
+- `jsx: react-jsx` の変換は `key` を props から外して第 3 引数で渡すので、コンポーネントには props に戻して渡す。`For` は `key` 関数を props で受けるためである。要素では使わない。
 - `Fragment` は子を並べるだけの記述。
 
 ### 6.3 マウントの手順
@@ -326,6 +327,8 @@ export declare const view: <A, T>(
 ### 8.1 位置の目印
 
 `If`・`Match`・`For` はラッパー要素を作らず、範囲の終わりを示すコメントノード（アンカー）を置く。中身の挿入は `anchor.before(...)`、削除は範囲内のノードの `remove()` で行う。マウント結果は `[...中身, anchor]` になる。
+
+分岐の中身のノードは、その分岐のスコープの `onScopeDispose` で外す。分岐の先頭に別の `If` があると中身のノードが後から入れ替わるので、外側がマウント時のノードの一覧を持っていても正しく外せないためである。親が持つ一覧には古いノードが残りうるが、外れたノードの `remove()` は何もしないので害はない。`For` は行を並べ替えるときに行の今のノードが要るので、行ごとに先頭のコメントノードを置き、そこから次の行の先頭（またはアンカー）の手前までを行のノードとする。
 
 ### 8.2 `If`
 

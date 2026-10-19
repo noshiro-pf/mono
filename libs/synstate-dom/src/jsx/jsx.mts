@@ -13,15 +13,20 @@ import { mountable, type Mountable } from './mountable.mjs';
  * this signature, so the props of an intrinsic element arrive as `P` and are
  * read with run-time checks.
  *
- * `key` is not used; `For` takes a `key` function as a prop instead.
  */
 export const createMountable = <P,>(
   type: string | ((componentProps: P) => Mountable),
   props: P,
-): Mountable =>
-  typeof type === 'string'
+  key?: unknown,
+): Mountable => {
+  // The transform takes `key` out of the props and passes it on its own. It
+  // is put back for a component: `For` takes its `key` function as a prop.
+  const propsWithKey = key === undefined ? props : ({ ...props, key } as const);
+
+  return typeof type === 'string'
     ? mountable(() => mountElement(type, props))
-    : mountable(() => type(props).mount());
+    : mountable(() => type(propsWithKey).mount());
+};
 
 /** Mounts its children in order, with no element around them. */
 export const Fragment = (props: Readonly<{ children?: Child }>): Mountable =>
