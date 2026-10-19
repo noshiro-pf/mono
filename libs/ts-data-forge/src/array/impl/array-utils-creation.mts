@@ -8,7 +8,6 @@ import type {
   Min,
   NonEmptyArray,
   NonZeroSafeIntWithSmallInt,
-  PositiveSafeIntWithSmallInt,
   RelaxedExclude,
   SafeInt,
   SafeIntWithSmallInt,
@@ -216,7 +215,10 @@ export function range<S extends SmallUint, E extends SmallUint>(
 export function range(
   start: SafeUintWithSmallInt,
   end: SafeUintWithSmallInt,
-  step?: PositiveSafeIntWithSmallInt,
+  // Every value lies between `start` and `end`, so a negative step yields
+  // non-negative numbers too.
+
+  step?: NonZeroSafeIntWithSmallInt,
 ): readonly SafeUint[];
 
 export function range(
