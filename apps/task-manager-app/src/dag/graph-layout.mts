@@ -115,6 +115,7 @@ export const layoutInput = (
       from: edge.from,
       to: edge.to,
       label: edgeLabel(edge),
+      implied: edge.implied,
     })),
     groups: membersAmong(groups, new Set(graph.nodes.map(({ id }) => id))),
   }) as const;
@@ -520,6 +521,8 @@ export type LaidOutEdge = DeepReadonly<{
   to: GraphNodeId;
   /** Empty for none. */
   label: string;
+  /** The order in time of two milestones rather than a dependency. */
+  implied: boolean;
 }>;
 
 /** How far apart ELK keeps what it lays out. */

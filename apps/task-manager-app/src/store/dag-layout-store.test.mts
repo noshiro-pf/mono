@@ -1,5 +1,6 @@
 import { createState } from 'synstate';
 import { Arr } from 'ts-data-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 import {
   ARC_NODE_GAP,
   COMPACT_MILESTONE_NODE_SIZE,
@@ -472,6 +473,20 @@ const shownWithWidth = async (
   return result;
 };
 
+/** Milestones `m0`, `m1`… on `dates`, in that order. */
+const dated = (dates: readonly number[]): DomainState =>
+  ({
+    tasks: [],
+    milestones: dates.map((date, index) =>
+      createMilestone({
+        id: asMilestoneId(`m${index}`),
+        title: `M${index}`,
+        now: 0,
+        date,
+      }),
+    ),
+  }) as const;
+
 describe(createDagLayoutStore, () => {
   describe('the automatic layout', () => {
     test('lays nothing out while the DAG is not shown', () => {
@@ -533,6 +548,31 @@ describe(createDagLayoutStore, () => {
         type: 'computing',
         previous: laidOut(deferred.requests[0], 100),
       });
+    });
+
+    test('orders the milestones that have a date by date, and follows a date changed', () => {
+      const { deferred, setState } = setup({
+        state: dated([3000, 1000, 2000]),
+      });
+
+      const implied = (index: number): readonly FixedLengthTuple<2, string>[] =>
+        (deferred.requests[index]?.edges ?? [])
+          .filter((edge) => edge.implied)
+          .map(({ from, to }) => [from, to] as const);
+
+      assert.deepStrictEqual(implied(0), [
+        ['milestone:m1', 'milestone:m2'],
+        ['milestone:m2', 'milestone:m0'],
+      ]);
+
+      setState(dated([3000, 2500, 2000]));
+
+      assert.strictEqual(deferred.requests.length, 2);
+
+      assert.deepStrictEqual(implied(1), [
+        ['milestone:m2', 'milestone:m1'],
+        ['milestone:m1', 'milestone:m0'],
+      ]);
     });
 
     test('drops a result that a newer request has overtaken', async () => {

@@ -60,6 +60,11 @@
  * ELK places: a node put somewhere stays where it was put, its top-left
  * corner where it was — and asks for a fit. Nothing is saved for it.
  *
+ * ELK lays out the milestones that have a date in order of date: the graph
+ * it is given has an edge from each to those of the next date
+ * (`withChronologicalEdges`), which the DAG draws dashed. A date changed
+ * changes the structure, and so lays the DAG out again as any edge does.
+ *
  * The nodes `hidden` (`dag/hidden-nodes.mts`) are drawn in no mode: ELK lays
  * out the rest, and 「アーク」 and 「タイル」 place the rest, which move to
  * their new places when that changes as when the order does. Where a hidden
@@ -122,6 +127,7 @@ import {
   buildDependencyGraph,
   listNodes,
   nodeId,
+  withChronologicalEdges,
   type DomainState,
   type GraphNodeId,
   type Group,
@@ -1184,8 +1190,10 @@ export const createDagLayoutStore = <H, F>(
         return;
       }
 
+      const shownState = withoutNodes(state, hidden);
+
       const input = layoutInput(
-        buildDependencyGraph(withoutNodes(state, hidden)),
+        withChronologicalEdges(shownState, buildDependencyGraph(shownState)),
         direction,
         size,
         groups,

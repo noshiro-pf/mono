@@ -92,6 +92,7 @@ export const edgeGeometries = (
       from: edge.from,
       to: edge.to,
       label: edge.label,
+      implied: edge.implied,
       segments,
       path: pathOf(segments),
       labelBox:
@@ -191,6 +192,8 @@ export type EdgeGeometry = DeepReadonly<{
   from: GraphNodeId;
   to: GraphNodeId;
   label: string;
+  /** Drawn dashed, and cannot be selected (`dag-edge.tsx`). */
+  implied: boolean;
   /**
    * One curve, or two that go round the nodes — or, for an edge routed
    * round the nodes in its way (`edge-routing.mts`), as many as it takes.

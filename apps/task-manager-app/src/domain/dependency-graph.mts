@@ -40,6 +40,7 @@ export const buildDependencyGraph = (state: DomainState): DependencyGraph => {
                   ? dependency.type
                   : undefined,
                 lagMs: dependency.lagMs,
+                implied: false,
               },
             ]
           : [];
@@ -65,4 +66,9 @@ export type DependencyGraphEdge = DeepReadonly<{
   /** `undefined` when the source is a milestone, which has no duration. */
   type: DependencyType | undefined;
   lagMs: number;
+  /**
+   * Not a dependency but the order in time of two milestones
+   * (`withChronologicalEdges`), which nothing waits on.
+   */
+  implied: boolean;
 }>;

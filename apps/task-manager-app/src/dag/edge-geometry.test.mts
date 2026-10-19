@@ -34,7 +34,7 @@ const milestone = (id: string, x: number, y: number): LaidOutNode =>
   }) as const;
 
 const edge = (from: GraphNodeId, to: GraphNodeId, label = ''): LaidOutEdge =>
-  ({ id: `${to}<${from}`, from, to, label }) as const;
+  ({ id: `${to}<${from}`, from, to, label, implied: false }) as const;
 
 const only = (geometries: readonly EdgeGeometry[]): EdgeGeometry => {
   const [first] = geometries;

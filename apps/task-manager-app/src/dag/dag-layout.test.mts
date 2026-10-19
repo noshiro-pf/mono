@@ -37,6 +37,7 @@ const edgeAM: LaidOutEdge = {
   from: 'task:a',
   to: 'milestone:m',
   label: '',
+  implied: false,
 } as const;
 
 describe(placeNodes, () => {

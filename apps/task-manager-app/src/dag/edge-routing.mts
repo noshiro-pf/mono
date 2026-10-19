@@ -1133,6 +1133,7 @@ const routedGeometry = (
     from: curve.from,
     to: curve.to,
     label: curve.label,
+    implied: curve.implied,
     segments: nonEmpty,
     path: pathOf(nonEmpty),
     labelBox:

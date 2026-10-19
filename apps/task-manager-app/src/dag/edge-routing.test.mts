@@ -33,7 +33,7 @@ const milestone = (id: string, x: number, y: number): LaidOutNode =>
   }) as const;
 
 const edge = (from: GraphNodeId, to: GraphNodeId, label = ''): LaidOutEdge =>
-  ({ id: `${to}<${from}`, from, to, label }) as const;
+  ({ id: `${to}<${from}`, from, to, label, implied: false }) as const;
 
 /** Points along every segment, no more than about a pixel apart. */
 const samples = (segments: readonly CubicSegment[]): readonly Point[] =>

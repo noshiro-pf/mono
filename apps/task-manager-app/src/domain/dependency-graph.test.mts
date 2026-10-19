@@ -68,6 +68,7 @@ describe(buildDependencyGraph, () => {
         to: 'task:b',
         type: 'start-to-start',
         lagMs: 100,
+        implied: false,
       },
       {
         id: 'task:b#1',
@@ -75,6 +76,7 @@ describe(buildDependencyGraph, () => {
         to: 'task:b',
         type: undefined,
         lagMs: 0,
+        implied: false,
       },
       {
         id: 'milestone:m#0',
@@ -82,6 +84,7 @@ describe(buildDependencyGraph, () => {
         to: 'milestone:m',
         type: 'finish-to-start',
         lagMs: 0,
+        implied: false,
       },
     ]);
   });
@@ -117,6 +120,7 @@ describe(buildDependencyGraph, () => {
         to: 'task:a',
         type: 'finish-to-start',
         lagMs: 0,
+        implied: false,
       },
     ]);
   });
