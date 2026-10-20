@@ -82,6 +82,13 @@ const lintScriptPrefixes = {
   'fix:lint': 'oxlint . --fix && eslint ',
 } as const;
 
+/**
+ * The build-output guard every lint script starts with. Its exact path is
+ * `check:root:deps-built-guard`'s to check; here it is only looked past.
+ */
+const depsBuiltGuardPrefix =
+  /^node (?:\.\.\/)+tools\/scripts\/cmd\/assert-deps-built\.mts && /u;
+
 /** The packages `ws:fix:lint` reaches: every member with a `fix:lint`. */
 const listLintedPackages = async (): Promise<readonly string[]> => {
   const manifests = git(['ls-files', '*/package.json'])
@@ -104,7 +111,10 @@ const checkPackage = async (dir: string): Promise<PackageResult> => {
     for (const [name, prefix] of Object.entries(lintScriptPrefixes)) {
       const script: unknown = scripts[name];
 
-      if (!isString(script) || !script.startsWith(prefix)) {
+      if (
+        !isString(script) ||
+        !script.replace(depsBuiltGuardPrefix, '').startsWith(prefix)
+      ) {
         yield `${dir}/package.json: "${name}" must start with \`${prefix}\`.`;
       }
     }
