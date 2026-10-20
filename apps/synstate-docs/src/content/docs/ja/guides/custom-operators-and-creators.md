@@ -18,7 +18,7 @@ SynState の組み込みの observable はすべて 4 つの factory のどれ�
 
 ## 同期の operator
 
-子の factory は config と `createTryUpdate` コールバックを受け取ります。`createTryUpdate` は新しい observable が自分自身に使える tools を受け取り、`tryUpdate` を返します。SynState は、その observable に届く更新のたびに、更新のトークンを渡して `tryUpdate` を呼びます。
+子の factory は config と `init` コールバックを受け取ります。`init` は observable を作る途中で 1 回だけ呼ばれ、新しい observable が自分自身に使える tools を受け取って、`tryUpdate` を返します。SynState は、その observable に届く更新のたびに、更新のトークンを渡して `tryUpdate` を呼びます。
 
 ```ts
 import { Optional } from 'ts-data-forge';
@@ -64,28 +64,36 @@ createSyncChildObservable(
 
 ### Config
 
-| フィールド      | 意味                                                                                                |
-| :-------------- | :-------------------------------------------------------------------------------------------------- |
-| `parents`       | この observable の派生元                                                                            |
-| `initialValue`  | `Optional.some(v)` か `Optional.none`                                                               |
-| `depth`         | 省略時は一番深い親の `depth` + 1。親ではないが読む observable の `depth` よりも大きくする           |
-| `onComplete`    | 完了したときに走る後始末（タイマーの解除、購読の解除）                                              |
-| `canEmitNoMore` | 親が完了したときに呼ばれる。`true` を返すと、生きている親が残っていてもこの observable を完了させる |
-| `flush`         | 非同期の子のみ。完了する前に保留中の値を `startUpdate` で流す。`dispose` では呼ばれない             |
+| フィールド     | 意味                                                                                      |
+| :------------- | :---------------------------------------------------------------------------------------- |
+| `parents`      | この observable の派生元                                                                  |
+| `initialValue` | `Optional.some(v)` か `Optional.none`                                                     |
+| `depth`        | 省略時は一番深い親の `depth` + 1。親ではないが読む observable の `depth` よりも大きくする |
 
 ### Tools
 
-| Tool                         | 意味                                                    |
-| :--------------------------- | :------------------------------------------------------ |
-| `setNext(value, token)`      | `token` の更新の中で `value` を出す                     |
-| `getSnapshot()`              | この observable の現在の値                              |
-| `complete()`                 | この observable をすぐに完了させる                      |
-| `completeAfterPropagation()` | 今の更新がすべての子孫に届いてから完了させる（`take`）  |
-| `startUpdate(value)`         | 非同期の子のみ。自分で新しい更新を始めて `value` を出す |
+| Tool                         | 意味                                                                                                   |
+| :--------------------------- | :----------------------------------------------------------------------------------------------------- |
+| `setNext(value, token)`      | `token` の更新の中で `value` を出す                                                                    |
+| `getSnapshot()`              | この observable の現在の値                                                                             |
+| `complete()`                 | この observable をすぐに完了させる                                                                     |
+| `completeAfterPropagation()` | 今の更新がすべての子孫に届いてから完了させる（`take`）                                                 |
+| `onComplete(teardown)`       | 後始末（タイマーの解除、購読の解除）を登録する。完了したとき、または dispose されたときに 1 回だけ走る |
+| `startUpdate(value)`         | 非同期の子のみ。自分で新しい更新を始めて `value` を出す                                                |
+
+### `tryUpdate` 以外も返す
+
+更新への応答以外にも答える必要がある operator は、`init` から `tryUpdate` の代わりにオブジェクトを返せます。どの hook も `init` で作った状態を読むので、状態は 1 か所にまとまります。
+
+| Hook            | 意味                                                                                                         |
+| :-------------- | :----------------------------------------------------------------------------------------------------------- |
+| `tryUpdate`     | その observable に届く更新のたびに、更新のトークンを渡して呼ばれる                                           |
+| `canEmitNoMore` | 親が完了したときに呼ばれる。`true` を返すと、生きている親が残っていてもこの observable を完了させる（`zip`） |
+| `flush`         | 非同期の子のみ。完了する前に保留中の値を `startUpdate` で流す。`dispose` では呼ばれない                      |
 
 ## 非同期の operator
 
-非同期の子は `startUpdate` で後から値を出します。`startUpdate` は自分で更新を始め、その observable から派生したすべてに伝搬させます。
+非同期の子は `startUpdate` で後から値を出します。`startUpdate` は自分で更新を始め、その observable から派生したすべてに伝搬させます。タイマーは `init` の中で作り、それを解除する後始末と並べて書きます。`debounce` は、完了するときにタイマーが持っている値を流す `flush` も返しています。
 
 ```ts
 import { Optional } from 'ts-data-forge';
@@ -94,23 +102,19 @@ import { createAsyncChildObservable, type Observable } from 'synstate';
 export const delay = (
     src: Observable<number>,
     ms: number,
-): Observable<number> => {
-    const mut_timers = new Set<ReturnType<typeof setTimeout>>();
+): Observable<number> =>
+    createAsyncChildObservable(
+        { parents: [src], initialValue: Optional.none },
+        ({ startUpdate, onComplete }) => {
+            const mut_timers = new Set<ReturnType<typeof setTimeout>>();
 
-    return createAsyncChildObservable(
-        {
-            parents: [src],
-            initialValue: Optional.none,
-            onComplete: () => {
+            onComplete(() => {
                 for (const t of mut_timers) {
                     clearTimeout(t);
                 }
+            });
 
-                mut_timers.clear();
-            },
-        },
-        ({ startUpdate }) =>
-            (updateToken) => {
+            return (updateToken) => {
                 const sn = src.getSnapshot();
 
                 if (src.updateToken !== updateToken || Optional.isNone(sn)) {
@@ -124,9 +128,9 @@ export const delay = (
                 }, ms);
 
                 mut_timers.add(t);
-            },
+            };
+        },
     );
-};
 ```
 
 ## Creator
@@ -155,7 +159,7 @@ export const fromEvent = (
     );
 ```
 
-tools の `onComplete` は `init` の中から後始末を登録するので、`init` で作ったもの（ここではリスナー）をそのまま使えます。root の config には `onComplete` はありません。登録した後始末は、observable が完了したとき、または dispose されたときに、登録順に 1 回だけ走ります。observable が完了した後に登録すると（`init` の中で同期的に完了させた場合など）、その場で走ります。
+tools の `onComplete` は `init` の中から後始末を登録するので、`init` で作ったもの（ここではリスナー）をそのまま使えます。どの factory の config にも `onComplete` はありません。登録した後始末は、observable が完了したとき、または dispose されたときに、登録順に 1 回だけ走ります。observable が完了した後に登録すると（`init` の中で同期的に完了させた場合など）、その場で走ります。
 
 ## できないこと
 

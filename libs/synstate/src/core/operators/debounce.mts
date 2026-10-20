@@ -108,60 +108,63 @@ export const debounce = <A,>(
 const createDebounceObservable = <A,>(
   parentObservable: Observable<A>,
   milliSeconds: number,
-): DebounceOperatorObservable<A> => {
-  let mut_timerId: TimerId | undefined = undefined;
-
-  /** The value the running timer will pass on. */
-  let mut_pending: Optional<A> = Optional.none;
-
-  const resetTimer = (): void => {
-    if (mut_timerId !== undefined) {
-      clearTimeout(mut_timerId);
-
-      mut_timerId = undefined;
-    }
-
-    mut_pending = Optional.none;
-  };
-
-  return createAsyncChildObservable(
+): DebounceOperatorObservable<A> =>
+  createAsyncChildObservable(
     {
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-      onComplete: resetTimer,
-      flush: (startUpdate) => {
-        const pending = mut_pending;
-
-        resetTimer();
-
-        if (Optional.isSome(pending)) {
-          startUpdate(pending.value);
-        }
-      },
     },
-    ({ startUpdate }) =>
-      (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+    ({ startUpdate, onComplete }) => {
+      let mut_timerId: TimerId | undefined = undefined;
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
+      /** The value the running timer will pass on. */
+      let mut_pending: Optional<A> = Optional.none;
+
+      const resetTimer = (): void => {
+        if (mut_timerId !== undefined) {
+          clearTimeout(mut_timerId);
+
+          mut_timerId = undefined;
         }
 
-        resetTimer();
+        mut_pending = Optional.none;
+      };
 
-        mut_pending = sn;
+      onComplete(resetTimer);
 
-        // set timer
-        mut_timerId = setTimeout(() => {
-          mut_timerId = undefined;
+      return {
+        tryUpdate: (updateToken) => {
+          const sn = parentObservable.getSnapshot();
 
-          mut_pending = Optional.none;
+          if (
+            parentObservable.updateToken !== updateToken ||
+            Optional.isNone(sn)
+          ) {
+            return; // skip update
+          }
 
-          startUpdate(sn.value);
-        }, milliSeconds);
-      },
+          resetTimer();
+
+          mut_pending = sn;
+
+          // set timer
+          mut_timerId = setTimeout(() => {
+            mut_timerId = undefined;
+
+            mut_pending = Optional.none;
+
+            startUpdate(sn.value);
+          }, milliSeconds);
+        },
+        flush: () => {
+          const pending = mut_pending;
+
+          resetTimer();
+
+          if (Optional.isSome(pending)) {
+            startUpdate(pending.value);
+          }
+        },
+      };
+    },
   );
-};

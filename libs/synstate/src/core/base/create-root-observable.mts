@@ -5,6 +5,7 @@ import {
   assembleObservable,
   createManagerObservableParts,
   createObservableBaseHandle,
+  createTeardownList,
   createTryUpdateNotImplemented,
   isPropagating,
 } from './create-observable-base.mjs';
@@ -67,26 +68,16 @@ export const createRootObservable = <
   const { addDescendant, deleteDescendant, startUpdate } =
     createManagerObservableParts(handle);
 
-  const mut_teardowns: (() => void)[] = [];
+  const teardowns = createTeardownList(handle.isCompleted);
 
   const complete = (): void => {
     if (handle.isCompleted()) {
       return;
     }
 
-    for (const teardown of mut_teardowns) {
-      teardown();
-    }
+    teardowns.runAll();
 
     handle.completeBase();
-  };
-
-  const addTeardown = (teardown: () => void): void => {
-    if (handle.isCompleted()) {
-      teardown();
-    } else {
-      mut_teardowns.push(teardown);
-    }
   };
 
   // A root created while an update propagates (inside a `switchMap`
@@ -112,7 +103,7 @@ export const createRootObservable = <
     getSnapshot: handle.getSnapshot,
     isCompleted: handle.isCompleted,
     complete,
-    onComplete: addTeardown,
+    onComplete: teardowns.add,
   });
 
   mut_isInitializing = false;

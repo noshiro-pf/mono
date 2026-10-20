@@ -28,23 +28,21 @@ const double = (src: Observable<number>): SyncChildObservable<number> =>
       },
   );
 
-const delay = (src: Observable<number>, ms: number): Observable<number> => {
-  const mut_timers = new Set<ReturnType<typeof setTimeout>>();
+const delay = (src: Observable<number>, ms: number): Observable<number> =>
+  createAsyncChildObservable(
+    { parents: [src], initialValue: Optional.none },
+    ({ startUpdate, onComplete }) => {
+      const mut_timers = new Set<ReturnType<typeof setTimeout>>();
 
-  return createAsyncChildObservable(
-    {
-      parents: [src],
-      initialValue: Optional.none,
-      onComplete: () => {
+      onComplete(() => {
         for (const t of mut_timers) {
           clearTimeout(t);
         }
 
         mut_timers.clear();
-      },
-    },
-    ({ startUpdate }) =>
-      (updateToken) => {
+      });
+
+      return (updateToken) => {
         const sn = src.getSnapshot();
 
         if (src.updateToken !== updateToken || Optional.isNone(sn)) {
@@ -58,9 +56,83 @@ const delay = (src: Observable<number>, ms: number): Observable<number> => {
         }, ms);
 
         mut_timers.add(t);
-      },
+      };
+    },
   );
-};
+
+/** Passes on the latest value once `ms` pass without a new one. */
+const debounceTime = (
+  src: Observable<number>,
+  ms: number,
+): Observable<number> =>
+  createAsyncChildObservable(
+    { parents: [src], initialValue: Optional.none },
+    ({ startUpdate, onComplete }) => {
+      let mut_timer: ReturnType<typeof setTimeout> | undefined = undefined;
+
+      let mut_pending: Optional<number> = Optional.none;
+
+      const reset = (): void => {
+        clearTimeout(mut_timer);
+
+        mut_timer = undefined;
+
+        mut_pending = Optional.none;
+      };
+
+      onComplete(reset);
+
+      return {
+        tryUpdate: (updateToken) => {
+          const sn = src.getSnapshot();
+
+          if (src.updateToken !== updateToken || Optional.isNone(sn)) {
+            return; // skip update
+          }
+
+          reset();
+
+          mut_pending = sn;
+
+          mut_timer = setTimeout(() => {
+            mut_pending = Optional.none;
+
+            startUpdate(sn.value);
+          }, ms);
+        },
+        flush: () => {
+          const pending = mut_pending;
+
+          reset();
+
+          if (Optional.isSome(pending)) {
+            startUpdate(pending.value);
+          }
+        },
+      };
+    },
+  );
+
+/** Passes on `main`'s values, and completes once `main` does. */
+const followMain = (
+  main: Observable<number>,
+  other: Observable<number>,
+): Observable<number> =>
+  createSyncChildObservable(
+    { parents: [main, other], initialValue: Optional.none },
+    ({ setNext }) => ({
+      tryUpdate: (updateToken) => {
+        const sn = main.getSnapshot();
+
+        if (main.updateToken !== updateToken || Optional.isNone(sn)) {
+          return; // skip update
+        }
+
+        setNext(sn.value, updateToken);
+      },
+      canEmitNoMore: () => main.isCompleted,
+    }),
+  );
 
 /** A minimal event source, standing in for `EventTarget` or a Node emitter. */
 type Emitter = Readonly<{
@@ -255,6 +327,90 @@ describe('custom operators and creators', () => {
     assert.deepStrictEqual(mut_calls, ['teardown']);
 
     assert.isTrue(obs$.isCompleted);
+  });
+
+  test('a custom async operator passes on what it holds on complete, not on dispose', () => {
+    vi.useFakeTimers();
+
+    const num$ = source<number>();
+
+    const completed$ = debounceTime(num$, 100);
+
+    const disposed$ = debounceTime(num$, 100);
+
+    const mut_completed: number[] = [];
+
+    const mut_disposed: number[] = [];
+
+    completed$.subscribe((v) => {
+      mut_completed.push(v);
+    });
+
+    disposed$.subscribe((v) => {
+      mut_disposed.push(v);
+    });
+
+    num$.next(1);
+
+    completed$.complete();
+
+    disposed$.dispose();
+
+    vi.runAllTimers();
+
+    assert.deepStrictEqual(mut_completed, [1]);
+
+    assert.deepStrictEqual(mut_disposed, []);
+
+    vi.useRealTimers();
+  });
+
+  test('a custom operator returning canEmitNoMore is asked when a parent completes', () => {
+    const main$ = source<number>();
+
+    const other$ = source<number>();
+
+    const followed$ = followMain(main$, other$);
+
+    other$.next(0);
+
+    assert.isFalse(followed$.isCompleted);
+
+    main$.complete();
+
+    // `other$` is still live, but `canEmitNoMore` says nothing more can come.
+    assert.isTrue(followed$.isCompleted);
+  });
+
+  test('an operator that completes itself in init is never registered to its parents', () => {
+    const num$ = source<number>();
+
+    let mut_tryUpdateCalls = 0;
+
+    const mut_teardowns: string[] = [];
+
+    const obs$ = createSyncChildObservable(
+      { parents: [num$], initialValue: Optional.none },
+      ({ complete, onComplete }) => {
+        complete();
+
+        onComplete(() => {
+          mut_teardowns.push('teardown');
+        });
+
+        return () => {
+          mut_tryUpdateCalls += 1;
+        };
+      },
+    );
+
+    assert.isTrue(obs$.isCompleted);
+
+    assert.deepStrictEqual(mut_teardowns, ['teardown']);
+
+    num$.next(1);
+
+    assert.strictEqual(mut_tryUpdateCalls, 0);
   });
 
   test('the public types carry only the members meant for users', () => {

@@ -458,6 +458,36 @@ export const createManagerObservableParts = <A,>(
   return { addDescendant, deleteDescendant, startUpdate };
 };
 
+/**
+ * The teardowns registered through the `onComplete` tool, run in the order
+ * registered by `runAll` when the observable completes. One registered once
+ * the observable has completed runs at once: `init` may complete it before it
+ * gets to register.
+ */
+export const createTeardownList = (
+  isCompleted: () => boolean,
+): Readonly<{
+  add: (teardown: () => void) => void;
+  runAll: () => void;
+}> => {
+  const mut_teardowns: (() => void)[] = [];
+
+  return {
+    add: (teardown) => {
+      if (isCompleted()) {
+        teardown();
+      } else {
+        mut_teardowns.push(teardown);
+      }
+    },
+    runAll: () => {
+      for (const teardown of mut_teardowns) {
+        teardown();
+      }
+    },
+  };
+};
+
 /** Default `tryUpdate` for observables that never receive parent updates. */
 export const createTryUpdateNotImplemented = (): ((
   _updateToken: UpdateToken,

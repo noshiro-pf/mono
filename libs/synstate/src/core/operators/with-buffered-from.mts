@@ -3,7 +3,6 @@ import { createSyncChildObservable } from '../base/index.mjs';
 import type {
   KeepInitialValueOperator,
   Observable,
-  Subscription,
   WithBufferedFromOperatorObservable,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
@@ -80,19 +79,8 @@ export const withBuffered = withBufferedFrom;
 const createWithBufferedFromObservable = <A, B>(
   parentObservable: Observable<A>,
   observable: Observable<B>,
-): WithBufferedFromOperatorObservable<A, B> => {
-  let mut_bufferedValues: readonly B[] = [];
-
-  const clearBuffer = (): void => {
-    mut_bufferedValues = [];
-  };
-
-  let mut_subscription: Subscription | undefined = undefined;
-
-  const result = createSyncChildObservable<
-    readonly [A, readonly B[]],
-    readonly [A]
-  >(
+): WithBufferedFromOperatorObservable<A, B> =>
+  createSyncChildObservable<readonly [A, readonly B[]], readonly [A]>(
     {
       parents: [parentObservable],
       depth: 1 + maxDepth([parentObservable, observable]),
@@ -107,14 +95,21 @@ const createWithBufferedFromObservable = <A, B>(
               Optional.isNone(me) ? [] : [me.value],
             ] as const),
       ).value,
-      onComplete: () => {
-        mut_subscription?.unsubscribe();
-
-        clearBuffer();
-      },
     },
-    ({ setNext }) =>
-      (updateToken) => {
+    ({ setNext, onComplete }) => {
+      let mut_bufferedValues: readonly B[] = [];
+
+      const subscription = observable.subscribe((value) => {
+        mut_bufferedValues = Arr.toPushed(mut_bufferedValues, value);
+      });
+
+      onComplete(() => {
+        subscription.unsubscribe();
+
+        mut_bufferedValues = [];
+      });
+
+      return (updateToken) => {
         const sn = parentObservable.getSnapshot();
 
         if (
@@ -126,17 +121,7 @@ const createWithBufferedFromObservable = <A, B>(
 
         setNext([sn.value, mut_bufferedValues], updateToken);
 
-        clearBuffer();
-      },
+        mut_bufferedValues = [];
+      };
+    },
   );
-
-  // A child completed at creation has already run `onComplete`; subscribing
-  // after it would leave a subscription nothing releases.
-  if (!result.isCompleted) {
-    mut_subscription = observable.subscribe((value) => {
-      mut_bufferedValues = Arr.toPushed(mut_bufferedValues, value);
-    });
-  }
-
-  return result;
-};

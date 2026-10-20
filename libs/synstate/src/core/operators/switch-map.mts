@@ -120,22 +120,23 @@ const createSwitchMapObservable = <A, B>(
   // current scope is whatever happens to be running.
   const ownerScope = getCurrentScope();
 
-  let mut_innerScope: Scope | undefined = undefined;
-
-  let mut_subscription: Subscription | undefined = undefined;
-
   return createAsyncChildObservable(
     {
       parents: [parentObservable],
       initialValue: Optional.none,
-      onComplete: () => {
+    },
+    ({ startUpdate, onComplete }) => {
+      let mut_innerScope: Scope | undefined = undefined;
+
+      let mut_subscription: Subscription | undefined = undefined;
+
+      onComplete(() => {
         mut_subscription?.unsubscribe();
 
         mut_innerScope?.dispose();
-      },
-    },
-    ({ startUpdate }) =>
-      (updateToken) => {
+      });
+
+      return (updateToken) => {
         const sn = parentObservable.getSnapshot();
 
         if (
@@ -160,6 +161,7 @@ const createSwitchMapObservable = <A, B>(
         });
 
         mut_subscription = subscription;
-      },
+      };
+    },
   );
 };
