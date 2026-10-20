@@ -144,6 +144,67 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, string> =>
     ),
     'fan-out/synstate-ns-per-branch-per-update': nsPerBranchPerUpdate(),
     'fan-out/jotai-slower-through-b': count(param(fanOutCrossoverLabel())),
+
+    // Summary: the fastest library in each scenario and how far SynState is
+    // from it, at the point of the sweep the summary table names. Derived
+    // rather than written, because which library leads is exactly what a
+    // re-measurement can change.
+    'summary/derived-chain-fastest': fastestRow(derivedChain),
+    'summary/derived-chain-synstate-over-fastest': factor(
+      median(derivedChain, 'SynState'),
+      median(derivedChain, fastestRow(derivedChain)),
+    ),
+    'summary/diamond-fastest': fastestRow(diamond),
+    'summary/diamond-synstate-over-fastest': factor(
+      median(diamond, 'SynState'),
+      median(diamond, fastestRow(diamond)),
+    ),
+    'summary/deep-chain-fastest': fastestAt(deepChain, DEEP_MAX),
+    'summary/deep-chain-synstate-over-fastest': factor(
+      at(deepChain, 'SynState', DEEP_MAX),
+      at(deepChain, fastestAt(deepChain, DEEP_MAX), DEEP_MAX),
+    ),
+    'summary/cascaded-diamond-fastest': fastestAt(
+      cascadedDiamond,
+      CASCADED_MAX,
+    ),
+    'summary/cascaded-diamond-synstate-over-fastest': factor(
+      at(cascadedDiamond, 'SynState', CASCADED_MAX),
+      at(
+        cascadedDiamond,
+        fastestAt(cascadedDiamond, CASCADED_MAX),
+        CASCADED_MAX,
+      ),
+    ),
+    'summary/fan-out-fastest': fastestAt(conditionalFanOut, fanOutLastLabel()),
+    'summary/fan-out-synstate-over-fastest': factor(
+      at(conditionalFanOut, 'SynState', fanOutLastLabel()),
+      at(
+        conditionalFanOut,
+        fastestAt(conditionalFanOut, fanOutLastLabel()),
+        fanOutLastLabel(),
+      ),
+    ),
+
+    // Summary: how each library's cost grows when the deep chain gets four
+    // times deeper at the same update count — the worst-case growth the page
+    // argues from, as one number per library.
+    'summary/deep-chain-synstate-growth': factor(
+      at(deepChain, 'SynState', DEEP_MAX),
+      at(deepChain, 'SynState', DEEP_SHALLOW),
+    ),
+    'summary/deep-chain-rxjs-growth': factor(
+      at(deepChain, 'RxJS', DEEP_MAX),
+      at(deepChain, 'RxJS', DEEP_SHALLOW),
+    ),
+    'summary/deep-chain-jotai-growth': factor(
+      at(deepChain, 'Jotai', DEEP_MAX),
+      at(deepChain, 'Jotai', DEEP_SHALLOW),
+    ),
+    'summary/deep-chain-mobx-growth': factor(
+      at(deepChain, 'MobX', DEEP_MAX),
+      at(deepChain, 'MobX', DEEP_SHALLOW),
+    ),
   }) as const;
 
 /** One library's row in a sweep, and the constants the sweep ran under. */
@@ -200,6 +261,12 @@ type StatsData = Readonly<{
  */
 const derivedChain: StatsData = derivedChainJson;
 
+/**
+ * The diamond, which only the summary quotes: SynState's distance from the
+ * fastest library on the one fixed-size graph with a diamond in it.
+ */
+const diamond: StatsData = diamondJson;
+
 const deepChain: SeriesData = deepChainJson;
 
 const cascadedDiamond: SeriesData = cascadedDiamondJson;
@@ -207,16 +274,13 @@ const cascadedDiamond: SeriesData = cascadedDiamondJson;
 const conditionalFanOut: SeriesData = conditionalFanOutJson;
 
 /**
- * Every committed table, for the environment check alone.
- *
- * The diamond is here and nowhere else in this module: no sentence quotes a
- * number from it any more, but it is a table on the page, so the environment
- * it was measured in has to agree with the others' or the page's one-sentence
- * description of where the numbers come from is false.
+ * Every committed table, for the environment check: each is a table on the
+ * page, so the environment it was measured in has to agree with the others' or
+ * the page's one-sentence description of where the numbers come from is false.
  */
 const allResults: readonly (StatsData | SeriesData)[] = [
   derivedChain,
-  diamondJson,
+  diamond,
   deepChain,
   cascadedDiamond,
   conditionalFanOut,
@@ -274,6 +338,9 @@ const DEEP_MAX = 'K=1000, M=200';
 
 const DEEP_MID = 'K=500, M=100';
 
+/** The shallowest chain at the update count of {@link DEEP_MAX}. */
+const DEEP_SHALLOW = 'K=1000, M=50';
+
 const CASCADED_MIN = 'N=2';
 
 const CASCADED_MAX = 'N=20';
@@ -319,6 +386,16 @@ const ms = (value: number): string =>
   value < 100
     ? (`${value.toFixed(1)} ms` as const)
     : (`${count(Math.round(value))} ms` as const);
+
+/**
+ * A ratio as the summary quotes it: one decimal below 10, where "3.6×" and
+ * "4×" say different things, and whole numbers above it, as {@link ratio}.
+ */
+const factor = (numerator: number, denominator: number): string => {
+  const value = divide(numerator, denominator);
+
+  return value < 10 ? value.toFixed(1) : count(Math.round(value));
+};
 
 const ratio = (numerator: number, denominator: number): string =>
   count(Math.round(divide(numerator, denominator)));
@@ -398,6 +475,36 @@ const aheadAt = (
   const mine = valueAt(data, label, xLabel);
 
   return mine !== null && (rival === null || mine < rival);
+};
+
+/** The library with the smallest median in a single-point scenario. */
+const fastestRow = (data: StatsData): string => {
+  const [first] = data.rows.toSorted((a, b) => a.median - b.median);
+
+  if (first === undefined) {
+    throw new Error('❌ this scenario measured no library');
+  }
+
+  return first.label;
+};
+
+/**
+ * The library that completed `xLabel` fastest. A timeout is never the fastest,
+ * for the reason {@link aheadAt} gives.
+ */
+const fastestAt = (data: SeriesData, xLabel: string): string => {
+  const [first] = data.series
+    .map((s) => ({ label: s.label, value: valueAt(data, s.label, xLabel) }))
+    .filter(
+      (r): r is Readonly<{ label: string; value: number }> => r.value !== null,
+    )
+    .toSorted((a, b) => a.value - b.value);
+
+  if (first === undefined) {
+    throw new Error(`❌ no library completed '${xLabel}'`);
+  }
+
+  return first.label;
 };
 
 const median = (data: StatsData, label: string): number => {
