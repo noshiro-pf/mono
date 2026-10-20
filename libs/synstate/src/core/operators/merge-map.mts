@@ -128,15 +128,17 @@ const createMergeMapObservable = <A, B>(
   // current scope is whatever happens to be running.
   const ownerScope = getCurrentScope();
 
-  let mut_innerScopes: readonly Scope[] = [];
-
-  let mut_subscriptions: readonly Subscription[] = [];
-
   return createAsyncChildObservable(
     {
       parents: [parentObservable],
       initialValue: Optional.none,
-      onComplete: () => {
+    },
+    ({ startUpdate, onComplete }) => {
+      let mut_innerScopes: readonly Scope[] = [];
+
+      let mut_subscriptions: readonly Subscription[] = [];
+
+      onComplete(() => {
         for (const s of mut_subscriptions) {
           s.unsubscribe();
         }
@@ -144,10 +146,9 @@ const createMergeMapObservable = <A, B>(
         for (const scope of mut_innerScopes) {
           scope.dispose();
         }
-      },
-    },
-    ({ startUpdate }) =>
-      (updateToken) => {
+      });
+
+      return (updateToken) => {
         const sn = parentObservable.getSnapshot();
 
         if (
@@ -168,6 +169,7 @@ const createMergeMapObservable = <A, B>(
         });
 
         mut_subscriptions = Arr.toPushed(mut_subscriptions, subscription);
-      },
+      };
+    },
   );
 };

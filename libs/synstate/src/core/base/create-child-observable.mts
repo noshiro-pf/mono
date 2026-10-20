@@ -16,6 +16,7 @@ import {
   assembleObservable,
   createManagerObservableParts,
   createObservableBaseHandle,
+  createTeardownList,
   runAfterPropagation,
 } from './create-observable-base.mjs';
 import {
@@ -43,6 +44,15 @@ export type SyncChildObservableTools<A> = Readonly<{
    * every descendant, so that they see the value just passed on first.
    */
   completeAfterPropagation: () => void;
+
+  /**
+   * Registers a teardown (clear timers, unsubscribe inner observables, …) to
+   * run when this observable completes or is disposed, in the order
+   * registered. Called from `init`, it lets the teardown close over what
+   * `init` creates. Registered once the observable has completed, the
+   * teardown runs at once.
+   */
+  onComplete: (teardown: () => void) => void;
 }>;
 
 /**
@@ -55,6 +65,39 @@ export type AsyncChildObservableTools<A> = Readonly<{
 }> &
   SyncChildObservableTools<A>;
 
+/**
+ * What a sync child's `init` may return instead of `tryUpdate` alone: the
+ * hooks the factory calls, which read the state `init` creates.
+ */
+export type SyncChildObservableHooks = Readonly<{
+  /** Called with the token of every update that reaches this observable. */
+  tryUpdate: (updateToken: UpdateToken) => void;
+
+  /**
+   * Whether this observable can emit nothing more although some parent is
+   * still live, asked whenever a parent completes. `true` completes it then,
+   * as all parents completing does (`zip` once a completed source's queue is
+   * empty).
+   */
+  canEmitNoMore?: () => boolean;
+}>;
+
+/**
+ * What an async child's `init` may return instead of `tryUpdate` alone. An
+ * async child can also hold a value it has not passed on yet (`debounce`'s
+ * pending value), which completing should not lose.
+ */
+export type AsyncChildObservableHooks = SyncChildObservableHooks &
+  Readonly<{
+    /**
+     * Run at the beginning of `complete()`, before the teardowns, and never
+     * by `dispose()`: passes on what this observable still holds through
+     * `startUpdate`, so that its subscribers see it before they see the
+     * completion. A disposed observable has no one left to tell.
+     */
+    flush?: () => void;
+  }>;
+
 type ChildObservableConfigBase<P extends NonEmptyUnknownList> = Readonly<{
   parents: Wrap<P>;
 
@@ -66,21 +109,6 @@ type ChildObservableConfigBase<P extends NonEmptyUnknownList> = Readonly<{
    * from before the update: pass `1 + Math.max(...)` over both then.
    */
   depth?: number;
-
-  /**
-   * Leaf teardown (clear timers, unsubscribe inner observables, …), run at
-   * the beginning of `complete()` — the closure replacement for
-   * `override complete() { teardown(); super.complete(); }`.
-   */
-  onComplete?: () => void;
-
-  /**
-   * Whether this observable can emit nothing more although some parent is
-   * still live, asked whenever a parent completes. `true` completes it then,
-   * as all parents completing does (`zip` once a completed source's queue is
-   * empty).
-   */
-  canEmitNoMore?: () => boolean;
 }>;
 
 export type ChildObservableConfig<
@@ -89,24 +117,6 @@ export type ChildObservableConfig<
 > = ChildObservableConfigBase<P> &
   Readonly<{
     initialValue: Optional<A>;
-  }>;
-
-/**
- * An async child can also hold a value it has not passed on yet (`debounce`'s
- * pending value), which completing should not lose.
- */
-export type AsyncChildObservableConfig<
-  A,
-  P extends NonEmptyUnknownList,
-> = ChildObservableConfig<A, P> &
-  Readonly<{
-    /**
-     * Run at the beginning of `complete()`, before `onComplete`, and never by
-     * `dispose()`: passes on what this observable still holds through
-     * `startUpdate`, so that its subscribers see it before they see the
-     * completion. A disposed observable has no one left to tell.
-     */
-    flush?: (startUpdate: (nextValue: A) => void) => void;
   }>;
 
 export type InitializedChildObservableConfig<
@@ -122,13 +132,15 @@ export type InitializedChildObservableConfig<
  * at all, in the same update as they do. `map`, `filter`, `combine` and the
  * other synchronous operators are built with it.
  *
- * `createTryUpdate` receives the tools and returns `tryUpdate`, which is
- * called with the token of every update that reaches this observable. A
- * parent that did not emit in that update has a different `updateToken`; to
- * emit, call `setNext` with the token received.
- * `createTryUpdate` runs during construction, before the observable is
- * registered to its parents, so the operator's state can live either in the
- * enclosing factory or inside the `createTryUpdate` closure.
+ * `init` runs during construction and receives the tools. It returns
+ * `tryUpdate`, which is called with the token of every update that reaches
+ * this observable — a parent that did not emit in that update has a different
+ * `updateToken`; to emit, call `setNext` with the token received — or an
+ * object holding `tryUpdate` and the other hooks
+ * ({@link SyncChildObservableHooks}). State the hooks share can live inside
+ * `init`, next to the teardown it registers with the `onComplete` tool.
+ * `init` may complete the observable; it is then never registered to its
+ * parents.
  *
  * @example
  *
@@ -175,17 +187,20 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
     parents,
     depth = 1 + maxDepth(parents),
     initialValue,
-    onComplete,
-    canEmitNoMore,
   }: ChildObservableConfig<A, P>,
-  createTryUpdate: (
+  init: (
     tools: SyncChildObservableTools<A>,
-  ) => (updateToken: UpdateToken) => void,
+  ) => ((updateToken: UpdateToken) => void) | SyncChildObservableHooks,
 ): SyncChildObservable<A, P> => {
   const handle = createObservableBaseHandle<A>(initialValue);
 
+  const teardowns = createTeardownList(handle.isCompleted);
+
   /** Set once assembled; see {@link unregisterChild}. */
   let mut_self: ChildObservableNode<A> | undefined = undefined;
+
+  /** Set once `init` returns; see {@link SyncChildObservableHooks}. */
+  let mut_canEmitNoMore: (() => boolean) | undefined = undefined;
 
   // Completing never reaches the parents: an upstream observable may be
   // shared, and only whoever owns it decides when it ends (#2133).
@@ -197,7 +212,7 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
       return;
     }
 
-    onComplete?.();
+    teardowns.runAll();
 
     handle.completeBase();
 
@@ -213,25 +228,30 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
     }
 
     // No live parent is left, or no value can come from the live ones.
-    if (parents.every((p) => p.isCompleted) || canEmitNoMore?.() === true) {
+    if (parents.every((p) => p.isCompleted) || mut_canEmitNoMore?.() === true) {
       complete();
     }
   };
 
-  const tryUpdate = createTryUpdate({
-    setNext: handle.setNext,
-    getSnapshot: handle.getSnapshot,
-    complete,
-    completeAfterPropagation: () => {
-      runAfterPropagation(complete);
-    },
-  });
+  const hooks = toHooks(
+    init({
+      setNext: handle.setNext,
+      getSnapshot: handle.getSnapshot,
+      complete,
+      completeAfterPropagation: () => {
+        runAfterPropagation(complete);
+      },
+      onComplete: teardowns.add,
+    }),
+  );
+
+  mut_canEmitNoMore = hooks.canEmitNoMore;
 
   const observable: SyncChildObservableNode<A, P> = assembleObservable({
     kind: 'sync child',
     depth,
     handle,
-    tryUpdate,
+    tryUpdate: hooks.tryUpdate,
     tryComplete,
     complete,
     dispose: complete,
@@ -239,9 +259,9 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
   });
 
   // Completed parents never update again, so a child created under them is
-  // complete from the start; registering it would only leave a reference in
-  // each parent (#2248).
-  if (parents.every((p) => p.isCompleted)) {
+  // complete from the start (#2248), as is one `init` completed; registering
+  // it would only leave a reference in each parent.
+  if (handle.isCompleted() || parents.every((p) => p.isCompleted)) {
     complete();
   } else {
     registerChild(observable, parents);
@@ -264,11 +284,11 @@ export const createInitializedSyncChildObservable = <
   P extends NonEmptyUnknownList,
 >(
   config: InitializedChildObservableConfig<A, P>,
-  createTryUpdate: (
+  init: (
     tools: SyncChildObservableTools<A>,
-  ) => (updateToken: UpdateToken) => void,
+  ) => ((updateToken: UpdateToken) => void) | SyncChildObservableHooks,
 ): InitializedSyncChildObservable<A, P> => {
-  const observable = createSyncChildObservable<A, P>(config, createTryUpdate);
+  const observable = createSyncChildObservable<A, P>(config, init);
 
   return (
     // `getSnapshot` always returns `Some` here: `initialValue` is a `Some` and
@@ -282,29 +302,32 @@ export const createInitializedSyncChildObservable = <
  * Creates an async-child observable: one derived from `parents` that may emit
  * later, in an update of its own, through `startUpdate` (`debounce`,
  * `switchMap`). It may also emit synchronously with `setNext`, as a sync child
- * does. See {@link createSyncChildObservable} for the `createTryUpdate`
- * contract.
+ * does. See {@link createSyncChildObservable} for the `init` contract; an
+ * async child's `init` may also return a `flush` hook
+ * ({@link AsyncChildObservableHooks}).
  */
 export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
   {
     parents,
     depth = 1 + maxDepth(parents),
     initialValue,
-    onComplete,
-    canEmitNoMore,
-    flush,
-  }: AsyncChildObservableConfig<A, P>,
-  createTryUpdate: (
+  }: ChildObservableConfig<A, P>,
+  init: (
     tools: AsyncChildObservableTools<A>,
-  ) => (updateToken: UpdateToken) => void,
+  ) => ((updateToken: UpdateToken) => void) | AsyncChildObservableHooks,
 ): AsyncChildObservable<A, P> => {
   const handle = createObservableBaseHandle<A>(initialValue);
 
   const { addDescendant, deleteDescendant, startUpdate } =
     createManagerObservableParts(handle);
 
+  const teardowns = createTeardownList(handle.isCompleted);
+
   /** Set once assembled; see {@link unregisterChild}. */
   let mut_self: ChildObservableNode<A> | undefined = undefined;
+
+  /** Set once `init` returns; see {@link AsyncChildObservableHooks}. */
+  let mut_hooks: AsyncChildObservableHooks | undefined = undefined;
 
   // Neither this nor `complete` reaches the parents: an upstream observable
   // may be shared, and only whoever owns it decides when it ends (#2133).
@@ -316,7 +339,7 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
       return;
     }
 
-    onComplete?.();
+    teardowns.runAll();
 
     handle.completeBase();
 
@@ -331,7 +354,7 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
       return;
     }
 
-    flush?.(startUpdate);
+    mut_hooks?.flush?.();
 
     dispose();
   };
@@ -343,26 +366,34 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     }
 
     // No live parent is left, or no value can come from the live ones.
-    if (parents.every((p) => p.isCompleted) || canEmitNoMore?.() === true) {
+    if (
+      parents.every((p) => p.isCompleted) ||
+      mut_hooks?.canEmitNoMore?.() === true
+    ) {
       complete();
     }
   };
 
-  const tryUpdate = createTryUpdate({
-    setNext: handle.setNext,
-    getSnapshot: handle.getSnapshot,
-    complete,
-    completeAfterPropagation: () => {
-      runAfterPropagation(complete);
-    },
-    startUpdate,
-  });
+  const hooks = toHooks(
+    init({
+      setNext: handle.setNext,
+      getSnapshot: handle.getSnapshot,
+      complete,
+      completeAfterPropagation: () => {
+        runAfterPropagation(complete);
+      },
+      onComplete: teardowns.add,
+      startUpdate,
+    }),
+  );
+
+  mut_hooks = hooks;
 
   const observable: AsyncChildObservableNode<A, P> = assembleObservable({
     kind: 'async child',
     depth,
     handle,
-    tryUpdate,
+    tryUpdate: hooks.tryUpdate,
     tryComplete,
     complete,
     dispose,
@@ -370,9 +401,9 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
   });
 
   // Completed parents never update again, so a child created under them is
-  // complete from the start; registering it would only leave a reference in
-  // each parent (#2248).
-  if (parents.every((p) => p.isCompleted)) {
+  // complete from the start (#2248), as is one `init` completed; registering
+  // it would only leave a reference in each parent.
+  if (handle.isCompleted() || parents.every((p) => p.isCompleted)) {
     complete();
   } else {
     registerChild(observable, parents);
@@ -384,6 +415,14 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
 };
 
 /* helpers */
+
+/** `init` may return `tryUpdate` alone, or it with the other hooks. */
+const toHooks = (
+  returned: ((updateToken: UpdateToken) => void) | AsyncChildObservableHooks,
+): AsyncChildObservableHooks =>
+  typeof returned === 'function'
+    ? ({ tryUpdate: returned } as const)
+    : returned;
 
 /**
  * Detects circular dependencies by walking the full ancestor chain of the
@@ -486,7 +525,7 @@ const registerChild = <A,>(
  * `tryUpdate` on every update (#2134).
  *
  * A completion that happens while the child is still being constructed (from
- * a leaf factory's `createTryUpdate`) precedes its registration, so there is
+ * its `init`) precedes its registration, which is then skipped, so there is
  * nothing to undo; `mut_self` is still `undefined` then.
  */
 const unregisterChild = <A,>(

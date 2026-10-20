@@ -96,63 +96,66 @@ const createZipObservable = <const A extends NonEmptyUnknownList>(
     ? Optional.some(Arr.map(parentsValues, (c) => c.value))
     : Optional.none;
 
-  const queues: TupleToQueueTuple<A> = Arr.map(parents, () => createQueue());
-
-  // The token of each parent's latest value that zip has taken in, so that a
-  // value a parent emits in the update it completes in — its `tryComplete`
-  // reaches zip before its `tryUpdate` does — still counts as queued.
-  const mut_takenTokens: UpdateToken[] = Array.from(
-    parents,
-    (p) => p.updateToken,
-  );
-
-  // No tuple can be completed any more once a completed source has nothing
-  // left to pair (#2343).
-  const canEmitNoMore = (): boolean =>
-    parents.some(
-      (par, index) =>
-        par.isCompleted &&
-        queues[index]?.isEmpty === true &&
-        (par.updateToken === mut_takenTokens[index] ||
-          Optional.isNone(par.getSnapshot())),
-    );
-
   return createSyncChildObservable<A, A>(
-    {
-      parents,
-      initialValue,
-      canEmitNoMore,
-    },
-    ({ setNext, complete }) =>
-      (updateToken) => {
-        for (const [index, par] of parents.entries()) {
-          const sn = par.getSnapshot();
+    { parents, initialValue },
+    ({ setNext, complete }) => {
+      const queues: TupleToQueueTuple<A> = Arr.map(parents, () =>
+        createQueue(),
+      );
 
-          if (!(par.updateToken === updateToken && Optional.isSome(sn))) {
-            continue;
+      // The token of each parent's latest value that zip has taken in, so
+      // that a value a parent emits in the update it completes in — its
+      // `tryComplete` reaches zip before its `tryUpdate` does — still counts
+      // as queued.
+      const mut_takenTokens: UpdateToken[] = Array.from(
+        parents,
+        (p) => p.updateToken,
+      );
+
+      // No tuple can be completed any more once a completed source has
+      // nothing left to pair (#2343).
+      const canEmitNoMore = (): boolean =>
+        parents.some(
+          (par, index) =>
+            par.isCompleted &&
+            queues[index]?.isEmpty === true &&
+            (par.updateToken === mut_takenTokens[index] ||
+              Optional.isNone(par.getSnapshot())),
+        );
+
+      return {
+        tryUpdate: (updateToken) => {
+          for (const [index, par] of parents.entries()) {
+            const sn = par.getSnapshot();
+
+            if (!(par.updateToken === updateToken && Optional.isSome(sn))) {
+              continue;
+            }
+
+            queues[index]?.enqueue(sn.value);
+
+            mut_takenTokens[index] = updateToken;
           }
 
-          queues[index]?.enqueue(sn.value);
+          if (queues.some((list) => list.isEmpty)) {
+            return;
+          }
 
-          mut_takenTokens[index] = updateToken;
-        }
+          const nextValue =
+            // `Arr.map` has a single result element type, so it reports
+            // `A[number] | undefined` per position rather than `A[P]`.
+            // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+            Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
 
-        if (queues.some((list) => list.isEmpty)) {
-          return;
-        }
+          setNext(nextValue, updateToken);
 
-        const nextValue =
-          // `Arr.map` has a single result element type, so it reports
-          // `A[number] | undefined` per position rather than `A[P]`.
-          // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-          Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
-
-        setNext(nextValue, updateToken);
-
-        if (canEmitNoMore()) {
-          complete();
-        }
-      },
+          if (canEmitNoMore()) {
+            complete();
+          }
+        },
+        canEmitNoMore,
+      };
+    },
   );
 };
 

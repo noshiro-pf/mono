@@ -117,60 +117,59 @@ export const audit = <A,>(
 const createAuditObservable = <A,>(
   parentObservable: Observable<A>,
   milliSeconds: number,
-): AuditOperatorObservable<A> => {
-  /** Set while a window is open; its end passes on the latest value. */
-  let mut_timerId: TimerId | undefined = undefined;
-
-  const resetTimer = (): void => {
-    if (mut_timerId === undefined) {
-      return;
-    }
-
-    clearTimeout(mut_timerId);
-
-    mut_timerId = undefined;
-  };
-
-  /** Ends the open window, passing on the latest value of the source. */
-  const emitLatest = (startUpdate: (nextValue: A) => void): void => {
-    mut_timerId = undefined;
-
-    const sn = parentObservable.getSnapshot();
-
-    if (Optional.isSome(sn)) {
-      startUpdate(sn.value);
-    }
-  };
-
-  return createAsyncChildObservable(
+): AuditOperatorObservable<A> =>
+  createAsyncChildObservable(
     {
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-      onComplete: resetTimer,
-      flush: (startUpdate) => {
+    },
+    ({ startUpdate, onComplete }) => {
+      /** Set while a window is open; its end passes on the latest value. */
+      let mut_timerId: TimerId | undefined = undefined;
+
+      /** Ends the open window, passing on the latest value of the source. */
+      const emitLatest = (): void => {
+        mut_timerId = undefined;
+
+        const sn = parentObservable.getSnapshot();
+
+        if (Optional.isSome(sn)) {
+          startUpdate(sn.value);
+        }
+      };
+
+      onComplete(() => {
         if (mut_timerId === undefined) {
           return;
         }
 
         clearTimeout(mut_timerId);
 
-        emitLatest(startUpdate);
-      },
-    },
-    ({ startUpdate }) =>
-      (updateToken) => {
-        if (
-          mut_timerId !== undefined ||
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(parentObservable.getSnapshot())
-        ) {
-          return; // skip update
-        }
+        mut_timerId = undefined;
+      });
 
-        // set timer
-        mut_timerId = setTimeout(() => {
-          emitLatest(startUpdate);
-        }, milliSeconds);
-      },
+      return {
+        tryUpdate: (updateToken) => {
+          if (
+            mut_timerId !== undefined ||
+            parentObservable.updateToken !== updateToken ||
+            Optional.isNone(parentObservable.getSnapshot())
+          ) {
+            return; // skip update
+          }
+
+          // set timer
+          mut_timerId = setTimeout(emitLatest, milliSeconds);
+        },
+        flush: () => {
+          if (mut_timerId === undefined) {
+            return;
+          }
+
+          clearTimeout(mut_timerId);
+
+          emitLatest();
+        },
+      };
+    },
   );
-};

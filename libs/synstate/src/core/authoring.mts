@@ -8,11 +8,12 @@ export {
   createInitializedSyncChildObservable,
   createRootObservable,
   createSyncChildObservable,
-  type AsyncChildObservableConfig,
+  type AsyncChildObservableHooks,
   type AsyncChildObservableTools,
   type ChildObservableConfig,
   type InitializedChildObservableConfig,
   type RootObservableConfig,
   type RootObservableTools,
+  type SyncChildObservableHooks,
   type SyncChildObservableTools,
 } from './base/index.mjs';

@@ -65,32 +65,37 @@ export const skipUntil =
 const createSkipUntilObservable = <A,>(
   parentObservable: Observable<A>,
   notifier: Observable<unknown>,
-): SkipUntilOperatorObservable<A> => {
-  // A notifier that already holds a value, or has completed, would call
-  // `stopSkipping` inside `subscribe`, before the subscription is stored.
-  let mut_isSkipping =
-    Optional.isNone(notifier.getSnapshot()) && !notifier.isCompleted;
-
-  let mut_subscription: Subscription | undefined = undefined;
-
-  const stopSkipping = (): void => {
-    mut_isSkipping = false;
-
-    mut_subscription?.unsubscribe();
-
-    mut_subscription = undefined;
-  };
-
-  const observable = createSyncChildObservable<A, readonly [A]>(
+): SkipUntilOperatorObservable<A> =>
+  createSyncChildObservable<A, readonly [A]>(
     {
       parents: [parentObservable],
       initialValue: Optional.none,
-      onComplete: () => {
-        mut_subscription?.unsubscribe();
-      },
     },
-    ({ setNext }) =>
-      (updateToken) => {
+    ({ setNext, onComplete }) => {
+      // A notifier that already holds a value, or has completed, would call
+      // `stopSkipping` inside `subscribe`, before the subscription is stored.
+      let mut_isSkipping =
+        Optional.isNone(notifier.getSnapshot()) && !notifier.isCompleted;
+
+      let mut_subscription: Subscription | undefined = undefined;
+
+      const stopSkipping = (): void => {
+        mut_isSkipping = false;
+
+        mut_subscription?.unsubscribe();
+
+        mut_subscription = undefined;
+      };
+
+      if (mut_isSkipping) {
+        mut_subscription = notifier.subscribe(stopSkipping, stopSkipping);
+      }
+
+      onComplete(() => {
+        mut_subscription?.unsubscribe();
+      });
+
+      return (updateToken) => {
         const sn = parentObservable.getSnapshot();
 
         if (
@@ -102,12 +107,6 @@ const createSkipUntilObservable = <A,>(
         }
 
         setNext(sn.value, updateToken);
-      },
+      };
+    },
   );
-
-  if (mut_isSkipping) {
-    mut_subscription = notifier.subscribe(stopSkipping, stopSkipping);
-  }
-
-  return observable;
-};

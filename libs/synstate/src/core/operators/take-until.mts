@@ -3,7 +3,6 @@ import { createSyncChildObservable } from '../base/index.mjs';
 import type {
   KeepInitialValueOperator,
   Observable,
-  Subscription,
   TakeUntilOperatorObservable,
 } from '../types/index.mjs';
 
@@ -68,19 +67,23 @@ export const takeUntil = <A,>(
 const createTakeUntilObservable = <A,>(
   parentObservable: Observable<A>,
   notifier: Observable<unknown>,
-): TakeUntilOperatorObservable<A> => {
-  let mut_subscription: Subscription | undefined = undefined;
-
-  const observable = createSyncChildObservable<A, readonly [A]>(
+): TakeUntilOperatorObservable<A> =>
+  createSyncChildObservable<A, readonly [A]>(
     {
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-      onComplete: () => {
-        mut_subscription?.unsubscribe();
-      },
     },
-    ({ setNext }) =>
-      (updateToken) => {
+    ({ setNext, complete, onComplete }) => {
+      // A notifier that already holds a value completes this observable
+      // inside `subscribe`; the teardown registered after it then runs at
+      // once.
+      const subscription = notifier.subscribe(complete, complete);
+
+      onComplete(() => {
+        subscription.unsubscribe();
+      });
+
+      return (updateToken) => {
         const sn = parentObservable.getSnapshot();
 
         if (
@@ -91,25 +94,6 @@ const createTakeUntilObservable = <A,>(
         }
 
         setNext(sn.value, updateToken);
-      },
-  );
-
-  const subscription = notifier.subscribe(
-    () => {
-      observable.complete();
-    },
-    () => {
-      observable.complete();
+      };
     },
   );
-
-  // A notifier that already holds a value completes `observable` inside
-  // `subscribe`, before `onComplete` can see the subscription.
-  if (observable.isCompleted) {
-    subscription.unsubscribe();
-  } else {
-    mut_subscription = subscription;
-  }
-
-  return observable;
-};

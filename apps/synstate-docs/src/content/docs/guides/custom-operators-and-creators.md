@@ -18,7 +18,7 @@ The names follow `kind`, which every observable carries and which a debugger sho
 
 ## A sync operator
 
-A child factory takes a config and a `createTryUpdate` callback. `createTryUpdate` receives the tools the new observable may use on itself and returns `tryUpdate`, which SynState calls with the token of every update that reaches the observable.
+A child factory takes a config and an `init` callback. `init` runs once, while the observable is created; it receives the tools the new observable may use on itself and returns `tryUpdate`, which SynState calls with the token of every update that reaches the observable.
 
 ```ts
 import { Optional } from 'ts-data-forge';
@@ -64,28 +64,36 @@ createSyncChildObservable(
 
 ### Config
 
-| Field           | Meaning                                                                                                                      |
-| :-------------- | :--------------------------------------------------------------------------------------------------------------------------- |
-| `parents`       | The observables this one is derived from                                                                                     |
-| `initialValue`  | `Optional.some(v)` or `Optional.none`                                                                                        |
-| `depth`         | Defaults to one more than the deepest parent's; must also be greater than that of any observable read without being a parent |
-| `onComplete`    | Teardown (clear timers, unsubscribe), run when the observable completes                                                      |
-| `canEmitNoMore` | Asked when a parent completes; `true` completes this observable although some parent is still live                           |
-| `flush`         | Async children only: passes on a pending value through `startUpdate` before completing, never on `dispose`                   |
+| Field          | Meaning                                                                                                                      |
+| :------------- | :--------------------------------------------------------------------------------------------------------------------------- |
+| `parents`      | The observables this one is derived from                                                                                     |
+| `initialValue` | `Optional.some(v)` or `Optional.none`                                                                                        |
+| `depth`        | Defaults to one more than the deepest parent's; must also be greater than that of any observable read without being a parent |
 
 ### Tools
 
-| Tool                         | Meaning                                                                   |
-| :--------------------------- | :------------------------------------------------------------------------ |
-| `setNext(value, token)`      | Emit `value` in the update `token` names                                  |
-| `getSnapshot()`              | This observable's current value                                           |
-| `complete()`                 | Complete this observable now                                              |
-| `completeAfterPropagation()` | Complete it once the current update has reached every descendant (`take`) |
-| `startUpdate(value)`         | Async children only: emit `value` in a new update of its own              |
+| Tool                         | Meaning                                                                                                |
+| :--------------------------- | :----------------------------------------------------------------------------------------------------- |
+| `setNext(value, token)`      | Emit `value` in the update `token` names                                                               |
+| `getSnapshot()`              | This observable's current value                                                                        |
+| `complete()`                 | Complete this observable now                                                                           |
+| `completeAfterPropagation()` | Complete it once the current update has reached every descendant (`take`)                              |
+| `onComplete(teardown)`       | Register a teardown (clear timers, unsubscribe), run once when the observable completes or is disposed |
+| `startUpdate(value)`         | Async children only: emit `value` in a new update of its own                                           |
+
+### Returning more than `tryUpdate`
+
+`init` may return an object instead of `tryUpdate` alone, when the operator has to answer more than updates. The hooks read the state `init` creates, so it lives in one place.
+
+| Hook            | Meaning                                                                                                    |
+| :-------------- | :--------------------------------------------------------------------------------------------------------- |
+| `tryUpdate`     | Called with the token of every update that reaches the observable                                          |
+| `canEmitNoMore` | Asked when a parent completes; `true` completes this observable although some parent is still live (`zip`) |
+| `flush`         | Async children only: passes on a pending value through `startUpdate` before completing, never on `dispose` |
 
 ## An async operator
 
-An async child emits later through `startUpdate`, which starts an update of its own and propagates it to everything derived from the observable.
+An async child emits later through `startUpdate`, which starts an update of its own and propagates it to everything derived from the observable. The timers are created in `init`, next to the teardown that clears them. `debounce` also returns a `flush` that passes on the value its timer still holds when it completes.
 
 ```ts
 import { Optional } from 'ts-data-forge';
@@ -94,23 +102,19 @@ import { createAsyncChildObservable, type Observable } from 'synstate';
 export const delay = (
     src: Observable<number>,
     ms: number,
-): Observable<number> => {
-    const mut_timers = new Set<ReturnType<typeof setTimeout>>();
+): Observable<number> =>
+    createAsyncChildObservable(
+        { parents: [src], initialValue: Optional.none },
+        ({ startUpdate, onComplete }) => {
+            const mut_timers = new Set<ReturnType<typeof setTimeout>>();
 
-    return createAsyncChildObservable(
-        {
-            parents: [src],
-            initialValue: Optional.none,
-            onComplete: () => {
+            onComplete(() => {
                 for (const t of mut_timers) {
                     clearTimeout(t);
                 }
+            });
 
-                mut_timers.clear();
-            },
-        },
-        ({ startUpdate }) =>
-            (updateToken) => {
+            return (updateToken) => {
                 const sn = src.getSnapshot();
 
                 if (src.updateToken !== updateToken || Optional.isNone(sn)) {
@@ -124,9 +128,9 @@ export const delay = (
                 }, ms);
 
                 mut_timers.add(t);
-            },
+            };
+        },
     );
-};
 ```
 
 ## A creator
@@ -155,7 +159,7 @@ export const fromEvent = (
     );
 ```
 
-The `onComplete` tool registers a teardown from inside `init`, so it can close over what `init` creates (here the listener). A root's config has no `onComplete`: teardowns run once, in the order registered, when the observable completes or is disposed; registered after the observable has completed (`init` may complete it synchronously), it runs at once.
+The `onComplete` tool registers a teardown from inside `init`, so it can close over what `init` creates (here the listener). Neither factory's config has an `onComplete`: teardowns run once, in the order registered, when the observable completes or is disposed; registered after the observable has completed (`init` may complete it synchronously), it runs at once.
 
 ## What you cannot do
 

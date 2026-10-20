@@ -98,25 +98,24 @@ export const throttle = <A,>(
 const createThrottleObservable = <A,>(
   parentObservable: Observable<A>,
   milliSeconds: number,
-): ThrottleOperatorObservable<A> => {
-  let mut_timerId: TimerId | undefined = undefined;
-
-  let mut_isSkipping = false;
-
-  const resetTimer = (): void => {
-    if (mut_timerId !== undefined) {
-      clearTimeout(mut_timerId);
-    }
-  };
-
-  return createSyncChildObservable(
+): ThrottleOperatorObservable<A> =>
+  createSyncChildObservable(
     {
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-      onComplete: resetTimer,
     },
-    ({ setNext }) =>
-      (updateToken) => {
+    ({ setNext, onComplete }) => {
+      let mut_timerId: TimerId | undefined = undefined;
+
+      let mut_isSkipping = false;
+
+      onComplete(() => {
+        if (mut_timerId !== undefined) {
+          clearTimeout(mut_timerId);
+        }
+      });
+
+      return (updateToken) => {
         const sn = parentObservable.getSnapshot();
 
         if (
@@ -135,6 +134,6 @@ const createThrottleObservable = <A,>(
         mut_timerId = setTimeout(() => {
           mut_isSkipping = false;
         }, milliSeconds);
-      },
+      };
+    },
   );
-};
