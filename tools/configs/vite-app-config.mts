@@ -11,9 +11,10 @@ import { appDevPort } from './app-dev-ports.mjs';
  * (so `index.html` and `public/` are found where they sit), and the output
  * goes to `build/`, which is the directory each app's `firebase.json` serves.
  *
- * Preact apps pass no plugin. Vite's esbuild transform reads `jsx` and
- * `jsxImportSource` from the package's `tsconfig.json`, which already say
- * `react-jsx` and `preact`, so the build matches what the type check sees.
+ * Preact and synstate-dom apps pass no plugin. Vite's esbuild transform reads
+ * `jsx` and `jsxImportSource` from the package's `tsconfig.json`, which already
+ * say `react-jsx` and `preact` (or `synstate-dom`), so the build matches what
+ * the type check sees.
  * `@vitejs/plugin-react` is here for React's Fast Refresh; the Preact
  * equivalent would pull Babel in, which is not worth a dev-server nicety for
  * apps this repository does not deploy.
@@ -30,7 +31,7 @@ export const defineViteAppConfig = ({
 }: Readonly<{
   /** The package's root directory, i.e. the parent of `configs`. */
   packageRoot: string;
-  framework: 'preact' | 'react';
+  framework: 'preact' | 'react' | 'synstate-dom';
   /**
    * Passed to `@vitejs/plugin-react` so that the build agrees with the
    * package's `tsconfig.json`. Emotion's `css` prop needs

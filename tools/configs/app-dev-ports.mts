@@ -27,6 +27,7 @@ const appDevPorts = {
   'mahjong-calculator-app': 5192,
   'my-portfolio-app-preact': 5193,
   'pr-manager-app': 5194,
+  'synstate-dom-sample-app': 5196,
   'task-manager-app': 5195,
 } as const;
 
