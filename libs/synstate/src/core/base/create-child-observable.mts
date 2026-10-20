@@ -1,4 +1,4 @@
-import { Arr, type Optional, type Some } from 'ts-data-forge';
+import { hasKey, isRecord, type Optional, type Some } from 'ts-data-forge';
 import { panic } from 'ts-std-forge';
 import type { MutableSet } from 'ts-type-forge';
 import type {
@@ -6,25 +6,23 @@ import type {
   InitializedSyncChildObservable,
   NonEmptyUnknownList,
   Observable,
-  ObservableId,
   SyncChildObservable,
   UpdateToken,
   Wrap,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
 import {
-  assembleObservable,
-  createManagerObservableParts,
-  createObservableBaseHandle,
-  createTeardownList,
+  addTeardown,
+  adoptIntoCurrentScope,
+  completeNode,
+  createNodeRecord,
+  registerChild,
   runAfterPropagation,
+  setNext,
+  startUpdate,
+  toPublic,
 } from './create-observable-base.mjs';
-import {
-  toNode,
-  type AsyncChildObservableNode,
-  type ChildObservableNode,
-  type SyncChildObservableNode,
-} from './observable-node.mjs';
+import { asMutable, type NodeRecord } from './observable-node.mjs';
 
 /**
  * The tools a sync-child factory (`map`, `filter`, `zip`, …) receives: what
@@ -192,84 +190,29 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
     tools: SyncChildObservableTools<A>,
   ) => ((updateToken: UpdateToken) => void) | SyncChildObservableHooks,
 ): SyncChildObservable<A, P> => {
-  const handle = createObservableBaseHandle<A>(initialValue);
-
-  const teardowns = createTeardownList(handle.isCompleted);
-
-  /** Set once assembled; see {@link unregisterChild}. */
-  let mut_self: ChildObservableNode<A> | undefined = undefined;
-
-  /** Set once `init` returns; see {@link SyncChildObservableHooks}. */
-  let mut_canEmitNoMore: (() => boolean) | undefined = undefined;
-
-  // Completing never reaches the parents: an upstream observable may be
-  // shared, and only whoever owns it decides when it ends (#2133).
-  const complete = (): void => {
-    // A completed node is reached again through every parent that completes
-    // after it; running again would repeat the teardown and the ancestor walk
-    // in `unregisterChild`.
-    if (handle.isCompleted()) {
-      return;
-    }
-
-    teardowns.runAll();
-
-    handle.completeBase();
-
-    if (mut_self !== undefined) {
-      unregisterChild(mut_self, parents);
-    }
-  };
-
-  // Called by a parent that has completed.
-  const tryComplete = (): void => {
-    if (handle.isCompleted()) {
-      return;
-    }
-
-    // No live parent is left, or no value can come from the live ones.
-    if (parents.every((p) => p.isCompleted) || mut_canEmitNoMore?.() === true) {
-      complete();
-    }
-  };
+  const node = createNodeRecord<A>('sync child', depth, parents, initialValue);
 
   const hooks = toHooks(
     init({
-      setNext: handle.setNext,
-      getSnapshot: handle.getSnapshot,
-      complete,
-      completeAfterPropagation: () => {
-        runAfterPropagation(complete);
+      setNext: (nextValue, updateToken) => {
+        setNext(node, nextValue, updateToken);
       },
-      onComplete: teardowns.add,
+      getSnapshot: () => node.snapshot,
+      complete: () => {
+        completeNode(node);
+      },
+      completeAfterPropagation: () => {
+        runAfterPropagation(() => {
+          completeNode(node);
+        });
+      },
+      onComplete: (teardown) => {
+        addTeardown(node, teardown);
+      },
     }),
   );
 
-  mut_canEmitNoMore = hooks.canEmitNoMore;
-
-  const observable: SyncChildObservableNode<A, P> = assembleObservable({
-    kind: 'sync child',
-    depth,
-    handle,
-    tryUpdate: hooks.tryUpdate,
-    tryComplete,
-    complete,
-    dispose: complete,
-    extra: { parents },
-  });
-
-  // Completed parents never update again, so a child created under them is
-  // complete from the start (#2248), as is one `init` completed; registering
-  // it would only leave a reference in each parent.
-  if (handle.isCompleted() || parents.every((p) => p.isCompleted)) {
-    complete();
-  } else {
-    registerChild(observable, parents);
-
-    mut_self = observable;
-  }
-
-  return observable;
+  return finishChild(node, hooks);
 };
 
 /**
@@ -316,105 +259,46 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     tools: AsyncChildObservableTools<A>,
   ) => ((updateToken: UpdateToken) => void) | AsyncChildObservableHooks,
 ): AsyncChildObservable<A, P> => {
-  const handle = createObservableBaseHandle<A>(initialValue);
-
-  const { addDescendant, deleteDescendant, startUpdate } =
-    createManagerObservableParts(handle);
-
-  const teardowns = createTeardownList(handle.isCompleted);
-
-  /** Set once assembled; see {@link unregisterChild}. */
-  let mut_self: ChildObservableNode<A> | undefined = undefined;
-
-  /** Set once `init` returns; see {@link AsyncChildObservableHooks}. */
-  let mut_hooks: AsyncChildObservableHooks | undefined = undefined;
-
-  // Neither this nor `complete` reaches the parents: an upstream observable
-  // may be shared, and only whoever owns it decides when it ends (#2133).
-  const dispose = (): void => {
-    // A completed node is reached again through every parent that completes
-    // after it; running again would repeat the teardown and the ancestor walk
-    // in `unregisterChild`.
-    if (handle.isCompleted()) {
-      return;
-    }
-
-    teardowns.runAll();
-
-    handle.completeBase();
-
-    if (mut_self !== undefined) {
-      unregisterChild(mut_self, parents);
-    }
-  };
-
-  // Unlike `dispose`, passes on what this observable still holds first.
-  const complete = (): void => {
-    if (handle.isCompleted()) {
-      return;
-    }
-
-    mut_hooks?.flush?.();
-
-    dispose();
-  };
-
-  // Called by a parent that has completed.
-  const tryComplete = (): void => {
-    if (handle.isCompleted()) {
-      return;
-    }
-
-    // No live parent is left, or no value can come from the live ones.
-    if (
-      parents.every((p) => p.isCompleted) ||
-      mut_hooks?.canEmitNoMore?.() === true
-    ) {
-      complete();
-    }
-  };
+  const node = createNodeRecord<A>('async child', depth, parents, initialValue);
 
   const hooks = toHooks(
     init({
-      setNext: handle.setNext,
-      getSnapshot: handle.getSnapshot,
-      complete,
-      completeAfterPropagation: () => {
-        runAfterPropagation(complete);
+      setNext: (nextValue, updateToken) => {
+        setNext(node, nextValue, updateToken);
       },
-      onComplete: teardowns.add,
-      startUpdate,
+      startUpdate: (nextValue) => {
+        startUpdate(node, nextValue);
+      },
+      getSnapshot: () => node.snapshot,
+      complete: () => {
+        completeNode(node);
+      },
+      completeAfterPropagation: () => {
+        runAfterPropagation(() => {
+          completeNode(node);
+        });
+      },
+      onComplete: (teardown) => {
+        addTeardown(node, teardown);
+      },
     }),
   );
 
-  mut_hooks = hooks;
-
-  const observable: AsyncChildObservableNode<A, P> = assembleObservable({
-    kind: 'async child',
-    depth,
-    handle,
-    tryUpdate: hooks.tryUpdate,
-    tryComplete,
-    complete,
-    dispose,
-    extra: { parents, addDescendant, deleteDescendant },
-  });
-
-  // Completed parents never update again, so a child created under them is
-  // complete from the start (#2248), as is one `init` completed; registering
-  // it would only leave a reference in each parent.
-  if (handle.isCompleted() || parents.every((p) => p.isCompleted)) {
-    complete();
-  } else {
-    registerChild(observable, parents);
-
-    mut_self = observable;
-  }
-
-  return observable;
+  return finishChild(node, hooks);
 };
 
 /* helpers */
+
+const isDevelopmentProcess = (): boolean => {
+  const proc: unknown = Reflect.get(globalThis, 'process');
+
+  return (
+    isRecord(proc) &&
+    hasKey(proc, 'env') &&
+    isRecord(proc.env) &&
+    (!hasKey(proc.env, 'NODE_ENV') || proc.env.NODE_ENV !== 'production')
+  );
+};
 
 /** `init` may return `tryUpdate` alone, or it with the other hooks. */
 const toHooks = (
@@ -425,6 +309,16 @@ const toHooks = (
     : returned;
 
 /**
+ * Whether {@link registerChild} checks for a circular dependency: everywhere
+ * but in a process whose `NODE_ENV` is `production`. A child's parents exist
+ * before it and cannot be changed afterwards, so only code that rewrites an
+ * observable's readonly `parents` can make a cycle, while the walk over every
+ * ancestor is paid on every creation. Where there is no `process` (a browser
+ * bundle) the check is off.
+ */
+const checksCircularDependency: boolean = isDevelopmentProcess();
+
+/**
  * Detects circular dependencies by walking the full ancestor chain of the
  * given parents and checking whether `child` already appears among them.
  *
@@ -432,20 +326,20 @@ const toHooks = (
  */
 const hasCircularDependencyFrom = (
   node: Observable<unknown>,
-  mut_visited: MutableSet<ObservableId>,
-  mut_inPath: MutableSet<ObservableId>,
+  mut_visited: MutableSet<Observable<unknown>>,
+  mut_inPath: MutableSet<Observable<unknown>>,
 ): boolean => {
-  if (mut_inPath.has(node.id)) {
+  if (mut_inPath.has(node)) {
     return true;
   }
 
-  if (mut_visited.has(node.id)) {
+  if (mut_visited.has(node)) {
     return false;
   }
 
-  mut_visited.add(node.id);
+  mut_visited.add(node);
 
-  mut_inPath.add(node.id);
+  mut_inPath.add(node);
 
   if (node.kind !== 'root') {
     for (const parent of node.parents) {
@@ -455,18 +349,18 @@ const hasCircularDependencyFrom = (
     }
   }
 
-  mut_inPath.delete(node.id);
+  mut_inPath.delete(node);
 
   return false;
 };
 
-const detectCircularDependency = (
-  child: ChildObservableNode<unknown>,
+const detectCircularDependency = <A,>(
+  child: NodeRecord<A>,
   parents: readonly Observable<unknown>[],
 ): void => {
-  const mut_visited = new Set<ObservableId>();
+  const mut_visited = new Set<Observable<unknown>>();
 
-  const mut_inPath = new Set<ObservableId>([child.id]);
+  const mut_inPath = new Set<Observable<unknown>>([toPublic(child)]);
 
   for (const parent of parents) {
     if (hasCircularDependencyFrom(parent, mut_visited, mut_inPath)) {
@@ -482,75 +376,39 @@ const detectCircularDependency = (
 };
 
 /**
- * Registers `child` to its parents and to all reachable manager observables.
- * Runs after the child object is fully assembled, so parents only ever hold a
- * reference to the final composed object (the class version registered `this`
- * from inside the constructor instead).
+ * Installs the hooks `init` returned, joins the current scope, and registers
+ * the child. Completed parents never update again, so a child created under
+ * them is complete from the start (#2248), as is one `init` completed;
+ * registering it would only leave a reference in each parent.
  */
-const registerChild = <A,>(
-  child: ChildObservableNode<A>,
-  parents: readonly Observable<unknown>[],
-): void => {
-  detectCircularDependency(child, parents);
+const finishChild = <A, R>(
+  node: NodeRecord<A>,
+  hooks: AsyncChildObservableHooks,
+): R => {
+  const mut_node = asMutable(node);
 
-  for (const p of parents) {
-    toNode(p).addChild(child);
-  }
+  mut_node.tryUpdate = hooks.tryUpdate;
 
-  // register child to all reachable ManagerObservables
-  const mut_rest = Array.from(parents);
+  mut_node.canEmitNoMore = hooks.canEmitNoMore;
 
-  while (Arr.isNonEmpty(mut_rest)) {
-    const popped = mut_rest.pop();
+  mut_node.flush = hooks.flush;
 
-    if (popped === undefined) {
-      break;
+  adoptIntoCurrentScope(mut_node);
+
+  const parents = mut_node.parents ?? ([] as const);
+
+  if (mut_node.isCompleted || parents.every((p) => p.isCompleted)) {
+    completeNode(node);
+  } else {
+    if (checksCircularDependency) {
+      detectCircularDependency(mut_node, parents);
     }
 
-    const p = toNode(popped);
-
-    if (p.kind === 'sync child') {
-      // trace back dependency graph
-      mut_rest.push(...p.parents);
-    } else {
-      p.addDescendant(child);
-    }
-  }
-};
-
-/**
- * Undoes {@link registerChild} for a completed child: its parents forget it, and
- * every manager it registered to stops propagating updates to it. Without this
- * a completed node stayed reachable for as long as its root lived, and ran its
- * `tryUpdate` on every update (#2134).
- *
- * A completion that happens while the child is still being constructed (from
- * its `init`) precedes its registration, which is then skipped, so there is
- * nothing to undo; `mut_self` is still `undefined` then.
- */
-const unregisterChild = <A,>(
-  child: ChildObservableNode<A>,
-  parents: readonly Observable<unknown>[],
-): void => {
-  for (const p of parents) {
-    toNode(p).deleteChild(child);
+    registerChild(mut_node);
   }
 
-  const mut_rest = Array.from(parents);
-
-  while (Arr.isNonEmpty(mut_rest)) {
-    const popped = mut_rest.pop();
-
-    if (popped === undefined) {
-      break;
-    }
-
-    const p = toNode(popped);
-
-    if (p.kind === 'sync child') {
-      mut_rest.push(...p.parents);
-    } else {
-      p.deleteDescendant(child);
-    }
-  }
+  return (
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+    mut_node as unknown as R
+  );
 };

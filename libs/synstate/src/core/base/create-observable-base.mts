@@ -1,309 +1,278 @@
 import { Arr, Optional } from 'ts-data-forge';
 import { unreachable } from 'ts-std-forge';
-import type { MutableMap, MutableSet, ReadonlyRecord } from 'ts-type-forge';
 import type {
   InitializedObservable,
   Observable,
-  ObservableId,
   ObservableKind,
   Operator,
-  Subscriber,
-  SubscriberId,
   Subscription,
   UpdateToken,
-  WithInitialValueOperator,
 } from '../types/index.mjs';
 import {
   binarySearch,
   getCurrentScopeInternals,
-  issueObservableId,
-  issueSubscriberId,
   issueUpdateToken,
+  notUpdatedYet,
   observableBrand,
   toSubscriber,
 } from '../utils/index.mjs';
-import type {
-  ChildObservableNode,
-  ObservableBaseNode,
+import {
+  asMutable,
+  toRecord,
+  type MutableNodeRecord,
+  type NodeRecord,
 } from './observable-node.mjs';
 
 /**
- * The mutable core shared by every observable, expressed as closures instead of
- * a base class.
+ * The public methods every observable shares: each {@link NodeRecord} holds
+ * these same functions, so creating one allocates no closure. They are called on the observable
+ * (`obs$.subscribe(...)`), and taking one off it to call alone is not
+ * supported: each reads the observable it was called on.
  *
- * The returned handle is the "protected" surface of the former
- * `ObservableBaseClass`: the layer factories (`createRootObservable`,
- * `createSyncChildObservable`, `createAsyncChildObservable`) build the public
- * object from it via {@link assembleObservable}, and leaf factories receive
- * only the narrow tools they need. Neither the handle nor its type is exported
- * from the package (`core/base/**` is excluded from index generation), so
- * `setNext` and friends stay internal, as `protected` kept them before.
+ * `this` is what Sumi bans (D-12); it is allowed
+ * here alone, because a node is created for every derived value of a UI and
+ * the closures the ban leads to cost several times what the rest of creating
+ * one does.
  */
-export type ObservableBaseHandle<A> = Readonly<{
-  id: ObservableId;
-
-  /**
-   * Registers the public object {@link assembleObservable} built from this
-   * handle, so that its four state flags (`isCompleted`, `updateToken`,
-   * `hasSubscriber`, `hasChild`) can be mirrored onto it as plain data
-   * properties.
-   *
-   * They used to be getters delegating to this handle's closures, and that
-   * costs more than it looks. Reading one was an accessor call plus a closure
-   * call where a field read would do — `updateToken` is read once per child
-   * per update, so the propagation path paid it on every step — and an object
-   * literal carrying accessors is far more expensive to create than one
-   * carrying data, which is most of what building a graph costs. Measured on
-   * one machine with `pnpm run benchmark`: the derived chain's 100,000 updates
-   * 16.7 ms -> 13.6 ms, and the cascaded diamond at N=20, whose measurement is
-   * dominated by graph construction, 587 ms -> 362 ms.
-   *
-   * Every write below therefore has to keep the mirror in step; that is the
-   * price of not reading through a closure on the hot path. It is paid in
-   * clarity too, and on purpose: `hasSubscriber` and `hasChild` are derived
-   * from `mut_subscribers` and `mut_children`, which a getter stated once and
-   * declaratively, whereas the mirror restates it at every write.
-   *
-   * Nor can the rarely read flags alone go back to getters while `updateToken`
-   * stays data. A single accessor in the literal is enough to lose nearly all
-   * of the gain: measured on Node 26 with the `...extra` spread followed by
-   * these properties, one getter among data properties made the literal about
-   * 10x slower to create than all data (four getters: about 15x) and gave
-   * every instance its own hidden class (`%HaveSameMap` false). Keep all four
-   * as data, or measure again before changing that.
-   */
-  attach: (writers: ObservableStateWriters) => void;
-
-  addChild: <B>(child: ChildObservableNode<B>) => void;
-
-  /**
-   * Forgets `child`, which a completed child calls on each of its parents so
-   * that nothing keeps a reference to it (#2134).
-   */
-  deleteChild: <B>(child: ChildObservableNode<B>) => void;
-
-  getSnapshot: () => Optional<A>;
-
-  isCompleted: () => boolean;
-
-  updateToken: () => UpdateToken;
-
-  hasSubscriber: () => boolean;
-
-  hasActiveChild: () => boolean;
-
-  subscribe: (onNext: (v: A) => void, onComplete?: () => void) => Subscription;
-
-  /** Stores `nextValue` as the current value and notifies subscribers. */
-  setNext: (nextValue: A, updateToken: UpdateToken) => void;
-
-  /**
-   * The innermost part of `complete()` (what `ObservableBaseClass.complete`
-   * used to do): marks this observable completed exactly once, notifies and
-   * removes all subscribers, and propagates `tryComplete` to children. Layer
-   * factories wrap this with leaf teardown and propagation to parents.
-   */
-  completeBase: () => void;
-}>;
+const observableMethods = {
+  getSnapshot,
+  subscribe: subscribeMethod,
+  pipe,
+  complete,
+  dispose,
+  hasActiveChild,
+} as const;
 
 /**
- * How the handle writes the four state flags onto the public object. The
- * writers are closures over that object rather than the object itself, because
- * a parameter this side could mutate has to be a mutable type, which
- * `@typescript-eslint/prefer-readonly-parameter-types` rejects — and the object
- * is `Readonly` to everyone else.
+ * Creates the record of a new observable. It is one object literal with
+ * every field, in the same order for every kind, so that all observables
+ * share one shape and V8 creates them from one template: a prototype made
+ * with `Object.create` and filled field by field cost several times more.
+ * The caller fills in `tryUpdate` and the hooks once `init` has returned
+ * them, then calls {@link adoptIntoCurrentScope}.
  */
-type ObservableStateWriters = Readonly<{
-  setIsCompleted: (value: boolean) => void;
-  setUpdateToken: (value: UpdateToken) => void;
-  setHasSubscriber: (value: boolean) => void;
-  setHasChild: (value: boolean) => void;
-}>;
-
-export const createObservableBaseHandle = <A,>(
+export const createNodeRecord = <A,>(
+  kind: ObservableKind,
+  depth: number,
+  parents: readonly Observable<unknown>[] | undefined,
   initialValue: Optional<A>,
-): ObservableBaseHandle<A> => {
-  const id = issueObservableId();
-
-  // A set, not an array: a completed child removes itself, and that has to be
-  // O(1) for a UI that creates and completes derived nodes on every mount.
-  const mut_children: MutableSet<ChildObservableNode<unknown>> = new Set();
-
-  const mut_subscribers: MutableMap<SubscriberId, Subscriber<A>> = new Map();
-
-  let mut_currentValue: Optional<A> = initialValue;
-
-  let mut_isCompleted = false;
-
-  let mut_updateToken: UpdateToken = issueUpdateToken();
-
-  /**
-   * Set once {@link assembleObservable} has built the public object. It does
-   * not exist while a leaf factory's `init` callback runs — that callback may
-   * already subscribe or complete — so every write below is optional, and
-   * `attach` copies the state as it stands rather than assuming defaults.
-   */
-  let mut_writers: ObservableStateWriters | undefined;
-
-  const attach = (writers: ObservableStateWriters): void => {
-    mut_writers = writers;
-
-    writers.setIsCompleted(mut_isCompleted);
-
-    writers.setUpdateToken(mut_updateToken);
-
-    writers.setHasSubscriber(mut_subscribers.size > 0);
-
-    writers.setHasChild(mut_children.size > 0);
+): NodeRecord<A> => {
+  const mut_node: MutableNodeRecord<A> = {
+    kind,
+    depth,
+    isCompleted: false,
+    updateToken: notUpdatedYet,
+    hasSubscriber: false,
+    hasChild: false,
+    parents,
+    snapshot: initialValue,
+    children: undefined,
+    subscribers: undefined,
+    teardowns: undefined,
+    tryUpdate: tryUpdateNotImplemented,
+    canEmitNoMore: undefined,
+    flush: undefined,
+    manager:
+      kind === 'sync child'
+        ? undefined
+        : { buckets: new Map(), depths: [], order: [] },
+    managers: kind === 'sync child' ? managersOf(parents ?? []) : [],
+    isRegistered: false,
+    releaseFromScope: undefined,
+    getSnapshot: observableMethods.getSnapshot,
+    subscribe: observableMethods.subscribe,
+    pipe: observableMethods.pipe,
+    complete: observableMethods.complete,
+    dispose: observableMethods.dispose,
+    hasActiveChild: observableMethods.hasActiveChild,
+    [observableBrand]: true,
   };
 
-  const addSubscriber = (s: Subscriber<A>): SubscriberId => {
-    // return the id of added subscriber
-    const subscriberId = issueSubscriberId();
+  if (kind !== 'sync child') {
+    mut_node.managers = [mut_node];
+  }
 
-    mut_subscribers.set(subscriberId, s);
-
-    mut_writers?.setHasSubscriber(true);
-
-    return subscriberId;
-  };
-
-  const removeSubscriber = (subscriberId: SubscriberId): void => {
-    mut_subscribers.delete(subscriberId);
-
-    mut_writers?.setHasSubscriber(mut_subscribers.size > 0);
-  };
-
-  const addChild = <B,>(child: ChildObservableNode<B>): void => {
-    mut_children.add(child);
-
-    mut_writers?.setHasChild(true);
-  };
-
-  const deleteChild = <B,>(child: ChildObservableNode<B>): void => {
-    mut_children.delete(child);
-
-    mut_writers?.setHasChild(mut_children.size > 0);
-  };
-
-  const getSnapshot = (): Optional<A> => mut_currentValue;
-
-  const isCompleted = (): boolean => mut_isCompleted;
-
-  const updateToken = (): UpdateToken => mut_updateToken;
-
-  const hasSubscriber = (): boolean => mut_subscribers.size > 0;
-
-  const hasActiveChild = (): boolean => {
-    for (const c of mut_children) {
-      if (!c.isCompleted) {
-        return true;
-      }
-    }
-
-    return false;
-  };
-
-  const setNext = (nextValue: A, nextUpdateToken: UpdateToken): void => {
-    mut_updateToken = nextUpdateToken;
-
-    mut_writers?.setUpdateToken(nextUpdateToken);
-
-    mut_currentValue = Optional.some(nextValue);
-
-    for (const s of mut_subscribers.values()) {
-      s.onNext(nextValue);
-    }
-  };
-
-  const completeBase = (): void => {
-    if (mut_isCompleted) {
-      return; // terminate only once
-    }
-
-    // change state
-    mut_isCompleted = true;
-
-    mut_writers?.setIsCompleted(true);
-
-    // run subscribers for the current value
-    for (const s of mut_subscribers.values()) {
-      s.onComplete();
-    }
-
-    // remove all subscribers
-    mut_subscribers.clear();
-
-    mut_writers?.setHasSubscriber(false);
-
-    // Propagate to children. A child that completes removes itself from
-    // `mut_children` during this loop, which iterating a `Set` tolerates.
-    for (const o of mut_children) {
-      o.tryComplete();
-    }
-  };
-
-  const subscribe = (
-    onNext: (v: A) => void,
-    onComplete?: () => void,
-  ): Subscription => {
-    // first emit
-    const curr = getSnapshot();
-
-    if (Optional.isSome(curr)) {
-      onNext(curr.value);
-    }
-
-    if (mut_isCompleted) {
-      if (onComplete !== undefined) {
-        onComplete();
-      }
-
-      return { unsubscribe: () => {} };
-    }
-
-    const subscriberId: SubscriberId = addSubscriber(
-      toSubscriber(onNext, onComplete),
-    );
-
-    return {
-      unsubscribe: () => {
-        removeSubscriber(subscriberId);
-      },
-    };
-  };
-
-  return {
-    id,
-    attach,
-    addChild,
-    deleteChild,
-    getSnapshot,
-    isCompleted,
-    updateToken,
-    hasSubscriber,
-    hasActiveChild,
-    subscribe,
-    setNext,
-    completeBase,
-  };
+  return mut_node;
 };
 
 /**
- * How many `startUpdate` calls are running, across every observable. A root
- * written to while this is non-zero is written to from inside a subscriber or
- * a projection, which {@link isPropagating} lets it detect (#2336).
+ * Joins the scope whose `run` is executing (`createScope`), if any. A node
+ * that completed while it was built (`just`, a child of completed parents)
+ * has nothing left to release.
  */
-const mut_propagation = { depth: 0 };
+export const adoptIntoCurrentScope = <A,>(node: NodeRecord<A>): void => {
+  const mut_node = asMutable(node);
 
-/** Whether some observable's update is propagating right now. */
-export const isPropagating = (): boolean => mut_propagation.depth > 0;
+  const scope = getCurrentScopeInternals();
+
+  if (scope !== undefined && !mut_node.isCompleted) {
+    mut_node.releaseFromScope = scope.adopt(toPublic(mut_node));
+  }
+};
+
+/** Stores `nextValue` as the current value and notifies subscribers. */
+export const setNext = <A,>(
+  node: NodeRecord<A>,
+  nextValue: A,
+  updateToken: UpdateToken,
+): void => {
+  const mut_node = asMutable(node);
+
+  mut_node.updateToken = updateToken;
+
+  mut_node.snapshot = Optional.some(nextValue);
+
+  if (mut_node.subscribers !== undefined) {
+    for (const s of mut_node.subscribers) {
+      s.onNext(nextValue);
+    }
+  }
+};
+
+/** Emits `nextValue` from a manager and propagates it to its descendants. */
+export const startUpdate = <A,>(node: NodeRecord<A>, nextValue: A): void => {
+  const updateToken = issueUpdateToken();
+
+  mut_propagation.depth += 1;
+
+  // A subscriber or projection may throw, and the depth has to come back
+  // down regardless, or every later write would warn. The exception itself
+  // is not caught: it reaches the caller of `next` as it always has.
+  // @sumi-expect-error exceptions/no-try
+  try {
+    setNext(node, nextValue, updateToken);
+
+    for (const p of propagationOrder(node)) {
+      p.tryUpdate(updateToken);
+    }
+  } finally {
+    mut_propagation.depth -= 1;
+
+    if (mut_propagation.depth === 0) {
+      flushAfterPropagation();
+    }
+  }
+};
 
 /**
- * Work deferred by {@link runAfterPropagation}, run once the outermost
- * `startUpdate` has reached every descendant.
+ * Registers a teardown (`onComplete` tool) to run when the node completes,
+ * in the order registered; one registered after that runs at once, since
+ * `init` may complete the node before it gets to register.
  */
-const mut_afterPropagation: (() => void)[] = [];
+export const addTeardown = <A,>(
+  node: NodeRecord<A>,
+  teardown: () => void,
+): void => {
+  const mut_node = asMutable(node);
+
+  if (mut_node.isCompleted) {
+    teardown();
+  } else {
+    // Copied rather than pushed: a node rarely has more than one or two.
+    mut_node.teardowns = Arr.toPushed(mut_node.teardowns ?? [], teardown);
+  }
+};
+
+/**
+ * Completes the node: an async child first passes on what it still holds
+ * (`flush`), then it is disposed. Completing never reaches the parents: an
+ * upstream observable may be shared, and only whoever owns it decides when
+ * it ends (#2133).
+ */
+export const completeNode = <A,>(node: NodeRecord<A>): void => {
+  const mut_node = asMutable(node);
+
+  if (mut_node.isCompleted) {
+    return;
+  }
+
+  mut_node.flush?.();
+
+  disposeNode(mut_node);
+};
+
+/**
+ * Completes the node without passing on anything it still holds, runs its
+ * teardowns, and takes it out of the graph.
+ */
+export const disposeNode = <A,>(node: NodeRecord<A>): void => {
+  const mut_node = asMutable(node);
+
+  // A completed node is reached again through every parent that completes
+  // after it; running again would repeat the teardown and the unregistering.
+  if (mut_node.isCompleted) {
+    return;
+  }
+
+  if (mut_node.teardowns !== undefined) {
+    for (const teardown of mut_node.teardowns) {
+      teardown();
+    }
+  }
+
+  completeBase(mut_node);
+
+  if (!mut_node.isRegistered) {
+    return;
+  }
+
+  mut_node.isRegistered = false;
+
+  unregisterChild(mut_node);
+};
+
+/**
+ * Called by a parent that has completed. A root has no parents, and a child
+ * completing never completes it (#2133), so only its own `complete()` ends
+ * it.
+ */
+export const tryComplete = <A,>(node: NodeRecord<A>): void => {
+  const mut_node = asMutable(node);
+
+  if (mut_node.isCompleted || mut_node.parents === undefined) {
+    return;
+  }
+
+  // No live parent is left, or no value can come from the live ones.
+  if (
+    mut_node.parents.every((p) => p.isCompleted) ||
+    mut_node.canEmitNoMore?.() === true
+  ) {
+    completeNode(mut_node);
+  }
+};
+
+/**
+ * Registers a child to its parents and to the managers it is reached from.
+ * Runs after `init`, so a child that `init` completed is never registered.
+ */
+export const registerChild = <A,>(child: NodeRecord<A>): void => {
+  const mut_child = asMutable(child);
+
+  const parents = mut_child.parents ?? ([] as const);
+
+  for (const p of parents) {
+    addChild(toRecord(p), mut_child);
+  }
+
+  for (const m of upstreamManagersOf(mut_child)) {
+    addDescendant(m, mut_child);
+  }
+
+  mut_child.isRegistered = true;
+};
+
+/** The public view of a record; the record is the observable. */
+export const toPublic = <A,>(node: NodeRecord<A>): Observable<A> =>
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  node as unknown as Observable<A>;
+
+/**
+ * Whether some observable's update is propagating right now. A root written
+ * to while one is, is written to from inside a subscriber or a projection
+ * (#2336).
+ */
+export const isPropagating = (): boolean => mut_propagation.depth > 0;
 
 /**
  * Runs `task` once the update now propagating has reached every descendant, or
@@ -319,6 +288,22 @@ export const runAfterPropagation = (task: () => void): void => {
   }
 };
 
+/** Default `tryUpdate` for observables that never receive parent updates. */
+export const createTryUpdateNotImplemented = (): ((
+  _updateToken: UpdateToken,
+) => void) => tryUpdateNotImplemented;
+
+/* implementation */
+
+/** How many `startUpdate` calls are running, across every observable. */
+const mut_propagation = { depth: 0 };
+
+/**
+ * Work deferred by {@link runAfterPropagation}, run once the outermost
+ * `startUpdate` has reached every descendant.
+ */
+const mut_afterPropagation: (() => void)[] = [];
+
 const flushAfterPropagation = (): void => {
   // A deferred task may start an update of its own, which flushes what that
   // update defers before this loop moves on.
@@ -327,352 +312,302 @@ const flushAfterPropagation = (): void => {
   }
 };
 
-/**
- * The extra members every manager observable — a root or an async child — owns:
- * the depth-ordered descendant list and the update propagation that walks it.
- */
-export type ManagerObservableParts<A> = Readonly<{
-  addDescendant: <B>(child: ChildObservableNode<B>) => void;
-
-  /**
-   * Takes `child` out of the propagation order, which a completed child calls
-   * on every manager it registered to (#2134).
-   */
-  deleteDescendant: <B>(child: ChildObservableNode<B>) => void;
-
-  /** Emits `nextValue` and propagates the update to all descendants. */
-  startUpdate: (nextValue: A) => void;
-}>;
-
-/**
- * Builds the manager half of a root or async-child observable. Both start their
- * own update propagation, so both keep a depth-ordered propagation list; this
- * is the single implementation of it (the class version duplicated it across
- * `RootObservableClass` and `AsyncChildObservableClass`).
- *
- * The descendants are kept in one insertion-ordered set per depth, so adding
- * and removing one is O(1) apart from the first node of a new depth. The flat
- * array `startUpdate` walks is rebuilt only when an update finds it stale: it
- * used to be copied on every `addDescendant`, which made creating n nodes under
- * one root O(n²). Rebuilding at the start of an update also keeps the walk a
- * snapshot, as the copy-on-write array was — a node created or completed while
- * an update is propagating does not change which nodes that update visits.
- */
-export const createManagerObservableParts = <A,>(
-  handle: ObservableBaseHandle<A>,
-): ManagerObservableParts<A> => {
-  const mut_buckets: MutableMap<
-    number,
-    MutableSet<ChildObservableNode<unknown>>
-  > = new Map();
-
-  /** The keys of `mut_buckets`, ascending. */
-  let mut_depths: readonly number[] = [];
-
-  /** `undefined` while stale. */
-  let mut_propagationOrder:
-    readonly ChildObservableNode<unknown>[] | undefined = [];
-
-  const addDescendant = <B,>(child: ChildObservableNode<B>): void => {
-    const mut_bucket = mut_buckets.get(child.depth);
-
-    if (mut_bucket === undefined) {
-      mut_buckets.set(
-        child.depth,
-        new Set<ChildObservableNode<unknown>>([child]),
-      );
-
-      mut_depths = Arr.toInserted(
-        mut_depths,
-        binarySearch(mut_depths, child.depth),
-        child.depth,
-      );
-    } else {
-      if (mut_bucket.has(child)) {
-        return;
-      }
-
-      mut_bucket.add(child);
-    }
-
-    mut_propagationOrder = undefined;
-  };
-
-  const deleteDescendant = <B,>(child: ChildObservableNode<B>): void => {
-    // An emptied bucket stays, so that its depth is not inserted again.
-    const mut_bucket = mut_buckets.get(child.depth);
-
-    if (mut_bucket?.delete(child) === true) {
-      mut_propagationOrder = undefined;
-    }
-  };
-
-  const getPropagationOrder = (): readonly ChildObservableNode<unknown>[] => {
-    if (mut_propagationOrder !== undefined) {
-      return mut_propagationOrder;
-    }
-
-    const mut_order: ChildObservableNode<unknown>[] = [];
-
-    for (const depth of mut_depths) {
-      const bucket = mut_buckets.get(depth);
-
-      if (bucket !== undefined) {
-        // Not `push(...bucket)`: a spread passes every element as an argument,
-        // which overflows the stack for a bucket of a few hundred thousand.
-        for (const c of bucket) {
-          mut_order.push(c);
-        }
-      }
-    }
-
-    mut_propagationOrder = mut_order;
-
-    return mut_order;
-  };
-
-  const startUpdate = (nextValue: A): void => {
-    const updateToken = issueUpdateToken();
-
-    mut_propagation.depth += 1;
-
-    // A subscriber or projection may throw, and the depth has to come back
-    // down regardless, or every later write would warn. The exception itself
-    // is not caught: it reaches the caller of `next` as it always has.
-    // @sumi-expect-error exceptions/no-try
-    try {
-      handle.setNext(nextValue, updateToken);
-
-      for (const p of getPropagationOrder()) {
-        p.tryUpdate(updateToken);
-      }
-    } finally {
-      mut_propagation.depth -= 1;
-
-      if (mut_propagation.depth === 0) {
-        flushAfterPropagation();
-      }
-    }
-  };
-
-  return { addDescendant, deleteDescendant, startUpdate };
-};
-
-/**
- * The teardowns registered through the `onComplete` tool, run in the order
- * registered by `runAll` when the observable completes. One registered once
- * the observable has completed runs at once: `init` may complete it before it
- * gets to register.
- */
-export const createTeardownList = (
-  isCompleted: () => boolean,
-): Readonly<{
-  add: (teardown: () => void) => void;
-  runAll: () => void;
-}> => {
-  const mut_teardowns: (() => void)[] = [];
-
-  return {
-    add: (teardown) => {
-      if (isCompleted()) {
-        teardown();
-      } else {
-        mut_teardowns.push(teardown);
-      }
-    },
-    runAll: () => {
-      for (const teardown of mut_teardowns) {
-        teardown();
-      }
-    },
-  };
-};
-
-/** Default `tryUpdate` for observables that never receive parent updates. */
-export const createTryUpdateNotImplemented = (): ((
-  _updateToken: UpdateToken,
-) => void) => tryUpdateNotImplemented;
-
 const tryUpdateNotImplemented = (_updateToken: UpdateToken): void => {
-  // Not `todo()`: nothing here is waiting to be written. This is the base
-  // default of what was a base-class method, and every observable that can
-  // receive a parent update supplies its own `tryUpdate`; an observable with
-  // no parents never gets one. Reaching this is the invariant breaking, which
-  // is what `unreachable` says (Sumi D-48). There is no `never` value to
-  // hand it — the fact of the call is the error.
+  // Not `todo()`: nothing here is waiting to be written. Every observable that
+  // can receive a parent update supplies its own `tryUpdate`; an observable
+  // with no parents never gets one. Reaching this is the invariant breaking,
+  // which is what `unreachable` says (Sumi D-48).
   unreachable();
 };
 
-type AssembleObservableArgs<
-  A,
-  Kind extends ObservableKind,
-  Extra extends ReadonlyRecord<string, unknown>,
-> = Readonly<{
-  kind: Kind;
-  depth: Kind extends 'root' ? 0 : number;
-  handle: ObservableBaseHandle<A>;
-  tryUpdate: (updateToken: UpdateToken) => void;
-  tryComplete: () => void;
-  complete: () => void;
-  dispose: () => void;
-  /**
-   * Kind-specific public members (`parents`, `addDescendant`) and leaf
-   * extensions (`next`, `start`). They are merged here, in the one place the
-   * final object literal is created, because the handle keeps the state flags
-   * up to date on that object alone: a copy made by spreading it afterwards
-   * would freeze their current values.
-   */
-  extra: Extra;
-}>;
+/** The record a method of {@link observableMethods} was called on. */
+const selfOf = <A,>(self: unknown): NodeRecord<A> =>
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  self as NodeRecord<A>;
 
-/**
- * Builds the public observable object from a base handle. This replaces the
- * implicit assembly a `class` performs: state stays in the handle's closures,
- * `isCompleted` / `updateToken` / `hasSubscriber` / `hasChild` become data
- * properties the handle keeps in step through `attach`, and the kind-specific
- * behavior (`tryUpdate`, `tryComplete`, `complete`) is passed in already
- * composed.
- */
-export const assembleObservable = <
-  A,
-  Kind extends ObservableKind,
-  Extra extends ReadonlyRecord<string, unknown>,
->({
-  kind,
-  depth,
-  handle,
-  tryUpdate,
-  tryComplete,
-  complete,
-  dispose,
-  extra,
-}: AssembleObservableArgs<A, Kind, Extra>): AssembledObservable<
-  A,
-  Kind,
-  Extra
-> => {
-  function pipe<B>(
-    operator: WithInitialValueOperator<A, B>,
-  ): InitializedObservable<B>;
+const subscribe = <A,>(
+  node: NodeRecord<A>,
+  onNext: (v: A) => void,
+  onComplete: (() => void) | undefined,
+): Subscription => {
+  const mut_node = asMutable(node);
 
-  // A `WithInitialValueOperator` is also an `Operator`: nothing at run time
-  // tells the two apart, so this set only refines the return type (#1952).
-  // @sumi-expect-error functions/no-refinement-overload
-  function pipe<B>(operator: Operator<A, B>): Observable<B>;
-
-  function pipe<B>(operator: Operator<A, B>): Observable<B> {
-    return operator(
-      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-      mut_observable as unknown as InitializedObservable<A>,
-    );
+  // first emit
+  if (Optional.isSome(mut_node.snapshot)) {
+    onNext(mut_node.snapshot.value);
   }
 
-  // The four state flags are plain data properties kept in step by the handle,
-  // not getters delegating to it — see `ObservableBaseHandle.attach` for the
-  // measurements that decided this. `updateToken` in particular is read once
-  // per child per update, and `tryUpdate` reading a field rather than calling
-  // through an accessor is most of what the change buys.
-  const mut_observable = {
-    ...extra,
+  if (mut_node.isCompleted) {
+    onComplete?.();
 
-    id: handle.id,
+    return noopSubscription;
+  }
 
-    kind,
+  const subscriber = toSubscriber(onNext, onComplete);
 
-    depth,
+  mut_node.subscribers ??= new Set();
 
-    addChild: handle.addChild,
+  mut_node.subscribers.add(subscriber);
 
-    deleteChild: handle.deleteChild,
+  mut_node.hasSubscriber = true;
 
-    getSnapshot: handle.getSnapshot,
-
-    isCompleted: false,
-
-    updateToken: handle.updateToken(),
-
-    hasSubscriber: false,
-
-    hasChild: false,
-
-    hasActiveChild: handle.hasActiveChild,
-
-    tryUpdate,
-
-    tryComplete,
-
-    complete,
-
-    dispose,
-
-    subscribe: handle.subscribe,
-
-    pipe,
-
-    // Last, not first: right after the `...extra` spread, a computed symbol
-    // key made the literal about twice as slow to create, and creating nodes
-    // is most of what mounting a UI costs.
-    [observableBrand]: true,
-  };
-
-  /**
-   * Set when a scope adopted this observable at creation. Completing — by the
-   * scope's dispose or on its own — releases it, so that a long-lived scope
-   * whose nodes come and go does not keep the completed ones.
-   */
-  let mut_releaseFromScope: (() => void) | undefined = undefined;
-
-  handle.attach({
-    setIsCompleted: (value) => {
-      mut_observable.isCompleted = value;
-
-      if (!value || mut_releaseFromScope === undefined) {
+  return {
+    unsubscribe: () => {
+      if (mut_node.subscribers === undefined) {
         return;
       }
 
-      mut_releaseFromScope();
+      mut_node.subscribers.delete(subscriber);
 
-      mut_releaseFromScope = undefined;
+      mut_node.hasSubscriber = mut_node.subscribers.size > 0;
     },
-
-    setUpdateToken: (value) => {
-      mut_observable.updateToken = value;
-    },
-
-    setHasSubscriber: (value) => {
-      mut_observable.hasSubscriber = value;
-    },
-
-    setHasChild: (value) => {
-      mut_observable.hasChild = value;
-    },
-  });
-
-  // Joins the scope whose `run` is executing (`createScope`), if any. A node
-  // that completed while it was built (`just`, a child of completed parents)
-  // has nothing left to release.
-  const scope = getCurrentScopeInternals();
-
-  if (scope !== undefined && !mut_observable.isCompleted) {
-    mut_releaseFromScope = scope.adopt(mut_observable);
-  }
-
-  return (
-    // The literal lacks only the brand of the public types, which exists in
-    // the types alone; this is the one place an observable is created, so it
-    // is the one place the brand is granted.
-    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-    mut_observable as unknown as AssembledObservable<A, Kind, Extra>
-  );
+  };
 };
 
-type AssembledObservable<
-  A,
-  Kind extends ObservableKind,
-  Extra extends ReadonlyRecord<string, unknown>,
-> = Extra &
-  ObservableBaseNode<A> &
-  Readonly<{
-    kind: Kind;
-    depth: AssembleObservableArgs<A, Kind, Extra>['depth'];
-  }>;
+const noopSubscription: Subscription = { unsubscribe: () => {} } as const;
+
+/**
+ * Marks the node completed exactly once, releases it from its scope,
+ * notifies and removes all subscribers, and lets its children decide whether
+ * they complete too.
+ */
+const completeBase = <A,>(node: NodeRecord<A>): void => {
+  const mut_node = asMutable(node);
+
+  mut_node.isCompleted = true;
+
+  if (mut_node.releaseFromScope !== undefined) {
+    mut_node.releaseFromScope();
+
+    mut_node.releaseFromScope = undefined;
+  }
+
+  if (mut_node.subscribers !== undefined) {
+    for (const s of mut_node.subscribers) {
+      s.onComplete();
+    }
+
+    mut_node.subscribers.clear();
+  }
+
+  mut_node.hasSubscriber = false;
+
+  // A child that completes removes itself from `children` during this loop,
+  // which iterating a `Set` tolerates.
+  if (mut_node.children !== undefined) {
+    for (const c of mut_node.children) {
+      tryComplete(c);
+    }
+  }
+};
+
+const addChild = <A,>(
+  node: NodeRecord<A>,
+  child: NodeRecord<unknown>,
+): void => {
+  const mut_node = asMutable(node);
+
+  // A set, not an array: a completed child removes itself, and that has to
+  // be O(1) for a UI that creates and completes derived nodes on every mount.
+  if (mut_node.children === undefined) {
+    mut_node.children = new Set([child]);
+  } else {
+    mut_node.children.add(child);
+  }
+
+  mut_node.hasChild = true;
+};
+
+const deleteChild = <A,>(
+  node: NodeRecord<A>,
+  child: NodeRecord<unknown>,
+): void => {
+  const mut_node = asMutable(node);
+
+  if (mut_node.children === undefined) {
+    return;
+  }
+
+  mut_node.children.delete(child);
+
+  mut_node.hasChild = mut_node.children.size > 0;
+};
+
+const addDescendant = (
+  manager: NodeRecord<unknown>,
+  child: NodeRecord<unknown>,
+): void => {
+  const mut_state = asMutable(manager).manager;
+
+  if (mut_state === undefined) {
+    return;
+  }
+
+  const mut_bucket = mut_state.buckets.get(child.depth);
+
+  if (mut_bucket === undefined) {
+    mut_state.buckets.set(child.depth, new Set([child]));
+
+    mut_state.depths = Arr.toInserted(
+      mut_state.depths,
+      binarySearch(mut_state.depths, child.depth),
+      child.depth,
+    );
+  } else {
+    if (mut_bucket.has(child)) {
+      return;
+    }
+
+    mut_bucket.add(child);
+  }
+
+  mut_state.order = undefined;
+};
+
+const deleteDescendant = (
+  manager: NodeRecord<unknown>,
+  child: NodeRecord<unknown>,
+): void => {
+  const mut_state = asMutable(manager).manager;
+
+  // An emptied bucket stays, so that its depth is not inserted again.
+  const mut_bucket = mut_state?.buckets.get(child.depth);
+
+  if (mut_state !== undefined && mut_bucket?.delete(child) === true) {
+    mut_state.order = undefined;
+  }
+};
+
+const propagationOrder = <A,>(
+  node: NodeRecord<A>,
+): readonly NodeRecord<unknown>[] => {
+  const mut_state = asMutable(node).manager;
+
+  if (mut_state === undefined) {
+    return [];
+  }
+
+  if (mut_state.order !== undefined) {
+    return mut_state.order;
+  }
+
+  const mut_order: NodeRecord<unknown>[] = [];
+
+  for (const depth of mut_state.depths) {
+    const bucket = mut_state.buckets.get(depth);
+
+    if (bucket !== undefined) {
+      // Not `push(...bucket)`: a spread passes every element as an argument,
+      // which overflows the stack for a bucket of a few hundred thousand.
+      for (const c of bucket) {
+        mut_order.push(c);
+      }
+    }
+  }
+
+  mut_state.order = mut_order;
+
+  return mut_order;
+};
+
+/**
+ * Undoes {@link registerChild} for a completed child: its parents forget it,
+ * and every manager it registered to stops propagating updates to it.
+ * Without this a completed node stayed reachable for as long as its root
+ * lived, and ran its `tryUpdate` on every update (#2134).
+ */
+const unregisterChild = <A,>(child: NodeRecord<A>): void => {
+  for (const p of child.parents ?? []) {
+    deleteChild(toRecord(p), child);
+  }
+
+  for (const m of upstreamManagersOf(child)) {
+    deleteDescendant(m, child);
+  }
+};
+
+/** The managers a child registers to: those its parents' descendants do. */
+const upstreamManagersOf = <A,>(
+  child: NodeRecord<A>,
+): readonly NodeRecord<unknown>[] =>
+  child.kind === 'sync child'
+    ? child.managers
+    : managersOf(child.parents ?? []);
+
+/**
+ * The managers the descendants of `parents` register to, shared with the
+ * parent when there is one.
+ */
+const managersOf = (
+  parents: readonly Observable<unknown>[],
+): readonly NodeRecord<unknown>[] => {
+  if (Arr.isFixedLengthArray(1, parents)) {
+    const [parent] = parents;
+
+    return toRecord(parent).managers;
+  }
+
+  return Array.from(new Set(parents.flatMap((p) => toRecord(p).managers)));
+};
+
+/* the shared methods; see `observableMethods` */
+
+// @sumi-expect-error functions/prefer-arrow-function
+function getSnapshot<A>(this: unknown): Optional<A> {
+  // @sumi-expect-error banned-syntax/no-this
+  return selfOf<A>(this).snapshot;
+}
+
+// @sumi-expect-error functions/prefer-arrow-function
+function subscribeMethod<A>(
+  this: unknown,
+  onNext: (v: A) => void,
+  onComplete?: () => void,
+): Subscription {
+  // @sumi-expect-error banned-syntax/no-this
+  return subscribe(selfOf<A>(this), onNext, onComplete);
+}
+
+// A `WithInitialValueOperator` is also an `Operator`: nothing at run time
+// tells the two apart, and the public types refine the return type (#1952).
+// @sumi-expect-error functions/prefer-arrow-function
+function pipe<A, B>(this: unknown, operator: Operator<A, B>): Observable<B> {
+  return operator(
+    // @sumi-expect-error banned-syntax/no-this
+    toInitialized<A>(this),
+  );
+}
+
+// @sumi-expect-error functions/prefer-arrow-function
+function complete(this: unknown): void {
+  // @sumi-expect-error banned-syntax/no-this
+  completeNode(selfOf<unknown>(this));
+}
+
+// @sumi-expect-error functions/prefer-arrow-function
+function dispose(this: unknown): void {
+  // @sumi-expect-error banned-syntax/no-this
+  disposeNode(selfOf<unknown>(this));
+}
+
+// @sumi-expect-error functions/prefer-arrow-function
+function hasActiveChild(this: unknown): boolean {
+  // @sumi-expect-error banned-syntax/no-this
+  const { children } = selfOf<unknown>(this);
+
+  if (children === undefined) {
+    return false;
+  }
+
+  for (const c of children) {
+    if (!c.isCompleted) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+const toInitialized = <A,>(self: unknown): InitializedObservable<A> =>
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  self as InitializedObservable<A>;
