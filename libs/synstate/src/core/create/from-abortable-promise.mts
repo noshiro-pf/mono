@@ -72,17 +72,16 @@ import type { FromPromiseObservable } from '../types/index.mjs';
 export const fromAbortablePromise = <A, E = unknown>(
   // @sumi-expect-error readonly/require-readonly-parameter
   factory: (signal: AbortSignal) => Promise<A>,
-): FromPromiseObservable<A, E> => {
-  const abortController = new AbortController();
+): FromPromiseObservable<A, E> =>
+  createRootObservable<Result<A, E>>(
+    { initialValue: Optional.none },
+    ({ startUpdate, isCompleted, complete, onComplete }) => {
+      const abortController = new AbortController();
 
-  return createRootObservable<Result<A, E>>(
-    {
-      initialValue: Optional.none,
-      onComplete: () => {
+      onComplete(() => {
         abortController.abort();
-      },
-    },
-    ({ startUpdate, isCompleted, complete }) => {
+      });
+
       const promise = factory(abortController.signal);
 
       promise
@@ -118,4 +117,3 @@ export const fromAbortablePromise = <A, E = unknown>(
       return {};
     },
   );
-};

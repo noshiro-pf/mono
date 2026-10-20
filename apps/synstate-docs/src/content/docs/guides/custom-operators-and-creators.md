@@ -131,7 +131,7 @@ export const delay = (
 
 ## A creator
 
-A root observable has no parents. `createRootObservable` takes a config and an `init` callback, which receives `startUpdate`, `getSnapshot`, `isCompleted` and `complete`, and returns the members to add to the observable (`next` for `source`, `start` for `timer`; `{}` for none).
+A root observable has no parents. `createRootObservable` takes a config and an `init` callback, which receives `startUpdate`, `getSnapshot`, `isCompleted`, `complete` and `onComplete`, and returns the members to add to the observable (`next` for `source`, `start` for `timer`; `{}` for none).
 
 ```ts
 import { Optional } from 'ts-data-forge';
@@ -140,30 +140,22 @@ import { createRootObservable, type RootObservable } from 'synstate';
 export const fromEvent = (
     target: EventTarget,
     type: string,
-): RootObservable<Event> => {
-    const mut_listener: { current?: (e: Event) => void } = {};
-
-    return createRootObservable<Event>(
-        {
-            initialValue: Optional.none,
-            onComplete: () => {
-                if (mut_listener.current !== undefined) {
-                    target.removeEventListener(type, mut_listener.current);
-                }
-            },
-        },
-        ({ startUpdate }) => {
-            mut_listener.current = startUpdate;
-
+): RootObservable<Event> =>
+    createRootObservable<Event>(
+        { initialValue: Optional.none },
+        ({ startUpdate, onComplete }) => {
             target.addEventListener(type, startUpdate);
+
+            onComplete(() => {
+                target.removeEventListener(type, startUpdate);
+            });
 
             return {};
         },
     );
-};
 ```
 
-`onComplete` is given before `init` runs, so the listener `init` creates is kept where `onComplete` can reach it.
+The `onComplete` tool registers a teardown from inside `init`, so it can close over what `init` creates (here the listener). A root's config has no `onComplete`: teardowns run once, in the order registered, when the observable completes or is disposed; registered after the observable has completed (`init` may complete it synchronously), it runs at once.
 
 ## What you cannot do
 

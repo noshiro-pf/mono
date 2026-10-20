@@ -89,49 +89,53 @@ export const counter = (
     SafeUint,
     Readonly<{ start: () => void }>
   >(
-    { initialValue: Optional.none, onComplete: resetTimer },
-    ({ startUpdate, isCompleted, complete }) => ({
-      start: () => {
-        if (mut_isStarted) {
-          console.warn('cannot start twice');
+    { initialValue: Optional.none },
+    ({ startUpdate, isCompleted, complete, onComplete }) => {
+      onComplete(resetTimer);
 
-          return;
-        }
+      return {
+        start: () => {
+          if (mut_isStarted) {
+            console.warn('cannot start twice');
 
-        mut_isStarted = true;
-
-        if (isCompleted()) {
-          console.warn('cannot restart stopped CounterObservable');
-
-          return;
-        }
-
-        const emit = (value: SafeUint): void => {
-          startUpdate(value);
-
-          mut_emittedCount += 1;
-
-          if (
-            options?.times !== undefined &&
-            mut_emittedCount >= options.times
-          ) {
-            complete();
+            return;
           }
-        };
 
-        if (options?.emitInitial ?? true) {
-          mut_timerId0 = setTimeout(() => {
+          mut_isStarted = true;
+
+          if (isCompleted()) {
+            console.warn('cannot restart stopped CounterObservable');
+
+            return;
+          }
+
+          const emit = (value: SafeUint): void => {
+            startUpdate(value);
+
+            mut_emittedCount += 1;
+
+            if (
+              options?.times !== undefined &&
+              mut_emittedCount >= options.times
+            ) {
+              complete();
+            }
+          };
+
+          if (options?.emitInitial ?? true) {
+            mut_timerId0 = setTimeout(() => {
+              emit(mut_counter);
+            }, 0);
+          }
+
+          mut_timerId = setInterval(() => {
+            mut_counter = SafeUint.add(1, mut_counter);
+
             emit(mut_counter);
-          }, 0);
-        }
-
-        mut_timerId = setInterval(() => {
-          mut_counter = SafeUint.add(1, mut_counter);
-
-          emit(mut_counter);
-        }, intervalMilliSeconds);
-      },
-    }),
+          }, intervalMilliSeconds);
+        },
+      };
+    },
   );
 
   if (!(options?.startManually ?? false)) {

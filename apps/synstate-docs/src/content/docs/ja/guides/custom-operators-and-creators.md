@@ -131,7 +131,7 @@ export const delay = (
 
 ## Creator
 
-root observable は親を持ちません。`createRootObservable` は config と `init` コールバックを受け取ります。`init` は `startUpdate`、`getSnapshot`、`isCompleted`、`complete` を受け取り、observable に足すメンバーを返します（`source` なら `next`、`timer` なら `start`。なければ `{}`）。
+root observable は親を持ちません。`createRootObservable` は config と `init` コールバックを受け取ります。`init` は `startUpdate`、`getSnapshot`、`isCompleted`、`complete`、`onComplete` を受け取り、observable に足すメンバーを返します（`source` なら `next`、`timer` なら `start`。なければ `{}`）。
 
 ```ts
 import { Optional } from 'ts-data-forge';
@@ -140,30 +140,22 @@ import { createRootObservable, type RootObservable } from 'synstate';
 export const fromEvent = (
     target: EventTarget,
     type: string,
-): RootObservable<Event> => {
-    const mut_listener: { current?: (e: Event) => void } = {};
-
-    return createRootObservable<Event>(
-        {
-            initialValue: Optional.none,
-            onComplete: () => {
-                if (mut_listener.current !== undefined) {
-                    target.removeEventListener(type, mut_listener.current);
-                }
-            },
-        },
-        ({ startUpdate }) => {
-            mut_listener.current = startUpdate;
-
+): RootObservable<Event> =>
+    createRootObservable<Event>(
+        { initialValue: Optional.none },
+        ({ startUpdate, onComplete }) => {
             target.addEventListener(type, startUpdate);
+
+            onComplete(() => {
+                target.removeEventListener(type, startUpdate);
+            });
 
             return {};
         },
     );
-};
 ```
 
-`onComplete` は `init` が走る前に渡すので、`init` で作るリスナーは `onComplete` から届く場所に置いておきます。
+tools の `onComplete` は `init` の中から後始末を登録するので、`init` で作ったもの（ここではリスナー）をそのまま使えます。root の config には `onComplete` はありません。登録した後始末は、observable が完了したとき、または dispose されたときに、登録順に 1 回だけ走ります。observable が完了した後に登録すると（`init` の中で同期的に完了させた場合など）、その場で走ります。
 
 ## できないこと
 
