@@ -9,7 +9,6 @@ import type {
   UpdateToken,
 } from '../types/index.mjs';
 import {
-  binarySearch,
   getCurrentScopeInternals,
   issueUpdateToken,
   notUpdatedYet,
@@ -72,12 +71,11 @@ export const createNodeRecord = <A,>(
     tryUpdate: tryUpdateNotImplemented,
     canEmitNoMore: undefined,
     flush: undefined,
-    manager:
-      kind === 'sync child'
-        ? undefined
-        : { buckets: new Map(), depths: [], order: [] },
+    descendants: kind === 'sync child' ? undefined : [],
     managers: kind === 'sync child' ? managersOf(parents ?? []) : [],
     isRegistered: false,
+    isPropagating: false,
+    joinedDuringUpdate: undefined,
     releaseFromScope: undefined,
     getSnapshot: observableMethods.getSnapshot,
     subscribe: observableMethods.subscribe,
@@ -133,6 +131,18 @@ export const setNext = <A,>(
 export const startUpdate = <A,>(node: NodeRecord<A>, nextValue: A): void => {
   const updateToken = issueUpdateToken();
 
+  const mut_node = asMutable(node);
+
+  // A write to this same manager from inside its own update starts an inner
+  // one; what joins during it joined during the outer one too.
+  const wasPropagating = mut_node.isPropagating;
+
+  const mut_joinedBefore = mut_node.joinedDuringUpdate;
+
+  mut_node.isPropagating = true;
+
+  mut_node.joinedDuringUpdate = undefined;
+
   mut_propagation.depth += 1;
 
   // A subscriber or projection may throw, and the depth has to come back
@@ -142,10 +152,23 @@ export const startUpdate = <A,>(node: NodeRecord<A>, nextValue: A): void => {
   try {
     setNext(node, nextValue, updateToken);
 
-    for (const p of propagationOrder(node)) {
-      p.tryUpdate(updateToken);
-    }
+    propagate(node, updateToken);
   } finally {
+    // Through `node`: TypeScript would take the write above for the value.
+    const joinedNow = node.joinedDuringUpdate;
+
+    mut_node.isPropagating = wasPropagating;
+
+    mut_node.joinedDuringUpdate = mut_joinedBefore;
+
+    if (wasPropagating && joinedNow !== undefined) {
+      mut_node.joinedDuringUpdate ??= new Set();
+
+      for (const c of joinedNow) {
+        mut_node.joinedDuringUpdate.add(c);
+      }
+    }
+
     mut_propagation.depth -= 1;
 
     if (mut_propagation.depth === 0) {
@@ -437,77 +460,72 @@ const addDescendant = (
   manager: NodeRecord<unknown>,
   child: NodeRecord<unknown>,
 ): void => {
-  const mut_state = asMutable(manager).manager;
+  const mut_manager = asMutable(manager);
 
-  if (mut_state === undefined) {
+  const descendants = mut_manager.descendants;
+
+  if (descendants === undefined) {
     return;
   }
 
-  const mut_bucket = mut_state.buckets.get(child.depth);
+  const index = child.depth - manager.depth - 1;
+
+  const mut_bucket = descendants[index];
 
   if (mut_bucket === undefined) {
-    mut_state.buckets.set(child.depth, new Set([child]));
-
-    mut_state.depths = Arr.toInserted(
-      mut_state.depths,
-      binarySearch(mut_state.depths, child.depth),
-      child.depth,
+    // The first node of its depth: rare, so the array is copied rather than
+    // written, which also leaves a walk already under way on the old one.
+    mut_manager.descendants = Array.from(
+      { length: Math.max(descendants.length, index + 1) },
+      (_, i) => (i === index ? new Set([child]) : descendants[i]),
     );
   } else {
-    if (mut_bucket.has(child)) {
-      return;
-    }
-
     mut_bucket.add(child);
   }
 
-  mut_state.order = undefined;
+  if (!mut_manager.isPropagating) {
+    return;
+  }
+
+  mut_manager.joinedDuringUpdate ??= new Set();
+
+  mut_manager.joinedDuringUpdate.add(child);
 };
 
 const deleteDescendant = (
   manager: NodeRecord<unknown>,
   child: NodeRecord<unknown>,
 ): void => {
-  const mut_state = asMutable(manager).manager;
+  // An emptied set stays, to be reused by the next node of its depth.
+  const mut_bucket =
+    asMutable(manager).descendants?.[child.depth - manager.depth - 1];
 
-  // An emptied bucket stays, so that its depth is not inserted again.
-  const mut_bucket = mut_state?.buckets.get(child.depth);
-
-  if (mut_state !== undefined && mut_bucket?.delete(child) === true) {
-    mut_state.order = undefined;
-  }
+  mut_bucket?.delete(child);
 };
 
-const propagationOrder = <A,>(
-  node: NodeRecord<A>,
-): readonly NodeRecord<unknown>[] => {
-  const mut_state = asMutable(node).manager;
+/**
+ * Runs `tryUpdate` on the descendants of `node`, shallowest first, skipping
+ * those registered after this update began (see `ManagerState`).
+ */
+const propagate = <A,>(node: NodeRecord<A>, updateToken: UpdateToken): void => {
+  const descendants = node.descendants;
 
-  if (mut_state === undefined) {
-    return [];
+  if (descendants === undefined) {
+    return;
   }
 
-  if (mut_state.order !== undefined) {
-    return mut_state.order;
-  }
-
-  const mut_order: NodeRecord<unknown>[] = [];
-
-  for (const depth of mut_state.depths) {
-    const bucket = mut_state.buckets.get(depth);
-
+  for (const bucket of descendants) {
     if (bucket !== undefined) {
-      // Not `push(...bucket)`: a spread passes every element as an argument,
-      // which overflows the stack for a bucket of a few hundred thousand.
       for (const c of bucket) {
-        mut_order.push(c);
+        // Read for each node, since the set is made when the first joins.
+        const joined = node.joinedDuringUpdate;
+
+        if (joined?.has(c) !== true) {
+          c.tryUpdate(updateToken);
+        }
       }
     }
   }
-
-  mut_state.order = mut_order;
-
-  return mut_order;
 };
 
 /**

@@ -1,11 +1,6 @@
 // cspell:ignore bivariance bivariant
 import type { Optional } from 'ts-data-forge';
-import type {
-  Mutable,
-  MutableMap,
-  MutableSet,
-  StrictOmit,
-} from 'ts-type-forge';
+import type { Mutable, MutableSet, StrictOmit } from 'ts-type-forge';
 import type {
   AsyncChildObservable,
   NonEmptyUnknownList,
@@ -67,7 +62,7 @@ export type NodeRecord<A> = Readonly<{
    * The descendants a root or an async child propagates its own updates to;
    * `undefined` for a sync child.
    */
-  manager: ManagerState | undefined;
+  descendants: ManagerState | undefined;
 
   /**
    * The managers this node's own descendants register to: itself for a
@@ -78,6 +73,17 @@ export type NodeRecord<A> = Readonly<{
 
   /** Whether the node is in its parents' and managers' lists. */
   isRegistered: boolean;
+
+  /** Whether this node, as a manager, is propagating an update of its own. */
+  isPropagating: boolean;
+
+  /**
+   * The descendants that registered to this manager while it propagated the
+   * update under way, which that update does not visit; made when the first
+   * one arrives. Kept on the manager rather than in a module, so that it
+   * also holds for a node another copy of synstate registered.
+   */
+  joinedDuringUpdate: ReadonlySet<NodeRecord<unknown>> | undefined;
 
   /** Set when a scope adopted this node at creation. */
   releaseFromScope: (() => void) | undefined;
@@ -101,7 +107,11 @@ export type NodeRecord<A> = Readonly<{
 export type MutableNodeRecord<A> = Mutable<
   StrictOmit<
     NodeRecord<A>,
-    'children' | 'manager' | 'subscribers' | 'teardowns'
+    | 'children'
+    | 'descendants'
+    | 'subscribers'
+    | 'teardowns'
+    | 'joinedDuringUpdate'
   >
 > &
   Mutable<
@@ -109,7 +119,8 @@ export type MutableNodeRecord<A> = Mutable<
       children: MutableSet<NodeRecord<unknown>> | undefined;
       subscribers: MutableSet<NodeSubscriber<A>> | undefined;
       teardowns: readonly (() => void)[] | undefined;
-      manager: MutableManagerState | undefined;
+      descendants: MutableManagerState | undefined;
+      joinedDuringUpdate: MutableSet<NodeRecord<unknown>> | undefined;
     }>
   >;
 
@@ -129,30 +140,26 @@ type NodeSubscriber<A> = Readonly<{
 }>;
 
 /**
- * The depth-ordered descendants of a manager. They are kept in one
- * insertion-ordered set per depth, so adding and removing one is O(1) apart
- * from the first node of a new depth. The flat array `startUpdate` walks is
- * rebuilt only when an update finds it stale; that also keeps the walk a
- * snapshot — a node created or completed while an update is propagating does
- * not change which nodes that update visits.
+ * The descendants of a manager, by depth: the set at index `i` holds those at
+ * `depth + 1 + i` of the manager, in the order they registered. Depths below
+ * a live node never skip one (every live node has a live parent one level
+ * up), so the array has few holes; a hole is `undefined`, never a gap left
+ * for V8 to treat as a holey array.
+ *
+ * `startUpdate` walks this array and its sets in place. Adding or removing a
+ * node is O(1) and there is no flat order to rebuild; only the first node of
+ * a depth replaces the array with a longer copy. A node deleted during
+ * the walk is skipped by the set's iterator; a node registered during it
+ * is also put in `joinedDuringUpdate` and skipped, so an update visits the
+ * nodes that existed when it began.
  */
-export type ManagerState = Readonly<{
-  buckets: ReadonlyMap<number, ReadonlySet<NodeRecord<unknown>>>;
+export type ManagerState = readonly (
+  ReadonlySet<NodeRecord<unknown>> | undefined
+)[];
 
-  /** The keys of `buckets`, ascending. */
-  depths: readonly number[];
-
-  /** `undefined` while stale. */
-  order: readonly NodeRecord<unknown>[] | undefined;
-}>;
-
-type MutableManagerState = Mutable<
-  Readonly<{
-    buckets: MutableMap<number, MutableSet<NodeRecord<unknown>>>;
-    depths: readonly number[];
-    order: readonly NodeRecord<unknown>[] | undefined;
-  }>
->;
+type MutableManagerState = readonly (
+  MutableSet<NodeRecord<unknown>> | undefined
+)[];
 
 /** The one place a record is written to; see {@link MutableNodeRecord}. */
 export const asMutable = <A,>(node: NodeRecord<A>): MutableNodeRecord<A> =>
