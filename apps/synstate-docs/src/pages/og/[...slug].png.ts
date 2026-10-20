@@ -3,7 +3,7 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 // @ts-expect-error -- astro:content is a virtual module available only at Astro build time
 import { getCollection } from 'astro:content';
-import { generateOgImage } from '../../lib/index.mjs';
+import { generateOgImage, toOgImageSlug } from '../../lib/index.mjs';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
@@ -17,7 +17,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
         data: Readonly<{ title: string; description?: string }>;
       }>,
     ) => ({
-      params: { slug: entry.id },
+      params: { slug: toOgImageSlug(entry.id) },
       props: {
         title: entry.data.title,
         description: entry.data.description,
