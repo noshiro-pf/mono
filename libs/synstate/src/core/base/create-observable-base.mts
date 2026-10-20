@@ -575,8 +575,6 @@ export const assembleObservable = <
   const mut_observable = {
     ...extra,
 
-    [observableBrand]: true,
-
     id: handle.id,
 
     kind,
@@ -610,6 +608,11 @@ export const assembleObservable = <
     subscribe: handle.subscribe,
 
     pipe,
+
+    // Last, not first: right after the `...extra` spread, a computed symbol
+    // key made the literal about twice as slow to create, and creating nodes
+    // is most of what mounting a UI costs.
+    [observableBrand]: true,
   };
 
   /**
