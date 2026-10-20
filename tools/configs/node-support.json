@@ -3,7 +3,7 @@
   "knownBroken": null,
   "targets": {
     "minimum": "22.22.2",
-    "lts": "24.21.0",
-    "current": "26.11.1"
+    "lts": "24.22.0",
+    "current": "26.12.0"
   }
 }
