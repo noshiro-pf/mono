@@ -372,7 +372,7 @@ export declare const view: <A, T>(
 - 配列を渡す props は `items` とする。Solid は `each` だが、`<For each={todos$}>` は英語として「for each todos」と読めてしまうため、渡すものを表す名詞にした。
 - `key` は React と同じく必須にする。位置で対応づけたいときは `key={(_, i) => i}` と明示する。位置で対応づける専用の `Index` は用意しない。
 - `For` はマウント時のスコープで、`items` から「キー → `{ item, index }`」の Map を作るノード（`entries$`）を 1 つ作る。
-- 行ごとに `createScope(マウント時のスコープ)` を作り、その `run` の中で `item$` と `index$` を `entries$` から派生させて（自分のキーの要素を取り出す `map` と `skipIfNoChange()`）、子の関数を 1 回呼ぶ。行の中は細粒度のまま更新される。
+- 行ごとに `createScope(マウント時のスコープ)` を作り、その `run` の中で `item$` と `index$` を `entries$` から派生させて（自分のキーの要素を取り出し、前回と同じなら流さない）、子の関数を 1 回呼ぶ。`item$` と `index$` はそれぞれ `entries$` の直接の子 1 つで作る。`map`・`filter`・`withInitialValue`・`skipIfNoChange` を重ねると行ごとに 8 ノードになり、行の作成と破棄の時間はほぼノード数で決まるため。行の中は細粒度のまま更新される。
 - 配列が更新されたら（`For` は `entries$` を購読して行の増減と DOM を扱う）:
     1. 既存のキーの行は、`entries$` の子として通常の伝播で `item$` と `index$` が更新される。`For` は何もしない。子の関数も呼ばない。
     2. 新しいキーは上の手順で行を作る。

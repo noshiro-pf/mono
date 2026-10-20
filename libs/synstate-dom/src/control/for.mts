@@ -1,15 +1,14 @@
 import {
+  createInitializedSyncChildObservable,
   createScope,
-  filter,
   getCurrentScope,
   map,
   onScopeDispose,
-  skipIfNoChange,
-  withInitialValue,
   type InitializedObservable,
+  type Observable,
   type Scope,
 } from 'synstate';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import { toObservable, type Bindable } from '../constant/index.mjs';
 import { bindValue } from '../internal/index.mjs';
 import { mountable, toNodes, type JSX } from '../jsx/index.mjs';
@@ -69,19 +68,9 @@ export const For = <T,>({
       rowStarts.add(start);
 
       const nodes = scope.run(() => {
-        const entry$ = entries$
-          .pipe(map((entries) => entries.byKey.get(rowKey)))
-          .pipe(filter(isEntry<T>));
+        const item$ = rowField(entries$, rowKey, entry.item, (e) => e.item);
 
-        const item$ = entry$
-          .pipe(map((e) => e.item))
-          .pipe(withInitialValue(entry.item))
-          .pipe(skipIfNoChange());
-
-        const index$ = entry$
-          .pipe(map((e) => e.index))
-          .pipe(withInitialValue(entry.index))
-          .pipe(skipIfNoChange());
+        const index$ = rowField(entries$, rowKey, entry.index, (e) => e.index);
 
         return toNodes(children(item$, index$).mount());
       });
@@ -241,8 +230,50 @@ const toEntries = <T,>(
   return { order, byKey: mut_byKey };
 };
 
-const isEntry = <T,>(entry: Entry<T> | undefined): entry is Entry<T> =>
-  entry !== undefined;
+/**
+ * One field of a row's entry, as a single child of `entries$`, where
+ * `map`, `filter`, `withInitialValue` and `skipIfNoChange` would make four:
+ * creating and disposing a row costs roughly its number of nodes.
+ *
+ * A row whose key has gone keeps its last value; its scope is disposed in
+ * the same update.
+ */
+const rowField = <T, A>(
+  entries$: Observable<Entries<T>>,
+  rowKey: unknown,
+  initialValue: A,
+  field: (entry: Entry<T>) => A,
+): InitializedObservable<A> =>
+  createInitializedSyncChildObservable(
+    { parents: [entries$], initialValue: Optional.some(initialValue) },
+    ({ setNext }) => {
+      let mut_previous = initialValue;
+
+      return (updateToken) => {
+        const sn = entries$.getSnapshot();
+
+        if (entries$.updateToken !== updateToken || Optional.isNone(sn)) {
+          return;
+        }
+
+        const entry = sn.value.byKey.get(rowKey);
+
+        if (entry === undefined) {
+          return;
+        }
+
+        const next = field(entry);
+
+        if (Object.is(next, mut_previous)) {
+          return;
+        }
+
+        mut_previous = next;
+
+        setNext(next, updateToken);
+      };
+    },
+  );
 
 /** Re-inserts the rows in the new order, so that iteration follows the DOM. */
 const reorderMap = (
