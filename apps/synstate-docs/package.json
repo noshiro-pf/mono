@@ -29,6 +29,7 @@
     "gen": "run-s gen:bundle-size gen:jsdoc-examples gen:jsdoc gen:readme gen:benchmark-doc fix:fmt",
     "gen:benchmark-doc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-benchmark.mts",
     "gen:bundle-size": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-bundle-size.mts",
+    "gen:icons": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen-icons.mts",
     "gen:jsdoc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-jsdoc-descriptions.mts",
     "gen:jsdoc-examples": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-jsdoc-examples.mts",
     "gen:readme": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-examples.mts",

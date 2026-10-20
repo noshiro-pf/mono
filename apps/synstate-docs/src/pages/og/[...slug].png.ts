@@ -1,3 +1,5 @@
+// `.ts`, not `.mts`: Astro routes an endpoint only with a `.js` or `.ts`
+// extension and silently skips any other, which left every og:image a 404.
 import type { APIRoute, GetStaticPaths } from 'astro';
 // @ts-expect-error -- astro:content is a virtual module available only at Astro build time
 import { getCollection } from 'astro:content';

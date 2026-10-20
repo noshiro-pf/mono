@@ -2,9 +2,10 @@
 import { Resvg } from '@resvg/resvg-js';
 import { readFileSync, readdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import * as path from 'node:path';
 import { inflateSync } from 'node:zlib';
 import type * as React from 'react';
-import satori from 'satori';
+import type * as Satori from 'satori';
 import { Arr, asSafeUint, range } from 'ts-data-forge';
 
 const OG_WIDTH = 1200;
@@ -136,6 +137,12 @@ const woffToTtf = (woffBuf: Readonly<Buffer>): Buffer => {
 // ---------------------------------------------------------------------------
 const require = createRequire(import.meta.url);
 
+// The CommonJS build: satori's ESM build runs a WebAssembly loader that reads
+// `__dirname`, which ES modules do not have, and the rejection kills the
+// process as soon as the module is imported.
+// eslint-disable-next-line total-functions/no-unsafe-type-assertion
+const { default: satori } = require('satori') as typeof Satori;
+
 const fontsDir = require
   .resolve('@fontsource/noto-sans-jp/400.css')
   .replace(/400\.css$/u, 'files/');
@@ -176,6 +183,25 @@ const fonts = [
 ] as const;
 
 // ---------------------------------------------------------------------------
+// Logo — rasterized from public/synstate-logo.png by `pnpm run gen:icons`.
+// Resolved from the working directory because this module is bundled before
+// it runs, so `import.meta.url` does not point into `src/`; Astro itself
+// takes the project root from the working directory.
+// ---------------------------------------------------------------------------
+const logoPng = readFileSync(
+  path.resolve(process.cwd(), 'public/favicon/logo-mark-256x256.png'),
+);
+
+// The site is built on every Node.js line CI tests, and
+// `Uint8Array#toBase64` arrived only in Node.js 25.
+// eslint-disable-next-line unicorn/prefer-uint8array-base64
+const logoBase64 = logoPng.toString('base64');
+
+const logoDataUri = `data:image/png;base64,${logoBase64}` as const;
+
+const SITE_LABEL = 'noshiro-pf.github.io/mono/synstate';
+
+// ---------------------------------------------------------------------------
 // OG image generation
 // ---------------------------------------------------------------------------
 export const generateOgImage = async (
@@ -194,7 +220,8 @@ export const generateOgImage = async (
           flexDirection: 'column',
           justifyContent: 'space-between',
           padding: '60px 72px',
-          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+          background:
+            'linear-gradient(135deg, #0b2152 0%, #123a6b 55%, #1d5a8c 100%)',
           fontFamily,
           color: '#f8fafc',
         },
@@ -206,18 +233,18 @@ export const generateOgImage = async (
               style: {
                 display: 'flex',
                 alignItems: 'center',
-                gap: '12px',
+                gap: '20px',
               },
               children: [
                 {
-                  type: 'div',
+                  type: 'img',
                   props: {
+                    src: logoDataUri,
+                    width: 72,
+                    height: 72,
                     style: {
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '8px',
-                      background:
-                        'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
+                      boxShadow: '0 0 24px rgba(96, 200, 255, 0.55)',
+                      borderRadius: '16px',
                     },
                   },
                 },
@@ -225,9 +252,9 @@ export const generateOgImage = async (
                   type: 'span',
                   props: {
                     style: {
-                      fontSize: '28px',
+                      fontSize: '36px',
                       fontWeight: 700,
-                      color: '#94a3b8',
+                      color: '#e0f2fe',
                     },
                     children: 'SynState',
                   },
@@ -268,13 +295,13 @@ export const generateOgImage = async (
                           style: {
                             fontSize: '24px',
                             lineHeight: 1.5,
-                            color: '#94a3b8',
+                            color: '#bae6fd',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                           },
                           children:
-                            description.length > 120
-                              ? `${description.slice(0, 117)}...`
+                            description.length > 160
+                              ? `${description.slice(0, 157)}...`
                               : description,
                         },
                       },
@@ -297,10 +324,23 @@ export const generateOgImage = async (
                   type: 'span',
                   props: {
                     style: {
-                      fontSize: '20px',
-                      color: '#64748b',
+                      fontSize: '22px',
+                      color: '#7dd3fc',
                     },
-                    children: 'noshiro-pf.github.io/synstate',
+                    children: SITE_LABEL,
+                  },
+                },
+                // The blue-to-green of the logo's "S".
+                {
+                  type: 'div',
+                  props: {
+                    style: {
+                      width: '240px',
+                      height: '8px',
+                      borderRadius: '4px',
+                      background:
+                        'linear-gradient(90deg, #2563eb 0%, #22c55e 100%)',
+                    },
                   },
                 },
               ],

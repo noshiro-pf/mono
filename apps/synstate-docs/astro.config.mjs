@@ -76,6 +76,9 @@ export default defineConfig({
             crossorigin: 'anonymous',
           },
         },
+        // Icons are rasterized from public/synstate-logo.png by
+        // `pnpm run gen:icons`; favicon.ico (16/32/48) is Starlight's
+        // `favicon` above.
         {
           tag: 'link',
           attrs: {
@@ -99,7 +102,21 @@ export default defineConfig({
           attrs: {
             rel: 'apple-touch-icon',
             sizes: '180x180',
-            href: '/mono/synstate/favicon/apple-icon-180x180.png',
+            href: '/mono/synstate/favicon/apple-touch-icon.png',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'apple-mobile-web-app-title',
+            content: 'SynState',
+          },
+        },
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'manifest',
+            href: '/mono/synstate/manifest.webmanifest',
           },
         },
       ],
