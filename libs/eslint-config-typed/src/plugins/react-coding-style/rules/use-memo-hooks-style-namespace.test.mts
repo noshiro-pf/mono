@@ -212,8 +212,49 @@ describe('use-memo-hooks-style through type wrappers', () => {
           const c = React.useMemo(() => x, []) satisfies number | undefined;
         `,
       },
+      {
+        name: '`satisfies` and `as const` around the factory are allowed',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: number;
+
+          const a = React.useMemo((() => x) satisfies () => number, []);
+          const b = React.useMemo((() => ({ x }) as const) satisfies () => unknown, []);
+        `,
+      },
     ],
     invalid: [
+      {
+        name: 'type assertion on the factory',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: number;
+
+          const a = React.useMemo((() => x) as () => number, []);
+          const b = React.useMemo((() => x)! as () => number, []);
+        `,
+        errors: [
+          { messageId: 'disallowUseMemoTypeAnnotation' },
+          { messageId: 'disallowUseMemoTypeAnnotation' },
+        ],
+      },
+      {
+        name: 'return type annotation and inner assertion of a wrapped factory',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: number;
+
+          const a = React.useMemo(((): number => x) satisfies () => number, []);
+          const b = React.useMemo((() => x as number) satisfies () => number, []);
+        `,
+        errors: [
+          { messageId: 'disallowUseMemoTypeAnnotation' },
+          { messageId: 'disallowUseMemoTypeAnnotation' },
+        ],
+      },
       {
         name: 'type assertion after `!`',
         code: dedent`
