@@ -53,6 +53,10 @@ const knownDivergences: ReadonlyMap<string, string> = new Map([
     'unicorn/no-new-array and @typescript-eslint/no-array-constructor do not see through `satisfies` or `as` around the constructor; only unicorn/no-unreadable-new-expression reports the lines, and it is not mapped.',
   ],
   [
+    'banned-syntax/no-new-array/invalid/through-global-object.mts',
+    'unicorn/no-new-array and @typescript-eslint/no-array-constructor match only a bare `Array` identifier, not `globalThis.Array`.',
+  ],
+  [
     'banned-syntax/no-this/invalid/this-in-function.mts',
     'prefer-arrow-functions leaves alone a `function` that uses `this`, which an arrow cannot replace; only func-names and object-shorthand report it, and neither is mapped.',
   ],
