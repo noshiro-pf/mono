@@ -182,6 +182,15 @@ describe('display-name through type wrappers', () => {
           (E.displayName satisfies string | undefined) = 'E';
         `,
       },
+      {
+        name: 'the assignment itself wrapped',
+        code: dedent`
+          const C = React.memo(() => <div />);
+          (C.displayName = 'C') satisfies string;
+          const D = React.memo(() => <div />);
+          (D.displayName = 'D') as string;
+        `,
+      },
     ],
     invalid: [
       {
