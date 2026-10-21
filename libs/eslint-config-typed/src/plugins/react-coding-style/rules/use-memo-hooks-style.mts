@@ -3,6 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { isTypeWrapper } from 'eslint-rule-forge';
 import { hasKey } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import { castNode, isReactApiCall } from './shared.mjs';
@@ -43,31 +44,59 @@ export const useMemoHooksStyleRule: TSESLint.RuleModule<MessageIds> = {
         });
       }
 
-      if (parent?.type === AST_NODE_TYPES.TSTypeAnnotation) {
-        context.report({
-          node: castNode(parent),
-          messageId: 'disallowUseMemoTypeAnnotation',
-        });
-      }
-
       const [firstArg] = node.arguments;
 
-      if (firstArg?.type === AST_NODE_TYPES.ArrowFunctionExpression) {
-        const { returnType, body } = firstArg;
-
-        if (returnType !== undefined) {
-          context.report({
-            node: castNode(returnType),
-            messageId: 'disallowUseMemoTypeAnnotation',
-          });
-        }
-
-        checkNodeForTypeAnnotations(context, body);
+      if (
+        firstArg !== undefined &&
+        firstArg.type !== AST_NODE_TYPES.SpreadElement
+      ) {
+        checkFactory(context, firstArg);
       }
     },
   }),
   defaultOptions: [],
 } as const;
+
+/**
+ * Reports the type annotations of `useMemo`'s factory: an `as` around it
+ * (`(() => x) as () => T`), its return type and the assertions in its body.
+ * The factory is found through type wrappers, so `satisfies` around it is
+ * looked through rather than hiding what it wraps.
+ */
+const checkFactory = (
+  context: DeepReadonly<TSESLint.RuleContext<MessageIds, []>>,
+  node: DeepReadonly<TSESTree.Expression>,
+): void => {
+  if (
+    (node.type === AST_NODE_TYPES.TSAsExpression ||
+      node.type === AST_NODE_TYPES.TSTypeAssertion) &&
+    !isConstAssertion(node.typeAnnotation)
+  ) {
+    context.report({
+      node: castNode(node),
+      messageId: 'disallowUseMemoTypeAnnotation',
+    });
+  }
+
+  if (isTypeWrapper(node)) {
+    checkFactory(context, node.expression);
+
+    return;
+  }
+
+  if (node.type === AST_NODE_TYPES.ArrowFunctionExpression) {
+    const { returnType, body } = node;
+
+    if (returnType !== undefined) {
+      context.report({
+        node: castNode(returnType),
+        messageId: 'disallowUseMemoTypeAnnotation',
+      });
+    }
+
+    checkNodeForTypeAnnotations(context, body);
+  }
+};
 
 /**
  * The outermost of the `!` and `satisfies` expressions directly around `node`,
