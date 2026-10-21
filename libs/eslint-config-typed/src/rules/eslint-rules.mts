@@ -25,14 +25,16 @@ export const restrictedGlobals = [
     message: 'Use Number.isNaN instead to avoid type coercion.',
   },
   {
+    // https://zenn.dev/megeton/articles/5f1ba5c7e1bfd0
     name: 'encodeURIComponent',
     message:
-      "Use 'stringify' from https://www.npmjs.com/package/query-string instead. (link: https://zenn.dev/megeton/articles/5f1ba5c7e1bfd0)",
+      "Use 'stringify' from https://www.npmjs.com/package/query-string instead.",
   },
   {
+    // https://zenn.dev/megeton/articles/5f1ba5c7e1bfd0
     name: 'decodeURIComponent',
     message:
-      "Use 'parse' from https://www.npmjs.com/package/query-string instead. (link: https://zenn.dev/megeton/articles/5f1ba5c7e1bfd0)",
+      "Use 'parse' from https://www.npmjs.com/package/query-string instead.",
   },
 ] as const satisfies EslintRulesOption['no-restricted-globals'];
 
