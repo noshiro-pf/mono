@@ -26,6 +26,7 @@ import {
   notUpdatedYet,
   observableBrand,
   toSubscriber,
+  type ScopeInternals,
 } from '../utils/index.mjs';
 import type { ChildNode } from './observable-node.mjs';
 
@@ -62,7 +63,7 @@ export class ObservableBaseClass<
   #mut_updateToken: UpdateToken;
   #mut_children: MutableSet<ChildNode> | undefined;
   #mut_subscribers: MutableSet<Subscriber<A>> | undefined;
-  #mut_releaseFromScope: (() => void) | undefined;
+  #mut_scope: ScopeInternals | undefined;
   readonly kind: Kind;
   readonly depth: Depth;
   declare readonly [observableBrand]: true;
@@ -90,7 +91,7 @@ export class ObservableBaseClass<
 
     this.#mut_subscribers = undefined;
 
-    this.#mut_releaseFromScope = undefined;
+    this.#mut_scope = undefined;
 
     this[observableBrand] = true;
   }
@@ -207,10 +208,10 @@ export class ObservableBaseClass<
 
     this.#mut_isCompleted = true;
 
-    if (this.#mut_releaseFromScope !== undefined) {
-      this.#mut_releaseFromScope();
+    if (this.#mut_scope !== undefined) {
+      this.#mut_scope.release();
 
-      this.#mut_releaseFromScope = undefined;
+      this.#mut_scope = undefined;
     }
 
     if (this.#mut_subscribers !== undefined) {
@@ -259,9 +260,13 @@ export class ObservableBaseClass<
   protected adoptIntoCurrentScope(): void {
     const scope = getCurrentScopeInternals();
 
-    if (scope !== undefined && !this.#mut_isCompleted) {
-      this.#mut_releaseFromScope = scope.adopt(this);
+    if (scope === undefined || this.#mut_isCompleted) {
+      return;
     }
+
+    scope.adopt(this);
+
+    this.#mut_scope = scope;
   }
 
   // A `WithInitialValueOperator` is also an `Operator`: nothing at run time

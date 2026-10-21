@@ -257,6 +257,83 @@ describe(createScope, () => {
     assert.deepStrictEqual(mut_completions, [1]);
   });
 
+  test('after many child scopes are disposed on their own, the parent disposes the rest once, newest first', () => {
+    const parent = createScope();
+
+    const mut_order: number[] = [];
+
+    const children = Array.from({ length: 100 }, (_, i) => {
+      const child = createScope(parent);
+
+      child.run(() => {
+        onScopeDispose(() => {
+          mut_order.push(i);
+        });
+      });
+
+      return child;
+    });
+
+    // Every child whose index is not a multiple of 3 goes on its own: 66 of
+    // them, enough for the parent to rebuild its list of children.
+    for (const [i, child] of children.entries()) {
+      if (i % 3 !== 0) {
+        child.dispose();
+      }
+    }
+
+    const disposedAlone = mut_order.length;
+
+    parent.dispose();
+
+    assert.strictEqual(disposedAlone, 66);
+
+    assert.deepStrictEqual(
+      mut_order.slice(disposedAlone),
+      Array.from({ length: 34 }, (_, k) => (33 - k) * 3),
+    );
+  });
+
+  test('after many owned nodes complete on their own, the scope disposes the rest once, newest first', () => {
+    const store$ = source<number>();
+
+    const scope = createScope();
+
+    const mut_completions: number[] = [];
+
+    const nodes = scope.run(() =>
+      Array.from({ length: 100 }, (_, i) => {
+        const node$ = store$.pipe(map((x) => x + i));
+
+        node$.subscribe(
+          () => {},
+          () => {
+            mut_completions.push(i);
+          },
+        );
+
+        return node$;
+      }),
+    );
+
+    for (const [i, node$] of nodes.entries()) {
+      if (i % 3 !== 0) {
+        node$.complete();
+      }
+    }
+
+    const completedAlone = mut_completions.length;
+
+    scope.dispose();
+
+    assert.strictEqual(completedAlone, 66);
+
+    assert.deepStrictEqual(
+      mut_completions.slice(completedAlone),
+      Array.from({ length: 34 }, (_, k) => (33 - k) * 3),
+    );
+  });
+
   test('nodes created inside untracked belong to no scope', () => {
     const store$ = source<number>();
 

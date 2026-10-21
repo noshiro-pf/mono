@@ -1,9 +1,16 @@
-import type { MutableSet } from 'ts-type-forge';
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding. A scope is a class for the reason the observables are (see
+// `ScopeClass` below), so those four rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import type { Scope } from '../types/index.mjs';
 import {
   getCurrentScopeInternals,
   runWithScope,
   type ScopeInternals,
+  type ScopeMember,
 } from '../utils/index.mjs';
 
 /**
@@ -19,103 +26,14 @@ import {
  * application code; state defined at module level belongs to no scope and
  * lives as long as the page.
  *
+ * `run` and `dispose` read the scope they are called on, so call them on it
+ * (`scope.dispose()`) rather than taking them off it.
+ *
  * @param parent - The scope whose disposal also disposes the new one
  * @returns The new scope
  */
-export const createScope = (parent?: Scope): Scope => {
-  const mut_children: MutableSet<Scope> = new Set();
-
-  let mut_cleanups: (() => void)[] = [];
-
-  const mut_nodes: MutableSet<Readonly<{ dispose: () => void }>> = new Set();
-
-  const parentInternals =
-    parent === undefined ? undefined : mut_internalsOf.get(parent);
-
-  let mut_isDisposed = false;
-
-  const dispose = (): void => {
-    if (mut_isDisposed) {
-      return;
-    }
-
-    mut_isDisposed = true;
-
-    // Copied first: a child scope leaves `mut_children` as it is disposed, and
-    // a node leaves `mut_nodes` as it completes.
-    for (const child of Array.from(mut_children).toReversed()) {
-      child.dispose();
-    }
-
-    for (const cleanup of mut_cleanups.toReversed()) {
-      cleanup();
-    }
-
-    mut_cleanups = [];
-
-    for (const node of Array.from(mut_nodes).toReversed()) {
-      node.dispose();
-    }
-
-    mut_nodes.clear();
-
-    parentInternals?.detachChild(scope);
-  };
-
-  const run = <R,>(body: () => R): R => {
-    if (mut_isDisposed) {
-      console.warn(
-        'synstate: run() was called on a disposed scope; what it creates belongs to no scope.',
-      );
-
-      return runWithScope(undefined, body);
-    }
-
-    return runWithScope(internals, body);
-  };
-
-  const scope: Scope = { run, dispose } as const;
-
-  const internals: ScopeInternals = {
-    scope,
-
-    adopt: (node) => {
-      mut_nodes.add(node);
-
-      return () => {
-        mut_nodes.delete(node);
-      };
-    },
-
-    addCleanup: (cleanup) => {
-      mut_cleanups.push(cleanup);
-    },
-  } as const;
-
-  mut_internalsOf.set(scope, {
-    addChild: (child) => {
-      mut_children.add(child);
-    },
-    detachChild: (child) => {
-      mut_children.delete(child);
-    },
-    isDisposed: () => mut_isDisposed,
-  });
-
-  if (parentInternals !== undefined) {
-    if (parentInternals.isDisposed()) {
-      console.warn(
-        'synstate: createScope() was given a disposed parent; the new scope is born disposed.',
-      );
-
-      mut_isDisposed = true;
-    } else {
-      parentInternals.addChild(scope);
-    }
-  }
-
-  return scope;
-};
+export const createScope = (parent?: Scope): Scope =>
+  new ScopeClass(parent instanceof ScopeClass ? parent : undefined);
 
 /**
  * Returns the scope whose `run` is executing, or `undefined` outside every
@@ -128,7 +46,7 @@ export const createScope = (parent?: Scope): Scope => {
  * @returns The current scope, if any
  */
 export const getCurrentScope = (): Scope | undefined =>
-  getCurrentScopeInternals()?.scope;
+  getCurrentScopeInternals();
 
 /**
  * Registers `cleanup` to be called when the current scope is disposed. Cleanups
@@ -163,11 +81,180 @@ export const onScopeDispose = (cleanup: () => void): void => {
 export const untracked = <R,>(body: () => R): R =>
   runWithScope(undefined, body);
 
-type ScopeRecord = Readonly<{
-  addChild: (child: Scope) => void;
-  detachChild: (child: Scope) => void;
-  isDisposed: () => boolean;
-}>;
+/**
+ * A scope is created for every row and branch of a UI, so creating one has to
+ * be cheap. It used to be a set of closures with a `Set` of children, a `Set`
+ * of owned observables and a record in a `WeakMap`; it is now one object whose
+ * methods live on the prototype and whose lists are arrays made when the
+ * first entry arrives.
+ *
+ * Whatever leaves a list on its own (a child scope disposed by itself, an
+ * observable that completed) is not looked up and spliced out: it only counts
+ * itself gone, and once at least half of a list is gone the list is rebuilt
+ * from what is left. Disposal walks the lists newest first, as before.
+ *
+ * The class itself is not exported; `createScope` is the way to make one.
+ */
+class ScopeClass implements ScopeInternals {
+  readonly #parent: ScopeClass | undefined;
+  // Pushed to in place: a scope gains children, cleanups and nodes one at a
+  // time, and copying the list for each would make a big scope quadratic.
+  // @sumi-expect-error readonly/require-readonly-type
+  #mut_children: ScopeClass[] | undefined;
+  #mut_goneChildren: number;
+  // @sumi-expect-error readonly/require-readonly-type
+  #mut_cleanups: (() => void)[] | undefined;
+  // @sumi-expect-error readonly/require-readonly-type
+  #mut_nodes: ScopeMember[] | undefined;
+  #mut_goneNodes: number;
+  #mut_isDisposed: boolean;
 
-/** The internal side of every scope `createScope` made, by its public face. */
-const mut_internalsOf = new WeakMap<Scope, ScopeRecord>();
+  constructor(parent: ScopeClass | undefined) {
+    this.#parent = parent;
+
+    this.#mut_children = undefined;
+
+    this.#mut_goneChildren = 0;
+
+    this.#mut_cleanups = undefined;
+
+    this.#mut_nodes = undefined;
+
+    this.#mut_goneNodes = 0;
+
+    this.#mut_isDisposed = false;
+
+    if (parent !== undefined) {
+      if (parent.#mut_isDisposed) {
+        console.warn(
+          'synstate: createScope() was given a disposed parent; the new scope is born disposed.',
+        );
+
+        this.#mut_isDisposed = true;
+      } else if (parent.#mut_children === undefined) {
+        parent.#mut_children = [this];
+      } else {
+        parent.#mut_children.push(this);
+      }
+    }
+  }
+
+  /** Called by a child scope that was disposed on its own. */
+  #childGone(): void {
+    const children = this.#mut_children;
+
+    if (children === undefined) {
+      return;
+    }
+
+    this.#mut_goneChildren += 1;
+
+    if (!isMostlyGone(this.#mut_goneChildren, children.length)) {
+      return;
+    }
+
+    this.#mut_children = children.filter((c) => !c.#mut_isDisposed);
+
+    this.#mut_goneChildren = 0;
+  }
+
+  run<R>(body: () => R): R {
+    if (this.#mut_isDisposed) {
+      console.warn(
+        'synstate: run() was called on a disposed scope; what it creates belongs to no scope.',
+      );
+
+      return runWithScope(undefined, body);
+    }
+
+    return runWithScope(this, body);
+  }
+
+  dispose(): void {
+    if (this.#mut_isDisposed) {
+      return;
+    }
+
+    // Set first: the children, cleanups and nodes below call back into this
+    // scope (`childGone`, `release`), which has nothing to do once it is
+    // disposing everything anyway.
+    this.#mut_isDisposed = true;
+
+    const children = this.#mut_children;
+
+    if (children !== undefined) {
+      this.#mut_children = undefined;
+
+      for (let mut_i = children.length - 1; mut_i >= 0; mut_i -= 1) {
+        children[mut_i]?.dispose();
+      }
+    }
+
+    const cleanups = this.#mut_cleanups;
+
+    if (cleanups !== undefined) {
+      this.#mut_cleanups = undefined;
+
+      for (let mut_i = cleanups.length - 1; mut_i >= 0; mut_i -= 1) {
+        cleanups[mut_i]?.();
+      }
+    }
+
+    const nodes = this.#mut_nodes;
+
+    if (nodes !== undefined) {
+      this.#mut_nodes = undefined;
+
+      for (let mut_i = nodes.length - 1; mut_i >= 0; mut_i -= 1) {
+        nodes[mut_i]?.dispose();
+      }
+    }
+
+    if (this.#parent !== undefined) {
+      this.#parent.#childGone();
+    }
+  }
+
+  adopt(node: ScopeMember): void {
+    if (this.#mut_nodes === undefined) {
+      this.#mut_nodes = [node];
+    } else {
+      this.#mut_nodes.push(node);
+    }
+  }
+
+  release(): void {
+    const nodes = this.#mut_nodes;
+
+    if (nodes === undefined) {
+      return;
+    }
+
+    this.#mut_goneNodes += 1;
+
+    if (!isMostlyGone(this.#mut_goneNodes, nodes.length)) {
+      return;
+    }
+
+    this.#mut_nodes = nodes.filter((n) => !n.isCompleted);
+
+    this.#mut_goneNodes = 0;
+  }
+
+  addCleanup(cleanup: () => void): void {
+    if (this.#mut_cleanups === undefined) {
+      this.#mut_cleanups = [cleanup];
+    } else {
+      this.#mut_cleanups.push(cleanup);
+    }
+  }
+}
+
+/**
+ * Whether a list is worth rebuilding: at least half of it is gone, and enough
+ * of it that the rebuild is paid for by the entries it drops.
+ */
+const isMostlyGone = (gone: number, length: number): boolean =>
+  gone >= minGoneToCompact && gone * 2 >= length;
+
+const minGoneToCompact = 16;
