@@ -404,7 +404,9 @@ export const eslintRules = {
   'no-return-assign': withDefaultOption('error'),
   'no-self-assign': withDefaultOption('error'),
   'no-self-compare': 'error',
-  'no-sequences': withDefaultOption('error'),
+  // Parentheses do not make `(0, f)(x)` any clearer, and with the comma
+  // operator gone from the code, the rules here need not look through it.
+  'no-sequences': ['error', { allowInParentheses: false }],
   'no-shadow-restricted-names': ['error', { reportGlobalThis: true }],
   'no-sparse-arrays': 'error',
   'no-template-curly-in-string': 'error',
