@@ -1,6 +1,6 @@
 import { Optional, Result } from 'ts-data-forge';
-import { createRootObservable } from '../base/index.mjs';
-import type { FromPromiseObservable } from '../types/index.mjs';
+import { RootObservableClass } from '../class/index.mjs';
+import { type FromPromiseObservable } from '../types/index.mjs';
 
 /**
  * Creates an observable from a Promise factory that receives an `AbortSignal`.
@@ -19,101 +19,65 @@ import type { FromPromiseObservable } from '../types/index.mjs';
  *
  * @example
  * ```ts
- * //  Timeline:
- * //
- * //  query$      "a"            "b"
- * //  request a   [in flight]    | (aborted)
- * //  request b                  [in flight]  -> "result for b"
- * //  results$                                  Ok("result for b")
- * //
- * //  Explanation:
- * //  - fromAbortablePromise hands its factory an AbortSignal
- * //  - switchMap completes the previous inner observable, which aborts it
- * //  - The AbortError that follows is swallowed, so nothing is emitted for it
- *
- * const search = (query: string, signal: AbortSignal): Promise<string> =>
- *   new Promise((resolve, reject) => {
- *     const timer = setTimeout(() => {
- *       resolve(`result for ${query}`);
- *     }, 50);
- *
- *     signal.addEventListener('abort', () => {
- *       clearTimeout(timer);
- *
- *       reject(new DOMException('aborted', 'AbortError'));
- *     });
- *   });
- *
- * const query$ = source<string>();
- *
- * const results$ = query$.pipe(
- *   switchMap((query) =>
- *     fromAbortablePromise((signal) => search(query, signal)),
+ * const results$ = query.pipe(
+ *   switchMap((q) =>
+ *     fromAbortablePromise((signal) =>
+ *       fetch(`/api/search?q=${q}`, { signal }).then((r) => r.json()),
+ *     ),
  *   ),
  * );
- *
- * const valueHistory: Result<string, unknown>[] = [];
- *
- * results$.subscribe((result) => {
- *   valueHistory.push(result);
- * });
- *
- * query$.next('a');
- *
- * query$.next('b');
- *
- * await new Promise<void>((resolve) => {
- *   setTimeout(resolve, 150);
- * });
- *
- * assert.deepStrictEqual(valueHistory, [Result.ok('result for b')]);
  * ```
  */
 export const fromAbortablePromise = <A, E = unknown>(
-  // @sumi-expect-error readonly/require-readonly-parameter
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   factory: (signal: AbortSignal) => Promise<A>,
 ): FromPromiseObservable<A, E> =>
-  createRootObservable<Result<A, E>>(
-    { initialValue: Optional.none },
-    ({ startUpdate, isCompleted, complete, onComplete }) => {
-      const abortController = new AbortController();
+  new FromAbortablePromiseObservableClass(factory);
 
-      onComplete(() => {
-        abortController.abort();
+class FromAbortablePromiseObservableClass<A, E = unknown>
+  extends RootObservableClass<Result<A, E>>
+  implements FromPromiseObservable<A, E>
+{
+  readonly #abortController: AbortController;
+
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  constructor(factory: (signal: AbortSignal) => Promise<A>) {
+    super({ initialValue: Optional.none });
+
+    this.#abortController = new AbortController();
+
+    const promise = factory(this.#abortController.signal);
+
+    promise
+      .then((value) => {
+        if (this.isCompleted) return;
+
+        this.startUpdate(Result.ok(value));
+      })
+      .catch((error: unknown) => {
+        if (this.isCompleted) return;
+
+        // Silently ignore AbortError — it means the observable was
+        // intentionally completed (e.g., by switchMap).
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        this.startUpdate(
+          Result.err(
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+            error as E,
+          ),
+        );
+      })
+      .finally(() => {
+        this.complete();
       });
+  }
 
-      const promise = factory(abortController.signal);
+  override complete(): void {
+    this.#abortController.abort();
 
-      promise
-        .then((value) => {
-          if (isCompleted()) {
-            return;
-          }
-
-          startUpdate(Result.ok(value));
-        })
-        .catch((error: unknown) => {
-          if (isCompleted()) {
-            return;
-          }
-
-          // Silently ignore AbortError — it means the observable was
-          // intentionally completed (e.g., by switchMap).
-          if (error instanceof DOMException && error.name === 'AbortError') {
-            return;
-          }
-
-          startUpdate(
-            Result.err(
-              // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-              error as E,
-            ),
-          );
-        })
-        .finally(() => {
-          complete();
-        });
-
-      return {};
-    },
-  );
+    super.complete();
+  }
+}

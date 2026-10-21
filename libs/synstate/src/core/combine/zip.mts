@@ -1,27 +1,25 @@
 import { Arr, Optional, createQueue, expectType } from 'ts-data-forge';
-import type { NonEmptyTuple, Tuple } from 'ts-type-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
+import { type NonEmptyTuple, type Tuple } from 'ts-type-forge';
+import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import { withInitialValue } from '../operators/index.mjs';
-import type {
-  InitializedObservable,
-  InitializedSyncChildObservable,
-  NonEmptyUnknownList,
-  Observable,
-  SyncChildObservable,
-  TupleToQueueTuple,
-  UpdateToken,
-  Wrap,
-  ZipObservable,
-  ZipObservableRefined,
+import {
+  type InitializedObservable,
+  type InitializedSyncChildObservable,
+  type NonEmptyUnknownList,
+  type Observable,
+  type SyncChildObservable,
+  type TupleToQueueTuple,
+  type UpdateToken,
+  type Wrap,
+  type ZipObservable,
+  type ZipObservableRefined,
 } from '../types/index.mjs';
 
 /**
  * Combines multiple observables by pairing their emissions by index.
  * Waits for all sources to emit their nth value before emitting the nth tuple.
- * Completes once a completed source has no value left to pair, as RxJS's
- * `zip` does: at once if it completes with nothing queued, otherwise after
- * the tuple that takes its last queued value.
+ * Completes when any source completes.
  *
  * @template OS - Tuple type of source observables
  * @param parents - Array of observables to zip
@@ -38,7 +36,7 @@ import type {
  * //  Explanation:
  * //  - zip pairs values by their index from multiple sources
  * //  - Waits for all sources to emit at the same index
- * //  - Completes once a completed source has no value left to pair
+ * //  - Completes when any source completes
  *
  * const [letters$, setLetter] = createState<string>('A');
  *
@@ -70,94 +68,64 @@ import type {
 export const zip = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): ZipObservableRefined<OS> =>
-  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  createZipObservable(parents) as unknown as ZipObservableRefined<OS>;
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  new ZipObservableClass(parents) as unknown as ZipObservableRefined<OS>;
 
-const createZipObservable = <const A extends NonEmptyUnknownList>(
-  parents: Wrap<A>,
-): ZipObservable<A> => {
-  const parentsValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
-    parents,
-    (p) => p.getSnapshot(),
-  );
+class ZipObservableClass<const A extends NonEmptyUnknownList>
+  extends SyncChildObservableClass<A, A>
+  implements ZipObservable<A>
+{
+  readonly #queues: TupleToQueueTuple<A>;
 
-  // The annotation on `initialValue` is what replaces the type assertion.
-  // `Arr.map` carries a single result element type, so it reports `A[number]`
-  // at every position, and `Tuple.MapTo<A[number], A>` — the uniform mapping
-  // — is *not* assignable back to `A`. The positional
-  // `Readonly<{ [K in keyof A]: A[K] }>` is, and TypeScript accepts the
-  // uniform result into it because the two mapped types share `keyof A`. So
-  // it is the annotation, not an assertion, that records the position-wise
-  // fact the checker cannot derive on its own.
-  const initialValue: Optional<Readonly<{ [K in keyof A]: A[K] }>> = Arr.every(
-    parentsValues,
-    Optional.isSome,
-  )
-    ? Optional.some(Arr.map(parentsValues, (c) => c.value))
-    : Optional.none;
+  constructor(parents: Wrap<A>) {
+    const parentsValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
+      parents,
+      (p) => p.getSnapshot(),
+    );
 
-  return createSyncChildObservable<A, A>(
-    { parents, initialValue },
-    ({ setNext, complete }) => {
-      const queues: TupleToQueueTuple<A> = Arr.map(parents, () =>
-        createQueue(),
-      );
+    // The annotation on `initialValue` is what replaces the type assertion.
+    // `Arr.map` carries a single result element type, so it reports `A[number]`
+    // at every position, and `Tuple.MapTo<A[number], A>` — the uniform mapping
+    // — is *not* assignable back to `A`. The positional
+    // `Readonly<{ [K in keyof A]: A[K] }>` is, and TypeScript accepts the
+    // uniform result into it because the two mapped types share `keyof A`. So
+    // it is the annotation, not an assertion, that records the position-wise
+    // fact the checker cannot derive on its own.
+    const initialValue: Optional<Readonly<{ [K in keyof A]: A[K] }>> =
+      Arr.every(parentsValues, Optional.isSome)
+        ? Optional.some(Arr.map(parentsValues, (c) => c.value))
+        : Optional.none;
 
-      // The token of each parent's latest value that zip has taken in, so
-      // that a value a parent emits in the update it completes in — its
-      // `tryComplete` reaches zip before its `tryUpdate` does — still counts
-      // as queued.
-      const mut_takenTokens: UpdateToken[] = Array.from(
-        parents,
-        (p) => p.updateToken,
-      );
+    super({
+      parents,
+      initialValue,
+    });
 
-      // No tuple can be completed any more once a completed source has
-      // nothing left to pair (#2343).
-      const canEmitNoMore = (): boolean =>
-        parents.some(
-          (par, index) =>
-            par.isCompleted &&
-            queues[index]?.isEmpty === true &&
-            (par.updateToken === mut_takenTokens[index] ||
-              Optional.isNone(par.getSnapshot())),
-        );
+    this.#queues = Arr.map(parents, () => createQueue());
+  }
 
-      return {
-        tryUpdate: (updateToken) => {
-          for (const [index, par] of parents.entries()) {
-            const sn = par.getSnapshot();
+  override tryUpdate(updateToken: UpdateToken): void {
+    const queues = this.#queues;
 
-            if (!(par.updateToken === updateToken && Optional.isSome(sn))) {
-              continue;
-            }
+    for (const [index, par] of this.parents.entries()) {
+      const sn = par.getSnapshot();
 
-            queues[index]?.enqueue(sn.value);
+      if (par.updateToken === updateToken && Optional.isSome(sn)) {
+        queues[index]?.enqueue(sn.value);
+      }
+    }
 
-            mut_takenTokens[index] = updateToken;
-          }
+    if (queues.every((list) => !list.isEmpty)) {
+      const nextValue =
+        // `Arr.map` has a single result element type, so it reports
+        // `A[number] | undefined` per position rather than `A[P]`.
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
 
-          if (queues.some((list) => list.isEmpty)) {
-            return;
-          }
-
-          const nextValue =
-            // `Arr.map` has a single result element type, so it reports
-            // `A[number] | undefined` per position rather than `A[P]`.
-            // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-            Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
-
-          setNext(nextValue, updateToken);
-
-          if (canEmitNoMore()) {
-            complete();
-          }
-        },
-        canEmitNoMore,
-      };
-    },
-  );
-};
+      this.setNext(nextValue, updateToken);
+    }
+  }
+}
 
 if (import.meta.vitest !== undefined) {
   test('type test', () => {

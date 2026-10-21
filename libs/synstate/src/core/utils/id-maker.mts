@@ -1,14 +1,14 @@
-import type {
-  ObservableId,
-  SubscriberId,
-  UpdateToken,
+import {
+  type ObservableId,
+  type SubscriberId,
+  type UpdateToken,
 } from '../types/index.mjs';
 
 function* idMaker<T extends symbol>(): Generator<T, T, T> {
   let mut_i = 0;
 
   while (true) {
-    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     yield Symbol(mut_i.toString()) as T;
 
     mut_i += 1;

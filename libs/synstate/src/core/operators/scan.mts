@@ -1,9 +1,10 @@
 import { Optional } from 'ts-data-forge';
-import { createInitializedSyncChildObservable } from '../base/index.mjs';
-import type {
-  Observable,
-  ScanOperatorObservable,
-  WithInitialValueOperator,
+import { InitializedSyncChildObservableClass } from '../class/index.mjs';
+import {
+  type Observable,
+  type ScanOperatorObservable,
+  type UpdateToken,
+  type WithInitialValueOperator,
 } from '../types/index.mjs';
 
 /**
@@ -61,32 +62,42 @@ export const scan =
     initialValue: B,
   ): WithInitialValueOperator<A, B> =>
   (parentObservable) =>
-    createScanObservable(parentObservable, reducer, initialValue);
+    new ScanObservableClass(parentObservable, reducer, initialValue);
 
-const createScanObservable = <A, B>(
-  parentObservable: Observable<A>,
-  reducer: (acc: B, curr: A) => B,
-  initialValue: B,
-): ScanOperatorObservable<A, B> =>
-  createInitializedSyncChildObservable(
-    {
+class ScanObservableClass<A, B>
+  extends InitializedSyncChildObservableClass<B, readonly [A]>
+  implements ScanOperatorObservable<A, B>
+{
+  readonly #reducer: (acc: B, curr: A) => B;
+
+  constructor(
+    parentObservable: Observable<A>,
+    reducer: (acc: B, curr: A) => B,
+    initialValue: B,
+  ) {
+    super({
       parents: [parentObservable],
       initialValue: Optional.some(initialValue),
-    },
-    ({ setNext, getSnapshot }) =>
-      (updateToken) => {
-        const psn = parentObservable.getSnapshot();
+    });
 
-        const sn = getSnapshot();
+    this.#reducer = reducer;
+  }
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(psn) ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        setNext(reducer(sn.value, psn.value), updateToken);
-      },
-  );
+    const psn = par.getSnapshot();
+
+    const sn = this.getSnapshot();
+
+    if (
+      par.updateToken !== updateToken ||
+      Optional.isNone(psn) ||
+      Optional.isNone(sn)
+    ) {
+      return; // skip update
+    }
+
+    this.setNext(this.#reducer(sn.value, psn.value), updateToken);
+  }
+}

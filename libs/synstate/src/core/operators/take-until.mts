@@ -1,9 +1,10 @@
 import { Optional } from 'ts-data-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
-import type {
-  KeepInitialValueOperator,
-  Observable,
-  TakeUntilOperatorObservable,
+import { SyncChildObservableClass } from '../class/index.mjs';
+import {
+  type KeepInitialValueOperator,
+  type Observable,
+  type TakeUntilOperatorObservable,
+  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -57,43 +58,42 @@ import type {
 export const takeUntil = <A,>(
   notifier: Observable<unknown>,
 ): KeepInitialValueOperator<A, A> =>
-  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
-    createTakeUntilObservable(
+    new TakeUntilObservableClass(
       parentObservable,
       notifier,
     )) as KeepInitialValueOperator<A, A>;
 
-const createTakeUntilObservable = <A,>(
-  parentObservable: Observable<A>,
-  notifier: Observable<unknown>,
-): TakeUntilOperatorObservable<A> =>
-  createSyncChildObservable<A, readonly [A]>(
-    {
+class TakeUntilObservableClass<A>
+  extends SyncChildObservableClass<A, readonly [A]>
+  implements TakeUntilOperatorObservable<A>
+{
+  constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
+    super({
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-    },
-    ({ setNext, complete, onComplete }) => {
-      // A notifier that already holds a value completes this observable
-      // inside `subscribe`; the teardown registered after it then runs at
-      // once.
-      const subscription = notifier.subscribe(complete, complete);
+    });
 
-      onComplete(() => {
-        subscription.unsubscribe();
-      });
+    notifier.subscribe(
+      () => {
+        this.complete();
+      },
+      () => {
+        this.complete();
+      },
+    );
+  }
 
-      return (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    const sn = par.getSnapshot();
 
-        setNext(sn.value, updateToken);
-      };
-    },
-  );
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
+
+    this.setNext(sn.value, updateToken);
+  }
+}

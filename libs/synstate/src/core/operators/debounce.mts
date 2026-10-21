@@ -1,18 +1,16 @@
 import { Optional } from 'ts-data-forge';
-import { createAsyncChildObservable } from '../base/index.mjs';
-import type {
-  DebounceOperatorObservable,
-  KeepInitialValueOperator,
-  Observable,
-  TimerId,
+import { AsyncChildObservableClass } from '../class/index.mjs';
+import {
+  type DebounceOperatorObservable,
+  type KeepInitialValueOperator,
+  type Observable,
+  type TimerId,
+  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
  * Delays emissions from the source observable until a specified time has passed without another emission.
  * Useful for handling user input events like typing or scrolling.
- *
- * Completing it, or its source completing, passes on the value its timer is
- * still holding before the completion; `dispose()` drops that value.
  *
  * @template A - The type of values from the source
  * @param milliSeconds - The debounce duration in milliseconds
@@ -98,73 +96,59 @@ import type {
 export const debounce = <A,>(
   milliSeconds: number,
 ): KeepInitialValueOperator<A, A> =>
-  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
-    createDebounceObservable(
+    new DebounceObservableClass(
       parentObservable,
       milliSeconds,
     )) as KeepInitialValueOperator<A, A>;
 
-const createDebounceObservable = <A,>(
-  parentObservable: Observable<A>,
-  milliSeconds: number,
-): DebounceOperatorObservable<A> =>
-  createAsyncChildObservable(
-    {
+class DebounceObservableClass<A>
+  extends AsyncChildObservableClass<A, readonly [A]>
+  implements DebounceOperatorObservable<A>
+{
+  readonly #milliSeconds: number;
+  #mut_timerId: TimerId | undefined;
+
+  constructor(parentObservable: Observable<A>, milliSeconds: number) {
+    super({
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-    },
-    ({ startUpdate, onComplete }) => {
-      let mut_timerId: TimerId | undefined = undefined;
+    });
 
-      /** The value the running timer will pass on. */
-      let mut_pending: Optional<A> = Optional.none;
+    this.#mut_timerId = undefined;
 
-      const resetTimer = (): void => {
-        if (mut_timerId !== undefined) {
-          clearTimeout(mut_timerId);
+    this.#milliSeconds = milliSeconds;
+  }
 
-          mut_timerId = undefined;
-        }
+  #resetTimer(): void {
+    if (this.#mut_timerId !== undefined) {
+      clearTimeout(this.#mut_timerId);
+    }
+  }
 
-        mut_pending = Optional.none;
-      };
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-      onComplete(resetTimer);
+    const sn = par.getSnapshot();
 
-      return {
-        tryUpdate: (updateToken) => {
-          const sn = parentObservable.getSnapshot();
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
 
-          if (
-            parentObservable.updateToken !== updateToken ||
-            Optional.isNone(sn)
-          ) {
-            return; // skip update
-          }
+    this.#resetTimer();
 
-          resetTimer();
+    // set timer
+    this.#mut_timerId = setTimeout(() => {
+      if (Optional.isNone(sn)) return;
 
-          mut_pending = sn;
+      this.startUpdate(sn.value);
+    }, this.#milliSeconds);
+  }
 
-          // set timer
-          mut_timerId = setTimeout(() => {
-            mut_timerId = undefined;
+  override complete(): void {
+    this.#resetTimer();
 
-            mut_pending = Optional.none;
-
-            startUpdate(sn.value);
-          }, milliSeconds);
-        },
-        flush: () => {
-          const pending = mut_pending;
-
-          resetTimer();
-
-          if (Optional.isSome(pending)) {
-            startUpdate(pending.value);
-          }
-        },
-      };
-    },
-  );
+    super.complete();
+  }
+}

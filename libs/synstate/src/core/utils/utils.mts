@@ -1,5 +1,5 @@
 import { Arr, asSafeInt, asUint32, SafeInt } from 'ts-data-forge';
-import type { NegativeInt32, Uint32 } from 'ts-type-forge';
+import { type NegativeInt32, type Uint32 } from 'ts-type-forge';
 
 export const halfInt = (x: SafeInt): SafeInt =>
   x % 2 === 0
@@ -34,13 +34,9 @@ export const binarySearch = <N extends number>(
   while (mut_left <= mut_right) {
     const curr = sortedArray[mut_mid];
 
-    if (x === curr) {
-      break;
-    }
+    if (x === curr) break;
 
-    if (curr === undefined) {
-      break;
-    }
+    if (curr === undefined) break;
 
     if (curr > x) {
       mut_right = SafeInt.sub(mut_mid, 1);
@@ -51,6 +47,6 @@ export const binarySearch = <N extends number>(
     mut_mid = SafeInt.add(mut_left, halfInt(SafeInt.sub(mut_right, mut_left)));
   }
 
-  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return mut_mid as NegativeInt32 | Uint32;
 };

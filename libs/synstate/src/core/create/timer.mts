@@ -1,6 +1,6 @@
 import { Optional } from 'ts-data-forge';
-import { createRootObservable } from '../base/index.mjs';
-import type { TimerId, TimerObservable } from '../types/index.mjs';
+import { RootObservableClass } from '../class/index.mjs';
+import { type TimerId, type TimerObservable } from '../types/index.mjs';
 
 /**
  * Creates an observable that emits 0 after a specified delay and then completes.
@@ -43,51 +43,62 @@ export const timer = (
   options?: Readonly<{
     startManually?: boolean;
   }>,
-): TimerObservable => {
-  let mut_timerId: TimerId | undefined = undefined;
+): TimerObservable =>
+  new TimerObservableClass(milliSeconds, options?.startManually ?? false);
 
-  let mut_isStarted = false;
+class TimerObservableClass
+  extends RootObservableClass<0>
+  implements TimerObservable
+{
+  readonly #milliSeconds: number;
+  #mut_timerId: TimerId | undefined;
+  #mut_isStarted: boolean;
 
-  const resetTimer = (): void => {
-    if (mut_timerId !== undefined) {
-      clearTimeout(mut_timerId);
+  constructor(milliSeconds: number, startManually: boolean) {
+    super({ initialValue: Optional.none });
+
+    this.#milliSeconds = milliSeconds;
+
+    this.#mut_timerId = undefined;
+
+    this.#mut_isStarted = false;
+
+    if (!startManually) {
+      this.start();
     }
-  };
-
-  const observable = createRootObservable<0, Readonly<{ start: () => void }>>(
-    { initialValue: Optional.none },
-    ({ startUpdate, isCompleted, complete, onComplete }) => {
-      onComplete(resetTimer);
-
-      return {
-        start: () => {
-          if (mut_isStarted) {
-            console.warn('cannot start twice');
-
-            return;
-          }
-
-          mut_isStarted = true;
-
-          if (isCompleted()) {
-            console.warn('cannot restart stopped TimerObservable');
-
-            return;
-          }
-
-          mut_timerId = setTimeout(() => {
-            startUpdate(0);
-
-            complete();
-          }, milliSeconds);
-        },
-      };
-    },
-  );
-
-  if (!(options?.startManually ?? false)) {
-    observable.start();
   }
 
-  return observable;
-};
+  #resetTimer(): void {
+    if (this.#mut_timerId !== undefined) {
+      clearTimeout(this.#mut_timerId);
+    }
+  }
+
+  start(): void {
+    if (this.#mut_isStarted) {
+      console.warn('cannot start twice');
+
+      return;
+    }
+
+    this.#mut_isStarted = true;
+
+    if (this.isCompleted) {
+      console.warn('cannot restart stopped TimerObservable');
+
+      return;
+    }
+
+    this.#mut_timerId = setTimeout(() => {
+      this.startUpdate(0);
+
+      this.complete();
+    }, this.#milliSeconds);
+  }
+
+  override complete(): void {
+    this.#resetTimer();
+
+    super.complete();
+  }
+}

@@ -1,8 +1,8 @@
 import { Arr, Optional } from 'ts-data-forge';
-import { createRootObservable } from '../base/index.mjs';
-import type {
-  InitializedSourceObservable,
-  SourceObservable,
+import { RootObservableClass } from '../class/index.mjs';
+import {
+  type InitializedSourceObservable,
+  type SourceObservable,
 } from '../types/index.mjs';
 
 /**
@@ -43,13 +43,6 @@ import type {
  *
  * assert.deepStrictEqual(valueHistory, [1, 2, 3]);
  * ```
- *
- * @note Do not call `next` from a subscriber or a projection while another
- * update is propagating: the write propagates immediately, so subscribers can
- * see an intermediate state, and it logs a `console.warn` (once per
- * observable). Derive the value from its source instead —
- * `const b$ = a$.pipe(map((a) => a * 2))` rather than
- * `a$.subscribe((a) => { setB(a * 2); })`.
  */
 export function source<const A>(
   initialValue: A,
@@ -58,28 +51,24 @@ export function source<const A>(
 export function source<const A>(): SourceObservable<A>;
 
 export function source<const A>(...args: readonly A[]): SourceObservable<A> {
-  return createRootObservable<
-    A,
-    Readonly<{ next: (nextValue: A) => A | undefined }>
-  >(
-    {
+  return new SourceObservableClass<A>(...args);
+}
+
+class SourceObservableClass<A>
+  extends RootObservableClass<A>
+  implements SourceObservable<A>
+{
+  constructor(...args: readonly A[]) {
+    super({
       initialValue: Arr.isNonEmpty(args)
         ? Optional.some(args[0])
         : Optional.none,
-    },
-    ({ startUpdate, getSnapshot, isCompleted }) => ({
-      // Returns the value held after the call: `nextValue`, or, once
-      // completed, the value already there — `undefined` only on a source
-      // that never had one, whose `next` is typed `void`.
-      next: (nextValue: A) => {
-        if (isCompleted()) {
-          return Optional.unwrap(getSnapshot());
-        }
+    });
+  }
 
-        startUpdate(nextValue);
+  next(nextValue: A): void {
+    if (this.isCompleted) return;
 
-        return nextValue;
-      },
-    }),
-  );
+    this.startUpdate(nextValue);
+  }
 }

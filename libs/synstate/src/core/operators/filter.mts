@@ -1,19 +1,18 @@
 import {
   asSafeUint,
   expectType,
-  isNotUndefined,
-  isString,
   Optional,
   pipe,
   SafeUint,
 } from 'ts-data-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
+import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
-import type {
-  DropInitialValueOperator,
-  FilterOperatorObservable,
-  InitializedObservable,
-  Observable,
+import {
+  type DropInitialValueOperator,
+  type FilterOperatorObservable,
+  type InitializedObservable,
+  type Observable,
+  type UpdateToken,
 } from '../types/index.mjs';
 import { withInitialValue } from './with-initial-value.mjs';
 
@@ -70,11 +69,6 @@ export function filter<A, B extends A>(
   predicate: (value: A, index: SafeUint | -1) => value is B,
 ): DropInitialValueOperator<A, B>;
 
-// A type-guard predicate and a boolean one are both functions at run time, so
-// this set only refines the return type (#1952). It stays overloaded because
-// one signature with a union parameter infers `unknown` for a generic guard
-// such as `isNotUndefined`; see the type test below.
-// @sumi-expect-error functions/no-refinement-overload
 export function filter<A>(
   predicate: (value: A, index: SafeUint | -1) => boolean,
 ): DropInitialValueOperator<A, A>;
@@ -83,15 +77,21 @@ export function filter<A>(
   predicate: (value: A, index: SafeUint | -1) => boolean,
 ): DropInitialValueOperator<A, A> {
   return (parentObservable) =>
-    createFilterObservable(parentObservable, predicate);
+    new FilterObservableClass(parentObservable, predicate);
 }
 
-const createFilterObservable = <A,>(
-  parentObservable: Observable<A>,
-  predicate: (x: A, index: SafeUint | -1) => boolean,
-): FilterOperatorObservable<A> =>
-  createSyncChildObservable(
-    {
+class FilterObservableClass<A>
+  extends SyncChildObservableClass<A, readonly [A]>
+  implements FilterOperatorObservable<A>
+{
+  readonly #predicate: (x: A, index: SafeUint | -1) => boolean;
+  #mut_index: SafeUint | -1;
+
+  constructor(
+    parentObservable: Observable<A>,
+    predicate: (x: A, index: SafeUint | -1) => boolean,
+  ) {
+    super({
       parents: [parentObservable],
       initialValue: pipe(parentObservable.getSnapshot()).map((sn) =>
         Optional.isNone(sn)
@@ -100,29 +100,30 @@ const createFilterObservable = <A,>(
             ? sn
             : Optional.none,
       ).value,
-    },
-    ({ setNext }) => {
-      let mut_index: SafeUint | -1 = -1;
+    });
 
-      return (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+    this.#mut_index = -1;
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    this.#predicate = predicate;
+  }
 
-        mut_index =
-          mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, mut_index);
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        if (predicate(sn.value, mut_index)) {
-          setNext(sn.value, updateToken);
-        }
-      };
-    },
-  );
+    const sn = par.getSnapshot();
+
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
+
+    this.#mut_index =
+      this.#mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, this.#mut_index);
+
+    if (this.#predicate(sn.value, this.#mut_index)) {
+      this.setNext(sn.value, updateToken);
+    }
+  }
+}
 
 if (import.meta.vitest !== undefined) {
   test('type test', () => {
@@ -145,39 +146,5 @@ if (import.meta.vitest !== undefined) {
     const _d = m.pipe(filter((x) => x % 2 === 0));
 
     expectType<typeof _d, Observable<number>>('=');
-  }
-
-  {
-    const s = source<number | undefined>();
-
-    const _guarded = s.pipe(filter((x): x is number => x !== undefined));
-
-    expectType<typeof _guarded, Observable<number>>('=');
-
-    const _inferred = s.pipe(filter((x) => x !== undefined));
-
-    expectType<typeof _inferred, Observable<number>>('=');
-
-    // A generic guard is what a single signature with a union parameter
-    // loses (it infers `unknown`), and why this set stays overloaded.
-    const _generic = s.pipe(filter(isNotUndefined));
-
-    expectType<typeof _generic, Observable<number>>('=');
-
-    const _withIndex = s.pipe(filter((x, i) => i === -1 || x === 0));
-
-    expectType<typeof _withIndex, Observable<number | undefined>>('=');
-  }
-
-  {
-    const _d = source<unknown>().pipe(filter(isString));
-
-    expectType<typeof _d, Observable<string>>('=');
-
-    const _standalone = filter((x: number) => x > 0);
-
-    expectType<typeof _standalone, DropInitialValueOperator<number, number>>(
-      '=',
-    );
   }
 }

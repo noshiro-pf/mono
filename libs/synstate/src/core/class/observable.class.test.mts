@@ -1,18 +1,17 @@
 import { expectType, Optional } from 'ts-data-forge';
-import type {
-  AsyncChildObservable,
-  ChildObservable,
-  Observable,
-  ObservableBase,
-  RootObservable,
-  SyncChildObservable,
+import {
+  type AsyncChildObservable,
+  type ChildObservable,
+  type Observable,
+  type ObservableBase,
+  type RootObservable,
+  type SyncChildObservable,
 } from '../types/index.mjs';
 import {
-  createAsyncChildObservable,
-  createSyncChildObservable,
-} from './create-child-observable.mjs';
-import { createTryUpdateNotImplemented } from './create-observable-base.mjs';
-import { createRootObservable } from './create-root-observable.mjs';
+  AsyncChildObservableClass,
+  SyncChildObservableClass,
+} from './child-observable-class.mjs';
+import { RootObservableClass } from './root-observable-class.mjs';
 
 /**
  * Inheritance
@@ -61,37 +60,30 @@ expectType<Observable<1>, Observable<number>>('<=');
 
 expectType<Observable<number>, Observable<1>>('!<=');
 
-const root = createRootObservable(
-  { initialValue: Optional.some(0) },
-  () => ({}),
-);
+const root = new RootObservableClass({
+  initialValue: Optional.some(0),
+});
 
 expectType<typeof root, RootObservable<number>>('<=');
 
-const syncChild = createSyncChildObservable(
-  {
-    parents: [root],
-    initialValue: Optional.some(0),
-  },
-  createTryUpdateNotImplemented,
-);
+const syncChild = new SyncChildObservableClass({
+  parents: [root],
+  initialValue: Optional.some(0),
+});
 
 expectType<typeof syncChild, SyncChildObservable<number>>('<=');
 
-const asyncChild = createAsyncChildObservable(
-  {
-    parents: [root],
-    initialValue: Optional.some(0),
-  },
-  createTryUpdateNotImplemented,
-);
+const asyncChild = new AsyncChildObservableClass({
+  parents: [root],
+  initialValue: Optional.some(0),
+});
 
 expectType<typeof asyncChild, AsyncChildObservable<number>>('<=');
 
-test('createSyncChildObservable', () => {
+test('SyncChildObservableClass', () => {
   expect(syncChild.depth).toBe(1);
 });
 
-test('createAsyncChildObservable', () => {
+test('AsyncChildObservableClass', () => {
   expect(asyncChild.depth).toBe(1);
 });

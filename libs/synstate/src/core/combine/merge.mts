@@ -1,14 +1,15 @@
 import { Optional, expectType } from 'ts-data-forge';
-import type { ArrayElement, NonEmptyTuple } from 'ts-type-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
+import { type ArrayElement, type NonEmptyTuple } from 'ts-type-forge';
+import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
-import type {
-  MergeObservable,
-  MergeObservableRefined,
-  NonEmptyUnknownList,
-  Observable,
-  SyncChildObservable,
-  Wrap,
+import {
+  type MergeObservable,
+  type MergeObservableRefined,
+  type NonEmptyUnknownList,
+  type Observable,
+  type SyncChildObservable,
+  type UpdateToken,
+  type Wrap,
 } from '../types/index.mjs';
 
 /**
@@ -58,39 +59,41 @@ import type {
  *
  * assert.deepStrictEqual(valueHistory, ['c1', 'k1', 'c2', 'k2']);
  * ```
+ *
+ * @note To improve code readability, consider using `createState` instead of `merge`,
+ * subscribing to `parents` and calling `setState` within it.
  */
 export const merge = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): MergeObservableRefined<OS> =>
-  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  createMergeObservable(parents) as MergeObservableRefined<OS>;
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  new MergeObservableClass(parents) as MergeObservableRefined<OS>;
 
-const createMergeObservable = <const P extends NonEmptyUnknownList>(
-  parents: Wrap<P>,
-): MergeObservable<P> =>
-  createSyncChildObservable<ArrayElement<P>, P>(
-    {
+class MergeObservableClass<const P extends NonEmptyUnknownList>
+  extends SyncChildObservableClass<ArrayElement<P>, P>
+  implements MergeObservable<P>
+{
+  constructor(parents: Wrap<P>) {
+    super({
       parents,
       initialValue: Optional.none,
-    },
-    ({ setNext }) =>
-      (updateToken) => {
-        const parentToUse = parents.find(
-          (o) =>
-            o.updateToken === updateToken && Optional.isSome(o.getSnapshot()),
-        );
+    });
+  }
 
-        if (parentToUse === undefined) {
-          return;
-        }
+  override tryUpdate(updateToken: UpdateToken): void {
+    const parentToUse = this.parents.find(
+      (o) => o.updateToken === updateToken && Optional.isSome(o.getSnapshot()),
+    );
 
-        const nextValue =
-          // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-          Optional.unwrap(parentToUse.getSnapshot()) as ArrayElement<P>;
+    if (parentToUse === undefined) return;
 
-        setNext(nextValue, updateToken);
-      },
-  );
+    const nextValue =
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      Optional.unwrap(parentToUse.getSnapshot()) as ArrayElement<P>;
+
+    this.setNext(nextValue, updateToken);
+  }
+}
 
 if (import.meta.vitest !== undefined) {
   test('type test', () => {

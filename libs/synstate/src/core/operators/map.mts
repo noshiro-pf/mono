@@ -1,11 +1,12 @@
 import { Optional, SafeUint, asSafeUint, expectType } from 'ts-data-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
+import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
-import type {
-  InitializedObservable,
-  KeepInitialValueOperator,
-  MapOperatorObservable,
-  Observable,
+import {
+  type InitializedObservable,
+  type KeepInitialValueOperator,
+  type MapOperatorObservable,
+  type Observable,
+  type UpdateToken,
 } from '../types/index.mjs';
 import { withInitialValue } from './with-initial-value.mjs';
 
@@ -50,46 +51,53 @@ import { withInitialValue } from './with-initial-value.mjs';
 export const map = <A, B>(
   mapFn: (x: A, index: SafeUint | -1) => B,
 ): KeepInitialValueOperator<A, B> =>
-  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
-    createMapObservable(parentObservable, mapFn)) as KeepInitialValueOperator<
-    A,
-    B
-  >;
+    new MapObservableClass(
+      parentObservable,
+      mapFn,
+    )) as KeepInitialValueOperator<A, B>;
 
 /* implementation */
 
-const createMapObservable = <A, B>(
-  parentObservable: Observable<A>,
-  mapFn: (x: A, index: SafeUint | -1) => B,
-): MapOperatorObservable<A, B> =>
-  createSyncChildObservable(
-    {
+class MapObservableClass<A, B>
+  extends SyncChildObservableClass<B, readonly [A]>
+  implements MapOperatorObservable<A, B>
+{
+  readonly #mapFn: (x: A, index: SafeUint | -1) => B;
+  #mut_index: SafeUint | -1;
+
+  constructor(
+    parentObservable: Observable<A>,
+    mapFn: (x: A, index: SafeUint | -1) => B,
+  ) {
+    super({
       parents: [parentObservable],
       initialValue: Optional.map(parentObservable.getSnapshot(), (x) =>
         mapFn(x, -1),
       ),
-    },
-    ({ setNext }) => {
-      let mut_index: SafeUint | -1 = -1;
+    });
 
-      return (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+    this.#mut_index = -1;
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    this.#mapFn = mapFn;
+  }
 
-        mut_index =
-          mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, mut_index);
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        setNext(mapFn(sn.value, mut_index), updateToken);
-      };
-    },
-  );
+    const sn = par.getSnapshot();
+
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
+
+    this.#mut_index =
+      this.#mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, this.#mut_index);
+
+    this.setNext(this.#mapFn(sn.value, this.#mut_index), updateToken);
+  }
+}
 
 if (import.meta.vitest !== undefined) {
   test('type test', () => {
