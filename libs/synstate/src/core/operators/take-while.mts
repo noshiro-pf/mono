@@ -112,6 +112,8 @@ class TakeWhileObservableClass<A>
     this.#mut_index = -1;
 
     this.#predicate = predicate;
+
+    this.attach();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {

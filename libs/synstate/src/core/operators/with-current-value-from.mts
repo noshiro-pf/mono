@@ -105,6 +105,8 @@ class WithCurrentValueFromObservableClass<A, B>
     });
 
     this.#observable = observable;
+
+    this.attach();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {

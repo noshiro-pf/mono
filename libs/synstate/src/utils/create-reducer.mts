@@ -9,7 +9,11 @@ import { source, type InitializedObservable } from '../core/index.mjs';
  * @template A - The type of actions
  * @param reducer - A pure function that takes current state and action, returns new state
  * @param initialState - The initial value of the state
- * @returns A 3-element tuple: `[state, dispatch, { getSnapshot, initialState }]`
+ * @param options - {@link StateOptions}: `equals` (default `Object.is`),
+ *   to pass on only the dispatches that change the state
+ * @returns A 3-element tuple: `[state, dispatch, { getSnapshot, initialState }]`.
+ *   `dispatch` returns the state it leaves; once `state` is completed, that
+ *   is the state held.
  *
  * @example
  * ```ts
@@ -43,10 +47,40 @@ import { source, type InitializedObservable } from '../core/index.mjs';
  *
  * assert.deepStrictEqual(stateHistory, [0, 1, 2, 1]);
  * ```
+ *
+ * @example
+ * ```ts
+ * const [count, dispatch] = createReducer(
+ *   (s, action: Readonly<{ type: 'add'; amount: number }>) =>
+ *     s + action.amount,
+ *   0,
+ *   { equals: () => false },
+ * );
+ *
+ * const countHistory: number[] = [];
+ *
+ * count.subscribe((value: number) => {
+ *   countHistory.push(value);
+ * });
+ *
+ * dispatch({ type: 'add', amount: 0 }); // 0 again, passed on all the same
+ *
+ * dispatch({ type: 'add', amount: 2 });
+ *
+ * assert.deepStrictEqual(countHistory, [0, 0, 2]);
+ * ```
+ *
+ * @note Do not call `dispatch` from a subscriber or a projection while another
+ * update is propagating: the write propagates immediately, so subscribers can
+ * see an intermediate state, and it logs a `console.warn` (once per
+ * observable). Derive the value from its source instead —
+ * `const b$ = a$.pipe(map((a) => a * 2))` rather than
+ * `a$.subscribe((a) => { setB(a * 2); })`.
  */
 export const createReducer = <S, A>(
   reducer: Reducer<S, A>,
   initialState: S,
+  options?: StateOptions<NoInfer<S>>,
 ): readonly [
   state: InitializedObservable<S>,
   dispatch: (action: A) => S,
@@ -57,15 +91,44 @@ export const createReducer = <S, A>(
 ] => {
   const state = source<S>(initialState);
 
+  const equals = options?.equals ?? Object.is;
+
   const dispatch = (action: A): S => {
-    const nextState = reducer(state.getSnapshot().value, action);
+    const currentState = state.getSnapshot().value;
 
-    state.next(nextState);
+    const nextState = reducer(currentState, action);
 
-    return nextState;
+    // Once completed, `next` keeps the state held and returns it.
+    return equals(currentState, nextState)
+      ? currentState
+      : state.next(nextState);
   };
 
   const getSnapshot = (): S => state.getSnapshot().value;
 
   return [state, dispatch, { getSnapshot, initialState }] as const;
 };
+
+/**
+ * Options of {@link createReducer}, `createState` and `createBooleanState`.
+ */
+export type StateOptions<S> = Readonly<{
+  /**
+   * Whether the next state is the same as the current one. When it says so,
+   * the update is not passed on — no subscriber, and nothing derived from
+   * the state, is told of it — and the current state is kept, along with its
+   * identity: `setState` and the like return the current state rather than
+   * the next.
+   *
+   * Decide here, where the state is held, rather than downstream with
+   * `skipIfNoChange`: an update passed on here reaches whatever reads the
+   * state directly before any operator can thin it out.
+   *
+   * Defaults to `Object.is`, so writing the value already held passes
+   * nothing on. Pass `() => false` to pass on every update, equal or not.
+   *
+   * @param current - The state held now
+   * @param next - The state the update would set
+   */
+  equals?: (current: S, next: S) => boolean;
+}>;

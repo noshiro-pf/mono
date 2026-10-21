@@ -20,6 +20,9 @@ import type {
  *
  * Unlike `throttle` which emits the first value, `audit` emits the last value.
  *
+ * Completing it, or its source completing, passes on the value its timer is
+ * still holding before the completion; `dispose()` drops that value.
+ *
  * @template A - The type of values from the source
  * @param milliSeconds - The audit time window in milliseconds
  * @returns An operator that audits emissions from the observable
@@ -124,8 +127,9 @@ class AuditObservableClass<A>
   implements AuditOperatorObservable<A>
 {
   readonly #milliSeconds: number;
+
+  /** Set while a window is open; its end passes on the latest value. */
   #mut_timerId: TimerId | undefined;
-  #mut_isSkipping: boolean;
 
   constructor(parentObservable: Observable<A>, milliSeconds: number) {
     super({
@@ -133,16 +137,21 @@ class AuditObservableClass<A>
       initialValue: parentObservable.getSnapshot(),
     });
 
-    this.#mut_isSkipping = false;
-
     this.#mut_timerId = undefined;
 
     this.#milliSeconds = milliSeconds;
+
+    this.attach();
   }
 
-  #resetTimer(): void {
-    if (this.#mut_timerId !== undefined) {
-      clearTimeout(this.#mut_timerId);
+  /** Ends the open window, passing on the latest value of the source. */
+  #emitLatest(): void {
+    this.#mut_timerId = undefined;
+
+    const sn = this.parents[0].getSnapshot();
+
+    if (Optional.isSome(sn)) {
+      this.startUpdate(sn.value);
     }
   }
 
@@ -150,32 +159,36 @@ class AuditObservableClass<A>
     const par = this.parents[0];
 
     if (
+      this.#mut_timerId !== undefined ||
       par.updateToken !== updateToken ||
-      Optional.isNone(par.getSnapshot()) ||
-      this.#mut_isSkipping
+      Optional.isNone(par.getSnapshot())
     ) {
       return; // skip update
     }
 
     // set timer
-    this.#mut_isSkipping = true;
-
     this.#mut_timerId = setTimeout(() => {
-      const sn = par.getSnapshot();
-
-      if (Optional.isNone(sn)) {
-        return;
-      }
-
-      this.startUpdate(sn.value);
-
-      this.#mut_isSkipping = false;
+      this.#emitLatest();
     }, this.#milliSeconds);
   }
 
-  override complete(): void {
-    this.#resetTimer();
+  protected override flush(): void {
+    if (this.#mut_timerId === undefined) {
+      return;
+    }
 
-    super.complete();
+    clearTimeout(this.#mut_timerId);
+
+    this.#emitLatest();
+  }
+
+  protected override teardown(): void {
+    if (this.#mut_timerId === undefined) {
+      return;
+    }
+
+    clearTimeout(this.#mut_timerId);
+
+    this.#mut_timerId = undefined;
   }
 }

@@ -11,6 +11,7 @@ import type {
   DropInitialValueOperator,
   Observable,
   SkipUntilOperatorObservable,
+  Subscription,
   UpdateToken,
 } from '../types/index.mjs';
 
@@ -74,6 +75,7 @@ class SkipUntilObservableClass<A>
   implements SkipUntilOperatorObservable<A>
 {
   #mut_isSkipping: boolean;
+  #mut_subscription: Subscription | undefined;
 
   constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
     super({
@@ -81,16 +83,26 @@ class SkipUntilObservableClass<A>
       initialValue: Optional.none,
     });
 
-    this.#mut_isSkipping = true;
+    // A notifier that already holds a value, or has completed, would stop
+    // the skipping inside `subscribe`, before the subscription is stored.
+    this.#mut_isSkipping =
+      Optional.isNone(notifier.getSnapshot()) && !notifier.isCompleted;
 
-    notifier.subscribe(
-      () => {
+    this.#mut_subscription = undefined;
+
+    if (this.#mut_isSkipping) {
+      const stopSkipping = (): void => {
         this.#mut_isSkipping = false;
-      },
-      () => {
-        this.#mut_isSkipping = false;
-      },
-    );
+
+        this.#mut_subscription?.unsubscribe();
+
+        this.#mut_subscription = undefined;
+      };
+
+      this.#mut_subscription = notifier.subscribe(stopSkipping, stopSkipping);
+    }
+
+    this.attach();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
@@ -99,13 +111,17 @@ class SkipUntilObservableClass<A>
     const sn = par.getSnapshot();
 
     if (
+      this.#mut_isSkipping ||
       par.updateToken !== updateToken ||
-      Optional.isNone(sn) ||
-      this.#mut_isSkipping
+      Optional.isNone(sn)
     ) {
       return; // skip update
     }
 
     this.setNext(sn.value, updateToken);
+  }
+
+  protected override teardown(): void {
+    this.#mut_subscription?.unsubscribe();
   }
 }

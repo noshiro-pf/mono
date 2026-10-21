@@ -6,15 +6,27 @@
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { asSafeUint, Optional, SafeUint } from 'ts-data-forge';
+import type { PositiveSafeIntWithSmallInt } from 'ts-type-forge';
 import { RootObservableClass } from '../class/index.mjs';
 import type { CounterObservable, TimerId } from '../types/index.mjs';
 
 /**
  * Creates an observable that emits incremental numbers at a specified interval.
- * Starts with 0 immediately after subscription, then emits 1, 2, 3, ... every interval.
+ * Emits 0 in the macrotask right after `start()` (which runs at creation
+ * unless `startManually` is set), then 1, 2, 3, ... every interval. A
+ * subscriber added after that 0 has been emitted does not receive it.
  *
  * @param intervalMilliSeconds - The interval duration in milliseconds
- * @param startManually - If true, waits for manual start (default: false)
+ * @param options - Optional settings
+ * @param options.startManually - If true, waits for `start()` instead of
+ *   starting at creation (default: false)
+ * @param options.emitInitial - If false, skips the 0 emitted right after
+ *   `start()`, so the first value is 1, one interval later — like RxJS
+ *   `interval` rather than `timer(0, ms)` (default: true)
+ * @param options.times - If set, completes right after the `times`-th
+ *   emission and clears its timers. Completion does not travel upstream, so
+ *   `counter(ms).pipe(take(n))` leaves the counter running; pass `times` to
+ *   the counter instead (default: unlimited)
  * @returns An observable that emits sequential numbers
  *
  * @example
@@ -45,60 +57,79 @@ import type { CounterObservable, TimerId } from '../types/index.mjs';
  *
  * assert.isTrue(Arr.isMinLengthArray(3, valueHistory));
  *
- * assert.deepStrictEqual(valueHistory[0], 0);
+ * assert.strictEqual(valueHistory[0], 0);
  *
- * assert.deepStrictEqual(valueHistory[1], 1);
+ * assert.strictEqual(valueHistory[1], 1);
  *
- * assert.deepStrictEqual(valueHistory[2], 2);
+ * assert.strictEqual(valueHistory[2], 2);
  * ```
  */
 export const counter = (
   intervalMilliSeconds: number,
   options?: Readonly<{
     startManually?: boolean;
+    emitInitial?: boolean;
+    times?: PositiveSafeIntWithSmallInt;
   }>,
-): CounterObservable =>
-  new CounterObservableClass(
+): CounterObservable => {
+  const observable = new CounterObservableClass(
     intervalMilliSeconds,
-    options?.startManually ?? false,
+    options?.emitInitial ?? true,
+    options?.times,
   );
+
+  if (!(options?.startManually ?? false)) {
+    observable.start();
+  }
+
+  return observable;
+};
 
 class CounterObservableClass
   extends RootObservableClass<SafeUint>
   implements CounterObservable
 {
   readonly #intervalMilliSeconds: number;
+  readonly #emitInitial: boolean;
+  readonly #times: PositiveSafeIntWithSmallInt | undefined;
   #mut_counter: SafeUint;
+  #mut_emittedCount: number;
   #mut_timerId0: TimerId | undefined;
   #mut_timerId: TimerId | undefined;
   #mut_isStarted: boolean;
 
-  constructor(intervalMilliSeconds: number, startManually: boolean) {
+  constructor(
+    intervalMilliSeconds: number,
+    emitInitial: boolean,
+    times: PositiveSafeIntWithSmallInt | undefined,
+  ) {
     super({ initialValue: Optional.none });
 
     this.#intervalMilliSeconds = intervalMilliSeconds;
 
+    this.#emitInitial = emitInitial;
+
+    this.#times = times;
+
     this.#mut_counter = asSafeUint(0);
+
+    this.#mut_emittedCount = 0;
 
     this.#mut_timerId0 = undefined;
 
     this.#mut_timerId = undefined;
 
     this.#mut_isStarted = false;
-
-    if (!startManually) {
-      this.start();
-    }
   }
 
-  #resetTimer(): void {
-    if (this.#mut_timerId0 === undefined || this.#mut_timerId === undefined) {
-      return;
+  #emit(value: SafeUint): void {
+    this.startUpdate(value);
+
+    this.#mut_emittedCount += 1;
+
+    if (this.#times !== undefined && this.#mut_emittedCount >= this.#times) {
+      this.complete();
     }
-
-    clearInterval(this.#mut_timerId0);
-
-    clearInterval(this.#mut_timerId);
   }
 
   start(): void {
@@ -116,20 +147,26 @@ class CounterObservableClass
       return;
     }
 
-    this.#mut_timerId0 = setTimeout(() => {
-      this.startUpdate(this.#mut_counter);
-    }, 0);
+    if (this.#emitInitial) {
+      this.#mut_timerId0 = setTimeout(() => {
+        this.#emit(this.#mut_counter);
+      }, 0);
+    }
 
     this.#mut_timerId = setInterval(() => {
       this.#mut_counter = SafeUint.add(1, this.#mut_counter);
 
-      this.startUpdate(this.#mut_counter);
+      this.#emit(this.#mut_counter);
     }, this.#intervalMilliSeconds);
   }
 
-  override complete(): void {
-    this.#resetTimer();
+  protected override teardown(): void {
+    if (this.#mut_timerId0 !== undefined) {
+      clearTimeout(this.#mut_timerId0);
+    }
 
-    super.complete();
+    if (this.#mut_timerId !== undefined) {
+      clearInterval(this.#mut_timerId);
+    }
   }
 }

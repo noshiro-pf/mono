@@ -1,4 +1,5 @@
 import type { InitializedObservable } from '../core/index.mjs';
+import type { StateOptions } from './create-reducer.mjs';
 import { createState } from './create-state.mjs';
 
 /**
@@ -6,6 +7,8 @@ import { createState } from './create-state.mjs';
  * Extends `createState` with boolean-specific helpers like `toggle`, `setTrue`, and `setFalse`.
  *
  * @param initialState - The initial boolean value
+ * @param options - {@link StateOptions}: `equals` (default `Object.is`),
+ *   to pass on only the updates that change the state
  * @returns A 2-element tuple: `[state, { setTrue, setFalse, toggle, setState, updateState, resetState, getSnapshot, initialState }]`
  *
  * @example
@@ -14,24 +17,25 @@ import { createState } from './create-state.mjs';
  * import { createBooleanState } from 'synstate';
  * import { useObservableValue } from 'synstate-react-hooks';
  *
- *     // Menu drawer open/close state.
- *     // setTrue and setFalse can be passed directly as callbacks
- *     // — no need to create wrapper functions like `() => setState(true)`.
- *     const [menuOpen$, { setTrue: openMenu, setFalse: closeMenu }] =
- *       createBooleanState(false);
+ * // Menu drawer open/close state.
+ * // setTrue and setFalse can be passed directly as callbacks
+ * // — no need to create wrapper functions like `() => setState(true)`.
+ * const [menuOpen$, { setTrue: openMenu, setFalse: closeMenu }] =
+ *   createBooleanState(false);
  *
- *     const SampleComponent = (): React.JSX.Element => (
- *       <MenuDrawer
- *         open={useObservableValue(menuOpen$)}
- *         onClose={closeMenu}
- *         onOpen={openMenu}
- *       />
- *     );
+ * const SampleComponent = (): React.JSX.Element => (
+ *   <MenuDrawer
+ *     open={useObservableValue(menuOpen$)}
+ *     onClose={closeMenu}
+ *     onOpen={openMenu}
+ *   />
+ * );
  * ```
  */
 
 export const createBooleanState = (
   initialState: boolean,
+  options?: StateOptions<boolean>,
 ): readonly [
   state: InitializedObservable<boolean>,
   utils: Readonly<{
@@ -46,7 +50,7 @@ export const createBooleanState = (
   }>,
 ] => {
   const [state, setState, { updateState, resetState, getSnapshot }] =
-    createState(initialState);
+    createState(initialState, options);
 
   return [
     state,

@@ -88,6 +88,8 @@ class MapObservableClass<A, B>
     this.#mut_index = -1;
 
     this.#mapFn = mapFn;
+
+    this.attach();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {

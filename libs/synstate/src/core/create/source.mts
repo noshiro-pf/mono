@@ -49,6 +49,13 @@ import type {
  *
  * assert.deepStrictEqual(valueHistory, [1, 2, 3]);
  * ```
+ *
+ * @note Do not call `next` from a subscriber or a projection while another
+ * update is propagating: the write propagates immediately, so subscribers can
+ * see an intermediate state, and it logs a `console.warn` (once per
+ * observable). Derive the value from its source instead —
+ * `const b$ = a$.pipe(map((a) => a * 2))` rather than
+ * `a$.subscribe((a) => { setB(a * 2); })`.
  */
 export function source<const A>(
   initialValue: A,
@@ -72,11 +79,16 @@ class SourceObservableClass<A>
     });
   }
 
-  next(nextValue: A): void {
+  // Returns the value held after the call: `nextValue`, or, once completed,
+  // the value already there — `undefined` only on a source that never had
+  // one, whose `next` is typed `void`.
+  next(nextValue: A): A | undefined {
     if (this.isCompleted) {
-      return;
+      return Optional.unwrap(this.getSnapshot());
     }
 
     this.startUpdate(nextValue);
+
+    return nextValue;
   }
 }

@@ -1,0 +1,264 @@
+import { Optional } from 'ts-data-forge';
+import { createState } from '../../utils/index.mjs';
+import { combine } from '../combine/index.mjs';
+import { counter, source } from '../create/index.mjs';
+import { debounce, map } from '../operators/index.mjs';
+import { toNode } from './observable-node.mjs';
+
+describe('completing a derived observable', () => {
+  test('does not complete an upstream state (#2133)', () => {
+    const [count$, setCount] = createState(0);
+
+    const doubled$ = count$.pipe(map((x) => x * 2));
+
+    doubled$.complete();
+
+    assert.isFalse(count$.isCompleted);
+
+    setCount(5);
+
+    assert.deepStrictEqual(count$.getSnapshot(), Optional.some(5));
+
+    const mut_got: number[] = [];
+
+    count$.subscribe((v) => {
+      mut_got.push(v);
+    });
+
+    setCount(6);
+
+    assert.deepStrictEqual(mut_got, [5, 6]);
+  });
+
+  test('does not complete a shared derived observable', () => {
+    const s = source<number>(0);
+
+    const shared$ = s.pipe(map((x) => x + 1));
+
+    const local$ = shared$.pipe(map((x) => x * 2));
+
+    local$.complete();
+
+    assert.isFalse(shared$.isCompleted);
+
+    assert.isFalse(s.isCompleted);
+
+    const mut_got: number[] = [];
+
+    shared$.subscribe((v) => {
+      mut_got.push(v);
+    });
+
+    s.next(1);
+
+    assert.deepStrictEqual(mut_got, [1, 2]);
+  });
+
+  test('does not complete an unused root with a teardown', () => {
+    const counter$ = counter(10, { startManually: true });
+
+    const derived$ = counter$.pipe(map((x) => x * 2));
+
+    const leaf$ = derived$.pipe(map((x) => x + 1));
+
+    leaf$.complete();
+
+    assert.isFalse(derived$.isCompleted);
+
+    assert.isFalse(counter$.isCompleted);
+
+    counter$.complete();
+
+    assert.isTrue(derived$.isCompleted);
+  });
+
+  test('does not complete an unused operator with a teardown', () => {
+    const s = source<number>(0);
+
+    const debounced$ = s.pipe(debounce(10));
+
+    const leaf$ = debounced$.pipe(map((x) => x));
+
+    leaf$.complete();
+
+    assert.isFalse(debounced$.isCompleted);
+
+    assert.isFalse(s.isCompleted);
+
+    debounced$.complete();
+  });
+
+  test('does not stop a root with a teardown that is still used', () => {
+    const counter$ = counter(10, { startManually: true });
+
+    counter$.subscribe(() => {});
+
+    counter$.pipe(map((x) => x)).complete();
+
+    assert.isFalse(counter$.isCompleted);
+
+    counter$.complete();
+  });
+});
+
+describe('dispose', () => {
+  test('completes the observable without completing its parents', () => {
+    const counter$ = counter(10, { startManually: true });
+
+    const derived$ = counter$.pipe(map((x) => x * 2));
+
+    derived$.dispose();
+
+    assert.isTrue(derived$.isCompleted);
+
+    assert.isFalse(counter$.isCompleted);
+
+    counter$.complete();
+  });
+
+  test('takes the observable out of the propagation graph', () => {
+    const s = source<number>(0);
+
+    s.subscribe(() => {});
+
+    let mut_calls = 0;
+
+    const derived$ = s.pipe(
+      map((x) => {
+        mut_calls += 1;
+
+        return x;
+      }),
+    );
+
+    derived$.dispose();
+
+    assert.isFalse(toNode(s).hasChild);
+
+    mut_calls = 0;
+
+    s.next(1);
+
+    expect(mut_calls).toBe(0);
+  });
+
+  test('completes the descendants that have no other live parent', () => {
+    const s = source<number>(0);
+
+    const t = source<number>(0);
+
+    const derived$ = s.pipe(map((x) => x));
+
+    const onlyChild$ = derived$.pipe(map((x) => x));
+
+    const s2 = t.pipe(map((x) => x));
+
+    const mut_got: string[] = [];
+
+    onlyChild$.subscribe(
+      () => {},
+      () => {
+        mut_got.push('onlyChild completed');
+      },
+    );
+
+    derived$.dispose();
+
+    assert.isTrue(onlyChild$.isCompleted);
+
+    assert.isFalse(s2.isCompleted);
+
+    assert.deepStrictEqual(mut_got, ['onlyChild completed']);
+  });
+
+  test('runs the teardown of the observable it is called on', async () => {
+    const s = source<number>(0);
+
+    const debounced$ = s.pipe(debounce(10));
+
+    const mut_got: number[] = [];
+
+    debounced$.subscribe((v) => {
+      mut_got.push(v);
+    });
+
+    s.next(1);
+
+    debounced$.dispose();
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 50);
+    });
+
+    // Only the initial value: the pending 1 was cancelled.
+    assert.deepStrictEqual(mut_got, [0]);
+  });
+});
+
+describe('a child created under completed parents (#2248)', () => {
+  test('completes at creation and keeps the value computed from the final parent value', () => {
+    const s = source<number>(0);
+
+    s.next(5);
+
+    s.complete();
+
+    const d = s.pipe(map((x) => x * 100));
+
+    assert.isTrue(d.isCompleted);
+
+    assert.deepStrictEqual(d.getSnapshot(), Optional.some(500));
+
+    const mut_got: string[] = [];
+
+    d.subscribe(
+      (v) => {
+        mut_got.push(`next ${v}`);
+      },
+      () => {
+        mut_got.push('complete');
+      },
+    );
+
+    // A completed observable emits its final value, then completes.
+    assert.deepStrictEqual(mut_got, ['next 500', 'complete']);
+  });
+
+  test('is not registered to the completed parent', () => {
+    const s = source<number>(0);
+
+    s.complete();
+
+    s.pipe(map((x) => x + 1));
+
+    assert.isFalse(toNode(s).hasChild);
+  });
+
+  test('completes an async child at creation', () => {
+    const s = source<number>(0);
+
+    s.complete();
+
+    const d = s.pipe(debounce(10));
+
+    assert.isTrue(d.isCompleted);
+
+    assert.isFalse(toNode(s).hasChild);
+  });
+
+  test('does not complete a child that still has a live parent', () => {
+    const live$ = source<number>(1);
+
+    const completed$ = source<number>(2);
+
+    completed$.complete();
+
+    const sum$ = combine([live$, completed$]).pipe(map(([a, b]) => a + b));
+
+    assert.isFalse(sum$.isCompleted);
+
+    live$.next(10);
+
+    assert.deepStrictEqual(sum$.getSnapshot(), Optional.some(12));
+  });
+});

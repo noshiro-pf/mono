@@ -10,6 +10,7 @@ import { RootObservableClass } from '../class/index.mjs';
 import type {
   FromSubscribableObservable,
   Subscribable,
+  Subscription,
 } from '../types/index.mjs';
 
 /**
@@ -79,10 +80,22 @@ class FromSubscribableObservableClass<A, E = unknown>
   extends RootObservableClass<Result<A, E>>
   implements FromSubscribableObservable<A, E>
 {
+  readonly #mut_subscription: Subscription | undefined;
+
+  /**
+   * Set once the subscribable has completed: its subscription is over, so
+   * completing this observable must not unsubscribe from it again.
+   */
+  #mut_isSourceCompleted: boolean;
+
   constructor(subscribable: Subscribable<A>) {
     super({ initialValue: Optional.none });
 
-    subscribable.subscribe(
+    this.#mut_subscription = undefined;
+
+    this.#mut_isSourceCompleted = false;
+
+    const subscription = subscribable.subscribe(
       (nextValue) => {
         this.startUpdate(Result.ok(nextValue));
       },
@@ -95,8 +108,29 @@ class FromSubscribableObservableClass<A, E = unknown>
         );
       },
       () => {
+        this.#mut_isSourceCompleted = true;
+
         this.complete();
       },
     );
+
+    // `subscribe` may have completed this observable already.
+    if (this.isCompleted) {
+      this.#unsubscribe(subscription);
+    } else {
+      this.#mut_subscription = subscription;
+    }
+  }
+
+  #unsubscribe(subscription: Subscription): void {
+    if (!this.#mut_isSourceCompleted) {
+      subscription.unsubscribe();
+    }
+  }
+
+  protected override teardown(): void {
+    if (this.#mut_subscription !== undefined) {
+      this.#unsubscribe(this.#mut_subscription);
+    }
   }
 }

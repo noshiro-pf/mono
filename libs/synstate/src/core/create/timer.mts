@@ -50,8 +50,15 @@ export const timer = (
   options?: Readonly<{
     startManually?: boolean;
   }>,
-): TimerObservable =>
-  new TimerObservableClass(milliSeconds, options?.startManually ?? false);
+): TimerObservable => {
+  const observable = new TimerObservableClass(milliSeconds);
+
+  if (!(options?.startManually ?? false)) {
+    observable.start();
+  }
+
+  return observable;
+};
 
 class TimerObservableClass
   extends RootObservableClass<0>
@@ -61,7 +68,7 @@ class TimerObservableClass
   #mut_timerId: TimerId | undefined;
   #mut_isStarted: boolean;
 
-  constructor(milliSeconds: number, startManually: boolean) {
+  constructor(milliSeconds: number) {
     super({ initialValue: Optional.none });
 
     this.#milliSeconds = milliSeconds;
@@ -69,16 +76,6 @@ class TimerObservableClass
     this.#mut_timerId = undefined;
 
     this.#mut_isStarted = false;
-
-    if (!startManually) {
-      this.start();
-    }
-  }
-
-  #resetTimer(): void {
-    if (this.#mut_timerId !== undefined) {
-      clearTimeout(this.#mut_timerId);
-    }
   }
 
   start(): void {
@@ -103,9 +100,9 @@ class TimerObservableClass
     }, this.#milliSeconds);
   }
 
-  override complete(): void {
-    this.#resetTimer();
-
-    super.complete();
+  protected override teardown(): void {
+    if (this.#mut_timerId !== undefined) {
+      clearTimeout(this.#mut_timerId);
+    }
   }
 }

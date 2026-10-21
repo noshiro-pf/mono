@@ -10,6 +10,7 @@ import { SyncChildObservableClass } from '../class/index.mjs';
 import type {
   KeepInitialValueOperator,
   Observable,
+  Subscription,
   UpdateToken,
   WithBufferedFromOperatorObservable,
 } from '../types/index.mjs';
@@ -88,7 +89,8 @@ class WithBufferedFromObservableClass<A, B>
   extends SyncChildObservableClass<readonly [A, readonly B[]], readonly [A]>
   implements WithBufferedFromOperatorObservable<A, B>
 {
-  #mut_bufferedValues: readonly B[] = [];
+  readonly #subscription: Subscription;
+  #mut_bufferedValues: readonly B[];
 
   constructor(parentObservable: Observable<A>, observable: Observable<B>) {
     super({
@@ -107,13 +109,13 @@ class WithBufferedFromObservableClass<A, B>
       ).value,
     });
 
-    observable.subscribe((value) => {
+    this.#mut_bufferedValues = [];
+
+    this.#subscription = observable.subscribe((value) => {
       this.#mut_bufferedValues = Arr.toPushed(this.#mut_bufferedValues, value);
     });
-  }
 
-  #clearBuffer(): void {
-    this.#mut_bufferedValues = [];
+    this.attach();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
@@ -127,6 +129,12 @@ class WithBufferedFromObservableClass<A, B>
 
     this.setNext([sn.value, this.#mut_bufferedValues], updateToken);
 
-    this.#clearBuffer();
+    this.#mut_bufferedValues = [];
+  }
+
+  protected override teardown(): void {
+    this.#subscription.unsubscribe();
+
+    this.#mut_bufferedValues = [];
   }
 }

@@ -19,6 +19,9 @@ import type {
  * Delays emissions from the source observable until a specified time has passed without another emission.
  * Useful for handling user input events like typing or scrolling.
  *
+ * Completing it, or its source completing, passes on the value its timer is
+ * still holding before the completion; `dispose()` drops that value.
+ *
  * @template A - The type of values from the source
  * @param milliSeconds - The debounce duration in milliseconds
  * @returns An operator that debounces the observable
@@ -117,6 +120,9 @@ class DebounceObservableClass<A>
   readonly #milliSeconds: number;
   #mut_timerId: TimerId | undefined;
 
+  /** The value the running timer will pass on. */
+  #mut_pending: Optional<A>;
+
   constructor(parentObservable: Observable<A>, milliSeconds: number) {
     super({
       parents: [parentObservable],
@@ -125,13 +131,21 @@ class DebounceObservableClass<A>
 
     this.#mut_timerId = undefined;
 
+    this.#mut_pending = Optional.none;
+
     this.#milliSeconds = milliSeconds;
+
+    this.attach();
   }
 
   #resetTimer(): void {
     if (this.#mut_timerId !== undefined) {
       clearTimeout(this.#mut_timerId);
+
+      this.#mut_timerId = undefined;
     }
+
+    this.#mut_pending = Optional.none;
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
@@ -145,19 +159,29 @@ class DebounceObservableClass<A>
 
     this.#resetTimer();
 
+    this.#mut_pending = sn;
+
     // set timer
     this.#mut_timerId = setTimeout(() => {
-      if (Optional.isNone(sn)) {
-        return;
-      }
+      this.#mut_timerId = undefined;
+
+      this.#mut_pending = Optional.none;
 
       this.startUpdate(sn.value);
     }, this.#milliSeconds);
   }
 
-  override complete(): void {
+  protected override flush(): void {
+    const pending = this.#mut_pending;
+
     this.#resetTimer();
 
-    super.complete();
+    if (Optional.isSome(pending)) {
+      this.startUpdate(pending.value);
+    }
+  }
+
+  protected override teardown(): void {
+    this.#resetTimer();
   }
 }

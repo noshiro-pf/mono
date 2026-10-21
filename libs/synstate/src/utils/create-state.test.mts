@@ -1,0 +1,90 @@
+import { createState } from './create-state.mjs';
+
+describe(createState, () => {
+  test('setState, updateState and resetState do not pass on a value `Object.is`-equal to the current one when no `equals` is given', () => {
+    const [state, setState, { updateState, resetState }] = createState(0);
+
+    const seen = record(state);
+
+    assert.strictEqual(setState(0), 0);
+
+    assert.strictEqual(
+      updateState((current) => current),
+      0,
+    );
+
+    assert.strictEqual(resetState(), 0);
+
+    setState(1);
+
+    assert.strictEqual(setState(1), 1);
+
+    assert.deepStrictEqual(seen, [0, 1]);
+  });
+
+  test('once the state is completed, setState, updateState and resetState return the current value', () => {
+    const [state, setState, { updateState, resetState, getSnapshot }] =
+      createState(0);
+
+    setState(1);
+
+    state.complete();
+
+    assert.strictEqual(setState(2), 1);
+
+    assert.strictEqual(
+      updateState((current) => current + 1),
+      1,
+    );
+
+    assert.strictEqual(resetState(), 1);
+
+    assert.strictEqual(getSnapshot(), 1);
+  });
+
+  test('passes on every update, equal or not, with `equals: () => false`', () => {
+    const [state, setState] = createState(0, { equals: () => false });
+
+    const seen = record(state);
+
+    setState(0);
+
+    assert.deepStrictEqual(seen, [0, 0]);
+  });
+
+  // What `equals` is for: whatever reads the state, directly or through
+  // anything derived from it, is told only of a real change, and an equal
+  // value written over the current one leaves the object that is there.
+  test('keeps the current object when `equals` finds the next one equal to it', () => {
+    const [state, setState, { getSnapshot }] = createState<readonly number[]>(
+      [1, 2],
+      {
+        equals: (current, next) =>
+          current.length === next.length &&
+          current.every((value, index) => value === next[index]),
+      },
+    );
+
+    const held = getSnapshot();
+
+    const seen = record(state);
+
+    assert.strictEqual(setState([1, 2]), held);
+
+    assert.strictEqual(getSnapshot(), held);
+
+    assert.deepStrictEqual(seen, [held]);
+  });
+});
+
+const record = <A,>(
+  state: Readonly<{ subscribe: (onNext: (value: A) => void) => unknown }>,
+): readonly A[] => {
+  const mut_seen: A[] = [];
+
+  state.subscribe((value) => {
+    mut_seen.push(value);
+  });
+
+  return mut_seen;
+};

@@ -10,6 +10,7 @@ import { SyncChildObservableClass } from '../class/index.mjs';
 import type {
   KeepInitialValueOperator,
   Observable,
+  Subscription,
   TakeUntilOperatorObservable,
   UpdateToken,
 } from '../types/index.mjs';
@@ -76,20 +77,28 @@ class TakeUntilObservableClass<A>
   extends SyncChildObservableClass<A, readonly [A]>
   implements TakeUntilOperatorObservable<A>
 {
+  /** Unset only while the `subscribe` in the constructor runs. */
+  readonly #subscription: Subscription | undefined;
+
   constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
     super({
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
     });
 
-    notifier.subscribe(
-      () => {
-        this.complete();
-      },
-      () => {
-        this.complete();
-      },
-    );
+    const complete = (): void => {
+      this.complete();
+    };
+
+    // A notifier that already holds a value completes this observable inside
+    // `subscribe`, before the subscription is stored.
+    this.#subscription = notifier.subscribe(complete, complete);
+
+    if (this.isCompleted) {
+      this.#subscription.unsubscribe();
+    }
+
+    this.attach();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
@@ -102,5 +111,9 @@ class TakeUntilObservableClass<A>
     }
 
     this.setNext(sn.value, updateToken);
+  }
+
+  protected override teardown(): void {
+    this.#subscription?.unsubscribe();
   }
 }

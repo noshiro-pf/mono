@@ -87,7 +87,7 @@ class SkipWhileObservableClass<A>
 {
   readonly #predicate: (value: A, index: SafeUint | -1) => boolean;
   #mut_index: SafeUint | -1;
-  #mut_skipping: boolean;
+  #mut_isSkipping: boolean;
 
   constructor(
     parentObservable: Observable<A>,
@@ -102,9 +102,11 @@ class SkipWhileObservableClass<A>
 
     this.#mut_index = -1;
 
+    this.#mut_isSkipping = true;
+
     this.#predicate = predicate;
 
-    this.#mut_skipping = true;
+    this.attach();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
@@ -120,10 +122,10 @@ class SkipWhileObservableClass<A>
       this.#mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, this.#mut_index);
 
     if (!this.#predicate(sn.value, this.#mut_index)) {
-      this.#mut_skipping = false;
+      this.#mut_isSkipping = false;
     }
 
-    if (!this.#mut_skipping) {
+    if (!this.#mut_isSkipping) {
       this.setNext(sn.value, updateToken);
     }
   }

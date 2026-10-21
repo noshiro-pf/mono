@@ -7,10 +7,12 @@
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Arr, Optional } from 'ts-data-forge';
 import { AsyncChildObservableClass } from '../class/index.mjs';
+import { createScope, getCurrentScope } from '../scope/index.mjs';
 import type {
   DropInitialValueOperator,
   MergeMapOperatorObservable,
   Observable,
+  Scope,
   Subscription,
   UpdateToken,
 } from '../types/index.mjs';
@@ -18,6 +20,11 @@ import type {
 /**
  * Projects each source value to an observable and merges all inner observables.
  * Unlike `switchMap`, does not cancel previous inner observables.
+ *
+ * Each projection runs in a scope of its own (see `createScope`): what it
+ * creates is disposed when `mergeMap` completes. An observable it only
+ * returns — one created outside the projection and shared with others — is
+ * unsubscribed and left running.
  *
  * @template A - The type of values from the source
  * @template B - The type of values from the projected observable
@@ -106,9 +113,6 @@ import type {
  *   'C3',
  * ]);
  * ```
- *
- * @note To improve code readability, consider using `createState` instead of `mergeMap`,
- * subscribing to `parentObservable` and calling `setState` within it.
  */
 export const mergeMap =
   <A, B>(
@@ -128,7 +132,11 @@ class MergeMapObservableClass<A, B>
   implements MergeMapOperatorObservable<A, B>
 {
   readonly #mapToObservable: (curr: A) => Observable<B>;
-  #mut_observables: readonly Observable<B>[];
+
+  /** See `SwitchMapObservableClass`. */
+  readonly #ownerScope: Scope | undefined;
+
+  #mut_innerScopes: readonly Scope[];
   #mut_subscriptions: readonly Subscription[];
 
   constructor(
@@ -142,9 +150,13 @@ class MergeMapObservableClass<A, B>
 
     this.#mapToObservable = mapToObservable;
 
-    this.#mut_observables = [];
+    this.#ownerScope = getCurrentScope();
+
+    this.#mut_innerScopes = [];
 
     this.#mut_subscriptions = [];
+
+    this.attach();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
@@ -156,9 +168,11 @@ class MergeMapObservableClass<A, B>
       return; // skip update
     }
 
-    const observable = this.#mapToObservable(sn.value);
+    const innerScope = createScope(this.#ownerScope);
 
-    this.#mut_observables = Arr.toPushed(this.#mut_observables, observable);
+    this.#mut_innerScopes = Arr.toPushed(this.#mut_innerScopes, innerScope);
+
+    const observable = innerScope.run(() => this.#mapToObservable(sn.value));
 
     const subscription = observable.subscribe((curr) => {
       this.startUpdate(curr);
@@ -170,15 +184,14 @@ class MergeMapObservableClass<A, B>
     );
   }
 
-  override complete(): void {
+  /** Releases the inner observables, and only those this operator made. */
+  protected override teardown(): void {
     for (const s of this.#mut_subscriptions) {
       s.unsubscribe();
     }
 
-    for (const o of this.#mut_observables) {
-      o.complete();
+    for (const scope of this.#mut_innerScopes) {
+      scope.dispose();
     }
-
-    super.complete();
   }
 }

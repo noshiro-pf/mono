@@ -1,7 +1,8 @@
 /**
  * Comparison tests: how SynState, RxJS, and Jotai handle circular dependencies.
  *
- * - SynState: detects cycles at construction time and throws a clear error.
+ * - SynState: detects cycles at construction time and throws a clear error,
+ *   outside production (`checksCircularDependency`).
  * - RxJS: pipe() always returns a new Observable, so static cycles cannot be
  *   expressed through the public API. No detection is needed or provided.
  * - Jotai: circular atom definitions are silently accepted. A cycle manifests
@@ -13,44 +14,62 @@ import { Optional } from 'ts-data-forge';
 import { combine } from '../combine/index.mjs';
 import { source } from '../create/index.mjs';
 import { map } from '../operators/index.mjs';
-import { SyncChildObservableClass } from './child-observable-class.mjs';
-import { RootObservableClass } from './root-observable-class.mjs';
+import { checksCircularDependency } from './child-observable-class.mjs';
+import {
+  createSyncChildObservable,
+  createTryUpdateNotImplemented,
+} from './create-child-observable.mjs';
+import { createRootObservable } from './create-root-observable.mjs';
 
 describe('circular dependency comparison', () => {
   describe('SynState', () => {
-    test('detects cycle at construction time with a clear error message', () => {
-      const root = new RootObservableClass({
-        initialValue: Optional.some(0),
-      });
+    // Only where the check runs: see `checksCircularDependency`.
+    test.runIf(checksCircularDependency)(
+      'detects cycle at construction time with a clear error message',
+      () => {
+        const root = createRootObservable(
+          { initialValue: Optional.some(0) },
+          () => ({}),
+        );
 
-      const childA = new SyncChildObservableClass({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+        const mut_childA = createSyncChildObservable(
+          {
+            parents: [root],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
 
-      const childB = new SyncChildObservableClass({
-        parents: [childA],
-        initialValue: Optional.some(0),
-      });
+        const childB = createSyncChildObservable(
+          {
+            parents: [mut_childA],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
 
-      // Simulate a cycle: childA → childB → childA
-      // In normal usage this is impossible — the check runs in every
-      // child constructor before the reference becomes available.
-      Object.defineProperty(childA, 'parents', {
-        value: [childB],
-        writable: false,
-        configurable: true,
-      });
-
-      expect(() => {
-        new SyncChildObservableClass({
-          parents: [childA],
-          initialValue: Optional.some(0),
+        // Simulate a cycle: mut_childA → childB → mut_childA
+        // In normal usage this is impossible — the check runs in every
+        // child constructor before the reference becomes available.
+        Object.defineProperty(mut_childA, 'parents', {
+          value: [childB],
+          writable: false,
+          configurable: true,
         });
-      }).toThrow(
-        'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
-      );
-    });
+
+        expect(() => {
+          createSyncChildObservable(
+            {
+              parents: [mut_childA],
+              initialValue: Optional.some(0),
+            },
+            createTryUpdateNotImplemented,
+          );
+        }).toThrow(
+          'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
+        );
+      },
+    );
 
     test('accepts valid DAG (diamond dependency)', () => {
       const a$ = source(0);

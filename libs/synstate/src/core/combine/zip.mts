@@ -26,7 +26,9 @@ import type {
 /**
  * Combines multiple observables by pairing their emissions by index.
  * Waits for all sources to emit their nth value before emitting the nth tuple.
- * Completes when any source completes.
+ * Completes once a completed source has no value left to pair, as RxJS's
+ * `zip` does: at once if it completes with nothing queued, otherwise after
+ * the tuple that takes its last queued value.
  *
  * @template OS - Tuple type of source observables
  * @param parents - Array of observables to zip
@@ -43,7 +45,7 @@ import type {
  * //  Explanation:
  * //  - zip pairs values by their index from multiple sources
  * //  - Waits for all sources to emit at the same index
- * //  - Completes when any source completes
+ * //  - Completes once a completed source has no value left to pair
  *
  * const [letters$, setLetter] = createState<string>('A');
  *
@@ -84,6 +86,15 @@ class ZipObservableClass<const A extends NonEmptyUnknownList>
 {
   readonly #queues: TupleToQueueTuple<A>;
 
+  /**
+   * The token of each parent's latest value that zip has taken in, so that a
+   * value a parent emits in the update it completes in — its `tryComplete`
+   * reaches zip before its `tryUpdate` does — still counts as queued.
+   * Written in place, one slot per parent, on every update that reaches zip.
+   */
+  // @sumi-expect-error readonly/require-readonly-type
+  readonly #mut_takenTokens: UpdateToken[];
+
   constructor(parents: Wrap<A>) {
     const parentsValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
       parents,
@@ -103,12 +114,13 @@ class ZipObservableClass<const A extends NonEmptyUnknownList>
         ? Optional.some(Arr.map(parentsValues, (c) => c.value))
         : Optional.none;
 
-    super({
-      parents,
-      initialValue,
-    });
+    super({ parents, initialValue });
 
     this.#queues = Arr.map(parents, () => createQueue());
+
+    this.#mut_takenTokens = Array.from(parents, (p) => p.updateToken);
+
+    this.attach();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
@@ -117,20 +129,44 @@ class ZipObservableClass<const A extends NonEmptyUnknownList>
     for (const [index, par] of this.parents.entries()) {
       const sn = par.getSnapshot();
 
-      if (par.updateToken === updateToken && Optional.isSome(sn)) {
-        queues[index]?.enqueue(sn.value);
+      if (!(par.updateToken === updateToken && Optional.isSome(sn))) {
+        continue;
       }
+
+      queues[index]?.enqueue(sn.value);
+
+      this.#mut_takenTokens[index] = updateToken;
     }
 
-    if (queues.every((list) => !list.isEmpty)) {
-      const nextValue =
-        // `Arr.map` has a single result element type, so it reports
-        // `A[number] | undefined` per position rather than `A[P]`.
-        // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-        Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
-
-      this.setNext(nextValue, updateToken);
+    if (queues.some((list) => list.isEmpty)) {
+      return;
     }
+
+    const nextValue =
+      // `Arr.map` has a single result element type, so it reports
+      // `A[number] | undefined` per position rather than `A[P]`.
+      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+      Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
+
+    this.setNext(nextValue, updateToken);
+
+    if (this.canEmitNoMore()) {
+      this.complete();
+    }
+  }
+
+  /**
+   * No tuple can be completed any more once a completed source has nothing
+   * left to pair (#2343).
+   */
+  override canEmitNoMore(): boolean {
+    return this.parents.some(
+      (par, index) =>
+        par.isCompleted &&
+        this.#queues[index]?.isEmpty === true &&
+        (par.updateToken === this.#mut_takenTokens[index] ||
+          Optional.isNone(par.getSnapshot())),
+    );
   }
 }
 

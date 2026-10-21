@@ -2,215 +2,323 @@ import { Optional } from 'ts-data-forge';
 import { combine, merge } from '../combine/index.mjs';
 import { source } from '../create/index.mjs';
 import { map } from '../operators/index.mjs';
+import { checksCircularDependency } from './child-observable-class.mjs';
 import {
-  AsyncChildObservableClass,
-  SyncChildObservableClass,
-} from './child-observable-class.mjs';
-import { RootObservableClass } from './root-observable-class.mjs';
+  createAsyncChildObservable,
+  createSyncChildObservable,
+  createTryUpdateNotImplemented,
+} from './create-child-observable.mjs';
+import { createRootObservable } from './create-root-observable.mjs';
 
 describe('circular dependency detection', () => {
-  describe('cycle in ancestor graph', () => {
+  // The check runs only in a process whose `NODE_ENV` is not `production`;
+  // the browser run has no `process`, and there nothing is checked.
+  describe.runIf(checksCircularDependency)('cycle in ancestor graph', () => {
     test('should throw when parent chain contains a cycle (A -> B -> A)', () => {
-      const root = new RootObservableClass({
-        initialValue: Optional.some(0),
-      });
+      const root = createRootObservable(
+        { initialValue: Optional.some(0) },
+        () => ({}),
+      );
 
-      const childA = new SyncChildObservableClass({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const mut_childA = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const childB = new SyncChildObservableClass({
-        parents: [childA],
-        initialValue: Optional.some(0),
-      });
+      const childB = createSyncChildObservable(
+        {
+          parents: [mut_childA],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      // Mutate childA.parents to create a cycle: childA -> childB -> childA
-      Object.defineProperty(childA, 'parents', {
+      // Mutate mut_childA.parents to create a cycle: mut_childA -> childB -> mut_childA
+      Object.defineProperty(mut_childA, 'parents', {
         value: [childB],
         writable: false,
         configurable: true,
       });
 
       expect(() => {
-        new SyncChildObservableClass({
-          parents: [childA],
-          initialValue: Optional.some(0),
-        });
+        createSyncChildObservable(
+          {
+            parents: [mut_childA],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).toThrow(
         'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
       );
     });
 
     test('should throw when AsyncChildObservable parent chain contains a cycle', () => {
-      const root = new RootObservableClass({
-        initialValue: Optional.some(0),
-      });
+      const root = createRootObservable(
+        { initialValue: Optional.some(0) },
+        () => ({}),
+      );
 
-      const childA = new AsyncChildObservableClass({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const mut_childA = createAsyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const childB = new SyncChildObservableClass({
-        parents: [childA],
-        initialValue: Optional.some(0),
-      });
+      const childB = createSyncChildObservable(
+        {
+          parents: [mut_childA],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      // Create cycle: childA -> childB -> childA
-      Object.defineProperty(childA, 'parents', {
+      // Create cycle: mut_childA -> childB -> mut_childA
+      Object.defineProperty(mut_childA, 'parents', {
         value: [childB],
         writable: false,
         configurable: true,
       });
 
       expect(() => {
-        new AsyncChildObservableClass({
-          parents: [childA],
-          initialValue: Optional.some(0),
-        });
+        createAsyncChildObservable(
+          {
+            parents: [mut_childA],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).toThrow(
         'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
       );
     });
 
     test('should throw when a cycle exists through a chain of 3 observables', () => {
-      const root = new RootObservableClass({
-        initialValue: Optional.some(0),
-      });
+      const root = createRootObservable(
+        { initialValue: Optional.some(0) },
+        () => ({}),
+      );
 
-      const childA = new SyncChildObservableClass({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const mut_childA = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const childB = new SyncChildObservableClass({
-        parents: [childA],
-        initialValue: Optional.some(0),
-      });
+      const childB = createSyncChildObservable(
+        {
+          parents: [mut_childA],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const childC = new SyncChildObservableClass({
-        parents: [childB],
-        initialValue: Optional.some(0),
-      });
+      const childC = createSyncChildObservable(
+        {
+          parents: [childB],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      // Create cycle: childA -> childC -> childB -> childA
-      Object.defineProperty(childA, 'parents', {
+      // Create cycle: mut_childA -> childC -> childB -> mut_childA
+      Object.defineProperty(mut_childA, 'parents', {
         value: [childC],
         writable: false,
         configurable: true,
       });
 
       expect(() => {
-        new SyncChildObservableClass({
-          parents: [childA],
-          initialValue: Optional.some(0),
-        });
+        createSyncChildObservable(
+          {
+            parents: [mut_childA],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).toThrow(
         'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
       );
     });
 
     test('should throw when the new child itself appears as an ancestor', () => {
-      const root = new RootObservableClass({
-        initialValue: Optional.some(0),
-      });
+      const root = createRootObservable(
+        { initialValue: Optional.some(0) },
+        () => ({}),
+      );
 
-      const childA = new SyncChildObservableClass({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const mut_childA = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      // Make childA's parents reference childA itself (self-loop)
-      Object.defineProperty(childA, 'parents', {
-        value: [childA],
+      // Make mut_childA's parents reference mut_childA itself (self-loop)
+      Object.defineProperty(mut_childA, 'parents', {
+        value: [mut_childA],
         writable: false,
         configurable: true,
       });
 
       expect(() => {
-        new SyncChildObservableClass({
-          parents: [childA],
-          initialValue: Optional.some(0),
-        });
+        createSyncChildObservable(
+          {
+            parents: [mut_childA],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).toThrow(
         'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
       );
     });
   });
 
+  describe.skipIf(checksCircularDependency)('with the check off', () => {
+    test('does not walk the ancestors of a new child', () => {
+      const root = createRootObservable(
+        { initialValue: Optional.some(0) },
+        () => ({}),
+      );
+
+      const mut_childA = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
+
+      Object.defineProperty(mut_childA, 'parents', {
+        value: [mut_childA],
+        writable: false,
+        configurable: true,
+      });
+
+      expect(() => {
+        createSyncChildObservable(
+          {
+            parents: [mut_childA],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
+      }).not.toThrow();
+    });
+  });
+
   describe('valid DAG patterns should not throw', () => {
     test('diamond dependency is not a cycle', () => {
-      const root = new RootObservableClass({
-        initialValue: Optional.some(0),
-      });
+      const root = createRootObservable(
+        { initialValue: Optional.some(0) },
+        () => ({}),
+      );
 
-      const left = new SyncChildObservableClass({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const left = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const right = new SyncChildObservableClass({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const right = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
       // Diamond: root -> left -> combined, root -> right -> combined
       expect(() => {
-        new SyncChildObservableClass({
-          parents: [left, right],
-          initialValue: Optional.some(0),
-        });
+        createSyncChildObservable(
+          {
+            parents: [left, right],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).not.toThrow();
     });
 
     test('linear chain is not a cycle', () => {
-      const root = new RootObservableClass({
-        initialValue: Optional.some(0),
-      });
+      const root = createRootObservable(
+        { initialValue: Optional.some(0) },
+        () => ({}),
+      );
 
-      const a = new SyncChildObservableClass({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const a = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const b = new SyncChildObservableClass({
-        parents: [a],
-        initialValue: Optional.some(0),
-      });
+      const b = createSyncChildObservable(
+        {
+          parents: [a],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
       expect(() => {
-        new SyncChildObservableClass({
-          parents: [b],
-          initialValue: Optional.some(0),
-        });
+        createSyncChildObservable(
+          {
+            parents: [b],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).not.toThrow();
     });
 
     test('multiple roots converging is not a cycle', () => {
-      const root1 = new RootObservableClass({
-        initialValue: Optional.some(1),
-      });
+      const root1 = createRootObservable(
+        { initialValue: Optional.some(1) },
+        () => ({}),
+      );
 
-      const root2 = new RootObservableClass({
-        initialValue: Optional.some(2),
-      });
+      const root2 = createRootObservable(
+        { initialValue: Optional.some(2) },
+        () => ({}),
+      );
 
-      const child1 = new SyncChildObservableClass({
-        parents: [root1],
-        initialValue: Optional.some(0),
-      });
+      const child1 = createSyncChildObservable(
+        {
+          parents: [root1],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const child2 = new SyncChildObservableClass({
-        parents: [root2],
-        initialValue: Optional.some(0),
-      });
+      const child2 = createSyncChildObservable(
+        {
+          parents: [root2],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
       expect(() => {
-        new SyncChildObservableClass({
-          parents: [child1, child2],
-          initialValue: Optional.some(0),
-        });
+        createSyncChildObservable(
+          {
+            parents: [child1, child2],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).not.toThrow();
     });
 

@@ -122,12 +122,8 @@ class ThrottleObservableClass<A>
     this.#mut_isSkipping = false;
 
     this.#milliSeconds = milliSeconds;
-  }
 
-  #resetTimer(): void {
-    if (this.#mut_timerId !== undefined) {
-      clearTimeout(this.#mut_timerId);
-    }
+    this.attach();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
@@ -136,9 +132,9 @@ class ThrottleObservableClass<A>
     const sn = par.getSnapshot();
 
     if (
+      this.#mut_isSkipping ||
       par.updateToken !== updateToken ||
-      Optional.isNone(sn) ||
-      this.#mut_isSkipping
+      Optional.isNone(sn)
     ) {
       return; // skip update
     }
@@ -153,9 +149,9 @@ class ThrottleObservableClass<A>
     }, this.#milliSeconds);
   }
 
-  override complete(): void {
-    this.#resetTimer();
-
-    super.complete();
+  protected override teardown(): void {
+    if (this.#mut_timerId !== undefined) {
+      clearTimeout(this.#mut_timerId);
+    }
   }
 }

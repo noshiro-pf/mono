@@ -93,6 +93,8 @@ class PairwiseObservableClass<A>
     // parentObservable.snapshot has value
     // if parentObservable is InitializedObservable
     this.#mut_previousValue = parentObservable.getSnapshot();
+
+    this.attach();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
@@ -106,12 +108,10 @@ class PairwiseObservableClass<A>
 
     const prev = this.#mut_previousValue;
 
-    const cond = !Optional.isNone(prev);
-
     // NOTE: Must update before setNext, otherwise Optional.isNone(prev) remains true when tryUpdate is called consecutively
-    this.#mut_previousValue = par.getSnapshot();
+    this.#mut_previousValue = sn;
 
-    if (cond) {
+    if (Optional.isSome(prev)) {
       this.setNext([prev.value, sn.value], updateToken);
     }
   }

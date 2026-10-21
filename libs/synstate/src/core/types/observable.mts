@@ -1,6 +1,13 @@
-import { expectType, type Optional, type Some } from 'ts-data-forge';
+import {
+  expectType,
+  hasKey,
+  isRecord,
+  type Optional,
+  type Some,
+} from 'ts-data-forge';
 import type { FixedLengthTuple, StrictOmit } from 'ts-type-forge';
-import type { ObservableId, UpdateToken } from './id.mjs';
+import { observableBrand } from '../utils/index.mjs';
+import type { UpdateToken } from './id.mjs';
 import type { ObservableKind } from './observable-kind.mjs';
 import type { NonEmptyUnknownList, Subscription } from './types.mjs';
 
@@ -19,24 +26,39 @@ import type { NonEmptyUnknownList, Subscription } from './types.mjs';
  */
 
 type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
-  id: ObservableId;
+  [observableBrand]: true;
+
   kind: Kind;
 
-  // reactive dependency tree structure
-  depth: ObservableKind extends 'root' ? 0 : number;
-  addChild: <B>(child: ChildObservable<B>) => void;
+  /**
+   * One more than the deepest observable this one is derived from; 0 for a
+   * root. An update reaches observables in ascending depth, so every parent
+   * has emitted before its child reads it.
+   */
+  depth: Kind extends 'root' ? 0 : number;
 
-  // state
   getSnapshot: () => Optional<A>;
   isCompleted: boolean;
-  updateToken: UpdateToken;
-  hasSubscriber: boolean;
-  hasChild: boolean;
-  hasActiveChild: () => boolean;
 
-  tryUpdate: (updateToken: UpdateToken) => void;
-  tryComplete: () => void;
+  /**
+   * The token of the update in which this observable last emitted. A child's
+   * `tryUpdate` receives the token of the update now propagating; a parent
+   * whose token differs did not emit in it. The token is opaque: compare it,
+   * store it, or pass it on to `setNext`.
+   */
+  updateToken: UpdateToken;
+
   complete: () => void;
+
+  /**
+   * Completes this observable and takes it out of the graph, for whoever owns
+   * it (a scope) to release it. Neither this nor `complete()` reaches upstream:
+   * a child completing never completes its parents, which may be shared
+   * (#2133). Its descendants complete once none of their parents is live.
+   * Unlike `complete()`, it passes on nothing the observable still holds: a
+   * `debounce` or `audit` drops its pending value instead of emitting it.
+   */
+  dispose: () => void;
   subscribe: (onNext: (v: A) => void, onComplete?: () => void) => Subscription;
 
   pipe: PipeMethod<A>;
@@ -77,14 +99,6 @@ namespace ObservableTypeConverter {
     Readonly<{
       parents: Wrap<P>;
     }>;
-
-  export type ToManager<
-    A,
-    O extends CreateObservableType<A, 'async child' | 'root'>,
-  > = O &
-    Readonly<{
-      addDescendant: <B>(child: ChildObservable<B>) => void;
-    }>;
 }
 
 export type SyncChildObservable<
@@ -104,9 +118,10 @@ export type InitializedSyncChildObservable<
 export type AsyncChildObservable<
   A,
   P extends NonEmptyUnknownList = NonEmptyUnknownList,
-> = ObservableTypeConverter.ToManager<
+> = ObservableTypeConverter.ToChild<
   A,
-  ObservableTypeConverter.ToChild<A, CreateObservableType<A, 'async child'>, P>
+  CreateObservableType<A, 'async child'>,
+  P
 >;
 
 export type InitializedAsyncChildObservable<
@@ -119,10 +134,7 @@ export type ChildObservable<
   P extends NonEmptyUnknownList = NonEmptyUnknownList,
 > = AsyncChildObservable<A, P> | SyncChildObservable<A, P>;
 
-export type RootObservable<A> = ObservableTypeConverter.ToManager<
-  A,
-  CreateObservableType<A, 'root'>
->;
+export type RootObservable<A> = CreateObservableType<A, 'root'>;
 
 export type InitializedRootObservable<A> =
   ObservableTypeConverter.ToInitialized<A, RootObservable<A>>;
@@ -159,6 +171,27 @@ export type Operator<A, B> =
   | DropInitialValueOperator<A, B>
   | KeepInitialValueOperator<A, B>;
 
+/**
+ * Tells an observable made by synstate from any other value, by the brand
+ * every observable carries. Checking for a `subscribe` method instead would
+ * also accept plain values that happen to have one.
+ *
+ * @example
+ *
+ * ```ts
+ * const [count$] = createState(0);
+ *
+ * assert.isTrue(isObservable(count$));
+ *
+ * // A `subscribe` method alone does not make an observable.
+ * assert.isFalse(isObservable({ subscribe: () => {} }));
+ *
+ * assert.isFalse(isObservable(0));
+ * ```
+ */
+export const isObservable = (value: unknown): value is Observable<unknown> =>
+  isRecord(value) && hasKey(value, observableBrand);
+
 export const isManagerObservable = <A,>(
   obs: Observable<A>,
 ): obs is ManagerObservable<A> => obs.kind !== 'sync child';
@@ -189,9 +222,42 @@ export type WrapInitialized<A extends readonly unknown[]> = Readonly<{
 // type GetDestTypeOfOperator<Op extends Operator<unknown, unknown>> =
 //   Op extends Operator<unknown, infer B> ? B : never;
 
-expectType<keyof AsyncChildObservable<unknown>, 'addDescendant'>('>=');
+// Only the members meant for users are public; the rest live on the
+// internal node types in `core/class` (#2117).
+expectType<
+  keyof Observable<unknown>,
+  | typeof observableBrand
+  | 'kind'
+  | 'depth'
+  | 'getSnapshot'
+  | 'isCompleted'
+  | 'updateToken'
+  | 'complete'
+  | 'dispose'
+  | 'subscribe'
+  | 'pipe'
+>('=');
 
-expectType<keyof RootObservable<unknown>, 'addDescendant'>('>=');
+expectType<
+  keyof ChildObservable<unknown>,
+  keyof Observable<unknown> | 'parents'
+>('=');
+
+// Everything but the brand is not enough to pass for an observable.
+expectType<
+  StrictOmit<RootObservable<unknown>, typeof observableBrand>,
+  Observable<unknown>
+>('!<=');
+
+expectType<RootObservable<unknown>['depth'], 0>('=');
+
+expectType<InitializedRootObservable<unknown>['depth'], 0>('=');
+
+expectType<SyncChildObservable<unknown>['depth'], number>('=');
+
+expectType<AsyncChildObservable<unknown>['depth'], number>('=');
+
+expectType<ObservableBase<unknown>['depth'], number>('=');
 
 expectType<Unwrap<Wrap<readonly [1, 2, 3]>>, readonly [1, 2, 3]>('=');
 

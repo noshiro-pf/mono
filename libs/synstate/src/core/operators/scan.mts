@@ -88,6 +88,8 @@ class ScanObservableClass<A, B>
     });
 
     this.#reducer = reducer;
+
+    this.attach();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
@@ -95,16 +97,13 @@ class ScanObservableClass<A, B>
 
     const psn = par.getSnapshot();
 
-    const sn = this.getSnapshot();
-
-    if (
-      par.updateToken !== updateToken ||
-      Optional.isNone(psn) ||
-      Optional.isNone(sn)
-    ) {
+    if (par.updateToken !== updateToken || Optional.isNone(psn)) {
       return; // skip update
     }
 
-    this.setNext(this.#reducer(sn.value, psn.value), updateToken);
+    this.setNext(
+      this.#reducer(this.getSnapshot().value, psn.value),
+      updateToken,
+    );
   }
 }

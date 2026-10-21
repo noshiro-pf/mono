@@ -74,6 +74,8 @@ class WithInitialValueObservableClass<A, I>
       parents: [parentObservable],
       initialValue: Optional.some(initialValue),
     });
+
+    this.attach();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {

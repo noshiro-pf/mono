@@ -20,7 +20,11 @@ import type { NonEmptyUnknownList } from './types.mjs';
 // RootObservable
 
 export type InitializedSourceObservable<A> = Readonly<{
-  next: (value: A) => void;
+  /**
+   * Passes `value` on and returns it. Once completed, passes nothing on and
+   * returns the value held.
+   */
+  next: (value: A) => A;
 }> &
   InitializedRootObservable<A>;
 
@@ -61,10 +65,15 @@ export type ScanOperatorObservable<A, B> = InitializedSyncChildObservable<
 
 // SyncChildObservable
 
+// The helpers stay in a namespace so their names do not crowd the module
+// scope. A namespace holding only types is erasable, so it passes
+// `erasableSyntaxOnly` (TS1294); the `expectType` assertions are call
+// statements, which is why they sit below it rather than beside the types
+// they check.
 namespace SynStateInternals {
   type Cast<A> = A extends NonEmptyUnknownList ? A : never;
 
-  type EveryInitialized<OS extends NonEmptyTuple<Observable<unknown>>> =
+  export type EveryInitialized<OS extends NonEmptyTuple<Observable<unknown>>> =
     OS extends NonEmptyTuple<InitializedObservable<unknown>> ? true : false;
 
   type IsInitialized<O> = readonly [O] extends readonly [
@@ -84,40 +93,8 @@ namespace SynStateInternals {
     // union distribution
     LogicalValue<OS extends OS ? IsInitialized<OS> : never>;
 
-  type SomeInitialized<OS extends NonEmptyTuple<Observable<unknown>>> =
+  export type SomeInitialized<OS extends NonEmptyTuple<Observable<unknown>>> =
     SomeInitializedImpl<OS[number]>;
-
-  expectType<EveryInitialized<readonly [Observable<1>]>, false>('=');
-
-  expectType<EveryInitialized<readonly [InitializedObservable<1>]>, true>('=');
-
-  expectType<
-    EveryInitialized<
-      readonly [InitializedObservable<1>, InitializedObservable<2>]
-    >,
-    true
-  >('=');
-
-  expectType<
-    EveryInitialized<readonly [Observable<1>, InitializedObservable<2>]>,
-    false
-  >('=');
-
-  expectType<SomeInitialized<readonly [Observable<1>]>, false>('=');
-
-  expectType<SomeInitialized<readonly [InitializedObservable<1>]>, true>('=');
-
-  expectType<
-    SomeInitialized<
-      readonly [InitializedObservable<1>, InitializedObservable<2>]
-    >,
-    true
-  >('=');
-
-  expectType<
-    SomeInitialized<readonly [Observable<1>, InitializedObservable<2>]>,
-    true
-  >('=');
 
   type InitializedCombineObservableImpl<A extends NonEmptyUnknownList> =
     InitializedSyncChildObservable<A, A>;
@@ -159,6 +136,52 @@ namespace SynStateInternals {
       : MergeObservableImpl<Unwrap<OS>>;
 }
 
+expectType<SynStateInternals.EveryInitialized<readonly [Observable<1>]>, false>(
+  '=',
+);
+
+expectType<
+  SynStateInternals.EveryInitialized<readonly [InitializedObservable<1>]>,
+  true
+>('=');
+
+expectType<
+  SynStateInternals.EveryInitialized<
+    readonly [InitializedObservable<1>, InitializedObservable<2>]
+  >,
+  true
+>('=');
+
+expectType<
+  SynStateInternals.EveryInitialized<
+    readonly [Observable<1>, InitializedObservable<2>]
+  >,
+  false
+>('=');
+
+expectType<SynStateInternals.SomeInitialized<readonly [Observable<1>]>, false>(
+  '=',
+);
+
+expectType<
+  SynStateInternals.SomeInitialized<readonly [InitializedObservable<1>]>,
+  true
+>('=');
+
+expectType<
+  SynStateInternals.SomeInitialized<
+    readonly [InitializedObservable<1>, InitializedObservable<2>]
+  >,
+  true
+>('=');
+
+expectType<
+  SynStateInternals.SomeInitialized<
+    readonly [Observable<1>, InitializedObservable<2>]
+  >,
+  true
+>('=');
+
 export type CombineObservable<A extends NonEmptyUnknownList> =
   SynStateInternals.CombineObservableImpl<A>;
 
@@ -186,6 +209,8 @@ export type PairwiseOperatorObservable<A> = SyncChildObservable<
   FixedLengthTuple<2, A>,
   readonly [A]
 >;
+
+export type TakeOperatorObservable<A> = SyncChildObservable<A, readonly [A]>;
 
 export type TakeWhileOperatorObservable<A> = SyncChildObservable<
   A,

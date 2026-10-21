@@ -119,29 +119,35 @@ class CombineObservableClass<const A extends NonEmptyUnknownList>
       parents,
       initialValue,
     });
+
+    this.attach();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
-    if (this.parents.every((o) => o.updateToken !== updateToken)) {
+    const parents = this.parents;
+
+    if (parents.every((o) => o.updateToken !== updateToken)) {
       return; // all parents are skipped
     }
 
-    // Same shape-preserving chain as the constructor: `Arr.map` (not the
+    // Same shape-preserving chain as the initial value: `Arr.map` (not the
     // native one, which drops the tuple shape) into the uniform
     // `Tuple.MapTo`, then a positional annotation to get back to `A`.
     const parentValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
-      this.parents,
+      parents,
       (a) => a.getSnapshot(),
     );
 
-    if (Arr.every(parentValues, Optional.isSome)) {
-      const nextValue: Readonly<{ [K in keyof A]: A[K] }> = Arr.map(
-        parentValues,
-        (a) => a.value,
-      );
-
-      this.setNext(nextValue, updateToken);
+    if (!Arr.every(parentValues, Optional.isSome)) {
+      return;
     }
+
+    const nextValue: Readonly<{ [K in keyof A]: A[K] }> = Arr.map(
+      parentValues,
+      (a) => a.value,
+    );
+
+    this.setNext(nextValue, updateToken);
   }
 }
 

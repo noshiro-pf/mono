@@ -109,6 +109,8 @@ class SkipIfNoChangeObservableClass<A>
     this.#mut_previousValue = parentObservable.getSnapshot();
 
     this.#eq = eq;
+
+    this.attach();
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
