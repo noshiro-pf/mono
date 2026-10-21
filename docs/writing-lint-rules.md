@@ -87,6 +87,21 @@ TypeScript の AST は逆で、括弧が `ParenthesizedExpression` というノ�
 構文を判定する前に、型ラッパーと一緒に剥がす（Sumi の checker の
 `src/ast/node-helpers.mts` の `unwrap`）。
 
+## カンマ式
+
+カンマ演算子は、`for` の初期化部・更新部を除いて `no-sequences`
+（`allowInParentheses: false`）で禁止している。Sumi も同じである
+（`banned-syntax/no-comma-operator`）。
+
+- **検出では、カンマ式を透過しなくてよい。** `(0, Number)(x)` の callee を最後の
+  要素とみなすような処理は書かない。書かれたカンマ式そのものを `no-sequences` が
+  報告するので、別のルールが中まで見ても新しく捕まるものはない。
+- **修正の出力では、カンマ式を括弧で包む。** ルールは公開されていて、
+  `no-sequences` を有効にしていない利用者のコードにも修正を当てる。ESLint は、
+  別のルールが同じ箇所を報告していても修正を適用する。報告漏れは見逃しで済むが、
+  壊れた修正はコードの意味を黙って変える。前節の `getArgumentText` のように、
+  差し込む先で括弧が要るなら付ける。
+
 ## テストに入れるケース
 
 ルールが探す構文要素と、型を聞くオペランドのそれぞれについて、次のケースを書く。
