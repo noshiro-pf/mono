@@ -359,6 +359,70 @@ describe('prefer-curried-call with parenthesized operands', () => {
   });
 });
 
+describe('prefer-curried-call fixes that would change the meaning', () => {
+  tester.run('prefer-curried-call', preferCurriedCall, {
+    valid: [
+      {
+        name: 'type arguments on the call are not dropped',
+        code: dedent`
+          ${curriedDecls}
+          declare function first<T>(array: readonly T[]): T | undefined;
+          declare const xss: readonly (readonly number[])[];
+          const ys = xss.map((a) => toPushed<readonly number[], number>(a, 5));
+          const zs = xss.map((a) => first<number>(a));
+        `,
+      },
+      {
+        name: 'a callee in an optional chain is not hoisted out of it',
+        code: dedent`
+          ${bothDecl}
+          declare const obj: { readonly m: Both } | undefined;
+          declare const nested: { readonly inner?: { readonly m: Both } };
+          [1, 2].map((a) => obj?.m(a, 1));
+          [1, 2].map((a) => nested.inner?.m(a, 1));
+          [1, 2].map((a) => (obj?.m as Both)(a, 1));
+          [1, 2].map((a) => (obj?.m)!(a, 1));
+        `,
+      },
+      {
+        name: 'a callee with side effects is not evaluated once instead of on every call',
+        code: dedent`
+          ${bothDecl}
+          declare const getG: () => Both;
+          declare const g: Both;
+          declare let i: number;
+          [1, 2].map((a) => getG()(a, 1));
+          [1, 2].map((a) => (getG() as Both)(a, 1));
+          [1, 2].map((a) => (i++, g)(a, 1));
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a pure member callee is still fixed',
+        code: dedent`
+          ${bothDecl}
+          declare const obj: { readonly m: Both };
+          declare const gs: readonly [Both];
+          [1, 2].map((a) => obj.m(a, 1));
+          [1, 2].map((a) => gs[0](a, 1));
+        `,
+        output: dedent`
+          ${bothDecl}
+          declare const obj: { readonly m: Both };
+          declare const gs: readonly [Both];
+          [1, 2].map(obj.m(1));
+          [1, 2].map(gs[0](1));
+        `,
+        errors: [
+          { messageId: 'useCurriedForm' },
+          { messageId: 'useCurriedForm' },
+        ],
+      },
+    ],
+  });
+});
+
 describe('prefer-curried-call with a global callee', () => {
   tester.run('prefer-curried-call', preferCurriedCall, {
     valid: [

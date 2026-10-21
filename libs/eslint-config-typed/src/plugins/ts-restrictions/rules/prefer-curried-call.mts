@@ -35,7 +35,10 @@ type MessageIds =
  *   a genuine curried version (`(a) => toPushed(a, x)` → `toPushed(x)`).
  *
  * The arrow's single parameter must appear exactly once, as the first argument
- * of the call, so dropping the wrapper is behavior-preserving.
+ * of the call, so dropping the wrapper is behavior-preserving. A call with
+ * explicit type arguments is left alone, since neither fix can keep them, and
+ * the curried form also requires the callee and `...rest` to be free of side
+ * effects, since they are then evaluated once rather than on every call.
  *
  * A global the host provides (`requestAnimationFrame`, `setTimeout`, `fetch`
  * in the default libraries) may have to be called on `globalThis` — passed as
@@ -218,7 +221,9 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
 
         const call = node.body;
 
-        if (call.optional) {
+        // Explicit type arguments would be dropped by either fix (`f<T>(a)` →
+        // `f`, `f<T>(a, 1)` → `f(1)`), changing what is inferred.
+        if (call.optional || call.typeArguments !== undefined) {
           return;
         }
 
@@ -303,10 +308,13 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
         }
 
         // `(a) => f(a, ...rest)` → `f(...rest)`
-        // Re-evaluating a side-effecting argument once (at currying time)
-        // instead of on every call would change behavior, so require the
-        // remaining arguments to be free of observable side effects.
+        // The callee and the remaining arguments are evaluated once (at
+        // currying time) instead of on every call, so require them to be free
+        // of observable side effects: `getF()(a, 1)` must stay as it is. An
+        // optional chain (`(obj?.m)(a, 1)`) is not pure either; hoisted, it
+        // would throw when the wrapper is created rather than when it is called.
         if (
+          !isPureExpression(call.callee) ||
           !restArgs.every(isPureExpression) ||
           calleeTypes.some(
             (calleeType) => !hasCurriedSignature(calleeType, restArgs.length),
