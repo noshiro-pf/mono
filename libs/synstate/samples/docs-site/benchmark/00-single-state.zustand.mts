@@ -6,13 +6,10 @@ export const runBenchmark = (n: number): number => {
     counter: 0,
   }));
 
-  const selectQuadrupled = (state: Readonly<{ counter: number }>): number =>
-    state.counter * 2 * 2;
-
-  let mut_lastValue = selectQuadrupled(store.getState());
+  let mut_lastValue = store.getState().counter;
 
   store.subscribe((state) => {
-    mut_lastValue = selectQuadrupled(state);
+    mut_lastValue = state.counter;
   });
 
   for (let mut_i = 1; mut_i <= n; mut_i++) {
@@ -24,9 +21,9 @@ export const runBenchmark = (n: number): number => {
 // embed-sample-code-ignore-below
 
 if (import.meta.vitest !== undefined) {
-  test('derived-chain benchmark (Zustand)', () => {
+  test('single-state benchmark (Zustand)', () => {
     const result = runBenchmark(1000);
 
-    assert.strictEqual(result, 1000 * 4);
+    assert.strictEqual(result, 1000);
   });
 }

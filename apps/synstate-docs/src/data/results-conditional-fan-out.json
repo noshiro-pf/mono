@@ -7,9 +7,9 @@
       "runner": "github-actions",
       "runnerImage": "ubuntu24",
       "node": "v26.12.0",
-      "platform": "Linux 7.0.0-1017-azure",
+      "platform": "Linux 6.17.0-1022-azure",
       "arch": "x64",
-      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
       "measuredOn": "2026-10-21",
       "libraries": {
         "synstate": "3.4.0",
@@ -36,19 +36,27 @@
   "series": [
     {
       "label": "SynState",
-      "values": [42.4, 52.6, 70.4, 107.3, 214, 394.7, 748.5, 1862, 3685.9]
+      "values": [31.8, 40.7, 57.3, 87.7, 185.7, 346, 695.3, 1886.2, 3820.8]
+    },
+    {
+      "label": "SynState (switchMap)",
+      "values": [5.7, 3.9, 4.2, 3.9, 4.9, 4.7, 3.9, 4, 4.2]
     },
     {
       "label": "RxJS",
-      "values": [8, 8, 8.2, 8.7, 9.7, 11.3, 17.4, 33.3, 56.1]
+      "values": [7.9, 7.7, 9.2, 9.1, 12.9, 18.4, 27.5, 40.4, 59]
+    },
+    {
+      "label": "RxJS (switchMap)",
+      "values": [3.4, 3.5, 3.4, 3.6, 3.7, 3.8, 3.8, 3.9, 3.9]
     },
     {
       "label": "Jotai",
-      "values": [139.1, 138.2, 139.8, 138.9, 137.9, 138.8, 138.5, 139.1, 142.5]
+      "values": [121.1, 117.8, 117.5, 118.3, 120, 119.2, 118.6, 119.5, 118.9]
     },
     {
       "label": "MobX",
-      "values": [2.5, 1.9, 1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.9]
+      "values": [2, 1.5, 1.5, 1.5, 1.6, 1.5, 1.5, 1.6, 1.6]
     }
   ]
 }

@@ -18,6 +18,9 @@
  *   map produces the same value, equality check prevents downstream
  *   propagation. Cost scales with B (number of branches).
  *
+ * - The same two libraries with `switchMap` (the "(switchMap)" rows): only
+ *   the selected branch is subscribed, as in the dynamic graphs below.
+ *
  * - Dynamic graphs (Jotai, MobX): the inactive branch is not in the
  *   dependency set, so updates do not trigger recomputation at all.
  */
@@ -55,7 +58,15 @@ type BenchmarkEntry = Readonly<{
 
 const entries: readonly BenchmarkEntry[] = [
   { label: '**SynState**', file: '05-conditional-fan-out.synstate.mts' },
+  {
+    label: '**SynState** (switchMap)',
+    file: '05-conditional-fan-out.synstate-switch-map.mts',
+  },
   { label: 'RxJS', file: '05-conditional-fan-out.rxjs.mts' },
+  {
+    label: 'RxJS (switchMap)',
+    file: '05-conditional-fan-out.rxjs-switch-map.mts',
+  },
   { label: 'Jotai', file: '05-conditional-fan-out.jotai.mts' },
   { label: 'MobX', file: '05-conditional-fan-out.mobx.mts' },
 ] as const;

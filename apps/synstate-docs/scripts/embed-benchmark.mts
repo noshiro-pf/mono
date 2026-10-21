@@ -49,6 +49,11 @@ type EmbedTarget = Readonly<{
 
 const targets: readonly EmbedTarget[] = [
   {
+    resultsFile: 'results-single-state.md',
+    startMarker: '{/* benchmark-result-single-state */}',
+    endMarker: '{/* /benchmark-result-single-state */}',
+  },
+  {
     resultsFile: 'results.md',
     startMarker: '{/* benchmark-result */}',
     endMarker: '{/* /benchmark-result */}',

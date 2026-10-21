@@ -4,12 +4,12 @@ import { proxy, subscribe } from 'valtio/vanilla';
 export const runBenchmark = (n: number): number => {
   const state = proxy({ counter: 0 });
 
-  let mut_lastValue = state.counter * 2 * 2;
+  let mut_lastValue = state.counter;
 
   const unsubscribe = subscribe(
     state,
     () => {
-      mut_lastValue = state.counter * 2 * 2;
+      mut_lastValue = state.counter;
     },
     true,
   );
@@ -25,9 +25,9 @@ export const runBenchmark = (n: number): number => {
 // embed-sample-code-ignore-below
 
 if (import.meta.vitest !== undefined) {
-  test('derived-chain benchmark (Valtio)', () => {
+  test('single-state benchmark (Valtio)', () => {
     const result = runBenchmark(1000);
 
-    assert.strictEqual(result, 1000 * 4);
+    assert.strictEqual(result, 1000);
   });
 }

@@ -7,9 +7,9 @@
       "runner": "github-actions",
       "runnerImage": "ubuntu24",
       "node": "v26.12.0",
-      "platform": "Linux 7.0.0-1017-azure",
+      "platform": "Linux 6.17.0-1022-azure",
       "arch": "x64",
-      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
       "measuredOn": "2026-10-21",
       "libraries": {
         "synstate": "3.4.0",
@@ -25,43 +25,43 @@
   "rows": [
     {
       "label": "SynState",
-      "median": 40.39,
-      "min": 38.96,
-      "max": 48.72,
-      "p95": 48.47,
-      "opsPerSec": 2475801
+      "median": 40.32,
+      "min": 39.37,
+      "max": 41.14,
+      "p95": 40.79,
+      "opsPerSec": 2480125
     },
     {
       "label": "RxJS",
-      "median": 18.91,
-      "min": 18.75,
-      "max": 19.79,
-      "p95": 19.34,
-      "opsPerSec": 5287059
+      "median": 16.37,
+      "min": 15.94,
+      "max": 17.48,
+      "p95": 17.15,
+      "opsPerSec": 6107190
     },
     {
       "label": "MobX",
-      "median": 145.78,
-      "min": 144.7,
-      "max": 189.63,
-      "p95": 151.06,
-      "opsPerSec": 685984
+      "median": 143.09,
+      "min": 140.08,
+      "max": 182.9,
+      "p95": 147.92,
+      "opsPerSec": 698880
     },
     {
       "label": "Jotai",
-      "median": 1098.32,
-      "min": 1087.76,
-      "max": 1151.37,
-      "p95": 1118.4,
-      "opsPerSec": 91048
+      "median": 992.85,
+      "min": 976.73,
+      "max": 1003.46,
+      "p95": 1002.65,
+      "opsPerSec": 100720
     },
     {
       "label": "Redux",
-      "median": 360.94,
-      "min": 352.99,
-      "max": 382.11,
-      "p95": 379,
-      "opsPerSec": 277051
+      "median": 351.38,
+      "min": 342.99,
+      "max": 400.61,
+      "p95": 375.91,
+      "opsPerSec": 284591
     }
   ]
 }
