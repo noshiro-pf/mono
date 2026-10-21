@@ -1,19 +1,26 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Arr, Optional, createQueue, expectType } from 'ts-data-forge';
-import { type NonEmptyTuple, type Tuple } from 'ts-type-forge';
+import type { NonEmptyTuple, Tuple } from 'ts-type-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import { withInitialValue } from '../operators/index.mjs';
-import {
-  type InitializedObservable,
-  type InitializedSyncChildObservable,
-  type NonEmptyUnknownList,
-  type Observable,
-  type SyncChildObservable,
-  type TupleToQueueTuple,
-  type UpdateToken,
-  type Wrap,
-  type ZipObservable,
-  type ZipObservableRefined,
+import type {
+  InitializedObservable,
+  InitializedSyncChildObservable,
+  NonEmptyUnknownList,
+  Observable,
+  SyncChildObservable,
+  TupleToQueueTuple,
+  UpdateToken,
+  Wrap,
+  ZipObservable,
+  ZipObservableRefined,
 } from '../types/index.mjs';
 
 /**
@@ -68,7 +75,7 @@ import {
 export const zip = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): ZipObservableRefined<OS> =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   new ZipObservableClass(parents) as unknown as ZipObservableRefined<OS>;
 
 class ZipObservableClass<const A extends NonEmptyUnknownList>
@@ -119,7 +126,7 @@ class ZipObservableClass<const A extends NonEmptyUnknownList>
       const nextValue =
         // `Arr.map` has a single result element type, so it reports
         // `A[number] | undefined` per position rather than `A[P]`.
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
         Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
 
       this.setNext(nextValue, updateToken);

@@ -7,8 +7,6 @@
  * - Jotai: circular atom definitions are silently accepted. A cycle manifests
  *   only at read time as a `Maximum call stack size exceeded` error.
  */
-/* eslint-disable functional/immutable-data */
-/* eslint-disable no-new */
 import { type Atom, atom, createStore } from 'jotai';
 import { BehaviorSubject, combineLatest, map as rxMap } from 'rxjs';
 import { Optional } from 'ts-data-forge';

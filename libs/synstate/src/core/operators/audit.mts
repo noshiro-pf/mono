@@ -1,11 +1,18 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional } from 'ts-data-forge';
 import { AsyncChildObservableClass } from '../class/index.mjs';
-import {
-  type AuditOperatorObservable,
-  type KeepInitialValueOperator,
-  type Observable,
-  type TimerId,
-  type UpdateToken,
+import type {
+  AuditOperatorObservable,
+  KeepInitialValueOperator,
+  Observable,
+  TimerId,
+  UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -105,7 +112,7 @@ import {
 export const audit = <A,>(
   milliSeconds: number,
 ): KeepInitialValueOperator<A, A> =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   ((parentObservable) =>
     new AuditObservableClass(
       parentObservable,
@@ -156,7 +163,9 @@ class AuditObservableClass<A>
     this.#mut_timerId = setTimeout(() => {
       const sn = par.getSnapshot();
 
-      if (Optional.isNone(sn)) return;
+      if (Optional.isNone(sn)) {
+        return;
+      }
 
       this.startUpdate(sn.value);
 

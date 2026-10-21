@@ -1,5 +1,9 @@
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Arr, type Some } from 'ts-data-forge';
-import { type MutableSet } from 'ts-type-forge';
+import type { MutableSet } from 'ts-type-forge';
 import {
   isChildObservable,
   isManagerObservable,
@@ -30,9 +34,13 @@ const hasCircularDependencyFrom = (
   mut_visited: MutableSet<ObservableId>,
   mut_inPath: MutableSet<ObservableId>,
 ): boolean => {
-  if (mut_inPath.has(node.id)) return true;
+  if (mut_inPath.has(node.id)) {
+    return true;
+  }
 
-  if (mut_visited.has(node.id)) return false;
+  if (mut_visited.has(node.id)) {
+    return false;
+  }
 
   mut_visited.add(node.id);
 
@@ -84,7 +92,9 @@ const registerChild = <A,>(
   while (Arr.isNonEmpty(mut_rest)) {
     const p = mut_rest.pop();
 
-    if (p === undefined) break;
+    if (p === undefined) {
+      break;
+    }
 
     if (isManagerObservable(p)) {
       p.addDescendant(child);
@@ -158,7 +168,9 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
 
   // overload
   addDescendant<B>(child: ChildObservable<B>): void {
-    if (this.descendantsIdSet.has(child.id)) return;
+    if (this.descendantsIdSet.has(child.id)) {
+      return;
+    }
 
     this.descendantsIdSet.add(child.id);
 
@@ -271,7 +283,7 @@ export class InitializedSyncChildObservableClass<
   }
 
   override getSnapshot(): Some<A> {
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     return super.getCurrentValue() as Some<A>;
   }
 

@@ -1,16 +1,23 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding. The observables are classes (why is on
+// `ObservableBaseClass` below), so those four rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Arr, Optional } from 'ts-data-forge';
-import { type MutableMap } from 'ts-type-forge';
-import {
-  type ChildObservable,
-  type InitializedObservable,
-  type Observable,
-  type ObservableBase,
-  type Operator,
-  type Subscriber,
-  type SubscriberId,
-  type Subscription,
-  type UpdateToken,
-  type WithInitialValueOperator,
+import type { MutableMap } from 'ts-type-forge';
+import type {
+  ChildObservable,
+  InitializedObservable,
+  Observable,
+  ObservableBase,
+  Operator,
+  Subscriber,
+  SubscriberId,
+  Subscription,
+  UpdateToken,
+  WithInitialValueOperator,
 } from '../types/index.mjs';
 import {
   issueObservableId,
@@ -130,7 +137,9 @@ export class ObservableBaseClass<
   }
 
   complete(): void {
-    if (this.isCompleted) return; // terminate only once
+    if (this.isCompleted) {
+      return; // terminate only once
+    }
 
     // change state
     this.#mut_isCompleted = true;
@@ -153,7 +162,7 @@ export class ObservableBaseClass<
   pipe<B>(operator: Operator<A, B>): Observable<B>;
   pipe<B>(operator: Operator<A, B>): Observable<B> {
     return operator(
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
       this as unknown as InitializedObservable<A>,
     );
   }

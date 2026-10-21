@@ -1,6 +1,6 @@
 import { Optional } from 'ts-data-forge';
 import { RootObservableClass } from '../class/index.mjs';
-import { type InitializedRootObservable } from '../types/index.mjs';
+import type { InitializedRootObservable } from '../types/index.mjs';
 
 /**
  * Creates an Observable that holds a single static value and immediately
@@ -38,6 +38,6 @@ export const just = <const A,>(value: A): InitializedRootObservable<A> => {
 
   obs.complete();
 
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   return obs as InitializedRootObservable<A>;
 };

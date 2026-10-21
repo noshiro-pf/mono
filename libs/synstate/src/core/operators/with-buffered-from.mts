@@ -1,10 +1,17 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Arr, Optional, pipe } from 'ts-data-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
-import {
-  type KeepInitialValueOperator,
-  type Observable,
-  type UpdateToken,
-  type WithBufferedFromOperatorObservable,
+import type {
+  KeepInitialValueOperator,
+  Observable,
+  UpdateToken,
+  WithBufferedFromOperatorObservable,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
 
@@ -64,7 +71,7 @@ import { maxDepth } from '../utils/index.mjs';
 export const withBufferedFrom = <A, B>(
   observable: Observable<B>,
 ): KeepInitialValueOperator<A, readonly [A, readonly B[]]> =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   ((parentObservable) =>
     new WithBufferedFromObservableClass(
       parentObservable,

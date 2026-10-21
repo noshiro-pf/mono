@@ -1,18 +1,24 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
 import { Arr, expectType, Optional } from 'ts-data-forge';
-import { type NonEmptyTuple, type Tuple } from 'ts-type-forge';
+import type { NonEmptyTuple, Tuple } from 'ts-type-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import { withInitialValue } from '../operators/index.mjs';
-import {
-  type CombineObservable,
-  type CombineObservableRefined,
-  type InitializedObservable,
-  type InitializedSyncChildObservable,
-  type NonEmptyUnknownList,
-  type Observable,
-  type SyncChildObservable,
-  type UpdateToken,
-  type Wrap,
+import type {
+  CombineObservable,
+  CombineObservableRefined,
+  InitializedObservable,
+  InitializedSyncChildObservable,
+  NonEmptyUnknownList,
+  Observable,
+  SyncChildObservable,
+  UpdateToken,
+  Wrap,
 } from '../types/index.mjs';
 
 /**
@@ -75,7 +81,7 @@ import {
 export const combine = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): CombineObservableRefined<OS> =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   new CombineObservableClass(
     parents,
   ) as unknown as CombineObservableRefined<OS>;
@@ -116,7 +122,9 @@ class CombineObservableClass<const A extends NonEmptyUnknownList>
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
-    if (this.parents.every((o) => o.updateToken !== updateToken)) return; // all parents are skipped
+    if (this.parents.every((o) => o.updateToken !== updateToken)) {
+      return; // all parents are skipped
+    }
 
     // Same shape-preserving chain as the constructor: `Arr.map` (not the
     // native one, which drops the tuple shape) into the uniform

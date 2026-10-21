@@ -1,15 +1,21 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
 import { Optional, expectType } from 'ts-data-forge';
-import { type ArrayElement, type NonEmptyTuple } from 'ts-type-forge';
+import type { ArrayElement, NonEmptyTuple } from 'ts-type-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
-import {
-  type MergeObservable,
-  type MergeObservableRefined,
-  type NonEmptyUnknownList,
-  type Observable,
-  type SyncChildObservable,
-  type UpdateToken,
-  type Wrap,
+import type {
+  MergeObservable,
+  MergeObservableRefined,
+  NonEmptyUnknownList,
+  Observable,
+  SyncChildObservable,
+  UpdateToken,
+  Wrap,
 } from '../types/index.mjs';
 
 /**
@@ -66,7 +72,7 @@ import {
 export const merge = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): MergeObservableRefined<OS> =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   new MergeObservableClass(parents) as MergeObservableRefined<OS>;
 
 class MergeObservableClass<const P extends NonEmptyUnknownList>
@@ -85,10 +91,12 @@ class MergeObservableClass<const P extends NonEmptyUnknownList>
       (o) => o.updateToken === updateToken && Optional.isSome(o.getSnapshot()),
     );
 
-    if (parentToUse === undefined) return;
+    if (parentToUse === undefined) {
+      return;
+    }
 
     const nextValue =
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
       Optional.unwrap(parentToUse.getSnapshot()) as ArrayElement<P>;
 
     this.setNext(nextValue, updateToken);

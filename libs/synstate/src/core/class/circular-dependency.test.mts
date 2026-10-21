@@ -1,5 +1,3 @@
-/* eslint-disable functional/immutable-data */
-/* eslint-disable no-new */
 import { Optional } from 'ts-data-forge';
 import { combine, merge } from '../combine/index.mjs';
 import { source } from '../create/index.mjs';

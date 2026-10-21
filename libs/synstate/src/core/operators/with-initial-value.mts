@@ -1,12 +1,18 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
 import { expectType, Optional } from 'ts-data-forge';
 import { InitializedSyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
-import {
-  type InitializedObservable,
-  type Observable,
-  type UpdateToken,
-  type WithInitialValueOperator,
-  type WithInitialValueOperatorObservable,
+import type {
+  InitializedObservable,
+  Observable,
+  UpdateToken,
+  WithInitialValueOperator,
+  WithInitialValueOperatorObservable,
 } from '../types/index.mjs';
 
 /**

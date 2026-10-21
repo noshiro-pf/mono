@@ -1,8 +1,8 @@
 import { expectType, type Optional, type Some } from 'ts-data-forge';
-import { type FixedLengthTuple, type StrictOmit } from 'ts-type-forge';
-import { type ObservableId, type UpdateToken } from './id.mjs';
-import { type ObservableKind } from './observable-kind.mjs';
-import { type NonEmptyUnknownList, type Subscription } from './types.mjs';
+import type { FixedLengthTuple, StrictOmit } from 'ts-type-forge';
+import type { ObservableId, UpdateToken } from './id.mjs';
+import type { ObservableKind } from './observable-kind.mjs';
+import type { NonEmptyUnknownList, Subscription } from './types.mjs';
 
 /**
  * Inheritance

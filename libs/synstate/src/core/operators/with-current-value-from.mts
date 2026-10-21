@@ -1,10 +1,17 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional, pipe } from 'ts-data-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
-import {
-  type DropInitialValueOperator,
-  type Observable,
-  type UpdateToken,
-  type WithCurrentValueFromOperatorObservable,
+import type {
+  DropInitialValueOperator,
+  Observable,
+  UpdateToken,
+  WithCurrentValueFromOperatorObservable,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
 
@@ -111,7 +118,9 @@ class WithCurrentValueFromObservableClass<A, B>
 
     const curr = this.#observable.getSnapshot();
 
-    if (Optional.isNone(curr)) return; // skip update
+    if (Optional.isNone(curr)) {
+      return; // skip update
+    }
 
     this.setNext([ps.value, curr.value], updateToken);
   }

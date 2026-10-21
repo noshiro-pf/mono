@@ -1,6 +1,13 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { asSafeUint, Optional, SafeUint } from 'ts-data-forge';
 import { RootObservableClass } from '../class/index.mjs';
-import { type CounterObservable, type TimerId } from '../types/index.mjs';
+import type { CounterObservable, TimerId } from '../types/index.mjs';
 
 /**
  * Creates an observable that emits incremental numbers at a specified interval.

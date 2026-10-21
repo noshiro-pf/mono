@@ -1,6 +1,13 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional, Result } from 'ts-data-forge';
 import { RootObservableClass } from '../class/index.mjs';
-import { type FromPromiseObservable } from '../types/index.mjs';
+import type { FromPromiseObservable } from '../types/index.mjs';
 
 /**
  * Creates an observable from a Promise factory that receives an `AbortSignal`.
@@ -29,7 +36,7 @@ import { type FromPromiseObservable } from '../types/index.mjs';
  * ```
  */
 export const fromAbortablePromise = <A, E = unknown>(
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  // @sumi-expect-error readonly/require-readonly-parameter
   factory: (signal: AbortSignal) => Promise<A>,
 ): FromPromiseObservable<A, E> =>
   new FromAbortablePromiseObservableClass(factory);
@@ -40,7 +47,7 @@ class FromAbortablePromiseObservableClass<A, E = unknown>
 {
   readonly #abortController: AbortController;
 
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  // @sumi-expect-error readonly/require-readonly-parameter
   constructor(factory: (signal: AbortSignal) => Promise<A>) {
     super({ initialValue: Optional.none });
 
@@ -50,12 +57,16 @@ class FromAbortablePromiseObservableClass<A, E = unknown>
 
     promise
       .then((value) => {
-        if (this.isCompleted) return;
+        if (this.isCompleted) {
+          return;
+        }
 
         this.startUpdate(Result.ok(value));
       })
       .catch((error: unknown) => {
-        if (this.isCompleted) return;
+        if (this.isCompleted) {
+          return;
+        }
 
         // Silently ignore AbortError — it means the observable was
         // intentionally completed (e.g., by switchMap).
@@ -65,7 +76,7 @@ class FromAbortablePromiseObservableClass<A, E = unknown>
 
         this.startUpdate(
           Result.err(
-            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+            // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
             error as E,
           ),
         );

@@ -1,5 +1,5 @@
 import { expectType, type Queue } from 'ts-data-forge';
-import { type NonEmptyTuple } from 'ts-type-forge';
+import type { NonEmptyTuple } from 'ts-type-forge';
 
 export type TupleToQueueTuple<T extends readonly unknown[]> = Readonly<{
   [P in keyof T]: Queue<T[P]>;
