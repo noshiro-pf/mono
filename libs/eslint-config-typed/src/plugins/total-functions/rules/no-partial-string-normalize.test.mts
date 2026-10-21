@@ -231,3 +231,60 @@ describe('no-partial-string-normalize through type wrappers', () => {
     ],
   });
 });
+
+describe('no-partial-string-normalize with an argument that is not an identifier', () => {
+  ruleTester.run('no-partial-string-normalize', noPartialStringNormalize, {
+    valid: [
+      {
+        name: 'an expression whose own type is a safe form',
+        filename: 'file.ts',
+        code: dedent`
+          declare const s: string;
+          declare const cond: boolean;
+          declare const options: { readonly form: 'NFC' | 'NFKC' };
+          declare const getForm: () => 'NFD' | undefined;
+          declare const maybe: 'NFKD' | undefined;
+          s.normalize(cond ? 'NFC' : 'NFD');
+          s.normalize(options.form);
+          s.normalize(getForm());
+          s.normalize(maybe ?? 'NFC');
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'an expression one of whose values is an arbitrary string',
+        filename: 'file.ts',
+        code: dedent`
+          declare const s: string;
+          declare const cond: boolean;
+          declare const form: string;
+          declare const options: { readonly form: string };
+          s.normalize(cond ? 'NFC' : form);
+          s.normalize(options.form);
+          s.normalize(form || 'NFC');
+        `,
+        errors: [
+          { messageId: 'errorStringGeneric' },
+          { messageId: 'errorStringGeneric' },
+          { messageId: 'errorStringGeneric' },
+        ],
+      },
+      {
+        name: 'a cast inside the expression does not make it a safe form',
+        filename: 'file.ts',
+        code: dedent`
+          declare const s: string;
+          declare const cond: boolean;
+          declare const form: string;
+          s.normalize(cond ? 'NFC' : (form as 'NFD'));
+          s.normalize(undefined ?? (form as 'NFD'));
+        `,
+        errors: [
+          { messageId: 'errorStringGeneric' },
+          { messageId: 'errorStringGeneric' },
+        ],
+      },
+    ],
+  });
+});
