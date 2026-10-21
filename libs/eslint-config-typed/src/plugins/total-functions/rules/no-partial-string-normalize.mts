@@ -44,6 +44,33 @@ export const noPartialStringNormalize = createRule({
         parserServices.esTreeNodeToTSNodeMap.get(expression),
       );
 
+    /**
+     * `true` when every value `node` may evaluate to is one of the four forms
+     * or `undefined`, by the type of the value itself. A conditional or
+     * logical expression is judged by its operands, so a cast in one of them
+     * (`cond ? 'NFC' : (form as 'NFD')`) cannot vouch for it as the type of
+     * the whole would.
+     */
+    const isSafeForm = (node: TSESTree.Expression): boolean => {
+      const expression = skipTypeWrappers(node);
+
+      if (expression.type === AST_NODE_TYPES.ConditionalExpression) {
+        return (
+          isSafeForm(expression.consequent) && isSafeForm(expression.alternate)
+        );
+      }
+
+      if (expression.type === AST_NODE_TYPES.LogicalExpression) {
+        return isSafeForm(expression.left) && isSafeForm(expression.right);
+      }
+
+      return unionTypeParts(typeOf(expression)).every(
+        (type) =>
+          (type.isStringLiteral() && SAFE_FORMS.has(type.value)) ||
+          isTypeFlagSet(type, TypeFlags.Undefined),
+      );
+    };
+
     return {
       CallExpression: (node) => {
         // We only care if this call is a member expression.
@@ -115,30 +142,10 @@ export const noPartialStringNormalize = createRule({
           return;
         }
 
-        const argument =
-          rawArgument.type === AST_NODE_TYPES.SpreadElement
-            ? rawArgument
-            : skipTypeWrappers(rawArgument);
-
-        const safeValues = new Set(['NFC', 'NFD', 'NFKC', 'NFKD']);
-
+        // TODO errorStringWillDefinitelyThrow
         if (
-          argument.type === AST_NODE_TYPES.Literal &&
-          typeof argument.value === 'string' &&
-          safeValues.has(argument.value)
-        ) {
-          // TODO errorStringWillDefinitelyThrow
-          // These four values are all safe.
-          return;
-        }
-
-        if (
-          argument.type === AST_NODE_TYPES.Identifier &&
-          unionTypeParts(typeOf(argument)).every(
-            (type) =>
-              (type.isStringLiteral() && safeValues.has(type.value)) ||
-              isTypeFlagSet(type, TypeFlags.Undefined),
-          )
+          rawArgument.type !== AST_NODE_TYPES.SpreadElement &&
+          isSafeForm(rawArgument)
         ) {
           return;
         }
@@ -154,3 +161,5 @@ export const noPartialStringNormalize = createRule({
   },
   defaultOptions: [],
 } as const);
+
+const SAFE_FORMS: ReadonlySet<string> = new Set(['NFC', 'NFD', 'NFKC', 'NFKD']);
