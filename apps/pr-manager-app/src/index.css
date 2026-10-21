@@ -1089,10 +1089,29 @@ a:focus-visible {
   padding: 0;
 }
 
+/*
+ * A stack is drawn as deep as it goes, so a fixed indent adds up: a dozen
+ * layers took more than the block is wide, and the deepest cards were
+ * squeezed narrower than what they hold, which spilled out of them and made
+ * the block scroll sideways. Each level's indent is instead the room the
+ * block has beyond a card's width, shared out among the levels the tree has
+ * (`--merge-order-depth`, written by the component), between a step that
+ * still reads as a level and the one a shallow tree has always had.
+ */
+.merge-order {
+  container-type: inline-size;
+}
+
 .merge-order-children {
+  --merge-order-step: clamp(
+    0.6rem,
+    (100cqi - 20rem) / max(var(--merge-order-depth, 1), 1),
+    2.1rem
+  );
+
   border-left: 2px solid var(--hairline);
-  margin-left: 1.1rem;
-  padding-left: 1rem;
+  margin-left: calc(var(--merge-order-step) / 2);
+  padding-left: calc(var(--merge-order-step) / 2);
 }
 
 .merge-order > li + li,
@@ -1634,6 +1653,8 @@ a:focus-visible {
 .branch {
   font-family: var(--font-mono);
   font-size: 0.75rem;
+  /* A branch name is one long word to the line breaker. */
+  overflow-wrap: anywhere;
 }
 
 .branch-arrow,
@@ -1652,6 +1673,7 @@ a:focus-visible {
   align-items: center;
   display: inline-flex;
   gap: 0.4rem;
+  max-inline-size: 100%;
 }
 
 .divergence-unread {
@@ -1673,7 +1695,11 @@ a:focus-visible {
  */
 .divergence-track {
   display: inline-flex;
+  /* Shorter only in a card too narrow for it, as the deepest of a deep stack
+     on a phone is; everywhere else every track is the same length. */
+  flex-shrink: 1;
   inline-size: 9rem;
+  min-inline-size: 4rem;
 }
 
 .divergence-half {
