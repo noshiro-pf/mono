@@ -21,7 +21,8 @@ type MessageIds = 'missingDisplayName' | 'mismatchedDisplayName';
  * This helps with debugging and component identification in React DevTools
  *
  * Type wrappers (`as`, `satisfies`, `!`, `<T>`) are looked through on the
- * memo call, on the component in `C.displayName` and on the assigned name.
+ * memo call, on the `C.displayName = ...` statement, on the component in
+ * `C.displayName` and on the assigned name.
  */
 export const displayNameRule: TSESLint.RuleModule<MessageIds, Options> = {
   meta: {
@@ -181,10 +182,16 @@ const getDisplayNameAssignment = (
 
   const nextStatement = program.body[componentIndex + 1];
 
-  return nextStatement?.type !== AST_NODE_TYPES.ExpressionStatement ||
-    nextStatement.expression.type !== AST_NODE_TYPES.AssignmentExpression
-    ? undefined
-    : nextStatement.expression;
+  if (nextStatement?.type !== AST_NODE_TYPES.ExpressionStatement) {
+    return undefined;
+  }
+
+  // `(C.displayName = 'C') satisfies string;` assigns it all the same.
+  const expression = skipTypeWrappers(nextStatement.expression);
+
+  return expression.type === AST_NODE_TYPES.AssignmentExpression
+    ? expression
+    : undefined;
 };
 
 const isComponentDisplayNameAssignment = (
