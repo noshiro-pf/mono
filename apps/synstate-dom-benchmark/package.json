@@ -12,6 +12,7 @@
   "type": "module",
   "scripts": {
     "benchmark": "vitest --config ./configs/vitest.config.mts run",
+    "benchmark:repeat": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/repeat-benchmark.mts",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
     "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "fix:fmt": "pnpm run z:format-uncommitted --cwd .",
@@ -30,12 +31,16 @@
   "dependencies": {
     "@preact/signals": "catalog:",
     "preact": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "solid-js": "1.9.17",
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
     "vanjs-core": "1.6.1"
   },
   "devDependencies": {
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
