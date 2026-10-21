@@ -2,13 +2,14 @@ import { Optional } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { isRootObservable, type RootObservable } from '../types/index.mjs';
 import {
-  assembleObservable,
-  createManagerObservableParts,
-  createObservableBaseHandle,
-  createTeardownList,
-  createTryUpdateNotImplemented,
+  addTeardown,
+  adoptIntoCurrentScope,
+  completeNode,
   isPropagating,
+  startUpdate,
 } from './create-observable-base.mjs';
+import { createNodeRecord } from './node-class.mjs';
+import { asMutable } from './observable-node.mjs';
 
 /**
  * The internal tools a root leaf factory (`source`, `timer`, `fromPromise`, …)
@@ -63,22 +64,7 @@ export const createRootObservable = <
   { initialValue }: RootObservableConfig<A>,
   init: (tools: RootObservableTools<A>) => Extension,
 ): Extension & RootObservable<A> => {
-  const handle = createObservableBaseHandle<A>(initialValue);
-
-  const { addDescendant, deleteDescendant, startUpdate } =
-    createManagerObservableParts(handle);
-
-  const teardowns = createTeardownList(handle.isCompleted);
-
-  const complete = (): void => {
-    if (handle.isCompleted()) {
-      return;
-    }
-
-    teardowns.runAll();
-
-    handle.completeBase();
-  };
+  const node = createNodeRecord('root', 0, undefined, initialValue);
 
   // A root created while an update propagates (inside a `switchMap`
   // projection, say) may emit synchronously while `init` runs, as
@@ -88,41 +74,39 @@ export const createRootObservable = <
 
   let mut_hasWarned = false;
 
-  const startUpdateWithWarning = (nextValue: A): void => {
-    if (!mut_isInitializing && !mut_hasWarned && isPropagating()) {
-      mut_hasWarned = true;
-
-      console.warn(writeDuringPropagationWarning);
-    }
-
-    startUpdate(nextValue);
-  };
-
   const extension: Extension = init({
-    startUpdate: startUpdateWithWarning,
-    getSnapshot: handle.getSnapshot,
-    isCompleted: handle.isCompleted,
-    complete,
-    onComplete: teardowns.add,
+    startUpdate: (nextValue) => {
+      if (!mut_isInitializing && !mut_hasWarned && isPropagating()) {
+        mut_hasWarned = true;
+
+        console.warn(writeDuringPropagationWarning);
+      }
+
+      startUpdate(node, nextValue);
+    },
+    getSnapshot: () => node.snapshot,
+    isCompleted: () => node.isCompleted,
+    complete: () => {
+      completeNode(node);
+    },
+    onComplete: (teardown) => {
+      addTeardown(node, teardown);
+    },
   });
 
   mut_isInitializing = false;
 
-  return assembleObservable({
-    kind: 'root',
-    depth: 0,
-    handle,
-    tryUpdate: createTryUpdateNotImplemented,
-    tryComplete: tryCompleteRoot,
-    complete,
-    // A root has no parents to keep out of it.
-    dispose: complete,
-    extra: {
-      ...extension,
-      addDescendant,
-      deleteDescendant,
-    },
-  });
+  // The leaf's own members (`next`, `start`, …) go on the record itself.
+  const mut_node = asMutable(node);
+
+  Object.assign(mut_node, extension);
+
+  adoptIntoCurrentScope(node);
+
+  return (
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+    node as unknown as Extension & RootObservable<A>
+  );
 };
 
 /**
@@ -134,13 +118,6 @@ export const createRootObservable = <
  */
 export const writeDuringPropagationWarning =
   'synstate: an observable was written to (next / setState / dispatch) while an update was propagating, so subscribers can see intermediate states. Derive the value with map / combine instead of writing from a subscriber or a projection.';
-
-/**
- * `tryComplete` is how a completed parent reaches its children. A root has no
- * parents, and a child completing never completes it (#2133), so only its own
- * `complete()` ends it.
- */
-const tryCompleteRoot = (): void => {};
 
 if (import.meta.vitest !== undefined) {
   test('isRootObservable', () => {

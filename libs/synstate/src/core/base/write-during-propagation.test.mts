@@ -1,4 +1,5 @@
 import { Result } from 'ts-data-forge';
+import { panic } from 'ts-std-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import { createState } from '../../utils/index.mjs';
 import { combine } from '../combine/index.mjs';
@@ -197,8 +198,7 @@ describe('a write to a root observable while an update is propagating (#2336)', 
 
     a$.subscribe((a) => {
       if (a > 0) {
-        // @sumi-expect-error exceptions/no-throw
-        throw new Error('boom');
+        panic('boom');
       }
     });
 

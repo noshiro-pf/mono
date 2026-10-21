@@ -106,7 +106,7 @@ export const constant = <const T extends {}>(
 ```
 
 - `Constant<T>` は型の上だけのブランドで、`constant()` は値をそのまま返す。実行時のコストはない。
-- ブランドは synstate 本体（`ObservableId` など）と揃えて ts-type-forge の `Brand` で作る。`Brand` のキーは文字列のプロパティなので、他のライブラリのブランドと衝突しないよう `'synstate-dom/Constant'` と名前空間を付ける。このキーは型の上では `true` として読めるが、実行時には存在しないので参照しない。
+- ブランドは synstate 本体（`UpdateToken` など）と揃えて ts-type-forge の `Brand` で作る。`Brand` のキーは文字列のプロパティなので、他のライブラリのブランドと衝突しないよう `'synstate-dom/Constant'` と名前空間を付ける。このキーは型の上では `true` として読めるが、実行時には存在しないので参照しない。
 - 素の値は `Constant<T>` に代入できない。`constant('btn')` の型は `Constant<'btn'>` でリテラル型を保つ。`Constant<T>` は `T` に代入できる。
 - `null` と `undefined` は `T extends {}` で拒否する。制約が無いと `constant(maybeStr)` が `Constant<string>` になり `undefined` が黙って落ちる。属性が無いことは props の省略で、あったりなかったりする値は `InitializedObservable<T | undefined>` で表す。値が無い状態を定数で渡す必要は props の省略で常に代えられるので、`null` / `undefined` の定数は用意しない。そのため、ライブラリのコンポーネントは値が無いことを表す props を optional にする。
 - `constant(obs$)` は条件型で拒否する。
