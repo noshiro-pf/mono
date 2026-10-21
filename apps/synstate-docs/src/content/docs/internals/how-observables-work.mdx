@@ -113,7 +113,7 @@ What SynState adds to the minimal version does not change the picture:
 - Derived Observables such as `map` and `combine` are not chained through `subscribe`. When one is created, it registers an update function with the root it descends from, and the root keeps those functions in a list sorted by depth. `next` on the root walks that list once, in order, which is how SynState avoids glitches ([How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/)). The list is built when the graph is built, and walking it is still a synchronous loop.
 - Completion (`complete`) is handled as well.
 
-The core is [`createObservableBaseHandle`](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/base/create-observable-base.mts): `subscribe` adds to a `Map` of subscribers, and `setNext` stores the value and calls each subscriber in a `for` loop.
+The core is [`ObservableBaseClass`](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/class/observable-base-class.mts): `subscribe` adds to a `Set` of subscribers, and `setNext` stores the value and calls each subscriber in a `for` loop.
 
 ## Where the Asynchronous Part Comes From
 

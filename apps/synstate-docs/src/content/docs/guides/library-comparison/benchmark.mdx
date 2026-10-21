@@ -1,6 +1,6 @@
 ---
 title: Performance Benchmark
-description: Performance benchmarks comparing SynState with other state management libraries — throughput, memory usage, and latency.
+description: Propagation-time benchmarks comparing SynState with other state management libraries across five graph shapes, and what they do and do not show.
 sidebar:
     order: 6
 ---
@@ -13,6 +13,27 @@ import DeepChainChart from '../../../../components/benchmark-chart/deep-chain-ch
 import CascadedDiamondChart from '../../../../components/benchmark-chart/cascaded-diamond-chart-island.astro';
 import ConditionalFanOutDepGraph from '../../../../components/dep-graph/conditional-fan-out-dep-graph-island.astro';
 import ConditionalFanOutChart from '../../../../components/benchmark-chart/conditional-fan-out-chart-island.astro';
+
+## How to Read This Page
+
+No library is the fastest in every scenario on this page, SynState included. Each scenario asks one question about one graph shape, so compare libraries within a scenario, not across them.
+
+| Scenario                                                      | What it stresses                                                  | Fastest here                                                         | SynState ÷ fastest                                                             |
+| ------------------------------------------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| [Derived chain](#scenario-derived-chain)                      | Fixed cost of one update through a two-step chain                 | {/* bench:summary/derived-chain-fastest */}Zustand{/* /bench */}     | {/* bench:summary/derived-chain-synstate-over-fastest */}3.3{/* /bench */}×    |
+| [Diamond](#scenario-diamond-dependency)                       | One diamond: two derived values merged back into one              | {/* bench:summary/diamond-fastest */}RxJS{/* /bench */}              | {/* bench:summary/diamond-synstate-over-fastest */}2.1{/* /bench */}×          |
+| [Deep chain](#scenario-deep-chain-throughput) (K=1000, M=200) | A deep stateful chain whose every stage is read by one `combine`  | {/* bench:summary/deep-chain-fastest */}SynState{/* /bench */}       | {/* bench:summary/deep-chain-synstate-over-fastest */}1.0{/* /bench */}×       |
+| [Cascaded diamond](#scenario-cascaded-diamond) (N=20)         | Diamonds in series, with the graph built inside every measurement | {/* bench:summary/cascaded-diamond-fastest */}SynState{/* /bench */} | {/* bench:summary/cascaded-diamond-synstate-over-fastest */}1.0{/* /bench */}× |
+| [Conditional fan-out](#scenario-conditional-fan-out) (B=1000) | Updates to a branch that nothing currently reads                  | {/* bench:summary/fan-out-fastest */}MobX{/* /bench */}              | {/* bench:summary/fan-out-synstate-over-fastest */}1,940{/* /bench */}×        |
+
+What the measurements support:
+
+- **SynState's per-update overhead is moderate, not the lowest.** On the two small graphs, libraries with less machinery per update are faster: Zustand computes the derived value inline in one callback, and RxJS chains plain `subscribe` calls with no ordering step. SynState is faster than Valtio, MobX, Jotai and Redux there.
+- **SynState's per-update cost does not explode with the shape of the graph.** This is what sets it apart from the other push-based library here. Every source update makes one pass over its descendants in depth order and calls each subscriber once, however many paths lead to it, so diamonds add no emissions. RxJS emits once per path instead: when the deep chain gets four times deeper ($M = 50 \to 200$ at $K = 1000$), SynState takes {/* bench:summary/deep-chain-synstate-growth */}3.1{/* /bench */}× as long, Jotai {/* bench:summary/deep-chain-jotai-growth */}4.2{/* /bench */}× and MobX {/* bench:summary/deep-chain-mobx-growth */}3.9{/* /bench */}×, but RxJS {/* bench:summary/deep-chain-rxjs-growth */}18{/* /bench */}×; and in the cascaded diamond RxJS stops completing at {/* bench:cascaded-diamond/rxjs-timeout-n-math */}$N=14${/* /bench */}. RxJS's intermediate emissions are also [glitches](/mono/synstate/internals/how-synstate-solved-the-glitch/): subscribers see combinations of old and new values.
+- **MobX and Jotai win where work can be skipped.** Both mark dependents stale when a source changes and recompute a derived value only when something reads it, tracking dependencies as the read happens. A branch nothing reads costs them nothing (conditional fan-out), and a chain of MobX `computed`s is evaluated once per read (cascaded diamond). SynState evaluates every derived value it has on every update of its source, whether or not anything reads it — the price of every `getSnapshot()` being consistent as soon as `next` returns — so its fan-out cost grows linearly with the number of branches it combines. See [Evaluation models](/mono/synstate/guides/library-comparison/library-comparison/#evaluation-models) for how each library schedules this work.
+- **Building a graph costs SynState little.** The cascaded diamond creates its graph inside each measurement, and SynState's row stays flat as $N$ grows: a new node registers with its parents and with the root it inherits from them, rather than walking back through the $2^N$ paths to the root. In a graph built once and updated many times, as in the deep chain, construction is not part of the per-update cost at all.
+
+So the conclusion the page supports is narrower than "SynState is fast": among the libraries here, SynState is the only push-based one whose per-update cost stays proportional to the size of the graph whatever its shape, with a per-update overhead well below MobX, Jotai and Redux and above the simplest stores. Where a pull-based library can skip work entirely, it is faster than SynState.
 
 ## Scenario: Derived Chain
 
@@ -29,13 +50,13 @@ A simple linear chain that measures pure overhead of each library's reactive pri
 {/* benchmark-result */}
 | Library | Median (ms) | Min (ms) | Max (ms) | p95 (ms) | Ops/sec |
 | ------------ | ----------: | -------: | -------: | -------: | ---------: |
-| **SynState** | 15.57 | 13.54 | 24.47 | 22.07 | 6,424,658 |
-| RxJS | 4.37 | 4.14 | 5.19 | 4.81 | 22,867,712 |
-| MobX | 64.38 | 62.04 | 66.96 | 66.93 | 1,553,398 |
-| Jotai | 447.96 | 437.57 | 486.18 | 465.94 | 223,236 |
-| Redux | 292.06 | 278.66 | 303.85 | 302.48 | 342,396 |
-| Zustand | 3.44 | 3.29 | 3.73 | 3.67 | 29,069,079 |
-| Valtio | 24.56 | 24.38 | 24.86 | 24.82 | 4,071,270 |
+| **SynState** | 17.49 | 15.94 | 23.21 | 23.11 | 5,717,955 |
+| RxJS | 7.22 | 7.11 | 8.19 | 7.87 | 13,842,679 |
+| MobX | 117.59 | 117.19 | 120.98 | 118.96 | 850,386 |
+| Jotai | 752.39 | 748.28 | 768.36 | 765.46 | 132,910 |
+| Redux | 281.21 | 275.20 | 294.01 | 291.02 | 355,610 |
+| Zustand | 5.33 | 5.18 | 5.47 | 5.43 | 18,766,074 |
+| Valtio | 46.24 | 45.79 | 46.57 | 46.49 | 2,162,673 |
 {/* /benchmark-result */}
 
 :::note[How these numbers are produced]
@@ -44,11 +65,11 @@ The numbers on this page are measured by CI on a pinned runner (`ubuntu-24.04`),
 |           |                                                                                                                                                             |
 | :-------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Runner    | {/* bench:environment/runner */}GitHub Actions ubuntu24{/* /bench */}                                                                                       |
-| OS        | {/* bench:environment/os */}Linux 6.17.0-1022-azure (x64){/* /bench */}                                                                                     |
-| CPU       | {/* bench:environment/cpu */}Intel(R) Xeon(R) 6973P-C{/* /bench */}                                                                                         |
-| Node      | {/* bench:environment/node */}v26.10.0{/* /bench */}                                                                                                        |
-| Libraries | {/* bench:environment/libraries */}synstate 3.1.0, rxjs 7.8.2, jotai 3.0.1, mobx 7.0.6, @reduxjs/toolkit 2.13.0, zustand 5.0.15, valtio 2.3.2{/* /bench */} |
-| Measured  | {/* bench:environment/measured-on */}2026-10-12{/* /bench */}                                                                                               |
+| OS        | {/* bench:environment/os */}Linux 7.0.0-1017-azure (x64){/* /bench */}                                                                                      |
+| CPU       | {/* bench:environment/cpu */}AMD EPYC 7763 64-Core Processor{/* /bench */}                                                                                  |
+| Node      | {/* bench:environment/node */}v26.12.0{/* /bench */}                                                                                                        |
+| Libraries | {/* bench:environment/libraries */}synstate 3.4.0, rxjs 7.8.2, jotai 3.0.1, mobx 7.0.6, @reduxjs/toolkit 2.13.0, zustand 5.0.15, valtio 2.3.2{/* /bench */} |
+| Measured  | {/* bench:environment/measured-on */}2026-10-21{/* /bench */}                                                                                               |
 
 Each scenario's results file records its own environment, and these values are read back from them. A dash means those tables were measured before the runner was pinned.
 
@@ -56,12 +77,12 @@ Absolute milliseconds are comparable only within one environment. Where a number
 :::
 
 :::caution[Reading the numbers in context]
-RxJS, Zustand, and Valtio appear faster than SynState in this simple chain scenario. However, raw throughput on a linear chain does not tell the full story:
+RxJS and Zustand are faster than SynState in this simple chain scenario. What this graph does not show:
 
-- **RxJS** is fast here because the graph has no diamond dependency. Once diamonds appear, `combineLatest` emits redundant intermediate values — $O(N^2)$ for wide diamonds and **exponential for cascaded diamonds** (generally $O(D^N)$ where $D$ is the fan-out per stage) — as shown in the [diamond scenario below](#scenario-diamond-dependency) and the [interactive demo](/mono/synstate/guides/library-comparison/interactive-demo/). RxJS also suffers from [glitches](/mono/synstate/internals/how-synstate-solved-the-glitch/) (inconsistent intermediate states), which SynState eliminates.
-- **Zustand** and **Valtio** achieve their speed by computing derived values **inline in a selector or callback** (`counter * 2 * 2`). They have no mechanism to define independent derived values and combine them — which is why they are **excluded from the Diamond Dependency scenario**. In real applications, any state that requires combining multiple derived sources (form validation, computed styles, aggregated dashboards) cannot be expressed with these libraries' vanilla APIs without manual orchestration.
+- **RxJS** is fast here, and still is in the [diamond scenario](#scenario-diamond-dependency), where a single diamond only doubles its emissions. As diamonds widen or are chained, `combineLatest` emits redundant intermediate values — $O(N^2)$ for wide diamonds and **exponential for cascaded diamonds** (generally $O(D^N)$ where $D$ is the fan-out per stage) — as shown in the [diamond scenario below](#scenario-diamond-dependency) and the [interactive demo](/mono/synstate/guides/library-comparison/interactive-demo/). RxJS also suffers from [glitches](/mono/synstate/internals/how-synstate-solved-the-glitch/) (inconsistent intermediate states), which SynState eliminates.
+- **Zustand** achieves its speed, as **Valtio** does its place in this table, by computing derived values **inline in a selector or callback** (`counter * 2 * 2`). They have no mechanism to define independent derived values and combine them — which is why they are **excluded from the Diamond Dependency scenario**. In real applications, any state that requires combining multiple derived sources (form validation, computed styles, aggregated dashboards) cannot be expressed with these libraries' vanilla APIs without manual orchestration.
 
-SynState is the only library in this benchmark that is **glitch-free, supports diamond dependencies, and maintains $O(n)$ propagation** in all cases.
+SynState's propagation stays $O(n)$ per update in every scenario, $n$ being the descendants of the updated source: the propagation order visits each of them exactly once, glitch-free and through diamonds alike. That is a statement about updates; the [cascaded diamond](#scenario-cascaded-diamond) table also measures building the graph, which stays small there. [How to Read This Page](#how-to-read-this-page) sums up what each scenario shows, including where SynState is the slower library.
 :::
 
 ### Implementation Details
@@ -295,7 +316,7 @@ A diamond-shaped dependency graph that tests how each library handles multiple d
 - Zustand is excluded because it has no mechanism to combine separate derived values.
 
 :::caution[RxJS Glitch]
-RxJS `combineLatest` fires the subscriber **twice per update** in this diamond graph (once with a stale value, once with the correct value). This doubled work is reflected in the benchmark results. See [How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/) for details.
+RxJS `combineLatest` fires the subscriber **twice per update** in this diamond graph (once with a stale value, once with the correct value). This doubled work is reflected in the benchmark results, and RxJS is still faster than SynState here: twice a very cheap pass costs less than one ordered pass. The doubling compounds once diamonds are chained — see the [cascaded diamond scenario](#scenario-cascaded-diamond). See [How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/) for details.
 :::
 
 ### Results
@@ -303,11 +324,11 @@ RxJS `combineLatest` fires the subscriber **twice per update** in this diamond g
 {/* benchmark-result-diamond */}
 | Library | Median (ms) | Min (ms) | Max (ms) | p95 (ms) | Ops/sec |
 | ------------ | ----------: | -------: | -------: | -------: | --------: |
-| **SynState** | 33.85 | 31.24 | 40.22 | 36.73 | 2,954,086 |
-| RxJS | 12.10 | 11.85 | 12.83 | 12.50 | 8,266,731 |
-| MobX | 92.18 | 85.89 | 98.53 | 96.37 | 1,084,794 |
-| Jotai | 658.22 | 635.74 | 690.45 | 668.98 | 151,926 |
-| Redux | 425.18 | 407.47 | 456.74 | 446.00 | 235,193 |
+| **SynState** | 40.39 | 38.96 | 48.72 | 48.47 | 2,475,801 |
+| RxJS | 18.91 | 18.75 | 19.79 | 19.34 | 5,287,059 |
+| MobX | 145.78 | 144.70 | 189.63 | 151.06 | 685,984 |
+| Jotai | 1098.32 | 1087.76 | 1151.37 | 1118.40 | 91,048 |
+| Redux | 360.94 | 352.99 | 382.11 | 379.00 | 277,051 |
 {/* /benchmark-result-diamond */}
 
 ### Implementation Details
@@ -524,21 +545,21 @@ SynState's `combine` waits until the entire propagation order is resolved before
 {/* benchmark-result-deep-chain */}
 | Library | K=100, M=50 | K=500, M=50 | K=1000, M=50 | K=100, M=100 | K=500, M=100 | K=1000, M=100 | K=500, M=200 | K=1000, M=200 |
 | ------------ | ----------: | ----------: | -----------: | -----------: | -----------: | ------------: | -----------: | ------------: |
-| **SynState** | 0.9 ms | 2.4 ms | 4.3 ms | 0.9 ms | 4.6 ms | 8.0 ms | 8.2 ms | 16.3 ms |
-| RxJS | 3.5 ms | 16.5 ms | 31.0 ms | 22.1 ms | 153.8 ms | 250.0 ms | 554.5 ms | 1161.6 ms |
-| Jotai | 15.8 ms | 59.0 ms | 128.4 ms | 25.9 ms | 126.4 ms | 251.8 ms | 256.6 ms | 504.8 ms |
-| MobX | 20.7 ms | 92.7 ms | 170.6 ms | 27.7 ms | 157.9 ms | 329.7 ms | 259.9 ms | 532.6 ms |
+| **SynState** | 1.5 ms | 2.9 ms | 4.7 ms | 1.0 ms | 4.3 ms | 8.4 ms | 7.9 ms | 14.8 ms |
+| RxJS | 7.3 ms | 27.8 ms | 57.2 ms | 20.7 ms | 128.7 ms | 229.3 ms | 481.4 ms | 1016.9 ms |
+| Jotai | 23.7 ms | 95.6 ms | 191.5 ms | 39.0 ms | 192.2 ms | 392.5 ms | 401.8 ms | 802.8 ms |
+| MobX | 22.0 ms | 103.4 ms | 205.2 ms | 41.2 ms | 201.5 ms | 412.7 ms | 402.6 ms | 805.1 ms |
 {/* /benchmark-result-deep-chain */}
 
 <DeepChainChart />
 
 ### Key observations
 
-- **SynState** scales linearly with both $K$ and $M$ — at $K=1000$, $M=200$, it finishes in **{/* bench:deep-chain/synstate@k1000-m200 */}16.3 ms{/* /bench */}**. Its push-based direct function calls have negligible per-stage overhead.
-- **RxJS** takes **{/* bench:deep-chain/rxjs@k1000-m200 */}1,162 ms{/* /bench */}** at $K=1000$, $M=200$ — **{/* bench:deep-chain/rxjs-over-synstate@k1000-m200 */}71{/* /bench */}× slower** than SynState. As explained above, this is not a constant-factor difference but a quadratic $O(M^2)$ asymptotic cost from `combineLatest`'s redundant emissions. The same blowup is visible in the [interactive demo](/mono/synstate/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load).
-- **Jotai** takes **{/* bench:deep-chain/jotai@k1000-m200 */}505 ms{/* /bench */}** at $K=1000$, $M=200$ — **{/* bench:deep-chain/jotai-over-synstate@k1000-m200 */}31{/* /bench */}× slower** than SynState — due to `selectAtom`'s per-update overhead (epoch-based recomputation and dynamic dependency tracking on every propagation step).
-- **MobX** takes **{/* bench:deep-chain/mobx@k1000-m200 */}533 ms{/* /bench */}** at $K=1000$, $M=200$ — **{/* bench:deep-chain/mobx-over-synstate@k1000-m200 */}33{/* /bench */}× slower** than SynState. This scenario requires `scan` (stateful accumulation: each stage needs its own previous value plus the new input). MobX's `computed` cannot express this because it is a pure derivation with no access to its own previous output. The only option is `observable.box` + `reaction` (push-based), which incurs per-stage overhead from proxy tracking, dependency notification, and `autorun` re-reads. In contrast, the [cascaded diamond scenario](#scenario-cascaded-diamond) uses stateless derivations that `computed` can handle efficiently via lazy evaluation.
-- At $K=500$, $M=100$ — a realistic scenario for 60fps animation with moderate graph complexity — SynState (**{/* bench:deep-chain/synstate@k500-m100 */}4.6 ms{/* /bench */}**) comfortably fits within the 16ms frame time, while RxJS ({/* bench:deep-chain/rxjs@k500-m100 */}154 ms{/* /bench */}), Jotai ({/* bench:deep-chain/jotai@k500-m100 */}126 ms{/* /bench */}), and MobX ({/* bench:deep-chain/mobx@k500-m100 */}158 ms{/* /bench */}) all far exceed it.
+- **SynState** scales linearly with both $K$ and $M$ — at $K=1000$, $M=200$, it finishes in **{/* bench:deep-chain/synstate@k1000-m200 */}14.8 ms{/* /bench */}**. Its push-based direct function calls have negligible per-stage overhead.
+- **RxJS** takes **{/* bench:deep-chain/rxjs@k1000-m200 */}1,017 ms{/* /bench */}** at $K=1000$, $M=200$ — **{/* bench:deep-chain/rxjs-over-synstate@k1000-m200 */}69{/* /bench */}× slower** than SynState. As explained above, this is not a constant-factor difference but a quadratic $O(M^2)$ asymptotic cost from `combineLatest`'s redundant emissions. The same blowup is visible in the [interactive demo](/mono/synstate/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load).
+- **Jotai** takes **{/* bench:deep-chain/jotai@k1000-m200 */}803 ms{/* /bench */}** at $K=1000$, $M=200$ — **{/* bench:deep-chain/jotai-over-synstate@k1000-m200 */}54{/* /bench */}× slower** than SynState — due to `selectAtom`'s per-update overhead (epoch-based recomputation and dynamic dependency tracking on every propagation step).
+- **MobX** takes **{/* bench:deep-chain/mobx@k1000-m200 */}805 ms{/* /bench */}** at $K=1000$, $M=200$ — **{/* bench:deep-chain/mobx-over-synstate@k1000-m200 */}54{/* /bench */}× slower** than SynState. This scenario requires `scan` (stateful accumulation: each stage needs its own previous value plus the new input). MobX's `computed` cannot express this because it is a pure derivation with no access to its own previous output. The only option is `observable.box` + `reaction` (push-based), which incurs per-stage overhead from proxy tracking, dependency notification, and `autorun` re-reads. In contrast, the [cascaded diamond scenario](#scenario-cascaded-diamond) uses stateless derivations that `computed` can handle efficiently via lazy evaluation.
+- At $K=500$, $M=100$ — a realistic scenario for 60fps animation with moderate graph complexity — SynState (**{/* bench:deep-chain/synstate@k500-m100 */}4.3 ms{/* /bench */}**) comfortably fits within the 16ms frame time, while RxJS ({/* bench:deep-chain/rxjs@k500-m100 */}129 ms{/* /bench */}), Jotai ({/* bench:deep-chain/jotai@k500-m100 */}192 ms{/* /bench */}), and MobX ({/* bench:deep-chain/mobx@k500-m100 */}202 ms{/* /bench */}) all far exceed it.
 
 ## Scenario: Cascaded Diamond
 
@@ -553,28 +574,28 @@ The diagram shows $N = 3$. In the benchmark, $N$ ranges from $2$ to $20$.
 - Measurements exceeding {/* bench:cascaded-diamond/timeout */}5,000 ms{/* /bench */} are aborted.
 
 :::caution[Why RxJS is $O(2^N)$ per source update in this benchmark]
-Each `combineLatest` in the chain fires twice per upstream emission (once for the left branch, once for the right). These doublings cascade: stage 1 fires 2 times, stage 2 fires 4, stage 3 fires 8, ..., stage $N$ fires $2^N$ times. At $N=14$ ($K=100$), RxJS spends nearly 2 seconds; at $N=16$, it exceeds the 5-second timeout. More generally, for a fan-out of $D$ branches per diamond, the cost would be $O(D^N)$.
+Each `combineLatest` in the chain fires twice per upstream emission (once for the left branch, once for the right). These doublings cascade: stage 1 fires 2 times, stage 2 fires 4, stage 3 fires 8, ..., stage $N$ fires $2^N$ times. At {/* bench:cascaded-diamond/rxjs-last-measured-n-math */}$N=12${/* /bench */} ($K=100$), RxJS already spends {/* bench:cascaded-diamond/rxjs@last-measured */}695 ms{/* /bench */}; at {/* bench:cascaded-diamond/rxjs-timeout-n-math */}$N=14${/* /bench */}, it exceeds the {/* bench:cascaded-diamond/timeout */}5,000 ms{/* /bench */} timeout. More generally, for a fan-out of $D$ branches per diamond, the cost would be $O(D^N)$.
 :::
 
 ### Results
 
 {/* benchmark-result-cascaded-diamond */}
 | Library | N=2 | N=4 | N=6 | N=8 | N=10 | N=12 | N=14 | N=16 | N=18 | N=20 |
-| ------------ | -----: | -----: | -----: | ------: | ------: | -------: | --------: | --------: | --------: | --------: |
-| **SynState** | 0.5 ms | 1.1 ms | 0.9 ms | 0.9 ms | 1.8 ms | 2.4 ms | 7.6 ms | 28.4 ms | 109.2 ms | 441.8 ms |
-| RxJS | 0.2 ms | 0.6 ms | 2.4 ms | 12.8 ms | 99.3 ms | 501.3 ms | 3032.4 ms | > 5000 ms | > 5000 ms | > 5000 ms |
-| Jotai | 2.0 ms | 2.4 ms | 3.1 ms | 4.1 ms | 5.0 ms | 6.0 ms | 7.5 ms | 12.9 ms | 10.4 ms | 16.5 ms |
-| MobX | 0.6 ms | 0.7 ms | 0.8 ms | 0.9 ms | 0.5 ms | 0.6 ms | 0.6 ms | 0.7 ms | 0.8 ms | 1.0 ms |
+| ------------ | -----: | -----: | -----: | ------: | -------: | -------: | --------: | --------: | --------: | --------: |
+| **SynState** | 0.5 ms | 0.9 ms | 1.4 ms | 0.9 ms | 0.7 ms | 0.8 ms | 0.9 ms | 0.9 ms | 1.1 ms | 1.2 ms |
+| RxJS | 0.3 ms | 1.0 ms | 3.9 ms | 26.7 ms | 129.3 ms | 695.2 ms | > 5000 ms | > 5000 ms | > 5000 ms | > 5000 ms |
+| Jotai | 2.5 ms | 4.1 ms | 5.1 ms | 6.8 ms | 8.4 ms | 10.0 ms | 11.6 ms | 13.5 ms | 15.0 ms | 16.5 ms |
+| MobX | 1.2 ms | 1.2 ms | 1.2 ms | 0.7 ms | 0.8 ms | 0.9 ms | 1.0 ms | 1.1 ms | 1.3 ms | 1.4 ms |
 {/* /benchmark-result-cascaded-diamond */}
 
 <CascadedDiamondChart />
 
 ### Key observations
 
-- **RxJS** exhibits classic $O(2^N)$ exponential growth (binary fan-out). It times out at {/* bench:cascaded-diamond/rxjs-timeout-n-math */}$N=16${/* /bench */} ({/* bench:cascaded-diamond/rxjs-timeout-emissions-math */}$2^{16} = 65536${/* /bench */} emissions per source update {/* bench:cascaded-diamond/updates-math */}$\times 100${/* /bench */} updates). At {/* bench:cascaded-diamond/rxjs-last-measured-n-math */}$N=14${/* /bench */}, it already takes **{/* bench:cascaded-diamond/rxjs@last-measured */}3,032 ms{/* /bench */}** — **{/* bench:cascaded-diamond/rxjs-over-synstate@last-measured */}399{/* /bench */}× slower** than SynState ({/* bench:cascaded-diamond/synstate@rxjs-last-measured */}7.6 ms{/* /bench */}).
-- **MobX** is still only {/* bench:cascaded-diamond/mobx@max-n */}1.0 ms{/* /bench */} at $N=20$, thanks to its lazy `computed` evaluation. MobX's `computed` values are not eagerly re-evaluated when their dependencies change — they are only recomputed when read. The `reaction` reads only the final `computed`, which triggers a single lazy pass through the chain. Each `computed` in the chain is evaluated exactly once per update, yielding $O(N)$ total work with minimal overhead. This contrasts sharply with the [deep chain throughput scenario](#scenario-deep-chain-throughput) where MobX is {/* bench:deep-chain/mobx-over-synstate@k1000-m200 */}33{/* /bench */}× slower than SynState — because that scenario uses a chain of `reaction`s (push-based), not `computed`s (pull-based). The performance characteristics depend heavily on which MobX primitive is used.
-- **SynState** propagates in $O(N)$ via depth-ordered traversal, but the benchmark includes graph construction cost in each `runBenchmark` call (creating $3N+1$ observables with binary search insertion into `propagationOrder`). This construction overhead grows with $N$ and dominates at large depths. At $N=20$, SynState takes {/* bench:cascaded-diamond/synstate@max-n */}442 ms{/* /bench */}. In applications where the graph is constructed once and updated many times, the per-update cost is $O(N)$ as shown in the deep chain throughput scenario.
-- **Jotai** stays essentially flat — {/* bench:cascaded-diamond/jotai@min-n */}2.0 ms{/* /bench */} at $N=2$ and {/* bench:cascaded-diamond/jotai@max-n */}16.5 ms{/* /bench */} at $N=20$ — because its dynamic dependency tracking recomputes each derived atom once per update regardless of depth, and because nothing here rebuilds the graph between updates. From {/* bench:cascaded-diamond/jotai-lead-from-n-math */}$N=14${/* /bench */} onward it is the fastest library in this scenario after MobX, and at $N=20$ it is ~{/* bench:cascaded-diamond/synstate-over-jotai@max-n */}27{/* /bench */}× faster than SynState, whose measurement is dominated by the per-call graph construction described above.
+- **RxJS** exhibits classic $O(2^N)$ exponential growth (binary fan-out). It times out at {/* bench:cascaded-diamond/rxjs-timeout-n-math */}$N=14${/* /bench */} ({/* bench:cascaded-diamond/rxjs-timeout-emissions-math */}$2^{14} = 16384${/* /bench */} emissions per source update {/* bench:cascaded-diamond/updates-math */}$\times 100${/* /bench */} updates). At {/* bench:cascaded-diamond/rxjs-last-measured-n-math */}$N=12${/* /bench */}, it already takes **{/* bench:cascaded-diamond/rxjs@last-measured */}695 ms{/* /bench */}** — **{/* bench:cascaded-diamond/rxjs-over-synstate@last-measured */}869{/* /bench */}× slower** than SynState ({/* bench:cascaded-diamond/synstate@rxjs-last-measured */}0.8 ms{/* /bench */}).
+- **MobX** is still only {/* bench:cascaded-diamond/mobx@max-n */}1.4 ms{/* /bench */} at $N=20$, thanks to its lazy `computed` evaluation. MobX's `computed` values are not eagerly re-evaluated when their dependencies change — they are only recomputed when read. The `reaction` reads only the final `computed`, which triggers a single lazy pass through the chain. Each `computed` in the chain is evaluated exactly once per update, yielding $O(N)$ total work with minimal overhead. This contrasts sharply with the [deep chain throughput scenario](#scenario-deep-chain-throughput) where MobX is {/* bench:deep-chain/mobx-over-synstate@k1000-m200 */}54{/* /bench */}× slower than SynState — because that scenario uses a chain of `reaction`s (push-based), not `computed`s (pull-based). The performance characteristics depend heavily on which MobX primitive is used.
+- **SynState** stays flat as well — {/* bench:cascaded-diamond/synstate@min-n */}0.5 ms{/* /bench */} at $N=2$ and {/* bench:cascaded-diamond/synstate@max-n */}1.2 ms{/* /bench */} at $N=20$ — although each `runBenchmark` call also builds the graph. An update visits each of the $3N+1$ observables once, in depth order, and calls the subscriber once. A new observable registers with its parents and with the root it inherits from them, so building the graph never walks the $2^N$ paths back to the root; only the circular-dependency check, which runs outside production, visits each ancestor, and it visits each of them once.
+- **Jotai** stays essentially flat too — {/* bench:cascaded-diamond/jotai@min-n */}2.5 ms{/* /bench */} at $N=2$ and {/* bench:cascaded-diamond/jotai@max-n */}16.5 ms{/* /bench */} at $N=20$ — because its dynamic dependency tracking recomputes each derived atom once per update regardless of depth. At $N=20$ it is ~{/* bench:cascaded-diamond/jotai-over-synstate@max-n */}14{/* /bench */}× slower than SynState.
 
 ## Scenario: Conditional Fan-Out
 
@@ -593,21 +614,21 @@ The key difference between libraries is **whether `branch[1]` has any observers 
 
 {/* benchmark-result-conditional-fan-out */}
 | Library | B=2 | B=5 | B=10 | B=20 | B=50 | B=100 | B=200 | B=500 | B=1000 |
-| ------------ | ------: | ------: | ------: | ------: | -------: | -------: | -------: | --------: | --------: |
-| **SynState** | 32.3 ms | 37.4 ms | 55.0 ms | 82.7 ms | 158.0 ms | 292.3 ms | 512.0 ms | 1251.7 ms | 2587.8 ms |
-| RxJS | 5.2 ms | 4.7 ms | 4.7 ms | 5.2 ms | 5.3 ms | 6.6 ms | 11.1 ms | 22.2 ms | 34.6 ms |
-| Jotai | 75.9 ms | 76.1 ms | 80.1 ms | 78.9 ms | 79.3 ms | 80.1 ms | 90.3 ms | 90.5 ms | 88.8 ms |
-| MobX | 1.5 ms | 1.3 ms | 1.2 ms | 1.3 ms | 1.3 ms | 1.2 ms | 1.3 ms | 1.3 ms | 1.3 ms |
+| ------------ | -------: | -------: | -------: | -------: | -------: | -------: | -------: | --------: | --------: |
+| **SynState** | 42.4 ms | 52.6 ms | 70.4 ms | 107.3 ms | 214.0 ms | 394.7 ms | 748.5 ms | 1862.0 ms | 3685.9 ms |
+| RxJS | 8.0 ms | 8.0 ms | 8.2 ms | 8.7 ms | 9.7 ms | 11.3 ms | 17.4 ms | 33.3 ms | 56.1 ms |
+| Jotai | 139.1 ms | 138.2 ms | 139.8 ms | 138.9 ms | 137.9 ms | 138.8 ms | 138.5 ms | 139.1 ms | 142.5 ms |
+| MobX | 2.5 ms | 1.9 ms | 1.8 ms | 1.8 ms | 1.8 ms | 1.8 ms | 1.8 ms | 1.8 ms | 1.9 ms |
 {/* /benchmark-result-conditional-fan-out */}
 
 <ConditionalFanOutChart />
 
 ### Key observations
 
-- **MobX** is the fastest in this scenario. `computed(() => branches[selector.get()].get())` subscribes only to `selector` and `branches[0]` at runtime, so `branches[1]`'s observer list is empty. Updating `branches[1]` has no one to notify — the cost is constant at ~{/* bench:fan-out/mobx-typical */}1.3 ms{/* /bench */} regardless of B.
-- **SynState**'s cost scales linearly with B because `combine` subscribes to all branches at construction time, so any branch update fires the combine. The linear trend is clearly visible in the chart: from {/* bench:fan-out/synstate@min-b */}32.3 ms{/* /bench */} at B=2 to {/* bench:fan-out/synstate@last-measured-b */}2,588 ms{/* /bench */} at B={/* bench:fan-out/synstate-last-measured-b */}1000{/* /bench */} (≈{/* bench:fan-out/synstate-ns-per-branch-per-update */}26{/* /bench */} ns per branch per update, over {/* bench:fan-out/updates-math */}$K = 100{,}000${/* /bench */} updates).
+- **MobX** is the fastest in this scenario. `computed(() => branches[selector.get()].get())` subscribes only to `selector` and `branches[0]` at runtime, so `branches[1]`'s observer list is empty. Updating `branches[1]` has no one to notify — the cost is constant at ~{/* bench:fan-out/mobx-typical */}1.8 ms{/* /bench */} regardless of B.
+- **SynState**'s cost scales linearly with B because `combine` subscribes to all branches at construction time, so any branch update fires the combine. The linear trend is clearly visible in the chart: from {/* bench:fan-out/synstate@min-b */}42.4 ms{/* /bench */} at B=2 to {/* bench:fan-out/synstate@last-measured-b */}3,686 ms{/* /bench */} at B={/* bench:fan-out/synstate-last-measured-b */}1000{/* /bench */} (≈{/* bench:fan-out/synstate-ns-per-branch-per-update */}37{/* /bench */} ns per branch per update, over {/* bench:fan-out/updates-math */}$K = 100{,}000${/* /bench */} updates).
 - **RxJS** uses the same static `combineLatest` approach. Its cost also scales with B but more slowly than SynState, because `combineLatest` does not perform equality comparison — it always emits, and the subscriber does minimal work (assigning a value).
-- **Jotai** uses dynamic subscriptions like MobX — `resultAtom` does not subscribe to the inactive branch, so no recomputation is triggered. However, `store.set()` itself performs bookkeeping operations (invalidation checks) inside the atom store, producing a constant overhead of ~{/* bench:fan-out/jotai-typical */}80.1 ms{/* /bench */} regardless of B. This makes Jotai slower than SynState for B≤{/* bench:fan-out/jotai-slower-through-b */}10{/* /bench */}.
+- **Jotai** uses dynamic subscriptions like MobX — `resultAtom` does not subscribe to the inactive branch, so no recomputation is triggered. However, `store.set()` itself performs bookkeeping operations (invalidation checks) inside the atom store, producing a constant overhead of ~{/* bench:fan-out/jotai-typical */}139 ms{/* /bench */} regardless of B. This makes Jotai slower than SynState for B≤{/* bench:fan-out/jotai-slower-through-b */}20{/* /bench */}.
 
     :::note[This benchmark is an intentionally favorable scenario for dynamic subscriptions]
     This benchmark is designed to illustrate the theoretical difference between static and dynamic subscriptions, and **intentionally constructs conditions most favorable to the dynamic subscription side**.
@@ -861,4 +882,4 @@ The root cause of the per-update gap:
 - **SynState**: `setCounter(i)` → call `doubled`'s map function → call `quadrupled`'s map function → call subscriber. Three direct function calls with no framework bookkeeping.
 - **Jotai**: `store.set(counterAtom, i)` → DFS invalidation (WeakSet alloc + Map writes) → DFS topological sort (WeakSet alloc + array push + reverse) → recompute `doubledAtom` (Map lookup + epoch check + Map write) → recompute `quadrupledAtom` (same) → flush callback → `store.get(quadrupledAtom)` (cache lookup).
 
-Over {/* bench:derived-chain/updates */}100,000{/* /bench */} iterations, SynState's three function calls dominate, while Jotai's per-update bookkeeping (Map/WeakSet allocations, epoch comparisons, two DFS traversals) accumulates into the observed ~{/* bench:derived-chain/jotai-over-synstate */}29{/* /bench */}× difference.
+Over {/* bench:derived-chain/updates */}100,000{/* /bench */} iterations, SynState's three function calls dominate, while Jotai's per-update bookkeeping (Map/WeakSet allocations, epoch comparisons, two DFS traversals) accumulates into the observed ~{/* bench:derived-chain/jotai-over-synstate */}43{/* /bench */}× difference.
