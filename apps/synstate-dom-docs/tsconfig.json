@@ -1,0 +1,16 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "libReplacement": true,
+
+    // Every code block on the site is a file in `samples/`, checked as a
+    // consumer would write it: against synstate-dom's published types.
+    "jsx": "react-jsx",
+    "jsxImportSource": "synstate-dom"
+  },
+  "include": ["./samples", "./scripts", "./test"],
+  "exclude": ["./src/content.config.ts"]
+}
