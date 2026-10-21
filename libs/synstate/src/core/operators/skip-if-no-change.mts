@@ -1,9 +1,10 @@
 import { Optional } from 'ts-data-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
-import type {
-  KeepInitialValueOperator,
-  Observable,
-  SkipIfNoChangeOperatorObservable,
+import { SyncChildObservableClass } from '../class/index.mjs';
+import {
+  type KeepInitialValueOperator,
+  type Observable,
+  type SkipIfNoChangeOperatorObservable,
+  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -70,9 +71,9 @@ import type {
 export const skipIfNoChange = <A,>(
   eq: (x: A, y: A) => boolean = (x, y) => Object.is(x, y),
 ): KeepInitialValueOperator<A, A> =>
-  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
-    createSkipIfNoChangeObservable(
+    new SkipIfNoChangeObservableClass(
       parentObservable,
       eq,
     )) as KeepInitialValueOperator<A, A>;
@@ -83,40 +84,44 @@ export const skipIfNoChange = <A,>(
  */
 export const distinctUntilChanged = skipIfNoChange;
 
-const createSkipIfNoChangeObservable = <A,>(
-  parentObservable: Observable<A>,
-  eq: (x: A, y: A) => boolean,
-): SkipIfNoChangeOperatorObservable<A> =>
-  createSyncChildObservable(
-    {
+class SkipIfNoChangeObservableClass<A>
+  extends SyncChildObservableClass<A, readonly [A]>
+  implements SkipIfNoChangeOperatorObservable<A>
+{
+  readonly #eq: (x: A, y: A) => boolean;
+  #mut_previousValue: Optional<A>;
+
+  constructor(parentObservable: Observable<A>, eq: (x: A, y: A) => boolean) {
+    super({
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-    },
-    ({ setNext }) => {
-      // parentObservable.snapshot has value
-      // if parentObservable is InitializedObservable
-      let mut_previousValue: Optional<A> = parentObservable.getSnapshot();
+    });
 
-      return (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+    // parentObservable.snapshot has value
+    // if parentObservable is InitializedObservable
+    this.#mut_previousValue = parentObservable.getSnapshot();
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    this.#eq = eq;
+  }
 
-        const prev = mut_previousValue;
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        const cond = Optional.isNone(prev) || !eq(prev.value, sn.value);
+    const sn = par.getSnapshot();
 
-        // NOTE: Must update before setNext, otherwise Optional.isNone(prev) remains true when tryUpdate is called consecutively
-        mut_previousValue = sn;
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
 
-        if (cond) {
-          setNext(sn.value, updateToken);
-        }
-      };
-    },
-  );
+    const prev = this.#mut_previousValue;
+
+    const cond = Optional.isNone(prev) || !this.#eq(prev.value, sn.value);
+
+    // NOTE: Must update before setNext, otherwise Optional.isNone(prev) remains true when tryUpdate is called consecutively
+    this.#mut_previousValue = sn;
+
+    if (cond) {
+      this.setNext(sn.value, updateToken);
+    }
+  }
+}

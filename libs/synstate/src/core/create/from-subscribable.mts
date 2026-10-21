@@ -1,8 +1,8 @@
 import { Optional, Result } from 'ts-data-forge';
-import { createRootObservable } from '../base/index.mjs';
-import type {
-  FromSubscribableObservable,
-  Subscribable,
+import { RootObservableClass } from '../class/index.mjs';
+import {
+  type FromSubscribableObservable,
+  type Subscribable,
 } from '../types/index.mjs';
 
 /**
@@ -66,39 +66,30 @@ import type {
 export const fromSubscribable = <A, E = unknown>(
   subscribable: Subscribable<A>,
 ): FromSubscribableObservable<A, E> =>
-  createRootObservable<Result<A, E>>(
-    { initialValue: Optional.none },
-    ({ startUpdate, complete, onComplete }) => {
-      // Set once the subscribable has completed: its subscription is over, so
-      // completing this observable must not unsubscribe from it again.
-      let mut_isSourceCompleted = false;
+  new FromSubscribableObservableClass(subscribable);
 
-      const subscription = subscribable.subscribe(
-        (nextValue) => {
-          startUpdate(Result.ok(nextValue));
-        },
-        (error?: unknown) => {
-          startUpdate(
-            Result.err(
-              // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-              error as E,
-            ),
-          );
-        },
-        () => {
-          mut_isSourceCompleted = true;
+class FromSubscribableObservableClass<A, E = unknown>
+  extends RootObservableClass<Result<A, E>>
+  implements FromSubscribableObservable<A, E>
+{
+  constructor(subscribable: Subscribable<A>) {
+    super({ initialValue: Optional.none });
 
-          complete();
-        },
-      );
-
-      // Runs at once if `subscribe` has already completed this observable.
-      onComplete(() => {
-        if (!mut_isSourceCompleted) {
-          subscription.unsubscribe();
-        }
-      });
-
-      return {};
-    },
-  );
+    subscribable.subscribe(
+      (nextValue) => {
+        this.startUpdate(Result.ok(nextValue));
+      },
+      (error?: unknown) => {
+        this.startUpdate(
+          Result.err(
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+            error as E,
+          ),
+        );
+      },
+      () => {
+        this.complete();
+      },
+    );
+  }
+}

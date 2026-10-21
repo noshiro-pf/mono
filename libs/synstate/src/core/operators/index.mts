@@ -11,7 +11,6 @@ export * from './skip-while.mjs';
 export * from './switch-map.mjs';
 export * from './take-until.mjs';
 export * from './take-while.mjs';
-export * from './take.mjs';
 export * from './throttle.mjs';
 export * from './with-buffered-from.mjs';
 export * from './with-current-value-from.mjs';

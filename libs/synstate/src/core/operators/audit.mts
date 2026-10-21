@@ -1,19 +1,17 @@
 import { Optional } from 'ts-data-forge';
-import { createAsyncChildObservable } from '../base/index.mjs';
-import type {
-  AuditOperatorObservable,
-  KeepInitialValueOperator,
-  Observable,
-  TimerId,
+import { AsyncChildObservableClass } from '../class/index.mjs';
+import {
+  type AuditOperatorObservable,
+  type KeepInitialValueOperator,
+  type Observable,
+  type TimerId,
+  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
  * Ignores source values for duration milliseconds, then emits the most recent value from the source Observable, then repeats this process.
  *
  * Unlike `throttle` which emits the first value, `audit` emits the last value.
- *
- * Completing it, or its source completing, passes on the value its timer is
- * still holding before the completion; `dispose()` drops that value.
  *
  * @template A - The type of values from the source
  * @param milliSeconds - The audit time window in milliseconds
@@ -107,69 +105,68 @@ import type {
 export const audit = <A,>(
   milliSeconds: number,
 ): KeepInitialValueOperator<A, A> =>
-  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
-    createAuditObservable(
+    new AuditObservableClass(
       parentObservable,
       milliSeconds,
     )) as KeepInitialValueOperator<A, A>;
 
-const createAuditObservable = <A,>(
-  parentObservable: Observable<A>,
-  milliSeconds: number,
-): AuditOperatorObservable<A> =>
-  createAsyncChildObservable(
-    {
+class AuditObservableClass<A>
+  extends AsyncChildObservableClass<A, readonly [A]>
+  implements AuditOperatorObservable<A>
+{
+  readonly #milliSeconds: number;
+  #mut_timerId: TimerId | undefined;
+  #mut_isSkipping: boolean;
+
+  constructor(parentObservable: Observable<A>, milliSeconds: number) {
+    super({
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-    },
-    ({ startUpdate, onComplete }) => {
-      /** Set while a window is open; its end passes on the latest value. */
-      let mut_timerId: TimerId | undefined = undefined;
+    });
 
-      /** Ends the open window, passing on the latest value of the source. */
-      const emitLatest = (): void => {
-        mut_timerId = undefined;
+    this.#mut_isSkipping = false;
 
-        const sn = parentObservable.getSnapshot();
+    this.#mut_timerId = undefined;
 
-        if (Optional.isSome(sn)) {
-          startUpdate(sn.value);
-        }
-      };
+    this.#milliSeconds = milliSeconds;
+  }
 
-      onComplete(() => {
-        if (mut_timerId === undefined) {
-          return;
-        }
+  #resetTimer(): void {
+    if (this.#mut_timerId !== undefined) {
+      clearTimeout(this.#mut_timerId);
+    }
+  }
 
-        clearTimeout(mut_timerId);
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        mut_timerId = undefined;
-      });
+    if (
+      par.updateToken !== updateToken ||
+      Optional.isNone(par.getSnapshot()) ||
+      this.#mut_isSkipping
+    ) {
+      return; // skip update
+    }
 
-      return {
-        tryUpdate: (updateToken) => {
-          if (
-            mut_timerId !== undefined ||
-            parentObservable.updateToken !== updateToken ||
-            Optional.isNone(parentObservable.getSnapshot())
-          ) {
-            return; // skip update
-          }
+    // set timer
+    this.#mut_isSkipping = true;
 
-          // set timer
-          mut_timerId = setTimeout(emitLatest, milliSeconds);
-        },
-        flush: () => {
-          if (mut_timerId === undefined) {
-            return;
-          }
+    this.#mut_timerId = setTimeout(() => {
+      const sn = par.getSnapshot();
 
-          clearTimeout(mut_timerId);
+      if (Optional.isNone(sn)) return;
 
-          emitLatest();
-        },
-      };
-    },
-  );
+      this.startUpdate(sn.value);
+
+      this.#mut_isSkipping = false;
+    }, this.#milliSeconds);
+  }
+
+  override complete(): void {
+    this.#resetTimer();
+
+    super.complete();
+  }
+}

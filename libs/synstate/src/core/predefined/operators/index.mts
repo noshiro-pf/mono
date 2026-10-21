@@ -5,6 +5,7 @@ export * from './map-result-ok.mjs';
 export * from './map-to.mjs';
 export * from './pluck.mjs';
 export * from './skip.mjs';
+export * from './take.mjs';
 export * from './unwrap-optional.mjs';
 export * from './unwrap-result-err.mjs';
 export * from './unwrap-result-ok.mjs';

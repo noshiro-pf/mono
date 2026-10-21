@@ -1,11 +1,12 @@
 import { expectType, Optional } from 'ts-data-forge';
-import { createInitializedSyncChildObservable } from '../base/index.mjs';
+import { InitializedSyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
-import type {
-  InitializedObservable,
-  Observable,
-  WithInitialValueOperator,
-  WithInitialValueOperatorObservable,
+import {
+  type InitializedObservable,
+  type Observable,
+  type UpdateToken,
+  type WithInitialValueOperator,
+  type WithInitialValueOperatorObservable,
 } from '../types/index.mjs';
 
 /**
@@ -56,31 +57,31 @@ import type {
 export const withInitialValue =
   <A, I = A>(initialValue: I): WithInitialValueOperator<A, A | I> =>
   (parentObservable) =>
-    createWithInitialValueObservable(parentObservable, initialValue);
+    new WithInitialValueObservableClass(parentObservable, initialValue);
 
-const createWithInitialValueObservable = <A, I>(
-  parentObservable: Observable<A>,
-  initialValue: I,
-): WithInitialValueOperatorObservable<A, I> =>
-  createInitializedSyncChildObservable<A | I, readonly [A]>(
-    {
+class WithInitialValueObservableClass<A, I>
+  extends InitializedSyncChildObservableClass<A | I, readonly [A]>
+  implements WithInitialValueOperatorObservable<A, I>
+{
+  constructor(parentObservable: Observable<A>, initialValue: I) {
+    super({
       parents: [parentObservable],
       initialValue: Optional.some(initialValue),
-    },
-    ({ setNext }) =>
-      (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+    });
+  }
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        setNext(sn.value, updateToken);
-      },
-  );
+    const sn = par.getSnapshot();
+
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
+
+    this.setNext(sn.value, updateToken);
+  }
+}
 
 if (import.meta.vitest !== undefined) {
   test('type test', () => {

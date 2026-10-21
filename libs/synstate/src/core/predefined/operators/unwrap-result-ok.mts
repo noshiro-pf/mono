@@ -1,7 +1,7 @@
 import { Result, type UnknownResult } from 'ts-data-forge';
-import type { Fn } from 'ts-type-forge';
+import { type Fn } from 'ts-type-forge';
 import { map } from '../../operators/index.mjs';
-import type { KeepInitialValueOperator } from '../../types/index.mjs';
+import { type KeepInitialValueOperator } from '../../types/index.mjs';
 
 /**
  * Unwraps the success value from a `Result`, converting `Ok(value)` to `value` and `Err` to `undefined`.
@@ -46,5 +46,5 @@ import type { KeepInitialValueOperator } from '../../types/index.mjs';
 export const unwrapResultOk = <
   R extends UnknownResult,
 >(): KeepInitialValueOperator<R, Result.UnwrapOk<R> | undefined> =>
-  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   map(Result.unwrapOk as Fn<R, Result.UnwrapOk<R> | undefined>);

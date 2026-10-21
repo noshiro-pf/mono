@@ -1,10 +1,10 @@
 import { Optional } from 'ts-data-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
-import type {
-  DropInitialValueOperator,
-  Observable,
-  SkipUntilOperatorObservable,
-  Subscription,
+import { SyncChildObservableClass } from '../class/index.mjs';
+import {
+  type DropInitialValueOperator,
+  type Observable,
+  type SkipUntilOperatorObservable,
+  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -60,53 +60,45 @@ import type {
 export const skipUntil =
   <A,>(notifier: Observable<unknown>): DropInitialValueOperator<A, A> =>
   (parentObservable) =>
-    createSkipUntilObservable(parentObservable, notifier);
+    new SkipUntilObservableClass(parentObservable, notifier);
 
-const createSkipUntilObservable = <A,>(
-  parentObservable: Observable<A>,
-  notifier: Observable<unknown>,
-): SkipUntilOperatorObservable<A> =>
-  createSyncChildObservable<A, readonly [A]>(
-    {
+class SkipUntilObservableClass<A>
+  extends SyncChildObservableClass<A, readonly [A]>
+  implements SkipUntilOperatorObservable<A>
+{
+  #mut_isSkipping: boolean;
+
+  constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
+    super({
       parents: [parentObservable],
       initialValue: Optional.none,
-    },
-    ({ setNext, onComplete }) => {
-      // A notifier that already holds a value, or has completed, would call
-      // `stopSkipping` inside `subscribe`, before the subscription is stored.
-      let mut_isSkipping =
-        Optional.isNone(notifier.getSnapshot()) && !notifier.isCompleted;
+    });
 
-      let mut_subscription: Subscription | undefined = undefined;
+    this.#mut_isSkipping = true;
 
-      const stopSkipping = (): void => {
-        mut_isSkipping = false;
+    notifier.subscribe(
+      () => {
+        this.#mut_isSkipping = false;
+      },
+      () => {
+        this.#mut_isSkipping = false;
+      },
+    );
+  }
 
-        mut_subscription?.unsubscribe();
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        mut_subscription = undefined;
-      };
+    const sn = par.getSnapshot();
 
-      if (mut_isSkipping) {
-        mut_subscription = notifier.subscribe(stopSkipping, stopSkipping);
-      }
+    if (
+      par.updateToken !== updateToken ||
+      Optional.isNone(sn) ||
+      this.#mut_isSkipping
+    ) {
+      return; // skip update
+    }
 
-      onComplete(() => {
-        mut_subscription?.unsubscribe();
-      });
-
-      return (updateToken) => {
-        const sn = parentObservable.getSnapshot();
-
-        if (
-          mut_isSkipping ||
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
-
-        setNext(sn.value, updateToken);
-      };
-    },
-  );
+    this.setNext(sn.value, updateToken);
+  }
+}

@@ -1,7 +1,7 @@
 import { Optional, type UnknownOptional } from 'ts-data-forge';
-import type { Fn } from 'ts-type-forge';
+import { type Fn } from 'ts-type-forge';
 import { map } from '../../operators/index.mjs';
-import type { KeepInitialValueOperator } from '../../types/index.mjs';
+import { type KeepInitialValueOperator } from '../../types/index.mjs';
 
 /**
  * Unwraps `Optional` values, converting `Some(value)` to `value` and `None` to `undefined`.
@@ -46,5 +46,5 @@ import type { KeepInitialValueOperator } from '../../types/index.mjs';
 export const unwrapOptional = <
   O extends UnknownOptional,
 >(): KeepInitialValueOperator<O, Optional.Unwrap<O> | undefined> =>
-  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   map(Optional.unwrap as Fn<O, Optional.Unwrap<O> | undefined>);

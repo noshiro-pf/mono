@@ -1,22 +1,16 @@
 import { Optional } from 'ts-data-forge';
-import { createAsyncChildObservable } from '../base/index.mjs';
-import { createScope, getCurrentScope } from '../scope/index.mjs';
-import type {
-  DropInitialValueOperator,
-  Observable,
-  Scope,
-  Subscription,
-  SwitchMapOperatorObservable,
+import { AsyncChildObservableClass } from '../class/index.mjs';
+import {
+  type DropInitialValueOperator,
+  type Observable,
+  type Subscription,
+  type SwitchMapOperatorObservable,
+  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
  * Projects each source value to an observable, subscribes to it, and emits its values.
  * When a new value arrives from the source, the previous inner observable is unsubscribed.
- *
- * The projection runs in a scope of its own (see `createScope`): what it
- * creates is disposed when the next value switches away from it and when
- * `switchMap` completes. An observable it only returns — one created outside
- * the projection and shared with others — is unsubscribed and left running.
  *
  * @template A - The type of values from the source
  * @template B - The type of values from the projected observable
@@ -103,65 +97,70 @@ import type {
  *   'C3',
  * ]);
  * ```
+ *
+ * @note To improve code readability, consider using `createState` instead of `switchMap`,
+ * subscribe to `parentObservable` and call `setState` within it.
  */
 export const switchMap =
   <A, B>(
     mapToObservable: (curr: A) => Observable<B>,
   ): DropInitialValueOperator<A, B> =>
   (parentObservable) =>
-    createSwitchMapObservable(parentObservable, mapToObservable);
+    new SwitchMapObservableClass(parentObservable, mapToObservable);
 
-const createSwitchMapObservable = <A, B>(
-  parentObservable: Observable<A>,
-  mapToObservable: (curr: A) => Observable<B>,
-): SwitchMapOperatorObservable<A, B> => {
-  // The scope the operator was created in, so that each inner scope is
-  // disposed with it; the projection itself runs during propagation, when the
-  // current scope is whatever happens to be running.
-  const ownerScope = getCurrentScope();
+class SwitchMapObservableClass<A, B>
+  extends AsyncChildObservableClass<B, readonly [A]>
+  implements SwitchMapOperatorObservable<A, B>
+{
+  readonly #mapToObservable: (curr: A) => Observable<B>;
+  #mut_observable: Observable<B> | undefined;
+  #mut_subscription: Subscription | undefined;
 
-  return createAsyncChildObservable(
-    {
+  constructor(
+    parentObservable: Observable<A>,
+    mapToObservable: (curr: A) => Observable<B>,
+  ) {
+    super({
       parents: [parentObservable],
       initialValue: Optional.none,
-    },
-    ({ startUpdate, onComplete }) => {
-      let mut_innerScope: Scope | undefined = undefined;
+    });
 
-      let mut_subscription: Subscription | undefined = undefined;
+    this.#mapToObservable = mapToObservable;
 
-      onComplete(() => {
-        mut_subscription?.unsubscribe();
+    this.#mut_observable = undefined;
 
-        mut_innerScope?.dispose();
-      });
+    this.#mut_subscription = undefined;
+  }
 
-      return (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    const sn = par.getSnapshot();
 
-        mut_subscription?.unsubscribe();
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
 
-        mut_innerScope?.dispose();
+    this.#mut_observable?.complete();
 
-        const innerScope = createScope(ownerScope);
+    this.#mut_subscription?.unsubscribe();
 
-        mut_innerScope = innerScope;
+    const observable = this.#mapToObservable(sn.value);
 
-        const observable = innerScope.run(() => mapToObservable(sn.value));
+    this.#mut_observable = observable;
 
-        const subscription = observable.subscribe((curr) => {
-          startUpdate(curr);
-        });
+    const subscription = observable.subscribe((curr) => {
+      this.startUpdate(curr);
+    });
 
-        mut_subscription = subscription;
-      };
-    },
-  );
-};
+    this.#mut_subscription = subscription;
+  }
+
+  override complete(): void {
+    this.#mut_subscription?.unsubscribe();
+
+    this.#mut_observable?.complete();
+
+    super.complete();
+  }
+}

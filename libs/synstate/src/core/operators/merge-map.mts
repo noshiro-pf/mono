@@ -1,22 +1,16 @@
 import { Arr, Optional } from 'ts-data-forge';
-import { createAsyncChildObservable } from '../base/index.mjs';
-import { createScope, getCurrentScope } from '../scope/index.mjs';
-import type {
-  DropInitialValueOperator,
-  MergeMapOperatorObservable,
-  Observable,
-  Scope,
-  Subscription,
+import { AsyncChildObservableClass } from '../class/index.mjs';
+import {
+  type DropInitialValueOperator,
+  type MergeMapOperatorObservable,
+  type Observable,
+  type Subscription,
+  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
  * Projects each source value to an observable and merges all inner observables.
  * Unlike `switchMap`, does not cancel previous inner observables.
- *
- * Each projection runs in a scope of its own (see `createScope`): what it
- * creates is disposed when `mergeMap` completes. An observable it only
- * returns — one created outside the projection and shared with others — is
- * unsubscribed and left running.
  *
  * @template A - The type of values from the source
  * @template B - The type of values from the projected observable
@@ -105,13 +99,16 @@ import type {
  *   'C3',
  * ]);
  * ```
+ *
+ * @note To improve code readability, consider using `createState` instead of `mergeMap`,
+ * subscribing to `parentObservable` and calling `setState` within it.
  */
 export const mergeMap =
   <A, B>(
     mapToObservable: (curr: A) => Observable<B>,
   ): DropInitialValueOperator<A, B> =>
   (parentObservable) =>
-    createMergeMapObservable(parentObservable, mapToObservable);
+    new MergeMapObservableClass(parentObservable, mapToObservable);
 
 /**
  * Alias for `mergeMap`.
@@ -119,57 +116,62 @@ export const mergeMap =
  */
 export const flatMap = mergeMap;
 
-const createMergeMapObservable = <A, B>(
-  parentObservable: Observable<A>,
-  mapToObservable: (curr: A) => Observable<B>,
-): MergeMapOperatorObservable<A, B> => {
-  // The scope the operator was created in, so that each inner scope is
-  // disposed with it; the projection itself runs during propagation, when the
-  // current scope is whatever happens to be running.
-  const ownerScope = getCurrentScope();
+class MergeMapObservableClass<A, B>
+  extends AsyncChildObservableClass<B, readonly [A]>
+  implements MergeMapOperatorObservable<A, B>
+{
+  readonly #mapToObservable: (curr: A) => Observable<B>;
+  #mut_observables: readonly Observable<B>[];
+  #mut_subscriptions: readonly Subscription[];
 
-  return createAsyncChildObservable(
-    {
+  constructor(
+    parentObservable: Observable<A>,
+    mapToObservable: (curr: A) => Observable<B>,
+  ) {
+    super({
       parents: [parentObservable],
       initialValue: Optional.none,
-    },
-    ({ startUpdate, onComplete }) => {
-      let mut_innerScopes: readonly Scope[] = [];
+    });
 
-      let mut_subscriptions: readonly Subscription[] = [];
+    this.#mapToObservable = mapToObservable;
 
-      onComplete(() => {
-        for (const s of mut_subscriptions) {
-          s.unsubscribe();
-        }
+    this.#mut_observables = [];
 
-        for (const scope of mut_innerScopes) {
-          scope.dispose();
-        }
-      });
+    this.#mut_subscriptions = [];
+  }
 
-      return (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    const sn = par.getSnapshot();
 
-        const innerScope = createScope(ownerScope);
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
 
-        mut_innerScopes = Arr.toPushed(mut_innerScopes, innerScope);
+    const observable = this.#mapToObservable(sn.value);
 
-        const observable = innerScope.run(() => mapToObservable(sn.value));
+    this.#mut_observables = Arr.toPushed(this.#mut_observables, observable);
 
-        const subscription = observable.subscribe((curr) => {
-          startUpdate(curr);
-        });
+    const subscription = observable.subscribe((curr) => {
+      this.startUpdate(curr);
+    });
 
-        mut_subscriptions = Arr.toPushed(mut_subscriptions, subscription);
-      };
-    },
-  );
-};
+    this.#mut_subscriptions = Arr.toPushed(
+      this.#mut_subscriptions,
+      subscription,
+    );
+  }
+
+  override complete(): void {
+    for (const s of this.#mut_subscriptions) {
+      s.unsubscribe();
+    }
+
+    for (const o of this.#mut_observables) {
+      o.complete();
+    }
+
+    super.complete();
+  }
+}
