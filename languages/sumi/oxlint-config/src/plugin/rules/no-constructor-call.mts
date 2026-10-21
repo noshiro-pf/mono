@@ -1,6 +1,8 @@
-import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
-import { skipTypeWrappers } from 'eslint-rule-forge';
+import type { TSESTree } from '@typescript-eslint/utils';
+import { castDeepMutable } from 'ts-data-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import { createRule } from './create-rule.mjs';
+import { globalReferenceName } from './global-reference.mjs';
 
 /**
  * The built-ins that have both a `new` form and a call form whose call form
@@ -32,7 +34,9 @@ const bannedCallees: ReadonlyMap<string, string> = new Map([
  * is an implicit conversion whose intent is not in the name and whose failure
  * is a sentinel. A locally declared binding of the same name is not the
  * global and is left alone. A type wrapper around the callee
- * (`(Number satisfies NumberConstructor)(x)`) is looked through.
+ * (`(Number satisfies NumberConstructor)(x)`) is looked through, the global
+ * object's property (`globalThis.Number(x)`) is the same constructor, and a
+ * tag (`` Number`1` ``) is called as a function too.
  */
 export const noConstructorCall = createRule({
   meta: {
@@ -48,40 +52,37 @@ export const noConstructorCall = createRule({
     schema: [],
   },
   defaultOptions: [],
-  create: (context) => ({
-    CallExpression: (node) => {
-      // `(Number satisfies NumberConstructor)('1')` still calls `Number`.
-      const callee = skipTypeWrappers(node.callee);
+  create: (context) => {
+    const check = (callee: DeepReadonly<TSESTree.Expression>): void => {
+      // `(Number satisfies NumberConstructor)('1')` and
+      // `globalThis.Number('1')` still call `Number`; a user declaration of
+      // the same name shadows the global and is not our case.
+      const name = globalReferenceName(context.sourceCode, callee);
 
-      if (callee.type !== AST_NODE_TYPES.Identifier) {
+      if (name === undefined) {
         return;
       }
 
-      const alternative = bannedCallees.get(callee.name);
+      const alternative = bannedCallees.get(name);
 
       if (alternative === undefined) {
         return;
       }
 
-      // A user declaration of the same name shadows the global: not our case.
-      for (
-        let mut_scope: TSESLint.Scope.Scope | null =
-          context.sourceCode.getScope(node.callee);
-        mut_scope !== null;
-        mut_scope = mut_scope.upper
-      ) {
-        const variable = mut_scope.set.get(callee.name);
-
-        if (variable !== undefined && variable.defs.length > 0) {
-          return;
-        }
-      }
-
       context.report({
-        node: node.callee,
+        node: castDeepMutable(callee),
         messageId: 'noConstructorCall',
-        data: { name: callee.name, alternative },
+        data: { name, alternative },
       });
-    },
-  }),
+    };
+
+    return {
+      CallExpression: (node) => {
+        check(node.callee);
+      },
+      TaggedTemplateExpression: (node) => {
+        check(node.tag);
+      },
+    };
+  },
 });
