@@ -123,6 +123,114 @@ describe('prefer-curried-produce', () => {
   });
 });
 
+describe('prefer-curried-produce fixes that would change the meaning', () => {
+  tester.run(ruleName, preferCurriedProduceRule, {
+    valid: [
+      {
+        name: 'a recipe that is not an inline function may read the extra arguments the curried form passes',
+        code: dedent`
+          import { produce } from 'immer';
+
+          declare const recipe: (draft: State, index: number) => void;
+
+          const ys = xs.map((s) => produce(s, recipe));
+        `,
+      },
+      {
+        name: 'a recipe with a second parameter would receive the callback arguments',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const ys = xs.map((s) =>
+            produce(s, (draft, index) => {
+              draft.index = index;
+            }),
+          );
+          const zs = xs.map((s) =>
+            produce(s, (draft, ...rest) => {
+              draft.rest = rest;
+            }),
+          );
+        `,
+      },
+      {
+        name: 'a function expression recipe may read `this` or `arguments`',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const ys = xs.map((s) =>
+            produce(s, function (draft) {
+              draft.count = arguments.length;
+            }),
+          );
+        `,
+      },
+      {
+        name: 'a patch listener would become the initial state of the curried form',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const update = (state) =>
+            produce(
+              state,
+              (draft) => {
+                draft.count += 1;
+              },
+              listener,
+            );
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a base state cast with `as` keeps the type as a type argument',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const update = (state) =>
+            produce(state as State, (draft) => {
+              draft.count += 1;
+            });
+
+          const reset = (state: Wide) =>
+            produce((state as unknown as State) satisfies State, (draft) => {
+              draft.count = 0;
+            });
+        `,
+        output: dedent`
+          import { produce } from 'immer';
+
+          const update = produce<State>((draft) => {
+            draft.count += 1;
+          });
+
+          const reset = produce<State>((draft) => {
+            draft.count = 0;
+          });
+        `,
+        errors: [
+          { messageId: 'useCurriedProduce' },
+          { messageId: 'useCurriedProduce' },
+        ],
+      },
+      {
+        name: 'a recipe arrow without parameters is fixed',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const update = (state) => produce(state, () => undefined);
+        `,
+        output: dedent`
+          import { produce } from 'immer';
+
+          const update = produce(() => undefined);
+        `,
+        errors: [{ messageId: 'useCurriedProduce' }],
+      },
+    ],
+  });
+});
+
 describe('prefer-curried-produce through type wrappers', () => {
   tester.run(ruleName, preferCurriedProduceRule, {
     valid: [],
