@@ -111,11 +111,17 @@ describe(parseMarkers, () => {
         // @sumi-expect-error banned-syntax/no-var
         // eslint-disable-next-line no-var
       `).problems,
-      ['line 1: @sumi-expect-error marker at end of file applies to nothing'],
+      [
+        {
+          line: 1,
+          message:
+            '@sumi-expect-error marker at end of file applies to nothing',
+        },
+      ],
     );
   });
 
-  test('a file-scoped marker has no line of its own', () => {
+  test('a file-scoped marker applies to no line but keeps its own', () => {
     assert.deepStrictEqual(
       parseMarkers(dedent`
         // @sumi-expect-error-file banned-syntax/no-var
@@ -127,8 +133,96 @@ describe(parseMarkers, () => {
           messageIncludes: undefined,
           fileScoped: true,
           line: 0,
-          markerLine: 0,
+          markerLine: 1,
         },
+      ],
+    );
+  });
+
+  test('a file-scoped marker may follow comments, blank lines and other markers', () => {
+    assert.deepStrictEqual(
+      parseMarkers(dedent`
+        #!/usr/bin/env node
+        /**
+         * A header comment.
+         */
+
+        // @sumi-expect-error-file null/no-null-literal
+        // @sumi-expect-error-file null/no-null-propagation
+        export const x = null;
+      `),
+      {
+        expected: [
+          {
+            ruleId: 'null/no-null-literal',
+            messageIncludes: undefined,
+            fileScoped: true,
+            line: 0,
+            markerLine: 6,
+          },
+          {
+            ruleId: 'null/no-null-propagation',
+            messageIncludes: undefined,
+            fileScoped: true,
+            line: 0,
+            markerLine: 7,
+          },
+        ],
+        problems: [],
+      },
+    );
+  });
+
+  test('a file-scoped marker after the first code line is a problem, not a marker', () => {
+    // Read top-down, a marker below code looks like it covers what follows it;
+    // it would cover the lines above it too.
+    assert.deepStrictEqual(
+      parseMarkers(dedent`
+        import { x } from './x.mjs';
+
+        // @sumi-expect-error-file null/no-null-literal
+        export const y = null;
+      `),
+      {
+        expected: [],
+        problems: [
+          {
+            line: 3,
+            message:
+              '@sumi-expect-error-file marker must come before the first code line',
+          },
+        ],
+      },
+    );
+  });
+
+  test('a code line inside a block comment does not end the header', () => {
+    assert.deepStrictEqual(
+      parseMarkers(dedent`
+        /*
+        const x = 1;
+        */
+        // @sumi-expect-error-file banned-syntax/no-var
+        var x = 1;
+      `).problems,
+      [],
+    );
+  });
+
+  test('a line-scoped marker is code-free and does not end the header', () => {
+    assert.deepStrictEqual(
+      parseMarkers(dedent`
+        // @sumi-expect-error banned-syntax/no-var
+        // @sumi-expect-error-file null/no-null-literal
+        var x = null;
+      `).expected.map(({ ruleId, line, markerLine }) => ({
+        ruleId,
+        line,
+        markerLine,
+      })),
+      [
+        { ruleId: 'null/no-null-literal', line: 0, markerLine: 2 },
+        { ruleId: 'banned-syntax/no-var', line: 3, markerLine: 1 },
       ],
     );
   });

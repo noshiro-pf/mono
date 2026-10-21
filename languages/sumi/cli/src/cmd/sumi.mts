@@ -96,10 +96,14 @@ const report = (result: CheckResult): number => {
 
   for (const unused of result.unusedExpectErrors) {
     console.error(
-      unused.line === 0
-        ? `${unused.filename}: unused @sumi-expect-error-file: ${unused.ruleId} was not reported in this file.`
+      unused.fileScoped
+        ? `${unused.filename}(${unused.line}): unused @sumi-expect-error-file: ${unused.ruleId} was not reported in this file.`
         : `${unused.filename}(${unused.line}): unused @sumi-expect-error: ${unused.ruleId} was not reported on the next line.`,
     );
+  }
+
+  for (const invalid of result.invalidExpectErrors) {
+    console.error(`${invalid.filename}(${invalid.line}): ${invalid.message}`);
   }
 
   if (result.lint.stderr.trim() !== '') {
@@ -119,7 +123,7 @@ const report = (result: CheckResult): number => {
   console.error(
     result.ok
       ? `sumi check: ${result.fileCount} files, no problems.`
-      : `sumi check: ${result.fileCount} files, ${result.typeCheck.diagnostics.length} type errors, ${result.lint.diagnostics.length + result.checker.diagnostics.length} lint problems, ${result.unusedExpectErrors.length} unused @sumi-expect-error.`,
+      : `sumi check: ${result.fileCount} files, ${result.typeCheck.diagnostics.length} type errors, ${result.lint.diagnostics.length + result.checker.diagnostics.length} lint problems, ${result.unusedExpectErrors.length} unused @sumi-expect-error, ${result.invalidExpectErrors.length} invalid @sumi-expect-error.`,
   );
 
   return result.ok ? 0 : 1;

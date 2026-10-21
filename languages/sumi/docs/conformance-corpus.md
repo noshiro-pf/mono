@@ -47,7 +47,7 @@ const b = a == c && n;
 
 - マーカーは**直後の 1 行**に適用される。ただし直後が他のリンタの next-line 指示（`eslint-disable-next-line` / `oxlint-disable-next-line`）ならそれを飛ばす（D-60）。ESLint の指示と同じ行を指すには、マーカーを指示の上に書く。
 - オプションでメッセージ部分文字列を検証できる: `// @sumi-expect-error null/no-null-literal "use undefined"`
-- ファイル全体に対する診断（モジュール形式の違反など）は先頭の `// @sumi-expect-error-file <rule-id>` で表す。
+- ファイル全体に対する診断（モジュール形式の違反など）は `// @sumi-expect-error-file <rule-id>` で表す。最初のコード行より前（コメント・空行・shebang・他のマーカーの間）に置き、コードより後にあるものはマーカーの誤りとして報告される（D-63）。ファイル中のどの行の診断にも当たり、件数は数えない。
 - 語形は `@ts-expect-error` に揃えている（D-51、2026-09-08 に `@sumi-expect` から改名）。コーパス内では**抑制ではなく期待の表明**で、出なければ失敗・余分に出ても失敗。~~ユーザーコードでの抑制コメントとして同じ形を採用するかは D-51 の将来項目。~~ → **ユーザーコードでも採用済み(2026-09-09)**: `sumi check` は当たったマーカーの lint 診断を抑制し、当たらなかったマーカーを `unused @sumi-expect-error` として報告する。字面も意味論も同じなので**パーサは 1 つ**（`@sumi-lang/oxlint-config` の `expect-error-markers.mts`）をコーパスと共有している。コーパス側との違いは、余分な診断がコーパスでは失敗になるのに対し、`sumi check` では単にその診断が報告される点だけ。
 - `compiler/<code>` のマーカーはコーパス専用。`sumi check` の抑制は lint 診断だけが対象（コンパイラエラーには `@ts-expect-error` がある）なので、ユーザーコードに書くと unused と報告される。
 - `valid/` 配下のファイルはマーカーを含んではならない（runner が検証）。

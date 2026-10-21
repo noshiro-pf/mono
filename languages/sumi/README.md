@@ -65,7 +65,7 @@ CI では `ws:build` の後の `ws:check:test:cov`(`code-check.yml`)でこれら
 pnpm --filter @sumi-lang/cli run sumi:demo
 ```
 
-型エラー・lint 違反・抑制された `@sumi-expect-error`・当たらなかった `@sumi-expect-error` をまとめて報告し、終了コード 1 で終わる。
+型エラー・lint 違反・抑制された `@sumi-expect-error`・当たらなかった `@sumi-expect-error`（行単位と、ファイル単位の `@sumi-expect-error-file` — D-63）・置き場所を誤ったマーカーをまとめて報告し、終了コード 1 で終わる。
 
 ```bash
 pnpm --filter @sumi-lang/cli run sumi:demo:options
