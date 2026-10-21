@@ -359,3 +359,95 @@ describe(`${noMutationWithoutMutPrefix.ruleId} through type wrappers`, () => {
     ],
   });
 });
+
+describe(`${noMutationWithoutMutPrefix.ruleId} in a destructuring assignment`, () => {
+  testRule(noMutationWithoutMutPrefix, {
+    valid: [
+      {
+        name: 'targets along a `mut_` path',
+        code: dedent`
+          const mut_o: { a: number; b: number } = { a: 0, b: 0 };
+          const state: { mut_seen: { a: number } } = { mut_seen: { a: 0 } };
+          declare const pair: readonly [number, number];
+          [mut_o.a, state.mut_seen.a] = pair;
+          ({ a: mut_o.a, b: mut_o.b } = mut_o);
+          export const out = [mut_o, state] as const;
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'member targets of an array pattern, nested and with rest',
+        code: dedent`
+          const o: { a: number; b: number; rest: number[] } = { a: 0, b: 0, rest: [] };
+          declare const pair: readonly [number, number];
+          declare const nested: readonly [readonly [number], number];
+          [
+            o.a,
+            , o.b,
+          ] = [...pair, 0];
+          [[o.a], o.b] = nested;
+          [...o.rest] = pair;
+          export const oOut = o;
+        `,
+        errors: [
+          { messageId: 'assignment', line: 5 },
+          { messageId: 'assignment', line: 6 },
+          { messageId: 'assignment', line: 8 },
+          { messageId: 'assignment', line: 8 },
+          { messageId: 'assignment', line: 9 },
+        ],
+      },
+      {
+        name: 'member targets of an object pattern, nested and with rest',
+        code: dedent`
+          const o: { a: number; b: number; rest: { c?: number } } = { a: 0, b: 0, rest: {} };
+          declare const source: { readonly a: number; readonly inner: { readonly b: number }; readonly c: number };
+          ({ a: o.a } = source);
+          ({ inner: { b: o.b } } = source);
+          ({ a: o['a'], ...o.rest } = source);
+          export const oOut = o;
+        `,
+        errors: [
+          { messageId: 'assignment', line: 3 },
+          { messageId: 'assignment', line: 4 },
+          { messageId: 'assignment', line: 5 },
+          { messageId: 'assignment', line: 5 },
+        ],
+      },
+      {
+        // The default's own `o.a = 1` is an assignment node of its own, and is
+        // reported once.
+        name: 'a target with a default value, reported once',
+        code: dedent`
+          const o: { a: number; b: number } = { a: 0, b: 0 };
+          declare const maybe: readonly [number | undefined];
+          [o.a = 1] = maybe;
+          ({ a: o.b = 2 } = { a: undefined });
+          export const oOut = o;
+        `,
+        errors: [
+          { messageId: 'assignment', line: 3 },
+          { messageId: 'assignment', line: 4 },
+        ],
+      },
+      {
+        name: 'a pattern as a loop target, and targets behind type wrappers',
+        code: dedent`
+          const o: { a: number; b: number } = { a: 0, b: 0 };
+          declare const pairs: readonly (readonly [number, number])[];
+          for ([o.a, (o.b satisfies number)] of pairs) {
+            // each iteration assigns o.a and o.b
+          }
+          [(o.a as number)] = [1];
+          export const oOut = o;
+        `,
+        errors: [
+          { messageId: 'assignment', line: 3 },
+          { messageId: 'assignment', line: 3 },
+          { messageId: 'assignment', line: 6 },
+        ],
+      },
+    ],
+  });
+});

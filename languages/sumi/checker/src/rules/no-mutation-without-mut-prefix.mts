@@ -10,8 +10,13 @@ import {
   isIdentifier,
   isNewExpression,
   isObjectLiteralExpression,
+  isOmittedExpression,
   isPropertyAccessExpression,
+  isPropertyAssignment,
+  isSpreadAssignment,
+  isSpreadElement,
   isStringLiteralLikeNode,
+  SyntaxKind,
   type ElementAccessExpression,
   type PropertyAccessExpression,
   type Node as TsNode,
@@ -64,15 +69,13 @@ import type { Rule, RuleContext } from '../engine/index.mjs';
  *
  * A `for … of` / `for … in` whose target is a member access
  * (`for (obj.current of xs)`) assigns on every iteration and is reported like
- * an assignment. Parentheses and type wrappers — `as`, `satisfies`, `!`,
- * `<T>` — are looked through wherever they appear: around a target
+ * an assignment. A destructuring pattern on the left of either
+ * (`[a.x, b.y] = pair`, `({ k: o.v } = obj)`) assigns to each access it holds,
+ * nested patterns and rest elements included, and each is reported the same
+ * way. Parentheses and type wrappers — `as`, `satisfies`, `!`, `<T>` — are
+ * looked through wherever they appear: around a target
  * (`(obj.x satisfies T) = 1`), a callee (`(xs.push)(1)`) or a receiver, whose
  * method is resolved on the type of the value rather than of the cast.
- *
- * One known gap: a destructuring assignment whose targets are member accesses
- * (`[a.x, b.y] = pair`) is not reported, because the left of the assignment is
- * the pattern rather than an access. The form does not occur in this
- * repository and the ESLint bridge covers it; add it here when it does.
  */
 export const noMutationWithoutMutPrefix: Rule = {
   ruleId: 'mutation/no-mutation-without-mut-prefix',
@@ -484,22 +487,64 @@ const isFreshValue = (
 
 /**
  * Assignment through an access path: the target of `=`, a compound operator,
- * or a `for … of` / `for … in` header.
+ * or a `for … of` / `for … in` header, or each access a destructuring pattern
+ * there assigns to.
  */
 const reportAssignedAccess = (
   node: TsNode,
   report: RuleContext['report'],
   isReportedByCompiler: RuleContext['isReportedByCompiler'],
 ): void => {
+  for (const target of assignedTargets(node)) {
+    if (
+      !isAccess(target) ||
+      isMutPermitted(target) ||
+      isReportedByCompiler(target, readonlyWriteCodes)
+    ) {
+      continue;
+    }
+
+    report(target, 'assignment', { path: pathText(target) });
+  }
+};
+
+/**
+ * What an assignment target writes to, unwrapped: the target itself, or the
+ * elements of a destructuring pattern, nested patterns and rest elements
+ * included. A shorthand property (`({ a } = obj)`) rebinds a variable, which
+ * is `functional/no-let`'s, and a target with a default (`[o.a = 1] = xs`) is
+ * left out because its `o.a = 1` is an assignment node of its own, visited
+ * and reported on its own.
+ */
+const assignedTargets = (node: TsNode): readonly TsNode[] => {
   const target = unwrap(node);
 
-  if (
-    !isAccess(target) ||
-    isMutPermitted(target) ||
-    isReportedByCompiler(target, readonlyWriteCodes)
-  ) {
-    return;
+  if (isArrayLiteralExpression(target)) {
+    return target.elements.flatMap((element) =>
+      isOmittedExpression(element) || hasDefault(element)
+        ? []
+        : assignedTargets(
+            isSpreadElement(element) ? element.expression : element,
+          ),
+    );
   }
 
-  report(target, 'assignment', { path: pathText(target) });
+  if (isObjectLiteralExpression(target)) {
+    return target.properties.flatMap((property) =>
+      isPropertyAssignment(property)
+        ? hasDefault(property.initializer)
+          ? []
+          : assignedTargets(property.initializer)
+        : isSpreadAssignment(property)
+          ? assignedTargets(property.expression)
+          : [],
+    );
+  }
+
+  return [target];
 };
+
+/** A pattern element with a default value: `target = value`. */
+const hasDefault = (node: TsNode): boolean =>
+  isBinaryExpression(node) &&
+  node.operatorToken.kind === SyntaxKind.EqualsToken;
