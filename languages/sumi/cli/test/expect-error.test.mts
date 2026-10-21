@@ -82,7 +82,12 @@ describe(applyExpectErrors, () => {
         assert.deepStrictEqual(result.lint, []);
 
         assert.deepStrictEqual(result.unused, [
-          { filename: file, line: 1, ruleId: 'banned-syntax/no-var' },
+          {
+            filename: file,
+            line: 1,
+            ruleId: 'banned-syntax/no-var',
+            fileScoped: false,
+          },
         ]);
       },
     );
@@ -124,7 +129,12 @@ describe(applyExpectErrors, () => {
         assert.deepStrictEqual(result.lint, observed);
 
         assert.deepStrictEqual(result.unused, [
-          { filename: file, line: 1, ruleId: 'banned-syntax/no-class' },
+          {
+            filename: file,
+            line: 1,
+            ruleId: 'banned-syntax/no-class',
+            fileScoped: false,
+          },
         ]);
       },
     );
@@ -157,13 +167,18 @@ describe(applyExpectErrors, () => {
       `,
       (file) => {
         assert.deepStrictEqual(applyExpectErrors([file], [], []).unused, [
-          { filename: file, line: 2, ruleId: 'banned-syntax/no-var' },
+          {
+            filename: file,
+            line: 2,
+            ruleId: 'banned-syntax/no-var',
+            fileScoped: false,
+          },
         ]);
       },
     );
   });
 
-  test('the file-scoped form matches any line and reports line 0 when unused', () => {
+  test('the file-scoped form matches any line and reports its own line when unused', () => {
     withFile(
       dedent`
         // @sumi-expect-error-file banned-syntax/no-var
@@ -177,7 +192,41 @@ describe(applyExpectErrors, () => {
         );
 
         assert.deepStrictEqual(applyExpectErrors([file], [], []).unused, [
-          { filename: file, line: 0, ruleId: 'banned-syntax/no-var' },
+          {
+            filename: file,
+            line: 1,
+            ruleId: 'banned-syntax/no-var',
+            fileScoped: true,
+          },
+        ]);
+      },
+    );
+  });
+
+  test('reports a marker that does not parse instead of ignoring it', () => {
+    withFile(
+      dedent`
+        const a = 1;
+        // @sumi-expect-error-file banned-syntax/no-var
+        var b = 2;
+      `,
+      (file) => {
+        const observed = [lintDiagnostic(file, 3)] as const;
+
+        const result = applyExpectErrors([file], observed, []);
+
+        // A misplaced file-scoped marker suppresses nothing, and says why.
+        assert.deepStrictEqual(result.lint, observed);
+
+        assert.deepStrictEqual(result.unused, []);
+
+        assert.deepStrictEqual(result.invalid, [
+          {
+            filename: file,
+            line: 2,
+            message:
+              '@sumi-expect-error-file marker must come before the first code line',
+          },
         ]);
       },
     );

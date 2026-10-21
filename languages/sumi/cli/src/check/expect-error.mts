@@ -21,6 +21,21 @@ export type UnusedExpectError = Readonly<{
   /** 1-based line of the marker itself. */
   line: number;
   ruleId: string;
+
+  /** `@sumi-expect-error-file`, which answers for the file, not one line. */
+  fileScoped: boolean;
+}>;
+
+/**
+ * A comment that starts like a marker but is not one: malformed, applying to
+ * nothing, or a `@sumi-expect-error-file` below code (D-63). It suppresses
+ * nothing, so without this report the diagnostic it meant would come back
+ * with no word about why.
+ */
+export type InvalidExpectError = Readonly<{
+  filename: string;
+  line: number;
+  message: string;
 }>;
 
 export type ExpectErrorResult = Readonly<{
@@ -30,6 +45,7 @@ export type ExpectErrorResult = Readonly<{
   /** The checker diagnostics left after the matched ones were suppressed. */
   checker: readonly CheckerDiagnostic[];
   unused: readonly UnusedExpectError[];
+  invalid: readonly InvalidExpectError[];
 }>;
 
 /**
@@ -115,6 +131,8 @@ export const applyExpectErrors = (
 
   const mut_unused: UnusedExpectError[] = [];
 
+  const mut_invalid: InvalidExpectError[] = [];
+
   for (const file of files) {
     const source = readFile(file);
 
@@ -122,11 +140,11 @@ export const applyExpectErrors = (
       continue;
     }
 
-    // `parseMarkers` reports the marker's own problems (a malformed one, or
-    // one at the end of the file) through `problems`; those are the corpus's
-    // to fail on, and here a marker that parses as nothing simply matches
-    // nothing and is reported as unused below.
-    const { expected } = parseMarkers(source);
+    const { expected, problems } = parseMarkers(source);
+
+    for (const problem of problems) {
+      mut_invalid.push({ filename: file, ...problem });
+    }
 
     const inFile = mut_byFile.get(file) ?? [];
 
@@ -141,9 +159,10 @@ export const applyExpectErrors = (
         mut_unused.push({
           filename: file,
           // The marker's own line, not the code's: the two need not be
-          // adjacent. A file-scoped marker has none, and reports 0.
+          // adjacent, and a file-scoped marker has no code line at all.
           line: marker.markerLine,
           ruleId: marker.ruleId,
+          fileScoped: marker.fileScoped,
         });
       } else {
         for (const entry of matched) {
@@ -165,6 +184,7 @@ export const applyExpectErrors = (
       (diagnostic) => !mut_suppressedChecker.has(diagnostic),
     ),
     unused: mut_unused,
+    invalid: mut_invalid,
   };
 };
 

@@ -3,7 +3,11 @@ import { runOxlint, type OxlintDiagnostic } from '@sumi-lang/oxlint-config';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Result } from 'ts-data-forge';
-import { applyExpectErrors, type UnusedExpectError } from './expect-error.mjs';
+import {
+  applyExpectErrors,
+  type InvalidExpectError,
+  type UnusedExpectError,
+} from './expect-error.mjs';
 import { showConfig } from './show-config.mjs';
 import { typeCheck, type TypeCheckDiagnostic } from './type-check.mjs';
 import {
@@ -19,8 +23,8 @@ import {
  *   entries. Nothing else ran — a check under overridden options is not the
  *   language's check (D-7 / D-40).
  * - `checked`: the type check, the oxlint preset and the type-aware checker
- *   ran; `ok` is whether all three were clean and no `@sumi-expect-error` was
- *   left unanswered.
+ *   ran; `ok` is whether all three were clean and every `@sumi-expect-error`
+ *   was well-formed and answered.
  */
 export type CheckResult = Readonly<
   | {
@@ -55,6 +59,9 @@ export type CheckResult = Readonly<
        * its own right — the directive is an assertion, not a mute button.
        */
       unusedExpectErrors: readonly UnusedExpectError[];
+
+      /** Marker-like comments that are not markers, and so suppress nothing. */
+      invalidExpectErrors: readonly InvalidExpectError[];
     }
 >;
 
@@ -132,6 +139,7 @@ export const runCheck = (project: string): Result<CheckResult, string> => {
       expectErrors.lint.length === 0 &&
       expectErrors.checker.length === 0 &&
       expectErrors.unused.length === 0 &&
+      expectErrors.invalid.length === 0 &&
       Result.isOk(checkerResult),
     fileCount: config.value.files.length,
     typeCheck: typeCheckResult,
@@ -141,6 +149,7 @@ export const runCheck = (project: string): Result<CheckResult, string> => {
       error: Result.isErr(checkerResult) ? checkerResult.value : undefined,
     },
     unusedExpectErrors: expectErrors.unused,
+    invalidExpectErrors: expectErrors.invalid,
   });
 };
 

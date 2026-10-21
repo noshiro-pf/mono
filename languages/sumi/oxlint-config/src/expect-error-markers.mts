@@ -7,7 +7,11 @@
  *   `oxlint-disable-next-line`). Skipping the directive is what lets both sit
  *   above one line: ESLint's applies to the line right after it, so the marker
  *   goes first and reaches past it to the same line.
- * - `// @sumi-expect-error-file <rule-id>` describes a file-wide diagnostic.
+ * - `// @sumi-expect-error-file <rule-id>` applies to the whole file, and goes
+ *   before its first code line (D-63): only comments, blank lines, a shebang
+ *   and other markers may come first. Below code it would read as covering
+ *   what follows it while covering what precedes it too, so it is a problem
+ *   there rather than a marker.
  *
  * One parser, two callers, because D-51 gave the marker one spelling and one
  * meaning wherever it appears — "the diagnostic must be here, and its absence
@@ -29,15 +33,21 @@ export type ExpectedDiagnostic = Readonly<{
   /** 1-based line of the code the marker applies to (0 for file-scoped). */
   line: number;
 
-  /** 1-based line of the marker itself (0 for file-scoped). */
+  /** 1-based line of the marker itself. */
   markerLine: number;
   fileScoped: boolean;
 }>;
 
 export type ParsedMarkers = Readonly<{
   expected: readonly ExpectedDiagnostic[];
-  /** Human-readable problems found while parsing (empty when well-formed). */
-  problems: readonly string[];
+  /** Problems found while parsing (empty when well-formed). */
+  problems: readonly MarkerProblem[];
+}>;
+
+export type MarkerProblem = Readonly<{
+  /** 1-based line the problem is on (the marker, or the line that breaks it). */
+  line: number;
+  message: string;
 }>;
 
 export const parseMarkers = (sourceText: string): ParsedMarkers => {
@@ -45,7 +55,13 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
 
   const mut_expected: ExpectedDiagnostic[] = [];
 
-  const mut_problems: string[] = [];
+  const mut_problems: MarkerProblem[] = [];
+
+  // Whether no code line has been seen yet, which is where a file-scoped
+  // marker may stand, and whether that header is inside a block comment.
+  let mut_inHeader = true;
+
+  let mut_inBlockComment = false;
 
   // Markers waiting for the next code line, as [1-based marker line, parsed].
   const mut_pending: [
@@ -60,13 +76,21 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
 
     if (parsed.type === 'marker') {
       if (parsed.fileScoped) {
-        mut_expected.push({
-          ruleId: parsed.ruleId,
-          messageIncludes: parsed.messageIncludes,
-          fileScoped: true,
-          line: 0,
-          markerLine: 0,
-        });
+        if (mut_inHeader) {
+          mut_expected.push({
+            ruleId: parsed.ruleId,
+            messageIncludes: parsed.messageIncludes,
+            fileScoped: true,
+            line: 0,
+            markerLine: lineNumber,
+          });
+        } else {
+          mut_problems.push({
+            line: lineNumber,
+            message:
+              '@sumi-expect-error-file marker must come before the first code line',
+          });
+        }
       } else {
         mut_pending.push([
           lineNumber,
@@ -82,11 +106,31 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
     }
 
     if (parsed.type === 'malformed') {
-      mut_problems.push(
-        `line ${lineNumber}: malformed @sumi-expect-error marker: ${lineText}`,
-      );
+      mut_problems.push({
+        line: lineNumber,
+        message: `malformed @sumi-expect-error marker: ${lineText}`,
+      });
 
       continue;
+    }
+
+    if (mut_inHeader) {
+      if (mut_inBlockComment) {
+        mut_inBlockComment = !lineText.includes('*/');
+      } else if (lineText.startsWith('/*')) {
+        const close = lineText.indexOf('*/', '/*'.length);
+
+        if (close === -1) {
+          mut_inBlockComment = true;
+        } else {
+          mut_inHeader = lineText.slice(close + '*/'.length).trim() === '';
+        }
+      } else {
+        mut_inHeader =
+          lineText === '' ||
+          lineText.startsWith('//') ||
+          (lineNumber === 1 && lineText.startsWith('#!'));
+      }
     }
 
     if (mut_pending.length === 0) {
@@ -98,9 +142,11 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
     }
 
     if (lineText === '') {
-      mut_problems.push(
-        `line ${lineNumber}: @sumi-expect-error marker must be immediately followed by a code line`,
-      );
+      mut_problems.push({
+        line: lineNumber,
+        message:
+          '@sumi-expect-error marker must be immediately followed by a code line',
+      });
 
       mut_pending.length = 0;
 
@@ -115,9 +161,10 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
   }
 
   for (const [markerLine] of mut_pending) {
-    mut_problems.push(
-      `line ${markerLine}: @sumi-expect-error marker at end of file applies to nothing`,
-    );
+    mut_problems.push({
+      line: markerLine,
+      message: '@sumi-expect-error marker at end of file applies to nothing',
+    });
   }
 
   return { expected: mut_expected, problems: mut_problems };
