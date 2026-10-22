@@ -1,5 +1,15 @@
 # eslint-plugin-ts-std-forge
 
+## 0.1.10
+
+### Patch Changes
+
+- a094d4c: `prefer-is-non-null-object` now reports the other ways of writing `typeof u === 'object' && u !== null`: the two halves in reverse order, either comparison with its operands swapped (`'object' === typeof u`, `null !== u`), `u != null` (which `typeof u === 'object'` has already made the same check), and the pair anywhere in a longer `&&` chain (`typeof u === 'object' && u !== null && 'k' in u` becomes `isNonNullObject(u) && 'k' in u`). The two halves have to be next to each other in the chain. The `eslint-plugin-ts-data-forge` version now also reads the two halves through type wrappers around each of them, as the `eslint-plugin-ts-std-forge` version already did.
+- 9d79d74: `prefer-is-record-and-has-key` no longer offers rewrites that change what the code does. An object whose type may be an array (an array, a tuple, a union with one, or a record widened by `as` to one that may be an array) is not reported, because `isRecord` rejects an array and `'0' in xs` would turn from `true` to `false`; `object` and `unknown` say nothing either way and are reported as before. An object with side effects, such as a call or a comma expression, is reported without a fix when the rewrite needs `isRecord`, because `isRecord(obj) && hasKey(obj, key)` would evaluate it twice; when the object is known to be a record, `hasKey(obj, key)` reads it once and the fix stays. The `eslint-plugin-ts-data-forge` version now also keeps the parentheses of a comma expression in the fix and reads `Object` in `Object.hasOwn` through type wrappers, as the `eslint-plugin-ts-std-forge` version already did.
+- Updated dependencies [fba7527]
+    - eslint-rule-forge@0.2.0
+    - ts-std-forge@0.5.1
+
 ## 0.1.9
 
 ### Patch Changes

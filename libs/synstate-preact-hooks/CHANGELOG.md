@@ -1,5 +1,44 @@
 # synstate-preact-hooks
 
+## 4.0.0
+
+### Major Changes
+
+- 7fae955: `debounce` and `audit` now pass on the value their timer is holding when they complete, and drop it when they are disposed. Completing either used to discard that value, so the last value of a source that completes within the window was lost; `complete()`, and the completion of the source, now emit it first and then complete. `dispose()` releases the timer without emitting, because a disposed observable has no one left to tell. `synstate-preact-signals`, `synstate-preact-hooks`, `synstate-react-hooks` and `synstate-react-hooks-compat` re-export synstate, so the change reaches their users as well.
+- c71a482: The observable types keep only the members meant for users — `id`, `kind`, `parents` (on child observables), `getSnapshot`, `isCompleted`, `updateToken`, `depth`, `subscribe`, `pipe`, `complete` and `dispose` — and can no longer be satisfied with an object literal. `addChild`, `deleteChild`, `addDescendant`, `deleteDescendant`, `tryUpdate`, `tryComplete`, `hasActiveChild`, `hasSubscriber` and `hasChild` leave them; they are still there at run time, for propagation, but code reading them no longer compiles. `synstate-preact-signals`, `synstate-preact-hooks`, `synstate-react-hooks` and `synstate-react-hooks-compat` re-export synstate, so the change reaches their users as well.
+- ebcf3fd: Creating an observable costs several times less: every observable is now an instance of a class — `ObservableBaseClass` and, below it, one class for each creator and operator — whose methods live on the prototype, rather than a set of closures made for each observable, and the collections of children and subscribers are made when the first one arrives. Two things change for users. The methods read `this`, so they must be called on the observable (`obs$.subscribe(f)`, `source$.next(v)`); taking one off it (`const { subscribe } = obs$`, `const { next } = source$`) or passing it as a callback no longer works. This holds for `getSnapshot`, `subscribe`, `pipe`, `complete` and `dispose`, and for `next` of a source and `start` of a timer or counter. Observables no longer carry an `id`, and the `ObservableId` and `SubscriberId` types are removed; nothing in synstate needed them once creating an observable stopped issuing ids. `UpdateToken` stays a symbol, now one per update rather than one per observable as well. The check for circular dependencies at creation runs only outside production (`NODE_ENV` other than `production`). `synstate-preact-signals`, `synstate-preact-hooks`, `synstate-react-hooks` and `synstate-react-hooks-compat` re-export synstate, so the change reaches their users as well.
+- 77ce113: Completing an observable no longer completes the observables it is derived from, and `autoComplete` is removed. A child's `complete()` no longer calls `tryComplete` on its parents: an observable completes only when it is completed itself or when all of its parents have completed. An unused upstream with a teardown (`counter`, `timer`, `debounce`, `switchMap`, …) keeps running until its owner completes or disposes it, so `counter(1000).pipe(take(3))` no longer stops the counter; complete the counter yourself once nothing needs it. `complete()` and `dispose()` now behave the same with respect to parents. `synstate-preact-signals`, `synstate-preact-hooks`, `synstate-react-hooks` and `synstate-react-hooks-compat` re-export synstate, so the change reaches their users as well.
+- 047effb: Make `Object.is` the default `equals` of `createState`, `createReducer` and `createBooleanState`.
+
+    An update whose next state is `Object.is`-equal to the current one is no longer passed on: no subscriber, and nothing derived from the state, is told of it, and the current state is kept. Pass `equals: () => false` to pass on every update as before.
+
+    `synstate-preact-signals`, `synstate-preact-hooks`, `synstate-react-hooks` and `synstate-react-hooks-compat` pass `equals` through, so the change reaches their users too: the signal, the components using the hook and the subscribers of `state` are not told of such an update.
+
+- 2c32c75: `take(n)` now completes in the same update as its `n`th emission, after passing that value on to its subscribers and to everything derived from it. Before, it completed only when the `n + 1`th value arrived, so `counter(1000).pipe(take(3))` stayed open for another tick after emitting three values, and over a source that emits exactly `n` times it stayed open until that source completed. The initial value is still passed on and not counted. `synstate-preact-signals`, `synstate-preact-hooks`, `synstate-react-hooks` and `synstate-react-hooks-compat` re-export synstate, so the change reaches their users as well.
+
+### Minor Changes
+
+- 3d8fa18: The factories every built-in observable is made by are exported for writing custom creators and operators: `createRootObservable`, `createSyncChildObservable`, `createInitializedSyncChildObservable` and `createAsyncChildObservable`, with their config and tools types. A custom operator tells whether a parent emitted in the update now propagating by comparing the parent's `updateToken` with the token its `tryUpdate` receives, as the built-in ones do. A guide, "Custom Operators and Creators", shows how. `synstate-preact-signals`, `synstate-preact-hooks`, `synstate-react-hooks` and `synstate-react-hooks-compat` re-export synstate, so the factories reach their users as well.
+- b6a174d: Add `isObservable(value)`, which tells an observable made by synstate from any other value. Every observable now carries a symbol key that marks it, so a plain object that happens to have a `subscribe` method is not taken for one. The marker is the same symbol the public observable types were already branded with, so an object literal still cannot pass for an observable. `synstate-preact-signals`, `synstate-preact-hooks`, `synstate-react-hooks` and `synstate-react-hooks-compat` re-export synstate, so `isObservable` reaches their users as well.
+
+### Patch Changes
+
+- Updated dependencies [7fae955]
+- Updated dependencies [3d8fa18]
+- Updated dependencies [b6a174d]
+- Updated dependencies [fa08e31]
+- Updated dependencies [c71a482]
+- Updated dependencies [f89dc57]
+- Updated dependencies [2148f2d]
+- Updated dependencies [9d29eef]
+- Updated dependencies [ebcf3fd]
+- Updated dependencies [ebc71f8]
+- Updated dependencies [77ce113]
+- Updated dependencies [047effb]
+- Updated dependencies [2c32c75]
+    - synstate@4.0.0
+    - ts-data-forge@14.8.0
+
 ## 3.4.0
 
 ### Patch Changes

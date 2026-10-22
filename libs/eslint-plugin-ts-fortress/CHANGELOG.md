@@ -1,5 +1,14 @@
 # eslint-plugin-ts-fortress
 
+## 1.3.4
+
+### Patch Changes
+
+- Updated dependencies [fba7527]
+- Updated dependencies [f89dc57]
+    - eslint-rule-forge@0.2.0
+    - ts-data-forge@14.8.0
+
 ## 1.3.3
 
 ### Patch Changes

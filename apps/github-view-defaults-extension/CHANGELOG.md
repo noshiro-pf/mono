@@ -1,5 +1,13 @@
 # github-view-defaults-extension
 
+## 0.4.4
+
+### Patch Changes
+
+- af35184: Stop keeping `w=1` and `show-viewed-files=false` on a pull request diff's address after the page has loaded, and leave GitHub's "Refresh" button to GitHub. The wrapping of `history.pushState` and `history.replaceState`, the write-back behind it, and the taking of the Refresh click are removed; they did not keep the parameters reliably. GitHub now refreshes the diff in place, and a diff loaded again from an address without the parameters, by a reload or a bookmark, is redirected to one with them, as before.
+- Updated dependencies [f89dc57]
+    - ts-data-forge@14.8.0
+
 ## 0.4.3
 
 ### Patch Changes

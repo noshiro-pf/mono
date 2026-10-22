@@ -1,5 +1,19 @@
 # @sumi-lang/oxlint-config
 
+## 0.0.6
+
+### Patch Changes
+
+- d1ae3cf: `banned-syntax/no-constructor-call` and `banned-syntax/no-new-array` now see a constructor reached through the global object (`globalThis.Number(x)`, `globalThis['String'](x)`, `new globalThis.Array(3)`, and `window`, `self` and `global` alike) unless a user declaration shadows that name. `no-constructor-call` also reports a constructor used as a template tag (`` String`42` ``), and `no-new-array` now leaves alone a locally declared `Array`, as `no-constructor-call` already did.
+- 26a1f5f: `@sumi-expect-error-file` now has to stand before the first code line (D-63): only comments, blank lines, a shebang and other markers may precede it. One placed below code is reported as an invalid marker and suppresses nothing, because it would read as covering only the lines after it.
+
+    `sumi check` now reports every comment that looks like a marker but is not one — malformed, applying to nothing, or a misplaced file-scoped marker — and fails on it; it used to drop them silently, leaving the diagnostic they meant with no word about why. An unused file-scoped marker is reported on its own line instead of line 0. `parseMarkers` returns its `problems` as `{ line, message }` and gives a file-scoped marker its own `markerLine`.
+
+- Updated dependencies [fba7527]
+- Updated dependencies [f89dc57]
+    - eslint-rule-forge@0.2.0
+    - ts-data-forge@14.8.0
+
 ## 0.0.5
 
 ### Patch Changes
