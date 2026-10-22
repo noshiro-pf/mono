@@ -1,0 +1,26 @@
+---
+prev: false
+next: false
+title: empty
+---
+
+値を持たず、作られた時点で完了している Observable を作成します（RxJS の `EMPTY` とほぼ同等）。何も流さないので、`switchMap` で何も追わない側の分岐に有用です。`source()` を使うと、誰も呼ばない `next` を持つものになってしまいます。
+
+## 使用例
+
+```ts
+import { createState, empty, switchMap } from 'synstate';
+
+const [isFollowing$, setIsFollowing] = createState(true);
+
+const [count$, setCount] = createState(0);
+
+// isFollowing$ が false の間は、count$ の値を何も流さない
+const followed$ = isFollowing$.pipe(
+    switchMap((isFollowing) => (isFollowing ? count$ : empty<number>())),
+);
+```
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/create/empty.mts)
+{/* /source-link */}

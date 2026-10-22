@@ -1,0 +1,31 @@
+---
+prev: false
+next: false
+title: empty
+---
+
+{/* jsdoc-description */}
+Creates an Observable that holds no value and is already completed, so it
+never passes anything on (almost equivalent to RxJS `EMPTY`). Useful inside
+`switchMap` for the branch that should follow nothing, where a `source()`
+would offer a `next` that nothing calls.
+{/* /jsdoc-description */}
+
+## Example
+
+```ts
+import { createState, empty, switchMap } from 'synstate';
+
+const [isFollowing$, setIsFollowing] = createState(true);
+
+const [count$, setCount] = createState(0);
+
+// While `isFollowing$` is false, nothing of `count$` is passed on.
+const followed$ = isFollowing$.pipe(
+    switchMap((isFollowing) => (isFollowing ? count$ : empty<number>())),
+);
+```
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/create/empty.mts)
+{/* /source-link */}
