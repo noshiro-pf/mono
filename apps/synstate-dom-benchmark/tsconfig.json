@@ -1,0 +1,13 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    // The default for the files with no pragma. `frameworks/solid.tsx` and
+    // `frameworks/preact-signals.tsx` name their own with `@jsxImportSource`.
+    "jsx": "react-jsx",
+    "jsxImportSource": "synstate-dom"
+  },
+  "include": ["./src", "./scripts", "./configs"]
+}
