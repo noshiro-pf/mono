@@ -63,6 +63,10 @@
             "integration_id": 15368
           },
           {
+            "context": "synstate-benchmark-result / result",
+            "integration_id": 15368
+          },
+          {
             "context": "no-skip-ci-label",
             "integration_id": 15368
           },

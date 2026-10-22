@@ -379,7 +379,7 @@ const WORKFLOW_GLOB = '.github/workflows/*.yml';
 
 /**
  * A workflow is one of the repository's checks when it triggers on
- * `pull_request`, which is exactly the five named in CLAUDE.md.
+ * `pull_request`, which is exactly the six named in CLAUDE.md.
  * `lint-pull-request.yml` and `skip-ci-label.yml` use `pull_request_target`
  * and run no repository command; `check-gates.yml` is reached through
  * `workflow_call`. The rest — the release, the dependency updates, the Pages
@@ -543,7 +543,7 @@ const toCommandId = (directory: string, scriptName: string): CommandId =>
  * or a workflow's own glue invokes, never a check in its own right.
  * `z:check-should-run` is the diff gate, which check-gates.yml calls through
  * `workflow_call` — a workflow that triggers on nothing and so is not one of
- * the five below.
+ * the six below.
  */
 const isCheckScript = (scriptName: string): boolean => {
   if (scriptName.startsWith(PLUMBING_PREFIX)) {
