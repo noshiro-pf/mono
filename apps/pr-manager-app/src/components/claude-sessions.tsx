@@ -8,7 +8,8 @@ type Props = Readonly<{ sessions: readonly ClaudeSession[] }>;
 /**
  * The Claude Code sessions the pull request was written in, by title, from
  * the `Claude-Session:` trailers in its body. A trailer that gave the URL
- * alone is shown as the URL.
+ * alone is shown as the URL, cut short with an ellipsis where the card is
+ * too narrow for it.
  */
 export const ClaudeSessions = memoNamed<Props>(
   'ClaudeSessions',
@@ -19,7 +20,11 @@ export const ClaudeSessions = memoNamed<Props>(
         <Fragment key={session.url}>
           {index === 0 ? '' : ', '}
           <ExternalLink href={session.url}>
-            {session.title === '' ? session.url : session.title}
+            {session.title === '' ? (
+              <span className={'claude-session-url'}>{session.url}</span>
+            ) : (
+              session.title
+            )}
           </ExternalLink>
         </Fragment>
       ))}
