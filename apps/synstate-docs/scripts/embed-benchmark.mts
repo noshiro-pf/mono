@@ -152,7 +152,12 @@ const embedInlineNumbers = (
   return inlineMarkers.reduce(
     (mut_content, { pattern, render }) =>
       mut_content.replaceAll(pattern, (_match, key: string | undefined) => {
-        const value = key === undefined ? undefined : numbers[key];
+        const entry = key === undefined ? undefined : numbers[key];
+
+        const value =
+          entry === undefined || typeof entry === 'string'
+            ? entry
+            : entry[pageLanguage(targetMarkdownFile)];
 
         if (key === undefined || value === undefined) {
           throw new Error(
@@ -167,6 +172,17 @@ const embedInlineNumbers = (
     markdown,
   );
 };
+
+/**
+ * The language a page is written in, by where it sits: Starlight keeps every
+ * translation under a directory named after its locale.
+ */
+const pageLanguage = (markdownFile: string): 'en' | 'ja' =>
+  path
+    .relative(path.resolve(workspaceRootPath, 'src/content/docs'), markdownFile)
+    .split(path.sep)[0] === 'ja'
+    ? 'ja'
+    : 'en';
 
 /**
  * The two spellings a marker takes, one per document format.

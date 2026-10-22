@@ -40,8 +40,13 @@ import {
  * measured, and the anchor it produced was neither readable nor stable. The
  * heading that quoted a ratio says "Why Jotai Is Slower" instead, and the
  * number it used to carry is in the paragraph below it, where a marker works.
+ *
+ * An entry is language-neutral wherever it can be. The one kind that cannot is
+ * a scenario the data picks out — which one a library does worst in — since
+ * the cell has to name it in the page's language; such an entry carries one
+ * spelling per language, and `embed-benchmark.mts` takes the page's.
  */
-export const benchmarkNumbers = (): ReadonlyRecord<string, string> =>
+export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
   ({
     // Where the numbers on this page were measured. Bare facts rather than a
     // sentence: a marker's value is written once and spliced into both
@@ -278,6 +283,28 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, string> =>
       1,
     ),
 
+    // Summary: for each library measured in every scenario, the summary row
+    // where it is furthest from that row's fastest library. Which row that is
+    // is what a re-measurement can change, so the scenario is derived too.
+    ...Object.fromEntries(
+      everyScenarioLibraries().flatMap((library) => {
+        const { scenario, spread } = worstSummaryRow(library);
+
+        const key = library.toLowerCase();
+
+        return [
+          [`summary/worst/${key}-scenario`, scenario.name],
+          [`summary/worst/${key}-fastest`, scenario.fastest()],
+          [
+            `summary/worst/${key}-over-fastest`,
+            scenario.timedOut(library)
+              ? (`>\u{A0}${factor(spread, 1)}` as const)
+              : factor(spread, 1),
+          ],
+        ] as const;
+      }),
+    ),
+
     // Summary: how each library's cost grows when the deep chain gets four
     // times deeper at the same update count — the worst-case growth the page
     // argues from, as one number per library.
@@ -298,6 +325,14 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, string> =>
       at(deepChain, 'MobX', DEEP_SHALLOW),
     ),
   }) as const;
+
+/**
+ * What a marker is replaced with: one string for every page, or one per
+ * language where the value is prose (see {@link benchmarkNumbers}).
+ */
+export type BenchmarkNumber = string | Localized;
+
+type Localized = Readonly<{ en: string; ja: string }>;
 
 /** One library's row in a sweep, and the constants the sweep ran under. */
 /**
@@ -684,14 +719,149 @@ const FAN_OUT_SUMMARY_EXCLUDED: readonly string[] = ['SynState'] as const;
 
 /** SynState's distance from the fastest in each row of the summary table. */
 const summarySynStateSpreads = (): readonly number[] =>
+  summaryScenarios().map((s) => s.spread('SynState'));
+
+/**
+ * One row of the summary table, as the per-library table reads it: the name
+ * the row is linked by, the library that leads it, and where any library
+ * stands against that one at the point of the sweep the row names.
+ */
+type SummaryScenario = Readonly<{
+  name: Localized;
+  /** The labels of the rows the scenario measured. */
+  libraries: readonly string[];
+  fastest: () => string;
+  spread: (library: string) => number;
+  timedOut: (library: string) => boolean;
+}>;
+
+/**
+ * The summary table's rows, in its order. A name is spelled as that table's
+ * first column spells it, the point of the sweep included.
+ */
+const summaryScenarios = (): readonly SummaryScenario[] =>
   [
-    rowSpread(singleState, 'SynState'),
-    rowSpread(derivedChain, 'SynState'),
-    rowSpread(diamond, 'SynState'),
-    pointSpread(deepChain, 'SynState', DEEP_MAX),
-    pointSpread(cascadedDiamond, 'SynState', CASCADED_MAX),
-    pointSpread(conditionalFanOut, 'SynState (switchMap)', fanOutLastLabel()),
+    statsScenario(
+      {
+        en: '[Single state](#scenario-single-state)',
+        ja: '[単一ステート](#シナリオ-単一ステート)',
+      },
+      singleState,
+    ),
+    statsScenario(
+      {
+        en: '[Derived chain](#scenario-derived-chain)',
+        ja: '[派生チェーン](#シナリオ-派生チェーン)',
+      },
+      derivedChain,
+    ),
+    statsScenario(
+      {
+        en: '[Diamond](#scenario-diamond-dependency)',
+        ja: '[ダイヤモンド](#シナリオ-ダイヤモンド依存関係)',
+      },
+      diamond,
+      glitchMarked,
+    ),
+    seriesScenario(
+      {
+        en: `[Deep chain](#scenario-deep-chain-throughput) (${DEEP_MAX})`,
+        ja: `[ディープチェーン](#シナリオ-ディープチェーンスループット)（${DEEP_MAX}）`,
+      },
+      deepChain,
+      DEEP_MAX,
+    ),
+    seriesScenario(
+      {
+        en: `[Cascaded diamond](#scenario-cascaded-diamond) (${CASCADED_MAX})`,
+        ja: `[カスケードダイアモンド](#シナリオ-カスケードダイアモンド)（${CASCADED_MAX}）`,
+      },
+      cascadedDiamond,
+      CASCADED_MAX,
+    ),
+    seriesScenario(
+      {
+        en: `[Conditional fan-out](#scenario-conditional-fan-out) (${fanOutLastLabel()})`,
+        ja: `[条件付きファンアウト](#シナリオ-条件付きファンアウト)（${fanOutLastLabel()}）`,
+      },
+      conditionalFanOut,
+      fanOutLastLabel(),
+      FAN_OUT_SUMMARY_FORMS,
+    ),
   ] as const;
+
+const statsScenario = (
+  name: Localized,
+  data: StatsData,
+  markFastest: (label: string) => string = (label) => label,
+): SummaryScenario =>
+  ({
+    name,
+    libraries: data.rows.map((r) => r.label),
+    fastest: () => markFastest(fastestRow(data)),
+    spread: (library) => rowSpread(data, library),
+    timedOut: () => false,
+  }) as const;
+
+/**
+ * A sweep read at one point. `forms` names, for a library measured in more
+ * than one form, the row the summary counts for it.
+ */
+const seriesScenario = (
+  name: Localized,
+  data: SeriesData,
+  xLabel: string,
+  forms: ReadonlyRecord<string, string> = {},
+): SummaryScenario => {
+  const form = (library: string): string => forms[library] ?? library;
+
+  return {
+    name,
+    libraries: data.series.map((s) => s.label),
+    fastest: () => fastestAt(data, xLabel),
+    spread: (library) => pointSpread(data, form(library), xLabel),
+    timedOut: (library) => valueAt(data, form(library), xLabel) === null,
+  };
+};
+
+/**
+ * The fan-out row the summary counts for a library measured both ways: the
+ * `switchMap` form, which follows the selector as MobX and Jotai do. The
+ * summary's own footnote says so for SynState; RxJS is held to the same form so
+ * that the per-library table compares the two push-based libraries alike.
+ */
+const FAN_OUT_SUMMARY_FORMS: ReadonlyRecord<string, string> = {
+  SynState: 'SynState (switchMap)',
+  RxJS: 'RxJS (switchMap)',
+} as const;
+
+/**
+ * The libraries every summary row measured, in the order the first row lists
+ * them — the rows of the per-library table. Redux, Zustand and Valtio take part
+ * in some scenarios only, and a worst case over some of them is not one.
+ */
+const everyScenarioLibraries = (): readonly string[] => {
+  const scenarios = summaryScenarios();
+
+  return (scenarios[0]?.libraries ?? []).filter((library) =>
+    scenarios.every((s) => s.libraries.includes(library)),
+  );
+};
+
+/** The summary row where `library` is furthest from that row's fastest. */
+const worstSummaryRow = (
+  library: string,
+): Readonly<{ scenario: SummaryScenario; spread: number }> => {
+  const [worst] = summaryScenarios()
+    .map((scenario) => ({ scenario, spread: scenario.spread(library) }))
+    .toSorted((a, b) => b.spread - a.spread);
+
+  if (worst === undefined) {
+    throw new Error('❌ the summary has no scenario');
+  }
+
+  return worst;
+};
 
 /** The slowest library's distance from the fastest in each summary row. */
 const summarySlowestSpreads = (): readonly number[] =>
