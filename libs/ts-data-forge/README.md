@@ -82,6 +82,7 @@ Essential FP utilities for cleaner, more reliable code.
 
 - **Optional** - Type-safe null handling
 - **Result** - Error handling without exceptions
+- **AsyncData** - The state of data fetched asynchronously: idle, pending, or settled as a `Result`
 - **Pipe** - Function composition utilities
 - **match** - Pattern matching for TypeScript
 

@@ -8,6 +8,7 @@
  * New code should import these from `ts-std-forge` directly.
  */
 export {
+  AsyncData,
   AsyncResult,
   Optional,
   Result,
@@ -17,6 +18,9 @@ export {
 } from 'ts-std-forge';
 
 export type {
+  AsyncErr,
+  AsyncIdle,
+  AsyncPending,
   Err,
   None,
   Ok,
@@ -25,6 +29,7 @@ export type {
   TernaryErr,
   TernaryOk,
   TernaryWarn,
+  UnknownAsyncData,
   UnknownOptional,
   UnknownResult,
   UnknownTernaryResult,

@@ -25,6 +25,84 @@ type SourceFileMapping = Readonly<{
  */
 export const sourceFileMappings: readonly SourceFileMapping[] = [
   {
+    sourcePath: 'src/functional/async-data/impl/async-data-idle.mts',
+    sampleFiles: ['samples/src/functional/async-data/idle-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-pending.mts',
+    sampleFiles: ['samples/src/functional/async-data/pending-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-ok.mts',
+    sampleFiles: ['samples/src/functional/async-data/ok-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-err.mts',
+    sampleFiles: ['samples/src/functional/async-data/err-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-is-idle.mts',
+    sampleFiles: ['samples/src/functional/async-data/is-idle-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-is-pending.mts',
+    sampleFiles: ['samples/src/functional/async-data/is-pending-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-is-settled.mts',
+    sampleFiles: ['samples/src/functional/async-data/is-settled-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-is-ok.mts',
+    sampleFiles: ['samples/src/functional/async-data/is-ok-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-is-err.mts',
+    sampleFiles: ['samples/src/functional/async-data/is-err-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-is-async-data.mts',
+    sampleFiles: [
+      'samples/src/functional/async-data/is-async-data-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-map.mts',
+    sampleFiles: ['samples/src/functional/async-data/map-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-map-err.mts',
+    sampleFiles: ['samples/src/functional/async-data/map-err-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-match.mts',
+    sampleFiles: ['samples/src/functional/async-data/match-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-latest-ok.mts',
+    sampleFiles: ['samples/src/functional/async-data/latest-ok-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-unwrap-ok.mts',
+    sampleFiles: ['samples/src/functional/async-data/unwrap-ok-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-unwrap-ok-or.mts',
+    sampleFiles: ['samples/src/functional/async-data/unwrap-ok-or-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-to-result.mts',
+    sampleFiles: ['samples/src/functional/async-data/to-result-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-to-pending.mts',
+    sampleFiles: ['samples/src/functional/async-data/to-pending-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-data/impl/async-data-settle.mts',
+    sampleFiles: ['samples/src/functional/async-data/settle-example.mts'],
+  },
+  {
     sourcePath: 'src/functional/ternary-result/impl/ternary-result-ok.mts',
     sampleFiles: ['samples/src/functional/ternary-result/ok-example.mts'],
   },
