@@ -4,7 +4,7 @@
 
 synstate の Observable を JSX の属性・子要素・props にそのまま渡し、DOM に直接束縛する UI ライブラリの実装仕様。コンパイラも仮想 DOM も持たない。
 
-- 状態: 実装中。パッケージの骨格、「4. 定数と `Bindable`」、「5. JSX の型」、「6. JSX ランタイムと `Mountable`」、「7. 束縛」まで実装済み。公開の準備が整うまで `package.json` は `"private": true` にしてある。
+- 状態: 実装中。パッケージの骨格、「4. 定数と `Bindable`」、「5. JSX の型」、「6. JSX ランタイムと `Mountable`」、「7. 束縛」、「8.2 `If`」、「8.3 `Match` 系」まで実装済み。公開の準備が整うまで `package.json` は `"private": true` にしてある。
 - 出典: 設計の起点は issue [#2131](https://github.com/noshiro-pf/mono/issues/2131)、synstate 側のライフサイクル（complete・dispose・スコープ）は「synstate ライフサイクル仕様」で確定した内容。本書は両者を UI ライブラリの実装の視点で 1 つにまとめたもので、食い違う箇所は本書で決め、その旨を書く。
 
 ## 1. 目的と範囲
@@ -354,7 +354,7 @@ export declare const view: <A, T>(
 ```
 
 - `MatchOptional`（`Optional<T>`）と `MatchResult`（`Result<T, E>`）を用意する。ts-data-forge の型にそろえる。
-- 子の関数には中身の型に絞った `InitializedObservable<T>` を渡す。タグ（Some / None、Ok / Err）が変わったときだけ分岐を作り直し、同じタグの間は渡した Observable に新しい中身を流す（`For` の行と同じく、分岐ごとの `createState` に `setState` する）。
+- 子の関数には中身の型に絞った `InitializedObservable<T>` を渡す。タグ（Some / None、Ok / Err）が変わったときだけ分岐を作り直し、同じタグの間は渡した Observable に新しい中身を流す。この Observable は `For` の行と同じく `value` から派生させ（`filter` で同じタグの値だけを通して中身を取り出す）、伝播中に書き込まない。
 - 汎用の `Match`（判別共用体の `type` で分ける）は、`MatchOptional` と `MatchResult` を作った後に形を決める。
 
 ### 8.4 `For`
