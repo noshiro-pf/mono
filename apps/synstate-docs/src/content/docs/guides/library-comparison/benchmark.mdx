@@ -35,6 +35,17 @@ In no scenario does SynState take more than {/* bench:summary/synstate-worst-ove
 
 A ratio marked `>` is a library that did not complete within the timeout ({/* bench:cascaded-diamond/timeout */}5,000 ms{/* /bench */}), divided as if it had taken exactly that long.
 
+Read the other way round, the same rows give each library its own worst case: for every library measured in all six scenarios, the scenario where it is furthest from that scenario's fastest library, and how far. Redux, Zustand and Valtio are measured in some scenarios only, so they have no row.
+
+| Library  | Scenario where it trails most                                                                                            | Fastest there                                                  |                                                   Library ÷ fastest |
+| -------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- | ------------------------------------------------------------------: |
+| SynState | {/* bench:summary/worst/synstate-scenario */}[Conditional fan-out](#scenario-conditional-fan-out) (B=1000){/* /bench */} | {/* bench:summary/worst/synstate-fastest */}MobX{/* /bench */} | {/* bench:summary/worst/synstate-over-fastest */}2.6{/* /bench */}× |
+| RxJS     | {/* bench:summary/worst/rxjs-scenario */}[Cascaded diamond](#scenario-cascaded-diamond) (N=20){/* /bench */}             | {/* bench:summary/worst/rxjs-fastest */}SynState{/* /bench */} | {/* bench:summary/worst/rxjs-over-fastest */}> 4,545{/* /bench */}× |
+| MobX     | {/* bench:summary/worst/mobx-scenario */}[Deep chain](#scenario-deep-chain-throughput) (K=1000, M=200){/* /bench */}     | {/* bench:summary/worst/mobx-fastest */}SynState{/* /bench */} |      {/* bench:summary/worst/mobx-over-fastest */}53{/* /bench */}× |
+| Jotai    | {/* bench:summary/worst/jotai-scenario */}[Derived chain](#scenario-derived-chain){/* /bench */}                         | {/* bench:summary/worst/jotai-fastest */}RxJS{/* /bench */}    |    {/* bench:summary/worst/jotai-over-fastest */}103{/* /bench */}× |
+
+In the conditional fan-out, SynState and RxJS are counted in their `switchMap` form, as in ※2.
+
 What the measurements support:
 
 - **SynState's per-update overhead is moderate, not the lowest.** With nothing derived (single state), every library does no more than store a value and call one subscriber, and that is the one scenario where all seven can be compared on equal terms: Zustand takes {/* bench:single-state/zustand-over-synstate */}1.0{/* /bench */}× as long as SynState, Valtio {/* bench:single-state/valtio-over-synstate */}7.4{/* /bench */}×, MobX {/* bench:single-state/mobx-over-synstate */}8.8{/* /bench */}×, Redux {/* bench:single-state/redux-over-synstate */}24{/* /bench */}× and Jotai {/* bench:single-state/jotai-over-synstate */}33{/* /bench */}×. On the small derived graphs, RxJS, which chains plain `subscribe` calls with no ordering step, is faster than SynState, and MobX, Jotai and Redux are slower.

@@ -35,6 +35,17 @@ SynState はどのシナリオでも最速のライブラリの {/* bench:summar
 
 `>` の付いた比率は、タイムアウト（{/* bench:cascaded-diamond/timeout */}5,000 ms{/* /bench */}）までに完了しなかったライブラリを、ちょうどその時間がかかったものとして割った値です。
 
+同じ行をライブラリの側から読むと、ライブラリごとの最悪のケースになります。6つのシナリオすべてで計測しているライブラリそれぞれについて、そのシナリオの最速のライブラリとの差が最も大きくなるシナリオと、その比です。Redux・Zustand・Valtio は一部のシナリオでしか計測していないため、行がありません。
+
+| ライブラリ | 最速との差が最も大きいシナリオ                                                                                                     | そのシナリオの最速                                             |                                                   ライブラリ ÷ 最速 |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------: |
+| SynState   | {/* bench:summary/worst/synstate-scenario */}[条件付きファンアウト](#シナリオ-条件付きファンアウト)（B=1000）{/* /bench */}        | {/* bench:summary/worst/synstate-fastest */}MobX{/* /bench */} | {/* bench:summary/worst/synstate-over-fastest */}2.6{/* /bench */}× |
+| RxJS       | {/* bench:summary/worst/rxjs-scenario */}[カスケードダイアモンド](#シナリオ-カスケードダイアモンド)（N=20）{/* /bench */}          | {/* bench:summary/worst/rxjs-fastest */}SynState{/* /bench */} | {/* bench:summary/worst/rxjs-over-fastest */}> 4,545{/* /bench */}× |
+| MobX       | {/* bench:summary/worst/mobx-scenario */}[ディープチェーン](#シナリオ-ディープチェーンスループット)（K=1000, M=200）{/* /bench */} | {/* bench:summary/worst/mobx-fastest */}SynState{/* /bench */} |      {/* bench:summary/worst/mobx-over-fastest */}53{/* /bench */}× |
+| Jotai      | {/* bench:summary/worst/jotai-scenario */}[派生チェーン](#シナリオ-派生チェーン){/* /bench */}                                     | {/* bench:summary/worst/jotai-fastest */}RxJS{/* /bench */}    |    {/* bench:summary/worst/jotai-over-fastest */}103{/* /bench */}× |
+
+条件付きファンアウトでは、※2 と同じく SynState と RxJS を `switchMap` で書いた形で数えています。
+
 計測結果から言えること：
 
 - **SynState の更新ごとのオーバーヘッドは中程度で、最小ではありません。** 何も派生しない場合（単一ステート）、どのライブラリも値を保持して subscriber を1つ呼ぶだけなので、7つすべてを同じ条件で比べられるのはこのシナリオだけです。SynState に対して、Zustand は {/* bench:single-state/zustand-over-synstate */}1.0{/* /bench */}倍、Valtio は {/* bench:single-state/valtio-over-synstate */}7.4{/* /bench */}倍、MobX は {/* bench:single-state/mobx-over-synstate */}8.8{/* /bench */}倍、Redux は {/* bench:single-state/redux-over-synstate */}24{/* /bench */}倍、Jotai は {/* bench:single-state/jotai-over-synstate */}33{/* /bench */}倍の時間がかかります。小さな派生グラフでは、順序付けの手順を持たずに `subscribe` 呼び出しを連ねるだけの RxJS が SynState より高速で、MobX・Jotai・Redux は SynState より低速です。
