@@ -4,6 +4,7 @@ import { performance } from 'node:perf_hooks';
 import { range } from 'ts-data-forge';
 import {
   type BenchmarkStats,
+  renderStatsTable,
   writeBenchmarkResults,
 } from './benchmark-results.mjs';
 import { resultsDir, scenarioDir } from './paths.mjs';
@@ -32,6 +33,20 @@ type Scenario = Readonly<{
 
 const scenarios: readonly Scenario[] = [
   {
+    title: 'Single State',
+    expectedValue: N,
+    resultsFile: 'results-single-state.md',
+    entries: [
+      { name: '**SynState**', file: '00-single-state.synstate.mts' },
+      { name: 'RxJS', file: '00-single-state.rxjs.mts' },
+      { name: 'MobX', file: '00-single-state.mobx.mts' },
+      { name: 'Jotai', file: '00-single-state.jotai.mts' },
+      { name: 'Redux', file: '00-single-state.redux.mts' },
+      { name: 'Zustand', file: '00-single-state.zustand.mts' },
+      { name: 'Valtio', file: '00-single-state.valtio.mts' },
+    ],
+  },
+  {
     title: 'Derived Chain',
     expectedValue: N * 4,
     resultsFile: 'results.md',
@@ -41,8 +56,6 @@ const scenarios: readonly Scenario[] = [
       { name: 'MobX', file: '01-derived-chain.mobx.mts' },
       { name: 'Jotai', file: '01-derived-chain.jotai.mts' },
       { name: 'Redux', file: '01-derived-chain.redux.mts' },
-      { name: 'Zustand', file: '01-derived-chain.zustand.mts' },
-      { name: 'Valtio', file: '01-derived-chain.valtio.mts' },
     ],
   },
   {
@@ -124,44 +137,25 @@ const runScenario = async (scenario: Scenario): Promise<void> => {
 
   console.info('');
 
-  // Build Markdown table
-  const mut_tableLines: string[] = [
-    '| Library  | Median (ms) | Min (ms) | Max (ms) | p95 (ms) | Ops/sec   |',
-
-    '| -------- | ----------: | -------: | -------: | -------: | --------: |',
-  ];
-
-  const mut_rows: BenchmarkStats[] = [];
-
-  for (const { name, times } of mut_results) {
+  const rows: readonly BenchmarkStats[] = mut_results.map(({ name, times }) => {
     const sorted = times.toSorted((a, b) => a - b);
 
     const med = median(sorted);
 
-    const min = sorted[0] ?? 0;
-
-    const max = sorted.at(-1) ?? 0;
-
-    const p95Val = p95(sorted);
-
     // eslint-disable-next-line total-functions/no-partial-division
     const opsPerSec = Math.round(N / (med / 1000));
 
-    mut_rows.push({
+    return {
       label: name,
       median: med,
-      min,
-      max,
-      p95: p95Val,
+      min: sorted[0] ?? 0,
+      max: sorted.at(-1) ?? 0,
+      p95: p95(sorted),
       opsPerSec,
-    });
+    };
+  });
 
-    mut_tableLines.push(
-      `| ${name.padEnd(8)} | ${med.toFixed(2).padStart(11)} | ${min.toFixed(2).padStart(8)} | ${max.toFixed(2).padStart(8)} | ${p95Val.toFixed(2).padStart(8)} | ${formatNumber(opsPerSec).padStart(9)} |`,
-    );
-  }
-
-  const tableContent = mut_tableLines.join('\n');
+  const tableContent = renderStatsTable(rows);
 
   // Print to console
   console.info(tableContent);
@@ -169,7 +163,7 @@ const runScenario = async (scenario: Scenario): Promise<void> => {
   await writeBenchmarkResults(resultsDir, scenario.resultsFile, tableContent, {
     kind: 'stats',
     meta: { updates: N, timeoutMs: null },
-    rows: mut_rows,
+    rows,
   });
 };
 

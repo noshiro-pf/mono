@@ -6,6 +6,7 @@ import {
   deepChain as deepChainJson,
   derivedChain as derivedChainJson,
   diamond as diamondJson,
+  singleState as singleStateJson,
 } from '../src/data/index.mjs';
 
 /**
@@ -59,6 +60,29 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, string> =>
         .join(', '),
     ),
     'environment/measured-on': environmentFact((e) => e.measuredOn),
+
+    // Scenario: Single State — the one scenario every library takes part in,
+    // so the one that quotes each of them against SynState.
+    'single-state/zustand-over-synstate': factor(
+      median(singleState, 'Zustand'),
+      median(singleState, 'SynState'),
+    ),
+    'single-state/valtio-over-synstate': factor(
+      median(singleState, 'Valtio'),
+      median(singleState, 'SynState'),
+    ),
+    'single-state/mobx-over-synstate': factor(
+      median(singleState, 'MobX'),
+      median(singleState, 'SynState'),
+    ),
+    'single-state/redux-over-synstate': factor(
+      median(singleState, 'Redux'),
+      median(singleState, 'SynState'),
+    ),
+    'single-state/jotai-over-synstate': factor(
+      median(singleState, 'Jotai'),
+      median(singleState, 'SynState'),
+    ),
 
     // Scenario: Derived Chain / Diamond Dependency
     //
@@ -137,6 +161,12 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, string> =>
     'fan-out/updates-math': `$K = ${count(updates(conditionalFanOut)).replace(',', '{,}')}$`,
     'fan-out/mobx-typical': ms(typical(conditionalFanOut, 'MobX')),
     'fan-out/jotai-typical': ms(typical(conditionalFanOut, 'Jotai')),
+    'fan-out/synstate-switch-map-typical': ms(
+      typical(conditionalFanOut, 'SynState (switchMap)'),
+    ),
+    'fan-out/rxjs-switch-map-typical': ms(
+      typical(conditionalFanOut, 'RxJS (switchMap)'),
+    ),
     'fan-out/synstate@min-b': ms(
       at(conditionalFanOut, 'SynState', FAN_OUT_MIN),
     ),
@@ -151,41 +181,101 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, string> =>
     // from it, at the point of the sweep the summary table names. Derived
     // rather than written, because which library leads is exactly what a
     // re-measurement can change.
+    'summary/single-state-fastest': fastestRow(singleState),
+    'summary/single-state-synstate-over-fastest': factor(
+      rowSpread(singleState, 'SynState'),
+      1,
+    ),
+    'summary/single-state-slowest': slowestRow(singleState),
+    'summary/single-state-slowest-over-fastest': factor(
+      rowSpread(singleState, slowestRow(singleState)),
+      1,
+    ),
     'summary/derived-chain-fastest': fastestRow(derivedChain),
     'summary/derived-chain-synstate-over-fastest': factor(
-      median(derivedChain, 'SynState'),
-      median(derivedChain, fastestRow(derivedChain)),
+      rowSpread(derivedChain, 'SynState'),
+      1,
     ),
-    'summary/diamond-fastest': fastestRow(diamond),
+    'summary/derived-chain-slowest': slowestRow(derivedChain),
+    'summary/derived-chain-slowest-over-fastest': factor(
+      rowSpread(derivedChain, slowestRow(derivedChain)),
+      1,
+    ),
+    // A diamond is where a library without an ordering step emits glitches,
+    // so the summary marks such a fastest row and its footnote names the
+    // fastest of the libraries that do not.
+    'summary/diamond-fastest': glitchMarked(fastestRow(diamond)),
+    'summary/diamond-fastest-glitch-free': fastestRow(
+      diamond,
+      GLITCHING_LIBRARIES,
+    ),
     'summary/diamond-synstate-over-fastest': factor(
-      median(diamond, 'SynState'),
-      median(diamond, fastestRow(diamond)),
+      rowSpread(diamond, 'SynState'),
+      1,
+    ),
+    'summary/diamond-slowest': slowestRow(diamond),
+    'summary/diamond-slowest-over-fastest': factor(
+      rowSpread(diamond, slowestRow(diamond)),
+      1,
     ),
     'summary/deep-chain-fastest': fastestAt(deepChain, DEEP_MAX),
     'summary/deep-chain-synstate-over-fastest': factor(
-      at(deepChain, 'SynState', DEEP_MAX),
-      at(deepChain, fastestAt(deepChain, DEEP_MAX), DEEP_MAX),
+      pointSpread(deepChain, 'SynState', DEEP_MAX),
+      1,
+    ),
+    'summary/deep-chain-slowest': slowestAt(deepChain, DEEP_MAX),
+    'summary/deep-chain-slowest-over-fastest': slowestSpreadText(
+      deepChain,
+      DEEP_MAX,
     ),
     'summary/cascaded-diamond-fastest': fastestAt(
       cascadedDiamond,
       CASCADED_MAX,
     ),
     'summary/cascaded-diamond-synstate-over-fastest': factor(
-      at(cascadedDiamond, 'SynState', CASCADED_MAX),
-      at(
-        cascadedDiamond,
-        fastestAt(cascadedDiamond, CASCADED_MAX),
-        CASCADED_MAX,
-      ),
+      pointSpread(cascadedDiamond, 'SynState', CASCADED_MAX),
+      1,
+    ),
+    'summary/cascaded-diamond-slowest': slowestAt(
+      cascadedDiamond,
+      CASCADED_MAX,
+    ),
+    'summary/cascaded-diamond-slowest-over-fastest': slowestSpreadText(
+      cascadedDiamond,
+      CASCADED_MAX,
     ),
     'summary/fan-out-fastest': fastestAt(conditionalFanOut, fanOutLastLabel()),
+    // SynState written with `switchMap`, the form that follows the selector as
+    // MobX and Jotai do; the `combine` form is in the footnote beside it, and
+    // is left out of the slowest column for the same reason.
     'summary/fan-out-synstate-over-fastest': factor(
-      at(conditionalFanOut, 'SynState', fanOutLastLabel()),
-      at(
-        conditionalFanOut,
-        fastestAt(conditionalFanOut, fanOutLastLabel()),
-        fanOutLastLabel(),
-      ),
+      pointSpread(conditionalFanOut, 'SynState (switchMap)', fanOutLastLabel()),
+      1,
+    ),
+    'summary/fan-out-synstate-combine-over-fastest': factor(
+      pointSpread(conditionalFanOut, 'SynState', fanOutLastLabel()),
+      1,
+    ),
+    'summary/fan-out-slowest': slowestAt(
+      conditionalFanOut,
+      fanOutLastLabel(),
+      FAN_OUT_SUMMARY_EXCLUDED,
+    ),
+    'summary/fan-out-slowest-over-fastest': slowestSpreadText(
+      conditionalFanOut,
+      fanOutLastLabel(),
+      FAN_OUT_SUMMARY_EXCLUDED,
+    ),
+    // The two figures the sentence under the summary table sets side by side:
+    // SynState's worst distance from the fastest across the six rows, and the
+    // smallest distance of any scenario's slowest library.
+    'summary/synstate-worst-over-fastest': factor(
+      Math.max(...summarySynStateSpreads()),
+      1,
+    ),
+    'summary/slowest-over-fastest-least': factor(
+      Math.min(...summarySlowestSpreads()),
+      1,
     ),
 
     // Summary: how each library's cost grows when the deep chain gets four
@@ -249,14 +339,21 @@ type StatsData = Readonly<{
 }>;
 
 /**
+ * One state and one subscriber, nothing derived: the only scenario Zustand and
+ * Valtio take part in, since their vanilla APIs have no derived-value node and
+ * anything else would measure them on a smaller graph than the others.
+ */
+const singleState: StatsData = singleStateJson;
+
+/**
  * The derived chain, which is also where the headline "up to N× faster than
  * Jotai and M× faster than Redux" is read from.
  *
- * It is the one scenario that carries both libraries and the simplest graph
- * either of them can be asked for, so both halves of that sentence come from
- * one measurement. Reading each half from whichever of the two single-point
- * scenarios flatters it most — which is how the pages came to say 30× and 16×,
- * the first from the derived chain and the second from the diamond — turned
+ * It carries both libraries and the simplest graph with a derived value in
+ * it, so both halves of that sentence come from one measurement. Reading each
+ * half from whichever scenario flatters it most — which is how the pages came
+ * to say 30× and 16×, the first from the derived chain and the second from
+ * the diamond — turned
  * out to be a choice noise makes: Redux's diamond median held at ~317 ms
  * across the two runs while SynState's doubled with the machine, and that
  * alone moved the wider scenario from one to the other.
@@ -281,6 +378,7 @@ const conditionalFanOut: SeriesData = conditionalFanOutJson;
  * the page's one-sentence description of where the numbers come from is false.
  */
 const allResults: readonly (StatsData | SeriesData)[] = [
+  singleState,
   derivedChain,
   diamond,
   deepChain,
@@ -471,9 +569,17 @@ const aheadAt = (
   return mine !== null && (rival === null || mine < rival);
 };
 
-/** The library with the smallest median in a single-point scenario. */
-const fastestRow = (data: StatsData): string => {
-  const [first] = data.rows.toSorted((a, b) => a.median - b.median);
+/**
+ * The library with the smallest median in a single-point scenario, leaving out
+ * the libraries named in `excluded`.
+ */
+const fastestRow = (
+  data: StatsData,
+  excluded: readonly string[] = [],
+): string => {
+  const [first] = data.rows
+    .filter((r) => !excluded.includes(r.label))
+    .toSorted((a, b) => a.median - b.median);
 
   if (first === undefined) {
     throw new Error('❌ this scenario measured no library');
@@ -500,6 +606,122 @@ const fastestAt = (data: SeriesData, xLabel: string): string => {
 
   return first.label;
 };
+
+/**
+ * The library with the largest median in a single-point scenario.
+ */
+const slowestRow = (data: StatsData): string => {
+  const [first] = data.rows.toSorted((a, b) => b.median - a.median);
+
+  if (first === undefined) {
+    throw new Error('❌ this scenario measured no library');
+  }
+
+  return first.label;
+};
+
+/**
+ * The library that took longest at `xLabel`, leaving out the rows named in
+ * `excluded`. A timeout is slower than any measurement, for the reason
+ * {@link aheadAt} gives.
+ */
+const slowestAt = (
+  data: SeriesData,
+  xLabel: string,
+  excluded: readonly string[] = [],
+): string => {
+  const [first] = data.series
+    .filter((s) => !excluded.includes(s.label))
+    .map((s) => ({
+      label: s.label,
+      value: valueAt(data, s.label, xLabel) ?? Number.POSITIVE_INFINITY,
+    }))
+    .toSorted((a, b) => b.value - a.value);
+
+  if (first === undefined) {
+    throw new Error(`❌ no library was measured at '${xLabel}'`);
+  }
+
+  return first.label;
+};
+
+/** How many times the fastest library's median `label`'s median is. */
+const rowSpread = (data: StatsData, label: string): number =>
+  divide(median(data, label), median(data, fastestRow(data)));
+
+/**
+ * How many times the fastest library's time `label`'s time at `xLabel` is. A
+ * row that timed out counts as the timeout itself, which makes the figure a
+ * lower bound; {@link slowestSpreadText} says so where it quotes one.
+ */
+const pointSpread = (data: SeriesData, label: string, xLabel: string): number =>
+  divide(
+    valueAt(data, label, xLabel) ?? timeout(data),
+    at(data, fastestAt(data, xLabel), xLabel),
+  );
+
+const slowestSpreadText = (
+  data: SeriesData,
+  xLabel: string,
+  excluded: readonly string[] = [],
+): string => {
+  const slowest = slowestAt(data, xLabel, excluded);
+
+  const value = factor(pointSpread(data, slowest, xLabel), 1);
+
+  return valueAt(data, slowest, xLabel) === null
+    ? // A no-break space, so that a narrow column does not wrap the mark away
+      // from its number.
+      (`>\u{A0}${value}` as const)
+    : value;
+};
+
+/**
+ * The fan-out rows the summary leaves out: SynState written with a `combine`
+ * over every branch, which the summary replaces with its `switchMap` form.
+ */
+const FAN_OUT_SUMMARY_EXCLUDED: readonly string[] = ['SynState'] as const;
+
+/** SynState's distance from the fastest in each row of the summary table. */
+const summarySynStateSpreads = (): readonly number[] =>
+  [
+    rowSpread(singleState, 'SynState'),
+    rowSpread(derivedChain, 'SynState'),
+    rowSpread(diamond, 'SynState'),
+    pointSpread(deepChain, 'SynState', DEEP_MAX),
+    pointSpread(cascadedDiamond, 'SynState', CASCADED_MAX),
+    pointSpread(conditionalFanOut, 'SynState (switchMap)', fanOutLastLabel()),
+  ] as const;
+
+/** The slowest library's distance from the fastest in each summary row. */
+const summarySlowestSpreads = (): readonly number[] =>
+  [
+    rowSpread(singleState, slowestRow(singleState)),
+    rowSpread(derivedChain, slowestRow(derivedChain)),
+    rowSpread(diamond, slowestRow(diamond)),
+    pointSpread(deepChain, slowestAt(deepChain, DEEP_MAX), DEEP_MAX),
+    pointSpread(
+      cascadedDiamond,
+      slowestAt(cascadedDiamond, CASCADED_MAX),
+      CASCADED_MAX,
+    ),
+    pointSpread(
+      conditionalFanOut,
+      slowestAt(conditionalFanOut, fanOutLastLabel(), FAN_OUT_SUMMARY_EXCLUDED),
+      fanOutLastLabel(),
+    ),
+  ] as const;
+
+/** The libraries whose subscribers see intermediate values in a diamond. */
+const GLITCHING_LIBRARIES: readonly string[] = ['RxJS'] as const;
+
+/**
+ * A library name, with the footnote mark the summary table explains when the
+ * library is one that glitches. Language-neutral, so one value serves both
+ * pages.
+ */
+const glitchMarked = (label: string): string =>
+  GLITCHING_LIBRARIES.includes(label) ? (`${label} ※1` as const) : label;
 
 const median = (data: StatsData, label: string): number => {
   const found = data.rows.find((r) => r.label === label);

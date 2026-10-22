@@ -68,6 +68,7 @@ const main = async (): Promise<void> => {
 const LIBRARIES = ['SynState', 'RxJS', 'Jotai', 'MobX'] as const;
 
 const scenarios = [
+  { title: 'single state', file: 'results-single-state.json' },
   { title: 'derived chain', file: 'results.json' },
   { title: 'diamond', file: 'results-diamond.json' },
   { title: 'deep chain', file: 'results-deep-chain.json' },

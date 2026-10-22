@@ -43,10 +43,10 @@ SynState's model is the simplest of the four to state: `next` on a source runs o
 
 Every benchmarked library has a vanilla API, so all of them run outside React. What differs is whether anything happens before a reader appears.
 
-- **SynState** registers a derived Observable with its root when it is created, so a pipeline written at module scope runs as soon as its source changes, subscribed or not. A search box's query, debounced and `switchMap`ped into `fromAbortablePromise(fetch(...))`, can live in a plain module, and a component, a test or a script that reads it gets the same value ([example](/mono/synstate/guides/declarative-state-management/#precise-control-over-async-behavior)). The price is the eager evaluation the conditional fan-out benchmark measures.
+- **SynState** registers a derived Observable with its root when it is created, so a pipeline written at module scope runs as soon as its source changes, subscribed or not. A search box's query, debounced and `switchMap`ped into `fromAbortablePromise(fetch(...))`, can live in a plain module, and a component, a test or a script that reads it gets the same value ([example](/mono/synstate/guides/declarative-state-management/#precise-control-over-async-behavior)). The same holds for a router kept as global state: its route, debounced and `switchMap`ped into a fetch, loads the page's data whether or not the view for it has mounted yet. The price is the eager evaluation the conditional fan-out benchmark measures, which a `switchMap` over the selected branch avoids.
 - **RxJS** can be written at module scope as well, but its pipelines are cold: nothing runs until a subscription, and each subscription runs the pipeline again, so a `fetch` inside it is sent once per subscriber unless the pipeline is shared (`share`, `shareReplay`).
-- **MobX** does not evaluate a `computed` until it is read, and does not cache it while unobserved. Work with side effects, such as fetching, goes into a `reaction` / `autorun` or an action (`flow`) that the application starts itself.
-- **Jotai** runs an atom's read function — an async atom's fetch included — when the atom is first read or mounted. In React that is a component rendering it (an async atom suspends that component); outside React nothing runs until code calls `store.get` or `store.sub`. Data loading written as atoms is therefore scheduled by whatever reads them, which in an application is usually React's rendering.
+- **MobX** does not evaluate a `computed` until it is read, and does not cache it while unobserved. Work with side effects, such as fetching, goes into a `reaction` / `autorun` or an action (`flow`) that the application starts itself. A `reaction` runs eagerly, and its `delay` option throttles it; cancelling a fetch that a newer route has made stale is left to the effect.
+- **Jotai** runs an atom's read function — an async atom's fetch included — when the atom is first read or mounted. In React that is a component rendering it (an async atom suspends that component); outside React nothing runs until code calls `store.get` or `store.sub`. Data loading written as atoms is therefore scheduled by whatever reads them, which in an application is usually React's rendering. Measured with jotai 3.0.1's vanilla store: an async atom derived from a route atom fetches nothing until `store.sub`; while subscribed it fetches on every route change and aborts the previous one through its `signal`, the equivalent of `switchMap`; once the last subscriber leaves, route changes fetch nothing. A debounce cannot be written inside the derivation and has to be built on the writing side.
 
 ## Benchmarked Libraries
 
@@ -68,9 +68,9 @@ SynState is built on a custom glitch-free Observable implementation. It provides
 
 **Trade-offs:**
 
-- Every derived value is recomputed on every update of its source, even when nothing reads it; MobX and Jotai skip that work.
-- Per-update overhead is above the simplest store (Zustand) and RxJS on small graphs.
-- A smaller operator set than RxJS.
+- Every derived value is recomputed on every update of its source, even when nothing reads it; MobX and Jotai skip that work. What they skip is a node the graph need not hold, which `switchMap`, disposing a scope or `audit` leaves out — see the [benchmark summary](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page).
+- Per-update overhead is above RxJS on small graphs.
+- A smaller operator set than RxJS, though it covers what its model needs: every Observable is already shared, so the `share` / `shareReplay` family has nothing to do, and errors travel as `Result` values (`mapResultOk`, `unwrapResultOk`, …) rather than through `catchError`. Operators and creators of your own are written with [the factories the built-in ones are made by](/mono/synstate/guides/custom-operators-and-creators/).
 
 **Best for:** Projects that need both simple shared state and sophisticated async pipelines in a single, consistent API.
 

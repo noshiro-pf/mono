@@ -43,10 +43,10 @@ MobX、Jotai、Recoil は**プル型（遅延）評価**によってグリッチ
 
 ベンチマークしたライブラリはすべてバニラ API を持つので、どれも React の外で動きます。違いは、読み手が現れる前に何かが動くかどうかです。
 
-- **SynState** は派生 Observable を作成時にルートへ登録するので、モジュールスコープに書いたパイプラインは、購読の有無にかかわらずソースが変わった時点で動きます。検索ボックスのクエリを debounce して `switchMap` で `fromAbortablePromise(fetch(...))` につなぐ処理を普通のモジュールに置け、それを読むコンポーネント・テスト・スクリプトは同じ値を得ます（[例](/mono/synstate/ja/guides/declarative-state-management/#非同期処理の正確な制御)）。その代償が、条件付きファンアウトのベンチマークが計測している先行評価です。
+- **SynState** は派生 Observable を作成時にルートへ登録するので、モジュールスコープに書いたパイプラインは、購読の有無にかかわらずソースが変わった時点で動きます。検索ボックスのクエリを debounce して `switchMap` で `fromAbortablePromise(fetch(...))` につなぐ処理を普通のモジュールに置け、それを読むコンポーネント・テスト・スクリプトは同じ値を得ます（[例](/mono/synstate/ja/guides/declarative-state-management/#非同期処理の正確な制御)）。グローバルステートとして持つ router も同じで、route を debounce して `switchMap` で fetch につなげば、そのページのビューがマウントされたかどうかに関係なくデータの読み込みが始まります。その代償が条件付きファンアウトのベンチマークが計測している先行評価で、選択中のブランチへの `switchMap` で避けられます。
 - **RxJS** もモジュールスコープに書けますが、パイプラインはコールドです。購読されるまで何も動かず、購読のたびにパイプラインが改めて実行されるため、共有（`share`、`shareReplay`）しない限り中の `fetch` は subscriber ごとに送信されます。
-- **MobX** は `computed` を読まれるまで評価せず、観測されていない間はキャッシュもしません。fetch のような副作用を伴う処理は、アプリケーション自身が開始する `reaction` / `autorun` やアクション（`flow`）に書きます。
-- **Jotai** は atom の read 関数（非同期 atom の fetch を含む）を、その atom が初めて読まれたかマウントされたときに実行します。React ではそれはコンポーネントのレンダリングであり（非同期 atom はそのコンポーネントをサスペンドさせます）、React の外ではコードが `store.get` か `store.sub` を呼ぶまで何も動きません。そのため atom として書いたデータ読み込みは、それを読むものによってスケジュールされ、アプリケーションでは通常 React のレンダリングがそれにあたります。
+- **MobX** は `computed` を読まれるまで評価せず、観測されていない間はキャッシュもしません。fetch のような副作用を伴う処理は、アプリケーション自身が開始する `reaction` / `autorun` やアクション（`flow`）に書きます。`reaction` は先行して動き、`delay` オプションで間引けます。新しい route によって古くなった fetch の取り消しは、副作用の側に任されます。
+- **Jotai** は atom の read 関数（非同期 atom の fetch を含む）を、その atom が初めて読まれたかマウントされたときに実行します。React ではそれはコンポーネントのレンダリングであり（非同期 atom はそのコンポーネントをサスペンドさせます）、React の外ではコードが `store.get` か `store.sub` を呼ぶまで何も動きません。そのため atom として書いたデータ読み込みは、それを読むものによってスケジュールされ、アプリケーションでは通常 React のレンダリングがそれにあたります。jotai 3.0.1 のバニラストアで確かめたところ、route atom から派生した非同期 atom は `store.sub` されるまで何も fetch せず、購読中は route が変わるたびに fetch して前の fetch を `signal` で中断し（`switchMap` に相当）、最後の購読者が離れると route が変わっても何も fetch しませんでした。debounce は派生の中には書けず、書き込む側で組み立てる必要があります。
 
 ## ベンチマーク対象ライブラリ
 
@@ -68,9 +68,9 @@ SynState はカスタムのグリッチフリー Observable 実装の上に構�
 
 **トレードオフ:**
 
-- 読まれていない派生値も、ソースが更新されるたびにすべて再計算される。MobX と Jotai はこの処理を省略できる。
-- 小さなグラフでは、更新ごとのオーバーヘッドが最も単純なストア（Zustand）や RxJS より大きい。
-- 演算子の数は RxJS より少ない。
+- 読まれていない派生値も、ソースが更新されるたびにすべて再計算される。MobX と Jotai はこの処理を省略できる。省略されるのはグラフが持つ必要のないノードで、`switchMap`、スコープの dispose、`audit` で外せる（[ベンチマークのまとめ](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)を参照）。
+- 小さなグラフでは、更新ごとのオーバーヘッドが RxJS より大きい。
+- 演算子の数は RxJS より少ない。ただし動作モデル上必要なものはそろっている。すべての Observable は最初から共有されているので `share` / `shareReplay` の類は不要で、エラーは `catchError` ではなく `Result` 値（`mapResultOk`、`unwrapResultOk` など）として流れる。独自の演算子や生成関数は [組み込みのものと同じファクトリ](/mono/synstate/ja/guides/custom-operators-and-creators/) で書ける。
 
 **最適:** シンプルな共有ステートと高度な非同期パイプラインの両方を単一の一貫した API で必要とするプロジェクト。
 

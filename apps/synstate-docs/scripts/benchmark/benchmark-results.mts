@@ -65,6 +65,35 @@ export const formatBenchmarkCell = (
     : (`${value.toFixed(1)} ms` as const);
 
 /**
+ * Renders a single-point scenario's rows as the Markdown table the docs embed.
+ *
+ * The last column divides each median by SynState's, so that a reader of a
+ * table with no chart beside it sees how many times as long each library took
+ * without doing the division — the figure the home page quotes from the
+ * derived chain. SynState's row reads `1.00×`.
+ */
+export const renderStatsTable = (rows: readonly BenchmarkStats[]): string => {
+  const synState = rows.find((r) => plainLabel(r.label) === 'SynState');
+
+  return [
+    '| Library | Median (ms) | Min (ms) | Max (ms) | p95 (ms) | Ops/sec | vs SynState |',
+    '| --- | --: | --: | --: | --: | --: | --: |',
+    ...rows.map(
+      (r) =>
+        `| ${r.label} | ${r.median.toFixed(2)} | ${r.min.toFixed(2)} | ${r.max.toFixed(2)} | ${r.p95.toFixed(2)} | ${formatInteger(r.opsPerSec)} | ${synState === undefined ? '—' : ratio(r.median, synState.median)} |`,
+    ),
+  ].join('\n');
+};
+
+const formatInteger = (n: number): string =>
+  n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+
+const ratio = (value: number, reference: number): string =>
+  Num.isNonZero(reference)
+    ? (`${Num.div(value, reference).toFixed(2)}×` as const)
+    : '—';
+
+/**
  * `BenchmarkMeta` as written, with the environment {@link
  * writeBenchmarkResults} stamps on.
  *
