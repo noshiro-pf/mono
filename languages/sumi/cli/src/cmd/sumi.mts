@@ -106,6 +106,12 @@ const report = (result: CheckResult): number => {
     console.error(`${invalid.filename}(${invalid.line}): ${invalid.message}`);
   }
 
+  for (const directive of result.silencingDirectives) {
+    console.error(
+      `${directive.filename}(${directive.line}): ${directive.message}`,
+    );
+  }
+
   if (result.lint.stderr.trim() !== '') {
     console.error(result.lint.stderr.trimEnd());
   }
@@ -123,7 +129,7 @@ const report = (result: CheckResult): number => {
   console.error(
     result.ok
       ? `sumi check: ${result.fileCount} files, no problems.`
-      : `sumi check: ${result.fileCount} files, ${result.typeCheck.diagnostics.length} type errors, ${result.lint.diagnostics.length + result.checker.diagnostics.length} lint problems, ${result.unusedExpectErrors.length} unused @sumi-expect-error, ${result.invalidExpectErrors.length} invalid @sumi-expect-error.`,
+      : `sumi check: ${result.fileCount} files, ${result.typeCheck.diagnostics.length} type errors, ${result.lint.diagnostics.length + result.checker.diagnostics.length} lint problems, ${result.unusedExpectErrors.length} unused @sumi-expect-error, ${result.invalidExpectErrors.length} invalid @sumi-expect-error, ${result.silencingDirectives.length} oxlint-disable directives silencing a Sumi rule.`,
   );
 
   return result.ok ? 0 : 1;

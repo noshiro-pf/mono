@@ -610,7 +610,7 @@
     - **ESLint と Sumi が同じ行を見る場合は両方のコメントが要る。** ESLint の `eslint-disable-next-line` は直後の行にしか掛からない。マーカーが直後の行に掛かるままだと、2 つを同じ行の上に重ねられない（それが #2097 のファイル単位マーカーの理由だった）。マーカーを先に書き、指示の行を飛ばして同じ行に掛かるようにすれば、両方とも行単位で書ける。順序を逆にすると ESLint の指示がマーカー行に掛かり、ESLint が未使用の指示として報告するので、誤りは黙って残らない。
 - **帰結**:
     - synstate の 7 ファイルの `@sumi-expect-error-file` は行単位のマーカーに置き換えた。他の 16 件にもマーカーを足した。
-    - `oxlint-disable*` は oxlint 自身の指示なので設定では止められず、今も Sumi の診断を黙らせられる。D-51 はこれを `@sumi-expect-error` で置き換える前提だが、禁止する仕組みはまだ無い。
+    - `oxlint-disable*` は oxlint 自身の指示なので設定では止められない。そこで `sumi check` は、Sumi のプリセットのルールに掛かる `oxlint-disable*`（ルール名を書かないもの、または末尾の部分がプリセットのルール名と一致するルールを挙げるもの）を報告して失敗にする（2026-10-22、#2200）。プリセット外のルールだけを挙げるものは残す。ESLint から oxlint に移したルールはそれで止めるため（`tools/configs/oxlint-rules.mts`）。コメントは行単位の文字列として探すので、そう読める文字列リテラルも報告される（報告する側に倒れる）。
     - `total-functions/no-unsafe-type-assertion` は `typescript/no-unsafe-type-assertion` より厳しいわけではない（2026-09-28 に同じ入力で比較）。前者だけが報告するのは `any as unknown`・`unknown as unknown`・新しいオブジェクトリテラルの upcast（excess property による誤検知）で、`any` の方は `banned-syntax/no-any` が既に禁じている。逆に後者だけが報告するのは `ReadonlySet<any> as ReadonlySet<string>` と `as any`。Sumi に同等のルールを足す必要は無い。
 
 ## D-61: Sumi sugar / Sumi refined は三項演算子を持たず、if 式で置き換える

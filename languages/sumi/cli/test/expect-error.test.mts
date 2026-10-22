@@ -291,6 +291,32 @@ describe(applyExpectErrors, () => {
     );
   });
 
+  test('reports an oxlint-disable directive that silences a preset rule', () => {
+    // oxlint applies the directive itself, so the diagnostic never reaches
+    // this pass; the directive is what is left to report.
+    withFile(
+      dedent`
+        // oxlint-disable-next-line no-var
+        var x = 1;
+        // oxlint-disable-next-line no-console
+        console.log(x);
+      `,
+      (file) => {
+        const result = applyExpectErrors([file], [], []);
+
+        assert.deepStrictEqual(
+          result.silencingDirectives.map(({ filename, line }) => ({
+            filename,
+            line,
+          })),
+          [{ filename: file, line: 1 }],
+        );
+
+        assert.deepStrictEqual(result.invalid, []);
+      },
+    );
+  });
+
   test('an unreadable file is skipped rather than throwing', () => {
     const missing = path.join(os.tmpdir(), 'sumi-expect-does-not-exist.mts');
 

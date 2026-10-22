@@ -6,6 +6,7 @@ import { Result } from 'ts-data-forge';
 import {
   applyExpectErrors,
   type InvalidExpectError,
+  type SilencingDirective,
   type UnusedExpectError,
 } from './expect-error.mjs';
 import { showConfig } from './show-config.mjs';
@@ -23,8 +24,9 @@ import {
  *   entries. Nothing else ran — a check under overridden options is not the
  *   language's check (D-7 / D-40).
  * - `checked`: the type check, the oxlint preset and the type-aware checker
- *   ran; `ok` is whether all three were clean and every `@sumi-expect-error`
- *   was well-formed and answered.
+ *   ran; `ok` is whether all three were clean, every `@sumi-expect-error`
+ *   was well-formed and answered, and no `oxlint-disable*` silenced a Sumi
+ *   rule.
  */
 export type CheckResult = Readonly<
   | {
@@ -62,6 +64,12 @@ export type CheckResult = Readonly<
 
       /** Marker-like comments that are not markers, and so suppress nothing. */
       invalidExpectErrors: readonly InvalidExpectError[];
+
+      /**
+       * `oxlint-disable*` comments that silence a Sumi rule, which only a
+       * marker may answer (D-60).
+       */
+      silencingDirectives: readonly SilencingDirective[];
     }
 >;
 
@@ -140,6 +148,7 @@ export const runCheck = (project: string): Result<CheckResult, string> => {
       expectErrors.checker.length === 0 &&
       expectErrors.unused.length === 0 &&
       expectErrors.invalid.length === 0 &&
+      expectErrors.silencingDirectives.length === 0 &&
       Result.isOk(checkerResult),
     fileCount: config.value.files.length,
     typeCheck: typeCheckResult,
@@ -150,6 +159,7 @@ export const runCheck = (project: string): Result<CheckResult, string> => {
     },
     unusedExpectErrors: expectErrors.unused,
     invalidExpectErrors: expectErrors.invalid,
+    silencingDirectives: expectErrors.silencingDirectives,
   });
 };
 
