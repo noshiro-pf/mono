@@ -3,6 +3,7 @@ import {
   eslintConfigForNodeJs,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
+  typescriptEslintRules,
   type FlatConfig,
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
@@ -22,6 +23,35 @@ export default [
   eslintPluginTsFortress.configs.recommended,
 
   eslintConfigForVitest(),
+
+  {
+    rules: defineKnownRules({
+      // The `JSX` namespace has to declare an `Element` type of its own.
+      '@typescript-eslint/no-shadow': [
+        'error',
+        {
+          ...typescriptEslintRules['@typescript-eslint/no-shadow'][1],
+          allow: ['Element'],
+        },
+      ],
+      // The DOM nodes a mount creates and moves are mutable by nature, as the
+      // elements the shared configuration already allows are.
+      '@typescript-eslint/prefer-readonly-parameter-types': [
+        'error',
+        {
+          ...typescriptEslintRules[
+            '@typescript-eslint/prefer-readonly-parameter-types'
+          ][1],
+          allow: [
+            ...typescriptEslintRules[
+              '@typescript-eslint/prefer-readonly-parameter-types'
+            ][1].allow,
+            { from: 'lib', name: ['ChildNode', 'Comment', 'Node', 'Text'] },
+          ],
+        },
+      ],
+    }),
+  },
 
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),
   {

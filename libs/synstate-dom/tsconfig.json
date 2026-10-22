@@ -9,7 +9,19 @@
     // `prepare` script writes do nothing without it. Set per package while the
     // repository migrates one at a time; it moves to the shared config once
     // every package passes. See docs/strict-typescript-lib-integration.md.
-    "libReplacement": true
+    "libReplacement": true,
+
+    "jsx": "react-jsx",
+    "jsxImportSource": "synstate-dom",
+    // `jsxImportSource` names this package itself, and the tests import it by
+    // name the way a consumer does. Mapped to the source so that they are
+    // checked against the code being edited rather than against the last
+    // build. See docs/workspace-package-linking.md.
+    "paths": {
+      "synstate-dom": ["./src/index.mts"],
+      "synstate-dom/jsx-runtime": ["./src/jsx-runtime.mts"],
+      "synstate-dom/jsx-dev-runtime": ["./src/jsx-dev-runtime.mts"]
+    }
   },
   "include": ["./src", "./test", "./scripts", "./configs"]
 }

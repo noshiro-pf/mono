@@ -11,6 +11,8 @@ A compiler-free, fine-grained UI library that binds [synstate](https://github.co
 - `Bindable<T>`: what a slot that takes data accepts, `InitializedObservable<T> | Constant<T> | View<T>`. A plain value is a type error.
 - `view(source, fn)`: an observable and a light transformation, bound without creating a node in the graph.
 - `mapBindable`, `derive` and `toObservable`: helpers for a component that receives a `Bindable`. Constants stay constants and never enter the graph.
+- The JSX runtime (`"jsx": "react-jsx"`, `"jsxImportSource": "synstate-dom"`): a JSX expression is a lazy `Mountable` description, and a component is called once, when it is mounted.
+- `render(App, container)`: mounts `App` in a root scope and returns the function that unmounts it. Elements take `ref` and children so far; attributes, properties and events come next.
 
 ## Naming
 

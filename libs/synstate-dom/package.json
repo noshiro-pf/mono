@@ -18,6 +18,18 @@
         "types": "./dist/index.d.mts",
         "default": "./dist/index.mjs"
       }
+    },
+    "./jsx-runtime": {
+      "import": {
+        "types": "./dist/jsx-runtime.d.mts",
+        "default": "./dist/jsx-runtime.mjs"
+      }
+    },
+    "./jsx-dev-runtime": {
+      "import": {
+        "types": "./dist/jsx-dev-runtime.d.mts",
+        "default": "./dist/jsx-dev-runtime.mjs"
+      }
     }
   },
   "module": "./dist/index.mjs",
@@ -33,10 +45,11 @@
     "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
     "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest:node run",
+    "check:test:browser": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest --project='Browser' run",
     "check:test:cov": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest:node run --coverage",
     "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "check-all": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-all.mts",
-    "fix:codemod": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --transformer convert-to-readonly '{src,test}/**/*.mts'",
+    "fix:codemod": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --transformer convert-to-readonly '{src,test}/**/*.{mts,tsx}'",
     "fix:fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
     "fix:fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
     "fix:fmt:full": "pnpm run z:prettier .",
@@ -44,7 +57,7 @@
     "fmt": "pnpm run fix:fmt",
     "gen": "run-s gen:index",
     "gen:index": "run-s gen:index:src fix:fmt",
-    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude \"internal/**\"",
+    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude jsx-runtime.mts --exclude jsx-dev-runtime.mts --exclude \"internal/**\"",
     "test": "pnpm run check:test",
     "test:cov:ui": "vite preview --outDir ./coverage",
     "test:ui": "pnpm run z:vitest:node --ui",
@@ -58,10 +71,12 @@
     "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
+    "@vitest/browser-playwright": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
+    "playwright": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
