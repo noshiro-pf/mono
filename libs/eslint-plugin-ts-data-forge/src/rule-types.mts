@@ -325,6 +325,21 @@ namespace PreferObjOverEntriesRoundTrip {
   export type RuleEntry = Linter.StringSeverity;
 }
 
+/**
+ * @description Replace `pipe(x).map(mapNullable(fn))` with `pipe(x).mapNullable(fn)`.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferPipeMapNullable {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
 export type EslintTsDataForgeRules = Readonly<{
   'ts-data-forge/prefer-canonical-array-slicing': PreferCanonicalArraySlicing.RuleEntry;
   'ts-data-forge/prefer-canonical-length-guard': PreferCanonicalLengthGuard.RuleEntry;
@@ -344,6 +359,7 @@ export type EslintTsDataForgeRules = Readonly<{
   'ts-data-forge/no-unnecessary-type-guard': NoUnnecessaryTypeGuard.RuleEntry;
   'ts-data-forge/prefer-comparison-over-nullish-guard': PreferComparisonOverNullishGuard.RuleEntry;
   'ts-data-forge/prefer-obj-over-entries-round-trip': PreferObjOverEntriesRoundTrip.RuleEntry;
+  'ts-data-forge/prefer-pipe-map-nullable': PreferPipeMapNullable.RuleEntry;
 }>;
 
 export type EslintTsDataForgeRulesOption = Readonly<{

@@ -28,6 +28,7 @@ const recommendedRules = {
   'ts-data-forge/no-unnecessary-type-guard': 'error',
   'ts-data-forge/prefer-comparison-over-nullish-guard': 'error',
   'ts-data-forge/prefer-obj-over-entries-round-trip': 'error',
+  'ts-data-forge/prefer-pipe-map-nullable': 'error',
 } as const satisfies ReadonlyRecord<
   `ts-data-forge/${keyof typeof tsDataForgeRules}`,
   'error'
