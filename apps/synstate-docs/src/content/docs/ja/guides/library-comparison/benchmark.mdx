@@ -764,7 +764,7 @@ SynState の `combine` は伝播順序が完全に解決されてから発行す
 
 - **RxJS** は典型的な $O(2^N)$ の指数関数的増大（二分岐）を示します。{/* bench:cascaded-diamond/rxjs-timeout-n-math */}$N=16${/* /bench */} でタイムアウト（ソース更新あたり {/* bench:cascaded-diamond/rxjs-timeout-emissions-math */}$2^{16} = 65536${/* /bench */} 回の発行 {/* bench:cascaded-diamond/updates-math */}$\times 100${/* /bench */} 回の更新）。{/* bench:cascaded-diamond/rxjs-last-measured-n-math */}$N=14${/* /bench */} では既に **{/* bench:cascaded-diamond/rxjs@last-measured */}4,101 ms{/* /bench */}** — SynState（{/* bench:cascaded-diamond/synstate@rxjs-last-measured */}0.9 ms{/* /bench */}）の約{/* bench:cascaded-diamond/rxjs-over-synstate@last-measured */}4,557{/* /bench */}倍です。
 - **MobX** は遅延 `computed` 評価により $N=20$ でも {/* bench:cascaded-diamond/mobx@max-n */}1.2 ms{/* /bench */} にとどまります。MobX の `computed` 値は依存が変化しても即座に再計算されず、実際に読み取られたときに初めて再計算されます。`reaction` は最終段の `computed` のみを読み取り、それがチェーンを遡って各 `computed` を1回ずつ遅延評価するため、更新あたりの総作業量は $O(N)$ で、オーバーヘッドも最小限です。これは[ディープチェーンスループットシナリオ](#シナリオ-ディープチェーンスループット)で MobX が SynState の約{/* bench:deep-chain/mobx-over-synstate@k1000-m200 */}53{/* /bench */}倍遅い結果と対照的です。あちらのシナリオでは `computed` ではなく `reaction` チェーン（push-based）を使用しており、パフォーマンス特性は使用する MobX プリミティブに大きく依存します。
-- **SynState** もほぼ横ばいです — $N=2$ で {/* bench:cascaded-diamond/synstate@min-n */}0.7 ms{/* /bench */}、$N=20$ で {/* bench:cascaded-diamond/synstate@max-n */}1.1 ms{/* /bench */}。各 `runBenchmark` 呼び出しはグラフの構築も含みます。更新は $3N+1$ 個の Observable を深さ順に1回ずつ訪れ、subscriber を1回だけ呼びます。新しい Observable は親と、親から受け継いだルートに登録されるだけなので、構築の際にルートまでの $2^N$ 本の経路をたどることはありません。祖先を訪れるのは本番環境以外で行われる循環依存チェックだけで、それも各祖先を1回ずつ訪れるだけです。
+- **SynState** もほぼ横ばいです — $N=2$ で {/* bench:cascaded-diamond/synstate@min-n */}0.7 ms{/* /bench */}、$N=20$ で {/* bench:cascaded-diamond/synstate@max-n */}1.1 ms{/* /bench */}。各 `runBenchmark` 呼び出しはグラフの構築も含みます。更新は $3N+1$ 個の Observable を深さ順に1回ずつ訪れ、subscriber を1回だけ呼びます。新しい Observable は親と、親から受け継いだルートに登録されるだけなので、構築の際にルートまでの $2^N$ 本の経路をたどることはありません。各祖先を1回ずつ訪れる循環依存チェックは本番環境以外でしか行われないため、ここでは測定に含まれません。
 - **Jotai** もほぼ横ばいです — $N=2$ で {/* bench:cascaded-diamond/jotai@min-n */}2.3 ms{/* /bench */}、$N=20$ で {/* bench:cascaded-diamond/jotai@max-n */}14.3 ms{/* /bench */}。動的依存関係追跡により派生 atom が深さによらず更新あたり1回ずつ再計算されるためです。$N=20$ では SynState の約{/* bench:cascaded-diamond/jotai-over-synstate@max-n */}13{/* /bench */}倍遅くなります。
 
 ## シナリオ： 条件付きファンアウト
@@ -1090,6 +1090,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 - **測定**： 20ラウンド。
 - $N$： 1ラウンドあたり $10^5$ 回の更新。
 - **タイミング**： `performance.now()`（サブミリ秒精度）。
+- **ビルド**： SynState を含むすべてのライブラリを本番ビルド（`NODE_ENV=production`）で実行しています。アプリケーションが配布するのはこちらなので、開発時のみのチェックは測定に含まれません。例外は Valtio で、その ES モジュールビルドは `import.meta.env.MODE` を読みますが、これはバンドラが定義するもので Node は定義しません。残る開発時チェックは購読の作成時とネストしたプロキシの接続時にだけ実行され、更新ごとには実行されません。
 - **統計**： 中央値、最小、最大、p95、ops/sec（中央値に基づく）。最初の3シナリオには、各中央値を SynState の中央値で割った「vs SynState」（SynState の何倍かかったか）も載せています。
 
 ### 公平性に関する注記
