@@ -1,10 +1,18 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional } from 'ts-data-forge';
-import { createAsyncChildObservable } from '../base/index.mjs';
+import { AsyncChildObservableClass } from '../class/index.mjs';
 import type {
   DebounceOperatorObservable,
   KeepInitialValueOperator,
   Observable,
   TimerId,
+  UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -100,71 +108,80 @@ export const debounce = <A,>(
 ): KeepInitialValueOperator<A, A> =>
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   ((parentObservable) =>
-    createDebounceObservable(
+    new DebounceObservableClass(
       parentObservable,
       milliSeconds,
     )) as KeepInitialValueOperator<A, A>;
 
-const createDebounceObservable = <A,>(
-  parentObservable: Observable<A>,
-  milliSeconds: number,
-): DebounceOperatorObservable<A> =>
-  createAsyncChildObservable(
-    {
+class DebounceObservableClass<A>
+  extends AsyncChildObservableClass<A, readonly [A]>
+  implements DebounceOperatorObservable<A>
+{
+  readonly #milliSeconds: number;
+  #mut_timerId: TimerId | undefined;
+
+  /** The value the running timer will pass on. */
+  #mut_pending: Optional<A>;
+
+  constructor(parentObservable: Observable<A>, milliSeconds: number) {
+    super({
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-    },
-    ({ startUpdate, onComplete }) => {
-      let mut_timerId: TimerId | undefined = undefined;
+    });
 
-      /** The value the running timer will pass on. */
-      let mut_pending: Optional<A> = Optional.none;
+    this.#mut_timerId = undefined;
 
-      const resetTimer = (): void => {
-        if (mut_timerId !== undefined) {
-          clearTimeout(mut_timerId);
+    this.#mut_pending = Optional.none;
 
-          mut_timerId = undefined;
-        }
+    this.#milliSeconds = milliSeconds;
 
-        mut_pending = Optional.none;
-      };
+    this.attach();
+  }
 
-      onComplete(resetTimer);
+  #resetTimer(): void {
+    if (this.#mut_timerId !== undefined) {
+      clearTimeout(this.#mut_timerId);
 
-      return {
-        tryUpdate: (updateToken) => {
-          const sn = parentObservable.getSnapshot();
+      this.#mut_timerId = undefined;
+    }
 
-          if (
-            parentObservable.updateToken !== updateToken ||
-            Optional.isNone(sn)
-          ) {
-            return; // skip update
-          }
+    this.#mut_pending = Optional.none;
+  }
 
-          resetTimer();
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-          mut_pending = sn;
+    const sn = par.getSnapshot();
 
-          // set timer
-          mut_timerId = setTimeout(() => {
-            mut_timerId = undefined;
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
 
-            mut_pending = Optional.none;
+    this.#resetTimer();
 
-            startUpdate(sn.value);
-          }, milliSeconds);
-        },
-        flush: () => {
-          const pending = mut_pending;
+    this.#mut_pending = sn;
 
-          resetTimer();
+    // set timer
+    this.#mut_timerId = setTimeout(() => {
+      this.#mut_timerId = undefined;
 
-          if (Optional.isSome(pending)) {
-            startUpdate(pending.value);
-          }
-        },
-      };
-    },
-  );
+      this.#mut_pending = Optional.none;
+
+      this.startUpdate(sn.value);
+    }, this.#milliSeconds);
+  }
+
+  protected override flush(): void {
+    const pending = this.#mut_pending;
+
+    this.#resetTimer();
+
+    if (Optional.isSome(pending)) {
+      this.startUpdate(pending.value);
+    }
+  }
+
+  protected override teardown(): void {
+    this.#resetTimer();
+  }
+}

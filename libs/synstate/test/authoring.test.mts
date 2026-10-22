@@ -1,4 +1,4 @@
-import { expectType, hasKey, isRecord, Optional } from 'ts-data-forge';
+import { expectType, isRecord, Optional } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import {
   combine,
@@ -426,7 +426,8 @@ describe('custom operators and creators', () => {
 
     expectType<'parents', keyof SyncChildObservable<number>>('<=');
 
-    // The members are still there at run time; only the types hide them.
-    assert.isTrue(isRecord(num$) && hasKey(num$, 'tryUpdate'));
+    // The members are still there at run time, on the observable's class;
+    // only the types hide them.
+    assert.isTrue(isRecord(num$) && Reflect.has(num$, 'tryUpdate'));
   });
 });

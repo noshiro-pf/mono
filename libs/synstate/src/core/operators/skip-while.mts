@@ -1,9 +1,17 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional, SafeUint, asSafeUint, pipe } from 'ts-data-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
+import { SyncChildObservableClass } from '../class/index.mjs';
 import type {
   DropInitialValueOperator,
   Observable,
   SkipWhileOperatorObservable,
+  UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -69,46 +77,56 @@ export const skipWhile =
     predicate: (value: A, index: SafeUint | -1) => boolean,
   ): DropInitialValueOperator<A, A> =>
   (parentObservable) =>
-    createSkipWhileObservable(parentObservable, predicate);
+    new SkipWhileObservableClass(parentObservable, predicate);
 
 /* implementation */
 
-const createSkipWhileObservable = <A,>(
-  parentObservable: Observable<A>,
-  predicate: (value: A, index: SafeUint | -1) => boolean,
-): SkipWhileOperatorObservable<A> =>
-  createSyncChildObservable(
-    {
+class SkipWhileObservableClass<A>
+  extends SyncChildObservableClass<A, readonly [A]>
+  implements SkipWhileOperatorObservable<A>
+{
+  readonly #predicate: (value: A, index: SafeUint | -1) => boolean;
+  #mut_index: SafeUint | -1;
+  #mut_isSkipping: boolean;
+
+  constructor(
+    parentObservable: Observable<A>,
+    predicate: (value: A, index: SafeUint | -1) => boolean,
+  ) {
+    super({
       parents: [parentObservable],
       initialValue: pipe(parentObservable.getSnapshot()).map((sn) =>
         Optional.isNone(sn) || predicate(sn.value, -1) ? Optional.none : sn,
       ).value,
-    },
-    ({ setNext }) => {
-      let mut_index: SafeUint | -1 = -1;
+    });
 
-      let mut_skipping = true;
+    this.#mut_index = -1;
 
-      return (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+    this.#mut_isSkipping = true;
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    this.#predicate = predicate;
 
-        mut_index =
-          mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, mut_index);
+    this.attach();
+  }
 
-        if (!predicate(sn.value, mut_index)) {
-          mut_skipping = false;
-        }
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        if (!mut_skipping) {
-          setNext(sn.value, updateToken);
-        }
-      };
-    },
-  );
+    const sn = par.getSnapshot();
+
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
+
+    this.#mut_index =
+      this.#mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, this.#mut_index);
+
+    if (!this.#predicate(sn.value, this.#mut_index)) {
+      this.#mut_isSkipping = false;
+    }
+
+    if (!this.#mut_isSkipping) {
+      this.setNext(sn.value, updateToken);
+    }
+  }
+}

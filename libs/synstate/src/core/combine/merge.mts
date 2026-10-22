@@ -1,6 +1,12 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
 import { Optional, expectType } from 'ts-data-forge';
 import type { ArrayElement, NonEmptyTuple } from 'ts-type-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
+import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import type {
   MergeObservable,
@@ -8,6 +14,7 @@ import type {
   NonEmptyUnknownList,
   Observable,
   SyncChildObservable,
+  UpdateToken,
   Wrap,
 } from '../types/index.mjs';
 
@@ -63,34 +70,37 @@ export const merge = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): MergeObservableRefined<OS> =>
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  createMergeObservable(parents) as MergeObservableRefined<OS>;
+  new MergeObservableClass(parents) as MergeObservableRefined<OS>;
 
-const createMergeObservable = <const P extends NonEmptyUnknownList>(
-  parents: Wrap<P>,
-): MergeObservable<P> =>
-  createSyncChildObservable<ArrayElement<P>, P>(
-    {
+class MergeObservableClass<const P extends NonEmptyUnknownList>
+  extends SyncChildObservableClass<ArrayElement<P>, P>
+  implements MergeObservable<P>
+{
+  constructor(parents: Wrap<P>) {
+    super({
       parents,
       initialValue: Optional.none,
-    },
-    ({ setNext }) =>
-      (updateToken) => {
-        const parentToUse = parents.find(
-          (o) =>
-            o.updateToken === updateToken && Optional.isSome(o.getSnapshot()),
-        );
+    });
 
-        if (parentToUse === undefined) {
-          return;
-        }
+    this.attach();
+  }
 
-        const nextValue =
-          // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-          Optional.unwrap(parentToUse.getSnapshot()) as ArrayElement<P>;
+  override tryUpdate(updateToken: UpdateToken): void {
+    const parentToUse = this.parents.find(
+      (o) => o.updateToken === updateToken && Optional.isSome(o.getSnapshot()),
+    );
 
-        setNext(nextValue, updateToken);
-      },
-  );
+    if (parentToUse === undefined) {
+      return;
+    }
+
+    const nextValue =
+      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+      Optional.unwrap(parentToUse.getSnapshot()) as ArrayElement<P>;
+
+    this.setNext(nextValue, updateToken);
+  }
+}
 
 if (import.meta.vitest !== undefined) {
   test('type test', () => {

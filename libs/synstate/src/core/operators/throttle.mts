@@ -1,10 +1,18 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional } from 'ts-data-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
+import { SyncChildObservableClass } from '../class/index.mjs';
 import type {
   KeepInitialValueOperator,
   Observable,
   ThrottleOperatorObservable,
   TimerId,
+  UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -90,50 +98,60 @@ export const throttle = <A,>(
 ): KeepInitialValueOperator<A, A> =>
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   ((parentObservable) =>
-    createThrottleObservable(
+    new ThrottleObservableClass(
       parentObservable,
       milliSeconds,
     )) as KeepInitialValueOperator<A, A>;
 
-const createThrottleObservable = <A,>(
-  parentObservable: Observable<A>,
-  milliSeconds: number,
-): ThrottleOperatorObservable<A> =>
-  createSyncChildObservable(
-    {
+class ThrottleObservableClass<A>
+  extends SyncChildObservableClass<A, readonly [A]>
+  implements ThrottleOperatorObservable<A>
+{
+  readonly #milliSeconds: number;
+  #mut_timerId: TimerId | undefined;
+  #mut_isSkipping: boolean;
+
+  constructor(parentObservable: Observable<A>, milliSeconds: number) {
+    super({
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-    },
-    ({ setNext, onComplete }) => {
-      let mut_timerId: TimerId | undefined = undefined;
+    });
 
-      let mut_isSkipping = false;
+    this.#mut_timerId = undefined;
 
-      onComplete(() => {
-        if (mut_timerId !== undefined) {
-          clearTimeout(mut_timerId);
-        }
-      });
+    this.#mut_isSkipping = false;
 
-      return (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+    this.#milliSeconds = milliSeconds;
 
-        if (
-          mut_isSkipping ||
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    this.attach();
+  }
 
-        setNext(sn.value, updateToken);
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        mut_isSkipping = true;
+    const sn = par.getSnapshot();
 
-        // set timer
-        mut_timerId = setTimeout(() => {
-          mut_isSkipping = false;
-        }, milliSeconds);
-      };
-    },
-  );
+    if (
+      this.#mut_isSkipping ||
+      par.updateToken !== updateToken ||
+      Optional.isNone(sn)
+    ) {
+      return; // skip update
+    }
+
+    this.setNext(sn.value, updateToken);
+
+    this.#mut_isSkipping = true;
+
+    // set timer
+    this.#mut_timerId = setTimeout(() => {
+      this.#mut_isSkipping = false;
+    }, this.#milliSeconds);
+  }
+
+  protected override teardown(): void {
+    if (this.#mut_timerId !== undefined) {
+      clearTimeout(this.#mut_timerId);
+    }
+  }
+}

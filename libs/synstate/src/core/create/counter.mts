@@ -1,6 +1,13 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { asSafeUint, Optional, SafeUint } from 'ts-data-forge';
 import type { PositiveSafeIntWithSmallInt } from 'ts-type-forge';
-import { createRootObservable } from '../base/index.mjs';
+import { RootObservableClass } from '../class/index.mjs';
 import type { CounterObservable, TimerId } from '../types/index.mjs';
 
 /**
@@ -65,77 +72,10 @@ export const counter = (
     times?: PositiveSafeIntWithSmallInt;
   }>,
 ): CounterObservable => {
-  let mut_counter: SafeUint = asSafeUint(0);
-
-  let mut_timerId0: TimerId | undefined = undefined;
-
-  let mut_timerId: TimerId | undefined = undefined;
-
-  let mut_isStarted = false;
-
-  let mut_emittedCount = 0;
-
-  const resetTimer = (): void => {
-    if (mut_timerId0 !== undefined) {
-      clearTimeout(mut_timerId0);
-    }
-
-    if (mut_timerId !== undefined) {
-      clearInterval(mut_timerId);
-    }
-  };
-
-  const observable = createRootObservable<
-    SafeUint,
-    Readonly<{ start: () => void }>
-  >(
-    { initialValue: Optional.none },
-    ({ startUpdate, isCompleted, complete, onComplete }) => {
-      onComplete(resetTimer);
-
-      return {
-        start: () => {
-          if (mut_isStarted) {
-            console.warn('cannot start twice');
-
-            return;
-          }
-
-          mut_isStarted = true;
-
-          if (isCompleted()) {
-            console.warn('cannot restart stopped CounterObservable');
-
-            return;
-          }
-
-          const emit = (value: SafeUint): void => {
-            startUpdate(value);
-
-            mut_emittedCount += 1;
-
-            if (
-              options?.times !== undefined &&
-              mut_emittedCount >= options.times
-            ) {
-              complete();
-            }
-          };
-
-          if (options?.emitInitial ?? true) {
-            mut_timerId0 = setTimeout(() => {
-              emit(mut_counter);
-            }, 0);
-          }
-
-          mut_timerId = setInterval(() => {
-            mut_counter = SafeUint.add(1, mut_counter);
-
-            emit(mut_counter);
-          }, intervalMilliSeconds);
-        },
-      };
-    },
+  const observable = new CounterObservableClass(
+    intervalMilliSeconds,
+    options?.emitInitial ?? true,
+    options?.times,
   );
 
   if (!(options?.startManually ?? false)) {
@@ -144,3 +84,89 @@ export const counter = (
 
   return observable;
 };
+
+class CounterObservableClass
+  extends RootObservableClass<SafeUint>
+  implements CounterObservable
+{
+  readonly #intervalMilliSeconds: number;
+  readonly #emitInitial: boolean;
+  readonly #times: PositiveSafeIntWithSmallInt | undefined;
+  #mut_counter: SafeUint;
+  #mut_emittedCount: number;
+  #mut_timerId0: TimerId | undefined;
+  #mut_timerId: TimerId | undefined;
+  #mut_isStarted: boolean;
+
+  constructor(
+    intervalMilliSeconds: number,
+    emitInitial: boolean,
+    times: PositiveSafeIntWithSmallInt | undefined,
+  ) {
+    super({ initialValue: Optional.none });
+
+    this.#intervalMilliSeconds = intervalMilliSeconds;
+
+    this.#emitInitial = emitInitial;
+
+    this.#times = times;
+
+    this.#mut_counter = asSafeUint(0);
+
+    this.#mut_emittedCount = 0;
+
+    this.#mut_timerId0 = undefined;
+
+    this.#mut_timerId = undefined;
+
+    this.#mut_isStarted = false;
+  }
+
+  #emit(value: SafeUint): void {
+    this.startUpdate(value);
+
+    this.#mut_emittedCount += 1;
+
+    if (this.#times !== undefined && this.#mut_emittedCount >= this.#times) {
+      this.complete();
+    }
+  }
+
+  start(): void {
+    if (this.#mut_isStarted) {
+      console.warn('cannot start twice');
+
+      return;
+    }
+
+    this.#mut_isStarted = true;
+
+    if (this.isCompleted) {
+      console.warn('cannot restart stopped CounterObservable');
+
+      return;
+    }
+
+    if (this.#emitInitial) {
+      this.#mut_timerId0 = setTimeout(() => {
+        this.#emit(this.#mut_counter);
+      }, 0);
+    }
+
+    this.#mut_timerId = setInterval(() => {
+      this.#mut_counter = SafeUint.add(1, this.#mut_counter);
+
+      this.#emit(this.#mut_counter);
+    }, this.#intervalMilliSeconds);
+  }
+
+  protected override teardown(): void {
+    if (this.#mut_timerId0 !== undefined) {
+      clearTimeout(this.#mut_timerId0);
+    }
+
+    if (this.#mut_timerId !== undefined) {
+      clearInterval(this.#mut_timerId);
+    }
+  }
+}

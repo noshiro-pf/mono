@@ -1,5 +1,12 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional } from 'ts-data-forge';
-import { createRootObservable } from '../base/index.mjs';
+import { RootObservableClass } from '../class/index.mjs';
 import type { TimerId, TimerObservable } from '../types/index.mjs';
 
 /**
@@ -44,46 +51,7 @@ export const timer = (
     startManually?: boolean;
   }>,
 ): TimerObservable => {
-  let mut_timerId: TimerId | undefined = undefined;
-
-  let mut_isStarted = false;
-
-  const resetTimer = (): void => {
-    if (mut_timerId !== undefined) {
-      clearTimeout(mut_timerId);
-    }
-  };
-
-  const observable = createRootObservable<0, Readonly<{ start: () => void }>>(
-    { initialValue: Optional.none },
-    ({ startUpdate, isCompleted, complete, onComplete }) => {
-      onComplete(resetTimer);
-
-      return {
-        start: () => {
-          if (mut_isStarted) {
-            console.warn('cannot start twice');
-
-            return;
-          }
-
-          mut_isStarted = true;
-
-          if (isCompleted()) {
-            console.warn('cannot restart stopped TimerObservable');
-
-            return;
-          }
-
-          mut_timerId = setTimeout(() => {
-            startUpdate(0);
-
-            complete();
-          }, milliSeconds);
-        },
-      };
-    },
-  );
+  const observable = new TimerObservableClass(milliSeconds);
 
   if (!(options?.startManually ?? false)) {
     observable.start();
@@ -91,3 +59,50 @@ export const timer = (
 
   return observable;
 };
+
+class TimerObservableClass
+  extends RootObservableClass<0>
+  implements TimerObservable
+{
+  readonly #milliSeconds: number;
+  #mut_timerId: TimerId | undefined;
+  #mut_isStarted: boolean;
+
+  constructor(milliSeconds: number) {
+    super({ initialValue: Optional.none });
+
+    this.#milliSeconds = milliSeconds;
+
+    this.#mut_timerId = undefined;
+
+    this.#mut_isStarted = false;
+  }
+
+  start(): void {
+    if (this.#mut_isStarted) {
+      console.warn('cannot start twice');
+
+      return;
+    }
+
+    this.#mut_isStarted = true;
+
+    if (this.isCompleted) {
+      console.warn('cannot restart stopped TimerObservable');
+
+      return;
+    }
+
+    this.#mut_timerId = setTimeout(() => {
+      this.startUpdate(0);
+
+      this.complete();
+    }, this.#milliSeconds);
+  }
+
+  protected override teardown(): void {
+    if (this.#mut_timerId !== undefined) {
+      clearTimeout(this.#mut_timerId);
+    }
+  }
+}

@@ -21,6 +21,14 @@ export default defineViteConfig({
     provider: playwright(),
     includeSource: ['src/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
+    exclude: [
+      '**/*.d.mts',
+      '**/index.mts',
+      'src/entry-point.mts',
+      // `vi.resetModules` does not give a page a second copy of a module, so
+      // the two copies this file needs exist only in Node.js.
+      'test/duplicate-copies.test.mts',
+    ],
     optimizeDepsInclude: ['jotai', 'rxjs', 'ts-data-forge > @sindresorhus/is'],
     testTimeout: 30_000,
   },

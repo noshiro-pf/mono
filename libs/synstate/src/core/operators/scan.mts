@@ -1,8 +1,16 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional } from 'ts-data-forge';
-import { createInitializedSyncChildObservable } from '../base/index.mjs';
+import { InitializedSyncChildObservableClass } from '../class/index.mjs';
 import type {
   Observable,
   ScanOperatorObservable,
+  UpdateToken,
   WithInitialValueOperator,
 } from '../types/index.mjs';
 
@@ -61,32 +69,41 @@ export const scan =
     initialValue: B,
   ): WithInitialValueOperator<A, B> =>
   (parentObservable) =>
-    createScanObservable(parentObservable, reducer, initialValue);
+    new ScanObservableClass(parentObservable, reducer, initialValue);
 
-const createScanObservable = <A, B>(
-  parentObservable: Observable<A>,
-  reducer: (acc: B, curr: A) => B,
-  initialValue: B,
-): ScanOperatorObservable<A, B> =>
-  createInitializedSyncChildObservable(
-    {
+class ScanObservableClass<A, B>
+  extends InitializedSyncChildObservableClass<B, readonly [A]>
+  implements ScanOperatorObservable<A, B>
+{
+  readonly #reducer: (acc: B, curr: A) => B;
+
+  constructor(
+    parentObservable: Observable<A>,
+    reducer: (acc: B, curr: A) => B,
+    initialValue: B,
+  ) {
+    super({
       parents: [parentObservable],
       initialValue: Optional.some(initialValue),
-    },
-    ({ setNext, getSnapshot }) =>
-      (updateToken) => {
-        const psn = parentObservable.getSnapshot();
+    });
 
-        const sn = getSnapshot();
+    this.#reducer = reducer;
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(psn) ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    this.attach();
+  }
 
-        setNext(reducer(sn.value, psn.value), updateToken);
-      },
-  );
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
+
+    const psn = par.getSnapshot();
+
+    if (par.updateToken !== updateToken || Optional.isNone(psn)) {
+      return; // skip update
+    }
+
+    this.setNext(
+      this.#reducer(this.getSnapshot().value, psn.value),
+      updateToken,
+    );
+  }
+}

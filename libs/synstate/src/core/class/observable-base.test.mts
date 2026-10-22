@@ -10,8 +10,8 @@ import type {
 import {
   createAsyncChildObservable,
   createSyncChildObservable,
+  createTryUpdateNotImplemented,
 } from './create-child-observable.mjs';
-import { createTryUpdateNotImplemented } from './create-observable-base.mjs';
 import { createRootObservable } from './create-root-observable.mjs';
 
 /**

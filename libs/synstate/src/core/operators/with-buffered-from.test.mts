@@ -1,4 +1,4 @@
-import { toNode } from '../base/index.mjs';
+import { toNode } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import { withBufferedFrom } from './with-buffered-from.mjs';
 

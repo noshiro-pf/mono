@@ -113,7 +113,7 @@ SynState が最小版に加えているものも、この構図を変えませ�
 - `map` や `combine` のような派生 Observable は `subscribe` で連鎖しているわけではありません。生成時に、自分の祖先にあたるルートに更新関数を登録し、ルートはそれらを深さ順にソートしたリストとして保持します。ルートの `next` はそのリストを先頭から一度だけ順に辿り、これによって SynState はグリッチを回避しています（[SynState がグリッチを解決した方法](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/)）。リストはグラフの構築時に作られ、それを辿るのはやはり同期的なループです。
 - 完了処理（`complete`）も扱います。
 
-中核は [`createObservableBaseHandle`](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/base/create-observable-base.mts) です。`subscribe` は subscriber の `Map` に追加し、`setNext` は値を保存して各 subscriber を `for` ループで呼び出します。
+中核は [`ObservableBaseClass`](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/class/observable-base-class.mts) です。`subscribe` は subscriber の `Set` に追加し、`setNext` は値を保存して各 subscriber を `for` ループで呼び出します。
 
 ## 非同期性はどこから来るのか
 

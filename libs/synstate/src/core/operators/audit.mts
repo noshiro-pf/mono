@@ -1,10 +1,18 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional } from 'ts-data-forge';
-import { createAsyncChildObservable } from '../base/index.mjs';
+import { AsyncChildObservableClass } from '../class/index.mjs';
 import type {
   AuditOperatorObservable,
   KeepInitialValueOperator,
   Observable,
   TimerId,
+  UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -109,67 +117,78 @@ export const audit = <A,>(
 ): KeepInitialValueOperator<A, A> =>
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   ((parentObservable) =>
-    createAuditObservable(
+    new AuditObservableClass(
       parentObservable,
       milliSeconds,
     )) as KeepInitialValueOperator<A, A>;
 
-const createAuditObservable = <A,>(
-  parentObservable: Observable<A>,
-  milliSeconds: number,
-): AuditOperatorObservable<A> =>
-  createAsyncChildObservable(
-    {
+class AuditObservableClass<A>
+  extends AsyncChildObservableClass<A, readonly [A]>
+  implements AuditOperatorObservable<A>
+{
+  readonly #milliSeconds: number;
+
+  /** Set while a window is open; its end passes on the latest value. */
+  #mut_timerId: TimerId | undefined;
+
+  constructor(parentObservable: Observable<A>, milliSeconds: number) {
+    super({
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-    },
-    ({ startUpdate, onComplete }) => {
-      /** Set while a window is open; its end passes on the latest value. */
-      let mut_timerId: TimerId | undefined = undefined;
+    });
 
-      /** Ends the open window, passing on the latest value of the source. */
-      const emitLatest = (): void => {
-        mut_timerId = undefined;
+    this.#mut_timerId = undefined;
 
-        const sn = parentObservable.getSnapshot();
+    this.#milliSeconds = milliSeconds;
 
-        if (Optional.isSome(sn)) {
-          startUpdate(sn.value);
-        }
-      };
+    this.attach();
+  }
 
-      onComplete(() => {
-        if (mut_timerId === undefined) {
-          return;
-        }
+  /** Ends the open window, passing on the latest value of the source. */
+  #emitLatest(): void {
+    this.#mut_timerId = undefined;
 
-        clearTimeout(mut_timerId);
+    const sn = this.parents[0].getSnapshot();
 
-        mut_timerId = undefined;
-      });
+    if (Optional.isSome(sn)) {
+      this.startUpdate(sn.value);
+    }
+  }
 
-      return {
-        tryUpdate: (updateToken) => {
-          if (
-            mut_timerId !== undefined ||
-            parentObservable.updateToken !== updateToken ||
-            Optional.isNone(parentObservable.getSnapshot())
-          ) {
-            return; // skip update
-          }
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-          // set timer
-          mut_timerId = setTimeout(emitLatest, milliSeconds);
-        },
-        flush: () => {
-          if (mut_timerId === undefined) {
-            return;
-          }
+    if (
+      this.#mut_timerId !== undefined ||
+      par.updateToken !== updateToken ||
+      Optional.isNone(par.getSnapshot())
+    ) {
+      return; // skip update
+    }
 
-          clearTimeout(mut_timerId);
+    // set timer
+    this.#mut_timerId = setTimeout(() => {
+      this.#emitLatest();
+    }, this.#milliSeconds);
+  }
 
-          emitLatest();
-        },
-      };
-    },
-  );
+  protected override flush(): void {
+    if (this.#mut_timerId === undefined) {
+      return;
+    }
+
+    clearTimeout(this.#mut_timerId);
+
+    this.#emitLatest();
+  }
+
+  protected override teardown(): void {
+    if (this.#mut_timerId === undefined) {
+      return;
+    }
+
+    clearTimeout(this.#mut_timerId);
+
+    this.#mut_timerId = undefined;
+  }
+}

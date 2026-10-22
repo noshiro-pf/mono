@@ -1,8 +1,16 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional, pipe } from 'ts-data-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
+import { SyncChildObservableClass } from '../class/index.mjs';
 import type {
   DropInitialValueOperator,
   Observable,
+  UpdateToken,
   WithCurrentValueFromOperatorObservable,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
@@ -68,7 +76,7 @@ export const withCurrentValueFrom =
     observable: Observable<B>,
   ): DropInitialValueOperator<A, readonly [A, B]> =>
   (parentObservable) =>
-    createWithCurrentValueFromObservable(parentObservable, observable);
+    new WithCurrentValueFromObservableClass(parentObservable, observable);
 
 /**
  * Alias for `withCurrentValueFrom`.
@@ -76,12 +84,14 @@ export const withCurrentValueFrom =
  */
 export const withLatestFrom = withCurrentValueFrom;
 
-const createWithCurrentValueFromObservable = <A, B>(
-  parentObservable: Observable<A>,
-  observable: Observable<B>,
-): WithCurrentValueFromOperatorObservable<A, B> =>
-  createSyncChildObservable<readonly [A, B], readonly [A]>(
-    {
+class WithCurrentValueFromObservableClass<A, B>
+  extends SyncChildObservableClass<readonly [A, B], readonly [A]>
+  implements WithCurrentValueFromOperatorObservable<A, B>
+{
+  readonly #observable: Observable<B>;
+
+  constructor(parentObservable: Observable<A>, observable: Observable<B>) {
+    super({
       parents: [parentObservable],
       depth: 1 + maxDepth([parentObservable, observable]),
       initialValue: pipe({
@@ -92,24 +102,28 @@ const createWithCurrentValueFromObservable = <A, B>(
           ? Optional.none
           : Optional.some([par.value, me.value] as const),
       ).value,
-    },
-    ({ setNext }) =>
-      (updateToken) => {
-        const ps = parentObservable.getSnapshot();
+    });
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(ps)
-        ) {
-          return; // skip update
-        }
+    this.#observable = observable;
 
-        const curr = observable.getSnapshot();
+    this.attach();
+  }
 
-        if (Optional.isNone(curr)) {
-          return; // skip update
-        }
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        setNext([ps.value, curr.value], updateToken);
-      },
-  );
+    const ps = par.getSnapshot();
+
+    if (par.updateToken !== updateToken || Optional.isNone(ps)) {
+      return; // skip update
+    }
+
+    const curr = this.#observable.getSnapshot();
+
+    if (Optional.isNone(curr)) {
+      return; // skip update
+    }
+
+    this.setNext([ps.value, curr.value], updateToken);
+  }
+}

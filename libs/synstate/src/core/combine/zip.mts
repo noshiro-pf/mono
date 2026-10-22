@@ -1,6 +1,13 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Arr, Optional, createQueue, expectType } from 'ts-data-forge';
 import type { NonEmptyTuple, Tuple } from 'ts-type-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
+import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import { withInitialValue } from '../operators/index.mjs';
 import type {
@@ -71,93 +78,97 @@ export const zip = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): ZipObservableRefined<OS> =>
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  createZipObservable(parents) as unknown as ZipObservableRefined<OS>;
+  new ZipObservableClass(parents) as unknown as ZipObservableRefined<OS>;
 
-const createZipObservable = <const A extends NonEmptyUnknownList>(
-  parents: Wrap<A>,
-): ZipObservable<A> => {
-  const parentsValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
-    parents,
-    (p) => p.getSnapshot(),
-  );
+class ZipObservableClass<const A extends NonEmptyUnknownList>
+  extends SyncChildObservableClass<A, A>
+  implements ZipObservable<A>
+{
+  readonly #queues: TupleToQueueTuple<A>;
 
-  // The annotation on `initialValue` is what replaces the type assertion.
-  // `Arr.map` carries a single result element type, so it reports `A[number]`
-  // at every position, and `Tuple.MapTo<A[number], A>` — the uniform mapping
-  // — is *not* assignable back to `A`. The positional
-  // `Readonly<{ [K in keyof A]: A[K] }>` is, and TypeScript accepts the
-  // uniform result into it because the two mapped types share `keyof A`. So
-  // it is the annotation, not an assertion, that records the position-wise
-  // fact the checker cannot derive on its own.
-  const initialValue: Optional<Readonly<{ [K in keyof A]: A[K] }>> = Arr.every(
-    parentsValues,
-    Optional.isSome,
-  )
-    ? Optional.some(Arr.map(parentsValues, (c) => c.value))
-    : Optional.none;
+  /**
+   * The token of each parent's latest value that zip has taken in, so that a
+   * value a parent emits in the update it completes in — its `tryComplete`
+   * reaches zip before its `tryUpdate` does — still counts as queued.
+   * Written in place, one slot per parent, on every update that reaches zip.
+   */
+  // @sumi-expect-error readonly/require-readonly-type
+  readonly #mut_takenTokens: UpdateToken[];
 
-  return createSyncChildObservable<A, A>(
-    { parents, initialValue },
-    ({ setNext, complete }) => {
-      const queues: TupleToQueueTuple<A> = Arr.map(parents, () =>
-        createQueue(),
-      );
+  constructor(parents: Wrap<A>) {
+    const parentsValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
+      parents,
+      (p) => p.getSnapshot(),
+    );
 
-      // The token of each parent's latest value that zip has taken in, so
-      // that a value a parent emits in the update it completes in — its
-      // `tryComplete` reaches zip before its `tryUpdate` does — still counts
-      // as queued.
-      const mut_takenTokens: UpdateToken[] = Array.from(
-        parents,
-        (p) => p.updateToken,
-      );
+    // The annotation on `initialValue` is what replaces the type assertion.
+    // `Arr.map` carries a single result element type, so it reports `A[number]`
+    // at every position, and `Tuple.MapTo<A[number], A>` — the uniform mapping
+    // — is *not* assignable back to `A`. The positional
+    // `Readonly<{ [K in keyof A]: A[K] }>` is, and TypeScript accepts the
+    // uniform result into it because the two mapped types share `keyof A`. So
+    // it is the annotation, not an assertion, that records the position-wise
+    // fact the checker cannot derive on its own.
+    const initialValue: Optional<Readonly<{ [K in keyof A]: A[K] }>> =
+      Arr.every(parentsValues, Optional.isSome)
+        ? Optional.some(Arr.map(parentsValues, (c) => c.value))
+        : Optional.none;
 
-      // No tuple can be completed any more once a completed source has
-      // nothing left to pair (#2343).
-      const canEmitNoMore = (): boolean =>
-        parents.some(
-          (par, index) =>
-            par.isCompleted &&
-            queues[index]?.isEmpty === true &&
-            (par.updateToken === mut_takenTokens[index] ||
-              Optional.isNone(par.getSnapshot())),
-        );
+    super({ parents, initialValue });
 
-      return {
-        tryUpdate: (updateToken) => {
-          for (const [index, par] of parents.entries()) {
-            const sn = par.getSnapshot();
+    this.#queues = Arr.map(parents, () => createQueue());
 
-            if (!(par.updateToken === updateToken && Optional.isSome(sn))) {
-              continue;
-            }
+    this.#mut_takenTokens = Array.from(parents, (p) => p.updateToken);
 
-            queues[index]?.enqueue(sn.value);
+    this.attach();
+  }
 
-            mut_takenTokens[index] = updateToken;
-          }
+  override tryUpdate(updateToken: UpdateToken): void {
+    const queues = this.#queues;
 
-          if (queues.some((list) => list.isEmpty)) {
-            return;
-          }
+    for (const [index, par] of this.parents.entries()) {
+      const sn = par.getSnapshot();
 
-          const nextValue =
-            // `Arr.map` has a single result element type, so it reports
-            // `A[number] | undefined` per position rather than `A[P]`.
-            // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-            Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
+      if (!(par.updateToken === updateToken && Optional.isSome(sn))) {
+        continue;
+      }
 
-          setNext(nextValue, updateToken);
+      queues[index]?.enqueue(sn.value);
 
-          if (canEmitNoMore()) {
-            complete();
-          }
-        },
-        canEmitNoMore,
-      };
-    },
-  );
-};
+      this.#mut_takenTokens[index] = updateToken;
+    }
+
+    if (queues.some((list) => list.isEmpty)) {
+      return;
+    }
+
+    const nextValue =
+      // `Arr.map` has a single result element type, so it reports
+      // `A[number] | undefined` per position rather than `A[P]`.
+      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+      Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
+
+    this.setNext(nextValue, updateToken);
+
+    if (this.canEmitNoMore()) {
+      this.complete();
+    }
+  }
+
+  /**
+   * No tuple can be completed any more once a completed source has nothing
+   * left to pair (#2343).
+   */
+  override canEmitNoMore(): boolean {
+    return this.parents.some(
+      (par, index) =>
+        par.isCompleted &&
+        this.#queues[index]?.isEmpty === true &&
+        (par.updateToken === this.#mut_takenTokens[index] ||
+          Optional.isNone(par.getSnapshot())),
+    );
+  }
+}
 
 if (import.meta.vitest !== undefined) {
   test('type test', () => {

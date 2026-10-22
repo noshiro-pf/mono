@@ -7,7 +7,7 @@ import {
 } from 'ts-data-forge';
 import type { FixedLengthTuple, StrictOmit } from 'ts-type-forge';
 import { observableBrand } from '../utils/index.mjs';
-import type { ObservableId, UpdateToken } from './id.mjs';
+import type { UpdateToken } from './id.mjs';
 import type { ObservableKind } from './observable-kind.mjs';
 import type { NonEmptyUnknownList, Subscription } from './types.mjs';
 
@@ -28,7 +28,6 @@ import type { NonEmptyUnknownList, Subscription } from './types.mjs';
 type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
   [observableBrand]: true;
 
-  id: ObservableId;
   kind: Kind;
 
   /**
@@ -224,11 +223,10 @@ export type WrapInitialized<A extends readonly unknown[]> = Readonly<{
 //   Op extends Operator<unknown, infer B> ? B : never;
 
 // Only the members meant for users are public; the rest live on the
-// internal node types in `core/base` (#2117).
+// internal node types in `core/class` (#2117).
 expectType<
   keyof Observable<unknown>,
   | typeof observableBrand
-  | 'id'
   | 'kind'
   | 'depth'
   | 'getSnapshot'

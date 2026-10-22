@@ -1,10 +1,18 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional } from 'ts-data-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
+import { SyncChildObservableClass } from '../class/index.mjs';
 import type {
   DropInitialValueOperator,
   Observable,
   SkipUntilOperatorObservable,
   Subscription,
+  UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -60,53 +68,60 @@ import type {
 export const skipUntil =
   <A,>(notifier: Observable<unknown>): DropInitialValueOperator<A, A> =>
   (parentObservable) =>
-    createSkipUntilObservable(parentObservable, notifier);
+    new SkipUntilObservableClass(parentObservable, notifier);
 
-const createSkipUntilObservable = <A,>(
-  parentObservable: Observable<A>,
-  notifier: Observable<unknown>,
-): SkipUntilOperatorObservable<A> =>
-  createSyncChildObservable<A, readonly [A]>(
-    {
+class SkipUntilObservableClass<A>
+  extends SyncChildObservableClass<A, readonly [A]>
+  implements SkipUntilOperatorObservable<A>
+{
+  #mut_isSkipping: boolean;
+  #mut_subscription: Subscription | undefined;
+
+  constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
+    super({
       parents: [parentObservable],
       initialValue: Optional.none,
-    },
-    ({ setNext, onComplete }) => {
-      // A notifier that already holds a value, or has completed, would call
-      // `stopSkipping` inside `subscribe`, before the subscription is stored.
-      let mut_isSkipping =
-        Optional.isNone(notifier.getSnapshot()) && !notifier.isCompleted;
+    });
 
-      let mut_subscription: Subscription | undefined = undefined;
+    // A notifier that already holds a value, or has completed, would stop
+    // the skipping inside `subscribe`, before the subscription is stored.
+    this.#mut_isSkipping =
+      Optional.isNone(notifier.getSnapshot()) && !notifier.isCompleted;
 
+    this.#mut_subscription = undefined;
+
+    if (this.#mut_isSkipping) {
       const stopSkipping = (): void => {
-        mut_isSkipping = false;
+        this.#mut_isSkipping = false;
 
-        mut_subscription?.unsubscribe();
+        this.#mut_subscription?.unsubscribe();
 
-        mut_subscription = undefined;
+        this.#mut_subscription = undefined;
       };
 
-      if (mut_isSkipping) {
-        mut_subscription = notifier.subscribe(stopSkipping, stopSkipping);
-      }
+      this.#mut_subscription = notifier.subscribe(stopSkipping, stopSkipping);
+    }
 
-      onComplete(() => {
-        mut_subscription?.unsubscribe();
-      });
+    this.attach();
+  }
 
-      return (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        if (
-          mut_isSkipping ||
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    const sn = par.getSnapshot();
 
-        setNext(sn.value, updateToken);
-      };
-    },
-  );
+    if (
+      this.#mut_isSkipping ||
+      par.updateToken !== updateToken ||
+      Optional.isNone(sn)
+    ) {
+      return; // skip update
+    }
+
+    this.setNext(sn.value, updateToken);
+  }
+
+  protected override teardown(): void {
+    this.#mut_subscription?.unsubscribe();
+  }
+}

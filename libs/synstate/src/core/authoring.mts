@@ -16,4 +16,4 @@ export {
   type RootObservableTools,
   type SyncChildObservableHooks,
   type SyncChildObservableTools,
-} from './base/index.mjs';
+} from './class/index.mjs';

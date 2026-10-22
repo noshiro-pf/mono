@@ -1,8 +1,17 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Arr, Optional, pipe } from 'ts-data-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
+import { SyncChildObservableClass } from '../class/index.mjs';
 import type {
   KeepInitialValueOperator,
   Observable,
+  Subscription,
+  UpdateToken,
   WithBufferedFromOperatorObservable,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
@@ -65,7 +74,7 @@ export const withBufferedFrom = <A, B>(
 ): KeepInitialValueOperator<A, readonly [A, readonly B[]]> =>
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   ((parentObservable) =>
-    createWithBufferedFromObservable(
+    new WithBufferedFromObservableClass(
       parentObservable,
       observable,
     )) as KeepInitialValueOperator<A, readonly [A, readonly B[]]>;
@@ -76,12 +85,15 @@ export const withBufferedFrom = <A, B>(
  */
 export const withBuffered = withBufferedFrom;
 
-const createWithBufferedFromObservable = <A, B>(
-  parentObservable: Observable<A>,
-  observable: Observable<B>,
-): WithBufferedFromOperatorObservable<A, B> =>
-  createSyncChildObservable<readonly [A, readonly B[]], readonly [A]>(
-    {
+class WithBufferedFromObservableClass<A, B>
+  extends SyncChildObservableClass<readonly [A, readonly B[]], readonly [A]>
+  implements WithBufferedFromOperatorObservable<A, B>
+{
+  readonly #subscription: Subscription;
+  #mut_bufferedValues: readonly B[];
+
+  constructor(parentObservable: Observable<A>, observable: Observable<B>) {
+    super({
       parents: [parentObservable],
       depth: 1 + maxDepth([parentObservable, observable]),
       initialValue: pipe({
@@ -95,33 +107,34 @@ const createWithBufferedFromObservable = <A, B>(
               Optional.isNone(me) ? [] : [me.value],
             ] as const),
       ).value,
-    },
-    ({ setNext, onComplete }) => {
-      let mut_bufferedValues: readonly B[] = [];
+    });
 
-      const subscription = observable.subscribe((value) => {
-        mut_bufferedValues = Arr.toPushed(mut_bufferedValues, value);
-      });
+    this.#mut_bufferedValues = [];
 
-      onComplete(() => {
-        subscription.unsubscribe();
+    this.#subscription = observable.subscribe((value) => {
+      this.#mut_bufferedValues = Arr.toPushed(this.#mut_bufferedValues, value);
+    });
 
-        mut_bufferedValues = [];
-      });
+    this.attach();
+  }
 
-      return (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    const sn = par.getSnapshot();
 
-        setNext([sn.value, mut_bufferedValues], updateToken);
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
 
-        mut_bufferedValues = [];
-      };
-    },
-  );
+    this.setNext([sn.value, this.#mut_bufferedValues], updateToken);
+
+    this.#mut_bufferedValues = [];
+  }
+
+  protected override teardown(): void {
+    this.#subscription.unsubscribe();
+
+    this.#mut_bufferedValues = [];
+  }
+}

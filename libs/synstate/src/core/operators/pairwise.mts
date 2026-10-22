@@ -1,10 +1,18 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
+import { SyncChildObservableClass } from '../class/index.mjs';
 import type {
   DropInitialValueOperator,
   Observable,
   PairwiseOperatorObservable,
+  UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -68,41 +76,43 @@ export const pairwise = <A,>(): DropInitialValueOperator<
 const f = <A,>(
   parentObservable: Observable<A>,
 ): Observable<FixedLengthTuple<2, A>> =>
-  createPairwiseObservable(parentObservable);
+  new PairwiseObservableClass(parentObservable);
 
-const createPairwiseObservable = <A,>(
-  parentObservable: Observable<A>,
-): PairwiseOperatorObservable<A> =>
-  createSyncChildObservable<FixedLengthTuple<2, A>, readonly [A]>(
-    {
+class PairwiseObservableClass<A>
+  extends SyncChildObservableClass<FixedLengthTuple<2, A>, readonly [A]>
+  implements PairwiseOperatorObservable<A>
+{
+  #mut_previousValue: Optional<A>;
+
+  constructor(parentObservable: Observable<A>) {
+    super({
       parents: [parentObservable],
       initialValue: Optional.none,
-    },
-    ({ setNext }) => {
-      // parentObservable.snapshot has value
-      // if parentObservable is InitializedObservable
-      let mut_previousValue: Optional<A> = parentObservable.getSnapshot();
+    });
 
-      return (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+    // parentObservable.snapshot has value
+    // if parentObservable is InitializedObservable
+    this.#mut_previousValue = parentObservable.getSnapshot();
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    this.attach();
+  }
 
-        const prev = mut_previousValue;
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        const cond = !Optional.isNone(prev);
+    const sn = par.getSnapshot();
 
-        // NOTE: Must update before setNext, otherwise Optional.isNone(prev) remains true when tryUpdate is called consecutively
-        mut_previousValue = parentObservable.getSnapshot();
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
 
-        if (cond) {
-          setNext([prev.value, sn.value], updateToken);
-        }
-      };
-    },
-  );
+    const prev = this.#mut_previousValue;
+
+    // NOTE: Must update before setNext, otherwise Optional.isNone(prev) remains true when tryUpdate is called consecutively
+    this.#mut_previousValue = sn;
+
+    if (Optional.isSome(prev)) {
+      this.setNext([prev.value, sn.value], updateToken);
+    }
+  }
+}

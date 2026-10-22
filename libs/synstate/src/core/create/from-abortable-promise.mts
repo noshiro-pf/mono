@@ -1,5 +1,12 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional, Result } from 'ts-data-forge';
-import { createRootObservable } from '../base/index.mjs';
+import { RootObservableClass } from '../class/index.mjs';
 import type { FromPromiseObservable } from '../types/index.mjs';
 
 /**
@@ -73,47 +80,54 @@ export const fromAbortablePromise = <A, E = unknown>(
   // @sumi-expect-error readonly/require-readonly-parameter
   factory: (signal: AbortSignal) => Promise<A>,
 ): FromPromiseObservable<A, E> =>
-  createRootObservable<Result<A, E>>(
-    { initialValue: Optional.none },
-    ({ startUpdate, isCompleted, complete, onComplete }) => {
-      const abortController = new AbortController();
+  new FromAbortablePromiseObservableClass(factory);
 
-      onComplete(() => {
-        abortController.abort();
+class FromAbortablePromiseObservableClass<A, E = unknown>
+  extends RootObservableClass<Result<A, E>>
+  implements FromPromiseObservable<A, E>
+{
+  readonly #abortController: AbortController;
+
+  // @sumi-expect-error readonly/require-readonly-parameter
+  constructor(factory: (signal: AbortSignal) => Promise<A>) {
+    super({ initialValue: Optional.none });
+
+    this.#abortController = new AbortController();
+
+    const promise = factory(this.#abortController.signal);
+
+    promise
+      .then((value) => {
+        if (this.isCompleted) {
+          return;
+        }
+
+        this.startUpdate(Result.ok(value));
+      })
+      .catch((error: unknown) => {
+        if (this.isCompleted) {
+          return;
+        }
+
+        // Silently ignore AbortError — it means the observable was
+        // intentionally completed (e.g., by switchMap).
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        this.startUpdate(
+          Result.err(
+            // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+            error as E,
+          ),
+        );
+      })
+      .finally(() => {
+        this.complete();
       });
+  }
 
-      const promise = factory(abortController.signal);
-
-      promise
-        .then((value) => {
-          if (isCompleted()) {
-            return;
-          }
-
-          startUpdate(Result.ok(value));
-        })
-        .catch((error: unknown) => {
-          if (isCompleted()) {
-            return;
-          }
-
-          // Silently ignore AbortError — it means the observable was
-          // intentionally completed (e.g., by switchMap).
-          if (error instanceof DOMException && error.name === 'AbortError') {
-            return;
-          }
-
-          startUpdate(
-            Result.err(
-              // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-              error as E,
-            ),
-          );
-        })
-        .finally(() => {
-          complete();
-        });
-
-      return {};
-    },
-  );
+  protected override teardown(): void {
+    this.#abortController.abort();
+  }
+}

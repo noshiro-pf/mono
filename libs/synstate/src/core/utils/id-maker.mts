@@ -1,31 +1,21 @@
-import type {
-  ObservableId,
-  SubscriberId,
-  UpdateToken,
-} from '../types/index.mjs';
+import type { UpdateToken } from '../types/index.mjs';
 
-function* idMaker<T extends symbol>(): Generator<T, T, T> {
-  let mut_i = 0;
-
-  while (true) {
-    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-    yield Symbol(mut_i.toString()) as T;
-
-    mut_i += 1;
-  }
-}
-
-const observableIdMaker = idMaker<ObservableId>();
-
-const subscriberIdMaker = idMaker<SubscriberId>();
-
-const updateTokenMaker = idMaker<UpdateToken>();
-
-export const issueObservableId = (): ObservableId =>
-  observableIdMaker.next().value;
-
-export const issueSubscriberId = (): SubscriberId =>
-  subscriberIdMaker.next().value;
-
+/**
+ * The token of a new update, which the update's root or async child passes to
+ * every node it reaches. A `Symbol` with no description, issued once per
+ * update and never per node, so its cost is spread over every node the
+ * update reaches. Unique without any counter, so the tokens of two copies of
+ * synstate in one program never coincide, and nothing is kept in a global.
+ */
 export const issueUpdateToken = (): UpdateToken =>
-  updateTokenMaker.next().value;
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  Symbol() as UpdateToken;
+
+/**
+ * The token a node holds before its first update: one value shared by every
+ * node of this copy, since no update is ever issued it, so creating a node
+ * issues nothing.
+ */
+export const notUpdatedYet: UpdateToken =
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  Symbol('synstate/not-updated-yet') as UpdateToken;

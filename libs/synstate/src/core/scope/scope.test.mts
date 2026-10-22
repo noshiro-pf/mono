@@ -1,7 +1,7 @@
 // cspell:ignore unstub
 import { expectType } from 'ts-data-forge';
 import type { Mock } from 'vitest';
-import { toNode } from '../base/index.mjs';
+import { toNode } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import { map } from '../operators/index.mjs';
 import type { Scope } from '../types/index.mjs';

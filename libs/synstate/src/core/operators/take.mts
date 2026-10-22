@@ -1,12 +1,20 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional, expectType } from 'ts-data-forge';
 import type { PositiveSafeIntWithSmallInt } from 'ts-type-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
+import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import type {
   DropInitialValueOperator,
   InitializedObservable,
   Observable,
   TakeOperatorObservable,
+  UpdateToken,
 } from '../types/index.mjs';
 import { withInitialValue } from './with-initial-value.mjs';
 
@@ -58,43 +66,52 @@ import { withInitialValue } from './with-initial-value.mjs';
 export const take =
   <A,>(n: PositiveSafeIntWithSmallInt): DropInitialValueOperator<A, A> =>
   (parentObservable) =>
-    createTakeObservable(parentObservable, n);
+    new TakeObservableClass(parentObservable, n);
 
 /* implementation */
 
-const createTakeObservable = <A,>(
-  parentObservable: Observable<A>,
-  n: PositiveSafeIntWithSmallInt,
-): TakeOperatorObservable<A> =>
-  createSyncChildObservable(
-    {
+class TakeObservableClass<A>
+  extends SyncChildObservableClass<A, readonly [A]>
+  implements TakeOperatorObservable<A>
+{
+  readonly #n: PositiveSafeIntWithSmallInt;
+  #mut_count: number;
+
+  constructor(parentObservable: Observable<A>, n: PositiveSafeIntWithSmallInt) {
+    super({
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-    },
-    ({ setNext, completeAfterPropagation }) => {
-      let mut_count = 0;
+    });
 
-      return (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+    this.#mut_count = 0;
 
-        if (
-          mut_count >= n ||
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    this.#n = n;
 
-        mut_count += 1;
+    this.attach();
+  }
 
-        setNext(sn.value, updateToken);
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        if (mut_count >= n) {
-          completeAfterPropagation();
-        }
-      };
-    },
-  );
+    const sn = par.getSnapshot();
+
+    if (
+      this.#mut_count >= this.#n ||
+      par.updateToken !== updateToken ||
+      Optional.isNone(sn)
+    ) {
+      return; // skip update
+    }
+
+    this.#mut_count += 1;
+
+    this.setNext(sn.value, updateToken);
+
+    if (this.#mut_count >= this.#n) {
+      this.completeAfterPropagation();
+    }
+  }
+}
 
 if (import.meta.vitest !== undefined) {
   test('type test', () => {

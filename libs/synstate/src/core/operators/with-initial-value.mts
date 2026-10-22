@@ -1,9 +1,16 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
 import { expectType, Optional } from 'ts-data-forge';
-import { createInitializedSyncChildObservable } from '../base/index.mjs';
+import { InitializedSyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import type {
   InitializedObservable,
   Observable,
+  UpdateToken,
   WithInitialValueOperator,
   WithInitialValueOperatorObservable,
 } from '../types/index.mjs';
@@ -56,31 +63,33 @@ import type {
 export const withInitialValue =
   <A, I = A>(initialValue: I): WithInitialValueOperator<A, A | I> =>
   (parentObservable) =>
-    createWithInitialValueObservable(parentObservable, initialValue);
+    new WithInitialValueObservableClass(parentObservable, initialValue);
 
-const createWithInitialValueObservable = <A, I>(
-  parentObservable: Observable<A>,
-  initialValue: I,
-): WithInitialValueOperatorObservable<A, I> =>
-  createInitializedSyncChildObservable<A | I, readonly [A]>(
-    {
+class WithInitialValueObservableClass<A, I>
+  extends InitializedSyncChildObservableClass<A | I, readonly [A]>
+  implements WithInitialValueOperatorObservable<A, I>
+{
+  constructor(parentObservable: Observable<A>, initialValue: I) {
+    super({
       parents: [parentObservable],
       initialValue: Optional.some(initialValue),
-    },
-    ({ setNext }) =>
-      (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+    });
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    this.attach();
+  }
 
-        setNext(sn.value, updateToken);
-      },
-  );
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
+
+    const sn = par.getSnapshot();
+
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
+
+    this.setNext(sn.value, updateToken);
+  }
+}
 
 if (import.meta.vitest !== undefined) {
   test('type test', () => {

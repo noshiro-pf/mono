@@ -1,5 +1,11 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
 import { Arr, Optional } from 'ts-data-forge';
-import { createRootObservable } from '../base/index.mjs';
+import { RootObservableClass } from '../class/index.mjs';
 import type {
   InitializedSourceObservable,
   SourceObservable,
@@ -58,28 +64,31 @@ export function source<const A>(
 export function source<const A>(): SourceObservable<A>;
 
 export function source<const A>(...args: readonly A[]): SourceObservable<A> {
-  return createRootObservable<
-    A,
-    Readonly<{ next: (nextValue: A) => A | undefined }>
-  >(
-    {
+  return new SourceObservableClass<A>(...args);
+}
+
+class SourceObservableClass<A>
+  extends RootObservableClass<A>
+  implements SourceObservable<A>
+{
+  constructor(...args: readonly A[]) {
+    super({
       initialValue: Arr.isNonEmpty(args)
         ? Optional.some(args[0])
         : Optional.none,
-    },
-    ({ startUpdate, getSnapshot, isCompleted }) => ({
-      // Returns the value held after the call: `nextValue`, or, once
-      // completed, the value already there — `undefined` only on a source
-      // that never had one, whose `next` is typed `void`.
-      next: (nextValue: A) => {
-        if (isCompleted()) {
-          return Optional.unwrap(getSnapshot());
-        }
+    });
+  }
 
-        startUpdate(nextValue);
+  // Returns the value held after the call: `nextValue`, or, once completed,
+  // the value already there — `undefined` only on a source that never had
+  // one, whose `next` is typed `void`.
+  next(nextValue: A): A | undefined {
+    if (this.isCompleted) {
+      return Optional.unwrap(this.getSnapshot());
+    }
 
-        return nextValue;
-      },
-    }),
-  );
+    this.startUpdate(nextValue);
+
+    return nextValue;
+  }
 }

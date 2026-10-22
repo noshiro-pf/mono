@@ -1,8 +1,16 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional, Result } from 'ts-data-forge';
-import { createRootObservable } from '../base/index.mjs';
+import { RootObservableClass } from '../class/index.mjs';
 import type {
   FromSubscribableObservable,
   Subscribable,
+  Subscription,
 } from '../types/index.mjs';
 
 /**
@@ -66,39 +74,63 @@ import type {
 export const fromSubscribable = <A, E = unknown>(
   subscribable: Subscribable<A>,
 ): FromSubscribableObservable<A, E> =>
-  createRootObservable<Result<A, E>>(
-    { initialValue: Optional.none },
-    ({ startUpdate, complete, onComplete }) => {
-      // Set once the subscribable has completed: its subscription is over, so
-      // completing this observable must not unsubscribe from it again.
-      let mut_isSourceCompleted = false;
+  new FromSubscribableObservableClass(subscribable);
 
-      const subscription = subscribable.subscribe(
-        (nextValue) => {
-          startUpdate(Result.ok(nextValue));
-        },
-        (error?: unknown) => {
-          startUpdate(
-            Result.err(
-              // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-              error as E,
-            ),
-          );
-        },
-        () => {
-          mut_isSourceCompleted = true;
+class FromSubscribableObservableClass<A, E = unknown>
+  extends RootObservableClass<Result<A, E>>
+  implements FromSubscribableObservable<A, E>
+{
+  readonly #mut_subscription: Subscription | undefined;
 
-          complete();
-        },
-      );
+  /**
+   * Set once the subscribable has completed: its subscription is over, so
+   * completing this observable must not unsubscribe from it again.
+   */
+  #mut_isSourceCompleted: boolean;
 
-      // Runs at once if `subscribe` has already completed this observable.
-      onComplete(() => {
-        if (!mut_isSourceCompleted) {
-          subscription.unsubscribe();
-        }
-      });
+  constructor(subscribable: Subscribable<A>) {
+    super({ initialValue: Optional.none });
 
-      return {};
-    },
-  );
+    this.#mut_subscription = undefined;
+
+    this.#mut_isSourceCompleted = false;
+
+    const subscription = subscribable.subscribe(
+      (nextValue) => {
+        this.startUpdate(Result.ok(nextValue));
+      },
+      (error?: unknown) => {
+        this.startUpdate(
+          Result.err(
+            // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+            error as E,
+          ),
+        );
+      },
+      () => {
+        this.#mut_isSourceCompleted = true;
+
+        this.complete();
+      },
+    );
+
+    // `subscribe` may have completed this observable already.
+    if (this.isCompleted) {
+      this.#unsubscribe(subscription);
+    } else {
+      this.#mut_subscription = subscription;
+    }
+  }
+
+  #unsubscribe(subscription: Subscription): void {
+    if (!this.#mut_isSourceCompleted) {
+      subscription.unsubscribe();
+    }
+  }
+
+  protected override teardown(): void {
+    if (this.#mut_subscription !== undefined) {
+      this.#unsubscribe(this.#mut_subscription);
+    }
+  }
+}

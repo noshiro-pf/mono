@@ -6,13 +6,13 @@
     "environment": {
       "runner": "github-actions",
       "runnerImage": "ubuntu24",
-      "node": "v26.10.0",
-      "platform": "Linux 6.17.0-1022-azure",
+      "node": "v26.12.0",
+      "platform": "Linux 7.0.0-1017-azure",
       "arch": "x64",
-      "cpu": "Intel(R) Xeon(R) 6973P-C",
-      "measuredOn": "2026-10-12",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "measuredOn": "2026-10-21",
       "libraries": {
-        "synstate": "3.1.0",
+        "synstate": "3.4.0",
         "rxjs": "7.8.2",
         "jotai": "3.0.1",
         "mobx": "7.0.6",
@@ -25,59 +25,59 @@
   "rows": [
     {
       "label": "SynState",
-      "median": 15.57,
-      "min": 13.54,
-      "max": 24.47,
-      "p95": 22.07,
-      "opsPerSec": 6424658
+      "median": 17.49,
+      "min": 15.94,
+      "max": 23.21,
+      "p95": 23.11,
+      "opsPerSec": 5717955
     },
     {
       "label": "RxJS",
-      "median": 4.37,
-      "min": 4.14,
-      "max": 5.19,
-      "p95": 4.81,
-      "opsPerSec": 22867712
+      "median": 7.22,
+      "min": 7.11,
+      "max": 8.19,
+      "p95": 7.87,
+      "opsPerSec": 13842679
     },
     {
       "label": "MobX",
-      "median": 64.38,
-      "min": 62.04,
-      "max": 66.96,
-      "p95": 66.93,
-      "opsPerSec": 1553398
+      "median": 117.59,
+      "min": 117.19,
+      "max": 120.98,
+      "p95": 118.96,
+      "opsPerSec": 850386
     },
     {
       "label": "Jotai",
-      "median": 447.96,
-      "min": 437.57,
-      "max": 486.18,
-      "p95": 465.94,
-      "opsPerSec": 223236
+      "median": 752.39,
+      "min": 748.28,
+      "max": 768.36,
+      "p95": 765.46,
+      "opsPerSec": 132910
     },
     {
       "label": "Redux",
-      "median": 292.06,
-      "min": 278.66,
-      "max": 303.85,
-      "p95": 302.48,
-      "opsPerSec": 342396
+      "median": 281.21,
+      "min": 275.2,
+      "max": 294.01,
+      "p95": 291.02,
+      "opsPerSec": 355610
     },
     {
       "label": "Zustand",
-      "median": 3.44,
-      "min": 3.29,
-      "max": 3.73,
-      "p95": 3.67,
-      "opsPerSec": 29069079
+      "median": 5.33,
+      "min": 5.18,
+      "max": 5.47,
+      "p95": 5.43,
+      "opsPerSec": 18766074
     },
     {
       "label": "Valtio",
-      "median": 24.56,
-      "min": 24.38,
-      "max": 24.86,
-      "p95": 24.82,
-      "opsPerSec": 4071270
+      "median": 46.24,
+      "min": 45.79,
+      "max": 46.57,
+      "p95": 46.49,
+      "opsPerSec": 2162673
     }
   ]
 }

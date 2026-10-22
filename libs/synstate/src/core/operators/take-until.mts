@@ -1,9 +1,18 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional } from 'ts-data-forge';
-import { createSyncChildObservable } from '../base/index.mjs';
+import { SyncChildObservableClass } from '../class/index.mjs';
 import type {
   KeepInitialValueOperator,
   Observable,
+  Subscription,
   TakeUntilOperatorObservable,
+  UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -59,41 +68,52 @@ export const takeUntil = <A,>(
 ): KeepInitialValueOperator<A, A> =>
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   ((parentObservable) =>
-    createTakeUntilObservable(
+    new TakeUntilObservableClass(
       parentObservable,
       notifier,
     )) as KeepInitialValueOperator<A, A>;
 
-const createTakeUntilObservable = <A,>(
-  parentObservable: Observable<A>,
-  notifier: Observable<unknown>,
-): TakeUntilOperatorObservable<A> =>
-  createSyncChildObservable<A, readonly [A]>(
-    {
+class TakeUntilObservableClass<A>
+  extends SyncChildObservableClass<A, readonly [A]>
+  implements TakeUntilOperatorObservable<A>
+{
+  /** Unset only while the `subscribe` in the constructor runs. */
+  readonly #subscription: Subscription | undefined;
+
+  constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
+    super({
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-    },
-    ({ setNext, complete, onComplete }) => {
-      // A notifier that already holds a value completes this observable
-      // inside `subscribe`; the teardown registered after it then runs at
-      // once.
-      const subscription = notifier.subscribe(complete, complete);
+    });
 
-      onComplete(() => {
-        subscription.unsubscribe();
-      });
+    const complete = (): void => {
+      this.complete();
+    };
 
-      return (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+    // A notifier that already holds a value completes this observable inside
+    // `subscribe`, before the subscription is stored.
+    this.#subscription = notifier.subscribe(complete, complete);
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    if (this.isCompleted) {
+      this.#subscription.unsubscribe();
+    }
 
-        setNext(sn.value, updateToken);
-      };
-    },
-  );
+    this.attach();
+  }
+
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
+
+    const sn = par.getSnapshot();
+
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
+
+    this.setNext(sn.value, updateToken);
+  }
+
+  protected override teardown(): void {
+    this.#subscription?.unsubscribe();
+  }
+}

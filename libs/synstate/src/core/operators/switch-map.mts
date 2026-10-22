@@ -1,5 +1,12 @@
+// Sumi bans classes, `this`, method syntax and writes to `this` outside a
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
+// so those rules are waived here (D-63).
+// @sumi-expect-error-file classes/no-class
+// @sumi-expect-error-file banned-syntax/no-this
+// @sumi-expect-error-file functions/prefer-arrow-function
+// @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional } from 'ts-data-forge';
-import { createAsyncChildObservable } from '../base/index.mjs';
+import { AsyncChildObservableClass } from '../class/index.mjs';
 import { createScope, getCurrentScope } from '../scope/index.mjs';
 import type {
   DropInitialValueOperator,
@@ -7,6 +14,7 @@ import type {
   Scope,
   Subscription,
   SwitchMapOperatorObservable,
+  UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -109,59 +117,74 @@ export const switchMap =
     mapToObservable: (curr: A) => Observable<B>,
   ): DropInitialValueOperator<A, B> =>
   (parentObservable) =>
-    createSwitchMapObservable(parentObservable, mapToObservable);
+    new SwitchMapObservableClass(parentObservable, mapToObservable);
 
-const createSwitchMapObservable = <A, B>(
-  parentObservable: Observable<A>,
-  mapToObservable: (curr: A) => Observable<B>,
-): SwitchMapOperatorObservable<A, B> => {
-  // The scope the operator was created in, so that each inner scope is
-  // disposed with it; the projection itself runs during propagation, when the
-  // current scope is whatever happens to be running.
-  const ownerScope = getCurrentScope();
+class SwitchMapObservableClass<A, B>
+  extends AsyncChildObservableClass<B, readonly [A]>
+  implements SwitchMapOperatorObservable<A, B>
+{
+  readonly #mapToObservable: (curr: A) => Observable<B>;
 
-  return createAsyncChildObservable(
-    {
+  /**
+   * The scope the operator was created in, so that each inner scope is
+   * disposed with it; the projection itself runs during propagation, when the
+   * current scope is whatever happens to be running.
+   */
+  readonly #ownerScope: Scope | undefined;
+
+  #mut_innerScope: Scope | undefined;
+  #mut_subscription: Subscription | undefined;
+
+  constructor(
+    parentObservable: Observable<A>,
+    mapToObservable: (curr: A) => Observable<B>,
+  ) {
+    super({
       parents: [parentObservable],
       initialValue: Optional.none,
-    },
-    ({ startUpdate, onComplete }) => {
-      let mut_innerScope: Scope | undefined = undefined;
+    });
 
-      let mut_subscription: Subscription | undefined = undefined;
+    this.#mapToObservable = mapToObservable;
 
-      onComplete(() => {
-        mut_subscription?.unsubscribe();
+    this.#ownerScope = getCurrentScope();
 
-        mut_innerScope?.dispose();
-      });
+    this.#mut_innerScope = undefined;
 
-      return (updateToken) => {
-        const sn = parentObservable.getSnapshot();
+    this.#mut_subscription = undefined;
 
-        if (
-          parentObservable.updateToken !== updateToken ||
-          Optional.isNone(sn)
-        ) {
-          return; // skip update
-        }
+    this.attach();
+  }
 
-        mut_subscription?.unsubscribe();
+  /** Releases the inner observable, and only the one this operator made. */
+  #releaseInner(): void {
+    this.#mut_subscription?.unsubscribe();
 
-        mut_innerScope?.dispose();
+    this.#mut_innerScope?.dispose();
+  }
 
-        const innerScope = createScope(ownerScope);
+  override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
 
-        mut_innerScope = innerScope;
+    const sn = par.getSnapshot();
 
-        const observable = innerScope.run(() => mapToObservable(sn.value));
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+      return; // skip update
+    }
 
-        const subscription = observable.subscribe((curr) => {
-          startUpdate(curr);
-        });
+    this.#releaseInner();
 
-        mut_subscription = subscription;
-      };
-    },
-  );
-};
+    const innerScope = createScope(this.#ownerScope);
+
+    this.#mut_innerScope = innerScope;
+
+    const observable = innerScope.run(() => this.#mapToObservable(sn.value));
+
+    this.#mut_subscription = observable.subscribe((curr) => {
+      this.startUpdate(curr);
+    });
+  }
+
+  protected override teardown(): void {
+    this.#releaseInner();
+  }
+}

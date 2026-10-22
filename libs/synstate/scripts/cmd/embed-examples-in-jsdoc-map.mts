@@ -25,7 +25,7 @@ type SourceFileMapping = Readonly<{
 export const sourceFileMappings: readonly SourceFileMapping[] = [
   // Authoring
   {
-    sourcePath: 'src/core/base/create-child-observable.mts',
+    sourcePath: 'src/core/class/create-child-observable.mts',
     sampleFiles: ['samples/src/create-sync-child-observable-example.mts'],
   },
   {

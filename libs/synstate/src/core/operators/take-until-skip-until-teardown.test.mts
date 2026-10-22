@@ -1,4 +1,4 @@
-import { toNode } from '../base/index.mjs';
+import { toNode } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import { skipUntil } from './skip-until.mjs';
 import { takeUntil } from './take-until.mjs';
