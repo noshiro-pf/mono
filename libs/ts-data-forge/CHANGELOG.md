@@ -1,5 +1,16 @@
 # ts-data-forge
 
+## 14.9.0
+
+### Minor Changes
+
+- 079cb28: Add `AsyncData<S, E>`, the state of data fetched asynchronously: `idle`, `pending`, or settled as the `Ok` / `Err` of `Result`. A pending or failed request keeps the latest success value as `previous`; `AsyncData.toPending` and `AsyncData.settle` move between the states and fill it in, and `AsyncData.isSettled` narrows a value to a `Result`. ts-data-forge re-exports it.
+
+### Patch Changes
+
+- Updated dependencies [079cb28]
+    - ts-std-forge@0.5.2
+
 ## 14.8.0
 
 ### Minor Changes

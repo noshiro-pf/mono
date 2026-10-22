@@ -1,5 +1,16 @@
 # color-demo-app
 
+## 0.0.14
+
+### Patch Changes
+
+- Updated dependencies [079cb28]
+    - ts-data-forge@14.9.0
+    - react-mui-utils@0.0.14
+    - react-utils@0.0.17
+    - ts-utils-additional@0.0.6
+    - better-react-use-state@1.0.1
+
 ## 0.0.13
 
 ### Patch Changes

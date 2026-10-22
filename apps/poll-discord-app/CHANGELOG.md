@@ -1,5 +1,13 @@
 # poll-discord-app
 
+## 0.0.11
+
+### Patch Changes
+
+- Updated dependencies [079cb28]
+    - ts-data-forge@14.9.0
+    - ts-fortress@12.3.1
+
 ## 0.0.10
 
 ### Patch Changes

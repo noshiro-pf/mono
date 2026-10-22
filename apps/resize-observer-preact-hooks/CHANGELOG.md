@@ -1,5 +1,13 @@
 # resize-observer-preact-hooks
 
+## 0.0.6
+
+### Patch Changes
+
+- Updated dependencies [079cb28]
+    - ts-data-forge@14.9.0
+    - better-preact-use-state@1.0.4
+
 ## 0.0.5
 
 ### Patch Changes
