@@ -1,7 +1,7 @@
 import { InputGroup } from '@blueprintjs/core';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { source, type Observable as SynstateObservable } from 'synstate';
+import { empty, type Observable as SynstateObservable } from 'synstate';
 import { useObservableEffect } from 'synstate-react-hooks';
 
 export type BpInputProps = InputGroupPropsOriginal &
@@ -36,7 +36,7 @@ export const BpInput = memoNamed<BpInputProps>(
       }
     }, [autoFocus, focusInput]);
 
-    useObservableEffect(focus$ ?? source<undefined>(), focusInput);
+    useObservableEffect(focus$ ?? empty<undefined>(), focusInput);
 
     return (
       <InputGroup

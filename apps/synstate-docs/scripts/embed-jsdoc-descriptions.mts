@@ -44,6 +44,7 @@ const jsdocMappings: DeepReadonly<
   ['filter', 'src/core/operators/filter.mts', 'filter'],
   ['from-promise', 'src/core/create/from-promise.mts', 'fromPromise'],
   ['just', 'src/core/create/just.mts', 'just'],
+  ['empty', 'src/core/create/empty.mts', 'empty'],
   [
     'from-subscribable',
     'src/core/create/from-subscribable.mts',

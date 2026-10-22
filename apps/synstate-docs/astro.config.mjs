@@ -179,6 +179,7 @@ export default defineConfig({
               items: [
                 { slug: 'reference/source' },
                 { slug: 'reference/just' },
+                { slug: 'reference/empty' },
                 { slug: 'reference/from-promise' },
                 { slug: 'reference/from-subscribable' },
                 { slug: 'reference/counter' },

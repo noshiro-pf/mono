@@ -29,6 +29,7 @@ For complex scenarios, SynState provides observable-based APIs:
 
 - [`source<T>()`](../source/): Create a new observable source (almost equivalent to RxJS `subject`).
 - [`just(value)`](../just/): Create an Observable that holds a single static value and immediately completes. Useful as a synchronous fallback inside `switchMap`.
+- [`empty()`](../empty/): Create an Observable that holds no value and is already completed (almost equivalent to RxJS `EMPTY`). Useful for the branch of a `switchMap` that should follow nothing.
 - [`fromPromise(promise)`](../from-promise/): Create observable from promise.
 - [`fromSubscribable()`](../from-subscribable/): Create observable from any subscribable object.
 - [`counter(ms)`](../counter/): Emit 0 at once, then 1, 2, … at intervals (almost equivalent to RxJS `timer(0, ms)`; with `{ emitInitial: false }`, almost equivalent to `interval(ms)`; `{ times: n }` completes it after `n` values).
