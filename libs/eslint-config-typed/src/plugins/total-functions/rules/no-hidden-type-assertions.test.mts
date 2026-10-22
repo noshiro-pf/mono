@@ -16,6 +16,30 @@ const ruleTester = new RuleTester({
 
 ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
   valid: [
+    // A cast to a function type that returns `unknown` asserts nothing
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare const parse: <T>(text: string) => T;
+        export const result = (parse as (text: string) => unknown)('{}');
+      `,
+    },
+    // A cast of a generic function whose type parameter appears in a parameter
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare const id: <T>(x: T) => T;
+        export const result = (id as (x: string) => string)('a');
+      `,
+    },
+    // A cast of a function that is not generic
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare const f: (text: string) => number;
+        export const result = (f as (text: string) => number)('a');
+      `,
+    },
     // No call signature
     {
       filename: 'file.ts',
@@ -278,6 +302,37 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
         export const result = axios.request<boolean>("hello");
       `,
       errors: [
+        {
+          messageId: 'errorStringGeneric',
+          type: AST_NODE_TYPES.CallExpression,
+        },
+      ],
+    },
+    // A hidden type assertion made by casting the generic function to a
+    // function type, which instantiates it without a type argument
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare const parse: <T>(text: string) => T;
+        type Foo = Readonly<{ a: number }>;
+        export const a = (parse as (text: string) => Foo)('{}');
+        export const b = (<(text: string) => Foo>parse)('{}');
+        export const c = (parse as unknown as (text: string) => Foo)('{}');
+        export const d = (parse! as (text: string) => Foo)('{}');
+      `,
+      errors: [
+        {
+          messageId: 'errorStringGeneric',
+          type: AST_NODE_TYPES.CallExpression,
+        },
+        {
+          messageId: 'errorStringGeneric',
+          type: AST_NODE_TYPES.CallExpression,
+        },
+        {
+          messageId: 'errorStringGeneric',
+          type: AST_NODE_TYPES.CallExpression,
+        },
         {
           messageId: 'errorStringGeneric',
           type: AST_NODE_TYPES.CallExpression,

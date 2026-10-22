@@ -309,6 +309,14 @@ describe('no-unnecessary-array-from through type wrappers', () => {
           const y = Array.from(xs as Iterable<number>).map((x) => x * 2);
         `,
       },
+      {
+        name: 'a `satisfies` the original array does not meet keeps the copy',
+        code: dedent`
+          declare const xs: readonly number[];
+          const y = (Array.from(xs) satisfies number[]).map((x) => x * 2);
+          const z = (Array.from(xs)! satisfies number[]).toSorted();
+        `,
+      },
     ],
     invalid: [
       {

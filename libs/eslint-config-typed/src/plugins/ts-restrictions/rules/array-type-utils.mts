@@ -1,5 +1,11 @@
-import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
+import {
+  AST_NODE_TYPES,
+  type ParserServicesWithTypeInformation,
+  type TSESTree,
+} from '@typescript-eslint/utils';
+import { isTypeWrapper } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
 
 /**
@@ -109,3 +115,43 @@ export const matchArrayFromCall = (
 
   return arg.type === AST_NODE_TYPES.SpreadElement ? undefined : arg;
 };
+
+/**
+ * Whether dropping the `Array.from()` copy `inner` would leave a `satisfies`
+ * between it and `wrapped` unmet: `(Array.from(xs) satisfies number[])` with
+ * `xs: readonly number[]` is checked against the mutable copy, which `xs`
+ * itself is not, so the copy is doing the type's work and stays. `as`, `!`
+ * and `<T>` do not check their operand that way and are not asked.
+ */
+export const createIsCopyNeededBySatisfies = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+  esTreeNodeToTSNodeMap: ParserServicesWithTypeInformation['esTreeNodeToTSNodeMap'],
+): ((
+  wrapped: DeepReadonly<TSESTree.Expression>,
+  inner: DeepReadonly<TSESTree.Expression>,
+  arg: DeepReadonly<TSESTree.Expression>,
+) => boolean) => {
+  const isCopyNeededBySatisfies = (
+    wrapped: DeepReadonly<TSESTree.Expression>,
+    inner: DeepReadonly<TSESTree.Expression>,
+    arg: DeepReadonly<TSESTree.Expression>,
+  ): boolean =>
+    wrapped !== inner &&
+    isTypeWrapper(wrapped) &&
+    ((wrapped.type === AST_NODE_TYPES.TSSatisfiesExpression &&
+      !checker.isTypeAssignableTo(
+        typeOf(arg),
+        typeOf(wrapped.typeAnnotation),
+      )) ||
+      isCopyNeededBySatisfies(wrapped.expression, inner, arg));
+
+  const typeOf = (node: DeepReadonly<TSESTree.Node>): ts.Type =>
+    checker.getTypeAtLocation(esTreeNodeToTSNodeMap.get(asNode(node)));
+
+  return isCopyNeededBySatisfies;
+};
+
+const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  node as T;

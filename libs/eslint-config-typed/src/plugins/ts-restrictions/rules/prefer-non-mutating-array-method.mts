@@ -13,6 +13,7 @@ import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import {
   createIsArrayOrTupleType,
+  createIsCopyNeededBySatisfies,
   matchArrayFromCall,
   toMemberObjectText,
 } from './array-type-utils.mjs';
@@ -38,7 +39,10 @@ type MessageIds = 'preferNonMutatingMethod';
  *
  * The `Array.from()` call is found through type wrappers, which the fix keeps
  * (`(Array.from(xs) as T[]).sort()` → `(xs as T[]).toSorted()`), and the
- * argument's type is that of its value, not of a cast around it.
+ * argument's type is that of its value, not of a cast around it. A
+ * `satisfies` around the call that the argument itself does not meet keeps
+ * the copy: `(Array.from(xs) satisfies number[])` with `xs: readonly number[]`
+ * would not type-check as `xs satisfies number[]`.
  */
 const MUTATING_METHOD_NAMES: ReadonlySet<string> = new Set([
   'fill',
@@ -109,6 +113,11 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
     const checker = parserServices.program.getTypeChecker();
 
     const isArrayOrTupleType = createIsArrayOrTupleType(checker);
+
+    const isCopyNeededBySatisfies = createIsCopyNeededBySatisfies(
+      checker,
+      parserServices.esTreeNodeToTSNodeMap,
+    );
 
     const getLayerTypes = createGetLayerTypes(parserServices);
 
@@ -197,6 +206,10 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
         // Guard against a shadowed `Array` binding whose `.from()` does not
         // return an array: the real `Array.from(arrayLike)` is always an array.
         if (!getLayerTypes(callee.object).every(isArrayOrTupleType)) {
+          return;
+        }
+
+        if (isCopyNeededBySatisfies(callee.object, inner, arg)) {
           return;
         }
 
