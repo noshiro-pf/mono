@@ -7,9 +7,11 @@ import {
   convertToReadonlyTransformer,
   replaceRecordWithUnknownRecordTransformer,
   transformSourceCode,
+  type TsMorphTransformer,
 } from 'ts-codemod-lib';
 import { Arr, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted, Result } from 'ts-repo-utils';
+import * as ts from 'typescript';
 import { projectRootPath } from '../project-root-path.mjs';
 
 const TYPES_RULES_DIR = path.resolve(projectRootPath, 'src/types/rules');
@@ -99,12 +101,22 @@ export const applyTransformationsToFile = async (
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     const originalCode = await fs.readFile(filePath, 'utf8');
 
-    // Transform the code with all transformers
-    const transformedCode = transformSourceCode(originalCode, false, [
-      convertInterfaceToTypeTransformer(),
-      replaceRecordWithUnknownRecordTransformer(),
-      convertToReadonlyTransformer(),
-    ]);
+    // The same three transformers in the same order as one
+    // `transformSourceCode` call over the file, but the two that rewrite only
+    // inside a declaration run one top-level statement at a time — see
+    // `transformEachStatement`.
+    const transformedCode = transformEachStatement(
+      transformSourceCode(
+        transformEachStatement(originalCode, [
+          convertInterfaceToTypeTransformer(),
+        ]),
+        false,
+        // It adds the `UnknownRecord` import at the top of the file, so it
+        // needs the whole file.
+        [replaceRecordWithUnknownRecordTransformer()],
+      ),
+      [convertToReadonlyTransformer()],
+    );
 
     // Check if the code was actually changed
     if (transformedCode === originalCode) {
@@ -132,6 +144,67 @@ export const applyTransformationsToFile = async (
     return Result.err(errStr);
   }
 };
+
+/**
+ * `transformSourceCode(code, false, transformers)` applied to each top-level
+ * statement of `code` by itself, for transformers that read and rewrite only
+ * inside the statement they are visiting.
+ *
+ * Each replacement a ts-morph transformer makes reparses the source file it
+ * is in, so over a whole file the transformation is quadratic in its length,
+ * and the larger rule files here (one `namespace` per rule) took the better
+ * part of a minute each. One statement at a time it is linear.
+ *
+ * Every statement but the first is transformed behind a `;` that is removed
+ * again, so that its leading comments start after a token, as they do in the
+ * file; at the start of a file, the comments on the same line as the
+ * statement before would count as its own. What follows the last statement
+ * is kept as it is.
+ */
+const transformEachStatement = (
+  code: string,
+  transformers: readonly TsMorphTransformer[],
+): string => {
+  const { statements } = ts.createSourceFile(
+    'source.mts',
+    code,
+    ts.ScriptTarget.ESNext,
+    false,
+    ts.ScriptKind.TS,
+  );
+
+  const last = statements.at(-1);
+
+  if (last === undefined) {
+    return transformSourceCode(code, false, transformers);
+  }
+
+  const transformedStatements = statements.map((statement, index) => {
+    const statementText = code.slice(statement.pos, statement.end);
+
+    if (index === 0) {
+      return transformSourceCode(statementText, false, transformers);
+    }
+
+    const transformed = transformSourceCode(
+      `${statementSeparator}${statementText}`,
+      false,
+      transformers,
+    );
+
+    if (!transformed.startsWith(statementSeparator)) {
+      throw new Error(
+        `A transformer rewrote the \`${statementSeparator}\` in front of a statement.`,
+      );
+    }
+
+    return transformed.slice(statementSeparator.length);
+  });
+
+  return Arr.toPushed(transformedStatements, code.slice(last.end)).join('');
+};
+
+const statementSeparator = ';';
 
 if (isDirectlyExecuted(import.meta.url)) {
   const args = Arr.skip(process.argv, 2);

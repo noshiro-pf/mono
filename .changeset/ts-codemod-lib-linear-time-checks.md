@@ -1,0 +1,5 @@
+---
+'ts-codemod-lib': minor
+---
+
+The transformers spend much less time on large files. The `*-ignore-next-line` check behind every transformer now asks a node for its leading comments before working out any line number, which most nodes, having none, no longer need, and works the line numbers out from the newline positions collected once per edit of the file rather than by counting newlines from the start of the file each time; it answers as before, a lone `\r` still starting no line. Each replacement with a one-line text no longer looks up the indentation of the node it replaces, which reparsed the whole file a second time and is applied only to lines after the first. Running `append-as-const` and `convert-to-readonly` over a repository of about 4,400 files took a fifth less time, and `convert-to-readonly` alone over a 330 kB file more than a third less. The new `replaceNodeWithText(node, text)` is that replacement, exported for custom transformers; it returns the node `replaceWithText` would.
