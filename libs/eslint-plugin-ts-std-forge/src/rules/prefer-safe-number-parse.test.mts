@@ -35,6 +35,27 @@ describe('prefer-safe-number-parse', () => {
         `,
       },
       {
+        name: 'ignores never-typed arguments (string & number = never)',
+        code: dedent`
+          declare const x: string & number;
+          const n = parseFloat(x);
+        `,
+      },
+      {
+        name: 'ignores spread arguments',
+        code: dedent`
+          declare const args: [string];
+          const n = parseFloat(...args);
+        `,
+      },
+      {
+        name: 'ignores parseInt (handled by prefer-safe-number-parse-integer)',
+        code: dedent`
+          const s = "123";
+          const n = parseInt(s, 10);
+        `,
+      },
+      {
         name: 'ignores a union that is not purely string',
         code: dedent`
           declare const s: string | undefined;
@@ -61,7 +82,7 @@ describe('prefer-safe-number-parse', () => {
           declare const s: string;
           const n = Result.unwrapOkOr(SafeNumber.parse(s), Number.NaN);
         `,
-        errors: [{ messageId: 'useSafeNumberParse' }],
+        errors: [{ messageId: 'useSafeParseFloat' }],
       },
       {
         name: 'rewrites Number.parseFloat on a string',
@@ -74,7 +95,7 @@ describe('prefer-safe-number-parse', () => {
           declare const s: string;
           const n = Result.unwrapOkOr(SafeNumber.parse(s), Number.NaN);
         `,
-        errors: [{ messageId: 'useSafeNumberParse' }],
+        errors: [{ messageId: 'useSafeParseFloat' }],
       },
       {
         name: 'rewrites Number(x) when x is a string',
@@ -87,7 +108,7 @@ describe('prefer-safe-number-parse', () => {
           declare const s: string;
           const n = Result.unwrapOkOr(SafeNumber.parse(s), Number.NaN);
         `,
-        errors: [{ messageId: 'useSafeNumberParse' }],
+        errors: [{ messageId: 'useSafeParseFloat' }],
       },
       {
         name: 'adds only the missing import',
@@ -102,7 +123,7 @@ describe('prefer-safe-number-parse', () => {
           declare const s: string;
           const n = Result.unwrapOkOr(SafeNumber.parse(s), Number.NaN);
         `,
-        errors: [{ messageId: 'useSafeNumberParse' }],
+        errors: [{ messageId: 'useSafeParseFloat' }],
       },
     ],
   });
@@ -159,7 +180,7 @@ describe('prefer-safe-number-parse through type wrappers', () => {
           declare const s: string;
           const n = Result.unwrapOkOr(SafeNumber.parse(s satisfies string), Number.NaN);
         `,
-        errors: [{ messageId: 'useSafeNumberParse' }],
+        errors: [{ messageId: 'useSafeParseFloat' }],
       },
       {
         name: 'reads the callee through `as` and `!`',
@@ -175,8 +196,8 @@ describe('prefer-safe-number-parse through type wrappers', () => {
           const b = Result.unwrapOkOr(SafeNumber.parse(s), Number.NaN);
         `,
         errors: [
-          { messageId: 'useSafeNumberParse' },
-          { messageId: 'useSafeNumberParse' },
+          { messageId: 'useSafeParseFloat' },
+          { messageId: 'useSafeParseFloat' },
         ],
       },
       {
@@ -190,7 +211,7 @@ describe('prefer-safe-number-parse through type wrappers', () => {
           declare const s: string;
           const n = Result.unwrapOkOr(SafeNumber.parse(s! as string), Number.NaN);
         `,
-        errors: [{ messageId: 'useSafeNumberParse' }],
+        errors: [{ messageId: 'useSafeParseFloat' }],
       },
     ],
   });
@@ -213,7 +234,7 @@ describe('prefer-safe-number-parse with parenthesized operands', () => {
           declare const s: string;
           const n = Result.unwrapOkOr(SafeNumber.parse((a, s)), Number.NaN);
         `,
-        errors: [{ messageId: 'useSafeNumberParse' }],
+        errors: [{ messageId: 'useSafeParseFloat' }],
       },
     ],
   });

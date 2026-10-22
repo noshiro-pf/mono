@@ -20,6 +20,13 @@ ruleTester.run('prefer-safe-array-is-array', preferSafeArrayIsArray, {
         const result = obj.isArray(value);
       `,
     },
+    {
+      name: 'A computed member named by a variable is not `isArray`',
+      code: dedent`
+        declare const isArray: 'from';
+        const result = Array[isArray](value);
+      `,
+    },
   ],
   invalid: [
     {
@@ -31,7 +38,7 @@ ruleTester.run('prefer-safe-array-is-array', preferSafeArrayIsArray, {
         import { SafeArray } from 'ts-std-forge';
         const result = SafeArray.isArray(value);
       `,
-      errors: [{ messageId: 'useSafeArrayIsArray' }],
+      errors: [{ messageId: 'useIsArray' }],
     },
     {
       name: 'Replace Array.isArray when SafeArray is already imported',
@@ -43,7 +50,7 @@ ruleTester.run('prefer-safe-array-is-array', preferSafeArrayIsArray, {
         import { SafeArray } from 'ts-std-forge';
         const result = SafeArray.isArray(value);
       `,
-      errors: [{ messageId: 'useSafeArrayIsArray' }],
+      errors: [{ messageId: 'useIsArray' }],
     },
     {
       name: 'Sees SafeArray imported by a second ts-std-forge declaration',
@@ -57,7 +64,7 @@ ruleTester.run('prefer-safe-array-is-array', preferSafeArrayIsArray, {
         import { SafeArray } from 'ts-std-forge';
         const result = SafeArray.isArray(value);
       `,
-      errors: [{ messageId: 'useSafeArrayIsArray' }],
+      errors: [{ messageId: 'useIsArray' }],
     },
     {
       name: 'Replace multiple Array.isArray calls, importing once',
@@ -70,10 +77,7 @@ ruleTester.run('prefer-safe-array-is-array', preferSafeArrayIsArray, {
         const result1 = SafeArray.isArray(value1);
         const result2 = SafeArray.isArray(value2);
       `,
-      errors: [
-        { messageId: 'useSafeArrayIsArray' },
-        { messageId: 'useSafeArrayIsArray' },
-      ],
+      errors: [{ messageId: 'useIsArray' }, { messageId: 'useIsArray' }],
     },
   ],
 });
@@ -91,7 +95,7 @@ describe('prefer-safe-array-is-array through type wrappers', () => {
           import { SafeArray } from 'ts-std-forge';
           const result = SafeArray.isArray(value);
         `,
-        errors: [{ messageId: 'useSafeArrayIsArray' }],
+        errors: [{ messageId: 'useIsArray' }],
       },
       {
         name: 'reads `Array` through `!`',
@@ -102,7 +106,7 @@ describe('prefer-safe-array-is-array through type wrappers', () => {
           import { SafeArray } from 'ts-std-forge';
           const result = SafeArray.isArray(value);
         `,
-        errors: [{ messageId: 'useSafeArrayIsArray' }],
+        errors: [{ messageId: 'useIsArray' }],
       },
       {
         name: 'reads the callee through `satisfies`',
@@ -113,7 +117,7 @@ describe('prefer-safe-array-is-array through type wrappers', () => {
           import { SafeArray } from 'ts-std-forge';
           const result = SafeArray.isArray(value);
         `,
-        errors: [{ messageId: 'useSafeArrayIsArray' }],
+        errors: [{ messageId: 'useIsArray' }],
       },
       {
         name: 'keeps a wrapper on the argument',
@@ -124,7 +128,7 @@ describe('prefer-safe-array-is-array through type wrappers', () => {
           import { SafeArray } from 'ts-std-forge';
           const result = SafeArray.isArray(value satisfies unknown);
         `,
-        errors: [{ messageId: 'useSafeArrayIsArray' }],
+        errors: [{ messageId: 'useIsArray' }],
       },
     ],
   });
@@ -143,7 +147,7 @@ describe('prefer-safe-array-is-array with parenthesized operands', () => {
           import { SafeArray } from 'ts-std-forge';
           const result = SafeArray.isArray(x);
         `,
-        errors: [{ messageId: 'useSafeArrayIsArray' }],
+        errors: [{ messageId: 'useIsArray' }],
       },
       {
         name: 'replaces a doubly parenthesized callee of an optional call',
@@ -154,7 +158,7 @@ describe('prefer-safe-array-is-array with parenthesized operands', () => {
           import { SafeArray } from 'ts-std-forge';
           const result = SafeArray.isArray?.(x);
         `,
-        errors: [{ messageId: 'useSafeArrayIsArray' }],
+        errors: [{ messageId: 'useIsArray' }],
       },
       {
         name: 'keeps a parenthesized argument',
@@ -165,7 +169,7 @@ describe('prefer-safe-array-is-array with parenthesized operands', () => {
           import { SafeArray } from 'ts-std-forge';
           const result = SafeArray.isArray((a, x));
         `,
-        errors: [{ messageId: 'useSafeArrayIsArray' }],
+        errors: [{ messageId: 'useIsArray' }],
       },
     ],
   });

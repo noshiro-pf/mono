@@ -214,6 +214,24 @@ describe('prefer-num-safe-parse-float through type wrappers', () => {
           { messageId: 'useSafeParseFloat' },
         ],
       },
+      {
+        name: 'the callee read through `as` and `!`',
+        code: dedent`
+          declare const s: string;
+          const a = (Number as NumberConstructor)(s);
+          const b = Number!.parseFloat(s);
+        `,
+        output: dedent`
+          import { Num, Result } from 'ts-data-forge';
+          declare const s: string;
+          const a = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+          const b = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
+        `,
+        errors: [
+          { messageId: 'useSafeParseFloat' },
+          { messageId: 'useSafeParseFloat' },
+        ],
+      },
     ],
   });
 }, 20000);

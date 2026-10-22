@@ -63,6 +63,54 @@ describe('prefer-is-record-and-has-key', () => {
         errors: [{ messageId: 'useHasKey' }],
       },
       {
+        name: 'keeps isRecord for an index-signature-carrying callable',
+        code: dedent`
+          type Callable = { (): void; [key: string]: unknown };
+          declare const obj: Callable;
+          const ok = Object.hasOwn(obj, 'a');
+        `,
+        output: dedent`
+          import { isRecord, hasKey } from 'ts-std-forge';
+          type Callable = { (): void; [key: string]: unknown };
+          declare const obj: Callable;
+          const ok = (isRecord(obj) && hasKey(obj, 'a'));
+        `,
+        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+      },
+      {
+        name: 'imports isRecord once when both forms appear in a file',
+        code: dedent`
+          declare const rec: Record<string, unknown>;
+          declare const unk: unknown;
+          const a = Object.hasOwn(rec, 'a');
+          const b = Object.hasOwn(unk, 'b');
+        `,
+        output: dedent`
+          import { isRecord, hasKey } from 'ts-std-forge';
+          declare const rec: Record<string, unknown>;
+          declare const unk: unknown;
+          const a = hasKey(rec, 'a');
+          const b = (isRecord(unk) && hasKey(unk, 'b'));
+        `,
+        errors: [
+          { messageId: 'useHasKey' },
+          { messageId: 'useIsRecordAndHasKey' },
+        ],
+      },
+      {
+        name: 'wraps a negated Object.hasOwn in parentheses',
+        code: dedent`
+          const obj = { a: 1 };
+          const ok = !Object.hasOwn(obj, 'a');
+        `,
+        output: dedent`
+          import { isRecord, hasKey } from 'ts-std-forge';
+          const obj = { a: 1 };
+          const ok = !(isRecord(obj) && hasKey(obj, 'a'));
+        `,
+        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+      },
+      {
         name: 'rewrites `key in obj` too',
         code: dedent`
           declare const obj: Record<string, number>;

@@ -9,9 +9,9 @@ import {
   getImportDeclarations,
   getNamedImports,
   skipTypeWrappers,
+  typeHoldsAtEveryLayer,
 } from 'eslint-rule-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { typeHoldsAtEveryLayer } from './ast-utils.mjs';
 import { TS_STD_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];

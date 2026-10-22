@@ -173,6 +173,24 @@ describe('prefer-num-safe-parse-int through type wrappers', () => {
           { messageId: 'useSafeParseInt' },
         ],
       },
+      {
+        name: 'the callee read through `as` and `!`',
+        code: dedent`
+          declare const s: string;
+          const a = (parseInt as typeof parseInt)(s);
+          const b = (Number as NumberConstructor)!.parseInt(s, 10);
+        `,
+        output: dedent`
+          import { Num, Result } from 'ts-data-forge';
+          declare const s: string;
+          const a = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
+          const b = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
+        `,
+        errors: [
+          { messageId: 'useSafeParseInt' },
+          { messageId: 'useSafeParseInt' },
+        ],
+      },
     ],
   });
 }, 20000);

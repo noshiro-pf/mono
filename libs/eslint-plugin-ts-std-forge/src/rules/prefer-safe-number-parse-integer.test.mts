@@ -34,6 +34,20 @@ describe('prefer-safe-number-parse-integer', () => {
           const n = parseInt(x as unknown as string & never, 10);
         `,
       },
+      {
+        name: 'ignores never-typed arguments',
+        code: dedent`
+          declare const x: string & number;
+          const n = parseInt(x, 10);
+        `,
+      },
+      {
+        name: 'ignores unrelated calls',
+        code: dedent`
+          const s = "1";
+          const n = Number(s);
+        `,
+      },
     ],
     invalid: [
       {
@@ -47,7 +61,7 @@ describe('prefer-safe-number-parse-integer', () => {
           declare const s: string;
           const n = Result.unwrapOkOr(SafeNumber.parseInteger(s), Number.NaN);
         `,
-        errors: [{ messageId: 'useSafeNumberParseInteger' }],
+        errors: [{ messageId: 'useSafeParseInt' }],
       },
       {
         name: 'rewrites Number.parseInt(x, 10)',
@@ -60,7 +74,7 @@ describe('prefer-safe-number-parse-integer', () => {
           declare const s: string;
           const n = Result.unwrapOkOr(SafeNumber.parseInteger(s), Number.NaN);
         `,
-        errors: [{ messageId: 'useSafeNumberParseInteger' }],
+        errors: [{ messageId: 'useSafeParseInt' }],
       },
     ],
   });
@@ -111,7 +125,7 @@ describe('prefer-safe-number-parse-integer through type wrappers', () => {
           declare const s: string;
           const n = Result.unwrapOkOr(SafeNumber.parseInteger(s), Number.NaN);
         `,
-        errors: [{ messageId: 'useSafeNumberParseInteger' }],
+        errors: [{ messageId: 'useSafeParseInt' }],
       },
       {
         name: 'reads a radix of 10 through `satisfies` and keeps `satisfies` on the argument',
@@ -124,7 +138,7 @@ describe('prefer-safe-number-parse-integer through type wrappers', () => {
           declare const s: string;
           const n = Result.unwrapOkOr(SafeNumber.parseInteger(s satisfies string), Number.NaN);
         `,
-        errors: [{ messageId: 'useSafeNumberParseInteger' }],
+        errors: [{ messageId: 'useSafeParseInt' }],
       },
       {
         name: 'reads the callee through `as` and `!`',
@@ -140,8 +154,8 @@ describe('prefer-safe-number-parse-integer through type wrappers', () => {
           const b = Result.unwrapOkOr(SafeNumber.parseInteger(s), Number.NaN);
         `,
         errors: [
-          { messageId: 'useSafeNumberParseInteger' },
-          { messageId: 'useSafeNumberParseInteger' },
+          { messageId: 'useSafeParseInt' },
+          { messageId: 'useSafeParseInt' },
         ],
       },
       {
@@ -155,7 +169,7 @@ describe('prefer-safe-number-parse-integer through type wrappers', () => {
           declare const s: string;
           const n = Result.unwrapOkOr(SafeNumber.parseInteger(s! as string), Number.NaN);
         `,
-        errors: [{ messageId: 'useSafeNumberParseInteger' }],
+        errors: [{ messageId: 'useSafeParseInt' }],
       },
     ],
   });
@@ -178,7 +192,7 @@ describe('prefer-safe-number-parse-integer with parenthesized operands', () => {
           declare const s: string;
           const n = Result.unwrapOkOr(SafeNumber.parseInteger((a, s)), Number.NaN);
         `,
-        errors: [{ messageId: 'useSafeNumberParseInteger' }],
+        errors: [{ messageId: 'useSafeParseInt' }],
       },
     ],
   });
