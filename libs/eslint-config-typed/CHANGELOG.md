@@ -1,5 +1,27 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.19.0
+
+### Minor Changes
+
+- 6c57a2e: `no-sequences` now reports a comma operator in parentheses too (`allowInParentheses: false`), so `(0, f)(x)` and `const r = (a(), b())` are errors. A `for` header's initializer and update are still allowed. Write the expressions as separate statements, or call `f` through a variable instead of `(0, f)`.
+- 5e3d670: `eslintConfigForPreact` now keeps the base `no-restricted-imports` pattern against importing `index.mjs` by relative path. It used to set the rule with its own `preact/compat` paths only, and a config that sets a rule replaces the options an earlier one set, so the pattern was lost in every Preact package. New exports let a config after it restrict more imports without dropping either: `restrictedImportsOptions` (the base options), `restrictedImportsOptionsForPreact` (those plus the `preact/compat` hooks), the `RestrictedImportsOptions` type, and `mergeRestrictedImportsOptions`, which concatenates the `paths` and the `patterns` of the options it is given.
+
+### Patch Changes
+
+- 76b4283: `react-coding-style/display-name` now accepts a `displayName` assignment wrapped in a type wrapper (`(C.displayName = 'C') satisfies string;`), which it used to report as missing.
+- 77970f1: `total-functions/no-partial-string-normalize` now judges any argument by its type, not only an identifier, so `s.normalize(cond ? 'NFC' : 'NFD')`, `s.normalize(options.form)` and `s.normalize(getForm())` are no longer reported when every value they may have is a valid form. A conditional or logical expression is judged by its operands, so a cast inside one still does not make it safe.
+- 03697ca: `eslintConfigForPreact` now lets `react/no-unknown-property` accept `tabindex` and `onDblClick`, the names Preact needs. Preact writes a prop to the DOM under the name it is spelled with, so `tabIndex` on an SVG element becomes an attribute browsers do not read as `tabindex`, and `onDoubleClick` listens for an event that never fires; the rule used to ask for exactly those spellings. The `css` prop the base config allows stays allowed.
+- d7e4f3c: `ts-restrictions/prefer-curried-call` no longer rewrites a call that has explicit type arguments, which the fix used to drop (`(a) => f<T>(a, 1)` → `f(1)`). It also no longer rewrites one whose callee has side effects, which the curried form would evaluate once instead of on every call (`(a) => getF()(a, 1)` → `getF()(1)`).
+- 0c83927: `immer-coding-style/prefer-curried-produce` no longer rewrites an updater whose recipe could read the extra arguments the curried `produce` passes on. It now fixes only an arrow recipe with at most one parameter, so `xs.map((s) => produce(s, recipe))` stays as it is. It also no longer moves a patch listener into the initial-state position, and it keeps the type of an `as` around the base state as the type argument (`(s) => produce(s as State, r)` → `produce<State>(r)`).
+- fba7527: `ts-restrictions/prefer-logical-over-boolean-ternary` negates a logical test by De Morgan: `a || b ? false : c` becomes `!a && !b && c` rather than `!(a || b) && c`. The negation it writes now comes from `negationOf` in `eslint-rule-forge`, which `eslint-plugin-ts-data-forge` shares.
+- 4fc0b5c: `react-coding-style/use-memo-hook-style` now finds `useMemo`'s factory through type wrappers. It reports an `as` around the factory (`React.useMemo((() => x) as () => T, deps)`), and it no longer misses the return type or the body's assertions of a factory wrapped in `satisfies`.
+- 66e251a: `eslintConfigForVitest` now sets `settings.vitest.typecheck`, so that the Vitest rules read types. Without it, `vitest/prefer-describe-function-title` took any import named as a `describe` title for a function, a type-only import included, and its autofix replaced the string with a reference to that import, which does not compile and throws at runtime. With the setting, `vitest/expect-expect` also counts `expectTypeOf` and `assertType` as assertions, and `vitest/valid-expect` leaves `expectTypeOf` alone; a config that turns `vitest/valid-title` on gets it accepting a title whose type is a function or a string. The setting needs type-aware linting, which the config already needed for `vitest/unbound-method`.
+- Updated dependencies [fba7527]
+- Updated dependencies [f89dc57]
+    - eslint-rule-forge@0.2.0
+    - ts-data-forge@14.8.0
+
 ## 5.18.0
 
 ### Minor Changes

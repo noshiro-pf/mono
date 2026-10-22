@@ -1,6 +1,6 @@
 {
   "name": "pr-report-core",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "description": "What `pr-report` and the Pull Requests Manager page decide about the open pull requests, whichever API they read",
   "repository": {

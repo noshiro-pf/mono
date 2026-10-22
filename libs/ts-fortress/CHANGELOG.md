@@ -1,5 +1,16 @@
 ## [11.0.2](https://github.com/noshiro-pf/ts-fortress/compare/v11.0.1...v11.0.2) (2026-07-24)
 
+## 12.3.0
+
+### Minor Changes
+
+- 4d08519: Add `onInvalidElement: 'drop'` to `array`, so that `fill` removes elements that are not of the element type instead of replacing them with filled values. The default stays `'fill'`. The documentation of `union` now states how `prune` and `fill` pick a member, including the declaration-order dependence of `prune` when members overlap.
+
+### Patch Changes
+
+- Updated dependencies [f89dc57]
+    - ts-data-forge@14.8.0
+
 ## 12.2.0
 
 ### Minor Changes

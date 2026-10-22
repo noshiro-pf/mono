@@ -1,5 +1,30 @@
 # eslint-plugin-ts-data-forge
 
+## 0.9.0
+
+### Minor Changes
+
+- fba7527: Add `prefer-arr-generate`, enabled by the `recommended` config, which rewrites the filter-and-map idiom `xs.flatMap((x) => (cond ? [f(x)] : []))` into a `for…of` loop in `Arr.generate` that yields `f(x)` when `cond` holds. A block-bodied callback whose only `return` is its last statement is rewritten too, with the statements before it moved into the loop. When the empty array is the consequent (`cond ? [] : [f(x)]`), the condition is negated the short way, with `negationOf` from `eslint-rule-forge`: `x !== undefined && x !== ''` rather than `!(x === undefined || x === '')`.
+
+    The rule is type-aware and only reports an array or tuple receiver. It offers a suggestion instead of a fix when:
+
+    - the result is used as a mutable array;
+    - a parameter type annotation, a return type on the callback or a type wrapper on the conditional would be dropped;
+    - the receiver relies on a narrowing that does not reach into the generator function;
+    - the receiver is a `filter()` call;
+    - a comment would be lost.
+
+### Patch Changes
+
+- a094d4c: `prefer-is-non-null-object` now reports the other ways of writing `typeof u === 'object' && u !== null`: the two halves in reverse order, either comparison with its operands swapped (`'object' === typeof u`, `null !== u`), `u != null` (which `typeof u === 'object'` has already made the same check), and the pair anywhere in a longer `&&` chain (`typeof u === 'object' && u !== null && 'k' in u` becomes `isNonNullObject(u) && 'k' in u`). The two halves have to be next to each other in the chain. The `eslint-plugin-ts-data-forge` version now also reads the two halves through type wrappers around each of them, as the `eslint-plugin-ts-std-forge` version already did.
+- 9d79d74: `prefer-is-record-and-has-key` no longer offers rewrites that change what the code does. An object whose type may be an array (an array, a tuple, a union with one, or a record widened by `as` to one that may be an array) is not reported, because `isRecord` rejects an array and `'0' in xs` would turn from `true` to `false`; `object` and `unknown` say nothing either way and are reported as before. An object with side effects, such as a call or a comma expression, is reported without a fix when the rewrite needs `isRecord`, because `isRecord(obj) && hasKey(obj, key)` would evaluate it twice; when the object is known to be a record, `hasKey(obj, key)` reads it once and the fix stays. The `eslint-plugin-ts-data-forge` version now also keeps the parentheses of a comma expression in the fix and reads `Object` in `Object.hasOwn` through type wrappers, as the `eslint-plugin-ts-std-forge` version already did.
+- a686ef8: `prefer-range-for-loop` no longer rewrites a loop into one that `range()` runs differently without the type checker noticing. A loop that assigns its variable anywhere but in the update, whose begin or step is a number literal that is not a safe integer (`i += 0.5`), or whose step is a negative literal (`i += -1`, which never reaches the end), is not reported. A loop whose end or step is not a literal or a never-reassigned variable (`i < xs.length`, `i < getN()`, a `step` the body doubles) is reported without a fix: the loop reads them on every iteration, while `range` reads them once. Whether a variable begin, end or step is a safe integer is left to the type checker: when it is not, the fixed call fails to type-check.
+- 0cf1272: `prefer-canonical-array-slicing` now reads through type wrappers (`as`, `satisfies`, `!`, `<T>`) in the places it still did not: a `filter` callback whose body is wrapped (`(_, i) => (i >= 1) satisfies boolean`), a wrapped `xs.length - N` or a wrapped `.length` inside it (`(xs as readonly T[]).length - 1`), and a wrapped receiver compared with its own `.length`. These were not reported before. `prefer-arr-is-bounded-length-array` now also takes a `min && max` pair whose comparisons are wrapped as a whole (`(xs.length >= 1 satisfies boolean) && xs.length <= 3`), and `prefer-arr-is-min-length-array` / `prefer-arr-is-max-length-array` leave such a pair to it instead of rewriting each half.
+- Updated dependencies [fba7527]
+- Updated dependencies [f89dc57]
+    - eslint-rule-forge@0.2.0
+    - ts-data-forge@14.8.0
+
 ## 0.8.6
 
 ### Patch Changes
