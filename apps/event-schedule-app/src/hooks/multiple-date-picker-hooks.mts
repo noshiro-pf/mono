@@ -6,6 +6,7 @@ import {
   ISetMapped,
   Optional,
   asSafeUint,
+  mapNullable,
 } from 'ts-data-forge';
 import { compareYearMonthDate } from 'ts-fortress-types';
 import type {
@@ -25,7 +26,6 @@ import {
   ymdFromKey,
   ymdToKey,
 } from '../functions/index.mjs';
-import { mapOptional } from '../utils-ported/index.mjs';
 import { ymd2day } from '../utils/index.mjs';
 
 const neverEmits$ = source<CalendarCurrentPageReducerState>();
@@ -116,7 +116,7 @@ export const useMultipleDatePickerState = (
                   : dayValue === 6
                     ? 'Saturday'
                     : 'normal',
-            holidayJpName: mapOptional(holidaysJpDefinition, (__m) =>
+            holidayJpName: mapNullable(holidaysJpDefinition, (__m) =>
               Optional.toNullable(__m.get(ymd)),
             ),
           };
@@ -149,7 +149,7 @@ export const useMultipleDatePickerState = (
 
   const selectedDatesDispatch = React.useMemo(
     () =>
-      mapOptional(
+      mapNullable(
         onSelectedDatesChange,
         (f) => (action: SelectedDatesReducerAction) => {
           f(
@@ -164,7 +164,7 @@ export const useMultipleDatePickerState = (
 
   const onDateClick = React.useMemo(
     () =>
-      mapOptional(selectedDatesDispatch, (f) => (ymd: YearMonthDate) => {
+      mapNullable(selectedDatesDispatch, (f) => (ymd: YearMonthDate) => {
         f({ type: 'flip', dateToFlip: ymd });
       }),
     [selectedDatesDispatch],
@@ -172,7 +172,7 @@ export const useMultipleDatePickerState = (
 
   const onWeekdaysHeaderCellClick = React.useMemo(
     () =>
-      mapOptional(selectedDatesDispatch, (f) => (w: DayOfWeekIndex) => {
+      mapNullable(selectedDatesDispatch, (f) => (w: DayOfWeekIndex) => {
         f({
           type: 'fill-column',
           dates: dates

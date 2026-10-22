@@ -11,7 +11,13 @@ import {
   skip,
 } from 'synstate';
 import { createBooleanState, createState } from 'synstate-react-hooks';
-import { Result, fastDeepEqual, isNotUndefined, pipe } from 'ts-data-forge';
+import {
+  Result,
+  fastDeepEqual,
+  isNotUndefined,
+  mapNullable,
+  pipe,
+} from 'ts-data-forge';
 import { compareYearMonthDate } from 'ts-fortress-types';
 import { api } from '../../api/index.mjs';
 import {
@@ -25,11 +31,7 @@ import {
   showToast,
 } from '../../functions/index.mjs';
 import type { EventScheduleSettingCommonState } from '../../types/index.mjs';
-import {
-  mapOptional,
-  noop,
-  toAbsolutePath,
-} from '../../utils-ported/index.mjs';
+import { toAbsolutePath } from '../../utils-ported/index.mjs';
 import { now } from '../../utils/index.mjs';
 import { Auth } from '../auth.mjs';
 import { createEventScheduleSettingStore } from './event-schedule-setting-common.mjs';
@@ -116,8 +118,8 @@ const saveToLocalStorage = (
     datetimeSpecification: commonState.datetimeSpecification,
     notes: commonState.notes,
     notificationSettings:
-      pipe(commonState.notificationSettingsWithEmail).map((__v) =>
-        mapOptional(__v, NotificationSettings.fill),
+      pipe(commonState.notificationSettingsWithEmail).mapNullable(
+        NotificationSettings.fill,
       ).value ?? 'none',
     title: commonState.title,
   });
@@ -164,7 +166,7 @@ const createEvent = async (): Promise<Result<undefined, string>> => {
   const res = await api.event.add({
     ...eventScheduleNormalized,
     author: {
-      id: mapOptional(fireAuthUser?.uid, UserId.cast) ?? null,
+      id: mapNullable(fireAuthUser?.uid, UserId.cast) ?? null,
       name: UserName.cast(fireAuthUser?.displayName ?? ''),
     },
   });
@@ -216,7 +218,7 @@ const onCreateEventClick = (): void => {
         intent: 'danger',
       });
     })
-    .catch(noop);
+    .catch(() => {});
 };
 
 const onClipboardButtonClick = (): void => {

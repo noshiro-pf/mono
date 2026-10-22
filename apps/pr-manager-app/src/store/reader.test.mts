@@ -1,9 +1,4 @@
-import {
-  createState,
-  source,
-  type SourceObservable,
-  type Observable as SynstateObservable,
-} from 'synstate';
+import { createState, source, type SourceObservable } from 'synstate';
 import { Result } from 'ts-data-forge';
 import { CLOCK_TICK_MS, POLL_INTERVAL_MS } from '../constants.mjs';
 import type { Answered } from '../graphql.mjs';
@@ -589,8 +584,6 @@ describe(createReader, () => {
     assert.strictEqual(timers.running(POLL_INTERVAL_MS), 0);
 
     assert.strictEqual(timers.running(CLOCK_TICK_MS), 0);
-
-    assert.isFalse(visibility.listening());
   });
 
   test('stop ends a poll timer started by the tab coming back', () => {
@@ -816,7 +809,6 @@ type Setup = Readonly<{
     hide: () => void;
     /** Shows the tab and says so. */
     show: () => void;
-    listening: () => boolean;
   }>;
   setToken: (token: StoredToken | undefined) => unknown;
   timers: Readonly<{
@@ -849,7 +841,7 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
   const countersOf = (ms: number): readonly SourceObservable<number>[] =>
     mut_counters.filter((c) => c.ms === ms).map((c) => c.counter);
 
-  const visibilityChange = createListenedSource();
+  const visibilityChange = source<undefined>();
 
   const mut_visibility = {
     visible: true,
@@ -859,14 +851,13 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
     hide: () => {
       mut_visibility.visible = false;
 
-      visibilityChange.next();
+      visibilityChange.next(undefined);
     },
     show: () => {
       mut_visibility.visible = true;
 
-      visibilityChange.next();
+      visibilityChange.next(undefined);
     },
-    listening: visibilityChange.listening,
   };
 
   const reader = createReader({
@@ -899,7 +890,7 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
       return counter;
     },
     isVisible: () => mut_visibility.visible,
-    visibilityChange: visibilityChange.observable,
+    visibilityChange,
   });
 
   return {
@@ -1098,46 +1089,3 @@ const issueList = (
     endCursor,
     referenced: [],
   }) as const;
-
-/**
- * A source that counts who listens to it. Whether anyone subscribes is not on
- * synstate's public types (#2117), so the double keeps the count itself.
- */
-const createListenedSource = (): Readonly<{
-  observable: SynstateObservable<undefined>;
-  next: () => void;
-  listening: () => boolean;
-}> => {
-  const change = source<undefined>();
-
-  const mut_count = { value: 0 };
-
-  return {
-    observable: {
-      ...change,
-      subscribe: (onNext, onComplete) => {
-        mut_count.value += 1;
-
-        const subscription = change.subscribe(onNext, onComplete);
-
-        const mut_active = { value: true };
-
-        return {
-          unsubscribe: () => {
-            if (mut_active.value) {
-              mut_active.value = false;
-
-              mut_count.value -= 1;
-            }
-
-            subscription.unsubscribe();
-          },
-        };
-      },
-    },
-    next: () => {
-      change.next(undefined);
-    },
-    listening: () => mut_count.value > 0,
-  };
-};

@@ -1,9 +1,9 @@
 import { ButtonNowrapStyled } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
+import { match } from 'ts-data-forge';
 import type { StrictOmit } from 'ts-type-forge';
 import { dict } from '../../../constants/index.mjs';
 import { AnswerPageStore } from '../../../store/index.mjs';
-import { match } from '../../../utils-ported/index.mjs';
 import { ButtonWithConfirm } from './button-with-confirm.js';
 
 const dc = dict.answerPage.answerBeingEdited;

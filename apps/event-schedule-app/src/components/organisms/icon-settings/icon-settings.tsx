@@ -6,7 +6,6 @@ import {
   iconListReducer,
   type IconListReducerAction,
 } from '../../../functions/index.mjs';
-import { noop } from '../../../utils-ported/index.mjs';
 import { Description } from '../../atoms/index.mjs';
 import { AnswerIconRow } from './icon-setting-row.js';
 
@@ -70,7 +69,6 @@ export const AnswerIconSettingsComponent = memoNamed<Props>(
           answerIcon={answerIcons.good}
           iconId={'good'}
           onDescriptionChange={onOkDescriptionChange}
-          onPointChange={noop}
         />
         <AnswerIconRow
           answerIcon={answerIcons.fair}
@@ -82,7 +80,6 @@ export const AnswerIconSettingsComponent = memoNamed<Props>(
           answerIcon={answerIcons.poor}
           iconId={'poor'}
           onDescriptionChange={onNgDescriptionChange}
-          onPointChange={noop}
         />
       </div>
     );

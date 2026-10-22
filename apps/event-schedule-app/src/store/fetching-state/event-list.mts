@@ -3,19 +3,21 @@ import {
   combine,
   createEventEmitter,
   createState,
+  debounce,
   filter,
   map,
+  merge,
   throttle,
   unwrapResultOk,
   withCurrentValueFrom,
   withInitialValue,
   type InitializedObservable,
 } from 'synstate';
-import { createBooleanState } from 'synstate-react-hooks';
+import { useObservableValue } from 'synstate-react-hooks';
 import { Result, isNotUndefined, tp } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { fetchThrottleTime } from '../../constants/index.mjs';
-import { noop } from '../../utils-ported/index.mjs';
+import { createReducerWithActions } from '../../utils/index.mjs';
 import { Auth } from '../auth.mjs';
 import { EventListPageFilterStore } from '../event-list-page-state/index.mjs';
 
@@ -25,7 +27,7 @@ const fetchEventListThrottled$ = fetchEventList$.pipe(
   throttle(fetchThrottleTime),
 );
 
-const [eventListResult$, setEventListResult] = createState<
+const [fetchedEventListResult$, setFetchedEventListResult] = createState<
   | Result<
       readonly EventListItem[] | undefined,
       Readonly<{ type: 'others' | 'wrong-type-response'; message: string }>
@@ -33,23 +35,9 @@ const [eventListResult$, setEventListResult] = createState<
   | undefined
 >(undefined);
 
-const result$ = eventListResult$;
-
-const [useRefreshButtonIsLoading, { setState: setRefreshButtonIsLoading }] =
-  createBooleanState(false);
-
-const [useRefreshButtonIsDisabled, { setState: setRefreshButtonIsDisabled }] =
-  createBooleanState(false);
-
-const refreshEventList = (): void => {
-  fetchEventList();
-
-  setRefreshButtonIsLoading(true);
-};
-
-/* subscriptions */
-
-combine(
+// Read on request (the first is made below), and again whenever the user or a
+// filter changes.
+const fetchEventListRequest$ = combine(
   tp(
     fetchEventListThrottled$,
     Auth.fireAuthUser$,
@@ -62,23 +50,59 @@ combine(
     EventListPageFilterStore.showAllPastDaysEvent$,
     EventListPageFilterStore.showOnlyEventSchedulesICreated$,
   ),
-).subscribe(
+);
+
+const fetchEventListStarted$ = fetchEventListRequest$.pipe(
+  filter(([_, fireAuthUser]) => fireAuthUser?.uid !== undefined),
+);
+
+/** Nobody is signed in, so there is no list to read. */
+const signedOutResult$ = fetchEventListRequest$
+  .pipe(filter(([_, fireAuthUser]) => fireAuthUser?.uid === undefined))
+  .pipe(map(() => Result.ok(undefined)));
+
+const result$ = merge([fetchedEventListResult$, signedOutResult$]).pipe(
+  withInitialValue(undefined),
+);
+
+const [useRefreshButtonIsLoading, setRefreshButtonIsLoading] =
+  createReducerWithActions(
+    (_: boolean, isLoading: boolean) => isLoading,
+    false,
+    [
+      fetchEventListStarted$.pipe(map(() => true)),
+      fetchedEventListResult$.pipe(map(() => false)),
+    ],
+  );
+
+/** Disabled for `fetchThrottleTime` after each read the button can ask for. */
+const refreshButtonIsDisabled$ = merge([
+  fetchEventListThrottled$.pipe(map(() => true)),
+  fetchEventListThrottled$
+    .pipe(debounce(fetchThrottleTime))
+    .pipe(map(() => false)),
+]).pipe(withInitialValue(false));
+
+const useRefreshButtonIsDisabled = (): boolean =>
+  useObservableValue(refreshButtonIsDisabled$);
+
+const refreshEventList = (): void => {
+  fetchEventList();
+
+  setRefreshButtonIsLoading(true);
+};
+
+/* subscriptions */
+
+fetchEventListStarted$.subscribe(
   ([
     _,
-    fireAuthUser,
+    _fireAuthUser,
     filterText,
     filterOptionState,
     showAllPastDaysEvent,
     showOnlyEventSchedulesICreated,
   ]) => {
-    if (fireAuthUser?.uid === undefined) {
-      setEventListResult(Result.ok(undefined));
-
-      return;
-    }
-
-    setRefreshButtonIsLoading(true);
-
     api.eventList
       .fetch({
         filterText,
@@ -87,11 +111,9 @@ combine(
         showOnlyEventSchedulesICreated,
       })
       .then((result) => {
-        setEventListResult(result);
-
-        setRefreshButtonIsLoading(false);
+        setFetchedEventListResult(result);
       })
-      .catch(noop);
+      .catch(() => {});
   },
 );
 
@@ -102,21 +124,9 @@ result$.subscribe((e) => {
   }
 });
 
-{
-  let mut_timer: TimerId | undefined = undefined;
-
-  fetchEventListThrottled$.subscribe(() => {
-    if (mut_timer !== undefined) {
-      clearTimeout(mut_timer);
-    }
-
-    setRefreshButtonIsDisabled(true);
-
-    mut_timer = setTimeout(() => {
-      setRefreshButtonIsDisabled(false);
-    }, fetchThrottleTime);
-  });
-}
+// The first read, asked for as the page's own requests are, so that the
+// throttle drops the one the page makes as it mounts.
+fetchEventList();
 
 export const eventList$: InitializedObservable<
   readonly EventListItem[] | undefined

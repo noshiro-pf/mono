@@ -7,8 +7,9 @@ import {
   DatePickerWeekdayStyled,
 } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
+import { mapNullable } from 'ts-data-forge';
 import type { DayOfWeekIndex } from 'ts-type-forge';
-import { daysOfWeekList, mapOptional } from '../../utils-ported/index.mjs';
+import { daysOfWeekList } from '../../utils-ported/index.mjs';
 
 type Props = Readonly<{ onClick?: (w: DayOfWeekIndex) => void }>;
 
@@ -19,7 +20,7 @@ export const WeekdaysHeader = memoNamed<Props>(
       () =>
         daysOfWeekList.en.map((w, idx) => ({
           ...w,
-          onClickHandler: mapOptional(onClick, (f) => () => {
+          onClickHandler: mapNullable(onClick, (f) => () => {
             f(
               // eslint-disable-next-line total-functions/no-unsafe-type-assertion
               idx as DayOfWeekIndex,

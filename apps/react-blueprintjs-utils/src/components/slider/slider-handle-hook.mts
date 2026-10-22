@@ -3,7 +3,6 @@ import * as React from 'react';
 import { useValueAsRef } from 'react-utils';
 import { asNonZeroFiniteNumber, Num, pipe } from 'ts-data-forge';
 import type { UintRange } from 'ts-type-forge';
-import { noop } from '../../utils/index.mjs';
 
 type Props = Readonly<{
   trackElementRef: React.RefObject<HTMLDivElement | null>;
@@ -56,7 +55,7 @@ export const useSliderHandleStateManager = ({
   const [isMoving, setIsMoving] = useState<boolean>(false);
 
   // value as ref
-  const removeDocumentEventListenersRef = React.useRef<() => void>(noop);
+  const removeDocumentEventListenersRef = React.useRef<() => void>(() => {});
 
   const clampRef = useValueAsRef(clamp);
 

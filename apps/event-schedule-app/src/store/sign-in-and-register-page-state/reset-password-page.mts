@@ -1,5 +1,4 @@
-import { type InitializedObservable, combine, map } from 'synstate';
-import { createReducer } from 'synstate-react-hooks';
+import { type InitializedObservable, combine, filter, map } from 'synstate';
 import { Optional, Result } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { Routes, dict } from '../../constants/index.mjs';
@@ -10,15 +9,21 @@ import {
   resetPasswordPageStateReducer,
   showToast,
 } from '../../functions/index.mjs';
+import { createReducerWithActions } from '../../utils/index.mjs';
 import { Router } from '../router.mjs';
 
 const dc = dict.register;
 
 const toast = createToaster();
 
-const [, dispatch, { state: formState$ }] = createReducer(
+const [, dispatch, { state: formState$ }] = createReducerWithActions(
   resetPasswordPageStateReducer,
   resetPasswordPageInitialState,
+  [
+    Router.isRoute.signInPage$
+      .pipe(filter((isSignInPage) => !isSignInPage))
+      .pipe(map(() => ({ type: 'reset' }) as const)),
+  ],
 );
 
 const enterButtonDisabled$ = formState$.pipe(
@@ -109,18 +114,6 @@ const enterClickHandler = (): void => {
 const inputEmailHandler = (value: string): void => {
   dispatch({ type: 'inputEmail', payload: value });
 };
-
-const resetAllState = (): void => {
-  dispatch({ type: 'reset' });
-};
-
-/* subscriptions */
-
-Router.isRoute.signInPage$.subscribe((isSignInPage) => {
-  if (!isSignInPage) {
-    resetAllState();
-  }
-});
 
 export const ResetPasswordPageStore = {
   state,

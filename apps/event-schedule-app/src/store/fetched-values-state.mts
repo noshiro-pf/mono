@@ -2,19 +2,11 @@ import {
   type InitializedObservable,
   combine,
   map,
-  skipIfNoChange,
   withInitialValue,
 } from 'synstate';
 import { Result } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
-import { mapOptional } from '../utils-ported/index.mjs';
-import { Auth } from './auth.mjs';
-import {
-  AnswersStore,
-  EventListStore,
-  EventScheduleStore,
-} from './fetching-state/index.mjs';
-import { Router } from './router.mjs';
+import { AnswersStore, EventScheduleStore } from './fetching-state/index.mjs';
 
 export const errorType$: InitializedObservable<
   DeepReadonly<
@@ -38,16 +30,3 @@ export const errorType$: InitializedObservable<
     ),
   )
   .pipe(withInitialValue(undefined));
-
-Router.eventId$.subscribe(() => {
-  EventScheduleStore.fetchEventSchedule();
-
-  AnswersStore.fetchAnswers();
-});
-
-Auth.fireAuthUser$
-  .pipe(map((u) => mapOptional(u, (a) => a.uid)))
-  .pipe(skipIfNoChange())
-  .subscribe(() => {
-    EventListStore.fetchEventList();
-  });

@@ -1,6 +1,6 @@
 import type * as Discord from 'discord.js';
 import { ChannelType } from 'discord.js';
-import { Result } from 'ts-data-forge';
+import { Result, match } from 'ts-data-forge';
 import { emojis } from '../constants.mjs';
 import { firestoreApi } from '../firebase/index.mjs';
 import {
@@ -14,7 +14,6 @@ import {
   toUserId,
   type AnswerType,
 } from '../types/index.mjs';
-import { match } from '../utils/index.mjs';
 import { fixAnswerAndUpdateMessage } from './fix-answer.mjs';
 
 const onRefreshClick = async (
@@ -181,12 +180,16 @@ const onMessageReactCommon = async (
 const mapReactionEmojiNameToAnswerType = (
   reactionEmojiName: string | null,
 ): AnswerType | 'refresh' | undefined =>
-  match(reactionEmojiName ?? '', {
-    [emojis.good.unicode]: 'good',
-    [emojis.fair.unicode]: 'fair',
-    [emojis.poor.unicode]: 'poor',
-    [emojis.refresh.unicode]: 'refresh',
-  });
+  match(
+    reactionEmojiName ?? '',
+    {
+      [emojis.good.unicode]: 'good',
+      [emojis.fair.unicode]: 'fair',
+      [emojis.poor.unicode]: 'poor',
+      [emojis.refresh.unicode]: 'refresh',
+    },
+    undefined,
+  );
 
 export const onMessageReactionAdd = async (
   reaction: Discord.MessageReaction,

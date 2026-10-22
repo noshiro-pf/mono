@@ -1,18 +1,17 @@
 import {
   type InitializedObservable,
-  combine,
   createEventEmitter,
   filter,
   merge,
   throttle,
   unwrapResultOk,
+  withCurrentValueFrom,
   withInitialValue,
 } from 'synstate';
 import { createState } from 'synstate-react-hooks';
 import { Result, isNotUndefined } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { fetchThrottleTime } from '../../constants/index.mjs';
-import { noop } from '../../utils-ported/index.mjs';
 import { Router } from '../router.mjs';
 
 const [fetchEventSchedule$, fetchEventSchedule] = createEventEmitter();
@@ -44,21 +43,26 @@ const [
 
 const result$ = eventScheduleResult$;
 
-combine([
-  merge([fetchEventScheduleThrottled$, refetchEventScheduleAfterWrite$]),
+// Read on request (the first is made below), and again whenever the page moves
+// to another event.
+merge([
+  fetchEventScheduleThrottled$,
+  refetchEventScheduleAfterWrite$,
   Router.eventId$,
-]).subscribe(([_, eventId]) => {
-  if (eventId === undefined) {
-    return;
-  }
+])
+  .pipe(withCurrentValueFrom(Router.eventId$))
+  .subscribe(([_, eventId]) => {
+    if (eventId === undefined) {
+      return;
+    }
 
-  api.event
-    .fetch(eventId)
-    .then((result) => {
-      setEventScheduleResult(result);
-    })
-    .catch(noop);
-});
+    api.event
+      .fetch(eventId)
+      .then((result) => {
+        setEventScheduleResult(result);
+      })
+      .catch(() => {});
+  });
 
 result$.subscribe((e) => {
   if (e !== undefined && Result.isErr(e)) {
@@ -66,6 +70,10 @@ result$.subscribe((e) => {
     console.error('eventScheduleResult', e);
   }
 });
+
+// The first read, asked for as the page's own requests are, so that the
+// throttle drops the one the page makes as it mounts.
+fetchEventSchedule();
 
 export const eventSchedule$: InitializedObservable<EventSchedule | undefined> =
   result$

@@ -1,5 +1,9 @@
 import {
   createState,
+  empty,
+  map,
+  switchMap,
+  withInitialValue,
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
@@ -20,17 +24,26 @@ export type MediaStore = Readonly<{
  * system is dark. A phone turned on its side changes the first.
  */
 export const createMediaStore = (deps: MediaDeps): MediaStore => {
-  const [matches, setMatches] = createState(deps.matches());
+  // Listened to only while started; switching away disposes the listener.
+  const [started, setStarted] = createState(false);
+
+  const matches = started
+    .pipe(
+      switchMap((isStarted) =>
+        isStarted
+          ? deps.change.pipe(map(() => deps.matches()))
+          : empty<boolean>(),
+      ),
+    )
+    .pipe(withInitialValue(deps.matches()));
 
   return {
     matches,
     start: () => {
-      const subscription = deps.change.subscribe(() => {
-        setMatches(deps.matches());
-      });
+      setStarted(true);
 
       return () => {
-        subscription.unsubscribe();
+        setStarted(false);
       };
     },
   };

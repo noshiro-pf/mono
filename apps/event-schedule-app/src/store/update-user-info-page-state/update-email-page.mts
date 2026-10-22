@@ -2,11 +2,11 @@ import { EmailAuthProvider } from 'firebase/auth';
 import {
   type InitializedObservable,
   combine,
+  filter,
   map,
   withCurrentValueFrom,
 } from 'synstate';
-import { createBooleanState, createReducer } from 'synstate-react-hooks';
-import { Result } from 'ts-data-forge';
+import { Result, isNotUndefined } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { dict } from '../../constants/index.mjs';
 import {
@@ -16,6 +16,10 @@ import {
   updateEmailPageInitialState,
   updateEmailPageStateReducer,
 } from '../../functions/index.mjs';
+import {
+  createReducerWithActions,
+  createToggleState,
+} from '../../utils/index.mjs';
 import { Auth } from '../auth.mjs';
 import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state.mjs';
 
@@ -23,9 +27,32 @@ const dc = dict.accountSettings;
 
 const toast = createToaster();
 
-const [, dispatch, { state: formState$ }] = createReducer(
+/** Cleared when the dialog closes, and filled in when this one opens. */
+const dialogActions$ = UpdateUserInfoDialogStore.openingDialogType$
+  .pipe(withCurrentValueFrom(Auth.fireAuthUser$))
+  .pipe(
+    map(([openingDialog, user]) => {
+      switch (openingDialog) {
+        case undefined:
+          return { type: 'reset' } as const;
+
+        case 'updateEmail':
+          return { type: 'inputEmail', payload: user?.email ?? '' } as const;
+
+        case 'deleteAccount':
+        case 'deleteAccountCreatedWithGoogle':
+        case 'updateDisplayName':
+        case 'updatePassword':
+          return undefined;
+      }
+    }),
+  )
+  .pipe(filter(isNotUndefined));
+
+const [, dispatch, { state: formState$ }] = createReducerWithActions(
   updateEmailPageStateReducer,
   updateEmailPageInitialState,
+  [dialogActions$],
 );
 
 const enterButtonDisabled$ = formState$.pipe(
@@ -40,14 +67,12 @@ const passwordFormIntent$: InitializedObservable<Intent> = formState$.pipe(
   map((st) => (st.password.error === undefined ? 'primary' : 'danger')),
 );
 
-const [
-  ,
-  {
-    state: passwordIsOpen$,
-    setFalse: hidePassword,
-    toggle: togglePasswordLock,
-  },
-] = createBooleanState(false);
+const { state: passwordIsOpen$, toggle: togglePasswordLock } =
+  createToggleState([
+    UpdateUserInfoDialogStore.openingDialogType$.pipe(
+      filter((openingDialog) => openingDialog === undefined),
+    ),
+  ]);
 
 const state = combine([
   formState$,
@@ -175,36 +200,6 @@ const inputEmailHandler = (value: string): void => {
 const inputPasswordHandler = (value: string): void => {
   dispatch({ type: 'inputPassword', payload: value });
 };
-
-const resetAllDialogState = (): void => {
-  dispatch({ type: 'reset' });
-
-  hidePassword();
-};
-
-/* subscriptions */
-
-UpdateUserInfoDialogStore.openingDialogType$
-  .pipe(withCurrentValueFrom(Auth.fireAuthUser$))
-  .subscribe(([openingDialog, user]) => {
-    switch (openingDialog) {
-      case undefined:
-        resetAllDialogState();
-
-        break;
-
-      case 'updateEmail':
-        dispatch({ type: 'inputEmail', payload: user?.email ?? '' });
-
-        break;
-
-      case 'deleteAccount':
-      case 'deleteAccountCreatedWithGoogle':
-      case 'updateDisplayName':
-      case 'updatePassword':
-        break;
-    }
-  });
 
 export const UpdateEmailPageStore = {
   togglePasswordLock,

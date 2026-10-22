@@ -1,7 +1,6 @@
 import { css } from '@emotion/react';
 import { BpInput } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { match } from '../../../utils-ported/index.mjs';
 import { CustomIcon } from '../../atoms/index.mjs';
 import {
   AnswerIconFairPointInput,
@@ -9,12 +8,22 @@ import {
   AnswerIconPoorPoint,
 } from '../../molecules/index.mjs';
 
-type Props = Readonly<{
-  iconId: AnswerIconId;
-  answerIcon: AnswerIconSetting;
-  onDescriptionChange: (value: string) => void;
-  onPointChange: (value: AnswerIconPoint) => void;
-}>;
+type Props = Readonly<
+  {
+    answerIcon: AnswerIconSetting;
+    onDescriptionChange: (value: string) => void;
+  } & (
+    | {
+        iconId: 'fair';
+        onPointChange: (value: AnswerIconPoint) => void;
+      }
+    | {
+        // good と poor の点数は固定なので変更ハンドラを持たない
+        iconId: 'good' | 'poor';
+        onPointChange?: undefined;
+      }
+  )
+>;
 
 export const AnswerIconRow = memoNamed<Props>(
   'AnswerIconRow',
@@ -57,19 +66,19 @@ export const AnswerIconRow = memoNamed<Props>(
           flex: 0 0 75px;
         `}
       >
-        {match(iconId, {
-          good: <AnswerIconGoodPoint />,
-          poor: <AnswerIconPoorPoint />,
-          fair: (
-            <div data-e2e={'fair-point-input'}>
-              <AnswerIconFairPointInput
-                disabled={false}
-                value={answerIcon.point}
-                onValueChange={onPointChange}
-              />
-            </div>
-          ),
-        })}
+        {iconId === 'fair' ? (
+          <div data-e2e={'fair-point-input'}>
+            <AnswerIconFairPointInput
+              disabled={false}
+              value={answerIcon.point}
+              onValueChange={onPointChange}
+            />
+          </div>
+        ) : iconId === 'good' ? (
+          <AnswerIconGoodPoint />
+        ) : (
+          <AnswerIconPoorPoint />
+        )}
       </div>
     </div>
   ),

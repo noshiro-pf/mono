@@ -6,7 +6,7 @@ import * as React from 'react';
 import { BpCheckbox, BpInput } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
 import { useObservableValue } from 'synstate-react-hooks';
-import { Arr, Result, tp } from 'ts-data-forge';
+import { Arr, Result, match, tp } from 'ts-data-forge';
 import { api } from '../../../api/index.mjs';
 import { dict } from '../../../constants/index.mjs';
 import { createToaster, showToast } from '../../../functions/index.mjs';
@@ -16,7 +16,6 @@ import {
   EventListStore,
   eventList$,
 } from '../../../store/index.mjs';
-import { match, noop } from '../../../utils-ported/index.mjs';
 import { Header } from '../../organisms/index.mjs';
 import { EventListItemComponent } from './event-list-item.js';
 
@@ -53,7 +52,7 @@ export const EventListPage = memoNamed('EventListPage', () => {
               archiveEventScheduleHandler(e.eventScheduleMetadata.id, {
                 id: UserId.cast(fireAuthUser.uid),
                 name: UserName.cast(fireAuthUser.displayName ?? ''),
-              }).catch(noop);
+              }).catch(() => {});
             },
             () => {
               if (fireAuthUser === undefined) {
@@ -63,7 +62,7 @@ export const EventListPage = memoNamed('EventListPage', () => {
               unarchiveEventScheduleHandler(e.eventScheduleMetadata.id, {
                 id: UserId.cast(fireAuthUser.uid),
                 name: UserName.cast(fireAuthUser.displayName ?? ''),
-              }).catch(noop);
+              }).catch(() => {});
             },
           ),
         ),

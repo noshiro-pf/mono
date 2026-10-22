@@ -1,5 +1,11 @@
 import * as firestore from 'firebase/firestore';
-import { Result, pipe, unknownToString } from 'ts-data-forge';
+import {
+  Result,
+  mapNullable,
+  match,
+  pipe,
+  unknownToString,
+} from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import {
   pollFromJson,
@@ -13,7 +19,7 @@ import {
   type PollId,
   type UserId,
 } from '../types/index.mjs';
-import { DateUtils, mapOptional, match, noop } from '../utils/index.mjs';
+import { DateUtils } from '../utils/index.mjs';
 import { firestoreApp } from './initialize-firebase.mjs';
 
 const pollsCollection = firestore.collection(firestoreApp, 'polls');
@@ -49,7 +55,7 @@ const getPollIdByCommandMessageId = (
         pipe(data)
           .map(valueType.fill)
           .map((o) => o.value)
-          .map((v) => mapOptional(v, toPollId)).value,
+          .mapNullable(toPollId).value,
       unknownToString,
     ),
   );
@@ -65,7 +71,7 @@ const setPollIdForCommandMessageId = (
         value: pollId,
       },
     ),
-  ).then(Result.fold(noop, unknownToString));
+  ).then(Result.fold(() => {}, unknownToString));
 
 const getPollIdByDateOptionId = (
   dateOptionId: DateOptionId,
@@ -80,7 +86,7 @@ const getPollIdByDateOptionId = (
         pipe(data)
           .map(valueType.fill)
           .map((o) => o.value)
-          .map((v) => mapOptional(v, toPollId)).value,
+          .mapNullable(toPollId).value,
       unknownToString,
     ),
   );
@@ -109,7 +115,7 @@ const setPollIdForDateOptionIds = async (
 const setPoll = (poll: Poll): Promise<Result<void, string>> =>
   Result.fromPromise(
     firestore.setDoc(firestore.doc(pollsCollection, poll.id), pollToJson(poll)),
-  ).then(Result.fold(noop, unknownToString));
+  ).then(Result.fold(() => {}, unknownToString));
 
 const getPollById = (
   pollId: PollId,
@@ -118,7 +124,7 @@ const getPollById = (
     firestore
       .getDoc(firestore.doc(pollsCollection, pollId))
       .then((d) => d.data()),
-  ).then(Result.fold((d) => mapOptional(d, pollFromJson), unknownToString));
+  ).then(Result.fold(mapNullable(pollFromJson), unknownToString));
 
 const updatePollTitle = (
   pollId: PollId,
@@ -126,14 +132,14 @@ const updatePollTitle = (
 ): Promise<Result<void, string>> =>
   Result.fromPromise(
     firestore.updateDoc(firestore.doc(pollsCollection, pollId), { title }),
-  ).then(Result.fold(noop, unknownToString));
+  ).then(Result.fold(() => {}, unknownToString));
 
 const updatePollUpdatedAt = (pollId: PollId): Promise<Result<void, string>> =>
   Result.fromPromise(
     firestore.updateDoc(firestore.doc(pollsCollection, pollId), {
       updatedAt: toTimestamp(DateUtils.now()),
     }),
-  ).then(Result.fold(noop, unknownToString));
+  ).then(Result.fold(() => {}, unknownToString));
 
 const updateMessageReaction = (
   pollId: PollId,
@@ -149,7 +155,7 @@ const updateMessageReaction = (
         remove: firestore.arrayRemove(userId),
       }),
     }),
-  ).then(Result.fold(noop, unknownToString));
+  ).then(Result.fold(() => {}, unknownToString));
 
 export const firestoreApi = {
   getPollIdByCommandMessageId,

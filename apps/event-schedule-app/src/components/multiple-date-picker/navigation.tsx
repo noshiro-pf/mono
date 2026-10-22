@@ -3,10 +3,10 @@ import { css } from '@emotion/react';
 import * as React from 'react';
 import { BpSelect } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { Arr, asSafeUint, Num, SafeUint } from 'ts-data-forge';
+import { Arr, asSafeUint, mapNullable, Num, SafeUint } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
 import type { MonthEnum } from 'ts-type-forge';
-import { mapOptional, monthsList } from '../../utils-ported/index.mjs';
+import { monthsList } from '../../utils-ported/index.mjs';
 
 const thisYear = asSafeUint(DateUtils.getLocaleYear(DateUtils.today()));
 
@@ -44,7 +44,7 @@ export const DatepickerNav = memoNamed<Props>(
     const onYearChangeHandler = React.useCallback(
       (value: string) => {
         onYearChange(
-          mapOptional(
+          mapNullable(
             Num.from(value),
             (a) => asSafeUint(a) satisfies SafeUint,
           ) ?? thisYear,
@@ -56,7 +56,7 @@ export const DatepickerNav = memoNamed<Props>(
     const onMonthChangeHandler = React.useCallback(
       (value: string) => {
         onMonthChange(
-          mapOptional(
+          mapNullable(
             Num.from(value),
             (a) =>
               // eslint-disable-next-line total-functions/no-unsafe-type-assertion

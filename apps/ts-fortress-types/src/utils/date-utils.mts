@@ -1,4 +1,4 @@
-import { asSafeUint } from 'ts-data-forge';
+import { asSafeUint, isSafeUint, Num } from 'ts-data-forge';
 import type {
   DateEnum,
   DayOfWeekIndex,
@@ -208,18 +208,23 @@ const monthToIndex = {
   12: 11,
 } as const satisfies ReadonlyRecord<MonthEnum, Index<12>>;
 
-const isInteger = (n: number, min: number, max: number): boolean =>
-  Number.isSafeInteger(n) && min <= n && n <= max;
+const isMonth: (n: number) => n is MonthEnum = Num.isUintInRangeInclusive(
+  1,
+  12,
+);
 
-const isSafeUint = (n: number): n is SafeUint =>
-  Number.isSafeInteger(n) && n >= 0;
+const isDayOfMonth: (n: number) => n is DateEnum = Num.isUintInRangeInclusive(
+  1,
+  31,
+);
 
-const isMonth = (n: number): n is MonthEnum => isInteger(n, 1, 12);
+const isHours: (n: number) => n is HoursEnum = Num.isUintInRangeInclusive(
+  0,
+  23,
+);
 
-const isDayOfMonth = (n: number): n is DateEnum => isInteger(n, 1, 31);
+const isMinutes = (n: number): n is MinutesEnum =>
+  Number.isSafeInteger(n) && Num.isInRangeInclusive(0, 59)(n);
 
-const isHours = (n: number): n is HoursEnum => isInteger(n, 0, 23);
-
-const isMinutes = (n: number): n is MinutesEnum => isInteger(n, 0, 59);
-
-const isDayOfWeek = (n: number): n is DayOfWeekIndex => isInteger(n, 0, 6);
+const isDayOfWeek: (n: number) => n is DayOfWeekIndex =
+  Num.isUintInRangeInclusive(0, 6);

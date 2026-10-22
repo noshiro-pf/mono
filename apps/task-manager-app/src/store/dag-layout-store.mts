@@ -82,9 +82,16 @@
 
 import {
   combine,
+  createEventEmitter,
   createState,
+  empty,
   map,
+  merge,
+  skipIfNoChange,
+  switchMap,
+  withInitialValue,
   type InitializedObservable,
+  type Observable as SynstateObservable,
 } from 'synstate';
 import { Arr, Num, unknownToString } from 'ts-data-forge';
 import {
@@ -283,36 +290,47 @@ export type DagLayoutStore = Readonly<{
 export const createDagLayoutStore = <H, F>(
   deps: DagLayoutDeps<H, F>,
 ): DagLayoutStore => {
-  const [autoLayout, setAutoLayout, { getSnapshot: getAutoLayout }] =
-    createState<DagLayoutState>({ type: 'idle' });
+  // What the store hands out is kept in these variables, which everything
+  // below reads and writes as it goes, and handed out as observables derived
+  // from them (`published`). A change of an input is followed by a node
+  // derived from that input, not by a subscriber of it: written from a
+  // subscriber, the observables would be written while that change is still
+  // propagating. What the store does on its own — an action, a frame, a
+  // timer, a layout coming back — is handed out by `publish`.
+  let mut_autoLayout: DagLayoutState = { type: 'idle' } as const;
 
-  const [arrangement, setArrangement, { getSnapshot: getArrangement }] =
-    createState<DagLayout>(
-      initialArrangement(
-        deps.stored.getSnapshot().value,
-        deps.defaultDirection.getSnapshot().value,
-      ),
+  let mut_arrangement: DagLayout = initialArrangement(
+    deps.stored.getSnapshot().value,
+    deps.defaultDirection.getSnapshot().value,
+  );
+
+  let mut_fitRequests = 0;
+
+  let mut_animatedPositions: ReadonlyMap<GraphNodeId, Point> | undefined =
+    undefined;
+
+  let mut_animatedOpacities: ReadonlyMap<GraphNodeId, number> | undefined =
+    undefined;
+
+  let mut_animationProgress: number | undefined = undefined;
+
+  const getAutoLayout = (): DagLayoutState => mut_autoLayout;
+
+  const getArrangement = (): DagLayout => mut_arrangement;
+
+  const [acted, publish] = createEventEmitter();
+
+  // While `start` has been called and its stop has not. The inputs are
+  // followed only then: what follows them is derived from this, so that
+  // stopping disposes it.
+  const [started, setStarted] = createState(false);
+
+  const whileStarted = (
+    follow: () => SynstateObservable<unknown>,
+  ): SynstateObservable<unknown> =>
+    started.pipe(
+      switchMap((isStarted) => (isStarted ? follow() : empty<unknown>())),
     );
-
-  const [fitRequests, , { updateState: updateFitRequests }] = createState(0);
-
-  const [
-    animatedPositions,
-    setAnimatedPositions,
-    { getSnapshot: getAnimatedPositions },
-  ] = createState<ReadonlyMap<GraphNodeId, Point> | undefined>(undefined);
-
-  const [
-    animatedOpacities,
-    setAnimatedOpacities,
-    { getSnapshot: getAnimatedOpacities },
-  ] = createState<ReadonlyMap<GraphNodeId, number> | undefined>(undefined);
-
-  const [
-    animationProgress,
-    setAnimationProgress,
-    { getSnapshot: getAnimationProgress },
-  ] = createState<number | undefined>(undefined);
 
   const [tileWidth, setTileWidthState, { getSnapshot: getTileWidth }] =
     createState<number | undefined>(undefined);
@@ -358,7 +376,8 @@ export const createDagLayoutStore = <H, F>(
 
   let mut_nodeSize = deps.nodeSize.getSnapshot().value;
 
-  let mut_diagramOrder = diagramOrder.getSnapshot().value;
+  let mut_diagramOrder: readonly GraphNodeId[] =
+    diagramOrder.getSnapshot().value;
 
   let mut_arcOrder = arcOrder.getSnapshot().value;
 
@@ -542,17 +561,11 @@ export const createDagLayoutStore = <H, F>(
 
     mut_animation = undefined;
 
-    if (getAnimatedPositions() !== undefined) {
-      setAnimatedPositions(undefined);
-    }
+    mut_animatedPositions = undefined;
 
-    if (getAnimatedOpacities() !== undefined) {
-      setAnimatedOpacities(undefined);
-    }
+    mut_animatedOpacities = undefined;
 
-    if (getAnimationProgress() !== undefined) {
-      setAnimationProgress(undefined);
-    }
+    mut_animationProgress = undefined;
   };
 
   const nextFrame = (): void => {
@@ -582,15 +595,21 @@ export const createDagLayoutStore = <H, F>(
       Num.isNonZero(deps.animationMs) ? Num.div(elapsed, deps.animationMs) : 1,
     );
 
-    setAnimationProgress(t);
+    mut_animationProgress = t;
 
-    setAnimatedPositions(interpolatePositions(from, to, t));
+    mut_animatedPositions = interpolatePositions(from, to, t);
 
     if (fade !== undefined) {
-      setAnimatedOpacities(interpolateOpacities(fade.from, fade.to, t));
+      mut_animatedOpacities = interpolateOpacities(fade.from, fade.to, t);
     }
 
-    mut_frame = deps.requestFrame(nextFrame);
+    mut_frame = deps.requestFrame(onFrame);
+  };
+
+  const onFrame = (): void => {
+    nextFrame();
+
+    publish();
   };
 
   const animationAllowed = (): boolean =>
@@ -609,9 +628,9 @@ export const createDagLayoutStore = <H, F>(
     to: ReadonlyMap<GraphNodeId, Point>,
     fade?: Fade,
   ): void => {
-    const drawn = getAnimatedPositions();
+    const drawn = mut_animatedPositions;
 
-    const drawnOpacities = getAnimatedOpacities();
+    const drawnOpacities = mut_animatedOpacities;
 
     finishAnimation();
 
@@ -647,15 +666,15 @@ export const createDagLayoutStore = <H, F>(
       budget: startFrameBudget(startedAt),
     };
 
-    setAnimationProgress(0);
+    mut_animationProgress = 0;
 
-    setAnimatedPositions(interpolatePositions(departure, to, 0));
+    mut_animatedPositions = interpolatePositions(departure, to, 0);
 
     if (fading !== undefined) {
-      setAnimatedOpacities(interpolateOpacities(fading.from, fading.to, 0));
+      mut_animatedOpacities = interpolateOpacities(fading.from, fading.to, 0);
     }
 
-    mut_frame = deps.requestFrame(nextFrame);
+    mut_frame = deps.requestFrame(onFrame);
   };
 
   /** The first time there is something to show: from a grid. */
@@ -705,7 +724,7 @@ export const createDagLayoutStore = <H, F>(
 
     const saved = frozen(next, members, replaced);
 
-    setArrangement(saved);
+    mut_arrangement = saved;
 
     deps.save(saved);
   };
@@ -738,7 +757,7 @@ export const createDagLayoutStore = <H, F>(
       animate(before, after);
     }
 
-    updateFitRequests((count) => count + 1);
+    mut_fitRequests += 1;
   };
 
   /**
@@ -871,7 +890,7 @@ export const createDagLayoutStore = <H, F>(
       mut_awaitingFrom = to;
     }
 
-    updateFitRequests((count) => count + 1);
+    mut_fitRequests += 1;
   };
 
   /**
@@ -901,7 +920,7 @@ export const createDagLayoutStore = <H, F>(
       animate(before, after);
     }
 
-    updateFitRequests((count) => count + 1);
+    mut_fitRequests += 1;
   };
 
   /**
@@ -946,7 +965,7 @@ export const createDagLayoutStore = <H, F>(
       animate(before, after);
     }
 
-    updateFitRequests((count) => count + 1);
+    mut_fitRequests += 1;
   };
 
   const setTileWidth = (available: number): void => {
@@ -1102,14 +1121,14 @@ export const createDagLayoutStore = <H, F>(
 
     const current = getArrangement();
 
-    setArrangement({
+    mut_arrangement = {
       direction: current.direction,
       positions: withPosition(current.positions, id, {
         x: from.x + delta.x,
         y: from.y + delta.y,
       }),
       groupPositions: current.groupPositions,
-    });
+    };
 
     cancelNudge();
 
@@ -1117,6 +1136,8 @@ export const createDagLayoutStore = <H, F>(
       mut_nudgeTimer = undefined;
 
       commit(getArrangement());
+
+      publish();
     }, deps.nudgeDelayMs);
   };
 
@@ -1144,235 +1165,280 @@ export const createDagLayoutStore = <H, F>(
     }
   };
 
-  const start = (): (() => void) => {
-    // A move not yet saved is not undone by a write coming back meanwhile:
-    // it is saved over it.
-    const storedSubscription = combine([
-      deps.stored,
-      deps.defaultDirection,
-    ]).subscribe(([stored, defaultDirection]) => {
-      if (mut_nudgeTimer !== undefined) {
-        return;
-      }
+  // A move not yet saved is not undone by a write coming back meanwhile:
+  // it is saved over it.
+  const followStored = (
+    stored: DagLayout | undefined,
+    defaultDirection: DagDirection,
+  ): void => {
+    if (mut_nudgeTimer !== undefined) {
+      return;
+    }
 
-      const before = positionsOf(placed());
+    const before = positionsOf(placed());
 
-      setArrangement(initialArrangement(stored, defaultDirection));
+    mut_arrangement = initialArrangement(stored, defaultDirection);
 
-      const after = positionsOf(placed());
+    const after = positionsOf(placed());
 
-      // Not for a write of this store's own, which comes back unchanged,
-      // nor outside the DAG, where nothing on screen moves.
-      if (
-        !onScreen() ||
-        !isArrangeable(mut_viewMode) ||
-        samePositions(before, after)
-      ) {
-        return;
-      }
+    // Not for a write of this store's own, which comes back unchanged,
+    // nor outside the DAG, where nothing on screen moves.
+    if (
+      !onScreen() ||
+      !isArrangeable(mut_viewMode) ||
+      samePositions(before, after)
+    ) {
+      return;
+    }
 
-      animate(before, after);
+    animate(before, after);
 
-      updateFitRequests((count) => count + 1);
-    });
+    mut_fitRequests += 1;
+  };
 
-    const layoutSubscription = combine([
-      deps.state,
-      arrangement,
-      deps.active,
-      deps.nodeSize,
-      deps.hidden,
-      membership,
-    ]).subscribe(([state, { direction }, active, size, hidden, groups]) => {
-      if (!active) {
-        finishAnimation();
+  const followLayoutInput = (
+    state: DomainState,
+    direction: DagDirection,
+    active: boolean,
+    size: NodeSize,
+    hidden: ReadonlySet<GraphNodeId>,
+    groups: readonly LayoutGroup[],
+  ): void => {
+    if (!active) {
+      finishAnimation();
 
-        return;
-      }
+      return;
+    }
 
-      const shownState = withoutNodes(state, hidden);
+    const shownState = withoutNodes(state, hidden);
 
-      const input = layoutInput(
-        withChronologicalEdges(shownState, buildDependencyGraph(shownState)),
-        direction,
-        size,
-        groups,
-      );
+    const input = layoutInput(
+      withChronologicalEdges(shownState, buildDependencyGraph(shownState)),
+      direction,
+      size,
+      groups,
+    );
 
-      const key = layoutKey(input);
+    const key = layoutKey(input);
 
-      if (key === mut_requestedKey) {
-        return;
-      }
+    if (key === mut_requestedKey) {
+      return;
+    }
 
-      mut_requestedKey = key;
+    mut_requestedKey = key;
 
-      setAutoLayout({ type: 'computing', previous: shownAutoLayout() });
+    mut_autoLayout = { type: 'computing', previous: shownAutoLayout() };
 
-      deps
-        .layout(input)
-        .then((laidOut) => {
-          if (mut_requestedKey !== key) {
-            return;
-          }
+    deps
+      .layout(input)
+      .then((laidOut) => {
+        if (mut_requestedKey !== key) {
+          return;
+        }
 
-          const previous = shownAutoLayout();
+        const previous = shownAutoLayout();
 
-          const previousMadeFor = mut_shownMadeFor;
+        const previousMadeFor = mut_shownMadeFor;
 
-          setAutoLayout({ type: 'ready', layout: laidOut });
+        mut_autoLayout = { type: 'ready', layout: laidOut };
 
-          mut_shownMadeFor = { direction, size };
+        mut_shownMadeFor = { direction, size };
 
-          if (
-            previous !== undefined &&
-            previousMadeFor?.direction === direction &&
-            previousMadeFor.size === size
-          ) {
-            followStructure(previous, laidOut);
-          }
+        if (
+          previous !== undefined &&
+          previousMadeFor?.direction === direction &&
+          previousMadeFor.size === size
+        ) {
+          followStructure(previous, laidOut);
+        }
 
-          applyArrangeIfRequested(laidOut);
+        applyArrangeIfRequested(laidOut);
 
-          moveAwaited();
+        moveAwaited();
 
-          introduce();
-        })
-        .catch((error: unknown) => {
-          if (mut_requestedKey !== key) {
-            return;
-          }
-
-          mut_arrangeRequested = false;
-
-          mut_awaitingFrom = undefined;
-
-          mut_shownMadeFor = undefined;
-
-          setAutoLayout({ type: 'error', message: unknownToString(error) });
-        });
-    });
-
-    // In 「アーク」 and 「タイル」, the nodes are shown moving into place as
-    // soon as there are any, without waiting for ELK to lay out the DAG.
-    const diagramSubscription = combine([
-      deps.active,
-      arcNodes,
-      tileNodes,
-    ]).subscribe(([active]) => {
-      if (active && !isArrangeable(mut_viewMode)) {
         introduce();
-      }
-    });
 
-    // Turned off, or less motion asked for, in the middle of one.
-    const motionSubscription = combine([
-      deps.animationSetting,
-      deps.reducedMotion,
-    ]).subscribe(() => {
-      if (!animationAllowed()) {
-        finishAnimation();
-      }
-    });
+        publish();
+      })
+      .catch((error: unknown) => {
+        if (mut_requestedKey !== key) {
+          return;
+        }
 
-    const viewModeSubscription = deps.viewMode.subscribe((mode) => {
-      if (mode === mut_viewMode) {
-        return;
-      }
+        mut_arrangeRequested = false;
 
-      const previous = mut_viewMode;
+        mut_awaitingFrom = undefined;
 
-      mut_viewMode = mode;
+        mut_shownMadeFor = undefined;
 
-      // Nothing on screen yet: it is drawn in the new mode from the start.
-      if (!onScreen()) {
-        return;
-      }
+        mut_autoLayout = { type: 'error', message: unknownToString(error) };
 
-      switchMode(previous, mode);
-    });
+        publish();
+      });
+  };
 
-    const nodeSizeSubscription = deps.nodeSize.subscribe((size) => {
-      if (size === mut_nodeSize) {
-        return;
-      }
+  const followViewMode = (mode: DagViewMode): void => {
+    if (mode === mut_viewMode) {
+      return;
+    }
 
-      const previous = mut_nodeSize;
+    const previous = mut_viewMode;
 
-      mut_nodeSize = size;
+    mut_viewMode = mode;
 
-      resize(previous, size);
-    });
+    // Nothing on screen yet: it is drawn in the new mode from the start.
+    if (!onScreen()) {
+      return;
+    }
 
-    const diagramOrderSubscription = diagramOrder.subscribe((ids) => {
-      if (sameDiagramOrder(ids, mut_diagramOrder)) {
-        return;
-      }
+    switchMode(previous, mode);
+  };
 
-      const previous = mut_diagramOrder;
+  const followNodeSize = (size: NodeSize): void => {
+    if (size === mut_nodeSize) {
+      return;
+    }
 
-      mut_diagramOrder = ids;
+    const previous = mut_nodeSize;
 
-      reorder('tile', previous, ids);
-    });
+    mut_nodeSize = size;
 
-    const arcOrderSubscription = arcOrder.subscribe((ids) => {
-      if (sameDiagramOrder(ids, mut_arcOrder)) {
-        return;
-      }
+    resize(previous, size);
+  };
 
-      const previous = mut_arcOrder;
+  const followDiagramOrder = (ids: readonly GraphNodeId[]): void => {
+    if (sameDiagramOrder(ids, mut_diagramOrder)) {
+      return;
+    }
 
-      mut_arcOrder = ids;
+    const previous = mut_diagramOrder;
 
-      reorder('arc', previous, ids);
-    });
+    mut_diagramOrder = ids;
+
+    reorder('tile', previous, ids);
+  };
+
+  const followArcOrder = (ids: readonly GraphNodeId[]): void => {
+    if (sameDiagramOrder(ids, mut_arcOrder)) {
+      return;
+    }
+
+    const previous = mut_arcOrder;
+
+    mut_arcOrder = ids;
+
+    reorder('arc', previous, ids);
+  };
+
+  // Apart from the rest, because the layout is asked for again when the
+  // arrangement it hands out changes.
+  const storedFollowed = whileStarted(() =>
+    combine([deps.stored, deps.defaultDirection]).pipe(
+      map(([stored, defaultDirection]) => {
+        followStored(stored, defaultDirection);
+      }),
+    ),
+  );
+
+  const arrangement = published(merge([acted, storedFollowed]), getArrangement);
+
+  const inputsFollowed = whileStarted(() =>
+    merge([
+      combine([
+        deps.state,
+        arrangement,
+        deps.active,
+        deps.nodeSize,
+        deps.hidden,
+        membership,
+      ]).pipe(
+        map(([state, { direction }, active, size, hidden, groups]) => {
+          followLayoutInput(state, direction, active, size, hidden, groups);
+        }),
+      ),
+      // In 「アーク」 and 「タイル」, the nodes are shown moving into place as
+      // soon as there are any, without waiting for ELK to lay out the DAG.
+      combine([deps.active, arcNodes, tileNodes]).pipe(
+        map(([active]) => {
+          if (active && !isArrangeable(mut_viewMode)) {
+            introduce();
+          }
+        }),
+      ),
+      // Turned off, or less motion asked for, in the middle of one.
+      combine([deps.animationSetting, deps.reducedMotion]).pipe(
+        map(() => {
+          if (!animationAllowed()) {
+            finishAnimation();
+          }
+        }),
+      ),
+      deps.viewMode.pipe(map(followViewMode)),
+      deps.nodeSize.pipe(map(followNodeSize)),
+      diagramOrder.pipe(map(followDiagramOrder)),
+      arcOrder.pipe(map(followArcOrder)),
+    ]).pipe(withInitialValue(undefined)),
+  );
+
+  const changed = merge([acted, storedFollowed, inputsFollowed]);
+
+  const start = (): (() => void) => {
+    setStarted(true);
 
     return () => {
       cancelNudge();
 
       finishAnimation();
 
-      diagramOrderSubscription.unsubscribe();
+      setStarted(false);
 
-      arcOrderSubscription.unsubscribe();
-
-      nodeSizeSubscription.unsubscribe();
-
-      viewModeSubscription.unsubscribe();
-
-      diagramSubscription.unsubscribe();
-
-      storedSubscription.unsubscribe();
-
-      layoutSubscription.unsubscribe();
-
-      motionSubscription.unsubscribe();
+      publish();
     };
   };
 
+  /** Runs `body`, an action of the reader's, and hands out what it did. */
+  const action =
+    <Args extends readonly unknown[]>(
+      body: (...args: Args) => void,
+    ): ((...args: Args) => void) =>
+    (...args) => {
+      body(...args);
+
+      publish();
+    };
+
   return {
-    autoLayout,
+    autoLayout: published(changed, getAutoLayout),
     arrangement,
-    fitRequests,
-    animatedPositions,
-    animatedOpacities,
-    animationProgress,
+    fitRequests: published(changed, () => mut_fitRequests),
+    animatedPositions: published(changed, () => mut_animatedPositions),
+    animatedOpacities: published(changed, () => mut_animatedOpacities),
+    animationProgress: published(changed, () => mut_animationProgress),
     arcNodes,
     tileNodes,
     membership,
-    setTileWidth,
-    finishAnimation,
-    moveNode,
-    dropNode,
-    moveGroup,
-    moveNodes,
-    nudgeNode,
-    setDirection,
-    autoArrange,
+    setTileWidth: action(setTileWidth),
+    finishAnimation: action(finishAnimation),
+    moveNode: action(moveNode),
+    dropNode: action(dropNode),
+    moveGroup: action(moveGroup),
+    moveNodes: action(moveNodes),
+    nudgeNode: action(nudgeNode),
+    setDirection: action(setDirection),
+    autoArrange: action(autoArrange),
     start,
   };
 };
+
+/**
+ * What `read` says, read again whenever `changes` emits, and passed on only
+ * when it is another value.
+ */
+const published = <A,>(
+  changes: SynstateObservable<unknown>,
+  read: () => A,
+): InitializedObservable<A> =>
+  changes.pipe(map(read)).pipe(withInitialValue(read())).pipe(skipIfNoChange());
 
 /** What, besides the graph, a layout was made for. */
 type LayoutMadeFor = Readonly<{

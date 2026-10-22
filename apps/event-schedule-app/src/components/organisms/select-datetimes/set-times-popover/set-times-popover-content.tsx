@@ -5,10 +5,10 @@ import { CheckboxView } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
 import { createReducer } from 'synstate-react-hooks';
 import { TimeRange } from 'ts-fortress-types';
-import type { DayOfWeekName, ReadonlyRecord } from 'ts-type-forge';
+import type { DayOfWeekName, ReadonlyRecord, Reducer } from 'ts-type-forge';
 import { dict } from '../../../../constants/index.mjs';
 import { timeRangeReducer } from '../../../../functions/index.mjs';
-import { Obj, type Reducer } from '../../../../utils-ported/index.mjs';
+import { Obj } from '../../../../utils-ported/index.mjs';
 import { TimeRangeView } from '../../../molecules/index.mjs';
 import { ButtonsWrapperAlignEnd } from '../../../styled/index.mjs';
 import {

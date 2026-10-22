@@ -9,9 +9,15 @@
 
 import {
   createState,
+  createValueEmitter,
+  empty,
   filter,
   map,
+  merge,
+  scan,
   skipIfNoChange,
+  switchMap,
+  withInitialValue,
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
@@ -168,102 +174,128 @@ export const createReader = (deps: ReaderDeps): Reader => {
     visibilityChange,
   } = deps;
 
+  // While `start` has been called and its stop has not. What only goes on
+  // while reading is derived from it, so that stopping disposes it.
+  const [started, setStarted] = createState(false);
+
+  // The token on every change of it while started, and once more on each
+  // start. Moving the same token between the tab and the device is not a
+  // change.
+  const tokenChanged = started.pipe(
+    switchMap((isStarted) =>
+      isStarted
+        ? token.pipe(map((stored) => stored?.value)).pipe(skipIfNoChange())
+        : empty<string | undefined>(),
+    ),
+  );
+
+  const tokenForgotten = tokenChanged.pipe(
+    filter((tokenValue) => tokenValue === undefined),
+  );
+
   // Each state below is passed on only when what it is given differs from
   // what it holds. `equals` decides that where the state is held, once, so
-  // nothing downstream has anything to compare.
-  const [
-    loadStatus,
-    setLoadStatus,
-    { updateState: updateLoadStatus, getSnapshot: getLoadStatus },
-  ] = createState<LoadStatus>(LOADING, { equals: fastDeepEqual });
+  // nothing downstream has anything to compare. The ones a change of token
+  // puts back are put back by the graph rather than by a subscriber of the
+  // token, which would be a write while that change is still propagating.
+  const {
+    state: loadStatus,
+    set: setLoadStatus,
+    update: updateLoadStatus,
+    getSnapshot: getLoadStatus,
+  } = createResettableState<LoadStatus>(LOADING, fastDeepEqual, [
+    tokenForgotten.pipe(map(() => LOADING)),
+  ]);
 
   const [rateLimit, , { updateState: updateRateLimit }] = createState<
     RateLimit | undefined
   >(undefined, { equals: fastDeepEqual });
 
-  const [nowMs, setNowMs] = createState(0);
+  const [nowMsRead, setNowMs] = createValueEmitter<number>();
 
-  const [readAt, setReadAt, { getSnapshot: getReadAt }] = createState(
-    EMPTY_PARTS.readAtEpochMs,
-    { equals: Object.is },
-  );
+  // A hidden tab has nobody to read the ages to, and coming back moves the
+  // clock at once.
+  const nowMsTicked = started
+    .pipe(
+      switchMap((isStarted) =>
+        isStarted
+          ? merge([counter(CLOCK_TICK_MS), visibilityChange])
+          : empty<unknown>(),
+      ),
+    )
+    .pipe(filter(() => isVisible()))
+    .pipe(map(() => now()));
 
-  const [summary, setSummary] = createState(EMPTY_PARTS.summary, {
-    equals: fastDeepEqual,
-  });
+  const nowMs = merge([nowMsRead, nowMsTicked]).pipe(withInitialValue(0));
 
+  // The report is held whole, and each part the page draws is taken from it.
   // The pull requests are kept one by one, each being its own card. What
   // `sameItemsIfEqual` makes of an answer that changed nothing is the array
-  // already held, which `equals` then stops.
-  const [entries, , { updateState: updateEntries }] = createState(
-    EMPTY_PARTS.entries,
-    { equals: Object.is },
-  );
+  // already held, which `Object.is` then stops.
+  const {
+    state: report,
+    update: updateReport,
+    getSnapshot: getReport,
+  } = createResettableState<ReportParts>(EMPTY_PARTS, Object.is, [
+    tokenForgotten.pipe(map(() => EMPTY_PARTS)),
+  ]);
 
-  const [roots, setRoots] = createState(EMPTY_PARTS.roots, {
-    equals: fastDeepEqual,
-  });
+  const partOf = <K extends keyof ReportParts>(
+    key: K,
+    equals: (x: ReportParts[K], y: ReportParts[K]) => boolean,
+  ): InitializedObservable<ReportParts[K]> =>
+    report.pipe(map((held) => held[key])).pipe(skipIfNoChange(equals));
 
-  const [cycles, setCycles] = createState(EMPTY_PARTS.cycles, {
-    equals: fastDeepEqual,
-  });
+  const readAt = partOf('readAtEpochMs', Object.is);
 
-  const [merged, setMerged] = createState(EMPTY_PARTS.merged, {
-    equals: fastDeepEqual,
-  });
+  const summary = partOf('summary', fastDeepEqual);
 
-  const [queue, setQueue] = createState(EMPTY_PARTS.queue, {
-    equals: fastDeepEqual,
-  });
+  const entries = partOf('entries', Object.is);
 
-  const [issues, setIssues, { getSnapshot: getIssues }] = createState(
-    EMPTY_PARTS.issues,
-    { equals: fastDeepEqual },
-  );
+  const roots = partOf('roots', fastDeepEqual);
 
-  const [reading, setReading] = createState(EMPTY_PARTS.reading, {
-    equals: fastDeepEqual,
-  });
+  const cycles = partOf('cycles', fastDeepEqual);
 
-  const [runs, setRuns, { updateState: updateRuns }] = createState<RunsStatus>(
+  const merged = partOf('merged', fastDeepEqual);
+
+  const queue = partOf('queue', fastDeepEqual);
+
+  const issues = partOf('issues', fastDeepEqual);
+
+  const reading = partOf('reading', fastDeepEqual);
+
+  const { state: runs, update: updateRuns } = createResettableState<RunsStatus>(
     RUNS_READING,
-    { equals: fastDeepEqual },
+    fastDeepEqual,
+    [tokenForgotten.pipe(map(() => RUNS_READING))],
   );
 
   // When the read of the runs on screen started; `0` while none is.
   let mut_runsShownFromMs = 0;
 
-  const [moreIssues, setMoreIssues, { getSnapshot: getMoreIssues }] =
-    createState<MoreIssuesStatus>(MORE_ISSUES_IDLE, { equals: fastDeepEqual });
+  const {
+    state: moreIssues,
+    set: setMoreIssues,
+    getSnapshot: getMoreIssues,
+  } = createResettableState<MoreIssuesStatus>(MORE_ISSUES_IDLE, fastDeepEqual, [
+    tokenChanged.pipe(map(() => MORE_ISSUES_IDLE)),
+  ]);
 
   // How many open issues each read lists. Raised by `loadMoreIssues`, and
-  // put back when the token changes.
-  const [, setIssueCount, { getSnapshot: getIssueCount }] =
-    createState(ISSUES_LIMIT);
+  // put back when the token changes. Nothing draws it, so it is a variable
+  // rather than a state.
+  let mut_issueCount = ISSUES_LIMIT;
 
-  const writeReport = (
-    report: ReportParts,
-    withIssues: boolean = true,
-  ): void => {
-    setReadAt(report.readAtEpochMs);
+  const getReadAt = (): number => getReport().readAtEpochMs;
 
-    setSummary(report.summary);
+  const getIssues = (): ReportParts['issues'] => getReport().issues;
 
-    updateEntries((held) => sameItemsIfEqual(held, report.entries));
-
-    setRoots(report.roots);
-
-    setCycles(report.cycles);
-
-    setMerged(report.merged);
-
-    setQueue(report.queue);
-
-    if (withIssues) {
-      setIssues(report.issues);
-    }
-
-    setReading(report.reading);
+  const writeReport = (next: ReportParts, withIssues: boolean): void => {
+    updateReport((held) => ({
+      ...next,
+      entries: sameItemsIfEqual(held.entries, next.entries),
+      issues: withIssues ? next.issues : held.issues,
+    }));
   };
 
   const currentToken = (): string | undefined =>
@@ -278,7 +310,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
     const startedAtMs = now();
 
-    const issueCount = getIssueCount();
+    const issueCount = mut_issueCount;
 
     // A page with nothing on it yet is drawn as the parts of the first read
     // answer, the merge order first; once it shows a report, a read replaces
@@ -306,7 +338,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
       // out when it was asked for before `loadMoreIssues` added a page: it
       // lists fewer than the page now shows, and would take that page away.
       if (settled.report !== undefined) {
-        writeReport(settled.report, issueCount >= getIssueCount());
+        writeReport(settled.report, issueCount >= mut_issueCount);
       }
 
       setLoadStatus(settled.status);
@@ -331,7 +363,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
           setNowMs(now());
 
-          writeReport(settled.report, issueCount >= getIssueCount());
+          writeReport(settled.report, issueCount >= mut_issueCount);
 
           setLoadStatus(settled.status);
         }
@@ -403,14 +435,17 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
       // Raised only now, so that a read that went out before the page came
       // back is not taken for one that lists it.
-      setIssueCount(getIssueCount() + ISSUES_PAGE_SIZE);
+      mut_issueCount += ISSUES_PAGE_SIZE;
 
       // A read that answered meanwhile has listed these already, from where
       // its own list ended; the page goes only where it was asked for.
       const current = getIssues();
 
       if (current.endCursor === after) {
-        setIssues(appendIssues(current, result.value));
+        updateReport((held) => ({
+          ...held,
+          issues: appendIssues(current, result.value),
+        }));
       }
 
       setMoreIssues(MORE_ISSUES_IDLE);
@@ -427,30 +462,16 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
   const start = (): (() => void) => {
     // The first read, and a read on every change of token, which is how a
-    // reader finds out whether GitHub takes the one they pasted. Moving the
-    // same token between the tab and the device is not a change.
-    const tokenSubscription = token
-      .pipe(map((stored) => stored?.value))
-      .pipe(skipIfNoChange())
-      .subscribe((tokenValue) => {
-        setIssueCount(ISSUES_LIMIT);
+    // reader finds out whether GitHub takes the one they pasted.
+    const tokenSubscription = tokenChanged.subscribe((tokenValue) => {
+      mut_issueCount = ISSUES_LIMIT;
 
-        setMoreIssues(MORE_ISSUES_IDLE);
-
-        if (tokenValue === undefined) {
-          setLoadStatus(LOADING);
-
-          writeReport(EMPTY_PARTS);
-
-          setRuns(RUNS_READING);
-
-          mut_runsShownFromMs = 0;
-        } else {
-          read();
-        }
-      });
-
-    const clock = counter(CLOCK_TICK_MS);
+      if (tokenValue === undefined) {
+        mut_runsShownFromMs = 0;
+      } else {
+        read();
+      }
+    });
 
     // A hidden tab is a tab nobody is reading, and a forgotten one would
     // otherwise go on spending the budget for the rest of the day. So the
@@ -478,8 +499,6 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
     const visibilitySubscription = visibilityChange.subscribe(() => {
       if (isVisible()) {
-        setNowMs(now());
-
         read();
 
         startPolling();
@@ -488,25 +507,18 @@ export const createReader = (deps: ReaderDeps): Reader => {
       }
     });
 
-    // Nor is there anyone to read the ages to, and coming back moves the
-    // clock at once.
-    const clockSubscription = clock
-      .pipe(filter(() => isVisible()))
-      .subscribe(() => {
-        setNowMs(now());
-      });
+    setStarted(true);
 
     return () => {
       tokenSubscription.unsubscribe();
 
       visibilitySubscription.unsubscribe();
 
-      clockSubscription.unsubscribe();
-
       stopPolling();
 
-      // Completing a counter is what clears its interval.
-      clock.complete();
+      // Switching away disposes the clock, and completing a counter is what
+      // clears its interval.
+      setStarted(false);
     };
   };
 
@@ -629,5 +641,43 @@ const pollEvery = (
       // Completing a counter is what clears its interval.
       poll.complete();
     },
+  };
+};
+
+type ResettableState<S> = Readonly<{
+  state: InitializedObservable<S>;
+  set: (next: S) => void;
+  update: (updater: (held: S) => S) => void;
+  getSnapshot: () => S;
+}>;
+
+/**
+ * A state that is written by `set` and `update`, and that each of `resets`
+ * puts back to what it emits, within the propagation that emitted it.
+ */
+const createResettableState = <S,>(
+  initialState: S,
+  equals: (x: S, y: S) => boolean,
+  resets: readonly SynstateObservable<S>[],
+): ResettableState<S> => {
+  const [updated, update] = createValueEmitter<(held: S) => S>();
+
+  const state = merge(
+    Arr.toUnshifted(updated)(
+      resets.map((reset) => reset.pipe(map((next) => (): S => next))),
+    ),
+  )
+    .pipe(
+      scan((held: S, updater: (prev: S) => S) => updater(held), initialState),
+    )
+    .pipe(skipIfNoChange(equals));
+
+  return {
+    state,
+    set: (next) => {
+      update(() => next);
+    },
+    update,
+    getSnapshot: () => state.getSnapshot().value,
   };
 };

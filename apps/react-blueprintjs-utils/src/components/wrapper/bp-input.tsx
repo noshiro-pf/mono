@@ -6,7 +6,7 @@ import { useObservableEffect } from 'synstate-react-hooks';
 
 export type BpInputProps = InputGroupPropsOriginal &
   Readonly<{
-    onValueChange: (value: string) => void;
+    onValueChange?: (value: string) => void;
     autoFocus?: boolean;
     focus$?: SynstateObservable<undefined>;
   }>;
@@ -19,7 +19,7 @@ export const BpInput = memoNamed<BpInputProps>(
     const onChangeHandler: React.ChangeEventHandler<HTMLInputElement> =
       React.useCallback(
         (ev) => {
-          onValueChange(ev.target.value);
+          onValueChange?.(ev.target.value);
         },
         [onValueChange],
       );

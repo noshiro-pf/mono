@@ -1,4 +1,5 @@
-import { Obj, type Reducer } from '../../utils-ported/index.mjs';
+import type { Reducer } from 'ts-type-forge';
+import { Obj } from '../../utils-ported/index.mjs';
 
 export type IconListReducerAction = Readonly<
   | { type: 'update-description'; iconId: AnswerIconId; description: string }

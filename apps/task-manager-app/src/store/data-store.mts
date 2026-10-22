@@ -12,7 +12,19 @@
  * tasks: it changes far less often, and a task never waits for it.
  */
 
-import { createState, type InitializedObservable } from 'synstate';
+import {
+  source as createSource,
+  createState,
+  filter,
+  fromSubscribable,
+  just,
+  map,
+  skipIfNoChange,
+  switchMap,
+  withInitialValue,
+  type InitializedObservable,
+  type Observable as SynstateObservable,
+} from 'synstate';
 import { Arr, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { DagLayout } from '../dag/index.mjs';
@@ -84,24 +96,103 @@ export type DataStore = Readonly<{
 export const EMPTY_STATE: DomainState = { tasks: [], milestones: [] } as const;
 
 export const createDataStore = (deps: DataDeps): DataStore => {
-  const [state, setState, { getSnapshot: getState }] =
-    createState<DomainState>(EMPTY_STATE);
+  // While `start` has been called and its stop has not. What is followed is
+  // derived from it, so that stopping, signing out or signing in as somebody
+  // else disposes the subscriptions to the repository followed before.
+  const [started, setStarted] = createState(false);
 
-  const [dataStatus, setDataStatus] = createState<DataStatus>('idle');
+  // Once stopped, what was read is kept as it is.
+  const followed = started
+    .pipe(
+      switchMap((isStarted): SynstateObservable<Followed> =>
+        isStarted
+          ? deps.session.pipe(map(repositoryOf))
+          : just('stopped' as const),
+      ),
+    )
+    .pipe(skipIfNoChange())
+    .pipe(withInitialValue<Followed>('stopped'));
 
-  const [dagLayout, setDagLayout] = createState<DagLayout | undefined>(
-    undefined,
+  /**
+   * What `subscribeTo` hands `next` from the repository followed: `signedOut` while
+   * nobody is signed in, and `empty` from signing in until the repository
+   * hands it something.
+   */
+  const follow = <A,>(
+    signedOut: A,
+    empty: A,
+    subscribeTo: (
+      repository: Repository,
+      next: (value: A) => void,
+    ) => () => void,
+  ): InitializedObservable<A> =>
+    followed
+      .pipe(
+        switchMap((repository) =>
+          repository === 'stopped'
+            ? createSource<A>()
+            : repository === undefined
+              ? just(signedOut)
+              : fromFeed(empty, (next) => subscribeTo(repository, next)),
+        ),
+      )
+      .pipe(withInitialValue(signedOut));
+
+  const loaded = follow<Loaded>(
+    { state: EMPTY_STATE, status: 'idle' },
+    { state: EMPTY_STATE, status: 'loading' },
+    (repository, next) =>
+      repository.subscribe({
+        next: (loadedState) => {
+          next({ state: loadedState, status: 'ready' });
+        },
+        error: (error) => {
+          deps.reportError(
+            'データを読み込めませんでした。権限の設定か接続を確認してください。',
+            error,
+          );
+        },
+      }),
   );
 
-  const [groups, setGroups] = createState<readonly Group[]>([]);
+  const state = loaded.pipe(map(({ state: next }) => next));
 
-  let mut_repository: Repository | undefined = undefined;
+  const dataStatus = loaded.pipe(map((current) => current.status));
+
+  const getState = (): DomainState => state.getSnapshot().value;
+
+  const dagLayout = follow<DagLayout | undefined>(
+    undefined,
+    undefined,
+    (repository, next) =>
+      repository.subscribeDagLayout({
+        next,
+        error: (error) => {
+          deps.reportError('DAG の配置を読み込めませんでした。', error);
+        },
+      }),
+  );
+
+  const groups = follow<readonly Group[]>([], [], (repository, next) =>
+    repository.subscribeGroups({
+      next,
+      error: (error) => {
+        deps.reportError('グループを読み込めませんでした。', error);
+      },
+    }),
+  );
+
+  const currentRepository = (): Repository | undefined => {
+    const repository = followed.getSnapshot().value;
+
+    return repository === 'stopped' ? undefined : repository;
+  };
 
   const write = (
     describe: string,
     run: (repository: Repository) => Promise<void>,
   ): void => {
-    const current = mut_repository;
+    const current = currentRepository();
 
     if (current === undefined) {
       deps.reportError(
@@ -117,83 +208,10 @@ export const createDataStore = (deps: DataDeps): DataStore => {
   };
 
   const start = (): (() => void) => {
-    let mut_stopRepository: (() => void) | undefined = undefined;
-
-    const stopFollowing = (): void => {
-      mut_stopRepository?.();
-
-      mut_stopRepository = undefined;
-
-      mut_repository = undefined;
-    };
-
-    const subscription = deps.session.subscribe((session) => {
-      if (
-        session.type === 'signed-in' &&
-        session.repository === mut_repository
-      ) {
-        return;
-      }
-
-      stopFollowing();
-
-      setState(EMPTY_STATE);
-
-      setDagLayout(undefined);
-
-      setGroups([]);
-
-      if (session.type !== 'signed-in') {
-        setDataStatus('idle');
-
-        return;
-      }
-
-      setDataStatus('loading');
-
-      mut_repository = session.repository;
-
-      const stopState = session.repository.subscribe({
-        next: (next) => {
-          setState(next);
-
-          setDataStatus('ready');
-        },
-        error: (error) => {
-          deps.reportError(
-            'データを読み込めませんでした。権限の設定か接続を確認してください。',
-            error,
-          );
-        },
-      });
-
-      const stopLayout = session.repository.subscribeDagLayout({
-        next: setDagLayout,
-        error: (error) => {
-          deps.reportError('DAG の配置を読み込めませんでした。', error);
-        },
-      });
-
-      const stopGroups = session.repository.subscribeGroups({
-        next: setGroups,
-        error: (error) => {
-          deps.reportError('グループを読み込めませんでした。', error);
-        },
-      });
-
-      mut_stopRepository = () => {
-        stopState();
-
-        stopLayout();
-
-        stopGroups();
-      };
-    });
+    setStarted(true);
 
     return () => {
-      subscription.unsubscribe();
-
-      stopFollowing();
+      setStarted(false);
     };
   };
 
@@ -304,3 +322,34 @@ const refusalReasons = {
   duplicate: 'すでに依存しています',
   cycle: '循環する依存になります',
 } as const satisfies ReadonlyRecord<DependencyRefusal, string>;
+
+/**
+ * The repository of whoever is signed in, `undefined` while nobody is, and
+ * `'stopped'` while the store is not started.
+ */
+type Followed = Repository | undefined | 'stopped';
+
+type Loaded = Readonly<{ state: DomainState; status: DataStatus }>;
+
+const repositoryOf = (session: Session): Repository | undefined =>
+  session.type === 'signed-in' ? session.repository : undefined;
+
+/**
+ * What `subscribe` hands `next`, as an observable whose value is `first`
+ * until then. What it hands while it is being subscribed to — the memory
+ * repository hands its state at once — is the observable's initial value
+ * rather than a write.
+ */
+const fromFeed = <A,>(
+  first: A,
+  subscribe: (next: (value: A) => void) => () => void,
+): SynstateObservable<A> =>
+  fromSubscribable<A, never>({
+    subscribe: (next) => {
+      next(first);
+
+      return { unsubscribe: subscribe(next) };
+    },
+  })
+    .pipe(filter(Result.isOk))
+    .pipe(map(({ value }) => value));

@@ -1,6 +1,6 @@
 import { OverlayToaster, type OverlayToasterProps } from '@blueprintjs/core';
 import { createRoot } from 'react-dom/client';
-import { match } from '../utils-ported/index.mjs';
+import { match } from 'ts-data-forge';
 
 // export const createToaster = (): IToaster =>
 //   Toaster.create({ canEscapeKeyClear: true, position: 'top' });
@@ -71,7 +71,7 @@ export const showToast = ({
         message,
         icon:
           icon ??
-          match<Intent, IconName | undefined>(intent, {
+          match(intent, {
             danger: 'error',
             success: 'tick',
             warning: 'warning-sign',

@@ -8,6 +8,8 @@ import {
   Optional,
   expectType,
   ifThen,
+  mapNullable,
+  match,
   pipe,
   tp,
 } from 'ts-data-forge';
@@ -26,7 +28,6 @@ import type {
   AnswerTableCell,
   AnswerTableCellPosition,
 } from '../../types/index.mjs';
-import { mapOptional, match } from '../../utils-ported/index.mjs';
 import { ymd2day } from '../../utils/index.mjs';
 import { eventSchedule$ } from '../fetching-state/index.mjs';
 import {
@@ -46,7 +47,7 @@ const answerSelectionMap$: InitializedObservable<
     >
   | undefined
 > = answersFiltered$.pipe(
-  map((answers) => mapOptional(answers, createAnswerSelectionMapFromAnswers)),
+  map(mapNullable(createAnswerSelectionMapFromAnswers)),
 );
 
 const answerSelectionMapFn$ = answerSelectionMap$.pipe(
@@ -60,7 +61,7 @@ const answerSelectionMapFn$ = answerSelectionMap$.pipe(
         point: AnswerIconPoint,
         comment: string,
       ] =>
-        mapOptional(answerSelectionMap, (__m) =>
+        mapNullable(answerSelectionMap, (__m) =>
           Optional.toNullable(__m.get({ datetimeRange, answerId })),
         ) ?? tp('none', 0, ''),
   ),
@@ -223,25 +224,24 @@ const datetimeRangeToTableRowValuesMap$: InitializedObservable<
               const score = Optional.toNullable(scores.get(datetimeRange)) ?? 0;
 
               const answerTableRow: readonly AnswerTableCell[] | undefined =
-                pipe(Optional.toNullable(answerTable.get(datetimeRange))).map(
-                  (__v) =>
-                    mapOptional(__v, (row) =>
-                      Arr.zip(
-                        row,
-                        answers.map((a) => a.weight),
-                      ).map(([[iconId, point, comment], weight]) => ({
-                        iconId,
-                        point,
-                        showPoint: match(iconId, {
-                          good: point !== eventSchedule.answerIcons.good.point,
-                          fair: point !== eventSchedule.answerIcons.fair.point,
-                          poor: point !== eventSchedule.answerIcons.poor.point,
-                          none: false,
-                        }),
-                        weight,
-                        comment,
-                      })),
-                    ),
+                pipe(
+                  Optional.toNullable(answerTable.get(datetimeRange)),
+                ).mapNullable((row) =>
+                  Arr.zip(
+                    row,
+                    answers.map((a) => a.weight),
+                  ).map(([[iconId, point, comment], weight]) => ({
+                    iconId,
+                    point,
+                    showPoint: match(iconId, {
+                      good: point !== eventSchedule.answerIcons.good.point,
+                      fair: point !== eventSchedule.answerIcons.fair.point,
+                      poor: point !== eventSchedule.answerIcons.poor.point,
+                      none: false,
+                    }),
+                    weight,
+                    comment,
+                  })),
                 ).value;
 
               const value: DeepReadonly<{
@@ -375,15 +375,7 @@ const tableBodyValuesFiltered$ = combine([
           scoreRange.value.max,
         )(score) &&
         // 曜日で絞り込み
-        match(day, {
-          0: Sun,
-          1: Mon,
-          2: Tue,
-          3: Wed,
-          4: Thr,
-          5: Fri,
-          6: Sat,
-        }) &&
+        tp(Sun, Mon, Tue, Wed, Thr, Fri, Sat)[day] &&
         // 日程範囲で絞り込み
         (dateStart === undefined ||
           compareYearMonthDate(dateStart, datetimeRange.ymd) <= 0) &&

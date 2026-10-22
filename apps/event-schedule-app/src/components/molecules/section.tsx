@@ -2,7 +2,7 @@ import { Button, Card } from '@blueprintjs/core';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { memoNamed } from 'react-utils';
-import { mapOptional } from '../../utils-ported/index.mjs';
+import { mapNullable } from 'ts-data-forge';
 import { SectionTitle } from '../atoms/index.mjs';
 
 type Props = Readonly<{ sectionTitle?: string; onCloseClick?: () => void }>;
@@ -18,10 +18,10 @@ export const Section = memoNamed<React.PropsWithChildren<Props>>(
     >
       <Card elevation={1}>
         <Header>
-          {mapOptional(sectionTitle, (s) => (
+          {mapNullable(sectionTitle, (s) => (
             <SectionTitle>{s}</SectionTitle>
           ))}
-          {mapOptional(onCloseClick, (f) => (
+          {mapNullable(onCloseClick, (f) => (
             <Button icon={'cross'} variant={'minimal'} onClick={f} />
           ))}
         </Header>

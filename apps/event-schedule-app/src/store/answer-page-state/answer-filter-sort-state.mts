@@ -7,7 +7,7 @@ import {
   map,
   skipIfNoChange,
 } from 'synstate';
-import { createReducer } from 'synstate-react-hooks';
+import { useObservableValue } from 'synstate-react-hooks';
 import {
   Arr,
   Optional,
@@ -15,15 +15,25 @@ import {
   expectType,
   fastDeepEqual,
   isNotUndefined,
+  mapNullable,
 } from 'ts-data-forge';
-import type { DeepReadonly, ReadonlyRecord, SafeUint } from 'ts-type-forge';
+import type {
+  DeepReadonly,
+  ReadonlyRecord,
+  SafeUint,
+  StrictPick,
+} from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
-import { AnswerFilterState } from '../../functions/index.mjs';
+import {
+  AnswerFilterState,
+  type AnswerFilterStateAction,
+} from '../../functions/index.mjs';
 import type {
   AnswerRank,
   AnswersScore,
   DetailedFilterIcon,
 } from '../../types/index.mjs';
+import { createReducerWithActions } from '../../utils/index.mjs';
 import { AnswersStore, eventSchedule$ } from '../fetching-state/index.mjs';
 import { AnswerFilterQueryParam } from './answer-filter-query-param.mjs';
 
@@ -33,8 +43,121 @@ const [
   { resetState: resetSortOrderAndKey_ },
 ] = createState<readonly ['date' | 'score', 'asc' | 'desc']>(['date', 'asc']);
 
-const [useFilterState, filterStateDispatch, { state: filterState$ }] =
-  createReducer(AnswerFilterState.reducer, AnswerFilterState.initialState);
+/**
+ * The filter, with the answers it was last limited by: how many of them it
+ * shows, after the filter by respondent, is the upper limit of the filter by
+ * icon count.
+ */
+type FilterStateWithAnswers = DeepReadonly<{
+  filterState: AnswerFilterState;
+  answers: Answer[] | undefined;
+  numAnswers: SafeUint | undefined;
+}>;
+
+/**
+ * An action of the filter itself is wrapped as `filter`, so that each kind of
+ * action is a case of its own and none is reached only by being neither.
+ */
+type FilterStateWithAnswersAction = DeepReadonly<
+  | { type: 'answers'; answers: Answer[] | undefined }
+  | { type: 'filter'; action: AnswerFilterStateAction }
+>;
+
+const filterStateWithAnswersReducer = (
+  state: FilterStateWithAnswers,
+  action: FilterStateWithAnswersAction,
+): FilterStateWithAnswers => {
+  const { filterState, answers } = applyToFilterOrAnswers(state, action);
+
+  const numAnswers = mapNullable(answers, (list) =>
+    asSafeUint(
+      list.filter((a) => !filterState.respondent.falseKeys.has(a.user.name))
+        .length,
+    ),
+  );
+
+  return {
+    filterState:
+      numAnswers === undefined || numAnswers === state.numAnswers
+        ? filterState
+        : AnswerFilterState.reducer(filterState, {
+            type: 'icon',
+            action: { type: 'setUpperLimit', upperLimit: numAnswers },
+          }),
+    answers,
+    numAnswers: numAnswers ?? state.numAnswers,
+  };
+};
+
+/**
+ * `switch` rather than `match`: each case reads the payload of its own kind of
+ * action, which only `switch` narrows to.
+ */
+const applyToFilterOrAnswers = (
+  state: FilterStateWithAnswers,
+  action: FilterStateWithAnswersAction,
+): StrictPick<FilterStateWithAnswers, 'answers' | 'filterState'> => {
+  switch (action.type) {
+    case 'answers':
+      return { filterState: state.filterState, answers: action.answers };
+
+    case 'filter':
+      return {
+        filterState: AnswerFilterState.reducer(
+          state.filterState,
+          action.action,
+        ),
+        answers: state.answers,
+      };
+  }
+};
+
+const [, filterStateWithAnswersDispatch, { state: filterStateWithAnswers$ }] =
+  createReducerWithActions(
+    filterStateWithAnswersReducer,
+    {
+      filterState: AnswerFilterState.initialState,
+      answers: undefined,
+      numAnswers: undefined,
+    },
+    [
+      AnswersStore.answers$.pipe(
+        map((answers) => ({ type: 'answers', answers }) as const),
+      ),
+      eventSchedule$
+        .pipe(filter(isNotUndefined))
+        .pipe(
+          map((eventSchedule) => ({
+            start: Optional.unwrapThrow(
+              Arr.first(eventSchedule.datetimeRangeList),
+            ).ymd,
+            end: Optional.unwrapThrow(Arr.last(eventSchedule.datetimeRangeList))
+              .ymd,
+          })),
+        )
+        .pipe(skipIfNoChange(fastDeepEqual))
+        .pipe(
+          map(
+            (range) =>
+              ({
+                type: 'filter',
+                action: { type: 'set-dateRangeDefaultValue', range },
+              }) as const,
+          ),
+        ),
+    ],
+  );
+
+const filterState$: InitializedObservable<AnswerFilterState> =
+  filterStateWithAnswers$.pipe(map((st) => st.filterState));
+
+const useFilterState = (): AnswerFilterState =>
+  useObservableValue(filterState$);
+
+const filterStateDispatch = (
+  action: AnswerFilterStateAction,
+): AnswerFilterState =>
+  filterStateWithAnswersDispatch({ type: 'filter', action }).filterState;
 
 const resetSortOrderAndKey = (): void => {
   AnswerFilterQueryParam.saveSortStateToQueryParams(resetSortOrderAndKey_());
@@ -333,13 +456,6 @@ const setScoreRangeMax = (max: AnswersScore): void => {
   AnswerFilterQueryParam.saveFilterStateToQueryParams(
     filterStateDispatch({ type: 'set-scoreRange-max', max }),
   );
-};
-
-const setDateRangeDefaultValue = (
-  range: Readonly<{ start: YearMonthDate; end: YearMonthDate }>,
-): void => {
-  // don't call AnswerFilterQueryParam.saveFilterStateToQueryParams
-  filterStateDispatch({ type: 'set-dateRangeDefaultValue', range });
 };
 
 const setEnabledFilteringByDayOfWeek = (value: boolean): void => {
@@ -689,8 +805,6 @@ const clearTags = (): void => {
   resetState();
 };
 
-/* subscriptions */
-
 export const answersFiltered$ = combine([
   AnswersStore.answers$,
   filterState$,
@@ -699,31 +813,6 @@ export const answersFiltered$ = combine([
     answers?.filter((a) => !filterState.respondent.falseKeys.has(a.user.name)),
   ),
 );
-
-answersFiltered$
-  .pipe(filter(isNotUndefined))
-  .pipe(map((answers) => answers.length))
-  .pipe(skipIfNoChange())
-  .subscribe((numAnswers) => {
-    filterStateDispatch({
-      type: 'icon',
-      action: { type: 'setUpperLimit', upperLimit: asSafeUint(numAnswers) },
-    });
-  });
-
-eventSchedule$
-  .pipe(filter(isNotUndefined))
-  .pipe(
-    map((eventSchedule) => ({
-      start: Optional.unwrapThrow(Arr.first(eventSchedule.datetimeRangeList))
-        .ymd,
-      end: Optional.unwrapThrow(Arr.last(eventSchedule.datetimeRangeList)).ymd,
-    })),
-  )
-  .pipe(skipIfNoChange(fastDeepEqual))
-  .subscribe((range) => {
-    setDateRangeDefaultValue(range);
-  });
 
 export const AnswerFilterAndSortStore = {
   sortKeyAndOrder$,
@@ -761,7 +850,6 @@ export const AnswerFilterAndSortStore = {
   setScoreRange,
   setScoreRangeMin,
   setScoreRangeMax,
-  setDateRangeDefaultValue,
   setEnabledFilteringByDayOfWeek,
   setSundayCheck,
   setMondayCheck,

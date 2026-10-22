@@ -1,5 +1,3 @@
-import type { MutableRecord, ReadonlyRecord, StrictOmit } from 'ts-type-forge';
-
 /**
  * Month and weekday names.
  *
@@ -105,31 +103,4 @@ export const toAbsolutePath = (relativePath: string): string => {
   mut_element.href = relativePath;
 
   return mut_element.href;
-};
-
-/** Sorts a tuple without mutating it, keeping its length in the type. */
-export const sortedTuple = <const T extends readonly unknown[]>(
-  tuple: T,
-  comparator: (a: T[number], b: T[number]) => number,
-): T =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  tuple.toSorted(comparator) as unknown as T;
-
-/** A copy of `record` without the listed keys. */
-export const omitKeys = <
-  const R extends ReadonlyRecord<string, unknown>,
-  const Keys extends readonly (keyof R & string)[],
->(
-  record: R,
-  keys: Keys,
-): StrictOmit<R, Keys[number]> => {
-  const mut_result: MutableRecord<string, unknown> = { ...record };
-
-  for (const key of keys) {
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete mut_result[key];
-  }
-
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  return mut_result as StrictOmit<R, Keys[number]>;
 };

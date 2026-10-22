@@ -1,10 +1,9 @@
 import { DateInput, type DatePickerShortcut } from '@blueprintjs/datetime';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { asSafeUint, castMutable, pipe } from 'ts-data-forge';
+import { asSafeUint, castMutable, mapNullable, pipe } from 'ts-data-forge';
 import { DateUtils, type Ymdhm } from 'ts-fortress-types';
 import type { SafeUint, StrictOmit } from 'ts-type-forge';
-import { mapOptional } from '../../utils/index.mjs';
 
 export type BpDatetimePickerProps = StrictOmit<
   DateInputPropsOriginal,
@@ -65,7 +64,7 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
 
     const date = React.useMemo<string | undefined>(
       () =>
-        mapOptional(ymdhm, (a) =>
+        mapNullable(ymdhm, (a) =>
           DateUtils.from(
             `${a.year}/${a.month}/${a.date} ${a.hours}:${a.minutes}:00`,
           ).toLocaleString(),

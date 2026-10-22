@@ -9,7 +9,6 @@ import {
   UpdatePasswordPageStore,
   UpdateUserInfoDialogStore,
 } from '../../../store/index.mjs';
-import { noop } from '../../../utils-ported/index.mjs';
 import { Label } from '../../atoms/index.mjs';
 import { LockButton } from '../../molecules/index.mjs';
 import { UpdateUserInfoDialogTemplate } from './update-user-info-dialog-template.js';
@@ -74,7 +73,6 @@ export const UpdatePasswordDialog = memoNamed<Props>(
               intent={'none'}
               type={'email'}
               value={currentEmail ?? ''}
-              onValueChange={noop}
             />
           </FormGroup>
 
