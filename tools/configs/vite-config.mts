@@ -1,3 +1,4 @@
+import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { castMutable } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
@@ -87,6 +88,21 @@ export const defineViteConfig = ({
       environment: 'node',
       alias: castMutable(alias),
       ...projectConfig(packageRoot, node),
+      // One module graph per worker rather than per test file. Isolated, each
+      // file imported its module graph afresh, and with in-source tests every
+      // source file is a test file: `ts-data-forge`'s Node.js tests spent 85%
+      // of their time importing, and took 17 s instead of 203 s without it.
+      //
+      // What a test changes outside its module — fake timers, a stubbed
+      // global or environment variable, the working directory — it restores
+      // before it ends, since the next file in the worker runs on whatever is
+      // left. A module mock cannot be kept to its file at all: a module
+      // another file has already imported in the worker keeps the real
+      // dependency, so whether the mock applies depends on the order the
+      // files ran in. A package whose tests mock a module is therefore run
+      // isolated, decided here rather than declared, so that adding the first
+      // `vi.mock` cannot forget it.
+      isolate: usesModuleMocks(packageRoot),
       typecheck: {
         tsconfig: path.resolve(packageRoot, './configs/tsconfig.test.json'),
       },
@@ -164,3 +180,23 @@ const projectConfig = (packageRoot: string, overrides?: ProjectOverrides) =>
     ],
     testTimeout: overrides?.testTimeout,
   }) as const satisfies ProjectConfig;
+
+/**
+ * Whether a file under the package's `src/`, `test/` or `samples/` calls
+ * `vi.mock` or `vi.doMock`. Any such file counts, test or not: a false
+ * positive costs speed, a false negative an order-dependent failure.
+ */
+export const usesModuleMocks = (packageRoot: string): boolean =>
+  fs
+    .globSync('{src,test,samples}/**/*.{mts,ts,tsx}', {
+      cwd: packageRoot,
+      exclude: (file) => file.includes('node_modules'),
+    })
+    .some((file) =>
+      moduleMockCall.test(
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.readFileSync(path.resolve(packageRoot, file), 'utf8'),
+      ),
+    );
+
+const moduleMockCall = /\bvi\s*\.\s*(?:mock|doMock)\s*\(/u;

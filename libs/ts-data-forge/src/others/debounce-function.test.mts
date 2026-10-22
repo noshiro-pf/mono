@@ -11,6 +11,9 @@ describe(debounce, () => {
   // eslint-disable-next-line vitest/no-hooks
   afterEach(() => {
     vi.restoreAllMocks();
+
+    // The test files of a worker share it, timers included.
+    vi.useRealTimers();
   });
 
   test('should delay the execution of the function', () => {
