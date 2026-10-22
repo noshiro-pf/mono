@@ -319,6 +319,7 @@ export const oxlintConfig = {
     '**/*.astro',
     '**/test/dist_/**',
     'apps/synstate-docs/src/content.config.ts',
+    'apps/synstate-dom-docs/src/content.config.ts',
     'languages/sumi/cli/demo/**',
     'languages/sumi/conformance/fixtures/**',
     'libs/ts-codemod-lib/test-code/**',

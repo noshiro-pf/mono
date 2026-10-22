@@ -1,0 +1,48 @@
+{
+  "name": "synstate-dom-docs",
+  "version": "0.0.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "apps/synstate-dom-docs"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "type": "module",
+  "scripts": {
+    "build": "astro build",
+    "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
+    "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "dev": "astro dev",
+    "fix:fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
+    "fix:fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
+    "fix:fmt:full": "pnpm run z:prettier .",
+    "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
+    "fmt": "pnpm run fix:fmt",
+    "gen": "run-s gen:samples gen:benchmark fix:fmt",
+    "gen:benchmark": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-benchmark.mts",
+    "gen:samples": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-samples.mts",
+    "preview": "astro preview",
+    "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch",
+    "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.42.5",
+    "astro": "^7.3.7"
+  },
+  "devDependencies": {
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "eslint-plugin-ts-fortress": "workspace:*",
+    "eslint-plugin-ts-type-forge": "workspace:*",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "synstate": "workspace:*",
+    "synstate-dom": "workspace:*",
+    "ts-data-forge": "workspace:*",
+    "ts-repo-utils": "workspace:*",
+    "ts-type-forge": "workspace:*"
+  }
+}

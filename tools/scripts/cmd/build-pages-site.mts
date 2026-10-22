@@ -18,6 +18,7 @@ import { projectRootPath } from '../project-root-path.mjs';
  * _site/
  *   index.html            a list of what is here
  *   synstate/             the hand-written documentation site (Astro)
+ *   synstate-dom/         the same, for synstate-dom
  *   pr-manager/           the Pull Requests Manager app (Vite)
  *   task-manager/         the task manager app (Vite)
  *   ts-data-forge/        TypeDoc output
@@ -25,7 +26,7 @@ import { projectRootPath } from '../project-root-path.mjs';
  * ```
  *
  * Reads what each package has already produced — `pnpm run ws:build`,
- * `pnpm run ws:doc` and the Astro build have to run first — and only copies.
+ * `pnpm run ws:doc` and the Astro builds have to run first — and only copies.
  *
  * An app's directory here and the `base` its bundle was built with have to
  * agree, or the page loads and then asks for its script at a path nothing
@@ -58,23 +59,23 @@ export const buildPagesSite = async (): Promise<Result<number, string>> => {
     mut_published.push({ name: pkg, from: 'TypeDoc' });
   }
 
-  {
-    const astroDist = path.resolve(projectRootPath, 'apps/synstate-docs/dist');
+  for (const { packageDir, siteDir, buildCommand } of astroSites) {
+    const astroDist = path.resolve(projectRootPath, 'apps', packageDir, 'dist');
 
     if (!(await pathExists(astroDist))) {
       return Result.err(
         [
           `The documentation site has not been built at ${astroDist}.`,
-          'Run `pnpm --filter @synstate/docs run build:astro` first.',
+          `Run \`${buildCommand}\` first.`,
         ].join('\n'),
       );
     }
 
-    await fs.cp(astroDist, path.resolve(outDir, 'synstate'), {
+    await fs.cp(astroDist, path.resolve(outDir, siteDir), {
       recursive: true,
     });
 
-    mut_published.push({ name: 'synstate', from: 'Astro' });
+    mut_published.push({ name: siteDir, from: 'Astro' });
   }
 
   for (const [packageDir, siteDir] of pagesAppEntries()) {
@@ -101,6 +102,25 @@ export const buildPagesSite = async (): Promise<Result<number, string>> => {
 
   return Result.ok(mut_published.length);
 };
+
+/**
+ * The hand-written documentation sites. Each one's `base` in
+ * `astro.config.mjs` is `/mono/<siteDir>/`, and has to stay so.
+ * `synstate-dom-docs` embeds nothing at build time, so `ws:build` builds it;
+ * `deploy-pages.yml` rebuilds only `synstate-docs`, after `ws:doc`.
+ */
+const astroSites = [
+  {
+    packageDir: 'synstate-docs',
+    siteDir: 'synstate',
+    buildCommand: 'pnpm --filter @synstate/docs run build:astro',
+  },
+  {
+    packageDir: 'synstate-dom-docs',
+    siteDir: 'synstate-dom',
+    buildCommand: 'pnpm --filter synstate-dom-docs run build',
+  },
+] as const;
 
 /** The packages that build TypeDoc output, found rather than listed. */
 const typedocPackages = async (): Promise<readonly string[]> => {

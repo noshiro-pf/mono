@@ -1,0 +1,44 @@
+---
+title: synstate-dom
+description: synstate の Observable を DOM に直接束縛する、コンパイラなしの細粒度 UI ライブラリ。
+template: splash
+hero:
+    tagline: synstate の Observable を JSX にそのまま渡す。コンポーネントは 1 回だけ呼ばれ、以後は Observable に束縛された属性・プロパティ・テキストだけが変わる。コンパイラも仮想 DOM も使わない。
+    actions:
+        - text: はじめる
+          link: /mono/synstate-dom/ja/getting-started/introduction/
+          icon: right-arrow
+          variant: primary
+        - text: ベンチマーク
+          link: /mono/synstate-dom/ja/background/benchmark/
+          variant: minimal
+---
+
+import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
+
+<Aside type="caution">
+    synstate-dom は開発中で、まだ npm に公開していない。最初のリリースまでに API
+    が変わることがある。
+</Aside>
+
+## 特長
+
+<CardGrid>
+    <Card title="細粒度、1 回だけ呼ぶ" icon="rocket">
+        コンポーネント関数はマウント時に 1 回だけ呼ばれる。更新は synstate
+        のグラフを伝わり、束縛された DOM
+        の葉（属性・プロパティ・テキストノード）に直接書き込まれる。
+    </Card>
+    <Card title="コンパイラなし" icon="setting">
+        TypeScript 標準の `"jsx": "react-jsx"` と `jsxImportSource`
+        だけで動く。設定する Babel や Vite のプラグインはない。
+    </Card>
+    <Card title="リアクティビティを型で表す" icon="approve-check">
+        データを受け取るスロットは Observable・`constant(...)`・`view(...)`
+        だけを受け付け、素の値は受け付けない。スナップショットを誤って読むと、更新されないビューではなく型エラーになる。
+    </Card>
+    <Card title="構造上リークしない" icon="random">
+        `If`・`Match`・`For`
+        は表示するものをそれぞれのスコープでマウントする。分岐を閉じたり行を消したりすると、その中で作った派生と購読がすべて破棄される。
+    </Card>
+</CardGrid>

@@ -1,0 +1,7 @@
+/* Prevent CJK text from breaking mid-word in table cells,
+   so wide tables overflow horizontally (with scroll) instead of
+   collapsing cells vertically. */
+table td,
+table th {
+  word-break: keep-all;
+}
