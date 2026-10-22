@@ -1,5 +1,18 @@
 # synstate-preact-hooks
 
+## 4.1.0
+
+### Minor Changes
+
+- ae4efdc: Add `empty()`, an observable that holds no value and is already completed, for the branch of a `switchMap` that should follow nothing. `synstate-preact-signals`, `synstate-preact-hooks`, `synstate-react-hooks` and `synstate-react-hooks-compat` re-export synstate, so `empty` reaches their users as well.
+
+### Patch Changes
+
+- Updated dependencies [079cb28]
+- Updated dependencies [ae4efdc]
+    - ts-data-forge@14.9.0
+    - synstate@4.1.0
+
 ## 4.0.0
 
 ### Major Changes

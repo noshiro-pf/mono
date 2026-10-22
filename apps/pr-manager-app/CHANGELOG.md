@@ -1,5 +1,18 @@
 # pr-manager-app
 
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies [079cb28]
+- Updated dependencies [ae4efdc]
+    - ts-data-forge@14.9.0
+    - synstate@4.1.0
+    - synstate-preact-signals@4.1.0
+    - pr-report-core@0.0.3
+    - preact-utils@0.0.14
+    - ts-fortress@12.3.1
+
 ## 0.0.9
 
 ### Patch Changes

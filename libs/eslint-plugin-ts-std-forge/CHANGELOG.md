@@ -1,5 +1,12 @@
 # eslint-plugin-ts-std-forge
 
+## 0.1.11
+
+### Patch Changes
+
+- Updated dependencies [079cb28]
+    - ts-std-forge@0.5.2
+
 ## 0.1.10
 
 ### Patch Changes
