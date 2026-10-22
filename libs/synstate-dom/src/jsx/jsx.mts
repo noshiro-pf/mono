@@ -1,4 +1,6 @@
 import { hasKey, isRecord } from 'ts-data-forge';
+import { bindProps } from '../bind/index.mjs';
+import { svgTagNames } from '../internal/index.mjs';
 import { isChild, mountChild, type Child } from './child.mjs';
 import { mountable, type Mountable } from './mountable.mjs';
 
@@ -26,7 +28,9 @@ export const Fragment = (props: Readonly<{ children?: Child }>): Mountable =>
   mountable(() => mountChild(props.children ?? []));
 
 const mountElement = (tag: string, props: unknown): Element => {
-  const element = document.createElement(tag);
+  const element = svgTagNameSet.has(tag)
+    ? document.createElementNS(svgNamespace, tag)
+    : document.createElement(tag);
 
   if (!isRecord(props)) {
     return element;
@@ -36,12 +40,18 @@ const mountElement = (tag: string, props: unknown): Element => {
     props.ref(element);
   }
 
+  bindProps(element, props);
+
   if (hasKey(props, 'children') && isChild(props.children)) {
     element.append(...mountChild(props.children));
   }
 
   return element;
 };
+
+const svgNamespace = 'http://www.w3.org/2000/svg';
+
+const svgTagNameSet: ReadonlySet<string> = new Set(svgTagNames);
 
 const isRefCallback = (value: unknown): value is (element: Element) => void =>
   typeof value === 'function';
