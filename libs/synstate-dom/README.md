@@ -15,6 +15,8 @@ A compiler-free, fine-grained UI library that binds [synstate](https://github.co
 - `render(App, container)`: mounts `App` in a root scope and returns the function that unmounts it.
 - Element props: attributes and DOM properties typed from `lib.dom.d.ts` (`Bindable<T>` of each writable primitive property), `aria-*` and `data-*`, `class` as a string or a `{ name: Bindable<boolean> }` object, `style` as a string or a per-property object, and `onClick`-style event handlers. SVG elements are created in the SVG namespace and take a fixed list of attributes.
 - `If`, `MatchOptional` and `MatchResult`: mount one branch at a time in a scope of its own, rebuilt only when the condition or the tag changes.
+- `For`: one row per key, each in a scope of its own; `item$` and `index$` are derived from `items`, and rows are moved as little as the longest increasing subsequence allows.
+- `Portal`: mounts its children into another element, in the scope where it is written.
 
 ## Naming
 

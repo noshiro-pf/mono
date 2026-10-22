@@ -1,0 +1,267 @@
+import {
+  createScope,
+  filter,
+  getCurrentScope,
+  map,
+  onScopeDispose,
+  skipIfNoChange,
+  withInitialValue,
+  type InitializedObservable,
+  type Scope,
+} from 'synstate';
+import { Arr } from 'ts-data-forge';
+import { toObservable, type Bindable } from '../constant/index.mjs';
+import { bindValue } from '../internal/index.mjs';
+import { mountable, toNodes, type JSX } from '../jsx/index.mjs';
+import { longestIncreasingSubsequence } from './longest-increasing-subsequence.mjs';
+
+/**
+ * Mounts one row per element of `items`, matched across updates by `key`
+ * (SPEC.md 8.4).
+ *
+ * `children` is called once per key, inside a scope of the row's own, with
+ * observables of the element and its index. A row whose key stays is not
+ * rebuilt: its `item$` and `index$` are derived from `items`, so they update
+ * in the ordinary propagation, and nothing is written during it. A key that
+ * goes disposes its row's scope and removes its nodes; the rows that stay
+ * are moved as little as the longest increasing subsequence allows.
+ *
+ * `key` is required, as in React; `(_, i) => i` matches rows by position. A
+ * key that appears twice is reported with `console.error`, and its later
+ * occurrences are rebuilt on every update.
+ */
+export const For = <T,>({
+  items,
+  key,
+  children,
+}: Readonly<{
+  items: Bindable<readonly T[]>;
+  key: (item: T, index: number) => unknown;
+  children: (
+    item$: InitializedObservable<T>,
+    index$: InitializedObservable<number>,
+  ) => JSX.Element;
+}>): JSX.Element =>
+  mountable(() => {
+    const parent = getCurrentScope();
+
+    const anchor = document.createComment('');
+
+    const entries$ = toObservable(items).pipe(
+      map((list) => toEntries(list, key)),
+    );
+
+    const mut_rows = new Map<unknown, Row>();
+
+    const rowStarts = new WeakSet<Node>();
+
+    const mut_initial: { nodes: readonly ChildNode[] } = { nodes: [] };
+
+    /** Creates a row in a scope of its own and returns its first nodes. */
+    const createRow = (
+      rowKey: unknown,
+      entry: Entry<T>,
+    ): readonly ChildNode[] => {
+      const scope = createScope(parent);
+
+      const start = document.createComment('');
+
+      rowStarts.add(start);
+
+      const nodes = scope.run(() => {
+        const entry$ = entries$
+          .pipe(map((entries) => entries.byKey.get(rowKey)))
+          .pipe(filter(isEntry<T>));
+
+        const item$ = entry$
+          .pipe(map((e) => e.item))
+          .pipe(withInitialValue(entry.item))
+          .pipe(skipIfNoChange());
+
+        const index$ = entry$
+          .pipe(map((e) => e.index))
+          .pipe(withInitialValue(entry.index))
+          .pipe(skipIfNoChange());
+
+        return toNodes(children(item$, index$).mount());
+      });
+
+      const row: Row = { scope, start } as const;
+
+      scope.run(() => {
+        onScopeDispose(() => {
+          for (const node of rowNodes(row)) {
+            node.remove();
+          }
+        });
+      });
+
+      mut_rows.set(rowKey, row);
+
+      return Arr.toUnshifted(start)(nodes);
+    };
+
+    /** The row's current nodes: from its start to the next row or the anchor. */
+    const rowNodes = (row: Row): readonly ChildNode[] => {
+      const mut_nodes: ChildNode[] = [row.start];
+
+      for (
+        let mut_node = row.start.nextSibling;
+        mut_node !== null && mut_node !== anchor && !rowStarts.has(mut_node);
+        mut_node = mut_node.nextSibling
+      ) {
+        mut_nodes.push(mut_node);
+      }
+
+      return mut_nodes;
+    };
+
+    bindValue(entries$, (entries) => {
+      const previousOrder = Array.from(mut_rows.keys());
+
+      for (const [rowKey, row] of mut_rows) {
+        if (entries.byKey.has(rowKey)) {
+          continue;
+        }
+
+        row.scope.dispose();
+
+        mut_rows.delete(rowKey);
+      }
+
+      if (anchor.parentNode === null) {
+        mut_initial.nodes = entries.order.flatMap((rowKey) => {
+          const entry = entries.byKey.get(rowKey);
+
+          return entry === undefined ? [] : createRow(rowKey, entry);
+        });
+
+        return;
+      }
+
+      const previousPosition = new Map(
+        previousOrder
+          .filter((rowKey) => mut_rows.has(rowKey))
+          .map((rowKey, position) => [rowKey, position]),
+      );
+
+      const positions = entries.order.map(
+        (rowKey) => previousPosition.get(rowKey) ?? -1,
+      );
+
+      const stay = longestIncreasingSubsequence(
+        positions.filter((position) => position >= 0),
+      );
+
+      const staying = new Set(
+        positions
+          .filter((position) => position >= 0)
+          .filter((_, k) => stay.has(k)),
+      );
+
+      let mut_next: ChildNode = anchor;
+
+      for (const rowKey of entries.order.toReversed()) {
+        const existing = mut_rows.get(rowKey);
+
+        if (existing === undefined) {
+          const entry = entries.byKey.get(rowKey);
+
+          if (entry === undefined) {
+            continue;
+          }
+
+          const [start, ...rest] = createRow(rowKey, entry);
+
+          if (start !== undefined) {
+            mut_next.before(start, ...rest);
+
+            mut_next = start;
+          }
+
+          continue;
+        }
+
+        if (!staying.has(previousPosition.get(rowKey) ?? -1)) {
+          mut_next.before(...rowNodes(existing));
+        }
+
+        mut_next = existing.start;
+      }
+
+      reorderMap(mut_rows, entries.order);
+    });
+
+    return Arr.toPushed(mut_initial.nodes, anchor);
+  });
+
+type Row = Readonly<{
+  /** The row's own scope, a child of the scope `For` was mounted in. */
+  scope: Scope;
+  /** A comment in front of the row's nodes, which do not otherwise stay put: a switch at the top of the row changes them. */
+  start: Comment;
+}>;
+
+type Entry<T> = Readonly<{ item: T; index: number }>;
+
+type Entries<T> = Readonly<{
+  order: readonly unknown[];
+  byKey: ReadonlyMap<unknown, Entry<T>>;
+}>;
+
+const toEntries = <T,>(
+  list: readonly T[],
+  key: (item: T, index: number) => unknown,
+): Entries<T> => {
+  const mut_byKey = new Map<unknown, Entry<T>>();
+
+  const order = list.map((item, index) => {
+    const itemKey = key(item, index);
+
+    if (!mut_byKey.has(itemKey)) {
+      mut_byKey.set(itemKey, { item, index });
+
+      return itemKey;
+    }
+
+    console.error(
+      'synstate-dom: For found the key',
+      itemKey,
+      'more than once; keys must be unique.',
+    );
+
+    // A fresh key: the duplicate is rebuilt on every update.
+    const duplicateKey = Symbol('duplicate key');
+
+    mut_byKey.set(duplicateKey, { item, index });
+
+    return duplicateKey;
+  });
+
+  return { order, byKey: mut_byKey };
+};
+
+const isEntry = <T,>(entry: Entry<T> | undefined): entry is Entry<T> =>
+  entry !== undefined;
+
+/** Re-inserts the rows in the new order, so that iteration follows the DOM. */
+const reorderMap = (
+  mut_rows: Map<unknown, Row>,
+  order: readonly unknown[],
+): void => {
+  const rows = Arr.generate(function* () {
+    for (const rowKey of order) {
+      const row = mut_rows.get(rowKey);
+
+      if (row !== undefined) {
+        yield [rowKey, row] as const;
+      }
+    }
+  });
+
+  mut_rows.clear();
+
+  for (const [rowKey, row] of rows) {
+    mut_rows.set(rowKey, row);
+  }
+};
