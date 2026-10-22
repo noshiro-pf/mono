@@ -1,27 +1,28 @@
 name: SynState Benchmark
 
-# A `paths` filter, unlike every check workflow here (see "Triggers" in
-# README.md for why those carry none). This workflow reports no required
-# status check: a benchmark on a shared runner is a measurement, not a
-# verdict, and gating a merge on it would gate it on the runner's mood. So a
-# path filter is exactly right here, and it keeps every unrelated pull request
-# from spending five minutes measuring what it did not touch.
+# Measures SynState and the libraries it is compared with, and fails when the
+# committed tables in apps/synstate-docs/src/data no longer describe the code
+# they ship with. A change that moves the numbers is declared by committing the
+# tables CI measured for it (the `synstate-benchmark-to-commit-<run id>`
+# artifact); the same change without them is red.
+#
+# The check workflow shape — triggers, concurrency, `permissions: {}`, the
+# gate, the aggregate — is in README.md. What is particular to this one:
+#
+# - It gates on code-check.yml's ignore list (`diff-scope: code`): the build
+#   it runs reads every workspace package SynState is built from, and a
+#   hand-kept list of those would miss the next one.
+# - On `main` the measurement runs even when the verdict is reused, because
+#   that run is what stores the baseline the next pull request is compared
+#   with. The aggregate still reports the reused verdict.
+# - A shared runner is noisy; `check-drift.mts` divides the runner out and
+#   calls drift only beyond 2× of a library's change relative to the others.
+
 on:
   push:
     branches:
       - main
-    paths:
-      - 'libs/synstate/src/**'
-      # A release bumps the version, which is part of the baseline key.
-      - 'libs/synstate/package.json'
-      - 'libs/synstate/samples/docs-site/benchmark/**'
-      - 'apps/synstate-docs/scripts/benchmark/**'
-      - 'apps/synstate-docs/src/data/**'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/synstate-benchmark.yml'
 
-  # `labeled` / `unlabeled` so that `skip-ci` stops the measurement and taking
-  # it off starts it, as in the check workflows.
   pull_request:
     types:
       - opened
@@ -29,34 +30,42 @@ on:
       - reopened
       - labeled
       - unlabeled
-    paths:
-      - 'libs/synstate/src/**'
-      - 'libs/synstate/package.json'
-      - 'libs/synstate/samples/docs-site/benchmark/**'
-      - 'apps/synstate-docs/scripts/benchmark/**'
-      - 'apps/synstate-docs/src/data/**'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/synstate-benchmark.yml'
 
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request', github.event.pull_request.number, github.ref) }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request', github.event.pull_request.number, github.event_name == 'push', github.sha, github.ref) }}
+  cancel-in-progress: true
 
 permissions: {}
 
 jobs:
-  benchmark:
-    # Not while `skip-ci` is on, and on a label event only when that label is
-    # `skip-ci` coming off: another label changes nothing measured. The run a
-    # label event starts still cancels the one in flight, which is how putting
-    # `skip-ci` on stops the `opened` run.
+  gates:
     if: >-
       github.event_name != 'pull_request' ||
-      (!contains(github.event.pull_request.labels.*.name, 'skip-ci') &&
-        ((github.event.action != 'labeled' && github.event.action != 'unlabeled') ||
-          github.event.label.name == 'skip-ci'))
+      !contains(github.event.pull_request.labels.*.name, 'skip-ci')
+    uses: ./.github/workflows/check-gates.yml
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+    with:
+      diff-scope: code
+      # A reused verdict does not skip `benchmark` on `main`, so the diff
+      # question is answered there all the same.
+      diff-when-reused: ${{ github.event_name == 'push' }}
+      result-job: synstate-benchmark-result / result
+
+  benchmark:
+    needs: gates
+    # On `main` a reused verdict does not skip it: that run stores the
+    # baseline the next pull request is compared with.
+    if: >-
+      !cancelled() &&
+      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
+      needs.gates.outputs.branch_up_to_date != 'false' &&
+      needs.gates.outputs.should_run != 'false' &&
+      (needs.gates.outputs.reused_result == '' || github.event_name == 'push')
     # Pinned, not `ubuntu-latest`. Comparability is the entire point: these
     # numbers are published, and a table measured on one image beside a table
     # measured on the next is the confusion this workflow exists to end. When
@@ -88,24 +97,45 @@ jobs:
       # The image and the Node version are spelled out rather than folded into
       # the digest, so that a glance at the cache name says which runner a
       # baseline came from.
+      #
+      # SynState's own version is not enough for SynState: the workspace
+      # package keeps its version until a release, so a rewrite of its core
+      # measured against a baseline of the old one reads as drift on `main`
+      # until then. The digest of every workspace package's source (SynState
+      # and whatever it is built from, without a list to keep) and of the
+      # benchmark itself therefore joins the key; test files are left out,
+      # since they change nothing measured.
       - name: Compute the baseline cache key
         id: key
+        env:
+          SOURCE_DIGEST: ${{ hashFiles('libs/*/src/**', '!libs/*/src/**/*.test.mts', 'libs/synstate/samples/docs-site/benchmark/**', 'apps/synstate-docs/scripts/benchmark/**') }}
         run: |
           set -euo pipefail
           libs="$(pnpm --filter @synstate/docs run --silent z:benchmark:version-key)"
           node_major="$(node -p 'process.versions.node.split(".")[0]')"
-          echo "value=synstate-benchmark-v1-ubuntu-24.04-node${node_major}-${libs}" >>"${GITHUB_OUTPUT}"
-          echo "Baseline key: synstate-benchmark-v1-ubuntu-24.04-node${node_major}-${libs}"
+          prefix="synstate-benchmark-v1-ubuntu-24.04-node${node_major}-${libs}-src"
+          key="${prefix}${SOURCE_DIGEST:0:12}"
+          echo "prefix=${prefix}" >>"${GITHUB_OUTPUT}"
+          echo "value=${key}" >>"${GITHUB_OUTPUT}"
+          echo "Baseline key: ${key}"
 
       # Restore only. A cache written on a pull request branch is visible to
       # that branch alone, so a baseline has to come from `main` to be worth
       # anything; the save step below is therefore gated on `main`.
+      #
+      # A branch that changes SynState's source has no baseline of its own, so
+      # the newest one `main` stored for the same versions stands in for it
+      # (`cache-hit` false, `cache-matched-key` set): that is the measurement
+      # of the code before the branch, which is what the branch is compared
+      # with. It never stands in for the committed tables, which have to match
+      # the code they ship with.
       - name: Restore the baseline for these versions
         id: baseline
         uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: baseline
           key: ${{ steps.key.outputs.value }}
+          restore-keys: ${{ steps.key.outputs.prefix }}
 
       # `Measure` overwrites them, and they are what is judged below.
       - name: Keep the committed tables
@@ -132,7 +162,7 @@ jobs:
           } >>"${GITHUB_STEP_SUMMARY}"
 
       - name: Compare with the baseline
-        if: steps.baseline.outputs.cache-hit == 'true'
+        if: steps.baseline.outputs.cache-matched-key != ''
         run: |
           set -euo pipefail
           pnpm --filter @synstate/docs run --silent z:benchmark:compare \
@@ -141,7 +171,7 @@ jobs:
             >>"${GITHUB_STEP_SUMMARY}"
 
       - name: Say that there was no baseline
-        if: steps.baseline.outputs.cache-hit != 'true'
+        if: steps.baseline.outputs.cache-matched-key == ''
         run: |
           set -euo pipefail
           {
@@ -187,17 +217,15 @@ jobs:
           key: ${{ steps.key.outputs.value }}
 
       # The published tables are judged against the measurement CI keeps for
-      # these versions: the cached baseline, or on `main` with none yet the one
-      # just taken and stored. Not byte for byte, and not in milliseconds:
-      # `check-drift.mts` divides out the runner instance and calls drift only
-      # a change of a library relative to the others beyond what unchanged
-      # code moves by between runs. So a dependency bump that moves nothing
-      # keeps the published tables, and one that does moves them.
+      # this source and these versions: the cached baseline, or where there is
+      # none — a branch that changes SynState or a compared library, or `main`
+      # right after one merged — the one just taken. Not byte for byte, and not
+      # in milliseconds: `check-drift.mts` divides out the runner instance and
+      # calls drift only a change of a library relative to the others beyond
+      # what unchanged code moves by between runs. So a dependency bump that
+      # moves nothing keeps the published tables, and one that does moves them.
       - name: Judge the committed tables
         id: committed
-        if: >-
-          steps.baseline.outputs.cache-hit == 'true' ||
-          (github.ref == 'refs/heads/main' && github.event_name != 'pull_request')
         run: |
           set -euo pipefail
           reference="$(pwd)/${{ case(steps.baseline.outputs.cache-hit == 'true', 'baseline', 'apps/synstate-docs/src/data') }}"
@@ -213,7 +241,7 @@ jobs:
         id: branch
         if: >-
           github.event_name == 'pull_request' &&
-          steps.baseline.outputs.cache-hit == 'true'
+          steps.baseline.outputs.cache-matched-key != ''
         run: |
           set -euo pipefail
           pnpm --filter @synstate/docs run --silent z:benchmark:check-drift \
@@ -235,21 +263,32 @@ jobs:
           path: ${{ steps.committed.outputs.reference }}
           if-no-files-found: error
 
-      # Red only on `main`. A pull request that bumps a compared library has no
-      # baseline to commit until it merges and `main` measures one, so failing
-      # it would hold every dependency update on a commit it cannot make; it
-      # gets a warning instead. A red run on `main` is the signal that the
-      # published tables no longer describe these versions. Committing the
-      # artifact is the fix; re-running `benchmark` locally is not, because a
-      # local machine is not the pinned runner.
+      # Red on a pull request too: a change that moves the numbers declares it
+      # by committing the tables measured for it, and one that does not is
+      # the change this check exists to stop. A dependency update that moves a
+      # compared library is no exception — its fix is the same commit.
+      # Re-running `benchmark` locally is not a fix, because a local machine is
+      # not the pinned runner.
       - name: Fail when the published tables have drifted
         if: steps.committed.outputs.drifted == 'true'
         run: |
           set -euo pipefail
-          message='The committed tables in apps/synstate-docs/src/data have drifted from the CI measurement for these library versions. Replace them with the files of the synstate-benchmark-to-commit-${{ github.run_id }} artifact, then run pnpm --filter @synstate/docs run gen:benchmark-doc and pnpm run fmt, and commit the result.'
-          if [ "${GITHUB_EVENT_NAME}" = 'pull_request' ]; then
-            echo "::warning title=Benchmark tables drifted::${message}"
-          else
-            echo "::error title=Benchmark tables drifted::${message}"
-            exit 1
-          fi
+          echo '::error title=Benchmark tables drifted::The committed tables in apps/synstate-docs/src/data do not describe this code and these library versions. If the change is meant to move the numbers, replace them with the files of the synstate-benchmark-to-commit-${{ github.run_id }} artifact, then run pnpm --filter @synstate/docs run gen:benchmark-doc and pnpm run fmt, and commit the result.'
+          exit 1
+
+  # The one required status check for this workflow, reported as
+  # `synstate-benchmark-result / result` — see "The aggregate job" in
+  # README.md.
+  synstate-benchmark-result:
+    needs:
+      - gates
+      - benchmark
+    # Not on a label event while `skip-ci` is on, so that putting the label on
+    # supersedes no verdict — "A label event under `skip-ci`" in README.md.
+    if: >-
+      always() &&
+      !((github.event.action == 'labeled' || github.event.action == 'unlabeled') &&
+        contains(github.event.pull_request.labels.*.name, 'skip-ci'))
+    uses: ./.github/workflows/check-result.yml
+    with:
+      needs: ${{ toJSON(needs) }}

@@ -11,23 +11,23 @@ GitHub shows a `.github/README.md` in place of the root one.
 
 ## Inventory
 
-| Workflow                         | Runs on                                        | Reports a required context              |
-| :------------------------------- | :--------------------------------------------- | :-------------------------------------- |
-| `code-check.yml`                 | pull requests; `push` to `main`                | `code-check-result / result`            |
-| `style-check.yml`                | pull requests; `push` to `main`                | `style-check-result / result`           |
-| `strict-lib-gen.yml`             | pull requests; `push` to `main`                | `strict-lib-gen-result / result`        |
-| `node-version-compatibility.yml` | pull requests; `push` to `main`                | `test-node-versions-result / result`    |
-| `verify-published-packages.yml`  | pull requests; `push` to `main`                | `verify-published-result / result`      |
-| `check-gates.yml`                | `workflow_call`, from the five above           | none; it is the gate the five share     |
-| `check-result.yml`               | `workflow_call`, from the five above           | the five above; it is their aggregate   |
-| `skip-ci-label.yml`              | `pull_request_target`                          | the `no-skip-ci-label` commit status    |
-| `lint-pull-request.yml`          | `pull_request_target`                          | its three jobs, by name                 |
-| `release.yml`                    | `push` to `main`                               | none                                    |
-| `pnpm-update.yml`                | schedule                                       | none; opens `chore/pnpm-update`         |
-| `node-support-update.yml`        | schedule                                       | none; opens `chore/node-support-update` |
-| `deploy-pages.yml`               | `push` to `main`                               | none                                    |
-| `synstate-benchmark.yml`         | `push` to `main`, pull requests, path-filtered | none; a measurement, not a verdict      |
-| `link-check.yml`                 | pull requests, path-filtered; schedule         | none; other people's servers decide it  |
+| Workflow                         | Runs on                                | Reports a required context              |
+| :------------------------------- | :------------------------------------- | :-------------------------------------- |
+| `code-check.yml`                 | pull requests; `push` to `main`        | `code-check-result / result`            |
+| `style-check.yml`                | pull requests; `push` to `main`        | `style-check-result / result`           |
+| `strict-lib-gen.yml`             | pull requests; `push` to `main`        | `strict-lib-gen-result / result`        |
+| `node-version-compatibility.yml` | pull requests; `push` to `main`        | `test-node-versions-result / result`    |
+| `verify-published-packages.yml`  | pull requests; `push` to `main`        | `verify-published-result / result`      |
+| `synstate-benchmark.yml`         | pull requests; `push` to `main`        | `synstate-benchmark-result / result`    |
+| `check-gates.yml`                | `workflow_call`, from the six above    | none; it is the gate the six share      |
+| `check-result.yml`               | `workflow_call`, from the six above    | the six above; it is their aggregate    |
+| `skip-ci-label.yml`              | `pull_request_target`                  | the `no-skip-ci-label` commit status    |
+| `lint-pull-request.yml`          | `pull_request_target`                  | its three jobs, by name                 |
+| `release.yml`                    | `push` to `main`                       | none                                    |
+| `pnpm-update.yml`                | schedule                               | none; opens `chore/pnpm-update`         |
+| `node-support-update.yml`        | schedule                               | none; opens `chore/node-support-update` |
+| `deploy-pages.yml`               | `push` to `main`                       | none                                    |
+| `link-check.yml`                 | pull requests, path-filtered; schedule | none; other people's servers decide it  |
 
 The required contexts are listed in `repo-settings/rulesets/main.json`. Every
 one of them is either an aggregate job (see "The aggregate job") or a job that
@@ -35,9 +35,10 @@ runs no repository code; none is a job that does the work.
 
 ## The check workflows
 
-Five workflows check a pull request: `code-check.yml`, `style-check.yml`,
-`strict-lib-gen.yml`, `node-version-compatibility.yml` and
-`verify-published-packages.yml`. They have one shape:
+Six workflows check a pull request: `code-check.yml`, `style-check.yml`,
+`strict-lib-gen.yml`, `node-version-compatibility.yml`,
+`verify-published-packages.yml` and `synstate-benchmark.yml`. They have one
+shape:
 
 ```text
 gates  (check-gates.yml, reusable)
@@ -93,8 +94,7 @@ on:
 - **No `paths` filter.** A workflow a path filter skips reports no status at
   all, and a required context that never arrives blocks the merge forever.
   The diff question is answered by the gate, after the workflow has started.
-  `synstate-benchmark.yml` and `link-check.yml` carry one because they report
-  no required context: a benchmark on a shared runner is a measurement, and
+  `link-check.yml` carries one because it reports no required context:
   whether an external URL answers is not a property of the tree.
 
 ### Concurrency
@@ -133,8 +133,8 @@ would apply to pull request runs as well, and GitHub rejects it alongside
 Queued rather than parallel is also nothing a push run needs: each reads only
 its own tree and its own `github.event.before`.
 
-Three workflows outside this shape, `skip-ci-label.yml`,
-`lint-pull-request.yml` and `synstate-benchmark.yml`, do write
+Two workflows outside this shape, `skip-ci-label.yml` and
+`lint-pull-request.yml`, do write
 `cancel-in-progress: ${{ github.event_name == '…' }}`, so that a run of their
 other triggers is left alone. The event name in that expression has to be one
 the workflow triggers on, or the expression is a constant and
@@ -350,7 +350,8 @@ of their own, so what they mean is here:
   is not on the strict-lib list because the changelogs are copied into the
   bundles. Adding a path wrongly fails nothing; it makes the workflow skip a
   diff it was the one thing meant to judge.
-- **`code`** (`code-check.yml`, `node-version-compatibility.yml`) drops
+- **`code`** (`code-check.yml`, `node-version-compatibility.yml`,
+  `synstate-benchmark.yml`) drops
   `experimental/`, `docs/`, `**.md`, `**.txt` and the style tools'
   configuration.
 - **`style`** (`style-check.yml`) drops `experimental/` and nothing else:
@@ -568,10 +569,8 @@ job to serve them would cost more than it saves.
 
 ## `skip-ci` and `no-skip-ci-label`
 
-`skip-ci` on a pull request skips the five check workflows; every gated job
-carries the label condition and boots no runner. `synstate-benchmark.yml`
-carries it too, and listens for `labeled` / `unlabeled` so that taking the
-label off starts it as it starts the checks. The three
+`skip-ci` on a pull request skips the six check workflows; every gated job
+carries the label condition and boots no runner. The three
 `lint-pull-request.yml` jobs run regardless (see "A label event under
 `skip-ci`"). GitHub has no label-based merge block, so on its own the
 label would leave a pull request that nothing checked looking exactly like one
