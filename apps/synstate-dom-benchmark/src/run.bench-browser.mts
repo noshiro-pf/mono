@@ -2,7 +2,9 @@ import { Arr } from 'ts-data-forge';
 import { commands } from 'vitest/browser';
 import type { BenchApp, Framework } from './bench-app.mjs';
 import {
+  preact,
   preactSignals,
+  react,
   solid,
   synstateDom,
   vanjs,
@@ -115,8 +117,22 @@ const frameworks: readonly Framework[] = [
   synstateDom,
   solid,
   preactSignals,
+  preact,
+  react,
   vanjs,
 ] as const;
+
+/**
+ * The order the libraries are measured in: `frameworks` turned left by
+ * `BENCHMARK_ROTATE` (set by `pnpm run benchmark:repeat`), so that over
+ * several runs each library is measured first in turn. The table keeps the
+ * order of `frameworks`.
+ */
+const measuringOrder: readonly Framework[] = (() => {
+  const shift = Number(process.env['BENCHMARK_ROTATE']) % frameworks.length;
+
+  return [...frameworks.slice(shift), ...frameworks.slice(0, shift)];
+})();
 
 const warmups = 3;
 
@@ -124,7 +140,7 @@ type Result = Readonly<{ caseName: string; framework: string; ms: number }>;
 
 test('js-framework-benchmark operations', async () => {
   const resultsByFramework = await mapInSequence(
-    frameworks,
+    measuringOrder,
     async (framework) => {
       const container = document.createElement('div');
 

@@ -14,6 +14,12 @@ export default defineConfig({
   mode: 'production',
   define: {
     'process.env.NODE_ENV': JSON.stringify('production'),
+    // Which library the run measures first (`scripts/repeat-benchmark.mts`
+    // turns it from run to run): the first one measured starts on a colder
+    // browser than the rest.
+    'process.env.BENCHMARK_ROTATE': JSON.stringify(
+      process.env['BENCHMARK_ROTATE'] ?? '0',
+    ),
   },
   resolve: {
     conditions: ['module', 'browser', 'production'],
@@ -28,7 +34,13 @@ export default defineConfig({
     include: [
       '@preact/signals',
       'preact',
+      'preact/compat',
+      'preact/hooks',
       'preact/jsx-runtime',
+      'react',
+      'react-dom',
+      'react-dom/client',
+      'react/jsx-runtime',
       'solid-js',
       'solid-js/web',
       'vanjs-core',
