@@ -16,6 +16,7 @@ import { preferIsRecordAndHasKey } from './prefer-is-record-and-has-key.mjs';
 import { preferNumSafeParseFloat } from './prefer-num-safe-parse-float.mjs';
 import { preferNumSafeParseInt } from './prefer-num-safe-parse-int.mjs';
 import { preferObjOverEntriesRoundTrip } from './prefer-obj-over-entries-round-trip.mjs';
+import { preferPipeMapNullable } from './prefer-pipe-map-nullable.mjs';
 import { preferRangeForLoop } from './prefer-range-for-loop.mjs';
 
 export const tsDataForgeRules = {
@@ -37,4 +38,5 @@ export const tsDataForgeRules = {
   'no-unnecessary-type-guard': noUnnecessaryTypeGuard,
   'prefer-comparison-over-nullish-guard': preferComparisonOverNullishGuard,
   'prefer-obj-over-entries-round-trip': preferObjOverEntriesRoundTrip,
+  'prefer-pipe-map-nullable': preferPipeMapNullable,
 } as const satisfies ESLintPlugin['rules'];
