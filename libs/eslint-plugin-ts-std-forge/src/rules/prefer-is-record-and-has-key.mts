@@ -19,21 +19,25 @@ type Options = readonly [];
 
 type MessageIds = 'useIsRecordAndHasKey' | 'useHasKey';
 
-export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
-  {
+/**
+ * `prefer-is-record-and-has-key`, steering toward `isRecord` and `hasKey` from
+ * `moduleName`. eslint-plugin-ts-data-forge builds its rule of the same name
+ * from this with `'ts-data-forge'`, which re-exports the same guards.
+ */
+export const createPreferIsRecordAndHasKey = (
+  moduleName: string,
+): TSESLint.RuleModule<MessageIds, Options> =>
+  ({
     meta: {
       type: 'suggestion',
       docs: {
-        description:
-          'Replace `Object.hasOwn(obj, key)` or `key in obj` with `isRecord(obj) && hasKey(obj, key)` from ts-std-forge',
+        description: `Replace \`Object.hasOwn(obj, key)\` or \`key in obj\` with \`isRecord(obj) && hasKey(obj, key)\` from ${moduleName}`,
       },
       fixable: 'code',
       schema: [],
       messages: {
-        useIsRecordAndHasKey:
-          'Replace `{{original}}` with `isRecord({{objName}}) && hasKey({{objName}}, {{keyName}})` from ts-std-forge.',
-        useHasKey:
-          'Replace `{{original}}` with `hasKey({{objName}}, {{keyName}})` from ts-std-forge.',
+        useIsRecordAndHasKey: `Replace \`{{original}}\` with \`isRecord({{objName}}) && hasKey({{objName}}, {{keyName}})\` from ${moduleName}.`,
+        useHasKey: `Replace \`{{original}}\` with \`hasKey({{objName}}, {{keyName}})\` from ${moduleName}.`,
       },
     },
 
@@ -42,10 +46,7 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
 
       const program = sourceCode.ast;
 
-      const tsStdForgeImports = getImportDeclarations(
-        program,
-        TS_STD_FORGE_MODULE,
-      );
+      const moduleImports = getImportDeclarations(program, moduleName);
 
       /**
        * Whether the `isRecord(...)` half of the rewrite would be dead code
@@ -157,7 +158,7 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
         },
 
         'Program:exit': () => {
-          const namedImports = getNamedImports(tsStdForgeImports);
+          const namedImports = getNamedImports(moduleImports);
 
           const rewrites = mut_nodesToFix.map((entry) => {
             // A record-typed object makes the `isRecord(...)` conjunct always
@@ -223,7 +224,7 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
                         ? buildNamedImportFix(
                             fixer,
                             program,
-                            TS_STD_FORGE_MODULE,
+                            moduleName,
                             importsToAdd,
                           )
                         : [];
@@ -239,7 +240,10 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
       };
     },
     defaultOptions: [],
-  } as const;
+  }) as const;
+
+export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
+  createPreferIsRecordAndHasKey(TS_STD_FORGE_MODULE);
 
 /**
  * Whether reading `node` again has no side effects: a variable, `this`, or a

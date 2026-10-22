@@ -3601,6 +3601,9 @@ importers:
       eslint:
         specifier: '>=9.0.0'
         version: 10.12.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-plugin-ts-std-forge:
+        specifier: workspace:^
+        version: link:../eslint-plugin-ts-std-forge
       eslint-rule-forge:
         specifier: workspace:^
         version: link:../eslint-rule-forge

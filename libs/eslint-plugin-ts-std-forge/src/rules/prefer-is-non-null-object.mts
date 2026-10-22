@@ -17,83 +17,89 @@ type Options = readonly [];
 
 type MessageIds = 'useIsNonNullObject';
 
-export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
-  meta: {
-    type: 'suggestion',
-    docs: {
-      description:
-        'Replace `typeof u === "object" && u !== null`, in either order and anywhere in an `&&` chain, with `isNonNullObject(u)` from ts-std-forge.',
-    },
-    fixable: 'code',
-    schema: [],
-    messages: {
-      useIsNonNullObject:
-        'Replace the object/null check with `isNonNullObject()` from ts-std-forge.',
-    },
-  },
-
-  create: (context) => {
-    const sourceCode = context.sourceCode;
-
-    const program = sourceCode.ast;
-
-    const tsStdForgeImports = getImportDeclarations(
-      program,
-      TS_STD_FORGE_MODULE,
-    );
-
-    const mut_pairsToFix: NonNullObjectPair[] = [];
-
-    return {
-      LogicalExpression: (node) => {
-        // A chain is read once, from its outermost `&&`.
-        if (node.operator !== '&&' || isChainOperand(sourceCode, node)) {
-          return;
-        }
-
-        mut_pairsToFix.push(...findNonNullObjectPairs(sourceCode, node));
+/**
+ * `prefer-is-non-null-object`, steering toward `isNonNullObject` from
+ * `moduleName`. eslint-plugin-ts-data-forge builds its rule of the same name
+ * from this with `'ts-data-forge'`, which re-exports the same guard.
+ */
+export const createPreferIsNonNullObject = (
+  moduleName: string,
+): TSESLint.RuleModule<MessageIds, Options> =>
+  ({
+    meta: {
+      type: 'suggestion',
+      docs: {
+        description: `Replace \`typeof u === "object" && u !== null\`, in either order and anywhere in an \`&&\` chain, with \`isNonNullObject(u)\` from ${moduleName}.`,
       },
-      'Program:exit': () => {
-        const hasIsNonNullObjectImport =
-          getNamedImports(tsStdForgeImports).includes('isNonNullObject');
-
-        // The import fix lives on the first report only:
-        // `insertTextBefore(program, …)` produces overlapping ranges
-        // otherwise and only one of them would survive a pass. A first report
-        // silenced by an `eslint-disable` comment therefore takes the import
-        // with it.
-        for (const [
-          index,
-          { range, identifierName },
-        ] of mut_pairsToFix.entries()) {
-          context.report({
-            loc: {
-              start: sourceCode.getLocFromIndex(range[0]),
-              end: sourceCode.getLocFromIndex(range[1]),
-            },
-            messageId: 'useIsNonNullObject',
-            fix: (fixer) => {
-              const replacement = `isNonNullObject(${identifierName})`;
-
-              const importFixes =
-                index === 0 && !hasIsNonNullObjectImport
-                  ? buildNamedImportFix(fixer, program, TS_STD_FORGE_MODULE, [
-                      'isNonNullObject',
-                    ])
-                  : [];
-
-              return [
-                ...importFixes,
-                fixer.replaceTextRange(range, replacement),
-              ];
-            },
-          });
-        }
+      fixable: 'code',
+      schema: [],
+      messages: {
+        useIsNonNullObject: `Replace the object/null check with \`isNonNullObject()\` from ${moduleName}.`,
       },
-    };
-  },
-  defaultOptions: [],
-} as const;
+    },
+
+    create: (context) => {
+      const sourceCode = context.sourceCode;
+
+      const program = sourceCode.ast;
+
+      const moduleImports = getImportDeclarations(program, moduleName);
+
+      const mut_pairsToFix: NonNullObjectPair[] = [];
+
+      return {
+        LogicalExpression: (node) => {
+          // A chain is read once, from its outermost `&&`.
+          if (node.operator !== '&&' || isChainOperand(sourceCode, node)) {
+            return;
+          }
+
+          mut_pairsToFix.push(...findNonNullObjectPairs(sourceCode, node));
+        },
+        'Program:exit': () => {
+          const hasIsNonNullObjectImport =
+            getNamedImports(moduleImports).includes('isNonNullObject');
+
+          // The import fix lives on the first report only:
+          // `insertTextBefore(program, …)` produces overlapping ranges
+          // otherwise and only one of them would survive a pass. A first report
+          // silenced by an `eslint-disable` comment therefore takes the import
+          // with it.
+          for (const [
+            index,
+            { range, identifierName },
+          ] of mut_pairsToFix.entries()) {
+            context.report({
+              loc: {
+                start: sourceCode.getLocFromIndex(range[0]),
+                end: sourceCode.getLocFromIndex(range[1]),
+              },
+              messageId: 'useIsNonNullObject',
+              fix: (fixer) => {
+                const replacement = `isNonNullObject(${identifierName})`;
+
+                const importFixes =
+                  index === 0 && !hasIsNonNullObjectImport
+                    ? buildNamedImportFix(fixer, program, moduleName, [
+                        'isNonNullObject',
+                      ])
+                    : [];
+
+                return [
+                  ...importFixes,
+                  fixer.replaceTextRange(range, replacement),
+                ];
+              },
+            });
+          }
+        },
+      };
+    },
+    defaultOptions: [],
+  }) as const;
+
+export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> =
+  createPreferIsNonNullObject(TS_STD_FORGE_MODULE);
 
 /**
  * A `typeof u === 'object'` and a `u !== null` next to each other in an `&&`
