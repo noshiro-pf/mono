@@ -5,7 +5,10 @@ import {
   hasDisableNextLineComment,
   isAsConstNode,
 } from '../functions/index.mjs';
-import { replaceNodeWithDebugPrint } from '../utils/index.mjs';
+import {
+  replaceNodeWithDebugPrint,
+  replaceNodeWithText,
+} from '../utils/index.mjs';
 import type { TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'append-as-const';
@@ -27,7 +30,7 @@ export const appendAsConstTransformer = (
     replaceNode:
       options?.debug === true
         ? replaceNodeWithDebugPrint
-        : (node, newNodeText) => node.replaceWithText(newNodeText),
+        : (node, newNodeText) => replaceNodeWithText(node, newNodeText),
   } as const;
 
   return {
@@ -319,7 +322,7 @@ const transformNode = (
 
     options.debugPrint(`${node.getText()} -> ${asConstText}`);
 
-    transformNode(node.replaceWithText(asConstText), context, options);
+    transformNode(replaceNodeWithText(node, asConstText), context, options);
 
     return;
   }

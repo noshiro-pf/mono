@@ -3,6 +3,7 @@
 import { Arr } from 'ts-data-forge';
 import type * as tsm from 'ts-morph';
 import { hasDisableNextLineComment } from '../functions/index.mjs';
+import { replaceNodeWithText } from '../utils/index.mjs';
 import type { TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'convert-interface-to-type';
@@ -91,7 +92,7 @@ export const convertInterfaceToTypeTransformer = (): TsMorphTransformer =>
         const typeAliasText =
           `${jsDocText}${exportKeyword}type ${interfaceName}${typeParamsStr} = ${mut_typeBody};` as const;
 
-        interfaceDecl.replaceWithText(typeAliasText);
+        replaceNodeWithText(interfaceDecl, typeAliasText);
       };
 
       const buildTypeLiteral = (

@@ -1,4 +1,5 @@
 import type * as tsm from 'ts-morph';
+import { replaceNodeWithText } from './replace-node-with-text.mjs';
 
 export const replaceNodeWithDebugPrint = (
   node: tsm.Node,
@@ -6,5 +7,5 @@ export const replaceNodeWithDebugPrint = (
 ): void => {
   console.debug(`${node.getText()} -> ${newNodeText}`);
 
-  node.replaceWithText(newNodeText);
+  replaceNodeWithText(node, newNodeText);
 };

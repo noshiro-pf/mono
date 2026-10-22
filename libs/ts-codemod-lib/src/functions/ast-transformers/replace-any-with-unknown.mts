@@ -4,6 +4,7 @@ import {
   isSpreadNamedTupleMemberNode,
   isSpreadParameterNode,
 } from '../functions/index.mjs';
+import { replaceNodeWithText } from '../utils/index.mjs';
 import type { TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'replace-any-with-unknown';
@@ -37,12 +38,12 @@ const transformNode = (node: tsm.Node): void => {
         // `[name: E0, ...args: any)]` -> `[name: E0, ...args: unknown[]]`
         isSpreadNamedTupleMemberNode(parent))
     ) {
-      anyKeywordNode.replaceWithText('readonly unknown[]');
+      replaceNodeWithText(anyKeywordNode, 'readonly unknown[]');
 
       return;
     }
 
-    anyKeywordNode.replaceWithText('unknown');
+    replaceNodeWithText(anyKeywordNode, 'unknown');
 
     return;
   }

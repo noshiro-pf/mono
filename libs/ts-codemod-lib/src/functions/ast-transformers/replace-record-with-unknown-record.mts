@@ -2,6 +2,7 @@
 import { Arr } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
 import { hasDisableNextLineComment } from '../functions/index.mjs';
+import { replaceNodeWithText } from '../utils/index.mjs';
 import type { TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'replace-record-with-unknown-record';
@@ -88,7 +89,8 @@ const processInterfaceDeclaration = (
 
     const interfaceName = interfaceDecl.getName();
 
-    interfaceDecl.replaceWithText(
+    replaceNodeWithText(
+      interfaceDecl,
       `${exportPrefix}type ${interfaceName} = UnknownRecord;`,
     );
 
@@ -128,7 +130,7 @@ const visitTypeNode = (node: tsm.TypeNode): boolean => {
             Arr.isFixedLengthArray(1, indexSigs) &&
             isStringUnknownIndexSignature(indexSigs[0])
           ) {
-            node.replaceWithText('UnknownRecord');
+            replaceNodeWithText(node, 'UnknownRecord');
 
             return true;
           }
@@ -156,7 +158,7 @@ const visitTypeNode = (node: tsm.TypeNode): boolean => {
       Arr.isFixedLengthArray(1, indexSigs) &&
       isStringUnknownIndexSignature(indexSigs[0])
     ) {
-      node.replaceWithText('UnknownRecord');
+      replaceNodeWithText(node, 'UnknownRecord');
 
       return true;
     }
@@ -229,7 +231,7 @@ const replaceIfRecordUnknown = (node: tsm.TypeReferenceNode): boolean => {
         typeArgs[0].getText() === 'string' &&
         typeArgs[1].getText() === 'unknown'
       ) {
-        node.replaceWithText('UnknownRecord');
+        replaceNodeWithText(node, 'UnknownRecord');
 
         return true;
       }
@@ -255,7 +257,7 @@ const replaceIfRecordUnknown = (node: tsm.TypeReferenceNode): boolean => {
               innerTypeArgs[0].getText() === 'string' &&
               innerTypeArgs[1].getText() === 'unknown'
             ) {
-              node.replaceWithText('UnknownRecord');
+              replaceNodeWithText(node, 'UnknownRecord');
 
               return true;
             }

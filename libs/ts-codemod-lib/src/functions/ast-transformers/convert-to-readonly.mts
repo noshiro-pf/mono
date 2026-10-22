@@ -29,7 +29,10 @@ import {
   wrapWithParentheses,
   type ReadonlyTypeReferenceNode,
 } from '../functions/index.mjs';
-import { replaceNodeWithDebugPrint } from '../utils/index.mjs';
+import {
+  replaceNodeWithDebugPrint,
+  replaceNodeWithText,
+} from '../utils/index.mjs';
 import {
   groupUnionIntersectionTypes,
   invalidDeepReadonlyTypeName,
@@ -72,7 +75,7 @@ export const convertToReadonlyTransformer = (
     replaceNode:
       options?.debug === true
         ? replaceNodeWithDebugPrint
-        : (node, newNodeText) => node.replaceWithText(newNodeText),
+        : (node, newNodeText) => replaceNodeWithText(node, newNodeText),
   } as const;
 
   return {
