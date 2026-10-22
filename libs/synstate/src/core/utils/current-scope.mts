@@ -1,23 +1,31 @@
 import type { Scope } from '../types/index.mjs';
 
-/**
- * The side of a scope the rest of the core talks to; {@link Scope} is the
- * public face of the same object. Kept out of the public API (`core/utils/**`
- * is excluded from index generation), so that only `createScope` and its
- * siblings decide what a scope owns.
- */
-export type ScopeInternals = Readonly<{
-  scope: Scope;
-
-  /**
-   * Takes `node` into the scope and returns the function that releases it
-   * again, which a node calls when it completes on its own so that the scope
-   * keeps no reference to it.
-   */
-  adopt: (node: Readonly<{ dispose: () => void }>) => () => void;
-
-  addCleanup: (cleanup: () => void) => void;
+/** What a scope owns: an observable, as far as the scope needs to know it. */
+export type ScopeMember = Readonly<{
+  isCompleted: boolean;
+  dispose: () => void;
 }>;
+
+/**
+ * The side of a scope the rest of the core talks to, on top of its public
+ * face {@link Scope}. Kept out of the public API (`core/utils/**` is excluded
+ * from index generation), so that only `createScope` and its siblings decide
+ * what a scope owns.
+ */
+export type ScopeInternals = Scope &
+  Readonly<{
+    /** Takes `node` into the scope. */
+    adopt: (node: ScopeMember) => void;
+
+    /**
+     * Tells the scope that one of the nodes it adopted completed on its own,
+     * so that the scope can drop it and keep no reference to it. The node is
+     * completed (`isCompleted`) by the time it calls this.
+     */
+    release: () => void;
+
+    addCleanup: (cleanup: () => void) => void;
+  }>;
 
 /**
  * The scope whose `run` is executing. A field rather than a module-level
