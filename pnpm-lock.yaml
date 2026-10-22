@@ -3919,6 +3919,43 @@ importers:
         specifier: 'catalog:'
         version: 5.0.15(@types/react@19.3.0)(immer@11.1.21)(react@19.3.0)
 
+  libs/synstate-dom:
+    dependencies:
+      ts-type-forge:
+        specifier: workspace:^
+        version: link:../ts-type-forge
+    devDependencies:
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.9
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.9)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.9)
+      synstate:
+        specifier: workspace:*
+        version: link:../synstate
+      ts-data-forge:
+        specifier: workspace:*
+        version: link:../ts-data-forge
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
+
   libs/synstate-preact-hooks:
     dependencies:
       synstate:
