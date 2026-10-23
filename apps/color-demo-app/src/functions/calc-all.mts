@@ -12,6 +12,7 @@ import type { DeepReadonly, NonEmptyArray, Percent } from 'ts-type-forge';
 import {
   hslToRgb,
   relativeLuminance,
+  toHue,
   variance,
   type Hsl,
   type Hue,
@@ -22,7 +23,6 @@ import { hueListToContrastRatioList } from './get-contrast-ratio-list.mjs';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated.mjs';
 import { normalizeList } from './normalize-list.mjs';
 import { pickupHighContrastHues } from './pickup-high-contrast-hues.mjs';
-import { toHue } from './to-hue.mjs';
 
 /**
  * `Arr.map` over a `Seq<N>` union yields a union of tuple types. Every member
