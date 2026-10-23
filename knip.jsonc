@@ -621,7 +621,7 @@
       "project": ["**/*.{mts,tsx}"],
       // Loaded by `src/index.css` through CSS `@import` rather than by a
       // module import, which knip does not follow.
-      "ignoreDependencies": ["@blueprintjs/core"],
+      "ignoreDependencies": ["@blueprintjs/core", "@blueprintjs/datetime"],
     },
 
     // Not an Astro site like the entry above assumes: a set of Node programs,

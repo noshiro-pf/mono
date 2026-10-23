@@ -1,3 +1,4 @@
+import { HtmlSelect } from 'blueprint-synstate';
 import {
   constant,
   derive,
@@ -7,7 +8,6 @@ import {
   type JSX,
 } from 'synstate-dom';
 import { dataStore } from '../store/index.mjs';
-import { HtmlSelect } from './html-select.js';
 
 type Props = Readonly<{
   /** The draft's `groupId`: a group's id, or empty for none. */

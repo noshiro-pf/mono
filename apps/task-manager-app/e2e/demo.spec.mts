@@ -319,7 +319,7 @@ test(
   },
 );
 
-test('clears a date', { tag: '@smoke' }, async ({ page }) => {
+test('picks and clears a date', { tag: '@smoke' }, async ({ page }) => {
   await page.goto(LIST);
 
   await expect.soft(page.getByTestId('list-view')).toBeVisible();
@@ -331,11 +331,13 @@ test('clears a date', { tag: '@smoke' }, async ({ page }) => {
 
   const dialog = page.getByTestId('node-dialog');
 
-  const dueDate = dialog.getByLabel('期限', { exact: true });
+  const dueDate = dialog.getByLabel('期限');
 
-  await expect.soft(dueDate).toHaveValue(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/u);
+  await expect.soft(dueDate).toHaveValue(/^\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}$/u);
 
-  await dialog.getByRole('button', { name: '期限をクリア' }).click();
+  await dueDate.click();
+
+  await dialog.getByRole('button', { name: 'クリア' }).click();
 
   await expect.soft(dueDate).toHaveValue('');
 });

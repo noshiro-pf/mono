@@ -1,3 +1,4 @@
+import { HtmlSelect } from 'blueprint-synstate';
 import {
   constant,
   For,
@@ -13,7 +14,6 @@ import {
   unusedSortKeys,
   type SortKeyActions,
 } from '../view-model/index.mjs';
-import { HtmlSelect } from './html-select.js';
 import { SortKeyRow } from './sort-key-row.js';
 
 type Props = Readonly<{
