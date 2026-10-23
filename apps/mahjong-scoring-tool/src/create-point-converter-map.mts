@@ -1,27 +1,6 @@
-import { asUint32 } from 'ts-data-forge';
+import { Arr, asUint32 } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
-import { average, count, sum } from './utils.mjs';
-
-/**
- * `map` over a four-tuple, keeping its length in the type.
- *
- * `Array.prototype.map` widens a tuple to `U[]`, which is why the
- * pre-restoration source cast its result back on every call. Writing the four
- * positions out is total, so the casts — and their
- * `total-functions/no-unsafe-type-assertion` disables — go away.
- */
-const map4 = <T, U>(
-  tuple: FixedLengthTuple<4, T>,
-  // A literal index, not `number`: callers index other four-tuples with it,
-  // and under `noUncheckedIndexedAccess` only a literal makes that total.
-  mapFn: (value: T, index: 0 | 1 | 2 | 3) => U,
-): FixedLengthTuple<4, U> =>
-  [
-    mapFn(tuple[0], 0),
-    mapFn(tuple[1], 1),
-    mapFn(tuple[2], 2),
-    mapFn(tuple[3], 3),
-  ] as const;
+import { average } from './utils.mjs';
 
 /**
  * 点棒からオカ・ウマを計算して pt に変換する Map を返す。
@@ -35,7 +14,7 @@ export const createPointMap = (
   oka: number,
   uma: FixedLengthTuple<4, number>,
 ): ReadonlyMap<number, number> => {
-  const sumOfRawPoints = sum(rawPoints);
+  const sumOfRawPoints = Arr.sum(rawPoints);
 
   if (sumOfRawPoints !== 100_000) {
     throw new Error(
@@ -44,25 +23,18 @@ export const createPointMap = (
   }
 
   /** E.g. `[35000, 35000, 20000, 10000]` */
-  // `toSorted` widens the tuple to `number[]`, and `noUncheckedIndexedAccess`
-  // makes each read `number | undefined`. Sorting four numbers yields four
-  // numbers, so naming the positions is total — and says so without a cast.
-  const descending = rawPoints.toSorted((x, y) => y - x);
-
-  const rawPointsSorted: FixedLengthTuple<4, number> = [
-    descending[0] ?? 0,
-    descending[1] ?? 0,
-    descending[2] ?? 0,
-    descending[3] ?? 0,
-  ] as const;
+  const rawPointsSorted: FixedLengthTuple<4, number> = Arr.toSorted(
+    rawPoints,
+    (x, y) => y - x,
+  );
 
   /** E.g. `[35, 35, 20, 10]` */
-  const pointsRounded: FixedLengthTuple<4, number> = map4(
+  const pointsRounded: FixedLengthTuple<4, number> = Arr.map(
     rawPointsSorted,
     (v) => v / 1000,
   );
 
-  const sumOfPointsRounded = sum(pointsRounded);
+  const sumOfPointsRounded = Arr.sum(pointsRounded);
 
   if (sumOfPointsRounded !== 100) {
     throw new Error(
@@ -71,13 +43,13 @@ export const createPointMap = (
   }
 
   /** E.g. `[0, 0, 2, 3]` */
-  const rank: FixedLengthTuple<4, number> = map4(pointsRounded, (x) =>
+  const rank: FixedLengthTuple<4, number> = Arr.map(pointsRounded, (x) =>
     pointsRounded.indexOf(x),
   );
 
   /** E.g. `[2, 0, 1, 1]` */
-  const rankCount: FixedLengthTuple<4, number> = map4(rank, (_, i) =>
-    count(rank, (x) => x === i),
+  const rankCount: FixedLengthTuple<4, number> = Arr.map(rank, (_, i) =>
+    Arr.count(rank, (x) => x === i),
   );
 
   /**
@@ -85,7 +57,7 @@ export const createPointMap = (
    *
    * E.g. `[10, 0, -5, -15]`
    */
-  const umaAveraged: FixedLengthTuple<4, number> = map4(uma, (_, i) =>
+  const umaAveraged: FixedLengthTuple<4, number> = Arr.map(uma, (_, i) =>
     average(uma.slice(i, asUint32(rankCount[i] + i))),
   );
 
@@ -100,7 +72,7 @@ export const createPointMap = (
   // eslint-disable-next-line total-functions/no-partial-division
   const topBonusAveraged: number = topBonus / rankCount[0];
 
-  const result: FixedLengthTuple<4, number> = map4(
+  const result: FixedLengthTuple<4, number> = Arr.map(
     pointsRounded,
     (p, i) =>
       p -
