@@ -23,15 +23,18 @@ dependencies.
 
 `x as T`, `x!`, `x satisfies T` and `<T>x` change a type and never a value.
 
-| Helper              | What it gives                                                                         |
-| :------------------ | :------------------------------------------------------------------------------------ |
-| `isTypeWrapper`     | whether a node is one of the four                                                     |
-| `skipTypeWrappers`  | the expression inside every wrapper around a node: judge syntax on this               |
-| `typeWrapperLayers` | the node and every expression inside its wrappers, outermost first: ask types of each |
-| `TypeWrapper`       | the four node types                                                                   |
+| Helper                  | What it gives                                                                         |
+| :---------------------- | :------------------------------------------------------------------------------------ |
+| `isTypeWrapper`         | whether a node is one of the four                                                     |
+| `skipTypeWrappers`      | the expression inside every wrapper around a node: judge syntax on this               |
+| `typeWrapperLayers`     | the node and every expression inside its wrappers, outermost first: ask types of each |
+| `TypeWrapper`           | the four node types                                                                   |
+| `isIdentifierNamed`     | whether a node, read through its wrappers, is the identifier of a given name          |
+| `typeHoldsAtEveryLayer` | whether a check holds of the type at every layer, `false` without type information    |
 
-All of them take a readonly (`DeepReadonly<TSESTree.Node>`) or a mutable node
-and give back the same kind.
+All of them but `typeHoldsAtEveryLayer` take a readonly
+(`DeepReadonly<TSESTree.Node>`) or a mutable node, and those that return a node
+give back the same kind.
 
 Judge syntax on what `skipTypeWrappers` returns, and write the fix from the
 original node, so that the wrapper is kept:
@@ -206,6 +209,22 @@ export const preferIsNullish: TSESLint.RuleModule<'preferIsNullish'> = {
     },
 } as const;
 ```
+
+## Rule factories
+
+Rules that several plugins carry, differing only in the module whose functions
+the fix writes. Each factory takes the module name (and the namespace the
+function is reached through, where there is one) and returns a complete rule,
+so that a fix to the rule reaches every plugin that builds it.
+
+| Factory                         | The rule it builds                                                                                        |
+| :------------------------------ | :-------------------------------------------------------------------------------------------------------- |
+| `createPreferIsNonNullObject`   | `typeof u === 'object' && u !== null` → `isNonNullObject(u)`                                              |
+| `createPreferIsRecordAndHasKey` | `Object.hasOwn(obj, key)` and `key in obj` → `isRecord(obj) && hasKey(obj, key)`, or `hasKey` on a record |
+| `createPreferArrayIsArray`      | `Array.isArray` → `<namespace>.isArray`                                                                   |
+| `createPreferSafeParseInt`      | `parseInt(x)`, `parseInt(x, 10)` → `Result.unwrapOkOr(<namespace>.<method>(x), Number.NaN)`               |
+| `createPreferSafeParseFloat`    | `parseFloat(x)`, `Number.parseFloat(x)`, `Number(x)` → the same, for a `string` `x`                       |
+| `createNoSideEffectImport`      | removes `import '<module>';`, with the reason the caller gives                                            |
 
 ## License
 

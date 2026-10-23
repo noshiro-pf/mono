@@ -208,7 +208,7 @@ namespace PreferIsRecordAndHasKey {
 }
 
 /**
- * @description Replace `parseInt(x, 10)` with `Result.unwrapOkOr(Num.safeParseInt(x), Number.NaN)` from ts-data-forge.
+ * @description Replace `parseInt(x)` or `Number.parseInt(x, 10)` with `Result.unwrapOkOr(Num.safeParseInt(x), Number.NaN)` from ts-data-forge.
  *
  *  ```md
  *  | key        | value      |

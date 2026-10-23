@@ -20,6 +20,13 @@ ruleTester.run('prefer-arr-is-array', preferArrIsArray, {
         const result = obj.isArray(value);
       `,
     },
+    {
+      name: 'A computed member named by a variable is not `isArray`',
+      code: dedent`
+        declare const isArray: 'from';
+        const result = Array[isArray](value);
+      `,
+    },
   ],
   invalid: [
     {
@@ -31,7 +38,7 @@ ruleTester.run('prefer-arr-is-array', preferArrIsArray, {
         import { Arr } from 'ts-data-forge';
         const result = Arr.isArray(value);
       `,
-      errors: [{ messageId: 'useArrIsArray' }],
+      errors: [{ messageId: 'useIsArray' }],
     },
     {
       name: 'Arr imported by a second ts-data-forge declaration is not imported again',
@@ -45,7 +52,7 @@ ruleTester.run('prefer-arr-is-array', preferArrIsArray, {
         import { Arr } from 'ts-data-forge';
         const result = Arr.isArray(value);
       `,
-      errors: [{ messageId: 'useArrIsArray' }],
+      errors: [{ messageId: 'useIsArray' }],
     },
     {
       name: 'Replace Array.isArray with Arr.isArray when Arr is already imported',
@@ -57,7 +64,7 @@ ruleTester.run('prefer-arr-is-array', preferArrIsArray, {
         import { Arr } from 'ts-data-forge';
         const result = Arr.isArray(value);
       `,
-      errors: [{ messageId: 'useArrIsArray' }],
+      errors: [{ messageId: 'useIsArray' }],
     },
     {
       name: 'Replace multiple Array.isArray calls',
@@ -70,7 +77,7 @@ ruleTester.run('prefer-arr-is-array', preferArrIsArray, {
         const result1 = Arr.isArray(value1);
         const result2 = Arr.isArray(value2);
       `,
-      errors: [{ messageId: 'useArrIsArray' }, { messageId: 'useArrIsArray' }],
+      errors: [{ messageId: 'useIsArray' }, { messageId: 'useIsArray' }],
     },
   ],
 });
@@ -89,7 +96,31 @@ describe('prefer-arr-is-array through type wrappers', () => {
           import { Arr } from 'ts-data-forge';
           const result = Arr.isArray(value);
         `,
-        errors: [{ messageId: 'useArrIsArray' }],
+        errors: [{ messageId: 'useIsArray' }],
+      },
+      {
+        name: 'Array reached through `!`',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          const result = Array!.isArray(value);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const result = Arr.isArray(value);
+        `,
+        errors: [{ messageId: 'useIsArray' }],
+      },
+      {
+        name: 'the callee reached through `satisfies`',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          const result = (Array.isArray satisfies unknown)(value);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const result = Arr.isArray(value);
+        `,
+        errors: [{ messageId: 'useIsArray' }],
       },
     ],
   });
@@ -107,9 +138,21 @@ describe('prefer-arr-is-array with parenthesized operands', () => {
         `,
         output: dedent`
           import { Arr } from 'ts-data-forge';
-          const result = (Arr.isArray)(value);
+          const result = Arr.isArray(value);
         `,
-        errors: [{ messageId: 'useArrIsArray' }],
+        errors: [{ messageId: 'useIsArray' }],
+      },
+      {
+        name: 'a doubly parenthesized callee of an optional call',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          const result = ((Array.isArray))?.(value);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const result = Arr.isArray?.(value);
+        `,
+        errors: [{ messageId: 'useIsArray' }],
       },
     ],
   });
