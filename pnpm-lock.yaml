@@ -2691,6 +2691,12 @@ importers:
       '@blueprintjs/core':
         specifier: ^6.21.0
         version: 6.21.0(@types/react@19.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@blueprintjs/datetime':
+        specifier: ^6.3.0
+        version: 6.3.0(@types/react@19.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      blueprint-synstate:
+        specifier: workspace:*
+        version: link:../../libs/blueprint-synstate
       elkjs:
         specifier: ^0.12.0
         version: 0.12.0
@@ -3320,6 +3326,52 @@ importers:
       tsx:
         specifier: 'catalog:'
         version: 4.23.15
+
+  libs/blueprint-synstate:
+    dependencies:
+      ts-type-forge:
+        specifier: workspace:^
+        version: link:../ts-type-forge
+    devDependencies:
+      '@vitest/browser-playwright':
+        specifier: 'catalog:'
+        version: 5.0.3(playwright@1.64.0)(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.0.3)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
+      playwright:
+        specifier: 'catalog:'
+        version: 1.64.0
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.9
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.9)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.9)
+      synstate:
+        specifier: workspace:*
+        version: link:../synstate
+      synstate-dom:
+        specifier: workspace:*
+        version: link:../synstate-dom
+      ts-data-forge:
+        specifier: workspace:*
+        version: link:../ts-data-forge
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
 
   libs/eslint-config-typed:
     dependencies:
@@ -15045,6 +15097,22 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.3.0
 
+  '@blueprintjs/datetime@6.3.0(@types/react@19.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@blueprintjs/core': 6.21.0(@types/react@19.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@blueprintjs/icons': 6.14.1(@types/react@19.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@blueprintjs/select': 6.4.0(@types/react@19.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      classnames: 2.5.1
+      date-fns: 2.30.0
+      date-fns-tz: 2.0.1(date-fns@2.30.0)
+      react: 18.3.1
+      react-day-picker: 8.10.2(date-fns@2.30.0)(react@18.3.1)
+      react-dom: 18.3.1(react@18.3.1)
+      react-innertext: 1.1.5(@types/react@19.3.0)(react@18.3.1)
+      tslib: 2.6.3
+    optionalDependencies:
+      '@types/react': 19.3.0
+
   '@blueprintjs/datetime@6.3.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       '@blueprintjs/core': 6.21.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -15077,6 +15145,18 @@ snapshots:
       classnames: 2.5.1
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
+      tslib: 2.6.3
+    optionalDependencies:
+      '@types/react': 19.3.0
+
+  '@blueprintjs/select@6.4.0(@types/react@19.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@blueprintjs/colors': 5.1.16
+      '@blueprintjs/core': 6.21.0(@types/react@19.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@blueprintjs/icons': 6.14.1(@types/react@19.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      classnames: 2.5.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
       tslib: 2.6.3
     optionalDependencies:
       '@types/react': 19.3.0
@@ -22332,6 +22412,11 @@ snapshots:
 
   re2js@2.8.6: {}
 
+  react-day-picker@8.10.2(date-fns@2.30.0)(react@18.3.1):
+    dependencies:
+      date-fns: 2.30.0
+      react: 18.3.1
+
   react-day-picker@8.10.2(date-fns@2.30.0)(react@19.3.0):
     dependencies:
       date-fns: 2.30.0
@@ -22349,6 +22434,11 @@ snapshots:
       scheduler: 0.28.0
 
   react-fast-compare@3.2.2: {}
+
+  react-innertext@1.1.5(@types/react@19.3.0)(react@18.3.1):
+    dependencies:
+      '@types/react': 19.3.0
+      react: 18.3.1
 
   react-innertext@1.1.5(@types/react@19.3.0)(react@19.3.0):
     dependencies:

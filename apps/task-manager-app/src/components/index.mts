@@ -30,7 +30,6 @@ export * from './due-date.js';
 export * from './follow-modal.mjs';
 export * from './group-dialog.js';
 export * from './group-field.js';
-export * from './html-select.js';
 export * from './label-chips.js';
 export * from './list-toolbar.js';
 export * from './list-view.js';

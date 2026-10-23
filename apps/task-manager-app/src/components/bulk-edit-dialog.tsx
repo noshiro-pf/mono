@@ -1,3 +1,4 @@
+import { HtmlSelect } from 'blueprint-synstate';
 import { combine, map, type InitializedObservable } from 'synstate';
 import { constant, For, If, MatchOptional, view, type JSX } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
@@ -15,7 +16,6 @@ import {
 } from '../store/index.mjs';
 import { parseLabels, progressLabels } from '../view-model/index.mjs';
 import { followModal } from './follow-modal.mjs';
-import { HtmlSelect } from './html-select.js';
 import { LabelChips } from './label-chips.js';
 
 /**

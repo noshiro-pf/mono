@@ -1,10 +1,10 @@
+import { HtmlSelect } from 'blueprint-synstate';
 import { constant, type JSX } from 'synstate-dom';
 import { animationSettingStore } from '../store/index.mjs';
 import {
   animationSettingLabels,
   animationSettings,
 } from '../view-model/index.mjs';
-import { HtmlSelect } from './html-select.js';
 
 /**
  * Whether the nodes move to their places in an animation: 「自動」 as the

@@ -1,6 +1,8 @@
 /*
- * Blueprint's style sheet supplies the look of the controls (`bp6-*` classes
- * on our own elements); none of its components is used. What follows is the layout,
+ * Blueprint's style sheets supply the look of the controls (`bp6-*` classes
+ * on our own elements, and on blueprint-synstate's date picker, which is
+ * written in Blueprint's markup); none of Blueprint's components is used.
+ * What follows is the layout,
  * the status colours, the DAG, and what a phone needs: safe-area insets,
  * 44px tap targets, and 16px inputs so that iOS does not zoom into a field.
  *
@@ -9,6 +11,7 @@
  */
 
 @import '@blueprintjs/core/lib/css/blueprint.css';
+@import '@blueprintjs/datetime/lib/css/blueprint-datetime.css';
 
 :root {
   color-scheme: light;
@@ -1484,27 +1487,21 @@ details[open] > .milestone-explanation-summary {
   }
 }
 
-/* A date and time in a form field: the input, and 「クリア」 beside it. */
+/* blueprint-synstate's date picker in a form field. */
 
 .date-time-field .bp6-label {
   margin-bottom: 4px;
 }
 
-.date-time-input {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.date-time-input > .bp6-button {
-  flex: none;
-  white-space: nowrap;
+.date-time-field .bp6-popover-target {
+  display: block;
 }
 
 /*
  * Blueprint places a select's caret at a fixed `top: 7px`, right for its own
  * 30px select and too high for ours, which are taller (`--tap`). Centre it
- * whatever the height.
+ * whatever the height. The date picker's month and year selects are the
+ * visible case.
  */
 .bp6-html-select select + .bp6-icon {
   top: 50%;
@@ -1514,10 +1511,33 @@ details[open] > .milestone-explanation-summary {
 /*
  * Blueprint's 24px of right padding ends the text exactly where the caret
  * (16px, 8px from the edge) begins. Ours (`HtmlSelect`) keep 8px clear of it.
+ * Before the date picker's rule below, which has the same specificity and
+ * sets its own selects tighter.
  */
 .bp6-html-select select {
   padding-right: 32px;
   text-overflow: ellipsis;
+}
+
+/*
+ * The month and year selects leave only the caret's own width to its right,
+ * so at 16px the caret touches the text. A few pixels apart, as in
+ * Blueprint's own examples.
+ */
+.bp6-datepicker-month-select select,
+.bp6-datepicker-year-select select {
+  padding-right: 20px;
+}
+
+/*
+ * The date picker places the month's caret by measuring the month's name in
+ * a hidden element, which keeps its 14px while the select is 16px (iOS zooms
+ * into a smaller one). Measure at the size that is drawn, or the caret lands
+ * inside the text; the padding is the gap the year's caret gets.
+ */
+.bp6-datepicker-caption-measure {
+  font-size: 16px;
+  padding-right: 4px;
 }
 
 .delete-confirm {

@@ -1,3 +1,4 @@
+import { HtmlSelect } from 'blueprint-synstate';
 import type { InitializedObservable } from 'synstate';
 import { constant, For, If, view, type JSX } from 'synstate-dom';
 import { dependencyTypes } from '../domain/index.mjs';
@@ -9,7 +10,6 @@ import {
   type RowCheck,
   type SourceOption,
 } from '../view-model/index.mjs';
-import { HtmlSelect } from './html-select.js';
 
 /** One row of `DependencyEditor`, with what it needs to draw it. */
 export type DependencyRowView = Readonly<{

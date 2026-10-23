@@ -1,3 +1,4 @@
+import { HtmlSelect } from 'blueprint-synstate';
 import { combine, map, type InitializedObservable } from 'synstate';
 import { constant, If, view, type JSX } from 'synstate-dom';
 import type { RelaxedExtract } from 'ts-type-forge';
@@ -19,7 +20,6 @@ import {
 import { DateTimeField } from './date-time-field.js';
 import { DependencyEditor } from './dependency-editor.js';
 import { GroupField } from './group-field.js';
-import { HtmlSelect } from './html-select.js';
 import { LabelChips } from './label-chips.js';
 import { StatusBadge } from './status-badge.js';
 import { WarningBadge } from './warning-badge.js';
