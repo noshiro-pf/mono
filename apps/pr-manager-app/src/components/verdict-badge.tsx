@@ -1,5 +1,6 @@
 import type { ChecksSummary } from 'pr-report-core';
 import { memoNamed } from 'preact-utils';
+import { readerSignals } from '../store/index.mjs';
 import {
   describeCheckBreakdown,
   describeCheckCounts,
@@ -13,7 +14,8 @@ type Props = Readonly<{
 }>;
 
 /**
- * The verdict of the contexts the ruleset requires, as an icon and a word,
+ * The verdict of the contexts the ruleset requires — or, where none is
+ * declared, of every context reported on the head — as an icon and a word,
  * and beside them how many are in each state — `1✗ 1… 7✓`.
  *
  * The counts because a verdict is one word over nine contexts, and the state
@@ -40,11 +42,13 @@ export const VerdictBadge = memoNamed<Props>('VerdictBadge', (props) => {
 
   const verdict = presentVerdict(checks.verdict);
 
+  const { ruleset } = readerSignals.features.value;
+
   return (
     <span
       className={'badge'}
       data-status={verdict.status}
-      title={describeCheckBreakdown(checks)}
+      title={describeCheckBreakdown(checks, ruleset)}
     >
       <BadgeIcon path={verdict.icon} />
 

@@ -5,6 +5,7 @@ import { useMemo } from 'preact/hooks';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
+  absentBlocks,
   columnsOf,
   columnWidths,
   MAX_SPLIT,
@@ -15,7 +16,7 @@ import {
   type BlockId,
   type ColumnIndex,
 } from '../layout.mjs';
-import { layoutSignals, layoutStore } from '../store/index.mjs';
+import { layoutSignals, layoutStore, readerSignals } from '../store/index.mjs';
 import { ViewSettingsRow } from './view-settings-row.js';
 
 /**
@@ -32,6 +33,10 @@ import { ViewSettingsRow } from './view-settings-row.js';
  */
 export const ViewSettings = memoNamed('ViewSettings', () => {
   const layout = layoutSignals.layout.value;
+
+  const features = readerSignals.features.value;
+
+  const absent = useMemo(() => absentBlocks(features), [features]);
 
   const columns = useMemo<
     readonly (readonly [ColumnIndex, readonly BlockId[]])[]
@@ -50,14 +55,14 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
     () =>
       Object.fromEntries(
         columns.flatMap(([, ids]) => {
-          const shown = shownOf(layout, ids);
+          const shown = shownOf(layout, ids, absent);
 
           const shares = sharePercents(layout, shown);
 
           return shown.map((id, index) => [id, shares[index] ?? 0] as const);
         }),
       ),
-    [columns, layout],
+    [columns, layout, absent],
   );
 
   return (
@@ -206,6 +211,7 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
                 {ids.map((id, index) => (
                   <ViewSettingsRow
                     key={id}
+                    absent={absent.includes(id)}
                     column={column}
                     columns={layout.columns}
                     count={ids.length}

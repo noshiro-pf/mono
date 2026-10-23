@@ -1,8 +1,7 @@
 import { memoNamed } from 'preact-utils';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { REPORT_SOURCE } from '../constants.mjs';
-import type { RunsStatus } from '../store/index.mjs';
+import { reportSource, type RunsStatus } from '../store/index.mjs';
 import type { StatusRole } from '../verdict.mjs';
 import {
   actionsQueryUrl,
@@ -109,7 +108,7 @@ const RunStateMark = memoNamed<Readonly<{ state: RunState }>>(
   },
 );
 
-const ACTIONS_URL = actionsQueryUrl(REPORT_SOURCE);
+const ACTIONS_URL = actionsQueryUrl(reportSource);
 
 const titleOf = ({ runs, totalCount }: WorkflowRunList): string =>
   runs.length < totalCount

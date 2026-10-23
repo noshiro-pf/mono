@@ -106,6 +106,11 @@ export type Reader = Readonly<{
   cycles: InitializedObservable<LoadedReport['cycles']>;
   merged: InitializedObservable<LoadedReport['merged']>;
   queue: InitializedObservable<LoadedReport['queue']>;
+  /**
+   * What the repository has of what this one runs. Both, until a read says
+   * otherwise: it is read with the pull requests, before anything is drawn.
+   */
+  features: InitializedObservable<LoadedReport['features']>;
   issues: InitializedObservable<LoadedReport['issues']>;
   /** The sections below the merge order that have not answered yet. */
   reading: InitializedObservable<readonly SectionPart[]>;
@@ -259,6 +264,8 @@ export const createReader = (deps: ReaderDeps): Reader => {
   const merged = partOf('merged', fastDeepEqual);
 
   const queue = partOf('queue', fastDeepEqual);
+
+  const features = partOf('features', fastDeepEqual);
 
   const issues = partOf('issues', fastDeepEqual);
 
@@ -535,6 +542,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     cycles,
     merged,
     queue,
+    features,
     issues,
     reading,
     runs,
@@ -557,6 +565,7 @@ type ReportParts = StrictPick<
   | 'cycles'
   | 'merged'
   | 'queue'
+  | 'features'
   | 'issues'
   | 'reading'
 >;
@@ -578,6 +587,7 @@ const EMPTY_PARTS: ReportParts = {
   cycles: [],
   merged: [],
   queue: undefined,
+  features: { ruleset: true, queue: true },
   issues: {
     items: [],
     totalCount: 0,

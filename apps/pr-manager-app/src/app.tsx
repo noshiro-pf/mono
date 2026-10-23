@@ -12,12 +12,13 @@ import {
   ViewSettings,
   WeeklyActivity,
 } from './components/index.mjs';
-import { REPORT_SOURCE, repositoryUrl } from './constants.mjs';
+import { repositoryUrl } from './constants.mjs';
 import {
   headerSignals,
   layoutSignals,
   reader,
   readerSignals,
+  reportSource,
   tokenSignals,
 } from './store/index.mjs';
 
@@ -85,8 +86,8 @@ export const App = memoNamed('App', () => {
           <div className={'toolbar-title'}>
             <h1 className={'page-title'}>{'GitHub Pull Requests Manager'}</h1>
 
-            <ExternalLink href={repositoryUrl(REPORT_SOURCE)}>
-              {`${REPORT_SOURCE.owner}/${REPORT_SOURCE.repo}`}
+            <ExternalLink href={repositoryUrl(reportSource)}>
+              {`${reportSource.owner}/${reportSource.repo}`}
             </ExternalLink>
 
             {ready ? <ReadFromGitHub folded /> : undefined}
@@ -95,8 +96,8 @@ export const App = memoNamed('App', () => {
           <div>
             <h1 className={'page-title'}>{'GitHub Pull Requests Manager'}</h1>
             <p className={'page-subtitle'}>
-              <ExternalLink href={repositoryUrl(REPORT_SOURCE)}>
-                {`${REPORT_SOURCE.owner}/${REPORT_SOURCE.repo}`}
+              <ExternalLink href={repositoryUrl(reportSource)}>
+                {`${reportSource.owner}/${reportSource.repo}`}
               </ExternalLink>
             </p>
           </div>

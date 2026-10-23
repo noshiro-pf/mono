@@ -13,7 +13,7 @@ import {
   type Observable as SynstateObservable,
 } from 'synstate';
 import { toSignal } from 'synstate-preact-signals';
-import { REPORT_SOURCE, repositoryUrl } from '../constants.mjs';
+import { reportSourceFromSearch, repositoryUrl } from '../constants.mjs';
 import { layoutFromLocation, saveLayout } from '../layout.mjs';
 import { loadIssuePage, loadReport } from '../load-report.mjs';
 import { readSetting, writeSetting } from '../settings-db.mjs';
@@ -25,6 +25,7 @@ import {
   themeFromLocation,
 } from '../theme.mjs';
 import { browserStores } from '../token.mjs';
+import { currentSearch } from '../url.mjs';
 import { loadWeeklyActivity } from '../weekly-activity.mjs';
 import { loadWorkflowRuns } from '../workflow-runs.mjs';
 import { createActivityStore } from './activity-store.mjs';
@@ -37,20 +38,23 @@ import { createReader } from './reader.mjs';
 import { createThemeStore } from './theme-store.mjs';
 import { createTokenStore } from './token-store.mjs';
 
+/** The repository the page reads, as the URL named it when the page opened. */
+export const reportSource = reportSourceFromSearch(currentSearch());
+
 export const tokenStore = createTokenStore(browserStores());
 
 export const reader = createReader({
   token: tokenStore.token,
   load: (token, nowMs, issueCount, onProgress) =>
-    loadReport(REPORT_SOURCE, {
+    loadReport(reportSource, {
       token,
       nowMs,
       issueCount,
       ...(onProgress === undefined ? {} : { onProgress }),
     }),
-  loadRuns: (token) => loadWorkflowRuns(REPORT_SOURCE, { token }),
+  loadRuns: (token) => loadWorkflowRuns(reportSource, { token }),
   loadIssues: (token, after, first) =>
-    loadIssuePage(REPORT_SOURCE, { token, after, first }),
+    loadIssuePage(reportSource, { token, after, first }),
   now: () => Date.now(),
   counter: (ms) => counter(ms, { emitInitial: false }),
   isVisible: () => document.visibilityState === 'visible',
@@ -78,6 +82,7 @@ const MERGE_ORDER_VIEW_KEY = 'merge-order-view';
 export const mergeOrderStore = createMergeOrderStore({
   entries: reader.entries,
   roots: reader.roots,
+  features: reader.features,
   load: () => readSetting(MERGE_ORDER_VIEW_KEY),
   // A choice that cannot be kept still applies for as long as the page is
   // open, which is all a reader would notice.
@@ -112,7 +117,7 @@ const ISSUES_DAG_HIDE_DONE_KEY = 'issues-dag-hide-done';
 export const issuesViewStore = createIssuesViewStore({
   issues: reader.issues,
   entries: reader.entries,
-  repoUrl: repositoryUrl(REPORT_SOURCE),
+  repoUrl: repositoryUrl(reportSource),
   load: () => readSetting(ISSUES_VIEW_KEY),
   save: (view) => {
     writeSetting(ISSUES_VIEW_KEY, view).catch(() => undefined);
@@ -127,7 +132,7 @@ export const issuesViewStore = createIssuesViewStore({
 
 export const activityStore = createActivityStore({
   token: tokenStore.token,
-  load: (token, nowMs) => loadWeeklyActivity(REPORT_SOURCE, { token, nowMs }),
+  load: (token, nowMs) => loadWeeklyActivity(reportSource, { token, nowMs }),
   now: () => Date.now(),
   setTimer: (delayMs, run) => {
     const timer = setTimeout(run, delayMs);
@@ -163,6 +168,7 @@ export const readerSignals = {
   cycles: toSignal(reader.cycles),
   merged: toSignal(reader.merged),
   queue: toSignal(reader.queue),
+  features: toSignal(reader.features),
   issues: toSignal(reader.issues),
   reading: toSignal(reader.reading),
   runs: toSignal(reader.runs),

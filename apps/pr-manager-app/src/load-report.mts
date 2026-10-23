@@ -157,6 +157,26 @@ export type PageSummary = Readonly<{
   pending: number;
 }>;
 
+/**
+ * What the repository has of what this repository runs, which decides what
+ * the page has to say. Without either the page is still the merge order, the
+ * stacks, the checks and the issues' dependencies; that is how it is used on
+ * any other repository.
+ */
+export type RepoFeatures = Readonly<{
+  /**
+   * Whether {@link MAIN_RULESET_PATH} is on the default branch, saying which
+   * contexts are required and whether a code owner has to approve.
+   */
+  ruleset: boolean;
+  /**
+   * Whether the repository has the `merge-queued` label, which is what
+   * `unblock-prs`'s queue is made of. Without it there is no queue to draw,
+   * nothing is queued and nothing is set aside.
+   */
+  queue: boolean;
+}>;
+
 /** The sections below the merge order, each read by a query of its own. */
 export type SectionPart = 'merged' | 'issues';
 
@@ -164,7 +184,13 @@ export type LoadedReport = Readonly<{
   repo: RepoRef;
   /** When the read this was built from started. */
   readAtEpochMs: number;
-  required: readonly string[];
+  /**
+   * The contexts the ruleset requires, or `undefined` where the repository
+   * declares none and each pull request is judged over every context
+   * reported on its head.
+   */
+  required: readonly string[] | undefined;
+  features: RepoFeatures;
   summary: PageSummary;
   entries: readonly Entry[];
   roots: PrReport['roots'];
@@ -481,7 +507,9 @@ type Known = Readonly<{
 /** The pull requests' query, and what the ruleset asks of them. */
 type PullsPart = Readonly<{
   defaultBranch: string;
-  requirements: RulesetRequirements;
+  /** `undefined` where no ruleset is declared. */
+  requirements: RulesetRequirements | undefined;
+  features: RepoFeatures;
   codeOwners: readonly CodeOwnersRule[];
   pulls: readonly OpenPullRequest[];
 }>;
@@ -536,6 +564,7 @@ const readPullRequests = async (ask: Ask): Promise<Answered<PullsPart>> => {
     defaultBranchRef,
     ruleset,
     codeOwners,
+    queueLabel,
     open: openPulls,
   } = validated.value.repository;
 
@@ -548,19 +577,15 @@ const readPullRequests = async (ask: Ask): Promise<Answered<PullsPart>> => {
     };
   }
 
-  if (ruleset === null) {
-    return {
-      rateLimit,
-      result: Result.err(
-        `${MAIN_RULESET_PATH} is not on the default branch, so there is nothing to say which checks are required.`,
-      ),
-    };
-  }
-
-  const requirements = parseRuleset(
-    ruleset.text,
-    `${MAIN_RULESET_PATH} on the default branch`,
-  );
+  // No ruleset is not an error: every repository but this one is without
+  // it. One that is there and cannot be read is, since it says something.
+  const requirements =
+    ruleset === null
+      ? Result.ok(undefined)
+      : parseRuleset(
+          ruleset.text,
+          `${MAIN_RULESET_PATH} on the default branch`,
+        );
 
   if (Result.isErr(requirements)) {
     return { rateLimit, result: requirements };
@@ -573,6 +598,7 @@ const readPullRequests = async (ask: Ask): Promise<Answered<PullsPart>> => {
       // requests to read a stack out of; the name is never compared.
       defaultBranch: defaultBranchRef?.name ?? '',
       requirements: requirements.value,
+      features: { ruleset: ruleset !== null, queue: queueLabel !== null },
       codeOwners: codeOwners === null ? [] : parseCodeOwners(codeOwners.text),
       pulls: openPulls.nodes,
     }),
@@ -676,7 +702,8 @@ const readDetails = async (
   const { result: ruled } = await pulls;
 
   const wantFiles =
-    Result.isOk(ruled) && ruled.value.requirements.requireCodeOwnerReview;
+    Result.isOk(ruled) &&
+    ruled.value.requirements?.requireCodeOwnerReview === true;
 
   const followedUp = await followUpRounds({
     operationName: 'MoreFiles',
@@ -1247,7 +1274,7 @@ const assemble = ({
   repo,
   nowMs,
   known,
-  pulls: { defaultBranch, requirements, codeOwners, pulls },
+  pulls: { defaultBranch, requirements, features, codeOwners, pulls },
 }: Readonly<{
   repo: RepoRef;
   nowMs: number;
@@ -1272,7 +1299,7 @@ const assemble = ({
   );
 
   const report = buildEntries({
-    required: requirements.requiredContexts,
+    required: requirements?.requiredContexts,
     defaultBranch,
     pulls: pulls.map((pr) => factsOf(pr, partsOf(pr))),
   });
@@ -1292,7 +1319,7 @@ const assemble = ({
         details === undefined
           ? { state: 'unknown' }
           : codeOwnerReview({
-              required: requirements.requireCodeOwnerReview,
+              required: requirements?.requireCodeOwnerReview ?? false,
               rules: codeOwners,
               files: details.files,
               filesComplete: details.filesComplete,
@@ -1311,7 +1338,8 @@ const assemble = ({
   return {
     repo,
     readAtEpochMs: nowMs,
-    required: requirements.requiredContexts,
+    required: requirements?.requiredContexts,
+    features,
     summary: summaryOf(entries),
     entries,
     roots: report.roots,
@@ -1327,9 +1355,10 @@ const assemble = ({
             defaultBranch,
             nowEpochMs: nowMs,
             rules: {
-              requireCodeOwnerReview: requirements.requireCodeOwnerReview,
+              requireCodeOwnerReview:
+                requirements?.requireCodeOwnerReview ?? false,
               requireConversationResolution:
-                requirements.requireConversationResolution,
+                requirements?.requireConversationResolution ?? false,
               codeOwners,
             },
             pulls: Arr.generate(function* () {

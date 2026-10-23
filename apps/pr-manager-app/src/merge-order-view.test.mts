@@ -9,9 +9,11 @@ import {
   parseMergeOrderView,
   STATUS_FILTERS,
   statusesOf,
+  statusFiltersOf,
   toggleOnly,
   togglePriority,
   toggleStatus,
+  withAvailable,
   withSort,
   type MergeOrderView,
 } from './merge-order-view.mjs';
@@ -408,6 +410,56 @@ describe(toggleOnly, () => {
     assert.deepStrictEqual(hidden.hiddenStatuses, ['failing']);
 
     assert.deepStrictEqual(hidden.onlyStatuses, []);
+  });
+});
+
+describe(statusFiltersOf, () => {
+  test('is every status where the queue is run', () => {
+    assert.deepStrictEqual(
+      statusFiltersOf({ queue: true, ruleset: true }),
+      STATUS_FILTERS,
+    );
+  });
+
+  // Nothing is queued or set aside without `unblock-prs`, and a count that
+  // is always nought is a switch that does nothing.
+  test('leaves out the queue’s own statuses where it is not', () => {
+    assert.deepStrictEqual(statusFiltersOf({ queue: false, ruleset: true }), [
+      'failing',
+      'awaitingReview',
+      'pending',
+    ]);
+  });
+
+  test('leaves out the wait for a code owner where no ruleset asks for one', () => {
+    assert.deepStrictEqual(statusFiltersOf({ queue: false, ruleset: false }), [
+      'failing',
+      'pending',
+    ]);
+  });
+});
+
+describe(withAvailable, () => {
+  // The choice is kept across visits, and across repositories: `only
+  // queued`, chosen on one that runs the queue, would otherwise leave
+  // nothing on one that does not, with no switch on screen to undo it.
+  test('drops what it hides or picks of the statuses not on offer', () => {
+    const view: MergeOrderView = {
+      ...DEFAULT_MERGE_ORDER_VIEW,
+      hiddenStatuses: ['setAside', 'pending'],
+      onlyStatuses: ['queued', 'failing'],
+    } as const;
+
+    assert.deepStrictEqual(
+      withAvailable(view, ['failing', 'awaitingReview', 'pending']),
+      {
+        ...view,
+        hiddenStatuses: ['pending'],
+        onlyStatuses: ['failing'],
+      },
+    );
+
+    assert.strictEqual(withAvailable(view, STATUS_FILTERS), view);
   });
 });
 

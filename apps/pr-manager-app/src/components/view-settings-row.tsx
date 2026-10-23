@@ -26,6 +26,13 @@ type Props = Readonly<{
   percent: number;
   /** Not drawn on the page; its height or share is kept, but not offered. */
   hidden: boolean;
+  /**
+   * Nothing in the repository for it — the queue, where there is no
+   * `merge-queued` label (`RepoFeatures` in `load-report.mts`) — so it is
+   * drawn nowhere, whatever {@link hidden} says, and showing it is not
+   * offered. It can still be moved, for a repository that has it.
+   */
+  absent: boolean;
 }>;
 
 /**
@@ -49,6 +56,7 @@ export const ViewSettingsRow = memoNamed<Props>('ViewSettingsRow', (props) => {
     share,
     percent,
     hidden,
+    absent,
   } = props;
 
   const blockName = BLOCK_NAMES[id];
@@ -156,7 +164,16 @@ export const ViewSettingsRow = memoNamed<Props>('ViewSettingsRow', (props) => {
         </button>
       ) : undefined}
 
-      {hidden ? (
+      {absent ? (
+        <span
+          className={'view-settings-height'}
+          title={
+            'This repository has no merge-queued label, so there is no queue to draw.'
+          }
+        >
+          {'none here'}
+        </span>
+      ) : hidden ? (
         <span className={'view-settings-height'}>{'hidden'}</span>
       ) : mode === 'fill' ? (
         <>
@@ -246,14 +263,16 @@ export const ViewSettingsRow = memoNamed<Props>('ViewSettingsRow', (props) => {
         </>
       )}
 
-      <button
-        aria-label={`${hidden ? 'Show' : 'Hide'} ${blockName}`}
-        className={'view-settings-small'}
-        type={'button'}
-        onClick={toggleHidden}
-      >
-        {hidden ? 'Show' : 'Hide'}
-      </button>
+      {absent ? undefined : (
+        <button
+          aria-label={`${hidden ? 'Show' : 'Hide'} ${blockName}`}
+          className={'view-settings-small'}
+          type={'button'}
+          onClick={toggleHidden}
+        >
+          {hidden ? 'Show' : 'Hide'}
+        </button>
+      )}
     </li>
   );
 });

@@ -1,7 +1,7 @@
 import { writeSetAsideComment } from 'pr-report-core';
 import { Arr, isRecord, Json, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { REPORT_SOURCE } from './constants.mjs';
+import { DEFAULT_REPORT_SOURCE } from './constants.mjs';
 import type { Fetch, FetchInit } from './graphql.mjs';
 import {
   appendIssues,
@@ -62,7 +62,7 @@ describe(loadReport, () => {
       }),
     );
 
-    const loading = loadReport(REPORT_SOURCE, {
+    const loading = loadReport(DEFAULT_REPORT_SOURCE, {
       token: 'token',
       nowMs: NOW_MS,
       fetchImpl,
@@ -111,7 +111,7 @@ describe(loadReport, () => {
       }),
     );
 
-    const loading = loadReport(REPORT_SOURCE, {
+    const loading = loadReport(DEFAULT_REPORT_SOURCE, {
       token: 'token',
       nowMs: NOW_MS,
       fetchImpl,
@@ -293,7 +293,7 @@ describe(loadReport, () => {
       answer('Compare', { compare_7: null }),
     );
 
-    const { result } = await loadReport(REPORT_SOURCE, {
+    const { result } = await loadReport(DEFAULT_REPORT_SOURCE, {
       token: 'token',
       nowMs: NOW_MS,
       fetchImpl,
@@ -549,7 +549,7 @@ describe(loadReport, () => {
       },
     );
 
-    const { result } = await loadReport(REPORT_SOURCE, {
+    const { result } = await loadReport(DEFAULT_REPORT_SOURCE, {
       token: 'token',
       nowMs: NOW_MS,
       issueCount: 100,
@@ -1147,10 +1147,81 @@ describe(loadReport, () => {
     ]);
   });
 
+  test('says the repository declares a ruleset and runs the queue', async () => {
+    const { fetchImpl } = answering(
+      report([pullRequest({ number: 7 })]),
+      answer('Compare', { compare_7: null }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.deepStrictEqual(loaded.features, { ruleset: true, queue: true });
+
+    assert.deepStrictEqual(loaded.required, [
+      'code-check-result / result',
+      'no-skip-ci-label',
+    ]);
+  });
+
+  // Any repository but this one: the page is still the merge order and the
+  // checks, judged over whatever reported.
+  test('without a ruleset, judges every context reported on the head', async () => {
+    const { fetchImpl } = answering(
+      report(
+        [
+          pullRequest({
+            number: 7,
+            contexts: [
+              checkRun('test', 'COMPLETED', 'FAILURE'),
+              checkRun('build', 'COMPLETED', 'SUCCESS'),
+            ],
+          }),
+        ],
+        [],
+        1,
+        NO_ISSUES,
+        { ruleset: null, codeOwners: null },
+      ),
+      answer('Compare', { compare_7: null }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.isFalse(loaded.features.ruleset);
+
+    assert.isUndefined(loaded.required);
+
+    const entry = loaded.entries[0];
+
+    assert.isDefined(entry);
+
+    assert.strictEqual(entry.checks.verdict, 'failing');
+
+    assert.deepStrictEqual(entry.checks.failed, ['test']);
+
+    assert.deepStrictEqual(entry.checks.passed, ['build']);
+
+    // Nothing asks for a code owner without a ruleset that says so.
+    assert.deepStrictEqual(entry.codeOwnerReview, { state: 'not-required' });
+  });
+
+  test('says the queue is not run where there is no `merge-queued` label', async () => {
+    const { fetchImpl } = answering(
+      report([pullRequest({ number: 7 })], [], 1, NO_ISSUES, {
+        queueLabel: null,
+      }),
+      answer('Compare', { compare_7: null }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.isFalse(loaded.features.queue);
+  });
+
   test('refuses to report part of the open pull requests as the whole', async () => {
     const { fetchImpl } = answering(report([], [], 51));
 
-    const { result } = await loadReport(REPORT_SOURCE, {
+    const { result } = await loadReport(DEFAULT_REPORT_SOURCE, {
       token: 'token',
       nowMs: NOW_MS,
       fetchImpl,
@@ -1162,7 +1233,7 @@ describe(loadReport, () => {
   });
 
   test('words a token GitHub will not take', async () => {
-    const { result } = await loadReport(REPORT_SOURCE, {
+    const { result } = await loadReport(DEFAULT_REPORT_SOURCE, {
       token: 'token',
       nowMs: NOW_MS,
       fetchImpl: refusingTheToken,
@@ -1174,7 +1245,7 @@ describe(loadReport, () => {
   });
 
   test("passes on GitHub's own words when it refuses the query", async () => {
-    const { result } = await loadReport(REPORT_SOURCE, {
+    const { result } = await loadReport(DEFAULT_REPORT_SOURCE, {
       token: 'token',
       nowMs: NOW_MS,
       fetchImpl: refusingTheQuery,
@@ -1194,7 +1265,7 @@ describe(loadReport, () => {
       'x-ratelimit-reset': '1790000000',
     }));
 
-    const { rateLimit } = await loadReport(REPORT_SOURCE, {
+    const { rateLimit } = await loadReport(DEFAULT_REPORT_SOURCE, {
       token: 'secret',
       nowMs: NOW_MS,
       fetchImpl,
@@ -1219,7 +1290,7 @@ describe(loadIssuePage, () => {
       issuesAnswer(issuePage(250, [31, 32], 'cursor-32')),
     );
 
-    const { result } = await loadIssuePage(REPORT_SOURCE, {
+    const { result } = await loadIssuePage(DEFAULT_REPORT_SOURCE, {
       token: 'token',
       after: 'cursor-30',
       first: 100,
@@ -1250,7 +1321,7 @@ describe(loadIssuePage, () => {
       OpenIssues: [{ data: { repository: {} } }],
     });
 
-    const { result } = await loadIssuePage(REPORT_SOURCE, {
+    const { result } = await loadIssuePage(DEFAULT_REPORT_SOURCE, {
       token: 'token',
       after: 'cursor-30',
       first: 100,
@@ -1356,7 +1427,7 @@ const load = async (
   fetchImpl: Fetch,
   issueCount?: number,
 ): Promise<LoadedReport> => {
-  const { result } = await loadReport(REPORT_SOURCE, {
+  const { result } = await loadReport(DEFAULT_REPORT_SOURCE, {
     token: 'token',
     nowMs: NOW_MS,
     ...(issueCount === undefined ? {} : { issueCount }),
@@ -1521,13 +1592,17 @@ const report = (
   mergedNodes: readonly unknown[] = [],
   totalCount: number = openNodes.length,
   issues: unknown = NO_ISSUES,
+  /** Fields of the pull requests' query to answer otherwise. */
+  repository: ReadonlyRecord<string, unknown> = {},
 ): Answers =>
   ({
     ...answer('PullRequests', {
       defaultBranchRef: { name: 'main' },
       ruleset: { text: RULESET },
       codeOwners: { text: '/.github/workflows/ @noshiro-pf\n' },
+      queueLabel: { name: 'merge-queued' },
       open: { totalCount, nodes: openNodes },
+      ...repository,
     }),
     ...answer('Checks', { open: { nodes: openNodes } }),
     ...answer('PullRequestDetails', { open: { nodes: openNodes } }),

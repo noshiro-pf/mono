@@ -71,7 +71,7 @@ describe(describeCheckCounts, () => {
 
 describe(describeCheckBreakdown, () => {
   test('names every required context under the state it is in', () => {
-    expect(describeCheckBreakdown(checks)).toBe(
+    expect(describeCheckBreakdown(checks, true)).toBe(
       [
         'over the 5 contexts the ruleset requires:',
         'failed — code-check-result / result',
@@ -97,7 +97,7 @@ describe(describeCheckBreakdown, () => {
       required: 4,
     } as const;
 
-    expect(describeCheckBreakdown(stacked)).toBe(
+    expect(describeCheckBreakdown(stacked, true)).toBe(
       [
         'over the 4 contexts the ruleset requires:',
         'not run on this base — Validate PR title, Validate commit count',
@@ -106,5 +106,11 @@ describe(describeCheckBreakdown, () => {
     );
 
     expect(describeCheckCounts(stacked)).toBe('2\u{2205} 2\u{2713}');
+  });
+
+  test('says what it is over where no ruleset is declared', () => {
+    expect(describeCheckBreakdown(checks, false).split('\n', 1)[0]).toBe(
+      'over the 5 contexts reported, no ruleset being declared:',
+    );
   });
 });

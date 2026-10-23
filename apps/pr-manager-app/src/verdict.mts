@@ -83,9 +83,20 @@ export const describeCheckCounts = (checks: ChecksSummary): string =>
     }
   }).join(' ');
 
-/** The same, spelled out with the names, for the hover. */
-export const describeCheckBreakdown = (checks: ChecksSummary): string =>
-  Arr.toUnshifted(`over the ${checks.required} contexts the ruleset requires:`)(
+/**
+ * The same, spelled out with the names, for the hover. Without a ruleset
+ * the contexts are every one reported on the head (`buildEntries` in
+ * `pr-report-core`), and the first line says so.
+ */
+export const describeCheckBreakdown = (
+  checks: ChecksSummary,
+  rulesetDeclared: boolean,
+): string =>
+  Arr.toUnshifted(
+    rulesetDeclared
+      ? `over the ${checks.required} contexts the ruleset requires:`
+      : `over the ${checks.required} contexts reported, no ruleset being declared:`,
+  )(
     Arr.generate(function* () {
       for (const { label, names } of partsOf(checks)) {
         if (!Arr.isEmpty(names)) {
