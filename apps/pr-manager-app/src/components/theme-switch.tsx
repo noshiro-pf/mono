@@ -1,5 +1,5 @@
-import { memoNamed } from 'preact-utils';
-import { themeSignals, themeStore } from '../store/index.mjs';
+import { constant, derive, view, type Bindable, type JSX } from 'synstate-dom';
+import { themeStore } from '../store/index.mjs';
 import { effectiveTheme, type ColorScheme } from '../theme.mjs';
 import { BadgeIcon } from './badge-icon.js';
 
@@ -11,47 +11,44 @@ import { BadgeIcon } from './badge-icon.js';
  * is read; a pair has neither problem. What a pick means is in `theme.mts`:
  * the URL keeps it, unless it is what the system shows anyway.
  */
-export const ThemeSwitch = memoNamed('ThemeSwitch', () => {
-  const theme = themeSignals.theme.value;
-
-  const system = themeSignals.system.value;
-
-  const shown = effectiveTheme(theme, system);
+export const ThemeSwitch = (): JSX.Element => {
+  const shownIs = (look: ColorScheme): Bindable<string> =>
+    derive([themeStore.theme, themeStore.system], (theme, system) =>
+      String(effectiveTheme(theme, system) === look),
+    );
 
   return (
     <fieldset
-      aria-label={'Theme'}
-      className={'theme-switch'}
-      title={
+      aria-label={constant('Theme')}
+      class={constant('theme-switch')}
+      title={view(themeStore.theme, (theme) =>
         theme === 'auto'
           ? 'Following the system. Picking the other look keeps it in the URL.'
-          : 'Chosen here, and kept in the URL. Picking what the system shows follows the system again.'
-      }
+          : 'Chosen here, and kept in the URL. Picking what the system shows follows the system again.',
+      )}
     >
       <button
-        aria-pressed={shown === 'light'}
-        className={'theme-switch-option'}
-        type={'button'}
+        aria-pressed={shownIs('light')}
+        class={constant('theme-switch-option')}
+        type={constant('button')}
         onClick={chooseLight}
       >
-        <BadgeIcon path={SUN} />
-        {'Light'}
+        <BadgeIcon path={constant(SUN)} />
+        {constant('Light')}
       </button>
 
       <button
-        aria-pressed={shown === 'dark'}
-        className={'theme-switch-option'}
-        type={'button'}
+        aria-pressed={shownIs('dark')}
+        class={constant('theme-switch-option')}
+        type={constant('button')}
         onClick={chooseDark}
       >
-        <BadgeIcon path={MOON} />
-        {'Dark'}
+        <BadgeIcon path={constant(MOON)} />
+        {constant('Dark')}
       </button>
     </fieldset>
   );
-});
-
-// Outside the component, since neither reads its props.
+};
 
 const choose = (picked: ColorScheme) => (): void => {
   themeStore.choose(picked);

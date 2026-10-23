@@ -1,6 +1,8 @@
-import { memoNamed } from 'preact-utils';
+import type { InitializedObservable } from 'synstate';
+import { constant, If, view, type JSX } from 'synstate-dom';
 
-type Props = Readonly<{
+/** What the tooltip shows. */
+export type QueueTipContent = Readonly<{
   number: number;
   title: string;
   /** What the word under the number leaves out, if anything. */
@@ -12,6 +14,8 @@ type Props = Readonly<{
   side: 'start' | 'end';
 }>;
 
+type Props = Readonly<{ tip: InitializedObservable<QueueTipContent> }>;
+
 /**
  * The tooltip of the queue box pointed at or focused (`queue-section.tsx`):
  * the title, and the detail on a second line. One for the whole block,
@@ -19,15 +23,23 @@ type Props = Readonly<{
  * box would cut off at the edge of a block that scrolls on its own. Hidden
  * from a screen reader, which reads the same words in the box itself.
  */
-export const QueueTip = memoNamed<Props>(
-  'QueueTip',
-  ({ number, title, detail, side }) => (
-    <span aria-hidden={'true'} className={'queue-tip'} data-side={side}>
-      <span className={'queue-tip-number'}>{`#${number} `}</span>
-      {title}
-      {detail === undefined ? undefined : (
-        <span className={'queue-tip-detail'}>{detail}</span>
-      )}
+export const QueueTip = ({ tip }: Props): JSX.Element => (
+  <span
+    aria-hidden={constant('true')}
+    class={constant('queue-tip')}
+    data-side={view(tip, ({ side }) => side)}
+  >
+    <span class={constant('queue-tip-number')}>
+      {view(tip, ({ number }) => `#${number} `)}
     </span>
-  ),
+    {view(tip, ({ title }) => title)}
+    <If
+      cond={view(tip, ({ detail }) => detail !== undefined)}
+      then={
+        <span class={constant('queue-tip-detail')}>
+          {view(tip, ({ detail }) => detail ?? '')}
+        </span>
+      }
+    />
+  </span>
 );

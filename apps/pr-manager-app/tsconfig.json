@@ -5,7 +5,7 @@
   ],
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "preact"
+    "jsxImportSource": "synstate-dom"
   },
   "include": ["./src", "./scripts", "./configs"]
 }

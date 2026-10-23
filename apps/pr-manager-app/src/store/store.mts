@@ -1,8 +1,8 @@
 /**
  * The page's state, made once with the browser as its surroundings.
  *
- * The components read it through the signals below and call its actions;
- * none of them holds state of its own. What each part does, and the tests of
+ * The components bind its values straight into the DOM and call its
+ * actions; none of them holds state of its own. What each part does, and the tests of
  * it, are in the modules this puts together — this file is only which real
  * thing each of them is handed.
  */
@@ -12,7 +12,6 @@ import {
   createEventEmitter,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { toSignal } from 'synstate-preact-signals';
 import { reportSourceFromSearch, repositoryUrl } from '../constants.mjs';
 import { layoutFromLocation, saveLayout } from '../layout.mjs';
 import { loadIssuePage, loadReport } from '../load-report.mjs';
@@ -142,90 +141,6 @@ export const activityStore = createActivityStore({
     };
   },
 });
-
-/**
- * Everything a component reads, as Preact signals, and the only way a
- * component reads the stores.
- *
- * The stores stay synstate, which is what their operators and their tests
- * are written in; this is where their values cross into the view. Read
- * `.value` in a render and Preact renders that component again when it
- * changes, as a hook would. Hand the signal itself to JSX as a child or a
- * DOM attribute instead and Preact rewrites that one node without rendering
- * anything, which is what the ages do (`components/age.tsx`).
- *
- * Nothing is made of them on the way: what a component needs, the store
- * derives, and emits only when it changed (`reader.mts`).
- */
-export const readerSignals = {
-  loadStatus: toSignal(reader.loadStatus),
-  readAt: toSignal(reader.readAt),
-  summary: toSignal(reader.summary),
-  entries: toSignal(reader.entries),
-  byNumber: toSignal(reader.byNumber),
-  scaleMax: toSignal(reader.scaleMax),
-  roots: toSignal(reader.roots),
-  cycles: toSignal(reader.cycles),
-  merged: toSignal(reader.merged),
-  queue: toSignal(reader.queue),
-  features: toSignal(reader.features),
-  issues: toSignal(reader.issues),
-  reading: toSignal(reader.reading),
-  runs: toSignal(reader.runs),
-  moreIssues: toSignal(reader.moreIssues),
-  rateLimit: toSignal(reader.rateLimit),
-  nowMs: toSignal(reader.nowMs),
-} as const;
-
-export const tokenSignals = {
-  token: toSignal(tokenStore.token),
-  saveError: toSignal(tokenStore.saveError),
-  typed: toSignal(tokenStore.typed),
-  remember: toSignal(tokenStore.remember),
-} as const;
-
-export const themeSignals = {
-  theme: toSignal(themeStore.theme),
-  system: toSignal(themeStore.system),
-} as const;
-
-export const mergeOrderSignals = {
-  view: toSignal(mergeOrderStore.view),
-  roots: toSignal(mergeOrderStore.roots),
-  counts: toSignal(mergeOrderStore.counts),
-} as const;
-
-export const headerSignals = {
-  folded: toSignal(headerStore.folded),
-} as const;
-
-export const issuesViewSignals = {
-  view: toSignal(issuesViewStore.view),
-  hideDone: toSignal(issuesViewStore.hideDone),
-  graph: toSignal(issuesViewStore.graph),
-  layout: toSignal(issuesViewStore.layout),
-  doneCount: toSignal(issuesViewStore.doneCount),
-  dagScale: toSignal(issuesViewStore.dagScale),
-  dagFitted: toSignal(issuesViewStore.dagFitted),
-} as const;
-
-export const issuesListSignals = {
-  view: toSignal(issuesListStore.view),
-  query: toSignal(issuesListStore.query),
-  items: toSignal(issuesListStore.items),
-  counts: toSignal(issuesListStore.counts),
-} as const;
-
-export const layoutSignals = {
-  layout: toSignal(layoutStore.layout),
-  mode: toSignal(layoutStore.mode),
-  settingsOpen: toSignal(layoutStore.settingsOpen),
-} as const;
-
-export const activitySignals = {
-  open: toSignal(activityStore.open),
-  status: toSignal(activityStore.status),
-} as const;
 
 /**
  * Starts the timers and the listeners. Called once, from `main.tsx`, before

@@ -1,16 +1,24 @@
 import type { ChecksSummary } from 'pr-report-core';
-import { memoNamed } from 'preact-utils';
-import { readerSignals } from '../store/index.mjs';
+import {
+  constant,
+  derive,
+  If,
+  mapBindable,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
+import { reader } from '../store/index.mjs';
 import {
   describeCheckBreakdown,
   describeCheckCounts,
   presentVerdict,
+  type StatusRole,
 } from '../verdict.mjs';
 import { BadgeIcon } from './badge-icon.js';
 
 type Props = Readonly<{
   /** `undefined` while the check results are still being read. */
-  checks: ChecksSummary | undefined;
+  checks: Bindable<ChecksSummary | undefined>;
 }>;
 
 /**
@@ -23,38 +31,62 @@ type Props = Readonly<{
  * skipped in a round that was being superseded — is invisible unless the
  * parts are shown. The names are on hover.
  */
-export const VerdictBadge = memoNamed<Props>('VerdictBadge', (props) => {
-  const { checks } = props;
+export const VerdictBadge = ({ checks }: Props): JSX.Element => {
+  const shown = derive([checks, reader.features], (summary, { ruleset }) =>
+    presentChecks(summary, ruleset),
+  );
 
+  return (
+    <span
+      class={constant('badge')}
+      data-status={mapBindable(shown, ({ status }) => status)}
+      title={mapBindable(shown, ({ title }) => title)}
+    >
+      <BadgeIcon path={mapBindable(shown, ({ icon }) => icon)} />
+
+      {mapBindable(shown, ({ label }) => label)}
+
+      <If
+        cond={mapBindable(checks, (summary) => summary !== undefined)}
+        then={
+          <span class={constant('badge-counts')}>
+            {mapBindable(shown, ({ counts }) => counts)}
+          </span>
+        }
+      />
+    </span>
+  );
+};
+
+type Shown = Readonly<{
+  status: StatusRole;
+  icon: string;
+  label: string;
+  title: string;
+  counts: string;
+}>;
+
+const presentChecks = (
+  checks: ChecksSummary | undefined,
+  rulesetDeclared: boolean,
+): Shown => {
   if (checks === undefined) {
-    return (
-      <span
-        className={'badge'}
-        data-status={'neutral'}
-        title={'The check results have not been read yet.'}
-      >
-        <BadgeIcon path={presentVerdict('pending').icon} />
-
-        {'reading checks…'}
-      </span>
-    );
+    return {
+      status: 'neutral',
+      icon: presentVerdict('pending').icon,
+      label: 'reading checks…',
+      title: 'The check results have not been read yet.',
+      counts: '',
+    };
   }
 
   const verdict = presentVerdict(checks.verdict);
 
-  const { ruleset } = readerSignals.features.value;
-
-  return (
-    <span
-      className={'badge'}
-      data-status={verdict.status}
-      title={describeCheckBreakdown(checks, ruleset)}
-    >
-      <BadgeIcon path={verdict.icon} />
-
-      {verdict.label}
-
-      <span className={'badge-counts'}>{describeCheckCounts(checks)}</span>
-    </span>
-  );
-});
+  return {
+    status: verdict.status,
+    icon: verdict.icon,
+    label: verdict.label,
+    title: describeCheckBreakdown(checks, rulesetDeclared),
+    counts: describeCheckCounts(checks),
+  };
+};

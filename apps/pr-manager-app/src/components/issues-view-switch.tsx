@@ -1,47 +1,45 @@
-import { memoNamed } from 'preact-utils';
-import {
-  issuesViewSignals,
-  issuesViewStore,
-  type IssuesView,
-} from '../store/index.mjs';
+import { constant, view, type JSX, type View } from 'synstate-dom';
+import { issuesViewStore, type IssuesView } from '../store/index.mjs';
 
 /**
  * The list or the DAG: two buttons side by side, the pressed one
  * (`aria-pressed`) being what the block shows — the theme switch's
  * segmented control (`theme-switch.tsx`), for the same reasons.
  */
-export const IssuesViewSwitch = memoNamed('IssuesViewSwitch', () => {
-  const view = issuesViewSignals.view.value;
+export const IssuesViewSwitch = (): JSX.Element => (
+  <fieldset
+    aria-label={constant('Show the issues as')}
+    class={constant('view-switch')}
+  >
+    <button
+      aria-pressed={pressedFor('list')}
+      class={constant('view-switch-option')}
+      title={constant('The open issues, most recently updated first')}
+      type={constant('button')}
+      onClick={showList}
+    >
+      {constant('List')}
+    </button>
 
-  return (
-    <fieldset aria-label={'Show the issues as'} className={'view-switch'}>
-      <button
-        aria-pressed={view === 'list'}
-        className={'view-switch-option'}
-        title={'The open issues, most recently updated first'}
-        type={'button'}
-        onClick={showList}
-      >
-        {'List'}
-      </button>
+    <button
+      aria-pressed={pressedFor('dag')}
+      class={constant('view-switch-option')}
+      title={constant(
+        'What each open issue waits for, from its Start-After: lines',
+      )}
+      type={constant('button')}
+      onClick={showDag}
+    >
+      {constant('DAG')}
+    </button>
+  </fieldset>
+);
 
-      <button
-        aria-pressed={view === 'dag'}
-        className={'view-switch-option'}
-        title={'What each open issue waits for, from its Start-After: lines'}
-        type={'button'}
-        onClick={showDag}
-      >
-        {'DAG'}
-      </button>
-    </fieldset>
-  );
-});
+const pressedFor = (shown: IssuesView): View<string> =>
+  view(issuesViewStore.view, (current) => String(current === shown));
 
-// Outside the component, since neither reads its props.
-
-const choose = (view: IssuesView) => (): void => {
-  issuesViewStore.choose(view);
+const choose = (shown: IssuesView) => (): void => {
+  issuesViewStore.choose(shown);
 };
 
 const showList = choose('list');

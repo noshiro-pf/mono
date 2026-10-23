@@ -1,9 +1,8 @@
 import type { LinkedIssue } from 'pr-report-core';
-import { Fragment } from 'preact';
-import { memoNamed } from 'preact-utils';
+import { constant, For, view, type Bindable, type JSX } from 'synstate-dom';
 import { ExternalLink } from './external-link.js';
 
-type Props = Readonly<{ issues: readonly LinkedIssue[] }>;
+type Props = Readonly<{ issues: Bindable<readonly LinkedIssue[]> }>;
 
 /**
  * The issues the pull request closes, with their titles where they are
@@ -15,17 +14,27 @@ type Props = Readonly<{ issues: readonly LinkedIssue[] }>;
  * a pull request it does not link them on yet, a stacked one. The titles are
  * there unless GitHub would not describe the issue.
  */
-export const LinkedIssues = memoNamed<Props>('LinkedIssues', ({ issues }) => (
-  <span className={'linked-issues'}>
-    {'closes '}
-    {issues.map((issue, index) => (
-      <Fragment key={issue.number}>
-        {index === 0 ? '' : ', '}
-        <ExternalLink dataState={issue.state} href={issue.url}>
-          {`#${issue.number}`}
-        </ExternalLink>
-        {issue.title === '' ? '' : ` ${issue.title}`}
-      </Fragment>
-    ))}
+export const LinkedIssues = ({ issues }: Props): JSX.Element => (
+  <span class={constant('linked-issues')}>
+    {constant('closes ')}
+    <For items={issues} key={(issue) => issue.number}>
+      {(issue$, index$) => (
+        <>
+          {view(index$, separator)}
+          <ExternalLink
+            dataState={view(issue$, (issue) => issue.state)}
+            href={view(issue$, (issue) => issue.url)}
+          >
+            {view(issue$, (issue) => `#${issue.number}`)}
+          </ExternalLink>
+          {view(issue$, (issue) =>
+            issue.title === '' ? '' : ` ${issue.title}`,
+          )}
+        </>
+      )}
+    </For>
   </span>
-));
+);
+
+/** Between two items of a list written as a sentence. */
+export const separator = (index: number): string => (index === 0 ? '' : ', ');

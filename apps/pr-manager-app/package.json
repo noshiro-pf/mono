@@ -36,14 +36,12 @@
   },
   "dependencies": {
     "pr-report-core": "workspace:*",
-    "preact-utils": "workspace:*",
     "synstate": "workspace:*",
-    "synstate-preact-signals": "workspace:*",
+    "synstate-dom": "workspace:*",
     "ts-data-forge": "workspace:*",
     "ts-fortress": "workspace:*"
   },
   "devDependencies": {
-    "@preact/signals": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "dedent": "catalog:",
     "eslint": "catalog:",
@@ -52,7 +50,6 @@
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
     "npm-run-all2": "catalog:",
-    "preact": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",

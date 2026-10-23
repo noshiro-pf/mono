@@ -1,9 +1,9 @@
-import { memoNamed } from 'preact-utils';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { splitViewUrl, type SplitViewSource } from '../split-view.mjs';
 import { ExternalLink } from './external-link.js';
 
-type Props = Readonly<{ entry: SplitViewSource }>;
+type Props = Readonly<{ entry: Bindable<SplitViewSource> }>;
 
 /**
  * Opens the pull request in `split-view-extension` — the diff beside the
@@ -15,17 +15,18 @@ type Props = Readonly<{ entry: SplitViewSource }>;
  * cannot ask. Without the extension the new tab is Chrome's "blocked" page,
  * which the title says in advance.
  */
-export const SplitViewLink = memoNamed<Props>('SplitViewLink', ({ entry }) => (
+export const SplitViewLink = ({ entry }: Props): JSX.Element => (
   <ExternalLink
-    href={splitViewUrl(entry)}
-    title={
-      Arr.isNonEmpty(entry.linkedIssues) || Arr.isNonEmpty(entry.claudeSessions)
+    href={mapBindable(entry, splitViewUrl)}
+    title={mapBindable(entry, (source) =>
+      Arr.isNonEmpty(source.linkedIssues) ||
+      Arr.isNonEmpty(source.claudeSessions)
         ? 'open the diff, the conversation, and the issue or the session beside them (needs split-view-extension)'
-        : 'open the diff and the conversation side by side (needs split-view-extension)'
-    }
+        : 'open the diff and the conversation side by side (needs split-view-extension)',
+    )}
     variant={'split-view'}
   >
-    <span aria-hidden={'true'}>{'⧉ '}</span>
-    {'split view'}
+    <span aria-hidden={constant('true')}>{constant('⧉ ')}</span>
+    {constant('split view')}
   </ExternalLink>
-));
+);

@@ -1,11 +1,11 @@
-import { memoNamed } from 'preact-utils';
-import { useCallback } from 'preact/hooks';
+import type { InitializedObservable } from 'synstate';
+import { constant, If, view, type JSX } from 'synstate-dom';
 import type { QueueSlot } from '../queue-view.mjs';
 import { ExternalLink } from './external-link.js';
 import { RunStateIcon } from './run-state-icon.js';
 
 type Props = Readonly<{
-  slot: QueueSlot;
+  slot$: InitializedObservable<QueueSlot>;
   /** Pointed at or focused: its tooltip is shown (`queue-tip.tsx`). */
   onShow: (prNumber: number) => void;
   onHide: () => void;
@@ -17,42 +17,50 @@ type Props = Readonly<{
  * waits, or what it is. The title is in it for a screen reader, which the
  * tooltip is hidden from.
  */
-export const QueueSlotBox = memoNamed<Props>(
-  'QueueSlotBox',
-  ({ slot, onShow, onHide }) => {
-    const show = useCallback((): void => {
-      onShow(slot.number);
-    }, [onShow, slot.number]);
-
-    return (
-      <ExternalLink
-        href={slot.url}
-        variant={'queue-link'}
-        onEnter={show}
-        onLeave={onHide}
-      >
-        {slot.priority === 'none' ? undefined : (
-          <span className={'queue-priority'} data-priority={slot.priority}>
-            {slot.priority}
-          </span>
-        )}
-
-        <span className={'queue-number'}>
-          {slot.kind === 'running' ? (
-            <RunStateIcon kind={'running'} label={'running'} />
-          ) : undefined}
-          {`#${slot.number}`}
+export const QueueSlotBox = ({ slot$, onShow, onHide }: Props): JSX.Element => (
+  <ExternalLink
+    href={view(slot$, (slot) => slot.url)}
+    variant={'queue-link'}
+    onEnter={() => {
+      onShow(slot$.getSnapshot().value.number);
+    }}
+    onLeave={onHide}
+  >
+    <If
+      cond={view(slot$, (slot) => slot.priority !== 'none')}
+      then={
+        <span
+          class={constant('queue-priority')}
+          data-priority={view(slot$, (slot) => slot.priority)}
+        >
+          {view(slot$, (slot) => slot.priority)}
         </span>
+      }
+    />
 
-        {slot.note === undefined ? undefined : (
-          <span className={'queue-note'}>{slot.note}</span>
-        )}
+    <span class={constant('queue-number')}>
+      <If
+        cond={view(slot$, (slot) => slot.kind === 'running')}
+        then={<RunStateIcon kind={'running'} label={'running'} />}
+      />
+      {view(slot$, (slot) => `#${slot.number}`)}
+    </span>
 
-        <span className={'visually-hidden'}>
-          {` ${slot.title}`}
-          {slot.detail === undefined ? undefined : ` — ${slot.detail}`}
+    <If
+      cond={view(slot$, (slot) => slot.note !== undefined)}
+      then={
+        <span class={constant('queue-note')}>
+          {view(slot$, (slot) => slot.note ?? '')}
         </span>
-      </ExternalLink>
-    );
-  },
+      }
+    />
+
+    <span class={constant('visually-hidden')}>
+      {view(slot$, (slot) =>
+        slot.detail === undefined
+          ? ` ${slot.title}`
+          : ` ${slot.title} — ${slot.detail}`,
+      )}
+    </span>
+  </ExternalLink>
 );

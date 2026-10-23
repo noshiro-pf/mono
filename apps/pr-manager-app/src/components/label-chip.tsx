@@ -1,9 +1,8 @@
 import type { Label } from 'pr-report-core';
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 import { chipColors } from '../label-color.mjs';
 
-type Props = Readonly<{ label: Label }>;
+type Props = Readonly<{ label: Bindable<Label> }>;
 
 /**
  * One label, in the colour GitHub gives it.
@@ -12,26 +11,24 @@ type Props = Readonly<{ label: Label }>;
  * whole point: a reader who knows what `skip-ci` looks like on GitHub should
  * not have to read the word here.
  */
-export const LabelChip = memoNamed<Props>('LabelChip', (props) => {
-  const { label } = props;
-
-  const style = useMemo(() => {
-    const colors = chipColors(label.color);
-
-    return {
-      backgroundColor: colors.background,
-      borderColor: colors.border,
-      color: colors.text,
-    };
-  }, [label.color]);
-
-  return (
-    <span
-      className={'label-chip'}
-      style={style}
-      title={label.description === '' ? label.name : label.description}
-    >
-      {label.name}
-    </span>
-  );
-});
+export const LabelChip = ({ label }: Props): JSX.Element => (
+  <span
+    class={constant('label-chip')}
+    style={{
+      'background-color': mapBindable(
+        label,
+        ({ color }) => chipColors(color).background,
+      ),
+      'border-color': mapBindable(
+        label,
+        ({ color }) => chipColors(color).border,
+      ),
+      color: mapBindable(label, ({ color }) => chipColors(color).text),
+    }}
+    title={mapBindable(label, ({ name, description }) =>
+      description === '' ? name : description,
+    )}
+  >
+    {mapBindable(label, ({ name }) => name)}
+  </span>
+);

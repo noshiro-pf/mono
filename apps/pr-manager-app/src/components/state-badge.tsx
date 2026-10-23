@@ -1,6 +1,6 @@
-import { memoNamed } from 'preact-utils';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 
-type Props = Readonly<{ isDraft: boolean }>;
+type Props = Readonly<{ isDraft: Bindable<boolean> }>;
 
 /**
  * Open or draft.
@@ -14,9 +14,15 @@ type Props = Readonly<{ isDraft: boolean }>;
  * colour here would put it on the same row as the check verdict, which is a
  * status.
  */
-export const StateBadge = memoNamed<Props>('StateBadge', ({ isDraft }) => (
-  <span className={'badge'} data-state={isDraft ? 'draft' : 'open'}>
-    <span aria-hidden={'true'}>{isDraft ? '◌' : '●'}</span>
-    {isDraft ? 'draft' : 'open'}
-  </span>
-));
+export const StateBadge = ({ isDraft }: Props): JSX.Element => {
+  const state = mapBindable(isDraft, (draft) => (draft ? 'draft' : 'open'));
+
+  return (
+    <span class={constant('badge')} data-state={state}>
+      <span aria-hidden={constant('true')}>
+        {mapBindable(isDraft, (draft) => (draft ? '◌' : '●'))}
+      </span>
+      {state}
+    </span>
+  );
+};

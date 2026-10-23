@@ -1,6 +1,6 @@
-import { memoNamed } from 'preact-utils';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 
-type Props = Readonly<{ armed: boolean }>;
+type Props = Readonly<{ armed: Bindable<boolean> }>;
 
 /**
  * Whether anything will land the pull request once the checks go green.
@@ -10,12 +10,14 @@ type Props = Readonly<{ armed: boolean }>;
  * so off is where every queued pull request waits for its turn, and on is its
  * turn having come — or a bot that armed its own.
  */
-export const AutoMergeBadge = memoNamed<Props>(
-  'AutoMergeBadge',
-  ({ armed }) => (
-    <span className={'badge'} data-auto-merge={armed ? 'on' : 'off'}>
-      <span aria-hidden={'true'}>{armed ? '⇥' : '⊘'}</span>
-      {armed ? 'auto-merge on' : 'auto-merge off'}
+export const AutoMergeBadge = ({ armed }: Props): JSX.Element => (
+  <span
+    class={constant('badge')}
+    data-auto-merge={mapBindable(armed, (on) => (on ? 'on' : 'off'))}
+  >
+    <span aria-hidden={constant('true')}>
+      {mapBindable(armed, (on) => (on ? '⇥' : '⊘'))}
     </span>
-  ),
+    {mapBindable(armed, (on) => (on ? 'auto-merge on' : 'auto-merge off'))}
+  </span>
 );

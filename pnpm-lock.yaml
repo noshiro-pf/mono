@@ -1812,15 +1812,12 @@ importers:
       pr-report-core:
         specifier: workspace:*
         version: link:../pr-report-core
-      preact-utils:
-        specifier: workspace:*
-        version: link:../preact-utils
       synstate:
         specifier: workspace:*
         version: link:../../libs/synstate
-      synstate-preact-signals:
+      synstate-dom:
         specifier: workspace:*
-        version: link:../../libs/synstate-preact-signals
+        version: link:../../libs/synstate-dom
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
@@ -1828,9 +1825,6 @@ importers:
         specifier: workspace:*
         version: link:../../libs/ts-fortress
     devDependencies:
-      '@preact/signals':
-        specifier: 'catalog:'
-        version: 2.11.3(preact@10.29.8)
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: 5.0.3(@vitest/browser@5.0.3)(vitest@5.0.3)
@@ -1855,9 +1849,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.3
-      preact:
-        specifier: 'catalog:'
-        version: 10.29.8(preact-render-to-string@6.8.0)
       prettier:
         specifier: 'catalog:'
         version: 3.9.9

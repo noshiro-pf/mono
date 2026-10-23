@@ -1,24 +1,17 @@
-import type { ComponentChildren } from 'preact';
-import { memoNamed } from 'preact-utils';
+import { constant, type Bindable, type Child, type JSX } from 'synstate-dom';
 
 type Props = Readonly<{
-  href: string;
-  children: ComponentChildren;
+  href: Bindable<string>;
+  children: Child;
   /**
-   * What the link is, rather than what it should look like: `className` on a
-   * component is what `react/forbid-component-props` forbids, and rightly —
-   * a caller passing one is a caller reaching across this boundary to style
+   * What the link is, rather than what it should look like: a caller passing
+   * a class name would be a caller reaching across this boundary to style
    * what is on the other side of it.
    */
-  variant?:
-    | 'issue-dag-link'
-    | 'pull-request-title'
-    | 'queue-link'
-    | 'section-link'
-    | 'split-view';
+  variant?: 'pull-request-title' | 'queue-link' | 'section-link' | 'split-view';
   /** `open` / `closed` / `unknown`, for the linked issue chips. */
-  dataState?: string;
-  title?: string;
+  dataState?: Bindable<string>;
+  title?: Bindable<string>;
   /** Pointed at or focused, for a tooltip drawn apart from the link. */
   onEnter?: () => void;
   /** No longer pointed at, or no longer focused. */
@@ -36,24 +29,30 @@ type Props = Readonly<{
  * One component rather than the attributes written out twelve times, so that
  * the thirteenth link cannot be the one that forgets. `noreferrer` implies
  * `noopener`, which is what keeps the opened page from reaching back through
- * `window.opener`.
+ * `window.opener`. The DAG's nodes are SVG links, which are `SvgLink`
+ * (`svg-elements.tsx`).
  */
-export const ExternalLink = memoNamed<Props>(
-  'ExternalLink',
-  ({ href, children, variant, dataState, title, onEnter, onLeave }) => (
-    <a
-      className={variant}
-      data-state={dataState}
-      href={href}
-      rel={'noreferrer'}
-      target={'_blank'}
-      title={title}
-      onBlur={onLeave}
-      onFocus={onEnter}
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
-    >
-      {children}
-    </a>
-  ),
+export const ExternalLink = ({
+  href,
+  children,
+  variant,
+  dataState,
+  title,
+  onEnter,
+  onLeave,
+}: Props): JSX.Element => (
+  <a
+    class={variant === undefined ? undefined : constant(variant)}
+    data-state={dataState}
+    href={href}
+    rel={constant('noreferrer')}
+    target={constant('_blank')}
+    title={title}
+    onBlur={onLeave}
+    onFocus={onEnter}
+    onMouseEnter={onEnter}
+    onMouseLeave={onLeave}
+  >
+    {children}
+  </a>
 );

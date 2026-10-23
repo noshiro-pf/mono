@@ -1,20 +1,20 @@
-import type { ComponentChildren } from 'preact';
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
+import { combine, map, type InitializedObservable } from 'synstate';
+import { constant, If, view, type JSX } from 'synstate-dom';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   absentBlocks,
   columnWidths,
   shownOf,
   type BlockId,
+  type Layout,
 } from '../layout.mjs';
-import { layoutSignals, readerSignals } from '../store/index.mjs';
+import { layoutStore, reader } from '../store/index.mjs';
 import { BlockColumn } from './block-column.js';
 import { ColumnDivider } from './column-divider.js';
 
 type Props = Readonly<{
   /** What each block holds. Where it goes is the layout's. */
-  blocks: ReadonlyRecord<BlockId, ComponentChildren>;
+  blocks: ReadonlyRecord<BlockId, JSX.Element>;
 }>;
 
 /**
@@ -33,87 +33,66 @@ type Props = Readonly<{
  *
  * In the `fill` mode the layout takes the height the page leaves it, and each
  * column shares that out among its blocks (`index.css`).
+ *
+ * A drag changes the layout many times a second, and what it changes is a
+ * width or a height: the columns keep their blocks, each block its contents,
+ * and only the styles bound to the layout are rewritten.
  */
-export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
-  const { blocks } = props;
+export const BlockLayout = ({ blocks }: Props): JSX.Element => {
+  const layout$ = layoutStore.layout;
 
-  const layout = layoutSignals.layout.value;
+  const absent$ = reader.features.pipe(map(absentBlocks));
 
-  const features = readerSignals.features.value;
-
-  const absent = useMemo(() => absentBlocks(features), [features]);
-
-  const widths = useMemo(() => columnWidths(layout), [layout]);
-
-  const left = useMemo(
-    () => shownOf(layout, layout.left, absent),
-    [layout, absent],
-  );
-
-  const middle = useMemo(
-    () => shownOf(layout, layout.middle, absent),
-    [layout, absent],
-  );
-
-  const right = useMemo(
-    () => shownOf(layout, layout.right, absent),
-    [layout, absent],
-  );
-
-  const style = useMemo(
-    () =>
-      widths.length > 1
-        ? {
-            gridTemplateColumns: widths
-              .map((width) => `minmax(0, ${width}fr)`)
-              .join(' auto '),
-          }
-        : undefined,
-    [widths],
-  );
+  const shownIn = (
+    column: (layout: Layout) => readonly BlockId[],
+  ): InitializedObservable<readonly BlockId[]> =>
+    combine([layout$, absent$]).pipe(
+      map(([layout, absent]) => shownOf(layout, column(layout), absent)),
+    );
 
   return (
     <div
-      className={'block-layout'}
-      data-columns={layout.columns}
-      data-mode={layout.mode}
-      style={style}
+      class={constant('block-layout')}
+      data-columns={view(layout$, ({ columns }) => String(columns))}
+      data-mode={view(layout$, ({ mode }) => mode)}
+      style={view(layout$, gridOf)}
     >
-      <BlockColumn
-        blocks={blocks}
-        heights={layout.heights}
-        ids={left}
-        mode={layout.mode}
-        shares={layout.shares}
+      <BlockColumn blocks={blocks} ids$={shownIn(({ left }) => left)} />
+
+      <If
+        cond={view(layout$, ({ columns }) => columns === 3)}
+        then={
+          <>
+            <ColumnDivider position={'first'} />
+
+            <BlockColumn
+              blocks={blocks}
+              ids$={shownIn(({ middle }) => middle)}
+            />
+          </>
+        }
       />
 
-      {layout.columns === 3 ? (
-        <>
-          <ColumnDivider line={0} />
+      <If
+        cond={view(layout$, ({ columns }) => columns !== 1)}
+        then={
+          <>
+            <ColumnDivider position={'last'} />
 
-          <BlockColumn
-            blocks={blocks}
-            heights={layout.heights}
-            ids={middle}
-            mode={layout.mode}
-            shares={layout.shares}
-          />
-        </>
-      ) : undefined}
-
-      {layout.columns === 1 ? undefined : (
-        <>
-          <ColumnDivider line={layout.columns === 3 ? 1 : 0} />
-
-          <BlockColumn
-            blocks={blocks}
-            heights={layout.heights}
-            ids={right}
-            mode={layout.mode}
-            shares={layout.shares}
-          />
-        </>
-      )}
+            <BlockColumn blocks={blocks} ids$={shownIn(({ right }) => right)} />
+          </>
+        }
+      />
     </div>
   );
-});
+};
+
+const gridOf = (layout: Layout): string => {
+  const widths = columnWidths(layout);
+
+  return widths.length > 1
+    ? `grid-template-columns: ${widths
+        .map((width) => `minmax(0, ${width}fr)`)
+        .join(' auto ')}`
+    : '';
+};

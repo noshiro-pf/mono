@@ -406,8 +406,8 @@ that asked last.
 The "read 3 minutes ago" line, and every other age on the page, is measured
 against a clock of its own that ticks every second while the tab is shown, so
 a tab that stopped reading does not go on looking fresh. The ages are
-signals bound to their text nodes (below), so a tick rewrites those and
-renders no component.
+bound to their text nodes (below), so a tick rewrites those and nothing
+else.
 
 An answer for a token that has since been cleared or replaced is dropped, so
 **Clear** empties the page even while a read is still out.
@@ -426,14 +426,17 @@ and `<html>` follow the theme, the URL follows the layout (through
 `debounce`), IndexedDB follows the merge order's filters and the folded
 header once what it held has been read, and the Layout dialog opens and closes as the store says.
 
-**The components read the stores only through Preact signals**, which
-`store.mts` makes from them with `synstate-preact-signals`' `toSignal`, and
-change them only by calling their actions. Reading a signal's `.value` in a
-render renders that component again when it changes; handing the signal
-itself to JSX as a child or a DOM attribute rewrites that one node and
-renders nothing, which is how the ages keep up with the clock.
+**The view is synstate-dom**, which binds the stores' observables straight
+into the DOM: each component is called once, and a value that changes
+rewrites the one text node or attribute bound to it, never a component.
+Components change the stores only by calling their actions, and read the
+current value with `getSnapshot` in an event handler. A list of pull requests is a `For`
+keyed by number, so a pull request whose entry the store kept (below) keeps
+its DOM; a part shown or not is an `If` or a `MatchOptional`, which builds
+its branch only when the branch changes. That is how the ages keep up with
+the clock without anything else being touched.
 
-Nothing is made of a signal on the way to the view: what a component needs,
+Little is made of a store value on the way to the view: what a component needs,
 the store derives, and **the store writes only what changed**. GitHub answers
 every read with the whole report, so what changed is found once, where the
 answer is written: `reader.mts` keeps the status and each part of the report

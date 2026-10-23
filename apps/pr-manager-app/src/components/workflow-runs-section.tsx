@@ -1,7 +1,17 @@
-import { memoNamed } from 'preact-utils';
-import { Arr } from 'ts-data-forge';
-import type { ReadonlyRecord } from 'ts-type-forge';
-import { reportSource, type RunsStatus } from '../store/index.mjs';
+import type { InitializedObservable } from 'synstate';
+import {
+  constant,
+  For,
+  If,
+  mapBindable,
+  MatchOptional,
+  view,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
+import { Arr, Optional } from 'ts-data-forge';
+import type { ReadonlyRecord, RelaxedExtract } from 'ts-type-forge';
+import { reader, reportSource, type RunsStatus } from '../store/index.mjs';
 import type { StatusRole } from '../verdict.mjs';
 import {
   actionsQueryUrl,
@@ -12,8 +22,6 @@ import { ExternalLink } from './external-link.js';
 import { RunStateIcon } from './run-state-icon.js';
 import { Timestamp } from './timestamp.js';
 
-type Props = Readonly<{ runs: RunsStatus }>;
-
 /**
  * The workflow runs still going, or waiting on someone, newest first: what
  * the Actions tab shows filtered to them, which the title links to.
@@ -21,69 +29,127 @@ type Props = Readonly<{ runs: RunsStatus }>;
  * Rows, as the merged pull requests and the issues are: a run is a name, a
  * state and where it came from, and reads in one line and a half.
  */
-export const WorkflowRunsSection = memoNamed<Props>(
-  'WorkflowRunsSection',
-  ({ runs }) => (
-    <section className={'section'}>
-      <h2 className={'section-title'}>
-        {runs.type === 'ready' ? titleOf(runs.list) : 'Running workflows'}{' '}
-        <ExternalLink href={ACTIONS_URL} variant={'section-link'}>
-          {'on GitHub'}
-        </ExternalLink>
-      </h2>
+export const WorkflowRunsSection = (): JSX.Element => (
+  <section class={constant('section')}>
+    <h2 class={constant('section-title')}>
+      {view(reader.runs, (runs) =>
+        runs.type === 'ready' ? titleOf(runs.list) : 'Running workflows',
+      )}
+      {constant(' ')}
+      <ExternalLink href={constant(ACTIONS_URL)} variant={'section-link'}>
+        {constant('on GitHub')}
+      </ExternalLink>
+    </h2>
 
-      {runs.type === 'reading' ? (
-        <p className={'section-note'}>{'Reading GitHub…'}</p>
-      ) : runs.type === 'failed' ? (
-        <p className={'section-note'} data-status={'critical'}>
-          {runs.message}
-        </p>
-      ) : (
-        <>
-          {runs.error === undefined ? undefined : (
-            <p className={'section-note'} data-status={'critical'}>
-              {`The last read failed, so this is the one before it: ${runs.error}`}
+    <MatchOptional
+      value={view(reader.runs, readyOf)}
+      some={(ready$) => <RunList ready$={ready$} />}
+      none={
+        <MatchOptional
+          value={view(reader.runs, (runs) =>
+            runs.type === 'failed'
+              ? Optional.some(runs.message)
+              : Optional.none,
+          )}
+          some={(message$) => (
+            <p
+              class={constant('section-note')}
+              data-status={constant('critical')}
+            >
+              {message$}
             </p>
           )}
+          none={
+            <p class={constant('section-note')}>
+              {constant('Reading GitHub…')}
+            </p>
+          }
+        />
+      }
+    />
+  </section>
+);
 
-          {Arr.isEmpty(runs.list.runs) ? (
-            <p className={'section-note'}>{'No workflow is running.'}</p>
-          ) : (
-            <ul className={'run-list'}>
-              {runs.list.runs.map((run) => (
-                <li key={run.id} className={'run-item'}>
-                  <div className={'pull-request-heading'}>
-                    <RunStateMark state={run.state} />
+type Ready = RelaxedExtract<RunsStatus, Readonly<{ type: 'ready' }>>;
 
-                    <ExternalLink href={run.url} variant={'pull-request-title'}>
-                      {run.title}
-                    </ExternalLink>
-                  </div>
+const RunList = ({
+  ready$,
+}: Readonly<{ ready$: InitializedObservable<Ready> }>): JSX.Element => (
+  <>
+    <MatchOptional
+      value={view(ready$, ({ error }) => Optional.fromNullable(error))}
+      some={(error$) => (
+        <p class={constant('section-note')} data-status={constant('critical')}>
+          {view(
+            error$,
+            (error) =>
+              `The last read failed, so this is the one before it: ${error}`,
+          )}
+        </p>
+      )}
+    />
 
-                  <div className={'pull-request-row'}>
-                    <span>{`${run.workflow} #${run.runNumber}`}</span>
+    <If
+      cond={view(ready$, ({ list }) => Arr.isEmpty(list.runs))}
+      then={
+        <p class={constant('section-note')}>
+          {constant('No workflow is running.')}
+        </p>
+      }
+      else={
+        <ul class={constant('run-list')}>
+          <For
+            items={view(ready$, ({ list }) => list.runs)}
+            key={(run) => run.id}
+          >
+            {(run$) => (
+              <li class={constant('run-item')}>
+                <div class={constant('pull-request-heading')}>
+                  <RunStateMark state={view(run$, (run) => run.state)} />
 
-                    <span>{run.event}</span>
+                  <ExternalLink
+                    href={view(run$, (run) => run.url)}
+                    variant={'pull-request-title'}
+                  >
+                    {view(run$, (run) => run.title)}
+                  </ExternalLink>
+                </div>
 
-                    {run.branch === undefined ? undefined : (
-                      <span className={'branch'}>
-                        <span aria-hidden={'true'}>{'⎇ '}</span>
-                        {run.branch}
+                <div class={constant('pull-request-row')}>
+                  <span>
+                    {view(run$, (run) => `${run.workflow} #${run.runNumber}`)}
+                  </span>
+
+                  <span>{view(run$, (run) => run.event)}</span>
+
+                  <MatchOptional
+                    value={view(run$, (run) =>
+                      Optional.fromNullable(run.branch),
+                    )}
+                    some={(branch$) => (
+                      <span class={constant('branch')}>
+                        <span aria-hidden={constant('true')}>
+                          {constant('⎇ ')}
+                        </span>
+                        {branch$}
                       </span>
                     )}
+                  />
 
-                    <Timestamp iso={run.createdAt} label={'started'} />
+                  <Timestamp
+                    iso={view(run$, (run) => run.createdAt)}
+                    label={'started'}
+                  />
 
-                    <span>{`by ${run.actor}`}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </>
-      )}
-    </section>
-  ),
+                  <span>{view(run$, (run) => `by ${run.actor}`)}</span>
+                </div>
+              </li>
+            )}
+          </For>
+        </ul>
+      }
+    />
+  </>
 );
 
 /**
@@ -91,22 +157,44 @@ export const WorkflowRunsSection = memoNamed<Props>(
  * most of what this block lists, and a badge with the word for the rest,
  * which are rare enough that a word reads better than a glyph to learn.
  */
-const RunStateMark = memoNamed<Readonly<{ state: RunState }>>(
-  'RunStateMark',
-  ({ state }) => {
-    const { label, status: role } = STATE_PRESENTATION[state];
-
-    return state === 'in_progress' ? (
-      <RunStateIcon kind={'running'} label={label} />
-    ) : state === 'queued' ? (
-      <RunStateIcon kind={'queued'} label={label} />
-    ) : (
-      <span className={'badge'} data-status={role}>
-        {label}
-      </span>
-    );
-  },
+const RunStateMark = ({
+  state,
+}: Readonly<{ state: Bindable<RunState> }>): JSX.Element => (
+  <If
+    cond={mapBindable(state, (current) => current === 'in_progress')}
+    then={
+      <RunStateIcon
+        kind={'running'}
+        label={STATE_PRESENTATION.in_progress.label}
+      />
+    }
+    else={
+      <If
+        cond={mapBindable(state, (current) => current === 'queued')}
+        then={
+          <RunStateIcon
+            kind={'queued'}
+            label={STATE_PRESENTATION.queued.label}
+          />
+        }
+        else={
+          <span
+            class={constant('badge')}
+            data-status={mapBindable(
+              state,
+              (current) => STATE_PRESENTATION[current].status,
+            )}
+          >
+            {mapBindable(state, (current) => STATE_PRESENTATION[current].label)}
+          </span>
+        }
+      />
+    }
+  />
 );
+
+const readyOf = (runs: RunsStatus): Optional<Ready> =>
+  runs.type === 'ready' ? Optional.some(runs) : Optional.none;
 
 const ACTIONS_URL = actionsQueryUrl(reportSource);
 

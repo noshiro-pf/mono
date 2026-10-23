@@ -1,7 +1,7 @@
-import { memoNamed } from 'preact-utils';
+import { constant, derive, If, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { MAX_SCALE, MIN_SCALE } from '../dag-zoom.mjs';
-import { issuesViewSignals, issuesViewStore } from '../store/index.mjs';
+import { issuesViewStore } from '../store/index.mjs';
 
 /**
  * How large the DAG is drawn (`dag-zoom.mts`): a zoom out and a zoom in on
@@ -10,72 +10,78 @@ import { issuesViewSignals, issuesViewStore } from '../store/index.mjs';
  * the DAG is drawn by pressed. A zoom leaves neither pressed; one that can go
  * no further is disabled. Not drawn while there is no graph to zoom.
  */
-export const IssueDagZoom = memoNamed('IssueDagZoom', () => {
-  const scale = issuesViewSignals.dagScale.value;
+export const IssueDagZoom = (): JSX.Element => (
+  <If
+    cond={view(issuesViewStore.graph, ({ nodes }) => Arr.isNonEmpty(nodes))}
+    then={<Zoom />}
+  />
+);
 
-  const fitted = issuesViewSignals.dagFitted.value;
-
-  if (!Arr.isNonEmpty(issuesViewSignals.graph.value.nodes)) {
-    return undefined;
-  }
+const Zoom = (): JSX.Element => {
+  const { dagScale: scale$, dagFitted: fitted$ } = issuesViewStore;
 
   return (
-    <div className={'issue-dag-zoom'}>
-      <fieldset aria-label={'Zoom'} className={'view-switch'}>
+    <div class={constant('issue-dag-zoom')}>
+      <fieldset aria-label={constant('Zoom')} class={constant('view-switch')}>
         <button
-          aria-label={'Zoom out'}
-          className={'view-switch-option'}
-          disabled={scale <= MIN_SCALE}
-          title={'Zoom out'}
-          type={'button'}
+          aria-label={constant('Zoom out')}
+          class={constant('view-switch-option')}
+          disabled={view(scale$, (scale) => scale <= MIN_SCALE)}
+          title={constant('Zoom out')}
+          type={constant('button')}
           onClick={zoomOut}
         >
-          {'−'}
+          {constant('−')}
         </button>
 
-        <output aria-live={'polite'} className={'issue-dag-zoom-level'}>
-          {`${Math.round(scale * 100)}%`}
+        <output
+          aria-live={constant('polite')}
+          class={constant('issue-dag-zoom-level')}
+        >
+          {view(scale$, (scale) => `${Math.round(scale * 100)}%`)}
         </output>
 
         <button
-          aria-label={'Zoom in'}
-          className={'view-switch-option'}
-          disabled={scale >= MAX_SCALE}
-          title={'Zoom in'}
-          type={'button'}
+          aria-label={constant('Zoom in')}
+          class={constant('view-switch-option')}
+          disabled={view(scale$, (scale) => scale >= MAX_SCALE)}
+          title={constant('Zoom in')}
+          type={constant('button')}
           onClick={zoomIn}
         >
-          {'+'}
+          {constant('+')}
         </button>
       </fieldset>
 
-      <fieldset aria-label={'Draw the graph at'} className={'view-switch'}>
+      <fieldset
+        aria-label={constant('Draw the graph at')}
+        class={constant('view-switch')}
+      >
         <button
-          aria-pressed={fitted}
-          className={'view-switch-option'}
-          title={'The whole graph in the box, however large it is'}
-          type={'button'}
+          aria-pressed={view(fitted$, String)}
+          class={constant('view-switch-option')}
+          title={constant('The whole graph in the box, however large it is')}
+          type={constant('button')}
           onClick={fit}
         >
-          {'Fit'}
+          {constant('Fit')}
         </button>
 
         <button
-          aria-pressed={!fitted && scale === 1}
-          className={'view-switch-option'}
-          title={'Back to the natural size'}
-          type={'button'}
+          aria-pressed={derive([fitted$, scale$], (fitted, scale) =>
+            String(!fitted && scale === 1),
+          )}
+          class={constant('view-switch-option')}
+          title={constant('Back to the natural size')}
+          type={constant('button')}
           onClick={reset}
         >
-          {'100%'}
+          {constant('100%')}
         </button>
       </fieldset>
     </div>
   );
-});
-
-// Outside the component, so that each button is handed the same function on
-// every render.
+};
 
 const zoomOut = (): void => {
   issuesViewStore.zoomOut();

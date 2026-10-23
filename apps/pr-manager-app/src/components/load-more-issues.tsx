@@ -1,45 +1,54 @@
-import { memoNamed } from 'preact-utils';
+import {
+  constant,
+  derive,
+  MatchOptional,
+  view,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { ISSUES_PAGE_SIZE } from '../report-query.mjs';
-import { reader, readerSignals } from '../store/index.mjs';
+import { reader } from '../store/index.mjs';
 
 type Props = Readonly<{
   /** How many open issues the list does not show yet. */
-  notListed: number;
+  notListed: Bindable<number>;
 }>;
 
 /**
  * The button under the open issues that lists the next page of them, and
  * why it did not if it did not.
- *
- * Its own component because the page being read changes nothing else, and
- * the one that reads that is the one that renders again for it.
  */
-export const LoadMoreIssues = memoNamed<Props>(
-  'LoadMoreIssues',
-  ({ notListed }) => {
-    const moreIssues = readerSignals.moreIssues.value;
+export const LoadMoreIssues = ({ notListed }: Props): JSX.Element => {
+  const loading = view(reader.moreIssues, ({ type }) => type === 'loading');
 
-    const loading = moreIssues.type === 'loading';
-
-    return (
-      <div className={'load-more'}>
-        <button
-          className={'load-more-button'}
-          disabled={loading}
-          type={'button'}
-          onClick={reader.loadMoreIssues}
-        >
-          {loading
+  return (
+    <div class={constant('load-more')}>
+      <button
+        class={constant('load-more-button')}
+        disabled={loading}
+        type={constant('button')}
+        onClick={reader.loadMoreIssues}
+      >
+        {derive([loading, notListed], (isLoading, count) =>
+          isLoading
             ? 'Reading…'
-            : notListed > 0
-              ? `Show ${Math.min(notListed, ISSUES_PAGE_SIZE)} more (${notListed} not shown)`
-              : 'Show more'}
-        </button>
+            : count > 0
+              ? `Show ${Math.min(count, ISSUES_PAGE_SIZE)} more (${count} not shown)`
+              : 'Show more',
+        )}
+      </button>
 
-        {moreIssues.type === 'failed' ? (
-          <span className={'poll-error'}>{moreIssues.message}</span>
-        ) : undefined}
-      </div>
-    );
-  },
-);
+      <MatchOptional
+        value={view(reader.moreIssues, (moreIssues) =>
+          moreIssues.type === 'failed'
+            ? Optional.some(moreIssues.message)
+            : Optional.none,
+        )}
+        some={(message$) => (
+          <span class={constant('poll-error')}>{message$}</span>
+        )}
+      />
+    </div>
+  );
+};

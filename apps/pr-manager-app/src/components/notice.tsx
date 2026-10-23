@@ -1,8 +1,7 @@
-import type { ComponentChildren } from 'preact';
-import { memoNamed } from 'preact-utils';
+import { constant, type Child, type JSX } from 'synstate-dom';
 import type { StatusRole } from '../verdict.mjs';
 
-type Props = Readonly<{ tone: StatusRole; children: ComponentChildren }>;
+type Props = Readonly<{ tone: StatusRole; children: Child }>;
 
 /**
  * Everything the page says when it has no report to show.
@@ -11,8 +10,8 @@ type Props = Readonly<{ tone: StatusRole; children: ComponentChildren }>;
  * carries the live region, and the two together are one announcement written
  * twice.
  */
-export const Notice = memoNamed<Props>('Notice', ({ tone, children }) => (
-  <output className={'notice'} data-status={tone}>
+export const Notice = ({ tone, children }: Props): JSX.Element => (
+  <output class={constant('notice')} data-status={constant(tone)}>
     {children}
   </output>
-));
+);
