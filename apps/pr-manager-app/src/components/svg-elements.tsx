@@ -14,7 +14,7 @@ import type { ReadonlyRecord } from 'ts-type-forge';
  * It makes `a`, `title`, `script` and `style` HTML elements wherever they are
  * written (its SPEC.md 5.2), and an HTML `<a>` inside an `<svg>` draws
  * nothing, nor does an HTML `<title>` name it; and it takes a fixed list of
- * SVG attributes, which leaves out `focusable` and the marker's. Each of these
+ * SVG attributes, which leaves out `focusable`. Each of these
  * goes once the library can say them itself.
  */
 

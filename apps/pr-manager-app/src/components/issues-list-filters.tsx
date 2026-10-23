@@ -145,7 +145,7 @@ const LabelPick = ({
             class={constant('label-pick-dot')}
             style={{
               'background-color': view(label$, ({ color }) =>
-                color === undefined ? '' : chipColors(color).background,
+                color === undefined ? undefined : chipColors(color).background,
               ),
             }}
           />
