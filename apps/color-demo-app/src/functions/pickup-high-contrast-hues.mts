@@ -16,10 +16,14 @@ import type {
   Percent,
   SmallUint,
 } from 'ts-type-forge';
-import { hslToRgb, relativeLuminance, type Hue } from 'ts-utils-additional';
+import {
+  hslToRgb,
+  relativeLuminance,
+  toHue,
+  type Hue,
+} from 'ts-utils-additional';
 import { huesDefault } from '../constants/index.mjs';
 import { getLuminanceListAccumulated } from './luminance-list-accumulated.mjs';
-import { toHue } from './to-hue.mjs';
 
 /** RelativeLuminanceの差分を累積した分布関数を縦軸yでn等分して、対応するx座標（=hue）を返す */
 export function pickupHighContrastHues<N extends SmallUint>(

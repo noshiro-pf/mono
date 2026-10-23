@@ -11,9 +11,13 @@ import * as React from 'react';
 import { memoNamed } from 'react-utils';
 import { Arr, Num, type Uint8 } from 'ts-data-forge';
 import type { DeepReadonly, Percent } from 'ts-type-forge';
-import { blackHsl, contrastRatioHsl, whiteHsl } from 'ts-utils-additional';
+import {
+  blackHsl,
+  contrastRatioHsl,
+  toHue,
+  whiteHsl,
+} from 'ts-utils-additional';
 import { huesDefault } from '../../constants/index.mjs';
-import { toHue } from '../../functions/index.mjs';
 
 const indices = [0, 1, 2] as const;
 
