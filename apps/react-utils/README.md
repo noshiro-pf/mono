@@ -31,9 +31,12 @@ React 19 and the React Compiler rules account for most of it.
   `ReactNode` is no longer a `ReactNode`.
 - `React.Reducer` was removed from React's types; `useAsyncReducer` declares the
   one line it was.
-- `getPlatform` and `PromiseState` have no successor in `ts-data-forge`;
-  [`src/utils`](./src/utils) carries them, each with a note on where it came
-  from.
+- `getPlatform` has no successor in `ts-data-forge`;
+  [`src/utils`](./src/utils) carries it, with a note on where it came from.
+- `PromiseState` was ported the same way and has since been replaced by
+  `AsyncData` from `ts-std-forge`: `usePromiseValue` returns
+  `AsyncData<T, unknown>`, starting at `AsyncData.pending()` because the
+  promise is already running when the hook receives it.
 - **`createTinyObservable` is gone: the observable is `synstate`'s.** The port
   was a 37-line multicast callback list, and `source()` is that list with a
   value and a graph around it — more than the hooks asked for, but not a

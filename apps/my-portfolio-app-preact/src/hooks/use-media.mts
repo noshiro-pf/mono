@@ -10,9 +10,9 @@ type MediaQueryState = Readonly<{
  * What `preact-media-hook`'s `useMedia` did, ported here.
  *
  * The package is a thin wrapper over `matchMedia` and has no successor in this
- * repository, so it follows the precedent set by `getPlatform` and
- * `PromiseState` in `apps/react-utils`: port the one function the app uses into
- * the app that uses it, rather than take a dependency for it.
+ * repository, so it follows the precedent set by `getPlatform` in
+ * `apps/react-utils`: port the one function the app uses into the app that uses
+ * it, rather than take a dependency for it.
  *
  * The subscription is what the wrapper was for — a bare `matchMedia` read would
  * never update when the viewport crosses the breakpoint.

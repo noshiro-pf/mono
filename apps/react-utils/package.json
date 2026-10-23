@@ -30,7 +30,8 @@
   "dependencies": {
     "better-react-use-state": "workspace:*",
     "synstate": "workspace:*",
-    "ts-data-forge": "workspace:*"
+    "ts-data-forge": "workspace:*",
+    "ts-std-forge": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "catalog:",
