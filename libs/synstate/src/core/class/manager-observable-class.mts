@@ -30,13 +30,17 @@ export class ManagerObservableClass<
    * treat as a holey array.
    *
    * An update walks this array and its sets in place. Adding or removing a
-   * node is O(1) and there is no flat order to rebuild; only the first node
-   * of a depth replaces the array with a longer copy. A node deleted during
-   * the walk is skipped by the set's iterator; a node registered during it is
-   * also put in `#mut_joinedDuringUpdate` and skipped, so an update visits the
-   * nodes that existed when it began.
+   * node is O(1) and there is no flat order to rebuild. The first node of a
+   * depth extends the array in place, except during this node's own update,
+   * when it replaces the array with a longer copy so that the walk keeps the
+   * array it began on; copying every time made a deep graph with many roots
+   * cubic to build, each root copying its array once per depth. A node
+   * deleted during the walk is skipped by the set's iterator; a node
+   * registered during it is also put in `#mut_joinedDuringUpdate` and
+   * skipped, so an update visits the nodes that existed when it began.
    */
-  #mut_propagationOrder: readonly (MutableSet<ChildNode> | undefined)[];
+  // @sumi-expect-error readonly/require-readonly-type
+  #mut_propagationOrder: (MutableSet<ChildNode> | undefined)[];
 
   /** Whether this node is propagating an update of its own. */
   #mut_isPropagating: boolean;
@@ -95,12 +99,20 @@ export class ManagerObservableClass<
     const mut_bucket = descendants[index];
 
     if (mut_bucket === undefined) {
-      // The first node of its depth: rare, so the array is copied rather than
-      // written, which also leaves a walk already under way on the old one.
-      this.#mut_propagationOrder = Array.from(
-        { length: Math.max(descendants.length, index + 1) },
-        (_, i) => (i === index ? new Set([child]) : descendants[i]),
-      );
+      if (this.#mut_isPropagating) {
+        // A walk is under way on this array; it keeps the old one.
+        this.#mut_propagationOrder = Array.from(
+          { length: Math.max(descendants.length, index + 1) },
+          (_, i) => (i === index ? new Set([child]) : descendants[i]),
+        );
+      } else {
+        // Filled up to `index` with `undefined`, so that the array has no gap.
+        while (descendants.length < index) {
+          descendants.push(undefined);
+        }
+
+        descendants[index] = new Set([child]);
+      }
     } else {
       mut_bucket.add(child);
     }
