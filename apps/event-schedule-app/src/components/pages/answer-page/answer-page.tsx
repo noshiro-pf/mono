@@ -9,7 +9,11 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import html2canvas from 'html2canvas';
 import * as React from 'react';
-import { AlertWithMaxWidth, BpSwitch } from 'react-blueprintjs-utils';
+import {
+  AlertWithMaxWidth,
+  BpSwitch,
+  toClassName,
+} from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
 import { useObservableValue } from 'synstate-react-hooks';
 import { castMutable, match } from 'ts-data-forge';
@@ -28,7 +32,6 @@ import {
   eventSchedule$,
   holidaysJpDefinition$,
 } from '../../../store/index.mjs';
-import { toClassName } from '../../../utils/index.mjs';
 import {
   CustomIcon,
   Description,

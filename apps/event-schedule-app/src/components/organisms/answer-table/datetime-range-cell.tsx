@@ -1,8 +1,8 @@
 import * as React from 'react';
+import { calendarDateColor } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
 import { type IMapMapped, match } from 'ts-data-forge';
 import {
-  calendarDateColor,
   dict,
   hm2str,
   ymd2dayStr,
