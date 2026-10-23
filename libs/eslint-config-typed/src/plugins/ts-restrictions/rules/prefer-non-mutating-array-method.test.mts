@@ -248,6 +248,13 @@ describe('prefer-non-mutating-array-method through type wrappers', () => {
           const y = Array.from(xs as Iterable<number>).sort();
         `,
       },
+      {
+        name: 'a `satisfies` the original array does not meet keeps the copy',
+        code: dedent`
+          declare const xs: readonly number[];
+          const y = (Array.from(xs) satisfies number[]).sort();
+        `,
+      },
     ],
     invalid: [
       {
@@ -278,6 +285,18 @@ describe('prefer-non-mutating-array-method through type wrappers', () => {
           { messageId: 'preferNonMutatingMethod' },
           { messageId: 'preferNonMutatingMethod' },
         ],
+      },
+      {
+        name: 'a `satisfies` the original array meets too',
+        code: dedent`
+          declare const xs: number[];
+          const y = (Array.from(xs) satisfies readonly number[]).sort();
+        `,
+        output: dedent`
+          declare const xs: number[];
+          const y = (xs satisfies readonly number[]).toSorted();
+        `,
+        errors: [{ messageId: 'preferNonMutatingMethod' }],
       },
       {
         name: 'a fill value wrapped in `satisfies`',

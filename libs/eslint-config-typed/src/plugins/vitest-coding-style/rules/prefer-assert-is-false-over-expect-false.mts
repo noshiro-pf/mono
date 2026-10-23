@@ -3,7 +3,11 @@ import {
   ESLintUtils,
   type TSESLint,
 } from '@typescript-eslint/utils';
-import { getArgumentText, skipTypeWrappers } from 'eslint-rule-forge';
+import {
+  getArgumentText,
+  skipTypeWrappers,
+  typeWrapperLayers,
+} from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
 import { getVitestReceiver } from './vitest-binding.mjs';
@@ -15,8 +19,10 @@ type Options = readonly [];
 /**
  * `expect(X).toBe(false)` becomes `assert.isFalse(X)` when `X` is a boolean. The
  * calls, the `expect` function and the `false` are read through `as`,
- * `satisfies`, `!` and `<T>`; `X` keeps its wrappers, and its type is asked
- * with them, since that is the argument `assert.isFalse` receives.
+ * `satisfies`, `!` and `<T>`; `X` keeps its wrappers, and is a boolean only
+ * if the type at every layer of them is one: a widening `as` is the author
+ * saying it may not be, and a narrowing one (`v as boolean` on an `unknown`,
+ * `flag!`) does not make the value a boolean.
  */
 export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
   MessageIds,
@@ -71,16 +77,17 @@ export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
         ) {
           const arg = expectCall.arguments[0];
 
-          if (arg !== undefined) {
-            const tsNode = parserServices.esTreeNodeToTSNodeMap.get(arg);
+          if (
+            arg !== undefined &&
+            !typeWrapperLayers(arg).every((layer) => {
+              const type = checker.getTypeAtLocation(
+                parserServices.esTreeNodeToTSNodeMap.get(layer),
+              );
 
-            const type = checker.getTypeAtLocation(tsNode);
-
-            const isBoolean = (type.flags & ts.TypeFlags.Boolean) !== 0;
-
-            if (!isBoolean) {
-              return;
-            }
+              return (type.flags & ts.TypeFlags.Boolean) !== 0;
+            })
+          ) {
+            return;
           }
 
           const argText =

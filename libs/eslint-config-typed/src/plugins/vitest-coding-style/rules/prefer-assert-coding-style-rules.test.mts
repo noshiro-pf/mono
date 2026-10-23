@@ -602,6 +602,22 @@ describe('prefer-assert-is-true-over-expect-true through type wrappers', () => {
             expect(flag).toBe(false as boolean);
           `,
         },
+        {
+          name: 'a narrowing assertion does not make the value a boolean',
+          code: dedent`
+            declare const v: unknown;
+            declare const maybe: boolean | undefined;
+            expect(v as boolean).toBe(true);
+            expect(maybe!).toBe(true);
+          `,
+        },
+        {
+          name: 'a widening cast is the author saying it may not be a boolean',
+          code: dedent`
+            declare const flag: boolean;
+            expect(flag as boolean | undefined).toBe(true);
+          `,
+        },
       ],
       invalid: [
         {
@@ -650,6 +666,18 @@ describe('prefer-assert-is-true-over-expect-true through type wrappers', () => {
           `,
           errors: [{ messageId: 'preferAssertIsTrueOverExpectTrue' }],
         },
+        {
+          name: 'an argument that is a boolean at every layer',
+          code: dedent`
+            declare const flag: boolean;
+            expect(flag as boolean).toBe(true);
+          `,
+          output: dedent`
+            declare const flag: boolean;
+            assert.isTrue(flag as boolean);
+          `,
+          errors: [{ messageId: 'preferAssertIsTrueOverExpectTrue' }],
+        },
       ],
     },
   );
@@ -692,6 +720,15 @@ describe('prefer-assert-is-false-over-expect-false through type wrappers', () =>
           code: dedent`
             declare const flag: boolean;
             expect(flag).toBe(true as boolean);
+          `,
+        },
+        {
+          name: 'a narrowing assertion does not make the value a boolean',
+          code: dedent`
+            declare const v: unknown;
+            declare const maybe: boolean | undefined;
+            expect(v as boolean).toBe(false);
+            expect(maybe!).toBe(false);
           `,
         },
       ],

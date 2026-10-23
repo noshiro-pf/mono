@@ -2,7 +2,12 @@ import {
   isTypeNeverType,
   isTypeUnknownType,
 } from '@typescript-eslint/type-utils';
-import { ESLintUtils } from '@typescript-eslint/utils';
+import {
+  AST_NODE_TYPES,
+  ESLintUtils,
+  type TSESTree,
+} from '@typescript-eslint/utils';
+import { typeWrapperLayers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import {
   isArrayTypeNode,
@@ -19,9 +24,13 @@ import {
   isUnionTypeNode,
   type NodeArray,
   type ParameterDeclaration,
+  type Signature,
+  type SignatureDeclaration,
   SyntaxKind,
+  type Type,
   type TypeElement,
   type TypeNode,
+  type TypeParameterDeclaration,
 } from 'typescript';
 import { createRule } from './common.mjs';
 
@@ -94,13 +103,158 @@ export const noHiddenTypeAssertions = createRule({
         )
         .flatMap((parameter) => explodeTypeNode(parameter, depth));
 
+    /**
+     * The type parameters of `declaration` that its return type uses, with
+     * their positional index (to look up the corresponding type arguments), or
+     * `undefined` when it declares no type parameters or no return type.
+     */
+    const typeParamsUsedInReturnTypeOf = (
+      declaration: SignatureDeclaration,
+    ):
+      | readonly Readonly<{
+          typeParameter: TypeParameterDeclaration;
+          index: number;
+        }>[]
+      | undefined => {
+      const { typeParameters, type: returnType } = declaration;
+
+      if (
+        returnType === undefined ||
+        typeParameters === undefined ||
+        typeParameters.length === 0
+      ) {
+        return undefined;
+      }
+
+      const returnTypes = explodeTypeNode(returnType, 0);
+
+      return typeParameters
+        .map((typeParameter, index) => ({ typeParameter, index }))
+        .filter((typeParameter) =>
+          returnTypes.some(
+            (retType) =>
+              isTypeReferenceNode(retType) &&
+              retType.typeName.kind === SyntaxKind.Identifier &&
+              retType.typeName.text === typeParameter.typeParameter.name.text,
+          ),
+        );
+    };
+
+    /**
+     * Whether every type parameter of `declaration` that its return type uses
+     * also appears in at least one (value) parameter. If so, the function
+     * probably isn't a hidden type assertion.
+     */
+    const returnTypeParamsAppearInValueParams = (
+      declaration: SignatureDeclaration,
+      typeParamsUsedInReturnType: readonly Readonly<{
+        typeParameter: TypeParameterDeclaration;
+      }>[],
+    ): boolean => {
+      const parameters = parametersToTypeNodes(declaration.parameters, 0);
+
+      return typeParamsUsedInReturnType
+        .map(({ typeParameter }) => typeParameter)
+        .every((typeParameter) =>
+          parameters.some(
+            (parameter) =>
+              isTypeReferenceNode(parameter) &&
+              parameter.typeName.kind === SyntaxKind.Identifier &&
+              typeParameter.name.text === parameter.typeName.text,
+          ),
+        );
+    };
+
+    /**
+     * Whether a call signature of `type` is a hidden type assertion: generic
+     * in a type parameter that only its return type uses.
+     */
+    const hasHiddenTypeAssertionSignature = (type: Type): boolean =>
+      type.getCallSignatures().some((signature) => {
+        const { declaration } = signature;
+
+        if (
+          declaration === undefined ||
+          declaration.kind === SyntaxKind.JSDocSignature
+        ) {
+          return false;
+        }
+
+        const typeParamsUsedInReturnType =
+          typeParamsUsedInReturnTypeOf(declaration);
+
+        return (
+          typeParamsUsedInReturnType !== undefined &&
+          !returnTypeParamsAppearInValueParams(
+            declaration,
+            typeParamsUsedInReturnType,
+          )
+        );
+      });
+
+    /**
+     * Whether the callee is a cast (`as` or `<T>`) of a function whose
+     * signature is a hidden type assertion: `(parse as () => Foo)()` picks
+     * `Foo` for `parse`'s type parameter as surely as `parse<Foo>()` does, and
+     * the cast is not reported by `no-unsafe-type-assertion`, since the
+     * generic function is assignable to every instantiation of it. Every layer
+     * under the outermost cast is asked, so that `parse as unknown as () =>
+     * Foo` is seen too. A call whose result is `unknown` or `never` asserts
+     * nothing.
+     */
+    const isCallThroughCastOfHiddenTypeAssertion = (
+      node: TSESTree.CallExpression,
+      callSignature: Signature,
+    ): boolean => {
+      const layers = typeWrapperLayers(node.callee);
+
+      const castIndex = layers.findIndex(
+        (layer) =>
+          layer.type === AST_NODE_TYPES.TSAsExpression ||
+          layer.type === AST_NODE_TYPES.TSTypeAssertion,
+      );
+
+      if (castIndex === -1) {
+        return false;
+      }
+
+      const returnType = callSignature.getReturnType();
+
+      if (isTypeUnknownType(returnType) || isTypeNeverType(returnType)) {
+        return false;
+      }
+
+      return layers
+        .slice(castIndex + 1)
+        .some((layer) =>
+          hasHiddenTypeAssertionSignature(
+            checker.getTypeAtLocation(
+              parserServices.esTreeNodeToTSNodeMap.get(layer),
+            ),
+          ),
+        );
+    };
+
     return {
       CallExpression: (node) => {
         const tsExpressionNode = parserServices.esTreeNodeToTSNodeMap.get(node);
 
         const callSignature = checker.getResolvedSignature(tsExpressionNode);
 
-        if (callSignature?.declaration === undefined) {
+        if (callSignature === undefined) {
+          return;
+        }
+
+        if (isCallThroughCastOfHiddenTypeAssertion(node, callSignature)) {
+          context.report({
+            node,
+            messageId: 'errorStringGeneric',
+          } as const);
+
+          return;
+        }
+
+        if (callSignature.declaration === undefined) {
           return;
         }
 
@@ -109,38 +263,13 @@ export const noHiddenTypeAssertions = createRule({
           return;
         }
 
-        const typeParameters = callSignature.declaration.typeParameters;
-
-        const parameters = parametersToTypeNodes(
-          callSignature.declaration.parameters,
-          0,
+        const typeParamsUsedInReturnType = typeParamsUsedInReturnTypeOf(
+          callSignature.declaration,
         );
 
-        const returnType = callSignature.declaration.type;
-
-        if (
-          returnType === undefined ||
-          typeParameters === undefined ||
-          typeParameters.length === 0
-        ) {
+        if (typeParamsUsedInReturnType === undefined) {
           return;
         }
-
-        const returnTypes = explodeTypeNode(returnType, 0);
-
-        // Of all the type parameters, these are the ones that are used in the
-        // return type (alongside their positional index, which we use next to
-        // look up corresponding type arguments)
-        const typeParamsUsedInReturnType = typeParameters
-          .map((typeParameter, index) => ({ typeParameter, index }))
-          .filter((typeParameter) =>
-            returnTypes.some(
-              (retType) =>
-                isTypeReferenceNode(retType) &&
-                retType.typeName.kind === SyntaxKind.Identifier &&
-                retType.typeName.text === typeParameter.typeParameter.name.text,
-            ),
-          );
 
         // Of all the type parameters that appear in the return type,
         // are they all set to `unknown` type arguments in this specific call?
@@ -171,22 +300,12 @@ export const noHiddenTypeAssertions = createRule({
           return;
         }
 
-        // Confirms that all the type parameters that appear in the return type ALSO
-        // appear in at least one (value) parameter. If they do, this probably isn't
-        // a hidden type assertion.
-        const allTypeParamsUsedInReturnTypeAlsoAppearInValueParams =
-          typeParamsUsedInReturnType
-            .map(({ typeParameter }) => typeParameter)
-            .every((typeParameter) =>
-              parameters.some(
-                (parameter) =>
-                  isTypeReferenceNode(parameter) &&
-                  parameter.typeName.kind === SyntaxKind.Identifier &&
-                  typeParameter.name.text === parameter.typeName.text,
-              ),
-            );
-
-        if (!allTypeParamsUsedInReturnTypeAlsoAppearInValueParams) {
+        if (
+          !returnTypeParamsAppearInValueParams(
+            callSignature.declaration,
+            typeParamsUsedInReturnType,
+          )
+        ) {
           context.report({
             node,
             messageId: 'errorStringGeneric',
