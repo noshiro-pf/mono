@@ -61,7 +61,10 @@ export type AsyncChildObservableTools<A> = Readonly<{
  * hooks the factory calls, which read the state `init` creates.
  */
 export type SyncChildObservableHooks = Readonly<{
-  /** Called with the token of every update that reaches this observable. */
+  /**
+   * Called with the token of every update in which a parent of this
+   * observable emitted.
+   */
   tryUpdate: (updateToken: UpdateToken) => void;
 
   /**
@@ -124,10 +127,10 @@ export type InitializedChildObservableConfig<
  * other synchronous operators are built with it.
  *
  * `init` runs during construction and receives the tools. It returns
- * `tryUpdate`, which is called with the token of every update that reaches
- * this observable — a parent that did not emit in that update has a different
- * `updateToken`; to emit, call `setNext` with the token received — or an
- * object holding `tryUpdate` and the other hooks
+ * `tryUpdate`, which is called with the token of every update in which some
+ * parent of this observable emitted — a parent that did not emit in that
+ * update has a different `updateToken`; to emit, call `setNext` with the
+ * token received — or an object holding `tryUpdate` and the other hooks
  * ({@link SyncChildObservableHooks}). State the hooks share can live inside
  * `init`, next to the teardown it registers with the `onComplete` tool.
  * `init` may complete the observable; it is then never registered to its

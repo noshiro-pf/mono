@@ -1,0 +1,123 @@
+---
+title: Tracing an Update
+description: Every field SynState's propagation reads or writes, step by step, through two updates of the filter diamond and an update a subscriber starts inside another.
+sidebar:
+    order: 4
+---
+
+import PropagationTrace from '../../../components/propagation-animation/propagation-trace-island.astro';
+
+[How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/) described the queue as buckets, one per depth. This page follows the code that implements them, field by field, through two updates of the graph from "Handling skipped updates", and then through an update that a subscriber starts inside another. Each step shows what the code holds after it: the module state of `propagation-state.mts`, the private fields of the update's `UpdateQueue`, the local variables of the function running, and three fields of every node.
+
+## The graph
+
+`combine` and the `map` after it are two nodes, so the `C` of the previous page appears here as `BD` (the `combine`) and `C` (the `map`):
+
+```tsx
+import { combine, createState, filter, map } from 'synstate';
+
+const [A, setA] = createState(0);
+
+const B = A.pipe(map((n) => n * 10)); // depth 1
+
+const D = A.pipe(filter((n) => n % 2 === 0)); // depth 1
+
+const BD = combine([B, D]); // depth 2
+
+const C = BD.pipe(map(([b, d]) => b + d)); // depth 3
+
+const E = D.pipe(map((n) => n * 10)); // depth 2
+
+setA(1); // B = 10, BD = [10, 0], C = 10; D rejects 1, so E is not reached
+
+setA(2); // B = 20, D = 2, BD = [20, 2], E = 20, C = 22
+```
+
+## Where the queue lives
+
+| Where                     | Field                                             | What it holds                                                                                                                                                                                |
+| :------------------------ | :------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `propagation-state.mts`   | `propagation.depth`, `propagation.outermostToken` | How many `startUpdate` calls are running, and the token of the outermost one. A root written to while `depth > 0` is written to from inside an update, and warns once.                       |
+|                           | `queueState.level`                                | How many updates of this copy of SynState are open: 1 for the outermost, 2 for an update started inside it.                                                                                  |
+|                           | `bucketSets[level - 1]`                           | The buckets of the update at that level: `nodes[index]`, an array of the nodes queued at depth `base + index`, and `lengths[index]`, how many of its slots are in use.                       |
+| `UpdateQueue` (the token) | `#base`                                           | The depth of bucket 0: the depth of the node that started the update, plus one. A node goes in bucket `node.depth - base`.                                                                   |
+|                           | `#buckets`                                        | The bucket set this update uses.                                                                                                                                                             |
+|                           | `#size`                                           | How many buckets are in use. The drain loop runs up to it, and it grows while the loop runs.                                                                                                 |
+|                           | `#isOpen`                                         | Whether the update is still running. A mark of an update that has closed means nothing, and is overwritten.                                                                                  |
+|                           | `#queuedDespiteMark`                              | The nodes this update has queued while another open update's mark was on them (see [below](#a-write-from-a-subscriber)). Made on first use, so it stays `undefined` in the two updates here. |
+| every node                | `updateToken`                                     | The token of the last update the node emitted in. Its children compare it with the token they are given.                                                                                     |
+|                           | `snapshot`                                        | The node's current value.                                                                                                                                                                    |
+|                           | `queuedFor`                                       | The mark: the token of the last update that queued the node. Comparing it with the update's own token is what queues a node only once per update.                                            |
+
+The bucket sets are module state, kept from one update to the next. An update empties a bucket by setting its length back to 0, not by making a new array, and it sets each slot back to `undefined` when it takes the node out, so that a slot does not keep a node alive. The next update writes over those slots, so after the first few updates an update allocates nothing but its token. Neither is `queuedFor` cleared after the visit: the next update has a new token, so an old mark never equals it, and `#isOpen` tells a mark that has ended from one that is still in use.
+
+In the drawing, a cyan tag on a node is a slot in use, `[index][slot]`, holding it, and a pink tag is a local variable holding it: `child` in `enqueueChildren` and `#push`, and `node` in `drain`. A dashed yellow ring means the node carries the mark of an update that is still open. In the panel, a slot past its bucket's length is drawn faded: it is not in use, whatever it holds. A field highlighted in pink changed in this step. The steps come from a model of the code below them; the tests of the samples on this page check that the library emits in the same order.
+
+## Update 1: `setA(1)`, an odd value
+
+<PropagationTrace scenario="filterDiamond" update={1} lang="en" />
+
+- `bucketSets[0]` and each of its arrays are made the first time they are needed: this is the update that pays for them.
+- `B` and `D` go in `nodes[0]`, at slots 0 and 1. `#size` grows from 2 to 3 while the loop is at `index = 1`, when `BD` queues `C`. The loop compares `index` with `#size` on every turn, so it reaches the new bucket.
+- `D` is visited, rejects 1, and returns without `setNext`: it keeps `t0`, and queues neither `BD` nor `E`. `BD` is visited anyway, because `B` queued it, and sees `B.updateToken === t1` and `D.updateToken === t0`. `E` is never touched.
+
+## Update 2: `setA(2)`, an even value
+
+<PropagationTrace scenario="filterDiamond" update={2} lang="en" />
+
+- `t2` takes the same `bucketSets[0]`. Every length is 0, so it is empty, though its arrays still have their slots; `#push` writes `B` and `D` over the `undefined` that update 1 left in them.
+- `B.queuedFor` is still `t1`, but `t1` has closed, so the mark is overwritten with `t2`. `BD` gets `queuedFor === t2` from `B`, so when `D` passes 2 and queues its children, `BD` is skipped: that one comparison keeps a node from being queued twice. `E` takes slot 1 of `nodes[1]`, which grows by one.
+- When the update ends, every length is 0 and every slot `undefined` again; the marks stay, as `t2`'s.
+
+## A write from a subscriber
+
+A subscriber that writes to a root starts an update while the update that called it is still draining. SynState lets the write through, and warns once per root, because the subscribers of the graph can then see intermediate states: in this graph, `BDR` emits twice for one `setA`.
+
+```tsx
+import { combine, createState, map } from 'synstate';
+
+const [A, setA] = createState(0);
+
+const [R, setR] = createState(0);
+
+const B = A.pipe(map((n) => n * 10)); // depth 1
+
+const D = A.pipe(map((n) => n * 100)); // depth 1
+
+const BDR = combine([B, D, R]); // depth 2
+
+// A write from a subscriber: an update nested in the one that reached D.
+D.subscribe((d) => {
+    if (d > 0) {
+        setR(d);
+    }
+});
+
+const mut_received: (readonly number[])[] = [];
+
+BDR.subscribe((values) => {
+    mut_received.push(values);
+});
+
+setA(1); // warns once: a root written to from a subscriber
+
+// [0, 0, 0], then [10, 100, 100] twice: in setR(100), then in setA(1)
+```
+
+<PropagationTrace scenario="nestedWrite" update={1} lang="en" />
+
+- `B` queues `BDR` in `t1` before `D`'s subscriber runs. When `setR(100)` starts `t2`, `BDR` waits in `t1`'s `nodes[1]` with `queuedFor === t1`.
+- `t2` is the second update open in this copy (`queueState.level` is 2), so it takes `bucketSets[1]`, a set of its own: it never writes into the buckets `t1` is still draining.
+- `R` queues `BDR` in `t2`. `BDR.queuedFor` is `t1`, and `t1.isOpen` is true, so `t2` leaves the mark alone: had it written `t2` there, `t1` would no longer see `BDR` as queued, and would queue it a second time if another parent of `BDR` emitted later in `t1`. `t2` records `BDR` in its own `#queuedDespiteMark` instead, which keeps `t2` itself from queuing it twice, and puts it in its `nodes[1]`.
+- `t2` runs to the end inside `D`'s subscriber: drained and closed before `t1` visits another node. `t1`'s buckets are as it left them, so `t1` visits `BDR` again, and `BDR` emits `[10, 100, 100]` once per token. `t1` cannot tell that `t2` has already brought `BDR` up to date.
+- `propagation.depth` counts both updates, so `outermostToken` stays `t1`, and the work deferred with `runAfterPropagation` waits for `t1`'s `endPropagation`.
+
+Deriving the value instead (`const R = D.pipe(…)`) avoids the warning and the second emission: the one update reaches `BDR` once, with every parent settled.
+
+:::caution[A write that never stops]
+The nested update runs to its end inside the subscriber, on the call stack. So a subscriber that writes back into the update that called it recurses, either directly, `A.subscribe((a) => setA(a + 1))`, or through another root, `A.subscribe((a) => setB(a + 1))` with `B.subscribe((b) => setA(b + 1))`. Each write opens one more update inside the last one, with one more level of `queueState.level` and its own bucket set, until SynState stops it: the write that would open the 101st nested update (`maxUpdateNesting`) throws an error that names the loop, rather than letting the stack overflow, and the outermost `setA` passes it on. On the way out, each `startUpdate` closes its update in a `finally`, so the updates after it start from a clean state, but the values written so far stay.
+
+A write that converges stops by itself. `createState` drops a value equal to the current one (`equals`, `Object.is` by default), so `A.subscribe((a) => setA(a))` ends after one round, as does a write behind a condition that becomes false. A chain that would converge but nests more than 100 deep is stopped too. The limit counts the updates of one copy of SynState.
+:::
+
+The same rule covers two copies of SynState in one program. An update of one copy can start inside an update of the other, and a node can carry the mark of either; each copy has its own bucket sets, and `#isOpen` is read across copies, so neither update overwrites a mark the other still needs. If a `tryUpdate` throws, `close` empties the slots still in use, so the next update starts from empty buckets.

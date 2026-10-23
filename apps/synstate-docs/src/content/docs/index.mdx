@@ -25,11 +25,11 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     </Card>
     <Card title="High Performance" icon="rocket">
 
-Glitch-free O(n) propagation — on the smallest graph with derived values (a two-step derived chain), **{/* bench:derived-chain/jotai-over-synstate */}49{/* /bench */}× faster** than Jotai and **{/* bench:derived-chain/redux-over-synstate */}20{/* /bench */}× faster** than Redux. See [the derived-chain benchmark](/mono/synstate/guides/library-comparison/benchmark/#scenario-derived-chain).
+Glitch-free O(n) propagation — on the smallest graph with derived values (a two-step derived chain), **{/* bench:derived-chain/jotai-over-synstate */}38{/* /bench */}× faster** than Jotai and **{/* bench:derived-chain/redux-over-synstate */}16{/* /bench */}× faster** than Redux. See [the derived-chain benchmark](/mono/synstate/guides/library-comparison/benchmark/#scenario-derived-chain).
 
     </Card>
     <Card title="Lightweight" icon="seti:favicon">
-        {/* bundle-size:synstate */}~6.1 kB min+gzip{/* /bundle-size:synstate */} with two external runtime dependencies,
+        {/* bundle-size:synstate */}~6.2 kB min+gzip{/* /bundle-size:synstate */} with two external runtime dependencies,
         one of which depends on the other.
     </Card>
     <Card title="Built-in Async Operators" icon="setting">
