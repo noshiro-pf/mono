@@ -22,6 +22,9 @@ import {
   writeBenchmarkResults,
 } from './benchmark-results.mjs';
 import { resultsDir, scenarioDir } from './paths.mjs';
+import { selectProductionBuilds } from './production-builds.mjs';
+
+selectProductionBuilds();
 
 const WARMUP_ROUNDS = 2;
 

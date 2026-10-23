@@ -105,6 +105,11 @@ jobs:
       # and whatever it is built from, without a list to keep) and of the
       # benchmark itself therefore joins the key; test files are left out,
       # since they change nothing measured.
+      #
+      # The `vN` is for a change of what is measured that none of that sees,
+      # and bumping it is what makes `main` re-measure; without it the
+      # committed tables keep being judged against the old baseline. v2: the
+      # libraries run their production builds (`production-builds.mts`).
       - name: Compute the baseline cache key
         id: key
         env:
@@ -113,7 +118,7 @@ jobs:
           set -euo pipefail
           libs="$(pnpm --filter @synstate/docs run --silent z:benchmark:version-key)"
           node_major="$(node -p 'process.versions.node.split(".")[0]')"
-          prefix="synstate-benchmark-v1-ubuntu-24.04-node${node_major}-${libs}-src"
+          prefix="synstate-benchmark-v2-ubuntu-24.04-node${node_major}-${libs}-src"
           key="${prefix}${SOURCE_DIGEST:0:12}"
           echo "prefix=${prefix}" >>"${GITHUB_OUTPUT}"
           echo "value=${key}" >>"${GITHUB_OUTPUT}"
