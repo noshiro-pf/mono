@@ -14,7 +14,7 @@ import { issuesViewStore } from '../store/index.mjs';
 import { dagBox } from './dag-box.mjs';
 import { IssueDagLegend } from './issue-dag-legend.js';
 import { IssueDagNode, type PlacedNode } from './issue-dag-node.js';
-import { svgAttributes, SvgTitle } from './svg-elements.js';
+import { SvgTitle } from './svg-elements.js';
 
 /**
  * The open issues as a graph of what each waits for, read left to right:
@@ -71,8 +71,13 @@ const Dag = (): JSX.Element => {
 
           <defs>
             <marker
-              ref={arrowMarker}
               id={constant('issue-dag-arrow')}
+              markerHeight={constant(8)}
+              markerUnits={constant('userSpaceOnUse')}
+              markerWidth={constant(8)}
+              orient={constant('auto')}
+              refX={constant(8)}
+              refY={constant(4)}
               viewBox={constant('0 0 8 8')}
             >
               <path
@@ -151,12 +156,3 @@ const placedNodesOf = (
     }
   });
 };
-
-const arrowMarker = svgAttributes({
-  markerHeight: '8',
-  markerUnits: 'userSpaceOnUse',
-  markerWidth: '8',
-  orient: 'auto',
-  refX: '8',
-  refY: '4',
-});

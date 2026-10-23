@@ -46,7 +46,7 @@ export const IssueDagLegend = (): JSX.Element => {
           <li>
             <span
               class={constant('issue-dag-swatch')}
-              data-kind={view(key$, ({ kind }) => kind ?? '')}
+              data-kind={view(key$, ({ kind }) => kind)}
               data-state={view(key$, ({ state }) => state)}
             />
             {view(key$, ({ label }) => label)}

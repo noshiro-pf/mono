@@ -44,7 +44,7 @@ type ToggleProps = Props &
  * nothing.
  */
 export const StatTile = ({ value, total, label, tone }: Props): JSX.Element => (
-  <div class={constant('stat-tile')} data-status={statusOf(tone)}>
+  <div class={constant('stat-tile')} data-status={tone}>
     <StatValue total={total} value={value} />
     <span class={constant('stat-label')}>{constant(label)}</span>
   </div>
@@ -71,7 +71,7 @@ export const StatToggle = ({
       aria-pressed={mapBindable(pressed, String)}
       class={constant('stat-tile stat-toggle')}
       data-only={mapBindable(only, String)}
-      data-status={statusOf(tone)}
+      data-status={tone}
       title={mapBindable(pressed, (shown) =>
         shown
           ? `Shown. Click to hide the pull requests that are ${label}.`
@@ -136,12 +136,6 @@ const StatValue = ({
     />
   </span>
 );
-
-/** An absent tone is an empty attribute, which no status colour matches. */
-const statusOf = (
-  tone: Bindable<StatusRole | undefined> | undefined,
-): Bindable<string> | undefined =>
-  tone === undefined ? undefined : mapBindable(tone, (role) => role ?? '');
 
 /** What a count reads while it is not known yet. */
 const READING = '…';
