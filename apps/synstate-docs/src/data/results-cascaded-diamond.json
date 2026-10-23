@@ -9,10 +9,10 @@
       "node": "v26.12.0",
       "platform": "Linux 6.17.0-1022-azure",
       "arch": "x64",
-      "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
-      "measuredOn": "2026-10-21",
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "measuredOn": "2026-10-23",
       "libraries": {
-        "synstate": "3.4.0",
+        "synstate": "4.1.0",
         "rxjs": "7.8.2",
         "jotai": "3.0.1",
         "mobx": "7.0.6",
@@ -37,19 +37,19 @@
   "series": [
     {
       "label": "SynState",
-      "values": [0.7, 1.2, 1.2, 1, 1.3, 0.9, 0.9, 1.1, 1.1, 1.1]
+      "values": [0.5, 0.4, 0.6, 0.7, 0.6, 0.4, 0.5, 0.4, 0.5, 0.5]
     },
     {
       "label": "RxJS",
-      "values": [0.2, 1, 3.3, 18.2, 115.1, 664.4, 4101, null, null, null]
+      "values": [0.1, 0.8, 2.2, 14.7, 82.9, 450.4, 4558.7, null, null, null]
     },
     {
       "label": "Jotai",
-      "values": [2.3, 3.6, 4.6, 6, 10.3, 8.7, 9.8, 11.6, 12.8, 14.3]
+      "values": [1.3, 2.2, 2.8, 3.8, 6.2, 5.6, 6.3, 7.4, 8.3, 9.3]
     },
     {
       "label": "MobX",
-      "values": [0.9, 1.1, 1, 0.8, 0.7, 0.9, 0.8, 0.9, 1.1, 1.2]
+      "values": [0.5, 0.6, 0.6, 0.7, 0.4, 0.5, 0.6, 0.6, 0.7, 0.8]
     }
   ]
 }
