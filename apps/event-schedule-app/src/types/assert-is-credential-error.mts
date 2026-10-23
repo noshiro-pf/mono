@@ -1,5 +1,5 @@
+import { hasKeyValue } from 'event-schedule-app-shared';
 import { isRecord, isString, unknownToString } from 'ts-data-forge';
-import { hasKeyValue } from '../utils-ported/index.mjs';
 
 export const assertIsCredentialError: (
   e: unknown,

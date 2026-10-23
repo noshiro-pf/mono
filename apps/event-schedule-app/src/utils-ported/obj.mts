@@ -1,34 +1,9 @@
-import { Arr, hasKey, Obj as ObjBase } from 'ts-data-forge';
+import { Arr, Obj as ObjBase } from 'ts-data-forge';
 import type {
-  ReadonlyRecord,
   RecordPaths,
   RecordValueAtPath,
   UnknownRecord,
 } from 'ts-type-forge';
-
-/**
- * Whether `record` has `key`, and its value satisfies `guard`.
- *
- * Ported from `Obj.hasKeyValue`; `ts-data-forge` has `hasKey` but nothing that
- * checks the value at the same time.
- */
-export function hasKeyValue<
-  const R extends UnknownRecord,
-  const K extends PropertyKey,
-  V,
->(
-  record: R,
-  key: K,
-  guard: (value: unknown) => value is V,
-): record is R & ReadonlyRecord<K, V>;
-
-export function hasKeyValue<const K extends PropertyKey, V>(
-  record: ReadonlyRecord<PropertyKey, unknown>,
-  key: K,
-  guard: (value: unknown) => value is V,
-): boolean {
-  return hasKey(record, key) && guard(record[key]);
-}
 
 /**
  * The `Obj` this app was written against.
