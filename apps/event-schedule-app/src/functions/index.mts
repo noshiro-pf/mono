@@ -11,4 +11,3 @@ export * from './select-datetimes-component/index.mjs';
 export * from './the-name-is-already-used.mjs';
 export * from './toaster.js';
 export * from './ymd-to-day-in-week.mjs';
-export * from './ymdhm-date-diff.mjs';
