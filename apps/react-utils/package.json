@@ -44,6 +44,7 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
+    "ts-type-forge": "workspace:*",
     "tsx": "catalog:"
   },
   "peerDependencies": {

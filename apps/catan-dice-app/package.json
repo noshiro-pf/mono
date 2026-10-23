@@ -53,6 +53,7 @@
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "ts-type-forge": "workspace:*",
     "tsx": "catalog:",
     "vite": "catalog:"
   }

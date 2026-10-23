@@ -892,6 +892,9 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.3.0(react@19.3.0)
+      ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-type-forge
       tsx:
         specifier: 'catalog:'
         version: 4.23.15
@@ -1968,6 +1971,9 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.9)
+      ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-type-forge
       tsx:
         specifier: 'catalog:'
         version: 4.23.15
@@ -2151,6 +2157,9 @@ importers:
       react:
         specifier: 'catalog:'
         version: 19.3.0
+      ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-type-forge
       tsx:
         specifier: 'catalog:'
         version: 4.23.15

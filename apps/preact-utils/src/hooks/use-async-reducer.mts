@@ -1,9 +1,7 @@
 import { useState } from 'better-preact-use-state';
 import * as Preact from 'preact/hooks';
 import { unknownToString } from 'ts-data-forge';
-
-/** React 19 dropped `React.Reducer`; it was only ever this. */
-type Reducer<S, A> = (prev: S, action: A) => S;
+import type { Reducer } from 'ts-type-forge';
 
 type AsyncDispatch<S, A> = (action: A) => Promise<S>;
 
