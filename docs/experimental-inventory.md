@@ -1887,3 +1887,14 @@ emulator が戻ったので、`experimental/` に残していた最後の e2e �
 まず起きないが、ローカルの emulator を相手にした Playwright では毎回起きた。
 書き込みの後の再取得（イベント設定の保存、回答の追加・更新・削除・後で回答）は
 `refetch…AfterWrite` として throttle を通さないようにした。
+
+### `PromiseState` は `AsyncData` に置き換えた（2026-10-23）
+
+`react-utils` ・ `preact-utils` の `src/utils/` に移植した `PromiseState` は、
+後に `ts-std-forge` に入った `AsyncData` に置き換えた（`ts-data-forge` も
+re-export している）。使っていたのは両パッケージの `usePromiseValue` だけで、
+pending に載せていた値は常に `undefined` だったので、`AsyncData.pending()` ・
+`AsyncData.ok(v)` ・ `AsyncData.err(e)` で表せないものは無かった。初期値が
+`AsyncData.idle` でなく `pending()` なのは、hook が受け取った時点で promise は
+もう走っているからである。上の表と `my-portfolio-app-preact` の節にある
+「`PromiseState` と同じ前例」は、当時の記録として残す。

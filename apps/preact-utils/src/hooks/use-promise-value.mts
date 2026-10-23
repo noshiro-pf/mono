@@ -1,18 +1,15 @@
 import { useState } from 'better-preact-use-state';
 import * as Preact from 'preact/hooks';
-import type { PromiseState } from '../utils/index.mjs';
+import { AsyncData } from 'ts-std-forge';
 
 export const usePromiseValue = <T,>(
   promise: Readonly<Promise<T>>,
-): PromiseState<undefined, unknown, T> => {
+): AsyncData<T, unknown> => {
   const promiseMemoized = Preact.useRef(promise);
 
-  const [settledValue, setSettledValue] = useState<
-    PromiseState<undefined, unknown, T>
-  >({
-    status: 'pending',
-    value: undefined,
-  });
+  const [settledValue, setSettledValue] = useState<AsyncData<T, unknown>>(
+    AsyncData.pending(),
+  );
 
   Preact.useEffect(() => {
     let mut_alive = true;
@@ -20,12 +17,12 @@ export const usePromiseValue = <T,>(
     promiseMemoized.current
       .then((v) => {
         if (mut_alive) {
-          setSettledValue({ status: 'success', value: v });
+          setSettledValue(AsyncData.ok(v));
         }
       })
       .catch((error: unknown) => {
         if (mut_alive) {
-          setSettledValue({ status: 'error', value: error });
+          setSettledValue(AsyncData.err(error));
         }
       });
 
