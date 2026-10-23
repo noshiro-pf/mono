@@ -29,6 +29,7 @@ import {
   type ScopeInternals,
 } from '../utils/index.mjs';
 import type { ChildNode } from './observable-node.mjs';
+import { enqueueChildren } from './propagation-state.mjs';
 
 /**
  * The base of every observable, and the reason an observable is a class.
@@ -64,6 +65,7 @@ export class ObservableBaseClass<
   #mut_children: MutableSet<ChildNode> | undefined;
   #mut_subscribers: MutableSet<Subscriber<A>> | undefined;
   #mut_scope: ScopeInternals | undefined;
+  #mut_queuedFor: UpdateToken | undefined;
   readonly kind: Kind;
   readonly depth: Depth;
   declare readonly [observableBrand]: true;
@@ -86,6 +88,8 @@ export class ObservableBaseClass<
     this.#mut_isCompleted = false;
 
     this.#mut_updateToken = notUpdatedYet;
+
+    this.#mut_queuedFor = undefined;
 
     this.#mut_children = undefined;
 
@@ -130,6 +134,14 @@ export class ObservableBaseClass<
     return false;
   }
 
+  get queuedFor(): UpdateToken | undefined {
+    return this.#mut_queuedFor;
+  }
+
+  setQueuedFor(updateToken: UpdateToken): void {
+    this.#mut_queuedFor = updateToken;
+  }
+
   addChild(child: ChildNode): void {
     // A set, not an array: a completed child removes itself, and that has to
     // be O(1) for a UI that creates and completes derived nodes on every mount.
@@ -144,11 +156,20 @@ export class ObservableBaseClass<
     this.#mut_children?.delete(child);
   }
 
-  /** Stores `nextValue` as the current value and notifies subscribers. */
+  /**
+   * Stores `nextValue` as the current value, queues the children for the
+   * update `updateToken`, and notifies subscribers. The children are queued
+   * first, so that a child a subscriber creates, which starts from this
+   * value, is not visited for it again.
+   */
   protected setNext(nextValue: A, updateToken: UpdateToken): void {
     this.#mut_updateToken = updateToken;
 
     this.#mut_snapshot = Optional.some(nextValue);
+
+    if (this.#mut_children !== undefined) {
+      enqueueChildren(this.#mut_children, updateToken);
+    }
 
     if (this.#mut_subscribers !== undefined) {
       for (const s of this.#mut_subscribers) {
@@ -248,7 +269,7 @@ export class ObservableBaseClass<
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this
   protected teardown(): void {}
 
-  /** Takes a completed child out of its parents' and managers' lists. */
+  /** Takes a completed child out of its parents' lists. */
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this
   protected detach(): void {}
 

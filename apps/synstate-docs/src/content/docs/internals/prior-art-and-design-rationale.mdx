@@ -2,16 +2,16 @@
 title: Prior Art and Design Rationale
 description: Prior art and design rationale behind SynState — influences from RxJS, Solid, Jotai, and the Observable pattern.
 sidebar:
-    order: 4
+    order: 5
 ---
 
-The [previous page](/mono/synstate/internals/how-synstate-solved-the-glitch/) explained how SynState achieves glitch-free propagation through a static dependency graph with a pre-computed propagation order. This page examines the historical context of this approach and explains why SynState chose a static graph while most modern state management libraries use dynamic graphs.
+[How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/) explained how SynState achieves glitch-free propagation through a static dependency graph, in which each node's place in the update order is fixed when it is constructed. This page examines the historical context of this approach and explains why SynState chose a static graph while most modern state management libraries use dynamic graphs.
 
 ## The Core Idea
 
 SynState's key insight is:
 
-> The dependency graph topology is static — it is determined when Observables are constructed and does not change between updates. This means the propagation order can be computed once at graph construction time, rather than re-derived on each emission.
+> The dependency graph topology is static — it is determined when Observables are constructed and does not change between updates. This means each node's depth, its place in the propagation order, can be computed once at graph construction time, rather than re-derived on each emission, and an update needs only one bucket per depth rather than a priority queue.
 
 This is not a novel idea. Each of its components — static dependency graphs, topological ordering for glitch avoidance, and the observation that static graphs enable one-time scheduling — has been described in academic literature, with the earliest work dating back to 1987.
 

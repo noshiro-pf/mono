@@ -1,0 +1,123 @@
+---
+title: 更新を 1 ステップずつ追う
+description: SynState の伝播が読み書きするすべてのフィールドを、filter のダイヤモンドの 2 回の更新と、subscriber が別の更新の中で始める更新で、1 ステップずつ追います。
+sidebar:
+    order: 4
+---
+
+import PropagationTrace from '../../../../components/propagation-animation/propagation-trace-island.astro';
+
+[SynState がグリッチを解決した方法](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/)では、キューを深さごとのバケットとして説明しました。このページでは、それを実装しているコードを、「スキップされた更新の処理」のグラフの 2 回の更新と、subscriber が別の更新の中で始める更新で、フィールド単位に追います。各ステップには、そのステップを実行した後の値が表示されます。`propagation-state.mts` のモジュール状態、更新の `UpdateQueue` の private フィールド、実行中の関数のローカル変数、そして各ノードの 3 つのフィールドです。
+
+## グラフ
+
+`combine` とその後の `map` は別々のノードなので、前のページの `C` は、ここでは `BD`（`combine`）と `C`（`map`）の 2 つになります。
+
+```tsx
+import { combine, createState, filter, map } from 'synstate';
+
+const [A, setA] = createState(0);
+
+const B = A.pipe(map((n) => n * 10)); // depth 1
+
+const D = A.pipe(filter((n) => n % 2 === 0)); // depth 1
+
+const BD = combine([B, D]); // depth 2
+
+const C = BD.pipe(map(([b, d]) => b + d)); // depth 3
+
+const E = D.pipe(map((n) => n * 10)); // depth 2
+
+setA(1); // B = 10, BD = [10, 0], C = 10; D rejects 1, so E is not reached
+
+setA(2); // B = 20, D = 2, BD = [20, 2], E = 20, C = 22
+```
+
+## キューの置き場所
+
+| 場所                        | フィールド                                        | 持っているもの                                                                                                                                                                                               |
+| :-------------------------- | :------------------------------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `propagation-state.mts`     | `propagation.depth`、`propagation.outermostToken` | 実行中の `startUpdate` の数と、最も外側の更新のトークンです。`depth > 0` の間にルートへ書き込むと、更新の中からの書き込みとして一度だけ警告が出ます。                                                        |
+|                             | `queueState.level`                                | この SynState のコピーで開いている更新の数です。最も外側の更新で 1、その中で始まった更新で 2 です。                                                                                                          |
+|                             | `bucketSets[level - 1]`                           | その段の更新が使うバケットです。`bucketSets[level - 1][index]` が深さ `base + index` のバケットで、`nodes` はその深さでキューに入ったノードの配列、`length` はそのうち使っているスロットの数です。           |
+| `UpdateQueue`（＝トークン） | `#base`                                           | バケット 0 の深さです。更新を始めたノードの深さ + 1 で、ノードはバケット `node.depth - base` に入ります。                                                                                                    |
+|                             | `#buckets`                                        | この更新が使うバケットの組です。                                                                                                                                                                             |
+|                             | `#size`                                           | 使っているバケットの数です。drain のループはここまで回り、ループ中にも増えます。                                                                                                                             |
+|                             | `#isOpen`                                         | 更新がまだ動いているかどうかです。閉じた更新の印には意味がないので、上書きされます。                                                                                                                         |
+|                             | `#queuedDespiteMark`                              | 開いている別の更新の印が付いたまま、この更新がキューに入れたノードの集合です（[後述](#subscriber-からの書き込み非推奨パターン)）。初めて使うときに作るので、ここでの 2 回の更新では `undefined` のままです。 |
+| 各ノード                    | `updateToken`                                     | そのノードが最後に発行した更新のトークンです。子は、渡されたトークンとこれを比べます。                                                                                                                       |
+|                             | `snapshot`                                        | ノードの現在の値です。                                                                                                                                                                                       |
+|                             | `queuedFor`                                       | 印：最後にこのノードをキューに入れた更新のトークンです。これを更新自身のトークンと比べることで、1 回の更新でノードがキューに入るのは 1 回だけになります。                                                    |
+
+バケットの組はモジュール状態で、更新から更新へ使い回します。更新はバケットを、新しい配列を作るのではなく長さを 0 に戻すことで空にし、ノードを取り出すときに各スロットを `undefined` に戻します。スロットがノードを生かし続けないためです。次の更新はそのスロットに上書きするので、最初の何回かが済めば、更新ごとに確保するのはトークンだけです。`queuedFor` も訪問の後に消しません。次の更新は新しいトークンを持つので古い印と一致することはなく、終わった更新の印か、まだ使われている印かは `#isOpen` で分かります。
+
+図では、ノードに付いた水色のタグはそのノードを持っている使用中のスロット `[index][slot]`、ピンクのタグはそのノードを持っているローカル変数です。`enqueueChildren` と `#push` の `child`、`drain` の `node` があります。黄色の点線の輪は、ノードにまだ開いている更新の印が付いていることを表します。パネルでは、バケットの長さより後ろのスロットを薄く表示します。何が入っていても使われていないスロットです。ピンクで強調されたフィールドは、そのステップで変わったものです。ステップは下に表示したコードのモデルから生成しています。このページのサンプルのテストで、ライブラリが同じ順序で発行することを確かめています。
+
+## 更新 1：`setA(1)`（奇数）
+
+<PropagationTrace scenario="filterDiamond" update={1} lang="ja" />
+
+- `bucketSets[0]` とその中のバケットは、初めて必要になったときに作ります。その分を払うのはこの更新です。
+- `B` と `D` はバケット 0 の `nodes` のスロット 0 と 1 に入ります。ループが `index = 1` にいる間に、`BD` が `C` をキューに入れて `#size` が 2 から 3 に増えます。ループは毎回 `index` と `#size` を比べるので、新しいバケットにも届きます。
+- `D` は訪問されますが 1 を通さず、`setNext` せずに戻ります。`t0` のままで、`BD` も `E` もキューに入れません。`BD` は `B` がキューに入れたので訪問され、`B.updateToken === t1` と `D.updateToken === t0` を見ます。`E` には一切触れません。
+
+## 更新 2：`setA(2)`（偶数）
+
+<PropagationTrace scenario="filterDiamond" update={2} lang="ja" />
+
+- `t2` は同じ `bucketSets[0]` を使います。どのバケットも `length` が 0 なので、`nodes` 配列にスロットが残っていても空です。`#push` は更新 1 が残した `undefined` の上に `B` と `D` を書きます。
+- `B.queuedFor` はまだ `t1` ですが、`t1` は閉じているので `t2` で上書きします。`BD` は `B` によって `queuedFor === t2` になるので、`D` が 2 を通して子をキューに入れるとき、`BD` は飛ばします。ノードが 2 回キューに入らないのは、この比較 1 つのおかげです。`E` はバケット 1 のスロット 1 に入り、その `nodes` が 1 つ伸びます。
+- 更新が終わると、`length` はすべて 0、スロットはすべて `undefined` に戻ります。印は `t2` のものとして残ります。
+
+## subscriber からの書き込み（非推奨パターン）
+
+ルートに書き込む subscriber は、呼び出し元の更新がまだ drain している間に新しい更新を始めます。無限ループにならない場合でも、このような書き込みは避けてください。書き込みはグラフの辺ではないので、SynState はそれを呼び出し元の更新の順序に組み込めず、2 つ目の更新として動かすしかありません。SynState はこの書き込みを通し、ルートごとに一度だけ警告します。グラフの subscriber が途中の状態を見ることになるからです。このグラフでは、1 回の `setA` で `BDR` が 2 回発行します。この節で示すのは、そうした書き込みがあってもキューが正しく動き続ける仕組みであって、使い方ではありません。
+
+```tsx
+import { combine, createState, map } from 'synstate';
+
+const [A, setA] = createState(0);
+
+const [R, setR] = createState(0);
+
+const B = A.pipe(map((n) => n * 10)); // depth 1
+
+const D = A.pipe(map((n) => n * 100)); // depth 1
+
+const BDR = combine([B, D, R]); // depth 2
+
+// A write from a subscriber: an update nested in the one that reached D.
+D.subscribe((d) => {
+    if (d > 0) {
+        setR(d);
+    }
+});
+
+const mut_received: (readonly number[])[] = [];
+
+BDR.subscribe((values) => {
+    mut_received.push(values);
+});
+
+setA(1); // warns once: a root written to from a subscriber
+
+// [0, 0, 0], then [10, 100, 100] twice: in setR(100), then in setA(1)
+```
+
+<PropagationTrace scenario="nestedWrite" update={1} lang="ja" />
+
+- `B` は、`D` の subscriber が動く前に `BDR` を `t1` に入れます。`setR(100)` が `t2` を始めたとき、`BDR` は `queuedFor === t1` で `t1` のバケット 1 にあります。
+- `t2` はこのコピーで 2 つ目に開いた更新（`queueState.level` が 2）なので、自分用の `bucketSets[1]` を使います。`t1` がまだ drain しているバケットには書き込みません。
+- `R` が `BDR` を `t2` に入れます。`BDR.queuedFor` は `t1` で、`t1.isOpen` は true なので、`t2` は印を書き換えません。`t2` と書き込むと、`t1` は `BDR` を入れ済みだと分からなくなり、`BDR` の別の親が後で `t1` で発行したときに、もう一度入れてしまうからです。代わりに `t2` は自分の `#queuedDespiteMark` に `BDR` を記録して自身の重複を防ぎ、自分のバケット 1 に入れます。
+- `t2` は `D` の subscriber の中で最後まで動きます。`t1` が次のノードを訪問する前に drain され、閉じられます。`t1` のバケットはそのままなので、`t1` はもう一度 `BDR` を訪問し、`BDR` はトークンごとに 1 回ずつ `[10, 100, 100]` を発行します。`t1` には、`t2` がすでに `BDR` を最新にしたことが分かりません。
+- `propagation.depth` は両方の更新を数えるので、`outermostToken` は `t1` のままで、`runAfterPropagation` で後回しにした処理は `t1` の `endPropagation` まで待ちます。
+
+正しいやり方は、Observable の接続関係を `pipe` で記述することです。値を導出にすれば（`const R = D.pipe(…)`）、`D → R` がグラフの辺になり、SynState は `BDR` が `R` の後だと分かります。1 回の更新が、親がすべて確定した状態で `BDR` に 1 回だけ届き、警告も 2 回目の発行も起きません。[`eslint-plugin-synstate`](/mono/synstate/ja/getting-started/installation/#eslint-プラグイン) の `synstate/no-write-during-propagation` ルールは、subscriber や `pipe` 内の射影関数からの書き込みを、書かれた場所で報告します。
+
+:::caution[終わらない書き込み]
+入れ子の更新は、subscriber の中でコールスタックに積まれたまま最後まで動きます。そのため、自分を呼んだ更新に書き戻す subscriber は再帰します。直接書き戻す `A.subscribe((a) => setA(a + 1))` も、別のルートを経由する `A.subscribe((a) => setB(a + 1))` と `B.subscribe((b) => setA(b + 1))` の組み合わせも同じです。書き込むたびに、直前の更新の中にもう 1 つ更新が開きます。`queueState.level` が 1 段上がり、その段のバケットの組が使われます。これは SynState が止めるまで続きます。入れ子の 101 段目（`maxUpdateNesting`）を開こうとする書き込みが、ループであることを示すエラーを投げます。スタックがあふれる前に止まり、いちばん外側の `setA` がそのエラーを呼び出し元に伝えます。抜ける途中で各 `startUpdate` が `finally` で自分の更新を閉じるので、その後の更新はきれいな状態から始まります。ただし、それまでに書き込まれた値は残ります。
+
+収束する書き込みは自然に止まります。`createState` は現在の値と等しい値を捨てる（`equals`、既定は `Object.is`）ので、`A.subscribe((a) => setA(a))` は 1 周で終わります。いずれ偽になる条件の下での書き込みも同様です。収束する書き込みでも、入れ子が 100 段を超えれば同じく止まります。上限は SynState のコピーごとに数えます。
+:::
+
+同じ決まりは、1 つのプログラムに SynState のコピーが 2 つある場合にも働きます。一方のコピーの更新が他方の更新の中で始まることがあり、ノードにはどちらの印も付きえます。バケットの組はコピーごとに別で、`#isOpen` はコピーをまたいで読めるので、どちらの更新も、相手がまだ必要とする印を上書きしません。`tryUpdate` が例外を投げた場合は、`close` が使用中のスロットを空にするので、次の更新は空のバケットから始まります。

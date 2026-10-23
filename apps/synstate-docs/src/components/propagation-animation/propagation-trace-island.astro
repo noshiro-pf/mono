@@ -1,0 +1,122 @@
+---
+import { type Lang } from './scenario.mjs';
+import { PropagationTrace } from './propagation-trace.jsx';
+import { type TraceScenarioName } from './simulate-trace.mjs';
+
+type Props = Readonly<{
+  scenario: TraceScenarioName;
+  update: number;
+  lang: Lang;
+}>;
+
+const { scenario, update, lang } = Astro.props;
+---
+
+<PropagationTrace
+  client:only="react"
+  lang={lang}
+  scenario={scenario}
+  update={update}
+/>
+
+<style is:global>
+  /*
+   * Global, because React renders the trace, but bundled only into the
+   * pages that render this island: the trace pages. In the page, the trace
+   * is one column in Starlight's content column. The Full screen button
+   * opens it in a dialog covering the window, where it takes two columns
+   * when the window is wide enough.
+   */
+  .propagation-trace {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin: 1.5rem 0;
+  }
+
+  .propagation-trace > *,
+  .propagation-trace-column > * {
+    margin-top: 0;
+  }
+
+  .propagation-trace-toolbar {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .propagation-trace-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    min-width: 0;
+  }
+
+  .propagation-trace-column > svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .propagation-trace-code {
+    max-height: 17rem;
+  }
+
+  .propagation-trace-dialog {
+    box-sizing: border-box;
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 1rem;
+    border: none;
+    background: var(--sl-color-bg);
+    color: var(--sl-color-text);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  .propagation-trace-dialog::backdrop {
+    background: var(--sl-color-bg);
+  }
+
+  .propagation-trace-dialog > .propagation-trace {
+    margin: 0;
+  }
+
+  /*
+   * Two columns in the dialog: the toolbar, graph, caption and controls on
+   * the left, the fields and the code on the right. The right column is held
+   * to the dialog's height (42rem at least, what the fields need), and the
+   * code pane shrinks to what is left, so a step fits in one screen.
+   */
+  @media (min-width: 72rem) {
+    .propagation-trace-dialog > .propagation-trace {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: start;
+      gap: 1rem;
+    }
+
+    .propagation-trace-dialog .propagation-trace-column > svg {
+      max-height: calc(100dvh - 18rem);
+    }
+
+    .propagation-trace-dialog .propagation-trace-column:last-child {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      max-height: max(42rem, calc(100dvh - 2rem));
+    }
+
+    .propagation-trace-dialog .propagation-trace-column:last-child > * {
+      flex-shrink: 0;
+    }
+
+    .propagation-trace-dialog
+      .propagation-trace-column:last-child
+      > .propagation-trace-code {
+      flex: 0 1 auto;
+      min-height: 10rem;
+      max-height: none;
+    }
+  }
+</style>

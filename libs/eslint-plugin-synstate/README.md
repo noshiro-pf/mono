@@ -64,9 +64,10 @@ export default [
 
 ## Rules
 
-| Rule                        | Description                                                                                                                                                  |
-| :-------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `no-unbounded-counter-pipe` | Disallow calling `.pipe` directly on `counter(...)` when it has no `times` option. Nothing holds the counter, so nothing can complete it, and it never ends. |
+| Rule                          | Description                                                                                                                                                                    |
+| :---------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `no-unbounded-counter-pipe`   | Disallow calling `.pipe` directly on `counter(...)` when it has no `times` option. Nothing holds the counter, so nothing can complete it, and it never ends.                   |
+| `no-write-during-propagation` | Disallow writing to a synstate state or source from a subscriber or a projection. The write starts an update inside the one that called it, outside the graph synstate orders. |
 
 ### `no-unbounded-counter-pipe`
 
@@ -91,6 +92,36 @@ It recognizes `counter` imported from `synstate` by name, under an alias or
 through a namespace import, and reads through `as`, `satisfies`, `!` and
 parentheses. Options it cannot see into — a variable, a spread, a computed
 key — are assumed to carry `times`, and are not reported.
+
+### `no-write-during-propagation`
+
+`a$.subscribe((a) => { setB(a * 2); })` reads like "keep `b$` at twice `a$`",
+but the write is not part of the graph. It starts a second update while the
+first is still propagating, so synstate cannot order it with the rest: a
+subscriber can see `a$` updated and `b$` not yet, a node that reads both can
+emit twice for one write, and a write back into the update that called it,
+directly (`a$.subscribe((a) => { setA(a + 1); })`) or through another state,
+recurses until synstate stops it. synstate warns at run time, once per state;
+this rule reports the write where it is written. Derive the value instead, so
+that the graph has the edge: `const b$ = a$.pipe(map((a) => a * 2))`.
+
+It reports a call, made directly in a function passed to `.subscribe(...)` or
+to an operator inside `.pipe(...)`, to what a synstate factory returned in the
+same file:
+
+- the setter of `createState`, and its `updateState` and `resetState`;
+- the `dispatch` of `createReducer`;
+- `setTrue`, `setFalse`, `setState`, `toggle`, `updateState` and `resetState`
+  of `createBooleanState`;
+- the emitter of `createEventEmitter` and `createValueEmitter`;
+- `next` of a `source()`.
+
+The factories are recognized imported from `synstate` by name, under an alias
+or through a namespace import, and the calls are read through `as`,
+`satisfies`, `!` and parentheses. Only the syntax is read, so a write in a
+function the callback merely defines (a `setTimeout` callback, which runs
+after the update) is not reported, and neither is a write through a setter
+imported from another file or a subscriber passed by name.
 
 ## License
 

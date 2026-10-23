@@ -25,7 +25,7 @@ if (import.meta.vitest !== undefined) {
     const sum = combineLatest([multipliedBy10, multipliedBy1000]).pipe(
       map(([a, b]) => a + b),
     );
-    // 0, 10, 1010, 20, 2020, 30, 3030, ...
+    // 0, 10, 1010, 1020, 2020, 2030, 3030, ...
 
     const result = await lastValueFrom(sum.pipe(take(7), toArray()));
 
