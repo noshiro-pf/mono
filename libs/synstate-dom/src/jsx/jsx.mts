@@ -45,11 +45,12 @@ const mountElement = (tag: string, props: unknown): Element => {
     props.ref(element);
   }
 
-  bindProps(element, props);
-
+  // Children first, so that a `<select>`'s `value` finds its `<option>`s.
   if (hasKey(props, 'children') && isChild(props.children)) {
     element.append(...mountChild(props.children));
   }
+
+  bindProps(element, props);
 
   return element;
 };

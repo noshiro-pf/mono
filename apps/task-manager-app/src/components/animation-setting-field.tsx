@@ -1,9 +1,5 @@
-import type { GenericEventHandler } from 'preact';
-import { memoNamed } from 'preact-utils';
-import {
-  animationSettingSignal,
-  animationSettingStore,
-} from '../store/index.mjs';
+import { constant, type JSX } from 'synstate-dom';
+import { animationSettingStore } from '../store/index.mjs';
 import {
   animationSettingLabels,
   animationSettings,
@@ -16,39 +12,39 @@ import { HtmlSelect } from './html-select.js';
  * hint says what no option shows: under any of them, an animation the
  * device cannot draw smoothly stops with every node in its place.
  */
-export const AnimationSettingField = memoNamed('AnimationSettingField', () => (
-  <div className={'settings-field'}>
-    <label className={'settings-field-control'}>
-      <span className={'settings-field-label'}>{'アニメーション'}</span>
+export const AnimationSettingField = (): JSX.Element => (
+  <div class={constant('settings-field')}>
+    <label class={constant('settings-field-control')}>
+      <span class={constant('settings-field-label')}>
+        {constant('アニメーション')}
+      </span>
       <HtmlSelect
-        aria-describedby={HINT_ID}
-        data-e2e={'dag-animation'}
-        value={animationSettingSignal.value}
-        onChange={onAnimationChange}
+        aria-describedby={constant(HINT_ID)}
+        data-e2e={constant('dag-animation')}
+        value={animationSettingStore.setting}
+        onChange={(changed) => {
+          const picked = animationSettings.find(
+            (setting) => setting === changed.currentTarget.value,
+          );
+
+          if (picked !== undefined) {
+            animationSettingStore.set(picked);
+          }
+        }}
       >
         {animationSettings.map((setting) => (
-          <option key={setting} value={setting}>
-            {animationSettingLabels[setting]}
+          <option value={constant(setting)}>
+            {constant(animationSettingLabels[setting])}
           </option>
         ))}
       </HtmlSelect>
     </label>
-    <p className={'settings-hint'} id={HINT_ID}>
-      {
-        'ノードが位置へ移るときのアニメーション。「自動」は端末の「視差効果を減らす」に従います。どの設定でも、動きが重いときは途中で止めてすぐ位置に置きます。'
-      }
+    <p class={constant('settings-hint')} id={constant(HINT_ID)}>
+      {constant(
+        'ノードが位置へ移るときのアニメーション。「自動」は端末の「視差効果を減らす」に従います。どの設定でも、動きが重いときは途中で止めてすぐ位置に置きます。',
+      )}
     </p>
   </div>
-));
-
-const onAnimationChange: GenericEventHandler<HTMLSelectElement> = (changed) => {
-  const picked = animationSettings.find(
-    (setting) => setting === changed.currentTarget.value,
-  );
-
-  if (picked !== undefined) {
-    animationSettingStore.set(picked);
-  }
-};
+);
 
 const HINT_ID = 'animation-setting-hint';

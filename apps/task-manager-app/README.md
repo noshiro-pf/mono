@@ -166,15 +166,13 @@ DAG（右へ）。自動整列した状態。ノードはドラッグで動か�
 ![タスクの詳細ダイアログ](./screenshots/task-dialog.png)
 
 スマートフォン幅。DAG（下へ、ダークモード）、アーク（ダークモード、ポインタを重ねた
-タスクの依存を強調）、新しいマイルストーン、期限の日時ピッカー。
+タスクの依存を強調）、新しいマイルストーン。
 
 ![DAG 表示（下へ、ダークモード）](./screenshots/dag-down-phone-dark.png)
 
 ![アーク表示（ダークモード、強調）](./screenshots/arc-phone-dark.png)
 
 ![新しいマイルストーンのダイアログ](./screenshots/milestone-new-phone.png)
-
-![日時ピッカー](./screenshots/date-picker-phone.png)
 
 ## 開発
 

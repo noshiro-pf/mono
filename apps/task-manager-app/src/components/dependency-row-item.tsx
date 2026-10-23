@@ -1,11 +1,9 @@
-import type { GenericEventHandler } from 'preact';
-import { memoNamed } from 'preact-utils';
-import { useCallback } from 'preact/hooks';
+import type { InitializedObservable } from 'synstate';
+import { constant, For, If, view, type JSX } from 'synstate-dom';
 import { dependencyTypes } from '../domain/index.mjs';
-import { domainSignal, editorStore } from '../store/index.mjs';
+import { editorStore } from '../store/index.mjs';
 import {
   dependencyTypeLabels,
-  describeDependency,
   parseSourceValue,
   type DependencyRow,
   type RowCheck,
@@ -13,15 +11,20 @@ import {
 } from '../view-model/index.mjs';
 import { HtmlSelect } from './html-select.js';
 
-type Props = Readonly<{
+/** One row of `DependencyEditor`, with what it needs to draw it. */
+export type DependencyRowView = Readonly<{
   row: DependencyRow;
   /** `undefined` only while the row and its check are out of step. */
   check: RowCheck | undefined;
   /** Whether the dependency holds now; `undefined` for a row that is none. */
   met: boolean | undefined;
-  /** 1-based, for the names of the controls. */
-  number: number;
+  /** What the controls are named after: the dependency, or its number. */
+  name: string;
   options: readonly SourceOption[];
+}>;
+
+type Props = Readonly<{
+  row: InitializedObservable<DependencyRowView>;
 }>;
 
 /**
@@ -32,174 +35,186 @@ type Props = Readonly<{
  * Below the fields, whether the dependency holds, or why the row cannot be
  * saved.
  */
-export const DependencyRowItem = memoNamed<Props>(
-  'DependencyRowItem',
-  (props) => {
-    const { row, check, met, number, options } = props;
+export const DependencyRowItem = ({ row }: Props): JSX.Element => {
+  // A row keeps its key for as long as it exists.
+  const { key } = row.getSnapshot().value.row;
 
-    const { key } = row;
+  const errorId = `dependency-row-error-${key}` as const;
 
-    const onSource = useCallback<GenericEventHandler<HTMLSelectElement>>(
-      (changed) => {
-        editorStore.updateDependencyRow(key, {
-          source: parseSourceValue(changed.currentTarget.value),
-        });
-      },
-      [key],
-    );
+  const isError = view(row, ({ check }) => check?.status === 'error');
 
-    const onType = useCallback<GenericEventHandler<HTMLSelectElement>>(
-      (changed) => {
-        const type = dependencyTypes.find(
-          (t) => t === changed.currentTarget.value,
-        );
-
-        if (type !== undefined) {
-          editorStore.updateDependencyRow(key, { type });
-        }
-      },
-      [key],
-    );
-
-    const onLagDays = useCallback<GenericEventHandler<HTMLInputElement>>(
-      (changed) => {
-        editorStore.updateDependencyRow(key, {
-          lagDays: changed.currentTarget.value,
-        });
-      },
-      [key],
-    );
-
-    const onLagHours = useCallback<GenericEventHandler<HTMLInputElement>>(
-      (changed) => {
-        editorStore.updateDependencyRow(key, {
-          lagHours: changed.currentTarget.value,
-        });
-      },
-      [key],
-    );
-
-    const onRemove = useCallback(() => {
-      editorStore.removeDependencyRow(key);
-    }, [key]);
-
-    const isError = check?.status === 'error';
-
-    const errorId = `dependency-row-error-${key}` as const;
-
-    const known = options.some(({ value }) => value === row.source);
-
-    const rowName =
-      check?.status === 'ok'
-        ? (`「${describeDependency(domainSignal.value, check.dependency)}」` as const)
-        : (`依存 ${number}` as const);
-
-    return (
-      <li
-        className={`bp6-card bp6-compact dependency-row${isError ? ' invalid' : ''}`}
-        data-e2e={'dependency-row'}
-      >
-        <div className={'dependency-row-fields'}>
-          <label className={'bp6-label dependency-source'}>
-            {'依存先'}
-            <HtmlSelect
-              aria-describedby={isError ? errorId : undefined}
-              aria-invalid={isError}
-              data-e2e={'dependency-source'}
-              fill
-              value={row.source}
-              onChange={onSource}
-            >
-              <option value={''}>{'選んでください'}</option>
-              {known || row.source === '' ? undefined : (
-                <option value={row.source}>{'（見つからない依存先）'}</option>
+  return (
+    <li
+      class={view(
+        row,
+        ({ check }) =>
+          `bp6-card bp6-compact dependency-row${check?.status === 'error' ? ' invalid' : ''}`,
+      )}
+      data-e2e={constant('dependency-row')}
+    >
+      <div class={constant('dependency-row-fields')}>
+        <label class={constant('bp6-label dependency-source')}>
+          {constant('依存先')}
+          <HtmlSelect
+            aria-describedby={view(row, ({ check }) =>
+              check?.status === 'error' ? errorId : undefined,
+            )}
+            aria-invalid={view(row, ({ check }) =>
+              String(check?.status === 'error'),
+            )}
+            data-e2e={constant('dependency-source')}
+            fill
+            value={view(row, (r) => r.row.source)}
+            onChange={(changed) => {
+              editorStore.updateDependencyRow(key, {
+                source: parseSourceValue(changed.currentTarget.value),
+              });
+            }}
+          >
+            <option value={constant('')}>{constant('選んでください')}</option>
+            <If
+              cond={view(
+                row,
+                (r) =>
+                  r.row.source !== '' &&
+                  r.options.every(({ value }) => value !== r.row.source),
               )}
-              {options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
+              then={
+                <option value={view(row, (r) => r.row.source)}>
+                  {constant('（見つからない依存先）')}
                 </option>
-              ))}
-            </HtmlSelect>
-          </label>
-          {row.source.startsWith('task:') ? (
-            <label className={'bp6-label dependency-type'}>
-              {'種類'}
+              }
+            />
+            <For items={view(row, (r) => r.options)} key={(o) => o.value}>
+              {(option$) => (
+                <option value={view(option$, ({ value }) => value)}>
+                  {view(option$, ({ label }) => label)}
+                </option>
+              )}
+            </For>
+          </HtmlSelect>
+        </label>
+        <If
+          cond={view(row, (r) => r.row.source.startsWith('task:'))}
+          then={
+            <label class={constant('bp6-label dependency-type')}>
+              {constant('種類')}
               <HtmlSelect
-                data-e2e={'dependency-type'}
+                data-e2e={constant('dependency-type')}
                 fill
-                value={row.type}
-                onChange={onType}
+                value={view(row, (r) => r.row.type)}
+                onChange={(changed) => {
+                  const type = dependencyTypes.find(
+                    (t) => t === changed.currentTarget.value,
+                  );
+
+                  if (type !== undefined) {
+                    editorStore.updateDependencyRow(key, { type });
+                  }
+                }}
               >
                 {dependencyTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {`${dependencyTypeLabels[type]}（${type === 'finish-to-start' ? 'FS' : 'SS'}）`}
+                  <option value={constant(type)}>
+                    {constant(
+                      `${dependencyTypeLabels[type]}（${type === 'finish-to-start' ? 'FS' : 'SS'}）`,
+                    )}
                   </option>
                 ))}
               </HtmlSelect>
             </label>
-          ) : (
-            <div className={'dependency-type'}>
-              <span className={'field-label'}>{'種類'}</span>
-              <span className={'dependency-type-fixed bp6-text-muted'}>
-                {row.source.startsWith('milestone:') ? '到達後' : '―'}
+          }
+          else={
+            <div class={constant('dependency-type')}>
+              <span class={constant('field-label')}>{constant('種類')}</span>
+              <span class={constant('dependency-type-fixed bp6-text-muted')}>
+                {view(row, (r) =>
+                  r.row.source.startsWith('milestone:') ? '到達後' : '―',
+                )}
               </span>
             </div>
-          )}
-          <label className={'bp6-label dependency-lag-days'}>
-            {'ずらす日数'}
-            <input
-              className={'bp6-input bp6-fill'}
-              data-e2e={'dependency-lag-days'}
-              inputMode={'decimal'}
-              min={0}
-              step={1}
-              type={'number'}
-              value={row.lagDays}
-              onInput={onLagDays}
-            />
-          </label>
-          <label className={'bp6-label dependency-lag-hours'}>
-            {'時間'}
-            <input
-              className={'bp6-input bp6-fill'}
-              data-e2e={'dependency-lag-hours'}
-              inputMode={'decimal'}
-              min={0}
-              step={1}
-              type={'number'}
-              value={row.lagHours}
-              onInput={onLagHours}
-            />
-          </label>
-          <button
-            aria-label={`${rowName}を外す`}
-            className={'bp6-button bp6-minimal dependency-remove'}
-            data-e2e={'dependency-remove'}
-            type={'button'}
-            onClick={onRemove}
-          >
-            {'外す'}
-          </button>
-        </div>
-        {check?.status === 'error' ? (
+          }
+        />
+        <label class={constant('bp6-label dependency-lag-days')}>
+          {constant('ずらす日数')}
+          <input
+            class={constant('bp6-input bp6-fill')}
+            data-e2e={constant('dependency-lag-days')}
+            inputMode={constant('decimal')}
+            min={constant('0')}
+            step={constant('1')}
+            type={constant('number')}
+            value={view(row, (r) => r.row.lagDays)}
+            onInput={(changed) => {
+              editorStore.updateDependencyRow(key, {
+                lagDays: changed.currentTarget.value,
+              });
+            }}
+          />
+        </label>
+        <label class={constant('bp6-label dependency-lag-hours')}>
+          {constant('時間')}
+          <input
+            class={constant('bp6-input bp6-fill')}
+            data-e2e={constant('dependency-lag-hours')}
+            inputMode={constant('decimal')}
+            min={constant('0')}
+            step={constant('1')}
+            type={constant('number')}
+            value={view(row, (r) => r.row.lagHours)}
+            onInput={(changed) => {
+              editorStore.updateDependencyRow(key, {
+                lagHours: changed.currentTarget.value,
+              });
+            }}
+          />
+        </label>
+        <button
+          aria-label={view(row, ({ name }) => `${name}を外す`)}
+          class={constant('bp6-button bp6-minimal dependency-remove')}
+          data-e2e={constant('dependency-remove')}
+          type={constant('button')}
+          onClick={() => {
+            editorStore.removeDependencyRow(key);
+          }}
+        >
+          {constant('外す')}
+        </button>
+      </div>
+      <If
+        cond={isError}
+        then={
           <p
-            className={'bp6-callout bp6-intent-danger dependency-row-message'}
-            data-e2e={'dependency-error'}
-            id={errorId}
-            role={'alert'}
+            class={constant(
+              'bp6-callout bp6-intent-danger dependency-row-message',
+            )}
+            data-e2e={constant('dependency-error')}
+            id={constant(errorId)}
+            role={constant('alert')}
           >
-            {check.message}
+            {view(row, ({ check }) =>
+              check?.status === 'error' ? check.message : '',
+            )}
           </p>
-        ) : met === undefined ? undefined : (
-          <p className={'dependency-row-message'}>
-            <span
-              className={`bp6-tag bp6-minimal ${met ? 'bp6-intent-success' : 'bp6-intent-warning'}`}
-            >
-              {met ? '充足' : '未充足'}
-            </span>
-          </p>
-        )}
-      </li>
-    );
-  },
-);
+        }
+        else={
+          <If
+            cond={view(row, ({ met }) => met !== undefined)}
+            then={
+              <p class={constant('dependency-row-message')}>
+                <span
+                  class={view(
+                    row,
+                    ({ met }) =>
+                      `bp6-tag bp6-minimal ${met === true ? 'bp6-intent-success' : 'bp6-intent-warning'}`,
+                  )}
+                >
+                  {view(row, ({ met }) => (met === true ? '充足' : '未充足'))}
+                </span>
+              </p>
+            }
+          />
+        }
+      />
+    </li>
+  );
+};

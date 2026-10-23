@@ -1,57 +1,35 @@
-import type {
-  FocusEventHandler,
-  KeyboardEventHandler,
-  MouseEventHandler,
-  PointerEventHandler,
-  RefObject,
-  WheelEventHandler,
-} from 'preact';
-import { memoNamed } from 'preact-utils';
 import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'preact/hooks';
-import { Arr, Num } from 'ts-data-forge';
+  combine,
+  createState,
+  map,
+  onScopeDispose,
+  skipIfNoChange,
+  type InitializedObservable,
+} from 'synstate';
+import { constant, For, If, MatchOptional, view, type JSX } from 'synstate-dom';
+import { Arr, Optional } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   anchoredTileScroll,
-  arcContentBounds,
-  arcGeometries,
-  arcHighlight,
   cancelConnect,
   clampTileScroll,
   connectHandleAt,
   contentPointAt,
   dropTarget,
   dropTargetAt,
-  edgeGeometries,
   fitBelowTransform,
   fitBoundsTransform,
   fitWidthTopTransform,
-  groupFrames,
   groupIdOfKey,
   groupKey,
-  groupsByMember,
-  highlightOf,
   IDLE_GESTURE,
-  interpolateTransform,
   lassoPathData,
-  moveNodesTo,
-  nodesBounds,
   nodesInLasso,
-  placeEmptyGroups,
-  placeNodes,
   pointerDown,
   pointerMove,
   pointerUp,
   positionsOf,
-  resizeNodes,
   revealTileScroll,
-  routeEdges,
   samePositions,
   tileAvailableWidth,
   tileContentHeight,
@@ -61,25 +39,21 @@ import {
   tileViewTransform,
   wheelScrollPixels,
   wheelZoomFactor,
-  withCurvesOf,
   zoomAt,
-  type ArcGeometry,
-  type Bounds,
   type ConnectDrag,
   type ConnectHandle,
-  type ConnectReach,
-  type EdgeGeometry,
   type Gesture,
   type Grab,
   type GraphLayout,
   type GroupFrame,
   type LaidOutNode,
+  type MilestoneNodeView,
   type NodeDrag,
   type Point,
+  type TaskNodeView,
   type ViewTransform,
 } from '../dag/index.mjs';
 import {
-  dependencyRefusal,
   GraphNodeIdCodec,
   GroupIdCodec,
   nodeRefOf,
@@ -87,51 +61,39 @@ import {
   type GroupId,
 } from '../domain/index.mjs';
 import {
-  animationSettingSignal,
-  arcEdgesSignal,
-  arcNodesSignal,
-  dagAnimatedOpacitiesSignal,
-  dagAnimatedPositionsSignal,
-  dagAnimationProgressSignal,
-  dagArrangementSignal,
-  dagFitRequestsSignal,
+  animationSettingStore,
   dagLayoutStore,
-  dagMembershipSignal,
-  dagOutsideNodesSignal,
-  dagSelectionSignal,
   dagSelectionStore,
-  dagViewModeSignal,
   dagViewModeStore,
   dataStore,
-  domainSignal,
-  groupsSignal,
-  nodeSizeSignal,
-  nodeViewsSignal,
-  reducedMotionSignal,
-  tileNodesSignal,
+  reducedMotionStore,
 } from '../store/index.mjs';
-import {
-  isArrangeable,
-  shouldAnimate,
-  type DagViewMode,
-} from '../view-model/index.mjs';
+import { shouldAnimate, type DagViewMode } from '../view-model/index.mjs';
 import { DagArcEdge } from './dag-arc-edge.js';
 import {
-  DagConnectOverlay,
-  type ConnectTarget,
-} from './dag-connect-overlay.js';
+  createDagCanvasScene,
+  reachAt,
+  type DagNodeRecord,
+  type SelectedEdge,
+} from './dag-canvas-scene.mjs';
+import { DagConnectOverlay } from './dag-connect-overlay.js';
 import { DagEdgeDelete } from './dag-edge-delete.js';
 import { DagEdge } from './dag-edge.js';
 import { DagGroupFrame } from './dag-group-frame.js';
 import { DagMilestoneNode } from './dag-milestone-node.js';
+import { nodeIdOf } from './dag-node-handlers.mjs';
 import { DagTaskNode } from './dag-task-node.js';
-import { nodeIdOf, usePointedNode } from './use-pointed-node.mjs';
+import {
+  createAfterUpdate,
+  listenInScope,
+  subscribeInScope,
+} from './scope-effects.mjs';
 
 type Props = Readonly<{
   /** ELK's layout, which places every node not put anywhere by hand. */
-  layout: GraphLayout;
+  layout: InitializedObservable<GraphLayout>;
   /** The toolbar over the canvas, which 「アーク」 and 「タイル」 start below. */
-  toolbarRef: RefObject<HTMLDivElement>;
+  toolbar: () => HTMLDivElement | undefined;
 }>;
 
 /**
@@ -139,8 +101,8 @@ type Props = Readonly<{
  * the edges drawn between them (`dag/edge-routing.mts`). The background can
  * be panned by dragging, the whole zoomed with the wheel or two fingers and
  * fitted to the screen; a node can be dragged to a new place, which is saved
- * when it is dropped. What a pointer does is `dag/gesture.mts`; this
- * forwards the events and draws.
+ * when it is dropped. What a pointer does is `dag/gesture.mts`, and what is
+ * drawn where is `dag-canvas-scene.mts`; this forwards the events and draws.
  *
  * A tap on a node opens it, a drag that starts on one moves it: `gesture`
  * says whether the press moved, and a click after a drag is swallowed before
@@ -151,18 +113,19 @@ type Props = Readonly<{
  * dropped outside every frame into none; while it is dragged, the frames
  * stay as they were when it was picked up, the one it would go into and the
  * one it would leave marked. A frame dragged by its title moves with its
- * nodes, and a tap on the title opens the group. `touch-action: none` (`index.css`) keeps the browser
- * from scrolling or zooming the page instead.
+ * nodes, and a tap on the title opens the group. `touch-action: none`
+ * (`index.css`) keeps the browser from scrolling or zooming the page
+ * instead.
  *
- * In 「DAG」, a mouse or pen near a node's outline — within
- * {@link HANDLE_REACH_PX}, outside the node or just inside — shows a handle
- * there (`dag/connect-handle.mts`), and a drag from it draws an arrow
- * instead of moving the node. Dropped on another node, the arrow makes that node depend
- * on the one it was drawn from (`dataStore.addDependency`), unless that
- * would be refused — a dependency already there, or a cycle — which the
- * node it is over shows before the drop, and a notice says after it.
- * Escape gives the arrow up before it is dropped, wherever the focus is. A
- * touch has no pointer to come near with, and so no handle.
+ * In 「DAG」, a mouse or pen near a node's outline — outside the node or just
+ * inside (`reachAt`) — shows a handle there (`dag/connect-handle.mts`), and a
+ * drag from it draws an arrow instead of moving the node. Dropped on another
+ * node, the arrow makes that node depend on the one it was drawn from
+ * (`dataStore.addDependency`), unless that would be refused — a dependency
+ * already there, or a cycle — which the node it is over shows before the
+ * drop, and a notice says after it. Escape gives the arrow up before it is
+ * dropped, wherever the focus is. A touch has no pointer to come near with,
+ * and so no handle.
  *
  * In 「DAG」, an edge pointed at is drawn in the focus colour, and a click on
  * it selects it and shows a button there (`dag-edge-delete.tsx`) that
@@ -182,9 +145,8 @@ type Props = Readonly<{
  * the edges are plain curves, and they are routed round the nodes once the
  * nodes are there; a press or a key on the canvas puts them there at once.
  * A dragged node's edges are routed at every move — unless that has taken
- * longer than {@link DRAG_ROUTING_BUDGET_MS}, when the rest of the drag
- * draws them as plain curves and leaves the others as they were, and the
- * drop routes them all.
+ * too long, when the rest of the drag draws them as plain curves and leaves
+ * the others as they were, and the drop routes them all.
  *
  * In 「アーク」 the tasks and the milestones are in a column
  * (`dagLayoutStore.arcNodes`) with arcs beside it (`dag/arc-geometry.mts`),
@@ -200,15 +162,15 @@ type Props = Readonly<{
  * only scrolled down and up (`dag/tile-scroll.mts`): by the wheel, a drag
  * anywhere — on a task too, which a tap still opens — and Page Up, Page
  * Down, Home and End, with the focus on a task, on the canvas, which takes
- * it in this mode, or nowhere; a task given the focus is scrolled into view. The canvas reports its width
- * (`dagLayoutStore.setTileWidth`); when it changes, the tasks move to their
- * new rows and the view follows them, keeping the first task of the first
- * row in view where it was. A thin thumb on the right says how far down the
- * view is.
+ * it in this mode, or nowhere; a task given the focus is scrolled into view.
+ * The canvas reports its width (`dagLayoutStore.setTileWidth`); when it
+ * changes, the tasks move to their new rows and the view follows them,
+ * keeping the first task of the first row in view where it was. A thin
+ * thumb on the right says how far down the view is.
  *
  * Every node is drawn at the reader's node size, 「標準」 or 「コンパクト」
- * (`nodeSizeSignal`) — a layout ELK made at the other size, while the next
- * is computed, at this one — and the edges are routed between those boxes.
+ * (`nodeSizeStore`) — a layout ELK made at the other size, while the next is
+ * computed, at this one — and the edges are routed between those boxes.
  *
  * While the view changes mode, the edges are hidden; the nodes one of the
  * modes does not draw fade (`dagLayoutStore.animatedOpacities`), and the
@@ -216,610 +178,161 @@ type Props = Readonly<{
  * (`dagLayoutStore.animationProgress`), so that what fades stays in sight.
  * The edges fade in once they are back, when the reader's setting animates.
  */
-export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
-  const { layout, toolbarRef } = props;
+export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
+  const { mode } = dagViewModeStore;
 
-  const views = nodeViewsSignal.value;
+  const { animatedPositions: animated, tileNodes } = dagLayoutStore;
 
-  const { direction, positions, groupPositions } = dagArrangementSignal.value;
+  const [transform$, setTransform, { getSnapshot: getTransform }] =
+    createState<ViewTransform>(INITIAL);
 
-  const membership = dagMembershipSignal.value;
+  const [dragged$, setDragged] = createState<NodeDrag | undefined>(undefined);
 
-  const selectedIds = dagSelectionSignal.value;
+  const [handle$, setHandle, { getSnapshot: getHandle }] = createState<
+    ConnectHandle | undefined
+  >(undefined, { equals: sameHandle });
 
-  const outside = dagOutsideNodesSignal.value;
+  const [connecting$, setConnecting, { getSnapshot: getConnecting }] =
+    createState<ConnectDrag | undefined>(undefined);
 
-  const selection = useMemo(
-    (): ReadonlySet<GraphNodeId> => new Set(selectedIds),
-    [selectedIds],
-  );
-
-  const groups = groupsSignal.value;
-
-  const fitRequests = dagFitRequestsSignal.value;
-
-  const animated = dagAnimatedPositionsSignal.value;
-
-  const opacities = dagAnimatedOpacitiesSignal.value;
-
-  const progress = dagAnimationProgressSignal.value;
-
-  const mode = dagViewModeSignal.value;
-
-  const arrangeable = isArrangeable(mode);
-
-  const arcNodes = arcNodesSignal.value;
-
-  const tileNodes = tileNodesSignal.value;
-
-  const arcEdges = arcEdgesSignal.value;
-
-  const nodeSize = nodeSizeSignal.value;
-
-  const compact = nodeSize === 'compact';
-
-  const motion = shouldAnimate(
-    animationSettingSignal.value,
-    reducedMotionSignal.value,
-  );
-
-  const {
-    pointed,
-    onPointerOver,
-    onPointerLeave,
-    onFocusCapture,
-    onBlurCapture,
-  } = usePointedNode();
-
-  const wrapper = useRef<HTMLElement>(null);
-
-  const controlsRef = useRef<HTMLDivElement>(null);
-
-  const mut_gesture = useRef<Gesture>(IDLE_GESTURE);
-
-  const [transform, setTransform] = useState<ViewTransform>(INITIAL);
-
-  const mut_transform = useRef<ViewTransform>(INITIAL);
-
-  const [dragged, setDragged] = useState<NodeDrag | undefined>(undefined);
-
-  // The handle under a mouse or pen, which a press draws an arrow from.
-  const [handle, setHandle] = useState<ConnectHandle | undefined>(undefined);
-
-  const mut_handle = useRef<ConnectHandle | undefined>(undefined);
-
-  const showHandle = useCallback((next: ConnectHandle | undefined) => {
-    const current = mut_handle.current;
-
-    if (
-      current?.id === next?.id &&
-      current?.at.x === next?.at.x &&
-      current?.at.y === next?.at.y
-    ) {
-      return;
-    }
-
-    mut_handle.current = next;
-
-    setHandle(next);
-  }, []);
-
-  const [connecting, setConnecting] = useState<ConnectDrag | undefined>(
-    undefined,
-  );
-
-  // The edge clicked, as it was drawn then, and where.
-  const [selectedEdge, setSelectedEdge] = useState<SelectedEdge | undefined>(
-    undefined,
-  );
+  const [selectedEdge$, setSelectedEdge, { getSnapshot: getSelectedEdge }] =
+    createState<SelectedEdge | undefined>(undefined);
 
   // 「なげなわ」: whether a drag on the background draws a lasso, as one
   // with Shift does, rather than panning.
-  const [lassoTool, setLassoTool] = useState(false);
+  const [
+    lassoTool$,
+    ,
+    { updateState: updateLassoTool, getSnapshot: getLassoTool },
+  ] = createState(false);
 
-  const mut_lassoTool = useRef(false);
-
-  const toggleLassoTool = useCallback(() => {
-    mut_lassoTool.current = !mut_lassoTool.current;
-
-    setLassoTool(mut_lassoTool.current);
-  }, []);
-
-  // The lasso being drawn, in content coordinates.
-  const [lasso, setLasso] = useState<readonly Point[] | undefined>(undefined);
-
-  // At the current size, which a layout still being made at it may not be.
-  const placed = useMemo(
-    () =>
-      placeNodes(
-        resizeNodes(layout.nodes, nodeSize),
-        layout.edges,
-        positions,
-        membership,
-      ),
-    [layout.nodes, layout.edges, nodeSize, positions, membership],
+  const [lasso$, setLasso] = createState<readonly Point[] | undefined>(
+    undefined,
   );
 
-  // Where the empty frames are when nothing moves.
-  const emptyAt = useMemo(
-    () => placeEmptyGroups(membership, layout.groups, placed, groupPositions),
-    [membership, layout.groups, placed, groupPositions],
+  // For the scroll indicator, which is drawn from it.
+  const [tileFrame$, setTileFrame] = createState<TileFrame | undefined>(
+    undefined,
+    { equals: sameTileFrame },
   );
 
-  // The frames as they are when nothing moves, and while a node is dragged.
-  const settledFrames = useMemo(
-    (): readonly GroupFrame[] =>
-      arrangeable ? groupFrames(placed, membership, emptyAt) : [],
-    [arrangeable, placed, membership, emptyAt],
+  const [viewFrom$, setViewFrom] = createState<ViewTransform | undefined>(
+    undefined,
   );
 
-  // How far the group being dragged by its title has moved, and its nodes.
-  const groupDrag = useMemo((): GroupDrag | undefined => {
-    const id = dragged === undefined ? undefined : groupIdOfKey(dragged.id);
-
-    const from = settledFrames.find((frame) => frame.id === id);
-
-    return dragged === undefined || from === undefined
-      ? undefined
-      : {
-          id: from.id,
-          dx: dragged.position.x - from.x,
-          dy: dragged.position.y - from.y,
-          members: new Set(
-            membership.find((group) => group.id === from.id)?.members,
-          ),
-        };
-  }, [dragged, settledFrames, membership]);
-
-  // How far the nodes selected have moved, while one of them is dragged
-  // with another selected.
-  const selectionDrag = useMemo((): MovingNodes | undefined => {
-    const id = dragged?.id;
-
-    const from =
-      id === undefined ||
-      !GraphNodeIdCodec.is(id) ||
-      !selection.has(id) ||
-      selection.size < 2
-        ? undefined
-        : placed.find((node) => node.id === id);
-
-    return dragged === undefined || from === undefined
-      ? undefined
-      : {
-          dx: dragged.position.x - from.x,
-          dy: dragged.position.y - from.y,
-          members: selection,
-        };
-  }, [dragged, selection, placed]);
-
-  // The nodes moving with the one dragged: those of its group, or those
-  // selected.
-  const moving = groupDrag ?? selectionDrag;
-
-  // Every node some mode draws: those of the DAG, and those 「アーク」 and
-  // 「タイル」 draw before ELK has laid them out.
-  const anyMode = useMemo(() => {
-    const known = new Set(placed.map(({ id }) => id));
-
-    return [
-      ...placed,
-      ...Arr.uniqBy(
-        [...arcNodes, ...tileNodes].filter(({ id }) => !known.has(id)),
-        ({ id }) => id,
-      ),
-    ];
-  }, [placed, arcNodes, tileNodes]);
-
-  // While they move, the nodes moving, wherever they are going; otherwise
-  // the nodes of the mode, where it draws them.
-  const shown = useMemo(
-    () =>
-      animated !== undefined
-        ? moveNodesTo(anyMode, animated).filter(({ id }) => animated.has(id))
-        : mode === 'arc'
-          ? arcNodes
-          : mode === 'tile'
-            ? tileNodes
-            : dragged === undefined
-              ? placed
-              : placed.map((node) =>
-                  node.id === dragged.id
-                    ? { ...node, x: dragged.position.x, y: dragged.position.y }
-                    : moving?.members.has(node.id) === true
-                      ? {
-                          ...node,
-                          x: node.x + moving.dx,
-                          y: node.y + moving.dy,
-                        }
-                      : node,
-                ),
-    [anyMode, placed, dragged, moving, animated, mode, arcNodes, tileNodes],
+  // The node of the canvas the reader is pointing at — under the pointer,
+  // or failing that, the one with the keyboard focus — for the arc
+  // diagram's highlight. A touch points at a node for as long as the finger
+  // is on it.
+  const [hovered$, setHovered] = createState<GraphNodeId | undefined>(
+    undefined,
   );
 
-  // Drawn while the DAG is, and not while the view changes mode: round the
-  // nodes moving, or the group dragged, and otherwise as they are.
-  const shownFrames = useMemo((): readonly GroupFrame[] => {
-    if (!arrangeable || opacities !== undefined) {
-      return [];
-    }
-
-    if (animated !== undefined || selectionDrag !== undefined) {
-      return groupFrames(shown, membership, emptyAt);
-    }
-
-    if (groupDrag === undefined) {
-      return settledFrames;
-    }
-
-    const from = emptyAt.get(groupDrag.id);
-
-    return groupFrames(
-      shown,
-      membership,
-      from === undefined
-        ? emptyAt
-        : new Map([
-            ...emptyAt,
-            [
-              groupDrag.id,
-              { x: from.x + groupDrag.dx, y: from.y + groupDrag.dy },
-            ],
-          ]),
-    );
-  }, [
-    arrangeable,
-    opacities,
-    animated,
-    selectionDrag,
-    groupDrag,
-    settledFrames,
-    shown,
-    membership,
-    emptyAt,
-  ]);
-
-  // The group a node being dragged would be dropped into, and the one it
-  // is in.
-  const dropTargets = useMemo((): NodeDropTargets | undefined => {
-    const node =
-      dragged === undefined || moving !== undefined
-        ? undefined
-        : shown.find(({ id }) => id === dragged.id);
-
-    if (node === undefined) {
-      return undefined;
-    }
-
-    return {
-      into: dropTarget(settledFrames, node),
-      from: groupsByMember(membership).get(node.id),
-    };
-  }, [dragged, moving, shown, settledFrames, membership]);
-
-  const titles = useMemo(
-    () => new Map(groups.map(({ id, title }) => [id, title])),
-    [groups],
+  const [focused$, setFocused] = createState<GraphNodeId | undefined>(
+    undefined,
   );
 
-  // The edges as they are when nothing moves.
-  const settled = useMemo(
-    () => (arrangeable ? routeEdges(direction, placed, layout.edges) : []),
-    [arrangeable, direction, placed, layout.edges],
-  );
+  const scene = createDagCanvasScene({
+    layout,
+    transform: transform$,
+    dragged: dragged$,
+    handle: handle$,
+    connecting: connecting$,
+    selectedEdge: selectedEdge$,
+    lasso: lasso$,
+    viewFrom: viewFrom$,
+    pointed: combine([hovered$, focused$]).pipe(
+      map(([hovered, focused]) => hovered ?? focused),
+    ),
+  });
 
-  const settledArcs = useMemo(
-    (): readonly ArcGeometry[] =>
-      mode === 'arc' ? arcGeometries(arcNodes, arcEdges) : [],
-    [mode, arcNodes, arcEdges],
-  );
+  const afterUpdate = createAfterUpdate();
 
-  // Hidden while the view changes mode, and in 「アーク」 while anything
-  // moves: the arcs are drawn for the column alone. 「タイル」 has none.
-  const edgesHidden = arrangeable
-    ? opacities !== undefined
-    : animated !== undefined;
+  const mut_elements: {
+    wrapper: HTMLElement | undefined;
+    controls: HTMLDivElement | undefined;
+  } = { wrapper: undefined, controls: undefined };
 
-  const highlight = useMemo(
-    () =>
-      mode === 'arc' && animated === undefined
-        ? arcHighlight(pointed, arcEdges)
-        : undefined,
-    [mode, animated, pointed, arcEdges],
-  );
-
-  // Whether routing has been too slow to keep up with this drag.
-  const mut_slowDrag = useRef(false);
-
-  const edges = useMemo((): readonly EdgeGeometry[] => {
-    if (!arrangeable) {
-      return [];
-    }
-
-    if (animated !== undefined) {
-      return edgeGeometries(direction, shown, layout.edges);
-    }
-
-    if (dragged === undefined) {
-      mut_slowDrag.current = false;
-
-      return settled;
-    }
-
-    if (mut_slowDrag.current) {
-      const curves = edgeGeometries(direction, shown, layout.edges);
-
-      // A group's nodes, or the selected ones, all move: every edge is a
-      // curve.
-      return selectionDrag === undefined && GraphNodeIdCodec.is(dragged.id)
-        ? withCurvesOf(settled, curves, dragged.id)
-        : curves;
-    }
-
-    const started = performance.now();
-
-    const routed = routeEdges(direction, shown, layout.edges);
-
-    mut_slowDrag.current = performance.now() - started > DRAG_ROUTING_BUDGET_MS;
-
-    return routed;
-  }, [
-    arrangeable,
-    animated,
-    dragged,
-    selectionDrag,
-    direction,
-    shown,
-    layout.edges,
-    settled,
-  ]);
-
-  // While a lasso is drawn, the nodes it closes round so far, which are
-  // drawn selected in place of those that are.
-  const drawnSelection = useMemo(
-    (): ReadonlySet<GraphNodeId> =>
-      lasso === undefined ? selection : new Set(nodesInLasso(placed, lasso)),
-    [lasso, selection, placed],
-  );
-
-  // The edge selected, while it is drawn as it was when clicked: not once
-  // it is gone or has moved, nor while anything is dragged or moves.
-  const selected = useMemo(() => {
-    if (
-      selectedEdge === undefined ||
-      edgesHidden ||
-      animated !== undefined ||
-      dragged !== undefined ||
-      connecting !== undefined
-    ) {
-      return undefined;
-    }
-
-    const edge = edges.find(({ id }) => id === selectedEdge.id);
-
-    return edge?.path === selectedEdge.path
-      ? { edge, at: selectedEdge.at }
-      : undefined;
-  }, [selectedEdge, edgesHidden, animated, dragged, connecting, edges]);
-
-  const selectedEdgeId = selected?.edge.id;
-
-  // Read by a click, which finds the edge it was on among them.
-  const mut_edges = useRef<readonly EdgeGeometry[]>(edges);
-
-  useEffect(() => {
-    mut_edges.current = edges;
-  }, [edges]);
-
-  const selectedFrom = selected?.edge.from;
-
-  const selectedTo = selected?.edge.to;
-
-  const deleteSelectedEdge = useCallback(() => {
-    setSelectedEdge(undefined);
-
-    if (selectedFrom === undefined || selectedTo === undefined) {
-      return;
-    }
-
-    dataStore.removeDependency(nodeRefOf(selectedTo), nodeRefOf(selectedFrom));
-  }, [selectedFrom, selectedTo]);
-
-  const dismissSelectedEdge = useCallback(() => {
-    setSelectedEdge(undefined);
-  }, []);
-
-  const deleteLabel =
-    selectedFrom === undefined || selectedTo === undefined
-      ? ''
-      : (`「${views.get(selectedTo)?.title ?? ''}」の「${views.get(selectedFrom)?.title ?? ''}」への依存を削除` as const);
-
-  // Read by a press on a node, which should not have to be made again
-  // whenever a node moves: the nodes that can be grabbed, none outside the
-  // mode the reader arranges, and the frames, which are read at the drop.
-  const mut_placed = useRef<readonly LaidOutNode[]>(placed);
-
-  const mut_frames = useRef<readonly GroupFrame[]>(settledFrames);
-
-  // And the nodes selected, which a drop of one of them moves.
-  const mut_selection = useRef<ReadonlySet<GraphNodeId>>(selection);
-
-  useEffect(() => {
-    mut_placed.current = arrangeable ? placed : [];
-
-    mut_frames.current = settledFrames;
-
-    mut_selection.current = selection;
-  }, [arrangeable, placed, settledFrames, selection]);
-
-  // The nodes a handle can be on: those that can be grabbed, once they are
-  // where they are drawn.
-  const mut_connectable = useRef<readonly LaidOutNode[]>([]);
-
-  useEffect(() => {
-    mut_connectable.current =
-      arrangeable && animated === undefined ? placed : [];
-
-    if (!arrangeable || animated !== undefined) {
-      showHandle(undefined);
-    }
-  }, [arrangeable, animated, placed, showHandle]);
-
-  const domain = domainSignal.value;
-
-  // The node the arrow being drawn is over, other than the one it is drawn
-  // from, and whether a dependency on that one would be refused.
-  const connectTarget = useMemo((): ConnectTarget | undefined => {
-    if (connecting === undefined) {
-      return undefined;
-    }
-
-    const id = dropTargetAt(placed, connecting.to, reachAt(transform.scale));
-
-    const node =
-      id === connecting.from
-        ? undefined
-        : placed.find((placedNode) => placedNode.id === id);
-
-    return node === undefined
-      ? undefined
-      : {
-          node,
-          refused:
-            dependencyRefusal(
-              domain,
-              nodeRefOf(node.id),
-              nodeRefOf(connecting.from),
-            ) !== undefined,
-        };
-  }, [connecting, placed, transform.scale, domain]);
-
-  // What `fit` shows all of, in the way the mode is read.
-  const fitTarget = useMemo(
-    (): FitTarget =>
-      mode === 'arc'
-        ? {
-            kind: 'width',
-            bounds: arcContentBounds(arcNodes, settledArcs, GRAPH_MARGIN),
-          }
-        : mode === 'tile'
-          ? { kind: 'top' }
-          : {
-              kind: 'whole',
-              bounds: nodesBounds([...placed, ...settledFrames], GRAPH_MARGIN),
-            },
-    [mode, placed, settledFrames, arcNodes, settledArcs],
-  );
-
-  const mut_fitTarget = useRef<FitTarget>(fitTarget);
-
-  useEffect(() => {
-    mut_fitTarget.current = fitTarget;
-  }, [fitTarget]);
-
-  const show = useCallback((next: ViewTransform) => {
-    mut_transform.current = next;
-
-    setTransform(next);
-  }, []);
+  let mut_gesture: Gesture = IDLE_GESTURE;
 
   // Below the toolbar: where 「アーク」 and 「タイル」 start.
-  const topInset = useCallback((): number => {
-    const bar = toolbarRef.current;
+  const topInset = (): number => {
+    const bar = toolbar();
 
     return (
-      (bar === null ? 0 : bar.offsetTop + bar.offsetHeight) + TOOLBAR_CLEARANCE
+      (bar === undefined ? 0 : bar.offsetTop + bar.offsetHeight) +
+      TOOLBAR_CLEARANCE
     );
-  }, [toolbarRef]);
+  };
 
   // Where the rows of 「タイル」 are seen: from below the toolbar to above
   // the buttons at the bottom, so the last row is never under them.
-  const measureTile = useCallback((): TileFrame | undefined => {
-    const element = wrapper.current;
+  const measureTile = (): TileFrame | undefined => {
+    const element = mut_elements.wrapper;
 
-    if (element === null) {
+    if (element === undefined) {
       return undefined;
     }
 
     const rowsTop = topInset();
 
-    const controls = controlsRef.current;
+    const controls = mut_elements.controls;
 
     const rowsBottom =
-      (controls === null ? element.clientHeight : controls.offsetTop) -
+      (controls === undefined ? element.clientHeight : controls.offsetTop) -
       TOOLBAR_CLEARANCE;
 
     return { topInset: rowsTop, viewport: Math.max(0, rowsBottom - rowsTop) };
-  }, [topInset]);
+  };
 
-  // For the scroll indicator, which is drawn from it.
-  const [tileFrame, setTileFrame] = useState<TileFrame | undefined>(undefined);
-
-  const remeasureTile = useCallback((): TileFrame | undefined => {
-    const frame = measureTile();
-
-    setTileFrame((previous) =>
-      previous?.topInset === frame?.topInset &&
-      previous?.viewport === frame?.viewport
-        ? previous
-        : frame,
-    );
-
-    return frame;
-  }, [measureTile]);
+  const remeasureTile = (): void => {
+    setTileFrame(measureTile());
+  };
 
   /** 「タイル」 scrolled to `offset`, or as near as it goes. */
-  const scrollTileTo = useCallback(
-    (offset: number) => {
-      const frame = measureTile();
+  const scrollTileTo = (offset: number): void => {
+    const frame = measureTile();
 
-      if (frame === undefined) {
-        return;
-      }
-
-      const content = tileContentHeight(
-        dagLayoutStore.tileNodes.getSnapshot().value,
-      );
-
-      show(
-        tileViewTransform(
-          clampTileScroll(offset, content, frame.viewport),
-          frame.topInset,
-        ),
-      );
-    },
-    [measureTile, show],
-  );
-
-  /** How far 「タイル」 is scrolled. */
-  const tileOffset = useCallback(
-    (): number => tileScrollOf(mut_transform.current, topInset()),
-    [topInset],
-  );
-
-  const fit = useCallback(() => {
-    const element = wrapper.current;
-
-    if (element === null) {
+    if (frame === undefined) {
       return;
     }
 
-    const view = {
+    const content = tileContentHeight(tileNodes.getSnapshot().value);
+
+    setTransform(
+      tileViewTransform(
+        clampTileScroll(offset, content, frame.viewport),
+        frame.topInset,
+      ),
+    );
+  };
+
+  /** How far 「タイル」 is scrolled. */
+  const tileOffset = (): number => tileScrollOf(getTransform(), topInset());
+
+  const fit = (): void => {
+    const element = mut_elements.wrapper;
+
+    if (element === undefined) {
+      return;
+    }
+
+    const size = {
       width: element.clientWidth,
       height: element.clientHeight,
     } as const;
 
-    const target = mut_fitTarget.current;
+    const target = scene.fitTarget.getSnapshot().value;
 
     switch (target.kind) {
       case 'whole':
-        show(fitBoundsTransform(target.bounds, view, FIT_PADDING));
+        setTransform(fitBoundsTransform(target.bounds, size, FIT_PADDING));
 
         break;
 
       case 'width':
-        show(
-          fitWidthTopTransform(target.bounds, view, {
+        setTransform(
+          fitWidthTopTransform(target.bounds, size, {
             padding: FIT_PADDING,
             topInset: topInset(),
             minScale: ARC_MIN_SCALE,
@@ -835,389 +348,430 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
 
         break;
     }
-  }, [show, topInset, remeasureTile, scrollTileTo]);
+  };
 
   // 「全体表示」: all of it in sight. 「アーク」 is otherwise fitted by its
   // width, which leaves a long column to be panned down; the button shows
   // the whole column, below the toolbar, however small that makes it.
-  const fitAll = useCallback(() => {
-    const element = wrapper.current;
+  const fitAll = (): void => {
+    const element = mut_elements.wrapper;
 
-    const target = mut_fitTarget.current;
+    const target = scene.fitTarget.getSnapshot().value;
 
-    if (element === null || target.kind !== 'width') {
+    if (element === undefined || target.kind !== 'width') {
       fit();
 
       return;
     }
 
-    show(
+    setTransform(
       fitBelowTransform(
         target.bounds,
         { width: element.clientWidth, height: element.clientHeight },
         { padding: FIT_PADDING, topInset: topInset() },
       ),
     );
-  }, [fit, show, topInset]);
+  };
 
-  // Where the view was when the mode changed, for it to follow the nodes
-  // from there to the fit of the new mode at their pace; `undefined` when
-  // it is where it is going.
-  const [viewFrom, setViewFrom] = useState<ViewTransform | undefined>(
-    undefined,
-  );
+  const zoomBy = (factor: number): void => {
+    const element = mut_elements.wrapper;
 
-  const mut_fittedMode = useRef(mode);
+    if (element === undefined) {
+      return;
+    }
 
-  const mut_fittedRequests = useRef(fitRequests);
+    setTransform(
+      zoomAt(
+        getTransform(),
+        factor,
+        element.clientWidth / 2,
+        element.clientHeight / 2,
+      ),
+    );
+  };
+
+  /**
+   * In 「タイル」, the rows scrolled as `key` says (`tileKeyScroll`); whether
+   * it said anything.
+   */
+  const scrollTileByKey = (key: string): boolean => {
+    const frame =
+      mode.getSnapshot().value === 'tile' ? measureTile() : undefined;
+
+    const target =
+      frame === undefined
+        ? undefined
+        : tileKeyScroll(
+            key,
+            tileOffset(),
+            frame.viewport,
+            tileContentHeight(tileNodes.getSnapshot().value),
+          );
+
+    if (target === undefined) {
+      return false;
+    }
+
+    scrollTileTo(target);
+
+    return true;
+  };
+
+  // The width of 「タイル」's rows follows the canvas's; in 「タイル」 the
+  // view follows the tasks to their new rows, the first of the first row in
+  // view staying where it was.
+  const onResize = (): void => {
+    const element = mut_elements.wrapper;
+
+    if (element === undefined) {
+      return;
+    }
+
+    const before = tileNodes.getSnapshot().value;
+
+    const offset = tileOffset();
+
+    const from = scene.drawnTransform.getSnapshot().value;
+
+    dagLayoutStore.setTileWidth(tileAvailableWidth(element.clientWidth));
+
+    if (mode.getSnapshot().value !== 'tile') {
+      return;
+    }
+
+    const after = tileNodes.getSnapshot().value;
+
+    remeasureTile();
+
+    scrollTileTo(
+      anchoredTileScroll(
+        before.map(({ id }) => id),
+        positionsOf(before),
+        positionsOf(after),
+        offset,
+        before[0]?.height ?? 0,
+      ),
+    );
+
+    // Moving with the tasks, as when the mode changes.
+    if (
+      Arr.isNonEmpty(before) &&
+      !samePositions(positionsOf(before), positionsOf(after)) &&
+      dagLayoutStore.animationProgress.getSnapshot().value !== undefined
+    ) {
+      setViewFrom(from);
+    }
+  };
+
+  const observer = new ResizeObserver(onResize);
+
+  // Measured once it is in the document, before the first paint, so the
+  // rows are there to be drawn from the start.
+  afterUpdate(() => {
+    const element = mut_elements.wrapper;
+
+    if (element === undefined) {
+      return;
+    }
+
+    onResize();
+
+    observer.observe(element);
+  });
+
+  onScopeDispose(() => {
+    observer.disconnect();
+  });
 
   // Show all of it when it is first drawn, when nodes come or go, after
   // 「自動整列」, when the node size changes and when the mode changes — not
   // when a node is moved. Following the nodes, if they move, for a change
   // of mode and whatever the store asks a fit for.
-  const structureKey = layout.nodes.map(({ id }) => id).join(' ');
+  const mut_fitted: {
+    mode: DagViewMode;
+    requests: number;
+    queued: boolean;
+  } = {
+    mode: mode.getSnapshot().value,
+    requests: dagLayoutStore.fitRequests.getSnapshot().value,
+    queued: false,
+  };
 
-  useEffect(() => {
-    const from = mut_transform.current;
+  const structureKey = layout
+    .pipe(map(({ nodes }) => nodes.map(({ id }) => id).join(' ')))
+    .pipe(skipIfNoChange());
 
-    const asked =
-      mut_fittedMode.current !== mode ||
-      mut_fittedRequests.current !== fitRequests;
+  subscribeInScope(
+    combine([structureKey, dagLayoutStore.fitRequests, mode]),
+    () => {
+      if (mut_fitted.queued) {
+        return;
+      }
 
-    mut_fittedMode.current = mode;
+      mut_fitted.queued = true;
 
-    mut_fittedRequests.current = fitRequests;
+      afterUpdate(() => {
+        mut_fitted.queued = false;
 
-    fit();
+        const from = getTransform();
 
-    setViewFrom(
-      asked &&
-        dagLayoutStore.animationProgress.getSnapshot().value !== undefined
-        ? from
-        : undefined,
-    );
-  }, [fit, structureKey, fitRequests, mode]);
+        const currentMode = mode.getSnapshot().value;
+
+        const requests = dagLayoutStore.fitRequests.getSnapshot().value;
+
+        const asked =
+          mut_fitted.mode !== currentMode || mut_fitted.requests !== requests;
+
+        mut_fitted.mode = currentMode;
+
+        mut_fitted.requests = requests;
+
+        fit();
+
+        setViewFrom(
+          asked &&
+            dagLayoutStore.animationProgress.getSnapshot().value !== undefined
+            ? from
+            : undefined,
+        );
+      });
+    },
+  );
 
   // Put there at once with the nodes: at the end, or when they are stopped.
-  useEffect(() => {
-    if (progress === undefined) {
-      setViewFrom(undefined);
-    }
-  }, [progress]);
-
-  const drawnTransform =
-    viewFrom === undefined || progress === undefined
-      ? transform
-      : interpolateTransform(viewFrom, transform, progress);
-
-  // Where a view that starts to follow the nodes now starts from.
-  const mut_drawnTransform = useRef(drawnTransform);
-
-  useEffect(() => {
-    mut_drawnTransform.current = drawnTransform;
-  }, [drawnTransform]);
-
-  // The width of 「タイル」's rows follows the canvas's; in 「タイル」 the
-  // view follows the tasks to their new rows, the first of the first row in
-  // view staying where it was. Before the first paint, so the rows are
-  // there to be drawn from the start.
-  useLayoutEffect(() => {
-    const element = wrapper.current;
-
-    if (element === null) {
-      return undefined;
+  subscribeInScope(dagLayoutStore.animationProgress, (progress) => {
+    if (progress !== undefined) {
+      return;
     }
 
-    const onResize = (): void => {
-      const before = dagLayoutStore.tileNodes.getSnapshot().value;
-
-      const offset = tileOffset();
-
-      const from = mut_drawnTransform.current;
-
-      dagLayoutStore.setTileWidth(tileAvailableWidth(element.clientWidth));
-
-      if (dagViewModeStore.mode.getSnapshot().value !== 'tile') {
-        return;
+    afterUpdate(() => {
+      if (dagLayoutStore.animationProgress.getSnapshot().value === undefined) {
+        setViewFrom(undefined);
       }
+    });
+  });
 
-      const after = dagLayoutStore.tileNodes.getSnapshot().value;
+  // No handle outside the mode the reader arranges, nor while the nodes
+  // move to their places: it would be on a node that is not there.
+  subscribeInScope(scene.connectable, (nodes) => {
+    if (Arr.isNonEmpty(nodes)) {
+      return;
+    }
 
-      remeasureTile();
-
-      scrollTileTo(
-        anchoredTileScroll(
-          before.map(({ id }) => id),
-          positionsOf(before),
-          positionsOf(after),
-          offset,
-          before[0]?.height ?? 0,
-        ),
-      );
-
-      // Moving with the tasks, as when the mode changes.
-      if (
-        Arr.isNonEmpty(before) &&
-        !samePositions(positionsOf(before), positionsOf(after)) &&
-        dagLayoutStore.animationProgress.getSnapshot().value !== undefined
-      ) {
-        setViewFrom(from);
-      }
-    };
-
-    onResize();
-
-    const observer = new ResizeObserver(onResize);
-
-    observer.observe(element);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [tileOffset, remeasureTile, scrollTileTo]);
-
-  const zoomBy = useCallback(
-    (factor: number) => {
-      const element = wrapper.current;
-
-      if (element === null) {
-        return;
-      }
-
-      show(
-        zoomAt(
-          mut_transform.current,
-          factor,
-          element.clientWidth / 2,
-          element.clientHeight / 2,
-        ),
-      );
-    },
-    [show],
-  );
-
-  const zoomIn = useCallback(() => {
-    zoomBy(BUTTON_ZOOM);
-  }, [zoomBy]);
-
-  const zoomOut = useCallback(() => {
-    zoomBy(1 / BUTTON_ZOOM);
-  }, [zoomBy]);
-
-  const onPointerDown = useCallback<PointerEventHandler<SVGSVGElement>>(
-    (pressed) => {
-      // Every node where it is going, before one of them is grabbed.
-      dagLayoutStore.finishAnimation();
-
-      const pressedHandle = mut_handle.current;
-
-      const first = !Arr.isNonEmpty(mut_gesture.current.pointers);
-
-      const grab: Grab | undefined =
-        first && pressedHandle !== undefined && pressed.pointerType !== 'touch'
-          ? ({
-              kind: 'connect',
-              from: pressedHandle.id,
-              anchor: pressedHandle.at,
-            } as const)
-          : (grabOf(pressed.target, mut_placed.current, mut_frames.current) ??
-            // The background, in the mode the reader arranges.
-            (first &&
-            Arr.isNonEmpty(mut_placed.current) &&
-            (pressed.shiftKey || mut_lassoTool.current)
-              ? ({ kind: 'lasso' } as const)
-              : undefined));
-
-      if (grab?.kind !== 'connect') {
-        showHandle(undefined);
-      }
-
-      mut_gesture.current = pointerDown(
-        mut_gesture.current,
-        pointerOf(pressed),
-        mut_transform.current,
-        grab,
-      );
-
-      setDragged(undefined);
-
-      setConnecting(undefined);
-
-      setLasso(undefined);
-    },
-    [showHandle],
-  );
-
-  const onPointerMove = useCallback<PointerEventHandler<SVGSVGElement>>(
-    (moved) => {
-      const before = mut_gesture.current;
-
-      // Nothing pressed: a mouse or pen hovering, which may be near an
-      // outline.
-      if (!Arr.isNonEmpty(before.pointers)) {
-        showHandle(
-          moved.pointerType === 'touch'
-            ? undefined
-            : connectHandleAt(
-                mut_connectable.current,
-                contentPointAt(mut_transform.current, pointerOf(moved)),
-                reachAt(mut_transform.current.scale),
-              ),
-        );
-
-        return;
-      }
-
-      const next = pointerMove(before, pointerOf(moved));
-
-      mut_gesture.current = next.gesture;
-
-      // Once it is a drag, the pointer belongs to the canvas even when it
-      // leaves it — not before, so that a tap still clicks the node.
-      if (!before.dragging && next.gesture.dragging) {
-        moved.currentTarget.setPointerCapture(moved.pointerId);
-      }
-
-      if (next.gesture.nodeDrag !== before.nodeDrag) {
-        setDragged(next.gesture.nodeDrag);
-      }
-
-      if (next.gesture.connectDrag !== before.connectDrag) {
-        setConnecting(next.gesture.connectDrag);
-      }
-
-      if (next.gesture.lasso !== before.lasso) {
-        setLasso(next.gesture.lasso);
-      }
-
-      if (next.transform === undefined) {
-        return;
-      }
-
-      if (mode !== 'tile') {
-        show(next.transform);
-
-        return;
-      }
-
-      // Down and up alone, and no pinch.
-      if (!Arr.isMinLengthArray(2, next.gesture.pointers)) {
-        scrollTileTo(tileScrollOf(next.transform, topInset()));
-      }
-    },
-    [mode, show, scrollTileTo, topInset, showHandle],
-  );
-
-  const onPointerEnd = useCallback<PointerEventHandler<SVGSVGElement>>(
-    (ended) => {
-      const before = mut_gesture.current;
-
-      const { gesture, dropped, connected, lassoed } = pointerUp(
-        before,
-        ended.pointerId,
-        mut_transform.current,
-      );
-
-      mut_gesture.current = gesture;
-
-      // A cancelled pointer (the system took it over) drops nothing.
-      if (dropped !== undefined && ended.type === 'pointerup') {
-        dropDragged(
-          dropped,
-          mut_placed.current,
-          mut_frames.current,
-          mut_selection.current,
-        );
-      }
-
-      if (lassoed !== undefined && ended.type === 'pointerup') {
-        dagSelectionStore.select(nodesInLasso(mut_placed.current, lassoed));
-      }
-
-      // A tap on the background selects none.
-      if (
-        ended.type === 'pointerup' &&
-        !before.dragging &&
-        (before.start?.grab === undefined ||
-          before.start.grab.kind === 'lasso') &&
-        Arr.isFixedLengthArray(1, before.pointers) &&
-        before.pointers.some(({ id }) => id === ended.pointerId)
-      ) {
-        dagSelectionStore.clear();
-      }
-
-      const target =
-        connected === undefined || ended.type !== 'pointerup'
-          ? undefined
-          : dropTargetAt(
-              mut_placed.current,
-              connected.to,
-              reachAt(mut_transform.current.scale),
-            );
-
-      // Dropped back on the node it was drawn from: nothing.
-      if (
-        connected !== undefined &&
-        target !== undefined &&
-        target !== connected.from
-      ) {
-        dataStore.addDependency(nodeRefOf(target), nodeRefOf(connected.from));
-      }
-
-      setDragged(undefined);
-
-      setConnecting(undefined);
-
-      setLasso(undefined);
-
-      // Shown again by the next move, where the pointer is then.
-      showHandle(undefined);
-    },
-    [showHandle],
-  );
+    afterUpdate(() => {
+      setHandle(undefined);
+    });
+  });
 
   // Escape while an arrow is drawn gives it up. Listened for on the window,
   // since the focus need not be on the canvas then.
-  const drawingArrow = connecting !== undefined;
-
-  useEffect(() => {
-    if (!drawingArrow) {
-      return undefined;
+  listenInScope(globalThis, 'keydown', (pressed) => {
+    if (
+      !(pressed instanceof KeyboardEvent) ||
+      pressed.key !== 'Escape' ||
+      getConnecting() === undefined
+    ) {
+      return;
     }
 
-    const onEscape = (pressed: KeyboardEvent): void => {
-      if (pressed.key !== 'Escape') {
-        return;
-      }
+    pressed.preventDefault();
 
-      pressed.preventDefault();
+    mut_gesture = cancelConnect(mut_gesture);
 
-      mut_gesture.current = cancelConnect(mut_gesture.current);
+    setConnecting(undefined);
 
-      setConnecting(undefined);
+    setHandle(undefined);
+  });
 
-      showHandle(undefined);
-    };
+  // A key with the focus nowhere — on the page itself, as it is when the
+  // page opens — scrolls 「タイル」 as one on the canvas does.
+  listenInScope(document, 'keydown', (pressed) => {
+    if (
+      !(pressed instanceof KeyboardEvent) ||
+      pressed.defaultPrevented ||
+      pressed.target !== document.body ||
+      !scrollTileByKey(pressed.key)
+    ) {
+      return;
+    }
 
-    addEventListener('keydown', onEscape);
+    pressed.preventDefault();
+  });
 
-    return () => {
-      removeEventListener('keydown', onEscape);
-    };
-  }, [drawingArrow, showHandle]);
+  const onPointerDown = (pressed: SvgPointerEvent): void => {
+    // Every node where it is going, before one of them is grabbed.
+    dagLayoutStore.finishAnimation();
 
-  const onPointerLeaveCanvas = useCallback<PointerEventHandler<SVGSVGElement>>(
-    (left) => {
-      onPointerLeave(left);
+    const pressedHandle = getHandle();
 
-      showHandle(undefined);
-    },
-    [onPointerLeave, showHandle],
-  );
+    const movableNodes = scene.movableNodes.getSnapshot().value;
 
-  // A click that was not a drag, which the capture above lets through: on
+    const first = !Arr.isNonEmpty(mut_gesture.pointers);
+
+    const grab: Grab | undefined =
+      first && pressedHandle !== undefined && pressed.pointerType !== 'touch'
+        ? ({
+            kind: 'connect',
+            from: pressedHandle.id,
+            anchor: pressedHandle.at,
+          } as const)
+        : (grabOf(
+            pressed.target,
+            movableNodes,
+            scene.settledFrames.getSnapshot().value,
+          ) ??
+          // The background, in the mode the reader arranges.
+          (first &&
+          Arr.isNonEmpty(movableNodes) &&
+          (pressed.shiftKey || getLassoTool())
+            ? ({ kind: 'lasso' } as const)
+            : undefined));
+
+    if (grab?.kind !== 'connect') {
+      setHandle(undefined);
+    }
+
+    mut_gesture = pointerDown(
+      mut_gesture,
+      pointerOf(pressed),
+      getTransform(),
+      grab,
+    );
+
+    setDragged(undefined);
+
+    setConnecting(undefined);
+
+    setLasso(undefined);
+  };
+
+  const onPointerMove = (moved: SvgPointerEvent): void => {
+    const before = mut_gesture;
+
+    // Nothing pressed: a mouse or pen hovering, which may be near an
+    // outline.
+    if (!Arr.isNonEmpty(before.pointers)) {
+      setHandle(
+        moved.pointerType === 'touch'
+          ? undefined
+          : connectHandleAt(
+              scene.connectable.getSnapshot().value,
+              contentPointAt(getTransform(), pointerOf(moved)),
+              reachAt(getTransform().scale),
+            ),
+      );
+
+      return;
+    }
+
+    const next = pointerMove(before, pointerOf(moved));
+
+    mut_gesture = next.gesture;
+
+    // Once it is a drag, the pointer belongs to the canvas even when it
+    // leaves it — not before, so that a tap still clicks the node.
+    if (!before.dragging && next.gesture.dragging) {
+      moved.currentTarget.setPointerCapture(moved.pointerId);
+    }
+
+    if (next.gesture.nodeDrag !== before.nodeDrag) {
+      setDragged(next.gesture.nodeDrag);
+    }
+
+    if (next.gesture.connectDrag !== before.connectDrag) {
+      setConnecting(next.gesture.connectDrag);
+    }
+
+    if (next.gesture.lasso !== before.lasso) {
+      setLasso(next.gesture.lasso);
+    }
+
+    if (next.transform === undefined) {
+      return;
+    }
+
+    if (mode.getSnapshot().value !== 'tile') {
+      setTransform(next.transform);
+
+      return;
+    }
+
+    // Down and up alone, and no pinch.
+    if (!Arr.isMinLengthArray(2, next.gesture.pointers)) {
+      scrollTileTo(tileScrollOf(next.transform, topInset()));
+    }
+  };
+
+  const onPointerEnd = (ended: SvgPointerEvent): void => {
+    const before = mut_gesture;
+
+    const { gesture, dropped, connected, lassoed } = pointerUp(
+      before,
+      ended.pointerId,
+      getTransform(),
+    );
+
+    mut_gesture = gesture;
+
+    const movableNodes = scene.movableNodes.getSnapshot().value;
+
+    // A cancelled pointer (the system took it over) drops nothing.
+    if (dropped !== undefined && ended.type === 'pointerup') {
+      dropDragged(
+        dropped,
+        movableNodes,
+        scene.settledFrames.getSnapshot().value,
+        scene.selection.getSnapshot().value,
+      );
+    }
+
+    if (lassoed !== undefined && ended.type === 'pointerup') {
+      dagSelectionStore.select(nodesInLasso(movableNodes, lassoed));
+    }
+
+    // A tap on the background selects none.
+    if (
+      ended.type === 'pointerup' &&
+      !before.dragging &&
+      (before.start?.grab === undefined ||
+        before.start.grab.kind === 'lasso') &&
+      Arr.isFixedLengthArray(1, before.pointers) &&
+      before.pointers.some(({ id }) => id === ended.pointerId)
+    ) {
+      dagSelectionStore.clear();
+    }
+
+    const target =
+      connected === undefined || ended.type !== 'pointerup'
+        ? undefined
+        : dropTargetAt(
+            movableNodes,
+            connected.to,
+            reachAt(getTransform().scale),
+          );
+
+    // Dropped back on the node it was drawn from: nothing.
+    if (
+      connected !== undefined &&
+      target !== undefined &&
+      target !== connected.from
+    ) {
+      dataStore.addDependency(nodeRefOf(target), nodeRefOf(connected.from));
+    }
+
+    setDragged(undefined);
+
+    setConnecting(undefined);
+
+    setLasso(undefined);
+
+    // Shown again by the next move, where the pointer is then.
+    setHandle(undefined);
+  };
+
+  // A click that was not a drag, which the capture below lets through: on
   // an edge, it selects it; anywhere else, it leaves none selected.
-  const onClick = useCallback<MouseEventHandler<SVGSVGElement>>((clicked) => {
+  const onClick = (clicked: MouseEvent & SvgTarget): void => {
     const element =
       clicked.target instanceof Element
         ? clicked.target.closest('[data-edge-id]')
@@ -1229,7 +783,9 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
     const edge =
       id === undefined
         ? undefined
-        : mut_edges.current.find((candidate) => candidate.id === id);
+        : scene.edges
+            .getSnapshot()
+            .value.find((candidate) => candidate.id === id);
 
     if (edge === undefined || edge.implied) {
       setSelectedEdge(undefined);
@@ -1242,471 +798,414 @@ export const DagCanvas = memoNamed<Props>('DagCanvas', (props) => {
     setSelectedEdge({
       id: edge.id,
       path: edge.path,
-      at: contentPointAt(mut_drawnTransform.current, {
+      at: contentPointAt(scene.drawnTransform.getSnapshot().value, {
         x: clicked.clientX - bounds.left,
         y: clicked.clientY - bounds.top,
       }),
     });
-  }, []);
+  };
 
-  const onClickCapture = useCallback<MouseEventHandler<SVGSVGElement>>(
-    (clicked) => {
-      if (!mut_gesture.current.dragging) {
-        return;
-      }
+  const onWheel = (wheeled: WheelEvent & SvgTarget): void => {
+    wheeled.preventDefault();
 
-      clicked.stopPropagation();
+    const tile = mode.getSnapshot().value === 'tile';
 
-      clicked.preventDefault();
-    },
-    [],
-  );
-
-  const onWheel = useCallback<WheelEventHandler<SVGSVGElement>>(
-    (wheeled) => {
-      wheeled.preventDefault();
-
-      // A pinch on a trackpad comes as a wheel with Ctrl, and zooms
-      // nothing in 「タイル」.
-      if (mode === 'tile' && wheeled.ctrlKey) {
-        return;
-      }
-
-      if (mode === 'tile') {
-        scrollTileTo(
-          tileOffset() +
-            wheelScrollPixels(
-              wheeled.deltaY,
-              wheeled.deltaMode,
-              measureTile()?.viewport ?? 0,
-            ),
-        );
-
-        return;
-      }
-
-      const bounds = wheeled.currentTarget.getBoundingClientRect();
-
-      show(
-        zoomAt(
-          mut_transform.current,
-          wheelZoomFactor(wheeled.deltaY, wheeled.deltaMode),
-          wheeled.clientX - bounds.left,
-          wheeled.clientY - bounds.top,
-        ),
-      );
-    },
-    [mode, show, scrollTileTo, tileOffset, measureTile],
-  );
-
-  /**
-   * In 「タイル」, the rows scrolled as `key` says (`tileKeyScroll`); whether
-   * it said anything.
-   */
-  const scrollTileByKey = useCallback(
-    (key: string): boolean => {
-      const frame = mode === 'tile' ? measureTile() : undefined;
-
-      const target =
-        frame === undefined
-          ? undefined
-          : tileKeyScroll(
-              key,
-              tileOffset(),
-              frame.viewport,
-              tileContentHeight(dagLayoutStore.tileNodes.getSnapshot().value),
-            );
-
-      if (target === undefined) {
-        return false;
-      }
-
-      scrollTileTo(target);
-
-      return true;
-    },
-    [mode, measureTile, tileOffset, scrollTileTo],
-  );
-
-  // A key with the focus nowhere — on the page itself, as it is when the
-  // page opens — scrolls 「タイル」 as one on the canvas does.
-  useEffect(() => {
-    if (mode !== 'tile') {
-      return undefined;
+    // A pinch on a trackpad comes as a wheel with Ctrl, and zooms nothing
+    // in 「タイル」.
+    if (tile && wheeled.ctrlKey) {
+      return;
     }
 
-    const onDocumentKeyDown = (pressed: KeyboardEvent): void => {
-      if (
-        pressed.defaultPrevented ||
-        pressed.target !== document.body ||
-        !scrollTileByKey(pressed.key)
-      ) {
-        return;
-      }
+    if (tile) {
+      scrollTileTo(
+        tileOffset() +
+          wheelScrollPixels(
+            wheeled.deltaY,
+            wheeled.deltaMode,
+            measureTile()?.viewport ?? 0,
+          ),
+      );
 
-      pressed.preventDefault();
-    };
+      return;
+    }
 
-    document.addEventListener('keydown', onDocumentKeyDown);
+    const bounds = wheeled.currentTarget.getBoundingClientRect();
 
-    return () => {
-      document.removeEventListener('keydown', onDocumentKeyDown);
-    };
-  }, [mode, scrollTileByKey]);
+    setTransform(
+      zoomAt(
+        getTransform(),
+        wheelZoomFactor(wheeled.deltaY, wheeled.deltaMode),
+        wheeled.clientX - bounds.left,
+        wheeled.clientY - bounds.top,
+      ),
+    );
+  };
 
   // The keys of the nodes, and in 「タイル」 those of the canvas, which
   // takes the focus there. This puts the nodes where they are going, keeps a
   // key pressed on a node from scrolling the page behind the dialog it
   // opens, and in 「タイル」 scrolls the rows.
-  const onKeyDown = useCallback<KeyboardEventHandler<SVGSVGElement>>(
-    (pressed) => {
-      dagLayoutStore.finishAnimation();
+  const onKeyDown = (pressed: KeyboardEvent): void => {
+    dagLayoutStore.finishAnimation();
 
-      switch (pressed.key) {
-        case ' ':
-          pressed.preventDefault();
-
-          break;
-
-        // Unless it gives up an arrow being drawn, which is all it does then.
-        case 'Escape':
-          if (mut_gesture.current.start?.grab?.kind !== 'connect') {
-            dagSelectionStore.clear();
-          }
-
-          break;
-
-        default:
-          break;
-      }
-
-      if (scrollTileByKey(pressed.key)) {
+    switch (pressed.key) {
+      case ' ':
         pressed.preventDefault();
+
+        break;
+
+      // Unless it gives up an arrow being drawn, which is all it does then.
+      case 'Escape':
+        if (mut_gesture.start?.grab?.kind !== 'connect') {
+          dagSelectionStore.clear();
+        }
+
+        break;
+
+      default:
+        break;
+    }
+
+    if (scrollTileByKey(pressed.key)) {
+      pressed.preventDefault();
+    }
+  };
+
+  // Focus is followed as it bubbles up from the node. Written once the
+  // update under way has finished: a focused node that goes is blurred while
+  // the update that removes it propagates.
+  const onFocusIn = (focusedIn: FocusEvent): void => {
+    const id = nodeIdOf(focusedIn.target);
+
+    afterUpdate(() => {
+      setFocused(id);
+    });
+
+    // In 「タイル」, a task given the focus — by Tab — is scrolled into view.
+    if (mode.getSnapshot().value !== 'tile') {
+      return;
+    }
+
+    const node = tileNodes.getSnapshot().value.find((tile) => tile.id === id);
+
+    const frame = measureTile();
+
+    if (node === undefined || frame === undefined) {
+      return;
+    }
+
+    scrollTileTo(
+      revealTileScroll(
+        tileOffset(),
+        node.y,
+        node.y + node.height,
+        frame.viewport,
+      ),
+    );
+  };
+
+  const deleteSelectedEdge = (): void => {
+    const state = scene.edgeDelete.getSnapshot().value;
+
+    setSelectedEdge(undefined);
+
+    if (Optional.isNone(state)) {
+      return;
+    }
+
+    dataStore.removeDependency(
+      nodeRefOf(state.value.to),
+      nodeRefOf(state.value.from),
+    );
+  };
+
+  // The button is blurred as it goes too, while that update propagates.
+  const dismissSelectedEdge = (): void => {
+    afterUpdate(() => {
+      if (getSelectedEdge() !== undefined) {
+        setSelectedEdge(undefined);
       }
-    },
-    [scrollTileByKey],
+    });
+  };
+
+  const tileFrameShown = combine([mode, tileFrame$]).pipe(
+    map(([current, frame]) => (current === 'tile' ? frame : undefined)),
   );
-
-  // In 「タイル」, a task given the focus — by Tab — is scrolled into view.
-  const onFocusIn = useCallback<FocusEventHandler<SVGSVGElement>>(
-    (focusedIn) => {
-      onFocusCapture(focusedIn);
-
-      if (mode !== 'tile') {
-        return;
-      }
-
-      const id = nodeIdOf(focusedIn.target);
-
-      const node = dagLayoutStore.tileNodes
-        .getSnapshot()
-        .value.find((tile) => tile.id === id);
-
-      const frame = measureTile();
-
-      if (node === undefined || frame === undefined) {
-        return;
-      }
-
-      scrollTileTo(
-        revealTileScroll(
-          tileOffset(),
-          node.y,
-          node.y + node.height,
-          frame.viewport,
-        ),
-      );
-    },
-    [mode, onFocusCapture, measureTile, scrollTileTo, tileOffset],
-  );
-
-  const thumb =
-    mode === 'tile' && animated === undefined && tileFrame !== undefined
-      ? tileScrollThumb(
-          tileScrollOf(transform, tileFrame.topInset),
-          tileFrame.viewport,
-          tileContentHeight(tileNodes),
-          tileFrame.viewport,
-        )
-      : undefined;
 
   // In 「タイル」, the rows are cut off at the toolbar's bottom edge as they
   // scroll up, as a scrolled box would cut them, rather than showing
   // through it.
-  const clipTop =
-    mode === 'tile' && tileFrame !== undefined
-      ? tileFrame.topInset - TOOLBAR_CLEARANCE
-      : undefined;
-
-  const thumbTop =
-    thumb === undefined || tileFrame === undefined
-      ? undefined
-      : tileFrame.topInset + thumb.top;
-
-  const thumbHeight = thumb?.height;
-
-  const thumbStyle = useMemo(
-    () =>
-      thumbTop === undefined || thumbHeight === undefined
-        ? undefined
-        : ({ top: `${thumbTop}px`, height: `${thumbHeight}px` } as const),
-    [thumbTop, thumbHeight],
+  const clipTop = tileFrameShown.pipe(
+    map((frame) =>
+      frame === undefined ? undefined : frame.topInset - TOOLBAR_CLEARANCE,
+    ),
   );
 
+  const thumb = combine([tileFrameShown, animated, transform$, tileNodes]).pipe(
+    map(([frame, moved, current, tiles]) => {
+      if (frame === undefined || moved !== undefined) {
+        return undefined;
+      }
+
+      const at = tileScrollThumb(
+        tileScrollOf(current, frame.topInset),
+        frame.viewport,
+        tileContentHeight(tiles),
+        frame.viewport,
+      );
+
+      return at === undefined
+        ? undefined
+        : ({ top: frame.topInset + at.top, height: at.height } as const);
+    }),
+  );
+
+  const { arrangeable } = scene;
+
   return (
-    <figure ref={wrapper} className={'dag-canvas'}>
-      <figcaption className={'visually-hidden'}>{captions[mode]}</figcaption>
+    <figure
+      ref={(element) => {
+        mut_elements.wrapper = element;
+      }}
+      class={constant('dag-canvas')}
+    >
+      <figcaption class={constant('visually-hidden')}>
+        {view(mode, (current) => captions[current])}
+      </figcaption>
       <svg
-        aria-label={mode === 'tile' ? captions.tile : undefined}
-        className={'dag-svg'}
-        data-animating={animated !== undefined}
-        data-connect={handle !== undefined || connecting !== undefined}
-        data-e2e={'dag-canvas'}
-        data-lasso={arrangeable && lassoTool}
-        data-mode={mode}
-        data-motion={motion}
+        ref={(svg) => {
+          // A click after a drag is swallowed here, before it reaches the
+          // node or the edge it ends on.
+          listenInScope(
+            svg,
+            'click',
+            (clicked) => {
+              if (!mut_gesture.dragging) {
+                return;
+              }
+
+              clicked.stopPropagation();
+
+              clicked.preventDefault();
+            },
+            { capture: true },
+          );
+        }}
+        aria-label={view(mode, (current) =>
+          current === 'tile' ? captions.tile : undefined,
+        )}
+        class={constant('dag-svg')}
+        data-animating={view(animated, (moved) => String(moved !== undefined))}
+        data-connect={view(combine([handle$, connecting$]), ([handle, arrow]) =>
+          String(handle !== undefined || arrow !== undefined),
+        )}
+        data-e2e={constant('dag-canvas')}
+        data-lasso={view(
+          combine([arrangeable, lassoTool$]),
+          ([canArrange, tool]) => String(canArrange && tool),
+        )}
+        data-mode={view(mode, (current) => current)}
+        data-motion={view(
+          combine([animationSettingStore.setting, reducedMotionStore.matches]),
+          ([setting, reduced]) => String(shouldAnimate(setting, reduced)),
+        )}
         // In 「タイル」, focusable — by Tab, or by a press on it — as a
-        // scrolled box is, so that its keys work with no task focused. Lower
-        // case: an SVG attribute `tabIndex` is not `tabindex`.
-        tabindex={mode === 'tile' ? 0 : undefined}
-        onBlurCapture={onBlurCapture}
+        // scrolled box is, so that its keys work with no task focused.
+        tabindex={view(mode, (current) => (current === 'tile' ? 0 : undefined))}
         onClick={onClick}
-        onClickCapture={onClickCapture}
-        onFocusCapture={onFocusIn}
+        onFocusIn={onFocusIn}
+        onFocusOut={() => {
+          afterUpdate(() => {
+            setFocused(undefined);
+          });
+        }}
         onKeyDown={onKeyDown}
         onPointerCancel={onPointerEnd}
         onPointerDown={onPointerDown}
-        onPointerLeave={onPointerLeaveCanvas}
+        onPointerLeave={() => {
+          setHovered(undefined);
+
+          setHandle(undefined);
+        }}
         onPointerMove={onPointerMove}
-        onPointerOver={onPointerOver}
+        onPointerOver={(over) => {
+          setHovered(nodeIdOf(over.target));
+        }}
         onPointerUp={onPointerEnd}
         onWheel={onWheel}
       >
         <defs>
-          <marker
-            id={'dag-arrow'}
-            markerHeight={8}
-            markerWidth={8}
-            orient={'auto-start-reverse'}
-            refX={9}
-            refY={5}
-            viewBox={'0 0 10 10'}
-          >
-            <path className={'dag-arrow'} d={'M 0 0 L 10 5 L 0 10 z'} />
-          </marker>
-          <marker
-            id={'dag-arrow-highlight'}
-            markerHeight={8}
-            markerWidth={8}
-            orient={'auto-start-reverse'}
-            refX={9}
-            refY={5}
-            viewBox={'0 0 10 10'}
-          >
-            <path
-              className={'dag-arrow-highlight'}
-              d={'M 0 0 L 10 5 L 0 10 z'}
-            />
-          </marker>
-          <marker
-            id={'dag-arrow-connect'}
-            markerHeight={8}
-            markerWidth={8}
-            orient={'auto-start-reverse'}
-            refX={9}
-            refY={5}
-            viewBox={'0 0 10 10'}
-          >
-            <path className={'dag-arrow-connect'} d={'M 0 0 L 10 5 L 0 10 z'} />
-          </marker>
-          <marker
-            id={'dag-arrow-refused'}
-            markerHeight={8}
-            markerWidth={8}
-            orient={'auto-start-reverse'}
-            refX={9}
-            refY={5}
-            viewBox={'0 0 10 10'}
-          >
-            <path className={'dag-arrow-refused'} d={'M 0 0 L 10 5 L 0 10 z'} />
-          </marker>
-          {clipTop === undefined ? undefined : (
-            <clipPath id={'dag-tile-clip'}>
-              <rect height={'100%'} width={'100%'} x={0} y={clipTop} />
-            </clipPath>
-          )}
+          {arrowMarker('dag-arrow')}
+          {arrowMarker('dag-arrow-highlight')}
+          {arrowMarker('dag-arrow-connect')}
+          {arrowMarker('dag-arrow-refused')}
+          <If
+            cond={view(clipTop, (top) => top !== undefined)}
+            then={
+              <clipPath id={constant('dag-tile-clip')}>
+                <rect
+                  height={constant('100%')}
+                  width={constant('100%')}
+                  x={constant(0)}
+                  y={view(clipTop, (top) => top ?? 0)}
+                />
+              </clipPath>
+            }
+          />
         </defs>
-        <g clipPath={clipTop === undefined ? undefined : 'url(#dag-tile-clip)'}>
+        <g
+          clip-path={view(clipTop, (top) =>
+            top === undefined ? undefined : 'url(#dag-tile-clip)',
+          )}
+        >
           <g
-            transform={`translate(${drawnTransform.x} ${drawnTransform.y}) scale(${drawnTransform.scale})`}
+            transform={view(
+              scene.drawnTransform,
+              ({ x, y, scale }) => `translate(${x} ${y}) scale(${scale})`,
+            )}
           >
-            {shownFrames.map((frame) => (
-              <DagGroupFrame
-                key={frame.id}
-                dragging={frame.id === groupDrag?.id}
-                drop={
-                  dropTargets === undefined ||
-                  dropTargets.into === dropTargets.from
-                    ? undefined
-                    : frame.id === dropTargets.into
-                      ? 'into'
-                      : frame.id === dropTargets.from
-                        ? 'leave'
-                        : undefined
-                }
-                frame={frame}
-                title={titles.get(frame.id) ?? ''}
-              />
-            ))}
-            {edgesHidden ? undefined : (
-              // Mounted afresh when they come back, which fades them in.
-              <g className={'dag-edges'}>
-                {edges.map((edge) => (
-                  <DagEdge
-                    key={edge.id}
-                    edge={edge}
-                    selected={edge.id === selectedEdgeId}
-                  />
-                ))}
-                {settledArcs.map((arc) => (
-                  <DagArcEdge
-                    key={arc.id}
-                    arc={arc}
-                    highlight={highlightOf(highlight?.edges, arc.id)}
-                  />
-                ))}
-              </g>
-            )}
-            {shown.map((node) => {
-              const view = views.get(node.id);
-
-              const isDragged =
-                node.id === dragged?.id ||
-                selectionDrag?.members.has(node.id) === true;
-
-              const isSelected = arrangeable && drawnSelection.has(node.id);
-
-              const nodeHighlight = highlightOf(highlight?.nodes, node.id);
-
-              const opacity = opacities?.get(node.id);
-
-              return view === undefined ? undefined : view.kind === 'task' ? (
-                <DagTaskNode
-                  key={node.id}
-                  compact={compact}
-                  dragging={isDragged}
-                  highlight={nodeHighlight}
-                  movable={arrangeable}
-                  node={node}
-                  opacity={opacity}
-                  outside={outside.has(node.id)}
-                  selected={isSelected}
-                  view={view}
+            <For items={scene.frames} key={({ frame }) => frame.id}>
+              {(record) => <DagGroupFrame record={record} />}
+            </For>
+            <If
+              cond={view(scene.edgesHidden, (hidden) => !hidden)}
+              then={
+                // Mounted afresh when they come back, which fades them in.
+                <g class={constant('dag-edges')}>
+                  <For items={scene.edgeList} key={({ edge }) => edge.id}>
+                    {(record) => <DagEdge record={record} />}
+                  </For>
+                  <For items={scene.arcs} key={({ arc }) => arc.id}>
+                    {(record) => <DagArcEdge record={record} />}
+                  </For>
+                </g>
+              }
+            />
+            <For items={scene.nodes} key={({ node }) => node.id}>
+              {(record) => (
+                <MatchOptional
+                  value={view(record, taskRecordOf)}
+                  some={(task) => <DagTaskNode record={task} />}
+                  none={
+                    <MatchOptional
+                      value={view(record, milestoneRecordOf)}
+                      some={(milestone) => (
+                        <DagMilestoneNode record={milestone} />
+                      )}
+                    />
+                  }
                 />
-              ) : (
-                <DagMilestoneNode
-                  key={node.id}
-                  compact={compact}
-                  dragging={isDragged}
-                  highlight={nodeHighlight}
-                  movable={arrangeable}
-                  node={node}
-                  opacity={opacity}
-                  outside={outside.has(node.id)}
-                  selected={isSelected}
-                  view={view}
+              )}
+            </For>
+            <MatchOptional
+              value={scene.edgeDelete}
+              some={(button) => (
+                <DagEdgeDelete
+                  button={button}
+                  onDelete={deleteSelectedEdge}
+                  onDismiss={dismissSelectedEdge}
                 />
-              );
-            })}
-            {selected === undefined ? undefined : (
-              <DagEdgeDelete
-                at={selected.at}
-                label={deleteLabel}
-                scale={drawnTransform.scale}
-                onDelete={deleteSelectedEdge}
-                onDismiss={dismissSelectedEdge}
-              />
-            )}
-            {lasso === undefined ? undefined : (
-              <path
-                className={'dag-lasso'}
-                d={lassoPathData(lasso)}
-                data-e2e={'dag-lasso'}
-              />
-            )}
-            {arrangeable ? (
-              <DagConnectOverlay
-                connecting={connecting}
-                handle={connecting === undefined ? handle : undefined}
-                scale={drawnTransform.scale}
-                target={connectTarget}
-              />
-            ) : undefined}
+              )}
+            />
+            <If
+              cond={view(lasso$, (points) => points !== undefined)}
+              then={
+                <path
+                  class={constant('dag-lasso')}
+                  d={view(lasso$, (points) => lassoPathData(points ?? []))}
+                  data-e2e={constant('dag-lasso')}
+                />
+              }
+            />
+            <MatchOptional
+              value={scene.connectOverlay}
+              some={(overlay) => <DagConnectOverlay overlay={overlay} />}
+            />
           </g>
         </g>
       </svg>
-      {thumbStyle === undefined ? undefined : (
-        <div
-          aria-hidden={'true'}
-          className={'dag-scroll-thumb'}
-          data-e2e={'dag-scroll-thumb'}
-          style={thumbStyle}
+      <If
+        cond={view(thumb, (at) => at !== undefined)}
+        then={
+          <div
+            aria-hidden={constant('true')}
+            class={constant('dag-scroll-thumb')}
+            data-e2e={constant('dag-scroll-thumb')}
+            style={{
+              top: view(thumb, (at) => `${at?.top ?? 0}px`),
+              height: view(thumb, (at) => `${at?.height ?? 0}px`),
+            }}
+          />
+        }
+      />
+      <div
+        ref={(element) => {
+          mut_elements.controls = element;
+        }}
+        class={constant('dag-controls')}
+      >
+        <If
+          cond={arrangeable}
+          then={
+            <button
+              aria-pressed={view(lassoTool$, String)}
+              class={{ 'bp6-button': constant(true), 'bp6-active': lassoTool$ }}
+              data-e2e={constant('dag-lasso-tool')}
+              title={constant(
+                '背景のドラッグで囲んだノードを選びます（Shift を押しながらのドラッグでも選べます）',
+              )}
+              type={constant('button')}
+              onClick={() => {
+                updateLassoTool((tool) => !tool);
+              }}
+            >
+              {constant('なげなわ')}
+            </button>
+          }
         />
-      )}
-      <div ref={controlsRef} className={'dag-controls'}>
-        {arrangeable ? (
-          <button
-            aria-pressed={lassoTool}
-            className={`bp6-button ${lassoTool ? 'bp6-active' : ''}`}
-            data-e2e={'dag-lasso-tool'}
-            title={
-              '背景のドラッグで囲んだノードを選びます（Shift を押しながらのドラッグでも選べます）'
-            }
-            type={'button'}
-            onClick={toggleLassoTool}
-          >
-            {'なげなわ'}
-          </button>
-        ) : undefined}
-        {mode === 'tile' ? undefined : (
-          <>
-            <button
-              aria-label={'拡大'}
-              className={'bp6-button'}
-              data-e2e={'dag-zoom-in'}
-              type={'button'}
-              onClick={zoomIn}
-            >
-              {'＋'}
-            </button>
-            <button
-              aria-label={'縮小'}
-              className={'bp6-button'}
-              data-e2e={'dag-zoom-out'}
-              type={'button'}
-              onClick={zoomOut}
-            >
-              {'－'}
-            </button>
-          </>
-        )}
+        <If
+          cond={view(mode, (current) => current !== 'tile')}
+          then={
+            <>
+              <button
+                aria-label={constant('拡大')}
+                class={constant('bp6-button')}
+                data-e2e={constant('dag-zoom-in')}
+                type={constant('button')}
+                onClick={() => {
+                  zoomBy(BUTTON_ZOOM);
+                }}
+              >
+                {constant('＋')}
+              </button>
+              <button
+                aria-label={constant('縮小')}
+                class={constant('bp6-button')}
+                data-e2e={constant('dag-zoom-out')}
+                type={constant('button')}
+                onClick={() => {
+                  zoomBy(1 / BUTTON_ZOOM);
+                }}
+              >
+                {constant('－')}
+              </button>
+            </>
+          }
+        />
         <button
-          className={'bp6-button'}
-          data-e2e={'dag-fit'}
-          type={'button'}
+          class={constant('bp6-button')}
+          data-e2e={constant('dag-fit')}
+          type={constant('button')}
           onClick={fitAll}
         >
-          {'全体表示'}
+          {constant('全体表示')}
         </button>
       </div>
     </figure>
   );
-});
+};
 
 const INITIAL: ViewTransform = { x: 0, y: 0, scale: 1 } as const;
-
-/** Clear around the nodes, as ELK leaves (`elk.padding`). */
-const GRAPH_MARGIN = 24;
 
 const FIT_PADDING = 16;
 
@@ -1719,42 +1218,17 @@ const ARC_MIN_SCALE = 0.5;
 /** Between the toolbar and the top of 「アーク」 fitted below it. */
 const TOOLBAR_CLEARANCE = 8;
 
-/** Nodes moving with the one dragged: how far, and which. */
-type MovingNodes = Readonly<{
-  dx: number;
-  dy: number;
-  members: ReadonlySet<GraphNodeId>;
-}>;
-
-/** The group dragged by its title: how far, and the nodes moving with it. */
-type GroupDrag = MovingNodes & Readonly<{ id: GroupId }>;
-
-/**
- * The group a node being dragged would go into if dropped now, and the one
- * it is in; `undefined` for none.
- */
-type NodeDropTargets = Readonly<{
-  into: GroupId | undefined;
-  from: GroupId | undefined;
-}>;
-
-/**
- * The edge clicked: its id, its path then — for it to stop being selected
- * once it is drawn anywhere else — and where it was clicked, in content
- * coordinates.
- */
-type SelectedEdge = Readonly<{ id: string; path: string; at: Point }>;
-
-/** What `fit` shows: all of it, its width from the top, or the top. */
-type FitTarget = Readonly<
-  { kind: 'whole' | 'width'; bounds: Bounds } | { kind: 'top' }
->;
+const BUTTON_ZOOM = 1.25;
 
 /**
  * Where 「タイル」 is seen: the top of its rows when not scrolled, and how
  * high the part of the canvas they are seen in is.
  */
 type TileFrame = Readonly<{ topInset: number; viewport: number }>;
+
+type SvgTarget = Readonly<{ currentTarget: SVGSVGElement }>;
+
+type SvgPointerEvent = PointerEvent & SvgTarget;
 
 /** What the canvas shows, for a screen reader. */
 const captions = {
@@ -1763,38 +1237,55 @@ const captions = {
   tile: 'タスクをタイトル順に左上から横に並べ、幅に収まらない分は次の行に折り返します。依存は示しません。タスクを選ぶと詳細を開きます。ホイール、ドラッグ、Page Up・Page Down・Home・End キーで縦にスクロールできます。',
 } as const satisfies ReadonlyRecord<DagViewMode, string>;
 
-const BUTTON_ZOOM = 1.25;
+/** An arrowhead the edges end in, drawn in the colour of `id`'s class. */
+const arrowMarker = (id: string): JSX.Element => (
+  <marker
+    id={constant(id)}
+    markerHeight={constant(8)}
+    markerWidth={constant(8)}
+    orient={constant('auto-start-reverse')}
+    refX={constant(9)}
+    refY={constant(5)}
+    viewBox={constant('0 0 10 10')}
+  >
+    <path class={constant(id)} d={constant('M 0 0 L 10 5 L 0 10 z')} />
+  </marker>
+);
 
 /**
- * How near a node's outline, on the screen, a mouse or pen shows its handle
- * — outside the node, where an arrow dropped still joins it, and inside it,
- * where the rest is for moving it.
+ * A row of the nodes as a task's, or as a milestone's. A node's id is the
+ * one or the other for good, so a row stays what it starts as.
  */
-const HANDLE_REACH_PX = { outside: 10, inside: 5 } as const;
+const taskRecordOf = ({
+  view: nodeView,
+  ...rest
+}: DagNodeRecord): Optional<DagNodeRecord<TaskNodeView>> =>
+  nodeView.kind === 'task'
+    ? Optional.some({ ...rest, view: nodeView })
+    : Optional.none;
 
-/** {@link HANDLE_REACH_PX} in content coordinates, at the zoom `scale`. */
-const reachAt = (scale: number): ConnectReach =>
-  Num.isNonZero(scale)
-    ? ({
-        outside: Num.div(HANDLE_REACH_PX.outside, scale),
-        inside: Num.div(HANDLE_REACH_PX.inside, scale),
-      } as const)
-    : HANDLE_REACH_PX;
+const milestoneRecordOf = ({
+  view: nodeView,
+  ...rest
+}: DagNodeRecord): Optional<DagNodeRecord<MilestoneNodeView>> =>
+  nodeView.kind === 'milestone'
+    ? Optional.some({ ...rest, view: nodeView })
+    : Optional.none;
 
-/**
- * How long routing the edges for one move of a drag may take before the
- * rest of the drag stops doing it: most of a frame.
- */
-const DRAG_ROUTING_BUDGET_MS = 10;
+/** The same handle, where a new object for it would draw nothing new. */
+const sameHandle = (
+  a: ConnectHandle | undefined,
+  b: ConnectHandle | undefined,
+): boolean => a?.id === b?.id && a?.at.x === b?.at.x && a?.at.y === b?.at.y;
+
+const sameTileFrame = (
+  a: TileFrame | undefined,
+  b: TileFrame | undefined,
+): boolean => a?.topInset === b?.topInset && a?.viewport === b?.viewport;
 
 /** The pointer, in the canvas's own coordinates. */
 const pointerOf = (
-  source: Readonly<{
-    pointerId: number;
-    clientX: number;
-    clientY: number;
-    currentTarget: Readonly<{ getBoundingClientRect: () => DOMRect }>;
-  }>,
+  source: SvgPointerEvent,
 ): Readonly<{ id: number; x: number; y: number }> => {
   const bounds = source.currentTarget.getBoundingClientRect();
 

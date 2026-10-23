@@ -1,41 +1,37 @@
-import type { GenericEventHandler } from 'preact';
-import { memoNamed } from 'preact-utils';
-import { dagViewModeSignal, dagViewModeStore } from '../store/index.mjs';
+import { constant, view, type JSX } from 'synstate-dom';
+import { dagViewModeStore } from '../store/index.mjs';
 import { dagViewModeLabels, dagViewModes } from '../view-model/index.mjs';
 
 /**
  * How the graph is drawn: one button per view mode, the pressed one is the
- * mode shown. Kept on this device, and in the URL. A mode added to `dagViewModes` gets its
- * button here with nothing else to do.
+ * mode shown. Kept on this device, and in the URL. A mode added to
+ * `dagViewModes` gets its button here with nothing else to do.
  */
-export const DagViewModeSwitch = memoNamed('DagViewModeSwitch', () => {
-  const current = dagViewModeSignal.value;
-
-  return (
-    <fieldset aria-label={'表示形式'} className={'bp6-button-group'}>
-      {dagViewModes.map((mode) => (
-        <button
-          key={mode}
-          aria-pressed={mode === current}
-          className={`bp6-button ${mode === current ? 'bp6-active' : ''}`}
-          data-e2e={`dag-mode-${mode}`}
-          type={'button'}
-          value={mode}
-          onClick={onModeClick}
-        >
-          {dagViewModeLabels[mode]}
-        </button>
-      ))}
-    </fieldset>
-  );
-});
-
-const onModeClick: GenericEventHandler<HTMLButtonElement> = (clicked) => {
-  const picked = dagViewModes.find(
-    (mode) => mode === clicked.currentTarget.value,
-  );
-
-  if (picked !== undefined) {
-    dagViewModeStore.set(picked);
-  }
-};
+export const DagViewModeSwitch = (): JSX.Element => (
+  <fieldset
+    aria-label={constant('表示形式')}
+    class={constant('bp6-button-group')}
+  >
+    {dagViewModes.map((mode) => (
+      <button
+        aria-pressed={view(dagViewModeStore.mode, (current) =>
+          String(current === mode),
+        )}
+        class={{
+          'bp6-button': constant(true),
+          'bp6-active': view(
+            dagViewModeStore.mode,
+            (current) => current === mode,
+          ),
+        }}
+        data-e2e={constant(`dag-mode-${mode}`)}
+        type={constant('button')}
+        onClick={() => {
+          dagViewModeStore.set(mode);
+        }}
+      >
+        {constant(dagViewModeLabels[mode])}
+      </button>
+    ))}
+  </fieldset>
+);

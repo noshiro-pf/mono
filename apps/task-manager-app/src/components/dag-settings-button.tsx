@@ -1,10 +1,5 @@
-import { memoNamed } from 'preact-utils';
-import {
-  dagFilterSignal,
-  narrowStore,
-  settingsPanelSignal,
-  uiStore,
-} from '../store/index.mjs';
+import { constant, If, view, type JSX } from 'synstate-dom';
+import { dagFilterStore, narrowStore, uiStore } from '../store/index.mjs';
 import {
   isDagFilterEmpty,
   settingsPanelPlacement,
@@ -20,37 +15,52 @@ import {
  * graph is filtered (`dag-filter-field.tsx`), a dot on it says so, since
  * nothing else on the screen does.
  */
-export const DagSettingsButton = memoNamed('DagSettingsButton', () => {
-  const filtered = !isDagFilterEmpty(dagFilterSignal.value);
-
-  return (
-    <button
-      aria-expanded={settingsPanelSignal.value !== undefined}
-      aria-haspopup={'dialog'}
-      className={'bp6-button dag-settings-button'}
-      data-e2e={'dag-settings'}
-      id={DAG_SETTINGS_BUTTON_ID}
-      type={'button'}
-      onClick={openSettings}
+export const DagSettingsButton = (): JSX.Element => (
+  <button
+    aria-expanded={view(uiStore.settingsPanel, (placement) =>
+      String(placement !== undefined),
+    )}
+    aria-haspopup={constant('dialog')}
+    class={constant('bp6-button dag-settings-button')}
+    data-e2e={constant('dag-settings')}
+    id={constant(DAG_SETTINGS_BUTTON_ID)}
+    type={constant('button')}
+    onClick={() => {
+      uiStore.openSettings(currentSettingsPlacement());
+    }}
+  >
+    <span
+      aria-hidden={constant('true')}
+      class={constant('bp6-icon bp6-icon-cog')}
     >
-      <span aria-hidden className={'bp6-icon bp6-icon-cog'}>
-        <svg data-icon={'cog'} height={16} viewBox={'0 0 16 16'} width={16}>
-          <path d={COG_16} fillRule={'evenodd'} />
-        </svg>
-      </span>
-      <span className={'dag-settings-button-text'}>{'表示設定'}</span>
-      {filtered ? (
+      <svg
+        data-icon={constant('cog')}
+        height={constant(16)}
+        viewBox={constant('0 0 16 16')}
+        width={constant(16)}
+      >
+        <path d={constant(COG_16)} fill-rule={constant('evenodd')} />
+      </svg>
+    </span>
+    <span class={constant('dag-settings-button-text')}>
+      {constant('表示設定')}
+    </span>
+    <If
+      cond={view(dagFilterStore.filter, (filter) => !isDagFilterEmpty(filter))}
+      then={
         <span
-          className={'dag-settings-filtered'}
-          data-e2e={'dag-filtered'}
-          title={'絞り込み中'}
+          class={constant('dag-settings-filtered')}
+          data-e2e={constant('dag-filtered')}
+          title={constant('絞り込み中')}
         >
-          <span className={'visually-hidden'}>{'（絞り込み中）'}</span>
+          <span class={constant('visually-hidden')}>
+            {constant('（絞り込み中）')}
+          </span>
         </span>
-      ) : undefined}
-    </button>
-  );
-});
+      }
+    />
+  </button>
+);
 
 /** For the panel, to hang from it and to give the focus back to it. */
 export const DAG_SETTINGS_BUTTON_ID = 'dag-settings-button';
@@ -71,10 +81,6 @@ export const currentSettingsPlacement = (): SettingsPanelPlacement => {
     { width: page.clientWidth, height: page.clientHeight },
     narrowStore.matches.getSnapshot().value,
   );
-};
-
-const openSettings = (): void => {
-  uiStore.openSettings(currentSettingsPlacement());
 };
 
 /**

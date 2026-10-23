@@ -1,14 +1,18 @@
-import type { GenericEventHandler } from 'preact';
-import { memoNamed } from 'preact-utils';
+import { combine, map } from 'synstate';
+import {
+  constant,
+  derive,
+  For,
+  If,
+  mapBindable,
+  view,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { taskLabels } from '../dag/index.mjs';
 import { asGroupId } from '../domain/index.mjs';
-import {
-  dagFilterSignal,
-  dagFilterStore,
-  domainSignal,
-  groupsSignal,
-} from '../store/index.mjs';
+import { dagFilterStore, dataStore } from '../store/index.mjs';
 import { isDagFilterEmpty } from '../view-model/index.mjs';
 
 /**
@@ -19,114 +23,155 @@ import { isDagFilterEmpty } from '../view-model/index.mjs';
  * it. What a choice leaves of the graph is `dag/node-filter.mts`'s; it is
  * kept in the URL (`view-model/dag-filter.mts`).
  */
-export const DagFilterField = memoNamed('DagFilterField', () => {
-  const filter = dagFilterSignal.value;
+export const DagFilterField = (): JSX.Element => {
+  const { filter } = dagFilterStore;
 
-  const groups = groupsSignal.value;
+  const { groups } = dataStore;
 
-  const labels = taskLabels(domainSignal.value);
+  const labels$ = dataStore.state.pipe(map(taskLabels));
+
+  const nothingToChoose = derive(
+    [groups, labels$],
+    (gs, ls) => Arr.isEmpty(gs) && Arr.isEmpty(ls),
+  );
 
   return (
-    <fieldset aria-describedby={HINT_ID} className={'settings-field'}>
-      <legend className={'settings-field-label'}>{'絞り込み'}</legend>
-      {Arr.isEmpty(groups) ? undefined : (
-        <fieldset className={'settings-field-control dag-filter-choices'}>
-          <legend className={'dag-filter-kind'}>{'グループ'}</legend>
-          {groups.map((group) => (
+    <fieldset
+      aria-describedby={constant(HINT_ID)}
+      class={constant('settings-field')}
+    >
+      <legend class={constant('settings-field-label')}>
+        {constant('絞り込み')}
+      </legend>
+      <If
+        cond={view(groups, Arr.isNonEmpty)}
+        then={
+          <fieldset
+            class={constant('settings-field-control dag-filter-choices')}
+          >
+            <legend class={constant('dag-filter-kind')}>
+              {constant('グループ')}
+            </legend>
+            <For items={groups} key={(group) => group.id}>
+              {(group$) => (
+                <Choice
+                  checked={combine([filter, group$]).pipe(
+                    map(([f, { id }]) => f.groups.includes(id)),
+                  )}
+                  e2e={'dag-filter-group'}
+                  title={view(group$, ({ title }) => title)}
+                  value={view(group$, ({ id }) => id)}
+                  onChange={onGroupChange}
+                />
+              )}
+            </For>
             <Choice
-              key={group.id}
-              checked={filter.groups.includes(group.id)}
+              checked={view(filter, (f) => f.groups.includes(undefined))}
               e2e={'dag-filter-group'}
-              title={group.title}
-              value={group.id}
+              title={constant('グループなし')}
+              value={constant('')}
               onChange={onGroupChange}
             />
-          ))}
-          <Choice
-            checked={filter.groups.includes(undefined)}
-            e2e={'dag-filter-group'}
-            title={'グループなし'}
-            value={''}
-            onChange={onGroupChange}
-          />
-        </fieldset>
-      )}
-      {Arr.isEmpty(labels) ? undefined : (
-        <fieldset className={'settings-field-control dag-filter-choices'}>
-          <legend className={'dag-filter-kind'}>{'ラベル'}</legend>
-          {labels.map((label) => (
+          </fieldset>
+        }
+      />
+      <If
+        cond={view(labels$, Arr.isNonEmpty)}
+        then={
+          <fieldset
+            class={constant('settings-field-control dag-filter-choices')}
+          >
+            <legend class={constant('dag-filter-kind')}>
+              {constant('ラベル')}
+            </legend>
+            <For items={labels$} key={(label) => label}>
+              {(label$) => (
+                <Choice
+                  checked={combine([filter, label$]).pipe(
+                    map(([f, label]) => f.labels.includes(label)),
+                  )}
+                  e2e={'dag-filter-label'}
+                  title={label$}
+                  value={label$}
+                  onChange={onLabelChange}
+                />
+              )}
+            </For>
             <Choice
-              key={label}
-              checked={filter.labels.includes(label)}
+              checked={view(filter, (f) => f.labels.includes(undefined))}
               e2e={'dag-filter-label'}
-              title={label}
-              value={label}
+              title={constant('ラベルなし')}
+              value={constant('')}
               onChange={onLabelChange}
             />
-          ))}
-          <Choice
-            checked={filter.labels.includes(undefined)}
-            e2e={'dag-filter-label'}
-            title={'ラベルなし'}
-            value={''}
-            onChange={onLabelChange}
-          />
-        </fieldset>
-      )}
-      <p className={'settings-hint'} id={HINT_ID}>
-        {Arr.isEmpty(groups) && Arr.isEmpty(labels)
-          ? 'グループを作るか、タスクにラベルを付けると、ここで絞り込めます。'
-          : 'どれかに当てはまるものを、グループとラベルの両方を選んだときは両方に当てはまるものを表示します。ラベルで絞るとき、マイルストーンは残ったタスクとつながるものだけを表示します。絞り込みの外でも、直接つながるノードは薄く表示します。'}
+          </fieldset>
+        }
+      />
+      <p class={constant('settings-hint')} id={constant(HINT_ID)}>
+        {mapBindable(nothingToChoose, (nothing) =>
+          nothing
+            ? 'グループを作るか、タスクにラベルを付けると、ここで絞り込めます。'
+            : 'どれかに当てはまるものを、グループとラベルの両方を選んだときは両方に当てはまるものを表示します。ラベルで絞るとき、マイルストーンは残ったタスクとつながるものだけを表示します。絞り込みの外でも、直接つながるノードは薄く表示します。',
+        )}
       </p>
-      {isDagFilterEmpty(filter) ? undefined : (
-        <button
-          className={'bp6-button bp6-small'}
-          data-e2e={'dag-filter-clear'}
-          type={'button'}
-          onClick={dagFilterStore.clear}
-        >
-          {'絞り込みを解除'}
-        </button>
-      )}
+      <If
+        cond={view(filter, (f) => !isDagFilterEmpty(f))}
+        then={
+          <button
+            class={constant('bp6-button bp6-small')}
+            data-e2e={constant('dag-filter-clear')}
+            type={constant('button')}
+            onClick={dagFilterStore.clear}
+          >
+            {constant('絞り込みを解除')}
+          </button>
+        }
+      />
     </fieldset>
   );
-});
+};
 
 type ChoiceProps = Readonly<{
-  title: string;
+  title: Bindable<string>;
   /** A group's id or a label, or empty for none. */
-  value: string;
-  checked: boolean;
+  value: Bindable<string>;
+  checked: Bindable<boolean>;
   e2e: string;
-  onChange: GenericEventHandler<HTMLInputElement>;
+  onChange: (changed: Readonly<{ currentTarget: HTMLInputElement }>) => void;
 }>;
 
-const Choice = memoNamed<ChoiceProps>('DagFilterChoice', (props) => {
-  const { title, value, checked, e2e, onChange } = props;
+const Choice = ({
+  title,
+  value,
+  checked,
+  e2e,
+  onChange,
+}: ChoiceProps): JSX.Element => (
+  <label class={constant('bp6-control bp6-checkbox dag-filter-choice')}>
+    <input
+      checked={checked}
+      class={constant('bp6-control-input')}
+      data-e2e={constant(e2e)}
+      type={constant('checkbox')}
+      value={value}
+      onChange={onChange}
+    />
+    <span class={constant('bp6-control-indicator')} />
+    {title}
+  </label>
+);
 
-  return (
-    <label className={'bp6-control bp6-checkbox dag-filter-choice'}>
-      <input
-        checked={checked}
-        className={'bp6-control-input'}
-        data-e2e={e2e}
-        type={'checkbox'}
-        value={value}
-        onChange={onChange}
-      />
-      <span className={'bp6-control-indicator'} />
-      {title}
-    </label>
-  );
-});
-
-const onGroupChange: GenericEventHandler<HTMLInputElement> = (changed) => {
+const onGroupChange = (
+  changed: Readonly<{ currentTarget: HTMLInputElement }>,
+): void => {
   const { value } = changed.currentTarget;
 
   dagFilterStore.toggleGroup(value === '' ? undefined : asGroupId(value));
 };
 
-const onLabelChange: GenericEventHandler<HTMLInputElement> = (changed) => {
+const onLabelChange = (
+  changed: Readonly<{ currentTarget: HTMLInputElement }>,
+): void => {
   const { value } = changed.currentTarget;
 
   dagFilterStore.toggleLabel(value === '' ? undefined : value);

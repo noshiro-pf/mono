@@ -1,31 +1,12 @@
-import { memoNamed } from 'preact-utils';
-import type {
-  HighlightState,
-  LaidOutNode,
-  MilestoneNodeView,
-} from '../dag/index.mjs';
-import { useDagNodeHandlers } from './use-dag-node-handlers.mjs';
+import type { InitializedObservable } from 'synstate';
+import { constant, If, view, type JSX } from 'synstate-dom';
+import type { LaidOutNode, MilestoneNodeView } from '../dag/index.mjs';
+import type { DagNodeRecord } from './dag-canvas-scene.mjs';
+import { dagNodeHandlers } from './dag-node-handlers.mjs';
+import { SvgTitle } from './svg-title.js';
 
 type Props = Readonly<{
-  node: LaidOutNode;
-  view: MilestoneNodeView;
-  /** Being dragged, and drawn lifted. */
-  dragging: boolean;
-  /** Selected by the lasso, and drawn outlined. */
-  selected: boolean;
-  /** Moved by the arrow keys: in the view modes the reader arranges. */
-  movable: boolean;
-  /** Brought forward or dimmed by the arc diagram's highlight. */
-  highlight: HighlightState;
-  /**
-   * Outside the filter, and drawn faint: there only as what a node in it
-   * waits for or is waited for by (`dag/node-filter.mts`).
-   */
-  outside: boolean;
-  /** While it fades out of or into a view mode; `undefined` for opaque. */
-  opacity: number | undefined;
-  /** 「コンパクト」: a smaller hexagon, its title alone and cut shorter. */
-  compact: boolean;
+  record: InitializedObservable<DagNodeRecord<MilestoneNodeView>>;
 }>;
 
 /**
@@ -33,92 +14,98 @@ type Props = Readonly<{
  * so it reads as a point to wait for rather than work to do, with its title
  * and, if it has one, its date under it; smaller when compact, its title cut
  * shorter and its date in its tooltip. Opened and moved as a task is
- * (`use-dag-node-handlers.mts`).
+ * (`dag-node-handlers.mts`).
  */
-export const DagMilestoneNode = memoNamed<Props>(
-  'DagMilestoneNode',
-  (props) => {
-    const {
-      node,
-      view,
-      dragging,
-      selected,
-      movable,
-      highlight,
-      outside,
-      opacity,
-      compact,
-    } = props;
+export const DagMilestoneNode = ({ record }: Props): JSX.Element => {
+  const { node: first } = record.getSnapshot().value;
 
-    const { openNode, onKeyDown } = useDagNodeHandlers(view.ref, movable);
+  const { openNode, onKeyDown } = dagNodeHandlers(
+    record.getSnapshot().value.view.ref,
+    () => record.getSnapshot().value.movable,
+  );
 
-    const { width, height } = node;
+  return (
+    // An SVG has no <button>: the group takes its role, focus and keys.
 
-    const withDate = !compact && view.date !== undefined;
-
-    const inset = height / 2;
-
-    const hexagon = [
-      [inset, 0],
-      [width - inset, 0],
-      [width, height / 2],
-      [width - inset, height],
-      [inset, height],
-      [0, height / 2],
-    ]
-      .map(([x, y]) => `${x},${y}`)
-      .join(' ');
-
-    return (
-      // An SVG has no <button>: the group takes its role, focus and keys.
-      // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
-      <g
-        aria-label={view.ariaLabel}
-        className={`dag-node dag-milestone ${view.reached ? 'reached' : 'pending'}${compact ? ' compact' : ''}${dragging ? ' dragging' : ''}${selected ? ' selected' : ''}`}
-        data-e2e={'dag-node'}
-        data-highlight={highlight}
-        data-node-id={node.id}
-        data-outside={outside}
-        data-selected={selected}
-        opacity={opacity}
-        role={'button'}
-        // Lower case: Preact sets an SVG element's props as attributes, and
-        // an SVG attribute `tabIndex` is not `tabindex` — no focus at all.
-        tabindex={0}
-        transform={`translate(${node.x} ${node.y})`}
-        onClick={openNode}
-        onKeyDown={onKeyDown}
+    <g
+      aria-label={view(record, (r) => r.view.ariaLabel)}
+      class={view(
+        record,
+        (r) =>
+          `dag-node dag-milestone ${r.view.reached ? 'reached' : 'pending'}${r.compact ? ' compact' : ''}${r.dragging ? ' dragging' : ''}${r.selected ? ' selected' : ''}`,
+      )}
+      data-e2e={constant('dag-node')}
+      data-highlight={view(record, (r) => r.highlight)}
+      data-node-id={constant(first.id)}
+      data-outside={view(record, (r) => String(r.outside))}
+      data-selected={view(record, (r) => String(r.selected))}
+      opacity={view(record, (r) => r.opacity)}
+      role={constant('button')}
+      tabindex={constant(0)}
+      transform={view(record, ({ node }) => `translate(${node.x} ${node.y})`)}
+      onClick={openNode}
+      onKeyDown={onKeyDown}
+    >
+      <SvgTitle>
+        {view(record, ({ view: v, compact }) =>
+          compact && v.date !== undefined ? `${v.title}\n${v.date}` : v.title,
+        )}
+      </SvgTitle>
+      <polygon
+        class={constant('dag-node-shape')}
+        points={view(record, (r) => hexagonOf(r.node))}
+      />
+      <text
+        class={constant('dag-node-title')}
+        dominant-baseline={constant('central')}
+        text-anchor={constant('middle')}
+        x={view(record, (r) => r.node.width / 2)}
+        y={view(record, (r) =>
+          withDate(r) ? r.node.height / 2 - LINE_OFFSET : r.node.height / 2,
+        )}
       >
-        <title>
-          {compact && view.date !== undefined
-            ? `${view.title}\n${view.date}`
-            : view.title}
-        </title>
-        <polygon className={'dag-node-shape'} points={hexagon} />
-        <text
-          className={'dag-node-title'}
-          dominantBaseline={'central'}
-          textAnchor={'middle'}
-          x={width / 2}
-          y={withDate ? height / 2 - LINE_OFFSET : height / 2}
-        >
-          {`${view.awaitingCheck ? '☐ ' : ''}${compact ? view.compactTitle : view.shortTitle}`}
-        </text>
-        {withDate ? (
+        {view(
+          record,
+          ({ view: v, compact }) =>
+            `${v.awaitingCheck ? '☐ ' : ''}${compact ? v.compactTitle : v.shortTitle}`,
+        )}
+      </text>
+      <If
+        cond={view(record, withDate)}
+        then={
           <text
-            className={'dag-node-meta'}
-            dominantBaseline={'central'}
-            textAnchor={'middle'}
-            x={width / 2}
-            y={height / 2 + LINE_OFFSET}
+            class={constant('dag-node-meta')}
+            dominant-baseline={constant('central')}
+            text-anchor={constant('middle')}
+            x={view(record, (r) => r.node.width / 2)}
+            y={view(record, (r) => r.node.height / 2 + LINE_OFFSET)}
           >
-            {view.date}
+            {view(record, (r) => r.view.date ?? '')}
           </text>
-        ) : undefined}
-      </g>
-    );
-  },
-);
+        }
+      />
+    </g>
+  );
+};
 
 /** From the middle of a standard node to the middle of each of its lines. */
 const LINE_OFFSET = 9;
+
+/** Its date under its title: on a standard node, when it has one. */
+const withDate = (record: DagNodeRecord<MilestoneNodeView>): boolean =>
+  !record.compact && record.view.date !== undefined;
+
+const hexagonOf = ({ width, height }: LaidOutNode): string => {
+  const inset = height / 2;
+
+  return [
+    [inset, 0],
+    [width - inset, 0],
+    [width, height / 2],
+    [width - inset, height],
+    [inset, height],
+    [0, height / 2],
+  ]
+    .map(([x, y]) => `${x},${y}`)
+    .join(' ');
+};

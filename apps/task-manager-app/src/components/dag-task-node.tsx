@@ -1,32 +1,13 @@
-import { memoNamed } from 'preact-utils';
-import type {
-  HighlightState,
-  LaidOutNode,
-  TaskNodeView,
-} from '../dag/index.mjs';
+import type { InitializedObservable } from 'synstate';
+import { constant, If, view, type JSX } from 'synstate-dom';
+import type { TaskNodeView } from '../dag/index.mjs';
 import { priorityLabels } from '../view-model/index.mjs';
-import { useDagNodeHandlers } from './use-dag-node-handlers.mjs';
+import type { DagNodeRecord } from './dag-canvas-scene.mjs';
+import { dagNodeHandlers } from './dag-node-handlers.mjs';
+import { SvgTitle } from './svg-title.js';
 
 type Props = Readonly<{
-  node: LaidOutNode;
-  view: TaskNodeView;
-  /** Being dragged, and drawn lifted. */
-  dragging: boolean;
-  /** Selected by the lasso, and drawn outlined. */
-  selected: boolean;
-  /** Moved by the arrow keys: in the view modes the reader arranges. */
-  movable: boolean;
-  /** Brought forward or dimmed by the arc diagram's highlight. */
-  highlight: HighlightState;
-  /**
-   * Outside the filter, and drawn faint: there only as what a node in it
-   * waits for or is waited for by (`dag/node-filter.mts`).
-   */
-  outside: boolean;
-  /** While it fades out of or into a view mode; `undefined` for opaque. */
-  opacity: number | undefined;
-  /** 「コンパクト」: the title alone, on one line. */
-  compact: boolean;
+  record: InitializedObservable<DagNodeRecord<TaskNodeView>>;
 }>;
 
 /**
@@ -39,124 +20,149 @@ type Props = Readonly<{
  * Focusable; Enter or Space opens it as a tap does, and in 「DAG」 the arrow
  * keys move it.
  */
-export const DagTaskNode = memoNamed<Props>('DagTaskNode', (props) => {
-  const {
-    node,
-    view,
-    dragging,
-    selected,
-    movable,
-    highlight,
-    outside,
-    opacity,
-    compact,
-  } = props;
+export const DagTaskNode = ({ record }: Props): JSX.Element => {
+  const { node: first } = record.getSnapshot().value;
 
-  const { openNode, onKeyDown } = useDagNodeHandlers(view.ref, movable);
+  const { openNode, onKeyDown } = dagNodeHandlers(
+    record.getSnapshot().value.view.ref,
+    () => record.getSnapshot().value.movable,
+  );
 
-  const rx = compact ? 6 : 8;
+  const compact = view(record, (r) => r.compact);
 
   return (
     // An SVG has no <button>: the group takes its role, focus and keys.
-    // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
+
     <g
-      aria-label={view.ariaLabel}
-      className={`dag-node dag-task status-${view.status}${compact ? ' compact' : ''}${dragging ? ' dragging' : ''}${selected ? ' selected' : ''}`}
-      data-e2e={'dag-node'}
-      data-highlight={highlight}
-      data-node-id={node.id}
-      data-outside={outside}
-      data-priority={view.priority}
-      data-selected={selected}
-      opacity={opacity}
-      role={'button'}
-      // Lower case: Preact sets an SVG element's props as attributes, and
-      // an SVG attribute `tabIndex` is not `tabindex` — no focus at all.
-      tabindex={0}
-      transform={`translate(${node.x} ${node.y})`}
+      aria-label={view(record, (r) => r.view.ariaLabel)}
+      class={view(
+        record,
+        (r) =>
+          `dag-node dag-task status-${r.view.status}${r.compact ? ' compact' : ''}${r.dragging ? ' dragging' : ''}${r.selected ? ' selected' : ''}`,
+      )}
+      data-e2e={constant('dag-node')}
+      data-highlight={view(record, (r) => r.highlight)}
+      data-node-id={constant(first.id)}
+      data-outside={view(record, (r) => String(r.outside))}
+      data-priority={view(record, (r) => String(r.view.priority))}
+      data-selected={view(record, (r) => String(r.selected))}
+      opacity={view(record, (r) => r.opacity)}
+      role={constant('button')}
+      tabindex={constant(0)}
+      transform={view(record, ({ node }) => `translate(${node.x} ${node.y})`)}
       onClick={openNode}
       onKeyDown={onKeyDown}
     >
-      <title>
-        {compact
-          ? `${view.title}\n${view.due}・優先度 ${priorityLabels[view.priority]}`
-          : view.title}
-      </title>
-      <g className={'dag-node-body'}>
-        {view.priority === 1 ? (
-          <rect
-            className={'dag-node-ring'}
-            height={node.height + 2 * RING_GAP}
-            rx={rx + RING_GAP}
-            width={node.width + 2 * RING_GAP}
-            x={-RING_GAP}
-            y={-RING_GAP}
-          />
-        ) : undefined}
-        <rect
-          className={'dag-node-shape'}
-          height={node.height}
-          rx={rx}
-          width={node.width}
-        />
-        {compact ? (
-          <text
-            className={'dag-node-title'}
-            dominantBaseline={'central'}
-            x={10}
-            y={node.height / 2}
-          >
-            {view.compactTitle}
-          </text>
-        ) : (
-          <>
-            <text className={'dag-node-title'} x={12} y={22}>
-              {view.shortTitle}
-            </text>
-            <text
-              className={`dag-node-meta${view.overdue ? ' overdue' : ''}`}
-              x={12}
-              y={42}
-            >
-              {view.due}
-            </text>
-          </>
+      <SvgTitle>
+        {view(record, ({ view: v, compact: isCompact }) =>
+          isCompact
+            ? `${v.title}\n${v.due}・優先度 ${priorityLabels[v.priority]}`
+            : v.title,
         )}
-        {view.warning ? (
-          <text
-            className={'dag-node-warning'}
-            dominantBaseline={compact ? 'central' : undefined}
-            textAnchor={'end'}
-            x={node.width - (compact ? 8 : 10)}
-            y={compact ? node.height / 2 : 42}
-          >
-            {'⚠'}
-          </text>
-        ) : undefined}
-        {view.priority === 3 ? undefined : (
-          <g
-            className={'dag-node-priority'}
-            transform={`translate(${node.width - PRIORITY_INSET - PRIORITY_WIDTH} ${-PRIORITY_HEIGHT / 2})`}
-          >
+      </SvgTitle>
+      <g class={constant('dag-node-body')}>
+        <If
+          cond={view(record, (r) => r.view.priority === 1)}
+          then={
             <rect
-              height={PRIORITY_HEIGHT}
-              rx={PRIORITY_HEIGHT / 2}
-              width={PRIORITY_WIDTH}
+              class={constant('dag-node-ring')}
+              height={view(record, (r) => r.node.height + 2 * RING_GAP)}
+              rx={view(record, (r) => cornerOf(r) + RING_GAP)}
+              width={view(record, (r) => r.node.width + 2 * RING_GAP)}
+              x={constant(-RING_GAP)}
+              y={constant(-RING_GAP)}
             />
+          }
+        />
+        <rect
+          class={constant('dag-node-shape')}
+          height={view(record, (r) => r.node.height)}
+          rx={view(record, cornerOf)}
+          width={view(record, (r) => r.node.width)}
+        />
+        <If
+          cond={compact}
+          then={
             <text
-              dominantBaseline={'central'}
-              textAnchor={'middle'}
-              x={PRIORITY_WIDTH / 2}
-              y={PRIORITY_HEIGHT / 2}
+              class={constant('dag-node-title')}
+              dominant-baseline={constant('central')}
+              x={constant(10)}
+              y={view(record, (r) => r.node.height / 2)}
             >
-              {priorityLabels[view.priority]}
+              {view(record, (r) => r.view.compactTitle)}
             </text>
-          </g>
-        )}
+          }
+          else={
+            <>
+              <text
+                class={constant('dag-node-title')}
+                x={constant(12)}
+                y={constant(22)}
+              >
+                {view(record, (r) => r.view.shortTitle)}
+              </text>
+              <text
+                class={view(record, (r) =>
+                  r.view.overdue ? 'dag-node-meta overdue' : 'dag-node-meta',
+                )}
+                x={constant(12)}
+                y={constant(42)}
+              >
+                {view(record, (r) => r.view.due)}
+              </text>
+            </>
+          }
+        />
+        <If
+          cond={view(record, (r) => r.view.warning)}
+          then={
+            <text
+              class={constant('dag-node-warning')}
+              dominant-baseline={view(record, (r) =>
+                r.compact ? 'central' : undefined,
+              )}
+              text-anchor={constant('end')}
+              x={view(record, (r) => r.node.width - (r.compact ? 8 : 10))}
+              y={view(record, (r) => (r.compact ? r.node.height / 2 : 42))}
+            >
+              {constant('⚠')}
+            </text>
+          }
+        />
+        <If
+          cond={view(record, (r) => r.view.priority !== 3)}
+          then={
+            <g
+              class={constant('dag-node-priority')}
+              transform={view(
+                record,
+                (r) =>
+                  `translate(${r.node.width - PRIORITY_INSET - PRIORITY_WIDTH} ${-PRIORITY_HEIGHT / 2})`,
+              )}
+            >
+              <rect
+                height={constant(PRIORITY_HEIGHT)}
+                rx={constant(PRIORITY_HEIGHT / 2)}
+                width={constant(PRIORITY_WIDTH)}
+              />
+              <text
+                dominant-baseline={constant('central')}
+                text-anchor={constant('middle')}
+                x={constant(PRIORITY_WIDTH / 2)}
+                y={constant(PRIORITY_HEIGHT / 2)}
+              >
+                {view(record, (r) => priorityLabels[r.view.priority])}
+              </text>
+            </g>
+          }
+        />
       </g>
     </g>
   );
-});
+};
+
+/** The corners: rounder on a standard node. */
+const cornerOf = (record: DagNodeRecord): number => (record.compact ? 6 : 8);
 
 /** Between a 「最高」 task's shape and its second outline. */
 const RING_GAP = 4;

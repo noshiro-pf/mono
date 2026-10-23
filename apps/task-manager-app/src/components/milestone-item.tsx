@@ -1,51 +1,70 @@
-import { memoNamed } from 'preact-utils';
-import { useCallback } from 'preact/hooks';
+import type { InitializedObservable } from 'synstate';
+import { constant, If, view, type JSX } from 'synstate-dom';
 import { editorStore } from '../store/index.mjs';
 import { formatDateTime, type MilestoneRow } from '../view-model/index.mjs';
 
 type Props = Readonly<{
-  row: MilestoneRow;
+  row: InitializedObservable<MilestoneRow>;
 }>;
 
 /** One milestone: whether it is reached, its date, and its manual check. */
-export const MilestoneItem = memoNamed<Props>('MilestoneItem', (props) => {
-  const { row } = props;
-
-  const { milestone } = row;
-
-  const openNode = useCallback(() => {
-    editorStore.open({ kind: 'milestone', id: milestone.id });
-  }, [milestone.id]);
-
-  const reached = row.reachedAt !== undefined;
-
-  return (
-    <li>
-      <button
-        className={'bp6-card milestone-item'}
-        data-e2e={'milestone-row'}
-        type={'button'}
-        onClick={openNode}
+export const MilestoneItem = ({ row }: Props): JSX.Element => (
+  <li>
+    <button
+      class={constant('bp6-card milestone-item')}
+      data-e2e={constant('milestone-row')}
+      type={constant('button')}
+      onClick={() => {
+        editorStore.open({
+          kind: 'milestone',
+          id: row.getSnapshot().value.milestone.id,
+        });
+      }}
+    >
+      <span
+        class={view(
+          row,
+          ({ reachedAt }) =>
+            `bp6-tag bp6-round milestone-badge ${reachedAt === undefined ? 'pending' : 'reached'}`,
+        )}
       >
-        <span
-          className={`bp6-tag bp6-round milestone-badge ${reached ? 'reached' : 'pending'}`}
-        >
-          {reached ? '◆ 到達済み' : '◇ 未到達'}
-        </span>
-        <span className={'milestone-title'}>{milestone.title}</span>
-        <span className={'milestone-meta'}>
-          {milestone.date === undefined ? undefined : (
-            <span>{formatDateTime(milestone.date)}</span>
-          )}
-          {milestone.requiresManualCheck ? (
-            <span
-              className={`bp6-tag bp6-minimal ${row.awaitingCheck ? 'bp6-intent-warning' : 'bp6-intent-success'}`}
-            >
-              {row.awaitingCheck ? '要確認' : '確認済み'}
+        {view(row, ({ reachedAt }) =>
+          reachedAt === undefined ? '◇ 未到達' : '◆ 到達済み',
+        )}
+      </span>
+      <span class={constant('milestone-title')}>
+        {view(row, ({ milestone }) => milestone.title)}
+      </span>
+      <span class={constant('milestone-meta')}>
+        <If
+          cond={view(row, ({ milestone }) => milestone.date !== undefined)}
+          then={
+            <span>
+              {view(row, ({ milestone }) =>
+                milestone.date === undefined
+                  ? ''
+                  : formatDateTime(milestone.date),
+              )}
             </span>
-          ) : undefined}
-        </span>
-      </button>
-    </li>
-  );
-});
+          }
+        />
+        <If
+          cond={view(row, ({ milestone }) => milestone.requiresManualCheck)}
+          then={
+            <span
+              class={view(
+                row,
+                ({ awaitingCheck }) =>
+                  `bp6-tag bp6-minimal ${awaitingCheck ? 'bp6-intent-warning' : 'bp6-intent-success'}`,
+              )}
+            >
+              {view(row, ({ awaitingCheck }) =>
+                awaitingCheck ? '要確認' : '確認済み',
+              )}
+            </span>
+          }
+        />
+      </span>
+    </button>
+  </li>
+);

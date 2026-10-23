@@ -1,17 +1,13 @@
-import type { RefObject } from 'preact';
-import { memoNamed } from 'preact-utils';
-import {
-  dagArrangementSignal,
-  dagLayoutStore,
-  dagViewModeSignal,
-} from '../store/index.mjs';
+import { constant, If, view, type JSX } from 'synstate-dom';
+import type { DagDirection } from '../dag/index.mjs';
+import { dagLayoutStore, dagViewModeStore } from '../store/index.mjs';
 import { isArrangeable } from '../view-model/index.mjs';
 import { DagSettingsButton } from './dag-settings-button.js';
 import { DagViewModeSwitch } from './dag-view-mode-switch.js';
 
 type Props = Readonly<{
-  /** Read by the canvas, which keeps 「アーク」 and 「タイル」 clear of it. */
-  toolbarRef: RefObject<HTMLDivElement>;
+  /** Called with the toolbar, which the canvas keeps clear of. */
+  toolbarRef: (element: HTMLDivElement) => void;
 }>;
 
 /**
@@ -27,57 +23,61 @@ type Props = Readonly<{
  * every mode (`dag-settings-panel.tsx`). One row at 390px in every mode
  * (`index.css`).
  */
-export const DagToolbar = memoNamed<Props>('DagToolbar', (props) => {
-  const { toolbarRef } = props;
-
-  const { direction } = dagArrangementSignal.value;
-
-  const arrangeable = isArrangeable(dagViewModeSignal.value);
-
-  return (
-    <div ref={toolbarRef} className={'dag-toolbar'} data-e2e={'dag-toolbar'}>
-      <DagViewModeSwitch />
-      {arrangeable ? (
+export const DagToolbar = ({ toolbarRef }: Props): JSX.Element => (
+  <div
+    ref={toolbarRef}
+    class={constant('dag-toolbar')}
+    data-e2e={constant('dag-toolbar')}
+  >
+    <DagViewModeSwitch />
+    <If
+      cond={view(dagViewModeStore.mode, isArrangeable)}
+      then={
         <>
-          <fieldset aria-label={'伸ばす向き'} className={'bp6-button-group'}>
-            <button
-              aria-pressed={direction === 'right'}
-              className={`bp6-button ${direction === 'right' ? 'bp6-active' : ''}`}
-              data-e2e={'dag-direction-right'}
-              type={'button'}
-              onClick={growRight}
-            >
-              {'右へ'}
-            </button>
-            <button
-              aria-pressed={direction === 'down'}
-              className={`bp6-button ${direction === 'down' ? 'bp6-active' : ''}`}
-              data-e2e={'dag-direction-down'}
-              type={'button'}
-              onClick={growDown}
-            >
-              {'下へ'}
-            </button>
+          <fieldset
+            aria-label={constant('伸ばす向き')}
+            class={constant('bp6-button-group')}
+          >
+            {directionButton('right', '右へ')}
+            {directionButton('down', '下へ')}
           </fieldset>
           <button
-            className={'bp6-button'}
-            data-e2e={'dag-arrange'}
-            type={'button'}
+            class={constant('bp6-button')}
+            data-e2e={constant('dag-arrange')}
+            type={constant('button')}
             onClick={dagLayoutStore.autoArrange}
           >
-            {'自動整列'}
+            {constant('自動整列')}
           </button>
         </>
-      ) : undefined}
-      <DagSettingsButton />
-    </div>
+      }
+    />
+    <DagSettingsButton />
+  </div>
+);
+
+const directionButton = (
+  direction: DagDirection,
+  label: string,
+): JSX.Element => {
+  const pressed = view(
+    dagLayoutStore.arrangement,
+    (arrangement) => arrangement.direction === direction,
   );
-});
 
-const growRight = (): void => {
-  dagLayoutStore.setDirection('right');
-};
-
-const growDown = (): void => {
-  dagLayoutStore.setDirection('down');
+  return (
+    <button
+      aria-pressed={view(dagLayoutStore.arrangement, (arrangement) =>
+        String(arrangement.direction === direction),
+      )}
+      class={{ 'bp6-button': constant(true), 'bp6-active': pressed }}
+      data-e2e={constant(`dag-direction-${direction}`)}
+      type={constant('button')}
+      onClick={() => {
+        dagLayoutStore.setDirection(direction);
+      }}
+    >
+      {constant(label)}
+    </button>
+  );
 };

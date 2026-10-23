@@ -1,6 +1,11 @@
-import type { GenericEventHandler } from 'preact';
-import { memoNamed } from 'preact-utils';
-import { useCallback } from 'preact/hooks';
+import {
+  constant,
+  For,
+  If,
+  mapBindable,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { sortKeys, type SortSpec } from '../domain/index.mjs';
 import {
@@ -13,7 +18,7 @@ import { SortKeyRow } from './sort-key-row.js';
 
 type Props = Readonly<{
   /** The keys, first one deciding. */
-  sort: readonly SortSpec[];
+  sort: Bindable<readonly SortSpec[]>;
   /** What each control does to them: a store's, which saves them. */
   actions: SortKeyActions;
   /** The accessible name of the list of keys. */
@@ -29,54 +34,75 @@ type Props = Readonly<{
  * (`list-toolbar.tsx`) and the order of 「アーク」 and 「タイル」
  * (`diagram-sort-field.tsx`) alike, each handing it its keys and its store.
  */
-export const SortEditor = memoNamed<Props>('SortEditor', (props) => {
-  const { sort, actions, label, emptyNote, 'data-e2e': e2e } = props;
+export const SortEditor = ({
+  sort,
+  actions,
+  label,
+  emptyNote,
+  'data-e2e': e2e,
+}: Props): JSX.Element => {
+  const unused = mapBindable(sort, unusedSortKeys);
 
-  const unused = unusedSortKeys(sort);
-
-  const addKey: GenericEventHandler<HTMLSelectElement> = useCallback(
-    (changed) => {
-      const picked = sortKeys.find(
-        (key) => key === changed.currentTarget.value,
-      );
-
-      if (picked !== undefined) {
-        actions.addKey(picked);
-      }
-    },
-    [actions],
-  );
+  const count = mapBindable(sort, (specs) => specs.length);
 
   return (
-    <div className={'sort-editor'} data-e2e={e2e}>
-      {Arr.isEmpty(sort) ? (
-        <p className={'bp6-text-muted sort-empty'}>{emptyNote}</p>
-      ) : (
-        <ol aria-label={label} className={'sort-keys'}>
-          {sort.map((spec, index) => (
-            <SortKeyRow
-              key={spec.key}
-              actions={actions}
-              count={sort.length}
-              index={index}
-              spec={spec}
-            />
-          ))}
-        </ol>
-      )}
-      {Arr.isEmpty(unused) ? undefined : (
-        <label className={'sort-add'}>
-          <span className={'visually-hidden'}>{'キーを追加'}</span>
-          <HtmlSelect value={''} onChange={addKey}>
-            <option value={''}>{'＋キーを追加…'}</option>
-            {unused.map((key) => (
-              <option key={key} value={key}>
-                {sortKeyLabels[key]}
-              </option>
-            ))}
-          </HtmlSelect>
-        </label>
-      )}
+    <div class={constant('sort-editor')} data-e2e={constant(e2e)}>
+      <If
+        cond={mapBindable(sort, Arr.isEmpty)}
+        then={
+          <p class={constant('bp6-text-muted sort-empty')}>
+            {constant(emptyNote)}
+          </p>
+        }
+        else={
+          <ol aria-label={constant(label)} class={constant('sort-keys')}>
+            <For items={sort} key={(spec) => spec.key}>
+              {(spec$, index$) => (
+                <SortKeyRow
+                  actions={actions}
+                  count={count}
+                  index={index$}
+                  spec={spec$}
+                />
+              )}
+            </For>
+          </ol>
+        }
+      />
+      <If
+        cond={mapBindable(unused, Arr.isNonEmpty)}
+        then={
+          <label class={constant('sort-add')}>
+            <span class={constant('visually-hidden')}>
+              {constant('キーを追加')}
+            </span>
+            <HtmlSelect
+              value={constant('')}
+              onChange={(changed) => {
+                const mut_select = changed.currentTarget;
+
+                const picked = sortKeys.find((key) => key === mut_select.value);
+
+                // Back to the prompt, which is what the field always shows.
+                mut_select.value = '';
+
+                if (picked !== undefined) {
+                  actions.addKey(picked);
+                }
+              }}
+            >
+              <option value={constant('')}>{constant('＋キーを追加…')}</option>
+              <For items={unused} key={(key) => key}>
+                {(key$) => (
+                  <option value={key$}>
+                    {mapBindable(key$, (key) => sortKeyLabels[key])}
+                  </option>
+                )}
+              </For>
+            </HtmlSelect>
+          </label>
+        }
+      />
     </div>
   );
-});
+};

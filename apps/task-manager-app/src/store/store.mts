@@ -1,16 +1,15 @@
 /**
- * The page's state, made once with the browser as its surroundings, and the
- * Preact signals the components read it through.
+ * The page's state, made once with the browser as its surroundings.
  *
- * Components read a signal's `.value` (which subscribes them) and call the
- * stores' actions; none of them holds the app's state. What each store does,
+ * Components bind the stores' observables to the DOM and call the stores'
+ * actions; none of them holds the app's state. A derivation only one view
+ * reads is made in that view's component, so that it exists only while the
+ * view is shown. What each store does,
  * and the tests of it, are in the modules this puts together — this file is
  * only which real thing each of them is handed.
  */
 
-import { computed } from '@preact/signals';
 import { combine, map, skipIfNoChange } from 'synstate';
-import { toSignal } from 'synstate-preact-signals';
 import {
   fromEvent,
   loadSetting,
@@ -20,8 +19,6 @@ import {
   saveSetting,
 } from '../browser.mjs';
 import {
-  arcEdges,
-  buildNodeViews,
   defaultDirection,
   filterNodes,
   hiddenNodeIds,
@@ -29,14 +26,11 @@ import {
   layoutWithElk,
   PLACEMENT_ANIMATION_MS,
   sameNodeIds,
-  withoutNodes,
 } from '../dag/index.mjs';
 import { nodeRefOf, type GraphNodeId } from '../domain/index.mjs';
 import type { Backend } from '../repository/index.mjs';
 import {
   animationSettingStorage,
-  buildMilestoneRows,
-  buildTaskRows,
   dagShowDoneStorage,
   dagViewModeStorage,
   diagramSortStorage,
@@ -183,12 +177,12 @@ const dagFilteredNodes = combine([
 );
 
 /** The nodes the graph screen draws in no mode. */
-const dagHiddenNodes = dagFilteredNodes
+export const dagHiddenNodes = dagFilteredNodes
   .pipe(map(({ hidden }) => hidden))
   .pipe(skipIfNoChange(sameNodeIds));
 
 /** The nodes drawn faint, outside the filter but joined to what is in it. */
-const dagOutsideNodes = dagFilteredNodes
+export const dagOutsideNodes = dagFilteredNodes
   .pipe(map(({ outside }) => outside))
   .pipe(skipIfNoChange(sameNodeIds));
 
@@ -250,94 +244,6 @@ export const dagSelectionStore = createDagSelectionStore({
 export const bulkEditStore = createBulkEditStore({
   editNodes: dataStore.editNodes,
 });
-
-export const sessionSignal = toSignal(sessionStore.session);
-
-export const signOutStateSignal = toSignal(sessionStore.signOutState);
-
-export const domainSignal = toSignal(dataStore.state);
-
-export const groupsSignal = toSignal(dataStore.groups);
-
-export const dataStatusSignal = toSignal(dataStore.status);
-
-export const nowSignal = toSignal(clockStore.now);
-
-export const viewSignal = toSignal(uiStore.view);
-
-export const noticeSignal = toSignal(uiStore.notice);
-
-export const settingsPanelSignal = toSignal(uiStore.settingsPanel);
-
-export const editorSignal = toSignal(editorStore.editor);
-
-export const groupEditorSignal = toSignal(groupEditorStore.editor);
-
-export const listSettingsSignal = toSignal(listSettingsStore.settings);
-
-export const narrowSignal = toSignal(narrowStore.matches);
-
-export const animationSettingSignal = toSignal(animationSettingStore.setting);
-
-export const reducedMotionSignal = toSignal(reducedMotionStore.matches);
-
-export const dagViewModeSignal = toSignal(dagViewModeStore.mode);
-
-export const nodeSizeSignal = toSignal(nodeSizeStore.size);
-
-export const diagramSortSignal = toSignal(diagramSortStore.sort);
-
-export const dagShowDoneSignal = toSignal(dagShowDoneStore.showDone);
-
-export const dagHiddenNodesSignal = toSignal(dagHiddenNodes);
-
-export const dagFilterSignal = toSignal(dagFilterStore.filter);
-
-export const dagOutsideNodesSignal = toSignal(dagOutsideNodes);
-
-export const dagAutoLayoutSignal = toSignal(dagLayoutStore.autoLayout);
-
-export const dagArrangementSignal = toSignal(dagLayoutStore.arrangement);
-
-export const dagFitRequestsSignal = toSignal(dagLayoutStore.fitRequests);
-
-export const dagAnimatedPositionsSignal = toSignal(
-  dagLayoutStore.animatedPositions,
-);
-
-export const dagAnimatedOpacitiesSignal = toSignal(
-  dagLayoutStore.animatedOpacities,
-);
-
-export const dagAnimationProgressSignal = toSignal(
-  dagLayoutStore.animationProgress,
-);
-
-export const arcNodesSignal = toSignal(dagLayoutStore.arcNodes);
-
-export const tileNodesSignal = toSignal(dagLayoutStore.tileNodes);
-
-export const dagMembershipSignal = toSignal(dagLayoutStore.membership);
-
-export const dagSelectionSignal = toSignal(dagSelectionStore.selected);
-
-export const bulkEditSignal = toSignal(bulkEditStore.editor);
-
-export const taskRowsSignal = computed(() =>
-  buildTaskRows(domainSignal.value, nowSignal.value, listSettingsSignal.value),
-);
-
-export const milestoneRowsSignal = computed(() =>
-  buildMilestoneRows(domainSignal.value, nowSignal.value),
-);
-
-export const nodeViewsSignal = computed(() =>
-  buildNodeViews(domainSignal.value, nowSignal.value),
-);
-
-export const arcEdgesSignal = computed(() =>
-  arcEdges(withoutNodes(domainSignal.value, dagHiddenNodesSignal.value)),
-);
 
 /**
  * Starts the timers and the listeners. Called once, from `main.tsx`, before
