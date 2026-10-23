@@ -25,6 +25,7 @@ const colors = {
   RxJS: '#ef4444',
   Jotai: '#f59e0b',
   MobX: '#8b5cf6',
+  Redux: '#14b8a6',
 } as const;
 
 const series = toColouredSeries(cascadedDiamondResults, colors);

@@ -10,7 +10,7 @@
       "platform": "Linux 6.17.0-1022-azure",
       "arch": "x64",
       "cpu": "AMD EPYC 9V45 96-Core Processor",
-      "measuredOn": "2026-10-23",
+      "measuredOn": "2026-10-25",
       "libraries": {
         "synstate": "4.1.0",
         "rxjs": "7.8.2",
@@ -25,59 +25,59 @@
   "rows": [
     {
       "label": "SynState",
-      "median": 3.58,
-      "min": 3.45,
-      "max": 7.26,
-      "p95": 5.31,
-      "opsPerSec": 27925472
+      "median": 2.21,
+      "min": 2.17,
+      "max": 3.85,
+      "p95": 2.82,
+      "opsPerSec": 45205126
     },
     {
       "label": "RxJS",
-      "median": 2.14,
-      "min": 2.1,
-      "max": 2.28,
-      "p95": 2.26,
-      "opsPerSec": 46645979
+      "median": 2.13,
+      "min": 2.07,
+      "max": 2.22,
+      "p95": 2.19,
+      "opsPerSec": 46975870
     },
     {
       "label": "MobX",
-      "median": 30.94,
-      "min": 30.42,
-      "max": 31.4,
-      "p95": 31.26,
-      "opsPerSec": 3232012
+      "median": 30.92,
+      "min": 30.44,
+      "max": 31.65,
+      "p95": 31.36,
+      "opsPerSec": 3234238
     },
     {
       "label": "Jotai",
-      "median": 97.3,
-      "min": 95.87,
-      "max": 99.97,
-      "p95": 98.37,
-      "opsPerSec": 1027719
+      "median": 93.95,
+      "min": 89.03,
+      "max": 100.99,
+      "p95": 95.53,
+      "opsPerSec": 1064341
     },
     {
       "label": "Redux",
-      "median": 71.06,
-      "min": 70.05,
-      "max": 102.11,
-      "p95": 76.56,
-      "opsPerSec": 1407349
+      "median": 70.16,
+      "min": 69.01,
+      "max": 71.79,
+      "p95": 71.36,
+      "opsPerSec": 1425293
     },
     {
       "label": "Zustand",
-      "median": 2.74,
-      "min": 2.71,
-      "max": 2.8,
-      "p95": 2.78,
-      "opsPerSec": 36506150
+      "median": 2.83,
+      "min": 2.73,
+      "max": 2.99,
+      "p95": 2.92,
+      "opsPerSec": 35316271
     },
     {
       "label": "Valtio",
-      "median": 23.04,
-      "min": 22.74,
-      "max": 23.46,
-      "p95": 23.37,
-      "opsPerSec": 4339451
+      "median": 21.46,
+      "min": 21.07,
+      "max": 21.87,
+      "p95": 21.78,
+      "opsPerSec": 4658877
     }
   ]
 }

@@ -1,8 +1,9 @@
 | Library                  |     B=2 |     B=5 |    B=10 |    B=20 |     B=50 |    B=100 |    B=200 |     B=500 |    B=1000 |
 | ------------------------ | ------: | ------: | ------: | ------: | -------: | -------: | -------: | --------: | --------: |
-| **SynState**             | 20.9 ms | 25.0 ms | 43.4 ms | 59.7 ms | 125.2 ms | 263.8 ms | 483.4 ms | 1235.2 ms | 2364.4 ms |
-| **SynState** (switchMap) |  3.3 ms |  2.5 ms |  2.5 ms |  2.5 ms |   2.4 ms |   3.3 ms |   3.2 ms |    2.7 ms |    3.1 ms |
-| RxJS                     |  4.6 ms |  4.7 ms |  4.8 ms |  5.1 ms |   5.6 ms |   7.5 ms |  14.3 ms |   20.1 ms |   26.8 ms |
-| RxJS (switchMap)         |  1.6 ms |  1.5 ms |  1.5 ms |  1.5 ms |   1.5 ms |   1.5 ms |   1.5 ms |    1.6 ms |    1.6 ms |
-| Jotai                    | 69.7 ms | 68.3 ms | 67.3 ms | 69.1 ms |  68.0 ms |  68.6 ms |  69.9 ms |   69.2 ms |   67.6 ms |
-| MobX                     |  0.9 ms |  0.8 ms |  0.8 ms |  0.8 ms |   1.1 ms |   0.8 ms |   1.2 ms |    1.4 ms |    0.9 ms |
+| **SynState**             | 19.9 ms | 24.6 ms | 35.7 ms | 59.3 ms | 123.9 ms | 222.5 ms | 455.9 ms | 1171.2 ms | 2340.0 ms |
+| **SynState** (switchMap) |  2.6 ms |  2.1 ms |  2.1 ms |  2.1 ms |   2.1 ms |   2.1 ms |   2.1 ms |    2.1 ms |    2.2 ms |
+| RxJS                     |  4.4 ms |  4.5 ms |  4.5 ms |  4.8 ms |   5.7 ms |   7.6 ms |  13.6 ms |   18.6 ms |   26.0 ms |
+| RxJS (switchMap)         |  1.6 ms |  1.5 ms |  1.5 ms |  1.5 ms |   1.5 ms |   1.5 ms |   1.5 ms |    1.5 ms |    1.6 ms |
+| Jotai                    | 75.9 ms | 69.9 ms | 74.5 ms | 72.5 ms |  71.8 ms |  73.5 ms |  75.5 ms |   72.3 ms |   75.6 ms |
+| MobX                     |  0.9 ms |  0.8 ms |  0.8 ms |  0.8 ms |   0.8 ms |   0.8 ms |   0.8 ms |    0.8 ms |    0.8 ms |
+| Redux                    | 66.4 ms | 65.2 ms | 68.5 ms | 64.2 ms |  66.3 ms |  65.1 ms |  69.5 ms |   74.7 ms |   90.4 ms |

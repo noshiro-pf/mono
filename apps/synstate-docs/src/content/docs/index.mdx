@@ -25,11 +25,11 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     </Card>
     <Card title="High Performance" icon="rocket">
 
-Glitch-free O(n) propagation — on the smallest graph with derived values (a two-step derived chain), **{/* bench:derived-chain/jotai-over-synstate */}49{/* /bench */}× faster** than Jotai and **{/* bench:derived-chain/redux-over-synstate */}20{/* /bench */}× faster** than Redux. See [the derived-chain benchmark](/mono/synstate/guides/library-comparison/benchmark/#scenario-derived-chain).
+Glitch-free O(n) propagation with no scenario where it falls far behind: in each of the six benchmark scenarios, within **{/* bench:summary/synstate-worst-over-fastest */}2.8{/* /bench */}×** of the fastest library, while {/* bench:summary/others-worst-libraries */}RxJS, MobX, Jotai and Redux{/* /bench */} each trail the fastest by {/* bench:summary/others-worst-over-fastest-least */}29{/* /bench */}× or more in at least one. See [the benchmark summary](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page).
 
     </Card>
     <Card title="Lightweight" icon="seti:favicon">
-        {/* bundle-size:synstate */}~6.1 kB min+gzip{/* /bundle-size:synstate */} with two external runtime dependencies,
+        {/* bundle-size:synstate */}~6.4 kB min+gzip{/* /bundle-size:synstate */} with two external runtime dependencies,
         one of which depends on the other.
     </Card>
     <Card title="Built-in Async Operators" icon="setting">

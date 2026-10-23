@@ -10,7 +10,7 @@
       "platform": "Linux 6.17.0-1022-azure",
       "arch": "x64",
       "cpu": "AMD EPYC 9V45 96-Core Processor",
-      "measuredOn": "2026-10-23",
+      "measuredOn": "2026-10-25",
       "libraries": {
         "synstate": "4.1.0",
         "rxjs": "7.8.2",
@@ -25,43 +25,43 @@
   "rows": [
     {
       "label": "SynState",
-      "median": 8.55,
-      "min": 7.7,
-      "max": 16.6,
-      "p95": 9.6,
-      "opsPerSec": 11697292
+      "median": 10.6,
+      "min": 10.39,
+      "max": 11.53,
+      "p95": 11.16,
+      "opsPerSec": 9430385
     },
     {
       "label": "RxJS",
-      "median": 3.91,
+      "median": 3.88,
       "min": 3.83,
-      "max": 5.14,
-      "p95": 4.03,
-      "opsPerSec": 25570183
+      "max": 4.27,
+      "p95": 3.96,
+      "opsPerSec": 25781944
     },
     {
       "label": "MobX",
-      "median": 65.68,
-      "min": 63.55,
-      "max": 73.51,
-      "p95": 67.48,
-      "opsPerSec": 1522499
+      "median": 66.15,
+      "min": 65.7,
+      "max": 85.14,
+      "p95": 84.59,
+      "opsPerSec": 1511762
     },
     {
       "label": "Jotai",
-      "median": 416.89,
-      "min": 400.58,
-      "max": 447.15,
-      "p95": 426.62,
-      "opsPerSec": 239869
+      "median": 437.38,
+      "min": 424.28,
+      "max": 496.64,
+      "p95": 454.28,
+      "opsPerSec": 228636
     },
     {
       "label": "Redux",
-      "median": 172.61,
-      "min": 165.06,
-      "max": 181.03,
-      "p95": 180.53,
-      "opsPerSec": 579327
+      "median": 162.83,
+      "min": 159.98,
+      "max": 178.76,
+      "p95": 176.54,
+      "opsPerSec": 614119
     }
   ]
 }

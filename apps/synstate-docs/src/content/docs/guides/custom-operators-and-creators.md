@@ -18,7 +18,7 @@ The names follow `kind`, which every observable carries and which a debugger sho
 
 ## A sync operator
 
-A child factory takes a config and an `init` callback. `init` runs once, while the observable is created; it receives the tools the new observable may use on itself and returns `tryUpdate`, which SynState calls with the token of every update that reaches the observable.
+A child factory takes a config and an `init` callback. `init` runs once, while the observable is created; it receives the tools the new observable may use on itself and returns `tryUpdate`, which SynState calls with the token of every update in which at least one parent of the observable emitted.
 
 ```ts
 import { Optional } from 'ts-data-forge';
@@ -87,7 +87,7 @@ createSyncChildObservable(
 
 | Hook            | Meaning                                                                                                    |
 | :-------------- | :--------------------------------------------------------------------------------------------------------- |
-| `tryUpdate`     | Called with the token of every update that reaches the observable                                          |
+| `tryUpdate`     | Called with the token of every update in which a parent of the observable emitted                          |
 | `canEmitNoMore` | Asked when a parent completes; `true` completes this observable although some parent is still live (`zip`) |
 | `flush`         | Async children only: passes on a pending value through `startUpdate` before completing, never on `dispose` |
 

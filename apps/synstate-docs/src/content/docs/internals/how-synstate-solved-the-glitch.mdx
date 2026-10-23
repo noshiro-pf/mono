@@ -6,13 +6,10 @@ sidebar:
 ---
 
 import DataTableDemo from '../../../components/data-table-demo/data-table-demo-island.astro';
-import RxJSGlitchSlideshow from '../../../components/svg-slideshow/rxjs-glitch-slides-island.astro';
-import SynStatePropagationOrderSlideshow from '../../../components/svg-slideshow/synstate-propagation-order-island.astro';
-import PriorityQueueSlideshow from '../../../components/svg-slideshow/priority-queue-slides-island.astro';
+import PropagationAnimation from '../../../components/propagation-animation/propagation-animation-island.astro';
 import DataTableGraph from '../../../components/dep-graph/data-table-graph-island.astro';
 import SimpleDiamondDepGraph from '../../../components/dep-graph/simple-diamond-dep-graph-island.astro';
 import FilterDiamondDepGraph from '../../../components/dep-graph/filter-diamond-dep-graph-island.astro';
-import SynStateUpdateTokenSlideshow from '../../../components/svg-slideshow/synstate-update-token-island.astro';
 
 ## What Is a Glitch?
 
@@ -81,7 +78,7 @@ The full output sequence of `sum` in RxJS is:
 0, 10, 1010, 1020, 2020, 2030, 3030, ...
 ```
 
-<RxJSGlitchSlideshow />
+<PropagationAnimation animation="rxjs" lang="en" />
 
 The values `10`, `1020`, `2030`, ... are **glitches** — they represent states where one derived observable has already updated but the other has not yet recalculated. These values should never exist logically (`sum` should always be a multiple of `1010`), yet they are emitted to subscribers, potentially causing incorrect UI rendering, invalid API calls, or subtle bugs.
 
@@ -111,7 +108,7 @@ const multipliedBy1000 = counterObservable.pipe(map((count) => count * 1000));
 const sum = combineLatest([multipliedBy10, multipliedBy1000]).pipe(
     map(([a, b]) => a + b),
 );
-// 0, 10, 1010, 20, 2020, 30, 3030, ...
+// 0, 10, 1010, 1020, 2020, 2030, 3030, ...
 
 const result = await lastValueFrom(sum.pipe(take(7), toArray()));
 
@@ -184,7 +181,7 @@ The queue is empty — propagation is complete. `sum` emits **`1010`**, the corr
 
 [reactivelib/reactive](https://github.com/reactivelib/reactive) is a TypeScript library that implements this topologically-ordered propagation, directly inspired by the Scala.React paper.
 
-<PriorityQueueSlideshow />
+<PropagationAnimation animation="priorityQueue" lang="en" />
 
 ### The Cost of Each Approach
 
@@ -212,40 +209,50 @@ SynState solves both problems: it achieves **glitch-free propagation in $O(n)$**
 
 ## What Happens in SynState (Glitch-Free, _O(n)_)
 
-SynState's key insight is that the dependency graph's topology is **static** — it is determined when observables are constructed and does not change between updates. This means the propagation order can be computed **once** when the graph is built, rather than re-derived on every emission.
+SynState's key insight is that a node's place in the update order is known when the node is built: its **depth**, a small integer. The queue of the priority queue approach can then be one bucket per depth, where putting a node in and taking it out each cost $O(1)$ instead of $O(\log n)$.
 
-### Pre-sorted propagation order
+### A queue bucketed by depth
 
 When an observable is created via `.pipe()` or a combinator (`combine`, `merge`, `zip`), SynState computes its **depth** — the length of the longest path from any root source:
 
 - **Root observables**: `depth = 0`.
 - **Child observables**: `depth = 1 + max(parent depths)`.
 
-Each root observable maintains an array called `propagationOrder` holding all its descendants in **ascending depth order**: one set of descendants per depth below it. A descendant joins the set of its depth when it is constructed and leaves it when it completes. When a source emits, propagation is a simple linear scan through this array:
+An update starts at a **manager observable** (see below), which opens a queue for the update with one bucket per depth below it. Every node that emits in the update, the manager first, puts each of its children into the bucket of the child's depth, once per update however many of the child's parents emit. The manager then takes the buckets in ascending depth and calls `tryUpdate` on each node in them; a node that emits puts its own children into deeper buckets as it goes, and the update ends when the last bucket is empty:
 
 ```ts
 // Simplified from ManagerObservableClass
 protected startUpdate(nextValue: A): void {
-    const updateToken = issueUpdateToken();
+    // The token of the update is also its queue
+    const updateToken = openUpdate(this.depth);
 
-    this.setNext(nextValue, updateToken);
+    this.setNext(nextValue, updateToken); // queues this node's children
 
-    // propagationOrder holds one set of descendants per depth (ascending)
-    for (const descendants of this.#propagationOrder) {
-        for (const child of descendants) {
-            child.tryUpdate(updateToken);
-        }
-    }
+    drainUpdate(updateToken); // visits the buckets in ascending depth
+}
+
+// Simplified from ObservableBaseClass, which every observable extends
+protected setNext(nextValue: A, updateToken: UpdateToken): void {
+    this.#updateToken = updateToken;
+
+    this.#snapshot = Optional.some(nextValue);
+
+    // Into the bucket of each child's depth, once per update
+    enqueueChildren(this.#children, updateToken);
+
+    // ...then notify the subscribers
 }
 ```
 
-This is a key architectural difference from RxJS. In RxJS, each observable is responsible for updating its own value and propagating to its children — propagation is distributed across the graph. In SynState, a **manager observable** centrally manages the update of all its descendants in a single loop. This centralized control is what makes depth-ordered propagation possible without a priority queue.
+This is a key architectural difference from RxJS. In RxJS, each observable propagates to its children as it emits, depth first. In SynState, an emitting node only queues its children; the **manager observable** that started the update decides when each of them is visited, in a single loop. This central loop is what lets the queue order the nodes by depth.
 
 SynState's Observable types are `RootObservable`, `SyncChildObservable`, and `AsyncChildObservable`. Of these, `RootObservable` and `AsyncChildObservable` act as managers. A `RootObservable` is the entry point of a graph, while an `AsyncChildObservable` is created by time-shifting operators such as [`debounce`](/mono/synstate/reference/debounce/) — since their emissions are asynchronous and cannot be coordinated by the upstream root, they take over as managers for their own downstream subgraph.
 
-Because the array is sorted by depth, every parent is guaranteed to have been updated before any of its children — the same correctness guarantee as the priority queue approach, but with **$O(n)$ propagation cost** and **no allocation per update** while the graph stays the same. The ordering work is paid when the graph changes, $O(1)$ for each node that joins or leaves, not on every emission.
+A parent is always shallower than its child and the buckets are processed shallowest first, so by the time a node is processed, all of its parents are final — the same guarantee as the priority queue approach. Each node the update reaches is put in a bucket once and taken out once, both in $O(1)$, so an update costs **$O(n)$** in the nodes it reaches, and the nodes it does not reach, such as those below a `filter` that rejected the value, are never touched. The buckets are one array per depth, reused from one update to the next: emptying one is setting its length back to 0, so an update allocates nothing but its token.
 
-<SynStatePropagationOrderSlideshow />
+<PropagationAnimation animation="synstateDiamond" lang="en" />
+
+The animation steps through one update of the diamond. A chip is a node waiting in a bucket: `D` is queued by `B`, and not again by `C`.
 
 Applying this to the diamond example:
 
@@ -275,7 +282,7 @@ No intermediate states. No glitches. Every value emitted to subscribers is consi
 
 ### Handling skipped updates: the update token
 
-The depth-ordered linear scan eliminates glitches when every node updates. But not every node updates on every cycle — operators like `filter` and `skipIfNoChange` can **skip** an emission. This introduces a subtlety: how does a downstream node know whether its parent was intentionally skipped in the current cycle, or simply hasn't been reached yet?
+Visiting by depth eliminates glitches when every node updates. But not every node updates on every cycle — operators like `filter` and `skipIfNoChange` can **skip** an emission. This introduces a subtlety: how does a downstream node know whether its parent was intentionally skipped in the current cycle, or simply hasn't been reached yet?
 
 Consider the following graph where `D` applies a `filter`:
 
@@ -302,14 +309,14 @@ const resultC = collectToArray(C.pipe(take(7)));
 const resultE = collectToArray(E.pipe(take(4)));
 ```
 
-When `A` emits an **even** value (e.g., `2`), all nodes update: `B` becomes `20`, `D` passes `2`, `C` emits `22`, and `E` becomes `20`. But when `A` emits an **odd** value (e.g., `1`), `D` does not pass the predicate — so `D` and its descendant `E` should not update, while `B` does update to `10` and `C` should re-evaluate because `B` has changed. The challenge is that `propagationOrder` is a **linearized** list — the original parent–child relationships are flattened away. When the manager iterates this list, each node must be able to determine on its own whether its parents were updated or skipped in this cycle.
+When `A` emits an **even** value (e.g., `2`), all nodes update: `B` becomes `20`, `D` passes `2`, `C` emits `22`, and `E` becomes `20`. But when `A` emits an **odd** value (e.g., `1`), `D` does not pass the predicate — so `D` and its descendant `E` should not update, while `B` does update to `10` and `C` should re-evaluate because `B` has changed. `C` is queued as soon as `B` emits, so when it is visited it must be able to determine on its own which of its parents were updated in this cycle and which were skipped.
 
-SynState solves this by giving every update cycle a unique identity — an **update token**. The token is a `Symbol` created at the start of each cycle via `issueUpdateToken()`, and it flows through the graph as follows:
+SynState solves this by giving every update cycle a unique identity — an **update token**. The token is a small object created at the start of each cycle by `openUpdate()` — the same object holds the cycle's queue — and it flows through the graph as follows:
 
 1. The manager creates a fresh token and stamps itself via `setNext(value, token)`.
-2. The same token is passed to every descendant's `tryUpdate(token)` during the linear scan.
+2. The same token is passed to the `tryUpdate(token)` of every node taken out of the queue.
 3. When a child successfully updates, it calls `setNext(newValue, token)`, stamping itself with the current cycle's token.
-4. When a child **skips** (e.g., `filter`'s predicate returns `false`), it does **not** call `setNext` — so its `updateToken` remains the token from a **previous** cycle.
+4. When a child **skips** (e.g., `filter`'s predicate returns `false`), it does **not** call `setNext` — so its `updateToken` remains the token from a **previous** cycle, and its children are not queued.
 
 This creates a simple invariant: **a node's `updateToken` equals the current cycle's token if and only if it was updated in this cycle.** Each node checks this on its parents with a single reference comparison — $O(1)$ — to decide whether to update or skip:
 
@@ -349,9 +356,11 @@ override tryUpdate(updateToken: UpdateToken): void {
 }
 ```
 
-Because each node's skip-or-update decision is a constant-time token comparison, the overall cost of a single update cycle remains **$O(n)$** where $n$ is the number of descendants — and each node pays **amortized $O(1)$** per cycle.
+Because each node's skip-or-update decision is a constant-time token comparison, the overall cost of a single update cycle remains **$O(n)$** where $n$ is the number of nodes the update reaches — and each node pays **amortized $O(1)$** per cycle.
 
-<SynStateUpdateTokenSlideshow />
+<PropagationAnimation animation="synstateFilterDiamond" lang="en" />
+
+The animation runs the graph above for `A = 1`, then for `A = 2`. For the odd value `D` does not emit, so `E` is never queued, while `C` is queued by `B` and learns from the tokens that only `B` emitted.
 
 ## Summary
 
@@ -363,19 +372,21 @@ Because each node's skip-or-update decision is a constant-time token comparison,
 
 SynState achieves glitch-free propagation in $O(n)$ by exploiting two properties of the dependency graph:
 
-1. **Static topology** — the graph structure is fixed at construction time, so the propagation order (`propagationOrder`) can be pre-computed once rather than re-derived on every emission.
-2. **Update tokens** — a unique token per cycle lets each node determine in $O(1)$ whether its parents participated in the current cycle, enabling correct skip-or-update decisions even though `propagationOrder` is a flat list with no graph structure.
+1. **Integer depths** — a node's depth is fixed when it is constructed, so the queue can be one bucket per depth, with $O(1)$ insertion and removal instead of a heap's $O(\log n)$.
+2. **Update tokens** — a unique token per cycle lets each node determine in $O(1)$ whether its parents participated in the current cycle, enabling correct skip-or-update decisions for a node queued by one parent while another was skipped.
 
 ### Cycle detection
 
-SynState's propagation model assumes the dependency graph is a **DAG** (directed acyclic graph). To guarantee this at runtime, SynState performs a **cycle check at construction time** — whenever a new observable is created via `.pipe()` or a combinator (`combine`, `merge`, `zip`), a depth-first traversal of the ancestor chain verifies that no node appears as its own ancestor. If a cycle is detected, an error is thrown immediately:
+SynState's propagation model assumes the dependency graph is a **DAG** (directed acyclic graph). To guarantee this at runtime, SynState performs a **cycle check at construction time** in development — whenever a new observable is created via `.pipe()` or a combinator (`combine`, `merge`, `zip`), a depth-first traversal of the ancestor chain verifies that no node appears as its own ancestor. If a cycle is detected, an error is thrown immediately:
 
 ```
 Circular dependency detected in observable graph:
 a child observable cannot be its own ancestor.
 ```
 
-This means that after the initial graph construction succeeds, all subsequent update cycles are guaranteed to operate on a DAG — no infinite loops, no corrupted propagation order.
+The check walks every ancestor of each new observable, so every creation pays for it. For performance, it **runs only in development**: it is off when `process.env.NODE_ENV` is `'production'`, and wherever there is no `process`, as in a browser bundle. Turning it off does not make production code less safe in normal use. A child's parents exist before it and cannot change afterwards, so the public API cannot build a cycle. What the check catches is code that rewrites an observable's `parents`, and that shows up in development and tests.
+
+This means that once the graph has been built, all subsequent update cycles are guaranteed to operate on a DAG — no infinite loops, and a depth for every node.
 
 Other libraries handle cycles differently:
 

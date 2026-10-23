@@ -20,11 +20,12 @@ type NodeInternals = Readonly<{
   deleteChild: (child: ChildNode) => void;
 
   /**
-   * The managers this node's own descendants register to: itself for a
-   * manager, its parents' for a sync child, shared with its parent when it
-   * has one. Cached so that creating a child does not walk its ancestors.
+   * The last update that queued this node (`propagation-state.mts`). Left in
+   * place after the visit: the next update has another token.
    */
-  managers: readonly ManagerNode[];
+  queuedFor: UpdateToken | undefined;
+
+  setQueuedFor: (updateToken: UpdateToken) => void;
 }>;
 
 /** An observable, as the other nodes of the graph see it. */
@@ -34,13 +35,6 @@ export type ChildNode = NodeInternals &
   ObservableBase<unknown> &
   Readonly<{
     parents: readonly Observable<unknown>[];
-  }>;
-
-export type ManagerNode = NodeInternals &
-  ObservableBase<unknown> &
-  Readonly<{
-    addDescendant: (child: ChildNode) => void;
-    deleteDescendant: (child: ChildNode) => void;
   }>;
 
 /**

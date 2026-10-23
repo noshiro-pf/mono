@@ -52,6 +52,7 @@ const entries: readonly BenchmarkEntry[] = [
   { label: 'RxJS', file: '04-cascaded-diamond.rxjs.mts' },
   { label: 'Jotai', file: '04-cascaded-diamond.jotai.mts' },
   { label: 'MobX', file: '04-cascaded-diamond.mobx.mts' },
+  { label: 'Redux', file: '04-cascaded-diamond.redux.mts' },
 ] as const;
 
 const median = (sorted: readonly number[]): number => {

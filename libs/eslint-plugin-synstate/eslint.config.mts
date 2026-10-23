@@ -70,8 +70,9 @@ export default [
        library stops being applied, and the `export` is what keeps that
        declaration from being an unused local. The no-export rule below is
        about test files, so it — and the loosened rules beside it — do not
-       apply here. */
-    ignores: ['test/strict-lib-active.mts'],
+       apply here. Nor to `test/fixtures/`: the modules a typed rule test
+       lints against, which export because the test imports them. */
+    ignores: ['test/strict-lib-active.mts', 'test/fixtures/**'],
     rules: defineKnownRules({
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-explicit-any': 'off',

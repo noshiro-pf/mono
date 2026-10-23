@@ -72,6 +72,7 @@ const entries: readonly BenchmarkEntry[] = [
   },
   { label: 'Jotai', file: '05-conditional-fan-out.jotai.mts' },
   { label: 'MobX', file: '05-conditional-fan-out.mobx.mts' },
+  { label: 'Redux', file: '05-conditional-fan-out.redux.mts' },
 ] as const;
 
 const median = (sorted: readonly number[]): number => {
