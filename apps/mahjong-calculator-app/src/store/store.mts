@@ -276,7 +276,7 @@ export const addTile2Hand = (tile: TileName): void => {
 
 // 牌を手牌から削除する。
 export const removeTileFromHand = (tile: TileName): void => {
-  updateHand((hand) => hand.toSpliced(hand.indexOf(tile, 1)));
+  updateHand((hand) => removeFirst(hand, tile));
 };
 
 // 牌を副露ブロックの一覧に追加する。
@@ -286,7 +286,7 @@ export const addRevealedBlock = (block: RevealedBlock): void => {
 
 // 牌を副露ブロックの一覧から削除する。
 export const removeRevealedBlock = (block: RevealedBlock): void => {
-  updateRevealedBlocks((blocks) => blocks.toSpliced(blocks.indexOf(block, 1)));
+  updateRevealedBlocks((blocks) => removeFirst(blocks, block));
 };
 
 // 牌をドラ表示牌の一覧に追加する。
@@ -367,4 +367,11 @@ export const setRandomHand = (): void => {
   clearHand();
 
   setHand(newHand);
+};
+
+/** `array` without its first occurrence of `value`; unchanged if there is none. */
+const removeFirst = <T,>(array: readonly T[], value: T): readonly T[] => {
+  const index = array.indexOf(value);
+
+  return index === -1 ? array : array.toSpliced(index, 1);
 };
