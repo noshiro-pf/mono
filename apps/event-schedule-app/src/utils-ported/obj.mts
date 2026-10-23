@@ -1,6 +1,10 @@
 import { Arr, hasKey, Obj as ObjBase } from 'ts-data-forge';
-import type { ReadonlyRecord, UnknownRecord } from 'ts-type-forge';
-import type { Paths, RecordValueAtPath } from './paths.mjs';
+import type {
+  ReadonlyRecord,
+  RecordPaths,
+  RecordValueAtPath,
+  UnknownRecord,
+} from 'ts-type-forge';
 
 /**
  * Whether `record` has `key`, and its value satisfies `guard`.
@@ -58,7 +62,7 @@ export namespace Obj {
   /** The value at `keyPath`, or `undefined` where the path does not exist. */
   export const getIn = <
     const R extends UnknownRecord,
-    const Path extends Paths<R>,
+    const Path extends RecordPaths<R>,
   >(
     record: R,
     keyPath: Path,
@@ -83,7 +87,7 @@ export namespace Obj {
   /** A copy with the value at `keyPath` replaced by `updater`'s result. */
   export const updateIn = <
     const R extends UnknownRecord,
-    const Path extends Paths<R>,
+    const Path extends RecordPaths<R>,
   >(
     record: R,
     keyPath: Path,

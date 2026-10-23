@@ -88,9 +88,6 @@ export const isEmailString = (str: string): boolean =>
 /** The identity function. */
 export const idfn = <T,>(value: T): T => value;
 
-/** A function whose input and output are the same type. */
-export type MonoTypeFunction<T> = (value: T) => T;
-
 /**
  * Resolves a relative path against the current document.
  *
