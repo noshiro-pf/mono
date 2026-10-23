@@ -8,6 +8,7 @@ import {
 import { useObservableValue } from 'synstate-preact-hooks';
 import { Arr, castMutable, Optional, type Result } from 'ts-data-forge';
 import type { JsonValue, MutableRecord, ReadonlyRecord } from 'ts-type-forge';
+import { getShuffled } from 'ts-utils-additional';
 import { tileDef } from '../constants/index.mjs';
 import {
   hand2TenhoString,
@@ -26,7 +27,6 @@ import type {
   TileName,
   Turn,
 } from '../types/index.mjs';
-import { getShuffled } from '../utils/index.mjs';
 
 // 手牌
 export const [

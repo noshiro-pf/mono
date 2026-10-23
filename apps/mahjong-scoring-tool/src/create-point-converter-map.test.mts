@@ -1,7 +1,7 @@
 import { Arr } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
+import { getShuffled } from 'ts-utils-additional';
 import { createPointMap } from './create-point-converter-map.mjs';
-import { getShuffled } from './shuffled.mjs';
 import type { Pair } from './types.mjs';
 
 describe('createPointMap', () => {

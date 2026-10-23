@@ -1555,6 +1555,9 @@ importers:
       ts-fortress:
         specifier: workspace:*
         version: link:../../libs/ts-fortress
+      ts-utils-additional:
+        specifier: workspace:*
+        version: link:../ts-utils-additional
     devDependencies:
       '@playwright/test':
         specifier: 'catalog:'
@@ -1632,6 +1635,9 @@ importers:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
+      ts-utils-additional:
+        specifier: workspace:*
+        version: link:../ts-utils-additional
       tsx:
         specifier: 'catalog:'
         version: 4.23.15

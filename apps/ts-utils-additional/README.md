@@ -6,13 +6,14 @@
 
 ## 入っているもの
 
-| ディレクトリ   | 内容                                                         | 利用者                                |
-| :------------- | :----------------------------------------------------------- | :------------------------------------ |
-| `color/`       | Hsl / Rgb 型、相互変換、コントラスト比、`hslToStr` など      | `color-demo-app` ・ `annotation-tool` |
-| `shape/`       | `Rect` ・ `Point` ・ `RectSize` の操作（正規化、内接、変換） | `annotation-tool` ・ `algo-app`       |
-| `types/record` | `Point` ・ `Rect` ・ `RectSize` の型                         | 同上                                  |
-| `array/math`   | `variance`                                                   | `color-demo-app`                      |
-| `num/`         | `dist`（`color/` のテストヘルパが使う）                      | 内部のみ                              |
+| ディレクトリ   | 内容                                                         | 利用者                                                           |
+| :------------- | :----------------------------------------------------------- | :--------------------------------------------------------------- |
+| `color/`       | Hsl / Rgb 型、相互変換、コントラスト比、`hslToStr` など      | `color-demo-app` ・ `annotation-tool`                            |
+| `shape/`       | `Rect` ・ `Point` ・ `RectSize` の操作（正規化、内接、変換） | `annotation-tool` ・ `algo-app`                                  |
+| `types/record` | `Point` ・ `Rect` ・ `RectSize` の型                         | 同上                                                             |
+| `array/math`   | `variance`                                                   | `color-demo-app`                                                 |
+| `array/`       | `getShuffled`                                                | `algo-app` ・ `mahjong-calculator-app` ・ `mahjong-scoring-tool` |
+| `num/`         | `dist`（`color/` のテストヘルパが使う）                      | 内部のみ                                                         |
 
 ## 入れていないもの
 
@@ -21,7 +22,7 @@
 
 | 省いたもの                                                 | 必要になる相手                        |
 | :--------------------------------------------------------- | :------------------------------------ |
-| `random/`（`getShuffled` ・ `permutation`）                | `algo-app`                            |
+| `random/`（`permutation`）                                 | `algo-app`                            |
 | `types/` の type-challenges 系（`PermutationString` ほか） | `algo-app`                            |
 | `bit-array/` ・ `date/` ・ `functional/` ・ `image/`       | なし                                  |
 | `others/` ・ `promise/` ・ `promise-result/` ・ `string/`  | なし（多くは `ts-data-forge` にある） |
