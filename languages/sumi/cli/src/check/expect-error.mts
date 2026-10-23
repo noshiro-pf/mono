@@ -1,5 +1,6 @@
 import type { CheckerDiagnostic } from '@sumi-lang/checker';
 import {
+  findSumiSilencingDirectives,
   parseMarkers,
   toRuleId,
   type OxlintDiagnostic,
@@ -38,6 +39,18 @@ export type InvalidExpectError = Readonly<{
   message: string;
 }>;
 
+/**
+ * An `oxlint-disable*` comment that silences a rule of the Sumi preset. oxlint
+ * applies it before `sumi check` sees a diagnostic, and no option turns it
+ * off, so the comment itself is reported: `@sumi-expect-error` is the one way
+ * to answer a Sumi diagnostic (D-60).
+ */
+export type SilencingDirective = Readonly<{
+  filename: string;
+  line: number;
+  message: string;
+}>;
+
 export type ExpectErrorResult = Readonly<{
   /** The oxlint diagnostics left after the matched ones were suppressed. */
   lint: readonly OxlintDiagnostic[];
@@ -46,6 +59,7 @@ export type ExpectErrorResult = Readonly<{
   checker: readonly CheckerDiagnostic[];
   unused: readonly UnusedExpectError[];
   invalid: readonly InvalidExpectError[];
+  silencingDirectives: readonly SilencingDirective[];
 }>;
 
 /**
@@ -66,7 +80,8 @@ type Entry = Readonly<
 
 /**
  * Applies the `@sumi-expect-error` directives in `files` to both engines'
- * diagnostics.
+ * diagnostics, and finds the `oxlint-disable*` comments that would answer one
+ * in their place.
  *
  * A marker names a neutral rule ID and applies to the next line that is
  * neither a marker nor another linter's next-line directive, exactly as it does
@@ -133,6 +148,8 @@ export const applyExpectErrors = (
 
   const mut_invalid: InvalidExpectError[] = [];
 
+  const mut_silencingDirectives: SilencingDirective[] = [];
+
   for (const file of files) {
     const source = readFile(file);
 
@@ -144,6 +161,10 @@ export const applyExpectErrors = (
 
     for (const problem of problems) {
       mut_invalid.push({ filename: file, ...problem });
+    }
+
+    for (const problem of findSumiSilencingDirectives(source)) {
+      mut_silencingDirectives.push({ filename: file, ...problem });
     }
 
     const inFile = mut_byFile.get(file) ?? [];
@@ -185,6 +206,7 @@ export const applyExpectErrors = (
     ),
     unused: mut_unused,
     invalid: mut_invalid,
+    silencingDirectives: mut_silencingDirectives,
   };
 };
 
