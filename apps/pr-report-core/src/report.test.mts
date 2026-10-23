@@ -119,4 +119,40 @@ describe(buildEntries, () => {
       ],
     );
   });
+
+  // A repository that declares no ruleset still has checks, and calling every
+  // pull request passed over none of them would hide the failing ones.
+  test('without a ruleset, judges every context reported on the head', () => {
+    const { entries } = buildEntries({
+      required: undefined,
+      defaultBranch: 'main',
+      pulls: [
+        facts(1, {
+          reported: new Map<string, ContextState>([
+            ['test', 'failed'],
+            ['build', 'passed'],
+          ]),
+        }),
+        facts(2, {
+          baseRef: 'branch-1',
+          reported: new Map<string, ContextState>([['build', 'passed']]),
+        }),
+        facts(3),
+      ],
+    });
+
+    assert.deepStrictEqual(
+      entries.map(({ checks }) => [
+        checks.verdict,
+        checks.failed,
+        checks.passed,
+        checks.required,
+      ]),
+      [
+        ['failing', ['test'], ['build'], 2],
+        ['passed', [], ['build'], 1],
+        ['passed', [], [], 0],
+      ],
+    );
+  });
 });

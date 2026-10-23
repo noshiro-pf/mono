@@ -3,10 +3,10 @@ import type { RefCallback } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import { Num } from 'ts-data-forge';
-import { REPORT_SOURCE } from '../constants.mjs';
 import {
   activitySignals,
   activityStore,
+  reportSource,
   tokenSignals,
 } from '../store/index.mjs';
 import {
@@ -176,7 +176,7 @@ const CountCell = memoNamed<CellProps>(
       <td>
         <div className={'weekly-activity-cell'}>
           <span className={'weekly-activity-count'}>
-            <ExternalLink href={activitySearchUrl(REPORT_SOURCE, kind, day)}>
+            <ExternalLink href={activitySearchUrl(reportSource, kind, day)}>
               {String(count)}
             </ExternalLink>
           </span>

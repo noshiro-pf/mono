@@ -74,7 +74,12 @@ export const buildEntries = ({
   defaultBranch,
   pulls,
 }: Readonly<{
-  required: readonly string[];
+  /**
+   * The contexts the ruleset requires, or `undefined` for a repository that
+   * declares none: each pull request is then judged over every context
+   * reported on its head.
+   */
+  required: readonly string[] | undefined;
   defaultBranch: string;
   pulls: readonly PullRequestFacts[];
 }>): DecidedEntries => {
@@ -99,7 +104,7 @@ export const buildEntries = ({
             : Arr.toUnshifted(stackedOn)(mergeAfter),
         ).filter((n) => open.has(n)),
         checks: summarizeChecks({
-          required,
+          required: required ?? Array.from(facts.reported.keys()).toSorted(),
           reported: facts.reported,
           paused: facts.labels.some((label) => label.name === SKIP_CI_LABEL),
           running: facts.checksRunning,

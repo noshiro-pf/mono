@@ -3,10 +3,14 @@ import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { REPORT_SOURCE, repositoryUrl } from '../constants.mjs';
+import { repositoryUrl } from '../constants.mjs';
 import type { BlockId } from '../layout.mjs';
 import { MERGED_WITHIN_DAYS } from '../load-report.mjs';
-import { mergeOrderSignals, readerSignals } from '../store/index.mjs';
+import {
+  mergeOrderSignals,
+  readerSignals,
+  reportSource,
+} from '../store/index.mjs';
 import { BlockLayout } from './block-layout.js';
 import { CyclesSection } from './cycles-section.js';
 import { IssuesSection } from './issues-section.js';
@@ -117,4 +121,4 @@ export const ReportView = memoNamed('ReportView', () => {
   return <BlockLayout blocks={blocks} />;
 });
 
-const REPO_URL = repositoryUrl(REPORT_SOURCE);
+const REPO_URL = repositoryUrl(reportSource);

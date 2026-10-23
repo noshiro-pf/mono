@@ -1,4 +1,5 @@
 import {
+  absentBlocks,
   BLOCK_IDS,
   columnsOf,
   columnWidths,
@@ -701,11 +702,26 @@ describe(shownOf, () => {
   test('is the blocks not hidden, in the order given', () => {
     const hidden = withHidden(DEFAULT_LAYOUT, 'runs', true);
 
-    assert.deepStrictEqual(shownOf(hidden, ['issues', 'runs', 'open']), [
+    assert.deepStrictEqual(shownOf(hidden, ['issues', 'runs', 'open'], []), [
       'issues',
       'open',
     ]);
 
-    assert.deepStrictEqual(shownOf(DEFAULT_LAYOUT, BLOCK_IDS), BLOCK_IDS);
+    assert.deepStrictEqual(shownOf(DEFAULT_LAYOUT, BLOCK_IDS, []), BLOCK_IDS);
+  });
+
+  test('leaves out the blocks the repository has nothing for', () => {
+    assert.deepStrictEqual(
+      shownOf(DEFAULT_LAYOUT, ['open', 'queue', 'runs'], ['queue']),
+      ['open', 'runs'],
+    );
+  });
+});
+
+describe(absentBlocks, () => {
+  test('is the queue where there is none', () => {
+    assert.deepStrictEqual(absentBlocks({ queue: false }), ['queue']);
+
+    assert.deepStrictEqual(absentBlocks({ queue: true }), []);
   });
 });

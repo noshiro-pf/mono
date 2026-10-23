@@ -1,7 +1,7 @@
 # `pr-manager-app`
 
 **GitHub Pull Requests Manager** — the state of every open pull request in
-`noshiro-pf/mono`, as a page.
+`noshiro-pf/mono`, or in any repository the URL names, as a page.
 
 <https://noshiro-pf.github.io/mono/pr-manager/>
 
@@ -106,6 +106,46 @@ them back under the rest. The zoom starts at
 It **only reads**. Nothing here labels, rebases, merges or comments — that is
 `pnpm run unblock-prs`, run by a person — and a page that cannot do any of it
 is a page that is safe to leave open.
+
+## Another repository
+
+The page reads `noshiro-pf/mono` unless the URL names another:
+`?repo=owner/name`, beside the layout and the theme, so a bookmark keeps it.
+It is read once, as the page opens. A value no repository can have reads
+`noshiro-pf/mono` instead, and the header names the repository read, so a
+mistyped one shows as what it is.
+
+It is used in one of two ways, and the page tells them apart by what the
+repository has rather than by a setting:
+
+- **As a view of the pull requests and the issues**, on any repository: the
+  merge order, drawn from `Merge-After: #N` lines in the pull requests'
+  bodies and from pull requests opened onto another's branch; each one's
+  checks, how far it is from its base, its labels and the issues it closes;
+  the workflow runs still going, what merged, and the open issues with the
+  graph their `Start-After: #N` lines draw (`docs/issue-start-after.md`). The
+  `priority:high`, `priority:mid`, `priority:low` and `pending` labels are
+  read wherever they are. Nothing needs installing: a token and the URL are
+  all of it.
+- **Beside `unblock-prs`**, as here, which adds the queue it works through,
+  what it set aside and why, and who claimed it.
+
+What follows from what the repository has:
+
+- **Without `repo-settings/rulesets/main.json` on the default branch**, the
+  verdict is over every context reported on the head instead of the ones the
+  ruleset requires, and the hover says so; nothing waits for a code owner,
+  since nothing says one has to approve, and the `awaiting code owner` count
+  is not offered. The page reads the declaration
+  rather than the rulesets GitHub enforces, because reading those wants an
+  admin token. One that is there and cannot be read fails the read, since it
+  does say something.
+- **Without the `merge-queued` label**, which is what `unblock-prs`'s queue is
+  made of, the queue block is not drawn — the Layout dialog lists it as
+  `none here` — and the `queued` and `set aside` counts are not offered. A
+  choice made of them is ignored there and kept, so it is back on a
+  repository that has them: the merge order's filters are kept per browser,
+  not per repository.
 
 ## The merge order
 
@@ -297,7 +337,8 @@ contexts, the merge order, the counts — is `pr-report-core`, the same code
 disagree about a pull request. Which contexts are required, and which paths
 need a code owner, are read from `repo-settings/rulesets/main.json` and
 `.github/CODEOWNERS` on the default branch, in the query that lists the pull
-requests.
+requests, as is whether the repository has the `merge-queued` label; what the
+page does without them is under "Another repository".
 
 **GraphQL, because of how GitHub charges.** REST charges a request, and one
 pull request takes three — the comparison against its base and the two kinds
@@ -418,6 +459,10 @@ only what GraphQL asks a caller to be:
 
 The panel says both of those on screen, with links to the two pages, so that
 nobody has to come here to find out what to tick.
+
+**A private repository** named by `?repo=` needs a token that can read it: a
+fine-grained one given read-only access to that repository, or a classic one
+with the `repo` scope — which can also write, though the page never does.
 
 Where it is kept is the reader's choice and the default is the cautious one:
 `sessionStorage`, gone when the tab closes. "Remember on this device" moves it

@@ -2,8 +2,13 @@ import type { ComponentChildren } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { columnWidths, shownOf, type BlockId } from '../layout.mjs';
-import { layoutSignals } from '../store/index.mjs';
+import {
+  absentBlocks,
+  columnWidths,
+  shownOf,
+  type BlockId,
+} from '../layout.mjs';
+import { layoutSignals, readerSignals } from '../store/index.mjs';
 import { BlockColumn } from './block-column.js';
 import { ColumnDivider } from './column-divider.js';
 
@@ -22,7 +27,9 @@ type Props = Readonly<{
  *
  * A hidden block is left out of its column altogether, so the blocks around
  * it share the column as if it were not there; a column whose blocks are all
- * hidden keeps its width, empty.
+ * hidden keeps its width, empty. So is a block the repository has nothing
+ * for (`absentBlocks`), without being hidden: the queue, on a repository
+ * that does not run `unblock-prs`.
  *
  * In the `fill` mode the layout takes the height the page leaves it, and each
  * column shares that out among its blocks (`index.css`).
@@ -32,13 +39,26 @@ export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
 
   const layout = layoutSignals.layout.value;
 
+  const features = readerSignals.features.value;
+
+  const absent = useMemo(() => absentBlocks(features), [features]);
+
   const widths = useMemo(() => columnWidths(layout), [layout]);
 
-  const left = useMemo(() => shownOf(layout, layout.left), [layout]);
+  const left = useMemo(
+    () => shownOf(layout, layout.left, absent),
+    [layout, absent],
+  );
 
-  const middle = useMemo(() => shownOf(layout, layout.middle), [layout]);
+  const middle = useMemo(
+    () => shownOf(layout, layout.middle, absent),
+    [layout, absent],
+  );
 
-  const right = useMemo(() => shownOf(layout, layout.right), [layout]);
+  const right = useMemo(
+    () => shownOf(layout, layout.right, absent),
+    [layout, absent],
+  );
 
   const style = useMemo(
     () =>

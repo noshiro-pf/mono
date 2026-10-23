@@ -1,9 +1,11 @@
 import { memoNamed } from 'preact-utils';
+import { useMemo } from 'preact/hooks';
 import { Arr, Obj } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   STATUS_FILTERS,
   STATUS_NAMES,
+  statusFiltersOf,
   type MergeOrderSort,
   type StatusFilter,
 } from '../merge-order-view.mjs';
@@ -34,7 +36,9 @@ import { OfTotal, StatTile } from './stat-tile.js';
  * `set aside` and `awaiting code owner` are what stops a pull request that
  * is otherwise ready, and are only this page's, as is `pending`, the
  * `pending` label an author puts on what they are holding back, which is
- * the count to switch off to leave it out.
+ * the count to switch off to leave it out. `queued` and `set aside` are
+ * left out where the repository does not run the queue, and `awaiting code
+ * owner` where it declares no ruleset (`statusFiltersOf`).
  */
 export const MergeOrderFilters = memoNamed('MergeOrderFilters', () => {
   const summary = readerSignals.summary.value;
@@ -42,6 +46,10 @@ export const MergeOrderFilters = memoNamed('MergeOrderFilters', () => {
   const view = mergeOrderSignals.view.value;
 
   const counts = mergeOrderSignals.counts.value;
+
+  const features = readerSignals.features.value;
+
+  const filters = useMemo(() => statusFiltersOf(features), [features]);
 
   return (
     <div className={'merge-order-filters'}>
@@ -54,7 +62,7 @@ export const MergeOrderFilters = memoNamed('MergeOrderFilters', () => {
           total={counts.open.total}
           value={counts.open.shown}
         />
-        {STATUS_FILTERS.map((filter) => {
+        {filters.map((filter) => {
           // Not known while what it is counted from is still being read.
           const count =
             summary[filter] === undefined ? undefined : counts.statuses[filter];

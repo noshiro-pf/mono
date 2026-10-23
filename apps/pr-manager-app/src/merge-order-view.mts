@@ -54,6 +54,45 @@ export const STATUS_FILTERS = [
   'pending',
 ] as const satisfies readonly (StatusFilter & keyof PageSummary)[];
 
+/**
+ * The statuses on offer. `queued` and `set aside` are `unblock-prs`'s, and
+ * `awaiting code owner` is what the ruleset asks for, so where the repository
+ * does not run the one or declare the other (`RepoFeatures` in
+ * `load-report.mts`) they are counts that are always nought, and switches
+ * that do nothing; they are left out there.
+ */
+export const statusFiltersOf = (
+  features: Readonly<{ queue: boolean; ruleset: boolean }>,
+): readonly StatusFilter[] =>
+  STATUS_FILTERS.filter(
+    (filter) =>
+      (features.queue || !QUEUE_STATUSES.has(filter)) &&
+      (features.ruleset || filter !== 'awaitingReview'),
+  );
+
+/**
+ * The view as it applies where only `available` is on offer: what it hides
+ * or picks of the rest is ignored rather than forgotten, so the choice comes
+ * back on a repository that has them — the choice is kept across visits,
+ * and the page reads any repository the URL names.
+ */
+export const withAvailable = (
+  view: MergeOrderView,
+  available: readonly StatusFilter[],
+): MergeOrderView =>
+  view.hiddenStatuses.every((each) => available.includes(each)) &&
+  view.onlyStatuses.every((each) => available.includes(each))
+    ? view
+    : ({
+        ...view,
+        hiddenStatuses: view.hiddenStatuses.filter((each) =>
+          available.includes(each),
+        ),
+        onlyStatuses: view.onlyStatuses.filter((each) =>
+          available.includes(each),
+        ),
+      } as const);
+
 /** What each status is called on the page. */
 export const STATUS_NAMES = {
   queued: 'queued',
@@ -386,3 +425,8 @@ export const known = <T extends string>(
   Arr.isArray(stored)
     ? all.filter((each) => stored.includes(each))
     : ([] as const);
+
+const QUEUE_STATUSES: ReadonlySet<StatusFilter> = new Set([
+  'queued',
+  'setAside',
+]);

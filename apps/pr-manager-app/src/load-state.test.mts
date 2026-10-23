@@ -87,6 +87,7 @@ const readAt = (readAtEpochMs: number): LoadedReport =>
     repo: { owner: 'noshiro-pf', name: 'mono' },
     readAtEpochMs,
     required: [],
+    features: { ruleset: true, queue: true },
     summary: {
       open: 0,
       queued: 0,

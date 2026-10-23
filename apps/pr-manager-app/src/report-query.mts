@@ -14,7 +14,11 @@
  * page of any list that did not fit in one.
  */
 
-import { MAIN_RULESET_PATH, SET_ASIDE_COMMENT_SCAN } from 'pr-report-core';
+import {
+  MAIN_RULESET_PATH,
+  MERGE_QUEUED_LABEL,
+  SET_ASIDE_COMMENT_SCAN,
+} from 'pr-report-core';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
 
@@ -88,9 +92,10 @@ const OPEN_PULLS =
 
 /**
  * The open pull requests as the merge order draws them — what each is, the
- * branch it is of, its labels, what its body declares — and the two files on
+ * branch it is of, its labels, what its body declares — the two files on
  * the default branch (`HEAD`) that say what a pull request is required to
- * have. The one query the page waits for before it draws anything.
+ * have, and whether the repository has the label `unblock-prs`'s queue is
+ * made of. The one query the page waits for before it draws anything.
  */
 export const PULL_REQUESTS_QUERY = [
   'query PullRequests($owner: String!, $name: String!) {',
@@ -98,6 +103,7 @@ export const PULL_REQUESTS_QUERY = [
   '    defaultBranchRef { name }',
   `    ruleset: object(expression: "HEAD:${MAIN_RULESET_PATH}") { ... on Blob { text } }`,
   `    codeOwners: object(expression: "HEAD:${CODE_OWNERS_PATH}") { ... on Blob { text } }`,
+  `    queueLabel: label(name: "${MERGE_QUEUED_LABEL}") { name }`,
   `    ${OPEN_PULLS} {`,
   '      totalCount',
   '      nodes {',
@@ -605,6 +611,8 @@ export const PullRequestsDataSchema = t.record({
     defaultBranchRef: t.union([t.record({ name: t.string() }), t.nullType]),
     ruleset: BlobSchema,
     codeOwners: BlobSchema,
+    /** `null` when the repository has no such label. */
+    queueLabel: t.union([t.record({ name: t.string() }), t.nullType]),
     open: t.record({
       totalCount: t.number(),
       nodes: t.array(PullRequestSchema),

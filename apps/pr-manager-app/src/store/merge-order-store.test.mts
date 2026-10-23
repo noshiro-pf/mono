@@ -153,6 +153,32 @@ describe(createMergeOrderStore, () => {
       total: 1,
     });
   });
+
+  test('ignores what the view says of the queue where there is none, and keeps it', () => {
+    const { store, setEntries, setQueue } = setup();
+
+    setEntries([entry(1, ['merge-queued']), entry(2, [])]);
+
+    store.toggleOnly('queued');
+
+    setQueue(false);
+
+    assert.deepStrictEqual(
+      store.roots.getSnapshot().value.map(({ number }) => number),
+      [1, 2],
+    );
+
+    assert.deepStrictEqual(store.view.getSnapshot().value.onlyStatuses, [
+      'queued',
+    ]);
+
+    setQueue(true);
+
+    assert.deepStrictEqual(
+      store.roots.getSnapshot().value.map(({ number }) => number),
+      [1],
+    );
+  });
 });
 
 const STORED: MergeOrderView = {
@@ -168,6 +194,7 @@ const setup = (): Readonly<{
   resolveLoad: (stored: unknown) => void;
   rejectLoad: () => void;
   setEntries: (entries: readonly Entry[]) => void;
+  setQueue: (queue: boolean) => void;
 }> => {
   const mut_saved: MergeOrderView[] = [];
 
@@ -177,9 +204,12 @@ const setup = (): Readonly<{
 
   const [roots, setRoots] = createState<readonly TreeNode[]>([]);
 
+  const [features, setFeatures] = createState({ ruleset: true, queue: true });
+
   const store = createMergeOrderStore({
     entries: entries$,
     roots,
+    features,
     load: () => promise,
     save: (view) => {
       mut_saved.push(view);
@@ -192,6 +222,9 @@ const setup = (): Readonly<{
     resolveLoad: resolve,
     rejectLoad: () => {
       reject(new Error('blocked'));
+    },
+    setQueue: (queue) => {
+      setFeatures({ ruleset: true, queue });
     },
     setEntries: (list) => {
       setEntries(list);

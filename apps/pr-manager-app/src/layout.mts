@@ -386,11 +386,24 @@ export const columnsOf = (layout: Layout): readonly (readonly BlockId[])[] => {
   }
 };
 
-/** Of `ids`, the blocks drawn: those {@link Layout.hidden} does not name. */
+/**
+ * Of `ids`, the blocks drawn: those {@link Layout.hidden} does not name, and
+ * that the repository has something for — `absent` names those it does not,
+ * which are not hidden so much as empty, and come back as they were on a
+ * repository that has them.
+ */
 export const shownOf = (
   layout: Layout,
   ids: readonly BlockId[],
-): readonly BlockId[] => ids.filter((id) => !layout.hidden.includes(id));
+  absent: readonly BlockId[],
+): readonly BlockId[] =>
+  ids.filter((id) => !layout.hidden.includes(id) && !absent.includes(id));
+
+/** The blocks a repository without some of what this one runs has nothing for. */
+export const absentBlocks = (
+  features: Readonly<{ queue: boolean }>,
+): readonly BlockId[] =>
+  features.queue ? ([] as const) : (['queue'] as const);
 
 /**
  * Hides `block`, or shows it again where it was. Its place, height and share
