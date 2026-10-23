@@ -1,4 +1,4 @@
-import { pipe } from 'ts-data-forge';
+import { Arr, pipe } from 'ts-data-forge';
 import { revealedTileTypeDef, tileDef } from '../constants/index.mjs';
 import type { ApiMeldedBlock, RevealedBlock } from '../types/index.mjs';
 import { revealedBlockToTiles } from './revealed-block-to-tiles.mjs';
@@ -157,19 +157,12 @@ export const revealedBlockToApiPayload = (
       }
     })
     .map((id) => {
-      // `Tpl.map` has no successor in `ts-data-forge`, and `Array.prototype.map`
-      // widens the tuple to an array — which the API type rejects, since it
-      // asks for at least three tiles. `revealedBlockToTiles` returns a
-      // three- or four-tuple, so naming the first three is total.
-      const [tile0, tile1, tile2, ...restTiles] =
-        revealedBlockToTiles(revealedBlock);
-
-      const tilesNo = [
-        tileDef[tile0].no,
-        tileDef[tile1].no,
-        tileDef[tile2].no,
-        ...restTiles.map((t) => tileDef[t].no),
-      ] as const;
+      // `Arr.map` keeps the three- or four-tuple `revealedBlockToTiles`
+      // returns, which the API type needs: it asks for at least three tiles.
+      const tilesNo = Arr.map(
+        revealedBlockToTiles(revealedBlock),
+        (t) => tileDef[t].no,
+      );
 
       return {
         type: id,

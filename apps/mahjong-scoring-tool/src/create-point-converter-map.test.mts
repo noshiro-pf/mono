@@ -1,8 +1,8 @@
+import { Arr } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import { createPointMap } from './create-point-converter-map.mjs';
 import { getShuffled } from './shuffled.mjs';
 import type { Pair } from './types.mjs';
-import { sum } from './utils.mjs';
 
 describe('createPointMap', () => {
   const oka = 30_000;
@@ -118,10 +118,10 @@ describe('createPointMap', () => {
   }>[])('$case', ({ input, output }) => {
     const result = createPointMap(getShuffled(input), oka, uma);
 
-    expect(sum(input)).toBe(100_000);
+    expect(Arr.sum(input)).toBe(100_000);
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    expect(sum(input.map((x) => result.get(x)!))).toBe(0);
+    expect(Arr.sum(input.map((x) => result.get(x)!))).toBe(0);
 
     expect(Array.from(result)).toStrictEqual(output);
   });
