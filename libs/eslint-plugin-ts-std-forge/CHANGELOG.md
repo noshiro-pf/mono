@@ -1,5 +1,17 @@
 # eslint-plugin-ts-std-forge
 
+## 0.1.12
+
+### Patch Changes
+
+- 384b952: Every rule but `prefer-safe-array-length-guard` is now built from the rule
+  factories in eslint-rule-forge, which eslint-plugin-ts-data-forge shares.
+  `prefer-safe-array-is-array` no longer reports a computed member such as
+  `Array[isArray](xs)`.
+- Updated dependencies [384b952]
+    - eslint-rule-forge@0.3.0
+    - ts-std-forge@0.5.2
+
 ## 0.1.11
 
 ### Patch Changes

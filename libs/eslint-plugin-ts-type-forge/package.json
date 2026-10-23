@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-ts-type-forge",
-  "version": "0.8.10",
+  "version": "0.8.11",
   "private": false,
   "description": "ESLint rules that steer type declarations toward ts-type-forge idioms.",
   "keywords": [
