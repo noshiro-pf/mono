@@ -1,10 +1,10 @@
 import { asSafeUint, Num, pipe, SafeUint } from 'ts-data-forge';
-import type { DeepReadonly, Reducer } from 'ts-type-forge';
+import type { DeepReadonly, MonoTypeFunction, Reducer } from 'ts-type-forge';
 import type {
   DetailedFilterIcon,
   NumIconFilterState,
 } from '../../types/index.mjs';
-import { type MonoTypeFunction, Obj } from '../../utils-ported/index.mjs';
+import { Obj } from '../../utils-ported/index.mjs';
 
 export type AnswerIconFilterState = DeepReadonly<{
   good: NumIconFilterState;

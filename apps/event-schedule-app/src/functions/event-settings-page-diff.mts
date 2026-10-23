@@ -9,16 +9,14 @@ import {
 import type {
   DeepReadonly,
   ReadonlyRecord,
+  RecordPaths,
+  RecordValueAtPath,
   RelaxedExclude,
   StrictExclude,
   StrictPick,
 } from 'ts-type-forge';
 import { dict, hm2str, ymd2str, ymdhm2str } from '../constants/index.mjs';
-import {
-  Obj,
-  type Paths,
-  type RecordValueAtPath,
-} from '../utils-ported/index.mjs';
+import { Obj } from '../utils-ported/index.mjs';
 import {
   datetimeRangeFromMapKey,
   datetimeRangeToMapKey,
@@ -55,7 +53,10 @@ const dc = dict.eventSettingsPage.diff;
 const map = (a: string, b: string): string =>
   `"${a}" ${dict.common.mapTo} "${b}"` as const;
 
-type EventSchedulePaths = StrictExclude<Paths<EventSchedule>, readonly []>;
+type EventSchedulePaths = StrictExclude<
+  RecordPaths<EventSchedule>,
+  readonly []
+>;
 
 {
   expectType<
