@@ -1,26 +1,48 @@
-import { memoNamed } from 'preact-utils';
+import { If, view, type JSX } from 'synstate-dom';
 import {
   MainScreen,
   SignInScreen,
   StartingScreen,
 } from './components/index.mjs';
-import { sessionSignal } from './store/index.mjs';
+import { sessionStore } from './store/index.mjs';
 
 /**
  * A personal task manager whose core is the dependency graph between tasks
  * and milestones: what can be started now follows from what it waits for.
  *
- * Which screen is up follows the session alone; everything below reads the
- * store through its signals.
+ * Which screen is up follows the session alone, and each is built once per
+ * change of screen; everything below binds the store's observables.
  */
-export const App = memoNamed('App', () => {
-  const session = sessionSignal.value;
+export const App = (): JSX.Element => {
+  const { session } = sessionStore;
 
-  return session.type === 'starting' ? (
-    <StartingScreen />
-  ) : session.type === 'signed-out' ? (
-    <SignInScreen error={session.error} signingIn={session.signingIn} />
-  ) : (
-    <MainScreen userName={session.userName} />
+  return (
+    <If
+      cond={view(session, (s) => s.type === 'starting')}
+      then={<StartingScreen />}
+      else={
+        <If
+          cond={view(session, (s) => s.type === 'signed-out')}
+          then={
+            <SignInScreen
+              error={view(session, (s) =>
+                s.type === 'signed-out' ? s.error : undefined,
+              )}
+              signingIn={view(
+                session,
+                (s) => s.type === 'signed-out' && s.signingIn,
+              )}
+            />
+          }
+          else={
+            <MainScreen
+              userName={view(session, (s) =>
+                s.type === 'signed-in' ? s.userName : '',
+              )}
+            />
+          }
+        />
+      }
+    />
   );
-});
+};

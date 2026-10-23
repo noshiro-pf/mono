@@ -1,24 +1,12 @@
-import type { KeyboardEventHandler } from 'preact';
-import { memoNamed } from 'preact-utils';
-import { useCallback } from 'preact/hooks';
-import {
-  frameTitle,
-  GROUP_HEADER,
-  GROUP_PADDING,
-  type GroupFrame,
-} from '../dag/index.mjs';
+import type { InitializedObservable } from 'synstate';
+import { constant, view, type JSX } from 'synstate-dom';
+import { frameTitle, GROUP_HEADER, GROUP_PADDING } from '../dag/index.mjs';
 import { groupEditorStore } from '../store/index.mjs';
+import type { DagFrameRecord } from './dag-canvas-scene.mjs';
+import { SvgTitle } from './svg-title.js';
 
 type Props = Readonly<{
-  frame: GroupFrame;
-  title: string;
-  /** Being dragged by its title. */
-  dragging: boolean;
-  /**
-   * While a node is dragged: `into` for the frame it would be dropped into,
-   * `leave` for the one it would leave, and `undefined` otherwise.
-   */
-  drop: 'into' | 'leave' | undefined;
+  record: InitializedObservable<DagFrameRecord>;
 }>;
 
 /**
@@ -28,70 +16,71 @@ type Props = Readonly<{
  * opens the group's dialog with; inside the frame, a press pans as one on
  * the background does. An empty group is drawn the same, round nothing.
  */
-export const DagGroupFrame = memoNamed<Props>('DagGroupFrame', (props) => {
-  const { frame, title, dragging, drop } = props;
+export const DagGroupFrame = ({ record }: Props): JSX.Element => {
+  const { id } = record.getSnapshot().value.frame;
 
-  const openGroup = useCallback(() => {
-    groupEditorStore.open(frame.id);
-  }, [frame.id]);
-
-  const onKeyDown = useCallback<KeyboardEventHandler<SVGGElement>>(
-    (pressed) => {
-      if (pressed.key !== 'Enter' && pressed.key !== ' ') {
-        return;
-      }
-
-      pressed.preventDefault();
-
-      groupEditorStore.open(frame.id);
-    },
-    [frame.id],
-  );
+  const title = view(record, (r) => r.title);
 
   return (
     <g
-      className={`dag-group${frame.empty ? ' empty' : ''}${dragging ? ' dragging' : ''}`}
-      data-drop={drop}
-      data-e2e={'dag-group'}
-      transform={`translate(${frame.x} ${frame.y})`}
+      class={view(
+        record,
+        ({ frame, dragging }) =>
+          `dag-group${frame.empty ? ' empty' : ''}${dragging ? ' dragging' : ''}`,
+      )}
+      data-drop={view(record, ({ drop }) => drop)}
+      data-e2e={constant('dag-group')}
+      transform={view(
+        record,
+        ({ frame }) => `translate(${frame.x} ${frame.y})`,
+      )}
     >
       <rect
-        className={'dag-group-frame'}
-        height={frame.height}
-        rx={GROUP_CORNER_RADIUS}
-        width={frame.width}
+        class={constant('dag-group-frame')}
+        height={view(record, ({ frame }) => frame.height)}
+        rx={constant(GROUP_CORNER_RADIUS)}
+        width={view(record, ({ frame }) => frame.width)}
       />
       {/* An SVG has no <button>: the title takes its role, focus and keys. */}
-      {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role */}
+      {}
       <g
-        aria-label={`グループ「${title}」`}
-        className={'dag-group-header'}
-        data-e2e={'dag-group-header'}
-        data-group-id={frame.id}
-        role={'button'}
-        // Lower case, as on a node (`dag-task-node.tsx`).
-        tabindex={0}
-        onClick={openGroup}
-        onKeyDown={onKeyDown}
+        aria-label={view(record, (r) => `グループ「${r.title}」`)}
+        class={constant('dag-group-header')}
+        data-e2e={constant('dag-group-header')}
+        data-group-id={constant(id)}
+        role={constant('button')}
+        tabindex={constant(0)}
+        onClick={() => {
+          groupEditorStore.open(id);
+        }}
+        onKeyDown={(pressed) => {
+          if (pressed.key !== 'Enter' && pressed.key !== ' ') {
+            return;
+          }
+
+          pressed.preventDefault();
+
+          groupEditorStore.open(id);
+        }}
       >
-        <title>{title}</title>
+        <SvgTitle>{title}</SvgTitle>
         <rect
-          className={'dag-group-header-area'}
-          height={GROUP_HEADER}
-          rx={GROUP_CORNER_RADIUS}
-          width={frame.width}
+          class={constant('dag-group-header-area')}
+          height={constant(GROUP_HEADER)}
+          rx={constant(GROUP_CORNER_RADIUS)}
+          width={view(record, ({ frame }) => frame.width)}
         />
         <text
-          className={'dag-group-title'}
-          dominantBaseline={'central'}
-          x={GROUP_PADDING}
-          y={GROUP_HEADER / 2}
+          class={constant('dag-group-title')}
+          dominant-baseline={constant('central')}
+          x={constant(GROUP_PADDING)}
+          y={constant(GROUP_HEADER / 2)}
         >
-          {frameTitle(title, frame.width)}
+          {view(record, (r) => frameTitle(r.title, r.frame.width))}
         </text>
       </g>
     </g>
   );
-});
+};
 
 const GROUP_CORNER_RADIUS = 12;

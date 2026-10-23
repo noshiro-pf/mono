@@ -7,7 +7,7 @@ import { pagesAppBase } from '../../../tools/configs/pages-apps.mjs';
 
 const shared: UserConfig = defineViteAppConfig({
   packageRoot: workspaceRootPath,
-  framework: 'preact',
+  framework: 'synstate-dom',
   // Served from the repository's Pages site rather than a host of its own,
   // so the asset URLs carry the whole prefix. The table it comes from is the
   // one `build-pages-site.mts` copies by.
@@ -42,26 +42,17 @@ export default {
   },
   // Every third-party module the page reaches, named up front. The dev
   // server otherwise finds some only when they are first loaded — those
-  // behind `main.tsx`'s dynamic imports (the backend, ELK), those behind the
-  // dialog's (the date picker), and those the workspace siblings import —
-  // optimizes them then and reloads the page, mid-run for the e2e suite. One
-  // this package does not depend on itself is named through the sibling that
-  // does. Blueprint's `react` and `react-dom` are `@preact/compat` (see
-  // `package.json`), so they are bundled with it and need no entry.
+  // behind `main.tsx`'s dynamic imports (the backend, ELK), and those the
+  // workspace siblings import — optimizes them then and reloads the page,
+  // mid-run for the e2e suite. One this package does not depend on itself is
+  // named through the sibling that does.
   optimizeDeps: {
     include: [
       'ts-data-forge > @sindresorhus/is',
-      'preact',
-      'preact/hooks',
-      'preact/jsx-runtime',
-      'preact/compat',
-      '@preact/signals',
       'elkjs/lib/elk.bundled.js',
       'firebase/app',
       'firebase/auth',
       'firebase/firestore',
-      '@blueprintjs/datetime',
-      'date-fns/locale',
     ],
   },
 } satisfies UserConfig;

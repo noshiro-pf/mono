@@ -1,10 +1,10 @@
-import type { GenericEventHandler } from 'preact';
-import { memoNamed } from 'preact-utils';
+import { combine, map, type InitializedObservable } from 'synstate';
+import { constant, If, view, type JSX } from 'synstate-dom';
 import type { RelaxedExtract } from 'ts-type-forge';
 import {
-  domainSignal,
+  clockStore,
+  dataStore,
   editorStore,
-  nowSignal,
   type EditorState,
 } from '../store/index.mjs';
 import {
@@ -20,7 +20,9 @@ import { MilestoneExplanation } from './milestone-explanation.js';
 import { MilestoneReachState } from './milestone-reach-state.js';
 
 type Props = Readonly<{
-  editor: RelaxedExtract<EditorState, Readonly<{ type: 'milestone' }>>;
+  editor: InitializedObservable<
+    RelaxedExtract<EditorState, Readonly<{ type: 'milestone' }>>
+  >;
 }>;
 
 /**
@@ -29,133 +31,152 @@ type Props = Readonly<{
  * (resolved and reopened here) and its dependencies — with whether it is
  * reached as drafted and what it still waits for, and its description last.
  */
-export const MilestoneForm = memoNamed<Props>('MilestoneForm', (props) => {
-  const { editor } = props;
+export const MilestoneForm = ({ editor }: Props): JSX.Element => {
+  const checks$ = combine([dataStore.state, editor]).pipe(
+    map(([state, { ref, rows }]) => validateRows(state, ref, rows)),
+  );
 
-  const { draft } = editor;
-
-  const checks = validateRows(domainSignal.value, editor.ref, editor.rows);
-
-  const insight = milestoneDraftInsight(
-    domainSignal.value,
-    editor.ref.id,
-    { ...draft, dependencies: validDependencies(checks) },
-    nowSignal.value,
+  const insight$ = combine([
+    dataStore.state,
+    editor,
+    checks$,
+    clockStore.now,
+  ]).pipe(
+    map(([state, { ref, draft }, checks, now]) =>
+      milestoneDraftInsight(
+        state,
+        ref.id,
+        { ...draft, dependencies: validDependencies(checks) },
+        now,
+      ),
+    ),
   );
 
   return (
     <>
-      <MilestoneExplanation collapsed={!editor.isNew} />
-      <div className={'form-grid'}>
-        <label className={'bp6-label field field-wide'}>
-          {'タイトル'}
+      <MilestoneExplanation collapsed={view(editor, ({ isNew }) => !isNew)} />
+      <div class={constant('form-grid')}>
+        <label class={constant('bp6-label field field-wide')}>
+          {constant('タイトル')}
           <input
-            className={'bp6-input bp6-fill'}
-            data-e2e={'title-input'}
-            required
-            type={'text'}
-            value={draft.title}
-            onInput={onTitle}
+            class={constant('bp6-input bp6-fill')}
+            data-e2e={constant('title-input')}
+            required={constant(true)}
+            type={constant('text')}
+            value={view(editor, ({ draft }) => draft.title)}
+            onInput={(changed) => {
+              editorStore.updateMilestoneDraft({
+                title: changed.currentTarget.value,
+              });
+            }}
           />
         </label>
-        <GroupField value={draft.groupId} onChange={onGroup} />
+        <GroupField
+          value={view(editor, ({ draft }) => draft.groupId)}
+          onChange={(changed) => {
+            editorStore.updateMilestoneDraft({
+              groupId: changed.currentTarget.value,
+            });
+          }}
+        />
       </div>
-      <fieldset className={'condition-group'}>
-        <legend>{'到達条件（すべて満たすと到達）'}</legend>
-        <MilestoneReachState insight={insight} />
-        <div className={'form-grid'}>
+      <fieldset class={constant('condition-group')}>
+        <legend>{constant('到達条件（すべて満たすと到達）')}</legend>
+        <MilestoneReachState insight={insight$} />
+        <div class={constant('form-grid')}>
           <DateTimeField
             id={'milestone-date'}
             label={'日時（この日時になると到達）'}
-            value={draft.date}
-            onChange={onDate}
+            value={view(editor, ({ draft }) => draft.date)}
+            onChange={(date) => {
+              editorStore.updateMilestoneDraft({ date });
+            }}
           />
-          <div className={'field field-wide'}>
-            <label className={'bp6-control bp6-checkbox'}>
+          <div class={constant('field field-wide')}>
+            <label class={constant('bp6-control bp6-checkbox')}>
               <input
-                checked={draft.requiresManualCheck}
-                className={'bp6-control-input'}
-                type={'checkbox'}
-                onChange={onRequiresCheck}
+                checked={view(editor, ({ draft }) => draft.requiresManualCheck)}
+                class={constant('bp6-control-input')}
+                type={constant('checkbox')}
+                onChange={(changed) => {
+                  editorStore.updateMilestoneDraft({
+                    requiresManualCheck: changed.currentTarget.checked,
+                  });
+                }}
               />
-              <span className={'bp6-control-indicator'} />
-              {'手動チェックが必要（「解消」を押すと到達）'}
+              <span class={constant('bp6-control-indicator')} />
+              {constant('手動チェックが必要（「解消」を押すと到達）')}
             </label>
-            {draft.requiresManualCheck ? (
-              <div className={'manual-check'}>
-                {draft.checkedAt === undefined ? (
-                  <>
-                    <span>{'未解消'}</span>
-                    <button
-                      className={'bp6-button bp6-intent-success'}
-                      data-e2e={'check-button'}
-                      type={'button'}
-                      onClick={editorStore.check}
-                    >
-                      {'解消'}
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <span>{`解消済み（${formatDateTime(draft.checkedAt)}）`}</span>
-                    <button
-                      className={'bp6-button'}
-                      type={'button'}
-                      onClick={editorStore.uncheck}
-                    >
-                      {'未解消に戻す'}
-                    </button>
-                  </>
-                )}
-              </div>
-            ) : undefined}
+            <If
+              cond={view(editor, ({ draft }) => draft.requiresManualCheck)}
+              then={
+                <div class={constant('manual-check')}>
+                  <If
+                    cond={view(
+                      editor,
+                      ({ draft }) => draft.checkedAt === undefined,
+                    )}
+                    then={
+                      <>
+                        <span>{constant('未解消')}</span>
+                        <button
+                          class={constant('bp6-button bp6-intent-success')}
+                          data-e2e={constant('check-button')}
+                          type={constant('button')}
+                          onClick={editorStore.check}
+                        >
+                          {constant('解消')}
+                        </button>
+                      </>
+                    }
+                    else={
+                      <>
+                        <span>
+                          {view(editor, ({ draft }) =>
+                            draft.checkedAt === undefined
+                              ? ''
+                              : `解消済み（${formatDateTime(draft.checkedAt)}）`,
+                          )}
+                        </span>
+                        <button
+                          class={constant('bp6-button')}
+                          type={constant('button')}
+                          onClick={editorStore.uncheck}
+                        >
+                          {constant('未解消に戻す')}
+                        </button>
+                      </>
+                    }
+                  />
+                </div>
+              }
+            />
           </div>
         </div>
-        <fieldset className={'condition-dependencies'}>
-          <legend className={'condition-sub-label'}>{'依存'}</legend>
+        <fieldset class={constant('condition-dependencies')}>
+          <legend class={constant('condition-sub-label')}>
+            {constant('依存')}
+          </legend>
           <DependencyEditor
-            checks={checks}
-            owner={editor.ref}
-            rows={editor.rows}
-            unmet={insight.unmet}
+            checks={checks$}
+            editor={editor}
+            unmet={insight$.pipe(map((i) => i.unmet))}
           />
         </fieldset>
       </fieldset>
-      <label className={'bp6-label field description-field'}>
-        {'説明'}
+      <label class={constant('bp6-label field description-field')}>
+        {constant('説明')}
         <textarea
-          className={'bp6-input bp6-fill'}
-          rows={3}
-          value={draft.description}
-          onInput={onDescription}
+          class={constant('bp6-input bp6-fill')}
+          rows={constant(3)}
+          value={view(editor, ({ draft }) => draft.description)}
+          onInput={(changed) => {
+            editorStore.updateMilestoneDraft({
+              description: changed.currentTarget.value,
+            });
+          }}
         />
       </label>
     </>
   );
-});
-
-// Outside the component, since none of them reads its props.
-
-const onTitle: GenericEventHandler<HTMLInputElement> = (changed) => {
-  editorStore.updateMilestoneDraft({ title: changed.currentTarget.value });
-};
-
-const onGroup: GenericEventHandler<HTMLSelectElement> = (changed) => {
-  editorStore.updateMilestoneDraft({ groupId: changed.currentTarget.value });
-};
-
-const onDate = (date: string): void => {
-  editorStore.updateMilestoneDraft({ date });
-};
-
-const onRequiresCheck: GenericEventHandler<HTMLInputElement> = (changed) => {
-  editorStore.updateMilestoneDraft({
-    requiresManualCheck: changed.currentTarget.checked,
-  });
-};
-
-const onDescription: GenericEventHandler<HTMLTextAreaElement> = (changed) => {
-  editorStore.updateMilestoneDraft({
-    description: changed.currentTarget.value,
-  });
 };

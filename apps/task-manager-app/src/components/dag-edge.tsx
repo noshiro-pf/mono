@@ -1,10 +1,10 @@
-import { memoNamed } from 'preact-utils';
-import type { EdgeGeometry } from '../dag/index.mjs';
+import type { InitializedObservable } from 'synstate';
+import { constant, If, view, type JSX } from 'synstate-dom';
+import type { DagEdgeRecord } from './dag-canvas-scene.mjs';
+import { DagEdgeLabel } from './dag-edge-label.js';
 
 type Props = Readonly<{
-  edge: EdgeGeometry;
-  /** Clicked, and showing the button that deletes it (`dag-canvas.tsx`). */
-  selected: boolean;
+  record: InitializedObservable<DagEdgeRecord>;
 }>;
 
 /**
@@ -22,49 +22,36 @@ type Props = Readonly<{
  * and with nothing to point at: it is no dependency, so there is nothing to
  * delete.
  */
-export const DagEdge = memoNamed<Props>('DagEdge', (props) => {
-  const { edge, selected } = props;
-
-  const { path, labelBox, label, from, to, routed, implied } = edge;
+export const DagEdge = ({ record }: Props): JSX.Element => {
+  const path = view(record, ({ edge }) => edge.path);
 
   return (
     <g
-      className={'dag-edge'}
-      data-e2e={'dag-edge'}
-      data-edge-id={edge.id}
-      data-from={from}
-      data-implied={implied}
-      data-routed={routed}
-      data-selected={selected}
-      data-to={to}
+      class={constant('dag-edge')}
+      data-e2e={constant('dag-edge')}
+      data-edge-id={view(record, ({ edge }) => edge.id)}
+      data-from={view(record, ({ edge }) => edge.from)}
+      data-implied={view(record, ({ edge }) => String(edge.implied))}
+      data-routed={view(record, ({ edge }) => String(edge.routed))}
+      data-selected={view(record, ({ selected }) => String(selected))}
+      data-to={view(record, ({ edge }) => edge.to)}
     >
       <path
-        className={'dag-edge-line'}
+        class={constant('dag-edge-line')}
         d={path}
-        markerEnd={'url(#dag-arrow)'}
+        marker-end={constant('url(#dag-arrow)')}
       />
-      {implied ? undefined : (
-        <path className={'dag-edge-hit'} d={path} data-e2e={'dag-edge-hit'} />
-      )}
-      {labelBox === undefined ? undefined : (
-        <g className={'dag-edge-label'}>
-          <rect
-            height={labelBox.height}
-            rx={4}
-            width={labelBox.width}
-            x={labelBox.x}
-            y={labelBox.y}
+      <If
+        cond={view(record, ({ edge }) => !edge.implied)}
+        then={
+          <path
+            class={constant('dag-edge-hit')}
+            d={path}
+            data-e2e={constant('dag-edge-hit')}
           />
-          <text
-            dominantBaseline={'central'}
-            textAnchor={'middle'}
-            x={labelBox.x + labelBox.width / 2}
-            y={labelBox.y + labelBox.height / 2}
-          >
-            {label}
-          </text>
-        </g>
-      )}
+        }
+      />
+      <DagEdgeLabel pick={({ edge }) => edge} source={record} />
     </g>
   );
-});
+};

@@ -1,47 +1,50 @@
-import { memoNamed } from 'preact-utils';
-import { lazy, Suspense } from 'preact/compat';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 
 type Props = Readonly<{
   /** The id of the input, unique on the page. */
   id: string;
   label: string;
   /** As the draft holds it: `YYYY-MM-DDTHH:mm`, empty for none. */
-  value: string;
+  value: Bindable<string>;
   onChange: (value: string) => void;
 }>;
 
 /**
- * A labelled date and time, picked with Blueprint's date picker
- * (`date-picker/`), which is loaded the first time a field is shown. Until
- * then an empty input stands in its place.
+ * A labelled date and time to the minute, on the browser's wall clock — what
+ * the drafts hold — picked with the browser's own picker, and 「クリア」,
+ * which leaves it empty.
  */
-export const DateTimeField = memoNamed<Props>('DateTimeField', (props) => {
-  const { id, label, value, onChange } = props;
-
-  return (
-    <div className={'field date-time-field'}>
-      <label className={'bp6-label'} htmlFor={id}>
-        {label}
-      </label>
-      <Suspense fallback={LOADING}>
-        <DateTimePicker id={id} value={value} onChange={onChange} />
-      </Suspense>
+export const DateTimeField = ({
+  id,
+  label,
+  value,
+  onChange,
+}: Props): JSX.Element => (
+  <div class={constant('field date-time-field')}>
+    <label class={constant('bp6-label')} htmlFor={constant(id)}>
+      {constant(label)}
+    </label>
+    <div class={constant('date-time-input')}>
+      <input
+        class={constant('bp6-input bp6-fill')}
+        id={constant(id)}
+        type={constant('datetime-local')}
+        value={value}
+        onInput={(changed) => {
+          onChange(changed.currentTarget.value);
+        }}
+      />
+      <button
+        aria-label={constant(`${label}をクリア`)}
+        class={constant('bp6-button bp6-minimal')}
+        disabled={mapBindable(value, (v) => v === '')}
+        type={constant('button')}
+        onClick={() => {
+          onChange('');
+        }}
+      >
+        {constant('クリア')}
+      </button>
     </div>
-  );
-});
-
-const DateTimePicker = lazy(async () => {
-  const { DateTimePicker: component } =
-    await import('../date-picker/index.mjs');
-
-  return { default: component };
-});
-
-const LOADING = (
-  <input
-    className={'bp6-input bp6-fill'}
-    disabled
-    placeholder={'読み込み中…'}
-    type={'text'}
-  />
+  </div>
 );

@@ -1,12 +1,10 @@
-import type {
-  GenericEventHandler,
-  RefCallback,
-  SubmitEventHandler,
-} from 'preact';
-import { memoNamed } from 'preact-utils';
-import { editorSignal, editorStore } from '../store/index.mjs';
-import { closeOnBackdropClick } from './close-on-backdrop-click.mjs';
+import type { InitializedObservable } from 'synstate';
+import { constant, If, MatchOptional, view, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
+import type { RelaxedExclude } from 'ts-type-forge';
+import { editorStore, type EditorState } from '../store/index.mjs';
 import { DeleteControls } from './delete-controls.js';
+import { followModal } from './follow-modal.mjs';
 import { MilestoneForm } from './milestone-form.js';
 import { TaskForm } from './task-form.js';
 
@@ -18,123 +16,134 @@ import { TaskForm } from './task-form.js';
  * stays inside; Escape and a tap on the backdrop close it. Styled with
  * Blueprint's dialog classes, and a full-screen sheet on a phone
  * (`index.css`). Whether it is open is the editor store's: the element
- * follows it.
+ * follows it (`follow-modal.mts`), and its form is built afresh each time it
+ * opens.
  */
-export const NodeDialog = memoNamed('NodeDialog', () => {
-  const editor = editorSignal.value;
+export const NodeDialog = (): JSX.Element => (
+  <dialog
+    ref={(dialog) => {
+      followModal(
+        dialog,
+        editorStore.editor,
+        (editor) => editor.type !== 'closed',
+        editorStore.close,
+      );
+    }}
+    aria-labelledby={constant(TITLE_ID)}
+    class={constant('bp6-dialog node-dialog')}
+    data-e2e={constant('node-dialog')}
+    onCancel={(cancelled) => {
+      // Closed through the store, which then closes the element.
+      cancelled.preventDefault();
 
-  return (
-    <dialog
-      ref={followOpen}
-      aria-labelledby={TITLE_ID}
-      className={'bp6-dialog node-dialog'}
-      data-e2e={'node-dialog'}
-      onCancel={onCancel}
-    >
-      {editor.type === 'closed' ? undefined : (
-        <form className={'node-dialog-form'} onSubmit={onSubmit}>
-          <div className={'bp6-dialog-header'}>
-            <h2 className={'bp6-heading'} id={TITLE_ID}>
-              {editor.type === 'task'
-                ? editor.isNew
-                  ? '新しいタスク'
-                  : 'タスク'
-                : editor.isNew
-                  ? '新しいマイルストーン'
-                  : 'マイルストーン'}
-            </h2>
-            <button
-              aria-label={'閉じる'}
-              className={'bp6-button bp6-minimal'}
-              type={'button'}
-              onClick={editorStore.close}
-            >
-              {'×'}
-            </button>
-          </div>
-          <div className={'bp6-dialog-body node-dialog-body'}>
-            {editor.error === undefined ? undefined : (
-              <p className={'bp6-callout bp6-intent-danger'} role={'alert'}>
-                {editor.error}
-              </p>
-            )}
-            {editor.type === 'task' ? (
-              <TaskForm editor={editor} />
-            ) : (
-              <MilestoneForm editor={editor} />
-            )}
-          </div>
-          <div className={'bp6-dialog-footer node-dialog-footer'}>
-            {editor.isNew ? (
-              <span />
-            ) : (
-              <DeleteControls confirming={editor.confirmingDelete} />
-            )}
-            <div className={'bp6-dialog-footer-actions'}>
-              <button
-                className={'bp6-button'}
-                type={'button'}
-                onClick={editorStore.close}
-              >
-                {'キャンセル'}
-              </button>
-              <button
-                className={'bp6-button bp6-intent-primary'}
-                data-e2e={'save'}
-                type={'submit'}
-              >
-                {'保存'}
-              </button>
-            </div>
-          </div>
-        </form>
+      editorStore.close();
+    }}
+  >
+    <MatchOptional
+      value={view(editorStore.editor, (editor) =>
+        editor.type === 'closed' ? Optional.none : Optional.some(editor),
       )}
-    </dialog>
-  );
-});
+      some={(editor$) => <NodeForm editor={editor$} />}
+    />
+  </dialog>
+);
 
-// Outside the component, since none of them reads its props.
+/** The editor while it is open. */
+type OpenEditorState = RelaxedExclude<
+  EditorState,
+  Readonly<{ type: 'closed' }>
+>;
 
-// A modal dialog is opened by a call, not an attribute, so the element
-// follows the store by subscribing to it for as long as it is mounted.
-const followOpen: RefCallback<HTMLDialogElement> = (dialog) => {
-  if (dialog === null) {
-    return undefined;
-  }
-
-  const stopClosingOnBackdropClick = closeOnBackdropClick(
-    dialog,
-    editorStore.close,
-  );
-
-  const subscription = editorStore.editor.subscribe((editor) => {
-    if (editor.type !== 'closed' && !dialog.open) {
-      dialog.showModal();
-    } else if (editor.type === 'closed' && dialog.open) {
-      dialog.close();
-    }
-  });
-
-  return () => {
-    subscription.unsubscribe();
-
-    stopClosingOnBackdropClick();
-  };
-};
-
-/** Escape: closed through the store, which then closes the element. */
-const onCancel: GenericEventHandler<HTMLDialogElement> = (cancelled) => {
-  cancelled.preventDefault();
-
-  editorStore.close();
-};
+const NodeForm = ({
+  editor,
+}: Readonly<{
+  editor: InitializedObservable<OpenEditorState>;
+}>): JSX.Element => (
+  <form class={constant('node-dialog-form')} onSubmit={onSubmit}>
+    <div class={constant('bp6-dialog-header')}>
+      <h2 class={constant('bp6-heading')} id={constant(TITLE_ID)}>
+        {view(editor, ({ type, isNew }) =>
+          type === 'task'
+            ? isNew
+              ? '新しいタスク'
+              : 'タスク'
+            : isNew
+              ? '新しいマイルストーン'
+              : 'マイルストーン',
+        )}
+      </h2>
+      <button
+        aria-label={constant('閉じる')}
+        class={constant('bp6-button bp6-minimal')}
+        type={constant('button')}
+        onClick={editorStore.close}
+      >
+        {constant('×')}
+      </button>
+    </div>
+    <div class={constant('bp6-dialog-body node-dialog-body')}>
+      <If
+        cond={view(editor, ({ error }) => error !== undefined)}
+        then={
+          <p
+            class={constant('bp6-callout bp6-intent-danger')}
+            role={constant('alert')}
+          >
+            {view(editor, ({ error }) => error ?? '')}
+          </p>
+        }
+      />
+      <MatchOptional
+        value={view(editor, (e) =>
+          e.type === 'task' ? Optional.some(e) : Optional.none,
+        )}
+        some={(task$) => <TaskForm editor={task$} />}
+      />
+      <MatchOptional
+        value={view(editor, (e) =>
+          e.type === 'milestone' ? Optional.some(e) : Optional.none,
+        )}
+        some={(milestone$) => <MilestoneForm editor={milestone$} />}
+      />
+    </div>
+    <div class={constant('bp6-dialog-footer node-dialog-footer')}>
+      <If
+        cond={view(editor, ({ isNew }) => isNew)}
+        then={<span />}
+        else={
+          <DeleteControls
+            confirming={view(editor, (e) => e.confirmingDelete)}
+          />
+        }
+      />
+      <div class={constant('bp6-dialog-footer-actions')}>
+        <button
+          class={constant('bp6-button')}
+          type={constant('button')}
+          onClick={editorStore.close}
+        >
+          {constant('キャンセル')}
+        </button>
+        <button
+          class={constant('bp6-button bp6-intent-primary')}
+          data-e2e={constant('save')}
+          type={constant('submit')}
+        >
+          {constant('保存')}
+        </button>
+      </div>
+    </div>
+  </form>
+);
 
 /**
  * Saves. A dependency row that is wrong holds the save back, and its error
  * is already on screen, so the first such row is brought into view and
  * focused instead.
  */
-const onSubmit: SubmitEventHandler<HTMLFormElement> = (submitted) => {
+const onSubmit = (
+  submitted: Event & Readonly<{ currentTarget: Element }>,
+): void => {
   submitted.preventDefault();
 
   editorStore.save();

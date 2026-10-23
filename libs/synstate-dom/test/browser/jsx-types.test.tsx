@@ -110,3 +110,39 @@ describe('element props types', () => {
     assert.isDefined([ok, observable]);
   });
 });
+
+describe('optional attributes', () => {
+  test('an attribute takes an observable of `T | undefined`', () => {
+    const [label$] = createState<string | undefined>(undefined);
+
+    const ok = (
+      <>
+        <div aria-label={label$} data-x={label$} title={label$} />
+        <svg>
+          <g role={constant('img')} opacity={view(label$, () => undefined)} />
+        </svg>
+      </>
+    );
+
+    // @ts-expect-error `value` is a DOM property, which has no absent state
+    const property = <input value={label$} />;
+
+    assert.isDefined([ok, property]);
+  });
+
+  test('a form takes its props, its named controls notwithstanding', () => {
+    const ok = (
+      <form
+        id={constant('f')}
+        onSubmit={(event) => {
+          event.preventDefault();
+        }}
+      />
+    );
+
+    // @ts-expect-error a form has no `href`
+    const wrong = <form href={constant('/')} />;
+
+    assert.isDefined([ok, wrong]);
+  });
+});

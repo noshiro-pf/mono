@@ -1,11 +1,11 @@
-import type { GenericEventHandler } from 'preact';
-import { memoNamed } from 'preact-utils';
+import { combine, map, type InitializedObservable } from 'synstate';
+import { constant, If, view, type JSX } from 'synstate-dom';
 import type { RelaxedExtract } from 'ts-type-forge';
 import { priorities, progresses } from '../domain/index.mjs';
 import {
-  domainSignal,
+  clockStore,
+  dataStore,
   editorStore,
-  nowSignal,
   type EditorState,
 } from '../store/index.mjs';
 import {
@@ -25,7 +25,9 @@ import { StatusBadge } from './status-badge.js';
 import { WarningBadge } from './warning-badge.js';
 
 type Props = Readonly<{
-  editor: RelaxedExtract<EditorState, Readonly<{ type: 'task' }>>;
+  editor: InitializedObservable<
+    RelaxedExtract<EditorState, Readonly<{ type: 'task' }>>
+  >;
 }>;
 
 /**
@@ -33,64 +35,96 @@ type Props = Readonly<{
  * what the task would be with the dependencies its rows would save and this
  * progress — so the effect of a change is visible before it is saved.
  */
-export const TaskForm = memoNamed<Props>('TaskForm', (props) => {
-  const { editor } = props;
+export const TaskForm = ({ editor }: Props): JSX.Element => {
+  const checks$ = combine([dataStore.state, editor]).pipe(
+    map(([state, { ref, rows }]) => validateRows(state, ref, rows)),
+  );
 
-  const { draft } = editor;
-
-  const checks = validateRows(domainSignal.value, editor.ref, editor.rows);
-
-  const insight = taskDraftInsight(
-    domainSignal.value,
-    editor.ref.id,
-    { progress: draft.progress, dependencies: validDependencies(checks) },
-    nowSignal.value,
+  const insight$ = combine([
+    dataStore.state,
+    editor,
+    checks$,
+    clockStore.now,
+  ]).pipe(
+    map(([state, { ref, draft }, checks, now]) =>
+      taskDraftInsight(
+        state,
+        ref.id,
+        { progress: draft.progress, dependencies: validDependencies(checks) },
+        now,
+      ),
+    ),
   );
 
   return (
     <>
-      <div className={'form-grid'}>
-        <label className={'bp6-label field field-wide'}>
-          {'タイトル'}
+      <div class={constant('form-grid')}>
+        <label class={constant('bp6-label field field-wide')}>
+          {constant('タイトル')}
           <input
-            className={'bp6-input bp6-fill'}
-            data-e2e={'title-input'}
-            required
-            type={'text'}
-            value={draft.title}
-            onInput={onTitle}
+            class={constant('bp6-input bp6-fill')}
+            data-e2e={constant('title-input')}
+            required={constant(true)}
+            type={constant('text')}
+            value={view(editor, ({ draft }) => draft.title)}
+            onInput={(changed) => {
+              editorStore.updateTaskDraft({
+                title: changed.currentTarget.value,
+              });
+            }}
           />
         </label>
-        <label className={'bp6-label field'}>
-          {'進捗'}
+        <label class={constant('bp6-label field')}>
+          {constant('進捗')}
           <HtmlSelect
-            data-e2e={'progress-select'}
+            data-e2e={constant('progress-select')}
             fill
-            value={draft.progress}
-            onChange={onProgress}
+            value={view(editor, ({ draft }) => draft.progress)}
+            onChange={(changed) => {
+              const progress = progresses.find(
+                (p) => p === changed.currentTarget.value,
+              );
+
+              if (progress !== undefined) {
+                editorStore.updateTaskDraft({ progress });
+              }
+            }}
           >
             {progresses.map((progress) => (
-              <option key={progress} value={progress}>
-                {progressLabels[progress]}
+              <option value={constant(progress)}>
+                {constant(progressLabels[progress])}
               </option>
             ))}
           </HtmlSelect>
         </label>
-        <div className={'field'}>
-          <span className={'field-label'}>{'状態'}</span>
-          <span className={'badges'} data-e2e={'draft-status'}>
-            <StatusBadge displayStatus={insight.status} />
-            {insight.startedWithUnmetDependencies ? (
-              <WarningBadge />
-            ) : undefined}
+        <div class={constant('field')}>
+          <span class={constant('field-label')}>{constant('状態')}</span>
+          <span class={constant('badges')} data-e2e={constant('draft-status')}>
+            <StatusBadge displayStatus={view(insight$, (i) => i.status)} />
+            <If
+              cond={view(insight$, (i) => i.startedWithUnmetDependencies)}
+              then={<WarningBadge />}
+            />
           </span>
         </div>
-        <label className={'bp6-label field'}>
-          {'優先度'}
-          <HtmlSelect fill value={String(draft.priority)} onChange={onPriority}>
+        <label class={constant('bp6-label field')}>
+          {constant('優先度')}
+          <HtmlSelect
+            fill
+            value={view(editor, ({ draft }) => String(draft.priority))}
+            onChange={(changed) => {
+              const priority = priorities.find(
+                (p) => String(p) === changed.currentTarget.value,
+              );
+
+              if (priority !== undefined) {
+                editorStore.updateTaskDraft({ priority });
+              }
+            }}
+          >
             {priorities.map((priority) => (
-              <option key={priority} value={String(priority)}>
-                {`${priority}（${priorityLabels[priority]}）`}
+              <option value={constant(String(priority))}>
+                {constant(`${priority}（${priorityLabels[priority]}）`)}
               </option>
             ))}
           </HtmlSelect>
@@ -98,100 +132,78 @@ export const TaskForm = memoNamed<Props>('TaskForm', (props) => {
         <DateTimeField
           id={'task-due-date'}
           label={'期限'}
-          value={draft.dueDate}
-          onChange={onDueDate}
+          value={view(editor, ({ draft }) => draft.dueDate)}
+          onChange={(dueDate) => {
+            editorStore.updateTaskDraft({ dueDate });
+          }}
         />
-        <label className={'bp6-label field'}>
-          {'見積（時間）'}
+        <label class={constant('bp6-label field')}>
+          {constant('見積（時間）')}
           <input
-            className={'bp6-input bp6-fill'}
-            inputMode={'decimal'}
-            min={0}
-            step={0.5}
-            type={'number'}
-            value={draft.estimateHours}
-            onInput={onEstimate}
+            class={constant('bp6-input bp6-fill')}
+            inputMode={constant('decimal')}
+            min={constant('0')}
+            step={constant('0.5')}
+            type={constant('number')}
+            value={view(editor, ({ draft }) => draft.estimateHours)}
+            onInput={(changed) => {
+              editorStore.updateTaskDraft({
+                estimateHours: changed.currentTarget.value,
+              });
+            }}
           />
         </label>
-        <GroupField value={draft.groupId} onChange={onGroup} />
-        <label className={'bp6-label field field-wide'}>
-          {'ラベル（カンマ区切り）'}
+        <GroupField
+          value={view(editor, ({ draft }) => draft.groupId)}
+          onChange={(changed) => {
+            editorStore.updateTaskDraft({
+              groupId: changed.currentTarget.value,
+            });
+          }}
+        />
+        <label class={constant('bp6-label field field-wide')}>
+          {constant('ラベル（カンマ区切り）')}
           <input
-            className={'bp6-input bp6-fill'}
-            type={'text'}
-            value={draft.labels}
-            onInput={onLabels}
+            class={constant('bp6-input bp6-fill')}
+            type={constant('text')}
+            value={view(editor, ({ draft }) => draft.labels)}
+            onInput={(changed) => {
+              editorStore.updateTaskDraft({
+                labels: changed.currentTarget.value,
+              });
+            }}
           />
-          <LabelChips labels={parseLabels(draft.labels)} />
+          <LabelChips
+            labels={view(editor, ({ draft }) => parseLabels(draft.labels))}
+          />
         </label>
-        <label className={'bp6-label field field-wide'}>
-          {'説明'}
+        <label class={constant('bp6-label field field-wide')}>
+          {constant('説明')}
           <textarea
-            className={'bp6-input bp6-fill'}
-            rows={3}
-            value={draft.description}
-            onInput={onDescription}
+            class={constant('bp6-input bp6-fill')}
+            rows={constant(3)}
+            value={view(editor, ({ draft }) => draft.description)}
+            onInput={(changed) => {
+              editorStore.updateTaskDraft({
+                description: changed.currentTarget.value,
+              });
+            }}
           />
         </label>
       </div>
-      <fieldset className={'condition-group'}>
-        <legend>{'着手条件（すべて満たされると着手可）'}</legend>
-        <p className={'bp6-text-muted condition-hint'}>
-          {
-            '特定の日時や外部要因を待つときは、マイルストーンを作って依存させます。'
-          }
+      <fieldset class={constant('condition-group')}>
+        <legend>{constant('着手条件（すべて満たされると着手可）')}</legend>
+        <p class={constant('bp6-text-muted condition-hint')}>
+          {constant(
+            '特定の日時や外部要因を待つときは、マイルストーンを作って依存させます。',
+          )}
         </p>
         <DependencyEditor
-          checks={checks}
-          owner={editor.ref}
-          rows={editor.rows}
-          unmet={insight.unmet}
+          checks={checks$}
+          editor={editor}
+          unmet={insight$.pipe(map((i) => i.unmet))}
         />
       </fieldset>
     </>
   );
-});
-
-// Outside the component, since none of them reads its props.
-
-const onTitle: GenericEventHandler<HTMLInputElement> = (changed) => {
-  editorStore.updateTaskDraft({ title: changed.currentTarget.value });
-};
-
-const onProgress: GenericEventHandler<HTMLSelectElement> = (changed) => {
-  const progress = progresses.find((p) => p === changed.currentTarget.value);
-
-  if (progress !== undefined) {
-    editorStore.updateTaskDraft({ progress });
-  }
-};
-
-const onPriority: GenericEventHandler<HTMLSelectElement> = (changed) => {
-  const priority = priorities.find(
-    (p) => String(p) === changed.currentTarget.value,
-  );
-
-  if (priority !== undefined) {
-    editorStore.updateTaskDraft({ priority });
-  }
-};
-
-const onDueDate = (dueDate: string): void => {
-  editorStore.updateTaskDraft({ dueDate });
-};
-
-const onEstimate: GenericEventHandler<HTMLInputElement> = (changed) => {
-  editorStore.updateTaskDraft({ estimateHours: changed.currentTarget.value });
-};
-
-const onGroup: GenericEventHandler<HTMLSelectElement> = (changed) => {
-  editorStore.updateTaskDraft({ groupId: changed.currentTarget.value });
-};
-
-const onLabels: GenericEventHandler<HTMLInputElement> = (changed) => {
-  editorStore.updateTaskDraft({ labels: changed.currentTarget.value });
-};
-
-const onDescription: GenericEventHandler<HTMLTextAreaElement> = (changed) => {
-  editorStore.updateTaskDraft({ description: changed.currentTarget.value });
 };

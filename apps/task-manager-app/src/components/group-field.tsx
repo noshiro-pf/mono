@@ -1,12 +1,18 @@
-import type { GenericEventHandler } from 'preact';
-import { memoNamed } from 'preact-utils';
-import { groupsSignal } from '../store/index.mjs';
+import {
+  constant,
+  derive,
+  For,
+  view,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
+import { dataStore } from '../store/index.mjs';
 import { HtmlSelect } from './html-select.js';
 
 type Props = Readonly<{
   /** The draft's `groupId`: a group's id, or empty for none. */
-  value: string;
-  onChange: GenericEventHandler<HTMLSelectElement>;
+  value: Bindable<string>;
+  onChange: (changed: Readonly<{ currentTarget: HTMLSelectElement }>) => void;
 }>;
 
 /**
@@ -14,29 +20,25 @@ type Props = Readonly<{
  * group that is gone reads as none. In 「DAG」 a node is also moved in and
  * out of a group by dragging it (`dag-canvas.tsx`).
  */
-export const GroupField = memoNamed<Props>('GroupField', (props) => {
-  const { value, onChange } = props;
-
-  const groups = groupsSignal.value;
-
-  const selected = groups.some(({ id }) => id === value) ? value : '';
-
-  return (
-    <label className={'bp6-label field'}>
-      {'グループ'}
-      <HtmlSelect
-        data-e2e={'group-select'}
-        fill
-        value={selected}
-        onChange={onChange}
-      >
-        <option value={''}>{'なし'}</option>
-        {groups.map((group) => (
-          <option key={group.id} value={group.id}>
-            {group.title}
+export const GroupField = ({ value, onChange }: Props): JSX.Element => (
+  <label class={constant('bp6-label field')}>
+    {constant('グループ')}
+    <HtmlSelect
+      data-e2e={constant('group-select')}
+      fill
+      value={derive([dataStore.groups, value], (groups, id) =>
+        groups.some((group) => group.id === id) ? id : '',
+      )}
+      onChange={onChange}
+    >
+      <option value={constant('')}>{constant('なし')}</option>
+      <For items={dataStore.groups} key={(group) => group.id}>
+        {(group$) => (
+          <option value={view(group$, ({ id }) => id)}>
+            {view(group$, ({ title }) => title)}
           </option>
-        ))}
-      </HtmlSelect>
-    </label>
-  );
-});
+        )}
+      </For>
+    </HtmlSelect>
+  </label>
+);

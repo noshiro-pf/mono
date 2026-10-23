@@ -1,38 +1,31 @@
-import { memoNamed } from 'preact-utils';
-import { uiStore, viewSignal } from '../store/index.mjs';
+import { constant, view, type JSX } from 'synstate-dom';
+import { uiStore } from '../store/index.mjs';
+import type { View } from '../view-model/index.mjs';
 
 /** The list or the DAG: two buttons, the pressed one is what is shown. */
-export const ViewSwitch = memoNamed('ViewSwitch', () => {
-  const view = viewSignal.value;
+export const ViewSwitch = (): JSX.Element => (
+  <fieldset
+    aria-label={constant('表示')}
+    class={constant('bp6-button-group view-switch')}
+  >
+    {viewButton('list', 'リスト')}
+    {viewButton('dag', 'DAG')}
+  </fieldset>
+);
 
-  return (
-    <fieldset aria-label={'表示'} className={'bp6-button-group view-switch'}>
-      <button
-        aria-pressed={view === 'list'}
-        className={`bp6-button ${view === 'list' ? 'bp6-active' : ''}`}
-        data-e2e={'view-list'}
-        type={'button'}
-        onClick={showList}
-      >
-        {'リスト'}
-      </button>
-      <button
-        aria-pressed={view === 'dag'}
-        className={`bp6-button ${view === 'dag' ? 'bp6-active' : ''}`}
-        data-e2e={'view-dag'}
-        type={'button'}
-        onClick={showDag}
-      >
-        {'DAG'}
-      </button>
-    </fieldset>
-  );
-});
-
-const showList = (): void => {
-  uiStore.setView('list');
-};
-
-const showDag = (): void => {
-  uiStore.setView('dag');
-};
+const viewButton = (shows: View, label: string): JSX.Element => (
+  <button
+    aria-pressed={view(uiStore.view, (v) => String(v === shows))}
+    class={{
+      'bp6-button': constant(true),
+      'bp6-active': view(uiStore.view, (v) => v === shows),
+    }}
+    data-e2e={constant(`view-${shows}`)}
+    type={constant('button')}
+    onClick={() => {
+      uiStore.setView(shows);
+    }}
+  >
+    {constant(label)}
+  </button>
+);

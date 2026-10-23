@@ -284,3 +284,38 @@ describe('svg', () => {
     assert.strictEqual(circle.getAttribute('r'), '3');
   });
 });
+
+describe('removing attributes', () => {
+  test('undefined removes an attribute', () => {
+    const [label$, setLabel] = createState<string | undefined>('a');
+
+    const { container } = mountInto(() => <div aria-label={label$} />);
+
+    const div = container.querySelector('div');
+
+    assert.strictEqual(div?.getAttribute('aria-label'), 'a');
+
+    setLabel(undefined);
+
+    assert.strictEqual(div?.hasAttribute('aria-label'), false);
+  });
+
+  test('a select takes the value of one of its options', () => {
+    const [value$, setValue] = createState('b');
+
+    const { container } = mountInto(() => (
+      <select value={value$}>
+        <option value={constant('a')}>{constant('A')}</option>
+        <option value={constant('b')}>{constant('B')}</option>
+      </select>
+    ));
+
+    const select = container.querySelector('select');
+
+    assert.strictEqual(select?.value, 'b');
+
+    setValue('a');
+
+    assert.strictEqual(select?.value, 'a');
+  });
+});

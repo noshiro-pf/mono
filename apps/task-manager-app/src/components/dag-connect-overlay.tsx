@@ -1,21 +1,11 @@
-import { memoNamed } from 'preact-utils';
+import type { InitializedObservable } from 'synstate';
+import { constant, If, view, type JSX } from 'synstate-dom';
 import { Num } from 'ts-data-forge';
-import {
-  outlineOf,
-  type ConnectDrag,
-  type ConnectHandle,
-  type LaidOutNode,
-} from '../dag/index.mjs';
+import { outlineOf, type LaidOutNode, type Point } from '../dag/index.mjs';
+import type { ConnectOverlayState } from './dag-canvas-scene.mjs';
 
 type Props = Readonly<{
-  /** The handle under the pointer, while no arrow is being drawn. */
-  handle: ConnectHandle | undefined;
-  /** The arrow being drawn. */
-  connecting: ConnectDrag | undefined;
-  /** The node the arrow would be dropped on, and whether that is refused. */
-  target: ConnectTarget | undefined;
-  /** The view's, for the handle to keep its size on the screen. */
-  scale: number;
+  overlay: InitializedObservable<ConnectOverlayState>;
 }>;
 
 /**
@@ -26,75 +16,75 @@ type Props = Readonly<{
  * dependency would be refused. Takes no pointer events: the canvas finds the
  * nodes under the pointer itself.
  */
-export const DagConnectOverlay = memoNamed<Props>(
-  'DagConnectOverlay',
-  (props) => {
-    const { handle, connecting, target, scale } = props;
-
-    const anchor = connecting?.anchor ?? handle?.at;
-
-    if (anchor === undefined) {
-      return undefined;
-    }
-
-    const radius = Num.isNonZero(scale)
-      ? Num.div(HANDLE_RADIUS_PX, scale)
-      : HANDLE_RADIUS_PX;
-
-    const around = target === undefined ? undefined : grown(target.node);
-
-    return (
-      <g
-        aria-hidden={'true'}
-        className={'dag-connect'}
-        data-e2e={'dag-connect'}
-        data-refused={target?.refused ?? false}
-      >
-        {around === undefined ? undefined : around.kind === 'task' ? (
-          <rect
-            className={'dag-connect-target'}
-            height={around.height}
-            rx={TASK_RX + TARGET_GAP}
-            width={around.width}
-            x={around.x}
-            y={around.y}
-          />
-        ) : (
-          <polygon
-            className={'dag-connect-target'}
-            points={outlineOf(around)
-              .map(({ x, y }) => `${x},${y}`)
-              .join(' ')}
-          />
-        )}
-        {connecting === undefined ? undefined : (
-          <line
-            className={'dag-connect-line'}
-            markerEnd={
-              target?.refused === true
-                ? 'url(#dag-arrow-refused)'
-                : 'url(#dag-arrow-connect)'
-            }
-            x1={anchor.x}
-            x2={connecting.to.x}
-            y1={anchor.y}
-            y2={connecting.to.y}
-          />
-        )}
-        <circle
-          className={'dag-connect-handle'}
-          cx={anchor.x}
-          cy={anchor.y}
-          data-e2e={'dag-connect-handle'}
-          r={radius}
+export const DagConnectOverlay = ({ overlay }: Props): JSX.Element => (
+  <g
+    aria-hidden={constant('true')}
+    class={constant('dag-connect')}
+    data-e2e={constant('dag-connect')}
+    data-refused={view(overlay, ({ target }) =>
+      String(target?.refused ?? false),
+    )}
+  >
+    <If
+      cond={view(overlay, (state) => around(state)?.kind === 'task')}
+      then={
+        <rect
+          class={constant('dag-connect-target')}
+          height={view(overlay, (state) => around(state)?.height ?? 0)}
+          rx={constant(TASK_RX + TARGET_GAP)}
+          width={view(overlay, (state) => around(state)?.width ?? 0)}
+          x={view(overlay, (state) => around(state)?.x ?? 0)}
+          y={view(overlay, (state) => around(state)?.y ?? 0)}
         />
-      </g>
-    );
-  },
-);
+      }
+    />
+    <If
+      cond={view(overlay, (state) => around(state)?.kind === 'milestone')}
+      then={
+        <polygon
+          class={constant('dag-connect-target')}
+          points={view(overlay, (state) => {
+            const node = around(state);
 
-/** The node an arrow is about to be dropped on, and whether it is refused. */
-export type ConnectTarget = Readonly<{ node: LaidOutNode; refused: boolean }>;
+            return node === undefined
+              ? ''
+              : outlineOf(node)
+                  .map(({ x, y }) => `${x},${y}`)
+                  .join(' ');
+          })}
+        />
+      }
+    />
+    <If
+      cond={view(overlay, ({ connecting }) => connecting !== undefined)}
+      then={
+        <line
+          class={constant('dag-connect-line')}
+          marker-end={view(overlay, ({ target }) =>
+            target?.refused === true
+              ? 'url(#dag-arrow-refused)'
+              : 'url(#dag-arrow-connect)',
+          )}
+          x1={view(overlay, ({ anchor }) => anchor.x)}
+          x2={view(overlay, (state) => arrowTo(state).x)}
+          y1={view(overlay, ({ anchor }) => anchor.y)}
+          y2={view(overlay, (state) => arrowTo(state).y)}
+        />
+      }
+    />
+    <circle
+      class={constant('dag-connect-handle')}
+      cx={view(overlay, ({ anchor }) => anchor.x)}
+      cy={view(overlay, ({ anchor }) => anchor.y)}
+      data-e2e={constant('dag-connect-handle')}
+      r={view(overlay, ({ scale }) =>
+        Num.isNonZero(scale)
+          ? Num.div(HANDLE_RADIUS_PX, scale)
+          : HANDLE_RADIUS_PX,
+      )}
+    />
+  </g>
+);
 
 /** Of the handle, on the screen. */
 const HANDLE_RADIUS_PX = 6;
@@ -114,3 +104,11 @@ const grown = (node: LaidOutNode): LaidOutNode =>
     width: node.width + 2 * TARGET_GAP,
     height: node.height + 2 * TARGET_GAP,
   }) as const;
+
+/** The outline drawn round the node the arrow would be dropped on. */
+const around = (state: ConnectOverlayState): LaidOutNode | undefined =>
+  state.target === undefined ? undefined : grown(state.target.node);
+
+/** Where the arrow being drawn ends: at the pointer. */
+const arrowTo = (state: ConnectOverlayState): Point =>
+  state.connecting?.to ?? state.anchor;

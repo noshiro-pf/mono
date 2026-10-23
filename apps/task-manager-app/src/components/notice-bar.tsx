@@ -1,20 +1,24 @@
-import { memoNamed } from 'preact-utils';
-import { noticeSignal, uiStore } from '../store/index.mjs';
+import { constant, If, view, type JSX } from 'synstate-dom';
+import { uiStore } from '../store/index.mjs';
 
 /** The last thing that went wrong — a write refused, a listener cut off. */
-export const NoticeBar = memoNamed('NoticeBar', () => {
-  const notice = noticeSignal.value;
-
-  return notice === undefined ? undefined : (
-    <div className={'bp6-callout bp6-intent-danger notice-bar'} role={'alert'}>
-      <span>{notice}</span>
-      <button
-        className={'bp6-button bp6-minimal'}
-        type={'button'}
-        onClick={uiStore.dismissNotice}
+export const NoticeBar = (): JSX.Element => (
+  <If
+    cond={view(uiStore.notice, (notice) => notice !== undefined)}
+    then={
+      <div
+        class={constant('bp6-callout bp6-intent-danger notice-bar')}
+        role={constant('alert')}
       >
-        {'閉じる'}
-      </button>
-    </div>
-  );
-});
+        <span>{view(uiStore.notice, (notice) => notice ?? '')}</span>
+        <button
+          class={constant('bp6-button bp6-minimal')}
+          type={constant('button')}
+          onClick={uiStore.dismissNotice}
+        >
+          {constant('閉じる')}
+        </button>
+      </div>
+    }
+  />
+);

@@ -1,19 +1,15 @@
-import { memoNamed } from 'preact-utils';
+import { constant, For, type Bindable, type JSX } from 'synstate-dom';
 
 type Props = Readonly<{
-  labels: readonly string[];
+  labels: Bindable<readonly string[]>;
 }>;
 
-export const LabelChips = memoNamed<Props>('LabelChips', (props) => {
-  const { labels } = props;
-
-  return (
-    <span className={'label-chips'}>
-      {labels.map((label) => (
-        <span key={label} className={'bp6-tag bp6-minimal label-chip'}>
-          {label}
-        </span>
-      ))}
-    </span>
-  );
-});
+export const LabelChips = ({ labels }: Props): JSX.Element => (
+  <span class={constant('label-chips')}>
+    <For items={labels} key={(label) => label}>
+      {(label$) => (
+        <span class={constant('bp6-tag bp6-minimal label-chip')}>{label$}</span>
+      )}
+    </For>
+  </span>
+);

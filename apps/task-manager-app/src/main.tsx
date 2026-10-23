@@ -1,4 +1,4 @@
-import { render } from 'preact';
+import { render } from 'synstate-dom';
 import { App } from './app.js';
 import './index.css';
 import type { Backend } from './repository/index.mjs';
@@ -13,7 +13,7 @@ if (container === null) {
 
 startStore();
 
-render(<App />, container);
+render(App, container);
 
 /**
  * The Firebase backend — or, in a development build asked for with

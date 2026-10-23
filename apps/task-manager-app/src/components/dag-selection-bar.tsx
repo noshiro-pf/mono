@@ -1,52 +1,50 @@
-import { memoNamed } from 'preact-utils';
+import { constant, If, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { nodeRefOf } from '../domain/index.mjs';
-import {
-  bulkEditStore,
-  dagSelectionSignal,
-  dagSelectionStore,
-} from '../store/index.mjs';
+import { bulkEditStore, dagSelectionStore } from '../store/index.mjs';
 
 /**
  * While nodes are selected on the DAG (`dag-canvas.tsx`): how many, and
  * 「一括編集」, which opens the dialog that edits them together
  * (`bulk-edit-dialog.tsx`), and 「選択解除」. Nothing while none are.
  */
-export const DagSelectionBar = memoNamed('DagSelectionBar', () => {
-  const selected = dagSelectionSignal.value;
-
-  return Arr.isNonEmpty(selected) ? (
-    <div
-      aria-label={'選択したノード'}
-      className={'dag-selection-bar'}
-      data-e2e={'dag-selection-bar'}
-      role={'toolbar'}
-    >
-      <output data-e2e={'dag-selection-count'}>
-        {`${selected.length} 件を選択中`}
-      </output>
-      <button
-        className={'bp6-button bp6-intent-primary'}
-        data-e2e={'dag-bulk-edit'}
-        type={'button'}
-        onClick={openBulkEdit}
+export const DagSelectionBar = (): JSX.Element => (
+  <If
+    cond={view(dagSelectionStore.selected, Arr.isNonEmpty)}
+    then={
+      <div
+        aria-label={constant('選択したノード')}
+        class={constant('dag-selection-bar')}
+        data-e2e={constant('dag-selection-bar')}
+        role={constant('toolbar')}
       >
-        {'一括編集'}
-      </button>
-      <button
-        className={'bp6-button bp6-minimal'}
-        data-e2e={'dag-clear-selection'}
-        type={'button'}
-        onClick={dagSelectionStore.clear}
-      >
-        {'選択解除'}
-      </button>
-    </div>
-  ) : undefined;
-});
-
-const openBulkEdit = (): void => {
-  bulkEditStore.open(
-    dagSelectionStore.selected.getSnapshot().value.map(nodeRefOf),
-  );
-};
+        <output data-e2e={constant('dag-selection-count')}>
+          {view(
+            dagSelectionStore.selected,
+            (ids) => `${ids.length} 件を選択中`,
+          )}
+        </output>
+        <button
+          class={constant('bp6-button bp6-intent-primary')}
+          data-e2e={constant('dag-bulk-edit')}
+          type={constant('button')}
+          onClick={() => {
+            bulkEditStore.open(
+              dagSelectionStore.selected.getSnapshot().value.map(nodeRefOf),
+            );
+          }}
+        >
+          {constant('一括編集')}
+        </button>
+        <button
+          class={constant('bp6-button bp6-minimal')}
+          data-e2e={constant('dag-clear-selection')}
+          type={constant('button')}
+          onClick={dagSelectionStore.clear}
+        >
+          {constant('選択解除')}
+        </button>
+      </div>
+    }
+  />
+);

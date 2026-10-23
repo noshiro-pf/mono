@@ -1,8 +1,10 @@
-import { memoNamed } from 'preact-utils';
+import { constant, type JSX } from 'synstate-dom';
 
 /** Shown until the backend has said who, if anyone, is signed in. */
-export const StartingScreen = memoNamed('StartingScreen', () => (
-  <div aria-busy className={'center-screen'}>
-    <output className={'bp6-text-muted'}>{'読み込み中…'}</output>
+export const StartingScreen = (): JSX.Element => (
+  <div aria-busy={constant('true')} class={constant('center-screen')}>
+    <output class={constant('bp6-text-muted')}>
+      {constant('読み込み中…')}
+    </output>
   </div>
-));
+);
