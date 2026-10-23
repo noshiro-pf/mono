@@ -37,7 +37,8 @@
     "synstate": "workspace:*",
     "synstate-preact-hooks": "workspace:*",
     "ts-data-forge": "workspace:*",
-    "ts-fortress": "workspace:*"
+    "ts-fortress": "workspace:*",
+    "ts-utils-additional": "workspace:*"
   },
   "devDependencies": {
     "@playwright/test": "catalog:",
