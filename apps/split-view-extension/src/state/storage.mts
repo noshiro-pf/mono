@@ -1,4 +1,4 @@
-import { Arr, hasKey, isRecord } from 'ts-data-forge';
+import { Arr, hasKey, isNotUndefined, isRecord } from 'ts-data-forge';
 import {
   clampPaneZoom,
   clampRatio,
@@ -126,7 +126,7 @@ export const parseWorkspaceState = (
 
   const panes =
     hasKey(value, 'panes') && Arr.isArray(value.panes)
-      ? value.panes.map(parsePaneState).filter(isDefined)
+      ? value.panes.map(parsePaneState).filter(isNotUndefined)
       : ([] as const);
 
   return {
@@ -233,5 +233,3 @@ const savedAtOf = (value: unknown): number =>
 
 const storageKeyOf = (workspaceId: string): string =>
   `${storageKeyPrefix}${workspaceId}` as const;
-
-const isDefined = <T,>(value: T | undefined): value is T => value !== undefined;
