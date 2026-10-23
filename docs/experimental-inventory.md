@@ -1,4 +1,4 @@
-<!-- cspell:ignore catan dezero firebaserc Ymdhm -->
+<!-- cspell:ignore catan dezero firebaserc idfn Ymdhm -->
 
 # `experimental/` の棚卸し
 
@@ -1898,3 +1898,46 @@ pending に載せていた値は常に `undefined` だったので、`AsyncData.
 `AsyncData.idle` でなく `pending()` なのは、hook が受け取った時点で promise は
 もう走っているからである。上の表と `my-portfolio-app-preact` の節にある
 「`PromiseState` と同じ前例」は、当時の記録として残す。
+
+### 「後継が無い」とした移植の見直し（2026-10-23）
+
+上の節と同じ日に、復元時に「後継が無い」として移植・書き換えたものを、現在の
+`ts-data-forge` ・ `ts-std-forge` ・ `ts-type-forge` ・ `ts-fortress` と照らし
+直した。後継が見つかったもの、またはリポジトリ内の別のパッケージに同じ定義が
+既にあったものは、それぞれ別の PR で置き換えた。
+
+| 移植・書き換え                                                             | 置き換え先                                                        | PR    |
+| :------------------------------------------------------------------------- | :---------------------------------------------------------------- | :---- |
+| `Reducer`（`react-utils` ・ `preact-utils` ・ `catan-dice-app`）           | `ts-type-forge` の `Reducer`                                      | #2466 |
+| `Paths` ・ `RecordValueAtPath` ・ `MonoTypeFunction`                       | `ts-type-forge` の `RecordPaths` ・ `RecordValueAtPath` ・ 同名   | #2467 |
+| `event-schedule-app` の `toClassName` ・ `calendarDateColor`               | `react-blueprintjs-utils` の同名                                  | #2468 |
+| `event-schedule-app` の `hasKeyValue`                                      | `event-schedule-app-shared` の同名（root から export するように） | #2469 |
+| `event-schedule-app` の `ymdhmDateDiff`（`functions/` と `utils/` の二重） | `utils/` の方だけ残す                                             | #2470 |
+| `map4` ・ `toSorted` の書き下し ・ `sum` ・ `count`（mahjong 系）          | `Arr.map` ・ `Arr.toSorted` ・ `Arr.sum` ・ `Arr.count`           | #2471 |
+| mahjong 系 2 app の `getShuffled`                                          | `ts-utils-additional` の `getShuffled`                            | #2472 |
+| `split-view-extension` の `isDefined`                                      | `ts-data-forge` の `isNotUndefined`                               | #2474 |
+| `color-demo-app` の `toHue`                                                | `ts-utils-additional` の `toHue`                                  | #2475 |
+
+上の対応表のうち、次の 2 行は誤りだった（記録としては残す）。
+
+- **`Arr.pushed` / `Arr.removed` には後継がある**: `Arr.toPushed` /
+  `Arr.toRemoved`。`mahjong-calculator-app` で `Arr.removed(a, a.indexOf(x))` を
+  手で書き換えた `a.toSpliced(a.indexOf(x, 1))` は括弧の位置がずれていて、
+  見つかった位置から末尾までを消していた。#2473 で直した（今のところ呼び出し元は無い）。
+- **`mapOptional(x, f)` の後継は `mapNullable(x, f)`**（`pipe(x).mapNullable(f)`
+  も同じ）。`housing-loan-calculator-app` は既にこれを使っていて、「後継が無い」
+  というコメントだけが残っていた。
+
+見直しても後継が無く、移植のまま残したもの: `getPlatform` ・ `useMedia` ・
+`Obj.set` / `update` / `getIn` / `setIn` / `updateIn` ・ `DateUtils` ・ `idfn` ・
+`toAbsolutePath` ・ `hexToRgb` ・ `downloadFile` ・ `upperAlphabets` ・
+`fromArray`。`getPlatform` は `react-utils` と `preact-utils` に同じものがあるが、
+移し先の `ts-utils-additional` は DOM を型に含めない設定（`lib: ["ESNext"]`）な
+ので、共通化しなかった。
+
+`isEmailString`（`event-schedule-app` と `react-blueprintjs-utils` に同じもの）は
+`ts-fortress` の `email()` が後継の候補だが、受け付ける文字列が違う（TLD の無い
+`a@b` を通し、引用符付きのローカル部や IP リテラルのドメインを通さない）ので、
+置き換えていない。`color-demo-app` の `pickupHighContrastHues` ・
+`getLuminanceListAccumulated` も、`ts-utils-additional` の同名とは引数と累積の
+初期値が違うので、共通化していない。

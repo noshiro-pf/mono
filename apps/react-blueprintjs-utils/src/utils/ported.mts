@@ -1,11 +1,10 @@
 /**
  * What `ts-data-forge` has no successor for.
  *
- * All three came from `@noshiro/ts-utils` / `@noshiro/ts-utils-additional`
- * before the monorepo consolidation.
+ * Both came from `@noshiro/ts-utils` / `@noshiro/ts-utils-additional` before
+ * the monorepo consolidation.
  */
 
-/** Does nothing. Used where a callback is required but has nothing to do. */
 import type { FixedLengthTuple } from 'ts-type-forge';
 
 /** Whether the string looks like an email address. */

@@ -5,9 +5,8 @@ import { memoNamed } from 'react-utils';
 
 /**
  * The inputs below are controlled, so React wants an `onChange`; the page has
- * nowhere to put the value. `react-blueprintjs-utils` exports a `noop`, but
- * depending on that package for one line would be the only reason this
- * playground needed it at all.
+ * nowhere to put the value. No package here exports a `noop`, and one line is
+ * not worth a dependency.
  */
 const noop = (): undefined => undefined;
 

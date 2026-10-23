@@ -28,9 +28,8 @@ const storeFromQuery = (
     interestRatePerMonth: query.get(queryParamKey.interestRatePerMonth),
   } as const;
 
-  // `mapOptional` has no successor; `pipe(...).mapNullable` is the same
-  // mapping, and `URLSearchParams.get` returns `null` rather than `undefined`,
-  // which `mapNullable` also covers.
+  // `mapNullable` is the old `mapOptional`; `URLSearchParams.get` returns
+  // `null` rather than `undefined`, which it covers too.
   const paramsAsNumber = {
     downPayment: pipe(paramsAsStr.downPayment).mapNullable(Num.from).value,
     propertyPrice: pipe(paramsAsStr.propertyPrice).mapNullable(Num.from).value,
