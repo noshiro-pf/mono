@@ -1,12 +1,7 @@
 import { Arr, castMutable, match, pipe, Uint32 } from 'ts-data-forge';
+import type { Reducer } from 'ts-type-forge';
 import { add1, sub1, type HistoryState } from '../type/index.mjs';
 import { rollTwoDices } from './roll-dice.mjs';
-
-/**
- * `Reducer` came from `@noshiro/react-utils`'s globals and has no successor.
- * `apps/react-utils` ports the same one-liner into its own `src/utils/`.
- */
-type Reducer<S, A> = (prev: S, action: A) => S;
 
 export const historyReducer: Reducer<
   HistoryState,

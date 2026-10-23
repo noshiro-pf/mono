@@ -29,8 +29,8 @@ React 19 and the React Compiler rules account for most of it.
   says so.
 - `DeepReadonly<{ … ReactNode }>` is `Readonly<{ … }>`: a deeply-readonly
   `ReactNode` is no longer a `ReactNode`.
-- `React.Reducer` was removed from React's types; `useAsyncReducer` declares the
-  one line it was.
+- `React.Reducer` was removed from React's types; `useAsyncReducer` takes
+  `ts-type-forge`'s `Reducer`, which is the same one line.
 - `getPlatform` has no successor in `ts-data-forge`;
   [`src/utils`](./src/utils) carries it, with a note on where it came from.
 - `PromiseState` was ported the same way and has since been replaced by
