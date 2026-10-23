@@ -1,5 +1,5 @@
-import { memoNamed } from 'preact-utils';
-import { issuesViewSignals, issuesViewStore } from '../store/index.mjs';
+import { constant, view, type JSX } from 'synstate-dom';
+import { issuesViewStore } from '../store/index.mjs';
 
 /**
  * Whether the DAG draws what is done: a switch shaped as the merge order's
@@ -8,31 +8,24 @@ import { issuesViewSignals, issuesViewStore } from '../store/index.mjs';
  * starts pressed, and the choice is kept across visits
  * (`issues-view-store.mts`).
  */
-export const IssueDagDoneToggle = memoNamed('IssueDagDoneToggle', () => {
-  const hideDone = issuesViewSignals.hideDone.value;
-
-  const doneCount = issuesViewSignals.doneCount.value;
-
-  return (
-    <button
-      aria-pressed={!hideDone}
-      className={'filter-chip'}
-      title={
-        hideDone
-          ? 'Draw the issues closed as completed and the merged pull requests again'
-          : 'Leave out the issues closed as completed and the merged pull requests, and the waits on them that are over'
-      }
-      type={'button'}
-      onClick={toggleHideDone}
-    >
-      {'Done'}
-      <span className={'filter-chip-count'}>{doneCount}</span>
-    </button>
-  );
-});
-
-// Outside the component, so that the button is handed the same function on
-// every render.
+export const IssueDagDoneToggle = (): JSX.Element => (
+  <button
+    aria-pressed={view(issuesViewStore.hideDone, (hide) => String(!hide))}
+    class={constant('filter-chip')}
+    title={view(issuesViewStore.hideDone, (hide) =>
+      hide
+        ? 'Draw the issues closed as completed and the merged pull requests again'
+        : 'Leave out the issues closed as completed and the merged pull requests, and the waits on them that are over',
+    )}
+    type={constant('button')}
+    onClick={toggleHideDone}
+  >
+    {constant('Done')}
+    <span class={constant('filter-chip-count')}>
+      {issuesViewStore.doneCount}
+    </span>
+  </button>
+);
 
 const toggleHideDone = (): void => {
   issuesViewStore.toggleHideDone();

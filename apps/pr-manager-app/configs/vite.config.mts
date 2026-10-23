@@ -56,7 +56,7 @@ const contentSecurityPolicy: VitePlugin = {
 
 const shared: UserConfig = defineViteAppConfig({
   packageRoot: workspaceRootPath,
-  framework: 'preact',
+  framework: 'synstate-dom',
   // This app is served from the repository's Pages site rather than a host of
   // its own, so the asset URLs have to carry the whole prefix. The table it
   // comes from is the same one `build-pages-site.mts` copies by.

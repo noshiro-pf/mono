@@ -1,4 +1,4 @@
-import { render } from 'preact';
+import { render } from 'synstate-dom';
 import { App } from './app.js';
 import './index.css';
 import { startStore } from './store/index.mjs';
@@ -11,4 +11,4 @@ if (container === null) {
 
 startStore();
 
-render(<App />, container);
+render(App, container);

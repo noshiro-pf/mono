@@ -1,5 +1,5 @@
-import { memoNamed } from 'preact-utils';
-import { headerSignals, headerStore } from '../store/index.mjs';
+import { constant, view, type JSX } from 'synstate-dom';
+import { headerStore } from '../store/index.mjs';
 import { BadgeIcon } from './badge-icon.js';
 
 /**
@@ -11,26 +11,26 @@ import { BadgeIcon } from './badge-icon.js';
  * and `aria-expanded` says whether it is shown. The chevron points where the
  * header goes on a press — up to fold it, down to bring it back.
  */
-export const HeaderFoldToggle = memoNamed('HeaderFoldToggle', () => {
-  const folded = headerSignals.folded.value;
-
-  return (
-    <button
-      aria-expanded={!folded}
-      aria-label={'Full header'}
-      className={'header-button header-fold-toggle'}
-      title={
-        folded
-          ? 'Show the full header, the token panel and when the report was read'
-          : 'Fold the header into this toolbar, for more room below'
-      }
-      type={'button'}
-      onClick={headerStore.toggle}
-    >
-      <BadgeIcon path={folded ? CHEVRON_DOWN : CHEVRON_UP} />
-    </button>
-  );
-});
+export const HeaderFoldToggle = (): JSX.Element => (
+  <button
+    aria-expanded={view(headerStore.folded, (folded) => String(!folded))}
+    aria-label={constant('Full header')}
+    class={constant('header-button header-fold-toggle')}
+    title={view(headerStore.folded, (folded) =>
+      folded
+        ? 'Show the full header, the token panel and when the report was read'
+        : 'Fold the header into this toolbar, for more room below',
+    )}
+    type={constant('button')}
+    onClick={headerStore.toggle}
+  >
+    <BadgeIcon
+      path={view(headerStore.folded, (folded) =>
+        folded ? CHEVRON_DOWN : CHEVRON_UP,
+      )}
+    />
+  </button>
+);
 
 const CHEVRON_UP = 'M3.5 10.5L8 6l4.5 4.5';
 

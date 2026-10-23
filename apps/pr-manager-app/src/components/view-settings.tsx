@@ -1,22 +1,17 @@
-import { effect } from '@preact/signals';
-import type { InputEventHandler, RefCallback } from 'preact';
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
+import { map } from 'synstate';
+import { constant, For, If, view, type Bindable, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
-import type { ReadonlyRecord } from 'ts-type-forge';
 import {
-  absentBlocks,
   columnsOf,
   columnWidths,
   MAX_SPLIT,
   MIN_SPLIT,
   MIN_THIRD_WIDTH,
-  sharePercents,
-  shownOf,
-  type BlockId,
   type ColumnIndex,
+  type Layout,
 } from '../layout.mjs';
-import { layoutSignals, layoutStore, readerSignals } from '../store/index.mjs';
+import { layoutStore } from '../store/index.mjs';
+import { followOpen } from './follow-open.mjs';
 import { ViewSettingsRow } from './view-settings-row.js';
 
 /**
@@ -31,252 +26,265 @@ import { ViewSettingsRow } from './view-settings-row.js';
  * tells it when Escape closes the dialog. Every change applies at once, so
  * there is nothing to confirm or cancel.
  */
-export const ViewSettings = memoNamed('ViewSettings', () => {
-  const layout = layoutSignals.layout.value;
-
-  const features = readerSignals.features.value;
-
-  const absent = useMemo(() => absentBlocks(features), [features]);
-
-  const columns = useMemo<
-    readonly (readonly [ColumnIndex, readonly BlockId[]])[]
-  >(
-    () =>
-      columnsOf(layout).map(
-        (ids, index) => [COLUMN_INDICES[index] ?? 0, ids] as const,
-      ),
-    [layout],
-  );
-
-  const widths = useMemo(() => columnWidths(layout), [layout]);
-
-  // What part of its column each block is given in the `fill` mode.
-  const percents = useMemo<Partial<ReadonlyRecord<BlockId, number>>>(
-    () =>
-      Object.fromEntries(
-        columns.flatMap(([, ids]) => {
-          const shown = shownOf(layout, ids, absent);
-
-          const shares = sharePercents(layout, shown);
-
-          return shown.map((id, index) => [id, shares[index] ?? 0] as const);
-        }),
-      ),
-    [columns, layout, absent],
-  );
+export const ViewSettings = (): JSX.Element => {
+  const layout$ = layoutStore.layout;
 
   return (
     <>
       <button
-        className={'header-button'}
-        type={'button'}
+        class={constant('header-button')}
+        type={constant('button')}
         onClick={layoutStore.openSettings}
       >
-        {'Layout'}
+        {constant('Layout')}
       </button>
 
       <dialog
-        ref={followOpen}
-        aria-labelledby={TITLE_ID}
-        className={'view-settings'}
+        ref={followOpen(layoutStore.settingsOpen)}
+        aria-labelledby={constant(TITLE_ID)}
+        class={constant('view-settings')}
         onClose={layoutStore.closeSettings}
       >
-        <h2 className={'view-settings-title'} id={TITLE_ID}>
-          {'Layout'}
+        <h2 class={constant('view-settings-title')} id={constant(TITLE_ID)}>
+          {constant('Layout')}
         </h2>
 
-        <fieldset className={'view-settings-group'}>
-          <legend>{'Columns'}</legend>
+        <fieldset class={constant('view-settings-group')}>
+          <legend>{constant('Columns')}</legend>
 
-          <label className={'view-settings-choice'}>
-            <input
-              checked={layout.columns === 1}
-              name={'columns'}
-              type={'radio'}
-              onChange={oneColumn}
-            />
-            {'One'}
-          </label>
+          <Choice
+            checked={view(layout$, ({ columns }) => columns === 1)}
+            label={'One'}
+            name={'columns'}
+            onChoose={oneColumn}
+          />
 
-          <label className={'view-settings-choice'}>
-            <input
-              checked={layout.columns === 2}
-              name={'columns'}
-              type={'radio'}
-              onChange={twoColumns}
-            />
-            {'Two, on a screen wide enough for them'}
-          </label>
+          <Choice
+            checked={view(layout$, ({ columns }) => columns === 2)}
+            label={'Two, on a screen wide enough for them'}
+            name={'columns'}
+            onChoose={twoColumns}
+          />
 
-          <label className={'view-settings-choice'}>
-            <input
-              checked={layout.columns === 3}
-              name={'columns'}
-              type={'radio'}
-              onChange={threeColumns}
-            />
-            {'Three, on a screen wide enough for them'}
-          </label>
+          <Choice
+            checked={view(layout$, ({ columns }) => columns === 3)}
+            label={'Three, on a screen wide enough for them'}
+            name={'columns'}
+            onChoose={threeColumns}
+          />
 
-          {layout.columns === 2 ? (
-            <label className={'view-settings-choice'} htmlFor={SPLIT_ID}>
-              {`Left column ${layout.split}%`}
-              <input
-                id={SPLIT_ID}
-                max={MAX_SPLIT}
-                min={MIN_SPLIT}
-                type={'range'}
-                value={layout.split}
-                onInput={onSplitInput}
-              />
-            </label>
-          ) : undefined}
-
-          {layout.columns === 3 ? (
-            <>
-              <label className={'view-settings-choice'} htmlFor={FIRST_LINE_ID}>
-                {`Left column ${widths[0] ?? 0}%`}
-                <input
-                  id={FIRST_LINE_ID}
-                  max={layout.lines[1] - MIN_THIRD_WIDTH}
-                  min={MIN_THIRD_WIDTH}
-                  type={'range'}
-                  value={layout.lines[0]}
-                  onInput={onFirstLineInput}
-                />
-              </label>
-
+          <If
+            cond={view(layout$, ({ columns }) => columns === 2)}
+            then={
               <label
-                className={'view-settings-choice'}
-                htmlFor={SECOND_LINE_ID}
+                class={constant('view-settings-choice')}
+                htmlFor={constant(SPLIT_ID)}
               >
-                {`Right column ${widths[2] ?? 0}%`}
+                {view(layout$, ({ split }) => `Left column ${split}%`)}
                 <input
-                  id={SECOND_LINE_ID}
-                  max={100 - layout.lines[0] - MIN_THIRD_WIDTH}
-                  min={MIN_THIRD_WIDTH}
-                  type={'range'}
-                  value={100 - layout.lines[1]}
-                  onInput={onSecondLineInput}
+                  id={constant(SPLIT_ID)}
+                  max={constant(String(MAX_SPLIT))}
+                  min={constant(String(MIN_SPLIT))}
+                  type={constant('range')}
+                  value={view(layout$, ({ split }) => String(split))}
+                  onInput={(changed) => {
+                    layoutStore.setSplit(changed.currentTarget.valueAsNumber);
+                  }}
                 />
               </label>
+            }
+          />
 
-              <p className={'section-note'}>
-                {`The middle column has the rest, ${widths[1] ?? 0}%.`}
-              </p>
-            </>
-          ) : undefined}
-        </fieldset>
-
-        <fieldset className={'view-settings-group'}>
-          <legend>{'Height'}</legend>
-
-          <label className={'view-settings-choice'}>
-            <input
-              checked={layout.mode === 'natural'}
-              name={'mode'}
-              type={'radio'}
-              onChange={naturalMode}
-            />
-            {'As tall as the blocks, and the page scrolls'}
-          </label>
-
-          <label className={'view-settings-choice'}>
-            <input
-              checked={layout.mode === 'fill'}
-              name={'mode'}
-              type={'radio'}
-              onChange={fillMode}
-            />
-            {'Fill the window, and each block scrolls'}
-          </label>
-        </fieldset>
-
-        {columns.map(([column, ids]) => (
-          <fieldset key={column} className={'view-settings-group'}>
-            <legend>
-              {layout.columns === 1
-                ? 'Blocks, top down'
-                : column === 0
-                  ? 'Left column'
-                  : column === 1 && layout.columns === 3
-                    ? 'Middle column'
-                    : 'Right column'}
-            </legend>
-
-            {Arr.isEmpty(ids) ? (
-              <p className={'section-note'}>{'Empty.'}</p>
-            ) : (
-              <ol className={'view-settings-blocks'}>
-                {ids.map((id, index) => (
-                  <ViewSettingsRow
-                    key={id}
-                    absent={absent.includes(id)}
-                    column={column}
-                    columns={layout.columns}
-                    count={ids.length}
-                    height={layout.heights[id]}
-                    hidden={layout.hidden.includes(id)}
-                    id={id}
-                    index={index}
-                    mode={layout.mode}
-                    percent={percents[id] ?? 0}
-                    share={layout.shares[id]}
+          <If
+            cond={view(layout$, ({ columns }) => columns === 3)}
+            then={
+              <>
+                <label
+                  class={constant('view-settings-choice')}
+                  htmlFor={constant(FIRST_LINE_ID)}
+                >
+                  {view(
+                    layout$,
+                    (layout) => `Left column ${columnWidths(layout)[0] ?? 0}%`,
+                  )}
+                  <input
+                    id={constant(FIRST_LINE_ID)}
+                    max={view(layout$, ({ lines }) =>
+                      String(lines[1] - MIN_THIRD_WIDTH),
+                    )}
+                    min={constant(String(MIN_THIRD_WIDTH))}
+                    type={constant('range')}
+                    value={view(layout$, ({ lines }) => String(lines[0]))}
+                    onInput={(changed) => {
+                      layoutStore.setLine(
+                        0,
+                        changed.currentTarget.valueAsNumber,
+                      );
+                    }}
                   />
-                ))}
-              </ol>
-            )}
-          </fieldset>
-        ))}
+                </label>
 
-        <p className={'section-note'}>
-          {
-            'A hidden block keeps its place and its size, and comes back there when shown. On the page: drag the line under a block to set its height — a double click there gives the natural height back, or, when the blocks fill the window, evens it with the block below. With two or three columns, drag the lines between them. The layout is kept in the URL.'
-          }
+                <label
+                  class={constant('view-settings-choice')}
+                  htmlFor={constant(SECOND_LINE_ID)}
+                >
+                  {view(
+                    layout$,
+                    (layout) => `Right column ${columnWidths(layout)[2] ?? 0}%`,
+                  )}
+                  <input
+                    id={constant(SECOND_LINE_ID)}
+                    max={view(layout$, ({ lines }) =>
+                      String(100 - lines[0] - MIN_THIRD_WIDTH),
+                    )}
+                    min={constant(String(MIN_THIRD_WIDTH))}
+                    type={constant('range')}
+                    value={view(layout$, ({ lines }) => String(100 - lines[1]))}
+                    // The right column's slider counts from the right, so
+                    // that more is wider for both: the line it moves is 100
+                    // less its value.
+                    onInput={(changed) => {
+                      layoutStore.setLine(
+                        1,
+                        100 - changed.currentTarget.valueAsNumber,
+                      );
+                    }}
+                  />
+                </label>
+
+                <p class={constant('section-note')}>
+                  {view(
+                    layout$,
+                    (layout) =>
+                      `The middle column has the rest, ${columnWidths(layout)[1] ?? 0}%.`,
+                  )}
+                </p>
+              </>
+            }
+          />
+        </fieldset>
+
+        <fieldset class={constant('view-settings-group')}>
+          <legend>{constant('Height')}</legend>
+
+          <Choice
+            checked={view(layout$, ({ mode }) => mode === 'natural')}
+            label={'As tall as the blocks, and the page scrolls'}
+            name={'mode'}
+            onChoose={naturalMode}
+          />
+
+          <Choice
+            checked={view(layout$, ({ mode }) => mode === 'fill')}
+            label={'Fill the window, and each block scrolls'}
+            name={'mode'}
+            onChoose={fillMode}
+          />
+        </fieldset>
+
+        <For items={view(layout$, columnIndicesOf)} key={(column) => column}>
+          {(column$) => {
+            // The key is the column, so the row's column is the one it was
+            // made with.
+            const column = column$.getSnapshot().value;
+
+            const ids$ = layout$.pipe(
+              map((layout) => columnsOf(layout)[column] ?? []),
+            );
+
+            return (
+              <fieldset class={constant('view-settings-group')}>
+                <legend>
+                  {view(layout$, (layout) => columnName(layout, column))}
+                </legend>
+
+                <If
+                  cond={view(ids$, Arr.isEmpty)}
+                  then={
+                    <p class={constant('section-note')}>{constant('Empty.')}</p>
+                  }
+                  else={
+                    <ol class={constant('view-settings-blocks')}>
+                      <For items={ids$} key={(id) => id}>
+                        {(id$, index$) => (
+                          <ViewSettingsRow
+                            column={column}
+                            id={id$.getSnapshot().value}
+                            ids$={ids$}
+                            index$={index$}
+                          />
+                        )}
+                      </For>
+                    </ol>
+                  }
+                />
+              </fieldset>
+            );
+          }}
+        </For>
+
+        <p class={constant('section-note')}>
+          {constant(
+            'A hidden block keeps its place and its size, and comes back there when shown. On the page: drag the line under a block to set its height — a double click there gives the natural height back, or, when the blocks fill the window, evens it with the block below. With two or three columns, drag the lines between them. The layout is kept in the URL.',
+          )}
         </p>
 
-        <div className={'view-settings-actions'}>
+        <div class={constant('view-settings-actions')}>
           <button
-            className={'view-settings-small'}
-            type={'button'}
+            class={constant('view-settings-small')}
+            type={constant('button')}
             onClick={layoutStore.reset}
           >
-            {'Reset the layout'}
+            {constant('Reset the layout')}
           </button>
 
           <button
-            className={'header-button'}
-            type={'button'}
+            class={constant('header-button')}
+            type={constant('button')}
             onClick={layoutStore.closeSettings}
           >
-            {'Done'}
+            {constant('Done')}
           </button>
         </div>
       </dialog>
     </>
   );
-});
-
-// Outside the component, since none of them reads its props: one function
-// each serves every render, with no `useCallback` to keep it stable.
-
-// A modal dialog is opened by a call, not an attribute, so the element
-// follows the signal with an effect for as long as it is mounted.
-const followOpen: RefCallback<HTMLDialogElement> = (dialog) => {
-  if (dialog === null) {
-    return undefined;
-  }
-
-  return effect(() => {
-    const shown = layoutSignals.settingsOpen.value;
-
-    if (shown && !dialog.open) {
-      dialog.showModal();
-    } else if (!shown && dialog.open) {
-      dialog.close();
-    }
-  });
 };
+
+/** One radio button of a group, with its label. */
+const Choice = ({
+  checked,
+  label,
+  name,
+  onChoose,
+}: Readonly<{
+  checked: Bindable<boolean>;
+  label: string;
+  name: string;
+  onChoose: () => void;
+}>): JSX.Element => (
+  <label class={constant('view-settings-choice')}>
+    <input
+      checked={checked}
+      name={constant(name)}
+      type={constant('radio')}
+      onChange={onChoose}
+    />
+    {constant(label)}
+  </label>
+);
+
+const columnIndicesOf = (layout: Layout): readonly ColumnIndex[] =>
+  COLUMN_INDICES.slice(0, layout.columns);
+
+const columnName = (layout: Layout, column: ColumnIndex): string =>
+  layout.columns === 1
+    ? 'Blocks, top down'
+    : column === 0
+      ? 'Left column'
+      : column === 1 && layout.columns === 3
+        ? 'Middle column'
+        : 'Right column';
 
 const oneColumn = (): void => {
   layoutStore.setColumns(1);
@@ -296,20 +304,6 @@ const naturalMode = (): void => {
 
 const fillMode = (): void => {
   layoutStore.setMode('fill');
-};
-
-const onSplitInput: InputEventHandler<HTMLInputElement> = (changed) => {
-  layoutStore.setSplit(changed.currentTarget.valueAsNumber);
-};
-
-const onFirstLineInput: InputEventHandler<HTMLInputElement> = (changed) => {
-  layoutStore.setLine(0, changed.currentTarget.valueAsNumber);
-};
-
-// The right column's slider counts from the right, so that more is wider for
-// both: the line it moves is 100 less its value.
-const onSecondLineInput: InputEventHandler<HTMLInputElement> = (changed) => {
-  layoutStore.setLine(1, 100 - changed.currentTarget.valueAsNumber);
 };
 
 const COLUMN_INDICES = [0, 1, 2] as const satisfies readonly ColumnIndex[];

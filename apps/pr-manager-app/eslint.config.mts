@@ -1,7 +1,6 @@
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
-  eslintConfigForPreact,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   type FlatConfig,
@@ -24,7 +23,6 @@ export default [
   eslintPluginTsDataForge.configs.recommended,
   eslintPluginTsFortress.configs.recommended,
 
-  ...eslintConfigForPreact(),
   eslintConfigForVitest(),
 
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),

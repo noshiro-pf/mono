@@ -1,30 +1,19 @@
-import { computed } from '@preact/signals';
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
+import { derive, type Bindable, type JSX } from 'synstate-dom';
 import { describeAge } from '../format.mjs';
-import { readerSignals } from '../store/index.mjs';
+import { reader } from '../store/index.mjs';
 
 type Props = Readonly<{
   /** The instant, in milliseconds since the epoch. */
-  epochMs: number;
+  epochMs: Bindable<number>;
 }>;
 
 /**
- * How long ago an instant was — "3 minutes ago" — kept current by the clock
- * without a render.
+ * How long ago an instant was — "3 minutes ago" — kept current by the clock.
  *
- * What it draws is a computed signal rather than its value, and Preact binds
- * a signal child to its text node: a tick rewrites that text and renders no
- * component, this one included. Reading `.value` here instead would
- * subscribe the component, and every tick would render it again.
+ * One text node bound to the clock and the instant: a tick rewrites that text
+ * and nothing else, as every update on this page rewrites only the nodes
+ * bound to what changed.
  */
-export const Age = memoNamed<Props>('Age', (props) => {
-  const { epochMs } = props;
-
-  const age = useMemo(
-    () => computed(() => describeAge(epochMs, readerSignals.nowMs.value)),
-    [epochMs],
-  );
-
-  return <>{age}</>;
-});
+export const Age = ({ epochMs }: Props): JSX.Element => (
+  <>{derive([epochMs, reader.nowMs], describeAge)}</>
+);

@@ -1,13 +1,20 @@
-import { effect } from '@preact/signals';
-import type { RefCallback } from 'preact';
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
-import { Num } from 'ts-data-forge';
+import type { InitializedObservable } from 'synstate';
 import {
-  activitySignals,
+  constant,
+  derive,
+  For,
+  MatchOptional,
+  view,
+  type Bindable,
+  type JSX,
+  type View,
+} from 'synstate-dom';
+import { Num, Optional } from 'ts-data-forge';
+import {
   activityStore,
   reportSource,
-  tokenSignals,
+  tokenStore,
+  type ActivityStatus,
 } from '../store/index.mjs';
 import {
   activitySearchUrl,
@@ -17,6 +24,7 @@ import {
   type WeeklyActivity as Week,
 } from '../weekly-activity.mjs';
 import { ExternalLink } from './external-link.js';
+import { followOpen } from './follow-open.mjs';
 
 /**
  * The "Activity" button and the dialog it opens: how many pull requests
@@ -32,184 +40,184 @@ import { ExternalLink } from './external-link.js';
  * scale across both columns, so a day's two bars can be compared as well as
  * the days.
  */
-export const WeeklyActivity = memoNamed('WeeklyActivity', () => {
-  const noToken = tokenSignals.token.value === undefined;
-
-  const activityStatus = activitySignals.status.value;
+export const WeeklyActivity = (): JSX.Element => {
+  const status$ = activityStore.status;
 
   return (
     <>
       <button
-        className={'header-button'}
-        disabled={noToken}
-        title={`Pull requests merged and issues closed on each of the last ${WEEK_LENGTH} days`}
-        type={'button'}
+        class={constant('header-button')}
+        disabled={view(tokenStore.token, (token) => token === undefined)}
+        title={constant(
+          `Pull requests merged and issues closed on each of the last ${WEEK_LENGTH} days`,
+        )}
+        type={constant('button')}
         onClick={activityStore.openDialog}
       >
-        {'Activity'}
+        {constant('Activity')}
       </button>
 
       <dialog
-        ref={followOpen}
-        aria-labelledby={TITLE_ID}
-        className={'view-settings weekly-activity'}
+        ref={followOpen(activityStore.open)}
+        aria-labelledby={constant(TITLE_ID)}
+        class={constant('view-settings weekly-activity')}
         onClose={activityStore.closeDialog}
       >
-        <h2 className={'view-settings-title'} id={TITLE_ID}>
-          {`The last ${WEEK_LENGTH} days`}
+        <h2 class={constant('view-settings-title')} id={constant(TITLE_ID)}>
+          {constant(`The last ${WEEK_LENGTH} days`)}
         </h2>
 
-        {activityStatus.type === 'ready' ? (
-          <ActivityTable activity={activityStatus.activity} />
-        ) : activityStatus.type === 'failed' ? (
-          <p className={'section-note'} role={'alert'}>
-            {activityStatus.message}
-          </p>
-        ) : (
-          <p className={'section-note'}>{'Counting…'}</p>
-        )}
-
-        <p className={'section-note'}>
-          {
-            'Days start at midnight in this browser’s time zone. Today is left out until it is over: the week moves on at midnight.'
+        <MatchOptional
+          value={view(status$, (status) =>
+            status.type === 'ready'
+              ? Optional.some(status.activity)
+              : Optional.none,
+          )}
+          some={(activity$) => <ActivityTable activity$={activity$} />}
+          none={
+            <MatchOptional
+              value={failedOf(status$)}
+              some={(message$) => (
+                <p class={constant('section-note')} role={constant('alert')}>
+                  {message$}
+                </p>
+              )}
+              none={
+                <p class={constant('section-note')}>{constant('Counting…')}</p>
+              }
+            />
           }
+        />
+
+        <p class={constant('section-note')}>
+          {constant(
+            'Days start at midnight in this browser’s time zone. Today is left out until it is over: the week moves on at midnight.',
+          )}
         </p>
 
-        <div className={'view-settings-actions weekly-activity-actions'}>
-          {activityStatus.type === 'failed' ? (
-            <button
-              className={'view-settings-small'}
-              type={'button'}
-              onClick={activityStore.retry}
-            >
-              {'Try again'}
-            </button>
-          ) : undefined}
+        <div class={constant('view-settings-actions weekly-activity-actions')}>
+          <MatchOptional
+            value={failedOf(status$)}
+            some={() => (
+              <button
+                class={constant('view-settings-small')}
+                type={constant('button')}
+                onClick={activityStore.retry}
+              >
+                {constant('Try again')}
+              </button>
+            )}
+          />
 
           <button
-            className={'header-button'}
-            type={'button'}
+            class={constant('header-button')}
+            type={constant('button')}
             onClick={activityStore.closeDialog}
           >
-            {'Done'}
+            {constant('Done')}
           </button>
         </div>
       </dialog>
     </>
   );
-});
+};
 
-type TableProps = Readonly<{ activity: Week }>;
+const ActivityTable = ({
+  activity$,
+}: Readonly<{ activity$: InitializedObservable<Week> }>): JSX.Element => {
+  const days = view(activity$, (activity) => activity.days);
 
-const ActivityTable = memoNamed<TableProps>('ActivityTable', ({ activity }) => {
-  const { days } = activity;
-
-  const totals = useMemo(
-    () => ({
-      merged: days.reduce((sum, day) => sum + day.merged, 0),
-      closed: days.reduce((sum, day) => sum + day.closed, 0),
-    }),
-    [days],
-  );
-
-  const scaleMax = useMemo(
-    () => Math.max(0, ...days.flatMap((day) => [day.merged, day.closed])),
-    [days],
+  const scaleMax = view(activity$, ({ days: all }) =>
+    Math.max(0, ...all.flatMap((day) => [day.merged, day.closed])),
   );
 
   return (
-    <table className={'weekly-activity-table'}>
+    <table class={constant('weekly-activity-table')}>
       <thead>
         <tr>
-          <th scope={'col'}>{'Day'}</th>
-          <th scope={'col'}>{'Pull requests merged'}</th>
-          <th scope={'col'}>{'Issues closed'}</th>
+          <th scope={constant('col')}>{constant('Day')}</th>
+          <th scope={constant('col')}>{constant('Pull requests merged')}</th>
+          <th scope={constant('col')}>{constant('Issues closed')}</th>
         </tr>
       </thead>
       <tbody>
-        {days.map((day) => (
-          <tr key={day.key}>
-            <th scope={'row'}>
-              <time dateTime={day.key}>{DAY_LABEL.format(day.startMs)}</time>
-            </th>
-            <CountCell day={day} kind={'merged'} scaleMax={scaleMax} />
-            <CountCell day={day} kind={'closed'} scaleMax={scaleMax} />
-          </tr>
-        ))}
+        <For items={days} key={(day) => day.key}>
+          {(day$) => (
+            <tr>
+              <th scope={constant('row')}>
+                <time dateTime={view(day$, (day) => day.key)}>
+                  {view(day$, (day) => DAY_LABEL.format(day.startMs))}
+                </time>
+              </th>
+              <CountCell day$={day$} kind={'merged'} scaleMax={scaleMax} />
+              <CountCell day$={day$} kind={'closed'} scaleMax={scaleMax} />
+            </tr>
+          )}
+        </For>
       </tbody>
       <tfoot>
         <tr>
-          <th scope={'row'}>{'Total'}</th>
-          <td className={'weekly-activity-total'}>
-            <span className={'weekly-activity-count'}>{totals.merged}</span>
+          <th scope={constant('row')}>{constant('Total')}</th>
+          <td class={constant('weekly-activity-total')}>
+            <span class={constant('weekly-activity-count')}>
+              {view(activity$, ({ days: all }) =>
+                all.reduce((sum, day) => sum + day.merged, 0),
+              )}
+            </span>
           </td>
-          <td className={'weekly-activity-total'}>
-            <span className={'weekly-activity-count'}>{totals.closed}</span>
+          <td class={constant('weekly-activity-total')}>
+            <span class={constant('weekly-activity-count')}>
+              {view(activity$, ({ days: all }) =>
+                all.reduce((sum, day) => sum + day.closed, 0),
+              )}
+            </span>
           </td>
         </tr>
       </tfoot>
     </table>
   );
-});
+};
 
 type CellProps = Readonly<{
-  day: DayActivity;
+  day$: InitializedObservable<DayActivity>;
   kind: ActivityKind;
-  scaleMax: number;
+  scaleMax: Bindable<number>;
 }>;
 
-const CountCell = memoNamed<CellProps>(
-  'CountCell',
-  ({ day, kind, scaleMax }) => {
-    const count = day[kind];
-
-    const style = useMemo(
-      () => ({
-        width: Num.isNonZero(scaleMax)
-          ? `${Num.div(count * 100, scaleMax)}%`
-          : '0%',
-      }),
-      [count, scaleMax],
-    );
-
-    return (
-      <td>
-        <div className={'weekly-activity-cell'}>
-          <span className={'weekly-activity-count'}>
-            <ExternalLink href={activitySearchUrl(reportSource, kind, day)}>
-              {String(count)}
-            </ExternalLink>
-          </span>
-          <span aria-hidden={'true'} className={'weekly-activity-track'}>
-            <span
-              className={'weekly-activity-bar'}
-              data-kind={kind}
-              style={style}
-            />
-          </span>
-        </div>
-      </td>
-    );
-  },
+const CountCell = ({ day$, kind, scaleMax }: CellProps): JSX.Element => (
+  <td>
+    <div class={constant('weekly-activity-cell')}>
+      <span class={constant('weekly-activity-count')}>
+        <ExternalLink
+          href={view(day$, (day) => activitySearchUrl(reportSource, kind, day))}
+        >
+          {view(day$, (day) => String(day[kind]))}
+        </ExternalLink>
+      </span>
+      <span
+        aria-hidden={constant('true')}
+        class={constant('weekly-activity-track')}
+      >
+        <span
+          class={constant('weekly-activity-bar')}
+          data-kind={constant(kind)}
+          style={{
+            width: derive([day$, scaleMax], (day, max) =>
+              Num.isNonZero(max) ? `${Num.div(day[kind] * 100, max)}%` : '0%',
+            ),
+          }}
+        />
+      </span>
+    </div>
+  </td>
 );
 
-// A modal dialog is opened by a call, not an attribute, so the element
-// follows the signal with an effect for as long as it is mounted.
-const followOpen: RefCallback<HTMLDialogElement> = (dialog) => {
-  if (dialog === null) {
-    return undefined;
-  }
-
-  return effect(() => {
-    const shown = activitySignals.open.value;
-
-    if (shown && !dialog.open) {
-      dialog.showModal();
-    } else if (!shown && dialog.open) {
-      dialog.close();
-    }
-  });
-};
+const failedOf = (
+  status$: InitializedObservable<ActivityStatus>,
+): View<Optional<string>> =>
+  view(status$, (status) =>
+    status.type === 'failed' ? Optional.some(status.message) : Optional.none,
+  );
 
 /** The reader's locale, as the time of reading is (`format.mts`). */
 const DAY_LABEL = new Intl.DateTimeFormat(undefined, {

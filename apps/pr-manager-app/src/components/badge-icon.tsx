@@ -1,8 +1,9 @@
-import { memoNamed } from 'preact-utils';
+import { constant, type Bindable, type JSX } from 'synstate-dom';
+import { svgAttributes } from './svg-elements.js';
 
 type Props = Readonly<{
   /** The `d` of one path, drawn on a 16×16 viewBox. */
-  path: string;
+  path: Bindable<string>;
 }>;
 
 /**
@@ -13,18 +14,20 @@ type Props = Readonly<{
  * `img-src` never comes into it. `aria-hidden` because the word beside it is
  * the label.
  */
-export const BadgeIcon = memoNamed<Props>('BadgeIcon', ({ path }) => (
+export const BadgeIcon = ({ path }: Props): JSX.Element => (
   <svg
-    aria-hidden={'true'}
-    className={'badge-icon'}
-    fill={'none'}
-    focusable={'false'}
-    stroke={'currentColor'}
-    strokeLinecap={'round'}
-    strokeLinejoin={'round'}
-    strokeWidth={1.6}
-    viewBox={'0 0 16 16'}
+    ref={notFocusable}
+    aria-hidden={constant('true')}
+    class={constant('badge-icon')}
+    fill={constant('none')}
+    stroke={constant('currentColor')}
+    stroke-linecap={constant('round')}
+    stroke-linejoin={constant('round')}
+    stroke-width={constant(1.6)}
+    viewBox={constant('0 0 16 16')}
   >
     <path d={path} />
   </svg>
-));
+);
+
+const notFocusable = svgAttributes({ focusable: 'false' });

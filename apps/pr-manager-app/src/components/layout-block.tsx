@@ -1,11 +1,10 @@
-import type { ComponentChildren, PointerEventHandler } from 'preact';
-import { memoNamed } from 'preact-utils';
-import { useCallback, useMemo, useRef } from 'preact/hooks';
+import type { InitializedObservable } from 'synstate';
+import { constant, If, view, type Child, type JSX } from 'synstate-dom';
 import type { BlockId } from '../layout.mjs';
 import { layoutStore } from '../store/index.mjs';
 
-type Props = Readonly<{
-  id: BlockId;
+/** What a block's mode gives it (`block-column.tsx`). */
+export type BlockPlacement = Readonly<{
   /**
    * Absent is the natural height, with no scroll of its own. Always absent in
    * the `fill` mode.
@@ -18,9 +17,14 @@ type Props = Readonly<{
    * between them shares; absent for the last of a column, which has none.
    */
   next: BlockId | undefined;
-  /** The share of {@link Props.next}. */
+  /** The share of {@link BlockPlacement.next}. */
   nextShare: number | undefined;
-  children: ComponentChildren;
+}>;
+
+type Props = Readonly<{
+  id: BlockId;
+  placement$: InitializedObservable<BlockPlacement>;
+  children: Child;
 }>;
 
 /**
@@ -40,55 +44,31 @@ type Props = Readonly<{
  * layout settings change a block's height with buttons, which is the
  * keyboard's way to the same thing.
  */
-export const LayoutBlock = memoNamed<Props>('LayoutBlock', (props) => {
-  const { id, height, share, next, nextShare, children } = props;
+export const LayoutBlock = ({
+  id,
+  placement$,
+  children,
+}: Props): JSX.Element => {
+  const mut_elements: {
+    /** Only to measure the block, and find the next one, when the line moves. */
+    block: HTMLDivElement | undefined;
+    /** Only to measure the block as drawn when a height drag starts. */
+    body: HTMLDivElement | undefined;
+  } = { block: undefined, body: undefined };
 
-  /** Only to measure the block as drawn when a height drag starts. */
-  const bodyRef = useRef<HTMLDivElement>(null);
+  const onDividerDown = (
+    pressed: PointerEvent & Readonly<{ currentTarget: HTMLDivElement }>,
+  ): void => {
+    if (pressed.button !== 0) {
+      return;
+    }
 
-  /** Only to measure the block, and find the next one, when the line moves. */
-  const blockRef = useRef<HTMLDivElement>(null);
+    const { share, next, nextShare } = placement$.getSnapshot().value;
 
-  const onDividerDown = useCallback<PointerEventHandler<HTMLDivElement>>(
-    (pressed) => {
-      if (pressed.button !== 0) {
-        return;
-      }
+    if (share === undefined) {
+      const { body } = mut_elements;
 
-      if (share === undefined) {
-        const body = bodyRef.current;
-
-        if (body === null) {
-          return;
-        }
-
-        pressed.preventDefault();
-
-        pressed.currentTarget.setPointerCapture(pressed.pointerId);
-
-        layoutStore.startResize(
-          id,
-          pressed.clientY,
-          body.getBoundingClientRect().height,
-        );
-
-        return;
-      }
-
-      // The blocks share their column's height by their shares and nothing
-      // else (`index.css`), so their heights as drawn are in the ratio of
-      // their shares, which is what `withBoundaryAt` relies on.
-      const block = blockRef.current;
-
-      if (block === null || next === undefined || nextShare === undefined) {
-        return;
-      }
-
-      const lower = block.parentElement?.querySelector<HTMLElement>(
-        `:scope > .layout-block[data-block='${CSS.escape(next)}']`,
-      );
-
-      if (lower === null || lower === undefined) {
+      if (body === undefined) {
         return;
       }
 
@@ -96,80 +76,116 @@ export const LayoutBlock = memoNamed<Props>('LayoutBlock', (props) => {
 
       pressed.currentTarget.setPointerCapture(pressed.pointerId);
 
-      layoutStore.startBoundaryResize({
-        upper: id,
-        lower: next,
-        fromY: pressed.clientY,
-        upperHeight: block.getBoundingClientRect().height,
-        lowerHeight: lower.getBoundingClientRect().height,
-        upperShare: share,
-        lowerShare: nextShare,
-      });
-    },
-    [id, share, next, nextShare],
-  );
+      layoutStore.startResize(
+        id,
+        pressed.clientY,
+        body.getBoundingClientRect().height,
+      );
 
-  const onDividerDoubleClick = useCallback((): void => {
+      return;
+    }
+
+    // The blocks share their column's height by their shares and nothing
+    // else (`index.css`), so their heights as drawn are in the ratio of
+    // their shares, which is what `withBoundaryAt` relies on.
+    const { block } = mut_elements;
+
+    if (block === undefined || next === undefined || nextShare === undefined) {
+      return;
+    }
+
+    const lower = block.parentElement?.querySelector<HTMLElement>(
+      `:scope > .layout-block[data-block='${CSS.escape(next)}']`,
+    );
+
+    if (lower === null || lower === undefined) {
+      return;
+    }
+
+    pressed.preventDefault();
+
+    pressed.currentTarget.setPointerCapture(pressed.pointerId);
+
+    layoutStore.startBoundaryResize({
+      upper: id,
+      lower: next,
+      fromY: pressed.clientY,
+      upperHeight: block.getBoundingClientRect().height,
+      lowerHeight: lower.getBoundingClientRect().height,
+      upperShare: share,
+      lowerShare: nextShare,
+    });
+  };
+
+  const onDividerDoubleClick = (): void => {
+    const { share, next } = placement$.getSnapshot().value;
+
     if (share === undefined) {
       layoutStore.setHeight(id, undefined);
     } else if (next !== undefined) {
       layoutStore.evenShares([id, next]);
     }
-  }, [id, share, next]);
-
-  const blockStyle = useMemo(
-    () => (share === undefined ? undefined : { flexGrow: share }),
-    [share],
-  );
-
-  const bodyStyle = useMemo(
-    () => (height === undefined ? undefined : { height }),
-    [height],
-  );
-
-  // The last block of a column in the `fill` mode has nothing to share with.
-  const divided = share === undefined || next !== undefined;
+  };
 
   return (
     <div
-      ref={blockRef}
-      className={'layout-block'}
-      data-block={id}
-      style={blockStyle}
+      ref={(element) => {
+        mut_elements.block = element;
+      }}
+      class={constant('layout-block')}
+      data-block={constant(id)}
+      style={{
+        'flex-grow': view(placement$, ({ share }) =>
+          share === undefined ? '' : String(share),
+        ),
+      }}
     >
       <div
-        ref={bodyRef}
-        className={'block-body'}
-        data-sized={height !== undefined || share !== undefined}
-        style={bodyStyle}
+        ref={(element) => {
+          mut_elements.body = element;
+        }}
+        class={constant('block-body')}
+        data-sized={view(placement$, ({ height, share }) =>
+          String(height !== undefined || share !== undefined),
+        )}
+        style={{
+          height: view(placement$, ({ height }) =>
+            height === undefined ? '' : `${height}px`,
+          ),
+        }}
       >
         {children}
       </div>
 
-      {divided ? (
-        <div
-          aria-hidden={'true'}
-          className={'row-divider'}
-          title={
-            share === undefined
-              ? 'Drag to set the height; double-click for the natural height'
-              : 'Drag to share the height with the block below; double-click to even them'
-          }
-          onDblClick={onDividerDoubleClick}
-          onLostPointerCapture={onDividerUp}
-          onPointerDown={onDividerDown}
-          onPointerMove={onDividerMove}
-          onPointerUp={onDividerUp}
-        />
-      ) : undefined}
+      <If
+        // The last block of a column in the `fill` mode has nothing to share
+        // with.
+        cond={view(
+          placement$,
+          ({ share, next }) => share === undefined || next !== undefined,
+        )}
+        then={
+          <div
+            aria-hidden={constant('true')}
+            class={constant('row-divider')}
+            title={view(placement$, ({ share }) =>
+              share === undefined
+                ? 'Drag to set the height; double-click for the natural height'
+                : 'Drag to share the height with the block below; double-click to even them',
+            )}
+            onDblClick={onDividerDoubleClick}
+            onLostPointerCapture={onDividerUp}
+            onPointerDown={onDividerDown}
+            onPointerMove={onDividerMove}
+            onPointerUp={onDividerUp}
+          />
+        }
+      />
     </div>
   );
-});
+};
 
-// Outside the component, since none of them reads its props: one function
-// each serves every render, with no `useCallback` to keep it stable.
-
-const onDividerMove: PointerEventHandler<HTMLDivElement> = (moved) => {
+const onDividerMove = (moved: PointerEvent): void => {
   layoutStore.resizeTo(moved.clientY);
 };
 

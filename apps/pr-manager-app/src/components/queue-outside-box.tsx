@@ -1,10 +1,10 @@
-import { memoNamed } from 'preact-utils';
-import { useCallback } from 'preact/hooks';
+import type { InitializedObservable } from 'synstate';
+import { constant, view, type JSX } from 'synstate-dom';
 import type { OutsideNode } from '../queue-view.mjs';
 import { ExternalLink } from './external-link.js';
 
 type Props = Readonly<{
-  node: OutsideNode;
+  node$: InitializedObservable<OutsideNode>;
   /** Pointed at or focused: its tooltip is shown (`queue-tip.tsx`). */
   onShow: (prNumber: number) => void;
   onHide: () => void;
@@ -14,27 +14,28 @@ type Props = Readonly<{
  * One pull request outside the queue (`queue-section.tsx`): its number, why
  * in a word, and whose it is to move.
  */
-export const QueueOutsideBox = memoNamed<Props>(
-  'QueueOutsideBox',
-  ({ node, onShow, onHide }) => {
-    const show = useCallback((): void => {
-      onShow(node.number);
-    }, [onShow, node.number]);
+export const QueueOutsideBox = ({
+  node$,
+  onShow,
+  onHide,
+}: Props): JSX.Element => (
+  <ExternalLink
+    href={view(node$, (node) => node.url)}
+    variant={'queue-link'}
+    onEnter={() => {
+      onShow(node$.getSnapshot().value.number);
+    }}
+    onLeave={onHide}
+  >
+    <span class={constant('queue-number')}>
+      {view(node$, (node) => `#${node.number}`)}
+    </span>
+    <span class={constant('queue-note')}>
+      {view(node$, (node) => `${node.reason} · ${node.owner}`)}
+    </span>
 
-    return (
-      <ExternalLink
-        href={node.url}
-        variant={'queue-link'}
-        onEnter={show}
-        onLeave={onHide}
-      >
-        <span className={'queue-number'}>{`#${node.number}`}</span>
-        <span className={'queue-note'}>{`${node.reason} · ${node.owner}`}</span>
-
-        <span className={'visually-hidden'}>
-          {` ${node.title} — ${node.detail}`}
-        </span>
-      </ExternalLink>
-    );
-  },
+    <span class={constant('visually-hidden')}>
+      {view(node$, (node) => ` ${node.title} — ${node.detail}`)}
+    </span>
+  </ExternalLink>
 );

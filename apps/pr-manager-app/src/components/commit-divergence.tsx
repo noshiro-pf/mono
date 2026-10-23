@@ -1,21 +1,27 @@
-import type { Comparison } from 'pr-report-core';
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
-import { Num } from 'ts-data-forge';
+import {
+  constant,
+  derive,
+  If,
+  mapBindable,
+  MatchOptional,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
+import { Num, Optional } from 'ts-data-forge';
+import type { Entry } from '../load-report.mjs';
 
 type Props = Readonly<{
-  /** Absent when GitHub could not compare them. */
-  comparison: Comparison | undefined;
-  /** Whether the comparison has not been read yet. */
-  reading: boolean;
+  /**
+   * The comparison is absent when GitHub could not compare them; the base is
+   * named, because "behind" without "behind what" is half a sentence.
+   */
+  entry: Bindable<Entry>;
   /**
    * The largest count on either side anywhere in the report, so that a bar on
    * one card can be compared with a bar on another. A per-card scale would
    * draw `-2` and `-39` the same length.
    */
-  scaleMax: number;
-  /** Named, because "behind" without "behind what" is half a sentence. */
-  baseRef: string;
+  scaleMax: Bindable<number>;
 }>;
 
 /**
@@ -31,57 +37,75 @@ type Props = Readonly<{
  * Both numbers are written out beside the bars. A reader should never have to
  * measure a bar to learn a count that is three characters long.
  */
-export const CommitDivergence = memoNamed<Props>(
-  'CommitDivergence',
-  (props) => {
-    const { comparison, reading, scaleMax, baseRef } = props;
-
-    const behind = useMemo(
-      () => ({ inlineSize: share(comparison?.behindBy ?? 0, scaleMax) }),
-      [comparison?.behindBy, scaleMax],
-    );
-
-    const ahead = useMemo(
-      () => ({ inlineSize: share(comparison?.aheadBy ?? 0, scaleMax) }),
-      [comparison?.aheadBy, scaleMax],
-    );
-
-    if (reading) {
-      return (
-        <span className={'divergence-unread'}>{'reading ahead/behind…'}</span>
-      );
-    }
-
-    if (comparison === undefined) {
-      return (
-        <span className={'divergence-unread'}>{'ahead/behind unread'}</span>
-      );
-    }
-
-    return (
-      <span
-        className={'divergence'}
-        title={`${comparison.aheadBy} commit(s) ${baseRef} does not have, ${comparison.behindBy} of ${baseRef} this branch does not`}
-      >
-        <span
-          className={'divergence-count'}
-        >{`${comparison.behindBy} behind`}</span>
-
-        <span aria-hidden={'true'} className={'divergence-track'}>
-          <span className={'divergence-half divergence-behind'}>
-            <span className={'divergence-bar'} style={behind} />
-          </span>
-          <span className={'divergence-half divergence-ahead'}>
-            <span className={'divergence-bar'} style={ahead} />
-          </span>
-        </span>
-
-        <span
-          className={'divergence-count'}
-        >{`${comparison.aheadBy} ahead`}</span>
+export const CommitDivergence = ({ entry, scaleMax }: Props): JSX.Element => (
+  <If
+    cond={mapBindable(entry, ({ reading }) => reading.includes('comparison'))}
+    then={
+      <span class={constant('divergence-unread')}>
+        {constant('reading ahead/behind…')}
       </span>
-    );
-  },
+    }
+    else={
+      <MatchOptional
+        value={mapBindable(entry, ({ comparison, baseRef }) =>
+          comparison === undefined
+            ? Optional.none
+            : Optional.some({ ...comparison, baseRef }),
+        )}
+        some={(shown$) => (
+          <span
+            class={constant('divergence')}
+            title={mapBindable(
+              shown$,
+              ({ aheadBy, behindBy, baseRef }) =>
+                `${aheadBy} commit(s) ${baseRef} does not have, ${behindBy} of ${baseRef} this branch does not`,
+            )}
+          >
+            <span class={constant('divergence-count')}>
+              {mapBindable(shown$, ({ behindBy }) => `${behindBy} behind`)}
+            </span>
+
+            <span
+              aria-hidden={constant('true')}
+              class={constant('divergence-track')}
+            >
+              <span class={constant('divergence-half divergence-behind')}>
+                <span
+                  class={constant('divergence-bar')}
+                  style={{
+                    'inline-size': derive(
+                      [shown$, scaleMax],
+                      ({ behindBy }, max) => share(behindBy, max),
+                    ),
+                  }}
+                />
+              </span>
+              <span class={constant('divergence-half divergence-ahead')}>
+                <span
+                  class={constant('divergence-bar')}
+                  style={{
+                    'inline-size': derive(
+                      [shown$, scaleMax],
+                      ({ aheadBy }, max) => share(aheadBy, max),
+                    ),
+                  }}
+                />
+              </span>
+            </span>
+
+            <span class={constant('divergence-count')}>
+              {mapBindable(shown$, ({ aheadBy }) => `${aheadBy} ahead`)}
+            </span>
+          </span>
+        )}
+        none={
+          <span class={constant('divergence-unread')}>
+            {constant('ahead/behind unread')}
+          </span>
+        }
+      />
+    }
+  />
 );
 
 /**

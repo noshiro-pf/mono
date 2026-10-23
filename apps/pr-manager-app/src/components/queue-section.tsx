@@ -1,16 +1,20 @@
-import { memoNamed } from 'preact-utils';
-import { useCallback, useState } from 'preact/hooks';
-import { Arr } from 'ts-data-forge';
+import { createState, map, type InitializedObservable } from 'synstate';
+import {
+  constant,
+  derive,
+  For,
+  If,
+  MatchOptional,
+  view,
+  type JSX,
+} from 'synstate-dom';
+import { Arr, Optional } from 'ts-data-forge';
 import type { QueueSlot, QueueView } from '../queue-view.mjs';
+import { reader } from '../store/index.mjs';
 import { QueueOutsideBox } from './queue-outside-box.js';
 import { QueueSlotBox } from './queue-slot-box.js';
-import { QueueTip } from './queue-tip.js';
+import { QueueTip, type QueueTipContent } from './queue-tip.js';
 import { RunStateIcon } from './run-state-icon.js';
-
-type Props = Readonly<{
-  /** `undefined` while what it is decided from is still being read. */
-  queue: QueueView | undefined;
-}>;
 
 /**
  * `unblock-prs`'s queue, as one row of boxes under the merge order: the pull
@@ -25,151 +29,232 @@ type Props = Readonly<{
  * card in the merge order, so a box says only its number, its priority and
  * a word on why it waits.
  */
-export const QueueSection = memoNamed<Props>('QueueSection', ({ queue }) => {
-  // The box pointed at or focused, by number.
-  const [shown, setShown] = useState<number | undefined>(undefined);
-
-  const show = useCallback((prNumber: number): void => {
-    setShown(prNumber);
-  }, []);
-
-  const hide = useCallback((): void => {
-    setShown(undefined);
-  }, []);
-
-  const running =
-    queue?.slots.filter(({ kind }) => kind === 'running').length ?? 0;
-
-  const queued = (queue?.slots.length ?? 0) - running;
-
-  const shownIndex =
-    queue?.slots.findIndex(({ number }) => number === shown) ?? -1;
-
-  const shownSlot = queue?.slots[shownIndex];
-
-  const shownOutside = queue?.outside.find(({ number }) => number === shown);
+export const QueueSection = (): JSX.Element => {
+  // `undefined` while what it is decided from is still being read.
+  const queue = view(reader.queue, Optional.fromNullable);
 
   return (
-    <section className={'section queue-section'}>
-      <h2 className={'section-title'}>
-        {'Queue'}
-        {queue === undefined ? undefined : (
-          <span
-            className={'queue-counts'}
-            title={
-              "In the order unblock-prs would pick them. A pull request one of its runs saw green without merging goes last there; that lives in the run's memory and is not shown here."
-            }
-          >
-            {[
-              `${queued} queued`,
-              `${running} running`,
-              `${queue.outside.length} set aside`,
-            ].join(' · ')}
-          </span>
-        )}
+    <section class={constant('section queue-section')}>
+      <h2 class={constant('section-title')}>
+        {constant('Queue')}
+        <MatchOptional
+          some={(queue$) => (
+            <span
+              class={constant('queue-counts')}
+              title={constant(
+                "In the order unblock-prs would pick them. A pull request one of its runs saw green without merging goes last there; that lives in the run's memory and is not shown here.",
+              )}
+            >
+              {view(queue$, countsOf)}
+            </span>
+          )}
+          value={queue}
+        />
       </h2>
 
-      {queue === undefined ? (
-        <p className={'section-note'}>{'Reading GitHub…'}</p>
-      ) : !Arr.isNonEmpty(queue.slots) && !Arr.isNonEmpty(queue.outside) ? (
-        <p className={'section-note'}>
-          {'No open pull request is labelled merge-queued.'}
-        </p>
-      ) : (
-        <>
-          {Arr.isNonEmpty(queue.slots) ? (
-            <div className={'queue-row'}>
-              <span className={'queue-base'}>
-                {queue.base}
-                <span aria-hidden={'true'}>{' ←'}</span>
-              </span>
-
-              <div className={'queue-track'}>
-                <ol className={'queue'}>
-                  {queue.slots.map((slot, index) => (
-                    <li
-                      key={slot.number}
-                      className={'queue-slot'}
-                      data-kind={slot.kind}
-                      data-priority={slot.priority}
-                    >
-                      <QueueSlotBox slot={slot} onHide={hide} onShow={show} />
-                      <span className={'queue-place'}>
-                        {placeOf(slot, index - running)}
-                      </span>
-                    </li>
-                  ))}
-                </ol>
-
-                {shownSlot === undefined ? undefined : (
-                  <QueueTip
-                    detail={shownSlot.detail}
-                    number={shownSlot.number}
-                    side={shownIndex < queue.slots.length / 2 ? 'start' : 'end'}
-                    title={shownSlot.title}
-                  />
-                )}
-              </div>
-            </div>
-          ) : undefined}
-
-          <div className={'queue-foot'}>
-            {Arr.isNonEmpty(queue.outside) ? (
-              <div className={'queue-outside'}>
-                <span className={'queue-outside-label'}>{'set aside'}</span>
-                <ul className={'queue-outside-list'}>
-                  {queue.outside.map((node) => (
-                    <li key={node.number} className={'queue-outside-node'}>
-                      <QueueOutsideBox
-                        node={node}
-                        onHide={hide}
-                        onShow={show}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : undefined}
-
-            <ul className={'queue-legend'}>
-              <li>
-                <RunStateIcon kind={'running'} label={'running'} />
-                <span aria-hidden={'true'}>{'running'}</span>
-              </li>
-              <li>
-                <span className={'queue-swatch'} data-kind={'waiting'} />
-                {'waits for another PR'}
-              </li>
-              <li>
-                <span className={'queue-swatch'} data-kind={'outside'} />
-                {'set aside'}
-              </li>
-              {(['high', 'mid', 'low'] as const).map((priority) => (
-                <li key={priority}>
-                  <span
-                    className={'queue-swatch'}
-                    data-kind={'priority'}
-                    data-priority={priority}
-                  />
-                  {priority}
-                </li>
-              ))}
-            </ul>
-
-            {shownOutside === undefined ? undefined : (
-              <QueueTip
-                detail={shownOutside.detail}
-                number={shownOutside.number}
-                side={'start'}
-                title={shownOutside.title}
-              />
-            )}
-          </div>
-        </>
-      )}
+      <MatchOptional
+        none={
+          <p class={constant('section-note')}>{constant('Reading GitHub…')}</p>
+        }
+        some={(queue$) => <QueueBody queue$={queue$} />}
+        value={queue}
+      />
     </section>
   );
-});
+};
+
+const QueueBody = ({
+  queue$,
+}: Readonly<{ queue$: InitializedObservable<QueueView> }>): JSX.Element => {
+  // The box pointed at or focused, by number. The page's one piece of state
+  // that is not a store's: it lives as long as the block does.
+  const [shown$, setShown] = createState<number | undefined>(undefined);
+
+  const show = (prNumber: number): void => {
+    setShown(prNumber);
+  };
+
+  const hide = (): void => {
+    setShown(undefined);
+  };
+
+  const running$ = queue$.pipe(map(runningOf));
+
+  return (
+    <If
+      cond={view(
+        queue$,
+        (queue) =>
+          !Arr.isNonEmpty(queue.slots) && !Arr.isNonEmpty(queue.outside),
+      )}
+      else={
+        <>
+          <If
+            cond={view(queue$, (queue) => Arr.isNonEmpty(queue.slots))}
+            then={
+              <div class={constant('queue-row')}>
+                <span class={constant('queue-base')}>
+                  {view(queue$, (queue) => queue.base)}
+                  <span aria-hidden={constant('true')}>{constant(' ←')}</span>
+                </span>
+
+                <div class={constant('queue-track')}>
+                  <ol class={constant('queue')}>
+                    <For
+                      items={view(queue$, (queue) => queue.slots)}
+                      key={(slot) => slot.number}
+                    >
+                      {(slot$, index$) => (
+                        <li
+                          class={constant('queue-slot')}
+                          data-kind={view(slot$, (slot) => slot.kind)}
+                          data-priority={view(slot$, (slot) => slot.priority)}
+                        >
+                          <QueueSlotBox
+                            slot$={slot$}
+                            onHide={hide}
+                            onShow={show}
+                          />
+                          <span class={constant('queue-place')}>
+                            {derive(
+                              [slot$, index$, running$],
+                              (slot, index, running) =>
+                                placeOf(slot, index - running),
+                            )}
+                          </span>
+                        </li>
+                      )}
+                    </For>
+                  </ol>
+
+                  <MatchOptional
+                    some={(tip$) => <QueueTip tip={tip$} />}
+                    value={derive([queue$, shown$], slotTipOf)}
+                  />
+                </div>
+              </div>
+            }
+          />
+
+          <div class={constant('queue-foot')}>
+            <If
+              cond={view(queue$, (queue) => Arr.isNonEmpty(queue.outside))}
+              then={
+                <div class={constant('queue-outside')}>
+                  <span class={constant('queue-outside-label')}>
+                    {constant('set aside')}
+                  </span>
+                  <ul class={constant('queue-outside-list')}>
+                    <For
+                      items={view(queue$, (queue) => queue.outside)}
+                      key={(node) => node.number}
+                    >
+                      {(node$) => (
+                        <li class={constant('queue-outside-node')}>
+                          <QueueOutsideBox
+                            node$={node$}
+                            onHide={hide}
+                            onShow={show}
+                          />
+                        </li>
+                      )}
+                    </For>
+                  </ul>
+                </div>
+              }
+            />
+
+            <QueueLegend />
+
+            <MatchOptional
+              some={(tip$) => <QueueTip tip={tip$} />}
+              value={derive([queue$, shown$], outsideTipOf)}
+            />
+          </div>
+        </>
+      }
+      then={
+        <p class={constant('section-note')}>
+          {constant('No open pull request is labelled merge-queued.')}
+        </p>
+      }
+    />
+  );
+};
+
+const QueueLegend = (): JSX.Element => (
+  <ul class={constant('queue-legend')}>
+    <li>
+      <RunStateIcon kind={'running'} label={'running'} />
+      <span aria-hidden={constant('true')}>{constant('running')}</span>
+    </li>
+    <li>
+      <span class={constant('queue-swatch')} data-kind={constant('waiting')} />
+      {constant('waits for another PR')}
+    </li>
+    <li>
+      <span class={constant('queue-swatch')} data-kind={constant('outside')} />
+      {constant('set aside')}
+    </li>
+    {(['high', 'mid', 'low'] as const).map((priority) => (
+      <li>
+        <span
+          class={constant('queue-swatch')}
+          data-kind={constant('priority')}
+          data-priority={constant(priority)}
+        />
+        {constant(priority)}
+      </li>
+    ))}
+  </ul>
+);
+
+const runningOf = (queue: QueueView): number =>
+  queue.slots.filter(({ kind }) => kind === 'running').length;
+
+const countsOf = (queue: QueueView): string => {
+  const running = runningOf(queue);
+
+  return [
+    `${queue.slots.length - running} queued`,
+    `${running} running`,
+    `${queue.outside.length} set aside`,
+  ].join(' · ');
+};
+
+const slotTipOf = (
+  queue: QueueView,
+  shown: number | undefined,
+): Optional<QueueTipContent> => {
+  const index = queue.slots.findIndex(({ number }) => number === shown);
+
+  const slot = queue.slots[index];
+
+  return slot === undefined
+    ? Optional.none
+    : Optional.some({
+        number: slot.number,
+        title: slot.title,
+        detail: slot.detail,
+        side: index < queue.slots.length / 2 ? 'start' : 'end',
+      });
+};
+
+const outsideTipOf = (
+  queue: QueueView,
+  shown: number | undefined,
+): Optional<QueueTipContent> => {
+  const node = queue.outside.find(({ number }) => number === shown);
+
+  return node === undefined
+    ? Optional.none
+    : Optional.some({
+        number: node.number,
+        title: node.title,
+        detail: node.detail,
+        side: 'start',
+      });
+};
 
 /** What the label under a box says: `running`, `next`, then 2, 3 and on. */
 const placeOf = (slot: QueueSlot, place: number): string =>

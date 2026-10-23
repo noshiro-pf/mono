@@ -1,11 +1,10 @@
-import type { InputEventHandler } from 'preact';
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
-import { Arr, Obj } from 'ts-data-forge';
+import type { InitializedObservable } from 'synstate';
+import { constant, For, If, view, type JSX } from 'synstate-dom';
+import { Arr } from 'ts-data-forge';
 import type { IssueSort, LabelCount } from '../issues-list-view.mjs';
 import { chipColors } from '../label-color.mjs';
 import { PRIORITIES } from '../priority.mjs';
-import { issuesListSignals, issuesListStore } from '../store/index.mjs';
+import { issuesListStore } from '../store/index.mjs';
 import { OfTotal } from './stat-tile.js';
 
 /**
@@ -19,146 +18,146 @@ import { OfTotal } from './stat-tile.js';
  * small by how many there are when that is more — the merge order's
  * counts, for issues.
  */
-export const IssuesListFilters = memoNamed('IssuesListFilters', () => {
-  const view = issuesListSignals.view.value;
-
-  const counts = issuesListSignals.counts.value;
+export const IssuesListFilters = (): JSX.Element => {
+  const { view: view$, counts: counts$ } = issuesListStore;
 
   return (
-    <div className={'issues-list-controls'}>
+    <div class={constant('issues-list-controls')}>
       <input
-        aria-label={'Search issue titles'}
-        autoComplete={'off'}
-        className={'issues-search'}
-        placeholder={'Search titles'}
-        type={'search'}
-        value={issuesListSignals.query.value}
-        onInput={onQueryInput}
+        aria-label={constant('Search issue titles')}
+        autocomplete={constant('off')}
+        class={constant('issues-search')}
+        placeholder={constant('Search titles')}
+        type={constant('search')}
+        value={issuesListStore.query}
+        onInput={(typed) => {
+          issuesListStore.setQuery(typed.currentTarget.value);
+        }}
       />
 
-      <fieldset aria-label={'Priority'} className={'filter-group'}>
-        <span className={'filter-group-name'}>{'priority'}</span>
+      <fieldset
+        aria-label={constant('Priority')}
+        class={constant('filter-group')}
+      >
+        <span class={constant('filter-group-name')}>
+          {constant('priority')}
+        </span>
         {PRIORITIES.map((priority) => (
           <button
-            key={priority}
-            aria-pressed={!view.hiddenPriorities.includes(priority)}
-            className={'filter-chip'}
-            type={'button'}
-            onClick={togglePriority[priority]}
+            aria-pressed={view(view$, ({ hiddenPriorities }) =>
+              String(!hiddenPriorities.includes(priority)),
+            )}
+            class={constant('filter-chip')}
+            type={constant('button')}
+            onClick={() => {
+              issuesListStore.togglePriority(priority);
+            }}
           >
-            {priority}
-            <span className={'filter-chip-count'}>
-              {counts.priorities[priority].shown}
+            {constant(priority)}
+            <span class={constant('filter-chip-count')}>
+              {view(counts$, ({ priorities }) => priorities[priority].shown)}
               <OfTotal
-                shown={counts.priorities[priority].shown}
-                total={counts.priorities[priority].total}
+                count={view(counts$, ({ priorities }) => priorities[priority])}
               />
             </span>
           </button>
         ))}
       </fieldset>
 
-      {Arr.isEmpty(counts.labels) ? undefined : (
-        <fieldset aria-label={'Labels'} className={'filter-group'}>
-          <span className={'filter-group-name'}>{'label'}</span>
-          {counts.labels.map((label) => (
-            <LabelPick key={label.name} label={label} />
-          ))}
-        </fieldset>
-      )}
+      <If
+        cond={view(counts$, ({ labels }) => Arr.isNonEmpty(labels))}
+        then={
+          <fieldset
+            aria-label={constant('Labels')}
+            class={constant('filter-group')}
+          >
+            <span class={constant('filter-group-name')}>
+              {constant('label')}
+            </span>
+            <For
+              items={view(counts$, ({ labels }) => labels)}
+              key={(label) => label.name}
+            >
+              {(label$) => <LabelPick label$={label$} />}
+            </For>
+          </fieldset>
+        }
+      />
 
-      <fieldset aria-label={'Sort'} className={'theme-switch'}>
+      <fieldset aria-label={constant('Sort')} class={constant('theme-switch')}>
         <button
-          aria-pressed={view.sort === 'updated'}
-          className={'theme-switch-option'}
-          title={'The most recently updated first.'}
-          type={'button'}
+          aria-pressed={view(view$, ({ sort }) => String(sort === 'updated'))}
+          class={constant('theme-switch-option')}
+          title={constant('The most recently updated first.')}
+          type={constant('button')}
           onClick={sortByUpdate}
         >
-          {'updated'}
+          {constant('updated')}
         </button>
         <button
-          aria-pressed={view.sort === 'priority'}
-          className={'theme-switch-option'}
-          title={
-            'High first; no priority is between mid and low. The most recently updated first within each.'
-          }
-          type={'button'}
+          aria-pressed={view(view$, ({ sort }) => String(sort === 'priority'))}
+          class={constant('theme-switch-option')}
+          title={constant(
+            'High first; no priority is between mid and low. The most recently updated first within each.',
+          )}
+          type={constant('button')}
           onClick={sortByPriority}
         >
-          {'priority'}
+          {constant('priority')}
         </button>
       </fieldset>
     </div>
   );
-});
+};
 
 /**
  * One label: its name beside a dot of GitHub's colour for it, and how many
  * open issues carry it. Pressed (`aria-pressed`) is picked, which is drawn
  * in the accent, as the merge order's `only` is: a label not picked is not
  * hidden, and is not struck through as a switched-off priority is.
+ *
+ * A row keyed by the label's name, so the name is the one it was made with.
  */
-const LabelPick = memoNamed<Readonly<{ label: LabelCount }>>(
-  'LabelPick',
-  ({ label: { name: labelName, color, picked, count } }) => {
-    const dot = useMemo(
-      () =>
-        color === undefined
-          ? undefined
-          : { backgroundColor: chipColors(color).background },
-      [color],
-    );
+const LabelPick = ({
+  label$,
+}: Readonly<{ label$: InitializedObservable<LabelCount> }>): JSX.Element => {
+  const labelName = label$.getSnapshot().value.name;
 
-    const toggle = useMemo(
-      () => () => {
+  return (
+    <button
+      aria-pressed={view(label$, ({ picked }) => String(picked))}
+      class={constant('filter-chip label-pick')}
+      title={view(label$, ({ picked }) =>
+        picked
+          ? `Picked. Click to stop showing only the issues labelled ${labelName}.`
+          : `Click to show only the issues labelled ${labelName}, and any others picked.`,
+      )}
+      type={constant('button')}
+      onClick={() => {
         issuesListStore.toggleLabel(labelName);
-      },
-      [labelName],
-    );
-
-    return (
-      <button
-        aria-pressed={picked}
-        className={'filter-chip label-pick'}
-        title={
-          picked
-            ? `Picked. Click to stop showing only the issues labelled ${labelName}.`
-            : `Click to show only the issues labelled ${labelName}, and any others picked.`
+      }}
+    >
+      <If
+        cond={view(label$, ({ color }) => color !== undefined)}
+        then={
+          <span
+            aria-hidden={constant('true')}
+            class={constant('label-pick-dot')}
+            style={{
+              'background-color': view(label$, ({ color }) =>
+                color === undefined ? '' : chipColors(color).background,
+              ),
+            }}
+          />
         }
-        type={'button'}
-        onClick={toggle}
-      >
-        {dot === undefined ? undefined : (
-          <span aria-hidden className={'label-pick-dot'} style={dot} />
-        )}
-        {labelName}
-        <span className={'filter-chip-count'}>
-          {count.shown}
-          <OfTotal shown={count.shown} total={count.total} />
-        </span>
-      </button>
-    );
-  },
-);
-
-// Outside the component, so that each switch is handed the same function on
-// every render.
-
-const togglePriority = Obj.fromEntries(
-  PRIORITIES.map(
-    (priority) =>
-      [
-        priority,
-        () => {
-          issuesListStore.togglePriority(priority);
-        },
-      ] as const,
-  ),
-);
-
-const onQueryInput: InputEventHandler<HTMLInputElement> = (typed) => {
-  issuesListStore.setQuery(typed.currentTarget.value);
+      />
+      {constant(labelName)}
+      <span class={constant('filter-chip-count')}>
+        {view(label$, ({ count }) => count.shown)}
+        <OfTotal count={view(label$, ({ count }) => count)} />
+      </span>
+    </button>
+  );
 };
 
 const sortBy = (sort: IssueSort) => (): void => {

@@ -1,25 +1,33 @@
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
+import { createState, onScopeDispose } from 'synstate';
+import {
+  constant,
+  derive,
+  If,
+  mapBindable,
+  MatchOptional,
+  view,
+  type JSX,
+} from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import {
   ExternalLink,
   HeaderFoldToggle,
   LoadStateView,
   Notice,
   ReadFromGitHub,
+  ReadFromGitHubFolded,
   ThemeSwitch,
   TokenPanel,
-  useBorderBoxHeight,
   ViewSettings,
   WeeklyActivity,
 } from './components/index.mjs';
 import { repositoryUrl } from './constants.mjs';
 import {
-  headerSignals,
-  layoutSignals,
+  headerStore,
+  layoutStore,
   reader,
-  readerSignals,
   reportSource,
-  tokenSignals,
+  tokenStore,
 } from './store/index.mjs';
 
 /**
@@ -35,7 +43,8 @@ import {
  * `unblock-prs`, run by a person, and a page that cannot do any of it is a
  * page that is safe to leave open — which is what this is for, so it keeps
  * itself current rather than going stale behind a tab. When it reads is
- * `store/reader.mts`; this only draws what the store holds.
+ * `store/reader.mts`; this only draws what the store holds, and is called
+ * once: every part of the page below is bound to the store values it shows.
  *
  * The header folds into a one-line toolbar that stays at the top of the
  * window (`HeaderFoldToggle`), for a reader who wants the room for the
@@ -49,66 +58,74 @@ import {
  * In the layout's `fill` mode (`layout.mts`) the page is as tall as the
  * window and does not scroll; the blocks share what the header leaves.
  */
-export const App = memoNamed('App', () => {
-  const loadStatus = readerSignals.loadStatus.value;
+export const App = (): JSX.Element => {
+  const { loadStatus } = reader;
 
-  const token = tokenSignals.token.value;
+  const { folded } = headerStore;
 
-  const folded = headerSignals.folded.value;
+  const noToken = view(tokenStore.token, (token) => token === undefined);
 
-  const layoutMode = layoutSignals.mode.value;
+  const ready = derive(
+    [tokenStore.token, loadStatus],
+    (token, status) => token !== undefined && status.type === 'ready',
+  );
 
-  // Outside the JSX: `react/jsx-no-leaked-render` rewrites a `&&` in an
-  // attribute into a ternary whose other arm is `null`, and `disabled` does
-  // not accept `null`.
-  const refreshing = loadStatus.type === 'ready' && loadStatus.refreshing;
+  const refreshing = view(
+    loadStatus,
+    (status) => status.type === 'ready' && status.refreshing,
+  );
 
-  const noToken = token === undefined;
+  const [headerHeight, setHeaderHeight] = createState(0);
 
-  const ready = !noToken && loadStatus.type === 'ready';
-
-  const [headerRef, headerHeight] = useBorderBoxHeight<HTMLElement>();
-
-  const style = useMemo(
-    () => ({ '--header-height': `${headerHeight}px` }),
-    [headerHeight],
+  const repository = (
+    <ExternalLink href={constant(repositoryUrl(reportSource))}>
+      {constant(`${reportSource.owner}/${reportSource.repo}`)}
+    </ExternalLink>
   );
 
   return (
     <main
-      className={'page'}
-      data-header={folded ? 'folded' : 'full'}
-      data-mode={layoutMode}
-      style={style}
+      class={constant('page')}
+      data-header={view(folded, (isFolded) => (isFolded ? 'folded' : 'full'))}
+      data-mode={layoutStore.mode}
+      style={{ '--header-height': view(headerHeight, (h) => `${h}px`) }}
     >
-      <header ref={headerRef} className={'page-header'}>
-        {folded ? (
-          <div className={'toolbar-title'}>
-            <h1 className={'page-title'}>{'GitHub Pull Requests Manager'}</h1>
+      <header
+        ref={observeHeight(setHeaderHeight)}
+        class={constant('page-header')}
+      >
+        <If
+          cond={folded}
+          then={
+            <div class={constant('toolbar-title')}>
+              <h1 class={constant('page-title')}>{constant(TITLE)}</h1>
 
-            <ExternalLink href={repositoryUrl(reportSource)}>
-              {`${reportSource.owner}/${reportSource.repo}`}
-            </ExternalLink>
+              {repository}
 
-            {ready ? <ReadFromGitHub folded /> : undefined}
-          </div>
-        ) : (
-          <div>
-            <h1 className={'page-title'}>{'GitHub Pull Requests Manager'}</h1>
-            <p className={'page-subtitle'}>
-              <ExternalLink href={repositoryUrl(reportSource)}>
-                {`${reportSource.owner}/${reportSource.repo}`}
-              </ExternalLink>
-            </p>
-          </div>
-        )}
+              <If cond={ready} then={<ReadFromGitHubFolded />} />
+            </div>
+          }
+          else={
+            <div>
+              <h1 class={constant('page-title')}>{constant(TITLE)}</h1>
+              <p class={constant('page-subtitle')}>{repository}</p>
+            </div>
+          }
+        />
 
-        <div className={'header-actions'}>
-          {loadStatus.type === 'ready' && loadStatus.pollError !== undefined ? (
-            <span className={'poll-error'} title={loadStatus.pollError}>
-              {'last refresh failed'}
-            </span>
-          ) : undefined}
+        <div class={constant('header-actions')}>
+          <MatchOptional
+            value={view(loadStatus, (status) =>
+              status.type === 'ready'
+                ? Optional.fromNullable(status.pollError)
+                : Optional.none,
+            )}
+            some={(pollError$) => (
+              <span class={constant('poll-error')} title={pollError$}>
+                {constant('last refresh failed')}
+              </span>
+            )}
+          />
 
           <WeeklyActivity />
 
@@ -117,12 +134,15 @@ export const App = memoNamed('App', () => {
           <ThemeSwitch />
 
           <button
-            className={'refresh-button'}
-            disabled={noToken || refreshing}
-            type={'button'}
+            class={constant('refresh-button')}
+            disabled={derive(
+              [noToken, refreshing],
+              (none, busy) => none || busy,
+            )}
+            type={constant('button')}
             onClick={reader.refresh}
           >
-            {refreshing ? 'Reading…' : 'Refresh'}
+            {mapBindable(refreshing, (busy) => (busy ? 'Reading…' : 'Refresh'))}
           </button>
 
           <HeaderFoldToggle />
@@ -131,19 +151,55 @@ export const App = memoNamed('App', () => {
 
       {/* Folded, the panel goes too — unless there is no token, when it is
           the one thing the page has to ask for. */}
-      {folded && !noToken ? undefined : <TokenPanel />}
+      <If
+        cond={derive([folded, noToken], (isFolded, none) => !isFolded || none)}
+        then={<TokenPanel />}
+      />
 
-      {ready && !folded ? <ReadFromGitHub folded={false} /> : undefined}
+      <If
+        cond={derive(
+          [ready, folded],
+          (isReady, isFolded) => isReady && !isFolded,
+        )}
+        then={<ReadFromGitHub />}
+      />
 
-      {noToken ? (
-        <Notice tone={'neutral'}>
-          {
-            'This page reads GitHub’s GraphQL API, which answers nobody without a token. Give it one above — a classic token with no scopes ticked is enough.'
-          }
-        </Notice>
-      ) : (
-        <LoadStateView loadStatus={loadStatus} />
-      )}
+      <If
+        cond={noToken}
+        then={
+          <Notice tone={'neutral'}>
+            {constant(
+              'This page reads GitHub’s GraphQL API, which answers nobody without a token. Give it one above — a classic token with no scopes ticked is enough.',
+            )}
+          </Notice>
+        }
+        else={<LoadStateView />}
+      />
     </main>
   );
-});
+};
+
+const TITLE = 'GitHub Pull Requests Manager';
+
+/**
+ * Hands the header's border-box height to `setHeight` whenever it changes,
+ * until the page goes. The toolbar wraps onto a second line on a narrow
+ * screen, so the height is measured rather than known.
+ */
+const observeHeight =
+  (setHeight: (height: number) => void) =>
+  (header: HTMLElement): void => {
+    const observer = new ResizeObserver(([observed]) => {
+      const box = observed?.borderBoxSize[0];
+
+      if (box !== undefined) {
+        setHeight(box.blockSize);
+      }
+    });
+
+    observer.observe(header);
+
+    onScopeDispose(() => {
+      observer.disconnect();
+    });
+  };

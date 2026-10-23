@@ -1,5 +1,14 @@
-import { memoNamed } from 'preact-utils';
-import { Arr } from 'ts-data-forge';
+import {
+  constant,
+  For,
+  If,
+  mapBindable,
+  MatchOptional,
+  view,
+  type Bindable,
+  type JSX,
+} from 'synstate-dom';
+import { Arr, Optional } from 'ts-data-forge';
 import type { Entry } from '../load-report.mjs';
 import { AutoMergeBadge } from './auto-merge-badge.js';
 import { ClaudeSessions } from './claude-sessions.js';
@@ -15,9 +24,9 @@ import { Timestamp } from './timestamp.js';
 import { VerdictBadge } from './verdict-badge.js';
 
 type Props = Readonly<{
-  entry: Entry;
+  entry: Bindable<Entry>;
   /** The scale every divergence bar in the report is drawn against. */
-  scaleMax: number;
+  scaleMax: Bindable<number>;
 }>;
 
 /**
@@ -33,100 +42,153 @@ type Props = Readonly<{
  * The card is drawn as soon as the pull request is read; the verdict, the
  * distance from the base and the badges read from its details come by
  * queries of their own, and say they are being read until they answer
- * (`entry.reading`).
+ * (`entry.reading`). A poll that changes a pull request rewrites the parts of
+ * its card bound to what changed, and leaves the rest of it alone.
  */
-export const PullRequestCard = memoNamed<Props>(
-  'PullRequestCard',
-  ({ entry, scaleMax }) => (
-    <article className={'pull-request'}>
-      <div className={'pull-request-badges'}>
-        <StateBadge isDraft={entry.isDraft} />
-        <VerdictBadge
-          checks={entry.reading.includes('checks') ? undefined : entry.checks}
-        />
-        <AutoMergeBadge armed={entry.autoMerge} />
-        <SetAsideBadge baseRef={entry.baseRef} setAside={entry.setAside} />
-        {entry.reading.includes('details') ? undefined : (
-          <ReviewBadge review={entry.codeOwnerReview} />
+export const PullRequestCard = ({ entry, scaleMax }: Props): JSX.Element => (
+  <article class={constant('pull-request')}>
+    <div class={constant('pull-request-badges')}>
+      <StateBadge isDraft={mapBindable(entry, ({ isDraft }) => isDraft)} />
+      <VerdictBadge
+        checks={mapBindable(entry, ({ reading, checks }) =>
+          reading.includes('checks') ? undefined : checks,
         )}
-      </div>
+      />
+      <AutoMergeBadge
+        armed={mapBindable(entry, ({ autoMerge }) => autoMerge)}
+      />
+      <SetAsideBadge entry={entry} />
+      <If
+        cond={mapBindable(entry, ({ reading }) => !reading.includes('details'))}
+        then={
+          <ReviewBadge
+            review={mapBindable(
+              entry,
+              ({ codeOwnerReview }) => codeOwnerReview,
+            )}
+          />
+        }
+      />
+    </div>
 
-      <div className={'pull-request-heading'}>
-        <span className={'pull-request-number'}>{`#${entry.number}`}</span>
-        <ExternalLink href={entry.url} variant={'pull-request-title'}>
-          {entry.title}
-        </ExternalLink>
-        <SplitViewLink entry={entry} />
-      </div>
+    <div class={constant('pull-request-heading')}>
+      <span class={constant('pull-request-number')}>
+        {mapBindable(entry, ({ number }) => `#${number}`)}
+      </span>
+      <ExternalLink
+        href={mapBindable(entry, ({ url }) => url)}
+        variant={'pull-request-title'}
+      >
+        {mapBindable(entry, ({ title }) => title)}
+      </ExternalLink>
+      <SplitViewLink entry={entry} />
+    </div>
 
-      {Arr.isNonEmpty(entry.linkedIssues) ? (
-        <div className={'pull-request-row'}>
-          <LinkedIssues issues={entry.linkedIssues} />
+    <If
+      cond={mapBindable(entry, ({ linkedIssues }) =>
+        Arr.isNonEmpty(linkedIssues),
+      )}
+      then={
+        <div class={constant('pull-request-row')}>
+          <LinkedIssues
+            issues={mapBindable(entry, ({ linkedIssues }) => linkedIssues)}
+          />
         </div>
-      ) : undefined}
+      }
+    />
 
-      {Arr.isNonEmpty(entry.claudeSessions) ? (
-        <div className={'pull-request-row'}>
-          <ClaudeSessions sessions={entry.claudeSessions} />
+    <If
+      cond={mapBindable(entry, ({ claudeSessions }) =>
+        Arr.isNonEmpty(claudeSessions),
+      )}
+      then={
+        <div class={constant('pull-request-row')}>
+          <ClaudeSessions
+            sessions={mapBindable(
+              entry,
+              ({ claudeSessions }) => claudeSessions,
+            )}
+          />
         </div>
-      ) : undefined}
+      }
+    />
 
-      <div className={'pull-request-row'}>
-        <span className={'branch'} title={'the branch this pull request is of'}>
-          <span aria-hidden={'true'}>{'⎇ '}</span>
-          {entry.headRef}
-          <span aria-hidden={'true'} className={'branch-arrow'}>
-            {' → '}
-          </span>
-          <span className={'branch-base'}>{entry.baseRef}</span>
+    <div class={constant('pull-request-row')}>
+      <span
+        class={constant('branch')}
+        title={constant('the branch this pull request is of')}
+      >
+        <span aria-hidden={constant('true')}>{constant('⎇ ')}</span>
+        {mapBindable(entry, ({ headRef }) => headRef)}
+        <span aria-hidden={constant('true')} class={constant('branch-arrow')}>
+          {constant(' → ')}
         </span>
+        <span class={constant('branch-base')}>
+          {mapBindable(entry, ({ baseRef }) => baseRef)}
+        </span>
+      </span>
 
-        {entry.stackedOn === undefined ? undefined : (
+      <MatchOptional
+        value={mapBindable(entry, ({ stackedOn }) =>
+          Optional.fromNullable(stackedOn),
+        )}
+        some={(stackedOn$) => (
           <span
-            className={'stacked-on'}
-            title={`Its base is the branch of #${entry.stackedOn}, so its diff is its own layer. GitHub moves it onto the base of #${entry.stackedOn} once that one merges.`}
+            class={constant('stacked-on')}
+            title={view(
+              stackedOn$,
+              (stackedOn) =>
+                `Its base is the branch of #${stackedOn}, so its diff is its own layer. GitHub moves it onto the base of #${stackedOn} once that one merges.`,
+            )}
           >
-            {`stacked on #${entry.stackedOn}`}
+            {view(stackedOn$, (stackedOn) => `stacked on #${stackedOn}`)}
           </span>
         )}
+      />
 
-        <CommitDivergence
-          baseRef={entry.baseRef}
-          comparison={entry.comparison}
-          reading={entry.reading.includes('comparison')}
-          scaleMax={scaleMax}
-        />
-      </div>
+      <CommitDivergence entry={entry} scaleMax={scaleMax} />
+    </div>
 
-      {/*
-       * Two instants that look like one question. `updatedAt` moves when
-       * anything about the pull request does — a label, a comment, an edit —
-       * and the head commit is when the branch itself last moved.
-       */}
-      <div className={'pull-request-row'}>
-        <Timestamp iso={entry.headCommittedAt} label={'pushed'} />
-        <Timestamp iso={entry.updatedAt} label={'updated'} />
-      </div>
+    {/*
+     * Two instants that look like one question. `updatedAt` moves when
+     * anything about the pull request does — a label, a comment, an edit —
+     * and the head commit is when the branch itself last moved.
+     */}
+    <div class={constant('pull-request-row')}>
+      <Timestamp
+        iso={mapBindable(entry, ({ headCommittedAt }) => headCommittedAt)}
+        label={'pushed'}
+      />
+      <Timestamp
+        iso={mapBindable(entry, ({ updatedAt }) => updatedAt)}
+        label={'updated'}
+      />
+    </div>
 
-      <div className={'pull-request-row'}>
-        {entry.labels.map((label) => (
-          <LabelChip key={label.name} label={label} />
-        ))}
+    <div class={constant('pull-request-row')}>
+      <For
+        items={mapBindable(entry, ({ labels }) => labels)}
+        key={(label) => label.name}
+      >
+        {(label$) => <LabelChip label={label$} />}
+      </For>
 
-        {Arr.isNonEmpty(entry.checks.failed) ? (
+      <If
+        cond={mapBindable(entry, ({ checks }) => Arr.isNonEmpty(checks.failed))}
+        then={
           <span
-            className={
-              entry.checks.verdict === 'paused'
-                ? 'stale-checks'
-                : 'failed-checks'
-            }
+            class={mapBindable(entry, ({ checks }) =>
+              checks.verdict === 'paused' ? 'stale-checks' : 'failed-checks',
+            )}
           >
-            {entry.checks.verdict === 'paused'
-              ? `stale red: ${entry.checks.failed.join(', ')}`
-              : `failed: ${entry.checks.failed.join(', ')}`}
+            {mapBindable(entry, ({ checks }) =>
+              checks.verdict === 'paused'
+                ? `stale red: ${checks.failed.join(', ')}`
+                : `failed: ${checks.failed.join(', ')}`,
+            )}
           </span>
-        ) : undefined}
-      </div>
-    </article>
-  ),
+        }
+      />
+    </div>
+  </article>
 );

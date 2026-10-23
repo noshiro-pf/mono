@@ -1,15 +1,14 @@
-import type { ComponentChildren } from 'preact';
-import { memoNamed } from 'preact-utils';
+import { combine, map, type InitializedObservable } from 'synstate';
+import { constant, For, type JSX } from 'synstate-dom';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { defaultShareOf, type BlockId, type Layout } from '../layout.mjs';
-import { LayoutBlock } from './layout-block.js';
+import { layoutStore } from '../store/index.mjs';
+import { LayoutBlock, type BlockPlacement } from './layout-block.js';
 
 type Props = Readonly<{
-  ids: readonly BlockId[];
-  blocks: ReadonlyRecord<BlockId, ComponentChildren>;
-  heights: Layout['heights'];
-  mode: Layout['mode'];
-  shares: Layout['shares'];
+  /** The blocks drawn in the column, top down. */
+  ids$: InitializedObservable<readonly BlockId[]>;
+  blocks: ReadonlyRecord<BlockId, JSX.Element>;
 }>;
 
 /**
@@ -17,33 +16,51 @@ type Props = Readonly<{
  * `natural` mode, and in the `fill` mode its share and the block under it,
  * which the line between them shares the height with.
  */
-export const BlockColumn = memoNamed<Props>('BlockColumn', (props) => {
-  const { ids, blocks, heights, mode, shares } = props;
+export const BlockColumn = ({ ids$, blocks }: Props): JSX.Element => (
+  <div class={constant('block-column')}>
+    <For items={ids$} key={(id) => id}>
+      {(id$, index$) => {
+        // The key is the id, so the row's id is the one it was made with.
+        const id = id$.getSnapshot().value;
 
-  const fill = mode === 'fill';
-
-  return (
-    <div className={'block-column'}>
-      {ids.map((id, index) => {
-        const below = ids[index + 1];
+        const placement$ = combine([layoutStore.layout, ids$, index$]).pipe(
+          map(([layout, ids, index]) => placementOf(layout, ids, index, id)),
+        );
 
         return (
-          <LayoutBlock
-            key={id}
-            height={fill ? undefined : heights[id]}
-            id={id}
-            next={fill ? below : undefined}
-            nextShare={
-              fill && below !== undefined
-                ? (shares[below] ?? defaultShareOf(below))
-                : undefined
-            }
-            share={fill ? (shares[id] ?? defaultShareOf(id)) : undefined}
-          >
+          <LayoutBlock id={id} placement$={placement$}>
             {blocks[id]}
           </LayoutBlock>
         );
-      })}
-    </div>
-  );
-});
+      }}
+    </For>
+  </div>
+);
+
+const placementOf = (
+  layout: Layout,
+  ids: readonly BlockId[],
+  index: number,
+  id: BlockId,
+): BlockPlacement => {
+  if (layout.mode !== 'fill') {
+    return {
+      height: layout.heights[id],
+      share: undefined,
+      next: undefined,
+      nextShare: undefined,
+    };
+  }
+
+  const below = ids[index + 1];
+
+  return {
+    height: undefined,
+    share: layout.shares[id] ?? defaultShareOf(id),
+    next: below,
+    nextShare:
+      below === undefined
+        ? undefined
+        : (layout.shares[below] ?? defaultShareOf(below)),
+  };
+};

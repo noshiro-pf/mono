@@ -1,12 +1,14 @@
-import type { PointerEventHandler } from 'preact';
-import { memoNamed } from 'preact-utils';
-import { useCallback } from 'preact/hooks';
+import { constant, type JSX } from 'synstate-dom';
 import { splitAt, type LineIndex } from '../layout.mjs';
 import { layoutStore } from '../store/index.mjs';
 
 type Props = Readonly<{
-  /** Which line between the columns this is, from the left. */
-  line: LineIndex;
+  /**
+   * The line before the middle column, or the one before the right: `0` or
+   * `1` with three columns, and `0` either way with two. Resolved when it is
+   * dragged, so that going from two columns to three keeps the line drawn.
+   */
+  position: 'first' | 'last';
 }>;
 
 /**
@@ -19,49 +21,44 @@ type Props = Readonly<{
  * the sliders in the layout settings, which are real controls rather than a
  * `separator` that would have to be taught to be one.
  */
-export const ColumnDivider = memoNamed<Props>('ColumnDivider', (props) => {
-  const { line } = props;
-
-  const onPointerMove = useCallback<PointerEventHandler<HTMLDivElement>>(
-    (moved) => {
-      const box = moved.currentTarget.parentElement?.getBoundingClientRect();
-
-      if (
-        box === undefined ||
-        !moved.currentTarget.hasPointerCapture(moved.pointerId)
-      ) {
-        return;
-      }
-
-      const at = splitAt(moved.clientX, box);
-
-      if (at !== undefined) {
-        layoutStore.setLine(line, at);
-      }
-    },
-    [line],
-  );
-
-  const onDoubleClick = useCallback((): void => {
-    layoutStore.evenLine(line);
-  }, [line]);
+export const ColumnDivider = ({ position }: Props): JSX.Element => {
+  const line = (): LineIndex =>
+    position === 'last' && layoutStore.layout.getSnapshot().value.columns === 3
+      ? 1
+      : 0;
 
   return (
     <div
-      aria-hidden={'true'}
-      className={'column-divider'}
-      title={'Drag to share the width; double-click to even it'}
-      onDblClick={onDoubleClick}
+      aria-hidden={constant('true')}
+      class={constant('column-divider')}
+      title={constant('Drag to share the width; double-click to even it')}
+      onDblClick={() => {
+        layoutStore.evenLine(line());
+      }}
       onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
+      onPointerMove={(moved) => {
+        const box = moved.currentTarget.parentElement?.getBoundingClientRect();
+
+        if (
+          box === undefined ||
+          !moved.currentTarget.hasPointerCapture(moved.pointerId)
+        ) {
+          return;
+        }
+
+        const at = splitAt(moved.clientX, box);
+
+        if (at !== undefined) {
+          layoutStore.setLine(line(), at);
+        }
+      }}
     />
   );
-});
+};
 
-// Outside the component, since it does not read its props: one function
-// serves every render, with no `useCallback` to keep it stable.
-
-const onPointerDown: PointerEventHandler<HTMLDivElement> = (pressed) => {
+const onPointerDown = (
+  pressed: PointerEvent & Readonly<{ currentTarget: HTMLDivElement }>,
+): void => {
   if (pressed.button !== 0) {
     return;
   }

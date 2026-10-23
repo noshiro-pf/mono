@@ -1,9 +1,20 @@
-import { memoNamed } from 'preact-utils';
-import { Arr } from 'ts-data-forge';
-import { issuesViewSignals } from '../store/index.mjs';
+import {
+  constant,
+  derive,
+  For,
+  If,
+  MatchOptional,
+  view,
+  type JSX,
+} from 'synstate-dom';
+import { Arr, Optional } from 'ts-data-forge';
+import type { IssueGraphLayout, LaidOutEdge } from '../issue-graph-layout.mjs';
+import type { IssueGraph } from '../issue-graph.mjs';
+import { issuesViewStore } from '../store/index.mjs';
+import { dagBox } from './dag-box.mjs';
 import { IssueDagLegend } from './issue-dag-legend.js';
-import { IssueDagNode } from './issue-dag-node.js';
-import { useDagBox } from './use-dag-box.mjs';
+import { IssueDagNode, type PlacedNode } from './issue-dag-node.js';
+import { svgAttributes, SvgTitle } from './svg-elements.js';
 
 /**
  * The open issues as a graph of what each waits for, read left to right:
@@ -21,87 +32,131 @@ import { useDagBox } from './use-dag-box.mjs';
  * Rounded down to whole pixels, which a fit relies on to leave the box no
  * scroll bar to draw.
  */
-export const IssueDag = memoNamed('IssueDag', () => {
-  const graph = issuesViewSignals.graph.value;
+export const IssueDag = (): JSX.Element => (
+  <If
+    cond={view(issuesViewStore.graph, ({ nodes }) => Arr.isNonEmpty(nodes))}
+    then={<Dag />}
+    else={<p class={constant('section-note')}>{constant('No open issues.')}</p>}
+  />
+);
 
-  const scale = issuesViewSignals.dagScale.value;
+const Dag = (): JSX.Element => {
+  const { graph: graph$, dagScale: scale$, layout: layout$ } = issuesViewStore;
 
-  const layout = issuesViewSignals.layout.value;
-
-  const box = useDagBox(scale, layout);
-
-  if (!Arr.isNonEmpty(graph.nodes)) {
-    return <p className={'section-note'}>{'No open issues.'}</p>;
-  }
-
-  const byNumber = new Map(graph.nodes.map((node) => [node.number, node]));
+  const box = dagBox(scale$, layout$);
 
   return (
-    <div className={'issue-dag'}>
-      <IssueDagLegend graph={graph} />
+    <div class={constant('issue-dag')}>
+      <IssueDagLegend />
 
-      <div ref={box.ref} className={'issue-dag-scroll'} onScroll={box.onScroll}>
+      <div
+        ref={box.ref}
+        class={constant('issue-dag-scroll')}
+        onScroll={box.onScroll}
+      >
         <svg
-          className={'issue-dag-svg'}
-          height={Math.floor(layout.height * scale)}
-          viewBox={`0 0 ${layout.width} ${layout.height}`}
-          width={Math.floor(layout.width * scale)}
+          class={constant('issue-dag-svg')}
+          height={derive([layout$, scale$], (layout, scale) =>
+            Math.floor(layout.height * scale),
+          )}
+          viewBox={view(
+            layout$,
+            ({ width, height }) => `0 0 ${width} ${height}`,
+          )}
+          width={derive([layout$, scale$], (layout, scale) =>
+            Math.floor(layout.width * scale),
+          )}
         >
-          <title>{'Open issues and what each waits for'}</title>
+          <SvgTitle>{constant('Open issues and what each waits for')}</SvgTitle>
 
           <defs>
             <marker
-              id={'issue-dag-arrow'}
-              markerHeight={8}
-              markerUnits={'userSpaceOnUse'}
-              markerWidth={8}
-              orient={'auto'}
-              refX={8}
-              refY={4}
-              viewBox={'0 0 8 8'}
+              ref={arrowMarker}
+              id={constant('issue-dag-arrow')}
+              viewBox={constant('0 0 8 8')}
             >
-              <path className={'issue-dag-arrow'} d={'M 0 0 L 8 4 L 0 8 z'} />
+              <path
+                class={constant('issue-dag-arrow')}
+                d={constant('M 0 0 L 8 4 L 0 8 z')}
+              />
             </marker>
           </defs>
 
-          <g className={'issue-dag-edges'}>
-            {layout.edges.map((edge) => (
-              <path
-                key={`${edge.kind}-${edge.from}-${edge.to}`}
-                className={'issue-dag-edge'}
-                d={edge.path}
-                data-kind={edge.kind}
-                data-settled={edge.settled}
-                markerEnd={
-                  edge.kind === 'start-after'
-                    ? 'url(#issue-dag-arrow)'
-                    : undefined
-                }
-              />
-            ))}
+          <g class={constant('issue-dag-edges')}>
+            <For items={view(layout$, ({ edges }) => edges)} key={edgeKey}>
+              {(edge$) => (
+                <path
+                  class={constant('issue-dag-edge')}
+                  d={view(edge$, ({ path }) => path)}
+                  data-kind={view(edge$, ({ kind }) => kind)}
+                  data-settled={view(edge$, ({ settled }) => String(settled))}
+                  // The kind is in the key, so it is the one the row was
+                  // made with.
+                  marker-end={
+                    edge$.getSnapshot().value.kind === 'start-after'
+                      ? constant('url(#issue-dag-arrow)')
+                      : undefined
+                  }
+                />
+              )}
+            </For>
           </g>
 
-          {layout.unconnectedLabel === undefined ? undefined : (
-            <text
-              className={'issue-dag-group-label'}
-              x={layout.unconnectedLabel.x}
-              y={layout.unconnectedLabel.y}
+          <MatchOptional
+            value={view(layout$, ({ unconnectedLabel }) =>
+              Optional.fromNullable(unconnectedLabel),
+            )}
+            some={(at$) => (
+              <text
+                class={constant('issue-dag-group-label')}
+                x={view(at$, ({ x }) => x)}
+                y={view(at$, ({ y }) => y)}
+              >
+                {constant('No dependencies either way')}
+              </text>
+            )}
+          />
+
+          <g class={constant('issue-dag-nodes')}>
+            <For
+              items={derive([layout$, graph$], placedNodesOf)}
+              key={({ node }) => node.number}
             >
-              {'No dependencies either way'}
-            </text>
-          )}
-
-          <g className={'issue-dag-nodes'}>
-            {layout.nodes.map(({ number, x, y }) => {
-              const node = byNumber.get(number);
-
-              return node === undefined ? undefined : (
-                <IssueDagNode key={number} node={node} x={x} y={y} />
-              );
-            })}
+              {(placed$) => <IssueDagNode placed$={placed$} />}
+            </For>
           </g>
         </svg>
       </div>
     </div>
   );
+};
+
+const edgeKey = ({ kind, from, to }: LaidOutEdge): string =>
+  `${kind}-${from}-${to}` as const;
+
+/** Each node the layout places, with where it goes. */
+const placedNodesOf = (
+  layout: IssueGraphLayout,
+  graph: IssueGraph,
+): readonly PlacedNode[] => {
+  const byNumber = new Map(graph.nodes.map((node) => [node.number, node]));
+
+  return Arr.generate(function* () {
+    for (const { number, x, y } of layout.nodes) {
+      const node = byNumber.get(number);
+
+      if (node !== undefined) {
+        yield { node, x, y };
+      }
+    }
+  });
+};
+
+const arrowMarker = svgAttributes({
+  markerHeight: '8',
+  markerUnits: 'userSpaceOnUse',
+  markerWidth: '8',
+  orient: 'auto',
+  refX: '8',
+  refY: '4',
 });

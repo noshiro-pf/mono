@@ -1,5 +1,5 @@
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, derive, For, If, view, type JSX } from 'synstate-dom';
 import { Num } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import {
@@ -9,15 +9,17 @@ import {
 } from '../issue-graph-layout.mjs';
 import type { IssueGraphNode } from '../issue-graph.mjs';
 import { numberPillWidth, wrapTitle } from '../node-title.mjs';
-import { ExternalLink } from './external-link.js';
 import { describeNode } from './issue-dag-states.mjs';
+import { SvgLink } from './svg-elements.js';
 
-type Props = Readonly<{
+/** A node and the top-left corner it is drawn at. */
+export type PlacedNode = Readonly<{
   node: IssueGraphNode;
-  /** The top-left corner. */
   x: number;
   y: number;
 }>;
+
+type Props = Readonly<{ placed$: InitializedObservable<PlacedNode> }>;
 
 /**
  * One issue or pull request: its title, in the colour of where it stands
@@ -32,121 +34,137 @@ type Props = Readonly<{
  * also gets a second outline around the shape, and a low one is drawn faint.
  * The number, the state and the priority are in the tooltip, which is also
  * what a screen reader announces.
+ *
+ * A row of the DAG keyed by its number, so the number, and with it the kind,
+ * the URL and the width of the number's pill, are the ones it was made with;
+ * where it stands, its title and its priority follow the graph.
  */
-export const IssueDagNode = memoNamed<Props>(
-  'IssueDagNode',
-  ({ node, x, y }) => {
-    const lines = useMemo(
-      () =>
-        wrapTitle(
-          node.title === '' ? `#${node.number}` : node.title,
-          TITLE_UNITS,
-          TITLE_LINES,
-        ),
-      [node.title, node.number],
-    );
+export const IssueDagNode = ({ placed$ }: Props): JSX.Element => {
+  const { number, kind, url } = placed$.getSnapshot().value.node;
 
-    const description = describeNode(node);
+  const numberWidth = numberPillWidth(number);
 
-    const numberWidth = numberPillWidth(node.number);
+  const lines$ = placed$.pipe(map(({ node }) => linesOf(node)));
 
-    return (
-      <ExternalLink
-        href={node.url}
-        title={description}
-        variant={'issue-dag-link'}
+  return (
+    <SvgLink href={url} title={view(placed$, ({ node }) => describeNode(node))}>
+      <g
+        class={constant('issue-dag-node')}
+        data-kind={constant(kind)}
+        data-priority={view(placed$, ({ node }) => node.priority)}
+        data-state={view(placed$, ({ node }) => node.state)}
+        transform={view(placed$, ({ x, y }) => `translate(${x} ${y})`)}
       >
-        <g
-          className={'issue-dag-node'}
-          data-kind={node.kind}
-          data-priority={node.priority}
-          data-state={node.state}
-          transform={`translate(${x} ${y})`}
+        <If
+          cond={view(placed$, ({ node }) => node.priority === 'high')}
+          then={
+            kind === 'pull-request' ? (
+              <rect
+                class={constant('issue-dag-ring')}
+                height={constant(NODE_HEIGHT + 2 * RING_GAP)}
+                rx={constant(NODE_HEIGHT / 2 + RING_GAP)}
+                width={constant(NODE_WIDTH + 2 * RING_GAP)}
+                x={constant(-RING_GAP)}
+                y={constant(-RING_GAP)}
+              />
+            ) : (
+              <polygon
+                class={constant('issue-dag-ring')}
+                points={constant(ISSUE_RING)}
+              />
+            )
+          }
+        />
+        {kind === 'pull-request' ? (
+          <rect
+            class={constant('issue-dag-shape')}
+            height={constant(NODE_HEIGHT)}
+            rx={constant(NODE_HEIGHT / 2)}
+            width={constant(NODE_WIDTH)}
+          />
+        ) : (
+          <polygon
+            class={constant('issue-dag-shape')}
+            points={constant(ISSUE_SHAPE)}
+          />
+        )}
+        <text
+          class={constant('issue-dag-title')}
+          text-anchor={constant('middle')}
         >
-          {node.priority !== 'high' ? undefined : node.kind ===
-            'pull-request' ? (
-            <rect
-              className={'issue-dag-ring'}
-              height={NODE_HEIGHT + 2 * RING_GAP}
-              rx={NODE_HEIGHT / 2 + RING_GAP}
-              width={NODE_WIDTH + 2 * RING_GAP}
-              x={-RING_GAP}
-              y={-RING_GAP}
-            />
-          ) : (
-            <polygon className={'issue-dag-ring'} points={ISSUE_RING} />
-          )}
-          {node.kind === 'pull-request' ? (
-            <rect
-              className={'issue-dag-shape'}
-              height={NODE_HEIGHT}
-              rx={NODE_HEIGHT / 2}
-              width={NODE_WIDTH}
-            />
-          ) : (
-            <polygon className={'issue-dag-shape'} points={ISSUE_SHAPE} />
-          )}
-          <text className={'issue-dag-title'} textAnchor={'middle'}>
-            {lines.map((line, index) => (
+          {/* The lines of one title, which only ever change together. */}
+          <For items={lines$} key={(_, index) => index}>
+            {(line$, index$) => (
               <tspan
-                // The lines of one title, which only ever change together.
-                // eslint-disable-next-line react/no-array-index-key
-                key={index}
-                dominantBaseline={'central'}
-                x={NODE_WIDTH / 2}
-                y={
-                  NODE_HEIGHT / 2 +
-                  (index - (lines.length - 1) / 2) * LINE_HEIGHT
-                }
+                dominant-baseline={constant('central')}
+                x={constant(NODE_WIDTH / 2)}
+                y={derive(
+                  [index$, lines$],
+                  (index, lines) =>
+                    NODE_HEIGHT / 2 +
+                    (index - (lines.length - 1) / 2) * LINE_HEIGHT,
+                )}
               >
-                {line}
+                {line$}
               </tspan>
-            ))}
-          </text>
-          <g
-            className={'issue-dag-number'}
-            transform={`translate(${NUMBER_X} ${-PRIORITY_HEIGHT / 2})`}
+            )}
+          </For>
+        </text>
+        <g
+          class={constant('issue-dag-number')}
+          transform={constant(`translate(${NUMBER_X} ${-PRIORITY_HEIGHT / 2})`)}
+        >
+          <rect
+            height={constant(PRIORITY_HEIGHT)}
+            rx={constant(PRIORITY_HEIGHT / 2)}
+            width={constant(numberWidth)}
+          />
+          <text
+            dominant-baseline={constant('central')}
+            text-anchor={constant('middle')}
+            x={constant(numberWidth / 2)}
+            y={constant(PRIORITY_HEIGHT / 2)}
           >
-            <rect
-              height={PRIORITY_HEIGHT}
-              rx={PRIORITY_HEIGHT / 2}
-              width={numberWidth}
-            />
-            <text
-              dominantBaseline={'central'}
-              textAnchor={'middle'}
-              x={numberWidth / 2}
-              y={PRIORITY_HEIGHT / 2}
-            >
-              {`#${node.number}`}
-            </text>
-          </g>
-          {node.priority === 'none' ? undefined : (
+            {constant(`#${number}`)}
+          </text>
+        </g>
+        <If
+          cond={view(placed$, ({ node }) => node.priority !== 'none')}
+          then={
             <g
-              className={'issue-dag-priority'}
-              data-priority={node.priority}
-              transform={`translate(${PRIORITY_X} ${-PRIORITY_HEIGHT / 2})`}
+              class={constant('issue-dag-priority')}
+              data-priority={view(placed$, ({ node }) => node.priority)}
+              transform={constant(
+                `translate(${PRIORITY_X} ${-PRIORITY_HEIGHT / 2})`,
+              )}
             >
               <rect
-                height={PRIORITY_HEIGHT}
-                rx={PRIORITY_HEIGHT / 2}
-                width={PRIORITY_WIDTH}
+                height={constant(PRIORITY_HEIGHT)}
+                rx={constant(PRIORITY_HEIGHT / 2)}
+                width={constant(PRIORITY_WIDTH)}
               />
               <text
-                dominantBaseline={'central'}
-                textAnchor={'middle'}
-                x={PRIORITY_WIDTH / 2}
-                y={PRIORITY_HEIGHT / 2}
+                dominant-baseline={constant('central')}
+                text-anchor={constant('middle')}
+                x={constant(PRIORITY_WIDTH / 2)}
+                y={constant(PRIORITY_HEIGHT / 2)}
               >
-                {node.priority}
+                {view(placed$, ({ node }) => node.priority)}
               </text>
             </g>
-          )}
-        </g>
-      </ExternalLink>
-    );
-  },
-);
+          }
+        />
+      </g>
+    </SvgLink>
+  );
+};
+
+const linesOf = (node: IssueGraphNode): readonly string[] =>
+  wrapTitle(
+    node.title === '' ? `#${node.number}` : node.title,
+    TITLE_UNITS,
+    TITLE_LINES,
+  );
 
 /** How far an issue's pointed ends reach in. */
 const POINT_INSET = 12;

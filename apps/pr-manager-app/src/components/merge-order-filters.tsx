@@ -1,22 +1,24 @@
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
-import { Arr, Obj } from 'ts-data-forge';
+import {
+  constant,
+  derive,
+  For,
+  mapBindable,
+  view,
+  type JSX,
+} from 'synstate-dom';
+import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
-  STATUS_FILTERS,
   STATUS_NAMES,
   statusFiltersOf,
+  type Count,
   type MergeOrderSort,
   type StatusFilter,
 } from '../merge-order-view.mjs';
 import { PRIORITIES, type Priority } from '../priority.mjs';
-import {
-  mergeOrderSignals,
-  mergeOrderStore,
-  readerSignals,
-} from '../store/index.mjs';
+import { mergeOrderStore, reader } from '../store/index.mjs';
 import type { StatusRole } from '../verdict.mjs';
-import { OfTotal, StatTile } from './stat-tile.js';
+import { OfTotal, StatTile, StatToggle } from './stat-tile.js';
 
 /**
  * What the merge order leads with: the counts, each a switch for the pull
@@ -40,101 +42,132 @@ import { OfTotal, StatTile } from './stat-tile.js';
  * left out where the repository does not run the queue, and `awaiting code
  * owner` where it declares no ruleset (`statusFiltersOf`).
  */
-export const MergeOrderFilters = memoNamed('MergeOrderFilters', () => {
-  const summary = readerSignals.summary.value;
-
-  const view = mergeOrderSignals.view.value;
-
-  const counts = mergeOrderSignals.counts.value;
-
-  const features = readerSignals.features.value;
-
-  const filters = useMemo(() => statusFiltersOf(features), [features]);
+export const MergeOrderFilters = (): JSX.Element => {
+  const { view: view$, counts: counts$ } = mergeOrderStore;
 
   return (
-    <div className={'merge-order-filters'}>
+    <div class={constant('merge-order-filters')}>
       <div
-        className={'summary-row'}
-        data-picking={Arr.isNonEmpty(view.onlyStatuses)}
+        class={constant('summary-row')}
+        data-picking={view(view$, ({ onlyStatuses }) =>
+          String(Arr.isNonEmpty(onlyStatuses)),
+        )}
       >
         <StatTile
           label={'open'}
-          total={counts.open.total}
-          value={counts.open.shown}
+          total={view(counts$, ({ open }) => open.total)}
+          value={view(counts$, ({ open }) => open.shown)}
         />
-        {filters.map((filter) => {
-          // Not known while what it is counted from is still being read.
-          const count =
-            summary[filter] === undefined ? undefined : counts.statuses[filter];
+        <For
+          items={view(reader.features, statusFiltersOf)}
+          key={(filter) => filter}
+        >
+          {(filter$) => {
+            // Read once: the tiles are keyed by it.
+            const filter = filter$.getSnapshot().value;
 
-          return (
-            <StatTile
-              key={filter}
-              label={STATUS_NAMES[filter]}
-              only={view.onlyStatuses.includes(filter)}
-              pressed={!view.hiddenStatuses.includes(filter)}
-              tone={(count?.shown ?? 0) > 0 ? STATUS_TONES[filter] : undefined}
-              total={count?.total}
-              value={count?.shown}
-              onOnly={toggleOnly[filter]}
-              onToggle={toggleStatus[filter]}
-            />
-          );
-        })}
+            // Not known while what it is counted from is still being read.
+            const count = derive(
+              [reader.summary, counts$],
+              (summary, counts): Count | undefined =>
+                summary[filter] === undefined
+                  ? undefined
+                  : counts.statuses[filter],
+            );
+
+            return (
+              <StatToggle
+                label={STATUS_NAMES[filter]}
+                only={view(view$, ({ onlyStatuses }) =>
+                  onlyStatuses.includes(filter),
+                )}
+                pressed={view(
+                  view$,
+                  ({ hiddenStatuses }) => !hiddenStatuses.includes(filter),
+                )}
+                tone={mapBindable(count, (c) =>
+                  (c?.shown ?? 0) > 0 ? STATUS_TONES[filter] : undefined,
+                )}
+                total={mapBindable(count, (c) => c?.total)}
+                value={mapBindable(count, (c) => c?.shown)}
+                onOnly={() => {
+                  mergeOrderStore.toggleOnly(filter);
+                }}
+                onToggle={() => {
+                  mergeOrderStore.toggleStatus(filter);
+                }}
+              />
+            );
+          }}
+        </For>
       </div>
 
-      <div className={'merge-order-controls'}>
-        <fieldset aria-label={'Priority'} className={'filter-group'}>
-          <span className={'filter-group-name'}>{'priority'}</span>
+      <div class={constant('merge-order-controls')}>
+        <fieldset
+          aria-label={constant('Priority')}
+          class={constant('filter-group')}
+        >
+          <span class={constant('filter-group-name')}>
+            {constant('priority')}
+          </span>
           {PRIORITIES.map((priority) => (
             <button
-              key={priority}
-              aria-pressed={!view.hiddenPriorities.includes(priority)}
-              className={'filter-chip'}
-              type={'button'}
-              onClick={togglePriority[priority]}
+              aria-pressed={view(view$, ({ hiddenPriorities }) =>
+                String(!hiddenPriorities.includes(priority)),
+              )}
+              class={constant('filter-chip')}
+              type={constant('button')}
+              onClick={() => {
+                mergeOrderStore.togglePriority(priority);
+              }}
             >
-              {PRIORITY_NAMES[priority]}
-              <span className={'filter-chip-count'}>
-                {counts.priorities[priority].shown}
+              {constant(PRIORITY_NAMES[priority])}
+              <span class={constant('filter-chip-count')}>
+                {view(counts$, ({ priorities }) => priorities[priority].shown)}
                 <OfTotal
-                  shown={counts.priorities[priority].shown}
-                  total={counts.priorities[priority].total}
+                  count={view(
+                    counts$,
+                    ({ priorities }) => priorities[priority],
+                  )}
                 />
               </span>
             </button>
           ))}
         </fieldset>
 
-        <fieldset aria-label={'Sort'} className={'theme-switch'}>
+        <fieldset
+          aria-label={constant('Sort')}
+          class={constant('theme-switch')}
+        >
           <button
-            aria-pressed={view.sort === 'order'}
-            className={'theme-switch-option'}
-            title={'In the order the trailers and the stacks declare.'}
-            type={'button'}
+            aria-pressed={view(view$, ({ sort }) => String(sort === 'order'))}
+            class={constant('theme-switch-option')}
+            title={constant(
+              'In the order the trailers and the stacks declare.',
+            )}
+            type={constant('button')}
             onClick={sortByOrder}
           >
-            {'merge order'}
+            {constant('merge order')}
           </button>
           <button
-            aria-pressed={view.sort === 'priority'}
-            className={'theme-switch-option'}
-            title={
-              'Each level of the tree by the highest priority in it and below it; no priority is between mid and low.'
-            }
-            type={'button'}
+            aria-pressed={view(view$, ({ sort }) =>
+              String(sort === 'priority'),
+            )}
+            class={constant('theme-switch-option')}
+            title={constant(
+              'Each level of the tree by the highest priority in it and below it; no priority is between mid and low.',
+            )}
+            type={constant('button')}
             onClick={sortByPriority}
           >
-            {'priority'}
+            {constant('priority')}
           </button>
         </fieldset>
       </div>
     </div>
   );
-});
-
-// Outside the component, so that each switch is handed the same function on
-// every render.
+};
 
 const STATUS_TONES = {
   queued: undefined,
@@ -150,42 +183,6 @@ const PRIORITY_NAMES = {
   low: 'low',
   none: 'none',
 } as const satisfies ReadonlyRecord<Priority, string>;
-
-const toggleStatus = Obj.fromEntries(
-  STATUS_FILTERS.map(
-    (filter) =>
-      [
-        filter,
-        () => {
-          mergeOrderStore.toggleStatus(filter);
-        },
-      ] as const,
-  ),
-);
-
-const toggleOnly = Obj.fromEntries(
-  STATUS_FILTERS.map(
-    (filter) =>
-      [
-        filter,
-        () => {
-          mergeOrderStore.toggleOnly(filter);
-        },
-      ] as const,
-  ),
-);
-
-const togglePriority = Obj.fromEntries(
-  PRIORITIES.map(
-    (priority) =>
-      [
-        priority,
-        () => {
-          mergeOrderStore.togglePriority(priority);
-        },
-      ] as const,
-  ),
-);
 
 const sortBy = (sort: MergeOrderSort) => (): void => {
   mergeOrderStore.setSort(sort);

@@ -1,7 +1,6 @@
-import { memoNamed } from 'preact-utils';
+import { constant, derive, For, If, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
-import type { IssueList } from '../load-report.mjs';
-import { issuesListSignals, issuesViewSignals } from '../store/index.mjs';
+import { issuesListStore, issuesViewStore, reader } from '../store/index.mjs';
 import { ExternalLink } from './external-link.js';
 import { IssueDagDoneToggle } from './issue-dag-done-toggle.js';
 import { IssueDagZoom } from './issue-dag-zoom.js';
@@ -11,12 +10,6 @@ import { IssuesViewSwitch } from './issues-view-switch.js';
 import { LabelChip } from './label-chip.js';
 import { LoadMoreIssues } from './load-more-issues.js';
 import { Timestamp } from './timestamp.js';
-
-type Props = Readonly<{
-  issues: IssueList;
-  /** Whether the list has not been read yet. */
-  reading: boolean;
-}>;
 
 /**
  * What is open that is not a pull request, most recently updated first, or
@@ -39,88 +32,139 @@ type Props = Readonly<{
  * a switch beside the List / DAG one for whether it draws what is done, and the zoom
  * at the other end of the row.
  */
-export const IssuesSection = memoNamed<Props>(
-  'IssuesSection',
-  ({ issues: { items, totalCount, endCursor }, reading }) => {
-    const shown = issuesListSignals.items.value;
+export const IssuesSection = (): JSX.Element => {
+  const issues$ = reader.issues;
 
-    return (
-      <section className={'section'}>
-        <h2 className={'section-title'}>
-          {reading
+  // Whether the list has not been read yet.
+  const reading = view(reader.reading, (parts) => parts.includes('issues'));
+
+  const dag = view(issuesViewStore.view, (shown) => shown === 'dag');
+
+  return (
+    <section class={constant('section')}>
+      <h2 class={constant('section-title')}>
+        {derive([reading, issues$], (isReading, { items, totalCount }) =>
+          isReading
             ? 'Open issues'
             : items.length < totalCount
               ? `Open issues (${items.length} of ${totalCount} read)`
-              : `Open issues (${totalCount})`}
-        </h2>
+              : `Open issues (${totalCount})`,
+        )}
+      </h2>
 
-        <div className={'issues-toolbar'}>
-          <IssuesViewSwitch />
+      <div class={constant('issues-toolbar')}>
+        <IssuesViewSwitch />
 
-          {issuesViewSignals.view.value === 'dag' ? (
-            <IssueDagDoneToggle />
-          ) : undefined}
+        <If
+          cond={dag}
+          then={
+            <>
+              <IssueDagDoneToggle />
+              <IssueDagZoom />
+            </>
+          }
+        />
+      </div>
 
-          {issuesViewSignals.view.value === 'dag' ? (
-            <IssueDagZoom />
-          ) : undefined}
-        </div>
+      <If
+        cond={derive(
+          [reading, issuesViewStore.view, issues$],
+          (isReading, shown, { items }) =>
+            !isReading && shown === 'list' && Arr.isNonEmpty(items),
+        )}
+        then={<IssuesListFilters />}
+      />
 
-        {!reading &&
-        issuesViewSignals.view.value === 'list' &&
-        Arr.isNonEmpty(items) ? (
-          <IssuesListFilters />
-        ) : undefined}
+      <If
+        cond={reading}
+        then={
+          <p class={constant('section-note')}>{constant('Reading GitHub…')}</p>
+        }
+        else={<If cond={dag} then={<IssueDag />} else={<IssueList />} />}
+      />
 
-        {reading ? (
-          <p className={'section-note'}>{'Reading GitHub…'}</p>
-        ) : issuesViewSignals.view.value === 'dag' ? (
-          <IssueDag />
-        ) : Arr.isEmpty(items) ? (
-          <p className={'section-note'}>{'No open issues.'}</p>
-        ) : Arr.isEmpty(shown) ? (
-          <p className={'section-note'}>
-            {issuesListSignals.query.value.trim() === ''
-              ? 'No open issue has the priorities and labels picked.'
-              : 'No open issue with the priorities and labels picked has a title matching the search.'}
+      <If
+        cond={view(issues$, ({ endCursor }) => endCursor !== undefined)}
+        then={
+          <LoadMoreIssues
+            notListed={view(
+              issues$,
+              ({ items, totalCount }) => totalCount - items.length,
+            )}
+          />
+        }
+      />
+    </section>
+  );
+};
+
+const IssueList = (): JSX.Element => (
+  <If
+    cond={view(reader.issues, ({ items }) => Arr.isEmpty(items))}
+    then={<p class={constant('section-note')}>{constant('No open issues.')}</p>}
+    else={
+      <If
+        cond={view(issuesListStore.items, Arr.isEmpty)}
+        then={
+          <p class={constant('section-note')}>
+            {view(issuesListStore.query, (query) =>
+              query.trim() === ''
+                ? 'No open issue has the priorities and labels picked.'
+                : 'No open issue with the priorities and labels picked has a title matching the search.',
+            )}
           </p>
-        ) : (
-          <ul className={'issue-list'}>
-            {shown.map((issue) => (
-              <li key={issue.number} className={'issue-item'}>
-                <div className={'pull-request-heading'}>
-                  <span
-                    className={'pull-request-number'}
-                  >{`#${issue.number}`}</span>
-                  <ExternalLink href={issue.url} variant={'pull-request-title'}>
-                    {issue.title}
-                  </ExternalLink>
-                </div>
-
-                <div className={'pull-request-row'}>
-                  <Timestamp iso={issue.updatedAt} label={'updated'} />
-
-                  <span>{`by ${issue.author}`}</span>
-
-                  {issue.comments > 0 ? (
-                    <span>
-                      {`${issue.comments} comment${issue.comments === 1 ? '' : 's'}`}
+        }
+        else={
+          <ul class={constant('issue-list')}>
+            <For items={issuesListStore.items} key={(issue) => issue.number}>
+              {(issue$) => (
+                <li class={constant('issue-item')}>
+                  <div class={constant('pull-request-heading')}>
+                    <span class={constant('pull-request-number')}>
+                      {view(issue$, (issue) => `#${issue.number}`)}
                     </span>
-                  ) : undefined}
+                    <ExternalLink
+                      href={view(issue$, (issue) => issue.url)}
+                      variant={'pull-request-title'}
+                    >
+                      {view(issue$, (issue) => issue.title)}
+                    </ExternalLink>
+                  </div>
 
-                  {issue.labels.map((label) => (
-                    <LabelChip key={label.name} label={label} />
-                  ))}
-                </div>
-              </li>
-            ))}
+                  <div class={constant('pull-request-row')}>
+                    <Timestamp
+                      iso={view(issue$, (issue) => issue.updatedAt)}
+                      label={'updated'}
+                    />
+
+                    <span>{view(issue$, (issue) => `by ${issue.author}`)}</span>
+
+                    <If
+                      cond={view(issue$, (issue) => issue.comments > 0)}
+                      then={
+                        <span>
+                          {view(
+                            issue$,
+                            ({ comments }) =>
+                              `${comments} comment${comments === 1 ? '' : 's'}`,
+                          )}
+                        </span>
+                      }
+                    />
+
+                    <For
+                      items={view(issue$, (issue) => issue.labels)}
+                      key={(label) => label.name}
+                    >
+                      {(label$) => <LabelChip label={label$} />}
+                    </For>
+                  </div>
+                </li>
+              )}
+            </For>
           </ul>
-        )}
-
-        {endCursor === undefined ? undefined : (
-          <LoadMoreIssues notListed={totalCount - items.length} />
-        )}
-      </section>
-    );
-  },
+        }
+      />
+    }
+  />
 );
