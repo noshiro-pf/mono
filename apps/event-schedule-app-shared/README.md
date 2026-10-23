@@ -24,6 +24,8 @@ npm, and this copy is private.
   `Arr.asNonEmptyArray` rather than written directly.
 - `Obj.hasKeyValue` has no successor; [`src/utils`](./src/utils) carries it,
   because the type guards throughout this package are written in terms of it.
+  It is exported, and `event-schedule-app` takes it from here rather than
+  carrying a copy.
 - `Object.hasOwn(a, 'k') ? a.k : …` became `hasKey(a, 'k') ? a.k : …`, which is
   both the repository convention and what makes the property access type-check.
 

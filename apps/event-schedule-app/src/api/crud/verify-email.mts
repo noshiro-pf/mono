@@ -1,7 +1,7 @@
+import { hasKeyValue } from 'event-schedule-app-shared';
 import { httpsCallable } from 'firebase/functions';
 import { Result, isRecord, isString, unknownToString } from 'ts-data-forge';
 import { fbFunctions } from '../../initialize-firebase.mjs';
-import { hasKeyValue } from '../../utils-ported/index.mjs';
 
 const fbVerifyEmail = httpsCallable(fbFunctions, 'verifyEmail');
 
