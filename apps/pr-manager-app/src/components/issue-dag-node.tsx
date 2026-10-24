@@ -31,8 +31,9 @@ type Props = Readonly<{ placed$: InitializedObservable<PlacedNode> }>;
  * right, both in ink rather than a colour, since the shape and the colour
  * already say what it is and where it stands; the number is the quieter of
  * the two, as what identifies a node rather than what ranks it. A high one
- * also gets a second outline around the shape, and a low one is drawn faint.
- * The number, the state and the priority are in the tooltip, which is also
+ * also gets a second outline around the shape, and a low one is drawn faint,
+ * as is one labelled `pending`, held back for now. The number, the state,
+ * the priority and whether it is pending are in the tooltip, which is also
  * what a screen reader announces.
  *
  * A row of the DAG keyed by its number, so the number, and with it the kind,
@@ -51,6 +52,7 @@ export const IssueDagNode = ({ placed$ }: Props): JSX.Element => {
       <g
         class={constant('issue-dag-node')}
         data-kind={constant(kind)}
+        data-pending={view(placed$, ({ node }) => String(node.pending))}
         data-priority={view(placed$, ({ node }) => node.priority)}
         data-state={view(placed$, ({ node }) => node.state)}
         transform={view(placed$, ({ x, y }) => `translate(${x} ${y})`)}

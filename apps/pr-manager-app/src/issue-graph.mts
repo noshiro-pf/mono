@@ -9,12 +9,14 @@
  * request that closes it, which is the work on that issue under way. How an
  * issue stands is `pr-report-core`'s `decideStartStates`; this adds where
  * everything else stands, whether a startable issue is being worked on, and
- * the `priority:*` label of what the page read the labels of.
+ * the `priority:*` label of what the page read the labels of, and whether
+ * it is labelled `pending`.
  */
 
 import { decideStartStates, type StartState } from 'pr-report-core';
 import type { StrictPick } from 'ts-type-forge';
 import type { Entry, IssueItem, ReferencedItem } from './load-report.mjs';
+import { isPending } from './pending.mjs';
 import { priorityOf, type Priority } from './priority.mjs';
 
 /**
@@ -41,6 +43,11 @@ export type IssueGraphNode = Readonly<{
    * pull request have their labels read; anything else is `none`.
    */
   priority: Priority;
+  /**
+   * Whether it is labelled `pending`, which its author puts on what is held
+   * back for now; read where the priority is, and `false` elsewhere.
+   */
+  pending: boolean;
 }>;
 
 export type IssueGraphEdge = Readonly<{
@@ -117,6 +124,7 @@ export const buildIssueGraph = ({
           ? 'in-progress'
           : state,
       priority: priorityOf(issue.labels),
+      pending: isPending(issue.labels),
     };
   });
 
@@ -137,6 +145,7 @@ export const buildIssueGraph = ({
         url: pull.url,
         state: 'open',
         priority: priorityOf(pull.labels),
+        pending: isPending(pull.labels),
       };
     }
 
@@ -150,6 +159,7 @@ export const buildIssueGraph = ({
           url: `${repoUrl}/issues/${number}`,
           state: 'unknown',
           priority: 'none',
+          pending: false,
         }
       : {
           number,
@@ -158,6 +168,7 @@ export const buildIssueGraph = ({
           url: item.url,
           state: item.status === 'waiting' ? 'open' : item.status,
           priority: 'none',
+          pending: false,
         };
   });
 
@@ -195,19 +206,30 @@ export const buildIssueGraph = ({
  * the node is why. The graph given is handed back when nothing in it is
  * done, so a graph that is not changed by this is not laid out again.
  */
-export const omitDone = (graph: IssueGraph): IssueGraph => {
-  const done = new Set(
-    graph.nodes
-      .filter(({ state }) => state === 'done')
-      .map(({ number }) => number),
-  );
+export const omitDone = (graph: IssueGraph): IssueGraph =>
+  omitNodes(graph, ({ state }) => state === 'done');
 
-  return done.size === 0
+/**
+ * The graph without what is labelled `pending`, and without the edges that
+ * run from it or to it. How the rest stands is left as it was: an issue
+ * waiting on one still waits, which its tooltip says. The graph given is
+ * handed back when nothing in it is pending.
+ */
+export const omitPending = (graph: IssueGraph): IssueGraph =>
+  omitNodes(graph, ({ pending }) => pending);
+
+const omitNodes = (
+  graph: IssueGraph,
+  omitted: (node: IssueGraphNode) => boolean,
+): IssueGraph => {
+  const gone = new Set(graph.nodes.filter(omitted).map(({ number }) => number));
+
+  return gone.size === 0
     ? graph
     : {
-        nodes: graph.nodes.filter(({ number }) => !done.has(number)),
+        nodes: graph.nodes.filter(({ number }) => !gone.has(number)),
         edges: graph.edges.filter(
-          ({ from, to }) => !done.has(from) && !done.has(to),
+          ({ from, to }) => !gone.has(from) && !gone.has(to),
         ),
       };
 };

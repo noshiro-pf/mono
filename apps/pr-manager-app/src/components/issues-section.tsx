@@ -3,6 +3,7 @@ import { Arr } from 'ts-data-forge';
 import { issuesListStore, issuesViewStore, reader } from '../store/index.mjs';
 import { ExternalLink } from './external-link.js';
 import { IssueDagDoneToggle } from './issue-dag-done-toggle.js';
+import { IssueDagPendingToggle } from './issue-dag-pending-toggle.js';
 import { IssueDagZoom } from './issue-dag-zoom.js';
 import { IssueDag } from './issue-dag.js';
 import { IssuesListFilters } from './issues-list-filters.js';
@@ -13,9 +14,10 @@ import { Timestamp } from './timestamp.js';
 
 /**
  * What is open that is not a pull request, most recently updated first, or
- * by priority, and narrowed by priority, label and a search of the titles
- * (`issues-list-filters.tsx`). The DAG is not narrowed by any of them: what
- * an issue waits for is drawn whole.
+ * by priority, and narrowed by priority, `pending`, label and a search of
+ * the titles (`issues-list-filters.tsx`). The DAG is not narrowed by any of
+ * them: what an issue waits for is drawn whole, save what it is told to
+ * leave out itself.
  *
  * Last, because it is the one section that is not about the queue: a reader
  * asks "what is in flight" first and "what is waiting to be started" second.
@@ -29,7 +31,8 @@ import { Timestamp } from './timestamp.js';
  * is there while some are not listed, for a page that failed.
  *
  * Or, switched to it, the DAG of what each waits for (`issue-dag.tsx`), with
- * a switch beside the List / DAG one for whether it draws what is done, and the zoom
+ * switches beside the List / DAG one for whether it draws what is done and
+ * what is pending, and the zoom
  * at the other end of the row.
  */
 export const IssuesSection = (): JSX.Element => {
@@ -60,6 +63,7 @@ export const IssuesSection = (): JSX.Element => {
           then={
             <>
               <IssueDagDoneToggle />
+              <IssueDagPendingToggle />
               <IssueDagZoom />
             </>
           }

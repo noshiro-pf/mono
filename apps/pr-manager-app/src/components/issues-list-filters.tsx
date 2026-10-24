@@ -10,7 +10,8 @@ import { OfTotal } from './stat-tile.js';
 /**
  * What the list of open issues leads with: a search of the titles, matched
  * as it is typed whatever the case, and not kept across visits; the priorities, switches as the
- * merge order's are (`merge-order-filters.tsx`); the labels, each a pick;
+ * merge order's are (`merge-order-filters.tsx`); `pending`, a switch as
+ * well, there while an open issue carries it; the labels, each a pick;
  * and the order. What each does is `issues-list-view.mts`; the choice is
  * kept across visits (`settings-db.mts`).
  *
@@ -63,6 +64,31 @@ export const IssuesListFilters = (): JSX.Element => {
           </button>
         ))}
       </fieldset>
+
+      <If
+        cond={view(counts$, ({ pending }) => pending.total > 0)}
+        then={
+          <button
+            aria-pressed={view(view$, ({ hidePending }) =>
+              String(!hidePending),
+            )}
+            class={constant('filter-chip')}
+            title={view(view$, ({ hidePending }) =>
+              hidePending
+                ? 'Show the issues labelled pending again'
+                : 'Leave out the issues labelled pending',
+            )}
+            type={constant('button')}
+            onClick={togglePending}
+          >
+            {constant('pending')}
+            <span class={constant('filter-chip-count')}>
+              {view(counts$, ({ pending }) => pending.shown)}
+              <OfTotal count={view(counts$, ({ pending }) => pending)} />
+            </span>
+          </button>
+        }
+      />
 
       <If
         cond={view(counts$, ({ labels }) => Arr.isNonEmpty(labels))}
@@ -158,6 +184,10 @@ const LabelPick = ({
       </span>
     </button>
   );
+};
+
+const togglePending = (): void => {
+  issuesListStore.togglePending();
 };
 
 const sortBy = (sort: IssueSort) => (): void => {

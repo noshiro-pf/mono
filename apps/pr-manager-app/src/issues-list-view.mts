@@ -13,6 +13,12 @@
  * question a reader brings to the list is "what bugs are open", not "what
  * is open that is not a bug".
  *
+ * **Pending** is the `pending` label, which an author puts on what is held
+ * back for now. It is a switch rather than one of the labels, as the merge
+ * order's `pending` is (`merge-order-view.mts`): what a reader wants of it is
+ * to leave it out. Switched off, an issue carrying it is hidden, whatever
+ * else it is.
+ *
  * **The search** is what the reader types: an issue is shown only when its
  * title holds it, whatever the case, and still not when its priority or its
  * labels leave it out. It narrows the list there and then, so it is not kept
@@ -25,10 +31,12 @@
  * update, by default; what the reader changes is kept (`settings-db.mts`).
  */
 
+import { PENDING_LABEL } from 'pr-report-core';
 import { Arr, hasKey, isRecord, isString } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { IssueItem } from './load-report.mjs';
 import { known, toggled, type Count } from './merge-order-view.mjs';
+import { isPending } from './pending.mjs';
 import {
   isPriorityLabel,
   PRIORITIES,
@@ -47,12 +55,15 @@ export type IssuesListView = Readonly<{
   hiddenPriorities: readonly Priority[];
   /** The labels picked, in name order; nothing picked is no narrowing. */
   onlyLabels: readonly string[];
+  /** Whether what is labelled `pending` is left out. */
+  hidePending: boolean;
   sort: IssueSort;
 }>;
 
 export const DEFAULT_ISSUES_LIST_VIEW: IssuesListView = {
   hiddenPriorities: [],
   onlyLabels: [],
+  hidePending: false,
   sort: 'updated',
 } as const;
 
@@ -72,7 +83,8 @@ export type LabelCount = Readonly<{
 export type IssuesListCounts = Readonly<{
   open: Count;
   priorities: ReadonlyRecord<Priority, Count>;
-  /** In name order. */
+  pending: Count;
+  /** In name order; neither the priorities nor `pending`. */
   labels: readonly LabelCount[];
 }>;
 
@@ -82,6 +94,7 @@ export const isIssueShown = (
   query: string = '',
 ): boolean =>
   !view.hiddenPriorities.includes(priorityOf(issue.labels)) &&
+  !(view.hidePending && isPending(issue.labels)) &&
   (!Arr.isNonEmpty(view.onlyLabels) ||
     issue.labels.some((label) => view.onlyLabels.includes(label.name))) &&
   matchesIssueTitle(issue, query);
@@ -145,7 +158,9 @@ export const countIssues = (
   const colors = new Map(
     items
       .flatMap(({ labels }) => labels)
-      .filter((label) => !isPriorityLabel(label.name))
+      .filter(
+        (label) => !isPriorityLabel(label.name) && label.name !== PENDING_LABEL,
+      )
       .map((label) => [label.name, label.color]),
   );
 
@@ -161,6 +176,12 @@ export const countIssues = (
       low: underPriority('low'),
       none: underPriority('none'),
     },
+    pending: countUnder(
+      items,
+      (issue) => isPending(issue.labels),
+      { ...view, hidePending: false },
+      query,
+    ),
     labels: names.map((labelName) => ({
       name: labelName,
       color: colors.get(labelName),
@@ -197,6 +218,9 @@ export const toggleLabel = (
         ),
   }) as const;
 
+export const togglePendingIssues = (view: IssuesListView): IssuesListView =>
+  ({ ...view, hidePending: !view.hidePending }) as const;
+
 export const withIssueSort = (
   view: IssuesListView,
   sort: IssueSort,
@@ -227,6 +251,7 @@ export const parseIssuesListView = (stored: unknown): IssuesListView => {
           a.localeCompare(b),
         )
       : [],
+    hidePending: hasKey(stored, 'hidePending') && stored.hidePending === true,
     sort:
       hasKey(stored, 'sort') && stored.sort === 'priority'
         ? 'priority'

@@ -2,6 +2,7 @@ import type { Label } from 'pr-report-core';
 import {
   buildIssueGraph,
   omitDone,
+  omitPending,
   type OpenPullRequestFacts,
 } from './issue-graph.mjs';
 import type { IssueItem, ReferencedItem } from './load-report.mjs';
@@ -104,6 +105,7 @@ describe(buildIssueGraph, () => {
         url: 'https://github.com/o/r/issues/5',
         state: 'attention',
         priority: 'none',
+        pending: false,
       },
       {
         number: 9,
@@ -112,6 +114,7 @@ describe(buildIssueGraph, () => {
         url: 'https://github.com/o/r/issues/9',
         state: 'unknown',
         priority: 'none',
+        pending: false,
       },
     ]);
   });
@@ -199,6 +202,30 @@ describe(buildIssueGraph, () => {
     );
   });
 
+  test('marks what is labelled pending, of a listed issue and of an open pull request', () => {
+    const graph = build({
+      issues: [
+        issue(1, [], ['pending']),
+        issue(2, [1], ['bug']),
+        issue(3, [4]),
+      ],
+      referenced: [referencedItem(4, 'issue', 'waiting')],
+      pulls: [pull(7, [2], ['pending'])],
+    });
+
+    assert.deepStrictEqual(
+      graph.nodes.map(({ number, pending }) => [number, pending]),
+      [
+        [1, true],
+        [2, false],
+        [3, false],
+        // What a declaration names past the list: its labels are not read.
+        [4, false],
+        [7, true],
+      ],
+    );
+  });
+
   test('marks the issues on a cycle', () => {
     const graph = build({ issues: [issue(1, [2]), issue(2, [1])] });
 
@@ -253,6 +280,34 @@ describe(omitDone, () => {
     const graph = build({ issues: [issue(1, []), issue(2, [1])] });
 
     assert.strictEqual(omitDone(graph), graph);
+  });
+});
+
+describe(omitPending, () => {
+  test('takes out what is pending, and every edge that runs from it or to it, leaving how the rest stands', () => {
+    const graph = build({
+      issues: [issue(1, [], ['pending']), issue(2, [1]), issue(3, [])],
+      pulls: [pull(7, [3], ['pending'])],
+    });
+
+    const shown = omitPending(graph);
+
+    assert.deepStrictEqual(
+      shown.nodes.map(({ number, state }) => [number, state]),
+      [
+        // Still waiting on #1, which is drawn no more.
+        [2, 'blocked'],
+        [3, 'in-progress'],
+      ],
+    );
+
+    assert.deepStrictEqual(shown.edges, []);
+  });
+
+  test('hands back the graph it was given when nothing in it is pending', () => {
+    const graph = build({ issues: [issue(1, []), issue(2, [1])] });
+
+    assert.strictEqual(omitPending(graph), graph);
   });
 });
 
