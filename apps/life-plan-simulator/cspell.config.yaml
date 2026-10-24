@@ -1,0 +1,12 @@
+version: '0.2'
+# Inherit the repository-wide settings. Required: when cspell runs with
+# this directory as its cwd, it stops at the nearest config and would
+# otherwise lose the root dictionaries and ignorePaths.
+import:
+  - '../../.cspell.config.yaml'
+words:
+  # 協会けんぽ（全国健康保険協会）, romanized in the names under `src/data/`.
+  - kyoukai
+  - kenpo
+  # 少額投資非課税制度, a sheet of the spreadsheet named in the README.
+  - NISA

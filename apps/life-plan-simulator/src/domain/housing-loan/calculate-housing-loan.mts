@@ -1,5 +1,5 @@
 import { Num } from 'ts-data-forge';
-import { type HousingLoanParams, type MonthlyPaymentResult } from './types.mjs';
+import type { HousingLoanParams, MonthlyPaymentResult } from './types.mjs';
 
 /**
  * 等額返済額を計算（元利均等返済）
@@ -14,9 +14,9 @@ const calculateFixedMonthlyPayment = (
   numberOfPayments: number,
 ): number => {
   if (monthlyRate === 0) {
-    if (!Num.isNonZero(numberOfPayments)) return 0;
-
-    return Num.div(principal, numberOfPayments);
+    return !Num.isNonZero(numberOfPayments)
+      ? 0
+      : Num.div(principal, numberOfPayments);
   }
 
   const r = monthlyRate;
@@ -25,9 +25,9 @@ const calculateFixedMonthlyPayment = (
 
   const denominator = (1 + r) ** n - 1;
 
-  if (!Num.isNonZero(denominator)) return 0;
-
-  return Num.div(principal * r * (1 + r) ** n, denominator);
+  return !Num.isNonZero(denominator)
+    ? 0
+    : Num.div(principal * r * (1 + r) ** n, denominator);
 };
 
 /**
