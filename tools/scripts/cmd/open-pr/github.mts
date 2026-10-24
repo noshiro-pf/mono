@@ -4,15 +4,14 @@ import dedent from 'dedent';
 import { isSafeRefName } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { git } from '../unblock-prs/github.mjs';
-import { sh } from '../unblock-prs/util.mjs';
 import {
   graphql,
   resolveRepo,
   resolveToken,
   rest,
   type ApiContext,
-} from './api.mjs';
+} from '../../lib/github-api.mjs';
+import { git, sh } from '../../lib/shell.mjs';
 import {
   PullRequestListResponseSchema,
   PullRequestResponseSchema,

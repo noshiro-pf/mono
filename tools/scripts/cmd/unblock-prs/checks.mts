@@ -5,29 +5,31 @@
 
 import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { git, parseJson } from './github.mjs';
+import { parseJson } from '../../lib/json.mjs';
+import { git } from '../../lib/shell.mjs';
+import { jsonFields } from './github.mjs';
 import type { ChecksSummary } from './types.mjs';
 
 /** The fields read from `gh pr checks --json`. */
-const CheckListSchema = t.array(
-  t.record({
-    name: t.string(),
-    /** `pass` | `fail` | `pending` | `skipping` | `cancel` */
-    bucket: t.string(),
-    link: t.string(),
-    /** ISO 8601; GitHub's zero time before the check has started. */
-    startedAt: t.string(),
-    /** ISO 8601; GitHub's zero time before the check has finished. */
-    completedAt: t.string(),
-  }),
-);
+const CheckSchema = t.record({
+  name: t.string(),
+  /** `pass` | `fail` | `pending` | `skipping` | `cancel` */
+  bucket: t.string(),
+  link: t.string(),
+  /** ISO 8601; GitHub's zero time before the check has started. */
+  startedAt: t.string(),
+  /** ISO 8601; GitHub's zero time before the check has finished. */
+  completedAt: t.string(),
+});
 
-export type ReportedCheck = t.TypeOf<typeof CheckListSchema>[number];
+const CheckListSchema = t.array(CheckSchema);
+
+export type ReportedCheck = t.TypeOf<typeof CheckSchema>;
 
 /** A check on the head that has not finished, and when it started. */
 export type RunningCheck = Readonly<{ name: string; startedAt: string }>;
 
-const CHECK_FIELDS = 'name,bucket,link,startedAt,completedAt';
+const CHECK_FIELDS = jsonFields(CheckSchema);
 
 /**
  * The checks that gate the merge, as GitHub reports them for the head commit.
@@ -47,7 +49,7 @@ export const listRequiredChecks = async (
     return listed.value.includes('no checks reported') ? Result.ok([]) : listed;
   }
 
-  return parseJson(listed.value, CheckListSchema);
+  return parseJson(listed.value, CheckListSchema, `gh pr checks ${prNumber}`);
 };
 
 /**
@@ -69,10 +71,12 @@ export const listRunningChecks = async (
     return listed.value.includes('no checks reported') ? Result.ok([]) : listed;
   }
 
-  return Result.map(parseJson(listed.value, CheckListSchema), (checks) =>
-    checks
-      .filter((check) => check.bucket === 'pending')
-      .map(({ name, startedAt }) => ({ name, startedAt })),
+  return Result.map(
+    parseJson(listed.value, CheckListSchema, `gh pr checks ${prNumber}`),
+    (checks) =>
+      checks
+        .filter((check) => check.bucket === 'pending')
+        .map(({ name, startedAt }) => ({ name, startedAt })),
   );
 };
 

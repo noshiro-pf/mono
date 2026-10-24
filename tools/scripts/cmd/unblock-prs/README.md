@@ -724,7 +724,10 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `options.mts`           | コマンドライン                                                |
 | `types.mts`             | 共有される型とスキーマ                                        |
 | `constants.mts`         | 待ち時間と諦めるまでの回数                                    |
-| `util.mts`              | quoting、ログ、停止シグナル                                   |
+| `util.mts`              | 停止シグナル                                                  |
+
+`gh` / `git` を走らせる `git()`、quoting の `sh()`、ログの `log()` は
+`open-pr` などほかのコマンドも使うので `tools/scripts/lib/` にあります。
 
 トレーラのパーサと閉路検出、どの PR がどの PR に積まれているか、ラベルの文字列、
 `CODEOWNERS` の判定、見送りの comment の隠しコメントとチェックボックスの書式、
@@ -1504,7 +1507,11 @@ the pull request the other's and nobody moved it (#2267).
 | `options.mts`           | the command line                                              |
 | `types.mts`             | the shapes every module passes around                         |
 | `constants.mts`         | how long it waits, and how long before it gives up            |
-| `util.mts`              | quoting, logging, the stop signal                             |
+| `util.mts`              | the stop signal                                               |
+
+The runner for `gh` and `git` (`git()`), the quoting (`sh()`) and the log
+line (`log()`) are used by `open-pr` and the other commands too, and live in
+`tools/scripts/lib/`.
 
 The trailer parser, the cycle detection, which pull request is stacked on
 which, the label strings, the `CODEOWNERS` rules, the set-aside comment's

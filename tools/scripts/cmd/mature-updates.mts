@@ -498,6 +498,11 @@ const describeSelection = (
 
 const stripTagPrefix = (tag: string): string => tag.replace(/^v/u, '');
 
+/**
+ * Not `tools/scripts/lib/github-api.mts`, which every other command calls the
+ * API through: it imports `ts-data-forge`, and this runs before
+ * `pnpm install` (see `main`). The token is read in the same order.
+ */
 const createGitHubApi = (): GitHubApi => {
   const baseUrl = (
     process.env['GITHUB_API_URL'] ?? 'https://api.github.com'

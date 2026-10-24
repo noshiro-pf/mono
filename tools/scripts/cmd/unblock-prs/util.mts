@@ -1,9 +1,11 @@
 /**
- * The small things every other module here needs: quoting, logging, and the
- * stop signal.
+ * The small things every other module here needs: the stop signal and what
+ * listens to it. Quoting and logging are shared with the other commands, in
+ * `tools/scripts/lib/`.
  */
 
 import { setTimeout as sleep } from 'node:timers/promises';
+import { log } from '../../lib/log.mjs';
 
 /**
  * Aborted by SIGINT / SIGTERM; every sleep listens to it.
@@ -28,10 +30,6 @@ const stopController = new AbortController();
  * rest of any block that has already tested it.
  */
 export const stopRequested = (): boolean => stopController.signal.aborted;
-
-/** Single-quotes a string for a POSIX shell. */
-export const sh = (value: string): string =>
-  `'${value.replaceAll("'", String.raw`'\''`)}'` as const;
 
 /**
  * The SHA `git ls-remote` lists for `branch`, by its whole ref name. A ref
@@ -61,21 +59,6 @@ export const pause = async (ms: number): Promise<void> => {
     () => undefined,
   );
 };
-
-export const log = (message: string): void => {
-  console.info(logLine(message));
-};
-
-/**
- * `message` stamped with the time in the machine's time zone (`TZ`), because
- * the person reading the log reads it against their own clock. The offset
- * stays in the stamp, so a line pasted elsewhere still names one instant.
- */
-export const logLine = (
-  message: string,
-  now: Temporal.ZonedDateTime = Temporal.Now.zonedDateTimeISO(),
-): string =>
-  `[${now.toString({ smallestUnit: 'millisecond', timeZoneName: 'never' })}] ${message}` as const;
 
 export const installStopHandlers = (): void => {
   const onSignal = (signal: NodeJS.Signals): void => {

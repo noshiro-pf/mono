@@ -61,7 +61,7 @@ pnpm run pr-report -- --issues-limit 10 # open な issue の最大件数
 
 ### トークン
 
-`GITHUB_TOKEN` か `GH_TOKEN` があれば使い、無ければ無認証で読みます。mono は
+`GH_TOKEN` か `GITHUB_TOKEN` があれば（この順に）使い、無ければ無認証で読みます。mono は
 public なので無認証でも動き、1回のレポートは匿名の 60 requests/hour に収まりま
 す（PR 1本あたり約3リクエスト = 20本程度まで。issue 一覧は全体で1リクエスト）。
 
@@ -170,7 +170,7 @@ The merged section is bounded twice, by days (7) and by count (20). The cap is
 about reading rather than about fitting: past twenty the section stops being
 a list and starts being an archive.
 
-`GITHUB_TOKEN` or `GH_TOKEN` is used when set. Without one the public API
+`GH_TOKEN` or `GITHUB_TOKEN`, in that order, is used when set. Without one the public API
 allows 60 requests an hour — about twenty pull requests at roughly three
 requests each, which one report a day fits inside — and the issue links are
 the ones the bodies declare with a closing keyword rather than GitHub's own

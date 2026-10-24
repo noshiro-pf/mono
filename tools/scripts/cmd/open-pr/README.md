@@ -46,7 +46,7 @@ stack する PR（下記）ならなおさらで、base は ruleset の掛から
 ### 認証情報
 
 GitHub の API を直接叩きます（`gh` は要りません）。トークンは
-**`GITHUB_TOKEN` → `GH_TOKEN` → `gh auth token`** の順に探します。コンテナや
+**`GH_TOKEN` → `GITHUB_TOKEN` → `gh auth token`** の順に探します（前2つは `gh` 自身が読む順で、`gh` を使う `unblock-prs` と同じアカウントになるように揃えています）。コンテナや
 runner には前2つが既にあり、`gh` で設定しただけのマシンでは3つ目が拾われるので、
 どちらでも何も書き出さずに動きます。どれも無ければその旨を言って止まります。
 
@@ -152,7 +152,9 @@ It goes on after `skip-ci`, so that the run its `labeled` event starts finds
 the checks held.
 
 It calls the GitHub API directly; `gh` is not required. The token is looked
-for in **`GITHUB_TOKEN`, then `GH_TOKEN`, then `gh auth token`** — the first
+for in **`GH_TOKEN`, then `GITHUB_TOKEN`, then `gh auth token`** — the order
+`gh` itself reads the first two in, so that this acts as the account
+`unblock-prs` does — the first
 two are already set in a container or on a runner, and the third picks up a
 machine set up with `gh` alone, so neither kind of machine has to export
 anything. `gh` was dropped because the places this command is most useful are

@@ -2,6 +2,7 @@
 
 import { isMergeableState } from 'pr-report-core';
 import { isRecord, Result } from 'ts-data-forge';
+import { log } from '../../lib/log.mjs';
 import {
   describeWaitingOn,
   listRequiredChecks,
@@ -24,7 +25,7 @@ import {
   describeTimeout,
 } from './set-aside-detail.mjs';
 import type { PullRequest, Watched } from './types.mjs';
-import { log, pause, stopRequested } from './util.mjs';
+import { pause, stopRequested } from './util.mjs';
 
 /**
  * Polls one pull request until it merges or until something says it will not.

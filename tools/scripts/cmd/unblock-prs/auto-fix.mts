@@ -15,9 +15,11 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { statesFromCheckRuns, type ContextState } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
-import { git, listCheckRuns, remoteSha, removeWorktree } from './github.mjs';
+import { log } from '../../lib/log.mjs';
+import { git, sh } from '../../lib/shell.mjs';
+import { listCheckRuns, remoteSha, removeWorktree } from './github.mjs';
 import type { AutoFixed, PullRequest } from './types.mjs';
-import { lastLines, log, sh, stopRequested } from './util.mjs';
+import { lastLines, stopRequested } from './util.mjs';
 
 /**
  * Tries once to fix the checks that failed on `head` by running the fixers
