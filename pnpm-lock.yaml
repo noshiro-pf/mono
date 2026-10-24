@@ -1892,6 +1892,9 @@ importers:
         specifier: workspace:*
         version: link:../../libs/ts-fortress
     devDependencies:
+      '@octokit/openapi-types':
+        specifier: ^29.0.1
+        version: 29.0.1
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.4
