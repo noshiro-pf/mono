@@ -7,8 +7,12 @@
 
 - `src/housing-loan/` — 元利均等返済の返済スケジュール計算。金利が毎月上がって
   いき上限で頭打ちになるシナリオに対応する。テスト付き。
+  **[apps/life-plan-simulator](../../apps/life-plan-simulator) の
+  `src/domain/housing-loan/` に移した。**
 - `src/data/` — 協会けんぽの保険料額表。`.mts`（型付きの定数）と `.json`（同じ
-  データの素の形）の 2 つ。
+  データの素の形）の 2 つ。**`.mts` と `index.mts` は
+  [apps/life-plan-simulator](../../apps/life-plan-simulator) の `src/data/` に移した。**
+  ここに残る `.json` は `scripts/parse_kyoukai_kenpo.mjs` の出力そのもの。
 - `scripts/` — 上のデータを作るのに使った使い捨てのスクリプト。
 
 ## Provenance
