@@ -1,5 +1,14 @@
 # pr-manager-app
 
+## 0.0.11
+
+### Patch Changes
+
+- Updated dependencies [766d3ef]
+    - synstate@4.1.1
+    - ts-fortress@12.3.1
+    - synstate-dom@0.1.0
+
 ## 0.0.10
 
 ### Patch Changes
