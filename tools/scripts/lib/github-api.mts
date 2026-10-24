@@ -1,18 +1,23 @@
 /**
- * The GitHub API over `fetch`, and the credential it needs.
+ * The GitHub API over `fetch`, and the credential it needs, for every command
+ * that does not go through `gh`.
  *
- * This command used to shell out to `gh`. It does not any more, because the
+ * `open-pr` used to shell out to `gh`. It does not any more, because the
  * places it is most useful — a cloud container, a runner — are the places
  * `gh` is least likely to be installed, while a token is already there. The
  * API is the same one `gh` calls; only where the credential comes from
  * differs, so `gh auth token` stays as the last resort for a machine set up
  * that way with nothing exported.
+ *
+ * `mature-updates.mts` keeps a client of its own: it runs before
+ * `pnpm install`, when nothing this imports exists yet.
  */
 
 import { Arr, Json, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { git } from '../unblock-prs/github.mjs';
+import { parseJson } from './json.mjs';
+import { git } from './shell.mjs';
 
 /** Owner and repository, as the API paths spell them. */
 export type Repo = Readonly<{ owner: string; name: string }>;
@@ -21,15 +26,31 @@ export type Repo = Readonly<{ owner: string; name: string }>;
 export type ApiContext = Readonly<{ repo: Repo; token: string }>;
 
 /**
+ * The token the environment holds, if any: `GH_TOKEN`, then `GITHUB_TOKEN`.
+ *
+ * That is the order `gh` reads them in, so that with both set a command over
+ * `fetch` acts as the same account as one over `gh` — `unblock-prs` writes
+ * its comments through `gh`, and the commands here trust a comment by whose
+ * account wrote it. A workflow sets either only by passing it; Actions
+ * exports neither by itself. `github-settings-as-code` reads a list of its
+ * own, without `GITHUB_TOKEN`, and says why in `resolveAuthToken`.
+ */
+export const tokenFromEnv = (): string | undefined => {
+  const token = process.env['GH_TOKEN'] ?? process.env['GITHUB_TOKEN'] ?? '';
+
+  return token === '' ? undefined : token;
+};
+
+/**
  * The token to authenticate with: the environment first, `gh` only if it has
- * to be. `GITHUB_TOKEN` and `GH_TOKEN` are what a runner and a container
+ * to be. `GH_TOKEN` and `GITHUB_TOKEN` are what a runner and a container
  * already set, and asking `gh` first would fail on exactly the machines this
- * change is for.
+ * is for.
  */
 export const resolveToken = async (): Promise<Result<string, string>> => {
-  const fromEnv = process.env['GITHUB_TOKEN'] ?? process.env['GH_TOKEN'] ?? '';
+  const fromEnv = tokenFromEnv();
 
-  if (fromEnv !== '') {
+  if (fromEnv !== undefined) {
     return Result.ok(fromEnv);
   }
 
@@ -37,7 +58,7 @@ export const resolveToken = async (): Promise<Result<string, string>> => {
 
   if (Result.isErr(fromGh)) {
     return Result.err(
-      'no credential: set GITHUB_TOKEN or GH_TOKEN, or authenticate `gh`',
+      'no credential: set GH_TOKEN or GITHUB_TOKEN, or authenticate `gh`',
     );
   }
 
@@ -45,7 +66,7 @@ export const resolveToken = async (): Promise<Result<string, string>> => {
 
   return trimmed === ''
     ? Result.err(
-        'no credential: set GITHUB_TOKEN or GH_TOKEN, or authenticate `gh`',
+        'no credential: set GH_TOKEN or GITHUB_TOKEN, or authenticate `gh`',
       )
     : Result.ok(trimmed);
 };
@@ -78,11 +99,6 @@ export const resolveRepo = async (): Promise<Result<Repo, string>> => {
     : Result.ok({ owner, name });
 };
 
-/**
- * One REST call, resolving to the parsed body. A non-2xx becomes an error
- * naming the status and what GitHub said about it, because "403" on its own
- * sends the reader to the wrong place.
- */
 /** The token and the repository, for a command that calls {@link rest}. */
 export const resolveApiContext = async (): Promise<
   Result<ApiContext, string>
@@ -100,6 +116,11 @@ export const resolveApiContext = async (): Promise<
     : Result.ok({ repo: repo.value, token: token.value });
 };
 
+/**
+ * One REST call, resolving to the parsed body. A non-2xx becomes an error
+ * naming the status and what GitHub said about it, because "403" on its own
+ * sends the reader to the wrong place.
+ */
 export const rest = async <A,>(
   context: ApiContext,
   method: 'GET' | 'PATCH' | 'POST',
@@ -123,7 +144,9 @@ export const rest = async <A,>(
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 
-  return Result.isErr(response) ? response : validate(response.value, schema);
+  return Result.isErr(response)
+    ? Result.err(response.value.message)
+    : validate(response.value, schema);
 };
 
 /**
@@ -142,7 +165,7 @@ export const viewerLogin = async (
   });
 
   return Result.isErr(response)
-    ? response
+    ? Result.err(response.value.message)
     : Result.map(
         validate(response.value, t.record({ login: t.string() })),
         ({ login }) => login,
@@ -156,7 +179,7 @@ export type RestOptions = Readonly<{
 }>;
 
 /**
- * One GraphQL mutation. Two of this command's four writes have no REST
+ * One GraphQL mutation. Two of `open-pr`'s four writes have no REST
  * equivalent — GitHub exposes neither "mark ready for review" nor "enable
  * auto-merge" there — so those go through here rather than through a
  * different tool.
@@ -178,7 +201,7 @@ export const graphql = async (
   });
 
   if (Result.isErr(response)) {
-    return response;
+    return Result.err(response.value.message);
   }
 
   const parsed = validate(response.value, GraphqlResponseSchema);
@@ -198,35 +221,53 @@ const GraphqlResponseSchema = t.record({
   errors: t.optional(t.array(t.record({ message: t.string() }))),
 });
 
+/** One request to the API, before anything is made of the answer. */
+export type GitHubRequest = Readonly<{
+  url: string;
+  method: 'GET' | 'PATCH' | 'POST';
+  /** Absent for an anonymous read, which a public repository allows. */
+  token: string | undefined;
+  accept: string;
+  body: string | undefined;
+}>;
+
+/**
+ * Why a request came to nothing: the transport failing, or GitHub refusing
+ * with a status and what it said about it.
+ */
+export type GitHubRefusal = Readonly<{
+  message: string;
+  /**
+   * Whether the refusal is the rate limit being spent — the one failure a
+   * reader can do something about without reading the body of the answer.
+   */
+  rateLimited: boolean;
+}>;
+
 /**
  * The request itself, resolving to the response body as text. A transport
- * failure and a refusal both become an error string; nothing here throws.
+ * failure and a refusal both become a {@link GitHubRefusal}; nothing here
+ * throws.
  *
  * The headers are assembled here rather than passed in, so that every call
- * this command makes carries the same ones and there is one place to read.
+ * the commands make carries the same ones and there is one place to read.
  */
-const send = async ({
+export const send = async ({
   url,
   method,
   token,
   accept,
   body,
-}: Readonly<{
-  url: string;
-  method: 'GET' | 'PATCH' | 'POST';
-  token: string;
-  accept: string;
-  body: string | undefined;
-}>): Promise<Result<string, string>> => {
+}: GitHubRequest): Promise<Result<string, GitHubRefusal>> => {
   const response = await Result.fromPromise(
     fetch(url, {
       method,
       headers: {
-        Authorization: `Bearer ${token}`,
+        ...(token === undefined ? {} : { Authorization: `Bearer ${token}` }),
         Accept: accept,
         'X-GitHub-Api-Version': '2022-11-28',
         // GitHub rejects an API request without one.
-        'User-Agent': 'noshiro-pf-mono-open-pr',
+        'User-Agent': 'noshiro-pf-mono-tools',
         ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
       },
       ...(body === undefined ? {} : { body }),
@@ -234,7 +275,10 @@ const send = async ({
   );
 
   if (Result.isErr(response)) {
-    return Result.err(`request failed: ${unknownToString(response.value)}`);
+    return Result.err({
+      message: `request failed: ${unknownToString(response.value)}`,
+      rateLimited: false,
+    });
   }
 
   const read = await Result.fromPromise(response.value.text());
@@ -243,9 +287,11 @@ const send = async ({
 
   return response.value.ok
     ? Result.ok(payload)
-    : Result.err(
-        `${response.value.status} ${response.value.statusText}: ${messageFrom(payload)}`,
-      );
+    : Result.err({
+        message: `${response.value.status} ${response.value.statusText}: ${messageFrom(payload)}`,
+        rateLimited:
+          response.value.headers.get('x-ratelimit-remaining') === '0',
+      });
 };
 
 /** What GitHub says went wrong, or the raw body when it says nothing. */
@@ -267,15 +313,13 @@ const messageFrom = (body: string): string => {
 
 const validate = <A,>(body: string, schema: t.Type<A>): Result<A, string> => {
   // `204 No Content`, which a workflow dispatch answers, is no JSON at all.
-  const parsed = body === '' ? Result.ok(undefined) : Json.parse(body);
+  if (body === '') {
+    const validated = schema.validate(undefined);
 
-  if (Result.isErr(parsed)) {
-    return Result.err(`invalid JSON from GitHub: ${parsed.value}`);
+    return Result.isErr(validated)
+      ? Result.err(t.validationErrorsToMessages(validated.value).join('\n'))
+      : Result.ok(validated.value);
   }
 
-  const validated = schema.validate(parsed.value);
-
-  return Result.isErr(validated)
-    ? Result.err(t.validationErrorsToMessages(validated.value).join('\n'))
-    : Result.ok(validated.value);
+  return parseJson(body, schema, 'the answer from GitHub');
 };

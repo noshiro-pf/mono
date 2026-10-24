@@ -16,7 +16,7 @@ import {
   rest,
   viewerLogin,
   type ApiContext,
-} from './open-pr/api.mjs';
+} from '../lib/github-api.mjs';
 import { readQueueState } from './pr-report/queue.mjs';
 
 /**

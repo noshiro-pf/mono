@@ -56,7 +56,7 @@ export const HELP = [
   `  --issues-limit <n>               how many open issues it lists (default ${DEFAULT_ISSUES_LIMIT})`,
   '  -h, --help                       show this help',
   '',
-  'Reads GITHUB_TOKEN or GH_TOKEN when one is set. Without it the public API',
+  'Reads GH_TOKEN or GITHUB_TOKEN when one is set. Without it the public API',
   'allows 60 requests an hour, which is about twenty pull requests, and the',
   'issue links are the ones the bodies declare rather than GitHub’s own list.',
 ].join('\n');

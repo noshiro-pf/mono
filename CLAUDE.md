@@ -52,7 +52,7 @@ see "Japanese text".
   holds shared config and the sample embedding scripts; `tools/scripts/cmd/`
   holds root-level `tsx` commands, one file each (a command that outgrows one
   file becomes a directory with `main.mts` and a `README.md`, like
-  `unblock-prs/`).
+  `unblock-prs/`); what several commands share goes in `tools/scripts/lib/`.
 - `repo-settings/` — declarative GitHub settings (`repo-settings/README.md`).
 - `articles/`, `books/` — Zenn content. See "Zenn".
 - `docs/` — prose about the repository plus verbatim texts (`json-spec/`,

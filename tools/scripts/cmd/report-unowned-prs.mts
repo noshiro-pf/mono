@@ -2,7 +2,7 @@ import type { QueueComments, QueueOwner, ReportEntry } from 'pr-report-core';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import { resolveApiContext, rest, viewerLogin } from './open-pr/api.mjs';
+import { resolveApiContext, rest, viewerLogin } from '../lib/github-api.mjs';
 import { readQueueState } from './pr-report/queue.mjs';
 
 /**

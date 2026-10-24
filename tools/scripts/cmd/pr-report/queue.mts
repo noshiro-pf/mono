@@ -7,6 +7,7 @@ import {
   type RepoRef,
 } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
+import { tokenFromEnv } from '../../lib/github-api.mjs';
 import { createClient, parseRepoRef } from './github.mjs';
 import { readRepoRef, readRequiredContexts } from './repo-settings.mjs';
 
@@ -79,13 +80,11 @@ export const readQueueState = async (
     return required;
   }
 
-  const client = createClient(
-    process.env['GITHUB_TOKEN'] ?? process.env['GH_TOKEN'],
-  );
+  const client = createClient(tokenFromEnv());
 
   if (!client.authenticated) {
     return Result.err(
-      'no GITHUB_TOKEN or GH_TOKEN: the queue comments, and so the owners, cannot be read',
+      'no GH_TOKEN or GITHUB_TOKEN: the queue comments, and so the owners, cannot be read',
     );
   }
 

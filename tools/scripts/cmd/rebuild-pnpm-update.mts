@@ -7,7 +7,7 @@ import {
 import { Arr, Num, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import { resolveApiContext, rest } from './open-pr/api.mjs';
+import { resolveApiContext, rest } from '../lib/github-api.mjs';
 import { readQueueState } from './pr-report/queue.mjs';
 
 /**

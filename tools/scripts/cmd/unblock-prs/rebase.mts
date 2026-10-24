@@ -16,9 +16,10 @@ import {
   type QueueOwner,
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
+import { log } from '../../lib/log.mjs';
+import { git, sh } from '../../lib/shell.mjs';
 import {
   armAutoMerge,
-  git,
   mergedHeadOf,
   readBaseChanges,
   remoteSha,
@@ -49,7 +50,7 @@ import type {
   SkipRecords,
   StackedOn,
 } from './types.mjs';
-import { lastLines, log, sh, stopRequested } from './util.mjs';
+import { lastLines, stopRequested } from './util.mjs';
 import { isVersionPullRequest } from './version-pr.mjs';
 
 /**

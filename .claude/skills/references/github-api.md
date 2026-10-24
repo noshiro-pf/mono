@@ -7,7 +7,7 @@ a skill; it is the one copy of the recipes more than one of them needs.
 as a person, and a session acting as one is the thing that rule is about. A
 scheduled run in a container has a second reason: there is no `gh` login there
 to act as, only a token. So everything here is the REST API, called the way
-`tools/scripts/cmd/open-pr/api.mts` calls it.
+`tools/scripts/lib/github-api.mts` calls it.
 
 `pnpm run unblock-prs` and `pnpm run open-pr` are not affected by any of this.
 The first shells out to `gh` and stays the author's to run; the second calls

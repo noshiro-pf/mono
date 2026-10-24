@@ -1,8 +1,9 @@
 // cspell:ignore retarget retargeted
 
 /**
- * Everything that shells out to `gh` or `git`, and nothing that decides.
- * `git` is also what `auto-fix.mts` runs its `pnpm` commands through.
+ * Everything that shells out to `gh` or `git`, and nothing that decides. The
+ * runner itself, `git`, is shared with the other commands
+ * (`tools/scripts/lib/shell.mts`).
  */
 
 import {
@@ -18,10 +19,11 @@ import {
   type ReviewState,
   type RulesetRequirements,
 } from 'pr-report-core';
-import { Arr, isRecord, Json, Result } from 'ts-data-forge';
+import { Arr, isRecord, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { $ } from 'ts-repo-utils';
-import { projectRootPath } from '../../project-root-path.mjs';
+import type { UnknownRecord } from 'ts-type-forge';
+import { parseJson } from '../../lib/json.mjs';
+import { git, sh } from '../../lib/shell.mjs';
 import {
   PullRequestListSchema,
   PullRequestSchema,
@@ -29,21 +31,18 @@ import {
   type OwnSetAsideComment,
   type PullRequest,
 } from './types.mjs';
-import { headShaFromListing, sh } from './util.mjs';
-
-const PR_JSON_FIELDS =
-  'number,id,title,body,state,headRefName,headRefOid,baseRefName,isCrossRepository,isDraft,mergeStateStatus,autoMergeRequest,labels';
+import { headShaFromListing } from './util.mjs';
 
 /**
- * Passed to every git and gh invocation. `GIT_TERMINAL_PROMPT=0` turns a
- * missing credential into a failure instead of a hang; `GIT_EDITOR=true`
- * keeps any editor git might want out of the way.
+ * The `--json` field list for `gh`, read off the schema that validates what it
+ * prints, so that a field added to one is never missing from the other — which
+ * would otherwise surface only at run time, as a validation error.
  */
-const childEnv: NodeJS.ProcessEnv = {
-  ...process.env,
-  GIT_TERMINAL_PROMPT: '0',
-  GIT_EDITOR: 'true',
-} as const;
+export const jsonFields = (
+  schema: Readonly<{ shape: UnknownRecord }>,
+): string => Object.keys(schema.shape).join(',');
+
+const PR_JSON_FIELDS = jsonFields(PullRequestSchema);
 
 export const checkPreflight = async (): Promise<
   Result<Readonly<{ defaultBranch: string }>, string>
@@ -82,7 +81,7 @@ export const listPullRequests = async (): Promise<
 
   return Result.isErr(listed)
     ? listed
-    : parseJson(listed.value, PullRequestListSchema);
+    : parseJson(listed.value, PullRequestListSchema, 'gh pr list');
 };
 
 export const viewPullRequest = async (
@@ -92,7 +91,7 @@ export const viewPullRequest = async (
 
   return Result.isErr(viewed)
     ? viewed
-    : parseJson(viewed.value, PullRequestSchema);
+    : parseJson(viewed.value, PullRequestSchema, `gh pr view ${prNumber}`);
 };
 
 /**
@@ -155,7 +154,11 @@ export const readBranchRules = async (
     return listed;
   }
 
-  const rules = parseJson(listed.value, t.array(t.unknown()));
+  const rules = parseJson(
+    listed.value,
+    t.array(t.unknown()),
+    `the rules for ${branch}`,
+  );
 
   return Result.isErr(rules)
     ? rules
@@ -220,7 +223,11 @@ export const readReviewStates = async (
     return answered;
   }
 
-  const parsed = parseJson(answered.value, RepositoryAnswerSchema);
+  const parsed = parseJson(
+    answered.value,
+    RepositoryAnswerSchema,
+    'gh api graphql',
+  );
 
   if (Result.isErr(parsed)) {
     return parsed;
@@ -386,7 +393,11 @@ export const readOwnComments = async (
     return answered;
   }
 
-  const parsed = parseJson(answered.value, RepositoryAnswerSchema);
+  const parsed = parseJson(
+    answered.value,
+    RepositoryAnswerSchema,
+    'gh api graphql',
+  );
 
   if (Result.isErr(parsed)) {
     return parsed;
@@ -537,7 +548,7 @@ export const readBaseChanges = async (
     return answered;
   }
 
-  const parsed = parseJson(answered.value, TimelineSchema);
+  const parsed = parseJson(answered.value, TimelineSchema, 'gh api graphql');
 
   if (Result.isErr(parsed)) {
     return parsed;
@@ -606,7 +617,7 @@ export const readNativeStack = async (
     return answered;
   }
 
-  const parsed = parseJson(answered.value, NativeStackSchema);
+  const parsed = parseJson(answered.value, NativeStackSchema, 'gh api graphql');
 
   if (Result.isErr(parsed)) {
     return parsed;
@@ -660,14 +671,18 @@ export const mergedHeadOf = async (
   branch: string,
 ): Promise<Result<MergedHead | undefined, string>> => {
   const listed = await git(
-    `gh pr list --state merged --head ${sh(branch)} --limit 5 --json number,headRefOid,mergeCommit,mergedAt`,
+    `gh pr list --state merged --head ${sh(branch)} --limit 5 --json ${jsonFields(MergedHeadSchema)}`,
   );
 
   if (Result.isErr(listed)) {
     return listed;
   }
 
-  const parsed = parseJson(listed.value, MergedHeadListSchema);
+  const parsed = parseJson(
+    listed.value,
+    MergedHeadListSchema,
+    'gh pr list --state merged',
+  );
 
   if (Result.isErr(parsed)) {
     return parsed;
@@ -695,14 +710,14 @@ export type MergedHead = Readonly<{
   mergeCommit: string | undefined;
 }>;
 
-const MergedHeadListSchema = t.array(
-  t.record({
-    number: t.number(),
-    headRefOid: t.string(),
-    mergeCommit: t.union([t.record({ oid: t.string() }), t.nullType]),
-    mergedAt: t.string(),
-  }),
-);
+const MergedHeadSchema = t.record({
+  number: t.number(),
+  headRefOid: t.string(),
+  mergeCommit: t.union([t.record({ oid: t.string() }), t.nullType]),
+  mergedAt: t.string(),
+});
+
+const MergedHeadListSchema = t.array(MergedHeadSchema);
 
 /**
  * Arms auto-merge, squash being the one method the ruleset allows. The
@@ -752,7 +767,7 @@ export const listCheckRuns = async (
     return listed;
   }
 
-  const pages = parseJson(listed.value, CheckRunPagesSchema);
+  const pages = parseJson(listed.value, CheckRunPagesSchema, 'the check runs');
 
   return Result.isErr(pages)
     ? pages
@@ -800,40 +815,3 @@ const SHA = /^[0-9a-f]{40}$/u;
 const ISSUES_ROUTE = 'repos/{owner}/{repo}/issues';
 
 const COMMITS_ROUTE = 'repos/{owner}/{repo}/commits';
-
-/**
- * Runs a git or gh command silently and resolves to its stdout, or to a
- * message that includes what it printed to stderr.
- */
-export const git = async (
-  command: string,
-  cwd: string = projectRootPath,
-): Promise<Result<string, string>> => {
-  const result = await $(command, {
-    cwd,
-    silent: true,
-    env: childEnv,
-    maxBuffer: 64 * 1024 * 1024,
-  });
-
-  return Result.isOk(result)
-    ? Result.ok(result.value.stdout)
-    : Result.err(result.value.message.trim());
-};
-
-export const parseJson = <A,>(
-  text: string,
-  schema: t.Type<A>,
-): Result<A, string> => {
-  const parsed = Json.parse(text);
-
-  if (Result.isErr(parsed)) {
-    return Result.err(`invalid JSON: ${parsed.value}`);
-  }
-
-  const validated = schema.validate(parsed.value);
-
-  return Result.isErr(validated)
-    ? Result.err(t.validationErrorsToMessages(validated.value).join('\n'))
-    : Result.ok(validated.value);
-};

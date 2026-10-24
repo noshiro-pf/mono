@@ -8,6 +8,7 @@ import {
 } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
+import { log } from '../../lib/log.mjs';
 import { autoFix } from './auto-fix.mjs';
 import { standingClaims } from './claims.mjs';
 import { STALE_STATE_PAUSE_MS } from './constants.mjs';
@@ -65,7 +66,7 @@ import type {
   Watched,
   WatchOutcome,
 } from './types.mjs';
-import { installStopHandlers, log, pause, stopRequested } from './util.mjs';
+import { installStopHandlers, pause, stopRequested } from './util.mjs';
 import { watch } from './watch.mjs';
 
 /**
@@ -238,7 +239,7 @@ import { watch } from './watch.mjs';
  * - `checks.mts` — what the merge is waiting for, judged against the contexts
  *   the ruleset requires.
  * - `github.mts` — everything that shells out to `gh` or `git`, and nothing
- *   that decides.
+ *   that decides. The runner and the quoting are `tools/scripts/lib/`'s.
  * - `labels.mts`, `skips.mts`, `demotions.mts`, `options.mts`, `types.mts`,
  *   `constants.mts`, `util.mts` — the vocabulary.
  */

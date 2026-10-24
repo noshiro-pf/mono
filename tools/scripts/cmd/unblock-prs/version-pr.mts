@@ -22,9 +22,9 @@
 
 import { BLOCKS_RELEASE_LABEL, isVersionBranch } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
-import { git } from './github.mjs';
+import { git, sh } from '../../lib/shell.mjs';
 import type { Classification, PullRequest, TriageContext } from './types.mjs';
-import { lastLines, sh } from './util.mjs';
+import { lastLines } from './util.mjs';
 
 /**
  * Whether this is the version pull request, by the branch it comes from

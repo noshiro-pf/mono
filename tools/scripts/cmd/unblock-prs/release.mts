@@ -20,10 +20,10 @@
 
 import { SKIP_CI_LABEL, type QueueOwner } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
+import { log } from '../../lib/log.mjs';
 import { addSkipCiLabel, listPullRequests } from './github.mjs';
 import { isMergeQueued, isSkipCiLabelled, priorityRank } from './labels.mjs';
 import type { PullRequest } from './types.mjs';
-import { log } from './util.mjs';
 import { isVersionPullRequest } from './version-pr.mjs';
 
 /**

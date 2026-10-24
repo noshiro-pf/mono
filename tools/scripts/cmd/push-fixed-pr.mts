@@ -8,13 +8,12 @@ import {
 } from 'pr-report-core';
 import { Arr, Num, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import { resolveApiContext } from './open-pr/api.mjs';
+import { resolveApiContext } from '../lib/github-api.mjs';
+import { git, sh } from '../lib/shell.mjs';
 import { addLabel } from './open-pr/github.mjs';
 import { readQueueState } from './pr-report/queue.mjs';
-import { git } from './unblock-prs/github.mjs';
 import { pushLeased, restack } from './unblock-prs/rebase.mjs';
 import type { BranchOf } from './unblock-prs/types.mjs';
-import { sh } from './unblock-prs/util.mjs';
 
 /**
  * Hands a fixed pull request back to the worker: pushes the commit a session

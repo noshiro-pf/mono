@@ -16,11 +16,11 @@ import {
   type QueueComments,
   type RepoRef,
 } from 'pr-report-core';
-import { Arr, Json, Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
+import { send } from '../../lib/github-api.mjs';
+import { parseJson } from '../../lib/json.mjs';
 import { parseClosingIssueRefs } from './linked-issues.mjs';
-
-const API_VERSION = '2022-11-28';
 
 /**
  * How many pull requests are read. A repository with more open than this has
@@ -246,37 +246,28 @@ export const createClient = (
     route: string,
     body?: string,
   ): Promise<Result<string, string>> => {
-    const response = await fetch(`${baseUrl}${route}`, {
+    const response = await send({
+      url: `${baseUrl}${route}`,
       method: body === undefined ? 'GET' : 'POST',
-      headers: {
-        Accept: 'application/vnd.github+json',
-        'X-GitHub-Api-Version': API_VERSION,
-        ...(token === undefined ? {} : { Authorization: `Bearer ${token}` }),
-      },
+      token,
+      accept: 'application/vnd.github+json',
       body,
     });
 
-    const text = await response.text();
-
-    if (response.ok) {
-      return Result.ok(text);
+    if (Result.isOk(response)) {
+      return response;
     }
 
-    // Told apart from any other 403, because it is the one failure a reader
-    // can do something about without reading the body of the answer.
-    const rateLimited = response.headers.get('x-ratelimit-remaining') === '0';
-
-    if (rateLimited) {
+    if (response.value.rateLimited) {
       mut_state.rateLimited = true;
     }
 
+    const refused = `${route} answered ${response.value.message}` as const;
+
     return Result.err(
-      [
-        `${route} answered ${response.status} ${response.statusText}`,
-        rateLimited
-          ? 'The rate limit is spent. Set GITHUB_TOKEN to raise it from 60 requests an hour to 5000.'
-          : text.slice(0, 500),
-      ].join('\n'),
+      response.value.rateLimited
+        ? `${refused}\nThe rate limit is spent. Set GH_TOKEN or GITHUB_TOKEN to raise it from 60 requests an hour to 5000.`
+        : refused,
     );
   };
 
@@ -711,7 +702,7 @@ export const createClient = (
 
       return mut_state.rateLimited
         ? Result.err(
-            'The GitHub rate limit was spent part way through, so this report would have been missing commit counts and check verdicts without saying which.\nSet GITHUB_TOKEN or GH_TOKEN to raise it from 60 requests an hour to 5000.',
+            'The GitHub rate limit was spent part way through, so this report would have been missing commit counts and check verdicts without saying which.\nSet GH_TOKEN or GITHUB_TOKEN to raise it from 60 requests an hour to 5000.',
           )
         : Result.ok(mut_facts);
     },
@@ -749,24 +740,4 @@ export const parseRepoRef = (raw: string): Result<RepoRef, string> => {
   return owner === '' || name === ''
     ? Result.err(`expected owner/name, got ${JSON.stringify(raw)}`)
     : Result.ok({ owner, name });
-};
-
-const parseJson = <A,>(
-  text: string,
-  schema: t.Type<A>,
-  route: string,
-): Result<A, string> => {
-  const parsed = Json.parse(text);
-
-  if (Result.isErr(parsed)) {
-    return Result.err(`${route} did not answer JSON: ${parsed.value}`);
-  }
-
-  const validated = schema.validate(parsed.value);
-
-  return Result.isErr(validated)
-    ? Result.err(
-        `${route} answered an unexpected shape:\n${t.validationErrorsToMessages(validated.value).join('\n')}`,
-      )
-    : Result.ok(validated.value);
 };

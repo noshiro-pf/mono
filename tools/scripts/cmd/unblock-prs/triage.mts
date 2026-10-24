@@ -22,6 +22,7 @@ import {
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
+import { log } from '../../lib/log.mjs';
 import {
   listRequiredChecks,
   listRunningChecks,
@@ -50,7 +51,7 @@ import type {
   TriageBase,
   TriageContext,
 } from './types.mjs';
-import { lastLines, log, pause, stopRequested } from './util.mjs';
+import { lastLines, pause, stopRequested } from './util.mjs';
 import {
   isRebuiltOnBaseTip,
   isVersionPullRequest,

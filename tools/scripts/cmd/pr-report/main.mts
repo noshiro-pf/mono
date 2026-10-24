@@ -6,6 +6,7 @@ import {
 } from 'pr-report-core';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
+import { tokenFromEnv } from '../../lib/github-api.mjs';
 import { createClient, parseRepoRef } from './github.mjs';
 import { HELP, parseOptions, type Format, type Options } from './options.mjs';
 import { ownersOf } from './queue.mjs';
@@ -68,9 +69,7 @@ export const prReport = async (
     return required;
   }
 
-  const client = createClient(
-    process.env['GITHUB_TOKEN'] ?? process.env['GH_TOKEN'],
-  );
+  const client = createClient(tokenFromEnv());
 
   const defaultBranch = await client.defaultBranch(repo.value);
 
