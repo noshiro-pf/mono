@@ -1,10 +1,11 @@
 {
   "extends": [
     "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json",
     "../../tools/configs/tsconfig/tsconfig.node-only.json"
   ],
   "compilerOptions": {
     "libReplacement": true
   },
-  "include": ["./src", "./scripts"]
+  "include": ["./src", "./scripts", "./configs"]
 }
