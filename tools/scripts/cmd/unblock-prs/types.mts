@@ -151,6 +151,18 @@ export type TriageBase = Readonly<{
   demoted: Demotions;
   requiredContexts: readonly string[];
   reviewRequirements: ReviewRequirements;
+  /** What the issues the pull requests close add to the merge order. */
+  issueOrder: IssueOrder;
+}>;
+
+/**
+ * Which open issues each open pull request closes, and each such issue's
+ * `Start-After:`, which the pull request closing it inherits as a merge
+ * order (`docs/issue-start-after.md`).
+ */
+export type IssueOrder = Readonly<{
+  closes: ReadonlyMap<number, readonly number[]>;
+  startAfter: ReadonlyMap<number, readonly number[]>;
 }>;
 
 /**

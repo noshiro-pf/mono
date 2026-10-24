@@ -126,7 +126,7 @@ export const rest = async <A,>(
   method: 'GET' | 'PATCH' | 'POST',
   path: string,
   schema: t.Type<A>,
-  { query, body }: RestOptions = {},
+  { query, body, withBodyHtml = false }: RestOptions = {},
 ): Promise<Result<A, string>> => {
   // `URLSearchParams` rather than hand-assembled pairs: a branch name carries
   // slashes and the one qualified parameter here carries a colon.
@@ -140,7 +140,9 @@ export const rest = async <A,>(
     url: `https://api.github.com/repos/${context.repo.owner}/${context.repo.name}${path}${search}`,
     method,
     token: context.token,
-    accept: 'application/vnd.github+json',
+    accept: withBodyHtml
+      ? 'application/vnd.github.full+json'
+      : 'application/vnd.github+json',
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 
@@ -176,6 +178,12 @@ export const viewerLogin = async (
 export type RestOptions = Readonly<{
   query?: ReadonlyRecord<string, string>;
   body?: unknown;
+  /**
+   * Ask for `body_html` beside `body`: GitHub's rendering, which marks the
+   * closing keywords it recognized (`pr-report-core`'s
+   * `closingKeywordIssuesIn`).
+   */
+  withBodyHtml?: boolean;
 }>;
 
 /**

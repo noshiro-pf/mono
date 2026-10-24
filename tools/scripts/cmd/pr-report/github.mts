@@ -3,6 +3,7 @@
 import {
   anyRunInProgress,
   closingIssuesIn,
+  parseStartAfter,
   readQueueComments,
   reportedContexts,
   type CheckRunReport,
@@ -110,6 +111,8 @@ const IssueListSchema = t.array(
   t.record({
     number: t.number(),
     title: t.string(),
+    /** Where `Start-After:` is read from. */
+    body: t.union([t.string(), t.nullType]),
     html_url: t.string(),
     created_at: t.string(),
     updated_at: t.string(),
@@ -125,6 +128,12 @@ const IssueListSchema = t.array(
     pull_request: t.optional(t.record({})),
   }),
 );
+
+const IssueBodySchema = t.record({
+  state: t.string(),
+  body: t.union([t.string(), t.nullType]),
+  pull_request: t.optional(t.record({})),
+});
 
 const WorkflowRunsSchema = t.record({
   total_count: t.number(),
@@ -213,6 +222,22 @@ export type Client = Readonly<{
     repo: RepoRef,
     limit: number,
   ) => Promise<Result<readonly OpenIssue[], string>>;
+  /**
+   * Whether each of `numbers` is an open issue, and what its body declares
+   * with `Start-After:`: one request each, for the issues the open pull
+   * requests close that the open list did not cover. One that cannot be read
+   * is left out, and declares nothing.
+   */
+  issueBodies: (
+    repo: RepoRef,
+    numbers: readonly number[],
+  ) => Promise<ReadonlyMap<number, IssueBody>>;
+}>;
+
+/** What {@link Client.issueBodies} reads of one issue. */
+export type IssueBody = Readonly<{
+  open: boolean;
+  startAfter: readonly number[];
 }>;
 
 /**
@@ -579,8 +604,30 @@ export const createClient = (
             createdAt: issue.created_at,
             updatedAt: issue.updated_at,
             comments: issue.comments,
+            startAfter: parseStartAfter(issue.body ?? ''),
           })),
       );
+    },
+
+    issueBodies: async (repo, numbers) => {
+      const mut_read = new Map<number, IssueBody>();
+
+      for (const number of numbers) {
+        const read = await getJson(
+          `/repos/${repo.owner}/${repo.name}/issues/${number}`,
+          IssueBodySchema,
+        );
+
+        // A pull request answers here too, and closes nothing it inherits.
+        if (Result.isOk(read) && read.value.pull_request === undefined) {
+          mut_read.set(number, {
+            open: read.value.state === 'open',
+            startAfter: parseStartAfter(read.value.body ?? ''),
+          });
+        }
+      }
+
+      return mut_read;
     },
 
     merged: async (repo, withinDays, limit) => {

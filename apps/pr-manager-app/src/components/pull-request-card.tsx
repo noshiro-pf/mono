@@ -146,6 +146,25 @@ export const PullRequestCard = ({ entry, scaleMax }: Props): JSX.Element => (
         )}
       />
 
+      <If
+        cond={mapBindable(
+          entry,
+          ({ inheritedMergeAfter, notStartedIssues }) =>
+            Arr.isNonEmpty(inheritedMergeAfter) ||
+            Arr.isNonEmpty(notStartedIssues),
+        )}
+        then={
+          <span
+            class={constant('stacked-on')}
+            title={constant(
+              'An issue this closes declares Start-After, which it inherits as a merge order. An open issue nobody is working on holds nothing.',
+            )}
+          >
+            {mapBindable(entry, inheritedOrderText)}
+          </span>
+        }
+      />
+
       <CommitDivergence entry={entry} scaleMax={scaleMax} />
     </div>
 
@@ -192,3 +211,23 @@ export const PullRequestCard = ({ entry, scaleMax }: Props): JSX.Element => (
     </div>
   </article>
 );
+
+/**
+ * What the issues it closes add to its merge order, in a line: the pull
+ * requests it now waits for, and the issues named that nobody has started.
+ */
+const inheritedOrderText = ({
+  inheritedMergeAfter,
+  notStartedIssues,
+}: Entry): string =>
+  [
+    ...(Arr.isNonEmpty(inheritedMergeAfter)
+      ? [`after ${numbers(inheritedMergeAfter)} (Start-After)`]
+      : []),
+    ...(Arr.isNonEmpty(notStartedIssues)
+      ? [`${numbers(notStartedIssues)} (issue) not done`]
+      : []),
+  ].join(' · ');
+
+const numbers = (list: readonly number[]): string =>
+  list.map((number) => `#${number}`).join(', ');

@@ -1,8 +1,14 @@
 /** Everything that talks to GitHub or to `git`, and nothing that decides. */
 
 import dedent from 'dedent';
-import { isSafeRefName } from 'pr-report-core';
-import { Result } from 'ts-data-forge';
+import {
+  closingKeywordIssuesIn,
+  inheritStartAfter,
+  isSafeRefName,
+  parseMergeAfter,
+  parseStartAfter,
+} from 'pr-report-core';
+import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import {
   graphql,
@@ -244,6 +250,115 @@ export const createPullRequest = async ({
 
   return Result.isErr(created) ? created : Result.ok(created.value.number);
 };
+
+/**
+ * What the issues the pull request closes start after, as open pull
+ * requests it should merge after (`pr-report-core`'s `inheritStartAfter`),
+ * less what its body or `alsoDeclared` — the layer it is stacked on — already
+ * says. The readers derive the same each time they read, so this is the
+ * body stating it, as it states a stack.
+ *
+ * Closing issues are read from the keywords GitHub marked in the body, which
+ * it marks whatever the base; one linked by hand in the sidebar is not seen.
+ */
+export const missingInheritedOrder = async (
+  api: ApiContext,
+  prNumber: number,
+  alsoDeclared: readonly number[],
+): Promise<
+  Result<Readonly<{ body: string; missing: readonly number[] }>, string>
+> => {
+  const viewed = await rest(api, 'GET', `/pulls/${prNumber}`, BodiesSchema, {
+    withBodyHtml: true,
+  });
+
+  if (Result.isErr(viewed)) {
+    return viewed;
+  }
+
+  const body = viewed.value.body ?? '';
+
+  const closes = closingKeywordIssuesIn(api.repo, viewed.value.body_html ?? '');
+
+  const mut_startAfter = new Map<number, readonly number[]>();
+
+  for (const issue of closes) {
+    const read = await rest(api, 'GET', `/issues/${issue}`, IssueSchema);
+
+    if (Result.isErr(read)) {
+      return read;
+    }
+
+    if (read.value.state === 'open' && read.value.pull_request === undefined) {
+      mut_startAfter.set(issue, parseStartAfter(read.value.body ?? ''));
+    }
+  }
+
+  if (!Array.from(mut_startAfter.values()).some(Arr.isNonEmpty)) {
+    return Result.ok({ body, missing: [] });
+  }
+
+  const open = await rest(api, 'GET', '/pulls', BodiesListSchema, {
+    query: { state: 'open', per_page: '100' },
+    withBodyHtml: true,
+  });
+
+  if (Result.isErr(open)) {
+    return open;
+  }
+
+  const others = open.value.filter(({ number }) => number !== prNumber);
+
+  const inherited = inheritStartAfter({
+    pulls: Arr.toUnshifted({
+      number: prNumber,
+      closes: Array.from(mut_startAfter.keys()),
+    })(
+      others.map(({ number, body_html: html }) => ({
+        number,
+        closes: closingKeywordIssuesIn(api.repo, html ?? ''),
+      })),
+    ),
+    startAfterOf: mut_startAfter,
+    openIssues: new Set(),
+  });
+
+  const declared = new Set(parseMergeAfter(body).concat(alsoDeclared));
+
+  return Result.ok({
+    body,
+    missing: (inherited.get(prNumber)?.mergeAfter ?? []).filter(
+      (number) => !declared.has(number),
+    ),
+  });
+};
+
+export const updateBody = async (
+  api: ApiContext,
+  prNumber: number,
+  body: string,
+): Promise<Result<undefined, string>> => {
+  const updated = await rest(api, 'PATCH', `/pulls/${prNumber}`, t.unknown(), {
+    body: { body },
+  });
+
+  return Result.isErr(updated) ? updated : Result.ok(undefined);
+};
+
+const BodiesSchema = t.record({
+  number: t.number(),
+  body: t.union([t.string(), t.nullType]),
+  body_html: t.optional(t.union([t.string(), t.nullType])),
+});
+
+const BodiesListSchema = t.array(BodiesSchema);
+
+/** An issue, or a pull request, which the issues route answers for too. */
+const IssueSchema = t.record({
+  state: t.string(),
+  body: t.union([t.string(), t.nullType]),
+  pull_request: t.optional(t.record({})),
+});
 
 export const addLabel = async (
   api: ApiContext,

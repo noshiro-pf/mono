@@ -28,3 +28,30 @@ export const withStackParent = (
   parent === undefined
     ? mergeAfter
     : Arr.uniq(Arr.toUnshifted(parent)(mergeAfter));
+
+/**
+ * `body` with `numbers` declared in it as well: added to the `Merge-After:`
+ * line it opens with, which is where this command writes one, or in a line
+ * of their own before it. The numbers are what the issues it closes start
+ * after and the body does not yet say (`openPullRequest`).
+ */
+export const withInheritedMergeAfter = (
+  body: string,
+  numbers: readonly number[],
+): string => {
+  const trailer = mergeAfterTrailer(numbers);
+
+  if (trailer === undefined) {
+    return body;
+  }
+
+  const [first = '', ...rest] = body.split('\n');
+
+  if (/^merge-after\s*:/iu.test(first)) {
+    return Arr.toUnshifted(
+      `${first.trimEnd()}, ${numbers.map((n) => `#${n}`).join(', ')}`,
+    )(rest).join('\n');
+  }
+
+  return body === '' ? `${trailer}\n` : `${trailer}\n\n${body}`;
+};

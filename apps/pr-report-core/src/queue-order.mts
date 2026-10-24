@@ -27,6 +27,7 @@ import { findMergeAfterCycles, parseMergeAfter } from './merge-after.mjs';
 import type { QueueOwner } from './queue-owner.mjs';
 import type { ReviewHold } from './review-hold.mjs';
 import { findStackParents } from './stack.mjs';
+import { inheritStartAfter } from './start-after.mjs';
 
 /** What one pull request's place in the queue is decided from. */
 export type QueueFacts = Readonly<{
@@ -55,6 +56,11 @@ export type QueueGraphMember = Readonly<{
   headRef: string;
   baseRef: string;
   fromFork: boolean;
+  /**
+   * The open issues it closes, whose `Start-After:` it inherits. Absent for
+   * a reader that did not read them: nothing is inherited.
+   */
+  closes?: readonly number[];
 }>;
 
 /** What the open pull requests say about one another. */
@@ -62,10 +68,16 @@ export type QueueGraph = Readonly<{
   /** Which open pull request each stacked one is on: child → parent. */
   stackParents: ReadonlyMap<number, number>;
   /**
-   * What each pull request must merge after: what it declared, and the one
-   * it is stacked on.
+   * What each pull request must merge after: what it declared, the one it
+   * is stacked on, and what it inherits.
    */
   dependencies: ReadonlyMap<number, readonly number[]>;
+  /**
+   * What each inherits from the issues it closes (`start-after.mts`'s
+   * `inheritStartAfter`), less what it declared or is stacked on, so that a
+   * note can say where a wait comes from when the body does not say it.
+   */
+  inherited: ReadonlyMap<number, readonly number[]>;
   /** The `Merge-After` cycles, each starting at its lowest number. */
   cycles: readonly (readonly number[])[];
   /** Every number that sits on one of them. */
@@ -179,17 +191,26 @@ export const isMergeableState = (mergeState: string): boolean =>
 
 /**
  * The stacks, the declared order and its cycles, and what holds the release,
- * read off the open pull requests.
+ * read off the open pull requests. `startAfterOf` is what the issues they
+ * close declare, each issue's `Start-After:` by its number.
  */
 export const queueGraph = (
   pulls: readonly QueueGraphMember[],
   defaultBranch: string,
+  startAfterOf: ReadonlyMap<number, readonly number[]> = new Map(),
 ): QueueGraph => {
   const sorted = pulls.toSorted((a, b) => a.number - b.number);
 
   const stackParents = findStackParents(sorted, defaultBranch);
 
-  const dependencies: ReadonlyMap<number, readonly number[]> = new Map(
+  // What is not started is a report's to say; the queue needs only the order.
+  const inheritedOrders = inheritStartAfter({
+    pulls: sorted.map(({ number, closes = [] }) => ({ number, closes })),
+    startAfterOf,
+    openIssues: new Set(),
+  });
+
+  const declared: ReadonlyMap<number, readonly number[]> = new Map(
     sorted.map((pr) => {
       const parent = stackParents.get(pr.number);
 
@@ -211,11 +232,36 @@ export const queueGraph = (
     }),
   );
 
+  const inherited: ReadonlyMap<number, readonly number[]> = new Map(
+    sorted.map(({ number, headRef }) => {
+      const own = declared.get(number) ?? [];
+
+      return [
+        number,
+        // The version pull request closes nothing it means to, and is held
+        // by `blocks-release` alone.
+        isVersionBranch(headRef, defaultBranch)
+          ? []
+          : (inheritedOrders.get(number)?.mergeAfter ?? []).filter(
+              (n) => !own.includes(n),
+            ),
+      ] as const;
+    }),
+  );
+
+  const dependencies: ReadonlyMap<number, readonly number[]> = new Map(
+    sorted.map(({ number }) => [
+      number,
+      [...(declared.get(number) ?? []), ...(inherited.get(number) ?? [])],
+    ]),
+  );
+
   const cycles = findMergeAfterCycles(dependencies);
 
   return {
     stackParents,
     dependencies,
+    inherited,
     cycles,
     cyclic: new Set(cycles.flat()),
     openNumbers: new Set(sorted.map((pr) => pr.number)),

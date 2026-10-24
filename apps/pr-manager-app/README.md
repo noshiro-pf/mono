@@ -154,6 +154,14 @@ top down is the order things can land, and a root is one that nothing open is
 holding up. A number that names nothing still open is dropped: the pull
 request it named has merged, which is the constraint being met.
 
+**What the issues a pull request closes start after counts as if it had
+named it** (`docs/issue-start-after.md`, "pull request への引き継ぎ"): an open
+pull request a closing issue's `Start-After:` names, or the open pull requests
+closing an open issue it names. The card says `after #N (Start-After)` for
+what it inherited beyond its own trailer, and `#N (issue) not done` for an
+open issue named that no open pull request closes, which holds nothing. The
+closing issues' bodies come with the details, so this fills in when they do.
+
 **A pull request that names several appears under each of them, and is drawn
 in full once** — its card and everything below it, under whichever of them
 the page reaches first reading downwards, not the first the trailer lists.

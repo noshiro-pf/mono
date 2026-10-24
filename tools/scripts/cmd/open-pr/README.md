@@ -87,6 +87,13 @@ pnpm run open-pr -- --base feat/lower-layer        # その PR の上に積む
 チェックがそのブランチの唯一のチェックなので、どれを走らせたかを本文に書いて
 ください。`--merge-after` を付けると `Merge-After:` 行が本文の先頭に入ります。
 
+**閉じる issue の `Start-After:` も本文に書きます。** PR を作った後、GitHub が
+本文から読んだ closing keyword の issue を読み、その `Start-After:` が名指す
+開いた PR（開いた issue なら、それを閉じる開いた PR）のうち本文にまだ無いものを、
+先頭の `Merge-After:` 行に足します（`docs/issue-start-after.md`）。`unblock-prs`
+と各レポートは本文に無くても引き継ぐので、これは順序を本文にも書いておくための
+ものです。サイドバーで手でリンクした issue は見ません。
+
 ### stacked PR
 
 `--base` に別の open な PR のブランチを渡すと、その PR の上に積んだ PR になり
@@ -190,6 +197,15 @@ The description is yours to write: while `skip-ci` is on, the checks you ran
 locally are the only checks the branch gets, so say which ones. `--merge-after`
 puts the `Merge-After:` line at the top of the body, where `unblock-prs` reads
 it.
+
+**What the issues it closes start after is written too.** Once the pull
+request exists, the script reads the issues GitHub found closing keywords for
+in the body, and adds to the `Merge-After:` line at the top the open pull
+requests their `Start-After:` names — or, for an open issue named, the open
+pull requests closing it — that the body does not name yet
+(`docs/issue-start-after.md`). `unblock-prs` and the reports inherit the same
+without it; this is the body stating the order. An issue linked by hand in
+the sidebar is not seen.
 
 A `--base` that is another open pull request's branch stacks this one on it:
 the diff is its own layer, and `unblock-prs` and the reports treat it as

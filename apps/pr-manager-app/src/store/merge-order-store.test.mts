@@ -268,6 +268,8 @@ const entry = (number: number, labels: readonly string[]): Entry =>
     linkedIssues: [],
     mergeAfter: [],
     stackedOn: undefined,
+    inheritedMergeAfter: [],
+    notStartedIssues: [],
     blockedBy: [],
     checks: {
       verdict: 'passed',

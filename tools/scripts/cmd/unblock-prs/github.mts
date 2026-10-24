@@ -25,9 +25,15 @@ import type { UnknownRecord } from 'ts-type-forge';
 import { parseJson } from '../../lib/json.mjs';
 import { git, sh } from '../../lib/shell.mjs';
 import {
+  issueOrderOf,
+  unlinkedClosingIssues,
+  type ClosingIssueAnswer,
+} from './merge-after.mjs';
+import {
   PullRequestListSchema,
   PullRequestSchema,
   type BaseChange,
+  type IssueOrder,
   type OwnSetAsideComment,
   type PullRequest,
 } from './types.mjs';
@@ -273,6 +279,182 @@ export const readReviewStates = async (
         ? codeOwners.value.text
         : undefined,
     states,
+  });
+};
+
+/**
+ * What the issues the open pull requests close add to the merge order
+ * (`merge-after.mts`'s `issueOrderOf`): one GraphQL request for what GitHub
+ * links and how it marked the bodies, and one more for the keyword-closed
+ * issues it did not link, only when there are any.
+ */
+export const readIssueOrder = async (
+  numbers: readonly number[],
+): Promise<Result<IssueOrder, string>> => {
+  if (!Arr.isNonEmpty(numbers)) {
+    return Result.ok({ closes: new Map(), startAfter: new Map() });
+  }
+
+  const pulls = await askRepository(
+    'ClosingIssues',
+    numbers.map((n) => ({
+      alias: `pr_${n}`,
+      number: n,
+      field: `pullRequest(number: $pr_${n}) { bodyHTML closingIssuesReferences(first: 10) { nodes { ${CLOSING_ISSUE_FIELDS} repository { nameWithOwner } } } }`,
+    })),
+  );
+
+  if (Result.isErr(pulls)) {
+    return pulls;
+  }
+
+  const { repo, fields } = pulls.value;
+
+  const own = `${repo.owner}/${repo.name}`.toLowerCase();
+
+  const read = Arr.generate(function* () {
+    for (const n of numbers) {
+      const node = ClosingIssuesNodeSchema.validate(fields(`pr_${n}`));
+
+      if (Result.isOk(node)) {
+        yield {
+          number: n,
+          bodyHtml: node.value.bodyHTML,
+          linked: node.value.closingIssuesReferences.nodes.filter(
+            (issue) => issue.repository.nameWithOwner.toLowerCase() === own,
+          ),
+        };
+      }
+    }
+  });
+
+  const unlinked = unlinkedClosingIssues(repo, read);
+
+  if (!Arr.isNonEmpty(unlinked)) {
+    return Result.ok(issueOrderOf(repo, read, new Map()));
+  }
+
+  const issues = await askRepository(
+    'UnlinkedIssues',
+    unlinked.map((n) => ({
+      alias: `issue_${n}`,
+      number: n,
+      field: `issue(number: $issue_${n}) { ${CLOSING_ISSUE_FIELDS} }`,
+    })),
+  );
+
+  if (Result.isErr(issues)) {
+    return issues;
+  }
+
+  const described = new Map(
+    Arr.generate(function* () {
+      for (const n of unlinked) {
+        const node = ClosingIssueSchema.validate(
+          issues.value.fields(`issue_${n}`),
+        );
+
+        if (Result.isOk(node)) {
+          yield [n, node.value] as const;
+        }
+      }
+    }),
+  );
+
+  return Result.ok(issueOrderOf(repo, read, described));
+};
+
+const CLOSING_ISSUE_FIELDS = 'number state body';
+
+const ClosingIssueSchema: t.Type<ClosingIssueAnswer> = t.record({
+  number: t.number(),
+  state: t.string(),
+  body: t.string(),
+});
+
+const ClosingIssuesNodeSchema = t.record({
+  bodyHTML: t.string(),
+  closingIssuesReferences: t.record({
+    nodes: t.array(
+      t.record({
+        number: t.number(),
+        state: t.string(),
+        body: t.string(),
+        repository: t.record({ nameWithOwner: t.string() }),
+      }),
+    ),
+  }),
+});
+
+/**
+ * One GraphQL request of aliased fields under the repository of the working
+ * directory, each taking one number as `$<alias>`, with the repository's own
+ * name read back so that a body's references can be told apart from another
+ * repository's.
+ */
+const askRepository = async (
+  operationName: string,
+  parts: readonly Readonly<{ alias: string; number: number; field: string }>[],
+): Promise<
+  Result<
+    Readonly<{
+      repo: Readonly<{ owner: string; name: string }>;
+      fields: (alias: string) => unknown;
+    }>,
+    string
+  >
+> => {
+  const query = [
+    `query ${operationName}(${['$owner: String!', '$name: String!', ...parts.map(({ alias }) => `$${alias}: Int!`)].join(', ')}) {`,
+    '  repository(owner: $owner, name: $name) {',
+    '    nameWithOwner',
+    ...parts.map(({ alias, field }) => `    ${alias}: ${field}`),
+    '  }',
+    '}',
+  ].join('\n');
+
+  const answered = await git(
+    [
+      'gh api graphql',
+      `-f ${sh(`query=${query}`)}`,
+      `-F ${sh('owner={owner}')}`,
+      `-F ${sh('name={repo}')}`,
+      ...parts.map(({ alias, number }) => `-F ${sh(`${alias}=${number}`)}`),
+    ].join(' '),
+  );
+
+  if (Result.isErr(answered)) {
+    return answered;
+  }
+
+  const parsed = parseJson(
+    answered.value,
+    RepositoryAnswerSchema,
+    'gh api graphql',
+  );
+
+  if (Result.isErr(parsed)) {
+    return parsed;
+  }
+
+  const { repository } = parsed.value.data;
+
+  const nameWithOwner = isRecord(repository)
+    ? repository['nameWithOwner']
+    : undefined;
+
+  const [owner, name] =
+    typeof nameWithOwner === 'string'
+      ? nameWithOwner.split('/')
+      : ([] as const);
+
+  if (owner === undefined || name === undefined || !isRecord(repository)) {
+    return Result.err('GitHub answered without the repository');
+  }
+
+  return Result.ok({
+    repo: { owner, name },
+    fields: (alias) => repository[alias],
   });
 };
 

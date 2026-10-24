@@ -50,6 +50,11 @@ export type QueueInput = Readonly<{
   nowEpochMs: number;
   rules: ReviewRules;
   pulls: readonly QueuePull[];
+  /**
+   * The `Start-After:` of each issue whose body was read, which a pull
+   * request closing it inherits as a merge order. Absent, none is.
+   */
+  startAfterOf?: ReadonlyMap<number, readonly number[]>;
 }>;
 
 /** Everything read about one open pull request that its place turns on. */
@@ -109,6 +114,7 @@ export const queueViewOf = ({
   nowEpochMs,
   rules,
   pulls,
+  startAfterOf,
 }: QueueInput): QueueView => {
   const graph = queueGraph(
     pulls.map(({ entry }) => ({
@@ -119,8 +125,12 @@ export const queueViewOf = ({
       headRef: entry.headRef,
       baseRef: entry.baseRef,
       fromFork: entry.fromFork,
+      closes: entry.linkedIssues
+        .filter(({ state }) => state !== 'closed')
+        .map(({ number }) => number),
     })),
     defaultBranch,
+    startAfterOf,
   );
 
   const owned = pulls.map((pull) => {

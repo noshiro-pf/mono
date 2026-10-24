@@ -1041,6 +1041,47 @@ describe(loadReport, () => {
     ]);
   });
 
+  test('a pull request inherits the Start-After of the issues it closes', async () => {
+    const { fetchImpl } = answering(
+      report([
+        pullRequest({
+          number: 10,
+          closingIssues: [
+            closes(1, 'noshiro-pf/mono', 'OPEN', 'Start-After: #11, #2'),
+          ],
+        }),
+        pullRequest({
+          number: 11,
+          baseRefName: 'branch-9',
+          bodyHTML: keywordHtml('Closes', 3),
+        }),
+      ]),
+      answer('Compare', { compare_10: null, compare_11: null }),
+      // #11 is onto another base, so GitHub links nothing; the issue it
+      // closes by keyword is read with its body too.
+      answer('Issues', {
+        issue_3: closes(3, 'noshiro-pf/mono', 'OPEN', 'Start-After: #10'),
+      }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.deepStrictEqual(
+      loaded.entries.map(({ number, inheritedMergeAfter, blockedBy }) => ({
+        number,
+        inheritedMergeAfter,
+        blockedBy,
+      })),
+      [
+        { number: 10, inheritedMergeAfter: [11], blockedBy: [11] },
+        { number: 11, inheritedMergeAfter: [10], blockedBy: [10] },
+      ],
+    );
+
+    // Each waits for the other through an issue, which is a cycle.
+    assert.deepStrictEqual(loaded.cycles, [[10, 11]]);
+  });
+
   test('asks nothing more for an issue GitHub already linked', async () => {
     const { fetchImpl, sent } = answering(
       report(
@@ -1822,6 +1863,7 @@ const closes = (
   number: number,
   nameWithOwner: string,
   state: string = 'CLOSED',
+  body: string = '',
 ): unknown =>
   ({
     number,
@@ -1829,6 +1871,7 @@ const closes = (
     url: `https://github.com/${nameWithOwner}/issues/${number}`,
     state,
     repository: { nameWithOwner },
+    body,
   }) as const;
 
 /**

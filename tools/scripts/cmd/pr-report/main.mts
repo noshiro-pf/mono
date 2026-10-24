@@ -1,13 +1,17 @@
 import {
   buildReport,
+  type IssueDeclarations,
+  type OpenIssue,
   type PrReport,
+  type PullRequestFacts,
   type QueueComments,
   type QueueOwner,
+  type RepoRef,
 } from 'pr-report-core';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { tokenFromEnv } from '../../lib/github-api.mjs';
-import { createClient, parseRepoRef } from './github.mjs';
+import { createClient, parseRepoRef, type Client } from './github.mjs';
 import { HELP, parseOptions, type Format, type Options } from './options.mjs';
 import { ownersOf } from './queue.mjs';
 import { renderMarkdown, renderTerminal } from './render.mjs';
@@ -105,6 +109,16 @@ export const prReport = async (
     return issues;
   }
 
+  // And one request for each issue the open pull requests close that the
+  // open list did not cover, whose `Start-After:` the pull request closing
+  // it inherits as a merge order.
+  const issueDeclarations = await declarationsOf(
+    client,
+    repo.value,
+    facts.value,
+    issues.value,
+  );
+
   // Only the JSON carries these: they are what a session working the queue
   // reads (`.claude/skills/unblock-prs/SKILL.md`), not what a person does.
   const queue =
@@ -125,6 +139,7 @@ export const prReport = async (
     mergedWithinDays: options.mergedDays,
     issues: issues.value,
     issuesLimit: options.issuesLimit,
+    issueDeclarations,
   });
 
   const owners = ownersOf(
@@ -135,6 +150,48 @@ export const prReport = async (
   );
 
   return Result.ok(print(report, queue, owners, options.format));
+};
+
+/**
+ * What the open issues listed, and the ones the open pull requests close
+ * beyond them, declare with `Start-After:`. A closing issue already known to
+ * be closed is not read: it closes nothing that is still to do.
+ */
+const declarationsOf = async (
+  client: Client,
+  repo: RepoRef,
+  pulls: readonly PullRequestFacts[],
+  issues: readonly OpenIssue[],
+): Promise<IssueDeclarations> => {
+  const listed = new Set(issues.map(({ number }) => number));
+
+  const beyond = Arr.uniq(
+    pulls.flatMap(({ linkedIssues }) =>
+      linkedIssues
+        .filter(
+          ({ number, state }) => state !== 'closed' && !listed.has(number),
+        )
+        .map(({ number }) => number),
+    ),
+  ).toSorted((a, b) => a - b);
+
+  const read = await client.issueBodies(repo, beyond);
+
+  const mut_startAfter = new Map(
+    issues.map(({ number, startAfter }) => [number, startAfter] as const),
+  );
+
+  const mut_open = new Set(listed);
+
+  for (const [number, { open, startAfter }] of read) {
+    mut_startAfter.set(number, startAfter);
+
+    if (open) {
+      mut_open.add(number);
+    }
+  }
+
+  return { startAfter: mut_startAfter, open: mut_open };
 };
 
 const print = (

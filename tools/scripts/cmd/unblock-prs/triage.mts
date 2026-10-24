@@ -161,8 +161,10 @@ export const triage = async (
       headRef: pr.headRefName,
       baseRef: pr.baseRefName,
       fromFork: pr.isCrossRepository,
+      closes: base.issueOrder.closes.get(pr.number) ?? [],
     })),
     base.defaultBranch,
+    base.issueOrder.startAfter,
   );
 
   // Who moves each one next, by the rule every reader of the queue shares
@@ -389,7 +391,12 @@ const classification = (
       return nativeStackNote(pr, standing.entry);
 
     case 'waiting':
-      return waitingOnNote(pr, standing.on, standing.cyclic);
+      return waitingOnNote(
+        pr,
+        standing.on,
+        standing.cyclic,
+        context.inherited.get(pr.number),
+      );
 
     case 'release-blocked':
       return releaseBlockedNote(pr, standing.by);

@@ -130,8 +130,20 @@ export type ReportEntry = PullRequestFacts &
      */
     stackedOn: number | undefined;
     /**
-     * What is still open of `mergeAfter` and `stackedOn`, and so still
-     * constrains.
+     * The open pull requests it merges after because an issue it closes
+     * starts after them (`start-after.mts`'s `inheritStartAfter`), less what
+     * `mergeAfter` and `stackedOn` already say.
+     */
+    inheritedMergeAfter: readonly number[];
+    /**
+     * The open issues the issues it closes start after that no open pull
+     * request closes. They hold nothing, and are said so that a reader knows
+     * the order its issue asked for is not under way.
+     */
+    notStartedIssues: readonly number[];
+    /**
+     * What is still open of `mergeAfter`, `stackedOn` and
+     * `inheritedMergeAfter`, and so still constrains.
      */
     blockedBy: readonly number[];
     checks: ChecksSummary;
@@ -181,6 +193,22 @@ export type OpenIssue = Readonly<{
   createdAt: string;
   updatedAt: string;
   comments: number;
+  /** What its `Start-After:` names (`docs/issue-start-after.md`). */
+  startAfter: readonly number[];
+}>;
+
+/**
+ * What the issues whose bodies were read declare with `Start-After:`, for a
+ * pull request closing one to inherit (`docs/issue-start-after.md`).
+ */
+export type IssueDeclarations = Readonly<{
+  /** Each issue's `Start-After:`; an issue not in it declares nothing. */
+  startAfter: ReadonlyMap<number, readonly number[]>;
+  /**
+   * The numbers known to be open issues, beyond the ones an open pull
+   * request links as open. Decides only what is said not to be started.
+   */
+  open: ReadonlySet<number>;
 }>;
 
 /** The counts a report leads with. */

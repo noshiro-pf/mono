@@ -356,6 +356,8 @@ const entry = (fields: PullFields): ReportEntry =>
     linkedIssues: [],
     mergeAfter: [],
     stackedOn: undefined,
+    inheritedMergeAfter: [],
+    notStartedIssues: [],
     blockedBy: [],
     checks: {
       verdict: fields.verdict,
