@@ -704,6 +704,9 @@ const notYetPublished: ReadonlySet<string> = new Set([
   // Added with its first rule, `no-unbounded-counter-pipe`. Delete this entry
   // after its first manual publish (libs/first-release.md).
   'eslint-plugin-synstate',
+  // Made public once the PR Manager and the task manager ran on it. Delete this
+  // entry after its first manual publish (libs/first-release.md).
+  'synstate-dom',
 ]);
 
 /**

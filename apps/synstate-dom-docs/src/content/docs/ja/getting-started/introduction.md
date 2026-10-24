@@ -6,7 +6,7 @@ description: synstate-dom とは何か、その土台となるモデル。
 synstate-dom は、[synstate](https://noshiro-pf.github.io/mono/synstate/ja/) の Observable を DOM に直接束縛する UI ライブラリである。JSX を書き、値を置く場所に Observable を渡す。コンパイラも仮想 DOM もない。
 
 :::caution
-synstate-dom は開発中で、まだ npm に公開していない。設計は [`SPEC.md`](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-dom/SPEC.md) にあり、このサイトは実装に合わせて書き足していく。
+synstate-dom はまだ 0.x で、マイナーリリースで API が変わることがある。設計は [`SPEC.md`](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-dom/SPEC.md) にあり、このサイトは実装に合わせて書き足していく。
 :::
 
 ## モデル
