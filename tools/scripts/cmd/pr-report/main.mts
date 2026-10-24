@@ -10,12 +10,12 @@ import {
 } from 'pr-report-core';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import { tokenFromEnv } from '../../lib/github-api.mjs';
-import { createClient, parseRepoRef, type Client } from './github.mjs';
+import { resolveRepo, tokenFromEnv } from '../../lib/github-api.mjs';
+import { createClient, type Client } from './github.mjs';
 import { HELP, parseOptions, type Format, type Options } from './options.mjs';
 import { ownersOf } from './queue.mjs';
 import { renderMarkdown, renderTerminal } from './render.mjs';
-import { readRepoRef, readRequiredContexts } from './repo-settings.mjs';
+import { readRequiredContexts } from './repo-settings.mjs';
 
 /**
  * Reports the state of every open pull request, in one page.
@@ -58,10 +58,7 @@ import { readRepoRef, readRequiredContexts } from './repo-settings.mjs';
 export const prReport = async (
   options: Options,
 ): Promise<Result<string, string>> => {
-  const repo =
-    options.repo === undefined
-      ? await readRepoRef()
-      : parseRepoRef(options.repo);
+  const repo = await resolveRepo(options.repo);
 
   if (Result.isErr(repo)) {
     return repo;

@@ -7,9 +7,9 @@ import {
   type RepoRef,
 } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
-import { tokenFromEnv } from '../../lib/github-api.mjs';
-import { createClient, parseRepoRef } from './github.mjs';
-import { readRepoRef, readRequiredContexts } from './repo-settings.mjs';
+import { resolveRepo, tokenFromEnv } from '../../lib/github-api.mjs';
+import { createClient } from './github.mjs';
+import { readRequiredContexts } from './repo-settings.mjs';
 
 /**
  * Who moves each open pull request in the queue next (`pr-report-core`'s
@@ -67,8 +67,7 @@ export type QueueState = Readonly<{
 export const readQueueState = async (
   repoOption?: string,
 ): Promise<Result<QueueState, string>> => {
-  const repo =
-    repoOption === undefined ? await readRepoRef() : parseRepoRef(repoOption);
+  const repo = await resolveRepo(repoOption);
 
   if (Result.isErr(repo)) {
     return repo;
