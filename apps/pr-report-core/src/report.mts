@@ -5,7 +5,13 @@ import { summarizeChecks } from './checks.mjs';
 import { SKIP_CI_LABEL } from './labels.mjs';
 import { parseMergeAfter } from './merge-after.mjs';
 import { findStackParents } from './stack.mjs';
-import { inheritStartAfter } from './start-after.mjs';
+import {
+  decideStartStates,
+  inheritStartAfter,
+  issuesInProgress,
+  withProgress,
+  type ReferenceStatus,
+} from './start-after.mjs';
 import { buildMergeAfterForest } from './tree.mjs';
 import type {
   IssueDeclarations,
@@ -15,6 +21,7 @@ import type {
   PullRequestFacts,
   RepoRef,
   ReportEntry,
+  ReportIssue,
   TreeNode,
 } from './types.mjs';
 
@@ -36,6 +43,7 @@ export const buildReport = ({
   issues,
   issuesLimit,
   issueDeclarations,
+  references = new Map(),
 }: Readonly<{
   repo: RepoRef;
   defaultBranch: string;
@@ -49,6 +57,11 @@ export const buildReport = ({
   issuesLimit: number;
   /** See {@link buildEntries}. */
   issueDeclarations?: IssueDeclarations;
+  /**
+   * Where each number the issues' `Start-After:` names stands, for what is
+   * neither a listed issue nor an open pull request; one missing is unknown.
+   */
+  references?: ReadonlyMap<number, ReferenceStatus>;
 }>): PrReport =>
   ({
     repo,
@@ -64,9 +77,46 @@ export const buildReport = ({
     }),
     merged,
     mergedWithinDays,
-    issues,
+    issues: reportIssues(issues, pulls, references),
     issuesLimit,
   }) as const;
+
+/**
+ * Each open issue with how it stands for being started
+ * (`docs/issue-start-after.md`): its start state, or `in-progress` when it
+ * is startable and an open pull request closes it, and where each thing it
+ * names stands.
+ */
+const reportIssues = (
+  issues: readonly OpenIssue[],
+  pulls: readonly PullRequestFacts[],
+  references: ReadonlyMap<number, ReferenceStatus>,
+): readonly ReportIssue[] => {
+  const listed = new Set(issues.map(({ number }) => number));
+
+  const open = new Set(pulls.map(({ number }) => number));
+
+  const statusOf = (number: number): ReferenceStatus =>
+    listed.has(number) || open.has(number)
+      ? 'waiting'
+      : (references.get(number) ?? 'unknown');
+
+  const states = decideStartStates(issues, statusOf);
+
+  const worked = issuesInProgress(pulls);
+
+  return issues.map((issue) => ({
+    ...issue,
+    start: withProgress(
+      states.get(issue.number) ?? 'free',
+      worked.has(issue.number),
+    ),
+    named: issue.startAfter.map((number) => ({
+      number,
+      status: statusOf(number),
+    })),
+  }));
+};
 
 export type DecidedEntries = Readonly<{
   entries: readonly ReportEntry[];

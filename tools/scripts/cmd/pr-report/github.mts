@@ -3,8 +3,10 @@
 import {
   anyRunInProgress,
   closingIssuesIn,
+  parseMergeAfter,
   parseStartAfter,
   readQueueComments,
+  referenceStatusOf,
   reportedContexts,
   type CheckRunReport,
   type Comparison,
@@ -15,6 +17,7 @@ import {
   type OpenIssue,
   type PullRequestFacts,
   type QueueComments,
+  type ReferenceStatus,
   type RepoRef,
 } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
@@ -135,6 +138,15 @@ const IssueBodySchema = t.record({
   pull_request: t.optional(t.record({})),
 });
 
+/** An issue or a pull request, as the issues route answers for either. */
+const ReferenceSchema = t.record({
+  state: t.string(),
+  state_reason: t.optional(t.union([t.string(), t.nullType])),
+  pull_request: t.optional(
+    t.record({ merged_at: t.union([t.string(), t.nullType]) }),
+  ),
+});
+
 const WorkflowRunsSchema = t.record({
   total_count: t.number(),
   workflow_runs: t.array(
@@ -232,6 +244,15 @@ export type Client = Readonly<{
     repo: RepoRef,
     numbers: readonly number[],
   ) => Promise<ReadonlyMap<number, IssueBody>>;
+  /**
+   * Where each of `numbers` — what the issues' `Start-After:` names beyond
+   * the open lists — stands: one request each, an issue or a pull request
+   * alike. One that cannot be read is left out, and is unknown.
+   */
+  references: (
+    repo: RepoRef,
+    numbers: readonly number[],
+  ) => Promise<ReadonlyMap<number, ReferenceStatus>>;
 }>;
 
 /** What {@link Client.issueBodies} reads of one issue. */
@@ -605,6 +626,7 @@ export const createClient = (
             updatedAt: issue.updated_at,
             comments: issue.comments,
             startAfter: parseStartAfter(issue.body ?? ''),
+            misplacedMergeAfter: parseMergeAfter(issue.body ?? ''),
           })),
       );
     },
@@ -625,6 +647,42 @@ export const createClient = (
             startAfter: parseStartAfter(read.value.body ?? ''),
           });
         }
+      }
+
+      return mut_read;
+    },
+
+    references: async (repo, numbers) => {
+      const mut_read = new Map<number, ReferenceStatus>();
+
+      for (const number of numbers) {
+        const read = await getJson(
+          `/repos/${repo.owner}/${repo.name}/issues/${number}`,
+          ReferenceSchema,
+        );
+
+        if (Result.isErr(read)) {
+          continue;
+        }
+
+        const {
+          state,
+          state_reason: stateReason,
+          pull_request: pull,
+        } = read.value;
+
+        mut_read.set(
+          number,
+          referenceStatusOf(
+            pull === undefined
+              ? { kind: 'issue', state, stateReason: stateReason ?? undefined }
+              : {
+                  kind: 'pull-request',
+                  state,
+                  merged: pull.merged_at !== null,
+                },
+          ),
+        );
       }
 
       return mut_read;

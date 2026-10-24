@@ -1,5 +1,7 @@
 // cspell:ignore RRGGBB
 
+import type { IssueStartState, ReferenceStatus } from './start-after.mjs';
+
 /**
  * The shapes a report is made of, whichever side reads GitHub for it:
  * `pr-report` over REST, the Pull Requests Manager page over GraphQL.
@@ -195,7 +197,20 @@ export type OpenIssue = Readonly<{
   comments: number;
   /** What its `Start-After:` names (`docs/issue-start-after.md`). */
   startAfter: readonly number[];
+  /**
+   * What a `Merge-After:` in its body names. That line is not read on an
+   * issue, and is shown as a slip to fix: `Start-After:` is the issue's.
+   */
+  misplacedMergeAfter: readonly number[];
 }>;
+
+/** One open issue as a report lists it, with how it stands for starting. */
+export type ReportIssue = OpenIssue &
+  Readonly<{
+    start: IssueStartState;
+    /** What its `Start-After:` names, in its order, and where each stands. */
+    named: readonly Readonly<{ number: number; status: ReferenceStatus }>[];
+  }>;
 
 /**
  * What the issues whose bodies were read declare with `Start-After:`, for a
@@ -244,7 +259,7 @@ export type PrReport = Readonly<{
   /** How far back that list goes. */
   mergedWithinDays: number;
   /** The open issues, most recently updated first. */
-  issues: readonly OpenIssue[];
+  issues: readonly ReportIssue[];
   /** What that list is capped at, so that a full one can say so. */
   issuesLimit: number;
 }>;

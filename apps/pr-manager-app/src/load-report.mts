@@ -25,6 +25,7 @@ import {
   epochMsOf,
   MAIN_RULESET_PATH,
   parseCodeOwners,
+  parseMergeAfter,
   parseRuleset,
   parseSetAsideComment,
   parseStartAfter,
@@ -1771,6 +1772,7 @@ const issueOf = (issue: OpenIssueNode): IssueItem =>
     updatedAt: issue.updatedAt,
     comments: issue.comments.totalCount,
     startAfter: parseStartAfter(issue.body),
+    misplacedMergeAfter: parseMergeAfter(issue.body),
   }) as const;
 
 /** What GitHub calls an account that has been deleted. */

@@ -3,8 +3,11 @@
 import {
   summarize,
   type ChecksSummary,
+  type IssueStartState,
   type PrReport,
+  type ReferenceStatus,
   type ReportEntry,
+  type ReportIssue,
   type TreeNode,
 } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
@@ -357,6 +360,7 @@ const issuesSection = (
         : (`#${issue.number}` as const);
 
       const detail = [
+        ...startDetail(issue),
         `updated ${issue.updatedAt}`,
         `by ${issue.author}`,
         ...(issue.comments > 0
@@ -373,6 +377,45 @@ const issuesSection = (
     }),
   ] as const;
 };
+
+/**
+ * How an issue stands for being started (`docs/issue-start-after.md`), unless
+ * it is free, which is the ordinary case; what its `Start-After:` names and
+ * where each stands; and a `Merge-After:` in its body, which is not read on
+ * an issue and is said so that it can be fixed.
+ */
+const startDetail = (issue: ReportIssue): readonly string[] =>
+  [
+    ...(issue.start === 'free'
+      ? ([] as const)
+      : ([START_WORDS[issue.start]] as const)),
+    ...(Arr.isNonEmpty(issue.named)
+      ? ([
+          `after ${issue.named.map(({ number, status }) => `#${number} (${STATUS_WORDS[status]})`).join(', ')}`,
+        ] as const)
+      : ([] as const)),
+    ...(Arr.isNonEmpty(issue.misplacedMergeAfter)
+      ? ([
+          `Merge-After: ${refs(issue.misplacedMergeAfter)} is not read on an issue; use Start-After:`,
+        ] as const)
+      : ([] as const)),
+  ] as const;
+
+const START_WORDS = {
+  free: 'free',
+  ready: 'ready',
+  'in-progress': 'in progress',
+  attention: 'needs a look',
+  blocked: 'waiting',
+  cycle: 'on a Start-After cycle',
+} as const satisfies ReadonlyRecord<IssueStartState, string>;
+
+const STATUS_WORDS = {
+  waiting: 'open',
+  done: 'done',
+  abandoned: 'closed unfinished',
+  unknown: 'unknown',
+} as const satisfies ReadonlyRecord<ReferenceStatus, string>;
 
 /** Said once, at the bottom, rather than beside every pull request. */
 const footnote = (report: PrReport): readonly string[] =>

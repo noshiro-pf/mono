@@ -13,7 +13,12 @@
  * it is labelled `pending`.
  */
 
-import { decideStartStates, type StartState } from 'pr-report-core';
+import {
+  decideStartStates,
+  withProgress,
+  type IssueStartState,
+} from 'pr-report-core';
+import { Arr } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import type { Entry, IssueItem, ReferencedItem } from './load-report.mjs';
 import { isPending } from './pending.mjs';
@@ -22,14 +27,15 @@ import { priorityOf, type Priority } from './priority.mjs';
 /**
  * How a node is drawn.
  *
- * A listed issue takes its {@link StartState}, or `in-progress` when it is
- * startable and an open pull request closes it. Anything else is where it
+ * A listed issue takes its {@link IssueStartState}: its start state, or
+ * `in-progress` when it is startable and an open pull request closes it
+ * (`pr-report-core`'s `withProgress`). Anything else is where it
  * stands: `open` for an open pull request, and for an open issue past the end
  * of the list, whose own declarations were not read; `done`, `abandoned` or
  * `unknown` for the rest, as `ReferenceStatus` says.
  */
 export type IssueNodeState =
-  StartState | 'abandoned' | 'done' | 'in-progress' | 'open' | 'unknown';
+  IssueStartState | 'abandoned' | 'done' | 'open' | 'unknown';
 
 export type IssueGraphNode = Readonly<{
   number: number;
@@ -119,10 +125,7 @@ export const buildIssueGraph = ({
       kind: 'issue',
       title: issue.title,
       url: issue.url,
-      state:
-        (state === 'free' || state === 'ready') && worked.has(issue.number)
-          ? 'in-progress'
-          : state,
+      state: withProgress(state, worked.has(issue.number)),
       priority: priorityOf(issue.labels),
       pending: isPending(issue.labels),
     };
@@ -197,6 +200,57 @@ export const buildIssueGraph = ({
 
   return { nodes, edges };
 };
+
+/** How a listed issue stands for being started, as its row says it. */
+export type IssueStart = Readonly<{
+  state: IssueStartState;
+  /** What its `Start-After:` names, as the graph draws each, in its order. */
+  named: readonly IssueGraphNode[];
+}>;
+
+/**
+ * Each listed issue's {@link IssueStart}, read off the whole graph — what
+ * is done included, since that is why an issue reads as ready.
+ */
+export const issueStartsOf = (
+  graph: IssueGraph,
+  issues: readonly IssueItem[],
+): ReadonlyMap<number, IssueStart> => {
+  const byNumber = new Map(graph.nodes.map((node) => [node.number, node]));
+
+  return new Map(
+    Arr.generate(function* () {
+      for (const { number, startAfter } of issues) {
+        const state = byNumber.get(number)?.state;
+
+        if (state !== undefined && isIssueStartState(state)) {
+          yield [
+            number,
+            {
+              state,
+              named: Arr.generate(function* () {
+                for (const each of startAfter) {
+                  const node = byNumber.get(each);
+
+                  if (node !== undefined) {
+                    yield node;
+                  }
+                }
+              }),
+            },
+          ] as const;
+        }
+      }
+    }),
+  );
+};
+
+/** Whether a node's state is a listed issue's rather than where it stands. */
+const isIssueStartState = (state: IssueNodeState): state is IssueStartState =>
+  state !== 'abandoned' &&
+  state !== 'done' &&
+  state !== 'open' &&
+  state !== 'unknown';
 
 /**
  * The graph without what is done — closed as completed, or merged — and

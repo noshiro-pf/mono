@@ -18,6 +18,7 @@ export * from './issue-dag-pending-toggle.js';
 export * from './issue-dag-states.mjs';
 export * from './issue-dag-zoom.js';
 export * from './issue-dag.js';
+export * from './issue-start-row.js';
 export * from './issues-list-filters.js';
 export * from './issues-section.js';
 export * from './issues-view-switch.js';

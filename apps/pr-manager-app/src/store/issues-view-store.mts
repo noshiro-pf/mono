@@ -109,6 +109,8 @@ export type IssuesViewStore = Readonly<{
    * when that is hidden.
    */
   graph: InitializedObservable<IssueGraph>;
+  /** The whole graph, what is done included: what the list reads from. */
+  fullGraph: InitializedObservable<IssueGraph>;
   layout: InitializedObservable<IssueGraphLayout>;
   /** How many nodes are done, whether or not they are drawn. */
   doneCount: InitializedObservable<number>;
@@ -335,6 +337,7 @@ export const createIssuesViewStore = (
     hideDone,
     hidePending,
     graph,
+    fullGraph,
     layout,
     doneCount,
     pendingCount,

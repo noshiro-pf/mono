@@ -1636,6 +1636,57 @@ a:focus-visible {
   color: var(--ink-muted);
 }
 
+/*
+ * How a listed issue stands for being started, in the DAG's colours
+ * (`issue-start-row.tsx`), and what it names, coloured by where each stands.
+ */
+.issue-start {
+  border-color: var(--dag-colour, var(--border-ring));
+  color: var(--dag-colour, var(--ink-secondary));
+}
+
+.issue-start[data-state='free'],
+.issue-start[data-state='ready'],
+.issue-start-named a[data-state='free'],
+.issue-start-named a[data-state='ready'] {
+  --dag-colour: var(--dag-good);
+}
+
+.issue-start[data-state='in-progress'],
+.issue-start-named a[data-state='in-progress'],
+.issue-start-named a[data-state='open'] {
+  --dag-colour: var(--dag-progress);
+}
+
+.issue-start[data-state='blocked'],
+.issue-start-named a[data-state='blocked'] {
+  --dag-colour: var(--dag-waiting);
+}
+
+.issue-start[data-state='attention'],
+.issue-start-named a[data-state='attention'] {
+  --dag-colour: var(--dag-attention);
+}
+
+.issue-start[data-state='cycle'],
+.issue-start-named a[data-state='cycle'] {
+  --dag-colour: var(--dag-critical);
+}
+
+.issue-start-named a {
+  color: var(--dag-colour, var(--ink-secondary));
+}
+
+.issue-start-named a[data-state='done'],
+.issue-start-named a[data-state='unknown'] {
+  color: var(--ink-muted);
+}
+
+.issue-start-named a[data-state='abandoned'] {
+  color: var(--ink-muted);
+  text-decoration: line-through;
+}
+
 /* --- labels, in GitHub's own colours ------------------------------------ */
 
 .label-chip {
@@ -1980,7 +2031,9 @@ a:focus-visible {
  * fills the shape and the colour itself draws its outline; the words are in
  * the legend and the tooltip, so the colour never says it alone.
  */
-.issue-dag {
+/* The issue list's start badges take the same colours. */
+.issue-dag,
+.issue-list {
   --dag-good: light-dark(#1c6e42, #3fb27f);
   --dag-waiting: light-dark(#935610, #f0b35a);
   --dag-attention: light-dark(#b4501f, #ec835a);

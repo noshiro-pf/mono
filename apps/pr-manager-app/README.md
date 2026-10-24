@@ -66,11 +66,20 @@ button under the list to ask for it again.
 issue carrying no one of them (or more than one), as they are in the merge
 order. Every other label an open issue carries is a pick: once any is picked,
 only the issues carrying one picked are listed, still not those whose priority
-is switched off. The order is **updated** or **priority**: high first, none
-between mid and low, and the most recently updated first within each. Each
-switch and pick counts what the list shows of it, as the merge order's do, and
-the choice is kept in the browser. They apply to the list; the DAG draws every
-issue.
+is switched off. **The start states** (`docs/issue-start-after.md`), in the
+DAG's words and colours, are switches too. The order is **updated**,
+**priority** — high first, none between mid and low — or **start**: what can
+be started (wait over, then free), what is in progress, what needs a look,
+what waits, what is on a cycle; the most recently updated first within each.
+Each switch and pick counts what the list shows of it, as the merge order's
+do, and the choice is kept in the browser. They apply to the list; the DAG
+draws every issue.
+
+**Each issue in the list says how it stands for being started**: a badge for
+its start state, the numbers its `Start-After:` names, each coloured by where
+it stands with its title on hover, and — when its body has one — that a
+`Merge-After:` line is not read on an issue, which is the slip to fix by
+writing `Start-After:`.
 
 **Running workflows** lists what the Actions tab shows filtered to
 `is:in_progress is:queued is:waiting is:action_required is:neutral is:stale`,

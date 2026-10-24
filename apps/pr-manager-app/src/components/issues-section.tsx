@@ -6,6 +6,7 @@ import { IssueDagDoneToggle } from './issue-dag-done-toggle.js';
 import { IssueDagPendingToggle } from './issue-dag-pending-toggle.js';
 import { IssueDagZoom } from './issue-dag-zoom.js';
 import { IssueDag } from './issue-dag.js';
+import { IssueStartRow } from './issue-start-row.js';
 import { IssuesListFilters } from './issues-list-filters.js';
 import { IssuesViewSwitch } from './issues-view-switch.js';
 import { LabelChip } from './label-chip.js';
@@ -13,11 +14,12 @@ import { LoadMoreIssues } from './load-more-issues.js';
 import { Timestamp } from './timestamp.js';
 
 /**
- * What is open that is not a pull request, most recently updated first, or
- * by priority, and narrowed by priority, `pending`, label and a search of
- * the titles (`issues-list-filters.tsx`). The DAG is not narrowed by any of
- * them: what an issue waits for is drawn whole, save what it is told to
- * leave out itself.
+ * What is open that is not a pull request, most recently updated first, by
+ * priority or by start state, and narrowed by priority, start state,
+ * `pending`, label and a search of the titles (`issues-list-filters.tsx`).
+ * Each row says how the issue stands for being started and what it waits for
+ * (`issue-start-row.tsx`). The DAG is not narrowed by any of them: what an
+ * issue waits for is drawn whole, save what it is told to leave out itself.
  *
  * Last, because it is the one section that is not about the queue: a reader
  * asks "what is in flight" first and "what is waiting to be started" second.
@@ -134,6 +136,14 @@ const IssueList = (): JSX.Element => (
                       {view(issue$, (issue) => issue.title)}
                     </ExternalLink>
                   </div>
+
+                  <IssueStartRow
+                    issue={issue$}
+                    start={derive(
+                      [issuesListStore.starts, issue$],
+                      (starts, { number }) => starts.get(number),
+                    )}
+                  />
 
                   <div class={constant('pull-request-row')}>
                     <Timestamp
