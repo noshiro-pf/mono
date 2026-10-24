@@ -1,6 +1,6 @@
 {
   "name": "synstate",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "Type-safe State Management Library for TypeScript/JavaScript",
   "repository": {
     "type": "git",

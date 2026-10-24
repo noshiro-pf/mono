@@ -1,5 +1,14 @@
 # annotation-tool
 
+## 0.0.16
+
+### Patch Changes
+
+- Updated dependencies [766d3ef]
+    - synstate@4.1.1
+    - synstate-react-hooks@4.1.1
+    - react-utils@0.0.18
+
 ## 0.0.15
 
 ### Patch Changes
