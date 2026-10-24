@@ -1,7 +1,8 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
-import { glob, isDirectlyExecuted } from 'ts-repo-utils';
+import { isDirectlyExecuted } from 'ts-repo-utils';
+import { listWorkflowFiles } from '../lib/repo-files.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -32,7 +33,7 @@ export const checkWorkflowEventName = (): Promise<
   Result<CheckSummary, string>
 > =>
   Result.safeTry(async function* () {
-    const workflowPaths = yield* Result.safeUnwrap(await collectWorkflows());
+    const workflowPaths = yield* Result.safeUnwrap(await listWorkflowFiles());
 
     const workflows = yield* Result.safeUnwrap(
       await readWorkflows(workflowPaths),
@@ -129,8 +130,6 @@ type CheckSummary = Readonly<{
   comparisons: number;
 }>;
 
-const WORKFLOW_GLOB = '.github/workflows/*.yml';
-
 const REUSABLE_EVENT = 'workflow_call';
 
 const TRIGGER_BLOCK_KEY = 'on:';
@@ -192,21 +191,6 @@ const collectComparedEventNames = (workflowFile: string): readonly string[] => {
       }
     }
   });
-};
-
-const collectWorkflows = async (): Promise<
-  Result<readonly string[], string>
-> => {
-  const result = await glob(WORKFLOW_GLOB, {
-    cwd: projectRootPath,
-    absolute: true,
-  });
-
-  return Result.isErr(result)
-    ? Result.err(
-        `Failed to list ${WORKFLOW_GLOB}: ${unknownToString(result.value)}`,
-      )
-    : Result.ok(result.value.toSorted());
 };
 
 const readWorkflows = async (

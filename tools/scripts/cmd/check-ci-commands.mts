@@ -11,9 +11,10 @@ import {
   Result,
   unknownToString,
 } from 'ts-data-forge';
-import { getWorkspacePackages, glob, isDirectlyExecuted } from 'ts-repo-utils';
+import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
 import { Regex } from 'ts-std-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { listWorkflowFiles } from '../lib/repo-files.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 import { parseWorkflowTriggers } from './check-workflow-event-name.mjs';
 
@@ -374,8 +375,6 @@ type CheckSummary = Readonly<{
 }>;
 
 const ROOT_DIRECTORY = '.';
-
-const WORKFLOW_GLOB = '.github/workflows/*.yml';
 
 /**
  * A workflow is one of the repository's checks when it triggers on
@@ -776,18 +775,13 @@ const readScripts = (manifest: unknown): ReadonlyRecord<string, string> => {
 const readCheckWorkflows = async (): Promise<
   Result<readonly CheckWorkflow[], string>
 > => {
-  const paths = await glob(WORKFLOW_GLOB, {
-    cwd: projectRootPath,
-    absolute: true,
-  });
+  const paths = await listWorkflowFiles();
 
   if (Result.isErr(paths)) {
-    return Result.err(
-      `Failed to list ${WORKFLOW_GLOB}: ${unknownToString(paths.value)}`,
-    );
+    return paths;
   }
 
-  const results = await Promise.all(paths.value.toSorted().map(readWorkflow));
+  const results = await Promise.all(paths.value.map(readWorkflow));
 
   const failed = results.find(Result.isErr);
 

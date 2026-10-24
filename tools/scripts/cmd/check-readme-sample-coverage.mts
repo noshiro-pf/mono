@@ -8,9 +8,9 @@ import {
   Result,
   unknownToString,
 } from 'ts-data-forge';
-import { glob, isDirectlyExecuted } from 'ts-repo-utils';
+import { isDirectlyExecuted } from 'ts-repo-utils';
 import { countSampleBackedFences } from '../../configs/embed-examples-in-markdown.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { listLibraryDirs } from '../lib/repo-files.mjs';
 
 /**
  * Fails when a published package's README carries a JavaScript / TypeScript
@@ -32,18 +32,13 @@ import { projectRootPath } from '../project-root-path.mjs';
 export const checkReadmeSampleCoverage = async (): Promise<
   Result<Readonly<{ packages: number; withFences: number }>, string>
 > => {
-  const packageManifestsResult = await glob('libs/*/package.json', {
-    cwd: projectRootPath,
-    absolute: true,
-  });
+  const packageDirsResult = await listLibraryDirs();
 
-  if (Result.isErr(packageManifestsResult)) {
-    return Result.err(
-      `❌ Failed to list the packages: ${unknownToString(packageManifestsResult.value)}`,
-    );
+  if (Result.isErr(packageDirsResult)) {
+    return Result.err(`❌ ${packageDirsResult.value}`);
   }
 
-  const packageDirs = packageManifestsResult.value.toSorted().map(path.dirname);
+  const packageDirs = packageDirsResult.value;
 
   const results = await Promise.all(packageDirs.map(checkPackage));
 

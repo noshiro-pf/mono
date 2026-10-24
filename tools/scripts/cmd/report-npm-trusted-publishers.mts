@@ -1,6 +1,5 @@
 import { spawn } from 'node:child_process';
 import { setTimeout as sleep } from 'node:timers/promises';
-import * as util from 'node:util';
 import {
   Arr,
   isRecord,
@@ -11,6 +10,7 @@ import {
 } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { parseCommandArgs } from '../lib/cli-args.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -436,36 +436,25 @@ const toTrustConfig = (item: ReadonlyRecord<string, unknown>): TrustConfig => {
 const parseOptions = (
   args: readonly string[],
 ): Result<Options | 'help', string> => {
-  // `pnpm run <script> -- --flag` passes the `--` through.
-  const [first, ...rest] = args;
-
-  const argv: readonly string[] = first === '--' ? rest : args;
-
-  const parsed = Result.fromThrowable(() =>
-    util.parseArgs({
-      args: Array.from(argv),
-      options: {
-        user: { type: 'string' },
-        'workspace-only': { type: 'boolean', default: false },
-        filter: { type: 'string' },
-        otp: { type: 'string' },
-        delay: { type: 'string', default: '1000' },
-        json: { type: 'boolean', default: false },
-        check: { type: 'boolean', default: false },
-        help: { type: 'boolean', short: 'h', default: false },
-      },
-    }),
-  );
+  const parsed = parseCommandArgs(args, {
+    user: { type: 'string' },
+    'workspace-only': { type: 'boolean', default: false },
+    filter: { type: 'string' },
+    otp: { type: 'string' },
+    delay: { type: 'string', default: '1000' },
+    json: { type: 'boolean', default: false },
+    check: { type: 'boolean', default: false },
+  });
 
   if (Result.isErr(parsed)) {
-    return Result.err(unknownToString(parsed.value));
+    return parsed;
   }
 
-  const { values } = parsed.value;
-
-  if (values.help) {
+  if (parsed.value === 'help') {
     return Result.ok('help');
   }
+
+  const values = parsed.value;
 
   const delayMs = Result.unwrapOkOr(Num.safeParseInt(values.delay), Number.NaN);
 

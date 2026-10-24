@@ -12,7 +12,7 @@ import {
 } from 'ts-data-forge';
 import { glob, isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { projectRootPath } from '../project-root-path.mjs';
+import { listLibraryDirs } from '../lib/repo-files.mjs';
 
 /**
  * Fails when a published package carries a JSDoc `@example` and nothing checks
@@ -41,10 +41,10 @@ import { projectRootPath } from '../project-root-path.mjs';
 export const checkExampleCoverage = async (): Promise<
   Result<Readonly<{ packages: number; withExamples: number }>, string>
 > => {
-  const packageDirsResult = await collectPackageDirs();
+  const packageDirsResult = await listLibraryDirs();
 
   if (Result.isErr(packageDirsResult)) {
-    return Result.err(packageDirsResult.value);
+    return Result.err(`❌ ${packageDirsResult.value}`);
   }
 
   const packageDirs = packageDirsResult.value;
@@ -131,23 +131,6 @@ const mapRelativePath = 'scripts/cmd/embed-examples-in-jsdoc-map.mts';
  */
 const countExampleTags = (content: string): number =>
   Array.from(content.matchAll(/^\s*\*\s*@example\b/gmu)).length;
-
-const collectPackageDirs = async (): Promise<
-  Result<readonly string[], string>
-> => {
-  const result = await glob('libs/*/package.json', {
-    cwd: projectRootPath,
-    absolute: true,
-  });
-
-  if (Result.isErr(result)) {
-    return Result.err(
-      `❌ Failed to list the packages: ${unknownToString(result.value)}`,
-    );
-  }
-
-  return Result.ok(result.value.toSorted().map(path.dirname));
-};
 
 const checkPackage = async (
   packageDir: string,
