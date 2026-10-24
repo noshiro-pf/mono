@@ -20,10 +20,16 @@ describe(describeFailedChecks, () => {
       },
     ] as const;
 
-    assert.deepStrictEqual(describeFailedChecks(summary({ failed })), {
-      detail: 'failed: code-check-result / result, style-check-result / result',
-      failedChecks: failed,
-    });
+    assert.deepStrictEqual(
+      describeFailedChecks(
+        summary({ failed: failed.map(({ name }) => name), failedRuns: failed }),
+      ),
+      {
+        detail:
+          'failed: code-check-result / result, style-check-result / result',
+        failedChecks: failed,
+      },
+    );
   });
 });
 
@@ -111,11 +117,15 @@ describe(describeCommandFailure, () => {
 
 const summary = (overrides: Partial<ChecksSummary> = {}): ChecksSummary =>
   ({
-    status: 'pending',
+    verdict: 'pending',
+    passed: [],
     failed: [],
+    failedRuns: [],
     pending: [],
+    skipped: [],
     missing: [],
+    notRun: [],
     running: [],
-    total: 9,
+    required: 9,
     ...overrides,
   }) as const;
