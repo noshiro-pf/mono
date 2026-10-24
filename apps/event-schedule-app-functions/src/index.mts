@@ -11,6 +11,7 @@ import {
 } from './notify-answer-deadline.mjs';
 import { notifyOnAnswerChangeBody } from './notify-on-answer-change.mjs';
 import { onUserDelete } from './on-user-delete.mjs';
+import { createMailBudget } from './send-report-budget.mjs';
 import { sendReportImpl } from './send-report-impl.mjs';
 import {
   fillAnswerWithCheck,
@@ -140,8 +141,22 @@ export const verifyEmail = regionSelected.https.onCall(
   },
 );
 
-export const sendReport = regionSelectedWithConfig.https.onCall(
-  (payload: unknown, _context) => {
+/**
+ * Error reports are mailed from the same account as the notifications, so
+ * they get a budget of their own; a report over it goes to the function's log
+ * instead. The budget is per instance, hence `maxInstances: 1`.
+ */
+const sendReportMailBudget = createMailBudget({
+  limit: 10,
+  windowMilliseconds: 60 ** 2 * 1000,
+});
+
+export const sendReport = regionSelected
+  .runWith({
+    secrets: [runtimeConfig],
+    maxInstances: 1,
+  })
+  .https.onCall((payload: unknown, _context) => {
     if (!isSendReportPayload(payload)) {
       throw new https.HttpsError(
         'invalid-argument',
@@ -149,6 +164,11 @@ export const sendReport = regionSelectedWithConfig.https.onCall(
       );
     }
 
+    if (!sendReportMailBudget(Date.now())) {
+      logger.error('Error report (mail budget used up):', payload.error);
+
+      return;
+    }
+
     sendReportImpl(payload).catch(logger.error);
-  },
-);
+  });

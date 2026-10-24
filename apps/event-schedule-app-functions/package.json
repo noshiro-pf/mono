@@ -13,6 +13,7 @@
   "scripts": {
     "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/build.mts",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
+    "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && vitest --config ./configs/vitest.config.mts run",
     "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "fix:fmt": "pnpm run z:format-uncommitted --cwd .",
     "fix:fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
@@ -22,7 +23,9 @@
     "gen": "run-s gen:index",
     "gen:index": "run-s gen:index:src fix:fmt",
     "gen:index:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --preserve index.mts",
+    "test": "pnpm run check:test",
     "watch:build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/build.mts --watch",
+    "watch:test": "vitest --config ./configs/vitest.config.mts watch",
     "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
     "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
     "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts",
@@ -51,7 +54,8 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "ts-type-forge": "workspace:*",
-    "tsx": "catalog:"
+    "tsx": "catalog:",
+    "vitest": "catalog:"
   },
   "engines": {
     "node": ">=22.22.2"
