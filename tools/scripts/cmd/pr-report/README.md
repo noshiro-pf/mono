@@ -50,6 +50,8 @@ rebase・マージ・コメントは一切しません（それは `unblock-prs`
   `on a Start-After cycle`。制約なしは書きません）と、`Start-After:` が名指す
   ものの状態（`after #N (open)` など）を出します（`docs/issue-start-after.md`）。
   名指したものが一覧にも open な PR にも無ければ、1件につき1リクエスト読みます。
+  GitHub の issue の依存関係（blocked by）も `Start-After:` と同じに読み、依存が
+  ある issue だけ1リクエスト足します。
   本文に `Merge-After:` があれば、issue では読まないことを書き間違いとして示します。
 
 ### 実行
@@ -166,7 +168,9 @@ on a full list). Each issue says how it stands for being started — `ready`,
 `waiting`, `needs a look`, `in progress` or `on a Start-After cycle`, and
 nothing when it is free — and where each thing its `Start-After:` names
 stands, as `after #N (open)` (`docs/issue-start-after.md`; one request for
-each named number that is neither listed nor an open pull request). A
+each named number that is neither listed nor an open pull request). GitHub's
+issue dependencies ("blocked by") count as `Start-After:` does, at one more
+request for each issue that has any. A
 `Merge-After:` in an issue's body is pointed out as the slip it is: an issue
 does not read it.
 

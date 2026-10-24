@@ -3,6 +3,7 @@ import {
   inheritStartAfter,
   issuesInProgress,
   referenceStatusOf,
+  waitsFor,
   withProgress,
   type ReferenceStatus,
 } from './start-after.mjs';
@@ -291,6 +292,21 @@ describe(inheritStartAfter, () => {
       }).get(10),
       { mergeAfter: [], notStarted: [] },
     );
+  });
+});
+
+describe(waitsFor, () => {
+  test('is the Start-After: line and GitHub’s blocked-by, each number once', () => {
+    assert.deepStrictEqual(
+      waitsFor('Start-After: #3, #1\n', [1, 7]),
+      [3, 1, 7],
+    );
+  });
+
+  test('either alone is enough', () => {
+    assert.deepStrictEqual(waitsFor('', [7]), [7]);
+
+    assert.deepStrictEqual(waitsFor('Start-After: #3', []), [3]);
   });
 });
 

@@ -320,9 +320,11 @@ export const readIssueOrder = async (
         yield {
           number: n,
           bodyHtml: node.value.bodyHTML,
-          linked: node.value.closingIssuesReferences.nodes.filter(
-            (issue) => issue.repository.nameWithOwner.toLowerCase() === own,
-          ),
+          linked: node.value.closingIssuesReferences.nodes
+            .filter(
+              (issue) => issue.repository.nameWithOwner.toLowerCase() === own,
+            )
+            .map((issue) => closingIssueAnswer(own, issue)),
         };
       }
     }
@@ -355,7 +357,7 @@ export const readIssueOrder = async (
         );
 
         if (Result.isOk(node)) {
-          yield [n, node.value] as const;
+          yield [n, closingIssueAnswer(own, node.value)] as const;
         }
       }
     }),
@@ -364,13 +366,44 @@ export const readIssueOrder = async (
   return Result.ok(issueOrderOf(repo, read, described));
 };
 
-const CLOSING_ISSUE_FIELDS = 'number state body';
+/**
+ * What an issue waits for is its `Start-After:` and the issues GitHub
+ * records as blocking it, read as one (`pr-report-core`'s `waitsFor`).
+ */
+const CLOSING_ISSUE_FIELDS =
+  'number state body blockedBy(first: 20) { nodes { number repository { nameWithOwner } } }';
 
-const ClosingIssueSchema: t.Type<ClosingIssueAnswer> = t.record({
+const BlockedBySchema = t.record({
+  nodes: t.array(
+    t.record({
+      number: t.number(),
+      repository: t.record({ nameWithOwner: t.string() }),
+    }),
+  ),
+});
+
+const ClosingIssueSchema = t.record({
   number: t.number(),
   state: t.string(),
   body: t.string(),
+  blockedBy: BlockedBySchema,
 });
+
+/** An issue as read, with only `own`'s issues among what blocks it. */
+const closingIssueAnswer = (
+  own: string,
+  { number, state, body, blockedBy }: t.TypeOf<typeof ClosingIssueSchema>,
+): ClosingIssueAnswer =>
+  ({
+    number,
+    state,
+    body,
+    blockedBy: blockedBy.nodes
+      .filter(
+        ({ repository }) => repository.nameWithOwner.toLowerCase() === own,
+      )
+      .map((node) => node.number),
+  }) as const;
 
 const ClosingIssuesNodeSchema = t.record({
   bodyHTML: t.string(),
@@ -380,6 +413,7 @@ const ClosingIssuesNodeSchema = t.record({
         number: t.number(),
         state: t.string(),
         body: t.string(),
+        blockedBy: BlockedBySchema,
         repository: t.record({ nameWithOwner: t.string() }),
       }),
     ),

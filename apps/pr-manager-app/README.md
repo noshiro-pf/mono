@@ -91,7 +91,8 @@ of it, so a read of it that fails says so in its own block and leaves the
 merge order as it was.
 
 **List / DAG**, above the issues, draws them instead as the graph of what each
-waits for, read from the `Start-After:` lines in their bodies
+waits for, read from the `Start-After:` lines in their bodies and from the
+issue dependencies GitHub records ("blocked by"), which count the same
 (`docs/issue-start-after.md`). An issue is a hexagon and a pull request a
 rounded box, the problem angular and what settles it round; an edge runs from
 what is waited for to what waits. Green is an issue that can be started (a thick

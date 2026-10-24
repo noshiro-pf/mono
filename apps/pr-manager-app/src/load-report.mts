@@ -28,12 +28,12 @@ import {
   parseMergeAfter,
   parseRuleset,
   parseSetAsideComment,
-  parseStartAfter,
   PENDING_LABEL,
   referenceStatusOf,
   reportedContexts,
   setAsideStillApplies,
   summarize,
+  waitsFor,
   type CheckRunReport,
   type CodeOwnerReview,
   type CodeOwnersRule,
@@ -89,6 +89,7 @@ import {
   referenceAlias,
   ReferenceSchema,
   referencesQuery,
+  type BlockedByNodes,
   type CheckSuiteNode,
   type ContextNode,
   type FollowUp,
@@ -454,7 +455,10 @@ export const loadIssuePage = async (
   }
 
   return withReferences({
-    list: issueListOf(validated.value.repository.issues),
+    list: issueListOf(
+      { owner: source.owner, name: source.repo },
+      validated.value.repository.issues,
+    ),
     rateLimit,
     ask,
   });
@@ -1287,7 +1291,10 @@ const startAfterOfNodes = (
       .filter(
         ({ repository }) => repository.nameWithOwner.toLowerCase() === own,
       )
-      .map(({ number, body }) => [number, parseStartAfter(body)]),
+      .map(({ number, body, blockedBy }) => [
+        number,
+        waitsFor(body, ownBlockedBy(repo, blockedBy)),
+      ]),
   );
 };
 
@@ -1753,15 +1760,27 @@ const mergedOf = (
     linkedIssues: linkedIssuesOf(repo, pr, described),
   }) as const;
 
-const issueListOf = (page: OpenIssuePage): IssueList =>
+const issueListOf = (repo: RepoRef, page: OpenIssuePage): IssueList =>
   ({
-    items: page.nodes.map(issueOf),
+    items: page.nodes.map((issue) => issueOf(repo, issue)),
     totalCount: page.totalCount,
     endCursor: nextCursor(page.pageInfo),
     referenced: [],
   }) as const;
 
-const issueOf = (issue: OpenIssueNode): IssueItem =>
+/** The numbers of `repo`'s issues among those blocking one. */
+const ownBlockedBy = (
+  repo: RepoRef,
+  blockedBy: BlockedByNodes,
+): readonly number[] => {
+  const own = `${repo.owner}/${repo.name}`.toLowerCase();
+
+  return blockedBy.nodes
+    .filter(({ repository }) => repository.nameWithOwner.toLowerCase() === own)
+    .map(({ number }) => number);
+};
+
+const issueOf = (repo: RepoRef, issue: OpenIssueNode): IssueItem =>
   ({
     number: issue.number,
     title: issue.title,
@@ -1771,7 +1790,7 @@ const issueOf = (issue: OpenIssueNode): IssueItem =>
     createdAt: issue.createdAt,
     updatedAt: issue.updatedAt,
     comments: issue.comments.totalCount,
-    startAfter: parseStartAfter(issue.body),
+    startAfter: waitsFor(issue.body, ownBlockedBy(repo, issue.blockedBy)),
     misplacedMergeAfter: parseMergeAfter(issue.body),
   }) as const;
 

@@ -29,7 +29,12 @@ describe(issueOrderOf, () => {
     const order = issueOrderOf(
       repo,
       [
-        { number: 10, bodyHtml: '', linked: [issue(1, 'Start-After: #20')] },
+        {
+          number: 10,
+          bodyHtml: '',
+          // What GitHub records as blocking it counts as the line does.
+          linked: [issue(1, 'Start-After: #20', 'OPEN', [21])],
+        },
         // Stacked: GitHub links nothing, and marks the keyword.
         { number: 11, bodyHtml: closes(2), linked: [] },
       ],
@@ -48,7 +53,7 @@ describe(issueOrderOf, () => {
       order.startAfter,
       new Map([
         [2, [3, 4]],
-        [1, [20]],
+        [1, [20, 21]],
       ]),
     );
   });
@@ -103,7 +108,8 @@ const issue = (
   number: number,
   body: string,
   state: string = 'OPEN',
-): ClosingIssueAnswer => ({ number, state, body }) as const;
+  blockedBy: readonly number[] = [],
+): ClosingIssueAnswer => ({ number, state, body, blockedBy }) as const;
 
 /** A closing keyword as GitHub renders one it recognized. */
 const closes = (number: number): string =>
