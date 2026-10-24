@@ -1,8 +1,8 @@
 /** What the command line says, and how it is read. */
 
-import * as util from 'node:util';
 import { MERGE_QUEUED_LABEL, SKIP_CI_LABEL } from 'pr-report-core';
-import { Num, Result } from 'ts-data-forge';
+import { Result } from 'ts-data-forge';
+import { parseCommandArgs, positiveInteger } from '../../lib/cli-args.mjs';
 
 export type Options = Readonly<{
   /** Run one cycle — survey, act on one pull request, report — and exit. */
@@ -64,58 +64,28 @@ export const HELP = [
 export const parseOptions = (
   args: readonly string[],
 ): Result<Options | 'help', string> => {
-  // `pnpm run unblock-prs -- --once` forwards the `--` as well, and
-  // `parseArgs` would read everything after it as positionals.
-  const [first, ...rest] = args;
-
-  const argv: readonly string[] = first === '--' ? rest : args;
-
-  const parsed = Result.fromThrowable(() =>
-    util.parseArgs({
-      args: Array.from(argv),
-      options: {
-        once: { type: 'boolean', default: false },
-        'dry-run': { type: 'boolean', default: false },
-        'active-interval': { type: 'string' },
-        'idle-after': { type: 'string' },
-        'idle-interval': { type: 'string' },
-        'poll-interval': { type: 'string' },
-        'watch-timeout': { type: 'string' },
-        'no-auto-fix': { type: 'boolean', default: false },
-        help: { type: 'boolean', short: 'h', default: false },
-      },
-    }),
-  );
+  const parsed = parseCommandArgs(args, {
+    once: { type: 'boolean', default: false },
+    'dry-run': { type: 'boolean', default: false },
+    'active-interval': { type: 'string' },
+    'idle-after': { type: 'string' },
+    'idle-interval': { type: 'string' },
+    'poll-interval': { type: 'string' },
+    'watch-timeout': { type: 'string' },
+    'no-auto-fix': { type: 'boolean', default: false },
+  });
 
   if (Result.isErr(parsed)) {
-    return Result.err(parsed.value.message);
+    return parsed;
   }
 
-  const { values } = parsed.value;
-
-  if (values.help) {
+  if (parsed.value === 'help') {
     return Result.ok('help');
   }
 
-  const positive = (
-    name: string,
-    raw: string | undefined,
-    fallback: number,
-  ): Result<number, string> => {
-    if (raw === undefined) {
-      return Result.ok(fallback);
-    }
+  const values = parsed.value;
 
-    const n = Num.safeParseInt(raw);
-
-    return Result.isOk(n) && n.value > 0
-      ? Result.ok(n.value)
-      : Result.err(
-          `--${name} must be a positive integer, got ${JSON.stringify(raw)}`,
-        );
-  };
-
-  const activeIntervalSec = positive(
+  const activeIntervalSec = positiveInteger(
     'active-interval',
     values['active-interval'],
     defaultOptions.activeIntervalSec,
@@ -125,7 +95,7 @@ export const parseOptions = (
     return activeIntervalSec;
   }
 
-  const idleAfter = positive(
+  const idleAfter = positiveInteger(
     'idle-after',
     values['idle-after'],
     defaultOptions.idleAfter,
@@ -135,7 +105,7 @@ export const parseOptions = (
     return idleAfter;
   }
 
-  const idleIntervalSec = positive(
+  const idleIntervalSec = positiveInteger(
     'idle-interval',
     values['idle-interval'],
     defaultOptions.idleIntervalSec,
@@ -145,7 +115,7 @@ export const parseOptions = (
     return idleIntervalSec;
   }
 
-  const pollIntervalSec = positive(
+  const pollIntervalSec = positiveInteger(
     'poll-interval',
     values['poll-interval'],
     defaultOptions.pollIntervalSec,
@@ -155,7 +125,7 @@ export const parseOptions = (
     return pollIntervalSec;
   }
 
-  const watchTimeoutMin = positive(
+  const watchTimeoutMin = positiveInteger(
     'watch-timeout',
     values['watch-timeout'],
     defaultOptions.watchTimeoutMin,

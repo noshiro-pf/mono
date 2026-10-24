@@ -1,7 +1,7 @@
 /** What the command line says, and how it is read. */
 
-import * as util from 'node:util';
-import { Num, Result } from 'ts-data-forge';
+import { Result } from 'ts-data-forge';
+import { parseCommandArgs, positiveInteger } from '../../lib/cli-args.mjs';
 
 export const FORMATS = ['json', 'markdown', 'terminal'] as const;
 
@@ -64,35 +64,23 @@ export const HELP = [
 export const parseOptions = (
   args: readonly string[],
 ): Result<Options | 'help', string> => {
-  // `pnpm run pr-report -- --format json` forwards the `--` as well, and
-  // `parseArgs` would read everything after it as positionals.
-  const [first, ...rest] = args;
-
-  const argv: readonly string[] = first === '--' ? rest : args;
-
-  const parsed = Result.fromThrowable(() =>
-    util.parseArgs({
-      args: Array.from(argv),
-      options: {
-        format: { type: 'string' },
-        repo: { type: 'string' },
-        'merged-days': { type: 'string' },
-        'merged-limit': { type: 'string' },
-        'issues-limit': { type: 'string' },
-        help: { type: 'boolean', short: 'h', default: false },
-      },
-    }),
-  );
+  const parsed = parseCommandArgs(args, {
+    format: { type: 'string' },
+    repo: { type: 'string' },
+    'merged-days': { type: 'string' },
+    'merged-limit': { type: 'string' },
+    'issues-limit': { type: 'string' },
+  });
 
   if (Result.isErr(parsed)) {
-    return Result.err(parsed.value.message);
+    return parsed;
   }
 
-  const { values } = parsed.value;
-
-  if (values.help) {
+  if (parsed.value === 'help') {
     return Result.ok('help');
   }
+
+  const values = parsed.value;
 
   const format = values.format ?? 'terminal';
 
@@ -102,7 +90,7 @@ export const parseOptions = (
     );
   }
 
-  const mergedDays = positive(
+  const mergedDays = positiveInteger(
     'merged-days',
     values['merged-days'],
     DEFAULT_MERGED_DAYS,
@@ -112,7 +100,7 @@ export const parseOptions = (
     return mergedDays;
   }
 
-  const mergedLimit = positive(
+  const mergedLimit = positiveInteger(
     'merged-limit',
     values['merged-limit'],
     DEFAULT_MERGED_LIMIT,
@@ -122,7 +110,7 @@ export const parseOptions = (
     return mergedLimit;
   }
 
-  const issuesLimit = positive(
+  const issuesLimit = positiveInteger(
     'issues-limit',
     values['issues-limit'],
     DEFAULT_ISSUES_LIMIT,
@@ -139,29 +127,6 @@ export const parseOptions = (
     mergedLimit: mergedLimit.value,
     issuesLimit: issuesLimit.value,
   });
-};
-
-/**
- * Rejected rather than clamped when it is not a positive whole number: `-3`
- * or `two` is a typo, and a report that quietly used the default instead
- * would be a report saying something other than what was asked for.
- */
-const positive = (
-  name: string,
-  raw: string | undefined,
-  fallback: number,
-): Result<number, string> => {
-  if (raw === undefined) {
-    return Result.ok(fallback);
-  }
-
-  const parsed = Result.unwrapOkOr(Num.safeParseFloat(raw), Number.NaN);
-
-  return Number.isSafeInteger(parsed) && parsed > 0
-    ? Result.ok(parsed)
-    : Result.err(
-        `--${name} must be a positive whole number, got ${JSON.stringify(raw)}`,
-      );
 };
 
 /**

@@ -4,9 +4,10 @@ import {
   type QueueOwner,
   type ReportEntry,
 } from 'pr-report-core';
-import { Arr, Num, Result, unknownToString } from 'ts-data-forge';
+import { Arr, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { isDirectlyExecuted } from 'ts-repo-utils';
+import { pullRequestNumber } from '../lib/cli-args.mjs';
 import { resolveApiContext, rest } from '../lib/github-api.mjs';
 import { readQueueState } from './pr-report/queue.mjs';
 
@@ -135,10 +136,7 @@ export const parseRebuildArgs = (
 
   const [first] = positional;
 
-  const number =
-    first !== undefined && /^#?[1-9]\d*$/u.test(first)
-      ? Result.unwrapOkOr(Num.safeParseInt(first.replace('#', '')), undefined)
-      : undefined;
+  const number = first === undefined ? undefined : pullRequestNumber(first);
 
   return positional.length > 1
     ? `unexpected argument: ${Arr.tail(positional).join(' ')}`

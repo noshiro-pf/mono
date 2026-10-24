@@ -1,8 +1,8 @@
 /** What the command line says, and how it is read. */
 
-import * as util from 'node:util';
 import { SKIP_CI_LABEL } from 'pr-report-core';
-import { Num, Result } from 'ts-data-forge';
+import { Result } from 'ts-data-forge';
+import { parseCommandArgs, pullRequestNumber } from '../../lib/cli-args.mjs';
 
 export type Options = Readonly<{
   /** The pull request title; the branch's last commit subject when absent. */
@@ -47,35 +47,23 @@ export const HELP = [
 export const parseOptions = (
   args: readonly string[],
 ): Result<Options | 'help', string> => {
-  // `pnpm run open-pr -- --dry-run` forwards the `--` as well, and
-  // `parseArgs` would read everything after it as positionals.
-  const [first, ...rest] = args;
-
-  const argv: readonly string[] = first === '--' ? rest : args;
-
-  const parsed = Result.fromThrowable(() =>
-    util.parseArgs({
-      args: Array.from(argv),
-      options: {
-        title: { type: 'string' },
-        'body-file': { type: 'string' },
-        base: { type: 'string' },
-        'merge-after': { type: 'string', multiple: true },
-        'dry-run': { type: 'boolean', default: false },
-        help: { type: 'boolean', short: 'h', default: false },
-      },
-    }),
-  );
+  const parsed = parseCommandArgs(args, {
+    title: { type: 'string' },
+    'body-file': { type: 'string' },
+    base: { type: 'string' },
+    'merge-after': { type: 'string', multiple: true },
+    'dry-run': { type: 'boolean', default: false },
+  });
 
   if (Result.isErr(parsed)) {
-    return Result.err(parsed.value.message);
+    return parsed;
   }
 
-  const { values } = parsed.value;
-
-  if (values.help) {
+  if (parsed.value === 'help') {
     return Result.ok('help');
   }
+
+  const values = parsed.value;
 
   const mergeAfter = parseMergeAfter(values['merge-after'] ?? []);
 
@@ -92,25 +80,21 @@ export const parseOptions = (
   });
 };
 
-/**
- * `#1901` and `1901` both name the same pull request, and a person copying
- * from GitHub will paste the first.
- */
 const parseMergeAfter = (
   raw: readonly string[],
 ): Result<readonly number[], string> => {
   const mut_numbers: number[] = [];
 
   for (const value of raw) {
-    const parsed = Num.safeParseInt(value.replace(/^#/u, ''));
+    const number = pullRequestNumber(value);
 
-    if (Result.isErr(parsed) || parsed.value <= 0) {
+    if (number === undefined) {
       return Result.err(
         `--merge-after must be a pull request number, got ${JSON.stringify(value)}`,
       );
     }
 
-    mut_numbers.push(parsed.value);
+    mut_numbers.push(number);
   }
 
   return Result.ok(mut_numbers);
