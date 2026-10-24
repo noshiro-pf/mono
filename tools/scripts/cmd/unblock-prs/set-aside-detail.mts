@@ -18,10 +18,10 @@ import type { ChecksSummary } from './types.mjs';
  */
 export const describeFailedChecks = (
   summary: ChecksSummary,
-): Readonly<{ detail: string; failedChecks: ChecksSummary['failed'] }> =>
+): Readonly<{ detail: string; failedChecks: ChecksSummary['failedRuns'] }> =>
   ({
-    detail: `failed: ${summary.failed.map((check) => check.name).join(', ')}`,
-    failedChecks: summary.failed,
+    detail: `failed: ${summary.failed.join(', ')}`,
+    failedChecks: summary.failedRuns,
   }) as const;
 
 /**

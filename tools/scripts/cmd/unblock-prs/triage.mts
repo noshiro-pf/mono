@@ -350,7 +350,7 @@ const settle = async (
         : settle(
             pr,
             context,
-            { ...reads, checksFailed: checks.value.status === 'failed' },
+            { ...reads, checksFailed: checks.value.verdict === 'failing' },
             checks.value,
           );
     }
@@ -594,7 +594,7 @@ export const reportTriage = (
 
   for (const { pr, summary } of triaged.failing) {
     log(
-      `  #${pr.number}: up to date but failing: ${summary.failed.map((check) => check.name).join(', ')}`,
+      `  #${pr.number}: up to date but failing: ${summary.failed.join(', ')}`,
     );
   }
 
