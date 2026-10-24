@@ -61,6 +61,15 @@ const ISSUE_FIELDS = 'number title url state repository { nameWithOwner }';
 const CLOSING_ISSUES =
   `closingIssuesReferences(first: 10) { nodes { ${ISSUE_FIELDS} } }` as const;
 
+/**
+ * An open pull request's closing issues, with the bodies their
+ * `Start-After:` is read from: the pull request inherits it as a merge order
+ * (`docs/issue-start-after.md`). A merged one inherits nothing, so its
+ * closing issues are read without.
+ */
+const OPEN_CLOSING_ISSUES =
+  `closingIssuesReferences(first: 10) { nodes { ${ISSUE_FIELDS} body } }` as const;
+
 const PAGE_INFO = 'pageInfo { hasNextPage endCursor }';
 
 /** The open issues, newest update first, in either query that lists them. */
@@ -153,7 +162,7 @@ export const DETAILS_QUERY = [
   `    ${OPEN_PULLS} {`,
   '      nodes {',
   '        number bodyHTML',
-  `        ${CLOSING_ISSUES}`,
+  `        ${OPEN_CLOSING_ISSUES}`,
   '        latestOpinionatedReviews(first: 20, writersOnly: true) { nodes { state author { login } } }',
   `        files(first: ${PAGE_SIZE}) { ${PAGE_INFO} nodes { path } }`,
   `        comments(last: ${SET_ASIDE_COMMENT_SCAN}) { nodes { url body viewerDidAuthor } }`,
@@ -300,7 +309,8 @@ const followUpPart = (
 
 /**
  * One query for the issues a body closes by keyword that GitHub has not
- * linked, so that each is listed as a linked one is. The aliases are
+ * linked, so that each is listed as a linked one is, with the body its
+ * `Start-After:` is read from. The aliases are
  * `issue_N`, which is what {@link issueAlias} reads them back by.
  */
 export const issuesQuery = (
@@ -316,7 +326,7 @@ export const issuesQuery = (
       ...numbers.map((number) => {
         const alias = issueAlias(number);
 
-        return `    ${alias}: issue(number: $${alias}) { ${ISSUE_FIELDS} }`;
+        return `    ${alias}: issue(number: $${alias}) { ${ISSUE_FIELDS} body }`;
       }),
       '  }',
       '}',
@@ -389,6 +399,16 @@ export const IssueSchema = t.record({
   url: t.string(),
   state: t.string(),
   repository: t.record({ nameWithOwner: t.string() }),
+});
+
+/** {@link IssueSchema} with the body, where `Start-After:` is read from. */
+export const IssueWithBodySchema = t.record({
+  number: t.number(),
+  title: t.string(),
+  url: t.string(),
+  state: t.string(),
+  repository: t.record({ nameWithOwner: t.string() }),
+  body: t.string(),
 });
 
 const ClosingIssuesSchema = t.record({ nodes: t.array(IssueSchema) });
@@ -500,7 +520,7 @@ const PullRequestDetailsSchema = t.record({
   number: t.number(),
   /** Where GitHub marks the closing keywords it read in `body`. */
   bodyHTML: t.string(),
-  closingIssuesReferences: ClosingIssuesSchema,
+  closingIssuesReferences: t.record({ nodes: t.array(IssueWithBodySchema) }),
   latestOpinionatedReviews: t.record({
     nodes: t.array(t.record({ state: t.string(), author: AuthorSchema })),
   }),

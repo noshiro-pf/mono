@@ -12,12 +12,18 @@ import {
   findStackParent,
   lastCommitSubject,
   markReady,
+  missingInheritedOrder,
   preflight,
   pushBranch,
+  updateBody,
   viewPullRequest,
 } from './github.mjs';
 import { HELP, parseOptions, type Options } from './options.mjs';
-import { mergeAfterTrailer, withStackParent } from './steps.mjs';
+import {
+  mergeAfterTrailer,
+  withInheritedMergeAfter,
+  withStackParent,
+} from './steps.mjs';
 
 /**
  * Opens the pull request for the current branch the way this repository wants
@@ -44,6 +50,12 @@ import { mergeAfterTrailer, withStackParent } from './steps.mjs';
  * **A `--base` other than the default branch stacks it** on the open pull
  * request that branch is from, which has to exist and which the branch has to
  * contain, and declares that one with `Merge-After:` as well.
+ *
+ * **What the issues it closes start after is declared too**: the open pull
+ * requests their `Start-After:` comes to (`docs/issue-start-after.md`),
+ * written into the body's `Merge-After:` once GitHub has read which issues
+ * the body closes. The readers inherit it without, so the body is saying
+ * what they already derive.
  */
 export const openPullRequest = async (
   options: Options,
@@ -111,6 +123,12 @@ export const openPullRequest = async (
     log(`#${prNumber.value}: marked ready for review`);
   }
 
+  const carried = await carryStartAfter(api, prNumber.value, mergeAfter);
+
+  if (Result.isErr(carried)) {
+    return carried;
+  }
+
   const labelled = await addLabel(api, prNumber.value, SKIP_CI_LABEL);
 
   if (Result.isErr(labelled)) {
@@ -133,6 +151,46 @@ export const openPullRequest = async (
       `Once it is reviewed, add merge-queued: unblock-prs arms auto-merge when it picks it${parent === undefined ? '' : `, which is once #${parent.value} has merged`}.`,
     ].join('\n'),
   );
+};
+
+/**
+ * Writes into the body, as `Merge-After:`, the open pull requests the issues
+ * it closes start after (`docs/issue-start-after.md`), once the body exists
+ * for GitHub to say which issues those are. A run on a body that says them
+ * already writes nothing.
+ */
+const carryStartAfter = async (
+  api: ApiContext,
+  prNumber: number,
+  declared: readonly number[],
+): Promise<Result<undefined, string>> => {
+  const order = await missingInheritedOrder(api, prNumber, declared);
+
+  if (Result.isErr(order)) {
+    return Result.err(`cannot read the issues it closes: ${order.value}`);
+  }
+
+  const { body, missing } = order.value;
+
+  if (!Arr.isNonEmpty(missing)) {
+    return Result.ok(undefined);
+  }
+
+  const updated = await updateBody(
+    api,
+    prNumber,
+    withInheritedMergeAfter(body, missing),
+  );
+
+  if (Result.isErr(updated)) {
+    return Result.err(`cannot write the inherited order: ${updated.value}`);
+  }
+
+  log(
+    `#${prNumber}: ${mergeAfterTrailer(missing) ?? ''}, from the Start-After of the issues it closes`,
+  );
+
+  return Result.ok(undefined);
 };
 
 /**
@@ -263,6 +321,7 @@ const dryRun = async (
       ? 'leave auto-merge unarmed: unblock-prs arms it when it picks it'
       : `leave auto-merge unarmed: it is stacked on #${parent}, and unblock-prs arms it when it picks it, after #${parent} merges`,
     trailer === undefined ? undefined : `declare ${trailer}`,
+    'add to Merge-After the open pull requests the issues it closes start after, if the body does not name them',
   ].filter((step) => step !== undefined);
 
   return Result.ok(

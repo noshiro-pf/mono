@@ -600,6 +600,8 @@ const entry = (
     linkedIssues: [],
     mergeAfter: [],
     stackedOn: undefined,
+    inheritedMergeAfter: [],
+    notStartedIssues: [],
     blockedBy: [],
     checks: {
       verdict,

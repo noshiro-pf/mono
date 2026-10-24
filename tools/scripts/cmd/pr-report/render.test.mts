@@ -64,6 +64,7 @@ const issue = (number: number): OpenIssue =>
     createdAt: '2026-09-10T00:00:00Z',
     updatedAt: '2026-09-17T00:00:00Z',
     comments: 2,
+    startAfter: [],
   }) as const;
 
 describe('renderMarkdown', () => {
@@ -110,6 +111,51 @@ describe('renderMarkdown', () => {
     assert.isTrue(lines[child]?.startsWith('  - ') === true);
 
     assert.include(lines[child] ?? '', 'stacked on #1901');
+  });
+
+  test('says what the issues it closes add to the order', () => {
+    const rendered = renderMarkdown(
+      buildReport({
+        repo: { owner: 'noshiro-pf', name: 'mono' },
+        defaultBranch: 'main',
+        generatedAt: '2026-09-18T09:00:00Z',
+        required: [],
+        merged: [],
+        mergedWithinDays: 7,
+        issues: [],
+        issuesLimit: 3,
+        authenticated: false,
+        pulls: [
+          facts({
+            number: 1903,
+            linkedIssues: [
+              {
+                number: 1800,
+                title: '',
+                url: 'https://github.com/noshiro-pf/mono/issues/1800',
+                state: 'open',
+              },
+            ],
+          }),
+          facts({ number: 1901 }),
+        ],
+        issueDeclarations: {
+          startAfter: new Map([[1800, [1901, 1700]]]),
+          open: new Set([1700]),
+        },
+      }),
+    );
+
+    const lines = rendered.split('\n');
+
+    const child = lines.findIndex((l) => l.includes('#1903'));
+
+    // Drawn under the one it inherited, as a declared one would be.
+    assert.isTrue(lines[child]?.startsWith('  - ') === true);
+
+    assert.include(lines[child] ?? '', 'after #1901 (Start-After)');
+
+    assert.include(lines[child] ?? '', '#1700 (issue) not done');
   });
 
   test('links the pull request and every issue it closes', () => {

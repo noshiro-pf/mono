@@ -10,9 +10,9 @@ issue の本文に、その issue に着手してよくなる条件を書く。p
 Start-After: #2113
 ```
 
-読み手は Pull Requests Manager（`apps/pr-manager-app`）の issue 一覧と
-`pnpm run pr-report` を予定している。どちらもまだ読んでいないので、今は人が読むための
-宣言である。
+issue の着手状態（下記）は、Pull Requests Manager（`apps/pr-manager-app`）の
+issue の DAG 表示が示す。issue を閉じる pull request への引き継ぎ（下記）は、
+Pull Requests Manager、`pnpm run pr-report`、`unblock-prs`、`open-pr` が行う。
 
 ## 何を書くか
 
@@ -124,7 +124,8 @@ issue の着手状態は、次のうち最初に当てはまるもの。
   完了せずに閉じたものと不明なものは、issue の側で見直しを求めている。
 
 **引き継ぎは読む側が行う。** pull request を開いた後に issue の宣言が書き換わっても
-追従するため、`pr-report-core` と `unblock-prs` が読むたびに導く。stack と同じく、
+追従するため、`pr-report-core` と `unblock-prs` が読むたびに導く
+（`pr-report-core` の `inheritStartAfter`）。stack と同じく、
 `open-pr` は開くときに引き継いだ分を `Merge-After:` として本文にも書き、本文が順序を
 述べるようにする。本文に書いたものと引き継いだものが同じなら、1 つとして数える。
 引き継いだ順序も `Merge-After:` の循環の検出に入る。

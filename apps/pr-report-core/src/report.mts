@@ -5,8 +5,10 @@ import { summarizeChecks } from './checks.mjs';
 import { SKIP_CI_LABEL } from './labels.mjs';
 import { parseMergeAfter } from './merge-after.mjs';
 import { findStackParents } from './stack.mjs';
+import { inheritStartAfter } from './start-after.mjs';
 import { buildMergeAfterForest } from './tree.mjs';
 import type {
+  IssueDeclarations,
   MergedPullRequest,
   OpenIssue,
   PrReport,
@@ -33,6 +35,7 @@ export const buildReport = ({
   mergedWithinDays,
   issues,
   issuesLimit,
+  issueDeclarations,
 }: Readonly<{
   repo: RepoRef;
   defaultBranch: string;
@@ -44,6 +47,8 @@ export const buildReport = ({
   mergedWithinDays: number;
   issues: readonly OpenIssue[];
   issuesLimit: number;
+  /** See {@link buildEntries}. */
+  issueDeclarations?: IssueDeclarations;
 }>): PrReport =>
   ({
     repo,
@@ -51,7 +56,12 @@ export const buildReport = ({
     generatedAt,
     authenticated,
     required,
-    ...buildEntries({ required, defaultBranch, pulls }),
+    ...buildEntries({
+      required,
+      defaultBranch,
+      pulls,
+      ...(issueDeclarations === undefined ? {} : { issues: issueDeclarations }),
+    }),
     merged,
     mergedWithinDays,
     issues,
@@ -73,6 +83,7 @@ export const buildEntries = ({
   required,
   defaultBranch,
   pulls,
+  issues = NO_DECLARATIONS,
 }: Readonly<{
   /**
    * The contexts the ruleset requires, or `undefined` for a repository that
@@ -82,10 +93,36 @@ export const buildEntries = ({
   required: readonly string[] | undefined;
   defaultBranch: string;
   pulls: readonly PullRequestFacts[];
+  /**
+   * What the issues the pull requests close declare, which each inherits;
+   * none read, none inherited.
+   */
+  issues?: IssueDeclarations;
 }>): DecidedEntries => {
   const open = new Set(pulls.map(({ number }) => number));
 
   const parents = findStackParents(pulls, defaultBranch);
+
+  const inherited = inheritStartAfter({
+    pulls: pulls.map(({ number, linkedIssues }) => ({
+      number,
+      closes: notKnownClosed(linkedIssues),
+    })),
+    startAfterOf: issues.startAfter,
+    openIssues: new Set(
+      Arr.generate(function* () {
+        yield* issues.open;
+
+        for (const { linkedIssues } of pulls) {
+          for (const { number, state } of linkedIssues) {
+            if (state === 'open') {
+              yield number;
+            }
+          }
+        }
+      }),
+    ),
+  });
 
   const entries: readonly ReportEntry[] = pulls
     .toSorted((a, b) => a.number - b.number)
@@ -94,15 +131,27 @@ export const buildEntries = ({
 
       const stackedOn = parents.get(facts.number);
 
+      const declared = Arr.uniq(
+        stackedOn === undefined
+          ? mergeAfter
+          : Arr.toUnshifted(stackedOn)(mergeAfter),
+      );
+
+      const inheritedOrder = inherited.get(facts.number);
+
+      const inheritedMergeAfter = (inheritedOrder?.mergeAfter ?? []).filter(
+        (n) => !declared.includes(n),
+      );
+
       return {
         ...facts,
         mergeAfter,
         stackedOn,
-        blockedBy: Arr.uniq(
-          stackedOn === undefined
-            ? mergeAfter
-            : Arr.toUnshifted(stackedOn)(mergeAfter),
-        ).filter((n) => open.has(n)),
+        inheritedMergeAfter,
+        notStartedIssues: inheritedOrder?.notStarted ?? [],
+        blockedBy: [...declared, ...inheritedMergeAfter].filter((n) =>
+          open.has(n),
+        ),
         checks: summarizeChecks({
           required: required ?? Array.from(facts.reported.keys()).toSorted(),
           reported: facts.reported,
@@ -125,3 +174,20 @@ export const buildEntries = ({
 
   return { entries, roots, cycles };
 };
+
+const NO_DECLARATIONS: IssueDeclarations = {
+  startAfter: new Map(),
+  open: new Set(),
+} as const;
+
+/**
+ * The issues a pull request closes that may still declare an order: any not
+ * known to be closed. One read from the body without a token has an
+ * `unknown` state, and is given the benefit of the doubt.
+ */
+const notKnownClosed = (
+  linkedIssues: PullRequestFacts['linkedIssues'],
+): readonly number[] =>
+  linkedIssues
+    .filter(({ state }) => state !== 'closed')
+    .map(({ number }) => number);

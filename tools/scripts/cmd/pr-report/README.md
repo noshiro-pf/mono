@@ -23,7 +23,11 @@ rebase・マージ・コメントは一切しません（それは `unblock-prs`
 - **マージ順** — `Merge-After:` トレーラと stack（base が別の open な PR の
   ブランチである PR は、その PR の上に積まれた層）が宣言するのはグラフですが、
   PR 一覧では4本の stack が無関係な4行に見えます。木として描けば、上にあるもの
-  が次に見るものです。積まれた PR には `stacked on #N` と出します。
+  が次に見るものです。積まれた PR には `stacked on #N` と出します。閉じる issue
+  の `Start-After:` から引き継いだ順序（`docs/issue-start-after.md`）も同じ木に
+  入り、`after #N (Start-After)` と出します。名指された開いた issue を誰も閉じて
+  いなければ、何も止めずに `#N (issue) not done` と出します。そのために、一覧に
+  無い閉じる issue を1件につき1リクエスト読みます。
 - **閉じる issue** — body を開かずに「これは何のための PR か」が分かるように。
 - **ラベル** — `skip-ci` と `merge-queued` はこのリポジトリの「まだ」と「準備
   完了」そのものです。
@@ -141,8 +145,12 @@ makes it safe to run on a schedule, with a read-only token or none.
 
 It reports what the pull request list cannot show in one screen: the merge
 order declared by the `Merge-After:` trailers and by the stacks — a pull
-request onto another's branch is a layer on it, marked `stacked on #N` — drawn
-as a tree, the issues each
+request onto another's branch is a layer on it, marked `stacked on #N` — and
+inherited from the `Start-After:` of the issues each closes, marked
+`after #N (Start-After)` (`docs/issue-start-after.md`; one request for each
+closing issue the open list does not cover, and an open issue named that
+nobody is closing is `#N (issue) not done`, holding nothing), drawn as a
+tree, the issues each
 pull request closes, its labels, the verdict of the contexts the ruleset
 requires (named, including the ones that have reported nothing at all), how
 far the branch is ahead of and behind its base (for a stacked one, behind the

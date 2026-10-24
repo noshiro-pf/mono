@@ -1,5 +1,5 @@
 import { buildEntries } from './report.mjs';
-import type { ContextState, PullRequestFacts } from './types.mjs';
+import type { ContextState, LinkedIssue, PullRequestFacts } from './types.mjs';
 
 const facts = (
   number: number,
@@ -25,6 +25,14 @@ const facts = (
     checksRunning: false,
     linkedIssues: [],
     ...overrides,
+  }) as const;
+
+const linked = (number: number, state: LinkedIssue['state']): LinkedIssue =>
+  ({
+    number,
+    title: `issue ${number}`,
+    url: `https://github.com/o/r/issues/${number}`,
+    state,
   }) as const;
 
 const decide = (
@@ -76,6 +84,101 @@ describe(buildEntries, () => {
     ]);
 
     assert.deepStrictEqual(entries[1]?.blockedBy, [1, 3]);
+  });
+
+  test('a pull request merges after what the issues it closes start after', () => {
+    const { entries, cycles } = buildEntries({
+      required: [],
+      defaultBranch: 'main',
+      pulls: [
+        facts(1, { linkedIssues: [linked(11, 'open')] }),
+        facts(2, { linkedIssues: [linked(12, 'open')] }),
+        facts(3, { body: 'Merge-After: #2' }),
+      ],
+      issues: {
+        // #11 waits for #12, which #2 is closing, and for the open #3; #13
+        // is open and nobody has started it.
+        startAfter: new Map([[11, [12, 3, 13]]]),
+        open: new Set([11, 12, 13]),
+      },
+    });
+
+    assert.deepStrictEqual(
+      entries.map(
+        ({ number, inheritedMergeAfter, notStartedIssues, blockedBy }) => ({
+          number,
+          inheritedMergeAfter,
+          notStartedIssues,
+          blockedBy,
+        }),
+      ),
+      [
+        {
+          number: 1,
+          inheritedMergeAfter: [2, 3],
+          notStartedIssues: [13],
+          blockedBy: [2, 3],
+        },
+        {
+          number: 2,
+          inheritedMergeAfter: [],
+          notStartedIssues: [],
+          blockedBy: [],
+        },
+        {
+          number: 3,
+          inheritedMergeAfter: [],
+          notStartedIssues: [],
+          blockedBy: [2],
+        },
+      ],
+    );
+
+    assert.deepStrictEqual(cycles, []);
+  });
+
+  test('what the body declares already is counted once, and not as inherited', () => {
+    const { entries } = buildEntries({
+      required: [],
+      defaultBranch: 'main',
+      pulls: [
+        facts(1, {
+          body: 'Merge-After: #2',
+          linkedIssues: [linked(11, 'open')],
+        }),
+        facts(2),
+      ],
+      issues: { startAfter: new Map([[11, [2]]]), open: new Set() },
+    });
+
+    assert.deepStrictEqual(entries[0]?.inheritedMergeAfter, []);
+
+    assert.deepStrictEqual(entries[0]?.blockedBy, [2]);
+  });
+
+  test('an inherited order runs into the cycles like a declared one', () => {
+    const { cycles } = buildEntries({
+      required: [],
+      defaultBranch: 'main',
+      pulls: [
+        facts(1, { linkedIssues: [linked(11, 'open')] }),
+        facts(2, { body: 'Merge-After: #1' }),
+      ],
+      issues: { startAfter: new Map([[11, [2]]]), open: new Set() },
+    });
+
+    assert.deepStrictEqual(cycles, [[1, 2]]);
+  });
+
+  test('a closed issue it names as closing declares nothing', () => {
+    const { entries } = buildEntries({
+      required: [],
+      defaultBranch: 'main',
+      pulls: [facts(1, { linkedIssues: [linked(11, 'closed')] }), facts(2)],
+      issues: { startAfter: new Map([[11, [2]]]), open: new Set() },
+    });
+
+    assert.deepStrictEqual(entries[0]?.blockedBy, []);
   });
 
   test('a base whose pull request has merged constrains nothing', () => {

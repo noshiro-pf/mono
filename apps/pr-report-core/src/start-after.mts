@@ -117,3 +117,83 @@ export const decideStartStates = (
     }),
   );
 };
+
+/**
+ * What one pull request takes over from the `Start-After:` of the issues it
+ * closes (`docs/issue-start-after.md`, "pull request への引き継ぎ").
+ */
+export type InheritedOrder = Readonly<{
+  /**
+   * The open pull requests it merges after because of them, as if its body
+   * had declared them: one an issue names, or one closing an open issue an
+   * issue names. Lowest number first, and never itself.
+   */
+  mergeAfter: readonly number[];
+  /**
+   * The open issues named that no open pull request closes. They hold
+   * nothing — waiting on work nobody has started could hold the merge for
+   * ever — but they are not done, and a reader is told so. Lowest first.
+   */
+  notStarted: readonly number[];
+}>;
+
+/**
+ * Each open pull request's {@link InheritedOrder}, keyed by its number.
+ *
+ * `closes` is the open issues each closes, by closing keyword or by GitHub's
+ * own link; `startAfterOf` what each issue whose body was read declares, and
+ * an issue missing from it declares nothing. `openIssues` is what is known to
+ * be an open issue, which only decides what is reported as
+ * {@link InheritedOrder.notStarted}: anything named that is neither an open
+ * pull request nor an open issue — merged, closed, unknown — constrains
+ * nothing, since the issue's own start state is what asks for it to be looked
+ * at.
+ *
+ * Nothing is transitive, as in {@link decideStartStates}: what the pull
+ * requests named in turn wait for is their own declaration's business.
+ */
+export const inheritStartAfter = ({
+  pulls,
+  startAfterOf,
+  openIssues,
+}: Readonly<{
+  pulls: readonly Readonly<{ number: number; closes: readonly number[] }>[];
+  startAfterOf: ReadonlyMap<number, readonly number[]>;
+  openIssues: ReadonlySet<number>;
+}>): ReadonlyMap<number, InheritedOrder> => {
+  const open = new Set(pulls.map(({ number }) => number));
+
+  const closersOf = (issue: number): readonly number[] =>
+    pulls
+      .filter(({ closes }) => closes.includes(issue))
+      .map(({ number }) => number);
+
+  return new Map(
+    pulls.map(({ number: self, closes }) => {
+      const named = Arr.uniq(
+        closes.flatMap((issue) => startAfterOf.get(issue) ?? []),
+      ).filter((number) => number !== self);
+
+      const mergeAfter = named.flatMap((number) =>
+        open.has(number) ? [number] : closersOf(number),
+      );
+
+      const notStarted = named.filter(
+        (number) =>
+          !open.has(number) &&
+          openIssues.has(number) &&
+          !Arr.isNonEmpty(closersOf(number)),
+      );
+
+      return [
+        self,
+        {
+          mergeAfter: Arr.uniq(
+            mergeAfter.filter((number) => number !== self),
+          ).toSorted((a, b) => a - b),
+          notStarted: notStarted.toSorted((a, b) => a - b),
+        },
+      ] as const;
+    }),
+  );
+};

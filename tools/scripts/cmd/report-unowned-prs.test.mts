@@ -23,6 +23,8 @@ const entry = (number: number): ReportEntry =>
     linkedIssues: [],
     mergeAfter: [],
     stackedOn: undefined,
+    inheritedMergeAfter: [],
+    notStartedIssues: [],
     blockedBy: [],
     checks: {
       verdict: 'paused',

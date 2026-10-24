@@ -37,6 +37,8 @@ const entry = (fields: Partial<ReportEntry> = {}): ReportEntry =>
     linkedIssues: [],
     mergeAfter: [],
     stackedOn: undefined,
+    inheritedMergeAfter: [],
+    notStartedIssues: [],
     blockedBy: [],
     checks: {
       verdict: 'paused',

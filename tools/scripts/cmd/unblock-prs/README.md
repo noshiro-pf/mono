@@ -63,6 +63,13 @@ Merge-After: #1901, #1903
   そこに含まれる PR は放置します（スクリプトには解消できないため）。
 - **コードフェンス内のトレーラは読みません。** 宣言とその実例は同じ文字列なの
   で、この機能を説明する文書が本物の制約になってしまわないようにするためです。
+- **閉じる issue の `Start-After:` も引き継ぎます**（`docs/issue-start-after.md`
+  の「pull request への引き継ぎ」）。名指されたのが開いた PR ならその PR を、
+  開いた issue ならそれを閉じる開いた PR を、`Merge-After:` で名指したのと同じに
+  扱います。閉じる issue は GitHub のリンクと、本文の closing keyword
+  （stack された PR を含む）で決め、survey ごとに読み直します。読めなかった
+  survey では何も引き継がず、その旨を出力します。`note` には、どの番号が
+  issue から来たかを書きます。
 
 **base（stacked PR）** も順序を宣言します。base が別の open な PR のブランチ
 である PR は、その PR の上に積まれた層です（GitHub の stacked pull request）。
@@ -290,8 +297,9 @@ pick も「3a」の rebase もしません。
 
 #### 2. triage
 
-1. 全 PR の body から `Merge-After:` を、base から stack を読んで依存グラフを
-   作り、閉路を検出（ version PR の body だけは読みません — 上書きされるので）。
+1. 全 PR の body から `Merge-After:` を、base から stack を、閉じる issue から
+   `Start-After:` を読んで依存グラフを作り、閉路を検出（ version PR の body
+   だけは読みません — 上書きされるので）。
 2. **範囲判定** — `merge-queued` が無ければ `ignore`（無言）。あって動かせなけ
    れば `note`（理由を出力）。
 3. **担当者** — 担当者（「担当者（owner）」）が `worker` でない PR は、担当者と
@@ -795,6 +803,14 @@ Merge-After: #1901, #1903
   because nothing here can move it.
 - **A trailer inside a fenced code block is not read**, so a document
   describing the convention does not become a constraint.
+- **The `Start-After:` of the issues it closes is inherited**
+  (`docs/issue-start-after.md`, "pull request への引き継ぎ"): an open pull
+  request named there is waited for as if `Merge-After:` named it, and an open
+  issue named stands for the open pull requests closing it. The issues it
+  closes are GitHub's links and the closing keywords in its body, a stacked
+  one's included, read again on every survey; a survey that cannot read them
+  inherits nothing and says so. The `note` says which numbers came from an
+  issue.
 
 **The base declares an order too.** A pull request onto another open pull
 request's branch is a layer stacked on it — GitHub's stacked pull requests —
@@ -1042,8 +1058,9 @@ Comments that cannot be read are logged, and the records stand as they were
 
 #### 2. Triage
 
-1. Build the dependency graph from every body's `Merge-After:` and every
-   base's stack, and find the cycles in it. The version pull request's body is
+1. Build the dependency graph from every body's `Merge-After:`, every base's
+   stack and the `Start-After:` of the issues each closes, and find the cycles
+   in it. The version pull request's body is
    the one that is not read, because it is overwritten; others may still name
    it.
 2. **Scope** — no `merge-queued` means `ignore`, silently. Queued but not

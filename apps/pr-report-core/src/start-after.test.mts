@@ -1,5 +1,6 @@
 import {
   decideStartStates,
+  inheritStartAfter,
   referenceStatusOf,
   type ReferenceStatus,
 } from './start-after.mjs';
@@ -179,6 +180,114 @@ describe(decideStartStates, () => {
         [3, 'cycle'],
         [4, 'blocked'],
       ]),
+    );
+  });
+});
+
+describe(inheritStartAfter, () => {
+  test('an open pull request an issue names is merged after, as if declared', () => {
+    assert.deepStrictEqual(
+      inheritStartAfter({
+        pulls: [
+          { number: 10, closes: [1] },
+          { number: 20, closes: [] },
+        ],
+        startAfterOf: new Map([[1, [20]]]),
+        openIssues: new Set([1]),
+      }),
+      new Map([
+        [10, { mergeAfter: [20], notStarted: [] }],
+        [20, { mergeAfter: [], notStarted: [] }],
+      ]),
+    );
+  });
+
+  test('an open issue named stands for the open pull requests closing it', () => {
+    assert.deepStrictEqual(
+      inheritStartAfter({
+        pulls: [
+          { number: 10, closes: [1] },
+          { number: 21, closes: [2] },
+          { number: 22, closes: [2] },
+        ],
+        startAfterOf: new Map([[1, [2]]]),
+        openIssues: new Set([1, 2]),
+      }).get(10),
+      { mergeAfter: [21, 22], notStarted: [] },
+    );
+  });
+
+  test('an open issue nobody has started holds nothing, and is said to be open', () => {
+    assert.deepStrictEqual(
+      inheritStartAfter({
+        pulls: [{ number: 10, closes: [1] }],
+        startAfterOf: new Map([[1, [2]]]),
+        openIssues: new Set([1, 2]),
+      }).get(10),
+      { mergeAfter: [], notStarted: [2] },
+    );
+  });
+
+  test('what is done, abandoned or unknown constrains nothing', () => {
+    // #3 is neither an open pull request nor an open issue: merged, closed,
+    // or a number nobody described.
+    assert.deepStrictEqual(
+      inheritStartAfter({
+        pulls: [{ number: 10, closes: [1] }],
+        startAfterOf: new Map([[1, [3]]]),
+        openIssues: new Set([1]),
+      }).get(10),
+      { mergeAfter: [], notStarted: [] },
+    );
+  });
+
+  test('never itself: neither named, nor as what closes the issue named', () => {
+    // #10 closes both #1 and #2, so #1's wait for #2 is this very change.
+    assert.deepStrictEqual(
+      inheritStartAfter({
+        pulls: [
+          { number: 10, closes: [1, 2] },
+          { number: 11, closes: [3] },
+        ],
+        startAfterOf: new Map([
+          [1, [2]],
+          [3, [11]],
+        ]),
+        openIssues: new Set([1, 2, 3]),
+      }),
+      new Map([
+        [10, { mergeAfter: [], notStarted: [] }],
+        [11, { mergeAfter: [], notStarted: [] }],
+      ]),
+    );
+  });
+
+  test('every issue closed contributes, each number once, lowest first', () => {
+    assert.deepStrictEqual(
+      inheritStartAfter({
+        pulls: [
+          { number: 10, closes: [1, 2] },
+          { number: 30, closes: [] },
+          { number: 20, closes: [5] },
+        ],
+        startAfterOf: new Map([
+          [1, [30, 5, 6]],
+          [2, [5, 30, 6]],
+        ]),
+        openIssues: new Set([1, 2, 5, 6]),
+      }).get(10),
+      { mergeAfter: [20, 30], notStarted: [6] },
+    );
+  });
+
+  test('an issue whose body was not read declares nothing', () => {
+    assert.deepStrictEqual(
+      inheritStartAfter({
+        pulls: [{ number: 10, closes: [1] }],
+        startAfterOf: new Map(),
+        openIssues: new Set([1]),
+      }).get(10),
+      { mergeAfter: [], notStarted: [] },
     );
   });
 });

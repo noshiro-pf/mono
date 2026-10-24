@@ -186,6 +186,7 @@ const describe = (
     entry.stackedOn === undefined
       ? undefined
       : (`stacked on #${entry.stackedOn}` as const),
+    ...inheritedOrder(entry),
     commits(entry),
     ...entry.labels.map(({ name }) => (markdown ? `\`${name}\`` : `[${name}]`)),
     autoMerge(entry),
@@ -197,6 +198,24 @@ const describe = (
 
   return Arr.toUnshifted(`${glyph} ${ref} ${title_}`)(detail).join(' · ');
 };
+
+/**
+ * What the issues it closes add to its order (`inheritStartAfter`): the open
+ * pull requests it now merges after, which the tree already draws it under,
+ * and the open issues they name that nobody has started, which hold nothing.
+ */
+const inheritedOrder = (entry: ReportEntry): readonly string[] =>
+  [
+    ...(Arr.isNonEmpty(entry.inheritedMergeAfter)
+      ? ([`after ${refs(entry.inheritedMergeAfter)} (Start-After)`] as const)
+      : ([] as const)),
+    ...(Arr.isNonEmpty(entry.notStartedIssues)
+      ? ([`${refs(entry.notStartedIssues)} (issue) not done`] as const)
+      : ([] as const)),
+  ] as const;
+
+const refs = (numbers: readonly number[]): string =>
+  numbers.map((number) => `#${number}`).join(', ');
 
 /**
  * Whether anything will land the pull request once the checks go green, said

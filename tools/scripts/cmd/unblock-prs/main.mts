@@ -15,6 +15,7 @@ import { STALE_STATE_PAUSE_MS } from './constants.mjs';
 import { afterWatch, followHead, pruneDemotions } from './demotions.mjs';
 import {
   checkPreflight,
+  readIssueOrder,
   readOwnComments,
   readSetAsideComments,
   viewPullRequest,
@@ -59,6 +60,7 @@ import {
 import type {
   CycleResult,
   Demotions,
+  IssueOrder,
   LoopState,
   PullRequest,
   SkipRecord,
@@ -485,6 +487,7 @@ const runCycle = async (
     demoted,
     requiredContexts,
     reviewRequirements,
+    issueOrder: await issueOrderFor(pullRequests),
   });
 
   reportTriage(triaged, pullRequests.length, { defaultBranch, demoted });
@@ -863,6 +866,28 @@ const reportDeparted = async (
   }
 
   return new Set(Array.from(tracked).filter(isOpen));
+};
+
+/**
+ * What the issues the open pull requests close add to the merge order. A
+ * read that fails holds nothing extra: the declared order and the stacks
+ * still stand, and an order inherited from an issue is the one a person can
+ * also write into the body.
+ */
+const issueOrderFor = async (
+  pullRequests: readonly PullRequest[],
+): Promise<IssueOrder> => {
+  const read = await readIssueOrder(pullRequests.map(({ number }) => number));
+
+  if (Result.isErr(read)) {
+    log(
+      `Cannot read the issues the pull requests close; inheriting no Start-After this cycle. (${read.value})`,
+    );
+
+    return { closes: new Map(), startAfter: new Map() };
+  }
+
+  return read.value;
 };
 
 const applyWatchOutcome = (

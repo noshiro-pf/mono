@@ -37,6 +37,7 @@ import {
   type CodeOwnerReview,
   type CodeOwnersRule,
   type Comparison,
+  type IssueDeclarations,
   type Label,
   type LinkedIssue,
   type MergedPullRequest,
@@ -75,8 +76,8 @@ import {
   issueAlias,
   ISSUES_LIMIT,
   ISSUES_PAGE_SIZE,
-  IssueSchema,
   issuesQuery,
+  IssueWithBodySchema,
   MERGED_QUERY,
   MergedDataSchema,
   OPEN_ISSUES_QUERY,
@@ -228,11 +229,7 @@ export type IssueList = Readonly<{
 }>;
 
 /** One open issue, as the page lists it. */
-export type IssueItem = OpenIssue &
-  Readonly<{
-    /** What its `Start-After:` names (`docs/issue-start-after.md`). */
-    startAfter: readonly number[];
-  }>;
+export type IssueItem = OpenIssue;
 
 /**
  * Something a `Start-After:` names that is not a listed issue, as GitHub
@@ -536,7 +533,14 @@ type DetailsState = Readonly<{
 }>;
 
 type DetailsPart = DetailsState &
-  Readonly<{ linkedIssues: readonly LinkedIssue[] }>;
+  Readonly<{
+    linkedIssues: readonly LinkedIssue[];
+    /**
+     * The `Start-After:` of each issue it closes, which it inherits as a
+     * merge order; an issue GitHub would not describe is not in it.
+     */
+    startAfter: ReadonlyMap<number, readonly number[]>;
+  }>;
 
 /**
  * How many follow-ups one part may make. Each is one request of about a
@@ -744,7 +748,8 @@ const readDetails = async (
     return { rateLimit: described.rateLimit, result: described.result };
   }
 
-  const names = described.result.value;
+  const { issues: names, startAfter: unlinkedStartAfter } =
+    described.result.value;
 
   return {
     rateLimit: described.rateLimit,
@@ -752,7 +757,15 @@ const readDetails = async (
       new Map(
         states.map((state) => [
           state.number,
-          { ...state, linkedIssues: linkedIssuesOf(repo, state.node, names) },
+          {
+            ...state,
+            linkedIssues: linkedIssuesOf(repo, state.node, names),
+            startAfter: closingStartAfterOf(
+              repo,
+              state.node,
+              unlinkedStartAfter,
+            ),
+          },
         ]),
       ),
     ),
@@ -859,7 +872,7 @@ const readMerged = async (
     return { rateLimit: described.rateLimit, result: described.result };
   }
 
-  const names = described.result.value;
+  const names = described.result.value.issues;
 
   return {
     rateLimit: described.rateLimit,
@@ -1174,10 +1187,11 @@ const applyFiles = (
 
 /**
  * What GitHub calls the issues in `numbers`, keyed by number, as a linked
- * one would be listed. Nothing is asked when there are none, which is so for
- * every pull request into the default branch. An issue GitHub will not
- * describe — deleted, or moved to another repository — is left out rather
- * than failing the read, and is listed by its number alone.
+ * one would be listed, and what each declares with `Start-After:`. Nothing
+ * is asked when there are none, which is so for every pull request into the
+ * default branch. An issue GitHub will not describe — deleted, or moved to
+ * another repository — is left out rather than failing the read, and is
+ * listed by its number alone.
  */
 const describeIssues = async ({
   repo,
@@ -1189,9 +1203,12 @@ const describeIssues = async ({
   numbers: readonly number[];
   rateLimit: RateLimit | undefined;
   ask: Ask;
-}>): Promise<Answered<ReadonlyMap<number, LinkedIssue>>> => {
+}>): Promise<Answered<DescribedIssues>> => {
   if (!Arr.isNonEmpty(numbers)) {
-    return { rateLimit, result: Result.ok(new Map()) };
+    return {
+      rateLimit,
+      result: Result.ok({ issues: new Map(), startAfter: new Map() }),
+    };
   }
 
   const { query, variables } = issuesQuery(numbers);
@@ -1208,7 +1225,7 @@ const describeIssues = async ({
 
   const nodes = Arr.generate(function* () {
     for (const number of numbers) {
-      const validated = IssueSchema.validate(field(issueAlias(number)));
+      const validated = IssueWithBodySchema.validate(field(issueAlias(number)));
 
       if (Result.isOk(validated)) {
         yield validated.value;
@@ -1218,12 +1235,59 @@ const describeIssues = async ({
 
   return {
     rateLimit: latestLimit,
-    result: Result.ok(
-      new Map(
+    result: Result.ok({
+      issues: new Map(
         closingIssuesIn(repo, nodes).map((issue) => [issue.number, issue]),
       ),
-    ),
+      startAfter: startAfterOfNodes(repo, nodes),
+    }),
   };
+};
+
+type DescribedIssues = Readonly<{
+  issues: ReadonlyMap<number, LinkedIssue>;
+  startAfter: ReadonlyMap<number, readonly number[]>;
+}>;
+
+/**
+ * The `Start-After:` of the issues an open pull request closes: the ones
+ * GitHub links, then the ones its body closes by keyword, from what
+ * {@link describeIssues} read of them.
+ */
+const closingStartAfterOf = (
+  repo: RepoRef,
+  pr: StrictPick<PullRequestDetails, 'bodyHTML' | 'closingIssuesReferences'>,
+  unlinked: ReadonlyMap<number, readonly number[]>,
+): ReadonlyMap<number, readonly number[]> => {
+  const mut_startAfter = new Map(
+    startAfterOfNodes(repo, pr.closingIssuesReferences.nodes),
+  );
+
+  for (const number of unlinkedIssuesOf(repo, pr)) {
+    const startAfter = unlinked.get(number);
+
+    if (startAfter !== undefined) {
+      mut_startAfter.set(number, startAfter);
+    }
+  }
+
+  return mut_startAfter;
+};
+
+/** Each of `repo`'s issues among `nodes`, by what its body declares. */
+const startAfterOfNodes = (
+  repo: RepoRef,
+  nodes: readonly t.TypeOf<typeof IssueWithBodySchema>[],
+): ReadonlyMap<number, readonly number[]> => {
+  const own = `${repo.owner}/${repo.name}`.toLowerCase();
+
+  return new Map(
+    nodes
+      .filter(
+        ({ repository }) => repository.nameWithOwner.toLowerCase() === own,
+      )
+      .map(({ number, body }) => [number, parseStartAfter(body)]),
+  );
 };
 
 /** The aliased fields under `repository` in an answer, by alias. */
@@ -1298,10 +1362,13 @@ const assemble = ({
     pulls.map((pr) => [pr.number, { pr, ...partsOf(pr) }]),
   );
 
+  const issueDeclarations = issueDeclarationsOf(known);
+
   const report = buildEntries({
     required: requirements?.requiredContexts,
     defaultBranch,
     pulls: pulls.map((pr) => factsOf(pr, partsOf(pr))),
+    issues: issueDeclarations,
   });
 
   const entries: readonly Entry[] = report.entries.map((entry) => {
@@ -1354,6 +1421,7 @@ const assemble = ({
         : queueViewOf({
             defaultBranch,
             nowEpochMs: nowMs,
+            startAfterOf: issueDeclarations.startAfter,
             rules: {
               requireCodeOwnerReview:
                 requirements?.requireCodeOwnerReview ?? false,
@@ -1375,6 +1443,44 @@ const assemble = ({
       ...(known.merged === undefined ? (['merged'] as const) : []),
       ...(known.issues === undefined ? (['issues'] as const) : []),
     ],
+  };
+};
+
+/**
+ * What the issues read so far declare with `Start-After:` — the listed ones,
+ * and the ones the open pull requests close — for those pull requests to
+ * inherit, and which numbers are known to be open issues.
+ */
+const issueDeclarationsOf = (known: Known): IssueDeclarations => {
+  const listed = known.issues?.items ?? [];
+
+  const mut_startAfter = new Map<number, readonly number[]>();
+
+  for (const { startAfter } of known.details?.values() ?? []) {
+    for (const [number, declared] of startAfter) {
+      mut_startAfter.set(number, declared);
+    }
+  }
+
+  for (const { number, startAfter } of listed) {
+    mut_startAfter.set(number, startAfter);
+  }
+
+  return {
+    startAfter: mut_startAfter,
+    open: new Set(
+      Arr.generate(function* () {
+        for (const { number } of listed) {
+          yield number;
+        }
+
+        for (const { number, kind, status } of known.issues?.referenced ?? []) {
+          if (kind === 'issue' && status === 'waiting') {
+            yield number;
+          }
+        }
+      }),
+    ),
   };
 };
 
@@ -1508,9 +1614,12 @@ const linkedIssuesOf = (
     ),
   ] as const;
 
-/** What a pull request says it closes, read both ways. */
+/**
+ * What a pull request says it closes, read both ways. A merged one's closing
+ * issues are read without their bodies, which an open one's have.
+ */
 type ClosingSources = StrictPick<
-  PullRequestDetails,
+  MergedPullRequestNode,
   'bodyHTML' | 'closingIssuesReferences'
 >;
 

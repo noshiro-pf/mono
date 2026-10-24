@@ -57,6 +57,42 @@ describe(queueGraph, () => {
     );
   });
 
+  test('a pull request also waits for what the issues it closes start after', () => {
+    const graph = queueGraph(
+      [
+        member({ number: 1, closes: [11] }),
+        member({ number: 2, closes: [12] }),
+        member({ number: 3, body: 'Merge-After: #1' }),
+      ],
+      'main',
+      new Map([
+        [11, [12]],
+        [12, [3]],
+      ]),
+    );
+
+    assert.deepStrictEqual(
+      graph.dependencies,
+      new Map([
+        [1, [2]],
+        [2, [3]],
+        [3, [1]],
+      ]),
+    );
+
+    assert.deepStrictEqual(
+      graph.inherited,
+      new Map([
+        [1, [2]],
+        [2, [3]],
+        [3, []],
+      ]),
+    );
+
+    // The inherited edges close the loop the declared one opens.
+    assert.deepStrictEqual(graph.cycles, [[1, 2, 3]]);
+  });
+
   test('lists what holds the release', () => {
     assert.deepStrictEqual(
       queueGraph(
@@ -386,6 +422,7 @@ const context = (fields: Partial<QueueContext> = {}): QueueContext =>
     defaultBranch: 'main',
     stackParents: new Map(),
     dependencies: new Map(),
+    inherited: new Map(),
     cycles: [],
     cyclic: new Set(),
     openNumbers: new Set(),
