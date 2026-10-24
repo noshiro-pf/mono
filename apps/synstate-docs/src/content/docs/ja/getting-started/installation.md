@@ -1,6 +1,6 @@
 ---
 title: インストール
-description: SynState と React・Preact 向けフレームワーク連携パッケージを npm / yarn / pnpm でインストールする方法。
+description: SynState と React・Preact 向けフレームワーク連携パッケージ、ESLint プラグインを npm / yarn / pnpm でインストールする方法。
 sidebar:
     order: 2
 ---
@@ -46,3 +46,22 @@ Preact を使用している場合は、コンパニオン hooks パッケージ
 ```bash
 npm add synstate-preact-hooks
 ```
+
+### ESLint プラグイン
+
+`eslint-plugin-synstate` は、型では検出できない誤りを報告します。たとえば subscriber からの state への書き込みです（`synstate/no-write-during-propagation`、[subscriber からの書き込み](/mono/synstate/ja/internals/tracing-an-update/#subscriber-からの書き込み非推奨パターン)を参照）。ESLint 9 以降の flat config が必要です：
+
+```bash
+npm add -D eslint-plugin-synstate
+```
+
+`recommended` プリセットはプラグインを登録し、すべてのルールを有効にします：
+
+```ts
+// eslint.config.mts
+import { eslintPluginSynstate } from 'eslint-plugin-synstate';
+
+export default [eslintPluginSynstate.configs.recommended];
+```
+
+ルールの一覧と個別の設定方法は[プラグインの README](https://github.com/noshiro-pf/mono/tree/main/libs/eslint-plugin-synstate#readme) にあります。

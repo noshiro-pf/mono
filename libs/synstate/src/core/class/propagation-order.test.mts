@@ -1,8 +1,75 @@
+import type { FixedLengthTuple } from 'ts-type-forge';
 import { createState } from '../../utils/index.mjs';
 import { combine } from '../combine/index.mjs';
 import { map } from '../operators/index.mjs';
 
 describe('the nodes an update visits', () => {
+  test('a node an update nested in another reaches is still visited once by the outer one', () => {
+    const [source$, setSource] = createState(0);
+
+    const [other$, setOther] = createState(0);
+
+    const a$ = source$.pipe(map((x) => x));
+
+    const b$ = source$.pipe(map((x) => x));
+
+    const c$ = combine([a$, b$, other$]);
+
+    const mut_received: FixedLengthTuple<3, number>[] = [];
+
+    c$.subscribe((v) => {
+      mut_received.push(v);
+    });
+
+    // Runs after `a$` has queued `c$` for the outer update, and before `b$`
+    // queues it again.
+    b$.subscribe((x) => {
+      if (x === 1) {
+        setOther(1);
+      }
+    });
+
+    setSource(1);
+
+    assert.deepStrictEqual(mut_received, [
+      [0, 0, 0],
+      // the nested update
+      [1, 1, 1],
+      // the outer update
+      [1, 1, 1],
+    ]);
+  });
+
+  test('a node created during an update is visited by it if a parent emits after', () => {
+    const [count$, setCount] = createState(0);
+
+    const early$ = count$.pipe(map((x) => x));
+
+    // Depth 2: emits after the subscribers of `early$` have run.
+    const late$ = count$.pipe(map((x) => x)).pipe(map((x) => x));
+
+    const mut_received: number[] = [];
+
+    let mut_created = false;
+
+    early$.subscribe((x) => {
+      if (x !== 1 || mut_created) {
+        return;
+      }
+
+      mut_created = true;
+
+      // Starts from `late$`'s value before this update.
+      late$.pipe(map((y) => y * 10)).subscribe((v) => {
+        mut_received.push(v);
+      });
+    });
+
+    setCount(1);
+
+    assert.deepStrictEqual(mut_received, [0, 10]);
+  });
+
   test('a node created while an update propagates is not visited by it', () => {
     const [count$, setCount] = createState(0);
 

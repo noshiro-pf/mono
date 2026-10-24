@@ -23,8 +23,24 @@ namespace NoUnboundedCounterPipe {
   export type RuleEntry = Linter.StringSeverity;
 }
 
+/**
+ * @description Disallow writing to a synstate state or source from a subscriber or a projection, while the update that called it is propagating.
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | false   |
+ *  ```
+ */
+namespace NoWriteDuringPropagation {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
 export type EslintSynstateRules = Readonly<{
   'synstate/no-unbounded-counter-pipe': NoUnboundedCounterPipe.RuleEntry;
+  'synstate/no-write-during-propagation': NoWriteDuringPropagation.RuleEntry;
 }>;
 
 export type EslintSynstateRulesOption = ReadonlyRecord<never, never>;

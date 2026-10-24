@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: Install SynState and its framework integrations for React, Preact, and Preact Signals via npm, yarn, or pnpm.
+description: Install SynState, its framework integrations for React, Preact, and Preact Signals, and its ESLint plugin via npm, yarn, or pnpm.
 sidebar:
     order: 2
 ---
@@ -46,3 +46,22 @@ If you are using Preact, install the companion hooks package:
 ```bash
 npm add synstate-preact-hooks
 ```
+
+### ESLint plugin
+
+`eslint-plugin-synstate` reports mistakes that the types cannot catch, such as a write to a state from a subscriber (`synstate/no-write-during-propagation`, see [A write from a subscriber](/mono/synstate/internals/tracing-an-update/#a-write-from-a-subscriber-an-anti-pattern)). It needs ESLint 9 or later, with a flat config:
+
+```bash
+npm add -D eslint-plugin-synstate
+```
+
+Its `recommended` preset registers the plugin and turns on every rule:
+
+```ts
+// eslint.config.mts
+import { eslintPluginSynstate } from 'eslint-plugin-synstate';
+
+export default [eslintPluginSynstate.configs.recommended];
+```
+
+The rules and how to configure them one by one are in the [plugin's README](https://github.com/noshiro-pf/mono/tree/main/libs/eslint-plugin-synstate#readme).
