@@ -3,6 +3,11 @@
  * the contexts the ruleset requires.
  */
 
+import {
+  combineContextStates,
+  summarizeChecks as summarizeContexts,
+  type ContextState,
+} from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { parseJson } from '../../lib/json.mjs';
@@ -96,6 +101,11 @@ export const listRunningChecks = async (
  * Such a failure waits for the round to end, as a check not yet reported
  * does. A failure of this round finished after it began, and still fails the
  * pull request at once.
+ *
+ * The verdict itself is `pr-report-core`'s `summarizeChecks`, which
+ * `pr-report` and the page reach theirs through, so the worker and the report
+ * cannot disagree about one; what is here turns what `gh` reports into the
+ * states that reads.
  */
 export const summarizeChecks = (
   checks: readonly ReportedCheck[],
@@ -114,47 +124,58 @@ export const summarizeChecks = (
     );
   };
 
-  const failures = checks.filter(
-    (check) => check.bucket === 'fail' || check.bucket === 'cancel',
-  );
+  const isFailureOfThisRound = (check: ReportedCheck): boolean =>
+    isFailure(check) && !isOfRoundBefore(check);
 
-  const failed = failures
-    .filter((check) => !isOfRoundBefore(check))
-    .map(({ name, link }) => ({ name, link }));
+  const mut_reported = new Map<string, ContextState>();
 
-  const pending = [
-    ...checks
-      .filter((check) => check.bucket === 'pending')
+  for (const check of checks) {
+    const state = stateOf(check, isOfRoundBefore(check));
+
+    const previous = mut_reported.get(check.name);
+
+    mut_reported.set(
+      check.name,
+      previous === undefined ? state : combineContextStates(previous, state),
+    );
+  }
+
+  const pendingNames = new Set(
+    checks
+      .filter((check) => mut_reported.get(check.name) === 'pending')
       .map((check) => check.name),
-    ...failures.filter(isOfRoundBefore).map((check) => check.name),
-  ] as const;
-
-  const reported = new Set(checks.map((check) => check.name));
-
-  const missing = requiredContexts.filter((context) => !reported.has(context));
+  );
 
   const stillRunning = running
     .map(({ name }) => name)
-    .filter((name) => !pending.includes(name));
+    .filter((name) => !pendingNames.has(name));
 
-  const status = Arr.isNonEmpty(failed)
-    ? 'failed'
-    : // No checks at all means they have not been reported yet — which is
-      // also all that can be said when the ruleset could not be read.
-      Arr.isNonEmpty(pending) ||
-        Arr.isNonEmpty(missing) ||
-        Arr.isNonEmpty(stillRunning) ||
-        !Arr.isNonEmpty(checks)
-      ? 'pending'
-      : 'passed';
+  const summary = summarizeContexts({
+    // What the ruleset asks for, and whatever `--required` reported besides:
+    // all of it, when the rules could not be read.
+    required: Arr.uniq([
+      ...requiredContexts,
+      ...checks.map((check) => check.name),
+    ]),
+    reported: mut_reported,
+    // `skip-ci` is the queue's to read (`queueStanding`), not the checks'.
+    paused: false,
+    // No checks at all means they have not been reported yet — which is
+    // also all that can be said when the ruleset could not be read.
+    running: Arr.isNonEmpty(stillRunning) || !Arr.isNonEmpty(checks),
+    // A required context that has not reported is waited for wherever the
+    // pull request points: the worker arms what it judges green, and an
+    // armed pull request stacked on a branch no ruleset covers merges into
+    // it at once.
+    baseCovered: true,
+  });
 
   return {
-    status,
-    failed,
-    pending,
-    missing,
+    ...summary,
+    failedRuns: checks
+      .filter(isFailureOfThisRound)
+      .map(({ name, link }) => ({ name, link })),
     running: stillRunning,
-    total: Math.max(checks.length, requiredContexts.length),
   };
 };
 
@@ -168,6 +189,24 @@ export const describeWaitingOn = (summary: ChecksSummary): string => {
 
   return Arr.isNonEmpty(waiting) ? waiting.join(', ') : 'checks to be reported';
 };
+
+const isFailure = (check: ReportedCheck): boolean =>
+  check.bucket === 'fail' || check.bucket === 'cancel';
+
+/**
+ * What one reported check says of its context. A failure of the round before
+ * waits for the round still running, as a check not yet reported does.
+ */
+const stateOf = (check: ReportedCheck, ofRoundBefore: boolean): ContextState =>
+  isFailure(check)
+    ? ofRoundBefore
+      ? 'pending'
+      : 'failed'
+    : check.bucket === 'pending'
+      ? 'pending'
+      : check.bucket === 'skipping'
+        ? 'skipped'
+        : 'passed';
 
 /**
  * When the earliest check still running started, in milliseconds; `undefined`

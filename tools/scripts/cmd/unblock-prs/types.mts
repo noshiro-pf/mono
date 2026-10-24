@@ -9,6 +9,7 @@ import type {
   RulesetRequirements,
   SetAsideComment,
   SetAsideReason,
+  ChecksSummary as SharedChecksSummary,
 } from 'pr-report-core';
 import * as t from 'ts-fortress';
 import type { StrictPick } from 'ts-type-forge';
@@ -78,7 +79,7 @@ export type SkipRecord = Readonly<{
   /** One sentence, which the log says and the comment leads with. */
   detail: string;
   /** For `checks-failed`: each failed required check, with its run. */
-  failedChecks?: ChecksSummary['failed'];
+  failedChecks?: ChecksSummary['failedRuns'];
   /** What the command that failed printed, which the comment folds away. */
   output?: string;
 }>;
@@ -120,26 +121,23 @@ export type Survey = Readonly<{
   reviewRequirements: ReviewRequirements;
 }>;
 
-export type ChecksSummary = Readonly<{
-  status: 'failed' | 'passed' | 'pending';
-  /** With the run's link, which a set-aside comment points at. */
-  failed: readonly Readonly<{ name: string; link: string }>[];
-  pending: readonly string[];
-  /**
-   * Required contexts with no check run on the head commit at all. GitHub
-   * shows these as "Expected — waiting for status to be reported" and
-   * `gh pr checks` does not list them, so they are found by subtracting what
-   * has reported from what the ruleset requires.
-   */
-  missing: readonly string[];
-  /**
-   * Checks on the head that have not finished and are not among `pending`,
-   * mostly the jobs a required aggregate is still waiting on.
-   */
-  running: readonly string[];
-  /** How many checks the verdict was reached over. */
-  total: number;
-}>;
+/**
+ * `pr-report-core`'s verdict over the required contexts — the one `pr-report`
+ * and the page reach too — with what the worker reads besides.
+ */
+export type ChecksSummary = SharedChecksSummary &
+  Readonly<{
+    /**
+     * {@link SharedChecksSummary.failed}, each with its run's link, which a
+     * set-aside comment points at.
+     */
+    failedRuns: readonly Readonly<{ name: string; link: string }>[];
+    /**
+     * Checks on the head that have not finished and are not among `pending`,
+     * mostly the jobs a required aggregate is still waiting on.
+     */
+    running: readonly string[];
+  }>;
 
 /** What a survey knows before the declared merge order has been read. */
 export type TriageBase = Readonly<{
@@ -256,7 +254,7 @@ export type WatchOutcome =
 export type Watched = Readonly<{
   outcome: WatchOutcome;
   detail?: string;
-  failedChecks?: ChecksSummary['failed'];
+  failedChecks?: ChecksSummary['failedRuns'];
 }>;
 
 /**

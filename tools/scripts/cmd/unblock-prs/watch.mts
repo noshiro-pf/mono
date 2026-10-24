@@ -126,7 +126,7 @@ export const watch = async (
       checks.value.running,
     );
 
-    if (summary.status === 'failed') {
+    if (summary.verdict === 'failing') {
       const failed = describeFailedChecks(summary);
 
       log(`#${pr.number}: ${failed.detail}`);
@@ -134,7 +134,7 @@ export const watch = async (
       return { outcome: 'checks-failed', ...failed };
     }
 
-    if (summary.status === 'pending') {
+    if (summary.verdict === 'pending') {
       mut_greenPolls = 0;
 
       log(
@@ -142,7 +142,7 @@ export const watch = async (
       );
     } else if (bypassReason !== undefined) {
       log(
-        `#${pr.number}: all ${summary.total} required checks green; it waits for a bypass merge.`,
+        `#${pr.number}: all ${summary.required} required checks green; it waits for a bypass merge.`,
       );
 
       return {
@@ -160,7 +160,7 @@ export const watch = async (
         : BLOCKED_GREEN_POLLS_BEFORE_GIVING_UP;
 
       log(
-        `#${pr.number}: ${current.mergeStateStatus}, all ${summary.total} required checks green (${mut_greenPolls}/${budget}), waiting for auto-merge`,
+        `#${pr.number}: ${current.mergeStateStatus}, all ${summary.required} required checks green (${mut_greenPolls}/${budget}), waiting for auto-merge`,
       );
 
       if (mut_greenPolls >= budget) {
