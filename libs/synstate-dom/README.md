@@ -2,8 +2,8 @@
 
 A compiler-free, fine-grained UI library that binds [synstate](https://github.com/noshiro-pf/mono/tree/main/libs/synstate) observables directly to the DOM.
 
-> [!WARNING]
-> Under development and not published yet. The design is in [`SPEC.md`](./SPEC.md) (Japanese); this README grows as the implementation catches up.
+> [!NOTE]
+> Version 0.x: the API may still change in a minor release. The design is in [`SPEC.md`](./SPEC.md) (Japanese).
 
 ## Usage
 

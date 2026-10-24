@@ -1,7 +1,6 @@
 {
   "name": "synstate-dom",
   "version": "0.1.0",
-  "private": true,
   "description": "Compiler-free fine-grained UI library that binds synstate observables directly to the DOM",
   "repository": {
     "type": "git",

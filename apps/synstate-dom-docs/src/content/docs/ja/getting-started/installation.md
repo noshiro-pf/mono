@@ -5,7 +5,7 @@ description: JSX の変換を設定し、最初のコンポーネントを描画
 
 ## インストール
 
-synstate-dom はまだ npm にない。公開後は 2 つの peer dependency と一緒にインストールする。これらはアプリが使うものと同じインスタンスでなければならない。
+synstate-dom は 2 つの peer dependency と一緒にインストールする。これらはアプリが使うものと同じインスタンスでなければならない。
 
 ```sh
 npm install synstate-dom synstate ts-data-forge

@@ -6,7 +6,7 @@ description: What synstate-dom is, and the model it is built on.
 synstate-dom is a UI library that binds [synstate](https://noshiro-pf.github.io/mono/synstate/) observables directly to the DOM. You write JSX and pass observables where values go; there is no compiler and no virtual DOM.
 
 :::caution
-synstate-dom is under development and not published to npm yet. The design is recorded in [`SPEC.md`](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-dom/SPEC.md) (in Japanese), and this site follows the implementation as it catches up.
+synstate-dom is at version 0.x: its API may still change in a minor release. The design is recorded in [`SPEC.md`](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-dom/SPEC.md) (in Japanese), and this site follows the implementation as it catches up.
 :::
 
 ## The model

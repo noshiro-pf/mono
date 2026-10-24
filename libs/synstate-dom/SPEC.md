@@ -4,7 +4,7 @@
 
 synstate の Observable を JSX の属性・子要素・props にそのまま渡し、DOM に直接束縛する UI ライブラリの実装仕様。コンパイラも仮想 DOM も持たない。
 
-- 状態: 実装中。パッケージの骨格、「4. 定数と `Bindable`」、「5. JSX の型」、「6. JSX ランタイムと `Mountable`」、「7. 束縛」、「8.2 `If`」、「8.3 `Match` 系」、「8.4 `For`」、「8.6 `Portal`」まで実装済み。公開の準備が整うまで `package.json` は `"private": true` にしてある。
+- 状態: 0.x として公開。パッケージの骨格、「4. 定数と `Bindable`」、「5. JSX の型」、「6. JSX ランタイムと `Mountable`」、「7. 束縛」、「8.2 `If`」、「8.3 `Match` 系」、「8.4 `For`」、「8.6 `Portal`」まで実装済み。
 - 出典: 設計の起点は issue [#2131](https://github.com/noshiro-pf/mono/issues/2131)、synstate 側のライフサイクル（complete・dispose・スコープ）は「synstate ライフサイクル仕様」で確定した内容。本書は両者を UI ライブラリの実装の視点で 1 つにまとめたもので、食い違う箇所は本書で決め、その旨を書く。
 
 ## 1. 目的と範囲

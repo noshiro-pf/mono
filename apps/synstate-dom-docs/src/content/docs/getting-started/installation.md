@@ -5,7 +5,7 @@ description: Set up the JSX transform and render a first component.
 
 ## Install
 
-synstate-dom is not on npm yet. Once it is published, it is installed with its two peer dependencies, which have to be the same instances the application uses:
+synstate-dom is installed with its two peer dependencies, which have to be the same instances the application uses:
 
 ```sh
 npm install synstate-dom synstate ts-data-forge
