@@ -132,13 +132,22 @@ issue の着手状態は、次のうち最初に当てはまるもの。
 述べるようにする。本文に書いたものと引き継いだものが同じなら、1 つとして数える。
 引き継いだ順序も `Merge-After:` の循環の検出に入る。
 
-## 実装の予定
+## GitHub の issue の依存関係
 
-- 解析は `apps/pr-report-core` に置き、`Merge-After:` と共有する
-  （`merge-after.mts` の `parseMergeAfter` をキー名を引数に取る形にする）。
-  共有にあたり、`other/repo#5` の `#5` を同じリポジトリの `#5` と読まないようにする。
-  今の `Merge-After:` の解析にはこの誤読がある。
-- 循環の検出には `findMergeAfterCycles` を使う。
-- 将来は、GitHub の issue の依存関係（GraphQL の `Issue.blockedBy`）も同じ辺として読む。
-  GitHub の依存関係は issue 同士しか結べないので、pull request を名指すには
-  本文の宣言が要る。
+GitHub の issue の依存関係（「blocked by」。GraphQL の `Issue.blockedBy`、REST の
+`/issues/{n}/dependencies/blocked_by`）も、`Start-After:` と同じ辺として読む。
+issue が待つものは、本文の `Start-After:` が名指すものと、GitHub がその issue を
+止めているとする issue を合わせたもの（`pr-report-core` の `waitsFor`）で、
+状態の判定、循環の検出、pull request への引き継ぎのどれでも区別しない。
+読むのは同じリポジトリの issue だけ。
+
+GitHub の依存関係は issue 同士しか結べないので、pull request を名指すには
+本文の宣言が要る。
+
+## 実装
+
+- 解析は `apps/pr-report-core` にあり、`Merge-After:` と共有する
+  （`merge-after.mts` の `parseStartAfter`）。`other/repo#5` は同じリポジトリの
+  `#5` と読まない。
+- 判定は `start-after.mts`（`decideStartStates`、`withProgress`、
+  `inheritStartAfter`）。循環の検出には `findMergeAfterCycles` を使う。

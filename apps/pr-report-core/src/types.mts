@@ -195,7 +195,11 @@ export type OpenIssue = Readonly<{
   createdAt: string;
   updatedAt: string;
   comments: number;
-  /** What its `Start-After:` names (`docs/issue-start-after.md`). */
+  /**
+   * What it waits for: what its `Start-After:` names and the issues GitHub
+   * records as blocking it, read as one (`waitsFor`,
+   * `docs/issue-start-after.md`).
+   */
   startAfter: readonly number[];
   /**
    * What a `Merge-After:` in its body names. That line is not read on an

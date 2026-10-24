@@ -4,10 +4,10 @@ import {
   anyRunInProgress,
   closingIssuesIn,
   parseMergeAfter,
-  parseStartAfter,
   readQueueComments,
   referenceStatusOf,
   reportedContexts,
+  waitsFor,
   type CheckRunReport,
   type Comparison,
   type ContextState,
@@ -107,6 +107,14 @@ const CheckRunsSchema = t.record({
 });
 
 /**
+ * How many issues block one, which says whether asking which is worth a
+ * request. Absent where GitHub does not send it.
+ */
+const DependenciesSummarySchema = t.optional(
+  t.record({ total_blocked_by: t.number() }),
+);
+
+/**
  * GitHub answers pull requests from the issues endpoint too, and the only
  * thing telling one apart in the answer is the `pull_request` key.
  */
@@ -116,6 +124,7 @@ const IssueListSchema = t.array(
     title: t.string(),
     /** Where `Start-After:` is read from. */
     body: t.union([t.string(), t.nullType]),
+    issue_dependencies_summary: DependenciesSummarySchema,
     html_url: t.string(),
     created_at: t.string(),
     updated_at: t.string(),
@@ -136,7 +145,13 @@ const IssueBodySchema = t.record({
   state: t.string(),
   body: t.union([t.string(), t.nullType]),
   pull_request: t.optional(t.record({})),
+  issue_dependencies_summary: DependenciesSummarySchema,
 });
+
+/** The issues blocking one, of whichever repository. */
+const BlockedByListSchema = t.array(
+  t.record({ number: t.number(), repository_url: t.string() }),
+);
 
 /** An issue or a pull request, as the issues route answers for either. */
 const ReferenceSchema = t.record({
@@ -486,6 +501,39 @@ export const createClient = (
   };
 
   /**
+   * The issues of `repo` GitHub records as blocking `issue` — its issue
+   * dependencies, read as its `Start-After:` is (`waitsFor`). Asked only
+   * when the issue's summary says it has any, so an issue with none costs
+   * nothing; one that cannot be read is taken as having none.
+   */
+  const blockedByOf = async (
+    repo: RepoRef,
+    issue: Readonly<{
+      number: number;
+      issue_dependencies_summary?:
+        Readonly<{ total_blocked_by: number }> | undefined;
+    }>,
+  ): Promise<readonly number[]> => {
+    if ((issue.issue_dependencies_summary?.total_blocked_by ?? 0) === 0) {
+      return [];
+    }
+
+    const listed = await getJson(
+      `/repos/${repo.owner}/${repo.name}/issues/${issue.number}/dependencies/blocked_by?per_page=${PAGE_SIZE}`,
+      BlockedByListSchema,
+    );
+
+    const own =
+      `https://api.github.com/repos/${repo.owner}/${repo.name}`.toLowerCase();
+
+    return Result.isErr(listed)
+      ? []
+      : listed.value
+          .filter(({ repository_url: url }) => url.toLowerCase() === own)
+          .map(({ number }) => number);
+  };
+
+  /**
    * The issues GitHub itself says each pull request closes — the sidebar
    * list, which includes a link made by hand and so knows more than the body
    * does. Only GraphQL exposes it, and GraphQL refuses an anonymous caller,
@@ -612,23 +660,28 @@ export const createClient = (
         return listed;
       }
 
-      return Result.ok(
-        listed.value
-          .filter((issue) => issue.pull_request === undefined)
-          .slice(0, limit)
-          .map((issue) => ({
-            number: issue.number,
-            title: issue.title,
-            author: issue.user?.login ?? 'unknown',
-            url: issue.html_url,
-            labels: labelsOf(issue.labels),
-            createdAt: issue.created_at,
-            updatedAt: issue.updated_at,
-            comments: issue.comments,
-            startAfter: parseStartAfter(issue.body ?? ''),
-            misplacedMergeAfter: parseMergeAfter(issue.body ?? ''),
-          })),
-      );
+      const mut_issues: OpenIssue[] = [];
+
+      for (const issue of listed.value
+        .filter((each) => each.pull_request === undefined)
+        .slice(0, limit)) {
+        const blockedBy = await blockedByOf(repo, issue);
+
+        mut_issues.push({
+          number: issue.number,
+          title: issue.title,
+          author: issue.user?.login ?? 'unknown',
+          url: issue.html_url,
+          labels: labelsOf(issue.labels),
+          createdAt: issue.created_at,
+          updatedAt: issue.updated_at,
+          comments: issue.comments,
+          startAfter: waitsFor(issue.body ?? '', blockedBy),
+          misplacedMergeAfter: parseMergeAfter(issue.body ?? ''),
+        });
+      }
+
+      return Result.ok(mut_issues);
     },
 
     issueBodies: async (repo, numbers) => {
@@ -644,7 +697,10 @@ export const createClient = (
         if (Result.isOk(read) && read.value.pull_request === undefined) {
           mut_read.set(number, {
             open: read.value.state === 'open',
-            startAfter: parseStartAfter(read.value.body ?? ''),
+            startAfter: waitsFor(
+              read.value.body ?? '',
+              await blockedByOf(repo, { number, ...read.value }),
+            ),
           });
         }
       }

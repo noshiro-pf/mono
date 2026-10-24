@@ -6,11 +6,7 @@
  * the Pull Requests Manager page draws the same queue.
  */
 
-import {
-  closingKeywordIssuesIn,
-  parseStartAfter,
-  type RepoRef,
-} from 'pr-report-core';
+import { closingKeywordIssuesIn, waitsFor, type RepoRef } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
 import type { Classification, IssueOrder, PullRequest } from './types.mjs';
 
@@ -48,6 +44,8 @@ export type ClosingIssueAnswer = Readonly<{
   /** `OPEN` or `CLOSED`. */
   state: string;
   body: string;
+  /** The issues of this repository GitHub records as blocking it. */
+  blockedBy: readonly number[];
 }>;
 
 /**
@@ -91,9 +89,9 @@ export const issueOrderOf = (
       ]),
     ),
     startAfter: new Map(
-      Array.from(issues.values(), ({ number, body }) => [
+      Array.from(issues.values(), ({ number, body, blockedBy }) => [
         number,
-        parseStartAfter(body),
+        waitsFor(body, blockedBy),
       ]),
     ),
   } as const;

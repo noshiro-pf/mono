@@ -561,15 +561,21 @@ describe(loadReport, () => {
     assert.isTrue(Result.isErr(result));
   });
 
-  test('reads Start-After out of the issue bodies, and asks once for what they name that is not listed', async () => {
+  test('reads Start-After out of the issue bodies and their blocked-by dependencies, and asks once for what they name that is not listed', async () => {
     const { fetchImpl, sent } = answering(
       report([], [], 0, {
         ...NO_ISSUES,
         totalCount: 3,
         nodes: [
           openIssue(2225, [], 'Moves the hosting.\n\nStart-After: #2162\n'),
-          openIssue(2162, [], 'Merge-After: #2225\n'),
-          openIssue(2224, [], 'Start-After: #2139, #7, #9999\n'),
+          openIssue(2162, [], 'Merge-After: #2225\n', [
+            // Another repository's #5 is not this one's.
+            [5, 'noshiro-pf/other'],
+          ]),
+          openIssue(2224, [], 'Start-After: #2139, #7\n', [
+            [9999, 'noshiro-pf/mono'],
+            [7, 'noshiro-pf/mono'],
+          ]),
         ],
       }),
       {
@@ -1056,7 +1062,10 @@ describe(loadReport, () => {
         pullRequest({
           number: 10,
           closingIssues: [
-            closes(1, 'noshiro-pf/mono', 'OPEN', 'Start-After: #11, #2'),
+            // #11 is a blocked-by dependency, read as the line is.
+            closes(1, 'noshiro-pf/mono', 'OPEN', 'Start-After: #2', [
+              [11, 'noshiro-pf/mono'],
+            ]),
           ],
         }),
         pullRequest({
@@ -1689,11 +1698,13 @@ const openIssue = (
   number: number,
   labels: readonly string[],
   body: string = '',
+  blockedBy: readonly (readonly [number, string])[] = [],
 ): unknown =>
   ({
     number,
     title: `Issue ${number}`,
     body,
+    blockedBy: blockedByNodes(blockedBy),
     url: `https://github.com/noshiro-pf/mono/issues/${number}`,
     createdAt: '2026-09-20T00:00:00Z',
     updatedAt: '2026-09-23T00:00:00Z',
@@ -1874,6 +1885,7 @@ const closes = (
   nameWithOwner: string,
   state: string = 'CLOSED',
   body: string = '',
+  blockedBy: readonly (readonly [number, string])[] = [],
 ): unknown =>
   ({
     number,
@@ -1882,6 +1894,18 @@ const closes = (
     state,
     repository: { nameWithOwner },
     body,
+    blockedBy: blockedByNodes(blockedBy),
+  }) as const;
+
+/** `blockedBy` as GraphQL answers it: each number with its repository. */
+const blockedByNodes = (
+  blockedBy: readonly (readonly [number, string])[],
+): unknown =>
+  ({
+    nodes: blockedBy.map(([number, nameWithOwner]) => ({
+      number,
+      repository: { nameWithOwner },
+    })),
   }) as const;
 
 /**

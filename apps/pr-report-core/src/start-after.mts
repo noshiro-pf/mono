@@ -5,7 +5,7 @@
  */
 
 import { Arr } from 'ts-data-forge';
-import { findMergeAfterCycles } from './merge-after.mjs';
+import { findMergeAfterCycles, parseStartAfter } from './merge-after.mjs';
 
 /**
  * Where one thing a declaration names stands, as far as starting goes.
@@ -34,6 +34,18 @@ export type ReferenceStatus = 'abandoned' | 'done' | 'unknown' | 'waiting';
  * has just become startable can stand out from one that always was.
  */
 export type StartState = 'attention' | 'blocked' | 'cycle' | 'free' | 'ready';
+
+/**
+ * What an issue waits for: what its body's `Start-After:` names, then the
+ * issues GitHub records as blocking it (its issue dependencies), each once.
+ * The two are one edge (`docs/issue-start-after.md`): a dependency can only
+ * join issues, and the line is how an issue names a pull request. `blockedBy`
+ * is this repository's only, for the reason `closingIssuesIn` gives.
+ */
+export const waitsFor = (
+  body: string,
+  blockedBy: readonly number[],
+): readonly number[] => Arr.uniq(parseStartAfter(body).concat(blockedBy));
 
 /**
  * How an issue is shown: its {@link StartState}, or `in-progress` when it is

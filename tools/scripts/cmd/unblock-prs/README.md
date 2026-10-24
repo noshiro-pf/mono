@@ -67,7 +67,8 @@ Merge-After: #1901, #1903
   の「pull request への引き継ぎ」）。名指されたのが開いた PR ならその PR を、
   開いた issue ならそれを閉じる開いた PR を、`Merge-After:` で名指したのと同じに
   扱います。閉じる issue は GitHub のリンクと、本文の closing keyword
-  （stack された PR を含む）で決め、survey ごとに読み直します。読めなかった
+  （stack された PR を含む）で決め、survey ごとに読み直します。GitHub の issue の
+  依存関係（blocked by）も `Start-After:` と同じに扱います。読めなかった
   survey では何も引き継がず、その旨を出力します。`note` には、どの番号が
   issue から来たかを書きます。
 
@@ -808,7 +809,8 @@ Merge-After: #1901, #1903
   request named there is waited for as if `Merge-After:` named it, and an open
   issue named stands for the open pull requests closing it. The issues it
   closes are GitHub's links and the closing keywords in its body, a stacked
-  one's included, read again on every survey; a survey that cannot read them
+  one's included, read again on every survey, and GitHub's issue
+  dependencies ("blocked by") count as `Start-After:` does; a survey that cannot read them
   inherits nothing and says so. The `note` says which numbers came from an
   issue.
 

@@ -58,6 +58,13 @@ const LABELS = 'labels(first: 20) { nodes { name color description } }';
 
 const ISSUE_FIELDS = 'number title url state repository { nameWithOwner }';
 
+/**
+ * The issues GitHub records as blocking one — its issue dependencies — which
+ * are read as `Start-After:` lines are (`pr-report-core`'s `waitsFor`).
+ */
+const BLOCKED_BY =
+  'blockedBy(first: 20) { nodes { number repository { nameWithOwner } } }';
+
 const CLOSING_ISSUES =
   `closingIssuesReferences(first: 10) { nodes { ${ISSUE_FIELDS} } }` as const;
 
@@ -68,7 +75,7 @@ const CLOSING_ISSUES =
  * closing issues are read without.
  */
 const OPEN_CLOSING_ISSUES =
-  `closingIssuesReferences(first: 10) { nodes { ${ISSUE_FIELDS} body } }` as const;
+  `closingIssuesReferences(first: 10) { nodes { ${ISSUE_FIELDS} body ${BLOCKED_BY} } }` as const;
 
 const PAGE_INFO = 'pageInfo { hasNextPage endCursor }';
 
@@ -81,6 +88,7 @@ const OPEN_ISSUE_PAGE = [
   PAGE_INFO,
   'nodes {',
   '  number title body url createdAt updatedAt',
+  `  ${BLOCKED_BY}`,
   '  author { login }',
   `  ${LABELS}`,
   '  comments { totalCount }',
@@ -326,7 +334,7 @@ export const issuesQuery = (
       ...numbers.map((number) => {
         const alias = issueAlias(number);
 
-        return `    ${alias}: issue(number: $${alias}) { ${ISSUE_FIELDS} body }`;
+        return `    ${alias}: issue(number: $${alias}) { ${ISSUE_FIELDS} body ${BLOCKED_BY} }`;
       }),
       '  }',
       '}',
@@ -401,7 +409,22 @@ export const IssueSchema = t.record({
   repository: t.record({ nameWithOwner: t.string() }),
 });
 
-/** {@link IssueSchema} with the body, where `Start-After:` is read from. */
+/** What GitHub records as blocking an issue, of any repository. */
+const BlockedBySchema = t.record({
+  nodes: t.array(
+    t.record({
+      number: t.number(),
+      repository: t.record({ nameWithOwner: t.string() }),
+    }),
+  ),
+});
+
+export type BlockedByNodes = t.TypeOf<typeof BlockedBySchema>;
+
+/**
+ * {@link IssueSchema} with what it waits for: the body `Start-After:` is
+ * read from, and its issue dependencies.
+ */
 export const IssueWithBodySchema = t.record({
   number: t.number(),
   title: t.string(),
@@ -409,6 +432,7 @@ export const IssueWithBodySchema = t.record({
   state: t.string(),
   repository: t.record({ nameWithOwner: t.string() }),
   body: t.string(),
+  blockedBy: BlockedBySchema,
 });
 
 const ClosingIssuesSchema = t.record({ nodes: t.array(IssueSchema) });
@@ -580,6 +604,7 @@ const OpenIssueSchema = t.record({
   title: t.string(),
   /** Where `Start-After:` is read from. */
   body: t.string(),
+  blockedBy: BlockedBySchema,
   url: t.string(),
   createdAt: t.string(),
   updatedAt: t.string(),

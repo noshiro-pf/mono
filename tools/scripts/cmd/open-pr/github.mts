@@ -6,7 +6,7 @@ import {
   inheritStartAfter,
   isSafeRefName,
   parseMergeAfter,
-  parseStartAfter,
+  waitsFor,
 } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
@@ -289,9 +289,18 @@ export const missingInheritedOrder = async (
       return read;
     }
 
-    if (read.value.state === 'open' && read.value.pull_request === undefined) {
-      mut_startAfter.set(issue, parseStartAfter(read.value.body ?? ''));
+    // A closed issue holds nothing, and a pull request declares no start.
+    if (read.value.state !== 'open' || read.value.pull_request !== undefined) {
+      continue;
     }
+
+    const blockedBy = await blockedByOf(api, issue, read.value);
+
+    if (Result.isErr(blockedBy)) {
+      return blockedBy;
+    }
+
+    mut_startAfter.set(issue, waitsFor(read.value.body ?? '', blockedBy.value));
   }
 
   if (!Array.from(mut_startAfter.values()).some(Arr.isNonEmpty)) {
@@ -358,7 +367,43 @@ const IssueSchema = t.record({
   state: t.string(),
   body: t.union([t.string(), t.nullType]),
   pull_request: t.optional(t.record({})),
+  /** How many issues block it; absent where GitHub does not send it. */
+  issue_dependencies_summary: t.optional(
+    t.record({ total_blocked_by: t.number() }),
+  ),
 });
+
+/**
+ * This repository's issues GitHub records as blocking `issue`, read as its
+ * `Start-After:` is (`waitsFor`); asked only when its summary says there are
+ * any.
+ */
+const blockedByOf = async (
+  api: ApiContext,
+  issue: number,
+  read: t.TypeOf<typeof IssueSchema>,
+): Promise<Result<readonly number[], string>> => {
+  if ((read.issue_dependencies_summary?.total_blocked_by ?? 0) === 0) {
+    return Result.ok([]);
+  }
+
+  const listed = await rest(
+    api,
+    'GET',
+    `/issues/${issue}/dependencies/blocked_by`,
+    t.array(t.record({ number: t.number(), repository_url: t.string() })),
+    { query: { per_page: '100' } },
+  );
+
+  const own =
+    `https://api.github.com/repos/${api.repo.owner}/${api.repo.name}`.toLowerCase();
+
+  return Result.map(listed, (blocking) =>
+    blocking
+      .filter(({ repository_url: url }) => url.toLowerCase() === own)
+      .map(({ number }) => number),
+  );
+};
 
 export const addLabel = async (
   api: ApiContext,

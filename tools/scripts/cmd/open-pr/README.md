@@ -89,7 +89,8 @@ pnpm run open-pr -- --base feat/lower-layer        # その PR の上に積む
 
 **閉じる issue の `Start-After:` も本文に書きます。** PR を作った後、GitHub が
 本文から読んだ closing keyword の issue を読み、その `Start-After:` が名指す
-開いた PR（開いた issue なら、それを閉じる開いた PR）のうち本文にまだ無いものを、
+開いた PR（開いた issue なら、それを閉じる開いた PR。GitHub の issue の依存関係
+blocked by も同じに読みます）のうち本文にまだ無いものを、
 先頭の `Merge-After:` 行に足します（`docs/issue-start-after.md`）。`unblock-prs`
 と各レポートは本文に無くても引き継ぐので、これは順序を本文にも書いておくための
 ものです。サイドバーで手でリンクした issue は見ません。
@@ -202,7 +203,8 @@ it.
 request exists, the script reads the issues GitHub found closing keywords for
 in the body, and adds to the `Merge-After:` line at the top the open pull
 requests their `Start-After:` names — or, for an open issue named, the open
-pull requests closing it — that the body does not name yet
+pull requests closing it; GitHub's "blocked by" counts the same — that the
+body does not name yet
 (`docs/issue-start-after.md`). `unblock-prs` and the reports inherit the same
 without it; this is the body stating the order. An issue linked by hand in
 the sidebar is not seen.
