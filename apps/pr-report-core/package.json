@@ -39,6 +39,7 @@
     "ts-fortress": "workspace:*"
   },
   "devDependencies": {
+    "@octokit/openapi-types": "^29.0.1",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "dedent": "catalog:",
