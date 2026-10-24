@@ -99,16 +99,6 @@ export const headerStore = createHeaderStore({
   },
 });
 
-const ISSUES_LIST_VIEW_KEY = 'issues-list-view';
-
-export const issuesListStore = createIssuesListStore({
-  issues: reader.issues,
-  load: () => readSetting(ISSUES_LIST_VIEW_KEY),
-  save: (view) => {
-    writeSetting(ISSUES_LIST_VIEW_KEY, view).catch(() => undefined);
-  },
-});
-
 const ISSUES_VIEW_KEY = 'issues-view';
 
 const ISSUES_DAG_HIDE_DONE_KEY = 'issues-dag-hide-done';
@@ -133,6 +123,17 @@ export const issuesViewStore = createIssuesViewStore({
   },
   moreIssues: reader.moreIssues,
   loadMoreIssues: reader.loadMoreIssues,
+});
+
+const ISSUES_LIST_VIEW_KEY = 'issues-list-view';
+
+export const issuesListStore = createIssuesListStore({
+  issues: reader.issues,
+  graph: issuesViewStore.fullGraph,
+  load: () => readSetting(ISSUES_LIST_VIEW_KEY),
+  save: (view) => {
+    writeSetting(ISSUES_LIST_VIEW_KEY, view).catch(() => undefined);
+  },
 });
 
 export const activityStore = createActivityStore({

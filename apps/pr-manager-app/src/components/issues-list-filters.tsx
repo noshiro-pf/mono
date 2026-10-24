@@ -1,19 +1,25 @@
 import type { InitializedObservable } from 'synstate';
 import { constant, For, If, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
-import type { IssueSort, LabelCount } from '../issues-list-view.mjs';
+import {
+  ISSUE_STARTS,
+  type IssueSort,
+  type LabelCount,
+} from '../issues-list-view.mjs';
 import { chipColors } from '../label-color.mjs';
 import { PRIORITIES } from '../priority.mjs';
 import { issuesListStore } from '../store/index.mjs';
+import { explainState, stateLabels } from './issue-dag-states.mjs';
 import { OfTotal } from './stat-tile.js';
 
 /**
  * What the list of open issues leads with: a search of the titles, matched
  * as it is typed whatever the case, and not kept across visits; the priorities, switches as the
- * merge order's are (`merge-order-filters.tsx`); `pending`, a switch as
- * well, there while an open issue carries it; the labels, each a pick;
- * and the order. What each does is `issues-list-view.mts`; the choice is
- * kept across visits (`settings-db.mts`).
+ * merge order's are (`merge-order-filters.tsx`); the start states, switches
+ * likewise, in the DAG's words; `pending`, a switch as well, there while an
+ * open issue carries it; the labels, each a pick; and the order. What each
+ * does is `issues-list-view.mts`; the choice is kept across visits
+ * (`settings-db.mts`).
  *
  * Each number is how many of what it counts the list shows, followed in
  * small by how many there are when that is more — the merge order's
@@ -60,6 +66,32 @@ export const IssuesListFilters = (): JSX.Element => {
               <OfTotal
                 count={view(counts$, ({ priorities }) => priorities[priority])}
               />
+            </span>
+          </button>
+        ))}
+      </fieldset>
+
+      <fieldset
+        aria-label={constant('Start state')}
+        class={constant('filter-group')}
+      >
+        <span class={constant('filter-group-name')}>{constant('start')}</span>
+        {ISSUE_STARTS.map((start) => (
+          <button
+            aria-pressed={view(view$, ({ hiddenStarts }) =>
+              String(!hiddenStarts.includes(start)),
+            )}
+            class={constant('filter-chip')}
+            title={constant(explainState({ kind: 'issue', state: start }))}
+            type={constant('button')}
+            onClick={() => {
+              issuesListStore.toggleStart(start);
+            }}
+          >
+            {constant(stateLabels[start])}
+            <span class={constant('filter-chip-count')}>
+              {view(counts$, ({ starts }) => starts[start].shown)}
+              <OfTotal count={view(counts$, ({ starts }) => starts[start])} />
             </span>
           </button>
         ))}
@@ -131,6 +163,17 @@ export const IssuesListFilters = (): JSX.Element => {
         >
           {constant('priority')}
         </button>
+        <button
+          aria-pressed={view(view$, ({ sort }) => String(sort === 'start'))}
+          class={constant('theme-switch-option')}
+          title={constant(
+            'What can be started first, then what is in progress, what needs a look, what waits, and what is on a cycle. The most recently updated first within each.',
+          )}
+          type={constant('button')}
+          onClick={sortByStart}
+        >
+          {constant('start')}
+        </button>
       </fieldset>
     </div>
   );
@@ -197,3 +240,5 @@ const sortBy = (sort: IssueSort) => (): void => {
 const sortByUpdate = sortBy('updated');
 
 const sortByPriority = sortBy('priority');
+
+const sortByStart = sortBy('start');

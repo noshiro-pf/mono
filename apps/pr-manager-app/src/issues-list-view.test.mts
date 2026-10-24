@@ -7,6 +7,7 @@ import {
   matchesIssueTitle,
   parseIssuesListView,
   toggleIssuePriority,
+  toggleIssueStart,
   toggleLabel,
   togglePendingIssues,
   withIssueSort,
@@ -138,6 +139,7 @@ describe(arrangeIssues, () => {
   test('leaves out what the view hides, in either order', () => {
     const view: IssuesListView = {
       hiddenPriorities: ['none'],
+      hiddenStarts: [],
       onlyLabels: ['bug'],
       hidePending: false,
       sort: 'priority',
@@ -317,6 +319,64 @@ describe(countIssues, () => {
   });
 });
 
+describe('the start states', () => {
+  // #1 ready, #2 blocked, #3 in progress, #4 none known (free), #5 on a
+  // cycle, #6 ready.
+  const starts = new Map([
+    [1, 'ready'],
+    [2, 'blocked'],
+    [3, 'in-progress'],
+    [5, 'cycle'],
+    [6, 'ready'],
+  ] as const);
+
+  test('a start state switched off hides the issues in it', () => {
+    const view = toggleIssueStart(
+      toggleIssueStart(DEFAULT_ISSUES_LIST_VIEW, 'blocked'),
+      'free',
+    );
+
+    assert.deepStrictEqual(
+      numbersOf(arrangeIssues(ISSUES, view, '', starts)),
+      [1, 3, 5, 6],
+    );
+  });
+
+  test('sorted by start state, the startable first and the stuck last, by update within each', () => {
+    assert.deepStrictEqual(
+      numbersOf(
+        arrangeIssues(
+          ISSUES,
+          withIssueSort(DEFAULT_ISSUES_LIST_VIEW, 'start'),
+          '',
+          starts,
+        ),
+      ),
+      [1, 6, 4, 3, 2, 5],
+    );
+  });
+
+  test('each start state counts what switching it on would show', () => {
+    const counts = countIssues(
+      ISSUES,
+      toggleIssueStart(DEFAULT_ISSUES_LIST_VIEW, 'ready'),
+      '',
+      starts,
+    );
+
+    assert.deepStrictEqual(counts.starts, {
+      ready: { shown: 2, total: 2 },
+      free: { shown: 1, total: 1 },
+      'in-progress': { shown: 1, total: 1 },
+      attention: { shown: 0, total: 0 },
+      blocked: { shown: 1, total: 1 },
+      cycle: { shown: 1, total: 1 },
+    });
+
+    assert.deepStrictEqual(counts.open, { shown: 4, total: 6 });
+  });
+});
+
 describe(toggleLabel, () => {
   test('picks and unpicks, keeping the labels in name order', () => {
     const picked = toggleLabel(
@@ -336,9 +396,10 @@ describe(parseIssuesListView, () => {
   test('reads back what was saved', () => {
     const view: IssuesListView = {
       hiddenPriorities: ['low', 'none'],
+      hiddenStarts: ['blocked'],
       onlyLabels: ['bug'],
       hidePending: true,
-      sort: 'priority',
+      sort: 'start',
     } as const;
 
     assert.deepStrictEqual(parseIssuesListView(view), view);
@@ -358,12 +419,14 @@ describe(parseIssuesListView, () => {
     assert.deepStrictEqual(
       parseIssuesListView({
         hiddenPriorities: ['urgent', 'mid'],
+        hiddenStarts: ['someday', 'cycle'],
         onlyLabels: ['bug', 3, 'bug'],
         hidePending: 'yes',
         sort: 'title',
       }),
       {
         hiddenPriorities: ['mid'],
+        hiddenStarts: ['cycle'],
         onlyLabels: ['bug'],
         hidePending: false,
         sort: 'updated',
@@ -383,6 +446,7 @@ const issue = (number: number, labelNames: readonly string[]): IssueItem =>
     updatedAt: '2026-09-23T00:00:00Z',
     comments: 0,
     startAfter: [],
+    misplacedMergeAfter: [],
   }) as const;
 
 const titled = (number: number, title: string): IssueItem =>

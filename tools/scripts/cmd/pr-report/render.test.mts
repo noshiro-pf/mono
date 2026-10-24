@@ -65,6 +65,7 @@ const issue = (number: number): OpenIssue =>
     updatedAt: '2026-09-17T00:00:00Z',
     comments: 2,
     startAfter: [],
+    misplacedMergeAfter: [],
   }) as const;
 
 describe('renderMarkdown', () => {
@@ -281,6 +282,44 @@ describe('the open issues section', () => {
     assert.isTrue(rendered.includes('`bug`'));
 
     assert.isTrue(rendered.includes('2 comments'));
+  });
+
+  test('says how each issue stands for being started, and what it waits for', () => {
+    const rendered = renderMarkdown(
+      buildReport({
+        repo: { owner: 'noshiro-pf', name: 'mono' },
+        defaultBranch: 'main',
+        generatedAt: '2026-09-18T09:00:00Z',
+        required: [],
+        merged: [],
+        mergedWithinDays: 7,
+        issues: [
+          { ...issue(2001), startAfter: [1901, 1700] },
+          { ...issue(2002), startAfter: [1700] },
+          { ...issue(2003), misplacedMergeAfter: [1901] },
+          issue(2004),
+        ],
+        issuesLimit: 30,
+        authenticated: false,
+        pulls: [facts({ number: 1901 })],
+        references: new Map([[1700, 'done']]),
+      }),
+    );
+
+    const line = (number: number): string =>
+      rendered.split('\n').find((each) => each.includes(`#${number}]`)) ?? '';
+
+    assert.include(line(2001), 'waiting · after #1901 (open), #1700 (done)');
+
+    assert.include(line(2002), 'ready · after #1700 (done)');
+
+    assert.include(
+      line(2003),
+      'Merge-After: #1901 is not read on an issue; use Start-After:',
+    );
+
+    // Free is the ordinary case, and is not said.
+    assert.notInclude(line(2004), 'free');
   });
 
   test('says when the list is full, so that it may not be all of them', () => {

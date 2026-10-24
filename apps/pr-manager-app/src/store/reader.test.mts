@@ -1085,6 +1085,7 @@ const issueList = (
       updatedAt: '2026-09-23T00:00:00Z',
       comments: 0,
       startAfter: [],
+      misplacedMergeAfter: [],
     })),
     totalCount: 200,
     endCursor,

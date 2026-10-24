@@ -3,7 +3,7 @@
  * legend, and a sentence for the node's tooltip.
  */
 
-import type { ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import type { IssueGraphNode, IssueNodeState } from '../issue-graph.mjs';
 
 /** In the order the legend lists them: what can be done first. */
@@ -39,12 +39,15 @@ export const stateLabels = {
 export const describeNode = (node: IssueGraphNode): string =>
   [
     `#${node.number}${node.title === '' ? '' : ` ${node.title}`}`,
-    `${stateLabels[node.state]}: ${explanation(node)}`,
+    `${stateLabels[node.state]}: ${explainState(node)}`,
     ...(node.priority === 'none' ? [] : [`Priority: ${node.priority}`]),
     ...(node.pending ? ['Labelled pending'] : []),
   ].join('\n');
 
-const explanation = (node: IssueGraphNode): string => {
+/** Why a node stands where it does, in a sentence. */
+export const explainState = (
+  node: StrictPick<IssueGraphNode, 'kind' | 'state'>,
+): string => {
   switch (node.state) {
     case 'free':
       return 'it declares nothing to wait for.';

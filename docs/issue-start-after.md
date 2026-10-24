@@ -11,7 +11,8 @@ Start-After: #2113
 ```
 
 issue の着手状態（下記）は、Pull Requests Manager（`apps/pr-manager-app`）の
-issue の DAG 表示が示す。issue を閉じる pull request への引き継ぎ（下記）は、
+issue 一覧と DAG 表示、`pnpm run pr-report` の issue の節が示す。
+issue を閉じる pull request への引き継ぎ（下記）は、
 Pull Requests Manager、`pnpm run pr-report`、`unblock-prs`、`open-pr` が行う。
 
 ## 何を書くか
@@ -45,7 +46,8 @@ pull request の作り直しにも追従する。
   自分を縛らないようにするため。`> ` で始まる引用行も、行頭がキーではないので読まない。
 - 読むのは本文だけで、コメントは読まない。
 
-issue の本文に書いた `Merge-After:` は読まない。書き間違いとして扱う。
+issue の本文に書いた `Merge-After:` は読まない。書き間違いとして扱い、読み手は
+そう示す。
 
 ## 書かない issue
 
@@ -101,7 +103,7 @@ issue の着手状態は、次のうち最初に当てはまるもの。
 - 「着手可」と「制約なし」を分けるのは、待っていたものが済んで始められるように
   なった issue を目立たせるため。
 - 着手状態とは別に、その issue を閉じる開いた pull request があれば「着手済み」と
-  表示する。
+  表示する（`pr-report-core` の `withProgress`）。
 
 ## pull request への引き継ぎ
 

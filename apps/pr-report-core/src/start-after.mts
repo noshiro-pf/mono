@@ -36,6 +36,33 @@ export type ReferenceStatus = 'abandoned' | 'done' | 'unknown' | 'waiting';
 export type StartState = 'attention' | 'blocked' | 'cycle' | 'free' | 'ready';
 
 /**
+ * How an issue is shown: its {@link StartState}, or `in-progress` when it is
+ * startable and an open pull request closes it. Kept apart from the start
+ * state in the rules (`docs/issue-start-after.md`): one that is blocked or
+ * on a cycle says so whether or not someone has started it.
+ */
+export type IssueStartState = StartState | 'in-progress';
+
+/** The {@link IssueStartState} of an issue, given whether it is worked on. */
+export const withProgress = (
+  state: StartState,
+  worked: boolean,
+): IssueStartState =>
+  worked && (state === 'free' || state === 'ready') ? 'in-progress' : state;
+
+/** The issues an open pull request closes: the ones being worked on. */
+export const issuesInProgress = (
+  pulls: readonly Readonly<{
+    linkedIssues: readonly Readonly<{ number: number }>[];
+  }>[],
+): ReadonlySet<number> =>
+  new Set(
+    pulls.flatMap(({ linkedIssues }) =>
+      linkedIssues.map(({ number }) => number),
+    ),
+  );
+
+/**
  * What GitHub says about a numbered item, in the terms both of its APIs
  * share once lower-cased: GraphQL's `CLOSED` / `NOT_PLANNED` are REST's
  * `closed` / `not_planned`.

@@ -1,6 +1,7 @@
 import type { Label } from 'pr-report-core';
 import {
   buildIssueGraph,
+  issueStartsOf,
   omitDone,
   omitPending,
   type OpenPullRequestFacts,
@@ -236,6 +237,40 @@ describe(buildIssueGraph, () => {
   });
 });
 
+describe(issueStartsOf, () => {
+  test('each listed issue’s state, and what it names as the graph draws it', () => {
+    const issues = [issue(1, []), issue(2, [1, 7]), issue(3, [])] as const;
+
+    const graph = build({
+      issues,
+      referenced: [referencedItem(7, 'pull-request', 'done')],
+      pulls: [pull(9, [3])],
+    });
+
+    const starts = issueStartsOf(graph, issues);
+
+    assert.deepStrictEqual(
+      Array.from(starts, ([number, { state, named }]) => ({
+        number,
+        state,
+        named: named.map((node) => [node.number, node.state]),
+      })),
+      [
+        { number: 1, state: 'free', named: [] },
+        {
+          number: 2,
+          state: 'blocked',
+          named: [
+            [1, 'free'],
+            [7, 'done'],
+          ],
+        },
+        { number: 3, state: 'in-progress', named: [] },
+      ],
+    );
+  });
+});
+
 describe(omitDone, () => {
   test('takes out what is done, and every edge that runs from it or to it', () => {
     const graph = build({
@@ -339,6 +374,7 @@ const issue = (
     updatedAt: '2026-09-23T00:00:00Z',
     comments: 0,
     startAfter,
+    misplacedMergeAfter: [],
   }) as const;
 
 const referencedItem = (

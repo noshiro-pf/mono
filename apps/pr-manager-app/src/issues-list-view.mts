@@ -19,6 +19,11 @@
  * to leave it out. Switched off, an issue carrying it is hidden, whatever
  * else it is.
  *
+ * **The start states** are how each issue stands for being started
+ * (`docs/issue-start-after.md`, `pr-report-core`'s `IssueStartState`), read
+ * off the issue graph (`issue-start.mts`); each is a switch as a priority is,
+ * and an issue none is known for is `free`.
+ *
  * **The search** is what the reader types: an issue is shown only when its
  * title holds it, whatever the case, and still not when its priority or its
  * labels leave it out. It narrows the list there and then, so it is not kept
@@ -26,12 +31,15 @@
  * (`issues-list-store.mts`) rather than in it.
  *
  * Sorted by priority, high comes first and "none" between mid and low, the
- * most recently updated first within each; otherwise the list is in the
- * order it is read, most recently updated first. Everything is shown, by
+ * most recently updated first within each; sorted by start state, what can
+ * be started first — ready, then free — then what is under way, what wants
+ * looking at, and what waits, the most recently updated first within each;
+ * otherwise the list is in the order it is read, most recently updated
+ * first. Everything is shown, by
  * update, by default; what the reader changes is kept (`settings-db.mts`).
  */
 
-import { PENDING_LABEL } from 'pr-report-core';
+import { PENDING_LABEL, type IssueStartState } from 'pr-report-core';
 import { Arr, hasKey, isRecord, isString } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { IssueItem } from './load-report.mjs';
@@ -45,7 +53,17 @@ import {
   type Priority,
 } from './priority.mjs';
 
-export type IssueSort = 'updated' | 'priority';
+export type IssueSort = 'updated' | 'priority' | 'start';
+
+/** Every start state, in the order the list sorts and lists them. */
+export const ISSUE_STARTS = [
+  'ready',
+  'free',
+  'in-progress',
+  'attention',
+  'blocked',
+  'cycle',
+] as const satisfies readonly IssueStartState[];
 
 export type IssuesListView = Readonly<{
   /**
@@ -53,6 +71,8 @@ export type IssuesListView = Readonly<{
    * that the two read alike.
    */
   hiddenPriorities: readonly Priority[];
+  /** Switched off, likewise. */
+  hiddenStarts: readonly IssueStartState[];
   /** The labels picked, in name order; nothing picked is no narrowing. */
   onlyLabels: readonly string[];
   /** Whether what is labelled `pending` is left out. */
@@ -62,6 +82,7 @@ export type IssuesListView = Readonly<{
 
 export const DEFAULT_ISSUES_LIST_VIEW: IssuesListView = {
   hiddenPriorities: [],
+  hiddenStarts: [],
   onlyLabels: [],
   hidePending: false,
   sort: 'updated',
@@ -84,17 +105,23 @@ export type IssuesListCounts = Readonly<{
   open: Count;
   priorities: ReadonlyRecord<Priority, Count>;
   pending: Count;
+  starts: ReadonlyRecord<IssueStartState, Count>;
   /** In name order; neither the priorities nor `pending`. */
   labels: readonly LabelCount[];
 }>;
+
+/** Each issue's start state, by number; one not in it is `free`. */
+export type IssueStarts = ReadonlyMap<number, IssueStartState>;
 
 export const isIssueShown = (
   issue: IssueItem,
   view: IssuesListView,
   query: string = '',
+  starts: IssueStarts = NO_STARTS,
 ): boolean =>
   !view.hiddenPriorities.includes(priorityOf(issue.labels)) &&
   !(view.hidePending && isPending(issue.labels)) &&
+  !view.hiddenStarts.includes(startOf(starts, issue)) &&
   (!Arr.isNonEmpty(view.onlyLabels) ||
     issue.labels.some((label) => view.onlyLabels.includes(label.name))) &&
   matchesIssueTitle(issue, query);
@@ -114,17 +141,31 @@ export const arrangeIssues = (
   items: readonly IssueItem[],
   view: IssuesListView,
   query: string = '',
+  starts: IssueStarts = NO_STARTS,
 ): readonly IssueItem[] => {
-  const shown = items.filter((issue) => isIssueShown(issue, view, query));
+  const shown = items.filter((issue) =>
+    isIssueShown(issue, view, query, starts),
+  );
 
-  // `toSorted` is stable, so each priority keeps the order it was read in.
-  return view.sort === 'priority'
-    ? shown.toSorted(
+  // `toSorted` is stable, so each rank keeps the order it was read in.
+  switch (view.sort) {
+    case 'priority':
+      return shown.toSorted(
         (a, b) =>
           PRIORITY_RANK[priorityOf(a.labels)] -
           PRIORITY_RANK[priorityOf(b.labels)],
-      )
-    : shown;
+      );
+
+    case 'start':
+      return shown.toSorted(
+        (a, b) =>
+          ISSUE_STARTS.indexOf(startOf(starts, a)) -
+          ISSUE_STARTS.indexOf(startOf(starts, b)),
+      );
+
+    case 'updated':
+      return shown;
+  }
 };
 
 /**
@@ -141,6 +182,7 @@ export const countIssues = (
   items: readonly IssueItem[],
   view: IssuesListView,
   query: string = '',
+  starts: IssueStarts = NO_STARTS,
 ): IssuesListCounts => {
   const underPriority = (which: Priority): Count =>
     countUnder(
@@ -153,6 +195,19 @@ export const countIssues = (
         ),
       },
       query,
+      starts,
+    );
+
+  const underStart = (which: IssueStartState): Count =>
+    countUnder(
+      items,
+      (issue) => startOf(starts, issue) === which,
+      {
+        ...view,
+        hiddenStarts: view.hiddenStarts.filter((each) => each !== which),
+      },
+      query,
+      starts,
     );
 
   const colors = new Map(
@@ -169,7 +224,7 @@ export const countIssues = (
   );
 
   return {
-    open: countUnder(items, () => true, view, query),
+    open: countUnder(items, () => true, view, query, starts),
     priorities: {
       high: underPriority('high'),
       mid: underPriority('mid'),
@@ -181,7 +236,16 @@ export const countIssues = (
       (issue) => isPending(issue.labels),
       { ...view, hidePending: false },
       query,
+      starts,
     ),
+    starts: {
+      ready: underStart('ready'),
+      free: underStart('free'),
+      'in-progress': underStart('in-progress'),
+      attention: underStart('attention'),
+      blocked: underStart('blocked'),
+      cycle: underStart('cycle'),
+    },
     labels: names.map((labelName) => ({
       name: labelName,
       color: colors.get(labelName),
@@ -191,6 +255,7 @@ export const countIssues = (
         (issue) => issue.labels.some((label) => label.name === labelName),
         { ...view, onlyLabels: [] },
         query,
+        starts,
       ),
     })),
   } as const;
@@ -203,6 +268,15 @@ export const toggleIssuePriority = (
   ({
     ...view,
     hiddenPriorities: toggled(PRIORITIES, view.hiddenPriorities, priority),
+  }) as const;
+
+export const toggleIssueStart = (
+  view: IssuesListView,
+  start: IssueStartState,
+): IssuesListView =>
+  ({
+    ...view,
+    hiddenStarts: toggled(ISSUE_STARTS, view.hiddenStarts, start),
   }) as const;
 
 export const toggleLabel = (
@@ -246,6 +320,10 @@ export const parseIssuesListView = (stored: unknown): IssuesListView => {
       PRIORITIES,
       hasKey(stored, 'hiddenPriorities') ? stored.hiddenPriorities : undefined,
     ),
+    hiddenStarts: known(
+      ISSUE_STARTS,
+      hasKey(stored, 'hiddenStarts') ? stored.hiddenStarts : undefined,
+    ),
     onlyLabels: Arr.isArray(onlyLabels)
       ? Arr.uniq(onlyLabels.filter(isString)).toSorted((a, b) =>
           a.localeCompare(b),
@@ -253,8 +331,9 @@ export const parseIssuesListView = (stored: unknown): IssuesListView => {
       : [],
     hidePending: hasKey(stored, 'hidePending') && stored.hidePending === true,
     sort:
-      hasKey(stored, 'sort') && stored.sort === 'priority'
-        ? 'priority'
+      hasKey(stored, 'sort') &&
+      (stored.sort === 'priority' || stored.sort === 'start')
+        ? stored.sort
         : 'updated',
   };
 };
@@ -264,11 +343,18 @@ const countUnder = (
   under: (issue: IssueItem) => boolean,
   view: IssuesListView,
   query: string,
+  starts: IssueStarts,
 ): Count => {
   const all = items.filter(under);
 
   return {
-    shown: all.filter((issue) => isIssueShown(issue, view, query)).length,
+    shown: all.filter((issue) => isIssueShown(issue, view, query, starts))
+      .length,
     total: all.length,
   } as const;
 };
+
+const NO_STARTS: IssueStarts = new Map();
+
+const startOf = (starts: IssueStarts, issue: IssueItem): IssueStartState =>
+  starts.get(issue.number) ?? 'free';

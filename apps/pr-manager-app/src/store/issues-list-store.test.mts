@@ -1,4 +1,5 @@
 import { createState } from 'synstate';
+import type { IssueGraph } from '../issue-graph.mjs';
 import {
   DEFAULT_ISSUES_LIST_VIEW,
   type IssuesListView,
@@ -166,6 +167,7 @@ describe(createIssuesListStore, () => {
 
 const STORED: IssuesListView = {
   hiddenPriorities: ['none'],
+  hiddenStarts: [],
   onlyLabels: ['bug'],
   hidePending: false,
   sort: 'priority',
@@ -189,8 +191,11 @@ const setup = (): Readonly<{
     referenced: [],
   });
 
+  const [graph] = createState<IssueGraph>({ nodes: [], edges: [] });
+
   const store = createIssuesListStore({
     issues,
+    graph,
     load: () => promise,
     save: (view) => {
       mut_saved.push(view);
@@ -235,6 +240,7 @@ const issue = (number: number, labelNames: readonly string[]): IssueItem =>
     updatedAt: '2026-09-23T00:00:00Z',
     comments: 0,
     startAfter: [],
+    misplacedMergeAfter: [],
   }) as const;
 
 const settle = async (): Promise<void> => {

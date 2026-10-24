@@ -451,6 +451,7 @@ describe(loadReport, () => {
         updatedAt: '2026-09-23T00:00:00Z',
         comments: 3,
         startAfter: [],
+        misplacedMergeAfter: [],
       },
       {
         number: 1976,
@@ -462,6 +463,7 @@ describe(loadReport, () => {
         updatedAt: '2026-09-23T00:00:00Z',
         comments: 3,
         startAfter: [],
+        misplacedMergeAfter: [],
       },
     ]);
 
@@ -566,7 +568,7 @@ describe(loadReport, () => {
         totalCount: 3,
         nodes: [
           openIssue(2225, [], 'Moves the hosting.\n\nStart-After: #2162\n'),
-          openIssue(2162, []),
+          openIssue(2162, [], 'Merge-After: #2225\n'),
           openIssue(2224, [], 'Start-After: #2139, #7, #9999\n'),
         ],
       }),
@@ -629,6 +631,13 @@ describe(loadReport, () => {
         [2162, []],
         [2224, [2139, 7, 9999]],
       ],
+    );
+
+    // A `Merge-After:` on an issue is not read as one, and is kept to be
+    // shown as the slip it is.
+    assert.deepStrictEqual(
+      loaded.issues.items.map(({ misplacedMergeAfter }) => misplacedMergeAfter),
+      [[], [2225], []],
     );
 
     // What GitHub would not describe is left out, and drawn as unknown.
@@ -1432,6 +1441,7 @@ const issueList = (
       updatedAt: '2026-09-23T00:00:00Z',
       comments: 0,
       startAfter: [],
+      misplacedMergeAfter: [],
     })),
     totalCount,
     endCursor,

@@ -1,5 +1,10 @@
-import { buildEntries } from './report.mjs';
-import type { ContextState, LinkedIssue, PullRequestFacts } from './types.mjs';
+import { buildEntries, buildReport } from './report.mjs';
+import type {
+  ContextState,
+  LinkedIssue,
+  OpenIssue,
+  PullRequestFacts,
+} from './types.mjs';
 
 const facts = (
   number: number,
@@ -259,3 +264,105 @@ describe(buildEntries, () => {
     );
   });
 });
+
+describe(buildReport, () => {
+  test('says how each open issue stands for being started', () => {
+    const report = buildReport({
+      repo: { owner: 'o', name: 'r' },
+      defaultBranch: 'main',
+      generatedAt: '2026-10-24T00:00:00Z',
+      required: [],
+      authenticated: true,
+      pulls: [facts(5, { linkedIssues: [linked(3, 'open')] })],
+      merged: [],
+      mergedWithinDays: 7,
+      issues: [
+        // Waits for an open pull request.
+        issue(1, [5]),
+        // Waits for an open issue, which waits for nothing.
+        issue(2, [3]),
+        // Free, and being closed by #5.
+        issue(3, []),
+        // Its wait is over, and one named was closed unmerged.
+        issue(4, [100, 101], [7]),
+      ],
+      issuesLimit: 30,
+      references: new Map([
+        [100, 'done'],
+        [101, 'abandoned'],
+      ]),
+    });
+
+    assert.deepStrictEqual(
+      report.issues.map(({ number, start, named, misplacedMergeAfter }) => ({
+        number,
+        start,
+        named,
+        misplacedMergeAfter,
+      })),
+      [
+        {
+          number: 1,
+          start: 'blocked',
+          named: [{ number: 5, status: 'waiting' }],
+          misplacedMergeAfter: [],
+        },
+        {
+          number: 2,
+          start: 'blocked',
+          named: [{ number: 3, status: 'waiting' }],
+          misplacedMergeAfter: [],
+        },
+        { number: 3, start: 'in-progress', named: [], misplacedMergeAfter: [] },
+        {
+          number: 4,
+          start: 'attention',
+          named: [
+            { number: 100, status: 'done' },
+            { number: 101, status: 'abandoned' },
+          ],
+          misplacedMergeAfter: [7],
+        },
+      ],
+    );
+  });
+
+  test('a number nothing describes is unknown', () => {
+    const report = buildReport({
+      repo: { owner: 'o', name: 'r' },
+      defaultBranch: 'main',
+      generatedAt: '2026-10-24T00:00:00Z',
+      required: [],
+      authenticated: false,
+      pulls: [],
+      merged: [],
+      mergedWithinDays: 7,
+      issues: [issue(1, [9])],
+      issuesLimit: 30,
+    });
+
+    assert.deepStrictEqual(report.issues[0]?.named, [
+      { number: 9, status: 'unknown' },
+    ]);
+
+    assert.strictEqual(report.issues[0]?.start, 'attention');
+  });
+});
+
+const issue = (
+  number: number,
+  startAfter: readonly number[],
+  misplacedMergeAfter: readonly number[] = [],
+): OpenIssue =>
+  ({
+    number,
+    title: `issue ${number}`,
+    author: 'someone',
+    url: `https://github.com/o/r/issues/${number}`,
+    labels: [],
+    createdAt: '2026-10-01T00:00:00Z',
+    updatedAt: '2026-10-02T00:00:00Z',
+    comments: 0,
+    startAfter,
+    misplacedMergeAfter,
+  }) as const;

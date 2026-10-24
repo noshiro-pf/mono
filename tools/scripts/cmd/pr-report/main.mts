@@ -119,6 +119,13 @@ export const prReport = async (
     issues.value,
   );
 
+  // And one for each thing the issues' `Start-After:` names that is neither
+  // a listed issue nor an open pull request, to say where it stands.
+  const references = await client.references(
+    repo.value,
+    namedBeyond(facts.value, issues.value),
+  );
+
   // Only the JSON carries these: they are what a session working the queue
   // reads (`.claude/skills/unblock-prs/SKILL.md`), not what a person does.
   const queue =
@@ -140,6 +147,7 @@ export const prReport = async (
     issues: issues.value,
     issuesLimit: options.issuesLimit,
     issueDeclarations,
+    references,
   });
 
   const owners = ownersOf(
@@ -192,6 +200,22 @@ const declarationsOf = async (
   }
 
   return { startAfter: mut_startAfter, open: mut_open };
+};
+
+/** What the listed issues name that is neither listed nor an open pull request. */
+const namedBeyond = (
+  pulls: readonly PullRequestFacts[],
+  issues: readonly OpenIssue[],
+): readonly number[] => {
+  const known = new Set(
+    pulls
+      .map(({ number }) => number)
+      .concat(issues.map(({ number }) => number)),
+  );
+
+  return Arr.uniq(issues.flatMap(({ startAfter }) => startAfter))
+    .filter((number) => !known.has(number))
+    .toSorted((a, b) => a - b);
 };
 
 const print = (
