@@ -66,6 +66,7 @@ export class ObservableBaseClass<
   #mut_subscribers: MutableSet<Subscriber<A>> | undefined;
   #mut_scope: ScopeInternals | undefined;
   #mut_queuedFor: UpdateToken | undefined;
+  #mut_nextInQueue: ChildNode | undefined;
   readonly kind: Kind;
   readonly depth: Depth;
   declare readonly [observableBrand]: true;
@@ -90,6 +91,8 @@ export class ObservableBaseClass<
     this.#mut_updateToken = notUpdatedYet;
 
     this.#mut_queuedFor = undefined;
+
+    this.#mut_nextInQueue = undefined;
 
     this.#mut_children = undefined;
 
@@ -138,8 +141,16 @@ export class ObservableBaseClass<
     return this.#mut_queuedFor;
   }
 
-  setQueuedFor(updateToken: UpdateToken): void {
+  setQueuedFor(updateToken: UpdateToken | undefined): void {
     this.#mut_queuedFor = updateToken;
+  }
+
+  get nextInQueue(): ChildNode | undefined {
+    return this.#mut_nextInQueue;
+  }
+
+  linkNextInQueue(next: ChildNode | undefined): void {
+    this.#mut_nextInQueue = next;
   }
 
   addChild(child: ChildNode): void {

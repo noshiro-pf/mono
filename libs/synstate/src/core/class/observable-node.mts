@@ -20,12 +20,17 @@ type NodeInternals = Readonly<{
   deleteChild: (child: ChildNode) => void;
 
   /**
-   * The last update that queued this node (`propagation-state.mts`). Left in
-   * place after the visit: the next update has another token.
+   * The update whose lists this node waits in, until it is visited
+   * (`propagation-state.mts`).
    */
   queuedFor: UpdateToken | undefined;
 
-  setQueuedFor: (updateToken: UpdateToken) => void;
+  setQueuedFor: (updateToken: UpdateToken | undefined) => void;
+
+  /** The next node at the same depth in those lists. */
+  nextInQueue: ChildNode | undefined;
+
+  linkNextInQueue: (next: ChildNode | undefined) => void;
 }>;
 
 /** An observable, as the other nodes of the graph see it. */

@@ -12,7 +12,6 @@ import { StableCaption } from './stable-caption.jsx';
 import { TraceDialog } from './trace-dialog.jsx';
 import {
   undefinedText,
-  type BucketSet,
   type NodeRow,
   type TraceNode,
   type TraceStep,
@@ -27,8 +26,8 @@ type Props = Readonly<{
 
 /**
  * Steps through one update as synstate runs it, showing every field the
- * propagation reads or writes: the module state and its buckets, the queues
- * of the updates open, the locals, and each node's token and mark.
+ * propagation reads or writes: the module state, the queues of the updates
+ * open, the locals, and each node's token and queue links.
  */
 export const PropagationTrace = React.memo<Props>(
   ({ scenario, update, lang }) => {
@@ -269,9 +268,7 @@ const GraphView = React.memo<
 
   const pointers = pointersOf(step, nodeById);
 
-  const openTokens: ReadonlySet<string> = new Set(
-    step.queues.filter((q) => q.isOpen).map((q) => q.token),
-  );
+  const links = step.nodes.filter((n) => n.nextInQueue !== undefinedText);
 
   return (
     <svg
@@ -290,6 +287,17 @@ const GraphView = React.memo<
           viewBox={'0 0 10 10'}
         >
           <path d={'M 0 0 L 10 5 L 0 10 z'} fill={colors.edge} />
+        </marker>
+        <marker
+          id={'trace-arrow-link'}
+          markerHeight={7}
+          markerWidth={7}
+          orient={'auto'}
+          refX={10}
+          refY={5}
+          viewBox={'0 0 10 10'}
+        >
+          <path d={'M 0 0 L 10 5 L 0 10 z'} fill={colors.link} />
         </marker>
       </defs>
 
@@ -333,6 +341,48 @@ const GraphView = React.memo<
         }),
       )}
 
+      {/* nextInQueue links */}
+      {links.map((row) => {
+        const from = nodeById.get(row.id);
+
+        const to = nodeById.get(row.nextInQueue);
+
+        if (from === undefined || to === undefined) {
+          return undefined;
+        }
+
+        const a = centerOf(from);
+
+        const b = centerOf(to);
+
+        const midX = (a.x + b.x) / 2;
+
+        const top = Math.min(a.y, b.y) - nodeRadius - 34;
+
+        return (
+          <g key={`link-${row.id}`}>
+            <path
+              d={`M ${(a.x + 10).toString()} ${(a.y - nodeRadius).toString()} Q ${midX.toString()} ${top.toString()} ${(b.x - 10).toString()} ${(b.y - nodeRadius - 4).toString()}`}
+              fill={'none'}
+              markerEnd={'url(#trace-arrow-link)'}
+              stroke={colors.link}
+              strokeDasharray={'6 4'}
+              strokeWidth={2.5}
+            />
+            <text
+              fill={colors.link}
+              fontFamily={monoFont}
+              fontSize={12}
+              textAnchor={'middle'}
+              x={midX}
+              y={top + 8}
+            >
+              {`${row.id}.nextInQueue`}
+            </text>
+          </g>
+        );
+      })}
+
       {nodes.map((n) => {
         const row = rows.get(n.id);
 
@@ -341,7 +391,6 @@ const GraphView = React.memo<
             active={step.activeNode === n.id}
             freshTokens={step.freshTokens}
             key={n.id}
-            markedByOpenUpdate={openTokens.has(row.queuedFor)}
             node={n}
             pointers={pointers.get(n.id) ?? []}
             row={row}
@@ -383,11 +432,12 @@ const NodeView = React.memo<
     row: NodeRow;
     active: boolean;
     freshTokens: readonly string[];
-    markedByOpenUpdate: boolean;
     pointers: readonly Pointer[];
   }>
->(({ node, row, active, freshTokens, markedByOpenUpdate, pointers }) => {
+>(({ node, row, active, freshTokens, pointers }) => {
   const c = centerOf(node);
+
+  const queued = row.queuedFor !== undefinedText;
 
   const fill = row.emitted
     ? colors.emitted
@@ -401,7 +451,7 @@ const NodeView = React.memo<
 
   return (
     <g>
-      {markedByOpenUpdate ? (
+      {queued ? (
         <circle
           cx={c.x}
           cy={c.y}
@@ -534,18 +584,18 @@ const ModulePanel = React.memo<
         name={'queueState.level'}
         value={m.level.toString()}
       />
-      {Arr.isEmpty(m.bucketSets) ? (
-        <Field changed={false} name={'bucketSets'} value={'[]'} />
-      ) : (
-        m.bucketSets.map((set, level) => (
-          <BucketSetView
-            changed={changed}
-            key={level}
-            level={level}
-            set={set}
-          />
-        ))
-      )}
+      <ArrayField
+        changed={changed}
+        name={'heads'}
+        prefix={'heads'}
+        values={m.heads}
+      />
+      <ArrayField
+        changed={changed}
+        name={'tails'}
+        prefix={'tails'}
+        values={m.tails}
+      />
     </section>
   );
 });
@@ -577,9 +627,9 @@ const QueuePanel = React.memo<
               value={q.base.toString()}
             />
             <Field
-              changed={changed.has(key('buckets'))}
-              name={'#buckets'}
-              value={q.buckets}
+              changed={changed.has(key('ownsLists'))}
+              name={'#ownsLists'}
+              value={q.ownsLists ? 'true' : 'false'}
             />
             <Field
               changed={changed.has(key('size'))}
@@ -587,14 +637,14 @@ const QueuePanel = React.memo<
               value={q.size.toString()}
             />
             <Field
-              changed={changed.has(key('isOpen'))}
-              name={'#isOpen'}
-              value={q.isOpen ? 'true' : 'false'}
+              changed={changed.has(key('spill'))}
+              name={'#spill'}
+              value={q.spill}
             />
             <Field
-              changed={changed.has(key('queuedDespiteMark'))}
-              name={'#queuedDespiteMark'}
-              value={q.queuedDespiteMark}
+              changed={changed.has(key('spilled'))}
+              name={'#spilled'}
+              value={q.spilled}
             />
           </section>
         );
@@ -679,70 +729,40 @@ const Field = React.memo<
 
 Field.displayName = 'Field';
 
-/**
- * One bucket set: a row per depth index, its slots, and its length. A slot
- * at or past the length is not in use, and is drawn faded.
- */
-const BucketSetView = React.memo<
-  Readonly<{ set: BucketSet; level: number; changed: ReadonlySet<string> }>
->(({ set, level, changed }) => {
-  const prefix = `buckets.${level.toString()}` as const;
-
-  return (
-    <div style={bucketSetStyle}>
-      <span style={fieldNameStyle}>{`bucketSets[${level.toString()}]`}</span>
-      {Arr.isEmpty(set.nodes) ? (
-        <span style={valueStyle}>{'{ nodes: [], lengths: [] }'}</span>
+const ArrayField = React.memo<
+  Readonly<{
+    name: string;
+    prefix: string;
+    values: readonly string[];
+    changed: ReadonlySet<string>;
+  }>
+>(({ name, prefix, values, changed }) => (
+  <div style={fieldStyle}>
+    <span style={fieldNameStyle}>{name}</span>
+    <span style={cellsStyle}>
+      {Arr.isEmpty(values) ? (
+        <span style={valueStyle}>{'[]'}</span>
       ) : (
-        set.nodes.map((bucket, index) => {
-          const length = set.lengths[index] ?? 0;
-
-          const i = index.toString();
-
-          return (
-            <div key={index} style={bucketRowStyle}>
-              <span style={fieldNameStyle}>{`nodes[${i}]`}</span>
-              <span style={cellsStyle}>
-                {Arr.isEmpty(bucket) ? (
-                  <span style={valueStyle}>{'[]'}</span>
-                ) : (
-                  bucket.map((v, slot) => (
-                    <span
-                      key={slot}
-                      style={
-                        changed.has(`${prefix}.${i}.${slot.toString()}`)
-                          ? cellChangedStyle
-                          : slot < length
-                            ? cellStyle
-                            : cellUnusedStyle
-                      }
-                      title={`nodes[${i}][${slot.toString()}]`}
-                    >
-                      <span style={cellIndexStyle}>{slot.toString()}</span>
-                      {v === undefinedText ? '—' : v}
-                    </span>
-                  ))
-                )}
-              </span>
-              <span
-                style={
-                  changed.has(`${prefix}.length.${i}`)
-                    ? valueChangedStyle
-                    : valueStyle
-                }
-                title={`lengths[${i}]`}
-              >
-                {`length ${length.toString()}`}
-              </span>
-            </div>
-          );
-        })
+        values.map((v, i) => (
+          <span
+            key={i}
+            style={
+              changed.has(`${prefix}.${i.toString()}`)
+                ? cellChangedStyle
+                : cellStyle
+            }
+            title={`${prefix}[${i.toString()}]`}
+          >
+            <span style={cellIndexStyle}>{i.toString()}</span>
+            {v === undefinedText ? '—' : v}
+          </span>
+        ))
       )}
-    </div>
-  );
-});
+    </span>
+  </div>
+));
 
-BucketSetView.displayName = 'BucketSetView';
+ArrayField.displayName = 'ArrayField';
 
 /** The source, with the lines this step runs highlighted and in view. */
 const CodeView = React.memo<Readonly<{ active: readonly string[] }>>(
@@ -813,13 +833,9 @@ type Point = Readonly<{ x: number; y: number }>;
 
 type Pointer = Readonly<{ label: string; kind: PointerKind }>;
 
-type PointerKind = 'bucket' | 'local';
+type PointerKind = 'list' | 'local';
 
-/**
- * What points at each node: the slots in use of each bucket set, as
- * `[index][slot]` (prefixed by the token of a nested update's set), and the
- * locals.
- */
+/** What points at each node: `heads[i]`, `tails[i]`, and the locals. */
 const pointersOf = (
   step: TraceStep,
   nodeById: ReadonlyMap<string, TraceNode>,
@@ -840,23 +856,12 @@ const pointersOf = (
     }
   };
 
-  const nested = step.module.bucketSets.length > 1;
+  for (const [i, h] of step.module.heads.entries()) {
+    add(h, { label: `heads[${i.toString()}]`, kind: 'list' });
+  }
 
-  for (const [level, set] of step.module.bucketSets.entries()) {
-    const owner = step.queues[level]?.token;
-
-    for (const [index, bucket] of set.nodes.entries()) {
-      const length = set.lengths[index] ?? 0;
-
-      for (const [slot, id] of bucket.entries()) {
-        if (slot < length) {
-          add(id, {
-            label: `${nested && owner !== undefined ? `${owner} ` : ''}[${index.toString()}][${slot.toString()}]`,
-            kind: 'bucket',
-          });
-        }
-      }
-    }
+  for (const [i, t] of step.module.tails.entries()) {
+    add(t, { label: `tails[${i.toString()}]`, kind: 'list' });
   }
 
   for (const l of step.locals) {
@@ -891,32 +896,16 @@ const flatten = (step: TraceStep): ReadonlyMap<string, string> =>
     ['propagationDepth', step.module.propagationDepth.toString()],
     ['outermostToken', step.module.outermostToken],
     ['level', step.module.level.toString()],
-    ...step.module.bucketSets.flatMap((set, level) => [
-      ...set.nodes.flatMap((bucket, index) =>
-        bucket.map(
-          (v, slot) =>
-            [
-              `buckets.${level.toString()}.${index.toString()}.${slot.toString()}`,
-              v,
-            ] as const,
-        ),
-      ),
-      ...set.lengths.map(
-        (length, index) =>
-          [
-            `buckets.${level.toString()}.length.${index.toString()}`,
-            length.toString(),
-          ] as const,
-      ),
-    ]),
+    ...step.module.heads.map((h, i) => [`heads.${i.toString()}`, h] as const),
+    ...step.module.tails.map((t, i) => [`tails.${i.toString()}`, t] as const),
     ...step.queues.flatMap(
       (q) =>
         [
           [`queue.${q.token}.base`, q.base.toString()],
-          [`queue.${q.token}.buckets`, q.buckets],
+          [`queue.${q.token}.ownsLists`, q.ownsLists ? 'true' : 'false'],
           [`queue.${q.token}.size`, q.size.toString()],
-          [`queue.${q.token}.isOpen`, q.isOpen ? 'true' : 'false'],
-          [`queue.${q.token}.queuedDespiteMark`, q.queuedDespiteMark],
+          [`queue.${q.token}.spill`, q.spill],
+          [`queue.${q.token}.spilled`, q.spilled],
         ] as const,
     ),
     ...step.locals.map((l) => [`local.${l.name}`, l.value] as const),
@@ -929,12 +918,18 @@ const nodeFields = [
   'snapshot',
   'updateToken',
   'queuedFor',
+  'nextInQueue',
 ] as const satisfies readonly (keyof NodeRow)[];
 
 const nodeColumns = ['node', 'depth', ...nodeFields] as const;
 
 /** The locals drawn as a tag on the node they hold. */
-const pointerLocals: ReadonlySet<string> = new Set(['child', 'node']);
+const pointerLocals: ReadonlySet<string> = new Set([
+  'child',
+  'curr',
+  'next',
+  'node',
+]);
 
 type Graph = Readonly<{
   nodes: readonly TraceNode[];
@@ -963,6 +958,7 @@ const monoFont = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const colors = {
   background: '#37474f',
   edge: '#90a4ae',
+  link: '#fff59d',
   text: '#eceff1',
   muted: '#b0bec5',
   nodeText: '#263238',
@@ -980,7 +976,7 @@ const colors = {
 } as const;
 
 const pointerColors = {
-  bucket: '#4dd0e1',
+  list: '#4dd0e1',
   local: '#f48fb1',
 } as const satisfies ReadonlyRecord<PointerKind, string>;
 
@@ -996,13 +992,13 @@ const legend = [
     stroke: 'none',
   },
   {
-    label: { en: 'open update’s mark', ja: '開いた更新の印' },
+    label: { en: 'queuedFor set', ja: 'queuedFor あり' },
     fill: 'none',
     stroke: colors.queued,
   },
   {
-    label: { en: '[index][slot]', ja: '[index][slot]' },
-    fill: pointerColors.bucket,
+    label: { en: 'heads / tails', ja: 'heads / tails' },
+    fill: pointerColors.list,
     stroke: 'none',
   },
 ] as const;
@@ -1092,27 +1088,6 @@ const cellChangedStyle: React.CSSProperties = {
   ...cellStyle,
   background: colors.changed,
   fontWeight: 700,
-} as const;
-
-const cellUnusedStyle: React.CSSProperties = {
-  ...cellStyle,
-  borderStyle: 'dashed',
-  opacity: 0.45,
-} as const;
-
-const bucketSetStyle: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '0.3rem',
-  marginTop: '0.2rem',
-} as const;
-
-const bucketRowStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.5rem',
-  marginTop: 0,
-  paddingLeft: '0.75rem',
 } as const;
 
 const cellIndexStyle: React.CSSProperties = {

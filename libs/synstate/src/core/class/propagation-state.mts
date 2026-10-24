@@ -87,13 +87,13 @@ export const endPropagation = (): void => {
 };
 
 /**
- * The buckets of this copy's open updates, one set per nesting level: an
- * array per depth below the node that started the update, and how many of
- * its slots are in use. Kept from update to update, so that an update
- * allocates nothing but its token; emptying a bucket is setting its length
- * to 0.
+ * The lists of this copy's outermost update: one per depth below the node
+ * that started it, linked through each node's `nextInQueue`. Kept from update
+ * to update, so that an update allocates nothing but its token.
  */
-const mut_bucketSets: Buckets[] = [];
+const mut_heads: (ChildNode | undefined)[] = [];
+
+const mut_tails: (ChildNode | undefined)[] = [];
 
 /** How many updates of this copy are open, the outermost included. */
 const mut_queueState: { level: number } = { level: 0 };
@@ -116,7 +116,7 @@ export const openUpdate = (depth: number): UpdateToken => {
 
   mut_queueState.level += 1;
 
-  return toToken(new UpdateQueue(depth + 1, mut_queueState.level));
+  return toToken(new UpdateQueue(depth + 1, mut_queueState.level === 1));
 };
 
 /**
@@ -135,7 +135,7 @@ export const drainUpdate = (updateToken: UpdateToken): void => {
   toQueue(updateToken).drain();
 };
 
-/** Closes an update, emptying what an exception left in its buckets. */
+/** Closes an update, unlinking what an exception left in its lists. */
 export const closeUpdate = (updateToken: UpdateToken): void => {
   toQueue(updateToken).close();
 
@@ -153,181 +153,168 @@ export const enqueueChildren = (
   toQueue(updateToken).enqueueChildren(children);
 };
 
-// Written in place: a bucket is emptied by its length, not replaced.
-// transformer-ignore-next-line convert-to-readonly
-type Buckets = {
-  /** `nodes[index]` holds the queued nodes at depth `base + index`. */
-  // @sumi-expect-error readonly/require-readonly-type
-  readonly nodes: (ChildNode | undefined)[][];
-  /** How many slots of `nodes[index]` are in use. */
-  // @sumi-expect-error readonly/require-readonly-type
-  readonly lengths: number[];
-};
-
 /**
  * The queue of one update, and its token.
  *
- * A queued node is marked with the token of the update that queued it
- * (`queuedFor`), which is how an update queues a node once. The mark is not
- * cleared after the visit: a later update has another token. An update does
- * not overwrite the mark of an update that is still open — one it is nested
- * in, or one of another copy of synstate — and remembers the nodes it
- * queues despite such a mark in a set of its own instead.
+ * A node waits in one list at a time, since it has one `nextInQueue`. The
+ * outermost update of this copy links the nodes no other update holds into
+ * `mut_heads` / `mut_tails`, marking each with `queuedFor` until it is
+ * visited. Every other node it reaches goes to `spill`, a set and an array
+ * per depth made on first use: a node waiting in another update's lists —
+ * of an update this one is nested in, or of another copy's — and every node
+ * of an update nested in this copy's outermost, which owns the lists.
  */
 class UpdateQueue {
   readonly #base: number;
 
-  readonly #buckets: Buckets;
+  readonly #ownsLists: boolean;
 
   #mut_size: number;
 
-  #mut_isOpen: boolean;
+  // @sumi-expect-error readonly/require-readonly-type
+  #mut_spill: (ChildNode[] | undefined)[] | undefined;
 
-  #mut_queuedDespiteMark: MutableSet<ChildNode> | undefined;
+  #mut_spilled: MutableSet<ChildNode> | undefined;
 
-  /** `level` is 1 for the outermost update of this copy. */
-  constructor(base: number, level: number) {
+  constructor(base: number, ownsLists: boolean) {
     this.#base = base;
 
-    const mut_buckets = mut_bucketSets[level - 1] ?? {
-      nodes: [],
-      lengths: [],
-    };
-
-    mut_bucketSets[level - 1] = mut_buckets;
-
-    this.#buckets = mut_buckets;
+    this.#ownsLists = ownsLists;
 
     this.#mut_size = 0;
 
-    this.#mut_isOpen = true;
+    this.#mut_spill = undefined;
 
-    this.#mut_queuedDespiteMark = undefined;
+    this.#mut_spilled = undefined;
   }
 
-  #push(child: ChildNode): void {
-    const index = child.depth - this.#base;
-
-    const { nodes: mut_nodes, lengths: mut_lengths } = this.#buckets;
-
-    while (mut_nodes.length <= index) {
-      mut_nodes.push([]);
-
-      mut_lengths.push(0);
+  #spill(child: ChildNode, index: number): void {
+    if (this.#mut_spilled === undefined) {
+      this.#mut_spilled = new Set();
     }
 
-    if (index >= this.#mut_size) {
-      this.#mut_size = index + 1;
+    this.#mut_spilled.add(child);
+
+    if (this.#mut_spill === undefined) {
+      this.#mut_spill = [];
     }
 
-    // Both are defined: the loop above made them.
-    // @sumi-expect-error banned-syntax/no-non-null-assertion
-    const mut_bucket = mut_nodes[index]!;
+    const mut_spill = this.#mut_spill;
 
-    // @sumi-expect-error banned-syntax/no-non-null-assertion
-    const length = mut_lengths[index]!;
+    while (mut_spill.length <= index) {
+      mut_spill.push(undefined);
+    }
 
-    if (length < mut_bucket.length) {
-      mut_bucket[length] = child;
+    const mut_bucket = mut_spill[index];
+
+    if (mut_bucket === undefined) {
+      mut_spill[index] = [child];
     } else {
       mut_bucket.push(child);
     }
-
-    mut_lengths[index] = length + 1;
   }
-
-  /** Whether the update is still running; read across copies of synstate. */
-  get isOpen(): boolean {
-    return this.#mut_isOpen;
-  }
-
   enqueueChildren(children: ReadonlySet<ChildNode>): void {
-    const ownMark = toToken(this);
+    const token = toToken(this);
 
     for (const child of children) {
-      const mark = child.queuedFor;
+      const queuedFor = child.queuedFor;
 
-      if (mark === ownMark) {
+      if (queuedFor === token || this.#mut_spilled?.has(child) === true) {
         continue;
       }
 
-      if (mark !== undefined && toQueue(mark).isOpen) {
-        // Another open update has queued `child` and may not have visited
-        // it yet: leave its mark alone.
-        if (this.#mut_queuedDespiteMark === undefined) {
-          this.#mut_queuedDespiteMark = new Set();
-        } else if (this.#mut_queuedDespiteMark.has(child)) {
-          continue;
-        }
+      const index = child.depth - this.#base;
 
-        this.#mut_queuedDespiteMark.add(child);
-      } else {
-        child.setQueuedFor(ownMark);
+      if (index >= this.#mut_size) {
+        this.#mut_size = index + 1;
       }
 
-      this.#push(child);
+      if (queuedFor !== undefined || !this.#ownsLists) {
+        this.#spill(child, index);
+
+        continue;
+      }
+
+      child.setQueuedFor(token);
+
+      const tail = mut_tails[index];
+
+      if (tail === undefined) {
+        mut_heads[index] = child;
+      } else {
+        tail.linkNextInQueue(child);
+      }
+
+      mut_tails[index] = child;
     }
   }
 
   drain(): void {
     const token = toToken(this);
 
-    const { nodes: mut_nodes, lengths: mut_lengths } = this.#buckets;
-
-    // `size` grows while the buckets are visited, always past `index`, which
-    // a `range` built at the start would miss.
+    // `size` grows while the lists are walked, always past `index`, which a
+    // `range` built at the start would miss.
     // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
     for (let mut_index = 0; mut_index < this.#mut_size; mut_index += 1) {
-      const mut_bucket = mut_nodes[mut_index];
+      if (this.#ownsLists) {
+        let mut_curr = mut_heads[mut_index];
 
-      if (mut_bucket === undefined) {
-        continue;
-      }
+        mut_heads[mut_index] = undefined;
 
-      // A node visited here queues only deeper nodes, so this bucket does
-      // not grow while it is visited. Its length is kept until the end, so
-      // that `close` can clear what an exception leaves.
-      const length = mut_lengths[mut_index] ?? 0;
+        mut_tails[mut_index] = undefined;
 
-      // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
-      for (let mut_slot = 0; mut_slot < length; mut_slot += 1) {
-        const node = mut_bucket[mut_slot];
+        while (mut_curr !== undefined) {
+          const next = mut_curr.nextInQueue;
 
-        // Drops the reference, so that a node completed and dropped by
-        // everything else is not kept alive by a slot.
-        mut_bucket[mut_slot] = undefined;
+          // Free for another update from here on: none of this node's
+          // parents emits again in this one, since they are all shallower.
+          mut_curr.linkNextInQueue(undefined);
 
-        if (node !== undefined && !node.isCompleted) {
-          node.tryUpdate(token);
+          mut_curr.setQueuedFor(undefined);
+
+          if (!mut_curr.isCompleted) {
+            mut_curr.tryUpdate(token);
+          }
+
+          mut_curr = next;
         }
       }
 
-      mut_lengths[mut_index] = 0;
+      for (const node of this.#mut_spill?.[mut_index] ?? []) {
+        if (!node.isCompleted) {
+          node.tryUpdate(token);
+        }
+      }
     }
 
+    // Every list is empty now; `close` has nothing to unlink.
     this.#mut_size = 0;
   }
 
   close(): void {
-    const { nodes: mut_nodes, lengths: mut_lengths } = this.#buckets;
-
-    // Only after an exception is anything left.
-    // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
-    for (let mut_index = 0; mut_index < this.#mut_size; mut_index += 1) {
-      const mut_bucket = mut_nodes[mut_index];
-
-      if (mut_bucket !== undefined) {
-        mut_bucket.fill(undefined, 0, mut_lengths[mut_index] ?? 0);
-      }
-
-      mut_lengths[mut_index] = 0;
+    if (!this.#ownsLists) {
+      return;
     }
 
-    this.#mut_size = 0;
+    // `range` builds an array, and this runs on every update.
+    // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
+    for (let mut_index = 0; mut_index < this.#mut_size; mut_index += 1) {
+      let mut_curr = mut_heads[mut_index];
 
-    this.#mut_isOpen = false;
+      mut_heads[mut_index] = undefined;
 
-    this.#mut_queuedDespiteMark = undefined;
+      mut_tails[mut_index] = undefined;
+
+      while (mut_curr !== undefined) {
+        const next = mut_curr.nextInQueue;
+
+        mut_curr.linkNextInQueue(undefined);
+
+        mut_curr.setQueuedFor(undefined);
+
+        mut_curr = next;
+      }
+    }
   }
 }
 

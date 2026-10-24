@@ -1,4 +1,4 @@
-import { Arr, asUint32 } from 'ts-data-forge';
+import { Arr } from 'ts-data-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import type { LocalizedText } from './scenario.mjs';
 import {
@@ -39,6 +39,7 @@ export const traceUpdates = (
         snapshot: n.initialValue,
         updateToken: 't0',
         queuedFor: undefined,
+        nextInQueue: undefined,
       },
     ]),
   );
@@ -47,7 +48,8 @@ export const traceUpdates = (
     propagationDepth: 0,
     outermostToken: undefined,
     level: 0,
-    bucketSets: [],
+    heads: [],
+    tails: [],
   };
 
   const mut_run: MutableRun = {
@@ -84,12 +86,8 @@ export const traceUpdates = (
         propagationDepth: mut_module.propagationDepth,
         outermostToken: mut_module.outermostToken ?? undefinedText,
         level: mut_module.level,
-        bucketSets: mut_module.bucketSets.map((set) => ({
-          nodes: set.nodes.map((bucket) =>
-            bucket.map((slot) => slot ?? undefinedText),
-          ),
-          lengths: Array.from(set.lengths),
-        })),
+        heads: mut_module.heads.map((h) => h ?? undefinedText),
+        tails: mut_module.tails.map((t) => t ?? undefinedText),
       },
       queues: mut_run.queues.map(showQueue),
       locals: step.locals ?? [],
@@ -102,6 +100,7 @@ export const traceUpdates = (
           snapshot: show(n.snapshot),
           updateToken: n.updateToken,
           queuedFor: n.queuedFor ?? undefinedText,
+          nextInQueue: n.nextInQueue ?? undefinedText,
           emitted: mut_run.emitCount.has(d.id),
           skipped: mut_run.skipped.has(d.id),
         };
@@ -124,20 +123,6 @@ export const traceUpdates = (
     return queue;
   };
 
-  const bucketsOf = (queue: DeepReadonly<MutableQueue>): MutableBuckets => {
-    const buckets = mut_module.bucketSets[queue.level - 1];
-
-    if (buckets === undefined) {
-      throw new Error(`no bucket set for ${queue.token}`);
-    }
-
-    return buckets;
-  };
-
-  /** Whether `token` is the token of an update open now. */
-  const isOpen = (token: string): boolean =>
-    mut_run.queues.some((q) => q.token === token && q.isOpen);
-
   /** `UpdateQueue.enqueueChildren`, one child at a time. */
   const enqueueChildren = (parent: string): void => {
     const mut_q = queueOf();
@@ -155,156 +140,170 @@ export const traceUpdates = (
     for (const id of children) {
       const mut_child = nodeOf(id);
 
-      const mark = mut_child.queuedFor;
-
-      const childLocal = [{ name: 'child', value: id }] as const;
-
-      if (mark === mut_q.token) {
+      if (mut_child.queuedFor === mut_q.token) {
         record({
           code: ['sn3', 'ec1', 'ec2'],
-          locals: childLocal,
+          locals: [{ name: 'child', value: id }],
           activeNode: parent,
           caption: {
-            en: `child = ${id}. ${id}.queuedFor is already ${mut_q.token}: another parent has put ${id} in this update's buckets. continue — a node is queued once per update.`,
-            ja: `child = ${id}。${id}.queuedFor はすでに ${mut_q.token} です。別の親が ${id} をこの更新のバケットに入れているので、continue します。1 回の更新でノードがキューに入るのは 1 回だけです。`,
+            en: `child = ${id}. ${id}.queuedFor is already ${mut_q.token}: ${id} waits in this update's list, put there by another parent. continue — a node is queued once per update.`,
+            ja: `child = ${id}。${id}.queuedFor はすでに ${mut_q.token} です。${id} は別の親によってこの更新のリストに入っているので、continue します。1 回の更新でノードがキューに入るのは 1 回だけです。`,
           },
         });
 
         continue;
       }
 
-      if (mark !== undefined && isOpen(mark)) {
-        if (mut_q.queuedDespiteMark?.has(id) === true) {
-          record({
-            code: ['sn3', 'ec1', 'ec2', 'ec3', 'ec4'],
-            locals: childLocal,
-            activeNode: parent,
-            caption: {
-              en: `child = ${id}. ${id}.queuedFor is ${mark}, which is still open, and #queuedDespiteMark already has ${id}: continue — a node is queued once per update.`,
-              ja: `child = ${id}。${id}.queuedFor はまだ開いている ${mark} で、#queuedDespiteMark にすでに ${id} があるので continue します。1 回の更新でノードがキューに入るのは 1 回だけです。`,
-            },
-          });
-
-          continue;
-        }
-
-        const mut_set = mut_q.queuedDespiteMark ?? new Set<string>();
-
-        mut_set.add(id);
-
-        mut_q.queuedDespiteMark = mut_set;
-
+      if (mut_q.spilled?.has(id) === true) {
         record({
-          code: ['sn3', 'ec1', 'ec2', 'ec3', 'ec4', 'ec5'],
-          locals: childLocal,
+          code: ['sn3', 'ec1', 'ec2'],
+          locals: [{ name: 'child', value: id }],
           activeNode: parent,
           caption: {
-            en: `child = ${id}. ${id}.queuedFor is ${mark}, not ${mut_q.token}, and ${mark}.isOpen is true: ${mark} is still running, outside ${mut_q.token}, and has queued ${id}. ${mut_q.token} must not overwrite that mark: if it did, ${mark} would no longer see ${id} as queued, and put it in its buckets a second time should another parent of ${id} emit in ${mark}. So ${mut_q.token} leaves the mark alone and remembers ${id} in a set of its own: #queuedDespiteMark = ${showSet(mut_set)}.`,
-            ja: `child = ${id}。${id}.queuedFor は ${mark} で ${mut_q.token} ではなく、${mark}.isOpen は true です。${mark} は ${mut_q.token} の外側でまだ動いていて、${id} をキューに入れています。${mut_q.token} はこの印を書き換えてはいけません。書き換えると ${mark} は ${id} を入れたことが分からなくなり、${id} の別の親が ${mark} で発行したときに、もう一度バケットに入れてしまいます。そこで印はそのままにして、${mut_q.token} 自身の集合に覚えます：#queuedDespiteMark = ${showSet(mut_set)}。`,
+            en: `child = ${id}. spilled already has ${id}: continue — a node is queued once per update.`,
+            ja: `child = ${id}。spilled にすでに ${id} があるので continue します。1 回の更新でノードがキューに入るのは 1 回だけです。`,
           },
         });
-      } else {
-        mut_child.queuedFor = mut_q.token;
 
-        record({
-          code: ['sn3', 'ec1', 'ec2', 'ec3', 'ec6'],
-          locals: childLocal,
-          activeNode: parent,
-          caption:
-            mark === undefined
-              ? {
-                  en: `child = ${id}. ${id}.queuedFor is undefined: ${id} has never been queued. So ${mut_q.token} marks it, ${id}.queuedFor = ${mut_q.token}, which is how it will know it has queued ${id}.`,
-                  ja: `child = ${id}。${id}.queuedFor は undefined で、${id} はまだ一度もキューに入ったことがありません。そこで ${mut_q.token} が印を付けます：${id}.queuedFor = ${mut_q.token}。これで ${mut_q.token} は ${id} を入れ済みだと分かります。`,
-                }
-              : {
-                  en: `child = ${id}. ${id}.queuedFor is ${mark}, not ${mut_q.token}, and ${mark} has closed (isOpen is false): the mark is left over from an update that has ended, and means nothing now. So it is overwritten: ${id}.queuedFor = ${mut_q.token}. No mark is ever cleared: closing ${mark} is what made its marks stale.`,
-                  ja: `child = ${id}。${id}.queuedFor は ${mark} で ${mut_q.token} ではなく、${mark} は閉じています（isOpen が false）。終わった更新が残した印で、もう意味はありません。そこで上書きします：${id}.queuedFor = ${mut_q.token}。印は一度も消しません。${mark} が閉じたことで、その印が無効になったのです。`,
-                },
-        });
+        continue;
       }
 
-      push(id, parent);
+      const index = mut_child.def.depth - mut_q.base;
+
+      const grows = index >= mut_q.size;
+
+      const sizeBefore = mut_q.size;
+
+      if (grows) {
+        mut_q.size = index + 1;
+      }
+
+      const i = index.toString();
+
+      const indexText =
+        `index = ${id}.depth − base = ${mut_child.def.depth.toString()} − ${mut_q.base.toString()} = ${i}` as const;
+
+      const sizeText: LocalizedText = grows
+        ? ({
+            en: `index ≥ size (${sizeBefore.toString()}), so size = ${mut_q.size.toString()}.`,
+            ja: `index ≥ size（${sizeBefore.toString()}）なので size = ${mut_q.size.toString()} にします。`,
+          } as const)
+        : ({
+            en: `index < size (${mut_q.size.toString()}), so size stays.`,
+            ja: `index < size（${mut_q.size.toString()}）なので size は変わりません。`,
+          } as const);
+
+      const heldElsewhere = mut_child.queuedFor;
+
+      record({
+        code: ['sn3', 'ec1', 'ec2', 'ec3', 'ec4'],
+        locals: [
+          { name: 'child', value: id },
+          { name: 'index', value: i },
+        ],
+        activeNode: parent,
+        caption:
+          heldElsewhere === undefined
+            ? {
+                en: `child = ${id}. ${id}.queuedFor is undefined and spilled does not have it, so this update has not queued ${id} yet. ${indexText}. ${sizeText.en}`,
+                ja: `child = ${id}。${id}.queuedFor は undefined で spilled にもないので、この更新はまだ ${id} をキューに入れていません。${indexText}。${sizeText.ja}`,
+              }
+            : {
+                en: `child = ${id}. ${id}.queuedFor is ${heldElsewhere}, not ${mut_q.token}, and spilled does not have it, so this update has not queued ${id} yet. ${indexText}. ${sizeText.en}`,
+                ja: `child = ${id}。${id}.queuedFor は ${heldElsewhere} で ${mut_q.token} ではなく、spilled にもないので、この更新はまだ ${id} をキューに入れていません。${indexText}。${sizeText.ja}`,
+              },
+      });
+
+      if (heldElsewhere !== undefined || !mut_q.ownsLists) {
+        const mut_spilled = mut_q.spilled ?? new Set<string>();
+
+        mut_spilled.add(id);
+
+        mut_q.spilled = mut_spilled;
+
+        const mut_spill = mut_q.spill ?? [];
+
+        while (mut_spill.length <= index) {
+          mut_spill.push(undefined);
+        }
+
+        mut_spill[index] = Arr.toPushed(mut_spill[index] ?? [], id);
+
+        mut_q.spill = mut_spill;
+
+        const reasons: LocalizedText =
+          heldElsewhere === undefined
+            ? ({
+                en: 'ownsLists is false: the lists belong to the update this one is nested in',
+                ja: 'ownsLists が false です。リストはこの更新を内側に持つ外側の更新のものです',
+              } as const)
+            : mut_q.ownsLists
+              ? ({
+                  en: `${id}.queuedFor is ${heldElsewhere}: ${id} waits in that update's list, and its one nextInQueue is taken`,
+                  ja: `${id}.queuedFor が ${heldElsewhere} です。${id} はその更新のリストで待っていて、1 本しかない nextInQueue は使用中です`,
+                } as const)
+              : ({
+                  en: `${id}.queuedFor is ${heldElsewhere}, so ${id} waits in that update's list, and in any case ownsLists is false`,
+                  ja: `${id}.queuedFor が ${heldElsewhere} で ${id} はその更新のリストで待っていますし、そもそも ownsLists が false です`,
+                } as const);
+
+        record({
+          code: ['ec5', 'sp1'],
+          locals: [
+            { name: 'child', value: id },
+            { name: 'index', value: i },
+          ],
+          activeNode: parent,
+          caption: {
+            en: `${reasons.en}. So ${id} is spilled: spilled = ${showSet(mut_spilled)}, and spill[${i}] gets ${id}. Neither ${id}.queuedFor nor ${id}.nextInQueue nor heads and tails is touched.`,
+            ja: `${reasons.ja}。そこで ${id} を spill に入れます。spilled = ${showSet(mut_spilled)} とし、spill[${i}] に ${id} を加えます。${id}.queuedFor・${id}.nextInQueue・heads・tails には触れません。`,
+          },
+        });
+
+        continue;
+      }
+
+      mut_child.queuedFor = mut_q.token;
+
+      const tail = mut_module.tails[index];
+
+      while (mut_module.heads.length <= index) {
+        mut_module.heads.push(undefined);
+
+        mut_module.tails.push(undefined);
+      }
+
+      if (tail === undefined) {
+        mut_module.heads[index] = id;
+      } else {
+        const mut_tail = nodeOf(tail);
+
+        mut_tail.nextInQueue = id;
+      }
+
+      mut_module.tails[index] = id;
+
+      record({
+        code: ['ec5', 'ec6', tail === undefined ? 'ec7' : 'ec8', 'ec9'],
+        locals: [
+          { name: 'child', value: id },
+          { name: 'index', value: i },
+        ],
+        activeNode: parent,
+        caption:
+          tail === undefined
+            ? {
+                en: `${id} is not in another update's list and ownsLists is true, so it goes in the lists: ${id}.queuedFor = ${mut_q.token}. tails[${i}] is undefined — the list is empty — so heads[${i}] = ${id}, and tails[${i}] = ${id}.`,
+                ja: `${id} は他の更新のリストになく、ownsLists は true なので、リストに入れます。${id}.queuedFor = ${mut_q.token}。tails[${i}] は undefined（リストが空）なので heads[${i}] = ${id}、tails[${i}] = ${id} とします。`,
+              }
+            : {
+                en: `${id} goes in the lists: ${id}.queuedFor = ${mut_q.token}. tails[${i}] is ${tail}, so ${tail}.nextInQueue = ${id} links ${id} after it, and tails[${i}] = ${id}. No array grows: the link is a field of ${tail}.`,
+                ja: `${id} をリストに入れます。${id}.queuedFor = ${mut_q.token}。tails[${i}] は ${tail} なので、${tail}.nextInQueue = ${id} で ${tail} の後ろにつなぎ、tails[${i}] = ${id} とします。配列は伸びず、つなぎ目は ${tail} 自身のフィールドです。`,
+              },
+      });
     }
 
     mut_run.stack.pop();
-  };
-
-  /** `UpdateQueue.#push`. */
-  const push = (id: string, parent: string): void => {
-    const mut_q = queueOf();
-
-    const mut_buckets = bucketsOf(mut_q);
-
-    const index = nodeOf(id).def.depth - mut_q.base;
-
-    const grows = index >= mut_q.size;
-
-    const sizeBefore = mut_q.size;
-
-    if (grows) {
-      mut_q.size = index + 1;
-    }
-
-    const made = mut_buckets.nodes.length <= index;
-
-    while (mut_buckets.nodes.length <= index) {
-      mut_buckets.nodes.push([]);
-
-      mut_buckets.lengths.push(0);
-    }
-
-    const mut_bucket = mut_buckets.nodes[index] ?? [];
-
-    const length = mut_buckets.lengths[index] ?? 0;
-
-    const reused = length < mut_bucket.length;
-
-    mut_bucket[length] = id;
-
-    mut_buckets.lengths[index] = length + 1;
-
-    const i = index.toString();
-
-    const n = length.toString();
-
-    const sizeText: LocalizedText = grows
-      ? ({
-          en: `index ≥ size (${sizeBefore.toString()}), so size = ${mut_q.size.toString()}`,
-          ja: `index ≥ size（${sizeBefore.toString()}）なので size = ${mut_q.size.toString()}`,
-        } as const)
-      : ({
-          en: `index < size (${mut_q.size.toString()}), so size stays`,
-          ja: `index < size（${mut_q.size.toString()}）なので size はそのまま`,
-        } as const);
-
-    const slotText: LocalizedText = made
-      ? ({
-          en: `nodes[${i}] did not exist yet, so it is made, empty, with lengths[${i}] = 0; it stays for every later update at this level`,
-          ja: `nodes[${i}] はまだないので、空の配列と lengths[${i}] = 0 を作ります。以後この段の更新はずっとこれを使います`,
-        } as const)
-      : reused
-        ? ({
-            en: `slot ${n} of nodes[${i}] already exists, left undefined by an earlier update: it is written over, and nothing is allocated`,
-            ja: `nodes[${i}] のスロット ${n} は前の更新が undefined にして残したもので、そこに上書きするので何も確保しません`,
-          } as const)
-        : ({
-            en: `nodes[${i}] has never held ${(length + 1).toString()} nodes, so it grows by one slot`,
-            ja: `nodes[${i}] が ${(length + 1).toString()} 個を持つのは初めてなので、スロットが 1 つ増えます`,
-          } as const);
-
-    record({
-      code: ['ec7', 'ps1', 'ps2', 'ps3', 'ps4', 'ps5', 'ps6'],
-      locals: [
-        { name: 'child', value: id },
-        { name: 'index', value: i },
-        { name: 'length', value: n },
-      ],
-      activeNode: parent,
-      caption: {
-        en: `#push(${id}): index = ${id}.depth − base = ${nodeOf(id).def.depth.toString()} − ${mut_q.base.toString()} = ${i}; ${sizeText.en}. length = lengths[${i}] = ${n}; ${slotText.en}. nodes[${i}][${n}] = ${id}, and lengths[${i}] = ${(length + 1).toString()}.`,
-        ja: `#push(${id})：index = ${id}.depth − base = ${nodeOf(id).def.depth.toString()} − ${mut_q.base.toString()} = ${i}。${sizeText.ja}。length = lengths[${i}] = ${n}。${slotText.ja}。nodes[${i}][${n}] = ${id}、lengths[${i}] = ${(length + 1).toString()} とします。`,
-      },
-    });
   };
 
   /**
@@ -399,14 +398,12 @@ export const traceUpdates = (
 
     update(subscriber.root, v, call);
 
-    const outerSet = `bucketSets[${(outer.level - 1).toString()}]` as const;
-
     record({
       code: ['sn4'],
       activeNode: id,
       caption: {
-        en: `${call} has returned to ${id}'s subscriber, and ${outer.token} carries on where it was. ${outer.token}'s buckets, ${outerSet}, were never touched: ${bucketsText(bucketsOf(outer))}. The marks it set are still ${outer.token}.`,
-        ja: `${call} が ${id} の subscriber に戻り、${outer.token} は中断したところから続けます。${outer.token} のバケット ${outerSet} には一度も触れていません：${bucketsText(bucketsOf(outer))}。${outer.token} が付けた印も ${outer.token} のままです。`,
+        en: `${call} has returned to ${id}'s subscriber, and ${outer.token} carries on where it was. Its lists were never touched: ${listsText(mut_module.heads)}, and the nodes in them still have queuedFor = ${outer.token}.`,
+        ja: `${call} が ${id} の subscriber に戻り、${outer.token} は中断したところから続けます。${outer.token} のリストには一度も触れていません。${listsText(mut_module.heads)} のままで、そこにあるノードの queuedFor も ${outer.token} のままです。`,
       },
     });
 
@@ -496,92 +493,142 @@ export const traceUpdates = (
     record({ code, activeNode: id, caption });
   };
 
-  /** `UpdateQueue.drain`, with the end of each bucket told in the next step. */
+  /** `UpdateQueue.drain`, with the end of each list told in the next step. */
   const drain = (): void => {
     const mut_q = queueOf();
 
     const token = mut_q.token;
 
-    const mut_buckets = bucketsOf(mut_q);
-
     mut_run.stack.push(`drainUpdate(${token})`);
 
     let mut_endOfBucket: LocalizedText = { en: '', ja: '' };
 
-    let mut_markTold = false;
-
-    // `size` grows while the buckets are visited, which a `range` built at
-    // the start would miss.
+    // `size` grows while the lists are walked, which a `range` built at the
+    // start would miss.
     // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
     for (let mut_index = 0; mut_index < mut_q.size; mut_index += 1) {
       const i = mut_index.toString();
 
       const depth = (mut_q.base + mut_index).toString();
 
-      const length = mut_buckets.lengths[mut_index] ?? 0;
+      const loopHead = (
+        mut_index === 0 ? (['su4'] as const) : (['dr8', 'dr9'] as const)
+      ) satisfies readonly CodeLineId[];
 
-      const n = length.toString();
+      const bucket: LocalizedText = {
+        en: `${mut_endOfBucket.en}index = ${i} < size (${mut_q.size.toString()}): the bucket of depth base + index = ${depth}.`,
+        ja: `${mut_endOfBucket.ja}index = ${i} < size（${mut_q.size.toString()}）：深さ base + index = ${depth} のバケットです。`,
+      } as const;
 
-      record({
-        code: [
-          ...(mut_index === 0
-            ? (['su4', 'dr1'] as const)
-            : (['dr8', 'dr9', 'dr10'] as const)),
-          'dr2',
-          'dr3',
-        ],
-        locals: [
-          { name: 'index', value: i },
-          { name: 'length', value: n },
-        ],
-        caption: {
-          en: `${mut_endOfBucket.en}index = ${i} < size (${mut_q.size.toString()}): the bucket of depth base + index = ${depth}. length = lengths[${i}] = ${n}${length === 0 ? ': nothing was queued at this depth' : ''}.`,
-          ja: `${mut_endOfBucket.ja}index = ${i} < size（${mut_q.size.toString()}）：深さ base + index = ${depth} のバケットです。length = lengths[${i}] = ${n}${length === 0 ? '。この深さには何も入っていません' : ''}。`,
-        },
-      });
+      let mut_previous: string | undefined = undefined;
 
-      for (const slot of Arr.seq(asUint32(length))) {
-        const mut_bucket = mut_buckets.nodes[mut_index] ?? [];
+      if (mut_q.ownsLists) {
+        const head = mut_module.heads[mut_index];
 
-        const id = mut_bucket[slot] ?? undefinedText;
+        mut_module.heads[mut_index] = undefined;
 
-        mut_bucket[slot] = undefined;
-
-        const s = slot.toString();
-
-        const mark: LocalizedText = mut_markTold
-          ? ({ en: '', ja: '' } as const)
-          : ({
-              en: ` ${id}.queuedFor stays ${nodeOf(id).queuedFor ?? undefinedText}: a mark is never cleared.`,
-              ja: `${id}.queuedFor は ${nodeOf(id).queuedFor ?? undefinedText} のままです。印は消しません。`,
-            } as const);
-
-        mut_markTold = true;
+        mut_module.tails[mut_index] = undefined;
 
         record({
-          code: ['dr4', 'dr5', 'dr6'],
+          code: [...loopHead, 'dr1', 'dr1a', 'dr2', 'dr3'],
           locals: [
             { name: 'index', value: i },
-            { name: 'length', value: n },
-            { name: 'slot', value: s },
+            { name: 'curr', value: head ?? undefinedText },
+          ],
+          activeNode: head,
+          caption: {
+            en: `${bucket.en} curr = heads[${i}] = ${head ?? 'undefined'}, and heads[${i}] and tails[${i}] are cleared: from here on the list is held only by curr and the nodes' nextInQueue.`,
+            ja: `${bucket.ja}curr = heads[${i}] = ${head ?? 'undefined'} とし、heads[${i}] と tails[${i}] を空にします。ここからリストをたどれるのは curr と各ノードの nextInQueue だけです。`,
+          },
+        });
+
+        let mut_curr = head;
+
+        while (mut_curr !== undefined) {
+          const mut_node = nodeOf(mut_curr);
+
+          const next = mut_node.nextInQueue;
+
+          mut_node.nextInQueue = undefined;
+
+          mut_node.queuedFor = undefined;
+
+          const curr = mut_curr;
+
+          record({
+            code: [
+              ...(mut_previous === undefined ? [] : (['dr8'] as const)),
+              'dr4',
+              'dr5',
+              'dr6',
+            ],
+            locals: [
+              { name: 'index', value: i },
+              { name: 'curr', value: curr },
+              { name: 'next', value: next ?? undefinedText },
+            ],
+            activeNode: curr,
+            caption: {
+              en: `${mut_previous === undefined ? '' : `curr = next = ${curr}. `}next = ${curr}.nextInQueue = ${next ?? 'undefined'}. Then ${curr}.nextInQueue and ${curr}.queuedFor are cleared: ${curr} is free to be queued again, which none of its parents will do in this update, as they are all shallower and done.`,
+              ja: `${mut_previous === undefined ? '' : `curr = next = ${curr}。`}next = ${curr}.nextInQueue = ${next ?? 'undefined'}。続いて ${curr}.nextInQueue と ${curr}.queuedFor を空にします。${curr} はもう一度キューに入れる状態になりますが、親はすべて浅く処理済みなので、この更新で入れ直されることはありません。`,
+            },
+          });
+
+          tryUpdate(curr, 'dr7');
+
+          mut_previous = curr;
+
+          mut_curr = next;
+        }
+      } else {
+        record({
+          code: [...loopHead, 'dr1', 'dr1a'],
+          locals: [{ name: 'index', value: i }],
+          caption: {
+            en: `${bucket.en} ownsLists is false, so this update has no list to walk: heads and tails belong to the outer update.`,
+            ja: `${bucket.ja}ownsLists が false なので、この更新にはたどるリストがありません。heads と tails は外側の更新のものです。`,
+          },
+        });
+      }
+
+      const listEnd: LocalizedText =
+        mut_previous === undefined
+          ? ({ en: '', ja: '' } as const)
+          : ({
+              en: 'curr = next = undefined, so the list ends; ',
+              ja: 'curr = next = undefined でリストが終わります。',
+            } as const);
+
+      const spilled = mut_q.spill?.[mut_index] ?? [];
+
+      for (const id of spilled) {
+        record({
+          code: ['dr9'],
+          locals: [
+            { name: 'index', value: i },
             { name: 'node', value: id },
           ],
           activeNode: id,
           caption: {
-            en: `slot = ${s} < length (${n}): node = nodes[${i}][${s}] = ${id}, and the slot is set back to undefined, so that it keeps no reference to ${id}.${mark.en}`,
-            ja: `slot = ${s} < length（${n}）：node = nodes[${i}][${s}] = ${id} とし、スロットを undefined に戻します。スロットが ${id} を参照し続けないためです。${mark.ja}`,
+            en: `${listEnd.en}spill[${i}] holds ${id}: node = ${id}. A spilled node is visited right after the list of its depth, so the visits stay in order of depth.`,
+            ja: `${listEnd.ja}spill[${i}] には ${id} があります。node = ${id} とします。spill に入れたノードは同じ深さのリストの直後に訪れるので、訪問は深さの順のままです。`,
           },
         });
 
-        tryUpdate(id, 'dr7');
+        tryUpdate(id, 'dr9');
       }
 
-      mut_buckets.lengths[mut_index] = 0;
-
-      mut_endOfBucket = {
-        en: `slot = ${n} is not < length (${n}), so lengths[${i}] = 0: the bucket is empty again, and its array keeps its slots for the next update. `,
-        ja: `slot = ${n} は length（${n}）未満ではないので、lengths[${i}] = 0 にします。バケットは空に戻り、配列のスロットは次の更新のために残ります。`,
-      };
+      mut_endOfBucket = Arr.isNonEmpty(spilled)
+        ? { en: '', ja: '' }
+        : mut_q.spill === undefined
+          ? {
+              en: `${listEnd.en}spill is undefined, so nothing was spilled at this depth. `,
+              ja: `${listEnd.ja}spill は undefined なので、この深さで退避したノードはありません。`,
+            }
+          : {
+              en: `${listEnd.en}spill[${i}] is empty. `,
+              ja: `${listEnd.ja}spill[${i}] は空です。`,
+            };
     }
 
     const size = mut_q.size;
@@ -589,11 +636,11 @@ export const traceUpdates = (
     mut_q.size = 0;
 
     record({
-      code: ['dr8', 'dr9', 'dr10', 'dr2', 'dr11'],
+      code: ['dr8', 'dr9', 'dr1', 'dr10'],
       locals: [{ name: 'index', value: size.toString() }],
       caption: {
-        en: `${mut_endOfBucket.en}index = ${size.toString()} is not < size (${size.toString()}): every bucket has been visited. size = 0.`,
-        ja: `${mut_endOfBucket.ja}index = ${size.toString()} は size（${size.toString()}）未満ではないので、すべてのバケットを訪れました。size = 0 にします。`,
+        en: `${mut_endOfBucket.en}index = ${size.toString()} is not < size (${size.toString()}): every bucket has been visited. size = 0${mut_q.ownsLists ? ', since every list is empty again' : ''}.`,
+        ja: `${mut_endOfBucket.ja}index = ${size.toString()} は size（${size.toString()}）未満ではないので、すべてのバケットを訪れました。${mut_q.ownsLists ? 'リストはすべて空に戻ったので ' : ''}size = 0 にします。`,
       },
     });
 
@@ -628,50 +675,32 @@ export const traceUpdates = (
 
     mut_module.level += 1;
 
-    const level = mut_module.level;
-
-    const setIndex = (level - 1).toString();
-
-    const reused = mut_module.bucketSets[level - 1] !== undefined;
-
-    if (!reused) {
-      mut_module.bucketSets[level - 1] = { nodes: [], lengths: [] };
-    }
+    const ownsLists = mut_module.level === 1;
 
     mut_run.queues.push({
       token,
       base: depth + 1,
-      level,
+      ownsLists,
       size: 0,
-      isOpen: true,
-      queuedDespiteMark: undefined,
+      spill: undefined,
+      spilled: undefined,
     });
 
     mut_run.stack.push(`openUpdate(${depth.toString()})`);
 
-    const setText: LocalizedText = reused
-      ? ({
-          en: `bucketSets[${setIndex}] is left from the previous update at this level and is reused as it is: every length is 0, so it is empty, though its arrays keep their slots.`,
-          ja: `bucketSets[${setIndex}] はこの段の前の更新が残したもので、そのまま使い回します。長さがすべて 0 なので、配列にスロットが残っていても空です。`,
-        } as const)
-      : ({
-          en: `bucketSets[${setIndex}] does not exist yet, so it is made empty — the only time it is; every later update at level ${level.toString()} reuses it.`,
-          ja: `bucketSets[${setIndex}] はまだないので、空で作ります。作るのはこの 1 回だけで、以後 level ${level.toString()} の更新はずっとこれを使い回します。`,
-        } as const);
-
     record({
-      code: ['su1', 'ou1', 'ou2', 'ou3'],
+      code: ['su1', 'ou1', 'ou2'],
       locals: [{ name: 'depth', value: depth.toString() }],
       activeNode: rootId,
       caption:
         outer === undefined
           ? {
-              en: `${call} calls ${rootId}.next(${input.toString()}), which starts an update. openUpdate raises level to 1 and takes the bucket set of that level. ${setText.en} The UpdateQueue ${token} gets base = ${rootId}.depth + 1 = ${(depth + 1).toString()}, so bucket 0 holds depth ${(depth + 1).toString()}. ${token} is the update's token and its queue at once.`,
-              ja: `${call} は ${rootId}.next(${input.toString()}) を呼び、更新が始まります。openUpdate は level を 1 に上げ、その段のバケットの組を取ります。${setText.ja}UpdateQueue ${token} は base = ${rootId}.depth + 1 = ${(depth + 1).toString()} で、バケット 0 は深さ ${(depth + 1).toString()} です。${token} はこの更新のトークンであり、同時にキューでもあります。`,
+              en: `${call} calls ${rootId}.next(${input.toString()}), which starts an update. openUpdate raises level to 1 and creates the UpdateQueue ${token}: base = ${rootId}.depth + 1 = ${(depth + 1).toString()}, so bucket 0 holds depth ${(depth + 1).toString()}; ownsLists = (level === 1) = true, so this update may use heads, tails and the nodes' own fields. ${token} is the update's token and its queue at once.`,
+              ja: `${call} は ${rootId}.next(${input.toString()}) を呼び、更新が始まります。openUpdate は level を 1 に上げ、UpdateQueue ${token} を作ります。base = ${rootId}.depth + 1 = ${(depth + 1).toString()} なのでバケット 0 は深さ ${(depth + 1).toString()} です。ownsLists = (level === 1) = true なので、この更新は heads・tails とノード自身のフィールドを使えます。${token} はこの更新のトークンであり、同時にキューでもあります。`,
             }
           : {
-              en: `${call} calls ${rootId}.next(${input.toString()}). propagation.depth > 0, so ${rootId} warns once that it was written to during an update, and then starts one anyway. openUpdate raises level to ${level.toString()}: ${outer.token} still uses bucketSets[${(outer.level - 1).toString()}], so ${token} takes the next set. ${setText.en} ${token} gets base = ${(depth + 1).toString()}.`,
-              ja: `${call} は ${rootId}.next(${input.toString()}) を呼びます。propagation.depth > 0 なので、${rootId} は更新中に書き込まれたことを一度だけ警告し、そのうえで更新を始めます。openUpdate は level を ${level.toString()} に上げます。${outer.token} が bucketSets[${(outer.level - 1).toString()}] を使っているので、${token} は次の組を取ります。${setText.ja}${token} は base = ${(depth + 1).toString()} です。`,
+              en: `${call} calls ${rootId}.next(${input.toString()}). propagation.depth > 0, so ${rootId} warns once that it was written to during an update, and then starts one anyway: openUpdate raises level to ${mut_module.level.toString()} and creates ${token}, with base = ${(depth + 1).toString()} and ownsLists = (level === 1) = false. ${outer.token} is still open and owns heads, tails and every queuedFor and nextInQueue, so ${token} may not touch them.`,
+              ja: `${call} は ${rootId}.next(${input.toString()}) を呼びます。propagation.depth > 0 なので、${rootId} は更新中に書き込まれたことを一度だけ警告し、そのうえで更新を始めます。openUpdate は level を ${mut_module.level.toString()} に上げて ${token} を作ります。base = ${(depth + 1).toString()}、ownsLists = (level === 1) = false です。${outer.token} がまだ開いていて、heads・tails とすべての queuedFor・nextInQueue を使っているので、${token} はそれらに触れられません。`,
             },
     });
 
@@ -709,22 +738,19 @@ export const traceUpdates = (
 
     mut_run.stack.push(`closeUpdate(${token})`);
 
-    const mut_q = queueOf();
-
-    const despite = mut_q.queuedDespiteMark;
-
-    mut_q.isOpen = false;
-
-    mut_q.queuedDespiteMark = undefined;
-
     mut_module.level -= 1;
 
     record({
-      code: ['su5', 'cu1', 'cl1', 'cl2', 'cu2'],
-      caption: {
-        en: `closeUpdate: drain left size 0 and every length 0, so close has no slot to empty (it would, had a tryUpdate thrown). isOpen = false: from now on the marks ${token} left are stale, and any update may overwrite them. #queuedDespiteMark is dropped${despite === undefined ? ' (it was never needed)' : `, ${showSet(despite)} with it`}. level = ${mut_module.level.toString()}.`,
-        ja: `closeUpdate：drain が size と長さをすべて 0 にしたので、close が空にするスロットはありません（tryUpdate が例外を投げた場合に働きます）。isOpen = false にします。これで ${token} が残した印は無効になり、どの更新も上書きできます。#queuedDespiteMark は${despite === undefined ? '（一度も使わなかったので undefined のまま）' : ` ${showSet(despite)} ごと`}捨てます。level = ${mut_module.level.toString()} にします。`,
-      },
+      code: ['su5', 'cu1', 'cl1', 'cu2'],
+      caption: ownsLists
+        ? {
+            en: 'closeUpdate: drain left every list empty and size 0, so close has nothing to unlink (it would, had a tryUpdate thrown). level = 0.',
+            ja: 'closeUpdate：drain がリストをすべて空にして size を 0 にしたので、close が外すものはありません（tryUpdate が例外を投げた場合に働きます）。level = 0 にします。',
+          }
+        : {
+            en: `closeUpdate: ownsLists is false, so close returns at once — this update linked nothing. level = ${mut_module.level.toString()}. Its spill and spilled are not cleared: nothing reads them once ${token} is closed.`,
+            ja: `closeUpdate：ownsLists が false なので、close はすぐに戻ります。この更新は何もつないでいません。level = ${mut_module.level.toString()} にします。spill と spilled は片付けませんが、${token} が閉じたあとは誰も読みません。`,
+          },
     });
 
     mut_run.stack.pop();
@@ -790,8 +816,8 @@ export const traceUpdates = (
     record({
       code: [],
       caption: {
-        en: `${call} has returned. ${emittedText} emitted; ${Arr.isEmpty(skipped) ? 'no node was visited without emitting' : `${skipped.join(', ')} was visited and did not emit`}${Arr.isNonEmpty(unreached) ? `, and ${unreached.join(', ')} was never reached` : ''}. Every length is 0 and no update is open. ${stamped.map((s) => `${s.token} lives on as the updateToken of ${s.nodes.join(', ')}`).join(', and ')}; the marks in queuedFor stay too, and the next update, finding their updates closed, overwrites them.`,
-        ja: `${call} が戻りました。${emittedText.replaceAll(', ', '、')} が発行し、${Arr.isEmpty(skipped) ? '訪れて発行しなかったノードはありません' : `${skipped.join('、')} は訪れたものの発行しませんでした`}${Arr.isNonEmpty(unreached) ? `。${unreached.join('、')} には更新が届いていません` : ''}。長さはすべて 0 で、開いている更新はありません。${stamped.map((s) => `${s.token} は ${s.nodes.join('、')} の updateToken として残ります`).join('。')}。queuedFor の印も残りますが、次の更新はその更新が閉じていることを見て上書きします。`,
+        en: `${call} has returned. ${emittedText} emitted; ${Arr.isEmpty(skipped) ? 'no node was visited without emitting' : `${skipped.join(', ')} was visited and did not emit`}${Arr.isNonEmpty(unreached) ? `, and ${unreached.join(', ')} was never reached` : ''}. Every queue field is back where it started; ${stamped.map((s) => `${s.token} lives on only as the updateToken of ${s.nodes.join(', ')}`).join(', and ')}.`,
+        ja: `${call} が戻りました。${emittedText.replaceAll(', ', '、')} が発行し、${Arr.isEmpty(skipped) ? '訪れて発行しなかったノードはありません' : `${skipped.join('、')} は訪れたものの発行しませんでした`}${Arr.isNonEmpty(unreached) ? `。${unreached.join('、')} には更新が届いていません` : ''}。キューのフィールドはすべて元に戻り、${stamped.map((s) => `${s.token} は ${s.nodes.join('、')} の updateToken として残るだけです`).join('。')}。`,
       },
     });
   };
@@ -816,8 +842,8 @@ export const traceUpdates = (
             {
               ...before,
               caption: {
-                en: `Where the previous update left things: ${before.nodes.map((n) => `${n.id} holds ${n.snapshot} (${n.updateToken})`).join(', ')}. bucketSets[0] keeps its arrays, every slot undefined and every length 0. The queuedFor marks are those of closed updates. Next: ${call}.`,
-                ja: `前の更新が終わった状態です：${before.nodes.map((n) => `${n.id} は ${n.snapshot}（${n.updateToken}）`).join('、')}。bucketSets[0] は配列を持ったままで、スロットはすべて undefined、長さはすべて 0 です。queuedFor の印は閉じた更新のものです。次は ${call} です。`,
+                en: `Where the previous update left things: ${before.nodes.map((n) => `${n.id} holds ${n.snapshot} (${n.updateToken})`).join(', ')}. queuedFor and nextInQueue are undefined everywhere, and heads and tails hold only undefined. Next: ${call}.`,
+                ja: `前の更新が終わった状態です：${before.nodes.map((n) => `${n.id} は ${n.snapshot}（${n.updateToken}）`).join('、')}。queuedFor と nextInQueue はすべて undefined で、heads と tails には undefined しかありません。次は ${call} です。`,
               },
             },
           ] as const)),
@@ -854,15 +880,8 @@ export const traceCode = [
   ['h3', '// propagation-state.mts'],
   ['ou0', 'openUpdate(depth) {'],
   ['ou1', '  queueState.level += 1;'],
-  [
-    'ou2',
-    '  const buckets = (bucketSets[queueState.level - 1] ??= { nodes: [], lengths: [] });',
-  ],
-  [
-    'ou3',
-    '  return new UpdateQueue(depth + 1, buckets); // #size 0, #isOpen true',
-  ],
-  ['ou4', '}'],
+  ['ou2', '  return new UpdateQueue(depth + 1, queueState.level === 1);'],
+  ['ou3', '}'],
   ['bp0', 'beginPropagation(token) {'],
   ['bp1', '  if (propagation.depth === 0) propagation.outermostToken = token;'],
   ['bp2', '  propagation.depth += 1;'],
@@ -879,51 +898,56 @@ export const traceCode = [
   ],
   ['ep3', '}'],
   ['b3', ''],
-  [
-    'h4',
-    '// class UpdateQueue: #base, #buckets, #size, #isOpen, #queuedDespiteMark',
-  ],
+  ['h4', '// class UpdateQueue: #base, #ownsLists, #size, #spill, #spilled'],
   ['ec0', 'enqueueChildren(children) {'],
   ['ec1', '  for (const child of children) {'],
-  ['ec2', '    if (child.queuedFor === this) continue;'],
-  ['ec3', '    if (child.queuedFor?.isOpen) {'],
-  ['ec4', '      if (this.#queuedDespiteMark?.has(child)) continue;'],
-  ['ec5', '      (this.#queuedDespiteMark ??= new Set()).add(child);'],
-  ['ec6', '    } else child.queuedFor = this;'],
-  ['ec7', '    this.#push(child);'],
-  ['ec8', '  }'],
-  ['ec9', '}'],
-  ['ps0', '#push(child) {'],
-  ['ps1', '  const index = child.depth - this.#base;'],
-  ['ps2', '  if (index >= this.#size) this.#size = index + 1;'],
   [
-    'ps3',
-    '  const { nodes, lengths } = this.#buckets; // nodes[index] made if missing',
+    'ec2',
+    '    if (child.queuedFor === this || this.#spilled?.has(child)) continue;',
   ],
-  ['ps4', '  const length = lengths[index];'],
-  ['ps5', '  nodes[index][length] = child;'],
-  ['ps6', '  lengths[index] = length + 1;'],
-  ['ps7', '}'],
+  ['ec3', '    const index = child.depth - this.#base;'],
+  ['ec4', '    if (index >= this.#size) this.#size = index + 1;'],
+  [
+    'ec5',
+    '    if (child.queuedFor !== undefined || !this.#ownsLists) { this.#spill(child, index); continue; }',
+  ],
+  ['ec6', '    child.queuedFor = this;'],
+  ['ec7', '    if (tails[index] === undefined) heads[index] = child;'],
+  ['ec8', '    else tails[index].nextInQueue = child;'],
+  ['ec9', '    tails[index] = child;'],
+  ['ec10', '  }'],
+  ['ec11', '}'],
+  ['sp0', '#spill(child, index) {'],
+  [
+    'sp1',
+    '  (this.#spilled ??= new Set()).add(child); ((this.#spill ??= [])[index] ??= []).push(child);',
+  ],
+  ['sp2', '}'],
   ['dr0', 'drain() {'],
-  ['dr1', '  const { nodes, lengths } = this.#buckets;'],
-  ['dr2', '  for (let index = 0; index < this.#size; index += 1) {'],
-  ['dr3', '    const length = lengths[index];'],
-  ['dr4', '    for (let slot = 0; slot < length; slot += 1) {'],
-  ['dr5', '      const node = nodes[index][slot];'],
-  ['dr6', '      nodes[index][slot] = undefined;'],
-  ['dr7', '      if (!node.isCompleted) node.tryUpdate(this);'],
-  ['dr8', '    }'],
-  ['dr9', '    lengths[index] = 0;'],
-  ['dr10', '  }'],
-  ['dr11', '  this.#size = 0;'],
-  ['dr12', '}'],
+  ['dr1', '  for (let index = 0; index < this.#size; index += 1) {'],
+  ['dr1a', '    if (this.#ownsLists) {'],
+  ['dr2', '      let curr = heads[index];'],
+  ['dr3', '      heads[index] = undefined; tails[index] = undefined;'],
+  ['dr4', '      while (curr !== undefined) {'],
+  ['dr5', '        const next = curr.nextInQueue;'],
+  ['dr6', '        curr.nextInQueue = undefined; curr.queuedFor = undefined;'],
+  ['dr7', '        curr.tryUpdate(this);'],
+  ['dr8', '        curr = next;'],
+  ['dr8b', '      }'],
+  ['dr8c', '    }'],
+  [
+    'dr9',
+    '    for (const node of this.#spill?.[index] ?? []) node.tryUpdate(this);',
+  ],
+  ['dr9b', '  }'],
+  ['dr10', '  this.#size = 0;'],
+  ['dr11', '}'],
   ['cl0', 'close() {'],
   [
     'cl1',
-    '  for (let index = 0; index < this.#size; index += 1) { /* empty what a throw left */ }',
+    '  if (!this.#ownsLists) return; /* else unlink what a throw left */',
   ],
-  ['cl2', '  this.#isOpen = false; this.#queuedDespiteMark = undefined;'],
-  ['cl3', '}'],
+  ['cl2', '}'],
   ['b4', ''],
   ['h5', '// tryUpdate(token) of map, filter and combine'],
   ['mp1', 'map:     if (parent.updateToken !== token) return;'],
@@ -1063,8 +1087,8 @@ const traceScenarios: ReadonlyRecord<TraceScenarioName, Scenario> = {
       { root: 'A', value: 2 },
     ],
     intro: {
-      en: 'Every node was created with its initial value and the token t0 (notUpdatedYet). No update has run yet: queuedFor is undefined everywhere, and there is no bucket set.',
-      ja: 'どのノードも初期値と、トークン t0（notUpdatedYet）を持って作られています。まだ更新は一度も走っていないので、queuedFor はすべて undefined で、バケットの組もありません。',
+      en: 'Every node was created with its initial value and the token t0 (notUpdatedYet), and nothing is queued: queuedFor and nextInQueue are undefined everywhere, and heads and tails are empty.',
+      ja: 'どのノードも初期値と、トークン t0（notUpdatedYet）を持って作られ、キューには何もありません。queuedFor と nextInQueue はすべて undefined で、heads と tails は空です。',
     },
   },
   /** A subscriber of `D` writes to the root `R`, which `BDR` also reads. */
@@ -1138,6 +1162,7 @@ type SimNode = {
   snapshot: Value;
   updateToken: string;
   queuedFor: string | undefined;
+  nextInQueue: string | undefined;
 };
 
 // transformer-ignore-next-line convert-to-readonly
@@ -1145,24 +1170,18 @@ type MutableModule = {
   propagationDepth: number;
   outermostToken: string | undefined;
   level: number;
-  bucketSets: MutableBuckets[];
-};
-
-// transformer-ignore-next-line convert-to-readonly
-type MutableBuckets = {
-  readonly nodes: (string | undefined)[][];
-  readonly lengths: number[];
+  heads: (string | undefined)[];
+  tails: (string | undefined)[];
 };
 
 // transformer-ignore-next-line convert-to-readonly
 type MutableQueue = {
   readonly token: string;
   readonly base: number;
-  /** The nesting level, 1 for the outermost: its bucket set is `level - 1`. */
-  readonly level: number;
+  readonly ownsLists: boolean;
   size: number;
-  isOpen: boolean;
-  queuedDespiteMark: Set<string> | undefined;
+  spill: (readonly string[] | undefined)[] | undefined;
+  spilled: Set<string> | undefined;
 };
 
 // transformer-ignore-next-line convert-to-readonly
@@ -1180,21 +1199,22 @@ const showQueue = (queue: DeepReadonly<MutableQueue>): QueueState =>
   ({
     token: queue.token,
     base: queue.base,
-    buckets: `bucketSets[${(queue.level - 1).toString()}]`,
+    ownsLists: queue.ownsLists,
     size: queue.size,
-    isOpen: queue.isOpen,
-    queuedDespiteMark:
-      queue.queuedDespiteMark === undefined
+    spill:
+      queue.spill === undefined
         ? undefinedText
-        : showSet(queue.queuedDespiteMark),
+        : (`[${queue.spill.map((bucket) => (bucket === undefined ? undefinedText : `[${bucket.join(', ')}]`)).join(', ')}]` as const),
+    spilled:
+      queue.spilled === undefined ? undefinedText : showSet(queue.spilled),
   }) as const;
 
 const showSet = (set: ReadonlySet<string>): string =>
   `{${Array.from(set).join(', ')}}` as const;
 
-/** `nodes = [[undefined, undefined], [BDR]], lengths = [2, 1]`. */
-const bucketsText = (buckets: DeepReadonly<MutableBuckets>): string =>
-  `nodes = [${buckets.nodes.map((bucket) => `[${bucket.map((slot) => slot ?? undefinedText).join(', ')}]`).join(', ')}], lengths = [${buckets.lengths.join(', ')}]` as const;
+/** `heads = [B, undefined]`, as the caption says it. */
+const listsText = (heads: readonly (string | undefined)[]): string =>
+  `heads = [${heads.map((h) => h ?? undefinedText).join(', ')}]` as const;
 
 const setterOf = (root: string): string => `set${root}` as const;
 

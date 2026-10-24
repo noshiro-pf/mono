@@ -41,7 +41,7 @@ if (import.meta.vitest !== undefined) {
       [0, 0, 0],
       // the nested update, setR(100)
       [10, 100, 100],
-      // the outer update, setA(1), visiting BDR from its own bucket
+      // the outer update, setA(1), visiting BDR from its own list
       [10, 100, 100],
     ]);
   });

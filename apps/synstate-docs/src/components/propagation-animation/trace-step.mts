@@ -27,26 +27,18 @@ export type ModuleState = Readonly<{
   propagationDepth: number;
   outermostToken: string;
   level: number;
-  /** `bucketSets[level - 1]`, one per nesting level reached so far. */
-  bucketSets: readonly BucketSet[];
-}>;
-
-/** The buckets of one nesting level: an array per depth, and its length. */
-export type BucketSet = Readonly<{
-  /** `nodes[index][slot]`; a slot past `lengths[index]` is not in use. */
-  nodes: readonly (readonly string[])[];
-  lengths: readonly number[];
+  heads: readonly string[];
+  tails: readonly string[];
 }>;
 
 /** The private fields of an `UpdateQueue`, which is also its token. */
 export type QueueState = Readonly<{
   token: string;
   base: number;
-  /** Which bucket set the queue uses: `bucketSets[0]`. */
-  buckets: string;
+  ownsLists: boolean;
   size: number;
-  isOpen: boolean;
-  queuedDespiteMark: string;
+  spill: string;
+  spilled: string;
 }>;
 
 export type Local = Readonly<{ name: string; value: string }>;
@@ -57,6 +49,7 @@ export type NodeRow = Readonly<{
   snapshot: string;
   updateToken: string;
   queuedFor: string;
+  nextInQueue: string;
   /** Whether the node emitted in the update this step belongs to. */
   emitted: boolean;
   /** Whether the node was visited and did not emit. */
