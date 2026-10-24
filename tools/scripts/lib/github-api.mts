@@ -13,17 +13,16 @@
  * `pnpm install`, when nothing this imports exists yet.
  */
 
+import type { RepoRef } from 'pr-report-core';
 import { Arr, Json, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { parseJson } from './json.mjs';
+import { projectRootPath } from '../project-root-path.mjs';
+import { parseJson, readJsonFile } from './json.mjs';
 import { git } from './shell.mjs';
 
-/** Owner and repository, as the API paths spell them. */
-export type Repo = Readonly<{ owner: string; name: string }>;
-
 /** What every call here needs: who to talk to, and as whom. */
-export type ApiContext = Readonly<{ repo: Repo; token: string }>;
+export type ApiContext = Readonly<{ repo: RepoRef; token: string }>;
 
 /**
  * The token the environment holds, if any: `GH_TOKEN`, then `GITHUB_TOKEN`.
@@ -72,32 +71,87 @@ export const resolveToken = async (): Promise<Result<string, string>> => {
 };
 
 /**
- * The repository to act on, read from `origin` rather than from a flag: the
- * pull request belongs where the branch is about to be pushed, and nothing
- * good comes of those two disagreeing.
+ * The repository a command acts on, for every command here: `repoOption`
+ * (`--repo owner/name`) when given, else `origin`, else the root
+ * `package.json`.
+ *
+ * `origin` before the manifest because a fork's checkout names the fork
+ * there and the upstream in the manifest, and a command that reads the queue
+ * of one and pushes or comments on the other is worse than either. The
+ * manifest is for a checkout whose `origin` names no GitHub repository at
+ * all — a proxy remote in a container, a tree without `.git` — where it is
+ * the only thing left that says.
  */
-export const resolveRepo = async (): Promise<Result<Repo, string>> => {
-  const url = await git('git remote get-url origin');
-
-  if (Result.isErr(url)) {
-    return Result.err(`cannot read origin: ${url.value}`);
+export const resolveRepo = async (
+  repoOption?: string,
+): Promise<Result<RepoRef, string>> => {
+  if (repoOption !== undefined) {
+    return parseRepoRef(repoOption);
   }
 
-  const trimmed = url.value.trim();
+  const origin = await git('git remote get-url origin');
 
-  // `https://github.com/owner/repo(.git)` and `git@github.com:owner/repo(.git)`
-  // are the two forms a checkout here is cloned with.
+  const fromOrigin = Result.isOk(origin)
+    ? repoOfUrl(origin.value.trim())
+    : undefined;
+
+  if (fromOrigin !== undefined) {
+    return Result.ok(fromOrigin);
+  }
+
+  const manifest = await readJsonFile(
+    `${projectRootPath}/package.json`,
+    PackageJsonSchema,
+  );
+
+  const fromManifest = Result.isOk(manifest)
+    ? repoOfUrl(manifest.value.repository.url)
+    : undefined;
+
+  return fromManifest === undefined
+    ? Result.err(
+        'cannot tell which repository this is: origin is not a GitHub remote, and the root package.json names none; pass --repo owner/name',
+      )
+    : Result.ok(fromManifest);
+};
+
+/** `owner/name`, as it is written everywhere else. */
+export const parseRepoRef = (raw: string): Result<RepoRef, string> => {
+  const parts = raw.split('/');
+
+  if (!Arr.isFixedLengthArray(2, parts)) {
+    return Result.err(`expected owner/name, got ${JSON.stringify(raw)}`);
+  }
+
+  const [owner, name] = parts;
+
+  return owner === '' || name === ''
+    ? Result.err(`expected owner/name, got ${JSON.stringify(raw)}`)
+    : Result.ok({ owner, name });
+};
+
+/**
+ * The GitHub repository a remote or `repository.url` names, in the forms a
+ * checkout here is cloned with or a manifest declares:
+ * `https://github.com/owner/name(.git)`, `git+https://…`, and
+ * `git@github.com:owner/name(.git)`.
+ */
+export const repoOfUrl = (url: string): RepoRef | undefined => {
   const match =
-    /github\.com[/:](?<owner>[^/]+)\/(?<name>[^/]+?)(?:\.git)?$/u.exec(trimmed);
+    /github\.com[/:](?<owner>[\w.-]+)\/(?<name>[\w.-]+?)(?:\.git)?$/u.exec(url);
 
   const owner = match?.groups?.['owner'];
 
   const name = match?.groups?.['name'];
 
   return owner === undefined || name === undefined
-    ? Result.err(`origin is not a GitHub remote: ${trimmed}`)
-    : Result.ok({ owner, name });
+    ? undefined
+    : { owner, name };
 };
+
+const PackageJsonSchema = t.record({
+  repository: t.record({ url: t.string() }),
+});
 
 /** The token and the repository, for a command that calls {@link rest}. */
 export const resolveApiContext = async (): Promise<

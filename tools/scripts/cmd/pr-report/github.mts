@@ -887,18 +887,3 @@ const labelsOf = (
     color,
     description: description ?? '',
   }));
-
-/** `owner/name`, as it is written everywhere else. */
-export const parseRepoRef = (raw: string): Result<RepoRef, string> => {
-  const parts = raw.split('/');
-
-  if (!Arr.isFixedLengthArray(2, parts)) {
-    return Result.err(`expected owner/name, got ${JSON.stringify(raw)}`);
-  }
-
-  const [owner, name] = parts;
-
-  return owner === '' || name === ''
-    ? Result.err(`expected owner/name, got ${JSON.stringify(raw)}`)
-    : Result.ok({ owner, name });
-};
