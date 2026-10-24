@@ -11,7 +11,9 @@
  *
  * The DAG can leave out what is done (`omitDone`), so that what is left to
  * do is all it lays out. That switch is kept the same way, under its own
- * key, and starts off: the DAG shows everything until told otherwise.
+ * key, and starts off: the DAG shows everything until told otherwise. So
+ * can what is labelled `pending` (`omitPending`), under a key of its own as
+ * well: what is held back for now is not what is left to do.
  *
  * Every open issue is read, in either view: the first thirty come with the
  * report, so that the block has something to show as soon as the rest of
@@ -63,7 +65,12 @@ import {
   type GridPlacement,
   type IssueGraphLayout,
 } from '../issue-graph-layout.mjs';
-import { buildIssueGraph, omitDone, type IssueGraph } from '../issue-graph.mjs';
+import {
+  buildIssueGraph,
+  omitDone,
+  omitPending,
+  type IssueGraph,
+} from '../issue-graph.mjs';
 import type { Entry, LoadedReport } from '../load-report.mjs';
 import type { MoreIssuesStatus } from './reader.mjs';
 
@@ -82,6 +89,9 @@ export type IssuesViewDeps = Readonly<{
   /** Whether the DAG left out what is done, as it was saved. */
   loadHideDone: () => Promise<unknown>;
   saveHideDone: (hide: boolean) => void;
+  /** Whether the DAG left out what is pending, as it was saved. */
+  loadHidePending: () => Promise<unknown>;
+  saveHidePending: (hide: boolean) => void;
   /** How the last page of open issues asked for went. */
   moreIssues: InitializedObservable<MoreIssuesStatus>;
   /** Asks for the next page of open issues. */
@@ -92,17 +102,25 @@ export type IssuesViewStore = Readonly<{
   view: InitializedObservable<IssuesView>;
   /** Whether the DAG leaves out what is done. */
   hideDone: InitializedObservable<boolean>;
-  /** The graph the DAG draws: without what is done, when that is hidden. */
+  /** Whether the DAG leaves out what is labelled `pending`. */
+  hidePending: InitializedObservable<boolean>;
+  /**
+   * The graph the DAG draws: without what is done, and what is pending,
+   * when that is hidden.
+   */
   graph: InitializedObservable<IssueGraph>;
   layout: InitializedObservable<IssueGraphLayout>;
   /** How many nodes are done, whether or not they are drawn. */
   doneCount: InitializedObservable<number>;
+  /** How many nodes are pending, whether or not they are drawn. */
+  pendingCount: InitializedObservable<number>;
   /** What the layout's units are multiplied by to draw the DAG. */
   dagScale: InitializedObservable<number>;
   /** Whether the DAG is drawn to fit its box, whatever the scale that takes. */
   dagFitted: InitializedObservable<boolean>;
   choose: (view: IssuesView) => void;
   toggleHideDone: () => void;
+  toggleHidePending: () => void;
   /** The room the DAG's box has for the graph, as last measured. */
   setDagBox: (box: Size) => void;
   zoomIn: () => void;
@@ -123,12 +141,19 @@ export const createIssuesViewStore = (
   const [hideDone, setHideDone, { updateState: updateHideDone }] =
     createState(false);
 
+  const [hidePending, setHidePending, { updateState: updateHidePending }] =
+    createState(false);
+
   const [zoom, setZoom] = createState<DagZoom>({ type: 'scale', scale: 1 });
 
   const [dagBox, setDagBox] = createState<Size>({ width: 0, height: 0 });
 
   // Whether the reader has chosen yet, for each.
-  const mut_reader = { changedView: false, changedHideDone: false };
+  const mut_reader = {
+    changedView: false,
+    changedHideDone: false,
+    changedHidePending: false,
+  };
 
   const choose = (next: IssuesView): void => {
     mut_reader.changedView = true;
@@ -140,6 +165,12 @@ export const createIssuesViewStore = (
     mut_reader.changedHideDone = true;
 
     updateHideDone((current) => !current);
+  };
+
+  const toggleHidePending = (): void => {
+    mut_reader.changedHidePending = true;
+
+    updateHidePending((current) => !current);
   };
 
   const start = (): (() => void) => {
@@ -201,6 +232,21 @@ export const createIssuesViewStore = (
       )
       .catch(() => undefined);
 
+    deps
+      .loadHidePending()
+      .catch(() => undefined)
+      .then(
+        resume(
+          (stored) => {
+            if (!mut_reader.changedHidePending) {
+              setHidePending(stored === true);
+            }
+          },
+          () => hidePending.subscribe(deps.saveHidePending),
+        ),
+      )
+      .catch(() => undefined);
+
     return () => {
       mut_run.stopped = true;
 
@@ -225,8 +271,14 @@ export const createIssuesViewStore = (
     )
     .pipe(skipIfNoChange(fastDeepEqual));
 
-  const graph = combine([fullGraph, hideDone])
-    .pipe(map(([full, hide]) => (hide ? omitDone(full) : full)))
+  const graph = combine([fullGraph, hideDone, hidePending])
+    .pipe(
+      map(([full, hideD, hideP]) => {
+        const withoutDone = hideD ? omitDone(full) : full;
+
+        return hideP ? omitPending(withoutDone) : withoutDone;
+      }),
+    )
     .pipe(skipIfNoChange(fastDeepEqual));
 
   const parts = graph.pipe(map(layoutConnected));
@@ -274,16 +326,23 @@ export const createIssuesViewStore = (
     )
     .pipe(skipIfNoChange());
 
+  const pendingCount = fullGraph
+    .pipe(map(({ nodes }) => nodes.filter(({ pending }) => pending).length))
+    .pipe(skipIfNoChange());
+
   return {
     view,
     hideDone,
+    hidePending,
     graph,
     layout,
     doneCount,
+    pendingCount,
     dagScale,
     dagFitted,
     choose,
     toggleHideDone,
+    toggleHidePending,
     setDagBox,
     zoomIn: zoomBy(zoomInFrom),
     zoomOut: zoomBy(zoomOutFrom),

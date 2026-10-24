@@ -93,6 +93,18 @@ export const IssueDagLegend = (): JSX.Element => {
           </li>
         }
       />
+      <If
+        cond={has(({ nodes }) => nodes.some(({ pending }) => pending))}
+        then={
+          <li>
+            <span
+              class={constant('issue-dag-swatch')}
+              data-pending={constant('true')}
+            />
+            {constant('Pending')}
+          </li>
+        }
+      />
     </ul>
   );
 };

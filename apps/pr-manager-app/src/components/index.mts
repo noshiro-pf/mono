@@ -14,6 +14,7 @@ export * from './header-fold-toggle.js';
 export * from './issue-dag-done-toggle.js';
 export * from './issue-dag-legend.js';
 export * from './issue-dag-node.js';
+export * from './issue-dag-pending-toggle.js';
 export * from './issue-dag-states.mjs';
 export * from './issue-dag-zoom.js';
 export * from './issue-dag.js';

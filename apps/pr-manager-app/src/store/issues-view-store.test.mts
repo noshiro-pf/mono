@@ -256,6 +256,103 @@ describe(createIssuesViewStore, () => {
     assert.strictEqual(store.graph.getSnapshot().value.nodes.length, 3);
   });
 
+  test('shows what is pending until told to hide it, takes the saved choice once read, and keeps a toggle made before', async () => {
+    const { store, savedHidePending, resolveLoadHidePending } = setup();
+
+    store.start();
+
+    assert.isFalse(store.hidePending.getSnapshot().value);
+
+    assert.deepStrictEqual(savedHidePending, []);
+
+    resolveLoadHidePending(true);
+
+    await settle();
+
+    assert.isTrue(store.hidePending.getSnapshot().value);
+
+    store.toggleHidePending();
+
+    assert.isFalse(store.hidePending.getSnapshot().value);
+
+    assert.strictEqual(savedHidePending.at(-1), false);
+
+    const other = setup();
+
+    other.store.start();
+
+    other.store.toggleHidePending();
+
+    other.resolveLoadHidePending(false);
+
+    await settle();
+
+    assert.isTrue(other.store.hidePending.getSnapshot().value);
+
+    assert.strictEqual(other.savedHidePending.at(-1), true);
+  });
+
+  test('anything saved but true, or nothing readable, shows what is pending', async () => {
+    const { store, rejectLoadHidePending } = setup();
+
+    store.start();
+
+    rejectLoadHidePending();
+
+    await settle();
+
+    assert.isFalse(store.hidePending.getSnapshot().value);
+
+    const other = setup();
+
+    other.store.start();
+
+    other.resolveLoadHidePending('yes');
+
+    await settle();
+
+    assert.isFalse(other.store.hidePending.getSnapshot().value);
+  });
+
+  test('hiding what is pending takes it out of the graph, with what is done or not, and counts it either way', () => {
+    const { store, setIssues } = setup();
+
+    setIssues({
+      items: [
+        { ...issueItem(5, [3]), labels: [pendingLabel] },
+        issueItem(6, [5]),
+      ],
+      totalCount: 2,
+      endCursor: undefined,
+      referenced: [referencedIssue(3, 'done')],
+    });
+
+    assert.strictEqual(store.pendingCount.getSnapshot().value, 1);
+
+    store.toggleHidePending();
+
+    assert.deepStrictEqual(
+      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
+      [3, 6],
+    );
+
+    store.toggleHideDone();
+
+    assert.deepStrictEqual(
+      store.layout.getSnapshot().value.nodes.map(({ number }) => number),
+      [6],
+    );
+
+    assert.strictEqual(store.pendingCount.getSnapshot().value, 1);
+
+    store.toggleHidePending();
+
+    assert.deepStrictEqual(
+      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
+      [5, 6],
+    );
+  });
+
   test('draws the DAG at its natural size until told otherwise, and steps a zoom in and out', () => {
     const { store } = setup();
 
@@ -406,6 +503,9 @@ const setup = (): Readonly<{
   rejectLoad: () => void;
   resolveLoadHideDone: (stored: unknown) => void;
   rejectLoadHideDone: () => void;
+  savedHidePending: readonly boolean[];
+  resolveLoadHidePending: (stored: unknown) => void;
+  rejectLoadHidePending: () => void;
   setIssues: (next: LoadedReport['issues']) => void;
   setEntries: (next: readonly Entry[]) => void;
   setMoreIssues: (next: MoreIssuesStatus) => void;
@@ -420,6 +520,10 @@ const setup = (): Readonly<{
   const { promise, resolve, reject } = Promise.withResolvers<unknown>();
 
   const hideDoneRead = Promise.withResolvers<unknown>();
+
+  const mut_savedHidePending: boolean[] = [];
+
+  const hidePendingRead = Promise.withResolvers<unknown>();
 
   const [issues, setIssues] = createState<LoadedReport['issues']>({
     items: [],
@@ -446,6 +550,10 @@ const setup = (): Readonly<{
     saveHideDone: (hide) => {
       mut_savedHideDone.push(hide);
     },
+    loadHidePending: () => hidePendingRead.promise,
+    saveHidePending: (hide) => {
+      mut_savedHidePending.push(hide);
+    },
     moreIssues,
     loadMoreIssues: () => {
       mut_loadMore.calls += 1;
@@ -463,6 +571,11 @@ const setup = (): Readonly<{
     resolveLoadHideDone: hideDoneRead.resolve,
     rejectLoadHideDone: () => {
       hideDoneRead.reject(new Error('blocked'));
+    },
+    savedHidePending: mut_savedHidePending,
+    resolveLoadHidePending: hidePendingRead.resolve,
+    rejectLoadHidePending: () => {
+      hidePendingRead.reject(new Error('blocked'));
     },
     setIssues,
     setEntries,
@@ -507,6 +620,12 @@ const referencedIssue = (
     url: `https://github.com/o/r/issues/${number}`,
     status: itemStatus,
   }) as const;
+
+const pendingLabel = {
+  name: 'pending',
+  color: 'ededed',
+  description: '',
+} as const;
 
 const settle = async (): Promise<void> => {
   await new Promise((resolve) => {

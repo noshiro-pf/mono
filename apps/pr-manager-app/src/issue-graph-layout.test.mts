@@ -394,6 +394,7 @@ const graph = (
       url: `https://github.com/o/r/issues/${number}`,
       state: 'free',
       priority: 'none',
+      pending: false,
     })),
     edges,
   }) as const;

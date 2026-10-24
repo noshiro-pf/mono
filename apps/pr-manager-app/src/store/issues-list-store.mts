@@ -29,6 +29,7 @@ import {
   parseIssuesListView,
   toggleIssuePriority,
   toggleLabel,
+  togglePendingIssues,
   withIssueSort,
   type IssuesListCounts,
   type IssuesListView,
@@ -57,6 +58,7 @@ export type IssuesListStore = Readonly<{
   counts: InitializedObservable<IssuesListCounts>;
   togglePriority: (priority: Priority) => void;
   toggleLabel: (labelName: string) => void;
+  togglePending: () => void;
   setSort: (sort: IssueSort) => void;
   setQuery: (query: string) => void;
   /** Reads what was saved, then saves every change; returns what stops it. */
@@ -135,6 +137,9 @@ export const createIssuesListStore = (
     },
     toggleLabel: (labelName) => {
       change((current) => toggleLabel(current, labelName));
+    },
+    togglePending: () => {
+      change(togglePendingIssues);
     },
     setSort: (sort) => {
       change((current) => withIssueSort(current, sort));

@@ -8,6 +8,7 @@ import {
   parseIssuesListView,
   toggleIssuePriority,
   toggleLabel,
+  togglePendingIssues,
   withIssueSort,
   type IssuesListView,
 } from './issues-list-view.mjs';
@@ -54,6 +55,32 @@ describe(isIssueShown, () => {
     assert.isFalse(isIssueShown(issue(1, ['bug', 'priority:low']), view));
 
     assert.isTrue(isIssueShown(issue(2, ['bug', 'priority:mid']), view));
+  });
+});
+
+describe(togglePendingIssues, () => {
+  test('hides the issues labelled pending, and shows them again', () => {
+    const view = togglePendingIssues(DEFAULT_ISSUES_LIST_VIEW);
+
+    assert.isFalse(isIssueShown(issue(1, ['pending']), view));
+
+    assert.isFalse(isIssueShown(issue(2, ['bug', 'pending']), view));
+
+    assert.isTrue(isIssueShown(issue(3, ['bug']), view));
+
+    assert.isTrue(
+      isIssueShown(issue(1, ['pending']), togglePendingIssues(view)),
+    );
+  });
+
+  test('a picked label does not show what is hidden as pending', () => {
+    const view = togglePendingIssues(
+      toggleLabel(DEFAULT_ISSUES_LIST_VIEW, 'bug'),
+    );
+
+    assert.isFalse(isIssueShown(issue(1, ['bug', 'pending']), view));
+
+    assert.isTrue(isIssueShown(issue(2, ['bug']), view));
   });
 });
 
@@ -112,6 +139,7 @@ describe(arrangeIssues, () => {
     const view: IssuesListView = {
       hiddenPriorities: ['none'],
       onlyLabels: ['bug'],
+      hidePending: false,
       sort: 'priority',
     } as const;
 
@@ -243,6 +271,35 @@ describe(countIssues, () => {
     });
   });
 
+  test('pending is its own switch, not a label: switched off, it reads what switching it on would show', () => {
+    const items = [
+      issue(1, ['pending']),
+      issue(2, ['pending', 'bug', 'priority:low']),
+      issue(3, ['bug']),
+    ] as const;
+
+    const shown = countIssues(items, DEFAULT_ISSUES_LIST_VIEW);
+
+    assert.deepStrictEqual(shown.pending, { shown: 2, total: 2 });
+
+    assert.deepStrictEqual(
+      shown.labels.map(({ name }) => name),
+      ['bug'],
+    );
+
+    const hidden = countIssues(
+      items,
+      togglePendingIssues(toggleIssuePriority(DEFAULT_ISSUES_LIST_VIEW, 'low')),
+    );
+
+    assert.deepStrictEqual(hidden.open, { shown: 1, total: 3 });
+
+    // #2 is low, which is still hidden.
+    assert.deepStrictEqual(hidden.pending, { shown: 1, total: 2 });
+
+    assert.deepStrictEqual(hidden.labels[0]?.count, { shown: 1, total: 2 });
+  });
+
   test('a picked label no open issue carries is still listed, so that it can be unpicked', () => {
     const counts = countIssues(
       ISSUES,
@@ -280,6 +337,7 @@ describe(parseIssuesListView, () => {
     const view: IssuesListView = {
       hiddenPriorities: ['low', 'none'],
       onlyLabels: ['bug'],
+      hidePending: true,
       sort: 'priority',
     } as const;
 
@@ -301,11 +359,13 @@ describe(parseIssuesListView, () => {
       parseIssuesListView({
         hiddenPriorities: ['urgent', 'mid'],
         onlyLabels: ['bug', 3, 'bug'],
+        hidePending: 'yes',
         sort: 'title',
       }),
       {
         hiddenPriorities: ['mid'],
         onlyLabels: ['bug'],
+        hidePending: false,
         sort: 'updated',
       },
     );

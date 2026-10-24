@@ -167,6 +167,7 @@ describe(createIssuesListStore, () => {
 const STORED: IssuesListView = {
   hiddenPriorities: ['none'],
   onlyLabels: ['bug'],
+  hidePending: false,
   sort: 'priority',
 } as const;
 

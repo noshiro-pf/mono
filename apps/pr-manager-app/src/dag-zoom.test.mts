@@ -188,6 +188,7 @@ const chainAndFree = (chain: number, free: number): IssueGraph =>
       url: `https://github.com/o/r/issues/${index + 1}`,
       state: 'free',
       priority: 'none',
+      pending: false,
     })),
     edges: Array.from({ length: chain - 1 }, (_, index) => ({
       from: index + 1,

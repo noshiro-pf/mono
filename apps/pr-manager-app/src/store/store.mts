@@ -113,6 +113,8 @@ const ISSUES_VIEW_KEY = 'issues-view';
 
 const ISSUES_DAG_HIDE_DONE_KEY = 'issues-dag-hide-done';
 
+const ISSUES_DAG_HIDE_PENDING_KEY = 'issues-dag-hide-pending';
+
 export const issuesViewStore = createIssuesViewStore({
   issues: reader.issues,
   entries: reader.entries,
@@ -124,6 +126,10 @@ export const issuesViewStore = createIssuesViewStore({
   loadHideDone: () => readSetting(ISSUES_DAG_HIDE_DONE_KEY),
   saveHideDone: (hide) => {
     writeSetting(ISSUES_DAG_HIDE_DONE_KEY, hide).catch(() => undefined);
+  },
+  loadHidePending: () => readSetting(ISSUES_DAG_HIDE_PENDING_KEY),
+  saveHidePending: (hide) => {
+    writeSetting(ISSUES_DAG_HIDE_PENDING_KEY, hide).catch(() => undefined);
   },
   moreIssues: reader.moreIssues,
   loadMoreIssues: reader.loadMoreIssues,

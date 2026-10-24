@@ -2175,7 +2175,7 @@ a:focus-visible {
 
 /*
  * Priority. A high one gets a second outline in the node's own colour, and a
- * low one is faint until pointed at, so neither changes what the colour
+ * low one, as one labelled `pending`, is faint until pointed at, so neither changes what the colour
  * says. The pill is in ink, strongest for high, so that it never reads as
  * one of the colours above; its word says which.
  */
@@ -2189,7 +2189,8 @@ a:focus-visible {
   stroke-dasharray: 5 3;
 }
 
-.issue-dag-node[data-priority='low'] {
+.issue-dag-node[data-priority='low'],
+.issue-dag-node[data-pending='true'] {
   opacity: 0.5;
 }
 
@@ -2205,6 +2206,13 @@ a:focus-visible {
 }
 
 .issue-dag-swatch[data-priority='low'] {
+  opacity: 0.5;
+}
+
+/* Labelled `pending`: faint as a low priority is, whatever its colour. */
+.issue-dag-swatch[data-pending] {
+  --dag-colour: var(--ink-secondary);
+
   opacity: 0.5;
 }
 

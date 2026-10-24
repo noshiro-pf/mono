@@ -33,12 +33,15 @@ export const stateLabels = {
   unknown: 'Unknown',
 } as const satisfies ReadonlyRecord<IssueNodeState, string>;
 
-/** `#2225 Title — Waiting: … — Priority: high`, for the tooltip. */
+/**
+ * `#2225 Title — Waiting: … — Priority: high — Pending`, for the tooltip.
+ */
 export const describeNode = (node: IssueGraphNode): string =>
   [
     `#${node.number}${node.title === '' ? '' : ` ${node.title}`}`,
     `${stateLabels[node.state]}: ${explanation(node)}`,
     ...(node.priority === 'none' ? [] : [`Priority: ${node.priority}`]),
+    ...(node.pending ? ['Labelled pending'] : []),
   ].join('\n');
 
 const explanation = (node: IssueGraphNode): string => {
