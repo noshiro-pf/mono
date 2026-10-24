@@ -15,7 +15,7 @@ describe(summarizeChecks, () => {
       [],
     );
 
-    assert.strictEqual(summary.status, 'passed');
+    assert.strictEqual(summary.verdict, 'passed');
   });
 
   test('counts a skipped context as met, as GitHub does', () => {
@@ -28,7 +28,7 @@ describe(summarizeChecks, () => {
       [],
     );
 
-    assert.strictEqual(summary.status, 'passed');
+    assert.strictEqual(summary.verdict, 'passed');
   });
 
   // #2069: `skip-ci` came off a head whose previous round had concluded the
@@ -43,7 +43,7 @@ describe(summarizeChecks, () => {
       [running('code-check (ws:fix:lint)')],
     );
 
-    assert.strictEqual(summary.status, 'pending');
+    assert.strictEqual(summary.verdict, 'pending');
 
     assert.deepStrictEqual(summary.running, ['code-check (ws:fix:lint)']);
 
@@ -78,7 +78,7 @@ describe(summarizeChecks, () => {
       [running('code-check (ws:fix:lint)')],
     );
 
-    assert.strictEqual(summary.status, 'failed');
+    assert.strictEqual(summary.verdict, 'failing');
   });
 
   test('fails on a required check that failed in the round still running', () => {
@@ -91,12 +91,16 @@ describe(summarizeChecks, () => {
       [running('code-check (ws:fix:lint)', '2026-10-12T15:20:14Z')],
     );
 
-    assert.strictEqual(summary.status, 'failed');
+    assert.strictEqual(summary.verdict, 'failing');
 
-    assert.deepStrictEqual(
-      summary.failed.map(({ name }) => name),
-      ['code-check-result / result'],
-    );
+    assert.deepStrictEqual(summary.failed, ['code-check-result / result']);
+
+    assert.deepStrictEqual(summary.failedRuns, [
+      {
+        name: 'code-check-result / result',
+        link: 'https://example.com/code-check-result / result',
+      },
+    ]);
   });
 
   // #2246: the round `skip-ci` cancelled when the pull request was opened
@@ -111,9 +115,11 @@ describe(summarizeChecks, () => {
       [running('code-check (ws:fix:lint)', '2026-10-12T15:20:14Z')],
     );
 
-    assert.strictEqual(summary.status, 'pending');
+    assert.strictEqual(summary.verdict, 'pending');
 
     assert.deepStrictEqual(summary.failed, []);
+
+    assert.deepStrictEqual(summary.failedRuns, []);
 
     assert.deepStrictEqual(summary.pending, ['code-check-result / result']);
   });
@@ -128,15 +134,78 @@ describe(summarizeChecks, () => {
       [],
     );
 
-    assert.strictEqual(summary.status, 'failed');
+    assert.strictEqual(summary.verdict, 'failing');
   });
 
   test('stays pending while a required context has not reported', () => {
     const summary = summarizeChecks([check('no-skip-ci-label')], required, []);
 
-    assert.strictEqual(summary.status, 'pending');
+    assert.strictEqual(summary.verdict, 'pending');
 
     assert.deepStrictEqual(summary.missing, ['code-check-result / result']);
+  });
+
+  test('counts the contexts the verdict was reached over', () => {
+    const summary = summarizeChecks(
+      [check('code-check-result / result'), check('no-skip-ci-label')],
+      required,
+      [],
+    );
+
+    assert.strictEqual(summary.required, 2);
+  });
+
+  // The rules could not be read: what `--required` reported is all there is.
+  test('judges by what has reported when nothing is known to be required', () => {
+    assert.strictEqual(
+      summarizeChecks([check('no-skip-ci-label')], [], []).verdict,
+      'passed',
+    );
+
+    assert.strictEqual(
+      summarizeChecks([check('no-skip-ci-label', 'fail')], [], []).verdict,
+      'failing',
+    );
+  });
+
+  test('stays pending while nothing has reported, even with nothing known to be required', () => {
+    assert.strictEqual(summarizeChecks([], [], []).verdict, 'pending');
+  });
+
+  test('fails on a context that failed once and passed once, as GitHub does', () => {
+    const summary = summarizeChecks(
+      [
+        check('code-check-result / result', 'pass'),
+        check('code-check-result / result', 'fail'),
+        check('no-skip-ci-label'),
+      ],
+      required,
+      [],
+    );
+
+    assert.strictEqual(summary.verdict, 'failing');
+
+    assert.deepStrictEqual(summary.failed, ['code-check-result / result']);
+  });
+
+  // The worker arms a pull request it judges green, and an armed pull
+  // request stacked on a branch no ruleset covers merges into it at once.
+  // So a required context that has not reported is waited for wherever the
+  // pull request points, unlike in `pr-report`'s `notRun`.
+  test('waits on a required context that has not reported, whatever the base', () => {
+    const summary = summarizeChecks([check('no-skip-ci-label')], required, []);
+
+    assert.deepStrictEqual(summary.notRun, []);
+
+    assert.deepStrictEqual(summary.missing, ['code-check-result / result']);
+  });
+
+  test("never reads as paused: `skip-ci` is the queue's to read, not the checks'", () => {
+    assert.notStrictEqual(
+      summarizeChecks([check('no-skip-ci-label', 'pending')], required, [])
+        .verdict,
+      'paused',
+    );
   });
 });
 
@@ -149,7 +218,7 @@ const check = (
   ({
     name,
     bucket,
-    link: '',
+    link: `https://example.com/${name}`,
     startedAt: completedAt,
     completedAt,
   }) as const;
