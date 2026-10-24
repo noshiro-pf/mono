@@ -1,6 +1,7 @@
 /** What `repo-settings/rulesets/main.json` asks of a pull request. */
 
-import { Arr, Json, Result } from 'ts-data-forge';
+import type { components } from '@octokit/openapi-types';
+import { Arr, expectType, Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 
 /** Where the ruleset is declared, relative to the repository root. */
@@ -99,6 +100,12 @@ const RulesetSchema = t.record({ rules: t.array(t.unknown()) });
  * One rule of the several kinds a ruleset holds. The others carry entirely
  * different parameters, so each rule is tried against this and the ones that
  * do not match are simply not the rule being looked for.
+ *
+ * Written here rather than taken from `octokit-safe-types`, whose
+ * `RepositoryRule` is the whole union: validating against it would refuse a
+ * kind of rule GitHub adds before that union has it, where this ignores one,
+ * and the page would carry the whole union to the browser for three fields.
+ * GitHub's own types still hold the fields read to their shape, below.
  */
 const RequiredStatusChecksRuleSchema = t.record({
   type: t.literal('required_status_checks'),
@@ -116,3 +123,31 @@ const ConversationResolutionRuleSchema = t.record({
   type: t.literal('pull_request'),
   parameters: t.record({ required_review_thread_resolution: t.boolean() }),
 });
+
+/**
+ * Each rule as GitHub's API description types it, with the parameters it may
+ * omit present: a rule of that shape has to be one the schema above accepts,
+ * so a field read here that GitHub renames or retypes fails the type check.
+ */
+type WithParameters<R extends Readonly<{ parameters?: unknown }>> = R &
+  Readonly<{ parameters: NonNullable<R['parameters']> }>;
+
+type GitHubRule<
+  K extends
+    'repository-rule-pull-request' | 'repository-rule-required-status-checks',
+> = WithParameters<components['schemas'][K]>;
+
+expectType<
+  GitHubRule<'repository-rule-required-status-checks'>,
+  t.TypeOf<typeof RequiredStatusChecksRuleSchema>
+>('<=');
+
+expectType<
+  GitHubRule<'repository-rule-pull-request'>,
+  t.TypeOf<typeof CodeOwnerReviewRuleSchema>
+>('<=');
+
+expectType<
+  GitHubRule<'repository-rule-pull-request'>,
+  t.TypeOf<typeof ConversationResolutionRuleSchema>
+>('<=');
