@@ -1,3 +1,4 @@
+import { asUint32, range } from 'ts-data-forge';
 import { calculateHousingLoan } from './calculate-housing-loan.mjs';
 
 describe(calculateHousingLoan, () => {
@@ -9,7 +10,7 @@ describe(calculateHousingLoan, () => {
       rateIncreaseEvery5Years: 0.005,
       monthlyRateIncrease: 0.00008333333333,
       maxAnnualRate: 0.03,
-    };
+    } as const;
 
     const result = calculateHousingLoan(params);
 
@@ -58,7 +59,7 @@ describe(calculateHousingLoan, () => {
       rateIncreaseEvery5Years: 0.01,
       monthlyRateIncrease: 0.001,
       maxAnnualRate: 0.03,
-    };
+    } as const;
 
     const result = calculateHousingLoan(params);
 
@@ -75,7 +76,7 @@ describe(calculateHousingLoan, () => {
       rateIncreaseEvery5Years: 0,
       monthlyRateIncrease: 0,
       maxAnnualRate: 0,
-    };
+    } as const;
 
     const result = calculateHousingLoan(params);
 
@@ -94,11 +95,11 @@ describe(calculateHousingLoan, () => {
       rateIncreaseEvery5Years: 0,
       monthlyRateIncrease: 0,
       maxAnnualRate: 0.01,
-    };
+    } as const;
 
     const result = calculateHousingLoan(params);
 
-    for (let mut_i = 1; mut_i < result.length; mut_i++) {
+    for (const mut_i of range(1, asUint32(result.length))) {
       expect(result[mut_i]?.remainingBalance).toBeLessThan(
         result[mut_i - 1]?.remainingBalance ?? 0,
       );
