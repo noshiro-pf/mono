@@ -154,7 +154,7 @@ const reportBody = (
   [
     markerOf(entry.number),
     '',
-    `#${entry.number} is in the merge queue, and \`queueOwner\` (\`apps/pr-report-core/src/queue-owner.mts\`) gives it to nobody: the worker, the skills and the people working the queue each leave it to the others.`,
+    `#${entry.number} is in the merge queue, and \`queueOwner\` (\`libs/pr-report-core/src/queue-owner.mts\`) gives it to nobody: the worker, the skills and the people working the queue each leave it to the others.`,
     '',
     `- Why: ${owner?.reason ?? 'no owner was returned'}`,
     `- Labels: ${Arr.isNonEmpty(entry.labels) ? entry.labels.map(({ name }) => `\`${name}\``).join(', ') : 'none'}`,

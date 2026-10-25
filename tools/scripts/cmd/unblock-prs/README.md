@@ -751,7 +751,7 @@ API を呼ぶ `rest()` / `graphqlQuery()`、`git` を走らせる `git()`、quot
 `CODEOWNERS` の判定、見送りの comment の隠しコメントとチェックボックスの書式、
 そして triage の判定そのもの（各 PR が queue のどこにいるか、レビューが止めているか、
 候補をどの順に pick するか: `queue-order.mts` と `review-hold.mts`）は、
-同じ queue を描く Pull Requests Manager と共有するため `apps/pr-report-core`
+同じ queue を描く Pull Requests Manager と共有するため `libs/pr-report-core`
 にあります。`triage.mts` はその判定が求めるものを GitHub と `git` から読むだけです。
 
 `index.mts` はありません。`ws:gen` は workspace メンバーしか歩かず `tools/` は
@@ -1555,7 +1555,7 @@ which, the label strings, the `CODEOWNERS` rules, the set-aside comment's
 hidden record and task box, and triage's decisions themselves — where each
 pull request stands in the queue, whether its review holds it, and the order
 candidates are picked in (`queue-order.mts` and `review-hold.mts`) — are in
-`apps/pr-report-core`, shared with the Pull Requests Manager page, which draws
+`libs/pr-report-core`, shared with the Pull Requests Manager page, which draws
 the same queue. `triage.mts` only reads, from GitHub and `git`, what those
 decisions ask for.
 

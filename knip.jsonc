@@ -645,14 +645,6 @@
       "project": ["**/*.mts"],
     },
 
-    // Not an Astro site like the entry above assumes: a single entry point.
-    // What `pr-report` and the app below share, which is the only reason it
-    // is a package of its own.
-    "apps/pr-report-core": {
-      "entry": ["src/index.mts", "configs/*.mts", "scripts/**/*.mts"],
-      "project": ["**/*.mts"],
-    },
-
     // Not an Astro site like the entry above assumes: a Vite Preact app whose
     // entry is the module `index.html` loads.
     "apps/pr-manager-app": {

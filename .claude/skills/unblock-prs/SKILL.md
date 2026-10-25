@@ -15,7 +15,7 @@ fixes those pull requests and does nothing else**, so that the two never do
 the same thing.
 
 **Every queued pull request has exactly one owner**, and every tool reads it
-from one function — `apps/pr-report-core/src/queue-owner.mts`, through
+from one function — `libs/pr-report-core/src/queue-owner.mts`, through
 `tools/scripts/cmd/pr-report/queue.mts` here and through
 `tools/scripts/cmd/unblock-prs/owner.mts` in the worker — so the two cannot
 disagree about whose a pull request is:
@@ -90,7 +90,7 @@ pnpm run claim-pr -- <number> --by <claimant>
 up once for this run; the same one throughout. It is refused unless the
 owner is a skill and no one else holds it: take the next one.
 
-The claim (`apps/pr-report-core/src/claim.mts`) is what keeps the worker from
+The claim (`libs/pr-report-core/src/claim.mts`) is what keeps the worker from
 retrying the pull request while you work — it would when `main` moves or the
 box is ticked — and keeps the session that opened it from fixing the same
 thing. It ends by itself when the branch is pushed, or after two hours. Run

@@ -601,7 +601,7 @@ on and `success` without it.
   the head that will merge.
 - `skip-ci`, `merge-queued`, `blocks-release` and `auto-rebase` exist only
   on GitHub; the
-  strings are in the workflows and `apps/pr-report-core/src/labels.mts`.
+  strings are in the workflows and `libs/pr-report-core/src/labels.mts`.
   Change them everywhere or nowhere.
 
 ### A label event under `skip-ci`
