@@ -8,7 +8,7 @@ import {
   summarizeChecks as summarizeContexts,
   type ContextState,
 } from 'pr-report-core';
-import { Arr, Result } from 'ts-data-forge';
+import { Arr, Num, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { parseJson } from '../../lib/json.mjs';
 import { git } from '../../lib/shell.mjs';
@@ -25,14 +25,24 @@ const CheckSchema = t.record({
   startedAt: t.string(),
   /** ISO 8601; GitHub's zero time before the check has finished. */
   completedAt: t.string(),
+  /** The workflow the job belongs to; empty for a commit status. */
+  workflow: t.string(),
 });
 
 const CheckListSchema = t.array(CheckSchema);
 
 export type ReportedCheck = t.TypeOf<typeof CheckSchema>;
 
-/** A check on the head that has not finished, and when it started. */
-export type RunningCheck = Readonly<{ name: string; startedAt: string }>;
+/**
+ * A check on the head that has not finished, when it started, and the
+ * workflow run it is a job of.
+ */
+export type RunningCheck = Readonly<{
+  name: string;
+  startedAt: string;
+  workflow: string;
+  link: string;
+}>;
 
 const CHECK_FIELDS = jsonFields(CheckSchema);
 
@@ -81,7 +91,12 @@ export const listRunningChecks = async (
     (checks) =>
       checks
         .filter((check) => check.bucket === 'pending')
-        .map(({ name, startedAt }) => ({ name, startedAt })),
+        .map(({ name, startedAt, workflow, link }) => ({
+          name,
+          startedAt,
+          workflow,
+          link,
+        })),
   );
 };
 
@@ -99,8 +114,12 @@ export const listRunningChecks = async (
  * under it, leaves its aggregates red, and reading that red as this round's
  * set a pull request aside while its first real round was under way (#2246).
  * Such a failure waits for the round to end, as a check not yet reported
- * does. A failure of this round finished after it began, and still fails the
- * pull request at once.
+ * does. So does one that finished after the round began but whose workflow
+ * has a newer run still going: the round `skip-ci` was put on for can take
+ * long enough to be cancelled that its aggregate goes red after the round
+ * taking its place has started, and only the run that replaced it says it is
+ * the round before (#2463). A failure of this round still fails the pull
+ * request at once.
  *
  * The verdict itself is `pr-report-core`'s `summarizeChecks`, which
  * `pr-report` and the page reach theirs through, so the worker and the report
@@ -118,9 +137,10 @@ export const summarizeChecks = (
     const completedMs = epochMs(check.completedAt);
 
     return (
-      roundStartedMs !== undefined &&
-      completedMs !== undefined &&
-      completedMs < roundStartedMs
+      (roundStartedMs !== undefined &&
+        completedMs !== undefined &&
+        completedMs < roundStartedMs) ||
+      isSuperseded(check, running)
     );
   };
 
@@ -207,6 +227,41 @@ const stateOf = (check: ReportedCheck, ofRoundBefore: boolean): ContextState =>
       : check.bucket === 'skipping'
         ? 'skipped'
         : 'passed';
+
+/**
+ * Whether a newer run of the check's own workflow is still running. Run ids
+ * only grow, so a higher one is a later run; a commit status has no workflow
+ * and no run, and is never superseded.
+ */
+const isSuperseded = (
+  check: ReportedCheck,
+  running: readonly RunningCheck[],
+): boolean => {
+  const runId = workflowRunId(check.link);
+
+  return (
+    check.workflow !== '' &&
+    runId !== undefined &&
+    running.some((other) => {
+      const otherRunId = workflowRunId(other.link);
+
+      return (
+        other.workflow === check.workflow &&
+        otherRunId !== undefined &&
+        otherRunId > runId
+      );
+    })
+  );
+};
+
+/** The run id in a job's link (`…/actions/runs/<id>/job/<id>`). */
+const workflowRunId = (link: string): number | undefined => {
+  const id = /\/actions\/runs\/(\d+)\//u.exec(link)?.[1];
+
+  return id === undefined
+    ? undefined
+    : Result.unwrapOkOr(Num.safeParseInt(id), undefined);
+};
 
 /**
  * When the earliest check still running started, in milliseconds; `undefined`

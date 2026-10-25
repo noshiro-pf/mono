@@ -478,7 +478,10 @@ green に見えます（#2069 はこれで `not-merging` になりました）�
 round のものとして、round が終わるまで待ちます。`open-pr` が開いた直後に
 `skip-ci` で止めた round は集約を赤く残すので、それを今の round の fail と読むと、
 最初の本番の round の途中で脇に置いてしまいます（#2246 はこれで `checks-failed`
-になりました）。
+になりました）。同じ workflow のもっと新しい run がまだ実行中の fail も前の round
+のものとして待ちます。`skip-ci` を付けた round のキャンセルが遅れると、その集約は
+新しい round が始まった後に赤くなるので、時刻では見分けられません（#2463 はこれで
+`checks-failed` になりました）。
 
 全部 green なのにマージされない場合は rebase では直せないので、連続 green 回
 数で打ち切ります。原因のうち未解決の会話と code owner の承認不足は triage が先
@@ -1260,6 +1263,10 @@ check still running started: that one is the round before, and waits for the
 round to end. The round `skip-ci` cancels as `open-pr` opens a pull request
 leaves its aggregates red, and reading that red as this round's set the first
 real round aside halfway through (#2246 was set aside `checks-failed` so).
+So is a failure whose workflow has a newer run still running: when the round
+`skip-ci` was put on for is slow to cancel, its aggregate goes red after the
+round replacing it has started, and the time alone cannot tell them apart
+(#2463 was set aside `checks-failed` so).
 
 A pull request that is green and still open is held by something a rebase
 cannot fix, so it is given a budget of consecutive green polls. An unresolved

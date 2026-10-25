@@ -84,7 +84,9 @@ describe(summarizeChecks, () => {
   test('fails on a required check that failed in the round still running', () => {
     const summary = summarizeChecks(
       [
-        check('code-check-result / result', 'fail', '2026-10-12T15:20:45Z'),
+        check('code-check-result / result', 'fail', {
+          completedAt: '2026-10-12T15:20:45Z',
+        }),
         check('no-skip-ci-label'),
       ],
       required,
@@ -108,7 +110,9 @@ describe(summarizeChecks, () => {
   test('waits on a required check that failed before the round still running began', () => {
     const summary = summarizeChecks(
       [
-        check('code-check-result / result', 'cancel', '2026-10-12T12:13:37Z'),
+        check('code-check-result / result', 'cancel', {
+          completedAt: '2026-10-12T12:13:37Z',
+        }),
         check('no-skip-ci-label'),
       ],
       required,
@@ -124,10 +128,90 @@ describe(summarizeChecks, () => {
     assert.deepStrictEqual(summary.pending, ['code-check-result / result']);
   });
 
+  // #2463: `skip-ci` came off while the round it was put on for was still
+  // being cancelled, so that round's aggregate went red 22 seconds after the
+  // new round's first check started. Its workflow's own new run, queued
+  // behind it by the concurrency group, is what says it is the round before.
+  test('waits on a required check whose workflow has a newer run still running', () => {
+    const summary = summarizeChecks(
+      [
+        check('synstate-benchmark-result / result', 'fail', {
+          completedAt: '2026-10-25T18:12:55Z',
+          workflow: 'SynState Benchmark',
+          runId: 40220095906,
+        }),
+        check('no-skip-ci-label'),
+      ],
+      ['synstate-benchmark-result / result', 'no-skip-ci-label'],
+      [
+        running('code-check (ws:fix:lint)', '2026-10-25T18:12:33Z', {
+          workflow: 'Code Check',
+          runId: 40220140988,
+        }),
+        running('gates / check', '2026-10-25T18:12:57Z', {
+          workflow: 'SynState Benchmark',
+          runId: 40220140914,
+        }),
+      ],
+    );
+
+    assert.strictEqual(summary.verdict, 'pending');
+
+    assert.deepStrictEqual(summary.failed, []);
+
+    assert.deepStrictEqual(summary.failedRuns, []);
+  });
+
+  test('fails on a required check whose workflow is still running in the same run', () => {
+    const summary = summarizeChecks(
+      [
+        check('code-check-result / result', 'fail', {
+          completedAt: '2026-10-25T18:12:55Z',
+          workflow: 'Code Check',
+          runId: 200,
+        }),
+        check('no-skip-ci-label'),
+      ],
+      required,
+      [
+        running('code-check (ws:fix:lint)', '2026-10-25T18:12:33Z', {
+          workflow: 'Code Check',
+          runId: 200,
+        }),
+      ],
+    );
+
+    assert.strictEqual(summary.verdict, 'failing');
+  });
+
+  test('fails on a required check when only another workflow has a newer run', () => {
+    const summary = summarizeChecks(
+      [
+        check('code-check-result / result', 'fail', {
+          completedAt: '2026-10-25T18:12:55Z',
+          workflow: 'Code Check',
+          runId: 100,
+        }),
+        check('no-skip-ci-label'),
+      ],
+      required,
+      [
+        running('gates / check', '2026-10-25T18:12:33Z', {
+          workflow: 'SynState Benchmark',
+          runId: 200,
+        }),
+      ],
+    );
+
+    assert.strictEqual(summary.verdict, 'failing');
+  });
+
   test('fails on a red left by the round before once nothing runs', () => {
     const summary = summarizeChecks(
       [
-        check('code-check-result / result', 'fail', '2026-10-12T12:13:37Z'),
+        check('code-check-result / result', 'fail', {
+          completedAt: '2026-10-12T12:13:37Z',
+        }),
         check('no-skip-ci-label'),
       ],
       required,
@@ -212,16 +296,38 @@ describe(summarizeChecks, () => {
 const check = (
   name: string,
   bucket: string = 'pass',
-  /** When it finished, which is also taken as when it started. */
-  completedAt: string = '',
+  {
+    completedAt = '',
+    workflow = '',
+    runId,
+  }: Readonly<{
+    /** When it finished, which is also taken as when it started. */
+    completedAt?: string;
+    workflow?: string;
+    runId?: number;
+  }> = {},
 ): ReportedCheck =>
   ({
     name,
     bucket,
-    link: `https://example.com/${name}`,
+    link: link(name, runId),
     startedAt: completedAt,
     completedAt,
+    workflow,
   }) as const;
 
-const running = (name: string, startedAt: string = ''): RunningCheck =>
-  ({ name, startedAt }) as const;
+const running = (
+  name: string,
+  startedAt: string = '',
+  {
+    workflow = '',
+    runId,
+  }: Readonly<{ workflow?: string; runId?: number }> = {},
+): RunningCheck =>
+  ({ name, startedAt, workflow, link: link(name, runId) }) as const;
+
+/** What `gh` reports for a job of a workflow run, or a status's own URL. */
+const link = (name: string, runId: number | undefined): string =>
+  runId === undefined
+    ? (`https://example.com/${name}` as const)
+    : (`https://github.com/noshiro-pf/mono/actions/runs/${runId}/job/1` as const);
