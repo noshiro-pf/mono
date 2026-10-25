@@ -1,5 +1,5 @@
 import type { LaidOutNode } from './graph-layout.mjs';
-import { lassoPathData, nodesInLasso } from './lasso.mjs';
+import { lassoPathData, nodesInLasso, rectangleLoop } from './lasso.mjs';
 
 // Tasks 100 × 40 at (0, 0) and (200, 0), and a milestone at (0, 100).
 const nodes: readonly LaidOutNode[] = [
@@ -93,5 +93,27 @@ describe(lassoPathData, () => {
 
   test('draws nothing for no points', () => {
     assert.strictEqual(lassoPathData([]), '');
+  });
+});
+
+describe(rectangleLoop, () => {
+  test('goes round the rectangle with these two corners opposite', () => {
+    assert.deepStrictEqual(rectangleLoop({ x: 0, y: 0 }, { x: 10, y: 5 }), [
+      { x: 0, y: 0 },
+      { x: 10, y: 0 },
+      { x: 10, y: 5 },
+      { x: 0, y: 5 },
+    ]);
+  });
+
+  test('takes the corners in either order', () => {
+    // Dragged up and to the left.
+    assert.deepStrictEqual(
+      nodesInLasso(
+        nodes,
+        rectangleLoop({ x: 120, y: 150 }, { x: -10, y: -10 }),
+      ),
+      ['task:a', 'milestone:m'],
+    );
   });
 });

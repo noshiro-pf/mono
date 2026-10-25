@@ -3,6 +3,8 @@
  * in it when its centre is, so that a loop drawn loosely round a node takes
  * it, and one that only clips its corner does not. Everything is in content
  * coordinates; the loop is closed from its last point back to its first.
+ * A rectangle (`rectangleLoop`) is a loop of its four corners, and selects
+ * the same way.
  */
 
 import { Arr, Num } from 'ts-data-forge';
@@ -25,6 +27,15 @@ export const nodesInLasso = (
           }),
         )
         .map(({ id }) => id);
+
+/** The loop round the rectangle with `a` and `b` at opposite corners. */
+export const rectangleLoop = (a: Point, b: Point): readonly Point[] =>
+  [
+    { x: a.x, y: a.y },
+    { x: b.x, y: a.y },
+    { x: b.x, y: b.y },
+    { x: a.x, y: b.y },
+  ] as const;
 
 /** The SVG path of `loop`, closed; empty for no points. */
 export const lassoPathData = (loop: readonly Point[]): string =>

@@ -47,6 +47,7 @@ import {
   type GraphLayout,
   type GroupFrame,
   type LaidOutNode,
+  type LassoShape,
   type MilestoneNodeView,
   type NodeDrag,
   type Point,
@@ -135,7 +136,9 @@ type Props = Readonly<{
  *
  * In 「DAG」, a drag on the background with Shift held — or with
  * 「なげなわ」 on, which a touch needs — draws a lasso (`dag/lasso.mts`)
- * instead of panning, and the nodes it closes round are selected
+ * instead of panning; with 「矩形選択」 on, it drags out a rectangle from
+ * where it went down, with Shift held or not. Either tool turns the other
+ * off. The nodes the lasso or the rectangle closes round are selected
  * (`dagSelectionStore`) in place of what was; a tap on the background, or
  * Escape, selects none. A drag that starts on a selected node moves every
  * selected node with it, each staying in its group, whose frame follows
@@ -198,13 +201,14 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
   const [selectedEdge$, setSelectedEdge, { getSnapshot: getSelectedEdge }] =
     createState<SelectedEdge | undefined>(undefined);
 
-  // 「なげなわ」: whether a drag on the background draws a lasso, as one
-  // with Shift does, rather than panning.
+  // 「なげなわ」 or 「矩形選択」: whether a drag on the background draws a
+  // lasso — freehand, as one with Shift does, or a rectangle — rather than
+  // panning.
   const [
     lassoTool$,
     ,
     { updateState: updateLassoTool, getSnapshot: getLassoTool },
-  ] = createState(false);
+  ] = createState<LassoShape | undefined>(undefined);
 
   const [lasso$, setLasso] = createState<readonly Point[] | undefined>(
     undefined,
@@ -623,8 +627,11 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
           // The background, in the mode the reader arranges.
           (first &&
           Arr.isNonEmpty(movableNodes) &&
-          (pressed.shiftKey || getLassoTool())
-            ? ({ kind: 'lasso' } as const)
+          (pressed.shiftKey || getLassoTool() !== undefined)
+            ? ({
+                kind: 'lasso',
+                shape: getLassoTool() ?? 'freehand',
+              } as const)
             : undefined));
 
     if (grab?.kind !== 'connect') {
@@ -1002,7 +1009,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
         data-e2e={constant('dag-canvas')}
         data-lasso={view(
           combine([arrangeable, lassoTool$]),
-          ([canArrange, tool]) => String(canArrange && tool),
+          ([canArrange, tool]) => String(canArrange && tool !== undefined),
         )}
         data-mode={view(mode, (current) => current)}
         data-motion={view(
@@ -1147,20 +1154,53 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
         <If
           cond={arrangeable}
           then={
-            <button
-              aria-pressed={view(lassoTool$, String)}
-              class={{ 'bp6-button': constant(true), 'bp6-active': lassoTool$ }}
-              data-e2e={constant('dag-lasso-tool')}
-              title={constant(
-                '背景のドラッグで囲んだノードを選びます（Shift を押しながらのドラッグでも選べます）',
-              )}
-              type={constant('button')}
-              onClick={() => {
-                updateLassoTool((tool) => !tool);
-              }}
-            >
-              {constant('なげなわ')}
-            </button>
+            <>
+              <button
+                aria-pressed={view(lassoTool$, (tool) =>
+                  String(tool === 'freehand'),
+                )}
+                class={{
+                  'bp6-button': constant(true),
+                  'bp6-active': view(lassoTool$, (tool) => tool === 'freehand'),
+                }}
+                data-e2e={constant('dag-lasso-tool')}
+                title={constant(
+                  '背景のドラッグで囲んだノードを選びます（Shift を押しながらのドラッグでも選べます）',
+                )}
+                type={constant('button')}
+                onClick={() => {
+                  updateLassoTool((tool) =>
+                    tool === 'freehand' ? undefined : 'freehand',
+                  );
+                }}
+              >
+                {constant('なげなわ')}
+              </button>
+              <button
+                aria-pressed={view(lassoTool$, (tool) =>
+                  String(tool === 'rectangle'),
+                )}
+                class={{
+                  'bp6-button': constant(true),
+                  'bp6-active': view(
+                    lassoTool$,
+                    (tool) => tool === 'rectangle',
+                  ),
+                }}
+                data-e2e={constant('dag-rectangle-tool')}
+                title={constant(
+                  '背景のドラッグで描いた矩形に入るノードを選びます',
+                )}
+                type={constant('button')}
+                onClick={() => {
+                  updateLassoTool((tool) =>
+                    tool === 'rectangle' ? undefined : 'rectangle',
+                  );
+                }}
+              >
+                {constant('矩形選択')}
+              </button>
+            </>
           }
         />
         <If

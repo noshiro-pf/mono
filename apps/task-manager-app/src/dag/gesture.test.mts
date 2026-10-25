@@ -391,7 +391,7 @@ describe(cancelConnect, () => {
 });
 
 describe('drawing a lasso', () => {
-  const grab = { kind: 'lasso' } as const;
+  const grab = { kind: 'lasso', shape: 'freehand' } as const;
 
   // Content (0, 0) at screen (10, 0), drawn twice as large.
   const zoomed: ViewTransform = { x: 10, y: 0, scale: 2 } as const;
@@ -477,5 +477,44 @@ describe('drawing a lasso', () => {
     assert.isUndefined(gesture.lasso);
 
     assert.isUndefined(pointerUp(gesture, 2, zoomed).lassoed);
+  });
+});
+
+describe('drawing a rectangle', () => {
+  const grab = { kind: 'lasso', shape: 'rectangle' } as const;
+
+  // Content (0, 0) at screen (10, 0), drawn twice as large.
+  const zoomed: ViewTransform = { x: 10, y: 0, scale: 2 } as const;
+
+  const pressed = pointerDown(
+    IDLE_GESTURE,
+    { id: 1, x: 10, y: 0 },
+    zoomed,
+    grab,
+  );
+
+  test('draws nothing for a small wobble, so a tap stays a tap', () => {
+    assert.isUndefined(
+      pointerMove(pressed, { id: 1, x: 12, y: 2 }).gesture.lasso,
+    );
+  });
+
+  test('draws the rectangle from where it was pressed to where the pointer is now, in content coordinates, and does not pan', () => {
+    const first = pointerMove(pressed, { id: 1, x: 110, y: 40 });
+
+    const second = pointerMove(first.gesture, { id: 1, x: 210, y: 100 });
+
+    assert.isUndefined(second.transform);
+
+    assert.deepStrictEqual(second.gesture.lasso, [
+      { x: 0, y: 0 },
+      { x: 100, y: 0 },
+      { x: 100, y: 50 },
+      { x: 0, y: 50 },
+    ]);
+
+    const { lassoed } = pointerUp(second.gesture, 1, zoomed);
+
+    assert.deepStrictEqual(lassoed, second.gesture.lasso);
   });
 });

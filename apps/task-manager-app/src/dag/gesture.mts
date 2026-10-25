@@ -17,7 +17,8 @@
  * into a pinch, which leaves the node where it was and draws nothing. A
  * group's frame, grabbed by its title, is dragged as a node is. A press
  * the canvas says draws a lasso (`lasso.mts`) draws one from where it went
- * down through every point it moves to (`lasso`), which ends where the
+ * down through every point it moves to (`lasso`) — or, for a rectangle, the
+ * rectangle from there to where the pointer is now — which ends where the
  * pointer lifts; a second finger turns it into a pinch as well.
  *
  * An arrow being drawn can be given up before it is dropped
@@ -30,6 +31,7 @@ import type { DeepReadonly } from 'ts-type-forge';
 import type { GraphNodeId } from '../domain/index.mjs';
 import { dragPosition } from './dag-layout.mjs';
 import type { GroupKey } from './group-frames.mjs';
+import { rectangleLoop } from './lasso.mjs';
 import {
   contentPointAt,
   panBy,
@@ -154,12 +156,17 @@ export const pointerMove = (
         ...gesture,
         pointers,
         dragging,
-        lasso: dragging
-          ? Arr.toPushed(
-              gesture.lasso ?? [contentPointAt(start.transform, startFirst)],
-              contentPointAt(start.transform, first),
-            )
-          : undefined,
+        lasso: !dragging
+          ? undefined
+          : start.grab.shape === 'rectangle'
+            ? rectangleLoop(
+                contentPointAt(start.transform, startFirst),
+                contentPointAt(start.transform, first),
+              )
+            : Arr.toPushed(
+                gesture.lasso ?? [contentPointAt(start.transform, startFirst)],
+                contentPointAt(start.transform, first),
+              ),
       },
       transform: undefined,
     };
@@ -275,8 +282,13 @@ export type ConnectGrab = Readonly<{
   anchor: Point;
 }>;
 
-/** The background, pressed to draw a lasso on rather than to pan. */
-export type LassoGrab = Readonly<{ kind: 'lasso' }>;
+/**
+ * The background, pressed to draw a lasso on rather than to pan: a loop
+ * drawn freehand, or a rectangle dragged out from corner to corner.
+ */
+export type LassoGrab = Readonly<{ kind: 'lasso'; shape: LassoShape }>;
+
+export type LassoShape = 'freehand' | 'rectangle';
 
 /** A press whose arrow was given up, which a move no longer drags. */
 type Cancelled = Readonly<{ kind: 'cancelled' }>;
@@ -314,7 +326,7 @@ export type Gesture = DeepReadonly<{
   connectDrag: ConnectDrag | undefined;
   /**
    * The lasso being drawn, in content coordinates: where the press went
-   * down, then every point it has moved to.
+   * down, then every point it has moved to; or a rectangle's four corners.
    */
   lasso: Point[] | undefined;
 }>;
