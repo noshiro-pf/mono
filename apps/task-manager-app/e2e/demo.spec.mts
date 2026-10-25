@@ -1558,6 +1558,43 @@ test(
   },
 );
 
+test(
+  'fits 「DAG」 between the toolbar and the buttons at the bottom',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    // Low enough that the height, not the width, decides the fit.
+    await page.setViewportSize({ width: 1280, height: 320 });
+
+    await page.goto(DEMO);
+
+    await settled(page);
+
+    const toolbarBox = await page.getByTestId('dag-toolbar').boundingBox();
+
+    const fitBox = await page.getByTestId('dag-fit').boundingBox();
+
+    const nodes = await page.getByTestId('dag-node').all();
+
+    expect.soft(nodes.length).toBeGreaterThan(0);
+
+    const boxes = await Promise.all(
+      nodes.map(async (node) => node.boundingBox()),
+    );
+
+    // Whether each node is all in sight, between the two.
+    const inView = boxes.map(
+      (box) =>
+        box !== null &&
+        toolbarBox !== null &&
+        fitBox !== null &&
+        box.y >= toolbarBox.y + toolbarBox.height &&
+        box.y + box.height <= fitBox.y,
+    );
+
+    expect.soft(inView.every((seen) => seen)).toBe(true);
+  },
+);
+
 /**
  * What 「タイル」 draws, read from the page: each task's title and place,
  * and the geometry the rows follow — the canvas's width, the left margin
