@@ -7,5 +7,5 @@
     "jsx": "react-jsx",
     "jsxImportSource": "synstate-dom"
   },
-  "include": ["./src", "./e2e", "./scripts", "./configs"]
+  "include": ["./src", "./test", "./e2e", "./scripts", "./configs"]
 }

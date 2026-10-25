@@ -10,3 +10,7 @@ words:
   - kenpo
   # 少額投資非課税制度, a sheet of the spreadsheet named in the README.
   - NISA
+  # iDeCo（個人型確定拠出年金）, in identifiers such as `idecoMonthly`.
+  - ideco
+  # The Firebase CLI's project file, named in the README.
+  - firebaserc

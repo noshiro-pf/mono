@@ -16,6 +16,7 @@ import type { FixedLengthTuple } from 'ts-type-forge';
  * reason as `app-dev-ports.mts`.
  */
 const pagesApps = {
+  'life-plan-simulator': 'life-plan-simulator',
   'pr-manager-app': 'pr-manager',
   'task-manager-app': 'task-manager',
 } as const;
