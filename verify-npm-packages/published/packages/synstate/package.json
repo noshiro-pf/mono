@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "synstate": "3.2.0"
+    "synstate": "4.1.0"
   }
 }
