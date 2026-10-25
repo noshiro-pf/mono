@@ -145,7 +145,7 @@ Each of the $K$ source updates triggers the full update pipeline:
 
 **Total per frame: $K \times O(M)$** with per-stage overhead from MobX's proxy-based tracking and reaction scheduling.
 
-SynState's push-based engine propagates through the same chain via **direct function calls** with the propagation order resolved once at construction time — no per-update graph traversal, no dynamic dependency tracking, no epoch bookkeeping.
+SynState's push-based engine propagates through the same chain via **direct function calls**, in an order set by depths resolved once at construction time — no dynamic dependency tracking, no epoch bookkeeping.
 
 | Library      | Per-update work                                | $K=500$, $M=100$ |
 | ------------ | ---------------------------------------------- | ---------------- |

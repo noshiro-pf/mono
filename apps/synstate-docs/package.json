@@ -66,6 +66,7 @@
   },
   "devDependencies": {
     "@astrojs/markdown-remark": "7.3.2",
+    "@reduxjs/toolkit": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "esbuild": "catalog:",

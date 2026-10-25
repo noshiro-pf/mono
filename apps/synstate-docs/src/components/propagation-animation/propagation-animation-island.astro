@@ -1,0 +1,16 @@
+---
+import { type Lang } from './scenario.mjs';
+import {
+  PropagationAnimation,
+  type AnimationName,
+} from './propagation-animation.jsx';
+
+type Props = Readonly<{
+  animation: AnimationName;
+  lang: Lang;
+}>;
+
+const { animation, lang } = Astro.props;
+---
+
+<PropagationAnimation animation={animation} client:only="react" lang={lang} />

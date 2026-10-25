@@ -29,6 +29,7 @@ const colors = {
   'RxJS (switchMap)': '#fca5a5',
   Jotai: '#f59e0b',
   MobX: '#8b5cf6',
+  Redux: '#14b8a6',
 } as const;
 
 const series = toColouredSeries(conditionalFanOutResults, colors);

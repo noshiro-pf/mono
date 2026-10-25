@@ -90,16 +90,9 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     ),
 
     // Scenario: Derived Chain / Diamond Dependency
-    //
-    // The first two are also the headline figures on the introduction and the
-    // landing page — see the note on the derived chain below.
     'derived-chain/updates': count(updates(derivedChain)),
     'derived-chain/jotai-over-synstate': ratio(
       median(derivedChain, 'Jotai'),
-      median(derivedChain, 'SynState'),
-    ),
-    'derived-chain/redux-over-synstate': ratio(
-      median(derivedChain, 'Redux'),
       median(derivedChain, 'SynState'),
     ),
 
@@ -121,10 +114,16 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       at(deepChain, 'MobX', DEEP_MAX),
       at(deepChain, 'SynState', DEEP_MAX),
     ),
+    'deep-chain/redux@k1000-m200': ms(at(deepChain, 'Redux', DEEP_MAX)),
+    'deep-chain/redux-over-synstate@k1000-m200': factor(
+      at(deepChain, 'Redux', DEEP_MAX),
+      at(deepChain, 'SynState', DEEP_MAX),
+    ),
     'deep-chain/synstate@k500-m100': ms(at(deepChain, 'SynState', DEEP_MID)),
     'deep-chain/rxjs@k500-m100': ms(at(deepChain, 'RxJS', DEEP_MID)),
     'deep-chain/jotai@k500-m100': ms(at(deepChain, 'Jotai', DEEP_MID)),
     'deep-chain/mobx@k500-m100': ms(at(deepChain, 'MobX', DEEP_MID)),
+    'deep-chain/redux@k500-m100': ms(at(deepChain, 'Redux', DEEP_MID)),
 
     // Scenario: Cascaded Diamond
     'cascaded-diamond/timeout': ms(timeout(cascadedDiamond)),
@@ -161,6 +160,16 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       at(cascadedDiamond, 'Jotai', CASCADED_MAX),
       at(cascadedDiamond, 'SynState', CASCADED_MAX),
     ),
+    'cascaded-diamond/redux@min-n': ms(
+      at(cascadedDiamond, 'Redux', CASCADED_MIN),
+    ),
+    'cascaded-diamond/redux@max-n': ms(
+      at(cascadedDiamond, 'Redux', CASCADED_MAX),
+    ),
+    'cascaded-diamond/redux-over-synstate@max-n': factor(
+      at(cascadedDiamond, 'Redux', CASCADED_MAX),
+      at(cascadedDiamond, 'SynState', CASCADED_MAX),
+    ),
 
     // Scenario: Conditional Fan-Out
     'fan-out/updates-math': `$K = ${count(updates(conditionalFanOut)).replace(',', '{,}')}$`,
@@ -180,6 +189,10 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       at(conditionalFanOut, 'SynState', fanOutLastLabel()),
     ),
     'fan-out/synstate-ns-per-branch-per-update': nsPerBranchPerUpdate(),
+    'fan-out/redux@min-b': ms(at(conditionalFanOut, 'Redux', FAN_OUT_MIN)),
+    'fan-out/redux@last-measured-b': ms(
+      at(conditionalFanOut, 'Redux', fanOutLastLabel()),
+    ),
     'fan-out/jotai-slower-through-b': count(param(fanOutCrossoverLabel())),
 
     // Summary: the fastest library in each scenario and how far SynState is
@@ -283,16 +296,35 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       1,
     ),
 
-    // Summary: for each library measured in every scenario, the summary row
-    // where it is furthest from that row's fastest library. Which row that is
-    // is what a re-measurement can change, so the scenario is derived too.
+    // The headline on the introduction and the landing page: SynState's worst
+    // case (the figure above) against the other libraries' worst cases. A
+    // library measured in some scenarios only is left out, since its worst
+    // case is over those alone.
+    'summary/others-worst-libraries': {
+      en: listed(otherEveryScenarioLibraries()),
+      ja: otherEveryScenarioLibraries().join('・'),
+    },
+    'summary/others-worst-over-fastest-least': factor(
+      Math.min(
+        ...otherEveryScenarioLibraries().map(
+          (library) => worstSummaryRow(library).spread,
+        ),
+      ),
+      1,
+    ),
+
+    // Summary: for each library, the summary row where it is furthest from
+    // that row's fastest library, among the rows that measured it. Which row
+    // that is is what a re-measurement can change, so the scenario is derived
+    // too; and so is the mark on a library some rows did not measure.
     ...Object.fromEntries(
-      everyScenarioLibraries().flatMap((library) => {
+      summaryLibraries().flatMap((library) => {
         const { scenario, spread } = worstSummaryRow(library);
 
         const key = library.toLowerCase();
 
         return [
+          [`summary/worst/${key}-library`, partialMarked(library)],
           [`summary/worst/${key}-scenario`, scenario.name],
           [`summary/worst/${key}-fastest`, scenario.fastest()],
           [
@@ -323,6 +355,10 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     'summary/deep-chain-mobx-growth': factor(
       at(deepChain, 'MobX', DEEP_MAX),
       at(deepChain, 'MobX', DEEP_SHALLOW),
+    ),
+    'summary/deep-chain-redux-growth': factor(
+      at(deepChain, 'Redux', DEEP_MAX),
+      at(deepChain, 'Redux', DEEP_SHALLOW),
     ),
   }) as const;
 
@@ -381,17 +417,10 @@ type StatsData = Readonly<{
 const singleState: StatsData = singleStateJson;
 
 /**
- * The derived chain, which is also where the headline "up to N× faster than
- * Jotai and M× faster than Redux" is read from.
- *
- * It carries both libraries and the simplest graph with a derived value in
- * it, so both halves of that sentence come from one measurement. Reading each
- * half from whichever scenario flatters it most — which is how the pages came
- * to say 30× and 16×, the first from the derived chain and the second from
- * the diamond — turned
- * out to be a choice noise makes: Redux's diamond median held at ~317 ms
- * across the two runs while SynState's doubled with the machine, and that
- * alone moved the wider scenario from one to the other.
+ * The derived chain. The headline on the introduction and the landing page
+ * used to be read from it ("N× faster than Jotai and M× faster than Redux");
+ * it now sets worst cases side by side instead, because one scenario chosen
+ * for its gap says more about the choice than about the libraries.
  */
 const derivedChain: StatsData = derivedChainJson;
 
@@ -836,23 +865,48 @@ const FAN_OUT_SUMMARY_FORMS: ReadonlyRecord<string, string> = {
 } as const;
 
 /**
- * The libraries every summary row measured, in the order the first row lists
- * them — the rows of the per-library table. Redux, Zustand and Valtio take part
- * in some scenarios only, and a worst case over some of them is not one.
+ * The rows of the per-library table, in the order the first summary row lists
+ * them. That row, the single state, is the one every library takes part in.
  */
-const everyScenarioLibraries = (): readonly string[] => {
-  const scenarios = summaryScenarios();
+const summaryLibraries = (): readonly string[] =>
+  summaryScenarios()[0]?.libraries ?? [];
 
-  return (scenarios[0]?.libraries ?? []).filter((library) =>
-    scenarios.every((s) => s.libraries.includes(library)),
+/**
+ * The libraries other than SynState that every summary row measured, in the
+ * per-library table's order.
+ */
+const otherEveryScenarioLibraries = (): readonly string[] =>
+  summaryLibraries().filter(
+    (library) =>
+      library !== 'SynState' &&
+      summaryScenarios().every((s) => s.libraries.includes(library)),
   );
-};
 
-/** The summary row where `library` is furthest from that row's fastest. */
+/** `a, b and c`: names joined as an English sentence lists them. */
+const listed = (names: readonly string[]): string =>
+  Arr.isMaxLengthArray(1, names)
+    ? names.join('')
+    : (`${Arr.butLast(names).join(', ')} and ${names.at(-1) ?? ''}` as const);
+
+/**
+ * A library name, with the footnote mark the page explains when some summary
+ * rows did not measure the library, so that its worst case is over the others
+ * only. Language-neutral, like {@link glitchMarked}.
+ */
+const partialMarked = (library: string): string =>
+  summaryScenarios().every((s) => s.libraries.includes(library))
+    ? library
+    : (`${library} ※3` as const);
+
+/**
+ * The summary row where `library` is furthest from that row's fastest, among
+ * the rows that measured it.
+ */
 const worstSummaryRow = (
   library: string,
 ): Readonly<{ scenario: SummaryScenario; spread: number }> => {
   const [worst] = summaryScenarios()
+    .filter((scenario) => scenario.libraries.includes(library))
     .map((scenario) => ({ scenario, spread: scenario.spread(library) }))
     .toSorted((a, b) => b.spread - a.spread);
 

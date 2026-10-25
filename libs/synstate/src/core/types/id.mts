@@ -1,3 +1,7 @@
-import type { Brand } from 'ts-type-forge';
+import type { Brand, UnknownRecord } from 'ts-type-forge';
 
-export type UpdateToken = Brand<symbol, 'update-token'>;
+/**
+ * Identifies one update. Opaque: an object issued per update, which is also
+ * that update's queue.
+ */
+export type UpdateToken = Brand<UnknownRecord, 'update-token'>;

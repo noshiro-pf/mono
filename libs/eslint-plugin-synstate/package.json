@@ -63,6 +63,7 @@
     "ts-type-forge": "workspace:~"
   },
   "devDependencies": {
+    "@typescript-eslint/parser": "catalog:",
     "@typescript-eslint/rule-tester": "catalog:",
     "dedent": "catalog:",
     "eslint-config-typed": "workspace:*",
@@ -71,6 +72,7 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
+    "synstate": "workspace:*",
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {

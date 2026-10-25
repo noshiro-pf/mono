@@ -371,6 +371,28 @@ const documents: DeepReadonly<
   {
     mdPath: path.resolve(
       workspaceRootPath,
+      'src/content/docs/internals/tracing-an-update.mdx',
+    ),
+    samplesDir: path.resolve(
+      synstateSamplesRoot,
+      'docs-site/tracing-an-update',
+    ),
+    sampleCodeFiles: ['01-traced-graph.mts', '02-nested-write.mts'],
+  },
+  {
+    mdPath: path.resolve(
+      workspaceRootPath,
+      `${jaDocsBase}/internals/tracing-an-update.mdx`,
+    ),
+    samplesDir: path.resolve(
+      synstateSamplesRoot,
+      'docs-site/tracing-an-update',
+    ),
+    sampleCodeFiles: ['01-traced-graph.mts', '02-nested-write.mts'],
+  },
+  {
+    mdPath: path.resolve(
+      workspaceRootPath,
       'src/content/docs/guides/library-comparison/benchmark.mdx',
     ),
     samplesDir: path.resolve(synstateSamplesRoot, 'docs-site/benchmark'),
@@ -398,6 +420,7 @@ const documents: DeepReadonly<
       '05-conditional-fan-out.rxjs-switch-map.mts',
       '05-conditional-fan-out.mobx.mts',
       '05-conditional-fan-out.jotai.mts',
+      '05-conditional-fan-out.redux.mts',
     ],
   },
   {
@@ -430,6 +453,7 @@ const documents: DeepReadonly<
       '05-conditional-fan-out.rxjs-switch-map.mts',
       '05-conditional-fan-out.mobx.mts',
       '05-conditional-fan-out.jotai.mts',
+      '05-conditional-fan-out.redux.mts',
     ],
   },
   {

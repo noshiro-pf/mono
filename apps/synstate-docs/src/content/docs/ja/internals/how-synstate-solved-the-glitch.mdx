@@ -6,13 +6,10 @@ sidebar:
 ---
 
 import DataTableDemo from '../../../../components/data-table-demo/data-table-demo-island.astro';
-import RxJSGlitchSlideshow from '../../../../components/svg-slideshow/rxjs-glitch-slides-island.astro';
-import SynStatePropagationOrderSlideshow from '../../../../components/svg-slideshow/synstate-propagation-order-island.astro';
-import PriorityQueueSlideshow from '../../../../components/svg-slideshow/priority-queue-slides-island.astro';
+import PropagationAnimation from '../../../../components/propagation-animation/propagation-animation-island.astro';
 import DataTableGraph from '../../../../components/dep-graph/data-table-graph-island.astro';
 import SimpleDiamondDepGraph from '../../../../components/dep-graph/simple-diamond-dep-graph-island.astro';
 import FilterDiamondDepGraph from '../../../../components/dep-graph/filter-diamond-dep-graph-island.astro';
-import SynStateUpdateTokenSlideshow from '../../../../components/svg-slideshow/synstate-update-token-island.astro';
 
 ## グリッチとは?
 
@@ -81,7 +78,7 @@ RxJS における `sum` の完全な出力シーケンスは：
 0, 10, 1010, 1020, 2020, 2030, 3030, ...
 ```
 
-<RxJSGlitchSlideshow />
+<PropagationAnimation animation="rxjs" lang="ja" />
 
 `10`、`1020`、`2030` などの値は**グリッチ**です。これらは一方の派生 Observable はすでに更新されたが、もう一方はまだ再計算されていない状態を表しています。これらの値は論理的には存在し得ないはずですが（`sum` は常に `1010` の倍数であるべき）、subscriber に発行されてしまい、不正確な UI 描画、無効な API 呼び出し、あるいは見つけにくいバグの原因となる可能性があります。
 
@@ -111,7 +108,7 @@ const multipliedBy1000 = counterObservable.pipe(map((count) => count * 1000));
 const sum = combineLatest([multipliedBy10, multipliedBy1000]).pipe(
     map(([a, b]) => a + b),
 );
-// 0, 10, 1010, 20, 2020, 30, 3030, ...
+// 0, 10, 1010, 1020, 2020, 2030, 3030, ...
 
 const result = await lastValueFrom(sum.pipe(take(7), toArray()));
 
@@ -184,7 +181,7 @@ sum (combine + map) → level 2
 
 [reactivelib/reactive](https://github.com/reactivelib/reactive) は、Scala.React の論文に直接触発された、このトポロジカル順序の伝搬を実装する TypeScript ライブラリです。
 
-<PriorityQueueSlideshow />
+<PropagationAnimation animation="priorityQueue" lang="ja" />
 
 ### 各アプローチのコスト
 
@@ -212,40 +209,50 @@ SynState は両方の問題を解決します。**$O(n)$ でのグリッチフ�
 
 ## SynState で起こること（グリッチフリー、_O(n)_）
 
-SynState の重要な洞察は、依存関係グラフのトポロジーは**静的**であるということです。Observable が構築されるときに決定され、更新の間に変化しません。これは、伝搬順序を発行のたびに再導出するのではなく、グラフの構築時に**一度だけ**計算できることを意味します。
+SynState の重要な洞察は、更新順序におけるノードの位置が、ノードを作った時点で決まることです。それがノードの**深さ**で、小さな整数です。そのため、優先度キューアプローチのキューを深さごとのバケットにでき、ノードを入れる操作も取り出す操作も $O(\log n)$ ではなく $O(1)$ になります。
 
-### 事前ソートされた伝搬順序
+### 深さごとのバケットに分けたキュー
 
 Observable が `.pipe()` またはコンビネータ（`combine`、`merge`、`zip`）を介して作成されると、SynState はその**深さ** — 任意のルートソースからの最長パスの長さ — を計算します：
 
 - **ルート Observable**： `depth = 0`.
 - **子 Observable**： `depth = 1 + max(parent depths)`.
 
-各ルート Observable は `propagationOrder` と呼ばれる配列を保持します。これはすべての子孫を**深さの昇順**で保持するもので、自身より下の深さごとに子孫の集合を 1 つずつ持ちます。子孫は構築時にその深さの集合に加わり、完了時に抜けます。ソースが発行すると、伝搬はこの配列に対するシンプルな線形走査です：
+更新は**マネージャー Observable**（後述）から始まります。マネージャーはその更新のキューを開き、自身より下の深さごとにバケットを 1 つずつ持たせます。更新の中で値を発行したノードは、マネージャーを先頭に、自分の子をそれぞれの深さのバケットに入れます。子の親がいくつ発行しても、子が入るのは 1 回の更新につき 1 回です。マネージャーはバケットを浅い順に取り出し、中のノードの `tryUpdate` を呼びます。発行したノードはその場で自分の子をより深いバケットに入れていき、最後のバケットが空になれば更新は終わりです：
 
 ```ts
 // Simplified from ManagerObservableClass
 protected startUpdate(nextValue: A): void {
-    const updateToken = issueUpdateToken();
+    // The token of the update is also its queue
+    const updateToken = openUpdate(this.depth);
 
-    this.setNext(nextValue, updateToken);
+    this.setNext(nextValue, updateToken); // queues this node's children
 
-    // propagationOrder holds one set of descendants per depth (ascending)
-    for (const descendants of this.#propagationOrder) {
-        for (const child of descendants) {
-            child.tryUpdate(updateToken);
-        }
-    }
+    drainUpdate(updateToken); // visits the buckets in ascending depth
+}
+
+// Simplified from ObservableBaseClass, which every observable extends
+protected setNext(nextValue: A, updateToken: UpdateToken): void {
+    this.#updateToken = updateToken;
+
+    this.#snapshot = Optional.some(nextValue);
+
+    // Into the bucket of each child's depth, once per update
+    enqueueChildren(this.#children, updateToken);
+
+    // ...then notify the subscribers
 }
 ```
 
-これは RxJS との重要なアーキテクチャの違いです。RxJS では、各 Observable が自身の値を更新し子に伝搬する責任を持ちます — 伝搬はグラフ全体に分散しています。SynState では、**マネージャー Observable** がすべての子孫の更新を単一のループで中央集権的に管理します。この集中管理方式が、優先度キューなしでの深さ順伝搬を可能にしています。
+これは RxJS との重要なアーキテクチャの違いです。RxJS では、各 Observable が発行したその場で子に伝搬します（深さ優先）。SynState では、発行したノードは子をキューに入れるだけで、いつ訪れるかは更新を始めた**マネージャー Observable** が単一のループで決めます。この中央のループがあるから、キューで深さ順に並べられます。
 
 SynState の Observable 型は `RootObservable`、`SyncChildObservable`、`AsyncChildObservable` です。このうち、`RootObservable` と `AsyncChildObservable` がマネージャーとして機能します。`RootObservable` はグラフのエントリーポイントであり、`AsyncChildObservable` は [`debounce`](/mono/synstate/ja/reference/debounce/) のような時間シフト演算子によって作成されます。その発行は非同期であり上流のルートによって調整できないため、自身の下流サブグラフのマネージャーとして引き継ぎます。
 
-配列は深さでソートされているため、すべての親がその子のいずれよりも先に更新されることが保証されます。これは優先度キューアプローチと同じ正確性の保証ですが、**$O(n)$ の伝搬コスト**でグラフが変わらない限り**更新ごとのアロケーションはありません**。順序付けのコストはグラフが変化したとき（加わる・抜けるノードごとに $O(1)$）に払われ、発行のたびには払われません。
+親は子より必ず浅く、バケットは浅い順に処理されるので、ノードを処理する時点で親の値はすべて確定しています。これは優先度キューアプローチと同じ保証です。更新が届いたノードはそれぞれバケットに 1 回入って 1 回出るだけで、どちらも $O(1)$ です。そのため更新のコストは、届いたノードの数について **$O(n)$** です。値を通さなかった `filter` の下のノードなど、更新が届かないノードには一切触れません。バケットは深さごとの配列で、更新から更新へ使い回します。空にするのは長さを 0 に戻すだけなので、更新ごとに確保するのはトークンだけです。
 
-<SynStatePropagationOrderSlideshow />
+<PropagationAnimation animation="synstateDiamond" lang="ja" />
+
+このアニメーションはダイヤモンドの1回の更新をたどります。チップはバケットで待っているノードです。`D` は `B` によってキューに入り、`C` からは二度目は入りません。
 
 これをダイヤモンドの例に適用すると：
 
@@ -275,7 +282,7 @@ SynState における `sum` の出力は：
 
 ### スキップされた更新の処理： 更新トークン
 
-深さ順の線形スキャンは、すべてのノードが更新される場合にグリッチを排除します。しかし、すべてのノードが毎サイクル更新されるわけではありません — `filter` や `skipIfNoChange` のような演算子は発行を**スキップ**することができます。これにより微妙な問題が生じます： 下流のノードは、親が現在のサイクルで意図的にスキップされたのか、まだ到達していないだけなのかをどう判断すればよいのでしょうか？
+深さ順に訪れることで、すべてのノードが更新される場合のグリッチはなくなります。しかし、すべてのノードが毎サイクル更新されるわけではありません — `filter` や `skipIfNoChange` のような演算子は発行を**スキップ**することができます。これにより微妙な問題が生じます： 下流のノードは、親が現在のサイクルで意図的にスキップされたのか、まだ到達していないだけなのかをどう判断すればよいのでしょうか？
 
 `D` が `filter` を適用する以下のグラフを考えてみましょう：
 
@@ -302,14 +309,14 @@ const resultC = collectToArray(C.pipe(take(7)));
 const resultE = collectToArray(E.pipe(take(4)));
 ```
 
-`A` が**偶数**の値（例： `2`）を発行すると、すべてのノードが更新されます： `B` は `20` に、`D` は `2` を通過し、`C` は `22` を発行、`E` は `20` になります。しかし `A` が**奇数**の値（例： `1`）を発行すると、`D` は述語を通過しません。そのため `D` とその子孫 `E` は更新されるべきではありませんが、`B` は `10` に更新され、`C` は `B` が変化したため再評価されるべきです。課題は、`propagationOrder` が**線形化された**リストであること — 元の親子関係は平坦化されています。マネージャーがこのリストを走査する際、各ノードはこのサイクルで自身の親が更新されたのかスキップされたのかを自力で判断する必要があります。
+`A` が**偶数**の値（例： `2`）を発行すると、すべてのノードが更新されます： `B` は `20` に、`D` は `2` を通過し、`C` は `22` を発行、`E` は `20` になります。しかし `A` が**奇数**の値（例： `1`）を発行すると、`D` は述語を通過しません。そのため `D` とその子孫 `E` は更新されるべきではありませんが、`B` は `10` に更新され、`C` は `B` が変化したため再評価されるべきです。`C` は `B` が発行した時点でキューに入るので、訪れられたときに、このサイクルで自身の親のどれが更新され、どれがスキップされたのかを自力で判断する必要があります。
 
-SynState はこれを、各更新サイクルに一意のアイデンティティ — **更新トークン** — を与えることで解決します。トークンは各サイクルの開始時に `issueUpdateToken()` で作成される `Symbol` であり、以下のようにグラフを流れます：
+SynState はこれを、各更新サイクルに一意のアイデンティティ — **更新トークン** — を与えることで解決します。トークンは各サイクルの開始時に `openUpdate()` で作成される小さなオブジェクトで、同じオブジェクトがそのサイクルのキューを持ちます。トークンは以下のようにグラフを流れます：
 
 1. マネージャーが新しいトークンを作成し、`setNext(value, token)` で自身にスタンプを押します。
-2. 同じトークンが線形スキャン中にすべての子孫の `tryUpdate(token)` に渡されます。
+2. 同じトークンが、キューから取り出されたすべてのノードの `tryUpdate(token)` に渡されます。
 3. 子が正常に更新されると、`setNext(newValue, token)` を呼び出し、現在のサイクルのトークンで自身にスタンプを押します。
-4. 子が**スキップ**した場合（例： `filter` の述語が `false` を返す）、`setNext` を呼び出し**ません** — そのため `updateToken` は**前の**サイクルのトークンのままです。
+4. 子が**スキップ**した場合（例： `filter` の述語が `false` を返す）、`setNext` を呼び出し**ません** — そのため `updateToken` は**前の**サイクルのトークンのままで、子もキューに入りません。
 
 これによりシンプルな不変条件が成立します： **ノードの `updateToken` が現在のサイクルのトークンと等しいのは、そのノードがこのサイクルで更新された場合かつその場合に限ります。** 各ノードは $O(1)$ の単一の参照比較で親のこれをチェックし、更新するかスキップするかを決定します：
 
@@ -349,9 +356,11 @@ override tryUpdate(updateToken: UpdateToken): void {
 }
 ```
 
-各ノードのスキップ/更新の判断が定数時間のトークン比較で済むため、単一の更新サイクルの全体コストは **$O(n)$**（$n$ は子孫の数）のままです。各ノードのコストは**サイクルあたり償却 $O(1)$** です。
+各ノードのスキップ/更新の判断が定数時間のトークン比較で済むため、単一の更新サイクルの全体コストは **$O(n)$**（$n$ は更新が届くノードの数）のままです。各ノードのコストは**サイクルあたり償却 $O(1)$** です。
 
-<SynStateUpdateTokenSlideshow />
+<PropagationAnimation animation="synstateFilterDiamond" lang="ja" />
+
+このアニメーションは上のグラフを `A = 1`、続いて `A = 2` で動かします。奇数の値では `D` が発行しないので `E` は一度もキューに入りません。`C` は `B` によってキューに入り、`B` だけが発行したことをトークンから知ります。
 
 ## まとめ
 
@@ -363,19 +372,21 @@ override tryUpdate(updateToken: UpdateToken): void {
 
 SynState は、依存関係グラフの2つの性質を活用して $O(n)$ でのグリッチフリー伝搬を実現しています：
 
-1. **静的トポロジー** — グラフ構造は構築時に固定されるため、伝搬順序（`propagationOrder`）を発行のたびに再導出するのではなく一度だけ事前計算できます。
-2. **更新トークン** — サイクルごとの一意のトークンにより、各ノードが $O(1)$ で自身の親が現在のサイクルに参加したかどうかを判断でき、`propagationOrder` がグラフ構造のないフラットリストであっても正しいスキップ/更新の判断が可能になります。
+1. **整数の深さ** — ノードの深さは構築時に固定されるため、キューを深さごとのバケットにでき、ヒープの $O(\log n)$ ではなく $O(1)$ で出し入れできます。
+2. **更新トークン** — サイクルごとの一意のトークンにより、各ノードが $O(1)$ で自身の親が現在のサイクルに参加したかどうかを判断でき、ある親がキューに入れたノードについて、別の親がスキップされていても正しいスキップ/更新の判断が可能になります。
 
 ### 循環依存の検出
 
-SynState の伝搬モデルは、依存関係グラフが **DAG**（有向非巡回グラフ）であることを前提としています。これをランタイムで保証するために、SynState は**構築時に循環チェック**を実行します。`.pipe()` またはコンビネータ（`combine`、`merge`、`zip`）を介して新しい Observable が作成されるたびに、祖先チェーンの深さ優先探索により、自分自身が祖先に含まれていないことを検証します。循環が検出された場合、即座にエラーがスローされます：
+SynState の伝搬モデルは、依存関係グラフが **DAG**（有向非巡回グラフ）であることを前提としています。これをランタイムで保証するために、SynState は開発環境で**構築時に循環チェック**を実行します。`.pipe()` またはコンビネータ（`combine`、`merge`、`zip`）を介して新しい Observable が作成されるたびに、祖先チェーンの深さ優先探索により、自分自身が祖先に含まれていないことを検証します。循環が検出された場合、即座にエラーがスローされます：
 
 ```
 Circular dependency detected in observable graph:
 a child observable cannot be its own ancestor.
 ```
 
-これにより、初期のグラフ構築が成功した後は、すべての後続の更新サイクルが DAG 上で動作することが保証されます — 無限ループも伝搬順序の破損もありません。
+このチェックは新しい Observable の祖先をすべてたどるので、作成のたびにコストがかかります。そのためパフォーマンスを優先し、**開発環境でのみ動かしています**。`process.env.NODE_ENV` が `'production'` のときと、ブラウザ向けバンドルのように `process` が存在しない環境ではオフです。オフにしても、通常の使い方で本番の安全性が下がるわけではありません。子の親は子より先に存在し、後から変えられないので、公開 API だけで循環を作ることはできないからです。このチェックが見つけるのは Observable の `parents` を書き換えるコードで、それは開発中やテストで見つかります。
+
+これにより、グラフが構築された後は、すべての後続の更新サイクルが DAG 上で動作することが保証されます — 無限ループはなく、どのノードにも深さが定まります。
 
 他のライブラリは循環を異なる方法で処理します：
 

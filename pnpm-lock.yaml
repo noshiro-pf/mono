@@ -2530,6 +2530,9 @@ importers:
       '@astrojs/markdown-remark':
         specifier: 7.3.2
         version: 7.3.2(supports-color@7.2.0)
+      '@reduxjs/toolkit':
+        specifier: 'catalog:'
+        version: 2.13.0(react@19.3.0)
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -3666,6 +3669,9 @@ importers:
         specifier: '>=5.0.0 <7.0.0'
         version: 6.0.3
     devDependencies:
+      '@typescript-eslint/parser':
+        specifier: 'catalog:'
+        version: 8.71.1(eslint@10.12.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
       '@typescript-eslint/rule-tester':
         specifier: 'catalog:'
         version: 8.71.1(eslint@10.12.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
@@ -3690,6 +3696,9 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.9)
+      synstate:
+        specifier: workspace:*
+        version: link:../synstate
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils

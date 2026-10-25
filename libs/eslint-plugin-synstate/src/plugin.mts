@@ -11,6 +11,7 @@ import type { ESLintFlatConfig, ESLintPlugin } from './types.mjs';
  */
 const recommendedRules = {
   'synstate/no-unbounded-counter-pipe': 'error',
+  'synstate/no-write-during-propagation': 'error',
 } as const satisfies ReadonlyRecord<
   `synstate/${keyof typeof synstateRules}`,
   'error'

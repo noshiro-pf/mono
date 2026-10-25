@@ -18,7 +18,7 @@ SynState の組み込みの observable はすべて 4 つの factory のどれ�
 
 ## 同期の operator
 
-子の factory は config と `init` コールバックを受け取ります。`init` は observable を作る途中で 1 回だけ呼ばれ、新しい observable が自分自身に使える tools を受け取って、`tryUpdate` を返します。SynState は、その observable に届く更新のたびに、更新のトークンを渡して `tryUpdate` を呼びます。
+子の factory は config と `init` コールバックを受け取ります。`init` は observable を作る途中で 1 回だけ呼ばれ、新しい observable が自分自身に使える tools を受け取って、`tryUpdate` を返します。SynState は、その observable の親が 1 つでも値を出した更新のたびに、更新のトークンを渡して `tryUpdate` を呼びます。
 
 ```ts
 import { Optional } from 'ts-data-forge';
@@ -87,7 +87,7 @@ createSyncChildObservable(
 
 | Hook            | 意味                                                                                                         |
 | :-------------- | :----------------------------------------------------------------------------------------------------------- |
-| `tryUpdate`     | その observable に届く更新のたびに、更新のトークンを渡して呼ばれる                                           |
+| `tryUpdate`     | 親が 1 つでも値を出した更新のたびに、更新のトークンを渡して呼ばれる                                          |
 | `canEmitNoMore` | 親が完了したときに呼ばれる。`true` を返すと、生きている親が残っていてもこの observable を完了させる（`zip`） |
 | `flush`         | 非同期の子のみ。完了する前に保留中の値を `startUpdate` で流す。`dispose` では呼ばれない                      |
 

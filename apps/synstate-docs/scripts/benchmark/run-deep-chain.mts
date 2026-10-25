@@ -97,6 +97,11 @@ const entries: readonly AdapterEntry[] = [
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, total-functions/no-unsafe-type-assertion
     createAdapter: adapters.createMobXThroughputAdapter as () => Adapter,
   },
+  {
+    label: 'Redux',
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, total-functions/no-unsafe-type-assertion
+    createAdapter: adapters.createReduxThroughputAdapter as () => Adapter,
+  },
 ] as const;
 
 const median = (sorted: readonly number[]): number => {
