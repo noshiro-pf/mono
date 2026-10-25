@@ -1506,10 +1506,10 @@ test(
 );
 
 test(
-  '「全体表示」 shows the whole arc diagram, not only its top',
+  'opens the arc diagram whole, and 「等倍表示」 toggles it to its natural size',
   { tag: '@smoke' },
   async ({ page }) => {
-    // Too low for the column at the scale 「アーク」 is first shown at.
+    // Too low for the column at its natural size.
     await page.setViewportSize({ width: 1000, height: 360 });
 
     await page.goto(DEMO);
@@ -1522,11 +1522,12 @@ test(
 
     const toolbarBox = await page.getByTestId('dag-toolbar').boundingBox();
 
-    // Whether each task is all in sight, between the toolbar and the bottom.
-    const inView = async (): Promise<readonly boolean[]> => {
+    // How many of the nodes are each all in sight, between the toolbar and
+    // the bottom: all of them, some, or none.
+    const inView = async (): Promise<'all' | 'some' | 'none'> => {
       const nodes = await page.getByTestId('dag-node').all();
 
-      return Promise.all(
+      const seen = await Promise.all(
         nodes.map(async (node) => {
           const box = await node.boundingBox();
 
@@ -1539,59 +1540,47 @@ test(
           );
         }),
       );
+
+      return seen.every((each) => each)
+        ? 'all'
+        : seen.includes(true)
+          ? 'some'
+          : 'none';
     };
 
-    // The top of the column, the rest to be panned down to.
-    const before = await inView();
+    const fitButton = page.getByTestId('dag-fit');
 
-    expect.soft(before.includes(false)).toBe(true);
+    // The whole column, as it is opened.
+    await expect.poll(inView).toBe('all');
 
-    await page.getByTestId('dag-fit').click();
+    await expect.soft(fitButton).toHaveText('等倍表示');
 
-    await expect
-      .poll(async () => {
-        const after = await inView();
+    // Its natural size: the top of the column, the rest to be panned to.
+    await fitButton.click();
 
-        return after.every((seen) => seen);
-      })
-      .toBe(true);
-  },
-);
+    await expect.poll(inView).toBe('some');
 
-test(
-  'fits 「DAG」 between the toolbar and the buttons at the bottom',
-  { tag: '@smoke' },
-  async ({ page }) => {
-    // Low enough that the height, not the width, decides the fit.
-    await page.setViewportSize({ width: 1280, height: 320 });
+    await expect.soft(fitButton).toHaveText('全体表示');
 
-    await page.goto(DEMO);
+    // And back.
+    await fitButton.click();
 
-    await settled(page);
+    await expect.poll(inView).toBe('all');
 
-    const toolbarBox = await page.getByTestId('dag-toolbar').boundingBox();
+    await expect.soft(fitButton).toHaveText('等倍表示');
 
-    const fitBox = await page.getByTestId('dag-fit').boundingBox();
+    // Another mode, and back, shows it whole again.
+    await fitButton.click();
 
-    const nodes = await page.getByTestId('dag-node').all();
+    await showMode(page, 'dag');
 
-    expect.soft(nodes.length).toBeGreaterThan(0);
+    await expect.soft(fitButton).toHaveText('全体表示');
 
-    const boxes = await Promise.all(
-      nodes.map(async (node) => node.boundingBox()),
-    );
+    await showMode(page, 'arc');
 
-    // Whether each node is all in sight, between the two.
-    const inView = boxes.map(
-      (box) =>
-        box !== null &&
-        toolbarBox !== null &&
-        fitBox !== null &&
-        box.y >= toolbarBox.y + toolbarBox.height &&
-        box.y + box.height <= fitBox.y,
-    );
+    await expect.poll(inView).toBe('all');
 
-    expect.soft(inView.every((seen) => seen)).toBe(true);
+    await expect.soft(fitButton).toHaveText('等倍表示');
   },
 );
 

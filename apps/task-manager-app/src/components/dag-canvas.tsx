@@ -10,6 +10,7 @@ import { constant, For, If, MatchOptional, view, type JSX } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
+  actualSizeTopTransform,
   anchoredTileScroll,
   cancelConnect,
   clampTileScroll,
@@ -18,7 +19,6 @@ import {
   dropTarget,
   dropTargetAt,
   fitBelowTransform,
-  fitWidthTopTransform,
   groupIdOfKey,
   groupKey,
   IDLE_GESTURE,
@@ -155,9 +155,11 @@ type Props = Readonly<{
  * and do not move: a press on one pans as one on the background does, and a
  * tap still opens it. Pointing at a node, or focusing it, brings its arcs
  * and the nodes at their other ends forward and dims the rest
- * (`dag/arc-highlight.mts`). The view fits the width and starts at the top,
- * below the toolbar, and is read by panning; 「全体表示」 shows the whole
- * column instead.
+ * (`dag/arc-highlight.mts`). The view shows the whole column, between the
+ * toolbar and the buttons at the bottom, however small that makes it; the
+ * button there, 「等倍表示」, puts it at its natural size from the top, below
+ * the toolbar, to be read by panning, and then reads 「全体表示」 to go back.
+ * Changing mode shows the whole column again.
  *
  * In 「タイル」 the tasks are in rows across the canvas
  * (`dagLayoutStore.tileNodes`), with no edges, at zoom 1, and the view is
@@ -222,6 +224,14 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
   const [viewFrom$, setViewFrom] = createState<ViewTransform | undefined>(
     undefined,
   );
+
+  // How 「アーク」 is fitted: the whole column, as it is first shown, or at
+  // its natural size from the top, to be panned down.
+  const [
+    arcZoom$,
+    setArcZoom,
+    { updateState: updateArcZoom, getSnapshot: getArcZoom },
+  ] = createState<ArcZoom>('whole');
 
   // The node of the canvas the reader is pointing at — under the pointer,
   // or failing that, the one with the keyboard focus — for the arc
@@ -347,13 +357,18 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
 
         break;
 
-      case 'width':
+      case 'column':
         setTransform(
-          fitWidthTopTransform(target.bounds, size, {
-            padding: FIT_PADDING,
-            topInset: topInset(),
-            minScale: ARC_MIN_SCALE,
-          }),
+          getArcZoom() === 'whole'
+            ? fitBelowTransform(target.bounds, size, {
+                padding: FIT_PADDING,
+                topInset: topInset(),
+                bottomInset: bottomInset(),
+              })
+            : actualSizeTopTransform(target.bounds, size, {
+                padding: FIT_PADDING,
+                topInset: topInset(),
+              }),
         );
 
         break;
@@ -367,32 +382,14 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     }
   };
 
-  // 「全体表示」: all of it in sight. 「アーク」 is otherwise fitted by its
-  // width, which leaves a long column to be panned down; the button shows
-  // the whole column, between the toolbar and the buttons at the bottom,
-  // however small that makes it.
-  const fitAll = (): void => {
-    const element = mut_elements.wrapper;
-
-    const target = scene.fitTarget.getSnapshot().value;
-
-    if (element === undefined || target.kind !== 'width') {
-      fit();
-
-      return;
+  // The button under the canvas: 「全体表示」, or in 「アーク」 the other
+  // of the whole column and its natural size.
+  const pressFit = (): void => {
+    if (mode.getSnapshot().value === 'arc') {
+      updateArcZoom(otherArcZoom);
     }
 
-    setTransform(
-      fitBelowTransform(
-        target.bounds,
-        { width: element.clientWidth, height: element.clientHeight },
-        {
-          padding: FIT_PADDING,
-          topInset: topInset(),
-          bottomInset: bottomInset(),
-        },
-      ),
-    );
+    fit();
   };
 
   const zoomBy = (factor: number): void => {
@@ -543,6 +540,10 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
 
         const asked =
           mut_fitted.mode !== currentMode || mut_fitted.requests !== requests;
+
+        if (mut_fitted.mode !== currentMode) {
+          setArcZoom('whole');
+        }
 
         mut_fitted.mode = currentMode;
 
@@ -1254,9 +1255,11 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
           class={constant('bp6-button')}
           data-e2e={constant('dag-fit')}
           type={constant('button')}
-          onClick={fitAll}
+          onClick={pressFit}
         >
-          {constant('全体表示')}
+          {view(combine([mode, arcZoom$]), ([current, zoom]) =>
+            current === 'arc' && zoom === 'whole' ? '等倍表示' : '全体表示',
+          )}
         </button>
       </div>
     </figure>
@@ -1267,11 +1270,10 @@ const INITIAL: ViewTransform = { x: 0, y: 0, scale: 1 } as const;
 
 const FIT_PADDING = 16;
 
-/**
- * The least scale 「アーク」 is fitted at: a long column is panned down
- * rather than shrunk out of reading.
- */
-const ARC_MIN_SCALE = 0.5;
+type ArcZoom = 'whole' | 'actual';
+
+const otherArcZoom = (zoom: ArcZoom): ArcZoom =>
+  zoom === 'whole' ? 'actual' : 'whole';
 
 /** Between the toolbar, or the buttons at the bottom, and what is fitted. */
 const TOOLBAR_CLEARANCE = 8;

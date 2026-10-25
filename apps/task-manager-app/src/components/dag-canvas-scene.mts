@@ -630,7 +630,7 @@ export const createDagCanvasScene = ({
     map(([current, placedNodes, settled, arc, arcList]): FitTarget =>
       current === 'arc'
         ? {
-            kind: 'width',
+            kind: 'column',
             bounds: arcContentBounds(arc, arcList, GRAPH_MARGIN),
           }
         : current === 'tile'
@@ -753,9 +753,9 @@ export type ConnectOverlayState = Readonly<{
 /** The node an arrow is about to be dropped on, and whether it is refused. */
 export type ConnectTarget = Readonly<{ node: LaidOutNode; refused: boolean }>;
 
-/** What `fit` shows: all of it, its width from the top, or the top. */
+/** What `fit` shows: all of it, the arc diagram's column, or the top. */
 export type FitTarget = Readonly<
-  { kind: 'whole' | 'width'; bounds: Bounds } | { kind: 'top' }
+  { kind: 'whole' | 'column'; bounds: Bounds } | { kind: 'top' }
 >;
 
 /**

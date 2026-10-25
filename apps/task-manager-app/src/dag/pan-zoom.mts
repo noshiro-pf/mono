@@ -117,34 +117,28 @@ export const fitBelowTransform = (
 };
 
 /**
- * `bounds` as wide as the view less `padding` on each side, and no larger
- * than its natural size, with its top `topInset` below the view's: for content
- * that is long rather than wide, such as the arc diagram's column, which is
- * read by panning down it. Never smaller than `minScale`, so that a long
- * column is not shrunk out of reading; content still too wide at that scale
- * starts at the left, for the rest to be panned to.
+ * `bounds` at its natural size, with its top `topInset` below the view's:
+ * for content that is long rather than wide, such as the arc diagram's
+ * column, read by panning down it. Centred if it is no wider than the view
+ * less `padding` on each side; otherwise it starts at the left, for the rest
+ * to be panned to.
  */
-export const fitWidthTopTransform = (
+export const actualSizeTopTransform = (
   bounds: Point & Size,
   view: Size,
-  options: Readonly<{ padding: number; topInset: number; minScale: number }>,
+  options: Readonly<{ padding: number; topInset: number }>,
 ): ViewTransform => {
-  const { padding, topInset, minScale } = options;
+  const { padding, topInset } = options;
 
-  const available = view.width - 2 * padding;
-
-  const scale = clampScale(
-    Math.max(minScale, Math.min(1, ratioOf(available, bounds.width, 1))),
-  );
-
-  const width = bounds.width * scale;
-
-  const left = width <= available ? (view.width - width) / 2 : padding;
+  const left =
+    bounds.width <= view.width - 2 * padding
+      ? (view.width - bounds.width) / 2
+      : padding;
 
   return {
-    x: left - bounds.x * scale,
-    y: topInset - bounds.y * scale,
-    scale,
+    x: left - bounds.x,
+    y: topInset - bounds.y,
+    scale: 1,
   };
 };
 
