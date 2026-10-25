@@ -771,7 +771,8 @@ fieldset {
   }
 }
 
-/* The lasso being drawn, and the canvas while 「なげなわ」 is on. */
+/* The lasso or rectangle being drawn, and the canvas while 「なげなわ」 or
+   「矩形選択」 is on. */
 .dag-lasso {
   fill: rgb(45 114 210 / 8%);
   stroke: var(--focus);

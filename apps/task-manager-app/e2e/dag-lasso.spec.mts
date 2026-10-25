@@ -155,6 +155,71 @@ test(
   },
 );
 
+test(
+  'selects the nodes inside a rectangle dragged out with 矩形選択 on, which turns なげなわ off',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await showDag(page);
+
+    const lassoTool = page.getByTestId('dag-lasso-tool');
+
+    const tool = page.getByTestId('dag-rectangle-tool');
+
+    await lassoTool.click();
+
+    await tool.click();
+
+    await expect.soft(tool).toHaveAttribute('aria-pressed', 'true');
+
+    await expect.soft(lassoTool).toHaveAttribute('aria-pressed', 'false');
+
+    const design = dagNode(page, /画面設計/u);
+
+    const api = dagNode(page, /API を実装する/u);
+
+    const designBefore = await centreOf(design);
+
+    const apiBefore = await centreOf(api);
+
+    // A straight drag from the background below left of both, as `lasso`
+    // starts, to above right of their centres.
+    const xs = [designBefore.x, apiBefore.x];
+
+    const ys = [designBefore.y, apiBefore.y];
+
+    await page.mouse.move(Math.min(...xs) - 92, Math.max(...ys) + 52);
+
+    await page.mouse.down();
+
+    await page.mouse.move(Math.max(...xs) + 12, Math.min(...ys) - 12, {
+      steps: 10,
+    });
+
+    await expect.soft(page.getByTestId('dag-lasso')).toBeVisible();
+
+    await page.mouse.up();
+
+    await expect
+      .soft(page.getByTestId('dag-selection-count'))
+      .toHaveText('2 件を選択中');
+
+    await expect.soft(design).toHaveAttribute('data-selected', 'true');
+
+    await expect.soft(api).toHaveAttribute('data-selected', 'true');
+
+    await expect
+      .soft(dagNode(page, /画面を実装する/u))
+      .toHaveAttribute('data-selected', 'false');
+
+    // The view did not pan.
+    expect.soft(await centreOf(design)).toStrictEqual(designBefore);
+
+    await tool.click();
+
+    await expect.soft(tool).toHaveAttribute('aria-pressed', 'false');
+  },
+);
+
 const showDag = async (page: DeepReadonly<Page>): Promise<void> => {
   await page.goto(DEMO);
 
