@@ -1537,6 +1537,9 @@ importers:
 
   apps/life-plan-simulator:
     dependencies:
+      firebase:
+        specifier: ^12.19.0
+        version: 12.19.0
       synstate:
         specifier: workspace:*
         version: link:../../libs/synstate
@@ -1546,7 +1549,13 @@ importers:
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
+      ts-fortress:
+        specifier: workspace:*
+        version: link:../../libs/ts-fortress
     devDependencies:
+      '@firebase/rules-unit-testing':
+        specifier: ^5.0.2
+        version: 5.0.2(firebase@12.19.0)
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.64.0
@@ -1577,6 +1586,9 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.9)
+      ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-type-forge
       tsx:
         specifier: 'catalog:'
         version: 4.23.15

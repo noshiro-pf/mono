@@ -15,3 +15,20 @@ export const formatYen = (amount: number): string =>
   `${yenFormat.format(Math.round(amount))} 円` as const;
 
 const yenFormat = new Intl.NumberFormat('ja-JP');
+
+/** 円単位に四捨五入して桁区切りを付ける（単位なし、表のセル用）。 */
+export const formatAmount = (amount: number): string =>
+  yenFormat.format(Math.round(amount));
+
+/** 割合を % で表示する。 */
+export const formatPercent = (ratio: number, fractionDigits = 2): string =>
+  `${(ratio * 100).toFixed(fractionDigits)}%` as const;
+
+/**
+ * 数値を入力欄に出す文字列にする。`0.0007 * 100` のような浮動小数の誤差は
+ * 12 桁で丸める。
+ */
+export const numberToInput = (value: number): string =>
+  String(
+    Result.unwrapOkOr(Num.safeParseFloat(value.toPrecision(12)), Number.NaN),
+  );

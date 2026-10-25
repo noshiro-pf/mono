@@ -1,45 +1,108 @@
-<!-- cspell:ignore kyoukai kenpo -->
-
 # life-plan-simulator
 
 Google スプレッドシートで作っている収支シミュレーターを、
 [synstate-dom](../../libs/synstate-dom) の SPA にしていくためのアプリ。
 
-いまは雛形で、画面にあるのは住宅ローンの入力と返済額の要約だけ。
+スプレッドシートの各シートをタブにしている。画面で編集できるのは入力値だけで、
+計算で導出される値（手取り・税金・評価額・残高など）は表示のみなので、計算式を
+壊すことがない。
+
+公開先: <https://noshiro-pf.github.io/mono/life-plan-simulator/>（`main` への push で
+`deploy-pages.yml` が載せる）
+
+Google アカウントでサインインし、入力値は「プラン」ごとに Cloud Firestore へ自動で
+保存する。プランはいくつでも作れ、ヘッダーで切り替え・作成・複製・名前の変更・削除が
+できる。「保存・読み込み」タブでは、開いているプランの入力値を JSON ファイルに
+書き出したり読み込んだりできる。仕組みは [task-manager-app](../task-manager-app) と
+同じ:
+
+- サインインは Firebase Auth の Google サインインで、ポップアップで行う（ページと
+  認証ドメインが別のため、リダイレクト方式は Safari のストレージ分離で失敗する）。
+- Firestore はオフラインキャッシュ（IndexedDB）を使い、オフライン中の変更は
+  接続が戻ったときに送る。
+- サインアウトすると端末内のキャッシュを消す。オフライン中の変更が送れていなければ
+  サインアウトせずに知らせ、変更を破棄してサインアウトするか選べる。
+- 開いているプランの id だけをブラウザの localStorage に残し、次に開いたときに
+  同じプランを開く。
 
 ## 構成
 
-- `src/domain/housing-loan/` — 元利均等返済の返済スケジュール計算。金利が毎月
-  上がっていき上限で頭打ちになるシナリオに対応する。
-  `experimental/life-plan-simulator` から移したもので、テストの期待値は元の
-  スプレッドシートの値。
-- `src/data/` — 協会けんぽの保険料額表（東京都、令和 6 年 3 月分〜）。社会保険料の
-  計算に使う予定で、まだ画面からは参照していない。表の作り方の記録は
-  `experimental/life-plan-simulator/` に残してある。
+- `src/domain/` — 計算。シートごとにモジュールを分けている。
+    - `input/` — 入力値の型と既定値（`ts-fortress` のスキーマ）。保存した値は
+      `SimulationInput.fill` で欠けた値を既定値で補って読み込む。
+    - `salary/` — `年収` シート。月給・賞与から健康保険料・厚生年金保険料・
+      雇用保険料・所得税・住民税を引いた手取り。
+    - `pension/` — `年金受給額` シート。受給開始年齢ごとの受給額・手取りと損益分岐。
+    - `investment/` — `積立NISA` / `投信（課税枠）` シート。
+    - `defined-contribution/` — `確定拠出型年金` シート。
+    - `housing-loan/` — `住宅ローン` シート。返済スケジュールと住宅ローン控除。
+      返済スケジュールの計算は `experimental/life-plan-simulator` から移したもの。
+    - `cash-flow/` — `収支` シート。上のすべてをまとめて月ごとの収支と現預金の
+      残高を求め、`収支グラフ` シートの判定（現預金が 0 / 下限を下回る月が無いか
+      など）を行う。
+    - `tax/`, `year-month/` — 税金・保険料の表引きと、年月の扱い。
+- `src/data/` — `data_` で始まるシートの表と、制度で決まっている率や額
+  （`system-parameters.mts`）。v1 ではハードコードしていて、制度が改定されたら
+  ここを直す。協会けんぽの保険料額表は東京都、令和 6 年 3 月分〜。
+- `src/repository/` — プランの型と文書の変換、保存先のインターフェース
+  （`PlanRepository`）、テストとデモ用のメモリ上の実装。
+- `src/firebase/` — Firebase Auth と Firestore の実装。`src/api/` — Firestore の
+  読み書きのすべて（書き込む文書をスキーマで刈り込む。ほかのディレクトリからは
+  `eslint.config.mts` で読み書きを禁じている）。
+- `src/store/` — セッション（サインイン・サインアウト）、プランの一覧と開いている
+  プラン、その入力値と計算結果。
 - `src/components/` — 画面。`src/utils/` — 入力値の変換と金額の表示。
+  `src/view-model/` — エミュレータの接続先やサインインのエラー文言など。
 
-## スプレッドシートとの対応
+## スプレッドシートとの違い
 
-元のスプレッドシートは月を 1 行とした表（2026 年から約 70 年分）で、シートごとに
-次のモジュールへ移していく予定。実際の収入・資産額・生年月日といった個人の値は
-このリポジトリ（公開）には入れず、画面の入力値として扱う。
+計算はスプレッドシートの式をそのまま移している。実際の値で計算結果を突き合わせて、
+次の点だけが違うことを確かめた。
 
-v1 はスプレッドシートとほぼ同等の機能を目指す。スプレッドシートを置き換える一番の
-理由は計算式を壊さないことなので、計算で導出される値は画面では入力できない表示に
-する。`data_` で始まるシートの表は v1 ではハードコードし、設定画面から変えられる
-ようにするのはその後。
+- スプレッドシートで手入力されていた最初の数か月の値（社会保険料・住民税など）も
+  年収の推移から計算する。住民税は 12 か月前の月給から求める。
+- 住宅ローンの返済額は返済開始月から計上する（スプレッドシートでは `収支` シートの
+  参照先の行がずれていた）。
+- 厚生年金保険料は報酬月額の範囲で等級を引く（スプレッドシートは標準報酬月額の
+  列で引いていた）。
+- 年金の住民税の基礎控除と均等割を円単位で計算する（スプレッドシートは 43 円・
+  0.5 円になっていた）。所得税と退職所得の所得税は速算表で計算する。
+- 給与の源泉徴収税額は月額表の 740,000 円以上の部分も式で計算する。
+- 積立 NISA・確定拠出年金の初期値は「開始月の投資の前の評価額」として扱う。
+- 何年かおきの支出は「初回の年月から間隔ごと」に出る（スプレッドシートは 2027 年
+  1 月を基準にした年に出ていた）。
+- 確定拠出年金の掛金は `年収` シートの企業型 DC と iDeCo の掛金から求め、二重に
+  入力しないようにした。
 
-| シート                               | 中身                                                                                                     | 移し先（予定）                           |
-| :----------------------------------- | :------------------------------------------------------------------------------------------------------- | :--------------------------------------- |
-| 収支                                 | 月ごとの収入合計・支出合計・資産運用・現預金残高。現預金が 0 未満 / 200 万円未満になる月が無いかの判定   | `src/domain/cash-flow/`                  |
-| 収支グラフ                           | 退職年齢・年金受給開始年齢・確定拠出年金の一括受給年齢・生活費の物価上昇率・運用利回りなどの前提とグラフ | 入力フォームとグラフ                     |
-| 年収                                 | 額面の月給・賞与から健康保険料・厚生年金保険料・雇用保険料・所得税・住民税を引いた手取り                 | `src/domain/salary/`                     |
-| 年金受給額                           | 受給開始年齢ごとの受給額、公的年金等控除、手取り、損益分岐年齢                                           | `src/domain/pension/`                    |
-| 積立 NISA / 投信（課税枠）           | 定期投資額・取り崩し額・評価額・元金と利益の割合、生涯投資枠                                             | `src/domain/investment/`                 |
-| 確定拠出型年金                       | 拠出額・評価額・受取額（一括 / 分割）                                                                    | `src/domain/defined-contribution/`       |
-| 住宅ローン                           | 返済スケジュールと住宅ローン控除                                                                         | `src/domain/housing-loan/`（計算は済み） |
-| 日常生活費                           | 費目ごとの月額                                                                                           | 入力フォーム                             |
-| data\_協会けんぽ保険料額表 ほか 3 つ | 健康保険・厚生年金の保険料額表、給与・賞与の源泉徴収税額表                                               | `src/data/`（協会けんぽの表は済み）      |
+実際の収入・資産額・生年月日といった個人の値はこのリポジトリ（公開）には入れず、
+既定値は一般的な例にしている。
+
+## データ構造
+
+```text
+users/{uid}/plans/{planId}   { name, createdAt, updatedAt, input }
+```
+
+- `input` は `SimulationInput` そのもの（`src/domain/input/`）。読み込むときに
+  `SimulationInput.fill` で欠けた値を既定値で補うので、入力項目を増やしても
+  古いプランはそのまま開ける。
+- 自分の `users/{uid}/plans` だけを読み書きでき、ほかは拒む（`firestore.rules`）。
+  `users/{uid}` の文書そのものは作らない。
+- 初回のサインインではプランが無く、「新しいプラン」で既定値のプランを作る。
+
+## Firebase の手作業
+
+Firebase プロジェクトは `life-plan-simulator-9eab3`（`.firebaserc`）。次はリポジトリの
+CI では行われないので、オーナーが手で行う。
+
+1. **ログインプロバイダ**: Authentication → ログイン方法で Google を有効にする。
+   `firestore.rules` も Google でサインインしたトークンしか受け付けない。
+2. **承認済みドメイン**: Authentication → 設定 → 承認済みドメインに `localhost` と
+   `noshiro-pf.github.io` を入れる。
+3. **セキュリティルールのデプロイ**: Firestore を作り、`pnpm run test:rules` が
+   通ることを確かめてから、このディレクトリで
+   `firebase deploy --only firestore:rules`。`firestore.rules` を変更しただけでは
+   反映されない。`firebase-tools` は依存に入れていないので、手元に入れて使う。
 
 ## Run
 
@@ -58,4 +121,45 @@ cd apps/life-plan-simulator
 pnpm run dev
 ```
 
-It listens on <http://localhost:5197> (`tools/configs/app-dev-ports.mts`).
+It listens on <http://localhost:5197/mono/life-plan-simulator/>
+(`tools/configs/app-dev-ports.mts`).
+
+### Emulators
+
+The dev server connects to local Firebase emulators (Authentication and
+Firestore), not to a real project. Start them first, in this directory:
+
+```sh
+firebase emulators:start   # needs firebase-tools and Java 21 or later
+```
+
+| Emulator       | Port |
+| :------------- | :--- |
+| Authentication | 9299 |
+| Firestore      | 8280 |
+| UI             | 4200 |
+
+The ports are in `firebase.json`, which the app reads too; they do not clash
+with task-manager-app's or event-schedule-app's emulators. Sign in through the
+Auth emulator's popup with a made-up account. To use the real project instead,
+set `VITE_FIREBASE_EMULATORS` to anything but `true` (in an untracked
+`.env.development.local`, or on the command line); a production build never
+connects to the emulators.
+
+### Demo mode
+
+`?storage=memory` runs the dev server without signing in, on one plan of the
+default inputs held in memory (a reload starts over):
+<http://localhost:5197/mono/life-plan-simulator/?storage=memory>. The e2e tests use it. It is behind
+`import.meta.env.DEV`, so a production build does not contain it.
+
+### Rules tests
+
+`pnpm run test:rules` loads `firestore.rules` into the Firestore emulator and
+runs `test/` against it with `@firebase/rules-unit-testing`: a user reads and
+writes their own plans, in the shape the rules allow, and nothing else; other
+users, signed-out access, tokens from providers other than Google and every
+other path are refused. `emulators:exec` starts and stops the emulator, so stop
+a running `firebase emulators:start` first. It needs Java 21 or later and is
+not a `check:` script, because no CI runner has Java and the emulator. Run it by
+hand before deploying a change to `firestore.rules`.

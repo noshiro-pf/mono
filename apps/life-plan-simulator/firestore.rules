@@ -1,0 +1,38 @@
+rules_version = '2';
+
+// Deployed by hand: `firebase deploy --only firestore:rules` from this
+// directory (see README.md). Editing this file changes nothing until then.
+//
+// Layout:
+//   users/{uid}/plans/{planId}   { name, createdAt, updatedAt, input }
+//
+// Each user has any number of plans, and nobody else can see them. The
+// rules decide who may touch a plan and which fields it has; what the fields
+// hold is checked by the app when it reads them
+// (`src/repository/plan-doc.mts`), and the rules are deployed by hand, so
+// they may lag behind the app.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Google is the only provider the app offers (README: Firebase の手作業).
+    // A token from any other provider — enabled in the console by mistake,
+    // or used straight against the Auth REST API with the public config —
+    // grants nothing.
+    function isOwner(uid) {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.uid == uid;
+    }
+
+    match /users/{uid}/plans/{planId} {
+      allow read, delete: if isOwner(uid);
+
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['name', 'createdAt', 'updatedAt', 'input'])
+        && request.resource.data.name is string
+        && request.resource.data.input is map;
+    }
+
+    // Everything else — `users/{uid}` itself, another user's plans, any
+    // other collection — is denied.
+  }
+}

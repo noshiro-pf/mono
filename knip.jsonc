@@ -668,7 +668,8 @@
     },
 
     // Not an Astro site like the entry above assumes: a Vite synstate-dom app
-    // whose entry is the module `index.html` loads.
+    // whose entry is the module `index.html` loads. `src/demo/` and
+    // `src/firebase/` are reached from it through dynamic imports.
     "apps/life-plan-simulator": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],

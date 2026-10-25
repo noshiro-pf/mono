@@ -29,6 +29,7 @@
     "gen:index:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --min-depth 1",
     "preview": "vite preview --config ./configs/vite.config.mts",
     "test": "pnpm run check:test",
+    "test:rules": "pnpm dlx firebase-tools@15 emulators:exec --only firestore --project demo-life-plan-simulator \"vitest --config ./configs/vitest.rules.config.mts run\"",
     "watch:test": "vitest --config ./configs/vitest.config.mts watch",
     "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
     "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
@@ -36,11 +37,14 @@
     "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
   },
   "dependencies": {
+    "firebase": "^12.19.0",
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
-    "ts-data-forge": "workspace:*"
+    "ts-data-forge": "workspace:*",
+    "ts-fortress": "workspace:*"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@playwright/test": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "eslint": "catalog:",
@@ -51,6 +55,7 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
+    "ts-type-forge": "workspace:*",
     "tsx": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
