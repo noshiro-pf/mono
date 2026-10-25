@@ -22,6 +22,7 @@ import {
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
+import type { ApiContext } from '../../lib/github-api.mjs';
 import { log } from '../../lib/log.mjs';
 import {
   listRequiredChecks,
@@ -64,11 +65,12 @@ import {
  * computing a merge state (`UNKNOWN`) for one that matters.
  */
 export const survey = async (
+  api: ApiContext,
   defaultBranch: string,
 ): Promise<Result<Survey, string>> => {
   let mut_attempt = 0;
 
-  let mut_listed = await listPullRequests();
+  let mut_listed = await listPullRequests(api);
 
   while (
     Result.isOk(mut_listed) &&
@@ -87,7 +89,7 @@ export const survey = async (
 
     await pause(UNKNOWN_STATE_RETRY_MS);
 
-    mut_listed = await listPullRequests();
+    mut_listed = await listPullRequests(api);
   }
 
   if (Result.isErr(mut_listed)) {
@@ -100,7 +102,7 @@ export const survey = async (
     return baseSha;
   }
 
-  const rules = await readRules(defaultBranch);
+  const rules = await readRules(api, defaultBranch);
 
   return Result.ok({
     pullRequests: mut_listed.value,
@@ -118,7 +120,7 @@ export const survey = async (
  *
  * The required contexts are what let "green" mean the whole list rather than
  * the part of it that has reported. A required context with no check run on the
- * head commit is not pending in `gh pr checks` — it is absent from it — so a
+ * head commit is not pending in the head's checks — it is absent from them — so a
  * pull request three minutes into a twenty-five minute matrix looks finished
  * without them. The review rules are what `pr-report-core`'s `review-hold.mts`
  * asks about.
@@ -126,8 +128,11 @@ export const survey = async (
  * Rules that cannot be read require nothing: the watch falls back to judging
  * by what has reported, on a longer leash, and no review holds anything.
  */
-const readRules = async (branch: string): Promise<RulesetRequirements> => {
-  const rules = await readBranchRules(branch);
+const readRules = async (
+  api: ApiContext,
+  branch: string,
+): Promise<RulesetRequirements> => {
+  const rules = await readBranchRules(api, branch);
 
   if (Result.isErr(rules)) {
     log(
@@ -145,6 +150,7 @@ const readRules = async (branch: string): Promise<RulesetRequirements> => {
 };
 
 export const triage = async (
+  api: ApiContext,
   pullRequests: readonly PullRequest[],
   base: TriageBase,
 ): Promise<Triage> => {
@@ -193,10 +199,11 @@ export const triage = async (
   const context: TriageContext = { ...base, ...graph, owners } as const;
 
   const beforeReview = await Promise.all(
-    sorted.map(async (pr) => ({ pr, ...(await settle(pr, context)) })),
+    sorted.map(async (pr) => ({ pr, ...(await settle(api, pr, context)) })),
   );
 
   const holds = await readReviewHolds(
+    api,
     beforeReview.filter(({ pr, standing }) =>
       asksReview(standing, pr.mergeStateStatus),
     ),
@@ -282,7 +289,7 @@ export const triage = async (
   };
 };
 
-/** What `queueStanding` decides from, as `gh` returned it. */
+/** What `queueStanding` decides from, as GitHub returned it. */
 const factsOf = (pr: PullRequest): QueueFacts =>
   ({
     number: pr.number,
@@ -309,6 +316,7 @@ type Settled = Readonly<{
  * only that, since each read is a request — until it can say.
  */
 const settle = async (
+  api: ApiContext,
   pr: PullRequest,
   context: TriageContext,
   reads: QueueReads = {},
@@ -323,9 +331,10 @@ const settle = async (
   switch (standing.read) {
     case 'nativeStack':
       return settle(
+        api,
         pr,
         context,
-        { ...reads, nativeStack: (await inNativeStack(pr)) ?? 'none' },
+        { ...reads, nativeStack: (await inNativeStack(api, pr)) ?? 'none' },
         summary,
       );
 
@@ -335,6 +344,7 @@ const settle = async (
       return Result.isErr(rebuilt)
         ? { standing, unread: rebuilt.value, summary }
         : settle(
+            api,
             pr,
             context,
             { ...reads, rebuiltOnTip: rebuilt.value },
@@ -343,11 +353,12 @@ const settle = async (
     }
 
     case 'checksFailed': {
-      const checks = await readChecks(pr, context);
+      const checks = await readChecks(api, pr, context);
 
       return Result.isErr(checks)
         ? { standing, unread: checks.value, summary }
         : settle(
+            api,
             pr,
             context,
             { ...reads, checksFailed: checks.value.verdict === 'failing' },
@@ -429,9 +440,10 @@ const classification = (
  * and GitHub's refusal to arm it, should it come, sets it aside.
  */
 const inNativeStack = async (
+  api: ApiContext,
   pr: PullRequest,
 ): Promise<QueueReads['nativeStack']> => {
-  const entry = await readNativeStack(pr.number);
+  const entry = await readNativeStack(api, pr.number);
 
   if (Result.isErr(entry)) {
     log(
@@ -451,6 +463,7 @@ const inNativeStack = async (
  * which is how this script behaved before it asked.
  */
 const readReviewHolds = async (
+  api: ApiContext,
   entries: readonly Readonly<{ pr: PullRequest }>[],
   context: TriageContext,
 ): Promise<ReadonlyMap<number, ReviewHold>> => {
@@ -465,6 +478,7 @@ const readReviewHolds = async (
   }
 
   const read = await readReviewStates(
+    api,
     entries.map(({ pr }) => pr.number),
     context.defaultBranch,
   );
@@ -505,10 +519,11 @@ const readReviewHolds = async (
  * cannot be read.
  */
 const readChecks = async (
+  api: ApiContext,
   pr: PullRequest,
   context: TriageContext,
 ): Promise<Result<ChecksSummary, Classification>> => {
-  const checks = await listRequiredChecks(pr.number);
+  const checks = await listRequiredChecks(api, pr.number);
 
   if (Result.isErr(checks)) {
     return Result.err({
@@ -520,7 +535,7 @@ const readChecks = async (
   // Pending and passed are both in flight here, but a red left by the round
   // before is not a failure while this round runs, and the checks still
   // running are what tell the two apart.
-  const running = await listRunningChecks(pr.number);
+  const running = await listRunningChecks(api, pr.number);
 
   if (Result.isErr(running)) {
     return Result.err({

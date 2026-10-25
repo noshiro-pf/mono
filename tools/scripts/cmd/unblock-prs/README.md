@@ -227,7 +227,11 @@ ruleset（最新の `main` の上で必須チェックが全部緑）が別に�
 
 ### 起動時
 
-`gh auth status` とデフォルトブランチの取得。SIGINT / SIGTERM のハンドラを設置
+トークンとリポジトリを決め、デフォルトブランチを読みます。GitHub へは `gh` を介さ
+ず API を直接呼び（`tools/scripts/lib/github-api.mts`）、トークンは `open-pr`
+と同じく **`GH_TOKEN` → `GITHUB_TOKEN` → `gh auth token`** の順に探します。リポ
+ジトリは `--repo owner/name`、無ければ `origin`、それも GitHub でなければルートの
+`package.json` です。SIGINT / SIGTERM のハンドラを設置
 します（停止要求後は現在のステップを終えてから抜けます。2回目のシグナルは即
 終了）。
 
@@ -235,7 +239,7 @@ ruleset（最新の `main` の上で必須チェックが全部緑）が別に�
 
 #### 1. survey
 
-`gh pr list` で open な PR を全件取得します（`body` を含む — 順序をそこから読
+GraphQL で open な PR を新しい順に100件まで取得します（`body` を含む — 順序をそこから読
 むため）。`mergeStateStatus` が `UNKNOWN` の PR があれば10秒おきに最大6回引き
 直します。GitHub が計算中の状態を「up-to-date」と誤読しないためです。あわせて
 `origin/main` の SHA と、`main` に適用されている rule を取得します。rule から
@@ -446,7 +450,7 @@ survey と違う / lease 負けで push が拒否され、remote の head が変
 
 | 条件                               | 結果                          |
 | :--------------------------------- | :---------------------------- |
-| `gh pr view` 失敗                  | 連続5回で `error`、未満は継続 |
+| PR の再取得に失敗                  | 連続5回で `error`、未満は継続 |
 | `MERGED`                           | `merged`                      |
 | `OPEN` でない                      | `closed`                      |
 | auto-merge が外れた（※）           | `auto-merge-disabled`         |
@@ -466,7 +470,7 @@ survey と違う / lease 負けで push が拒否され、remote の head が変
 
 **green の判定は「ruleset が要求する context 全部」** であり、報告済みのものだ
 けではありません。head commit にまだ check run が無い必須 context は
-`gh pr checks` の出力に pending として並ぶのではなく **行ごと現れません**。報
+head のチェックの一覧に pending として並ぶのではなく **行ごと現れません**。報
 告済みだけで判定すると、25分かかるマトリクスの3分目に「完了」と誤読します。
 
 **head 上で何か一つでも実行中なら green とは数えません**（必須かどうかを問わず）。
@@ -593,6 +597,7 @@ auto-merge、draft、本文）、レビュー待ちの理由、`main` の tip �
 | `--poll-interval <sec>`   |   30 | watch 中のポーリング間隔                     |
 | `--watch-timeout <min>`   |   90 | 1本を諦めるまでの時間                        |
 | `--no-auto-fix`           |      | 「4a」の自動修正をしない                     |
+| `--repo <owner/name>`     |      | `origin` が指さないリポジトリを扱う          |
 
 ログの各行の時刻はマシンの既定のタイムゾーンで、UTC からのオフセット付きで出ます
 （例: `[2026-09-27T21:03:04.500+09:00]`）。別のタイムゾーンで読みたいときは
@@ -641,7 +646,7 @@ auto-merge、draft、本文）、レビュー待ちの理由、`main` の tip �
 - マージは止めません。
 - 書くのは新しく見送ったときだけで、同じ状態のまま見送り続けている間は書き直し
   ません。`--dry-run` では書きません。書けなかったときはその旨をログに出して
-  続行します。書き込むのは `gh` のアカウントなので、そのアカウントが作者の PR
+  続行します。書き込むのはトークンのアカウントなので、そのアカウントが作者の PR
   では作者に通知は飛びません。PR を購読しているセッションは comment で起こされ
   るので、自分の PR が見送られたことに気づけます。
 - 以前の commit status はすでに付いているものを API で消せませんが、次の push
@@ -728,7 +733,7 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `checks.mts`            | マージが何を待っているか                                      |
 | `claims.mts`            | セッションの claim のうち有効なもの                           |
 | `owner.mts`             | 各 PR の担当者（`pr-report-core` の `queueOwner`）            |
-| `github.mts`            | `gh` / `git` を叩くもの全部。判断はしない                     |
+| `github.mts`            | GitHub と `git` を読み書きするもの全部。判断はしない          |
 | `labels.mts`            | ラベルがその PR について何を言うか                            |
 | `skips.mts`             | 諦めた PR を何をもって覚え続けるか、comment との突き合わせ    |
 | `set-aside-comment.mts` | 見送りの comment の文章                                       |
@@ -738,15 +743,16 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `constants.mts`         | 待ち時間と諦めるまでの回数                                    |
 | `util.mts`              | 停止シグナル                                                  |
 
-`gh` / `git` を走らせる `git()`、quoting の `sh()`、ログの `log()` は
-`open-pr` などほかのコマンドも使うので `tools/scripts/lib/` にあります。
+API を呼ぶ `rest()` / `graphqlQuery()`、`git` を走らせる `git()`、quoting の
+`sh()`、ログの `log()` は `open-pr` などほかのコマンドも使うので
+`tools/scripts/lib/` にあります。
 
 トレーラのパーサと閉路検出、どの PR がどの PR に積まれているか、ラベルの文字列、
 `CODEOWNERS` の判定、見送りの comment の隠しコメントとチェックボックスの書式、
 そして triage の判定そのもの（各 PR が queue のどこにいるか、レビューが止めているか、
 候補をどの順に pick するか: `queue-order.mts` と `review-hold.mts`）は、
 同じ queue を描く Pull Requests Manager と共有するため `apps/pr-report-core`
-にあります。`triage.mts` はその判定が求めるものを `gh` / `git` で読むだけです。
+にあります。`triage.mts` はその判定が求めるものを GitHub と `git` から読むだけです。
 
 `index.mts` はありません。`ws:gen` は workspace メンバーしか歩かず `tools/` は
 意図的にメンバーではないので、手で維持するだけの barrel になります。
@@ -989,7 +995,11 @@ on its own: every required check green, on the current `main`.
 
 ### At startup
 
-`gh auth status` and the default branch. SIGINT / SIGTERM handlers are
+The token, the repository and its default branch. GitHub is called directly
+(`tools/scripts/lib/github-api.mts`), not through `gh`, and the token is
+looked for as `open-pr` looks for it: **`GH_TOKEN`, then `GITHUB_TOKEN`, then
+`gh auth token`**. The repository is `--repo owner/name`, else `origin`, else
+the root `package.json` when `origin` is not GitHub. SIGINT / SIGTERM handlers are
 installed: the first signal finishes the current step and stops, a second one
 exits immediately.
 
@@ -997,7 +1007,7 @@ exits immediately.
 
 #### 1. Survey
 
-`gh pr list` for every open pull request, `body` included — that is where the
+GraphQL for the open pull requests, newest first and up to a hundred, `body` included — that is where the
 order is read from. While any of them reports `mergeStateStatus: UNKNOWN` the
 list is fetched again, up to six times at ten-second intervals, so a state
 GitHub is still computing is never read as up to date. The tip of
@@ -1228,7 +1238,7 @@ first that matches:
 
 | Condition                          | Outcome                              |
 | :--------------------------------- | :----------------------------------- |
-| `gh pr view` failed                | `error` after 5 in a row, else retry |
+| re-reading the pull request failed | `error` after 5 in a row, else retry |
 | `MERGED`                           | `merged`                             |
 | not `OPEN`                         | `closed`                             |
 | auto-merge switched off (\*)       | `auto-merge-disabled`                |
@@ -1249,7 +1259,7 @@ moved, is one whose check results say nothing.
 
 **"Green" means the whole list the ruleset requires**, not the part of it that
 has reported. A required context with no check run on the head commit is not
-pending in `gh pr checks` — it is _absent_ from it, so judging by what has
+pending in the head's checks — it is _absent_ from them, so judging by what has
 reported writes a pull request off three minutes into a twenty-five minute
 matrix.
 
@@ -1379,6 +1389,7 @@ minutes.
 | `--poll-interval <sec>`   |      30 | wait between polls of the watched one      |
 | `--watch-timeout <min>`   |      90 | give up on one pull request after this     |
 | `--no-auto-fix`           |         | skip the fix in "4a"                       |
+| `--repo <owner/name>`     |         | the repository, when `origin` is not it    |
 
 Each log line is stamped with the time in the machine's time zone, with its
 offset from UTC (`[2026-09-27T21:03:04.500+09:00]`). To read it in another
@@ -1432,7 +1443,7 @@ the terminal the script ran in.
 - It is written when a pull request is newly set aside, not again on every
   survey that finds the same record standing; not at all under `--dry-run`;
   and a comment that could not be written is logged and nothing more. It is
-  written as the `gh` account, so on a pull request that account opened the
+  written as the token's account, so on a pull request that account opened the
   author is not notified; a session subscribed to the pull request is woken
   by it, and so learns its pull request was set aside.
 - The commit statuses written before cannot be deleted through the API; each
@@ -1525,7 +1536,7 @@ the pull request the other's and nobody moved it (#2267).
 | `checks.mts`            | what the merge is waiting for                                 |
 | `claims.mts`            | the claims sessions wrote that still hold                     |
 | `owner.mts`             | who owns each pull request (`pr-report-core`'s `queueOwner`)  |
-| `github.mts`            | everything that shells out to `gh` or `git`                   |
+| `github.mts`            | everything that reads or writes GitHub or `git`               |
 | `labels.mts`            | what the labels say about a pull request                      |
 | `skips.mts`             | what the loop remembers, for how long, and what comments say  |
 | `set-aside-comment.mts` | the prose of the set-aside comment                            |
@@ -1535,9 +1546,9 @@ the pull request the other's and nobody moved it (#2267).
 | `constants.mts`         | how long it waits, and how long before it gives up            |
 | `util.mts`              | the stop signal                                               |
 
-The runner for `gh` and `git` (`git()`), the quoting (`sh()`) and the log
-line (`log()`) are used by `open-pr` and the other commands too, and live in
-`tools/scripts/lib/`.
+The API client (`rest()`, `graphqlQuery()`), the runner for `git` (`git()`),
+the quoting (`sh()`) and the log line (`log()`) are used by `open-pr` and the
+other commands too, and live in `tools/scripts/lib/`.
 
 The trailer parser, the cycle detection, which pull request is stacked on
 which, the label strings, the `CODEOWNERS` rules, the set-aside comment's
@@ -1545,7 +1556,7 @@ hidden record and task box, and triage's decisions themselves — where each
 pull request stands in the queue, whether its review holds it, and the order
 candidates are picked in (`queue-order.mts` and `review-hold.mts`) — are in
 `apps/pr-report-core`, shared with the Pull Requests Manager page, which draws
-the same queue. `triage.mts` only reads, through `gh` and `git`, what those
+the same queue. `triage.mts` only reads, from GitHub and `git`, what those
 decisions ask for.
 
 There is no `index.mts`: `ws:gen` only walks workspace members and `tools/` is

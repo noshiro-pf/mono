@@ -1,6 +1,8 @@
 import {
   describeWaitingOn,
+  reportedChecksOf,
   summarizeChecks,
+  type CheckContextNode,
   type ReportedCheck,
   type RunningCheck,
 } from './checks.mjs';
@@ -310,7 +312,7 @@ const check = (
   ({
     name,
     bucket,
-    link: link(name, runId),
+    link: linkOf(name, runId),
     startedAt: completedAt,
     completedAt,
     workflow,
@@ -324,10 +326,182 @@ const running = (
     runId,
   }: Readonly<{ workflow?: string; runId?: number }> = {},
 ): RunningCheck =>
-  ({ name, startedAt, workflow, link: link(name, runId) }) as const;
+  ({ name, startedAt, workflow, link: linkOf(name, runId) }) as const;
 
 /** What `gh` reports for a job of a workflow run, or a status's own URL. */
-const link = (name: string, runId: number | undefined): string =>
+const linkOf = (name: string, runId: number | undefined): string =>
   runId === undefined
     ? (`https://example.com/${name}` as const)
     : (`https://github.com/noshiro-pf/mono/actions/runs/${runId}/job/1` as const);
+
+describe(reportedChecksOf, () => {
+  const ZERO = '0001-01-01T00:00:00Z';
+
+  test('sorts a check run into the bucket `gh pr checks` would', () => {
+    const buckets = reportedChecksOf(
+      [
+        checkRun('a', 'COMPLETED', 'SUCCESS'),
+        checkRun('b', 'COMPLETED', 'SKIPPED'),
+        checkRun('c', 'COMPLETED', 'NEUTRAL'),
+        checkRun('d', 'COMPLETED', 'FAILURE'),
+        checkRun('e', 'COMPLETED', 'TIMED_OUT'),
+        checkRun('f', 'COMPLETED', 'ACTION_REQUIRED'),
+        checkRun('g', 'COMPLETED', 'CANCELLED'),
+        checkRun('h', 'IN_PROGRESS', null),
+        checkRun('i', 'QUEUED', null, null),
+        checkRun('j', 'COMPLETED', 'STALE'),
+        checkRun('k', 'COMPLETED', 'STARTUP_FAILURE'),
+      ],
+      'all',
+    ).map(({ name, bucket }) => `${name}:${bucket}`);
+
+    assert.deepStrictEqual(buckets, [
+      'a:pass',
+      'b:skipping',
+      'c:skipping',
+      'd:fail',
+      'e:fail',
+      'f:fail',
+      'g:cancel',
+      'h:pending',
+      'i:pending',
+      'j:pending',
+      'k:fail',
+    ]);
+  });
+
+  test('sorts a commit status by its state, its time being when it was set', () => {
+    assert.deepStrictEqual(
+      reportedChecksOf(
+        [
+          statusContext('no-skip-ci-label', 'SUCCESS'),
+          statusContext('x', 'FAILURE'),
+          statusContext('y', 'ERROR'),
+          statusContext('z', 'PENDING'),
+          statusContext('w', 'EXPECTED'),
+        ],
+        'all',
+      ).map(({ name, bucket, link, startedAt, completedAt }) => ({
+        name,
+        bucket,
+        link,
+        startedAt,
+        completedAt,
+      })),
+      [
+        ['no-skip-ci-label', 'pass'],
+        ['x', 'fail'],
+        ['y', 'fail'],
+        ['z', 'pending'],
+        ['w', 'pending'],
+      ].map(([name, bucket]) => ({
+        name,
+        bucket,
+        link: '',
+        startedAt: '2026-10-25T10:00:00Z',
+        completedAt: '2026-10-25T10:00:00Z',
+      })),
+    );
+  });
+
+  test("writes GitHub's zero time for a time not reached yet", () => {
+    const [queued] = reportedChecksOf(
+      [checkRun('i', 'QUEUED', null, null)],
+      'all',
+    );
+
+    assert.strictEqual(queued?.startedAt, ZERO);
+
+    assert.strictEqual(queued?.completedAt, ZERO);
+  });
+
+  test('keeps only the latest run of a job in one workflow and event', () => {
+    const checks = reportedChecksOf(
+      [
+        checkRun('a', 'COMPLETED', 'CANCELLED', '2026-10-25T09:00:00Z'),
+        checkRun('a', 'IN_PROGRESS', null, '2026-10-25T10:00:00Z'),
+        checkRun('a', 'COMPLETED', 'SUCCESS', '2026-10-25T08:00:00Z', {
+          event: 'push',
+        }),
+      ],
+      'all',
+    );
+
+    assert.deepStrictEqual(
+      checks.map(({ bucket }) => bucket),
+      ['pending', 'pass'],
+    );
+  });
+
+  test('reads the workflow of a check run, and none for a commit status', () => {
+    assert.deepStrictEqual(
+      reportedChecksOf(
+        [checkRun('a', 'COMPLETED', 'SUCCESS'), statusContext('b', 'SUCCESS')],
+        'all',
+      ).map(({ workflow }) => workflow),
+      ['code-check', ''],
+    );
+  });
+
+  test('keeps a check run and a commit status of the same name apart', () => {
+    assert.strictEqual(
+      reportedChecksOf(
+        [checkRun('x', 'COMPLETED', 'SUCCESS'), statusContext('x', 'FAILURE')],
+        'all',
+      ).length,
+      2,
+    );
+  });
+
+  test('leaves out what the branch does not require when asked to', () => {
+    assert.deepStrictEqual(
+      reportedChecksOf(
+        [
+          checkRun('a', 'COMPLETED', 'SUCCESS'),
+          checkRun('b', 'COMPLETED', 'SUCCESS', undefined, {
+            isRequired: false,
+          }),
+        ],
+        'required',
+      ).map(({ name }) => name),
+      ['a'],
+    );
+  });
+});
+
+const checkRun = (
+  name: string,
+  status: string,
+  conclusion: string | null,
+  startedAt: string | null = '2026-10-25T10:00:00Z',
+  { isRequired = true, event = 'pull_request' }: CheckRunOptions = {},
+): CheckContextNode =>
+  ({
+    __typename: 'CheckRun',
+    name,
+    status,
+    conclusion,
+    startedAt,
+    completedAt: conclusion === null ? null : ('2026-10-25T10:05:00Z' as const),
+    detailsUrl: `https://example.com/${name}`,
+    isRequired,
+    checkSuite: {
+      workflowRun: { event, workflow: { name: 'code-check' } },
+    },
+  }) as const;
+
+type CheckRunOptions = Readonly<{ isRequired?: boolean; event?: string }>;
+
+const statusContext = (
+  context: string,
+  state: string,
+  createdAt = '2026-10-25T10:00:00Z',
+): CheckContextNode =>
+  ({
+    __typename: 'StatusContext',
+    context,
+    state,
+    targetUrl: null,
+    createdAt,
+    isRequired: true,
+  }) as const;

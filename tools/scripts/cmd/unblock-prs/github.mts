@@ -1,9 +1,9 @@
 // cspell:ignore retarget retargeted
 
 /**
- * Everything that shells out to `gh` or `git`, and nothing that decides. The
- * runner itself, `git`, is shared with the other commands
- * (`tools/scripts/lib/shell.mts`).
+ * Everything that reads or writes GitHub or `git`, and nothing that decides.
+ * The API client and the `git` runner are shared with the other commands
+ * (`tools/scripts/lib/`).
  */
 
 import {
@@ -21,8 +21,15 @@ import {
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import type { UnknownRecord } from 'ts-type-forge';
-import { parseJson } from '../../lib/json.mjs';
+import {
+  addLabel,
+  graphql,
+  graphqlQuery,
+  resolveApiContext,
+  rest,
+  type ApiContext,
+  type GraphqlVariables,
+} from '../../lib/github-api.mjs';
 import { git, sh } from '../../lib/shell.mjs';
 import {
   issueOrderOf,
@@ -30,7 +37,6 @@ import {
   type ClosingIssueAnswer,
 } from './merge-after.mjs';
 import {
-  PullRequestListSchema,
   PullRequestSchema,
   type BaseChange,
   type IssueOrder,
@@ -40,34 +46,32 @@ import {
 import { headShaFromListing } from './util.mjs';
 
 /**
- * The `--json` field list for `gh`, read off the schema that validates what it
- * prints, so that a field added to one is never missing from the other — which
- * would otherwise surface only at run time, as a validation error.
+ * The credential and the repository every call here takes, and the branch
+ * the queue lands on. `repoOption` is `--repo owner/name`, when given.
  */
-export const jsonFields = (
-  schema: Readonly<{ shape: UnknownRecord }>,
-): string => Object.keys(schema.shape).join(',');
-
-const PR_JSON_FIELDS = jsonFields(PullRequestSchema);
-
-export const checkPreflight = async (): Promise<
-  Result<Readonly<{ defaultBranch: string }>, string>
+export const checkPreflight = async (
+  repoOption: string | undefined,
+): Promise<
+  Result<Readonly<{ api: ApiContext; defaultBranch: string }>, string>
 > => {
-  const auth = await git('gh auth status');
+  const api = await resolveApiContext(repoOption);
 
-  if (Result.isErr(auth)) {
-    return Result.err(`gh is not authenticated:\n${auth.value}`);
+  if (Result.isErr(api)) {
+    return api;
   }
 
-  const defaultBranch = await git(
-    'gh repo view --json defaultBranchRef --jq .defaultBranchRef.name',
+  const repository = await rest(
+    api.value,
+    'GET',
+    '',
+    t.record({ default_branch: t.string() }),
   );
 
-  if (Result.isErr(defaultBranch)) {
-    return Result.err(`cannot read the default branch: ${defaultBranch.value}`);
+  if (Result.isErr(repository)) {
+    return Result.err(`cannot read the default branch: ${repository.value}`);
   }
 
-  const name = defaultBranch.value.trim();
+  const name = repository.value.default_branch;
 
   if (!isSafeRefName(name)) {
     return Result.err(
@@ -75,30 +79,55 @@ export const checkPreflight = async (): Promise<
     );
   }
 
-  return Result.ok({ defaultBranch: name });
+  return Result.ok({ api: api.value, defaultBranch: name });
 };
 
-export const listPullRequests = async (): Promise<
-  Result<readonly PullRequest[], string>
-> => {
-  const listed = await git(
-    `gh pr list --state open --limit 100 --json ${PR_JSON_FIELDS}`,
+/**
+ * The open pull requests, newest first, at most {@link OPEN_LIMIT} of them
+ * as `gh pr list` read. GraphQL, because `mergeStateStatus` is not in REST.
+ */
+export const listPullRequests = async (
+  api: ApiContext,
+): Promise<Result<readonly PullRequest[], string>> =>
+  Result.map(
+    await askRepositoryOf(
+      api,
+      [
+        'query($owner: String!, $name: String!) {',
+        '  repository(owner: $owner, name: $name) {',
+        `    pullRequests(states: OPEN, first: ${OPEN_LIMIT}, orderBy: { field: CREATED_AT, direction: DESC }) {`,
+        `      nodes { ${PULL_REQUEST_FIELDS} }`,
+        '    }',
+        '  }',
+        '}',
+      ].join('\n'),
+      {},
+      t.record({
+        pullRequests: t.record({ nodes: t.array(PullRequestNodeSchema) }),
+      }),
+    ),
+    ({ pullRequests }) => pullRequests.nodes.map(pullRequestOfNode),
   );
 
-  return Result.isErr(listed)
-    ? listed
-    : parseJson(listed.value, PullRequestListSchema, 'gh pr list');
-};
-
 export const viewPullRequest = async (
+  api: ApiContext,
   prNumber: number,
-): Promise<Result<PullRequest, string>> => {
-  const viewed = await git(`gh pr view ${prNumber} --json ${PR_JSON_FIELDS}`);
-
-  return Result.isErr(viewed)
-    ? viewed
-    : parseJson(viewed.value, PullRequestSchema, `gh pr view ${prNumber}`);
-};
+): Promise<Result<PullRequest, string>> =>
+  Result.map(
+    await askRepositoryOf(
+      api,
+      [
+        'query($owner: String!, $name: String!, $number: Int!) {',
+        '  repository(owner: $owner, name: $name) {',
+        `    pullRequest(number: $number) { ${PULL_REQUEST_FIELDS} }`,
+        '  }',
+        '}',
+      ].join('\n'),
+      { number: prNumber },
+      t.record({ pullRequest: PullRequestNodeSchema }),
+    ),
+    ({ pullRequest }) => pullRequestOfNode(pullRequest),
+  );
 
 /**
  * `REVIEW_REQUIRED`, `CHANGES_REQUESTED`, `APPROVED`, or empty when the
@@ -106,14 +135,64 @@ export const viewPullRequest = async (
  * merge, to say what holds it.
  */
 export const viewReviewDecision = async (
+  api: ApiContext,
   prNumber: number,
-): Promise<Result<string, string>> => {
-  const viewed = await git(
-    `gh pr view ${prNumber} --json reviewDecision --jq .reviewDecision`,
+): Promise<Result<string, string>> =>
+  Result.map(
+    await askRepositoryOf(
+      api,
+      [
+        'query($owner: String!, $name: String!, $number: Int!) {',
+        '  repository(owner: $owner, name: $name) {',
+        '    pullRequest(number: $number) { reviewDecision }',
+        '  }',
+        '}',
+      ].join('\n'),
+      { number: prNumber },
+      t.record({
+        pullRequest: t.record({
+          reviewDecision: t.union([t.string(), t.nullType]),
+        }),
+      }),
+    ),
+    ({ pullRequest }) => pullRequest.reviewDecision ?? '',
   );
 
-  return Result.isErr(viewed) ? viewed : Result.ok(viewed.value.trim());
-};
+/**
+ * A pull request as GraphQL answers it, in the shape every module here reads
+ * ({@link PullRequestSchema}): only the labels differ, a connection there and
+ * a list here.
+ */
+export const pullRequestOfNode = (
+  node: t.TypeOf<typeof PullRequestNodeSchema>,
+): PullRequest =>
+  ({
+    ...node,
+    labels: node.labels.nodes,
+  }) as const;
+
+/** How many open pull requests one survey reads, as many as `gh` did. */
+const OPEN_LIMIT = 100;
+
+/**
+ * The fields of {@link PullRequestSchema}, read off it so that a field added
+ * there is asked for here; `labels` and `autoMergeRequest` are objects, and
+ * name what of them is read.
+ */
+const PULL_REQUEST_FIELDS = Object.keys(PullRequestSchema.shape)
+  .map((key) =>
+    key === 'labels'
+      ? 'labels(first: 100) { nodes { name } }'
+      : key === 'autoMergeRequest'
+        ? 'autoMergeRequest { enabledAt }'
+        : key,
+  )
+  .join(' ');
+
+const PullRequestNodeSchema = t.record({
+  ...PullRequestSchema.shape,
+  labels: t.record({ nodes: PullRequestSchema.shape.labels }),
+});
 
 /**
  * The tip of `branch` on `origin`, by its whole ref name
@@ -144,31 +223,18 @@ export const remoteSha = async (
  * nothing until it is applied.
  */
 export const readBranchRules = async (
+  api: ApiContext,
   branch: string,
 ): Promise<Result<RulesetRequirements, string>> => {
-  const listed = await git(
-    [
-      'gh api',
-      // Joined rather than interpolated: `gh` fills the `{owner}` and
-      // `{repo}` placeholders in, and a template literal holding them is
-      // indistinguishable from a mistyped one to `unicorn`.
-      sh(['repos', '{owner}', '{repo}', 'rules', 'branches', branch].join('/')),
-    ].join(' '),
+  // One path segment, whatever the name holds: `release/1.x` included. The
+  // rule's premise, building a query string, is not what this is.
+  // eslint-disable-next-line no-restricted-globals
+  const segment = encodeURIComponent(branch);
+
+  return Result.map(
+    await rest(api, 'GET', `/rules/branches/${segment}`, t.array(t.unknown())),
+    requirementsOfRules,
   );
-
-  if (Result.isErr(listed)) {
-    return listed;
-  }
-
-  const rules = parseJson(
-    listed.value,
-    t.array(t.unknown()),
-    `the rules for ${branch}`,
-  );
-
-  return Result.isErr(rules)
-    ? rules
-    : Result.ok(requirementsOfRules(rules.value));
 };
 
 /**
@@ -181,6 +247,7 @@ export const readBranchRules = async (
  * its own alias.
  */
 export const readReviewStates = async (
+  api: ApiContext,
   numbers: readonly number[],
   defaultBranch: string,
 ): Promise<
@@ -212,34 +279,21 @@ export const readReviewStates = async (
     '}',
   ].join('\n');
 
-  const answered = await git(
-    [
-      'gh api graphql',
-      `-f ${sh(`query=${query}`)}`,
-      // `-F` fills `{owner}` and `{repo}` in, as `gh api` does in a path,
-      // and sends a number as a number.
-      `-F ${sh('owner={owner}')}`,
-      `-F ${sh('name={repo}')}`,
-      `-f ${sh(`codeOwners=${defaultBranch}:${CODE_OWNERS_PATH}`)}`,
-      ...numbers.map((n) => `-F ${sh(`pr_${n}=${n}`)}`),
-    ].join(' '),
+  const answered = await askRepositoryOf(
+    api,
+    query,
+    {
+      codeOwners: `${defaultBranch}:${CODE_OWNERS_PATH}`,
+      ...Object.fromEntries(numbers.map((n) => [`pr_${n}`, n] as const)),
+    },
+    t.unknown(),
   );
 
   if (Result.isErr(answered)) {
     return answered;
   }
 
-  const parsed = parseJson(
-    answered.value,
-    RepositoryAnswerSchema,
-    'gh api graphql',
-  );
-
-  if (Result.isErr(parsed)) {
-    return parsed;
-  }
-
-  const { repository } = parsed.value.data;
+  const repository = answered.value;
 
   if (!isRecord(repository)) {
     return Result.err('GitHub answered without the repository');
@@ -289,6 +343,7 @@ export const readReviewStates = async (
  * issues it did not link, only when there are any.
  */
 export const readIssueOrder = async (
+  api: ApiContext,
   numbers: readonly number[],
 ): Promise<Result<IssueOrder, string>> => {
   if (!Arr.isNonEmpty(numbers)) {
@@ -296,6 +351,7 @@ export const readIssueOrder = async (
   }
 
   const pulls = await askRepository(
+    api,
     'ClosingIssues',
     numbers.map((n) => ({
       alias: `pr_${n}`,
@@ -337,6 +393,7 @@ export const readIssueOrder = async (
   }
 
   const issues = await askRepository(
+    api,
     'UnlinkedIssues',
     unlinked.map((n) => ({
       alias: `issue_${n}`,
@@ -427,6 +484,7 @@ const ClosingIssuesNodeSchema = t.record({
  * repository's.
  */
 const askRepository = async (
+  api: ApiContext,
   operationName: string,
   parts: readonly Readonly<{ alias: string; number: number; field: string }>[],
 ): Promise<
@@ -447,31 +505,20 @@ const askRepository = async (
     '}',
   ].join('\n');
 
-  const answered = await git(
-    [
-      'gh api graphql',
-      `-f ${sh(`query=${query}`)}`,
-      `-F ${sh('owner={owner}')}`,
-      `-F ${sh('name={repo}')}`,
-      ...parts.map(({ alias, number }) => `-F ${sh(`${alias}=${number}`)}`),
-    ].join(' '),
+  const answered = await askRepositoryOf(
+    api,
+    query,
+    Object.fromEntries(
+      parts.map(({ alias, number }) => [alias, number] as const),
+    ),
+    t.unknown(),
   );
 
   if (Result.isErr(answered)) {
     return answered;
   }
 
-  const parsed = parseJson(
-    answered.value,
-    RepositoryAnswerSchema,
-    'gh api graphql',
-  );
-
-  if (Result.isErr(parsed)) {
-    return parsed;
-  }
-
-  const { repository } = parsed.value.data;
+  const repository = answered.value;
 
   const nameWithOwner = isRecord(repository)
     ? repository['nameWithOwner']
@@ -492,16 +539,30 @@ const askRepository = async (
   });
 };
 
+/**
+ * One GraphQL request whose `$owner` and `$name` are the repository's, to be
+ * declared by `query`, resolving to what it answered under `repository`.
+ */
+const askRepositoryOf = async <A,>(
+  api: ApiContext,
+  query: string,
+  variables: GraphqlVariables,
+  schema: t.Type<A>,
+): Promise<Result<A, string>> =>
+  Result.map(
+    await graphqlQuery(
+      api,
+      query,
+      { owner: api.repo.owner, name: api.repo.name, ...variables },
+      t.record({ repository: schema }),
+    ),
+    ({ repository }) => repository,
+  );
+
 const CODE_OWNERS_PATH = '.github/CODEOWNERS';
 
 /** One page of a list inside a pull request. */
 const PAGE_SIZE = 100;
-
-const RepositoryAnswerSchema = t.record({
-  data: t.record({
-    repository: t.unknown(),
-  }),
-});
 
 const CodeOwnersBlobSchema = t.union([
   t.record({ text: t.string() }),
@@ -544,23 +605,19 @@ const reviewStateOf = (
   }) as const;
 
 export const addSkipCiLabel = async (
+  api: ApiContext,
   prNumber: number,
-): Promise<Result<undefined, string>> => {
-  const added = await git(
-    `gh pr edit ${prNumber} --add-label ${sh(SKIP_CI_LABEL)}`,
-  );
-
-  return Result.isErr(added) ? added : Result.ok(undefined);
-};
+): Promise<Result<undefined, string>> => addLabel(api, prNumber, SKIP_CI_LABEL);
 
 /**
  * This account's set-aside comment on each of `numbers` that has one. See
  * {@link readOwnComments}.
  */
 export const readSetAsideComments = async (
+  api: ApiContext,
   numbers: readonly number[],
 ): Promise<Result<ReadonlyMap<number, OwnSetAsideComment>, string>> =>
-  Result.map(await readOwnComments(numbers), ({ setAside }) => setAside);
+  Result.map(await readOwnComments(api, numbers), ({ setAside }) => setAside);
 
 /**
  * This account's set-aside comment, and the standing claim a session wrote
@@ -570,6 +627,7 @@ export const readSetAsideComments = async (
  * `viewerDidAuthor` counts; of several of a kind, the oldest is the one.
  */
 export const readOwnComments = async (
+  api: ApiContext,
   numbers: readonly number[],
 ): Promise<
   Result<
@@ -595,31 +653,18 @@ export const readOwnComments = async (
     '}',
   ].join('\n');
 
-  const answered = await git(
-    [
-      'gh api graphql',
-      `-f ${sh(`query=${query}`)}`,
-      `-F ${sh('owner={owner}')}`,
-      `-F ${sh('name={repo}')}`,
-      ...numbers.map((n) => `-F ${sh(`pr_${n}=${n}`)}`),
-    ].join(' '),
+  const answered = await askRepositoryOf(
+    api,
+    query,
+    Object.fromEntries(numbers.map((n) => [`pr_${n}`, n] as const)),
+    t.unknown(),
   );
 
   if (Result.isErr(answered)) {
     return answered;
   }
 
-  const parsed = parseJson(
-    answered.value,
-    RepositoryAnswerSchema,
-    'gh api graphql',
-  );
-
-  if (Result.isErr(parsed)) {
-    return parsed;
-  }
-
-  const { repository } = parsed.value.data;
+  const repository = answered.value;
 
   if (!isRecord(repository)) {
     return Result.err('GitHub answered without the repository');
@@ -717,26 +762,23 @@ const CommentsNodeSchema = t.record({
  * place — and as a new comment otherwise.
  */
 export const writeSetAsideCommentOn = async (
+  api: ApiContext,
   prNumber: number,
   existing: number | undefined,
   body: string,
-): Promise<Result<undefined, string>> => {
-  const written = await git(
-    [
-      existing === undefined ? 'gh api --method POST' : 'gh api --method PATCH',
-      // `{owner}` and `{repo}` are `gh api`'s placeholders for the
-      // repository of the working directory, not interpolations.
-      sh(
-        existing === undefined
-          ? [ISSUES_ROUTE, prNumber, 'comments'].join('/')
-          : [ISSUES_ROUTE, 'comments', existing].join('/'),
-      ),
-      `-f ${sh(`body=${body}`)}`,
-    ].join(' '),
+): Promise<Result<undefined, string>> =>
+  Result.map(
+    await rest(
+      api,
+      existing === undefined ? 'POST' : 'PATCH',
+      existing === undefined
+        ? `/issues/${prNumber}/comments`
+        : `/issues/comments/${existing}`,
+      t.unknown(),
+      { body: { body } },
+    ),
+    () => undefined,
   );
-
-  return Result.isErr(written) ? written : Result.ok(undefined);
-};
 
 /**
  * Every change of the pull request's base its timeline records, oldest
@@ -746,44 +788,29 @@ export const writeSetAsideCommentOn = async (
  * base was between.
  */
 export const readBaseChanges = async (
+  api: ApiContext,
   prNumber: number,
-): Promise<Result<readonly BaseChange[], string>> => {
-  const answered = await git(
-    [
-      'gh api graphql',
-      // `gh` fills these two placeholders in from the working directory's
-      // repository.
-      `-F ${sh('owner={owner}')}`,
-      `-F ${sh('repo={repo}')}`,
-      `-F number=${prNumber}`,
-      `-f ${sh(`query=${TIMELINE_QUERY}`)}`,
-    ].join(' '),
-  );
-
-  if (Result.isErr(answered)) {
-    return answered;
-  }
-
-  const parsed = parseJson(answered.value, TimelineSchema, 'gh api graphql');
-
-  if (Result.isErr(parsed)) {
-    return parsed;
-  }
-
-  return Result.ok(
-    parsed.value.data.repository.pullRequest.timelineItems.nodes.map(
-      (node) =>
-        ({
-          from: node.previousRefName ?? '',
-          to: node.currentRefName ?? '',
-        }) as const,
+): Promise<Result<readonly BaseChange[], string>> =>
+  Result.map(
+    await askRepositoryOf(
+      api,
+      TIMELINE_QUERY,
+      { number: prNumber },
+      TimelineSchema,
     ),
+    ({ pullRequest }) =>
+      pullRequest.timelineItems.nodes.map(
+        (node) =>
+          ({
+            from: node.previousRefName ?? '',
+            to: node.currentRefName ?? '',
+          }) as const,
+      ),
   );
-};
 
 const TIMELINE_QUERY = [
-  'query($owner: String!, $repo: String!, $number: Int!) {',
-  '  repository(owner: $owner, name: $repo) {',
+  'query($owner: String!, $name: String!, $number: Int!) {',
+  '  repository(owner: $owner, name: $name) {',
   '    pullRequest(number: $number) {',
   '      timelineItems(last: 100, itemTypes: [BASE_REF_CHANGED_EVENT]) {',
   '        nodes {',
@@ -801,60 +828,41 @@ const TimelineNodeSchema = t.record({
 });
 
 const TimelineSchema = t.record({
-  data: t.record({
-    repository: t.record({
-      pullRequest: t.record({
-        timelineItems: t.record({
-          nodes: t.array(TimelineNodeSchema),
-        }),
-      }),
+  pullRequest: t.record({
+    timelineItems: t.record({
+      nodes: t.array(TimelineNodeSchema),
     }),
   }),
 });
 
 /**
  * The pull request's place in one of GitHub's native stacks, or `undefined`
- * when it is in none. GraphQL, because `gh pr view` does not know them.
+ * when it is in none. GraphQL, because REST does not know them.
  */
 export const readNativeStack = async (
+  api: ApiContext,
   prNumber: number,
-): Promise<Result<NativeStackEntry | undefined, string>> => {
-  const answered = await git(
-    [
-      'gh api graphql',
-      `-F ${sh('owner={owner}')}`,
-      `-F ${sh('repo={repo}')}`,
-      `-F number=${prNumber}`,
-      `-f ${sh(`query=${NATIVE_STACK_QUERY}`)}`,
-    ].join(' '),
+): Promise<Result<NativeStackEntry | undefined, string>> =>
+  Result.map(
+    await askRepositoryOf(
+      api,
+      NATIVE_STACK_QUERY,
+      { number: prNumber },
+      NativeStackSchema,
+    ),
+    ({ pullRequest: { stackEntry } }) =>
+      stackEntry === null
+        ? undefined
+        : {
+            stack: stackEntry.stack.number,
+            position: stackEntry.position,
+            size: stackEntry.stack.size,
+          },
   );
-
-  if (Result.isErr(answered)) {
-    return answered;
-  }
-
-  const parsed = parseJson(answered.value, NativeStackSchema, 'gh api graphql');
-
-  if (Result.isErr(parsed)) {
-    return parsed;
-  }
-
-  const entry = parsed.value.data.repository.pullRequest.stackEntry;
-
-  return Result.ok(
-    entry === null
-      ? undefined
-      : {
-          stack: entry.stack.number,
-          position: entry.position,
-          size: entry.stack.size,
-        },
-  );
-};
 
 const NATIVE_STACK_QUERY = [
-  'query($owner: String!, $repo: String!, $number: Int!) {',
-  '  repository(owner: $owner, name: $repo) {',
+  'query($owner: String!, $name: String!, $number: Int!) {',
+  '  repository(owner: $owner, name: $name) {',
   '    pullRequest(number: $number) {',
   '      stackEntry { position stack { number size } }',
   '    }',
@@ -863,18 +871,14 @@ const NATIVE_STACK_QUERY = [
 ].join(' ');
 
 const NativeStackSchema = t.record({
-  data: t.record({
-    repository: t.record({
-      pullRequest: t.record({
-        stackEntry: t.union([
-          t.record({
-            position: t.number(),
-            stack: t.record({ number: t.number(), size: t.number() }),
-          }),
-          t.nullType,
-        ]),
+  pullRequest: t.record({
+    stackEntry: t.union([
+      t.record({
+        position: t.number(),
+        stack: t.record({ number: t.number(), size: t.number() }),
       }),
-    }),
+      t.nullType,
+    ]),
   }),
 });
 
@@ -884,39 +888,43 @@ const NativeStackSchema = t.record({
  * retargeted pull request was stacked on, whose commits it may still carry.
  */
 export const mergedHeadOf = async (
+  api: ApiContext,
   branch: string,
-): Promise<Result<MergedHead | undefined, string>> => {
-  const listed = await git(
-    `gh pr list --state merged --head ${sh(branch)} --limit 5 --json ${jsonFields(MergedHeadSchema)}`,
+): Promise<Result<MergedHead | undefined, string>> =>
+  Result.map(
+    await rest(api, 'GET', '/pulls', t.array(MergedPullSchema), {
+      query: {
+        state: 'closed',
+        head: `${api.repo.owner}:${branch}`,
+        sort: 'updated',
+        direction: 'desc',
+        per_page: '5',
+      },
+    }),
+    latestMergedHead,
   );
 
-  if (Result.isErr(listed)) {
-    return listed;
-  }
+/**
+ * The last merged of `pulls`, closed pull requests from one branch, or
+ * `undefined` when none of them merged.
+ */
+export const latestMergedHead = (
+  pulls: readonly t.TypeOf<typeof MergedPullSchema>[],
+): MergedHead | undefined => {
+  const [latest] = pulls
+    .filter(
+      (pull): pull is typeof pull & Readonly<{ merged_at: string }> =>
+        pull.merged_at !== null,
+    )
+    .toSorted((a, b) => b.merged_at.localeCompare(a.merged_at));
 
-  const parsed = parseJson(
-    listed.value,
-    MergedHeadListSchema,
-    'gh pr list --state merged',
-  );
-
-  if (Result.isErr(parsed)) {
-    return parsed;
-  }
-
-  const [latest] = parsed.value.toSorted((a, b) =>
-    b.mergedAt.localeCompare(a.mergedAt),
-  );
-
-  return Result.ok(
-    latest === undefined
-      ? undefined
-      : {
-          number: latest.number,
-          headSha: latest.headRefOid,
-          mergeCommit: latest.mergeCommit?.oid,
-        },
-  );
+  return latest === undefined
+    ? undefined
+    : {
+        number: latest.number,
+        headSha: latest.head.sha,
+        mergeCommit: latest.merge_commit_sha ?? undefined,
+      };
 };
 
 export type MergedHead = Readonly<{
@@ -926,33 +934,23 @@ export type MergedHead = Readonly<{
   mergeCommit: string | undefined;
 }>;
 
-const MergedHeadSchema = t.record({
+const MergedPullSchema = t.record({
   number: t.number(),
-  headRefOid: t.string(),
-  mergeCommit: t.union([t.record({ oid: t.string() }), t.nullType]),
-  mergedAt: t.string(),
+  head: t.record({ sha: t.string() }),
+  merge_commit_sha: t.union([t.string(), t.nullType]),
+  merged_at: t.union([t.string(), t.nullType]),
 });
-
-const MergedHeadListSchema = t.array(MergedHeadSchema);
 
 /**
  * Arms auto-merge, squash being the one method the ruleset allows. The
- * mutation rather than `gh pr merge --auto`, which merges on the spot when
- * nothing holds the pull request; this one refuses instead.
+ * mutation refuses when nothing holds the pull request, where
+ * `gh pr merge --auto` would merge it on the spot.
  */
 export const armAutoMerge = async (
+  api: ApiContext,
   nodeId: string,
-): Promise<Result<undefined, string>> => {
-  const armed = await git(
-    [
-      'gh api graphql',
-      `-f ${sh(`id=${nodeId}`)}`,
-      `-f ${sh(`query=${ARM_MUTATION}`)}`,
-    ].join(' '),
-  );
-
-  return Result.isErr(armed) ? armed : Result.ok(undefined);
-};
+): Promise<Result<undefined, string>> =>
+  graphql(api, ARM_MUTATION, { id: nodeId });
 
 const ARM_MUTATION =
   'mutation($id: ID!) { enablePullRequestAutoMerge(input: { pullRequestId: $id, mergeMethod: SQUASH }) { clientMutationId } }';
@@ -965,59 +963,71 @@ const ARM_MUTATION =
  * required.
  */
 export const listCheckRuns = async (
+  api: ApiContext,
   headSha: string,
 ): Promise<Result<readonly CheckRunReport[], string>> => {
   if (!SHA.test(headSha)) {
     return Result.err(`unexpected head SHA: ${JSON.stringify(headSha)}`);
   }
 
-  const listed = await git(
-    [
-      'gh api --paginate --slurp',
-      // `gh api`'s placeholders again, as in `writeSetAsideCommentOn`.
-      sh([COMMITS_ROUTE, headSha, 'check-runs?per_page=100'].join('/')),
-    ].join(' '),
-  );
+  const mut_collected: CheckRunReport[] = [];
 
-  if (Result.isErr(listed)) {
-    return listed;
+  for (const page of Arr.seq(MAX_CHECK_RUN_PAGES)) {
+    const answered = await rest(
+      api,
+      'GET',
+      `/commits/${headSha}/check-runs`,
+      CheckRunPageSchema,
+      { query: { per_page: String(PAGE_SIZE), page: String(page + 1) } },
+    );
+
+    if (Result.isErr(answered)) {
+      return answered;
+    }
+
+    for (const run of answered.value.check_runs) {
+      if (run.app?.slug === 'github-actions') {
+        mut_collected.push({
+          id: run.id,
+          checkSuiteId: run.check_suite.id,
+          name: run.name,
+          status: run.status,
+          conclusion: run.conclusion ?? undefined,
+          // Not read: a fix is planned once the checks have failed, not
+          // while a newer round is running.
+          round: undefined,
+        });
+      }
+    }
+
+    if (
+      Arr.isEmpty(answered.value.check_runs) ||
+      (page + 1) * PAGE_SIZE >= answered.value.total_count
+    ) {
+      return Result.ok(mut_collected);
+    }
   }
 
-  const pages = parseJson(listed.value, CheckRunPagesSchema, 'the check runs');
-
-  return Result.isErr(pages)
-    ? pages
-    : Result.ok(
-        pages.value
-          .flatMap((page) => page.check_runs)
-          .filter((run) => run.app?.slug === 'github-actions')
-          .map((run) => ({
-            id: run.id,
-            checkSuiteId: run.check_suite.id,
-            name: run.name,
-            status: run.status,
-            conclusion: run.conclusion ?? undefined,
-            // Not read: a fix is planned once the checks have failed, not
-            // while a newer round is running.
-            round: undefined,
-          })),
-      );
+  return Result.err(
+    `${headSha} has more than ${PAGE_SIZE * MAX_CHECK_RUN_PAGES} check runs, which is more than this reads`,
+  );
 };
 
-const CheckRunPagesSchema = t.array(
-  t.record({
-    check_runs: t.array(
-      t.record({
-        id: t.number(),
-        check_suite: t.record({ id: t.number() }),
-        app: t.union([t.record({ slug: t.string() }), t.nullType]),
-        name: t.string(),
-        status: t.string(),
-        conclusion: t.union([t.string(), t.nullType]),
-      }),
-    ),
-  }),
-);
+const MAX_CHECK_RUN_PAGES = 10;
+
+const CheckRunPageSchema = t.record({
+  total_count: t.number(),
+  check_runs: t.array(
+    t.record({
+      id: t.number(),
+      check_suite: t.record({ id: t.number() }),
+      app: t.union([t.record({ slug: t.string() }), t.nullType]),
+      name: t.string(),
+      status: t.string(),
+      conclusion: t.union([t.string(), t.nullType]),
+    }),
+  ),
+});
 
 export const removeWorktree = async (worktreeDir: string): Promise<void> => {
   // Both fail harmlessly when there is nothing to remove.
@@ -1027,7 +1037,3 @@ export const removeWorktree = async (worktreeDir: string): Promise<void> => {
 };
 
 const SHA = /^[0-9a-f]{40}$/u;
-
-const ISSUES_ROUTE = 'repos/{owner}/{repo}/issues';
-
-const COMMITS_ROUTE = 'repos/{owner}/{repo}/commits';

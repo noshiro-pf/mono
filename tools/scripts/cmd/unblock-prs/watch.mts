@@ -2,6 +2,7 @@
 
 import { isMergeableState } from 'pr-report-core';
 import { isRecord, Result } from 'ts-data-forge';
+import type { ApiContext } from '../../lib/github-api.mjs';
 import { log } from '../../lib/log.mjs';
 import {
   describeWaitingOn,
@@ -39,6 +40,7 @@ import { pause, stopRequested } from './util.mjs';
  * comment to say.
  */
 export const watch = async (
+  api: ApiContext,
   pr: PullRequest,
   expectedHead: string,
   requiredContexts: readonly string[],
@@ -58,7 +60,7 @@ export const watch = async (
       break;
     }
 
-    const viewed = await viewPullRequest(pr.number);
+    const viewed = await viewPullRequest(api, pr.number);
 
     if (Result.isErr(viewed)) {
       mut_errors += 1;
@@ -104,7 +106,7 @@ export const watch = async (
       return { outcome: 'behind-again' };
     }
 
-    const checks = await readChecks(pr.number);
+    const checks = await readChecks(api, pr.number);
 
     if (Result.isErr(checks)) {
       mut_errors += 1;
@@ -164,7 +166,7 @@ export const watch = async (
       );
 
       if (mut_greenPolls >= budget) {
-        const reviewDecision = await viewReviewDecision(pr.number);
+        const reviewDecision = await viewReviewDecision(api, pr.number);
 
         return {
           outcome: 'not-merging',
@@ -193,6 +195,7 @@ export const watch = async (
 
 /** The required checks and the names of every check still running. */
 const readChecks = async (
+  api: ApiContext,
   prNumber: number,
 ): Promise<
   Result<
@@ -203,13 +206,13 @@ const readChecks = async (
     string
   >
 > => {
-  const required = await listRequiredChecks(prNumber);
+  const required = await listRequiredChecks(api, prNumber);
 
   if (Result.isErr(required)) {
     return required;
   }
 
-  const running = await listRunningChecks(prNumber);
+  const running = await listRunningChecks(api, prNumber);
 
   return Result.isErr(running)
     ? running

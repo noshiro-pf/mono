@@ -2,10 +2,9 @@ import * as fs from 'node:fs/promises';
 import { AUTO_REBASE_LABEL, SKIP_CI_LABEL } from 'pr-report-core';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import type { ApiContext } from '../../lib/github-api.mjs';
+import { addLabel, type ApiContext } from '../../lib/github-api.mjs';
 import { log } from '../../lib/log.mjs';
 import {
-  addLabel,
   containsBase,
   createPullRequest,
   findOpenPullRequest,

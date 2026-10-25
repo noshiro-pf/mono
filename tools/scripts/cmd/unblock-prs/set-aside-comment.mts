@@ -106,7 +106,7 @@ export type ResolvedBy = 'base-moved' | 'pushed' | 'retry';
 /**
  * How much of what a command printed the comment keeps, from its end, where
  * git says what stopped it. GitHub takes a comment of up to 65,536
- * characters, and the whole body is one argument to `gh`.
+ * characters.
  */
 const OUTPUT_LINES = 60;
 

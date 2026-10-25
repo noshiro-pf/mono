@@ -9,9 +9,8 @@ import {
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { pullRequestNumber } from '../lib/cli-args.mjs';
-import { resolveApiContext } from '../lib/github-api.mjs';
+import { addLabel, resolveApiContext } from '../lib/github-api.mjs';
 import { git, sh } from '../lib/shell.mjs';
-import { addLabel } from './open-pr/github.mjs';
 import { readQueueState } from './pr-report/queue.mjs';
 import { pushLeased, restack } from './unblock-prs/rebase.mjs';
 import type { BranchOf } from './unblock-prs/types.mjs';

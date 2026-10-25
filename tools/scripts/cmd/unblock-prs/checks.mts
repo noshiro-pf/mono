@@ -1,6 +1,6 @@
 /**
- * What the merge is waiting for, read from `gh pr checks` and judged against
- * the contexts the ruleset requires.
+ * What the merge is waiting for, read from the head commit's checks and
+ * judged against the contexts the ruleset requires.
  */
 
 import {
@@ -10,28 +10,25 @@ import {
 } from 'pr-report-core';
 import { Arr, Num, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { parseJson } from '../../lib/json.mjs';
-import { git } from '../../lib/shell.mjs';
-import { jsonFields } from './github.mjs';
+import { graphqlQuery, type ApiContext } from '../../lib/github-api.mjs';
 import type { ChecksSummary } from './types.mjs';
 
-/** The fields read from `gh pr checks --json`. */
-const CheckSchema = t.record({
-  name: t.string(),
+/**
+ * One check on the head, in the shape `gh pr checks --json` printed, which
+ * is what this script read until it called the API itself.
+ */
+export type ReportedCheck = Readonly<{
+  name: string;
   /** `pass` | `fail` | `pending` | `skipping` | `cancel` */
-  bucket: t.string(),
-  link: t.string(),
+  bucket: string;
+  link: string;
   /** ISO 8601; GitHub's zero time before the check has started. */
-  startedAt: t.string(),
+  startedAt: string;
   /** ISO 8601; GitHub's zero time before the check has finished. */
-  completedAt: t.string(),
+  completedAt: string;
   /** The workflow the job belongs to; empty for a commit status. */
-  workflow: t.string(),
-});
-
-const CheckListSchema = t.array(CheckSchema);
-
-export type ReportedCheck = t.TypeOf<typeof CheckSchema>;
+  workflow: string;
+}>;
 
 /**
  * A check on the head that has not finished, when it started, and the
@@ -44,64 +41,320 @@ export type RunningCheck = Readonly<{
   link: string;
 }>;
 
-const CHECK_FIELDS = jsonFields(CheckSchema);
-
 /**
  * The checks that gate the merge, as GitHub reports them for the head commit.
- * `--required` reads `isRequired` from the API, so the list follows the
- * ruleset without this script having to know it.
+ * `isRequired` is GitHub's own answer for this pull request, so the list
+ * follows the ruleset without this script having to know it.
  */
 export const listRequiredChecks = async (
+  api: ApiContext,
   prNumber: number,
-): Promise<Result<readonly ReportedCheck[], string>> => {
-  const listed = await git(
-    `gh pr checks ${prNumber} --required --json ${CHECK_FIELDS}`,
+): Promise<Result<readonly ReportedCheck[], string>> =>
+  Result.map(await readCheckContexts(api, prNumber), (contexts) =>
+    reportedChecksOf(contexts, 'required'),
   );
-
-  if (Result.isErr(listed)) {
-    // Right after a push there is nothing to report yet, and gh treats that
-    // as an error rather than an empty list.
-    return listed.value.includes('no checks reported') ? Result.ok([]) : listed;
-  }
-
-  return parseJson(listed.value, CheckListSchema, `gh pr checks ${prNumber}`);
-};
 
 /**
  * The checks on the head commit that have not finished, required or not.
  *
  * A required aggregate has no run in a new round until the jobs it waits on
- * are done, so until then `--required` answers with the round before. When
- * that round was the one `skip-ci` skipped, every aggregate reads `skipped`
- * and the commit looks green halfway through its matrix. Anything still
- * running is what says the round is not over, and when it started is what
- * tells a failure of the round before from one of this round.
+ * are done, so until then the required ones answer with the round before.
+ * When that round was the one `skip-ci` skipped, every aggregate reads
+ * `skipped` and the commit looks green halfway through its matrix. Anything
+ * still running is what says the round is not over, and when it started is
+ * what tells a failure of the round before from one of this round.
  */
 export const listRunningChecks = async (
+  api: ApiContext,
   prNumber: number,
-): Promise<Result<readonly RunningCheck[], string>> => {
-  const listed = await git(`gh pr checks ${prNumber} --json ${CHECK_FIELDS}`);
+): Promise<Result<readonly RunningCheck[], string>> =>
+  Result.map(await readCheckContexts(api, prNumber), (contexts) =>
+    reportedChecksOf(contexts, 'all')
+      .filter((check) => check.bucket === 'pending')
+      .map(({ name, startedAt, workflow, link }) => ({
+        name,
+        startedAt,
+        workflow,
+        link,
+      })),
+  );
 
-  if (Result.isErr(listed)) {
-    return listed.value.includes('no checks reported') ? Result.ok([]) : listed;
+/**
+ * What the head commit's checks say, as `gh pr checks` said it: each check
+ * run and commit status in a bucket, and of the runs of one job in one
+ * workflow and event only the latest — a re-run, or the round `skip-ci`
+ * cancelled under the one now running — so that a superseded failure does
+ * not speak for its context. `which` is `'required'` for only what GitHub
+ * says this pull request requires.
+ *
+ * Unlike `gh`, the survivors keep the order GitHub listed them in. A commit
+ * status's start and finish are both when it was set, the one time it has.
+ */
+export const reportedChecksOf = (
+  contexts: readonly CheckContextNode[],
+  which: 'all' | 'required',
+): readonly ReportedCheck[] => {
+  const mut_latest = new Map<string, CheckContextNode>();
+
+  for (const context of contexts) {
+    const key = keyOf(context);
+
+    const kept = mut_latest.get(key);
+
+    if (kept === undefined || startedAtOf(context) > startedAtOf(kept)) {
+      mut_latest.set(key, context);
+    }
   }
 
-  return Result.map(
-    parseJson(listed.value, CheckListSchema, `gh pr checks ${prNumber}`),
-    (checks) =>
-      checks
-        .filter((check) => check.bucket === 'pending')
-        .map(({ name, startedAt, workflow, link }) => ({
-          name,
-          startedAt,
-          workflow,
-          link,
-        })),
+  const survivors = new Set(mut_latest.values());
+
+  return contexts
+    .filter(
+      (context) =>
+        survivors.has(context) && (which === 'all' || context.isRequired),
+    )
+    .map(reportedCheckOf);
+};
+
+/** A context of the head commit's status check rollup, as read. */
+export type CheckContextNode = t.TypeOf<typeof CheckContextNodeSchema>;
+
+/**
+ * Every context of the pull request's head commit, page by page. A head with
+ * none reported yet — right after a push — is an empty list.
+ */
+const readCheckContexts = async (
+  api: ApiContext,
+  prNumber: number,
+): Promise<Result<readonly CheckContextNode[], string>> => {
+  const mut_contexts: CheckContextNode[] = [];
+
+  let mut_after: string | undefined = undefined;
+
+  for (const _page of Arr.seq(MAX_PAGES)) {
+    const rollup = await readRollupPage(api, prNumber, mut_after);
+
+    if (Result.isErr(rollup)) {
+      return rollup;
+    }
+
+    if (rollup.value === null) {
+      return Result.ok(mut_contexts);
+    }
+
+    mut_contexts.push(...rollup.value.nodes);
+
+    const { hasNextPage, endCursor } = rollup.value.pageInfo;
+
+    if (!hasNextPage || endCursor === null) {
+      return Result.ok(mut_contexts);
+    }
+
+    mut_after = endCursor;
+  }
+
+  return Result.err(
+    `#${prNumber} has more than ${MAX_PAGES * PAGE_SIZE} checks on its head`,
   );
 };
 
 /**
- * `checks` is what `gh pr checks --required` reported for the head commit;
+ * One page of the head commit's contexts, from `after` on; `null` when the
+ * head has no rollup yet.
+ */
+const readRollupPage = async (
+  api: ApiContext,
+  prNumber: number,
+  after: string | undefined,
+): Promise<Result<RollupPage | null, string>> =>
+  Result.map(
+    await graphqlQuery(
+      api,
+      CHECKS_QUERY,
+      {
+        owner: api.repo.owner,
+        name: api.repo.name,
+        number: prNumber,
+        ...(after === undefined ? {} : { after }),
+      },
+      ChecksAnswerSchema,
+    ),
+    (answer) =>
+      answer.repository.pullRequest.commits.nodes[0]?.commit.statusCheckRollup
+        ?.contexts ?? null,
+  );
+
+type RollupPage = Readonly<{
+  pageInfo: Readonly<{ hasNextPage: boolean; endCursor: string | null }>;
+  nodes: readonly CheckContextNode[];
+}>;
+
+const PAGE_SIZE = 100;
+
+const MAX_PAGES = 10;
+
+const CHECKS_QUERY = [
+  'query($owner: String!, $name: String!, $number: Int!, $after: String) {',
+  '  repository(owner: $owner, name: $name) {',
+  '    pullRequest(number: $number) {',
+  '      commits(last: 1) { nodes { commit { statusCheckRollup {',
+  `        contexts(first: ${PAGE_SIZE}, after: $after) {`,
+  '          pageInfo { hasNextPage endCursor }',
+  '          nodes {',
+  '            __typename',
+  '            ... on CheckRun {',
+  '              name status conclusion startedAt completedAt detailsUrl',
+  '              isRequired(pullRequestNumber: $number)',
+  '              checkSuite { workflowRun { event workflow { name } } }',
+  '            }',
+  '            ... on StatusContext {',
+  '              context state targetUrl createdAt',
+  '              isRequired(pullRequestNumber: $number)',
+  '            }',
+  '          }',
+  '        }',
+  '      } } }',
+  '    }',
+  '  }',
+  '}',
+].join('\n');
+
+const CheckContextNodeSchema = t.union([
+  t.record({
+    __typename: t.literal('CheckRun'),
+    name: t.string(),
+    status: t.string(),
+    conclusion: t.union([t.string(), t.nullType]),
+    startedAt: t.union([t.string(), t.nullType]),
+    completedAt: t.union([t.string(), t.nullType]),
+    detailsUrl: t.union([t.string(), t.nullType]),
+    isRequired: t.boolean(),
+    checkSuite: t.union([
+      t.record({
+        workflowRun: t.union([
+          t.record({
+            event: t.string(),
+            workflow: t.record({ name: t.string() }),
+          }),
+          t.nullType,
+        ]),
+      }),
+      t.nullType,
+    ]),
+  }),
+  t.record({
+    __typename: t.literal('StatusContext'),
+    context: t.string(),
+    state: t.string(),
+    targetUrl: t.union([t.string(), t.nullType]),
+    createdAt: t.string(),
+    isRequired: t.boolean(),
+  }),
+]);
+
+const ChecksAnswerSchema = t.record({
+  repository: t.record({
+    pullRequest: t.record({
+      commits: t.record({
+        nodes: t.array(
+          t.record({
+            commit: t.record({
+              statusCheckRollup: t.union([
+                t.record({
+                  contexts: t.record({
+                    pageInfo: t.record({
+                      hasNextPage: t.boolean(),
+                      endCursor: t.union([t.string(), t.nullType]),
+                    }),
+                    nodes: t.array(CheckContextNodeSchema),
+                  }),
+                }),
+                t.nullType,
+              ]),
+            }),
+          }),
+        ),
+      }),
+    }),
+  }),
+});
+
+/** What `gh` wrote for a time a check has not reached. */
+const ZERO_TIME = '0001-01-01T00:00:00Z';
+
+/**
+ * Which runs supersede each other: a commit status by its context, a check
+ * run by its name, workflow and event, as `gh` told them apart.
+ */
+const keyOf = (context: CheckContextNode): string =>
+  context.__typename === 'StatusContext'
+    ? (`status:${context.context}` as const)
+    : [
+        'run',
+        context.name,
+        context.checkSuite?.workflowRun?.workflow.name ?? '',
+        context.checkSuite?.workflowRun?.event ?? '',
+      ].join(':');
+
+const startedAtOf = (context: CheckContextNode): string =>
+  (context.__typename === 'StatusContext'
+    ? context.createdAt
+    : context.startedAt) ?? ZERO_TIME;
+
+const reportedCheckOf = (context: CheckContextNode): ReportedCheck =>
+  context.__typename === 'StatusContext'
+    ? ({
+        name: context.context,
+        bucket: bucketOf(context.state),
+        link: context.targetUrl ?? '',
+        startedAt: context.createdAt,
+        completedAt: context.createdAt,
+        workflow: '',
+      } as const)
+    : ({
+        name: context.name,
+        bucket: bucketOf(
+          context.status === 'COMPLETED'
+            ? (context.conclusion ?? '')
+            : context.status,
+        ),
+        link: context.detailsUrl ?? '',
+        startedAt: context.startedAt ?? ZERO_TIME,
+        completedAt: context.completedAt ?? ZERO_TIME,
+        workflow: context.checkSuite?.workflowRun?.workflow.name ?? '',
+      } as const);
+
+/**
+ * A check run's conclusion, or its status while it runs, or a commit
+ * status's state, in `gh pr checks`'s buckets. Anything else — `QUEUED`,
+ * `IN_PROGRESS`, `PENDING`, `EXPECTED`, `STALE` — is waited for.
+ */
+const bucketOf = (state: string): string => {
+  switch (state) {
+    case 'SUCCESS':
+      return 'pass';
+
+    case 'SKIPPED':
+    case 'NEUTRAL':
+      return 'skipping';
+
+    case 'ERROR':
+    case 'FAILURE':
+    case 'TIMED_OUT':
+    case 'ACTION_REQUIRED':
+    case 'STARTUP_FAILURE':
+      return 'fail';
+
+    case 'CANCELLED':
+      return 'cancel';
+
+    default:
+      return 'pending';
+  }
+};
+
+/**
+ * `checks` is what {@link listRequiredChecks} reported for the head commit;
  * `requiredContexts` is what the ruleset asks for. The difference between the
  * two is the point: a context in the second and not the first has not
  * reported yet, and GitHub will not merge until it does. `running` is every
@@ -123,8 +376,8 @@ export const listRunningChecks = async (
  *
  * The verdict itself is `pr-report-core`'s `summarizeChecks`, which
  * `pr-report` and the page reach theirs through, so the worker and the report
- * cannot disagree about one; what is here turns what `gh` reports into the
- * states that reads.
+ * cannot disagree about one; what is here turns what GitHub reports into
+ * the states that reads.
  */
 export const summarizeChecks = (
   checks: readonly ReportedCheck[],

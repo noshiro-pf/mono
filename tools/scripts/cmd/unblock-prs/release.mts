@@ -20,6 +20,7 @@
 
 import { SKIP_CI_LABEL, type QueueOwner } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
+import type { ApiContext } from '../../lib/github-api.mjs';
 import { log } from '../../lib/log.mjs';
 import { addSkipCiLabel, listPullRequests } from './github.mjs';
 import { isMergeQueued, isSkipCiLabelled, priorityRank } from './labels.mjs';
@@ -33,11 +34,12 @@ import { isVersionPullRequest } from './version-pr.mjs';
  * `target` keeps its release.
  */
 export const settleAfterRelease = async (
+  api: ApiContext,
   target: PullRequest,
   owners: ReadonlyMap<number, QueueOwner>,
   defaultBranch: string,
 ): Promise<'kept' | 'yielded'> => {
-  const listed = await listPullRequests();
+  const listed = await listPullRequests(api);
 
   if (Result.isErr(listed)) {
     log(`Cannot list pull requests to check the release: ${listed.value}`);
@@ -51,7 +53,7 @@ export const settleAfterRelease = async (
     return 'kept';
   }
 
-  const added = await addSkipCiLabel(target.number);
+  const added = await addSkipCiLabel(api, target.number);
 
   log(
     Result.isErr(added)

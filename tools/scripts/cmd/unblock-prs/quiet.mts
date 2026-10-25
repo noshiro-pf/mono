@@ -20,7 +20,7 @@ export const initialQuiet: Quiet = {
  * the body because that is where `Merge-After:` is declared — and what the
  * reviews hold, which triage reads separately: an approval or a resolved
  * conversation is exactly what a held pull request is waiting for. The title
- * is left out, as is the order `gh` lists things in.
+ * is left out, as is the order GitHub lists things in.
  */
 export const surveyFingerprint = (
   survey: StrictPick<Survey, 'baseSha' | 'pullRequests'>,

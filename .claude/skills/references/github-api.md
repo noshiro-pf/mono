@@ -9,9 +9,10 @@ scheduled run in a container has a second reason: there is no `gh` login there
 to act as, only a token. So everything here is the REST API, called the way
 `tools/scripts/lib/github-api.mts` calls it.
 
-`pnpm run unblock-prs` and `pnpm run open-pr` are not affected by any of this.
-The first shells out to `gh` and stays the author's to run; the second calls
-this same API and is the one a session runs.
+`pnpm run unblock-prs` and `pnpm run open-pr` are not affected by any of this:
+both call this same API with the same token. The first stays the author's to
+run — it arms auto-merge, which only GraphQL can, and a session's proxy
+refuses GraphQL; the second is the one a session runs.
 
 ## The credential
 

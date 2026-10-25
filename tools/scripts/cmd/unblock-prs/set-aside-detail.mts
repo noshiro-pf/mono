@@ -26,7 +26,7 @@ export const describeFailedChecks = (
 
 /**
  * What holds a pull request whose required checks are all green.
- * `reviewDecision` is `gh pr view`'s: `REVIEW_REQUIRED` when a review the
+ * `reviewDecision` is GitHub's: `REVIEW_REQUIRED` when a review the
  * rules ask for is missing, which with `required_approving_review_count: 0`
  * leaves a code owner's; empty when the rules ask for none.
  */

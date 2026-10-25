@@ -16,6 +16,7 @@ import {
   type QueueOwner,
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
+import { removeLabel, type ApiContext } from '../../lib/github-api.mjs';
 import { log } from '../../lib/log.mjs';
 import { git, sh } from '../../lib/shell.mjs';
 import {
@@ -317,6 +318,7 @@ type Rebased = Readonly<{ kind: 'moved' } | { kind: 'rebased'; head: string }>;
  * that the branch is on the tip; there is nothing left to move.
  */
 export const advance = async (
+  api: ApiContext,
   pr: PullRequest,
   defaultBranch: string,
   plan: AdvancePlan,
@@ -329,14 +331,14 @@ export const advance = async (
     }
 
     if (plan.arm) {
-      const armed = await armOnPick(pr, pr.headRefOid, defaultBranch);
+      const armed = await armOnPick(api, pr, pr.headRefOid, defaultBranch);
 
       if (Result.isErr(armed) || armed.value === 'moved') {
         return Result.isErr(armed) ? armed : Result.ok({ kind: 'moved' });
       }
     }
 
-    const unlabelled = await removeSkipCiLabel(pr, pr.headRefOid);
+    const unlabelled = await removeSkipCiLabel(api, pr, pr.headRefOid);
 
     return Result.isErr(unlabelled)
       ? unlabelled
@@ -347,7 +349,7 @@ export const advance = async (
         );
   }
 
-  const merged = await stackedOnMerged(pr, defaultBranch);
+  const merged = await stackedOnMerged(api, pr, defaultBranch);
 
   const rebased = await rebaseAndPush(pr, {
     onto: `origin/${defaultBranch}`,
@@ -376,7 +378,7 @@ export const advance = async (
   }
 
   if (plan.arm) {
-    const armed = await armOnPick(pr, head, defaultBranch);
+    const armed = await armOnPick(api, pr, head, defaultBranch);
 
     if (Result.isErr(armed) || armed.value === 'moved') {
       return Result.isErr(armed) ? armed : Result.ok({ kind: 'moved' });
@@ -389,7 +391,7 @@ export const advance = async (
       : Result.ok({ kind: 'advanced', head });
   }
 
-  const removed = await removeSkipCiLabel(pr, head);
+  const removed = await removeSkipCiLabel(api, pr, head);
 
   return Result.isErr(removed)
     ? removed
@@ -413,6 +415,7 @@ export const advance = async (
  * the heads the survey read stale.
  */
 export const restackRetargeted = async (
+  api: ApiContext,
   before: StackedOn | undefined,
   pullRequests: readonly PullRequest[],
   defaultBranch: string,
@@ -427,7 +430,7 @@ export const restackRetargeted = async (
       break;
     }
 
-    const outcome = await restackOffMerged(layer, defaultBranch, {
+    const outcome = await restackOffMerged(api, layer, defaultBranch, {
       dryRun,
       descendants: stackDescendants(stackParents, layer.pr.number).flatMap(
         (number) => pullRequests.filter((pr) => pr.number === number),
@@ -570,6 +573,7 @@ export const restackBehind = async (
  * was decided on is a rebase old by now.
  */
 const removeSkipCiLabel = async (
+  api: ApiContext,
   pr: PullRequest,
   head: string,
 ): Promise<Result<'moved' | 'removed', RebaseFailure>> => {
@@ -583,7 +587,7 @@ const removeSkipCiLabel = async (
       ...(output === undefined ? {} : { output }),
     });
 
-  const current = await viewPullRequest(pr.number);
+  const current = await viewPullRequest(api, pr.number);
 
   if (Result.isErr(current)) {
     return failed(`cannot re-read it before unlabelling: ${current.value}`);
@@ -607,9 +611,7 @@ const removeSkipCiLabel = async (
     return failed(`${MERGE_QUEUED_LABEL} came off while it was rebasing`);
   }
 
-  const removed = await git(
-    `gh pr edit ${pr.number} --remove-label ${sh(SKIP_CI_LABEL)}`,
-  );
+  const removed = await removeLabel(api, pr.number, SKIP_CI_LABEL);
 
   return Result.isErr(removed)
     ? failed(
@@ -627,10 +629,11 @@ const removeSkipCiLabel = async (
  * patches, which a one-commit layer squash-merged unchanged also survives.
  */
 const stackedOnMerged = async (
+  api: ApiContext,
   pr: PullRequest,
   defaultBranch: string,
 ): Promise<MergedHead | undefined> => {
-  const changes = await readBaseChanges(pr.number);
+  const changes = await readBaseChanges(api, pr.number);
 
   if (Result.isErr(changes)) {
     log(
@@ -646,7 +649,7 @@ const stackedOnMerged = async (
     return undefined;
   }
 
-  const merged = await mergedHeadOf(from);
+  const merged = await mergedHeadOf(api, from);
 
   if (Result.isErr(merged)) {
     log(
@@ -665,17 +668,18 @@ const stackedOnMerged = async (
  * without this.
  */
 const restackOffMerged = async (
+  api: ApiContext,
   { pr, from }: RetargetedLayer,
   defaultBranch: string,
   plan: Readonly<{ dryRun: boolean; descendants: readonly PullRequest[] }>,
 ): Promise<'moved' | 'restacked' | 'untouched'> => {
-  const branch = from ?? (await retargetedFromTimeline(pr, defaultBranch));
+  const branch = from ?? (await retargetedFromTimeline(api, pr, defaultBranch));
 
   if (branch === undefined || !isSafeRefName(branch)) {
     return 'untouched';
   }
 
-  const merged = await mergedHeadOf(branch);
+  const merged = await mergedHeadOf(api, branch);
 
   if (Result.isErr(merged)) {
     log(
@@ -766,10 +770,11 @@ const restackOffMerged = async (
  * did. A timeline that cannot be read says nothing.
  */
 const retargetedFromTimeline = async (
+  api: ApiContext,
   pr: PullRequest,
   defaultBranch: string,
 ): Promise<string | undefined> => {
-  const changes = await readBaseChanges(pr.number);
+  const changes = await readBaseChanges(api, pr.number);
 
   if (Result.isErr(changes)) {
     log(
@@ -902,6 +907,7 @@ export const restack = async (
  * taking `merge-queued` off.
  */
 export const armOnPick = async (
+  api: ApiContext,
   pr: PullRequest,
   head: string,
   defaultBranch: string,
@@ -916,7 +922,7 @@ export const armOnPick = async (
       ...(output === undefined ? {} : { output }),
     });
 
-  const current = await viewPullRequest(pr.number);
+  const current = await viewPullRequest(api, pr.number);
 
   if (Result.isErr(current)) {
     return failed(`cannot re-read it before arming: ${current.value}`);
@@ -943,7 +949,7 @@ export const armOnPick = async (
     return Result.ok('armed');
   }
 
-  const armed = await armAutoMerge(current.value.id);
+  const armed = await armAutoMerge(api, current.value.id);
 
   if (Result.isErr(armed)) {
     return failed(

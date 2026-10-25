@@ -8,6 +8,7 @@ import {
 } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
+import type { ApiContext } from '../../lib/github-api.mjs';
 import { log } from '../../lib/log.mjs';
 import { autoFix } from './auto-fix.mjs';
 import { standingClaims } from './claims.mjs';
@@ -132,8 +133,8 @@ import { watch } from './watch.mjs';
  *    required context reported
  *    green and it still did not merge. "Green" means the whole list the
  *    ruleset requires, not the part of it that has reported — a required
- *    context with no check run on the head commit is absent from
- *    `gh pr checks` rather than pending in it, so reading its absence as
+ *    context with no check run on the head commit is absent from the
+ *    head's checks rather than pending in them, so reading its absence as
  *    success is what used to write a pull request off three minutes into a
  *    twenty-five minute matrix.
  *    When a required check failed and every job that failed under it is a
@@ -240,21 +241,22 @@ import { watch } from './watch.mjs';
  * - `quiet.mts` — how long to sleep when there is nothing to do.
  * - `checks.mts` — what the merge is waiting for, judged against the contexts
  *   the ruleset requires.
- * - `github.mts` — everything that shells out to `gh` or `git`, and nothing
- *   that decides. The runner and the quoting are `tools/scripts/lib/`'s.
+ * - `github.mts` — everything that reads or writes GitHub or `git`, and
+ *   nothing that decides. The API client, the runner and the quoting are
+ *   `tools/scripts/lib/`'s.
  * - `labels.mts`, `skips.mts`, `demotions.mts`, `options.mts`, `types.mts`,
  *   `constants.mts`, `util.mts` — the vocabulary.
  */
 const unblockPrs = async (
   options: Options,
 ): Promise<Result<undefined, string>> => {
-  const preflight = await checkPreflight();
+  const preflight = await checkPreflight(options.repo);
 
   if (Result.isErr(preflight)) {
     return preflight;
   }
 
-  const { defaultBranch } = preflight.value;
+  const { api, defaultBranch } = preflight.value;
 
   log(
     `Watching pull requests into ${defaultBranch}${options.dryRun ? ' (dry run)' : ''}.`,
@@ -272,10 +274,11 @@ const unblockPrs = async (
   };
 
   while (!stopRequested()) {
-    const cycle = await runCycle(defaultBranch, mut_state, options);
+    const cycle = await runCycle(api, defaultBranch, mut_state, options);
 
     if (!options.dryRun) {
       await announceSetAside(
+        api,
         newSkips(cycle.settled, cycle.state.skipped),
         defaultBranch,
       );
@@ -309,15 +312,17 @@ const unblockPrs = async (
  * to land pull requests, and this is not a reason to stop.
  */
 const announceSetAside = async (
+  api: ApiContext,
   skips: readonly SkipRecord[],
   defaultBranch: string,
 ): Promise<void> => {
   for (const skip of skips) {
-    const existing = await readSetAsideComments([skip.number]);
+    const existing = await readSetAsideComments(api, [skip.number]);
 
     const written = Result.isErr(existing)
       ? existing
       : await writeSetAsideCommentOn(
+          api,
           skip.number,
           existing.value.get(skip.number)?.databaseId,
           setAsideCommentBody(skip, defaultBranch),
@@ -345,6 +350,7 @@ const announceSetAside = async (
  * Comments that cannot be read hold nothing: every push is leased anyway.
  */
 const settleWithComments = async (
+  api: ApiContext,
   skipped: SkipRecords,
   pullRequests: readonly PullRequest[],
   baseSha: string,
@@ -354,6 +360,7 @@ const settleWithComments = async (
   Readonly<{ skipped: SkipRecords; claimed: ReadonlyMap<number, Claim> }>
 > => {
   const read = await readOwnComments(
+    api,
     pullRequests
       .filter((pr) => wantsAutoRebase(pr) || skipped.has(pr.number))
       .map((pr) => pr.number),
@@ -382,6 +389,7 @@ const settleWithComments = async (
     }
 
     const written = await writeSetAsideCommentOn(
+      api,
       number,
       databaseId,
       resolvedCommentBody(
@@ -406,7 +414,7 @@ const settleWithComments = async (
       `Writing the set-aside comment again on ${unannounced.map(({ number }) => `#${number}`).join(', ')}, which no comment says.`,
     );
 
-    await announceSetAside(unannounced, defaultBranch);
+    await announceSetAside(api, unannounced, defaultBranch);
   }
 
   return {
@@ -420,11 +428,12 @@ const settleWithComments = async (
 };
 
 const runCycle = async (
+  api: ApiContext,
   defaultBranch: string,
   before: LoopState,
   options: Options,
 ): Promise<CycleResult> => {
-  const listed = await survey(defaultBranch);
+  const listed = await survey(api, defaultBranch);
 
   if (Result.isErr(listed)) {
     log(`Survey failed: ${listed.value}`);
@@ -443,12 +452,13 @@ const runCycle = async (
   // A layer the one below merged from under goes first, labelled or not, and
   // the heads read before it are then read again. See `stack.mts`.
   const surveyed = (await restackRetargeted(
+    api,
     before.stackedOn,
     listed.value.pullRequests,
     defaultBranch,
     options.dryRun,
   ))
-    ? await survey(defaultBranch)
+    ? await survey(api, defaultBranch)
     : listed;
 
   if (Result.isErr(surveyed)) {
@@ -467,9 +477,10 @@ const runCycle = async (
   // A pull request this run acted on and can no longer see is one that ended
   // while nothing was watching it — including one the watch had given up on,
   // whose merge would otherwise go unrecorded.
-  const tracked = await reportDeparted(before.tracked, pullRequests);
+  const tracked = await reportDeparted(api, before.tracked, pullRequests);
 
   const { skipped, claimed } = await settleWithComments(
+    api,
     pruneSkips(before.skipped, pullRequests, baseSha),
     pullRequests,
     baseSha,
@@ -479,7 +490,7 @@ const runCycle = async (
 
   const demoted = pruneDemotions(before.demoted, pullRequests);
 
-  const triaged = await triage(pullRequests, {
+  const triaged = await triage(api, pullRequests, {
     defaultBranch,
     baseSha,
     skipped,
@@ -487,7 +498,7 @@ const runCycle = async (
     demoted,
     requiredContexts,
     reviewRequirements,
-    issueOrder: await issueOrderFor(pullRequests),
+    issueOrder: await issueOrderFor(api, pullRequests),
   });
 
   reportTriage(triaged, pullRequests.length, { defaultBranch, demoted });
@@ -551,7 +562,12 @@ const runCycle = async (
     // Before the watch, which reads a pull request without auto-merge as one
     // someone switched it off on.
     if (arm) {
-      const armed = await armOnPick(watched, watched.headRefOid, defaultBranch);
+      const armed = await armOnPick(
+        api,
+        watched,
+        watched.headRefOid,
+        defaultBranch,
+      );
 
       if (Result.isErr(armed)) {
         log(`#${watched.number}: ${armed.value.detail}`);
@@ -581,6 +597,7 @@ const runCycle = async (
     }
 
     const { ended, head } = await watchAndFix(
+      api,
       watched,
       watched.headRefOid,
       { defaultBranch, requiredContexts, bypassReason },
@@ -641,7 +658,7 @@ const runCycle = async (
       `#${target.number} (${target.headRefName}) is next: ${describeAction(target, defaultBranch, triaged)}.`,
     );
 
-    const advanced = await advance(target, defaultBranch, {
+    const advanced = await advance(api, target, defaultBranch, {
       arm: triaged.toArm.has(target.number),
       descendants: stackDescendants(
         triaged.stackParents,
@@ -695,7 +712,7 @@ const runCycle = async (
     const demotedNow = followHead(demoted, target.number, advancedHead);
 
     if (
-      (await settleAfterRelease(target, triaged.owners, defaultBranch)) ===
+      (await settleAfterRelease(api, target, triaged.owners, defaultBranch)) ===
       'yielded'
     ) {
       log(
@@ -714,6 +731,7 @@ const runCycle = async (
     );
 
     const { ended, head } = await watchAndFix(
+      api,
       target,
       advancedHead,
       {
@@ -757,6 +775,7 @@ const runCycle = async (
  * cycle picked.
  */
 const watchAndFix = async (
+  api: ApiContext,
   pr: PullRequest,
   expectedHead: string,
   context: Readonly<{
@@ -768,6 +787,7 @@ const watchAndFix = async (
   options: Options,
 ): Promise<Readonly<{ ended: Watched; head: string }>> => {
   const ended = await watch(
+    api,
     pr,
     expectedHead,
     context.requiredContexts,
@@ -783,7 +803,7 @@ const watchAndFix = async (
     return { ended, head: expectedHead };
   }
 
-  const fixed = await autoFix(pr, expectedHead, context.defaultBranch);
+  const fixed = await autoFix(api, pr, expectedHead, context.defaultBranch);
 
   switch (fixed.kind) {
     case 'declined':
@@ -801,6 +821,7 @@ const watchAndFix = async (
 
       return {
         ended: await watch(
+          api,
           pr,
           fixed.head,
           context.requiredContexts,
@@ -835,6 +856,7 @@ const trackAfterWatch = (
  * run that pushed the merge commit never mentions it.
  */
 const reportDeparted = async (
+  api: ApiContext,
   tracked: ReadonlySet<number>,
   pullRequests: readonly PullRequest[],
 ): Promise<ReadonlySet<number>> => {
@@ -846,7 +868,7 @@ const reportDeparted = async (
   const viewed = await Promise.all(
     departed.map(async (prNumber) => ({
       prNumber,
-      result: await viewPullRequest(prNumber),
+      result: await viewPullRequest(api, prNumber),
     })),
   );
 
@@ -875,9 +897,13 @@ const reportDeparted = async (
  * also write into the body.
  */
 const issueOrderFor = async (
+  api: ApiContext,
   pullRequests: readonly PullRequest[],
 ): Promise<IssueOrder> => {
-  const read = await readIssueOrder(pullRequests.map(({ number }) => number));
+  const read = await readIssueOrder(
+    api,
+    pullRequests.map(({ number }) => number),
+  );
 
   if (Result.isErr(read)) {
     log(

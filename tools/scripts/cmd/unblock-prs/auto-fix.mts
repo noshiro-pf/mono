@@ -15,6 +15,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { statesFromCheckRuns, type ContextState } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
+import type { ApiContext } from '../../lib/github-api.mjs';
 import { log } from '../../lib/log.mjs';
 import { git, sh } from '../../lib/shell.mjs';
 import { listCheckRuns, remoteSha, removeWorktree } from './github.mjs';
@@ -39,11 +40,12 @@ import { lastLines, stopRequested } from './util.mjs';
  * not a mechanical act.
  */
 export const autoFix = async (
+  api: ApiContext,
   pr: PullRequest,
   head: string,
   defaultBranch: string,
 ): Promise<AutoFixed> => {
-  const runs = await listCheckRuns(head);
+  const runs = await listCheckRuns(api, head);
 
   if (Result.isErr(runs)) {
     return declined(`cannot read the check runs: ${runs.value}`);
