@@ -1,5 +1,13 @@
 # split-view-extension
 
+## 0.6.2
+
+### Patch Changes
+
+- Updated dependencies [7f3e173]
+    - ts-data-forge@14.10.0
+    - react-utils@0.0.18
+
 ## 0.6.1
 
 ### Patch Changes
