@@ -11,6 +11,7 @@
  */
 
 import { Num, Result } from 'ts-data-forge';
+import { POLL_INTERVAL_MS } from './constants.mjs';
 
 export type RateLimit = Readonly<{
   /** Points left in the current window. */
@@ -48,6 +49,74 @@ export const readRateLimit = (headers: Headers): RateLimit | undefined => {
  */
 export const isRunningLow = (rateLimit: RateLimit): boolean =>
   rateLimit.remaining <= rateLimit.limit * LOW;
+
+/** The budget as it stood at an instant, for {@link pollIntervalFor}. */
+export type BudgetSample = Readonly<{ rateLimit: RateLimit; atMs: number }>;
+
+/**
+ * How often to read so that the page spends about half of the account's
+ * budget — what reading every {@link POLL_INTERVAL_MS} spends on this
+ * repository — measured by what the budget went down by between two reads:
+ * a larger repository costs more a read, and is read less often rather than
+ * spending the whole budget, never less often than
+ * {@link MAX_POLL_INTERVAL_MS}. Anything else the account spends in between
+ * counts too, which slows the page rather than the account's other work.
+ *
+ * The interval it has, when the two say nothing about the cost: no read
+ * before, a window that refilled in between, or no time between them.
+ */
+export const pollIntervalFor = ({
+  intervalMs,
+  previous,
+  current,
+}: Readonly<{
+  intervalMs: number;
+  previous: BudgetSample | undefined;
+  current: BudgetSample;
+}>): number => {
+  if (
+    previous?.rateLimit.resetEpochMs !== current.rateLimit.resetEpochMs ||
+    current.atMs <= previous.atMs
+  ) {
+    return intervalMs;
+  }
+
+  const elapsedMs = current.atMs - previous.atMs;
+
+  const allowedPerHour = current.rateLimit.limit * POLL_BUDGET_SHARE;
+
+  if (!Num.isNonZero(elapsedMs) || !Num.isNonZero(allowedPerHour)) {
+    return intervalMs;
+  }
+
+  const spent = Math.max(
+    0,
+    previous.rateLimit.remaining - current.rateLimit.remaining,
+  );
+
+  // What one read costs, over what an hour allows, is the share of an hour
+  // a read has to be apart from the next.
+  const wantedMs = Num.div(
+    Num.div(spent * intervalMs, elapsedMs) * MS_PER_HOUR,
+    allowedPerHour,
+  );
+
+  const wanted =
+    Math.ceil(wantedMs / POLL_INTERVAL_STEP_MS) * POLL_INTERVAL_STEP_MS;
+
+  return Math.min(MAX_POLL_INTERVAL_MS, Math.max(POLL_INTERVAL_MS, wanted));
+};
+
+/** Five minutes: past that, the page has stopped being current. */
+export const MAX_POLL_INTERVAL_MS = 300_000;
+
+/** The share of the budget the page's reads may spend. */
+const POLL_BUDGET_SHARE = 0.5;
+
+/** Intervals in steps of five seconds, so that noise does not move them. */
+const POLL_INTERVAL_STEP_MS = 5000;
+
+const MS_PER_HOUR = 3_600_000;
 
 const MS_PER_SECOND = 1000;
 

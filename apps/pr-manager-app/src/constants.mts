@@ -85,7 +85,8 @@ export const repositoryUrl = (source: ReportSource): string =>
   `https://github.com/${source.owner}/${source.repo}` as const;
 
 /**
- * How often the page reads GitHub again while it is on screen.
+ * How often the page reads GitHub again while it is on screen, at most: a
+ * repository whose reads cost more is read less often (`pollIntervalFor`).
  *
  * **Set by the GraphQL budget.** A read is one query per part of the page
  * and a follow-up, about 9 points against this repository by GitHub's

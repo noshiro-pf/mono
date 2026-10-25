@@ -134,6 +134,7 @@ export const buildEntries = ({
   defaultBranch,
   pulls,
   issues = NO_DECLARATIONS,
+  skipCiPauses = true,
 }: Readonly<{
   /**
    * The contexts the ruleset requires, or `undefined` for a repository that
@@ -148,6 +149,13 @@ export const buildEntries = ({
    * none read, none inherited.
    */
   issues?: IssueDeclarations;
+  /**
+   * Whether the `skip-ci` label means what it means here — the checks held
+   * back, so the verdict is `paused` — which is so wherever `unblock-prs`'s
+   * queue runs. Elsewhere it is a label like any other, and the checks are
+   * judged as they stand.
+   */
+  skipCiPauses?: boolean;
 }>): DecidedEntries => {
   const open = new Set(pulls.map(({ number }) => number));
 
@@ -205,7 +213,9 @@ export const buildEntries = ({
         checks: summarizeChecks({
           required: required ?? Array.from(facts.reported.keys()).toSorted(),
           reported: facts.reported,
-          paused: facts.labels.some((label) => label.name === SKIP_CI_LABEL),
+          paused:
+            skipCiPauses &&
+            facts.labels.some((label) => label.name === SKIP_CI_LABEL),
           running: facts.checksRunning,
           // The ruleset's own condition: `~DEFAULT_BRANCH` and `main`.
           baseCovered: facts.baseRef === defaultBranch,

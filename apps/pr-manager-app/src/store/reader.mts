@@ -39,7 +39,11 @@ import {
   settle,
   type LoadStatus,
 } from '../load-state.mjs';
-import type { RateLimit } from '../rate-limit.mjs';
+import {
+  pollIntervalFor,
+  type BudgetSample,
+  type RateLimit,
+} from '../rate-limit.mjs';
 import { ISSUES_LIMIT, ISSUES_PAGE_SIZE } from '../report-query.mjs';
 import { sameItemsIfEqual } from '../share.mjs';
 import type { StoredToken } from '../token.mjs';
@@ -120,6 +124,12 @@ export type Reader = Readonly<{
   moreIssues: InitializedObservable<MoreIssuesStatus>;
   /** What GitHub last said was left of the budget. */
   rateLimit: InitializedObservable<RateLimit | undefined>;
+  /**
+   * How long the page waits between two reads: {@link POLL_INTERVAL_MS}, or
+   * longer where a read costs more than half the budget can pay for at that
+   * pace (`pollIntervalFor` in `rate-limit.mts`).
+   */
+  pollIntervalMs: InitializedObservable<number>;
   /**
    * The instant every "3 minutes ago" on the page is measured against.
    *
@@ -215,6 +225,37 @@ export const createReader = (deps: ReaderDeps): Reader => {
   const [rateLimit, , { updateState: updateRateLimit }] = createState<
     RateLimit | undefined
   >(undefined, { equals: fastDeepEqual });
+
+  const [
+    pollIntervalMs,
+    setPollIntervalMs,
+    { getSnapshot: getPollIntervalMs },
+  ] = createState(POLL_INTERVAL_MS);
+
+  // The budget after the last read that said what it was, which the next is
+  // measured against.
+  let mut_lastBudget: BudgetSample | undefined = undefined;
+
+  const measureBudget = (answeredLimit: RateLimit | undefined): void => {
+    if (answeredLimit === undefined) {
+      return;
+    }
+
+    const sample: BudgetSample = {
+      rateLimit: answeredLimit,
+      atMs: now(),
+    } as const;
+
+    setPollIntervalMs(
+      pollIntervalFor({
+        intervalMs: getPollIntervalMs(),
+        previous: mut_lastBudget,
+        current: sample,
+      }),
+    );
+
+    mut_lastBudget = sample;
+  };
 
   const [nowMsRead, setNowMs] = createValueEmitter<number>();
 
@@ -337,6 +378,8 @@ export const createReader = (deps: ReaderDeps): Reader => {
       setNowMs(now());
 
       updateRateLimit((current) => answeredLimit ?? current);
+
+      measureBudget(answeredLimit);
 
       const settled = settle(getLoadStatus(), getReadAt(), result, startedAtMs);
 
@@ -497,12 +540,22 @@ export const createReader = (deps: ReaderDeps): Reader => {
     const startPolling = (): void => {
       stopPolling();
 
-      mut_poll = pollEvery(counter(POLL_INTERVAL_MS), read);
+      const everyMs = getPollIntervalMs();
+
+      mut_poll = { ...pollEvery(counter(everyMs), read), everyMs };
     };
 
     if (isVisible()) {
       startPolling();
     }
+
+    // A read that finds a read costing more, or less, sets the timer going
+    // again at the new interval, from that read.
+    const intervalSubscription = pollIntervalMs.subscribe((everyMs) => {
+      if (mut_poll !== undefined && mut_poll.everyMs !== everyMs) {
+        startPolling();
+      }
+    });
 
     const visibilitySubscription = visibilityChange.subscribe(() => {
       if (isVisible()) {
@@ -520,6 +573,8 @@ export const createReader = (deps: ReaderDeps): Reader => {
       tokenSubscription.unsubscribe();
 
       visibilitySubscription.unsubscribe();
+
+      intervalSubscription.unsubscribe();
 
       stopPolling();
 
@@ -548,6 +603,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     runs,
     moreIssues,
     rateLimit,
+    pollIntervalMs,
     nowMs,
     refresh,
     loadMoreIssues,
@@ -630,7 +686,7 @@ const divergenceScale = (entries: readonly Entry[]): number =>
     }),
   );
 
-type PollTimer = Readonly<{ stop: () => void }>;
+type PollTimer = Readonly<{ stop: () => void; everyMs?: number }>;
 
 /**
  * Reads on every tick of `poll`. Whoever starts the timer has just read, so

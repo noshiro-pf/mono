@@ -54,8 +54,9 @@ written for. The header always names the repository shown.
 - **Layout**: one, two or three columns, the blocks in any order, any block
   hidden, or the whole page fitted to the window.
 
-The page reads GitHub every fifteen seconds while the tab is visible, and
-stops while it is hidden.
+The page reads GitHub every fifteen seconds while the tab is visible, less
+often on a repository large enough that this would spend more than half the
+token account's budget, and stops while the tab is hidden.
 
 ## What your repository can add
 
@@ -88,18 +89,42 @@ and labels; it is not packaged for use elsewhere yet.
 - It goes to `api.github.com` and nowhere else: the page's
   `Content-Security-Policy` allows no other host.
 - It is kept in `sessionStorage`, gone when the tab closes, unless you tick
-  **Remember on this device**, which keeps it in `localStorage`. That storage
-  is shared by every app published under `noshiro-pf.github.io`.
+  **Remember on this device**, which keeps it in `localStorage`.
 - **Clear** forgets it.
+- **Both stay in your browser.** Nothing is sent to a server of ours: there
+  is none, and the page is static files on GitHub Pages. Neither the
+  repository's owner nor anyone else can read what you saved; only pages
+  opened in your own browser can.
+
+**What "shared with other pages" means.** A browser keeps `localStorage` per
+site, and every page under `https://noshiro-pf.github.io/` is one site. So,
+in your browser, a token you chose to remember can be read by any page from
+there that you open, not only this one. What is published there:
+
+- from this repository, under `/mono/`: this page, the
+  [Task Manager](https://noshiro-pf.github.io/mono/task-manager/), and the
+  documentation of the libraries (`synstate`, `synstate-dom` and the TypeDoc
+  pages);
+- the older documentation sites of `noshiro-pf`'s archived repositories,
+  which are no longer rebuilt.
+
+None of them reads this page's token. The Task Manager keeps only its own
+data there (its display settings, and Firebase's copy of its tasks and
+sign-in), and the documentation keeps nothing. The token is
+stored under a key no other page uses (`github-token--pr-manager-app--…`).
+The "remember" choice is still off by default, because a page published
+there later would be on the same site.
+
 - The page spends the token account's GraphQL budget: about 9 points a read
-  on a repository of this size, 2,000 or so of the 5,000 an hour. The panel
-  shows what is left.
+  on a repository of this size, 2,000 or so of the 5,000 an hour. On a larger
+  repository it reads less often, so that it keeps to about half the budget.
+  The panel shows what is left and how often it reads.
 
 ## Limits
 
 - github.com only: not GitHub Enterprise Server or `ghe.com`.
 - Read-only: nothing here labels, rebases, merges or comments.
-- Up to 50 open pull requests; with more, the page says so instead.
+- Up to 500 open pull requests; with more, the page says so instead.
 
 ## Running it locally
 

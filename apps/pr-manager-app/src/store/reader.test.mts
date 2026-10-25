@@ -156,6 +156,34 @@ describe(createReader, () => {
     assert.strictEqual(loads.length, 3);
   });
 
+  test('reads less often when a read costs more than half the budget allows', async () => {
+    const { reader, loads, timers, clock } = setup(TOKEN_A);
+
+    reader.start();
+
+    clock.set(1_000);
+
+    await answer(loads, 0, Result.ok(readAt(1_000)), budget(4000));
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    // 30 points in 15 seconds: one read every 45 seconds spends 2,500 an hour.
+    clock.set(16_000);
+
+    await answer(loads, 1, Result.ok(readAt(16_000)), budget(3970));
+
+    assert.strictEqual(reader.pollIntervalMs.getSnapshot().value, 45_000);
+
+    // The fifteen-second timer is gone, and the next read is 45 seconds on.
+    assert.strictEqual(timers.running(POLL_INTERVAL_MS), 0);
+
+    assert.strictEqual(timers.running(45_000), 1);
+
+    timers.fire(45_000);
+
+    assert.strictEqual(loads.length, 3);
+  });
+
   test('stops the poll timer when the tab is hidden', () => {
     const { reader, loads, timers, visibility } = setup(TOKEN_A);
 
@@ -1091,3 +1119,6 @@ const issueList = (
     endCursor,
     referenced: [],
   }) as const;
+
+const budget = (remaining: number): RateLimit =>
+  ({ remaining, limit: 5000, resetEpochMs: 3_600_000 }) as const;

@@ -19,20 +19,29 @@ import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**
- * How many open pull requests one read covers. A repository with more open
- * than this has a different problem than an unreadable page, so a read that
- * finds more fails loudly rather than reporting part of them as the whole.
- * It is also most of what the query costs: the points are counted from the
- * sizes asked for, not from what comes back.
+ * How many open pull requests one page of each query that lists them covers.
+ * It is most of what a query costs — the points are counted from the sizes
+ * asked for, not from what comes back — so it is what this repository needs
+ * rather than GitHub's most, and a repository with more is read a page more
+ * at a time.
  */
-export const OPEN_LIMIT = 50;
+export const OPEN_PAGE_SIZE = 50;
 
 /**
- * How many recently updated merged pull requests are looked through for the
- * ones that merged in the window. Updated rather than merged, because GitHub
- * does not sort by merge time.
+ * How many pages of them a read follows: {@link OPEN_PAGE_SIZE} times this
+ * is the most open pull requests the page reports. A repository with more has
+ * a different problem than an unreadable page, so a read that finds more
+ * fails loudly rather than reporting part of them as the whole.
  */
-const MERGED_SCAN = 30;
+export const MAX_OPEN_PAGES = 10;
+
+/**
+ * How many of the pull requests merged in the window are looked through for
+ * the latest to merge, most recently updated first: search cannot sort by
+ * merge time, and one updated since it merged — a comment, a label — sorts
+ * ahead of one merged later. The section lists twenty.
+ */
+const MERGED_SCAN = 50;
 
 /**
  * How many open issues a read lists, most recently updated first — the
@@ -107,9 +116,13 @@ const CONTEXT_NODES = [
   '}',
 ].join(' ');
 
-/** The open pull requests, in the order every query that lists them uses. */
+/**
+ * A page of the open pull requests, in the order every query that lists them
+ * uses: oldest first, so that one opened while the pages are being read lands
+ * on the last of them rather than moving the others along.
+ */
 const OPEN_PULLS =
-  `open: pullRequests(states: OPEN, first: ${OPEN_LIMIT}, orderBy: { field: CREATED_AT, direction: ASC })` as const;
+  `open: pullRequests(states: OPEN, first: ${OPEN_PAGE_SIZE}, after: $after, orderBy: { field: CREATED_AT, direction: ASC })` as const;
 
 /**
  * The open pull requests as the merge order draws them — what each is, the
@@ -120,7 +133,7 @@ const OPEN_PULLS =
  * requires is REST's (`branch-rules.mts`), asked once this names the branch.
  */
 export const PULL_REQUESTS_QUERY = [
-  'query PullRequests($owner: String!, $name: String!) {',
+  'query PullRequests($owner: String!, $name: String!, $after: String) {',
   '  repository(owner: $owner, name: $name) {',
   '    defaultBranchRef { name }',
   ...Object.entries(CODE_OWNERS_PATHS).map(
@@ -129,7 +142,7 @@ export const PULL_REQUESTS_QUERY = [
   ),
   `    queueLabel: label(name: "${MERGE_QUEUED_LABEL}") { name }`,
   `    ${OPEN_PULLS} {`,
-  '      totalCount',
+  `      ${PAGE_INFO}`,
   '      nodes {',
   '        number title body isDraft url updatedAt',
   '        author { login }',
@@ -151,9 +164,10 @@ export const PULL_REQUESTS_QUERY = [
  * current one.
  */
 export const CHECKS_QUERY = [
-  'query Checks($owner: String!, $name: String!) {',
+  'query Checks($owner: String!, $name: String!, $after: String) {',
   '  repository(owner: $owner, name: $name) {',
   `    ${OPEN_PULLS} {`,
+  `      ${PAGE_INFO}`,
   '      nodes {',
   '        number headRefOid',
   `        commits(last: 1) { nodes { commit { statusCheckRollup { contexts(first: ${PAGE_SIZE}) { ${PAGE_INFO} ${CONTEXT_NODES} } } } } }`,
@@ -172,9 +186,10 @@ export const CHECKS_QUERY = [
  * in one of GitHub's native stacks (`queue-view.mts`).
  */
 export const DETAILS_QUERY = [
-  'query PullRequestDetails($owner: String!, $name: String!) {',
+  'query PullRequestDetails($owner: String!, $name: String!, $after: String) {',
   '  repository(owner: $owner, name: $name) {',
   `    ${OPEN_PULLS} {`,
+  `      ${PAGE_INFO}`,
   '      nodes {',
   '        number bodyHTML',
   `        ${OPEN_CLOSING_ISSUES}`,
@@ -189,12 +204,20 @@ export const DETAILS_QUERY = [
   '}',
 ].join('\n');
 
-/** The pull requests that merged lately, for the section below the queue. */
+/**
+ * The pull requests that merged lately, for the section below the queue:
+ * those a search ({@link mergedSearch}) finds merged since the window began,
+ * rather than the repository's merged pull requests most recently updated,
+ * which on a busy repository are a week's worth of old ones commented on.
+ * `repository` is asked for only so that the query uses `$owner` and `$name`,
+ * which every query here is sent.
+ */
 export const MERGED_QUERY = [
-  'query MergedPullRequests($owner: String!, $name: String!) {',
-  '  repository(owner: $owner, name: $name) {',
-  `    merged: pullRequests(states: MERGED, first: ${MERGED_SCAN}, orderBy: { field: UPDATED_AT, direction: DESC }) {`,
-  '      nodes {',
+  'query MergedPullRequests($owner: String!, $name: String!, $search: String!) {',
+  '  repository(owner: $owner, name: $name) { nameWithOwner }',
+  `  merged: search(query: $search, type: ISSUE, first: ${MERGED_SCAN}) {`,
+  '    nodes {',
+  '      ... on PullRequest {',
   '        number title bodyHTML url mergedAt headRefName baseRefName',
   '        author { login }',
   `        ${LABELS}`,
@@ -204,6 +227,26 @@ export const MERGED_QUERY = [
   '  }',
   '}',
 ].join('\n');
+
+/**
+ * What {@link MERGED_QUERY} searches for: the repository's pull requests
+ * merged on or after the day `sinceMs` falls on, in UTC — a day being as fine
+ * as search goes, the rest is cut by the merge time itself.
+ */
+export const mergedSearch = (
+  repo: Readonly<{ owner: string; name: string }>,
+  sinceMs: number,
+): string => {
+  // `Date` rather than `Temporal`, which not every browser the page may be
+  // opened in has yet (`epochMsOf` in pr-report-core says the same); only the
+  // ISO form, which ECMAScript defines exactly, is read off it.
+  // eslint-disable-next-line unicorn/prefer-temporal
+  const since = new Date(sinceMs);
+
+  const day = since.toISOString().slice(0, 10);
+
+  return `repo:${repo.owner}/${repo.name} is:pr is:merged merged:>=${day} sort:updated-desc` as const;
+};
 
 /**
  * `$first` open issues, most recently updated first: the first of them when
@@ -667,7 +710,7 @@ export const PullRequestsDataSchema = t.record({
     /** `null` when the repository has no such label. */
     queueLabel: t.union([t.record({ name: t.string() }), t.nullType]),
     open: t.record({
-      totalCount: t.number(),
+      pageInfo: PageInfoSchema,
       nodes: t.array(PullRequestSchema),
     }),
   }),
@@ -675,20 +718,24 @@ export const PullRequestsDataSchema = t.record({
 
 export const ChecksDataSchema = t.record({
   repository: t.record({
-    open: t.record({ nodes: t.array(PullRequestChecksSchema) }),
+    open: t.record({
+      pageInfo: PageInfoSchema,
+      nodes: t.array(PullRequestChecksSchema),
+    }),
   }),
 });
 
 export const DetailsDataSchema = t.record({
   repository: t.record({
-    open: t.record({ nodes: t.array(PullRequestDetailsSchema) }),
+    open: t.record({
+      pageInfo: PageInfoSchema,
+      nodes: t.array(PullRequestDetailsSchema),
+    }),
   }),
 });
 
 export const MergedDataSchema = t.record({
-  repository: t.record({
-    merged: t.record({ nodes: t.array(MergedPullRequestSchema) }),
-  }),
+  merged: t.record({ nodes: t.array(MergedPullRequestSchema) }),
 });
 
 /** A base branch that no longer exists is a `null` ref. */

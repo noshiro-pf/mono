@@ -143,9 +143,18 @@ What follows from what the repository has:
   fail the read, since a verdict over a guess at them would be a guess.
 - **`CODEOWNERS` is read where GitHub looks for it**, in its order:
   `.github/CODEOWNERS`, then the root, then `docs/`, on the default branch.
+- **Open pull requests are read fifty a page**, every page on every read, up
+  to ten pages; past five hundred the read fails and says so, rather than
+  drawing a merge order with some of them missing. The checks and the
+  details are paged the same way.
+- **What merged is found by search** (`merged:>=` the day a week back, in
+  `mergedSearch`), not by the most recently updated closed pull requests,
+  which on a busy repository can all be closed without merging.
 - **Without the `merge-queued` label**, which is what `unblock-prs`'s queue is
   made of, the queue block is not drawn — the Layout dialog lists it as
-  `none here` — and the `queued` and `set aside` counts are not offered. A
+  `none here` — and the `queued` and `set aside` counts are not offered. Nor
+  is a pull request labelled `skip-ci` read as paused: elsewhere the label is
+  no promise that its checks are held back, so their verdict stands. A
   choice made of them is ignored there and kept, so it is back on a
   repository that has them: the merge order's filters are kept per browser,
   not per repository.
@@ -408,6 +417,15 @@ a read that finds nothing new costs the same as one that finds everything.
 Every fifteen seconds is 240 reads an hour, about 2,000 of the 5,000 points an
 account gets, which leaves the rest for whatever else that account does with
 GraphQL — `gh` included, since the budget is the account's.
+
+**A larger repository is read less often**, rather than spending the budget
+faster: after each read the page compares what the budget went down by with
+the time since the read before (`pollIntervalFor` in `rate-limit.mts`), and
+spaces the reads so that they spend about half of it, in steps of five
+seconds, never more often than fifteen seconds nor less often than five
+minutes. Whatever else the account spends meanwhile counts too, which slows
+the page rather than the account's other work. The token panel says the
+interval in use.
 
 **Every page of open issues is read again by every read after it**, one query
 a page, about a point each by GitHub's formula, so the list stays as current

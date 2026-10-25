@@ -228,6 +228,28 @@ describe(buildEntries, () => {
     );
   });
 
+  test('reads `skip-ci` as paused only where the caller says it means that', () => {
+    const skipCi = facts(1, {
+      labels: [{ name: 'skip-ci', color: 'cccccc', description: '' }],
+      reported: new Map<string, ContextState>([['test', 'failed']]),
+    });
+
+    const verdictOf = (skipCiPauses: boolean | undefined): string | undefined =>
+      buildEntries({
+        required: ['test'],
+        defaultBranch: 'main',
+        pulls: [skipCi],
+        ...(skipCiPauses === undefined ? {} : { skipCiPauses }),
+      }).entries[0]?.checks.verdict;
+
+    assert.strictEqual(verdictOf(undefined), 'paused');
+
+    assert.strictEqual(verdictOf(true), 'paused');
+
+    // Another repository's `skip-ci` is a label like any other.
+    assert.strictEqual(verdictOf(false), 'failing');
+  });
+
   // A repository that declares no ruleset still has checks, and calling every
   // pull request passed over none of them would hide the failing ones.
   test('without a ruleset, judges every context reported on the head', () => {
