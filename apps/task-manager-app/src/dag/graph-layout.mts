@@ -345,6 +345,13 @@ export const layOutGraph = async (
  * node or a frame it does not hold, and each group's box is its frame. Two
  * nodes, or a node and an empty group, are kept as far apart as they were.
  *
+ * First the members of each group are drawn together across the layers
+ * (`closeGapsBetweenMembers`): a band across the frame that no member is in
+ * holds only what is not in the group, which is about to be moved out of
+ * it, and would be left as an empty band in the frame — as wide as the rest
+ * of the graph, when a member depends on, or is depended on by, a node in
+ * the middle of another group.
+ *
  * A frame and the nodes in it move as one, and so does each node in no
  * group. Taken from the top (from the left), each moves just past those
  * before it in its way, so nothing moves along the layers and no edge turns
@@ -359,7 +366,21 @@ export const clearOfFrames = (
   direction: DagDirection,
   layout: GraphLayout,
 ): GraphLayout => {
-  const nodesById = new Map(layout.nodes.map((node) => [node.id, node]));
+  const across = direction === 'right' ? 'y' : 'x';
+
+  const along = direction === 'right' ? 'x' : 'y';
+
+  const acrossSize = direction === 'right' ? 'height' : 'width';
+
+  const alongSize = direction === 'right' ? 'width' : 'height';
+
+  const drawnTogether = closeGapsBetweenMembers(
+    direction,
+    layout.groups,
+    layout.nodes,
+  );
+
+  const nodesById = new Map(drawnTogether.map((node) => [node.id, node]));
 
   const grouped = new Set(layout.groups.flatMap(({ members }) => members));
 
@@ -384,7 +405,7 @@ export const clearOfFrames = (
         frame: frame !== undefined,
       };
     }),
-    ...layout.nodes
+    ...drawnTogether
       .filter(({ id }) => !grouped.has(id))
       .map((node): Block => ({
         key: node.id,
@@ -393,14 +414,6 @@ export const clearOfFrames = (
         frame: false,
       })),
   ] as const;
-
-  const across = direction === 'right' ? 'y' : 'x';
-
-  const along = direction === 'right' ? 'x' : 'y';
-
-  const acrossSize = direction === 'right' ? 'height' : 'width';
-
-  const alongSize = direction === 'right' ? 'width' : 'height';
 
   const mut_moved: (Block & Readonly<{ at: number }>)[] = [];
 
@@ -451,7 +464,7 @@ export const clearOfFrames = (
     return shift === 0 ? at : { ...at, [across]: at[across] + shift };
   };
 
-  const nodes = layout.nodes.map((node) => moved(node, node.id));
+  const nodes = drawnTogether.map((node) => moved(node, node.id));
 
   const movedById = new Map(nodes.map((node) => [node.id, node]));
 
@@ -476,6 +489,62 @@ export const clearOfFrames = (
         : { ...group, ...frame };
     }),
   };
+};
+
+/**
+ * `nodes` with the members of each of `groups` moved across the layers, up
+ * when the graph grows to the right, left when it grows down, until no two
+ * bands of them across the frame are more than `NODE_SPACING` apart, which
+ * is as close as ELK puts two nodes of a layer. Within a band, and among
+ * what is in no group, nothing moves.
+ */
+const closeGapsBetweenMembers = (
+  direction: DagDirection,
+  groups: readonly LayoutGroup[],
+  nodes: readonly LaidOutNode[],
+): readonly LaidOutNode[] => {
+  const across = direction === 'right' ? 'y' : 'x';
+
+  const acrossSize = direction === 'right' ? 'height' : 'width';
+
+  const nodesById = new Map(nodes.map((node) => [node.id, node]));
+
+  const mut_shifts = new Map<GraphNodeId, number>();
+
+  for (const { members } of groups) {
+    let mut_end: number | undefined = undefined;
+
+    let mut_closed = 0;
+
+    const placed = Arr.generate(function* () {
+      for (const member of members) {
+        const node = nodesById.get(member);
+
+        if (node !== undefined) {
+          yield node;
+        }
+      }
+    });
+
+    for (const node of placed.toSorted((a, b) => a[across] - b[across])) {
+      if (mut_end !== undefined && node[across] - mut_end > NODE_SPACING) {
+        mut_closed += node[across] - mut_end - NODE_SPACING;
+      }
+
+      mut_shifts.set(node.id, mut_closed);
+
+      mut_end = Math.max(
+        mut_end ?? node[across],
+        node[across] + node[acrossSize],
+      );
+    }
+  }
+
+  return nodes.map((node) => {
+    const shift = mut_shifts.get(node.id) ?? 0;
+
+    return shift === 0 ? node : { ...node, [across]: node[across] - shift };
+  });
 };
 
 /**
@@ -525,9 +594,12 @@ export type LaidOutEdge = DeepReadonly<{
   implied: boolean;
 }>;
 
+/** How far apart ELK keeps two nodes of a layer. */
+const NODE_SPACING = 28;
+
 /** How far apart ELK keeps what it lays out. */
 const spacingOptions = {
-  'elk.spacing.nodeNode': '28',
+  'elk.spacing.nodeNode': String(NODE_SPACING),
   'elk.layered.spacing.nodeNodeBetweenLayers': '56',
   // An edge that skips a layer passes between two of its nodes, where
   // it is routed (`edge-routing.mts`) more than 20 from each: room for

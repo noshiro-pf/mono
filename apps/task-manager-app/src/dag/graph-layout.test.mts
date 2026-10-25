@@ -47,6 +47,9 @@ const g = asGroupId('g');
 
 const h = asGroupId('h');
 
+/** `elk.spacing.nodeNode`. */
+const NODE_SPACING = 28;
+
 /** More than `elk.spacing.edgeLabel`, less than any node. */
 const LABEL_ROOM = 8;
 
@@ -824,6 +827,92 @@ describe(layOutGraph, () => {
   );
 });
 
+describe('layOutGraph, with a dependency between groups', () => {
+  test.each(dagDirections)(
+    'leaves no band inside a group, %s, where a member waits for a node in the middle of another group',
+    async (direction) => {
+      // Three chains in g, the middle one waiting for s in h; h holds s and
+      // n, which nothing joins: s goes where it is waited for, in the
+      // middle of g, and n where ELK puts what nothing joins, apart.
+      const chains = [
+        ['a1', 'a2', 'a3', 'a4'],
+        ['b1', 'b2', 'b3', 'b4'],
+        ['c1', 'c2', 'c3', 'c4'],
+      ] as const;
+
+      const tasks = [
+        ...chains.flatMap((chain) =>
+          chain.map((id, index) =>
+            createTask({
+              id: asTaskId(id),
+              title: id,
+              now: 0,
+              dependencies: [
+                ...(index === 0 ? [] : [chain[index - 1] ?? id]),
+                ...(id === 'b3' ? ['s'] : []),
+              ].map((from) => ({
+                from: { kind: 'task', id: asTaskId(from) },
+                type: 'finish-to-start',
+                lagMs: 0,
+              })),
+            }),
+          ),
+        ),
+        createTask({ id: asTaskId('s'), title: 's', now: 0 }),
+        createTask({ id: asTaskId('n'), title: 'n', now: 0 }),
+      ] as const;
+
+      const input = layoutInput(
+        buildDependencyGraph({ tasks, milestones: [] }),
+        direction,
+        'standard',
+        [
+          {
+            id: g,
+            members: chains.flatMap((chain) =>
+              chain.map((id): GraphNodeId => `task:${id}`),
+            ),
+          },
+          { id: h, members: ['task:n', 'task:s'] },
+        ],
+      );
+
+      const layout = await layOutGraph(input, layoutWithElk);
+
+      const groupH = layout.groups.find(({ id }) => id === h);
+
+      assert.isDefined(groupH);
+
+      const acrossSize = direction === 'right' ? 'height' : 'width';
+
+      // No larger across than two nodes, one band apart.
+      assert.isAtMost(
+        groupH[acrossSize],
+        2 * TASK_NODE_SIZE[acrossSize] +
+          NODE_SPACING +
+          GROUP_HEADER +
+          GROUP_PADDING,
+      );
+
+      for (const [index, node] of layout.nodes.entries()) {
+        for (const other of layout.nodes.slice(index + 1)) {
+          assert.isFalse(overlaps(node, other));
+        }
+      }
+
+      for (const group of layout.groups) {
+        assert.deepStrictEqual(
+          layout.nodes
+            .filter((node) => overlaps(node, group))
+            .map(({ id }) => id)
+            .toSorted(),
+          group.members.toSorted(),
+        );
+      }
+    },
+  );
+});
+
 describe(labelSize, () => {
   test('grows with the text, wide characters counting double', () => {
     assert.isBelow(labelSize('SS').width, labelSize('SS +3日').width);
@@ -857,35 +946,81 @@ describe(clearOfFrames, () => {
     ],
   } as const;
 
-  test('moves what is inside a frame and not in its group past it, and what comes after past that', () => {
+  test('draws the members together, moves what is between them past the frame, and leaves what is clear of it', () => {
     const moved = clearOfFrames('right', layout);
 
     const [group] = moved.groups;
 
     assert.isDefined(group);
 
-    // The frame round the members, which are where they were.
+    // c up to as close below a as ELK puts two nodes of a layer, and the
+    // frame round them: b's place between them is not left empty.
+    const nodeC = TASK_NODE_SIZE.height + NODE_SPACING;
+
     assert.deepStrictEqual(group, {
       id: g,
       members: ['task:a', 'task:c'],
       x: -GROUP_PADDING,
       y: -GROUP_HEADER,
       width: TASK_NODE_SIZE.width + 2 * GROUP_PADDING,
-      height: 200 + TASK_NODE_SIZE.height + GROUP_HEADER + GROUP_PADDING,
+      height: nodeC + TASK_NODE_SIZE.height + GROUP_HEADER + GROUP_PADDING,
     });
 
-    const [, nodeB, , nodeD, nodeE] = moved.nodes;
+    const [nodeA, nodeB, movedC, nodeD, nodeE] = moved.nodes;
 
     const below = group.y + group.height + PLACEMENT_GAP;
 
-    // Down past the frame, and the next one down past it in turn.
     assert.deepStrictEqual(
-      [nodeB?.x, nodeB?.y, nodeD?.x, nodeD?.y],
-      [0, below, 0, below + TASK_NODE_SIZE.height + PLACEMENT_GAP],
+      [nodeA, movedC].map((node) => [node?.x, node?.y]),
+      [
+        [0, 0],
+        [0, nodeC],
+      ],
     );
+
+    // Down past the frame; d is below that already, and stays.
+    assert.deepStrictEqual([nodeB?.x, nodeB?.y], [0, below]);
+
+    assert.isAbove(300, below + TASK_NODE_SIZE.height + PLACEMENT_GAP);
+
+    assert.strictEqual(nodeD, layout.nodes[3]);
 
     // Nothing in its way, in a layer of its own.
     assert.strictEqual(nodeE, layout.nodes[4]);
+  });
+
+  test('draws the bands of members together, and keeps the members of a band where they are in it', () => {
+    // a and b side by side in one band, c a little below b in it; d far
+    // below, and further along.
+    const moved = clearOfFrames('right', {
+      nodes: [
+        box('a', 0, 0),
+        box('b', 240, 10),
+        box('c', 480, 40),
+        box('d', 720, 500),
+      ],
+      edges: [],
+      groups: [
+        {
+          id: g,
+          members: ['task:a', 'task:b', 'task:c', 'task:d'],
+          x: 0,
+          y: 0,
+          width: 0,
+          height: 0,
+        },
+      ],
+    });
+
+    assert.deepStrictEqual(
+      moved.nodes.map(({ x, y }) => [x, y]),
+      [
+        [0, 0],
+        [240, 10],
+        [480, 40],
+        [720, 40 + TASK_NODE_SIZE.height + NODE_SPACING],
+      ],
+    );
   });
 
   test('moves to the right when the graph grows down', () => {
