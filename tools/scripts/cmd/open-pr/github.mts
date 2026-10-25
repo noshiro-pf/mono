@@ -405,23 +405,6 @@ const blockedByOf = async (
   );
 };
 
-export const addLabel = async (
-  api: ApiContext,
-  prNumber: number,
-  label: string,
-): Promise<Result<undefined, string>> => {
-  // Labels hang off the issue, which is the same object as the pull request.
-  const added = await rest(
-    api,
-    'POST',
-    `/issues/${prNumber}/labels`,
-    t.unknown(),
-    { body: { labels: [label] } },
-  );
-
-  return Result.isErr(added) ? added : Result.ok(undefined);
-};
-
 /**
  * GraphQL: the REST API cannot take a pull request out of draft. The one
  * GraphQL call this command makes, and only for a pull request someone

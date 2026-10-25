@@ -14,7 +14,7 @@ import type {
 import * as t from 'ts-fortress';
 import type { StrictPick } from 'ts-type-forge';
 
-/** The fields read from `gh pr list` / `gh pr view`. */
+/** The fields read of each pull request (`github.mts`'s `listPullRequests`). */
 export const PullRequestSchema = t.record({
   number: t.number(),
   /** The node id, which the GraphQL mutation that arms auto-merge takes. */
@@ -43,7 +43,7 @@ export const PullRequestListSchema = t.array(PullRequestSchema);
 
 /**
  * What moving a branch reads of its pull request, which `push-fixed-pr` fills
- * in from the REST API rather than from `gh`.
+ * in from the REST API rather than from GraphQL.
  */
 export type BranchOf = StrictPick<
   PullRequest,

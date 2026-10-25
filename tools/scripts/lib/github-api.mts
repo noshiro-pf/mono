@@ -1,10 +1,10 @@
 /**
- * The GitHub API over `fetch`, and the credential it needs, for every command
- * that does not go through `gh`.
+ * The GitHub API over `fetch`, and the credential it needs, for every command.
  *
- * `open-pr` used to shell out to `gh`. It does not any more, because the
- * places it is most useful — a cloud container, a runner — are the places
- * `gh` is least likely to be installed, while a token is already there. The
+ * `open-pr` and `unblock-prs` used to shell out to `gh`. They do not any
+ * more, because the places they are most useful — a cloud container, a
+ * runner, a repository other than this one — are the places `gh` is least
+ * likely to be installed, while a token is already there. The
  * API is the same one `gh` calls; only where the credential comes from
  * differs, so `gh auth token` stays as the last resort for a machine set up
  * that way with nothing exported.
@@ -27,10 +27,10 @@ export type ApiContext = Readonly<{ repo: RepoRef; token: string }>;
 /**
  * The token the environment holds, if any: `GH_TOKEN`, then `GITHUB_TOKEN`.
  *
- * That is the order `gh` reads them in, so that with both set a command over
- * `fetch` acts as the same account as one over `gh` — `unblock-prs` writes
- * its comments through `gh`, and the commands here trust a comment by whose
- * account wrote it. A workflow sets either only by passing it; Actions
+ * That is the order `gh` reads them in, so that with both set every command
+ * here acts as the same account as `gh` would — the commands trust a comment
+ * by whose account wrote it, and `unblock-prs`'s set-aside comments were
+ * written through `gh` before it moved here. A workflow sets either only by passing it; Actions
  * exports neither by itself. `github-settings-as-code` reads a list of its
  * own, without `GITHUB_TOKEN`, and says why in `resolveAuthToken`.
  */
@@ -153,17 +153,21 @@ const PackageJsonSchema = t.record({
   repository: t.record({ url: t.string() }),
 });
 
-/** The token and the repository, for a command that calls {@link rest}. */
-export const resolveApiContext = async (): Promise<
-  Result<ApiContext, string>
-> => {
+/**
+ * The token and the repository, for a command that calls {@link rest}.
+ * `repoOption` is a `--repo owner/name` the command was given, if any
+ * ({@link resolveRepo}).
+ */
+export const resolveApiContext = async (
+  repoOption?: string,
+): Promise<Result<ApiContext, string>> => {
   const token = await resolveToken();
 
   if (Result.isErr(token)) {
     return token;
   }
 
-  const repo = await resolveRepo();
+  const repo = await resolveRepo(repoOption);
 
   return Result.isErr(repo)
     ? repo
@@ -177,7 +181,7 @@ export const resolveApiContext = async (): Promise<
  */
 export const rest = async <A,>(
   context: ApiContext,
-  method: 'GET' | 'PATCH' | 'POST',
+  method: HttpMethod,
   path: string,
   schema: t.Type<A>,
   { query, body, withBodyHtml = false }: RestOptions = {},
@@ -245,15 +249,31 @@ export type RestOptions = Readonly<{
  * equivalent — GitHub exposes neither "mark ready for review" nor "enable
  * auto-merge" there — so those go through here rather than through a
  * different tool.
- *
- * GraphQL answers 200 to a failed mutation and puts the reason in `errors`,
- * so that is checked rather than the status alone.
  */
 export const graphql = async (
   context: ApiContext,
   query: string,
-  variables: ReadonlyRecord<string, string>,
-): Promise<Result<undefined, string>> => {
+  variables: GraphqlVariables,
+): Promise<Result<undefined, string>> =>
+  Result.map(
+    await graphqlQuery(context, query, variables, t.unknown()),
+    () => undefined,
+  );
+
+/**
+ * One GraphQL request, resolving to its `data` validated by `schema`.
+ *
+ * GraphQL answers 200 to a failed request and puts the reason in `errors`,
+ * so that is checked rather than the status alone. A partial answer — `data`
+ * beside `errors` — is still a failure: what is missing from it is exactly
+ * what the caller asked for.
+ */
+export const graphqlQuery = async <A,>(
+  context: ApiContext,
+  query: string,
+  variables: GraphqlVariables,
+  schema: t.Type<A>,
+): Promise<Result<A, string>> => {
   const response = await send({
     url: 'https://api.github.com/graphql',
     method: 'POST',
@@ -274,19 +294,75 @@ export const graphql = async (
 
   const errors = parsed.value.errors ?? [];
 
-  return Arr.isEmpty(errors)
-    ? Result.ok(undefined)
-    : Result.err(errors.map((error) => error.message).join('; '));
+  if (Arr.isNonEmpty(errors)) {
+    return Result.err(errors.map((error) => error.message).join('; '));
+  }
+
+  const data = schema.validate(parsed.value.data);
+
+  return Result.isErr(data)
+    ? Result.err(t.validationErrorsToMessages(data.value).join('\n'))
+    : Result.ok(data.value);
 };
 
+/** What a GraphQL request's variables may hold: names, numbers and ids. */
+export type GraphqlVariables = ReadonlyRecord<string, number | string>;
+
 const GraphqlResponseSchema = t.record({
+  data: t.optional(t.unknown()),
   errors: t.optional(t.array(t.record({ message: t.string() }))),
 });
+
+/** The methods the commands call the REST API with. */
+export type HttpMethod = 'DELETE' | 'GET' | 'PATCH' | 'POST';
+
+/**
+ * Adds `label` to a pull request. Labels hang off the issue, which is the
+ * same object as the pull request.
+ */
+export const addLabel = async (
+  context: ApiContext,
+  prNumber: number,
+  label: string,
+): Promise<Result<undefined, string>> =>
+  Result.map(
+    await rest(context, 'POST', `/issues/${prNumber}/labels`, t.unknown(), {
+      body: { labels: [label] },
+    }),
+    () => undefined,
+  );
+
+/**
+ * Takes `label` off a pull request. A label already off is not an error, as
+ * it is not to `gh pr edit --remove-label`: GitHub answers 404, and what the
+ * caller wanted is true.
+ */
+export const removeLabel = async (
+  context: ApiContext,
+  prNumber: number,
+  label: string,
+): Promise<Result<undefined, string>> => {
+  // One path segment, whatever the name holds. The rule's premise, building
+  // a query string, is not what this is.
+  // eslint-disable-next-line no-restricted-globals
+  const segment = encodeURIComponent(label);
+
+  const removed = await rest(
+    context,
+    'DELETE',
+    `/issues/${prNumber}/labels/${segment}`,
+    t.unknown(),
+  );
+
+  return Result.isOk(removed) || removed.value.startsWith('404 ')
+    ? Result.ok(undefined)
+    : removed;
+};
 
 /** One request to the API, before anything is made of the answer. */
 export type GitHubRequest = Readonly<{
   url: string;
-  method: 'GET' | 'PATCH' | 'POST';
+  method: HttpMethod;
   /** Absent for an anonymous read, which a public repository allows. */
   token: string | undefined;
   accept: string;

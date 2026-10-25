@@ -1,7 +1,7 @@
 /**
  * Who moves each pull request next, as the worker reads it: `pr-report-core`'s
  * `queueOwner`, the one function `pr-report`, `claim-pr` and every other
- * command a session runs read it through, given the facts `gh` returned.
+ * command a session runs read it through, given the facts GitHub returned.
  *
  * The set-aside comes from the records, which by the time triage reads them
  * are what this account's comments say (`settleSkips`): a record the base

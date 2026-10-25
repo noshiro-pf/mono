@@ -27,6 +27,11 @@ export type Options = Readonly<{
    * the fixer run, amended onto its commit and pushed. See `auto-fix.mts`.
    */
   autoFix: boolean;
+  /**
+   * The repository, `owner/name`, when it is not the one `origin` names
+   * (`tools/scripts/lib/github-api.mts`'s `resolveRepo`).
+   */
+  repo: string | undefined;
 }>;
 
 export const defaultOptions: Options = {
@@ -38,6 +43,7 @@ export const defaultOptions: Options = {
   pollIntervalSec: 30,
   watchTimeoutMin: 90,
   autoFix: true,
+  repo: undefined,
 } as const;
 
 export const HELP = [
@@ -58,6 +64,7 @@ export const HELP = [
   `  --poll-interval <sec>    wait between polls of the watched pull request (default ${defaultOptions.pollIntervalSec})`,
   `  --watch-timeout <min>    give up on a pull request after this long (default ${defaultOptions.watchTimeoutMin})`,
   "  --no-auto-fix            leave a failure that is only a fixer's diff as it is",
+  '  --repo <owner/name>      the repository, when origin does not name it',
   '  -h, --help               show this help',
 ].join('\n');
 
@@ -73,6 +80,7 @@ export const parseOptions = (
     'poll-interval': { type: 'string' },
     'watch-timeout': { type: 'string' },
     'no-auto-fix': { type: 'boolean', default: false },
+    repo: { type: 'string' },
   });
 
   if (Result.isErr(parsed)) {
@@ -144,5 +152,6 @@ export const parseOptions = (
     pollIntervalSec: pollIntervalSec.value,
     watchTimeoutMin: watchTimeoutMin.value,
     autoFix: !values['no-auto-fix'],
+    repo: values.repo,
   });
 };
