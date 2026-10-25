@@ -1,10 +1,10 @@
 import type { FixedLengthTuple } from 'ts-type-forge';
 import {
+  actualSizeTopTransform,
   contentPointAt,
   fitBelowTransform,
   fitBoundsTransform,
   fitViewTransform,
-  fitWidthTopTransform,
   interpolateTransform,
   MAX_SCALE,
   MIN_SCALE,
@@ -182,52 +182,40 @@ describe(fitBelowTransform, () => {
   });
 });
 
-describe(fitWidthTopTransform, () => {
-  test('fits the width, centred, with the top below the inset', () => {
-    const fitted = fitWidthTopTransform(
-      { x: -10, y: -20, width: 400, height: 2000 },
-      { width: 216, height: 300 },
-      { padding: 8, topInset: 60, minScale: 0.25 },
-    );
-
-    assert.strictEqual(fitted.scale, 0.5);
-
-    // The left edge 8 in, the top at the inset: the height is not fitted.
-    assert.deepStrictEqual(toScreen(fitted, -10, -20), [8, 60]);
-  });
-
-  test('centres a narrow column, at its natural size', () => {
-    const fitted = fitWidthTopTransform(
-      { x: 0, y: 0, width: 200, height: 100 },
-      { width: 1000, height: 800 },
-      { padding: 16, topInset: 60, minScale: 0.5 },
+describe(actualSizeTopTransform, () => {
+  test('centres a narrow column at its natural size, the top below the inset', () => {
+    const fitted = actualSizeTopTransform(
+      { x: -10, y: -20, width: 200, height: 2000 },
+      { width: 1000, height: 300 },
+      { padding: 16, topInset: 60 },
     );
 
     assert.strictEqual(fitted.scale, 1);
 
-    assert.deepStrictEqual(toScreen(fitted, 0, 0), [400, 60]);
+    // The height is not fitted: the rest is panned down to.
+    assert.deepStrictEqual(toScreen(fitted, -10, -20), [400, 60]);
   });
 
-  test('stops at the least scale, from the left, for the rest to be panned to', () => {
-    const fitted = fitWidthTopTransform(
+  test('starts a wide column at the left, for the rest to be panned to', () => {
+    const fitted = actualSizeTopTransform(
       { x: 0, y: 0, width: 2000, height: 100 },
       { width: 400, height: 800 },
-      { padding: 16, topInset: 60, minScale: 0.5 },
+      { padding: 16, topInset: 60 },
     );
 
-    assert.strictEqual(fitted.scale, 0.5);
+    assert.strictEqual(fitted.scale, 1);
 
     assert.deepStrictEqual(toScreen(fitted, 0, 0), [16, 60]);
   });
 
-  test('keeps the least scale for an empty view', () => {
-    const fitted = fitWidthTopTransform(
+  test('is at its natural size in an empty view too', () => {
+    const fitted = actualSizeTopTransform(
       { x: 0, y: 0, width: 200, height: 100 },
       { width: 0, height: 0 },
-      { padding: 16, topInset: 60, minScale: 0.5 },
+      { padding: 16, topInset: 60 },
     );
 
-    assert.strictEqual(fitted.scale, 0.5);
+    assert.strictEqual(fitted.scale, 1);
   });
 });
 
