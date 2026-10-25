@@ -95,7 +95,7 @@ const DagScreen = ({
   layout,
 }: Readonly<{ layout: InitializedObservable<GraphLayout> }>): JSX.Element => {
   // Set by the toolbar as it is made; read by the canvas, which keeps
-  // 「アーク」 and 「タイル」 clear of it.
+  // every mode clear of it.
   const mut_toolbar: { element: HTMLDivElement | undefined } = {
     element: undefined,
   };

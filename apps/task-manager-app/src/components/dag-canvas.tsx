@@ -18,7 +18,6 @@ import {
   dropTarget,
   dropTargetAt,
   fitBelowTransform,
-  fitBoundsTransform,
   fitWidthTopTransform,
   groupIdOfKey,
   groupKey,
@@ -93,7 +92,7 @@ import {
 type Props = Readonly<{
   /** ELK's layout, which places every node not put anywhere by hand. */
   layout: InitializedObservable<GraphLayout>;
-  /** The toolbar over the canvas, which 「アーク」 and 「タイル」 start below. */
+  /** The toolbar over the canvas, which every mode is fitted below. */
   toolbar: () => HTMLDivElement | undefined;
 }>;
 
@@ -259,7 +258,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
 
   let mut_gesture: Gesture = IDLE_GESTURE;
 
-  // Below the toolbar: where 「アーク」 and 「タイル」 start.
+  // Below the toolbar: where every mode is fitted from.
   const topInset = (): number => {
     const bar = toolbar();
 
@@ -267,6 +266,18 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
       (bar === undefined ? 0 : bar.offsetTop + bar.offsetHeight) +
       TOOLBAR_CLEARANCE
     );
+  };
+
+  // From above the buttons at the bottom to the bottom of the canvas: what
+  // a fit keeps clear of, so that nothing is fitted under them.
+  const bottomInset = (): number => {
+    const element = mut_elements.wrapper;
+
+    const controls = mut_elements.controls;
+
+    return element === undefined || controls === undefined
+      ? 0
+      : element.clientHeight - controls.offsetTop + TOOLBAR_CLEARANCE;
   };
 
   // Where the rows of 「タイル」 are seen: from below the toolbar to above
@@ -280,11 +291,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
 
     const rowsTop = topInset();
 
-    const controls = mut_elements.controls;
-
-    const rowsBottom =
-      (controls === undefined ? element.clientHeight : controls.offsetTop) -
-      TOOLBAR_CLEARANCE;
+    const rowsBottom = element.clientHeight - bottomInset();
 
     return { topInset: rowsTop, viewport: Math.max(0, rowsBottom - rowsTop) };
   };
@@ -330,7 +337,13 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
 
     switch (target.kind) {
       case 'whole':
-        setTransform(fitBoundsTransform(target.bounds, size, FIT_PADDING));
+        setTransform(
+          fitBelowTransform(target.bounds, size, {
+            padding: FIT_PADDING,
+            topInset: topInset(),
+            bottomInset: bottomInset(),
+          }),
+        );
 
         break;
 
@@ -356,7 +369,8 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
 
   // 「全体表示」: all of it in sight. 「アーク」 is otherwise fitted by its
   // width, which leaves a long column to be panned down; the button shows
-  // the whole column, below the toolbar, however small that makes it.
+  // the whole column, between the toolbar and the buttons at the bottom,
+  // however small that makes it.
   const fitAll = (): void => {
     const element = mut_elements.wrapper;
 
@@ -372,7 +386,11 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
       fitBelowTransform(
         target.bounds,
         { width: element.clientWidth, height: element.clientHeight },
-        { padding: FIT_PADDING, topInset: topInset() },
+        {
+          padding: FIT_PADDING,
+          topInset: topInset(),
+          bottomInset: bottomInset(),
+        },
       ),
     );
   };
@@ -1255,7 +1273,7 @@ const FIT_PADDING = 16;
  */
 const ARC_MIN_SCALE = 0.5;
 
-/** Between the toolbar and the top of 「アーク」 fitted below it. */
+/** Between the toolbar, or the buttons at the bottom, and what is fitted. */
 const TOOLBAR_CLEARANCE = 8;
 
 const BUTTON_ZOOM = 1.25;

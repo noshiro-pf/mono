@@ -156,6 +156,21 @@ describe(fitBelowTransform, () => {
     assert.deepStrictEqual(toScreen(fitted, 0, 0), [400, 410]);
   });
 
+  test('keeps clear of the bottom inset too', () => {
+    const fitted = fitBelowTransform(
+      { x: 0, y: 0, width: 400, height: 1000 },
+      { width: 500, height: 600 },
+      { padding: 0, topInset: 60, bottomInset: 40 },
+    );
+
+    // 500 between the insets for 1000.
+    assert.strictEqual(fitted.scale, 0.5);
+
+    assert.deepStrictEqual(toScreen(fitted, 0, 0), [150, 60]);
+
+    assert.deepStrictEqual(toScreen(fitted, 400, 1000), [350, 560]);
+  });
+
   test('stops at the least scale', () => {
     const fitted = fitBelowTransform(
       { x: 0, y: 0, width: 200, height: 100_000 },
