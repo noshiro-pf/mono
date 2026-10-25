@@ -10,25 +10,25 @@ import type {
 } from './types.mjs';
 
 /**
- * `state` without the node `ref`, and without every dependency on it — what
- * deleting a node has to write in one go, so that no other node is left
- * waiting for something that no longer exists (a dependency on a missing
- * node never holds).
+ * `state` without the nodes `refs`, and without every dependency on any of
+ * them — what deleting nodes has to write in one go, so that no other node
+ * is left waiting for something that no longer exists (a dependency on a
+ * missing node never holds).
  *
- * `updatedTasks` and `updatedMilestones` are the nodes whose dependencies
- * changed, with `updatedAt` set to `now`; the other nodes are returned as
- * they were. A node that does not exist is still cleaned out of the
- * dependencies that name it.
+ * `updatedTasks` and `updatedMilestones` are the nodes kept whose
+ * dependencies changed, with `updatedAt` set to `now`; the other nodes are
+ * returned as they were. A node that does not exist is still cleaned out of
+ * the dependencies that name it.
  */
-export const removeNode = (
+export const removeNodes = (
   state: DomainState,
-  ref: NodeRef,
+  refs: readonly NodeRef[],
   now: number,
-): RemoveNodeResult => {
-  const removedId = nodeId(ref);
+): RemoveNodesResult => {
+  const removedIds = new Set(refs.map(nodeId));
 
   const dependsOnRemoved = (dependency: Dependency): boolean =>
-    nodeId(dependency.from) === removedId;
+    removedIds.has(nodeId(dependency.from));
 
   /** `dependencies` without those on the node, or `undefined` if none was. */
   const remaining = (
@@ -39,7 +39,7 @@ export const removeNode = (
       : undefined;
 
   const tasks = state.tasks
-    .filter((task) => nodeId({ kind: 'task', id: task.id }) !== removedId)
+    .filter((task) => !removedIds.has(nodeId({ kind: 'task', id: task.id })))
     .map((task) => {
       const dependencies = remaining(task.dependencies);
 
@@ -55,7 +55,7 @@ export const removeNode = (
   const milestones = state.milestones
     .filter(
       (milestone) =>
-        nodeId({ kind: 'milestone', id: milestone.id }) !== removedId,
+        !removedIds.has(nodeId({ kind: 'milestone', id: milestone.id })),
     )
     .map((milestone) => {
       const dependencies = remaining(milestone.dependencies);
@@ -93,7 +93,7 @@ export const removeNode = (
   };
 };
 
-export type RemoveNodeResult = DeepReadonly<{
+export type RemoveNodesResult = DeepReadonly<{
   state: DomainState;
   updatedTasks: Task[];
   updatedMilestones: Milestone[];

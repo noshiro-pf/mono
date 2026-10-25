@@ -220,6 +220,49 @@ test(
   },
 );
 
+test(
+  'deletes the nodes selected with a lasso, after asking',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await showDag(page);
+
+    const design = dagNode(page, /画面設計/u);
+
+    const api = dagNode(page, /API を実装する/u);
+
+    await shiftLasso(page, [await centreOf(design), await centreOf(api)]);
+
+    const bar = page.getByTestId('dag-selection-bar');
+
+    await page.getByTestId('dag-bulk-delete').click();
+
+    await expect
+      .soft(page.getByTestId('dag-bulk-delete-question'))
+      .toHaveText('2 件を依存ごと削除しますか？');
+
+    // やめる deletes nothing, and keeps the selection.
+    await bar.getByRole('button', { name: 'やめる' }).click();
+
+    await expect
+      .soft(page.getByTestId('dag-selection-count'))
+      .toHaveText('2 件を選択中');
+
+    await expect.soft(design).toHaveCount(1);
+
+    await page.getByTestId('dag-bulk-delete').click();
+
+    await page.getByTestId('dag-bulk-delete-confirm').click();
+
+    await expect.soft(design).toHaveCount(0);
+
+    await expect.soft(api).toHaveCount(0);
+
+    await expect.soft(dagNode(page, /画面を実装する/u)).toHaveCount(1);
+
+    await expect.soft(bar).toHaveCount(0);
+  },
+);
+
 const showDag = async (page: DeepReadonly<Page>): Promise<void> => {
   await page.goto(DEMO);
 

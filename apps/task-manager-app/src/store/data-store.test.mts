@@ -108,13 +108,42 @@ describe(createDataStore, () => {
 
     setSession(signedIn(createMemoryRepository(initial)));
 
-    store.deleteNode({ kind: 'task', id: asTaskId('a') });
+    store.deleteNodes([{ kind: 'task', id: asTaskId('a') }]);
 
     await Promise.resolve();
 
     assert.deepStrictEqual(store.state.getSnapshot().value.tasks, [
       { ...b, dependencies: [], updatedAt: 1000 },
     ]);
+  });
+
+  test('deletes several nodes in one write', async () => {
+    const { store, setSession } = setup();
+
+    setSession(signedIn(createMemoryRepository(initial)));
+
+    store.deleteNodes([
+      { kind: 'task', id: asTaskId('a') },
+      { kind: 'task', id: asTaskId('b') },
+    ]);
+
+    await Promise.resolve();
+
+    assert.deepStrictEqual(store.state.getSnapshot().value.tasks, []);
+  });
+
+  test('deleting none writes nothing', async () => {
+    const { store, setSession } = setup();
+
+    setSession(signedIn(createMemoryRepository(initial)));
+
+    const before = store.state.getSnapshot().value;
+
+    store.deleteNodes([]);
+
+    await Promise.resolve();
+
+    assert.strictEqual(store.state.getSnapshot().value, before);
   });
 
   test('adds a dependency, onto the node as stored', async () => {

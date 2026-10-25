@@ -41,6 +41,7 @@ import {
   parseViewQuery,
 } from '../view-model/index.mjs';
 import { createAnimationSettingStore } from './animation-setting-store.mjs';
+import { createBulkDeleteStore } from './bulk-delete-store.mjs';
 import { createBulkEditStore } from './bulk-edit-store.mjs';
 import { createClockStore } from './clock-store.mjs';
 import { createDagFilterStore } from './dag-filter-store.mjs';
@@ -105,7 +106,9 @@ export const editorStore = createEditorStore({
   timeZone: undefined,
   putTask: dataStore.putTask,
   putMilestone: dataStore.putMilestone,
-  deleteNode: dataStore.deleteNode,
+  deleteNode: (ref) => {
+    dataStore.deleteNodes([ref]);
+  },
 });
 
 export const groupEditorStore = createGroupEditorStore({
@@ -243,6 +246,11 @@ export const dagSelectionStore = createDagSelectionStore({
 
 export const bulkEditStore = createBulkEditStore({
   editNodes: dataStore.editNodes,
+});
+
+export const bulkDeleteStore = createBulkDeleteStore({
+  selected: dagSelectionStore.selected,
+  deleteNodes: dataStore.deleteNodes,
 });
 
 /**

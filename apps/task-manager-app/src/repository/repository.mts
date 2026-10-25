@@ -27,11 +27,14 @@ export type Repository = Readonly<{
   /** Creates or replaces the milestone with its id. */
   putMilestone: (milestone: Milestone) => Promise<void>;
   /**
-   * Deletes the node `ref` and writes the nodes `cleanup` names — those whose
-   * dependencies on it were removed (see `removeNode`) — all together, so
-   * that nothing is left depending on a node that is gone.
+   * Deletes the nodes `refs` and writes the nodes `cleanup` names — those
+   * whose dependencies on them were removed (see `removeNodes`) — all
+   * together, so that nothing is left depending on a node that is gone.
    */
-  deleteNode: (ref: NodeRef, cleanup: NodeCleanup) => Promise<void>;
+  deleteNodes: (
+    refs: readonly NodeRef[],
+    cleanup: NodeCleanup,
+  ) => Promise<void>;
   /**
    * Creates or replaces every task and milestone `nodes` names, all
    * together: those edited at once (see `editNodes`).

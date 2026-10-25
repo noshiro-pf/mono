@@ -34,7 +34,7 @@ import {
   regroupNode,
   removeDependency,
   removeGroup,
-  removeNode,
+  removeNodes,
   type DependencyRefusal,
   type DomainState,
   type Group,
@@ -66,8 +66,11 @@ export type DataStore = Readonly<{
   dagLayout: InitializedObservable<DagLayout | undefined>;
   putTask: (task: Task) => void;
   putMilestone: (milestone: Milestone) => void;
-  /** Deletes the node and every dependency on it, in one write. */
-  deleteNode: (ref: NodeRef) => void;
+  /**
+   * Deletes the nodes `refs` and every dependency on any of them, in one
+   * write; writes nothing when `refs` is empty.
+   */
+  deleteNodes: (refs: readonly NodeRef[]) => void;
   /**
    * Makes `dependent` depend on `source` as `addDependency` says, or
    * reports why it does not.
@@ -228,9 +231,13 @@ export const createDataStore = (deps: DataDeps): DataStore => {
         repository.putMilestone(milestone),
       );
     },
-    deleteNode: (ref) => {
+    deleteNodes: (refs) => {
+      if (!Arr.isNonEmpty(refs)) {
+        return;
+      }
+
       write('削除', (repository) =>
-        repository.deleteNode(ref, removeNode(getState(), ref, deps.now())),
+        repository.deleteNodes(refs, removeNodes(getState(), refs, deps.now())),
       );
     },
     addDependency: (dependent, source) => {
