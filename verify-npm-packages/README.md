@@ -67,6 +67,13 @@ import することになり、`SyntaxError: does not provide an export named ..
 `published/` は次にピンが動くとき（`pnpm-update` の `--update`）に、新しい API を
 持つバージョンと一緒に追いつく。
 
+`local/` の生成物はこのチェックアウトの manifest だけで決まる（tarball のパスに
+バージョンは入らず、peer 範囲は workspace から読む）。pack も install もせずに
+生成だけするのが `pnpm run gen:verify-npm-packages` で、`changeset:version-packages`
+がこれを呼ぶ。peer に取っている `synstate` がメジャーを上げると `changeset version`
+が `synstate-dom` の peer 範囲を書き換えるので、version PR はこれ無しでは
+「作業ツリーが汚れていないか」で落ちる。
+
 ## 独立性をどう担保しているか
 
 依存を宣言し忘れたパッケージを検出するには、各 project が**自分の宣言した依存しか

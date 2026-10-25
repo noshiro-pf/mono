@@ -165,7 +165,7 @@ jobs:
       # optionalDependency からバイナリを解決し、script はその取りこぼしの
       # 保険でしかない。`strict-ts-lib-v7.0-link` が張る
       # `node_modules/@typescript/lib-*` が要るのは型検査だけで、
-      # `changeset:version-packages` はどれもしない。その最後の
+      # `changeset:version-packages` はどれもしない。その途中の
       # `pnpm install --no-frozen-lockfile` が script 付きで走り直すので、
       # リンクはそこで戻る。
       #

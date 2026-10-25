@@ -93,6 +93,31 @@ export const verifyNpmPackages = async (
 };
 
 /**
+ * Writes the committed files of the `local` space and nothing else: no pack,
+ * no install, no check.
+ *
+ * What they say comes from the manifests in this checkout alone (the tarball
+ * paths do not carry a version, and the peers are read from the workspace), so
+ * this is enough to bring them in line with a manifest that changed. The
+ * version pull request needs exactly that: `changeset version` rewrites a peer
+ * range such as `synstate: >=4.1.0` when that peer takes a major, and the
+ * release job, which holds `id-token: write`, should not install thirty-odd
+ * projects to follow it.
+ */
+export const generateLocalSpace = async (): Promise<
+  Result<undefined, string>
+> => {
+  const generated = await generateSpace(
+    'local',
+    path.resolve(verifyDir, 'local'),
+    await readPublishablePackages(),
+    { updatePins: false },
+  );
+
+  return Result.map(generated, () => undefined);
+};
+
+/**
  * Runs `check` with the repository's own `@typescript/lib-*` links removed,
  * and puts them back afterwards, whatever `check` returned.
  *
@@ -1028,9 +1053,14 @@ if (isDirectlyExecuted(import.meta.url)) {
     ? 'published'
     : 'local';
 
-  const result = await verifyNpmPackages(target, {
-    updatePins: process.argv.includes('--update'),
-  });
+  // `--gen` writes the local space and stops — see `generateLocalSpace`.
+  const generateOnly = process.argv.includes('--gen');
+
+  const result = generateOnly
+    ? await generateLocalSpace()
+    : await verifyNpmPackages(target, {
+        updatePins: process.argv.includes('--update'),
+      });
 
   if (Result.isErr(result)) {
     console.error(`\n❌ ${result.value}`);
@@ -1038,5 +1068,9 @@ if (isDirectlyExecuted(import.meta.url)) {
     process.exit(1);
   }
 
-  console.info(`\n✅ The ${target} packages import and run.`);
+  console.info(
+    generateOnly
+      ? '\n✅ The local space is generated.'
+      : `\n✅ The ${target} packages import and run.`,
+  );
 }
