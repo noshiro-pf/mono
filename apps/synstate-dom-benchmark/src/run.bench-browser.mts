@@ -9,6 +9,13 @@ import {
   synstateDom,
   vanjs,
 } from './frameworks/index.mjs';
+import {
+  loanScenario,
+  measureScenario,
+  scheduleScenario,
+  type ScenarioResult,
+} from './scenarios/index.mjs';
+import { mapInSequence, median, rotated, settle, warmups } from './timing.mjs';
 
 type Case = Readonly<{
   name: string;
@@ -122,25 +129,11 @@ const frameworks: readonly Framework[] = [
   vanjs,
 ] as const;
 
-/**
- * The order the libraries are measured in: `frameworks` turned left by
- * `BENCHMARK_ROTATE` (set by `pnpm run benchmark:repeat`), so that over
- * several runs each library is measured first in turn. The table keeps the
- * order of `frameworks`.
- */
-const measuringOrder: readonly Framework[] = (() => {
-  const shift = Number(process.env['BENCHMARK_ROTATE']) % frameworks.length;
-
-  return [...frameworks.slice(shift), ...frameworks.slice(0, shift)];
-})();
-
-const warmups = 3;
-
 type Result = Readonly<{ caseName: string; framework: string; ms: number }>;
 
 test('js-framework-benchmark operations', async () => {
   const resultsByFramework = await mapInSequence(
-    measuringOrder,
+    rotated(frameworks),
     async (framework) => {
       const container = document.createElement('div');
 
@@ -177,7 +170,14 @@ test('js-framework-benchmark operations', async () => {
 
   const table = toMarkdown(results);
 
-  console.info(table);
+  const scenarioResults = [
+    ...(await measureScenario(loanScenario)),
+    ...(await measureScenario(scheduleScenario)),
+  ] as const;
+
+  const scenarioTable = scenariosToMarkdown(scenarioResults);
+
+  console.info(`${table}\n\n${scenarioTable}`);
 
   await commands.writeFile(
     'RESULTS.md',
@@ -190,25 +190,15 @@ test('js-framework-benchmark operations', async () => {
       '',
       table,
       '',
+      '## Scenarios',
+      '',
+      "The scenarios of `src/scenarios/`; see README.md. `wrong` is a library that rendered figures other than the model's, so has no time.",
+      '',
+      scenarioTable,
+      '',
     ].join('\n'),
   );
 });
-
-/** `Array#map` with an async callback, one element at a time. */
-const mapInSequence = async <T, R>(
-  items: readonly T[],
-  fn: (item: T) => Promise<R>,
-): Promise<readonly R[]> => {
-  const [head, ...rest] = items;
-
-  if (head === undefined) {
-    return [];
-  }
-
-  const first = await fn(head);
-
-  return Arr.toUnshifted(first)(await mapInSequence(rest, fn));
-};
 
 /**
  * Checks that an implementation renders what the others do, so that the
@@ -287,31 +277,6 @@ const measure = async (
   return samples.slice(warmups);
 };
 
-/**
- * Waits for one macrotask, which lets VanJS's `setTimeout` and Preact's
- * microtask render run, then forces layout. Every implementation pays the
- * same wait, so it shifts the timings equally rather than favouring the ones
- * that update synchronously.
- */
-const settle = async (container: HTMLElement): Promise<void> => {
-  await new Promise<void>((resolve) => {
-    setTimeout(resolve, 0);
-  });
-
-  // Reading the geometry makes the browser lay the table out now.
-  container.getBoundingClientRect();
-};
-
-const median = (samples: readonly number[]): number => {
-  const sorted = samples.toSorted((a, b) => a - b);
-
-  const mid = Math.floor(sorted.length / 2);
-
-  return sorted.length % 2 === 1
-    ? (sorted[mid] ?? Number.NaN)
-    : ((sorted[mid - 1] ?? Number.NaN) + (sorted[mid] ?? Number.NaN)) / 2;
-};
-
 const toMarkdown = (results: readonly Result[]): string => {
   const cell = (caseName: string, framework: string): string =>
     (
@@ -325,6 +290,37 @@ const toMarkdown = (results: readonly Result[]): string => {
     ...cases.map(
       (c) =>
         `| ${c.name} | ${frameworks.map((f) => cell(c.name, f.name)).join(' | ')} |`,
+    ),
+  ].join('\n');
+};
+
+/**
+ * The scenarios' table, one row per operation in the order measured. A
+ * library that rendered the wrong figures has `wrong` in place of a time.
+ */
+const scenariosToMarkdown = (results: readonly ScenarioResult[]): string => {
+  const operations = Arr.uniq(results.map((r) => r.operation));
+
+  const cell = (operation: string, framework: string): string => {
+    const ms = results.find(
+      (r) => r.operation === operation && r.framework === framework,
+    )?.ms;
+
+    return ms === undefined ? 'wrong' : ms.toFixed(2);
+  };
+
+  const columns = Arr.uniq(
+    [loanScenario, scheduleScenario].flatMap((scenario) =>
+      scenario.frameworks.map((f) => f.name),
+    ),
+  );
+
+  return [
+    `| operation (median ms) | ${columns.join(' | ')} |`,
+    `| :-- | ${columns.map(() => '--:').join(' | ')} |`,
+    ...operations.map(
+      (operation) =>
+        `| ${operation} | ${columns.map((name) => cell(operation, name)).join(' | ')} |`,
     ),
   ].join('\n');
 };

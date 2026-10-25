@@ -15,8 +15,8 @@ type VanRow = Readonly<{
  * list kept by hand, moving and removing the row elements directly, as
  * js-framework-benchmark's VanJS implementation does.
  *
- * VanJS applies state changes to the DOM in a `setTimeout` of its own, which
- * the harness waits for along with everything else.
+ * VanJS applies state changes to the DOM in a microtask of its own, which the
+ * harness waits for along with everything else.
  */
 export const vanjs: Framework = {
   name: 'VanJS',

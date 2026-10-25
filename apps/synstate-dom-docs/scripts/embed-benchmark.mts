@@ -79,6 +79,15 @@ const pages: readonly (readonly [Locale, string])[] = [
 type Results = Readonly<{
   userAgent: string;
   runs: number;
+  operations: Table;
+  scenarios: Table;
+}>;
+
+/**
+ * One of RESULTS.md's tables of medians. A scenario's median is `NaN` where
+ * the library rendered the wrong figures, which RESULTS.md writes `wrong`.
+ */
+type Table = Readonly<{
   libraries: readonly string[];
   rows: readonly Readonly<{
     operation: string;
@@ -105,7 +114,19 @@ const operationNamesJa: ReadonlyRecord<string, string> = {
   'create 10,000 rows': '10,000 行を作る',
   'append 1,000 to 1,000 rows': '1,000 行に 1,000 行を追加する',
   'clear 1,000 rows': '1,000 行を消す',
+  'loan: build the table': 'ローン：表を作る',
+  'loan: change the interest rate': 'ローン：金利を変える',
+  'loan: prepay in month 181': 'ローン：181 か月目に繰上返済する',
+  'loan: prepay in month 349': 'ローン：349 か月目に繰上返済する',
+  'schedule: build the schedule': '工程表：工程表を作る',
+  'schedule: lengthen the first task': '工程表：最初のタスクを延ばす',
+  'schedule: lengthen a task in the middle': '工程表：中ほどのタスクを延ばす',
+  'schedule: lengthen a task near the end':
+    '工程表：終わり近くのタスクを延ばす',
 } as const;
+
+/** What RESULTS.md writes in place of a time for the wrong figures. */
+const wrong = 'wrong';
 
 const parseResults = (markdown: string): Result<Results, string> => {
   const environment =
@@ -123,11 +144,62 @@ const parseResults = (markdown: string): Result<Results, string> => {
     );
   }
 
-  // The first table only: the medians. RESULTS.md's ratio table after it is
-  // recomputed below, so that the Japanese page can head it in Japanese.
+  // The medians of the operations, the first table, and those of the
+  // scenarios, the first table after their heading. RESULTS.md's ratio tables
+  // are recomputed below, so that the Japanese page can head them in
+  // Japanese.
   const lines = markdown.split('\n').map((line) => line.trim());
 
-  const tableStart = lines.findIndex((line) => line.startsWith('|'));
+  const operations = parseTable(lines, 0, false);
+
+  if (Result.isErr(operations)) {
+    return operations;
+  }
+
+  const scenariosHeading = lines.indexOf('## Scenarios');
+
+  if (scenariosHeading === -1) {
+    return Result.err('the "## Scenarios" section was not found');
+  }
+
+  const scenarios = parseTable(lines, scenariosHeading, true);
+
+  if (Result.isErr(scenarios)) {
+    return scenarios;
+  }
+
+  const { libraries } = operations.value;
+
+  if (
+    !libraries.includes(subject) ||
+    !libraries.includes(reference) ||
+    !scenarios.value.libraries.includes(subject)
+  ) {
+    return Result.err(
+      `a table has no "${subject}" column, or the first no "${reference}" column`,
+    );
+  }
+
+  return Result.ok({
+    userAgent,
+    runs: Result.unwrapOkOr(Num.safeParseFloat(runs), Number.NaN),
+    operations: operations.value,
+    scenarios: scenarios.value,
+  });
+};
+
+/**
+ * Reads the first table at or after line `from`. Where `wrongAllowed`, a
+ * `wrong` cell is read as `NaN`; any other cell must be a positive number.
+ */
+const parseTable = (
+  lines: readonly string[],
+  from: number,
+  wrongAllowed: boolean,
+): Result<Table, string> => {
+  const tableStart = lines.findIndex(
+    (line, i) => i >= from && line.startsWith('|'),
+  );
 
   const tableEnd = lines.findIndex(
     (line, i) => i > tableStart && !line.startsWith('|'),
@@ -146,23 +218,25 @@ const parseResults = (markdown: string): Result<Results, string> => {
 
   const libraries = Arr.tail(cells(header));
 
-  if (!libraries.includes(subject) || !libraries.includes(reference)) {
-    return Result.err(
-      `the table has no "${subject}" or no "${reference}" column`,
-    );
-  }
-
-  const mut_rows: Results['rows'][number][] = [];
+  const mut_rows: Table['rows'][number][] = [];
 
   for (const line of body) {
     const [operation, ...values] = cells(line);
 
-    const medians = values.map(Number);
+    const medians = values.map((value) =>
+      wrongAllowed && value === wrong
+        ? Number.NaN
+        : Result.unwrapOkOr(Num.safeParseFloat(value), Number.NaN),
+    );
 
     if (
       operation === undefined ||
       medians.length !== libraries.length ||
-      medians.some((m) => !(Number.isFinite(m) && m > 0))
+      medians.some(
+        (m, i) =>
+          !(Number.isFinite(m) && m > 0) &&
+          !(wrongAllowed && values[i] === wrong),
+      )
     ) {
       return Result.err(`a row could not be read: ${line}`);
     }
@@ -170,12 +244,7 @@ const parseResults = (markdown: string): Result<Results, string> => {
     mut_rows.push({ operation, medians });
   }
 
-  return Result.ok({
-    userAgent,
-    runs: Result.unwrapOkOr(Num.safeParseFloat(runs), Number.NaN),
-    libraries,
-    rows: mut_rows,
-  });
+  return Result.ok({ libraries, rows: mut_rows });
 };
 
 const cells = (line: string): readonly string[] =>
@@ -197,10 +266,6 @@ const render = (
   results: Results,
   locale: Locale,
 ): ReadonlyRecord<string, Embedded> => {
-  const subjectIndex = results.libraries.indexOf(subject);
-
-  const referenceIndex = results.libraries.indexOf(reference);
-
   const operationName = (operation: string): string => {
     if (locale === 'en') {
       return operation;
@@ -217,44 +282,46 @@ const render = (
     return name;
   };
 
-  const tableHeader = (firstColumn: string): string =>
+  const wrongCell = locale === 'en' ? 'wrong' : '誤り';
+
+  const medians = (table: Table): string =>
     [
-      `| ${firstColumn} | ${results.libraries.join(' | ')} |`,
-      `| :-- | ${results.libraries.map(() => '--:').join(' | ')} |`,
+      `| ${locale === 'en' ? 'operation (median ms)' : '操作（中央値 ms）'} | ${table.libraries.join(' | ')} |`,
+      `| :-- | ${table.libraries.map(() => '--:').join(' | ')} |`,
+      ...table.rows.map(
+        ({ operation, medians: ms }) =>
+          `| ${operationName(operation)} | ${ms.map((m) => (Number.isNaN(m) ? wrongCell : m.toFixed(2))).join(' | ')} |`,
+      ),
     ].join('\n');
 
-  const medians = Arr.toUnshifted(
-    tableHeader(
-      locale === 'en' ? 'operation (median ms)' : '操作（中央値 ms）',
-    ),
-  )(
-    results.rows.map(
-      ({ operation, medians: ms }) =>
-        `| ${operationName(operation)} | ${ms.map((m) => m.toFixed(2)).join(' | ')} |`,
-    ),
-  ).join('\n');
+  const ratios = (table: Table): string => {
+    const subjectIndex = table.libraries.indexOf(subject);
 
-  const others = results.libraries.filter((library) => library !== subject);
+    const others = table.libraries.filter((library) => library !== subject);
 
-  const ratios = Arr.toUnshifted(
-    [
+    return [
       `| ${locale === 'en' ? 'operation' : '操作'} | ${others.join(' | ')} |`,
       `| :-- | ${others.map(() => '--:').join(' | ')} |`,
-    ].join('\n'),
-  )(
-    results.rows.map(({ operation, medians: ms }) => {
-      const subjectMs = ms[subjectIndex] ?? Number.NaN;
+      ...table.rows.map(({ operation, medians: ms }) => {
+        const subjectMs = ms[subjectIndex] ?? Number.NaN;
 
-      const cellsOfOthers = ms
-        .filter((_, i) => i !== subjectIndex)
-        .map((m) => ratio(m, subjectMs));
+        const cellsOfOthers = ms
+          .filter((_, i) => i !== subjectIndex)
+          .map((m) => ratio(m, subjectMs));
 
-      return `| ${operationName(operation)} | ${cellsOfOthers.join(' | ')} |`;
-    }),
-  ).join('\n');
+        return `| ${operationName(operation)} | ${cellsOfOthers.join(' | ')} |`;
+      }),
+    ].join('\n');
+  };
 
-  const toReference = results.rows.map(({ medians: ms }) =>
-    ratioOf(ms[subjectIndex] ?? Number.NaN, ms[referenceIndex] ?? Number.NaN),
+  const { operations } = results;
+
+  const subjectColumn = operations.libraries.indexOf(subject);
+
+  const referenceColumn = operations.libraries.indexOf(reference);
+
+  const toReference = operations.rows.map(({ medians: ms }) =>
+    ratioOf(ms[subjectColumn] ?? Number.NaN, ms[referenceColumn] ?? Number.NaN),
   );
 
   const environment =
@@ -264,8 +331,10 @@ const render = (
 
   return {
     environment: { text: environment, block: true },
-    medians: { text: medians, block: true },
-    ratios: { text: ratios, block: true },
+    medians: { text: medians(operations), block: true },
+    ratios: { text: ratios(operations), block: true },
+    'scenario-medians': { text: medians(results.scenarios), block: true },
+    'scenario-ratios': { text: ratios(results.scenarios), block: true },
     'reference-min': {
       text: Math.min(...toReference).toFixed(2),
       block: false,
@@ -277,8 +346,11 @@ const render = (
   };
 };
 
+/** A dash where either time is missing (`wrong`). */
 const ratio = (value: number, base: number): string =>
-  `${ratioOf(value, base).toFixed(2)}×` as const;
+  Number.isNaN(value) || Number.isNaN(base)
+    ? '–'
+    : (`${ratioOf(value, base).toFixed(2)}×` as const);
 
 /** `parseResults` has already rejected a median that is not positive. */
 const ratioOf = (value: number, base: number): number =>

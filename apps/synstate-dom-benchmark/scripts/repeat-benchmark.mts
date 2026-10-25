@@ -71,7 +71,7 @@ const main = async (): Promise<void> => {
       return { current, baseline } as const;
     });
 
-    const medians = medianTable(rounds.map((r) => r.current));
+    const medians = medianTables(rounds.map((r) => r.current));
 
     const measuredIn = userAgentOf(await readResults(workspaceRootPath));
 
@@ -85,18 +85,25 @@ const main = async (): Promise<void> => {
         '',
         `Measured in \`${measuredIn}\`. Each figure is the median of ${runs} runs of \`pnpm run benchmark\`, each measuring the libraries in a different order and each itself the median of its timed runs; see README.md for what is timed.`,
         '',
-        `| operation (median ms) | ${medians.columns.join(' | ')} |`,
-        `| :-- | ${medians.columns.map(() => '--:').join(' | ')} |`,
-        ...medians.rows.map(
-          (row) =>
-            `| ${row.operation} | ${row.values.map((v) => v.toFixed(2)).join(' | ')} |`,
-        ),
+        mediansTable(medians.operations),
         '',
         '## Relative to synstate-dom',
         '',
-        "Each library's time divided by synstate-dom's: below 1 is faster than synstate-dom, above 1 slower.",
+        ratioNote,
         '',
-        ratioTable(medians),
+        ratioTable(medians.operations),
+        '',
+        '## Scenarios',
+        '',
+        `${scenariosNote} The medians are taken as above.`,
+        '',
+        mediansTable(medians.scenarios),
+        '',
+        '### Relative to synstate-dom',
+        '',
+        ratioNote,
+        '',
+        ratioTable(medians.scenarios),
         '',
       ].join('\n'),
     );
@@ -110,8 +117,8 @@ const main = async (): Promise<void> => {
           `## ${values.baseline} → this tree (median ms of ${runs} alternating runs)`,
           '',
           comparisonTable(
-            medianTable(rounds.flatMap((r) => r.baseline ?? [])),
-            medians,
+            medianTables(rounds.flatMap((r) => r.baseline ?? [])).operations,
+            medians.operations,
           ),
         ].join('\n'),
       );
@@ -131,7 +138,26 @@ type Table = Readonly<{
   }>[];
 }>;
 
+/**
+ * What one run of `pnpm run benchmark` writes: the table of
+ * js-framework-benchmark's operations, and the table of the scenarios.
+ */
+type Tables = Readonly<{ operations: Table; scenarios: Table }>;
+
 const synstateDomColumn = 'synstate-dom';
+
+/**
+ * What `run.bench-browser.mts` writes in a scenario's cell when the library
+ * rendered the wrong figures; read as `NaN`.
+ */
+const wrong = 'wrong';
+
+/** The first sentence of the scenarios' section, as one run writes it. */
+const scenariosNote =
+  "The scenarios of `src/scenarios/`; see README.md. `wrong` is a library that rendered figures other than the model's, so has no time.";
+
+const ratioNote =
+  "Each library's time divided by synstate-dom's: below 1 is faster than synstate-dom, above 1 slower.";
 
 const repoRoot = path.resolve(workspaceRootPath, '../..');
 
@@ -146,8 +172,8 @@ const readResults = async (appRoot: string): Promise<string> =>
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   fs.readFile(resultsPath(appRoot), 'utf8');
 
-/** Runs the benchmark once in `appRoot` and reads the table it wrote. */
-const runOnce = async (appRoot: string, rotate: number): Promise<Table> => {
+/** Runs the benchmark once in `appRoot` and reads the tables it wrote. */
+const runOnce = async (appRoot: string, rotate: number): Promise<Tables> => {
   run('pnpm', ['run', 'benchmark'], appRoot, {
     BENCHMARK_ROTATE: String(rotate),
   });
@@ -196,24 +222,54 @@ const run = (
   }
 };
 
-/** Reads the table `pnpm run benchmark` writes into RESULTS.md. */
-const parseResults = (markdown: string): Table => {
-  const lines = markdown.split('\n').filter((line) => line.startsWith('|'));
+/**
+ * Reads the two tables `pnpm run benchmark` writes into RESULTS.md, each a run
+ * of lines that start with `|`.
+ */
+const parseResults = (markdown: string): Tables => {
+  const blocks = markdown
+    .split('\n')
+    .reduce<readonly (readonly string[])[]>(
+      (found, line, i, lines) =>
+        !line.startsWith('|')
+          ? found
+          : lines[i - 1]?.startsWith('|') === true
+            ? found.with(
+                found.length - 1,
+                Arr.toPushed(found.at(-1) ?? [], line),
+              )
+            : Arr.toPushed(found, [line]),
+      [],
+    )
+    .map(parseTable);
 
-  const [header, , ...body] = lines;
+  const [operations, scenarios] = blocks;
 
-  if (header === undefined) {
-    throw new Error('RESULTS.md has no table');
+  if (operations === undefined || scenarios === undefined) {
+    throw new Error('RESULTS.md does not have the two tables of one run');
   }
 
-  const [, ...columns] = cellsOf(header);
+  return { operations, scenarios };
+};
+
+const parseTable = (lines: readonly string[]): Table => {
+  const [header, , ...body] = lines;
+
+  const [, ...columns] = cellsOf(header ?? '');
 
   return {
     columns,
     rows: body.map((line) => {
       const [operation = '', ...values] = cellsOf(line);
 
-      return { operation, values: values.map(Number) };
+      return {
+        operation,
+        values: values.map((v) =>
+          v === wrong
+            ? Number.NaN
+            : Result.unwrapOkOr(Num.safeParseFloat(v), Number.NaN),
+        ),
+      };
     }),
   };
 };
@@ -229,7 +285,29 @@ const cellsOf = (line: string): readonly string[] =>
 const userAgentOf = (markdown: string): string =>
   /Measured in `([^`]*)`/u.exec(markdown)?.[1] ?? 'an unknown browser';
 
-/** The median of each cell over `tables`, which must share their layout. */
+const medianTables = (runs: readonly Tables[]): Tables =>
+  ({
+    operations: medianTable(runs.map((r) => r.operations)),
+    scenarios: medianTable(runs.map((r) => r.scenarios)),
+  }) as const;
+
+const mediansTable = (table: Table): string =>
+  [
+    `| operation (median ms) | ${table.columns.join(' | ')} |`,
+    `| :-- | ${table.columns.map(() => '--:').join(' | ')} |`,
+    ...table.rows.map(
+      (row) =>
+        `| ${row.operation} | ${row.values.map((v) => (Number.isNaN(v) ? wrong : v.toFixed(2))).join(' | ')} |`,
+    ),
+  ].join('\n');
+
+/**
+ * The median of each cell over `tables`, which must share their layout. A
+ * cell that is `NaN` (`wrong`) in any run is `NaN`. Rounded as RESULTS.md
+ * prints it, so that a ratio here is the one a reader gets from the medians
+ * shown, as the docs site's embedding computes it; a scenario's figure is a
+ * tenth of a millisecond, where the rounding moves a ratio by 5%.
+ */
 const medianTable = (tables: readonly Table[]): Table => {
   const [first] = tables;
 
@@ -241,14 +319,21 @@ const medianTable = (tables: readonly Table[]): Table => {
     columns: first.columns,
     rows: first.rows.map((row, r) => ({
       operation: row.operation,
-      values: first.columns.map((_, c) =>
-        median(tables.map((t) => t.rows[r]?.values[c] ?? Number.NaN)),
+      values: first.columns.map(
+        (_, c) =>
+          Math.round(
+            median(tables.map((t) => t.rows[r]?.values[c] ?? Number.NaN)) * 100,
+          ) / 100,
       ),
     })),
   };
 };
 
 const median = (samples: readonly number[]): number => {
+  if (samples.some(Number.isNaN)) {
+    return Number.NaN;
+  }
+
   const sorted = samples.toSorted((a, b) => a - b);
 
   const mid = Math.floor(sorted.length / 2);
@@ -305,7 +390,9 @@ const comparisonTable = (before: Table, after: Table): string => {
 };
 
 const ratio = (value: number, base: number): string =>
-  Num.isNonZero(base) ? (`${Num.div(value, base).toFixed(2)}×` as const) : '–';
+  Num.isNonZero(base) && !Number.isNaN(value) && !Number.isNaN(base)
+    ? (`${Num.div(value, base).toFixed(2)}×` as const)
+    : '–';
 
 /** `Array#map` with an async callback, one element at a time. */
 const mapInSequence = async <T, R>(
