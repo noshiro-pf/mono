@@ -1,6 +1,5 @@
 import { constant, derive, MatchOptional, view, type JSX } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
-import { POLL_INTERVAL_MS } from '../constants.mjs';
 import { isRunningLow, type RateLimit } from '../rate-limit.mjs';
 import { reader, tokenStore } from '../store/index.mjs';
 import type { StoredToken } from '../token.mjs';
@@ -42,7 +41,7 @@ export const TokenPanel = (): JSX.Element => {
 
       <div class={constant('token-body')}>
         <p class={{ 'token-state': constant(true), 'token-state-low': low }}>
-          {derive([token, reader.rateLimit], stateWords)}
+          {derive([token, reader.rateLimit, reader.pollIntervalMs], stateWords)}
         </p>
 
         <form
@@ -142,10 +141,11 @@ const SECONDS_PER_MINUTE = 60;
 const stateWords = (
   token: StoredToken | undefined,
   rateLimit: RateLimit | undefined,
+  pollIntervalMs: number,
 ): string =>
   token === undefined
     ? 'Nothing is read until there is one.'
-    : (`Held ${token.store === 'device' ? 'on this device' : 'in this tab only'}. ${limitWords(rateLimit)} Reading every ${seconds(POLL_INTERVAL_MS)} while this tab is visible.${rateLimit !== undefined && isRunningLow(rateLimit) ? RUNNING_LOW : ''}` as const);
+    : (`Held ${token.store === 'device' ? 'on this device' : 'in this tab only'}. ${limitWords(rateLimit)} Reading every ${seconds(pollIntervalMs)} while this tab is visible.${rateLimit !== undefined && isRunningLow(rateLimit) ? RUNNING_LOW : ''}` as const);
 
 /**
  * What GitHub last said is left, or what it would be if it has not answered

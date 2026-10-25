@@ -78,10 +78,12 @@ import {
   ISSUES_PAGE_SIZE,
   issuesQuery,
   IssueWithBodySchema,
+  MAX_OPEN_PAGES,
   MERGED_QUERY,
   MergedDataSchema,
+  mergedSearch,
   OPEN_ISSUES_QUERY,
-  OPEN_LIMIT,
+  OPEN_PAGE_SIZE,
   OpenIssuesDataSchema,
   PULL_REQUESTS_QUERY,
   PullRequestsDataSchema,
@@ -584,30 +586,30 @@ const readPullRequests = async (
   ask: Ask,
   repo: RepoRef,
 ): Promise<Answered<PullsPart>> => {
-  const answered = await ask(PULL_REQUESTS_QUERY);
+  const answered = await readOpenPages({
+    ask,
+    query: PULL_REQUESTS_QUERY,
+    schema: PullRequestsDataSchema,
+    // What GitHub answers for a name it cannot resolve for this token,
+    // whether there is no such repository or it is one the token may not
+    // read: it does not say which, so the sentence names both.
+    refusal: (answer) =>
+      repositoryOf(answer) === null
+        ? `GitHub shows this token no repository ${repo.owner}/${repo.name}. Check the name, or, if it is private, give the page a token that can read it.`
+        : undefined,
+  });
 
-  const { rateLimit } = answered;
+  const { rateLimit, result: pages } = answered;
 
-  if (Result.isErr(answered.result)) {
-    return { rateLimit, result: answered.result };
+  if (Result.isErr(pages)) {
+    return { rateLimit, result: pages };
   }
 
-  // What GitHub answers for a name it cannot resolve for this token, whether
-  // there is no such repository or it is one the token may not read: it does
-  // not say which, so the sentence names both.
-  if (repositoryOf(answered.result.value) === null) {
-    return {
-      rateLimit,
-      result: Result.err(
-        `GitHub shows this token no repository ${repo.owner}/${repo.name}. Check the name, or, if it is private, give the page a token that can read it.`,
-      ),
-    };
-  }
+  // What is not a list is the same on every page; the first one's is read.
+  const first = pages.value[0];
 
-  const validated = PullRequestsDataSchema.validate(answered.result.value.data);
-
-  if (Result.isErr(validated)) {
-    return { rateLimit, result: Result.err(unexpectedShape(validated.value)) };
+  if (first === undefined) {
+    return { rateLimit, result: Result.err('GitHub sent no pull requests.') };
   }
 
   const {
@@ -616,17 +618,7 @@ const readPullRequests = async (
     codeOwnersAtRoot,
     codeOwnersInDocs,
     queueLabel,
-    open: openPulls,
-  } = validated.value.repository;
-
-  if (openPulls.totalCount > OPEN_LIMIT) {
-    return {
-      rateLimit,
-      result: Result.err(
-        `There are ${openPulls.totalCount} open pull requests; this page reads ${OPEN_LIMIT} and would report a part of them as the whole.`,
-      ),
-    };
-  }
+  } = first.repository;
 
   // GitHub reads the first of the three it finds, in this order.
   const owners = codeOwners ?? codeOwnersAtRoot ?? codeOwnersInDocs;
@@ -639,7 +631,7 @@ const readPullRequests = async (
       defaultBranch: defaultBranchRef?.name ?? '',
       queue: queueLabel !== null,
       codeOwners: owners === null ? [] : parseCodeOwners(owners.text),
-      pulls: openPulls.nodes,
+      pulls: openNodesOf(pages.value),
     }),
   };
 };
@@ -653,24 +645,19 @@ const readPullRequests = async (
 const readChecks = async (
   ask: Ask,
 ): Promise<Answered<ReadonlyMap<number, ChecksState>>> => {
-  const answered = await ask(CHECKS_QUERY);
+  const answered = await readOpenPages({
+    ask,
+    query: CHECKS_QUERY,
+    schema: ChecksDataSchema,
+  });
 
   if (Result.isErr(answered.result)) {
     return { rateLimit: answered.rateLimit, result: answered.result };
   }
 
-  const validated = ChecksDataSchema.validate(answered.result.value.data);
-
-  if (Result.isErr(validated)) {
-    return {
-      rateLimit: answered.rateLimit,
-      result: Result.err(unexpectedShape(validated.value)),
-    };
-  }
-
   const followedUp = await followUpRounds({
     operationName: 'MoreChecks',
-    states: validated.value.repository.open.nodes.map((node): ChecksState => {
+    states: openNodesOf(answered.result.value).map((node): ChecksState => {
       const rollup = node.commits.nodes[0]?.commit.statusCheckRollup ?? null;
 
       return {
@@ -723,19 +710,14 @@ const readDetails = async (
   repo: RepoRef,
   rules: Promise<Answered<RulesetRequirements>>,
 ): Promise<Answered<ReadonlyMap<number, DetailsPart>>> => {
-  const answered = await ask(DETAILS_QUERY);
+  const answered = await readOpenPages({
+    ask,
+    query: DETAILS_QUERY,
+    schema: DetailsDataSchema,
+  });
 
   if (Result.isErr(answered.result)) {
     return { rateLimit: answered.rateLimit, result: answered.result };
-  }
-
-  const validated = DetailsDataSchema.validate(answered.result.value.data);
-
-  if (Result.isErr(validated)) {
-    return {
-      rateLimit: answered.rateLimit,
-      result: Result.err(unexpectedShape(validated.value)),
-    };
   }
 
   const { result: ruled } = await rules;
@@ -744,7 +726,7 @@ const readDetails = async (
 
   const followedUp = await followUpRounds({
     operationName: 'MoreFiles',
-    states: validated.value.repository.open.nodes.map((node): DetailsState => ({
+    states: openNodesOf(answered.result.value).map((node): DetailsState => ({
       number: node.number,
       node,
       files: node.files.nodes.map(({ path }) => path),
@@ -864,7 +846,11 @@ const readMerged = async (
   repo: RepoRef,
   nowMs: number,
 ): Promise<Answered<readonly Merged[]>> => {
-  const answered = await ask(MERGED_QUERY);
+  const cutoff = nowMs - MERGED_WITHIN_DAYS * MS_PER_DAY;
+
+  const answered = await ask(MERGED_QUERY, {
+    search: mergedSearch(repo, cutoff),
+  });
 
   if (Result.isErr(answered.result)) {
     return { rateLimit: answered.rateLimit, result: answered.result };
@@ -879,10 +865,8 @@ const readMerged = async (
     };
   }
 
-  const cutoff = nowMs - MERGED_WITHIN_DAYS * MS_PER_DAY;
-
   const inWindow = Arr.generate(function* () {
-    for (const pr of validated.value.repository.merged.nodes) {
+    for (const pr of validated.value.merged.nodes) {
       const mergedAtEpochMs = epochMsOf(pr.mergedAt);
 
       if (mergedAtEpochMs !== undefined) {
@@ -1171,6 +1155,92 @@ const followUpRounds = async <S extends Readonly<{ number: number }>>({
   });
 };
 
+/** A page of one of the queries that list the open pull requests. */
+type OpenPage<N> = Readonly<{
+  repository: Readonly<{
+    open: Readonly<{
+      pageInfo: Readonly<{ hasNextPage: boolean; endCursor: string | null }>;
+      nodes: readonly N[];
+    }>;
+  }>;
+}>;
+
+/**
+ * Every page of one of the queries that list the open pull requests, each
+ * validated by `schema`, the next asked for after the one before: a cursor is
+ * known only once the page before it has answered. `refusal` words an answer
+ * that is not a page at all. More than {@link MAX_OPEN_PAGES} fails the read,
+ * rather than reporting the first of them as the whole.
+ */
+const readOpenPages = async <D extends OpenPage<unknown>>({
+  ask,
+  query,
+  schema,
+  refusal,
+  after = null,
+  pages = [],
+  rateLimit,
+}: Readonly<{
+  ask: Ask;
+  query: string;
+  schema: t.Type<D>;
+  refusal?: (answer: GraphqlAnswer) => string | undefined;
+  after?: string | null;
+  pages?: readonly D[];
+  rateLimit?: RateLimit;
+}>): Promise<Answered<readonly D[]>> => {
+  if (pages.length >= MAX_OPEN_PAGES) {
+    return {
+      rateLimit,
+      result: Result.err(
+        `There are more than ${MAX_OPEN_PAGES * OPEN_PAGE_SIZE} open pull requests; this page reads that many and would report a part of them as the whole.`,
+      ),
+    };
+  }
+
+  const answered = await ask(query, { after });
+
+  const latestLimit = answered.rateLimit ?? rateLimit;
+
+  if (Result.isErr(answered.result)) {
+    return { rateLimit: latestLimit, result: answered.result };
+  }
+
+  const refused = refusal?.(answered.result.value);
+
+  if (refused !== undefined) {
+    return { rateLimit: latestLimit, result: Result.err(refused) };
+  }
+
+  const validated = schema.validate(answered.result.value.data);
+
+  if (Result.isErr(validated)) {
+    return {
+      rateLimit: latestLimit,
+      result: Result.err(unexpectedShape(validated.value)),
+    };
+  }
+
+  const read = Arr.toPushed(pages, validated.value);
+
+  const next = nextCursor(validated.value.repository.open.pageInfo);
+
+  return next === undefined
+    ? { rateLimit: latestLimit, result: Result.ok(read) }
+    : readOpenPages({
+        ask,
+        query,
+        schema,
+        ...(refusal === undefined ? {} : { refusal }),
+        after: next,
+        pages: read,
+        ...(latestLimit === undefined ? {} : { rateLimit: latestLimit }),
+      });
+};
+
+const openNodesOf = <N,>(pages: readonly OpenPage<N>[]): readonly N[] =>
+  pages.flatMap((page) => page.repository.open.nodes);
+
 const applyContexts = (
   state: ChecksState,
   _followUp: FollowUp,
@@ -1423,6 +1493,9 @@ const assemble = ({
 
   const report = buildEntries({
     required,
+    // `skip-ci` holds the checks back where `unblock-prs` runs, and is
+    // anyone's label anywhere else.
+    skipCiPauses: queue,
     defaultBranch,
     pulls: pulls.map((pr) => factsOf(pr, partsOf(pr))),
     issues: issueDeclarations,

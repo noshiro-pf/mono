@@ -1,5 +1,12 @@
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { isRunningLow, readRateLimit, type RateLimit } from './rate-limit.mjs';
+import { POLL_INTERVAL_MS } from './constants.mjs';
+import {
+  isRunningLow,
+  MAX_POLL_INTERVAL_MS,
+  pollIntervalFor,
+  readRateLimit,
+  type RateLimit,
+} from './rate-limit.mjs';
 
 const headers = (entries: ReadonlyRecord<string, string>): Headers =>
   new Headers(entries);
@@ -86,3 +93,72 @@ describe(isRunningLow, () => {
     assert.isTrue(isRunningLow(at(0, 60)));
   });
 });
+
+describe(pollIntervalFor, () => {
+  test('stays at fifteen seconds while a read costs what one costs here', () => {
+    // 9 points in 15 seconds is 2,160 an hour, within half of 5,000.
+    assert.strictEqual(
+      pollIntervalFor({
+        intervalMs: POLL_INTERVAL_MS,
+        previous: sample(4000, 0),
+        current: sample(3991, 15_000),
+      }),
+      POLL_INTERVAL_MS,
+    );
+  });
+
+  test('reads less often where a read costs more, to spend half the budget', () => {
+    // 30 points every 15 seconds is 7,200 an hour; half of 5,000 is 2,500,
+    // which 30 points a read reaches at one read every 43.2 seconds.
+    assert.strictEqual(
+      pollIntervalFor({
+        intervalMs: POLL_INTERVAL_MS,
+        previous: sample(4000, 0),
+        current: sample(3970, 15_000),
+      }),
+      45_000,
+    );
+  });
+
+  test('comes back once reads cost less again', () => {
+    assert.strictEqual(
+      pollIntervalFor({
+        intervalMs: 45_000,
+        previous: sample(4000, 0),
+        current: sample(3991, 45_000),
+      }),
+      POLL_INTERVAL_MS,
+    );
+  });
+
+  test('never waits longer than five minutes', () => {
+    assert.strictEqual(
+      pollIntervalFor({
+        intervalMs: POLL_INTERVAL_MS,
+        previous: sample(4000, 0),
+        current: sample(1000, 15_000),
+      }),
+      MAX_POLL_INTERVAL_MS,
+    );
+  });
+
+  test('keeps the interval it has when the two say nothing about the cost', () => {
+    for (const [previous, current] of [
+      [undefined, sample(3991, 15_000)],
+      // A new window began between them.
+      [sample(10, 0, 1), sample(4990, 15_000, 2)],
+      [sample(4000, 15_000), sample(3990, 15_000)],
+    ] as const) {
+      assert.strictEqual(
+        pollIntervalFor({ intervalMs: 30_000, previous, current }),
+        30_000,
+      );
+    }
+  });
+});
+
+const sample = (remaining: number, atMs: number, resetEpochMs = 0) =>
+  ({
+    rateLimit: { remaining, limit: 5000, resetEpochMs },
+    atMs,
+  }) as const;

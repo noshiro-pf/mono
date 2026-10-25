@@ -11,7 +11,12 @@ import {
   type LoadedReport,
   type ReferencedItem,
 } from './load-report.mjs';
-import { ISSUES_LIMIT, ISSUES_PAGE_SIZE } from './report-query.mjs';
+import {
+  ISSUES_LIMIT,
+  ISSUES_PAGE_SIZE,
+  MAX_OPEN_PAGES,
+  OPEN_PAGE_SIZE,
+} from './report-query.mjs';
 import type { RestFetchInit } from './workflow-runs.mjs';
 
 describe(loadReport, () => {
@@ -288,7 +293,10 @@ describe(loadReport, () => {
         ...report([pullRequest({ number: 7, headRefOid: 'pushed' })]),
         // A push landed between the two queries.
         ...answer('Checks', {
-          open: { nodes: [pullRequest({ number: 7, headRefOid: 'before' })] },
+          open: openPage(
+            [pullRequest({ number: 7, headRefOid: 'before' })],
+            undefined,
+          ),
         }),
       },
       answer('Compare', {
@@ -445,7 +453,7 @@ describe(loadReport, () => {
 
   test('lists the open issues, and how many there are in all', async () => {
     const { fetchImpl } = answering(
-      report([], [], 0, {
+      report([], [], undefined, {
         totalCount: 42,
         pageInfo: { hasNextPage: true, endCursor: 'cursor-2' },
         nodes: [
@@ -493,7 +501,7 @@ describe(loadReport, () => {
 
   test('lists more open issues when asked for more, a page at a time', async () => {
     const { fetchImpl, sent } = answering(
-      report([], [], 0, issuePage(250, [1, 2], 'cursor-2')),
+      report([], [], undefined, issuePage(250, [1, 2], 'cursor-2')),
       issuesAnswer(issuePage(250, [3, 4], 'cursor-4')),
       issuesAnswer(issuePage(250, [5], 'cursor-5')),
     );
@@ -536,7 +544,7 @@ describe(loadReport, () => {
 
   test('stops at the last open issue, however many were asked for', async () => {
     const { fetchImpl, sent } = answering(
-      report([], [], 0, issuePage(3, [1, 2], 'cursor-2')),
+      report([], [], undefined, issuePage(3, [1, 2], 'cursor-2')),
       issuesAnswer(issuePage(3, [3], undefined)),
     );
 
@@ -554,7 +562,7 @@ describe(loadReport, () => {
 
   test('asks for no more open issues than a read lists by default', async () => {
     const { fetchImpl, sent } = answering(
-      report([], [], 0, issuePage(250, [1, 2], 'cursor-2')),
+      report([], [], undefined, issuePage(250, [1, 2], 'cursor-2')),
     );
 
     const loaded = await load(fetchImpl);
@@ -566,7 +574,7 @@ describe(loadReport, () => {
 
   test('fails the read when a page of open issues cannot be read', async () => {
     const { fetchImpl } = answering(
-      report([], [], 0, issuePage(250, [1, 2], 'cursor-2')),
+      report([], [], undefined, issuePage(250, [1, 2], 'cursor-2')),
       {
         OpenIssues: [{ data: { repository: { issues: { totalCount: 250 } } } }],
       },
@@ -584,7 +592,7 @@ describe(loadReport, () => {
 
   test('reads Start-After out of the issue bodies and their blocked-by dependencies, and asks once for what they name that is not listed', async () => {
     const { fetchImpl, sent } = answering(
-      report([], [], 0, {
+      report([], [], undefined, {
         ...NO_ISSUES,
         totalCount: 3,
         nodes: [
@@ -688,7 +696,7 @@ describe(loadReport, () => {
 
   test('reads a merged pull request a declaration names', async () => {
     const { fetchImpl } = answering(
-      report([], [], 0, {
+      report([], [], undefined, {
         ...NO_ISSUES,
         totalCount: 1,
         nodes: [openIssue(2214, [], 'Start-After: #2207')],
@@ -720,7 +728,7 @@ describe(loadReport, () => {
 
   test('asks nothing more when every declaration names a listed issue', async () => {
     const { fetchImpl, sent } = answering(
-      report([], [], 0, {
+      report([], [], undefined, {
         ...NO_ISSUES,
         totalCount: 2,
         nodes: [openIssue(2, [], 'Start-After: #1'), openIssue(1, [])],
@@ -990,7 +998,7 @@ describe(loadReport, () => {
   });
 
   test('keeps what merged in the last week, newest first', async () => {
-    const { fetchImpl } = answering(
+    const { fetchImpl, sent } = answering(
       report(
         [],
         [
@@ -1006,6 +1014,16 @@ describe(loadReport, () => {
     assert.deepStrictEqual(
       loaded.merged.map(({ number }) => number),
       [3, 1],
+    );
+
+    // Searched for by when they merged, from the day the week began.
+    assert.deepStrictEqual(
+      named(sent, 'MergedPullRequests').map(
+        ({ variables }) => variables['search'],
+      ),
+      [
+        'repo:noshiro-pf/mono is:pr is:merged merged:>=2026-09-17 sort:updated-desc',
+      ],
     );
   });
 
@@ -1263,7 +1281,7 @@ describe(loadReport, () => {
       report(
         [pullRequest({ number: 7 })],
         [],
-        1,
+        undefined,
         NO_ISSUES,
         {},
         restAnswers({
@@ -1326,7 +1344,7 @@ describe(loadReport, () => {
 
     const atRoot = await load(
       answering(
-        report([owned], [], 1, NO_ISSUES, {
+        report([owned], [], undefined, NO_ISSUES, {
           codeOwners: null,
           codeOwnersAtRoot: { text: '/docs/ @someone-else\n' },
           codeOwnersInDocs: { text: '/docs/ @a-third\n' },
@@ -1344,7 +1362,7 @@ describe(loadReport, () => {
 
     const inDocs = await load(
       answering(
-        report([owned], [], 1, NO_ISSUES, {
+        report([owned], [], undefined, NO_ISSUES, {
           codeOwners: null,
           codeOwnersInDocs: { text: '/docs/ @a-third\n' },
         }),
@@ -1375,7 +1393,7 @@ describe(loadReport, () => {
           }),
         ],
         [],
-        1,
+        undefined,
         NO_ISSUES,
         { codeOwners: null },
         restAnswers({ rules: [] }),
@@ -1405,9 +1423,35 @@ describe(loadReport, () => {
     assert.deepStrictEqual(entry.codeOwnerReview, { state: 'not-required' });
   });
 
+  test('judges the checks of a pull request labelled `skip-ci` where no queue runs', async () => {
+    const labelled = pullRequest({
+      number: 7,
+      labels: ['skip-ci'],
+      contexts: [
+        checkRun('code-check-result / result', 'COMPLETED', 'FAILURE'),
+      ],
+    });
+
+    const here = await load(
+      answering(report([labelled]), answer('Compare', { compare_7: null }))
+        .fetchImpl,
+    );
+
+    assert.strictEqual(here.entries[0]?.checks.verdict, 'paused');
+
+    const elsewhere = await load(
+      answering(
+        report([labelled], [], undefined, NO_ISSUES, { queueLabel: null }),
+        answer('Compare', { compare_7: null }),
+      ).fetchImpl,
+    );
+
+    assert.strictEqual(elsewhere.entries[0]?.checks.verdict, 'failing');
+  });
+
   test('says the queue is not run where there is no `merge-queued` label', async () => {
     const { fetchImpl } = answering(
-      report([pullRequest({ number: 7 })], [], 1, NO_ISSUES, {
+      report([pullRequest({ number: 7 })], [], undefined, NO_ISSUES, {
         queueLabel: null,
       }),
       answer('Compare', { compare_7: null }),
@@ -1449,8 +1493,53 @@ describe(loadReport, () => {
     assert.include(result.value, 'private');
   });
 
+  test('reads every page of the open pull requests, each query its own', async () => {
+    const { fetchImpl, sent } = answering(
+      report([pullRequest({ number: 7 })], [], 'page-1'),
+      laterOpenPage(
+        [pullRequest({ number: 8, baseRefName: 'branch-7' })],
+        undefined,
+      ),
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+        compare_8: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    for (const operation of ['PullRequests', 'Checks', 'PullRequestDetails']) {
+      assert.deepStrictEqual(
+        named(sent, operation).map(({ variables }) => variables['after']),
+        [null, 'page-1'],
+      );
+    }
+
+    assert.deepStrictEqual(
+      loaded.entries.map(({ number, checks }) => [number, checks.verdict]),
+      [
+        [7, 'passed'],
+        [8, 'passed'],
+      ],
+    );
+
+    // The second page's pull request is stacked on the first's.
+    assert.deepStrictEqual(
+      loaded.roots.map(({ number, children }) => [
+        number,
+        children.map((child) => child.number),
+      ]),
+      [[7, [8]]],
+    );
+  });
+
   test('refuses to report part of the open pull requests as the whole', async () => {
-    const { fetchImpl } = answering(report([], [], 51));
+    const { fetchImpl } = answering(
+      report([], [], 'page-1'),
+      ...Arr.seq(MAX_OPEN_PAGES).map((index) =>
+        laterOpenPage([], `page-${index + 2}`),
+      ),
+    );
 
     const { result } = await loadReport(DEFAULT_REPORT_SOURCE, {
       token: 'token',
@@ -1460,7 +1549,10 @@ describe(loadReport, () => {
 
     assert.isTrue(Result.isErr(result));
 
-    assert.isTrue(result.value.includes('51 open pull requests'));
+    assert.include(
+      result.value,
+      `more than ${MAX_OPEN_PAGES * OPEN_PAGE_SIZE} open pull requests`,
+    );
   });
 
   test('words a token GitHub will not take', async () => {
@@ -1865,7 +1957,8 @@ const restAnswers = ({
 const report = (
   openNodes: readonly unknown[],
   mergedNodes: readonly unknown[] = [],
-  totalCount: number = openNodes.length,
+  /** Where the next page of open pull requests starts, if there is one. */
+  openEndCursor?: string,
   issues: unknown = NO_ISSUES,
   /** Fields of the pull requests' query to answer otherwise. */
   repository: ReadonlyRecord<string, unknown> = {},
@@ -1874,18 +1967,62 @@ const report = (
   ({
     ...rest,
     ...answer('PullRequests', {
-      defaultBranchRef: { name: 'main' },
-      codeOwners: { text: '/.github/workflows/ @noshiro-pf\n' },
-      codeOwnersAtRoot: null,
-      codeOwnersInDocs: null,
-      queueLabel: { name: 'merge-queued' },
-      open: { totalCount, nodes: openNodes },
+      ...REPOSITORY_FIELDS,
+      open: openPage(openNodes, openEndCursor),
       ...repository,
     }),
-    ...answer('Checks', { open: { nodes: openNodes } }),
-    ...answer('PullRequestDetails', { open: { nodes: openNodes } }),
-    ...answer('MergedPullRequests', { merged: { nodes: mergedNodes } }),
+    ...answer('Checks', { open: openPage(openNodes, openEndCursor) }),
+    ...answer('PullRequestDetails', {
+      open: openPage(openNodes, openEndCursor),
+    }),
+    MergedPullRequests: [
+      {
+        data: {
+          repository: { nameWithOwner: 'noshiro-pf/mono' },
+          merged: { nodes: mergedNodes },
+        },
+      },
+    ],
     ...issuesAnswer(issues),
+  }) as const;
+
+/** What the pull requests' query answers beside them, on every page. */
+const REPOSITORY_FIELDS = {
+  defaultBranchRef: { name: 'main' },
+  codeOwners: { text: '/.github/workflows/ @noshiro-pf\n' },
+  codeOwnersAtRoot: null,
+  codeOwnersInDocs: null,
+  queueLabel: { name: 'merge-queued' },
+} as const;
+
+/**
+ * A page of open pull requests, the last one when `endCursor` is
+ * `undefined`, as each of the three queries that list them answers it.
+ */
+const openPage = (
+  nodes: readonly unknown[],
+  endCursor: string | undefined,
+): unknown =>
+  ({
+    pageInfo: {
+      hasNextPage: endCursor !== undefined,
+      endCursor: endCursor ?? null,
+    },
+    nodes,
+  }) as const;
+
+/** The page after the first of each query that lists the open ones. */
+const laterOpenPage = (
+  nodes: readonly unknown[],
+  endCursor: string | undefined,
+): Answers =>
+  ({
+    ...answer('PullRequests', {
+      ...REPOSITORY_FIELDS,
+      open: openPage(nodes, endCursor),
+    }),
+    ...answer('Checks', { open: openPage(nodes, endCursor) }),
+    ...answer('PullRequestDetails', { open: openPage(nodes, endCursor) }),
   }) as const;
 
 const NO_ISSUES = {
