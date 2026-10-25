@@ -1,6 +1,6 @@
 import { createMilestone } from './create-milestone.mjs';
 import { createTask } from './create-task.mjs';
-import { removeNode } from './remove-node.mjs';
+import { removeNodes } from './remove-nodes.mjs';
 import { asMilestoneId, asTaskId, type DomainState } from './types.mjs';
 
 const a = asTaskId('a');
@@ -45,9 +45,9 @@ const state: DomainState = {
   ],
 } as const;
 
-describe(removeNode, () => {
+describe(removeNodes, () => {
   test('removes a task and every dependency on it, in one change set', () => {
-    const result = removeNode(state, { kind: 'task', id: a }, now);
+    const result = removeNodes(state, [{ kind: 'task', id: a }], now);
 
     assert.deepStrictEqual(
       result.state.tasks.map(({ id }) => id),
@@ -73,7 +73,7 @@ describe(removeNode, () => {
   });
 
   test('marks what it rewrote as updated now, and leaves the rest as they were', () => {
-    const result = removeNode(state, { kind: 'task', id: a }, now);
+    const result = removeNodes(state, [{ kind: 'task', id: a }], now);
 
     assert.strictEqual(result.updatedTasks[0]?.updatedAt, now);
 
@@ -83,7 +83,7 @@ describe(removeNode, () => {
   });
 
   test('removes a milestone and the dependencies on it', () => {
-    const result = removeNode(state, { kind: 'milestone', id: m }, now);
+    const result = removeNodes(state, [{ kind: 'milestone', id: m }], now);
 
     assert.deepStrictEqual(result.state.milestones, []);
 
@@ -113,7 +113,7 @@ describe(removeNode, () => {
   });
 
   test('a node nothing depends on changes nothing else', () => {
-    const result = removeNode(state, { kind: 'task', id: c }, now);
+    const result = removeNodes(state, [{ kind: 'task', id: c }], now);
 
     assert.deepStrictEqual(
       result.state.tasks.map(({ id }) => id),
@@ -143,7 +143,11 @@ describe(removeNode, () => {
       ],
     } as const;
 
-    const result = removeNode(sameId, { kind: 'task', id: asTaskId('x') }, now);
+    const result = removeNodes(
+      sameId,
+      [{ kind: 'task', id: asTaskId('x') }],
+      now,
+    );
 
     assert.deepStrictEqual(
       result.state.tasks.map(({ id }) => id),
@@ -156,11 +160,71 @@ describe(removeNode, () => {
   });
 
   test('removing a node that does not exist changes nothing', () => {
-    const result = removeNode(
+    const result = removeNodes(
       state,
-      { kind: 'task', id: asTaskId('nope') },
+      [{ kind: 'task', id: asTaskId('nope') }],
       now,
     );
+
+    assert.deepStrictEqual(result.state, state);
+
+    assert.deepStrictEqual(result.updatedTasks, []);
+
+    assert.deepStrictEqual(result.updatedMilestones, []);
+  });
+
+  test('removes several nodes at once, and rewrites none of those it removes', () => {
+    const result = removeNodes(
+      state,
+      [
+        { kind: 'task', id: a },
+        { kind: 'task', id: b },
+      ],
+      now,
+    );
+
+    assert.deepStrictEqual(
+      result.state.tasks.map(({ id }) => id),
+      [c],
+    );
+
+    // B depended on A, but is gone too.
+    assert.deepStrictEqual(result.updatedTasks, []);
+
+    assert.deepStrictEqual(
+      result.updatedMilestones.map(({ id, dependencies }) => [
+        id,
+        dependencies,
+      ]),
+      [[m, []]],
+    );
+  });
+
+  test('removes a task and a milestone together, and every dependency on either', () => {
+    const result = removeNodes(
+      state,
+      [
+        { kind: 'milestone', id: m },
+        { kind: 'task', id: a },
+      ],
+      now,
+    );
+
+    assert.deepStrictEqual(result.state.milestones, []);
+
+    assert.deepStrictEqual(
+      result.updatedTasks.map(({ id, dependencies }) => [id, dependencies]),
+      [
+        [b, []],
+        [c, []],
+      ],
+    );
+
+    assert.deepStrictEqual(result.updatedMilestones, []);
+  });
+
+  test('removing none changes nothing', () => {
+    const result = removeNodes(state, [], now);
 
     assert.deepStrictEqual(result.state, state);
 

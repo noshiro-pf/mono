@@ -4,7 +4,7 @@ import {
   asTaskId,
   createMilestone,
   createTask,
-  removeNode,
+  removeNodes,
   type DomainState,
 } from '../domain/index.mjs';
 import { createMemoryRepository } from './memory-repository.mjs';
@@ -98,9 +98,9 @@ describe(createMemoryRepository, () => {
 
     const ref = { kind: 'task', id: asTaskId('a') } as const;
 
-    const removed = removeNode(initial, ref, 100);
+    const removed = removeNodes(initial, [ref], 100);
 
-    await repository.deleteNode(ref, removed);
+    await repository.deleteNodes([ref], removed);
 
     assert.strictEqual(observer.states.length, 2);
 

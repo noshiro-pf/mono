@@ -128,9 +128,11 @@ export const createFirestoreRepository = (
     putTask: (task) => putDoc(taskDoc(task.id), taskToDoc(task)),
     putMilestone: (milestone) =>
       putDoc(milestoneDoc(milestone.id), milestoneToDoc(milestone)),
-    deleteNode: (ref, { updatedTasks, updatedMilestones }) =>
+    deleteNodes: (refs, { updatedTasks, updatedMilestones }) =>
       commitBatch(firestore, (batch) => {
-        batch.delete(doc(collectionOf(ref.kind), ref.id));
+        for (const ref of refs) {
+          batch.delete(doc(collectionOf(ref.kind), ref.id));
+        }
 
         for (const task of updatedTasks) {
           batch.set(taskDoc(task.id), taskToDoc(task));

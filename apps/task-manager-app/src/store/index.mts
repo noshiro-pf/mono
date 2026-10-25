@@ -1,4 +1,5 @@
 export * from './animation-setting-store.mjs';
+export * from './bulk-delete-store.mjs';
 export * from './bulk-edit-store.mjs';
 export * from './clock-store.mjs';
 export * from './dag-filter-store.mjs';

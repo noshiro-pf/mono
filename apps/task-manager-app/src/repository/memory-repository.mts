@@ -79,7 +79,8 @@ export const createMemoryRepository = (
         tasks: mut_state.tasks,
         milestones: upsert(mut_state.milestones, milestone),
       }),
-    deleteNode: (ref, cleanup) => update(withDeleted(mut_state, ref, cleanup)),
+    deleteNodes: (refs, cleanup) =>
+      update(withDeleted(mut_state, refs, cleanup)),
     putNodes: ({ updatedTasks, updatedMilestones }) =>
       update({
         tasks: upsertAll(mut_state.tasks, updatedTasks),
@@ -145,21 +146,21 @@ const upsertAll = <T extends Readonly<{ id: string }>>(
 
 const withDeleted = (
   state: DomainState,
-  ref: NodeRef,
+  refs: readonly NodeRef[],
   { updatedTasks, updatedMilestones }: NodeCleanup,
 ): DomainState => {
-  const deletedId = nodeId(ref);
+  const deletedIds = new Set(refs.map(nodeId));
 
   return {
     tasks: upsertAll(
       state.tasks.filter(
-        ({ id }) => nodeId({ kind: 'task', id }) !== deletedId,
+        ({ id }) => !deletedIds.has(nodeId({ kind: 'task', id })),
       ),
       updatedTasks,
     ),
     milestones: upsertAll(
       state.milestones.filter(
-        ({ id }) => nodeId({ kind: 'milestone', id }) !== deletedId,
+        ({ id }) => !deletedIds.has(nodeId({ kind: 'milestone', id })),
       ),
       updatedMilestones,
     ),
