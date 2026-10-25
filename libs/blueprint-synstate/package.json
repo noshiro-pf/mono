@@ -76,9 +76,9 @@
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {
-    "synstate": ">=4.1.0",
+    "synstate": ">=5.0.0",
     "synstate-dom": ">=0.1.0",
-    "ts-data-forge": ">=14.9.0"
+    "ts-data-forge": ">=14.10.0"
   },
   "engines": {
     "node": ">=22.22.2",

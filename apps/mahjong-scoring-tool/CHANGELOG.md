@@ -1,5 +1,12 @@
 # mahjong-scoring-tool
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies [7f3e173]
+    - ts-data-forge@14.10.0
+
 ## 0.0.6
 
 ### Patch Changes
