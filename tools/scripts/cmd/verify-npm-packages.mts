@@ -696,18 +696,7 @@ const siblingOverrides = (
  * checkout — a version that does not have it. Removing the entry then only
  * pins the breakage. Wait for the release that fixes it.
  */
-const notYetPublished: ReadonlySet<string> = new Set([
-  // Added when the ESLint rule helpers the plugins and eslint-config-typed had
-  // each copied moved into one package (#2180). Delete this entry after its
-  // first manual publish (libs/first-release.md).
-  'eslint-rule-forge',
-  // Added with its first rule, `no-unbounded-counter-pipe`. Delete this entry
-  // after its first manual publish (libs/first-release.md).
-  'eslint-plugin-synstate',
-  // Made public once the PR Manager and the task manager ran on it. Delete this
-  // entry after its first manual publish (libs/first-release.md).
-  'synstate-dom',
-]);
+const notYetPublished: ReadonlySet<string> = new Set();
 
 /**
  * The published space pins an exact version, committed, rather than tracking

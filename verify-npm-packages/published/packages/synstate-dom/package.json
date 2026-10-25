@@ -1,0 +1,11 @@
+{
+  "name": "verify-synstate-dom",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "synstate": ">=4.1.0",
+    "synstate-dom": "0.1.0",
+    "ts-data-forge": ">=14.9.0"
+  }
+}
