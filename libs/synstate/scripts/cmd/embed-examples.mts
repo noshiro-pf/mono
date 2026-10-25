@@ -17,6 +17,7 @@ const documents = [
       '05-simple-state-with-additional-api.mts',
       '../src/create-state-equals-example.mts',
       '../src/create-reducer-equals-example.mts',
+      '../src/create-state-keep-equal-parts-example.mts',
       '06-global-counter.tsx',
       '07-todo-reducer.tsx',
       '08-dark-mode.tsx',

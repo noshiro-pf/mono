@@ -343,6 +343,41 @@ describe(createReader, () => {
     assert.deepStrictEqual(written(), ['merged', 'readAt']);
   });
 
+  test('a pull request that did not change keeps its object when another is put before it', async () => {
+    const { reader, loads, timers, clock } = setup(TOKEN_A);
+
+    reader.start();
+
+    await answer(
+      loads,
+      0,
+      Result.ok({ ...readAt(1_000), merged: [MERGED] }),
+      LIMIT,
+    );
+
+    const [held] = reader.merged.getSnapshot().value;
+
+    clock.set(3_000);
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    await answer(
+      loads,
+      1,
+      Result.ok({
+        ...readAt(2_000),
+        merged: [{ ...MERGED, number: 8 }, structuredClone(MERGED)],
+      }),
+      LIMIT,
+    );
+
+    const [added, kept] = reader.merged.getSnapshot().value;
+
+    assert.strictEqual(added?.number, 8);
+
+    assert.strictEqual(kept, held);
+  });
+
   test('says how the reading went apart from what it read', async () => {
     const { reader, loads, timers, clock } = setup(TOKEN_A);
 

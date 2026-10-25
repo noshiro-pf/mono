@@ -1,3 +1,4 @@
+import { replaceEqualDeep, type ReplaceEqualDeepOptions } from 'ts-data-forge';
 import type { Reducer } from 'ts-type-forge';
 import { source, type InitializedObservable } from '../core/index.mjs';
 
@@ -10,7 +11,8 @@ import { source, type InitializedObservable } from '../core/index.mjs';
  * @param reducer - A pure function that takes current state and action, returns new state
  * @param initialState - The initial value of the state
  * @param options - {@link StateOptions}: `equals` (default `Object.is`),
- *   to pass on only the dispatches that change the state
+ *   to pass on only the dispatches that change the state, and
+ *   `keepEqualParts`, to keep the parts of the state a dispatch did not change
  * @returns A 3-element tuple: `[state, dispatch, { getSnapshot, initialState }]`.
  *   `dispatch` returns the state it leaves; once `state` is completed, that
  *   is the state held.
@@ -93,10 +95,20 @@ export const createReducer = <S, A>(
 
   const equals = options?.equals ?? Object.is;
 
+  const keepEqualParts = options?.keepEqualParts ?? false;
+
+  const keepOptions =
+    typeof keepEqualParts === 'boolean' ? undefined : keepEqualParts;
+
   const dispatch = (action: A): S => {
     const currentState = state.getSnapshot().value;
 
-    const nextState = reducer(currentState, action);
+    const reduced = reducer(currentState, action);
+
+    const nextState =
+      keepEqualParts === false
+        ? reduced
+        : replaceEqualDeep(currentState, reduced, keepOptions);
 
     // Once completed, `next` keeps the state held and returns it.
     return equals(currentState, nextState)
@@ -131,4 +143,32 @@ export type StateOptions<S> = Readonly<{
    * @param next - The state the update would set
    */
   equals?: (current: S, next: S) => boolean;
+
+  /**
+   * Whether an update keeps the parts of the state it did not change. With
+   * `true`, the next state is compared with the current one before it is
+   * written, and every part of it deeply equal to the same part of the
+   * current state is replaced by that part (`replaceEqualDeep` of
+   * ts-data-forge): a reader of an unchanged part keeps the object it has, so
+   * `skipIfNoChange()` with `Object.is` stops it. When the whole next state is
+   * deeply equal, the current state is kept and nothing is passed on, so
+   * `equals` can stay `Object.is`.
+   *
+   * This is for a state written whole from a source that answers with a new
+   * object every time, a server polled for a report, say. Array items are
+   * matched by index; pass `{ key }` to match them by key, an item for which
+   * `key` returns `undefined` being matched by index. Only plain objects and
+   * arrays are walked into; a `Map`, a `Set`, a `Date` or a class instance is
+   * compared and kept whole.
+   *
+   * Prefer this over `keepEqualParts()` downstream: keeping the parts where
+   * the state is written means no update with nothing in it is passed on at
+   * all, and nothing downstream has anything to undo.
+   *
+   * Defaults to `false`: the next state is written as given. With it on,
+   * each update compares deeply every part of the next state that is not
+   * the very object of the current one; a state whose updates already keep
+   * what they do not change, as `{ ...prev, x }` does, gains nothing from it.
+   */
+  keepEqualParts?: boolean | ReplaceEqualDeepOptions;
 }>;

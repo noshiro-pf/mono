@@ -24,7 +24,7 @@
 - 🎯 **Simple State Management**: Easy-to-use `createState` and `createReducer` similar to React useState/useReducer for global state
 - ⚡ **High Performance**: Optimized for fast state updates and minimal re-renders
 - 🎨 **Type-Safe**: Full TypeScript support with precise type inference
-- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~6.4 kB min+gzip<!-- /bundle-size:synstate --> with two external runtime dependencies ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge) and [ts-std-forge](https://www.npmjs.com/package/ts-std-forge), and the first depends on the second)
+- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~6.5 kB min+gzip<!-- /bundle-size:synstate --> with two external runtime dependencies ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge) and [ts-std-forge](https://www.npmjs.com/package/ts-std-forge), and the first depends on the second)
 - 🌐 **Framework Agnostic**: Works with React, Vue, Svelte, or vanilla JavaScript
 - 🔄 **Reactive Updates**: Automatic propagation of state changes to all subscribers
 - 📡 **Event System**: Built-in `createValueEmitter`, `createEventEmitter` for event-driven architecture
@@ -333,6 +333,62 @@ dispatch({ type: 'add', amount: 2 });
 
 assert.deepStrictEqual(countHistory, [0, 0, 2]);
 ```
+
+### Keeping the Parts an Update Did Not Change (`keepEqualParts`)
+
+A state written whole from a source that answers with a new object every time, such as a server polled for a report, can take `keepEqualParts: true`. The next state is compared with the current one before it is written: every part deeply equal to the same part of the current state is replaced by that part, so whatever reads an unchanged part keeps the object it has and `skipIfNoChange()` with `Object.is` stops it, and an answer that changes nothing is not passed on at all. Array items are matched by index; `keepEqualParts: { key }` matches them by key. The comparison is `replaceEqualDeep` of ts-data-forge, which serves any other write too.
+
+```tsx
+type PullReport = DeepReadonly<{
+    summary: { open: number };
+    pulls: { number: number; title: string }[];
+}>;
+
+const [report, setReport] = createState<PullReport>(
+    { summary: { open: 0 }, pulls: [] },
+    { keepEqualParts: true },
+);
+
+const summary = report.pipe(map((r) => r.summary)).pipe(skipIfNoChange());
+
+const summaryHistory: unknown[] = [];
+
+summary.subscribe((value) => {
+    summaryHistory.push(value);
+});
+
+// A server answers each poll with the whole report, a new object every
+// time. What did not change keeps the object already held.
+setReport({
+    summary: { open: 1 },
+    pulls: [{ number: 1, title: 'one' }],
+});
+
+const held = report.getSnapshot().value;
+
+// An answer that changes nothing is not passed on at all.
+setReport({
+    summary: { open: 1 },
+    pulls: [{ number: 1, title: 'one' }],
+});
+
+assert.strictEqual(report.getSnapshot().value, held);
+
+// An edited title: a new report and a new array, while the summary is
+// the one held, so `summary` is not told of it.
+setReport({
+    summary: { open: 1 },
+    pulls: [{ number: 1, title: 'one (edited)' }],
+});
+
+assert.notStrictEqual(report.getSnapshot().value, held);
+
+assert.strictEqual(report.getSnapshot().value.summary, held.summary);
+
+assert.deepStrictEqual(summaryHistory, [{ open: 0 }, { open: 1 }]);
+```
+
+Keep references where the value is written, as here, rather than downstream. The `keepEqualParts()` operator does the same to a stream, but every update that changes nothing has already been passed on by then, so keep it for a source that is not yours to change.
 
 ### Global Counter State (React)
 
@@ -684,6 +740,7 @@ For complex scenarios, SynState provides observable-based APIs:
 - Filtering
     - `filter(predicate)`: Filter values
     - `skipIfNoChange()`: Skip duplicate values (alias: `distinctUntilChanged`)
+    - `keepEqualParts()`: Keep the parts equal to the last value and skip a value equal to it as a whole; prefer the `keepEqualParts` option of `createState`
     - `skip(n)`: Skip first n emissions
     - `take(n)`: Take first n emissions then complete
     - `skipWhile(predicate)`: Skip values while predicate is true

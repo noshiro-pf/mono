@@ -1,6 +1,7 @@
 export * from './audit.mjs';
 export * from './debounce.mjs';
 export * from './filter.mjs';
+export * from './keep-equal-parts.mjs';
 export * from './map.mjs';
 export * from './merge-map.mjs';
 export * from './pairwise.mjs';

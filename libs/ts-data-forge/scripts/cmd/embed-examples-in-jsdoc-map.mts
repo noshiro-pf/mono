@@ -493,6 +493,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/promise/create-promise-example.mts'],
   },
   {
+    sourcePath: 'src/others/replace-equal-deep.mts',
+    sampleFiles: ['samples/src/others/replace-equal-deep-example.mts'],
+  },
+  {
     sourcePath: 'src/others/tuple.mts',
     sampleFiles: ['samples/src/others/tp-example.mts'],
   },

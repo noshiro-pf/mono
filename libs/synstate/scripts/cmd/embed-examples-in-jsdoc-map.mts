@@ -50,6 +50,7 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: [
       'samples/src/create-state-example.mts',
       'samples/src/create-state-equals-example.mts',
+      'samples/src/create-state-keep-equal-parts-example.mts',
     ],
   },
   {
@@ -98,6 +99,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
   {
     sourcePath: 'src/core/operators/switch-map.mts',
     sampleFiles: ['samples/src/switch-map-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/operators/keep-equal-parts.mts',
+    sampleFiles: ['samples/src/keep-equal-parts-example.mts'],
   },
   {
     sourcePath: 'src/core/operators/skip-if-no-change.mts',

@@ -21,7 +21,15 @@ import {
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { Arr, fastDeepEqual, Result, unknownToString } from 'ts-data-forge';
+import {
+  Arr,
+  fastDeepEqual,
+  hasKey,
+  isRecord,
+  replaceEqualDeep,
+  Result,
+  unknownToString,
+} from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { CLOCK_TICK_MS, POLL_INTERVAL_MS } from '../constants.mjs';
 import type { Answered } from '../graphql.mjs';
@@ -45,7 +53,6 @@ import {
   type RateLimit,
 } from '../rate-limit.mjs';
 import { ISSUES_LIMIT, ISSUES_PAGE_SIZE } from '../report-query.mjs';
-import { sameItemsIfEqual } from '../share.mjs';
 import type { StoredToken } from '../token.mjs';
 import type { WorkflowRunList } from '../workflow-runs.mjs';
 
@@ -275,9 +282,9 @@ export const createReader = (deps: ReaderDeps): Reader => {
   const nowMs = merge([nowMsRead, nowMsTicked]).pipe(withInitialValue(0));
 
   // The report is held whole, and each part the page draws is taken from it.
-  // The pull requests are kept one by one, each being its own card. What
-  // `sameItemsIfEqual` makes of an answer that changed nothing is the array
-  // already held, which `Object.is` then stops.
+  // `writeReport` keeps every part an answer did not change as the object
+  // already held, so a part is compared by reference alone, and a card whose
+  // pull request did not change is handed the object it already has.
   const {
     state: report,
     update: updateReport,
@@ -288,29 +295,28 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
   const partOf = <K extends keyof ReportParts>(
     key: K,
-    equals: (x: ReportParts[K], y: ReportParts[K]) => boolean,
   ): InitializedObservable<ReportParts[K]> =>
-    report.pipe(map((held) => held[key])).pipe(skipIfNoChange(equals));
+    report.pipe(map((held) => held[key])).pipe(skipIfNoChange());
 
-  const readAt = partOf('readAtEpochMs', Object.is);
+  const readAt = partOf('readAtEpochMs');
 
-  const summary = partOf('summary', fastDeepEqual);
+  const summary = partOf('summary');
 
-  const entries = partOf('entries', Object.is);
+  const entries = partOf('entries');
 
-  const roots = partOf('roots', fastDeepEqual);
+  const roots = partOf('roots');
 
-  const cycles = partOf('cycles', fastDeepEqual);
+  const cycles = partOf('cycles');
 
-  const merged = partOf('merged', fastDeepEqual);
+  const merged = partOf('merged');
 
-  const queue = partOf('queue', fastDeepEqual);
+  const queue = partOf('queue');
 
-  const features = partOf('features', fastDeepEqual);
+  const features = partOf('features');
 
-  const issues = partOf('issues', fastDeepEqual);
+  const issues = partOf('issues');
 
-  const reading = partOf('reading', fastDeepEqual);
+  const reading = partOf('reading');
 
   const { state: runs, update: updateRuns } = createResettableState<RunsStatus>(
     RUNS_READING,
@@ -339,11 +345,13 @@ export const createReader = (deps: ReaderDeps): Reader => {
   const getIssues = (): ReportParts['issues'] => getReport().issues;
 
   const writeReport = (next: ReportParts, withIssues: boolean): void => {
-    updateReport((held) => ({
-      ...next,
-      entries: sameItemsIfEqual(held.entries, next.entries),
-      issues: withIssues ? next.issues : held.issues,
-    }));
+    updateReport((held) =>
+      replaceEqualDeep(
+        held,
+        { ...next, issues: withIssues ? next.issues : held.issues },
+        { key: pullRequestNumber },
+      ),
+    );
   };
 
   const currentToken = (): string | undefined =>
@@ -625,6 +633,15 @@ type ReportParts = StrictPick<
   | 'issues'
   | 'reading'
 >;
+
+/**
+ * What an item of the report's arrays is matched by when an answer is
+ * written over the report held: its number, when it is a pull request or an
+ * issue. A pull request opening or merging moves every one after it, and one
+ * that only moved has not changed.
+ */
+const pullRequestNumber = (item: unknown): unknown =>
+  isRecord(item) && hasKey(item, 'number') ? item.number : undefined;
 
 /** What the page shows while there is no report. */
 const EMPTY_PARTS: ReportParts = {
