@@ -161,9 +161,84 @@ a:focus-visible {
 }
 
 .page-subtitle {
+  align-items: baseline;
   color: var(--ink-secondary);
+  display: flex;
+  flex-wrap: wrap;
   font-size: 0.875rem;
+  gap: 0 0.6rem;
   margin: 0.15rem 0 0;
+}
+
+/*
+ * Beside the repository's name, one word until it is opened: changing the
+ * repository is seldom, and the header is where the report's state is.
+ */
+.repo-switch {
+  font-size: 0.8125rem;
+}
+
+.repo-switch-summary {
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.repo-switch-summary:hover {
+  color: var(--accent);
+}
+
+.repo-switch[open] {
+  flex-basis: 100%;
+}
+
+.repo-switch-form {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  max-width: 34rem;
+}
+
+.repo-switch-label {
+  color: var(--ink-secondary);
+}
+
+.repo-switch-input {
+  background: var(--surface);
+  border: 1px solid var(--baseline);
+  border-radius: var(--radius);
+  color: var(--ink-primary);
+  flex: 1 1 16rem;
+  font: inherit;
+  font-family: var(--font-mono);
+  min-width: 0;
+  padding: 0.35rem 0.6rem;
+}
+
+.repo-switch-open {
+  background: var(--surface);
+  border: 1px solid var(--baseline);
+  border-radius: var(--radius);
+  color: var(--ink-primary);
+  cursor: pointer;
+  font: inherit;
+  padding: 0.35rem 0.85rem;
+}
+
+.repo-switch-open:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.repo-switch-error {
+  color: var(--status-critical);
+  margin: 0.5rem 0 0;
+}
+
+.repo-switch-note {
+  color: var(--ink-muted);
+  margin: 0.4rem 0 0;
 }
 
 .header-actions {

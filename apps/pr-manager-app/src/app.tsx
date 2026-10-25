@@ -16,6 +16,7 @@ import {
   Notice,
   ReadFromGitHub,
   ReadFromGitHubFolded,
+  RepoSwitch,
   ThemeSwitch,
   TokenPanel,
   ViewSettings,
@@ -35,7 +36,7 @@ import {
  *
  * Reads the open pull requests straight from GitHub and shows what is
  * holding each one up — the merge order the `Merge-After:` trailers declare,
- * the verdict of the contexts the ruleset requires, how far each branch is
+ * the verdict of the contexts the default branch requires, how far each branch is
  * from its base, whether it conflicts with it, and whether it waits for a
  * code owner — with what merged in the last week below.
  *
@@ -108,7 +109,11 @@ export const App = (): JSX.Element => {
           else={
             <div>
               <h1 class={constant('page-title')}>{constant(TITLE)}</h1>
-              <p class={constant('page-subtitle')}>{repository}</p>
+              <div class={constant('page-subtitle')}>
+                {repository}
+
+                <RepoSwitch />
+              </div>
             </div>
           }
         />

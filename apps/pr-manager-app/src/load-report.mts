@@ -321,7 +321,7 @@ export const loadReport = async (
       ...(fetchImpl === undefined ? {} : { fetchImpl }),
     });
 
-  const pulls = readPullRequests(ask);
+  const pulls = readPullRequests(ask, repo);
 
   const rules = pulls.then(async ({ result }) =>
     Result.isOk(result)
@@ -580,13 +580,28 @@ type DetailsPart = DetailsState &
  */
 const MAX_FOLLOW_UP_ROUNDS = 10;
 
-const readPullRequests = async (ask: Ask): Promise<Answered<PullsPart>> => {
+const readPullRequests = async (
+  ask: Ask,
+  repo: RepoRef,
+): Promise<Answered<PullsPart>> => {
   const answered = await ask(PULL_REQUESTS_QUERY);
 
   const { rateLimit } = answered;
 
   if (Result.isErr(answered.result)) {
     return { rateLimit, result: answered.result };
+  }
+
+  // What GitHub answers for a name it cannot resolve for this token, whether
+  // there is no such repository or it is one the token may not read: it does
+  // not say which, so the sentence names both.
+  if (repositoryOf(answered.result.value) === null) {
+    return {
+      rateLimit,
+      result: Result.err(
+        `GitHub shows this token no repository ${repo.owner}/${repo.name}. Check the name, or, if it is private, give the page a token that can read it.`,
+      ),
+    };
   }
 
   const validated = PullRequestsDataSchema.validate(answered.result.value.data);
@@ -1310,6 +1325,10 @@ const startAfterOfNodes = (
       ]),
   );
 };
+
+/** `repository` in an answer, `undefined` when there is no such field. */
+const repositoryOf = ({ data }: GraphqlAnswer): unknown =>
+  isRecord(data) ? data['repository'] : undefined;
 
 /** The aliased fields under `repository` in an answer, by alias. */
 const fieldsOf =
