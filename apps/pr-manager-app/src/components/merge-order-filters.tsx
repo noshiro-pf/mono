@@ -40,7 +40,7 @@ import { OfTotal, StatTile, StatToggle } from './stat-tile.js';
  * `pending` label an author puts on what they are holding back, which is
  * the count to switch off to leave it out. `queued` and `set aside` are
  * left out where the repository does not run the queue, and `awaiting code
- * owner` where it declares no ruleset (`statusFiltersOf`).
+ * owner` where no ruleset asks for one (`statusFiltersOf`).
  */
 export const MergeOrderFilters = (): JSX.Element => {
   const { view: view$, counts: counts$ } = mergeOrderStore;

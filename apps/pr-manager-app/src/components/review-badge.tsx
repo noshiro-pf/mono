@@ -14,9 +14,9 @@ type Props = Readonly<{ review: Bindable<CodeOwnerReview> }>;
  * Whether the pull request waits for a code owner to approve it.
  *
  * `main`'s ruleset asks for no approvals in general, but for a code owner's
- * on the paths `.github/CODEOWNERS` lists — so a pull request touching one
- * stays green and never merges, and nothing on it says why. Shown only when
- * that is the case, or when it cannot be told.
+ * on the paths `CODEOWNERS` lists — so a pull request touching one stays
+ * green and never merges, and nothing on it says why. Shown only when that is
+ * the case, or when it cannot be told.
  */
 export const ReviewBadge = ({ review }: Props): JSX.Element => (
   <If
@@ -54,7 +54,9 @@ const titleOf = (review: CodeOwnerReview): string =>
             ]
           : []),
       ].join('\n')
-    : 'more files changed than this page reads, so it cannot tell whether a code owner has to approve';
+    : review.state === 'unknown' && review.teams !== undefined
+      ? (`${review.teams.map((team) => `@${team}`).join(', ')} may already have approved: telling who is on a team takes a permission this page does not ask for` as const)
+      : 'more files changed than this page reads, so it cannot tell whether a code owner has to approve';
 
 const labelOf = (review: CodeOwnerReview): string =>
   review.state === 'required'

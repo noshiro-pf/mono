@@ -121,12 +121,13 @@ const escapeChar = (char: string): string =>
  * waits for ever: GitHub does not let an author approve their own pull
  * request, so when the author is the only owner nothing but a ruleset bypass
  * will merge it. `unknown` is a pull request whose changed files were more
- * than could be read, where the unread ones might be owned.
+ * than could be read, where the unread ones might be owned — or, with
+ * `teams`, one approved by someone these teams might have as a member.
  */
 export type CodeOwnerReview = Readonly<
   | { state: 'approved' }
   | { state: 'not-required' }
-  | { state: 'unknown' }
+  | { state: 'unknown'; teams?: readonly string[] }
   | {
       state: 'required';
       paths: readonly string[];
@@ -143,9 +144,13 @@ export type CodeOwnerReview = Readonly<
  * already stopped calling it an approval by the time this reads it.
  *
  * Owners are compared by login, case-insensitively, as GitHub compares
- * them. A team owner (`@org/team`) is never matched by one person's
- * approval here, because telling who is on the team takes a permission
- * neither reader asks for; `CODEOWNERS` in this repository names no team.
+ * them. A team owner (`@org/team`) cannot be: telling who is on the team
+ * takes `read:org`, which neither reader asks for. So a path a team owns
+ * waits while nobody at all has approved, is approved by a person owning it
+ * beside the team, and otherwise — someone approved, and might be on the
+ * team — cannot be told, which makes the whole `unknown` unless another
+ * path is plainly still waiting. `CODEOWNERS` in this repository names no
+ * team.
  */
 export const codeOwnerReview = ({
   required,
@@ -171,7 +176,7 @@ export const codeOwnerReview = ({
 
   const approved = new Set(approvers.map((login) => login.toLowerCase()));
 
-  const waiting = Arr.generate(function* () {
+  const unapproved = Arr.generate(function* () {
     for (const path of files) {
       const owners = ownersOf(path, rules);
 
@@ -183,6 +188,11 @@ export const codeOwnerReview = ({
       }
     }
   });
+
+  // An approval by someone not named might be a team member's.
+  const waiting = unapproved.filter(
+    ({ owners }) => approved.size === 0 || !owners.some(isTeam),
+  );
 
   if (Arr.isNonEmpty(waiting)) {
     const owners = Arr.uniq(waiting.flatMap((file) => file.owners));
@@ -201,7 +211,19 @@ export const codeOwnerReview = ({
     return { state: 'unknown' };
   }
 
+  if (Arr.isNonEmpty(unapproved)) {
+    return {
+      state: 'unknown',
+      teams: Arr.uniq(
+        unapproved.flatMap(({ owners }) => owners.filter(isTeam)),
+      ),
+    };
+  }
+
   const owned = files.some((path) => Arr.isNonEmpty(ownersOf(path, rules)));
 
   return owned ? { state: 'approved' } : { state: 'not-required' };
 };
+
+/** `org/team`, as opposed to a person's login or an email address. */
+const isTeam = (owner: string): boolean => owner.includes('/');

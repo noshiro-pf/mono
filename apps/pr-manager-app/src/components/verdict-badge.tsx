@@ -22,8 +22,8 @@ type Props = Readonly<{
 }>;
 
 /**
- * The verdict of the contexts the ruleset requires — or, where none is
- * declared, of every context reported on the head — as an icon and a word,
+ * The verdict of the contexts the default branch requires — or, where it
+ * requires none, of every context reported on the head — as an icon and a word,
  * and beside them how many are in each state — `1✗ 1… 7✓`.
  *
  * The counts because a verdict is one word over nine contexts, and the state
@@ -32,8 +32,9 @@ type Props = Readonly<{
  * parts are shown. The names are on hover.
  */
 export const VerdictBadge = ({ checks }: Props): JSX.Element => {
-  const shown = derive([checks, reader.features], (summary, { ruleset }) =>
-    presentChecks(summary, ruleset),
+  const shown = derive(
+    [checks, reader.features],
+    (summary, { requiredChecks }) => presentChecks(summary, requiredChecks),
   );
 
   return (
@@ -68,7 +69,7 @@ type Shown = Readonly<{
 
 const presentChecks = (
   checks: ChecksSummary | undefined,
-  rulesetDeclared: boolean,
+  requiredChecks: boolean,
 ): Shown => {
   if (checks === undefined) {
     return {
@@ -86,7 +87,7 @@ const presentChecks = (
     status: verdict.status,
     icon: verdict.icon,
     label: verdict.label,
-    title: describeCheckBreakdown(checks, rulesetDeclared),
+    title: describeCheckBreakdown(checks, requiredChecks),
     counts: describeCheckCounts(checks),
   };
 };

@@ -2,7 +2,7 @@ import { writeSetAsideComment } from 'pr-report-core';
 import { Arr, isRecord, Json, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { DEFAULT_REPORT_SOURCE } from './constants.mjs';
-import type { Fetch, FetchInit } from './graphql.mjs';
+import type { FetchInit } from './graphql.mjs';
 import {
   appendIssues,
   loadIssuePage,
@@ -12,6 +12,7 @@ import {
   type ReferencedItem,
 } from './load-report.mjs';
 import { ISSUES_LIMIT, ISSUES_PAGE_SIZE } from './report-query.mjs';
+import type { RestFetchInit } from './workflow-runs.mjs';
 
 describe(loadReport, () => {
   test('reads the pull requests, then how far each head is from its base', async () => {
@@ -80,7 +81,16 @@ describe(loadReport, () => {
 
     await release('PullRequests');
 
-    assert.strictEqual(asked().at(-1), 'Compare');
+    // The default branch's rules and the comparison, both named by it.
+    assert.deepStrictEqual(Arr.takeLast(asked(), 3).toSorted(), [
+      'Branch',
+      'BranchRules',
+      'Compare',
+    ]);
+
+    await release('BranchRules');
+
+    await release('Branch');
 
     await release('Checks');
 
@@ -161,6 +171,17 @@ describe(loadReport, () => {
 
     await release('Checks');
 
+    // Not judged until the rules say which contexts count.
+    assert.deepStrictEqual(mut_progress.at(-1)?.entries[0]?.reading, [
+      'checks',
+      'comparison',
+      'details',
+    ]);
+
+    await release('BranchRules');
+
+    await release('Branch');
+
     const checked = mut_progress.at(-1);
 
     assert.deepStrictEqual(checked?.entries[0]?.reading, [
@@ -178,7 +199,7 @@ describe(loadReport, () => {
 
     await release('OpenIssues');
 
-    assert.strictEqual(mut_progress.length, 5);
+    assert.strictEqual(mut_progress.length, 6);
 
     await release('Compare');
 
@@ -199,7 +220,7 @@ describe(loadReport, () => {
     );
 
     // The last part to answer is the read's own answer, not progress.
-    assert.strictEqual(mut_progress.length, 5);
+    assert.strictEqual(mut_progress.length, 6);
 
     // Drawn only once the comparisons have answered: a queue drawn without
     // them would put a head behind its base in the wrong place.
@@ -1206,25 +1227,142 @@ describe(loadReport, () => {
     ]);
   });
 
-  test('says the repository declares a ruleset and runs the queue', async () => {
-    const { fetchImpl } = answering(
+  test('reads what GitHub enforces on the default branch, and that the queue runs', async () => {
+    const { fetchImpl, sent } = answering(
       report([pullRequest({ number: 7 })]),
       answer('Compare', { compare_7: null }),
     );
 
     const loaded = await load(fetchImpl);
 
-    assert.deepStrictEqual(loaded.features, { ruleset: true, queue: true });
+    assert.deepStrictEqual(loaded.features, {
+      requiredChecks: true,
+      codeOwnerReview: true,
+      queue: true,
+    });
 
     assert.deepStrictEqual(loaded.required, [
       'code-check-result / result',
       'no-skip-ci-label',
     ]);
+
+    assert.deepStrictEqual(
+      sent
+        .filter(({ operation }) => operation.startsWith('Branch'))
+        .map(({ route }) => route)
+        .toSorted(),
+      [
+        'https://api.github.com/repos/noshiro-pf/mono/branches/main',
+        'https://api.github.com/repos/noshiro-pf/mono/rules/branches/main?per_page=100',
+      ],
+    );
   });
 
-  // Any repository but this one: the page is still the merge order and the
-  // checks, judged over whatever reported.
-  test('without a ruleset, judges every context reported on the head', async () => {
+  test('counts the contexts a classic protection rule requires', async () => {
+    const { fetchImpl } = answering(
+      report(
+        [pullRequest({ number: 7 })],
+        [],
+        1,
+        NO_ISSUES,
+        {},
+        restAnswers({
+          rules: [],
+          branch: {
+            protection: {
+              enabled: true,
+              required_status_checks: {
+                enforcement_level: 'everyone',
+                contexts: ['code-check-result / result'],
+              },
+            },
+          },
+        }),
+      ),
+      answer('Compare', { compare_7: null }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.deepStrictEqual(loaded.required, ['code-check-result / result']);
+
+    // No ruleset asks for a code owner, and a classic rule cannot be read to.
+    assert.isFalse(loaded.features.codeOwnerReview);
+
+    assert.deepStrictEqual(loaded.entries[0]?.codeOwnerReview, {
+      state: 'not-required',
+    });
+  });
+
+  test('fails the read when the rules cannot be read', async () => {
+    const { fetchImpl: answerNow } = answering(
+      report([pullRequest({ number: 7 })]),
+      answer('Compare', { compare_7: null }),
+    );
+
+    const fetchImpl: Fetch = async (route, init) =>
+      route.includes('/rules/branches/')
+        ? Promise.resolve(
+            new Response('{}', { status: 403, statusText: 'Forbidden' }),
+          )
+        : answerNow(route, init);
+
+    const { result } = await loadReport(DEFAULT_REPORT_SOURCE, {
+      token: 'token',
+      nowMs: NOW_MS,
+      fetchImpl,
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, 'the rules on main');
+  });
+
+  test('reads CODEOWNERS where GitHub would find it, `.github/` first', async () => {
+    const owned = pullRequest({
+      number: 7,
+      files: ['docs/a.md'],
+    });
+
+    const atRoot = await load(
+      answering(
+        report([owned], [], 1, NO_ISSUES, {
+          codeOwners: null,
+          codeOwnersAtRoot: { text: '/docs/ @someone-else\n' },
+          codeOwnersInDocs: { text: '/docs/ @a-third\n' },
+        }),
+        answer('Compare', { compare_7: null }),
+      ).fetchImpl,
+    );
+
+    assert.deepStrictEqual(atRoot.entries[0]?.codeOwnerReview, {
+      state: 'required',
+      paths: ['docs/a.md'],
+      owners: ['someone-else'],
+      authorOwns: false,
+    });
+
+    const inDocs = await load(
+      answering(
+        report([owned], [], 1, NO_ISSUES, {
+          codeOwners: null,
+          codeOwnersInDocs: { text: '/docs/ @a-third\n' },
+        }),
+        answer('Compare', { compare_7: null }),
+      ).fetchImpl,
+    );
+
+    assert.deepStrictEqual(inDocs.entries[0]?.codeOwnerReview, {
+      state: 'required',
+      paths: ['docs/a.md'],
+      owners: ['a-third'],
+      authorOwns: false,
+    });
+  });
+
+  // Most repositories but this one: the page is still the merge order and
+  // the checks, judged over whatever reported.
+  test('where the default branch requires nothing, judges every context reported on the head', async () => {
     const { fetchImpl } = answering(
       report(
         [
@@ -1239,14 +1377,17 @@ describe(loadReport, () => {
         [],
         1,
         NO_ISSUES,
-        { ruleset: null, codeOwners: null },
+        { codeOwners: null },
+        restAnswers({ rules: [] }),
       ),
       answer('Compare', { compare_7: null }),
     );
 
     const loaded = await load(fetchImpl);
 
-    assert.isFalse(loaded.features.ruleset);
+    assert.isFalse(loaded.features.requiredChecks);
+
+    assert.isFalse(loaded.features.codeOwnerReview);
 
     assert.isUndefined(loaded.required);
 
@@ -1260,7 +1401,7 @@ describe(loadReport, () => {
 
     assert.deepStrictEqual(entry.checks.passed, ['build']);
 
-    // Nothing asks for a code owner without a ruleset that says so.
+    // Nothing asks for a code owner without a rule that says so.
     assert.deepStrictEqual(entry.codeOwnerReview, { state: 'not-required' });
   });
 
@@ -1483,6 +1624,12 @@ const refusingTheQuery: Fetch = () =>
 /** 2026-09-24T00:00:00Z. */
 const NOW_MS = 1_790_208_000_000;
 
+/** GraphQL's and REST's both, as `loadReport` takes it. */
+type Fetch = (
+  route: string,
+  init: FetchInit | RestFetchInit,
+) => Promise<Response>;
+
 const load = async (
   fetchImpl: Fetch,
   issueCount?: number,
@@ -1503,8 +1650,12 @@ const load = async (
 type Answers = ReadonlyRecord<string, readonly unknown[]>;
 
 type Sent = Readonly<{
-  /** The operation name, `PullRequests` for `query PullRequests(…`. */
+  /**
+   * The operation name, `PullRequests` for `query PullRequests(…`, and for
+   * the two REST requests `BranchRules` and `Branch`.
+   */
   operation: string;
+  route: string;
   query: string;
   variables: ReadonlyRecord<string, unknown>;
   headers: FetchInit['headers'];
@@ -1525,15 +1676,19 @@ const answering = (
 
   const headersOf = parts.find((part) => typeof part === 'function');
 
-  const fetchImpl: Fetch = (_, init) => {
-    const sent = sentOf(init);
+  const fetchImpl: Fetch = (route, init) => {
+    const sent = sentOf(route, init);
 
     const answered = named(mut_sent, sent.operation).length;
 
     mut_sent.push(sent);
 
-    const body =
-      answers.flatMap((part) => part[sent.operation] ?? [])[answered] ?? {};
+    const given = answers.flatMap((part) => part[sent.operation] ?? []);
+
+    // What a branch requires stays put from one read to the next.
+    const body = REST_OPERATIONS.has(sent.operation)
+      ? (given[answered] ?? given.at(-1) ?? {})
+      : (given[answered] ?? {});
 
     return Promise.resolve(
       Response.json(body, {
@@ -1545,7 +1700,19 @@ const answering = (
   return { fetchImpl, sent: mut_sent };
 };
 
-const sentOf = (init: FetchInit): Sent => {
+const REST_OPERATIONS: ReadonlySet<string> = new Set(['BranchRules', 'Branch']);
+
+const sentOf = (route: string, init: FetchInit | RestFetchInit): Sent => {
+  if (init.method === 'GET') {
+    return {
+      operation: route.includes('/rules/branches/') ? 'BranchRules' : 'Branch',
+      route,
+      query: '',
+      variables: {},
+      headers: init.headers,
+    };
+  }
+
   const parsed = Json.parse(init.body);
 
   const request = Result.isOk(parsed) ? parsed.value : undefined;
@@ -1559,6 +1726,7 @@ const sentOf = (init: FetchInit): Sent => {
 
   return {
     operation: /^query (\w+)/u.exec(query)?.[1] ?? '',
+    route,
     query,
     variables: isRecord(variables) ? variables : {},
     headers: init.headers,
@@ -1585,7 +1753,7 @@ const holding = (
   const fetchImpl: Fetch = async (route, init) =>
     new Promise((resolve) => {
       mut_held.push({
-        operation: sentOf(init).operation,
+        operation: sentOf(route, init).operation,
         release: () => {
           resolve(answerNow(route, init));
         },
@@ -1624,23 +1792,39 @@ const answer = (
   fields: ReadonlyRecord<string, unknown>,
 ): Answers => ({ [operation]: [{ data: { repository: fields } }] }) as const;
 
-const RULESET = JSON.stringify({
-  rules: [
-    {
-      type: 'pull_request',
-      parameters: { require_code_owner_review: true },
+/** What `GET …/rules/branches/main` answers here, in the parts read. */
+const RULES = [
+  { type: 'deletion' },
+  {
+    type: 'pull_request',
+    parameters: { require_code_owner_review: true },
+  },
+  {
+    type: 'required_status_checks',
+    parameters: {
+      required_status_checks: [
+        { context: 'code-check-result / result' },
+        { context: 'no-skip-ci-label' },
+      ],
     },
-    {
-      type: 'required_status_checks',
-      parameters: {
-        required_status_checks: [
-          { context: 'code-check-result / result' },
-          { context: 'no-skip-ci-label' },
-        ],
-      },
-    },
-  ],
-});
+  },
+] as const;
+
+/** What `GET …/branches/main` answers of a branch no classic rule protects. */
+const UNPROTECTED_BRANCH = {
+  name: 'main',
+  protection: {
+    enabled: false,
+    required_status_checks: { enforcement_level: 'off', contexts: [] },
+  },
+} as const;
+
+/** The two REST answers, `rules` and `branch` in place of the usual ones. */
+const restAnswers = ({
+  rules = RULES,
+  branch = UNPROTECTED_BRANCH,
+}: Readonly<{ rules?: unknown; branch?: unknown }> = {}): Answers =>
+  ({ BranchRules: [rules], Branch: [branch] }) as const;
 
 /**
  * Every query a read sends but the follow-ups, answered from one set of
@@ -1654,12 +1838,15 @@ const report = (
   issues: unknown = NO_ISSUES,
   /** Fields of the pull requests' query to answer otherwise. */
   repository: ReadonlyRecord<string, unknown> = {},
+  rest: Answers = restAnswers(),
 ): Answers =>
   ({
+    ...rest,
     ...answer('PullRequests', {
       defaultBranchRef: { name: 'main' },
-      ruleset: { text: RULESET },
       codeOwners: { text: '/.github/workflows/ @noshiro-pf\n' },
+      codeOwnersAtRoot: null,
+      codeOwnersInDocs: null,
       queueLabel: { name: 'merge-queued' },
       open: { totalCount, nodes: openNodes },
       ...repository,

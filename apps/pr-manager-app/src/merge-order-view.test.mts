@@ -416,7 +416,7 @@ describe(toggleOnly, () => {
 describe(statusFiltersOf, () => {
   test('is every status where the queue is run', () => {
     assert.deepStrictEqual(
-      statusFiltersOf({ queue: true, ruleset: true }),
+      statusFiltersOf({ queue: true, codeOwnerReview: true }),
       STATUS_FILTERS,
     );
   });
@@ -424,18 +424,17 @@ describe(statusFiltersOf, () => {
   // Nothing is queued or set aside without `unblock-prs`, and a count that
   // is always nought is a switch that does nothing.
   test('leaves out the queue’s own statuses where it is not', () => {
-    assert.deepStrictEqual(statusFiltersOf({ queue: false, ruleset: true }), [
-      'failing',
-      'awaitingReview',
-      'pending',
-    ]);
+    assert.deepStrictEqual(
+      statusFiltersOf({ queue: false, codeOwnerReview: true }),
+      ['failing', 'awaitingReview', 'pending'],
+    );
   });
 
   test('leaves out the wait for a code owner where no ruleset asks for one', () => {
-    assert.deepStrictEqual(statusFiltersOf({ queue: false, ruleset: false }), [
-      'failing',
-      'pending',
-    ]);
+    assert.deepStrictEqual(
+      statusFiltersOf({ queue: false, codeOwnerReview: false }),
+      ['failing', 'pending'],
+    );
   });
 });
 

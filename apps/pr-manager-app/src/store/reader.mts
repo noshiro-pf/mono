@@ -587,7 +587,7 @@ const EMPTY_PARTS: ReportParts = {
   cycles: [],
   merged: [],
   queue: undefined,
-  features: { ruleset: true, queue: true },
+  features: { requiredChecks: true, codeOwnerReview: true, queue: true },
   issues: {
     items: [],
     totalCount: 0,

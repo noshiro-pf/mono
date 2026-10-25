@@ -174,8 +174,8 @@ export const readBranchRules = async (
 /**
  * `CODEOWNERS` on the default branch, and what `pr-report-core`'s
  * `review-hold.mts` reads about each of `numbers`, in one GraphQL request.
- * `undefined` for a repository without `.github/CODEOWNERS` — the one place the
- * Pull Requests Manager reads it from too.
+ * `undefined` for a repository without `.github/CODEOWNERS`, the one of the
+ * three places GitHub looks that this repository uses.
  *
  * Every number goes in as a variable, and each pull request comes back under
  * its own alias.

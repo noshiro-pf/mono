@@ -13,7 +13,7 @@ and the stacks declare drawn as the tree it is — a pull request onto another's
 branch is marked `stacked on #N` under it — the issues each pull request closes with
 their titles, its labels in GitHub's own colours, the branch it is of,
 whether it is open or a draft, whether auto-merge is armed, the verdict of
-the contexts the ruleset requires, how far each branch is ahead of and
+the contexts the default branch requires, how far each branch is ahead of and
 behind its base, and when it was last pushed to and last updated.
 
 The verdict carries its parts — `1✗ 1… 1– 6✓`, failed, still coming,
@@ -39,7 +39,10 @@ nothing on GitHub's own list shows:
   a code owner's on the paths `.github/CODEOWNERS` lists — so a pull request
   touching one stays green and never merges. When the author is the only
   owner it can never be approved, and the badge says it needs a ruleset
-  bypass instead.
+  bypass instead. A team owner (`@org/team`) is matched by nobody's
+  approval, since who is on a team takes `read:org` to find out: a path a
+  team owns waits while nobody has approved, and once someone has, whether
+  that was a member is not known, which the badge says.
 
 **The queue** `pnpm run unblock-prs` works through is drawn under the merge
 order, as one row of boxes: the pull request it is running at the head, by
@@ -142,14 +145,17 @@ repository has rather than by a setting:
 
 What follows from what the repository has:
 
-- **Without `repo-settings/rulesets/main.json` on the default branch**, the
-  verdict is over every context reported on the head instead of the ones the
-  ruleset requires, and the hover says so; nothing waits for a code owner,
-  since nothing says one has to approve, and the `awaiting code owner` count
-  is not offered. The page reads the declaration
-  rather than the rulesets GitHub enforces, because reading those wants an
-  admin token. One that is there and cannot be read fails the read, since it
-  does say something.
+- **What the default branch requires is what GitHub enforces on it**: every
+  ruleset that applies to it and the contexts a classic branch protection
+  rule requires, read from the REST API as `unblock-prs` reads them. Where it
+  requires no context, the verdict is over every context reported on the head
+  instead, and the hover says so. Where no ruleset asks for a code owner's
+  approval, nothing waits for one and the `awaiting code owner` count is not
+  offered; a classic rule's review settings are not among what a token
+  without admin can read, so they are not either. Rules that cannot be read
+  fail the read, since a verdict over a guess at them would be a guess.
+- **`CODEOWNERS` is read where GitHub looks for it**, in its order:
+  `.github/CODEOWNERS`, then the root, then `docs/`, on the default branch.
 - **Without the `merge-queued` label**, which is what `unblock-prs`'s queue is
   made of, the queue block is not drawn — the Layout dialog lists it as
   `none here` — and the `queued` and `set aside` counts are not offered. A
@@ -352,11 +358,19 @@ file in between: pressing **Refresh** shows what GitHub shows at that moment.
 What is decided about the pull requests — the verdict over the required
 contexts, the merge order, the counts — is `pr-report-core`, the same code
 `pnpm run pr-report` decides it with, so the page and the command cannot
-disagree about a pull request. Which contexts are required, and which paths
-need a code owner, are read from `repo-settings/rulesets/main.json` and
-`.github/CODEOWNERS` on the default branch, in the query that lists the pull
-requests, as is whether the repository has the `merge-queued` label; what the
-page does without them is under "Another repository".
+disagree about a pull request. Which paths need a code owner is read from
+`CODEOWNERS` on the default branch, in the query that lists the pull
+requests, as is whether the repository has the `merge-queued` label. Which
+contexts are required, and whether a code owner has to approve, are REST's:
+`GET /repos/{owner}/{repo}/rules/branches/{branch}` and
+`GET /repos/{owner}/{repo}/branches/{branch}` for the default branch, asked
+as soon as that query names it. Both want no more than reading the
+repository, where the endpoints serving a ruleset's or a protection rule's
+whole settings want an admin, and both go out as `no-cache`, as the workflow
+runs do (below), so that every read after the first costs nothing while the
+rules stay as they are. The verdicts wait for them, which they answer well
+before the checks do. What the page does without any of it is under "Another
+repository".
 
 **GraphQL, because of how GitHub charges.** REST charges a request, and one
 pull request takes three — the comparison against its base and the two kinds

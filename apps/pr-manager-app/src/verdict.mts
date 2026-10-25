@@ -84,18 +84,18 @@ export const describeCheckCounts = (checks: ChecksSummary): string =>
   }).join(' ');
 
 /**
- * The same, spelled out with the names, for the hover. Without a ruleset
- * the contexts are every one reported on the head (`buildEntries` in
- * `pr-report-core`), and the first line says so.
+ * The same, spelled out with the names, for the hover. Where the default
+ * branch requires no context, they are every one reported on the head
+ * (`buildEntries` in `pr-report-core`), and the first line says so.
  */
 export const describeCheckBreakdown = (
   checks: ChecksSummary,
-  rulesetDeclared: boolean,
+  requiredChecks: boolean,
 ): string =>
   Arr.toUnshifted(
-    rulesetDeclared
-      ? `over the ${checks.required} contexts the ruleset requires:`
-      : `over the ${checks.required} contexts reported, no ruleset being declared:`,
+    requiredChecks
+      ? `over the ${checks.required} contexts the default branch requires:`
+      : `over the ${checks.required} contexts reported, the default branch requiring none:`,
   )(
     Arr.generate(function* () {
       for (const { label, names } of partsOf(checks)) {
