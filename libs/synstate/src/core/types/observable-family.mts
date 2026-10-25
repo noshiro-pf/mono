@@ -244,6 +244,11 @@ export type WithBufferedFromOperatorObservable<A, B> = SyncChildObservable<
 
 export type FilterOperatorObservable<A> = SyncChildObservable<A, readonly [A]>;
 
+export type KeepEqualPartsOperatorObservable<A> = SyncChildObservable<
+  A,
+  readonly [A]
+>;
+
 export type SkipIfNoChangeOperatorObservable<A> = SyncChildObservable<
   A,
   readonly [A]

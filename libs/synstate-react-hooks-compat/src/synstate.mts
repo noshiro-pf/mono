@@ -27,6 +27,7 @@ export {
   isObservable,
   isRootObservable,
   just,
+  keepEqualParts,
   map,
   mapOptional,
   mapResultErr,

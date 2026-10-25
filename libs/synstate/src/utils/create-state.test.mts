@@ -1,3 +1,4 @@
+import { hasKey, isRecord } from 'ts-data-forge';
 import { createState } from './create-state.mjs';
 
 describe(createState, () => {
@@ -74,6 +75,93 @@ describe(createState, () => {
     assert.strictEqual(getSnapshot(), held);
 
     assert.deepStrictEqual(seen, [held]);
+  });
+
+  describe('keepEqualParts', () => {
+    type Report = Readonly<{
+      summary: Readonly<{ open: number }>;
+      entries: readonly Readonly<{ number: number; title: string }>[];
+    }>;
+
+    const initial: Report = {
+      summary: { open: 1 },
+      entries: [{ number: 1, title: 'a' }],
+    } as const;
+
+    test('passes nothing on, and keeps the current object, when the next state is deeply equal', () => {
+      const [state, setState, { getSnapshot }] = createState(initial, {
+        keepEqualParts: true,
+      });
+
+      const seen = record(state);
+
+      assert.strictEqual(
+        setState({
+          summary: { open: 1 },
+          entries: [{ number: 1, title: 'a' }],
+        }),
+        initial,
+      );
+
+      assert.strictEqual(getSnapshot(), initial);
+
+      assert.deepStrictEqual(seen, [initial]);
+    });
+
+    test('writes a new state whose unchanged branches are the current ones', () => {
+      const [state, setState] = createState(initial, { keepEqualParts: true });
+
+      const seen = record(state);
+
+      const written = setState({
+        summary: { open: 1 },
+        entries: [
+          { number: 1, title: 'a' },
+          { number: 2, title: 'b' },
+        ],
+      });
+
+      assert.deepStrictEqual(seen, [initial, written]);
+
+      assert.strictEqual(written.summary, initial.summary);
+
+      assert.strictEqual(written.entries[0], initial.entries[0]);
+    });
+
+    test('applies to `updateState` and matches items by `key`', () => {
+      const [state, , { updateState }] = createState(initial, {
+        keepEqualParts: {
+          key: (item) =>
+            isRecord(item) && hasKey(item, 'number') ? item.number : undefined,
+        },
+      });
+
+      // A whole new object, as a server answer would be.
+      const written = updateState(() => ({
+        summary: { open: 1 },
+        entries: [
+          { number: 0, title: 'new' },
+          { number: 1, title: 'a' },
+        ],
+      }));
+
+      assert.strictEqual(written.summary, initial.summary);
+
+      assert.strictEqual(written.entries[1], initial.entries[0]);
+
+      assert.strictEqual(state.getSnapshot().value, written);
+    });
+
+    test('is off by default', () => {
+      const [, setState] = createState(initial);
+
+      const next: Report = {
+        summary: { open: 1 },
+        entries: [{ number: 1, title: 'a' }],
+      } as const;
+
+      assert.strictEqual(setState(next), next);
+    });
   });
 });
 
