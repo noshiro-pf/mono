@@ -94,6 +94,8 @@ dist
 
 # Vite build output for the apps under `apps/` (`firebase.json` serves `build`)
 apps/*/build
+# event-schedule-app-functions' bundle, deployed from beside `firebase.json`
+apps/event-schedule-app/functions-build
 
 # Gatsby files
 .cache/

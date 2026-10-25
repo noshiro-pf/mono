@@ -11,22 +11,23 @@ The Cloud Functions of [`event-schedule-app`](../event-schedule-app/README.md):
 - `userDeletionListener` — removes a deleted user's id from events and answers
 
 The Firebase project, `firebase.json` and the Firestore rules are in
-`apps/event-schedule-app`; its `functions.source` points at this package's
-`build/`.
+`apps/event-schedule-app`, and so is what this package builds:
+`firebase deploy` refuses a `functions.source` outside the directory holding
+`firebase.json`.
 
 ## Build
 
 ```sh
-pnpm run build        # bundle into build/
+pnpm run build        # bundle into ../event-schedule-app/functions-build/
 pnpm run watch:build  # rebuild on change, for the emulator
 ```
 
-`build/` is what gets deployed, and it is bundled for that reason: Cloud
-Functions runs `npm install` on the deployed `package.json`, which cannot
+`functions-build/` is what gets deployed, and it is bundled for that reason:
+Cloud Functions runs `npm install` on the deployed `package.json`, which cannot
 resolve the `workspace:*` dependencies. So `scripts/build.mts` bundles the
-workspace packages into `build/index.mjs` and writes a `build/package.json`
-naming only `firebase-admin`, `firebase-functions` and `nodemailer`, pinned to
-the versions installed here.
+workspace packages into `functions-build/index.mjs` and writes a
+`functions-build/package.json` naming only `firebase-admin`,
+`firebase-functions` and `nodemailer`, pinned to the versions installed here.
 
 ## Configuration
 
@@ -55,10 +56,11 @@ pnpm dlx firebase-tools@15 functions:config:export --secret RUNTIME_CONFIG
 Pass `--secret`: without it the command offers `FUNCTIONS_CONFIG_EXPORT`, a
 name the code does not read.
 
-The emulator does not read Secret Manager: `build/.secret.local` holds a dummy
-`RUNTIME_CONFIG`, so mail fails and everything else works. To send real mail
-locally, put a `.secret.local` beside this README (`RUNTIME_CONFIG=<json>` on
-one line); the build copies it instead. It is ignored by git and not deployed.
+The emulator does not read Secret Manager: `functions-build/.secret.local`
+holds a dummy `RUNTIME_CONFIG`, so mail fails and everything else works. To
+send real mail locally, put a `.secret.local` beside this README
+(`RUNTIME_CONFIG=<json>` on one line); the build copies it instead. It is
+ignored by git and not deployed.
 
 ## Deploy
 

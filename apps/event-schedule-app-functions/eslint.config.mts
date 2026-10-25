@@ -12,9 +12,6 @@ import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
 const thisDir = import.meta.dirname;
 
 export default [
-  {
-    ignores: ['build/**'],
-  },
   ...eslintConfigForTypeScript({
     tsconfigRootDir: thisDir,
     tsconfigFileName: './tsconfig.json',
