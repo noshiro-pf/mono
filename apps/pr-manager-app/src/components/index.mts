@@ -37,6 +37,7 @@ export * from './queue-section.js';
 export * from './queue-slot-box.js';
 export * from './queue-tip.js';
 export * from './read-from-github.js';
+export * from './repo-switch.js';
 export * from './report-view.js';
 export * from './review-badge.js';
 export * from './run-state-icon.js';

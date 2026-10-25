@@ -1418,6 +1418,37 @@ describe(loadReport, () => {
     assert.isFalse(loaded.features.queue);
   });
 
+  // GitHub answers a name it cannot resolve for the token with a `null`
+  // repository, whether there is none or it is private.
+  test('says when the token can see no repository by that name', async () => {
+    const { fetchImpl } = answering({
+      PullRequests: [
+        {
+          data: { repository: null },
+          errors: [
+            {
+              type: 'NOT_FOUND',
+              path: ['repository'],
+              message:
+                "Could not resolve to a Repository with the name 'example-org/hello'.",
+            },
+          ],
+        },
+      ],
+    });
+
+    const { result } = await loadReport(
+      { owner: 'example-org', repo: 'hello' },
+      { token: 'token', nowMs: NOW_MS, fetchImpl },
+    );
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, 'example-org/hello');
+
+    assert.include(result.value, 'private');
+  });
+
   test('refuses to report part of the open pull requests as the whole', async () => {
     const { fetchImpl } = answering(report([], [], 51));
 

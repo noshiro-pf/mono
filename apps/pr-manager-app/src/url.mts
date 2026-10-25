@@ -35,3 +35,16 @@ export const rewriteSearch = (rewrite: (current: string) => string): void => {
     `${pathname}${nextSearch}${hash}`,
   );
 };
+
+/**
+ * Opens the page again at the query string `rewrite` makes of the current
+ * one: what the page reads is decided as it opens, so a different one is a
+ * different visit, with a history entry the back button returns from.
+ */
+export const navigateToSearch = (
+  rewrite: (current: string) => string,
+): void => {
+  const { pathname, search, hash } = browserLocation;
+
+  browserLocation.assign(`${pathname}${rewrite(search)}${hash}`);
+};
