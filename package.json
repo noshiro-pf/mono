@@ -27,7 +27,7 @@
   "scripts": {
     "build:pages-site": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/build-pages-site.mts",
     "changeset:publish": "pnpm changeset publish",
-    "changeset:version-packages": "pnpm changeset version && pnpm run strict-lib:fix:fmt && pnpm run strict-lib:gen:packages && pnpm install --no-frozen-lockfile",
+    "changeset:version-packages": "pnpm changeset version && pnpm run strict-lib:fix:fmt && pnpm run strict-lib:gen:packages && pnpm install --no-frozen-lockfile && pnpm run gen:deps-graph && pnpm run gen:verify-npm-packages",
     "check:cspell": "cspell \"{**,.github/**/*}\" --gitignore --gitignore-root ./ --no-progress && pnpm run check:cspell:changeset",
     "check:cspell:changeset": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/cspell-changeset.mts",
     "check:knip": "node ./tools/scripts/cmd/assert-deps-built.mts --workspace && knip --no-progress --no-config-hints --include dependencies,unlisted,binaries,unresolved,catalog,catalogReferences",
@@ -77,6 +77,7 @@
     "fmt:full": "pnpm run fix:fmt:full",
     "gen:deps-graph": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/gen-dependency-graph.mts",
     "gen:license-files": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/gen-license-files.mts",
+    "gen:verify-npm-packages": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/verify-npm-packages.mts --gen",
     "licenses": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-licenses.mts --report",
     "node-support:update": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/update-node-support.mts",
     "npm-trusted-publishers": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/report-npm-trusted-publishers.mts",
