@@ -6,15 +6,23 @@ import { hasKey, isRecord, isString, Json, Result } from 'ts-data-forge';
 // Bundled, unlike `poll-discord-app`: Cloud Functions installs the deployed
 // directory with `npm install` from its `package.json` alone, and npm cannot
 // resolve `workspace:*`. So the workspace packages are bundled in, and the
-// directory deployed is `build/`, whose `package.json` names only what is left
+// directory deployed is `outDir`, whose `package.json` names only what is left
 // external — the packages Cloud Functions has to install itself.
 //
 // `firebase.json` (in `apps/event-schedule-app`) points `functions.source` at
-// `build/`, which the emulator loads too, so this runs before either.
+// `outDir`, which the emulator loads too, so this runs before either.
 
 const packageRoot = path.resolve(import.meta.dirname, '..');
 
-const outDir = path.resolve(packageRoot, 'build');
+/**
+ * In `apps/event-schedule-app`, not in this package: `firebase deploy` refuses
+ * a `functions.source` outside the directory holding `firebase.json` ("is
+ * outside of project directory"), though the emulator accepts one.
+ */
+const outDir = path.resolve(
+  packageRoot,
+  '../event-schedule-app/functions-build',
+);
 
 /**
  * Left out of the bundle and installed by Cloud Functions. `firebase-functions`
@@ -111,7 +119,7 @@ const writeDeployManifest = async (): Promise<void> => {
 
 /**
  * The emulator reads secrets from `.secret.local` in the functions source,
- * which is `build/`, and otherwise tries the production ones with the
+ * which is `outDir`, and otherwise tries the production ones with the
  * developer's credentials. So one is always written here: the developer's own
  * `.secret.local` beside `package.json` if there is one, and otherwise a dummy
  * that lets the functions run and fail only when they try to send mail. Deploy
@@ -153,7 +161,7 @@ const writeLocalSecrets = async (): Promise<void> => {
  * `node_modules/.bin/firebase-functions`, which firebase-tools looks for in the
  * functions source and the Firebase project directory but not in the directories
  * above them, where Node.js would look. Under pnpm it exists only in this
- * package's `node_modules`, so `build/` gets a link to it. Deploy does not
+ * package's `node_modules`, so `outDir` gets a link to it. Deploy does not
  * upload it (`ignore` in `firebase.json`).
  */
 const linkNodeModules = async (): Promise<void> => {
@@ -161,7 +169,10 @@ const linkNodeModules = async (): Promise<void> => {
 
   await fs.rm(link, { force: true });
 
-  await fs.symlink('../node_modules', link);
+  await fs.symlink(
+    path.relative(outDir, path.resolve(packageRoot, 'node_modules')),
+    link,
+  );
 };
 
 const installedVersion = async (name: string): Promise<string> => {

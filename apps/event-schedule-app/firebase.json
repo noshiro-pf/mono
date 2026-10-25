@@ -15,7 +15,7 @@
     "indexes": "firestore.indexes.json"
   },
   "functions": {
-    "source": "../event-schedule-app-functions/build",
+    "source": "functions-build",
     "codebase": "default",
     "ignore": [
       "node_modules",
@@ -24,7 +24,7 @@
       "firebase-debug.*.log",
       ".secret.local"
     ],
-    "predeploy": ["pnpm --dir \"$RESOURCE_DIR/..\" run build"]
+    "predeploy": ["pnpm --dir ../event-schedule-app-functions run build"]
   },
   "emulators": {
     "auth": {

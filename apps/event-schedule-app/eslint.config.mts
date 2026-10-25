@@ -13,6 +13,10 @@ import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
 const thisDir = import.meta.dirname;
 
 export default [
+  {
+    // The bundle `../event-schedule-app-functions` builds for Cloud Functions.
+    ignores: ['functions-build/**'],
+  },
   ...eslintConfigForTypeScript({
     tsconfigRootDir: thisDir,
     tsconfigFileName: './tsconfig.json',
