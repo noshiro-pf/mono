@@ -12,6 +12,7 @@ import type { ApiContext } from '../../lib/github-api.mjs';
 import { log } from '../../lib/log.mjs';
 import { autoFix } from './auto-fix.mjs';
 import { standingClaims } from './claims.mjs';
+import { CONFIG_PATH, readConfig, type AutoFixConfig } from './config.mjs';
 import { STALE_STATE_PAUSE_MS } from './constants.mjs';
 import { afterWatch, followHead, pruneDemotions } from './demotions.mjs';
 import {
@@ -258,6 +259,20 @@ const unblockPrs = async (
 
   const { api, defaultBranch } = preflight.value;
 
+  const config = await readConfig();
+
+  if (Result.isErr(config)) {
+    return config;
+  }
+
+  const autoFixConfig = options.autoFix ? config.value?.autoFix : undefined;
+
+  if (autoFixConfig === undefined && options.autoFix) {
+    log(
+      `No autoFix in ${CONFIG_PATH}: a failed check is reported, never fixed here.`,
+    );
+  }
+
   log(
     `Watching pull requests into ${defaultBranch}${options.dryRun ? ' (dry run)' : ''}.`,
   );
@@ -274,7 +289,13 @@ const unblockPrs = async (
   };
 
   while (!stopRequested()) {
-    const cycle = await runCycle(api, defaultBranch, mut_state, options);
+    const cycle = await runCycle(
+      api,
+      defaultBranch,
+      mut_state,
+      options,
+      autoFixConfig,
+    );
 
     if (!options.dryRun) {
       await announceSetAside(
@@ -432,6 +453,7 @@ const runCycle = async (
   defaultBranch: string,
   before: LoopState,
   options: Options,
+  autoFixConfig: AutoFixConfig | undefined,
 ): Promise<CycleResult> => {
   const listed = await survey(api, defaultBranch);
 
@@ -600,7 +622,7 @@ const runCycle = async (
       api,
       watched,
       watched.headRefOid,
-      { defaultBranch, requiredContexts, bypassReason },
+      { defaultBranch, requiredContexts, bypassReason, autoFixConfig },
       options,
     );
 
@@ -749,6 +771,7 @@ const runCycle = async (
         defaultBranch,
         requiredContexts,
         bypassReason: triaged.bypass.get(target.number),
+        autoFixConfig,
       },
       options,
     );
@@ -794,6 +817,8 @@ const watchAndFix = async (
     requiredContexts: readonly string[];
     /** Set for one only a ruleset bypass merges; see `watch`. */
     bypassReason: string | undefined;
+    /** `undefined` under `--no-auto-fix`, or when the repository has none. */
+    autoFixConfig: AutoFixConfig | undefined;
   }>,
   options: Options,
 ): Promise<Readonly<{ ended: Watched; head: string }>> => {
@@ -808,13 +833,19 @@ const watchAndFix = async (
 
   if (
     ended.outcome !== 'checks-failed' ||
-    !options.autoFix ||
+    context.autoFixConfig === undefined ||
     stopRequested()
   ) {
     return { ended, head: expectedHead };
   }
 
-  const fixed = await autoFix(api, pr, expectedHead, context.defaultBranch);
+  const fixed = await autoFix(
+    api,
+    pr,
+    expectedHead,
+    context.defaultBranch,
+    context.autoFixConfig,
+  );
 
   switch (fixed.kind) {
     case 'declined':

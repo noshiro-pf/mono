@@ -1,0 +1,31 @@
+{
+  "$schema": "../tools/scripts/cmd/unblock-prs/config.schema.json",
+  "autoFix": {
+    "ignore": ["^[\\w-]+-result / result$"],
+    "before": ["pnpm install --frozen-lockfile"],
+    "prepare": [
+      {
+        "context": "^code-check \\(|^style-check \\(ws:gen\\)$",
+        "run": "pnpm run ws:build"
+      }
+    ],
+    "fixers": [
+      {
+        "context": "^(?:code-check|style-check) \\(((?:(?:ws|strict-lib):)?(?:fix:)?gen(?::[^)]*)?)\\)$",
+        "run": "pnpm run $1",
+        "stage": 0
+      },
+      {
+        "context": "^(?:code-check|style-check) \\(((?:(?:ws|strict-lib):)?fix:fmt(?::[^)]*)?)\\)$",
+        "run": "pnpm run $1",
+        "stage": 2
+      },
+      {
+        "context": "^(?:code-check|style-check) \\(((?:(?:ws|strict-lib):)?fix(?::[^)]*)?)\\)$",
+        "run": "pnpm run $1",
+        "stage": 1
+      }
+    ],
+    "after": ["pnpm run fix:fmt:diff"]
+  }
+}
