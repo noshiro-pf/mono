@@ -11,7 +11,7 @@ The figures below are embedded from that app's [`RESULTS.md`](https://github.com
 
 <!-- benchmark:environment -->
 
-Measured in `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.37 Safari/537.36`. Each figure is the median of 5 runs, each measuring the libraries in a different order and each itself the median of its timed runs.
+Measured in `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36`. Each figure is the median of 8 runs, each measuring the libraries in a different order and each itself the median of its timed runs.
 
 <!-- /benchmark -->
 
@@ -23,15 +23,15 @@ Lower is better.
 
 | operation (median ms)           | synstate-dom |  Solid | Preact + Signals | Preact |  React |  VanJS |
 | :------------------------------ | -----------: | -----: | ---------------: | -----: | -----: | -----: |
-| create 1,000 rows               |        23.10 |  17.20 |            19.80 |  17.60 |  19.50 |  20.00 |
-| replace all 1,000 rows          |        25.50 |  19.90 |            26.30 |  23.10 |  21.50 |  22.30 |
-| update every 10th of 1,000 rows |        10.80 |   8.70 |             9.20 |   9.20 |   8.80 |   8.80 |
-| select a row                    |         4.60 |   4.20 |             4.40 |   4.30 |   4.50 |  27.80 |
-| swap two rows                   |         6.50 |   5.00 |             5.50 |   5.40 |  18.70 |   5.40 |
-| remove a row                    |         5.90 |   5.10 |             4.80 |   5.10 |   5.30 |   5.30 |
-| create 10,000 rows              |       239.40 | 178.10 |           231.30 | 205.80 | 377.70 | 246.60 |
-| append 1,000 to 1,000 rows      |        27.70 |  22.00 |            24.30 |  23.80 |  23.90 |  26.30 |
-| clear 1,000 rows                |         7.60 |   5.80 |             5.40 |   4.20 |   6.30 |   5.90 |
+| create 1,000 rows               |        21.05 |  16.85 |            17.85 |  15.25 |  19.70 |  18.15 |
+| replace all 1,000 rows          |        24.40 |  17.60 |            23.25 |  21.45 |  21.45 |  20.15 |
+| update every 10th of 1,000 rows |        10.65 |   8.45 |             8.70 |   9.05 |   9.40 |   9.00 |
+| select a row                    |         4.65 |   4.20 |             4.75 |   4.20 |   4.55 |  29.15 |
+| swap two rows                   |         6.10 |   4.85 |             5.00 |   5.60 |  17.05 |   5.05 |
+| remove a row                    |         6.60 |   4.70 |             4.95 |   5.20 |   5.35 |   5.40 |
+| create 10,000 rows              |       216.55 | 148.95 |           216.35 | 180.35 | 363.60 | 200.95 |
+| append 1,000 to 1,000 rows      |        25.10 |  20.35 |            23.45 |  22.30 |  22.35 |  22.90 |
+| clear 1,000 rows                |         7.75 |   5.50 |             6.45 |   4.20 |   6.20 |   6.40 |
 
 <!-- /benchmark -->
 
@@ -43,21 +43,21 @@ Each library's time divided by synstate-dom's: below 1.00× is faster than synst
 
 | operation                       | Solid | Preact + Signals | Preact | React | VanJS |
 | :------------------------------ | ----: | ---------------: | -----: | ----: | ----: |
-| create 1,000 rows               | 0.74× |            0.86× |  0.76× | 0.84× | 0.87× |
-| replace all 1,000 rows          | 0.78× |            1.03× |  0.91× | 0.84× | 0.87× |
-| update every 10th of 1,000 rows | 0.81× |            0.85× |  0.85× | 0.81× | 0.81× |
-| select a row                    | 0.91× |            0.96× |  0.93× | 0.98× | 6.04× |
-| swap two rows                   | 0.77× |            0.85× |  0.83× | 2.88× | 0.83× |
-| remove a row                    | 0.86× |            0.81× |  0.86× | 0.90× | 0.90× |
-| create 10,000 rows              | 0.74× |            0.97× |  0.86× | 1.58× | 1.03× |
-| append 1,000 to 1,000 rows      | 0.79× |            0.88× |  0.86× | 0.86× | 0.95× |
-| clear 1,000 rows                | 0.76× |            0.71× |  0.55× | 0.83× | 0.78× |
+| create 1,000 rows               | 0.80× |            0.85× |  0.72× | 0.94× | 0.86× |
+| replace all 1,000 rows          | 0.72× |            0.95× |  0.88× | 0.88× | 0.83× |
+| update every 10th of 1,000 rows | 0.79× |            0.82× |  0.85× | 0.88× | 0.85× |
+| select a row                    | 0.90× |            1.02× |  0.90× | 0.98× | 6.27× |
+| swap two rows                   | 0.80× |            0.82× |  0.92× | 2.80× | 0.83× |
+| remove a row                    | 0.71× |            0.75× |  0.79× | 0.81× | 0.82× |
+| create 10,000 rows              | 0.69× |            1.00× |  0.83× | 1.68× | 0.93× |
+| append 1,000 to 1,000 rows      | 0.81× |            0.93× |  0.89× | 0.89× | 0.91× |
+| clear 1,000 rows                | 0.71× |            0.83× |  0.54× | 0.80× | 0.83× |
 
 <!-- /benchmark -->
 
 ## Reading the results
 
-In these runs, synstate-dom took between <!-- benchmark:reference-min -->1.10<!-- /benchmark -->× and <!-- benchmark:reference-max -->1.34<!-- /benchmark -->× Solid's time, depending on the operation. It is not the fastest at any of them; the table above shows where it is ahead of another library and where it is behind.
+In these runs, synstate-dom took between <!-- benchmark:reference-min -->1.11<!-- /benchmark -->× and <!-- benchmark:reference-max -->1.45<!-- /benchmark -->× Solid's time, depending on the operation. It is not the fastest at any of them; the table above shows where it is ahead of another library and where it is behind.
 
 - **Creating rows** is where the absence of a compiler shows most. Solid clones a compiled `<template>` for each row; synstate-dom calls `createElement` for each node and binds each dynamic leaf with its own subscription. Each row also creates two synstate nodes, for its item and its index (see `For` in [Control flow](/mono/synstate-dom/guides/control-flow/#for)), and the time to create and dispose rows grows roughly with the number of nodes.
 - **Partial updates** take different paths. Solid, Preact + Signals and VanJS hold a signal per label and write to the 100 that change. synstate-dom replaces the whole array, as the documentation recommends; every row's `item$` compares its item with the previous one, and only the 100 rows whose item changed write to the DOM. Preact and React re-render the table from the new state, and only the `memo` rows whose props changed render again.

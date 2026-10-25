@@ -168,7 +168,11 @@ const prepareBaseline = async (ref: string): Promise<string> => {
 
   run('pnpm', ['install', '--frozen-lockfile'], root);
 
-  run('pnpm', ['--filter', 'synstate-dom-benchmark^...', 'run', 'build'], root);
+  // `ws:build`, not `pnpm --filter 'synstate-dom-benchmark^...' run build`:
+  // pnpm orders a filtered run by devDependencies too, which run in a cycle
+  // through the ESLint packages, so a fresh worktree builds a package before
+  // what it imports.
+  run('pnpm', ['run', 'ws:build'], root);
 
   return root;
 };
