@@ -73,7 +73,7 @@ describe(describeCheckBreakdown, () => {
   test('names every required context under the state it is in', () => {
     expect(describeCheckBreakdown(checks, true)).toBe(
       [
-        'over the 5 contexts the ruleset requires:',
+        'over the 5 contexts the default branch requires:',
         'failed — code-check-result / result',
         'pending — spell-check-result / result',
         'skipped — test-node-versions-result / result',
@@ -99,7 +99,7 @@ describe(describeCheckBreakdown, () => {
 
     expect(describeCheckBreakdown(stacked, true)).toBe(
       [
-        'over the 4 contexts the ruleset requires:',
+        'over the 4 contexts the default branch requires:',
         'not run on this base — Validate PR title, Validate commit count',
         'passed — code-check-result / result, no-skip-ci-label',
       ].join('\n'),
@@ -108,9 +108,9 @@ describe(describeCheckBreakdown, () => {
     expect(describeCheckCounts(stacked)).toBe('2\u{2205} 2\u{2713}');
   });
 
-  test('says what it is over where no ruleset is declared', () => {
+  test('says what it is over where the default branch requires none', () => {
     expect(describeCheckBreakdown(checks, false).split('\n', 1)[0]).toBe(
-      'over the 5 contexts reported, no ruleset being declared:',
+      'over the 5 contexts reported, the default branch requiring none:',
     );
   });
 });

@@ -23,10 +23,8 @@ import {
   closingKeywordIssuesIn,
   codeOwnerReview,
   epochMsOf,
-  MAIN_RULESET_PATH,
   parseCodeOwners,
   parseMergeAfter,
-  parseRuleset,
   parseSetAsideComment,
   PENDING_LABEL,
   referenceStatusOf,
@@ -54,6 +52,7 @@ import {
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
+import { loadBranchRules } from './branch-rules.mjs';
 import { parseClaudeSessions, type ClaudeSession } from './claude-session.mjs';
 import type { ReportSource } from './constants.mjs';
 import {
@@ -100,6 +99,7 @@ import {
   type OpenPullRequest,
   type PullRequestDetails,
 } from './report-query.mjs';
+import type { RestFetch } from './workflow-runs.mjs';
 
 /**
  * What `unblock-prs` said when it last set the pull request aside, read from
@@ -162,16 +162,23 @@ export type PageSummary = Readonly<{
 
 /**
  * What the repository has of what this repository runs, which decides what
- * the page has to say. Without either the page is still the merge order, the
- * stacks, the checks and the issues' dependencies; that is how it is used on
- * any other repository.
+ * the page has to say. Without any of it the page is still the merge order,
+ * the stacks, the checks and the issues' dependencies; that is how it is used
+ * on most other repositories.
  */
 export type RepoFeatures = Readonly<{
   /**
-   * Whether {@link MAIN_RULESET_PATH} is on the default branch, saying which
-   * contexts are required and whether a code owner has to approve.
+   * Whether the default branch requires any context, by a ruleset or a
+   * classic protection rule (`branch-rules.mts`). Without one, each pull
+   * request is judged over every context reported on its head.
    */
-  ruleset: boolean;
+  requiredChecks: boolean;
+  /**
+   * Whether a ruleset on the default branch has a code owner approve a change
+   * to what they own. `true` until the rules have answered, so that the count
+   * it offers is not taken away and given back on every first read here.
+   */
+  codeOwnerReview: boolean;
   /**
    * Whether the repository has the `merge-queued` label, which is what
    * `unblock-prs`'s queue is made of. Without it there is no queue to draw,
@@ -188,9 +195,9 @@ export type LoadedReport = Readonly<{
   /** When the read this was built from started. */
   readAtEpochMs: number;
   /**
-   * The contexts the ruleset requires, or `undefined` where the repository
-   * declares none and each pull request is judged over every context
-   * reported on its head.
+   * The contexts the default branch requires, or `undefined` where it
+   * requires none, or its rules have not answered yet, and each pull request
+   * is judged over every context reported on its head.
    */
   required: readonly string[] | undefined;
   features: RepoFeatures;
@@ -270,15 +277,18 @@ export type LoadRequest = Readonly<{
    * called for the last part: that is the report the read resolves to.
    */
   onProgress?: (report: LoadedReport) => void;
-  fetchImpl?: Fetch;
+  /** GraphQL's and REST's both: the default branch's rules are REST's. */
+  fetchImpl?: Fetch & RestFetch;
 }>;
 
 /**
  * The report, or a sentence a reader can act on.
  *
- * Six parts, all asked for at once: the pull requests, their check results,
- * their details, how far each head is from its base, what merged lately, and
- * the open issues. Only the comparison waits, for the pull requests' heads.
+ * Seven parts, all asked for at once: the pull requests, their check
+ * results, their details, how far each head is from its base, what the
+ * default branch requires of them, what merged lately, and the open issues.
+ * Only the comparison and the rules wait, for the pull requests' heads and
+ * the default branch's name.
  * Some parts may need one more query — the rest of a list that did not fit
  * in one page, which is rare and bounded by {@link MAX_FOLLOW_UP_ROUNDS}, or
  * what an issue a body closes by keyword, unlinked by GitHub, is called —
@@ -313,10 +323,24 @@ export const loadReport = async (
 
   const pulls = readPullRequests(ask);
 
+  const rules = pulls.then(async ({ result }) =>
+    Result.isOk(result)
+      ? {
+          rateLimit: undefined,
+          result: await loadBranchRules(source, result.value.defaultBranch, {
+            token,
+            ...(fetchImpl === undefined ? {} : { fetchImpl }),
+          }),
+        }
+      : // The pull requests' own failure is the one the read reports.
+        { rateLimit: undefined, result },
+  );
+
   const parts = {
     pulls,
+    rules,
     checks: readChecks(ask),
-    details: readDetails(ask, repo, pulls),
+    details: readDetails(ask, repo, rules),
     comparisons: pulls.then(async ({ result }) =>
       Result.isOk(result)
         ? readComparisons(ask, result.value.pulls)
@@ -367,6 +391,7 @@ export const loadReport = async (
 
   const answers = await Promise.all([
     track('pulls', parts.pulls),
+    track('rules', parts.rules),
     track('checks', parts.checks),
     track('details', parts.details),
     track('comparisons', parts.comparisons),
@@ -498,6 +523,8 @@ type Ask = (
 /** What has answered so far, part by part. */
 type Known = Readonly<{
   pulls?: PullsPart;
+  /** What the default branch requires, which the verdicts are over. */
+  rules?: RulesetRequirements;
   checks?: ReadonlyMap<number, ChecksState>;
   details?: ReadonlyMap<number, DetailsPart>;
   /** Every pull request compared, `undefined` where GitHub could not. */
@@ -506,12 +533,11 @@ type Known = Readonly<{
   issues?: IssueList;
 }>;
 
-/** The pull requests' query, and what the ruleset asks of them. */
+/** The pull requests' query, and what the repository says of their owners. */
 type PullsPart = Readonly<{
   defaultBranch: string;
-  /** `undefined` where no ruleset is declared. */
-  requirements: RulesetRequirements | undefined;
-  features: RepoFeatures;
+  /** Whether the repository has the `merge-queued` label. */
+  queue: boolean;
   codeOwners: readonly CodeOwnersRule[];
   pulls: readonly OpenPullRequest[];
 }>;
@@ -571,8 +597,9 @@ const readPullRequests = async (ask: Ask): Promise<Answered<PullsPart>> => {
 
   const {
     defaultBranchRef,
-    ruleset,
     codeOwners,
+    codeOwnersAtRoot,
+    codeOwnersInDocs,
     queueLabel,
     open: openPulls,
   } = validated.value.repository;
@@ -586,19 +613,8 @@ const readPullRequests = async (ask: Ask): Promise<Answered<PullsPart>> => {
     };
   }
 
-  // No ruleset is not an error: every repository but this one is without
-  // it. One that is there and cannot be read is, since it says something.
-  const requirements =
-    ruleset === null
-      ? Result.ok(undefined)
-      : parseRuleset(
-          ruleset.text,
-          `${MAIN_RULESET_PATH} on the default branch`,
-        );
-
-  if (Result.isErr(requirements)) {
-    return { rateLimit, result: requirements };
-  }
+  // GitHub reads the first of the three it finds, in this order.
+  const owners = codeOwners ?? codeOwnersAtRoot ?? codeOwnersInDocs;
 
   return {
     rateLimit,
@@ -606,9 +622,8 @@ const readPullRequests = async (ask: Ask): Promise<Answered<PullsPart>> => {
       // A repository with no default branch has no commits, and so no pull
       // requests to read a stack out of; the name is never compared.
       defaultBranch: defaultBranchRef?.name ?? '',
-      requirements: requirements.value,
-      features: { ruleset: ruleset !== null, queue: queueLabel !== null },
-      codeOwners: codeOwners === null ? [] : parseCodeOwners(codeOwners.text),
+      queue: queueLabel !== null,
+      codeOwners: owners === null ? [] : parseCodeOwners(owners.text),
       pulls: openPulls.nodes,
     }),
   };
@@ -684,14 +699,14 @@ const readChecks = async (
 
 /**
  * Each open pull request's details, with the issues its body closes. The
- * changed files are paged through only when the ruleset asks for a code
- * owner's review, since that is all they are read for — which the pull
- * requests' query says, so this waits for it before asking for more pages.
+ * changed files are paged through only when the default branch asks for a
+ * code owner's review, since that is all they are read for — which its rules
+ * say, so this waits for them before asking for more pages.
  */
 const readDetails = async (
   ask: Ask,
   repo: RepoRef,
-  pulls: Promise<Answered<PullsPart>>,
+  rules: Promise<Answered<RulesetRequirements>>,
 ): Promise<Answered<ReadonlyMap<number, DetailsPart>>> => {
   const answered = await ask(DETAILS_QUERY);
 
@@ -708,11 +723,9 @@ const readDetails = async (
     };
   }
 
-  const { result: ruled } = await pulls;
+  const { result: ruled } = await rules;
 
-  const wantFiles =
-    Result.isOk(ruled) &&
-    ruled.value.requirements?.requireCodeOwnerReview === true;
+  const wantFiles = Result.isOk(ruled) && ruled.value.requireCodeOwnerReview;
 
   const followedUp = await followUpRounds({
     operationName: 'MoreFiles',
@@ -1346,20 +1359,37 @@ const assemble = ({
   repo,
   nowMs,
   known,
-  pulls: { defaultBranch, requirements, features, codeOwners, pulls },
+  pulls: { defaultBranch, queue, codeOwners, pulls },
 }: Readonly<{
   repo: RepoRef;
   nowMs: number;
   known: Known;
   pulls: PullsPart;
 }>): LoadedReport => {
+  const requirements = known.rules;
+
+  const required =
+    requirements !== undefined && Arr.isNonEmpty(requirements.requiredContexts)
+      ? requirements.requiredContexts
+      : undefined;
+
+  const features: RepoFeatures = {
+    requiredChecks: required !== undefined,
+    codeOwnerReview: requirements?.requireCodeOwnerReview ?? true,
+    queue,
+  } as const;
+
   const partsOf = (pr: OpenPullRequest): PartsOfPull => {
     const checks = known.checks?.get(pr.number);
 
     return {
       // Results reported on another head — a push that landed between the
-      // two queries — are not this head's, and the next read has them.
-      checks: checks?.headSha === pr.headRefOid ? checks : undefined,
+      // two queries — are not this head's, and the next read has them. Nor
+      // are any judged before the rules say which of them count.
+      checks:
+        requirements !== undefined && checks?.headSha === pr.headRefOid
+          ? checks
+          : undefined,
       comparisonRead: known.comparisons?.has(pr.number) === true,
       comparison: known.comparisons?.get(pr.number),
       details: known.details?.get(pr.number),
@@ -1373,7 +1403,7 @@ const assemble = ({
   const issueDeclarations = issueDeclarationsOf(known);
 
   const report = buildEntries({
-    required: requirements?.requiredContexts,
+    required,
     defaultBranch,
     pulls: pulls.map((pr) => factsOf(pr, partsOf(pr))),
     issues: issueDeclarations,
@@ -1391,10 +1421,10 @@ const assemble = ({
           ? undefined
           : setAsideOf(parts.pr, details),
       codeOwnerReview:
-        details === undefined
+        details === undefined || requirements === undefined
           ? { state: 'unknown' }
           : codeOwnerReview({
-              required: requirements?.requireCodeOwnerReview ?? false,
+              required: requirements.requireCodeOwnerReview,
               rules: codeOwners,
               files: details.files,
               filesComplete: details.filesComplete,
@@ -1413,7 +1443,7 @@ const assemble = ({
   return {
     repo,
     readAtEpochMs: nowMs,
-    required: requirements?.requiredContexts,
+    required,
     features,
     summary: summaryOf(entries),
     entries,
@@ -1422,6 +1452,7 @@ const assemble = ({
     merged: known.merged ?? [],
     issues: known.issues ?? NO_ISSUES,
     queue:
+      requirements === undefined ||
       known.checks === undefined ||
       known.comparisons === undefined ||
       known.details === undefined
@@ -1431,10 +1462,9 @@ const assemble = ({
             nowEpochMs: nowMs,
             startAfterOf: issueDeclarations.startAfter,
             rules: {
-              requireCodeOwnerReview:
-                requirements?.requireCodeOwnerReview ?? false,
+              requireCodeOwnerReview: requirements.requireCodeOwnerReview,
               requireConversationResolution:
-                requirements?.requireConversationResolution ?? false,
+                requirements.requireConversationResolution,
               codeOwners,
             },
             pulls: Arr.generate(function* () {

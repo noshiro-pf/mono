@@ -204,7 +204,11 @@ const setup = (): Readonly<{
 
   const [roots, setRoots] = createState<readonly TreeNode[]>([]);
 
-  const [features, setFeatures] = createState({ ruleset: true, queue: true });
+  const [features, setFeatures] = createState({
+    requiredChecks: true,
+    codeOwnerReview: true,
+    queue: true,
+  });
 
   const store = createMergeOrderStore({
     entries: entries$,
@@ -224,7 +228,7 @@ const setup = (): Readonly<{
       reject(new Error('blocked'));
     },
     setQueue: (queue) => {
-      setFeatures({ ruleset: true, queue });
+      setFeatures({ requiredChecks: true, codeOwnerReview: true, queue });
     },
     setEntries: (list) => {
       setEntries(list);

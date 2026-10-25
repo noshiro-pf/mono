@@ -14,11 +14,7 @@
  * page of any list that did not fit in one.
  */
 
-import {
-  MAIN_RULESET_PATH,
-  MERGE_QUEUED_LABEL,
-  SET_ASIDE_COMMENT_SCAN,
-} from 'pr-report-core';
+import { MERGE_QUEUED_LABEL, SET_ASIDE_COMMENT_SCAN } from 'pr-report-core';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
 
@@ -52,7 +48,15 @@ export const ISSUES_PAGE_SIZE = 100;
 /** One page of a list inside a pull request. */
 const PAGE_SIZE = 100;
 
-const CODE_OWNERS_PATH = '.github/CODEOWNERS';
+/**
+ * Where GitHub looks for `CODEOWNERS`, in the order it looks: the first it
+ * finds is the one it reads.
+ */
+const CODE_OWNERS_PATHS = {
+  codeOwners: '.github/CODEOWNERS',
+  codeOwnersAtRoot: 'CODEOWNERS',
+  codeOwnersInDocs: 'docs/CODEOWNERS',
+} as const;
 
 const LABELS = 'labels(first: 20) { nodes { name color description } }';
 
@@ -109,17 +113,20 @@ const OPEN_PULLS =
 
 /**
  * The open pull requests as the merge order draws them — what each is, the
- * branch it is of, its labels, what its body declares — the two files on
- * the default branch (`HEAD`) that say what a pull request is required to
- * have, and whether the repository has the label `unblock-prs`'s queue is
- * made of. The one query the page waits for before it draws anything.
+ * branch it is of, its labels, what its body declares — the `CODEOWNERS` on
+ * the default branch (`HEAD`) wherever GitHub would find it, and whether the
+ * repository has the label `unblock-prs`'s queue is made of. The one query
+ * the page waits for before it draws anything. What the default branch
+ * requires is REST's (`branch-rules.mts`), asked once this names the branch.
  */
 export const PULL_REQUESTS_QUERY = [
   'query PullRequests($owner: String!, $name: String!) {',
   '  repository(owner: $owner, name: $name) {',
   '    defaultBranchRef { name }',
-  `    ruleset: object(expression: "HEAD:${MAIN_RULESET_PATH}") { ... on Blob { text } }`,
-  `    codeOwners: object(expression: "HEAD:${CODE_OWNERS_PATH}") { ... on Blob { text } }`,
+  ...Object.entries(CODE_OWNERS_PATHS).map(
+    ([alias, path]) =>
+      `    ${alias}: object(expression: "HEAD:${path}") { ... on Blob { text } }`,
+  ),
   `    queueLabel: label(name: "${MERGE_QUEUED_LABEL}") { name }`,
   `    ${OPEN_PULLS} {`,
   '      totalCount',
@@ -654,8 +661,9 @@ export const PullRequestsDataSchema = t.record({
   repository: t.record({
     /** `null` only for a repository with no commits, and so no pull requests. */
     defaultBranchRef: t.union([t.record({ name: t.string() }), t.nullType]),
-    ruleset: BlobSchema,
     codeOwners: BlobSchema,
+    codeOwnersAtRoot: BlobSchema,
+    codeOwnersInDocs: BlobSchema,
     /** `null` when the repository has no such label. */
     queueLabel: t.union([t.record({ name: t.string() }), t.nullType]),
     open: t.record({

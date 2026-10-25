@@ -174,6 +174,63 @@ describe(codeOwnerReview, () => {
   test('still reports a wait it has already found in a partial list', () => {
     assert.strictEqual(review({ filesComplete: false }).state, 'required');
   });
+
+  describe('a team owner', () => {
+    const teamRules = parseCodeOwners(dedent`
+      /docs/ @org/docs-team
+      /src/ @org/core @noshiro-pf
+    `);
+
+    test('waits on a path it owns while nobody has approved at all', () => {
+      assert.deepStrictEqual(
+        review({ rules: teamRules, files: ['docs/a.md'] }),
+        {
+          state: 'required',
+          paths: ['docs/a.md'],
+          owners: ['org/docs-team'],
+          authorOwns: false,
+        },
+      );
+    });
+
+    // Telling who is on a team takes `read:org`, which no reader asks for.
+    test('cannot tell whether an approval came from someone on it', () => {
+      assert.deepStrictEqual(
+        review({ rules: teamRules, files: ['docs/a.md'], approvers: ['x'] }),
+        { state: 'unknown', teams: ['org/docs-team'] },
+      );
+    });
+
+    test('is not needed once a person it shares the path with approves', () => {
+      assert.deepStrictEqual(
+        review({
+          rules: teamRules,
+          files: ['src/a.mts'],
+          approvers: ['noshiro-pf'],
+        }),
+        { state: 'approved' },
+      );
+    });
+
+    test('leaves a wait found on another path standing', () => {
+      assert.deepStrictEqual(
+        review({
+          rules: parseCodeOwners(dedent`
+            /docs/ @org/docs-team
+            /.github/ @noshiro-pf
+          `),
+          files: ['docs/a.md', '.github/x.yml'],
+          approvers: ['x'],
+        }),
+        {
+          state: 'required',
+          paths: ['.github/x.yml'],
+          owners: ['noshiro-pf'],
+          authorOwns: false,
+        },
+      );
+    });
+  });
 });
 
 const owners = (text: string, path: string): readonly string[] =>

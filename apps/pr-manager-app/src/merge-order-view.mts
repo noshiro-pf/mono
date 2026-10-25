@@ -56,18 +56,18 @@ export const STATUS_FILTERS = [
 
 /**
  * The statuses on offer. `queued` and `set aside` are `unblock-prs`'s, and
- * `awaiting code owner` is what the ruleset asks for, so where the repository
- * does not run the one or declare the other (`RepoFeatures` in
- * `load-report.mts`) they are counts that are always nought, and switches
- * that do nothing; they are left out there.
+ * `awaiting code owner` is what a ruleset on the default branch asks for, so
+ * where the repository does not run the one or ask for the other
+ * (`RepoFeatures` in `load-report.mts`) they are counts that are always
+ * nought, and switches that do nothing; they are left out there.
  */
 export const statusFiltersOf = (
-  features: Readonly<{ queue: boolean; ruleset: boolean }>,
+  features: Readonly<{ queue: boolean; codeOwnerReview: boolean }>,
 ): readonly StatusFilter[] =>
   STATUS_FILTERS.filter(
     (filter) =>
       (features.queue || !QUEUE_STATUSES.has(filter)) &&
-      (features.ruleset || filter !== 'awaitingReview'),
+      (features.codeOwnerReview || filter !== 'awaitingReview'),
   );
 
 /**

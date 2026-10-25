@@ -20,16 +20,17 @@ export type RulesetRequirements = Readonly<{
 }>;
 
 /**
- * The requirements, read from the declaration rather than from GitHub.
+ * The requirements, read from the declaration rather than from GitHub, for
+ * `pnpm run pr-report`, which reads the checkout. The file is the desired
+ * state; what GitHub enforces is {@link requirementsOfRules} over
+ * `rules/branches/{branch}`, which `unblock-prs` and the Pull Requests
+ * Manager read and which wants no more than read access. The gap is that a
+ * file under `repo-settings/` changes nothing until
+ * `pnpm run repo-settings:apply` runs, so a context added here and not
+ * applied is reported as missing on every pull request — which is a fair
+ * thing for a report to say out loud.
  *
- * The API that serves a ruleset wants an admin token, and the file is the
- * desired state anyway. The gap is that a file under `repo-settings/`
- * changes nothing until `pnpm run repo-settings:apply` runs, so a context
- * added here and not applied is reported as missing on every pull request —
- * which is a fair thing for a report to say out loud.
- *
- * `source` names the file in the messages, because the two readers have it
- * from different places: `pr-report` from the checkout, the page from `main`.
+ * `source` names the file in the messages.
  */
 export const parseRuleset = (
   text: string,
