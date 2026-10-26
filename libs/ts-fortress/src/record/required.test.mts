@@ -61,6 +61,7 @@ describe(required, () => {
       | 'fill'
       | 'prune'
       | 'structure'
+      | 'annotations'
       | 'optional'
     >('=');
 

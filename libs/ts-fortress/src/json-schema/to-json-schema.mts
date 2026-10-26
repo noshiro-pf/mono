@@ -5,6 +5,7 @@ import {
   isBoolean,
   isNumber,
   isString,
+  Obj,
   Result,
 } from 'ts-data-forge';
 import type {
@@ -14,7 +15,9 @@ import type {
   RelaxedExtract,
 } from 'ts-type-forge';
 import { hasConstraints } from '../constraints/index.mjs';
+import { JsonValue as JsonValueType } from '../predefined/index.mjs';
 import type {
+  TypeAnnotations,
   TypeStructure,
   TypeStructureKind,
   UnknownType,
@@ -51,6 +54,11 @@ import type {
  * and the `uppercase` / `lowercase` string constraints add their names to
  * `x-refined`, and the schema accepts more than the type does there. The type
  * stays the authority on what is valid; the schema is what other tools read.
+ *
+ * The annotations `annotate` adds — `title`, `description`, `format`,
+ * `examples` and `deprecated` — are written under the keywords of the same
+ * names, beside the schema of the type they are on. An example the type does
+ * not accept, or one that is not JSON, is an error.
  *
  * Default values are not written as `default`: every type has one, so
  * writing it would tell a client that every property may be left out.
@@ -138,8 +146,10 @@ export type JsonSchemaConversionError = Readonly<{
    * - `'opaque'` — the type has no `structure` to read.
    * - `'unsatisfiable'` — the type accepts no value that the schema could
    *   state (a `multipleOf` of 0).
+   * - `'invalid-example'` — one of the type's `examples` is not of the type.
+   *   An example that is not JSON is `'not-json'`.
    */
-  kind: 'not-json' | 'opaque' | 'unsatisfiable';
+  kind: 'not-json' | 'opaque' | 'unsatisfiable' | 'invalid-example';
   /** JSON Pointer to where in the schema the type's schema would go. */
   schemaPath: string;
   typeName: string;
@@ -204,6 +214,31 @@ type ConversionResult = Result<
 >;
 
 const convert = (
+  type: UnknownType,
+  defs: Defs,
+  path: readonly string[],
+): ConversionResult => {
+  const schema = convertStructure(type, defs, path);
+
+  const { annotations } = type;
+
+  if (annotations === undefined || Result.isErr(schema)) {
+    return schema;
+  }
+
+  return Result.map(annotationsSchema(type, annotations, path), (keywords) => ({
+    // `title` and `description` first, where a reader looks for them; then
+    // every annotation of the type's own over the one its base type's schema
+    // has already (an `annotate` of a `uuid()` replacing its `format`, say).
+    ...Obj.filter(keywords, (_value, key) => LEADING_KEYWORDS.has(key)),
+    ...schema.value,
+    ...keywords,
+  }));
+};
+
+const LEADING_KEYWORDS: ReadonlySet<string> = new Set(['title', 'description']);
+
+const convertStructure = (
   type: UnknownType,
   defs: Defs,
   path: readonly string[],
@@ -312,6 +347,52 @@ const convert = (
     case 'recursion':
       return recursionSchema(structure, defs);
   }
+};
+
+// --- annotations ---
+
+const annotationsSchema = (
+  type: UnknownType,
+  annotations: TypeAnnotations,
+  path: readonly string[],
+): ConversionResult => {
+  const { title, description, format, deprecated, examples } = annotations;
+
+  const errors = (examples ?? []).flatMap((example, i) => {
+    const examplePath = [...path, 'examples', i.toString()] as const;
+
+    return !JsonValueType.is(example)
+      ? [
+          conversionError(
+            'not-json',
+            type,
+            examplePath,
+            'the example is not JSON',
+          ),
+        ]
+      : !type.is(example)
+        ? [
+            conversionError(
+              'invalid-example',
+              type,
+              examplePath,
+              'the example is not of the type',
+            ),
+          ]
+        : [];
+  });
+
+  return Arr.isNonEmpty(errors)
+    ? Result.err(errors)
+    : Result.ok({
+        ...(title === undefined ? {} : { title }),
+        ...(description === undefined ? {} : { description }),
+        ...(format === undefined ? {} : { format }),
+        ...(deprecated === undefined ? {} : { deprecated }),
+        ...(examples === undefined
+          ? {}
+          : { examples: examples.filter(JsonValueType.is) }),
+      });
 };
 
 // --- records and collections ---
@@ -471,7 +552,8 @@ const flattenUnionMembers = (
   members: readonly UnknownType[],
 ): readonly UnknownType[] =>
   members.flatMap((member) =>
-    member.structure?.kind === 'union'
+    // An annotated union keeps its own place, so that its annotations do.
+    member.structure?.kind === 'union' && member.annotations === undefined
       ? flattenUnionMembers(member.structure.memberTypes)
       : [member],
   );
@@ -899,10 +981,20 @@ const failure = (
   type: UnknownType,
   path: readonly string[],
   message: string,
-): ConversionResult =>
-  Result.err([
-    { kind, schemaPath: toPointer(path), typeName: type.typeName, message },
-  ]);
+): ConversionResult => Result.err([conversionError(kind, type, path, message)]);
+
+const conversionError = (
+  kind: JsonSchemaConversionError['kind'],
+  type: UnknownType,
+  path: readonly string[],
+  message: string,
+): JsonSchemaConversionError =>
+  ({
+    kind,
+    schemaPath: toPointer(path),
+    typeName: type.typeName,
+    message,
+  }) as const;
 
 const toPointer = (path: readonly string[]): string =>
   path

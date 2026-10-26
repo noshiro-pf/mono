@@ -59,9 +59,60 @@ export type Type<A> = Readonly<{
    */
   structure?: TypeStructure;
 
+  /**
+   * What the type means to a reader, set by `annotate` (see
+   * {@link TypeAnnotations}). It changes nothing the type does; `toJsonSchema`
+   * writes it out.
+   */
+  annotations?: TypeAnnotations;
+
   /** @internal Used to mark properties as optional in record type validation */
   optional?: true;
 }>;
+
+/**
+ * The JSON Schema annotations a type carries, written by `toJsonSchema` under
+ * the keywords of the same names. Validation never reads them: a `format`
+ * describes the values, and the type alone decides which are valid.
+ *
+ * @template A - The type's value type, which each of `examples` is.
+ */
+export type TypeAnnotations<A = unknown> = Partial<
+  Readonly<{
+    title: string;
+    description: string;
+    format: JsonSchemaFormat;
+    examples: readonly A[];
+    deprecated: boolean;
+  }>
+>;
+
+/**
+ * A JSON Schema `format`: one of the formats the draft 2020-12 vocabulary
+ * defines, or any other string, which JSON Schema leaves to the tools that
+ * read it (OpenAPI's `int32` or `password`, for example).
+ */
+export type JsonSchemaFormat =
+  | 'date-time'
+  | 'date'
+  | 'time'
+  | 'duration'
+  | 'email'
+  | 'idn-email'
+  | 'hostname'
+  | 'idn-hostname'
+  | 'ipv4'
+  | 'ipv6'
+  | 'uri'
+  | 'uri-reference'
+  | 'iri'
+  | 'iri-reference'
+  | 'uuid'
+  | 'uri-template'
+  | 'json-pointer'
+  | 'relative-json-pointer'
+  | 'regex' // Keeps the names above in autocomplete while accepting any other string.
+  | (string & {});
 
 /**
  * The runtime description of a {@link Type}, discriminated by `kind`.

@@ -95,7 +95,9 @@ export {
 // --- Public types from type.mts ---
 export type {
   ExcessPropertyOption,
+  JsonSchemaFormat,
   Type,
+  TypeAnnotations,
   TypeOf,
   TypeStructure,
   TypeStructureKind,

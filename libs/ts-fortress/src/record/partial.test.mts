@@ -40,6 +40,7 @@ describe(partial, () => {
       | 'prune'
       | 'validate'
       | 'structure'
+      | 'annotations'
       | 'optional'
     >('=');
 

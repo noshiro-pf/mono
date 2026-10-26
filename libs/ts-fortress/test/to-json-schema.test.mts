@@ -464,6 +464,157 @@ describe(t.toJsonSchema, () => {
     });
   });
 
+  describe('annotations', () => {
+    test('title and description lead, the other annotations follow', () => {
+      const NonEmpty = t.string('a', { minLength: 1 });
+
+      const Name = t.annotate(NonEmpty, {
+        examples: [NonEmpty.cast('Ada')],
+        deprecated: true,
+        format: 'name',
+        description: 'What to call it.',
+        title: 'Name',
+      });
+
+      const schema = schemaOf(Name);
+
+      assert.deepStrictEqual(schema, {
+        title: 'Name',
+        description: 'What to call it.',
+        type: 'string',
+        minLength: 1,
+        format: 'name',
+        deprecated: true,
+        examples: ['Ada'],
+      });
+
+      assert.deepStrictEqual(Object.keys(schema), [
+        'title',
+        'description',
+        'type',
+        'minLength',
+        'format',
+        'deprecated',
+        'examples',
+      ]);
+    });
+
+    test('on record members, optional on either side', () => {
+      assert.deepStrictEqual(
+        schemaOf(
+          t.strictRecord({
+            a: t.annotate(t.string(), { description: 'A.' }),
+            b: t.optional(t.annotate(t.number(), { description: 'B.' })),
+            c: t.annotate(t.optional(t.boolean()), { description: 'C.' }),
+          }),
+        ),
+        {
+          type: 'object',
+          properties: {
+            a: { description: 'A.', type: 'string' },
+            b: { description: 'B.', type: 'number' },
+            c: { description: 'C.', type: 'boolean' },
+          },
+          required: ['a'],
+          additionalProperties: false,
+        },
+      );
+    });
+
+    test("uuid's format, kept or replaced by the type's own", () => {
+      assert.deepStrictEqual(schemaOf(t.uuid()), {
+        type: 'string',
+        minLength: 1,
+        'x-brand': 'Uuid',
+        format: 'uuid',
+      });
+
+      assert.deepStrictEqual(
+        schemaOf(t.annotate(t.uuid(), { description: 'An id.' })),
+        {
+          description: 'An id.',
+          type: 'string',
+          minLength: 1,
+          'x-brand': 'Uuid',
+          format: 'uuid',
+        },
+      );
+
+      assert.deepStrictEqual(
+        schemaOf(t.annotate(t.uuid(), { format: 'x-uuid' })),
+        {
+          type: 'string',
+          minLength: 1,
+          'x-brand': 'Uuid',
+          format: 'x-uuid',
+        },
+      );
+    });
+
+    test('on a recursion, beside each reference; inside it, in $defs', () => {
+      type List = Readonly<{ next?: List }>;
+
+      const List: t.Type<List> = t.annotate(
+        t.recursion('List', () =>
+          t.annotate(
+            t.record({
+              next: t.optional(List, { forceUndefinedDefault: true }),
+            }),
+            { title: 'Node' },
+          ),
+        ),
+        { description: 'A list.' },
+      );
+
+      assert.deepStrictEqual(schemaOf(List), {
+        description: 'A list.',
+        $ref: '#/$defs/List',
+        $defs: {
+          List: {
+            title: 'Node',
+            type: 'object',
+            properties: {
+              next: { description: 'A list.', $ref: '#/$defs/List' },
+            },
+            required: [],
+          },
+        },
+      });
+    });
+
+    test('an annotated union is not merged into the union around it', () => {
+      const Inner = t.annotate(t.union([t.literal('a'), t.literal('b')]), {
+        description: 'Letters.',
+      });
+
+      assert.deepStrictEqual(schemaOf(t.union([Inner, t.number()])), {
+        anyOf: [
+          { description: 'Letters.', anyOf: [{ const: 'a' }, { const: 'b' }] },
+          { type: 'number' },
+        ],
+      });
+    });
+
+    test('an example the type does not accept, or not JSON, is an error', () => {
+      const schema = t.toJsonSchema(
+        t.record({
+          a: t.annotate(t.number(0, { min: 0 }), { examples: [1, -1] }),
+          b: t.annotate(t.unknown(), { examples: [1n] }),
+        }),
+      );
+
+      assert.isTrue(Result.isErr(schema));
+
+      assert.deepStrictEqual(
+        schema.value.map(({ kind, schemaPath }) => [kind, schemaPath]),
+        [
+          ['invalid-example', '/properties/a/examples/1'],
+          ['not-json', '/properties/b/examples/0'],
+        ],
+      );
+    });
+  });
+
   describe('errors', () => {
     test('names every part that has no schema, by where it would go', () => {
       const schema = t.toJsonSchema(
@@ -505,7 +656,12 @@ describe(t.toJsonSchema, () => {
   });
 
   describe('agrees with validate on JSON values', () => {
-    const ajv = new Ajv2020({ strict: true, discriminator: true });
+    // A `format` is an annotation the type does not check either.
+    const ajv = new Ajv2020({
+      strict: true,
+      discriminator: true,
+      validateFormats: false,
+    });
 
     ajv.addKeyword('x-brand');
 
@@ -552,6 +708,16 @@ describe(t.toJsonSchema, () => {
       [t.nonEmptyArray(t.boolean()), [[true], [], [1]]],
       [t.JsonValue, [{ a: [1, 'b', { c: null }] }, [], 'x']],
       [t.enumType(['a', 1]), ['a', 1, 'b', true]],
+      [
+        t.annotate(
+          t.strictRecord({
+            id: t.annotate(t.string(), { format: 'uuid', title: 'Id' }),
+            n: t.annotate(t.optional(t.int()), { deprecated: true }),
+          }),
+          { description: 'D.', examples: [{ id: 'x' }] },
+        ),
+        [{ id: 'x' }, { id: 'x', n: 1 }, { id: 'x', n: 1.5 }, {}],
+      ],
     ] as const satisfies readonly (readonly [
       t.Type<unknown>,
       readonly unknown[],

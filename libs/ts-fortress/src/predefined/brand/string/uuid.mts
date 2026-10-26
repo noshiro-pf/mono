@@ -6,6 +6,7 @@ import type {
   UintRangeInclusive,
 } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
+import { annotate } from '../../../other-types/index.mjs';
 import { string } from '../../../primitives/index.mjs';
 import type { Type } from '../../../type.mjs';
 
@@ -39,26 +40,31 @@ export const uuid = <V extends UuidVersion | UuidVersionAdditionalOption>(
 
   const version = options?.version ?? 'all';
 
+  // Every value accepted is in the hexadecimal form RFC 9562 defines, so it
+  // is also of the JSON Schema `uuid` format.
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  return brand<UuidBaseString & NonEmptyString, readonly ['Uuid']>({
-    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-    baseType: string(defaultValue, { nonempty: true }) as Type<
-      UuidBaseString & NonEmptyString
-    >,
-    is: (s): s is T => uuidDef[version](s),
-    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-    defaultValue: defaultValue as UuidBaseString & NonEmptyString,
-    brandKeys: ['Uuid'],
-    typeName:
-      options?.typeName ??
-      (version === 4
-        ? 'UuidV4'
-        : version === 6
-          ? 'UuidV6'
-          : version === 7
-            ? 'UuidV7'
-            : 'Uuid'),
-  }) satisfies Type<T> as Type<UuidOf<V>>;
+  return annotate(
+    brand<UuidBaseString & NonEmptyString, readonly ['Uuid']>({
+      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+      baseType: string(defaultValue, { nonempty: true }) as Type<
+        UuidBaseString & NonEmptyString
+      >,
+      is: (s): s is T => uuidDef[version](s),
+      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+      defaultValue: defaultValue as UuidBaseString & NonEmptyString,
+      brandKeys: ['Uuid'],
+      typeName:
+        options?.typeName ??
+        (version === 4
+          ? 'UuidV4'
+          : version === 6
+            ? 'UuidV6'
+            : version === 7
+              ? 'UuidV7'
+              : 'Uuid'),
+    }),
+    { format: 'uuid' },
+  ) satisfies Type<T> as Type<UuidOf<V>>;
 };
 
 type UuidVersionAdditionalOption = 'nil' | 'max' | 'all' | 'loose';
