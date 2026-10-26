@@ -304,17 +304,13 @@ export const createIssuesViewStore = (
     map(([laidOut, placed]) => placeGrid(laidOut, placed)),
   );
 
-  const dagScale = combine([zoom, layout, dagBox])
-    .pipe(
-      map(([current, laidOut, box]) =>
-        current.type === 'fit' ? fitScale(laidOut, box) : current.scale,
-      ),
-    )
-    .pipe(skipIfNoChange());
+  const dagScale = combine([zoom, layout, dagBox]).pipe(
+    map(([current, laidOut, box]) =>
+      current.type === 'fit' ? fitScale(laidOut, box) : current.scale,
+    ),
+  );
 
-  const dagFitted = zoom
-    .pipe(map(({ type }) => type === 'fit'))
-    .pipe(skipIfNoChange());
+  const dagFitted = zoom.pipe(map(({ type }) => type === 'fit'));
 
   const zoomBy = (step: (scale: number) => number) => (): void => {
     setKept(placement.getSnapshot().value);
@@ -322,15 +318,13 @@ export const createIssuesViewStore = (
     setZoom({ type: 'scale', scale: step(dagScale.getSnapshot().value) });
   };
 
-  const doneCount = fullGraph
-    .pipe(
-      map(({ nodes }) => nodes.filter(({ state }) => state === 'done').length),
-    )
-    .pipe(skipIfNoChange());
+  const doneCount = fullGraph.pipe(
+    map(({ nodes }) => nodes.filter(({ state }) => state === 'done').length),
+  );
 
-  const pendingCount = fullGraph
-    .pipe(map(({ nodes }) => nodes.filter(({ pending }) => pending).length))
-    .pipe(skipIfNoChange());
+  const pendingCount = fullGraph.pipe(
+    map(({ nodes }) => nodes.filter(({ pending }) => pending).length),
+  );
 
   return {
     view,

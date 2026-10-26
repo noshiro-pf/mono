@@ -336,7 +336,7 @@ assert.deepStrictEqual(countHistory, [0, 0, 2]);
 
 ### Keeping the Parts an Update Did Not Change (`keepEqualParts`)
 
-A state written whole from a source that answers with a new object every time, such as a server polled for a report, can take `keepEqualParts: true`. The next state is compared with the current one before it is written: every part deeply equal to the same part of the current state is replaced by that part, so whatever reads an unchanged part keeps the object it has and `skipIfNoChange()` with `Object.is` stops it, and an answer that changes nothing is not passed on at all. Array items are matched by index; `keepEqualParts: { key }` matches them by key. The comparison is `replaceEqualDeep` of ts-data-forge, which serves any other write too.
+A state written whole from a source that answers with a new object every time, such as a server polled for a report, can take `keepEqualParts: true`. The next state is compared with the current one before it is written: every part deeply equal to the same part of the current state is replaced by that part, so whatever reads an unchanged part keeps the object it has and `map`, comparing with `Object.is`, stops there, and an answer that changes nothing is not passed on at all. Array items are matched by index; `keepEqualParts: { key }` matches them by key. The comparison is `replaceEqualDeep` of ts-data-forge, which serves any other write too.
 
 ```tsx
 type PullReport = DeepReadonly<{
@@ -349,7 +349,7 @@ const [report, setReport] = createState<PullReport>(
     { keepEqualParts: true },
 );
 
-const summary = report.pipe(map((r) => r.summary)).pipe(skipIfNoChange());
+const summary = report.pipe(map((r) => r.summary));
 
 const summaryHistory: unknown[] = [];
 

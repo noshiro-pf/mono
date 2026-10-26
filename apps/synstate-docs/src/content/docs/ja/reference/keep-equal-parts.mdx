@@ -6,7 +6,7 @@ title: keepEqualParts
 
 {/* jsdoc-description */}
 
-流れてきた値のうち、前に流した値の同じ部分と深く等しい部分を、前の値のその部分で置き換えて流します。値全体が前の値と深く等しければ、何も流しません（構造共有）。変わっていない部分を読む側は手元のオブジェクトをそのまま持ち続けるので、`Object.is` の `skipIfNoChange()` で止まります。`skipIfNoChange(fastDeepEqual)` を包含します。
+流れてきた値のうち、前に流した値の同じ部分と深く等しい部分を、前の値のその部分で置き換えて流します。値全体が前の値と深く等しければ、何も流しません（構造共有）。変わっていない部分を読む側は手元のオブジェクトをそのまま持ち続けるので、`Object.is` で比べる `map` がそこで止めます。`skipIfNoChange(fastDeepEqual)` を包含します。
 
 **参照は値を書き込む側で保つのが第一です。** `setState` の前に比べ、何も変わっていなければ書き込まないようにすれば、下流で打ち消すものが何もなくなります。丸ごと書き込む状態には `createState` と `createReducer` の `keepEqualParts` オプションが、それ以外の書き込みには ts-data-forge の `replaceEqualDeep` がそれを行います。このオペレーターでは、何も変えない更新もソースとそこまでのすべてに届き、そのたびに値全体をたどり直します。ソースを自分で変えられない場合（外から丸ごと届くストリーム）に使ってください。
 
@@ -30,9 +30,7 @@ const message$ = source<Board>();
 
 const board$ = message$.pipe(keepEqualParts());
 
-const firstCard$ = board$
-    .pipe(map((board) => board.cards[0]))
-    .pipe(skipIfNoChange());
+const firstCard$ = board$.pipe(map((board) => board.cards[0]));
 
 const boardHistory: Board[] = [];
 

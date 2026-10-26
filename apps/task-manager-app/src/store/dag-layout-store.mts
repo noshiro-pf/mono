@@ -91,6 +91,7 @@ import {
   switchMap,
   withInitialValue,
   type InitializedObservable,
+  type KeepInitialValueOperator,
   type Observable as SynstateObservable,
 } from 'synstate';
 import { Arr, Num, unknownToString } from 'ts-data-forge';
@@ -1334,7 +1335,7 @@ export const createDagLayoutStore = <H, F>(
   // arrangement it hands out changes.
   const storedFollowed = whileStarted(() =>
     combine([deps.stored, deps.defaultDirection]).pipe(
-      map(([stored, defaultDirection]) => {
+      following(([stored, defaultDirection]) => {
         followStored(stored, defaultDirection);
       }),
     ),
@@ -1352,14 +1353,14 @@ export const createDagLayoutStore = <H, F>(
         deps.hidden,
         membership,
       ]).pipe(
-        map(([state, { direction }, active, size, hidden, groups]) => {
+        following(([state, { direction }, active, size, hidden, groups]) => {
           followLayoutInput(state, direction, active, size, hidden, groups);
         }),
       ),
       // In 「アーク」 and 「タイル」, the nodes are shown moving into place as
       // soon as there are any, without waiting for ELK to lay out the DAG.
       combine([deps.active, arcNodes, tileNodes]).pipe(
-        map(([active]) => {
+        following(([active]) => {
           if (active && !isArrangeable(mut_viewMode)) {
             introduce();
           }
@@ -1367,16 +1368,16 @@ export const createDagLayoutStore = <H, F>(
       ),
       // Turned off, or less motion asked for, in the middle of one.
       combine([deps.animationSetting, deps.reducedMotion]).pipe(
-        map(() => {
+        following(() => {
           if (!animationAllowed()) {
             finishAnimation();
           }
         }),
       ),
-      deps.viewMode.pipe(map(followViewMode)),
-      deps.nodeSize.pipe(map(followNodeSize)),
-      diagramOrder.pipe(map(followDiagramOrder)),
-      arcOrder.pipe(map(followArcOrder)),
+      deps.viewMode.pipe(following(followViewMode)),
+      deps.nodeSize.pipe(following(followNodeSize)),
+      diagramOrder.pipe(following(followDiagramOrder)),
+      arcOrder.pipe(following(followArcOrder)),
     ]).pipe(withInitialValue(undefined)),
   );
 
@@ -1429,6 +1430,14 @@ export const createDagLayoutStore = <H, F>(
     start,
   };
 };
+
+/**
+ * Runs `effect` on every value, and emits after each run, though it returns
+ * nothing: what follows an input signals each time it has followed it.
+ */
+const following = <A,>(
+  effect: (a: A) => void,
+): KeepInitialValueOperator<A, void> => map(effect, { equals: () => false });
 
 /**
  * What `read` says, read again whenever `changes` emits, and passed on only

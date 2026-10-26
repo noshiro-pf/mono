@@ -6,31 +6,35 @@ if (import.meta.vitest !== undefined) {
 
     //  Timeline:
     //
-    //  num$      "A"      "B"      "C"
-    //  indexed$  "0: A"   "1: B"   "2: C"
+    //  num$      1   3   4   6   7
+    //  parity$   1       0       1
     //
     //  Explanation:
-    //  - mapWithIndex transforms each value along with its index
-    //  - Index starts at 0 and increments with each emission
+    //  - map transforms each value
+    //  - A result equal to the one held is not emitted
 
-    const num$ = source<string>();
+    const num$ = source<number>();
 
-    const indexed$ = num$.pipe(map((x, i) => `${i}: ${x}`));
+    const parity$ = num$.pipe(map((x) => x % 2));
 
     // transformer-ignore-next-line convert-to-readonly, append-as-const
-    const valueHistory: string[] = [];
+    const valueHistory: number[] = [];
 
-    indexed$.subscribe((s) => {
-      valueHistory.push(s);
+    parity$.subscribe((p) => {
+      valueHistory.push(p);
     });
 
-    num$.next('A'); // 0: A
+    num$.next(1); // 1
 
-    num$.next('B'); // 1: B
+    num$.next(3); // still 1: not emitted
 
-    num$.next('C'); // 2: C
+    num$.next(4); // 0
 
-    assert.deepStrictEqual(valueHistory, ['0: A', '1: B', '2: C']);
+    num$.next(6); // still 0: not emitted
+
+    num$.next(7); // 1
+
+    assert.deepStrictEqual(valueHistory, [1, 0, 1]);
 
     // embed-sample-code-ignore-below
   });

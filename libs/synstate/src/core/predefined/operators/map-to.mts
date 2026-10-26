@@ -3,7 +3,11 @@ import type { KeepInitialValueOperator } from '../../types/index.mjs';
 
 /**
  * Maps all emitted values to a constant value, ignoring the source values.
- * Equivalent to `map(() => value)`.
+ * Emits on every source value although the value never changes — where
+ * `map(() => value)` would stop every result after the first as equal — so
+ * it is the one for turning events into a value. The value's type is
+ * inferred as written, as with `as const`: `mapTo('reset')` gives
+ * `'reset'`, not `string`.
  *
  * @template A - The type of values from the source
  * @template B - The type of the constant value
@@ -41,5 +45,5 @@ import type { KeepInitialValueOperator } from '../../types/index.mjs';
  * assert.deepStrictEqual(valueHistory, [1, 1, 1]);
  * ```
  */
-export const mapTo = <A, B>(value: B): KeepInitialValueOperator<A, B> =>
-  map(() => value);
+export const mapTo = <A, const B>(value: B): KeepInitialValueOperator<A, B> =>
+  map(() => value, { equals: () => false });

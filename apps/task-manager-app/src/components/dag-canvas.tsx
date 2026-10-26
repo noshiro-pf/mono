@@ -3,7 +3,6 @@ import {
   createState,
   map,
   onScopeDispose,
-  skipIfNoChange,
   type InitializedObservable,
 } from 'synstate';
 import { constant, For, If, MatchOptional, view, type JSX } from 'synstate-dom';
@@ -516,9 +515,9 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     queued: false,
   };
 
-  const structureKey = layout
-    .pipe(map(({ nodes }) => nodes.map(({ id }) => id).join(' ')))
-    .pipe(skipIfNoChange());
+  const structureKey = layout.pipe(
+    map(({ nodes }) => nodes.map(({ id }) => id).join(' ')),
+  );
 
   subscribeInScope(
     combine([structureKey, dagLayoutStore.fitRequests, mode]),

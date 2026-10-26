@@ -1,9 +1,9 @@
 import {
   createValueEmitter,
-  map,
+  type InitializedObservable,
+  mapTo,
   merge,
   scan,
-  type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
 import { useObservableValue } from 'synstate-react-hooks';
@@ -66,7 +66,7 @@ export const createToggleState = (
     (isOn: boolean, action: 'toggle' | 'reset') =>
       match(action, { toggle: !isOn, reset: false }),
     false,
-    resets.map((reset$) => reset$.pipe(map(() => 'reset' as const))),
+    resets.map((reset$) => reset$.pipe(mapTo('reset'))),
   );
 
   return {

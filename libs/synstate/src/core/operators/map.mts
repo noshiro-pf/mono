@@ -5,7 +5,7 @@
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
-import { Optional, SafeUint, asSafeUint, expectType } from 'ts-data-forge';
+import { Optional, expectType } from 'ts-data-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import type {
@@ -18,51 +18,64 @@ import type {
 import { withInitialValue } from './with-initial-value.mjs';
 
 /**
- * Transforms each value emitted by the source using a mapping function that also receives the emission index.
+ * Transforms each value emitted by the source with a mapping function, and
+ * emits the result unless it equals the one already held.
+ *
+ * The comparison is `Object.is` unless `equals` says otherwise, so a result
+ * that did not change wakes nothing below. To pass on every result — an event
+ * turned into a value, say — give `equals: () => false`, or use `mapTo`. The
+ * mapping function receives the value alone; `withIndex` attaches an index.
  *
  * @template A - The type of values from the source
  * @template B - The type of mapped values
- * @param mapFn - A function that maps each value (receives value and index)
- * @returns An operator that maps values with index
+ * @param mapFn - A function that maps each value
+ * @param options - `equals` compares a result with the one held
+ * @returns An operator that maps values
  *
  * @example
  * ```ts
  * //  Timeline:
  * //
- * //  num$      "A"      "B"      "C"
- * //  indexed$  "0: A"   "1: B"   "2: C"
+ * //  num$      1   3   4   6   7
+ * //  parity$   1       0       1
  * //
  * //  Explanation:
- * //  - mapWithIndex transforms each value along with its index
- * //  - Index starts at 0 and increments with each emission
+ * //  - map transforms each value
+ * //  - A result equal to the one held is not emitted
  *
- * const num$ = source<string>();
+ * const num$ = source<number>();
  *
- * const indexed$ = num$.pipe(map((x, i) => `${i}: ${x}`));
+ * const parity$ = num$.pipe(map((x) => x % 2));
  *
- * const valueHistory: string[] = [];
+ * const valueHistory: number[] = [];
  *
- * indexed$.subscribe((s) => {
- *   valueHistory.push(s);
+ * parity$.subscribe((p) => {
+ *   valueHistory.push(p);
  * });
  *
- * num$.next('A'); // 0: A
+ * num$.next(1); // 1
  *
- * num$.next('B'); // 1: B
+ * num$.next(3); // still 1: not emitted
  *
- * num$.next('C'); // 2: C
+ * num$.next(4); // 0
  *
- * assert.deepStrictEqual(valueHistory, ['0: A', '1: B', '2: C']);
+ * num$.next(6); // still 0: not emitted
+ *
+ * num$.next(7); // 1
+ *
+ * assert.deepStrictEqual(valueHistory, [1, 0, 1]);
  * ```
  */
 export const map = <A, B>(
-  mapFn: (x: A, index: SafeUint | -1) => B,
+  mapFn: (x: A) => B,
+  options?: Readonly<{ equals?: (x: B, y: B) => boolean }>,
 ): KeepInitialValueOperator<A, B> =>
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   ((parentObservable) =>
     new MapObservableClass(
       parentObservable,
       mapFn,
+      options?.equals ?? Object.is,
     )) as KeepInitialValueOperator<A, B>;
 
 /* implementation */
@@ -71,23 +84,22 @@ class MapObservableClass<A, B>
   extends SyncChildObservableClass<B, readonly [A]>
   implements MapOperatorObservable<A, B>
 {
-  readonly #mapFn: (x: A, index: SafeUint | -1) => B;
-  #mut_index: SafeUint | -1;
+  readonly #mapFn: (x: A) => B;
+  readonly #equals: (x: B, y: B) => boolean;
 
   constructor(
     parentObservable: Observable<A>,
-    mapFn: (x: A, index: SafeUint | -1) => B,
+    mapFn: (x: A) => B,
+    equals: (x: B, y: B) => boolean,
   ) {
     super({
       parents: [parentObservable],
-      initialValue: Optional.map(parentObservable.getSnapshot(), (x) =>
-        mapFn(x, -1),
-      ),
+      initialValue: Optional.map(parentObservable.getSnapshot(), mapFn),
     });
 
-    this.#mut_index = -1;
-
     this.#mapFn = mapFn;
+
+    this.#equals = equals;
 
     this.attach();
   }
@@ -101,10 +113,15 @@ class MapObservableClass<A, B>
       return; // skip update
     }
 
-    this.#mut_index =
-      this.#mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, this.#mut_index);
+    const next = this.#mapFn(sn.value);
 
-    this.setNext(this.#mapFn(sn.value, this.#mut_index), updateToken);
+    const held = this.getSnapshot();
+
+    if (Optional.isSome(held) && this.#equals(held.value, next)) {
+      return; // the result did not change
+    }
+
+    this.setNext(next, updateToken);
   }
 }
 
@@ -116,7 +133,7 @@ if (import.meta.vitest !== undefined) {
   {
     const s: Observable<number> = source<number>();
 
-    const _d1 = s.pipe(map((x, i) => x + i));
+    const _d1 = s.pipe(map((x) => x + 1));
 
     expectType<typeof _d1, Observable<number>>('=');
   }
@@ -126,7 +143,7 @@ if (import.meta.vitest !== undefined) {
 
     const m: InitializedObservable<number> = s.pipe(withInitialValue(0));
 
-    const _d = m.pipe(map((x, i) => x + i));
+    const _d = m.pipe(map((x) => x + 1));
 
     expectType<typeof _d, InitializedObservable<number>>('=');
   }

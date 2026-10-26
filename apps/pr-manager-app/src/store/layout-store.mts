@@ -14,7 +14,6 @@ import {
   createState,
   debounce,
   map,
-  skipIfNoChange,
   type InitializedObservable,
 } from 'synstate';
 import {
@@ -138,7 +137,7 @@ export const createLayoutStore = (deps: LayoutDeps): LayoutStore => {
 
   return {
     layout,
-    mode: layout.pipe(map((current) => current.mode)).pipe(skipIfNoChange()),
+    mode: layout.pipe(map((current) => current.mode)),
     resizing,
     settingsOpen,
     setColumns: (columns) => {

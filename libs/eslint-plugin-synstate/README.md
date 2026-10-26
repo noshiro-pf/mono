@@ -64,10 +64,30 @@ export default [
 
 ## Rules
 
-| Rule                          | Description                                                                                                                                                                    |
-| :---------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `no-unbounded-counter-pipe`   | Disallow calling `.pipe` directly on `counter(...)` when it has no `times` option. Nothing holds the counter, so nothing can complete it, and it never ends.                   |
-| `no-write-during-propagation` | Disallow writing to a synstate state or source from a subscriber or a projection. The write starts an update inside the one that called it, outside the graph synstate orders. |
+| Rule                             | Description                                                                                                                                                                    |
+| :------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `no-redundant-skip-if-no-change` | Disallow `skipIfNoChange()` directly after `map`, which already stops a result equal (`Object.is`) to the one it holds. Fixable.                                               |
+| `no-unbounded-counter-pipe`      | Disallow calling `.pipe` directly on `counter(...)` when it has no `times` option. Nothing holds the counter, so nothing can complete it, and it never ends.                   |
+| `no-write-during-propagation`    | Disallow writing to a synstate state or source from a subscriber or a projection. The write starts an update inside the one that called it, outside the graph synstate orders. |
+| `prefer-map-to`                  | Require `mapTo(c)` instead of `map(() => c)`. `map` stops a result equal to the one it holds, so a `map` to a constant emits once and never again. Fixable.                    |
+
+### `no-redundant-skip-if-no-change`
+
+`map` passes on a result only when it is not `Object.is` the one it holds, so
+`layout$.pipe(map((l) => l.mode)).pipe(skipIfNoChange())` compares every
+result twice and keeps one more observable for nothing. The rule removes the
+`.pipe(skipIfNoChange())`.
+
+Only `skipIfNoChange` (or `distinctUntilChanged`) given no comparison or
+`Object.is` is reported, piped directly onto `x.pipe(map(f))` where that `map`
+is given no `equals`: a comparison of its own may stop more than `Object.is`,
+a `map` with `equals` may pass equal results on, and an operator in between
+(`withInitialValue`) may emit a value `map` never compared. An observable
+reached through a name is not followed. Both operators are recognized imported
+from `synstate` by name, under an alias or through a namespace import, and read
+through `as`, `satisfies`, `!` and parentheses, which the fix keeps around the
+mapped observable. A comment inside the removed text leaves the report without
+a fix.
 
 ### `no-unbounded-counter-pipe`
 
@@ -136,6 +156,31 @@ covers a write in a function the callback merely defines (a `setTimeout`
 callback, which runs after the update, so it is correct), a setter passed as an
 argument or kept in an object, and a function imported from another file and
 called from the callback.
+
+### `prefer-map-to`
+
+`map` passes on a result only when it is not `Object.is` the one it holds, so
+that a derived value that did not change wakes nothing below it. A `map` that
+turns events into a constant — `click$.pipe(map(() => true))`,
+`reset$.pipe(map(() => 'reset' as const))` — therefore emits on the first event
+and on none after it. `mapTo(true)` emits on every one, and the rule rewrites
+the call to it, adding the import when the file has none.
+
+Only a body that is the same value every time it runs is reported, because
+`mapTo` evaluates its value once: a literal other than a regular expression, a
+template literal with no expression, `undefined`, a `const` or an import, or
+`-`, `+`, `!` or `void` of one of those. A body that calls something or builds
+an object or array is left alone; a new object each time is never equal, so
+such a `map` emits on every event already. A `map` given `equals` is left alone
+too, since its author has said how results compare. When the event maps to a
+value that can repeat but is not constant — a request mapped to the id it is
+for — give the `map` `{ equals: () => false }`; the rule cannot tell such a
+`map` from a derived state and does not report it.
+
+`map` is recognized imported from `synstate` by name, under an alias or
+through a namespace import, and the body is read through `as`, `satisfies`,
+`!` and parentheses, which the fix keeps. A callee in a type wrapper, or a file
+where `mapTo` names something else, is reported without a fix.
 
 ## License
 

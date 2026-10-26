@@ -1,4 +1,10 @@
-import { type InitializedObservable, combine, filter, map } from 'synstate';
+import {
+  combine,
+  filter,
+  type InitializedObservable,
+  map,
+  mapTo,
+} from 'synstate';
 import { Result } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { dict } from '../../constants/index.mjs';
@@ -37,7 +43,7 @@ const [, dispatchIsWaitingResponse, { state: isWaitingResponseState }] =
   createReducerWithActions(
     (_: boolean, isWaitingResponse: boolean) => isWaitingResponse,
     false,
-    [dialogClosed$.pipe(map(() => false))],
+    [dialogClosed$.pipe(mapTo(false))],
   );
 
 const setTrueIsWaitingResponse = (): void => {

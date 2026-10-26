@@ -1,9 +1,4 @@
-import {
-  combine,
-  map,
-  skipIfNoChange,
-  type InitializedObservable,
-} from 'synstate';
+import { combine, map, type InitializedObservable } from 'synstate';
 import { Arr, fastDeepEqual, Num, Optional } from 'ts-data-forge';
 import {
   arcContentBounds,
@@ -96,7 +91,7 @@ export const createDagCanvasScene = ({
     tileNodes,
   } = dagLayoutStore;
 
-  const arrangeable = mode.pipe(map(isArrangeable)).pipe(skipIfNoChange());
+  const arrangeable = mode.pipe(map(isArrangeable));
 
   const views = combine([dataStore.state, clockStore.now]).pipe(
     map(([state, now]) => buildNodeViews(state, now)),

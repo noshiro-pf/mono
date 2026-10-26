@@ -102,7 +102,7 @@ const reducer = <S,>(state: S, action: Action<S>): S => {
  *   { keepEqualParts: true },
  * );
  *
- * const summary = report.pipe(map((r) => r.summary)).pipe(skipIfNoChange());
+ * const summary = report.pipe(map((r) => r.summary));
  *
  * const summaryHistory: unknown[] = [];
  *

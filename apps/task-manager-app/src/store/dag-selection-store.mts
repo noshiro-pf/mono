@@ -13,6 +13,7 @@ import {
   empty,
   filter,
   map,
+  mapTo,
   merge,
   switchMap,
   withInitialValue,
@@ -55,9 +56,7 @@ export const createDagSelectionStore = (
   const dropped = started.pipe(
     switchMap((isStarted) =>
       isStarted
-        ? deps.active
-            .pipe(filter((active) => !active))
-            .pipe(map(() => NONE_CHOSEN))
+        ? deps.active.pipe(filter((active) => !active)).pipe(mapTo(NONE_CHOSEN))
         : empty<readonly GraphNodeId[]>(),
     ),
   );

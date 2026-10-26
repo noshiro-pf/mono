@@ -150,7 +150,7 @@ export type StateOptions<S> = Readonly<{
    * written, and every part of it deeply equal to the same part of the
    * current state is replaced by that part (`replaceEqualDeep` of
    * ts-data-forge): a reader of an unchanged part keeps the object it has, so
-   * `skipIfNoChange()` with `Object.is` stops it. When the whole next state is
+   * `map`, comparing with `Object.is`, stops there. When the whole next state is
    * deeply equal, the current state is kept and nothing is passed on, so
    * `equals` can stay `Object.is`.
    *
