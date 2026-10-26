@@ -1,7 +1,6 @@
 /** What `repo-settings/rulesets/main.json` asks of a pull request. */
 
-import type { components } from '@octokit/openapi-types';
-import { Arr, expectType, Json, Result } from 'ts-data-forge';
+import { Arr, Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 
 /** Where the ruleset is declared, relative to the repository root. */
@@ -126,29 +125,16 @@ const ConversationResolutionRuleSchema = t.record({
 });
 
 /**
- * Each rule as GitHub's API description types it, with the parameters it may
- * omit present: a rule of that shape has to be one the schema above accepts,
- * so a field read here that GitHub renames or retypes fails the type check.
+ * The rules as read: `ruleset.test.mts` checks each against GitHub's API
+ * description, so that a field read here that GitHub renames or retypes
+ * fails the type check.
  */
-type WithParameters<R extends Readonly<{ parameters?: unknown }>> = R &
-  Readonly<{ parameters: NonNullable<R['parameters']> }>;
+export type RequiredStatusChecksRule = t.TypeOf<
+  typeof RequiredStatusChecksRuleSchema
+>;
 
-type GitHubRule<
-  K extends
-    'repository-rule-pull-request' | 'repository-rule-required-status-checks',
-> = WithParameters<components['schemas'][K]>;
+export type CodeOwnerReviewRule = t.TypeOf<typeof CodeOwnerReviewRuleSchema>;
 
-expectType<
-  GitHubRule<'repository-rule-required-status-checks'>,
-  t.TypeOf<typeof RequiredStatusChecksRuleSchema>
->('<=');
-
-expectType<
-  GitHubRule<'repository-rule-pull-request'>,
-  t.TypeOf<typeof CodeOwnerReviewRuleSchema>
->('<=');
-
-expectType<
-  GitHubRule<'repository-rule-pull-request'>,
-  t.TypeOf<typeof ConversationResolutionRuleSchema>
->('<=');
+export type ConversationResolutionRule = t.TypeOf<
+  typeof ConversationResolutionRuleSchema
+>;

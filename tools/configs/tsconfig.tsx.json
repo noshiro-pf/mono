@@ -25,7 +25,7 @@
       "ts-codemod-lib": ["libs/ts-codemod-lib/src/entry-point.mts"],
       "ts-fortress": ["libs/ts-fortress/src/entry-point.mts"],
       "octokit-safe-types": ["libs/octokit-safe-types/src/entry-point.mts"],
-      "pr-report-core": ["apps/pr-report-core/src/index.mts"]
+      "pr-report-core": ["libs/pr-report-core/src/entry-point.mts"]
     }
   }
 }

@@ -140,7 +140,7 @@ public なので無認証でも動き、1回のレポートは匿名の 60 reque
 （<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`）はこの
 スクリプトの出力を読みません。ページは GitHub の GraphQL API を毎回自分で読み、
 判定（必須 context の verdict、`Merge-After:` の木、件数）はこのスクリプトと同じ
-`apps/pr-report-core` で下します。REST と GraphQL の2つの読み方があるのは、
+`libs/pr-report-core` で下します。REST と GraphQL の2つの読み方があるのは、
 Claude Code セッションのプロキシが GraphQL を拒否するためで、このスクリプトは
 そこでも動くよう REST のままです。
 
@@ -239,6 +239,6 @@ The **GitHub Pull Requests Manager** page
 (<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`) does
 not read this output. It reads GitHub's GraphQL API itself on every read, and
 reaches its verdicts, merge order and counts through the same
-`apps/pr-report-core` this script uses. There are two ways of reading because
+`libs/pr-report-core` this script uses. There are two ways of reading because
 a Claude Code session's proxy refuses GraphQL, and this script stays on REST
 so that it runs there too.

@@ -13,6 +13,13 @@ import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
 const thisDir = import.meta.dirname;
 
 export default [
+  {
+    ignores: [
+      // test/dist_/ has its own tsconfig and type-checks the built dist/
+      // output (see scripts/cmd/check-dist.mts).
+      'test/dist_/**',
+    ],
+  },
   ...eslintConfigForTypeScript({
     tsconfigRootDir: thisDir,
     tsconfigFileName: './tsconfig.json',
@@ -30,7 +37,16 @@ export default [
     files: ['scripts/**', 'configs/**'],
     rules: defineKnownRules({
       '@typescript-eslint/explicit-function-return-type': 'off',
+      'no-await-in-loop': 'off',
+      'import-x/no-internal-modules': 'off',
       'import-x/no-default-export': 'off',
+    }),
+  },
+
+  {
+    files: ['src/entry-point.mts'],
+    rules: defineKnownRules({
+      'no-restricted-imports': 'off',
     }),
   },
 

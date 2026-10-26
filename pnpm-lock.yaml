@@ -384,7 +384,7 @@ importers:
         version: 1.64.0
       pr-report-core:
         specifier: workspace:*
-        version: link:apps/pr-report-core
+        version: link:libs/pr-report-core
       prettier:
         specifier: 'catalog:'
         version: 3.9.9
@@ -1887,7 +1887,7 @@ importers:
     dependencies:
       pr-report-core:
         specifier: workspace:*
-        version: link:../pr-report-core
+        version: link:../../libs/pr-report-core
       synstate:
         specifier: workspace:*
         version: link:../../libs/synstate
@@ -1937,64 +1937,6 @@ importers:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
-      tsx:
-        specifier: 'catalog:'
-        version: 4.23.15
-      vite:
-        specifier: 'catalog:'
-        version: 8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
-      vitest:
-        specifier: 'catalog:'
-        version: 5.0.3(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
-
-  apps/pr-report-core:
-    dependencies:
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
-      ts-fortress:
-        specifier: workspace:*
-        version: link:../../libs/ts-fortress
-    devDependencies:
-      '@octokit/openapi-types':
-        specifier: ^29.0.1
-        version: 29.0.1
-      '@types/node':
-        specifier: 'catalog:'
-        version: 26.6.4
-      '@vitest/coverage-v8':
-        specifier: 'catalog:'
-        version: 5.0.3(@vitest/browser@5.0.3)(vitest@5.0.3)
-      dedent:
-        specifier: 'catalog:'
-        version: 1.7.2(babel-plugin-macros@3.1.0)
-      eslint:
-        specifier: 'catalog:'
-        version: 10.12.0(jiti@2.7.0)(supports-color@7.2.0)
-      eslint-config-typed:
-        specifier: workspace:*
-        version: link:../../libs/eslint-config-typed
-      eslint-plugin-ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/eslint-plugin-ts-data-forge
-      eslint-plugin-ts-fortress:
-        specifier: workspace:*
-        version: link:../../libs/eslint-plugin-ts-fortress
-      eslint-plugin-ts-type-forge:
-        specifier: workspace:*
-        version: link:../../libs/eslint-plugin-ts-type-forge
-      npm-run-all2:
-        specifier: 'catalog:'
-        version: 9.0.3
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.9
-      prettier-plugin-organize-imports:
-        specifier: 'catalog:'
-        version: 4.3.0(prettier@3.9.9)(typescript@6.0.3)
-      prettier-plugin-packagejson:
-        specifier: 'catalog:'
-        version: 3.0.2(prettier@3.9.9)
       tsx:
         specifier: 'catalog:'
         version: 4.23.15
@@ -4126,6 +4068,79 @@ importers:
       typescript-native:
         specifier: npm:typescript@7.0.2
         version: typescript@7.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.3(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+
+  libs/pr-report-core:
+    dependencies:
+      ts-data-forge:
+        specifier: workspace:^
+        version: link:../ts-data-forge
+      ts-fortress:
+        specifier: workspace:^
+        version: link:../ts-fortress
+    devDependencies:
+      '@octokit/openapi-types':
+        specifier: ^29.0.1
+        version: 29.0.1
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.4
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 5.0.3(@vitest/browser@5.0.3)(vitest@5.0.3)
+      cspell:
+        specifier: 'catalog:'
+        version: 10.3.6
+      dedent:
+        specifier: 'catalog:'
+        version: 1.7.2(babel-plugin-macros@3.1.0)
+      eslint:
+        specifier: 'catalog:'
+        version: 10.12.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
+      jiti:
+        specifier: 'catalog:'
+        version: 2.7.0
+      npm-run-all2:
+        specifier: 'catalog:'
+        version: 9.0.3
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.9
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.9)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.9)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
+      tsx:
+        specifier: 'catalog:'
+        version: 4.23.15
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      typescript-native:
+        specifier: npm:typescript@7.0.2
+        version: typescript@7.0.2
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.0.3(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))

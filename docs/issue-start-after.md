@@ -146,7 +146,7 @@ GitHub の依存関係は issue 同士しか結べないので、pull request �
 
 ## 実装
 
-- 解析は `apps/pr-report-core` にあり、`Merge-After:` と共有する
+- 解析は `libs/pr-report-core` にあり、`Merge-After:` と共有する
   （`merge-after.mts` の `parseStartAfter`）。`other/repo#5` は同じリポジトリの
   `#5` と読まない。
 - 判定は `start-after.mts`（`decideStartStates`、`withProgress`、

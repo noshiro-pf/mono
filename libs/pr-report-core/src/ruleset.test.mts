@@ -1,5 +1,38 @@
-import { Result } from 'ts-data-forge';
-import { parseRuleset, requirementsOfRules } from './ruleset.mjs';
+import type { components } from '@octokit/openapi-types';
+import { expectType, Result } from 'ts-data-forge';
+import {
+  parseRuleset,
+  requirementsOfRules,
+  type CodeOwnerReviewRule,
+  type ConversationResolutionRule,
+  type RequiredStatusChecksRule,
+} from './ruleset.mjs';
+
+/**
+ * Each rule as GitHub's API description types it, with the parameters it may
+ * omit present: a rule of that shape has to be one the schema accepts.
+ */
+type WithParameters<R extends Readonly<{ parameters?: unknown }>> = R &
+  Readonly<{ parameters: NonNullable<R['parameters']> }>;
+
+type GitHubRule<
+  K extends
+    'repository-rule-pull-request' | 'repository-rule-required-status-checks',
+> = WithParameters<components['schemas'][K]>;
+
+expectType<
+  GitHubRule<'repository-rule-required-status-checks'>,
+  RequiredStatusChecksRule
+>('<=');
+
+expectType<GitHubRule<'repository-rule-pull-request'>, CodeOwnerReviewRule>(
+  '<=',
+);
+
+expectType<
+  GitHubRule<'repository-rule-pull-request'>,
+  ConversationResolutionRule
+>('<=');
 
 describe(parseRuleset, () => {
   test('reads the required contexts and the review rules', () => {
