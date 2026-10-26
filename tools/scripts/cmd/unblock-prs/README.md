@@ -502,11 +502,31 @@ round のものとして、round が終わるまで待ちます。`open-pr` が�
 #### 4a. fixer の差分だけで落ちたなら直す
 
 watch が `checks-failed` で終わったら、その head の check run を集約 job の下の
-matrix の job まで読みます。失敗した job が **すべて** `code-check (X)` か
+matrix の job まで読みます。どの失敗なら直せるか、何を実行すれば直るかはリポジ
+トリの `.github/unblock-prs.json` の `autoFix` が決めます（スキーマは
+`config.mts` から `gen:unblock-prs-schema` が生成する
+[`config.schema.json`](./config.schema.json)）。ファイルが無いか `autoFix` が無
+ければ自動修正はせず、キュー、rebase、`Merge-After:`、stack、見送りコメントは
+そのまま動きます。ラベル名、`Merge-After:`、version PR のブランチ名
+（`changeset-release/<base>`）は PR Manager のページも読む規約なので、設定には
+しません。
+
+| キー      | 意味                                                                                                   |
+| :-------- | :----------------------------------------------------------------------------------------------------- |
+| `ignore`  | 失敗していても読まない context の正規表現（集約 job など）                                             |
+| `before`  | 常に最初に実行するコマンド（install）                                                                  |
+| `prepare` | 直す context が `context` に一致したときだけ、`before` の後に1回実行するコマンド（build）              |
+| `fixers`  | 残りの失敗はすべて、どれかの `context` に一致しなければならない。最初に一致したものの `run` を実行する |
+| `after`   | 常に最後に実行するコマンド（フォーマッタ）                                                             |
+
+`run` の `$1`〜`$9` は `context` のキャプチャで、シェル用にクォートして埋め込み
+ます。`fixers` は `stage` の小さい順、同じ `stage` ならコマンド順に実行します。
+
+このリポジトリの設定では、失敗した job が **すべて** `code-check (X)` か
 `style-check (X)` で、`X` が `fix:` か `gen:` のコマンド（`ws:` /
-`strict-lib:` 付きも含む）なら、それはコマンドがファイルを書き換えただけの失敗
-です。どの job も最後に `z:assert-repo-is-clean` を実行するからです。その場合
-に限り、次のことをします。
+`strict-lib:` 付きも含む）なら直します。どの job も最後に
+`z:assert-repo-is-clean` を実行するので、それはコマンドがファイルを書き換えた
+だけの失敗だからです。その場合に限り、次のことをします。
 
 1. 使い捨ての worktree で `pnpm install --frozen-lockfile` し、CI がビルドする
    entry（`code-check` のすべてと `ws:gen`）があれば `ws:build` を実行します。
@@ -524,6 +544,7 @@ matrix の job まで読みます。失敗した job が **すべて** `code-che
 次の場合は何もせず、理由をログに出して従来通り `checks-failed` として見送り
 ます。
 
+- リポジトリに `autoFix` の設定が無い。
 - 失敗した job に1つでも fixer 以外がある（型、テスト、`ws:doc`、
   `Validate commit count` など）。push しても落ちるマトリクスを1回走らせるだけ
   なので、全体を skill に任せます。
@@ -733,6 +754,7 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `release.mts`           | 解放されている PR を1本に保つ                                 |
 | `watch.mts`             | 1本をマージまでポーリング                                     |
 | `auto-fix.mts`          | fixer の差分だけの失敗を直して push                           |
+| `config.mts`            | `.github/unblock-prs.json` を読む                             |
 | `quiet.mts`             | 何もない時にどれだけ待つか                                    |
 | `checks.mts`            | マージが何を待っているか                                      |
 | `claims.mts`            | セッションの claim のうち有効なもの                           |
@@ -1298,11 +1320,32 @@ been superseded looks like for a moment.
 #### 4a. Fix a failure that is only a fixer's diff
 
 When the watch ends in `checks-failed`, the head's check runs are read down to
-the matrix jobs under the aggregates. If **every** job that failed is a
-`code-check (X)` or `style-check (X)` entry whose `X` is a `fix:` or `gen:`
-command (under `ws:` or `strict-lib:` too), the failure is the command having
-rewritten files, because every job ends with `z:assert-repo-is-clean`. Then,
-and only then:
+the matrix jobs under the aggregates. Which failures can be fixed, and what
+fixes each, is the repository's `.github/unblock-prs.json`, under `autoFix`
+(schema: [`config.schema.json`](./config.schema.json), generated from
+`config.mts` by `gen:unblock-prs-schema`). Without the file, or
+without `autoFix` in it, nothing is fixed, and the queue, rebasing,
+`Merge-After:`, stacks and set-aside comments work as ever. The label names,
+`Merge-After:` and the version pull request's branch
+(`changeset-release/<base>`) are conventions the PR Manager page reads too, so
+they are not configured.
+
+| Key       | Meaning                                                                                       |
+| :-------- | :-------------------------------------------------------------------------------------------- |
+| `ignore`  | regular expressions for failed contexts that are not read (aggregates)                        |
+| `before`  | commands run first, always (an install)                                                       |
+| `prepare` | commands run once after `before` when a context being fixed matches `context` (a build)       |
+| `fixers`  | every other failure has to match one `context`; the first that matches gives the `run` to run |
+| `after`   | commands run last, always (a formatter)                                                       |
+
+In `run`, `$1` to `$9` are `context`'s capture groups, shell-quoted. Fixers run
+by `stage`, lowest first, and within a stage by command.
+
+This repository's configuration fixes a failure when **every** job that failed
+is a `code-check (X)` or `style-check (X)` entry whose `X` is a `fix:` or
+`gen:` command (under `ws:` or `strict-lib:` too): every job ends with
+`z:assert-repo-is-clean`, so the failure is the command having rewritten
+files. Then, and only then:
 
 1. In a throwaway worktree, `pnpm install --frozen-lockfile`, and `ws:build`
    when CI builds for one of the entries (every `code-check` entry, and
@@ -1320,6 +1363,7 @@ and only then:
 Nothing is done, and the pull request is set aside as `checks-failed` as
 before with the reason logged, when:
 
+- The repository configures no `autoFix`.
 - Any failed job is not a fixer (types, tests, `ws:doc`, `Validate commit
 count`, …). Pushing would run a matrix that fails anyway, so the whole of it
   is left to the skill.
@@ -1540,6 +1584,7 @@ the pull request the other's and nobody moved it (#2267).
 | `release.mts`           | holding the queue to one released pull request                |
 | `watch.mts`             | polling one pull request until it merges, or will not         |
 | `auto-fix.mts`          | fixing and pushing a failure that is only a fixer's diff      |
+| `config.mts`            | reading `.github/unblock-prs.json`                            |
 | `quiet.mts`             | how long to sleep when there is nothing to do                 |
 | `checks.mts`            | what the merge is waiting for                                 |
 | `claims.mts`            | the claims sessions wrote that still hold                     |

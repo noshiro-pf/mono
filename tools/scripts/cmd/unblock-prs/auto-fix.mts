@@ -8,16 +8,19 @@
  * entry of the check matrices fails by _changing_ files rather than by
  * reporting anything, and the fix is to run the same command and commit what
  * it wrote. That much is mechanical; everything else a failing check asks for
- * is the skill's, or a person's, and is left to them.
+ * is the skill's, or a person's, and is left to them. Which jobs are shaped
+ * like that, and what reproduces each, is the repository's to say
+ * (`config.mts`).
  */
 
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { statesFromCheckRuns, type ContextState } from 'pr-report-core';
-import { Arr, Result } from 'ts-data-forge';
+import { Arr, Num, Result } from 'ts-data-forge';
 import type { ApiContext } from '../../lib/github-api.mjs';
 import { log } from '../../lib/log.mjs';
 import { git, sh } from '../../lib/shell.mjs';
+import { CONFIG_PATH, type AutoFixConfig } from './config.mjs';
 import { listCheckRuns, remoteSha, removeWorktree } from './github.mjs';
 import type { AutoFixed, PullRequest } from './types.mjs';
 import { lastLines, stopRequested } from './util.mjs';
@@ -44,6 +47,7 @@ export const autoFix = async (
   pr: PullRequest,
   head: string,
   defaultBranch: string,
+  config: AutoFixConfig | undefined,
 ): Promise<AutoFixed> => {
   const runs = await listCheckRuns(api, head);
 
@@ -51,7 +55,7 @@ export const autoFix = async (
     return declined(`cannot read the check runs: ${runs.value}`);
   }
 
-  const plan = planAutoFix(statesFromCheckRuns(runs.value));
+  const plan = planAutoFix(statesFromCheckRuns(runs.value), config);
 
   if (Result.isErr(plan)) {
     return declined(plan.value);
@@ -110,34 +114,40 @@ export const autoFix = async (
 /**
  * What to run for the jobs that failed, or why nothing is to be run.
  *
- * `states` is every context on the head commit. A failed aggregate
- * (`*-result / result`) is only the echo of a job that failed under it, so it
- * is not read; every other failure has to be a `code-check (X)` or
- * `style-check (X)` entry whose `X` is a fixer. Those two matrices run
- * `pnpm run X` at the root and then assert a clean tree, so running `X` is
- * the whole of what reproduces them — the other workflows' jobs are not
- * shaped like that.
- *
- * A fixer is what the script prefixes say writes the tree: `fix:` and `gen:`
- * (`CLAUDE.md`, "Commands"), under `ws:` or `strict-lib:` as well. `ws:doc`
- * writes too, but what it writes is untracked; a tree it leaves dirty is a
- * generator it calls, and running it to find out takes ten minutes.
+ * `states` is every context on the head commit. A failed context the
+ * configuration ignores (an aggregate, only the echo of a job that failed
+ * under it) is not read; every other failure has to match one of its fixers,
+ * whose command is the whole of what reproduces the job — a job that runs a
+ * command and then asserts a clean tree. `config` is the repository's
+ * (`config.mts`); without one nothing is fixed.
  */
 export const planAutoFix = (
   states: ReadonlyMap<string, ContextState>,
+  config: AutoFixConfig | undefined,
 ): Result<AutoFixPlan, string> => {
+  if (config === undefined) {
+    return Result.err(`the repository has no autoFix in ${CONFIG_PATH}`);
+  }
+
   const failed = Array.from(states)
-    .filter(([name, state]) => state === 'failed' && !AGGREGATE.test(name))
+    .filter(
+      ([name, state]) =>
+        state === 'failed' &&
+        config.ignore.every((pattern) => !pattern.test(name)),
+    )
     .map(([name]) => name);
 
   if (!Arr.isNonEmpty(failed)) {
-    return Result.err('no job failed apart from the aggregates');
+    return Result.err('no job failed apart from the ignored ones');
   }
 
-  const entries = failed.map((name) => ({ name, entry: fixerEntry(name) }));
+  const entries = failed.map((name) => ({
+    name,
+    fixer: fixerFor(name, config),
+  }));
 
   const others = entries
-    .filter(({ entry }) => entry === undefined)
+    .filter(({ fixer }) => fixer === undefined)
     .map(({ name }) => name);
 
   if (Arr.isNonEmpty(others)) {
@@ -147,32 +157,38 @@ export const planAutoFix = (
   }
 
   const fixers = entries
-    .map(({ entry }) => entry)
-    .filter((entry) => entry !== undefined);
+    .map(({ fixer }) => fixer)
+    .filter((fixer) => fixer !== undefined);
 
   return Result.ok({
-    commands: fixers
-      .map(({ command }) => command)
-      .toSorted((a, b) =>
-        stageOf(a) === stageOf(b)
-          ? a.localeCompare(b)
-          : stageOf(a) - stageOf(b),
-      ),
-    // CI builds before every `code-check` entry (the matrix unpacks the
-    // `build` job's `dist/`) and before `style-check`'s `ws:gen`, whose
-    // generators import workspace siblings through their `exports`.
-    build: fixers.some(
-      ({ workflow, command }) =>
-        workflow === 'code-check' || command === 'ws:gen',
+    before: config.before,
+    prepare: Arr.uniq(
+      config.prepare
+        .filter(({ context }) => failed.some((name) => context.test(name)))
+        .map(({ run }) => run),
     ),
+    commands: Arr.uniq(
+      fixers
+        .toSorted((a, b) =>
+          a.stage === b.stage
+            ? a.command.localeCompare(b.command)
+            : a.stage - b.stage,
+        )
+        .map(({ command }) => command),
+    ),
+    after: config.after,
   });
 };
 
 export type AutoFixPlan = Readonly<{
-  /** Generators first, formatters last. */
+  /** What runs first, always. */
+  before: readonly string[];
+  /** What the failed jobs were given before they ran, each once. */
+  prepare: readonly string[];
+  /** The fixers, by stage. */
   commands: readonly string[];
-  /** Whether `ws:build` has to run before them. */
-  build: boolean;
+  /** What settles their output. */
+  after: readonly string[];
 }>;
 
 /**
@@ -185,38 +201,36 @@ export type AutoFixPlan = Readonly<{
  */
 const WORKTREE_ROOT = path.join(os.homedir(), '.local', 'state', 'unblock-prs');
 
-const AGGREGATE = /^[\w-]+-result \/ result$/u;
-
-const MATRIX_ENTRY = /^(code-check|style-check) \((.+)\)$/u;
-
-const FIXER = /^(?:(?:ws|strict-lib):)?(?:fix|gen)(?::|$)/u;
-
-const fixerEntry = (
+/**
+ * The first fixer `name` matches, with its command: `$1` to `$9` replaced by
+ * the capture groups, shell-quoted, since a context's name is whatever the
+ * job that reported it chose.
+ */
+const fixerFor = (
   name: string,
-): Readonly<{ workflow: string; command: string }> | undefined => {
-  const matched = MATRIX_ENTRY.exec(name);
+  config: AutoFixConfig,
+): Readonly<{ command: string; stage: number }> | undefined => {
+  const matched = config.fixers
+    .map((candidate) => ({ candidate, groups: candidate.context.exec(name) }))
+    .find((entry) => entry.groups !== null);
 
-  if (matched === null) {
+  const fixer = matched?.candidate;
+
+  const groups = matched?.groups ?? undefined;
+
+  if (fixer === undefined || groups === undefined) {
     return undefined;
   }
 
-  const [, workflow, command] = matched;
-
-  return workflow !== undefined && command !== undefined && FIXER.test(command)
-    ? { workflow, command }
-    : undefined;
+  return {
+    command: fixer.run.replaceAll(/\$([1-9])/gu, (_, index: string) =>
+      sh(
+        groups[Result.unwrapOkOr(Num.safeParseFloat(index), Number.NaN)] ?? '',
+      ),
+    ),
+    stage: fixer.stage,
+  };
 };
-
-/**
- * Generators write sources the others read, and formatters settle what the
- * others wrote; everything else runs between them.
- */
-const stageOf = (command: string): number =>
-  /(?:^|:)gen(?::|$)/u.test(command)
-    ? 0
-    : /(?:^|:)fix:fmt(?::|$)/u.test(command)
-      ? 2
-      : 1;
 
 const declined = (detail: string): AutoFixed =>
   ({ kind: 'declined', detail }) as const;
@@ -249,13 +263,10 @@ const fixInWorktree = async (
   }
 
   const steps = [
-    'pnpm install --frozen-lockfile',
-    ...(plan.build ? (['pnpm run ws:build'] as const) : ([] as const)),
-    ...plan.commands.map((command) => `pnpm run ${sh(command)}`),
-    // What the fixers wrote, formatted as `fmt` would format it on a
-    // person's machine. Prettier only: `strict-lib/` is oxfmt's, and none of
-    // the fixers but `strict-lib:fix:fmt` itself writes there.
-    'pnpm run fix:fmt:diff',
+    ...plan.before,
+    ...plan.prepare,
+    ...plan.commands,
+    ...plan.after,
   ] as const;
 
   for (const step of steps) {

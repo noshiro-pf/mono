@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "unblock-prs configuration",
+  "description": "What a repository says about itself in .github/unblock-prs.json: the parts of an unblock-prs run that depend on how its CI is laid out. Labels, Merge-After: and the version pull request's branch are fixed conventions, not set here.",
+  "type": "object",
+  "properties": {
+    "$schema": { "type": "string" },
+    "autoFix": {
+      "description": "How to fix a failure that is only a fixer's diff: a job that runs a command and then asserts a clean tree. Absent: a failure is never fixed, only reported.",
+      "type": "object",
+      "properties": {
+        "ignore": {
+          "description": "Regular expressions for failed contexts that are only the echo of another, such as an aggregate job, and are not read.",
+          "type": "array",
+          "items": { "type": "string", "format": "regex" }
+        },
+        "before": {
+          "description": "Commands run first, always: what CI does before any job (an install).",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "prepare": {
+          "description": "Commands run after `before` when a context being fixed matches `context`, each command once: what CI gives some jobs and not others (a build).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "context": { "type": "string", "format": "regex" },
+              "run": { "type": "string" }
+            },
+            "required": ["context", "run"],
+            "additionalProperties": false
+          }
+        },
+        "fixers": {
+          "description": "Every failed context not ignored has to match one of these, the first that matches deciding, or nothing is fixed.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "context": {
+                "description": "A regular expression for the failed context's name.",
+                "type": "string",
+                "format": "regex"
+              },
+              "run": {
+                "description": "The command, where $1 to $9 are the context's capture groups, shell-quoted.",
+                "type": "string"
+              },
+              "stage": {
+                "description": "Lower stages run first, and within a stage by command.",
+                "type": "number"
+              }
+            },
+            "required": ["context", "run", "stage"],
+            "additionalProperties": false
+          }
+        },
+        "after": {
+          "description": "Commands run last, always: settling what the fixers wrote (a formatter).",
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["ignore", "before", "prepare", "fixers", "after"],
+      "additionalProperties": false
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

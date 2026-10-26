@@ -1,6 +1,15 @@
 import type { ContextState } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
 import { planAutoFix } from './auto-fix.mjs';
+import { readConfig } from './config.mjs';
+
+// The repository's own `.github/unblock-prs.json`: these tests are what its
+// rules mean for the matrices it has.
+const config = await readConfig().then((read) =>
+  Result.isOk(read) ? read.value?.autoFix : undefined,
+);
+
+const build = 'pnpm run ws:build';
 
 const states = (
   entries: readonly (readonly [string, ContextState])[],
@@ -15,13 +24,16 @@ describe('planAutoFix', () => {
         ['code-check-result / result', 'failed'],
         ['style-check (fix:fmt:full)', 'passed'],
       ]),
+      config,
     );
 
     assert.isTrue(Result.isOk(plan));
 
     assert.deepStrictEqual(plan.value, {
-      commands: ['fix:codemod:full'],
-      build: true,
+      before: ['pnpm install --frozen-lockfile'],
+      prepare: [build],
+      commands: ["pnpm run 'fix:codemod:full'"],
+      after: ['pnpm run fix:fmt:diff'],
     });
   });
 
@@ -32,22 +44,24 @@ describe('planAutoFix', () => {
         ['style-check (strict-lib:fix:fmt)', 'failed'],
         ['style-check-result / result', 'failed'],
       ]),
+      config,
     );
 
     assert.isTrue(Result.isOk(formatOnly));
 
-    assert.isFalse(formatOnly.value.build);
+    assert.deepStrictEqual(formatOnly.value.prepare, []);
 
     const generated = planAutoFix(
       states([
         ['style-check (ws:gen)', 'failed'],
         ['style-check (gen:deps-graph)', 'failed'],
       ]),
+      config,
     );
 
     assert.isTrue(Result.isOk(generated));
 
-    assert.isTrue(generated.value.build);
+    assert.deepStrictEqual(generated.value.prepare, [build]);
   });
 
   test('runs generators first and formatters last', () => {
@@ -60,17 +74,18 @@ describe('planAutoFix', () => {
         ['code-check (fix:codemod:full)', 'failed'],
         ['style-check (gen:license-files)', 'failed'],
       ]),
+      config,
     );
 
     assert.isTrue(Result.isOk(plan));
 
     assert.deepStrictEqual(plan.value.commands, [
-      'gen:license-files',
-      'ws:gen',
-      'fix:codemod:full',
-      'ws:fix:lint',
-      'fix:fmt:full',
-      'strict-lib:fix:fmt',
+      "pnpm run 'gen:license-files'",
+      "pnpm run 'ws:gen'",
+      "pnpm run 'fix:codemod:full'",
+      "pnpm run 'ws:fix:lint'",
+      "pnpm run 'fix:fmt:full'",
+      "pnpm run 'strict-lib:fix:fmt'",
     ]);
   });
 
@@ -81,6 +96,7 @@ describe('planAutoFix', () => {
         ['code-check (ws:check:types)', 'failed'],
         ['code-check-result / result', 'failed'],
       ]),
+      config,
     );
 
     assert.isTrue(Result.isErr(plan));
@@ -96,7 +112,7 @@ describe('planAutoFix', () => {
     ['a job of another workflow', 'Validate commit count'],
     ['a matrix entry of another workflow', 'test-node-versions (fix:x)'],
   ] as const)('declines %s', (_, name) => {
-    const plan = planAutoFix(states([[name, 'failed']]));
+    const plan = planAutoFix(states([[name, 'failed']]), config);
 
     assert.isTrue(Result.isErr(plan));
 
@@ -109,6 +125,7 @@ describe('planAutoFix', () => {
         ['code-check (fix:codemod:full)', 'passed'],
         ['code-check-result / result', 'failed'],
       ]),
+      config,
     );
 
     assert.isTrue(Result.isErr(plan));
@@ -121,10 +138,22 @@ describe('planAutoFix', () => {
         ['code-check (ws:check:types)', 'pending'],
         ['code-check (ws:check:e2e)', 'skipped'],
       ]),
+      config,
     );
 
     assert.isTrue(Result.isOk(plan));
 
-    assert.deepStrictEqual(plan.value.commands, ['fix:fmt:full']);
+    assert.deepStrictEqual(plan.value.commands, ["pnpm run 'fix:fmt:full'"]);
+  });
+
+  test('declines everything where the repository configures no auto-fix', () => {
+    const plan = planAutoFix(
+      states([['style-check (fix:fmt:full)', 'failed']]),
+      undefined,
+    );
+
+    assert.isTrue(Result.isErr(plan));
+
+    expect(plan.value).toContain('.github/unblock-prs.json');
   });
 });
