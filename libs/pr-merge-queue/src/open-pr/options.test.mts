@@ -10,6 +10,7 @@ const defaults: Options = {
   bodyFile: undefined,
   base: undefined,
   mergeAfter: [],
+  mergeBefore: [],
   dryRun: false,
 } as const;
 
@@ -53,6 +54,26 @@ describe(parseOptions, () => {
 
   test('refuses a `--merge-after` that is not a pull request number', () => {
     assert.isTrue(Result.isErr(parsed('--merge-after', 'later')));
+  });
+
+  test('accepts `--merge-before` once per successor, with or without a `#`', () => {
+    assert.deepStrictEqual(
+      Result.unwrapOk(
+        parsed('--merge-before', '#1905', '--merge-before', '1907'),
+      ),
+      { ...defaults, mergeBefore: [1905, 1907] },
+    );
+  });
+
+  test('refuses a `--merge-before` that is not a pull request number', () => {
+    assert.isTrue(Result.isErr(parsed('--merge-before', 'soon')));
+  });
+
+  // Both at once is a cycle of two, which nothing would ever merge.
+  test('refuses a pull request named as both predecessor and successor', () => {
+    assert.isTrue(
+      Result.isErr(parsed('--merge-after', '1905', '--merge-before', '#1905')),
+    );
   });
 
   // `unblock-prs` passes a draft over, so the option that would ask for one

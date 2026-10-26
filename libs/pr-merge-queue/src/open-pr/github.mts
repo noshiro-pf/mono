@@ -2,9 +2,11 @@
 
 import dedent from 'dedent';
 import {
+  BLOCKS_RELEASE_LABEL,
   closingKeywordIssuesIn,
   inheritStartAfter,
   isSafeRefName,
+  isVersionBranch,
   parseMergeAfter,
   waitsFor,
 } from 'pr-report-core';
@@ -342,6 +344,42 @@ export const missingInheritedOrder = async (
     ),
   });
 };
+
+/**
+ * The body of `prNumber`, to have a `Merge-After:` written into it for
+ * `--merge-before`: an open pull request, and not the version pull request,
+ * whose body `changesets/action` rewrites on every push to the default
+ * branch — `blocks-release`, on this one, is how the release is held.
+ */
+export const readSuccessor = async (
+  api: ApiContext,
+  prNumber: number,
+  defaultBranch: string,
+): Promise<Result<string, string>> => {
+  const read = await rest(api, 'GET', `/pulls/${prNumber}`, SuccessorSchema);
+
+  if (Result.isErr(read)) {
+    return Result.err(`cannot read #${prNumber}: ${read.value}`);
+  }
+
+  const { state, body, head } = read.value;
+
+  return state !== 'open'
+    ? Result.err(
+        `#${prNumber} is ${state}; --merge-before names an open pull request`,
+      )
+    : isVersionBranch(head.ref, defaultBranch)
+      ? Result.err(
+          `#${prNumber} is the version pull request, whose body is rewritten on every push; label this one ${BLOCKS_RELEASE_LABEL} instead`,
+        )
+      : Result.ok(body ?? '');
+};
+
+const SuccessorSchema = t.record({
+  state: t.string(),
+  body: t.union([t.string(), t.nullType]),
+  head: t.record({ ref: t.string() }),
+});
 
 export const updateBody = async (
   api: ApiContext,
