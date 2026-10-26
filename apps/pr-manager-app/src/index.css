@@ -1072,6 +1072,52 @@ a:focus-visible {
   justify-content: space-between;
 }
 
+/* --- how to use ---------------------------------------------------------- */
+
+.how-to-use {
+  font-size: 0.9375rem;
+  max-width: min(40rem, 92vw);
+  line-height: 1.5;
+}
+
+.how-to-use-lead {
+  color: var(--ink-secondary);
+  margin: 0 0 1rem;
+}
+
+.how-to-use-section {
+  margin: 0 0 1rem;
+}
+
+.how-to-use-heading {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0 0 0.35rem;
+}
+
+.how-to-use-list {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.how-to-use-list > li {
+  margin: 0.25rem 0;
+}
+
+.how-to-use code {
+  background: var(--plane);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  padding: 0 0.25rem;
+  white-space: nowrap;
+}
+
+.how-to-use-actions {
+  justify-content: flex-end;
+}
+
 /* --- the week's activity ------------------------------------------------- */
 
 .weekly-activity {

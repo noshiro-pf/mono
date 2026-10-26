@@ -61,7 +61,7 @@ token account's budget, and stops while the tab is hidden.
 ## What your repository can add
 
 The page is useful on any repository as it is. These conventions, all
-optional, make it say more:
+optional, make it say more; **How to use** in the header sums them up:
 
 | Write this                                                                      | and the page                                      |
 | :------------------------------------------------------------------------------ | :------------------------------------------------ |
