@@ -4,7 +4,7 @@ import type { ArrayElement, StrictOmit, UnknownRecord } from 'ts-type-forge';
 import {
   type ExcessPropertyOption,
   flattenShapeStructure,
-  hasRecordInternals,
+  recordViewOf,
   type Type,
   type TypeOf,
 } from '../type.mjs';
@@ -25,11 +25,13 @@ export const omit = <
     }>
   >,
 ): OmittedType<R, KeysToOmit> => {
-  if (!hasRecordInternals(recordType)) {
+  const view = recordViewOf(recordType);
+
+  if (view === undefined) {
     panic(`Expected a record type but received: ${recordType.typeName}`);
   }
 
-  const shape = flattenShapeStructure(recordType.shapeStructure);
+  const shape = flattenShapeStructure(view.shapeStructure);
 
   if (shape === undefined) {
     panic(
@@ -43,7 +45,7 @@ export const omit = <
       options?.typeName ??
       `Omit<${recordType.typeName}, ${toUnionKeyString(keysToOmit)}>`,
 
-    excessProperty: options?.excessProperty ?? recordType.excessProperty,
+    excessProperty: options?.excessProperty ?? view.excessProperty,
   }) as unknown as OmittedType<R, KeysToOmit>;
 };
 

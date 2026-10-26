@@ -10,8 +10,8 @@ import {
 import { undefinedType } from '../primitives/index.mjs';
 import {
   expandShapeStructure,
-  hasRecordInternals,
-  hasTupleInternals,
+  recordViewOf,
+  tupleElementTypesOf,
   type Type,
   type TypeOf,
   type UnknownShape,
@@ -116,11 +116,13 @@ export function at(
 ): Type<unknown> {
   // --- Tuple index access ---
   if (typeof keyOrIndex === 'number') {
-    if (!hasTupleInternals(type)) {
+    const elementTypes = tupleElementTypesOf(type);
+
+    if (elementTypes === undefined) {
       panic(`Expected a tuple type but received: ${type.typeName}`);
     }
 
-    const elementType = type.elementTypes[keyOrIndex];
+    const elementType = elementTypes[keyOrIndex];
 
     if (elementType === undefined) {
       panic(
@@ -132,11 +134,13 @@ export function at(
   }
 
   // --- Record key access ---
-  if (!hasRecordInternals(type)) {
+  const view = recordViewOf(type);
+
+  if (view === undefined) {
     panic(`Expected a record type but received: ${type.typeName}`);
   }
 
-  const shapes = expandShapeStructure(type.shapeStructure);
+  const shapes = expandShapeStructure(view.shapeStructure);
 
   const memberTypes: readonly Type<unknown>[] = Arr.generate(function* () {
     for (const shape of shapes) {

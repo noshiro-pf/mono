@@ -17,7 +17,6 @@ import type {
 } from 'ts-type-forge';
 import type {
   ExcessPropertyOption,
-  RecordTypeInternals,
   Type,
   TypeOf,
   UnknownShape,
@@ -219,11 +218,8 @@ export const record = <
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
     shape,
-    shapeStructure: { kind: 'simple', shape } as const,
-    excessProperty: ep,
     structure: { kind: 'record', shape, excessProperty: ep },
-  } satisfies Type<V> & RecordTypeInternals & WithShape<S> as Type<V> &
-    WithShape<S>;
+  } satisfies Type<V> & WithShape<S> as Type<V> & WithShape<S>;
 };
 
 /**

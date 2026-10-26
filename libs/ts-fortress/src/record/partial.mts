@@ -13,7 +13,7 @@ import {
   type TypeOf,
   type UnknownShape,
   flattenShapeStructure,
-  hasRecordInternals,
+  recordViewOf,
 } from '../type.mjs';
 import { toUnionKeyString } from '../utils/index.mjs';
 import { optional } from './optional.mjs';
@@ -36,11 +36,13 @@ export const partial = <
     }>
   >,
 ): PartialType<R, KeysToBeOptional> => {
-  if (!hasRecordInternals(recordType)) {
+  const view = recordViewOf(recordType);
+
+  if (view === undefined) {
     panic(`Expected a record type but received: ${recordType.typeName}`);
   }
 
-  const shape = flattenShapeStructure(recordType.shapeStructure);
+  const shape = flattenShapeStructure(view.shapeStructure);
 
   if (shape === undefined) {
     panic(
@@ -65,7 +67,7 @@ export const partial = <
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   return record(partialShape, {
     typeName: typeNameFilled,
-    excessProperty: options?.excessProperty ?? recordType.excessProperty,
+    excessProperty: options?.excessProperty ?? view.excessProperty,
   }) as unknown as PartialType<R, KeysToBeOptional>;
 };
 

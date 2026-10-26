@@ -5,11 +5,11 @@ import { union } from '../compose/index.mjs';
 import { literal } from '../other-types/index.mjs';
 import {
   type ExcessPropertyOption,
-  type RecordTypeInternals,
+  type RecordView,
   type Type,
   type TypeOf,
   expandShapeStructure,
-  hasRecordInternals,
+  recordViewOf,
 } from '../type.mjs';
 import { toIntersectionString } from '../utils/index.mjs';
 import { record } from './record.mjs';
@@ -27,7 +27,9 @@ export const mergeRecords = <
     }>
   >,
 ): MergeRecordsType<Types> => {
-  if (!recordTypes.every(hasRecordInternals)) {
+  const views = recordTypes.map(recordViewOf);
+
+  if (!views.every((view): view is RecordView => view !== undefined)) {
     panic(
       'Expected a record type but received a non-record type in mergeRecords',
     );
@@ -38,8 +40,8 @@ export const mergeRecords = <
     `(${toIntersectionString(recordTypes.map((a) => a.typeName))})`;
 
   // Expand all shape structures to get all possible shape combinations
-  const expandedShapesPerType = Arr.map(recordTypes, (t) =>
-    expandShapeStructure(t.shapeStructure),
+  const expandedShapesPerType = views.map((view) =>
+    expandShapeStructure(view.shapeStructure),
   );
 
   // Estimate the total number of merged variants that would be produced.
@@ -67,7 +69,7 @@ export const mergeRecords = <
   );
 
   const excessProperty =
-    options?.excessProperty ?? deriveStrictestExcessProperty(recordTypes);
+    options?.excessProperty ?? deriveStrictestExcessProperty(views);
 
   // If there's only one merged shape, return it directly
   if (Arr.isFixedLengthTuple(1, mergedShapes)) {
@@ -117,7 +119,7 @@ type ExactValueOf<T> =
   T extends Readonly<{ defaultValue: infer V }> ? V : never;
 
 const deriveStrictestExcessProperty = (
-  types: readonly RecordTypeInternals[],
+  types: readonly RecordView[],
 ): ExcessPropertyOption =>
   types.some((t) => t.excessProperty === 'reject') ? 'reject' : 'allow';
 

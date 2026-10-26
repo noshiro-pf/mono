@@ -1,10 +1,5 @@
 import { Arr, memoizeFunction, Result } from 'ts-data-forge';
-import type {
-  TupleTypeInternals,
-  Type,
-  TypeOf,
-  UnknownType,
-} from '../type.mjs';
+import type { Type, TypeOf, UnknownType } from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,
@@ -102,9 +97,6 @@ export const tuple = <const A extends readonly UnknownType[]>(
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
-    // Retain the element types so that `at(tupleType, index)` can recover the
-    // Type at a given position.
-    elementTypes: types,
     structure: { kind: 'tuple', elementTypes: types },
-  } satisfies Type<T> & TupleTypeInternals as Type<T>;
+  } satisfies Type<T> as Type<T>;
 };

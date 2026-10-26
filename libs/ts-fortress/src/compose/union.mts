@@ -2,13 +2,11 @@ import { Arr, expectType, memoizeFunction, Result } from 'ts-data-forge';
 import type { ArrayElement, NonEmptyTuple, StrictPick } from 'ts-type-forge';
 import {
   flattenShapeStructure,
-  hasRecordInternals,
-  hasTupleInternals,
-  hasUnionInternals,
-  type ExcessPropertyOption,
+  recordViewOf,
+  tupleElementTypesOf,
   type Type,
   type TypeOf,
-  type UnionTypeInternals,
+  unionMembersOf,
   type UnknownType,
 } from '../type.mjs';
 import {
@@ -103,15 +101,13 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
    *
    * Two things deliberately stay unflattened: `typeName` and the member
    * listing use the members as they were written, so a nested union that
-   * carries a name of its own keeps it; and a `recursion` member answers
-   * {@link hasUnionInternals} without running its definition, so a type
-   * defined in terms of itself stays a single opaque member.
+   * carries a name of its own keeps it; and a `recursion` member's
+   * `structure` is a `recursion`, read without running its definition, so a
+   * type defined in terms of itself stays a single opaque member.
    *
    * See `documents/union-closest-member-heuristic.md`.
    */
-  const memberTypes: readonly UnknownType[] = types.flatMap((t) =>
-    hasUnionInternals(t) ? t.memberTypes : [t],
-  );
+  const memberTypes: readonly UnknownType[] = types.flatMap(unionMembersOf);
 
   const validate: Type<T>['validate'] = (a) => {
     if (memberTypes.some((t) => t.is(a))) {
@@ -222,30 +218,8 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
     is,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
-    // Lets a union that takes this one as a member flatten it in.
-    memberTypes,
     structure: { kind: 'union', memberTypes: types },
-  } as const satisfies Type<T> & UnionTypeInternals;
-
-  // If all types are records, add RecordTypeInternals with union structure
-  if (types.every(hasRecordInternals)) {
-    const shapeStructures = Arr.map(types, (t) => t.shapeStructure);
-
-    const excessProperty: ExcessPropertyOption = Arr.some(
-      types,
-      (t) => t.excessProperty === 'reject',
-    )
-      ? 'reject'
-      : 'allow';
-
-    return {
-      ...baseType,
-      shapeStructure: Arr.isFixedLengthTuple(1, shapeStructures)
-        ? shapeStructures[0]
-        : ({ kind: 'union', variants: shapeStructures } as const),
-      excessProperty,
-    } as UnionType<Types>;
-  }
+  } as const satisfies Type<T>;
 
   return baseType as UnionType<Types>;
 };
@@ -307,13 +281,15 @@ const compareByCloseness = (x: MemberCloseness, y: MemberCloseness): number =>
  * of keys (a union of shapes) also counts as one check.
  */
 const checkCountOf = (memberType: UnknownType): number => {
-  if (hasRecordInternals(memberType)) {
-    const shape = flattenShapeStructure(memberType.shapeStructure);
+  const view = recordViewOf(memberType);
+
+  if (view !== undefined) {
+    const shape = flattenShapeStructure(view.shapeStructure);
 
     return shape === undefined ? 1 : Object.keys(shape).length;
   }
 
-  return hasTupleInternals(memberType) ? memberType.elementTypes.length : 1;
+  return tupleElementTypesOf(memberType)?.length ?? 1;
 };
 
 const validationErrorsOf = (
