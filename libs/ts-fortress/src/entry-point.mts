@@ -11,6 +11,8 @@ export * from './constraints/index.mjs';
 
 export * from './enum/index.mjs';
 
+export * from './json-schema/index.mjs';
+
 export * from './other-types/index.mjs';
 
 export * from './predefined/index.mjs';

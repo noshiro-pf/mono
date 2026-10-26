@@ -224,6 +224,7 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
     cast: createCastFn(validate),
     // Lets a union that takes this one as a member flatten it in.
     memberTypes,
+    structure: { kind: 'union', memberTypes: types },
   } as const satisfies Type<T> & UnionTypeInternals;
 
   // If all types are records, add RecordTypeInternals with union structure

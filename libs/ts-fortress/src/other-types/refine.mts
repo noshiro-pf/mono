@@ -68,6 +68,7 @@ export const refine = <
       typeName,
       defaultValue,
       validate,
+      structure: { kind: 'refine', baseType },
     }),
     baseType,
   );

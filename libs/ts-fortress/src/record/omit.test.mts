@@ -27,6 +27,7 @@ describe(omit, () => {
     | 'fill'
     | 'prune'
     | 'validate'
+    | 'structure'
     | 'optional'
   >('=');
 

@@ -38,6 +38,7 @@ describe(pick, () => {
     | 'fill'
     | 'prune'
     | 'validate'
+    | 'structure'
     | 'optional'
   >('=');
 

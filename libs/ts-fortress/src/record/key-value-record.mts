@@ -117,5 +117,6 @@ export const keyValueRecord = <K extends Type<string>, V extends UnknownType>(
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
+    structure: { kind: 'keyValueRecord', keyType, valueType },
   };
 };

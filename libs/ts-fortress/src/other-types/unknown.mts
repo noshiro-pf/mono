@@ -14,6 +14,7 @@ export const unknown = (defaultValue?: unknown): Type<unknown> =>
     validate,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
+    structure: { kind: 'unknown' },
   }) as const;
 
 const validate: Type<unknown>['validate'] = Result.ok;

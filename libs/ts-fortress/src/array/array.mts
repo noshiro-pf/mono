@@ -95,5 +95,11 @@ export const array = <A,>(
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
+    structure: {
+      kind: 'array',
+      elementType,
+      minLength: undefined,
+      maxLength: undefined,
+    },
   };
 };

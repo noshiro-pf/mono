@@ -6,4 +6,5 @@ export const undefinedType: Type<undefined> = createPrimitiveType({
   typeName: 'undefined',
   defaultValue: undefined,
   is: isUndefined,
+  structure: { kind: 'undefined' },
 });

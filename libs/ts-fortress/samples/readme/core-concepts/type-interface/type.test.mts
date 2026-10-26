@@ -9,11 +9,16 @@ type Type<A> = Readonly<{
   fill: (a: unknown) => A; // Fill missing values with defaults
   prune: <B extends A>(a: B) => A; // Recursively remove excess properties
   validate: (a: unknown) => Result<A, readonly ValidationError[]>; // Detailed validation
+  structure?: TypeStructure; // What the type is built from, readable at runtime
 }>;
 
 // embed-sample-code-ignore-below
 /* eslint-disable import-x/first */
 import { expectType, type Result } from 'ts-data-forge';
-import type { Type as Type_, ValidationError } from '../../../../src/index.mjs';
+import type {
+  Type as Type_,
+  TypeStructure,
+  ValidationError,
+} from '../../../../src/index.mjs';
 
 expectType<Type<number>, StrictOmit<Type_<number>, 'optional'>>('=');

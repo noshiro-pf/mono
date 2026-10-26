@@ -101,5 +101,6 @@ const intRangeImpl = <Start extends Int11, End extends Int11 | 1024>(
     is,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
+    structure: { kind: 'integerRange', min: start, max: end - 1 },
   };
 };

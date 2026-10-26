@@ -108,5 +108,13 @@ export function fixedLengthArray<A>(
         )
       : getDefaultValue();
 
-  return buildType({ typeName, getDefaultValue, validate, fill, elementType });
+  return buildType({
+    typeName,
+    getDefaultValue,
+    validate,
+    fill,
+    elementType,
+    minLength: size,
+    maxLength: size,
+  });
 }

@@ -10,12 +10,13 @@ import type {
 } from 'ts-type-forge';
 import {
   attachConstraints,
-  type ConstrainedType,
   fillConstraints,
+  type ConstrainedType,
   type FillConstraints,
   type NoConstraints,
 } from '../constraints/index.mjs';
 import { refine } from '../other-types/index.mjs';
+import { withStructure, type TypeStructure } from '../type.mjs';
 import {
   createPrimitiveType,
   type StringConstraintViolation,
@@ -38,6 +39,7 @@ export function string(
     typeName: 'string',
     defaultValue,
     is: isString,
+    structure: STRUCTURE,
   });
 
   const constraintValues = fillConstraints<
@@ -71,19 +73,25 @@ export function string(
   }
 
   return attachConstraints(
-    refine({
-      baseType,
-      defaultValue,
-      is: (value): value is string => Result.isOk(constraintsPredicate(value)),
-      typeName: 'string',
-      getConstraintDetails: (value) => {
-        const result = constraintsPredicate(value);
+    // The constraints are what the refinement checks, and they are on the
+    // type itself, so it describes itself as the primitive it refines.
+    withStructure(
+      refine({
+        baseType,
+        defaultValue,
+        is: (value): value is string =>
+          Result.isOk(constraintsPredicate(value)),
+        typeName: 'string',
+        getConstraintDetails: (value) => {
+          const result = constraintsPredicate(value);
 
-        return Result.isErr(result)
-          ? { kind: 'string-constraint', violation: result.value }
-          : undefined;
-      },
-    }),
+          return Result.isErr(result)
+            ? { kind: 'string-constraint', violation: result.value }
+            : undefined;
+        },
+      }),
+      STRUCTURE,
+    ),
     constraintValues,
   );
 }
@@ -387,3 +395,5 @@ const defaultValueErrorMessage = (
   violation: StringConstraintViolation,
 ): string =>
   `defaultValue "${value}" for string does not satisfy the constraint ${violation.constraint} = ${violation.value}` as const;
+
+const STRUCTURE: TypeStructure = { kind: 'string' } as const;

@@ -1,6 +1,6 @@
 import { Arr, Obj, hasKey, isRecord, type Result } from 'ts-data-forge';
 import { panic } from 'ts-std-forge';
-import type { ReadonlyRecord } from 'ts-type-forge';
+import type { Primitive, ReadonlyRecord, StrictExtract } from 'ts-type-forge';
 import type { ValidationError } from './utils/index.mjs';
 
 /**
@@ -51,9 +51,120 @@ export type Type<A> = Readonly<{
   prune: <B extends A>(a: B) => A;
   validate: (a: unknown) => Result<A, readonly ValidationError[]>;
 
+  /**
+   * What the type is built from, readable at runtime: the kind of type and
+   * the types it is composed of (see {@link TypeStructure}). Every type the
+   * package constructs carries one; a `Type` written by hand may not, and is
+   * then opaque to whatever reads it (`toJsonSchema` among them).
+   */
+  structure?: TypeStructure;
+
   /** @internal Used to mark properties as optional in record type validation */
   optional?: true;
 }>;
+
+/**
+ * The runtime description of a {@link Type}, discriminated by `kind`.
+ *
+ * It records what the type was built from and nothing it computes: the
+ * constraint values of `string` / `number` / `bigint` are on the type's own
+ * `constraints` (see `WithConstraints`), whether a record member is optional
+ * is the member type's `optional`, and a predicate passed to `refine`,
+ * `brand` or `templateLiteral` stays a closure — such a type says only that
+ * it narrows its base type.
+ *
+ * - `record` — `shape` as given, and whether excess properties are rejected.
+ *   The record operations (`pick`, `omit`, `partial`, `required`,
+ *   `mergeRecords`) build a new `record`, so they describe themselves as one.
+ * - `array` — an array of `elementType`, `minLength` / `maxLength` set by
+ *   the length-constrained arrays and tuples (`nonEmptyArray`,
+ *   `fixedLengthArray`, `minLengthTuple`, ...).
+ * - `tuple` — one type per position, of exactly that length.
+ * - `union` / `intersection` — the member types as written: a union nested
+ *   directly in another stays a member here, though it is flattened for
+ *   validation.
+ * - `integerRange` — an integer from `min` to `max`, both inclusive.
+ * - `brand` — `baseType` branded with `brandKeys` (and not `brandFalseKeys`);
+ *   `refined` tells whether an `is` predicate narrows it further.
+ * - `recursion` — `resolve` returns the definition, called lazily so that a
+ *   type defined in terms of itself can be traversed without looping.
+ */
+export type TypeStructure = Readonly<
+  | {
+      kind:
+        | 'string'
+        | 'number'
+        | 'bigint'
+        | 'boolean'
+        | 'symbol'
+        | 'null'
+        | 'undefined'
+        | 'unknown'
+        | 'templateLiteral';
+    }
+  | {
+      kind: 'literal';
+      value: StrictExtract<Primitive, string | number | bigint | boolean>;
+    }
+  | { kind: 'enum'; values: readonly Primitive[] }
+  | { kind: 'integerRange'; min: number; max: number }
+  | {
+      kind: 'record';
+      shape: UnknownShape;
+      excessProperty: ExcessPropertyOption;
+    }
+  | {
+      kind: 'keyValueRecord';
+      keyType: UnknownType;
+      valueType: UnknownType;
+    }
+  | {
+      kind: 'array';
+      elementType: UnknownType;
+      minLength: number | undefined;
+      maxLength: number | undefined;
+    }
+  | { kind: 'tuple'; elementTypes: readonly UnknownType[] }
+  | { kind: 'union'; memberTypes: readonly UnknownType[] }
+  | { kind: 'intersection'; memberTypes: readonly UnknownType[] }
+  | { kind: 'map'; keyType: UnknownType; valueType: UnknownType }
+  | { kind: 'set'; elementType: UnknownType }
+  | { kind: 'refine'; baseType: UnknownType }
+  | {
+      kind: 'brand';
+      baseType: UnknownType;
+      brandKeys: readonly string[];
+      brandFalseKeys: readonly string[];
+      refined: boolean;
+    }
+  | {
+      kind: 'recursion';
+      typeName: string;
+      resolve: () => UnknownType;
+    }
+>;
+
+/** The `kind`s of {@link TypeStructure}. */
+export type TypeStructureKind = TypeStructure['kind'];
+
+/**
+ * @internal Replaces the {@link TypeStructure} of `type`, keeping every other
+ * property as it is — by property descriptor, for the reason given in
+ * `attachConstraints`.
+ */
+export const withStructure = <T extends UnknownType>(
+  type: T,
+  structure: TypeStructure,
+): T =>
+  // The same object with one property replaced.
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  Object.defineProperties(
+    {},
+    {
+      ...Object.getOwnPropertyDescriptors(type),
+      structure: { value: structure, enumerable: true },
+    },
+  ) as T;
 
 /**
  * @internal The bound used wherever a codec is accepted without caring which

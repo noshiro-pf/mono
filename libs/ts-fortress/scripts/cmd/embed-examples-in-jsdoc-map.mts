@@ -63,6 +63,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/primitives/string-constraints-example.mts'],
   },
   {
+    sourcePath: 'src/json-schema/to-json-schema.mts',
+    sampleFiles: ['samples/src/json-schema/to-json-schema-example.mts'],
+  },
+  {
     sourcePath: 'src/record/at.mts',
     sampleFiles: [
       'samples/src/record/at-constraints-example.mts',

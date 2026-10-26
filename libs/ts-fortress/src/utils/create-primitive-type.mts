@@ -1,6 +1,6 @@
 import { Result } from 'ts-data-forge';
 import type { Primitive } from 'ts-type-forge';
-import type { Type } from '../type.mjs';
+import type { Type, TypeStructure } from '../type.mjs';
 import { createAssertFn } from './create-assert-fn.mjs';
 import { createCastFn } from './create-cast-fn.mjs';
 import { createPrimitiveValidationError } from './validation-error.mjs';
@@ -8,11 +8,13 @@ import { createPrimitiveValidationError } from './validation-error.mjs';
 export const createPrimitiveType = <A extends Primitive>({
   defaultValue,
   is,
+  structure,
   typeName,
 }: Readonly<{
   typeName: string;
   defaultValue: A;
   is: (value: unknown) => value is A;
+  structure?: TypeStructure;
 }>): Type<A> => {
   const validate: Type<A>['validate'] = (a) =>
     is(a)
@@ -35,5 +37,6 @@ export const createPrimitiveType = <A extends Primitive>({
     validate,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
+    ...(structure === undefined ? {} : { structure }),
   };
 };

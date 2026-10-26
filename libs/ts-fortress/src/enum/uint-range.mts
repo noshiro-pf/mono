@@ -107,5 +107,6 @@ const uintRangeImpl = <
     is,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
+    structure: { kind: 'integerRange', min: start, max: end - 1 },
   };
 };

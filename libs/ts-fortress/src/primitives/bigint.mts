@@ -3,12 +3,13 @@ import { panic } from 'ts-std-forge';
 import type { ArrayElement, BoolAnd, BoolNot } from 'ts-type-forge';
 import {
   attachConstraints,
-  type ConstrainedType,
   fillConstraints,
+  type ConstrainedType,
   type FillConstraints,
   type NoConstraints,
 } from '../constraints/index.mjs';
 import { refine } from '../other-types/index.mjs';
+import { withStructure, type TypeStructure } from '../type.mjs';
 import {
   createPrimitiveType,
   type NumericConstraintViolation,
@@ -33,6 +34,7 @@ export function bigint(
     typeName: 'bigint',
     defaultValue,
     is: isBigint,
+    structure: STRUCTURE,
   });
 
   const constraintValues = fillConstraints<Required<Constraints>, Constraints>(
@@ -58,24 +60,29 @@ export function bigint(
   }
 
   return attachConstraints(
-    refine({
-      baseType,
-      defaultValue,
-      is: (value): value is NumberType =>
-        Result.isOk(constraintsPredicate(value)),
-      typeName: 'bigint',
-      getConstraintDetails: (value) => {
-        const result = constraintsPredicate(value);
+    // The constraints are what the refinement checks, and they are on the
+    // type itself, so it describes itself as the primitive it refines.
+    withStructure(
+      refine({
+        baseType,
+        defaultValue,
+        is: (value): value is NumberType =>
+          Result.isOk(constraintsPredicate(value)),
+        typeName: 'bigint',
+        getConstraintDetails: (value) => {
+          const result = constraintsPredicate(value);
 
-        return Result.isErr(result)
-          ? {
-              kind: 'numeric-constraint',
-              numericType: 'bigint',
-              violation: result.value,
-            }
-          : undefined;
-      },
-    }),
+          return Result.isErr(result)
+            ? {
+                kind: 'numeric-constraint',
+                numericType: 'bigint',
+                violation: result.value,
+              }
+            : undefined;
+        },
+      }),
+      STRUCTURE,
+    ),
     constraintValues,
   );
 }
@@ -322,3 +329,5 @@ const defaultValueErrorMessage = (
   violation: NumericConstraintViolation,
 ): string =>
   `defaultValue [${value}] for bigint does not satisfy the constraint ${violation.constraint} = ${violation.value}` as const;
+
+const STRUCTURE: TypeStructure = { kind: 'bigint' } as const;

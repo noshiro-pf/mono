@@ -60,6 +60,7 @@ export const optional = <T extends UnknownType>(
     prune: t.prune,
     validate: t.validate,
     typeName: t.typeName,
+    ...(t.structure === undefined ? {} : { structure: t.structure }),
 
     // `OptionalPropertyType<T>` is `T & { optional: true }`, so a constrained
     // member type keeps promising its `constraints` — carry them over, or an

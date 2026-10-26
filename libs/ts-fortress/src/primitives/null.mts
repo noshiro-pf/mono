@@ -8,4 +8,5 @@ export const nullType: Type<null> = createPrimitiveType({
   // @sumi-expect-error null/no-null-literal
   defaultValue: null,
   is: isNull,
+  structure: { kind: 'null' },
 });

@@ -60,6 +60,7 @@ describe(required, () => {
       | 'defaultValue'
       | 'fill'
       | 'prune'
+      | 'structure'
       | 'optional'
     >('=');
 

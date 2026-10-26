@@ -404,6 +404,66 @@ What that gives you:
 
 > **Tip:** If a default value violates its constraints, `ts-fortress` throws during construction. This guards against invalid schemas ever reaching production.
 
+## JSON Schema
+
+`t.toJsonSchema(type)` writes the JSON Schema (draft 2020-12, the dialect OpenAPI 3.1 uses) of the JSON values a type accepts, so that an editor, a config file's `$schema`, or an API document can be generated from the type instead of being written a second time and drifting from it.
+
+```tsx
+import * as t from 'ts-fortress';
+
+const Config = t.strictRecord({
+    name: t.string('app', { minLength: 1 }),
+    retries: t.optional(t.uint32()),
+    mode: t.enumType(['fast', 'safe']),
+});
+
+const schema = t.toJsonSchema(Config);
+
+assert.deepStrictEqual(
+    schema,
+    t.Result.ok({
+        $schema: 'https://json-schema.org/draft/2020-12/schema',
+        type: 'object',
+        properties: {
+            name: { type: 'string', minLength: 1 },
+            retries: {
+                type: 'integer',
+                minimum: 0,
+                exclusiveMaximum: 4_294_967_296,
+                'x-brand': 'Uint32',
+            },
+            mode: { enum: ['fast', 'safe'] },
+        },
+        required: ['name', 'mode'],
+        additionalProperties: false,
+    }),
+);
+
+// A part that has no JSON form is an error, named by where it would go
+const WithBigint = t.record({ id: t.bigint() });
+
+assert.deepStrictEqual(
+    t.toJsonSchema(WithBigint),
+    t.Result.err([
+        {
+            kind: 'not-json',
+            schemaPath: '/properties/id',
+            typeName: 'bigint',
+            message: 'no JSON value is of the kind `bigint`',
+        },
+    ]),
+);
+```
+
+How it reads a type:
+
+- **It is read off the type's `structure`.** Every type the package builds carries a `structure` describing what it was built from (`{ kind: 'record', shape, excessProperty }`, `{ kind: 'union', memberTypes }`, ...), and `constraints` for the constrained primitives. A `Type` written by hand without one is an `'opaque'` error.
+- **Constraints become keywords**: `minLength` / `maxLength` / `pattern` for strings, `minimum` / `exclusiveMaximum` / `multipleOf` for numbers, `integer` for `int` and the integer ranges, `minItems` / `maxItems` for the length-constrained arrays. The predefined branded numbers say what their brands mean, so `t.uint32()` is an integer from 0 to 2^32 - 1.
+- **Records** list every member not wrapped in `t.optional` under `required`, and `t.strictRecord` adds `additionalProperties: false`. **Unions** become `anyOf`, or `oneOf` with an OpenAPI `discriminator` when a literal key tells the members apart; **intersections** become `allOf`; **recursions** become `$defs` entries named after their `typeName`.
+- **A predicate cannot be written down.** `t.refine`, `t.templateLiteral` and the `uppercase` / `lowercase` string constraints add their names to `x-refined`, and `t.brand` its name to `x-brand`; there the schema accepts more than the type does, and the type stays the authority.
+- **No JSON value is a `bigint`, `symbol`, `undefined`, `Map` or `Set`**, so such a type is a `'not-json'` error — except as a union member, which is left out: `t.nullable(t.string())` is a string.
+- Default values are not written as `default`, since every type has one and a client would read every property as one it may leave out. Pass `{ includeSchemaUri: false }` to leave `$schema` off a schema embedded in another document.
+
 ## Why ts-fortress over Zod and io-ts?
 
 While ts-fortress, [Zod](https://github.com/colinhacks/zod), and [io-ts](https://github.com/gcanti/io-ts) are all excellent TypeScript validation libraries, ts-fortress offers more readable and informative error messages than both, a more type-safe way of building validators than Zod, and addresses some critical runtime consistency issues found in io-ts.
@@ -464,6 +524,7 @@ type Type<A> = Readonly<{
     fill: (a: unknown) => A; // Fill missing values with defaults
     prune: <B extends A>(a: B) => A; // Recursively remove excess properties
     validate: (a: unknown) => Result<A, readonly ValidationError[]>; // Detailed validation
+    structure?: TypeStructure; // What the type is built from, readable at runtime
 }>;
 ```
 
@@ -1148,6 +1209,8 @@ type ValidationError = Readonly<{
 - `type.constraints` - The constraints a `t.string` / `t.number` / `t.bigint` type (or a `t.refine` / `t.brand` wrapper of one) was created with. Every constraint key is present; the unspecified ones are typed `undefined`. See [Reading constraints back](#reading-constraints-back)
 - `t.ConstraintsOf<T>` - The constraint record carried by a type
 - `t.attachConstraints(type, constraints)` - Attach constraint values to a type of your own
+- `type.structure` - What a type was built from, discriminated by `kind` (`t.TypeStructure`)
+- `t.toJsonSchema(type, { includeSchemaUri? })` - The JSON Schema of a type. See [JSON Schema](#json-schema)
 - `t.enumType(values)` - Enum validation
 - `t.uintRange(start, end, { defaultValue? })` - Non-negative integer range validation (`end` is exclusive)
 - `t.intRange(start, end, { defaultValue? })` - Integer range validation (`end` is exclusive)

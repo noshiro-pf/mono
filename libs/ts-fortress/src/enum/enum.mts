@@ -96,5 +96,6 @@ export function enumType<const Values extends NonEmptyTuple<Primitive>>(
     is,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
+    structure: { kind: 'enum', values },
   };
 }

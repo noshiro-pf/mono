@@ -83,5 +83,7 @@ export const nonEmptyArray = <A,>(
     validate,
     fill,
     elementType,
+    minLength: 1,
+    maxLength: undefined,
   });
 };

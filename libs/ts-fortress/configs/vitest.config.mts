@@ -26,6 +26,7 @@ export default defineViteConfig({
       'zod',
       'io-ts/PathReporter',
       'ts-data-forge > @sindresorhus/is',
+      'ajv/dist/2020.js',
     ],
   },
 });

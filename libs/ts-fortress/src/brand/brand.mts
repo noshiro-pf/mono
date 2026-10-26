@@ -95,6 +95,13 @@ export const brand = <
       typeName: typeNameFilled,
       defaultValue,
       validate,
+      structure: {
+        kind: 'brand',
+        baseType,
+        brandKeys,
+        brandFalseKeys: brandFalseKeys ?? [],
+        refined: is_ !== undefined,
+      },
     }),
     baseType,
   );

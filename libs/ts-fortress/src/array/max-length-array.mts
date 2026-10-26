@@ -109,5 +109,13 @@ export function maxLengthArray<A>(
         )
       : getDefaultValue();
 
-  return buildType({ typeName, getDefaultValue, validate, fill, elementType });
+  return buildType({
+    typeName,
+    getDefaultValue,
+    validate,
+    fill,
+    elementType,
+    minLength: undefined,
+    maxLength,
+  });
 }
