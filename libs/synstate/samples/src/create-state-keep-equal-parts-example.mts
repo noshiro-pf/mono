@@ -1,4 +1,4 @@
-import { createState, map, skipIfNoChange } from 'synstate';
+import { createState, map } from 'synstate';
 import type { DeepReadonly } from 'ts-type-forge';
 
 if (import.meta.vitest !== undefined) {
@@ -15,7 +15,7 @@ if (import.meta.vitest !== undefined) {
       { keepEqualParts: true },
     );
 
-    const summary = report.pipe(map((r) => r.summary)).pipe(skipIfNoChange());
+    const summary = report.pipe(map((r) => r.summary));
 
     // transformer-ignore-next-line convert-to-readonly, append-as-const
     const summaryHistory: unknown[] = [];

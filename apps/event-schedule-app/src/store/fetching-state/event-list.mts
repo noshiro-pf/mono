@@ -6,6 +6,7 @@ import {
   debounce,
   filter,
   map,
+  mapTo,
   merge,
   throttle,
   unwrapResultOk,
@@ -45,7 +46,8 @@ const fetchEventListRequest$ = combine(
     EventListPageFilterStore.filterByText$
       .pipe(withInitialValue(undefined))
       .pipe(withCurrentValueFrom(EventListPageFilterStore.filterText$))
-      .pipe(map(([_, filterText]) => filterText)),
+      // Every press of the filter button reads again, even for the same text.
+      .pipe(map(([_, filterText]) => filterText, { equals: () => false })),
     EventListPageFilterStore.filterOptionState$,
     EventListPageFilterStore.showAllPastDaysEvent$,
     EventListPageFilterStore.showOnlyEventSchedulesICreated$,
@@ -70,17 +72,15 @@ const [useRefreshButtonIsLoading, setRefreshButtonIsLoading] =
     (_: boolean, isLoading: boolean) => isLoading,
     false,
     [
-      fetchEventListStarted$.pipe(map(() => true)),
-      fetchedEventListResult$.pipe(map(() => false)),
+      fetchEventListStarted$.pipe(mapTo(true)),
+      fetchedEventListResult$.pipe(mapTo(false)),
     ],
   );
 
 /** Disabled for `fetchThrottleTime` after each read the button can ask for. */
 const refreshButtonIsDisabled$ = merge([
-  fetchEventListThrottled$.pipe(map(() => true)),
-  fetchEventListThrottled$
-    .pipe(debounce(fetchThrottleTime))
-    .pipe(map(() => false)),
+  fetchEventListThrottled$.pipe(mapTo(true)),
+  fetchEventListThrottled$.pipe(debounce(fetchThrottleTime)).pipe(mapTo(false)),
 ]).pipe(withInitialValue(false));
 
 const useRefreshButtonIsDisabled = (): boolean =>

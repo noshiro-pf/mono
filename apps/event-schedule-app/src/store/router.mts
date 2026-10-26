@@ -1,10 +1,4 @@
-import {
-  type InitializedObservable,
-  filter,
-  map,
-  pluck,
-  skipIfNoChange,
-} from 'synstate';
+import { type InitializedObservable, filter, map, pluck } from 'synstate';
 import { useObservableValue } from 'synstate-react-hooks';
 import { createRouter } from 'tiny-router-observable';
 import { Optional } from 'ts-data-forge';
@@ -36,28 +30,14 @@ export const Router = {
   pageToBack$,
 
   isRoute: {
-    createPage$: pathSegments$
-      .pipe(map(Routes.isRoute.createPage))
-      .pipe(skipIfNoChange()),
-    answerPage$: pathSegments$
-      .pipe(map(Routes.isRoute.answerPage))
-      .pipe(skipIfNoChange()),
-    editPage$: pathSegments$
-      .pipe(map(Routes.isRoute.editPage))
-      .pipe(skipIfNoChange()),
-    eventListPage$: pathSegments$
-      .pipe(map(Routes.isRoute.eventListPage))
-      .pipe(skipIfNoChange()),
-    registerPage$: pathSegments$
-      .pipe(map(Routes.isRoute.registerPage))
-      .pipe(skipIfNoChange()),
-    signInPage$: pathSegments$
-      .pipe(map(Routes.isRoute.signInPage))
-      .pipe(skipIfNoChange()),
+    createPage$: pathSegments$.pipe(map(Routes.isRoute.createPage)),
+    answerPage$: pathSegments$.pipe(map(Routes.isRoute.answerPage)),
+    editPage$: pathSegments$.pipe(map(Routes.isRoute.editPage)),
+    eventListPage$: pathSegments$.pipe(map(Routes.isRoute.eventListPage)),
+    registerPage$: pathSegments$.pipe(map(Routes.isRoute.registerPage)),
+    signInPage$: pathSegments$.pipe(map(Routes.isRoute.signInPage)),
   },
-  eventId$: pathSegments$
-    .pipe(map(Routes.getEventIdFromPathname))
-    .pipe(skipIfNoChange()),
+  eventId$: pathSegments$.pipe(map(Routes.getEventIdFromPathname)),
 
   useShowPage: (): Readonly<{
     createPage: boolean;

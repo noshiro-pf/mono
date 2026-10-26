@@ -126,15 +126,13 @@ export const createPlanStore = ({
 
   const [selectedId, setSelectedId] = createState(selection.load());
 
-  const currentPlan = combine([plans, selectedId])
-    .pipe(
-      map(([state, id]) =>
-        state.type === 'loaded'
-          ? (state.plans.find((p) => p.id === id) ?? state.plans[0])
-          : undefined,
-      ),
-    )
-    .pipe(skipIfNoChange());
+  const currentPlan = combine([plans, selectedId]).pipe(
+    map(([state, id]) =>
+      state.type === 'loaded'
+        ? (state.plans.find((p) => p.id === id) ?? state.plans[0])
+        : undefined,
+    ),
+  );
 
   const input = currentPlan
     .pipe(map((plan) => plan?.input ?? defaultSimulationInput))

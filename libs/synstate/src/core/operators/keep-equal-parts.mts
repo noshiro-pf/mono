@@ -59,9 +59,7 @@ import type {
  *
  * const board$ = message$.pipe(keepEqualParts());
  *
- * const firstCard$ = board$
- *   .pipe(map((board) => board.cards[0]))
- *   .pipe(skipIfNoChange());
+ * const firstCard$ = board$.pipe(map((board) => board.cards[0]));
  *
  * const boardHistory: Board[] = [];
  *

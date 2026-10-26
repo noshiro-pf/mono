@@ -1,7 +1,7 @@
 /** @jsxImportSource preact */
 // embed-sample-code-ignore-above
 import { signal } from '@preact/signals';
-import { debounce, map } from 'synstate';
+import { debounce, map, withIndex } from 'synstate';
 import { fromSignal, toSignal } from 'synstate-preact-signals';
 
 // Raw input signal (Preact Signal — updates immediately on every keystroke)
@@ -17,7 +17,9 @@ const debouncedInput$ = input$.pipe(debounce(500));
 const debouncedSignal = toSignal(debouncedInput$, '');
 
 // Count how many times the debounced value has changed
-const updateCount$ = debouncedInput$.pipe(map((_, i) => i + 1));
+const updateCount$ = debouncedInput$
+  .pipe(withIndex())
+  .pipe(map(([i]) => i + 1));
 
 const updateCountSignal = toSignal(updateCount$);
 

@@ -1,4 +1,4 @@
-import { keepEqualParts, map, skipIfNoChange, source } from 'synstate';
+import { keepEqualParts, map, source } from 'synstate';
 import type { DeepReadonly } from 'ts-type-forge';
 
 if (import.meta.vitest !== undefined) {
@@ -18,9 +18,7 @@ if (import.meta.vitest !== undefined) {
 
     const board$ = message$.pipe(keepEqualParts());
 
-    const firstCard$ = board$
-      .pipe(map((board) => board.cards[0]))
-      .pipe(skipIfNoChange());
+    const firstCard$ = board$.pipe(map((board) => board.cards[0]));
 
     // transformer-ignore-next-line convert-to-readonly, append-as-const
     const boardHistory: Board[] = [];

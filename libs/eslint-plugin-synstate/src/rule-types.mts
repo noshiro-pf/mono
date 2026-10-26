@@ -9,6 +9,21 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 import type { synstateRules } from './rules/index.mjs';
 
 /**
+ * @description Disallow `skipIfNoChange()` directly after `map`, which already stops a result equal to the one it holds.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace NoRedundantSkipIfNoChange {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Disallow calling `.pipe` directly on a synstate `counter(...)` that has no `times` option, since nothing can ever stop that counter.
  *
  *  ```md
@@ -38,9 +53,26 @@ namespace NoWriteDuringPropagation {
   export type RuleEntry = Linter.StringSeverity;
 }
 
+/**
+ * @description Require `mapTo(c)` instead of `map(() => c)`, since `map` stops every result after the first as equal, while `mapTo` emits on every source value.
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
+ *  ```
+ */
+namespace PreferMapTo {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
 export type EslintSynstateRules = Readonly<{
+  'synstate/no-redundant-skip-if-no-change': NoRedundantSkipIfNoChange.RuleEntry;
   'synstate/no-unbounded-counter-pipe': NoUnboundedCounterPipe.RuleEntry;
   'synstate/no-write-during-propagation': NoWriteDuringPropagation.RuleEntry;
+  'synstate/prefer-map-to': PreferMapTo.RuleEntry;
 }>;
 
 export type EslintSynstateRulesOption = ReadonlyRecord<never, never>;

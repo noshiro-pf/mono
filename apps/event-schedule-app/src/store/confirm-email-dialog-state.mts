@@ -1,8 +1,9 @@
 import {
-  type InitializedObservable,
   combine,
   filter,
+  type InitializedObservable,
   map,
+  mapTo,
   merge,
 } from 'synstate';
 import { Result } from 'ts-data-forge';
@@ -30,7 +31,7 @@ const leftEditPage$ = Router.isRoute.editPage$.pipe(
 
 const [, dispatchEmailIsVerified, { state: emailIsVerified$ }] =
   createReducerWithActions((_: boolean, verified: boolean) => verified, false, [
-    leftEditPage$.pipe(map(() => false)),
+    leftEditPage$.pipe(mapTo(false)),
   ]);
 
 const isOpen$ = combine([emailIsVerified$, eventSchedule$]).pipe(

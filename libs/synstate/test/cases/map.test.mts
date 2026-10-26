@@ -1,6 +1,12 @@
 import { tp } from 'ts-data-forge';
 import type { FixedLengthTuple, SafeUint } from 'ts-type-forge';
-import { counter, map, take, type Observable } from '../../src/index.mjs';
+import {
+  counter,
+  map,
+  take,
+  withIndex,
+  type Observable,
+} from '../../src/index.mjs';
 import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { testStream } from '../test-stream.mjs';
 import type { StreamTestCase } from '../typedef.mjs';
@@ -18,7 +24,9 @@ const createStreams = (
 
   const counter11$ = counter$.pipe(take(11));
 
-  const doubleWithIndex$ = counter11$.pipe(map((x, i) => tp(i, x * 2)));
+  const doubleWithIndex$ = counter11$
+    .pipe(withIndex())
+    .pipe(map(([i, x]) => tp(i, x * 2)));
 
   const quad1$ = doubleWithIndex$.pipe(map(([, x]) => x * 2));
 

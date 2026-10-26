@@ -4,6 +4,7 @@ import {
   debounce,
   filter,
   map,
+  mapTo,
   merge,
   throttle,
   unwrapResultOk,
@@ -45,25 +46,21 @@ const fetchAnswersStarted$ = merge([
   Router.eventId$,
 ])
   .pipe(withCurrentValueFrom(Router.eventId$))
-  .pipe(map(([_, eventId]) => eventId))
+  // Every request is a read, even one for the event already read.
+  .pipe(map(([_, eventId]) => eventId, { equals: () => false }))
   .pipe(filter(isNotUndefined));
 
 const [useRefreshButtonIsLoading, setRefreshButtonIsLoading] =
   createReducerWithActions(
     (_: boolean, isLoading: boolean) => isLoading,
     false,
-    [
-      fetchAnswersStarted$.pipe(map(() => true)),
-      answersResult$.pipe(map(() => false)),
-    ],
+    [fetchAnswersStarted$.pipe(mapTo(true)), answersResult$.pipe(mapTo(false))],
   );
 
 /** Disabled for `fetchThrottleTime` after each read the button can ask for. */
 const refreshButtonIsDisabled$ = merge([
-  fetchAnswersThrottled$.pipe(map(() => true)),
-  fetchAnswersThrottled$
-    .pipe(debounce(fetchThrottleTime))
-    .pipe(map(() => false)),
+  fetchAnswersThrottled$.pipe(mapTo(true)),
+  fetchAnswersThrottled$.pipe(debounce(fetchThrottleTime)).pipe(mapTo(false)),
 ]).pipe(withInitialValue(false));
 
 const useRefreshButtonIsDisabled = (): boolean =>

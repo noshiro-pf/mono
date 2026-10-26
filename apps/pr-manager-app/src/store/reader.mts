@@ -13,6 +13,7 @@ import {
   empty,
   filter,
   map,
+  mapTo,
   merge,
   scan,
   skipIfNoChange,
@@ -206,7 +207,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
   const tokenChanged = started.pipe(
     switchMap((isStarted) =>
       isStarted
-        ? token.pipe(map((stored) => stored?.value)).pipe(skipIfNoChange())
+        ? token.pipe(map((stored) => stored?.value))
         : empty<string | undefined>(),
     ),
   );
@@ -226,7 +227,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     update: updateLoadStatus,
     getSnapshot: getLoadStatus,
   } = createResettableState<LoadStatus>(LOADING, fastDeepEqual, [
-    tokenForgotten.pipe(map(() => LOADING)),
+    tokenForgotten.pipe(mapTo(LOADING)),
   ]);
 
   const [rateLimit, , { updateState: updateRateLimit }] = createState<
@@ -290,13 +291,13 @@ export const createReader = (deps: ReaderDeps): Reader => {
     update: updateReport,
     getSnapshot: getReport,
   } = createResettableState<ReportParts>(EMPTY_PARTS, Object.is, [
-    tokenForgotten.pipe(map(() => EMPTY_PARTS)),
+    tokenForgotten.pipe(mapTo(EMPTY_PARTS)),
   ]);
 
   const partOf = <K extends keyof ReportParts>(
     key: K,
   ): InitializedObservable<ReportParts[K]> =>
-    report.pipe(map((held) => held[key])).pipe(skipIfNoChange());
+    report.pipe(map((held) => held[key]));
 
   const readAt = partOf('readAtEpochMs');
 
@@ -321,7 +322,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
   const { state: runs, update: updateRuns } = createResettableState<RunsStatus>(
     RUNS_READING,
     fastDeepEqual,
-    [tokenForgotten.pipe(map(() => RUNS_READING))],
+    [tokenForgotten.pipe(mapTo(RUNS_READING))],
   );
 
   // When the read of the runs on screen started; `0` while none is.
@@ -332,7 +333,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     set: setMoreIssues,
     getSnapshot: getMoreIssues,
   } = createResettableState<MoreIssuesStatus>(MORE_ISSUES_IDLE, fastDeepEqual, [
-    tokenChanged.pipe(map(() => MORE_ISSUES_IDLE)),
+    tokenChanged.pipe(mapTo(MORE_ISSUES_IDLE)),
   ]);
 
   // How many open issues each read lists. Raised by `loadMoreIssues`, and

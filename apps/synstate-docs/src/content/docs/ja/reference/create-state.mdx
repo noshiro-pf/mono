@@ -88,7 +88,7 @@ const [report, setReport] = createState<PullReport>(
     { keepEqualParts: true },
 );
 
-const summary = report.pipe(map((r) => r.summary)).pipe(skipIfNoChange());
+const summary = report.pipe(map((r) => r.summary));
 
 const summaryHistory: unknown[] = [];
 
@@ -127,7 +127,7 @@ assert.strictEqual(report.getSnapshot().value.summary, held.summary);
 assert.deepStrictEqual(summaryHistory, [{ open: 0 }, { open: 1 }]);
 ```
 
-次の状態は書き込む前に今の状態と比べられます。今の状態の同じ部分と深く等しい部分はその部分に置き換わるので、変わっていない部分を読む側は手元のオブジェクトを持ち続け、`Object.is` の `skipIfNoChange()` で止まります。何も変えない更新はそもそも伝わりません。配列の要素は index で照合し、`keepEqualParts: { key }` を渡すと key で照合します。[`keepEqualParts`](../keep-equal-parts/) オペレーターの書き込み側の版で、こちらを優先してください。
+次の状態は書き込む前に今の状態と比べられます。今の状態の同じ部分と深く等しい部分はその部分に置き換わるので、変わっていない部分を読む側は手元のオブジェクトを持ち続け、`Object.is` で比べる `map` がそこで止めます。何も変えない更新はそもそも伝わりません。配列の要素は index で照合し、`keepEqualParts: { key }` を渡すと key で照合します。[`keepEqualParts`](../keep-equal-parts/) オペレーターの書き込み側の版で、こちらを優先してください。
 
 {/* source-link */}
 [View source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/utils/create-state.mts)

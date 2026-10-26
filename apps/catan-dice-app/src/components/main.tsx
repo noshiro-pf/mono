@@ -30,9 +30,9 @@ const [undo$, undo] = createEventEmitter();
 const [redo$, redo] = createEventEmitter();
 
 const history$ = merge([
-  rollDices$.pipe(mapTo('roll-dices' as const)),
-  undo$.pipe(mapTo('undo' as const)),
-  redo$.pipe(mapTo('redo' as const)),
+  rollDices$.pipe(mapTo('roll-dices')),
+  undo$.pipe(mapTo('undo')),
+  redo$.pipe(mapTo('redo')),
 ] as const).pipe(scan(historyReducer, defaultHistoryState));
 
 const undoable$ = history$

@@ -9,7 +9,9 @@ import { colors } from '../../../components/constants.mjs';
 
 {/* jsdoc-description */}
 Attaches a sequential index to each emitted value, producing `[index, value]` tuples.
-Index starts at 0 and increments with each emission.
+Index starts at 0 and increments with each emission; a value the source
+already holds when this is applied gets -1. Use it where `map` used to
+receive an index.
 {/* /jsdoc-description */}
 
 ## Marble Diagram

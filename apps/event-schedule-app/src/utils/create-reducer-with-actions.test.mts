@@ -1,4 +1,4 @@
-import { createState, filter, map } from 'synstate';
+import { createState, filter, mapTo } from 'synstate';
 import { match } from 'ts-data-forge';
 import {
   createReducerWithActions,
@@ -14,11 +14,7 @@ describe('createReducerWithActions', () => {
         (_: string, action: 'input' | 'reset') =>
           match(action, { input: 'a', reset: '' }),
         '',
-        [
-          page$
-            .pipe(filter((page) => page !== 'form'))
-            .pipe(map(() => 'reset' as const)),
-        ],
+        [page$.pipe(filter((page) => page !== 'form')).pipe(mapTo('reset'))],
       );
 
       const mut_history: string[] = [];

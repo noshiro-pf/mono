@@ -9,7 +9,7 @@ import { colors } from '../../../../components/constants.mjs';
 
 {/* jsdoc-description */}
 ソースの値を無視して、すべての発行値を定数値にマッピングします。
-`map(() => value)` と同等です。
+値は変わりませんが、ソースが発行するたびに発行します。`map(() => value)` は 2 回目以降の結果を等しいとして止めるので、イベントを値に変えるときはこちらを使ってください。値の型は `as const` を付けたときと同じく書いたとおりに推論され、`mapTo('reset')` は `string` ではなく `'reset'` になります。
 {/* /jsdoc-description */}
 
 ## Marble Diagram

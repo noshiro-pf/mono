@@ -86,7 +86,7 @@ const [report, setReport] = createState<PullReport>(
     { keepEqualParts: true },
 );
 
-const summary = report.pipe(map((r) => r.summary)).pipe(skipIfNoChange());
+const summary = report.pipe(map((r) => r.summary));
 
 const summaryHistory: unknown[] = [];
 
@@ -125,7 +125,7 @@ assert.strictEqual(report.getSnapshot().value.summary, held.summary);
 assert.deepStrictEqual(summaryHistory, [{ open: 0 }, { open: 1 }]);
 ```
 
-The next state is compared with the current one before it is written: every part deeply equal to the same part of the current state is replaced by that part, so whatever reads an unchanged part keeps the object it has and `skipIfNoChange()` with `Object.is` stops it, and an update that changes nothing is not passed on at all. Array items are matched by index; `keepEqualParts: { key }` matches them by key. It is the writing-side counterpart of the [`keepEqualParts`](../keep-equal-parts/) operator, and the one to prefer.
+The next state is compared with the current one before it is written: every part deeply equal to the same part of the current state is replaced by that part, so whatever reads an unchanged part keeps the object it has and `map`, comparing with `Object.is`, stops there, and an update that changes nothing is not passed on at all. Array items are matched by index; `keepEqualParts: { key }` matches them by key. It is the writing-side counterpart of the [`keepEqualParts`](../keep-equal-parts/) operator, and the one to prefer.
 
 {/* source-link */}
 [View source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/utils/create-state.mts)
