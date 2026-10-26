@@ -114,5 +114,13 @@ export function minLengthArray<A>(
         );
   };
 
-  return buildType({ typeName, getDefaultValue, validate, fill, elementType });
+  return buildType({
+    typeName,
+    getDefaultValue,
+    validate,
+    fill,
+    elementType,
+    minLength,
+    maxLength: undefined,
+  });
 }

@@ -39,6 +39,7 @@ describe(partial, () => {
       | 'fill'
       | 'prune'
       | 'validate'
+      | 'structure'
       | 'optional'
     >('=');
 

@@ -76,6 +76,7 @@ export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
     is,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
+    structure: { kind: 'intersection', memberTypes: types },
   } as const;
 
   // If all types are records, add RecordTypeInternals

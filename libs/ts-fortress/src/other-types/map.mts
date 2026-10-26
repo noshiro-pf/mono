@@ -118,5 +118,6 @@ export const MapType = <K extends UnknownType, V extends UnknownType>(
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
+    structure: { kind: 'map', keyType, valueType },
   };
 };

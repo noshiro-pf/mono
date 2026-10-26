@@ -97,6 +97,8 @@ export type {
   ExcessPropertyOption,
   Type,
   TypeOf,
+  TypeStructure,
+  TypeStructureKind,
   UnknownShape,
   WithShape,
 } from './type.mjs';

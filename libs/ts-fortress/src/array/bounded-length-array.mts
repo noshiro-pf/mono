@@ -158,5 +158,13 @@ export function boundedLengthArray<A>(
         );
   };
 
-  return buildType({ typeName, getDefaultValue, validate, fill, elementType });
+  return buildType({
+    typeName,
+    getDefaultValue,
+    validate,
+    fill,
+    elementType,
+    minLength: min,
+    maxLength: max,
+  });
 }

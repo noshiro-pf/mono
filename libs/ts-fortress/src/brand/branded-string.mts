@@ -5,7 +5,7 @@ import { brand } from './brand.mjs';
 
 export const brandedString = <K extends string>({
   defaultValue,
-  is = (_u): _u is Brand<string, K> => true,
+  is,
   typeName,
 }: Readonly<{
   typeName: K;

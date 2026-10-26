@@ -180,6 +180,7 @@ export const recursion = <A,>(
     is,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
+    structure: { kind: 'recursion', typeName, resolve: getInnerType },
   } as const;
 
   // Proxy to propagate RecordTypeInternals if the inner type has them

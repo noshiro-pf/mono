@@ -124,5 +124,6 @@ export const templateLiteral = <T extends string>({
     is: createIsFn<T>(validate),
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
+    structure: { kind: 'templateLiteral' },
   };
 };

@@ -51,12 +51,17 @@ export const buildType = <Elm, T extends readonly Elm[] = readonly Elm[]>({
   validate,
   fill,
   elementType,
+  minLength,
+  maxLength,
 }: Readonly<{
   typeName: string;
   getDefaultValue: () => readonly Elm[];
   validate: (a: unknown) => Result<readonly Elm[], readonly ValidationError[]>;
   fill: (a: unknown) => readonly Elm[];
   elementType: Type<Elm>;
+  /** The bounds `validate` enforces, both inclusive, for the structure. */
+  minLength: number | undefined;
+  maxLength: number | undefined;
 }>): Type<T> => {
   const base: Type<readonly Elm[]> = {
     typeName,
@@ -69,6 +74,7 @@ export const buildType = <Elm, T extends readonly Elm[] = readonly Elm[]>({
     is: createIsFn(validate),
     cast: createCastFn(validate),
     assertIs: createAssertFn(validate),
+    structure: { kind: 'array', elementType, minLength, maxLength },
   } as const;
 
   // The branded output type `T` (e.g. `NonEmptyArray` / `FixedLengthArray`) is

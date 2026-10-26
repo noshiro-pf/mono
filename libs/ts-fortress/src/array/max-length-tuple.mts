@@ -129,5 +129,11 @@ export function maxLengthTuple<A>(
     is: createIsFn(validate),
     cast: createCastFn(validate),
     assertIs: createAssertFn(validate),
+    structure: {
+      kind: 'array',
+      elementType,
+      minLength: undefined,
+      maxLength: size,
+    },
   };
 }

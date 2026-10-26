@@ -105,5 +105,6 @@ export const tuple = <const A extends readonly UnknownType[]>(
     // Retain the element types so that `at(tupleType, index)` can recover the
     // Type at a given position.
     elementTypes: types,
+    structure: { kind: 'tuple', elementTypes: types },
   } satisfies Type<T> & TupleTypeInternals as Type<T>;
 };

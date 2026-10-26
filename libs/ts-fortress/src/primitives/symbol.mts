@@ -7,4 +7,5 @@ export const symbol = (defaultValue: symbol): Type<symbol> =>
     typeName: 'symbol',
     defaultValue,
     is: isSymbol,
+    structure: { kind: 'symbol' },
   });

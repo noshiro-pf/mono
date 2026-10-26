@@ -76,6 +76,7 @@
     "@sumi-lang/cli": "workspace:*",
     "@vitest/browser-playwright": "catalog:",
     "@vitest/ui": "catalog:",
+    "ajv": "8.20.0",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",

@@ -82,5 +82,6 @@ export const SetType = <T extends UnknownType>(
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
+    structure: { kind: 'set', elementType },
   };
 };

@@ -221,6 +221,7 @@ export const record = <
     shape,
     shapeStructure: { kind: 'simple', shape } as const,
     excessProperty: ep,
+    structure: { kind: 'record', shape, excessProperty: ep },
   } satisfies Type<V> & RecordTypeInternals & WithShape<S> as Type<V> &
     WithShape<S>;
 };

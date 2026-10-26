@@ -16,4 +16,5 @@ export const literal = <
         : value.toString(),
     defaultValue: value,
     is: (u: unknown): u is L => u === value,
+    structure: { kind: 'literal', value },
   });

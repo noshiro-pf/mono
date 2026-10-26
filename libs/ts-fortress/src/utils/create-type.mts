@@ -1,4 +1,4 @@
-import type { Type } from '../type.mjs';
+import type { Type, TypeStructure } from '../type.mjs';
 import { createAssertFn } from './create-assert-fn.mjs';
 import { createCastFn } from './create-cast-fn.mjs';
 import { createIsFn } from './create-is-fn.mjs';
@@ -7,6 +7,7 @@ export const createType = <A,>({
   defaultValue,
   fill,
   prune,
+  structure,
   typeName,
   validate,
 }: Readonly<{
@@ -15,6 +16,7 @@ export const createType = <A,>({
   validate: Type<A>['validate'];
   fill?: Type<A>['fill'];
   prune?: Type<A>['prune'];
+  structure?: TypeStructure;
 }>): Type<A> => {
   const is = createIsFn<A>(validate);
 
@@ -27,5 +29,6 @@ export const createType = <A,>({
     fill: fill ?? ((a) => (is(a) ? a : defaultValue)),
     prune: prune ?? ((a) => a),
     cast: createCastFn(validate),
+    ...(structure === undefined ? {} : { structure }),
   };
 };
