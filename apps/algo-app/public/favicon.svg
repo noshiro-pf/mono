@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- A black card and a white one: the numbered cards of the game. -->
+  <rect width="32" height="32" rx="7" fill="#0f766e" />
+  <rect x="5.5" y="7.5" width="12" height="18" rx="2" fill="#1f2328" stroke="#fff" stroke-width="1.5" transform="rotate(-10 11.5 16.5)" />
+  <rect x="14.5" y="6.5" width="12" height="18" rx="2" fill="#fff" stroke="#1f2328" stroke-width="1.5" transform="rotate(8 20.5 15.5)" />
+</svg>

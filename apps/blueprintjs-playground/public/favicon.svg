@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Blueprint paper: a grid on Blueprint's blue. -->
+  <rect width="32" height="32" rx="7" fill="#2d72d2" />
+  <g fill="none" stroke="#fff">
+    <rect x="6.5" y="6.5" width="19" height="19" rx="1.5" stroke-width="2" />
+    <path d="M12.83 6.5v19M19.17 6.5v19M6.5 12.83h19M6.5 19.17h19" stroke-width="1.2" stroke-opacity="0.7" />
+  </g>
+</svg>

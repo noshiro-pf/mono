@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Two dice: the rolls whose splits the probability table counts. -->
+  <rect width="32" height="32" rx="7" fill="#c2410c" />
+  <g transform="rotate(-12 11.5 12.5)">
+    <rect x="4.5" y="5.5" width="14" height="14" rx="3" fill="#fff" />
+    <g fill="#c2410c">
+      <circle cx="8.3" cy="9.3" r="1.5" />
+      <circle cx="14.7" cy="9.3" r="1.5" />
+      <circle cx="11.5" cy="12.5" r="1.5" />
+      <circle cx="8.3" cy="15.7" r="1.5" />
+      <circle cx="14.7" cy="15.7" r="1.5" />
+    </g>
+  </g>
+  <g transform="rotate(14 20.5 20.5)">
+    <rect x="14" y="14" width="13" height="13" rx="3" fill="#fff" stroke="#c2410c" stroke-width="1.2" />
+    <g fill="#c2410c">
+      <circle cx="17.5" cy="17.5" r="1.4" />
+      <circle cx="20.5" cy="20.5" r="1.4" />
+      <circle cx="23.5" cy="23.5" r="1.4" />
+    </g>
+  </g>
+</svg>
