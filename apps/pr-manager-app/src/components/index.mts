@@ -11,6 +11,7 @@ export * from './dag-box.mjs';
 export * from './external-link.js';
 export * from './follow-open.mjs';
 export * from './header-fold-toggle.js';
+export * from './how-to-use.js';
 export * from './issue-dag-done-toggle.js';
 export * from './issue-dag-legend.js';
 export * from './issue-dag-node.js';

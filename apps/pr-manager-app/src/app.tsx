@@ -12,6 +12,7 @@ import { Optional } from 'ts-data-forge';
 import {
   ExternalLink,
   HeaderFoldToggle,
+  HowToUse,
   LoadStateView,
   Notice,
   ReadFromGitHub,
@@ -131,6 +132,8 @@ export const App = (): JSX.Element => {
               </span>
             )}
           />
+
+          <HowToUse />
 
           <WeeklyActivity />
 
