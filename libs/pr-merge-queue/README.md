@@ -39,6 +39,23 @@ The checks a pull request has to pass are what GitHub's rules require on the
 default branch, or what `repo-settings/rulesets/main.json` declares where a
 repository keeps its rulesets as code.
 
+## The Claude Code plugin
+
+`unblock-prs` sets aside what it cannot land by itself — a failing check, a
+rebase that conflicted — for the `unblock-prs` skill to fix. The skill ships as
+a Claude Code plugin from this repository's marketplace:
+
+```text
+/plugin marketplace add noshiro-pf/mono
+/plugin install pr-merge-queue@noshiro-pf
+```
+
+Then run `/pr-merge-queue:unblock-prs` beside the worker, or under `/loop`.
+The skill reads the repository's own instructions first, and
+`.github/unblock-prs.md` if there is one: how its checks are reproduced, and
+which branches it generates rather than writes. The plugin's version is the
+package's, so the skill matches the commands of the same version.
+
 ## As a library
 
 What the commands share is exported too, for scripts that talk to the same

@@ -1,18 +1,21 @@
+<!-- cspell:ignore ELIFECYCLE -->
+
 # Reading GitHub without `gh`
 
-Shared by the skills beside it. This directory holds no `SKILL.md` and is not
-a skill; it is the one copy of the recipes more than one of them needs.
+The recipes the `unblock-prs` skill needs beyond the package's commands.
+`<owner>/<repo>` is the repository the worker runs in, and `<base>` its
+default branch.
 
-`CLAUDE.md`, "Session rules" forbids a session the `gh` CLI — it authenticates
-as a person, and a session acting as one is the thing that rule is about. A
-scheduled run in a container has a second reason: there is no `gh` login there
-to act as, only a token. So everything here is the REST API, called the way
-`libs/pr-merge-queue/src/lib/github-api.mts` calls it.
+The skill does not use the `gh` CLI: it authenticates as a person, and the
+worker reads claims and comments as the token's account. A scheduled run in a
+container has a second reason: there is no `gh` login there to act as, only a
+token. So everything here is the REST API, called the way the package's
+`src/lib/github-api.mts` calls it.
 
-`pnpm run unblock-prs` and `pnpm run open-pr` are not affected by any of this:
-both call this same API with the same token. The first stays the author's to
-run — it arms auto-merge, which only GraphQL can, and a session's proxy
-refuses GraphQL; the second is the one a session runs.
+`unblock-prs` and `open-pr` are not affected by any of this: both call this
+same API with the same token. The first stays the author's to run — it arms
+auto-merge, which only GraphQL can, and a Claude Code session's proxy may
+refuse GraphQL; the second is the one a session runs.
 
 ## The credential
 
@@ -34,7 +37,7 @@ gh_api() {
         -H "Authorization: Bearer $GH_TOKEN" \
         -H "Accept: application/vnd.github+json" \
         -H "X-GitHub-Api-Version: 2022-11-28" \
-        -H "User-Agent: noshiro-pf-mono" \
+        -H "User-Agent: pr-merge-queue" \
         "https://api.github.com/$1"
 }
 ```
@@ -44,7 +47,7 @@ exits 0 on a 404 or a 403, so a refusal arrives as a body reading
 `{"message": ...}` rather than as a failure — pass `-w '\n%{http_code}\n'` on
 anything that writes.
 
-`jq` is not installed. Read JSON with `python3 -c`, or let a script do it.
+`jq` may not be installed. The recipes read JSON with `python3 -c`.
 
 **GraphQL is refused by the proxy.** Nothing here may depend on it, which
 rules out `mergeStateStatus`, `closingIssuesReferences`, marking a pull
@@ -55,8 +58,8 @@ below or is something a session must not do anyway.
 
 | `gh`                                    | here                                                         |
 | :-------------------------------------- | :----------------------------------------------------------- |
-| `gh pr list`, `gh pr view`              | `pnpm run pr-report -- --format json`, or `GET /pulls`       |
-| `gh pr checks`                          | `pnpm run pr-report`; by hand, the two endpoints below       |
+| `gh pr list`, `gh pr view`              | `pr-report --format json`, or `GET /pulls`                   |
+| `gh pr checks`                          | `pr-report`; by hand, the two endpoints below                |
 | `gh pr checks --watch`                  | a poll loop — there is no server-side wait                   |
 | `gh run view --job <id> --log-failed`   | `GET /actions/jobs/{id}/logs`, whole log, grep it            |
 | `gh pr edit --title`                    | `PATCH /pulls/{n}`                                           |
@@ -67,9 +70,9 @@ below or is something a session must not do anyway.
 
 ## Whether a pull request is green
 
-**Use `pnpm run pr-report`.** It reads both places GitHub keeps a verdict and
+**Use `pr-report`.** It reads both places GitHub keeps a verdict and
 judges the result against the contexts the ruleset requires, which is more
-than one trap deep — `libs/pr-merge-queue/src/pr-report/README.md` says which
+than one trap deep — the package's `src/pr-report/README.md` says which
 traps it handles, and its tests are what hold that. Reading the endpoints by
 hand and comparing what comes back to "how many are green" gets each of them
 wrong.
@@ -103,18 +106,18 @@ Read by hand, this is what to watch for:
   finished last. Every suite of one push is created in the same second, so
   which suite got the higher id is luck: usually the superseding green one,
   and when it is not, the stale red holds the merge until something pushes
-  or re-runs. `CLAUDE.md`, "Commits and pull requests" says to ignore that
-  red; this is the case where GitHub does not, and a reader who sorts by
+  or re-runs. A repository that holds its pull requests with `skip-ci` says
+  to ignore that red; this is the case where GitHub does not, and a reader who sorts by
   `started_at` calls a blocked pull request green.
 
-`pr-report` reads the required contexts from `repo-settings/rulesets/main.json`
-rather than from GitHub, because the API that serves a ruleset wants an admin
-token. The file is the desired state, and a context in it that
-`repo-settings:apply` has not applied yet is required by nothing. When the
-difference matters, ask GitHub:
+`pr-report` reads the required contexts from GitHub's rules for the default
+branch — or from `repo-settings/rulesets/main.json` where a repository keeps
+its rulesets as code, which is the desired state: a context in it that has not
+been applied yet is required by nothing. When the difference matters, ask
+GitHub:
 
 ```bash
-gh_api 'repos/noshiro-pf/mono/rules/branches/main' | python3 -c '
+gh_api 'repos/<owner>/<repo>/rules/branches/<base>' | python3 -c '
 import json, sys
 for rule in json.load(sys.stdin):
     if rule.get("type") == "required_status_checks":
@@ -125,7 +128,7 @@ for rule in json.load(sys.stdin):
 ## The open pull request for a branch
 
 ```bash
-gh_api 'repos/noshiro-pf/mono/pulls?state=open&head=noshiro-pf:chore/pnpm-update'
+gh_api 'repos/<owner>/<repo>/pulls?state=open&head=<owner>:<branch>'
 ```
 
 `head` is qualified with the owner. A bare branch name also matches the same
@@ -135,7 +138,7 @@ acted on is how a session pushes to the wrong place.
 ## Whether a branch is behind its base
 
 ```bash
-gh_api 'repos/noshiro-pf/mono/compare/main...chore/pnpm-update' | python3 -c '
+gh_api 'repos/<owner>/<repo>/compare/<base>...<branch>' | python3 -c '
 import json, sys
 d = json.load(sys.stdin)
 print(d["status"], "behind_by", d["behind_by"], "ahead_by", d["ahead_by"])'
@@ -157,7 +160,7 @@ The aggregate's `details_url` is `.../actions/runs/<run_id>/job/<job_id>`.
 With the run id:
 
 ```bash
-gh_api 'repos/noshiro-pf/mono/actions/runs/<run_id>/jobs?per_page=100&filter=latest' \
+gh_api 'repos/<owner>/<repo>/actions/runs/<run_id>/jobs?per_page=100&filter=latest' \
     | python3 -c '
 import json, sys
 for job in json.load(sys.stdin)["jobs"]:
@@ -169,8 +172,8 @@ Then the log. There is no `--log-failed`: the whole job log comes back as
 plain text, tens of kilobytes of it, so grep rather than read.
 
 ```bash
-curl -sSL -H "Authorization: Bearer $GH_TOKEN" -H "User-Agent: noshiro-pf-mono" \
-    "https://api.github.com/repos/noshiro-pf/mono/actions/jobs/<job_id>/logs" -o job.log
+curl -sSL -H "Authorization: Bearer $GH_TOKEN" -H "User-Agent: pr-merge-queue" \
+    "https://api.github.com/repos/<owner>/<repo>/actions/jobs/<job_id>/logs" -o job.log
 grep -nE '##\[error\]|ELIFECYCLE|ERR_PNPM' job.log
 ```
 
@@ -194,7 +197,7 @@ Find which run is holding it: list the runs of that name and take the one in
 the greatest `check_suite.id`, then read its `details_url` for the run id.
 
 ```bash
-gh_api 'repos/noshiro-pf/mono/commits/<sha>/check-runs?check_name=test-node-versions-result%20%2F%20result' \
+gh_api 'repos/<owner>/<repo>/commits/<sha>/check-runs?check_name=test-node-versions-result%20%2F%20result' \
     | python3 -c '
 import json, sys
 runs = json.load(sys.stdin)["check_runs"]
@@ -210,8 +213,8 @@ curl -sS -X POST -w '\n%{http_code}\n' \
     -H "Authorization: Bearer $GH_TOKEN" \
     -H "Accept: application/vnd.github+json" \
     -H "X-GitHub-Api-Version: 2022-11-28" \
-    -H "User-Agent: noshiro-pf-mono" \
-    'https://api.github.com/repos/noshiro-pf/mono/actions/runs/<run_id>/rerun'
+    -H "User-Agent: pr-merge-queue" \
+    'https://api.github.com/repos/<owner>/<repo>/actions/runs/<run_id>/rerun'
 ```
 
 It needs `actions: write`, and it costs that workflow's matrix once. Re-run
@@ -227,7 +230,7 @@ scheduled run spends a rate limit on a pull request nobody is going to look at.
 
 ```bash
 for _ in $(seq 1 30); do
-    pnpm run pr-report -- --format json > report.json
+    pr-report --format json > report.json
     # stop when the entry for this branch is no longer pending
     sleep 60
 done
@@ -247,11 +250,11 @@ curl -sS -X POST \
     -H "Authorization: Bearer $GH_TOKEN" \
     -H "Accept: application/vnd.github+json" \
     -H "X-GitHub-Api-Version: 2022-11-28" \
-    -H "User-Agent: noshiro-pf-mono" \
+    -H "User-Agent: pr-merge-queue" \
     -H "Content-Type: application/json" \
     -w '\n%{http_code}\n' \
     -d @comment.json \
-    'https://api.github.com/repos/noshiro-pf/mono/issues/<number>/comments'
+    'https://api.github.com/repos/<owner>/<repo>/issues/<number>/comments'
 ```
 
 A title (`PATCH /pulls/{n}` with `{"title": "..."}`), a label
@@ -259,5 +262,5 @@ A title (`PATCH /pulls/{n}` with `{"title": "..."}`), a label
 
 **What a session does not call**, however easy the route is:
 `PUT /pulls/{n}/merge`, anything arming or disarming auto-merge, and
-`POST /pulls/{n}/reviews`. See `CLAUDE.md`, "Session rules" and "Commits and
-pull requests".
+`POST /pulls/{n}/reviews`. Each is the worker's or a person's, as the skill
+says.

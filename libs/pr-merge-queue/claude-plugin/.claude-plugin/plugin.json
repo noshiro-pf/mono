@@ -1,0 +1,10 @@
+{
+  "name": "pr-merge-queue",
+  "version": "0.0.0",
+  "description": "The unblock-prs skill: fix the pull requests the pr-merge-queue worker set aside, one at a time, claimed first and pushed with the worker's own push.",
+  "author": { "name": "noshiro-pf" },
+  "homepage": "https://github.com/noshiro-pf/mono/tree/main/libs/pr-merge-queue",
+  "repository": "https://github.com/noshiro-pf/mono",
+  "license": "Apache-2.0",
+  "keywords": ["merge-queue", "pull-request", "github"]
+}

@@ -27,7 +27,7 @@
   "scripts": {
     "build:pages-site": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/build-pages-site.mts",
     "changeset:publish": "pnpm changeset publish",
-    "changeset:version-packages": "pnpm changeset version && pnpm run strict-lib:fix:fmt && pnpm run strict-lib:gen:packages && pnpm install --no-frozen-lockfile && pnpm run gen:deps-graph && pnpm run gen:verify-npm-packages",
+    "changeset:version-packages": "pnpm changeset version && pnpm run strict-lib:fix:fmt && pnpm run strict-lib:gen:packages && pnpm install --no-frozen-lockfile && pnpm run gen:deps-graph && pnpm run gen:verify-npm-packages && pnpm run --filter=pr-merge-queue gen:plugin-version",
     "check:cspell": "cspell \"{**,.github/**/*}\" --gitignore --gitignore-root ./ --no-progress && pnpm run check:cspell:changeset",
     "check:cspell:changeset": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/cspell-changeset.mts",
     "check:knip": "node ./tools/scripts/cmd/assert-deps-built.mts --workspace && knip --no-progress --no-config-hints --include dependencies,unlisted,binaries,unresolved,catalog,catalogReferences",
