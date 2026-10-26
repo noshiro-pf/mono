@@ -377,14 +377,14 @@ SynState achieves glitch-free propagation in $O(n)$ by exploiting two properties
 
 ### Cycle detection
 
-SynState's propagation model assumes the dependency graph is a **DAG** (directed acyclic graph). To guarantee this at runtime, SynState performs a **cycle check at construction time** in development — whenever a new observable is created via `.pipe()` or a combinator (`combine`, `merge`, `zip`), a depth-first traversal of the ancestor chain verifies that no node appears as its own ancestor. If a cycle is detected, an error is thrown immediately:
+SynState's propagation model assumes the dependency graph is a **DAG** (directed acyclic graph). The public API guarantees this by construction: a new observable's parents exist before it and cannot change afterwards, so no observable can become its own ancestor. On top of that, SynState verifies it with a **cycle check at construction time** in development — whenever a new observable is created via `.pipe()` or a combinator (`combine`, `merge`, `zip`), a depth-first traversal of the ancestor chain verifies that no node appears as its own ancestor. If a cycle is detected, an error is thrown immediately:
 
 ```
 Circular dependency detected in observable graph:
 a child observable cannot be its own ancestor.
 ```
 
-The check walks every ancestor of each new observable, so every creation pays for it. For performance, it **runs only in development**: it is off when `process.env.NODE_ENV` is `'production'`, and wherever there is no `process`, as in a browser bundle. Turning it off does not make production code less safe in normal use. A child's parents exist before it and cannot change afterwards, so the public API cannot build a cycle. What the check catches is code that rewrites an observable's `parents`, and that shows up in development and tests.
+The check is **on in development and off in production**. It walks every ancestor of each new observable, so every creation pays for it, and production does not: it is off when `process.env.NODE_ENV` is `'production'`, and wherever there is no `process`, as in a browser bundle. Since the public API cannot build a cycle, what the check catches is code that rewrites an observable's `parents`, and such code runs in development and tests before it reaches production.
 
 This means that once the graph has been built, all subsequent update cycles are guaranteed to operate on a DAG — no infinite loops, and a depth for every node.
 
