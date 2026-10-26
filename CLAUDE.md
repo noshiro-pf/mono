@@ -47,7 +47,8 @@ see "Japanese text".
 ## Repository layout
 
 - `libs/*` — published npm packages. `apps/*` — applications, private, each
-  still carrying `"exports": "./src/index.mts"` so siblings can resolve it.
+  still carrying `"exports": "./src/index.mts"` so siblings can resolve it. A
+  browser app's `<head>` (icons, link cards) follows `docs/browser-app-head.md`.
 - `tools/` — repository tooling; not a workspace member. `tools/configs/`
   holds shared config and the sample embedding scripts; `tools/scripts/cmd/`
   holds root-level `tsx` commands, one file each (a command that outgrows one
@@ -64,8 +65,7 @@ see "Japanese text".
 - `verify-npm-packages/` — installs what the packages publish and runs it.
 
 Workspace globs are in `pnpm-workspace.yaml`; a directory is a member only
-with a `package.json`, and `tools/configs/`, `tools/scripts/` have none on
-purpose.
+with a `package.json`; `tools/configs/` and `tools/scripts/` have none by design.
 
 **One `.gitignore`, at the root**, and one deliberate package-level
 `.prettierignore` (`languages/sumi/conformance/`). Each says why in its own
