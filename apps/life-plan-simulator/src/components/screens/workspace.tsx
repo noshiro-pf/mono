@@ -1,5 +1,6 @@
+import { Tabs } from 'blueprint-synstate';
 import { createState } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
+import { constant, type JSX } from 'synstate-dom';
 import {
   CashFlowTab,
   DataTab,
@@ -20,49 +21,38 @@ export const Workspace = (): JSX.Element => {
   const [tab$, setTab] = createState<TabId>('overview');
 
   return (
-    <>
-      <nav class={constant('tabs')} aria-label={constant('シート')}>
-        {tabs.map((tab) => (
-          <button
-            type={constant('button')}
-            data-e2e={constant(`tab-${tab.id}`)}
-            aria-current={view(tab$, (t) =>
-              t === tab.id ? 'page' : undefined,
-            )}
-            onClick={() => {
-              setTab(tab.id);
-            }}
-          >
-            {constant(tab.label)}
-          </button>
-        ))}
-      </nav>
-      {tabs.map((tab) => (
-        <If cond={view(tab$, (t) => t === tab.id)} then={tab.render()} />
-      ))}
-    </>
+    <Tabs
+      id={'sheets'}
+      class={'workspace'}
+      aria-label={constant('シート')}
+      tabs={tabsWithE2e}
+      selectedTabId={tab$}
+      onChange={setTab}
+    />
   );
 };
 
 type TabId = (typeof tabs)[number]['id'];
 
 const tabs = [
-  { id: 'overview', label: '概要', render: () => <OverviewTab /> },
-  { id: 'cash-flow', label: '収支', render: () => <CashFlowTab /> },
-  { id: 'salary', label: '年収', render: () => <SalaryTab /> },
-  { id: 'pension', label: '年金受給額', render: () => <PensionTab /> },
-  {
-    id: 'nisa',
-    label: '積立 NISA',
-    render: () => <InvestmentTab account={'nisa'} />,
-  },
+  { id: 'overview', title: '概要', panel: <OverviewTab /> },
+  { id: 'cash-flow', title: '収支', panel: <CashFlowTab /> },
+  { id: 'salary', title: '年収', panel: <SalaryTab /> },
+  { id: 'pension', title: '年金受給額', panel: <PensionTab /> },
+  { id: 'nisa', title: '積立 NISA', panel: <InvestmentTab account={'nisa'} /> },
   {
     id: 'taxable',
-    label: '投信（課税枠）',
-    render: () => <InvestmentTab account={'taxableInvestment'} />,
+    title: '投信（課税枠）',
+    panel: <InvestmentTab account={'taxableInvestment'} />,
   },
-  { id: 'dc', label: '確定拠出年金', render: () => <DefinedContributionTab /> },
-  { id: 'housing-loan', label: '住宅ローン', render: () => <HousingLoanTab /> },
-  { id: 'living-cost', label: '日常生活費', render: () => <LivingCostTab /> },
-  { id: 'data', label: '保存・読み込み', render: () => <DataTab /> },
+  { id: 'dc', title: '確定拠出年金', panel: <DefinedContributionTab /> },
+  { id: 'housing-loan', title: '住宅ローン', panel: <HousingLoanTab /> },
+  { id: 'living-cost', title: '日常生活費', panel: <LivingCostTab /> },
+  { id: 'data', title: '保存・読み込み', panel: <DataTab /> },
 ] as const;
+
+/** e2e のテストが探す、各タブの見出しの `data-e2e`。 */
+const tabsWithE2e = tabs.map((tab) => ({
+  ...tab,
+  'data-e2e': `tab-${tab.id}`,
+}));

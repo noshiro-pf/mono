@@ -1,3 +1,4 @@
+import { Card, HtmlTable } from 'blueprint-synstate';
 import { constant, view, type JSX } from 'synstate-dom';
 import { input$, result$, updateSection } from '../../store/index.mjs';
 import { formatAmount, formatYen } from '../../utils/index.mjs';
@@ -6,9 +7,11 @@ import { NumberField, OutputField } from '../fields/index.mjs';
 /** `年金受給額` シート: 受給額の計算と、受給開始年齢ごとの手取り・損益分岐。 */
 export const PensionTab = (): JSX.Element => (
   <div class={constant('tab-body')}>
-    <section>
-      <h2>{constant('標準受給額（65 歳から受給する場合）')}</h2>
-      <p class={constant('note')}>
+    <Card>
+      <h2 class={constant('bp6-heading')}>
+        {constant('標準受給額（65 歳から受給する場合）')}
+      </h2>
+      <p class={constant('bp6-text-muted note')}>
         {constant(
           '老齢厚生年金（報酬比例部分）は 22 歳から退職年齢までの年収（年収の推移の表から）の平均 × 0.005481 × 加入年数。年収は 780 万円で頭打ちにする。',
         )}
@@ -47,16 +50,24 @@ export const PensionTab = (): JSX.Element => (
           value={view(result$, (r) => formatYen(r.pension.annualAt65 / 12))}
         />
       </div>
-    </section>
-    <section>
-      <h2>{constant('受給開始年齢ごとの手取り')}</h2>
-      <p class={constant('note')}>
+    </Card>
+    <Card>
+      <h2 class={constant('bp6-heading')}>
+        {constant('受給開始年齢ごとの手取り')}
+      </h2>
+      <p class={constant('bp6-text-muted note')}>
         {constant(
           '「何歳まで得か」は、各年齢までの手取りの累計（老後の運用利回りで運用したとき）がほかの受給開始年齢より多い、最後の年齢。',
         )}
       </p>
       <div class={constant('table-wrapper')}>
-        <table class={constant('result')} data-e2e={constant('pension-table')}>
+        <HtmlTable
+          bordered
+          compact
+          striped
+          class={'result'}
+          data-e2e={constant('pension-table')}
+        >
           <caption>{constant('受給開始年齢ごとの年金（円 / 年）')}</caption>
           <thead>
             <tr>
@@ -90,9 +101,9 @@ export const PensionTab = (): JSX.Element => (
               </tr>
             ))}
           </tbody>
-        </table>
+        </HtmlTable>
       </div>
-    </section>
+    </Card>
   </div>
 );
 

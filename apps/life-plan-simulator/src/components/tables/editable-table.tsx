@@ -1,12 +1,6 @@
+import { Button, HtmlTable } from 'blueprint-synstate';
 import type { InitializedObservable } from 'synstate';
-import {
-  constant,
-  For,
-  mapBindable,
-  view,
-  type Bindable,
-  type JSX,
-} from 'synstate-dom';
+import { constant, For, view, type Bindable, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { NumberInput, TextInput, type NumberUnit } from '../fields/index.mjs';
 
@@ -35,8 +29,10 @@ export const EditableTable = <T extends Readonly<{ id: number }>>({
 
   return (
     <div class={constant('table-wrapper')}>
-      <table
-        class={constant('editable')}
+      <HtmlTable
+        bordered
+        compact
+        class={'editable'}
         data-e2e={e2e === undefined ? undefined : constant(e2e)}
       >
         <caption>{constant(caption)}</caption>
@@ -62,25 +58,29 @@ export const EditableTable = <T extends Readonly<{ id: number }>>({
                   </td>
                 ))}
                 <td>
-                  <button
-                    type={constant('button')}
+                  <Button
+                    icon={'trash'}
+                    intent={'danger'}
+                    size={'small'}
+                    variant={constant('minimal')}
                     aria-label={constant(`${caption}の行を削除`)}
+                    title={constant('削除')}
                     onClick={() => {
                       const { id } = row$.getSnapshot().value;
 
                       update((rows) => rows.filter((r) => r.id !== id));
                     }}
-                  >
-                    {constant('削除')}
-                  </button>
+                  />
                 </td>
               </tr>
             )}
           </For>
         </tbody>
-      </table>
-      <button
-        type={constant('button')}
+      </HtmlTable>
+      <Button
+        icon={'plus'}
+        size={'small'}
+        text={constant(`${caption}に行を追加`)}
         onClick={() => {
           update((rows) =>
             Arr.toPushed(
@@ -89,9 +89,7 @@ export const EditableTable = <T extends Readonly<{ id: number }>>({
             ),
           );
         }}
-      >
-        {mapBindable(constant(caption), (c) => `${c}に行を追加`)}
-      </button>
+      />
     </div>
   );
 };
@@ -131,6 +129,7 @@ const cell = <T extends Readonly<{ id: number }>>(
         <NumberInput
           label={column.header}
           unit={column.unit ?? 'plain'}
+          size={'small'}
           value={view(row$, column.get)}
           onChange={(value) => {
             updateRow(row$.getSnapshot().value.id, (row) =>
@@ -146,6 +145,7 @@ const cell = <T extends Readonly<{ id: number }>>(
         <TextInput
           label={column.header}
           type={column.kind}
+          size={'small'}
           value={view(row$, column.get)}
           onChange={(value) => {
             updateRow(row$.getSnapshot().value.id, (row) =>

@@ -1,3 +1,4 @@
+import { Card } from 'blueprint-synstate';
 import { createState } from 'synstate';
 import { constant, view, type JSX } from 'synstate-dom';
 import {
@@ -26,9 +27,9 @@ export const DefinedContributionTab = (): JSX.Element => {
 
   return (
     <div class={constant('tab-body')}>
-      <section>
-        <h2>{constant('入力')}</h2>
-        <p class={constant('note')}>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('入力')}</h2>
+        <p class={constant('bp6-text-muted note')}>
           {constant(
             '掛金は「年収」のタブの企業型 DC と iDeCo の合計で、60 歳か退職年齢の早いほうになる月から 0。運用利回りは現役時代のもの。一括受給の年齢は「概要」のタブで決める。',
           )}
@@ -102,9 +103,9 @@ export const DefinedContributionTab = (): JSX.Element => {
             }}
           />
         </div>
-      </section>
-      <section>
-        <h2>{constant('一括受給')}</h2>
+      </Card>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('一括受給')}</h2>
         <div class={constant('form')}>
           <OutputField
             label="一括受取年月"
@@ -151,10 +152,10 @@ export const DefinedContributionTab = (): JSX.Element => {
             )}
           />
         </div>
-      </section>
-      <section>
+      </Card>
+      <Card>
         <div class={constant('section-header')}>
-          <h2>{constant('評価額の推移')}</h2>
+          <h2 class={constant('bp6-heading')}>{constant('評価額の推移')}</h2>
           <GranularityToggle
             granularity$={granularity$}
             setGranularity={setGranularity}
@@ -170,7 +171,7 @@ export const DefinedContributionTab = (): JSX.Element => {
           ageOf={(r) => r.age}
           granularity={granularity$}
         />
-      </section>
+      </Card>
     </div>
   );
 };

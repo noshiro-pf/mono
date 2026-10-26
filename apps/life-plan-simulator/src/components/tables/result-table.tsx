@@ -1,3 +1,4 @@
+import { HtmlTable } from 'blueprint-synstate';
 import {
   constant,
   derive,
@@ -43,8 +44,11 @@ export const ResultTable = <R,>({
 
   return (
     <div class={constant('table-wrapper scroll')}>
-      <table
-        class={constant('result')}
+      <HtmlTable
+        bordered
+        compact
+        striped
+        class={'result'}
         data-e2e={e2e === undefined ? undefined : constant(e2e)}
       >
         <caption>{constant(caption)}</caption>
@@ -72,7 +76,7 @@ export const ResultTable = <R,>({
             )}
           </For>
         </tbody>
-      </table>
+      </HtmlTable>
     </div>
   );
 };

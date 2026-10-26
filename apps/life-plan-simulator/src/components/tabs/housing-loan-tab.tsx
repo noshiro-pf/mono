@@ -1,3 +1,4 @@
+import { Card } from 'blueprint-synstate';
 import { createState } from 'synstate';
 import { constant, derive, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
@@ -41,9 +42,9 @@ export const HousingLoanTab = (): JSX.Element => {
 
   return (
     <div class={constant('tab-body')}>
-      <section>
-        <h2>{constant('借入')}</h2>
-        <p class={constant('note')}>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('借入')}</h2>
+        <p class={constant('bp6-text-muted note')}>
           {constant(
             '元利均等返済。金利は初期金利から毎月少しずつ上がり、上限で頭打ちになる。借入額を 0 にすると住宅ローンなしで計算する。',
           )}
@@ -101,9 +102,9 @@ export const HousingLoanTab = (): JSX.Element => {
             }}
           />
         </div>
-      </section>
-      <section>
-        <h2>{constant('住宅ローン控除')}</h2>
+      </Card>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('住宅ローン控除')}</h2>
         <div class={constant('form')}>
           <SelectField
             label="住宅の種別"
@@ -135,9 +136,9 @@ export const HousingLoanTab = (): JSX.Element => {
             }}
           />
         </div>
-      </section>
-      <section>
-        <h2>{constant('返済額')}</h2>
+      </Card>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('返済額')}</h2>
         <div class={constant('form')}>
           <OutputField
             label="初回の返済額"
@@ -168,10 +169,12 @@ export const HousingLoanTab = (): JSX.Element => {
             )}
           />
         </div>
-      </section>
-      <section>
+      </Card>
+      <Card>
         <div class={constant('section-header')}>
-          <h2>{constant('返済スケジュール')}</h2>
+          <h2 class={constant('bp6-heading')}>
+            {constant('返済スケジュール')}
+          </h2>
           <GranularityToggle
             granularity$={granularity$}
             setGranularity={setGranularity}
@@ -185,7 +188,7 @@ export const HousingLoanTab = (): JSX.Element => {
           ageOf={(r) => r.age}
           granularity={granularity$}
         />
-      </section>
+      </Card>
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import { Card } from 'blueprint-synstate';
 import { constant, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import type { LivingCostItem } from '../../domain/index.mjs';
@@ -9,9 +10,9 @@ import { EditableTable, type EditableColumn } from '../tables/index.mjs';
 /** `日常生活費` シート: 費目ごとの月額と合計。 */
 export const LivingCostTab = (): JSX.Element => (
   <div class={constant('tab-body')}>
-    <section>
-      <h2>{constant('日常生活費')}</h2>
-      <p class={constant('note')}>
+    <Card>
+      <h2 class={constant('bp6-heading')}>{constant('日常生活費')}</h2>
+      <p class={constant('bp6-text-muted note')}>
         {constant(
           '開始時点の月額。収支では物価上昇率で毎年増える。年額のものは 12 で割って入れる。',
         )}
@@ -41,7 +42,7 @@ export const LivingCostTab = (): JSX.Element => (
           )}
         />
       </div>
-    </section>
+    </Card>
   </div>
 );
 

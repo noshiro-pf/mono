@@ -1,21 +1,42 @@
 /* cspell:ignore nums */
 
+/*
+ * Blueprint's style sheet draws the controls (blueprint-synstate's
+ * components, in Blueprint's markup) and, under `body.bp6-dark`, their dark
+ * theme. What is here is the layout, and the colours Blueprint has no class
+ * for, in both themes.
+ */
+@import '@blueprintjs/core/lib/css/blueprint.css';
+
 :root {
-  --fg: #1f2328;
-  --muted: #59636e;
-  --bg: #f6f8fa;
-  --surface: #ffffff;
-  --border: #d0d7de;
-  --accent: #0969da;
-  --derived-bg: #f0f3f6;
-  --ok: #1a7f37;
-  --ng: #cf222e;
-  --grid: #e4e8ec;
-  --axis: #8c959f;
-  --series-1: #0969da;
-  --series-2: #1a7f37;
-  --series-3: #bf8700;
-  --series-4: #8250df;
+  /* Blueprint's palette: light gray 5, dark gray 1. */
+  --page-bg: #f6f7f9;
+  --muted: #5f6b7c;
+  --derived-bg: rgb(143 153 168 / 15%);
+  --selected-bg: rgb(45 114 210 / 15%);
+  --ok: #238551;
+  --ng: #cd4246;
+  --grid: #dce0e5;
+  --axis: #8f99a8;
+  --series-1: #2d72d2;
+  --series-2: #238551;
+  --series-3: #c87619;
+  --series-4: #9d3f9d;
+}
+
+.bp6-dark {
+  --page-bg: #1c2127;
+  --muted: #abb3bf;
+  --derived-bg: rgb(143 153 168 / 20%);
+  --selected-bg: rgb(76 144 240 / 25%);
+  --ok: #72ca9b;
+  --ng: #fa999c;
+  --grid: #383e47;
+  --axis: #738091;
+  --series-1: #8abbff;
+  --series-2: #72ca9b;
+  --series-3: #fbb360;
+  --series-4: #d69fd6;
 }
 
 body {
@@ -24,8 +45,7 @@ body {
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans',
     'Noto Sans JP', sans-serif;
-  color: var(--fg);
-  background-color: var(--bg);
+  background-color: var(--page-bg);
 }
 
 main {
@@ -35,20 +55,13 @@ main {
   margin: 0 auto;
 }
 
-h1,
-h2 {
-  margin: 0 0 12px;
+main > *,
+.tab-body > * {
+  min-width: 0;
 }
 
-h2 {
+h2.bp6-heading {
   font-size: 1.1rem;
-}
-
-section {
-  padding: 16px;
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
 }
 
 .tab-body {
@@ -56,24 +69,14 @@ section {
   gap: 16px;
 }
 
-.tabs {
-  display: flex;
+/* The panel's cards below the tab titles. */
+.workspace > .bp6-tab-list {
   flex-wrap: wrap;
-  gap: 4px;
+  row-gap: 4px;
 }
 
-.tabs button {
-  padding: 6px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.tabs button[aria-current='page'] {
-  color: #ffffff;
-  background: var(--accent);
-  border-color: var(--accent);
+.workspace > .bp6-tab-panel {
+  margin-top: 16px;
 }
 
 .form {
@@ -83,34 +86,32 @@ section {
   margin-top: 12px;
 }
 
-.field {
-  display: grid;
-  gap: 4px;
-  align-content: start;
+/* A field's label sits in a grid cell, which holds the spacing. */
+.form label.bp6-label,
+.form .bp6-label,
+.plan-bar label.bp6-label {
+  margin: 0;
 }
 
-.field > span {
-  font-size: 0.85rem;
+.field {
   color: var(--muted);
 }
 
 .field.checkbox {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  align-self: end;
+  color: inherit;
 }
 
-input,
-select {
-  font: inherit;
-}
-
-input[type='number'] {
+.bp6-input-group.number input {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
 /* 計算で導出される値。入力欄と見分けられるように背景を変える。 */
+.field.output {
+  display: block;
+}
+
 .field.output output,
 td.derived {
   font-variant-numeric: tabular-nums;
@@ -118,14 +119,20 @@ td.derived {
 }
 
 .field.output output {
-  padding: 4px 8px;
-  border-radius: 4px;
+  display: block;
+  margin-top: 4px;
+  padding: 6px 8px;
+  color: #1c2127;
+  border-radius: 2px;
+}
+
+.bp6-dark .field.output output {
+  color: #f6f7f9;
 }
 
 .note {
   margin: 0 0 8px;
   font-size: 0.85rem;
-  color: var(--muted);
 }
 
 .section-header {
@@ -134,17 +141,6 @@ td.derived {
   gap: 12px;
   align-items: baseline;
   justify-content: space-between;
-}
-
-.toggle {
-  display: flex;
-  gap: 4px;
-}
-
-.toggle button[aria-pressed='true'] {
-  color: #ffffff;
-  background: var(--accent);
-  border: 1px solid var(--accent);
 }
 
 .table-wrapper {
@@ -159,8 +155,7 @@ td.derived {
   overflow: auto;
 }
 
-table {
-  border-collapse: collapse;
+table.bp6-html-table {
   font-size: 0.85rem;
 }
 
@@ -170,10 +165,8 @@ caption {
   padding-bottom: 4px;
 }
 
-th,
-td {
-  padding: 4px 8px;
-  border: 1px solid var(--border);
+table.bp6-html-table th,
+table.bp6-html-table td {
   white-space: nowrap;
 }
 
@@ -182,30 +175,40 @@ table.result td {
   font-variant-numeric: tabular-nums;
 }
 
-table.result thead th {
+/* The header row and the first column stay in view while the table scrolls. */
+table.result thead th,
+table.result tbody th {
   position: sticky;
+  background-color: var(--bp-surface-background-color-default-rest, #ffffff);
+}
+
+.bp6-dark table.result thead th,
+.bp6-dark table.result tbody th {
+  background-color: #2f343c;
+}
+
+table.result thead th {
   top: 0;
-  background: var(--surface);
+  z-index: 1;
 }
 
 table.result tbody th {
-  position: sticky;
   left: 0;
-  background: var(--surface);
   text-align: left;
   font-weight: normal;
 }
 
 table.result tr.selected th,
 table.result tr.selected td {
-  background: #ddf4ff;
+  background-image: linear-gradient(var(--selected-bg), var(--selected-bg));
 }
 
 table.editable td {
   padding: 2px 4px;
+  vertical-align: middle;
 }
 
-table.editable input[type='number'] {
+table.editable .bp6-input-group.number {
   width: 9em;
 }
 
@@ -220,6 +223,15 @@ table.editable td.derived {
   list-style: none;
   display: grid;
   gap: 4px;
+}
+
+.checks li {
+  color: var(--ok);
+  font-weight: bold;
+}
+
+.checks li.ng {
+  color: var(--ng);
 }
 
 .chart svg {
@@ -257,10 +269,6 @@ table.editable td.derived {
   align-items: center;
 }
 
-.file-button input {
-  margin-left: 8px;
-}
-
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -268,27 +276,6 @@ table.editable td.derived {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
-}
-
-.checks li {
-  color: var(--ok);
-  font-weight: bold;
-}
-
-.checks li.ng {
-  color: var(--ng);
-}
-
-main > *,
-.tab-body > * {
-  min-width: 0;
-}
-
-.field input:not([type='checkbox']),
-.field select,
-.field output {
-  box-sizing: border-box;
-  width: 100%;
 }
 
 .center-screen {
@@ -299,45 +286,29 @@ main > *,
 
 .sign-in-card {
   display: grid;
-  gap: 12px;
-  max-width: 420px;
+  gap: 16px;
+  max-width: 460px;
   justify-items: start;
 }
 
-button.primary {
-  padding: 8px 16px;
-  color: #ffffff;
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-button.primary:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-button.danger {
-  color: #ffffff;
-  background: var(--ng);
-  border: 1px solid var(--ng);
-}
-
-.error {
+.sign-in-card p {
   margin: 0;
-  color: var(--ng);
 }
 
 .app-header {
+  display: grid;
+  gap: 12px;
+}
+
+.title-bar {
   display: flex;
   flex-wrap: wrap;
   gap: 12px 24px;
-  align-items: end;
+  align-items: center;
   justify-content: space-between;
 }
 
-.app-header h1 {
+.title-bar h1 {
   margin: 0;
   font-size: 1.4rem;
 }
@@ -351,28 +322,38 @@ button.danger {
 
 .account {
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 8px 12px;
   align-items: center;
 }
 
-.notice-bar {
+.notice-bar.bp6-callout {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 16px;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
 }
 
-.notice-bar.warning {
-  background: #fff8c5;
-  border-color: #d4a72c;
+.notice-bar.bp6-callout > .bp6-icon:first-child {
+  position: static;
 }
 
-.notice-bar.error {
-  color: var(--ng);
-  background: #ffebe9;
-  border-color: #ff8182;
+.notice-bar.bp6-callout.bp6-callout-icon {
+  padding-left: 12px;
+}
+
+.sign-in-card h1 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+/*
+ * Blueprint draws a focus ring on `:focus`, so a tab or button clicked with
+ * the mouse keeps one; only keyboard focus is shown, as Blueprint's
+ * `FocusStyleManager.onlyShowFocusOnTabs()` would do.
+ */
+:focus:not(:focus-visible),
+.bp6-control input:focus:not(:focus-visible) ~ .bp6-control-indicator {
+  outline: none;
 }

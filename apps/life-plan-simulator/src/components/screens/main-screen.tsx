@@ -1,3 +1,4 @@
+import { Card } from 'blueprint-synstate';
 import { constant, If, view, type Bindable, type JSX } from 'synstate-dom';
 import { planStore } from '../../store/index.mjs';
 import { AppHeader } from './app-header.js';
@@ -21,7 +22,7 @@ export const MainScreen = ({ userName }: Props): JSX.Element => {
         cond={view(currentPlan, (p) => p !== undefined)}
         then={<Workspace />}
         else={
-          <section aria-busy={view(plans, (s) => String(s.type === 'loading'))}>
+          <Card aria-busy={view(plans, (s) => String(s.type === 'loading'))}>
             <p
               data-e2e={constant('plans-status')}
               role={view(plans, (s) =>
@@ -36,7 +37,7 @@ export const MainScreen = ({ userName }: Props): JSX.Element => {
                     : 'プランがありません。「新しいプラン」から作成してください。',
               )}
             </p>
-          </section>
+          </Card>
         }
       />
     </main>

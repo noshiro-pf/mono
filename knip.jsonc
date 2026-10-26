@@ -665,6 +665,9 @@
     "apps/life-plan-simulator": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],
+      // Loaded by `src/index.css` through CSS `@import` rather than by a
+      // module import, which knip does not follow.
+      "ignoreDependencies": ["@blueprintjs/core"],
     },
   },
 }

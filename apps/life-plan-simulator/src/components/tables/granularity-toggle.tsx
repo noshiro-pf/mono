@@ -1,5 +1,6 @@
+import { SegmentedControl } from 'blueprint-synstate';
 import type { InitializedObservable } from 'synstate';
-import { constant, view, type JSX } from 'synstate-dom';
+import { constant, type JSX } from 'synstate-dom';
 import type { Granularity } from './result-table.js';
 
 /** 表を年ごと / 月ごとに切り替えるボタン。 */
@@ -10,26 +11,17 @@ export const GranularityToggle = ({
   granularity$: InitializedObservable<Granularity>;
   setGranularity: (g: Granularity) => void;
 }>): JSX.Element => (
-  <div
-    class={constant('toggle')}
-    role={constant('group')}
+  <SegmentedControl
     aria-label={constant('表示の単位')}
-  >
-    {options.map(({ id, label }) => (
-      <button
-        type={constant('button')}
-        aria-pressed={view(granularity$, (g) => (g === id ? 'true' : 'false'))}
-        onClick={() => {
-          setGranularity(id);
-        }}
-      >
-        {constant(label)}
-      </button>
-    ))}
-  </div>
+    intent={'primary'}
+    size={'small'}
+    options={options}
+    value={granularity$}
+    onValueChange={setGranularity}
+  />
 );
 
 const options = [
-  { id: 'year', label: '年ごと' },
-  { id: 'month', label: '月ごと' },
-] as const satisfies readonly Readonly<{ id: Granularity; label: string }>[];
+  { value: 'year', label: '年ごと' },
+  { value: 'month', label: '月ごと' },
+] as const satisfies readonly Readonly<{ value: Granularity; label: string }>[];

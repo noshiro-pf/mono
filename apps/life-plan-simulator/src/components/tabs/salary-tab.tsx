@@ -1,3 +1,4 @@
+import { Card } from 'blueprint-synstate';
 import { createState } from 'synstate';
 import { constant, derive, view, type JSX } from 'synstate-dom';
 import {
@@ -26,9 +27,9 @@ export const SalaryTab = (): JSX.Element => {
 
   return (
     <div class={constant('tab-body')}>
-      <section>
-        <h2>{constant('年収の推移')}</h2>
-        <p class={constant('note')}>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('年収の推移')}</h2>
+        <p class={constant('bp6-text-muted note')}>
           {constant(
             '各行の値は開始年月から次の行の開始年月の前まで続く。賞与は毎年 1 月に支給する。企業型 DC と iDeCo の掛金は確定拠出年金に積み立てる。',
           )}
@@ -50,10 +51,12 @@ export const SalaryTab = (): JSX.Element => {
             annualBonus: 0,
           })}
         />
-      </section>
-      <section>
+      </Card>
+      <Card>
         <div class={constant('section-header')}>
-          <h2>{constant('税金・保険料と手取り')}</h2>
+          <h2 class={constant('bp6-heading')}>
+            {constant('税金・保険料と手取り')}
+          </h2>
           <GranularityToggle
             granularity$={granularity$}
             setGranularity={setGranularity}
@@ -68,7 +71,7 @@ export const SalaryTab = (): JSX.Element => {
           ageOf={(r) => r.age}
           granularity={granularity$}
         />
-      </section>
+      </Card>
     </div>
   );
 };

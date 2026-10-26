@@ -1,3 +1,4 @@
+import { Button, Callout } from 'blueprint-synstate';
 import { constant, If, view, type JSX } from 'synstate-dom';
 import { planStore, sessionStore } from '../../store/index.mjs';
 
@@ -10,10 +11,11 @@ export const UnsentWritesBar = (): JSX.Element => (
   <If
     cond={view(sessionStore.signOutState, (state) => state === 'unsent-writes')}
     then={
-      <div
-        class={constant('notice-bar warning')}
+      <Callout
+        class={'notice-bar'}
+        intent={'warning'}
         data-e2e={constant('unsent-writes')}
-        role={constant('alert')}
+        role={'alert'}
       >
         <span>
           {constant(
@@ -21,20 +23,17 @@ export const UnsentWritesBar = (): JSX.Element => (
           )}
         </span>
         <span class={constant('actions')}>
-          <button
-            type={constant('button')}
+          <Button
+            intent={'danger'}
+            text={constant('変更を破棄してサインアウト')}
             onClick={sessionStore.discardUnsentWritesAndSignOut}
-          >
-            {constant('変更を破棄してサインアウト')}
-          </button>
-          <button
-            type={constant('button')}
+          />
+          <Button
+            text={constant('サインアウトしない')}
             onClick={sessionStore.cancelSignOut}
-          >
-            {constant('サインアウトしない')}
-          </button>
+          />
         </span>
-      </div>
+      </Callout>
     }
   />
 );
@@ -44,12 +43,15 @@ export const WriteErrorBar = (): JSX.Element => (
   <If
     cond={view(planStore.writeError, (message) => message !== undefined)}
     then={
-      <div class={constant('notice-bar error')} role={constant('alert')}>
+      <Callout class={'notice-bar'} intent={'danger'} role={'alert'}>
         <span>{view(planStore.writeError, (message) => message ?? '')}</span>
-        <button type={constant('button')} onClick={planStore.dismissWriteError}>
-          {constant('閉じる')}
-        </button>
-      </div>
+        <Button
+          icon={'cross'}
+          variant={constant('minimal')}
+          text={constant('閉じる')}
+          onClick={planStore.dismissWriteError}
+        />
+      </Callout>
     }
   />
 );

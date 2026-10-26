@@ -1,3 +1,4 @@
+import { Card } from 'blueprint-synstate';
 import { createState } from 'synstate';
 import { constant, view, type Bindable, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
@@ -43,8 +44,8 @@ export const InvestmentTab = ({
 
   return (
     <div class={constant('tab-body')}>
-      <section>
-        <h2>{constant('開始時点の状態')}</h2>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('開始時点の状態')}</h2>
         <div class={constant('form')}>
           <NumberField
             label="評価額（円）"
@@ -72,51 +73,51 @@ export const InvestmentTab = ({
             []
           )}
         </div>
-        <p class={constant('note')}>
+        <p class={constant('bp6-text-muted note')}>
           {constant(
             '開始月の投資の前の値。確定拠出年金の一括受給額をこの口座に入れる設定は「確定拠出年金」のタブにある。',
           )}
         </p>
-      </section>
-      <section>
-        <h2>{constant('定期投資額')}</h2>
+      </Card>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('定期投資額')}</h2>
         <EditableTable
           caption="定期投資額"
           {...listOf('regularContributions')}
           columns={stepColumns}
           createItem={newStep}
         />
-      </section>
-      <section>
-        <h2>{constant('単発投資額')}</h2>
+      </Card>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('単発投資額')}</h2>
         <EditableTable
           caption="単発投資額"
           {...listOf('oneOffContributions')}
           columns={oneOffColumns}
           createItem={newOneOff}
         />
-      </section>
-      <section>
-        <h2>{constant('定期取り崩し額')}</h2>
+      </Card>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('定期取り崩し額')}</h2>
         <EditableTable
           caption="定期取り崩し額"
           {...listOf('regularWithdrawals')}
           columns={stepColumns}
           createItem={newStep}
         />
-      </section>
-      <section>
-        <h2>{constant('単発取り崩し額')}</h2>
+      </Card>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('単発取り崩し額')}</h2>
         <EditableTable
           caption="単発取り崩し額"
           {...listOf('oneOffWithdrawals')}
           columns={oneOffColumns}
           createItem={newOneOff}
         />
-      </section>
-      <section>
+      </Card>
+      <Card>
         <div class={constant('section-header')}>
-          <h2>{constant('評価額の推移')}</h2>
+          <h2 class={constant('bp6-heading')}>{constant('評価額の推移')}</h2>
           <GranularityToggle
             granularity$={granularity$}
             setGranularity={setGranularity}
@@ -130,7 +131,7 @@ export const InvestmentTab = ({
           ageOf={(r) => r.age}
           granularity={granularity$}
         />
-      </section>
+      </Card>
     </div>
   );
 };
