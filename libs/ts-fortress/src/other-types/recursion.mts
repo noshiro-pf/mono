@@ -1,5 +1,5 @@
-import { hasKey, isRecord, memoizeFunction } from 'ts-data-forge';
-import { hasRecordInternals, type Type } from '../type.mjs';
+import { memoizeFunction } from 'ts-data-forge';
+import type { Type } from '../type.mjs';
 import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
 
 /**
@@ -169,7 +169,7 @@ export const recursion = <A,>(
 
   const prune = (a: A): A => getInnerType().prune(a);
 
-  const baseType: Type<A> = {
+  return {
     typeName,
     get defaultValue(): A {
       return getDefaultValue();
@@ -182,58 +182,4 @@ export const recursion = <A,>(
     cast: createCastFn(validate),
     structure: { kind: 'recursion', typeName, resolve: getInnerType },
   } as const;
-
-  // Proxy to propagate RecordTypeInternals if the inner type has them
-  return new Proxy(baseType, {
-    get: (target, prop) => {
-      if (prop === 'shapeStructure' || prop === 'excessProperty') {
-        const inner = getInnerType();
-
-        if (hasRecordInternals(inner)) {
-          return inner[prop];
-        }
-      }
-
-      if (
-        typeof prop === 'string' &&
-        isRecord(target) &&
-        hasKey(target, prop)
-      ) {
-        return target[prop as keyof typeof target];
-      }
-
-      return undefined;
-    },
-    has: (target, prop) => {
-      if (prop === 'shapeStructure' || prop === 'excessProperty') {
-        const inner = getInnerType();
-
-        return hasRecordInternals(inner);
-      }
-
-      return isRecord(target) && hasKey(target, prop);
-    },
-    ownKeys: (target) => {
-      const inner = getInnerType();
-
-      return hasRecordInternals(inner)
-        ? [...Object.keys(target), 'shapeStructure', 'excessProperty']
-        : Object.keys(target);
-    },
-    getOwnPropertyDescriptor: (target, prop) => {
-      if (prop === 'shapeStructure' || prop === 'excessProperty') {
-        const inner = getInnerType();
-
-        if (hasRecordInternals(inner)) {
-          return {
-            enumerable: true,
-            configurable: true,
-            value: inner[prop],
-          };
-        }
-      }
-
-      return Object.getOwnPropertyDescriptor(target, prop);
-    },
-  });
 };

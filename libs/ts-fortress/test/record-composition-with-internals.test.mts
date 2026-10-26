@@ -1,9 +1,13 @@
 import {
+  annotate,
+  at,
   intersection,
+  literal,
   mergeRecords,
   nullType,
   number,
   omit,
+  optional,
   partial,
   pick,
   record,
@@ -14,14 +18,14 @@ import {
   type Type,
 } from '../src/index.mjs';
 
-describe('Record composition should preserve RecordTypeInternals', () => {
+describe('Record composition should preserve the record view', () => {
   const baseRecord = record({
     a: number(),
     b: string(),
     c: number(),
   });
 
-  test('omit result should have RecordTypeInternals', () => {
+  test('omit result should have the record view', () => {
     const omittedRecord = omit(baseRecord, ['c']);
 
     // This should not throw
@@ -30,7 +34,7 @@ describe('Record composition should preserve RecordTypeInternals', () => {
     assert.isTrue(merged.is({ a: 1, b: 'hello', c: 2 }));
   });
 
-  test('pick result should have RecordTypeInternals', () => {
+  test('pick result should have the record view', () => {
     const pickedRecord = pick(baseRecord, ['a', 'b']);
 
     // This should not throw
@@ -39,7 +43,7 @@ describe('Record composition should preserve RecordTypeInternals', () => {
     assert.isTrue(merged.is({ a: 1, b: 'hello', c: 2 }));
   });
 
-  test('partial result should have RecordTypeInternals', () => {
+  test('partial result should have the record view', () => {
     const partialRecord = partial(baseRecord);
 
     // This should not throw
@@ -48,7 +52,7 @@ describe('Record composition should preserve RecordTypeInternals', () => {
     assert.isTrue(merged.is({ a: 1, b: 'hello', c: 2 }));
   });
 
-  test('required result should have RecordTypeInternals', () => {
+  test('required result should have the record view', () => {
     const partialRecord = partial(baseRecord);
 
     const requiredRecord = required(partialRecord);
@@ -59,7 +63,7 @@ describe('Record composition should preserve RecordTypeInternals', () => {
     assert.isTrue(merged.is({ a: 1, b: 'hello', c: 2 }));
   });
 
-  test('union of records should have RecordTypeInternals', () => {
+  test('union of records should have the record view', () => {
     const record1 = record({ x: number() });
 
     const record2 = record({ y: string() });
@@ -72,7 +76,7 @@ describe('Record composition should preserve RecordTypeInternals', () => {
     assert.isTrue(merged.is({ x: 1, y: 'hello' }));
   });
 
-  test('intersection of records should have RecordTypeInternals', () => {
+  test('intersection of records should have the record view', () => {
     const record1 = record({ a: number() });
 
     const record2 = record({ b: string() });
@@ -88,7 +92,7 @@ describe('Record composition should preserve RecordTypeInternals', () => {
     assert.isTrue(merged.is({ a: 1, b: 'hello' }));
   });
 
-  test('recursion with record should have RecordTypeInternals', () => {
+  test('recursion with record should have the record view', () => {
     type LinkedList = Readonly<{
       value: number;
       next: LinkedList | null;
@@ -121,6 +125,74 @@ describe('Record composition should preserve RecordTypeInternals', () => {
         id: 'test',
       }),
     );
+  });
+
+  describe('read off the structure', () => {
+    test('a record wrapped in optional or annotate is still a record', () => {
+      for (const wrapped of [
+        optional(baseRecord),
+        annotate(baseRecord, { description: 'A record.' }),
+      ]) {
+        const picked = pick(wrapped, ['a']);
+
+        assert.isTrue(picked.is({ a: 1 }));
+
+        assert.isFalse(picked.is({ b: 'x' }));
+
+        assert.isTrue(at(wrapped, 'b').is('x'));
+      }
+    });
+
+    test('a union whose member refers back to it is built without running the member', () => {
+      type U = Readonly<{ kind: 'leaf' } | { kind: 'node'; child?: U }>;
+
+      const U: Type<U> = union([
+        record({ kind: literal('leaf') }),
+        recursion('Node', () =>
+          record({
+            kind: literal('node'),
+            child: optional(U, { forceUndefinedDefault: true }),
+          }),
+        ),
+      ]);
+
+      assert.isTrue(U.is({ kind: 'node', child: { kind: 'leaf' } }));
+
+      assert.isTrue(at(U, 'kind').is('node'));
+    });
+
+    test('an intersection whose member refers back to it is built without running the member', () => {
+      type I = Readonly<{ id: string } & { next?: I }>;
+
+      const I: Type<I> = intersection(
+        [
+          record({ id: string() }),
+          recursion('Next', () =>
+            record({ next: optional(I, { forceUndefinedDefault: true }) }),
+          ),
+        ],
+        record({ id: string() }),
+      );
+
+      assert.isTrue(I.is({ id: 'a', next: { id: 'b' } }));
+
+      assert.deepStrictEqual(I.prune({ id: 'a', next: { id: 'b' } }), {
+        id: 'a',
+        next: { id: 'b' },
+      });
+    });
+
+    test('a recursion that is a union with itself is not a record', () => {
+      type R = Readonly<{ a: number }>;
+
+      const R: Type<R> = recursion('R', () =>
+        union([record({ a: number() }), R]),
+      );
+
+      assert.isTrue(R.is({ a: 1 }));
+
+      expect(() => pick(R, ['a'])).toThrow('Expected a record type');
+    });
   });
 
   describe('negative cases for compositions', () => {

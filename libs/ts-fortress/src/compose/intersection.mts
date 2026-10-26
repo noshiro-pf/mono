@@ -1,8 +1,15 @@
-import { Arr, expectType, hasKey, isRecord, Obj, Result } from 'ts-data-forge';
+import {
+  Arr,
+  expectType,
+  hasKey,
+  isRecord,
+  memoizeFunction,
+  Obj,
+  Result,
+} from 'ts-data-forge';
 import type { Intersection, NonEmptyTuple } from 'ts-type-forge';
 import {
-  hasRecordInternals,
-  type ExcessPropertyOption,
+  recordViewOf,
   type Type,
   type TypeOf,
   type UnknownType,
@@ -65,46 +72,35 @@ export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
 
   const fill: Type<T>['fill'] = (a) => (is(a) ? a : defaultType.fill(a));
 
+  // Decided on first use rather than here: a member may be a `recursion`
+  // whose definition refers to the binding this intersection initializes.
+  const isRecordIntersection = memoizeFunction((): boolean =>
+    types.every((t) => recordViewOf(t) !== undefined),
+  );
+
+  const prune: Type<T>['prune'] = (a) =>
+    isRecordIntersection()
+      ? // A value path is represented by a record intersection if it is
+        // represented by any member, so the pruned members are merged
+        // (deeply; see `mergePruned`). Every member is a record type here,
+        // so each pruned result is a record.
+        // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+        (types.map((t) => t.prune(a)).reduce(mergePruned, {}) as T)
+      : // Non-record intersections (e.g. branded primitives) have no excess
+        // paths to remove.
+        a;
+
   const baseType: Type<T> = {
     typeName: typeNameFilled,
     defaultValue: defaultType.defaultValue,
     fill,
-    // Non-record intersections (e.g. branded primitives) have no excess paths
-    // to remove. Record intersections override this below.
-    prune: (a) => a,
+    prune,
     validate,
     is,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
     structure: { kind: 'intersection', memberTypes: types },
   } as const;
-
-  // If all types are records, add RecordTypeInternals
-  if (types.every(hasRecordInternals)) {
-    const shapeStructures = Arr.map(types, (t) => t.shapeStructure);
-
-    const excessProperty: ExcessPropertyOption = Arr.some(
-      types,
-      (t) => t.excessProperty === 'reject',
-    )
-      ? 'reject'
-      : 'allow';
-
-    return {
-      ...baseType,
-      // A value path is represented by a record intersection if it is
-      // represented by any member, so the pruned members are merged (deeply;
-      // see `mergePruned`). All members are record types here
-      // (`hasRecordInternals`), so each pruned result is a record.
-      prune: (a: T): T =>
-        // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-        types.map((t) => t.prune(a)).reduce(mergePruned, {}) as T,
-      shapeStructure: Arr.isFixedLengthTuple(1, shapeStructures)
-        ? shapeStructures[0]
-        : ({ kind: 'intersection', parts: shapeStructures } as const),
-      excessProperty,
-    } as IntersectionType<Types>;
-  }
 
   return baseType;
 };

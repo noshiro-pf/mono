@@ -4,7 +4,7 @@ import type { ArrayElement, StrictPick, UnknownRecord } from 'ts-type-forge';
 import {
   type ExcessPropertyOption,
   flattenShapeStructure,
-  hasRecordInternals,
+  recordViewOf,
   type Type,
   type TypeOf,
 } from '../type.mjs';
@@ -25,11 +25,13 @@ export const pick = <
     }>
   >,
 ): PickedType<R, KeysToPick> => {
-  if (!hasRecordInternals(recordType)) {
+  const view = recordViewOf(recordType);
+
+  if (view === undefined) {
     panic(`Expected a record type but received: ${recordType.typeName}`);
   }
 
-  const shape = flattenShapeStructure(recordType.shapeStructure);
+  const shape = flattenShapeStructure(view.shapeStructure);
 
   if (shape === undefined) {
     panic(
@@ -43,7 +45,7 @@ export const pick = <
       options?.typeName ??
       `Pick<${recordType.typeName}, ${toUnionKeyString(keysToPick)}>`,
 
-    excessProperty: options?.excessProperty ?? recordType.excessProperty,
+    excessProperty: options?.excessProperty ?? view.excessProperty,
   }) as unknown as PickedType<R, KeysToPick>;
 };
 

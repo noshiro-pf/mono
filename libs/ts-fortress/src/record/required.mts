@@ -9,7 +9,7 @@ import type {
 } from 'ts-type-forge';
 import {
   flattenShapeStructure,
-  hasRecordInternals,
+  recordViewOf,
   type ExcessPropertyOption,
   type Type,
   type TypeOf,
@@ -37,11 +37,13 @@ export const required = <
     }>
   >,
 ): RequiredType<R, KeysToBeRequired> => {
-  if (!hasRecordInternals(recordType)) {
+  const view = recordViewOf(recordType);
+
+  if (view === undefined) {
     panic(`Expected a record type but received: ${recordType.typeName}`);
   }
 
-  const shape = flattenShapeStructure(recordType.shapeStructure);
+  const shape = flattenShapeStructure(view.shapeStructure);
 
   if (shape === undefined) {
     panic(
@@ -66,7 +68,7 @@ export const required = <
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   return record(requiredShape, {
     typeName: typeNameFilled,
-    excessProperty: options?.excessProperty ?? recordType.excessProperty,
+    excessProperty: options?.excessProperty ?? view.excessProperty,
   }) as unknown as Type<RequiredValue<R, KeysToBeRequired>>;
 };
 

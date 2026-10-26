@@ -1,4 +1,4 @@
-import { Arr, Obj, hasKey, isRecord, type Result } from 'ts-data-forge';
+import { Arr, Obj, type Result } from 'ts-data-forge';
 import { panic } from 'ts-std-forge';
 import type { Primitive, ReadonlyRecord, StrictExtract } from 'ts-type-forge';
 import type { ValidationError } from './utils/index.mjs';
@@ -283,28 +283,15 @@ export type ShapeStructure = Readonly<
   | { kind: 'intersection'; parts: readonly ShapeStructure[] }
 >;
 
-/** @internal Runtime type for accessing internal record properties via cast. */
-export type RecordTypeInternals = Readonly<{
+/**
+ * @internal What the record operations (`pick`, `omit`, `at`, `mergeRecords`,
+ * ...) read off a record type: its shapes and how it treats excess
+ * properties. It is computed from the type's `structure` by
+ * {@link recordViewOf}, not stored on the type.
+ */
+export type RecordView = Readonly<{
   shapeStructure: ShapeStructure;
   excessProperty: ExcessPropertyOption;
-}>;
-
-/**
- * @internal Internal properties attached to tuple types so that the element
- * type at a given index can be recovered (e.g. by {@link at}).
- */
-export type TupleTypeInternals = Readonly<{
-  elementTypes: readonly Type<unknown>[];
-}>;
-
-/**
- * @internal Internal properties attached to union types so that a union
- * nested directly inside another union can contribute its own members to the
- * parent (see {@link hasUnionInternals}).
- */
-export type UnionTypeInternals = Readonly<{
-  /** The member types, with directly nested unions already flattened in. */
-  memberTypes: readonly UnknownType[];
 }>;
 
 /** @internal Helper to flatten ShapeStructure to a simple shape if possible */
@@ -389,77 +376,73 @@ export const expandShapeStructure = (
   }
 };
 
-/** @internal Backward compatibility: simple shape accessor */
-export const getShape = (internals: RecordTypeInternals): UnknownShape => {
-  const flattened = flattenShapeStructure(internals.shapeStructure);
+/**
+ * @internal The {@link RecordView} of a type, if it is a record: a `record`,
+ * or a `union` / `intersection` whose members all are, or a `recursion` that
+ * resolves to one (which runs its definition). A `recursion` reached again
+ * while it is being resolved is not a record.
+ */
+export const recordViewOf = (type: UnknownType): RecordView | undefined =>
+  recordViewOfImpl(type, new Set());
 
-  if (flattened === undefined) {
-    panic(
-      'getShape() can only be called on simple or intersection record types, but received a union type. Use shapeStructure instead.',
+const recordViewOfImpl = (
+  type: UnknownType,
+  resolving: ReadonlySet<() => UnknownType>,
+): RecordView | undefined => {
+  const { structure } = type;
+
+  if (structure?.kind === 'record') {
+    return {
+      shapeStructure: { kind: 'simple', shape: structure.shape },
+      excessProperty: structure.excessProperty,
+    };
+  }
+
+  if (structure?.kind === 'union' || structure?.kind === 'intersection') {
+    const views = structure.memberTypes.map((member) =>
+      recordViewOfImpl(member, resolving),
+    );
+
+    if (!views.every((view): view is RecordView => view !== undefined)) {
+      return undefined;
+    }
+
+    const shapeStructures = views.map((view) => view.shapeStructure);
+
+    return {
+      shapeStructure: Arr.isFixedLengthTuple(1, shapeStructures)
+        ? shapeStructures[0]
+        : structure.kind === 'union'
+          ? { kind: 'union', variants: shapeStructures }
+          : { kind: 'intersection', parts: shapeStructures },
+      excessProperty: views.some((view) => view.excessProperty === 'reject')
+        ? 'reject'
+        : 'allow',
+    };
+  }
+
+  if (structure?.kind === 'recursion' && !resolving.has(structure.resolve)) {
+    return recordViewOfImpl(
+      structure.resolve(),
+      new Set([...resolving, structure.resolve]),
     );
   }
 
-  return flattened;
+  return undefined;
 };
 
-/** @internal Runtime check for record type internals. */
-export const hasRecordInternals = <T extends UnknownType>(
-  t: T,
-): t is T & RecordTypeInternals => hasRecordInternalsImpl(t);
-
-const hasRecordInternalsImpl = (t: unknown): t is RecordTypeInternals =>
-  isRecord(t) &&
-  hasKey(t, 'shapeStructure') &&
-  isValidShapeStructure(t.shapeStructure) &&
-  hasKey(t, 'excessProperty') &&
-  (t.excessProperty === 'allow' || t.excessProperty === 'reject');
-
-/** @internal Runtime check for tuple type internals. */
-export const hasTupleInternals = <T extends UnknownType>(
-  t: T,
-): t is T & TupleTypeInternals => hasTupleInternalsImpl(t);
-
-const hasTupleInternalsImpl = (t: unknown): t is TupleTypeInternals =>
-  isRecord(t) && hasKey(t, 'elementTypes') && Arr.isArray(t.elementTypes);
+/** @internal The element types of a `tuple`, if the type is one. */
+export const tupleElementTypesOf = (
+  type: UnknownType,
+): readonly UnknownType[] | undefined =>
+  type.structure?.kind === 'tuple' ? type.structure.elementTypes : undefined;
 
 /**
- * @internal Runtime check for union type internals.
- *
- * A `recursion` type answers this without resolving its definition (its proxy
- * only forwards the keys the base type already has), so a recursive member is
- * treated as an opaque type rather than being flattened.
+ * @internal The members of a union with the unions nested directly in it
+ * flattened in, or the type itself if it is not a union. A `recursion` is
+ * not a union here even if it resolves to one, so that it is not run.
  */
-export const hasUnionInternals = <T extends UnknownType>(
-  t: T,
-): t is T & UnionTypeInternals => hasUnionInternalsImpl(t);
-
-const hasUnionInternalsImpl = (t: unknown): t is UnionTypeInternals =>
-  isRecord(t) && hasKey(t, 'memberTypes') && Arr.isArray(t.memberTypes);
-
-const isValidShapeStructure = (s: unknown): s is ShapeStructure => {
-  if (!isRecord(s) || !hasKey(s, 'kind')) {
-    return false;
-  }
-
-  if (s.kind === 'simple') {
-    return hasKey(s, 'shape') && isRecord(s.shape);
-  }
-
-  if (s.kind === 'union') {
-    return (
-      hasKey(s, 'variants') &&
-      Arr.isArray(s.variants) &&
-      s.variants.every(isValidShapeStructure)
-    );
-  }
-
-  if (s.kind === 'intersection') {
-    return (
-      hasKey(s, 'parts') &&
-      Arr.isArray(s.parts) &&
-      s.parts.every(isValidShapeStructure)
-    );
-  }
-
-  return false;
-};
+export const unionMembersOf = (type: UnknownType): readonly UnknownType[] =>
+  type.structure?.kind === 'union'
+    ? type.structure.memberTypes.flatMap(unionMembersOf)
+    : ([type] as const);

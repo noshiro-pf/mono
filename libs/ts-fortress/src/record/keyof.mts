@@ -12,7 +12,7 @@ import {
   type ShapeStructure,
   type Type,
   type TypeOf,
-  hasRecordInternals,
+  recordViewOf,
 } from '../type.mjs';
 
 export const keyof = <const R extends UnknownRecord>(
@@ -23,12 +23,14 @@ export const keyof = <const R extends UnknownRecord>(
     }>
   >,
 ): KeyofType<R> => {
-  if (!hasRecordInternals(recordType)) {
+  const view = recordViewOf(recordType);
+
+  if (view === undefined) {
     panic(`Expected a record type but received: ${recordType.typeName}`);
   }
 
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  return pipe(getKeysFromStructure(recordType.shapeStructure)).map((keys) =>
+  return pipe(getKeysFromStructure(view.shapeStructure)).map((keys) =>
     Arr.isNonEmpty(keys)
       ? (enumType(keys, {
           typeName: options?.typeName ?? `keyof ${recordType.typeName}`,

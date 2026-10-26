@@ -1,4 +1,3 @@
-import { Arr } from 'ts-data-forge';
 import type { TypeAnnotations, TypeOf, UnknownType } from '../type.mjs';
 
 /**
@@ -39,48 +38,18 @@ import type { TypeAnnotations, TypeOf, UnknownType } from '../type.mjs';
 export const annotate = <T extends UnknownType>(
   type: T,
   annotations: TypeAnnotations<TypeOf<T>>,
-): T => {
-  const merged: TypeAnnotations = {
-    ...type.annotations,
-    ...annotations,
-  } as const;
-
-  // A proxy rather than a copy: copying reads every property, and a
-  // `recursion` reads some of its properties off the type it resolves to,
-  // which does not exist yet while `annotate(t.recursion(...))` initializes
-  // the binding the definition refers to. Reading through also keeps the
-  // lazy `defaultValue` getters lazy.
-  //
-  // The target is an empty object, whose own properties put no invariant on
-  // what the traps report.
+): T =>
+  // Property descriptors rather than a spread, as in `attachConstraints`: a
+  // spread would call the lazy `defaultValue` getter of a record, union or
+  // recursion here.
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  return new Proxy(
+  Object.defineProperties(
     {},
     {
-      get: (_, key) =>
-        key === ANNOTATIONS ? merged : Reflect.get(type, key, type),
-      has: (_, key) => key === ANNOTATIONS || Reflect.has(type, key),
-      ownKeys: () => {
-        const keys = Reflect.ownKeys(type);
-
-        return keys.includes(ANNOTATIONS)
-          ? keys
-          : Arr.toPushed(keys, ANNOTATIONS);
-      },
-      getOwnPropertyDescriptor: (_, key) => {
-        const descriptor =
-          key === ANNOTATIONS
-            ? ({ value: merged, enumerable: true, writable: false } as const)
-            : Reflect.getOwnPropertyDescriptor(type, key);
-
-        // Reported configurable, as a property the target does not have
-        // must be.
-        return descriptor === undefined
-          ? undefined
-          : { ...descriptor, configurable: true };
+      ...Object.getOwnPropertyDescriptors(type),
+      annotations: {
+        value: { ...type.annotations, ...annotations },
+        enumerable: true,
       },
     },
   ) as T;
-};
-
-const ANNOTATIONS = 'annotations';

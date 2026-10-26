@@ -5,7 +5,7 @@ import { union } from '../compose/index.mjs';
 import { undefinedType } from '../primitives/index.mjs';
 import {
   flattenShapeStructure,
-  hasRecordInternals,
+  recordViewOf,
   type Type,
   type TypeOf,
 } from '../type.mjs';
@@ -20,11 +20,13 @@ export const valueof = <const R extends UnknownRecord>(
     }>
   >,
 ): ValueOfType<R> => {
-  if (!hasRecordInternals(recordType)) {
+  const view = recordViewOf(recordType);
+
+  if (view === undefined) {
     panic(`Expected a record type but received: ${recordType.typeName}`);
   }
 
-  const shape = flattenShapeStructure(recordType.shapeStructure);
+  const shape = flattenShapeStructure(view.shapeStructure);
 
   if (shape === undefined) {
     panic(
