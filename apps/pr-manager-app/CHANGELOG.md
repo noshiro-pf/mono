@@ -1,5 +1,20 @@
 # pr-manager-app
 
+## 0.0.12
+
+### Patch Changes
+
+- Updated dependencies [5139149]
+- Updated dependencies [5fd0af1]
+- Updated dependencies [5e9b2c6]
+- Updated dependencies [1ebff9f]
+- Updated dependencies [4d0d586]
+    - synstate-dom@0.2.0
+    - pr-report-core@0.0.5
+    - synstate@5.0.1
+    - ts-fortress@12.4.0
+    - ts-data-forge@14.10.0
+
 ## 0.0.11
 
 ### Patch Changes

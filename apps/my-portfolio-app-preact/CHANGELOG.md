@@ -1,5 +1,16 @@
 # my-portfolio-app-preact
 
+## 0.0.17
+
+### Patch Changes
+
+- preact-utils@0.0.16
+    - resize-observer-preact-hooks@0.0.7
+    - tiny-router-observable@0.0.19
+    - better-preact-use-state@1.0.4
+    - synstate-preact-hooks@5.0.1
+    - ts-data-forge@14.10.0
+
 ## 0.0.16
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # tiny-router-observable
 
+## 0.0.19
+
+### Patch Changes
+
+- Updated dependencies [5e9b2c6]
+    - synstate@5.0.1
+    - ts-data-forge@14.10.0
+
 ## 0.0.18
 
 ### Patch Changes

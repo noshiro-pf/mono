@@ -1,5 +1,17 @@
 # react-blueprintjs-utils
 
+## 0.0.22
+
+### Patch Changes
+
+- Updated dependencies [5e9b2c6]
+    - synstate@5.0.1
+    - react-utils@0.0.19
+    - ts-fortress-types@0.0.14
+    - better-react-use-state@1.0.1
+    - synstate-react-hooks@5.0.1
+    - ts-data-forge@14.10.0
+
 ## 0.0.21
 
 ### Patch Changes

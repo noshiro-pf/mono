@@ -1,5 +1,12 @@
 # synstate-preact-hooks
 
+## 5.0.1
+
+### Patch Changes
+
+- Updated dependencies [5e9b2c6]
+    - synstate@5.0.1
+
 ## 5.0.0
 
 ### Major Changes

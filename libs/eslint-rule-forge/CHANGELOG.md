@@ -1,5 +1,11 @@
 # eslint-rule-forge
 
+## 0.3.1
+
+### Patch Changes
+
+- ca74a91: Update dependencies
+
 ## 0.3.0
 
 ### Minor Changes
