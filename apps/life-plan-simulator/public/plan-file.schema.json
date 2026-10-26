@@ -1,0 +1,542 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "input": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "type": "object",
+          "properties": {
+            "birth": {
+              "type": "string"
+            },
+            "start": {
+              "type": "string"
+            },
+            "endAge": {
+              "type": "number"
+            }
+          },
+          "required": ["birth", "start", "endAge"]
+        },
+        "assumptions": {
+          "type": "object",
+          "properties": {
+            "retirementAge": {
+              "type": "number"
+            },
+            "pensionStartAge": {
+              "type": "number"
+            },
+            "dcLumpSumAge": {
+              "type": "number"
+            },
+            "livingCostInflationRate": {
+              "type": "number"
+            },
+            "yieldWorking": {
+              "type": "number"
+            },
+            "yieldRetired": {
+              "type": "number"
+            },
+            "yieldSwitchAge": {
+              "type": "number"
+            },
+            "initialCash": {
+              "type": "number"
+            },
+            "cashThreshold": {
+              "type": "number"
+            },
+            "cashThresholdCheckFrom": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "retirementAge",
+            "pensionStartAge",
+            "dcLumpSumAge",
+            "livingCostInflationRate",
+            "yieldWorking",
+            "yieldRetired",
+            "yieldSwitchAge",
+            "initialCash",
+            "cashThreshold",
+            "cashThresholdCheckFrom"
+          ]
+        },
+        "salaryHistory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "start": {
+                "type": "string"
+              },
+              "annualBase": {
+                "type": "number"
+              },
+              "companyDcMonthly": {
+                "type": "number"
+              },
+              "idecoMonthly": {
+                "type": "number"
+              },
+              "annualBonus": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "id",
+              "start",
+              "annualBase",
+              "companyDcMonthly",
+              "idecoMonthly",
+              "annualBonus"
+            ]
+          }
+        },
+        "livingCosts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "category": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "monthly": {
+                "type": "number"
+              },
+              "note": {
+                "type": "string"
+              }
+            },
+            "required": ["id", "category", "name", "monthly", "note"]
+          }
+        },
+        "rent": {
+          "type": "object",
+          "properties": {
+            "monthly": {
+              "type": "number"
+            },
+            "until": {
+              "type": "string"
+            }
+          },
+          "required": ["monthly", "until"]
+        },
+        "housingLoan": {
+          "type": "object",
+          "properties": {
+            "principal": {
+              "type": "number"
+            },
+            "termYears": {
+              "type": "number"
+            },
+            "start": {
+              "type": "string"
+            },
+            "initialRate": {
+              "type": "number"
+            },
+            "rateIncreasePer5Years": {
+              "type": "number"
+            },
+            "maxRate": {
+              "type": "number"
+            },
+            "houseType": {
+              "enum": ["long-life", "zeh", "energy-efficient", "other"]
+            },
+            "houseCondition": {
+              "enum": ["new", "used"]
+            },
+            "childRearing": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "principal",
+            "termYears",
+            "start",
+            "initialRate",
+            "rateIncreasePer5Years",
+            "maxRate",
+            "houseType",
+            "houseCondition",
+            "childRearing"
+          ]
+        },
+        "periodicExpenses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "number"
+              },
+              "intervalYears": {
+                "type": "number"
+              },
+              "first": {
+                "type": "string"
+              },
+              "until": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "amount",
+              "intervalYears",
+              "first",
+              "until"
+            ]
+          }
+        },
+        "oneOffIncomes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "month": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "number"
+              }
+            },
+            "required": ["id", "name", "month", "amount"]
+          }
+        },
+        "oneOffExpenses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "month": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "number"
+              }
+            },
+            "required": ["id", "name", "month", "amount"]
+          }
+        },
+        "oldNisa": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "purchasedAt": {
+              "type": "string"
+            },
+            "sellAt": {
+              "type": "string"
+            }
+          },
+          "required": ["amount", "purchasedAt", "sellAt"]
+        },
+        "nisa": {
+          "type": "object",
+          "properties": {
+            "initialValue": {
+              "type": "number"
+            },
+            "initialPrincipal": {
+              "type": "number"
+            },
+            "initialUsedQuota": {
+              "type": "number"
+            },
+            "regularContributions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "start": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  }
+                },
+                "required": ["id", "start", "amount"]
+              }
+            },
+            "oneOffContributions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "month": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  }
+                },
+                "required": ["id", "name", "month", "amount"]
+              }
+            },
+            "regularWithdrawals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "start": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  }
+                },
+                "required": ["id", "start", "amount"]
+              }
+            },
+            "oneOffWithdrawals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "month": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  }
+                },
+                "required": ["id", "name", "month", "amount"]
+              }
+            }
+          },
+          "required": [
+            "initialValue",
+            "initialPrincipal",
+            "initialUsedQuota",
+            "regularContributions",
+            "oneOffContributions",
+            "regularWithdrawals",
+            "oneOffWithdrawals"
+          ]
+        },
+        "taxableInvestment": {
+          "type": "object",
+          "properties": {
+            "initialValue": {
+              "type": "number"
+            },
+            "initialPrincipal": {
+              "type": "number"
+            },
+            "initialUsedQuota": {
+              "type": "number"
+            },
+            "regularContributions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "start": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  }
+                },
+                "required": ["id", "start", "amount"]
+              }
+            },
+            "oneOffContributions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "month": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  }
+                },
+                "required": ["id", "name", "month", "amount"]
+              }
+            },
+            "regularWithdrawals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "start": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  }
+                },
+                "required": ["id", "start", "amount"]
+              }
+            },
+            "oneOffWithdrawals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "month": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  }
+                },
+                "required": ["id", "name", "month", "amount"]
+              }
+            }
+          },
+          "required": [
+            "initialValue",
+            "initialPrincipal",
+            "initialUsedQuota",
+            "regularContributions",
+            "oneOffContributions",
+            "regularWithdrawals",
+            "oneOffWithdrawals"
+          ]
+        },
+        "definedContribution": {
+          "type": "object",
+          "properties": {
+            "initialValue": {
+              "type": "number"
+            },
+            "joinedAt": {
+              "type": "string"
+            },
+            "installmentAge60To64": {
+              "type": "number"
+            },
+            "installmentAge65To68": {
+              "type": "number"
+            },
+            "lumpSumToNisa": {
+              "type": "number"
+            },
+            "lumpSumRestToTaxable": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "initialValue",
+            "joinedAt",
+            "installmentAge60To64",
+            "installmentAge65To68",
+            "lumpSumToNisa",
+            "lumpSumRestToTaxable"
+          ]
+        },
+        "pension": {
+          "type": "object",
+          "properties": {
+            "basicPensionMonths": {
+              "type": "number"
+            }
+          },
+          "required": ["basicPensionMonths"]
+        }
+      },
+      "required": [
+        "profile",
+        "assumptions",
+        "salaryHistory",
+        "livingCosts",
+        "rent",
+        "housingLoan",
+        "periodicExpenses",
+        "oneOffIncomes",
+        "oneOffExpenses",
+        "oldNisa",
+        "nisa",
+        "taxableInvestment",
+        "definedContribution",
+        "pension"
+      ]
+    }
+  },
+  "required": ["name", "input"]
+}
