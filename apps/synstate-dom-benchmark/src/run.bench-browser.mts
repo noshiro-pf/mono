@@ -13,6 +13,7 @@ import {
   loanScenario,
   measureScenario,
   scheduleScenario,
+  zoomScenario,
   type ScenarioResult,
 } from './scenarios/index.mjs';
 import { mapInSequence, median, rotated, settle, warmups } from './timing.mjs';
@@ -173,6 +174,7 @@ test('js-framework-benchmark operations', async () => {
   const scenarioResults = [
     ...(await measureScenario(loanScenario)),
     ...(await measureScenario(scheduleScenario)),
+    ...(await measureScenario(zoomScenario)),
   ] as const;
 
   const scenarioTable = scenariosToMarkdown(scenarioResults);
@@ -310,7 +312,7 @@ const scenariosToMarkdown = (results: readonly ScenarioResult[]): string => {
   };
 
   const columns = Arr.uniq(
-    [loanScenario, scheduleScenario].flatMap((scenario) =>
+    [loanScenario, scheduleScenario, zoomScenario].flatMap((scenario) =>
       scenario.frameworks.map((f) => f.name),
     ),
   );

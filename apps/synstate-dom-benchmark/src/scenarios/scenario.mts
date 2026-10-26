@@ -1,7 +1,8 @@
 /**
  * A scenario: a screen whose figures are derived from a few inputs through a
- * graph with diamonds of many lengths, as opposed to the table of
- * js-framework-benchmark, where each row depends on its own data only.
+ * graph (with diamonds of many lengths, or where most changes stop partway),
+ * as opposed to the table of js-framework-benchmark, where each row depends
+ * on its own data only.
  *
  * Every scenario computes many values and shows few of them ("compute big,
  * display small"), so that what is timed is mostly the propagation through
