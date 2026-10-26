@@ -179,9 +179,7 @@ class SwitchMapObservableClass<A, B>
 
     const observable = innerScope.run(() => this.#mapToObservable(sn.value));
 
-    this.#mut_subscription = observable.subscribe((curr) => {
-      this.startUpdate(curr);
-    });
+    this.#mut_subscription = this.subscribeInner(observable, updateToken);
   }
 
   protected override teardown(): void {

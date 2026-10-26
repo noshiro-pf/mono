@@ -174,9 +174,7 @@ class MergeMapObservableClass<A, B>
 
     const observable = innerScope.run(() => this.#mapToObservable(sn.value));
 
-    const subscription = observable.subscribe((curr) => {
-      this.startUpdate(curr);
-    });
+    const subscription = this.subscribeInner(observable, updateToken);
 
     this.#mut_subscriptions = Arr.toPushed(
       this.#mut_subscriptions,
