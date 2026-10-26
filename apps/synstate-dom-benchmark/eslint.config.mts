@@ -27,7 +27,7 @@ export default [
     files: ['src/**'],
     rules: defineKnownRules({
       // A signal is mutable by design, and the Preact components take theirs
-      // as props.
+      // as props; so is a VanJS state, which the scenarios pass to helpers.
       '@typescript-eslint/prefer-readonly-parameter-types': [
         'error',
         {
@@ -43,6 +43,7 @@ export default [
               package: '@preact/signals-core',
               name: ['ReadonlySignal', 'Signal'],
             },
+            { from: 'package', package: 'vanjs-core', name: 'State' },
           ],
         },
       ],

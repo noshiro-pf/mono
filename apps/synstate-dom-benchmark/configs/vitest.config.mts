@@ -49,9 +49,9 @@ export default defineConfig({
   },
   plugins: [
     solidPlugin({
-      // Only Solid's file goes through its compiler; the others keep the JSX
+      // Only Solid's files go through its compiler; the others keep the JSX
       // transform their `@jsxImportSource` pragma names.
-      include: ['src/frameworks/solid.tsx'],
+      include: ['src/frameworks/solid.tsx', 'src/scenarios/*/solid.tsx'],
       dev: false,
       hot: false,
     }),
