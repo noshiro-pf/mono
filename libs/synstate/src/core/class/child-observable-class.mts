@@ -273,12 +273,15 @@ const isDevelopmentProcess = (): boolean => {
 };
 
 /**
- * Whether {@link registerChild} checks for a circular dependency: everywhere
- * but in a process whose `NODE_ENV` is `production`. A child's parents exist
- * before it and cannot be changed afterwards, so only code that rewrites an
- * observable's readonly `parents` can make a cycle, while the walk over every
- * ancestor is paid on every creation. Where there is no `process` (a browser
- * bundle) the check is off.
+ * Whether {@link registerChild} checks for a circular dependency: on in
+ * development, off in production. The public API cannot make a cycle — a
+ * child's parents exist before it and cannot be changed afterwards — so the
+ * check is a safety net for what propagation assumes (a DAG, a depth for every
+ * node) against code that rewrites an observable's readonly `parents`, and
+ * development is where that code runs first. It walks every ancestor of each
+ * new observable, a cost production does not pay: the check is off when
+ * `NODE_ENV` is `production`, and where there is no `process` (a browser
+ * bundle).
  */
 export const checksCircularDependency: boolean = isDevelopmentProcess();
 
