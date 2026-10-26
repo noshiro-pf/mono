@@ -1,0 +1,79 @@
+---
+prev: false
+next: false
+title: keepEqualParts
+---
+
+{/* jsdoc-description */}
+
+流れてきた値のうち、前に流した値の同じ部分と深く等しい部分を、前の値のその部分で置き換えて流します。値全体が前の値と深く等しければ、何も流しません（構造共有）。変わっていない部分を読む側は手元のオブジェクトをそのまま持ち続けるので、`Object.is` の `skipIfNoChange()` で止まります。`skipIfNoChange(fastDeepEqual)` を包含します。
+
+**参照は値を書き込む側で保つのが第一です。** `setState` の前に比べ、何も変わっていなければ書き込まないようにすれば、下流で打ち消すものが何もなくなります。丸ごと書き込む状態には `createState` と `createReducer` の `keepEqualParts` オプションが、それ以外の書き込みには ts-data-forge の `replaceEqualDeep` がそれを行います。このオペレーターでは、何も変えない更新もソースとそこまでのすべてに届き、そのたびに値全体をたどり直します。ソースを自分で変えられない場合（外から丸ごと届くストリーム）に使ってください。
+
+配列の要素は index で照合します。`{ key }` を渡すと key で照合し、`key` が `undefined` を返す要素は index で照合します。中までたどるのはプレーンなオブジェクトと配列だけで、`Map`・`Set`・`Date`・class のインスタンスは丸ごと比べて丸ごと保ちます。保った部分は後の値と共有されるので、流した値をあとから書き換えてはいけません。
+
+{/* /jsdoc-description */}
+
+## 使用例
+
+```tsx
+type Board = DeepReadonly<{
+    title: string;
+    cards: { id: number; text: string }[];
+}>;
+
+// A stream that arrives whole from outside (a WebSocket, say), each
+// message a new object even when nothing changed. A state you write
+// yourself takes `createState(initial, { keepEqualParts: true })`
+// instead.
+const message$ = source<Board>();
+
+const board$ = message$.pipe(keepEqualParts());
+
+const firstCard$ = board$
+    .pipe(map((board) => board.cards[0]))
+    .pipe(skipIfNoChange());
+
+const boardHistory: Board[] = [];
+
+board$.subscribe((board) => {
+    boardHistory.push(board);
+});
+
+const firstCardHistory: unknown[] = [];
+
+firstCard$.subscribe((card) => {
+    firstCardHistory.push(card);
+});
+
+message$.next({ title: 'todo', cards: [{ id: 1, text: 'a' }] });
+
+// Equal to the last one: nothing is passed on.
+message$.next({ title: 'todo', cards: [{ id: 1, text: 'a' }] });
+
+assert.strictEqual(boardHistory.length, 1);
+
+// A card added: a new board, but the first card is the one passed on
+// before, so `firstCard$` is not told of it.
+message$.next({
+    title: 'todo',
+    cards: [
+        { id: 1, text: 'a' },
+        { id: 2, text: 'b' },
+    ],
+});
+
+assert.strictEqual(boardHistory.length, 2);
+
+assert.strictEqual(boardHistory[1]?.cards[0], boardHistory[0]?.cards[0]);
+
+assert.strictEqual(firstCardHistory.length, 1);
+```
+
+## 関連
+
+- [`createState` の `keepEqualParts`](../create-state/#変わらなかった部分を保つkeepequalparts)：同じ比較を状態に書き込む側で行います。何も変えない更新はそこから先へ伝わりません。
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/operators/keep-equal-parts.mts)
+{/* /source-link */}

@@ -1,0 +1,75 @@
+---
+prev: false
+next: false
+title: fromAbortablePromise
+---
+
+{/* jsdoc-description */}
+Creates an observable from a Promise factory that receives an `AbortSignal`.
+When the observable is completed (e.g., by `switchMap` switching to a new
+inner observable), the `AbortController` is automatically aborted, cancelling
+the in-flight request.
+
+Emits `Result.ok(value)` when the promise resolves, or `Result.err(error)`
+when it rejects. Rejections caused by abort (`AbortError`) are silently
+ignored and do not emit.
+{/* /jsdoc-description */}
+
+## Example
+
+```tsx
+//  Timeline:
+//
+//  query$      "a"            "b"
+//  request a   [in flight]    | (aborted)
+//  request b                  [in flight]  -> "result for b"
+//  results$                                  Ok("result for b")
+//
+//  Explanation:
+//  - fromAbortablePromise hands its factory an AbortSignal
+//  - switchMap completes the previous inner observable, which aborts it
+//  - The AbortError that follows is swallowed, so nothing is emitted for it
+
+const search = (query: string, signal: AbortSignal): Promise<string> =>
+    new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+            resolve(`result for ${query}`);
+        }, 50);
+
+        signal.addEventListener('abort', () => {
+            clearTimeout(timer);
+
+            reject(new DOMException('aborted', 'AbortError'));
+        });
+    });
+
+const query$ = source<string>();
+
+const results$ = query$.pipe(
+    switchMap((query) =>
+        fromAbortablePromise((signal) => search(query, signal)),
+    ),
+);
+
+const valueHistory: Result<string, unknown>[] = [];
+
+results$.subscribe((result) => {
+    valueHistory.push(result);
+});
+
+query$.next('a');
+
+query$.next('b');
+
+await new Promise<void>((resolve) => {
+    setTimeout(resolve, 150);
+});
+
+assert.deepStrictEqual(valueHistory, [Result.ok('result for b')]);
+```
+
+Use it instead of [`fromPromise`](../from-promise/) when the request can be cancelled, typically as the projection of [`switchMap`](../switch-map/), so that a request whose answer nobody waits for any longer is aborted rather than left running.
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/create/from-abortable-promise.mts)
+{/* /source-link */}

@@ -71,6 +71,62 @@ assert.deepStrictEqual(queryHistory, ['label:bug page:1', 'label:bug page:2']);
 
 `equals` defaults to `Object.is`, so writing the value already held passes nothing on. Pass `equals: () => false` to pass on every update, equal or not.
 
+## Keeping the parts that did not change (`keepEqualParts`)
+
+A state written whole from a source that answers with a new object every time, such as a server polled for a report, can take `keepEqualParts: true`.
+
+```tsx
+type PullReport = DeepReadonly<{
+    summary: { open: number };
+    pulls: { number: number; title: string }[];
+}>;
+
+const [report, setReport] = createState<PullReport>(
+    { summary: { open: 0 }, pulls: [] },
+    { keepEqualParts: true },
+);
+
+const summary = report.pipe(map((r) => r.summary)).pipe(skipIfNoChange());
+
+const summaryHistory: unknown[] = [];
+
+summary.subscribe((value) => {
+    summaryHistory.push(value);
+});
+
+// A server answers each poll with the whole report, a new object every
+// time. What did not change keeps the object already held.
+setReport({
+    summary: { open: 1 },
+    pulls: [{ number: 1, title: 'one' }],
+});
+
+const held = report.getSnapshot().value;
+
+// An answer that changes nothing is not passed on at all.
+setReport({
+    summary: { open: 1 },
+    pulls: [{ number: 1, title: 'one' }],
+});
+
+assert.strictEqual(report.getSnapshot().value, held);
+
+// An edited title: a new report and a new array, while the summary is
+// the one held, so `summary` is not told of it.
+setReport({
+    summary: { open: 1 },
+    pulls: [{ number: 1, title: 'one (edited)' }],
+});
+
+assert.notStrictEqual(report.getSnapshot().value, held);
+
+assert.strictEqual(report.getSnapshot().value.summary, held.summary);
+
+assert.deepStrictEqual(summaryHistory, [{ open: 0 }, { open: 1 }]);
+```
+
+The next state is compared with the current one before it is written: every part deeply equal to the same part of the current state is replaced by that part, so whatever reads an unchanged part keeps the object it has and `skipIfNoChange()` with `Object.is` stops it, and an update that changes nothing is not passed on at all. Array items are matched by index; `keepEqualParts: { key }` matches them by key. It is the writing-side counterpart of the [`keepEqualParts`](../keep-equal-parts/) operator, and the one to prefer.
+
 {/* source-link */}
 [View source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/utils/create-state.mts)
 {/* /source-link */}

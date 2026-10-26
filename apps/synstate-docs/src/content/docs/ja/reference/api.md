@@ -31,6 +31,7 @@ SynStateはアプリケーションの状態を管理するためのシンプル
 - [`just(value)`](../just/): 単一の静的な値を保持し即座に完了するObservableを作成。`switchMap` 内の同期フォールバックとして有用。
 - [`empty()`](../empty/): 値を持たず即座に完了しているObservableを作成（RxJS の `EMPTY` とほぼ同等）。`switchMap` で何も追わない分岐に有用。
 - [`fromPromise(promise)`](../from-promise/): PromiseからObservableを作成。
+- [`fromAbortablePromise(factory)`](../from-abortable-promise/): `AbortSignal` を受け取る Promise のファクトリから Observable を作成。Observable が complete すると（`switchMap` が切り替えたときなど）abort される。
 - [`fromSubscribable()`](../from-subscribable/): 任意のsubscribableオブジェクトからObservableを作成。
 - [`counter(ms)`](../counter/): すぐに 0 を発行し、その後一定間隔で 1, 2, … を発行（RxJSの`timer(0, ms)`とほぼ同等。`{ emitInitial: false }` を渡すと`interval(ms)`とほぼ同等。`{ times: n }` を渡すと`n`回発行した直後に complete）。
 - [`timer(delay)`](../timer/): 遅延後に発行。
@@ -88,6 +89,7 @@ SynStateはアプリケーションの状態を管理するためのシンプル
 - [`withBuffered(observable)`](../with-buffered/): Observableからの値をバッファリングし、親とともに発行（別名： `withBufferedFrom`）。
 - [`withCurrentValueFrom(observable)`](../with-current-value-from/): 別のObservableから現在の値をサンプリング（別名： `withLatestFrom`）。
 - [`withInitialValue(value)`](../with-initial-value/): 未初期化のObservableに初期値を提供。
+- [`keepEqualParts(options?)`](../keep-equal-parts/): 前の値と等しい部分を前の値のもので置き換え、全体が等しい値は流さない（構造共有）。自分で書き込む状態には `createState` の `keepEqualParts` オプションを優先。
 
 ### スコープ（ライブラリ作成者向け）
 

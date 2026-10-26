@@ -31,6 +31,7 @@ For complex scenarios, SynState provides observable-based APIs:
 - [`just(value)`](../just/): Create an Observable that holds a single static value and immediately completes. Useful as a synchronous fallback inside `switchMap`.
 - [`empty()`](../empty/): Create an Observable that holds no value and is already completed (almost equivalent to RxJS `EMPTY`). Useful for the branch of a `switchMap` that should follow nothing.
 - [`fromPromise(promise)`](../from-promise/): Create observable from promise.
+- [`fromAbortablePromise(factory)`](../from-abortable-promise/): Create observable from a promise factory that receives an `AbortSignal`, aborted when the observable completes (as when `switchMap` switches away).
 - [`fromSubscribable()`](../from-subscribable/): Create observable from any subscribable object.
 - [`counter(ms)`](../counter/): Emit 0 at once, then 1, 2, … at intervals (almost equivalent to RxJS `timer(0, ms)`; with `{ emitInitial: false }`, almost equivalent to `interval(ms)`; `{ times: n }` completes it after `n` values).
 - [`timer(delay)`](../timer/): Emit after delay.
@@ -88,6 +89,7 @@ For complex scenarios, SynState provides observable-based APIs:
 - [`withBuffered(observable)`](../with-buffered/): Buffer values from observable and emit with parent (alias: `withBufferedFrom`).
 - [`withCurrentValueFrom(observable)`](../with-current-value-from/): Sample current value from another observable (alias: `withLatestFrom`).
 - [`withInitialValue(value)`](../with-initial-value/): Provide an initial value for uninitialized observable.
+- [`keepEqualParts(options?)`](../keep-equal-parts/): Keep the parts equal to the last value and skip a value equal to it as a whole (structural sharing). Prefer the `keepEqualParts` option of `createState` for a state you write.
 
 ### Scopes (for library authors)
 

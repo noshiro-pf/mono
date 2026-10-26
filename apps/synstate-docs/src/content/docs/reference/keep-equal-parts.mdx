@@ -1,0 +1,92 @@
+---
+prev: false
+next: false
+title: keepEqualParts
+---
+
+{/* jsdoc-description */}
+Passes on each value with every part deeply equal to the same part of the
+value passed on before replaced by that part, and skips a value deeply
+equal to it altogether (structural sharing). A reader of a part that did
+not change keeps the object it has, so `skipIfNoChange()` with `Object.is`
+stops it. Superset of `skipIfNoChange(fastDeepEqual)`.
+
+**Prefer keeping references where the value is written** — compare before
+`setState`, and skip it when nothing changed — so that nothing downstream
+has anything to undo. The `keepEqualParts` option of `createState` and
+`createReducer` does it for a state written whole, and `replaceEqualDeep`
+of ts-data-forge does it for any other write. This operator lets every
+update that changes nothing reach the source and everything up to it, and
+walks the whole value again on each one; reach for it when the source is
+not yours to change (a stream that arrives whole from outside).
+
+Array items are matched by index; pass `{ key }` to match them by key, an
+item for which `key` returns `undefined` being matched by index. Only plain
+objects and arrays are walked into; a `Map`, a `Set`, a `Date` or a class
+instance is compared and kept whole. The values must not be changed after
+they are passed on, because the parts kept are shared by later values.
+{/* /jsdoc-description */}
+
+## Example
+
+```tsx
+type Board = DeepReadonly<{
+    title: string;
+    cards: { id: number; text: string }[];
+}>;
+
+// A stream that arrives whole from outside (a WebSocket, say), each
+// message a new object even when nothing changed. A state you write
+// yourself takes `createState(initial, { keepEqualParts: true })`
+// instead.
+const message$ = source<Board>();
+
+const board$ = message$.pipe(keepEqualParts());
+
+const firstCard$ = board$
+    .pipe(map((board) => board.cards[0]))
+    .pipe(skipIfNoChange());
+
+const boardHistory: Board[] = [];
+
+board$.subscribe((board) => {
+    boardHistory.push(board);
+});
+
+const firstCardHistory: unknown[] = [];
+
+firstCard$.subscribe((card) => {
+    firstCardHistory.push(card);
+});
+
+message$.next({ title: 'todo', cards: [{ id: 1, text: 'a' }] });
+
+// Equal to the last one: nothing is passed on.
+message$.next({ title: 'todo', cards: [{ id: 1, text: 'a' }] });
+
+assert.strictEqual(boardHistory.length, 1);
+
+// A card added: a new board, but the first card is the one passed on
+// before, so `firstCard$` is not told of it.
+message$.next({
+    title: 'todo',
+    cards: [
+        { id: 1, text: 'a' },
+        { id: 2, text: 'b' },
+    ],
+});
+
+assert.strictEqual(boardHistory.length, 2);
+
+assert.strictEqual(boardHistory[1]?.cards[0], boardHistory[0]?.cards[0]);
+
+assert.strictEqual(firstCardHistory.length, 1);
+```
+
+## See also
+
+- [`createState` with `keepEqualParts`](../create-state/#keeping-the-parts-that-did-not-change-keepequalparts): the same comparison where the state is written, which an update that changes nothing never gets past.
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/operators/keep-equal-parts.mts)
+{/* /source-link */}
