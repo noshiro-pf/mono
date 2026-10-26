@@ -10,6 +10,7 @@ type Type<A> = Readonly<{
   prune: <B extends A>(a: B) => A; // Recursively remove excess properties
   validate: (a: unknown) => Result<A, readonly ValidationError[]>; // Detailed validation
   structure?: TypeStructure; // What the type is built from, readable at runtime
+  annotations?: TypeAnnotations; // Title, description, format, ... (see `annotate`)
 }>;
 
 // embed-sample-code-ignore-below
@@ -17,6 +18,7 @@ type Type<A> = Readonly<{
 import { expectType, type Result } from 'ts-data-forge';
 import type {
   Type as Type_,
+  TypeAnnotations,
   TypeStructure,
   ValidationError,
 } from '../../../../src/index.mjs';

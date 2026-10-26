@@ -1,3 +1,4 @@
+export * from './annotate.mjs';
 export * from './literal.mjs';
 export * from './map.mjs';
 export * from './recursion.mjs';

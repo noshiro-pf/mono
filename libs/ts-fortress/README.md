@@ -464,6 +464,72 @@ How it reads a type:
 - **No JSON value is a `bigint`, `symbol`, `undefined`, `Map` or `Set`**, so such a type is a `'not-json'` error — except as a union member, which is left out: `t.nullable(t.string())` is a string.
 - Default values are not written as `default`, since every type has one and a client would read every property as one it may leave out. Pass `{ includeSchemaUri: false }` to leave `$schema` off a schema embedded in another document.
 
+### Annotations
+
+`t.annotate(type, { title, description, format, examples, deprecated })` gives a type what a reader of its schema needs and its structure cannot say. `toJsonSchema` writes each under the keyword of the same name, `title` and `description` first.
+
+```tsx
+import * as t from 'ts-fortress';
+
+const Config = t.strictRecord({
+    name: t.annotate(t.string('app'), {
+        description: 'The name the service registers under.',
+    }),
+    retries: t.optional(
+        t.annotate(t.uint32(), {
+            description: 'How many times a failed request is retried.',
+            examples: [t.asUint32(3)],
+        }),
+    ),
+    id: t.uuid(),
+});
+
+const schema = t.toJsonSchema(
+    t.annotate(Config, { title: 'Service configuration' }),
+    { includeSchemaUri: false },
+);
+
+assert.deepStrictEqual(
+    schema,
+    t.Result.ok({
+        title: 'Service configuration',
+        type: 'object',
+        properties: {
+            name: {
+                description: 'The name the service registers under.',
+                type: 'string',
+            },
+            retries: {
+                description: 'How many times a failed request is retried.',
+                type: 'integer',
+                minimum: 0,
+                exclusiveMaximum: 4_294_967_296,
+                'x-brand': 'Uint32',
+                examples: [3],
+            },
+            // `uuid()` carries the `uuid` format of its own
+            id: {
+                type: 'string',
+                minLength: 1,
+                'x-brand': 'Uuid',
+                format: 'uuid',
+            },
+        },
+        required: ['name', 'id'],
+        additionalProperties: false,
+    }),
+);
+
+// Annotations never change what is valid
+assert.isTrue(t.annotate(t.string(), { format: 'email' }).is('not an e-mail'));
+```
+
+- **Annotations change nothing the type does.** Validation, `fill`, `prune`, the default value, `constraints` and a record's `shape` are those of the type annotated, and a `format` is a description: the type decides what is valid.
+- **`t.optional` and `t.annotate` go either way round.** `t.optional(t.annotate(x, ...))` and `t.annotate(t.optional(x), ...)` are the same record member.
+- **A key given again replaces the earlier one**, so `t.annotate(t.uuid(), { format: 'my-uuid' })` replaces the `uuid` format `t.uuid()` carries. `t.uuid()` is the only predefined type with a `format`: what `t.email()`, `t.uri()` and `t.iso8601()` accept is not contained in the JSON Schema format of that name, and a validator that asserted it would reject some of their values.
+- **`examples` are values of the type**, checked by `toJsonSchema`: one the type does not accept is an `'invalid-example'` error, and one that is not JSON a `'not-json'` error.
+- An annotated `t.recursion` is annotated at each `$ref` to it; annotate the type its definition returns to annotate the `$defs` entry.
+
 ## Why ts-fortress over Zod and io-ts?
 
 While ts-fortress, [Zod](https://github.com/colinhacks/zod), and [io-ts](https://github.com/gcanti/io-ts) are all excellent TypeScript validation libraries, ts-fortress offers more readable and informative error messages than both, a more type-safe way of building validators than Zod, and addresses some critical runtime consistency issues found in io-ts.
@@ -525,6 +591,7 @@ type Type<A> = Readonly<{
     prune: <B extends A>(a: B) => A; // Recursively remove excess properties
     validate: (a: unknown) => Result<A, readonly ValidationError[]>; // Detailed validation
     structure?: TypeStructure; // What the type is built from, readable at runtime
+    annotations?: TypeAnnotations; // Title, description, format, ... (see `annotate`)
 }>;
 ```
 
@@ -1211,6 +1278,7 @@ type ValidationError = Readonly<{
 - `t.attachConstraints(type, constraints)` - Attach constraint values to a type of your own
 - `type.structure` - What a type was built from, discriminated by `kind` (`t.TypeStructure`)
 - `t.toJsonSchema(type, { includeSchemaUri? })` - The JSON Schema of a type. See [JSON Schema](#json-schema)
+- `t.annotate(type, { title?, description?, format?, examples?, deprecated? })` - A type with annotations for its JSON Schema (`type.annotations`). See [Annotations](#annotations)
 - `t.enumType(values)` - Enum validation
 - `t.uintRange(start, end, { defaultValue? })` - Non-negative integer range validation (`end` is exclusive)
 - `t.intRange(start, end, { defaultValue? })` - Integer range validation (`end` is exclusive)

@@ -34,6 +34,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     ],
   },
   {
+    sourcePath: 'src/other-types/annotate.mts',
+    sampleFiles: ['samples/src/other-types/annotate/annotate-example.mts'],
+  },
+  {
     sourcePath: 'src/record/optional.mts',
     sampleFiles: [
       'samples/src/other-types/recursion/mutually-recursive-with-optional-example.mts',
