@@ -1,5 +1,14 @@
 # eslint-plugin-ts-data-forge
 
+## 0.10.3
+
+### Patch Changes
+
+- ca74a91: Update dependencies
+- Updated dependencies [ca74a91]
+    - eslint-rule-forge@0.3.1
+    - ts-data-forge@14.10.0
+
 ## 0.10.2
 
 ### Patch Changes

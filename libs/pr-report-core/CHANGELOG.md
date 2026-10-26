@@ -1,5 +1,14 @@
 # pr-report-core
 
+## 0.0.5
+
+### Patch Changes
+
+- 5fd0af1: No change to the code. This is the first version published by the release workflow through npm trusted publishing, so it carries a provenance attestation; 0.0.4 was published by hand without one.
+- Updated dependencies [1ebff9f]
+- Updated dependencies [4d0d586]
+    - ts-fortress@12.4.0
+
 ## 0.0.4
 
 ### Patch Changes

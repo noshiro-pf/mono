@@ -1,5 +1,14 @@
 # [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
 
+## 4.0.5
+
+### Patch Changes
+
+- ca74a91: Update dependencies
+- Updated dependencies [1ebff9f]
+- Updated dependencies [4d0d586]
+    - ts-fortress@12.4.0
+
 ## 4.0.4
 
 ### Patch Changes

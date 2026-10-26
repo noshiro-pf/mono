@@ -1,5 +1,13 @@
 # eslint-plugin-synstate
 
+## 0.2.1
+
+### Patch Changes
+
+- ca74a91: Update dependencies
+- Updated dependencies [ca74a91]
+    - eslint-rule-forge@0.3.1
+
 ## 0.2.0
 
 ### Minor Changes

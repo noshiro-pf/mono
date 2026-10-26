@@ -1,5 +1,13 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.19.2
+
+### Patch Changes
+
+- ca74a91: Update dependencies
+- Updated dependencies [ca74a91]
+    - eslint-rule-forge@0.3.1
+
 ## 5.19.1
 
 ### Patch Changes
