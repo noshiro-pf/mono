@@ -102,7 +102,13 @@ describe(yieldsTo, () => {
     const other = pullRequest({ number: 3, labels: [queued] });
 
     assert.strictEqual(
-      yieldsTo(target, [target, other], new Map([[3, worker]]), 'main')?.number,
+      yieldsTo(
+        target,
+        [target, other],
+        new Map([[3, worker]]),
+        new Set([3, 7]),
+        'main',
+      )?.number,
       3,
     );
   });
@@ -111,7 +117,32 @@ describe(yieldsTo, () => {
     const other = pullRequest({ number: 12, labels: [queued] });
 
     assert.isUndefined(
-      yieldsTo(target, [target, other], new Map([[12, worker]]), 'main'),
+      yieldsTo(
+        target,
+        [target, other],
+        new Map([[12, worker]]),
+        new Set([7, 12]),
+        'main',
+      ),
+    );
+  });
+
+  test('keeps its release against one that was already released when the survey picked it', () => {
+    // Released before the survey — a person took `skip-ci` off, or labelled
+    // `merge-queued` one that never had it — and not in flight, or the survey
+    // would have watched it: waiting on its declared order, held by its
+    // review, conflicting. It is still released on the next survey, so
+    // yielding to it would release and pause the same pull request forever.
+    const other = pullRequest({ number: 3, labels: [queued, high] });
+
+    assert.isUndefined(
+      yieldsTo(
+        target,
+        [target, other],
+        new Map([[3, worker]]),
+        new Set([7]),
+        'main',
+      ),
     );
   });
 
@@ -121,17 +152,31 @@ describe(yieldsTo, () => {
     const other = pullRequest({ number: 3, labels: [queued] });
 
     assert.isUndefined(
-      yieldsTo(target, [target, other], new Map([[3, skill]]), 'main'),
+      yieldsTo(
+        target,
+        [target, other],
+        new Map([[3, skill]]),
+        new Set([3, 7]),
+        'main',
+      ),
     );
 
-    assert.isUndefined(yieldsTo(target, [target, other], new Map(), 'main'));
+    assert.isUndefined(
+      yieldsTo(target, [target, other], new Map(), new Set([3, 7]), 'main'),
+    );
   });
 
   test('does not count one paused by skip-ci', () => {
     const other = pullRequest({ number: 3, labels: [queued, skipCi] });
 
     assert.isUndefined(
-      yieldsTo(target, [target, other], new Map([[3, worker]]), 'main'),
+      yieldsTo(
+        target,
+        [target, other],
+        new Map([[3, worker]]),
+        new Set([3, 7]),
+        'main',
+      ),
     );
   });
 });

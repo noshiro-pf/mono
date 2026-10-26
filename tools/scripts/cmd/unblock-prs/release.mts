@@ -16,6 +16,13 @@
  * another of its pull requests was released in the same moment and goes
  * first, it pauses its own ({@link yieldsTo}). A pull request someone else
  * releases runs, and what that costs is a matrix, not a wrong merge.
+ *
+ * "In the same moment" is the whole of it: only one the survey saw paused by
+ * `skip-ci` is yielded to. One already released when the survey picked
+ * `target` and not in flight — waiting on its declared order, held by its
+ * review, conflicting, released by hand — is released on the next survey
+ * too, which picks `target` again, so yielding to it took `skip-ci` off and
+ * put it back on `target` for as long as the script ran.
  */
 
 import { SKIP_CI_LABEL, type QueueOwner } from 'pr-report-core';
@@ -30,13 +37,15 @@ import { isVersionPullRequest } from './version-pr.mjs';
 /**
  * Looks again once `target` has been released, and when another pull request
  * the worker owns was released in the same moment and goes first, pauses
- * `target` — the one pull request this may label. Resolves to whether
- * `target` keeps its release.
+ * `target` — the one pull request this may label. `pausedAtSurvey` is the
+ * pull requests the survey that picked `target` saw labelled `skip-ci`.
+ * Resolves to whether `target` keeps its release.
  */
 export const settleAfterRelease = async (
   api: ApiContext,
   target: PullRequest,
   owners: ReadonlyMap<number, QueueOwner>,
+  pausedAtSurvey: ReadonlySet<number>,
   defaultBranch: string,
 ): Promise<'kept' | 'yielded'> => {
   const listed = await listPullRequests(api);
@@ -47,7 +56,13 @@ export const settleAfterRelease = async (
     return 'kept';
   }
 
-  const first = yieldsTo(target, listed.value, owners, defaultBranch);
+  const first = yieldsTo(
+    target,
+    listed.value,
+    owners,
+    pausedAtSurvey,
+    defaultBranch,
+  );
 
   if (first === undefined) {
     return 'kept';
@@ -65,20 +80,25 @@ export const settleAfterRelease = async (
 };
 
 /**
- * The pull request `target` should step back for, if any: another released
- * one the worker owns that goes first in {@link firstInReleaseOrder}. One set
- * aside or claimed is a skill's or a person's and runs nothing until its fix
- * is pushed, so it holds nothing back; counting it would stall the queue
- * behind a pull request nobody is about to run.
+ * The pull request `target` should step back for, if any: another one the
+ * worker owns, paused when the survey ran (`pausedAtSurvey`) and released
+ * since, that goes first in {@link firstInReleaseOrder}. One set aside or
+ * claimed is a skill's or a person's and runs nothing until its fix is
+ * pushed, so it holds nothing back; counting it would stall the queue behind
+ * a pull request nobody is about to run. One released before the survey is
+ * not counted either: see the top of this file.
  */
 export const yieldsTo = (
   target: PullRequest,
   pullRequests: readonly PullRequest[],
   owners: ReadonlyMap<number, QueueOwner>,
+  pausedAtSurvey: ReadonlySet<number>,
   defaultBranch: string,
 ): PullRequest | undefined => {
   const others = releasedExcept(pullRequests, target.number).filter(
-    (pr) => owners.get(pr.number)?.owner === 'worker',
+    (pr) =>
+      owners.get(pr.number)?.owner === 'worker' &&
+      pausedAtSurvey.has(pr.number),
   );
 
   const first = firstInReleaseOrder(

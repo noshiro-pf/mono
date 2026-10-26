@@ -217,7 +217,11 @@ PR は常に1本まで** に保ちます。`main` が動く前にマージでき
   `skip-ci` を付け直して譲り、survey からやり直します（`release.mts` の
   `yieldsTo`）。見送り中・claim 中の PR（skill か人の担当）は、直した push まで
   CI を走らせないので数えません。数えると、誰も走らせない PR の後ろでキューが
-  止まります。
+  止まります。survey の時点で既に解放されていた PR（人が `skip-ci` を外した、
+  `skip-ci` なしの PR に `merge-queued` を付けた、など）も数えません。in flight
+  でないそれ（`Merge-After:` 待ち、review 待ち、conflict など）は次の survey でも
+  解放されたままで、譲ると同じ PR を pick しては `skip-ci` を戻す無限ループに
+  なります。
 - 人や bot が解放した PR はそのまま走ります。無駄になりうるのはマトリクス1回分
   で、誤ったマージは起きません。上の例の手順 3 は、skill が push の前に自分の
   PR に `skip-ci` を付けるので起きません。
@@ -984,7 +988,11 @@ bot opens released, and one a person had released on purpose.
   **its own** and surveys again (`yieldsTo` in `release.mts`). A set-aside or
   claimed pull request, a skill's or a person's, runs nothing until its fix is
   pushed, so it does not count; counting it would stall the queue behind a
-  pull request nobody is about to run.
+  pull request nobody is about to run. Nor does one already released when the
+  survey ran (a person took `skip-ci` off it, or labelled `merge-queued` one
+  that never had it): not in flight — waiting on `Merge-After:`, held by its
+  review, conflicting — it is still released on the next survey, and yielding
+  to it would pick and pause the same pull request forever.
 - A pull request a person or a bot released runs as released. What that can
   cost is a matrix, not a wrong merge. Step 3 of the example no longer
   happens, because the skill puts `skip-ci` on its own pull request before it

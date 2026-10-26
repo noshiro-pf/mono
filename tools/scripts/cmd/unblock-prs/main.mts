@@ -22,7 +22,7 @@ import {
   viewPullRequest,
   writeSetAsideCommentOn,
 } from './github.mjs';
-import { wantsAutoRebase } from './labels.mjs';
+import { isSkipCiLabelled, wantsAutoRebase } from './labels.mjs';
 import { HELP, parseOptions, type Options } from './options.mjs';
 import {
   idleWaitSec,
@@ -649,6 +649,12 @@ const runCycle = async (
     return { state: state(mut_skipped), next: 'stop', settled: skipped };
   }
 
+  // What a release found afterwards can have happened in the same moment
+  // only for these; see `release.mts`.
+  const pausedAtSurvey: ReadonlySet<number> = new Set(
+    pullRequests.filter(isSkipCiLabelled).map((pr) => pr.number),
+  );
+
   for (const target of triaged.candidates) {
     if (stopRequested()) {
       return { state: state(mut_skipped), next: 'stop', settled: skipped };
@@ -712,8 +718,13 @@ const runCycle = async (
     const demotedNow = followHead(demoted, target.number, advancedHead);
 
     if (
-      (await settleAfterRelease(api, target, triaged.owners, defaultBranch)) ===
-      'yielded'
+      (await settleAfterRelease(
+        api,
+        target,
+        triaged.owners,
+        pausedAtSurvey,
+        defaultBranch,
+      )) === 'yielded'
     ) {
       log(
         `#${target.number} was released at the same moment as another, which goes first; paused it again.`,
