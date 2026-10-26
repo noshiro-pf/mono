@@ -108,10 +108,10 @@ export const Table = (): JSX.Element => (
 );
 ```
 
-- `items: Bindable<readonly T[]>`, `key: (item: T, index: number) => unknown`, and as children a function `(item$, index$) => JSX.Element`.
+- `items: Bindable<readonly T[]>`, `key: (item: T, index: number) => unknown`, and as children a function `(item$, index$) => JSX.Element`. `index$` is made only when the function declares a second parameter, as in Solid; a row that does not need its position leaves it out, and each row then has one node less to create and to update.
 - `key` is required, as in React. To match rows by position, say so with `key={(_, i) => i}`; there is no separate `Index` component.
 - The row function runs once per key. When the array changes, an existing row receives its new item and index through `item$` and `index$`, which are derived from `items`, and the row function is not called again. A new key gets a new row; a row whose key is gone has its scope disposed and its nodes removed.
-- Rows are reordered with as few moves as the longest increasing subsequence allows.
+- Rows are reordered with as few moves as the longest increasing subsequence allows. An update that keeps every key in its place moves nothing, and one that keeps no key (clearing or replacing the whole list) removes the old rows' nodes at once.
 - A key that appears twice is reported with `console.error`, as React does. It does not break anything, but each duplicate is rebuilt on every update.
 
 ## `Portal`
