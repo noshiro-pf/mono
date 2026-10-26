@@ -4,6 +4,6 @@ import { runCmdInStagesAcrossWorkspaces } from 'ts-repo-utils';
 await runCmdInStagesAcrossWorkspaces({
   rootPackageJsonDir: '../',
   cmd: 'build',
-  concurrency: 3,
+  concurrency: 4,
   filterWorkspacePattern: (name) => !name.includes('experimental'),
 });

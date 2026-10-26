@@ -4,7 +4,7 @@ import { validationErrorsToMessages } from '../utils/index.mjs';
 import { boolean } from './boolean.mjs';
 
 describe(boolean, () => {
-  const targetType = boolean(false);
+  const targetType = boolean();
 
   type TargetType = TypeOf<typeof targetType>;
 

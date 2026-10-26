@@ -3858,6 +3858,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "AbortSignal.timeout",
    *             "AbortSignal.any",
    *             "DOMException",
+   *             "QuotaExceededError",
    *             "FormData",
    *             "Headers",
    *             "MessageEvent",
@@ -3865,6 +3866,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "Request",
    *             "Response",
    *             "WebAssembly",
+   *             "Worker",
    *             "WebSocket",
    *             "fetch",
    *             "global",
@@ -3895,6 +3897,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "Buffer.from",
    *             "Buffer.isBuffer",
    *             "Buffer.isEncoding",
+   *             "Buffer.stringLength",
    *             "File",
    *             "atob",
    *             "btoa",
@@ -3949,6 +3952,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "SubtleCrypto.supports",
    *             "CloseEvent",
    *             "CustomEvent",
+   *             "ErrorEvent",
    *             "Event",
    *             "EventSource",
    *             "EventTarget",
@@ -4017,6 +4021,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "process.mainModule",
    *             "process.noDeprecation",
    *             "process.permission",
+   *             "process.permission.drop",
    *             "process.pid",
    *             "process.platform",
    *             "process.ppid",
@@ -4058,6 +4063,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "process.version",
    *             "process.versions",
    *             "process.abort",
+   *             "process.addUncaughtExceptionCaptureCallback",
    *             "process.chdir",
    *             "process.constrainedMemory",
    *             "process.cpuUsage",
@@ -4203,6 +4209,24 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "async_hooks.AsyncLocalStorage.snapshot",
    *             "async_hooks.AsyncResource",
    *             "async_hooks.AsyncResource.bind",
+   *             "bench",
+   *             "bench.after",
+   *             "bench.afterEach",
+   *             "bench.before",
+   *             "bench.beforeEach",
+   *             "bench.bench",
+   *             "bench.bench.only",
+   *             "bench.bench.skip",
+   *             "bench.createRunner",
+   *             "bench.describe",
+   *             "bench.only",
+   *             "bench.run",
+   *             "bench.runFile",
+   *             "bench.skip",
+   *             "bench.suite",
+   *             "bench/reporters",
+   *             "bench/reporters.json",
+   *             "bench/reporters.spec",
    *             "buffer",
    *             "buffer.constants",
    *             "buffer.INSPECT_MAX_BYTES",
@@ -4211,6 +4235,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "buffer.atob",
    *             "buffer.btoa",
    *             "buffer.isAscii",
+   *             "buffer.isLatin1",
    *             "buffer.isUtf8",
    *             "buffer.resolveObjectURL",
    *             "buffer.transcode",
@@ -4228,6 +4253,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "buffer.Buffer.from",
    *             "buffer.Buffer.isBuffer",
    *             "buffer.Buffer.isEncoding",
+   *             "buffer.Buffer.stringLength",
    *             "buffer.File",
    *             "child_process",
    *             "child_process.exec",
@@ -4287,6 +4313,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "crypto.createECDH",
    *             "crypto.createHash",
    *             "crypto.createHmac",
+   *             "crypto.createMac",
    *             "crypto.createPrivateKey",
    *             "crypto.createPublicKey",
    *             "crypto.createSecretKey",
@@ -4307,9 +4334,11 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "crypto.getDiffieHellman",
    *             "crypto.getFips",
    *             "crypto.getHashes",
+   *             "crypto.getMacs",
    *             "crypto.hash",
    *             "crypto.hkdf",
    *             "crypto.hkdfSync",
+   *             "crypto.parsePKCS12",
    *             "crypto.pbkdf2",
    *             "crypto.pbkdf2Sync",
    *             "crypto.privateDecrypt",
@@ -4320,6 +4349,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "crypto.randomFillSync",
    *             "crypto.randomFill",
    *             "crypto.randomInt",
+   *             "crypto.randomUUIDv7",
    *             "crypto.scrypt",
    *             "crypto.scryptSync",
    *             "crypto.secureHeapUsed",
@@ -4358,8 +4388,10 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "diagnostics_channel.subscribe",
    *             "diagnostics_channel.unsubscribe",
    *             "diagnostics_channel.tracingChannel",
+   *             "diagnostics_channel.boundedChannel",
    *             "diagnostics_channel.Channel",
    *             "diagnostics_channel.TracingChannel",
+   *             "diagnostics_channel.BoundedChannel",
    *             "dns",
    *             "dns.Resolver",
    *             "dns.getServers",
@@ -4431,6 +4463,10 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "dns/promises.setDefaultResultOrder",
    *             "dns/promises.getDefaultResultOrder",
    *             "dns/promises.setServers",
+   *             "dtls",
+   *             "dtls.connect",
+   *             "dtls.createSecureContext",
+   *             "dtls.listen",
    *             "domain",
    *             "domain.create",
    *             "domain.Domain",
@@ -4474,6 +4510,42 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "events.on",
    *             "events.setMaxListeners",
    *             "events.addAbortListener",
+   *             "ffi",
+   *             "ffi.DynamicLibrary",
+   *             "ffi.dlclose",
+   *             "ffi.dlopen",
+   *             "ffi.dlsym",
+   *             "ffi.exportArrayBuffer",
+   *             "ffi.exportArrayBufferView",
+   *             "ffi.exportBuffer",
+   *             "ffi.exportString",
+   *             "ffi.getCurrentEventLoop",
+   *             "ffi.getFloat32",
+   *             "ffi.getFloat64",
+   *             "ffi.getInt16",
+   *             "ffi.getInt32",
+   *             "ffi.getInt64",
+   *             "ffi.getInt8",
+   *             "ffi.getRawPointer",
+   *             "ffi.getUint16",
+   *             "ffi.getUint32",
+   *             "ffi.getUint64",
+   *             "ffi.getUint8",
+   *             "ffi.setFloat32",
+   *             "ffi.setFloat64",
+   *             "ffi.setInt16",
+   *             "ffi.setInt32",
+   *             "ffi.setInt64",
+   *             "ffi.setInt8",
+   *             "ffi.setUint16",
+   *             "ffi.setUint32",
+   *             "ffi.setUint64",
+   *             "ffi.setUint8",
+   *             "ffi.suffix",
+   *             "ffi.toArrayBuffer",
+   *             "ffi.toBuffer",
+   *             "ffi.toString",
+   *             "ffi.types",
    *             "fs",
    *             "fs.promises",
    *             "fs.promises.FileHandle",
@@ -4587,6 +4659,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "fs.mkdtempDisposableSync",
    *             "fs.opendirSync",
    *             "fs.openSync",
+   *             "fs.openAsBlobSync",
    *             "fs.readdirSync",
    *             "fs.readFileSync",
    *             "fs.readlinkSync",
@@ -4607,6 +4680,10 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "fs.writeSync",
    *             "fs.writevSync",
    *             "fs.constants",
+   *             "fs.F_OK",
+   *             "fs.R_OK",
+   *             "fs.W_OK",
+   *             "fs.X_OK",
    *             "fs.Dir",
    *             "fs.Dirent",
    *             "fs.FSWatcher",
@@ -4684,7 +4761,12 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "http.request",
    *             "http.validateHeaderName",
    *             "http.validateHeaderValue",
+   *             "http.isValidHeaderName",
+   *             "http.isValidHeaderValue",
+   *             "http.websocketMask",
+   *             "http.websocketUnmask",
    *             "http.setMaxIdleHTTPParsers",
+   *             "http.setGlobalProxyFromEnv",
    *             "http.Agent()",
    *             "http.Agent",
    *             "http.ClientRequest()",
@@ -4714,6 +4796,11 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "https.Server",
    *             "inspector",
    *             "inspector.Session",
+   *             "inspector.DOMStorage.domStorageItemAdded",
+   *             "inspector.DOMStorage.domStorageItemRemoved",
+   *             "inspector.DOMStorage.domStorageItemUpdated",
+   *             "inspector.DOMStorage.domStorageItemsCleared",
+   *             "inspector.DOMStorage.registerStorage",
    *             "inspector.Network.dataReceived",
    *             "inspector.Network.dataSent",
    *             "inspector.Network.loadingFailed",
@@ -4731,6 +4818,11 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "inspector.waitForDebugger",
    *             "inspector/promises",
    *             "inspector/promises.Session",
+   *             "inspector/promises.DOMStorage.domStorageItemAdded",
+   *             "inspector/promises.DOMStorage.domStorageItemRemoved",
+   *             "inspector/promises.DOMStorage.domStorageItemUpdated",
+   *             "inspector/promises.DOMStorage.domStorageItemsCleared",
+   *             "inspector/promises.DOMStorage.registerStorage",
    *             "inspector/promises.Network.dataReceived",
    *             "inspector/promises.Network.dataSent",
    *             "inspector/promises.Network.loadingFailed",
@@ -4746,6 +4838,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "inspector/promises.open",
    *             "inspector/promises.url",
    *             "inspector/promises.waitForDebugger",
+   *             "module._debug",
    *             "module.builtinModules",
    *             "module.constants.compileCacheStatus",
    *             "module.createRequire",
@@ -4763,6 +4856,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "module.syncBuiltinESMExports",
    *             "module.findSourceMap",
    *             "module.SourceMap",
+   *             "module.Module._debug",
    *             "module.Module.builtinModules",
    *             "module.Module.createRequire",
    *             "module.Module.createRequireFromPath",
@@ -4790,8 +4884,10 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "net.isIP",
    *             "net.isIPv4",
    *             "net.isIPv6",
+   *             "net.BoundSocket",
    *             "net.BlockList",
    *             "net.BlockList.isBlockList",
+   *             "net.BlockList.PRIVATE_RANGES",
    *             "net.SocketAddress",
    *             "net.SocketAddress.parse",
    *             "net.Server",
@@ -4924,7 +5020,9 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "perf_hooks.performance.timerify",
    *             "perf_hooks.performance.toJSON",
    *             "perf_hooks.createHistogram",
+   *             "perf_hooks.createSlidingWindowHistogram",
    *             "perf_hooks.eventLoopUtilization",
+   *             "perf_hooks.importHistogram",
    *             "perf_hooks.timerify",
    *             "perf_hooks.monitorEventLoopDelay",
    *             "perf_hooks.PerformanceEntry",
@@ -5027,6 +5125,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "stream/web.ReadableStreamDefaultController",
    *             "stream/web.ReadableByteStreamController",
    *             "stream/web.ReadableStreamBYOBRequest",
+   *             "stream/web.ReadableStreamTee",
    *             "stream/web.WritableStream",
    *             "stream/web.WritableStreamDefaultWriter",
    *             "stream/web.WritableStreamDefaultController",
@@ -5042,8 +5141,84 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "stream/consumers.arrayBuffer",
    *             "stream/consumers.blob",
    *             "stream/consumers.buffer",
+   *             "stream/consumers.bytes",
    *             "stream/consumers.json",
    *             "stream/consumers.text",
+   *             "stream/iter",
+   *             "stream/iter.array",
+   *             "stream/iter.arrayBuffer",
+   *             "stream/iter.arrayBufferSync",
+   *             "stream/iter.arraySync",
+   *             "stream/iter.broadcast",
+   *             "stream/iter.broadcastProtocol",
+   *             "stream/iter.bytes",
+   *             "stream/iter.bytesSync",
+   *             "stream/iter.drainableProtocol",
+   *             "stream/iter.dump",
+   *             "stream/iter.dumpSync",
+   *             "stream/iter.duplex",
+   *             "stream/iter.from",
+   *             "stream/iter.fromSync",
+   *             "stream/iter.merge",
+   *             "stream/iter.ondrain",
+   *             "stream/iter.pipeTo",
+   *             "stream/iter.pipeToSync",
+   *             "stream/iter.pull",
+   *             "stream/iter.pullSync",
+   *             "stream/iter.push",
+   *             "stream/iter.share",
+   *             "stream/iter.shareProtocol",
+   *             "stream/iter.shareSync",
+   *             "stream/iter.shareSyncProtocol",
+   *             "stream/iter.tap",
+   *             "stream/iter.tapSync",
+   *             "stream/iter.text",
+   *             "stream/iter.textSync",
+   *             "stream/iter.toAsyncStreamable",
+   *             "stream/iter.toStreamable",
+   *             "stream/iter.fromReadable",
+   *             "stream/iter.fromWritable",
+   *             "stream/iter.toReadable",
+   *             "stream/iter.toReadableSync",
+   *             "stream/iter.toWritable",
+   *             "stream/iter.Broadcast",
+   *             "stream/iter.Broadcast.from",
+   *             "stream/iter.Share",
+   *             "stream/iter.Share.from",
+   *             "stream/iter.Stream",
+   *             "stream/iter.Stream.array",
+   *             "stream/iter.Stream.arrayBuffer",
+   *             "stream/iter.Stream.arrayBufferSync",
+   *             "stream/iter.Stream.arraySync",
+   *             "stream/iter.Stream.broadcast",
+   *             "stream/iter.Stream.broadcastProtocol",
+   *             "stream/iter.Stream.bytes",
+   *             "stream/iter.Stream.bytesSync",
+   *             "stream/iter.Stream.drainableProtocol",
+   *             "stream/iter.Stream.dump",
+   *             "stream/iter.Stream.dumpSync",
+   *             "stream/iter.Stream.duplex",
+   *             "stream/iter.Stream.from",
+   *             "stream/iter.Stream.fromSync",
+   *             "stream/iter.Stream.merge",
+   *             "stream/iter.Stream.ondrain",
+   *             "stream/iter.Stream.pipeTo",
+   *             "stream/iter.Stream.pipeToSync",
+   *             "stream/iter.Stream.pull",
+   *             "stream/iter.Stream.pullSync",
+   *             "stream/iter.Stream.push",
+   *             "stream/iter.Stream.share",
+   *             "stream/iter.Stream.shareProtocol",
+   *             "stream/iter.Stream.shareSync",
+   *             "stream/iter.Stream.shareSyncProtocol",
+   *             "stream/iter.Stream.tap",
+   *             "stream/iter.Stream.tapSync",
+   *             "stream/iter.Stream.text",
+   *             "stream/iter.Stream.textSync",
+   *             "stream/iter.Stream.toAsyncStreamable",
+   *             "stream/iter.Stream.toStreamable",
+   *             "stream/iter.SyncShare",
+   *             "stream/iter.SyncShare.fromSync",
    *             "_stream_duplex",
    *             "_stream_passthrough",
    *             "_stream_readable",
@@ -5058,8 +5233,10 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "sqlite.constants.SQLITE_CHANGESET_REPLACE",
    *             "sqlite.constants.SQLITE_CHANGESET_ABORT",
    *             "sqlite.backup",
+   *             "sqlite.Database",
    *             "sqlite.DatabaseSync",
    *             "sqlite.Session",
+   *             "sqlite.Statement",
    *             "sqlite.StatementSync",
    *             "sqlite.SQLITE_CHANGESET_OMIT",
    *             "sqlite.SQLITE_CHANGESET_REPLACE",
@@ -5075,6 +5252,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "test.describe.only",
    *             "test.describe.skip",
    *             "test.describe.todo",
+   *             "test.getTestContext",
    *             "test.it",
    *             "test.it.only",
    *             "test.it.skip",
@@ -5136,6 +5314,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "tls.DEFAULT_ECDH_CURVE",
    *             "tls.DEFAULT_MAX_VERSION",
    *             "tls.DEFAULT_MIN_VERSION",
+   *             "tls.getCertificateCompressionAlgorithms",
    *             "tls.getCACertificates",
    *             "tls.getCiphers",
    *             "tls.rootCertificates",
@@ -5170,6 +5349,8 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "util.promisify",
    *             "util.promisify.custom",
    *             "util.callbackify",
+   *             "util.convertProcessSignalToExitCode",
+   *             "util.debounce",
    *             "util.debuglog",
    *             "util.debug",
    *             "util.deprecate",
@@ -5187,16 +5368,20 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "util.inspect.defaultOptions",
    *             "util.inspect.replDefaults",
    *             "util.isDeepStrictEqual",
+   *             "util.isPartialDeepStrictEqual",
+   *             "util.markPromiseAsHandled",
    *             "util.parseArgs",
    *             "util.parseEnv",
    *             "util.setTraceSigInt",
    *             "util.stripVTControlCharacters",
    *             "util.styleText",
+   *             "util.throttle",
    *             "util.toUSVString",
    *             "util.transferableAbortController",
    *             "util.transferableAbortSignal",
    *             "util.aborted",
    *             "util.MIMEType",
+   *             "util.MIMEType.parse",
    *             "util.MIMEParams",
    *             "util.TextDecoder",
    *             "util.TextEncoder",
@@ -5338,8 +5523,20 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "v8.takeCoverage",
    *             "v8.writeHeapSnapshot",
    *             "v8.setHeapSnapshotNearHeapLimit",
+   *             "v8.setHeapProfileNearHeapLimit",
    *             "v8.GCProfiler",
    *             "v8.startCpuProfile",
+   *             "v8.startHeapProfile",
+   *             "vfs",
+   *             "vfs.ComposableProvider",
+   *             "vfs.create",
+   *             "vfs.MemoryProvider",
+   *             "vfs.registerProvider",
+   *             "vfs.RealFSProvider",
+   *             "vfs.vfsBase",
+   *             "vfs.VirtualFileSystem",
+   *             "vfs.VirtualProvider",
+   *             "vfs.ZipProvider",
    *             "vm.constants",
    *             "vm.compileFunction",
    *             "vm.createContext",
@@ -5476,6 +5673,11 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "zlib.zstdCompressSync",
    *             "zlib.zstdDecompress",
    *             "zlib.zstdDecompressSync",
+   *             "zlib.createZipArchive",
+   *             "zlib.createZipArchiveSync",
+   *             "zlib.getMaxZipContentSize",
+   *             "zlib.setMaxZipContentSize",
+   *             "zlib.zipFiles",
    *             "zlib.BrotliCompress()",
    *             "zlib.BrotliCompress",
    *             "zlib.BrotliDecompress()",
@@ -5497,7 +5699,34 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "zlib.ZstdCompress",
    *             "zlib.ZstdDecompress",
    *             "zlib.ZstdOptions",
+   *             "zlib.ZipBuffer",
+   *             "zlib.ZipEntry",
+   *             "zlib.ZipEntry.create",
+   *             "zlib.ZipEntry.createStream",
+   *             "zlib.ZipEntry.createSymlink",
+   *             "zlib.ZipEntry.createSync",
+   *             "zlib.ZipEntry.read",
+   *             "zlib.ZipFile",
+   *             "zlib.ZipFile.open",
+   *             "zlib.ZipFile.openSync",
    *             "zlib",
+   *             "zlib/iter",
+   *             "zlib/iter.compressBrotli",
+   *             "zlib/iter.compressBrotliSync",
+   *             "zlib/iter.compressDeflate",
+   *             "zlib/iter.compressDeflateSync",
+   *             "zlib/iter.compressGzip",
+   *             "zlib/iter.compressGzipSync",
+   *             "zlib/iter.compressZstd",
+   *             "zlib/iter.compressZstdSync",
+   *             "zlib/iter.decompressBrotli",
+   *             "zlib/iter.decompressBrotliSync",
+   *             "zlib/iter.decompressDeflate",
+   *             "zlib/iter.decompressDeflateSync",
+   *             "zlib/iter.decompressGzip",
+   *             "zlib/iter.decompressGzipSync",
+   *             "zlib/iter.decompressZstd",
+   *             "zlib/iter.decompressZstdSync",
    *             "import.meta.resolve",
    *             "import.meta.dirname",
    *             "import.meta.filename",
@@ -5542,6 +5771,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'AbortSignal.timeout'
       | 'AbortSignal.any'
       | 'DOMException'
+      | 'QuotaExceededError'
       | 'FormData'
       | 'Headers'
       | 'MessageEvent'
@@ -5549,6 +5779,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'Request'
       | 'Response'
       | 'WebAssembly'
+      | 'Worker'
       | 'WebSocket'
       | 'fetch'
       | 'global'
@@ -5579,6 +5810,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'Buffer.from'
       | 'Buffer.isBuffer'
       | 'Buffer.isEncoding'
+      | 'Buffer.stringLength'
       | 'File'
       | 'atob'
       | 'btoa'
@@ -5633,6 +5865,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'SubtleCrypto.supports'
       | 'CloseEvent'
       | 'CustomEvent'
+      | 'ErrorEvent'
       | 'Event'
       | 'EventSource'
       | 'EventTarget'
@@ -5701,6 +5934,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'process.mainModule'
       | 'process.noDeprecation'
       | 'process.permission'
+      | 'process.permission.drop'
       | 'process.pid'
       | 'process.platform'
       | 'process.ppid'
@@ -5742,6 +5976,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'process.version'
       | 'process.versions'
       | 'process.abort'
+      | 'process.addUncaughtExceptionCaptureCallback'
       | 'process.chdir'
       | 'process.constrainedMemory'
       | 'process.cpuUsage'
@@ -5887,6 +6122,24 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'async_hooks.AsyncLocalStorage.snapshot'
       | 'async_hooks.AsyncResource'
       | 'async_hooks.AsyncResource.bind'
+      | 'bench'
+      | 'bench.after'
+      | 'bench.afterEach'
+      | 'bench.before'
+      | 'bench.beforeEach'
+      | 'bench.bench'
+      | 'bench.bench.only'
+      | 'bench.bench.skip'
+      | 'bench.createRunner'
+      | 'bench.describe'
+      | 'bench.only'
+      | 'bench.run'
+      | 'bench.runFile'
+      | 'bench.skip'
+      | 'bench.suite'
+      | 'bench/reporters'
+      | 'bench/reporters.json'
+      | 'bench/reporters.spec'
       | 'buffer'
       | 'buffer.constants'
       | 'buffer.INSPECT_MAX_BYTES'
@@ -5895,6 +6148,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'buffer.atob'
       | 'buffer.btoa'
       | 'buffer.isAscii'
+      | 'buffer.isLatin1'
       | 'buffer.isUtf8'
       | 'buffer.resolveObjectURL'
       | 'buffer.transcode'
@@ -5912,6 +6166,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'buffer.Buffer.from'
       | 'buffer.Buffer.isBuffer'
       | 'buffer.Buffer.isEncoding'
+      | 'buffer.Buffer.stringLength'
       | 'buffer.File'
       | 'child_process'
       | 'child_process.exec'
@@ -5971,6 +6226,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'crypto.createECDH'
       | 'crypto.createHash'
       | 'crypto.createHmac'
+      | 'crypto.createMac'
       | 'crypto.createPrivateKey'
       | 'crypto.createPublicKey'
       | 'crypto.createSecretKey'
@@ -5991,9 +6247,11 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'crypto.getDiffieHellman'
       | 'crypto.getFips'
       | 'crypto.getHashes'
+      | 'crypto.getMacs'
       | 'crypto.hash'
       | 'crypto.hkdf'
       | 'crypto.hkdfSync'
+      | 'crypto.parsePKCS12'
       | 'crypto.pbkdf2'
       | 'crypto.pbkdf2Sync'
       | 'crypto.privateDecrypt'
@@ -6004,6 +6262,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'crypto.randomFillSync'
       | 'crypto.randomFill'
       | 'crypto.randomInt'
+      | 'crypto.randomUUIDv7'
       | 'crypto.scrypt'
       | 'crypto.scryptSync'
       | 'crypto.secureHeapUsed'
@@ -6042,8 +6301,10 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'diagnostics_channel.subscribe'
       | 'diagnostics_channel.unsubscribe'
       | 'diagnostics_channel.tracingChannel'
+      | 'diagnostics_channel.boundedChannel'
       | 'diagnostics_channel.Channel'
       | 'diagnostics_channel.TracingChannel'
+      | 'diagnostics_channel.BoundedChannel'
       | 'dns'
       | 'dns.Resolver'
       | 'dns.getServers'
@@ -6115,6 +6376,10 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'dns/promises.setDefaultResultOrder'
       | 'dns/promises.getDefaultResultOrder'
       | 'dns/promises.setServers'
+      | 'dtls'
+      | 'dtls.connect'
+      | 'dtls.createSecureContext'
+      | 'dtls.listen'
       | 'domain'
       | 'domain.create'
       | 'domain.Domain'
@@ -6158,6 +6423,42 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'events.on'
       | 'events.setMaxListeners'
       | 'events.addAbortListener'
+      | 'ffi'
+      | 'ffi.DynamicLibrary'
+      | 'ffi.dlclose'
+      | 'ffi.dlopen'
+      | 'ffi.dlsym'
+      | 'ffi.exportArrayBuffer'
+      | 'ffi.exportArrayBufferView'
+      | 'ffi.exportBuffer'
+      | 'ffi.exportString'
+      | 'ffi.getCurrentEventLoop'
+      | 'ffi.getFloat32'
+      | 'ffi.getFloat64'
+      | 'ffi.getInt16'
+      | 'ffi.getInt32'
+      | 'ffi.getInt64'
+      | 'ffi.getInt8'
+      | 'ffi.getRawPointer'
+      | 'ffi.getUint16'
+      | 'ffi.getUint32'
+      | 'ffi.getUint64'
+      | 'ffi.getUint8'
+      | 'ffi.setFloat32'
+      | 'ffi.setFloat64'
+      | 'ffi.setInt16'
+      | 'ffi.setInt32'
+      | 'ffi.setInt64'
+      | 'ffi.setInt8'
+      | 'ffi.setUint16'
+      | 'ffi.setUint32'
+      | 'ffi.setUint64'
+      | 'ffi.setUint8'
+      | 'ffi.suffix'
+      | 'ffi.toArrayBuffer'
+      | 'ffi.toBuffer'
+      | 'ffi.toString'
+      | 'ffi.types'
       | 'fs'
       | 'fs.promises'
       | 'fs.promises.FileHandle'
@@ -6271,6 +6572,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'fs.mkdtempDisposableSync'
       | 'fs.opendirSync'
       | 'fs.openSync'
+      | 'fs.openAsBlobSync'
       | 'fs.readdirSync'
       | 'fs.readFileSync'
       | 'fs.readlinkSync'
@@ -6291,6 +6593,10 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'fs.writeSync'
       | 'fs.writevSync'
       | 'fs.constants'
+      | 'fs.F_OK'
+      | 'fs.R_OK'
+      | 'fs.W_OK'
+      | 'fs.X_OK'
       | 'fs.Dir'
       | 'fs.Dirent'
       | 'fs.FSWatcher'
@@ -6368,7 +6674,12 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'http.request'
       | 'http.validateHeaderName'
       | 'http.validateHeaderValue'
+      | 'http.isValidHeaderName'
+      | 'http.isValidHeaderValue'
+      | 'http.websocketMask'
+      | 'http.websocketUnmask'
       | 'http.setMaxIdleHTTPParsers'
+      | 'http.setGlobalProxyFromEnv'
       | 'http.Agent()'
       | 'http.Agent'
       | 'http.ClientRequest()'
@@ -6398,6 +6709,11 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'https.Server'
       | 'inspector'
       | 'inspector.Session'
+      | 'inspector.DOMStorage.domStorageItemAdded'
+      | 'inspector.DOMStorage.domStorageItemRemoved'
+      | 'inspector.DOMStorage.domStorageItemUpdated'
+      | 'inspector.DOMStorage.domStorageItemsCleared'
+      | 'inspector.DOMStorage.registerStorage'
       | 'inspector.Network.dataReceived'
       | 'inspector.Network.dataSent'
       | 'inspector.Network.loadingFailed'
@@ -6415,6 +6731,11 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'inspector.waitForDebugger'
       | 'inspector/promises'
       | 'inspector/promises.Session'
+      | 'inspector/promises.DOMStorage.domStorageItemAdded'
+      | 'inspector/promises.DOMStorage.domStorageItemRemoved'
+      | 'inspector/promises.DOMStorage.domStorageItemUpdated'
+      | 'inspector/promises.DOMStorage.domStorageItemsCleared'
+      | 'inspector/promises.DOMStorage.registerStorage'
       | 'inspector/promises.Network.dataReceived'
       | 'inspector/promises.Network.dataSent'
       | 'inspector/promises.Network.loadingFailed'
@@ -6430,6 +6751,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'inspector/promises.open'
       | 'inspector/promises.url'
       | 'inspector/promises.waitForDebugger'
+      | 'module._debug'
       | 'module.builtinModules'
       | 'module.constants.compileCacheStatus'
       | 'module.createRequire'
@@ -6447,6 +6769,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'module.syncBuiltinESMExports'
       | 'module.findSourceMap'
       | 'module.SourceMap'
+      | 'module.Module._debug'
       | 'module.Module.builtinModules'
       | 'module.Module.createRequire'
       | 'module.Module.createRequireFromPath'
@@ -6474,8 +6797,10 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'net.isIP'
       | 'net.isIPv4'
       | 'net.isIPv6'
+      | 'net.BoundSocket'
       | 'net.BlockList'
       | 'net.BlockList.isBlockList'
+      | 'net.BlockList.PRIVATE_RANGES'
       | 'net.SocketAddress'
       | 'net.SocketAddress.parse'
       | 'net.Server'
@@ -6608,7 +6933,9 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'perf_hooks.performance.timerify'
       | 'perf_hooks.performance.toJSON'
       | 'perf_hooks.createHistogram'
+      | 'perf_hooks.createSlidingWindowHistogram'
       | 'perf_hooks.eventLoopUtilization'
+      | 'perf_hooks.importHistogram'
       | 'perf_hooks.timerify'
       | 'perf_hooks.monitorEventLoopDelay'
       | 'perf_hooks.PerformanceEntry'
@@ -6711,6 +7038,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'stream/web.ReadableStreamDefaultController'
       | 'stream/web.ReadableByteStreamController'
       | 'stream/web.ReadableStreamBYOBRequest'
+      | 'stream/web.ReadableStreamTee'
       | 'stream/web.WritableStream'
       | 'stream/web.WritableStreamDefaultWriter'
       | 'stream/web.WritableStreamDefaultController'
@@ -6726,8 +7054,84 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'stream/consumers.arrayBuffer'
       | 'stream/consumers.blob'
       | 'stream/consumers.buffer'
+      | 'stream/consumers.bytes'
       | 'stream/consumers.json'
       | 'stream/consumers.text'
+      | 'stream/iter'
+      | 'stream/iter.array'
+      | 'stream/iter.arrayBuffer'
+      | 'stream/iter.arrayBufferSync'
+      | 'stream/iter.arraySync'
+      | 'stream/iter.broadcast'
+      | 'stream/iter.broadcastProtocol'
+      | 'stream/iter.bytes'
+      | 'stream/iter.bytesSync'
+      | 'stream/iter.drainableProtocol'
+      | 'stream/iter.dump'
+      | 'stream/iter.dumpSync'
+      | 'stream/iter.duplex'
+      | 'stream/iter.from'
+      | 'stream/iter.fromSync'
+      | 'stream/iter.merge'
+      | 'stream/iter.ondrain'
+      | 'stream/iter.pipeTo'
+      | 'stream/iter.pipeToSync'
+      | 'stream/iter.pull'
+      | 'stream/iter.pullSync'
+      | 'stream/iter.push'
+      | 'stream/iter.share'
+      | 'stream/iter.shareProtocol'
+      | 'stream/iter.shareSync'
+      | 'stream/iter.shareSyncProtocol'
+      | 'stream/iter.tap'
+      | 'stream/iter.tapSync'
+      | 'stream/iter.text'
+      | 'stream/iter.textSync'
+      | 'stream/iter.toAsyncStreamable'
+      | 'stream/iter.toStreamable'
+      | 'stream/iter.fromReadable'
+      | 'stream/iter.fromWritable'
+      | 'stream/iter.toReadable'
+      | 'stream/iter.toReadableSync'
+      | 'stream/iter.toWritable'
+      | 'stream/iter.Broadcast'
+      | 'stream/iter.Broadcast.from'
+      | 'stream/iter.Share'
+      | 'stream/iter.Share.from'
+      | 'stream/iter.Stream'
+      | 'stream/iter.Stream.array'
+      | 'stream/iter.Stream.arrayBuffer'
+      | 'stream/iter.Stream.arrayBufferSync'
+      | 'stream/iter.Stream.arraySync'
+      | 'stream/iter.Stream.broadcast'
+      | 'stream/iter.Stream.broadcastProtocol'
+      | 'stream/iter.Stream.bytes'
+      | 'stream/iter.Stream.bytesSync'
+      | 'stream/iter.Stream.drainableProtocol'
+      | 'stream/iter.Stream.dump'
+      | 'stream/iter.Stream.dumpSync'
+      | 'stream/iter.Stream.duplex'
+      | 'stream/iter.Stream.from'
+      | 'stream/iter.Stream.fromSync'
+      | 'stream/iter.Stream.merge'
+      | 'stream/iter.Stream.ondrain'
+      | 'stream/iter.Stream.pipeTo'
+      | 'stream/iter.Stream.pipeToSync'
+      | 'stream/iter.Stream.pull'
+      | 'stream/iter.Stream.pullSync'
+      | 'stream/iter.Stream.push'
+      | 'stream/iter.Stream.share'
+      | 'stream/iter.Stream.shareProtocol'
+      | 'stream/iter.Stream.shareSync'
+      | 'stream/iter.Stream.shareSyncProtocol'
+      | 'stream/iter.Stream.tap'
+      | 'stream/iter.Stream.tapSync'
+      | 'stream/iter.Stream.text'
+      | 'stream/iter.Stream.textSync'
+      | 'stream/iter.Stream.toAsyncStreamable'
+      | 'stream/iter.Stream.toStreamable'
+      | 'stream/iter.SyncShare'
+      | 'stream/iter.SyncShare.fromSync'
       | '_stream_duplex'
       | '_stream_passthrough'
       | '_stream_readable'
@@ -6742,8 +7146,10 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'sqlite.constants.SQLITE_CHANGESET_REPLACE'
       | 'sqlite.constants.SQLITE_CHANGESET_ABORT'
       | 'sqlite.backup'
+      | 'sqlite.Database'
       | 'sqlite.DatabaseSync'
       | 'sqlite.Session'
+      | 'sqlite.Statement'
       | 'sqlite.StatementSync'
       | 'sqlite.SQLITE_CHANGESET_OMIT'
       | 'sqlite.SQLITE_CHANGESET_REPLACE'
@@ -6759,6 +7165,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'test.describe.only'
       | 'test.describe.skip'
       | 'test.describe.todo'
+      | 'test.getTestContext'
       | 'test.it'
       | 'test.it.only'
       | 'test.it.skip'
@@ -6820,6 +7227,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'tls.DEFAULT_ECDH_CURVE'
       | 'tls.DEFAULT_MAX_VERSION'
       | 'tls.DEFAULT_MIN_VERSION'
+      | 'tls.getCertificateCompressionAlgorithms'
       | 'tls.getCACertificates'
       | 'tls.getCiphers'
       | 'tls.rootCertificates'
@@ -6854,6 +7262,8 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'util.promisify'
       | 'util.promisify.custom'
       | 'util.callbackify'
+      | 'util.convertProcessSignalToExitCode'
+      | 'util.debounce'
       | 'util.debuglog'
       | 'util.debug'
       | 'util.deprecate'
@@ -6871,16 +7281,20 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'util.inspect.defaultOptions'
       | 'util.inspect.replDefaults'
       | 'util.isDeepStrictEqual'
+      | 'util.isPartialDeepStrictEqual'
+      | 'util.markPromiseAsHandled'
       | 'util.parseArgs'
       | 'util.parseEnv'
       | 'util.setTraceSigInt'
       | 'util.stripVTControlCharacters'
       | 'util.styleText'
+      | 'util.throttle'
       | 'util.toUSVString'
       | 'util.transferableAbortController'
       | 'util.transferableAbortSignal'
       | 'util.aborted'
       | 'util.MIMEType'
+      | 'util.MIMEType.parse'
       | 'util.MIMEParams'
       | 'util.TextDecoder'
       | 'util.TextEncoder'
@@ -7022,8 +7436,20 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'v8.takeCoverage'
       | 'v8.writeHeapSnapshot'
       | 'v8.setHeapSnapshotNearHeapLimit'
+      | 'v8.setHeapProfileNearHeapLimit'
       | 'v8.GCProfiler'
       | 'v8.startCpuProfile'
+      | 'v8.startHeapProfile'
+      | 'vfs'
+      | 'vfs.ComposableProvider'
+      | 'vfs.create'
+      | 'vfs.MemoryProvider'
+      | 'vfs.registerProvider'
+      | 'vfs.RealFSProvider'
+      | 'vfs.vfsBase'
+      | 'vfs.VirtualFileSystem'
+      | 'vfs.VirtualProvider'
+      | 'vfs.ZipProvider'
       | 'vm.constants'
       | 'vm.compileFunction'
       | 'vm.createContext'
@@ -7160,6 +7586,11 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'zlib.zstdCompressSync'
       | 'zlib.zstdDecompress'
       | 'zlib.zstdDecompressSync'
+      | 'zlib.createZipArchive'
+      | 'zlib.createZipArchiveSync'
+      | 'zlib.getMaxZipContentSize'
+      | 'zlib.setMaxZipContentSize'
+      | 'zlib.zipFiles'
       | 'zlib.BrotliCompress()'
       | 'zlib.BrotliCompress'
       | 'zlib.BrotliDecompress()'
@@ -7181,7 +7612,34 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'zlib.ZstdCompress'
       | 'zlib.ZstdDecompress'
       | 'zlib.ZstdOptions'
+      | 'zlib.ZipBuffer'
+      | 'zlib.ZipEntry'
+      | 'zlib.ZipEntry.create'
+      | 'zlib.ZipEntry.createStream'
+      | 'zlib.ZipEntry.createSymlink'
+      | 'zlib.ZipEntry.createSync'
+      | 'zlib.ZipEntry.read'
+      | 'zlib.ZipFile'
+      | 'zlib.ZipFile.open'
+      | 'zlib.ZipFile.openSync'
       | 'zlib'
+      | 'zlib/iter'
+      | 'zlib/iter.compressBrotli'
+      | 'zlib/iter.compressBrotliSync'
+      | 'zlib/iter.compressDeflate'
+      | 'zlib/iter.compressDeflateSync'
+      | 'zlib/iter.compressGzip'
+      | 'zlib/iter.compressGzipSync'
+      | 'zlib/iter.compressZstd'
+      | 'zlib/iter.compressZstdSync'
+      | 'zlib/iter.decompressBrotli'
+      | 'zlib/iter.decompressBrotliSync'
+      | 'zlib/iter.decompressDeflate'
+      | 'zlib/iter.decompressDeflateSync'
+      | 'zlib/iter.decompressGzip'
+      | 'zlib/iter.decompressGzipSync'
+      | 'zlib/iter.decompressZstd'
+      | 'zlib/iter.decompressZstdSync'
       | 'import.meta.resolve'
       | 'import.meta.dirname'
       | 'import.meta.filename'

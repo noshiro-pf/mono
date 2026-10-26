@@ -90,7 +90,7 @@
     "typedoc": "catalog:",
     "typedoc-github-theme": "catalog:",
     "vite": "catalog:",
-    "zod": "4.6.5"
+    "zod": "4.6.7"
   },
   "engines": {
     "node": ">=22.22.2",

@@ -12,7 +12,7 @@ describe(summarizeChecks, () => {
 
   test('passes when every required context passed and nothing is running', () => {
     const summary = summarizeChecks(
-      [check('code-check-result / result', 'pass'), check('no-skip-ci-label')],
+      [check('code-check-result / result'), check('no-skip-ci-label')],
       required,
       [],
     );
@@ -261,7 +261,7 @@ describe(summarizeChecks, () => {
   test('fails on a context that failed once and passed once, as GitHub does', () => {
     const summary = summarizeChecks(
       [
-        check('code-check-result / result', 'pass'),
+        check('code-check-result / result'),
         check('code-check-result / result', 'fail'),
         check('no-skip-ci-label'),
       ],
@@ -419,7 +419,7 @@ describe(reportedChecksOf, () => {
     const checks = reportedChecksOf(
       [
         checkRun('a', 'COMPLETED', 'CANCELLED', '2026-10-25T09:00:00Z'),
-        checkRun('a', 'IN_PROGRESS', null, '2026-10-25T10:00:00Z'),
+        checkRun('a', 'IN_PROGRESS', null, '2026-10-25T11:00:00Z'),
         checkRun('a', 'COMPLETED', 'SUCCESS', '2026-10-25T08:00:00Z', {
           event: 'push',
         }),

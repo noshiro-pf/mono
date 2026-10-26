@@ -139,7 +139,7 @@ export const genIndex = async (
       const resolvedDir = path.resolve(dir);
 
       // eslint-disable-next-line no-await-in-loop
-      await generateIndexFileForDir(resolvedDir, filledConfig, undefined, 0);
+      await generateIndexFileForDir(resolvedDir, filledConfig);
     }
 
     conditionalEcho('✓ Index files generated\n');

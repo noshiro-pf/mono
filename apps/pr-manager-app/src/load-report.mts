@@ -586,7 +586,7 @@ const readPullRequests = async (
   ask: Ask,
   repo: RepoRef,
 ): Promise<Answered<PullsPart>> => {
-  const answered = await readOpenPages({
+  const { rateLimit, result: pages } = await readOpenPages({
     ask,
     query: PULL_REQUESTS_QUERY,
     schema: PullRequestsDataSchema,
@@ -598,8 +598,6 @@ const readPullRequests = async (
         ? `GitHub shows this token no repository ${repo.owner}/${repo.name}. Check the name, or, if it is private, give the page a token that can read it.`
         : undefined,
   });
-
-  const { rateLimit, result: pages } = answered;
 
   if (Result.isErr(pages)) {
     return { rateLimit, result: pages };

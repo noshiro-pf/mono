@@ -112,7 +112,7 @@ describe(diagramTaskIds, () => {
       ],
     } as const;
 
-    const ascending = (key: SortSpec['key'], now = 1000): readonly string[] =>
+    const ascending = (key: SortSpec['key'], now: number): readonly string[] =>
       diagramTaskIds(graph, [{ key, order: 'asc' }], now);
 
     test.each([
@@ -124,7 +124,7 @@ describe(diagramTaskIds, () => {
       ['estimate', ['task:s', 'task:p', 'task:q', 'task:r']],
       ['depth', ['task:p', 'task:q', 'task:r', 'task:s']],
     ] as const)('%s', (key, expected) => {
-      assert.deepStrictEqual(ascending(key), expected);
+      assert.deepStrictEqual(ascending(key, 1000), expected);
     });
 
     test('status, at the time given', () => {
