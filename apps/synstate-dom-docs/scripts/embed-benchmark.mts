@@ -123,6 +123,9 @@ const operationNamesJa: ReadonlyRecord<string, string> = {
   'schedule: lengthen a task in the middle': '工程表：中ほどのタスクを延ばす',
   'schedule: lengthen a task near the end':
     '工程表：終わり近くのタスクを延ばす',
+  'zoom: build the map': 'ズーム：地図を作る',
+  'zoom: zoom within a level': 'ズーム：同じ段階の中でズームする',
+  'zoom: zoom to the next level': 'ズーム：次の段階までズームする',
 } as const;
 
 /** What RESULTS.md writes in place of a time for the wrong figures. */
