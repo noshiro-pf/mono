@@ -42,6 +42,11 @@ const jsdocMappings: DeepReadonly<
   ],
   ['debounce', 'src/core/operators/debounce.mts', 'debounce'],
   ['filter', 'src/core/operators/filter.mts', 'filter'],
+  [
+    'from-abortable-promise',
+    'src/core/create/from-abortable-promise.mts',
+    'fromAbortablePromise',
+  ],
   ['from-promise', 'src/core/create/from-promise.mts', 'fromPromise'],
   ['just', 'src/core/create/just.mts', 'just'],
   ['empty', 'src/core/create/empty.mts', 'empty'],
@@ -51,6 +56,11 @@ const jsdocMappings: DeepReadonly<
     'fromSubscribable',
   ],
   ['get-key', 'src/core/predefined/operators/pluck.mts', 'pluck'],
+  [
+    'keep-equal-parts',
+    'src/core/operators/keep-equal-parts.mts',
+    'keepEqualParts',
+  ],
   ['map', 'src/core/operators/map.mts', 'map'],
   [
     'map-optional',

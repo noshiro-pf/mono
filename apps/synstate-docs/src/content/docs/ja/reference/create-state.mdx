@@ -73,6 +73,62 @@ assert.deepStrictEqual(queryHistory, ['label:bug page:1', 'label:bug page:2']);
 
 `equals` の既定値は `Object.is` で、すでに持っている値を書き込んでも何も伝わりません。等しいかどうかにかかわらずすべての更新を伝えるには `equals: () => false` を渡してください。
 
+## 変わらなかった部分を保つ（`keepEqualParts`）
+
+定期的に問い合わせたサーバーの返答のように、毎回新しいオブジェクトで丸ごと書き込む状態には `keepEqualParts: true` を指定できます。
+
+```tsx
+type PullReport = DeepReadonly<{
+    summary: { open: number };
+    pulls: { number: number; title: string }[];
+}>;
+
+const [report, setReport] = createState<PullReport>(
+    { summary: { open: 0 }, pulls: [] },
+    { keepEqualParts: true },
+);
+
+const summary = report.pipe(map((r) => r.summary)).pipe(skipIfNoChange());
+
+const summaryHistory: unknown[] = [];
+
+summary.subscribe((value) => {
+    summaryHistory.push(value);
+});
+
+// A server answers each poll with the whole report, a new object every
+// time. What did not change keeps the object already held.
+setReport({
+    summary: { open: 1 },
+    pulls: [{ number: 1, title: 'one' }],
+});
+
+const held = report.getSnapshot().value;
+
+// An answer that changes nothing is not passed on at all.
+setReport({
+    summary: { open: 1 },
+    pulls: [{ number: 1, title: 'one' }],
+});
+
+assert.strictEqual(report.getSnapshot().value, held);
+
+// An edited title: a new report and a new array, while the summary is
+// the one held, so `summary` is not told of it.
+setReport({
+    summary: { open: 1 },
+    pulls: [{ number: 1, title: 'one (edited)' }],
+});
+
+assert.notStrictEqual(report.getSnapshot().value, held);
+
+assert.strictEqual(report.getSnapshot().value.summary, held.summary);
+
+assert.deepStrictEqual(summaryHistory, [{ open: 0 }, { open: 1 }]);
+```
+
+次の状態は書き込む前に今の状態と比べられます。今の状態の同じ部分と深く等しい部分はその部分に置き換わるので、変わっていない部分を読む側は手元のオブジェクトを持ち続け、`Object.is` の `skipIfNoChange()` で止まります。何も変えない更新はそもそも伝わりません。配列の要素は index で照合し、`keepEqualParts: { key }` を渡すと key で照合します。[`keepEqualParts`](../keep-equal-parts/) オペレーターの書き込み側の版で、こちらを優先してください。
+
 {/* source-link */}
 [View source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/utils/create-state.mts)
 {/* /source-link */}
