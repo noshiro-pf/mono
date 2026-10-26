@@ -45,12 +45,12 @@ const ISO8601ValidatorOption: Type<ISO8601ValidatorOption> = record({
   /**
    *  If strict is true, date strings with invalid dates like 2009-02-29 will be invalid.
    */
-  strict: boolean(false),
+  strict: boolean(),
 
   /**
    * If strictSeparator is true, date strings with date and time separated by anything other than a T will be invalid.
    */
-  strictSeparator: boolean(false),
+  strictSeparator: boolean(),
 
   /**
    * @default new Date().toISOString()

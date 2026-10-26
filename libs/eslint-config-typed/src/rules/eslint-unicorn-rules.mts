@@ -410,6 +410,7 @@ export const eslintUnicornRules = {
   // (`Array#splice`) as if they had to be functions.
   'unicorn/no-non-function-verb-prefix': 'off',
   'unicorn/no-nonstandard-builtin-properties': 'error',
+  'unicorn/no-repeated-call-wrappers': 'error',
   'unicorn/no-selector-as-dom-name': 'error',
   'unicorn/no-shorthand-property-overrides': 'error',
   'unicorn/no-top-level-assignment-in-function': 'error',
@@ -424,6 +425,7 @@ export const eslintUnicornRules = {
    */
   'unicorn/no-unnecessary-array-flat-map': 'off',
   'unicorn/no-unnecessary-boolean-comparison': 'error',
+  'unicorn/no-unnecessary-default-arguments': 'error',
   'unicorn/no-unnecessary-fetch-options': 'error',
   'unicorn/no-unnecessary-string-trim': 'error',
   // Treats an argument as "complex" unless it is an identifier, a literal, a

@@ -41,7 +41,7 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
-    "@typescript-eslint/utils": "^8.71.1",
+    "@typescript-eslint/utils": "^8.71.2",
     "eslint-rule-forge": "workspace:*",
     "oxlint": "catalog:",
     "oxlint-tsgolint": "catalog:",

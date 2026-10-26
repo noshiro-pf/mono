@@ -89,7 +89,7 @@ describe('findHalfwidthParentheses', () => {
   });
 
   test('reads a fence as prose when the file is not Markdown', () => {
-    assert.deepStrictEqual(matchesOf('速度(実測)を測る。', false), ['(実測)']);
+    assert.deepStrictEqual(matchesOf('速度(実測)を測る。'), ['(実測)']);
   });
 
   test('reports the line and the column of the opening parenthesis', () => {

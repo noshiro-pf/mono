@@ -28,8 +28,8 @@
     "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.42.5",
-    "astro": "^7.3.7"
+    "@astrojs/starlight": "^0.42.6",
+    "astro": "^7.4.0"
   },
   "devDependencies": {
     "eslint-config-typed": "workspace:*",

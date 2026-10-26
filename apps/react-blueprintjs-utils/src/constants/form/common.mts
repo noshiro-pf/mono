@@ -96,7 +96,7 @@ export const inputTransitionShadow = (
   focused: boolean = false,
 ): string =>
   focused
-    ? [borderShadow(1, color, 1), borderShadow(0.3, color, 3)].join(', ')
+    ? [borderShadow(1, color), borderShadow(0.3, color, 3)].join(', ')
     : [borderShadow(0, color, 0), borderShadow(0, color, 0)].join(', ');
 
 export const ptInputPlaceholder = css`

@@ -407,7 +407,7 @@ describe('recursive', () => {
 
       const TaskTitleType = optional(string(''));
 
-      const TaskDoneType = optional(boolean(false));
+      const TaskDoneType = optional(boolean());
 
       const TaskPartial: Type<Task> = recursion('TaskPartial', () =>
         record({
@@ -449,7 +449,7 @@ describe('recursive', () => {
         record({
           id: TaskIdType,
           title: string(''),
-          done: boolean(false),
+          done: boolean(),
           subtasks: array(TaskRequired),
         }),
       );
