@@ -117,7 +117,7 @@ The core is [`ObservableBaseClass`](https://github.com/noshiro-pf/mono/blob/main
 
 ## Where the Asynchronous Part Comes From
 
-If propagation is synchronous, how do `timer`, `counter`, `fromPromise` or `debounce` work? They are the **callers** of `next`. A time-based source is an Observable whose update is started from a `setTimeout` / `setInterval` callback; `fromPromise` starts it from a promise callback; an asynchronous operator such as `debounce` or `switchMap` starts a new propagation of its own from such a callback, or, for `switchMap`, from a subscriber of its inner Observable. The timer belongs to the JavaScript runtime, not to the Observable, and once the callback starts the update, everything downstream runs synchronously exactly as above.
+If propagation is synchronous, how do `timer`, `counter`, `fromPromise` or `debounce` work? They are the **callers** of `next`. A time-based source is an Observable whose update is started from a `setTimeout` / `setInterval` callback; `fromPromise` starts it from a promise callback; an asynchronous operator such as `debounce` or `switchMap` starts a new propagation of its own from such a callback, or, for `switchMap`, from a subscriber of its inner Observable. (The value an inner Observable already holds when `switchMap` subscribes to it, as `just(x)` does, is not a new propagation: it is passed on in the update that made the inner Observable, so that nothing downstream sees it beside the source's old value.) The timer belongs to the JavaScript runtime, not to the Observable, and once the callback starts the update, everything downstream runs synchronously exactly as above.
 
 A few consequences follow directly:
 

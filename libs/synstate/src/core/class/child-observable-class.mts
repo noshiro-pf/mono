@@ -14,7 +14,9 @@ import type {
   NonEmptyUnknownList,
   Observable,
   Operator,
+  Subscription,
   SyncChildObservable,
+  UpdateToken,
   WithInitialValueOperator,
   Wrap,
 } from '../types/index.mjs';
@@ -195,6 +197,40 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
     runAfterPropagation(() => {
       this.complete();
     });
+  }
+
+  /**
+   * Subscribes to the inner observable that the projection of `switchMap` /
+   * `mergeMap` returned.
+   *
+   * If the inner observable already holds a value (`just(x)`, a state), it
+   * emits that value synchronously while being subscribed. That first value
+   * is emitted with `updateToken`, the token of the update that ran the
+   * projection, so it joins the propagation in progress like a sync
+   * operator's value would. Starting an update of its own instead would
+   * reach the nodes below before the current update reached this
+   * observable's siblings: a node reading both would see the new inner value
+   * beside stale sibling values (a glitch), and would emit twice.
+   *
+   * Values the inner observable emits later start updates of their own.
+   */
+  protected subscribeInner(
+    inner: Observable<A>,
+    updateToken: UpdateToken,
+  ): Subscription {
+    let mut_isSubscribing = true;
+
+    const subscription = inner.subscribe((value) => {
+      if (mut_isSubscribing) {
+        this.setNext(value, updateToken);
+      } else {
+        this.startUpdate(value);
+      }
+    });
+
+    mut_isSubscribing = false;
+
+    return subscription;
   }
 }
 

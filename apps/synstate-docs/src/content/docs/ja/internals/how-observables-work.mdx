@@ -117,7 +117,7 @@ SynState が最小版に加えているものも、この構図を変えませ�
 
 ## 非同期性はどこから来るのか
 
-伝搬が同期的なら、`timer`、`counter`、`fromPromise`、`debounce` はどうやって動いているのでしょうか。これらは `next` を**呼ぶ側**です。時間に基づくソースは、`setTimeout` / `setInterval` のコールバックから更新が開始される Observable です。`fromPromise` は Promise のコールバックから開始します。`debounce` や `switchMap` のような非同期演算子は、そうしたコールバック（`switchMap` の場合は内側の Observable の subscriber）から自分自身の伝搬を開始します。タイマーは Observable ではなく JavaScript ランタイムが持っており、コールバックが更新を開始した時点から先は、上で見たとおりすべて同期的に実行されます。
+伝搬が同期的なら、`timer`、`counter`、`fromPromise`、`debounce` はどうやって動いているのでしょうか。これらは `next` を**呼ぶ側**です。時間に基づくソースは、`setTimeout` / `setInterval` のコールバックから更新が開始される Observable です。`fromPromise` は Promise のコールバックから開始します。`debounce` や `switchMap` のような非同期演算子は、そうしたコールバック（`switchMap` の場合は内側の Observable の subscriber）から自分自身の伝搬を開始します（`switchMap` が購読した時点で内側の Observable がすでに持っている値、たとえば `just(x)` の値は、新しい伝搬ではありません。内側の Observable を作った更新の中でそのまま流すので、下流がその値をソースの古い値と並べて見ることはありません）。タイマーは Observable ではなく JavaScript ランタイムが持っており、コールバックが更新を開始した時点から先は、上で見たとおりすべて同期的に実行されます。
 
 ここから次のことが直接導かれます：
 
