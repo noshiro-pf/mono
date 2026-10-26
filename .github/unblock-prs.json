@@ -1,5 +1,5 @@
 {
-  "$schema": "../tools/scripts/cmd/unblock-prs/config.schema.json",
+  "$schema": "../libs/pr-merge-queue/src/unblock-prs/config.schema.json",
   "autoFix": {
     "ignore": ["^[\\w-]+-result / result$"],
     "before": ["pnpm install --frozen-lockfile"],

@@ -1,0 +1,1616 @@
+<!-- cspell:ignore unlabel, gpgsign, tmpfs -->
+
+# `unblock-prs`
+
+`pnpm run unblock-prs` — the worker that lands the merge queue. The
+`/unblock-prs` skill fixes what it sets aside, and nothing else.
+
+- [日本語](#日本語)
+- [English](#english)
+
+The authority for the conventions this reads is `CLAUDE.md`: "CI" and
+"Commits and pull requests". This file describes what the script does with
+them.
+
+## 日本語
+
+### 何をするスクリプトか
+
+`merge-queued` ラベルの付いた PR を、PR 自身が宣言した順に **1本ずつ** 前に進
+めます。1サイクルで触るのは常に1本だけです。マージした瞬間に `main` が動き、
+他のブランチはすべて `BEHIND` に戻るため、まとめて rebase しても1本を除いて捨
+てることになるからです。
+
+**やらないこと**: マージ（auto-merge の仕事）、`merge-queued` を付けること、
+レビュー承認、失敗したチェックの修正（skill の仕事。例外は fixer の差分だけで落
+ちた場合で、「4a」を参照）。rebase は使い捨ての `git worktree` の中で行うので、
+実行元のチェックアウトの作業ツリーには触れません。
+
+### PR 側で宣言する6つのこと
+
+**`merge-queued` ラベル** が対象範囲そのものです。付いていない PR は何も言わず
+に無視します（例外は2つで、下の層がマージされて `main` に付け替えられた層の
+積み直し（下の「base」の項）と、`auto-rebase` の付いた PR を `main` に追従させる
+こと（下の「`auto-rebase`」の項）です）。付いていて、かつ動かせない PR（draft / base が `main` でも open な
+PR のブランチでもない）は理由をログに出します —
+ラベルは明示的な依頼なので、答えが「できない」なら黙っていてはいけないから
+です。
+
+**auto-merge を張るのはこのスクリプトだけです**（ `rebase.mts` の `armOnPick` ）。
+`open-pr` はどの PR にも張らず、ここが `merge-queued` の PR を pick したときに
+張ります — rebase する候補なら push の後・`skip-ci` を外す前に、up-to-date で
+watch する PR なら watch の前に。ruleset は承認を要求しないので、張られた PR は
+緑になった瞬間にマージされます。キューに入れる前に張らないのはそのためで、
+stack の層は base が ruleset の掛からないブランチなので、張った瞬間に下の層へ
+マージされかねません。マージしてよいかを表すのは `merge-queued` だけなので、
+auto-merge が外れた PR（base の変更で GitHub が外した場合も、人が切った場合も）
+は次に pick されたときに張り直します。止めたいときは `merge-queued` を外します。
+
+**`Merge-After:` トレーラ** が順序を宣言します。行頭に書き、複数の番号を1行に
+並べても、行を分けても構いません。
+
+```markdown
+Merge-After: #1901, #1903
+```
+
+- 指定した PR が **すべて** open でなくなるまで、その PR は pick されません
+  （AND です）。
+- 制約するのは pick だけです。すでに up-to-date でマージ進行中の PR は従来通り
+  watch します。auto-merge は何が書かれていようとマージするので、そこで見送る
+  と「直後にマージされて無効になるブランチ」を rebase しに行くだけです。
+- 1つの PR が複数の先行 PR を指定でき、複数の PR が同じ先行 PR を指定できるの
+  で、宣言されるのは列ではなくグラフです。**閉路は検出して名指しで報告**し、
+  そこに含まれる PR は放置します（スクリプトには解消できないため）。
+- **コードフェンス内のトレーラは読みません。** 宣言とその実例は同じ文字列なの
+  で、この機能を説明する文書が本物の制約になってしまわないようにするためです。
+- **閉じる issue の `Start-After:` も引き継ぎます**（`docs/issue-start-after.md`
+  の「pull request への引き継ぎ」）。名指されたのが開いた PR ならその PR を、
+  開いた issue ならそれを閉じる開いた PR を、`Merge-After:` で名指したのと同じに
+  扱います。閉じる issue は GitHub のリンクと、本文の closing keyword
+  （stack された PR を含む）で決め、survey ごとに読み直します。GitHub の issue の
+  依存関係（blocked by）も `Start-After:` と同じに扱います。読めなかった
+  survey では何も引き継がず、その旨を出力します。`note` には、どの番号が
+  issue から来たかを書きます。
+
+**base（stacked PR）** も順序を宣言します。base が別の open な PR のブランチ
+である PR は、その PR の上に積まれた層です（GitHub の stacked pull request）。
+差分はその層の分だけになり、レビューしやすくなります。
+
+- 下の層がマージされるまで pick されません。判定は base だけで行うので、
+  `Merge-After:` の無い stack も認識します。`open-pr --base` は下の層を
+  `Merge-After:` にも書きますが、base と同じ意味で、二重に数えることはありません。
+- 下の層がマージされると、GitHub がこの PR を `main` に付け替えます。そこから
+  先は普通の PR です。
+- **付け替えられた層は、キューに入れなくても積み直します。** 付け替えられた PR
+  はマージされた下の層のコミットをまだ含んでいるので、差分に下の層の変更まで
+  表示されます。次の survey で、下の層がマージされたときの head から、その
+  squash commit の上へ `--onto` で rebase し、上の層も一緒に運びます（「1a」）。
+    - ラベルは問いません。これは GitHub が付け替えたことの後始末で、順番が来た
+      わけではないからです。`main` の新しい変更は持ち込まず、レビューが終わって
+      いる必要もありません。
+    - ruleset は up-to-date のブランチしか、squash でしかマージさせないので、
+      squash commit のツリーはマージされた head のツリーと同じです。したがって
+      積み直した層のツリーも元と同じで、変わるのは履歴（と差分の見え方）だけで
+      す。チェック済みのツリーは再チェックされないので、`skip-ci` が外れていても
+      CI は増えません。
+    - `skip-ci` も auto-merge も触りません。`merge-queued` の付いた層は対象外で
+      す。pick されたときの rebase が同じコミットを同じ方法で落とすからです。
+- **GitHub のネイティブ stack は扱いません。** GitHub はネイティブ stack に
+  入った PR に auto-merge を張らせず（ "Auto-merge is not supported for stacked
+  pull requests" ）、下の層がマージされて `main` に付け替えられた後も stack
+  から外しません。そういう PR は pick せず、手でマージするよう `note` で報告
+  します。stack は base だけで作ってください。
+- 積まれている間は pick されないので、auto-merge も張られません。張られるのは
+  `main` に付け替えられて順番が来たときです。
+- **下の層を rebase したら、上の層も一緒に運びます。** `git rebase --onto <新しい
+head> <古い head>` で各層を自分のコミットだけ積み直して push します。こうしない
+  と上の層の差分に下の層の古いコミットが混ざり、下の層がマージされたときの
+  GitHub の rebase も上の層が含んでいない head から始まることになります。
+  `merge-queued` の有無は問いません — stack は1つの単位として動きます。
+- 付け替えられた PR に、GitHub が rebase しなかったために下の層のコミットが
+  残っていれば、マージされた head から `--onto` で rebase します。patch が
+  squash commit と一致することに頼らないためです。
+- fork のブランチは親にならず、積み直しの対象にもなりません。
+
+**`blocks-release` ラベル** は「次のリリースにはこれが入っていなければならな
+い」という宣言です。これが付いた PR が1本でも open な間、version PR
+（ `changeset-release/main` から changesets が開く PR ）は pick されません。
+
+- 制約するのは version PR だけです。ラベルの付いた PR 自身は何も制約されませ
+  ん。
+- **draft でも数えます。** キューに入れていない PR、まだ書きかけの PR でリリー
+  スを止められるのがこのラベルの目的だからです。裏返すと、忘れられた draft が
+  1本あるとリリースは止まり続けるので、毎サイクル名指しで報告します。
+- 外す運用はありません。制約は「 open であること」なので、マージでもクローズで
+  も PR が閉じれば自動的に解除されます。
+- version PR 自身に付いた場合は無視します（自分で自分を止め続けるだけで、誰も
+  外せないため）。
+
+**なぜ本文ではなくラベルなのか。** version PR は唯一、本文に何も書けない PR で
+す。`changesets/action` は main への push のたびに `updatePullRequest` で title
+と body を丸ごと上書きするので、そこに書いた `Merge-After:` は消えます。しかも
+消えるのは「キューに他の PR があって先にマージされた時」、つまり順序宣言が効い
+ていてほしいまさにその瞬間です。だから宣言は逆側 — リリースが待っている当の
+PR — から行います。public repository なので、コメントではなく write 権限の要る
+ラベルであることにも意味があります。
+
+**`auto-rebase` ラベル** は「レビューや順番を待っている間も `main` に追従させ
+てほしい」という宣言です。差分を自分の変更だけにしておき、レビューしやすくする
+ためのものです（「3a」）。
+
+- `skip-ci` と一緒のときだけ効きます。`skip-ci` が付いていれば push しても CI
+  は走りません。
+- `merge-queued` の付いた PR も同じ扱いです。pick されない間（`Merge-After`
+  やレビュー待ち）も、`skip-ci` が付いていれば `main` に追従させます。
+- queue に動かす候補が無いときだけ動きます。`main` がすぐまた動くときに push
+  しても無駄になるからです。
+- `open-pr` が stack の全層に付けます。一番下より上の層は下の層と一緒に運ば
+  れるだけで、このラベルが効くのは、下の層がマージされてその層が `main` に付
+  け替えられてからです。付け替えのときに付ける仕組みは無いので、最初から付け
+  ておきます。
+- 印を付けた PR だけが対象です（opt-in）。寝かせてあるブランチを付け忘れで動
+  かしてしまわないためです。レビューを頼む直前に付ければ足ります。
+
+**`priority:high` / `priority:low` ラベル** は「pick できるものの中で優先して
+ほしい / 後回しで良い」という宣言です。
+
+- pick できる候補の中で、`priority:high` を先頭に、`priority:low` を末尾に並
+  べます。並び替えるだけで、ゲートではありません。`Merge-After`、stack、
+  `blocks-release`、レビュー待ちで止まっている PR は止まったままで、進行中の PR
+  は何が付いていても今まで通り watch します。
+- version PR にも効きます。`priority:high` を付ければ順番待ちの変更より先にリ
+  リースし、`priority:low` の付いた変更は普通の version PR より後ろ、つまり次
+  のリリースに回ります。
+- `DIRTY` と version PR を後ろに回す並びより優先し、番号順はその内側です。
+  green のまま止まった PR（「5」）を最後に回す規則だけはこれより強く、
+  `priority:high` でも最後です。
+- 解放されている PR が2本になったときにどちらを残すかも、この順で決めます。
+- 両方付いている PR は、矛盾しているのでどちらも無いものとして扱い、triage の
+  出力でそう言います。
+- GitHub にある `priority:mid` は読みません。ラベル無しと同じです。
+
+**`skip-ci` は対象範囲の判定には使いません。** キューに入った PR を一時停止さ
+せるだけで、順番が来たら外すのがこのスクリプトの仕事です。「3a」で `main` に追
+従させるかどうかの条件には使います（push しても CI が走らないことの保証として）。
+
+### 解放されている PR は1本まで
+
+`merge-queued` が付いていて `skip-ci` の無い PR を「解放されている」と呼びます。
+push されてもラベルが外れても、フルマトリクスが走る PR です。**解放されている
+PR は常に1本まで** に保ちます。`main` が動く前にマージできるのは1本だけなの
+で、2本目の実行は捨てることになるからです。
+
+#### なぜ必要か — 起きていたこと
+
+このスクリプトと `/unblock-prs` skill は、同じキューを互いに見えないまま並行し
+て動かします。ルールが無いと、例えば次のことが起きます。
+
+1. `merge-queued` の PR A の `skip-ci` を外し、CI を走らせる。CI が失敗してマー
+   ジが止まる。A は `skip-ci` が外れたまま見送られる。
+2. このスクリプトが次の `merge-queued` PR B を pick し、`skip-ci` を外す。
+3. skill が A の失敗を直して push する。A の `skip-ci` は外れたままなので、この
+   push で A のマトリクスも走る。
+4. A と B で CI が同時に走り、先にマージされた方が `main` を動かす。もう片方は
+   `BEHIND` に戻り、その CI 実行は丸ごと無駄になる。
+
+どちらの書き手も単独では正しく動いています。無駄は、「CI を走らせてよいのは1本
+だけ」という状態がどこにも記録されていないことから生まれます。`skip-ci` をその
+記録として使います。
+
+今の skill は見送られた PR だけを直し、push は必ず `skip-ci` を付けてから行う
+ので、この例の手順 3 は skill からは起きません。人の push や、
+`pnpm-update.yml` のようにラベル無しで開かれる PR があるので、ルールはそのまま
+です。
+
+#### ルール
+
+**このスクリプトが `skip-ci` を付けるのは、自分で外したばかりのラベルを戻して、
+同時に解放された別の PR に譲るときだけです。** 他の PR には付けません。以前は解放する前に他の解放済み PR 全部に `skip-ci` を付け
+ていましたが、bot が解放済みで開く依存更新 PR や、人が意図して解放した PR まで
+止めてしまうので、やめました。
+
+- **in flight の PR があれば、他を pick しない。** triage が in flight と判断
+  した PR があれば、それを watch して rebase も解放もしません（「3」）。
+- **解放した直後にもう一度見る。** 同じ瞬間に、担当者が `worker` の別の PR も
+  解放されていて、そちらが pick の順（`priority:high` が先、`priority:low` が
+  後、その中で番号の小さい順、version PR は最後）で先なら、**自分の PR に**
+  `skip-ci` を付け直して譲り、survey からやり直します（`release.mts` の
+  `yieldsTo`）。見送り中・claim 中の PR（skill か人の担当）は、直した push まで
+  CI を走らせないので数えません。数えると、誰も走らせない PR の後ろでキューが
+  止まります。survey の時点で既に解放されていた PR（人が `skip-ci` を外した、
+  `skip-ci` なしの PR に `merge-queued` を付けた、など）も数えません。in flight
+  でないそれ（`Merge-After:` 待ち、review 待ち、conflict など）は次の survey でも
+  解放されたままで、譲ると同じ PR を pick しては `skip-ci` を戻す無限ループに
+  なります。
+- 人や bot が解放した PR はそのまま走ります。無駄になりうるのはマトリクス1回分
+  で、誤ったマージは起きません。上の例の手順 3 は、skill が push の前に自分の
+  PR に `skip-ci` を付けるので起きません。
+
+この規則が保証するのは CI 時間だけで、マージの正しさは保証しません。それは
+ruleset（最新の `main` の上で必須チェックが全部緑）が別に保証しています。
+
+### 起動時
+
+トークンとリポジトリを決め、デフォルトブランチを読みます。GitHub へは `gh` を介さ
+ず API を直接呼び（`../lib/github-api.mts`）、トークンは `open-pr`
+と同じく **`GH_TOKEN` → `GITHUB_TOKEN` → `gh auth token`** の順に探します。リポ
+ジトリは `--repo owner/name`、無ければ `origin`、それも GitHub でなければルートの
+`package.json` です。SIGINT / SIGTERM のハンドラを設置
+します（停止要求後は現在のステップを終えてから抜けます。2回目のシグナルは即
+終了）。
+
+### 1サイクル
+
+#### 1. survey
+
+GraphQL で open な PR を新しい順に100件まで取得します（`body` を含む — 順序をそこから読
+むため）。`mergeStateStatus` が `UNKNOWN` の PR があれば10秒おきに最大6回引き
+直します。GitHub が計算中の状態を「up-to-date」と誤読しないためです。あわせて
+`origin/main` の SHA と、`main` に適用されている rule を取得します。rule から
+読むのは、必須の status check の一覧と、レビューへの2つの要件（code owner の承
+認、会話の解決）です。宣言ファイルではなく GitHub が実際に適用しているものを読
+みます。`origin/main` の SHA は ref 名全体（`refs/heads/main`）で読みます。
+`git ls-remote origin main` は名前の末尾で一致させるので
+`changeset-release/main` も拾い、しかもそちらが先に並びます。version PR の
+head を `main` と取り違えると、見送りの記録が動かない base に紐付き、`main` が
+動いても再試行されません。
+
+#### 1a. 付け替えられた層の積み直し
+
+前回の survey で stack の層だった PR（下の層がマージされ、まだ付け替えられて
+いないものも含む）のうち、今回 `main` を base にしていて `merge-queued` の無い
+ものについて、次を確かめます。
+
+- 付け替え元のブランチから最後にマージされた PR の head を、まだ含んでいるか。
+- 含んでいれば、その head から squash commit の上へ `--onto` で rebase し、
+  `--force-with-lease`（survey が見た head を明示）で push します。その上の層
+  も「3」の2と同じように積み直します。
+- 何か動いたら、survey をもう一度取ってから triage に進みます。読んだ head が
+  古くなっているからです。
+
+起動直後の1回目には比べる前回がないので、`main` を base にしている PR すべて
+について timeline からどのブランチから付け替えられたかを読みます。含んでいな
+い（GitHub が rebase した、または積み直し済み）PR は黙って通り過ぎます。
+conflict や fork など積み直せない層は理由をログに出して残し、次からは追いませ
+ん（記録は作りません。そのまま置いておけば、GitHub が付け替えたときの状態で
+す）。`--dry-run` では何をするかを出力するだけです。
+
+#### 1b. 見送りの comment を読む
+
+`merge-queued` の PR と、このプロセスが見送りの記録を持っている PR について、
+自分のアカウントが書いた見送りの comment（「見送った PR はどこで分かるか」）を
+GraphQL 1回でまとめて読み、記録と突き合わせます（`skips.mts` の
+`settleSkips`）。
+
+- comment が見送った head から branch が動いた、または見送った base から
+  `main` が動いた（`checks-failed` と `awaiting-bypass` を除く）なら、comment
+  を1行の「解消済み」に書き換えます。
+- 「再試行」のチェックボックスに人がチェックを入れていたら、comment を
+  「解消済み」に書き換え、その PR の見送りの記録を捨てます。今回の triage は
+  見送られていなかったものとしてその PR を扱います。また失敗すれば、また
+  見送って comment に書きます。
+- まだ有効なのにこのプロセスが記録を持っていない comment は、前のプロセスが
+  残したものです。記録として引き継ぎ、試し直しません。同じ head と base の
+  rebase は同じように conflict するからです。
+- 逆に、このプロセスが記録を持っているのに、それを言う comment が無い（書き込
+  みに失敗した）PR には comment を書き直します（`unannouncedSkips`）。放って
+  おくと、このスクリプトは見送り中として扱い、comment を読む skill は担当者を
+  `worker` と読むので、互いに相手に任せたままになります。
+
+同じリクエストで、セッションが書いた **claim**（「見送った PR を直すセッション
+の claim」）も読みます。まだ有効な claim は見送りの記録とは別に持ち、その PR は
+pick も「3a」の rebase もしません。
+
+読めなければログに出して、記録はそのままで続行します（claim は無いものとしま
+す）。`--dry-run` では書き換えません。
+
+#### 2. triage
+
+1. 全 PR の body から `Merge-After:` を、base から stack を、閉じる issue から
+   `Start-After:` を読んで依存グラフを作り、閉路を検出（ version PR の body
+   だけは読みません — 上書きされるので）。
+2. **範囲判定** — `merge-queued` が無ければ `ignore`（無言）。あって動かせなけ
+   れば `note`（理由を出力）。
+3. **担当者** — 担当者（「担当者（owner）」）が `worker` でない PR は、担当者と
+   理由を添えて `note`。見送りの記録が head に残っている PR と、セッションが
+   claim している PR がこれにあたります。
+4. **stack** — 積まれている PR は「下の層が先」と `note`。
+   **auto-merge** — 無い PR は、GitHub のネイティブ stack に入っていれば
+   `note`（手でマージ）。そうでなければ先へ進み、pick されたときに張られます。
+5. **`Merge-After` ゲート** — 指定先が1つでも open なら `note`。
+6. **version PR** — `changeset-release/<デフォルトブランチ>` から来た PR は専
+   用の扱いになります。`blocks-release` の付いた open な PR があれば `note`。
+   無ければ、そのブランチが **main の現在の先端の上に建っているか** を
+   `git merge-base` で確かめ、建っていなければ `note`（ Release workflow がま
+   だ作り直していない）。どちらでもなければ、`skip-ci` が付いていれば
+   **candidate**、付いていなければ必須チェックを読んで **failing** か
+   **in-flight**。`mergeStateStatus` を使わないのは、これを読み違えた代償が
+   「feature 抜きのリリース」だからです（ GitHub の答えは非同期に計算された
+   キャッシュ）。
+7. **振り分け**
+    - `skip-ci` 付き → **candidate**。merge state は見ません。
+      `no-skip-ci-label` が pending なので、どれだけ準備できていても必ず
+      `BLOCKED` になり、「スキップされたチェック」と「実行中のチェック」が区別
+      できないからです。
+    - `BEHIND` / `DIRTY` → **candidate**。`DIRTY` は GitHub が非同期に計算して
+      キャッシュした答えで、しかも聞いている質問が違います（3-way merge が衝突
+      するか／rebase が衝突するか）。除外理由にはせず、実際に rebase させて答
+      えさせます。ただし確実な `BEHIND` より後ろに並べます。
+    - `CLEAN` / `UNSTABLE` / `HAS_HOOKS` → **in-flight**。
+    - `BLOCKED` → 必須チェックを読み、失敗なら **failing**、未完なら
+      **in-flight**。新しい round が実行中なら、前の round が残した赤も未完と
+      数えます。
+8. **レビュー待ち** — **candidate** になった PR と、`BLOCKED` のまま
+   **in-flight** になった PR について、レビューがマージを止めていないかを
+   GraphQL 1回でまとめて読みます。止めていれば **held**（理由を出力）にして、
+   rebase も解放も watch もしません。読むのは ruleset が要求する2つです。
+    - **code owner の承認** — 変更したパスのうち `.github/CODEOWNERS` に所有者
+      がいるもの全部に、所有者の承認が要ります。GitHub の `reviewDecision` は
+      branch protection の答えで、ruleset のこのリポジトリでは常に `null` なの
+      で、`CODEOWNERS` と変更ファイルと承認から計算します。Pull Requests
+      Manager と同じ `pr-report-core` の `codeOwnerReview` です。作者自身が所有
+      者なら、作者は自分の PR を承認できないので、そう出力します。
+    - **未解決の会話** — 1件でもあれば。
+
+    例外は、承認待ちのパスの所有者が**作者だけ**の PR です（未解決の会話が無
+    い場合）。作者は自分の PR を承認できないので、承認は永遠に来ず、ruleset
+    bypass でマージするしかありません。held にすると `skip-ci` が付いたまま
+    になり、bypass merge の判断材料になるチェック結果が一度も出ないので、held
+    にはしません。ほかの PR と同じく rebase、`skip-ci` 外し、watch まで進めます
+    が、**auto-merge は arm しません**（承認が来ないので発火しないため）。
+    green になったら `awaiting-bypass` で見送り、bypass merge を人に頼む
+    comment を書きます。
+
+    チェックでは分からない理由でマージできない PR を解放すると、マトリクスを
+    1回丸ごと使い、watch の間キューを止めます。しかも `main` が動くたびに
+    `BEHIND` として先頭に戻ってくるので、他の PR がマージされるたびに同じこと
+    を繰り返します。承認や会話の解決があれば次の survey で答えが変わるので、
+    skip 記録は作りません。変更ファイルが1ページ（100件）に収まらず判定しきれ
+    ない場合と、読み取りに失敗した場合は、止めません（以前の動作）。GitHub が
+    mergeable と言っている in-flight の PR は、それ自体が「チェック以外に残っ
+    ているものは無い」という答えなので、今まで通り watch します。
+
+このスクリプトは **version PR を rebase しません。** `changeset-release/main`
+は Release workflow が main の先端から毎回作り直して force-push するブランチで、
+ここで rebase すると (a) 2つの自動化が同じブランチを force-push し、(b) 古い
+version commit が「まだ消費していない changeset を含む先端」の上に乗るため、
+マージすると **その changeset 抜きのリリース** が出ます。やることは `skip-ci`
+を外すことだけです。候補の並びでも最後に回します — こちらはゲートではなく順序
+なので、リリースを止めることはありません（キュー済みの変更とリリースが同時に準
+備できた時、変更を先に入れるだけ）。
+
+#### 3. 1本だけ動かす
+
+**in-flight があればそれを watch して終わり** — rebase はしません。auto-merge
+が無ければ watch の前に張ります。
+
+なければ candidate の先頭に対して、次の手順を行います。並びは番号順で、後ろに回
+すものが3種類あります。`DIRTY`、その後ろに version PR、さらにその後ろに green
+のまま止まった PR（「5」）です。green のまま止まった PR 以外は、まず
+`priority:high` / ラベル無し / `priority:low` の順に分け、その中で今の並びに
+します。
+
+1. 使い捨て worktree で `origin/main` に rebase し、`--force-with-lease`
+   （survey が見た head を明示）で push。stack から降ろされた PR がマージ済みの
+   下の層の head をまだ含んでいれば、その head からの `--onto` にします。
+2. head が変わったなら、その上に積まれた層を下から順に `--onto` で積み直して
+   push します。積み直せない層（衝突、fork、下の層が動かなかった）は理由を
+   ログに出して残し、この PR 自体は止めません。
+3. auto-merge が無ければ、再確認（open / `main` 向き / head が今 push したもの /
+   `merge-queued` がまだ付いている）してから張ります。`skip-ci` を外す前なので、
+   張っている間もマージはラベルが止めています。
+4. `skip-ci` が付いていれば、**push の後で** 再確認（まだ open か / head が今
+   push したものか / 両ラベルがまだ付いているか）してからラベルを外します。
+   順序が要点です。ラベルが付いている間の push は全チェックが skip される
+   `synchronize` を起こすだけで無料ですが、ラベルを外すと `unlabeled` が発火
+   し、**実際にマージされる head の上で** マトリクスが1回だけ走ります。逆順だ
+   と rebase 前の head でフルマトリクスが起動し、直後の push がそれをキャンセ
+   ルします。
+5. rebase が no-op で、かつ `skip-ci` も付いていなかった場合だけ「GitHub の
+   merge state が古かった」と判断し、30秒待って survey からやり直します。
+
+失敗（conflict / push 拒否 / auto-merge を張れない / ラベル除去失敗）した場合は記録して **同じサイクル
+内で次の候補へ** 進みます。キューが止まるわけではありません。
+
+例外は **作業中にブランチが動いた場合** です（rebase 前の fetch で head が
+survey と違う / lease 負けで push が拒否され、remote の head が変わっている /
+ラベルを外す前の再確認で head が違う）。これは skill や人が同じ PR を動かして
+いるということなので、失敗として記録せず、次の候補にも進まずに survey からやり
+直します。次の候補を rebase すると、相手が起動するマトリクスの横でもう1本走ら
+せることになるからです。`/unblock-prs` skill はこのスクリプトと並行して動く前
+提で書かれています。
+
+#### 3a. 待っている PR を main に積み直す
+
+「3」で動かす候補が無いとき（進行中の PR も、pick する候補も無いとき）だけ、
+次の PR を `main` へ rebase します。`main` がすぐまた動くときに push しても無
+駄になるからです。レビュー中や順番待ちの PR の差分を、自分の変更だけにしてお
+くためのものです。
+
+- 対象: **`skip-ci` が付いていて**（push しても CI が走らない）、**
+  `auto-rebase` か `merge-queued` のどちらかが付いている** PR。そのうち open、
+  draft でない、同じリポジトリのブランチ、base が `main`、version PR ではない、
+  担当者が `worker` のもの（見送りの記録も、セッションの claim も無いもの）。
+  `merge-queued` の PR がここまで来るのは、`Merge-After` やレビュー待ちなどで
+  pick されないときです。pick される前に rebase しておいても、`skip-ci` が付
+  いていれば損はありません。
+- `skip-ci` が付いていると merge state は `BLOCKED` のままなので、遅れている
+  かどうかは `BEHIND` / `DIRTY` ではなく、`git merge-base --is-ancestor` で
+  `origin/main` が head の祖先かどうかで判断します。
+- 普通の `git rebase origin/main` を試し、`--force-with-lease`（survey が見た
+  head を明示）で push します。その上の層は「3」の2と同じ `restack()` で積み直
+  します。衝突や push の拒否は見送りとして記録し、comment で知らせます（head
+  か `main` が動くか、retry の欄にチェックが入るまで試し直しません）。
+- 何か動いたら、triage の前に survey をやり直します。
+
+**`auto-rebase` ラベル**は `open-pr` が stack の全層に付けます。対象は base が
+`main` の層だけなので、上の層は下の層がマージされるまで一緒に運ばれるだけです。
+付いていない PR は、寝かせてあるブランチも含めて、この節では動かしません。
+
+#### 4. watch
+
+`--poll-interval`（既定30秒）待ってから、マージするか「しない」と確定するまで
+ポーリングします。各回で次の順に判定し、該当した時点で抜けます。
+
+| 条件                               | 結果                          |
+| :--------------------------------- | :---------------------------- |
+| PR の再取得に失敗                  | 連続5回で `error`、未満は継続 |
+| `MERGED`                           | `merged`                      |
+| `OPEN` でない                      | `closed`                      |
+| auto-merge が外れた（※）           | `auto-merge-disabled`         |
+| `skip-ci` が再付与された           | `skip-ci-labelled`            |
+| head が push したものと違う        | `head-moved`                  |
+| `BEHIND` / `DIRTY`                 | `behind-again`                |
+| 必須チェックが fail / cancel       | `checks-failed`               |
+| 全 green（bypass merge 待ちの PR） | `awaiting-bypass`             |
+| 全 green が規定回数続く            | `not-merging`                 |
+| `--watch-timeout`（既定90分）超過  | `timeout`                     |
+| SIGINT / SIGTERM                   | `stopped`                     |
+
+※ bypass merge 待ちの PR（「2」の8）は arm していないので、この行は見ません。
+
+順序には意味があります。ラベルの再付与やブランチの移動をチェック結果より先に
+見るのは、その状態の PR のチェックを読んでも意味がないからです。
+
+**green の判定は「ruleset が要求する context 全部」** であり、報告済みのものだ
+けではありません。head commit にまだ check run が無い必須 context は
+head のチェックの一覧に pending として並ぶのではなく **行ごと現れません**。報
+告済みだけで判定すると、25分かかるマトリクスの3分目に「完了」と誤読します。
+
+**head 上で何か一つでも実行中なら green とは数えません**（必須かどうかを問わず）。
+必須の集約ジョブは、待っているジョブが終わるまで新しい round に check run を
+持たないので、その間 `--required` は前の round の結果を返します。前の round が
+`skip-ci` で飛ばされたものなら集約は全部 `skipped` で、マトリクスの途中なのに
+green に見えます（#2069 はこれで `not-merging` になりました）。fail はこの間も
+すぐ判定しますが、実行中のうち最も早く始まったものより前に終わった fail は前の
+round のものとして、round が終わるまで待ちます。`open-pr` が開いた直後に
+`skip-ci` で止めた round は集約を赤く残すので、それを今の round の fail と読むと、
+最初の本番の round の途中で脇に置いてしまいます（#2246 はこれで `checks-failed`
+になりました）。同じ workflow のもっと新しい run がまだ実行中の fail も前の round
+のものとして待ちます。`skip-ci` を付けた round のキャンセルが遅れると、その集約は
+新しい round が始まった後に赤くなるので、時刻では見分けられません（#2463 はこれで
+`checks-failed` になりました）。
+
+全部 green なのにマージされない場合は rebase では直せないので、連続 green 回
+数で打ち切ります。原因のうち未解決の会話と code owner の承認不足は triage が先
+に見つけて解放しないので（「2」の8）、ここに来るのはそれ以外です。たとえばマー
+ジ権限の無い人が auto-merge を有効にした、このスクリプトが読まない rule に引っ
+かかっている、などです。GitHub 自身が mergeable と言っている場合は3回、`BLOCKED` の
+まま green の場合は8回。後者が長いのは、check run が superseded された直後の一
+瞬がこの形になるためです。
+
+#### 4a. fixer の差分だけで落ちたなら直す
+
+watch が `checks-failed` で終わったら、その head の check run を集約 job の下の
+matrix の job まで読みます。どの失敗なら直せるか、何を実行すれば直るかはリポジ
+トリの `.github/unblock-prs.json` の `autoFix` が決めます（スキーマは
+`config.mts` から `gen:config-schema` が生成する
+[`config.schema.json`](./config.schema.json)）。ファイルが無いか `autoFix` が無
+ければ自動修正はせず、キュー、rebase、`Merge-After:`、stack、見送りコメントは
+そのまま動きます。ラベル名、`Merge-After:`、version PR のブランチ名
+（`changeset-release/<base>`）は PR Manager のページも読む規約なので、設定には
+しません。
+
+| キー      | 意味                                                                                                   |
+| :-------- | :----------------------------------------------------------------------------------------------------- |
+| `ignore`  | 失敗していても読まない context の正規表現（集約 job など）                                             |
+| `before`  | 常に最初に実行するコマンド（install）                                                                  |
+| `prepare` | 直す context が `context` に一致したときだけ、`before` の後に1回実行するコマンド（build）              |
+| `fixers`  | 残りの失敗はすべて、どれかの `context` に一致しなければならない。最初に一致したものの `run` を実行する |
+| `after`   | 常に最後に実行するコマンド（フォーマッタ）                                                             |
+
+`run` の `$1`〜`$9` は `context` のキャプチャで、シェル用にクォートして埋め込み
+ます。`fixers` は `stage` の小さい順、同じ `stage` ならコマンド順に実行します。
+
+このリポジトリの設定では、失敗した job が **すべて** `code-check (X)` か
+`style-check (X)` で、`X` が `fix:` か `gen:` のコマンド（`ws:` /
+`strict-lib:` 付きも含む）なら直します。どの job も最後に
+`z:assert-repo-is-clean` を実行するので、それはコマンドがファイルを書き換えた
+だけの失敗だからです。その場合に限り、次のことをします。
+
+1. 使い捨ての worktree で `pnpm install --frozen-lockfile` し、CI がビルドする
+   entry（`code-check` のすべてと `ws:gen`）があれば `ws:build` を実行します。
+   worktree は `~/.local/state/unblock-prs/` に作ります。OS の temp は tmpfs
+   のことが多く、pnpm store から `node_modules` をハードリンクできません。git
+   ディレクトリや `~/.cache` の下も使えません。`fix:fmt:diff` は絶対パスのどこ
+   かに `.git` / `.cache` / `dist` / `build` / `out` を含むファイルをすべて飛ば
+   すためです。
+2. 失敗したコマンドを、生成系 → その他 → フォーマッタの順に実行し、最後に
+   `fix:fmt:diff` を実行します。
+3. 差分があれば PR の1コミットに `--amend` し、失敗した head を lease にして
+   `--force-with-lease` で push します。
+4. 新しい head を watch します。**次の PR は pick しません。**
+
+次の場合は何もせず、理由をログに出して従来通り `checks-failed` として見送り
+ます。
+
+- リポジトリに `autoFix` の設定が無い。
+- 失敗した job に1つでも fixer 以外がある（型、テスト、`ws:doc`、
+  `Validate commit count` など）。push しても落ちるマトリクスを1回走らせるだけ
+  なので、全体を skill に任せます。
+- ブランチが1コミットでない。squash はメッセージを書く行為なので skill の仕事
+  です。
+- コマンドが失敗した、または差分が出なかった。
+- 自動修正で push した head がまた落ちた。1回の watch につき1回までです。
+
+対象は watch している1本、つまりこのサイクルが pick した PR だけです。
+`merge-queued` で CI が落ちている他の PR には触れません。
+
+- **`ws:doc` は対象外です。** `doc` が書くのは untracked な出力で、tree を汚す
+  のはその中で呼ばれる生成器（`ws:gen` でも走る）です。しかも実行に10分かか
+  ります。
+- **oxfmt。** `fix:fmt:diff` は Prettier だけで、`strict-lib/` は整形しませ
+  ん。fixer のうち `strict-lib/` に書くのは `strict-lib:fix:fmt` 自身だけなの
+  で、それが落ちていればそのコマンドが実行されます。
+
+#### 5. 記憶して次のサイクルへ
+
+判定は **その head かつその base のまま** の間だけ有効です。
+
+| 記録される理由                    | push で解除 | `main` の移動で解除 |
+| :-------------------------------- | :---------: | :-----------------: |
+| `rebase-failed`（実際に衝突した） |      ✓      |          ✓          |
+| `push-failed`                     |      ✓      |          ✓          |
+| `unlabel-failed`                  |      ✓      |          ✓          |
+| `arm-failed`                      |      ✓      |          ✓          |
+| `already-in-base`                 |      ✓      |          ✓          |
+| `not-merging`                     |      ✓      |          ✓          |
+| `watch-timeout`                   |      ✓      |          ✓          |
+| `checks-failed`                   |      ✓      |   **✗（意図的）**   |
+| `awaiting-bypass`                 |      ✓      |   **✗（意図的）**   |
+
+衝突の判定がキャッシュされないのはこのためです。衝突していた相手のコミットが
+base の移動と一緒に消えたかもしれないので、`main` が動けば記録は捨てられ、次の
+サイクルで再試行されます。`checks-failed` は base に紐付いていません —
+rebase しても同じマトリクスが同じように落ちるだけで、直すのは人間の仕事だから
+です。`awaiting-bypass` も同じく base に紐付けません。待っている bypass merge
+は base の移動を待たないので、他の PR がマージされるたびに rebase してマトリク
+スを回し直しても無駄になるだけです。最新の `main` の上で確かめ直したいときは、
+comment の再試行ボックスにチェックを入れます。
+
+`not-merging` の PR は、記録が消えた後も **candidate の最後**（version PR より
+後ろ）に回されます。`main` が動けば記録は消えて `BEHIND` の candidate に戻り
+ます。しかし原因は triage が読めなかったものなので、次もマージされない見込みが
+高いです。先頭に置いたままだと、他の PR がマージされるたびにこの PR がマトリク
+スを1回使い、green になって打ち切られる、という流れを繰り返します。除外ではな
+く最後に回すだけなのは、推測が外れることがあるからです（原因がその後に解消して
+いる場合）。この降格は **誰かが push するまで** 続きます。このスクリプト自身の
+rebase や「4a」の push では解けません。記憶はプロセスの中だけにあるので、再起
+動すると忘れます。
+
+このサイクルで触った PR が次の survey で open 一覧から消えていれば、マージされ
+たのかクローズされたのかを報告します。watch を諦めた数分後にマージされた PR を
+取りこぼさないためです。
+
+何もすることがなければ待ってから再 survey します。待ち時間は一覧が動いている
+かどうかで変わります。open な PR の一覧（head、merge state、ラベル、
+auto-merge、draft、本文）、レビュー待ちの理由、`main` の tip が
+`--idle-after`（既定10回）続けて
+前回の survey と同じになるまでは `--active-interval`（既定30秒）、それ以降は
+`--idle-interval`（既定300秒）です。何か変われば短い間隔に戻ります。今キュー
+に入れた PR を数分放置しないためです。
+
+### オプション
+
+| オプション                | 既定 | 意味                                         |
+| :------------------------ | ---: | :------------------------------------------- |
+| `--once`                  |      | 1サイクルだけ実行して終了                    |
+| `--dry-run`               |      | survey と報告だけ行い、何も変更しない        |
+| `--active-interval <sec>` |   30 | 一覧が動いている間の再 survey までの待ち時間 |
+| `--idle-after <n>`        |   10 | 何回続けて変化が無ければ長い間隔にするか     |
+| `--idle-interval <sec>`   |  300 | 一覧が止まった後の再 survey までの待ち時間   |
+| `--poll-interval <sec>`   |   30 | watch 中のポーリング間隔                     |
+| `--watch-timeout <min>`   |   90 | 1本を諦めるまでの時間                        |
+| `--no-auto-fix`           |      | 「4a」の自動修正をしない                     |
+| `--repo <owner/name>`     |      | `origin` が指さないリポジトリを扱う          |
+
+ログの各行の時刻はマシンの既定のタイムゾーンで、UTC からのオフセット付きで出ます
+（例: `[2026-09-27T21:03:04.500+09:00]`）。別のタイムゾーンで読みたいときは
+`TZ=Asia/Tokyo pnpm run unblock-prs` のように `TZ` で指定します。
+
+### 見送った PR はどこで分かるか
+
+このスクリプトは手元で動き、何をしたかは標準出力にしか出ません。そこで PR を
+見送るたびに、**その PR に comment を書きます**。comment は PR ごとに1本で、
+2回目からは同じ comment を書き換えます。**GitHub Pull Requests Manager**
+（<https://noshiro-pf.github.io/mono/pr-manager/>）がそれを読んで PR ごとに
+表示するので、端末を見に行かなくても止まっている理由が分かります。
+
+- **1行目は機械が読む隠しコメント**です（
+  `<!-- unblock-prs:set-aside reason=… head=… base=… -->`）。理由と、見送った
+  時点の head と base の SHA を書きます。書式は `pr-report-core` の
+  `set-aside.mts` にあり、このスクリプトとページが同じものを読みます。その後の
+  文章は人が読むためのもので、機械は読みません（`set-aside-comment.mts`）。
+  理由の1文（`set-aside-detail.mts`: `checks-failed` は落ちたチェック名、
+  `not-merging` は何が止めているか、`watch-timeout` はまだ待っていたもの、
+  `rebase-failed` は conflict したファイル）、落ちた必須チェックそれぞれの
+  run へのリンク、失敗したコマンドの出力（`<details>` に畳み、末尾60行まで）、
+  何があれば解けるか、を書きます。
+- **最終行はチェックボックス「Retry」**です。チェックを入れると、次の
+  survey がその PR の見送りを捨てて試し直します（「1」の1b）。他人の comment
+  のチェックボックスを切り替えられるのは write 権限のある人だけです。
+  `checks-failed` のまま up to date な PR は、試し直しても同じ失敗を見つけて
+  また見送るだけです。直すのは push です。
+- **読むのは自分のアカウントが書いた comment だけ**です（GraphQL の
+  `viewerDidAuthor`）。リポジトリが public なので、誰でも同じ隠しコメントで
+  始まる comment を書けるからです。ページも同じ規則で読みます。
+- **本文ではなく comment** なのは、本文は作者やセッションや `open-pr` も書き
+  換え、REST の PATCH には条件付き更新がないので人の編集を消しかねないからです。
+  version PR の本文は push のたびに上書きされます。以前の commit status（
+  context `unblock-prs`、state `failure`）をやめたのは、必須でもないのに PR の
+  checks に ✗ が残り、140字しか書けず、人が消すことも試し直しを頼むこともでき
+  なかったからです。
+- **GitHub の `mergeable` ではなくこちら**を見るのは、あれが merge の可否で、
+  このスクリプトがするのは rebase だからです（`DIRTY` を信用しない理由と同じ）。
+- **解けたら1行の「解消済み」に書き換えます。** head か base が動いた（
+  `checks-failed` と `awaiting-bypass` は head だけ — `skips.mts` と同じ規則を
+  `pr-report-core` の `setAsideApplies` で共有しています）、または再試行を頼ま
+  れたときです。消さないのは、timeline で経緯を追えるようにするためです。ペー
+  ジは、head が動いた comment は表示せず、base が動いたものは灰色の古い記録と
+  して表示します。
+- マージは止めません。
+- 書くのは新しく見送ったときだけで、同じ状態のまま見送り続けている間は書き直し
+  ません。`--dry-run` では書きません。書けなかったときはその旨をログに出して
+  続行します。書き込むのはトークンのアカウントなので、そのアカウントが作者の PR
+  では作者に通知は飛びません。PR を購読しているセッションは comment で起こされ
+  るので、自分の PR が見送られたことに気づけます。
+- 以前の commit status はすでに付いているものを API で消せませんが、次の push
+  で head が変われば消えるので放ってあります。
+
+code owner の承認待ちで止まっている PR は、変更したパスと `.github/CODEOWNERS`
+からページが自分で判定します。このスクリプトも同じ判定で、その PR を解放せずに
+残します（「2」の8）。この場合 comment は書きません。承認されれば次の survey で
+動き出すからです。所有者が作者だけの PR はその例外で、チェックを回して green に
+なった時点で `awaiting-bypass` の comment を書きます。
+
+### 見送った PR を直すセッションの claim
+
+見送った PR は `/unblock-prs` skill が直します（PR を開いたセッションが直すこ
+ともあります）。直している間にこのスクリプトが同じ PR を試し直す（`main` が動
+いた、Retry にチェックが入った）と、同じ conflict を2か所で解くことになるので、
+直す側は先に **claim** を書きます（`pnpm run claim-pr -- <番号> --by <名前>`）。
+
+- 書式は `pr-report-core` の `claim.mts` で、1行目が
+  `<!-- unblock-prs:claim head=… by=… at=… -->` の comment です。見送りの
+  comment と同じく PR ごとに1本、書き換えて使い、自分のアカウントのものだけ
+  を読みます。`by` が同じアカウントで書く claim の書き手を区別します。
+- **有効なのは、claim した head のままで、120分以内の間だけ**です。直した
+  push で head が動けばそれだけで終わり、PR はこのスクリプトに戻ります（push
+  で戻るのは以前と同じです）。120分は push せずに止まったセッションのため
+  で、長くかかるなら同じコマンドで書き直します。諦めるときは `--release`。
+- 有効な claim がある PR は、pick も「3a」の rebase もせず、ラベルにも触りま
+  せん（skill は自分で `skip-ci` を付けてから push します）。
+- `claim-pr` は、担当者が skill でない PR（このスクリプトがまさに動かそうとし
+  ている PR や、人の手が要る PR）と、他の書き手の claim が有効な PR には書き
+  ません。書いた後に読み直し、同時に書いた相手に負けていれば失敗します。
+- `pnpm run pr-report -- --format json` の各 entry の `owner` が、skill が直す
+  PR を選ぶときに読むものです。
+
+### 担当者（owner）
+
+キューにある PR（`merge-queued`、または `skip-ci` と `auto-rebase`）には、次に
+動かす担当者が必ず1つ決まります。決めるのは `pr-report-core` の
+`queue-owner.mts` の `queueOwner` だけで、このスクリプト（`owner.mts`）も
+`pr-report` / `claim-pr` / `push-fixed-pr` / `report-unowned-prs`
+（`pr-report/queue.mts`）も同じ関数に同じ事実を渡して読みます。#2267 では、こ
+のスクリプトと skill がそれぞれ別の読み方の `main` で見送りの有効性を判定し、
+互いに相手の担当だと判断して誰も動かしませんでした。
+
+| `owner`  | 次に動かすもの                                                                                            |
+| :------- | :-------------------------------------------------------------------------------------------------------- |
+| `worker` | このスクリプト。順番待ち、stack の上の層、見送りが解消済み                                                |
+| `skill`  | `/unblock-prs` skill。claim 中、または `rebase-failed` / `checks-failed` で見送り中（依存更新 PR も含む） |
+| `human`  | 人。draft、fork、閉路、bypass merge 待ち、設定や権限で止まっている見送り                                  |
+| `none`   | 誰でもない。規則の想定外の状態で、ツールのバグ                                                            |
+
+- **読むのは comment と PR だけで、base の先端は読みません。** 見送りの
+  comment が受け渡しの印です。このスクリプトが「解消済み」に書き換える（head
+  が動いた、再試行を頼まれた、base に紐付く理由で `main` が動いた）までは
+  skill か人の担当です。このスクリプトが止まっていても、担当者が誰でもなくなる
+  ことはありません。
+- 見送りの理由ごとの担当者は `setAsideOwner` が網羅します。理由の一覧
+  （`SET_ASIDE_REASONS`）もそこにあり、このスクリプトはそれを使うので、担当者
+  の無い理由を書くことはできません（コンパイルが通りません）。`none` になるの
+  は、このファイルの知らない理由が comment にあるときです。
+- 依存更新 PR（`chore/pnpm-update`）も他の PR と同じく skill の担当です。
+  ただし `rebase-failed` は rebase で解かず、`pnpm run rebuild-pnpm-update` で
+  `pnpm-update.yml` に `main` の先端から作り直させます。lockfile を含めて生成
+  されるブランチなので、手で解いた conflict は `minimumReleaseAge` の下で解決
+  されたことを誰も確かめていないからです。
+- `none` は `pnpm run report-unowned-prs` が issue にします（PR ごとに1本、
+  本文の隠し行で既存の issue を見つけます）。`/unblock-prs` skill が毎回実行
+  します。
+
+### ファイル構成
+
+| ファイル                | 役割                                                          |
+| :---------------------- | :------------------------------------------------------------ |
+| `main.mts`              | ループ本体とコマンドライン（入口）                            |
+| `triage.mts`            | 1回の survey が各 PR について何を言うか（判定の読み込み）     |
+| `merge-after.mts`       | 宣言された順序が pick に何を言うか                            |
+| `stack.mts`             | stacked PR — いつ待たせ、いつ張り、何を運ぶか、いつ積み直すか |
+| `version-pr.mts`        | version PR と、それを止めているもの                           |
+| `rebase.mts`            | ブランチを動かす — worktree 内の rebase と `skip-ci` 除去     |
+| `release.mts`           | 解放されている PR を1本に保つ                                 |
+| `watch.mts`             | 1本をマージまでポーリング                                     |
+| `auto-fix.mts`          | fixer の差分だけの失敗を直して push                           |
+| `config.mts`            | `.github/unblock-prs.json` を読む                             |
+| `quiet.mts`             | 何もない時にどれだけ待つか                                    |
+| `checks.mts`            | マージが何を待っているか                                      |
+| `claims.mts`            | セッションの claim のうち有効なもの                           |
+| `owner.mts`             | 各 PR の担当者（`pr-report-core` の `queueOwner`）            |
+| `github.mts`            | GitHub と `git` を読み書きするもの全部。判断はしない          |
+| `labels.mts`            | ラベルがその PR について何を言うか                            |
+| `skips.mts`             | 諦めた PR を何をもって覚え続けるか、comment との突き合わせ    |
+| `set-aside-comment.mts` | 見送りの comment の文章                                       |
+| `demotions.mts`         | green のまま止まった PR をいつまで最後に回すか                |
+| `options.mts`           | コマンドライン                                                |
+| `types.mts`             | 共有される型とスキーマ                                        |
+| `constants.mts`         | 待ち時間と諦めるまでの回数                                    |
+| `util.mts`              | 停止シグナル                                                  |
+
+API を呼ぶ `rest()` / `graphqlQuery()`、`git` を走らせる `git()`、quoting の
+`sh()`、ログの `log()` は `open-pr` などほかのコマンドも使うので
+`../lib/` にあります。
+
+トレーラのパーサと閉路検出、どの PR がどの PR に積まれているか、ラベルの文字列、
+`CODEOWNERS` の判定、見送りの comment の隠しコメントとチェックボックスの書式、
+そして triage の判定そのもの（各 PR が queue のどこにいるか、レビューが止めているか、
+候補をどの順に pick するか: `queue-order.mts` と `review-hold.mts`）は、
+同じ queue を描く Pull Requests Manager と共有するため `libs/pr-report-core`
+にあります。`triage.mts` はその判定が求めるものを GitHub と `git` から読むだけです。
+
+`index.mts` はありません。`ws:gen` は workspace メンバーしか歩かず `tools/` は
+意図的にメンバーではないので、手で維持するだけの barrel になります。
+
+## English
+
+### What it does
+
+Takes the pull requests labelled `merge-queued` forward **one at a time**, in
+the order those pull requests declare. One per cycle, always: merging any of
+them moves `main` and puts every other branch back to `BEHIND`, so a batch
+rebase runs a full CI matrix per branch and throws all but the first away.
+
+**What it never does**: merge (auto-merge's job), add `merge-queued`, approve a
+review, or fix a failing check (the skill's job — except a failure that is only
+a fixer's diff, see "4a"). The rebase happens in a throwaway `git worktree`, so
+the checkout it runs from is never touched.
+
+### The six things a pull request declares
+
+**The `merge-queued` label is the scope rule.** A pull request without it is
+passed over in silence — with two exceptions: a layer GitHub moved onto
+`main` when the layer below it merged, which is rebased off that layer's
+commits whatever its labels (see "the base" below), and a pull request
+labelled `auto-rebase`, which is kept on `main` (see "`auto-rebase`" below). One that has it and cannot be acted on — a draft, or a
+base that is neither `main` nor an open pull request's branch — is reported,
+because the label asked for something and the answer is no.
+
+**This script is the only thing that arms auto-merge** (`armOnPick` in
+`rebase.mts`).
+`open-pr` arms nothing; this script arms a queued pull request when it picks
+it — one it rebases after the push and before `skip-ci` comes off, one already
+up to date before it is watched. The ruleset asks for no approvals, so an
+armed pull request merges the moment it goes green, which is why nothing is
+armed before it is queued; and a layer of a stack, onto a branch no ruleset
+covers, could merge into the layer below the moment it was armed.
+`merge-queued` is the only thing read as permission, so one that has lost its
+auto-merge — GitHub disarms it when the base changes, and a person may switch
+it off — is armed again when it is next picked. Holding one back is taking
+`merge-queued` off.
+
+**The `Merge-After:` trailer declares the order.** On its own line, naming as
+many numbers as it likes, on one line or several:
+
+```markdown
+Merge-After: #1901, #1903
+```
+
+- The pull request is not picked until **every** pull request it names has
+  left the open list. It is an AND, not an OR.
+- It constrains picking and nothing else. One that is already up to date and
+  merging is watched as ever, because auto-merge will merge it whatever is
+  declared here — and passing it over would only send the cycle off to rebase
+  a branch that merge is about to invalidate.
+- One pull request may name several predecessors and several may name the
+  same one, so what is declared is a graph rather than a list. **A cycle is
+  detected and reported by name**, and everything caught in it is left alone,
+  because nothing here can move it.
+- **A trailer inside a fenced code block is not read**, so a document
+  describing the convention does not become a constraint.
+- **The `Start-After:` of the issues it closes is inherited**
+  (`docs/issue-start-after.md`, "pull request への引き継ぎ"): an open pull
+  request named there is waited for as if `Merge-After:` named it, and an open
+  issue named stands for the open pull requests closing it. The issues it
+  closes are GitHub's links and the closing keywords in its body, a stacked
+  one's included, read again on every survey, and GitHub's issue
+  dependencies ("blocked by") count as `Start-After:` does; a survey that cannot read them
+  inherits nothing and says so. The `note` says which numbers came from an
+  issue.
+
+**The base declares an order too.** A pull request onto another open pull
+request's branch is a layer stacked on it — GitHub's stacked pull requests —
+and its diff is its own layer and nothing below it, which is what makes it
+reviewable.
+
+- It is not picked until the layer below it has merged. The base alone says
+  so, so a stack with no `Merge-After:` is recognized too; `open-pr --base`
+  writes the layer below into `Merge-After:` as well, which means the same and
+  is not counted twice.
+- When the layer below merges, GitHub moves this one onto `main`. From then
+  on it is an ordinary pull request.
+- **A layer moved onto `main` is restacked without being queued.** It still
+  carries the merged layer's commits, so its diff shows that layer's changes
+  as its own. The next survey rebases it with `--onto` from the head that
+  layer merged at onto its squash commit, carrying the layers above along
+  ("1a").
+    - No label is asked: this undoes GitHub's move, and is not the pull
+      request's turn. It brings in nothing new from `main`, and needs no review
+      to have finished.
+    - The ruleset merges only an up-to-date branch, and only by squash, so the
+      squash commit's tree is the merged head's, and the restacked layer's tree
+      is the one it had. Only its history, and so its diff, changes; a tree
+      already checked is not checked again, so it costs no CI even with
+      `skip-ci` off.
+    - `skip-ci` and auto-merge are left as they are. A layer labelled
+      `merge-queued` is left to its rebase when it is picked, which drops the
+      same commits the same way.
+- **GitHub's native stacks are not landed.** GitHub refuses auto-merge on a
+  pull request in one ("Auto-merge is not supported for stacked pull
+  requests"), and keeps a layer in its stack after the layer below has merged
+  and it has been moved onto `main`. Such a pull request is not picked but
+  reported as a `note`, to be merged by hand. Make a stack with the base
+  alone.
+- A stacked pull request is never picked, so never armed. It is armed when
+  its turn comes, after GitHub has moved it onto `main`.
+- **When a layer is rebased, the layers above it are carried along.** Each is
+  replayed with `git rebase --onto <new head> <old head>` — its own commits and
+  nothing else — and pushed. Otherwise each would show the layer below's old
+  commits in its diff, and GitHub's rebase when that layer merges would start
+  from a head the layer above does not contain. `merge-queued` is not asked:
+  a stack moves as one.
+- A pull request moved off a stack that GitHub did not rebase still carries
+  the merged layer's commits; it is rebased with `--onto` from the head that
+  layer merged at, rather than trusting the patches to match the squash
+  commit.
+- A fork's branch is never a parent, and never restacked.
+
+**The `blocks-release` label says the next release must contain this pull
+request.** While one carrying it is open, the version pull request — the one
+`changesets/action` opens from `changeset-release/main` — is not picked.
+
+- It constrains the version pull request and nothing else. The pull request
+  carrying it is not constrained at all.
+- **A draft counts.** Holding a release for something not queued, or not
+  finished, is the whole point of the label. The other side of that is a
+  forgotten draft holding every release, so the blockers are named in the
+  report on every cycle.
+- Nothing ever takes it off: the constraint is "open", so merging or closing
+  the pull request ends it and leaves no state to clean up.
+- On the version pull request itself it is ignored — it would hold it forever
+  with nothing able to take it off, which is a `Merge-After` cycle by another
+  name.
+
+**Why a label, and not the body.** The version pull request is the one pull
+request that cannot declare anything in its body: `changesets/action`
+overwrites its title and body through `updatePullRequest` on every push to the
+base, so a `Merge-After:` written there is wiped — and wiped precisely when
+another queued pull request merged first, which is when the order mattered. So
+the declaration is made from the other side, by the pull request the release is
+waiting for. A label rather than a comment for a second reason: this repository
+is public, and a label needs write access while a comment does not.
+
+**The `auto-rebase` label asks for the pull request to be kept on `main`
+while it waits** for review or for its turn, so that its diff stays its own
+changes and easy to review ("3a").
+
+- It works only together with `skip-ci`, under which a push runs no checks.
+- A `merge-queued` pull request is treated the same: while it cannot be picked
+  (waiting on a `Merge-After` or its review), it is kept on `main` as long as
+  `skip-ci` is on.
+- It acts only when the queue has nothing to do, because a push while `main`
+  is about to move again is wasted.
+- `open-pr` puts it on every layer of a stack. A layer above the bottom is
+  only carried along until the layer below merges and it is moved onto
+  `main`; that is when its own label starts to count, and nothing adds one
+  then, so it is there from the start.
+- It is opt-in, so that a branch left to sleep is never moved for want of a
+  label. Putting it on just before asking for a review is enough.
+
+**The `priority:high` and `priority:low` labels say which of the pickable
+pull requests to take first, and which can wait.**
+
+- Among the candidates, one labelled `priority:high` goes first and one
+  labelled `priority:low` last. It is an ordering, not a gate: what
+  `Merge-After`, a stack, `blocks-release` or a review holds stays held, and
+  one in flight is watched whatever it carries.
+- The version pull request reads it too. `priority:high` on it releases
+  before the queued changes; a change labelled `priority:low` goes after an
+  unlabelled version pull request, so into the release after.
+- It outranks the ordering that moves `DIRTY` and the version pull request
+  back, and the numbers order within it. Only the rule that puts last one that
+  sat green without merging ("5") is stronger: that one is last even with
+  `priority:high`.
+- When two pull requests are released at once, the same order says which
+  keeps its release.
+- One carrying both contradicts itself and counts as neither, and the triage
+  output says so.
+- `priority:mid`, which also exists on GitHub, is not read: it is the same as
+  no label.
+
+**`skip-ci` is not a scope rule.** It pauses a queued pull request, and taking
+it off when its turn comes is the job. It is a condition of "3a", as the
+guarantee that the push runs no checks.
+
+### One released pull request at a time
+
+A pull request labelled `merge-queued` without `skip-ci` is **released**:
+pushing to it, or taking the label off, runs the full matrix. **At most one is
+released at any time.** Only one can merge before `main` moves, so a second
+one's run is thrown away.
+
+#### Why — what happened without it
+
+This script and the `/unblock-prs` skill move the same queue side by side,
+and neither can see the other. Without the rule:
+
+1. Queued pull request A has its `skip-ci` taken off, and its matrix runs. A
+   check fails and the merge is blocked. A is set aside with the label off.
+2. This script picks the next queued pull request, B, and takes its `skip-ci`
+   off.
+3. The skill fixes A's failure and pushes. A has no label, so the push starts
+   A's matrix too.
+4. A and B run at once. Whichever merges first moves `main`, the other goes
+   back to `BEHIND`, and the whole of its run is wasted.
+
+Each writer was right on its own. The waste comes from "only one may run" being
+written down nowhere, and `skip-ci` is where it is now written.
+
+The skill now fixes only set-aside pull requests and always pushes under
+`skip-ci`, so step 3 no longer comes from it. A person's push and a pull
+request opened without the label, as `pnpm-update.yml` opens one, still can,
+so the rule stays.
+
+#### The rule
+
+**This script puts `skip-ci` on a pull request only to give back the label it
+has just taken off, yielding to another released in the same moment.** It
+puts it on no other pull request. It used to pause every other released pull request before releasing its own,
+which stopped pull requests nobody had handed it: the dependency update the
+bot opens released, and one a person had released on purpose.
+
+- **Pick nothing while one is in flight.** When triage finds a pull request
+  in flight, this script watches it and rebases and releases nothing else
+  ("3").
+- **Look again straight after releasing.** When another pull request the
+  worker owns was released in the same moment and comes first in the pick
+  order (`priority:high` first and `priority:low` last, then the lowest
+  number, the version pull request last), this script puts `skip-ci` back on
+  **its own** and surveys again (`yieldsTo` in `release.mts`). A set-aside or
+  claimed pull request, a skill's or a person's, runs nothing until its fix is
+  pushed, so it does not count; counting it would stall the queue behind a
+  pull request nobody is about to run. Nor does one already released when the
+  survey ran (a person took `skip-ci` off it, or labelled `merge-queued` one
+  that never had it): not in flight — waiting on `Merge-After:`, held by its
+  review, conflicting — it is still released on the next survey, and yielding
+  to it would pick and pause the same pull request forever.
+- A pull request a person or a bot released runs as released. What that can
+  cost is a matrix, not a wrong merge. Step 3 of the example no longer
+  happens, because the skill puts `skip-ci` on its own pull request before it
+  pushes.
+
+The rule protects CI time, not correctness. The ruleset protects correctness
+on its own: every required check green, on the current `main`.
+
+### At startup
+
+The token, the repository and its default branch. GitHub is called directly
+(`../lib/github-api.mts`), not through `gh`, and the token is
+looked for as `open-pr` looks for it: **`GH_TOKEN`, then `GITHUB_TOKEN`, then
+`gh auth token`**. The repository is `--repo owner/name`, else `origin`, else
+the root `package.json` when `origin` is not GitHub. SIGINT / SIGTERM handlers are
+installed: the first signal finishes the current step and stops, a second one
+exits immediately.
+
+### One cycle
+
+#### 1. Survey
+
+GraphQL for the open pull requests, newest first and up to a hundred, `body` included — that is where the
+order is read from. While any of them reports `mergeStateStatus: UNKNOWN` the
+list is fetched again, up to six times at ten-second intervals, so a state
+GitHub is still computing is never read as up to date. The tip of
+`origin/main` is read too, and so are the rules GitHub applies to `main`: the
+contexts they require, and whether they require a code owner's approval and
+every conversation resolved. These are the rules GitHub enforces, not the ones
+declared under `repo-settings/`. The tip is read by its whole ref name
+(`refs/heads/main`): `git ls-remote origin main` matches on the tail of the
+name, so it lists `changeset-release/main` too, and first. Read as `main`, the
+version pull request's head ties each set-aside to a base that never moves,
+and nothing is tried again when `main` does.
+
+#### 1a. Restack the layers GitHub moved
+
+For each pull request the last survey saw as a layer — including one whose
+parent had merged and which GitHub had yet to move — that is now onto `main`
+and not labelled `merge-queued`:
+
+- Does it still contain the head the last pull request merged from the branch
+  it was moved off?
+- If so, rebase it with `--onto` from that head onto the squash commit, push
+  with `--force-with-lease` against the head the survey saw, and restack the
+  layers above it as in step 2 of "3".
+- If anything moved, survey again before triage, since the heads it read are
+  stale.
+
+The first cycle of a run has no previous survey, so it reads the timeline of
+every pull request onto `main` for the branch it was moved off. One that no
+longer contains the merged head — GitHub rebased it, or it was restacked
+already — is passed over in silence. A layer that cannot be restacked — a
+conflict, a fork — is logged with the reason and left, and not followed
+again: no record is kept, and left alone it is where GitHub put it. With
+`--dry-run` it only says what it would do.
+
+#### 1b. Read the set-aside comments
+
+For the `merge-queued` pull requests and any other this process holds a record
+for, read the set-aside comments this account wrote ("Where a passed-over pull
+request shows") in one GraphQL request, and settle the records with them
+(`settleSkips` in `skips.mts`):
+
+- A comment set aside at a head the branch has moved from, or against a base
+  `main` has moved from (except `checks-failed` and `awaiting-bypass`), is
+  rewritten as one resolved line.
+- A comment whose "Retry" box a person ticked is rewritten as resolved, and
+  that pull request's record is dropped: this cycle's triage treats it as if
+  it had never been set aside. One that fails again is set aside again, and
+  its comment says so again.
+- A comment still standing that this process holds no record for was left by
+  an earlier run. It is taken up as a record rather than tried again: a rebase
+  of the same head onto the same base conflicts the same way.
+- A record this process holds that no comment says — the write failed — has
+  its comment written again (`unannouncedSkips`). Left alone, this script
+  holds the pull request aside while the skill, which reads the comment, reads
+  its owner as `worker`, and each leaves it to the other.
+
+The same request reads the **claims** sessions wrote ("A session's claim on a
+set-aside pull request"). Those still holding are kept beside the records, and
+the pull request is neither picked nor rebased by "3a".
+
+Comments that cannot be read are logged, and the records stand as they were
+(and nothing is claimed). With `--dry-run` nothing is rewritten.
+
+#### 2. Triage
+
+1. Build the dependency graph from every body's `Merge-After:`, every base's
+   stack and the `Start-After:` of the issues each closes, and find the cycles
+   in it. The version pull request's body is
+   the one that is not read, because it is overwritten; others may still name
+   it.
+2. **Scope** — no `merge-queued` means `ignore`, silently. Queued but not
+   actionable means a `note` naming the reason.
+3. **Owner** — one whose owner ("Who owns a pull request in the queue") is not
+   `worker` is a `note` naming its owner and why: one set aside at its head,
+   and one a session has claimed.
+4. **Stacks** — a stacked pull request is a `note` saying the layer below goes
+   first. **Auto-merge** — one without it is a `note` if it is in one of
+   GitHub's native stacks (to be merged by hand); otherwise it goes on, and is
+   armed when picked.
+5. **The `Merge-After` gate** — a `note` while anything it names is open.
+6. **The version pull request** — one whose branch is
+   `changeset-release/<default branch>` is handled on its own. A `note` while
+   any pull request labelled `blocks-release` is open. Otherwise `git
+merge-base` says whether the branch was built on the current tip of the
+   base, and a `note` while it was not — the release workflow has not rebuilt
+   it yet. Past both: **candidate** if it carries `skip-ci`, and otherwise
+   **failing** or **in flight** by its required checks. `mergeStateStatus` is
+   not what answers this one: GitHub's answer is computed asynchronously and
+   cached, and being wrong here releases a set the branch was built before.
+7. **The rest**
+    - Carrying `skip-ci` → **candidate**, whatever the merge state says. With
+      `no-skip-ci-label` pending it reads `BLOCKED` however ready it is, and
+      checks that were skipped are indistinguishable from checks still
+      running.
+    - `BEHIND` / `DIRTY` → **candidate**. `DIRTY` is an asynchronously
+      computed, cached answer to a different question — whether _merging_
+      conflicts, not whether a rebase will — so it is never a reason to
+      exclude. The rebase answers it; it is only ordered last.
+    - `CLEAN` / `UNSTABLE` / `HAS_HOOKS` → **in flight**.
+    - `BLOCKED` → read the required checks: **failing** if one failed,
+      **in flight** if they are still running — a red left by the round before
+      included, while the checks on the head say a new round is running.
+8. **Its review** — for every **candidate**, and every **in flight** that
+   GitHub still calls `BLOCKED`, one GraphQL request reads whether its review
+   holds the merge. If it does, the pull request is **held**, with the reason
+   in the output, and is not rebased, released or watched. Two things are
+   read, the two the ruleset asks for:
+    - **A code owner's approval** of every changed path that
+      `.github/CODEOWNERS` gives an owner. GitHub's `reviewDecision` answers
+      for branch protection, not a ruleset, and is `null` for every pull
+      request here. So this is worked out from `CODEOWNERS`, the changed files
+      and the approvals, by `pr-report-core`'s `codeOwnerReview`, the same
+      code the Pull Requests Manager uses. When the author owns the path it
+      says so, since an author may not approve their own pull request.
+    - **An unresolved conversation**, any at all.
+
+    The exception is a pull request whose waiting paths **only its author**
+    owns, with no conversation open. No approval will ever come, so it merges
+    by a ruleset bypass or not at all, and holding it would leave it under
+    `skip-ci` with no verdict for whoever makes that merge. So it is not
+    held: it is rebased, released and watched like any other, but **never
+    armed** — auto-merge would wait for the same approval — and once its
+    checks are green it is set aside `awaiting-bypass`, with a comment asking
+    a person for the bypass merge.
+
+    Releasing a pull request that cannot merge for a reason no check reports
+    runs a whole matrix and holds the queue for the length of a watch. And
+    since `main` moving puts it back at the front as `BEHIND`, it would do so
+    again every time anything else merged. An approval or a resolved
+    conversation changes the answer on the next survey, so nothing is
+    recorded. A pull request whose changed files run past one page (100) is
+    not held on a guess, and neither is anything when the request fails; that
+    is how the script behaved before it asked. One in flight that GitHub calls
+    mergeable is watched as ever: that state is GitHub's own answer that
+    nothing but the checks is left.
+
+**The version pull request is never rebased.** `changeset-release/main` is
+rebuilt from the tip of the base and force-pushed by the release workflow on
+every push to it, so a rebase here would be (a) a second thing force-pushing
+one branch and (b) the old version commit landing on a tip that carries a
+changeset it never consumed — merge that and the release is missing the change
+the queue was assembled for. Taking `skip-ci` off is the whole of what it is
+given, and it is ordered last among the candidates. That last part is an
+ordering and not a gate, so it never stops a release: it only means that when
+a queued change and the release are both ready, the change goes in first.
+
+#### 3. Act on exactly one
+
+**If anything is in flight, watch that and stop** — do not rebase another.
+Arm it first if it has no auto-merge.
+
+Otherwise take the first candidate. Candidates go lowest number first, with
+three kinds moved back: `DIRTY` after the rest, the version pull request after
+that, and one that sat green without merging (step 5) last of all. Everything
+but that last kind is first split into `priority:high`, unlabelled and
+`priority:low`, in that order, and ordered as above within each. Then:
+
+1. Rebase onto `origin/main` in a throwaway worktree and push with
+   `--force-with-lease`, leased against the head the survey saw. A pull
+   request moved off a stack that still contains the head its merged layer
+   merged at is rebased `--onto` from that head.
+2. If the head moved, restack the layers above it, lowest first, each with
+   `--onto`, and push them. A layer that cannot be moved — a conflict, a fork,
+   a layer below that did not move — is logged and left; the pull request
+   whose turn it is goes on regardless.
+3. If it has no auto-merge, ask GitHub once more — still open, onto `main`,
+   head is the commit just pushed, `merge-queued` still on — and arm it. This
+   comes before `skip-ci` is taken off, so the label holds the merge while it
+   happens.
+4. If it carries `skip-ci`, ask GitHub once more — still open, head is the
+   commit just pushed, both labels still on — and then take the label off.
+   The order is the point: while the label is on, the push fires a
+   `synchronize` whose every check skips, so it is free; taking the label off
+   then fires `unlabeled` and runs the matrix once, **on the head that will
+   actually be merged**. The other order starts a full matrix on the
+   pre-rebase head and has the push cancel it.
+5. A rebase that changed nothing, on a pull request with no label to take off
+   either, means GitHub's merge state was stale: wait thirty seconds and
+   survey again.
+
+A failure — a real conflict, a refused push, auto-merge that could not be
+armed, a label that could not be removed — is recorded and **the next candidate is tried in the same cycle**.
+The queue does not stop.
+
+The exception is **a branch that moved under it**: the head the fetch finds
+is not the one the survey saw, a push lost its lease to a head that has
+since changed, or the re-read before taking the label off finds a different
+head. That is the skill or a person moving the same pull request, so nothing
+is recorded, and the cycle surveys again rather than moving on — rebasing the
+next candidate would start a second matrix beside the one the other writer is
+about to start. The `/unblock-prs` skill is written to run alongside this
+script.
+
+#### 3a. Keep waiting pull requests on the tip
+
+Only when step 3 has nothing to act on — nothing in flight and no candidate to
+pick — rebase the following onto `main`, because a push while `main` is about
+to move again is wasted. It keeps the diff of a pull request under review, or
+waiting its turn, to its own changes.
+
+- Eligible: **labelled `skip-ci`** (so the push runs no checks) **and either
+  `auto-rebase` or `merge-queued`**; open, not a draft, a branch of this
+  repository, based on `main`, not the version pull request, and whose owner
+  is `worker` — no set-aside standing at its head, and no session's claim. A
+  queued one gets
+  here only when it cannot be picked — waiting on a `Merge-After` or its
+  review — and rebasing it early under `skip-ci` costs nothing.
+- `skip-ci` leaves the merge state at `BLOCKED`, so whether it is behind is
+  read from git, not from `BEHIND` / `DIRTY`: `git merge-base --is-ancestor`
+  says whether `origin/main` is in its head.
+- A plain `git rebase origin/main`, pushed with `--force-with-lease` against
+  the head the survey saw; the layers above are carried by `restack()`, as in
+  step 2 of "3". A conflict or a refused push is a set-aside, announced in its
+  comment and not tried again until the head or `main` moves or the retry box
+  is ticked.
+- If anything moved, survey again before triage.
+
+**The `auto-rebase` label** is on every layer of a stack, where `open-pr` puts
+it; only a layer based on `main` is a target, so the layers above are carried
+along until the one below merges. A pull request with neither label — a
+branch left to sleep included — is not moved by this step.
+
+#### 4. Watch
+
+After one `--poll-interval` (30s by default), poll until it merges or until
+something says it will not. Each poll tests these in order and leaves on the
+first that matches:
+
+| Condition                          | Outcome                              |
+| :--------------------------------- | :----------------------------------- |
+| re-reading the pull request failed | `error` after 5 in a row, else retry |
+| `MERGED`                           | `merged`                             |
+| not `OPEN`                         | `closed`                             |
+| auto-merge switched off (\*)       | `auto-merge-disabled`                |
+| `skip-ci` went back on             | `skip-ci-labelled`                   |
+| head is not the commit pushed      | `head-moved`                         |
+| `BEHIND` / `DIRTY`                 | `behind-again`                       |
+| a required check failed            | `checks-failed`                      |
+| green, and only a bypass merges it | `awaiting-bypass`                    |
+| green for the whole budget         | `not-merging`                        |
+| past `--watch-timeout` (90m)       | `timeout`                            |
+| SIGINT / SIGTERM                   | `stopped`                            |
+
+(\*) Not read for one only a bypass merges (step 2, item 8), which is never
+armed.
+
+The order matters: a pull request whose label went back on, or whose branch
+moved, is one whose check results say nothing.
+
+**"Green" means the whole list the ruleset requires**, not the part of it that
+has reported. A required context with no check run on the head commit is not
+pending in the head's checks — it is _absent_ from them, so judging by what has
+reported writes a pull request off three minutes into a twenty-five minute
+matrix.
+
+**Nothing on the head may still be running**, required or not. A required
+aggregate has no run in a new round until the jobs it waits on are done, so
+until then `--required` answers with the round before, and when that round
+was the one `skip-ci` skipped, every aggregate reads `skipped` and the commit
+looks green halfway through its matrix (#2069 was set aside `not-merging` so).
+A failure is still acted on at once, unless it finished before the earliest
+check still running started: that one is the round before, and waits for the
+round to end. The round `skip-ci` cancels as `open-pr` opens a pull request
+leaves its aggregates red, and reading that red as this round's set the first
+real round aside halfway through (#2246 was set aside `checks-failed` so).
+So is a failure whose workflow has a newer run still running: when the round
+`skip-ci` was put on for is slow to cancel, its aggregate goes red after the
+round replacing it has started, and the time alone cannot tell them apart
+(#2463 was set aside `checks-failed` so).
+
+A pull request that is green and still open is held by something a rebase
+cannot fix, so it is given a budget of consecutive green polls. An unresolved
+conversation or a missing code-owner approval is caught by triage before
+release (step 2, item 8), so what reaches this point is anything else, such as
+auto-merge armed by someone who may not merge, or a rule this script does not
+read. The budget is three when GitHub itself calls it mergeable, eight while it still reads
+`BLOCKED`, because that combination is also what a check run that has just
+been superseded looks like for a moment.
+
+#### 4a. Fix a failure that is only a fixer's diff
+
+When the watch ends in `checks-failed`, the head's check runs are read down to
+the matrix jobs under the aggregates. Which failures can be fixed, and what
+fixes each, is the repository's `.github/unblock-prs.json`, under `autoFix`
+(schema: [`config.schema.json`](./config.schema.json), generated from
+`config.mts` by `gen:config-schema`). Without the file, or
+without `autoFix` in it, nothing is fixed, and the queue, rebasing,
+`Merge-After:`, stacks and set-aside comments work as ever. The label names,
+`Merge-After:` and the version pull request's branch
+(`changeset-release/<base>`) are conventions the PR Manager page reads too, so
+they are not configured.
+
+| Key       | Meaning                                                                                       |
+| :-------- | :-------------------------------------------------------------------------------------------- |
+| `ignore`  | regular expressions for failed contexts that are not read (aggregates)                        |
+| `before`  | commands run first, always (an install)                                                       |
+| `prepare` | commands run once after `before` when a context being fixed matches `context` (a build)       |
+| `fixers`  | every other failure has to match one `context`; the first that matches gives the `run` to run |
+| `after`   | commands run last, always (a formatter)                                                       |
+
+In `run`, `$1` to `$9` are `context`'s capture groups, shell-quoted. Fixers run
+by `stage`, lowest first, and within a stage by command.
+
+This repository's configuration fixes a failure when **every** job that failed
+is a `code-check (X)` or `style-check (X)` entry whose `X` is a `fix:` or
+`gen:` command (under `ws:` or `strict-lib:` too): every job ends with
+`z:assert-repo-is-clean`, so the failure is the command having rewritten
+files. Then, and only then:
+
+1. In a throwaway worktree, `pnpm install --frozen-lockfile`, and `ws:build`
+   when CI builds for one of the entries (every `code-check` entry, and
+   `ws:gen`). The worktree goes in `~/.local/state/unblock-prs/`. Not the OS
+   temp directory, which is often a tmpfs, and the pnpm store hard-links
+   `node_modules` only within one filesystem. Not the git directory or
+   `~/.cache` either, because `fix:fmt:diff` skips every file with a `.git`,
+   `.cache`, `dist`, `build` or `out` segment anywhere in its absolute path.
+2. Run the failed commands, generators first and formatters last, then
+   `fix:fmt:diff`.
+3. If anything changed, amend it onto the pull request's one commit and push
+   with `--force-with-lease` against the head that failed.
+4. Watch the new head. **The next pull request is not picked.**
+
+Nothing is done, and the pull request is set aside as `checks-failed` as
+before with the reason logged, when:
+
+- The repository configures no `autoFix`.
+- Any failed job is not a fixer (types, tests, `ws:doc`, `Validate commit
+count`, …). Pushing would run a matrix that fails anyway, so the whole of it
+  is left to the skill.
+- The branch is not one commit. Squashing writes a message, which is the
+  skill's to do.
+- A command failed, or none of them changed anything.
+- The head the fix pushed failed again. It is once per watch.
+
+It applies to the one pull request being watched, the one this cycle picked,
+and never to the other queued pull requests whose checks are failing.
+
+- **`ws:doc` is not a fixer.** What `doc` writes is untracked; what leaves the
+  tree dirty is a generator it calls, which `ws:gen` runs too, and it takes ten
+  minutes.
+- **oxfmt.** `fix:fmt:diff` is Prettier only and leaves `strict-lib/` alone.
+  Of the fixers only `strict-lib:fix:fmt` itself writes there, so when that
+  entry failed it is the command that runs.
+
+#### 5. Remember, and go round again
+
+A verdict lasts as long as the state it was reached in.
+
+| Recorded reason                   | Cleared by a push | Cleared when `main` moves |
+| :-------------------------------- | :---------------: | :-----------------------: |
+| `rebase-failed` (a real conflict) |         ✓         |             ✓             |
+| `push-failed`                     |         ✓         |             ✓             |
+| `unlabel-failed`                  |         ✓         |             ✓             |
+| `arm-failed`                      |         ✓         |             ✓             |
+| `already-in-base`                 |         ✓         |             ✓             |
+| `not-merging`                     |         ✓         |             ✓             |
+| `watch-timeout`                   |         ✓         |             ✓             |
+| `checks-failed`                   |         ✓         |    **✗ (deliberate)**     |
+| `awaiting-bypass`                 |         ✓         |    **✗ (deliberate)**     |
+
+So a conflict verdict is never cached across a base that moved: the commit it
+conflicted with may have gone with it. `checks-failed` is the exception —
+rebasing would put the same failing matrix through again, and fixing the
+failure is a person's job, so the push that carries the fix is what clears it.
+`awaiting-bypass` is not tied to the base either: the bypass merge it waits for
+does not wait for the base, and rebasing it each time anything else merged
+would run the matrix again for nothing. Its comment's retry box is how a person
+asks for a run on the current `main`.
+
+A `not-merging` pull request is also **picked last** from then on, after the
+version pull request, and this outlives the record. `main` moving clears the
+record and makes it a `BEHIND` candidate again. But what held it is something
+triage could not read, so it will most likely not merge next time either. Left
+at the front, it would run a matrix, sit green and be given up on each time
+anything else merged. It is moved back rather than excluded, because the
+guess is wrong for one whose cause has since cleared. The demotion lasts until
+**someone else pushes**: this script's own rebase, or a "4a" push, carries it
+along. It is kept in memory only, so a restart forgets it.
+
+A pull request this run acted on that has left the open list by the next
+survey is reported as merged or closed. Nothing else would notice one that
+merged minutes after the watch gave up on it.
+
+With nothing to do, the loop sleeps and surveys again, for how long depending
+on whether the list is still moving. It sleeps `--active-interval` (30s) until
+`--idle-after` (10) surveys in a row have seen the same open pull requests
+(head, merge state, labels, auto-merge, draft flag, body), the same reasons a
+review holds any of them, and the same tip of `main`, and `--idle-interval` (300s) from then on. Any change brings it back
+to the short interval, so a pull request queued a moment ago is not left for
+minutes.
+
+### Options
+
+| Option                    | Default | Meaning                                    |
+| :------------------------ | ------: | :----------------------------------------- |
+| `--once`                  |         | run one cycle and exit                     |
+| `--dry-run`               |         | survey and report, change nothing          |
+| `--active-interval <sec>` |      30 | wait between surveys while the list moves  |
+| `--idle-after <n>`        |      10 | unchanged surveys before the long wait     |
+| `--idle-interval <sec>`   |     300 | wait between surveys once it has sat still |
+| `--poll-interval <sec>`   |      30 | wait between polls of the watched one      |
+| `--watch-timeout <min>`   |      90 | give up on one pull request after this     |
+| `--no-auto-fix`           |         | skip the fix in "4a"                       |
+| `--repo <owner/name>`     |         | the repository, when `origin` is not it    |
+
+Each log line is stamped with the time in the machine's time zone, with its
+offset from UTC (`[2026-09-27T21:03:04.500+09:00]`). To read it in another
+zone, set `TZ`: `TZ=Asia/Tokyo pnpm run unblock-prs`.
+
+### Where a passed-over pull request shows
+
+This script runs on someone's machine and says everything it does on standard
+output. So each time it sets a pull request aside it also **writes a comment
+on that pull request** — one per pull request, edited in place from the second
+time on. The **GitHub Pull Requests Manager** page
+(<https://noshiro-pf.github.io/mono/pr-manager/>) reads it and shows it on
+the pull request, so finding out why one is not moving does not mean finding
+the terminal the script ran in.
+
+- **The first line is a hidden record for machines**
+  (`<!-- unblock-prs:set-aside reason=… head=… base=… -->`): the reason, and
+  the head's and the base's SHAs at the time. Its format is `set-aside.mts` in
+  `pr-report-core`, which this script and the page both read with. The prose
+  after it is for people and nothing reads it back (`set-aside-comment.mts`):
+  the reason's one sentence (`set-aside-detail.mts`: the failed checks for
+  `checks-failed`, what holds it for `not-merging`, what it was still waiting
+  on for `watch-timeout`, the conflicting files for `rebase-failed`), a link
+  to the run of each failed required check, what the failed command printed
+  (folded in `<details>`, its last 60 lines), and what will clear it.
+- **The last line is a "Retry" task box.** Ticking it has the next survey drop
+  the pull request's record and try it again (step 1b of "1"). Only those who
+  can write to the repository can tick a box in someone else's comment. A
+  `checks-failed` pull request that is up to date is only found failing and
+  set aside again; what clears that is a push.
+- **Only comments this account wrote count** (`viewerDidAuthor` in GraphQL):
+  the repository is public, and anyone can post a comment that starts with
+  the same hidden line. The page reads by the same rule.
+- **A comment, not the body**, because the author, a session and `open-pr`
+  write the body too, and the REST API has no conditional update to keep an
+  edit made in between; the version pull request's body is rewritten on every
+  push. **Not a commit status any more** (context `unblock-prs`, state
+  `failure`, as it was): that left a ✗ among the checks for a context nothing
+  requires, had 140 characters to say why, and could neither be taken off nor
+  asked to try again.
+- **This rather than GitHub's `mergeable`**, because that answers whether a
+  merge conflicts and this script rebases — the same reason it does not take
+  `DIRTY` at its word.
+- **Once it no longer applies it is rewritten as one resolved line**: the
+  head or the base moved (the head alone for `checks-failed` and
+  `awaiting-bypass`, by the rule `skips.mts` uses too, shared as
+  `setAsideApplies` in `pr-report-core`), or a retry was asked for. It is kept rather than deleted, so the timeline
+  keeps what happened. The page shows nothing for a comment whose head has
+  moved, and a moved base as a grey, older record.
+- It holds no merge.
+- It is written when a pull request is newly set aside, not again on every
+  survey that finds the same record standing; not at all under `--dry-run`;
+  and a comment that could not be written is logged and nothing more. It is
+  written as the token's account, so on a pull request that account opened the
+  author is not notified; a session subscribed to the pull request is woken
+  by it, and so learns its pull request was set aside.
+- The commit statuses written before cannot be deleted through the API; each
+  goes with its head at the next push, so they are left alone.
+
+A pull request waiting for a code owner the page works out for itself, from
+the paths it changes and `.github/CODEOWNERS`. This script works it out the
+same way and leaves that pull request in the queue (step 2, item 8). It writes
+no comment for it, because an approval puts it back in the running on the
+next survey. The exception is one only its author owns, whose checks are run
+and which gets an `awaiting-bypass` comment once they are green.
+
+### A session's claim on a set-aside pull request
+
+What this script sets aside, the `/unblock-prs` skill fixes — and so, at
+times, does the session that opened the pull request. If this script tried
+the same pull request again meanwhile (`main` moved, the "Retry" box was
+ticked), the same conflict would be resolved in two places. So whoever fixes
+one writes a **claim** first (`pnpm run claim-pr -- <number> --by <name>`).
+
+- Its format is `claim.mts` in `pr-report-core`: a comment whose first line is
+  `<!-- unblock-prs:claim head=… by=… at=… -->`. Like the set-aside comment
+  it is one per pull request, edited in place, and only this account's count;
+  `by` tells apart the claimants writing as that one account.
+- **It holds while the head is the one it claimed, for at most 120
+  minutes.** The push carrying the fix moves the head, which ends it and hands
+  the pull request back to this script, as a push always did. The 120 minutes
+  are for a session that stopped without pushing; one that needs longer writes
+  the claim again, and one that gives up runs it with `--release`.
+- While a claim holds, the pull request is not picked, not rebased by "3a",
+  and its labels are left alone: the skill puts `skip-ci` on before it
+  pushes.
+- `claim-pr` refuses a pull request whose owner is not a skill — this script
+  is about to move it, or a person has to — and one another claimant holds.
+  It reads back after writing, and fails when someone writing in the same
+  moment won.
+- `owner` on each entry of `pnpm run pr-report -- --format json` is what the
+  skill reads to choose what to fix.
+
+### Who owns a pull request in the queue
+
+Every pull request in the queue (`merge-queued`, or `skip-ci` with
+`auto-rebase`) has exactly one owner, who moves it next. Only
+`pr-report-core`'s `queueOwner` (`queue-owner.mts`) decides it, and this
+script (`owner.mts`), `pr-report`, `claim-pr`, `push-fixed-pr` and
+`report-unowned-prs` (`pr-report/queue.mts`) all pass it the same facts.
+This script and the skill used to judge whether a set-aside still stood
+against their own reading of `main`, and when the readings differed each found
+the pull request the other's and nobody moved it (#2267).
+
+| `owner`  | who moves it next                                                                                                 |
+| :------- | :---------------------------------------------------------------------------------------------------------------- |
+| `worker` | this script: waiting its turn, a layer of a stack, a set-aside resolved                                           |
+| `skill`  | the `/unblock-prs` skill: claimed, or set aside `rebase-failed` / `checks-failed`, the dependency update included |
+| `human`  | a person: a draft, a fork, a cycle, a bypass merge, a setting or a permission                                     |
+| `none`   | nobody: a state the rules do not cover, which is a bug in the tooling                                             |
+
+- **It reads the comments and the pull request, never the tip of the base.**
+  The set-aside comment is the hand-off: until this script rewrites it as
+  resolved — the head moved, a retry was asked for, or `main` moved under a
+  reason tied to the base — the pull request is a skill's or a person's. A
+  stopped script leaves it so, rather than nobody's.
+- `setAsideOwner` gives every reason an owner. The list of reasons
+  (`SET_ASIDE_REASONS`) is beside it and this script writes from it, so a
+  reason with no owner does not compile. `none` is a reason in a comment that
+  module does not know.
+- The dependency update (`chore/pnpm-update`) is the skill's like any other,
+  except that a `rebase-failed` on it is not rebased:
+  `pnpm run rebuild-pnpm-update` has `pnpm-update.yml` build it again from the
+  tip of `main`. The branch is generated, lockfile and all, and nothing checks
+  that a conflict resolved by hand was resolved under `minimumReleaseAge`.
+- `pnpm run report-unowned-prs` files an issue for each `none`, one per pull
+  request, found again by a hidden line in its body. The `/unblock-prs` skill
+  runs it every round.
+
+### Layout
+
+| File                    | Role                                                          |
+| :---------------------- | :------------------------------------------------------------ |
+| `main.mts`              | the loop and the command line (entry point)                   |
+| `triage.mts`            | what one survey says about each pull request (the reading)    |
+| `merge-after.mts`       | what the declared order says about picking                    |
+| `stack.mts`             | stacked pull requests — when they wait, arm, move and restack |
+| `version-pr.mts`        | the version pull request, and what holds it back              |
+| `rebase.mts`            | moving a branch — the worktree rebase, the label removal      |
+| `release.mts`           | holding the queue to one released pull request                |
+| `watch.mts`             | polling one pull request until it merges, or will not         |
+| `auto-fix.mts`          | fixing and pushing a failure that is only a fixer's diff      |
+| `config.mts`            | reading `.github/unblock-prs.json`                            |
+| `quiet.mts`             | how long to sleep when there is nothing to do                 |
+| `checks.mts`            | what the merge is waiting for                                 |
+| `claims.mts`            | the claims sessions wrote that still hold                     |
+| `owner.mts`             | who owns each pull request (`pr-report-core`'s `queueOwner`)  |
+| `github.mts`            | everything that reads or writes GitHub or `git`               |
+| `labels.mts`            | what the labels say about a pull request                      |
+| `skips.mts`             | what the loop remembers, for how long, and what comments say  |
+| `set-aside-comment.mts` | the prose of the set-aside comment                            |
+| `demotions.mts`         | how long one that sat green without merging goes last         |
+| `options.mts`           | the command line                                              |
+| `types.mts`             | the shapes every module passes around                         |
+| `constants.mts`         | how long it waits, and how long before it gives up            |
+| `util.mts`              | the stop signal                                               |
+
+The API client (`rest()`, `graphqlQuery()`), the runner for `git` (`git()`),
+the quoting (`sh()`) and the log line (`log()`) are used by `open-pr` and the
+other commands too, and live in `../lib/`.
+
+The trailer parser, the cycle detection, which pull request is stacked on
+which, the label strings, the `CODEOWNERS` rules, the set-aside comment's
+hidden record and task box, and triage's decisions themselves — where each
+pull request stands in the queue, whether its review holds it, and the order
+candidates are picked in (`queue-order.mts` and `review-hold.mts`) — are in
+`libs/pr-report-core`, shared with the Pull Requests Manager page, which draws
+the same queue. `triage.mts` only reads, from GitHub and `git`, what those
+decisions ask for.
+
+There is no `index.mts`: `ws:gen` only walks workspace members and `tools/` is
+deliberately not one, so a barrel here would be hand-maintained for nothing.

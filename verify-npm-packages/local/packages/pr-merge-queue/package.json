@@ -1,0 +1,9 @@
+{
+  "name": "verify-pr-merge-queue",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "pr-merge-queue": "file:../../../.tarballs/pr-merge-queue.tgz"
+  }
+}

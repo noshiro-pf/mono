@@ -92,7 +92,7 @@ export const getStagedFiles = async (
  * `base` is the only caller-supplied value this module puts on a git
  * invocation, which makes the two properties above the ones to preserve: see
  * {@link execGit} for why they are handled as data rather than as text, and
- * `tools/scripts/cmd/unblock-prs/util.mts` in this repository for the same
+ * `libs/pr-merge-queue/src/unblock-prs/util.mts` in this repository for the same
  * leading-`-` rule applied to refs from an untrusted source.
  */
 export const getDiffFrom = async (

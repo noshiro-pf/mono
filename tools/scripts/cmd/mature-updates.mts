@@ -499,7 +499,7 @@ const describeSelection = (
 const stripTagPrefix = (tag: string): string => tag.replace(/^v/u, '');
 
 /**
- * Not `tools/scripts/lib/github-api.mts`, which every other command calls the
+ * Not `libs/pr-merge-queue/src/lib/github-api.mts`, which every other command calls the
  * API through: it imports `ts-data-forge`, and this runs before
  * `pnpm install` (see `main`). The token is read in the same order.
  */

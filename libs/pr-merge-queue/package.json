@@ -1,0 +1,120 @@
+{
+  "name": "pr-merge-queue",
+  "version": "0.0.0",
+  "private": false,
+  "description": "A merge queue for GitHub driven by labels and `Merge-After:` trailers: unblock-prs lands the queued pull requests one at a time, open-pr opens one the way the queue wants it, and pr-report, claim-pr, push-fixed-pr and report-unowned-prs read and hand over the queue",
+  "keywords": [
+    "github",
+    "pull-request",
+    "merge-queue",
+    "stacked-pull-requests",
+    "cli"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "libs/pr-merge-queue"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/entry-point.d.mts",
+        "default": "./dist/entry-point.mjs"
+      },
+      "default": {
+        "types": "./dist/entry-point.d.mts",
+        "default": "./dist/entry-point.mjs"
+      }
+    }
+  },
+  "module": "./dist/entry-point.mjs",
+  "types": "./dist/entry-point.d.mts",
+  "bin": {
+    "claim-pr": "./dist/cmd/claim-pr.mjs",
+    "open-pr": "./dist/cmd/open-pr.mjs",
+    "pr-report": "./dist/cmd/pr-report.mjs",
+    "push-fixed-pr": "./dist/cmd/push-fixed-pr.mjs",
+    "report-unowned-prs": "./dist/cmd/report-unowned-prs.mjs",
+    "unblock-prs": "./dist/cmd/unblock-prs.mjs"
+  },
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",
+    "check:cspell": "cspell \"**\" --gitignore --gitignore-root ../../ --no-progress",
+    "check:dist": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-dist.mts",
+    "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
+    "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
+    "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest:node run",
+    "check:test:cov": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest:node run --coverage",
+    "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "doc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-docs.mts",
+    "fix:codemod": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --uncommitted --transformer append-as-const --transformer convert-to-readonly '{src,scripts,samples}/**/*.mts' && pnpm run fix:fmt",
+    "fix:codemod:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --diff-from origin/main --transformer append-as-const --transformer convert-to-readonly '{src,scripts,samples}/**/*.mts' && pnpm run fix:fmt",
+    "fix:codemod:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --transformer append-as-const --transformer convert-to-readonly '{src,scripts,samples}/**/*.mts' && pnpm run fix:fmt",
+    "fix:fmt": "pnpm run z:format-uncommitted --cwd .",
+    "fix:fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
+    "fix:fmt:full": "prettier --write .",
+    "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
+    "fmt": "pnpm run fix:fmt",
+    "gen": "run-s gen:index gen:config-schema",
+    "gen:config-schema": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-config-schema.mts",
+    "gen:index": "run-s gen:index:src fix:fmt",
+    "gen:index:src": "pnpm run z:gen-index-ts ./src/lib,./src/open-pr,./src/unblock-prs,./src/pr-report,./src/claim-pr,./src/push-fixed-pr,./src/report-unowned-prs --index-ext .mts --export-ext .mjs --target-ext .mts",
+    "test": "pnpm run check:test",
+    "watch:test": "pnpm run z:vitest:node watch",
+    "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
+    "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
+    "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts",
+    "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts",
+    "z:vitest": "vitest --config ./configs/vitest.config.mts",
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
+  },
+  "dependencies": {
+    "dedent": "^1.7.2",
+    "pr-report-core": "workspace:^",
+    "ts-data-forge": "workspace:^",
+    "ts-fortress": "workspace:^",
+    "ts-repo-utils": "workspace:^",
+    "ts-type-forge": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "cspell": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "eslint-plugin-ts-fortress": "workspace:*",
+    "eslint-plugin-ts-type-forge": "workspace:*",
+    "jiti": "catalog:",
+    "npm-run-all2": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "typescript-native": "npm:typescript@7.0.2",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.22.2",
+    "pnpm": ">=9.0.0"
+  },
+  "volta": {
+    "node": "26.12.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

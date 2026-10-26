@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
 import { setTimeout as sleep } from 'node:timers/promises';
+import { parseCommandArgs } from 'pr-merge-queue';
 import {
   Arr,
   isRecord,
@@ -10,7 +11,6 @@ import {
 } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { parseCommandArgs } from '../lib/cli-args.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**

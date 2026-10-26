@@ -260,7 +260,7 @@ jobs:
           # "The label call succeeded" and "the label is on now" are not the
           # same claim, and this is the one decision that lands on `main`;
           # `pnpm run open-pr` refuses here for the same reason, see
-          # tools/scripts/cmd/open-pr/README.md.
+          # libs/pr-merge-queue/src/open-pr/README.md.
           #
           # A run over a pull request that already exists does not put
           # `skip-ci` back on. A label already taken off was taken off to

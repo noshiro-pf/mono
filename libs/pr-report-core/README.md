@@ -12,10 +12,10 @@ npm add pr-report-core
 
 Two readers share it, so they cannot disagree:
 
-| reader                                                                              | reads GitHub through | runs in                    |
-| :---------------------------------------------------------------------------------- | :------------------- | :------------------------- |
-| [GitHub Pull Requests Manager](https://noshiro-pf.github.io/mono/pr-manager/)       | GraphQL              | the browser, on every read |
-| `unblock-prs`, `open-pr` and `pr-report` (`noshiro-pf/mono`'s `tools/scripts/cmd/`) | REST and GraphQL     | a terminal, or an agent    |
+| reader                                                                                     | reads GitHub through | runs in                    |
+| :----------------------------------------------------------------------------------------- | :------------------- | :------------------------- |
+| [GitHub Pull Requests Manager](https://noshiro-pf.github.io/mono/pr-manager/)              | GraphQL              | the browser, on every read |
+| `unblock-prs`, `open-pr` and `pr-report` ([`pr-merge-queue`](../pr-merge-queue/README.md)) | REST and GraphQL     | a terminal, or an agent    |
 
 ## Example
 
