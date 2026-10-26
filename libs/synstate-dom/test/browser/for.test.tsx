@@ -288,6 +288,95 @@ describe(For, () => {
     expect(warn).not.toHaveBeenCalled();
   });
 
+  test('makes index$ only for a children that declares it', () => {
+    const [items$, setItems] = createState<readonly string[]>(['a', 'b']);
+
+    const mut_arguments: number[] = [];
+
+    const { container } = mountInto(() => (
+      <For items={items$} key={(s) => s}>
+        {(...args: readonly [InitializedObservable<string>]) => {
+          mut_arguments.push(args.length);
+
+          return <i>{args[0]}</i>;
+        }}
+      </For>
+    ));
+
+    setItems(['b', 'a', 'c']);
+
+    assert.deepStrictEqual(mut_arguments, [1, 1, 1]);
+
+    assert.strictEqual(container.textContent, 'bac');
+  });
+
+  test('an update that keeps the order moves no node', () => {
+    const { container, setItems, text } = setup([item('a'), item('b')]);
+
+    const observer = new MutationObserver(() => {});
+
+    observer.observe(container, { childList: true, subtree: true });
+
+    setItems([item('a', 'apple'), item('b', 'banana')]);
+
+    assert.deepStrictEqual(observer.takeRecords(), []);
+
+    observer.disconnect();
+
+    assert.strictEqual(text(), '0:apple 1:banana');
+  });
+
+  test('replacing every row keeps the nodes around the list', () => {
+    const [items$, setItems] = createState<readonly string[]>(['a', 'b']);
+
+    const [suffix$, setSuffix] = createState('!');
+
+    const mut_runs = { current: 0 };
+
+    const { container } = mountInto(() => (
+      <ul>
+        <li>{constant('head')}</li>
+        <For items={items$} key={(s) => s}>
+          {(item$) => (
+            <li>
+              {view(suffix$, (s) => {
+                mut_runs.current += 1;
+
+                return `${item$.getSnapshot().value}${s}`;
+              })}
+            </li>
+          )}
+        </For>
+        <li>{constant('tail')}</li>
+      </ul>
+    ));
+
+    const texts = (): readonly string[] =>
+      Array.from(container.querySelectorAll('li'), (li) => li.textContent);
+
+    const [, a] = container.querySelectorAll('li');
+
+    setItems(['c', 'd']);
+
+    assert.deepStrictEqual(texts(), ['head', 'c!', 'd!', 'tail']);
+
+    assert.strictEqual(a?.isConnected, false);
+
+    setItems([]);
+
+    assert.deepStrictEqual(texts(), ['head', 'tail']);
+
+    const before = mut_runs.current;
+
+    setSuffix('?');
+
+    assert.strictEqual(mut_runs.current, before);
+
+    setItems(['e']);
+
+    assert.deepStrictEqual(texts(), ['head', 'e?', 'tail']);
+  });
+
   test('unmounting removes every row', () => {
     const { container, unmount } = setup([item('a'), item('b')]);
 

@@ -59,7 +59,7 @@ description: js-framework-benchmark の操作と、値どうしが diamond で�
 
 この計測では、synstate-dom は操作によって Solid の <!-- benchmark:reference-min -->1.10<!-- /benchmark --> 倍から <!-- benchmark:reference-max -->1.36<!-- /benchmark --> 倍の時間がかかった。どの操作でも最速ではない。ほかのライブラリより速い操作と遅い操作は上の表にある。
 
-- **行の作成**は、コンパイラがないことが最も表れるところである。Solid は行ごとにコンパイル済みの `<template>` を複製する。synstate-dom はノードごとに `createElement` を呼び、動的な葉をそれぞれ購読で束縛する。行ごとに要素と位置のための synstate のノードも 2 つ作り（[制御構文](/mono/synstate-dom/ja/guides/control-flow/#for)の `For` を参照）、行の作成と破棄の時間はノード数にほぼ比例して増える。
+- **行の作成**は、コンパイラがないことが最も表れるところである。Solid は行ごとにコンパイル済みの `<template>` を複製する。synstate-dom はノードごとに `createElement` を呼び、動的な葉をそれぞれ購読で束縛する。行ごとに要素のための synstate のノードも作り（位置を受け取る行ではもう 1 つ作るが、この表は受け取らない。[制御構文](/mono/synstate-dom/ja/guides/control-flow/#for)の `For` を参照）、行の作成と破棄の時間はノード数にほぼ比例して増える。
 - **部分更新**は実装によって経路が違う。Solid・Preact + Signals・VanJS はラベルごとに signal を持ち、変わる 100 個に書き込む。synstate-dom はドキュメントが勧めるとおり配列全体を置き換え、各行の `item$` が前回の要素と比べて、要素が変わった 100 行だけが DOM に書き込む。Preact と React は新しい状態から表を再描画し、props が変わった `memo` の行だけが描画し直される。
 - **行の選択**は、Solid では `createSelector` によって 2 行だけに触れ、Preact と React では `memo` の行 2 つを再描画する。synstate-dom では各行が選択状態を `view` で束縛しているので 1,000 個の `view` がすべて実行され、各行のクラスが切り替えられる。Preact + Signals も同様に行ごとの `useComputed` を再計算する。
 

@@ -9,6 +9,7 @@ import {
   type Scope,
 } from 'synstate';
 import { Arr, Optional } from 'ts-data-forge';
+import type { BivariantHack } from 'ts-type-forge';
 import { toObservable, type Bindable } from '../constant/index.mjs';
 import { bindValue } from '../internal/index.mjs';
 import { mountable, toNodes, type JSX } from '../jsx/index.mjs';
@@ -19,11 +20,16 @@ import { longestIncreasingSubsequence } from './longest-increasing-subsequence.m
  * (SPEC.md 8.4).
  *
  * `children` is called once per key, inside a scope of the row's own, with
- * observables of the element and its index. A row whose key stays is not
- * rebuilt: its `item$` and `index$` are derived from `items`, so they update
- * in the ordinary propagation, and nothing is written during it. A key that
- * goes disposes its row's scope and removes its nodes; the rows that stay
- * are moved as little as the longest increasing subsequence allows.
+ * observables of the element and its index. The index is made only for a
+ * `children` that declares a second parameter (`children.length >= 2`); one
+ * that reads it otherwise, through a rest parameter or `arguments`, is given
+ * `undefined`.
+ *
+ * A row whose key stays is not rebuilt: its `item$` and `index$` are derived
+ * from `items`, so they update in the ordinary propagation, and nothing is
+ * written during it. A key that goes disposes its row's scope and removes its
+ * nodes; the rows that stay are moved as little as the longest increasing
+ * subsequence allows.
  *
  * `key` is required, as in React; `(_, i) => i` matches rows by position. A
  * key that appears twice is reported with `console.error`, and its later
@@ -50,6 +56,18 @@ export const For = <T,>({
       map((list) => toEntries(list, key)),
     );
 
+    // `index$` is a node of its own in every row, visited on every update of
+    // `items`; a `children` that declares no second parameter is not given
+    // one, as Solid's `For` does.
+    const usesIndex = children.length >= 2;
+
+    const callChildren: BivariantHack<
+      (
+        item$: InitializedObservable<T>,
+        index$?: InitializedObservable<number>,
+      ) => JSX.Element
+    > = children;
+
     const mut_rows = new Map<unknown, Row>();
 
     const rowStarts = new WeakSet<Node>();
@@ -70,9 +88,15 @@ export const For = <T,>({
       const nodes = scope.run(() => {
         const item$ = rowField(entries$, rowKey, entry.item, (e) => e.item);
 
-        const index$ = rowField(entries$, rowKey, entry.index, (e) => e.index);
-
-        return toNodes(children(item$, index$).mount());
+        return toNodes(
+          (usesIndex
+            ? callChildren(
+                item$,
+                rowField(entries$, rowKey, entry.index, (e) => e.index),
+              )
+            : callChildren(item$)
+          ).mount(),
+        );
       });
 
       const row: Row = { scope, start } as const;
@@ -105,8 +129,44 @@ export const For = <T,>({
       return mut_nodes;
     };
 
+    /**
+     * When no key stays, takes every row's nodes out in one range, rather than
+     * one by one as each row's scope is disposed: clearing or replacing the
+     * whole list is then one DOM operation. The scopes are disposed after,
+     * and find their nodes already detached.
+     */
+    const removeAllAtOnceIfEveryKeyGoes = (
+      previousOrder: readonly unknown[],
+      entries: Entries<T>,
+    ): void => {
+      if (
+        !Arr.isNonEmpty(previousOrder) ||
+        previousOrder.some((rowKey) => entries.byKey.has(rowKey))
+      ) {
+        return;
+      }
+
+      const first = mut_rows.get(previousOrder[0]);
+
+      if (first === undefined) {
+        return;
+      }
+
+      const range = document.createRange();
+
+      range.setStartBefore(first.start);
+
+      range.setEndBefore(anchor);
+
+      range.deleteContents();
+    };
+
     bindValue(entries$, (entries) => {
       const previousOrder = Array.from(mut_rows.keys());
+
+      if (anchor.parentNode !== null) {
+        removeAllAtOnceIfEveryKeyGoes(previousOrder, entries);
+      }
 
       for (const [rowKey, row] of mut_rows) {
         if (entries.byKey.has(rowKey)) {
@@ -125,6 +185,10 @@ export const For = <T,>({
           return entry === undefined ? [] : createRow(rowKey, entry);
         });
 
+        return;
+      }
+
+      if (Arr.eq(previousOrder, entries.order)) {
         return;
       }
 

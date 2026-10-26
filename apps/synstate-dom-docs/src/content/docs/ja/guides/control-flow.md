@@ -108,10 +108,10 @@ export const Table = (): JSX.Element => (
 );
 ```
 
-- `items: Bindable<readonly T[]>`、`key: (item: T, index: number) => unknown`、子は関数 `(item$, index$) => JSX.Element`。
+- `items: Bindable<readonly T[]>`、`key: (item: T, index: number) => unknown`、子は関数 `(item$, index$) => JSX.Element`。`index$` は、Solid と同じく関数が第 2 引数を宣言しているときだけ作られる。位置を使わない行は省けば、行ごとに作るノードも更新で走るノードも 1 つ減る。
 - `key` は React と同じく必須。位置で対応づけるときは `key={(_, i) => i}` と明示する。専用の `Index` コンポーネントはない。
 - 行の関数はキーごとに 1 回だけ実行される。配列が変わると、既存の行は `items` から派生した `item$` と `index$` を通して新しい要素と位置を受け取り、行の関数は再び呼ばれない。新しいキーには新しい行を作り、キーが消えた行はスコープを破棄してノードを外す。
-- 行の並べ替えは、最長増加部分列で移動を最小にする。
+- 行の並べ替えは、最長増加部分列で移動を最小にする。どのキーも同じ位置に残る更新では何も動かさず、残るキーが 1 つもない更新（全消去や全置き換え）では古い行のノードをまとめて外す。
 - 同じキーが 2 つ以上あると、React と同じく `console.error` で知らせる。壊れはしないが、重複した行は更新のたびに作り直される。
 
 ## `Portal`
