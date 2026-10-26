@@ -75,7 +75,14 @@ GitHub Actions を選び、次を登録する。
 | Organization / user | `noshiro-pf`  |
 | Repository          | `mono`        |
 | Workflow filename   | `release.yml` |
-| Environment         | 空欄          |
+| Environment         | `release`     |
+
+**Environment は空欄にしないこと。** Release job は `environment: release` で
+動き、その environment は `main` からしか使えない
+（`repo-settings/environments/release.json`）。npm 側にも `release` を入れて
+初めて、`main` 以外の ref から動いた `release.yml` の publish を npm が拒否する。
+空欄でも publish は通ってしまうので、入れ忘れはどこにも現れない。理由の詳細は
+`.github/workflows/release.yml` の `environment` のコメントにある。
 
 **この手順を飛ばすと、Release は次のように落ちる。**
 
@@ -135,7 +142,7 @@ git タグも失敗したパッケージの分だけが作られる。
 - [ ] `repository.directory` がパッケージのパスを指している
 - [ ] Release PR をマージする**前**に手動 publish した
 - [ ] `pnpm publish`（`npm publish` ではない）を使った
-- [ ] trusted publisher を設定した（飛ばすと Release が 404 で落ちる）
+- [ ] trusted publisher を設定した（Environment は `release`。飛ばすと Release が 404 で落ちる）
 - [ ] 公開後、まっさらなディレクトリで実際にインストールして動かした
 
 最後の項目は省略しないこと。`ts-codemod-lib` の CLI は
