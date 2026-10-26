@@ -162,6 +162,12 @@ export const licensePolicy = {
       reason:
         'Asks for nothing, but is not OSI-approved and has no warranty disclaimer, so it is on no standard allow-list and does not belong on this one as a class. A `textlint` formatter’s dependency, and a word list cspell loads when it runs (whose LICENSE file was already WTFPL; 4.1.7 corrected a `license` field that said MIT). Tooling only, unmodified, not redistributed.',
     },
+    {
+      license: 'Unlicense',
+      packages: ['markdown-it-anchor'],
+      reason:
+        'A public-domain dedication with a fallback grant to anyone for any purpose and no conditions, not even a notice. Kept off `allowed` as a class because, unlike CC0, it says nothing about jurisdictions where copyright cannot be waived (Japan among them), and leans on its grant sentence there. Reached only through the root devDependency `zenn-cli` (via `zenn-markdown-html`), which renders the Zenn preview locally; up to 0.5.4 `zenn-cli` bundled it into its own `dist/`, so it is not new code, only newly visible. Tooling only, unmodified, not redistributed.',
+    },
   ],
 } as const satisfies LicensePolicy;
 
