@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!--
+    A balance rising over the years on a pair of axes: the simulation's
+    chart, on the page's accent blue (the `accent` custom property in
+    `src/index.css`). Fixed colours rather than following the theme, because
+    the icon sits on the browser's tab strip, not on the page.
+
+    Never two hyphens in a row inside this comment: XML forbids them there,
+    and a browser then rejects the whole file and shows no icon.
+  -->
+  <rect width="32" height="32" rx="7" fill="#0969da" />
+  <g
+    fill="none"
+    stroke="#fff"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M7 6.5V25h18.5" stroke-width="2" stroke-opacity="0.6" />
+    <path d="M10 20.5l4.5-4.5l3.5 2.5l6-7.5" stroke-width="2.4" />
+  </g>
+  <circle cx="24" cy="11" r="2.6" fill="#fff" />
+</svg>
