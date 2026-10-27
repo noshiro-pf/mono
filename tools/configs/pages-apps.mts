@@ -16,8 +16,16 @@ import type { FixedLengthTuple } from 'ts-type-forge';
  * reason as `app-dev-ports.mts`.
  */
 const pagesApps = {
+  'annotation-tool': 'annotation-tool',
+  'cant-stop-probability-app': 'cant-stop-probability',
+  'catan-dice-app': 'catan-dice',
+  'color-demo-app': 'color-demo',
+  'housing-loan-calculator-app': 'housing-loan-calculator',
+  'lambda-calculus-interpreter-preact': 'lambda-calculus-interpreter-preact',
+  'lambda-calculus-interpreter-react': 'lambda-calculus-interpreter-react',
   'life-plan-simulator': 'life-plan-simulator',
   'pr-manager-app': 'pr-manager',
+  'profile-app': 'profile',
   'task-manager-app': 'task-manager',
 } as const;
 
@@ -26,6 +34,9 @@ const pagesApps = {
  * under the repository name rather than at the domain root.
  */
 export const PAGES_SITE_ROOT = '/mono/';
+
+/** The host the Pages site is served from. */
+export const PAGES_SITE_ORIGIN = 'https://noshiro-pf.github.io';
 
 /** Where the app rooted at `packageRoot` is served from, e.g. `pr-manager`. */
 export const pagesAppDir = (packageRoot: string): string => {
@@ -43,6 +54,10 @@ export const pagesAppDir = (packageRoot: string): string => {
 /** The same, as the URL prefix Vite writes into the built `index.html`. */
 export const pagesAppBase = (packageRoot: string): string =>
   `${PAGES_SITE_ROOT}${pagesAppDir(packageRoot)}/`;
+
+/** The same, as the whole URL a page is reached at, e.g. for `og:url`. */
+export const pagesAppUrl = (packageRoot: string): string =>
+  `${PAGES_SITE_ORIGIN}${pagesAppBase(packageRoot)}`;
 
 /** Every published app, as `[package directory, site directory]` pairs. */
 export const pagesAppEntries = (): readonly FixedLengthTuple<2, string>[] =>

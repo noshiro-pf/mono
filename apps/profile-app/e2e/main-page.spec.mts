@@ -67,3 +67,39 @@ test('tab 5', { tag: '@smoke' }, async ({ page }) => {
 
   await expect.soft(heading.nth(0)).toHaveText('執筆物');
 });
+
+test('the root opens the first tab', { tag: '@smoke' }, async ({ page }) => {
+  await page.goto('/');
+
+  await expect.soft(page).toHaveURL(/\/mono\/profile\/career\/$/u);
+});
+
+test(
+  'a tab is a path below the base path, and survives a reload',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/');
+
+    await page.getByTestId('tabs').getByTestId('tab-2').click();
+
+    await expect.soft(page).toHaveURL(/\/mono\/profile\/skills\/$/u);
+
+    await page.reload();
+
+    await expect
+      .soft(page.getByTestId('root').getByRole('heading').nth(0))
+      .toHaveText('スキル');
+  },
+);
+
+test(
+  'a tab opens directly by its path',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/mono/profile/writings/');
+
+    await expect
+      .soft(page.getByTestId('root').getByRole('heading').nth(0))
+      .toHaveText('執筆物');
+  },
+);

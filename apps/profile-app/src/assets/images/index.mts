@@ -8,4 +8,4 @@ export { default as EventScheduleAppImage } from './event_schedule_app.png';
 export { default as HousingLoanCalculatorAppImage } from './housing_loan_calculator_app.png';
 export { default as LambdaInterpreterAppImage } from './lambda_interpreter_app.png';
 export { default as MnistAppImage } from './mnist_app.png';
-export { default as MyPortfolioAppImage } from './my-portfolio-app.png';
+export { default as ProfileAppImage } from './profile_app.png';

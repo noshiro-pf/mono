@@ -1810,6 +1810,21 @@ npm 依存は増やしていない。app のディレクトリで
 `pnpm dlx firebase-tools deploy --only hosting` を叩けば、`firebase.json` と
 `.firebaserc` だけで通る。
 
+### GitHub Pages への移行（2026-10-27）
+
+上の表のうち DB を使わない 8 app（`algo-app` 以外）は、GitHub Pages の
+`https://noshiro-pf.github.io/mono/<dir>/` に移した（#2161）。`<dir>` は
+`tools/configs/pages-apps.mts` が決め、`deploy-pages.yml` が `main` への push
+ごとに公開する。Firebase の project は移行期間のあいだ残し、旧 URL から Pages へ
+転送する redirect だけを一度デプロイする。その `firebase.json` と
+`.firebaserc` は project を削除するときに一緒に消す
+（`pnpm run check:root:firebase-redirects` が中身と対を確かめる）。上の「既知の衝突」は
+これで解け、`lambda-calculus-interpreter-preact` と `-react` は別のディレクトリに
+両方載る。
+
+`my-portfolio-app-preact` はこのとき `profile-app` に改名した。この文書の
+それより前の節は、当時の名前のまま残す。
+
 ## 移動の取りこぼし 2 件（2026-09-07）
 
 復元が一通り終わったところで `experimental/` を両方向に突き合わせた。

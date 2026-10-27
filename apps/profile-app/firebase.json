@@ -1,0 +1,12 @@
+{
+  "hosting": {
+    "public": "public",
+    "redirects": [
+      {
+        "regex": "^/(.*)$",
+        "destination": "https://noshiro-pf.github.io/mono/profile/:1",
+        "type": 301
+      }
+    ]
+  }
+}

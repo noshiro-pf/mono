@@ -3,7 +3,11 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, isRecord, Result, unknownToString } from 'ts-data-forge';
 import { glob, isDirectlyExecuted } from 'ts-repo-utils';
-import { PAGES_SITE_ROOT, pagesAppEntries } from '../../configs/pages-apps.mjs';
+import {
+  PAGES_SITE_ORIGIN,
+  PAGES_SITE_ROOT,
+  pagesAppEntries,
+} from '../../configs/pages-apps.mjs';
 import {
   type AppHead,
   linkTargets,
@@ -245,8 +249,6 @@ const hasDoubleHyphenInComment = (svg: string): boolean =>
   svg
     .matchAll(/<!--(?<body>[\s\S]*?)-->/gu)
     .some((matched) => matched.groups?.['body']?.includes('--') === true);
-
-const PAGES_SITE_ORIGIN = 'https://noshiro-pf.github.io';
 
 const listBrowserAppDirs = async (): Promise<
   Result<readonly string[], string>

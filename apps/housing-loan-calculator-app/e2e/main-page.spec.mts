@@ -173,3 +173,35 @@ test('config 2', { tag: '@smoke' }, async ({ page }) => {
 
   await expect.soft(paymentsSumDescription).toHaveText('3030.92万円');
 });
+
+test(
+  'the settings stay in the address below the base path, across a reload',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/');
+
+    const {
+      numericInputDownPaymentManYen,
+      numericInputPropertyPriceManYen,
+      borrowingTotalYenDescription,
+    } = getElements(page);
+
+    // Not the defaults (200 and 2780), so that the address has to change.
+    await numericInputDownPaymentManYen.fill('100');
+
+    await numericInputPropertyPriceManYen.fill('3000');
+
+    // An input commits its value when it loses focus.
+    await numericInputPropertyPriceManYen.blur();
+
+    await expect.soft(borrowingTotalYenDescription).toHaveText('2900万円');
+
+    // The query string is written to the app's own page on the Pages site,
+    // not to the site's root.
+    await expect.soft(page).toHaveURL(/\/mono\/housing-loan-calculator\/\?/u);
+
+    await page.reload();
+
+    await expect.soft(borrowingTotalYenDescription).toHaveText('2900万円');
+  },
+);

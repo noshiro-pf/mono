@@ -19,9 +19,8 @@ import { projectRootPath } from '../project-root-path.mjs';
  *   index.html            a list of what is here
  *   synstate/             the hand-written documentation site (Astro)
  *   synstate-dom/         the same, for synstate-dom
- *   life-plan-simulator/  the life plan simulator app (Vite)
- *   pr-manager/           the Pull Requests Manager app (Vite)
- *   task-manager/         the task manager app (Vite)
+ *   pr-manager/           the Pull Requests Manager app (Vite), and one
+ *   …                     directory for each other app in `pages-apps.mts`
  *   ts-data-forge/        TypeDoc output
  *   …
  * ```

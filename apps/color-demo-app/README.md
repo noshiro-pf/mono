@@ -4,6 +4,8 @@ The demo page for picking N colours that stay easy to tell apart. It shows the
 generated palette against the contrast thresholds, using the `color/` half of
 `ts-utils-additional`.
 
+<https://noshiro-pf.github.io/mono/color-demo/>
+
 Written for the article
 [見分けやすい N 色をうまく選ぶ関数を作ったよ](https://qiita.com/pikohideaki/items/59415524503f833ce41e).
 

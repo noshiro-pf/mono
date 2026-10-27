@@ -2,6 +2,11 @@
 import { createState, map, type InitializedObservable } from 'synstate';
 import { castMutable, pipe } from 'ts-data-forge';
 import type { DeepReadonly, StrictOmit } from 'ts-type-forge';
+import {
+  normalizeBasePath,
+  prependBasePath,
+  stripBasePath,
+} from './base-path.mjs';
 
 /**
  * @param sortParams - Sort query params by key. Default is true.
@@ -19,7 +24,10 @@ export type ReadonlyURLSearchParams = DeepReadonly<
 >;
 
 export type RouterState = Readonly<{
-  /** `(new URL(window.location.href)).searchParams` */
+  /**
+   * `window.location.pathname`, below `RouterOptions.basePath` — `/career/`
+   * for `/mono/profile/career/` when the base path is `/mono/profile/`.
+   */
   pathname: string;
 
   /** `splitToPathSegments(pathname)` */
@@ -61,6 +69,18 @@ export type Router = Readonly<{
 
 export type RouterOptions = Readonly<{
   /**
+   * The path the app is served under, e.g. `/mono/profile/` — pass
+   * `import.meta.env.BASE_URL` from a Vite app. Defaults to `/`.
+   *
+   * Every path the router hands out or takes in is below it: `state.pathname`
+   * has it stripped, and `push`, `redirect` and the `redirect` option put a
+   * root-relative path (`/career/`) back under it. So an app routes as if it
+   * were served at the root, wherever it is deployed. A whole URL, such as a
+   * clicked link's `href`, is taken as it is.
+   */
+  basePath?: string;
+
+  /**
    * The path to replace `pathname` with, or `undefined` to keep it. It is
    * applied to every URL before `state` shows it — the first one included —
    * so that nobody has to redirect from a subscriber of `state`, which would
@@ -74,14 +94,22 @@ export type RouterOptions = Readonly<{
  * URL changes.
  */
 export const createRouter = (routerOptions?: RouterOptions): Router => {
+  const basePath = normalizeBasePath(routerOptions?.basePath ?? '/');
+
   const getCurrentUrl = (): URL => new URL(window.location.href);
 
   /** The current URL, redirected first if `routerOptions.redirect` asks for it. */
   const readUrl = (): URL => {
-    const to = routerOptions?.redirect?.(window.location.pathname);
+    const to = routerOptions?.redirect?.(
+      stripBasePath(basePath, window.location.pathname),
+    );
 
     if (to !== undefined) {
-      window.history.replaceState({}, '', withSlash(to));
+      window.history.replaceState(
+        {},
+        '',
+        withSlash(prependBasePath(basePath, to)),
+      );
     }
 
     return getCurrentUrl();
@@ -90,11 +118,15 @@ export const createRouter = (routerOptions?: RouterOptions): Router => {
   const [url$, setUrl] = createState<URL>(readUrl());
 
   const state = url$.pipe(
-    map((a) => ({
-      pathname: a.pathname,
-      searchParams: a.searchParams,
-      pathSegments: splitToPathSegments(a.pathname),
-    })),
+    map((a) => {
+      const pathname = stripBasePath(basePath, a.pathname);
+
+      return {
+        pathname,
+        searchParams: a.searchParams,
+        pathSegments: splitToPathSegments(pathname),
+      };
+    }),
   );
 
   const updateState = (): void => {
@@ -144,21 +176,17 @@ export const createRouter = (routerOptions?: RouterOptions): Router => {
   };
 
   const push = (nextUrl: string, appendSlash: boolean = true): void => {
-    window.history.pushState(
-      {},
-      '',
-      appendSlash ? withSlash(nextUrl) : nextUrl,
-    );
+    const url = prependBasePath(basePath, nextUrl);
+
+    window.history.pushState({}, '', appendSlash ? withSlash(url) : url);
 
     updateState();
   };
 
   const redirect = (nextUrl: string, appendSlash: boolean = true): void => {
-    window.history.replaceState(
-      {},
-      '',
-      appendSlash ? withSlash(nextUrl) : nextUrl,
-    );
+    const url = prependBasePath(basePath, nextUrl);
+
+    window.history.replaceState({}, '', appendSlash ? withSlash(url) : url);
 
     updateState();
   };

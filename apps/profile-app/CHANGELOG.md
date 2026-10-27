@@ -1,4 +1,4 @@
-# my-portfolio-app-preact
+# profile-app
 
 ## 0.0.18
 
