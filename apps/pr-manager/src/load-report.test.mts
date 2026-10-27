@@ -1886,7 +1886,10 @@ const answering = (
   return { fetchImpl, sent: mut_sent };
 };
 
-const REST_OPERATIONS: ReadonlySet<string> = new Set(['BranchRules', 'Branch']);
+const REST_OPERATIONS: ReadonlySet<string> = new Set<string>([
+  'BranchRules',
+  'Branch',
+]);
 
 const sentOf = (route: string, init: FetchInit | RestFetchInit): Sent => {
   if (init.method === 'GET') {

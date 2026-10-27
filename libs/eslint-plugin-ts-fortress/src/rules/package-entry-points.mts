@@ -30,7 +30,7 @@ export const packageEntryPoints = (
   const packageJsonPath = findPackageJson(path.dirname(fileName));
 
   if (packageJsonPath === undefined) {
-    return new Set();
+    return new Set<string>();
   }
 
   const mut_cache = mut_cacheOf(program);
@@ -59,7 +59,7 @@ const mut_entryPointsCache = new WeakMap<
 const LEGACY_ENTRY_FIELDS = ['main', 'module', 'types', 'typings'] as const;
 
 /** Directories a build conventionally writes to, traced back to `src`. */
-const OUTPUT_DIRECTORIES = new Set([
+const OUTPUT_DIRECTORIES = new Set<string>([
   'dist',
   'lib',
   'build',

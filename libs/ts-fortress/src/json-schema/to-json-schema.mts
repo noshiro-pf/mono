@@ -236,7 +236,10 @@ const convert = (
   }));
 };
 
-const LEADING_KEYWORDS: ReadonlySet<string> = new Set(['title', 'description']);
+const LEADING_KEYWORDS: ReadonlySet<string> = new Set<string>([
+  'title',
+  'description',
+]);
 
 const convertStructure = (
   type: UnknownType,
@@ -792,7 +795,10 @@ type BrandKeyMeaning = Readonly<{
 }>;
 
 /** `Finite` means nothing here: a JSON number is always finite. */
-const BRAND_KEY_MEANINGS: ReadonlyMap<string, BrandKeyMeaning> = new Map([
+const BRAND_KEY_MEANINGS: ReadonlyMap<string, BrandKeyMeaning> = new Map<
+  string,
+  BrandKeyMeaning
+>([
   ['Int', { integer: true }],
   [
     'SafeInt',
@@ -816,7 +822,10 @@ const BRAND_KEY_MEANINGS: ReadonlyMap<string, BrandKeyMeaning> = new Map([
 ] as const);
 
 /** What a key in `brandFalseKeys` — one the value does _not_ have — means. */
-const BRAND_FALSE_KEY_MEANINGS: ReadonlyMap<string, BrandKeyMeaning> = new Map([
+const BRAND_FALSE_KEY_MEANINGS: ReadonlyMap<string, BrandKeyMeaning> = new Map<
+  string,
+  BrandKeyMeaning
+>([
   ['>=0', { exclusiveMaximum: 0 }],
   ['<=0', { exclusiveMinimum: 0 }],
 ] as const);

@@ -154,7 +154,7 @@ const CITATION_JAPANESE =
 /** `see "Japanese text"`, which is how `CLAUDE.md` points at itself. */
 const CITATION_SELF = /(?:^|\W)[sS]ee\s+"(?<heading>[^"\n]+)"/gu;
 
-const SCANNED_EXTENSIONS: ReadonlySet<string> = new Set([
+const SCANNED_EXTENSIONS: ReadonlySet<string> = new Set<string>([
   '.json',
   '.jsonc',
   '.md',
@@ -184,7 +184,7 @@ const IGNORED_PREFIXES: readonly string[] = [
  * fixtures by exact path for the same reason, and by exact path rather than a
  * directive comment so that the exclusion is visible from here.
  */
-const IGNORED_PATHS: ReadonlySet<string> = new Set([
+const IGNORED_PATHS: ReadonlySet<string> = new Set<string>([
   'tools/scripts/cmd/check-claude-md-references.mts',
   'tools/scripts/cmd/check-claude-md-references.test.mts',
 ]);

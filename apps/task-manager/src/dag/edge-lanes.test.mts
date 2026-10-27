@@ -150,7 +150,7 @@ describe(orderPorts, () => {
     at(400, 40),
   ] as const;
 
-  const boxes = new Map([
+  const boxes = new Map<string, AxisBox>([
     ['target', box(400, 500, 20, 80)],
     ['above', box(-100, 0, -30, 30)],
     ['below', box(-100, 0, 70, 130)],
@@ -194,7 +194,10 @@ describe(orderPorts, () => {
   });
 
   test('leaves them where a new port would take one past another node', () => {
-    const blocked = new Map([...boxes, ['between', box(380, 395, 30, 38)]]);
+    const blocked = new Map<string, AxisBox>([
+      ...boxes,
+      ['between', box(380, 395, 30, 38)],
+    ]);
 
     assert.deepStrictEqual(
       orderPorts(

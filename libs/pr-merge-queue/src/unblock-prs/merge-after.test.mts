@@ -38,12 +38,14 @@ describe(issueOrderOf, () => {
         // Stacked: GitHub links nothing, and marks the keyword.
         { number: 11, bodyHtml: closes(2), linked: [] },
       ],
-      new Map([[2, issue(2, 'Start-After: #3, #4')]]),
+      new Map<number, ClosingIssueAnswer>([
+        [2, issue(2, 'Start-After: #3, #4')],
+      ]),
     );
 
     assert.deepStrictEqual(
       order.closes,
-      new Map([
+      new Map<number, readonly number[]>([
         [10, [1]],
         [11, [2]],
       ]),
@@ -51,7 +53,7 @@ describe(issueOrderOf, () => {
 
     assert.deepStrictEqual(
       order.startAfter,
-      new Map([
+      new Map<number, readonly number[]>([
         [2, [3, 4]],
         [1, [20, 21]],
       ]),
@@ -68,10 +70,13 @@ describe(issueOrderOf, () => {
           linked: [issue(1, 'Start-After: #20', 'CLOSED')],
         },
       ],
-      new Map(),
+      new Map<number, ClosingIssueAnswer>(),
     );
 
-    assert.deepStrictEqual(order.closes, new Map([[10, []]]));
+    assert.deepStrictEqual(
+      order.closes,
+      new Map<number, readonly number[]>([[10, []]]),
+    );
   });
 });
 

@@ -68,7 +68,7 @@ describe(parseLicensesOutput, () => {
 });
 
 describe(isAllowedExpression, () => {
-  const allowed = new Set(['MIT', 'BSD-3-Clause']);
+  const allowed = new Set<string>(['MIT', 'BSD-3-Clause']);
 
   test('a plain identifier is looked up', () => {
     assert.isTrue(isAllowedExpression('MIT', allowed));

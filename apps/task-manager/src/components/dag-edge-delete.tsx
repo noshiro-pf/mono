@@ -104,7 +104,7 @@ const RADIUS_PX = 11;
 /** Half the width of the cross, as a share of the radius. */
 const CROSS_RATIO = 0.4;
 
-const DELETE_KEYS: ReadonlySet<string> = new Set([
+const DELETE_KEYS: ReadonlySet<string> = new Set<string>([
   'Delete',
   'Backspace',
   'Enter',

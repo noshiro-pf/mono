@@ -10,7 +10,7 @@ const TS_TYPE_FORGE = 'ts-type-forge';
  * the list is closed; a missing entry surfaces as an unresolved-type error in
  * the per-version lib-check (`skipLibCheck: false`).
  */
-const tsTypeForgeTypeNames: ReadonlySet<string> = new Set([
+const tsTypeForgeTypeNames: ReadonlySet<string> = new Set<string>([
   // brandedNumberFromTypeUtils
   'FiniteNumber',
   'Int',

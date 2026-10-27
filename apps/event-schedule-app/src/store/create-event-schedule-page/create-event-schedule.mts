@@ -224,12 +224,10 @@ const onCreateEventClick = (): void => {
 const onClipboardButtonClick = (): void => {
   const url = getUrlSnapshot();
 
-  // eslint-disable-next-line unicorn/prefer-global-this
-  const clipboard = window.navigator.clipboard;
+  const clipboard = globalThis.navigator.clipboard;
 
   // https://stackoverflow.com/questions/51805395/navigator-clipboard-is-undefined
-  // eslint-disable-next-line unicorn/prefer-global-this
-  if (window.isSecureContext) {
+  if (globalThis.isSecureContext) {
     // TODO: use toast
     clipboard.writeText(url).catch(console.error);
   }

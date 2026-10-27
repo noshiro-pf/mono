@@ -56,7 +56,7 @@ const png = (width: number, height: number): PublicFile =>
     text: undefined,
   }) as const;
 
-const goodFiles: ReadonlyMap<string, PublicFile> = new Map([
+const goodFiles: ReadonlyMap<string, PublicFile> = new Map<string, PublicFile>([
   ['favicon.svg', svg('<svg><!-- a drawing --></svg>')],
   ['apple-touch-icon.png', png(180, 180)],
   ['og-image.png', png(1200, 630)],
@@ -105,7 +105,7 @@ describe('collectAppHeadViolations', () => {
   test('fails an SVG with two hyphens inside a comment', () => {
     const violations = collectAppHeadViolations(
       facts(publishedHead(), {
-        publicFiles: new Map([
+        publicFiles: new Map<string, PublicFile>([
           ...goodFiles,
           ['favicon.svg', svg('<svg><!-- the --accent colour --></svg>')],
         ]),
@@ -182,7 +182,10 @@ describe('collectAppHeadViolations', () => {
   test('fails an og:image of the wrong size', () => {
     const violations = collectAppHeadViolations(
       facts(publishedHead(), {
-        publicFiles: new Map([...goodFiles, ['og-image.png', png(96, 96)]]),
+        publicFiles: new Map<string, PublicFile>([
+          ...goodFiles,
+          ['og-image.png', png(96, 96)],
+        ]),
       }),
     );
 
@@ -200,7 +203,7 @@ describe('collectAppHeadViolations', () => {
   test('fails a touch icon that is not 180×180', () => {
     const violations = collectAppHeadViolations(
       facts(publishedHead(), {
-        publicFiles: new Map([
+        publicFiles: new Map<string, PublicFile>([
           ...goodFiles,
           ['apple-touch-icon.png', png(57, 57)],
         ]),

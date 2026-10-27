@@ -574,7 +574,7 @@ const PRIMITIVE_LIKE_TYPE_FLAGS =
   ts.TypeFlags.BigIntLike |
   ts.TypeFlags.ESSymbolLike;
 
-const EMPTY_FALSY_SET: ReadonlySet<FalsyValueTag> = new Set();
+const EMPTY_FALSY_SET: ReadonlySet<FalsyValueTag> = new Set<FalsyValueTag>();
 
 const NEVER_FALSY_SUMMARY: TypeSummary = {
   falsyValues: EMPTY_FALSY_SET,

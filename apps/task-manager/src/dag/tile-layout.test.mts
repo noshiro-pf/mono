@@ -1,5 +1,6 @@
 import type { GraphNodeId } from '../domain/index.mjs';
 import { COMPACT_TASK_NODE_SIZE, TASK_NODE_SIZE } from './graph-layout.mjs';
+import type { Point } from './pan-zoom.mjs';
 import {
   TILE_MARGIN,
   TILE_NODE_GAP,
@@ -42,7 +43,7 @@ describe(tileLayout, () => {
         10,
         320,
       ),
-      new Map([
+      new Map<string, Point>([
         ['task:e', { x: 0, y: 0 }],
         ['task:a', { x: 110, y: 0 }],
         ['task:d', { x: 220, y: 0 }],
@@ -55,7 +56,7 @@ describe(tileLayout, () => {
   test('is one column for a width narrower than a node', () => {
     assert.deepStrictEqual(
       tileLayout(['task:a', 'task:b', 'task:c'], size, 10, 60),
-      new Map([
+      new Map<string, Point>([
         ['task:a', { x: 0, y: 0 }],
         ['task:b', { x: 0, y: 50 }],
         ['task:c', { x: 0, y: 100 }],

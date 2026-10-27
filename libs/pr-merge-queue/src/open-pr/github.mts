@@ -332,7 +332,7 @@ export const missingInheritedOrder = async (
       })),
     ),
     startAfterOf: mut_startAfter,
-    openIssues: new Set(),
+    openIssues: new Set<number>(),
   });
 
   const declared = new Set(parseMergeAfter(body).concat(alsoDeclared));

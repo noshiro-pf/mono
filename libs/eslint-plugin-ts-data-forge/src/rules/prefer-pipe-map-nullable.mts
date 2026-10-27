@@ -294,7 +294,7 @@ export const preferPipeMapNullable: TSESLint.RuleModule<MessageIds, Options> = {
 const PIPE_MODULES = [TS_DATA_FORGE_MODULE, 'ts-std-forge'] as const;
 
 /** The methods of a `Pipe` that return another `Pipe`. */
-const PIPE_CHAIN_METHODS: ReadonlySet<string> = new Set([
+const PIPE_CHAIN_METHODS: ReadonlySet<string> = new Set<string>([
   'map',
   'mapNullable',
   'mapOptional',

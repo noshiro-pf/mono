@@ -454,7 +454,7 @@ export const createClient = (
       );
 
       if (Result.isErr(answered)) {
-        return new Map();
+        return new Map<number, CheckRunReport['round']>();
       }
 
       for (const run of answered.value.workflow_runs) {
@@ -474,7 +474,7 @@ export const createClient = (
       }
     }
 
-    return new Map();
+    return new Map<number, CheckRunReport['round']>();
   };
 
   /**
@@ -575,13 +575,13 @@ export const createClient = (
     );
 
     if (Result.isErr(answered)) {
-      return new Map();
+      return new Map<number, readonly LinkedIssue[]>();
     }
 
     const parsed = parseJson(answered.value, ClosingIssuesSchema, '/graphql');
 
     if (Result.isErr(parsed)) {
-      return new Map();
+      return new Map<number, readonly LinkedIssue[]>();
     }
 
     return new Map(
@@ -633,7 +633,7 @@ export const createClient = (
       );
 
       if (Result.isErr(viewer) || Result.isErr(tip)) {
-        return new Map();
+        return new Map<number, QueueComments>();
       }
 
       const nowEpochMs = currentEpochMs();

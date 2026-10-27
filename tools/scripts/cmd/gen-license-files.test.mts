@@ -10,7 +10,7 @@ import {
   type PackageManifest,
 } from './gen-license-files.mjs';
 
-const known = new Set(['Apache-2.0']);
+const known = new Set<string>(['Apache-2.0']);
 
 const manifestOf = (
   dir: string,

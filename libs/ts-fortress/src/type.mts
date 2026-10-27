@@ -383,7 +383,7 @@ export const expandShapeStructure = (
  * while it is being resolved is not a record.
  */
 export const recordViewOf = (type: UnknownType): RecordView | undefined =>
-  recordViewOfImpl(type, new Set());
+  recordViewOfImpl(type, new Set<() => UnknownType>());
 
 const recordViewOfImpl = (
   type: UnknownType,
@@ -424,7 +424,7 @@ const recordViewOfImpl = (
   if (structure?.kind === 'recursion' && !resolving.has(structure.resolve)) {
     return recordViewOfImpl(
       structure.resolve(),
-      new Set([...resolving, structure.resolve]),
+      new Set<() => UnknownType>([...resolving, structure.resolve]),
     );
   }
 

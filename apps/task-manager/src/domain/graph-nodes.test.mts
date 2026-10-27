@@ -7,6 +7,7 @@ import {
   listNodes,
   nodeId,
   nodeRefOf,
+  type GraphNodeId,
 } from './graph-nodes.mjs';
 import { asMilestoneId, asTaskId, type DomainState } from './types.mjs';
 
@@ -108,7 +109,7 @@ describe(buildSourceIds, () => {
   test('lists the existing nodes each node depends on, once each', () => {
     assert.deepStrictEqual(
       buildSourceIds(state),
-      new Map([
+      new Map<GraphNodeId, readonly GraphNodeId[]>([
         ['task:a', []],
         ['task:b', ['task:a', 'milestone:m']],
         ['milestone:m', ['task:a']],
@@ -121,7 +122,7 @@ describe(buildDependentIds, () => {
   test('lists the nodes depending on each node, in node order', () => {
     assert.deepStrictEqual(
       buildDependentIds(state),
-      new Map([
+      new Map<GraphNodeId, readonly GraphNodeId[]>([
         ['task:a', ['task:b', 'milestone:m']],
         ['task:b', []],
         ['milestone:m', ['task:b']],

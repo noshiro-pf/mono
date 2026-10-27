@@ -2,10 +2,12 @@
 
 import {
   buildReport,
+  type ContextState,
   type Label,
   type OpenIssue,
   type PrReport,
   type PullRequestFacts,
+  type ReferenceStatus,
 } from 'pr-report-core';
 import { renderMarkdown, renderTerminal } from './render.mjs';
 
@@ -31,7 +33,7 @@ const facts = (
     headCommittedAt: '2026-09-17T00:00:00Z',
     comparison: { aheadBy: 1, behindBy: 0 },
     autoMerge: false,
-    reported: new Map(),
+    reported: new Map<string, ContextState>(),
     checksRunning: false,
     linkedIssues: [],
     ...overrides,
@@ -141,8 +143,10 @@ describe(renderMarkdown, () => {
           facts({ number: 1901 }),
         ],
         issueDeclarations: {
-          startAfter: new Map([[1800, [1901, 1700]]]),
-          open: new Set([1700]),
+          startAfter: new Map<number, readonly number[]>([
+            [1800, [1901, 1700]],
+          ]),
+          open: new Set<number>([1700]),
         },
       }),
     );
@@ -302,7 +306,7 @@ describe('the open issues section', () => {
         issuesLimit: 30,
         authenticated: false,
         pulls: [facts({ number: 1901 })],
-        references: new Map([[1700, 'done']]),
+        references: new Map<number, ReferenceStatus>([[1700, 'done']]),
       }),
     );
 

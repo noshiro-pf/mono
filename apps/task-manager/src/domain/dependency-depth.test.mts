@@ -7,8 +7,10 @@ import {
   asTaskId,
   type Dependency,
   type Milestone,
+  type MilestoneId,
   type NodeRef,
   type Task,
+  type TaskId,
 } from './types.mjs';
 
 const ref = (s: string): NodeRef =>
@@ -54,13 +56,13 @@ describe(dependencyDepth, () => {
         milestones: [milestone('m1', 'b'), milestone('m0')],
       }),
       Result.ok({
-        tasks: new Map([
+        tasks: new Map<TaskId, number>([
           [asTaskId('a'), 0],
           [asTaskId('b'), 1],
           [asTaskId('c'), 3],
           [asTaskId('d'), 1],
         ]),
-        milestones: new Map([
+        milestones: new Map<MilestoneId, number>([
           [asMilestoneId('m1'), 2],
           [asMilestoneId('m0'), 0],
         ]),
@@ -72,8 +74,8 @@ describe(dependencyDepth, () => {
     assert.deepStrictEqual(
       dependencyDepth({ tasks: [task('a', 'x', 'm9')], milestones: [] }),
       Result.ok({
-        tasks: new Map([[asTaskId('a'), 0]]),
-        milestones: new Map(),
+        tasks: new Map<TaskId, number>([[asTaskId('a'), 0]]),
+        milestones: new Map<MilestoneId, number>(),
       }),
     );
   });

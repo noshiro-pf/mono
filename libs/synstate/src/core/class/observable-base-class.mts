@@ -146,7 +146,7 @@ export class ObservableBaseClass<
     // A set, not an array: a completed child removes itself, and that has to
     // be O(1) for a UI that creates and completes derived nodes on every mount.
     if (this.#mut_children === undefined) {
-      this.#mut_children = new Set([child]);
+      this.#mut_children = new Set<ChildNode>([child]);
     } else {
       this.#mut_children.add(child);
     }
@@ -321,7 +321,7 @@ export class ObservableBaseClass<
 
     const subscriber = toSubscriber(onNext, onComplete);
 
-    this.#mut_subscribers ??= new Set();
+    this.#mut_subscribers ??= new Set<Subscriber<A>>();
 
     this.#mut_subscribers.add(subscriber);
 

@@ -58,10 +58,8 @@ export type LockedCompilerOptionName = keyof typeof lockedCompilerOptions;
  * "report a suggestion", so they have to be written down. For every other
  * `false` entry, absence is TypeScript's own default and is accepted.
  */
-export const lockedOptionsThatMustBeExplicit: ReadonlySet<string> = new Set([
-  'allowUnusedLabels',
-  'allowUnreachableCode',
-]);
+export const lockedOptionsThatMustBeExplicit: ReadonlySet<string> =
+  new Set<string>(['allowUnusedLabels', 'allowUnreachableCode']);
 
 /**
  * The flags `strict: true` turns on, as of the TypeScript this package
@@ -70,7 +68,7 @@ export const lockedOptionsThatMustBeExplicit: ReadonlySet<string> = new Set([
  * be turned back off individually — an explicit `false` on any of them is a
  * violation, while absence is fine (it inherits from `strict`).
  */
-export const strictFamilyOptionNames: ReadonlySet<string> = new Set([
+export const strictFamilyOptionNames: ReadonlySet<string> = new Set<string>([
   'alwaysStrict',
   'noImplicitAny',
   'noImplicitThis',

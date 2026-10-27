@@ -208,7 +208,7 @@ const statementStartingWith = (
 };
 
 /** Where an expression is taken whole, or by an operator binding looser. */
-const LOOSER_CONTEXTS: ReadonlySet<AST_NODE_TYPES> = new Set([
+const LOOSER_CONTEXTS: ReadonlySet<AST_NODE_TYPES> = new Set<AST_NODE_TYPES>([
   AST_NODE_TYPES.ArrayExpression,
   AST_NODE_TYPES.ArrowFunctionExpression,
   AST_NODE_TYPES.AssignmentExpression,
@@ -231,7 +231,11 @@ const LOOSER_CONTEXTS: ReadonlySet<AST_NODE_TYPES> = new Set([
 ]);
 
 /** Tokens after which a statement starts, whatever comes next. */
-const STATEMENT_BOUNDARIES: ReadonlySet<string> = new Set([';', '{', '}']);
+const STATEMENT_BOUNDARIES: ReadonlySet<string> = new Set<string>([
+  ';',
+  '{',
+  '}',
+]);
 
 /** A statement starting so would continue the line before it without `;`. */
 const STARTS_CONTINUING_A_LINE = /^[([`+\-/]/u;

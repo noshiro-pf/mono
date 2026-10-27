@@ -7,6 +7,7 @@ import {
   type DomainState,
   type GraphNodeId,
   type Group,
+  type GroupId,
 } from '../domain/index.mjs';
 import { PLACEMENT_GAP } from './dag-layout.mjs';
 import type { LaidOutGroup, LaidOutNode } from './graph-layout.mjs';
@@ -25,6 +26,7 @@ import {
   withMemberMoved,
   type GroupFrame,
 } from './group-frames.mjs';
+import type { Point } from './pan-zoom.mjs';
 
 const g = asGroupId('g');
 
@@ -108,7 +110,11 @@ describe(groupMembership, () => {
     } as const;
 
     assert.deepStrictEqual(
-      groupMembership(state, [groupOf(g), groupOf(h)], new Set(['task:b'])),
+      groupMembership(
+        state,
+        [groupOf(g), groupOf(h)],
+        new Set<GraphNodeId>(['task:b']),
+      ),
       [
         { id: g, members: ['task:a'] },
         { id: h, members: ['milestone:m'] },
@@ -157,7 +163,7 @@ describe(groupFrames, () => {
       groupFrames(
         [nodeA, nodeB],
         [{ id: g, members: ['task:a', 'task:b', 'task:hidden'] }],
-        new Map(),
+        new Map<GroupId, Point>(),
       ),
       [
         {
@@ -180,7 +186,7 @@ describe(groupFrames, () => {
           { id: g, members: ['task:hidden'] },
           { id: h, members: [] },
         ],
-        new Map([[g, { x: 5, y: 6 }]]),
+        new Map<GroupId, Point>([[g, { x: 5, y: 6 }]]),
       ),
       [{ id: g, empty: true, x: 5, y: 6, ...EMPTY_GROUP_SIZE }],
     );
@@ -197,9 +203,9 @@ describe(placeEmptyGroups, () => {
         ],
         [box(g, 0, 0), box(h, 600, 600)],
         [nodeA],
-        new Map([[g, { x: 10, y: 20 }]]),
+        new Map<GroupId, Point>([[g, { x: 10, y: 20 }]]),
       ),
-      new Map([
+      new Map<GroupId, Point>([
         [g, { x: 10, y: 20 }],
         [h, { x: 600, y: 600 }],
       ]),
@@ -215,7 +221,7 @@ describe(placeEmptyGroups, () => {
       ],
       [box(g, 100, 100)],
       [nodeA],
-      new Map(),
+      new Map<GroupId, Point>(),
     );
 
     assert.deepStrictEqual(Array.from(placed.keys()), [g]);

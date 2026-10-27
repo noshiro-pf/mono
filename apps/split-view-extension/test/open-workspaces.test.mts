@@ -17,7 +17,7 @@ describe('workspaceTabsToOpen', () => {
     assert.deepStrictEqual(
       workspaceTabsToOpen(
         [entry('a'), entry('b', true), entry('c')],
-        new Set(),
+        new Set<string>(),
         undefined,
       ),
       [
@@ -32,7 +32,7 @@ describe('workspaceTabsToOpen', () => {
     assert.deepStrictEqual(
       workspaceTabsToOpen(
         [entry('a'), entry('b'), entry('c')],
-        new Set(['b']),
+        new Set<string>(['b']),
         undefined,
       ),
       [
@@ -44,7 +44,11 @@ describe('workspaceTabsToOpen', () => {
 
   test('brings the one named to the front, and only that one', () => {
     assert.deepStrictEqual(
-      workspaceTabsToOpen([entry('a'), entry('b'), entry('c')], new Set(), 'b'),
+      workspaceTabsToOpen(
+        [entry('a'), entry('b'), entry('c')],
+        new Set<string>(),
+        'b',
+      ),
       [
         { workspaceId: 'a', pinned: false, active: false },
         { workspaceId: 'b', pinned: false, active: true },
@@ -53,7 +57,11 @@ describe('workspaceTabsToOpen', () => {
     );
 
     assert.deepStrictEqual(
-      workspaceTabsToOpen([entry('a'), entry('b')], new Set(['b']), 'b'),
+      workspaceTabsToOpen(
+        [entry('a'), entry('b')],
+        new Set<string>(['b']),
+        'b',
+      ),
       [{ workspaceId: 'a', pinned: false, active: false }],
     );
   });

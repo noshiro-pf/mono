@@ -22,7 +22,7 @@ const allowedSchemes: readonly string[] = [
   'https:',
 ] as const;
 
-const localHostnames = new Set(['localhost', '127.0.0.1', '[::1]']);
+const localHostnames = new Set<string>(['localhost', '127.0.0.1', '[::1]']);
 
 const searchUrl = 'https://www.google.com/search';
 

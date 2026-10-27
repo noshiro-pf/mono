@@ -721,7 +721,7 @@ const siblingOverrides = (
  * checkout — a version that does not have it. Removing the entry then only
  * pins the breakage. Wait for the release that fixes it.
  */
-const notYetPublished: ReadonlySet<string> = new Set();
+const notYetPublished: ReadonlySet<string> = new Set<string>();
 
 /**
  * The published space pins an exact version, committed, rather than tracking
@@ -858,7 +858,9 @@ const smokeTsconfig = (
 const isTypesOnly = (packageName: string): boolean =>
   typesOnlyPackages.has(packageName) || isStrictLibPackage(packageName);
 
-const typesOnlyPackages: ReadonlySet<string> = new Set(['ts-type-forge']);
+const typesOnlyPackages: ReadonlySet<string> = new Set<string>([
+  'ts-type-forge',
+]);
 
 /**
  * The TypeScript a package is compiled against. A strict standard library

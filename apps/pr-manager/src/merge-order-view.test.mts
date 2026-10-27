@@ -1,4 +1,9 @@
-import { summarize, type Label, type TreeNode } from 'pr-report-core';
+import {
+  summarize,
+  type ContextState,
+  type Label,
+  type TreeNode,
+} from 'pr-report-core';
 import type { Entry } from './load-report.mjs';
 import {
   arrangeForest,
@@ -594,7 +599,7 @@ const entry = (
     updatedAt: '2026-10-01T00:00:00Z',
     headCommittedAt: undefined,
     comparison: { aheadBy: 1, behindBy },
-    reported: new Map(),
+    reported: new Map<string, ContextState>(),
     checksRunning: false,
     linkedIssues: [],
     mergeAfter: [],

@@ -1,4 +1,4 @@
-import type { DagLayout } from '../dag/index.mjs';
+import type { DagLayout, Point } from '../dag/index.mjs';
 import {
   asMilestoneId,
   asTaskId,
@@ -6,6 +6,8 @@ import {
   createTask,
   removeNodes,
   type DomainState,
+  type GraphNodeId,
+  type GroupId,
 } from '../domain/index.mjs';
 import { createMemoryRepository } from './memory-repository.mjs';
 
@@ -125,8 +127,8 @@ describe(createMemoryRepository, () => {
 describe('the DAG layout of a memory repository', () => {
   const layout: DagLayout = {
     direction: 'down',
-    positions: new Map([['task:a', { x: 1, y: 2 }]]),
-    groupPositions: new Map(),
+    positions: new Map<GraphNodeId, Point>([['task:a', { x: 1, y: 2 }]]),
+    groupPositions: new Map<GroupId, Point>(),
   } as const;
 
   const recordLayouts = (): Readonly<{

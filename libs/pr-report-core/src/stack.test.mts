@@ -96,7 +96,7 @@ describe(findStackParents, () => {
 
 describe(stackDescendants, () => {
   test('every layer above, each after the one it is on', () => {
-    const parents = new Map([
+    const parents = new Map<number, number>([
       [2, 1],
       [3, 2],
       [4, 1],
@@ -114,7 +114,7 @@ describe(stackDescendants, () => {
     // Two pull requests opened onto each other's branches. Nothing lands
     // either, and the merge order reports it as a cycle; the walk only has to
     // stop.
-    const parents = new Map([
+    const parents = new Map<number, number>([
       [1, 2],
       [2, 1],
     ]);

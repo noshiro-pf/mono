@@ -113,7 +113,7 @@ const rootIdentifierName = (wrapped: TSESTree.Node): string | undefined => {
 
 type ComparisonOperator = '!==' | '<' | '<=' | '>' | '>=';
 
-const COMPARISON_OPERATORS: ReadonlySet<string> = new Set([
+const COMPARISON_OPERATORS: ReadonlySet<string> = new Set<string>([
   '!==',
   '<',
   '<=',

@@ -322,7 +322,10 @@ describe(countIssues, () => {
 describe('the start states', () => {
   // #1 ready, #2 blocked, #3 in progress, #4 none known (free), #5 on a
   // cycle, #6 ready.
-  const starts = new Map([
+  const starts = new Map<
+    1 | 2 | 3 | 5 | 6,
+    'ready' | 'blocked' | 'cycle' | 'in-progress'
+  >([
     [1, 'ready'],
     [2, 'blocked'],
     [3, 'in-progress'],

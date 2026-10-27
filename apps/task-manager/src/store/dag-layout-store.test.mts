@@ -258,7 +258,7 @@ const setup = (
   );
 
   const [hidden, setHidden] = createState<ReadonlySet<GraphNodeId>>(
-    options.hidden ?? new Set(),
+    options.hidden ?? new Set<GraphNodeId>(),
   );
 
   const [groups, setGroups] = createState<readonly Group[]>(
@@ -620,8 +620,8 @@ describe(createDagLayoutStore, () => {
       const { store, setDefaultDirection } = setup({
         stored: {
           direction: 'down',
-          positions: new Map(),
-          groupPositions: new Map(),
+          positions: new Map<GraphNodeId, Point>(),
+          groupPositions: new Map<GroupId, Point>(),
         },
       });
 
@@ -639,7 +639,7 @@ describe(createDagLayoutStore, () => {
         stored: {
           direction: 'right',
           positions: positions([['task:b', { x: 500, y: 60 }]]),
-          groupPositions: new Map(),
+          groupPositions: new Map<GroupId, Point>(),
         },
       });
 
@@ -657,7 +657,7 @@ describe(createDagLayoutStore, () => {
             ['task:a', { x: 0, y: 0 }],
             ['task:b', { x: 500, y: 60 }],
           ]),
-          groupPositions: new Map(),
+          groupPositions: new Map<GroupId, Point>(),
         },
       ]);
 
@@ -684,7 +684,7 @@ describe(createDagLayoutStore, () => {
             ['task:a', { x: 0, y: 0 }],
             ['task:b', { x: 40, y: 300 }],
           ]),
-          groupPositions: new Map(),
+          groupPositions: new Map<GroupId, Point>(),
         },
       ]);
 
@@ -708,7 +708,7 @@ describe(createDagLayoutStore, () => {
             ['task:b', { x: 100, y: 0 }],
             ['task:c', { x: 210, y: 50 }],
           ]),
-          groupPositions: new Map(),
+          groupPositions: new Map<GroupId, Point>(),
         },
       ]);
     });
@@ -718,7 +718,7 @@ describe(createDagLayoutStore, () => {
         stored: {
           direction: 'right',
           positions: positions([['task:gone', { x: 1, y: 1 }]]),
-          groupPositions: new Map(),
+          groupPositions: new Map<GroupId, Point>(),
         },
       });
 
@@ -758,7 +758,7 @@ describe(createDagLayoutStore, () => {
         {
           direction: 'right',
           positions: positions([['task:a', { x: 8, y: 40 }]]),
-          groupPositions: new Map(),
+          groupPositions: new Map<GroupId, Point>(),
         },
       ]);
 
@@ -776,8 +776,8 @@ describe(createDagLayoutStore, () => {
 
       setStored({
         direction: 'right',
-        positions: new Map(),
-        groupPositions: new Map(),
+        positions: new Map<GraphNodeId, Point>(),
+        groupPositions: new Map<GroupId, Point>(),
       });
 
       timer.fire();
@@ -794,7 +794,7 @@ describe(createDagLayoutStore, () => {
       const elsewhere: DagLayout = {
         direction: 'down',
         positions: positions([['task:a', { x: 3, y: 4 }]]),
-        groupPositions: new Map(),
+        groupPositions: new Map<GroupId, Point>(),
       } as const;
 
       setStored(elsewhere);
@@ -813,7 +813,7 @@ describe(createDagLayoutStore, () => {
             ['task:a', { x: 900, y: 900 }],
             ['task:b', { x: -50, y: 20 }],
           ]),
-          groupPositions: new Map(),
+          groupPositions: new Map<GroupId, Point>(),
         },
       });
 
@@ -832,7 +832,7 @@ describe(createDagLayoutStore, () => {
             ['task:a', { x: 0, y: 0 }],
             ['task:b', { x: 0, y: 100 }],
           ]),
-          groupPositions: new Map(),
+          groupPositions: new Map<GroupId, Point>(),
         },
       ]);
 
@@ -854,7 +854,7 @@ describe(createDagLayoutStore, () => {
         {
           direction: 'right',
           positions: positions([['task:a', { x: 0, y: 0 }]]),
-          groupPositions: new Map(),
+          groupPositions: new Map<GroupId, Point>(),
         },
       ]);
     });
@@ -881,7 +881,7 @@ describe(createDagLayoutStore, () => {
           ['task:b', { x: 300, y: 0 }],
           ['task:c', { x: 600, y: 0 }],
         ]),
-        groupPositions: new Map(),
+        groupPositions: new Map<GroupId, Point>(),
       });
 
       // From where they were, as for 自動整列.
@@ -908,7 +908,7 @@ describe(createDagLayoutStore, () => {
       assert.deepStrictEqual(saved.at(-1), {
         direction: 'right',
         positions: positions([['task:a', { x: 0, y: 0 }]]),
-        groupPositions: new Map(),
+        groupPositions: new Map<GroupId, Point>(),
       });
     });
 
@@ -947,7 +947,7 @@ describe(createDagLayoutStore, () => {
           ['task:b', { x: 300, y: 0 }],
           ['task:c', { x: 200, y: TASK_NODE_SIZE.height + PLACEMENT_GAP }],
         ]),
-        groupPositions: new Map(),
+        groupPositions: new Map<GroupId, Point>(),
       });
 
       assert.isUndefined(animated(store));
@@ -972,7 +972,7 @@ describe(createDagLayoutStore, () => {
           ['task:a', { x: 0, y: 0 }],
           ['task:b', { x: 100, y: 0 }],
         ]),
-        groupPositions: new Map(),
+        groupPositions: new Map<GroupId, Point>(),
       });
     });
   });
@@ -1076,7 +1076,7 @@ describe(createDagLayoutStore, () => {
             ['task:a', { x: 900, y: 900 }],
             ['task:b', { x: -50, y: 20 }],
           ]),
-          groupPositions: new Map(),
+          groupPositions: new Map<GroupId, Point>(),
         },
       });
 
@@ -1106,7 +1106,7 @@ describe(createDagLayoutStore, () => {
           ['task:a', { x: 300, y: 300 }],
           ['task:b', { x: 600, y: 300 }],
         ]),
-        groupPositions: new Map(),
+        groupPositions: new Map<GroupId, Point>(),
       });
 
       assert.deepStrictEqual(
@@ -1145,7 +1145,7 @@ describe(createDagLayoutStore, () => {
         stored: {
           direction: 'right',
           positions: positions([['task:a', { x: 900, y: 900 }]]),
-          groupPositions: new Map(),
+          groupPositions: new Map<GroupId, Point>(),
         },
       });
 
@@ -1192,7 +1192,7 @@ describe(createDagLayoutStore, () => {
       setStored({
         direction: 'right',
         positions: positions([['task:a', { x: 300, y: 300 }]]),
-        groupPositions: new Map(),
+        groupPositions: new Map<GroupId, Point>(),
       });
 
       store.autoArrange();
@@ -1219,7 +1219,7 @@ describe(createDagLayoutStore, () => {
       setStored({
         direction: 'right',
         positions: positions([['task:a', { x: 300, y: 300 }]]),
-        groupPositions: new Map(),
+        groupPositions: new Map<GroupId, Point>(),
       });
 
       store.autoArrange();
@@ -1253,7 +1253,7 @@ describe(createDagLayoutStore, () => {
       setStored({
         direction: 'right',
         positions: positions([['task:a', { x: 300, y: 300 }]]),
-        groupPositions: new Map(),
+        groupPositions: new Map<GroupId, Point>(),
       });
 
       assert.isDefined(animated(store));
@@ -1353,7 +1353,7 @@ describe(createDagLayoutStore, () => {
         stored: {
           direction: 'right',
           positions: positions([['task:a', { x: 900, y: 900 }]]),
-          groupPositions: new Map(),
+          groupPositions: new Map<GroupId, Point>(),
         },
       });
 
@@ -1411,7 +1411,7 @@ describe(createDagLayoutStore, () => {
       assert.deepStrictEqual(animated(store), dagPlaces);
 
       // Still a change of mode, for the view, with nothing to fade.
-      assert.deepStrictEqual(opacities(store), new Map());
+      assert.deepStrictEqual(opacities(store), new Map<GraphNodeId, number>());
 
       assert.strictEqual(store.fitRequests.getSnapshot().value, fits + 1);
 
@@ -1469,7 +1469,7 @@ describe(createDagLayoutStore, () => {
         ]),
       );
 
-      assert.deepStrictEqual(opacities(store), new Map());
+      assert.deepStrictEqual(opacities(store), new Map<GraphNodeId, number>());
 
       clock.advance(ANIMATION_MS);
 
@@ -1481,7 +1481,7 @@ describe(createDagLayoutStore, () => {
 
       assert.deepStrictEqual(
         store.arrangement.getSnapshot().value.positions,
-        new Map(),
+        new Map<GraphNodeId, Point>(),
       );
     });
 
@@ -1593,7 +1593,7 @@ describe(createDagLayoutStore, () => {
 
       assert.deepStrictEqual(
         new Set(first?.keys()),
-        new Set(['task:x', 'task:y', 'milestone:m']),
+        new Set<string>(['task:x', 'task:y', 'milestone:m']),
       );
 
       clock.advance(ANIMATION_MS);
@@ -1620,7 +1620,7 @@ describe(createDagLayoutStore, () => {
 
       assert.deepStrictEqual(
         new Set(animated(store)?.keys()),
-        new Set(['task:x', 'task:y', 'milestone:m']),
+        new Set<string>(['task:x', 'task:y', 'milestone:m']),
       );
     });
 
@@ -1637,7 +1637,7 @@ describe(createDagLayoutStore, () => {
       // Nothing to go to yet: they stay, fading none, where they are.
       assert.deepStrictEqual(animated(store), arcPlaces);
 
-      assert.deepStrictEqual(opacities(store), new Map());
+      assert.deepStrictEqual(opacities(store), new Map<GraphNodeId, number>());
 
       clock.advance(ANIMATION_MS);
 
@@ -1681,7 +1681,10 @@ describe(createDagLayoutStore, () => {
         column.get('task:n'),
       );
 
-      assert.deepStrictEqual(opacities(store), new Map([['task:n', 0]]));
+      assert.deepStrictEqual(
+        opacities(store),
+        new Map<GraphNodeId, number>([['task:n', 0]]),
+      );
     });
 
     test('switched to DAG while a task added is laid out, moves it there from the column once it is', async () => {
@@ -1713,7 +1716,7 @@ describe(createDagLayoutStore, () => {
         column.get('task:n'),
       );
 
-      assert.deepStrictEqual(opacities(store), new Map());
+      assert.deepStrictEqual(opacities(store), new Map<GraphNodeId, number>());
 
       clock.advance(ANIMATION_MS);
 
@@ -1745,7 +1748,7 @@ describe(createDagLayoutStore, () => {
       setStored({
         direction: 'right',
         positions: positions([['task:x', { x: 500, y: 500 }]]),
-        groupPositions: new Map(),
+        groupPositions: new Map<GroupId, Point>(),
       });
 
       assert.isUndefined(animated(store));
@@ -1863,7 +1866,7 @@ describe(createDagLayoutStore, () => {
 
       assert.deepStrictEqual(
         store.arrangement.getSnapshot().value.positions,
-        new Map(),
+        new Map<GraphNodeId, Point>(),
       );
     });
 
@@ -1871,7 +1874,7 @@ describe(createDagLayoutStore, () => {
       const stored: DagLayout = {
         direction: 'right',
         positions: positions([['task:y', { x: 500, y: 40 }]]),
-        groupPositions: new Map(),
+        groupPositions: new Map<GroupId, Point>(),
       } as const;
 
       const { store, deferred, clock, saved, setNodeSize } = await shown({
@@ -1911,7 +1914,7 @@ describe(createDagLayoutStore, () => {
           ['task:a', { x: 10, y: 10 }],
           ['task:b', { x: 300, y: 10 }],
         ]),
-        groupPositions: new Map(),
+        groupPositions: new Map<GroupId, Point>(),
       } as const;
 
       const { store, deferred, clock, saved, setNodeSize } = await shown({
@@ -2229,7 +2232,10 @@ describe(createDagLayoutStore, () => {
         ]),
       );
 
-      assert.deepStrictEqual(opacities(store), new Map([['milestone:m', 1]]));
+      assert.deepStrictEqual(
+        opacities(store),
+        new Map<GraphNodeId, number>([['milestone:m', 1]]),
+      );
 
       assert.strictEqual(store.fitRequests.getSnapshot().value, fits + 1);
 
@@ -2273,7 +2279,10 @@ describe(createDagLayoutStore, () => {
         ]),
       );
 
-      assert.deepStrictEqual(opacities(store), new Map([['milestone:m', 0]]));
+      assert.deepStrictEqual(
+        opacities(store),
+        new Map<GraphNodeId, number>([['milestone:m', 0]]),
+      );
 
       clock.advance(ANIMATION_MS);
 
@@ -2283,7 +2292,7 @@ describe(createDagLayoutStore, () => {
 
       assert.deepStrictEqual(
         store.arrangement.getSnapshot().value.positions,
-        new Map(),
+        new Map<GraphNodeId, Point>(),
       );
     });
 
@@ -2306,7 +2315,10 @@ describe(createDagLayoutStore, () => {
         ]),
       );
 
-      assert.deepStrictEqual(opacities(store), new Map([['milestone:m', 1]]));
+      assert.deepStrictEqual(
+        opacities(store),
+        new Map<GraphNodeId, number>([['milestone:m', 1]]),
+      );
 
       clock.advance(ANIMATION_MS / 2);
 
@@ -2324,10 +2336,13 @@ describe(createDagLayoutStore, () => {
 
       assert.deepStrictEqual(
         new Set(animated(store)?.keys()),
-        new Set(['task:x', 'task:y', 'milestone:m']),
+        new Set<string>(['task:x', 'task:y', 'milestone:m']),
       );
 
-      assert.deepStrictEqual(opacities(store), new Map([['milestone:m', 0]]));
+      assert.deepStrictEqual(
+        opacities(store),
+        new Map<GraphNodeId, number>([['milestone:m', 0]]),
+      );
 
       clock.advance(ANIMATION_MS);
 
@@ -2449,7 +2464,7 @@ describe(createDagLayoutStore, () => {
 
       assert.deepStrictEqual(
         new Set(animated(store)?.keys()),
-        new Set(['task:x', 'task:y']),
+        new Set<string>(['task:x', 'task:y']),
       );
 
       clock.advance(ANIMATION_MS);
@@ -2746,7 +2761,7 @@ describe(createDagLayoutStore, () => {
     test('are not laid out, and are once they are drawn again', () => {
       const { deferred, setHidden } = setup({
         state: two,
-        hidden: new Set(['task:b']),
+        hidden: new Set<GraphNodeId>(['task:b']),
       });
 
       assert.deepStrictEqual(
@@ -2754,7 +2769,7 @@ describe(createDagLayoutStore, () => {
         ['task:a'],
       );
 
-      setHidden(new Set());
+      setHidden(new Set<GraphNodeId>());
 
       assert.deepStrictEqual(
         deferred.requests[1]?.nodes.map(({ id }) => id),
@@ -2767,7 +2782,7 @@ describe(createDagLayoutStore, () => {
 
       store.moveNode('task:b', { x: 5, y: 5 });
 
-      setHidden(new Set(['task:b']));
+      setHidden(new Set<GraphNodeId>(['task:b']));
 
       deferred.resolve(1);
 
@@ -2783,7 +2798,7 @@ describe(createDagLayoutStore, () => {
         ]),
       );
 
-      setHidden(new Set());
+      setHidden(new Set<GraphNodeId>());
 
       deferred.resolve(2);
 
@@ -2804,7 +2819,7 @@ describe(createDagLayoutStore, () => {
       clock.advance(ANIMATION_MS);
 
       // By title: y (Alpha), then x (Zeta).
-      setHidden(new Set(['task:y']));
+      setHidden(new Set<GraphNodeId>(['task:y']));
 
       const step = TASK_NODE_SIZE.height + ARC_NODE_GAP;
 
@@ -2841,7 +2856,7 @@ describe(createDagLayoutStore, () => {
 
       clock.advance(ANIMATION_MS);
 
-      setHidden(new Set(['task:y']));
+      setHidden(new Set<GraphNodeId>(['task:y']));
 
       clock.advance(ANIMATION_MS);
 
@@ -2883,7 +2898,7 @@ describe(createDagLayoutStore, () => {
 
       const { store } = await shownWithWidth(TASK_NODE_SIZE.width, {
         state: done,
-        hidden: new Set(['task:x']),
+        hidden: new Set<GraphNodeId>(['task:x']),
         viewMode: 'arc',
         diagramSort: [
           { key: 'status', order: 'asc' },
@@ -2949,7 +2964,7 @@ describe(createDagLayoutStore, () => {
         { id: g, members: ['task:a'] },
       ]);
 
-      setHidden(new Set(['task:a']));
+      setHidden(new Set<GraphNodeId>(['task:a']));
 
       assert.deepStrictEqual(store.membership.getSnapshot().value, [
         { id: g, members: [] },
@@ -2971,7 +2986,9 @@ describe(createDagLayoutStore, () => {
 
       assert.deepStrictEqual(
         saved.at(-1)?.groupPositions,
-        new Map([[g, { x: 10 - GROUP_PADDING, y: 10 - GROUP_HEADER }]]),
+        new Map<GroupId, Point>([
+          [g, { x: 10 - GROUP_PADDING, y: 10 - GROUP_HEADER }],
+        ]),
       );
     });
 

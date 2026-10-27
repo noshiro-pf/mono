@@ -141,7 +141,7 @@ describe(findMergeAfterCycles, () => {
   test('finds nothing in a chain', () => {
     assert.deepStrictEqual(
       findMergeAfterCycles(
-        new Map([
+        new Map<number, readonly number[]>([
           [3, [2]],
           [2, [1]],
           [1, []],
@@ -154,7 +154,7 @@ describe(findMergeAfterCycles, () => {
   test('finds nothing in a diamond', () => {
     assert.deepStrictEqual(
       findMergeAfterCycles(
-        new Map([
+        new Map<number, readonly number[]>([
           [4, [2, 3]],
           [3, [1]],
           [2, [1]],
@@ -168,7 +168,7 @@ describe(findMergeAfterCycles, () => {
   test('finds a two-node cycle, starting at its lowest number', () => {
     assert.deepStrictEqual(
       findMergeAfterCycles(
-        new Map([
+        new Map<number, readonly number[]>([
           [2, [1]],
           [1, [2]],
         ]),
@@ -178,7 +178,10 @@ describe(findMergeAfterCycles, () => {
   });
 
   test('finds a pull request that declares itself', () => {
-    assert.deepStrictEqual(findMergeAfterCycles(new Map([[7, [7]]])), [[7]]);
+    assert.deepStrictEqual(
+      findMergeAfterCycles(new Map<number, readonly number[]>([[7, [7]]])),
+      [[7]],
+    );
   });
 
   test('reports a cycle once however it is entered', () => {
@@ -186,7 +189,7 @@ describe(findMergeAfterCycles, () => {
     // different node each time.
     assert.deepStrictEqual(
       findMergeAfterCycles(
-        new Map([
+        new Map<number, readonly number[]>([
           [9, [1]],
           [10, [2]],
           [1, [2]],
@@ -201,7 +204,7 @@ describe(findMergeAfterCycles, () => {
   test('finds two independent cycles', () => {
     assert.deepStrictEqual(
       findMergeAfterCycles(
-        new Map([
+        new Map<number, readonly number[]>([
           [1, [2]],
           [2, [1]],
           [5, [6]],
@@ -216,6 +219,9 @@ describe(findMergeAfterCycles, () => {
   });
 
   test('follows an edge to a pull request that declared nothing', () => {
-    assert.deepStrictEqual(findMergeAfterCycles(new Map([[1, [2]]])), []);
+    assert.deepStrictEqual(
+      findMergeAfterCycles(new Map<number, readonly number[]>([[1, [2]]])),
+      [],
+    );
   });
 });

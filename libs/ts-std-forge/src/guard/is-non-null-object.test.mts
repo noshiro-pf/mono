@@ -35,9 +35,9 @@ describe(isNonNullObject, () => {
 
     assert.isTrue(isNonNullObject(/regex/u));
 
-    assert.isTrue(isNonNullObject(new Map()));
+    assert.isTrue(isNonNullObject(new Map<unknown, unknown>()));
 
-    assert.isTrue(isNonNullObject(new Set()));
+    assert.isTrue(isNonNullObject(new Set<unknown>()));
 
     assert.isTrue(isNonNullObject(new Error('test')));
   });

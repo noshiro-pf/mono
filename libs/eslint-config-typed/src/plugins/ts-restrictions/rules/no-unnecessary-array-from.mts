@@ -35,7 +35,7 @@ type MessageIds = 'unnecessaryArrayFrom';
  * the copy: `(Array.from(xs) satisfies number[])` with `xs: readonly number[]`
  * would not type-check as `xs satisfies number[]`.
  */
-const NON_MUTATING_ARRAY_METHODS: ReadonlySet<string> = new Set([
+const NON_MUTATING_ARRAY_METHODS: ReadonlySet<string> = new Set<string>([
   'at',
   'concat',
   // 'constructor',

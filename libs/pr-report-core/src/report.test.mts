@@ -1,4 +1,5 @@
 import { buildEntries, buildReport } from './report.mjs';
+import type { ReferenceStatus } from './start-after.mjs';
 import type {
   ContextState,
   LinkedIssue,
@@ -26,7 +27,7 @@ const facts = (
     updatedAt: '2026-09-26T00:00:00Z',
     headCommittedAt: undefined,
     comparison: undefined,
-    reported: new Map(),
+    reported: new Map<string, ContextState>(),
     checksRunning: false,
     linkedIssues: [],
     ...overrides,
@@ -103,8 +104,8 @@ describe(buildEntries, () => {
       issues: {
         // #11 waits for #12, which #2 is closing, and for the open #3; #13
         // is open and nobody has started it.
-        startAfter: new Map([[11, [12, 3, 13]]]),
-        open: new Set([11, 12, 13]),
+        startAfter: new Map<number, readonly number[]>([[11, [12, 3, 13]]]),
+        open: new Set<number>([11, 12, 13]),
       },
     });
 
@@ -153,7 +154,10 @@ describe(buildEntries, () => {
         }),
         facts(2),
       ],
-      issues: { startAfter: new Map([[11, [2]]]), open: new Set() },
+      issues: {
+        startAfter: new Map<number, readonly number[]>([[11, [2]]]),
+        open: new Set<number>(),
+      },
     });
 
     assert.deepStrictEqual(entries[0]?.inheritedMergeAfter, []);
@@ -169,7 +173,10 @@ describe(buildEntries, () => {
         facts(1, { linkedIssues: [linked(11, 'open')] }),
         facts(2, { body: 'Merge-After: #1' }),
       ],
-      issues: { startAfter: new Map([[11, [2]]]), open: new Set() },
+      issues: {
+        startAfter: new Map<number, readonly number[]>([[11, [2]]]),
+        open: new Set<number>(),
+      },
     });
 
     assert.deepStrictEqual(cycles, [[1, 2]]);
@@ -180,7 +187,10 @@ describe(buildEntries, () => {
       required: [],
       defaultBranch: 'main',
       pulls: [facts(1, { linkedIssues: [linked(11, 'closed')] }), facts(2)],
-      issues: { startAfter: new Map([[11, [2]]]), open: new Set() },
+      issues: {
+        startAfter: new Map<number, readonly number[]>([[11, [2]]]),
+        open: new Set<number>(),
+      },
     });
 
     assert.deepStrictEqual(entries[0]?.blockedBy, []);
@@ -309,7 +319,7 @@ describe(buildReport, () => {
         issue(4, [100, 101], [7]),
       ],
       issuesLimit: 30,
-      references: new Map([
+      references: new Map<number, ReferenceStatus>([
         [100, 'done'],
         [101, 'abandoned'],
       ]),

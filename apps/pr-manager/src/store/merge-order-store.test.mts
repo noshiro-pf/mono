@@ -1,4 +1,4 @@
-import type { TreeNode } from 'pr-report-core';
+import type { ContextState, TreeNode } from 'pr-report-core';
 import { createState } from 'synstate';
 import type { Entry } from '../load-report.mjs';
 import {
@@ -267,7 +267,7 @@ const entry = (number: number, labels: readonly string[]): Entry =>
     updatedAt: '2026-10-01T00:00:00Z',
     headCommittedAt: undefined,
     comparison: undefined,
-    reported: new Map(),
+    reported: new Map<string, ContextState>(),
     checksRunning: false,
     linkedIssues: [],
     mergeAfter: [],

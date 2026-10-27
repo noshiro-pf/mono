@@ -84,12 +84,12 @@ describe(validationErrorToMessage, () => {
         omitted: 'an array of length 3',
       },
       {
-        actualValue: new Map([['a', 1]]),
+        actualValue: new Map<string, number>([['a', 1]]),
         printed: '<Map> type value `Map([["a",1]])`',
         omitted: 'a Map of size 1',
       },
       {
-        actualValue: new Set([1, 2]),
+        actualValue: new Set<number>([1, 2]),
         printed: '<Set> type value `Set([1,2])`',
         omitted: 'a Set of size 2',
       },

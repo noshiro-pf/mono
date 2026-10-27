@@ -287,22 +287,23 @@ export const noRestrictedCastName: TSESLint.RuleModule<MessageIds, Options> = {
  * (a binary, conditional or comma expression, an object literal, …) is
  * parenthesized.
  */
-const PARENTHESES_FREE_AS_OPERAND_TYPES: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.ArrayExpression,
-  AST_NODE_TYPES.AwaitExpression,
-  AST_NODE_TYPES.CallExpression,
-  AST_NODE_TYPES.ChainExpression,
-  AST_NODE_TYPES.Identifier,
-  AST_NODE_TYPES.Literal,
-  AST_NODE_TYPES.MemberExpression,
-  AST_NODE_TYPES.NewExpression,
-  AST_NODE_TYPES.TaggedTemplateExpression,
-  AST_NODE_TYPES.TemplateLiteral,
-  AST_NODE_TYPES.ThisExpression,
-  AST_NODE_TYPES.TSNonNullExpression,
-  AST_NODE_TYPES.UnaryExpression,
-  AST_NODE_TYPES.UpdateExpression,
-]);
+const PARENTHESES_FREE_AS_OPERAND_TYPES: ReadonlySet<AST_NODE_TYPES> =
+  new Set<AST_NODE_TYPES>([
+    AST_NODE_TYPES.ArrayExpression,
+    AST_NODE_TYPES.AwaitExpression,
+    AST_NODE_TYPES.CallExpression,
+    AST_NODE_TYPES.ChainExpression,
+    AST_NODE_TYPES.Identifier,
+    AST_NODE_TYPES.Literal,
+    AST_NODE_TYPES.MemberExpression,
+    AST_NODE_TYPES.NewExpression,
+    AST_NODE_TYPES.TaggedTemplateExpression,
+    AST_NODE_TYPES.TemplateLiteral,
+    AST_NODE_TYPES.ThisExpression,
+    AST_NODE_TYPES.TSNonNullExpression,
+    AST_NODE_TYPES.UnaryExpression,
+    AST_NODE_TYPES.UpdateExpression,
+  ]);
 
 /**
  * Whether `node` sits where any expression but a comma expression may stand
@@ -343,14 +344,15 @@ const acceptsAnyExpression = (
 };
 
 /** Parents whose every expression child accepts any expression but a comma one. */
-const ANY_EXPRESSION_PARENT_TYPES: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.ArrayExpression,
-  AST_NODE_TYPES.JSXExpressionContainer,
-  AST_NODE_TYPES.ReturnStatement,
-  AST_NODE_TYPES.SpreadElement,
-  AST_NODE_TYPES.TemplateLiteral,
-  AST_NODE_TYPES.VariableDeclarator,
-]);
+const ANY_EXPRESSION_PARENT_TYPES: ReadonlySet<AST_NODE_TYPES> =
+  new Set<AST_NODE_TYPES>([
+    AST_NODE_TYPES.ArrayExpression,
+    AST_NODE_TYPES.JSXExpressionContainer,
+    AST_NODE_TYPES.ReturnStatement,
+    AST_NODE_TYPES.SpreadElement,
+    AST_NODE_TYPES.TemplateLiteral,
+    AST_NODE_TYPES.VariableDeclarator,
+  ]);
 
 const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion

@@ -191,7 +191,7 @@ const isMutableArrayOnly = (
 };
 
 /** Methods that `ReadonlyArray` lacks and that mutate the receiver. */
-const mutatingMethods: ReadonlySet<string> = new Set([
+const mutatingMethods: ReadonlySet<string> = new Set<string>([
   'copyWithin',
   'fill',
   'pop',

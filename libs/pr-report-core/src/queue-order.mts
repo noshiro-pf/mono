@@ -197,7 +197,10 @@ export const isMergeableState = (mergeState: string): boolean =>
 export const queueGraph = (
   pulls: readonly QueueGraphMember[],
   defaultBranch: string,
-  startAfterOf: ReadonlyMap<number, readonly number[]> = new Map(),
+  startAfterOf: ReadonlyMap<number, readonly number[]> = new Map<
+    number,
+    readonly number[]
+  >(),
 ): QueueGraph => {
   const sorted = pulls.toSorted((a, b) => a.number - b.number);
 
@@ -207,7 +210,7 @@ export const queueGraph = (
   const inheritedOrders = inheritStartAfter({
     pulls: sorted.map(({ number, closes = [] }) => ({ number, closes })),
     startAfterOf,
-    openIssues: new Set(),
+    openIssues: new Set<number>(),
   });
 
   const declared: ReadonlyMap<number, readonly number[]> = new Map(

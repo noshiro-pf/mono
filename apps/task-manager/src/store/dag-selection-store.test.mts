@@ -26,7 +26,9 @@ const setup = (): Readonly<{
 }> => {
   const [stateObservable, setState] = createState<DomainState>(state);
 
-  const [hidden, setHidden] = createState<ReadonlySet<GraphNodeId>>(new Set());
+  const [hidden, setHidden] = createState<ReadonlySet<GraphNodeId>>(
+    new Set<GraphNodeId>(),
+  );
 
   const [active, setActive] = createState(true);
 
@@ -71,7 +73,7 @@ describe(createDagSelectionStore, () => {
 
     store.select(['task:a', 'task:b', 'milestone:m']);
 
-    setHidden(new Set(['milestone:m']));
+    setHidden(new Set<GraphNodeId>(['milestone:m']));
 
     assert.deepStrictEqual(selected(), ['task:a', 'task:b']);
 
@@ -83,7 +85,7 @@ describe(createDagSelectionStore, () => {
     assert.deepStrictEqual(selected(), ['task:b']);
 
     // Shown again, it is selected again.
-    setHidden(new Set());
+    setHidden(new Set<GraphNodeId>());
 
     assert.deepStrictEqual(selected(), ['task:b', 'milestone:m']);
   });

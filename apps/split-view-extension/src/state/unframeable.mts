@@ -57,7 +57,7 @@ export const unframeableKindOf = (
  * `about:` is here for `about:srcdoc` and the like; `about:blank` is dealt with
  * above, being a blank page on purpose rather than a page that failed.
  */
-const browserSchemes = new Set([
+const browserSchemes = new Set<string>([
   'about:',
   'chrome-untrusted:',
   'chrome:',
@@ -66,7 +66,10 @@ const browserSchemes = new Set([
 ]);
 
 /** Including this extension's own pages: a split view inside a pane is not one. */
-const extensionSchemes = new Set(['chrome-extension:', 'moz-extension:']);
+const extensionSchemes = new Set<string>([
+  'chrome-extension:',
+  'moz-extension:',
+]);
 
 /**
  * `chrome.google.com` is the Web Store only under `/webstore`; the rest of that

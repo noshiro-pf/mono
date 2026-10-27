@@ -1,7 +1,12 @@
 import { createMilestone } from './create-milestone.mjs';
 import { createTask } from './create-task.mjs';
 import { taskSortContext } from './task-sort-context.mjs';
-import { asMilestoneId, asTaskId, type DomainState } from './types.mjs';
+import {
+  asMilestoneId,
+  asTaskId,
+  type DomainState,
+  type TaskId,
+} from './types.mjs';
 
 const a = asTaskId('a');
 
@@ -39,7 +44,10 @@ describe(taskSortContext, () => {
   test('has every task’s status at the time given', () => {
     assert.deepStrictEqual(
       taskSortContext(state, 1000).displayStatusById,
-      new Map([
+      new Map<
+        TaskId,
+        'in-progress' | 'in-review' | 'done' | 'ready' | 'blocked'
+      >([
         [a, 'in-progress'],
         [b, 'blocked'],
         [c, 'blocked'],
@@ -48,7 +56,10 @@ describe(taskSortContext, () => {
 
     assert.deepStrictEqual(
       taskSortContext(state, 6000).displayStatusById,
-      new Map([
+      new Map<
+        TaskId,
+        'in-progress' | 'in-review' | 'done' | 'ready' | 'blocked'
+      >([
         [a, 'in-progress'],
         [b, 'blocked'],
         [c, 'ready'],
@@ -59,7 +70,7 @@ describe(taskSortContext, () => {
   test('has every task’s dependency depth, through milestones too', () => {
     assert.deepStrictEqual(
       taskSortContext(state, 1000).depthById,
-      new Map([
+      new Map<TaskId, number>([
         [a, 0],
         [b, 1],
         [c, 1],

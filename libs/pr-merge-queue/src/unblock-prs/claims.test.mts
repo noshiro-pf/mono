@@ -32,33 +32,37 @@ const pullRequest = (number: number, headRefOid = HEAD): PullRequest =>
 describe(standingClaims, () => {
   test('keeps a claim at the head its pull request is at', () => {
     assert.deepStrictEqual(
-      standingClaims(new Map([[1, CLAIM]]), [pullRequest(1)], NOW),
-      new Map([[1, CLAIM]]),
+      standingClaims(
+        new Map<number, Claim>([[1, CLAIM]]),
+        [pullRequest(1)],
+        NOW,
+      ),
+      new Map<number, Claim>([[1, CLAIM]]),
     );
   });
 
   test('drops one whose branch has been pushed, which is the claim done', () => {
     assert.deepStrictEqual(
       standingClaims(
-        new Map([[1, CLAIM]]),
+        new Map<number, Claim>([[1, CLAIM]]),
         [pullRequest(1, 'd'.repeat(40))],
         NOW,
       ),
-      new Map(),
+      new Map<number, Claim>(),
     );
   });
 
   test('drops one that has run out, and one on a closed pull request', () => {
     assert.deepStrictEqual(
       standingClaims(
-        new Map([
+        new Map<number, Claim>([
           [1, CLAIM],
           [2, CLAIM],
         ]),
         [pullRequest(1)],
         NOW + 3 * 60 * 60_000,
       ),
-      new Map(),
+      new Map<number, Claim>(),
     );
   });
 });

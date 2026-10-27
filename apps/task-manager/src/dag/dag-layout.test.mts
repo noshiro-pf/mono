@@ -42,9 +42,10 @@ const edgeAM: LaidOutEdge = {
 
 describe(placeNodes, () => {
   test('puts a node where it was put by hand, and the rest where ELK did', () => {
-    const positions: ReadonlyMap<GraphNodeId, Point> = new Map([
-      ['task:a', { x: -10, y: 300 }],
-    ]);
+    const positions: ReadonlyMap<GraphNodeId, Point> = new Map<
+      GraphNodeId,
+      Point
+    >([['task:a', { x: -10, y: 300 }]]);
 
     assert.deepStrictEqual(placeNodes([nodeA, nodeM], [], positions), [
       { ...nodeA, x: -10, y: 300 },
@@ -53,9 +54,10 @@ describe(placeNodes, () => {
   });
 
   test('ignores the position of a node that no longer exists', () => {
-    const positions: ReadonlyMap<GraphNodeId, Point> = new Map([
-      ['task:gone', { x: 1, y: 2 }],
-    ]);
+    const positions: ReadonlyMap<GraphNodeId, Point> = new Map<
+      GraphNodeId,
+      Point
+    >([['task:gone', { x: 1, y: 2 }]]);
 
     assert.deepStrictEqual(placeNodes([nodeA], [], positions), [nodeA]);
   });
@@ -63,16 +65,17 @@ describe(placeNodes, () => {
   test('is ELK’s layout as it is while no node was put anywhere', () => {
     const over = { ...nodeM, x: 30, y: 30 } as const;
 
-    assert.deepStrictEqual(placeNodes([nodeA, over], [], new Map()), [
-      nodeA,
-      over,
-    ]);
+    assert.deepStrictEqual(
+      placeNodes([nodeA, over], [], new Map<GraphNodeId, Point>()),
+      [nodeA, over],
+    );
   });
 
   test('moves a node put nowhere off a node put by hand, to the nearest place clear of it', () => {
-    const positions: ReadonlyMap<GraphNodeId, Point> = new Map([
-      ['task:a', { x: 200, y: 30 }],
-    ]);
+    const positions: ReadonlyMap<GraphNodeId, Point> = new Map<
+      GraphNodeId,
+      Point
+    >([['task:a', { x: 200, y: 30 }]]);
 
     // Above `a`, as close as `PLACEMENT_GAP` allows: closer than below,
     // to the left or to the right.
@@ -83,9 +86,10 @@ describe(placeNodes, () => {
   });
 
   test('moves a node put nowhere as far as the nodes it is joined to were moved', () => {
-    const positions: ReadonlyMap<GraphNodeId, Point> = new Map([
-      ['task:a', { x: 24, y: 324 }],
-    ]);
+    const positions: ReadonlyMap<GraphNodeId, Point> = new Map<
+      GraphNodeId,
+      Point
+    >([['task:a', { x: 24, y: 324 }]]);
 
     assert.deepStrictEqual(placeNodes([nodeA, nodeM], [edgeAM], positions), [
       { ...nodeA, x: 24, y: 324 },
@@ -94,9 +98,10 @@ describe(placeNodes, () => {
   });
 
   test('moves a node put nowhere as far as the nodes of its group were moved', () => {
-    const positions: ReadonlyMap<GraphNodeId, Point> = new Map([
-      ['task:a', { x: 24, y: 324 }],
-    ]);
+    const positions: ReadonlyMap<GraphNodeId, Point> = new Map<
+      GraphNodeId,
+      Point
+    >([['task:a', { x: 24, y: 324 }]]);
 
     assert.deepStrictEqual(
       placeNodes([nodeA, nodeM], [], positions, [
@@ -119,9 +124,10 @@ describe(placeNodes, () => {
       y: 0,
     } as const;
 
-    const positions: ReadonlyMap<GraphNodeId, Point> = new Map([
-      ['task:gone', { x: 1, y: 2 }],
-    ]);
+    const positions: ReadonlyMap<GraphNodeId, Point> = new Map<
+      GraphNodeId,
+      Point
+    >([['task:gone', { x: 1, y: 2 }]]);
 
     assert.deepStrictEqual(placeNodes([first, second], [], positions), [
       first,
@@ -132,7 +138,10 @@ describe(placeNodes, () => {
 
 describe(moveNodesTo, () => {
   test('moves the nodes `positions` has, and leaves the rest', () => {
-    const positions: ReadonlyMap<GraphNodeId, Point> = new Map([
+    const positions: ReadonlyMap<GraphNodeId, Point> = new Map<
+      GraphNodeId,
+      Point
+    >([
       ['task:a', { x: -10, y: 300 }],
       ['task:gone', { x: 1, y: 2 }],
     ]);
@@ -148,7 +157,7 @@ describe(positionsOf, () => {
   test('is every node’s top-left corner, by id', () => {
     assert.deepStrictEqual(
       positionsOf([nodeA, nodeM]),
-      new Map([
+      new Map<GraphNodeId, Point>([
         ['task:a', { x: 24, y: 24 }],
         ['milestone:m', { x: 200, y: 30 }],
       ]),

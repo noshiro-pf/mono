@@ -263,7 +263,7 @@ const namespaceDescription = (config: BrandedNumberConfig): string => {
   return `Namespace providing type-safe operations for the \`${config.pascalName}\` branded type.\n\nThe \`${config.pascalName}\` type represents ${config.typeNameInMessage}.${divisionNote}${precisionNote}`;
 };
 
-const VOWELS = new Set(['a', 'e', 'i', 'o', 'u']);
+const VOWELS = new Set<string>(['a', 'e', 'i', 'o', 'u']);
 
 const indefinite = (word: string): string =>
   VOWELS.has(word.slice(0, 1).toLowerCase()) ? 'an' : 'a';

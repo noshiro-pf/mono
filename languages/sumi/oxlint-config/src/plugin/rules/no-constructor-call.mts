@@ -9,7 +9,7 @@ import { globalReferenceName } from './global-reference.mjs';
  * is an implicit conversion (or a different operation). `Symbol()` and
  * `BigInt()` are deliberately absent: they have no `new` form (D-41).
  */
-const bannedCallees: ReadonlyMap<string, string> = new Map([
+const bannedCallees: ReadonlyMap<string, string> = new Map<string, string>([
   ['Boolean', 'an explicit comparison such as `x !== undefined`'],
   ['Number', '`SafeNumber.parse` / `SafeNumber.parseInteger` (ts-std-forge)'],
   ['String', '`SafeString.fromPrimitive` (ts-std-forge) or a template literal'],

@@ -29,7 +29,7 @@ describe('the ESLint off block', () => {
 
     assert.deepStrictEqual(
       new Set(Object.values(eslintConfigOffForSumiCheck.rules)),
-      new Set(['off']),
+      new Set<string>(['off']),
     );
   });
 

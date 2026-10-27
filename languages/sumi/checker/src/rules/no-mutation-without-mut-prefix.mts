@@ -194,7 +194,9 @@ export const noMutationWithoutMutPrefix: Rule = {
  * property). Where one of them lands on the target, the write is already
  * reported, and a second report of the same line would say nothing new.
  */
-const readonlyWriteCodes: ReadonlySet<number> = new Set([2540, 2542, 2704]);
+const readonlyWriteCodes: ReadonlySet<number> = new Set<number>([
+  2540, 2542, 2704,
+]);
 
 /** An access path: `a.b`, `a[0]`, and the chains built from them. */
 const isAccess = (
@@ -252,10 +254,10 @@ const dateSetterNames: readonly string[] = [
 const mutatorsByOwner: ReadonlyMap<
   string,
   ReadonlyMap<string, string>
-> = new Map([
+> = new Map<string, ReadonlyMap<string, string>>([
   [
     'Array',
-    new Map([
+    new Map<string, string>([
       ['copyWithin', '`with`'],
       ['fill', '`Array.from`'],
       ['pop', '`xs.slice(0, -1)`'],
@@ -271,7 +273,7 @@ const mutatorsByOwner: ReadonlyMap<
     (name) =>
       [
         name,
-        new Map([
+        new Map<string, string>([
           ['copyWithin', '`with`'],
           ['fill', '`xs.map(() => value)`'],
           ['reverse', '`toReversed`'],
@@ -282,7 +284,7 @@ const mutatorsByOwner: ReadonlyMap<
   ),
   [
     'Map',
-    new Map([
+    new Map<string, string>([
       ['clear', '`new Map()`'],
       ['delete', 'a new `Map` built without the entry'],
       ['getOrInsert', '`m.get(k) ?? v`'],
@@ -292,7 +294,7 @@ const mutatorsByOwner: ReadonlyMap<
   ],
   [
     'Set',
-    new Map([
+    new Map<string, string>([
       ['add', '`new Set([...s, x])`'],
       ['clear', '`new Set()`'],
       ['delete', 'a new `Set` built without the element'],
@@ -300,7 +302,7 @@ const mutatorsByOwner: ReadonlyMap<
   ],
   [
     'WeakMap',
-    new Map([
+    new Map<string, string>([
       ['delete', 'a new `WeakMap` built without the entry'],
       ['getOrInsert', '`m.get(k) ?? v`'],
       ['getOrInsertComputed', '`m.get(k) ?? f(k)`'],
@@ -309,7 +311,7 @@ const mutatorsByOwner: ReadonlyMap<
   ],
   [
     'WeakSet',
-    new Map([
+    new Map<string, string>([
       ['add', 'a new `WeakSet`'],
       ['delete', 'a new `WeakSet` built without the element'],
     ]),
@@ -320,7 +322,7 @@ const mutatorsByOwner: ReadonlyMap<
   ],
   [
     'ObjectConstructor',
-    new Map([
+    new Map<string, string>([
       ['assign', '`{ ...target, ...source }`'],
       ['defineProperties', '`{ ...target, ...properties }`'],
       ['defineProperty', '`{ ...target, [key]: value }`'],
@@ -329,7 +331,7 @@ const mutatorsByOwner: ReadonlyMap<
   ],
   [
     'Reflect',
-    new Map([
+    new Map<string, string>([
       ['defineProperty', '`{ ...target, [key]: value }`'],
       ['deleteProperty', 'a new object built without the key'],
       ['set', '`{ ...target, [key]: value }`'],
@@ -342,7 +344,10 @@ const mutatorsByOwner: ReadonlyMap<
  * The owners whose mutators are static functions taking the target as their
  * first argument, with the name to print them under.
  */
-const argumentMutatingOwners: ReadonlyMap<string, string> = new Map([
+const argumentMutatingOwners: ReadonlyMap<string, string> = new Map<
+  string,
+  string
+>([
   ['ObjectConstructor', 'Object'],
   ['Reflect', 'Reflect'],
 ]);
@@ -374,24 +379,31 @@ const arrayCopyingMethods = [
 const freshValueMembersByOwner: ReadonlyMap<
   string,
   ReadonlySet<string>
-> = new Map([
+> = new Map<string, ReadonlySet<string>>([
   ['Array', new Set(arrayCopyingMethods)],
   ['ReadonlyArray', new Set(arrayCopyingMethods)],
-  ['ArrayConstructor', new Set(['from', 'of'])],
+  ['ArrayConstructor', new Set<string>(['from', 'of'])],
   [
     'ObjectConstructor',
-    new Set(['create', 'entries', 'fromEntries', 'keys', 'values']),
+    new Set<string>(['create', 'entries', 'fromEntries', 'keys', 'values']),
   ],
   ...typedArrayNames.map(
     (name) =>
       [
         name,
-        new Set(['filter', 'map', 'slice', 'toReversed', 'toSorted', 'with']),
+        new Set<string>([
+          'filter',
+          'map',
+          'slice',
+          'toReversed',
+          'toSorted',
+          'with',
+        ]),
       ] as const,
   ),
-  ['String', new Set(['split'])],
-  ['Set', new Set(['difference', 'intersection', 'union'])],
-  ['ReadonlySet', new Set(['difference', 'intersection', 'union'])],
+  ['String', new Set<string>(['split'])],
+  ['Set', new Set<string>(['difference', 'intersection', 'union'])],
+  ['ReadonlySet', new Set<string>(['difference', 'intersection', 'union'])],
 ]);
 
 /**

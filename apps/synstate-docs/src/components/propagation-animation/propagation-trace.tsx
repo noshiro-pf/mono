@@ -870,7 +870,7 @@ const changedKeys = (
   current: TraceStep | undefined,
 ): ReadonlySet<string> => {
   if (previous === undefined || current === undefined) {
-    return new Set();
+    return new Set<string>();
   }
 
   const before = flatten(previous);
@@ -883,7 +883,7 @@ const changedKeys = (
 };
 
 const flatten = (step: TraceStep): ReadonlyMap<string, string> =>
-  new Map([
+  new Map<string, string>([
     ['propagationDepth', step.module.propagationDepth.toString()],
     ['outermostToken', step.module.outermostToken],
     ['level', step.module.level.toString()],
@@ -930,7 +930,7 @@ const nodeFields = [
 const nodeColumns = ['node', 'depth', ...nodeFields] as const;
 
 /** The locals drawn as a tag on the node they hold. */
-const pointerLocals: ReadonlySet<string> = new Set(['child', 'node']);
+const pointerLocals: ReadonlySet<string> = new Set<string>(['child', 'node']);
 
 type Graph = Readonly<{
   nodes: readonly TraceNode[];

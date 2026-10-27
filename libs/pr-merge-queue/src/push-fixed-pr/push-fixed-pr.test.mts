@@ -3,6 +3,7 @@ import {
   readQueueComments,
   writeClaimComment,
   writeSetAsideComment,
+  type ContextState,
   type QueueComments,
   type ReportEntry,
 } from 'pr-report-core';
@@ -32,7 +33,7 @@ const entry = (fields: Partial<ReportEntry> = {}): ReportEntry =>
     updatedAt: '2026-10-15T00:00:00Z',
     headCommittedAt: undefined,
     comparison: undefined,
-    reported: new Map(),
+    reported: new Map<string, ContextState>(),
     checksRunning: false,
     linkedIssues: [],
     mergeAfter: [],

@@ -193,7 +193,7 @@ describe(interpolateOpacities, () => {
   test('is `from` at 0 and `to` at 1', () => {
     assert.deepStrictEqual(
       interpolateOpacities(from, to, 0),
-      new Map([
+      new Map<GraphNodeId, number>([
         ['milestone:a', 1],
         ['milestone:b', 0],
         ['milestone:c', 0.5],
@@ -206,7 +206,7 @@ describe(interpolateOpacities, () => {
   test('fades each node linearly, one with nothing to come from staying put', () => {
     assert.deepStrictEqual(
       interpolateOpacities(from, to, 0.25),
-      new Map([
+      new Map<GraphNodeId, number>([
         ['milestone:a', 0.75],
         ['milestone:b', 0.25],
         ['milestone:c', 0.5],

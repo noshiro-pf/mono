@@ -348,7 +348,10 @@ export const readIssueOrder = async (
   numbers: readonly number[],
 ): Promise<Result<IssueOrder, string>> => {
   if (!Arr.isNonEmpty(numbers)) {
-    return Result.ok({ closes: new Map(), startAfter: new Map() });
+    return Result.ok({
+      closes: new Map<number, readonly number[]>(),
+      startAfter: new Map<number, readonly number[]>(),
+    });
   }
 
   const pulls = await askRepository(
@@ -390,7 +393,9 @@ export const readIssueOrder = async (
   const unlinked = unlinkedClosingIssues(repo, read);
 
   if (!Arr.isNonEmpty(unlinked)) {
-    return Result.ok(issueOrderOf(repo, read, new Map()));
+    return Result.ok(
+      issueOrderOf(repo, read, new Map<number, ClosingIssueAnswer>()),
+    );
   }
 
   const issues = await askRepository(
@@ -640,7 +645,10 @@ export const readOwnComments = async (
   >
 > => {
   if (!Arr.isNonEmpty(numbers)) {
-    return Result.ok({ setAside: new Map(), claims: new Map() });
+    return Result.ok({
+      setAside: new Map<number, OwnSetAsideComment>(),
+      claims: new Map<number, Claim>(),
+    });
   }
 
   const query = [

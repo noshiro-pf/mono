@@ -55,8 +55,8 @@ export const traceUpdates = (
     freshTokens: [],
     queues: [],
     stack: [],
-    emitCount: new Map(),
-    skipped: new Set(),
+    emitCount: new Map<string, number>(),
+    skipped: new Set<string>(),
     steps: [],
   };
 

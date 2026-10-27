@@ -254,7 +254,7 @@ export const createDagCanvasScene = ({
           members,
           from === undefined
             ? empty
-            : new Map([
+            : new Map<GroupId, Point>([
                 ...empty,
                 [group.id, { x: from.x + group.dx, y: from.y + group.dy }],
               ]),
@@ -919,7 +919,7 @@ const selectionDragOf = (
 const createRecordCache = <R, K>(
   keyOf: (record: R) => K,
 ): ((records: readonly R[]) => readonly R[]) => {
-  let mut_previous: ReadonlyMap<K, R> = new Map();
+  let mut_previous: ReadonlyMap<K, R> = new Map<K, R>();
 
   return (records) => {
     const kept = records.map((record) => {

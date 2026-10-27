@@ -3,7 +3,7 @@ import type { MutableSet } from 'ts-type-forge';
 // embed-sample-code-ignore-above
 
 type TagSet = MutableSet<string>;
-const tags: TagSet = new Set(['typescript', 'javascript', 'react']);
+const tags: TagSet = new Set<string>(['typescript', 'javascript', 'react']);
 tags.add('vue'); // ✓ allowed - set is mutable
 tags.delete('react'); // ✓ allowed
 

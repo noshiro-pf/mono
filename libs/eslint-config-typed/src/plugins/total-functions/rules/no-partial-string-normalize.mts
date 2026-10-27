@@ -162,4 +162,9 @@ export const noPartialStringNormalize = createRule({
   defaultOptions: [],
 } as const);
 
-const SAFE_FORMS: ReadonlySet<string> = new Set(['NFC', 'NFD', 'NFKC', 'NFKD']);
+const SAFE_FORMS: ReadonlySet<string> = new Set<string>([
+  'NFC',
+  'NFD',
+  'NFKC',
+  'NFKD',
+]);

@@ -23,7 +23,7 @@ export const SetType = <T extends UnknownType>(
 
   const typeName = options?.typeName ?? 'Set';
 
-  const getDefaultValue = memoizeFunction((): S => new Set());
+  const getDefaultValue = memoizeFunction((): S => new Set<TypeOf<T>>());
 
   const validate: Type<S>['validate'] = (a) => {
     if (!isSet(a)) {

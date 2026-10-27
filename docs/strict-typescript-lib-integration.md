@@ -2817,3 +2817,40 @@ Response: infer T } ? T : typeof undici.Response` と宣言していて、DOM �
 
 回帰テストは `strict-lib/configs/tsconfig/lib-check-entry.ts` に足した
 （`globalThis.navigator` などが通ることと、`globalThis.NaN` が通らないこと）。
+
+### lint の側
+
+`globalThis` に載らない名前が残る以上、lint もそれに合わせた。
+
+- `unicorn/prefer-global-this` は「`window.X` と `globalThis.X` は同じ」を前提に
+  `window.history` を `globalThis.history` へ書き換えさせるが、strict lib では
+  後者が型エラーになる。`no-restricted-globals` は素の `history` を禁じるので、
+  **どの書き方も lint か型のどちらかで落ちていた**。
+  `ts-restrictions/prefer-global-this` は upstream のルールをそのまま走らせ、
+  `typeof globalThis` に無いメンバーへ届く `window.X`（分割代入を含む）の報告だけを
+  落とす。stock lib では upstream と同じものを報告する
+- `restrictedGlobalsForBrowser` の案内先は、`var` に残した `location` ・
+  `navigator` が `globalThis.X`、ウィンドウにしか無い `history` が `window.history`
+- `eslintConfigForBrowser` は `location` ・ `history` ・ `navigator` を
+  グローバルとして宣言しない。宣言していると `unicorn/no-unnecessary-global-this`
+  が `globalThis.location` を素の `location` に書き換え、それを
+  `no-restricted-globals` が禁じる。これまで 3 つのルールを同時に満たせたのは
+  `const { location } = globalThis` という分割代入だけで、各所のコメントが
+  その事情を説明していた。宣言しなくても `no-restricted-globals` は未宣言の
+  名前への参照を報告する
+
+同じ opt-in で `new Set(['task:a'])` が `ReadonlySet<GraphNodeId>` を満たさなくなる
+件も出た。strict lib の `ReadonlySet#has` は、リテラル union の Set でも広い型で
+引けるよう `T | (WidenLiteral<T> & {})` を取る（意図した宣言）。このせいで文脈型から
+`T` を推論しなくなり、`Set<string>` になる。stock lib では `new Set()` が
+`Set<any>` になって何も落ちないので、**どちらの lib でも同じ型になる型引数を
+書く**のを正とし、`ts-restrictions/explicit-collection-type-arguments` で求める
+（引数なし、または配列リテラルのときだけ。式を渡すなら要素型はそこから決まる）。
+修正と提案が書く型引数は、文脈（注釈・引数・プロパティ）を推論より優先する。
+推論は lib によって違う（strict lib ではリテラル union が `string` に広がり、
+空の `new Map()` は `never` になる）ので、宣言された側を写す。
+既存の約 440 か所はこの提案で書き換えた。TypeScript は `Readonly<{ … }>` の別名を
+保たず展開して印字するので、同じパッケージに同じ形の別名がちょうど 1 つあれば
+それに置き換えてある。
+コンストラクタの型引数を const にする案も試したが、文脈が無いと
+`new Set(['a'])` が `Set<'a'>` になって `.add('b')` が通らなくなるので採らなかった。

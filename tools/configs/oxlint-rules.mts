@@ -267,7 +267,10 @@ const oxlintPrefixes = [
 ] as const;
 
 // typescript-eslint extension rules that oxlint implements as the core rule.
-const oxlintNameOverrides: ReadonlyMap<string, string> = new Map([
+const oxlintNameOverrides: ReadonlyMap<string, string> = new Map<
+  string,
+  string
+>([
   ['@typescript-eslint/default-param-last', 'default-param-last'],
   [
     '@typescript-eslint/no-unused-private-class-members',

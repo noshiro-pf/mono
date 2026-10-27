@@ -268,7 +268,7 @@ const FENCE_MARKER = /^\s{0,3}(?<marker>`{3,}|~{3,})/u;
 const MAX_REWRITE_PASSES = 3;
 
 /** The extensions worth reading. Everything else is binary or generated. */
-const SCANNED_EXTENSIONS: ReadonlySet<string> = new Set([
+const SCANNED_EXTENSIONS: ReadonlySet<string> = new Set<string>([
   '.css',
   '.cts',
   '.html',
@@ -287,7 +287,10 @@ const SCANNED_EXTENSIONS: ReadonlySet<string> = new Set([
   '.yml',
 ]);
 
-const MARKDOWN_EXTENSIONS: ReadonlySet<string> = new Set(['.md', '.mdx']);
+const MARKDOWN_EXTENSIONS: ReadonlySet<string> = new Set<string>([
+  '.md',
+  '.mdx',
+]);
 
 /**
  * Paths whose text is not ours to punctuate.
@@ -324,7 +327,7 @@ const IGNORED_PATTERN = /^strict-lib\/v[\d.]+\//u;
  * directive the scan looks for would be a string this very file has to
  * contain, and containing it would exempt the check from itself.
  */
-const IGNORED_PATHS: ReadonlySet<string> = new Set([
+const IGNORED_PATHS: ReadonlySet<string> = new Set<string>([
   'tools/scripts/cmd/check-japanese-parentheses.test.mts',
 ]);
 

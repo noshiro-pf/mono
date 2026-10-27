@@ -278,9 +278,9 @@ export const unblockPrs = async (
   installStopHandlers();
 
   let mut_state: LoopState = {
-    skipped: new Map(),
-    demoted: new Map(),
-    tracked: new Set(),
+    skipped: new Map<number, SkipRecord>(),
+    demoted: new Map<number, string>(),
+    tracked: new Set<number>(),
     baseSha: undefined,
     quiet: initialQuiet,
     stackedOn: undefined,
@@ -388,7 +388,7 @@ const settleWithComments = async (
   if (Result.isErr(read)) {
     log(`Cannot read the set-aside comments: ${read.value}`);
 
-    return { skipped, claimed: new Map() };
+    return { skipped, claimed: new Map<number, Claim>() };
   }
 
   const settled = settleSkips(
@@ -892,7 +892,7 @@ const trackAfterWatch = (
 ): ReadonlySet<number> =>
   outcome === 'merged' || outcome === 'closed'
     ? new Set(Array.from(tracked).filter((number) => number !== prNumber))
-    : new Set([...tracked, prNumber]);
+    : new Set<number>([...tracked, prNumber]);
 
 /**
  * Says what became of the pull requests this run acted on that have left the
@@ -957,7 +957,10 @@ const issueOrderFor = async (
       `Cannot read the issues the pull requests close; inheriting no Start-After this cycle. (${read.value})`,
     );
 
-    return { closes: new Map(), startAfter: new Map() };
+    return {
+      closes: new Map<number, readonly number[]>(),
+      startAfter: new Map<number, readonly number[]>(),
+    };
   }
 
   return read.value;

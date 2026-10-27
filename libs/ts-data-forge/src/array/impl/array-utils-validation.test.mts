@@ -39,7 +39,7 @@ describe('Arr validations', () => {
 
       assert.isFalse(isArray({}));
 
-      assert.isFalse(isArray(new Set()));
+      assert.isFalse(isArray(new Set<unknown>()));
     });
 
     test('should refine union types correctly', () => {

@@ -354,7 +354,7 @@ const countUnder = (
   } as const;
 };
 
-const NO_STARTS: IssueStarts = new Map();
+const NO_STARTS: IssueStarts = new Map<number, IssueStartState>();
 
 const startOf = (starts: IssueStarts, issue: IssueItem): IssueStartState =>
   starts.get(issue.number) ?? 'free';

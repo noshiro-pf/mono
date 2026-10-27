@@ -218,7 +218,7 @@ const SCOPE_PATTERN =
 const SITE_PAGES_PREFIX = 'apps/synstate-docs/src/';
 
 /** The extensions worth reading. Everything else is binary. */
-const SCANNED_EXTENSIONS: ReadonlySet<string> = new Set([
+const SCANNED_EXTENSIONS: ReadonlySet<string> = new Set<string>([
   '.astro',
   '.json',
   '.md',
@@ -229,7 +229,10 @@ const SCANNED_EXTENSIONS: ReadonlySet<string> = new Set([
   '.tsx',
 ]);
 
-const MARKDOWN_EXTENSIONS: ReadonlySet<string> = new Set(['.md', '.mdx']);
+const MARKDOWN_EXTENSIONS: ReadonlySet<string> = new Set<string>([
+  '.md',
+  '.mdx',
+]);
 
 /**
  * An absolute URL into this repository on `main`, up to whitespace, a quote,

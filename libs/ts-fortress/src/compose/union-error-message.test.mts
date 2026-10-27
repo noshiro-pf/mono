@@ -158,7 +158,7 @@ describe('union - error messages', () => {
     });
 
     test('a Map passed to a union of records', () => {
-      const result = shape.validate(new Map([['radius', 5]]));
+      const result = shape.validate(new Map<string, number>([['radius', 5]]));
 
       assert.isTrue(Result.isErr(result));
 

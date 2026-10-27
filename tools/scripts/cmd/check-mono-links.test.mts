@@ -150,31 +150,51 @@ describe('brokenReason', () => {
 
   test('accepts a tracked file and a directory that holds one', async () => {
     assert.isUndefined(
-      await brokenReason(linkTo('libs/synstate/src/a.mts'), tree, new Map()),
+      await brokenReason(
+        linkTo('libs/synstate/src/a.mts'),
+        tree,
+        new Map<string, number>(),
+      ),
     );
 
     assert.isUndefined(
-      await brokenReason(linkTo('libs/synstate/src'), tree, new Map()),
+      await brokenReason(
+        linkTo('libs/synstate/src'),
+        tree,
+        new Map<string, number>(),
+      ),
     );
 
-    assert.isUndefined(await brokenReason(linkTo('libs'), tree, new Map()));
+    assert.isUndefined(
+      await brokenReason(linkTo('libs'), tree, new Map<string, number>()),
+    );
   });
 
   test('rejects a path the tree does not have', async () => {
     assert.strictEqual(
-      await brokenReason(linkTo('libs/synstate/src/b.mts'), tree, new Map()),
+      await brokenReason(
+        linkTo('libs/synstate/src/b.mts'),
+        tree,
+        new Map<string, number>(),
+      ),
       'no such path on main',
     );
 
     // A prefix of a file name is not a directory.
     assert.strictEqual(
-      await brokenReason(linkTo('libs/synstate/src/a'), tree, new Map()),
+      await brokenReason(
+        linkTo('libs/synstate/src/a'),
+        tree,
+        new Map<string, number>(),
+      ),
       'no such path on main',
     );
   });
 
   test('checks a line anchor against the length of the file', async () => {
-    const lineCounts = new Map([['libs/synstate/src/a.mts', 20]]);
+    const lineCounts = new Map<string, number>([
+      ['libs/synstate/src/a.mts', 20],
+    ]);
 
     assert.isUndefined(
       await brokenReason(
@@ -199,7 +219,7 @@ describe('brokenReason', () => {
       await brokenReason(
         linkTo('libs/synstate/src', { first: 1, last: 1 }),
         tree,
-        new Map(),
+        new Map<string, number>(),
       ),
       'a line anchor on a directory',
     );

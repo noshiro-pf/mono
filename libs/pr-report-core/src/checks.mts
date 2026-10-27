@@ -133,7 +133,7 @@ export const classifyCheckRun = (
         ? 'passed'
         : 'failed';
 
-const PASSING_CONCLUSIONS: ReadonlySet<string> = new Set([
+const PASSING_CONCLUSIONS: ReadonlySet<string> = new Set<string>([
   'neutral',
   'success',
 ]);

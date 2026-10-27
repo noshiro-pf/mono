@@ -180,7 +180,7 @@ const defaultIgnoreFn = (filePath: string): boolean => {
   );
 };
 
-const ignoreFiles: ReadonlySet<string> = new Set([
+const ignoreFiles: ReadonlySet<string> = new Set<string>([
   '.DS_Store',
   'package-lock.json',
   'yarn.lock',

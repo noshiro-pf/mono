@@ -27,7 +27,7 @@ type MessageIds = 'useStrictOrRelaxed' | 'replaceWith';
  * that is not provably part of the union, a key set computed from a still
  * deferred type parameter).
  */
-const ALTERNATIVES: StdTypeAlternatives = new Map([
+const ALTERNATIVES: StdTypeAlternatives = new Map<string, readonly string[]>([
   ['Exclude', ['StrictExclude', 'RelaxedExclude']],
   ['Extract', ['StrictExtract', 'RelaxedExtract']],
   ['Omit', ['StrictOmit', 'RelaxedOmit']],

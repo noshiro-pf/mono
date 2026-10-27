@@ -39,7 +39,7 @@ describe('ISet.create', () => {
   });
 
   test('should create set from JavaScript Set', () => {
-    const jsSet = new Set(['a', 'b', 'c']);
+    const jsSet = new Set<string>(['a', 'b', 'c']);
 
     const set = ISet.create(jsSet);
 

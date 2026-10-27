@@ -152,13 +152,14 @@ export const jsxBooleanLogicalOperands: TSESLint.RuleModule<
 } as const;
 
 /** Expressions that need parentheses as the test of a ternary. */
-const LOOSER_THAN_TERNARY_TEST: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.ArrowFunctionExpression,
-  AST_NODE_TYPES.AssignmentExpression,
-  AST_NODE_TYPES.ConditionalExpression,
-  AST_NODE_TYPES.SequenceExpression,
-  AST_NODE_TYPES.YieldExpression,
-]);
+const LOOSER_THAN_TERNARY_TEST: ReadonlySet<AST_NODE_TYPES> =
+  new Set<AST_NODE_TYPES>([
+    AST_NODE_TYPES.ArrowFunctionExpression,
+    AST_NODE_TYPES.AssignmentExpression,
+    AST_NODE_TYPES.ConditionalExpression,
+    AST_NODE_TYPES.SequenceExpression,
+    AST_NODE_TYPES.YieldExpression,
+  ]);
 
 /**
  * Whether every value of `type` is `true` or `false`. `never` holds none, so
