@@ -64,30 +64,89 @@ export default [
 
 ## Rules
 
-| Rule                             | Description                                                                                                                                                                    |
-| :------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `no-redundant-skip-if-no-change` | Disallow `skipIfNoChange()` directly after `map`, which already stops a result equal (`Object.is`) to the one it holds. Fixable.                                               |
-| `no-unbounded-counter-pipe`      | Disallow calling `.pipe` directly on `counter(...)` when it has no `times` option. Nothing holds the counter, so nothing can complete it, and it never ends.                   |
-| `no-write-during-propagation`    | Disallow writing to a synstate state or source from a subscriber or a projection. The write starts an update inside the one that called it, outside the graph synstate orders. |
-| `prefer-map-to`                  | Require `mapTo(c)` instead of `map(() => c)`. `map` stops a result equal to the one it holds, so a `map` to a constant emits once and never again. Fixable.                    |
+| Rule                             | Description                                                                                                                                                                          |
+| :------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `no-identity-map`                | Require `skipIfNoChange()` instead of `map((x) => x)`, which changes no value and only stops a repeated one. Fixable.                                                                |
+| `no-redundant-skip-if-no-change` | Disallow `skipIfNoChange()` directly after `map`, an operator built on it, or another `skipIfNoChange()`, which already stop a value equal (`Object.is`) to the one before. Fixable. |
+| `no-throw-in-operator`           | Disallow `throw` in a function passed to a synstate operator. The exception stops the update midway, leaving part of the graph updated; return a `Result` instead.                   |
+| `no-unbounded-counter-pipe`      | Disallow calling `.pipe` directly on `counter(...)` when it has no `times` option. Nothing holds the counter, so nothing can complete it, and it never ends.                         |
+| `no-write-during-propagation`    | Disallow writing to a synstate state or source from a subscriber or a projection. The write starts an update inside the one that called it, outside the graph synstate orders.       |
+| `prefer-map-to`                  | Require `mapTo(c)` instead of `map(() => c)`. `map` stops a result equal to the one it holds, so a `map` to a constant emits once and never again. Fixable.                          |
+
+### `no-identity-map`
+
+`map` passes on a result only when it is not `Object.is` the one it holds, so
+`x$.pipe(map((x) => x))` changes no value and only stops one equal to the
+value before. That is `skipIfNoChange()`, written as something that reads like
+it does nothing; the rule rewrites it to `skipIfNoChange()`, adding the import
+when the file has none. Remove the operator instead when nothing needs
+stopping.
+
+Reported is a `map` given one function, not `async`, that returns its one
+parameter: an arrow, or a function whose body is that `return`. A `map` given
+`equals` is left alone, since its author has said how results compare. Type
+syntax in the call — an annotated parameter or return type, type arguments, or
+`as`, `satisfies` or `!` around the function or the result — may be what the
+`map` was written for, so such a call is reported without a fix; to widen the
+type, annotate the variable that holds the result instead. `map` is
+recognized imported from `synstate` by name, under an alias or through a
+namespace import. A callee in a type wrapper, a comment in the call, or a file
+where `skipIfNoChange` names something else is reported without a fix.
 
 ### `no-redundant-skip-if-no-change`
 
 `map` passes on a result only when it is not `Object.is` the one it holds, so
 `layout$.pipe(map((l) => l.mode)).pipe(skipIfNoChange())` compares every
 result twice and keeps one more observable for nothing. The rule removes the
-`.pipe(skipIfNoChange())`.
+`.pipe(skipIfNoChange())`. The same holds after the operators synstate builds
+on `map` — `pluck` (`getKey`), `mapOptional`, `mapResultOk`, `mapResultErr`,
+`unwrapOptional`, `unwrapResultOk`, `unwrapResultErr` — and after a
+`skipIfNoChange()` that compares with `Object.is` itself: of the values these
+pass on, none is `Object.is` the one before.
 
 Only `skipIfNoChange` (or `distinctUntilChanged`) given no comparison or
-`Object.is` is reported, piped directly onto `x.pipe(map(f))` where that `map`
-is given no `equals`: a comparison of its own may stop more than `Object.is`,
-a `map` with `equals` may pass equal results on, and an operator in between
-(`withInitialValue`) may emit a value `map` never compared. An observable
-reached through a name is not followed. Both operators are recognized imported
-from `synstate` by name, under an alias or through a namespace import, and read
+`Object.is` is reported, piped directly onto `x.pipe(op)` where `op` is one of
+those: a `map` given no `equals`, an operator built on `map`, or
+`skipIfNoChange` comparing with `Object.is`. A comparison of its own may stop
+more than `Object.is`, a `map` with `equals` may pass equal results on, `mapTo`
+emits on every source value, and an operator in between (`withInitialValue`)
+may emit a value the one before it never compared. An observable reached
+through a name is not followed. The operators are recognized imported from
+`synstate` by name, under an alias or through a namespace import, and read
 through `as`, `satisfies`, `!` and parentheses, which the fix keeps around the
-mapped observable. A comment inside the removed text leaves the report without
+observable before. A comment inside the removed text leaves the report without
 a fix.
+
+### `no-throw-in-operator`
+
+synstate calls the functions given to its operators while an update
+propagates, and catches nothing they throw. A `throw` in
+`text$.pipe(map((text) => { if (text === '') throw new Error('empty'); ... }))`
+stops the update where it is and reaches whoever wrote to the source: the
+nodes the update already reached hold the new value, those it had not reached
+keep the old one, and a subscriber that reads both sees them disagree until
+the next update. Make the function pure and return the failure as a value,
+which the graph carries like any other —
+`map((text) => (text === '' ? Result.err('empty') : Result.ok(text)))` — and
+handle it downstream with `mapResultOk`, `unwrapResultOk` or
+`filter(Result.isOk)`.
+
+Reported is a `throw` directly in a function given to a synstate operator
+called in `.pipe(...)` — as an argument, or as a property of an options object
+(`map(f, { equals })`) — unless a `try` with a `catch` in the same function
+encloses it. A function passed by name counts when the file defines it (a
+function declaration, or a `const` bound to a function), and so does a
+function of the file that the callback calls, at any depth: the rule reports
+the call in the callback, naming the function that throws. The operators are
+recognized imported from `synstate` by name, under an alias or through a
+namespace import, and read through `as`, `satisfies`, `!` and parentheses.
+
+Not reported: a `throw` in a function the callback only defines (a `.then`
+callback, which runs after the update), in an `async` function (whose `throw`
+rejects the promise it returns), a function imported from another file, and a
+call that throws without a `throw` of the file, such as `JSON.parse` or
+`Result.unwrapThrow`. The rule reads the syntax only; a file with no `throw`
+costs it one look at each call.
 
 ### `no-unbounded-counter-pipe`
 

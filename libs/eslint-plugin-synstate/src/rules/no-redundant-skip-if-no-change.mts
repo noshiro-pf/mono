@@ -20,12 +20,18 @@ type MessageIds = 'redundantSkipIfNoChange';
 /**
  * `map` passes on a result only when it is not `Object.is` the one it holds,
  * so a `skipIfNoChange()` piped straight after it compares what `map` has
- * already compared, and costs one more observable for nothing.
+ * already compared, and costs one more observable for nothing. The same
+ * holds after the operators synstate builds on `map` (`pluck`,
+ * `unwrapResultOk`, …) and after a `skipIfNoChange()` that compares with
+ * `Object.is` itself: of the values it passes on, none is `Object.is` the one
+ * before.
  *
  * Only `skipIfNoChange()` with no comparison or with `Object.is` (or its alias
- * `distinctUntilChanged`) is reported, piped directly onto `x.pipe(map(f))`
- * where that `map` is given no `equals`. A `map` with `equals` may pass equal
- * results on, and a comparison of its own may stop more than `Object.is`.
+ * `distinctUntilChanged`) is reported, piped directly onto `x.pipe(op)` where
+ * `op` is one of those: a `map` given no `equals`, an operator built on
+ * `map`, or `skipIfNoChange` comparing with `Object.is`. A `map` with
+ * `equals` may pass equal results on, a comparison of its own may stop more
+ * than `Object.is`, and `mapTo` emits on every source value.
  */
 export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
   MessageIds,
@@ -35,13 +41,13 @@ export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
     type: 'suggestion',
     docs: {
       description:
-        'Disallow `skipIfNoChange()` directly after `map`, which already stops a result equal to the one it holds.',
+        'Disallow `skipIfNoChange()` directly after `map`, an operator built on it, or another `skipIfNoChange()`, which already stop a value equal to the one before.',
     },
     fixable: 'code',
     schema: [],
     messages: {
       redundantSkipIfNoChange:
-        '`map` already stops a result equal (`Object.is`) to the one it holds, so this `skipIfNoChange()` compares again for nothing. Remove it.',
+        '`{{operator}}` already stops a value equal (`Object.is`) to the one before it, so this `skipIfNoChange()` compares again for nothing. Remove it.',
     },
   },
 
@@ -96,9 +102,28 @@ export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
           return;
         }
 
-        const mapCall = skipTypeWrappers(inner.operator);
+        const upstream = skipTypeWrappers(inner.operator);
 
-        if (!callsSynstate(mapCall, ['map']) || mapCall.arguments.length > 1) {
+        if (
+          !callsSynstate(upstream, [
+            'map',
+            ...builtOnMap,
+            'skipIfNoChange',
+            'distinctUntilChanged',
+          ])
+        ) {
+          return;
+        }
+
+        const operator = resolveCallee(upstream.callee)?.canonicalName;
+
+        if (
+          operator === undefined ||
+          (operator === 'map' && upstream.arguments.length > 1) ||
+          ((operator === 'skipIfNoChange' ||
+            operator === 'distinctUntilChanged') &&
+            !comparesWithObjectIs(upstream.arguments))
+        ) {
           return;
         }
 
@@ -119,6 +144,7 @@ export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
         context.report({
           node: skip,
           messageId: 'redundantSkipIfNoChange',
+          data: { operator },
           fix: hasComment ? null : (fixer) => fixer.removeRange(removed),
         });
       },
@@ -126,6 +152,21 @@ export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
   },
   defaultOptions: [],
 } as const;
+
+/**
+ * The operators synstate builds on `map` with no `equals`, which therefore
+ * stop a result `Object.is` the one they hold.
+ */
+const builtOnMap = [
+  'pluck',
+  'getKey',
+  'mapOptional',
+  'mapResultOk',
+  'mapResultErr',
+  'unwrapOptional',
+  'unwrapResultOk',
+  'unwrapResultErr',
+] as const;
 
 /**
  * `node` as `receiver.pipe(operator)`, or `undefined` when it is not a `.pipe`

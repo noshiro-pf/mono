@@ -11,13 +11,11 @@ import {
   getImportDeclarations,
   getImportedLocalName,
   getRangeWithParens,
-  hasForeignBinding,
-  isTypeWrapper,
   skipTypeWrappers,
   type ResolvedCallee,
 } from 'eslint-rule-forge';
 import { SYNSTATE_MODULE } from './constants.mjs';
-import { isShadowedCallee } from './synstate-callee.mjs';
+import { isShadowedCallee, replacementCallee } from './synstate-callee.mjs';
 
 type Options = readonly [];
 
@@ -102,6 +100,7 @@ export const preferMapTo: TSESLint.RuleModule<MessageIds, Options> = {
             sourceCode,
             node,
             resolved,
+            'mapTo',
             importedMapTo,
           );
 
@@ -145,36 +144,6 @@ export const preferMapTo: TSESLint.RuleModule<MessageIds, Options> = {
   },
   defaultOptions: [],
 } as const;
-
-/**
- * What the fix writes in place of the callee — or in place of the property,
- * for a namespace import — or `undefined` when it cannot fix: the callee is
- * in a type wrapper written for `map`'s type, or `mapTo` would name something
- * that is not synstate's at the call.
- */
-const replacementCallee = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceCode: TSESLint.SourceCode,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.CallExpression,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  resolved: ResolvedCallee,
-  importedMapTo: string | undefined,
-): string | undefined => {
-  if (resolved.isNamespace) {
-    return 'mapTo';
-  }
-
-  if (isTypeWrapper(node.callee)) {
-    return undefined;
-  }
-
-  const name = importedMapTo ?? 'mapTo';
-
-  return hasForeignBinding(sourceCode, node, name, SYNSTATE_MODULE)
-    ? undefined
-    : name;
-};
 
 /**
  * The body of `argument` when it is an arrow function that returns the same
