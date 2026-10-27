@@ -2854,3 +2854,69 @@ Response: infer T } ? T : typeof undici.Response` と宣言していて、DOM �
 それに置き換えてある。
 コンストラクタの型引数を const にする案も試したが、文脈が無いと
 `new Set(['a'])` が `Set<'a'>` になって `.add('b')` が通らなくなるので採らなかった。
+
+## 残りのパッケージとルートの opt-in（#2484、2026-10-28）
+
+#1737 の後に追加・復元した 31 パッケージ（issue に挙げた 30 と、その後に入った
+`apps/life-plan-simulator`）と、ルートの `tsconfig.json`（`check:root:types`）を
+opt-in した。各パッケージは `test/strict-lib-active.mts` の probe を持ち、ルートの
+probe は `tools/scripts/strict-lib-active.mts`。
+
+### 件数は土台の 2 本で 3 分の 1 になった
+
+`main` の上でそのまま opt-in すると型エラーは約 140 件で、半分は 2 つの根から来ていた。
+
+| 根                                                              | 直したところ                                        |
+| :-------------------------------------------------------------- | :-------------------------------------------------- |
+| `globalThis.location` などが無い（`declare var` の `const` 化） | #2567（変換器）                                     |
+| `new Set(['task:a'])` が文脈型から推論されない                  | #2577（型引数を書く lint と、既存箇所への書き込み） |
+
+その上に積むと 47 件、うち 31 パッケージ中 20 は 0 件だった。lint は
+`String()` の非推奨が約 200 件で、型に応じて `x.toString()`（数値・真偽値）、
+`x`（もともと `string`）、`unknownToString(x)`（`unknown` ・ null を含むもの・
+catch した値）に置き換えた。
+
+### 直し方の内訳
+
+- **ウィンドウ専用のグローバル** — `window.history` ・ `window.navigation` ・
+  `window.innerHeight` と、`var` に戻った `globalThis.location` ・
+  `globalThis.navigator`。「どの書き方も lint を通らないので分割代入で別名にする」
+  回避は 5 ファイルとも消えた。`document.title` への代入は、モジュールの読み込み時に
+  `window` を参照しないよう、代入する関数の中で `const mut_page = document` とした
+- **`length = 0`** — 束縛ごと差し替える（#1789 と同じ）。ループ内のクロージャが
+  束縛を読むテストは `no-loop-func` に当たるので、配列を空にせず「どこから先が
+  書き込みか」の位置を覚える形にした
+- **`Date` の範囲外引数** — `blueprint-synstate` の暦計算は日の繰り上げそのものに
+  依っている（`day + days`、0 日目）。#1839 は宣言を変えずに閉じられたので、
+  `number` を受ける `setFullYear` で組み立てる `localNoon`（`internal/` に置き、
+  公開しない）に寄せた。副産物として 0〜99 年が 1900 年代に読み替えられなくなった
+- **`includes` の型述語が false 側でも絞る**（前述）— `split-view-extension` で
+  `siteOrigin` が `never` になった。読む側を関数に分けて、絞られた変数を guard の
+  後で読まないようにした
+- **`Number#toFixed` の引数** — `formatPercent` の引数型を `UintRangeInclusive<0, 100>`
+  にした（範囲外は `RangeError` なので、strict lib の言い分が正しい）
+- **`Response#json()`** — `MutableJsonValue` を返すようになったので、
+  `mahjong-calculator-app` の `data as JsonValue` は不要なアサーションとして
+  消えた
+
+`.d.mts` が変わらないことは `blueprint-synstate`（`libs/` で唯一の対象）で
+確かめた。差分は公開されない `internal/index.d.mts` の再エクスポート 1 行だけ。
+
+### strict lib 側が直ったら戻す箇所（追加）
+
+| 原因                                                                                 | 箇所                                                                                                   | 入れたもの                                  |
+| :----------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------- | :------------------------------------------ |
+| `union` / `symmetricDifference` の `U` が `has` の広い引数から `string` に推論される | `languages/sumi/checker/src/rules/no-refinement-overload.mts`、`apps/task-manager/src/store/store.mts` | `union<T>(…)` の型引数                      |
+| `ToObjectEntries` が省略可能なキーに `-?` を付けず、エントリが `undefined` を含む    | `languages/sumi/eslint-config/test/sumi-rules.test.mts`                                                | `Object.entries<RuleEntry \| undefined>(…)` |
+
+どちらも単体で再現する（`ReadonlySet<'a' | 'b'>` 同士の `union` が
+`ReadonlySet<string>`、`{ a?: number }` を `for (const [k, v] of Object.entries(r))`
+で分割代入できない）。
+
+### 再発防止
+
+`check:root:tsconfig-lib-replacement` が、全ワークスペースメンバーとルートの
+`tsconfig.json` が `libReplacement` を `true` か `false` で**自分のファイルに**
+書いていること、`false` なら直前の行か同じ行にコメントで理由があることを確かめる。
+`tsconfig.json` を持たないメンバー（strict lib の bundle とハーネス）は対象外。
+今回の 30 件は、未宣言でも何も落ちないために溜まった。

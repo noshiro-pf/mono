@@ -19,7 +19,7 @@ import {
 export const DagSettingsButton = (): JSX.Element => (
   <button
     aria-expanded={view(uiStore.settingsPanel, (placement) =>
-      String(placement !== undefined),
+      (placement !== undefined).toString(),
     )}
     aria-haspopup={constant('dialog')}
     class={constant('bp6-button dag-settings-button')}

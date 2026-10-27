@@ -1,5 +1,5 @@
 import { Optional } from 'ts-data-forge';
-import { parseInteger } from '../internal/index.mjs';
+import { localNoon, parseInteger } from '../internal/index.mjs';
 
 /**
  * A date and a time of day to the minute, as a wall clock shows them: no
@@ -80,20 +80,16 @@ export const wallClockOf = (date: Readonly<Date>): WallClock =>
 export const now = (): WallClock => wallClockOf(new Date());
 
 /** The number of days in `month` (1 to 12) of `year`. */
-export const daysInMonth = (year: number, month: number): number => {
+export const daysInMonth = (year: number, month: number): number =>
   // Day 0 of the next month is the last day of this one.
-  const last = new Date(year, month, 0);
-
-  return last.getDate();
-};
+  localNoon(year, month + 1, 0).getDate();
 
 /**
  * `clock` moved by `days` days, the time kept. Counted on the calendar, so a
  * change to or from daylight saving time moves nothing.
  */
 export const addDays = (clock: WallClock, days: number): WallClock => {
-  // Noon, which no daylight saving transition reaches.
-  const moved = new Date(clock.year, clock.month - 1, clock.day + days, 12);
+  const moved = localNoon(clock.year, clock.month, clock.day + days);
 
   return {
     ...clock,
@@ -180,11 +176,8 @@ export const withDayOf = (time: WallClock, day: WallClock): WallClock =>
   }) as const;
 
 /** The day of the week of `clock`, 0 for Sunday to 6 for Saturday. */
-export const dayOfWeek = ({ year, month, day }: WallClock): number => {
-  const noon = new Date(year, month - 1, day, 12);
-
-  return noon.getDay();
-};
+export const dayOfWeek = ({ year, month, day }: WallClock): number =>
+  localNoon(year, month, day).getDay();
 
 /**
  * The weeks a month is drawn in, from the week of its first day to the week
@@ -223,7 +216,7 @@ const isIntegerIn = (value: number, min: number, max: number): boolean =>
   Number.isSafeInteger(value) && min <= value && value <= max;
 
 const pad = (value: number, width: number): string =>
-  String(value).padStart(width, '0');
+  value.toString().padStart(width, '0');
 
 if (import.meta.vitest !== undefined) {
   describe(parseWallClock, () => {

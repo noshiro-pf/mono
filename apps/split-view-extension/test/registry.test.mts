@@ -21,7 +21,7 @@ const registryOf = (
   ({
     version: 1,
     entries: labels.map((label, index) => ({
-      id: `id-${String(index)}`,
+      id: `id-${index.toString()}`,
       name: label,
       createdAt: index,
       pinned: false,

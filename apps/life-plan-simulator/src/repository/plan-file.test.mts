@@ -13,16 +13,15 @@ import {
 
 describe(planToFileJson, () => {
   test('writes the schema URL, the name and the inputs', () => {
-    assert.deepStrictEqual(
-      JSON.parse(
-        planToFileJson({ name: '持ち家', input: defaultSimulationInput }),
-      ),
-      {
-        $schema: planFileSchemaUrl,
-        name: '持ち家',
-        input: defaultSimulationInput,
-      },
+    const written: unknown = JSON.parse(
+      planToFileJson({ name: '持ち家', input: defaultSimulationInput }),
     );
+
+    assert.deepStrictEqual(written, {
+      $schema: planFileSchemaUrl,
+      name: '持ち家',
+      input: defaultSimulationInput,
+    });
   });
 
   test('is what PlanFile accepts', () => {

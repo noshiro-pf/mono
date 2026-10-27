@@ -98,7 +98,7 @@ const toNumber = (s: string): number =>
   Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
 
 const pad = (n: number, width: number): string =>
-  String(n).padStart(width, '0');
+  n.toString().padStart(width, '0');
 
 /** The wall clock of `timeZone` at `epochMs`. */
 const wallClock = (

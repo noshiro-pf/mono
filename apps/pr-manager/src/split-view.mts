@@ -73,14 +73,15 @@ export const splitViewUrl = (entry: SplitViewSource): string => {
     ['title', `#${entry.number} ${entry.title}`],
     ['layout', layout],
     ...panes.map(({ url }) => ['url', url] as const),
-    ...panes.map(({ zoom }) => ['zoom', String(zoom)] as const),
+    ...panes.map(({ zoom }) => ['zoom', zoom.toString()] as const),
   ] as const;
 
   // Escaped as a form is, `:` and `/` included; the extension reads either
   // form, and writes the readable one back into its address bar once it has
   // loaded. One pair at a time, because `url` repeats.
   const query = params
-    .map(([key, value]) => String(new URLSearchParams({ [key]: value })))
+    .map(([key, value]) => new URLSearchParams({ [key]: value }))
+    .map((pair) => pair.toString())
     .join('&');
 
   return `${splitViewPageUrl}?${query}`;

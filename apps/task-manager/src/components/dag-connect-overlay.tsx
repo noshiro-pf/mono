@@ -22,7 +22,7 @@ export const DagConnectOverlay = ({ overlay }: Props): JSX.Element => (
     class={constant('dag-connect')}
     data-e2e={constant('dag-connect')}
     data-refused={view(overlay, ({ target }) =>
-      String(target?.refused ?? false),
+      (target?.refused ?? false).toString(),
     )}
   >
     <If

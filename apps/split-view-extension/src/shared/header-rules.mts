@@ -1,11 +1,6 @@
-import { castMutable } from 'ts-data-forge';
+import { castMutable, unknownToString } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { eventLogSessionKey } from './constants.mjs';
-
-// Neither `window.navigator`, `globalThis.navigator` nor a bare `navigator`
-// satisfies the lint rules together; destructuring once names it something that
-// is none of those. The same dance as `browserHistory` in `frame-agent.mts`.
-const { navigator: browserNavigator } = globalThis;
 
 /**
  * The response headers that stop a page from being framed, and the session rule
@@ -242,7 +237,7 @@ const probeFramingHeaders = async (
       vary: response.headers.get('vary'),
     };
   } catch (error: unknown) {
-    return { url, fetchFailed: String(error) };
+    return { url, fetchFailed: unknownToString(error) };
   }
 };
 
@@ -273,13 +268,13 @@ export const readRuleDiagnostics = async (
     ? await chrome.declarativeNetRequest
         .getMatchedRules(tabId === undefined ? {} : { tabId })
         .then((result) => result.rulesMatchedInfo)
-        .catch((error: unknown) => `unavailable: ${String(error)}`)
+        .catch((error: unknown) => `unavailable: ${unknownToString(error)}`)
     : 'not a development build';
 
   return JSON.stringify(
     {
       build: SPLIT_VIEW_BUILD_ID,
-      userAgent: browserNavigator.userAgent,
+      userAgent: globalThis.navigator.userAgent,
       extensionId: chrome.runtime.id,
       hostAccess,
       tabId: tabId ?? null,

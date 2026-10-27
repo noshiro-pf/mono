@@ -48,7 +48,12 @@ describe('composition', () => {
   test('every Sumi override is the effective entry', () => {
     assert.isTrue(Object.keys(sumiRules).length > 0);
 
-    for (const [ruleId, entry] of Object.entries(sumiRules)) {
+    // The type argument picks the plain-record overload: the strict standard
+    // library's record overload maps the optional keys of `sumiRules` to
+    // entries that may be `undefined`, which cannot be destructured.
+    for (const [ruleId, entry] of Object.entries<RuleEntry | undefined>(
+      sumiRules,
+    )) {
       assert.deepStrictEqual(effectiveRuleEntry(ruleId), entry);
     }
   });

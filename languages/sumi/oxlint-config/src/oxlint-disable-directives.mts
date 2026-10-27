@@ -111,7 +111,7 @@ const parseDirective = (body: string): Directive | undefined => {
   const keyword = directiveKeywords.find(
     (k) =>
       trimmed === k ||
-      (trimmed.startsWith(k) && /\s/u.test(trimmed.charAt(k.length))),
+      (trimmed.startsWith(k) && /\s/u.test(trimmed.at(k.length) ?? '')),
   );
 
   if (keyword === undefined) {

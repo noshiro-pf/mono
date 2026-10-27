@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { Arr, fastDeepEqual, Num } from 'ts-data-forge';
+import { Arr, fastDeepEqual, Num, unknownToString } from 'ts-data-forge';
 import {
   PaneDropIndicator,
   PaneFrame,
@@ -344,7 +344,7 @@ export const App = memoNamed('App', () => {
     };
 
     collect().catch((error: unknown) => {
-      setDiagnostics(String(error));
+      setDiagnostics(unknownToString(error));
     });
   }, [state.panes]);
 
@@ -631,7 +631,7 @@ export const App = memoNamed('App', () => {
         commitRegistry(result.registry);
 
         setNotice(
-          `Imported ${String(result.added + result.replaced)} (${String(result.added)} new, ${String(result.replaced)} replaced)`,
+          `Imported ${(result.added + result.replaced).toString()} (${result.added.toString()} new, ${result.replaced.toString()} replaced)`,
         );
 
         // The workspace on screen is one of the ones that may have just been
@@ -1147,7 +1147,7 @@ export const App = memoNamed('App', () => {
 
               return rect === undefined ? undefined : (
                 <PaneFrame
-                  key={`${session.workspaceId ?? ''}:${String(pane.id)}`}
+                  key={`${session.workspaceId ?? ''}:${pane.id.toString()}`}
                   active={pane.id === state.activePaneId}
                   canClose={state.panes.length > 1}
                   dispatch={dispatch}

@@ -135,9 +135,7 @@ export const LayoutBlock = ({
       class={constant('layout-block')}
       data-block={constant(id)}
       style={{
-        'flex-grow': view(placement$, ({ share }) =>
-          share === undefined ? undefined : String(share),
-        ),
+        'flex-grow': view(placement$, ({ share }) => share?.toString()),
       }}
     >
       <div
@@ -146,7 +144,7 @@ export const LayoutBlock = ({
         }}
         class={constant('block-body')}
         data-sized={view(placement$, ({ height, share }) =>
-          String(height !== undefined || share !== undefined),
+          (height !== undefined || share !== undefined).toString(),
         )}
         style={{
           height: view(placement$, ({ height }) =>

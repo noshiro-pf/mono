@@ -107,7 +107,7 @@ export const describeOpenedWorkspaces = ({
   const openedPart =
     opened === 1
       ? 'Opened one split view in a tab of its own.'
-      : (`Opened ${String(opened)} split views in tabs of their own.` as const);
+      : (`Opened ${opened.toString()} split views in tabs of their own.` as const);
 
   if (alreadyOpen === 0) {
     return openedPart;
@@ -116,7 +116,7 @@ export const describeOpenedWorkspaces = ({
   return `${openedPart} ${
     alreadyOpen === 1
       ? ('One was' as const)
-      : (`${String(alreadyOpen)} were` as const)
+      : (`${alreadyOpen.toString()} were` as const)
   } already open.` as const;
 };
 

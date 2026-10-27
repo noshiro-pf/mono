@@ -1,3 +1,5 @@
+import { localNoon } from '../internal/index.mjs';
+
 /**
  * The names a calendar is drawn with in `locale`, from `Intl`: what
  * Blueprint takes from a date-fns locale, which is not loaded here.
@@ -28,18 +30,17 @@ export const calendarNames = (locale: string): CalendarNames => {
 
   return {
     months: Array.from({ length: 12 }, (_, index) =>
-      month.format(new Date(2000, index, 1, 12)),
+      month.format(localNoon(2000, index + 1, 1)),
     ),
     weekdaysShort: SUNDAY_TO_SATURDAY.map((date) => weekdayShort.format(date)),
     weekdaysLong: SUNDAY_TO_SATURDAY.map((date) => weekdayLong.format(date)),
-    caption: (year, m) => caption.format(new Date(year, m - 1, 1, 12)),
+    caption: (year, m) => caption.format(localNoon(year, m, 1)),
   };
 };
 
 /** 2000-01-02 was a Sunday. */
-const SUNDAY_TO_SATURDAY = Array.from(
-  { length: 7 },
-  (_, index) => new Date(2000, 0, 2 + index, 12),
+const SUNDAY_TO_SATURDAY = Array.from({ length: 7 }, (_, index) =>
+  localNoon(2000, 1, 2 + index),
 );
 
 if (import.meta.vitest !== undefined) {

@@ -176,11 +176,12 @@ export const pullRequestSplitViewSearch = ({
     ],
     ['layout', layout],
     ...panes.map(({ url }) => ['url', url] as const),
-    ...panes.map(({ zoom }) => ['zoom', String(zoom)] as const),
+    ...panes.map(({ zoom }) => ['zoom', zoom.toString()] as const),
   ] as const;
 
   const query = params
-    .map(([key, value]) => String(new URLSearchParams({ [key]: value })))
+    .map(([key, value]) => new URLSearchParams({ [key]: value }))
+    .map((pair) => pair.toString())
     .join('&');
 
   return `?${query}`;

@@ -591,7 +591,7 @@ const isUncoveredByDesign = (directory: string, scriptName: string): boolean =>
 const tokenize = (args: string): readonly string[] => {
   const mut_tokens: string[] = [];
 
-  const mut_current: string[] = [];
+  let mut_current: string[] = [];
 
   const mut_state = { quote: '' };
 
@@ -602,7 +602,7 @@ const tokenize = (args: string): readonly string[] => {
 
     mut_tokens.push(mut_current.join(''));
 
-    mut_current.length = 0;
+    mut_current = [];
   };
 
   for (const character of args) {

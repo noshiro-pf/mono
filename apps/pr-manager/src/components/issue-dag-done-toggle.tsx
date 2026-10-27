@@ -10,7 +10,7 @@ import { issuesViewStore } from '../store/index.mjs';
  */
 export const IssueDagDoneToggle = (): JSX.Element => (
   <button
-    aria-pressed={view(issuesViewStore.hideDone, (hide) => String(!hide))}
+    aria-pressed={view(issuesViewStore.hideDone, (hide) => (!hide).toString())}
     class={constant('filter-chip')}
     title={view(issuesViewStore.hideDone, (hide) =>
       hide

@@ -163,7 +163,7 @@ export const weeklyActivityQuery = (
   variables: ReadonlyRecord<string, string>;
 }> => {
   const fields = Arr.toPushed(
-    days.map((day, index) => ({ day, suffix: String(index) })),
+    days.map((day, index) => ({ day, suffix: index.toString() })),
     { day: today, suffix: TODAY_SUFFIX },
   ).flatMap(({ day, suffix }) =>
     KINDS.map((kind) => ({
@@ -240,7 +240,7 @@ export const loadWeeklyActivity = async (
   }
 
   const counted = days.map((day, index) =>
-    countedDay(data, day, String(index)),
+    countedDay(data, day, index.toString()),
   );
 
   const todayCounted = countedDay(data, today, TODAY_SUFFIX);
@@ -408,4 +408,4 @@ const UTC_DATE = new Intl.DateTimeFormat('en-CA', {
   day: '2-digit',
 });
 
-const pad = (value: number): string => String(value).padStart(2, '0');
+const pad = (value: number): string => value.toString().padStart(2, '0');

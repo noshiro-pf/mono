@@ -75,7 +75,7 @@ const main = async (): Promise<void> => {
      * `history.replaceState` the fixture does — and it is loads, not address
      * changes, that a redirect loop is made of.
      */
-    const mut_documentLoads: string[] = [];
+    let mut_documentLoads: string[] = [];
 
     await context.route(`${origin}/**`, async (route) => {
       const request = route.request();
@@ -149,7 +149,7 @@ const main = async (): Promise<void> => {
 
     /** `goto` is interrupted when the extension redirects, which is the point. */
     const visit = async (url: string): Promise<string> => {
-      mut_documentLoads.length = 0;
+      mut_documentLoads = [];
 
       await page
         .goto(url, { waitUntil: 'domcontentloaded' })
@@ -204,7 +204,7 @@ const main = async (): Promise<void> => {
       'https://example.com/noshiro-pf/mono/pull/1/files',
     );
 
-    mut_documentLoads.length = 0;
+    mut_documentLoads = [];
 
     await page.locator('#files-tab').click();
 
@@ -372,14 +372,14 @@ const main = async (): Promise<void> => {
     // took off stays off, and nothing is loaded again to put it back.
     check(
       'the site takes a default off, and the page is not loaded again',
-      `${String(mut_documentLoads.length)} page loads, at ${page.url()}`,
+      `${mut_documentLoads.length.toString()} page loads, at ${page.url()}`,
       `2 page loads, at ${origin}/stripped/mono/pull/1/files?w=1`,
     );
 
     // The reload is a new document at the address the site left, so it is
     // redirected once, as any other arrival would be — and then the site takes
     // the parameter off again, and that is all.
-    mut_documentLoads.length = 0;
+    mut_documentLoads = [];
 
     await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
 
@@ -387,7 +387,7 @@ const main = async (): Promise<void> => {
 
     check(
       'and a reload of that address is redirected once',
-      `${String(mut_documentLoads.length)} page loads, at ${page.url()}`,
+      `${mut_documentLoads.length.toString()} page loads, at ${page.url()}`,
       `2 page loads, at ${origin}/stripped/mono/pull/1/files?w=1`,
     );
 
@@ -408,19 +408,19 @@ const main = async (): Promise<void> => {
 
     check(
       'the refresh is left to the site, in place',
-      `${String(mut_documentLoads.length)} page load, at ${refreshedUrl}`,
+      `${mut_documentLoads.length.toString()} page load, at ${refreshedUrl}`,
       `1 page load, at ${origin}/refreshing/mono/pull/1/files`,
     );
 
     // Reloading that page is what brings the defaults back: a new document at
     // the bare path, redirected once.
-    mut_documentLoads.length = 0;
+    mut_documentLoads = [];
 
     await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
 
     check(
       'and a reload after it brings the defaults back',
-      `${String(mut_documentLoads.length)} page loads, at ${await settleUntil((url) => url.includes('show-viewed-files'))}`,
+      `${mut_documentLoads.length.toString()} page loads, at ${await settleUntil((url) => url.includes('show-viewed-files'))}`,
       `2 page loads, at ${origin}/refreshing/mono/pull/1/files?w=1&show-viewed-files=false`,
     );
 
@@ -441,7 +441,7 @@ const main = async (): Promise<void> => {
   }
 
   if (Arr.isNonEmpty(mut_failures)) {
-    throw new Error(`${String(mut_failures.length)} check(s) failed.`);
+    throw new Error(`${mut_failures.length.toString()} check(s) failed.`);
   }
 
   console.log('\nall checks passed');

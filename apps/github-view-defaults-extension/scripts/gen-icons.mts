@@ -26,12 +26,12 @@ const main = (): void => {
   fs.mkdirSync(iconsPath, { recursive: true });
 
   for (const size of iconSizes) {
-    const file = path.resolve(iconsPath, `${String(size)}.png`);
+    const file = path.resolve(iconsPath, `${size.toString()}.png`);
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(file, encodePng(size));
 
-    console.log(`${file}  ${String(size)}x${String(size)}`);
+    console.log(`${file}  ${size.toString()}x${size.toString()}`);
   }
 };
 

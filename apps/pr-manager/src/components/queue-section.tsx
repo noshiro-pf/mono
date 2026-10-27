@@ -262,4 +262,4 @@ const placeOf = (slot: QueueSlot, place: number): string =>
     ? 'running'
     : place === 0
       ? 'next'
-      : String(place + 1);
+      : (place + 1).toString();

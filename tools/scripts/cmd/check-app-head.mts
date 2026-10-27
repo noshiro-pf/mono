@@ -221,8 +221,8 @@ const collectPublishedViolations = (
     ) {
       yield `public/${imagePath} is not a ${OG_IMAGE_WIDTH}×${OG_IMAGE_HEIGHT} PNG, the size a large link card is drawn at.`;
     } else if (
-      head.meta.get('og:image:width') !== String(OG_IMAGE_WIDTH) ||
-      head.meta.get('og:image:height') !== String(OG_IMAGE_HEIGHT)
+      head.meta.get('og:image:width') !== OG_IMAGE_WIDTH.toString() ||
+      head.meta.get('og:image:height') !== OG_IMAGE_HEIGHT.toString()
     ) {
       yield `og:image:width / og:image:height do not say ${OG_IMAGE_WIDTH} / ${OG_IMAGE_HEIGHT}, the size of public/${imagePath}.`;
     }

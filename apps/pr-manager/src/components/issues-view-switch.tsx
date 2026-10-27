@@ -36,7 +36,7 @@ export const IssuesViewSwitch = (): JSX.Element => (
 );
 
 const pressedFor = (shown: IssuesView): View<string> =>
-  view(issuesViewStore.view, (current) => String(current === shown));
+  view(issuesViewStore.view, (current) => (current === shown).toString());
 
 const choose = (shown: IssuesView) => (): void => {
   issuesViewStore.choose(shown);

@@ -1,7 +1,7 @@
 import { Button, Card, FileInput } from 'blueprint-synstate';
 import { createState, type InitializedObservable } from 'synstate';
 import { constant, For, If, view, type JSX } from 'synstate-dom';
-import { Arr, Result } from 'ts-data-forge';
+import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { planFileSchemaUrl } from '../../repository/index.mjs';
 import {
   exportCurrentPlan,
@@ -62,7 +62,7 @@ export const DataTab = (): JSX.Element => {
           loadFile(file, load)
             .catch((error: unknown) => {
               setMessage(
-                `${file.name} を読み込めませんでした: ${String(error)}`,
+                `${file.name} を読み込めませんでした: ${unknownToString(error)}`,
               );
             })
             .finally(() => {

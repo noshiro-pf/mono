@@ -53,7 +53,7 @@ export const BlockLayout = ({ blocks }: Props): JSX.Element => {
   return (
     <div
       class={constant('block-layout')}
-      data-columns={view(layout$, ({ columns }) => String(columns))}
+      data-columns={view(layout$, ({ columns }) => columns.toString())}
       data-mode={view(layout$, ({ mode }) => mode)}
       style={view(layout$, gridOf)}
     >

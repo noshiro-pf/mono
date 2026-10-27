@@ -248,7 +248,7 @@ const CountCell = ({ day, kind, scaleMax }: CellProps): JSX.Element => (
             activitySearchUrl(reportSource, kind, counted),
           )}
         >
-          {derive([day], (counted) => String(counted[kind]))}
+          {derive([day], (counted) => counted[kind].toString())}
         </ExternalLink>
       </span>
       <span

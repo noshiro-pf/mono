@@ -101,13 +101,17 @@ const parseAttributes = (source: string): ReadonlyMap<string, string> =>
 /** The character references an attribute value can carry, `&amp;` last. */
 const decodeEntities = (value: string): string =>
   value
-    .replaceAll(/&#x(?<hex>[\da-f]+);/giu, (_, hex: string) =>
-      String.fromCodePoint(Number.parseInt(hex, 16)),
+    .replaceAll(/&#x(?<hex>[\da-f]+);/giu, (match, hex: string | undefined) =>
+      hex === undefined
+        ? match
+        : String.fromCodePoint(Number.parseInt(hex, 16)),
     )
-    .replaceAll(/&#(?<decimal>\d+);/gu, (_, decimal: string) =>
-      String.fromCodePoint(
-        Result.unwrapOkOr(Num.safeParseInt(decimal), Number.NaN),
-      ),
+    .replaceAll(/&#(?<decimal>\d+);/gu, (match, decimal: string | undefined) =>
+      decimal === undefined
+        ? match
+        : String.fromCodePoint(
+            Result.unwrapOkOr(Num.safeParseInt(decimal), Number.NaN),
+          ),
     )
     .replaceAll('&quot;', '"')
     .replaceAll('&apos;', "'")

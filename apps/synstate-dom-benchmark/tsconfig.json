@@ -4,10 +4,11 @@
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    "libReplacement": true,
     // The default for the files with no pragma. `frameworks/solid.tsx` and
     // `frameworks/preact-signals.tsx` name their own with `@jsxImportSource`.
     "jsx": "react-jsx",
     "jsxImportSource": "synstate-dom"
   },
-  "include": ["./src", "./scripts", "./configs"]
+  "include": ["./src", "./test", "./scripts", "./configs"]
 }

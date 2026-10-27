@@ -70,7 +70,7 @@ export const moveOpenSplitViewTab = async (
 };
 
 export const openSplitViewTabKey = (tabId: number): string =>
-  `${splitViewOpenTabKeyPrefix}${String(tabId)}` as const;
+  `${splitViewOpenTabKeyPrefix}${tabId.toString()}` as const;
 
 /** The tabs recorded in the whole of session storage, keyed by tab id. */
 export const openSplitViewTabsFrom = (

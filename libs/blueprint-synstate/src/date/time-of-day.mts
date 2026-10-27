@@ -34,7 +34,8 @@ export const isTimeUnitText = (
 };
 
 /** `value` in two digits at least. */
-export const pad2 = (value: number): string => String(value).padStart(2, '0');
+export const pad2 = (value: number): string =>
+  value.toString().padStart(2, '0');
 
 const MIDNIGHT: TimeOfDay = { hour: 0, minute: 0 } as const;
 

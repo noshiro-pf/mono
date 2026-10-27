@@ -67,7 +67,7 @@ const main = (): void => {
 
   // Moving between pages within github.com changes the address without
   // loading a document, so it is the history entry that is watched.
-  browserNavigation.addEventListener('currententrychange', showOnPullRequests);
+  window.navigation.addEventListener('currententrychange', showOnPullRequests);
 
   /**
    * A plain click replaces this tab with the split view; one that opens it
@@ -247,10 +247,6 @@ const fetchTimeoutMs = 5000;
 
 /** `MouseEvent.button` of the wheel. */
 const middleButton = 1;
-
-// See the note in `frame-agent.mts`: the Navigation API reached under a name
-// the lint rules accept.
-const { navigation: browserNavigation } = globalThis;
 
 const css = [
   ':host {',

@@ -1020,19 +1020,21 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
           current === 'tile' ? captions.tile : undefined,
         )}
         class={constant('dag-svg')}
-        data-animating={view(animated, (moved) => String(moved !== undefined))}
+        data-animating={view(animated, (moved) =>
+          (moved !== undefined).toString(),
+        )}
         data-connect={view(combine([handle$, connecting$]), ([handle, arrow]) =>
-          String(handle !== undefined || arrow !== undefined),
+          (handle !== undefined || arrow !== undefined).toString(),
         )}
         data-e2e={constant('dag-canvas')}
         data-lasso={view(
           combine([arrangeable, lassoTool$]),
-          ([canArrange, tool]) => String(canArrange && tool !== undefined),
+          ([canArrange, tool]) => (canArrange && tool !== undefined).toString(),
         )}
         data-mode={view(mode, (current) => current)}
         data-motion={view(
           combine([animationSettingStore.setting, reducedMotionStore.matches]),
-          ([setting, reduced]) => String(shouldAnimate(setting, reduced)),
+          ([setting, reduced]) => shouldAnimate(setting, reduced).toString(),
         )}
         // In 「タイル」, focusable — by Tab, or by a press on it — as a
         // scrolled box is, so that its keys work with no task focused.
@@ -1175,7 +1177,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
             <>
               <button
                 aria-pressed={view(lassoTool$, (tool) =>
-                  String(tool === 'freehand'),
+                  (tool === 'freehand').toString(),
                 )}
                 class={{
                   'bp6-button': constant(true),
@@ -1196,7 +1198,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
               </button>
               <button
                 aria-pressed={view(lassoTool$, (tool) =>
-                  String(tool === 'rectangle'),
+                  (tool === 'rectangle').toString(),
                 )}
                 class={{
                   'bp6-button': constant(true),

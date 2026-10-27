@@ -43,7 +43,7 @@ export const MergeOrder = ({ nodes, depth }: Props): JSX.Element => {
         depth === 0
           ? {
               '--merge-order-depth': mapBindable(nodes, (top) =>
-                String(depthOf(top)),
+                depthOf(top).toString(),
               ),
             }
           : undefined

@@ -32,18 +32,6 @@ import {
  * of the tab title. See `page-title.mts`.
  */
 
-// Neither `window.location`, `globalThis.location` nor a bare `location`
-// satisfies the lint rules together — `no-restricted-globals` wants one
-// spelling and `unicorn/prefer-global-this` another. Destructuring once names
-// it something that is none of the three; the same dance as `browserHistory`
-// in `split-view-extension`'s frame agent.
-const { location: browserLocation } = globalThis;
-
-// `document.title = …` is a mutation the lint rules reject unless the object it
-// is reached through is named as mutable — the same trick as `mut_page` in
-// `split-view-extension`'s `tab-identity.mts`. Only the title goes through it.
-const { document: mut_page } = globalThis;
-
 /**
  * Elements already looked at, so that a rescan does not re-parse every `href`
  * on the page for every batch of mutations. A pull request page holds hundreds
@@ -111,13 +99,19 @@ const main = (): void => {
  * the same answer. See `preferredUrlOfPage`.
  */
 const applyPreferredUrlToThisPage = (): void => {
-  const page = managedPagePathOf(browserLocation.href, browserLocation.origin);
+  const page = managedPagePathOf(
+    globalThis.location.href,
+    globalThis.location.origin,
+  );
 
   if (page === undefined) {
     return;
   }
 
-  const next = preferredUrlOfPage(browserLocation.href, browserLocation.origin);
+  const next = preferredUrlOfPage(
+    globalThis.location.href,
+    globalThis.location.origin,
+  );
 
   if (next === undefined) {
     // It arrived the way the rules want it — because a rewritten link brought
@@ -139,7 +133,7 @@ const applyPreferredUrlToThisPage = (): void => {
   // `replace` rather than `assign`: the address as it arrived was never a page
   // the user looked at, so it does not belong in the history. Going back from
   // here should leave the pull request, not bounce through a redirect.
-  browserLocation.replace(next);
+  globalThis.location.replace(next);
 };
 
 /**
@@ -159,11 +153,16 @@ const applyNumberToTitle = (): void => {
 
   const base = ours?.base ?? current;
 
-  const next = numberedTitleOf(base, browserLocation.href);
+  const next = numberedTitleOf(base, globalThis.location.href);
 
   if (next === current || next === ours?.written) {
     return;
   }
+
+  // `document.title = …` is a mutation the lint rules reject unless the object
+  // it is reached through is named as mutable — the same as `mut_page` in
+  // `split-view-extension`'s `tab-identity.mts`.
+  const mut_page = document;
 
   mut_page.title = next;
 
@@ -201,8 +200,8 @@ const patchAnchor = (element: Element): void => {
   // the same href in the repository's own navigation is sent to the full list.
   const next = preferredUrlOfLink(
     element.href,
-    browserLocation.origin,
-    browserLocation.href,
+    globalThis.location.origin,
+    globalThis.location.href,
   );
 
   if (next !== undefined) {
@@ -265,7 +264,11 @@ const suppressClientSideNavigation = (clickEvent: Event): void => {
   patchAnchor(anchor);
 
   if (
-    isSettledLink(anchor.href, browserLocation.origin, browserLocation.href)
+    isSettledLink(
+      anchor.href,
+      globalThis.location.origin,
+      globalThis.location.href,
+    )
   ) {
     // `stopImmediatePropagation` rather than `stopPropagation`: a listener the
     // page adds to the window in the capture phase would otherwise still run,
@@ -284,10 +287,10 @@ const suppressClientSideNavigation = (clickEvent: Event): void => {
  * nobody has looked at yet.
  */
 const watchForChanges = (): void => {
-  let mut_lastHref = browserLocation.href;
+  let mut_lastHref = globalThis.location.href;
 
   const observer = new MutationObserver((mutations) => {
-    const currentHref = browserLocation.href;
+    const currentHref = globalThis.location.href;
 
     // A client-side navigation shows up here as "the DOM changed and the
     // address is not what it was". There is no event for it that a content

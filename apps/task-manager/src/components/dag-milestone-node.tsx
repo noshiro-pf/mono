@@ -37,8 +37,8 @@ export const DagMilestoneNode = ({ record }: Props): JSX.Element => {
       data-e2e={constant('dag-node')}
       data-highlight={view(record, (r) => r.highlight)}
       data-node-id={constant(first.id)}
-      data-outside={view(record, (r) => String(r.outside))}
-      data-selected={view(record, (r) => String(r.selected))}
+      data-outside={view(record, (r) => r.outside.toString())}
+      data-selected={view(record, (r) => r.selected.toString())}
       opacity={view(record, (r) => r.opacity)}
       role={constant('button')}
       tabindex={constant(0)}

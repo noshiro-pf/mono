@@ -3,7 +3,14 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import * as util from 'node:util';
-import { Arr, asUint32, isPositiveUint32, Num, Result } from 'ts-data-forge';
+import {
+  Arr,
+  asUint32,
+  isPositiveUint32,
+  Num,
+  Result,
+  unknownToString,
+} from 'ts-data-forge';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 /**
@@ -175,7 +182,7 @@ const readResults = async (appRoot: string): Promise<string> =>
 /** Runs the benchmark once in `appRoot` and reads the tables it wrote. */
 const runOnce = async (appRoot: string, rotate: number): Promise<Tables> => {
   run('pnpm', ['run', 'benchmark'], appRoot, {
-    BENCHMARK_ROTATE: String(rotate),
+    BENCHMARK_ROTATE: rotate.toString(),
   });
 
   return parseResults(await readResults(appRoot));
@@ -217,7 +224,7 @@ const run = (
 
   if (result.status !== 0) {
     throw new Error(
-      `${Arr.toUnshifted(command)(args).join(' ')} failed in ${cwd} (exit ${String(result.status)})`,
+      `${Arr.toUnshifted(command)(args).join(' ')} failed in ${cwd} (exit ${unknownToString(result.status)})`,
     );
   }
 };

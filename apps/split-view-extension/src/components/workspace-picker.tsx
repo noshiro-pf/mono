@@ -126,7 +126,7 @@ export const WorkspacePicker = memoNamed(
         >
           {registry.entries.map((entry, index) => (
             <option key={entry.id} value={entry.id}>
-              {`${String(index + 1)}: ${entry.name}`}
+              {`${(index + 1).toString()}: ${entry.name}`}
             </option>
           ))}
         </select>

@@ -74,7 +74,7 @@ export const ViewSettingsRow = ({
   return (
     <li
       class={constant('view-settings-block')}
-      data-hidden={view(row$, ({ hidden }) => String(hidden))}
+      data-hidden={view(row$, ({ hidden }) => hidden.toString())}
     >
       <span class={constant('view-settings-name')}>{constant(blockName)}</span>
 

@@ -4,8 +4,9 @@
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    "libReplacement": true,
     "jsx": "react-jsx",
     "jsxImportSource": "synstate-dom"
   },
-  "include": ["./src", "./scripts", "./configs"]
+  "include": ["./src", "./test", "./scripts", "./configs"]
 }

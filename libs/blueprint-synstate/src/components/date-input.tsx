@@ -294,7 +294,7 @@ export const DateInput = ({
             { width: container.offsetWidth, height: container.offsetHeight },
             {
               width: document.documentElement.clientWidth,
-              height: globalThis.innerHeight,
+              height: window.innerHeight,
             },
           ),
         ),

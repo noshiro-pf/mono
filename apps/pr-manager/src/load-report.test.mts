@@ -1646,7 +1646,7 @@ describe(loadReport, () => {
     const mut_remaining = [4990, 4988, 4989, 4987];
 
     const { fetchImpl, sent } = answering(report([]), {}, () => ({
-      'x-ratelimit-remaining': String(mut_remaining.shift() ?? 4999),
+      'x-ratelimit-remaining': (mut_remaining.shift() ?? 4999).toString(),
       'x-ratelimit-limit': '5000',
       'x-ratelimit-reset': '1790000000',
     }));

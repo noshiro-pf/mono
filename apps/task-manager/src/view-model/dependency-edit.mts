@@ -33,8 +33,8 @@ export const rowsFromDependencies = (
       key,
       source: nodeId(dependency.from),
       type: isTaskDependency(dependency) ? dependency.type : 'finish-to-start',
-      lagDays: String(days),
-      lagHours: String(hours),
+      lagDays: days.toString(),
+      lagHours: hours.toString(),
     };
   });
 

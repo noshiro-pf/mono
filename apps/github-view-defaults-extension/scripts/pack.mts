@@ -34,7 +34,7 @@ const main = (): void => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const { size } = fs.statSync(zipPath);
 
-  console.log(`${zipPath}  (${String(Math.round(size / 1024))} kB)`);
+  console.log(`${zipPath}  (${Math.round(size / 1024).toString()} kB)`);
 
   console.log('  source maps left out');
 };

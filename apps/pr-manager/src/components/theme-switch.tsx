@@ -14,7 +14,7 @@ import { BadgeIcon } from './badge-icon.js';
 export const ThemeSwitch = (): JSX.Element => {
   const shownIs = (look: ColorScheme): Bindable<string> =>
     derive([themeStore.theme, themeStore.system], (theme, system) =>
-      String(effectiveTheme(theme, system) === look),
+      (effectiveTheme(theme, system) === look).toString(),
     );
 
   return (

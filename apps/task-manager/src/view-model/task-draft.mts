@@ -32,7 +32,7 @@ export const taskToDraft = (task: Task, timeZone?: string): TaskDraft =>
     estimateHours:
       task.estimateHours === undefined
         ? ('' as const)
-        : String(task.estimateHours),
+        : task.estimateHours.toString(),
     groupId: task.groupId ?? '',
   }) as const;
 

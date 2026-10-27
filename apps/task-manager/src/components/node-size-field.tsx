@@ -19,7 +19,7 @@ export const NodeSizeField = (): JSX.Element => (
       {nodeSizes.map((size) => (
         <button
           aria-pressed={view(nodeSizeStore.size, (current) =>
-            String(current === size),
+            (current === size).toString(),
           )}
           class={{
             'bp6-button': constant(true),

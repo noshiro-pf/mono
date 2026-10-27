@@ -64,10 +64,8 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
   let mut_inBlockComment = false;
 
   // Markers waiting for the next code line, as [1-based marker line, parsed].
-  const mut_pending: [
-    number,
-    Omit<ExpectedDiagnostic, 'line' | 'markerLine'>,
-  ][] = [];
+  let mut_pending: [number, Omit<ExpectedDiagnostic, 'line' | 'markerLine'>][] =
+    [];
 
   for (const [index, lineText] of lines.entries()) {
     const lineNumber = index + 1;
@@ -148,7 +146,7 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
           '@sumi-expect-error marker must be immediately followed by a code line',
       });
 
-      mut_pending.length = 0;
+      mut_pending = [];
 
       continue;
     }
@@ -157,7 +155,7 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
       mut_expected.push({ ...pending, line: lineNumber, markerLine });
     }
 
-    mut_pending.length = 0;
+    mut_pending = [];
   }
 
   for (const [markerLine] of mut_pending) {

@@ -75,6 +75,6 @@ export const noOverloadedFunctionExpression: Rule = {
       return;
     }
 
-    report(node, 'overloaded', { count: String(count) });
+    report(node, 'overloaded', { count: count.toString() });
   },
 } as const;

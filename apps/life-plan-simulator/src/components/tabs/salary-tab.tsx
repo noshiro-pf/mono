@@ -92,7 +92,7 @@ const historyColumns: readonly EditableColumn<SalaryHistoryEntry>[] = [
 
         return start === undefined
           ? ''
-          : String(ageAt(start, parseYearMonthOr(input.profile.birth, 0)));
+          : ageAt(start, parseYearMonthOr(input.profile.birth, 0)).toString();
       }),
   },
   {

@@ -1056,9 +1056,9 @@ const recordWrites = (reader: Reader): (() => readonly string[]) => {
   }
 
   // Subscribing hands over what each holds now, which is not a write.
-  mut_written.length = 0;
+  const handedOver = mut_written.length;
 
-  return () => mut_written.toSorted();
+  return () => mut_written.slice(handedOver).toSorted();
 };
 
 const RUNS: WorkflowRunList = {

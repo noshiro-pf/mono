@@ -98,7 +98,7 @@ export const noRefinementOverload: Rule = {
       );
 
       report(later.declaration, 'indistinguishable', {
-        line: String(line + 1),
+        line: (line + 1).toString(),
       });
     }
   },
@@ -288,8 +288,11 @@ const positionClasses = (
 
   const classes = typeofClasses(checker, type);
 
+  // `union`'s type argument is written out: under the strict standard
+  // library it is otherwise inferred as `string` from a set of a literal union,
+  // through the widened parameter of `ReadonlySet#has`.
   return mayBeAbsent
-    ? classes.union(new Set<'undefined'>(['undefined']))
+    ? classes.union<TypeofClass>(new Set<TypeofClass>(['undefined']))
     : classes;
 };
 
@@ -359,7 +362,7 @@ const typeofClasses = (
     return type
       .getTypes()
       .reduce<ReadonlySet<TypeofClass>>(
-        (acc, member) => acc.union(typeofClasses(checker, member)),
+        (acc, member) => acc.union<TypeofClass>(typeofClasses(checker, member)),
         new Set<TypeofClass>(),
       );
   }
@@ -399,7 +402,7 @@ const widenObject = (
   classes: ReadonlySet<TypeofClass>,
 ): ReadonlySet<TypeofClass> =>
   classes.has('object')
-    ? classes.union(new Set<'function'>(['function']))
+    ? classes.union<TypeofClass>(new Set<TypeofClass>(['function']))
     : classes;
 
 const objectClasses = (
@@ -495,7 +498,7 @@ const literalKeys = (type: Type): readonly string[] | undefined => {
 
   const keys = members.map((member): string | undefined =>
     member.isLiteralType()
-      ? `${typeof member.value}:${String(member.value)}`
+      ? `${typeof member.value}:${member.value.toString()}`
       : (member.flags & TypeFlags.Undefined) !== 0
         ? 'undefined'
         : (member.flags & TypeFlags.Null) !== 0
