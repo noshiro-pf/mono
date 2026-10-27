@@ -251,7 +251,7 @@ class UpdateQueue {
         // Another open update has queued `child` and may not have visited
         // it yet: leave its mark alone.
         if (this.#mut_queuedDespiteMark === undefined) {
-          this.#mut_queuedDespiteMark = new Set();
+          this.#mut_queuedDespiteMark = new Set<ChildNode>();
         } else if (this.#mut_queuedDespiteMark.has(child)) {
           continue;
         }

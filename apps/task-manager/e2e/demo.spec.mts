@@ -1421,14 +1421,14 @@ test(
     await expect
       .poll(async () => highlightCounts(arcs))
       .toStrictEqual(
-        new Map([
+        new Map<string, number>([
           ['on', 3],
           ['dim', 7],
         ]),
       );
 
     expect.soft(await highlightCounts(nodes)).toStrictEqual(
-      new Map([
+      new Map<string, number>([
         ['on', 4],
         ['dim', 5],
       ]),
@@ -1439,7 +1439,7 @@ test(
 
     await expect
       .poll(async () => highlightCounts(arcs))
-      .toStrictEqual(new Map([['none', 10]]));
+      .toStrictEqual(new Map<string, number>([['none', 10]]));
 
     // So does the keyboard focus.
     await dagNode(page, /利用者向けドキュメント/u).focus();
@@ -1447,7 +1447,7 @@ test(
     await expect
       .poll(async () => highlightCounts(arcs))
       .toStrictEqual(
-        new Map([
+        new Map<string, number>([
           ['on', 1],
           ['dim', 9],
         ]),

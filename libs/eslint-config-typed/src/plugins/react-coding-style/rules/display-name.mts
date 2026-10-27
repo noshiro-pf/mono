@@ -141,9 +141,9 @@ const normalizeNames = (
   names: string | undefined | readonly string[],
 ): ReadonlySet<string> =>
   names === undefined
-    ? new Set()
+    ? new Set<string>()
     : typeof names === 'string'
-      ? new Set([names])
+      ? new Set<string>([names])
       : new Set(names);
 
 const getDisplayNameAssignment = (

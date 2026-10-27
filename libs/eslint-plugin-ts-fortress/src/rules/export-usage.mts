@@ -22,7 +22,13 @@ export const isExportedValueUsed = (
   exportName: string,
   entryPoints: ReadonlySet<string>,
 ): boolean =>
-  isUsed(importEdges(program), entryPoints, fileName, exportName, new Set());
+  isUsed(
+    importEdges(program),
+    entryPoints,
+    fileName,
+    exportName,
+    new Set<string>(),
+  );
 
 /** One way a file of the program reaches the exports of another. */
 type ImportEdge =

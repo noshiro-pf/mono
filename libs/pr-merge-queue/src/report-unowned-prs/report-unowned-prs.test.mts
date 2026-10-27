@@ -1,4 +1,4 @@
-import type { ReportEntry } from 'pr-report-core';
+import type { ContextState, ReportEntry } from 'pr-report-core';
 import { planUnownedReports } from './report-unowned-prs.mjs';
 
 const entry = (number: number): ReportEntry =>
@@ -18,7 +18,7 @@ const entry = (number: number): ReportEntry =>
     updatedAt: '2026-10-15T00:00:00Z',
     headCommittedAt: undefined,
     comparison: undefined,
-    reported: new Map(),
+    reported: new Map<string, ContextState>(),
     checksRunning: false,
     linkedIssues: [],
     mergeAfter: [],

@@ -10,6 +10,13 @@ export const eslintConfigForBrowser = (files?: readonly string[]): FlatConfig =>
       // https://github.com/sindresorhus/globals/blob/main/globals.json
       globals: {
         ...globals.browser,
+        // Not declared, so that `unicorn/no-unnecessary-global-this` does not
+        // rewrite `globalThis.location` to the bare `location` that
+        // `no-restricted-globals` forbids (see `restrictedGlobalsForBrowser`).
+        // That rule still reports a bare reference to an undeclared name.
+        location: 'off',
+        history: 'off',
+        navigator: 'off',
       },
       sourceType: 'module',
     },

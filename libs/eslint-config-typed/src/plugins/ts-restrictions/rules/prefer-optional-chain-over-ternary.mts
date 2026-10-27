@@ -269,7 +269,10 @@ const strictPairCheckOf = (
     return undefined;
   }
 
-  const operators = new Set([left.operator, right.operator]);
+  const operators = new Set<'==' | '!=' | '===' | '!=='>([
+    left.operator,
+    right.operator,
+  ]);
 
   return test.operator === '||' && operators.size === 1 && operators.has('===')
     ? { value: left.value, nullishWhenTrue: true }

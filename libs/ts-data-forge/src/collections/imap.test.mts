@@ -81,7 +81,7 @@ describe('IMap.create', () => {
   });
 
   test('should create map from JavaScript Map', () => {
-    const jsMap = new Map([
+    const jsMap = new Map<string, number>([
       ['a', 1],
       ['b', 2],
     ]);

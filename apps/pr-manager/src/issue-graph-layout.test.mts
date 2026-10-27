@@ -19,7 +19,7 @@ describe(assignColumns, () => {
   test('puts each node one past the furthest of what it waits for', () => {
     assert.deepStrictEqual(
       assignColumns([1, 2, 3], [edge(1, 2), edge(2, 3), edge(1, 3)]),
-      new Map([
+      new Map<number, number>([
         [1, 0],
         [2, 1],
         [3, 2],

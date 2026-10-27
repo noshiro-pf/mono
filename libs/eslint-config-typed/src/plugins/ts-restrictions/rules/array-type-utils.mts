@@ -60,13 +60,14 @@ export const createIsArrayOrTupleType = (
  * binary/logical expression, etc.) is wrapped in parentheses when inlined so the
  * resulting `<arg>.toSorted()` keeps its original precedence.
  */
-const PARENTHESES_FREE_OBJECT_TYPES: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.Identifier,
-  AST_NODE_TYPES.MemberExpression,
-  AST_NODE_TYPES.CallExpression,
-  AST_NODE_TYPES.ThisExpression,
-  AST_NODE_TYPES.ArrayExpression,
-]);
+const PARENTHESES_FREE_OBJECT_TYPES: ReadonlySet<AST_NODE_TYPES> =
+  new Set<AST_NODE_TYPES>([
+    AST_NODE_TYPES.Identifier,
+    AST_NODE_TYPES.MemberExpression,
+    AST_NODE_TYPES.CallExpression,
+    AST_NODE_TYPES.ThisExpression,
+    AST_NODE_TYPES.ArrayExpression,
+  ]);
 
 /**
  * Wraps the source text of an expression in parentheses when it cannot be used

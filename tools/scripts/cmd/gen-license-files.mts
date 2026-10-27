@@ -209,7 +209,7 @@ export const collectViolations = (
 export const licenseTextsFrom = (
   rootLicenseText: string,
 ): ReadonlyMap<string, string> =>
-  new Map([[REPOSITORY_LICENSE, rootLicenseText]]);
+  new Map<string, string>([[REPOSITORY_LICENSE, rootLicenseText]]);
 
 /** Lowercase hexadecimal SHA-256 of `text` read as UTF-8. */
 export const sha256Of = (text: string): string =>

@@ -484,18 +484,23 @@ type Leaf = DeepReadonly<TSESTree.Node> | undefined;
 type Folded = Readonly<{ prefix: string; leaves: readonly Leaf[] }>;
 
 /** Operands that `?:` binds tighter than, and so must be parenthesized. */
-const LOW_PRECEDENCE_TYPES: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.AssignmentExpression,
-  AST_NODE_TYPES.AwaitExpression,
-  AST_NODE_TYPES.SequenceExpression,
-  AST_NODE_TYPES.TSAsExpression,
-  AST_NODE_TYPES.TSSatisfiesExpression,
-  AST_NODE_TYPES.TSTypeAssertion,
-  AST_NODE_TYPES.YieldExpression,
-]);
+const LOW_PRECEDENCE_TYPES: ReadonlySet<AST_NODE_TYPES> =
+  new Set<AST_NODE_TYPES>([
+    AST_NODE_TYPES.AssignmentExpression,
+    AST_NODE_TYPES.AwaitExpression,
+    AST_NODE_TYPES.SequenceExpression,
+    AST_NODE_TYPES.TSAsExpression,
+    AST_NODE_TYPES.TSSatisfiesExpression,
+    AST_NODE_TYPES.TSTypeAssertion,
+    AST_NODE_TYPES.YieldExpression,
+  ]);
 
 /** Tokens after which a statement starts, whatever comes next. */
-const STATEMENT_BOUNDARIES: ReadonlySet<string> = new Set([';', '{', '}']);
+const STATEMENT_BOUNDARIES: ReadonlySet<string> = new Set<string>([
+  ';',
+  '{',
+  '}',
+]);
 
 /** A statement starting so would continue the line before it without `;`. */
 const STARTS_CONTINUING_A_LINE = /^[([`+\-/]/u;

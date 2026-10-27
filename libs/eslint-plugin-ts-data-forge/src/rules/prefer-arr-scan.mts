@@ -21,7 +21,10 @@ type Options = readonly [];
 type MessageIds = 'preferArrScanPrefix' | 'preferArrScanAccumulate';
 
 /** Array methods that cut a prefix or a suffix out of the array they are called on. */
-const SLICING_METHODS: ReadonlySet<string> = new Set(['slice', 'subarray']);
+const SLICING_METHODS: ReadonlySet<string> = new Set<string>([
+  'slice',
+  'subarray',
+]);
 
 /** A `map` call whose callback ignores the element it is handed. */
 type PrefixCandidate = Readonly<{

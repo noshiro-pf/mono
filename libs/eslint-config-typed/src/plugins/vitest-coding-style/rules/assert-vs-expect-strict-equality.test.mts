@@ -91,9 +91,12 @@ test('the two agree that an `undefined`-valued key differs from an absent one', 
 });
 
 test('the two agree on `Map`, `Set`, `NaN` and `-0`', () => {
-  assert.deepStrictEqual(new Map([[1, 2]]), new Map([[1, 2]]));
+  assert.deepStrictEqual(
+    new Map<number, number>([[1, 2]]),
+    new Map<number, number>([[1, 2]]),
+  );
 
-  assert.deepStrictEqual(new Set([1]), new Set([1]));
+  assert.deepStrictEqual(new Set<number>([1]), new Set<number>([1]));
 
   // `NaN` is equal to itself, and `0` is not equal to `-0`, in both.
   // eslint-disable-next-line vitest-coding-style/prefer-assert-strict-equal-for-primitives -- pins the NaN case itself

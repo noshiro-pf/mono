@@ -122,7 +122,7 @@ export type PublicFile = Readonly<{
 }>;
 
 /** The `<link>` relations whose `href` is a file the page itself serves. */
-const FILE_LINK_RELATIONS: ReadonlySet<string> = new Set([
+const FILE_LINK_RELATIONS: ReadonlySet<string> = new Set<string>([
   'icon',
   'shortcut icon',
   'apple-touch-icon',

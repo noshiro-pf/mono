@@ -1,6 +1,6 @@
 // cspell:ignore retarget retargeted
 
-import type { Claim } from 'pr-report-core';
+import type { Claim, QueueOwner } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
 import { ownerOf } from './owner.mjs';
 import {
@@ -43,24 +43,27 @@ const pullRequest = (
 
 const context = (
   stackParents: ReadonlyMap<number, number>,
-  cyclic: ReadonlySet<number> = new Set(),
+  cyclic: ReadonlySet<number> = new Set<number>(),
 ): TriageContext =>
   ({
     defaultBranch: 'main',
     baseSha: 'b'.repeat(40),
-    skipped: new Map(),
-    claimed: new Map(),
-    owners: new Map(),
-    demoted: new Map(),
+    skipped: new Map<number, SkipRecord>(),
+    claimed: new Map<number, Claim>(),
+    owners: new Map<number, QueueOwner>(),
+    demoted: new Map<number, string>(),
     requiredContexts: [],
-    issueOrder: { closes: new Map(), startAfter: new Map() },
+    issueOrder: {
+      closes: new Map<number, readonly number[]>(),
+      startAfter: new Map<number, readonly number[]>(),
+    },
     reviewRequirements: {
       requireCodeOwnerReview: false,
       requireConversationResolution: false,
     },
-    openNumbers: new Set(),
-    dependencies: new Map(),
-    inherited: new Map(),
+    openNumbers: new Set<number>(),
+    dependencies: new Map<number, readonly number[]>(),
+    inherited: new Map<number, readonly number[]>(),
     stackParents,
     cycles: [],
     cyclic,
@@ -105,7 +108,11 @@ describe(retargetedFrom, () => {
 describe(stackedNote, () => {
   test('says which layer it waits for', () => {
     assert.deepStrictEqual(
-      stackedNote(pullRequest({ number: 2 }), 1, context(new Map([[2, 1]]))),
+      stackedNote(
+        pullRequest({ number: 2 }),
+        1,
+        context(new Map<number, number>([[2, 1]])),
+      ),
       {
         kind: 'note',
         note: '#2: stacked on #1, which merges first',
@@ -118,11 +125,11 @@ describe(stackedNote, () => {
       pullRequest({ number: 2 }),
       1,
       context(
-        new Map([
+        new Map<number, number>([
           [2, 1],
           [1, 2],
         ]),
-        new Set([1, 2]),
+        new Set<number>([1, 2]),
       ),
     );
 
@@ -181,7 +188,7 @@ describe(stackParentsOf, () => {
         ],
         'main',
       ),
-      new Map([
+      new Map<number, number>([
         [2, 1],
         [3, 2],
       ]),
@@ -198,7 +205,7 @@ describe(stackedOnAfter, () => {
 
     assert.deepStrictEqual(
       stackedOnAfter(undefined, pulls, stackParentsOf(pulls, 'main')),
-      new Map([[2, 'feature/1']]),
+      new Map<number, string>([[2, 'feature/1']]),
     );
   });
 
@@ -211,11 +218,11 @@ describe(stackedOnAfter, () => {
 
     assert.deepStrictEqual(
       stackedOnAfter(
-        new Map([[2, 'feature/1']]),
+        new Map<number, string>([[2, 'feature/1']]),
         pulls,
         stackParentsOf(pulls, 'main'),
       ),
-      new Map([[2, 'feature/1']]),
+      new Map<number, string>([[2, 'feature/1']]),
     );
   });
 
@@ -224,18 +231,22 @@ describe(stackedOnAfter, () => {
 
     assert.deepStrictEqual(
       stackedOnAfter(
-        new Map([[2, 'feature/1']]),
+        new Map<number, string>([[2, 'feature/1']]),
         pulls,
         stackParentsOf(pulls, 'main'),
       ),
-      new Map(),
+      new Map<number, string>(),
     );
   });
 
   test('forgets a layer that is no longer open', () => {
     assert.deepStrictEqual(
-      stackedOnAfter(new Map([[2, 'feature/1']]), [], new Map()),
-      new Map(),
+      stackedOnAfter(
+        new Map<number, string>([[2, 'feature/1']]),
+        [],
+        new Map<number, number>(),
+      ),
+      new Map<number, string>(),
     );
   });
 });
@@ -245,7 +256,11 @@ describe(retargetedLayers, () => {
     const layer = pullRequest({ number: 2 });
 
     assert.deepStrictEqual(
-      retargetedLayers(new Map([[2, 'feature/1']]), [layer], 'main'),
+      retargetedLayers(
+        new Map<number, string>([[2, 'feature/1']]),
+        [layer],
+        'main',
+      ),
       [{ pr: layer, from: 'feature/1' }],
     );
   });
@@ -253,7 +268,7 @@ describe(retargetedLayers, () => {
   test('is nothing for a layer GitHub has not moved yet', () => {
     assert.deepStrictEqual(
       retargetedLayers(
-        new Map([[2, 'feature/1']]),
+        new Map<number, string>([[2, 'feature/1']]),
         [pullRequest({ number: 2, baseRefName: 'feature/1' })],
         'main',
       ),
@@ -263,7 +278,11 @@ describe(retargetedLayers, () => {
 
   test('is nothing for a pull request that was never seen stacked', () => {
     assert.deepStrictEqual(
-      retargetedLayers(new Map(), [pullRequest({ number: 2 })], 'main'),
+      retargetedLayers(
+        new Map<number, string>(),
+        [pullRequest({ number: 2 })],
+        'main',
+      ),
       [],
     );
   });
@@ -284,7 +303,7 @@ describe(retargetedLayers, () => {
   test('leaves a queued pull request to its own rebase when it is picked', () => {
     assert.deepStrictEqual(
       retargetedLayers(
-        new Map([[2, 'feature/1']]),
+        new Map<number, string>([[2, 'feature/1']]),
         [pullRequest({ number: 2, labels: [{ name: 'merge-queued' }] })],
         'main',
       ),
@@ -312,8 +331,8 @@ const labelled = (...names: readonly string[]): PullRequest['labels'] =>
 
 const targets = (
   pullRequests: readonly PullRequest[],
-  skipped: ReadonlyMap<number, SkipRecord> = new Map(),
-  claimed: ReadonlyMap<number, Claim> = new Map(),
+  skipped: ReadonlyMap<number, SkipRecord> = new Map<number, SkipRecord>(),
+  claimed: ReadonlyMap<number, Claim> = new Map<number, Claim>(),
 ): readonly number[] =>
   autoRebaseTargets(pullRequests, 'main', {
     owners: new Map(
@@ -323,8 +342,8 @@ const targets = (
             defaultBranch: 'main',
             skipped,
             claimed,
-            stackParents: new Map(),
-            cyclic: new Set(),
+            stackParents: new Map<number, number>(),
+            cyclic: new Set<number>(),
             nowEpochMs: NOW,
           });
 
@@ -401,7 +420,7 @@ describe(autoRebaseTargets, () => {
     assert.deepStrictEqual(
       targets(
         [given],
-        new Map([
+        new Map<number, SkipRecord>([
           [
             1,
             {
@@ -431,8 +450,8 @@ describe(autoRebaseTargets, () => {
             labels: labelled('skip-ci', 'auto-rebase'),
           }),
         ],
-        new Map(),
-        new Map([
+        new Map<number, SkipRecord>(),
+        new Map<number, Claim>([
           [
             1,
             {

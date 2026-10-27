@@ -39,7 +39,7 @@ export const afterWatch = (
   outcome: WatchOutcome,
 ): Demotions =>
   outcome === 'not-merging'
-    ? new Map([...demoted, [prNumber, head]])
+    ? new Map<number, string>([...demoted, [prNumber, head]])
     : followHead(demoted, prNumber, head);
 
 /**
@@ -51,7 +51,9 @@ export const followHead = (
   prNumber: number,
   head: string,
 ): Demotions =>
-  demoted.has(prNumber) ? new Map([...demoted, [prNumber, head]]) : demoted;
+  demoted.has(prNumber)
+    ? new Map<number, string>([...demoted, [prNumber, head]])
+    : demoted;
 
 /**
  * Drops demotions of pull requests that are gone or that someone else has

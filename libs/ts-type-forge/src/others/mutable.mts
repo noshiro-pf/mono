@@ -81,7 +81,7 @@ export type ToMutableSet<T extends ReadonlySet<any>> =
  * @example
  * ```ts
  * type TagSet = MutableSet<string>;
- * const tags: TagSet = new Set(['typescript', 'javascript', 'react']);
+ * const tags: TagSet = new Set<string>(['typescript', 'javascript', 'react']);
  * tags.add('vue'); // ✓ allowed - set is mutable
  * tags.delete('react'); // ✓ allowed
  * ```
@@ -98,7 +98,7 @@ export type MutableSet<K> = Set<K>;
  * @example
  * ```ts
  * type UserCache = MutableMap<string, User>;
- * const cache: UserCache = new Map();
+ * const cache: UserCache = new Map<string, User>();
  * cache.set('user1', { id: 1, name: 'Alice' }); // ✓ allowed - map is mutable
  * cache.delete('user1'); // ✓ allowed
  * ```

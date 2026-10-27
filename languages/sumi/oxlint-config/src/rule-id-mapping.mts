@@ -9,7 +9,10 @@
  * Several codes may implement one ID (`eqeqeq` and `no-eq-null` together are
  * `banned-syntax/no-loose-equality`); one code implements at most one ID.
  */
-export const oxlintCodeToRuleId: ReadonlyMap<string, string> = new Map([
+export const oxlintCodeToRuleId: ReadonlyMap<string, string> = new Map<
+  string,
+  string
+>([
   // banned-syntax
   ['eslint(no-var)', 'banned-syntax/no-var'],
   ['eslint(eqeqeq)', 'banned-syntax/no-loose-equality'],

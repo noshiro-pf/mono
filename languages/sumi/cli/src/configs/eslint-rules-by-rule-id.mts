@@ -13,7 +13,7 @@
  * oxlint preset implements.
  */
 export const eslintRulesByRuleId: ReadonlyMap<string, readonly string[]> =
-  new Map([
+  new Map<string, readonly string[]>([
     // banned-syntax
     ['banned-syntax/no-var', ['no-var']],
     ['banned-syntax/no-loose-equality', ['eqeqeq', 'no-eq-null']],

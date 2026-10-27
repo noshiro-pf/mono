@@ -36,7 +36,7 @@ const COMPARISON_GUARDS: ReadonlyRecord<string, ComparisonSpec> = {
  * intended, but are parenthesized so that the type or the grouping is not read
  * as part of the comparison.
  */
-const ARG_NEEDS_PARENS: ReadonlySet<string> = new Set([
+const ARG_NEEDS_PARENS: ReadonlySet<string> = new Set<string>([
   AST_NODE_TYPES.LogicalExpression,
   AST_NODE_TYPES.ConditionalExpression,
   AST_NODE_TYPES.AssignmentExpression,
@@ -48,7 +48,7 @@ const ARG_NEEDS_PARENS: ReadonlySet<string> = new Set([
 ]);
 
 /** Binary operators that bind no tighter than `===` / `!==`. */
-const LOOSE_BINARY_OPERATORS: ReadonlySet<string> = new Set([
+const LOOSE_BINARY_OPERATORS: ReadonlySet<string> = new Set<string>([
   '|',
   '^',
   '&',

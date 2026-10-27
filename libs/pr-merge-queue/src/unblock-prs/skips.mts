@@ -67,7 +67,7 @@ export const pruneSkips = (
   );
 
 export const withSkip = (skipped: SkipRecords, skip: SkipRecord): SkipRecords =>
-  new Map([...skipped, [skip.number, skip]]);
+  new Map<number, SkipRecord>([...skipped, [skip.number, skip]]);
 
 /**
  * The records in `after` that `before` did not have — a pull request newly

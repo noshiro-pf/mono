@@ -43,7 +43,7 @@ import { fixturesRootPath, listFixtures } from '../src/index.mjs';
  * `@ts-expect-error`: an entry whose rule becomes implemented fails the
  * "still unimplemented" check below and has to be removed.
  */
-const knownUnimplementedRuleIds: ReadonlySet<string> = new Set();
+const knownUnimplementedRuleIds: ReadonlySet<string> = new Set<string>();
 
 const implementedRuleIds: ReadonlySet<string> =
   oxlintRuleIds.union(checkerRuleIds);

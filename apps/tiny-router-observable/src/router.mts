@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/prefer-global-this */
 import { createState, map, type InitializedObservable } from 'synstate';
 import { castMutable, pipe } from 'ts-data-forge';
 import type { DeepReadonly, StrictOmit } from 'ts-type-forge';
@@ -96,12 +95,12 @@ export type RouterOptions = Readonly<{
 export const createRouter = (routerOptions?: RouterOptions): Router => {
   const basePath = normalizeBasePath(routerOptions?.basePath ?? '/');
 
-  const getCurrentUrl = (): URL => new URL(window.location.href);
+  const getCurrentUrl = (): URL => new URL(globalThis.location.href);
 
   /** The current URL, redirected first if `routerOptions.redirect` asks for it. */
   const readUrl = (): URL => {
     const to = routerOptions?.redirect?.(
-      stripBasePath(basePath, window.location.pathname),
+      stripBasePath(basePath, globalThis.location.pathname),
     );
 
     if (to !== undefined) {

@@ -127,7 +127,7 @@ export const restrictCastMutable: Rule = {
   },
 } as const;
 
-const escapeNames: ReadonlySet<string> = new Set([
+const escapeNames: ReadonlySet<string> = new Set<string>([
   'castMutable',
   'castDeepMutable',
 ]);

@@ -43,7 +43,7 @@ const duplicateImportLineDivergence =
  * Listed explicitly, like an `@ts-expect-error`: an entry that starts agreeing
  * fails "still diverges" below and has to be removed.
  */
-const knownDivergences: ReadonlyMap<string, string> = new Map([
+const knownDivergences: ReadonlyMap<string, string> = new Map<string, string>([
   [
     'banned-syntax/no-arguments/invalid/arguments-object.mts',
     'prefer-arrow-functions leaves alone a `function` that uses `arguments`, which an arrow cannot replace; only func-names reports it, and that rule is not mapped.',

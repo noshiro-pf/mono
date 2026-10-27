@@ -34,7 +34,9 @@ export const MapType = <K extends UnknownType, V extends UnknownType>(
 
   const typeName = options?.typeName ?? 'Map';
 
-  const getDefaultValue = memoizeFunction((): M => new Map());
+  const getDefaultValue = memoizeFunction(
+    (): M => new Map<TypeOf<K>, TypeOf<V>>(),
+  );
 
   const validate: Type<M>['validate'] = (a) => {
     if (!isMap(a)) {

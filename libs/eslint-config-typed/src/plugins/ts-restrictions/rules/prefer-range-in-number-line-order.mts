@@ -326,19 +326,21 @@ const bindsAsLooseAsRelational = (
     : LOOSER_EXPRESSIONS.has(node.type);
 
 /** Expressions other than binary ones that bind no tighter than `<`. */
-const LOOSER_EXPRESSIONS: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.ArrowFunctionExpression,
-  AST_NODE_TYPES.AssignmentExpression,
-  AST_NODE_TYPES.ConditionalExpression,
-  AST_NODE_TYPES.LogicalExpression,
-  AST_NODE_TYPES.SequenceExpression,
-  AST_NODE_TYPES.TSAsExpression,
-  AST_NODE_TYPES.TSSatisfiesExpression,
-  AST_NODE_TYPES.YieldExpression,
-]);
+const LOOSER_EXPRESSIONS: ReadonlySet<AST_NODE_TYPES> = new Set<AST_NODE_TYPES>(
+  [
+    AST_NODE_TYPES.ArrowFunctionExpression,
+    AST_NODE_TYPES.AssignmentExpression,
+    AST_NODE_TYPES.ConditionalExpression,
+    AST_NODE_TYPES.LogicalExpression,
+    AST_NODE_TYPES.SequenceExpression,
+    AST_NODE_TYPES.TSAsExpression,
+    AST_NODE_TYPES.TSSatisfiesExpression,
+    AST_NODE_TYPES.YieldExpression,
+  ],
+);
 
 /** Binary operators binding tighter than a relational comparison. */
-const TIGHTER_BINARY_OPERATORS: ReadonlySet<string> = new Set([
+const TIGHTER_BINARY_OPERATORS: ReadonlySet<string> = new Set<string>([
   '<<',
   '>>',
   '>>>',

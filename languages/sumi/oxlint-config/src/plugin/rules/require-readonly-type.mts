@@ -5,16 +5,21 @@ import { createRule } from './create-rule.mjs';
 const MUT_PREFIX = 'mut_';
 
 /** References that make everything beneath them readonly. */
-const deepReadonlyNames: ReadonlySet<string> = new Set(['DeepReadonly']);
+const deepReadonlyNames: ReadonlySet<string> = new Set<string>([
+  'DeepReadonly',
+]);
 
 /** References whose direct type argument is readonly (shallowly). */
-const shallowReadonlyNames: ReadonlySet<string> = new Set(['Readonly']);
+const shallowReadonlyNames: ReadonlySet<string> = new Set<string>(['Readonly']);
 
 /** References that declare mutability on purpose; nothing beneath is checked. */
-const mutableNames: ReadonlySet<string> = new Set(['Mutable', 'MutableRecord']);
+const mutableNames: ReadonlySet<string> = new Set<string>([
+  'Mutable',
+  'MutableRecord',
+]);
 
 /** Mutable standard-library references and what to write instead. */
-const mutableReferences: ReadonlyMap<string, string> = new Map([
+const mutableReferences: ReadonlyMap<string, string> = new Map<string, string>([
   ['Array', '`readonly T[]` (or `ReadonlyArray<T>`)'],
   ['Map', '`ReadonlyMap<K, V>`'],
   ['Set', '`ReadonlySet<T>`'],

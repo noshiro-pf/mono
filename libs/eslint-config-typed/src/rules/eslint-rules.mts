@@ -40,20 +40,23 @@ export const restrictedGlobals = [
 
 export const restrictedGlobalsForBrowser = [
   ...restrictedGlobals,
+  // The bare names are ambiguous with react-router's `location`, `history`
+  // and `navigator`. The spelling each message names is the one the
+  // `prefer-global-this` rules accept: `location` and `navigator` exist where
+  // there is no `window` (a worker; Node.js has a `navigator`), and the strict
+  // standard library keeps them on `typeof globalThis`; `history` is a
+  // window's alone, and that library declares it off `globalThis`.
   {
-    // Avoid ambiguity with react-router's location
     name: 'location',
-    message: "Use 'window.location' instead.",
+    message: "Use 'globalThis.location' instead.",
   },
   {
-    // Avoid ambiguity with react-router's history
     name: 'history',
     message: "Use 'window.history' instead.",
   },
   {
-    // Avoid ambiguity with react-router's navigator
     name: 'navigator',
-    message: "Use 'window.navigator' instead.",
+    message: "Use 'globalThis.navigator' instead.",
   },
   {
     name: 'length',

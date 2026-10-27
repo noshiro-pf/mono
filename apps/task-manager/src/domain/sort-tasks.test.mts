@@ -189,7 +189,7 @@ describe(sortTasks, () => {
   test('sorts by depth from the context, a task without one last', () => {
     const tasks = [task('a'), task('b'), task('c'), task('d')] as const;
 
-    const depthById = new Map([
+    const depthById = new Map<TaskId, number>([
       [asTaskId('a'), 2],
       [asTaskId('b'), 0],
       [asTaskId('c'), 1],

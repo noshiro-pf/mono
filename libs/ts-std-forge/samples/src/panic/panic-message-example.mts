@@ -10,7 +10,11 @@ if (import.meta.vitest !== undefined) {
     const get = (map: ReadonlyMap<string, number>, key: string): number =>
       map.get(key) ?? panic(`missing key: ${key}`);
 
-    assert.throws(() => get(new Map(), 'a'), Error, 'missing key: a');
+    assert.throws(
+      () => get(new Map<string, number>(), 'a'),
+      Error,
+      'missing key: a',
+    );
 
     // embed-sample-code-ignore-below
   });

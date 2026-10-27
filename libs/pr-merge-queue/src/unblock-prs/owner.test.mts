@@ -41,10 +41,10 @@ const CLAIM: Claim = {
 const context = (fields: Partial<OwnerContext> = {}): OwnerContext =>
   ({
     defaultBranch: 'main',
-    skipped: new Map(),
-    claimed: new Map(),
-    stackParents: new Map(),
-    cyclic: new Set(),
+    skipped: new Map<number, SkipRecord>(),
+    claimed: new Map<number, Claim>(),
+    stackParents: new Map<number, number>(),
+    cyclic: new Set<number>(),
     nowEpochMs: NOW,
     ...fields,
   }) as const;
@@ -56,7 +56,10 @@ describe(ownerOf, () => {
 
   test('reads a record as the comment it was taken up from', () => {
     assert.deepStrictEqual(
-      ownerOf(pullRequest(), context({ skipped: new Map([[2267, SKIP]]) })),
+      ownerOf(
+        pullRequest(),
+        context({ skipped: new Map<number, SkipRecord>([[2267, SKIP]]) }),
+      ),
       {
         owner: 'skill',
         reason: 'set aside `rebase-failed` at its head; the skill fixes it',
@@ -66,8 +69,10 @@ describe(ownerOf, () => {
 
   test('is the claimant’s while the claim holds', () => {
     assert.strictEqual(
-      ownerOf(pullRequest(), context({ claimed: new Map([[2267, CLAIM]]) }))
-        ?.owner,
+      ownerOf(
+        pullRequest(),
+        context({ claimed: new Map<number, Claim>([[2267, CLAIM]]) }),
+      )?.owner,
       'skill',
     );
   });
@@ -79,7 +84,7 @@ describe(ownerOf, () => {
 
 describe(ownerNote, () => {
   test('says whose a set-aside pull request is, and why it was set aside', () => {
-    const skipped = new Map([[2267, SKIP]]);
+    const skipped = new Map<number, SkipRecord>([[2267, SKIP]]);
 
     assert.deepStrictEqual(
       ownerNote(
@@ -95,12 +100,12 @@ describe(ownerNote, () => {
   });
 
   test('names the claimant', () => {
-    const claimed = new Map([[2267, CLAIM]]);
+    const claimed = new Map<number, Claim>([[2267, CLAIM]]);
 
     const note = ownerNote(
       pullRequest(),
       ownerOf(pullRequest(), context({ claimed })),
-      new Map(),
+      new Map<number, SkipRecord>(),
     );
 
     assert.include(note?.kind === 'note' ? note.note : '', 'unblock-wren');
@@ -108,7 +113,11 @@ describe(ownerNote, () => {
 
   test('says nothing about the worker’s own', () => {
     assert.isUndefined(
-      ownerNote(pullRequest(), ownerOf(pullRequest(), context()), new Map()),
+      ownerNote(
+        pullRequest(),
+        ownerOf(pullRequest(), context()),
+        new Map<number, SkipRecord>(),
+      ),
     );
   });
 });

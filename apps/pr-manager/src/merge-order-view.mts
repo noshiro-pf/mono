@@ -426,7 +426,7 @@ export const known = <T extends string>(
     ? all.filter((each) => stored.includes(each))
     : ([] as const);
 
-const QUEUE_STATUSES: ReadonlySet<StatusFilter> = new Set([
+const QUEUE_STATUSES: ReadonlySet<StatusFilter> = new Set<StatusFilter>([
   'queued',
   'setAside',
 ]);

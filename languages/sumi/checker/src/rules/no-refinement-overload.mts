@@ -283,12 +283,14 @@ const positionClasses = (
   const mayBeAbsent = index >= clause.minArgs;
 
   if (type === undefined) {
-    return mayBeAbsent ? new Set(['undefined']) : allClasses;
+    return mayBeAbsent ? new Set<TypeofClass>(['undefined']) : allClasses;
   }
 
   const classes = typeofClasses(checker, type);
 
-  return mayBeAbsent ? classes.union(new Set(['undefined'])) : classes;
+  return mayBeAbsent
+    ? classes.union(new Set<'undefined'>(['undefined']))
+    : classes;
 };
 
 type TypeofClass =
@@ -301,7 +303,7 @@ type TypeofClass =
   | 'symbol'
   | 'undefined';
 
-const allClasses: ReadonlySet<TypeofClass> = new Set([
+const allClasses: ReadonlySet<TypeofClass> = new Set<TypeofClass>([
   'bigint',
   'boolean',
   'function',
@@ -342,7 +344,7 @@ const typeofClasses = (
   }
 
   if ((type.flags & TypeFlags.Never) !== 0) {
-    return new Set();
+    return new Set<TypeofClass>();
   }
 
   const primitive = primitiveClasses.find(
@@ -350,7 +352,7 @@ const typeofClasses = (
   );
 
   if (primitive !== undefined) {
-    return new Set([primitive[1]]);
+    return new Set<TypeofClass>([primitive[1]]);
   }
 
   if (type.isUnionType()) {
@@ -358,7 +360,7 @@ const typeofClasses = (
       .getTypes()
       .reduce<ReadonlySet<TypeofClass>>(
         (acc, member) => acc.union(typeofClasses(checker, member)),
-        new Set(),
+        new Set<TypeofClass>(),
       );
   }
 
@@ -377,7 +379,7 @@ const typeofClasses = (
   }
 
   if ((type.flags & TypeFlags.NonPrimitive) !== 0) {
-    return new Set(['function', 'object']);
+    return new Set<TypeofClass>(['function', 'object']);
   }
 
   if ((type.flags & TypeFlags.Object) !== 0) {
@@ -396,7 +398,9 @@ const typeofClasses = (
 const widenObject = (
   classes: ReadonlySet<TypeofClass>,
 ): ReadonlySet<TypeofClass> =>
-  classes.has('object') ? classes.union(new Set(['function'])) : classes;
+  classes.has('object')
+    ? classes.union(new Set<'function'>(['function']))
+    : classes;
 
 const objectClasses = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -405,8 +409,8 @@ const objectClasses = (
 ): ReadonlySet<TypeofClass> =>
   checker.getSignaturesOfType(type, SignatureKind.Call).length > 0 ||
   checker.getSignaturesOfType(type, SignatureKind.Construct).length > 0
-    ? new Set(['function'])
-    : new Set(['object']);
+    ? new Set<TypeofClass>(['function'])
+    : new Set<TypeofClass>(['object']);
 
 /**
  * The members of `type` an object may be: the union members whose `typeof`

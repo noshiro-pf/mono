@@ -486,7 +486,7 @@ export const createDagLayoutStore = <H, F>(
   const frozen = (
     next: DagLayout,
     members: readonly LayoutGroup[] = membership.getSnapshot().value,
-    replaced: ReadonlySet<GraphNodeId> = new Set(),
+    replaced: ReadonlySet<GraphNodeId> = new Set<GraphNodeId>(),
   ): DagLayout => {
     const drawnNow = positionsOf(placed());
 
@@ -1042,7 +1042,10 @@ export const createDagLayoutStore = <H, F>(
         groupPositions:
           from === undefined || left === undefined
             ? current.groupPositions
-            : new Map([...current.groupPositions, [from, left]]),
+            : new Map<GroupId, Point>([
+                ...current.groupPositions,
+                [from, left],
+              ]),
       },
       withMemberMoved(members, id, into),
     );
@@ -1085,7 +1088,10 @@ export const createDagLayoutStore = <H, F>(
     commit({
       direction: current.direction,
       positions: new Map(nodePositions),
-      groupPositions: new Map([...current.groupPositions, [id, position]]),
+      groupPositions: new Map<GroupId, Point>([
+        ...current.groupPositions,
+        [id, position],
+      ]),
     });
   };
 
@@ -1503,12 +1509,13 @@ const initialArrangement = (
 ): DagLayout =>
   stored ?? {
     direction: defaultDirection,
-    positions: new Map(),
-    groupPositions: new Map(),
+    positions: new Map<GraphNodeId, Point>(),
+    groupPositions: new Map<GroupId, Point>(),
   };
 
 const withPosition = (
   positions: ReadonlyMap<GraphNodeId, Point>,
   id: GraphNodeId,
   position: Point,
-): ReadonlyMap<GraphNodeId, Point> => new Map([...positions, [id, position]]);
+): ReadonlyMap<GraphNodeId, Point> =>
+  new Map<GraphNodeId, Point>([...positions, [id, position]]);

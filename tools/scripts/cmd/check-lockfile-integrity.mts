@@ -150,14 +150,14 @@ type Reference = Readonly<{
 
 const LOCKFILE_NAME = 'pnpm-lock.yaml';
 
-const IMPORTER_DEPENDENCY_FIELDS: ReadonlySet<string> = new Set([
+const IMPORTER_DEPENDENCY_FIELDS: ReadonlySet<string> = new Set<string>([
   'dependencies',
   'devDependencies',
   'optionalDependencies',
   'packageManagerDependencies',
 ]);
 
-const SNAPSHOT_DEPENDENCY_FIELDS: ReadonlySet<string> = new Set([
+const SNAPSHOT_DEPENDENCY_FIELDS: ReadonlySet<string> = new Set<string>([
   'dependencies',
   'optionalDependencies',
 ]);

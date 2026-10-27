@@ -1,5 +1,5 @@
 import { createState } from 'synstate';
-import type { DagLayout } from '../dag/index.mjs';
+import type { DagLayout, Point } from '../dag/index.mjs';
 import {
   asGroupId,
   asMilestoneId,
@@ -7,7 +7,9 @@ import {
   createMilestone,
   createTask,
   type DomainState,
+  type GraphNodeId,
   type Group,
+  type GroupId,
 } from '../domain/index.mjs';
 import {
   createMemoryRepository,
@@ -418,8 +420,8 @@ describe(createDataStore, () => {
   describe('the DAG layout', () => {
     const layout: DagLayout = {
       direction: 'down',
-      positions: new Map([['task:a', { x: 1, y: 2 }]]),
-      groupPositions: new Map(),
+      positions: new Map<GraphNodeId, Point>([['task:a', { x: 1, y: 2 }]]),
+      groupPositions: new Map<GroupId, Point>(),
     } as const;
 
     test('is none until somebody signs in, and that project’s after', () => {

@@ -43,10 +43,12 @@ const axisLetterOf: ReadonlyRecord<SplitAxis, string> = {
   column: 'c',
 } as const;
 
-const axisOfLetter: ReadonlyMap<string, SplitAxis> = new Map([
-  ['r', 'row'],
-  ['c', 'column'],
-]);
+const axisOfLetter: ReadonlyMap<string, SplitAxis> = new Map<string, SplitAxis>(
+  [
+    ['r', 'row'],
+    ['c', 'column'],
+  ],
+);
 
 /** A tenth of a percent is finer than a divider can be dragged. */
 const ratioDigitsOf = (ratio: number): string => {

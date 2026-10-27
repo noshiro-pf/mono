@@ -49,7 +49,7 @@ export const globalReferenceName = (
 };
 
 /** The names the global object is reachable by, depending on the host. */
-const globalObjectNames: ReadonlySet<string> = new Set([
+const globalObjectNames: ReadonlySet<string> = new Set<string>([
   'globalThis',
   'window',
   'self',

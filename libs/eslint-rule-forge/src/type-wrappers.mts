@@ -119,7 +119,7 @@ export const typeHoldsAtEveryLayer = (
   });
 };
 
-const TYPE_WRAPPERS: ReadonlySet<AST_NODE_TYPES> = new Set([
+const TYPE_WRAPPERS: ReadonlySet<AST_NODE_TYPES> = new Set<AST_NODE_TYPES>([
   AST_NODE_TYPES.TSAsExpression,
   AST_NODE_TYPES.TSNonNullExpression,
   AST_NODE_TYPES.TSSatisfiesExpression,

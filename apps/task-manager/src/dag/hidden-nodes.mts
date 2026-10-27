@@ -28,7 +28,7 @@ export const hiddenNodeIds = (
   showDone: boolean,
 ): ReadonlySet<GraphNodeId> => {
   if (showDone) {
-    return new Set();
+    return new Set<GraphNodeId>();
   }
 
   const evaluator = createEvaluator(buildEvaluationContext(state), now);

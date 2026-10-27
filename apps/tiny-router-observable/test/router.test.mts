@@ -153,9 +153,13 @@ describe(createRouter, () => {
 });
 
 /**
- * Stands in for the browser's `window`: just the location and the history
+ * Stands in for the browser's globals: just the location and the history
  * methods the router calls, with each URL resolved against the current one
  * as `history.pushState` does. Returns a reader of the current URL.
+ *
+ * The location is stubbed both on its own and on `window`, because the router
+ * reads it as `globalThis.location` (a worker has one too) and the history as
+ * `window.history` (only a window has one).
  */
 const openAt = (href: string): (() => URL) => {
   const mut_current = { url: new URL(href) };
@@ -170,15 +174,19 @@ const openAt = (href: string): (() => URL) => {
     }
   };
 
-  vi.stubGlobal('window', {
-    location: {
-      get href() {
-        return mut_current.url.href;
-      },
-      get pathname() {
-        return mut_current.url.pathname;
-      },
+  const location = {
+    get href() {
+      return mut_current.url.href;
     },
+    get pathname() {
+      return mut_current.url.pathname;
+    },
+  } as const;
+
+  vi.stubGlobal('location', location);
+
+  vi.stubGlobal('window', {
+    location,
     history: {
       pushState: navigate,
       replaceState: navigate,

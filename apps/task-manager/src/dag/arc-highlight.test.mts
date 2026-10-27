@@ -1,3 +1,4 @@
+import type { GraphNodeId } from '../domain/index.mjs';
 import { arcHighlight, highlightOf } from './arc-highlight.mjs';
 
 const edges = [
@@ -16,16 +17,16 @@ describe(arcHighlight, () => {
 
     assert.deepStrictEqual(
       highlight?.nodes,
-      new Set(['task:b', 'task:a', 'task:c']),
+      new Set<GraphNodeId>(['task:b', 'task:a', 'task:c']),
     );
 
-    assert.deepStrictEqual(highlight?.edges, new Set(['ab', 'bc']));
+    assert.deepStrictEqual(highlight?.edges, new Set<string>(['ab', 'bc']));
   });
 
   test('is the node alone when it has no arcs', () => {
     const highlight = arcHighlight('task:z', edges);
 
-    assert.deepStrictEqual(highlight?.nodes, new Set(['task:z']));
+    assert.deepStrictEqual(highlight?.nodes, new Set<GraphNodeId>(['task:z']));
 
     assert.strictEqual(highlight?.edges.size, 0);
   });

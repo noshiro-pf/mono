@@ -799,7 +799,10 @@ const readComparisons = async (
   pulls: readonly OpenPullRequest[],
 ): Promise<Answered<ReadonlyMap<number, Comparison | undefined>>> => {
   if (!Arr.isNonEmpty(pulls)) {
-    return { rateLimit: undefined, result: Result.ok(new Map()) };
+    return {
+      rateLimit: undefined,
+      result: Result.ok(new Map<number, Comparison | undefined>()),
+    };
   }
 
   const followUps = pulls.map(
@@ -1312,7 +1315,10 @@ const describeIssues = async ({
   if (!Arr.isNonEmpty(numbers)) {
     return {
       rateLimit,
-      result: Result.ok({ issues: new Map(), startAfter: new Map() }),
+      result: Result.ok({
+        issues: new Map<number, LinkedIssue>(),
+        startAfter: new Map<number, readonly number[]>(),
+      }),
     };
   }
 

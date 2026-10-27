@@ -183,7 +183,7 @@ export const eslintUnicornRules = {
   'unicorn/prefer-structured-clone': withDefaultOption('error'),
   'unicorn/no-negation-in-equality-check': 'error',
   'unicorn/consistent-existence-index-check': 'error',
-  'unicorn/prefer-global-this': 'error',
+  'unicorn/prefer-global-this': 'off', // Replaced by ts-restrictions/prefer-global-this, which runs it and lets `window.X` stand where `typeof globalThis` lacks `X`
   'unicorn/prefer-math-min-max': 'error',
 
   'unicorn/no-instanceof-builtins': [

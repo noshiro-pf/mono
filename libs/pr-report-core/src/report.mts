@@ -43,7 +43,7 @@ export const buildReport = ({
   issues,
   issuesLimit,
   issueDeclarations,
-  references = new Map(),
+  references = new Map<number, ReferenceStatus>(),
 }: Readonly<{
   repo: RepoRef;
   defaultBranch: string;
@@ -236,8 +236,8 @@ export const buildEntries = ({
 };
 
 const NO_DECLARATIONS: IssueDeclarations = {
-  startAfter: new Map(),
-  open: new Set(),
+  startAfter: new Map<number, readonly number[]>(),
+  open: new Set<number>(),
 } as const;
 
 /**

@@ -175,7 +175,7 @@ export const parseChangesetBumps = (
   const lines = content.split('\n');
 
   if (lines[0]?.trim() !== '---') {
-    return new Map();
+    return new Map<string, Bump>();
   }
 
   const end = lines.findIndex(
@@ -183,7 +183,7 @@ export const parseChangesetBumps = (
   );
 
   if (end === -1) {
-    return new Map();
+    return new Map<string, Bump>();
   }
 
   return new Map(

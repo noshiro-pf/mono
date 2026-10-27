@@ -20,7 +20,10 @@ describe(orderCandidates, () => {
             pullRequest({ number: 3, mergeStateStatus: 'DIRTY' }),
             pullRequest({ number: 4 }),
           ],
-          { defaultBranch: 'main', demoted: new Map([[1, 'a'.repeat(40)]]) },
+          {
+            defaultBranch: 'main',
+            demoted: new Map<number, string>([[1, 'a'.repeat(40)]]),
+          },
         ),
       ),
       [4, 3, 2, 1],
@@ -35,7 +38,10 @@ describe(orderCandidates, () => {
             pullRequest({ number: 1, headRefOid: 'c'.repeat(40) }),
             pullRequest({ number: 2 }),
           ],
-          { defaultBranch: 'main', demoted: new Map([[1, 'a'.repeat(40)]]) },
+          {
+            defaultBranch: 'main',
+            demoted: new Map<number, string>([[1, 'a'.repeat(40)]]),
+          },
         ),
       ),
       [1, 2],
@@ -47,9 +53,9 @@ describe(describeAction, () => {
   test('arms what it picks', () => {
     assert.strictEqual(
       describeAction(pullRequest({ number: 1 }), 'main', {
-        stackParents: new Map(),
-        toArm: new Set([1]),
-        bypass: new Map(),
+        stackParents: new Map<number, number>(),
+        toArm: new Set<number>([1]),
+        bypass: new Map<number, string>(),
       }),
       'rebase onto main, arm auto-merge',
     );
@@ -65,9 +71,11 @@ describe(describeAction, () => {
         }),
         'main',
         {
-          stackParents: new Map(),
-          toArm: new Set(),
-          bypass: new Map([[1, 'the author is the only owner']]),
+          stackParents: new Map<number, number>(),
+          toArm: new Set<number>(),
+          bypass: new Map<number, string>([
+            [1, 'the author is the only owner'],
+          ]),
         },
       ),
       'rebase onto main, leave auto-merge off (the author is the only owner, so it needs a bypass merge), then take skip-ci off it',

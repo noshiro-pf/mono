@@ -387,7 +387,10 @@ const ROOT_DIRECTORY = '.';
  */
 const PULL_REQUEST_EVENT = 'pull_request';
 
-const RECURSIVE_FLAGS: ReadonlySet<string> = new Set(['--recursive', '-r']);
+const RECURSIVE_FLAGS: ReadonlySet<string> = new Set<string>([
+  '--recursive',
+  '-r',
+]);
 
 const PNPM_RUN = /pnpm run (?<args>[^&|;\n]*)/gu;
 
@@ -623,9 +626,9 @@ const tokenize = (args: string): readonly string[] => {
   return mut_tokens;
 };
 
-const QUOTES: ReadonlySet<string> = new Set(["'", '"']);
+const QUOTES: ReadonlySet<string> = new Set<string>(["'", '"']);
 
-const WHITESPACE: ReadonlySet<string> = new Set([' ', '\t']);
+const WHITESPACE: ReadonlySet<string> = new Set<string>([' ', '\t']);
 
 /**
  * A script name against an `npm-run-all` glob, where `*` stands for any run of

@@ -6,6 +6,7 @@ import {
 export const eslintTsRestrictionsRules = {
   'ts-restrictions/no-restricted-syntax': 'off',
   'ts-restrictions/no-restricted-cast-name': 'off',
+  'ts-restrictions/explicit-collection-type-arguments': 'error',
   'ts-restrictions/jsx-boolean-logical-operands': 'error',
   'ts-restrictions/no-negated-comparison': 'error',
   'ts-restrictions/no-string-spread': 'error',
@@ -13,6 +14,7 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/no-unnecessary-coalesce-undefined': 'error',
   'ts-restrictions/prefer-curried-call': 'error',
   'ts-restrictions/prefer-dedent': 'error',
+  'ts-restrictions/prefer-global-this': 'error',
   'ts-restrictions/prefer-non-mutating-array-method': 'error',
   'ts-restrictions/prefer-logical-over-boolean-ternary': 'error',
   'ts-restrictions/prefer-nullish-coalescing-when-safe': 'error',

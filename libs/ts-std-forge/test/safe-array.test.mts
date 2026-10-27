@@ -10,7 +10,7 @@ describe('SafeArray.isArray', () => {
       undefined,
       null,
       { length: 2 },
-      new Set([1]),
+      new Set<number>([1]),
     ] as const;
 
     for (const value of values) {

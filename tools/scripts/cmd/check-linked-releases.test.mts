@@ -120,7 +120,7 @@ describe('checkLinkedReleases', () => {
 
 const GROUP = ['core', 'wrapper'] as const;
 
-const VERSIONS: ReadonlyMap<string, string> = new Map([
+const VERSIONS: ReadonlyMap<string, string> = new Map<string, string>([
   ['core', '3.1.0'],
   ['wrapper', '2.1.0'],
   ['young', '0.4.0'],

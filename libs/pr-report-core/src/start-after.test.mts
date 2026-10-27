@@ -5,7 +5,9 @@ import {
   referenceStatusOf,
   waitsFor,
   withProgress,
+  type InheritedOrder,
   type ReferenceStatus,
+  type StartState,
 } from './start-after.mjs';
 
 describe(referenceStatusOf, () => {
@@ -90,7 +92,7 @@ describe(decideStartStates, () => {
   test('an issue that declares nothing is free', () => {
     assert.deepStrictEqual(
       decideStartStates([{ number: 1, startAfter: [] }], known([])),
-      new Map([[1, 'free']]),
+      new Map<number, StartState>([[1, 'free']]),
     );
   });
 
@@ -103,7 +105,7 @@ describe(decideStartStates, () => {
         ],
         known([]),
       ),
-      new Map([
+      new Map<number, StartState>([
         [1, 'free'],
         [2, 'blocked'],
       ]),
@@ -119,7 +121,7 @@ describe(decideStartStates, () => {
           [2, 'done'],
         ]),
       ),
-      new Map([[3, 'ready']]),
+      new Map<number, StartState>([[3, 'ready']]),
     );
   });
 
@@ -137,7 +139,7 @@ describe(decideStartStates, () => {
           [3, 'waiting'],
         ]),
       ),
-      new Map([
+      new Map<number, StartState>([
         [10, 'blocked'],
         [11, 'attention'],
         [12, 'attention'],
@@ -158,7 +160,7 @@ describe(decideStartStates, () => {
           [9, 'waiting'],
         ]),
       ),
-      new Map([
+      new Map<number, StartState>([
         [1, 'blocked'],
         [2, 'blocked'],
         [3, 'ready'],
@@ -177,7 +179,7 @@ describe(decideStartStates, () => {
         ],
         known([]),
       ),
-      new Map([
+      new Map<number, StartState>([
         [1, 'cycle'],
         [2, 'cycle'],
         [3, 'cycle'],
@@ -195,10 +197,10 @@ describe(inheritStartAfter, () => {
           { number: 10, closes: [1] },
           { number: 20, closes: [] },
         ],
-        startAfterOf: new Map([[1, [20]]]),
-        openIssues: new Set([1]),
+        startAfterOf: new Map<number, readonly number[]>([[1, [20]]]),
+        openIssues: new Set<number>([1]),
       }),
-      new Map([
+      new Map<number, InheritedOrder>([
         [10, { mergeAfter: [20], notStarted: [] }],
         [20, { mergeAfter: [], notStarted: [] }],
       ]),
@@ -213,8 +215,8 @@ describe(inheritStartAfter, () => {
           { number: 21, closes: [2] },
           { number: 22, closes: [2] },
         ],
-        startAfterOf: new Map([[1, [2]]]),
-        openIssues: new Set([1, 2]),
+        startAfterOf: new Map<number, readonly number[]>([[1, [2]]]),
+        openIssues: new Set<number>([1, 2]),
       }).get(10),
       { mergeAfter: [21, 22], notStarted: [] },
     );
@@ -224,8 +226,8 @@ describe(inheritStartAfter, () => {
     assert.deepStrictEqual(
       inheritStartAfter({
         pulls: [{ number: 10, closes: [1] }],
-        startAfterOf: new Map([[1, [2]]]),
-        openIssues: new Set([1, 2]),
+        startAfterOf: new Map<number, readonly number[]>([[1, [2]]]),
+        openIssues: new Set<number>([1, 2]),
       }).get(10),
       { mergeAfter: [], notStarted: [2] },
     );
@@ -237,8 +239,8 @@ describe(inheritStartAfter, () => {
     assert.deepStrictEqual(
       inheritStartAfter({
         pulls: [{ number: 10, closes: [1] }],
-        startAfterOf: new Map([[1, [3]]]),
-        openIssues: new Set([1]),
+        startAfterOf: new Map<number, readonly number[]>([[1, [3]]]),
+        openIssues: new Set<number>([1]),
       }).get(10),
       { mergeAfter: [], notStarted: [] },
     );
@@ -252,13 +254,13 @@ describe(inheritStartAfter, () => {
           { number: 10, closes: [1, 2] },
           { number: 11, closes: [3] },
         ],
-        startAfterOf: new Map([
+        startAfterOf: new Map<number, readonly number[]>([
           [1, [2]],
           [3, [11]],
         ]),
-        openIssues: new Set([1, 2, 3]),
+        openIssues: new Set<number>([1, 2, 3]),
       }),
-      new Map([
+      new Map<number, InheritedOrder>([
         [10, { mergeAfter: [], notStarted: [] }],
         [11, { mergeAfter: [], notStarted: [] }],
       ]),
@@ -273,11 +275,11 @@ describe(inheritStartAfter, () => {
           { number: 30, closes: [] },
           { number: 20, closes: [5] },
         ],
-        startAfterOf: new Map([
+        startAfterOf: new Map<number, readonly number[]>([
           [1, [30, 5, 6]],
           [2, [5, 30, 6]],
         ]),
-        openIssues: new Set([1, 2, 5, 6]),
+        openIssues: new Set<number>([1, 2, 5, 6]),
       }).get(10),
       { mergeAfter: [20, 30], notStarted: [6] },
     );
@@ -287,8 +289,8 @@ describe(inheritStartAfter, () => {
     assert.deepStrictEqual(
       inheritStartAfter({
         pulls: [{ number: 10, closes: [1] }],
-        startAfterOf: new Map(),
-        openIssues: new Set([1]),
+        startAfterOf: new Map<number, readonly number[]>(),
+        openIssues: new Set<number>([1]),
       }).get(10),
       { mergeAfter: [], notStarted: [] },
     );
@@ -336,7 +338,7 @@ describe(issuesInProgress, () => {
         { linkedIssues: [{ number: 2 }] },
         { linkedIssues: [] },
       ]),
-      new Set([1, 2]),
+      new Set<number>([1, 2]),
     );
   });
 });

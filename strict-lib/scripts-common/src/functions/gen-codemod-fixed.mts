@@ -10,7 +10,7 @@ import { transformDeclarationFile } from './codemod/transform-dts.mjs';
  * glob that the ESLint `functional/prefer-readonly-type` rule was scoped to in
  * the now-removed `defineGenEslintConfig`.
  */
-const readonlyExcludedFiles: ReadonlySet<string> = new Set([
+const readonlyExcludedFiles: ReadonlySet<string> = new Set<string>([
   'lib.dom.d.ts',
   'lib.webworker.d.ts',
 ]);

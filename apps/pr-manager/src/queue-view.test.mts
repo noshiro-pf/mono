@@ -8,6 +8,7 @@ import {
   writeClaimComment,
   writeSetAsideComment,
   type ChecksSummary,
+  type ContextState,
   type ReportEntry,
 } from 'pr-report-core';
 import { queueViewOf, type QueuePull, type QueueView } from './queue-view.mjs';
@@ -351,7 +352,7 @@ const entry = (fields: PullFields): ReportEntry =>
     updatedAt: NOW_ISO,
     headCommittedAt: undefined,
     comparison: { aheadBy: 1, behindBy: fields.behindBy },
-    reported: new Map(),
+    reported: new Map<string, ContextState>(),
     checksRunning: false,
     linkedIssues: [],
     mergeAfter: [],

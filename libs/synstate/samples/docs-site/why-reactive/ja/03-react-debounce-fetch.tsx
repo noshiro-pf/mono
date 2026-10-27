@@ -1,4 +1,4 @@
-/* eslint-disable unicorn/prefer-global-this */
+/* eslint-disable ts-restrictions/prefer-global-this */
 /* eslint-disable @stylistic/padding-line-between-statements */
 // embed-sample-code-ignore-above
 

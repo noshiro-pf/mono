@@ -21,12 +21,12 @@ export const describeSignInError = (error: unknown): string | undefined => {
 };
 
 /** The reader closed the popup, or opened a second one: nothing failed. */
-const SILENT_CODES: ReadonlySet<string> = new Set([
+const SILENT_CODES: ReadonlySet<string> = new Set<string>([
   'auth/popup-closed-by-user',
   'auth/cancelled-popup-request',
 ]);
 
-const MESSAGES: ReadonlyMap<string, string> = new Map([
+const MESSAGES: ReadonlyMap<string, string> = new Map<string, string>([
   [
     'auth/popup-blocked',
     'ポップアップがブロックされました。このページのポップアップを許可して、もう一度お試しください。',

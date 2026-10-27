@@ -86,7 +86,7 @@ describe(isRecord, () => {
     test('Map is a record (but its entries are not own properties)', () => {
       expectType<ReadonlyMap<string, number>, UnknownRecord>('!<=');
 
-      const unk: unknown = new Map([['a', 1]]);
+      const unk: unknown = new Map<string, number>([['a', 1]]);
 
       if (isRecord(unk)) {
         // Map entries are not own properties, so hasKey correctly rejects them.
@@ -99,7 +99,7 @@ describe(isRecord, () => {
     test('Set is a record', () => {
       expectType<ReadonlySet<number>, UnknownRecord>('!<=');
 
-      const unk: unknown = new Set([1, 2, 3]);
+      const unk: unknown = new Set<number>([1, 2, 3]);
 
       assert.isTrue(isRecord(unk));
     });

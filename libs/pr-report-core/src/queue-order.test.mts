@@ -14,6 +14,7 @@ import {
   type QueueFacts,
   type QueueGraphMember,
 } from './queue-order.mjs';
+import type { QueueOwner } from './queue-owner.mjs';
 
 describe(queueGraph, () => {
   test('reads the declared order and the stack together, and the cycles in them', () => {
@@ -26,11 +27,14 @@ describe(queueGraph, () => {
       'main',
     );
 
-    assert.deepStrictEqual(graph.stackParents, new Map([[2, 1]]));
+    assert.deepStrictEqual(
+      graph.stackParents,
+      new Map<number, number>([[2, 1]]),
+    );
 
     assert.deepStrictEqual(
       graph.dependencies,
-      new Map([
+      new Map<number, readonly number[]>([
         [1, [3]],
         [2, [1]],
         [3, [1]],
@@ -65,7 +69,7 @@ describe(queueGraph, () => {
         member({ number: 3, body: 'Merge-After: #1' }),
       ],
       'main',
-      new Map([
+      new Map<number, readonly number[]>([
         [11, [12]],
         [12, [3]],
       ]),
@@ -73,7 +77,7 @@ describe(queueGraph, () => {
 
     assert.deepStrictEqual(
       graph.dependencies,
-      new Map([
+      new Map<number, readonly number[]>([
         [1, [2]],
         [2, [3]],
         [3, [1]],
@@ -82,7 +86,7 @@ describe(queueGraph, () => {
 
     assert.deepStrictEqual(
       graph.inherited,
-      new Map([
+      new Map<number, readonly number[]>([
         [1, [2]],
         [2, [3]],
         [3, []],
@@ -132,7 +136,7 @@ describe(queueStanding, () => {
     assert.deepStrictEqual(
       queueStanding(
         facts({ number: 1 }),
-        context({ owners: new Map([[1, owner]]) }),
+        context({ owners: new Map<number, QueueOwner>([[1, owner]]) }),
       ),
       { kind: 'owned', owner },
     );
@@ -142,7 +146,7 @@ describe(queueStanding, () => {
     assert.deepStrictEqual(
       queueStanding(
         facts({ number: 2, baseRef: 'feature/1' }),
-        context({ stackParents: new Map([[2, 1]]) }),
+        context({ stackParents: new Map<number, number>([[2, 1]]) }),
       ),
       { kind: 'stacked', on: 1, cyclic: false },
     );
@@ -184,8 +188,8 @@ describe(queueStanding, () => {
       queueStanding(
         pr,
         context({
-          dependencies: new Map([[2, [1]]]),
-          openNumbers: new Set([1, 2]),
+          dependencies: new Map<number, readonly number[]>([[2, [1]]]),
+          openNumbers: new Set<number>([1, 2]),
         }),
       ),
       { kind: 'waiting', on: [1], cyclic: false },
@@ -420,13 +424,13 @@ const member = (
 const context = (fields: Partial<QueueContext> = {}): QueueContext =>
   ({
     defaultBranch: 'main',
-    stackParents: new Map(),
-    dependencies: new Map(),
-    inherited: new Map(),
+    stackParents: new Map<number, number>(),
+    dependencies: new Map<number, readonly number[]>(),
+    inherited: new Map<number, readonly number[]>(),
     cycles: [],
-    cyclic: new Set(),
-    openNumbers: new Set(),
+    cyclic: new Set<number>(),
+    openNumbers: new Set<number>(),
     releaseBlockers: [],
-    owners: new Map(),
+    owners: new Map<number, QueueOwner>(),
     ...fields,
   }) as const;

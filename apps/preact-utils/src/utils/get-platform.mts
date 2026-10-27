@@ -8,8 +8,7 @@
  * modifier key counts as "ctrl", so being wrong is harmless.
  */
 export const getPlatform = (): 'mac' | 'other' | 'windows' => {
-  // eslint-disable-next-line unicorn/prefer-global-this
-  const platform = window.navigator.platform.toUpperCase();
+  const platform = globalThis.navigator.platform.toUpperCase();
 
   return platform.includes('MAC')
     ? 'mac'

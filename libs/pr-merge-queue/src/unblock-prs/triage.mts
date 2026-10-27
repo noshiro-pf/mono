@@ -478,7 +478,7 @@ const readReviewHolds = async (
     !Arr.isNonEmpty(entries) ||
     (!requireCodeOwnerReview && !requireConversationResolution)
   ) {
-    return new Map();
+    return new Map<number, ReviewHold>();
   }
 
   const read = await readReviewStates(
@@ -492,7 +492,7 @@ const readReviewHolds = async (
       `Cannot read the reviews; holding nothing for them. (${lastLines(read.value, 2)})`,
     );
 
-    return new Map();
+    return new Map<number, ReviewHold>();
   }
 
   const rules = {

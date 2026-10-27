@@ -250,12 +250,12 @@ const neighborsOf = (
 
   return pairs.reduce<ReadonlyMap<GraphNodeId, readonly GraphNodeId[]>>(
     (acc, [from, to]) =>
-      new Map([
+      new Map<GraphNodeId, readonly GraphNodeId[]>([
         ...acc,
         [from, Arr.toPushed(acc.get(from) ?? [], to)],
         [to, Arr.toPushed(acc.get(to) ?? [], from)],
       ]),
-    new Map(),
+    new Map<GraphNodeId, readonly GraphNodeId[]>(),
   );
 };
 

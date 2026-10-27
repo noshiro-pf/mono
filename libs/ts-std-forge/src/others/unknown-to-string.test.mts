@@ -191,13 +191,13 @@ describe(unknownToString, () => {
       });
 
       test('empty Map', () => {
-        const map = new Map();
+        const map = new Map<unknown, unknown>();
 
         expect(unknownToString(map)).toBe('Map([])');
       });
 
       test('Map with prettyPrint', () => {
-        const map = new Map([
+        const map = new Map<string, number>([
           ['a', 1],
           ['b', 2],
         ]);
@@ -219,19 +219,19 @@ describe(unknownToString, () => {
       });
 
       test('Set with values', () => {
-        const set = new Set([1, 2, 3, 'test', true]);
+        const set = new Set<string | number | boolean>([1, 2, 3, 'test', true]);
 
         expect(unknownToString(set)).toBe('Set([1,2,3,"test",true])');
       });
 
       test('empty Set', () => {
-        const set = new Set();
+        const set = new Set<unknown>();
 
         expect(unknownToString(set)).toBe('Set([])');
       });
 
       test('Set with prettyPrint', () => {
-        const set = new Set([1, { a: 2 }, 3]);
+        const set = new Set<number | Readonly<{ a: number }>>([1, { a: 2 }, 3]);
 
         expect(unknownToString(set, { prettyPrintObject: true })).toBe(
           dedent`
@@ -247,7 +247,9 @@ describe(unknownToString, () => {
       });
 
       test('nested Map and Set', () => {
-        const map = new Map([['set', new Set([1, 2])]]);
+        const map = new Map<string, ReadonlySet<number>>([
+          ['set', new Set<number>([1, 2])],
+        ]);
 
         const result = unknownToString(map);
 

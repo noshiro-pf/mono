@@ -15,7 +15,7 @@ test('MapType with string keys and number values', () => {
   expectType<StringNumberMap, ReadonlyMap<string, number>>('=');
 
   // Valid map
-  const validMap = new Map([
+  const validMap = new Map<string, number>([
     ['a', 1],
     ['b', 2],
     ['c', 3],
@@ -25,7 +25,7 @@ test('MapType with string keys and number values', () => {
 
   assert.isTrue(StringNumberMap.is(validMap));
 
-  assert.isTrue(StringNumberMap.is(new Map()));
+  assert.isTrue(StringNumberMap.is(new Map<unknown, unknown>()));
 
   assert.isFalse(StringNumberMap.is({}));
 
@@ -105,7 +105,7 @@ test('MapType fill() method', () => {
   const StringNumberMap = MapType(string(), number());
 
   // Valid map - should preserve valid entries
-  const validMap = new Map([
+  const validMap = new Map<string, number>([
     ['a', 1],
     ['b', 2],
   ]);
@@ -139,14 +139,14 @@ test('MapType fill() method', () => {
 
   expect(filled3.size).toBe(0);
 
-  assert.deepStrictEqual(filled3, new Map());
+  assert.deepStrictEqual(filled3, new Map<string, number>());
 });
 
 test('MapType cast() method', () => {
   const StringNumberMap = MapType(string(), number());
 
   // Valid map
-  const validMap = new Map([['key', 42]]);
+  const validMap = new Map<string, number>([['key', 42]]);
 
   const casted = StringNumberMap.cast(validMap);
 
@@ -167,7 +167,7 @@ test('MapType assertIs() method', () => {
   ) => asserts a is ReadonlyMap<string, number> = StringNumberMap.assertIs;
 
   // Valid map - should not throw
-  const validMap = new Map([['key', 42]]);
+  const validMap = new Map<string, number>([['key', 42]]);
 
   expect(() => {
     assertIsStringNumberMap(validMap);
@@ -206,7 +206,7 @@ test('MapType with number keys and string values', () => {
 
   expectType<NumberStringMap, ReadonlyMap<number, string>>('=');
 
-  const validMap = new Map([
+  const validMap = new Map<number, string>([
     [1, 'one'],
     [2, 'two'],
     [3, 'three'],
@@ -222,7 +222,10 @@ test('MapType with number keys and string values', () => {
 test('MapType defaultValue', () => {
   const StringNumberMap = MapType(string(), number());
 
-  assert.deepStrictEqual(StringNumberMap.defaultValue, new Map());
+  assert.deepStrictEqual(
+    StringNumberMap.defaultValue,
+    new Map<string, number>(),
+  );
 
   expect(StringNumberMap.defaultValue.size).toBe(0);
 });

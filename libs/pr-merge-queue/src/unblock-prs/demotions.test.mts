@@ -7,12 +7,12 @@ import {
 import type { Demotions, PullRequest } from './types.mjs';
 
 describe(afterWatch, () => {
-  const none: Demotions = new Map();
+  const none: Demotions = new Map<number, string>();
 
   test('demotes a pull request that sat green without merging', () => {
     assert.deepStrictEqual(
       afterWatch(none, 7, 'head', 'not-merging'),
-      new Map([[7, 'head']]),
+      new Map<number, string>([[7, 'head']]),
     );
   });
 
@@ -32,8 +32,13 @@ describe(afterWatch, () => {
   // cleared by the next survey as if someone else had pushed.
   test('keeps a demotion on the head the watch ended on', () => {
     assert.deepStrictEqual(
-      afterWatch(new Map([[7, 'old']]), 7, 'new', 'checks-failed'),
-      new Map([[7, 'new']]),
+      afterWatch(
+        new Map<number, string>([[7, 'old']]),
+        7,
+        'new',
+        'checks-failed',
+      ),
+      new Map<number, string>([[7, 'new']]),
     );
   });
 });
@@ -41,21 +46,25 @@ describe(afterWatch, () => {
 describe(followHead, () => {
   test('moves a demotion to the head this run pushed', () => {
     assert.deepStrictEqual(
-      followHead(new Map([[7, 'before-rebase']]), 7, 'after-rebase'),
-      new Map([[7, 'after-rebase']]),
+      followHead(
+        new Map<number, string>([[7, 'before-rebase']]),
+        7,
+        'after-rebase',
+      ),
+      new Map<number, string>([[7, 'after-rebase']]),
     );
   });
 
   test('demotes nothing that was not demoted', () => {
     assert.deepStrictEqual(
-      followHead(new Map([[7, 'head']]), 8, 'other'),
-      new Map([[7, 'head']]),
+      followHead(new Map<number, string>([[7, 'head']]), 8, 'other'),
+      new Map<number, string>([[7, 'head']]),
     );
   });
 });
 
 describe(pruneDemotions, () => {
-  const demoted: Demotions = new Map([
+  const demoted: Demotions = new Map<number, string>([
     [1, 'a'.repeat(40)],
     [2, 'a'.repeat(40)],
     [3, 'a'.repeat(40)],
@@ -70,7 +79,10 @@ describe(pruneDemotions, () => {
       pullRequest({ number: 2, headRefOid: 'd'.repeat(40) }),
     ]);
 
-    assert.deepStrictEqual(kept, new Map([[1, 'a'.repeat(40)]]));
+    assert.deepStrictEqual(
+      kept,
+      new Map<number, string>([[1, 'a'.repeat(40)]]),
+    );
 
     assert.isTrue(isDemoted(kept, pullRequest({ number: 1 })));
 

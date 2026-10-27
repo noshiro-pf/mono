@@ -46,7 +46,7 @@ export const filterNodes = (
   const chosen = knownChoices(state, groups, filter);
 
   if (Arr.isEmpty(chosen.groups) && Arr.isEmpty(chosen.labels)) {
-    return { hidden, outside: new Set() } as const;
+    return { hidden, outside: new Set<GraphNodeId>() } as const;
   }
 
   const groupIds = new Set(groups.map(({ id }) => id));

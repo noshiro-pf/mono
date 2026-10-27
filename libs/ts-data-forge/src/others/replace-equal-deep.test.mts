@@ -228,11 +228,17 @@ describe(replaceEqualDeep, () => {
   });
 
   test('compares a Map, a Set, a Date or a class instance whole', () => {
-    const map = new Map([['a', { x: 1 }]]);
+    const map = new Map<string, Readonly<{ x: number }>>([['a', { x: 1 }]]);
 
-    assert.strictEqual(replaceEqualDeep(map, new Map([['a', { x: 1 }]])), map);
+    assert.strictEqual(
+      replaceEqualDeep(
+        map,
+        new Map<string, Readonly<{ x: number }>>([['a', { x: 1 }]]),
+      ),
+      map,
+    );
 
-    const changedMap = new Map([
+    const changedMap = new Map<string, Readonly<{ x: number }>>([
       ['a', { x: 1 }],
       ['b', { x: 2 }],
     ]);
@@ -244,9 +250,9 @@ describe(replaceEqualDeep, () => {
     // Nothing inside is reused.
     assert.notStrictEqual(sharedMap.get('a'), map.get('a'));
 
-    const set = new Set([1, 2]);
+    const set = new Set<number>([1, 2]);
 
-    assert.strictEqual(replaceEqualDeep(set, new Set([1, 2])), set);
+    assert.strictEqual(replaceEqualDeep(set, new Set<number>([1, 2])), set);
 
     const date = new Date(0);
 
@@ -282,12 +288,12 @@ describe(replaceEqualDeep, () => {
   });
 
   test('reuses a Map compared whole inside a plain object', () => {
-    const map = new Map([['a', 1]]);
+    const map = new Map<string, number>([['a', 1]]);
 
     const current = { map, count: 1 } as const;
 
     const shared = replaceEqualDeep(current, {
-      map: new Map([['a', 1]]),
+      map: new Map<string, number>([['a', 1]]),
       count: 2,
     });
 

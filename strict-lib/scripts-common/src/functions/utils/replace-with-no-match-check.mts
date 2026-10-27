@@ -158,7 +158,7 @@ const tokenize = (text: string): readonly string[] => {
  * extra `|` before the next token (i.e. positions where a type position can
  * start: after `:`, `(`, `,`, `|`, or `=`).
  */
-const unionStartTokens = new Set([':', '(', ',', '|', '=']);
+const unionStartTokens = new Set<string>([':', '(', ',', '|', '=']);
 
 /**
  * Builds a regex matching `text` that tolerates oxfmt re-wrapping `text` onto

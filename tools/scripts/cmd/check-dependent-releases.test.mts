@@ -194,8 +194,13 @@ describe('checkDependentReleases', () => {
     const result = check({
       changesets: [changeset({ young: 'minor' })],
       packages: [pkg('young', '0.5.1'), pkg('wrapper', '0.2.0', ['young'])],
-      reExports: new Map([
-        ['wrapper', new Map([['young', ['libs/wrapper/src/index.mts']]])],
+      reExports: new Map<string, ReadonlyMap<string, readonly string[]>>([
+        [
+          'wrapper',
+          new Map<string, readonly string[]>([
+            ['young', ['libs/wrapper/src/index.mts']],
+          ]),
+        ],
       ]),
     });
 
@@ -258,8 +263,13 @@ describe('checkDependentReleases', () => {
   test('names the first re-exporting file and counts the rest', () => {
     const result = check({
       changesets: [changeset({ core: 'major' })],
-      reExports: new Map([
-        ['wrapper', new Map([['core', ['a.mts', 'b.mts', 'c.mts']]])],
+      reExports: new Map<string, ReadonlyMap<string, readonly string[]>>([
+        [
+          'wrapper',
+          new Map<string, readonly string[]>([
+            ['core', ['a.mts', 'b.mts', 'c.mts']],
+          ]),
+        ],
       ]),
     });
 
@@ -309,8 +319,13 @@ describe('checkDependentReleases', () => {
         pkg('wrapper', '2.0.0', ['core-a']),
       ],
       groups: [{ kind: 'fixed', members: ['core-*'] }],
-      reExports: new Map([
-        ['wrapper', new Map([['core-a', ['libs/wrapper/src/index.mts']]])],
+      reExports: new Map<string, ReadonlyMap<string, readonly string[]>>([
+        [
+          'wrapper',
+          new Map<string, readonly string[]>([
+            ['core-a', ['libs/wrapper/src/index.mts']],
+          ]),
+        ],
       ]),
     });
 
@@ -416,8 +431,13 @@ const check = ({
     pkg('typed', '1.0.0', ['core']),
     pkg('user', '4.0.0', ['core']),
   ],
-  reExports = new Map([
-    ['wrapper', new Map([['core', ['libs/wrapper/src/index.mts']]])],
+  reExports = new Map<string, ReadonlyMap<string, readonly string[]>>([
+    [
+      'wrapper',
+      new Map<string, readonly string[]>([
+        ['core', ['libs/wrapper/src/index.mts']],
+      ]),
+    ],
   ]),
   overrides = [],
 }: Readonly<{

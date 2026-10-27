@@ -32,7 +32,7 @@ assert.deepStrictEqual(parseMergeAfter(body), [12, 14]);
 
 // #12 waits for #14 and #14 for #12: neither can ever merge first.
 const cycles = findMergeAfterCycles(
-    new Map([
+    new Map<number, readonly number[]>([
         [12, [14]],
         [14, [12]],
     ]),

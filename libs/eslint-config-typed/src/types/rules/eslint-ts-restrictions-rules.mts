@@ -58,6 +58,22 @@ namespace CheckDestructuringCompleteness {
 }
 
 /**
+ * @description Require explicit type arguments on `new Set` / `new Map` / `new WeakSet` / `new WeakMap` called with no argument or an array literal
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  ```
+ */
+namespace ExplicitCollectionTypeArguments {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Require booleans on both sides of `&&` and `||` whose value is rendered or passed in JSX, and write the rest as a ternary (`{a && <X />}` → `{a ? <X /> : undefined}`).
  *
  *  ```md
@@ -341,6 +357,21 @@ namespace PreferDedent {
 }
 
 /**
+ * @description Prefer `globalThis` over `window`, `self` and `global` (`unicorn/prefer-global-this`), except for members `typeof globalThis` lacks — under the strict standard library, a window's own globals such as `history`
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferGlobalThis {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Replace a ternary with one boolean literal branch by `&&` or `||` (`a ? false : b` → `!a && b`, `a ? true : b` → `a || b`).
  *
  *  ```md
@@ -458,6 +489,7 @@ namespace PreferTernary {
 
 export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
+  'ts-restrictions/explicit-collection-type-arguments': ExplicitCollectionTypeArguments.RuleEntry;
   'ts-restrictions/jsx-boolean-logical-operands': JsxBooleanLogicalOperands.RuleEntry;
   'ts-restrictions/no-negated-comparison': NoNegatedComparison.RuleEntry;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;
@@ -467,6 +499,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/no-unnecessary-coalesce-undefined': NoUnnecessaryCoalesceUndefined.RuleEntry;
   'ts-restrictions/prefer-curried-call': PreferCurriedCall.RuleEntry;
   'ts-restrictions/prefer-dedent': PreferDedent.RuleEntry;
+  'ts-restrictions/prefer-global-this': PreferGlobalThis.RuleEntry;
   'ts-restrictions/prefer-logical-over-boolean-ternary': PreferLogicalOverBooleanTernary.RuleEntry;
   'ts-restrictions/prefer-non-mutating-array-method': PreferNonMutatingArrayMethod.RuleEntry;
   'ts-restrictions/prefer-nullish-coalescing-when-safe': PreferNullishCoalescingWhenSafe.RuleEntry;

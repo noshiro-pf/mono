@@ -21,7 +21,7 @@ type MessageIds = 'useReadonlyOrMutableRecord' | 'replaceWith';
  * mutability of every record type spelled with it is decided by whoever reads
  * it. The ts-type-forge pair spells it out.
  */
-const ALTERNATIVES: StdTypeAlternatives = new Map([
+const ALTERNATIVES: StdTypeAlternatives = new Map<string, readonly string[]>([
   ['Record', ['ReadonlyRecord', 'MutableRecord']],
 ]);
 

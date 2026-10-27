@@ -1,12 +1,13 @@
 import { expectType, Result } from 'ts-data-forge';
 import type { StrictExclude } from 'ts-type-forge';
-import type { DagLayout } from '../dag/index.mjs';
+import type { DagLayout, Point } from '../dag/index.mjs';
 import {
   asGroupId,
   asMilestoneId,
   asTaskId,
   createMilestone,
   createTask,
+  type GraphNodeId,
   type Group,
   type GroupId,
   type Milestone,
@@ -239,8 +240,8 @@ describe('what is written', () => {
 
     const layout: DagLayout = {
       direction: 'down',
-      positions: new Map([['task:a', node]]),
-      groupPositions: new Map(),
+      positions: new Map<GraphNodeId, Point>([['task:a', node]]),
+      groupPositions: new Map<GroupId, Point>(),
     } as const;
 
     const strayLayout = { ...layout, zoom: 2 } as const;
@@ -465,11 +466,13 @@ describe(personalProjectDoc, () => {
 describe(dagLayoutToDoc, () => {
   const layout: DagLayout = {
     direction: 'down',
-    positions: new Map([
+    positions: new Map<GraphNodeId, Point>([
       ['task:a', { x: 24, y: -8 }],
       ['milestone:m', { x: 300.5, y: 40 }],
     ]),
-    groupPositions: new Map([[asGroupId('g1'), { x: 8, y: 16 }]]),
+    groupPositions: new Map<GroupId, Point>([
+      [asGroupId('g1'), { x: 8, y: 16 }],
+    ]),
   } as const;
 
   test('writes the positions as maps keyed by node id and group id', () => {
@@ -495,8 +498,8 @@ describe(dagLayoutToDoc, () => {
   test('round-trips a layout with no positions', () => {
     const empty: DagLayout = {
       direction: 'right',
-      positions: new Map(),
-      groupPositions: new Map(),
+      positions: new Map<GraphNodeId, Point>(),
+      groupPositions: new Map<GroupId, Point>(),
     } as const;
 
     assert.deepStrictEqual(
@@ -524,8 +527,8 @@ describe(dagLayoutFromDoc, () => {
       dagLayoutFromDoc(doc),
       Result.ok({
         direction: 'right',
-        positions: new Map([['task:a', { x: 1, y: 2 }]]),
-        groupPositions: new Map(),
+        positions: new Map<GraphNodeId, Point>([['task:a', { x: 1, y: 2 }]]),
+        groupPositions: new Map<GroupId, Point>(),
       }),
     );
   });

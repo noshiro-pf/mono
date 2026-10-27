@@ -382,13 +382,13 @@ describe(fastDeepEqual, () => {
     test.each([
       {
         name: 'empty maps are equal',
-        x: new Map(),
-        y: new Map(),
+        x: new Map<unknown, unknown>(),
+        y: new Map<unknown, unknown>(),
         expected: '=',
       },
       {
         name: 'empty maps of different class are not equal',
-        x: new Map(),
+        x: new Map<unknown, unknown>(),
         y: new MyMap(),
         expected: '!=',
       },
@@ -436,32 +436,44 @@ describe(fastDeepEqual, () => {
       },
       {
         name: 'equal maps (same sub-keys)',
-        x: new Map([['a', [createMap({ b: 'c' })]]]),
-        y: new Map([['a', [createMap({ b: 'c' })]]]),
+        x: new Map<string, readonly ReadonlyMap<unknown, string>[]>([
+          ['a', [createMap({ b: 'c' })]],
+        ]),
+        y: new Map<string, readonly ReadonlyMap<unknown, string>[]>([
+          ['a', [createMap({ b: 'c' })]],
+        ]),
         expected: '=',
       },
       {
         name: 'not equal maps (different sub-key value)',
-        x: new Map([['a', [createMap({ b: 'c' })]]]),
-        y: new Map([['a', [createMap({ b: 'd' })]]]),
+        x: new Map<string, readonly ReadonlyMap<unknown, string>[]>([
+          ['a', [createMap({ b: 'c' })]],
+        ]),
+        y: new Map<string, readonly ReadonlyMap<unknown, string>[]>([
+          ['a', [createMap({ b: 'd' })]],
+        ]),
         expected: '!=',
       },
       {
         name: 'not equal maps (different sub-key)',
-        x: new Map([['a', [createMap({ b: 'c' })]]]),
-        y: new Map([['a', [createMap({ c: 'c' })]]]),
+        x: new Map<string, readonly ReadonlyMap<unknown, string>[]>([
+          ['a', [createMap({ b: 'c' })]],
+        ]),
+        y: new Map<string, readonly ReadonlyMap<unknown, string>[]>([
+          ['a', [createMap({ c: 'c' })]],
+        ]),
         expected: '!=',
       },
       {
         name: 'empty map and empty object are equal',
         x: {},
-        y: new Map(),
+        y: new Map<unknown, unknown>(),
         expected: '!=',
       },
       {
         name: 'empty map and empty array are not equal',
         x: [],
-        y: new Map(),
+        y: new Map<unknown, unknown>(),
         expected: '!=',
       },
       {
@@ -514,13 +526,13 @@ describe(fastDeepEqual, () => {
     test.each([
       {
         name: 'empty sets are equal',
-        x: new Set(),
-        y: new Set(),
+        x: new Set<unknown>(),
+        y: new Set<unknown>(),
         expected: '=',
       },
       {
         name: 'empty sets of different class are not equal',
-        x: new Set(),
+        x: new Set<unknown>(),
         y: new MySet(),
         expected: '!=',
       },
@@ -575,13 +587,13 @@ describe(fastDeepEqual, () => {
       {
         name: 'empty set and empty object are not equal',
         x: {},
-        y: new Set(),
+        y: new Set<unknown>(),
         expected: '!=',
       },
       {
         name: 'empty set and empty array are not equal',
         x: [],
-        y: new Set(),
+        y: new Set<unknown>(),
         expected: '!=',
       },
       {
@@ -598,7 +610,7 @@ describe(fastDeepEqual, () => {
       },
       {
         name: 'set and pseudo set are not equal',
-        x: new Set(),
+        x: new Set<unknown>(),
         y: {
           constructor: Set,
           size: 0,

@@ -557,7 +557,7 @@ const isPureExpression = (node: DeepReadonly<TSESTree.Node>): boolean => {
  * no `this` and so may be passed as values. `eval` is left out: passing it
  * turns a direct `eval` into an indirect one.
  */
-const ECMASCRIPT_GLOBAL_FUNCTIONS: ReadonlySet<string> = new Set([
+const ECMASCRIPT_GLOBAL_FUNCTIONS: ReadonlySet<string> = new Set<string>([
   'AggregateError',
   'Array',
   'ArrayBuffer',
@@ -616,11 +616,12 @@ const ECMASCRIPT_GLOBAL_FUNCTIONS: ReadonlySet<string> = new Set([
  * Callee kinds whose source text can be followed by an argument list without
  * parentheses.
  */
-const PARENTHESES_FREE_CALLEE_TYPES: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.Identifier,
-  AST_NODE_TYPES.MemberExpression,
-  AST_NODE_TYPES.CallExpression,
-]);
+const PARENTHESES_FREE_CALLEE_TYPES: ReadonlySet<AST_NODE_TYPES> =
+  new Set<AST_NODE_TYPES>([
+    AST_NODE_TYPES.Identifier,
+    AST_NODE_TYPES.MemberExpression,
+    AST_NODE_TYPES.CallExpression,
+  ]);
 
 const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion

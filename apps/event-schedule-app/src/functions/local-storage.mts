@@ -26,11 +26,9 @@ const keys: StoreKeys = {
 } as const;
 
 const restore = (at: string): string | undefined =>
-  // eslint-disable-next-line unicorn/prefer-global-this
   window.localStorage.getItem(at) ?? undefined;
 
 const save = (at: string, value: string): void => {
-  // eslint-disable-next-line unicorn/prefer-global-this
   window.localStorage.setItem(at, value);
 };
 

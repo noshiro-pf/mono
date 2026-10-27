@@ -16,13 +16,13 @@ test('SetType with string elements', () => {
   expectType<StringSet, ReadonlySet<string>>('=');
 
   // Valid set
-  const validSet = new Set(['a', 'b', 'c']);
+  const validSet = new Set<string>(['a', 'b', 'c']);
 
   // is() test
 
   assert.isTrue(StringSet.is(validSet));
 
-  assert.isTrue(StringSet.is(new Set()));
+  assert.isTrue(StringSet.is(new Set<unknown>()));
 
   assert.isFalse(StringSet.is({}));
 
@@ -51,7 +51,7 @@ test('SetType with number elements', () => {
 
   expectType<NumberSet, ReadonlySet<number>>('=');
 
-  const validSet = new Set([1, 2, 3, 4, 5]);
+  const validSet = new Set<number>([1, 2, 3, 4, 5]);
 
   // is() test
 
@@ -97,7 +97,7 @@ test('SetType fill() method', () => {
   const NumberSet = SetType(number());
 
   // Valid set - should preserve all elements
-  const validSet = new Set([1, 2, 3]);
+  const validSet = new Set<number>([1, 2, 3]);
 
   const filled1 = NumberSet.fill(validSet);
 
@@ -127,14 +127,14 @@ test('SetType fill() method', () => {
 
   expect(filled3.size).toBe(0);
 
-  assert.deepStrictEqual(filled3, new Set());
+  assert.deepStrictEqual(filled3, new Set<number>());
 });
 
 test('SetType cast() method', () => {
   const StringSet = SetType(string());
 
   // Valid set
-  const validSet = new Set(['hello', 'world']);
+  const validSet = new Set<string>(['hello', 'world']);
 
   const casted = StringSet.cast(validSet);
 
@@ -158,7 +158,7 @@ test('SetType assertIs() method', () => {
     NumberSet.assertIs;
 
   // Valid set - should not throw
-  const validSet = new Set([1, 2, 3]);
+  const validSet = new Set<number>([1, 2, 3]);
 
   expect(() => {
     assertIsNumberSet(validSet);
@@ -210,7 +210,7 @@ test('SetType with complex element types', () => {
 
   const user2 = { id: 2, name: 'Bob' } as const;
 
-  const validSet = new Set([user1, user2]);
+  const validSet = new Set<TypeOf<typeof UserType>>([user1, user2]);
 
   // is() test
 
@@ -222,7 +222,7 @@ test('SetType with complex element types', () => {
   assert.isTrue(Result.isOk(result));
 
   // Invalid element
-  const invalidSet = new Set([
+  const invalidSet = new Set<unknown>([
     user1,
     { id: 'invalid', name: 'Charlie' }, // Invalid id type
   ]);
@@ -233,7 +233,7 @@ test('SetType with complex element types', () => {
 test('SetType defaultValue', () => {
   const StringSet = SetType(string());
 
-  assert.deepStrictEqual(StringSet.defaultValue, new Set());
+  assert.deepStrictEqual(StringSet.defaultValue, new Set<string>());
 
   expect(StringSet.defaultValue.size).toBe(0);
 });
@@ -243,7 +243,7 @@ test('SetType ensures uniqueness', () => {
 
   // Set with duplicate values (Set automatically handles uniqueness)
   // eslint-disable-next-line unicorn/no-duplicate-set-values
-  const setWithDuplicates = new Set([1, 2, 2, 3, 3, 3]);
+  const setWithDuplicates = new Set<number>([1, 2, 2, 3, 3, 3]);
 
   expect(setWithDuplicates.size).toBe(3); // Only unique values
 

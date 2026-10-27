@@ -62,7 +62,7 @@ const compilerConfig = {
 // Plugins whose `valid-title` rule schema needs `mustMatch`/`mustNotMatch`
 // pattern expansion. Hoisted to module scope as a Set so it is allocated once
 // and looked up in O(1) rather than re-allocating/scanning on every iteration.
-const validTitlePlugins: ReadonlySet<string> = new Set([
+const validTitlePlugins: ReadonlySet<string> = new Set<string>([
   'eslint-plugin-playwright',
   'eslint-plugin-jest',
   '@vitest/eslint-plugin',

@@ -279,32 +279,34 @@ const precedenceOf = (node: DeepReadonly<TSESTree.Node>): Precedence => {
   return LOOSER_THAN_LOGICAL.has(node.type) ? 'looser' : 'tighter';
 };
 
-const LOOSER_THAN_LOGICAL: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.ArrowFunctionExpression,
-  AST_NODE_TYPES.AssignmentExpression,
-  AST_NODE_TYPES.ConditionalExpression,
-  AST_NODE_TYPES.SequenceExpression,
-  AST_NODE_TYPES.YieldExpression,
-]);
+const LOOSER_THAN_LOGICAL: ReadonlySet<AST_NODE_TYPES> =
+  new Set<AST_NODE_TYPES>([
+    AST_NODE_TYPES.ArrowFunctionExpression,
+    AST_NODE_TYPES.AssignmentExpression,
+    AST_NODE_TYPES.ConditionalExpression,
+    AST_NODE_TYPES.SequenceExpression,
+    AST_NODE_TYPES.YieldExpression,
+  ]);
 
 /** Expressions `!` can be put in front of without parentheses. */
-const BINDS_AS_TIGHT_AS_UNARY: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.ArrayExpression,
-  AST_NODE_TYPES.AwaitExpression,
-  AST_NODE_TYPES.CallExpression,
-  AST_NODE_TYPES.ChainExpression,
-  AST_NODE_TYPES.Identifier,
-  AST_NODE_TYPES.Literal,
-  AST_NODE_TYPES.MemberExpression,
-  AST_NODE_TYPES.MetaProperty,
-  AST_NODE_TYPES.NewExpression,
-  AST_NODE_TYPES.ObjectExpression,
-  AST_NODE_TYPES.TaggedTemplateExpression,
-  AST_NODE_TYPES.TemplateLiteral,
-  AST_NODE_TYPES.ThisExpression,
-  AST_NODE_TYPES.TSNonNullExpression,
-  AST_NODE_TYPES.UnaryExpression,
-]);
+const BINDS_AS_TIGHT_AS_UNARY: ReadonlySet<AST_NODE_TYPES> =
+  new Set<AST_NODE_TYPES>([
+    AST_NODE_TYPES.ArrayExpression,
+    AST_NODE_TYPES.AwaitExpression,
+    AST_NODE_TYPES.CallExpression,
+    AST_NODE_TYPES.ChainExpression,
+    AST_NODE_TYPES.Identifier,
+    AST_NODE_TYPES.Literal,
+    AST_NODE_TYPES.MemberExpression,
+    AST_NODE_TYPES.MetaProperty,
+    AST_NODE_TYPES.NewExpression,
+    AST_NODE_TYPES.ObjectExpression,
+    AST_NODE_TYPES.TaggedTemplateExpression,
+    AST_NODE_TYPES.TemplateLiteral,
+    AST_NODE_TYPES.ThisExpression,
+    AST_NODE_TYPES.TSNonNullExpression,
+    AST_NODE_TYPES.UnaryExpression,
+  ]);
 
 const RELATIONAL_OPERATORS: ReadonlySet<ComparisonOperator> =
   new Set<ComparisonOperator>(['<', '<=', '>', '>=']);

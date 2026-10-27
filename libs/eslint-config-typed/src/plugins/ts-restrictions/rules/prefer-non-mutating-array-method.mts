@@ -44,7 +44,7 @@ type MessageIds = 'preferNonMutatingMethod';
  * the copy: `(Array.from(xs) satisfies number[])` with `xs: readonly number[]`
  * would not type-check as `xs satisfies number[]`.
  */
-const MUTATING_METHOD_NAMES: ReadonlySet<string> = new Set([
+const MUTATING_METHOD_NAMES: ReadonlySet<string> = new Set<string>([
   'fill',
   'reverse',
   'sort',

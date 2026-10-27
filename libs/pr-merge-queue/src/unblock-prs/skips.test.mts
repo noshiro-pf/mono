@@ -8,7 +8,7 @@ import type {
 } from './types.mjs';
 
 describe(newSkips, () => {
-  const none: SkipRecords = new Map();
+  const none: SkipRecords = new Map<number, SkipRecord>();
 
   test('reports a pull request set aside for the first time', () => {
     assert.deepStrictEqual(newSkips(none, withSkip(none, skip())), [skip()]);
@@ -42,7 +42,7 @@ describe(newSkips, () => {
 });
 
 describe(unannouncedSkips, () => {
-  const none: SkipRecords = new Map();
+  const none: SkipRecords = new Map<number, SkipRecord>();
 
   const record = skip({ headSha: HEAD, baseSha: BASE });
 
@@ -88,7 +88,7 @@ describe(unannouncedSkips, () => {
 });
 
 describe(settleSkips, () => {
-  const none: SkipRecords = new Map();
+  const none: SkipRecords = new Map<number, SkipRecord>();
 
   test('resolves a comment whose head has moved', () => {
     assert.deepStrictEqual(

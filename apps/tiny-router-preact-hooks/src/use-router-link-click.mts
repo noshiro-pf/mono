@@ -89,8 +89,7 @@ export const createRouterLinkClickHandler =
     // If the URL hasn't changed, a regular <a> will do a replace instead of
     // a push, so do the same here.
     const replace =
-      // eslint-disable-next-line unicorn/prefer-global-this
-      replaceProp === true || createPath(window.location) === href;
+      replaceProp === true || createPath(globalThis.location) === href;
 
     if (replace) {
       redirectFn(href);

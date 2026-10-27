@@ -1,5 +1,6 @@
 import type { ESLintPlugin } from '../../../types/index.mjs';
 import { checkDestructuringCompleteness } from './check-destructuring-completeness.mjs';
+import { explicitCollectionTypeArguments } from './explicit-collection-type-arguments.mjs';
 import { jsxBooleanLogicalOperands } from './jsx-boolean-logical-operands.mjs';
 import { noNegatedComparison } from './no-negated-comparison.mjs';
 import { noRestrictedCastName } from './no-restricted-cast-name.mjs';
@@ -9,6 +10,7 @@ import { noUnnecessaryArrayFrom } from './no-unnecessary-array-from.mjs';
 import { noUnnecessaryCoalesceUndefined } from './no-unnecessary-coalesce-undefined.mjs';
 import { preferCurriedCall } from './prefer-curried-call.mjs';
 import { preferDedent } from './prefer-dedent.mjs';
+import { preferGlobalThis } from './prefer-global-this.mjs';
 import { preferLogicalOverBooleanTernary } from './prefer-logical-over-boolean-ternary.mjs';
 import { preferNonMutatingArrayMethod } from './prefer-non-mutating-array-method.mjs';
 import { preferNullishCoalescingWhenSafe } from './prefer-nullish-coalescing-when-safe.mjs';
@@ -18,6 +20,7 @@ import { preferTernary } from './prefer-ternary.mjs';
 
 export const tsRestrictionsRules = {
   'check-destructuring-completeness': checkDestructuringCompleteness,
+  'explicit-collection-type-arguments': explicitCollectionTypeArguments,
   'jsx-boolean-logical-operands': jsxBooleanLogicalOperands,
   'no-negated-comparison': noNegatedComparison,
   'no-restricted-cast-name': noRestrictedCastName,
@@ -27,6 +30,7 @@ export const tsRestrictionsRules = {
   'no-unnecessary-coalesce-undefined': noUnnecessaryCoalesceUndefined,
   'prefer-curried-call': preferCurriedCall,
   'prefer-dedent': preferDedent,
+  'prefer-global-this': preferGlobalThis,
   'prefer-logical-over-boolean-ternary': preferLogicalOverBooleanTernary,
   'prefer-non-mutating-array-method': preferNonMutatingArrayMethod,
   'prefer-nullish-coalescing-when-safe': preferNullishCoalescingWhenSafe,

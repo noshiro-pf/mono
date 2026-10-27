@@ -1,6 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import type { ContextState } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { planAutoFix } from './auto-fix.mjs';
@@ -93,7 +94,7 @@ describe('a fixer command', () => {
     assert.isTrue(Result.isOk(config));
 
     const plan = planAutoFix(
-      new Map([["fix (a'; rm -rf /)", 'failed']]),
+      new Map<string, ContextState>([["fix (a'; rm -rf /)", 'failed']]),
       config.value.autoFix,
     );
 

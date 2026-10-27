@@ -1,6 +1,7 @@
 import dedent from 'dedent';
 import { Result } from 'ts-data-forge';
 import {
+  type Bump,
   checkNextMajor,
   isBreakingRelease,
   listStockItems,
@@ -22,7 +23,7 @@ describe('parseChangesetBumps', () => {
 
     assert.deepStrictEqual(
       bumps,
-      new Map([
+      new Map<string, Bump>([
         ['ts-data-forge', 'major'],
         ['ts-fortress', 'minor'],
         ['synstate', 'patch'],
@@ -147,7 +148,7 @@ describe('checkNextMajor', () => {
   test('passes items while the version is unchanged', () => {
     const result = checkNextMajor({
       stocks: [stock('1.2.3')],
-      baseVersions: new Map([['pkg', '1.2.3']]),
+      baseVersions: new Map<string, string>([['pkg', '1.2.3']]),
     });
 
     assert.deepStrictEqual(
@@ -159,7 +160,7 @@ describe('checkNextMajor', () => {
   test('passes items a non-breaking release leaves behind', () => {
     const result = checkNextMajor({
       stocks: [stock('1.3.0')],
-      baseVersions: new Map([['pkg', '1.2.3']]),
+      baseVersions: new Map<string, string>([['pkg', '1.2.3']]),
     });
 
     assert.isTrue(Result.isOk(result));
@@ -168,7 +169,7 @@ describe('checkNextMajor', () => {
   test('fails a major release that would leave items behind, and lists them', () => {
     const result = checkNextMajor({
       stocks: [stock('2.0.0')],
-      baseVersions: new Map([['pkg', '1.2.3']]),
+      baseVersions: new Map<string, string>([['pkg', '1.2.3']]),
     });
 
     assert.isTrue(Result.isErr(result));
@@ -197,7 +198,7 @@ describe('checkNextMajor', () => {
           `,
         ),
       ],
-      baseVersions: new Map([['pkg', '1.2.3']]),
+      baseVersions: new Map<string, string>([['pkg', '1.2.3']]),
     });
 
     assert.isTrue(Result.isErr(result));
@@ -210,7 +211,7 @@ describe('checkNextMajor', () => {
   test('lets a major release through undecided items', () => {
     const result = checkNextMajor({
       stocks: [stock('2.0.0', UNDECIDED_ONLY)],
-      baseVersions: new Map([['pkg', '1.2.3']]),
+      baseVersions: new Map<string, string>([['pkg', '1.2.3']]),
     });
 
     assert.deepStrictEqual(
@@ -222,7 +223,7 @@ describe('checkNextMajor', () => {
   test('fails a minor release of a 0.x package that would leave items behind', () => {
     const result = checkNextMajor({
       stocks: [stock('0.6.0')],
-      baseVersions: new Map([['pkg', '0.5.1']]),
+      baseVersions: new Map<string, string>([['pkg', '0.5.1']]),
     });
 
     assert.isTrue(Result.isErr(result));
@@ -231,7 +232,7 @@ describe('checkNextMajor', () => {
   test('passes a package the base does not have', () => {
     const result = checkNextMajor({
       stocks: [stock('1.0.0')],
-      baseVersions: new Map(),
+      baseVersions: new Map<string, string>(),
     });
 
     assert.isTrue(Result.isOk(result));
@@ -240,7 +241,7 @@ describe('checkNextMajor', () => {
   test('fails a file with no items left', () => {
     const result = checkNextMajor({
       stocks: [stock('1.2.3', '# Next major\n')],
-      baseVersions: new Map([['pkg', '1.2.3']]),
+      baseVersions: new Map<string, string>([['pkg', '1.2.3']]),
     });
 
     assert.isTrue(Result.isErr(result));
@@ -251,7 +252,7 @@ describe('checkNextMajor', () => {
   test('fails a file with no package beside it', () => {
     const result = checkNextMajor({
       stocks: [{ ...stock('1.2.3'), manifest: undefined }],
-      baseVersions: new Map(),
+      baseVersions: new Map<string, string>(),
     });
 
     assert.isTrue(Result.isErr(result));

@@ -8,6 +8,7 @@ import {
   statesFromCheckRuns,
   summarizeChecks,
 } from './checks.mjs';
+import type { ContextState } from './types.mjs';
 
 describe(classifyCheckRun, () => {
   test('an unfinished run is pending whatever it last concluded', () => {
@@ -60,7 +61,7 @@ describe(summarizeChecks, () => {
   test('every required context green is a pass', () => {
     const summary = summarizeChecks({
       required,
-      reported: new Map([
+      reported: new Map<string, ContextState>([
         ['code-check-result / result', 'passed'],
         ['no-skip-ci-label', 'passed'],
       ]),
@@ -79,7 +80,9 @@ describe(summarizeChecks, () => {
     // absent from the check list rather than pending in it.
     const summary = summarizeChecks({
       required,
-      reported: new Map([['code-check-result / result', 'passed']]),
+      reported: new Map<string, ContextState>([
+        ['code-check-result / result', 'passed'],
+      ]),
       paused: false,
       running: false,
       baseCovered: true,
@@ -95,7 +98,7 @@ describe(summarizeChecks, () => {
   test('a failure outranks anything still running', () => {
     const summary = summarizeChecks({
       required,
-      reported: new Map([
+      reported: new Map<string, ContextState>([
         ['code-check-result / result', 'failed'],
         ['no-skip-ci-label', 'pending'],
       ]),
@@ -117,7 +120,7 @@ describe(summarizeChecks, () => {
     // asks about.
     const summary = summarizeChecks({
       required,
-      reported: new Map([
+      reported: new Map<string, ContextState>([
         ['code-check-result / result', 'failed'],
         ['no-skip-ci-label', 'pending'],
       ]),
@@ -136,7 +139,7 @@ describe(summarizeChecks, () => {
   test('a skipped context counts as met and is listed as skipped', () => {
     const summary = summarizeChecks({
       required,
-      reported: new Map([
+      reported: new Map<string, ContextState>([
         ['code-check-result / result', 'skipped'],
         ['no-skip-ci-label', 'passed'],
       ]),
@@ -155,7 +158,7 @@ describe(summarizeChecks, () => {
   test('anything still running on the commit keeps the verdict pending', () => {
     const summary = summarizeChecks({
       required,
-      reported: new Map([
+      reported: new Map<string, ContextState>([
         ['code-check-result / result', 'passed'],
         ['no-skip-ci-label', 'passed'],
       ]),
@@ -173,7 +176,7 @@ describe(summarizeChecks, () => {
   test('a failure is not hidden by something still running', () => {
     const summary = summarizeChecks({
       required,
-      reported: new Map([
+      reported: new Map<string, ContextState>([
         ['code-check-result / result', 'failed'],
         ['no-skip-ci-label', 'passed'],
       ]),
@@ -188,7 +191,7 @@ describe(summarizeChecks, () => {
   test('a context nothing requires is not counted', () => {
     const summary = summarizeChecks({
       required,
-      reported: new Map([
+      reported: new Map<string, ContextState>([
         ['code-check-result / result', 'passed'],
         ['no-skip-ci-label', 'passed'],
         ['some-optional-job', 'failed'],
@@ -213,7 +216,7 @@ describe(summarizeChecks, () => {
     test('a context that never reported is not waited for', () => {
       const summary = summarizeChecks({
         required: withLint,
-        reported: new Map([
+        reported: new Map<string, ContextState>([
           ['code-check-result / result', 'passed'],
           ['no-skip-ci-label', 'passed'],
         ]),
@@ -236,7 +239,7 @@ describe(summarizeChecks, () => {
       // on it at all; that is not a pass over zero contexts.
       const summary = summarizeChecks({
         required: withLint,
-        reported: new Map(),
+        reported: new Map<string, ContextState>(),
         paused: false,
         running: false,
         baseCovered: false,
@@ -252,7 +255,7 @@ describe(summarizeChecks, () => {
     test('a context that reported is judged as anywhere else', () => {
       const summary = summarizeChecks({
         required: withLint,
-        reported: new Map([
+        reported: new Map<string, ContextState>([
           ['code-check-result / result', 'failed'],
           ['no-skip-ci-label', 'pending'],
         ]),
@@ -270,7 +273,9 @@ describe(summarizeChecks, () => {
   test('on a base the ruleset covers, nothing is excused from reporting', () => {
     const summary = summarizeChecks({
       required,
-      reported: new Map([['code-check-result / result', 'passed']]),
+      reported: new Map<string, ContextState>([
+        ['code-check-result / result', 'passed'],
+      ]),
       paused: false,
       running: false,
       baseCovered: true,
@@ -422,7 +427,7 @@ describe(reportedContexts, () => {
         [completedRun('code-check-result / result', 'success')],
         [{ context: 'no-skip-ci-label', state: 'pending' }],
       ),
-      new Map([
+      new Map<string, ContextState>([
         ['code-check-result / result', 'passed'],
         ['no-skip-ci-label', 'pending'],
       ]),
@@ -435,7 +440,7 @@ describe(reportedContexts, () => {
         [completedRun('lint', 'failure')],
         [{ context: 'lint', state: 'success' }],
       ),
-      new Map([['lint', 'failed']]),
+      new Map<string, ContextState>([['lint', 'failed']]),
     );
 
     assert.deepStrictEqual(
@@ -443,7 +448,7 @@ describe(reportedContexts, () => {
         [completedRun('lint', 'success')],
         [{ context: 'lint', state: 'pending' }],
       ),
-      new Map([['lint', 'pending']]),
+      new Map<string, ContextState>([['lint', 'pending']]),
     );
   });
 });

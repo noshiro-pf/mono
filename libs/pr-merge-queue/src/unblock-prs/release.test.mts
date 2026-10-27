@@ -105,8 +105,8 @@ describe(yieldsTo, () => {
       yieldsTo(
         target,
         [target, other],
-        new Map([[3, worker]]),
-        new Set([3, 7]),
+        new Map<number, QueueOwner>([[3, worker]]),
+        new Set<number>([3, 7]),
         'main',
       )?.number,
       3,
@@ -120,8 +120,8 @@ describe(yieldsTo, () => {
       yieldsTo(
         target,
         [target, other],
-        new Map([[12, worker]]),
-        new Set([7, 12]),
+        new Map<number, QueueOwner>([[12, worker]]),
+        new Set<number>([7, 12]),
         'main',
       ),
     );
@@ -139,8 +139,8 @@ describe(yieldsTo, () => {
       yieldsTo(
         target,
         [target, other],
-        new Map([[3, worker]]),
-        new Set([7]),
+        new Map<number, QueueOwner>([[3, worker]]),
+        new Set<number>([7]),
         'main',
       ),
     );
@@ -155,14 +155,20 @@ describe(yieldsTo, () => {
       yieldsTo(
         target,
         [target, other],
-        new Map([[3, skill]]),
-        new Set([3, 7]),
+        new Map<number, QueueOwner>([[3, skill]]),
+        new Set<number>([3, 7]),
         'main',
       ),
     );
 
     assert.isUndefined(
-      yieldsTo(target, [target, other], new Map(), new Set([3, 7]), 'main'),
+      yieldsTo(
+        target,
+        [target, other],
+        new Map<number, QueueOwner>(),
+        new Set<number>([3, 7]),
+        'main',
+      ),
     );
   });
 
@@ -173,8 +179,8 @@ describe(yieldsTo, () => {
       yieldsTo(
         target,
         [target, other],
-        new Map([[3, worker]]),
-        new Set([3, 7]),
+        new Map<number, QueueOwner>([[3, worker]]),
+        new Set<number>([3, 7]),
         'main',
       ),
     );
