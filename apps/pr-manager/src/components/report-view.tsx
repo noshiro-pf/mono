@@ -1,10 +1,12 @@
 import { constant, If, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { openPullRequestsUrl } from '../github-links.mjs';
 import type { BlockId } from '../layout.mjs';
-import { mergeOrderStore, reader } from '../store/index.mjs';
+import { mergeOrderStore, reader, reportSource } from '../store/index.mjs';
 import { BlockLayout } from './block-layout.js';
 import { CyclesSection } from './cycles-section.js';
+import { ExternalLink } from './external-link.js';
 import { IssuesSection } from './issues-section.js';
 import { MergeOrderFilters } from './merge-order-filters.js';
 import { MergeOrder } from './merge-order.js';
@@ -36,7 +38,15 @@ const blocks: ReadonlyRecord<BlockId, JSX.Element> = {
       <section class={constant('section')}>
         {/* One sticky head: the counts stay in view under the title. */}
         <div class={constant('section-head')}>
-          <h2 class={constant('section-title')}>{constant('Merge order')}</h2>
+          <h2 class={constant('section-title')}>
+            {constant('Merge order ')}
+            <ExternalLink
+              href={constant(openPullRequestsUrl(reportSource))}
+              variant={'section-link'}
+            >
+              {constant('on GitHub')}
+            </ExternalLink>
+          </h2>
           <MergeOrderFilters />
         </div>
         <If
