@@ -1,5 +1,11 @@
 # split-view-extension
 
+## 0.6.4
+
+### Patch Changes
+
+- react-utils@0.0.20
+
 ## 0.6.3
 
 ### Patch Changes

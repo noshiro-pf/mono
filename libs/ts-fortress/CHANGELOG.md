@@ -1,5 +1,11 @@
 ## [11.0.2](https://github.com/noshiro-pf/ts-fortress/compare/v11.0.1...v11.0.2) (2026-07-24)
 
+## 12.4.1
+
+### Patch Changes
+
+- c5f2503: The record operations (`pick`, `omit`, `partial`, `required`, `keyof`, `valueof`, `at`, `mergeRecords`) now read a record type off its `structure` instead of internal fields stored beside it, and `recursion` is no longer a `Proxy`. A record wrapped in `optional` or `annotate` is accepted by them, and `union` / `intersection` no longer run the definition of a `recursion` member when they are built, so a member may refer back to the union or intersection being defined.
+
 ## 12.4.0
 
 ### Minor Changes

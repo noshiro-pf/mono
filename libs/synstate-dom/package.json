@@ -1,6 +1,6 @@
 {
   "name": "synstate-dom",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Compiler-free fine-grained UI library that binds synstate observables directly to the DOM",
   "repository": {
     "type": "git",
@@ -86,7 +86,7 @@
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {
-    "synstate": ">=5.0.1",
+    "synstate": ">=6.0.0",
     "ts-data-forge": ">=14.10.0"
   },
   "engines": {
