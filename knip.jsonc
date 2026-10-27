@@ -619,9 +619,17 @@
         "e2e/**/*.spec.mts",
       ],
       "project": ["**/*.{mts,tsx}"],
-      // Loaded by `src/index.css` through CSS `@import` rather than by a
-      // module import, which knip does not follow.
-      "ignoreDependencies": ["@blueprintjs/core", "@blueprintjs/datetime"],
+      "ignoreDependencies": [
+        // Loaded by `src/index.css` through CSS `@import` rather than by a
+        // module import, which knip does not follow.
+        "@blueprintjs/core",
+        "@blueprintjs/datetime",
+        // Nothing imports them: they are declared only to pin the React that
+        // the Blueprint packages' peers resolve to, which pnpm would otherwise
+        // pick from whatever the rest of the workspace offers (#2564).
+        "react",
+        "react-dom",
+      ],
     },
 
     // Not an Astro site like the entry above assumes: a set of Node programs,
@@ -665,9 +673,16 @@
     "apps/life-plan-simulator": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],
-      // Loaded by `src/index.css` through CSS `@import` rather than by a
-      // module import, which knip does not follow.
-      "ignoreDependencies": ["@blueprintjs/core"],
+      "ignoreDependencies": [
+        // Loaded by `src/index.css` through CSS `@import` rather than by a
+        // module import, which knip does not follow.
+        "@blueprintjs/core",
+        // Nothing imports them: they are declared only to pin the React that
+        // `@blueprintjs/core`'s peers resolve to, which pnpm would otherwise
+        // pick from whatever the rest of the workspace offers (#2564).
+        "react",
+        "react-dom",
+      ],
     },
   },
 }

@@ -1112,7 +1112,7 @@ importers:
         version: 14.5.0(@firebase/app-compat@0.5.18)(@firebase/app@0.16.2)(supports-color@7.2.0)
       firebase-functions:
         specifier: ^7.4.0
-        version: 7.4.0(firebase-admin@14.5.0(@firebase/app-compat@0.5.18)(@firebase/app@0.16.2)(supports-color@7.2.0))(supports-color@7.2.0)
+        version: 7.4.0(firebase-admin@14.5.0(@firebase/app-compat@0.5.18)(@firebase/app@0.16.2)(supports-color@7.2.0))(graphql@16.14.2)(supports-color@7.2.0)
       nodemailer:
         specifier: ^10.1.7
         version: 10.1.7
@@ -1595,6 +1595,12 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.10)
+      react:
+        specifier: 'catalog:'
+        version: 19.3.1
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.3.1(react@19.3.1)
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2779,6 +2785,12 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.10)
+      react:
+        specifier: 'catalog:'
+        version: 19.3.1
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.3.1(react@19.3.1)
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -20477,7 +20489,7 @@ snapshots:
       - '@firebase/app-compat'
       - supports-color
 
-  firebase-functions@7.4.0(firebase-admin@14.5.0(@firebase/app-compat@0.5.18)(@firebase/app@0.16.2)(supports-color@7.2.0))(supports-color@7.2.0):
+  firebase-functions@7.4.0(firebase-admin@14.5.0(@firebase/app-compat@0.5.18)(@firebase/app@0.16.2)(supports-color@7.2.0))(graphql@16.14.2)(supports-color@7.2.0):
     dependencies:
       '@types/cors': 2.8.19
       '@types/express': 5.0.6
@@ -20485,6 +20497,8 @@ snapshots:
       express: 5.3.0(supports-color@7.2.0)
       firebase-admin: 14.5.0(@firebase/app-compat@0.5.18)(@firebase/app@0.16.2)(supports-color@7.2.0)
       protobufjs: 7.6.6
+    optionalDependencies:
+      graphql: 16.14.2
     transitivePeerDependencies:
       - supports-color
 
