@@ -58,6 +58,20 @@ ruleTester.run('no-redundant-skip-if-no-change', noRedundantSkipIfNoChange, {
         const x$ = mapped$.pipe(skipIfNoChange());
       `,
     },
+    {
+      name: 'after `mapTo`, which emits on every source value',
+      code: dedent`
+        import { mapTo, skipIfNoChange } from 'synstate';
+        const x$ = click$.pipe(mapTo(1)).pipe(skipIfNoChange());
+      `,
+    },
+    {
+      name: 'after a `skipIfNoChange` with a comparison of its own',
+      code: dedent`
+        import { skipIfNoChange } from 'synstate';
+        const x$ = a$.pipe(skipIfNoChange(() => false)).pipe(skipIfNoChange());
+      `,
+    },
   ],
   invalid: [
     {
@@ -121,6 +135,102 @@ ruleTester.run('no-redundant-skip-if-no-change', noRedundantSkipIfNoChange, {
         import { map as project, skipIfNoChange as distinct } from 'synstate';
         const a = x$.pipe(S.map(f));
         const b = x$.pipe(project(f));
+      `,
+    },
+    {
+      name: 'after the operators built on `map`',
+      code: dedent`
+        import {
+          getKey,
+          mapOptional,
+          mapResultErr,
+          mapResultOk,
+          pluck,
+          skipIfNoChange,
+          unwrapOptional,
+          unwrapResultErr,
+          unwrapResultOk,
+        } from 'synstate';
+        const a = x$.pipe(pluck('mode')).pipe(skipIfNoChange());
+        const b = x$.pipe(getKey('mode')).pipe(skipIfNoChange());
+        const c = x$.pipe(mapOptional(f)).pipe(skipIfNoChange());
+        const d = x$.pipe(mapResultOk(f)).pipe(skipIfNoChange());
+        const e = x$.pipe(mapResultErr(f)).pipe(skipIfNoChange());
+        const g = x$.pipe(unwrapOptional()).pipe(skipIfNoChange());
+        const h = x$.pipe(unwrapResultOk()).pipe(skipIfNoChange());
+        const i = x$.pipe(unwrapResultErr()).pipe(skipIfNoChange());
+      `,
+      errors: [
+        { messageId: 'redundantSkipIfNoChange', data: { operator: 'pluck' } },
+        { messageId: 'redundantSkipIfNoChange', data: { operator: 'getKey' } },
+        {
+          messageId: 'redundantSkipIfNoChange',
+          data: { operator: 'mapOptional' },
+        },
+        {
+          messageId: 'redundantSkipIfNoChange',
+          data: { operator: 'mapResultOk' },
+        },
+        {
+          messageId: 'redundantSkipIfNoChange',
+          data: { operator: 'mapResultErr' },
+        },
+        {
+          messageId: 'redundantSkipIfNoChange',
+          data: { operator: 'unwrapOptional' },
+        },
+        {
+          messageId: 'redundantSkipIfNoChange',
+          data: { operator: 'unwrapResultOk' },
+        },
+        {
+          messageId: 'redundantSkipIfNoChange',
+          data: { operator: 'unwrapResultErr' },
+        },
+      ],
+      output: dedent`
+        import {
+          getKey,
+          mapOptional,
+          mapResultErr,
+          mapResultOk,
+          pluck,
+          skipIfNoChange,
+          unwrapOptional,
+          unwrapResultErr,
+          unwrapResultOk,
+        } from 'synstate';
+        const a = x$.pipe(pluck('mode'));
+        const b = x$.pipe(getKey('mode'));
+        const c = x$.pipe(mapOptional(f));
+        const d = x$.pipe(mapResultOk(f));
+        const e = x$.pipe(mapResultErr(f));
+        const g = x$.pipe(unwrapOptional());
+        const h = x$.pipe(unwrapResultOk());
+        const i = x$.pipe(unwrapResultErr());
+      `,
+    },
+    {
+      name: 'after a `skipIfNoChange` that compares with `Object.is`',
+      code: dedent`
+        import { distinctUntilChanged, skipIfNoChange } from 'synstate';
+        const a = x$.pipe(skipIfNoChange()).pipe(skipIfNoChange());
+        const b = x$.pipe(distinctUntilChanged(Object.is)).pipe(skipIfNoChange());
+      `,
+      errors: [
+        {
+          messageId: 'redundantSkipIfNoChange',
+          data: { operator: 'skipIfNoChange' },
+        },
+        {
+          messageId: 'redundantSkipIfNoChange',
+          data: { operator: 'distinctUntilChanged' },
+        },
+      ],
+      output: dedent`
+        import { distinctUntilChanged, skipIfNoChange } from 'synstate';
+        const a = x$.pipe(skipIfNoChange());
+        const b = x$.pipe(distinctUntilChanged(Object.is));
       `,
     },
     {

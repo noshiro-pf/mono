@@ -9,7 +9,22 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 import type { synstateRules } from './rules/index.mjs';
 
 /**
- * @description Disallow `skipIfNoChange()` directly after `map`, which already stops a result equal to the one it holds.
+ * @description Require `skipIfNoChange()` instead of `map((x) => x)`, which changes no value and only stops a repeated one.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace NoIdentityMap {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Disallow `skipIfNoChange()` directly after `map`, an operator built on it, or another `skipIfNoChange()`, which already stop a value equal to the one before.
  *
  *  ```md
  *  | key        | value      |
@@ -20,6 +35,21 @@ import type { synstateRules } from './rules/index.mjs';
  *  ```
  */
 namespace NoRedundantSkipIfNoChange {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Disallow `throw` in a function passed to a synstate operator, which stops the update midway; return a `Result` instead.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | false      |
+ *  ```
+ */
+namespace NoThrowInOperator {
   export type RuleEntry = Linter.StringSeverity;
 }
 
@@ -69,7 +99,9 @@ namespace PreferMapTo {
 }
 
 export type EslintSynstateRules = Readonly<{
+  'synstate/no-identity-map': NoIdentityMap.RuleEntry;
   'synstate/no-redundant-skip-if-no-change': NoRedundantSkipIfNoChange.RuleEntry;
+  'synstate/no-throw-in-operator': NoThrowInOperator.RuleEntry;
   'synstate/no-unbounded-counter-pipe': NoUnboundedCounterPipe.RuleEntry;
   'synstate/no-write-during-propagation': NoWriteDuringPropagation.RuleEntry;
   'synstate/prefer-map-to': PreferMapTo.RuleEntry;

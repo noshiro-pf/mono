@@ -10,7 +10,9 @@ import type { ESLintFlatConfig, ESLintPlugin } from './types.mjs';
  * but `error` fails to type-check. That is the whole check; no test repeats it.
  */
 const recommendedRules = {
+  'synstate/no-identity-map': 'error',
   'synstate/no-redundant-skip-if-no-change': 'error',
+  'synstate/no-throw-in-operator': 'error',
   'synstate/no-unbounded-counter-pipe': 'error',
   'synstate/no-write-during-propagation': 'error',
   'synstate/prefer-map-to': 'error',
