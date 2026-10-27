@@ -73,14 +73,46 @@ export const pullRequestTitleOf = (
 };
 
 /**
- * The query string of `split.html` that opens a pull request as the PR
- * Manager's links do: the diff, without whitespace changes or the files
- * already viewed, beside the conversation at 7:3, and when the pull request
- * closes an issue, the diff, the conversation and the issue at 2:1:1.
+ * A Claude Code session's address, or `undefined` for anything else — which
+ * is what is checked of a link read off a page before a pane is pointed at
+ * it.
+ */
+export const claudeSessionUrlOf = (address: string): string | undefined =>
+  claudeSessionUrlPattern.test(address) ? address : undefined;
+
+/**
+ * The first Claude Code session a pull request's description names on a
+ * `Claude-Session:` line — `Claude-Session: [<title>](<url>)`, or the URL
+ * alone — as the PR Manager reads it
+ * (`apps/pr-manager-app/src/claude-session.mts`): at the start of a line, in
+ * any case, and only a `https://claude.ai/code/session_…` URL, so a trailer is
+ * not a way to put an arbitrary page in a pane.
  *
- * Beside the diff alone, the conversation is at 100%, as the diff is: its 30%
- * is wide enough to read at full size. Shared with the issue, each has a
- * quarter, and both are at 75% so that more of each fits.
+ * The description is read off GitHub's rendering of it, with each link
+ * written back as `[<text>](<href>)` — a bare URL is rendered as a link to
+ * itself — and the code blocks left out, which is where the PR Manager does
+ * not look either.
+ */
+export const claudeSessionUrlOfBody = (body: string): string | undefined =>
+  Array.from(body.matchAll(trailerLinePattern), (line) =>
+    sessionUrlOfTrailer((line.groups?.['value'] ?? '').trim()),
+  ).find((url) => url !== undefined);
+
+/**
+ * The query string of `split.html` that opens a pull request as the PR
+ * Manager's links do (`apps/pr-manager-app/src/split-view.mts`): the diff,
+ * without whitespace changes or the files already viewed, beside the
+ * conversation at 7:3. When the pull request closes an issue or names the
+ * Claude Code session it was written in, the right half is shared with it at
+ * 1:1 — the conversation beside the issue, the session beside the
+ * conversation — and with both, the issue beside the conversation stacked
+ * over the session. The session is next to the diff unless the issue is there
+ * too.
+ *
+ * Beside the diff alone, the conversation is at 100%, as the diff and the
+ * session always are: its 30% is wide enough to read at full size. The
+ * conversation and the issue are at 75% when they share the right half, so
+ * that more of each fits.
  *
  * Every pull request opened this way reuses one saved split view,
  * `github-pull-request`, rather than adding one to the list each time. It is
@@ -93,30 +125,45 @@ export const pullRequestSplitViewSearch = ({
   pullRequest,
   title,
   issueUrl,
+  sessionUrl,
 }: Readonly<{
   pullRequest: PullRequest;
   title: string | undefined;
   issueUrl: string | undefined;
+  sessionUrl: string | undefined;
 }>): string => {
   const diff = {
     url: `${pullRequest.url}/files?${diffQuery}`,
     zoom: full,
   } as const;
 
+  const conversation = { url: pullRequest.url, zoom: narrow } as const;
+
   const { layout, panes } =
     issueUrl === undefined
-      ? ({
-          layout: 'r70pp',
-          panes: [diff, { url: pullRequest.url, zoom: full }],
-        } as const)
-      : ({
-          layout: threeColumns,
-          panes: [
-            diff,
-            { url: pullRequest.url, zoom: narrow },
-            { url: issueUrl, zoom: narrow },
-          ],
-        } as const);
+      ? sessionUrl === undefined
+        ? ({
+            layout: 'r70pp',
+            panes: [diff, { url: pullRequest.url, zoom: full }],
+          } as const)
+        : ({
+            layout: threeColumns,
+            panes: [diff, { url: sessionUrl, zoom: full }, conversation],
+          } as const)
+      : sessionUrl === undefined
+        ? ({
+            layout: threeColumns,
+            panes: [diff, conversation, { url: issueUrl, zoom: narrow }],
+          } as const)
+        : ({
+            layout: threeColumnsStacked,
+            panes: [
+              diff,
+              { url: issueUrl, zoom: narrow },
+              conversation,
+              { url: sessionUrl, zoom: full },
+            ],
+          } as const);
 
   const params = [
     ['ws', workspaceId],
@@ -173,6 +220,12 @@ const repositoryItemOf = (
     : undefined;
 };
 
+/** A trailer's value, linked or bare, as a session's address. */
+const sessionUrlOfTrailer = (value: string): string | undefined =>
+  claudeSessionUrlOf(
+    linkedTrailerPattern.exec(value)?.groups?.['url'] ?? value,
+  );
+
 /** An owner is letters, digits and hyphens. */
 const ownerPattern = /^[a-z\d-]+$/iu;
 
@@ -187,6 +240,15 @@ const pullRequestLabelPattern = /^Pull Request #\d+$/u;
 
 /** What `github-view-defaults-extension` puts in front of the title. */
 const numberPrefixPattern = /^#\d+ /u;
+
+const claudeSessionUrlPattern =
+  /^https:\/\/claude\.ai\/code\/session_[0-9A-Za-z]+$/u;
+
+const trailerLinePattern =
+  /^[^\S\n]*claude-session[^\S\n]*:(?<value>[^\n]*)$/gimu;
+
+/** `[<title>](<url>)` */
+const linkedTrailerPattern = /^\[.*\]\((?<url>[^()\s]*)\)$/u;
 
 const workspaceId = 'github-pull-request';
 
@@ -205,10 +267,13 @@ const full = 1;
 const narrow = 0.75;
 
 /**
- * The diff, the conversation and the issue at 2:1:1, as the diff and the
- * conversation in the left three quarters beside the issue, so that closing
- * the conversation widens the diff. The PR Manager's `threeColumns`
- * (`apps/pr-manager-app/src/split-view.mts`) says why the ratios are not 75%
- * and 2/3.
+ * The diff, the middle column and the right column at 2:1:1, as the diff and
+ * the middle column in the left three quarters beside the right column, so
+ * that closing the middle pane widens the diff. The PR Manager's
+ * `threeColumns` (`apps/pr-manager-app/src/split-view.mts`) says why the
+ * ratios are not 75% and 2/3.
  */
 const threeColumns = 'r75.1r66.8ppp';
+
+/** `threeColumns`, with the right column stacked in two. */
+const threeColumnsStacked = 'r75.1r66.8ppcpp';

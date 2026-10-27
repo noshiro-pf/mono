@@ -10,12 +10,14 @@ export const githubMessageTag = 'split-view/github/v1';
  * The two messages between `github-button.mts` and the service worker.
  *
  * - `open`, content script to worker: open this pull request in a split view,
- *   with what the content script read off GitHub. The worker opens the tab,
- *   because an extension page is not something a web page can navigate to.
+ *   with what the content script read off GitHub — its title, the issue it
+ *   closes and the Claude Code session it was written in. The worker opens
+ *   the tab, because an extension page is not something a web page can
+ *   navigate to.
  * - `look-up`, worker to content script: the context menu was used on this
- *   pull request; read its title and issue as the button does, and answer with
- *   an `open`. The worker cannot read them itself — a service worker has no
- *   `DOMParser` and does not carry the user's GitHub session.
+ *   pull request; read its title, issue and session as the button does, and
+ *   answer with an `open`. The worker cannot read them itself — a service
+ *   worker has no `DOMParser` and does not carry the user's GitHub session.
  */
 export type GitHubMessage = Readonly<
   | {
@@ -24,6 +26,7 @@ export type GitHubMessage = Readonly<
       url: string;
       title: string | undefined;
       issueUrl: string | undefined;
+      sessionUrl: string | undefined;
       /** `false` for a Ctrl+click or a middle click: open it behind this tab. */
       active: boolean;
       /**
@@ -70,18 +73,22 @@ export const asGitHubMessage = (value: unknown): GitHubMessage | undefined => {
 
   const issueUrl = hasKey(value, 'issueUrl') ? value.issueUrl : undefined;
 
+  const sessionUrl = hasKey(value, 'sessionUrl') ? value.sessionUrl : undefined;
+
   return hasKey(value, 'active') &&
     typeof value.active === 'boolean' &&
     hasKey(value, 'closeOpener') &&
     typeof value.closeOpener === 'boolean' &&
     isOptionalString(title) &&
-    isOptionalString(issueUrl)
+    isOptionalString(issueUrl) &&
+    isOptionalString(sessionUrl)
     ? {
         tag: githubMessageTag,
         kind: 'open',
         url: value.url,
         title,
         issueUrl,
+        sessionUrl,
         active: value.active,
         closeOpener: value.closeOpener,
       }

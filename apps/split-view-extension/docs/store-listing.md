@@ -82,7 +82,8 @@ Worth knowing before you install:
   ordinary tab, which is the way out of any of this.
 • A GitHub pull request can be opened in a split view from a button on its
   page or from the context menu of a link to it: its diff beside its
-  conversation, and the issue it closes beside that.
+  conversation, and beside those the issue it closes and the Claude Code
+  session it names.
 • Nothing leaves your computer. There is no account, no analytics and no
   server: the layouts and addresses live in the browser's own extension
   storage.
@@ -183,10 +184,12 @@ it which pane it belongs to.
 
 ```text
 Puts a "Split view" button on GitHub pull request pages, which opens the pull
-request in a split view: its diff beside its conversation, and the issue it
-closes beside that. When the button or the context menu item is used, the
-script loads that pull request's page from github.com and reads its title and
-the address of the issue it closes. It reads nothing until then, and sends
+request in a split view: its diff beside its conversation, and beside those
+the issue it closes and the Claude Code session it names. When the button or
+the context menu item is used, the script loads that pull request's page from
+github.com and reads its title, the address of the issue it closes and the
+address of a Claude Code session named on a "Claude-Session:" line of its
+description. It reads nothing until then, and sends
 nothing anywhere but to the extension's own service worker, which opens the
 tab.
 ```

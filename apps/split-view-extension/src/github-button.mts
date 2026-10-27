@@ -1,5 +1,6 @@
 import {
   asGitHubMessage,
+  claudeSessionUrlOfBody,
   githubMessageTag,
   issueUrlOf,
   pullRequestOf,
@@ -11,7 +12,8 @@ import {
 /**
  * The content script on github.com: a "⧉ Split view" button on every pull
  * request, which opens it as the PR Manager's links do — the diff beside the
- * conversation, and the issue it closes beside that.
+ * conversation, and beside those the issue it closes and the Claude Code
+ * session it was written in, when it names them.
  *
  * It runs in the top frame of github.com only, so a pull request shown in a
  * pane of a split view has no button of its own.
@@ -40,7 +42,8 @@ const main = (): void => {
 
   mut_button.title = [
     'Open this pull request in Split View: the diff beside the conversation,',
-    'and the issue it closes beside that. This tab is closed once it opens.',
+    'and the issue it closes and the Claude Code session it names beside them.',
+    'This tab is closed once it opens.',
     'Ctrl+click or middle-click opens it behind this tab and keeps this tab.',
   ].join('\n');
 
@@ -117,14 +120,15 @@ const main = (): void => {
 };
 
 /**
- * Reads the pull request's title and the issue it closes from its
- * conversation page, and asks the service worker to open the split view.
+ * Reads the pull request's title, the issue it closes and the Claude Code
+ * session it names from its conversation page, and asks the service worker to
+ * open the split view.
  *
  * The conversation page is fetched rather than read off the document on
- * screen: the diff has neither, and a pull request named in a link is not on
- * screen at all. The fetch is same-origin, so it sees what the user sees,
+ * screen: the diff has none of them, and a pull request named in a link is not
+ * on screen at all. The fetch is same-origin, so it sees what the user sees,
  * private repositories included. When it fails, or GitHub's markup has moved,
- * the split view opens all the same, without the issue.
+ * the split view opens all the same, without the issue or the session.
  */
 const openPullRequest = async (
   pullRequest: PullRequest,
@@ -143,6 +147,7 @@ const openPullRequest = async (
       conversation?.title ??
       (onScreen ? pullRequestTitleOf(document.title) : undefined),
     issueUrl: conversation?.issueUrl,
+    sessionUrl: conversation?.sessionUrl,
     active,
     closeOpener,
   } as const;
@@ -151,15 +156,21 @@ const openPullRequest = async (
 };
 
 /**
- * The title, and the first issue in the sidebar's "Development" section —
+ * The title; the first issue in the sidebar's "Development" section —
  * "Successfully merging this pull request may close these issues" — which is
  * GitHub's `closingIssuesReferences`, the list the PR Manager takes its issue
- * from. Only the first, as there.
+ * from; and the first Claude Code session the description names on a
+ * `Claude-Session:` line, as the PR Manager reads it. Only the first of each,
+ * as there.
  */
 const readConversation = async (
   pullRequest: PullRequest,
 ): Promise<
-  | Readonly<{ title: string | undefined; issueUrl: string | undefined }>
+  | Readonly<{
+      title: string | undefined;
+      issueUrl: string | undefined;
+      sessionUrl: string | undefined;
+    }>
   | undefined
 > => {
   try {
@@ -182,14 +193,54 @@ const readConversation = async (
         page.querySelectorAll(closingIssueSelector),
         (anchor) => issueUrlOf(anchor.getAttribute('href') ?? ''),
       ).find((issueUrl) => issueUrl !== undefined),
+      sessionUrl: claudeSessionUrlOfBody(
+        descriptionTextOf(page.querySelector(descriptionSelector)),
+      ),
     };
   } catch {
     return undefined;
   }
 };
 
+/**
+ * The description as Markdown enough for `claudeSessionUrlOfBody`: its text,
+ * with each link written back as `[<text>](<href>)` and the code left out.
+ * GitHub puts a line break between the rendered blocks and after each `<br>`,
+ * so a line of the text is a line of what was written.
+ */
+const descriptionTextOf = (description: Element | null): string => {
+  if (description === null) {
+    return '';
+  }
+
+  const mut_copy = description.cloneNode(true);
+
+  if (!(mut_copy instanceof Element)) {
+    return '';
+  }
+
+  for (const mut_code of mut_copy.querySelectorAll('pre, code')) {
+    mut_code.remove();
+  }
+
+  for (const mut_anchor of mut_copy.querySelectorAll('a[href]')) {
+    mut_anchor.replaceWith(
+      `[${mut_anchor.textContent}](${mut_anchor.getAttribute('href') ?? ''})`,
+    );
+  }
+
+  for (const mut_lineBreak of mut_copy.querySelectorAll('br')) {
+    mut_lineBreak.replaceWith('\n');
+  }
+
+  return mut_copy.textContent;
+};
+
 const closingIssueSelector =
   'development-menu a[data-hovercard-type="issue"][href]';
+
+/** The pull request's description, as GitHub renders it. */
+const descriptionSelector = '.js-command-palette-pull-body .js-comment-body';
 
 /** Long enough for a large pull request's page, short enough to give up on. */
 const fetchTimeoutMs = 5000;
