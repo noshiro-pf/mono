@@ -23,7 +23,7 @@ const storeFromQuery = (
   const paramsAsStr = {
     repaymentType: query.get(queryParamKey.repaymentType),
     downPayment: query.get(queryParamKey.downPayment),
-    propertyPrice: query.get(queryParamKey.propertyPrice),
+    borrowingTotal: query.get(queryParamKey.borrowingTotal),
     borrowingPeriodMonth: query.get(queryParamKey.borrowingPeriodMonth),
     interestRatePerMonth: query.get(queryParamKey.interestRatePerMonth),
   } as const;
@@ -32,7 +32,8 @@ const storeFromQuery = (
   // `null` rather than `undefined`, which it covers too.
   const paramsAsNumber = {
     downPayment: pipe(paramsAsStr.downPayment).mapNullable(Num.from).value,
-    propertyPrice: pipe(paramsAsStr.propertyPrice).mapNullable(Num.from).value,
+    borrowingTotal: pipe(paramsAsStr.borrowingTotal).mapNullable(Num.from)
+      .value,
     borrowingPeriodMonth: pipe(paramsAsStr.borrowingPeriodMonth).mapNullable(
       Num.from,
     ).value,
@@ -51,10 +52,10 @@ const storeFromQuery = (
       paramsAsNumber.downPayment === undefined
         ? prev.downPaymentManYen
         : Yen.cast(paramsAsNumber.downPayment),
-    propertyPriceManYen:
-      paramsAsNumber.propertyPrice === undefined
-        ? prev.propertyPriceManYen
-        : Yen.cast(paramsAsNumber.propertyPrice),
+    borrowingTotalManYen:
+      paramsAsNumber.borrowingTotal === undefined
+        ? prev.borrowingTotalManYen
+        : Yen.cast(paramsAsNumber.borrowingTotal),
     borrowingPeriodYear:
       paramsAsNumber.borrowingPeriodMonth === undefined
         ? prev.borrowingPeriodYear
@@ -80,7 +81,7 @@ const setStore = (patch: Partial<Store>): void => {
     uriWithQueryParams('/', [
       [queryParamKey.repaymentType, store.repaymentType],
       [queryParamKey.downPayment, store.downPaymentManYen],
-      [queryParamKey.propertyPrice, store.propertyPriceManYen],
+      [queryParamKey.borrowingTotal, store.borrowingTotalManYen],
       [queryParamKey.borrowingPeriodMonth, store.borrowingPeriodYear],
       [queryParamKey.interestRatePerMonth, store.interestRatePercentPerYear],
     ]),
@@ -91,14 +92,14 @@ const setRepaymentType = (repaymentType: RepaymentType): void => {
   setStore({ repaymentType });
 };
 
-// 頭金（円）
+// 頭金（万円）
 const setDownPaymentManYen = (downPaymentManYen: Yen): void => {
   setStore({ downPaymentManYen });
 };
 
-// 物件の金額（円）
-const setPropertyPriceManYen = (propertyPriceManYen: Yen): void => {
-  setStore({ propertyPriceManYen });
+// 借入金額（万円）
+const setBorrowingTotalManYen = (borrowingTotalManYen: Yen): void => {
+  setStore({ borrowingTotalManYen });
 };
 
 // 借入期間（年）
@@ -115,9 +116,9 @@ const setInterestRatePercentPerYear = (
 
 export {
   setBorrowingPeriodYear,
+  setBorrowingTotalManYen,
   setDownPaymentManYen,
   setInterestRatePercentPerYear,
-  setPropertyPriceManYen,
   setRepaymentType,
   store$,
 };

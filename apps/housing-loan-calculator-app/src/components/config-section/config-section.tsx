@@ -5,9 +5,9 @@ import { useObservableValue } from 'synstate-react-hooks';
 import { dict } from '../../constants/index.mjs';
 import {
   setBorrowingPeriodYear,
+  setBorrowingTotalManYen,
   setDownPaymentManYen,
   setInterestRatePercentPerYear,
-  setPropertyPriceManYen,
   setRepaymentType,
   store$,
 } from '../../store/index.mjs';
@@ -22,7 +22,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
   const {
     repaymentType,
     downPaymentManYen,
-    propertyPriceManYen,
+    borrowingTotalManYen,
     borrowingPeriodYear,
     interestRatePercentPerYear,
   } = useObservableValue(store$);
@@ -43,12 +43,12 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
       </ConfigElement>
       <ConfigElement>
         <Label>
-          {dict.propertyPriceManYen}
+          {dict.borrowingTotalManYen}
           <YenNumericInput
-            cyId={'numericInput-propertyPriceManYen'}
+            cyId={'numericInput-borrowingTotalManYen'}
             min={0}
-            value={propertyPriceManYen}
-            onValueChange={setPropertyPriceManYen}
+            value={borrowingTotalManYen}
+            onValueChange={setBorrowingTotalManYen}
           />
         </Label>
       </ConfigElement>

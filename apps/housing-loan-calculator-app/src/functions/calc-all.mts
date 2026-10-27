@@ -10,8 +10,7 @@ import { calcPrincipalEqualPayment } from './calc-principal-equal-payment.mjs';
 
 export const calcAll = ({
   repaymentType,
-  downPaymentManYen,
-  propertyPriceManYen,
+  borrowingTotalManYen,
   borrowingPeriodYear,
   interestRatePercentPerYear,
 }: Store): CalculatedValues => {
@@ -19,17 +18,13 @@ export const calcAll = ({
    * - 1 -> 元金均等返済
    * - 2 -> 元利均等返済
    */
-  const downPaymentYen = Yen.cast(downPaymentManYen * 10_000);
-
-  const propertyPriceYen = Yen.cast(propertyPriceManYen * 10_000);
+  const borrowingTotalYen = Yen.cast(borrowingTotalManYen * 10_000);
 
   const borrowingPeriodMonth = Uint32.mul(borrowingPeriodYear, 12);
 
   const interestRatePerMonth = PercentFloat.cast(
     interestRatePercentPerYear / 1200,
   );
-
-  const borrowingTotalYen = Yen.cast(propertyPriceYen - downPaymentYen); // 借入金額
 
   const {
     fixedPrincipalYenPerMonth,

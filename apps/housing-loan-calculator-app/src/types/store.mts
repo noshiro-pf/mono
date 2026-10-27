@@ -5,10 +5,10 @@ import type { Yen } from './yen.mjs';
 
 export type Store = Readonly<{
   repaymentType: RepaymentType;
-  /** 頭金（円） */
+  /** 頭金（万円） */
   downPaymentManYen: Yen;
-  /** 物件の金額（円） */
-  propertyPriceManYen: Yen;
+  /** 借入金額（万円） */
+  borrowingTotalManYen: Yen;
   /** 借入期間（年） */
   borrowingPeriodYear: Year;
   /** 年当たりの金利 */
