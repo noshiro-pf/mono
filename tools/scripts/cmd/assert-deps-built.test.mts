@@ -7,8 +7,10 @@ import * as util from 'node:util';
 import { isRecord, isString } from 'ts-data-forge';
 import {
   entryPointTargets,
+  findLinkedPackages,
   findMissingBuilds,
   formatMissingBuilds,
+  workspaceStartDirs,
 } from './assert-deps-built.mjs';
 
 const scriptPath = fileURLToPath(
@@ -169,6 +171,60 @@ const makeWorkspace = (): string => {
   return root;
 };
 
+describe(findLinkedPackages, () => {
+  test('lists every sibling a package reaches, built or not, with who needs it', () => {
+    const root = makeWorkspace();
+
+    touch(path.join(root, 'base/dist/index.mjs'));
+
+    assert.deepStrictEqual(findLinkedPackages(root, [path.join(root, 'app')]), [
+      {
+        packageDir: path.join(root, 'shared'),
+        packageName: 'shared',
+        neededBy: 'app',
+      },
+      {
+        packageDir: path.join(root, 'lib'),
+        packageName: 'lib',
+        neededBy: 'app',
+      },
+      {
+        packageDir: path.join(root, 'base'),
+        packageName: 'base',
+        neededBy: 'lib',
+      },
+    ]);
+  });
+
+  test('a package nothing links to is not listed', () => {
+    const root = makeWorkspace();
+
+    assert.deepStrictEqual(
+      findLinkedPackages(root, [path.join(root, 'base')]),
+      [],
+    );
+  });
+});
+
+describe(workspaceStartDirs, () => {
+  test('is the root followed by each member the root `workspaces` names', () => {
+    const root = makeWorkspace();
+
+    writeJson(path.join(root, 'package.json'), {
+      name: 'root',
+      workspaces: ['app', 'lib', 'not-a-package'],
+    });
+
+    makeDirs(root, ['not-a-package']);
+
+    assert.deepStrictEqual(workspaceStartDirs(root), [
+      root,
+      path.join(root, 'app'),
+      path.join(root, 'lib'),
+    ]);
+  });
+});
+
 describe(findMissingBuilds, () => {
   test('reports a sibling whose build output is missing, and the sibling it reaches', () => {
     const root = makeWorkspace();
@@ -250,7 +306,7 @@ describe(formatMissingBuilds, () => {
       [
         'Build output is missing:',
         '  libs/ts-data-forge (needed by ts-repo-utils): dist/types.d.mts, dist/entry-point.mjs',
-        'Run `pnpm run ws:build` first.',
+        'Run `pnpm run ws:build:deps` (or `ws:build`) first.',
       ].join('\n'),
     );
   });
@@ -305,7 +361,7 @@ describe('the script', () => {
 
     assert.include(stderr, 'packages/lib');
 
-    assert.include(stderr, 'pnpm run ws:build');
+    assert.include(stderr, 'pnpm run ws:build:deps');
   });
 
   test('the script imports nothing outside node: builtins at runtime', () => {

@@ -9,7 +9,7 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**
  * Fails, before a check starts, when a workspace sibling it resolves through
- * `node_modules` has not been built, and says to run `pnpm run ws:build`.
+ * `node_modules` has not been built, and says to run `pnpm run ws:build:deps`.
  *
  * ```sh
  * node ../../tools/scripts/cmd/assert-deps-built.mts       # the package in cwd
@@ -56,8 +56,7 @@ export const main = (argv: readonly string[]): void => {
       : path.resolve(argv[rootIndex + 1] ?? '.');
 
   const startDirs = argv.includes('--workspace')
-    ? // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing -- ts-data-forge is not built when this runs (see the header).
-      ([rootDir, ...workspaceMembers(rootDir)] as const)
+    ? workspaceStartDirs(rootDir)
     : ([process.cwd()] as const);
 
   const missing = findMissingBuilds(rootDir, startDirs);
@@ -79,10 +78,35 @@ export const main = (argv: readonly string[]): void => {
 export const findMissingBuilds = (
   rootDir: string,
   startDirs: readonly string[],
-): readonly MissingBuild[] => {
+): readonly MissingBuild[] =>
+  findLinkedPackages(rootDir, startDirs)
+    .map(({ packageDir, neededBy }) => ({
+      packageDir,
+      neededBy,
+      missing: entryPointTargets(readManifest(packageDir))
+        .map(path.normalize)
+        .filter(
+          (target) =>
+            // eslint-disable-next-line security/detect-non-literal-fs-filename
+            !fs.existsSync(path.resolve(packageDir, target)),
+        ),
+    }))
+    // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- ts-data-forge is not built when this runs (see the header).
+    .filter(({ missing }) => missing.length > 0);
+
+/**
+ * Every package of the repository a check started in one of `startDirs`
+ * would resolve through `node_modules`, built or not, in the order they are
+ * first reached. `ws:build:deps` builds exactly these, so that this guard
+ * passes everywhere `--workspace` would run it.
+ */
+export const findLinkedPackages = (
+  rootDir: string,
+  startDirs: readonly string[],
+): readonly LinkedPackage[] => {
   const mut_checked = new Set<string>();
 
-  const mut_result: MissingBuild[] = [];
+  const mut_result: LinkedPackage[] = [];
 
   // Level by level, so that `neededBy` names the nearest package that needs it.
   let mut_frontier: readonly Edge[] = startDirs.flatMap((startDir) =>
@@ -104,18 +128,11 @@ export const findMissingBuilds = (
 
       mut_checked.add(packageDir);
 
-      const missing = entryPointTargets(readManifest(packageDir))
-        .map(path.normalize)
-        .filter(
-          (target) =>
-            // eslint-disable-next-line security/detect-non-literal-fs-filename
-            !fs.existsSync(path.resolve(packageDir, target)),
-        );
-
-      // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- ts-data-forge is not built when this runs (see the header).
-      if (missing.length > 0) {
-        mut_result.push({ packageDir, neededBy, missing });
-      }
+      mut_result.push({
+        packageDir,
+        packageName: packageName(packageDir, readManifest(packageDir)),
+        neededBy,
+      });
 
       mut_next.push(
         ...edgesFrom(rootDir, packageDir, ['dependencies', 'peerDependencies']),
@@ -127,6 +144,15 @@ export const findMissingBuilds = (
 
   return mut_result;
 };
+
+/**
+ * Where `--workspace` starts: the root and every member the root
+ * `package.json`'s `workspaces` names — the same list `pnpm-workspace.yaml`
+ * holds, in a file Node can read without a YAML parser.
+ */
+export const workspaceStartDirs = (rootDir: string): readonly string[] =>
+  // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing -- ts-data-forge is not built when this runs (see the header).
+  [rootDir, ...workspaceMembers(rootDir)] as const;
 
 /**
  * The files an import of the package can resolve to, as written in its
@@ -162,8 +188,15 @@ export const formatMissingBuilds = (
       (m) =>
         `  ${path.relative(rootDir, m.packageDir)} (needed by ${m.neededBy}): ${m.missing.join(', ')}`,
     ),
-    'Run `pnpm run ws:build` first.',
+    'Run `pnpm run ws:build:deps` (or `ws:build`) first.',
   ].join('\n');
+
+export type LinkedPackage = Readonly<{
+  packageDir: string;
+  packageName: string;
+  /** The package through which the check reaches this one. */
+  neededBy: string;
+}>;
 
 export type MissingBuild = Readonly<{
   packageDir: string;
@@ -242,10 +275,7 @@ const linkedSiblings = (
   });
 };
 
-/**
- * The members `workspaces` in the root `package.json` names: the same list
- * `pnpm-workspace.yaml` holds, in a file Node can read without a YAML parser.
- */
+/** The members `workspaces` in the root `package.json` names. */
 const workspaceMembers = (rootDir: string): readonly string[] => {
   const manifest = readManifest(rootDir);
 
