@@ -617,7 +617,7 @@ describe(loadReport, () => {
                   number: 7,
                   title: 'Pull request 7',
                   url: 'https://github.com/noshiro-pf/mono/pull/7',
-                  state: 'OPEN',
+                  pullRequestState: 'OPEN',
                   merged: false,
                 },
                 ref_2139: {
@@ -707,7 +707,7 @@ describe(loadReport, () => {
           number: 2207,
           title: 'Pull request 2207',
           url: 'https://github.com/noshiro-pf/mono/pull/2207',
-          state: 'MERGED',
+          pullRequestState: 'MERGED',
           merged: true,
         },
       }),

@@ -101,6 +101,7 @@
     "unblock-prs": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/pr-merge-queue/src/cmd/unblock-prs.mts",
     "update-actions": "node ./tools/scripts/cmd/mature-updates.mts actions",
     "update-changeset": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/changeset-for-dependency-update.mts",
+    "update-github-graphql-schema": "curl -fsSL https://raw.githubusercontent.com/github/docs/main/src/graphql/data/fpt/schema.docs.graphql -o tools/configs/github-graphql/schema.docs.graphql",
     "update-packages": "pnpm update --latest --recursive --filter '!./strict-lib/v*/output/lib'",
     "verify:npm-packages": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/verify-npm-packages.mts",
     "verify:npm-packages:published": "pnpm run verify:npm-packages --published",

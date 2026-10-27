@@ -430,10 +430,13 @@ export const referencesQuery = (
 export const referenceAlias = (number: number): string =>
   `ref_${number}` as const;
 
+// `state` is an `IssueState` on one and a `PullRequestState` on the other, and
+// GraphQL does not let one response key carry two types: a selection that
+// asks both under the same name is invalid, so the pull request's is aliased.
 const REFERENCE_FIELDS = [
   '__typename',
   '... on Issue { number title url state stateReason }',
-  '... on PullRequest { number title url state merged }',
+  '... on PullRequest { number title url pullRequestState: state merged }',
 ].join(' ');
 
 const PageInfoSchema = t.record({
@@ -692,7 +695,7 @@ export const ReferenceSchema = t.union([
     number: t.number(),
     title: t.string(),
     url: t.string(),
-    state: t.string(),
+    pullRequestState: t.string(),
     merged: t.boolean(),
   }),
 ]);
