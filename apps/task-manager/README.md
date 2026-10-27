@@ -276,10 +276,11 @@ firebase emulators:start   # firebase-tools と Java 21 以上が必要
 ポートを使うため、`firebase emulators:start` を動かしているときは先に止める。
 ほかのテストと同じく `ws:build` のあとに走らせる。
 
-このスクリプトは `check:*` に入れていない。どの CI のランナーにも Java と
-エミュレータを用意していないため、`check:` にすると CI で走らないチェックになる
-（`check:root:ci-commands` がそれを指摘する）。`firestore.rules` を変えたときは
-手元で走らせてからデプロイする。
+このスクリプトは `check:*` に入れていない。プルリクエストのチェックでは走らず、
+`deploy-firebase.yml` がルールをデプロイする前にだけ走らせて、落ちればデプロイしない
+（[docs/firebase-deploy.md](../../docs/firebase-deploy.md)）。`check:` にすると
+`code-check.yml` に Java とエミュレータが要る。`firestore.rules` を変えたときは
+手元でも走らせてからマージする。
 
 ### デモモード
 
@@ -293,15 +294,18 @@ firebase emulators:start   # firebase-tools と Java 21 以上が必要
 
 ## Firebase の手作業
 
-Firebase プロジェクトは `task-manager-app-d0cae`（`.firebaserc`）。次はリポジトリの
-CI では行われないので、オーナーが手で行う。
+Firebase プロジェクトは `task-manager-app-d0cae`（`.firebaserc`）。
 
-1. **セキュリティルールのデプロイ**: `pnpm run test:rules` が通ることを確かめてから、
-   このディレクトリで `firebase deploy --only firestore:rules`。`firestore.rules` を変更しただけでは
-   反映されない。`firebase-tools` は依存に入れていないので、手元に入れて使う。
-2. **承認済みドメイン**: Authentication → 設定 → 承認済みドメインに `localhost` と
+セキュリティルールは、このパッケージの `version` が `main` で変わったとき
+`deploy-firebase.yml` が `pnpm run test:rules` を通してからデプロイする。
+`firestore.rules` を変えたら `task-manager` を名指しする changeset を付ける
+（[docs/firebase-deploy.md](../../docs/firebase-deploy.md)）。
+
+次はリポジトリの CI では行われないので、オーナーが手で行う。
+
+1. **承認済みドメイン**: Authentication → 設定 → 承認済みドメインに `localhost` と
    `noshiro-pf.github.io` を入れる。
-3. **ログインプロバイダ**: Authentication → ログイン方法で Google を有効にする。
+2. **ログインプロバイダ**: Authentication → ログイン方法で Google を有効にする。
    `firestore.rules` も Google でサインインしたトークンしか受け付けないので、
    ほかのプロバイダを有効にしてもデータには触れない。
 

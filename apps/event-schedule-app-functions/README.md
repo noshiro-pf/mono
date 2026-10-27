@@ -64,12 +64,21 @@ ignored by git and not deployed.
 
 ## Deploy
 
+A changeset naming this package deploys the functions once the version pull
+request merges (`deploy-firebase.yml`, described in
+[docs/firebase-deploy.md](../../docs/firebase-deploy.md)). That workflow
+builds here, writes the discovery manifest
+`functions-build/functions.yaml` so that the deploy does not start the
+functions to find them, and deploys with the `predeploy` hook removed.
+
+By hand, which also runs the build through `predeploy` in `firebase.json`:
+
 ```sh
 cd ../event-schedule-app
 pnpm dlx firebase-tools@15 deploy --only functions
 ```
 
-`predeploy` in `firebase.json` runs the build. The functions are 1st gen
+The functions are 1st gen
 (`firebase-functions/v1`) on Node.js 22, as they were deployed before;
 moving to 2nd gen renames every function, so it is a change of its own.
 Node.js 22 on 1st gen is supported until 2027-10-31.

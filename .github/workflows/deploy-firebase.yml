@@ -1,0 +1,514 @@
+name: Deploy Firebase
+
+# Deploys the apps that depend on Firebase (Firestore, Auth, Functions) and so
+# cannot move to GitHub Pages. What triggers a deploy is a changeset: a push to
+# main that changes a target's `package.json` `version` deploys that target,
+# and only with that target's `--only`. A version pull request merging is the
+# usual such push. GCP setup, the roles and how to choose what a changeset
+# deploys are in `docs/firebase-deploy.md`.
+#
+# Split as `release.yml` is, for the reasons in README.md's "Jobs that hold a
+# key": `build` runs the dependency tree and holds nothing, `deploy` holds the
+# OIDC token and runs nothing out of the tree. What is particular here is
+# Cloud Functions. Left alone, `firebase deploy --only functions` runs
+# `predeploy` (the build) and then starts the functions' own code through
+# `node_modules/.bin/firebase-functions` to discover what to deploy — the
+# dependency tree again, with the key in the environment. So `build` writes
+# that discovery result into `functions-build/functions.yaml`, which
+# firebase-tools reads in place of starting anything, and `deploy` strips every
+# `predeploy` / `postdeploy` hook from `firebase.json` before it runs, unpacks
+# only the build output, and refuses an artifact that carries a
+# `node_modules` or lacks the manifest.
+
+on:
+  push:
+    branches:
+      - main
+
+  # A redeploy, or a rollback to an earlier commit on main.
+  workflow_dispatch:
+    inputs:
+      package:
+        description: The package whose target to deploy (see `TARGETS` in the `plan` job).
+        required: true
+        type: choice
+        options:
+          - event-schedule-app
+          - event-schedule-app-functions
+          - algo-app
+          - task-manager
+          - life-plan-simulator
+      commit:
+        description: A commit on main to deploy instead of the tip, for a rollback. Empty deploys the tip.
+        required: false
+        type: string
+        default: ''
+
+env:
+  CI: true
+  # The standalone build: one file, checked against the hash below, so the
+  # job holding the key resolves no dependency tree at install time, as
+  # `npm install -g firebase-tools` would. Firebase publishes no checksum; the
+  # hash is the asset's as downloaded when the version was pinned, so moving
+  # the version means downloading it and writing its `sha256sum` here. The
+  # version is held to `minimumReleaseAge` by hand.
+  FIREBASE_TOOLS_VERSION: 15.34.0
+  FIREBASE_TOOLS_SHA256: e6e271a8050b70f92725e4349faf9a586ff12e1d4b57deb751e86211a107f644
+
+permissions: {}
+
+jobs:
+  # Decides what to deploy. Reads two `package.json` files per target through
+  # the API, so it neither checks out nor installs anything.
+  plan:
+    name: Plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: read
+
+    outputs:
+      targets: ${{ steps.plan.outputs.targets }}
+      commit: ${{ steps.plan.outputs.commit }}
+      rollback: ${{ steps.plan.outputs.rollback }}
+
+    steps:
+      # `package_dir` holds the `package.json` whose `version` is compared;
+      # `firebase_dir` holds `firebase.json`. They differ for the functions,
+      # whose `firebase.json` is the app's (see
+      # `apps/event-schedule-app-functions/README.md`). `build` is what the
+      # `build` job produces: `hosting` the app's `build/`, `functions`
+      # `functions-build/` with its discovery manifest, `none` nothing (rules
+      # only). A new target goes here and in the `package` input above; a
+      # dispatch naming a package missing here fails.
+      - name: Choose the targets
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BEFORE: ${{ github.event.before }}
+          INPUT_PACKAGE: ${{ inputs.package }}
+          INPUT_COMMIT: ${{ inputs.commit }}
+          TARGETS: |
+            [
+              { "package": "event-schedule-app", "package_dir": "apps/event-schedule-app", "firebase_dir": "apps/event-schedule-app", "project": "event-schedule-app", "only": "hosting,firestore", "build": "hosting" },
+              { "package": "event-schedule-app-functions", "package_dir": "apps/event-schedule-app-functions", "firebase_dir": "apps/event-schedule-app", "project": "event-schedule-app", "only": "functions", "build": "functions" },
+              { "package": "algo-app", "package_dir": "apps/algo-app", "firebase_dir": "apps/algo-app", "project": "algo-app-45270", "only": "firestore", "build": "none" },
+              { "package": "task-manager", "package_dir": "apps/task-manager", "firebase_dir": "apps/task-manager", "project": "task-manager-app-d0cae", "only": "firestore", "build": "none" },
+              { "package": "life-plan-simulator", "package_dir": "apps/life-plan-simulator", "firebase_dir": "apps/life-plan-simulator", "project": "life-plan-simulator-9eab3", "only": "firestore", "build": "none" }
+            ]
+        run: |
+          set -euo pipefail
+
+          # The `version` at a commit, or empty where the file does not exist.
+          # Any other failure stops the run: read as "unchanged", it would skip
+          # a deploy with nothing red.
+          version_at() {
+            local out
+            if ! out="$(gh api -H 'Accept: application/vnd.github.raw' \
+              "repos/${GITHUB_REPOSITORY}/contents/$2/package.json?ref=$1" 2>&1)"; then
+              if grep -q 'HTTP 404' <<< "$out"; then
+                return 0
+              fi
+              echo "$out" >&2
+              return 1
+            fi
+            jq -r '.version // ""' <<< "$out"
+          }
+
+          if [[ "$GITHUB_EVENT_NAME" == 'workflow_dispatch' ]]; then
+            if [[ "$GITHUB_REF" != 'refs/heads/main' ]]; then
+              echo "::error::Dispatch from main; the deploy environment refuses any other ref."
+              exit 1
+            fi
+
+            # Only a commit main already contains, so that a dispatch cannot
+            # deploy something that never passed review. The input is
+            # resolved to a SHA once and everything after uses that SHA: a
+            # branch or tag name resolved twice could move in between.
+            # `compare` answers `ahead` or `identical` exactly when the
+            # commit is an ancestor of (or is) the tip.
+            commit="$GITHUB_SHA"
+            rollback=false
+            if [[ -n "$INPUT_COMMIT" ]]; then
+              commit="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${INPUT_COMMIT}" --jq .sha)"
+              status="$(gh api "repos/${GITHUB_REPOSITORY}/compare/${commit}...${GITHUB_SHA}" --jq .status)"
+              if [[ "$status" != 'ahead' && "$status" != 'identical' ]]; then
+                echo "::error::${INPUT_COMMIT} (${commit}) is not on main (compare says '${status}')."
+                exit 1
+              fi
+              rollback="$(jq -rn --arg a "$commit" --arg b "$GITHUB_SHA" '$a != $b')"
+            fi
+
+            targets="$(jq -c --arg p "$INPUT_PACKAGE" '[.[] | select(.package == $p)]' <<< "$TARGETS")"
+            if [[ "$targets" == '[]' ]]; then
+              echo "::error::${INPUT_PACKAGE} is a dispatch option with no entry in TARGETS."
+              exit 1
+            fi
+          else
+            commit="$GITHUB_SHA"
+            rollback=false
+            targets='[]'
+            # `version` itself, not a path filter: a dependency update changes
+            # `package.json` too.
+            while IFS= read -r target; do
+              package="$(jq -r .package <<< "$target")"
+              package_dir="$(jq -r .package_dir <<< "$target")"
+              before="$(version_at "$BEFORE" "$package_dir")"
+              after="$(version_at "$GITHUB_SHA" "$package_dir")"
+              if [[ -n "$after" && "$before" != "$after" ]]; then
+                echo "${package}: ${before:-(none)} -> ${after}, deploying."
+                targets="$(jq -c --argjson t "$target" '. + [$t]' <<< "$targets")"
+              else
+                echo "${package}: ${after:-(none)}, unchanged."
+              fi
+            done < <(jq -c '.[]' <<< "$TARGETS")
+          fi
+
+          {
+            echo "targets=${targets}"
+            echo "commit=${commit}"
+            echo "rollback=${rollback}"
+          } >> "$GITHUB_OUTPUT"
+
+  # Runs the dependency tree. Holds nothing. One job for every target, so the
+  # workspace is installed and built once; a target that fails is left out of
+  # the artifact and the job goes red, but the others are still packed, and
+  # `deploy` deploys what is there.
+  build:
+    name: Build
+    needs: plan
+    if: needs.plan.outputs.targets != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    permissions:
+      contents: read
+
+    env:
+      TARGETS: ${{ needs.plan.outputs.targets }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.plan.outputs.commit }}
+          persist-credentials: false
+
+      - name: Set up pnpm, Node.js and the dependencies
+        uses: ./.github/actions/setup
+
+      - name: Build the workspace packages the apps import
+        run: pnpm run ws:build:deps
+
+      # The Firestore emulator that `test:rules` starts needs Java 21 or
+      # later; the runner image carries one without making it the default.
+      - name: Use Java 21
+        run: |
+          set -euo pipefail
+          if [[ -z "${JAVA_HOME_21_X64:-}" ]]; then
+            echo "::error::The runner image has no JAVA_HOME_21_X64; the rules tests need Java 21."
+            exit 1
+          fi
+          echo "JAVA_HOME=${JAVA_HOME_21_X64}" >> "$GITHUB_ENV"
+          echo "${JAVA_HOME_21_X64}/bin" >> "$GITHUB_PATH"
+
+      # Per target: the app's build, its `test:rules` where it has one (a
+      # rules deploy is gated on them, as the apps' READMEs asked of a deploy
+      # by hand), and for the functions the discovery manifest. What passes
+      # is packed into `deploy/`: `<package>.ok`, and `<package>.tar.gz`
+      # holding only the build output. `node_modules` is the build's link
+      # into the workspace and `.secret.local` the emulator's dummy secret;
+      # neither is deployed (`functions.ignore`), and `deploy` refuses a
+      # tarball with a `node_modules` in it.
+      #
+      # The manifest is what `firebase deploy` would otherwise learn by
+      # starting the functions in the `deploy` job, given the environment
+      # firebase-tools gives that call. Of it, `GCLOUD_PROJECT` (from which
+      # the Firestore triggers' resource names are built) is known here;
+      # `FIREBASE_CONFIG` comes from the project's `adminSdkConfig`, which
+      # needs credentials, so it carries the project id alone. A trigger that
+      # reads the default bucket or database instance from it then fails
+      # here, rather than writing a manifest a deploy by hand would not.
+      # firebase-tools would also load the source's `.env` files into the
+      # call; nothing does that here, so one in the source fails the build.
+      # The bin reads its directory argument only when given two arguments,
+      # so it is run from the directory instead.
+      - name: Build, test and pack each target
+        id: targets
+        run: |
+          set -euo pipefail
+          out="${RUNNER_TEMP}/deploy"
+          mkdir -p "$out"
+
+          build_one() {
+            set -euo pipefail
+            local package package_dir firebase_dir project build output
+            package="$(jq -r .package <<< "$1")"
+            package_dir="$(jq -r .package_dir <<< "$1")"
+            firebase_dir="$(jq -r .firebase_dir <<< "$1")"
+            project="$(jq -r .project <<< "$1")"
+            build="$(jq -r .build <<< "$1")"
+
+            if [[ "$build" != 'none' ]]; then
+              pnpm --dir "$package_dir" run build
+            fi
+
+            if jq -e '.scripts["test:rules"]' "${package_dir}/package.json" > /dev/null; then
+              pnpm --dir "$package_dir" run test:rules
+            fi
+
+            case "$build" in
+              hosting) output=build ;;
+              functions)
+                output=functions-build
+                (
+                  cd "${firebase_dir}/functions-build"
+                  if compgen -G '.env*' > /dev/null; then
+                    echo "::error::${package}: .env files in the functions source would be read by a deploy by hand and not here."
+                    exit 1
+                  fi
+                  config="$(jq -cn --arg p "$project" '{ projectId: $p }')"
+                  FUNCTIONS_MANIFEST_OUTPUT_PATH="${PWD}/functions.yaml" \
+                    GCLOUD_PROJECT="$project" \
+                    GOOGLE_CLOUD_QUOTA_PROJECT="$project" \
+                    FIREBASE_CONFIG="$config" \
+                    CLOUD_RUNTIME_CONFIG="$(jq -cn --argjson c "$config" '{ firebase: $c }')" \
+                    ./node_modules/.bin/firebase-functions
+                  echo "Discovered $(jq '.endpoints | length' functions.yaml) functions."
+                )
+                ;;
+              none) output='' ;;
+              *)
+                echo "::error::${package}: unknown build '${build}'."
+                return 1
+                ;;
+            esac
+
+            if [[ -n "$output" ]]; then
+              tar -C "$firebase_dir" --exclude=node_modules --exclude=.secret.local \
+                -czf "${out}/${package}.tar.gz" "$output"
+              ls -lh "${out}/${package}.tar.gz"
+            fi
+            touch "${out}/${package}.ok"
+          }
+
+          failed=()
+          while IFS= read -r target; do
+            package="$(jq -r .package <<< "$target")"
+            echo "::group::${package}"
+            # A subshell outside any condition, so that `set -e` holds in it.
+            set +e
+            (build_one "$target")
+            status=$?
+            set -e
+            echo "::endgroup::"
+            if [[ "$status" -ne 0 ]]; then
+              echo "::error::${package}: build or rules test failed; it is not deployed."
+              rm -f "${out}/${package}.ok" "${out}/${package}.tar.gz"
+              failed+=("$package")
+            fi
+          done < <(jq -c '.[]' <<< "$TARGETS")
+
+          echo "failed=${failed[*]}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload the build output
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: deploy
+          path: ${{ runner.temp }}/deploy
+          if-no-files-found: ignore
+          retention-days: 1
+
+      - name: Fail for the targets left out
+        if: steps.targets.outputs.failed != ''
+        env:
+          FAILED: ${{ steps.targets.outputs.failed }}
+        run: |
+          echo "::error::Not deployed: ${FAILED}"
+          exit 1
+
+  # Holds the OIDC token. Installs nothing from the lockfile and runs nothing
+  # out of the tree: the checkout and the artifact are data that firebase-tools
+  # reads and uploads.
+  #
+  # Runs when `build` failed too, so that one target's failure does not hold
+  # back the others; a target whose `<package>.ok` is missing fails here.
+  deploy:
+    name: Deploy (${{ matrix.target.package }})
+    needs: [plan, build]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.targets != '[]' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # One deploy per target at a time, never cancelled half-way
+    # (`deploy-pages.yml` does the same). GitHub keeps one waiting job per
+    # group and replaces it with whichever arrives last, which with parallel
+    # builds need not be the newer commit; the first step handles that.
+    concurrency:
+      group: deploy-firebase-${{ matrix.target.package }}
+      cancel-in-progress: false
+
+    # Limited to main (`repo-settings/environments/firebase-deploy.json`), and
+    # named in the GCP provider's attribute condition, so an OIDC token from
+    # any other ref or workflow is refused there.
+    environment: firebase-deploy
+
+    permissions:
+      actions: write # to dispatch a deploy of main's tip when this run is stale
+      contents: read
+      id-token: write # to exchange for GCP credentials
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(needs.plan.outputs.targets) }}
+
+    env:
+      PACKAGE: ${{ matrix.target.package }}
+      PACKAGE_DIR: ${{ matrix.target.package_dir }}
+      FIREBASE_DIR: ${{ matrix.target.firebase_dir }}
+      PROJECT: ${{ matrix.target.project }}
+      ONLY: ${{ matrix.target.only }}
+      BUILD: ${{ matrix.target.build }}
+      COMMIT: ${{ needs.plan.outputs.commit }}
+
+    steps:
+      # If main's tip has a different `version` for this package than the
+      # commit this run built, this run is not the one to deploy. A newer run
+      # may already have deployed the tip, or may have been the waiting job
+      # this one replaced and never run at all; which, nothing here can tell.
+      # So this one dispatches a deploy of the tip and stands down: at worst
+      # the tip is deployed twice, and the dispatched deploy, being the
+      # latest, is what the environment's history shows as live. A rollback
+      # is meant to deploy an older commit and skips this.
+      - name: Check this is still the version on main
+        id: current
+        if: needs.plan.outputs.rollback != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version_at() {
+            gh api -H 'Accept: application/vnd.github.raw' \
+              "repos/${GITHUB_REPOSITORY}/contents/${PACKAGE_DIR}/package.json?ref=$1" |
+              jq -r .version
+          }
+          mine="$(version_at "$COMMIT")"
+          tip="$(version_at main)"
+          if [[ "$mine" == "$tip" ]]; then
+            echo "stale=false" >> "$GITHUB_OUTPUT"
+          else
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/actions/workflows/deploy-firebase.yml/dispatches" \
+              -f ref=main -f "inputs[package]=${PACKAGE}"
+            echo "::notice::${PACKAGE} is ${tip} on main and ${mine} here; dispatched a deploy of main's tip in place of this one."
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.current.outputs.stale != 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.plan.outputs.commit }}
+          persist-credentials: false
+          sparse-checkout: ${{ matrix.target.firebase_dir }}
+
+      - name: Download the build output
+        if: steps.current.outputs.stale != 'true'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: deploy
+          path: ${{ runner.temp }}/deploy
+
+      # The artifact comes from the job that runs the dependency tree, so it
+      # is read as hostile: only this target's build output is unpacked, into
+      # an empty directory, and it is refused if it carries anything that
+      # firebase-tools could start (a `node_modules`) or that could point
+      # outside it (a link), or, for the functions, lacks the manifest that
+      # keeps firebase-tools from starting them. `firebase.json` and the
+      # rules come from the checkout, never from the artifact.
+      - name: Unpack the build output
+        if: steps.current.outputs.stale != 'true'
+        run: |
+          set -euo pipefail
+          dir="${RUNNER_TEMP}/deploy"
+          if [[ ! -f "${dir}/${PACKAGE}.ok" ]]; then
+            echo "::error::The build of ${PACKAGE} did not pass (see the Build job); not deploying it."
+            exit 1
+          fi
+
+          case "$BUILD" in
+            hosting) output=build ;;
+            functions) output=functions-build ;;
+            *) exit 0 ;;
+          esac
+
+          tarball="${dir}/${PACKAGE}.tar.gz"
+          if tar -tzf "$tarball" | grep -Ev "^${output}(/|\$)" | grep -q .; then
+            echo "::error::The artifact holds more than ${output}/."
+            exit 1
+          fi
+          if tar -tzf "$tarball" | grep -Eq '(^|/)(node_modules|\.\.)(/|$)'; then
+            echo "::error::The artifact holds a node_modules or a '..' path."
+            exit 1
+          fi
+
+          unpacked="${RUNNER_TEMP}/unpacked"
+          mkdir "$unpacked"
+          tar -C "$unpacked" --no-same-owner -xzf "$tarball" -- "$output"
+          if find "$unpacked" ! -type f ! -type d | grep -q .; then
+            echo "::error::The artifact holds something other than files and directories."
+            exit 1
+          fi
+          if [[ -e "${FIREBASE_DIR}/${output}" ]]; then
+            echo "::error::${FIREBASE_DIR}/${output} is in the checkout."
+            exit 1
+          fi
+          mv "${unpacked}/${output}" "${FIREBASE_DIR}/${output}"
+
+          if [[ "$BUILD" == 'functions' && ! -f "${FIREBASE_DIR}/${output}/functions.yaml" ]]; then
+            echo "::error::No functions.yaml; firebase-tools would start the functions to discover them."
+            exit 1
+          fi
+
+      # A hook is a command firebase-tools runs from the tree; the build has
+      # already happened in the `build` job.
+      - name: Remove the deploy hooks from firebase.json
+        if: steps.current.outputs.stale != 'true'
+        working-directory: ${{ matrix.target.firebase_dir }}
+        run: |
+          set -euo pipefail
+          jq 'walk(if type == "object" then del(.predeploy, .postdeploy) else . end)' \
+            firebase.json > "${RUNNER_TEMP}/firebase.json"
+          mv "${RUNNER_TEMP}/firebase.json" firebase.json
+
+      - name: Install firebase-tools
+        if: steps.current.outputs.stale != 'true'
+        run: |
+          set -euo pipefail
+          bin="${RUNNER_TEMP}/firebase-tools/firebase"
+          mkdir -p "$(dirname "$bin")"
+          curl -fsSL -o "$bin" \
+            "https://github.com/firebase/firebase-tools/releases/download/v${FIREBASE_TOOLS_VERSION}/firebase-tools-linux"
+          echo "${FIREBASE_TOOLS_SHA256}  ${bin}" | sha256sum --check --strict
+          chmod +x "$bin"
+          echo "FIREBASE_BIN=${bin}" >> "$GITHUB_ENV"
+
+      # Install and unpack come before this step ("Jobs that hold a key").
+      - name: Authenticate to Google Cloud
+        if: steps.current.outputs.stale != 'true'
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ vars.FIREBASE_DEPLOY_WIF_PROVIDER }}
+          service_account: firebase-deploy@${{ matrix.target.project }}.iam.gserviceaccount.com
+
+      # No `--force`: a deploy that would delete a function, or that needs a
+      # prompt answered, fails instead of answering it.
+      - name: Deploy
+        if: steps.current.outputs.stale != 'true'
+        working-directory: ${{ matrix.target.firebase_dir }}
+        run: |
+          "$FIREBASE_BIN" deploy --non-interactive \
+            --project "$PROJECT" --only "$ONLY" \
+            --message "${PACKAGE} ${COMMIT}"

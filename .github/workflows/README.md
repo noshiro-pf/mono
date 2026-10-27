@@ -27,6 +27,7 @@ GitHub shows a `.github/README.md` in place of the root one.
 | `pnpm-update.yml`                | schedule                               | none; opens `chore/pnpm-update`         |
 | `node-support-update.yml`        | schedule                               | none; opens `chore/node-support-update` |
 | `deploy-pages.yml`               | `push` to `main`                       | none                                    |
+| `deploy-firebase.yml`            | `push` to `main`                       | none; deploys on a `version` change     |
 | `link-check.yml`                 | pull requests, path-filtered; schedule | none; other people's servers decide it  |
 
 The required contexts are listed in `repo-settings/rulesets/main.json`. Every
@@ -655,8 +656,9 @@ to this.
 
 ## Jobs that hold a key
 
-Three workflows push, open pull requests or publish: `pnpm-update.yml`,
-`node-support-update.yml`, `release.yml`. Each runs
+Five workflows push, open pull requests, publish or deploy: `pnpm-update.yml`,
+`node-support-update.yml`, `release.yml`, `deploy-pages.yml`,
+`deploy-firebase.yml`. Each runs
 third-party code somewhere in the same run (`pnpm install` and every `tsx`
 invocation execute the dependency tree; `allowBuilds` gates install scripts,
 not the import-time code of the toolchain), and each holds a key that can
@@ -688,7 +690,13 @@ So the job that runs the dependency tree holds nothing (`contents: read`,
 `persist-credentials: false` on its checkout, so no token is in the git
 config either), and the job that holds the key installs nothing and runs
 nothing out of the working tree. `pnpm-update.yml` crosses a patch,
-`release.yml` a `dist/` tarball.
+`release.yml` a `dist/` tarball, `deploy-pages.yml` the site, which
+`actions/deploy-pages` hands to GitHub without unpacking it, and
+`deploy-firebase.yml` the apps' build output (and the functions' discovery
+manifest, so that firebase-tools does not start the functions to find them).
+An artifact the key job unpacks is hostile: unpack only the members expected,
+into an empty directory, and refuse what could run or point elsewhere before
+the key is fetched.
 `node-support-update.yml` is the one that is not split, and says why.
 
 ### Pushing a branch and opening a pull request

@@ -360,19 +360,21 @@ ingest the feed). Outside reports come through private vulnerability reporting
 
 ## Releases
 
-Changesets only; do not reintroduce `semantic-release`. `pnpm changeset` for
-any user-visible change to a `libs/` package or a Chrome extension (`minor` for
-a feature, `patch` for a fix); `.changeset/` at the root is the only one. An
-extension's version is its `package.json`'s, which the build writes into
-`dist/manifest.json`, so without a changeset its next store upload is refused
-as not newer. **A package's first publish is manual** (`libs/first-release.md`).
-Tags are `<package-name>@<version>`; repository-prefixed tags are imported
-history, never create new ones. `changeset:version-packages` formats
-`strict-lib/` before regenerating the bundles, because `changeset version`
-writes changelogs Prettier does not own. **A breaking change put off to the
-next major goes in the package's `NEXT_MAJOR.md`** (a candidate under
-`## Undecided`), not a TODO comment; `check:prose:next-major` holds the
-version pull request, not the breaking changeset, until it is applied.
+Changesets only; do not reintroduce `semantic-release`. `pnpm changeset` for any
+user-visible change to a `libs/` package, a Chrome extension or a Firebase app
+(`minor` for a feature, `patch` for a fix); `.changeset/` at the root is the
+only one. An extension's version is its `package.json`'s, which the build writes
+into `dist/manifest.json`, so without a changeset its next store upload is
+refused as not newer. A Firebase app deploys when its `version` moves on `main`,
+the package named deciding what (`docs/firebase-deploy.md`). **A first publish
+is manual** (`libs/first-release.md`). Tags are `<package-name>@<version>`;
+repository-prefixed tags are imported history, never create new ones.
+`changeset:version-packages` formats `strict-lib/` before regenerating the
+bundles, as `changeset version` writes changelogs Prettier does not own. **A
+breaking change put off to the next major goes in the package's
+`NEXT_MAJOR.md`** (a candidate under `## Undecided`), not a TODO comment;
+`check:prose:next-major` holds the version pull request, not the breaking
+changeset, until it is applied.
 
 **A release is queued like anything else, but the version pull request is
 declared _on_ rather than _by_.** `changesets/action` overwrites the title and
@@ -382,10 +384,9 @@ made it matter — which is why **`blocks-release`, on the pull request the
 release must contain, is the only ordering that holds**. `release.yml` keeps
 `skip-ci` on the version pull request, so it is held from the moment it
 exists; adding `merge-queued` is the author's act of saying "release this",
-and `unblock-prs` arms it when it picks it.
-`unblock-prs` never rebases that branch — `release.yml` rebuilds it from the
-tip itself, and a rebase would carry the old version commit onto a tip whose
-changesets it never consumed, releasing without them.
+and `unblock-prs` arms it when it picks it, but never rebases it: `release.yml`
+rebuilds it from the tip, and a rebase would carry the old version commit onto
+a tip whose changesets it never consumed, releasing without them.
 
 ## Node.js version support
 
@@ -422,8 +423,7 @@ cannot decide:
 - `verify-npm-packages/` keeps its rules in its own `README.md` — which part
   is hand-written, and which of the two commands reads what. It needs
   `ws:build`.
-- No bundler: libraries build with `tsc` plus the strip pass. Nothing depends
-  on `rollup`.
+- No bundler: `tsc` and the strip pass build libraries; nothing uses `rollup`.
 - Shared devDependency versions live in the `catalog:` of
   `pnpm-workspace.yaml`; published `dependencies` / `peerDependencies` keep
   literal ranges. `update.ignoreDeps` is the one place a dependency is held

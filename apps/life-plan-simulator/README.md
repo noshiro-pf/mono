@@ -118,17 +118,20 @@ users/{uid}/plans/{planId}   { name, createdAt, updatedAt, input }
 
 ## Firebase の手作業
 
-Firebase プロジェクトは `life-plan-simulator-9eab3`（`.firebaserc`）。次はリポジトリの
-CI では行われないので、オーナーが手で行う。
+Firebase プロジェクトは `life-plan-simulator-9eab3`（`.firebaserc`）。
+
+セキュリティルールは、このパッケージの `version` が `main` で変わったとき
+`deploy-firebase.yml` が `pnpm run test:rules` を通してからデプロイする。
+`firestore.rules` を変えたら `life-plan-simulator` を名指しする changeset を付ける
+（[docs/firebase-deploy.md](../../docs/firebase-deploy.md)）。
+
+次はリポジトリの CI では行われないので、オーナーが手で行う。
 
 1. **ログインプロバイダ**: Authentication → ログイン方法で Google を有効にする。
    `firestore.rules` も Google でサインインしたトークンしか受け付けない。
 2. **承認済みドメイン**: Authentication → 設定 → 承認済みドメインに `localhost` と
    `noshiro-pf.github.io` を入れる。
-3. **セキュリティルールのデプロイ**: Firestore を作り、`pnpm run test:rules` が
-   通ることを確かめてから、このディレクトリで
-   `firebase deploy --only firestore:rules`。`firestore.rules` を変更しただけでは
-   反映されない。`firebase-tools` は依存に入れていないので、手元に入れて使う。
+3. **Firestore**: データベースを作る。ルールは上のとおり CI がデプロイする。
 
 ## Run
 
@@ -187,5 +190,6 @@ writes their own plans, in the shape the rules allow, and nothing else; other
 users, signed-out access, tokens from providers other than Google and every
 other path are refused. `emulators:exec` starts and stops the emulator, so stop
 a running `firebase emulators:start` first. It needs Java 21 or later and is
-not a `check:` script, because no CI runner has Java and the emulator. Run it by
-hand before deploying a change to `firestore.rules`.
+not a `check:` script: pull request checks do not run it, and
+`deploy-firebase.yml` runs it before deploying the rules and deploys nothing if
+it fails. Run it by hand before merging a change to `firestore.rules`.

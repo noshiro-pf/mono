@@ -27,8 +27,8 @@ first and keeps the emulators' data in `emulator-data/` between runs; run that
 package's `watch:build` to have the emulator pick up changes to the functions.
 
 The emulators load `firestore.rules`, so what they let the app do is what
-production lets it do. Nothing in CI reads the rules; a change there takes
-effect only with `pnpm dlx firebase-tools deploy --only firestore:rules`.
+production lets it do. Nothing in CI tests the rules; a change there takes
+effect when it is deployed (see "Deploy").
 
 The Firestore and Pub/Sub emulators need Java (JDK 21 or later), and the
 emulators run through `pnpm dlx firebase-tools`, so nothing else is installed.
@@ -43,6 +43,16 @@ pnpm run check:e2e:emulators  # the tests that write to Firestore
 `check:e2e:emulators` starts its own emulators with empty data
 (`firebase emulators:exec`), so stop `pnpm run emulators` first: they listen
 on the same ports. No workflow runs it yet, since no runner has Java.
+
+### Deploy
+
+`deploy-firebase.yml` deploys `hosting` and `firestore` (rules and indexes)
+when this package's `version` changes on `main`, which is what a changeset
+naming `event-schedule-app` does once the version pull request merges. The
+functions are a package of their own, deployed when a changeset names
+`event-schedule-app-functions`. Which package deploys what, and the one-time
+GCP setup, are in
+[docs/firebase-deploy.md](../../docs/firebase-deploy.md).
 
 ### Firestore structure
 

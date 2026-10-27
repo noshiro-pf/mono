@@ -1,7 +1,8 @@
-// Firestore rules of event-schedule-app. Deployed by hand with
-// `pnpm dlx firebase-tools deploy --only firestore:rules` from this directory;
-// nothing in CI reads this file, so a change here is a change to what the
-// next deploy does.
+// Firestore rules of event-schedule-app. Deployed by `deploy-firebase.yml`
+// when this package's `version` changes on main, so a change here needs a
+// changeset naming `event-schedule-app`; without one it waits for whatever
+// next moves the version (a library release does) and goes out with that.
+// Nothing tests them in CI (docs/firebase-deploy.md).
 //
 // Who may do what (the Cloud Functions use the Admin SDK and bypass this):
 //
