@@ -1,7 +1,7 @@
 /** What the command line says, and how it is read. */
 
 import { SKIP_CI_LABEL } from 'pr-report-core';
-import { Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import { parseCommandArgs, pullRequestNumber } from '../lib/index.mjs';
 
 export type Options = Readonly<{
@@ -16,6 +16,11 @@ export type Options = Readonly<{
   base: string | undefined;
   /** Pull requests to declare with `Merge-After:`, in the order given. */
   mergeAfter: readonly number[];
+  /**
+   * Open pull requests that are to merge after this one, each to have it
+   * written into its `Merge-After:`, in the order given.
+   */
+  mergeBefore: readonly number[];
   /** Say what would be done, and touch nothing. */
   dryRun: boolean;
 }>;
@@ -40,6 +45,8 @@ export const HELP = [
   '  --base <branch>         what to target (default: the repository default branch);',
   '                          the branch of an open pull request stacks it on that one',
   '  --merge-after <number>  declare a predecessor; repeat for several',
+  '  --merge-before <number> declare a successor: write this one into the',
+  '                          Merge-After of that open pull request; repeat for several',
   '  --dry-run               say what would be done, and touch nothing',
   '  -h, --help              show this help',
 ].join('\n');
@@ -52,6 +59,7 @@ export const parseOptions = (
     'body-file': { type: 'string' },
     base: { type: 'string' },
     'merge-after': { type: 'string', multiple: true },
+    'merge-before': { type: 'string', multiple: true },
     'dry-run': { type: 'boolean', default: false },
   });
 
@@ -65,10 +73,27 @@ export const parseOptions = (
 
   const values = parsed.value;
 
-  const mergeAfter = parseMergeAfter(values['merge-after'] ?? []);
+  const mergeAfter = parseNumbers('--merge-after', values['merge-after'] ?? []);
 
   if (Result.isErr(mergeAfter)) {
     return mergeAfter;
+  }
+
+  const mergeBefore = parseNumbers(
+    '--merge-before',
+    values['merge-before'] ?? [],
+  );
+
+  if (Result.isErr(mergeBefore)) {
+    return mergeBefore;
+  }
+
+  const both = mergeBefore.value.filter((n) => mergeAfter.value.includes(n));
+
+  if (Arr.isNonEmpty(both)) {
+    return Result.err(
+      `${both.map((n) => `#${n}`).join(', ')} named by both --merge-after and --merge-before: a cycle, which nothing would ever merge`,
+    );
   }
 
   return Result.ok({
@@ -76,11 +101,13 @@ export const parseOptions = (
     bodyFile: values['body-file'],
     base: values.base,
     mergeAfter: mergeAfter.value,
+    mergeBefore: mergeBefore.value,
     dryRun: values['dry-run'],
   });
 };
 
-const parseMergeAfter = (
+const parseNumbers = (
+  flag: '--merge-after' | '--merge-before',
   raw: readonly string[],
 ): Result<readonly number[], string> => {
   const mut_numbers: number[] = [];
@@ -90,7 +117,7 @@ const parseMergeAfter = (
 
     if (number === undefined) {
       return Result.err(
-        `--merge-after must be a pull request number, got ${JSON.stringify(value)}`,
+        `${flag} must be a pull request number, got ${JSON.stringify(value)}`,
       );
     }
 

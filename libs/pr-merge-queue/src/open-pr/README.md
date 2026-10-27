@@ -72,6 +72,7 @@ pnpm run open-pr                                   # 既定
 pnpm run open-pr -- --dry-run                      # 何をするかだけ表示
 pnpm run open-pr -- --title 'fix: 説明' --body-file ./pr.md
 pnpm run open-pr -- --merge-after '#1901'          # 順序を宣言
+pnpm run open-pr -- --merge-before '#1905'         # #1905 をこの PR の後にする
 pnpm run open-pr -- --base feat/lower-layer        # その PR の上に積む
 ```
 
@@ -81,6 +82,7 @@ pnpm run open-pr -- --base feat/lower-layer        # その PR の上に積む
 | `--body-file <path>` | トレーラのみ / 空欄 | 本文を読むファイル                        |
 | `--base <branch>`    |  リポジトリの既定値 | 対象ブランチ（PR のブランチなら stack）   |
 | `--merge-after <n>`  |                なし | `Merge-After:` を宣言（複数回可）         |
+| `--merge-before <n>` |                なし | `<n>` の `Merge-After:` にこの PR を追記  |
 | `--dry-run`          |                 off | 何も触らずに手順だけ出す                  |
 
 **本文は自分で書くものです。** `skip-ci` が付いている間はローカルで走らせた
@@ -94,6 +96,17 @@ blocked by も同じに読みます）のうち本文にまだ無いものを、
 先頭の `Merge-After:` 行に足します（`docs/issue-start-after.md`）。`unblock-prs`
 と各レポートは本文に無くても引き継ぐので、これは順序を本文にも書いておくための
 ものです。サイドバーで手でリンクした issue は見ません。
+
+**`--merge-before` は後から見つかった前提作業のためのものです。** PR A の
+レビューで先にやるべき作業が出たとき、その PR B を
+`--merge-before '#A'` で開くと、B を作った後で A の本文の `Merge-After:` 行に
+B の番号を足し（無ければ先頭に行を作り）、B の本文の先頭には
+`Merges before #A, …` という一行を書きます。順序の宣言は A の本文の
+`Merge-After:` だけで、`Merge-Before:` のような逆向きの構文はありません。
+待っている PR の本文を読めば待つ理由がわかる、という前提を保つためです。
+名指した PR が open でなければ、また version PR（`blocks-release` を使います）
+や、この PR が後にマージされる相手（stack の下の層を含む）であれば、push の前に
+止まります。既に A がこの PR を名指していれば A は書き換えません。
 
 ### stacked PR
 
@@ -183,6 +196,7 @@ pnpm run open-pr                                   # the default
 pnpm run open-pr -- --dry-run                      # say what would be done
 pnpm run open-pr -- --title 'fix: a thing' --body-file ./pr.md
 pnpm run open-pr -- --merge-after '#1901'          # declare an order
+pnpm run open-pr -- --merge-before '#1905'         # #1905 merges after this
 pnpm run open-pr -- --base feat/lower-layer        # stack it on that one
 ```
 
@@ -192,6 +206,7 @@ pnpm run open-pr -- --base feat/lower-layer        # stack it on that one
 | `--body-file <path>` |  the trailer, or empty | where to read the body from               |
 | `--base <branch>`    | the repository default | what to target; a pull request's stacks   |
 | `--merge-after <n>`  |                   none | declare a predecessor; repeat for several |
+| `--merge-before <n>` |                   none | write this one into `<n>`'s `Merge-After` |
 | `--dry-run`          |                    off | print the steps and touch nothing         |
 
 The description is yours to write: while `skip-ci` is on, the checks you ran
@@ -208,6 +223,17 @@ body does not name yet
 (`docs/issue-start-after.md`). `unblock-prs` and the reports inherit the same
 without it; this is the body stating the order. An issue linked by hand in
 the sidebar is not seen.
+
+**`--merge-before` is for work found to come first after the pull request
+needing it was opened.** Opening that work, B, with `--merge-before '#A'`
+adds B's number to the `Merge-After:` line of A's body once B exists (or
+writes one at the top), and opens B's body with a `Merges before #A, …` line.
+The declaration is A's `Merge-After:` alone; there is no reverse syntax such
+as `Merge-Before:`, so that why a pull request waits is always in its own
+body. The script stops before pushing when a pull request named is not open,
+is the version pull request (label B `blocks-release` instead), or is one B
+merges after, the layer it is stacked on included. A body that names B
+already is left alone.
 
 A `--base` that is another open pull request's branch stacks this one on it:
 the diff is its own layer, and `unblock-prs` and the reports treat it as

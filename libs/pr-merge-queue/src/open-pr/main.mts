@@ -1,5 +1,9 @@
 import * as fs from 'node:fs/promises';
-import { AUTO_REBASE_LABEL, SKIP_CI_LABEL } from 'pr-report-core';
+import {
+  AUTO_REBASE_LABEL,
+  parseMergeAfter,
+  SKIP_CI_LABEL,
+} from 'pr-report-core';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { addLabel, log, type ApiContext } from '../lib/index.mjs';
 import {
@@ -12,13 +16,15 @@ import {
   missingInheritedOrder,
   preflight,
   pushBranch,
+  readSuccessor,
   updateBody,
   viewPullRequest,
 } from './github.mjs';
 import type { Options } from './options.mjs';
 import {
   mergeAfterTrailer,
-  withInheritedMergeAfter,
+  mergeBeforeNote,
+  withMergeAfter,
   withStackParent,
 } from './steps.mjs';
 
@@ -53,6 +59,14 @@ import {
  * written into the body's `Merge-After:` once GitHub has read which issues
  * the body closes. The readers inherit it without, so the body is saying
  * what they already derive.
+ *
+ * **`--merge-before` declares the order from the other end**, for work found
+ * to come first after the pull request that needs it was opened: this one's
+ * number is written into the `Merge-After:` of each pull request named, and
+ * a line saying so into this one's body. The declaration stays where every
+ * reader looks for why a pull request waits — in the body of the one that
+ * waits — so there is no second syntax to read. The pull requests named are
+ * checked to be open before anything is pushed.
  */
 export const openPullRequest = async (
   options: Options,
@@ -74,6 +88,17 @@ export const openPullRequest = async (
   }
 
   const mergeAfter = withStackParent(options.mergeAfter, parent?.value);
+
+  const successors = await checkSuccessors(
+    api,
+    options.mergeBefore,
+    mergeAfter,
+    defaultBranch,
+  );
+
+  if (Result.isErr(successors)) {
+    return successors;
+  }
 
   if (options.dryRun) {
     return dryRun(api, branch, base, options, parent?.value, mergeAfter);
@@ -126,6 +151,17 @@ export const openPullRequest = async (
     return carried;
   }
 
+  const declared = await declareBefore(
+    api,
+    prNumber.value,
+    options.mergeBefore,
+    defaultBranch,
+  );
+
+  if (Result.isErr(declared)) {
+    return declared;
+  }
+
   const labelled = await addLabel(api, prNumber.value, SKIP_CI_LABEL);
 
   if (Result.isErr(labelled)) {
@@ -176,7 +212,7 @@ const carryStartAfter = async (
   const updated = await updateBody(
     api,
     prNumber,
-    withInheritedMergeAfter(body, missing),
+    withMergeAfter(body, missing),
   );
 
   if (Result.isErr(updated)) {
@@ -186,6 +222,84 @@ const carryStartAfter = async (
   log(
     `#${prNumber}: ${mergeAfterTrailer(missing) ?? ''}, from the Start-After of the issues it closes`,
   );
+
+  return Result.ok(undefined);
+};
+
+/**
+ * Refuses a `--merge-before` that names what this one merges after — the
+ * layer it is stacked on included, which `parseOptions` cannot see — or a
+ * pull request that is not open, before anything is pushed.
+ */
+const checkSuccessors = async (
+  api: ApiContext,
+  mergeBefore: readonly number[],
+  mergeAfter: readonly number[],
+  defaultBranch: string,
+): Promise<Result<undefined, string>> => {
+  for (const number of mergeBefore) {
+    if (mergeAfter.includes(number)) {
+      return Result.err(
+        `#${number} is what this one merges after, so --merge-before #${number} would be a cycle`,
+      );
+    }
+
+    const read = await readSuccessor(api, number, defaultBranch);
+
+    if (Result.isErr(read)) {
+      return read;
+    }
+  }
+
+  return Result.ok(undefined);
+};
+
+/**
+ * Writes `prNumber` into the `Merge-After:` of each `--merge-before` pull
+ * request, read again now rather than when it was checked, so that an edit
+ * made in between is kept. One that names it already is left as it is.
+ */
+const declareBefore = async (
+  api: ApiContext,
+  prNumber: number,
+  mergeBefore: readonly number[],
+  defaultBranch: string,
+): Promise<Result<undefined, string>> => {
+  for (const number of mergeBefore) {
+    if (number === prNumber) {
+      return Result.err(
+        `--merge-before #${number} names this pull request itself`,
+      );
+    }
+
+    const body = await readSuccessor(api, number, defaultBranch);
+
+    if (Result.isErr(body)) {
+      return body;
+    }
+
+    // A set rather than `includes`, whose strict type guard would leave
+    // `prNumber` as `never` past the `continue`.
+    const named = new Set(parseMergeAfter(body.value));
+
+    if (named.has(prNumber)) {
+      continue;
+    }
+
+    const updated = await updateBody(
+      api,
+      number,
+      withMergeAfter(body.value, [prNumber]),
+    );
+
+    if (Result.isErr(updated)) {
+      return Result.err(
+        `cannot write #${prNumber} into the Merge-After of #${number}: ${updated.value}`,
+      );
+    }
+
+    log(`#${number}: Merge-After #${prNumber} written into its body`);
+  }
 
   return Result.ok(undefined);
 };
@@ -261,7 +375,12 @@ const resolveBody = async (
   options: Options,
   mergeAfter: readonly number[],
 ): Promise<Result<string, string>> => {
-  const trailer = mergeAfterTrailer(mergeAfter);
+  const head = [
+    mergeAfterTrailer(mergeAfter),
+    mergeBeforeNote(options.mergeBefore),
+  ].filter((line) => line !== undefined);
+
+  const trailer = Arr.isNonEmpty(head) ? head.join('\n') : undefined;
 
   if (options.bodyFile === undefined) {
     return Result.ok(trailer === undefined ? '' : `${trailer}\n`);
@@ -280,7 +399,7 @@ const resolveBody = async (
   }
 
   // The trailer goes first, where `unblock-prs` reads it and a reader sees it
-  // before the prose.
+  // before the prose, and the `--merge-before` note with it.
   return Result.ok(
     trailer === undefined ? read.value : `${trailer}\n\n${read.value}`,
   );
@@ -318,6 +437,9 @@ const dryRun = async (
       ? 'leave auto-merge unarmed: unblock-prs arms it when it picks it'
       : `leave auto-merge unarmed: it is stacked on #${parent}, and unblock-prs arms it when it picks it, after #${parent} merges`,
     trailer === undefined ? undefined : `declare ${trailer}`,
+    Arr.isNonEmpty(options.mergeBefore)
+      ? `write ${existing.value === undefined ? 'its number' : `#${existing.value.number}`} into the Merge-After of ${options.mergeBefore.map((n) => `#${n}`).join(', ')}${existing.value === undefined ? ', and say so in its body' : ''}`
+      : undefined,
     'add to Merge-After the open pull requests the issues it closes start after, if the body does not name them',
   ].filter((step) => step !== undefined);
 
