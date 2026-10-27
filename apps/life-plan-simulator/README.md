@@ -12,8 +12,9 @@ Google スプレッドシートで作っている収支シミュレーターを�
 
 Google アカウントでサインインし、入力値は「プラン」ごとに Cloud Firestore へ自動で
 保存する。プランはいくつでも作れ、ヘッダーで切り替え・作成・複製・名前の変更・削除が
-できる。「保存・読み込み」タブでは、開いているプランの入力値を JSON ファイルに
-書き出したり読み込んだりできる。仕組みは [task-manager-app](../task-manager-app) と
+できる。「保存・読み込み」タブでは、開いているプランを JSON ファイルに書き出したり、
+JSON ファイルを新しいプランとして（または開いているプランの入力値として）読み込んだり
+できる（[プランのファイル](#プランのファイル)）。仕組みは [task-manager-app](../task-manager-app) と
 同じ:
 
 - サインインは Firebase Auth の Google サインインで、ポップアップで行う（ページと
@@ -96,6 +97,24 @@ users/{uid}/plans/{planId}   { name, createdAt, updatedAt, input }
 - 自分の `users/{uid}/plans` だけを読み書きでき、ほかは拒む（`firestore.rules`）。
   `users/{uid}` の文書そのものは作らない。
 - 初回のサインインではプランが無く、「新しいプラン」で既定値のプランを作る。
+
+## プランのファイル
+
+「保存・読み込み」タブが書き出し、読み込むファイル（`src/repository/plan-file.mts`）:
+
+```text
+{ "$schema": "<公開している JSON Schema の URL>", "name": "プラン名", "input": { ... } }
+```
+
+- `input` は `SimulationInput` そのもの。読み込むときは保存したプランと同じく
+  `SimulationInput.fill` で欠けた値・読めない値を既定値で補い、補った値を画面に
+  列挙する。最初の版が書き出した、入力値だけのファイルも読める。
+- JSON Schema は `PlanFile` から ts-fortress の `toJsonSchema` で生成した
+  `public/plan-file.schema.json`（`pnpm run gen:schema`）で、アプリと一緒に
+  `https://noshiro-pf.github.io/mono/life-plan-simulator/plan-file.schema.json` に
+  載る。書き出したファイルはその URL を `$schema` に持つので、対応するエディタで
+  開くと補完・検査される。`PlanFile` を変えたら `gen:schema` を走らせる
+  （生成物が古いと `plan-file.test.mts` が落ちる）。
 
 ## Firebase の手作業
 

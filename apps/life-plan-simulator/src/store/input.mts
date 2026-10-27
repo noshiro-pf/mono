@@ -1,10 +1,15 @@
 import { map } from 'synstate';
-import { Json, Result } from 'ts-data-forge';
+import { Result } from 'ts-data-forge';
 import {
   defaultSimulationInput,
   simulate,
-  SimulationInput,
+  type SimulationInput,
 } from '../domain/index.mjs';
+import {
+  parsePlanFile,
+  planFileName,
+  planToFileJson,
+} from '../repository/index.mjs';
 import { planStore } from './store.mjs';
 
 /** 開いているプランの入力値。 */
@@ -22,20 +27,43 @@ export const updateSection = <K extends keyof SimulationInput>(
 };
 
 /**
- * JSON 文字列を開いているプランの入力値として読み込む。欠けた値は既定値で
- * 補う。
+ * 開いているプランを書き出すファイルの名前と中身。開いているプランが無ければ
+ * `undefined`。
  */
-export const importInput = (json: string): Result<undefined, string> => {
-  const parsed = Json.parse(json);
+export const exportCurrentPlan = ():
+  Readonly<{ fileName: string; json: string }> | undefined => {
+  const plan = planStore.currentPlan.getSnapshot().value;
 
-  if (Result.isErr(parsed)) {
-    return parsed;
-  }
-
-  planStore.updateInput(() => SimulationInput.fill(parsed.value));
-
-  return Result.ok(undefined);
+  return plan === undefined
+    ? undefined
+    : { fileName: planFileName(plan.name), json: planToFileJson(plan) };
 };
+
+/**
+ * プランのファイルを新しいプランとして読み込み、そのプランを開く。成功すれば
+ * 既定値で補った値を返す。
+ */
+export const importAsNewPlan = (
+  json: string,
+): Result<readonly string[], string> =>
+  Result.map(parsePlanFile(json), ({ name, input, warnings }) => {
+    planStore.addPlan(name, input);
+
+    return warnings;
+  });
+
+/**
+ * プランのファイルの入力値で、開いているプランの入力値を置き換える（名前は
+ * 変えない）。成功すれば既定値で補った値を返す。
+ */
+export const importIntoCurrentPlan = (
+  json: string,
+): Result<readonly string[], string> =>
+  Result.map(parsePlanFile(json), ({ input, warnings }) => {
+    planStore.updateInput(() => input);
+
+    return warnings;
+  });
 
 /** 開いているプランの入力値を既定値に戻す。 */
 export const resetInput = (): void => {

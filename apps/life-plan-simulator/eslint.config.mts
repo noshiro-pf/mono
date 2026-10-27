@@ -74,6 +74,14 @@ export default [
   },
 
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),
+  {
+    // `gen-plan-file-schema.mts` writes the schema from the type in `src/`,
+    // which has no entry point of its own to be reached through.
+    files: ['scripts/**'],
+    rules: defineKnownRules({
+      'import-x/no-internal-modules': 'off',
+    }),
+  },
 
   // Last, so that nothing above turns these back on.
   eslintConfigOffForOxlint,

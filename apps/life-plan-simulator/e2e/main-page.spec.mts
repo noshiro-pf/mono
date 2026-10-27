@@ -99,6 +99,58 @@ test('plans keep their own inputs', { tag: '@smoke' }, async ({ page }) => {
     .toHaveText(['プラン 1', '持ち家']);
 });
 
+test(
+  'a plan exported to a file reads back as a new plan',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto(demo);
+
+    const initialCash = page.getByTestId('initial-cash');
+
+    await initialCash.fill('1234567');
+
+    await initialCash.press('Enter');
+
+    // ASCII, because Chromium saves a download as "download" when its name is
+    // not in the locale's character set, and a container's locale may be C.
+    await page.getByTestId('plan-name').fill('home');
+
+    await page.getByTestId('plan-name').press('Enter');
+
+    await page.getByTestId('tab-data').click();
+
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByTestId('plan-export').click(),
+    ]);
+
+    expect.soft(download.suggestedFilename()).toBe('home.json');
+
+    // Changed after the export, so that the value below is the file's.
+    await page.getByTestId('tab-overview').click();
+
+    await initialCash.fill('1');
+
+    await initialCash.press('Enter');
+
+    await page.getByTestId('tab-data').click();
+
+    await page
+      .getByTestId('plan-import-new')
+      .setInputFiles(await download.path());
+
+    await expect
+      .soft(page.getByTestId('plan-select').getByRole('option'))
+      .toHaveText(['home', 'home']);
+
+    await expect.soft(page.getByTestId('plan-import-warnings')).toBeEmpty();
+
+    await page.getByTestId('tab-overview').click();
+
+    await expect.soft(initialCash).toHaveValue('1234567');
+  },
+);
+
 test('asks to sign in', { tag: '@smoke' }, async ({ page }) => {
   await page.goto(app);
 

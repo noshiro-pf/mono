@@ -144,6 +144,28 @@ describe(createPlanStore, () => {
     assert.deepStrictEqual(saved(), ['b']);
   });
 
+  test('adds a plan read from a file, and opens it', () => {
+    const { store } = setUp(createMemoryRepository([plan('a', 1)]));
+
+    const input = {
+      ...defaultSimulationInput,
+      profile: { ...defaultSimulationInput.profile, birth: '1975-03' },
+    } as const;
+
+    store.addPlan('持ち家', input);
+
+    assert.strictEqual(store.currentPlan.getSnapshot().value?.name, '持ち家');
+
+    assert.deepStrictEqual(store.input.getSnapshot().value, input);
+
+    // A file without a name gets the name a new plan would.
+    store.addPlan(undefined, defaultSimulationInput);
+
+    assert.deepStrictEqual(names(store), ['plan a', '持ち家', 'プラン 1']);
+
+    assert.strictEqual(store.currentPlan.getSnapshot().value?.name, 'プラン 1');
+  });
+
   test('creates, duplicates, renames and deletes plans', () => {
     const { store } = setUp(createMemoryRepository([plan('a', 1)]));
 

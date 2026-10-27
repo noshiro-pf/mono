@@ -60,6 +60,11 @@ export type PlanStore = Readonly<{
   createPlan: () => void;
   /** Copies the open plan, and opens the copy. */
   duplicatePlan: () => void;
+  /**
+   * Creates a plan with these inputs, read from a file, and opens it. Without
+   * a name it gets the one {@link createPlan} would give.
+   */
+  addPlan: (name: string | undefined, input: SimulationInput) => void;
   renamePlan: (name: string) => void;
   deletePlan: () => void;
   /** Rewrites the open plan's inputs; nothing happens while there is none. */
@@ -232,6 +237,9 @@ export const createPlanStore = ({
       if (plan !== undefined) {
         createFrom(() => `${plan.name} のコピー`, plan.input);
       }
+    },
+    addPlan: (name, planInput) => {
+      createFrom((existing) => name ?? nextPlanName(existing), planInput);
     },
     renamePlan: (name) => {
       const trimmed = name.trim();
