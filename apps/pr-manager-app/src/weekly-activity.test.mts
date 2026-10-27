@@ -8,6 +8,7 @@ import {
   isoWithOffset,
   loadWeeklyActivity,
   nextMidnightMs,
+  todayOf,
   WEEK_LENGTH,
   weekBefore,
   weeklyActivityQuery,
@@ -189,6 +190,23 @@ describe(activitySearch, () => {
   });
 });
 
+describe(todayOf, () => {
+  test('is the day `nowMs` is in, the whole of it, apart from the week before', () => {
+    const today = todayOf(NOW_MS, TOKYO);
+
+    assert.strictEqual(today.key, '2026-10-18');
+
+    assert.strictEqual(today.startMs, weekBefore(NOW_MS, TOKYO).at(-1)?.endMs);
+
+    assert.strictEqual(today.endMs, nextMidnightMs(NOW_MS, TOKYO));
+
+    assert.strictEqual(
+      today.range,
+      '2026-10-18T00:00:00+09:00..2026-10-18T23:59:59+09:00',
+    );
+  });
+});
+
 describe(weeklyActivityQuery, () => {
   test('asks for one count per day and kind, each search a variable', () => {
     const days = weekBefore(NOW_MS, TOKYO);
@@ -196,9 +214,11 @@ describe(weeklyActivityQuery, () => {
     const { query, variables } = weeklyActivityQuery(
       DEFAULT_REPORT_SOURCE,
       days,
+      todayOf(NOW_MS, TOKYO),
     );
 
-    assert.strictEqual(Object.keys(variables).length, WEEK_LENGTH * 2);
+    // The week's days and today, each merged and closed.
+    assert.strictEqual(Object.keys(variables).length, (WEEK_LENGTH + 1) * 2);
 
     assert.include(
       query,
@@ -211,18 +231,27 @@ describe(weeklyActivityQuery, () => {
       variables['closed_6'],
       'repo:noshiro-pf/mono is:issue is:closed closed:2026-10-17T00:00:00+09:00..2026-10-17T23:59:59+09:00',
     );
+
+    assert.strictEqual(
+      variables['merged_today'],
+      'repo:noshiro-pf/mono is:pr is:merged merged:2026-10-18T00:00:00+09:00..2026-10-18T23:59:59+09:00',
+    );
   });
 });
 
 describe(loadWeeklyActivity, () => {
   test('reads each day’s counts, with the token', async () => {
     const { fetchImpl, sent } = answering({
-      data: Object.fromEntries(
-        Arr.seq(WEEK_LENGTH).flatMap((index) => [
-          [`merged_${index}`, { issueCount: index + 10 }] as const,
-          [`closed_${index}`, { issueCount: index }] as const,
-        ]),
-      ),
+      data: {
+        ...Object.fromEntries(
+          Arr.seq(WEEK_LENGTH).flatMap((index) => [
+            [`merged_${index}`, { issueCount: index + 10 }] as const,
+            [`closed_${index}`, { issueCount: index }] as const,
+          ]),
+        ),
+        merged_today: { issueCount: 2 },
+        closed_today: { issueCount: 1 },
+      },
     });
 
     const loaded = await loadWeeklyActivity(DEFAULT_REPORT_SOURCE, {
@@ -258,6 +287,38 @@ describe(loadWeeklyActivity, () => {
         ['2026-10-17', 16, 6],
       ],
     );
+
+    // Today is apart from the week, and as far as the moment it was read.
+    assert.deepStrictEqual(
+      [
+        loaded.result.value.today.key,
+        loaded.result.value.today.merged,
+        loaded.result.value.today.closed,
+      ],
+      ['2026-10-18', 2, 1],
+    );
+
+    assert.strictEqual(loaded.result.value.countedAtMs, NOW_MS);
+  });
+
+  test('an answer missing today’s count fails the whole read', async () => {
+    const { fetchImpl } = answering({
+      data: Object.fromEntries(
+        Arr.seq(WEEK_LENGTH).flatMap((index) => [
+          [`merged_${index}`, { issueCount: 1 }] as const,
+          [`closed_${index}`, { issueCount: 1 }] as const,
+        ]),
+      ),
+    });
+
+    const loaded = await loadWeeklyActivity(DEFAULT_REPORT_SOURCE, {
+      token: 'secret',
+      nowMs: NOW_MS,
+      timeZone: TOKYO,
+      fetchImpl,
+    });
+
+    assert.isTrue(Result.isErr(loaded.result));
   });
 
   test('a count GitHub could not give fails the week rather than reading as 0', async () => {

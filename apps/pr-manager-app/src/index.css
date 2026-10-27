@@ -1124,6 +1124,19 @@ a:focus-visible {
   min-width: min(28rem, 92vw);
 }
 
+.weekly-activity-heading {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+}
+
+.weekly-activity-as-of {
+  color: var(--ink-secondary);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+
 .weekly-activity-table {
   border-collapse: collapse;
   font-size: 0.875rem;

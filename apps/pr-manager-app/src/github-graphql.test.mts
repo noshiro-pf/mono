@@ -27,7 +27,11 @@ import {
   PULL_REQUESTS_QUERY,
   referencesQuery,
 } from './report-query.mjs';
-import { weekBefore, weeklyActivityQuery } from './weekly-activity.mjs';
+import {
+  todayOf,
+  weekBefore,
+  weeklyActivityQuery,
+} from './weekly-activity.mjs';
 
 describe('the GraphQL queries', () => {
   test.each(QUERIES)(
@@ -82,6 +86,7 @@ const QUERIES: readonly FixedLengthTuple<2, string>[] = [
     weeklyActivityQuery(
       DEFAULT_REPORT_SOURCE,
       weekBefore(/* 2026-10-18T13:00:00Z */ 1_792_328_400_000, 'Asia/Tokyo'),
+      todayOf(/* 2026-10-18T13:00:00Z */ 1_792_328_400_000, 'Asia/Tokyo'),
     ).query,
   ],
 ] as const;
