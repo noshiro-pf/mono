@@ -1,106 +1,48 @@
 <!doctype html>
-<html lang="en">
-  <head prefix="og: http://ogp.me/ns#">
-    <meta charset="utf-8" />
-
-    <!-- favicons -->
-    <link rel="shortcut icon" href="/assets/icons/favicon.ico" />
-    <link
-      rel="apple-touch-icon"
-      sizes="57x57"
-      href="/assets/icons/apple-icon-57x57.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="60x60"
-      href="/assets/icons/apple-icon-60x60.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="72x72"
-      href="/assets/icons/apple-icon-72x72.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="76x76"
-      href="/assets/icons/apple-icon-76x76.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="114x114"
-      href="/assets/icons/apple-icon-114x114.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="120x120"
-      href="/assets/icons/apple-icon-120x120.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="144x144"
-      href="/assets/icons/apple-icon-144x144.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="152x152"
-      href="/assets/icons/apple-icon-152x152.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/assets/icons/apple-icon-180x180.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="/assets/icons/android-icon-192x192.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="/assets/icons/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="96x96"
-      href="/assets/icons/favicon-96x96.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="/assets/icons/favicon-16x16.png"
-    />
-    <meta name="msapplication-TileColor" content="#ffffff" />
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
-      name="msapplication-TileImage"
-      content="/assets/icons/ms-icon-144x144.png"
+      name="description"
+      content="候補日を並べて参加者の都合を集め、多くの人が集まれる日を選ぶ日程調整アプリ"
     />
     <meta name="theme-color" content="#f3ebaa" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="manifest" href="/manifest.json" />
-
-    <!-- OGP -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!--
+      For iOS's "Add to Home Screen", which does not read the SVG favicon and
+      without a touch icon draws the title's first letter instead. The PNG is
+      favicon.svg's drawing on a full square, since iOS rounds the corners
+      itself and fills transparency with black. The title meta is the name
+      proposed under the icon; the home screen cuts off much longer ones.
+    -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="日程調整" />
+    <!--
+      The link card X, Slack, Discord and the like draw for a shared URL.
+      Crawlers do not run the page's script and want absolute URLs here, so
+      og:url and og:image are written out in full: the Firebase Hosting site
+      of the project in .firebaserc. theme-color is the stripe Discord draws
+      beside the card. og-image.png and apple-touch-icon.png are drawn by
+      `pnpm run gen:app-images`.
+    -->
+    <meta property="og:type" content="website" />
     <meta property="og:title" content="イベント日程調整" />
     <meta property="og:description" content="出欠情報を入力してください。" />
-    <meta property="og:url" content="https://event-schedule-app.web.app" />
+    <meta property="og:url" content="https://event-schedule-app.web.app/" />
     <meta
       property="og:image"
-      content="https://event-schedule-app.web.app/assets/preview.png"
+      content="https://event-schedule-app.web.app/og-image.png"
     />
-    <!-- Twitter -->
-    <meta name="twitter:title" content="イベント日程調整" />
-    <meta name="twitter:description" content="出欠情報を入力してください。" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:creator" content="@noshiro_piko" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta
-      name="twitter:image"
-      content="https://event-schedule-app.web.app/assets/preview.png"
+      property="og:image:alt"
+      content="イベント日程調整 — 出欠情報を入力してください。"
     />
-
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@noshiro_piko" />
     <title>イベント日程調整</title>
   </head>
   <body>

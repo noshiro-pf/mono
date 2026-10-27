@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- A house: what the loan is for. -->
+  <rect width="32" height="32" rx="7" fill="#1d4859" />
+  <path d="M16 6.5L5.5 15.5h3V25.5h15V15.5h3z" fill="#fff" stroke="#fff" stroke-width="1.5" stroke-linejoin="round" />
+  <rect x="13.5" y="18" width="5" height="7.5" rx="0.8" fill="#1d4859" />
+</svg>

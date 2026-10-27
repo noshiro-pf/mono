@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!--
+    A calendar page with one day marked: the drawing the app has always used,
+    redrawn as vector so it stays sharp at tab size.
+  -->
+  <rect width="32" height="32" rx="7" fill="#475f8e" />
+  <rect x="6" y="8" width="20" height="18" rx="2.5" fill="#fff" />
+  <path d="M8.5 8h15a2.5 2.5 0 0 1 2.5 2.5V13H6v-2.5A2.5 2.5 0 0 1 8.5 8z" fill="#f44e57" />
+  <g fill="#fff" stroke="#475f8e" stroke-width="1">
+    <rect x="10.5" y="5" width="2.5" height="5.5" rx="1.25" />
+    <rect x="19" y="5" width="2.5" height="5.5" rx="1.25" />
+  </g>
+  <g fill="#cfd5e2">
+    <rect x="8.5" y="15.5" width="3.5" height="3.5" rx="0.6" />
+    <rect x="14.25" y="15.5" width="3.5" height="3.5" rx="0.6" />
+    <rect x="20" y="15.5" width="3.5" height="3.5" rx="0.6" />
+    <rect x="8.5" y="20.5" width="3.5" height="3.5" rx="0.6" />
+    <rect x="14.25" y="20.5" width="3.5" height="3.5" rx="0.6" />
+  </g>
+  <rect x="20" y="20.5" width="3.5" height="3.5" rx="0.6" fill="#f44e57" />
+</svg>

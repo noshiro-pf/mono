@@ -15,6 +15,27 @@ export default defineConfig({
       customCss: ['./src/styles/custom.css'],
       // synstate's own icon, until synstate-dom has one.
       favicon: '/favicon.ico',
+      head: [
+        // The stripe Discord draws beside the link card; synstate's blue.
+        { tag: 'meta', attrs: { name: 'theme-color', content: '#3b82f6' } },
+        // For iOS's "Add to Home Screen", which does not read the favicon and
+        // without a touch icon draws the title's first letter instead. The
+        // PNG is synstate's, from `apps/synstate-docs/public/favicon/`.
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'apple-touch-icon',
+            href: '/mono/synstate-dom/apple-touch-icon.png',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'apple-mobile-web-app-title',
+            content: 'synstate-dom',
+          },
+        },
+      ],
       defaultLocale: 'root',
       locales: {
         root: { label: 'English', lang: 'en' },

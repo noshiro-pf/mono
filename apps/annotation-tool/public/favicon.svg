@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- A bounding box with its corner handles: what the tool draws on an image. -->
+  <rect width="32" height="32" rx="7" fill="#6d28d9" />
+  <rect x="8" y="8" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="3 2.4" stroke-dashoffset="-1.5" />
+  <g fill="#fff">
+    <rect x="5.5" y="5.5" width="5" height="5" rx="1" />
+    <rect x="21.5" y="5.5" width="5" height="5" rx="1" />
+    <rect x="5.5" y="21.5" width="5" height="5" rx="1" />
+    <rect x="21.5" y="21.5" width="5" height="5" rx="1" />
+  </g>
+</svg>

@@ -1,8 +1,50 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="見分けやすい N 色を選ぶ関数のデモ。隣り合う色のコントラスト比を確かめながら色相・彩度・明度を変えられる"
+    />
+    <meta name="theme-color" content="#1f2328" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!--
+      For iOS's "Add to Home Screen", which does not read the SVG favicon and
+      without a touch icon draws the title's first letter instead. The PNG is
+      favicon.svg's drawing on a full square, since iOS rounds the corners
+      itself and fills transparency with black. The title meta is the name
+      proposed under the icon; the home screen cuts off much longer ones.
+    -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Color Demo" />
+    <!--
+      The link card X, Slack, Discord and the like draw for a shared URL.
+      Crawlers do not run the page's script and want absolute URLs here, so
+      og:url and og:image are written out in full: the Firebase Hosting site
+      of the project in .firebaserc. theme-color is the stripe Discord draws
+      beside the card. og-image.png and apple-touch-icon.png are drawn by
+      `pnpm run gen:app-images`.
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Color Demo" />
+    <meta
+      property="og:description"
+      content="見分けやすい N 色を選ぶ関数のデモ。隣り合う色のコントラスト比を確かめながら色相・彩度・明度を変えられる"
+    />
+    <meta property="og:url" content="https://color-demo-app.web.app/" />
+    <meta
+      property="og:image"
+      content="https://color-demo-app.web.app/og-image.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Color Demo — 見分けやすい N 色を選ぶ関数のデモ。隣り合う色のコントラスト比を確かめながら色相・彩度・明度を変えられる"
+    />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Share+Tech+Mono"
