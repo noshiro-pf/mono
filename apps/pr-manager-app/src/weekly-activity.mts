@@ -1,15 +1,18 @@
 /**
  * How many pull requests merged and how many issues closed on each of the
- * last seven days, for the dialog the header's "Activity" button opens.
+ * last seven days, and so far today, for the dialog the header's "Activity"
+ * button opens.
  *
  * **A day is the reader's own**: it starts at midnight in the browser's time
  * zone, not in UTC, because "how many did I merge on Tuesday" is a question
  * about the reader's Tuesday. The seven are the days that have ended — up to
  * yesterday — so a count never changes once it is shown; the week moves on
  * at midnight, which is when the store reads it again (`activity-store.mts`).
+ * **Today is counted apart from them**: it is still going, so its counts are
+ * as of the read, and none of the week's (its total included) waits on it.
  *
  * **Counted by GitHub's search** rather than by listing what merged and
- * closed: one `issueCount` per day and kind, fourteen aliased fields in one
+ * closed: one `issueCount` per day and kind, sixteen aliased fields in one
  * query, so the cost is the same however busy the week was. A search
  * qualifier takes a time with an offset, which is what puts each day's
  * bounds at the reader's midnight. The merged section's list
@@ -45,8 +48,12 @@ export type DayActivity = ActivityDay &
 export type WeeklyActivity = Readonly<{
   /** Oldest first, ending with yesterday. */
   days: readonly DayActivity[];
+  /** Today so far: the whole day is searched, up to {@link countedAtMs}. */
+  today: DayActivity;
   /** The day the week was counted on, which it ends the day before. */
   countedOn: string;
+  /** When it was counted, which is how far into today {@link today} runs. */
+  countedAtMs: number;
 }>;
 
 /**
@@ -67,6 +74,14 @@ export const weekBefore = (
     dayOf(today - WEEK_LENGTH + index, timeZone),
   );
 };
+
+/**
+ * The day `nowMs` is in, in `timeZone`, from its midnight to the next. The
+ * search runs to the end of the day rather than to `nowMs`, which finds
+ * nothing more now and keeps a count's link right when it is followed later.
+ */
+export const todayOf = (nowMs: number, timeZone?: string): ActivityDay =>
+  dayOf(epochDayOf(nowMs, timeZone), timeZone);
 
 /** The `YYYY-MM-DD` of the day `nowMs` is in, in `timeZone`. */
 export const dayKeyOf = (nowMs: number, timeZone?: string): string =>
@@ -134,20 +149,25 @@ export const activitySearchUrl = (
 };
 
 /**
- * One query for the whole week: `merged_N` and `closed_N` for the `N`th day,
- * each a search asked only for its count. Every search string is a
- * variable, as a follow-up's values are (`report-query.mts`).
+ * One query for the whole week and today: `merged_N` and `closed_N` for the
+ * `N`th day, `merged_today` and `closed_today` for today, each a search asked
+ * only for its count. Every search string is a variable, as a follow-up's
+ * values are (`report-query.mts`).
  */
 export const weeklyActivityQuery = (
   source: ReportSource,
   days: readonly ActivityDay[],
+  today: ActivityDay,
 ): Readonly<{
   query: string;
   variables: ReadonlyRecord<string, string>;
 }> => {
-  const fields = days.flatMap((day, index) =>
+  const fields = Arr.toPushed(
+    days.map((day, index) => ({ day, suffix: String(index) })),
+    { day: today, suffix: TODAY_SUFFIX },
+  ).flatMap(({ day, suffix }) =>
     KINDS.map((kind) => ({
-      alias: alias(kind, index),
+      alias: alias(kind, suffix),
       search: activitySearch(source, kind, day),
     })),
   );
@@ -178,9 +198,10 @@ export type WeeklyActivityRequest = Readonly<{
 }>;
 
 /**
- * The week before the day `nowMs` is in, counted, or a sentence a reader can
- * act on. A count GitHub could not give fails the whole week: a day drawn
- * as `0` that was really unanswered would be read as a quiet day.
+ * The week before the day `nowMs` is in, and that day so far, counted, or a
+ * sentence a reader can act on. A count GitHub could not give fails the
+ * whole read: a day drawn as `0` that was really unanswered would be read as
+ * a quiet day.
  */
 export const loadWeeklyActivity = async (
   source: ReportSource,
@@ -190,7 +211,9 @@ export const loadWeeklyActivity = async (
 
   const days = weekBefore(nowMs, timeZone);
 
-  const { query, variables } = weeklyActivityQuery(source, days);
+  const today = todayOf(nowMs, timeZone);
+
+  const { query, variables } = weeklyActivityQuery(source, days, today);
 
   const answered = await askGraphql({
     query,
@@ -216,17 +239,13 @@ export const loadWeeklyActivity = async (
     };
   }
 
-  const counted = days.map((day, index) => {
-    const mergedCount = countAt(data, alias('merged', index));
+  const counted = days.map((day, index) =>
+    countedDay(data, day, String(index)),
+  );
 
-    const closedCount = countAt(data, alias('closed', index));
+  const todayCounted = countedDay(data, today, TODAY_SUFFIX);
 
-    return mergedCount === undefined || closedCount === undefined
-      ? undefined
-      : { ...day, merged: mergedCount, closed: closedCount };
-  });
-
-  if (counted.includes(undefined)) {
+  if (todayCounted === undefined || counted.includes(undefined)) {
     return {
       rateLimit,
       result: Result.err(
@@ -239,7 +258,9 @@ export const loadWeeklyActivity = async (
     rateLimit,
     result: Result.ok({
       days: counted.filter((day) => day !== undefined),
+      today: todayCounted,
       countedOn: dayKeyOf(nowMs, timeZone),
+      countedAtMs: nowMs,
     }),
   };
 };
@@ -252,8 +273,24 @@ const MINUTE_MS = 60_000;
 
 const DAY_MS = 86_400_000;
 
-const alias = (kind: ActivityKind, index: number): string =>
-  `${kind}_${index}` as const;
+const TODAY_SUFFIX = 'today';
+
+const alias = (kind: ActivityKind, suffix: string): string =>
+  `${kind}_${suffix}` as const;
+
+const countedDay = (
+  data: unknown,
+  day: ActivityDay,
+  suffix: string,
+): DayActivity | undefined => {
+  const mergedCount = countAt(data, alias('merged', suffix));
+
+  const closedCount = countAt(data, alias('closed', suffix));
+
+  return mergedCount === undefined || closedCount === undefined
+    ? undefined
+    : { ...day, merged: mergedCount, closed: closedCount };
+};
 
 const countAt = (data: unknown, key: string): number | undefined => {
   if (!isRecord(data)) {

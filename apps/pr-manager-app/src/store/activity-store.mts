@@ -1,12 +1,12 @@
 /**
- * The week's activity dialog: whether it is open, and the week it shows
- * (`weekly-activity.mts`).
+ * The week's activity dialog: whether it is open, and the week and today it
+ * shows (`weekly-activity.mts`).
  *
- * **Read when it is opened, not with the report.** The counts are of days
- * that have ended, so they cannot change until midnight, and a reader who
- * never opens the dialog should not pay a search a poll for them. Once read,
- * the week is kept for the rest of the day: opening the dialog again shows
- * it at once and asks GitHub nothing.
+ * **Read when it is opened, not with the report**: a reader who never opens
+ * the dialog should not pay a search a poll for it. The week's counts are of
+ * days that have ended, but today's are still moving, so every opening reads
+ * again — one query, both together. On the day it was read, what is held is
+ * shown meanwhile rather than "Counting…", since only today can differ.
  *
  * **Midnight moves the week on.** A timer set for the next local midnight
  * reads the new week then if the dialog is open, and otherwise forgets the
@@ -65,7 +65,8 @@ export const createActivityStore = (deps: ActivityDeps): ActivityStore => {
   // token changed, or midnight passed — is dropped rather than shown.
   const mut_reads = { latest: 0 };
 
-  const read = (): void => {
+  /** `keep` leaves what is shown on screen until the answer replaces it. */
+  const read = (keep = false): void => {
     mut_reads.latest += 1;
 
     const id = mut_reads.latest;
@@ -81,7 +82,9 @@ export const createActivityStore = (deps: ActivityDeps): ActivityStore => {
       return;
     }
 
-    setStatus({ type: 'loading' });
+    if (!keep) {
+      setStatus({ type: 'loading' });
+    }
 
     deps
       .load(stored.value, deps.now())
@@ -99,23 +102,19 @@ export const createActivityStore = (deps: ActivityDeps): ActivityStore => {
       .catch(() => undefined);
   };
 
-  /** Whether what is held is a week that still stands, or on its way. */
-  const current = (): boolean => {
-    const held = getStatus();
-
-    return (
-      held.type === 'loading' ||
-      (held.type === 'ready' &&
-        held.activity.countedOn === dayKeyOf(deps.now()))
-    );
-  };
-
   const openDialog = (): void => {
     setOpen(true);
 
-    if (!current()) {
-      read();
+    const held = getStatus();
+
+    if (held.type === 'loading') {
+      return;
     }
+
+    // Read on the same day, the week still stands and only today is redone.
+    read(
+      held.type === 'ready' && held.activity.countedOn === dayKeyOf(deps.now()),
+    );
   };
 
   const closeDialog = (): void => {
@@ -173,7 +172,9 @@ export const createActivityStore = (deps: ActivityDeps): ActivityStore => {
     status: activityStatus,
     openDialog,
     closeDialog,
-    retry: read,
+    retry: () => {
+      read();
+    },
     start,
   };
 };

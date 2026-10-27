@@ -6,7 +6,7 @@ import { dayKeyOf, type WeeklyActivity } from '../weekly-activity.mjs';
 import { createActivityStore } from './activity-store.mjs';
 
 describe(createActivityStore, () => {
-  test('reads nothing until it is opened, then reads the week once for the day', async () => {
+  test('reads nothing until it is opened, then reads the week', async () => {
     const { store, loads, answer } = setup();
 
     store.start();
@@ -25,14 +25,47 @@ describe(createActivityStore, () => {
 
     assert.strictEqual(store.status.getSnapshot().value.type, 'ready');
 
+    assert.strictEqual(loads.length, 1);
+
+    assert.strictEqual(loads[0]?.token, 'secret');
+  });
+
+  test('opened again on the same day, it shows what it holds while reading today again', async () => {
+    const { store, loads, answer } = setup();
+
+    store.openDialog();
+
+    answer(0, week(TODAY, 1));
+
+    await settle();
+
     store.closeDialog();
 
     store.openDialog();
 
-    // The same day: what was read is shown again, and nothing is asked.
-    assert.strictEqual(loads.length, 1);
+    // Today is still going, so it is asked again; the week held stays on
+    // screen meanwhile rather than "Counting…".
+    assert.strictEqual(loads.length, 2);
 
-    assert.strictEqual(loads[0]?.token, 'secret');
+    assert.strictEqual(todayMergedOf(store), 1);
+
+    answer(1, week(TODAY, 3));
+
+    await settle();
+
+    assert.strictEqual(todayMergedOf(store), 3);
+  });
+
+  test('opened again while a read is on its way, it asks nothing more', () => {
+    const { store, loads } = setup();
+
+    store.openDialog();
+
+    store.closeDialog();
+
+    store.openDialog();
+
+    assert.strictEqual(loads.length, 1);
   });
 
   test('opened on a later day than the week held, it reads again', async () => {
@@ -51,6 +84,9 @@ describe(createActivityStore, () => {
     store.openDialog();
 
     assert.strictEqual(loads.length, 2);
+
+    // Yesterday's week is not shown while the new one is read.
+    assert.strictEqual(store.status.getSnapshot().value.type, 'loading');
   });
 
   test('midnight reads the new week while the dialog is open, and forgets it while closed', async () => {
@@ -161,8 +197,31 @@ const TOMORROW_MS = NOW_MS + 86_400_000;
 
 const TODAY = 'today';
 
-const week = (countedOn: string): Answered<WeeklyActivity>['result'] =>
-  Result.ok({ days: [], countedOn });
+const week = (
+  countedOn: string,
+  todayMerged = 0,
+): Answered<WeeklyActivity>['result'] =>
+  Result.ok({
+    days: [],
+    today: {
+      key: countedOn,
+      startMs: 0,
+      endMs: 0,
+      range: '',
+      merged: todayMerged,
+      closed: 0,
+    },
+    countedOn,
+    countedAtMs: NOW_MS,
+  });
+
+const todayMergedOf = (
+  store: ReturnType<typeof createActivityStore>,
+): number | undefined => {
+  const status = store.status.getSnapshot().value;
+
+  return status.type === 'ready' ? status.activity.today.merged : undefined;
+};
 
 const setup = (): Readonly<{
   store: ReturnType<typeof createActivityStore>;
