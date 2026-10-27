@@ -151,7 +151,7 @@ terminates. `build` and `doc` write untracked output. Consequences:
   `check:prose:*` script is in CI with no other wiring. `check:prose` must
   stay buildless.
 
-Main entry points: `ws:build`, `ws:gen`, `ws:check:types`, `ws:fix:lint`,
+Main entry points: `ws:build[:deps]`, `ws:gen`, `ws:check:types`, `ws:fix:lint`,
 `ws:check:test[:cov|:browser]`, `ws:check:e2e`, `ws:check:dist`,
 `ws:check:ext`, `ws:check:sumi`, `ws:doc`, `check:cspell`, `check:md`,
 `check:prose`, `check:root`, `check:knip`, `check:published-deps`,

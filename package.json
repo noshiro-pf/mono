@@ -106,6 +106,7 @@
     "verify:npm-packages:published": "pnpm run verify:npm-packages --published",
     "verify:npm-packages:published:update": "pnpm run verify:npm-packages --published --update",
     "ws:build": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/ws-build-stages.mts",
+    "ws:build:deps": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/ws-build-deps-stages.mts",
     "ws:check:dist": "node ./tools/scripts/cmd/assert-deps-built.mts --workspace && pnpm run --recursive --if-present \"/^check:dist/\"",
     "ws:check:e2e": "node ./tools/scripts/cmd/assert-deps-built.mts --workspace && pnpm run --recursive --workspace-concurrency=1 --if-present check:e2e",
     "ws:check:ext": "pnpm run --recursive --if-present check:ext",
