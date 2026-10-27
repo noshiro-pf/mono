@@ -5,8 +5,7 @@ import { calculatedValues$, store$ } from '../../store/index.mjs';
 import { DataItem } from './data-item.js';
 
 export const SummarySection = memoNamed('SummarySection', () => {
-  const { repaymentType, downPaymentManYen, borrowingTotalManYen } =
-    useObservableValue(store$);
+  const { repaymentType, borrowingTotalManYen } = useObservableValue(store$);
 
   const {
     fixedPrincipalYenPerMonth,
@@ -40,11 +39,7 @@ export const SummarySection = memoNamed('SummarySection', () => {
       <DataItem
         cyIdForDescription={'paymentsSumDescription'}
         cyIdForTitle={'paymentsSumTitle'}
-        description={`${(
-          downPaymentManYen +
-          borrowingTotalManYen +
-          interestSumManYen
-        ).toFixed(2)}万円`}
+        description={`${(borrowingTotalManYen + interestSumManYen).toFixed(2)}万円`}
         title={dict.paymentsSum}
       />
     </dl>
