@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "synstate": ">=5.0.1",
+    "synstate": ">=6.0.0",
     "synstate-dom": "file:../../../.tarballs/synstate-dom.tgz",
     "ts-data-forge": ">=14.10.0"
   }

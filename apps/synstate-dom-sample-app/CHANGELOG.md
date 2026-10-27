@@ -1,5 +1,14 @@
 # synstate-dom-sample-app
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [ddbb770]
+- Updated dependencies [ddbb770]
+    - synstate-dom@0.3.0
+    - synstate@6.0.0
+
 ## 0.0.3
 
 ### Patch Changes

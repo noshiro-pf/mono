@@ -1,5 +1,14 @@
 # lambda-calculus-interpreter-preact
 
+## 0.0.18
+
+### Patch Changes
+
+- Updated dependencies [ddbb770]
+    - synstate@6.0.0
+    - synstate-preact-hooks@6.0.0
+    - preact-utils@0.0.17
+
 ## 0.0.17
 
 ### Patch Changes

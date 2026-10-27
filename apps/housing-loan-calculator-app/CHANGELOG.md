@@ -1,5 +1,18 @@
 # housing-loan-calculator-app
 
+## 0.0.22
+
+### Patch Changes
+
+- Updated dependencies [ddbb770]
+- Updated dependencies [c5f2503]
+    - synstate@6.0.0
+    - synstate-react-hooks@6.0.0
+    - ts-fortress@12.4.1
+    - react-blueprintjs-utils@0.0.23
+    - react-utils@0.0.20
+    - tiny-router-observable@0.0.20
+
 ## 0.0.21
 
 ### Patch Changes
