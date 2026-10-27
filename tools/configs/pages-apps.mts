@@ -1,10 +1,8 @@
 import * as path from 'node:path';
-import { hasKey, isRecord } from 'ts-data-forge';
-import type { FixedLengthTuple } from 'ts-type-forge';
 
 /**
- * The apps published as part of the GitHub Pages site, and the directory each
- * one is served from.
+ * The apps published as part of the GitHub Pages site, by package directory
+ * name, which is also the directory each one is served from.
  *
  * Two places need this and they must not disagree: Vite writes the asset URLs
  * at build time from `base`, and `build-pages-site.mts` decides where the
@@ -12,22 +10,22 @@ import type { FixedLengthTuple } from 'ts-type-forge';
  * a path nothing serves — a blank screen with a 404 in the console and no
  * failing check anywhere, since both halves did exactly what they were told.
  *
- * Keyed by the package's directory name, in the same way and for the same
- * reason as `app-dev-ports.mts`.
+ * The site directory is the package directory, not a second name kept beside
+ * it, so renaming an app's directory moves its URL.
  */
-const pagesApps = {
-  'annotation-tool': 'annotation-tool',
-  'cant-stop-probability-app': 'cant-stop-probability',
-  'catan-dice-app': 'catan-dice',
-  'color-demo-app': 'color-demo',
-  'housing-loan-calculator-app': 'housing-loan-calculator',
-  'lambda-calculus-interpreter-preact': 'lambda-calculus-interpreter-preact',
-  'lambda-calculus-interpreter-react': 'lambda-calculus-interpreter-react',
-  'life-plan-simulator': 'life-plan-simulator',
-  'pr-manager-app': 'pr-manager',
-  'profile-app': 'profile',
-  'task-manager-app': 'task-manager',
-} as const;
+const pagesApps: readonly string[] = [
+  'annotation-tool',
+  'cant-stop-probability',
+  'catan-dice',
+  'color-demo',
+  'housing-loan-calculator',
+  'lambda-calculus-interpreter-preact',
+  'lambda-calculus-interpreter-react',
+  'life-plan-simulator',
+  'pr-manager',
+  'profile',
+  'task-manager',
+];
 
 /**
  * The repository's Pages site is a project site, so everything it serves is
@@ -42,13 +40,13 @@ export const PAGES_SITE_ORIGIN = 'https://noshiro-pf.github.io';
 export const pagesAppDir = (packageRoot: string): string => {
   const name = path.basename(packageRoot);
 
-  if (!(isRecord(pagesApps) && hasKey(pagesApps, name))) {
+  if (!pagesApps.includes(name)) {
     throw new Error(
       `pagesAppDir: "${name}" is not published to Pages. Add it to tools/configs/pages-apps.mts.`,
     );
   }
 
-  return pagesApps[name as keyof typeof pagesApps];
+  return name;
 };
 
 /** The same, as the URL prefix Vite writes into the built `index.html`. */
@@ -59,6 +57,5 @@ export const pagesAppBase = (packageRoot: string): string =>
 export const pagesAppUrl = (packageRoot: string): string =>
   `${PAGES_SITE_ORIGIN}${pagesAppBase(packageRoot)}`;
 
-/** Every published app, as `[package directory, site directory]` pairs. */
-export const pagesAppEntries = (): readonly FixedLengthTuple<2, string>[] =>
-  Object.entries(pagesApps);
+/** The directory name of every published app, under `apps/` and the site. */
+export const pagesAppDirs = (): readonly string[] => pagesApps;

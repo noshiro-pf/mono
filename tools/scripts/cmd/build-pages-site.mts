@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted, pathExists } from 'ts-repo-utils';
-import { pagesAppEntries } from '../../configs/pages-apps.mjs';
+import { pagesAppDirs } from '../../configs/pages-apps.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -30,7 +30,8 @@ import { projectRootPath } from '../project-root-path.mjs';
  *
  * An app's directory here and the `base` its bundle was built with have to
  * agree, or the page loads and then asks for its script at a path nothing
- * serves. Both come from `tools/configs/pages-apps.mts` for that reason.
+ * serves. Both are the app's directory under `apps/`, as listed in
+ * `tools/configs/pages-apps.mts`.
  */
 export const buildPagesSite = async (): Promise<Result<number, string>> => {
   const outDir = path.resolve(projectRootPath, '_site');
@@ -78,21 +79,21 @@ export const buildPagesSite = async (): Promise<Result<number, string>> => {
     mut_published.push({ name: siteDir, from: 'Astro' });
   }
 
-  for (const [packageDir, siteDir] of pagesAppEntries()) {
-    const appBuild = path.resolve(projectRootPath, 'apps', packageDir, 'build');
+  for (const appDir of pagesAppDirs()) {
+    const appBuild = path.resolve(projectRootPath, 'apps', appDir, 'build');
 
     if (!(await pathExists(path.resolve(appBuild, 'index.html')))) {
       return Result.err(
         [
-          `${packageDir} has no built app at ${appBuild}/index.html.`,
+          `${appDir} has no built app at ${appBuild}/index.html.`,
           'Run `pnpm run ws:build` first.',
         ].join('\n'),
       );
     }
 
-    await fs.cp(appBuild, path.resolve(outDir, siteDir), { recursive: true });
+    await fs.cp(appBuild, path.resolve(outDir, appDir), { recursive: true });
 
-    mut_published.push({ name: siteDir, from: 'app' });
+    mut_published.push({ name: appDir, from: 'app' });
   }
 
   const indexPath = path.resolve(outDir, 'index.html');

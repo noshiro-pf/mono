@@ -118,7 +118,7 @@ export const licensePolicy = {
       license: 'EPL-2.0 OR GPL-3.0-or-later',
       packages: ['elkjs'],
       reason:
-        'Taken under EPL-2.0, the first of the two: file-level copyleft, like MPL. `apps/task-manager-app` bundles it unmodified and serves it, which is distribution in object code, so the copy has to keep its notice and say where the source is — the minifier drops the notice the file carries, and the app’s Vite config puts a short one, with the source URL, back in front of the chunk ELK lands in. The app around it may stay under its own license. What to watch: modifying ELK (a `pnpm patch`) obliges publishing the modified files under EPL-2.0; and a build change that moves ELK into a chunk the banner does not match leaves the copy without its notice.',
+        'Taken under EPL-2.0, the first of the two: file-level copyleft, like MPL. `apps/task-manager` bundles it unmodified and serves it, which is distribution in object code, so the copy has to keep its notice and say where the source is — the minifier drops the notice the file carries, and the app’s Vite config puts a short one, with the source URL, back in front of the chunk ELK lands in. The app around it may stay under its own license. What to watch: modifying ELK (a `pnpm patch`) obliges publishing the modified files under EPL-2.0; and a build change that moves ELK into a chunk the banner does not match leaves the copy without its notice.',
     },
     {
       license: 'LGPL-3.0-or-later',

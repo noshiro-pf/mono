@@ -16,14 +16,14 @@ graph LR
   annotation_tool["annotation-tool"]
   blueprintjs_playground["blueprintjs-playground"]
   blueprintjs_playground_styled["blueprintjs-playground-styled"]
-  cant_stop_probability_app["cant-stop-probability-app"]
-  catan_dice_app["catan-dice-app"]
-  color_demo_app["color-demo-app"]
+  cant_stop_probability["cant-stop-probability"]
+  catan_dice["catan-dice"]
+  color_demo["color-demo"]
   event_schedule_app["event-schedule-app"]
   event_schedule_app_functions["event-schedule-app-functions"]
   event_schedule_app_shared["event-schedule-app-shared"]
   github_view_defaults_extension["github-view-defaults-extension"]
-  housing_loan_calculator_app["housing-loan-calculator-app"]
+  housing_loan_calculator["housing-loan-calculator"]
   lambda_calculus_interpreter_core["lambda-calculus-interpreter-core"]
   lambda_calculus_interpreter_preact["lambda-calculus-interpreter-preact"]
   lambda_calculus_interpreter_react["lambda-calculus-interpreter-react"]
@@ -32,9 +32,9 @@ graph LR
   mahjong_scoring_tool["mahjong-scoring-tool"]
   numeric_input_utils["numeric-input-utils"]
   poll_discord_app["poll-discord-app"]
-  pr_manager_app["pr-manager-app"]
+  pr_manager["pr-manager"]
   preact_utils["preact-utils"]
-  profile_app["profile-app"]
+  profile["profile"]
   react_blueprintjs_utils["react-blueprintjs-utils"]
   react_mui_utils["react-mui-utils"]
   react_utils["react-utils"]
@@ -47,7 +47,7 @@ graph LR
   synstate_dom_benchmark["synstate-dom-benchmark"]
   synstate_dom_docs["synstate-dom-docs"]
   synstate_dom_sample_app["synstate-dom-sample-app"]
-  task_manager_app["task-manager-app"]
+  task_manager["task-manager"]
   tiny_router_observable["tiny-router-observable"]
   tiny_router_preact_hooks["tiny-router-preact-hooks"]
   tiny_router_react_hooks["tiny-router-react-hooks"]
@@ -98,21 +98,21 @@ graph LR
   blueprintjs_playground --> react_utils
   blueprintjs_playground_styled --> react_blueprintjs_utils
   blueprintjs_playground_styled --> react_utils
-  cant_stop_probability_app --> react_blueprintjs_utils
-  cant_stop_probability_app --> react_utils
-  cant_stop_probability_app --> synstate
-  cant_stop_probability_app --> synstate_react_hooks
-  cant_stop_probability_app --> ts_data_forge
-  cant_stop_probability_app --> ts_fortress
-  catan_dice_app --> react_utils
-  catan_dice_app --> synstate
-  catan_dice_app --> synstate_react_hooks
-  catan_dice_app --> ts_data_forge
-  color_demo_app --> better_react_use_state
-  color_demo_app --> react_mui_utils
-  color_demo_app --> react_utils
-  color_demo_app --> ts_data_forge
-  color_demo_app --> ts_utils_additional
+  cant_stop_probability --> react_blueprintjs_utils
+  cant_stop_probability --> react_utils
+  cant_stop_probability --> synstate
+  cant_stop_probability --> synstate_react_hooks
+  cant_stop_probability --> ts_data_forge
+  cant_stop_probability --> ts_fortress
+  catan_dice --> react_utils
+  catan_dice --> synstate
+  catan_dice --> synstate_react_hooks
+  catan_dice --> ts_data_forge
+  color_demo --> better_react_use_state
+  color_demo --> react_mui_utils
+  color_demo --> react_utils
+  color_demo --> ts_data_forge
+  color_demo --> ts_utils_additional
   event_schedule_app --> better_react_use_state
   event_schedule_app --> event_schedule_app_shared
   event_schedule_app --> numeric_input_utils
@@ -133,14 +133,14 @@ graph LR
   event_schedule_app_shared --> ts_fortress
   event_schedule_app_shared --> ts_fortress_types
   github_view_defaults_extension --> ts_data_forge
-  housing_loan_calculator_app --> numeric_input_utils
-  housing_loan_calculator_app --> react_blueprintjs_utils
-  housing_loan_calculator_app --> react_utils
-  housing_loan_calculator_app --> synstate
-  housing_loan_calculator_app --> synstate_react_hooks
-  housing_loan_calculator_app --> tiny_router_observable
-  housing_loan_calculator_app --> ts_data_forge
-  housing_loan_calculator_app --> ts_fortress
+  housing_loan_calculator --> numeric_input_utils
+  housing_loan_calculator --> react_blueprintjs_utils
+  housing_loan_calculator --> react_utils
+  housing_loan_calculator --> synstate
+  housing_loan_calculator --> synstate_react_hooks
+  housing_loan_calculator --> tiny_router_observable
+  housing_loan_calculator --> ts_data_forge
+  housing_loan_calculator --> ts_fortress
   lambda_calculus_interpreter_core --> ts_data_forge
   lambda_calculus_interpreter_preact --> lambda_calculus_interpreter_core
   lambda_calculus_interpreter_preact --> preact_utils
@@ -167,21 +167,21 @@ graph LR
   numeric_input_utils --> ts_data_forge
   poll_discord_app --> ts_data_forge
   poll_discord_app --> ts_fortress
-  pr_manager_app --> pr_report_core
-  pr_manager_app --> synstate
-  pr_manager_app --> synstate_dom
-  pr_manager_app --> ts_data_forge
-  pr_manager_app --> ts_fortress
+  pr_manager --> pr_report_core
+  pr_manager --> synstate
+  pr_manager --> synstate_dom
+  pr_manager --> ts_data_forge
+  pr_manager --> ts_fortress
   preact_utils --> better_preact_use_state
   preact_utils --> synstate
   preact_utils --> ts_data_forge
   preact_utils --> ts_std_forge
-  profile_app --> better_preact_use_state
-  profile_app --> preact_utils
-  profile_app --> resize_observer_preact_hooks
-  profile_app --> synstate_preact_hooks
-  profile_app --> tiny_router_observable
-  profile_app --> ts_data_forge
+  profile --> better_preact_use_state
+  profile --> preact_utils
+  profile --> resize_observer_preact_hooks
+  profile --> synstate_preact_hooks
+  profile --> tiny_router_observable
+  profile --> ts_data_forge
   react_blueprintjs_utils --> better_react_use_state
   react_blueprintjs_utils --> react_utils
   react_blueprintjs_utils --> synstate
@@ -218,11 +218,11 @@ graph LR
   synstate_dom_sample_app --> synstate
   synstate_dom_sample_app --> synstate_dom
   synstate_dom_sample_app --> ts_data_forge
-  task_manager_app --> blueprint_synstate
-  task_manager_app --> synstate
-  task_manager_app --> synstate_dom
-  task_manager_app --> ts_data_forge
-  task_manager_app --> ts_fortress
+  task_manager --> blueprint_synstate
+  task_manager --> synstate
+  task_manager --> synstate_dom
+  task_manager --> ts_data_forge
+  task_manager --> ts_fortress
   tiny_router_observable --> synstate
   tiny_router_observable --> ts_data_forge
   ts_fortress_types --> ts_data_forge
@@ -309,16 +309,16 @@ graph LR
 
 ### `ws:build` が使う段階
 
-| 段階 | パッケージ                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| ---: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|    1 | `synstate-dom-docs`, `tiny-router-preact-hooks`, `tiny-router-react-hooks`, `better-preact-use-state`, `better-react-use-state`, `ts-type-forge`                                                                                                                                                                                                                                                                                                                |
-|    2 | `eslint-rule-forge`, `ts-std-forge`                                                                                                                                                                                                                                                                                                                                                                                                                             |
-|    3 | `eslint-plugin-synstate`, `eslint-plugin-ts-std-forge`, `ts-data-forge`                                                                                                                                                                                                                                                                                                                                                                                         |
-|    4 | `github-view-defaults-extension`, `lambda-calculus-interpreter-core`, `mahjong-scoring-tool`, `numeric-input-utils`, `resize-observer-preact-hooks`, `resize-observer-react-hooks`, `ts-utils-additional`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`                                                                       |
-|    5 | `poll-discord-app`, `preact-utils`, `react-utils`, `slack-archive-tools`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `pr-report-core`, `synstate-dom`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                                                                                                                                    |
-|    6 | `algo-app`, `annotation-tool`, `blueprintjs-playground`, `catan-dice-app`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `mahjong-calculator-app`, `pr-manager-app`, `profile-app`, `react-blueprintjs-utils`, `react-utils-styled`, `split-view-extension`, `@synstate/docs`, `synstate-dom-benchmark`, `synstate-dom-sample-app`, `blueprint-synstate`, `github-settings-as-code`, `pr-merge-queue` |
-|    7 | `blueprintjs-playground-styled`, `cant-stop-probability-app`, `event-schedule-app`, `event-schedule-app-functions`, `housing-loan-calculator-app`, `life-plan-simulator`, `react-mui-utils`, `task-manager-app`                                                                                                                                                                                                                                                 |
-|    8 | `color-demo-app`                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| 段階 | パッケージ                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ---: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|    1 | `synstate-dom-docs`, `tiny-router-preact-hooks`, `tiny-router-react-hooks`, `better-preact-use-state`, `better-react-use-state`, `ts-type-forge`                                                                                                                                                                                                                                                                                                    |
+|    2 | `eslint-rule-forge`, `ts-std-forge`                                                                                                                                                                                                                                                                                                                                                                                                                 |
+|    3 | `eslint-plugin-synstate`, `eslint-plugin-ts-std-forge`, `ts-data-forge`                                                                                                                                                                                                                                                                                                                                                                             |
+|    4 | `github-view-defaults-extension`, `lambda-calculus-interpreter-core`, `mahjong-scoring-tool`, `numeric-input-utils`, `resize-observer-preact-hooks`, `resize-observer-react-hooks`, `ts-utils-additional`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`                                                           |
+|    5 | `poll-discord-app`, `preact-utils`, `react-utils`, `slack-archive-tools`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `pr-report-core`, `synstate-dom`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                                                                                                                        |
+|    6 | `algo-app`, `annotation-tool`, `blueprintjs-playground`, `catan-dice`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `mahjong-calculator-app`, `pr-manager`, `profile`, `react-blueprintjs-utils`, `react-utils-styled`, `split-view-extension`, `@synstate/docs`, `synstate-dom-benchmark`, `synstate-dom-sample-app`, `blueprint-synstate`, `github-settings-as-code`, `pr-merge-queue` |
+|    7 | `blueprintjs-playground-styled`, `cant-stop-probability`, `event-schedule-app`, `event-schedule-app-functions`, `housing-loan-calculator`, `life-plan-simulator`, `react-mui-utils`, `task-manager`                                                                                                                                                                                                                                                 |
+|    8 | `color-demo`                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 ### 参考: devDependencies も含めた場合
 
@@ -336,12 +336,12 @@ graph LR
 | `blueprintjs-playground`             | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                               |
 | `blueprintjs-playground-styled`      | dep  | `react-blueprintjs-utils`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `blueprintjs-playground-styled`      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                               |
-| `cant-stop-probability-app`          | dep  | `react-blueprintjs-utils`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
-| `cant-stop-probability-app`          | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
-| `catan-dice-app`                     | dep  | `react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                           |
-| `catan-dice-app`                     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                             |
-| `color-demo-app`                     | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`react-mui-utils`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-utils-additional`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                      |
-| `color-demo-app`                     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `cant-stop-probability`              | dep  | `react-blueprintjs-utils`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
+| `cant-stop-probability`              | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
+| `catan-dice`                         | dep  | `react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                           |
+| `catan-dice`                         | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                             |
+| `color-demo`                         | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`react-mui-utils`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-utils-additional`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                      |
+| `color-demo`                         | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `event-schedule-app`                 | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`event-schedule-app-shared`&nbsp;`workspace:*`<br>`numeric-input-utils`&nbsp;`workspace:*`<br>`react-blueprintjs-utils`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`tiny-router-observable`&nbsp;`workspace:*`<br>`tiny-router-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`<br>`ts-fortress-types`&nbsp;`workspace:*` |
 | `event-schedule-app`                 | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
 | `event-schedule-app-functions`       | dep  | `event-schedule-app-shared`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`<br>`ts-fortress-types`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                             |
@@ -350,8 +350,8 @@ graph LR
 | `event-schedule-app-shared`          | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
 | `github-view-defaults-extension`     | dep  | `ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `github-view-defaults-extension`     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                             |
-| `housing-loan-calculator-app`        | dep  | `numeric-input-utils`&nbsp;`workspace:*`<br>`react-blueprintjs-utils`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`tiny-router-observable`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                            |
-| `housing-loan-calculator-app`        | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
+| `housing-loan-calculator`            | dep  | `numeric-input-utils`&nbsp;`workspace:*`<br>`react-blueprintjs-utils`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`tiny-router-observable`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                            |
+| `housing-loan-calculator`            | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
 | `lambda-calculus-interpreter-core`   | dep  | `ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `lambda-calculus-interpreter-core`   | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                         |
 | `lambda-calculus-interpreter-preact` | dep  | `lambda-calculus-interpreter-core`&nbsp;`workspace:*`<br>`preact-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-preact-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                |
@@ -368,12 +368,12 @@ graph LR
 | `numeric-input-utils`                | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                               |
 | `poll-discord-app`                   | dep  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | `poll-discord-app`                   | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                 |
-| `pr-manager-app`                     | dep  | `pr-report-core`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-dom`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                            |
-| `pr-manager-app`                     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
+| `pr-manager`                         | dep  | `pr-report-core`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-dom`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                            |
+| `pr-manager`                         | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
 | `preact-utils`                       | dep  | `better-preact-use-state`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-std-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                       |
 | `preact-utils`                       | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                         |
-| `profile-app`                        | dep  | `better-preact-use-state`&nbsp;`workspace:*`<br>`preact-utils`&nbsp;`workspace:*`<br>`resize-observer-preact-hooks`&nbsp;`workspace:*`<br>`synstate-preact-hooks`&nbsp;`workspace:*`<br>`tiny-router-observable`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                      |
-| `profile-app`                        | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
+| `profile`                            | dep  | `better-preact-use-state`&nbsp;`workspace:*`<br>`preact-utils`&nbsp;`workspace:*`<br>`resize-observer-preact-hooks`&nbsp;`workspace:*`<br>`synstate-preact-hooks`&nbsp;`workspace:*`<br>`tiny-router-observable`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                      |
+| `profile`                            | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
 | `react-blueprintjs-utils`            | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress-types`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                  |
 | `react-blueprintjs-utils`            | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                         |
 | `react-mui-utils`                    | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`react-utils-styled`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                               |
@@ -397,8 +397,8 @@ graph LR
 | `synstate-dom-docs`                  | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-dom`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                     |
 | `synstate-dom-sample-app`            | dep  | `synstate`&nbsp;`workspace:*`<br>`synstate-dom`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `synstate-dom-sample-app`            | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                               |
-| `task-manager-app`                   | dep  | `blueprint-synstate`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-dom`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                        |
-| `task-manager-app`                   | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
+| `task-manager`                       | dep  | `blueprint-synstate`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-dom`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                        |
+| `task-manager`                       | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
 | `tiny-router-observable`             | dep  | `synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `tiny-router-observable`             | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                         |
 | `tiny-router-preact-hooks`           | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                         |

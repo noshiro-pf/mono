@@ -9,7 +9,7 @@ const app = (
   files: Readonly<{ firebaseJson?: unknown; firebaserc?: boolean }>,
 ): Parameters<typeof findRedirectViolations>[0][number] =>
   ({
-    packageDir: 'catan-dice-app',
+    packageDir: 'catan-dice',
     pagesUrl: PAGES_URL,
     firebaseJson:
       files.firebaseJson === undefined

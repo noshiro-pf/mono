@@ -152,7 +152,7 @@ its `ws`.
 Only the address bar, a bookmark, another extension, or a page listed in the
 manifest's `web_accessible_resources` can open a `chrome-extension://` URL.
 A build from source lists one origin, `https://noshiro-pf.github.io`, for the
-[PR Manager](../pr-manager-app/docs/design.md#opening-a-pull-request-in-a-split-view)'s
+[PR Manager](../pr-manager/docs/design.md#opening-a-pull-request-in-a-split-view)'s
 split view links; Chrome reads the list by origin, so that is every app
 published there. `pnpm run build:dev` adds the PR Manager's dev server on
 `localhost` as well (see [`docs/development.md`](./docs/development.md)). The
@@ -169,7 +169,7 @@ finds itself framed draws nothing.
 
 Every pull request page on github.com, in any repository, has a **⧉ Split
 view** button at the bottom left. It opens the pull request in a new tab the way
-the [PR Manager](../pr-manager-app/docs/design.md#opening-a-pull-request-in-a-split-view)'s
+the [PR Manager](../pr-manager/docs/design.md#opening-a-pull-request-in-a-split-view)'s
 links do: the diff, without whitespace changes or the files already marked
 viewed, beside the conversation at 7:3. When the pull request closes an
 issue, or names the Claude Code session it was written in, that shares the

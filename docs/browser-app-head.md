@@ -10,7 +10,7 @@
 すべての `apps/*/index.html` について、名前を挙げたファイルがあること、公開する
 ページが下記を備えることを確かめる。
 
-見本は `apps/task-manager-app/index.html`（GitHub Pages）と
+見本は `apps/task-manager/index.html`（GitHub Pages）と
 `apps/event-schedule-app/index.html`（Firebase Hosting）。
 
 ## 置くもの
@@ -60,7 +60,7 @@ X は `twitter:title` などが無ければ `og:*` を読むので、`twitter:*`
   `browserconfig.xml`、`manifest.json`）が要らない。色はテーマに追従させず
   固定する（アイコンが載るのはページではなくブラウザのタブ列なので、白地にも
   黒地にも読める「濃い色の角丸＋白い絵」にする）。手描きのラスター画を
-  アイコンにしているアプリ（`profile-app`）だけは PNG を使う。
+  アイコンにしているアプリ（`profile`）だけは PNG を使う。
 - **SVG のコメントに `--`（ハイフン 2 つの連続）を書かない。** XML では
   禁止で、ブラウザはファイル全体を拒否してアイコンを出さない。画像
   ビューアでは描けてしまうので気づきにくい（ガードが見る）。
@@ -109,12 +109,12 @@ Astro のサイトは別の作り方をする。`apps/synstate-docs` はロゴ P
 
 ## 各アプリの状況（2026-10 時点）
 
-| アプリ                                                                                                                                                                                                          | 公開先                   | favicon                   | iOS                             | OGP                                                   |
-| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------- | :------------------------ | :------------------------------ | :---------------------------------------------------- |
-| `annotation-tool`, `cant-stop-probability-app`, `catan-dice-app`, `color-demo-app`, `housing-loan-calculator-app`, `lambda-calculus-interpreter-*`, `life-plan-simulator`, `pr-manager-app`, `task-manager-app` | Pages                    | `favicon.svg`             | `apple-touch-icon.png` ＋ title | あり                                                  |
-| `profile-app`                                                                                                                                                                                                   | Pages                    | `favicon.png`（手描き）   | `apple-touch-icon.png` ＋ title | あり                                                  |
-| `event-schedule-app`                                                                                                                                                                                            | Firebase                 | `favicon.svg`             | `apple-touch-icon.png` ＋ title | あり                                                  |
-| `synstate-docs`（Astro）                                                                                                                                                                                        | Pages                    | `.ico` ＋ PNG             | `apple-touch-icon.png` ＋ title | あり（Starlight の `og:*` ＋ページごとの画像）        |
-| `synstate-dom-docs`（Astro）                                                                                                                                                                                    | Pages                    | `.ico`（synstate のもの） | `apple-touch-icon.png` ＋ title | Starlight の `og:*` と `theme-color` のみ（画像なし） |
-| `algo-app`, `blueprintjs-playground*`, `mahjong-calculator-app`                                                                                                                                                 | なし                     | `favicon.svg`             | なし                            | なし                                                  |
-| `synstate-dom-sample-app`                                                                                                                                                                                       | なし（開発サーバーのみ） | `.ico`（synstate のもの） | なし                            | なし                                                  |
+| アプリ                                                                                                                                                                                  | 公開先                   | favicon                   | iOS                             | OGP                                                   |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------- | :------------------------ | :------------------------------ | :---------------------------------------------------- |
+| `annotation-tool`, `cant-stop-probability`, `catan-dice`, `color-demo`, `housing-loan-calculator`, `lambda-calculus-interpreter-*`, `life-plan-simulator`, `pr-manager`, `task-manager` | Pages                    | `favicon.svg`             | `apple-touch-icon.png` ＋ title | あり                                                  |
+| `profile`                                                                                                                                                                               | Pages                    | `favicon.png`（手描き）   | `apple-touch-icon.png` ＋ title | あり                                                  |
+| `event-schedule-app`                                                                                                                                                                    | Firebase                 | `favicon.svg`             | `apple-touch-icon.png` ＋ title | あり                                                  |
+| `synstate-docs`（Astro）                                                                                                                                                                | Pages                    | `.ico` ＋ PNG             | `apple-touch-icon.png` ＋ title | あり（Starlight の `og:*` ＋ページごとの画像）        |
+| `synstate-dom-docs`（Astro）                                                                                                                                                            | Pages                    | `.ico`（synstate のもの） | `apple-touch-icon.png` ＋ title | Starlight の `og:*` と `theme-color` のみ（画像なし） |
+| `algo-app`, `blueprintjs-playground*`, `mahjong-calculator-app`                                                                                                                         | なし                     | `favicon.svg`             | なし                            | なし                                                  |
+| `synstate-dom-sample-app`                                                                                                                                                               | なし（開発サーバーのみ） | `.ico`（synstate のもの） | なし                            | なし                                                  |

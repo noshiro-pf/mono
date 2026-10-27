@@ -3,11 +3,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, isRecord, Result, unknownToString } from 'ts-data-forge';
 import { glob, isDirectlyExecuted } from 'ts-repo-utils';
-import {
-  PAGES_SITE_ORIGIN,
-  PAGES_SITE_ROOT,
-  pagesAppEntries,
-} from '../../configs/pages-apps.mjs';
+import { pagesAppDirs, pagesAppUrl } from '../../configs/pages-apps.mjs';
 import {
   type AppHead,
   linkTargets,
@@ -284,17 +280,12 @@ const readAppFacts = async (
         readFirebaseProject(appDir),
       ]);
 
-      const name = path.basename(appDir);
-
-      const pagesDir = pagesAppEntries().find(([key]) => key === name)?.[1];
-
       return {
         head: parseAppHead(html),
         publicFiles,
-        pagesUrl:
-          pagesDir === undefined
-            ? undefined
-            : `${PAGES_SITE_ORIGIN}${PAGES_SITE_ROOT}${pagesDir}/`,
+        pagesUrl: pagesAppDirs().includes(path.basename(appDir))
+          ? pagesAppUrl(appDir)
+          : undefined,
         firebaseUrl:
           firebaseProject === undefined
             ? undefined

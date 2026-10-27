@@ -84,7 +84,7 @@ export const claudeSessionUrlOf = (address: string): string | undefined =>
  * The first Claude Code session a pull request's description names on a
  * `Claude-Session:` line — `Claude-Session: [<title>](<url>)`, or the URL
  * alone — as the PR Manager reads it
- * (`apps/pr-manager-app/src/claude-session.mts`): at the start of a line, in
+ * (`apps/pr-manager/src/claude-session.mts`): at the start of a line, in
  * any case, and only a `https://claude.ai/code/session_…` URL, so a trailer is
  * not a way to put an arbitrary page in a pane.
  *
@@ -100,7 +100,7 @@ export const claudeSessionUrlOfBody = (body: string): string | undefined =>
 
 /**
  * The query string of `split.html` that opens a pull request as the PR
- * Manager's links do (`apps/pr-manager-app/src/split-view.mts`): the diff,
+ * Manager's links do (`apps/pr-manager/src/split-view.mts`): the diff,
  * without whitespace changes or the files already viewed, beside the
  * conversation at 7:3. When the pull request closes an issue or names the
  * Claude Code session it was written in, the right half is shared with it at
@@ -270,7 +270,7 @@ const narrow = 0.75;
  * The diff, the middle column and the right column at 2:1:1, as the diff and
  * the middle column in the left three quarters beside the right column, so
  * that closing the middle pane widens the diff. The PR Manager's
- * `threeColumns` (`apps/pr-manager-app/src/split-view.mts`) says why the
+ * `threeColumns` (`apps/pr-manager/src/split-view.mts`) says why the
  * ratios are not 75% and 2/3.
  */
 const threeColumns = 'r75.1r66.8ppp';

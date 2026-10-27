@@ -69,4 +69,4 @@ assert.deepStrictEqual(cycles, [[12, 14]]);
 
 The conventions themselves — what to write, and what the page shows for it —
 are in the
-[GitHub Pull Requests Manager's README](https://github.com/noshiro-pf/mono/tree/main/apps/pr-manager-app#what-your-repository-can-add).
+[GitHub Pull Requests Manager's README](https://github.com/noshiro-pf/mono/tree/main/apps/pr-manager#what-your-repository-can-add).
