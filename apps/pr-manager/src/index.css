@@ -736,6 +736,36 @@ a:focus-visible {
   font-weight: 400;
 }
 
+/*
+ * A link in a section's title that does something on GitHub, drawn as a
+ * button at the end of the row: the title is a flex row only where it holds
+ * one, so the others keep their text flow.
+ */
+.section-title:has(.section-action) {
+  align-items: baseline;
+  column-gap: 0.25rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.section-action {
+  background: var(--surface);
+  border: 1px solid var(--baseline);
+  border-radius: var(--radius);
+  color: var(--ink-primary);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  margin-left: auto;
+  padding: 0.15rem 0.65rem;
+}
+
+.section-action:hover,
+.section-action:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+  text-decoration: none;
+}
+
 /* --- the blocks and their layout --------------------------------------- */
 
 /*

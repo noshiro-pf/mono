@@ -1,6 +1,12 @@
 import { constant, derive, For, If, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
-import { issuesListStore, issuesViewStore, reader } from '../store/index.mjs';
+import { newIssueUrl, openIssuesUrl } from '../github-links.mjs';
+import {
+  issuesListStore,
+  issuesViewStore,
+  reader,
+  reportSource,
+} from '../store/index.mjs';
 import { ExternalLink } from './external-link.js';
 import { IssueDagDoneToggle } from './issue-dag-done-toggle.js';
 import { IssueDagPendingToggle } from './issue-dag-pending-toggle.js';
@@ -55,6 +61,19 @@ export const IssuesSection = (): JSX.Element => {
               ? `Open issues (${items.length} of ${totalCount} read)`
               : `Open issues (${totalCount})`,
         )}
+        {constant(' ')}
+        <ExternalLink
+          href={constant(openIssuesUrl(reportSource))}
+          variant={'section-link'}
+        >
+          {constant('on GitHub')}
+        </ExternalLink>
+        <ExternalLink
+          href={constant(newIssueUrl(reportSource))}
+          variant={'section-action'}
+        >
+          {constant('New issue')}
+        </ExternalLink>
       </h2>
 
       <div class={constant('issues-toolbar')}>

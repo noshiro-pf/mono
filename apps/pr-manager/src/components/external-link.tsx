@@ -8,7 +8,12 @@ type Props = Readonly<{
    * a class name would be a caller reaching across this boundary to style
    * what is on the other side of it.
    */
-  variant?: 'pull-request-title' | 'queue-link' | 'section-link' | 'split-view';
+  variant?:
+    | 'pull-request-title'
+    | 'queue-link'
+    | 'section-action'
+    | 'section-link'
+    | 'split-view';
   /** `open` / `closed` / `unknown`, for the linked issue chips. */
   dataState?: Bindable<string>;
   title?: Bindable<string>;

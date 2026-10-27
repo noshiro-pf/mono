@@ -1,8 +1,9 @@
 import { constant, For, If, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { formatLocalTime } from '../format.mjs';
+import { mergedPullRequestsUrl } from '../github-links.mjs';
 import { MERGED_WITHIN_DAYS } from '../load-report.mjs';
-import { reader } from '../store/index.mjs';
+import { reader, reportSource } from '../store/index.mjs';
 import { Age } from './age.js';
 import { ExternalLink } from './external-link.js';
 import { LabelChip } from './label-chip.js';
@@ -18,7 +19,16 @@ import { LinkedIssues } from './linked-issues.js';
 export const MergedSection = (): JSX.Element => (
   <section class={constant('section')}>
     <h2 class={constant('section-title')}>
-      {constant(`Merged in the last ${daysOf(MERGED_WITHIN_DAYS)}`)}
+      {constant(`Merged in the last ${daysOf(MERGED_WITHIN_DAYS)} `)}
+      <ExternalLink
+        // From the last read, so a page left open keeps its window.
+        href={view(reader.readAt, (readAt) =>
+          mergedPullRequestsUrl(reportSource, readAt),
+        )}
+        variant={'section-link'}
+      >
+        {constant('on GitHub')}
+      </ExternalLink>
     </h2>
 
     <If
