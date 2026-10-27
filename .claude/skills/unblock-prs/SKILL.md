@@ -9,15 +9,15 @@ description: Fix the queued pull requests whose owner is this skill — set asid
 machine. It rebases the queued pull requests one at a time, arms their
 auto-merge, takes `skip-ci` off when each one's turn comes, watches the
 checks, and fixes a failure that is only a fixer's diff itself
-(`tools/scripts/cmd/unblock-prs/README.md`, "4a"). When it can go no further
+(`libs/pr-merge-queue/src/unblock-prs/README.md`, "4a"). When it can go no further
 with one it **sets it aside** and says why in a comment on it. **This skill
 fixes those pull requests and does nothing else**, so that the two never do
 the same thing.
 
 **Every queued pull request has exactly one owner**, and every tool reads it
 from one function — `libs/pr-report-core/src/queue-owner.mts`, through
-`tools/scripts/cmd/pr-report/queue.mts` here and through
-`tools/scripts/cmd/unblock-prs/owner.mts` in the worker — so the two cannot
+`libs/pr-merge-queue/src/pr-report/queue.mts` here and through
+`libs/pr-merge-queue/src/unblock-prs/owner.mts` in the worker — so the two cannot
 disagree about whose a pull request is:
 
 | `owner`  | who moves it next                                                   |
@@ -134,7 +134,7 @@ pnpm run push-fixed-pr -- <number> --by <claimant> --head "$(git -C <dir> rev-pa
 ```
 
 It is the worker's own code (`pushLeased` and `restack` in
-`tools/scripts/cmd/unblock-prs/rebase.mts`): it refuses unless the owner is a
+`libs/pr-merge-queue/src/unblock-prs/rebase.mts`): it refuses unless the owner is a
 skill and the claim is yours, puts `skip-ci` on first when it is off, pushes
 leased against the claimed head, and carries the layers stacked on it along,
 lowest first, logging any it cannot move.

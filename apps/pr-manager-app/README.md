@@ -81,7 +81,7 @@ request closing it, is
 `merge-queued` one at a time. There the page also shows the queue it works
 through, what it set aside and why, and who claimed what. It shows these only
 on a repository that has a `merge-queued` label. `unblock-prs` itself lives in
-this repository (`tools/scripts/cmd/unblock-prs/`) and assumes its workflows
+this repository (`libs/pr-merge-queue/src/unblock-prs/`) and assumes its workflows
 and labels; it is not packaged for use elsewhere yet.
 
 ## Your token

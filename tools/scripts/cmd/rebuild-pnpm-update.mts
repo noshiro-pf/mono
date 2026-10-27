@@ -1,4 +1,10 @@
 import {
+  pullRequestNumber,
+  readQueueState,
+  resolveApiContext,
+  rest,
+} from 'pr-merge-queue';
+import {
   PNPM_UPDATE_BRANCH,
   type QueueComments,
   type QueueOwner,
@@ -7,9 +13,6 @@ import {
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import { pullRequestNumber } from '../lib/cli-args.mjs';
-import { resolveApiContext, rest } from '../lib/github-api.mjs';
-import { readQueueState } from './pr-report/queue.mjs';
 
 /**
  * Resolves a conflict on the dependency update the way that branch is made:

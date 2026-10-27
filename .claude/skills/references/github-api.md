@@ -7,7 +7,7 @@ a skill; it is the one copy of the recipes more than one of them needs.
 as a person, and a session acting as one is the thing that rule is about. A
 scheduled run in a container has a second reason: there is no `gh` login there
 to act as, only a token. So everything here is the REST API, called the way
-`tools/scripts/lib/github-api.mts` calls it.
+`libs/pr-merge-queue/src/lib/github-api.mts` calls it.
 
 `pnpm run unblock-prs` and `pnpm run open-pr` are not affected by any of this:
 both call this same API with the same token. The first stays the author's to
@@ -69,7 +69,7 @@ below or is something a session must not do anyway.
 
 **Use `pnpm run pr-report`.** It reads both places GitHub keeps a verdict and
 judges the result against the contexts the ruleset requires, which is more
-than one trap deep — `tools/scripts/cmd/pr-report/README.md` says which
+than one trap deep — `libs/pr-merge-queue/src/pr-report/README.md` says which
 traps it handles, and its tests are what hold that. Reading the endpoints by
 hand and comparing what comes back to "how many are green" gets each of them
 wrong.

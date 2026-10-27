@@ -51,8 +51,8 @@ see "Japanese text".
 - `tools/` — repository tooling; not a workspace member. `tools/configs/`
   holds shared config and the sample embedding scripts; `tools/scripts/cmd/`
   holds root-level `tsx` commands, one file each (a command that outgrows one
-  file becomes a directory with `main.mts` and a `README.md`, like
-  `unblock-prs/`); what several commands share goes in `tools/scripts/lib/`.
+  file becomes a directory with `main.mts` and a `README.md`); what several
+  commands share goes in `tools/scripts/lib/`.
 - `repo-settings/` — declarative GitHub settings (`repo-settings/README.md`).
 - `articles/`, `books/` — Zenn content. See "Zenn".
 - `docs/` — prose about the repository plus verbatim texts (`json-spec/`,
@@ -311,7 +311,7 @@ ingest the feed). Outside reports come through private vulnerability reporting
   `unblock-prs` arms a `merge-queued` pull request whenever it picks it; to
   hold one back, take `merge-queued` off. Run the local checks first and
   say in the description which ones — while the label is on they are the only
-  checks the branch gets. Details in `tools/scripts/cmd/open-pr/README.md`.
+  checks the branch gets. Details in `libs/pr-merge-queue/src/open-pr/README.md`.
 - **A Claude Code session names itself in the description**, on a line of its
   own outside a code fence: `Claude-Session: [<title>](<session URL>)`, the
   title as it reads when the pull request is opened, or the URL alone when the
@@ -357,7 +357,7 @@ ingest the feed). Outside reports come through private vulnerability reporting
   is queued: `pnpm-update.yml` opens with `merge-queued`,
   `node-support-update.yml` with `skip-ci`, held until a person queues it, as
   `open-pr` leaves a session's. Both arm their own auto-merge. Details in
-  `tools/scripts/cmd/unblock-prs/README.md`.
+  `libs/pr-merge-queue/src/unblock-prs/README.md`.
 
 ## Releases
 

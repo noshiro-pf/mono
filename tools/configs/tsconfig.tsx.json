@@ -10,8 +10,9 @@
   //
   // Every workspace package reachable from a source-run entry point needs an
   // entry here — `z:repo-settings` runs `github-settings-as-code`'s `src/`,
-  // which reaches `ts-fortress` and `octokit-safe-types`, and `pr-report`,
-  // `unblock-prs` and `open-pr` reach `pr-report-core`.
+  // which reaches `ts-fortress` and `octokit-safe-types`, the commands of
+  // `pr-merge-queue` reach `pr-report-core`, and the tools that share their
+  // GitHub client reach `pr-merge-queue`.
   //
   // Passed explicitly: `tsx --tsconfig ../../tools/configs/tsconfig.tsx.json`.
   // Only affects that process; type-checking uses each package's own tsconfig.
@@ -25,6 +26,7 @@
       "ts-codemod-lib": ["libs/ts-codemod-lib/src/entry-point.mts"],
       "ts-fortress": ["libs/ts-fortress/src/entry-point.mts"],
       "octokit-safe-types": ["libs/octokit-safe-types/src/entry-point.mts"],
+      "pr-merge-queue": ["libs/pr-merge-queue/src/entry-point.mts"],
       "pr-report-core": ["libs/pr-report-core/src/entry-point.mts"]
     }
   }
