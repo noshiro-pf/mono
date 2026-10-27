@@ -76,13 +76,27 @@ What `Start-After:` means, and how an issue's wait carries over to the pull
 request closing it, is
 [`docs/issue-start-after.md`](../../docs/issue-start-after.md).
 
-**With `unblock-prs`.** In `noshiro-pf/mono` the page sits beside
-`unblock-prs`, a script that lands the pull requests labelled
-`merge-queued` one at a time. There the page also shows the queue it works
-through, what it set aside and why, and who claimed what. It shows these only
-on a repository that has a `merge-queued` label. `unblock-prs` itself lives in
-this repository (`libs/pr-merge-queue/src/unblock-prs/`) and assumes its workflows
-and labels; it is not packaged for use elsewhere yet.
+**With a merge queue.** The page also shows a queue run by labels: the pull
+requests labelled `merge-queued` in the order they land, what was set aside
+and why, who claimed what, and whose turn each one is. It shows these only on
+a repository that has a `merge-queued` label. The queue itself is the npm
+package [`pr-merge-queue`](../../libs/pr-merge-queue/README.md), with a
+Claude Code plugin that fixes what it sets aside. In short:
+
+1. `npm add --save-dev pr-merge-queue`, and a token in `GH_TOKEN` or
+   `GITHUB_TOKEN` (or `gh auth token`).
+2. Create the labels `merge-queued`, `skip-ci` and `auto-rebase`
+   (`blocks-release` too with a changesets version pull request). Allow
+   squash merging and auto-merge, require status checks on the default branch
+   with branches up to date, and make the workflows skip while `skip-ci` is
+   on.
+3. Open pull requests with `open-pr`, label the ready ones `merge-queued`, and
+   leave `unblock-prs` running.
+4. Install the plugin for what it sets aside:
+   `/plugin marketplace add noshiro-pf/mono`, then
+   `/plugin install pr-merge-queue@noshiro-pf`.
+
+The package's README, "Setting up a repository", has each step and why.
 
 ## Your token
 
