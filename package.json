@@ -48,6 +48,7 @@
     "check:root:ci-commands": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-ci-commands.mts",
     "check:root:deps-built-guard": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-deps-built-guard.mts",
     "check:root:example-coverage": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-example-coverage.mts",
+    "check:root:firebase-redirects": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-firebase-redirects.mts",
     "check:root:knip-config": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-knip-config.mts",
     "check:root:licenses": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-licenses.mts",
     "check:root:lint": "node ./tools/scripts/cmd/assert-deps-built.mts && pnpm run z:eslint ./tools/{scripts,configs}/**/*.mts --fix",

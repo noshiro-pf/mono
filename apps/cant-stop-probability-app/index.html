@@ -20,11 +20,12 @@
     <meta name="apple-mobile-web-app-title" content="Can't Stop" />
     <!--
       The link card X, Slack, Discord and the like draw for a shared URL.
-      Crawlers do not run the page's script and want absolute URLs here, so
-      og:url and og:image are written out in full: the Firebase Hosting site
-      of the project in .firebaserc. theme-color is the stripe Discord draws
-      beside the card. og-image.png and apple-touch-icon.png are drawn by
-      `pnpm run gen:app-images`.
+      Crawlers do not run the page's script and want absolute URLs here, while
+      Vite would only turn "/og-image.png" into a path under the base, so
+      og:url and og:image are written out in full: the Pages site plus the
+      app's directory in tools/configs/pages-apps.mts. theme-color is the
+      stripe Discord draws beside the card. og-image.png and
+      apple-touch-icon.png are drawn by `pnpm run gen:app-images`.
     -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Can't Stop Probability" />
@@ -32,10 +33,13 @@
       property="og:description"
       content="The chance a roll advances at least one of your three columns in Can't Stop, for every choice of three."
     />
-    <meta property="og:url" content="https://cant-stop-probability.web.app/" />
+    <meta
+      property="og:url"
+      content="https://noshiro-pf.github.io/mono/cant-stop-probability/"
+    />
     <meta
       property="og:image"
-      content="https://cant-stop-probability.web.app/og-image.png"
+      content="https://noshiro-pf.github.io/mono/cant-stop-probability/og-image.png"
     />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />

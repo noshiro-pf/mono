@@ -10,7 +10,7 @@ import {
   HousingLoanCalculatorAppImage,
   LambdaInterpreterAppImage,
   MnistAppImage,
-  MyPortfolioAppImage,
+  ProfileAppImage,
 } from './images/index.mjs';
 
 export const products: DeepReadonly<{
@@ -20,8 +20,8 @@ export const products: DeepReadonly<{
   libraries: [
     {
       id: 'syncflow',
-      link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/syncflow',
-      title: '★ SyncFlow',
+      link: 'https://github.com/noshiro-pf/mono/tree/main/libs/synstate',
+      title: '★ SynState（旧 SyncFlow）',
       subtitle: 'リアクティブプログラミング用のTypeScriptのライブラリ',
       description:
         'RxJS風の構文のリアクティブプログラミングライブラリ。前作の「rnjs」と同じく「グリッチ」が起きないRxJSを目指し作ったものだが、rnjs で発生したパフォーマンスの問題を解決するために内部実装を全面的に刷新。priority queueを使わず、topological sortによりObservable全体のDAGの依存関係を事前に計算して更新を実行することでglitchを回避するようにし、都度queueを挟む実装より高速に実行できるようにした。',
@@ -30,8 +30,8 @@ export const products: DeepReadonly<{
     },
     {
       id: 'io-ts',
-      link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/io-ts',
-      title: '@noshiro/io-ts',
+      link: 'https://github.com/noshiro-pf/mono/tree/main/libs/ts-fortress',
+      title: 'ts-fortress（旧 @noshiro/io-ts）',
       subtitle:
         '外界から来た値の型チェックをより便利に行うためのTypeScriptライブラリ',
       description:
@@ -41,8 +41,8 @@ export const products: DeepReadonly<{
     },
     {
       id: 'ts-type-utils',
-      link: 'https://github.com/noshiro-pf/mono/tree/main/packages/ts-type-utils',
-      title: '@noshiro/ts-type-utils',
+      link: 'https://github.com/noshiro-pf/mono/tree/main/libs/ts-type-forge',
+      title: 'ts-type-forge（旧 @noshiro/ts-type-utils）',
       subtitle: 'TypeScriptの型ユーティリティ集',
       description:
         '`type UintRange<1, 5> = 1 | 2 | 3 | 4` のような型ユーティリティのライブラリ',
@@ -51,8 +51,8 @@ export const products: DeepReadonly<{
     },
     {
       id: 'ts-utils',
-      link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/ts-utils',
-      title: '@noshiro/ts-utils',
+      link: 'https://github.com/noshiro-pf/mono/tree/main/libs/ts-data-forge',
+      title: 'ts-data-forge（旧 @noshiro/ts-utils）',
       subtitle: 'TypeScriptのユーティリティ集',
       description: 'Result型や配列・オブジェクト操作ユーティリティなど',
       implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
@@ -60,8 +60,8 @@ export const products: DeepReadonly<{
     },
     {
       id: 'tiny-router-observable',
-      link: 'https://github.com/noshiro-pf/mono/tree/main/packages/utils/tiny-router-observable',
-      title: '@noshiro/tiny-router-observable',
+      link: 'https://github.com/noshiro-pf/mono/tree/main/apps/tiny-router-observable',
+      title: 'tiny-router-observable',
       subtitle: '簡易的なRouterライブラリ',
       description: 'React Router より簡単なAPIのライブラリが欲しかったので自作',
       implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
@@ -96,7 +96,7 @@ export const products: DeepReadonly<{
     },
     {
       id: 'annotation-tool',
-      link: 'https://annotation-tool-d8b49.web.app/',
+      link: 'https://noshiro-pf.github.io/mono/annotation-tool/',
       title: 'アノテーションツール（未完成）',
       subtitle: '矩形ツールによる画像アノテーションを行うUI',
       description:
@@ -107,7 +107,7 @@ export const products: DeepReadonly<{
     },
     {
       id: 'housing-loan-calculator',
-      link: 'https://housing-loan-calculator.web.app',
+      link: 'https://noshiro-pf.github.io/mono/housing-loan-calculator/',
       title: '住宅ローン返済シミュレータ',
       subtitle: '住宅ローンの月々の返済額などを計算',
       description:
@@ -118,7 +118,7 @@ export const products: DeepReadonly<{
     },
     {
       id: 'cant-stop-probability',
-      link: 'https://cant-stop-probability.web.app/',
+      link: 'https://noshiro-pf.github.io/mono/cant-stop-probability/',
       title: "ボードゲーム「Can't Stop」の確率表",
       subtitle: '',
       description: '期待値等を調べるために作成。',
@@ -128,7 +128,7 @@ export const products: DeepReadonly<{
     },
     {
       id: 'color-demo-app',
-      link: 'https://color-demo-app.web.app',
+      link: 'https://noshiro-pf.github.io/mono/color-demo/',
       title: 'Color Contrast Demo',
       subtitle:
         '色のコントラストなどについて書いた記事（https://qiita.com/pikohideaki/items/59415524503f833ce41e）のために作ったデモアプリ。',
@@ -139,7 +139,7 @@ export const products: DeepReadonly<{
     },
     {
       id: 'catan-dice',
-      link: 'https://catan-dice-5f3bc.web.app/',
+      link: 'https://noshiro-pf.github.io/mono/catan-dice/',
       title: 'CATAN dice',
       subtitle:
         '6面ダイス2個を振って合計を表示するカタン（ボードゲーム）用サポートアプリ',
@@ -153,9 +153,9 @@ export const products: DeepReadonly<{
       imageUrl: CatanDiceAppImage,
     },
     {
-      id: 'my-portfolio-app',
-      link: 'https://my-portfolio-app-4f8be.web.app/',
-      title: 'ポートフォリオ',
+      id: 'profile-app',
+      link: 'https://noshiro-pf.github.io/mono/profile/',
+      title: 'プロフィール',
       subtitle: 'このページ',
       description: '',
       implementation: [
@@ -164,13 +164,13 @@ export const products: DeepReadonly<{
         '（→ 後にmarkdownファイルも直接bundleするように変更）。',
         'タブ切り替えをreact-routerで行うように変更（2020/08/04）。（最終更新：右上に記載）',
         ' → 2021-09-22 に Preact 化した。ルーティングも自作ライブラリに置き換えた。',
-        'Github Actions で main branch 更新時に自動でデプロイするよう設定。',
+        'GitHub Actions で main branch 更新時に GitHub Pages へ自動でデプロイするよう設定。',
       ].join(' '),
-      imageUrl: MyPortfolioAppImage,
+      imageUrl: ProfileAppImage,
     },
     {
       id: 'lambda-calculus-interpreter',
-      link: 'https://lambda-calculus-interpre-70e41.web.app',
+      link: 'https://noshiro-pf.github.io/mono/lambda-calculus-interpreter-react/',
       title: 'Lambda Calculus Interpreter',
       subtitle: '簡単な型無しラムダ計算のインタプリタ（おもちゃ）',
       description:
@@ -180,6 +180,7 @@ export const products: DeepReadonly<{
         ' → 2019年8月7日にReactで再実装 → 2021/1/27にPreactやSolidにも移植',
         ' → 2021-03-12にRxJSを自作ライブラリ SyncFlow に差し替えた。',
         '（最終更新：2024年7月9日）',
+        ' Preact 版 → https://noshiro-pf.github.io/mono/lambda-calculus-interpreter-preact/',
       ].join(''),
       imageUrl: LambdaInterpreterAppImage,
     },

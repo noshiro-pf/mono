@@ -1,11 +1,11 @@
 {
   "hosting": {
-    "public": "build",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [
+    "public": "public",
+    "redirects": [
       {
-        "source": "**",
-        "destination": "/index.html"
+        "regex": "^/(.*)$",
+        "destination": "https://noshiro-pf.github.io/mono/lambda-calculus-interpreter-react/:1",
+        "type": 301
       }
     ]
   }

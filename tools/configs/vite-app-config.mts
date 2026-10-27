@@ -9,15 +9,17 @@ import { appDevPort } from './app-dev-ports.mjs';
  *
  * What every app shares is the shape: the package directory is the Vite root
  * (so `index.html` and `public/` are found where they sit), and the output
- * goes to `build/`, which is the directory each app's `firebase.json` serves.
+ * goes to `build/` — the directory `build-pages-site.mts` copies for an app on
+ * the GitHub Pages site, and the one `firebase.json` serves for an app on
+ * Firebase Hosting.
  *
  * Preact and synstate-dom apps pass no plugin. Vite's esbuild transform reads
  * `jsx` and `jsxImportSource` from the package's `tsconfig.json`, which already
  * say `react-jsx` and `preact` (or `synstate-dom`), so the build matches what
  * the type check sees.
  * `@vitejs/plugin-react` is here for React's Fast Refresh; the Preact
- * equivalent would pull Babel in, which is not worth a dev-server nicety for
- * apps this repository does not deploy.
+ * equivalent would pull Babel in, which is not worth it for a dev-server
+ * nicety.
  *
  * The dev-server port comes from `app-dev-ports.mts`, keyed by the package
  * directory name, so that this config and the app's Playwright config cannot

@@ -3,6 +3,8 @@
 The React front end for `lambda-calculus-interpreter-core`: enter a lambda
 term and watch it reduce.
 
+<https://noshiro-pf.github.io/mono/lambda-calculus-interpreter-react/>
+
 Restored from `experimental/` — see
 [docs/monorepo-consolidation.md](../../docs/monorepo-consolidation.md).
 

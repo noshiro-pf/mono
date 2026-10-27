@@ -26,8 +26,8 @@ const appDevPorts = {
   'lambda-calculus-interpreter-react': 5191,
   'life-plan-simulator': 5197,
   'mahjong-calculator-app': 5192,
-  'my-portfolio-app-preact': 5193,
   'pr-manager-app': 5194,
+  'profile-app': 5193,
   'synstate-dom-sample-app': 5196,
   'task-manager-app': 5195,
 } as const;

@@ -1721,76 +1721,6 @@ importers:
         specifier: 'catalog:'
         version: 5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
 
-  apps/my-portfolio-app-preact:
-    dependencies:
-      better-preact-use-state:
-        specifier: workspace:*
-        version: link:../../libs/better-preact-use-state
-      goober:
-        specifier: ^2.1.19
-        version: 2.1.19(csstype@3.2.3)
-      preact-utils:
-        specifier: workspace:*
-        version: link:../preact-utils
-      resize-observer-preact-hooks:
-        specifier: workspace:*
-        version: link:../resize-observer-preact-hooks
-      synstate-preact-hooks:
-        specifier: workspace:*
-        version: link:../../libs/synstate-preact-hooks
-      tiny-router-observable:
-        specifier: workspace:*
-        version: link:../tiny-router-observable
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
-    devDependencies:
-      '@mdx-js/rollup':
-        specifier: ^3.1.1
-        version: 3.1.1(rollup@4.64.10)(supports-color@7.2.0)
-      '@playwright/test':
-        specifier: 'catalog:'
-        version: 1.64.1
-      eslint:
-        specifier: 'catalog:'
-        version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
-      eslint-config-typed:
-        specifier: workspace:*
-        version: link:../../libs/eslint-config-typed
-      eslint-plugin-ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/eslint-plugin-ts-data-forge
-      eslint-plugin-ts-fortress:
-        specifier: workspace:*
-        version: link:../../libs/eslint-plugin-ts-fortress
-      eslint-plugin-ts-type-forge:
-        specifier: workspace:*
-        version: link:../../libs/eslint-plugin-ts-type-forge
-      npm-run-all2:
-        specifier: 'catalog:'
-        version: 9.0.3
-      preact:
-        specifier: 'catalog:'
-        version: 10.29.8(preact-render-to-string@6.8.1)
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
-      prettier-plugin-organize-imports:
-        specifier: 'catalog:'
-        version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
-      prettier-plugin-packagejson:
-        specifier: 'catalog:'
-        version: 3.0.2(prettier@3.9.10)
-      ts-type-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-type-forge
-      tsx:
-        specifier: 'catalog:'
-        version: 4.23.15
-      vite:
-        specifier: 'catalog:'
-        version: 8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
-
   apps/numeric-input-utils:
     dependencies:
       ts-data-forge:
@@ -2007,6 +1937,76 @@ importers:
       tsx:
         specifier: 'catalog:'
         version: 4.23.15
+
+  apps/profile-app:
+    dependencies:
+      better-preact-use-state:
+        specifier: workspace:*
+        version: link:../../libs/better-preact-use-state
+      goober:
+        specifier: ^2.1.19
+        version: 2.1.19(csstype@3.2.3)
+      preact-utils:
+        specifier: workspace:*
+        version: link:../preact-utils
+      resize-observer-preact-hooks:
+        specifier: workspace:*
+        version: link:../resize-observer-preact-hooks
+      synstate-preact-hooks:
+        specifier: workspace:*
+        version: link:../../libs/synstate-preact-hooks
+      tiny-router-observable:
+        specifier: workspace:*
+        version: link:../tiny-router-observable
+      ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-data-forge
+    devDependencies:
+      '@mdx-js/rollup':
+        specifier: ^3.1.1
+        version: 3.1.1(rollup@4.64.10)(supports-color@7.2.0)
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.64.1
+      eslint:
+        specifier: 'catalog:'
+        version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../../libs/eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-type-forge
+      npm-run-all2:
+        specifier: 'catalog:'
+        version: 9.0.3
+      preact:
+        specifier: 'catalog:'
+        version: 10.29.8(preact-render-to-string@6.8.1)
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.10
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.10)
+      ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-type-forge
+      tsx:
+        specifier: 'catalog:'
+        version: 4.23.15
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
 
   apps/react-blueprintjs-utils:
     dependencies:
@@ -2804,6 +2804,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.5
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 5.0.5(@vitest/browser@5.0.5)(vitest@5.0.5)
       eslint:
         specifier: 'catalog:'
         version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
@@ -2834,6 +2837,12 @@ importers:
       tsx:
         specifier: 'catalog:'
         version: 4.23.15
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.5(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/browser-playwright@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
 
   apps/tiny-router-preact-hooks:
     devDependencies:

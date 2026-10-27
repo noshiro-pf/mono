@@ -11,6 +11,17 @@ one of the six utilities `event-schedule-app` needs, and
 `tiny-router-react-hooks` sits on top of it. Never published to npm, so it comes
 back to `apps/` as a private package.
 
+## Serving below a base path
+
+An app on the repository's GitHub Pages site is served from
+`/mono/<dir>/`, not from the root. Pass Vite's base to `createRouter` —
+`createRouter({ basePath: import.meta.env.BASE_URL })` — and route as if the
+app were at the root.
+
+`state.pathname` then reads `/career/` for `/mono/profile/career/`, and
+`push('/career/')` goes to `/mono/profile/career/`. A whole URL (a clicked
+link's `href`, or what `updateQueryParams` builds) is taken as it is.
+
 ## What changed on the way back
 
 - `@noshiro/syncflow` → `synstate`, whose API has moved: `createState` returns a

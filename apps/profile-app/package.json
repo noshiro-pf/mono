@@ -1,11 +1,11 @@
 {
-  "name": "my-portfolio-app-preact",
+  "name": "profile-app",
   "version": "0.0.18",
   "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noshiro-pf/mono.git",
-    "directory": "apps/my-portfolio-app-preact"
+    "directory": "apps/profile-app"
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",

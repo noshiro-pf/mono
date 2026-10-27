@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="noshiro-pf が作ったライブラリ・ウェブアプリと、書いた記事の一覧"
+      content="noshiro-pf の経歴・自己紹介・スキルと、作ったもの・書いたものの一覧"
     />
     <meta name="theme-color" content="#ffcf29" />
     <link rel="icon" type="image/png" href="/favicon.png" />
@@ -16,35 +16,39 @@
       cuts off much longer ones.
     -->
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="Portfolio" />
+    <meta name="apple-mobile-web-app-title" content="Profile" />
     <!--
       The link card X, Slack, Discord and the like draw for a shared URL.
-      Crawlers do not run the page's script and want absolute URLs here, so
-      og:url and og:image are written out in full: the Firebase Hosting site
-      of the project in .firebaserc. theme-color is the stripe Discord draws
-      beside the card. og-image.png and apple-touch-icon.png are drawn by
-      `pnpm run gen:app-images`.
+      Crawlers do not run the page's script and want absolute URLs here, while
+      Vite would only turn "/og-image.png" into a path under the base, so
+      og:url and og:image are written out in full: the Pages site plus the
+      app's directory in tools/configs/pages-apps.mts. theme-color is the
+      stripe Discord draws beside the card. og-image.png and
+      apple-touch-icon.png are drawn by `pnpm run gen:app-images`.
     -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="noshiro-pf のポートフォリオ" />
+    <meta property="og:title" content="noshiro-pf のプロフィール" />
     <meta
       property="og:description"
-      content="noshiro-pf が作ったライブラリ・ウェブアプリと、書いた記事の一覧"
+      content="noshiro-pf の経歴・自己紹介・スキルと、作ったもの・書いたものの一覧"
     />
-    <meta property="og:url" content="https://my-portfolio-app-4f8be.web.app/" />
+    <meta
+      property="og:url"
+      content="https://noshiro-pf.github.io/mono/profile/"
+    />
     <meta
       property="og:image"
-      content="https://my-portfolio-app-4f8be.web.app/og-image.png"
+      content="https://noshiro-pf.github.io/mono/profile/og-image.png"
     />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="noshiro-pf のポートフォリオ — noshiro-pf が作ったライブラリ・ウェブアプリと、書いた記事の一覧"
+      content="noshiro-pf のプロフィール — noshiro-pf の経歴・自己紹介・スキルと、作ったもの・書いたものの一覧"
     />
     <meta property="og:locale" content="ja_JP" />
     <meta name="twitter:card" content="summary_large_image" />
-    <title>Portfolio</title>
+    <title>noshiro-pf のプロフィール</title>
   </head>
   <body>
     <div id="app"></div>

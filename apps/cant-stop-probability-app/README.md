@@ -3,7 +3,7 @@
 The probability table for the board game Can't Stop: for every choice of three
 columns, how often two dice can be split to advance at least one of them.
 
-<https://cant-stop-probability.web.app/>
+<https://noshiro-pf.github.io/mono/cant-stop-probability/>
 
 Restored from `experimental/` — see
 [docs/monorepo-consolidation.md](../../docs/monorepo-consolidation.md).
