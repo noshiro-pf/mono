@@ -1,5 +1,15 @@
 # split-view-extension
 
+## 0.7.0
+
+### Minor Changes
+
+- c052de4: Open a pull request from the GitHub button or the context menu the way the PR Manager's links do, with the Claude Code session its description names on a `Claude-Session:` line: the session goes between the diff and the conversation, or, when the pull request also closes an issue, under the conversation, beside the issue.
+
+### Patch Changes
+
+- 411fe63: Open a pull request that closes an issue with the diff and the conversation split off the issue first, so that closing the conversation widens the diff instead of the issue. The three columns keep their 2:1:1 widths.
+
 ## 0.6.4
 
 ### Patch Changes
