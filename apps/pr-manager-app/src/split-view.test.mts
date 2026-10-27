@@ -37,7 +37,7 @@ describe(splitViewUrl, () => {
     assert.deepStrictEqual(params.getAll('url'), [diffUrl, pullRequestUrl]);
   });
 
-  test('adds the closed issue on the right, at 2:1:1', () => {
+  test('adds the closed issue on the right, at 2:1:1, the diff and the conversation split off it first', () => {
     const params = paramsOf(
       splitViewUrl({
         ...pullRequest,
@@ -46,7 +46,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    expect(params.get('layout')).toBe('rprpp');
+    expect(params.get('layout')).toBe('r75.1r66.8ppp');
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,
@@ -64,7 +64,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    expect(params.get('layout')).toBe('rprpp');
+    expect(params.get('layout')).toBe('r75.1r66.8ppp');
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,
@@ -82,7 +82,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    expect(params.get('layout')).toBe('rprpp');
+    expect(params.get('layout')).toBe('r75.1r66.8ppp');
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,
@@ -100,7 +100,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    expect(params.get('layout')).toBe('rprpcpp');
+    expect(params.get('layout')).toBe('r75.1r66.8ppcpp');
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,

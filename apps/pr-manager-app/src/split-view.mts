@@ -49,16 +49,16 @@ export const splitViewUrl = (entry: SplitViewSource): string => {
             panes: [diff, { url: entry.url, zoom: full }],
           } as const)
         : ({
-            layout: 'rprpp',
+            layout: threeColumns,
             panes: [diff, { url: sessionUrl, zoom: full }, conversation],
           } as const)
       : sessionUrl === undefined
         ? ({
-            layout: 'rprpp',
+            layout: threeColumns,
             panes: [diff, conversation, { url: issueUrl, zoom: reading }],
           } as const)
         : ({
-            layout: 'rprpcpp',
+            layout: threeColumnsStacked,
             panes: [
               diff,
               { url: issueUrl, zoom: reading },
@@ -117,6 +117,19 @@ const workspaceName = 'PR Manager';
  * already marked viewed (`show-viewed-files=false`).
  */
 const diffQuery = 'w=1&show-viewed-files=false';
+
+/**
+ * The diff, the middle column and the right column at 2:1:1, as the diff and
+ * the middle column in the left three quarters beside the right column, so
+ * that closing the middle pane widens the diff. The ratios are not 75% and
+ * 2/3 because of the 6px gutters: these keep each column within 2px of the
+ * width it had as half the page beside a halved right half, at window widths
+ * from 1024px to 3840px.
+ */
+const threeColumns = 'r75.1r66.8ppp';
+
+/** `threeColumns`, with the right column stacked in two. */
+const threeColumnsStacked = 'r75.1r66.8ppcpp';
 
 /** 100%, where the extension's `zoom` leaves a pane when it is absent. */
 const full = 1;
