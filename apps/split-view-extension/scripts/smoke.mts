@@ -3,7 +3,7 @@ import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { Arr, Num } from 'ts-data-forge';
+import { Arr, Num, unknownToString } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
@@ -68,7 +68,7 @@ const main = async (): Promise<void> => {
     const mut_errors: string[] = [];
 
     page.on('pageerror', (error) => {
-      mut_errors.push(String(error));
+      mut_errors.push(error.toString());
     });
 
     const appears = async (
@@ -183,7 +183,7 @@ const main = async (): Promise<void> => {
 
     const address = page.locator('.pane__input').first();
 
-    await address.fill(`localhost:${String(serverPort)}`);
+    await address.fill(`localhost:${serverPort.toString()}`);
 
     await address.press('Enter');
 
@@ -300,7 +300,7 @@ const main = async (): Promise<void> => {
     };
 
     // A pane blocked by the site's own service worker, and the way out of it.
-    await address.fill(`http://localhost:${String(serverPort)}/sw-home`);
+    await address.fill(`http://localhost:${serverPort.toString()}/sw-home`);
 
     await address.press('Enter');
 
@@ -308,7 +308,7 @@ const main = async (): Promise<void> => {
 
     await page.waitForTimeout(2500);
 
-    await address.fill(`http://localhost:${String(serverPort)}/sw-target`);
+    await address.fill(`http://localhost:${serverPort.toString()}/sw-target`);
 
     await address.press('Enter');
 
@@ -345,13 +345,13 @@ const main = async (): Promise<void> => {
     // With the worker gone the site registers it again on the next visit, so
     // the pane can be brought back to the same failure — and then the per-origin
     // setting should clear it without anyone pressing anything.
-    await address.fill(`http://localhost:${String(serverPort)}/sw-home`);
+    await address.fill(`http://localhost:${serverPort.toString()}/sw-home`);
 
     await address.press('Enter');
 
     await page.waitForTimeout(2500);
 
-    await address.fill(`http://localhost:${String(serverPort)}/sw-target`);
+    await address.fill(`http://localhost:${serverPort.toString()}/sw-target`);
 
     await address.press('Enter');
 
@@ -388,7 +388,7 @@ const main = async (): Promise<void> => {
     // twice: the clear that keeps the worker away from the *next* navigation
     // was followed by a reload, about 40ms after the page arrived, and the
     // page that came back registered another worker for the next one to find.
-    await address.fill(`http://localhost:${String(serverPort)}/sw-loop`);
+    await address.fill(`http://localhost:${serverPort.toString()}/sw-loop`);
 
     await address.press('Enter');
 
@@ -432,7 +432,7 @@ const main = async (): Promise<void> => {
       .first()
       .contentFrame();
 
-    await address.fill(`http://localhost:${String(serverPort)}/sw-late`);
+    await address.fill(`http://localhost:${serverPort.toString()}/sw-late`);
 
     await address.press('Enter');
 
@@ -454,7 +454,7 @@ const main = async (): Promise<void> => {
     // ordinary tab — reaches the pane's next navigation before anything in the
     // pane can see it arrive. That navigation is blocked, and the clear that
     // follows has to land where the link was going.
-    await address.fill(`http://localhost:${String(serverPort)}/sw-late`);
+    await address.fill(`http://localhost:${serverPort.toString()}/sw-late`);
 
     await address.press('Enter');
 
@@ -464,14 +464,10 @@ const main = async (): Promise<void> => {
 
     const siteTab = await context.newPage();
 
-    await siteTab.goto(`http://localhost:${String(serverPort)}/sw-home`);
+    await siteTab.goto(`http://localhost:${serverPort.toString()}/sw-home`);
 
     await siteTab.evaluate(async () => {
-      // Destructured, as in `frame-agent.mts`: no spelling of `navigator`
-      // satisfies every lint rule at once.
-      const { navigator: tabNavigator } = globalThis;
-
-      await tabNavigator.serviceWorker.ready;
+      await globalThis.navigator.serviceWorker.ready;
     });
 
     await paneContent.locator('#to-target').click();
@@ -514,7 +510,7 @@ const main = async (): Promise<void> => {
 
     // Back to where the next section expects to find this pane: what a split
     // view was left showing is part of what it restores.
-    await address.fill(`http://localhost:${String(serverPort)}/sw-target`);
+    await address.fill(`http://localhost:${serverPort.toString()}/sw-target`);
 
     await address.press('Enter');
 
@@ -567,7 +563,7 @@ const main = async (): Promise<void> => {
     // because the content script forwards it. The pane is pointed at the plain
     // page first — the one it is on has a service worker being fought over, and
     // a frame mid-reload is not something to press a key into.
-    await address.fill(`http://localhost:${String(serverPort)}/`);
+    await address.fill(`http://localhost:${serverPort.toString()}/`);
 
     await address.press('Enter');
 
@@ -748,24 +744,24 @@ const main = async (): Promise<void> => {
 
     const zoomLabelOf = async (paneIndex: number): Promise<string> =>
       page
-        .locator(`.pane >> nth=${String(paneIndex)} >> .pane__zoom`)
+        .locator(`.pane >> nth=${paneIndex.toString()} >> .pane__zoom`)
         .innerText()
         .catch(() => '100%');
 
     const frameStyleOf = async (paneIndex: number): Promise<string> =>
       (await page
-        .locator(`.pane >> nth=${String(paneIndex)} >> .pane__frame`)
+        .locator(`.pane >> nth=${paneIndex.toString()} >> .pane__frame`)
         .getAttribute('style')) ?? '';
 
     const paneBox = async (index: number): Promise<Box> =>
-      boxOf(`.pane >> nth=${String(index)}`);
+      boxOf(`.pane >> nth=${index.toString()}`);
 
     /** The frame of the pane pointed at the local server, if it is loaded. */
     const localFrame = (): ReturnType<typeof page.frames>[number] | undefined =>
       page
         .frames()
         .find((frame) =>
-          frame.url().startsWith(`http://localhost:${String(serverPort)}`),
+          frame.url().startsWith(`http://localhost:${serverPort.toString()}`),
         );
 
     // A marker inside the frame. Zoom is a `transform` on the `iframe`, so it
@@ -837,7 +833,7 @@ const main = async (): Promise<void> => {
       to: Readonly<{ x: number; y: number }>,
     ): Promise<string> => {
       const grip = await boxOf(
-        `.pane >> nth=${String(paneIndex)} >> .pane__grip`,
+        `.pane >> nth=${paneIndex.toString()} >> .pane__grip`,
       );
 
       await page.mouse.move(
@@ -926,8 +922,8 @@ const main = async (): Promise<void> => {
 
     const linkedUrl = `chrome-extension://${extensionId}/split.html?${[
       'layout=r70pp',
-      `url=http://localhost:${String(serverPort)}/`,
-      `url=http://localhost:${String(serverPort)}/second`,
+      `url=http://localhost:${serverPort.toString()}/`,
+      `url=http://localhost:${serverPort.toString()}/second`,
       'zoom=1',
       'zoom=0.75',
       'name=linked',
@@ -1033,7 +1029,7 @@ const main = async (): Promise<void> => {
       check(
         'dragging a divider narrows the pane beside it',
         paneAfterDrag.width < paneBeforeDrag.width - 50,
-        `${String(paneBeforeDrag.width)} -> ${String(paneAfterDrag.width)}`,
+        `${paneBeforeDrag.width.toString()} -> ${paneAfterDrag.width.toString()}`,
       ),
       check('splitting a pane adds one', afterSplit === 5, afterSplit),
       check('a reload restores the layout', restoredPanes === 5, restoredPanes),
@@ -1123,7 +1119,7 @@ const main = async (): Promise<void> => {
       check(
         'creating one adds it to the list and shows it in a new tab',
         optionsAfterCreate === 2 && titleAfterCreate.startsWith('2: '),
-        `${String(optionsAfterCreate)} / ${titleAfterCreate}`,
+        `${optionsAfterCreate.toString()} / ${titleAfterCreate}`,
       ),
       check(
         'and the tab it was created from stays where it was',
@@ -1153,12 +1149,12 @@ const main = async (): Promise<void> => {
       check(
         'opening every split view gives a tab to the one not open',
         tabsAfterOpenAll === 2 && otherTabUrl.includes('ws='),
-        `${String(tabsAfterOpenAll)} tabs / ${otherTabUrl.slice(-24)}`,
+        `${tabsAfterOpenAll.toString()} tabs / ${otherTabUrl.slice(-24)}`,
       ),
       check(
         'and asking again opens nothing, saying so instead',
         tabsAfterOpeningTwice === 2 && openAllNotice.includes('already open'),
-        `${String(tabsAfterOpeningTwice)} tabs / ${openAllNotice}`,
+        `${tabsAfterOpeningTwice.toString()} tabs / ${openAllNotice}`,
       ),
       check(
         'a split view last seen in a pinned tab comes back pinned',
@@ -1168,7 +1164,7 @@ const main = async (): Promise<void> => {
       check(
         'the export writes a backup of every saved split view',
         exportedText.includes('"kind": "split-view-backup"') &&
-          exportedText.includes(`localhost:${String(serverPort)}`),
+          exportedText.includes(`localhost:${serverPort.toString()}`),
         exportedText.length,
       ),
       check(
@@ -1179,7 +1175,7 @@ const main = async (): Promise<void> => {
       check(
         'the list and the layout both survive a reload',
         optionsAfterReload === 1 && addressAfterReload === addressBeforeReload,
-        `${String(optionsAfterReload)} / ${addressAfterReload}`,
+        `${optionsAfterReload.toString()} / ${addressAfterReload}`,
       ),
       check(
         'the zoom buttons step one pane up the ladder',
@@ -1194,7 +1190,7 @@ const main = async (): Promise<void> => {
       check(
         'without reloading it either',
         markAfterZoom === 'kept',
-        String(markAfterZoom),
+        unknownToString(markAfterZoom),
       ),
       check(
         'Ctrl+wheel inside the pane zooms it too',
@@ -1214,17 +1210,17 @@ const main = async (): Promise<void> => {
       check(
         'and exchanges the two panes places',
         swappedPlaces,
-        `${String(Math.round(boxBefore0.x))} -> ${String(Math.round(boxAfter0.x))}`,
+        `${Math.round(boxBefore0.x).toString()} -> ${Math.round(boxAfter0.x).toString()}`,
       ),
       check(
         'without reloading either of them',
         markAfterSwap === 'kept',
-        String(markAfterSwap),
+        unknownToString(markAfterSwap),
       ),
       check(
         'dropping on an edge moves the pane to that side instead',
         moveLabel === 'Move here' && movedBeside && panesAfterMove === 4,
-        `${moveLabel} / ${String(panesAfterMove)} panes`,
+        `${moveLabel} / ${panesAfterMove.toString()} panes`,
       ),
       check(
         'a moved pane keeps its zoom',
@@ -1234,11 +1230,11 @@ const main = async (): Promise<void> => {
       check(
         'a URL describing a split view opens it: two panes at 7:3',
         linkedPaneCount === 2 && Math.abs(linkedRatio - 0.7) < 0.03,
-        `${String(linkedPaneCount)} panes / ${linkedRatio.toFixed(2)}`,
+        `${linkedPaneCount.toString()} panes / ${linkedRatio.toFixed(2)}`,
       ),
       check(
         'at the addresses it names, in order',
-        linkedAddresses[0].endsWith(`:${String(serverPort)}/`) &&
+        linkedAddresses[0].endsWith(`:${serverPort.toString()}/`) &&
           linkedAddresses[1].endsWith('/second'),
         linkedAddresses.join(' , '),
       ),
@@ -1251,7 +1247,7 @@ const main = async (): Promise<void> => {
         'as a new split view on the list, named by the URL',
         optionsAfterLink === optionsBeforeLink + 1 &&
           linkedOption.includes('linked'),
-        `${String(optionsAfterLink)} / ${linkedOption}`,
+        `${optionsAfterLink.toString()} / ${linkedOption}`,
       ),
       check(
         'and in a tab titled by the URL',
@@ -1270,7 +1266,7 @@ const main = async (): Promise<void> => {
         'and follows a navigation made inside a pane',
         linkFollowed &&
           urlAfterNavigation.includes(
-            `url=http://localhost:${String(serverPort)}/second&url=http://localhost:${String(serverPort)}/second`,
+            `url=http://localhost:${serverPort.toString()}/second&url=http://localhost:${serverPort.toString()}/second`,
           ),
         urlAfterNavigation.slice(urlAfterNavigation.indexOf('?')),
       ),
@@ -1279,7 +1275,7 @@ const main = async (): Promise<void> => {
         relinkedAddress.endsWith('/second') &&
           relinkedZoom.includes('zoom: 0.75') &&
           optionsAfterRelink === optionsAfterLink,
-        `${relinkedAddress} / ${relinkedZoom} / ${String(optionsAfterRelink)}`,
+        `${relinkedAddress} / ${relinkedZoom} / ${optionsAfterRelink.toString()}`,
       ),
       check(
         'no uncaught errors on the page',
@@ -1339,7 +1335,7 @@ const check = (
   ({
     label,
     ok,
-    note: note === '' ? ('' as const) : (`(${String(note)})` as const),
+    note: note === '' ? ('' as const) : (`(${unknownToString(note)})` as const),
   }) as const;
 
 const assertBuildIsPresent = (): void => {

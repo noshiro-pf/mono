@@ -83,7 +83,7 @@ export const dayButton = (root: Element, day: number): HTMLButtonElement => {
   const found = all<HTMLButtonElement>(
     root,
     'button.rdp-day:not(.rdp-day_outside)',
-  ).find((button) => button.textContent === String(day));
+  ).find((button) => button.textContent === day.toString());
 
   assert.isDefined(found);
 

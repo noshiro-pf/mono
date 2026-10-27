@@ -236,7 +236,7 @@ export const nextWorkspaceName = (registry: WorkspaceRegistry): string => {
   const firstUnused = (candidate: number): number =>
     used.has(candidate) ? firstUnused(candidate + 1) : candidate;
 
-  return `split-view-${String(firstUnused(1))}`;
+  return `split-view-${firstUnused(1).toString()}`;
 };
 
 /**
@@ -262,7 +262,7 @@ export const registryFromStoredWorkspaces = (
     version: 1,
     entries: ordered.map((entry, index) => ({
       id: entry.id,
-      name: `split-view-${String(index + 1)}`,
+      name: `split-view-${(index + 1).toString()}`,
       createdAt: entry.savedAt,
       pinned: false,
     })),

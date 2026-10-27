@@ -47,20 +47,6 @@ const reportIntervalMs = 1000;
  */
 const serviceWorkerSweepIntervalMs = 1000;
 
-// See the note in `header-rules.mts`: `window.navigator` / `globalThis.navigator`
-// / a bare `navigator` cannot all satisfy the lint rules at once.
-const { navigator: browserNavigator } = globalThis;
-
-// `history` cannot be reached as `window.history` (the lint rules want
-// `globalThis`) nor as `globalThis.history` (they then want it bare) nor bare
-// (it is a restricted global). Destructuring it once names it something that is
-// none of those.
-const { history: browserHistory } = globalThis;
-
-// The same for the Navigation API, which is what says where a document is
-// leaving for.
-const { navigation: browserNavigation } = globalThis;
-
 const main = (): void => {
   if (!isSplitViewFrame()) {
     return;
@@ -89,13 +75,13 @@ const main = (): void => {
       paneId: mut_paneId,
       url: document.location.href,
       title: document.title,
-      historyLength: browserHistory.length,
+      historyLength: window.history.length,
     } as const;
 
     const signature = [
       message.url,
       message.title,
-      String(message.historyLength),
+      message.historyLength.toString(),
     ].join(' ');
 
     if (signature === mut_lastSignature) {
@@ -253,7 +239,7 @@ const main = (): void => {
    * user back to the page the link was on. GET navigations only: a form post
    * cannot be repeated by going to its address.
    */
-  browserNavigation.addEventListener('navigate', (navigateEvent) => {
+  window.navigation.addEventListener('navigate', (navigateEvent) => {
     if (
       mut_paneId === undefined ||
       mut_replyOrigin === undefined ||
@@ -340,7 +326,8 @@ const unregisterServiceWorkers = async (
 
 /** Unregisters every service worker of this origin, and counts them. */
 const removeServiceWorkers = async (): Promise<number> => {
-  const registrations = await browserNavigator.serviceWorker.getRegistrations();
+  const registrations =
+    await globalThis.navigator.serviceWorker.getRegistrations();
 
   const results = await Promise.all(
     registrations.map(async (registration) => registration.unregister()),
@@ -351,13 +338,13 @@ const removeServiceWorkers = async (): Promise<number> => {
 
 const runCommand = (command: FrameCommand): void => {
   if (command === 'back') {
-    browserHistory.back();
+    window.history.back();
 
     return;
   }
 
   if (command === 'forward') {
-    browserHistory.forward();
+    window.history.forward();
 
     return;
   }

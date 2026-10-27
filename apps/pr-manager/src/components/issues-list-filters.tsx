@@ -52,7 +52,7 @@ export const IssuesListFilters = (): JSX.Element => {
         {PRIORITIES.map((priority) => (
           <button
             aria-pressed={view(view$, ({ hiddenPriorities }) =>
-              String(!hiddenPriorities.includes(priority)),
+              (!hiddenPriorities.includes(priority)).toString(),
             )}
             class={constant('filter-chip')}
             type={constant('button')}
@@ -79,7 +79,7 @@ export const IssuesListFilters = (): JSX.Element => {
         {ISSUE_STARTS.map((start) => (
           <button
             aria-pressed={view(view$, ({ hiddenStarts }) =>
-              String(!hiddenStarts.includes(start)),
+              (!hiddenStarts.includes(start)).toString(),
             )}
             class={constant('filter-chip')}
             title={constant(explainState({ kind: 'issue', state: start }))}
@@ -102,7 +102,7 @@ export const IssuesListFilters = (): JSX.Element => {
         then={
           <button
             aria-pressed={view(view$, ({ hidePending }) =>
-              String(!hidePending),
+              (!hidePending).toString(),
             )}
             class={constant('filter-chip')}
             title={view(view$, ({ hidePending }) =>
@@ -144,7 +144,9 @@ export const IssuesListFilters = (): JSX.Element => {
 
       <fieldset aria-label={constant('Sort')} class={constant('theme-switch')}>
         <button
-          aria-pressed={view(view$, ({ sort }) => String(sort === 'updated'))}
+          aria-pressed={view(view$, ({ sort }) =>
+            (sort === 'updated').toString(),
+          )}
           class={constant('theme-switch-option')}
           title={constant('The most recently updated first.')}
           type={constant('button')}
@@ -153,7 +155,9 @@ export const IssuesListFilters = (): JSX.Element => {
           {constant('updated')}
         </button>
         <button
-          aria-pressed={view(view$, ({ sort }) => String(sort === 'priority'))}
+          aria-pressed={view(view$, ({ sort }) =>
+            (sort === 'priority').toString(),
+          )}
           class={constant('theme-switch-option')}
           title={constant(
             'High first; no priority is between mid and low. The most recently updated first within each.',
@@ -164,7 +168,9 @@ export const IssuesListFilters = (): JSX.Element => {
           {constant('priority')}
         </button>
         <button
-          aria-pressed={view(view$, ({ sort }) => String(sort === 'start'))}
+          aria-pressed={view(view$, ({ sort }) =>
+            (sort === 'start').toString(),
+          )}
           class={constant('theme-switch-option')}
           title={constant(
             'What can be started first, then what is in progress, what needs a look, what waits, and what is on a cycle. The most recently updated first within each.',
@@ -194,7 +200,7 @@ const LabelPick = ({
 
   return (
     <button
-      aria-pressed={view(label$, ({ picked }) => String(picked))}
+      aria-pressed={view(label$, ({ picked }) => picked.toString())}
       class={constant('filter-chip label-pick')}
       title={view(label$, ({ picked }) =>
         picked

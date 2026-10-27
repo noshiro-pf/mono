@@ -237,7 +237,12 @@ export const dagSelectionStore = createDagSelectionStore({
   state: dataStore.state,
   // The nodes outside the filter are there to be seen, not edited with it.
   hidden: combine([dagHiddenNodes, dagOutsideNodes]).pipe(
-    map(([hidden, outside]): ReadonlySet<GraphNodeId> => hidden.union(outside)),
+    // `union`'s type argument is written out: under the strict standard library
+    // it is otherwise inferred as `string` from a set of a literal union,
+    // through the widened parameter of `ReadonlySet#has`.
+    map(([hidden, outside]): ReadonlySet<GraphNodeId> =>
+      hidden.union<GraphNodeId>(outside),
+    ),
   ),
   active: combine([uiStore.view, dagViewModeStore.mode]).pipe(
     map(([view, mode]) => view === 'dag' && isArrangeable(mode)),

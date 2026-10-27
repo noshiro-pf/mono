@@ -135,7 +135,7 @@ export const TimePicker = ({
         Optional.isSome(editing) && editing.value.unit === unit
           ? editing.value.text
           : unit === 'hour'
-            ? String(time.hour)
+            ? time.hour.toString()
             : pad2(time.minute),
       ),
     );
@@ -153,7 +153,7 @@ export const TimePicker = ({
         }}
         disabled={constant(disabled)}
         id={constant(ids[unit])}
-        max={constant(String(TIME_UNIT_MAX[unit]))}
+        max={constant(TIME_UNIT_MAX[unit].toString())}
         min={constant('0')}
         type={constant('number')}
         value={text$}

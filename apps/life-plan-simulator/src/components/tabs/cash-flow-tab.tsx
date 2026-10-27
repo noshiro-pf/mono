@@ -181,7 +181,7 @@ const periodicColumns: readonly EditableColumn<PeriodicExpense>[] = [
     header: '回数（確認用）',
     render: (row$) =>
       periodicStat(row$, (amounts) =>
-        String(amounts.filter((a) => a > 0).length),
+        amounts.filter((a) => a > 0).length.toString(),
       ),
   },
   {

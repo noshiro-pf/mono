@@ -91,7 +91,9 @@ describe(initialGridPositions, () => {
   });
 
   test('is wide in a wide frame and tall in a tall one', () => {
-    const nodes = Array.from({ length: 12 }, (_, index) => task(String(index)));
+    const nodes = Array.from({ length: 12 }, (_, index) =>
+      task(index.toString()),
+    );
 
     const extent = (grid: ReadonlyMap<GraphNodeId, Point>): Point => {
       const points = Array.from(grid.values());

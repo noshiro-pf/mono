@@ -15,10 +15,10 @@ export const PaneDropIndicator = memoNamed(
   ({ target }: Readonly<{ target: PaneDropTarget }>) => {
     const style = React.useMemo<React.CSSProperties>(
       () => ({
-        left: `${String(target.indicator.left)}px`,
-        top: `${String(target.indicator.top)}px`,
-        width: `${String(target.indicator.width)}px`,
-        height: `${String(target.indicator.height)}px`,
+        left: `${target.indicator.left.toString()}px`,
+        top: `${target.indicator.top.toString()}px`,
+        width: `${target.indicator.width.toString()}px`,
+        height: `${target.indicator.height.toString()}px`,
       }),
       [target.indicator],
     );

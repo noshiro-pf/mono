@@ -68,7 +68,7 @@ const directionButton = (
   return (
     <button
       aria-pressed={view(dagLayoutStore.arrangement, (arrangement) =>
-        String(arrangement.direction === direction),
+        (arrangement.direction === direction).toString(),
       )}
       class={{ 'bp6-button': constant(true), 'bp6-active': pressed }}
       data-e2e={constant(`dag-direction-${direction}`)}

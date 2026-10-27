@@ -166,7 +166,7 @@ const report = (
 
   const signedId = idFromDer(publicKeyDerOf(key.path));
 
-  console.log(`${crxPath}  (${String(Math.round(crx.length / 1024))} kB)`);
+  console.log(`${crxPath}  (${Math.round(crx.length / 1024).toString()} kB)`);
 
   console.log('  source maps left out');
 

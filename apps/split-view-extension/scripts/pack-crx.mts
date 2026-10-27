@@ -180,7 +180,7 @@ const report = (
 
   const pinnedId = idFromDer(Uint8Array.fromBase64(manifestKey));
 
-  console.log(`${crxPath}  (${String(Math.round(crx.length / 1024))} kB)`);
+  console.log(`${crxPath}  (${Math.round(crx.length / 1024).toString()} kB)`);
 
   console.log(
     '  manifest `key` and `web_accessible_resources` removed, source maps left out',

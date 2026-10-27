@@ -196,10 +196,10 @@ const main = async (): Promise<void> => {
 const demoPort = 5187;
 
 const demoUrls = [
-  `http://localhost:${String(demoPort)}/reference`,
-  `http://localhost:${String(demoPort)}/pull-request`,
-  `http://localhost:${String(demoPort)}/notes`,
-  `http://localhost:${String(demoPort)}/log`,
+  `http://localhost:${demoPort.toString()}/reference`,
+  `http://localhost:${demoPort.toString()}/pull-request`,
+  `http://localhost:${demoPort.toString()}/notes`,
+  `http://localhost:${demoPort.toString()}/log`,
 ] as const;
 
 type Box = Readonly<{ x: number; y: number; width: number; height: number }>;
@@ -263,7 +263,7 @@ const demoPage = (route: string): string =>
     ...Array.from(
       { length: 6 },
       (_, index) =>
-        `<div class="row"><span class="tag">${route}</span><span>Line ${String(index + 1)} of something you might be reading in a pane</span></div>`,
+        `<div class="row"><span class="tag">${route}</span><span>Line ${(index + 1).toString()} of something you might be reading in a pane</span></div>`,
     ),
     '</body></html>',
   ].join('');

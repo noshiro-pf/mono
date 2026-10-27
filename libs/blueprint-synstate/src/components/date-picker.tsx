@@ -372,7 +372,7 @@ export const DatePicker = ({
             moveFocus(day, event);
           }}
         >
-          {constant(String(day.day))}
+          {constant(day.day.toString())}
         </button>
       </td>
     );
@@ -426,7 +426,7 @@ export const DatePicker = ({
               });
             }}
             value={view(display$, (index) =>
-              String(monthOfIndex(index).month - 1),
+              (monthOfIndex(index).month - 1).toString(),
             )}
             onChange={(changed) => {
               const month = parseInteger(changed.currentTarget.value);
@@ -443,7 +443,7 @@ export const DatePicker = ({
           >
             <For items={monthOptions$} key={(option) => option.value}>
               {(option$) => (
-                <option value={view(option$, (o) => String(o.value - 1))}>
+                <option value={view(option$, (o) => (o.value - 1).toString())}>
                   {view(option$, (o) => o.label)}
                 </option>
               )}
@@ -456,7 +456,9 @@ export const DatePicker = ({
             class={'bp6-datepicker-year-select'}
             minimal
             name={'years'}
-            value={view(display$, (index) => String(monthOfIndex(index).year))}
+            value={view(display$, (index) =>
+              monthOfIndex(index).year.toString(),
+            )}
             onChange={(changed) => {
               const year = parseInteger(changed.currentTarget.value);
 
@@ -474,9 +476,9 @@ export const DatePicker = ({
               {(option$) => (
                 <option
                   disabled={view(option$, (o) => o.disabled)}
-                  value={view(option$, (o) => String(o.year))}
+                  value={view(option$, (o) => o.year.toString())}
                 >
-                  {view(option$, (o) => String(o.year))}
+                  {view(option$, (o) => o.year.toString())}
                 </option>
               )}
             </For>

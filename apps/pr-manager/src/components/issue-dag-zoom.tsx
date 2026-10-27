@@ -69,7 +69,7 @@ const Zoom = (): JSX.Element => {
 
         <button
           aria-pressed={derive([fitted$, scale$], (fitted, scale) =>
-            String(!fitted && scale === 1),
+            (!fitted && scale === 1).toString(),
           )}
           class={constant('view-switch-option')}
           title={constant('Back to the natural size')}

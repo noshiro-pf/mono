@@ -45,7 +45,7 @@ export const steppedPaneZoom = (
 };
 
 export const formatPaneZoom = (zoom: number): string =>
-  `${String(Math.round(zoom * 100))}%` as const;
+  `${Math.round(zoom * 100).toString()}%` as const;
 
 const smallestZoom = 0.5;
 

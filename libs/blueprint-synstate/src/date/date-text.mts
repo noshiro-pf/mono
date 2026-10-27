@@ -65,7 +65,7 @@ const DATE_TIME_PATTERN =
   /^(\d{4})[/-](\d{1,2})[/-](\d{1,2})[ T](\d{1,2}):(\d{2})$/u;
 
 const pad = (value: number, width: number): string =>
-  String(value).padStart(width, '0');
+  value.toString().padStart(width, '0');
 
 if (import.meta.vitest !== undefined) {
   const clock = { year: 2026, month: 10, day: 9, hour: 8, minute: 5 } as const;

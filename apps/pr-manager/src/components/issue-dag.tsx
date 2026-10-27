@@ -94,7 +94,9 @@ const Dag = (): JSX.Element => {
                   class={constant('issue-dag-edge')}
                   d={view(edge$, ({ path }) => path)}
                   data-kind={view(edge$, ({ kind }) => kind)}
-                  data-settled={view(edge$, ({ settled }) => String(settled))}
+                  data-settled={view(edge$, ({ settled }) =>
+                    settled.toString(),
+                  )}
                   // The kind is in the key, so it is the one the row was
                   // made with.
                   marker-end={

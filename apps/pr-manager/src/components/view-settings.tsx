@@ -83,10 +83,10 @@ export const ViewSettings = (): JSX.Element => {
                 {view(layout$, ({ split }) => `Left column ${split}%`)}
                 <input
                   id={constant(SPLIT_ID)}
-                  max={constant(String(MAX_SPLIT))}
-                  min={constant(String(MIN_SPLIT))}
+                  max={constant(MAX_SPLIT.toString())}
+                  min={constant(MIN_SPLIT.toString())}
                   type={constant('range')}
-                  value={view(layout$, ({ split }) => String(split))}
+                  value={view(layout$, ({ split }) => split.toString())}
                   onInput={(changed) => {
                     layoutStore.setSplit(changed.currentTarget.valueAsNumber);
                   }}
@@ -110,11 +110,11 @@ export const ViewSettings = (): JSX.Element => {
                   <input
                     id={constant(FIRST_LINE_ID)}
                     max={view(layout$, ({ lines }) =>
-                      String(lines[1] - MIN_THIRD_WIDTH),
+                      (lines[1] - MIN_THIRD_WIDTH).toString(),
                     )}
-                    min={constant(String(MIN_THIRD_WIDTH))}
+                    min={constant(MIN_THIRD_WIDTH.toString())}
                     type={constant('range')}
-                    value={view(layout$, ({ lines }) => String(lines[0]))}
+                    value={view(layout$, ({ lines }) => lines[0].toString())}
                     onInput={(changed) => {
                       layoutStore.setLine(
                         0,
@@ -135,11 +135,13 @@ export const ViewSettings = (): JSX.Element => {
                   <input
                     id={constant(SECOND_LINE_ID)}
                     max={view(layout$, ({ lines }) =>
-                      String(100 - lines[0] - MIN_THIRD_WIDTH),
+                      (100 - lines[0] - MIN_THIRD_WIDTH).toString(),
                     )}
-                    min={constant(String(MIN_THIRD_WIDTH))}
+                    min={constant(MIN_THIRD_WIDTH.toString())}
                     type={constant('range')}
-                    value={view(layout$, ({ lines }) => String(100 - lines[1]))}
+                    value={view(layout$, ({ lines }) =>
+                      (100 - lines[1]).toString(),
+                    )}
                     // The right column's slider counts from the right, so
                     // that more is wider for both: the line it moves is 100
                     // less its value.

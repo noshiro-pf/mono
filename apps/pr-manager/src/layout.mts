@@ -276,7 +276,7 @@ export const searchWithLayout = (search: string, layout: Layout): string => {
       params.set(PARAM.left, layout.left.join(SEPARATOR));
     }
   } else {
-    params.set(PARAM.columns, String(layout.columns));
+    params.set(PARAM.columns, layout.columns.toString());
 
     params.set(PARAM.left, layout.left.join(SEPARATOR));
 
@@ -288,7 +288,7 @@ export const searchWithLayout = (search: string, layout: Layout): string => {
   }
 
   if (layout.split !== DEFAULT_LAYOUT.split) {
-    params.set(PARAM.split, String(layout.split));
+    params.set(PARAM.split, layout.split.toString());
   }
 
   if (!Arr.eq(layout.lines, DEFAULT_LAYOUT.lines)) {
@@ -299,7 +299,7 @@ export const searchWithLayout = (search: string, layout: Layout): string => {
     const height = layout.heights[id];
 
     if (height !== undefined) {
-      params.set(heightParam(id), String(height));
+      params.set(heightParam(id), height.toString());
     }
   }
 
@@ -311,7 +311,7 @@ export const searchWithLayout = (search: string, layout: Layout): string => {
     const share = layout.shares[id];
 
     if (share !== undefined) {
-      params.set(shareParam(id), String(share));
+      params.set(shareParam(id), share.toString());
     }
   }
 

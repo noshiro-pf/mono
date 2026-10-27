@@ -40,10 +40,13 @@ export const PAGES_SITE_ORIGIN = 'https://noshiro-pf.github.io';
 export const pagesAppDir = (packageRoot: string): string => {
   const name = path.basename(packageRoot);
 
+  // Written before the `includes` guard: under the strict standard library
+  // `includes` is a type predicate that also narrows when it is false, so
+  // `name` would read as `never` inside the branch.
+  const notPublished = `pagesAppDir: "${name}" is not published to Pages. Add it to tools/configs/pages-apps.mts.`;
+
   if (!pagesApps.includes(name)) {
-    throw new Error(
-      `pagesAppDir: "${name}" is not published to Pages. Add it to tools/configs/pages-apps.mts.`,
-    );
+    throw new Error(notPublished);
   }
 
   return name;

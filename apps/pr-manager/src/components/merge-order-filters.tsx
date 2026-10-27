@@ -50,7 +50,7 @@ export const MergeOrderFilters = (): JSX.Element => {
       <div
         class={constant('summary-row')}
         data-picking={view(view$, ({ onlyStatuses }) =>
-          String(Arr.isNonEmpty(onlyStatuses)),
+          Arr.isNonEmpty(onlyStatuses).toString(),
         )}
       >
         <StatTile
@@ -113,7 +113,7 @@ export const MergeOrderFilters = (): JSX.Element => {
           {PRIORITIES.map((priority) => (
             <button
               aria-pressed={view(view$, ({ hiddenPriorities }) =>
-                String(!hiddenPriorities.includes(priority)),
+                (!hiddenPriorities.includes(priority)).toString(),
               )}
               class={constant('filter-chip')}
               type={constant('button')}
@@ -140,7 +140,9 @@ export const MergeOrderFilters = (): JSX.Element => {
           class={constant('theme-switch')}
         >
           <button
-            aria-pressed={view(view$, ({ sort }) => String(sort === 'order'))}
+            aria-pressed={view(view$, ({ sort }) =>
+              (sort === 'order').toString(),
+            )}
             class={constant('theme-switch-option')}
             title={constant(
               'In the order the trailers and the stacks declare.',
@@ -152,7 +154,7 @@ export const MergeOrderFilters = (): JSX.Element => {
           </button>
           <button
             aria-pressed={view(view$, ({ sort }) =>
-              String(sort === 'priority'),
+              (sort === 'priority').toString(),
             )}
             class={constant('theme-switch-option')}
             title={constant(

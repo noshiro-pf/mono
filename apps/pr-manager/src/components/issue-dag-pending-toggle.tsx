@@ -9,7 +9,9 @@ import { issuesViewStore } from '../store/index.mjs';
  */
 export const IssueDagPendingToggle = (): JSX.Element => (
   <button
-    aria-pressed={view(issuesViewStore.hidePending, (hide) => String(!hide))}
+    aria-pressed={view(issuesViewStore.hidePending, (hide) =>
+      (!hide).toString(),
+    )}
     class={constant('filter-chip')}
     title={view(issuesViewStore.hidePending, (hide) =>
       hide

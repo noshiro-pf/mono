@@ -25,7 +25,9 @@ export default [
   eslintConfigForVitest(),
 
   {
-    files: ['src/date/**'],
+    // `local-noon.mts` is that arithmetic's one way to build a `Date`; it sits in
+    // `internal/` so that the barrel does not publish it.
+    files: ['src/date/**', 'src/internal/local-noon.mts'],
     rules: defineKnownRules({
       // `Temporal` is not in every browser the pickers run in, nor on Node
       // 22, which this repository's `engines` floor and the Node.js test

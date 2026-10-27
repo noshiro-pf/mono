@@ -60,6 +60,7 @@
     "check:root:package-manager": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-package-manager.mts",
     "check:root:strict-lib-links": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-strict-lib-links.mts",
     "check:root:test": "node ./tools/scripts/cmd/assert-deps-built.mts && vitest run --config ./tools/configs/vitest.tools.config.mts",
+    "check:root:tsconfig-lib-replacement": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-tsconfig-lib-replacement.mts",
     "check:root:tsconfig-paths": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-tsconfig-paths.mts",
     "check:root:types": "node ./tools/scripts/cmd/assert-deps-built.mts && tsc -p ./tsconfig.json --noEmit",
     "check:root:workflow-event-name": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-workflow-event-name.mts",

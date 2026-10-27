@@ -149,7 +149,7 @@ const desiredTargets = (
 
   if (ltsMajor === undefined) {
     return Result.err(
-      `❌ No LTS line below Node ${String(currentMajor)} is still supported.`,
+      `❌ No LTS line below Node ${currentMajor.toString()} is still supported.`,
     );
   }
 
@@ -205,7 +205,7 @@ const lowestSupportedLts = (
     return config.targets.minimum;
   }
 
-  return `${String(oldestSupportedLtsMajor)}.0.0`;
+  return `${oldestSupportedLtsMajor.toString()}.0.0`;
 };
 
 const fetchReleaseData = async (): Promise<Result<ReleaseData, string>> => {
@@ -329,7 +329,7 @@ const eolLineOf = (
   const parsed = parseVersion(version);
 
   return parsed !== undefined && releases.eolMajors.has(parsed.major)
-    ? `${String(parsed.major)}.x`
+    ? `${parsed.major.toString()}.x`
     : undefined;
 };
 
@@ -364,7 +364,7 @@ const fetchJson = async (url: string): Promise<Result<unknown, string>> => {
 
   if (!response.value.ok) {
     return Result.err(
-      `❌ Failed to fetch ${url}: HTTP ${String(response.value.status)}.`,
+      `❌ Failed to fetch ${url}: HTTP ${response.value.status.toString()}.`,
     );
   }
 
@@ -376,7 +376,7 @@ const fetchJson = async (url: string): Promise<Result<unknown, string>> => {
 };
 
 const formatVersion = (version: Version): string =>
-  `${String(version.major)}.${String(version.minor)}.${String(version.patch)}` as const;
+  `${version.major.toString()}.${version.minor.toString()}.${version.patch.toString()}` as const;
 
 if (isDirectlyExecuted(import.meta.url)) {
   const allowMinimumChange = process.argv.includes('--allow-minimum-change');
@@ -413,7 +413,7 @@ if (isDirectlyExecuted(import.meta.url)) {
     }
 
     console.info(
-      `${String(fixedCount)} package.json field(s) updated to match.`,
+      `${fixedCount.toString()} package.json field(s) updated to match.`,
     );
   }
 }

@@ -60,7 +60,7 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
               check?.status === 'error' ? errorId : undefined,
             )}
             aria-invalid={view(row, ({ check }) =>
-              String(check?.status === 'error'),
+              (check?.status === 'error').toString(),
             )}
             data-e2e={constant('dependency-source')}
             fill

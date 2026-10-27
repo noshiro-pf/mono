@@ -111,10 +111,10 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
           {constant('優先度')}
           <HtmlSelect
             fill
-            value={view(editor, ({ draft }) => String(draft.priority))}
+            value={view(editor, ({ draft }) => draft.priority.toString())}
             onChange={(changed) => {
               const priority = priorities.find(
-                (p) => String(p) === changed.currentTarget.value,
+                (p) => p.toString() === changed.currentTarget.value,
               );
 
               if (priority !== undefined) {
@@ -123,7 +123,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
             }}
           >
             {priorities.map((priority) => (
-              <option value={constant(String(priority))}>
+              <option value={constant(priority.toString())}>
                 {constant(`${priority}（${priorityLabels[priority]}）`)}
               </option>
             ))}

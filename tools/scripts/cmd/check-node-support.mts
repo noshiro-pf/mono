@@ -339,7 +339,9 @@ const parseTargets = (
     return Result.err(
       [
         '❌ Every `targets` entry must be an exact `major.minor.patch`:',
-        ...malformed.map(({ key, raw }) => `     ${key}: ${String(raw)}`),
+        ...malformed.map(
+          ({ key, raw }) => `     ${key}: ${unknownToString(raw)}`,
+        ),
         '',
         '   A range would defeat the point — the matrix pins the versions the',
         '   checks actually ran on, so that a green run names them.',

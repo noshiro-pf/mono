@@ -42,7 +42,9 @@ export const DagView = (): JSX.Element => {
 
   return (
     <main
-      aria-busy={view(autoLayout, ({ type }) => String(type === 'computing'))}
+      aria-busy={view(autoLayout, ({ type }) =>
+        (type === 'computing').toString(),
+      )}
       class={constant('dag-view')}
       data-e2e={constant('dag-view')}
     >

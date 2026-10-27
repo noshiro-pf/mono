@@ -274,7 +274,7 @@ export const layOutGraph = async (
       'elk.algorithm': 'layered',
       'elk.direction': elkDirection(input.direction),
       'elk.padding': ELK_PADDING,
-      'elk.spacing.componentComponent': String(PLACEMENT_GAP),
+      'elk.spacing.componentComponent': PLACEMENT_GAP.toString(),
     },
     children: extents.map((extent, index) =>
       elkBox({ id: partId(index), width: extent.width, height: extent.height }),
@@ -599,7 +599,7 @@ const NODE_SPACING = 28;
 
 /** How far apart ELK keeps what it lays out. */
 const spacingOptions = {
-  'elk.spacing.nodeNode': String(NODE_SPACING),
+  'elk.spacing.nodeNode': NODE_SPACING.toString(),
   'elk.layered.spacing.nodeNodeBetweenLayers': '56',
   // An edge that skips a layer passes between two of its nodes, where
   // it is routed (`edge-routing.mts`) more than 20 from each: room for

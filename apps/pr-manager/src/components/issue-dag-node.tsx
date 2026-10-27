@@ -52,7 +52,7 @@ export const IssueDagNode = ({ placed$ }: Props): JSX.Element => {
       <g
         class={constant('issue-dag-node')}
         data-kind={constant(kind)}
-        data-pending={view(placed$, ({ node }) => String(node.pending))}
+        data-pending={view(placed$, ({ node }) => node.pending.toString())}
         data-priority={view(placed$, ({ node }) => node.priority)}
         data-state={view(placed$, ({ node }) => node.state)}
         transform={view(placed$, ({ x, y }) => `translate(${x} ${y})`)}

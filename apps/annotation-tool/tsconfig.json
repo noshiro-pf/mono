@@ -4,8 +4,9 @@
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    "libReplacement": true,
     // Emotion's `css` prop: the JSX factory has to come from @emotion/react.
     "jsxImportSource": "@emotion/react"
   },
-  "include": ["./src", "./e2e", "./scripts", "./configs"]
+  "include": ["./src", "./test", "./e2e", "./scripts", "./configs"]
 }

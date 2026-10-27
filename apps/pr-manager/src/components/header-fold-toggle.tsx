@@ -13,7 +13,7 @@ import { BadgeIcon } from './badge-icon.js';
  */
 export const HeaderFoldToggle = (): JSX.Element => (
   <button
-    aria-expanded={view(headerStore.folded, (folded) => String(!folded))}
+    aria-expanded={view(headerStore.folded, (folded) => (!folded).toString())}
     aria-label={constant('Full header')}
     class={constant('header-button header-fold-toggle')}
     title={view(headerStore.folded, (folded) =>

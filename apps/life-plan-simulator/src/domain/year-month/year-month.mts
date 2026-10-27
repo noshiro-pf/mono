@@ -33,7 +33,7 @@ export const parseYearMonthOr = (
 
 /** 通算月数を `YYYY-MM` にする。 */
 export const formatYearMonth = (index: MonthIndex): string =>
-  `${yearOf(index)}-${String(monthOf(index)).padStart(2, '0')}` as const;
+  `${yearOf(index)}-${monthOf(index).toString().padStart(2, '0')}` as const;
 
 /** 通算月数の西暦年。 */
 export const yearOf = (index: MonthIndex): number => Math.floor(index / 12);

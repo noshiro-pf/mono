@@ -104,12 +104,17 @@ export const collectEventNameViolations = (
 
   return Arr.generate(function* () {
     for (const eventName of triggers.comparedEventNames) {
+      // Written before the `includes` guard: under the strict standard library
+      // `includes` is a type predicate that also narrows when it is false, so
+      // `eventName` would read as `never` inside the branch.
+      const finding = [
+        `\`github.event_name\` is compared against '${eventName}', which is`,
+        'not a trigger of this workflow, so the comparison is constant.',
+        `Its triggers are: ${triggers.triggerEvents.join(', ')}.`,
+      ].join(' ');
+
       if (!triggers.triggerEvents.includes(eventName)) {
-        yield [
-          `\`github.event_name\` is compared against '${eventName}', which is`,
-          'not a trigger of this workflow, so the comparison is constant.',
-          `Its triggers are: ${triggers.triggerEvents.join(', ')}.`,
-        ].join(' ');
+        yield finding;
       }
     }
   });

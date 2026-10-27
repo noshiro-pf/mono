@@ -3,11 +3,6 @@ import { paneIdsOf, type WorkspaceState } from '../layout/index.mjs';
 import { extensionIcon, extensionIconPaneBoundsOf } from '../shared/index.mjs';
 import { findPane } from './reducer.mjs';
 
-// `document.title = …` is a mutation the lint rules reject unless the object it
-// is reached through is named as mutable — the same trick `frame-agent.mts`
-// uses for `history`. Everything in this module goes through it.
-const { document: mut_page } = globalThis;
-
 /**
  * What the tab shows for a workspace: its number and its name.
  *
@@ -15,7 +10,7 @@ const { document: mut_page } = globalThis;
  * row of tabs all reading `split-view…` says nothing about which is which.
  */
 export const tabTitleOf = (position: number, workspaceName: string): string =>
-  `${String(position)}: ${workspaceName}` as const;
+  `${position.toString()}: ${workspaceName}` as const;
 
 /**
  * What follows the number in the tab's title.
@@ -62,6 +57,10 @@ export const applyTabIdentity = (
   position: number,
   workspaceName: string,
 ): void => {
+  // `document.title = …` is a mutation the lint rules reject unless the object
+  // it is reached through is named as mutable.
+  const mut_page = document;
+
   mut_page.title = tabTitleOf(position, workspaceName);
 
   const dataUri = faviconDataUri(position);
@@ -70,12 +69,12 @@ export const applyTabIdentity = (
     return;
   }
 
-  const existing = mut_page.querySelector(`link#${faviconLinkId}`);
+  const existing = document.querySelector(`link#${faviconLinkId}`);
 
   const mut_link =
     existing instanceof HTMLLinkElement
       ? existing
-      : mut_page.createElement('link');
+      : document.createElement('link');
 
   mut_link.id = faviconLinkId;
 
@@ -84,7 +83,7 @@ export const applyTabIdentity = (
   mut_link.href = dataUri;
 
   if (existing === null) {
-    mut_page.head.append(mut_link);
+    document.head.append(mut_link);
   }
 };
 
@@ -98,7 +97,7 @@ export const applyTabIdentity = (
  * Calendar's tab shows, and the two could not be told apart in a tab strip.
  */
 export const faviconDataUri = (position: number): string | undefined => {
-  const mut_canvas = mut_page.createElement('canvas');
+  const mut_canvas = document.createElement('canvas');
 
   mut_canvas.width = faviconPx;
 
@@ -122,7 +121,7 @@ export const faviconDataUri = (position: number): string | undefined => {
 
   mut_context.fill(extensionIconPanesPathOf(icon));
 
-  mut_context.font = `700 ${String(fontPx)}px system-ui, sans-serif`;
+  mut_context.font = `700 ${fontPx.toString()}px system-ui, sans-serif`;
 
   mut_context.textAlign = 'center';
 
@@ -176,7 +175,7 @@ export const faviconLayoutOf = (
   outlinePx: number;
   icon: IconPlacement;
 }> => {
-  const label = String(Math.max(1, Math.round(position)));
+  const label = Math.max(1, Math.round(position)).toString();
 
   const fontPx =
     fontPxByDigits[Math.min(label.length, fontPxByDigits.length) - 1] ??
@@ -277,4 +276,4 @@ const rgbOf = (
   [r, g, b]: readonly [number, number, number],
   alpha: number,
 ): string =>
-  `rgb(${String(r)} ${String(g)} ${String(b)} / ${String(alpha)})` as const;
+  `rgb(${r.toString()} ${g.toString()} ${b.toString()} / ${alpha.toString()})` as const;

@@ -1,5 +1,4 @@
 import { Arr, Json, Optional, Result } from 'ts-data-forge';
-import type { JsonValue } from 'ts-type-forge';
 import packageJson from '../../package.json' with { type: 'json' };
 import {
   flagOptionsDef,
@@ -167,12 +166,7 @@ export const calculate = (): void => {
   })
     .then((response) => response.json())
     .then((data) => {
-      setResult(
-        Result.ok(
-          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          data as JsonValue,
-        ),
-      );
+      setResult(Result.ok(data));
     })
     .catch(() => {
       setResult(

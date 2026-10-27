@@ -31,9 +31,9 @@ export const DagEdge = ({ record }: Props): JSX.Element => {
       data-e2e={constant('dag-edge')}
       data-edge-id={view(record, ({ edge }) => edge.id)}
       data-from={view(record, ({ edge }) => edge.from)}
-      data-implied={view(record, ({ edge }) => String(edge.implied))}
-      data-routed={view(record, ({ edge }) => String(edge.routed))}
-      data-selected={view(record, ({ selected }) => String(selected))}
+      data-implied={view(record, ({ edge }) => edge.implied.toString())}
+      data-routed={view(record, ({ edge }) => edge.routed.toString())}
+      data-selected={view(record, ({ selected }) => selected.toString())}
       data-to={view(record, ({ edge }) => edge.to)}
     >
       <path

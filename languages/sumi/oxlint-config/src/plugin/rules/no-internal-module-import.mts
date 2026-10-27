@@ -2,6 +2,7 @@ import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
 import { skipTypeWrappers } from 'eslint-rule-forge';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { hasKey, isRecord } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import { createRule } from './create-rule.mjs';
 
@@ -174,11 +175,7 @@ const packageHasExports = (
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const parsed: unknown = JSON.parse(fs.readFileSync(manifest, 'utf8'));
 
-      return (
-        typeof parsed === 'object' &&
-        parsed !== null &&
-        Object.hasOwn(parsed, 'exports')
-      );
+      return isRecord(parsed) && hasKey(parsed, 'exports');
     }
 
     if (path.dirname(mut_dir) === mut_dir) {

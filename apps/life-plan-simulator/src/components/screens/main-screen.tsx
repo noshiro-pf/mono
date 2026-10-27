@@ -22,7 +22,9 @@ export const MainScreen = ({ userName }: Props): JSX.Element => {
         cond={view(currentPlan, (p) => p !== undefined)}
         then={<Workspace />}
         else={
-          <Card aria-busy={view(plans, (s) => String(s.type === 'loading'))}>
+          <Card
+            aria-busy={view(plans, (s) => (s.type === 'loading').toString())}
+          >
             <p
               data-e2e={constant('plans-status')}
               role={view(plans, (s) =>

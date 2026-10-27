@@ -15,10 +15,6 @@ import { workspaceQueryParam } from '../shared/index.mjs';
 import { createPane, findPane } from './reducer.mjs';
 import { normalizeAddress } from './url.mjs';
 
-// See the note in `frame-agent.mts`: neither `window.history`,
-// `globalThis.history` nor a bare `history` satisfies the lint rules together.
-const { history: browserHistory } = globalThis;
-
 /**
  * The query parameters of `split.html`, which together describe a split view.
  *
@@ -97,9 +93,9 @@ export const putWorkspaceInUrl = (
   // A bare query resolves against the page's own URL, so this replaces the
   // query and nothing else.
   if (mode === 'push') {
-    browserHistory.pushState(undefined, '', search);
+    window.history.pushState(undefined, '', search);
   } else {
-    browserHistory.replaceState(undefined, '', search);
+    window.history.replaceState(undefined, '', search);
   }
 };
 
@@ -135,7 +131,9 @@ export const workspaceUrlSearch = (
     ),
     ...(zooms.every((zoom) => zoom === defaultPaneZoom)
       ? ([] as const)
-      : zooms.map((zoom) => `${paneZoomQueryParam}=${String(zoom)}` as const)),
+      : zooms.map(
+          (zoom) => `${paneZoomQueryParam}=${zoom.toString()}` as const,
+        )),
     ...(sandboxes.every((sandboxed) => sandboxed)
       ? ([] as const)
       : sandboxes.map(

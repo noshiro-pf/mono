@@ -3,6 +3,12 @@
     "./tools/configs/tsconfig/tsconfig.type-check.json",
     "./tools/configs/tsconfig/tsconfig.vite.json"
   ],
+  "compilerOptions": {
+    // Opted into the strict standard library like every workspace member
+    // (`check:root:tsconfig-lib-replacement` holds each to stating it);
+    // `tools/scripts/strict-lib-active.mts` is this program's probe.
+    "libReplacement": true
+  },
   "include": [
     "./tools/**/*",
     "./**/eslint.config*.mts",

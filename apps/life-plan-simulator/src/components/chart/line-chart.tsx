@@ -28,20 +28,22 @@ export const LineChart = ({
         {tickIndices(yTickCount).map((i) => (
           <g>
             <line
-              x1={constant(String(padding.left))}
-              x2={constant(String(width - padding.right))}
+              x1={constant(padding.left.toString())}
+              x2={constant((width - padding.right).toString())}
               y1={mapBindable(layout, (l) =>
-                String(l.yTicks[i]?.position ?? 0),
+                (l.yTicks[i]?.position ?? 0).toString(),
               )}
               y2={mapBindable(layout, (l) =>
-                String(l.yTicks[i]?.position ?? 0),
+                (l.yTicks[i]?.position ?? 0).toString(),
               )}
               stroke={constant('var(--grid)')}
               stroke-width={constant('1')}
             />
             <text
-              x={constant(String(padding.left - 6))}
-              y={mapBindable(layout, (l) => String(l.yTicks[i]?.position ?? 0))}
+              x={constant((padding.left - 6).toString())}
+              y={mapBindable(layout, (l) =>
+                (l.yTicks[i]?.position ?? 0).toString(),
+              )}
               text-anchor={constant('end')}
               dominant-baseline={constant('middle')}
               font-size={constant('11')}
@@ -53,8 +55,10 @@ export const LineChart = ({
         ))}
         {tickIndices(xTickCount).map((i) => (
           <text
-            x={mapBindable(layout, (l) => String(l.xTicks[i]?.position ?? 0))}
-            y={constant(String(height - padding.bottom + 16))}
+            x={mapBindable(layout, (l) =>
+              (l.xTicks[i]?.position ?? 0).toString(),
+            )}
+            y={constant((height - padding.bottom + 16).toString())}
             text-anchor={constant('middle')}
             font-size={constant('11')}
             fill={constant('var(--muted)')}
@@ -63,10 +67,10 @@ export const LineChart = ({
           </text>
         ))}
         <line
-          x1={constant(String(padding.left))}
-          x2={constant(String(width - padding.right))}
-          y1={mapBindable(layout, (l) => String(l.zero))}
-          y2={mapBindable(layout, (l) => String(l.zero))}
+          x1={constant(padding.left.toString())}
+          x2={constant((width - padding.right).toString())}
+          y1={mapBindable(layout, (l) => l.zero.toString())}
+          y2={mapBindable(layout, (l) => l.zero.toString())}
           stroke={constant('var(--axis)')}
           stroke-width={constant('1')}
         />

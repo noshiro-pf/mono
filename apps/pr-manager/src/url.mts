@@ -4,12 +4,7 @@
  * pasted link opens the same way.
  */
 
-// Neither `window.location`, `globalThis.location` nor a bare `location`
-// satisfies the lint rules together; destructuring once names each something
-// that is none of the three — the same as in `github-view-defaults-extension`.
-const { location: browserLocation, history: browserHistory } = globalThis;
-
-export const currentSearch = (): string => browserLocation.search;
+export const currentSearch = (): string => globalThis.location.search;
 
 /**
  * Writes the query string that `rewrite` makes of the current one, without a
@@ -21,7 +16,7 @@ export const currentSearch = (): string => browserLocation.search;
  * last parameter would otherwise change nothing.
  */
 export const rewriteSearch = (rewrite: (current: string) => string): void => {
-  const { pathname, search, hash } = browserLocation;
+  const { pathname, search, hash } = globalThis.location;
 
   const nextSearch = rewrite(search);
 
@@ -29,8 +24,8 @@ export const rewriteSearch = (rewrite: (current: string) => string): void => {
     return;
   }
 
-  browserHistory.replaceState(
-    browserHistory.state,
+  window.history.replaceState(
+    window.history.state,
     '',
     `${pathname}${nextSearch}${hash}`,
   );
@@ -44,7 +39,7 @@ export const rewriteSearch = (rewrite: (current: string) => string): void => {
 export const navigateToSearch = (
   rewrite: (current: string) => string,
 ): void => {
-  const { pathname, search, hash } = browserLocation;
+  const { pathname, search, hash } = globalThis.location;
 
-  browserLocation.assign(`${pathname}${rewrite(search)}${hash}`);
+  globalThis.location.assign(`${pathname}${rewrite(search)}${hash}`);
 };

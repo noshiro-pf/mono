@@ -4,6 +4,7 @@
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    "libReplacement": true,
     // `chrome` on top of what tsconfig.vite.json lists: the extension APIs are
     // global, so they arrive through `types` rather than through an import.
     "types": [

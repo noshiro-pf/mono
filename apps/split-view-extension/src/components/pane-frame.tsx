@@ -643,9 +643,7 @@ export const PaneFrame = memoNamed(
     const resetToggleTitle =
       siteOrigin === undefined
         ? ''
-        : alwaysReset
-          ? (`Service workers are always cleared for ${siteOrigin}. Click to stop.` as const)
-          : (`Always clear service workers for ${siteOrigin}` as const);
+        : resetToggleTitleOf(siteOrigin, alwaysReset);
 
     const handleToggleAlwaysReset = React.useCallback((): void => {
       if (siteOrigin !== undefined) {
@@ -1270,3 +1268,19 @@ const faviconQuery = (pageUrl: string): string => {
 
   return params.toString();
 };
+
+/**
+ * The title of the toggle that keeps service workers cleared for `siteOrigin`.
+ *
+ * A function of its own so that the origin is not read under `alwaysReset`: the
+ * strict standard library declares `includes` as a type predicate, which
+ * TypeScript also applies when it is false, so where `alwaysReset` is false a
+ * `siteOrigin` that passed through it would be narrowed to `never`.
+ */
+const resetToggleTitleOf = (
+  siteOrigin: string,
+  alwaysReset: boolean,
+): string =>
+  alwaysReset
+    ? (`Service workers are always cleared for ${siteOrigin}. Click to stop.` as const)
+    : (`Always clear service workers for ${siteOrigin}` as const);

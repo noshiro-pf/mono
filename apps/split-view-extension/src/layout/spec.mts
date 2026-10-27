@@ -54,7 +54,7 @@ const axisOfLetter: ReadonlyMap<string, SplitAxis> = new Map<string, SplitAxis>(
 const ratioDigitsOf = (ratio: number): string => {
   const percent = Math.round(ratio * 1000) / 10;
 
-  return percent === 50 ? '' : String(percent);
+  return percent === 50 ? '' : percent.toString();
 };
 
 const ratioCharacters = new Set('0123456789.');
