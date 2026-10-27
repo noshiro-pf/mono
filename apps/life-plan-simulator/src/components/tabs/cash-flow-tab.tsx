@@ -1,3 +1,4 @@
+import { Card } from 'blueprint-synstate';
 import { createState, type InitializedObservable } from 'synstate';
 import { constant, derive, view, type Bindable, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
@@ -24,8 +25,8 @@ export const CashFlowTab = (): JSX.Element => {
 
   return (
     <div class={constant('tab-body')}>
-      <section>
-        <h2>{constant('住宅費（賃貸）')}</h2>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('住宅費（賃貸）')}</h2>
         <div class={constant('form')}>
           <NumberField
             label="家賃（円 / 月）"
@@ -43,9 +44,9 @@ export const CashFlowTab = (): JSX.Element => {
             }}
           />
         </div>
-      </section>
-      <section>
-        <h2>{constant('何年かおきの支出')}</h2>
+      </Card>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('何年かおきの支出')}</h2>
         <EditableTable
           caption="何年かおきの支出"
           items={view(input$, (i) => i.periodicExpenses)}
@@ -62,9 +63,9 @@ export const CashFlowTab = (): JSX.Element => {
             until: '2090-01',
           })}
         />
-      </section>
-      <section>
-        <h2>{constant('臨時収入')}</h2>
+      </Card>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('臨時収入')}</h2>
         <EditableTable
           caption="臨時収入"
           items={view(input$, (i) => i.oneOffIncomes)}
@@ -74,9 +75,9 @@ export const CashFlowTab = (): JSX.Element => {
           }}
           createItem={newOneOff}
         />
-      </section>
-      <section>
-        <h2>{constant('臨時支出')}</h2>
+      </Card>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('臨時支出')}</h2>
         <EditableTable
           caption="臨時支出"
           items={view(input$, (i) => i.oneOffExpenses)}
@@ -86,10 +87,12 @@ export const CashFlowTab = (): JSX.Element => {
           }}
           createItem={newOneOff}
         />
-      </section>
-      <section>
-        <h2>{constant('旧つみたて NISA の預り')}</h2>
-        <p class={constant('note')}>
+      </Card>
+      <Card>
+        <h2 class={constant('bp6-heading')}>
+          {constant('旧つみたて NISA の預り')}
+        </h2>
+        <p class={constant('bp6-text-muted note')}>
           {constant(
             '購入から売却まで現役時代の運用利回りで増え、売却した月の収入になる。',
           )}
@@ -119,10 +122,10 @@ export const CashFlowTab = (): JSX.Element => {
             }}
           />
         </div>
-      </section>
-      <section>
+      </Card>
+      <Card>
         <div class={constant('section-header')}>
-          <h2>{constant('収支')}</h2>
+          <h2 class={constant('bp6-heading')}>{constant('収支')}</h2>
           <GranularityToggle
             granularity$={granularity$}
             setGranularity={setGranularity}
@@ -137,7 +140,7 @@ export const CashFlowTab = (): JSX.Element => {
           ageOf={(r) => r.age}
           granularity={granularity$}
         />
-      </section>
+      </Card>
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import { Card } from 'blueprint-synstate';
 import { constant, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import {
@@ -18,8 +19,8 @@ export const OverviewTab = (): JSX.Element => {
 
   return (
     <div class={constant('tab-body')}>
-      <section>
-        <h2>{constant('判定')}</h2>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('判定')}</h2>
         <ul class={constant('checks')} data-e2e={constant('checks')}>
           {checkItems.map(({ label, pick }) => (
             <li class={{ ng: view(result$, (r) => pick(r) !== undefined) }}>
@@ -33,17 +34,19 @@ export const OverviewTab = (): JSX.Element => {
             </li>
           ))}
         </ul>
-      </section>
-      <section>
-        <h2>{constant('資産の推移（各年の最後の月）')}</h2>
+      </Card>
+      <Card>
+        <h2 class={constant('bp6-heading')}>
+          {constant('資産の推移（各年の最後の月）')}
+        </h2>
         <LineChart
           label={constant('資産の推移')}
           data={chartData}
           series={chartSeries}
         />
-      </section>
-      <section>
-        <h2>{constant('基本情報')}</h2>
+      </Card>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('基本情報')}</h2>
         <div class={constant('form')}>
           <TextField
             label="生年月"
@@ -69,9 +72,9 @@ export const OverviewTab = (): JSX.Element => {
             }}
           />
         </div>
-      </section>
-      <section>
-        <h2>{constant('前提')}</h2>
+      </Card>
+      <Card>
+        <h2 class={constant('bp6-heading')}>{constant('前提')}</h2>
         <div class={constant('form')}>
           {assumptionFields.map((f) => (
             <NumberField
@@ -102,7 +105,7 @@ export const OverviewTab = (): JSX.Element => {
             )}
           />
         </div>
-      </section>
+      </Card>
     </div>
   );
 };

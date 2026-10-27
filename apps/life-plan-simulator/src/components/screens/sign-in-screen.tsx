@@ -1,3 +1,4 @@
+import { Button, Callout, Card } from 'blueprint-synstate';
 import {
   constant,
   If,
@@ -6,6 +7,7 @@ import {
   type JSX,
 } from 'synstate-dom';
 import { sessionStore } from '../../store/index.mjs';
+import { ThemeControl } from './theme-control.js';
 
 type Props = Readonly<{
   error: Bindable<string | undefined>;
@@ -15,32 +17,34 @@ type Props = Readonly<{
 /** Shown while nobody is signed in: one button, Google sign-in in a popup. */
 export const SignInScreen = ({ error, signingIn }: Props): JSX.Element => (
   <main class={constant('center-screen')}>
-    <section class={constant('sign-in-card')}>
-      <h1>{constant('ライフプランシミュレーター')}</h1>
+    <Card class={'sign-in-card'} elevation={1}>
+      <h1 class={constant('bp6-heading')}>
+        {constant('ライフプランシミュレーター')}
+      </h1>
       <p>
         {constant(
           '収入・支出・資産の推移を月ごとに計算します。プランはアカウントに保存され、複数作って比べられます。',
         )}
       </p>
-      <button
-        class={constant('primary')}
+      <Button
+        intent={'primary'}
+        size={'large'}
         data-e2e={constant('sign-in')}
         disabled={signingIn}
-        type={constant('button')}
-        onClick={sessionStore.signIn}
-      >
-        {mapBindable(signingIn, (busy) =>
+        text={mapBindable(signingIn, (busy) =>
           busy ? 'サインイン中…' : 'Google でサインイン',
         )}
-      </button>
+        onClick={sessionStore.signIn}
+      />
       <If
         cond={mapBindable(error, (message) => message !== undefined)}
         then={
-          <p class={constant('error')} role={constant('alert')}>
+          <Callout intent={'danger'} role={'alert'}>
             {mapBindable(error, (message) => message ?? '')}
-          </p>
+          </Callout>
         }
       />
-    </section>
+      <ThemeControl />
+    </Card>
   </main>
 );

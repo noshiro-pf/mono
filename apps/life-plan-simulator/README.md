@@ -25,6 +25,13 @@ Google アカウントでサインインし、入力値は「プラン」ごと�
 - 開いているプランの id だけをブラウザの localStorage に残し、次に開いたときに
   同じプランを開く。
 
+見た目は [blueprint-synstate](../../libs/blueprint-synstate) のコンポーネント
+（Blueprint のマークアップを synstate-dom で組んだもの）と Blueprint のスタイル
+シートで描く。React は読み込まない。テーマはライト・ダーク・「システム設定に
+合わせる」から選べ（既定は「システム設定に合わせる」）、選んだテーマはブラウザの
+localStorage に残す。ダークは `<body>` の `bp6-dark` で、Blueprint のダークテーマに
+グラフなどの色を `src/index.css` で合わせている。
+
 ## 構成
 
 - `src/domain/` — 計算。シートごとにモジュールを分けている。
@@ -50,7 +57,7 @@ Google アカウントでサインインし、入力値は「プラン」ごと�
   読み書きのすべて（書き込む文書をスキーマで刈り込む。ほかのディレクトリからは
   `eslint.config.mts` で読み書きを禁じている）。
 - `src/store/` — セッション（サインイン・サインアウト）、プランの一覧と開いている
-  プラン、その入力値と計算結果。
+  プラン、その入力値と計算結果、テーマ。
 - `src/components/` — 画面。`src/utils/` — 入力値の変換と金額の表示。
   `src/view-model/` — エミュレータの接続先やサインインのエラー文言など。
 
@@ -106,8 +113,8 @@ CI では行われないので、オーナーが手で行う。
 
 ## Run
 
-From the repository root, build the workspace once so that `synstate` and
-`synstate-dom` have a `dist/`:
+From the repository root, build the workspace once so that `synstate`,
+`synstate-dom` and `blueprint-synstate` have a `dist/`:
 
 ```sh
 pnpm install

@@ -107,6 +107,43 @@ test('asks to sign in', { tag: '@smoke' }, async ({ page }) => {
     .toHaveText('Google でサインイン');
 });
 
+test(
+  'the theme follows the choice, or the system',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' });
+
+    await page.goto(demo);
+
+    const isDark = (): Promise<boolean> =>
+      page.evaluate(() => document.body.classList.contains('bp6-dark'));
+
+    // 「システム設定に合わせる」 is the default.
+    await expect.poll(isDark).toBe(true);
+
+    await page.emulateMedia({ colorScheme: 'light' });
+
+    await expect.poll(isDark).toBe(false);
+
+    await page.getByTestId('theme-dark').click();
+
+    await expect.poll(isDark).toBe(true);
+
+    // The choice is this browser's, and outlasts a reload.
+    await page.reload();
+
+    await expect.poll(isDark).toBe(true);
+
+    await expect
+      .soft(page.getByTestId('theme-dark'))
+      .toHaveAttribute('aria-checked', 'true');
+
+    await page.getByTestId('theme-light').click();
+
+    await expect.poll(isDark).toBe(false);
+  },
+);
+
 /**
  * The in-memory demo (`?storage=memory`), signed in with one plan of the
  * default inputs; nothing here needs the Firebase emulators.

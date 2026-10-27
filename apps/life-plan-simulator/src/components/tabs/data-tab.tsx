@@ -1,3 +1,4 @@
+import { Button, Card, FileInput } from 'blueprint-synstate';
 import { createState } from 'synstate';
 import { constant, If, view, type JSX } from 'synstate-dom';
 import { Result } from 'ts-data-forge';
@@ -24,50 +25,51 @@ export const DataTab = (): JSX.Element => {
 
   return (
     <div class={constant('tab-body')}>
-      <section>
-        <h2>{constant('入力値の保存と読み込み')}</h2>
-        <p class={constant('note')}>
+      <Card>
+        <h2 class={constant('bp6-heading')}>
+          {constant('入力値の保存と読み込み')}
+        </h2>
+        <p class={constant('bp6-text-muted note')}>
           {constant(
             '入力値はプランごとにアカウント（Firestore）へ自動で保存される。ここでは開いているプランの入力値を JSON ファイルに書き出したり、JSON ファイルから読み込んで置き換えたりできる。',
           )}
         </p>
         <div class={constant('actions')}>
-          <button
-            type={constant('button')}
+          <Button
+            icon={'export'}
+            text={constant('JSON ファイルに書き出す')}
             onClick={() => {
               downloadJson(
                 JSON.stringify(input$.getSnapshot().value, undefined, 2),
                 'life-plan-simulator-input.json',
               );
             }}
-          >
-            {constant('JSON ファイルに書き出す')}
-          </button>
-          <label class={constant('file-button')}>
-            {constant('JSON ファイルを読み込む')}
-            <input
-              type={constant('file')}
-              accept={constant('application/json,.json')}
-              onChange={(e) => {
-                const file = e.currentTarget.files?.[0];
+          />
+          <FileInput
+            accept={'application/json,.json'}
+            aria-label={constant('JSON ファイルを読み込む')}
+            buttonText={'選ぶ'}
+            text={constant('JSON を読み込む…')}
+            onInputChange={(e) => {
+              const file = e.currentTarget.files?.[0];
 
-                if (file !== undefined) {
-                  loadFile(file).catch((error: unknown) => {
-                    setMessage(
-                      `${file.name} を読み込めませんでした: ${String(error)}`,
-                    );
-                  });
-                }
-              }}
-            />
-          </label>
+              if (file !== undefined) {
+                loadFile(file).catch((error: unknown) => {
+                  setMessage(
+                    `${file.name} を読み込めませんでした: ${String(error)}`,
+                  );
+                });
+              }
+            }}
+          />
           <If
             cond={confirmingReset$}
             then={
               <span class={constant('actions')}>
                 {constant('このプランの入力値をすべて既定値に戻しますか？')}
-                <button
-                  type={constant('button')}
+                <Button
+                  intent={'danger'}
+                  text={constant('戻す')}
                   onClick={() => {
                     resetInput();
 
@@ -75,33 +77,29 @@ export const DataTab = (): JSX.Element => {
 
                     setMessage('入力値を既定値に戻しました。');
                   }}
-                >
-                  {constant('戻す')}
-                </button>
-                <button
-                  type={constant('button')}
+                />
+                <Button
+                  text={constant('やめる')}
                   onClick={() => {
                     setConfirmingReset(false);
                   }}
-                >
-                  {constant('やめる')}
-                </button>
+                />
               </span>
             }
             else={
-              <button
-                type={constant('button')}
+              <Button
+                intent={'danger'}
+                variant={constant('outlined')}
+                text={constant('既定値に戻す')}
                 onClick={() => {
                   setConfirmingReset(true);
                 }}
-              >
-                {constant('既定値に戻す')}
-              </button>
+              />
             }
           />
         </div>
         <p role={constant('status')}>{view(message$, (m) => m)}</p>
-      </section>
+      </Card>
     </div>
   );
 };

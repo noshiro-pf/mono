@@ -47,13 +47,24 @@ unmount();
 
 ## What is implemented
 
-| Component    | Blueprint's       | Notes                                                                                                        |
-| :----------- | :---------------- | :----------------------------------------------------------------------------------------------------------- |
-| `DateInput`  | `DateInput`       | The popover is drawn in place, positioned `fixed`, as `usePortal: false` and `positioningStrategy: 'fixed'`. |
-| `DatePicker` | `DatePicker`      | react-day-picker's markup and keyboard navigation; month and weekday names from `Intl`.                      |
-| `TimePicker` | `TimePicker`      | To the minute, on a 24-hour clock.                                                                           |
-| `HtmlSelect` | `HTMLSelect`      | The wrapper is a `<span>`, so that it may sit inside a `<label>`.                                            |
-| `Icon`       | `Icon` (16px SVG) | The few icons the components above draw, and `cog`.                                                          |
+| Component          | Blueprint's        | Notes                                                                                                        |
+| :----------------- | :----------------- | :----------------------------------------------------------------------------------------------------------- |
+| `Button`           | `Button`           | `variant` may change after mount; no `loading` spinner.                                                      |
+| `ButtonGroup`      | `ButtonGroup`      |                                                                                                              |
+| `Callout`          | `Callout`          | The icon defaults to the intent's, as Blueprint's does.                                                      |
+| `Card`             | `Card`             |                                                                                                              |
+| `Checkbox`         | `Checkbox`         | No indeterminate state.                                                                                      |
+| `DateInput`        | `DateInput`        | The popover is drawn in place, positioned `fixed`, as `usePortal: false` and `positioningStrategy: 'fixed'`. |
+| `DatePicker`       | `DatePicker`       | react-day-picker's markup and keyboard navigation; month and weekday names from `Intl`.                      |
+| `FileInput`        | `FileInput`        |                                                                                                              |
+| `HtmlSelect`       | `HTMLSelect`       | The wrapper is a `<span>`, so that it may sit inside a `<label>`.                                            |
+| `HtmlTable`        | `HTMLTable`        |                                                                                                              |
+| `Icon`             | `Icon` (16px SVG)  | The few icons the components above draw, and those an app built on them has needed.                          |
+| `InputGroup`       | `InputGroup`       | No elements beside the input. `onChange` is the DOM's `change`; `onInput` is every keystroke.                |
+| `Label`            | `Label`            | Wraps its control, so that the control needs no `id`.                                                        |
+| `SegmentedControl` | `SegmentedControl` | As a `radiogroup`.                                                                                           |
+| `Tabs`             | `Tabs`             | As `renderActiveTabPanelOnly`, without `animate`.                                                            |
+| `TimePicker`       | `TimePicker`       | To the minute, on a 24-hour clock.                                                                           |
 
 Values are strings, as the browser's own inputs hold them: `YYYY-MM-DD` for a date, `YYYY-MM-DDTHH:mm` for a date with a `timePrecision`, `HH:mm` for a time, and `''` for none. They are wall-clock times with no time zone, so no time zone is offered.
 

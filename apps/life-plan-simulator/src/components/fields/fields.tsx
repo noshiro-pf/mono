@@ -1,3 +1,4 @@
+import { Checkbox, HtmlSelect, InputGroup, Label } from 'blueprint-synstate';
 import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 import { numberToInput, parseNumberInput } from '../../utils/index.mjs';
 
@@ -22,8 +23,7 @@ export const NumberField = ({
   unit = 'plain',
   e2e,
 }: FieldProps<number> & Readonly<{ unit?: NumberUnit }>): JSX.Element => (
-  <label class={constant('field')}>
-    <span>{constant(label)}</span>
+  <Label class={'field'} text={constant(label)}>
     <NumberInput
       label={label}
       value={value}
@@ -31,7 +31,7 @@ export const NumberField = ({
       unit={unit}
       e2e={e2e}
     />
-  </label>
+  </Label>
 );
 
 /** ラベルを持たない数値の入力欄（表のセル用）。 */
@@ -40,11 +40,15 @@ export const NumberInput = ({
   value,
   onChange,
   unit = 'plain',
+  size = 'medium',
   e2e,
-}: FieldProps<number> & Readonly<{ unit?: NumberUnit }>): JSX.Element => (
-  <input
-    type={constant('number')}
-    step={constant('any')}
+}: FieldProps<number> &
+  Readonly<{ unit?: NumberUnit; size?: 'medium' | 'small' }>): JSX.Element => (
+  <InputGroup
+    type={'number'}
+    step={'any'}
+    size={size}
+    class={'number'}
     aria-label={constant(label)}
     data-e2e={e2e === undefined ? undefined : constant(e2e)}
     value={mapBindable(value, (v) =>
@@ -65,8 +69,7 @@ export const TextField = ({
   type = 'text',
   e2e,
 }: FieldProps<string> & Readonly<{ type?: 'month' | 'text' }>): JSX.Element => (
-  <label class={constant('field')}>
-    <span>{constant(label)}</span>
+  <Label class={'field'} text={constant(label)}>
     <TextInput
       label={label}
       value={value}
@@ -74,7 +77,7 @@ export const TextField = ({
       type={type}
       e2e={e2e}
     />
-  </label>
+  </Label>
 );
 
 /** ラベルを持たない文字列・年月の入力欄（表のセル用）。 */
@@ -83,10 +86,16 @@ export const TextInput = ({
   value,
   onChange,
   type = 'text',
+  size = 'medium',
   e2e,
-}: FieldProps<string> & Readonly<{ type?: 'month' | 'text' }>): JSX.Element => (
-  <input
-    type={constant(type)}
+}: FieldProps<string> &
+  Readonly<{
+    type?: 'month' | 'text';
+    size?: 'medium' | 'small';
+  }>): JSX.Element => (
+  <InputGroup
+    type={type}
+    size={size}
     aria-label={constant(label)}
     data-e2e={e2e === undefined ? undefined : constant(e2e)}
     value={value}
@@ -102,17 +111,15 @@ export const CheckboxField = ({
   onChange,
   e2e,
 }: FieldProps<boolean>): JSX.Element => (
-  <label class={constant('field checkbox')}>
-    <input
-      type={constant('checkbox')}
-      data-e2e={e2e === undefined ? undefined : constant(e2e)}
-      checked={value}
-      onChange={(e) => {
-        onChange(e.currentTarget.checked);
-      }}
-    />
-    <span>{constant(label)}</span>
-  </label>
+  <Checkbox
+    class={'field checkbox'}
+    label={constant(label)}
+    data-e2e={e2e === undefined ? undefined : constant(e2e)}
+    checked={value}
+    onChange={(e) => {
+      onChange(e.currentTarget.checked);
+    }}
+  />
 );
 
 export const SelectField = <T extends string>({
@@ -125,9 +132,9 @@ export const SelectField = <T extends string>({
   Readonly<{
     options: readonly Readonly<{ id: T; label: string }>[];
   }>): JSX.Element => (
-  <label class={constant('field')}>
-    <span>{constant(label)}</span>
-    <select
+  <Label class={'field'} text={constant(label)}>
+    <HtmlSelect
+      fill
       data-e2e={e2e === undefined ? undefined : constant(e2e)}
       value={value}
       onChange={(e) => {
@@ -143,8 +150,8 @@ export const SelectField = <T extends string>({
       {options.map((o) => (
         <option value={constant<string>(o.id)}>{constant(o.label)}</option>
       ))}
-    </select>
-  </label>
+    </HtmlSelect>
+  </Label>
 );
 
 /** 計算で導出される値。入力できない表示にする。 */
@@ -157,8 +164,8 @@ export const OutputField = ({
   value: Bindable<string>;
   e2e?: string;
 }>): JSX.Element => (
-  <div class={constant('field output')}>
-    <span>{constant(label)}</span>
+  <div class={constant('bp6-label field output')}>
+    {constant(label)}
     <output data-e2e={e2e === undefined ? undefined : constant(e2e)}>
       {value}
     </output>
