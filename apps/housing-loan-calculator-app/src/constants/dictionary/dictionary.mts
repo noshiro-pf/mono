@@ -3,7 +3,6 @@ export const dict = {
   settings: '設定',
   numPayments: '支払い回数（回目）',
   borrowingBalanceYen: '借入残高（円）',
-  borrowingTotalYen: '借入金額（＝物件の金額－頭金）',
   interestYen: '利息（円）',
   monthlyPaymentsYen: (unit: boolean): string =>
     `月々の支払い額${unit ? '（円）' : ''}`,
@@ -12,7 +11,7 @@ export const dict = {
   interestSum: '利息合計額',
   paymentsSum: '合計支払い額（＝頭金＋借入金額＋利息）',
   downPaymentManYen: '頭金（万円）',
-  propertyPriceManYen: '物件の金額（万円）',
+  borrowingTotalManYen: '借入金額（万円）',
   borrowingPeriodYear: '借入期間（年）',
   interestRatePerYear: '年利（％）',
   repaymentType: '返済方法',

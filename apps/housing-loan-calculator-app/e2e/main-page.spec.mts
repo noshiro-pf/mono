@@ -11,12 +11,10 @@ const getElements = (
   page: DeepReadonly<Page>,
 ): Readonly<{
   numericInputDownPaymentManYen: Locator;
-  numericInputPropertyPriceManYen: Locator;
+  numericInputBorrowingTotalManYen: Locator;
   numericInputBorrowingPeriodYear: Locator;
   numericInputInterestRatePerYear: Locator;
   repaymentTypeRadioGroup: Locator;
-  borrowingTotalYenTitle: Locator;
-  borrowingTotalYenDescription: Locator;
   fixedPrincipalYenPerMonthTitle: Locator;
   fixedMonthlyPaymentsYenTitle: Locator;
   fixedMonthlyPaymentsYenDescription: Locator;
@@ -29,8 +27,8 @@ const getElements = (
   numericInputDownPaymentManYen: page.getByTestId(
     'numericInput-downPaymentManYen',
   ),
-  numericInputPropertyPriceManYen: page.getByTestId(
-    'numericInput-propertyPriceManYen',
+  numericInputBorrowingTotalManYen: page.getByTestId(
+    'numericInput-borrowingTotalManYen',
   ),
   numericInputBorrowingPeriodYear: page.getByTestId(
     'numericInput-borrowingPeriodYear',
@@ -40,10 +38,6 @@ const getElements = (
   ),
   repaymentTypeRadioGroup: page.getByTestId('repaymentTypeRadioGroup'),
 
-  borrowingTotalYenTitle: page.getByTestId('borrowingTotalYenTitle'),
-  borrowingTotalYenDescription: page.getByTestId(
-    'borrowingTotalYenDescription',
-  ),
   fixedPrincipalYenPerMonthTitle: page.getByTestId(
     'fixedPrincipalYenPerMonthTitle',
   ),
@@ -69,12 +63,10 @@ test('config 1', { tag: '@smoke' }, async ({ page }) => {
 
   const {
     numericInputDownPaymentManYen,
-    numericInputPropertyPriceManYen,
+    numericInputBorrowingTotalManYen,
     numericInputBorrowingPeriodYear,
     numericInputInterestRatePerYear,
     repaymentTypeRadioGroup,
-    borrowingTotalYenTitle,
-    borrowingTotalYenDescription,
     fixedPrincipalYenPerMonthTitle,
     fixedPrincipalYenPerMonthDescription,
     interestSumTitle,
@@ -85,7 +77,7 @@ test('config 1', { tag: '@smoke' }, async ({ page }) => {
 
   await numericInputDownPaymentManYen.fill('200');
 
-  await numericInputPropertyPriceManYen.fill('2780');
+  await numericInputBorrowingTotalManYen.fill('2580');
 
   await numericInputBorrowingPeriodYear.fill('35');
 
@@ -95,12 +87,6 @@ test('config 1', { tag: '@smoke' }, async ({ page }) => {
     .getByTestId('radio--principal-equal-payment')
     // eslint-disable-next-line playwright/no-force-option
     .check({ force: true });
-
-  await expect
-    .soft(borrowingTotalYenTitle)
-    .toHaveText('借入金額（＝物件の金額－頭金）');
-
-  await expect.soft(borrowingTotalYenDescription).toHaveText('2580万円');
 
   await expect
     .soft(fixedPrincipalYenPerMonthTitle)
@@ -126,12 +112,10 @@ test('config 2', { tag: '@smoke' }, async ({ page }) => {
 
   const {
     numericInputDownPaymentManYen,
-    numericInputPropertyPriceManYen,
+    numericInputBorrowingTotalManYen,
     numericInputBorrowingPeriodYear,
     numericInputInterestRatePerYear,
     repaymentTypeRadioGroup,
-    borrowingTotalYenTitle,
-    borrowingTotalYenDescription,
     fixedMonthlyPaymentsYenTitle,
     fixedMonthlyPaymentsYenDescription,
     interestSumTitle,
@@ -142,7 +126,7 @@ test('config 2', { tag: '@smoke' }, async ({ page }) => {
 
   await numericInputDownPaymentManYen.fill('0');
 
-  await numericInputPropertyPriceManYen.fill('2780');
+  await numericInputBorrowingTotalManYen.fill('2780');
 
   await numericInputBorrowingPeriodYear.fill('35');
 
@@ -152,12 +136,6 @@ test('config 2', { tag: '@smoke' }, async ({ page }) => {
     .getByTestId('radio--principal-and-interest-equal-repayment')
     // eslint-disable-next-line playwright/no-force-option
     .check({ force: true });
-
-  await expect
-    .soft(borrowingTotalYenTitle)
-    .toHaveText('借入金額（＝物件の金額－頭金）');
-
-  await expect.soft(borrowingTotalYenDescription).toHaveText('2780万円');
 
   await expect.soft(fixedMonthlyPaymentsYenTitle).toHaveText('月々の支払い額');
 
@@ -180,21 +158,16 @@ test(
   async ({ page }) => {
     await page.goto('/');
 
-    const {
-      numericInputDownPaymentManYen,
-      numericInputPropertyPriceManYen,
-      borrowingTotalYenDescription,
-    } = getElements(page);
+    const { numericInputDownPaymentManYen, numericInputBorrowingTotalManYen } =
+      getElements(page);
 
-    // Not the defaults (200 and 2780), so that the address has to change.
+    // Not the defaults (200 and 2580), so that the address has to change.
     await numericInputDownPaymentManYen.fill('100');
 
-    await numericInputPropertyPriceManYen.fill('3000');
+    await numericInputBorrowingTotalManYen.fill('3000');
 
     // An input commits its value when it loses focus.
-    await numericInputPropertyPriceManYen.blur();
-
-    await expect.soft(borrowingTotalYenDescription).toHaveText('2900万円');
+    await numericInputBorrowingTotalManYen.blur();
 
     // The query string is written to the app's own page on the Pages site,
     // not to the site's root.
@@ -202,6 +175,8 @@ test(
 
     await page.reload();
 
-    await expect.soft(borrowingTotalYenDescription).toHaveText('2900万円');
+    await expect.soft(numericInputDownPaymentManYen).toHaveValue('100');
+
+    await expect.soft(numericInputBorrowingTotalManYen).toHaveValue('3000');
   },
 );
