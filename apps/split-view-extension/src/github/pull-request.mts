@@ -76,11 +76,11 @@ export const pullRequestTitleOf = (
  * The query string of `split.html` that opens a pull request as the PR
  * Manager's links do: the diff, without whitespace changes or the files
  * already viewed, beside the conversation at 7:3, and when the pull request
- * closes an issue, the right half shared with it at 1:1.
+ * closes an issue, the diff, the conversation and the issue at 2:1:1.
  *
  * Beside the diff alone, the conversation is at 100%, as the diff is: its 30%
- * is wide enough to read at full size. Shared with the issue, each has 15%,
- * and both are at 75% so that more of each fits.
+ * is wide enough to read at full size. Shared with the issue, each has a
+ * quarter, and both are at 75% so that more of each fits.
  *
  * Every pull request opened this way reuses one saved split view,
  * `github-pull-request`, rather than adding one to the list each time. It is
@@ -110,7 +110,7 @@ export const pullRequestSplitViewSearch = ({
           panes: [diff, { url: pullRequest.url, zoom: full }],
         } as const)
       : ({
-          layout: 'rprpp',
+          layout: threeColumns,
           panes: [
             diff,
             { url: pullRequest.url, zoom: narrow },
@@ -203,3 +203,12 @@ const full = 1;
 
 /** The conversation and the issue, when they share the right half. */
 const narrow = 0.75;
+
+/**
+ * The diff, the conversation and the issue at 2:1:1, as the diff and the
+ * conversation in the left three quarters beside the issue, so that closing
+ * the conversation widens the diff. The PR Manager's `threeColumns`
+ * (`apps/pr-manager-app/src/split-view.mts`) says why the ratios are not 75%
+ * and 2/3.
+ */
+const threeColumns = 'r75.1r66.8ppp';

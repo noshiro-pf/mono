@@ -1,10 +1,14 @@
 import {
   asGitHubMessage,
+  computeGeometry,
   githubMessageTag,
   issueUrlOf,
+  parseLayoutSpec,
   pullRequestOf,
   pullRequestSplitViewSearch,
   pullRequestTitleOf,
+  removePaneAt,
+  type LayoutNode,
 } from '../src/index.mjs';
 
 describe('pullRequestOf', () => {
@@ -166,7 +170,7 @@ describe('pullRequestSplitViewSearch', () => {
     );
   });
 
-  test('shares the right half with the issue the pull request closes', () => {
+  test('puts the issue beside the diff and the conversation at 2:1:1', () => {
     assert.deepStrictEqual(
       read(
         pullRequestSplitViewSearch({
@@ -179,11 +183,45 @@ describe('pullRequestSplitViewSearch', () => {
         ws: 'github-pull-request',
         name: 'GitHub pull request',
         title: '#2085 Fix the thing',
-        layout: 'rprpp',
+        layout: 'r75.1r66.8ppp',
         url: [diff, conversation, issue],
         zoom: ['1', '0.75', '0.75'],
       },
     );
+  });
+
+  test('keeps each column within 2px of its width as the diff beside a halved right half', () => {
+    const root = threeColumnRoot();
+
+    const diffBesideHalvedRight = parseLayoutSpec('rprpp');
+
+    assert.isDefined(diffBesideHalvedRight);
+
+    for (const width of [1024, 1280, 1440, 1920, 2560, 3840]) {
+      const before = widthsOf(diffBesideHalvedRight, width);
+
+      for (const [index, after] of widthsOf(root, width).entries()) {
+        assert.isAtMost(Math.abs(after - (before[index] ?? 0)), 2);
+      }
+    }
+  });
+
+  test('gives the diff the width of the conversation when it is closed', () => {
+    const root = threeColumnRoot();
+
+    const withoutConversation = removePaneAt(root, 1);
+
+    assert.isDefined(withoutConversation);
+
+    const [diffWidth = 0, conversationWidth = 0, issueWidth = 0] = widthsOf(
+      root,
+      1920,
+    );
+
+    assert.deepStrictEqual(widthsOf(withoutConversation, 1920), [
+      diffWidth + gutter + conversationWidth,
+      issueWidth,
+    ]);
   });
 
   test('titles the tab with the number alone when the title is unknown', () => {
@@ -309,6 +347,36 @@ describe('asGitHubMessage', () => {
     }
   });
 });
+
+const gutter = 6;
+
+/** The tree of the split view a pull request that closes an issue opens. */
+const threeColumnRoot = (): LayoutNode => {
+  const params = new URLSearchParams(
+    pullRequestSplitViewSearch({
+      pullRequest: {
+        number: 2085,
+        url: 'https://github.com/noshiro-pf/mono/pull/2085',
+      },
+      title: undefined,
+      issueUrl: 'https://github.com/noshiro-pf/mono/issues/2084',
+    }),
+  );
+
+  const root = parseLayoutSpec(params.get('layout') ?? '');
+
+  assert.isDefined(root);
+
+  return root;
+};
+
+/** Each pane's width, in pane order, on a page `width` pixels wide. */
+const widthsOf = (root: LayoutNode, width: number): readonly number[] =>
+  computeGeometry(
+    root,
+    { left: 0, top: 0, width, height: 800 },
+    gutter,
+  ).panes.map(({ rect }) => rect.width);
 
 /** What `split.html` reads back out of the query. */
 const read = (search: string): unknown => {
