@@ -132,7 +132,7 @@ export const prReport = async (
   );
 
   // Only the JSON carries these: they are what a session working the queue
-  // reads (`.claude/skills/unblock-prs/SKILL.md`), not what a person does.
+  // reads (`claude-plugin/skills/unblock-prs/SKILL.md`), not what a person does.
   const queue =
     options.format === 'json'
       ? await client.queueComments(repo.value, defaultBranch.value, facts.value)
