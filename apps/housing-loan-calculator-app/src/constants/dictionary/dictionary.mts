@@ -9,8 +9,7 @@ export const dict = {
   monthlyPrincipalPaymentsYen: (unit: boolean): string =>
     `月々の元金の支払い額${unit ? '（円）' : ''}`,
   interestSum: '利息合計額',
-  paymentsSum: '合計支払い額（＝頭金＋借入金額＋利息）',
-  downPaymentManYen: '頭金（万円）',
+  paymentsSum: '合計支払い額（＝借入金額＋利息）',
   borrowingTotalManYen: '借入金額（万円）',
   borrowingPeriodYear: '借入期間（年）',
   interestRatePerYear: '年利（％）',

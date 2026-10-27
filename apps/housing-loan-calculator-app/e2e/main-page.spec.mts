@@ -10,7 +10,6 @@ test('visit main page', { tag: '@smoke' }, async ({ page }) => {
 const getElements = (
   page: DeepReadonly<Page>,
 ): Readonly<{
-  numericInputDownPaymentManYen: Locator;
   numericInputBorrowingTotalManYen: Locator;
   numericInputBorrowingPeriodYear: Locator;
   numericInputInterestRatePerYear: Locator;
@@ -24,9 +23,6 @@ const getElements = (
   paymentsSumTitle: Locator;
   paymentsSumDescription: Locator;
 }> => ({
-  numericInputDownPaymentManYen: page.getByTestId(
-    'numericInput-downPaymentManYen',
-  ),
   numericInputBorrowingTotalManYen: page.getByTestId(
     'numericInput-borrowingTotalManYen',
   ),
@@ -62,7 +58,6 @@ test('config 1', { tag: '@smoke' }, async ({ page }) => {
   await expect.soft(page.getByTestId('root')).toBeVisible();
 
   const {
-    numericInputDownPaymentManYen,
     numericInputBorrowingTotalManYen,
     numericInputBorrowingPeriodYear,
     numericInputInterestRatePerYear,
@@ -74,8 +69,6 @@ test('config 1', { tag: '@smoke' }, async ({ page }) => {
     paymentsSumTitle,
     paymentsSumDescription,
   } = getElements(page);
-
-  await numericInputDownPaymentManYen.fill('200');
 
   await numericInputBorrowingTotalManYen.fill('2580');
 
@@ -100,9 +93,9 @@ test('config 1', { tag: '@smoke' }, async ({ page }) => {
 
   await expect
     .soft(paymentsSumTitle)
-    .toHaveText('合計支払い額（＝頭金＋借入金額＋利息）');
+    .toHaveText('合計支払い額（＝借入金額＋利息）');
 
-  await expect.soft(paymentsSumDescription).toHaveText('3006.29万円');
+  await expect.soft(paymentsSumDescription).toHaveText('2806.29万円');
 });
 
 test('config 2', { tag: '@smoke' }, async ({ page }) => {
@@ -111,7 +104,6 @@ test('config 2', { tag: '@smoke' }, async ({ page }) => {
   await expect.soft(page.getByTestId('root')).toBeVisible();
 
   const {
-    numericInputDownPaymentManYen,
     numericInputBorrowingTotalManYen,
     numericInputBorrowingPeriodYear,
     numericInputInterestRatePerYear,
@@ -123,8 +115,6 @@ test('config 2', { tag: '@smoke' }, async ({ page }) => {
     paymentsSumTitle,
     paymentsSumDescription,
   } = getElements(page);
-
-  await numericInputDownPaymentManYen.fill('0');
 
   await numericInputBorrowingTotalManYen.fill('2780');
 
@@ -147,7 +137,7 @@ test('config 2', { tag: '@smoke' }, async ({ page }) => {
 
   await expect
     .soft(paymentsSumTitle)
-    .toHaveText('合計支払い額（＝頭金＋借入金額＋利息）');
+    .toHaveText('合計支払い額（＝借入金額＋利息）');
 
   await expect.soft(paymentsSumDescription).toHaveText('3030.92万円');
 });
@@ -158,16 +148,18 @@ test(
   async ({ page }) => {
     await page.goto('/');
 
-    const { numericInputDownPaymentManYen, numericInputBorrowingTotalManYen } =
-      getElements(page);
+    const {
+      numericInputBorrowingTotalManYen,
+      numericInputBorrowingPeriodYear,
+    } = getElements(page);
 
-    // Not the defaults (200 and 2580), so that the address has to change.
-    await numericInputDownPaymentManYen.fill('100');
-
+    // Not the defaults (2580 and 35), so that the address has to change.
     await numericInputBorrowingTotalManYen.fill('3000');
 
+    await numericInputBorrowingPeriodYear.fill('30');
+
     // An input commits its value when it loses focus.
-    await numericInputBorrowingTotalManYen.blur();
+    await numericInputBorrowingPeriodYear.blur();
 
     // The query string is written to the app's own page on the Pages site,
     // not to the site's root.
@@ -175,8 +167,8 @@ test(
 
     await page.reload();
 
-    await expect.soft(numericInputDownPaymentManYen).toHaveValue('100');
-
     await expect.soft(numericInputBorrowingTotalManYen).toHaveValue('3000');
+
+    await expect.soft(numericInputBorrowingPeriodYear).toHaveValue('30');
   },
 );

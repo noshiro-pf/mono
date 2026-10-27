@@ -6,7 +6,6 @@ import { dict } from '../../constants/index.mjs';
 import {
   setBorrowingPeriodYear,
   setBorrowingTotalManYen,
-  setDownPaymentManYen,
   setInterestRatePercentPerYear,
   setRepaymentType,
   store$,
@@ -21,7 +20,6 @@ import { RepaymentTypeRadioGroup } from './repayment-type-radio-group.js';
 export const ConfigSection = memoNamed('ConfigSection', () => {
   const {
     repaymentType,
-    downPaymentManYen,
     borrowingTotalManYen,
     borrowingPeriodYear,
     interestRatePercentPerYear,
@@ -30,17 +28,6 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
   return (
     <>
       <SectionTitle>{dict.settings}</SectionTitle>
-      <ConfigElement>
-        <Label>
-          {dict.downPaymentManYen}
-          <YenNumericInput
-            cyId={'numericInput-downPaymentManYen'}
-            min={0}
-            value={downPaymentManYen}
-            onValueChange={setDownPaymentManYen}
-          />
-        </Label>
-      </ConfigElement>
       <ConfigElement>
         <Label>
           {dict.borrowingTotalManYen}

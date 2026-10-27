@@ -5,8 +5,6 @@ import type { Yen } from './yen.mjs';
 
 export type Store = Readonly<{
   repaymentType: RepaymentType;
-  /** 頭金（万円） */
-  downPaymentManYen: Yen;
   /** 借入金額（万円） */
   borrowingTotalManYen: Yen;
   /** 借入期間（年） */

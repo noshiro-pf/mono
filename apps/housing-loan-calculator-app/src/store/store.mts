@@ -22,7 +22,6 @@ const storeFromQuery = (
 ): Store => {
   const paramsAsStr = {
     repaymentType: query.get(queryParamKey.repaymentType),
-    downPayment: query.get(queryParamKey.downPayment),
     borrowingTotal: query.get(queryParamKey.borrowingTotal),
     borrowingPeriodMonth: query.get(queryParamKey.borrowingPeriodMonth),
     interestRatePerMonth: query.get(queryParamKey.interestRatePerMonth),
@@ -31,7 +30,6 @@ const storeFromQuery = (
   // `mapNullable` is the old `mapOptional`; `URLSearchParams.get` returns
   // `null` rather than `undefined`, which it covers too.
   const paramsAsNumber = {
-    downPayment: pipe(paramsAsStr.downPayment).mapNullable(Num.from).value,
     borrowingTotal: pipe(paramsAsStr.borrowingTotal).mapNullable(Num.from)
       .value,
     borrowingPeriodMonth: pipe(paramsAsStr.borrowingPeriodMonth).mapNullable(
@@ -48,10 +46,6 @@ const storeFromQuery = (
       paramsAsStr.repaymentType === 'principal-equal-payment'
         ? paramsAsStr.repaymentType
         : prev.repaymentType,
-    downPaymentManYen:
-      paramsAsNumber.downPayment === undefined
-        ? prev.downPaymentManYen
-        : Yen.cast(paramsAsNumber.downPayment),
     borrowingTotalManYen:
       paramsAsNumber.borrowingTotal === undefined
         ? prev.borrowingTotalManYen
@@ -80,7 +74,6 @@ const setStore = (patch: Partial<Store>): void => {
   Router.push(
     uriWithQueryParams('/', [
       [queryParamKey.repaymentType, store.repaymentType],
-      [queryParamKey.downPayment, store.downPaymentManYen],
       [queryParamKey.borrowingTotal, store.borrowingTotalManYen],
       [queryParamKey.borrowingPeriodMonth, store.borrowingPeriodYear],
       [queryParamKey.interestRatePerMonth, store.interestRatePercentPerYear],
@@ -90,11 +83,6 @@ const setStore = (patch: Partial<Store>): void => {
 
 const setRepaymentType = (repaymentType: RepaymentType): void => {
   setStore({ repaymentType });
-};
-
-// 頭金（万円）
-const setDownPaymentManYen = (downPaymentManYen: Yen): void => {
-  setStore({ downPaymentManYen });
 };
 
 // 借入金額（万円）
@@ -117,7 +105,6 @@ const setInterestRatePercentPerYear = (
 export {
   setBorrowingPeriodYear,
   setBorrowingTotalManYen,
-  setDownPaymentManYen,
   setInterestRatePercentPerYear,
   setRepaymentType,
   store$,
