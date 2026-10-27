@@ -844,6 +844,69 @@ describe(loadReport, () => {
     ]);
   });
 
+  test('reads the rest of the report past a head with more check results than it reads', async () => {
+    // A head relabelled in a loop collects a round of check runs per label
+    // event: thousands, of which only the latest rounds count.
+    const morePage = {
+      contexts_7: {
+        statusCheckRollup: {
+          contexts: {
+            pageInfo: { hasNextPage: true, endCursor: 'cursor-n' },
+            nodes: [
+              checkRun('code-check-result / result', 'COMPLETED', 'CANCELLED'),
+            ],
+          },
+        },
+      },
+    } as const;
+
+    const { fetchImpl, sent } = answering(
+      report([
+        pullRequest({
+          number: 7,
+          labels: ['merge-queued', 'skip-ci'],
+          contexts: [
+            checkRun('code-check-result / result', 'COMPLETED', 'SUCCESS'),
+          ],
+          contextsAfter: 'cursor-1',
+        }),
+        pullRequest({ number: 8, labels: ['merge-queued'] }),
+      ]),
+      answer('Compare', {
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+        compare_8: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
+      {
+        MoreChecks: Arr.create(20, { data: { repository: morePage } }),
+      },
+    );
+
+    const loaded = await load(fetchImpl);
+
+    // It stops following them, rather than reading pages without end.
+    assert.isAtMost(named(sent, 'MoreChecks').length, 10);
+
+    const [seven, eight] = loaded.entries;
+
+    assert.strictEqual(seven?.number, 7);
+
+    assert.isString(seven?.checksUnread);
+
+    assert.notInclude(seven?.reading ?? [], 'checks');
+
+    assert.strictEqual(eight?.number, 8);
+
+    assert.isUndefined(eight?.checksUnread);
+
+    // The pull requests it could judge, and the queue, are still reported.
+    assert.deepStrictEqual(eight?.checks.passed, [
+      'code-check-result / result',
+      'no-skip-ci-label',
+    ]);
+
+    assert.isDefined(loaded.queue);
+  });
+
   test('reports a wait for a code owner', async () => {
     const { fetchImpl } = answering(
       report([

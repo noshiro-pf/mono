@@ -631,5 +631,6 @@ const entry = (
         } as const)
       : ({ state: 'not-required' } as const),
     claudeSessions: [],
+    checksUnread: undefined,
     reading: [],
   }) as const;

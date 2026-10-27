@@ -19,6 +19,11 @@ import { BadgeIcon } from './badge-icon.js';
 type Props = Readonly<{
   /** `undefined` while the check results are still being read. */
   checks: Bindable<ChecksSummary | undefined>;
+  /**
+   * Why the check results, though read, are not judged — more of them than a
+   * read follows — or `undefined` when they are.
+   */
+  unread: Bindable<string | undefined>;
 }>;
 
 /**
@@ -31,10 +36,13 @@ type Props = Readonly<{
  * skipped in a round that was being superseded — is invisible unless the
  * parts are shown. The names are on hover.
  */
-export const VerdictBadge = ({ checks }: Props): JSX.Element => {
+export const VerdictBadge = ({ checks, unread }: Props): JSX.Element => {
   const shown = derive(
-    [checks, reader.features],
-    (summary, { requiredChecks }) => presentChecks(summary, requiredChecks),
+    [checks, unread, reader.features],
+    (summary, reason, { requiredChecks }) =>
+      reason === undefined
+        ? presentChecks(summary, requiredChecks)
+        : presentUnread(reason),
   );
 
   return (
@@ -48,7 +56,10 @@ export const VerdictBadge = ({ checks }: Props): JSX.Element => {
       {mapBindable(shown, ({ label }) => label)}
 
       <If
-        cond={mapBindable(checks, (summary) => summary !== undefined)}
+        cond={derive(
+          [checks, unread],
+          (summary, reason) => summary !== undefined && reason === undefined,
+        )}
         then={
           <span class={constant('badge-counts')}>
             {mapBindable(shown, ({ counts }) => counts)}
@@ -91,3 +102,13 @@ const presentChecks = (
     counts: describeCheckCounts(checks),
   };
 };
+
+/** A question mark: the results are there, and too many to answer from. */
+const presentUnread = (reason: string): Shown =>
+  ({
+    status: 'neutral',
+    icon: 'M5.8 6a2.2 2.2 0 1 1 3.2 2c-.7.4-1 .9-1 1.6v.4M8 12.2v.1',
+    label: 'checks unread',
+    title: reason,
+    counts: '',
+  }) as const;
