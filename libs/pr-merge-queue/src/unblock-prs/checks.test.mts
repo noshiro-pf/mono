@@ -1,4 +1,6 @@
+import { Arr } from 'ts-data-forge';
 import {
+  CHECKS_QUERY,
   describeWaitingOn,
   reportedChecksOf,
   summarizeChecks,
@@ -6,6 +8,26 @@ import {
   type ReportedCheck,
   type RunningCheck,
 } from './checks.mjs';
+
+// GitHub answers a selection left open with a parse error, and the worker
+// then reads no pull request's checks at all.
+describe('CHECKS_QUERY', () => {
+  test('closes every selection it opens, and nothing it did not', () => {
+    const depths = Array.from(CHECKS_QUERY).reduce<readonly number[]>(
+      (acc, char) =>
+        char === '{'
+          ? Arr.toPushed(acc, (acc.at(-1) ?? 0) + 1)
+          : char === '}'
+            ? Arr.toPushed(acc, (acc.at(-1) ?? 0) - 1)
+            : acc,
+      [],
+    );
+
+    assert.isTrue(depths.every((depth) => depth >= 0));
+
+    assert.strictEqual(depths.at(-1), 0);
+  });
+});
 
 describe(summarizeChecks, () => {
   const required = ['code-check-result / result', 'no-skip-ci-label'] as const;

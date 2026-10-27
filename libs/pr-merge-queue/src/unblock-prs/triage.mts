@@ -264,6 +264,11 @@ export const triage = async (
     inFlight: classified
       .filter(({ result }) => result.kind === 'in-flight')
       .map(({ pr }) => pr),
+    // Only a pull request without `skip-ci` has its checks read, so one whose
+    // read failed is released and may be running its matrix.
+    unreadReleased: beforeReview
+      .filter(({ pr, unread }) => unread !== undefined && !isSkipCiLabelled(pr))
+      .map(({ pr }) => pr),
     held: Arr.generate(function* () {
       for (const { pr, result } of classified) {
         if (result.kind === 'held') {

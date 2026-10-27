@@ -194,7 +194,7 @@ const PAGE_SIZE = 100;
 
 const MAX_PAGES = 10;
 
-const CHECKS_QUERY = [
+export const CHECKS_QUERY = [
   'query($owner: String!, $name: String!, $number: Int!, $after: String) {',
   '  repository(owner: $owner, name: $name) {',
   '    pullRequest(number: $number) {',
@@ -214,7 +214,7 @@ const CHECKS_QUERY = [
   '            }',
   '          }',
   '        }',
-  '      } } }',
+  '      } } } }',
   '    }',
   '  }',
   '}',
