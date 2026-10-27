@@ -134,6 +134,12 @@ export type Entry = ReportEntry &
     /** Read from the `Claude-Session:` trailers in the body. */
     claudeSessions: readonly ClaudeSession[];
     /**
+     * Why the head's checks were not judged although they were read: it has
+     * more results than a read follows. `checks` is then the stand-in for
+     * none reported, which the page does not show as a verdict.
+     */
+    checksUnread: string | undefined;
+    /**
      * The parts not read yet. What a listed part fills in holds a stand-in
      * — no checks reported, no comparison, no review asked for — which the
      * page does not show as if it had been read.
@@ -550,7 +556,10 @@ type ChecksState = Readonly<{
   /** The head they were reported on. */
   headSha: string;
   contexts: readonly ContextNode[];
-  /** Where the next page of check results starts, if there is one. */
+  /**
+   * Where the next page of check results starts, if there is one. Still set
+   * once the read is over, the head had more than it follows.
+   */
   contextsAfter: string | undefined;
 }>;
 
@@ -638,7 +647,11 @@ const readPullRequests = async (
  * The check results on every open pull request's head, all of them: a
  * verdict over the first hundred of a head with more would be a guess
  * presented as a fact, so a head whose results do not end within
- * {@link MAX_FOLLOW_UP_ROUNDS} pages fails the read.
+ * {@link MAX_FOLLOW_UP_ROUNDS} pages is not judged (its `contextsAfter`
+ * still set), and its card says so. Not the read failing: a head relabelled
+ * in a loop collects a round of check runs per label event, and one such
+ * pull request would otherwise take the verdicts and the queue of every
+ * other one with it, on every read until it merged.
  */
 const readChecks = async (
   ask: Ask,
@@ -680,20 +693,11 @@ const readChecks = async (
     return { rateLimit: followedUp.rateLimit, result: followed };
   }
 
-  const states = followed.value;
-
-  const unfinished = states.find(
-    ({ contextsAfter }) => contextsAfter !== undefined,
-  );
-
   return {
     rateLimit: followedUp.rateLimit,
-    result:
-      unfinished === undefined
-        ? Result.ok(new Map(states.map((state) => [state.number, state])))
-        : Result.err(
-            `#${unfinished.number} has more check results than this page reads, so its verdict would be a guess.`,
-          ),
+    result: Result.ok(
+      new Map(followed.value.map((state) => [state.number, state])),
+    ),
   };
 };
 
@@ -1522,6 +1526,10 @@ const assemble = ({
               author: entry.author,
             }),
       claudeSessions: parseClaudeSessions(entry.body),
+      checksUnread:
+        parts?.checks?.contextsAfter === undefined
+          ? undefined
+          : `#${entry.number} has more check results than this page reads, so it gives no verdict over them.`,
       reading: [
         ...(parts?.checks === undefined ? (['checks'] as const) : []),
         ...(parts?.comparisonRead === true ? [] : (['comparison'] as const)),
@@ -1661,7 +1669,11 @@ const factsOf = (
   pr: OpenPullRequest,
   { checks, comparison, details }: PartsOfPull,
 ): PullRequestFacts => {
-  const contexts = checks?.contexts ?? [];
+  // An unfinished list is judged as none, rather than as what it began with.
+  const contexts =
+    checks === undefined || checks.contextsAfter !== undefined
+      ? ([] as const)
+      : checks.contexts;
 
   const runs: readonly CheckRunReport[] = Arr.generate(function* () {
     for (const node of contexts) {

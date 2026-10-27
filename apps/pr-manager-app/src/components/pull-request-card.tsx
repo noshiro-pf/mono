@@ -53,6 +53,7 @@ export const PullRequestCard = ({ entry, scaleMax }: Props): JSX.Element => (
         checks={mapBindable(entry, ({ reading, checks }) =>
           reading.includes('checks') ? undefined : checks,
         )}
+        unread={mapBindable(entry, ({ checksUnread }) => checksUnread)}
       />
       <AutoMergeBadge
         armed={mapBindable(entry, ({ autoMerge }) => autoMerge)}
