@@ -36,9 +36,11 @@ words:
   # Layouts in the notation of `src/layout/spec.mts`, as the examples in the
   # README, the docs and the tests spell them: a 2×2 grid, one pane beside two
   # stacked, three side by side, and a spec with one child too many — and the
-  # three columns a GitHub pull request opens in when it closes an issue.
+  # three columns a GitHub pull request opens in when it closes an issue, and
+  # their right column stacked when it also names a Claude Code session.
   - rcppcpp
   - rpcpp
   - prpp
   - rppp
   - rprpp
+  - ppcpp

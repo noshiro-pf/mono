@@ -2,6 +2,7 @@ import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   asGitHubMessage,
+  claudeSessionUrlOf,
   githubMessageTag,
   issueUrlOf,
   pullRequestOf,
@@ -228,7 +229,7 @@ const openSplitView = async (): Promise<void> => {
  *
  * The addresses were read off a web page, so they are checked again here:
  * nothing but a pull request on github.com is opened, and nothing but an issue
- * there is put beside it.
+ * there and a Claude Code session is put beside it.
  */
 const openPullRequest = async (
   message: Extract<GitHubMessage, Readonly<{ kind: 'open' }>>,
@@ -245,6 +246,10 @@ const openPullRequest = async (
     title: message.title,
     issueUrl:
       message.issueUrl === undefined ? undefined : issueUrlOf(message.issueUrl),
+    sessionUrl:
+      message.sessionUrl === undefined
+        ? undefined
+        : claudeSessionUrlOf(message.sessionUrl),
   });
 
   await chrome.tabs.create({
@@ -270,8 +275,9 @@ type OpenerTab = Readonly<Pick<chrome.tabs.Tab, 'id' | 'index' | 'windowId'>>;
 /**
  * The context menu's item was chosen on a pull request.
  *
- * The title and the issue are read by the GitHub content script, which is
- * asked to do so and answers with an `open`. A tab it is not in — a link to a
+ * The title, the issue and the session are read by the GitHub content
+ * script, which is asked to do so and answers with an `open`, so the split
+ * view is the button's, and the PR Manager's. A tab it is not in — a link to a
  * pull request on another site, or a GitHub tab loaded before the extension
  * was — refuses the message, and the pull request is opened with what the
  * address alone says.
@@ -307,6 +313,7 @@ const openPullRequestFromMenu = async (
       url,
       title: undefined,
       issueUrl: undefined,
+      sessionUrl: undefined,
       active: true,
       closeOpener: false,
     },

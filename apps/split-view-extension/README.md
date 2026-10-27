@@ -171,10 +171,13 @@ Every pull request page on github.com, in any repository, has a **⧉ Split
 view** button at the bottom left. It opens the pull request in a new tab the way
 the [PR Manager](../pr-manager-app/docs/design.md#opening-a-pull-request-in-a-split-view)'s
 links do: the diff, without whitespace changes or the files already marked
-viewed, beside the conversation at 7:3 — and when the pull request closes an
-issue, the right half shared with that issue. Everything is at 100%, except
-the conversation and the issue when they share the right half, which are at
-75% so that more of each fits. The pull request's own tab is closed once the
+viewed, beside the conversation at 7:3. When the pull request closes an
+issue, or names the Claude Code session it was written in, that shares the
+right half at 1:1 — the issue right of the conversation, the session left of
+it, next to the diff; with both, the issue is on the left of the right half,
+beside the conversation stacked over the session. Everything is at 100%,
+except the conversation and the issue when they share the right half, which
+are at 75% so that more of each fits. The pull request's own tab is closed once the
 split view has opened, so the split view takes its place; `Ctrl`+click or a
 middle click opens it behind the current tab instead, and keeps that tab.
 
@@ -182,12 +185,14 @@ A link to a pull request — on GitHub, in a mail, in a chat — has **Open pull
 request in Split View** in its context menu, and so does a pull request's own
 page.
 
-The title and the issue are read from the pull request's conversation page, as
-you see it, so a private repository works when you are signed in. The issue is
-the first one GitHub lists under "Successfully merging this pull request may
-close these issues". A link from outside GitHub opens without the issue, since
-nothing there can read it, and so does a pull request whose page could not be
-read.
+The title, the issue and the session are read from the pull request's
+conversation page, as you see it, so a private repository works when you are
+signed in. The issue is the first one GitHub lists under "Successfully merging
+this pull request may close these issues"; the session is the first
+`https://claude.ai/code/session_…` link on a `Claude-Session:` line of the
+description, outside code, as the PR Manager reads it. A link from outside
+GitHub opens without the issue or the session, since nothing there can read
+them, and so does a pull request whose page could not be read.
 
 Every pull request opened this way reuses one saved split view, **GitHub pull
 request**, instead of adding one to the list each time; the PR Manager's links
