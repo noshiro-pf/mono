@@ -10,7 +10,7 @@ import {
 } from 'ts-data-forge';
 import { isDirectlyExecuted, pathExists } from 'ts-repo-utils';
 import type { DeepReadonly } from 'ts-type-forge';
-import { pagesAppEntries, pagesAppUrl } from '../../configs/pages-apps.mjs';
+import { pagesAppDirs, pagesAppUrl } from '../../configs/pages-apps.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -36,7 +36,7 @@ export const checkFirebaseRedirects = async (): Promise<
   Result<number, string>
 > => {
   const apps = await Promise.all(
-    pagesAppEntries().map(async ([packageDir]) => {
+    pagesAppDirs().map(async (packageDir) => {
       const appDir = path.resolve(projectRootPath, 'apps', packageDir);
 
       const firebaseJsonPath = path.resolve(appDir, 'firebase.json');

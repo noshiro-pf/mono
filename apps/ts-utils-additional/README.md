@@ -8,10 +8,10 @@
 
 | ディレクトリ   | 内容                                                         | 利用者                                                           |
 | :------------- | :----------------------------------------------------------- | :--------------------------------------------------------------- |
-| `color/`       | Hsl / Rgb 型、相互変換、コントラスト比、`hslToStr` など      | `color-demo-app` ・ `annotation-tool`                            |
+| `color/`       | Hsl / Rgb 型、相互変換、コントラスト比、`hslToStr` など      | `color-demo` ・ `annotation-tool`                                |
 | `shape/`       | `Rect` ・ `Point` ・ `RectSize` の操作（正規化、内接、変換） | `annotation-tool` ・ `algo-app`                                  |
 | `types/record` | `Point` ・ `Rect` ・ `RectSize` の型                         | 同上                                                             |
-| `array/math`   | `variance`                                                   | `color-demo-app`                                                 |
+| `array/math`   | `variance`                                                   | `color-demo`                                                     |
 | `array/`       | `getShuffled`                                                | `algo-app` ・ `mahjong-calculator-app` ・ `mahjong-scoring-tool` |
 | `num/`         | `dist`（`color/` のテストヘルパが使う）                      | 内部のみ                                                         |
 

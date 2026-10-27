@@ -8,7 +8,7 @@ licensed under [CC BY 4.0](https://github.com/github/docs/blob/main/LICENSE).
 The tests that check the GraphQL requests against it read it from here:
 
 - `libs/pr-merge-queue/src/github-graphql.test.mts`
-- `apps/pr-manager-app/src/github-graphql.test.mts`
+- `apps/pr-manager/src/github-graphql.test.mts`
 
 GitHub answers a query it cannot read with an error and no data, and a query
 is a string, so nothing else says one is wrong before it reaches GitHub.

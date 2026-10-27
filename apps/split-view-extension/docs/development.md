@@ -59,7 +59,7 @@ on the extension's card in `chrome://extensions`.
 `build:dev` adds a read-only `webRequest` log in the service worker, which shows
 what Chrome attributes a pane's request to and which framing headers arrive —
 the way to make "this pane will not load" answerable. It also lets the
-pr-manager-app dev server (`pnpm run dev` / `preview` there) open `split.html`
+pr-manager dev server (`pnpm run dev` / `preview` there) open `split.html`
 from a link, which a production build allows from `noshiro-pf.github.io` only;
 from `localhost` a production build refuses the link with
 `ERR_BLOCKED_BY_CLIENT`.

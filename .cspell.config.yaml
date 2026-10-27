@@ -47,7 +47,7 @@ ignorePaths:
 # `cspell:ignore` comment in that file.
 words:
   - anthropics
-  # The board game, in `apps/catan-dice-app`'s name — so it reaches the
+  # The board game, in `apps/catan-dice`'s name — so it reaches the
   # generated dependency graph and the inventory too, not one directory.
   - catan
   - bivariant

@@ -10,7 +10,7 @@ issue の本文に、その issue に着手してよくなる条件を書く。p
 Start-After: #2113
 ```
 
-issue の着手状態（下記）は、Pull Requests Manager（`apps/pr-manager-app`）の
+issue の着手状態（下記）は、Pull Requests Manager（`apps/pr-manager`）の
 issue 一覧と DAG 表示、`pnpm run pr-report` の issue の節が示す。
 issue を閉じる pull request への引き継ぎ（下記）は、
 Pull Requests Manager、`pnpm run pr-report`、`unblock-prs`、`open-pr` が行う。

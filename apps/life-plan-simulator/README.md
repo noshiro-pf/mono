@@ -14,7 +14,7 @@ Google アカウントでサインインし、入力値は「プラン」ごと�
 保存する。プランはいくつでも作れ、ヘッダーで切り替え・作成・複製・名前の変更・削除が
 できる。「保存・読み込み」タブでは、開いているプランを JSON ファイルに書き出したり、
 JSON ファイルを新しいプランとして（または開いているプランの入力値として）読み込んだり
-できる（[プランのファイル](#プランのファイル)）。仕組みは [task-manager-app](../task-manager-app) と
+できる（[プランのファイル](#プランのファイル)）。仕組みは [task-manager](../task-manager) と
 同じ:
 
 - サインインは Firebase Auth の Google サインインで、ポップアップで行う（ページと
@@ -166,7 +166,7 @@ firebase emulators:start   # needs firebase-tools and Java 21 or later
 | UI             | 4200 |
 
 The ports are in `firebase.json`, which the app reads too; they do not clash
-with task-manager-app's or event-schedule-app's emulators. Sign in through the
+with task-manager's or event-schedule-app's emulators. Sign in through the
 Auth emulator's popup with a made-up account. To use the real project instead,
 set `VITE_FIREBASE_EMULATORS` to anything but `true` (in an untracked
 `.env.development.local`, or on the command line); a production build never

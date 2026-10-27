@@ -420,7 +420,7 @@
 
     // Not an Astro site like the entry above assumes: a Vite Preact app whose
     // entry is the module `index.html` would load.
-    "apps/profile-app": {
+    "apps/profile": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],
     },
@@ -440,7 +440,7 @@
 
     // Not an Astro site like the entry below assumes: a Vite React app whose
     // entry is the module `index.html` would load.
-    "apps/catan-dice-app": {
+    "apps/catan-dice": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],
       // Loaded by `src/index.css` through CSS `@import` rather than by a
@@ -449,7 +449,7 @@
       "ignoreDependencies": ["@fontsource/roboto"],
     },
 
-    "apps/color-demo-app": {
+    "apps/color-demo": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],
       // Loaded by `src/index.css` through CSS `@import` rather than by a
@@ -574,7 +574,7 @@
       ],
     },
 
-    "apps/housing-loan-calculator-app": {
+    "apps/housing-loan-calculator": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],
       // Loaded by `src/index.css` through CSS `@import` rather than by a
@@ -582,7 +582,7 @@
       "ignoreDependencies": ["normalize.css", "@blueprintjs/icons"],
     },
 
-    "apps/cant-stop-probability-app": {
+    "apps/cant-stop-probability": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],
       // Loaded by `src/index.css` through CSS `@import` rather than by a
@@ -611,7 +611,7 @@
     // Not an Astro site like the entry above assumes: a Vite Preact app whose
     // entry is the module `index.html` loads. `src/demo/` and `src/firebase/`
     // are reached from it through dynamic imports.
-    "apps/task-manager-app": {
+    "apps/task-manager": {
       "entry": [
         "src/main.tsx",
         "configs/*.mts",
@@ -655,7 +655,7 @@
 
     // Not an Astro site like the entry above assumes: a Vite Preact app whose
     // entry is the module `index.html` loads.
-    "apps/pr-manager-app": {
+    "apps/pr-manager": {
       "entry": ["src/main.tsx", "configs/*.mts", "scripts/**/*.mts"],
       "project": ["**/*.{mts,tsx}"],
     },

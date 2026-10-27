@@ -17,7 +17,7 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
  *   checkout loaded from another path is still the same extension with the
  *   same storage.
  * - **`web_accessible_resources`**, for the same reason from the other side.
- *   It lets the pr-manager-app open `split.html` from a link, and that link
+ *   It lets the PR Manager open `split.html` from a link, and that link
  *   names the pinned id, which a store install does not have — so in the
  *   package it would reach nobody, and would only let every page it lists
  *   tell that the extension is installed.

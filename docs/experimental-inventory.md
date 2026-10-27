@@ -1825,6 +1825,13 @@ npm 依存は増やしていない。app のディレクトリで
 `my-portfolio-app-preact` はこのとき `profile-app` に改名した。この文書の
 それより前の節は、当時の名前のまま残す。
 
+その後、Pages に載る app のうち名前が公開パスと違っていた 7 つ
+（`cant-stop-probability-app` ・ `catan-dice-app` ・ `color-demo-app` ・
+`housing-loan-calculator-app` ・ `pr-manager-app` ・ `profile-app` ・
+`task-manager-app`）は、ディレクトリ名とパッケージ名から `-app` を外して
+公開パスに揃えた（#2575）。公開 URL は変わらない。この文書のほかの節は
+当時の名前のまま残す。
+
 ## 移動の取りこぼし 2 件（2026-09-07）
 
 復元が一通り終わったところで `experimental/` を両方向に突き合わせた。

@@ -157,7 +157,7 @@ apps/event-schedule-app/functions-build
 # configs/typedoc.config.mjs. Listed by name rather than as `*/docs/` because
 # the other docs/ hold hand-written prose and stay tracked:
 # libs/eslint-config-typed, libs/synstate, apps/split-view-extension,
-# apps/github-view-defaults-extension and apps/pr-manager-app.
+# apps/github-view-defaults-extension and apps/pr-manager.
 /libs/ts-codemod-lib/docs/
 /libs/ts-data-forge/docs/
 /libs/ts-fortress/docs/

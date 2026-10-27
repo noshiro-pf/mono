@@ -53,7 +53,7 @@ const addDiagnosticPermissions = (outDir: string): VitePlugin => ({
 });
 
 /**
- * The pr-manager-app dev server, `pnpm run dev` and `pnpm run preview` alike,
+ * The pr-manager dev server, `pnpm run dev` and `pnpm run preview` alike,
  * as the origins its "split view" links come from while it is being worked on.
  *
  * `public/manifest.json` lets `https://noshiro-pf.github.io` open `split.html`;
@@ -72,9 +72,7 @@ const addDiagnosticPermissions = (outDir: string): VitePlugin => ({
 const addPrManagerDevOrigins = (outDir: string): VitePlugin => ({
   name: 'split-view:pr-manager-dev-origins',
   writeBundle: (): void => {
-    const port = appDevPort(
-      path.resolve(workspaceRootPath, '../pr-manager-app'),
-    );
+    const port = appDevPort(path.resolve(workspaceRootPath, '../pr-manager'));
 
     const manifestPath = path.resolve(outDir, 'manifest.json');
 
@@ -139,7 +137,7 @@ const stripCrossOriginAttribute = (): VitePlugin => ({
  */
 export default defineConfig(({ mode }) => {
   /**
-   * A development build carries the diagnostics and the pr-manager-app dev
+   * A development build carries the diagnostics and the pr-manager dev
    * server's origins; a production build carries neither.
    */
   const diagnostics = mode !== 'production';
