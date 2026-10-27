@@ -242,7 +242,7 @@
    autoAllocateChunkSize?: number;
    cancel?: UnderlyingSourceCancelCallback;
    pull?: UnderlyingSourcePullCallback<R>;
-@@ -773,10 +780,10 @@ interface AbortController {
+@@ -773,7 +780,7 @@ interface AbortController {
    /** Returns the AbortSignal object associated with this object. */
    readonly signal: AbortSignal;
    /** Invoking this method will set this object's AbortSignal's aborted flag and signal to any observers that the associated activity is to be aborted. */
@@ -250,11 +250,7 @@
 +  abort(reason?: unknown): void;
  }
  
--declare var AbortController: {
-+declare const AbortController: {
-   prototype: AbortController;
-   new (): AbortController;
- };
+ declare var AbortController: {
 @@ -789,12 +796,12 @@ interface AbortSignalEventMap {
  interface AbortSignal extends EventTarget {
    /** Returns true if this AbortSignal's AbortController has signaled to abort, and false otherwise. */
@@ -280,12 +276,8 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -814,10 +821,10 @@ interface AbortSignal extends EventTarget {
-   ): void;
- }
- 
--declare var AbortSignal: {
-+declare const AbortSignal: {
+@@ -817,7 +824,7 @@ interface AbortSignal extends EventTarget {
+ declare var AbortSignal: {
    prototype: AbortSignal;
    new (): AbortSignal;
 -  abort(reason?: any): AbortSignal;
@@ -315,12 +307,9 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -864,9 +871,9 @@ interface Blob {
-   text(): Promise<string>;
- }
+@@ -866,7 +873,7 @@ interface Blob {
  
--declare var Blob: {
-+declare const Blob: {
+ declare var Blob: {
    prototype: Blob;
 -  new (blobParts?: BlobPart[], options?: BlobPropertyBag): Blob;
 +  new (blobParts?: readonly BlobPart[], options?: BlobPropertyBag): Blob;
@@ -373,24 +362,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -915,7 +930,7 @@ interface BroadcastChannel extends EventTarget {
-   ): void;
- }
- 
--declare var BroadcastChannel: {
-+declare const BroadcastChannel: {
-   prototype: BroadcastChannel;
-   new (name: string): BroadcastChannel;
- };
-@@ -926,7 +941,7 @@ interface ByteLengthQueuingStrategy extends QueuingStrategy<ArrayBufferView> {
-   readonly size: QueuingStrategySize<ArrayBufferView>;
- }
- 
--declare var ByteLengthQueuingStrategy: {
-+declare const ByteLengthQueuingStrategy: {
-   prototype: ByteLengthQueuingStrategy;
-   new (init: QueuingStrategyInit): ByteLengthQueuingStrategy;
- };
 @@ -937,7 +952,7 @@ declare var ByteLengthQueuingStrategy: {
   */
  interface Cache {
@@ -400,33 +371,6 @@
    delete(
      request: RequestInfo | URL,
      options?: CacheQueryOptions,
-@@ -957,7 +972,7 @@ interface Cache {
-   put(request: RequestInfo | URL, response: Response): Promise<void>;
- }
- 
--declare var Cache: {
-+declare const Cache: {
-   prototype: Cache;
-   new (): Cache;
- };
-@@ -977,7 +992,7 @@ interface CacheStorage {
-   open(cacheName: string): Promise<Cache>;
- }
- 
--declare var CacheStorage: {
-+declare const CacheStorage: {
-   prototype: CacheStorage;
-   new (): CacheStorage;
- };
-@@ -1066,7 +1081,7 @@ interface CanvasGradient {
-   addColorStop(offset: number, color: string): void;
- }
- 
--declare var CanvasGradient: {
-+declare const CanvasGradient: {
-   prototype: CanvasGradient;
-   new (): CanvasGradient;
- };
 @@ -1151,7 +1166,7 @@ interface CanvasPathDrawingStyles {
    lineWidth: number;
    miterLimit: number;
@@ -436,15 +380,6 @@
  }
  
  /** An opaque object describing a pattern, based on an image, a canvas, or a video, created by the CanvasRenderingContext2D.createPattern() method. */
-@@ -1160,7 +1175,7 @@ interface CanvasPattern {
-   setTransform(transform?: DOMMatrix2DInit): void;
- }
- 
--declare var CanvasPattern: {
-+declare const CanvasPattern: {
-   prototype: CanvasPattern;
-   new (): CanvasPattern;
- };
 @@ -1228,11 +1243,11 @@ interface Client {
    readonly id: string;
    readonly type: ClientTypes;
@@ -469,34 +404,7 @@
    prototype: Clients;
    new (): Clients;
  };
-@@ -1262,7 +1277,7 @@ interface CloseEvent extends Event {
-   readonly wasClean: boolean;
- }
- 
--declare var CloseEvent: {
-+declare const CloseEvent: {
-   prototype: CloseEvent;
-   new (type: string, eventInitDict?: CloseEventInit): CloseEvent;
- };
-@@ -1273,7 +1288,7 @@ interface CountQueuingStrategy extends QueuingStrategy {
-   readonly size: QueuingStrategySize;
- }
- 
--declare var CountQueuingStrategy: {
-+declare const CountQueuingStrategy: {
-   prototype: CountQueuingStrategy;
-   new (init: QueuingStrategyInit): CountQueuingStrategy;
- };
-@@ -1287,7 +1302,7 @@ interface Crypto {
-   randomUUID(): `${string}-${string}-${string}-${string}-${string}`;
- }
- 
--declare var Crypto: {
-+declare const Crypto: {
-   prototype: Crypto;
-   new (): Crypto;
- };
-@@ -1300,15 +1315,15 @@ interface CryptoKey {
+@@ -1300,7 +1315,7 @@ interface CryptoKey {
    readonly algorithm: KeyAlgorithm;
    readonly extractable: boolean;
    readonly type: KeyType;
@@ -504,9 +412,8 @@
 +  readonly usages: readonly KeyUsage[];
  }
  
--declare var CryptoKey: {
-+declare const CryptoKey: {
-   prototype: CryptoKey;
+ declare var CryptoKey: {
+@@ -1308,7 +1323,7 @@ declare var CryptoKey: {
    new (): CryptoKey;
  };
  
@@ -515,30 +422,9 @@
    /** Returns any custom data event was created with. Typically used for synthetic events. */
    readonly detail: T;
    /** @deprecated */
-@@ -1320,7 +1335,7 @@ interface CustomEvent<T = any> extends Event {
-   ): void;
- }
+@@ -1443,7 +1458,7 @@ interface DOMMatrix extends DOMMatrixReadOnly {
  
--declare var CustomEvent: {
-+declare const CustomEvent: {
-   prototype: CustomEvent;
-   new <T>(type: string, eventInitDict?: CustomEventInit<T>): CustomEvent<T>;
- };
-@@ -1358,7 +1373,7 @@ interface DOMException extends Error {
-   readonly DATA_CLONE_ERR: 25;
- }
- 
--declare var DOMException: {
-+declare const DOMException: {
-   prototype: DOMException;
-   new (message?: string, name?: string): DOMException;
-   readonly INDEX_SIZE_ERR: 1;
-@@ -1441,9 +1456,9 @@ interface DOMMatrix extends DOMMatrixReadOnly {
-   translateSelf(tx?: number, ty?: number, tz?: number): DOMMatrix;
- }
- 
--declare var DOMMatrix: {
-+declare const DOMMatrix: {
+ declare var DOMMatrix: {
    prototype: DOMMatrix;
 -  new (init?: string | number[]): DOMMatrix;
 +  new (init?: string | readonly number[]): DOMMatrix;
@@ -555,24 +441,14 @@
    translate(tx?: number, ty?: number, tz?: number): DOMMatrix;
  }
  
--declare var DOMMatrixReadOnly: {
-+declare const DOMMatrixReadOnly: {
+ declare var DOMMatrixReadOnly: {
    prototype: DOMMatrixReadOnly;
 -  new (init?: string | number[]): DOMMatrixReadOnly;
 +  new (init?: string | readonly number[]): DOMMatrixReadOnly;
    fromFloat32Array(array32: Float32Array): DOMMatrixReadOnly;
    fromFloat64Array(array64: Float64Array): DOMMatrixReadOnly;
    fromMatrix(other?: DOMMatrixInit): DOMMatrixReadOnly;
-@@ -1526,7 +1541,7 @@ interface DOMPoint extends DOMPointReadOnly {
-   z: number;
- }
- 
--declare var DOMPoint: {
-+declare const DOMPoint: {
-   prototype: DOMPoint;
-   new (x?: number, y?: number, z?: number, w?: number): DOMPoint;
-   fromPoint(other?: DOMPointInit): DOMPoint;
-@@ -1538,10 +1553,10 @@ interface DOMPointReadOnly {
+@@ -1538,7 +1553,7 @@ interface DOMPointReadOnly {
    readonly y: number;
    readonly z: number;
    matrixTransform(matrix?: DOMMatrixInit): DOMPoint;
@@ -580,12 +456,8 @@
 +  toJSON(): unknown;
  }
  
--declare var DOMPointReadOnly: {
-+declare const DOMPointReadOnly: {
-   prototype: DOMPointReadOnly;
-   new (x?: number, y?: number, z?: number, w?: number): DOMPointReadOnly;
-   fromPoint(other?: DOMPointInit): DOMPointReadOnly;
-@@ -1553,10 +1568,10 @@ interface DOMQuad {
+ declare var DOMPointReadOnly: {
+@@ -1553,7 +1568,7 @@ interface DOMQuad {
    readonly p3: DOMPoint;
    readonly p4: DOMPoint;
    getBounds(): DOMRect;
@@ -593,21 +465,8 @@
 +  toJSON(): unknown;
  }
  
--declare var DOMQuad: {
-+declare const DOMQuad: {
-   prototype: DOMQuad;
-   new (
-     p1?: DOMPointInit,
-@@ -1575,7 +1590,7 @@ interface DOMRect extends DOMRectReadOnly {
-   y: number;
- }
- 
--declare var DOMRect: {
-+declare const DOMRect: {
-   prototype: DOMRect;
-   new (x?: number, y?: number, width?: number, height?: number): DOMRect;
-   fromRect(other?: DOMRectInit): DOMRect;
-@@ -1590,10 +1605,10 @@ interface DOMRectReadOnly {
+ declare var DOMQuad: {
+@@ -1590,7 +1605,7 @@ interface DOMRectReadOnly {
    readonly width: number;
    readonly x: number;
    readonly y: number;
@@ -615,20 +474,7 @@
 +  toJSON(): unknown;
  }
  
--declare var DOMRectReadOnly: {
-+declare const DOMRectReadOnly: {
-   prototype: DOMRectReadOnly;
-   new (
-     x?: number,
-@@ -1615,7 +1630,7 @@ interface DOMStringList {
-   [index: number]: string;
- }
- 
--declare var DOMStringList: {
-+declare const DOMStringList: {
-   prototype: DOMStringList;
-   new (): DOMStringList;
- };
+ declare var DOMRectReadOnly: {
 @@ -1631,22 +1646,22 @@ interface DedicatedWorkerGlobalScope
    /** Returns dedicatedWorkerGlobal's name, i.e. the value given to the Worker constructor. Primarily useful for debugging. */
    readonly name: string;
@@ -675,7 +521,7 @@
    prototype: DedicatedWorkerGlobalScope;
    new (): DedicatedWorkerGlobalScope;
  };
-@@ -1736,13 +1751,13 @@ interface EXT_texture_norm16 {
+@@ -1736,7 +1751,7 @@ interface EXT_texture_norm16 {
  /** Events providing information related to errors in scripts or in files. */
  interface ErrorEvent extends Event {
    readonly colno: number;
@@ -684,22 +530,6 @@
    readonly filename: string;
    readonly lineno: number;
    readonly message: string;
- }
- 
--declare var ErrorEvent: {
-+declare const ErrorEvent: {
-   prototype: ErrorEvent;
-   new (type: string, eventInitDict?: ErrorEventInit): ErrorEvent;
- };
-@@ -1791,7 +1806,7 @@ interface Event {
-   readonly BUBBLING_PHASE: 3;
- }
- 
--declare var Event: {
-+declare const Event: {
-   prototype: Event;
-   new (type: string, eventInitDict?: EventInit): Event;
-   readonly NONE: 0;
 @@ -1815,9 +1830,9 @@ interface EventSourceEventMap {
  }
  
@@ -743,24 +573,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -1861,7 +1876,7 @@ interface EventSource extends EventTarget {
-   ): void;
- }
- 
--declare var EventSource: {
-+declare const EventSource: {
-   prototype: EventSource;
-   new (url: string | URL, eventSourceInitDict?: EventSourceInit): EventSource;
-   readonly CONNECTING: 0;
-@@ -1901,31 +1916,31 @@ interface EventTarget {
-   ): void;
- }
- 
--declare var EventTarget: {
-+declare const EventTarget: {
-   prototype: EventTarget;
-   new (): EventTarget;
- };
+@@ -1908,24 +1923,24 @@ declare var EventTarget: {
  
  /** Extends the lifetime of the install and activate events dispatched on the global scope as part of the service worker lifecycle. This ensures that any functional events (like FetchEvent) are not dispatched until it upgrades database schemas and deletes the outdated cache entries. */
  interface ExtendableEvent extends Event {
@@ -805,12 +618,9 @@
    prototype: FetchEvent;
    new (type: string, eventInitDict: FetchEventInit): FetchEvent;
  };
-@@ -1955,9 +1970,13 @@ interface File extends Blob {
-   readonly webkitRelativePath: string;
- }
+@@ -1957,7 +1972,11 @@ interface File extends Blob {
  
--declare var File: {
-+declare const File: {
+ declare var File: {
    prototype: File;
 -  new (fileBits: BlobPart[], fileName: string, options?: FilePropertyBag): File;
 +  new (
@@ -821,15 +631,6 @@
  };
  
  /** An object of this type is returned by the files property of the HTML <input> element; this lets you access the list of files selected with the <input type="file"> element. It's also used for a list of files dropped into web content when using the drag and drop API; see the DataTransfer object for details on this usage. */
-@@ -1967,7 +1986,7 @@ interface FileList {
-   [index: number]: File;
- }
- 
--declare var FileList: {
-+declare const FileList: {
-   prototype: FileList;
-   new (): FileList;
- };
 @@ -1984,14 +2003,22 @@ interface FileReaderEventMap {
  /** Lets web applications asynchronously read the contents of files (or raw data buffers) stored on the user's computer, using File or Blob objects to specify the file or data to read. */
  interface FileReader extends EventTarget {
@@ -877,15 +678,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -2027,7 +2054,7 @@ interface FileReader extends EventTarget {
-   ): void;
- }
- 
--declare var FileReader: {
-+declare const FileReader: {
-   prototype: FileReader;
-   new (): FileReader;
-   readonly EMPTY: 0;
 @@ -2044,7 +2071,7 @@ interface FileReaderSync {
    readAsText(blob: Blob, encoding?: string): string;
  }
@@ -894,33 +686,6 @@
 +declare const FileReaderSync: {
    prototype: FileReaderSync;
    new (): FileReaderSync;
- };
-@@ -2064,7 +2091,7 @@ interface FileSystemDirectoryHandle extends FileSystemHandle {
-   resolve(possibleDescendant: FileSystemHandle): Promise<string[] | null>;
- }
- 
--declare var FileSystemDirectoryHandle: {
-+declare const FileSystemDirectoryHandle: {
-   prototype: FileSystemDirectoryHandle;
-   new (): FileSystemDirectoryHandle;
- };
-@@ -2076,7 +2103,7 @@ interface FileSystemFileHandle extends FileSystemHandle {
-   getFile(): Promise<File>;
- }
- 
--declare var FileSystemFileHandle: {
-+declare const FileSystemFileHandle: {
-   prototype: FileSystemFileHandle;
-   new (): FileSystemFileHandle;
- };
-@@ -2088,7 +2115,7 @@ interface FileSystemHandle {
-   isSameEntry(other: FileSystemHandle): Promise<boolean>;
- }
- 
--declare var FileSystemHandle: {
-+declare const FileSystemHandle: {
-   prototype: FileSystemHandle;
-   new (): FileSystemHandle;
  };
 @@ -2103,7 +2130,7 @@ interface FileSystemSyncAccessHandle {
    write(buffer: BufferSource, options?: FileSystemReadWriteOptions): number;
@@ -931,15 +696,6 @@
    prototype: FileSystemSyncAccessHandle;
    new (): FileSystemSyncAccessHandle;
  };
-@@ -2125,7 +2152,7 @@ interface FontFace {
-   load(): Promise<FontFace>;
- }
- 
--declare var FontFace: {
-+declare const FontFace: {
-   prototype: FontFace;
-   new (
-     family: string,
 @@ -2141,20 +2168,20 @@ interface FontFaceSetEventMap {
  }
  
@@ -975,27 +731,16 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -2174,16 +2201,16 @@ interface FontFaceSet extends EventTarget {
-   ): void;
- }
+@@ -2176,7 +2203,7 @@ interface FontFaceSet extends EventTarget {
  
--declare var FontFaceSet: {
-+declare const FontFaceSet: {
+ declare var FontFaceSet: {
    prototype: FontFaceSet;
 -  new (initialFaces: FontFace[]): FontFaceSet;
 +  new (initialFaces: readonly FontFace[]): FontFaceSet;
  };
  
  interface FontFaceSetLoadEvent extends Event {
-   readonly fontfaces: ReadonlyArray<FontFace>;
- }
- 
--declare var FontFaceSetLoadEvent: {
-+declare const FontFaceSetLoadEvent: {
-   prototype: FontFaceSetLoadEvent;
-   new (
-     type: string,
-@@ -2209,11 +2236,11 @@ interface FormData {
+@@ -2209,7 +2236,7 @@ interface FormData {
        key: string,
        parent: FormData,
      ) => void,
@@ -1004,12 +749,7 @@
    ): void;
  }
  
--declare var FormData: {
-+declare const FormData: {
-   prototype: FormData;
-   new (): FormData;
- };
-@@ -2232,11 +2259,11 @@ interface Headers {
+@@ -2232,7 +2259,7 @@ interface Headers {
    set(name: string, value: string): void;
    forEach(
      callbackfn: (value: string, key: string, parent: Headers) => void,
@@ -1018,12 +758,7 @@
    ): void;
  }
  
--declare var Headers: {
-+declare const Headers: {
-   prototype: Headers;
-   new (init?: HeadersInit): Headers;
- };
-@@ -2271,10 +2298,10 @@ interface IDBCursor {
+@@ -2271,7 +2298,7 @@ interface IDBCursor {
     *
     * If successful, request's result will be the record's key.
     */
@@ -1031,12 +766,8 @@
 +  update(value: unknown): IDBRequest<IDBValidKey>;
  }
  
--declare var IDBCursor: {
-+declare const IDBCursor: {
-   prototype: IDBCursor;
-   new (): IDBCursor;
- };
-@@ -2282,10 +2309,10 @@ declare var IDBCursor: {
+ declare var IDBCursor: {
+@@ -2282,7 +2309,7 @@ declare var IDBCursor: {
  /** This IndexedDB API interface represents a cursor for traversing or iterating over multiple records in a database. It is the same as the IDBCursor, except that it includes the value property. */
  interface IDBCursorWithValue extends IDBCursor {
    /** Returns the cursor's current value. */
@@ -1044,11 +775,7 @@
 +  readonly value: unknown;
  }
  
--declare var IDBCursorWithValue: {
-+declare const IDBCursorWithValue: {
-   prototype: IDBCursorWithValue;
-   new (): IDBCursorWithValue;
- };
+ declare var IDBCursorWithValue: {
 @@ -2303,11 +2330,11 @@ interface IDBDatabase extends EventTarget {
    readonly name: string;
    /** Returns a list of the names of object stores in the database. */
@@ -1090,15 +817,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -2356,7 +2383,7 @@ interface IDBDatabase extends EventTarget {
-   ): void;
- }
- 
--declare var IDBDatabase: {
-+declare const IDBDatabase: {
-   prototype: IDBDatabase;
-   new (): IDBDatabase;
- };
 @@ -2368,7 +2395,7 @@ interface IDBFactory {
     *
     * Throws a "DataError" DOMException if either input is not a valid key.
@@ -1108,15 +826,7 @@
    databases(): Promise<IDBDatabaseInfo[]>;
    /** Attempts to delete the named database. If the database already exists and there are open connections that don't close in response to a versionchange event, the request will be blocked until all they close. If the request is successful request's result will be null. */
    deleteDatabase(name: string): IDBOpenDBRequest;
-@@ -2376,14 +2403,14 @@ interface IDBFactory {
-   open(name: string, version?: number): IDBOpenDBRequest;
- }
- 
--declare var IDBFactory: {
-+declare const IDBFactory: {
-   prototype: IDBFactory;
-   new (): IDBFactory;
- };
+@@ -2383,7 +2410,7 @@ declare var IDBFactory: {
  
  /** IDBIndex interface of the IndexedDB API provides asynchronous access to an index in a database. An index is a kind of object store for looking up records in another object store, called the referenced object store. You use this interface to retrieve data. */
  interface IDBIndex {
@@ -1143,16 +853,7 @@
    /**
     * Retrieves the keys of records matching the given key or key range in query (up to count if given).
     *
-@@ -2446,7 +2473,7 @@ interface IDBIndex {
-   ): IDBRequest<IDBCursor | null>;
- }
- 
--declare var IDBIndex: {
-+declare const IDBIndex: {
-   prototype: IDBIndex;
-   new (): IDBIndex;
- };
-@@ -2454,33 +2481,33 @@ declare var IDBIndex: {
+@@ -2454,15 +2481,15 @@ declare var IDBIndex: {
  /** A key range can be a single value or a range with upper and lower bounds or endpoints. If the key range has both upper and lower bounds, then it is bounded; if it has no bounds, it is unbounded. A bounded key range can either be open (the endpoints are excluded) or closed (the endpoints are included). To retrieve all keys within a certain range, you can use the following code constructs: */
  interface IDBKeyRange {
    /** Returns lower bound, or undefined if none. */
@@ -1170,9 +871,8 @@
 +  includes(key: unknown): boolean;
  }
  
--declare var IDBKeyRange: {
-+declare const IDBKeyRange: {
-   prototype: IDBKeyRange;
+ declare var IDBKeyRange: {
+@@ -2470,17 +2497,17 @@ declare var IDBKeyRange: {
    new (): IDBKeyRange;
    /** Returns a new IDBKeyRange spanning from lower to upper. If lowerOpen is true, lower is not included in the range. If upperOpen is true, upper is not included in the range. */
    bound(
@@ -1240,7 +940,7 @@
    /**
     * Retrieves the keys of records matching the given key or key range in query (up to count if given).
     *
-@@ -2597,10 +2624,10 @@ interface IDBObjectStore {
+@@ -2597,7 +2624,7 @@ interface IDBObjectStore {
     *
     * If successful, request's result will be the record's key.
     */
@@ -1248,11 +948,7 @@
 +  put(value: unknown, key?: IDBValidKey): IDBRequest<IDBValidKey>;
  }
  
--declare var IDBObjectStore: {
-+declare const IDBObjectStore: {
-   prototype: IDBObjectStore;
-   new (): IDBObjectStore;
- };
+ declare var IDBObjectStore: {
 @@ -2613,14 +2640,17 @@ interface IDBOpenDBRequestEventMap extends IDBRequestEventMap {
  /** Also inherits methods from its parents IDBRequest and EventTarget. */
  interface IDBOpenDBRequest extends IDBRequest<IDBDatabase> {
@@ -1286,15 +982,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -2640,7 +2673,7 @@ interface IDBOpenDBRequest extends IDBRequest<IDBDatabase> {
-   ): void;
- }
- 
--declare var IDBOpenDBRequest: {
-+declare const IDBOpenDBRequest: {
-   prototype: IDBOpenDBRequest;
-   new (): IDBOpenDBRequest;
- };
 @@ -2651,11 +2684,11 @@ interface IDBRequestEventMap {
  }
  
@@ -1328,15 +1015,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -2686,7 +2719,7 @@ interface IDBRequest<T = any> extends EventTarget {
-   ): void;
- }
- 
--declare var IDBRequest: {
-+declare const IDBRequest: {
-   prototype: IDBRequest;
-   new (): IDBRequest;
- };
 @@ -2707,9 +2740,9 @@ interface IDBTransaction extends EventTarget {
    readonly mode: IDBTransactionMode;
    /** Returns a list of the names of object stores in the transaction's scope. For an upgrade transaction this is all object stores in the database. */
@@ -1368,61 +1046,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -2737,7 +2770,7 @@ interface IDBTransaction extends EventTarget {
-   ): void;
- }
- 
--declare var IDBTransaction: {
-+declare const IDBTransaction: {
-   prototype: IDBTransaction;
-   new (): IDBTransaction;
- };
-@@ -2748,7 +2781,7 @@ interface IDBVersionChangeEvent extends Event {
-   readonly oldVersion: number;
- }
- 
--declare var IDBVersionChangeEvent: {
-+declare const IDBVersionChangeEvent: {
-   prototype: IDBVersionChangeEvent;
-   new (
-     type: string,
-@@ -2765,7 +2798,7 @@ interface ImageBitmap {
-   close(): void;
- }
- 
--declare var ImageBitmap: {
-+declare const ImageBitmap: {
-   prototype: ImageBitmap;
-   new (): ImageBitmap;
- };
-@@ -2775,7 +2808,7 @@ interface ImageBitmapRenderingContext {
-   transferFromImageBitmap(bitmap: ImageBitmap | null): void;
- }
- 
--declare var ImageBitmapRenderingContext: {
-+declare const ImageBitmapRenderingContext: {
-   prototype: ImageBitmapRenderingContext;
-   new (): ImageBitmapRenderingContext;
- };
-@@ -2791,7 +2824,7 @@ interface ImageData {
-   readonly width: number;
- }
- 
--declare var ImageData: {
-+declare const ImageData: {
-   prototype: ImageData;
-   new (sw: number, sh: number, settings?: ImageDataSettings): ImageData;
-   new (
-@@ -2812,7 +2845,7 @@ interface Lock {
-   readonly name: string;
- }
- 
--declare var Lock: {
-+declare const Lock: {
-   prototype: Lock;
-   new (): Lock;
- };
-@@ -2820,15 +2853,15 @@ declare var Lock: {
+@@ -2820,12 +2853,12 @@ declare var Lock: {
  /** Available only in secure contexts. */
  interface LockManager {
    query(): Promise<LockManagerSnapshot>;
@@ -1436,28 +1060,8 @@
 +  ): Promise<unknown>;
  }
  
--declare var LockManager: {
-+declare const LockManager: {
-   prototype: LockManager;
-   new (): LockManager;
- };
-@@ -2842,7 +2875,7 @@ interface MediaCapabilities {
-   ): Promise<MediaCapabilitiesEncodingInfo>;
- }
- 
--declare var MediaCapabilities: {
-+declare const MediaCapabilities: {
-   prototype: MediaCapabilities;
-   new (): MediaCapabilities;
- };
-@@ -2855,13 +2888,13 @@ interface MessageChannel {
-   readonly port2: MessagePort;
- }
- 
--declare var MessageChannel: {
-+declare const MessageChannel: {
-   prototype: MessageChannel;
-   new (): MessageChannel;
+ declare var LockManager: {
+@@ -2861,7 +2894,7 @@ declare var MessageChannel: {
  };
  
  /** A message received by a target object. */
@@ -1466,7 +1070,7 @@
    /** Returns the data of the message. */
    readonly data: T;
    /** Returns the last event ID string, for server-sent events. */
-@@ -2877,15 +2910,15 @@ interface MessageEvent<T = any> extends Event {
+@@ -2877,11 +2910,11 @@ interface MessageEvent<T = any> extends Event {
      type: string,
      bubbles?: boolean,
      cancelable?: boolean,
@@ -1480,11 +1084,6 @@
    ): void;
  }
  
--declare var MessageEvent: {
-+declare const MessageEvent: {
-   prototype: MessageEvent;
-   new <T>(type: string, eventInitDict?: MessageEventInit<T>): MessageEvent<T>;
- };
 @@ -2897,8 +2930,8 @@ interface MessagePortEventMap {
  
  /** This Channel Messaging API interface represents one of the two ports of a MessageChannel, allowing messages to be sent from one port and listening out for them arriving at the other. */
@@ -1522,24 +1121,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -2932,7 +2965,7 @@ interface MessagePort extends EventTarget {
-   ): void;
- }
- 
--declare var MessagePort: {
-+declare const MessagePort: {
-   prototype: MessagePort;
-   new (): MessagePort;
- };
-@@ -2945,7 +2978,7 @@ interface NavigationPreloadManager {
-   setHeaderValue(value: string): Promise<void>;
- }
- 
--declare var NavigationPreloadManager: {
-+declare const NavigationPreloadManager: {
-   prototype: NavigationPreloadManager;
-   new (): NavigationPreloadManager;
- };
 @@ -2997,20 +3030,20 @@ interface NotificationEventMap {
  /** This Notifications API interface is used to configure and display desktop notifications to the user. */
  interface Notification extends EventTarget {
@@ -1576,15 +1157,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -3030,7 +3063,7 @@ interface Notification extends EventTarget {
-   ): void;
- }
- 
--declare var Notification: {
-+declare const Notification: {
-   prototype: Notification;
-   new (title: string, options?: NotificationOptions): Notification;
-   readonly permission: NotificationPermission;
 @@ -3042,7 +3075,7 @@ interface NotificationEvent extends ExtendableEvent {
    readonly notification: Notification;
  }
@@ -1656,33 +1228,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -3191,7 +3236,7 @@ interface OffscreenCanvas extends EventTarget {
-   ): void;
- }
- 
--declare var OffscreenCanvas: {
-+declare const OffscreenCanvas: {
-   prototype: OffscreenCanvas;
-   new (width: number, height: number): OffscreenCanvas;
- };
-@@ -3217,7 +3262,7 @@ interface OffscreenCanvasRenderingContext2D
-   commit(): void;
- }
- 
--declare var OffscreenCanvasRenderingContext2D: {
-+declare const OffscreenCanvasRenderingContext2D: {
-   prototype: OffscreenCanvasRenderingContext2D;
-   new (): OffscreenCanvasRenderingContext2D;
- };
-@@ -3228,7 +3273,7 @@ interface Path2D extends CanvasPath {
-   addPath(path: Path2D, transform?: DOMMatrix2DInit): void;
- }
- 
--declare var Path2D: {
-+declare const Path2D: {
-   prototype: Path2D;
-   new (path?: Path2D | string): Path2D;
- };
 @@ -3239,7 +3284,9 @@ interface PerformanceEventMap {
  
  /** Provides access to performance-related information for the current page. It's part of the High Resolution Time API, but is enhanced by the Performance Timeline API, the Navigation Timing API, the User Timing API, and the Resource Timing API. */
@@ -1716,16 +1261,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -3278,7 +3325,7 @@ interface Performance extends EventTarget {
-   ): void;
- }
- 
--declare var Performance: {
-+declare const Performance: {
-   prototype: Performance;
-   new (): Performance;
- };
-@@ -3289,30 +3336,30 @@ interface PerformanceEntry {
+@@ -3289,7 +3336,7 @@ interface PerformanceEntry {
    readonly entryType: string;
    readonly name: string;
    readonly startTime: DOMHighResTimeStamp;
@@ -1733,11 +1269,8 @@
 +  toJSON(): unknown;
  }
  
--declare var PerformanceEntry: {
-+declare const PerformanceEntry: {
-   prototype: PerformanceEntry;
-   new (): PerformanceEntry;
- };
+ declare var PerformanceEntry: {
+@@ -3299,7 +3346,7 @@ declare var PerformanceEntry: {
  
  /** PerformanceMark is an abstract interface for PerformanceEntry objects with an entryType of "mark". Entries of this type are created by calling performance.mark() to add a named DOMHighResTimeStamp (the mark) to the browser's performance timeline. */
  interface PerformanceMark extends PerformanceEntry {
@@ -1745,11 +1278,8 @@
 +  readonly detail: unknown;
  }
  
--declare var PerformanceMark: {
-+declare const PerformanceMark: {
-   prototype: PerformanceMark;
-   new (markName: string, markOptions?: PerformanceMarkOptions): PerformanceMark;
- };
+ declare var PerformanceMark: {
+@@ -3309,7 +3356,7 @@ declare var PerformanceMark: {
  
  /** PerformanceMeasure is an abstract interface for PerformanceEntry objects with an entryType of "measure". Entries of this type are created by calling performance.measure() to add a named DOMHighResTimeStamp (the measure) between two marks to the browser's performance timeline. */
  interface PerformanceMeasure extends PerformanceEntry {
@@ -1757,30 +1287,8 @@
 +  readonly detail: unknown;
  }
  
--declare var PerformanceMeasure: {
-+declare const PerformanceMeasure: {
-   prototype: PerformanceMeasure;
-   new (): PerformanceMeasure;
- };
-@@ -3323,7 +3370,7 @@ interface PerformanceObserver {
-   takeRecords(): PerformanceEntryList;
- }
- 
--declare var PerformanceObserver: {
-+declare const PerformanceObserver: {
-   prototype: PerformanceObserver;
-   new (callback: PerformanceObserverCallback): PerformanceObserver;
-   readonly supportedEntryTypes: ReadonlyArray<string>;
-@@ -3335,7 +3382,7 @@ interface PerformanceObserverEntryList {
-   getEntriesByType(type: string): PerformanceEntryList;
- }
- 
--declare var PerformanceObserverEntryList: {
-+declare const PerformanceObserverEntryList: {
-   prototype: PerformanceObserverEntryList;
-   new (): PerformanceObserverEntryList;
- };
-@@ -3360,10 +3407,10 @@ interface PerformanceResourceTiming extends PerformanceEntry {
+ declare var PerformanceMeasure: {
+@@ -3360,7 +3407,7 @@ interface PerformanceResourceTiming extends PerformanceEntry {
    readonly serverTiming: ReadonlyArray<PerformanceServerTiming>;
    readonly transferSize: number;
    readonly workerStart: DOMHighResTimeStamp;
@@ -1788,12 +1296,8 @@
 +  toJSON(): unknown;
  }
  
--declare var PerformanceResourceTiming: {
-+declare const PerformanceResourceTiming: {
-   prototype: PerformanceResourceTiming;
-   new (): PerformanceResourceTiming;
- };
-@@ -3372,10 +3419,10 @@ interface PerformanceServerTiming {
+ declare var PerformanceResourceTiming: {
+@@ -3372,7 +3419,7 @@ interface PerformanceServerTiming {
    readonly description: string;
    readonly duration: DOMHighResTimeStamp;
    readonly name: string;
@@ -1801,11 +1305,7 @@
 +  toJSON(): unknown;
  }
  
--declare var PerformanceServerTiming: {
-+declare const PerformanceServerTiming: {
-   prototype: PerformanceServerTiming;
-   new (): PerformanceServerTiming;
- };
+ declare var PerformanceServerTiming: {
 @@ -3386,11 +3433,14 @@ interface PermissionStatusEventMap {
  
  interface PermissionStatus extends EventTarget {
@@ -1835,32 +1335,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -3410,7 +3463,7 @@ interface PermissionStatus extends EventTarget {
-   ): void;
- }
- 
--declare var PermissionStatus: {
-+declare const PermissionStatus: {
-   prototype: PermissionStatus;
-   new (): PermissionStatus;
- };
-@@ -3419,7 +3472,7 @@ interface Permissions {
-   query(permissionDesc: PermissionDescriptor): Promise<PermissionStatus>;
- }
- 
--declare var Permissions: {
-+declare const Permissions: {
-   prototype: Permissions;
-   new (): Permissions;
- };
-@@ -3432,17 +3485,17 @@ interface ProgressEvent<T extends EventTarget = EventTarget> extends Event {
-   readonly total: number;
- }
- 
--declare var ProgressEvent: {
-+declare const ProgressEvent: {
-   prototype: ProgressEvent;
-   new (type: string, eventInitDict?: ProgressEventInit): ProgressEvent;
+@@ -3438,8 +3491,8 @@ declare var ProgressEvent: {
  };
  
  interface PromiseRejectionEvent extends Event {
@@ -1870,11 +1345,7 @@
 +  readonly reason: unknown;
  }
  
--declare var PromiseRejectionEvent: {
-+declare const PromiseRejectionEvent: {
-   prototype: PromiseRejectionEvent;
-   new (
-     type: string,
+ declare var PromiseRejectionEvent: {
 @@ -3458,7 +3511,7 @@ interface PushEvent extends ExtendableEvent {
    readonly data: PushMessageData | null;
  }
@@ -1884,15 +1355,6 @@
    prototype: PushEvent;
    new (type: string, eventInitDict?: PushEventInit): PushEvent;
  };
-@@ -3475,7 +3528,7 @@ interface PushManager {
-   subscribe(options?: PushSubscriptionOptionsInit): Promise<PushSubscription>;
- }
- 
--declare var PushManager: {
-+declare const PushManager: {
-   prototype: PushManager;
-   new (): PushManager;
-   readonly supportedContentEncodings: ReadonlyArray<string>;
 @@ -3488,11 +3541,11 @@ declare var PushManager: {
  interface PushMessageData {
    arrayBuffer(): ArrayBuffer;
@@ -1907,43 +1369,7 @@
    prototype: PushMessageData;
    new (): PushMessageData;
  };
-@@ -3510,7 +3563,7 @@ interface PushSubscription {
-   unsubscribe(): Promise<boolean>;
- }
- 
--declare var PushSubscription: {
-+declare const PushSubscription: {
-   prototype: PushSubscription;
-   new (): PushSubscription;
- };
-@@ -3521,7 +3574,7 @@ interface PushSubscriptionOptions {
-   readonly userVisibleOnly: boolean;
- }
- 
--declare var PushSubscriptionOptions: {
-+declare const PushSubscriptionOptions: {
-   prototype: PushSubscriptionOptions;
-   new (): PushSubscriptionOptions;
- };
-@@ -3532,7 +3585,7 @@ interface RTCEncodedAudioFrame {
-   getMetadata(): RTCEncodedAudioFrameMetadata;
- }
- 
--declare var RTCEncodedAudioFrame: {
-+declare const RTCEncodedAudioFrame: {
-   prototype: RTCEncodedAudioFrame;
-   new (): RTCEncodedAudioFrame;
- };
-@@ -3544,7 +3597,7 @@ interface RTCEncodedVideoFrame {
-   getMetadata(): RTCEncodedVideoFrameMetadata;
- }
- 
--declare var RTCEncodedVideoFrame: {
-+declare const RTCEncodedVideoFrame: {
-   prototype: RTCEncodedVideoFrame;
-   new (): RTCEncodedVideoFrame;
- };
-@@ -3554,18 +3607,18 @@ interface ReadableByteStreamController {
+@@ -3554,7 +3607,7 @@ interface ReadableByteStreamController {
    readonly desiredSize: number | null;
    close(): void;
    enqueue(chunk: ArrayBufferView): void;
@@ -1951,10 +1377,8 @@
 +  error(e?: unknown): void;
  }
  
--declare var ReadableByteStreamController: {
-+declare const ReadableByteStreamController: {
-   prototype: ReadableByteStreamController;
-   new (): ReadableByteStreamController;
+ declare var ReadableByteStreamController: {
+@@ -3563,9 +3616,9 @@ declare var ReadableByteStreamController: {
  };
  
  /** This Streams API interface represents a readable stream of byte data. The Fetch API offers a concrete instance of a ReadableStream through the body property of a Response object. */
@@ -1966,14 +1390,7 @@
    getReader(options: { mode: 'byob' }): ReadableStreamBYOBReader;
    getReader(): ReadableStreamDefaultReader<R>;
    getReader(options?: ReadableStreamGetReaderOptions): ReadableStreamReader<R>;
-@@ -3580,17 +3633,17 @@ interface ReadableStream<R = any> {
-   tee(): [ReadableStream<R>, ReadableStream<R>];
- }
- 
--declare var ReadableStream: {
-+declare const ReadableStream: {
-   prototype: ReadableStream;
-   new (
+@@ -3586,11 +3639,11 @@ declare var ReadableStream: {
      underlyingSource: UnderlyingByteSource,
      strategy?: { highWaterMark?: number },
    ): ReadableStream<Uint8Array>;
@@ -1987,22 +1404,7 @@
      underlyingSource?: UnderlyingSource<R>,
      strategy?: QueuingStrategy<R>,
    ): ReadableStream<R>;
-@@ -3603,7 +3656,7 @@ interface ReadableStreamBYOBReader extends ReadableStreamGenericReader {
-   releaseLock(): void;
- }
- 
--declare var ReadableStreamBYOBReader: {
-+declare const ReadableStreamBYOBReader: {
-   prototype: ReadableStreamBYOBReader;
-   new (stream: ReadableStream): ReadableStreamBYOBReader;
- };
-@@ -3614,38 +3667,38 @@ interface ReadableStreamBYOBRequest {
-   respondWithNewView(view: ArrayBufferView): void;
- }
- 
--declare var ReadableStreamBYOBRequest: {
-+declare const ReadableStreamBYOBRequest: {
-   prototype: ReadableStreamBYOBRequest;
+@@ -3619,11 +3672,11 @@ declare var ReadableStreamBYOBRequest: {
    new (): ReadableStreamBYOBRequest;
  };
  
@@ -2015,10 +1417,8 @@
 +  error(e?: unknown): void;
  }
  
--declare var ReadableStreamDefaultController: {
-+declare const ReadableStreamDefaultController: {
-   prototype: ReadableStreamDefaultController;
-   new (): ReadableStreamDefaultController;
+ declare var ReadableStreamDefaultController: {
+@@ -3632,7 +3685,7 @@ declare var ReadableStreamDefaultController: {
  };
  
  interface ReadableStreamDefaultReader<
@@ -2027,10 +1427,9 @@
  > extends ReadableStreamGenericReader {
    read(): Promise<ReadableStreamReadResult<R>>;
    releaseLock(): void;
- }
+@@ -3640,12 +3693,12 @@ interface ReadableStreamDefaultReader<
  
--declare var ReadableStreamDefaultReader: {
-+declare const ReadableStreamDefaultReader: {
+ declare var ReadableStreamDefaultReader: {
    prototype: ReadableStreamDefaultReader;
 -  new <R = any>(stream: ReadableStream<R>): ReadableStreamDefaultReader<R>;
 +  new <R = unknown>(stream: ReadableStream<R>): ReadableStreamDefaultReader<R>;
@@ -2052,33 +1451,6 @@
    /** Returns the mode associated with request, which is a string indicating whether the request will use CORS, or will be restricted to same-origin URLs. */
    readonly mode: RequestMode;
    /** Returns the redirect mode associated with request, which is a string indicating how redirects for the request will be handled during fetching. A request will follow redirects by default. */
-@@ -3679,7 +3732,7 @@ interface Request extends Body {
-   clone(): Request;
- }
- 
--declare var Request: {
-+declare const Request: {
-   prototype: Request;
-   new (input: RequestInfo | URL, init?: RequestInit): Request;
- };
-@@ -3696,7 +3749,7 @@ interface Response extends Body {
-   clone(): Response;
- }
- 
--declare var Response: {
-+declare const Response: {
-   prototype: Response;
-   new (body?: BodyInit | null, init?: ResponseInit): Response;
-   error(): Response;
-@@ -3719,7 +3772,7 @@ interface SecurityPolicyViolationEvent extends Event {
-   readonly violatedDirective: string;
- }
- 
--declare var SecurityPolicyViolationEvent: {
-+declare const SecurityPolicyViolationEvent: {
-   prototype: SecurityPolicyViolationEvent;
-   new (
-     type: string,
 @@ -3736,14 +3789,14 @@ interface ServiceWorkerEventMap extends AbstractWorkerEventMap {
   * Available only in secure contexts.
   */
@@ -2107,15 +1479,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -3763,7 +3816,7 @@ interface ServiceWorker extends EventTarget, AbstractWorker {
-   ): void;
- }
- 
--declare var ServiceWorker: {
-+declare const ServiceWorker: {
-   prototype: ServiceWorker;
-   new (): ServiceWorker;
- };
 @@ -3780,10 +3833,14 @@ interface ServiceWorkerContainerEventMap {
   */
  interface ServiceWorkerContainer extends EventTarget {
@@ -2152,15 +1515,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -3823,7 +3880,7 @@ interface ServiceWorkerContainer extends EventTarget {
-   ): void;
- }
- 
--declare var ServiceWorkerContainer: {
-+declare const ServiceWorkerContainer: {
-   prototype: ServiceWorkerContainer;
-   new (): ServiceWorkerContainer;
- };
 @@ -3844,27 +3901,27 @@ interface ServiceWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
  interface ServiceWorkerGlobalScope extends WorkerGlobalScope {
    readonly clients: Clients;
@@ -2254,15 +1608,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -3951,7 +4010,7 @@ interface ServiceWorkerRegistration extends EventTarget {
-   ): void;
- }
- 
--declare var ServiceWorkerRegistration: {
-+declare const ServiceWorkerRegistration: {
-   prototype: ServiceWorkerRegistration;
-   new (): ServiceWorkerRegistration;
- };
 @@ -3963,7 +4022,9 @@ interface SharedWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
  interface SharedWorkerGlobalScope extends WorkerGlobalScope {
    /** Returns sharedWorkerGlobal's name, i.e. the value given to the SharedWorker constructor. Multiple SharedWorker objects can correspond to the same shared worker (and SharedWorkerGlobalScope), by reusing the same name. */
@@ -2301,15 +1646,6 @@
    prototype: SharedWorkerGlobalScope;
    new (): SharedWorkerGlobalScope;
  };
-@@ -4006,7 +4067,7 @@ interface StorageManager {
-   persisted(): Promise<boolean>;
- }
- 
--declare var StorageManager: {
-+declare const StorageManager: {
-   prototype: StorageManager;
-   new (): StorageManager;
- };
 @@ -4049,7 +4110,7 @@ interface SubtleCrypto {
        | HkdfParams
        | Pbkdf2Params,
@@ -2346,67 +1682,7 @@
    ): Promise<CryptoKey>;
    verify(
      algorithm: AlgorithmIdentifier | RsaPssParams | EcdsaParams,
-@@ -4152,7 +4213,7 @@ interface SubtleCrypto {
-   ): Promise<ArrayBuffer>;
- }
- 
--declare var SubtleCrypto: {
-+declare const SubtleCrypto: {
-   prototype: SubtleCrypto;
-   new (): SubtleCrypto;
- };
-@@ -4163,7 +4224,7 @@ interface TextDecoder extends TextDecoderCommon {
-    * Returns the result of running encoding's decoder. The method can be invoked zero or more times with options's stream set to true, and then once without options's stream (or set to false), to process a fragmented input. If the invocation without options's stream (or set to false) has no input, it's clearest to omit both arguments.
-    *
-    * ```
--   * var string = "", decoder = new TextDecoder(encoding), buffer;
-+   *   const  string = "", decoder = new TextDecoder(encoding), buffer;
-    * while(buffer = next_chunk()) {
-    *   string += decoder.decode(buffer, {stream:true});
-    * }
-@@ -4175,7 +4236,7 @@ interface TextDecoder extends TextDecoderCommon {
-   decode(input?: BufferSource, options?: TextDecodeOptions): string;
- }
- 
--declare var TextDecoder: {
-+declare const TextDecoder: {
-   prototype: TextDecoder;
-   new (label?: string, options?: TextDecoderOptions): TextDecoder;
- };
-@@ -4194,7 +4255,7 @@ interface TextDecoderStream extends GenericTransformStream, TextDecoderCommon {
-   readonly writable: WritableStream<BufferSource>;
- }
- 
--declare var TextDecoderStream: {
-+declare const TextDecoderStream: {
-   prototype: TextDecoderStream;
-   new (label?: string, options?: TextDecoderOptions): TextDecoderStream;
- };
-@@ -4210,7 +4271,7 @@ interface TextEncoder extends TextEncoderCommon {
-   ): TextEncoderEncodeIntoResult;
- }
- 
--declare var TextEncoder: {
-+declare const TextEncoder: {
-   prototype: TextEncoder;
-   new (): TextEncoder;
- };
-@@ -4225,7 +4286,7 @@ interface TextEncoderStream extends GenericTransformStream, TextEncoderCommon {
-   readonly writable: WritableStream<string>;
- }
- 
--declare var TextEncoderStream: {
-+declare const TextEncoderStream: {
-   prototype: TextEncoderStream;
-   new (): TextEncoderStream;
- };
-@@ -4248,33 +4309,33 @@ interface TextMetrics {
-   readonly width: number;
- }
- 
--declare var TextMetrics: {
-+declare const TextMetrics: {
-   prototype: TextMetrics;
+@@ -4253,24 +4314,24 @@ declare var TextMetrics: {
    new (): TextMetrics;
  };
  
@@ -2416,8 +1692,7 @@
    readonly writable: WritableStream<I>;
  }
  
--declare var TransformStream: {
-+declare const TransformStream: {
+ declare var TransformStream: {
    prototype: TransformStream;
 -  new <I = any, O = any>(
 +  new <I = unknown, O = unknown>(
@@ -2436,20 +1711,6 @@
    terminate(): void;
  }
  
--declare var TransformStreamDefaultController: {
-+declare const TransformStreamDefaultController: {
-   prototype: TransformStreamDefaultController;
-   new (): TransformStreamDefaultController;
- };
-@@ -4297,7 +4358,7 @@ interface URL {
-   toJSON(): string;
- }
- 
--declare var URL: {
-+declare const URL: {
-   prototype: URL;
-   new (url: string | URL, base?: string | URL): URL;
-   createObjectURL(obj: Blob): string;
 @@ -4322,14 +4383,18 @@ interface URLSearchParams {
    toString(): string;
    forEach(
@@ -2459,8 +1720,7 @@
    ): void;
  }
  
--declare var URLSearchParams: {
-+declare const URLSearchParams: {
+ declare var URLSearchParams: {
    prototype: URLSearchParams;
    new (
 -    init?: string[][] | Record<string, string> | string | URLSearchParams,
@@ -2471,15 +1731,6 @@
 +      | URLSearchParams,
    ): URLSearchParams;
    toString(): string;
- };
-@@ -4342,7 +4407,7 @@ interface VideoColorSpace {
-   toJSON(): VideoColorSpaceInit;
- }
- 
--declare var VideoColorSpace: {
-+declare const VideoColorSpace: {
-   prototype: VideoColorSpace;
-   new (init?: VideoColorSpaceInit): VideoColorSpace;
  };
 @@ -4433,7 +4498,7 @@ interface WEBGL_depth_texture {
  }
@@ -2540,15 +1791,6 @@
      offsetsOffset: GLuint,
      drawcount: GLsizei,
    ): void;
-@@ -4522,7 +4587,7 @@ interface WebGL2RenderingContext
-     WebGL2RenderingContextOverloads,
-     WebGLRenderingContextBase {}
- 
--declare var WebGL2RenderingContext: {
-+declare const WebGL2RenderingContext: {
-   prototype: WebGL2RenderingContext;
-   new (): WebGL2RenderingContext;
-   readonly READ_BUFFER: 0x0c02;
 @@ -5227,7 +5292,7 @@ interface WebGL2RenderingContextBase {
      count: GLsizei,
      instanceCount: GLsizei,
@@ -2621,77 +1863,6 @@
      bufferMode: GLenum,
    ): void;
    uniform1ui(location: WebGLUniformLocation | null, v0: GLuint): void;
-@@ -6082,7 +6147,7 @@ interface WebGLActiveInfo {
-   readonly type: GLenum;
- }
- 
--declare var WebGLActiveInfo: {
-+declare const WebGLActiveInfo: {
-   prototype: WebGLActiveInfo;
-   new (): WebGLActiveInfo;
- };
-@@ -6090,7 +6155,7 @@ declare var WebGLActiveInfo: {
- /** Part of the WebGL API and represents an opaque buffer object storing data such as vertices or colors. */
- interface WebGLBuffer {}
- 
--declare var WebGLBuffer: {
-+declare const WebGLBuffer: {
-   prototype: WebGLBuffer;
-   new (): WebGLBuffer;
- };
-@@ -6100,7 +6165,7 @@ interface WebGLContextEvent extends Event {
-   readonly statusMessage: string;
- }
- 
--declare var WebGLContextEvent: {
-+declare const WebGLContextEvent: {
-   prototype: WebGLContextEvent;
-   new (type: string, eventInit?: WebGLContextEventInit): WebGLContextEvent;
- };
-@@ -6108,7 +6173,7 @@ declare var WebGLContextEvent: {
- /** Part of the WebGL API and represents a collection of buffers that serve as a rendering destination. */
- interface WebGLFramebuffer {}
- 
--declare var WebGLFramebuffer: {
-+declare const WebGLFramebuffer: {
-   prototype: WebGLFramebuffer;
-   new (): WebGLFramebuffer;
- };
-@@ -6116,14 +6181,14 @@ declare var WebGLFramebuffer: {
- /** The WebGLProgram is part of the WebGL API and is a combination of two compiled WebGLShaders consisting of a vertex shader and a fragment shader (both written in GLSL). */
- interface WebGLProgram {}
- 
--declare var WebGLProgram: {
-+declare const WebGLProgram: {
-   prototype: WebGLProgram;
-   new (): WebGLProgram;
- };
- 
- interface WebGLQuery {}
- 
--declare var WebGLQuery: {
-+declare const WebGLQuery: {
-   prototype: WebGLQuery;
-   new (): WebGLQuery;
- };
-@@ -6131,7 +6196,7 @@ declare var WebGLQuery: {
- /** Part of the WebGL API and represents a buffer that can contain an image, or can be source or target of an rendering operation. */
- interface WebGLRenderbuffer {}
- 
--declare var WebGLRenderbuffer: {
-+declare const WebGLRenderbuffer: {
-   prototype: WebGLRenderbuffer;
-   new (): WebGLRenderbuffer;
- };
-@@ -6140,7 +6205,7 @@ declare var WebGLRenderbuffer: {
- interface WebGLRenderingContext
-   extends WebGLRenderingContextBase, WebGLRenderingContextOverloads {}
- 
--declare var WebGLRenderingContext: {
-+declare const WebGLRenderingContext: {
-   prototype: WebGLRenderingContext;
-   new (): WebGLRenderingContext;
-   readonly DEPTH_BUFFER_BIT: 0x00000100;
 @@ -6558,7 +6623,7 @@ interface WebGLRenderingContextBase {
    ): WebGLActiveInfo | null;
    getAttachedShaders(program: WebGLProgram): WebGLShader[] | null;
@@ -2742,75 +1913,6 @@
    getVertexAttribOffset(index: GLuint, pname: GLenum): GLintptr;
    hint(target: GLenum, mode: GLenum): void;
    isBuffer(buffer: WebGLBuffer | null): GLboolean;
-@@ -7163,7 +7228,7 @@ interface WebGLRenderingContextOverloads {
- 
- interface WebGLSampler {}
- 
--declare var WebGLSampler: {
-+declare const WebGLSampler: {
-   prototype: WebGLSampler;
-   new (): WebGLSampler;
- };
-@@ -7171,7 +7236,7 @@ declare var WebGLSampler: {
- /** The WebGLShader is part of the WebGL API and can either be a vertex or a fragment shader. A WebGLProgram requires both types of shaders. */
- interface WebGLShader {}
- 
--declare var WebGLShader: {
-+declare const WebGLShader: {
-   prototype: WebGLShader;
-   new (): WebGLShader;
- };
-@@ -7183,14 +7248,14 @@ interface WebGLShaderPrecisionFormat {
-   readonly rangeMin: GLint;
- }
- 
--declare var WebGLShaderPrecisionFormat: {
-+declare const WebGLShaderPrecisionFormat: {
-   prototype: WebGLShaderPrecisionFormat;
-   new (): WebGLShaderPrecisionFormat;
- };
- 
- interface WebGLSync {}
- 
--declare var WebGLSync: {
-+declare const WebGLSync: {
-   prototype: WebGLSync;
-   new (): WebGLSync;
- };
-@@ -7198,14 +7263,14 @@ declare var WebGLSync: {
- /** Part of the WebGL API and represents an opaque texture object providing storage and state for texturing operations. */
- interface WebGLTexture {}
- 
--declare var WebGLTexture: {
-+declare const WebGLTexture: {
-   prototype: WebGLTexture;
-   new (): WebGLTexture;
- };
- 
- interface WebGLTransformFeedback {}
- 
--declare var WebGLTransformFeedback: {
-+declare const WebGLTransformFeedback: {
-   prototype: WebGLTransformFeedback;
-   new (): WebGLTransformFeedback;
- };
-@@ -7213,14 +7278,14 @@ declare var WebGLTransformFeedback: {
- /** Part of the WebGL API and represents the location of a uniform variable in a shader program. */
- interface WebGLUniformLocation {}
- 
--declare var WebGLUniformLocation: {
-+declare const WebGLUniformLocation: {
-   prototype: WebGLUniformLocation;
-   new (): WebGLUniformLocation;
- };
- 
- interface WebGLVertexArrayObject {}
- 
--declare var WebGLVertexArrayObject: {
-+declare const WebGLVertexArrayObject: {
-   prototype: WebGLVertexArrayObject;
-   new (): WebGLVertexArrayObject;
- };
 @@ -7250,10 +7315,10 @@ interface WebSocket extends EventTarget {
    readonly bufferedAmount: number;
    /** Returns the extensions selected by the server, if any. */
@@ -2844,12 +1946,9 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -7290,9 +7355,9 @@ interface WebSocket extends EventTarget {
-   ): void;
- }
+@@ -7292,7 +7357,7 @@ interface WebSocket extends EventTarget {
  
--declare var WebSocket: {
-+declare const WebSocket: {
+ declare var WebSocket: {
    prototype: WebSocket;
 -  new (url: string | URL, protocols?: string | string[]): WebSocket;
 +  new (url: string | URL, protocols?: string | readonly string[]): WebSocket;
@@ -2922,15 +2021,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -7389,7 +7457,7 @@ interface Worker extends EventTarget, AbstractWorker {
-   ): void;
- }
- 
--declare var Worker: {
-+declare const Worker: {
-   prototype: Worker;
-   new (scriptURL: string | URL, options?: WorkerOptions): Worker;
- };
 @@ -7410,15 +7478,15 @@ interface WorkerGlobalScope
    readonly location: WorkerLocation;
    /** Returns workerGlobal's WorkerNavigator object. */
@@ -3009,15 +2099,14 @@
    getWriter(): WritableStreamDefaultWriter<W>;
  }
  
--declare var WritableStream: {
-+declare const WritableStream: {
+ declare var WritableStream: {
    prototype: WritableStream;
 -  new <W = any>(
 +  new <W = unknown>(
      underlyingSink?: UnderlyingSink<W>,
      strategy?: QueuingStrategy<W>,
    ): WritableStream<W>;
-@@ -7512,28 +7580,28 @@ declare var WritableStream: {
+@@ -7512,7 +7580,7 @@ declare var WritableStream: {
  /** This Streams API interface represents a controller allowing control of a WritableStream's state. When constructing a WritableStream, the underlying sink is given a corresponding WritableStreamDefaultController instance to manipulate. */
  interface WritableStreamDefaultController {
    readonly signal: AbortSignal;
@@ -3025,10 +2114,8 @@
 +  error(e?: unknown): void;
  }
  
--declare var WritableStreamDefaultController: {
-+declare const WritableStreamDefaultController: {
-   prototype: WritableStreamDefaultController;
-   new (): WritableStreamDefaultController;
+ declare var WritableStreamDefaultController: {
+@@ -7521,11 +7589,11 @@ declare var WritableStreamDefaultController: {
  };
  
  /** This Streams API interface is the object returned by WritableStream.getWriter() and once created locks the < writer to the WritableStream ensuring that no other streams can write to the underlying sink. */
@@ -3042,10 +2129,9 @@
    close(): Promise<void>;
    releaseLock(): void;
    write(chunk?: W): Promise<void>;
- }
+@@ -7533,7 +7601,7 @@ interface WritableStreamDefaultWriter<W = any> {
  
--declare var WritableStreamDefaultWriter: {
-+declare const WritableStreamDefaultWriter: {
+ declare var WritableStreamDefaultWriter: {
    prototype: WritableStreamDefaultWriter;
 -  new <W = any>(stream: WritableStream<W>): WritableStreamDefaultWriter<W>;
 +  new <W = unknown>(stream: WritableStream<W>): WritableStreamDefaultWriter<W>;
@@ -3096,15 +2182,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -7650,7 +7718,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
-   ): void;
- }
- 
--declare var XMLHttpRequest: {
-+declare const XMLHttpRequest: {
-   prototype: XMLHttpRequest;
-   new (): XMLHttpRequest;
-   readonly UNSENT: 0;
 @@ -7671,19 +7739,19 @@ interface XMLHttpRequestEventTargetEventMap {
  }
  
@@ -3142,15 +2219,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -7706,7 +7774,7 @@ interface XMLHttpRequestEventTarget extends EventTarget {
-   ): void;
- }
- 
--declare var XMLHttpRequestEventTarget: {
-+declare const XMLHttpRequestEventTarget: {
-   prototype: XMLHttpRequestEventTarget;
-   new (): XMLHttpRequestEventTarget;
- };
 @@ -7717,7 +7785,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
      listener: (
        this: XMLHttpRequestUpload,
@@ -3169,14 +2237,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -7740,67 +7808,67 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
-   ): void;
- }
- 
--declare var XMLHttpRequestUpload: {
-+declare const XMLHttpRequestUpload: {
-   prototype: XMLHttpRequestUpload;
-   new (): XMLHttpRequestUpload;
+@@ -7746,26 +7814,26 @@ declare var XMLHttpRequestUpload: {
  };
  
  interface Console {
@@ -3215,9 +2276,8 @@
 +  warn(...data: readonly unknown[]): void;
  }
  
--declare var console: Console;
-+declare const console: Console;
- 
+ declare var console: Console;
+@@ -7773,34 +7841,34 @@ declare var console: Console;
  declare namespace WebAssembly {
    interface CompileError extends Error {}
  
@@ -3376,20 +2436,18 @@
  }
  
  interface VoidFunction {
-@@ -7990,60 +8058,63 @@ interface VoidFunction {
+@@ -7990,19 +8058,22 @@ interface VoidFunction {
  }
  
  /** Returns dedicatedWorkerGlobal's name, i.e. the value given to the Worker constructor. Primarily useful for debugging. */
 -declare var name: string;
--declare var onmessage:
--  | ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => any)
 +declare const name: string;
-+declare const onmessage:
+ declare var onmessage:
+-  | ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => any)
 +  | ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => unknown)
    | null;
--declare var onmessageerror:
+ declare var onmessageerror:
 -  | ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => any)
-+declare const onmessageerror:
 +  | ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => unknown)
    | null;
  /** Aborts dedicatedWorkerGlobal. */
@@ -3406,70 +2464,44 @@
    options?: StructuredSerializeOptions,
  ): void;
  /** Dispatches a synthetic event event to target and returns true if either event's cancelable attribute value is false or its preventDefault() method was not invoked, and false otherwise. */
- declare function dispatchEvent(event: Event): boolean;
- /** Returns workerGlobal's WorkerLocation object. */
--declare var location: WorkerLocation;
-+declare const location: WorkerLocation;
+@@ -8012,22 +8083,22 @@ declare var location: WorkerLocation;
  /** Returns workerGlobal's WorkerNavigator object. */
--declare var navigator: WorkerNavigator;
--declare var onerror:
+ declare var navigator: WorkerNavigator;
+ declare var onerror:
 -  | ((this: DedicatedWorkerGlobalScope, ev: ErrorEvent) => any)
-+declare const navigator: WorkerNavigator;
-+declare const onerror:
 +  | ((this: DedicatedWorkerGlobalScope, ev: ErrorEvent) => unknown)
    | null;
--declare var onlanguagechange:
+ declare var onlanguagechange:
 -  | ((this: DedicatedWorkerGlobalScope, ev: Event) => any)
-+declare const onlanguagechange:
 +  | ((this: DedicatedWorkerGlobalScope, ev: Event) => unknown)
    | null;
--declare var onoffline:
+ declare var onoffline:
 -  | ((this: DedicatedWorkerGlobalScope, ev: Event) => any)
-+declare const onoffline:
 +  | ((this: DedicatedWorkerGlobalScope, ev: Event) => unknown)
    | null;
--declare var ononline:
+ declare var ononline:
 -  | ((this: DedicatedWorkerGlobalScope, ev: Event) => any)
-+declare const ononline:
 +  | ((this: DedicatedWorkerGlobalScope, ev: Event) => unknown)
    | null;
--declare var onrejectionhandled:
+ declare var onrejectionhandled:
 -  | ((this: DedicatedWorkerGlobalScope, ev: PromiseRejectionEvent) => any)
-+declare const onrejectionhandled:
 +  | ((this: DedicatedWorkerGlobalScope, ev: PromiseRejectionEvent) => unknown)
    | null;
--declare var onunhandledrejection:
+ declare var onunhandledrejection:
 -  | ((this: DedicatedWorkerGlobalScope, ev: PromiseRejectionEvent) => any)
-+declare const onunhandledrejection:
 +  | ((this: DedicatedWorkerGlobalScope, ev: PromiseRejectionEvent) => unknown)
    | null;
  /** Returns workerGlobal. */
--declare var self: WorkerGlobalScope & typeof globalThis;
-+declare const self: WorkerGlobalScope & typeof globalThis;
- /** Fetches each URL in urls, executes them one-by-one in the order they are passed, and then returns (or throws if something went amiss). */
+ declare var self: WorkerGlobalScope & typeof globalThis;
+@@ -8035,7 +8106,7 @@ declare var self: WorkerGlobalScope & typeof globalThis;
  declare function importScripts(...urls: (string | URL)[]): void;
  /** Dispatches a synthetic event event to target and returns true if either event's cancelable attribute value is false or its preventDefault() method was not invoked, and false otherwise. */
  declare function dispatchEvent(event: Event): boolean;
 -declare var fonts: FontFaceSet;
 +declare const fonts: FontFaceSet;
  /** Available only in secure contexts. */
--declare var caches: CacheStorage;
--declare var crossOriginIsolated: boolean;
--declare var crypto: Crypto;
--declare var indexedDB: IDBFactory;
--declare var isSecureContext: boolean;
--declare var origin: string;
--declare var performance: Performance;
-+declare const caches: CacheStorage;
-+declare const crossOriginIsolated: boolean;
-+declare const crypto: Crypto;
-+declare const indexedDB: IDBFactory;
-+declare const isSecureContext: boolean;
-+declare const origin: string;
-+declare const performance: Performance;
- declare function atob(data: string): string;
- declare function btoa(data: string): string;
- declare function clearInterval(id: number | undefined): void;
+ declare var caches: CacheStorage;
+ declare var crossOriginIsolated: boolean;
 @@ -8065,21 +8136,21 @@ declare function fetch(
    init?: RequestInit,
  ): Promise<Response>;

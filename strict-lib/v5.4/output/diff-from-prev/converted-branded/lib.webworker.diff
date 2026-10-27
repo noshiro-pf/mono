@@ -1,5 +1,5 @@
 diff --git a/v5.3/output/lib-files-branded/lib.webworker.d.ts b/v5.4/output/lib-files-branded/lib.webworker.d.ts
-index 7e74a9b6725912f354958fc59493eace3e222179..1d46d7e4855a75a4939ed3e30cc0c3ebfb674593 100644
+index 38fae52c6169a2504bb799a350efb90f2272a0cf..91f790df4ce2a9de561781a2b268b90726886a61 100644
 --- a/v5.3/output/lib-files-branded/lib.webworker.d.ts
 +++ b/v5.4/output/lib-files-branded/lib.webworker.d.ts
 @@ -188,7 +188,7 @@ interface EcdsaParams extends Algorithm {
@@ -131,7 +131,7 @@ index 7e74a9b6725912f354958fc59493eace3e222179..1d46d7e4855a75a4939ed3e30cc0c3eb
  }
  
  interface CanvasTransform {
-@@ -2519,6 +2525,7 @@ declare const DecompressionStream: {
+@@ -2519,6 +2525,7 @@ declare var DecompressionStream: {
  interface DedicatedWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
    message: MessageEvent;
    messageerror: MessageEvent;
@@ -158,7 +158,7 @@ index 7e74a9b6725912f354958fc59493eace3e222179..1d46d7e4855a75a4939ed3e30cc0c3eb
 +  copyTo(destination: AllowSharedBufferSource): void;
  }
  
- declare const EncodedVideoChunk: {
+ declare var EncodedVideoChunk: {
 @@ -3132,7 +3143,11 @@ interface FileReader extends EventTarget {
    abort(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileReader/readAsArrayBuffer) */
@@ -199,7 +199,7 @@ index 7e74a9b6725912f354958fc59493eace3e222179..1d46d7e4855a75a4939ed3e30cc0c3eb
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/silent) */
    readonly silent: boolean | null;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/tag) */
-@@ -5448,9 +5465,13 @@ declare const PushSubscriptionOptions: {
+@@ -5448,9 +5465,13 @@ declare var PushSubscriptionOptions: {
    new (): PushSubscriptionOptions;
  };
  
@@ -213,7 +213,7 @@ index 7e74a9b6725912f354958fc59493eace3e222179..1d46d7e4855a75a4939ed3e30cc0c3eb
    getMetadata(): RTCEncodedAudioFrameMetadata;
  }
  
-@@ -5459,10 +5480,15 @@ declare const RTCEncodedAudioFrame: {
+@@ -5459,10 +5480,15 @@ declare var RTCEncodedAudioFrame: {
    new (): RTCEncodedAudioFrame;
  };
  
@@ -229,7 +229,7 @@ index 7e74a9b6725912f354958fc59493eace3e222179..1d46d7e4855a75a4939ed3e30cc0c3eb
    getMetadata(): RTCEncodedVideoFrameMetadata;
  }
  
-@@ -5471,6 +5497,36 @@ declare const RTCEncodedVideoFrame: {
+@@ -5471,6 +5497,36 @@ declare var RTCEncodedVideoFrame: {
    new (): RTCEncodedVideoFrame;
  };
  
@@ -336,7 +336,7 @@ index 7e74a9b6725912f354958fc59493eace3e222179..1d46d7e4855a75a4939ed3e30cc0c3eb
    ): Promise<readonly PlaneLayout[]>;
  }
 @@ -6832,7 +6920,7 @@ interface VideoFrame {
- declare const VideoFrame: {
+ declare var VideoFrame: {
    prototype: VideoFrame;
    new (image: CanvasImageSource, init?: VideoFrameInit): VideoFrame;
 -  new (data: BufferSource, init: VideoFrameBufferInit): VideoFrame;
@@ -397,7 +397,7 @@ index 7e74a9b6725912f354958fc59493eace3e222179..1d46d7e4855a75a4939ed3e30cc0c3eb
      drawcount: GLsizei,
    ): void;
  }
-@@ -7064,7 +7152,6 @@ declare const WebGL2RenderingContext: {
+@@ -7064,7 +7152,6 @@ declare var WebGL2RenderingContext: {
    readonly STENCIL: 0x1802;
    readonly RED: 0x1903;
    readonly RGB8: 0x8051;
@@ -405,7 +405,7 @@ index 7e74a9b6725912f354958fc59493eace3e222179..1d46d7e4855a75a4939ed3e30cc0c3eb
    readonly RGB10_A2: 0x8059;
    readonly TEXTURE_BINDING_3D: 0x806a;
    readonly UNPACK_SKIP_IMAGES: 0x806d;
-@@ -7575,6 +7662,7 @@ declare const WebGL2RenderingContext: {
+@@ -7575,6 +7662,7 @@ declare var WebGL2RenderingContext: {
    readonly RENDERBUFFER: 0x8d41;
    readonly RGBA4: 0x8056;
    readonly RGB5_A1: 0x8057;
@@ -750,7 +750,7 @@ index 7e74a9b6725912f354958fc59493eace3e222179..1d46d7e4855a75a4939ed3e30cc0c3eb
      srcLength?: GLuint,
    ): void;
  }
-@@ -9069,6 +9160,7 @@ declare const WebGLRenderingContext: {
+@@ -9069,6 +9160,7 @@ declare var WebGLRenderingContext: {
    readonly RENDERBUFFER: 0x8d41;
    readonly RGBA4: 0x8056;
    readonly RGB5_A1: 0x8057;
@@ -802,7 +802,7 @@ index 7e74a9b6725912f354958fc59493eace3e222179..1d46d7e4855a75a4939ed3e30cc0c3eb
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransportDatagramDuplexStream/readable) */
    readonly readable: ReadableStream;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransportDatagramDuplexStream/writable) */
-@@ -10868,44 +10969,44 @@ declare const XMLHttpRequestUpload: {
+@@ -10868,44 +10969,44 @@ declare var XMLHttpRequestUpload: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console) */
  interface Console {
@@ -986,8 +986,8 @@ index 7e74a9b6725912f354958fc59493eace3e222179..1d46d7e4855a75a4939ed3e30cc0c3eb
    function validate(bytes: BufferSource): boolean;
  }
  
-@@ -11191,6 +11292,10 @@ declare const onmessage:
- declare const onmessageerror:
+@@ -11191,6 +11292,10 @@ declare var onmessage:
+ declare var onmessageerror:
    | ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => unknown)
    | null;
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/rtctransform_event) */

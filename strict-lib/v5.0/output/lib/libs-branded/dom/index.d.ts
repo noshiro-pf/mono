@@ -2087,7 +2087,7 @@ interface AbortController {
   abort(reason?: unknown): void;
 }
 
-declare const AbortController: {
+declare var AbortController: {
   prototype: AbortController;
   new (): AbortController;
 };
@@ -2125,7 +2125,7 @@ interface AbortSignal extends EventTarget {
   ): void;
 }
 
-declare const AbortSignal: {
+declare var AbortSignal: {
   prototype: AbortSignal;
   new (): AbortSignal;
   abort(reason?: unknown): AbortSignal;
@@ -2840,7 +2840,7 @@ interface Blob {
   text(): Promise<string>;
 }
 
-declare const Blob: {
+declare var Blob: {
   prototype: Blob;
   new (blobParts?: readonly BlobPart[], options?: BlobPropertyBag): Blob;
 };
@@ -2909,7 +2909,7 @@ interface BroadcastChannel extends EventTarget {
   ): void;
 }
 
-declare const BroadcastChannel: {
+declare var BroadcastChannel: {
   prototype: BroadcastChannel;
   new (name: string): BroadcastChannel;
 };
@@ -2920,7 +2920,7 @@ interface ByteLengthQueuingStrategy extends QueuingStrategy<ArrayBufferView> {
   readonly size: QueuingStrategySize<ArrayBufferView>;
 }
 
-declare const ByteLengthQueuingStrategy: {
+declare var ByteLengthQueuingStrategy: {
   prototype: ByteLengthQueuingStrategy;
   new (init: QueuingStrategyInit): ByteLengthQueuingStrategy;
 };
@@ -3826,7 +3826,7 @@ interface Cache {
   put(request: RequestInfo | URL, response: Response): Promise<void>;
 }
 
-declare const Cache: {
+declare var Cache: {
   prototype: Cache;
   new (): Cache;
 };
@@ -3846,7 +3846,7 @@ interface CacheStorage {
   open(cacheName: string): Promise<Cache>;
 }
 
-declare const CacheStorage: {
+declare var CacheStorage: {
   prototype: CacheStorage;
   new (): CacheStorage;
 };
@@ -3971,7 +3971,7 @@ interface CanvasGradient {
   addColorStop(offset: number, color: string): void;
 }
 
-declare const CanvasGradient: {
+declare var CanvasGradient: {
   prototype: CanvasGradient;
   new (): CanvasGradient;
 };
@@ -4065,7 +4065,7 @@ interface CanvasPattern {
   setTransform(transform?: DOMMatrix2DInit): void;
 }
 
-declare const CanvasPattern: {
+declare var CanvasPattern: {
   prototype: CanvasPattern;
   new (): CanvasPattern;
 };
@@ -4273,7 +4273,7 @@ interface CloseEvent extends Event {
   readonly wasClean: boolean;
 }
 
-declare const CloseEvent: {
+declare var CloseEvent: {
   prototype: CloseEvent;
   new (type: string, eventInitDict?: CloseEventInit): CloseEvent;
 };
@@ -4359,7 +4359,7 @@ interface CountQueuingStrategy extends QueuingStrategy {
   readonly size: QueuingStrategySize;
 }
 
-declare const CountQueuingStrategy: {
+declare var CountQueuingStrategy: {
   prototype: CountQueuingStrategy;
   new (init: QueuingStrategyInit): CountQueuingStrategy;
 };
@@ -4397,7 +4397,7 @@ interface Crypto {
   randomUUID(): `${string}-${string}-${string}-${string}-${string}`;
 }
 
-declare const Crypto: {
+declare var Crypto: {
   prototype: Crypto;
   new (): Crypto;
 };
@@ -4413,7 +4413,7 @@ interface CryptoKey {
   readonly usages: readonly KeyUsage[];
 }
 
-declare const CryptoKey: {
+declare var CryptoKey: {
   prototype: CryptoKey;
   new (): CryptoKey;
 };
@@ -4446,7 +4446,7 @@ interface CustomEvent<T = unknown> extends Event {
   ): void;
 }
 
-declare const CustomEvent: {
+declare var CustomEvent: {
   prototype: CustomEvent;
   new <T>(type: string, eventInitDict?: CustomEventInit<T>): CustomEvent<T>;
 };
@@ -4484,7 +4484,7 @@ interface DOMException extends Error {
   readonly DATA_CLONE_ERR: 25;
 }
 
-declare const DOMException: {
+declare var DOMException: {
   prototype: DOMException;
   new (message?: string, name?: string): DOMException;
   readonly INDEX_SIZE_ERR: 1;
@@ -4590,7 +4590,7 @@ interface DOMMatrix extends DOMMatrixReadOnly {
   translateSelf(tx?: number, ty?: number, tz?: number): DOMMatrix;
 }
 
-declare const DOMMatrix: {
+declare var DOMMatrix: {
   prototype: DOMMatrix;
   new (init?: string | readonly number[]): DOMMatrix;
   fromFloat32Array(array32: Float32Array): DOMMatrix;
@@ -4667,7 +4667,7 @@ interface DOMMatrixReadOnly {
   toString(): string;
 }
 
-declare const DOMMatrixReadOnly: {
+declare var DOMMatrixReadOnly: {
   prototype: DOMMatrixReadOnly;
   new (init?: string | readonly number[]): DOMMatrixReadOnly;
   fromFloat32Array(array32: Float32Array): DOMMatrixReadOnly;
@@ -4702,7 +4702,7 @@ interface DOMPoint extends DOMPointReadOnly {
   z: number;
 }
 
-declare const DOMPoint: {
+declare var DOMPoint: {
   prototype: DOMPoint;
   new (x?: number, y?: number, z?: number, w?: number): DOMPoint;
   fromPoint(other?: DOMPointInit): DOMPoint;
@@ -4720,7 +4720,7 @@ interface DOMPointReadOnly {
   toJSON(): unknown;
 }
 
-declare const DOMPointReadOnly: {
+declare var DOMPointReadOnly: {
   prototype: DOMPointReadOnly;
   new (x?: number, y?: number, z?: number, w?: number): DOMPointReadOnly;
   fromPoint(other?: DOMPointInit): DOMPointReadOnly;
@@ -4735,7 +4735,7 @@ interface DOMQuad {
   toJSON(): unknown;
 }
 
-declare const DOMQuad: {
+declare var DOMQuad: {
   prototype: DOMQuad;
   new (
     p1?: DOMPointInit,
@@ -4754,7 +4754,7 @@ interface DOMRect extends DOMRectReadOnly {
   y: number;
 }
 
-declare const DOMRect: {
+declare var DOMRect: {
   prototype: DOMRect;
   new (x?: number, y?: number, width?: number, height?: number): DOMRect;
   fromRect(other?: DOMRectInit): DOMRect;
@@ -4786,7 +4786,7 @@ interface DOMRectReadOnly {
   toJSON(): unknown;
 }
 
-declare const DOMRectReadOnly: {
+declare var DOMRectReadOnly: {
   prototype: DOMRectReadOnly;
   new (
     x?: number,
@@ -4808,7 +4808,7 @@ interface DOMStringList {
   [index: number]: string;
 }
 
-declare const DOMStringList: {
+declare var DOMStringList: {
   prototype: DOMStringList;
   new (): DOMStringList;
 };
@@ -5940,7 +5940,7 @@ interface ErrorEvent extends Event {
   readonly message: string;
 }
 
-declare const ErrorEvent: {
+declare var ErrorEvent: {
   prototype: ErrorEvent;
   new (type: string, eventInitDict?: ErrorEventInit): ErrorEvent;
 };
@@ -5989,7 +5989,7 @@ interface Event {
   readonly BUBBLING_PHASE: 3;
 }
 
-declare const Event: {
+declare var Event: {
   prototype: Event;
   new (type: string, eventInitDict?: EventInit): Event;
   readonly NONE: 0;
@@ -6071,7 +6071,7 @@ interface EventSource extends EventTarget {
   ): void;
 }
 
-declare const EventSource: {
+declare var EventSource: {
   prototype: EventSource;
   new (url: string | URL, eventSourceInitDict?: EventSourceInit): EventSource;
   readonly CONNECTING: 0;
@@ -6111,7 +6111,7 @@ interface EventTarget {
   ): void;
 }
 
-declare const EventTarget: {
+declare var EventTarget: {
   prototype: EventTarget;
   new (): EventTarget;
 };
@@ -6137,7 +6137,7 @@ interface File extends Blob {
   readonly webkitRelativePath: string;
 }
 
-declare const File: {
+declare var File: {
   prototype: File;
   new (
     fileBits: readonly BlobPart[],
@@ -6153,7 +6153,7 @@ interface FileList {
   [index: number]: File;
 }
 
-declare const FileList: {
+declare var FileList: {
   prototype: FileList;
   new (): FileList;
 };
@@ -6221,7 +6221,7 @@ interface FileReader extends EventTarget {
   ): void;
 }
 
-declare const FileReader: {
+declare var FileReader: {
   prototype: FileReader;
   new (): FileReader;
   readonly EMPTY: 0;
@@ -6277,7 +6277,7 @@ interface FileSystemDirectoryHandle extends FileSystemHandle {
   ): Promise<readonly string[] | null>;
 }
 
-declare const FileSystemDirectoryHandle: {
+declare var FileSystemDirectoryHandle: {
   prototype: FileSystemDirectoryHandle;
   new (): FileSystemDirectoryHandle;
 };
@@ -6326,7 +6326,7 @@ interface FileSystemFileHandle extends FileSystemHandle {
   getFile(): Promise<File>;
 }
 
-declare const FileSystemFileHandle: {
+declare var FileSystemFileHandle: {
   prototype: FileSystemFileHandle;
   new (): FileSystemFileHandle;
 };
@@ -6338,7 +6338,7 @@ interface FileSystemHandle {
   isSameEntry(other: FileSystemHandle): Promise<boolean>;
 }
 
-declare const FileSystemHandle: {
+declare var FileSystemHandle: {
   prototype: FileSystemHandle;
   new (): FileSystemHandle;
 };
@@ -6370,7 +6370,7 @@ interface FontFace {
   load(): Promise<FontFace>;
 }
 
-declare const FontFace: {
+declare var FontFace: {
   prototype: FontFace;
   new (
     family: string,
@@ -6419,7 +6419,7 @@ interface FontFaceSet extends EventTarget {
   ): void;
 }
 
-declare const FontFaceSet: {
+declare var FontFaceSet: {
   prototype: FontFaceSet;
   new (initialFaces: readonly FontFace[]): FontFaceSet;
 };
@@ -6428,7 +6428,7 @@ interface FontFaceSetLoadEvent extends Event {
   readonly fontfaces: ReadonlyArray<FontFace>;
 }
 
-declare const FontFaceSetLoadEvent: {
+declare var FontFaceSetLoadEvent: {
   prototype: FontFaceSetLoadEvent;
   new (
     type: string,
@@ -6458,7 +6458,7 @@ interface FormData {
   ): void;
 }
 
-declare const FormData: {
+declare var FormData: {
   prototype: FormData;
   new (form?: HTMLFormElement): FormData;
 };
@@ -10951,7 +10951,7 @@ interface Headers {
   ): void;
 }
 
-declare const Headers: {
+declare var Headers: {
   prototype: Headers;
   new (init?: HeadersInit): Headers;
 };
@@ -11006,7 +11006,7 @@ interface IDBCursor {
   update(value: unknown): IDBRequest<IDBValidKey>;
 }
 
-declare const IDBCursor: {
+declare var IDBCursor: {
   prototype: IDBCursor;
   new (): IDBCursor;
 };
@@ -11017,7 +11017,7 @@ interface IDBCursorWithValue extends IDBCursor {
   readonly value: unknown;
 }
 
-declare const IDBCursorWithValue: {
+declare var IDBCursorWithValue: {
   prototype: IDBCursorWithValue;
   new (): IDBCursorWithValue;
 };
@@ -11088,7 +11088,7 @@ interface IDBDatabase extends EventTarget {
   ): void;
 }
 
-declare const IDBDatabase: {
+declare var IDBDatabase: {
   prototype: IDBDatabase;
   new (): IDBDatabase;
 };
@@ -11108,7 +11108,7 @@ interface IDBFactory {
   open(name: string, version?: number): IDBOpenDBRequest;
 }
 
-declare const IDBFactory: {
+declare var IDBFactory: {
   prototype: IDBFactory;
   new (): IDBFactory;
 };
@@ -11178,7 +11178,7 @@ interface IDBIndex {
   ): IDBRequest<IDBCursor | null>;
 }
 
-declare const IDBIndex: {
+declare var IDBIndex: {
   prototype: IDBIndex;
   new (): IDBIndex;
 };
@@ -11197,7 +11197,7 @@ interface IDBKeyRange {
   includes(key: unknown): boolean;
 }
 
-declare const IDBKeyRange: {
+declare var IDBKeyRange: {
   prototype: IDBKeyRange;
   new (): IDBKeyRange;
   /** Returns a new IDBKeyRange spanning from lower to upper. If lowerOpen is true, lower is not included in the range. If upperOpen is true, upper is not included in the range. */
@@ -11332,7 +11332,7 @@ interface IDBObjectStore {
   put(value: unknown, key?: IDBValidKey): IDBRequest<IDBValidKey>;
 }
 
-declare const IDBObjectStore: {
+declare var IDBObjectStore: {
   prototype: IDBObjectStore;
   new (): IDBObjectStore;
 };
@@ -11378,7 +11378,7 @@ interface IDBOpenDBRequest extends IDBRequest<IDBDatabase> {
   ): void;
 }
 
-declare const IDBOpenDBRequest: {
+declare var IDBOpenDBRequest: {
   prototype: IDBOpenDBRequest;
   new (): IDBOpenDBRequest;
 };
@@ -11424,7 +11424,7 @@ interface IDBRequest<T = unknown> extends EventTarget {
   ): void;
 }
 
-declare const IDBRequest: {
+declare var IDBRequest: {
   prototype: IDBRequest;
   new (): IDBRequest;
 };
@@ -11475,7 +11475,7 @@ interface IDBTransaction extends EventTarget {
   ): void;
 }
 
-declare const IDBTransaction: {
+declare var IDBTransaction: {
   prototype: IDBTransaction;
   new (): IDBTransaction;
 };
@@ -11486,7 +11486,7 @@ interface IDBVersionChangeEvent extends Event {
   readonly oldVersion: number;
 }
 
-declare const IDBVersionChangeEvent: {
+declare var IDBVersionChangeEvent: {
   prototype: IDBVersionChangeEvent;
   new (
     type: string,
@@ -11527,7 +11527,7 @@ interface ImageBitmap {
   close(): void;
 }
 
-declare const ImageBitmap: {
+declare var ImageBitmap: {
   prototype: ImageBitmap;
   new (): ImageBitmap;
 };
@@ -11539,7 +11539,7 @@ interface ImageBitmapRenderingContext {
   transferFromImageBitmap(bitmap: ImageBitmap | null): void;
 }
 
-declare const ImageBitmapRenderingContext: {
+declare var ImageBitmapRenderingContext: {
   prototype: ImageBitmapRenderingContext;
   new (): ImageBitmapRenderingContext;
 };
@@ -11555,7 +11555,7 @@ interface ImageData {
   readonly width: number;
 }
 
-declare const ImageData: {
+declare var ImageData: {
   prototype: ImageData;
   new (sw: number, sh: number, settings?: ImageDataSettings): ImageData;
   new (
@@ -11775,7 +11775,7 @@ interface Lock {
   readonly name: string;
 }
 
-declare const Lock: {
+declare var Lock: {
   prototype: Lock;
   new (): Lock;
 };
@@ -11791,7 +11791,7 @@ interface LockManager {
   ): Promise<unknown>;
 }
 
-declare const LockManager: {
+declare var LockManager: {
   prototype: LockManager;
   new (): LockManager;
 };
@@ -12034,7 +12034,7 @@ interface MediaCapabilities {
   ): Promise<MediaCapabilitiesEncodingInfo>;
 }
 
-declare const MediaCapabilities: {
+declare var MediaCapabilities: {
   prototype: MediaCapabilities;
   new (): MediaCapabilities;
 };
@@ -12626,7 +12626,7 @@ interface MessageChannel {
   readonly port2: MessagePort;
 }
 
-declare const MessageChannel: {
+declare var MessageChannel: {
   prototype: MessageChannel;
   new (): MessageChannel;
 };
@@ -12656,7 +12656,7 @@ interface MessageEvent<T = unknown> extends Event {
   ): void;
 }
 
-declare const MessageEvent: {
+declare var MessageEvent: {
   prototype: MessageEvent;
   new <T>(type: string, eventInitDict?: MessageEventInit<T>): MessageEvent<T>;
 };
@@ -12703,7 +12703,7 @@ interface MessagePort extends EventTarget {
   ): void;
 }
 
-declare const MessagePort: {
+declare var MessagePort: {
   prototype: MessagePort;
   new (): MessagePort;
 };
@@ -12920,7 +12920,7 @@ interface NavigationPreloadManager {
   setHeaderValue(value: string): Promise<void>;
 }
 
-declare const NavigationPreloadManager: {
+declare var NavigationPreloadManager: {
   prototype: NavigationPreloadManager;
   new (): NavigationPreloadManager;
 };
@@ -13268,7 +13268,7 @@ interface Notification extends EventTarget {
   ): void;
 }
 
-declare const Notification: {
+declare var Notification: {
   prototype: Notification;
   new (title: string, options?: NotificationOptions): Notification;
   readonly permission: NotificationPermission;
@@ -13497,7 +13497,7 @@ interface OffscreenCanvas extends EventTarget {
   ): void;
 }
 
-declare const OffscreenCanvas: {
+declare var OffscreenCanvas: {
   prototype: OffscreenCanvas;
   new (width: number, height: number): OffscreenCanvas;
 };
@@ -13523,7 +13523,7 @@ interface OffscreenCanvasRenderingContext2D
   commit(): void;
 }
 
-declare const OffscreenCanvasRenderingContext2D: {
+declare var OffscreenCanvasRenderingContext2D: {
   prototype: OffscreenCanvasRenderingContext2D;
   new (): OffscreenCanvasRenderingContext2D;
 };
@@ -13694,7 +13694,7 @@ interface Path2D extends CanvasPath {
   addPath(path: Path2D, transform?: DOMMatrix2DInit): void;
 }
 
-declare const Path2D: {
+declare var Path2D: {
   prototype: Path2D;
   new (path?: Path2D | string): Path2D;
 };
@@ -13847,7 +13847,7 @@ interface Performance extends EventTarget {
   ): void;
 }
 
-declare const Performance: {
+declare var Performance: {
   prototype: Performance;
   new (): Performance;
 };
@@ -13861,7 +13861,7 @@ interface PerformanceEntry {
   toJSON(): unknown;
 }
 
-declare const PerformanceEntry: {
+declare var PerformanceEntry: {
   prototype: PerformanceEntry;
   new (): PerformanceEntry;
 };
@@ -13884,7 +13884,7 @@ interface PerformanceMark extends PerformanceEntry {
   readonly detail: unknown;
 }
 
-declare const PerformanceMark: {
+declare var PerformanceMark: {
   prototype: PerformanceMark;
   new (markName: string, markOptions?: PerformanceMarkOptions): PerformanceMark;
 };
@@ -13894,7 +13894,7 @@ interface PerformanceMeasure extends PerformanceEntry {
   readonly detail: unknown;
 }
 
-declare const PerformanceMeasure: {
+declare var PerformanceMeasure: {
   prototype: PerformanceMeasure;
   new (): PerformanceMeasure;
 };
@@ -13952,7 +13952,7 @@ interface PerformanceObserver {
   takeRecords(): PerformanceEntryList;
 }
 
-declare const PerformanceObserver: {
+declare var PerformanceObserver: {
   prototype: PerformanceObserver;
   new (callback: PerformanceObserverCallback): PerformanceObserver;
   readonly supportedEntryTypes: ReadonlyArray<string>;
@@ -13964,7 +13964,7 @@ interface PerformanceObserverEntryList {
   getEntriesByType(type: string): PerformanceEntryList;
 }
 
-declare const PerformanceObserverEntryList: {
+declare var PerformanceObserverEntryList: {
   prototype: PerformanceObserverEntryList;
   new (): PerformanceObserverEntryList;
 };
@@ -13999,7 +13999,7 @@ interface PerformanceResourceTiming extends PerformanceEntry {
   toJSON(): unknown;
 }
 
-declare const PerformanceResourceTiming: {
+declare var PerformanceResourceTiming: {
   prototype: PerformanceResourceTiming;
   new (): PerformanceResourceTiming;
 };
@@ -14011,7 +14011,7 @@ interface PerformanceServerTiming {
   toJSON(): unknown;
 }
 
-declare const PerformanceServerTiming: {
+declare var PerformanceServerTiming: {
   prototype: PerformanceServerTiming;
   new (): PerformanceServerTiming;
 };
@@ -14117,7 +14117,7 @@ interface PermissionStatus extends EventTarget {
   ): void;
 }
 
-declare const PermissionStatus: {
+declare var PermissionStatus: {
   prototype: PermissionStatus;
   new (): PermissionStatus;
 };
@@ -14126,7 +14126,7 @@ interface Permissions {
   query(permissionDesc: PermissionDescriptor): Promise<PermissionStatus>;
 }
 
-declare const Permissions: {
+declare var Permissions: {
   prototype: Permissions;
   new (): Permissions;
 };
@@ -14299,7 +14299,7 @@ interface ProgressEvent<T extends EventTarget = EventTarget> extends Event {
   readonly total: number;
 }
 
-declare const ProgressEvent: {
+declare var ProgressEvent: {
   prototype: ProgressEvent;
   new (type: string, eventInitDict?: ProgressEventInit): ProgressEvent;
 };
@@ -14309,7 +14309,7 @@ interface PromiseRejectionEvent extends Event {
   readonly reason: unknown;
 }
 
-declare const PromiseRejectionEvent: {
+declare var PromiseRejectionEvent: {
   prototype: PromiseRejectionEvent;
   new (
     type: string,
@@ -14344,7 +14344,7 @@ interface PushManager {
   subscribe(options?: PushSubscriptionOptionsInit): Promise<PushSubscription>;
 }
 
-declare const PushManager: {
+declare var PushManager: {
   prototype: PushManager;
   new (): PushManager;
   readonly supportedContentEncodings: ReadonlyArray<string>;
@@ -14363,7 +14363,7 @@ interface PushSubscription {
   unsubscribe(): Promise<boolean>;
 }
 
-declare const PushSubscription: {
+declare var PushSubscription: {
   prototype: PushSubscription;
   new (): PushSubscription;
 };
@@ -14374,7 +14374,7 @@ interface PushSubscriptionOptions {
   readonly userVisibleOnly: boolean;
 }
 
-declare const PushSubscriptionOptions: {
+declare var PushSubscriptionOptions: {
   prototype: PushSubscriptionOptions;
   new (): PushSubscriptionOptions;
 };
@@ -14561,7 +14561,7 @@ interface RTCEncodedAudioFrame {
   getMetadata(): RTCEncodedAudioFrameMetadata;
 }
 
-declare const RTCEncodedAudioFrame: {
+declare var RTCEncodedAudioFrame: {
   prototype: RTCEncodedAudioFrame;
   new (): RTCEncodedAudioFrame;
 };
@@ -14573,7 +14573,7 @@ interface RTCEncodedVideoFrame {
   getMetadata(): RTCEncodedVideoFrameMetadata;
 }
 
-declare const RTCEncodedVideoFrame: {
+declare var RTCEncodedVideoFrame: {
   prototype: RTCEncodedVideoFrame;
   new (): RTCEncodedVideoFrame;
 };
@@ -15030,7 +15030,7 @@ interface ReadableByteStreamController {
   error(e?: unknown): void;
 }
 
-declare const ReadableByteStreamController: {
+declare var ReadableByteStreamController: {
   prototype: ReadableByteStreamController;
   new (): ReadableByteStreamController;
 };
@@ -15053,7 +15053,7 @@ interface ReadableStream<R = unknown> {
   tee(): [ReadableStream<R>, ReadableStream<R>];
 }
 
-declare const ReadableStream: {
+declare var ReadableStream: {
   prototype: ReadableStream;
   new (
     underlyingSource: UnderlyingByteSource,
@@ -15076,7 +15076,7 @@ interface ReadableStreamBYOBReader extends ReadableStreamGenericReader {
   releaseLock(): void;
 }
 
-declare const ReadableStreamBYOBReader: {
+declare var ReadableStreamBYOBReader: {
   prototype: ReadableStreamBYOBReader;
   new (stream: ReadableStream): ReadableStreamBYOBReader;
 };
@@ -15087,7 +15087,7 @@ interface ReadableStreamBYOBRequest {
   respondWithNewView(view: ArrayBufferView): void;
 }
 
-declare const ReadableStreamBYOBRequest: {
+declare var ReadableStreamBYOBRequest: {
   prototype: ReadableStreamBYOBRequest;
   new (): ReadableStreamBYOBRequest;
 };
@@ -15099,7 +15099,7 @@ interface ReadableStreamDefaultController<R = unknown> {
   error(e?: unknown): void;
 }
 
-declare const ReadableStreamDefaultController: {
+declare var ReadableStreamDefaultController: {
   prototype: ReadableStreamDefaultController;
   new (): ReadableStreamDefaultController;
 };
@@ -15111,7 +15111,7 @@ interface ReadableStreamDefaultReader<
   releaseLock(): void;
 }
 
-declare const ReadableStreamDefaultReader: {
+declare var ReadableStreamDefaultReader: {
   prototype: ReadableStreamDefaultReader;
   new <R = unknown>(stream: ReadableStream<R>): ReadableStreamDefaultReader<R>;
 };
@@ -15195,7 +15195,7 @@ interface Request extends Body {
   clone(): Request;
 }
 
-declare const Request: {
+declare var Request: {
   prototype: Request;
   new (input: RequestInfo | URL, init?: RequestInit): Request;
 };
@@ -15246,7 +15246,7 @@ interface Response extends Body {
   clone(): Response;
 }
 
-declare const Response: {
+declare var Response: {
   prototype: Response;
   new (body?: BodyInit | null, init?: ResponseInit): Response;
   error(): Response;
@@ -18425,7 +18425,7 @@ interface SecurityPolicyViolationEvent extends Event {
   readonly violatedDirective: string;
 }
 
-declare const SecurityPolicyViolationEvent: {
+declare var SecurityPolicyViolationEvent: {
   prototype: SecurityPolicyViolationEvent;
   new (
     type: string,
@@ -18507,7 +18507,7 @@ interface ServiceWorker extends EventTarget, AbstractWorker {
   ): void;
 }
 
-declare const ServiceWorker: {
+declare var ServiceWorker: {
   prototype: ServiceWorker;
   new (): ServiceWorker;
 };
@@ -18571,7 +18571,7 @@ interface ServiceWorkerContainer extends EventTarget {
   ): void;
 }
 
-declare const ServiceWorkerContainer: {
+declare var ServiceWorkerContainer: {
   prototype: ServiceWorkerContainer;
   new (): ServiceWorkerContainer;
 };
@@ -18629,7 +18629,7 @@ interface ServiceWorkerRegistration extends EventTarget {
   ): void;
 }
 
-declare const ServiceWorkerRegistration: {
+declare var ServiceWorkerRegistration: {
   prototype: ServiceWorkerRegistration;
   new (): ServiceWorkerRegistration;
 };
@@ -19095,7 +19095,7 @@ interface StorageManager {
   persisted(): Promise<boolean>;
 }
 
-declare const StorageManager: {
+declare var StorageManager: {
   prototype: StorageManager;
   new (): StorageManager;
 };
@@ -19285,7 +19285,7 @@ interface SubtleCrypto {
   ): Promise<ArrayBuffer>;
 }
 
-declare const SubtleCrypto: {
+declare var SubtleCrypto: {
   prototype: SubtleCrypto;
   new (): SubtleCrypto;
 };
@@ -19309,7 +19309,7 @@ interface TextDecoder extends TextDecoderCommon {
    * Returns the result of running encoding's decoder. The method can be invoked zero or more times with options's stream set to true, and then once without options's stream (or set to false), to process a fragmented input. If the invocation without options's stream (or set to false) has no input, it's clearest to omit both arguments.
    *
    * ```
-   *   const  string = "", decoder = new TextDecoder(encoding), buffer;
+   * var string = "", decoder = new TextDecoder(encoding), buffer;
    * while(buffer = next_chunk()) {
    *   string += decoder.decode(buffer, {stream:true});
    * }
@@ -19321,7 +19321,7 @@ interface TextDecoder extends TextDecoderCommon {
   decode(input?: BufferSource, options?: TextDecodeOptions): string;
 }
 
-declare const TextDecoder: {
+declare var TextDecoder: {
   prototype: TextDecoder;
   new (label?: string, options?: TextDecoderOptions): TextDecoder;
 };
@@ -19340,7 +19340,7 @@ interface TextDecoderStream extends GenericTransformStream, TextDecoderCommon {
   readonly writable: WritableStream<BufferSource>;
 }
 
-declare const TextDecoderStream: {
+declare var TextDecoderStream: {
   prototype: TextDecoderStream;
   new (label?: string, options?: TextDecoderOptions): TextDecoderStream;
 };
@@ -19356,7 +19356,7 @@ interface TextEncoder extends TextEncoderCommon {
   ): TextEncoderEncodeIntoResult;
 }
 
-declare const TextEncoder: {
+declare var TextEncoder: {
   prototype: TextEncoder;
   new (): TextEncoder;
 };
@@ -19371,7 +19371,7 @@ interface TextEncoderStream extends GenericTransformStream, TextEncoderCommon {
   readonly writable: WritableStream<string>;
 }
 
-declare const TextEncoderStream: {
+declare var TextEncoderStream: {
   prototype: TextEncoderStream;
   new (): TextEncoderStream;
 };
@@ -19394,7 +19394,7 @@ interface TextMetrics {
   readonly width: number;
 }
 
-declare const TextMetrics: {
+declare var TextMetrics: {
   prototype: TextMetrics;
   new (): TextMetrics;
 };
@@ -19670,7 +19670,7 @@ interface TransformStream<I = unknown, O = unknown> {
   readonly writable: WritableStream<I>;
 }
 
-declare const TransformStream: {
+declare var TransformStream: {
   prototype: TransformStream;
   new <I = unknown, O = unknown>(
     transformer?: Transformer<I, O>,
@@ -19686,7 +19686,7 @@ interface TransformStreamDefaultController<O = unknown> {
   terminate(): void;
 }
 
-declare const TransformStreamDefaultController: {
+declare var TransformStreamDefaultController: {
   prototype: TransformStreamDefaultController;
   new (): TransformStreamDefaultController;
 };
@@ -19765,7 +19765,7 @@ interface URL {
   toJSON(): string;
 }
 
-declare const URL: {
+declare var URL: {
   prototype: URL;
   new (url: string | URL, base?: string | URL): URL;
   createObjectURL(obj: Blob | MediaSource): string;
@@ -19797,7 +19797,7 @@ interface URLSearchParams {
   ): void;
 }
 
-declare const URLSearchParams: {
+declare var URLSearchParams: {
   prototype: URLSearchParams;
   new (
     init?:
@@ -19892,7 +19892,7 @@ interface VideoColorSpace {
   toJSON(): VideoColorSpaceInit;
 }
 
-declare const VideoColorSpace: {
+declare var VideoColorSpace: {
   prototype: VideoColorSpace;
   new (init?: VideoColorSpaceInit): VideoColorSpace;
 };
@@ -20139,7 +20139,7 @@ interface WebGL2RenderingContext
     WebGL2RenderingContextOverloads,
     WebGLRenderingContextBase {}
 
-declare const WebGL2RenderingContext: {
+declare var WebGL2RenderingContext: {
   prototype: WebGL2RenderingContext;
   new (): WebGL2RenderingContext;
   readonly READ_BUFFER: 0x0c02;
@@ -21699,7 +21699,7 @@ interface WebGLActiveInfo {
   readonly type: GLenum;
 }
 
-declare const WebGLActiveInfo: {
+declare var WebGLActiveInfo: {
   prototype: WebGLActiveInfo;
   new (): WebGLActiveInfo;
 };
@@ -21707,7 +21707,7 @@ declare const WebGLActiveInfo: {
 /** Part of the WebGL API and represents an opaque buffer object storing data such as vertices or colors. */
 interface WebGLBuffer {}
 
-declare const WebGLBuffer: {
+declare var WebGLBuffer: {
   prototype: WebGLBuffer;
   new (): WebGLBuffer;
 };
@@ -21717,7 +21717,7 @@ interface WebGLContextEvent extends Event {
   readonly statusMessage: string;
 }
 
-declare const WebGLContextEvent: {
+declare var WebGLContextEvent: {
   prototype: WebGLContextEvent;
   new (type: string, eventInit?: WebGLContextEventInit): WebGLContextEvent;
 };
@@ -21725,7 +21725,7 @@ declare const WebGLContextEvent: {
 /** Part of the WebGL API and represents a collection of buffers that serve as a rendering destination. */
 interface WebGLFramebuffer {}
 
-declare const WebGLFramebuffer: {
+declare var WebGLFramebuffer: {
   prototype: WebGLFramebuffer;
   new (): WebGLFramebuffer;
 };
@@ -21733,14 +21733,14 @@ declare const WebGLFramebuffer: {
 /** The WebGLProgram is part of the WebGL API and is a combination of two compiled WebGLShaders consisting of a vertex shader and a fragment shader (both written in GLSL). */
 interface WebGLProgram {}
 
-declare const WebGLProgram: {
+declare var WebGLProgram: {
   prototype: WebGLProgram;
   new (): WebGLProgram;
 };
 
 interface WebGLQuery {}
 
-declare const WebGLQuery: {
+declare var WebGLQuery: {
   prototype: WebGLQuery;
   new (): WebGLQuery;
 };
@@ -21748,7 +21748,7 @@ declare const WebGLQuery: {
 /** Part of the WebGL API and represents a buffer that can contain an image, or can be source or target of an rendering operation. */
 interface WebGLRenderbuffer {}
 
-declare const WebGLRenderbuffer: {
+declare var WebGLRenderbuffer: {
   prototype: WebGLRenderbuffer;
   new (): WebGLRenderbuffer;
 };
@@ -21757,7 +21757,7 @@ declare const WebGLRenderbuffer: {
 interface WebGLRenderingContext
   extends WebGLRenderingContextBase, WebGLRenderingContextOverloads {}
 
-declare const WebGLRenderingContext: {
+declare var WebGLRenderingContext: {
   prototype: WebGLRenderingContext;
   new (): WebGLRenderingContext;
   readonly DEPTH_BUFFER_BIT: 0x00000100;
@@ -22781,7 +22781,7 @@ interface WebGLRenderingContextOverloads {
 
 interface WebGLSampler {}
 
-declare const WebGLSampler: {
+declare var WebGLSampler: {
   prototype: WebGLSampler;
   new (): WebGLSampler;
 };
@@ -22789,7 +22789,7 @@ declare const WebGLSampler: {
 /** The WebGLShader is part of the WebGL API and can either be a vertex or a fragment shader. A WebGLProgram requires both types of shaders. */
 interface WebGLShader {}
 
-declare const WebGLShader: {
+declare var WebGLShader: {
   prototype: WebGLShader;
   new (): WebGLShader;
 };
@@ -22801,14 +22801,14 @@ interface WebGLShaderPrecisionFormat {
   readonly rangeMin: GLint;
 }
 
-declare const WebGLShaderPrecisionFormat: {
+declare var WebGLShaderPrecisionFormat: {
   prototype: WebGLShaderPrecisionFormat;
   new (): WebGLShaderPrecisionFormat;
 };
 
 interface WebGLSync {}
 
-declare const WebGLSync: {
+declare var WebGLSync: {
   prototype: WebGLSync;
   new (): WebGLSync;
 };
@@ -22816,14 +22816,14 @@ declare const WebGLSync: {
 /** Part of the WebGL API and represents an opaque texture object providing storage and state for texturing operations. */
 interface WebGLTexture {}
 
-declare const WebGLTexture: {
+declare var WebGLTexture: {
   prototype: WebGLTexture;
   new (): WebGLTexture;
 };
 
 interface WebGLTransformFeedback {}
 
-declare const WebGLTransformFeedback: {
+declare var WebGLTransformFeedback: {
   prototype: WebGLTransformFeedback;
   new (): WebGLTransformFeedback;
 };
@@ -22831,14 +22831,14 @@ declare const WebGLTransformFeedback: {
 /** Part of the WebGL API and represents the location of a uniform variable in a shader program. */
 interface WebGLUniformLocation {}
 
-declare const WebGLUniformLocation: {
+declare var WebGLUniformLocation: {
   prototype: WebGLUniformLocation;
   new (): WebGLUniformLocation;
 };
 
 interface WebGLVertexArrayObject {}
 
-declare const WebGLVertexArrayObject: {
+declare var WebGLVertexArrayObject: {
   prototype: WebGLVertexArrayObject;
   new (): WebGLVertexArrayObject;
 };
@@ -22908,7 +22908,7 @@ interface WebSocket extends EventTarget {
   ): void;
 }
 
-declare const WebSocket: {
+declare var WebSocket: {
   prototype: WebSocket;
   new (url: string | URL, protocols?: string | readonly string[]): WebSocket;
   readonly CONNECTING: 0;
@@ -23289,7 +23289,7 @@ interface Worker extends EventTarget, AbstractWorker {
   ): void;
 }
 
-declare const Worker: {
+declare var Worker: {
   prototype: Worker;
   new (scriptURL: string | URL, options?: WorkerOptions): Worker;
 };
@@ -23319,7 +23319,7 @@ interface WritableStream<W = unknown> {
   getWriter(): WritableStreamDefaultWriter<W>;
 }
 
-declare const WritableStream: {
+declare var WritableStream: {
   prototype: WritableStream;
   new <W = unknown>(
     underlyingSink?: UnderlyingSink<W>,
@@ -23333,7 +23333,7 @@ interface WritableStreamDefaultController {
   error(e?: unknown): void;
 }
 
-declare const WritableStreamDefaultController: {
+declare var WritableStreamDefaultController: {
   prototype: WritableStreamDefaultController;
   new (): WritableStreamDefaultController;
 };
@@ -23349,7 +23349,7 @@ interface WritableStreamDefaultWriter<W = unknown> {
   write(chunk?: W): Promise<void>;
 }
 
-declare const WritableStreamDefaultWriter: {
+declare var WritableStreamDefaultWriter: {
   prototype: WritableStreamDefaultWriter;
   new <W = unknown>(stream: WritableStream<W>): WritableStreamDefaultWriter<W>;
 };
@@ -23503,7 +23503,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
   ): void;
 }
 
-declare const XMLHttpRequest: {
+declare var XMLHttpRequest: {
   prototype: XMLHttpRequest;
   new (): XMLHttpRequest;
   readonly UNSENT: 0;
@@ -23559,7 +23559,7 @@ interface XMLHttpRequestEventTarget extends EventTarget {
   ): void;
 }
 
-declare const XMLHttpRequestEventTarget: {
+declare var XMLHttpRequestEventTarget: {
   prototype: XMLHttpRequestEventTarget;
   new (): XMLHttpRequestEventTarget;
 };
@@ -23593,7 +23593,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
   ): void;
 }
 
-declare const XMLHttpRequestUpload: {
+declare var XMLHttpRequestUpload: {
   prototype: XMLHttpRequestUpload;
   new (): XMLHttpRequestUpload;
 };
@@ -23727,7 +23727,7 @@ interface Console {
   warn(...data: readonly unknown[]): void;
 }
 
-declare const console: Console;
+declare var console: Console;
 
 /** Holds useful CSS-related methods. No object with this interface are implemented: it contains only static methods and therefore is a utilitarian interface. */
 declare namespace CSS {
@@ -24158,7 +24158,7 @@ interface HTMLElementTagNameMap {
   track: HTMLTrackElement;
   u: HTMLElement;
   ul: HTMLUListElement;
-  const: HTMLElement;
+  var: HTMLElement;
   video: HTMLVideoElement;
   wbr: HTMLElement;
 }
@@ -24333,14 +24333,14 @@ declare const history: History;
 declare const innerHeight: number;
 declare const innerWidth: number;
 declare const length: number;
-declare const location: Location;
+declare var location: Location;
 /** Returns true if the location bar is visible; otherwise, returns false. */
 declare const locationbar: BarProp;
 /** Returns true if the menu bar is visible; otherwise, returns false. */
 declare const menubar: BarProp;
 /** @deprecated */
 declare const name: void;
-declare const navigator: Navigator;
+declare var navigator: Navigator;
 /** Available only in secure contexts. */
 declare const ondevicemotion:
   | ((this: Window, ev: DeviceMotionEvent) => unknown)
@@ -24379,7 +24379,7 @@ declare const scrollX: number;
 declare const scrollY: number;
 /** Returns true if the scrollbars are visible; otherwise, returns false. */
 declare const scrollbars: BarProp;
-declare const self: Window & typeof globalThis;
+declare var self: Window & typeof globalThis;
 declare const speechSynthesis: SpeechSynthesis;
 /** @deprecated */
 declare const status: string;
@@ -24561,7 +24561,7 @@ declare const onended: ((this: Window, ev: Event) => unknown) | null;
  * Fires when an error occurs during object loading.
  * @param ev The event.
  */
-declare const onerror: OnErrorEventHandler;
+declare var onerror: OnErrorEventHandler;
 /**
  * Fires when the object receives focus.
  * @param ev The event.
@@ -24805,13 +24805,13 @@ declare const ongamepaddisconnected:
 declare const onhashchange:
   | ((this: Window, ev: HashChangeEvent) => unknown)
   | null;
-declare const onlanguagechange: ((this: Window, ev: Event) => unknown) | null;
-declare const onmessage: ((this: Window, ev: MessageEvent) => unknown) | null;
-declare const onmessageerror:
+declare var onlanguagechange: ((this: Window, ev: Event) => unknown) | null;
+declare var onmessage: ((this: Window, ev: MessageEvent) => unknown) | null;
+declare var onmessageerror:
   | ((this: Window, ev: MessageEvent) => unknown)
   | null;
-declare const onoffline: ((this: Window, ev: Event) => unknown) | null;
-declare const ononline: ((this: Window, ev: Event) => unknown) | null;
+declare var onoffline: ((this: Window, ev: Event) => unknown) | null;
+declare var ononline: ((this: Window, ev: Event) => unknown) | null;
 declare const onpagehide:
   | ((this: Window, ev: PageTransitionEvent) => unknown)
   | null;
@@ -24819,23 +24819,23 @@ declare const onpageshow:
   | ((this: Window, ev: PageTransitionEvent) => unknown)
   | null;
 declare const onpopstate: ((this: Window, ev: PopStateEvent) => unknown) | null;
-declare const onrejectionhandled:
+declare var onrejectionhandled:
   | ((this: Window, ev: PromiseRejectionEvent) => unknown)
   | null;
 declare const onstorage: ((this: Window, ev: StorageEvent) => unknown) | null;
-declare const onunhandledrejection:
+declare var onunhandledrejection:
   | ((this: Window, ev: PromiseRejectionEvent) => unknown)
   | null;
 declare const onunload: ((this: Window, ev: Event) => unknown) | null;
 declare const localStorage: Storage;
 /** Available only in secure contexts. */
-declare const caches: CacheStorage;
-declare const crossOriginIsolated: boolean;
-declare const crypto: Crypto;
-declare const indexedDB: IDBFactory;
-declare const isSecureContext: boolean;
-declare const origin: string;
-declare const performance: Performance;
+declare var caches: CacheStorage;
+declare var crossOriginIsolated: boolean;
+declare var crypto: Crypto;
+declare var indexedDB: IDBFactory;
+declare var isSecureContext: boolean;
+declare var origin: string;
+declare var performance: Performance;
 declare function atob(data: string): string;
 declare function btoa(data: string): string;
 declare function clearInterval(id: number | undefined): void;

@@ -881,7 +881,7 @@
    readonly FILTER_ACCEPT: 1;
    readonly FILTER_REJECT: 2;
    readonly FILTER_SKIP: 3;
-@@ -3366,10 +3373,10 @@ interface AbortController {
+@@ -3366,7 +3373,7 @@ interface AbortController {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortController/abort)
     */
@@ -889,11 +889,7 @@
 +  abort(reason?: unknown): void;
  }
  
--declare var AbortController: {
-+declare const AbortController: {
-   prototype: AbortController;
-   new (): AbortController;
- };
+ declare var AbortController: {
 @@ -3391,13 +3398,13 @@ interface AbortSignal extends EventTarget {
     */
    readonly aborted: boolean;
@@ -928,15 +924,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -3426,7 +3433,7 @@ interface AbortSignal extends EventTarget {
-   ): void;
- }
- 
--declare var AbortSignal: {
-+declare const AbortSignal: {
-   prototype: AbortSignal;
-   new (): AbortSignal;
-   /**
 @@ -3434,13 +3441,13 @@ declare var AbortSignal: {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_static)
@@ -1152,15 +1139,6 @@
    prototype: AudioContext;
    new (contextOptions?: AudioContextOptions): AudioContext;
  };
-@@ -4258,7 +4265,7 @@ interface AudioData {
-   ): void;
- }
- 
--declare var AudioData: {
-+declare const AudioData: {
-   prototype: AudioData;
-   new (init: AudioDataInit): AudioData;
- };
 @@ -4281,7 +4288,7 @@ interface AudioDecoder extends EventTarget {
     */
    readonly decodeQueueSize: number;
@@ -1188,15 +1166,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -4340,7 +4347,7 @@ interface AudioDecoder extends EventTarget {
-   ): void;
- }
- 
--declare var AudioDecoder: {
-+declare const AudioDecoder: {
-   prototype: AudioDecoder;
-   new (init: AudioDecoderInit): AudioDecoder;
-   /**
 @@ -4365,7 +4372,7 @@ interface AudioDestinationNode extends AudioNode {
    readonly maxChannelCount: number;
  }
@@ -1233,15 +1202,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -4447,7 +4454,7 @@ interface AudioEncoder extends EventTarget {
-   ): void;
- }
- 
--declare var AudioEncoder: {
-+declare const AudioEncoder: {
-   prototype: AudioEncoder;
-   new (init: AudioEncoderInit): AudioEncoder;
-   /**
 @@ -4541,7 +4548,7 @@ interface AudioListener {
    setPosition(x: number, y: number, z: number): void;
  }
@@ -1519,12 +1479,9 @@
    prototype: BiquadFilterNode;
    new (
      context: BaseAudioContext,
-@@ -5336,9 +5360,9 @@ interface Blob {
-   text(): Promise<string>;
- }
+@@ -5338,7 +5362,7 @@ interface Blob {
  
--declare var Blob: {
-+declare const Blob: {
+ declare var Blob: {
    prototype: Blob;
 -  new (blobParts?: BlobPart[], options?: BlobPropertyBag): Blob;
 +  new (blobParts?: readonly BlobPart[], options?: BlobPropertyBag): Blob;
@@ -1591,24 +1548,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -5440,7 +5472,7 @@ interface BroadcastChannel extends EventTarget {
-   ): void;
- }
- 
--declare var BroadcastChannel: {
-+declare const BroadcastChannel: {
-   prototype: BroadcastChannel;
-   new (name: string): BroadcastChannel;
- };
-@@ -5461,7 +5493,7 @@ interface ByteLengthQueuingStrategy extends QueuingStrategy<ArrayBufferView> {
-   readonly size: QueuingStrategySize<ArrayBufferView>;
- }
- 
--declare var ByteLengthQueuingStrategy: {
-+declare const ByteLengthQueuingStrategy: {
-   prototype: ByteLengthQueuingStrategy;
-   new (init: QueuingStrategyInit): ByteLengthQueuingStrategy;
- };
 @@ -5473,7 +5505,7 @@ declare var ByteLengthQueuingStrategy: {
   */
  interface CDATASection extends Text {}
@@ -1708,15 +1647,6 @@
    prototype: CSSGroupingRule;
    new (): CSSGroupingRule;
  };
-@@ -5754,7 +5786,7 @@ declare var CSSGroupingRule: {
-  */
- interface CSSImageValue extends CSSStyleValue {}
- 
--declare var CSSImageValue: {
-+declare const CSSImageValue: {
-   prototype: CSSImageValue;
-   new (): CSSImageValue;
- };
 @@ -5798,7 +5830,7 @@ interface CSSImportRule extends CSSRule {
    readonly supportsText: string | null;
  }
@@ -1744,15 +1674,6 @@
    prototype: CSSKeyframesRule;
    new (): CSSKeyframesRule;
  };
-@@ -5893,7 +5925,7 @@ interface CSSKeywordValue extends CSSStyleValue {
-   value: string;
- }
- 
--declare var CSSKeywordValue: {
-+declare const CSSKeywordValue: {
-   prototype: CSSKeywordValue;
-   new (value: string): CSSKeywordValue;
- };
 @@ -5912,7 +5944,7 @@ interface CSSLayerBlockRule extends CSSGroupingRule {
    readonly name: string;
  }
@@ -1771,99 +1692,42 @@
    prototype: CSSLayerStatementRule;
    new (): CSSLayerStatementRule;
  };
-@@ -5942,7 +5974,7 @@ interface CSSMathClamp extends CSSMathValue {
-   readonly value: CSSNumericValue;
- }
+@@ -5986,7 +6018,7 @@ interface CSSMathMax extends CSSMathValue {
  
--declare var CSSMathClamp: {
-+declare const CSSMathClamp: {
-   prototype: CSSMathClamp;
-   new (
-     lower: CSSNumberish,
-@@ -5965,7 +5997,7 @@ interface CSSMathInvert extends CSSMathValue {
-   readonly value: CSSNumericValue;
- }
- 
--declare var CSSMathInvert: {
-+declare const CSSMathInvert: {
-   prototype: CSSMathInvert;
-   new (arg: CSSNumberish): CSSMathInvert;
- };
-@@ -5984,9 +6016,9 @@ interface CSSMathMax extends CSSMathValue {
-   readonly values: CSSNumericArray;
- }
- 
--declare var CSSMathMax: {
-+declare const CSSMathMax: {
+ declare var CSSMathMax: {
    prototype: CSSMathMax;
 -  new (...args: CSSNumberish[]): CSSMathMax;
 +  new (...args: readonly CSSNumberish[]): CSSMathMax;
  };
  
  /**
-@@ -6003,9 +6035,9 @@ interface CSSMathMin extends CSSMathValue {
-   readonly values: CSSNumericArray;
- }
+@@ -6005,7 +6037,7 @@ interface CSSMathMin extends CSSMathValue {
  
--declare var CSSMathMin: {
-+declare const CSSMathMin: {
+ declare var CSSMathMin: {
    prototype: CSSMathMin;
 -  new (...args: CSSNumberish[]): CSSMathMin;
 +  new (...args: readonly CSSNumberish[]): CSSMathMin;
  };
  
  /**
-@@ -6022,7 +6054,7 @@ interface CSSMathNegate extends CSSMathValue {
-   readonly value: CSSNumericValue;
- }
+@@ -6043,7 +6075,7 @@ interface CSSMathProduct extends CSSMathValue {
  
--declare var CSSMathNegate: {
-+declare const CSSMathNegate: {
-   prototype: CSSMathNegate;
-   new (arg: CSSNumberish): CSSMathNegate;
- };
-@@ -6041,9 +6073,9 @@ interface CSSMathProduct extends CSSMathValue {
-   readonly values: CSSNumericArray;
- }
- 
--declare var CSSMathProduct: {
-+declare const CSSMathProduct: {
+ declare var CSSMathProduct: {
    prototype: CSSMathProduct;
 -  new (...args: CSSNumberish[]): CSSMathProduct;
 +  new (...args: readonly CSSNumberish[]): CSSMathProduct;
  };
  
  /**
-@@ -6060,9 +6092,9 @@ interface CSSMathSum extends CSSMathValue {
-   readonly values: CSSNumericArray;
- }
+@@ -6062,7 +6094,7 @@ interface CSSMathSum extends CSSMathValue {
  
--declare var CSSMathSum: {
-+declare const CSSMathSum: {
+ declare var CSSMathSum: {
    prototype: CSSMathSum;
 -  new (...args: CSSNumberish[]): CSSMathSum;
 +  new (...args: readonly CSSNumberish[]): CSSMathSum;
  };
  
  /**
-@@ -6079,7 +6111,7 @@ interface CSSMathValue extends CSSNumericValue {
-   readonly operator: CSSMathOperator;
- }
- 
--declare var CSSMathValue: {
-+declare const CSSMathValue: {
-   prototype: CSSMathValue;
-   new (): CSSMathValue;
- };
-@@ -6098,7 +6130,7 @@ interface CSSMatrixComponent extends CSSTransformComponent {
-   matrix: DOMMatrix;
- }
- 
--declare var CSSMatrixComponent: {
-+declare const CSSMatrixComponent: {
-   prototype: CSSMatrixComponent;
-   new (
-     matrix: DOMMatrixReadOnly,
 @@ -6121,7 +6153,7 @@ interface CSSMediaRule extends CSSConditionRule {
    set media(mediaText: string);
  }
@@ -1891,7 +1755,7 @@
    prototype: CSSNestedDeclarations;
    new (): CSSNestedDeclarations;
  };
-@@ -6189,12 +6221,12 @@ interface CSSNumericArray {
+@@ -6189,7 +6221,7 @@ interface CSSNumericArray {
        key: number,
        parent: CSSNumericArray,
      ) => void,
@@ -1900,12 +1764,6 @@
    ): void;
    [index: number]: CSSNumericValue;
  }
- 
--declare var CSSNumericArray: {
-+declare const CSSNumericArray: {
-   prototype: CSSNumericArray;
-   new (): CSSNumericArray;
- };
 @@ -6210,43 +6242,43 @@ interface CSSNumericValue extends CSSStyleValue {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/add)
@@ -1966,15 +1824,6 @@
    /**
     * The **`type()`** method of the CSSNumericValue interface returns the type of CSSNumericValue, one of angle, flex, frequency, length, resolution, percent, percentHint, or time.
     *
-@@ -6267,7 +6299,7 @@ interface CSSNumericValue extends CSSStyleValue {
-   type(): CSSNumericType;
- }
- 
--declare var CSSNumericValue: {
-+declare const CSSNumericValue: {
-   prototype: CSSNumericValue;
-   new (): CSSNumericValue;
-   /**
 @@ -6306,7 +6338,7 @@ interface CSSPageDescriptors extends CSSStyleDeclarationBase {
    size: string;
  }
@@ -1992,15 +1841,6 @@
 +declare const CSSPageRule: {
    prototype: CSSPageRule;
    new (): CSSPageRule;
- };
-@@ -6351,7 +6383,7 @@ interface CSSPerspective extends CSSTransformComponent {
-   length: CSSPerspectiveValue;
- }
- 
--declare var CSSPerspective: {
-+declare const CSSPerspective: {
-   prototype: CSSPerspective;
-   new (length: CSSPerspectiveValue): CSSPerspective;
  };
 @@ -6504,7 +6536,7 @@ interface CSSPositionTryDescriptors extends CSSStyleDeclarationBase {
    width: string;
@@ -2029,15 +1869,6 @@
    prototype: CSSPropertyRule;
    new (): CSSPropertyRule;
  };
-@@ -6604,7 +6636,7 @@ interface CSSRotate extends CSSTransformComponent {
-   z: CSSNumberish;
- }
- 
--declare var CSSRotate: {
-+declare const CSSRotate: {
-   prototype: CSSRotate;
-   new (angle: CSSNumericValue): CSSRotate;
-   new (
 @@ -6661,7 +6693,7 @@ interface CSSRule {
    readonly FONT_FEATURE_VALUES_RULE: 14;
  }
@@ -2056,15 +1887,6 @@
    prototype: CSSRuleList;
    new (): CSSRuleList;
  };
-@@ -6731,7 +6763,7 @@ interface CSSScale extends CSSTransformComponent {
-   z: CSSNumberish;
- }
- 
--declare var CSSScale: {
-+declare const CSSScale: {
-   prototype: CSSScale;
-   new (x: CSSNumberish, y: CSSNumberish, z?: CSSNumberish): CSSScale;
- };
 @@ -6756,7 +6788,7 @@ interface CSSScopeRule extends CSSGroupingRule {
    readonly start: string | null;
  }
@@ -2073,33 +1895,6 @@
 +declare const CSSScopeRule: {
    prototype: CSSScopeRule;
    new (): CSSScopeRule;
- };
-@@ -6781,7 +6813,7 @@ interface CSSSkew extends CSSTransformComponent {
-   ay: CSSNumericValue;
- }
- 
--declare var CSSSkew: {
-+declare const CSSSkew: {
-   prototype: CSSSkew;
-   new (ax: CSSNumericValue, ay: CSSNumericValue): CSSSkew;
- };
-@@ -6800,7 +6832,7 @@ interface CSSSkewX extends CSSTransformComponent {
-   ax: CSSNumericValue;
- }
- 
--declare var CSSSkewX: {
-+declare const CSSSkewX: {
-   prototype: CSSSkewX;
-   new (ax: CSSNumericValue): CSSSkewX;
- };
-@@ -6819,7 +6851,7 @@ interface CSSSkewY extends CSSTransformComponent {
-   ay: CSSNumericValue;
- }
- 
--declare var CSSSkewY: {
-+declare const CSSSkewY: {
-   prototype: CSSSkewY;
-   new (ay: CSSNumericValue): CSSSkewY;
  };
 @@ -6831,7 +6863,7 @@ declare var CSSSkewY: {
   */
@@ -2146,15 +1941,6 @@
    prototype: CSSStyleSheet;
    new (options?: CSSStyleSheetInit): CSSStyleSheet;
  };
-@@ -10204,7 +10236,7 @@ interface CSSStyleValue {
-   toString(): string;
- }
- 
--declare var CSSStyleValue: {
-+declare const CSSStyleValue: {
-   prototype: CSSStyleValue;
-   new (): CSSStyleValue;
-   /**
 @@ -10228,7 +10260,7 @@ declare var CSSStyleValue: {
   */
  interface CSSSupportsRule extends CSSConditionRule {}
@@ -2163,15 +1949,6 @@
 +declare const CSSSupportsRule: {
    prototype: CSSSupportsRule;
    new (): CSSSupportsRule;
- };
-@@ -10254,7 +10286,7 @@ interface CSSTransformComponent {
-   toString(): string;
- }
- 
--declare var CSSTransformComponent: {
-+declare const CSSTransformComponent: {
-   prototype: CSSTransformComponent;
-   new (): CSSTransformComponent;
  };
 @@ -10289,14 +10321,14 @@ interface CSSTransformValue extends CSSStyleValue {
        key: number,
@@ -2183,8 +1960,7 @@
    [index: number]: CSSTransformComponent;
  }
  
--declare var CSSTransformValue: {
-+declare const CSSTransformValue: {
+ declare var CSSTransformValue: {
    prototype: CSSTransformValue;
 -  new (transforms: CSSTransformComponent[]): CSSTransformValue;
 +  new (transforms: readonly CSSTransformComponent[]): CSSTransformValue;
@@ -2218,25 +1994,7 @@
    prototype: CSSTransition;
    new (): CSSTransition;
  };
-@@ -10364,7 +10396,7 @@ interface CSSTranslate extends CSSTransformComponent {
-   z: CSSNumericValue;
- }
- 
--declare var CSSTranslate: {
-+declare const CSSTranslate: {
-   prototype: CSSTranslate;
-   new (
-     x: CSSNumericValue,
-@@ -10393,7 +10425,7 @@ interface CSSUnitValue extends CSSNumericValue {
-   value: number;
- }
- 
--declare var CSSUnitValue: {
-+declare const CSSUnitValue: {
-   prototype: CSSUnitValue;
-   new (value: number, unit: string): CSSUnitValue;
- };
-@@ -10416,18 +10448,18 @@ interface CSSUnparsedValue extends CSSStyleValue {
+@@ -10416,14 +10448,14 @@ interface CSSUnparsedValue extends CSSStyleValue {
        key: number,
        parent: CSSUnparsedValue,
      ) => void,
@@ -2246,28 +2004,13 @@
    [index: number]: CSSUnparsedSegment;
  }
  
--declare var CSSUnparsedValue: {
-+declare const CSSUnparsedValue: {
+ declare var CSSUnparsedValue: {
    prototype: CSSUnparsedValue;
 -  new (members: CSSUnparsedSegment[]): CSSUnparsedValue;
 +  new (members: readonly CSSUnparsedSegment[]): CSSUnparsedValue;
  };
  
  /**
-- * The **`CSSVariableReferenceValue`** interface of the CSS Typed Object Model API allows you to create a custom name for a built-in CSS value. This object functionality is sometimes called a "CSS variable" and serves the same purpose as the var() function. The custom name must begin with two dashes.
-+ * The **`CSSVariableReferenceValue`** interface of the CSS Typed Object Model API allows you to create a custom name for a built-in CSS value. This object functionality is sometimes called a "CSS variable" and serves the same purpose as the   const () function. The custom name must begin with two dashes.
-  *
-  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSVariableReferenceValue)
-  */
-@@ -10446,7 +10478,7 @@ interface CSSVariableReferenceValue {
-   variable: string;
- }
- 
--declare var CSSVariableReferenceValue: {
-+declare const CSSVariableReferenceValue: {
-   prototype: CSSVariableReferenceValue;
-   new (
-     variable: string,
 @@ -10474,7 +10506,7 @@ interface CSSViewTransitionRule extends CSSRule {
    readonly types: ReadonlyArray<string>;
  }
@@ -2286,24 +2029,6 @@
    /**
     * The **`delete()`** method of the Cache interface finds the Cache entry whose key is the request, and if found, deletes the Cache entry and returns a Promise that resolves to true. If no Cache entry is found, it resolves to false.
     *
-@@ -10542,7 +10574,7 @@ interface Cache {
-   put(request: RequestInfo | URL, response: Response): Promise<void>;
- }
- 
--declare var Cache: {
-+declare const Cache: {
-   prototype: Cache;
-   new (): Cache;
- };
-@@ -10589,7 +10621,7 @@ interface CacheStorage {
-   open(cacheName: string): Promise<Cache>;
- }
- 
--declare var CacheStorage: {
-+declare const CacheStorage: {
-   prototype: CacheStorage;
-   new (): CacheStorage;
- };
 @@ -10617,7 +10649,7 @@ interface CanvasCaptureMediaStreamTrack extends MediaStreamTrack {
      listener: (
        this: CanvasCaptureMediaStreamTrack,
@@ -2331,15 +2056,6 @@
    prototype: CanvasCaptureMediaStreamTrack;
    new (): CanvasCaptureMediaStreamTrack;
  };
-@@ -10749,7 +10781,7 @@ interface CanvasGradient {
-   addColorStop(offset: number, color: string): void;
- }
- 
--declare var CanvasGradient: {
-+declare const CanvasGradient: {
-   prototype: CanvasGradient;
-   new (): CanvasGradient;
- };
 @@ -10856,7 +10888,7 @@ interface CanvasPathDrawingStyles {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/getLineDash) */
    getLineDash(): number[];
@@ -2349,15 +2065,6 @@
  }
  
  /**
-@@ -10873,7 +10905,7 @@ interface CanvasPattern {
-   setTransform(transform?: DOMMatrix2DInit): void;
- }
- 
--declare var CanvasPattern: {
-+declare const CanvasPattern: {
-   prototype: CanvasPattern;
-   new (): CanvasPattern;
- };
 @@ -10919,7 +10951,7 @@ interface CanvasRenderingContext2D
    readonly canvas: HTMLCanvasElement;
  }
@@ -2430,15 +2137,6 @@
    prototype: ClipboardItem;
    new (
      items: Record<string, string | Blob | PromiseLike<string | Blob>>,
-@@ -11301,7 +11333,7 @@ interface CloseEvent extends Event {
-   readonly wasClean: boolean;
- }
- 
--declare var CloseEvent: {
-+declare const CloseEvent: {
-   prototype: CloseEvent;
-   new (type: string, eventInitDict?: CloseEventInit): CloseEvent;
- };
 @@ -11326,7 +11358,7 @@ interface CommandEvent extends Event {
    readonly source: Element | null;
  }
@@ -2465,15 +2163,6 @@
 +declare const CompositionEvent: {
    prototype: CompositionEvent;
    new (type: string, eventInitDict?: CompositionEventInit): CompositionEvent;
- };
-@@ -11387,7 +11419,7 @@ interface CompressionStream extends GenericTransformStream {
-   readonly writable: WritableStream<BufferSource>;
- }
- 
--declare var CompressionStream: {
-+declare const CompressionStream: {
-   prototype: CompressionStream;
-   new (format: CompressionFormat): CompressionStream;
  };
 @@ -11409,7 +11441,7 @@ interface ConstantSourceNode extends AudioScheduledSourceNode {
      listener: (
@@ -2556,16 +2245,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -11576,7 +11608,7 @@ interface CookieStore extends EventTarget {
-   ): void;
- }
- 
--declare var CookieStore: {
-+declare const CookieStore: {
-   prototype: CookieStore;
-   new (): CookieStore;
- };
-@@ -11599,16 +11631,16 @@ interface CookieStoreManager {
+@@ -11599,13 +11631,13 @@ interface CookieStoreManager {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CookieStoreManager/subscribe)
     */
@@ -2580,20 +2260,7 @@
 +  unsubscribe(subscriptions: readonly CookieStoreGetOptions[]): Promise<void>;
  }
  
--declare var CookieStoreManager: {
-+declare const CookieStoreManager: {
-   prototype: CookieStoreManager;
-   new (): CookieStoreManager;
- };
-@@ -11629,7 +11661,7 @@ interface CountQueuingStrategy extends QueuingStrategy {
-   readonly size: QueuingStrategySize;
- }
- 
--declare var CountQueuingStrategy: {
-+declare const CountQueuingStrategy: {
-   prototype: CountQueuingStrategy;
-   new (init: QueuingStrategyInit): CountQueuingStrategy;
- };
+ declare var CookieStoreManager: {
 @@ -11655,7 +11687,7 @@ interface Credential {
    readonly type: string;
  }
@@ -2612,16 +2279,7 @@
    prototype: CredentialsContainer;
    new (): CredentialsContainer;
  };
-@@ -11726,7 +11758,7 @@ interface Crypto {
-   randomUUID(): `${string}-${string}-${string}-${string}-${string}`;
- }
- 
--declare var Crypto: {
-+declare const Crypto: {
-   prototype: Crypto;
-   new (): Crypto;
- };
-@@ -11761,10 +11793,10 @@ interface CryptoKey {
+@@ -11761,7 +11793,7 @@ interface CryptoKey {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CryptoKey/usages)
     */
@@ -2629,11 +2287,7 @@
 +  readonly usages: readonly KeyUsage[];
  }
  
--declare var CryptoKey: {
-+declare const CryptoKey: {
-   prototype: CryptoKey;
-   new (): CryptoKey;
- };
+ declare var CryptoKey: {
 @@ -11812,7 +11844,7 @@ interface CustomElementRegistry {
    whenDefined(name: string): Promise<CustomElementConstructor>;
  }
@@ -2652,15 +2306,6 @@
    /**
     * The read-only **`detail`** property of the CustomEvent interface returns any data passed when initializing the event.
     *
-@@ -11843,7 +11875,7 @@ interface CustomEvent<T = any> extends Event {
-   ): void;
- }
- 
--declare var CustomEvent: {
-+declare const CustomEvent: {
-   prototype: CustomEvent;
-   new <T>(type: string, eventInitDict?: CustomEventInit<T>): CustomEvent<T>;
- };
 @@ -11856,11 +11888,11 @@ declare var CustomEvent: {
  interface CustomStateSet {
    forEach(
@@ -2675,15 +2320,6 @@
    prototype: CustomStateSet;
    new (): CustomStateSet;
  };
-@@ -11917,7 +11949,7 @@ interface DOMException extends Error {
-   readonly DATA_CLONE_ERR: 25;
- }
- 
--declare var DOMException: {
-+declare const DOMException: {
-   prototype: DOMException;
-   new (message?: string, name?: string): DOMException;
-   readonly INDEX_SIZE_ERR: 1;
 @@ -11985,10 +12017,10 @@ interface DOMImplementation {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMImplementation/hasFeature)
@@ -2697,12 +2333,9 @@
    prototype: DOMImplementation;
    new (): DOMImplementation;
  };
-@@ -12134,9 +12166,9 @@ interface DOMMatrix extends DOMMatrixReadOnly {
-   translateSelf(tx?: number, ty?: number, tz?: number): DOMMatrix;
- }
+@@ -12136,7 +12168,7 @@ interface DOMMatrix extends DOMMatrixReadOnly {
  
--declare var DOMMatrix: {
-+declare const DOMMatrix: {
+ declare var DOMMatrix: {
    prototype: DOMMatrix;
 -  new (init?: string | number[]): DOMMatrix;
 +  new (init?: string | readonly number[]): DOMMatrix;
@@ -2731,12 +2364,9 @@
    /**
     * The **`transformPoint`** method of the DOMMatrixReadOnly interface creates a new DOMPoint object, transforming a specified point by the matrix. Neither the matrix nor the original point are altered.
     *
-@@ -12343,9 +12375,9 @@ interface DOMMatrixReadOnly {
-   toString(): string;
- }
+@@ -12345,7 +12377,7 @@ interface DOMMatrixReadOnly {
  
--declare var DOMMatrixReadOnly: {
-+declare const DOMMatrixReadOnly: {
+ declare var DOMMatrixReadOnly: {
    prototype: DOMMatrixReadOnly;
 -  new (init?: string | number[]): DOMMatrixReadOnly;
 +  new (init?: string | readonly number[]): DOMMatrixReadOnly;
@@ -2752,15 +2382,6 @@
    prototype: DOMParser;
    new (): DOMParser;
  };
-@@ -12417,7 +12449,7 @@ interface DOMPoint extends DOMPointReadOnly {
-   z: number;
- }
- 
--declare var DOMPoint: {
-+declare const DOMPoint: {
-   prototype: DOMPoint;
-   new (x?: number, y?: number, z?: number, w?: number): DOMPoint;
-   /**
 @@ -12429,7 +12461,7 @@ declare var DOMPoint: {
  };
  
@@ -2770,7 +2391,7 @@
  
  /**
   * The **`DOMPointReadOnly`** interface specifies the coordinate and perspective fields used by DOMPoint to define a 2D or 3D point in a coordinate system.
-@@ -12472,10 +12504,10 @@ interface DOMPointReadOnly {
+@@ -12472,7 +12504,7 @@ interface DOMPointReadOnly {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPointReadOnly/toJSON)
     */
@@ -2778,12 +2399,8 @@
 +  toJSON(): unknown;
  }
  
--declare var DOMPointReadOnly: {
-+declare const DOMPointReadOnly: {
-   prototype: DOMPointReadOnly;
-   new (x?: number, y?: number, z?: number, w?: number): DOMPointReadOnly;
-   /**
-@@ -12527,10 +12559,10 @@ interface DOMQuad {
+ declare var DOMPointReadOnly: {
+@@ -12527,7 +12559,7 @@ interface DOMQuad {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMQuad/toJSON)
     */
@@ -2791,20 +2408,7 @@
 +  toJSON(): unknown;
  }
  
--declare var DOMQuad: {
-+declare const DOMQuad: {
-   prototype: DOMQuad;
-   new (
-     p1?: DOMPointInit,
-@@ -12584,7 +12616,7 @@ interface DOMRect extends DOMRectReadOnly {
-   y: number;
- }
- 
--declare var DOMRect: {
-+declare const DOMRect: {
-   prototype: DOMRect;
-   new (x?: number, y?: number, width?: number, height?: number): DOMRect;
-   /**
+ declare var DOMQuad: {
 @@ -12596,7 +12628,7 @@ declare var DOMRect: {
  };
  
@@ -2823,7 +2427,7 @@
    prototype: DOMRectList;
    new (): DOMRectList;
  };
-@@ -12683,10 +12715,10 @@ interface DOMRectReadOnly {
+@@ -12683,7 +12715,7 @@ interface DOMRectReadOnly {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMRectReadOnly/toJSON)
     */
@@ -2831,20 +2435,7 @@
 +  toJSON(): unknown;
  }
  
--declare var DOMRectReadOnly: {
-+declare const DOMRectReadOnly: {
-   prototype: DOMRectReadOnly;
-   new (
-     x?: number,
-@@ -12729,7 +12761,7 @@ interface DOMStringList {
-   [index: number]: string;
- }
- 
--declare var DOMStringList: {
-+declare const DOMStringList: {
-   prototype: DOMStringList;
-   new (): DOMStringList;
- };
+ declare var DOMRectReadOnly: {
 @@ -12743,7 +12775,7 @@ interface DOMStringMap {
    [name: string]: string | undefined;
  }
@@ -2913,15 +2504,6 @@
 +declare const DataTransferItemList: {
    prototype: DataTransferItemList;
    new (): DataTransferItemList;
- };
-@@ -12991,7 +13023,7 @@ interface DecompressionStream extends GenericTransformStream {
-   readonly writable: WritableStream<BufferSource>;
- }
- 
--declare var DecompressionStream: {
-+declare const DecompressionStream: {
-   prototype: DecompressionStream;
-   new (format: CompressionFormat): DecompressionStream;
  };
 @@ -13010,7 +13042,7 @@ interface DelayNode extends AudioNode {
    readonly delayTime: AudioParam;
@@ -3133,24 +2715,6 @@
    prototype: ElementInternals;
    new (): ElementInternals;
  };
-@@ -14866,7 +14898,7 @@ interface EncodedAudioChunk {
-   copyTo(destination: AllowSharedBufferSource): void;
- }
- 
--declare var EncodedAudioChunk: {
-+declare const EncodedAudioChunk: {
-   prototype: EncodedAudioChunk;
-   new (init: EncodedAudioChunkInit): EncodedAudioChunk;
- };
-@@ -14909,7 +14941,7 @@ interface EncodedVideoChunk {
-   copyTo(destination: AllowSharedBufferSource): void;
- }
- 
--declare var EncodedVideoChunk: {
-+declare const EncodedVideoChunk: {
-   prototype: EncodedVideoChunk;
-   new (init: EncodedVideoChunkInit): EncodedVideoChunk;
- };
 @@ -14931,7 +14963,7 @@ interface ErrorEvent extends Event {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent/error)
@@ -3160,24 +2724,6 @@
    /**
     * The **`filename`** read-only property of the ErrorEvent interface returns a string containing the name of the script file in which the error occurred.
     *
-@@ -14952,7 +14984,7 @@ interface ErrorEvent extends Event {
-   readonly message: string;
- }
- 
--declare var ErrorEvent: {
-+declare const ErrorEvent: {
-   prototype: ErrorEvent;
-   new (type: string, eventInitDict?: ErrorEventInit): ErrorEvent;
- };
-@@ -15081,7 +15113,7 @@ interface Event {
-   readonly BUBBLING_PHASE: 3;
- }
- 
--declare var Event: {
-+declare const Event: {
-   prototype: Event;
-   new (type: string, eventInitDict?: EventInit): Event;
-   readonly NONE: 0;
 @@ -15098,11 +15130,11 @@ declare var Event: {
  interface EventCounts {
    forEach(
@@ -3237,24 +2783,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -15192,7 +15224,7 @@ interface EventSource extends EventTarget {
-   ): void;
- }
- 
--declare var EventSource: {
-+declare const EventSource: {
-   prototype: EventSource;
-   new (url: string | URL, eventSourceInitDict?: EventSourceInit): EventSource;
-   readonly CONNECTING: 0;
-@@ -15234,7 +15266,7 @@ interface EventTarget {
-   ): void;
- }
- 
--declare var EventTarget: {
-+declare const EventTarget: {
-   prototype: EventTarget;
-   new (): EventTarget;
- };
 @@ -15248,7 +15280,7 @@ interface External {
  }
  
@@ -3264,12 +2792,9 @@
    prototype: External;
    new (): External;
  };
-@@ -15279,9 +15311,13 @@ interface File extends Blob {
-   readonly webkitRelativePath: string;
- }
+@@ -15281,7 +15313,11 @@ interface File extends Blob {
  
--declare var File: {
-+declare const File: {
+ declare var File: {
    prototype: File;
 -  new (fileBits: BlobPart[], fileName: string, options?: FilePropertyBag): File;
 +  new (
@@ -3280,15 +2805,6 @@
  };
  
  /**
-@@ -15305,7 +15341,7 @@ interface FileList {
-   [index: number]: File;
- }
- 
--declare var FileList: {
-+declare const FileList: {
-   prototype: FileList;
-   new (): FileList;
- };
 @@ -15332,19 +15368,27 @@ interface FileReader extends EventTarget {
     */
    readonly error: DOMException | null;
@@ -3341,15 +2857,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -15413,7 +15457,7 @@ interface FileReader extends EventTarget {
-   ): void;
- }
- 
--declare var FileReader: {
-+declare const FileReader: {
-   prototype: FileReader;
-   new (): FileReader;
-   readonly EMPTY: 0;
 @@ -15441,7 +15485,7 @@ interface FileSystem {
    readonly root: FileSystemDirectoryEntry;
  }
@@ -3367,15 +2874,6 @@
 +declare const FileSystemDirectoryEntry: {
    prototype: FileSystemDirectoryEntry;
    new (): FileSystemDirectoryEntry;
- };
-@@ -15527,7 +15571,7 @@ interface FileSystemDirectoryHandle extends FileSystemHandle {
-   resolve(possibleDescendant: FileSystemHandle): Promise<string[] | null>;
- }
- 
--declare var FileSystemDirectoryHandle: {
-+declare const FileSystemDirectoryHandle: {
-   prototype: FileSystemDirectoryHandle;
-   new (): FileSystemDirectoryHandle;
  };
 @@ -15549,7 +15593,7 @@ interface FileSystemDirectoryReader {
    ): void;
@@ -3404,33 +2902,6 @@
    prototype: FileSystemFileEntry;
    new (): FileSystemFileEntry;
  };
-@@ -15649,7 +15693,7 @@ interface FileSystemFileHandle extends FileSystemHandle {
-   getFile(): Promise<File>;
- }
- 
--declare var FileSystemFileHandle: {
-+declare const FileSystemFileHandle: {
-   prototype: FileSystemFileHandle;
-   new (): FileSystemFileHandle;
- };
-@@ -15681,7 +15725,7 @@ interface FileSystemHandle {
-   isSameEntry(other: FileSystemHandle): Promise<boolean>;
- }
- 
--declare var FileSystemHandle: {
-+declare const FileSystemHandle: {
-   prototype: FileSystemHandle;
-   new (): FileSystemHandle;
- };
-@@ -15713,7 +15757,7 @@ interface FileSystemWritableFileStream extends WritableStream {
-   write(data: FileSystemWriteChunkType): Promise<void>;
- }
- 
--declare var FileSystemWritableFileStream: {
-+declare const FileSystemWritableFileStream: {
-   prototype: FileSystemWritableFileStream;
-   new (): FileSystemWritableFileStream;
- };
 @@ -15732,7 +15776,7 @@ interface FocusEvent extends UIEvent {
    readonly relatedTarget: EventTarget | null;
  }
@@ -3440,15 +2911,6 @@
    prototype: FocusEvent;
    new (type: string, eventInitDict?: FocusEventInit): FocusEvent;
  };
-@@ -15829,7 +15873,7 @@ interface FontFace {
-   load(): Promise<FontFace>;
- }
- 
--declare var FontFace: {
-+declare const FontFace: {
-   prototype: FontFace;
-   new (
-     family: string,
 @@ -15851,11 +15895,15 @@ interface FontFaceSetEventMap {
   */
  interface FontFaceSet extends EventTarget {
@@ -3491,25 +2953,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -15906,7 +15954,7 @@ interface FontFaceSet extends EventTarget {
-   ): void;
- }
- 
--declare var FontFaceSet: {
-+declare const FontFaceSet: {
-   prototype: FontFaceSet;
-   new (): FontFaceSet;
- };
-@@ -15925,7 +15973,7 @@ interface FontFaceSetLoadEvent extends Event {
-   readonly fontfaces: ReadonlyArray<FontFace>;
- }
- 
--declare var FontFaceSetLoadEvent: {
-+declare const FontFaceSetLoadEvent: {
-   prototype: FontFaceSetLoadEvent;
-   new (
-     type: string,
-@@ -15990,11 +16038,11 @@ interface FormData {
+@@ -15990,7 +16038,7 @@ interface FormData {
        key: string,
        parent: FormData,
      ) => void,
@@ -3518,11 +2962,6 @@
    ): void;
  }
  
--declare var FormData: {
-+declare const FormData: {
-   prototype: FormData;
-   new (form?: HTMLFormElement, submitter?: HTMLElement | null): FormData;
- };
 @@ -16013,7 +16061,7 @@ interface FormDataEvent extends Event {
    readonly formData: FormData;
  }
@@ -3541,51 +2980,6 @@
    prototype: FragmentDirective;
    new (): FragmentDirective;
  };
-@@ -16059,7 +16107,7 @@ interface GPU {
-   ): Promise<GPUAdapter | null>;
- }
- 
--declare var GPU: {
-+declare const GPU: {
-   prototype: GPU;
-   new (): GPU;
- };
-@@ -16097,7 +16145,7 @@ interface GPUAdapter {
-   requestDevice(descriptor?: GPUDeviceDescriptor): Promise<GPUDevice>;
- }
- 
--declare var GPUAdapter: {
-+declare const GPUAdapter: {
-   prototype: GPUAdapter;
-   new (): GPUAdapter;
- };
-@@ -16153,7 +16201,7 @@ interface GPUAdapterInfo {
-   readonly vendor: string;
- }
- 
--declare var GPUAdapterInfo: {
-+declare const GPUAdapterInfo: {
-   prototype: GPUAdapterInfo;
-   new (): GPUAdapterInfo;
- };
-@@ -16166,7 +16214,7 @@ declare var GPUAdapterInfo: {
-  */
- interface GPUBindGroup extends GPUObjectBase {}
- 
--declare var GPUBindGroup: {
-+declare const GPUBindGroup: {
-   prototype: GPUBindGroup;
-   new (): GPUBindGroup;
- };
-@@ -16179,7 +16227,7 @@ declare var GPUBindGroup: {
-  */
- interface GPUBindGroupLayout extends GPUObjectBase {}
- 
--declare var GPUBindGroupLayout: {
-+declare const GPUBindGroupLayout: {
-   prototype: GPUBindGroupLayout;
-   new (): GPUBindGroupLayout;
- };
 @@ -16189,7 +16237,7 @@ interface GPUBindingCommandsMixin {
    setBindGroup(
      index: GPUIndex32,
@@ -3595,78 +2989,6 @@
    ): void;
    setBindGroup(
      index: GPUIndex32,
-@@ -16255,7 +16303,7 @@ interface GPUBuffer extends GPUObjectBase {
-   unmap(): void;
- }
- 
--declare var GPUBuffer: {
-+declare const GPUBuffer: {
-   prototype: GPUBuffer;
-   new (): GPUBuffer;
- };
-@@ -16299,7 +16347,7 @@ interface GPUCanvasContext {
-   unconfigure(): void;
- }
- 
--declare var GPUCanvasContext: {
-+declare const GPUCanvasContext: {
-   prototype: GPUCanvasContext;
-   new (): GPUCanvasContext;
- };
-@@ -16312,7 +16360,7 @@ declare var GPUCanvasContext: {
-  */
- interface GPUCommandBuffer extends GPUObjectBase {}
- 
--declare var GPUCommandBuffer: {
-+declare const GPUCommandBuffer: {
-   prototype: GPUCommandBuffer;
-   new (): GPUCommandBuffer;
- };
-@@ -16411,7 +16459,7 @@ interface GPUCommandEncoder extends GPUDebugCommandsMixin, GPUObjectBase {
-   ): void;
- }
- 
--declare var GPUCommandEncoder: {
-+declare const GPUCommandEncoder: {
-   prototype: GPUCommandEncoder;
-   new (): GPUCommandEncoder;
- };
-@@ -16431,7 +16479,7 @@ interface GPUCompilationInfo {
-   readonly messages: ReadonlyArray<GPUCompilationMessage>;
- }
- 
--declare var GPUCompilationInfo: {
-+declare const GPUCompilationInfo: {
-   prototype: GPUCompilationInfo;
-   new (): GPUCompilationInfo;
- };
-@@ -16481,7 +16529,7 @@ interface GPUCompilationMessage {
-   readonly type: GPUCompilationMessageType;
- }
- 
--declare var GPUCompilationMessage: {
-+declare const GPUCompilationMessage: {
-   prototype: GPUCompilationMessage;
-   new (): GPUCompilationMessage;
- };
-@@ -16527,7 +16575,7 @@ interface GPUComputePassEncoder
-   setPipeline(pipeline: GPUComputePipeline): void;
- }
- 
--declare var GPUComputePassEncoder: {
-+declare const GPUComputePassEncoder: {
-   prototype: GPUComputePassEncoder;
-   new (): GPUComputePassEncoder;
- };
-@@ -16540,7 +16588,7 @@ declare var GPUComputePassEncoder: {
-  */
- interface GPUComputePipeline extends GPUObjectBase, GPUPipelineBase {}
- 
--declare var GPUComputePipeline: {
-+declare const GPUComputePipeline: {
-   prototype: GPUComputePipeline;
-   new (): GPUComputePipeline;
- };
 @@ -16591,7 +16639,7 @@ interface GPUDevice extends EventTarget, GPUObjectBase {
    readonly lost: Promise<GPUDeviceLostInfo>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/GPUDevice/uncapturederror_event) */
@@ -3694,87 +3016,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -16747,7 +16795,7 @@ interface GPUDevice extends EventTarget, GPUObjectBase {
-   ): void;
- }
- 
--declare var GPUDevice: {
-+declare const GPUDevice: {
-   prototype: GPUDevice;
-   new (): GPUDevice;
- };
-@@ -16773,7 +16821,7 @@ interface GPUDeviceLostInfo {
-   readonly reason: GPUDeviceLostReason;
- }
- 
--declare var GPUDeviceLostInfo: {
-+declare const GPUDeviceLostInfo: {
-   prototype: GPUDeviceLostInfo;
-   new (): GPUDeviceLostInfo;
- };
-@@ -16793,7 +16841,7 @@ interface GPUError {
-   readonly message: string;
- }
- 
--declare var GPUError: {
-+declare const GPUError: {
-   prototype: GPUError;
-   new (): GPUError;
- };
-@@ -16806,7 +16854,7 @@ declare var GPUError: {
-  */
- interface GPUExternalTexture extends GPUObjectBase {}
- 
--declare var GPUExternalTexture: {
-+declare const GPUExternalTexture: {
-   prototype: GPUExternalTexture;
-   new (): GPUExternalTexture;
- };
-@@ -16819,7 +16867,7 @@ declare var GPUExternalTexture: {
-  */
- interface GPUInternalError extends GPUError {}
- 
--declare var GPUInternalError: {
-+declare const GPUInternalError: {
-   prototype: GPUInternalError;
-   new (message: string): GPUInternalError;
- };
-@@ -16837,7 +16885,7 @@ interface GPUObjectBase {
-  */
- interface GPUOutOfMemoryError extends GPUError {}
- 
--declare var GPUOutOfMemoryError: {
-+declare const GPUOutOfMemoryError: {
-   prototype: GPUOutOfMemoryError;
-   new (message: string): GPUOutOfMemoryError;
- };
-@@ -16862,7 +16910,7 @@ interface GPUPipelineError extends DOMException {
-   readonly reason: GPUPipelineErrorReason;
- }
- 
--declare var GPUPipelineError: {
-+declare const GPUPipelineError: {
-   prototype: GPUPipelineError;
-   new (message: string, options: GPUPipelineErrorInit): GPUPipelineError;
- };
-@@ -16875,7 +16923,7 @@ declare var GPUPipelineError: {
-  */
- interface GPUPipelineLayout extends GPUObjectBase {}
- 
--declare var GPUPipelineLayout: {
-+declare const GPUPipelineLayout: {
-   prototype: GPUPipelineLayout;
-   new (): GPUPipelineLayout;
- };
-@@ -16907,7 +16955,7 @@ interface GPUQuerySet extends GPUObjectBase {
-   destroy(): void;
- }
- 
--declare var GPUQuerySet: {
-+declare const GPUQuerySet: {
-   prototype: GPUQuerySet;
-   new (): GPUQuerySet;
- };
 @@ -16940,7 +16988,7 @@ interface GPUQueue extends GPUObjectBase {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/GPUQueue/submit)
@@ -3784,33 +3025,6 @@
    /**
     * The **`writeBuffer()`** method of the GPUQueue interface writes a provided data source into a given GPUBuffer.
     *
-@@ -16966,7 +17014,7 @@ interface GPUQueue extends GPUObjectBase {
-   ): void;
- }
- 
--declare var GPUQueue: {
-+declare const GPUQueue: {
-   prototype: GPUQueue;
-   new (): GPUQueue;
- };
-@@ -16979,7 +17027,7 @@ declare var GPUQueue: {
-  */
- interface GPURenderBundle extends GPUObjectBase {}
- 
--declare var GPURenderBundle: {
-+declare const GPURenderBundle: {
-   prototype: GPURenderBundle;
-   new (): GPURenderBundle;
- };
-@@ -17004,7 +17052,7 @@ interface GPURenderBundleEncoder
-   finish(descriptor?: GPURenderBundleDescriptor): GPURenderBundle;
- }
- 
--declare var GPURenderBundleEncoder: {
-+declare const GPURenderBundleEncoder: {
-   prototype: GPURenderBundleEncoder;
-   new (): GPURenderBundleEncoder;
- };
 @@ -17085,7 +17133,7 @@ interface GPURenderPassEncoder
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/GPURenderPassEncoder/executeBundles)
@@ -3820,43 +3034,7 @@
    /**
     * The **`setBlendConstant()`** method of the GPURenderPassEncoder interface sets the constant blend color and alpha values used with "constant" and "one-minus-constant" blend factors (as set in the descriptor of the GPUDevice.createRenderPipeline() method, in the blend property).
     *
-@@ -17124,7 +17172,7 @@ interface GPURenderPassEncoder
-   ): void;
- }
- 
--declare var GPURenderPassEncoder: {
-+declare const GPURenderPassEncoder: {
-   prototype: GPURenderPassEncoder;
-   new (): GPURenderPassEncoder;
- };
-@@ -17137,7 +17185,7 @@ declare var GPURenderPassEncoder: {
-  */
- interface GPURenderPipeline extends GPUObjectBase, GPUPipelineBase {}
- 
--declare var GPURenderPipeline: {
-+declare const GPURenderPipeline: {
-   prototype: GPURenderPipeline;
-   new (): GPURenderPipeline;
- };
-@@ -17150,7 +17198,7 @@ declare var GPURenderPipeline: {
-  */
- interface GPUSampler extends GPUObjectBase {}
- 
--declare var GPUSampler: {
-+declare const GPUSampler: {
-   prototype: GPUSampler;
-   new (): GPUSampler;
- };
-@@ -17170,7 +17218,7 @@ interface GPUShaderModule extends GPUObjectBase {
-   getCompilationInfo(): Promise<GPUCompilationInfo>;
- }
- 
--declare var GPUShaderModule: {
-+declare const GPUShaderModule: {
-   prototype: GPUShaderModule;
-   new (): GPUShaderModule;
- };
-@@ -17188,11 +17236,11 @@ interface GPUSupportedFeatures {
+@@ -17188,7 +17236,7 @@ interface GPUSupportedFeatures {
        key: string,
        parent: GPUSupportedFeatures,
      ) => void,
@@ -3865,56 +3043,6 @@
    ): void;
  }
  
--declare var GPUSupportedFeatures: {
-+declare const GPUSupportedFeatures: {
-   prototype: GPUSupportedFeatures;
-   new (): GPUSupportedFeatures;
- };
-@@ -17268,7 +17316,7 @@ interface GPUSupportedLimits {
-   readonly minUniformBufferOffsetAlignment: number;
- }
- 
--declare var GPUSupportedLimits: {
-+declare const GPUSupportedLimits: {
-   prototype: GPUSupportedLimits;
-   new (): GPUSupportedLimits;
- };
-@@ -17342,7 +17390,7 @@ interface GPUTexture extends GPUObjectBase {
-   destroy(): void;
- }
- 
--declare var GPUTexture: {
-+declare const GPUTexture: {
-   prototype: GPUTexture;
-   new (): GPUTexture;
- };
-@@ -17355,7 +17403,7 @@ declare var GPUTexture: {
-  */
- interface GPUTextureView extends GPUObjectBase {}
- 
--declare var GPUTextureView: {
-+declare const GPUTextureView: {
-   prototype: GPUTextureView;
-   new (): GPUTextureView;
- };
-@@ -17375,7 +17423,7 @@ interface GPUUncapturedErrorEvent extends Event {
-   readonly error: GPUError;
- }
- 
--declare var GPUUncapturedErrorEvent: {
-+declare const GPUUncapturedErrorEvent: {
-   prototype: GPUUncapturedErrorEvent;
-   new (
-     type: string,
-@@ -17391,7 +17439,7 @@ declare var GPUUncapturedErrorEvent: {
-  */
- interface GPUValidationError extends GPUError {}
- 
--declare var GPUValidationError: {
-+declare const GPUValidationError: {
-   prototype: GPUValidationError;
-   new (message: string): GPUValidationError;
- };
 @@ -17410,7 +17458,7 @@ interface GainNode extends AudioNode {
    readonly gain: AudioParam;
  }
@@ -6579,7 +5707,7 @@
    prototype: HashChangeEvent;
    new (type: string, eventInitDict?: HashChangeEventInit): HashChangeEvent;
  };
-@@ -24263,11 +24433,11 @@ interface Headers {
+@@ -24263,7 +24433,7 @@ interface Headers {
    set(name: string, value: string): void;
    forEach(
      callbackfn: (value: string, key: string, parent: Headers) => void,
@@ -6588,11 +5716,6 @@
    ): void;
  }
  
--declare var Headers: {
-+declare const Headers: {
-   prototype: Headers;
-   new (init?: HeadersInit): Headers;
- };
 @@ -24296,13 +24466,13 @@ interface Highlight {
        key: AbstractRange,
        parent: Highlight,
@@ -6653,7 +5776,7 @@
    prototype: History;
    new (): History;
  };
-@@ -24452,10 +24622,10 @@ interface IDBCursor {
+@@ -24452,7 +24622,7 @@ interface IDBCursor {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBCursor/update)
     */
@@ -6661,12 +5784,8 @@
 +  update(value: unknown): IDBRequest<IDBValidKey>;
  }
  
--declare var IDBCursor: {
-+declare const IDBCursor: {
-   prototype: IDBCursor;
-   new (): IDBCursor;
- };
-@@ -24471,10 +24641,10 @@ interface IDBCursorWithValue extends IDBCursor {
+ declare var IDBCursor: {
+@@ -24471,7 +24641,7 @@ interface IDBCursorWithValue extends IDBCursor {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBCursorWithValue/value)
     */
@@ -6674,11 +5793,7 @@
 +  readonly value: unknown;
  }
  
--declare var IDBCursorWithValue: {
-+declare const IDBCursorWithValue: {
-   prototype: IDBCursorWithValue;
-   new (): IDBCursorWithValue;
- };
+ declare var IDBCursorWithValue: {
 @@ -24505,13 +24675,13 @@ interface IDBDatabase extends EventTarget {
     */
    readonly objectStoreNames: DOMStringList;
@@ -6722,15 +5837,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -24572,7 +24742,7 @@ interface IDBDatabase extends EventTarget {
-   ): void;
- }
- 
--declare var IDBDatabase: {
-+declare const IDBDatabase: {
-   prototype: IDBDatabase;
-   new (): IDBDatabase;
- };
 @@ -24588,7 +24758,7 @@ interface IDBFactory {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBFactory/cmp)
@@ -6740,15 +5846,6 @@
    /**
     * The **`databases`** method of the IDBFactory interface returns a Promise that fulfills with an array of objects containing the name and version of all the available databases.
     *
-@@ -24609,7 +24779,7 @@ interface IDBFactory {
-   open(name: string, version?: number): IDBOpenDBRequest;
- }
- 
--declare var IDBFactory: {
-+declare const IDBFactory: {
-   prototype: IDBFactory;
-   new (): IDBFactory;
- };
 @@ -24625,7 +24795,7 @@ interface IDBIndex {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBIndex/keyPath)
@@ -6776,15 +5873,6 @@
    /**
     * The **`getAllKeys()`** method of the IDBIndex interface asynchronously retrieves the primary keys of all objects inside the index, setting them as the result of the request object.
     *
-@@ -24706,7 +24876,7 @@ interface IDBIndex {
-   ): IDBRequest<IDBCursor | null>;
- }
- 
--declare var IDBIndex: {
-+declare const IDBIndex: {
-   prototype: IDBIndex;
-   new (): IDBIndex;
- };
 @@ -24722,7 +24892,7 @@ interface IDBKeyRange {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBKeyRange/lower)
@@ -6803,7 +5891,7 @@
    /**
     * The **`upperOpen`** read-only property of the IDBKeyRange interface returns a boolean indicating whether the upper-bound value is included in the key range.
     *
-@@ -24746,10 +24916,10 @@ interface IDBKeyRange {
+@@ -24746,7 +24916,7 @@ interface IDBKeyRange {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBKeyRange/includes)
     */
@@ -6811,11 +5899,7 @@
 +  includes(key: unknown): boolean;
  }
  
--declare var IDBKeyRange: {
-+declare const IDBKeyRange: {
-   prototype: IDBKeyRange;
-   new (): IDBKeyRange;
-   /**
+ declare var IDBKeyRange: {
 @@ -24758,8 +24928,8 @@ declare var IDBKeyRange: {
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBKeyRange/bound_static)
     */
@@ -6895,7 +5979,7 @@
    /**
     * The **`getAllKeys()`** method of the IDBObjectStore interface returns an IDBRequest object retrieves record keys for all objects in the object store matching the specified parameter or all objects in the store if no parameters are given.
     *
-@@ -24918,10 +25088,10 @@ interface IDBObjectStore {
+@@ -24918,7 +25088,7 @@ interface IDBObjectStore {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBObjectStore/put)
     */
@@ -6903,11 +5987,7 @@
 +  put(value: unknown, key?: IDBValidKey): IDBRequest<IDBValidKey>;
  }
  
--declare var IDBObjectStore: {
-+declare const IDBObjectStore: {
-   prototype: IDBObjectStore;
-   new (): IDBObjectStore;
- };
+ declare var IDBObjectStore: {
 @@ -24939,15 +25109,18 @@ interface IDBOpenDBRequestEventMap extends IDBRequestEventMap {
  interface IDBOpenDBRequest extends IDBRequest<IDBDatabase> {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBOpenDBRequest/blocked_event) */
@@ -6942,15 +6022,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -24967,7 +25143,7 @@ interface IDBOpenDBRequest extends IDBRequest<IDBDatabase> {
-   ): void;
- }
- 
--declare var IDBOpenDBRequest: {
-+declare const IDBOpenDBRequest: {
-   prototype: IDBOpenDBRequest;
-   new (): IDBOpenDBRequest;
- };
 @@ -24982,7 +25158,7 @@ interface IDBRequestEventMap {
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBRequest)
@@ -6990,15 +6061,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -25039,7 +25215,7 @@ interface IDBRequest<T = any> extends EventTarget {
-   ): void;
- }
- 
--declare var IDBRequest: {
-+declare const IDBRequest: {
-   prototype: IDBRequest;
-   new (): IDBRequest;
- };
 @@ -25087,11 +25263,11 @@ interface IDBTransaction extends EventTarget {
     */
    readonly objectStoreNames: DOMStringList;
@@ -7032,24 +6094,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -25132,7 +25308,7 @@ interface IDBTransaction extends EventTarget {
-   ): void;
- }
- 
--declare var IDBTransaction: {
-+declare const IDBTransaction: {
-   prototype: IDBTransaction;
-   new (): IDBTransaction;
- };
-@@ -25157,7 +25333,7 @@ interface IDBVersionChangeEvent extends Event {
-   readonly oldVersion: number;
- }
- 
--declare var IDBVersionChangeEvent: {
-+declare const IDBVersionChangeEvent: {
-   prototype: IDBVersionChangeEvent;
-   new (
-     type: string,
 @@ -25183,7 +25359,7 @@ interface IIRFilterNode extends AudioNode {
    ): void;
  }
@@ -7068,24 +6112,6 @@
    prototype: IdleDeadline;
    new (): IdleDeadline;
  };
-@@ -25239,7 +25415,7 @@ interface ImageBitmap {
-   close(): void;
- }
- 
--declare var ImageBitmap: {
-+declare const ImageBitmap: {
-   prototype: ImageBitmap;
-   new (): ImageBitmap;
- };
-@@ -25264,7 +25440,7 @@ interface ImageBitmapRenderingContext {
-   transferFromImageBitmap(bitmap: ImageBitmap | null): void;
- }
- 
--declare var ImageBitmapRenderingContext: {
-+declare const ImageBitmapRenderingContext: {
-   prototype: ImageBitmapRenderingContext;
-   new (): ImageBitmapRenderingContext;
- };
 @@ -25308,7 +25484,7 @@ interface ImageCapture {
    takePhoto(photoSettings?: PhotoSettings): Promise<Blob>;
  }
@@ -7094,42 +6120,6 @@
 +declare const ImageCapture: {
    prototype: ImageCapture;
    new (videoTrack: MediaStreamTrack): ImageCapture;
- };
-@@ -25345,7 +25521,7 @@ interface ImageData {
-   readonly width: number;
- }
- 
--declare var ImageData: {
-+declare const ImageData: {
-   prototype: ImageData;
-   new (sw: number, sh: number, settings?: ImageDataSettings): ImageData;
-   new (
-@@ -25407,7 +25583,7 @@ interface ImageDecoder {
-   reset(): void;
- }
- 
--declare var ImageDecoder: {
-+declare const ImageDecoder: {
-   prototype: ImageDecoder;
-   new (init: ImageDecoderInit): ImageDecoder;
-   /**
-@@ -25451,7 +25627,7 @@ interface ImageTrack {
-   selected: boolean;
- }
- 
--declare var ImageTrack: {
-+declare const ImageTrack: {
-   prototype: ImageTrack;
-   new (): ImageTrack;
- };
-@@ -25490,7 +25666,7 @@ interface ImageTrackList {
-   [index: number]: ImageTrack;
- }
- 
--declare var ImageTrackList: {
-+declare const ImageTrackList: {
-   prototype: ImageTrackList;
-   new (): ImageTrackList;
  };
 @@ -25515,7 +25691,7 @@ interface InputDeviceInfo extends MediaDeviceInfo {
    getCapabilities(): MediaTrackCapabilities;
@@ -7217,24 +6207,6 @@
 +declare const Location: {
    prototype: Location;
    new (): Location;
- };
-@@ -26031,7 +26209,7 @@ interface Lock {
-   readonly name: string;
- }
- 
--declare var Lock: {
-+declare const Lock: {
-   prototype: Lock;
-   new (): Lock;
- };
-@@ -26065,7 +26243,7 @@ interface LockManager {
-   ): Promise<Awaited<T>>;
- }
- 
--declare var LockManager: {
-+declare const LockManager: {
-   prototype: LockManager;
-   new (): LockManager;
  };
 @@ -26088,7 +26266,9 @@ interface MIDIAccess extends EventTarget {
     */
@@ -7444,15 +6416,6 @@
 +declare const MathMLElement: {
    prototype: MathMLElement;
    new (): MathMLElement;
- };
-@@ -26446,7 +26626,7 @@ interface MediaCapabilities {
-   ): Promise<MediaCapabilitiesEncodingInfo>;
- }
- 
--declare var MediaCapabilities: {
-+declare const MediaCapabilities: {
-   prototype: MediaCapabilities;
-   new (): MediaCapabilities;
  };
 @@ -26487,10 +26667,10 @@ interface MediaDeviceInfo {
     *
@@ -7801,15 +6764,6 @@
    prototype: MediaSource;
    new (): MediaSource;
    /**
-@@ -27341,7 +27533,7 @@ declare var MediaSource: {
-  */
- interface MediaSourceHandle {}
- 
--declare var MediaSourceHandle: {
-+declare const MediaSourceHandle: {
-   prototype: MediaSourceHandle;
-   new (): MediaSourceHandle;
- };
 @@ -27370,9 +27562,13 @@ interface MediaStream extends EventTarget {
     */
    readonly id: string;
@@ -7933,15 +6887,6 @@
    prototype: MediaStreamTrackEvent;
    new (
      type: string,
-@@ -27653,7 +27855,7 @@ interface MessageChannel {
-   readonly port2: MessagePort;
- }
- 
--declare var MessageChannel: {
-+declare const MessageChannel: {
-   prototype: MessageChannel;
-   new (): MessageChannel;
- };
 @@ -27663,7 +27865,7 @@ declare var MessageChannel: {
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent)
@@ -7951,7 +6896,7 @@
    /**
     * The **`data`** read-only property of the MessageEvent interface represents the data sent by the message emitter.
     *
-@@ -27699,15 +27901,15 @@ interface MessageEvent<T = any> extends Event {
+@@ -27699,11 +27901,11 @@ interface MessageEvent<T = any> extends Event {
      type: string,
      bubbles?: boolean,
      cancelable?: boolean,
@@ -7965,11 +6910,6 @@
    ): void;
  }
  
--declare var MessageEvent: {
-+declare const MessageEvent: {
-   prototype: MessageEvent;
-   new <T>(type: string, eventInitDict?: MessageEventInit<T>): MessageEvent<T>;
- };
 @@ -27719,12 +27921,12 @@ interface MessageEventTargetEventMap {
  
  interface MessageEventTarget<T> {
@@ -8024,15 +6964,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -27796,7 +27998,7 @@ interface MessagePort extends EventTarget, MessageEventTarget<MessagePort> {
-   ): void;
- }
- 
--declare var MessagePort: {
-+declare const MessagePort: {
-   prototype: MessagePort;
-   new (): MessagePort;
- };
 @@ -27831,7 +28033,7 @@ interface MimeType {
  }
  
@@ -8234,15 +7165,6 @@
    prototype: NavigationPrecommitController;
    new (): NavigationPrecommitController;
  };
-@@ -28649,7 +28851,7 @@ interface NavigationPreloadManager {
-   setHeaderValue(value: string): Promise<void>;
- }
- 
--declare var NavigationPreloadManager: {
-+declare const NavigationPreloadManager: {
-   prototype: NavigationPreloadManager;
-   new (): NavigationPreloadManager;
- };
 @@ -28681,7 +28883,7 @@ interface NavigationTransition {
    readonly navigationType: NavigationType;
  }
@@ -8366,15 +7288,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -29434,7 +29636,7 @@ interface Notification extends EventTarget {
-   ): void;
- }
- 
--declare var Notification: {
-+declare const Notification: {
-   prototype: Notification;
-   new (title: string, options?: NotificationOptions): Notification;
-   /**
 @@ -29644,7 +29846,7 @@ interface OfflineAudioCompletionEvent extends Event {
    readonly renderedBuffer: AudioBuffer;
  }
@@ -8485,24 +7398,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -29808,7 +30022,7 @@ interface OffscreenCanvas extends EventTarget {
-   ): void;
- }
- 
--declare var OffscreenCanvas: {
-+declare const OffscreenCanvas: {
-   prototype: OffscreenCanvas;
-   new (width: number, height: number): OffscreenCanvas;
- };
-@@ -29839,7 +30053,7 @@ interface OffscreenCanvasRenderingContext2D
-   readonly canvas: OffscreenCanvas;
- }
- 
--declare var OffscreenCanvasRenderingContext2D: {
-+declare const OffscreenCanvasRenderingContext2D: {
-   prototype: OffscreenCanvasRenderingContext2D;
-   new (): OffscreenCanvasRenderingContext2D;
- };
 @@ -29879,7 +30093,7 @@ interface OscillatorNode extends AudioScheduledSourceNode {
      listener: (
        this: OscillatorNode,
@@ -8574,15 +7469,6 @@
 +declare const PannerNode: {
    prototype: PannerNode;
    new (context: BaseAudioContext, options?: PannerOptions): PannerNode;
- };
-@@ -30211,7 +30425,7 @@ interface Path2D extends CanvasPath {
-   addPath(path: Path2D, transform?: DOMMatrix2DInit): void;
- }
- 
--declare var Path2D: {
-+declare const Path2D: {
-   prototype: Path2D;
-   new (path?: Path2D | string): Path2D;
  };
 @@ -30287,10 +30501,10 @@ interface PaymentAddress {
     *
@@ -8770,16 +7656,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -30704,7 +30926,7 @@ interface Performance extends EventTarget {
-   ): void;
- }
- 
--declare var Performance: {
-+declare const Performance: {
-   prototype: Performance;
-   new (): Performance;
- };
-@@ -30744,10 +30966,10 @@ interface PerformanceEntry {
+@@ -30744,7 +30966,7 @@ interface PerformanceEntry {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceEntry/toJSON)
     */
@@ -8787,11 +7664,7 @@
 +  toJSON(): unknown;
  }
  
--declare var PerformanceEntry: {
-+declare const PerformanceEntry: {
-   prototype: PerformanceEntry;
-   new (): PerformanceEntry;
- };
+ declare var PerformanceEntry: {
 @@ -30793,10 +31015,10 @@ interface PerformanceEventTiming extends PerformanceEntry {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceEventTiming/toJSON)
@@ -8805,7 +7678,7 @@
    prototype: PerformanceEventTiming;
    new (): PerformanceEventTiming;
  };
-@@ -30812,10 +31034,10 @@ interface PerformanceMark extends PerformanceEntry {
+@@ -30812,7 +31034,7 @@ interface PerformanceMark extends PerformanceEntry {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceMark/detail)
     */
@@ -8813,12 +7686,8 @@
 +  readonly detail: unknown;
  }
  
--declare var PerformanceMark: {
-+declare const PerformanceMark: {
-   prototype: PerformanceMark;
-   new (markName: string, markOptions?: PerformanceMarkOptions): PerformanceMark;
- };
-@@ -30831,10 +31053,10 @@ interface PerformanceMeasure extends PerformanceEntry {
+ declare var PerformanceMark: {
+@@ -30831,7 +31053,7 @@ interface PerformanceMeasure extends PerformanceEntry {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceMeasure/detail)
     */
@@ -8826,11 +7695,7 @@
 +  readonly detail: unknown;
  }
  
--declare var PerformanceMeasure: {
-+declare const PerformanceMeasure: {
-   prototype: PerformanceMeasure;
-   new (): PerformanceMeasure;
- };
+ declare var PerformanceMeasure: {
 @@ -30866,7 +31088,7 @@ interface PerformanceNavigation {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceNavigation/toJSON)
@@ -8862,24 +7727,6 @@
    prototype: PerformanceNavigationTiming;
    new (): PerformanceNavigationTiming;
  };
-@@ -30988,7 +31210,7 @@ interface PerformanceObserver {
-   takeRecords(): PerformanceEntryList;
- }
- 
--declare var PerformanceObserver: {
-+declare const PerformanceObserver: {
-   prototype: PerformanceObserver;
-   new (callback: PerformanceObserverCallback): PerformanceObserver;
-   /**
-@@ -31025,7 +31247,7 @@ interface PerformanceObserverEntryList {
-   getEntriesByType(type: string): PerformanceEntryList;
- }
- 
--declare var PerformanceObserverEntryList: {
-+declare const PerformanceObserverEntryList: {
-   prototype: PerformanceObserverEntryList;
-   new (): PerformanceObserverEntryList;
- };
 @@ -31041,10 +31263,10 @@ interface PerformancePaintTiming extends PerformanceEntry, PaintTimingMixin {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformancePaintTiming/toJSON)
@@ -8893,7 +7740,7 @@
    prototype: PerformancePaintTiming;
    new (): PerformancePaintTiming;
  };
-@@ -31174,10 +31396,10 @@ interface PerformanceResourceTiming extends PerformanceEntry {
+@@ -31174,7 +31396,7 @@ interface PerformanceResourceTiming extends PerformanceEntry {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceResourceTiming/toJSON)
     */
@@ -8901,12 +7748,8 @@
 +  toJSON(): unknown;
  }
  
--declare var PerformanceResourceTiming: {
-+declare const PerformanceResourceTiming: {
-   prototype: PerformanceResourceTiming;
-   new (): PerformanceResourceTiming;
- };
-@@ -31211,10 +31433,10 @@ interface PerformanceServerTiming {
+ declare var PerformanceResourceTiming: {
+@@ -31211,7 +31433,7 @@ interface PerformanceServerTiming {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceServerTiming/toJSON)
     */
@@ -8914,11 +7757,7 @@
 +  toJSON(): unknown;
  }
  
--declare var PerformanceServerTiming: {
-+declare const PerformanceServerTiming: {
-   prototype: PerformanceServerTiming;
-   new (): PerformanceServerTiming;
- };
+ declare var PerformanceServerTiming: {
 @@ -31379,11 +31601,11 @@ interface PerformanceTiming {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceTiming/toJSON)
@@ -8975,24 +7814,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -31446,7 +31674,7 @@ interface PermissionStatus extends EventTarget {
-   ): void;
- }
- 
--declare var PermissionStatus: {
-+declare const PermissionStatus: {
-   prototype: PermissionStatus;
-   new (): PermissionStatus;
- };
-@@ -31465,7 +31693,7 @@ interface Permissions {
-   query(permissionDesc: PermissionDescriptor): Promise<PermissionStatus>;
- }
- 
--declare var Permissions: {
-+declare const Permissions: {
-   prototype: Permissions;
-   new (): Permissions;
- };
 @@ -31484,7 +31712,7 @@ interface PictureInPictureEvent extends Event {
    readonly pictureInPictureWindow: PictureInPictureWindow;
  }
@@ -9087,16 +7908,7 @@
    prototype: ProcessingInstruction;
    new (): ProcessingInstruction;
  };
-@@ -31798,7 +32026,7 @@ interface ProgressEvent<T extends EventTarget = EventTarget> extends Event {
-   readonly total: number;
- }
- 
--declare var ProgressEvent: {
-+declare const ProgressEvent: {
-   prototype: ProgressEvent;
-   new (type: string, eventInitDict?: ProgressEventInit): ProgressEvent;
- };
-@@ -31814,16 +32042,16 @@ interface PromiseRejectionEvent extends Event {
+@@ -31814,13 +32042,13 @@ interface PromiseRejectionEvent extends Event {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PromiseRejectionEvent/promise)
     */
@@ -9111,11 +7923,7 @@
 +  readonly reason: unknown;
  }
  
--declare var PromiseRejectionEvent: {
-+declare const PromiseRejectionEvent: {
-   prototype: PromiseRejectionEvent;
-   new (
-     type: string,
+ declare var PromiseRejectionEvent: {
 @@ -31870,7 +32098,7 @@ interface PublicKeyCredential extends Credential {
    toJSON(): RegistrationResponseJSON | AuthenticationResponseJSON;
  }
@@ -9125,33 +7933,6 @@
    prototype: PublicKeyCredential;
    new (): PublicKeyCredential;
    /**
-@@ -31958,7 +32186,7 @@ interface PushManager {
-   subscribe(options?: PushSubscriptionOptionsInit): Promise<PushSubscription>;
- }
- 
--declare var PushManager: {
-+declare const PushManager: {
-   prototype: PushManager;
-   new (): PushManager;
-   /**
-@@ -32020,7 +32248,7 @@ interface PushSubscription {
-   unsubscribe(): Promise<boolean>;
- }
- 
--declare var PushSubscription: {
-+declare const PushSubscription: {
-   prototype: PushSubscription;
-   new (): PushSubscription;
- };
-@@ -32046,7 +32274,7 @@ interface PushSubscriptionOptions {
-   readonly userVisibleOnly: boolean;
- }
- 
--declare var PushSubscriptionOptions: {
-+declare const PushSubscriptionOptions: {
-   prototype: PushSubscriptionOptions;
-   new (): PushSubscriptionOptions;
- };
 @@ -32071,7 +32299,7 @@ interface RTCCertificate {
    getFingerprints(): RTCDtlsFingerprint[];
  }
@@ -9248,15 +8029,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -32287,7 +32515,7 @@ interface RTCDataChannel extends EventTarget {
-   ): void;
- }
- 
--declare var RTCDataChannel: {
-+declare const RTCDataChannel: {
-   prototype: RTCDataChannel;
-   new (): RTCDataChannel;
- };
 @@ -32306,7 +32534,7 @@ interface RTCDataChannelEvent extends Event {
    readonly channel: RTCDataChannel;
  }
@@ -9310,24 +8082,6 @@
 +declare const RTCDtlsTransport: {
    prototype: RTCDtlsTransport;
    new (): RTCDtlsTransport;
- };
-@@ -32395,7 +32629,7 @@ interface RTCEncodedAudioFrame {
-   getMetadata(): RTCEncodedAudioFrameMetadata;
- }
- 
--declare var RTCEncodedAudioFrame: {
-+declare const RTCEncodedAudioFrame: {
-   prototype: RTCEncodedAudioFrame;
-   new (): RTCEncodedAudioFrame;
- };
-@@ -32432,7 +32666,7 @@ interface RTCEncodedVideoFrame {
-   getMetadata(): RTCEncodedVideoFrameMetadata;
- }
- 
--declare var RTCEncodedVideoFrame: {
-+declare const RTCEncodedVideoFrame: {
-   prototype: RTCEncodedVideoFrame;
-   new (): RTCEncodedVideoFrame;
  };
 @@ -32475,7 +32709,7 @@ interface RTCError extends DOMException {
    readonly sentAlert: number | null;
@@ -9662,7 +8416,7 @@
    prototype: Range;
    new (): Range;
    readonly START_TO_START: 0;
-@@ -33600,10 +33859,10 @@ interface ReadableByteStreamController {
+@@ -33600,7 +33859,7 @@ interface ReadableByteStreamController {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/error)
     */
@@ -9670,11 +8424,7 @@
 +  error(e?: unknown): void;
  }
  
--declare var ReadableByteStreamController: {
-+declare const ReadableByteStreamController: {
-   prototype: ReadableByteStreamController;
-   new (): ReadableByteStreamController;
- };
+ declare var ReadableByteStreamController: {
 @@ -33613,7 +33872,7 @@ declare var ReadableByteStreamController: {
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream)
@@ -9693,14 +8443,7 @@
    /**
     * The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it. While the stream is locked, no other reader can be acquired until this one is released.
     *
-@@ -33660,17 +33919,17 @@ interface ReadableStream<R = any> {
-   tee(): [ReadableStream<R>, ReadableStream<R>];
- }
- 
--declare var ReadableStream: {
-+declare const ReadableStream: {
-   prototype: ReadableStream;
-   new (
+@@ -33666,11 +33925,11 @@ declare var ReadableStream: {
      underlyingSource: UnderlyingByteSource,
      strategy?: { highWaterMark?: number },
    ): ReadableStream<Uint8Array<ArrayBuffer>>;
@@ -9714,24 +8457,6 @@
      underlyingSource?: UnderlyingSource<R>,
      strategy?: QueuingStrategy<R>,
    ): ReadableStream<R>;
-@@ -33699,7 +33958,7 @@ interface ReadableStreamBYOBReader extends ReadableStreamGenericReader {
-   releaseLock(): void;
- }
- 
--declare var ReadableStreamBYOBReader: {
-+declare const ReadableStreamBYOBReader: {
-   prototype: ReadableStreamBYOBReader;
-   new (
-     stream: ReadableStream<Uint8Array<ArrayBuffer>>,
-@@ -33732,7 +33991,7 @@ interface ReadableStreamBYOBRequest {
-   respondWithNewView(view: ArrayBufferView<ArrayBuffer>): void;
- }
- 
--declare var ReadableStreamBYOBRequest: {
-+declare const ReadableStreamBYOBRequest: {
-   prototype: ReadableStreamBYOBRequest;
-   new (): ReadableStreamBYOBRequest;
- };
 @@ -33742,7 +34001,7 @@ declare var ReadableStreamBYOBRequest: {
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController)
@@ -9741,7 +8466,7 @@
    /**
     * The **`desiredSize`** read-only property of the ReadableStreamDefaultController interface returns the desired size required to fill the stream's internal queue.
     *
-@@ -33766,10 +34025,10 @@ interface ReadableStreamDefaultController<R = any> {
+@@ -33766,7 +34025,7 @@ interface ReadableStreamDefaultController<R = any> {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/error)
     */
@@ -9749,11 +8474,7 @@
 +  error(e?: unknown): void;
  }
  
--declare var ReadableStreamDefaultController: {
-+declare const ReadableStreamDefaultController: {
-   prototype: ReadableStreamDefaultController;
-   new (): ReadableStreamDefaultController;
- };
+ declare var ReadableStreamDefaultController: {
 @@ -33780,7 +34039,7 @@ declare var ReadableStreamDefaultController: {
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultReader)
   */
@@ -9763,12 +8484,9 @@
  > extends ReadableStreamGenericReader {
    /**
     * The **`read()`** method of the ReadableStreamDefaultReader interface returns a Promise providing access to the next chunk in the stream's internal queue.
-@@ -33796,16 +34055,16 @@ interface ReadableStreamDefaultReader<
-   releaseLock(): void;
- }
+@@ -33798,14 +34057,14 @@ interface ReadableStreamDefaultReader<
  
--declare var ReadableStreamDefaultReader: {
-+declare const ReadableStreamDefaultReader: {
+ declare var ReadableStreamDefaultReader: {
    prototype: ReadableStreamDefaultReader;
 -  new <R = any>(stream: ReadableStream<R>): ReadableStreamDefaultReader<R>;
 +  new <R = unknown>(stream: ReadableStream<R>): ReadableStreamDefaultReader<R>;
@@ -9825,15 +8543,6 @@
    prototype: RemotePlayback;
    new (): RemotePlayback;
  };
-@@ -33905,7 +34164,7 @@ interface ReportingObserver {
-   takeRecords(): ReportList;
- }
- 
--declare var ReportingObserver: {
-+declare const ReportingObserver: {
-   prototype: ReportingObserver;
-   new (
-     callback: ReportingObserverCallback,
 @@ -33960,7 +34219,7 @@ interface Request extends Body {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/method)
@@ -9843,15 +8552,6 @@
    /**
     * The **`mode`** read-only property of the Request interface contains the mode of the request (e.g., cors, no-cors, same-origin, or navigate.) This is used to determine if cross-origin requests lead to valid responses, and which properties of the response are readable.
     *
-@@ -34005,7 +34264,7 @@ interface Request extends Body {
-   clone(): Request;
- }
- 
--declare var Request: {
-+declare const Request: {
-   prototype: Request;
-   new (input: RequestInfo | URL, init?: RequestInit): Request;
- };
 @@ -34036,7 +34295,7 @@ interface ResizeObserver {
    unobserve(target: Element): void;
  }
@@ -9879,15 +8579,6 @@
    prototype: ResizeObserverSize;
    new (): ResizeObserverSize;
  };
-@@ -34165,7 +34424,7 @@ interface Response extends Body {
-   clone(): Response;
- }
- 
--declare var Response: {
-+declare const Response: {
-   prototype: Response;
-   new (body?: BodyInit | null, init?: ResponseInit): Response;
-   /**
 @@ -34179,7 +34438,7 @@ declare var Response: {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/json_static)
@@ -12114,15 +10805,6 @@
    /**
     * The **`yield()`** method of the Scheduler interface is used for yielding to the main thread during a task and continuing execution later, with the continuation scheduled as a prioritized task (see the Prioritized Task Scheduling API for more information). This allows long-running work to be broken up so the browser stays responsive.
     *
-@@ -39331,7 +39656,7 @@ interface Scheduler {
-   yield(): Promise<void>;
- }
- 
--declare var Scheduler: {
-+declare const Scheduler: {
-   prototype: Scheduler;
-   new (): Scheduler;
- };
 @@ -39386,7 +39711,7 @@ interface Screen {
    readonly width: number;
  }
@@ -12212,15 +10894,6 @@
    prototype: ScrollTimeline;
    new (options?: ScrollTimelineOptions): ScrollTimeline;
  };
-@@ -39625,7 +39950,7 @@ interface SecurityPolicyViolationEvent extends Event {
-   readonly violatedDirective: string;
- }
- 
--declare var SecurityPolicyViolationEvent: {
-+declare const SecurityPolicyViolationEvent: {
-   prototype: SecurityPolicyViolationEvent;
-   new (
-     type: string,
 @@ -39791,7 +40116,7 @@ interface Selection {
    toString(): string;
  }
@@ -12263,15 +10936,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -39850,7 +40175,7 @@ interface ServiceWorker extends EventTarget, AbstractWorker {
-   ): void;
- }
- 
--declare var ServiceWorker: {
-+declare const ServiceWorker: {
-   prototype: ServiceWorker;
-   new (): ServiceWorker;
- };
 @@ -39875,12 +40200,16 @@ interface ServiceWorkerContainer extends EventTarget {
     */
    readonly controller: ServiceWorker | null;
@@ -12310,15 +10974,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -39945,7 +40274,7 @@ interface ServiceWorkerContainer extends EventTarget {
-   ): void;
- }
- 
--declare var ServiceWorkerContainer: {
-+declare const ServiceWorkerContainer: {
-   prototype: ServiceWorkerContainer;
-   new (): ServiceWorkerContainer;
- };
 @@ -39986,7 +40315,9 @@ interface ServiceWorkerRegistration extends EventTarget, PushManagerAttribute {
     */
    readonly navigationPreload: NavigationPreloadManager;
@@ -12348,15 +11003,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -40057,7 +40388,7 @@ interface ServiceWorkerRegistration extends EventTarget, PushManagerAttribute {
-   ): void;
- }
- 
--declare var ServiceWorkerRegistration: {
-+declare const ServiceWorkerRegistration: {
-   prototype: ServiceWorkerRegistration;
-   new (): ServiceWorkerRegistration;
- };
 @@ -40102,7 +40433,7 @@ interface ShadowRoot extends DocumentFragment, DocumentOrShadowRoot {
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ShadowRoot/mode)
     */
@@ -12730,15 +11376,6 @@
    prototype: StorageEvent;
    new (type: string, eventInitDict?: StorageEventInit): StorageEvent;
  };
-@@ -40987,7 +41333,7 @@ interface StorageManager {
-   persisted(): Promise<boolean>;
- }
- 
--declare var StorageManager: {
-+declare const StorageManager: {
-   prototype: StorageManager;
-   new (): StorageManager;
- };
 @@ -41024,7 +41370,7 @@ interface StylePropertyMap extends StylePropertyMapReadOnly {
    set(property: string, ...values: (CSSStyleValue | string)[]): void;
  }
@@ -12748,7 +11385,7 @@
    prototype: StylePropertyMap;
    new (): StylePropertyMap;
  };
-@@ -41061,15 +41407,15 @@ interface StylePropertyMapReadOnly {
+@@ -41061,11 +41407,11 @@ interface StylePropertyMapReadOnly {
    has(property: string): boolean;
    forEach(
      callbackfn: (
@@ -12762,11 +11399,6 @@
    ): void;
  }
  
--declare var StylePropertyMapReadOnly: {
-+declare const StylePropertyMapReadOnly: {
-   prototype: StylePropertyMapReadOnly;
-   new (): StylePropertyMapReadOnly;
- };
 @@ -41125,7 +41471,7 @@ interface StyleSheet {
    readonly type: string;
  }
@@ -12830,33 +11462,6 @@
    ): Promise<CryptoKey>;
    /**
     * The **`verify()`** method of the SubtleCrypto interface verifies a digital signature.
-@@ -41392,7 +41738,7 @@ interface SubtleCrypto {
-   ): Promise<ArrayBuffer>;
- }
- 
--declare var SubtleCrypto: {
-+declare const SubtleCrypto: {
-   prototype: SubtleCrypto;
-   new (): SubtleCrypto;
- };
-@@ -41411,7 +41757,7 @@ interface TaskController extends AbortController {
-   setPriority(priority: TaskPriority): void;
- }
- 
--declare var TaskController: {
-+declare const TaskController: {
-   prototype: TaskController;
-   new (init?: TaskControllerInit): TaskController;
- };
-@@ -41430,7 +41776,7 @@ interface TaskPriorityChangeEvent extends Event {
-   readonly previousPriority: TaskPriority;
- }
- 
--declare var TaskPriorityChangeEvent: {
-+declare const TaskPriorityChangeEvent: {
-   prototype: TaskPriorityChangeEvent;
-   new (
-     type: string,
 @@ -41450,7 +41796,7 @@ interface TaskSignalEventMap extends AbortSignalEventMap {
  interface TaskSignal extends AbortSignal {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TaskSignal/prioritychange_event) */
@@ -12884,15 +11489,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -41480,7 +41826,7 @@ interface TaskSignal extends AbortSignal {
-   ): void;
- }
- 
--declare var TaskSignal: {
-+declare const TaskSignal: {
-   prototype: TaskSignal;
-   new (): TaskSignal;
-   /**
 @@ -41488,7 +41834,7 @@ declare var TaskSignal: {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TaskSignal/any_static)
@@ -12911,42 +11507,6 @@
    prototype: Text;
    new (data?: string): Text;
  };
-@@ -41530,7 +41876,7 @@ interface TextDecoder extends TextDecoderCommon {
-   decode(input?: AllowSharedBufferSource, options?: TextDecodeOptions): string;
- }
- 
--declare var TextDecoder: {
-+declare const TextDecoder: {
-   prototype: TextDecoder;
-   new (label?: string, options?: TextDecoderOptions): TextDecoder;
- };
-@@ -41568,7 +41914,7 @@ interface TextDecoderStream extends GenericTransformStream, TextDecoderCommon {
-   readonly writable: WritableStream<BufferSource>;
- }
- 
--declare var TextDecoderStream: {
-+declare const TextDecoderStream: {
-   prototype: TextDecoderStream;
-   new (label?: string, options?: TextDecoderOptions): TextDecoderStream;
- };
-@@ -41596,7 +41942,7 @@ interface TextEncoder extends TextEncoderCommon {
-   ): TextEncoderEncodeIntoResult;
- }
- 
--declare var TextEncoder: {
-+declare const TextEncoder: {
-   prototype: TextEncoder;
-   new (): TextEncoder;
- };
-@@ -41622,7 +41968,7 @@ interface TextEncoderStream extends GenericTransformStream, TextEncoderCommon {
-   readonly writable: WritableStream<string>;
- }
- 
--declare var TextEncoderStream: {
-+declare const TextEncoderStream: {
-   prototype: TextEncoderStream;
-   new (): TextEncoderStream;
- };
 @@ -41657,7 +42003,7 @@ interface TextEvent extends UIEvent {
  }
  
@@ -12955,15 +11515,6 @@
 +declare const TextEvent: {
    prototype: TextEvent;
    new (): TextEvent;
- };
-@@ -41742,7 +42088,7 @@ interface TextMetrics {
-   readonly width: number;
- }
- 
--declare var TextMetrics: {
-+declare const TextMetrics: {
-   prototype: TextMetrics;
-   new (): TextMetrics;
  };
 @@ -41806,7 +42152,7 @@ interface TextTrack extends EventTarget {
     */
@@ -13154,12 +11705,9 @@
    /**
     * The **`readable`** read-only property of the TransformStream interface returns the ReadableStream instance controlled by this TransformStream. This stream emits the transformed output data.
     *
-@@ -42269,9 +42615,9 @@ interface TransformStream<I = any, O = any> {
-   readonly writable: WritableStream<I>;
- }
+@@ -42271,7 +42617,7 @@ interface TransformStream<I = any, O = any> {
  
--declare var TransformStream: {
-+declare const TransformStream: {
+ declare var TransformStream: {
    prototype: TransformStream;
 -  new <I = any, O = any>(
 +  new <I = unknown, O = unknown>(
@@ -13184,15 +11732,6 @@
    /**
     * The **`terminate()`** method of the TransformStreamDefaultController interface closes the readable side and errors the writable side of the stream.
     *
-@@ -42310,7 +42656,7 @@ interface TransformStreamDefaultController<O = any> {
-   terminate(): void;
- }
- 
--declare var TransformStreamDefaultController: {
-+declare const TransformStreamDefaultController: {
-   prototype: TransformStreamDefaultController;
-   new (): TransformStreamDefaultController;
- };
 @@ -42341,7 +42687,7 @@ interface TransitionEvent extends Event {
    readonly pseudoElement: string;
  }
@@ -13220,15 +11759,6 @@
    prototype: UIEvent;
    new (type: string, eventInitDict?: UIEventInit): UIEvent;
  };
-@@ -42560,7 +42906,7 @@ interface URL {
-   toJSON(): string;
- }
- 
--declare var URL: {
-+declare const URL: {
-   prototype: URL;
-   new (url: string | URL, base?: string | URL): URL;
-   /**
 @@ -42590,7 +42936,7 @@ declare var URL: {
  };
  
@@ -13238,15 +11768,6 @@
  
  /**
   * The **`URLPattern`** interface of the URL Pattern API matches URLs or parts of URLs against a pattern. The pattern can contain capturing groups that extract parts of the matched URL.
-@@ -42669,7 +43015,7 @@ interface URLPattern {
-   test(input?: URLPatternInput, baseURL?: string | URL): boolean;
- }
- 
--declare var URLPattern: {
-+declare const URLPattern: {
-   prototype: URLPattern;
-   new (
-     input: URLPatternInput,
 @@ -42736,14 +43082,18 @@ interface URLSearchParams {
    toString(): string;
    forEach(
@@ -13256,8 +11777,7 @@
    ): void;
  }
  
--declare var URLSearchParams: {
-+declare const URLSearchParams: {
+ declare var URLSearchParams: {
    prototype: URLSearchParams;
    new (
 -    init?: string[][] | Record<string, string> | string | URLSearchParams,
@@ -13323,15 +11843,6 @@
    prototype: ValidityState;
    new (): ValidityState;
  };
-@@ -43009,7 +43359,7 @@ interface VideoColorSpace {
-   toJSON(): VideoColorSpaceInit;
- }
- 
--declare var VideoColorSpace: {
-+declare const VideoColorSpace: {
-   prototype: VideoColorSpace;
-   new (init?: VideoColorSpaceInit): VideoColorSpace;
- };
 @@ -43032,7 +43382,7 @@ interface VideoDecoder extends EventTarget {
     */
    readonly decodeQueueSize: number;
@@ -13359,15 +11870,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -43091,7 +43441,7 @@ interface VideoDecoder extends EventTarget {
-   ): void;
- }
- 
--declare var VideoDecoder: {
-+declare const VideoDecoder: {
-   prototype: VideoDecoder;
-   new (init: VideoDecoderInit): VideoDecoder;
-   /**
 @@ -43120,7 +43470,7 @@ interface VideoEncoder extends EventTarget {
     */
    readonly encodeQueueSize: number;
@@ -13395,24 +11897,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -43179,7 +43529,7 @@ interface VideoEncoder extends EventTarget {
-   ): void;
- }
- 
--declare var VideoEncoder: {
-+declare const VideoEncoder: {
-   prototype: VideoEncoder;
-   new (init: VideoEncoderInit): VideoEncoder;
-   /**
-@@ -43285,7 +43635,7 @@ interface VideoFrame {
-   ): Promise<PlaneLayout[]>;
- }
- 
--declare var VideoFrame: {
-+declare const VideoFrame: {
-   prototype: VideoFrame;
-   new (image: CanvasImageSource, init?: VideoFrameInit): VideoFrame;
-   new (data: AllowSharedBufferSource, init: VideoFrameBufferInit): VideoFrame;
 @@ -43324,7 +43674,7 @@ interface VideoPlaybackQuality {
    readonly totalVideoFrames: number;
  }
@@ -13558,7 +12042,7 @@
      offsetsOffset: number,
      drawcount: GLsizei,
    ): void;
-@@ -43804,11 +44154,11 @@ interface WGSLLanguageFeatures {
+@@ -43804,7 +44154,7 @@ interface WGSLLanguageFeatures {
        key: string,
        parent: WGSLLanguageFeatures,
      ) => void,
@@ -13567,11 +12051,6 @@
    ): void;
  }
  
--declare var WGSLLanguageFeatures: {
-+declare const WGSLLanguageFeatures: {
-   prototype: WGSLLanguageFeatures;
-   new (): WGSLLanguageFeatures;
- };
 @@ -43828,7 +44178,7 @@ interface WakeLock {
    request(type?: WakeLockType): Promise<WakeLockSentinel>;
  }
@@ -13632,15 +12111,6 @@
    prototype: WaveShaperNode;
    new (context: BaseAudioContext, options?: WaveShaperOptions): WaveShaperNode;
  };
-@@ -43927,7 +44283,7 @@ interface WebGL2RenderingContext
-     WebGL2RenderingContextOverloads,
-     WebGLRenderingContextBase {}
- 
--declare var WebGL2RenderingContext: {
-+declare const WebGL2RenderingContext: {
-   prototype: WebGL2RenderingContext;
-   new (): WebGL2RenderingContext;
-   readonly READ_BUFFER: 0x0c02;
 @@ -44660,7 +45016,7 @@ interface WebGL2RenderingContextBase {
      instanceCount: GLsizei,
    ): void;
@@ -13721,78 +12191,6 @@
      bufferMode: GLenum,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniform) */
-@@ -45615,7 +45971,7 @@ interface WebGLActiveInfo {
-   readonly type: GLenum;
- }
- 
--declare var WebGLActiveInfo: {
-+declare const WebGLActiveInfo: {
-   prototype: WebGLActiveInfo;
-   new (): WebGLActiveInfo;
- };
-@@ -45627,7 +45983,7 @@ declare var WebGLActiveInfo: {
-  */
- interface WebGLBuffer {}
- 
--declare var WebGLBuffer: {
-+declare const WebGLBuffer: {
-   prototype: WebGLBuffer;
-   new (): WebGLBuffer;
- };
-@@ -45646,7 +46002,7 @@ interface WebGLContextEvent extends Event {
-   readonly statusMessage: string;
- }
- 
--declare var WebGLContextEvent: {
-+declare const WebGLContextEvent: {
-   prototype: WebGLContextEvent;
-   new (type: string, eventInit?: WebGLContextEventInit): WebGLContextEvent;
- };
-@@ -45658,7 +46014,7 @@ declare var WebGLContextEvent: {
-  */
- interface WebGLFramebuffer {}
- 
--declare var WebGLFramebuffer: {
-+declare const WebGLFramebuffer: {
-   prototype: WebGLFramebuffer;
-   new (): WebGLFramebuffer;
- };
-@@ -45670,7 +46026,7 @@ declare var WebGLFramebuffer: {
-  */
- interface WebGLProgram {}
- 
--declare var WebGLProgram: {
-+declare const WebGLProgram: {
-   prototype: WebGLProgram;
-   new (): WebGLProgram;
- };
-@@ -45682,7 +46038,7 @@ declare var WebGLProgram: {
-  */
- interface WebGLQuery {}
- 
--declare var WebGLQuery: {
-+declare const WebGLQuery: {
-   prototype: WebGLQuery;
-   new (): WebGLQuery;
- };
-@@ -45694,7 +46050,7 @@ declare var WebGLQuery: {
-  */
- interface WebGLRenderbuffer {}
- 
--declare var WebGLRenderbuffer: {
-+declare const WebGLRenderbuffer: {
-   prototype: WebGLRenderbuffer;
-   new (): WebGLRenderbuffer;
- };
-@@ -45707,7 +46063,7 @@ declare var WebGLRenderbuffer: {
- interface WebGLRenderingContext
-   extends WebGLRenderingContextBase, WebGLRenderingContextOverloads {}
- 
--declare var WebGLRenderingContext: {
-+declare const WebGLRenderingContext: {
-   prototype: WebGLRenderingContext;
-   new (): WebGLRenderingContext;
-   readonly DEPTH_BUFFER_BIT: 0x00000100;
 @@ -46189,13 +46545,13 @@ interface WebGLRenderingContextBase {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getAttribLocation) */
    getAttribLocation(program: WebGLProgram, name: string): GLint;
@@ -13854,78 +12252,6 @@
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getVertexAttribOffset) */
    getVertexAttribOffset(index: GLuint, pname: GLenum): GLintptr;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/hint) */
-@@ -46892,7 +47248,7 @@ interface WebGLRenderingContextOverloads {
-  */
- interface WebGLSampler {}
- 
--declare var WebGLSampler: {
-+declare const WebGLSampler: {
-   prototype: WebGLSampler;
-   new (): WebGLSampler;
- };
-@@ -46904,7 +47260,7 @@ declare var WebGLSampler: {
-  */
- interface WebGLShader {}
- 
--declare var WebGLShader: {
-+declare const WebGLShader: {
-   prototype: WebGLShader;
-   new (): WebGLShader;
- };
-@@ -46935,7 +47291,7 @@ interface WebGLShaderPrecisionFormat {
-   readonly rangeMin: GLint;
- }
- 
--declare var WebGLShaderPrecisionFormat: {
-+declare const WebGLShaderPrecisionFormat: {
-   prototype: WebGLShaderPrecisionFormat;
-   new (): WebGLShaderPrecisionFormat;
- };
-@@ -46947,7 +47303,7 @@ declare var WebGLShaderPrecisionFormat: {
-  */
- interface WebGLSync {}
- 
--declare var WebGLSync: {
-+declare const WebGLSync: {
-   prototype: WebGLSync;
-   new (): WebGLSync;
- };
-@@ -46959,7 +47315,7 @@ declare var WebGLSync: {
-  */
- interface WebGLTexture {}
- 
--declare var WebGLTexture: {
-+declare const WebGLTexture: {
-   prototype: WebGLTexture;
-   new (): WebGLTexture;
- };
-@@ -46971,7 +47327,7 @@ declare var WebGLTexture: {
-  */
- interface WebGLTransformFeedback {}
- 
--declare var WebGLTransformFeedback: {
-+declare const WebGLTransformFeedback: {
-   prototype: WebGLTransformFeedback;
-   new (): WebGLTransformFeedback;
- };
-@@ -46983,7 +47339,7 @@ declare var WebGLTransformFeedback: {
-  */
- interface WebGLUniformLocation {}
- 
--declare var WebGLUniformLocation: {
-+declare const WebGLUniformLocation: {
-   prototype: WebGLUniformLocation;
-   new (): WebGLUniformLocation;
- };
-@@ -46995,7 +47351,7 @@ declare var WebGLUniformLocation: {
-  */
- interface WebGLVertexArrayObject {}
- 
--declare var WebGLVertexArrayObject: {
-+declare const WebGLVertexArrayObject: {
-   prototype: WebGLVertexArrayObject;
-   new (): WebGLVertexArrayObject;
- };
 @@ -47035,13 +47391,13 @@ interface WebSocket extends EventTarget {
     */
    readonly extensions: string;
@@ -13962,54 +12288,15 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -47098,9 +47454,9 @@ interface WebSocket extends EventTarget {
-   ): void;
- }
+@@ -47100,7 +47456,7 @@ interface WebSocket extends EventTarget {
  
--declare var WebSocket: {
-+declare const WebSocket: {
+ declare var WebSocket: {
    prototype: WebSocket;
 -  new (url: string | URL, protocols?: string | string[]): WebSocket;
 +  new (url: string | URL, protocols?: string | readonly string[]): WebSocket;
    readonly CONNECTING: 0;
    readonly OPEN: 1;
    readonly CLOSING: 2;
-@@ -47168,7 +47524,7 @@ interface WebTransport {
-   ): Promise<WritableStream>;
- }
- 
--declare var WebTransport: {
-+declare const WebTransport: {
-   prototype: WebTransport;
-   new (url: string | URL, options?: WebTransportOptions): WebTransport;
- };
-@@ -47194,7 +47550,7 @@ interface WebTransportBidirectionalStream {
-   readonly writable: WritableStream;
- }
- 
--declare var WebTransportBidirectionalStream: {
-+declare const WebTransportBidirectionalStream: {
-   prototype: WebTransportBidirectionalStream;
-   new (): WebTransportBidirectionalStream;
- };
-@@ -47250,7 +47606,7 @@ interface WebTransportDatagramDuplexStream {
-   readonly writable: WritableStream;
- }
- 
--declare var WebTransportDatagramDuplexStream: {
-+declare const WebTransportDatagramDuplexStream: {
-   prototype: WebTransportDatagramDuplexStream;
-   new (): WebTransportDatagramDuplexStream;
- };
-@@ -47276,7 +47632,7 @@ interface WebTransportError extends DOMException {
-   readonly streamErrorCode: number | null;
- }
- 
--declare var WebTransportError: {
-+declare const WebTransportError: {
-   prototype: WebTransportError;
-   new (message?: string, options?: WebTransportErrorOptions): WebTransportError;
- };
 @@ -47316,7 +47672,7 @@ interface WheelEvent extends MouseEvent {
    readonly DOM_DELTA_PAGE: 0x02;
  }
@@ -14279,15 +12566,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -48070,7 +48435,7 @@ interface Worker
-   ): void;
- }
- 
--declare var Worker: {
-+declare const Worker: {
-   prototype: Worker;
-   new (scriptURL: string | URL, options?: WorkerOptions): Worker;
- };
 @@ -48090,7 +48455,7 @@ interface Worklet {
    addModule(moduleURL: string | URL, options?: WorkletOptions): Promise<void>;
  }
@@ -14315,19 +12593,16 @@
    /**
     * The **`close()`** method of the WritableStream interface closes the associated stream. All chunks written before this method is called are sent before the returned promise is fulfilled.
     *
-@@ -48127,9 +48492,9 @@ interface WritableStream<W = any> {
-   getWriter(): WritableStreamDefaultWriter<W>;
- }
+@@ -48129,7 +48494,7 @@ interface WritableStream<W = any> {
  
--declare var WritableStream: {
-+declare const WritableStream: {
+ declare var WritableStream: {
    prototype: WritableStream;
 -  new <W = any>(
 +  new <W = unknown>(
      underlyingSink?: UnderlyingSink<W>,
      strategy?: QueuingStrategy<W>,
    ): WritableStream<W>;
-@@ -48152,10 +48517,10 @@ interface WritableStreamDefaultController {
+@@ -48152,7 +48517,7 @@ interface WritableStreamDefaultController {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController/error)
     */
@@ -14335,11 +12610,7 @@
 +  error(e?: unknown): void;
  }
  
--declare var WritableStreamDefaultController: {
-+declare const WritableStreamDefaultController: {
-   prototype: WritableStreamDefaultController;
-   new (): WritableStreamDefaultController;
- };
+ declare var WritableStreamDefaultController: {
 @@ -48165,7 +48530,7 @@ declare var WritableStreamDefaultController: {
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter)
@@ -14358,12 +12629,9 @@
    /**
     * The **`close()`** method of the WritableStreamDefaultWriter interface closes the associated writable stream.
     *
-@@ -48210,9 +48575,9 @@ interface WritableStreamDefaultWriter<W = any> {
-   write(chunk?: W): Promise<void>;
- }
+@@ -48212,7 +48577,7 @@ interface WritableStreamDefaultWriter<W = any> {
  
--declare var WritableStreamDefaultWriter: {
-+declare const WritableStreamDefaultWriter: {
+ declare var WritableStreamDefaultWriter: {
    prototype: WritableStreamDefaultWriter;
 -  new <W = any>(stream: WritableStream<W>): WritableStreamDefaultWriter<W>;
 +  new <W = unknown>(stream: WritableStream<W>): WritableStreamDefaultWriter<W>;
@@ -14445,15 +12713,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -48402,7 +48767,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
-   ): void;
- }
- 
--declare var XMLHttpRequest: {
-+declare const XMLHttpRequest: {
-   prototype: XMLHttpRequest;
-   new (): XMLHttpRequest;
-   readonly UNSENT: 0;
 @@ -48428,19 +48793,19 @@ interface XMLHttpRequestEventTargetEventMap {
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequestEventTarget)
   */
@@ -14491,15 +12750,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -48463,7 +48828,7 @@ interface XMLHttpRequestEventTarget extends EventTarget {
-   ): void;
- }
- 
--declare var XMLHttpRequestEventTarget: {
-+declare const XMLHttpRequestEventTarget: {
-   prototype: XMLHttpRequestEventTarget;
-   new (): XMLHttpRequestEventTarget;
- };
 @@ -48479,7 +48844,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
      listener: (
        this: XMLHttpRequestUpload,
@@ -14518,15 +12768,6 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -48502,7 +48867,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
-   ): void;
- }
- 
--declare var XMLHttpRequestUpload: {
-+declare const XMLHttpRequestUpload: {
-   prototype: XMLHttpRequestUpload;
-   new (): XMLHttpRequestUpload;
- };
 @@ -48521,7 +48886,7 @@ interface XMLSerializer {
    serializeToString(root: Node): string;
  }
@@ -14842,7 +13083,7 @@
    /** The **`console.timeStamp()`** static method adds a single marker to the browser's Performance tool (Firefox bug 1387528, Chrome). This lets you correlate a point in your code with the other events recorded in the timeline, such as layout and paint events. */
    timeStamp(label?: string): void;
    /**
-@@ -49304,16 +49669,16 @@ interface Console {
+@@ -49304,13 +49669,13 @@ interface Console {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/trace_static)
     */
@@ -14857,11 +13098,7 @@
 +  warn(...data: readonly unknown[]): void;
  }
  
--declare var console: Console;
-+declare const console: Console;
- 
- interface AudioDataOutputCallback {
-   (output: AudioData): void;
+ declare var console: Console;
 @@ -49324,7 +49689,7 @@ interface BlobCallback {
  }
  
@@ -14992,15 +13229,6 @@
  }
  
  interface VoidFunction {
-@@ -49629,7 +49997,7 @@ interface HTMLElementTagNameMap {
-   track: HTMLTrackElement;
-   u: HTMLElement;
-   ul: HTMLUListElement;
--  var: HTMLElement;
-+  const: HTMLElement;
-   video: HTMLVideoElement;
-   wbr: HTMLElement;
- }
 @@ -49773,13 +50141,13 @@ type ElementTagNameMap = HTMLElementTagNameMap &
      Exclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>
    >;
@@ -15018,7 +13246,7 @@
    new (
      text?: string,
      value?: string,
-@@ -49792,105 +50160,105 @@ declare var Option: {
+@@ -49792,87 +50160,87 @@ declare var Option: {
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/navigator)
   */
@@ -15120,12 +13348,7 @@
  /**
   * The read-only **`location`** property of the Window interface returns a Location object with information about the current location of the document.
   *
-  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/location)
-  */
--declare var location: Location;
-+declare const location: Location;
- /**
-  * Returns the **`locationbar`** object.
+@@ -49884,13 +50252,13 @@ declare var location: Location;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/locationbar)
   */
@@ -15141,7 +13364,7 @@
  /**
   * The **`Window.name`** property gets/sets the name of the window's browsing context.
   *
-@@ -49903,193 +50271,195 @@ declare const name: void;
+@@ -49903,7 +50271,7 @@ declare const name: void;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/navigation)
   */
@@ -15150,12 +13373,7 @@
  /**
   * The **`Window.navigator`** read-only property returns a reference to the Navigator object, which has methods and properties about the application running the script.
   *
-  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/navigator)
-  */
--declare var navigator: Navigator;
-+declare const navigator: Navigator;
- /**
-  * Available only in secure contexts.
+@@ -49915,126 +50283,128 @@ declare var navigator: Navigator;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/devicemotion_event)
   */
@@ -15308,12 +13526,7 @@
  /**
   * The **`Window.self`** read-only property returns the window itself, as a WindowProxy. It can be used with dot notation on a window object (that is, window.self) or standalone (self). The advantage of the standalone notation is that a similar notation exists for non-window contexts, such as in Web Workers. By using self, you can refer to the global scope in a way that will work not only in a window context (self will resolve to window.self) but also in a worker context (self will then resolve to WorkerGlobalScope.self).
   *
-  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/self)
-  */
--declare var self: Window & typeof globalThis;
-+declare const self: Window & typeof globalThis;
- /**
-  * The **`speechSynthesis`** read-only property of the Window object returns a SpeechSynthesis object, which is the entry point into using Web Speech API speech synthesis functionality.
+@@ -50046,50 +50416,50 @@ declare var self: Window & typeof globalThis;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/speechSynthesis)
   */
@@ -15388,7 +13601,7 @@
    options?: WindowPostMessageOptions,
  ): void;
  /**
-@@ -50264,341 +50634,377 @@ declare function cancelAnimationFrame(handle: number): void;
+@@ -50264,321 +50634,357 @@ declare function cancelAnimationFrame(handle: number): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/requestAnimationFrame) */
  declare function requestAnimationFrame(callback: FrameRequestCallback): number;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/abort_event) */
@@ -15509,8 +13722,7 @@
 -declare var onended: ((this: Window, ev: Event) => any) | null;
 +declare const onended: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/error_event) */
--declare var onerror: OnErrorEventHandler;
-+declare const onerror: OnErrorEventHandler;
+ declare var onerror: OnErrorEventHandler;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/focus_event) */
 -declare var onfocus: ((this: Window, ev: FocusEvent) => any) | null;
 +declare const onfocus: ((this: Window, ev: FocusEvent) => unknown) | null;
@@ -15824,21 +14036,21 @@
 +  | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/languagechange_event) */
 -declare var onlanguagechange: ((this: Window, ev: Event) => any) | null;
-+declare const onlanguagechange: ((this: Window, ev: Event) => unknown) | null;
++declare var onlanguagechange: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/message_event) */
 -declare var onmessage: ((this: Window, ev: MessageEvent) => any) | null;
-+declare const onmessage: ((this: Window, ev: MessageEvent) => unknown) | null;
++declare var onmessage: ((this: Window, ev: MessageEvent) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/messageerror_event) */
 -declare var onmessageerror: ((this: Window, ev: MessageEvent) => any) | null;
-+declare const onmessageerror:
++declare var onmessageerror:
 +  | ((this: Window, ev: MessageEvent) => unknown)
 +  | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/offline_event) */
 -declare var onoffline: ((this: Window, ev: Event) => any) | null;
-+declare const onoffline: ((this: Window, ev: Event) => unknown) | null;
++declare var onoffline: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/online_event) */
 -declare var ononline: ((this: Window, ev: Event) => any) | null;
-+declare const ononline: ((this: Window, ev: Event) => unknown) | null;
++declare var ononline: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/pagehide_event) */
 -declare var onpagehide: ((this: Window, ev: PageTransitionEvent) => any) | null;
 +declare const onpagehide:
@@ -15861,18 +14073,16 @@
 -declare var onpopstate: ((this: Window, ev: PopStateEvent) => any) | null;
 +declare const onpopstate: ((this: Window, ev: PopStateEvent) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/rejectionhandled_event) */
--declare var onrejectionhandled:
+ declare var onrejectionhandled:
 -  | ((this: Window, ev: PromiseRejectionEvent) => any)
-+declare const onrejectionhandled:
 +  | ((this: Window, ev: PromiseRejectionEvent) => unknown)
    | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/storage_event) */
 -declare var onstorage: ((this: Window, ev: StorageEvent) => any) | null;
 +declare const onstorage: ((this: Window, ev: StorageEvent) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/unhandledrejection_event) */
--declare var onunhandledrejection:
+ declare var onunhandledrejection:
 -  | ((this: Window, ev: PromiseRejectionEvent) => any)
-+declare const onunhandledrejection:
 +  | ((this: Window, ev: PromiseRejectionEvent) => unknown)
    | null;
  /**
@@ -15888,34 +14098,6 @@
  /**
   * Available only in secure contexts.
   *
-  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/caches)
-  */
--declare var caches: CacheStorage;
-+declare const caches: CacheStorage;
- /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/crossOriginIsolated) */
--declare var crossOriginIsolated: boolean;
-+declare const crossOriginIsolated: boolean;
- /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/crypto) */
--declare var crypto: Crypto;
-+declare const crypto: Crypto;
- /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/indexedDB) */
--declare var indexedDB: IDBFactory;
-+declare const indexedDB: IDBFactory;
- /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/isSecureContext) */
--declare var isSecureContext: boolean;
-+declare const isSecureContext: boolean;
- /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/origin) */
--declare var origin: string;
-+declare const origin: string;
- /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/performance) */
--declare var performance: Performance;
-+declare const performance: Performance;
- /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/scheduler) */
--declare var scheduler: Scheduler;
-+declare const scheduler: Scheduler;
- /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/atob) */
- declare function atob(data: string): string;
- /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
 @@ -50628,29 +51034,29 @@ declare function fetch(
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/queueMicrotask) */
  declare function queueMicrotask(callback: VoidFunction): void;

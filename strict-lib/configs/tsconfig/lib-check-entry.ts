@@ -67,3 +67,23 @@ export const replaced = (subject: string): string =>
       /(\d+)/g,
       (_match, digits: string | undefined) => `<${digits ?? ''}>`,
     );
+
+/**
+ * A global that a window and a worker both have is a property of
+ * `typeof globalThis`; any other global is not.
+ *
+ * The converter turns `declare var` into `declare const` so that assigning to a
+ * global is an error, and a `const` is not a property of `typeof globalThis`.
+ * The names `lib.dom` and `lib.webworker` both declare are kept `var`, because
+ * `globalThis.X` is the one spelling of them that works where there is no
+ * `window` (a worker, Node.js). Both halves are asserted, in both flavors.
+ */
+export const sharedGlobals: readonly object[] = [
+  globalThis.navigator,
+  globalThis.location,
+  globalThis.crypto,
+  globalThis.Response,
+];
+
+// @ts-expect-error `NaN` is `const`; `Number.NaN` reaches it everywhere.
+export const notOnGlobalThis: number = globalThis.NaN;

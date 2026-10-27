@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files/lib.dom.d.ts b/v5.7/output/lib-files/lib.dom.d.ts
-index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf99995023b37 100644
+index bb8fab5b26748a93a7a960850088fe87b0a7aa87..ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e 100644
 --- a/v5.6/output/lib-files/lib.dom.d.ts
 +++ b/v5.7/output/lib-files/lib.dom.d.ts
 @@ -32,6 +32,19 @@ interface AddEventListenerOptions extends EventListenerOptions {
@@ -447,7 +447,7 @@ index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf999
 +  ): void;
 +}
 +
-+declare const AudioData: {
++declare var AudioData: {
 +  prototype: AudioData;
 +  new (init: AudioDataInit): AudioData;
 +};
@@ -500,7 +500,7 @@ index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf999
 +  ): void;
 +}
 +
-+declare const AudioDecoder: {
++declare var AudioDecoder: {
 +  prototype: AudioDecoder;
 +  new (init: AudioDecoderInit): AudioDecoder;
 +  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioDecoder/isConfigSupported_static) */
@@ -562,7 +562,7 @@ index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf999
 +  ): void;
 +}
 +
-+declare const AudioEncoder: {
++declare var AudioEncoder: {
 +  prototype: AudioEncoder;
 +  new (init: AudioEncoderInit): AudioEncoder;
 +  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioEncoder/isConfigSupported_static) */
@@ -627,7 +627,7 @@ index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf999
    readonly length: number;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSKeyframesRule/name) */
    name: string;
-@@ -4010,7 +4338,7 @@ declare const CSSPerspective: {
+@@ -4010,7 +4338,7 @@ declare var CSSPerspective: {
  interface CSSPropertyRule extends CSSRule {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSPropertyRule/inherits) */
    readonly inherits: boolean;
@@ -807,7 +807,7 @@ index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf999
 +  readonly writable: WritableStream<BufferSource>;
 +}
  
- declare const CompressionStream: {
+ declare var CompressionStream: {
    prototype: CompressionStream;
 @@ -6719,27 +7097,49 @@ declare const DOMImplementation: {
  
@@ -921,7 +921,7 @@ index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf999
 +  readonly writable: WritableStream<BufferSource>;
 +}
  
- declare const DecompressionStream: {
+ declare var DecompressionStream: {
    prototype: DecompressionStream;
 @@ -7593,6 +8018,8 @@ interface Document
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/forms)
@@ -992,7 +992,7 @@ index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf999
 +  copyTo(destination: AllowSharedBufferSource): void;
 +}
 +
-+declare const EncodedAudioChunk: {
++declare var EncodedAudioChunk: {
 +  prototype: EncodedAudioChunk;
 +  new (init: EncodedAudioChunkInit): EncodedAudioChunk;
 +};
@@ -1000,7 +1000,7 @@ index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf999
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/EncodedVideoChunk) */
  interface EncodedVideoChunk {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/EncodedVideoChunk/byteLength) */
-@@ -9498,25 +9952,29 @@ declare const FontFace: {
+@@ -9498,25 +9952,29 @@ declare var FontFace: {
    prototype: FontFace;
    new (
      family: string,
@@ -1039,7 +1039,7 @@ index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf999
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FontFaceSet/status) */
 @@ -9553,7 +10011,7 @@ interface FontFaceSet extends EventTarget {
  
- declare const FontFaceSet: {
+ declare var FontFaceSet: {
    prototype: FontFaceSet;
 -  new (initialFaces: readonly FontFace[]): FontFaceSet;
 +  new (): FontFaceSet;
@@ -2047,7 +2047,7 @@ index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf999
     */
    readonly objectStoreNames: DOMStringList;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBTransaction/abort_event) */
-@@ -16462,7 +17316,11 @@ declare const ImageBitmap: {
+@@ -16462,7 +17316,11 @@ declare var ImageBitmap: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ImageBitmapRenderingContext) */
  interface ImageBitmapRenderingContext {
@@ -2071,7 +2071,7 @@ index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf999
  };
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/KHR_parallel_shader_compile) */
-@@ -16893,7 +17749,7 @@ declare const LockManager: {
+@@ -16893,7 +17749,7 @@ declare var LockManager: {
  };
  
  interface MIDIAccessEventMap {
@@ -2207,7 +2207,7 @@ index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf999
    readonly canvas: OffscreenCanvas;
  }
  
-@@ -19634,6 +20428,37 @@ declare const Path2D: {
+@@ -19634,6 +20428,37 @@ declare var Path2D: {
    new (path?: Path2D | string): Path2D;
  };
  
@@ -2473,7 +2473,7 @@ index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf999
    ): Promise<void>;
 @@ -21621,7 +22545,7 @@ interface ReadableStreamBYOBReader extends ReadableStreamGenericReader {
  
- declare const ReadableStreamBYOBReader: {
+ declare var ReadableStreamBYOBReader: {
    prototype: ReadableStreamBYOBReader;
 -  new (stream: ReadableStream): ReadableStreamBYOBReader;
 +  new (stream: ReadableStream<Uint8Array>): ReadableStreamBYOBReader;
@@ -2513,7 +2513,7 @@ index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf999
    ): Promise<ArrayBuffer>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey) */
    deriveKey(
-@@ -26867,8 +27800,23 @@ declare const TextEncoderStream: {
+@@ -26867,8 +27800,23 @@ declare var TextEncoderStream: {
    new (): TextEncoderStream;
  };
  
@@ -2554,7 +2554,7 @@ index 9093a6ce024f664854b2eb67d8e165473b4b5bd4..4546fa2ff38cb7584edd0ec5acadf999
    onremovetrack: ((this: TextTrackList, ev: TrackEvent) => unknown) | null;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextTrackList/getTrackById) */
    getTrackById(id: string): TextTrack | null;
-@@ -27614,7 +28563,7 @@ declare const URLSearchParams: {
+@@ -27614,7 +28563,7 @@ declare var URLSearchParams: {
  interface UserActivation {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/UserActivation/hasBeenActive) */
    readonly hasBeenActive: boolean;

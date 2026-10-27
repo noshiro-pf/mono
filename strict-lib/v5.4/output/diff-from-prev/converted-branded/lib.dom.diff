@@ -1,5 +1,5 @@
 diff --git a/v5.3/output/lib-files-branded/lib.dom.d.ts b/v5.4/output/lib-files-branded/lib.dom.d.ts
-index 8e312ec0dce01358223fc8210c86514e8fa58dd6..d4f5cd4a8a87399dc6a3a7ae13d90071d9d5affc 100644
+index 8a6830889bc88d438c6234c6f029737d63f3a933..12e57db93f56347951108b0561cee336a4665799 100644
 --- a/v5.3/output/lib-files-branded/lib.dom.d.ts
 +++ b/v5.4/output/lib-files-branded/lib.dom.d.ts
 @@ -142,6 +142,7 @@ interface AuthenticationExtensionsClientInputs {
@@ -388,7 +388,7 @@ index 8e312ec0dce01358223fc8210c86514e8fa58dd6..d4f5cd4a8a87399dc6a3a7ae13d90071
 +  copyTo(destination: AllowSharedBufferSource): void;
  }
  
- declare const EncodedVideoChunk: {
+ declare var EncodedVideoChunk: {
 @@ -9147,7 +9191,11 @@ interface FileReader extends EventTarget {
    abort(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileReader/readAsArrayBuffer) */
@@ -621,7 +621,7 @@ index 8e312ec0dce01358223fc8210c86514e8fa58dd6..d4f5cd4a8a87399dc6a3a7ae13d90071
    addEventListener<K extends keyof HTMLElementEventMap>(
      type: K,
      listener: (
-@@ -15813,6 +15890,44 @@ declare const Headers: {
+@@ -15813,6 +15890,44 @@ declare var Headers: {
    new (init?: HeadersInit): Headers;
  };
  
@@ -801,7 +801,7 @@ index 8e312ec0dce01358223fc8210c86514e8fa58dd6..d4f5cd4a8a87399dc6a3a7ae13d90071
    getMetadata(): RTCEncodedAudioFrameMetadata;
  }
  
-@@ -21118,10 +21251,15 @@ declare const RTCEncodedAudioFrame: {
+@@ -21118,10 +21251,15 @@ declare var RTCEncodedAudioFrame: {
    new (): RTCEncodedAudioFrame;
  };
  
@@ -957,7 +957,7 @@ index 8e312ec0dce01358223fc8210c86514e8fa58dd6..d4f5cd4a8a87399dc6a3a7ae13d90071
    ): Promise<readonly PlaneLayout[]>;
  }
 @@ -28053,7 +28245,7 @@ interface VideoFrame {
- declare const VideoFrame: {
+ declare var VideoFrame: {
    prototype: VideoFrame;
    new (image: CanvasImageSource, init?: VideoFrameInit): VideoFrame;
 -  new (data: BufferSource, init: VideoFrameBufferInit): VideoFrame;
@@ -1018,7 +1018,7 @@ index 8e312ec0dce01358223fc8210c86514e8fa58dd6..d4f5cd4a8a87399dc6a3a7ae13d90071
      drawcount: GLsizei,
    ): void;
  }
-@@ -28445,7 +28637,6 @@ declare const WebGL2RenderingContext: {
+@@ -28445,7 +28637,6 @@ declare var WebGL2RenderingContext: {
    readonly STENCIL: 0x1802;
    readonly RED: 0x1903;
    readonly RGB8: 0x8051;
@@ -1026,7 +1026,7 @@ index 8e312ec0dce01358223fc8210c86514e8fa58dd6..d4f5cd4a8a87399dc6a3a7ae13d90071
    readonly RGB10_A2: 0x8059;
    readonly TEXTURE_BINDING_3D: 0x806a;
    readonly UNPACK_SKIP_IMAGES: 0x806d;
-@@ -28956,6 +29147,7 @@ declare const WebGL2RenderingContext: {
+@@ -28956,6 +29147,7 @@ declare var WebGL2RenderingContext: {
    readonly RENDERBUFFER: 0x8d41;
    readonly RGBA4: 0x8056;
    readonly RGB5_A1: 0x8057;
@@ -1371,7 +1371,7 @@ index 8e312ec0dce01358223fc8210c86514e8fa58dd6..d4f5cd4a8a87399dc6a3a7ae13d90071
      srcLength?: GLuint,
    ): void;
  }
-@@ -30450,6 +30645,7 @@ declare const WebGLRenderingContext: {
+@@ -30450,6 +30645,7 @@ declare var WebGLRenderingContext: {
    readonly RENDERBUFFER: 0x8d41;
    readonly RGBA4: 0x8056;
    readonly RGB5_A1: 0x8057;
@@ -1523,7 +1523,7 @@ index 8e312ec0dce01358223fc8210c86514e8fa58dd6..d4f5cd4a8a87399dc6a3a7ae13d90071
    warn(...data: readonly unknown[]): void;
  }
  
-@@ -32807,10 +33025,13 @@ declare const console: Console;
+@@ -32807,10 +33025,13 @@ declare var console: Console;
  
  /** Holds useful CSS-related methods. No object with this interface are implemented: it contains only static methods and therefore is a utilitarian interface. */
  declare namespace CSS {
@@ -1740,7 +1740,7 @@ index 8e312ec0dce01358223fc8210c86514e8fa58dd6..d4f5cd4a8a87399dc6a3a7ae13d90071
    | ((this: Window, ev: PointerEvent) => unknown)
    | null;
 @@ -34373,7 +34613,11 @@ declare const onstorage: ((this: Window, ev: StorageEvent) => unknown) | null;
- declare const onunhandledrejection:
+ declare var onunhandledrejection:
    | ((this: Window, ev: PromiseRejectionEvent) => unknown)
    | null;
 -/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/unload_event) */

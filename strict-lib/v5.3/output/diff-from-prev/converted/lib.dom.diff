@@ -1,5 +1,5 @@
 diff --git a/v5.2/output/lib-files/lib.dom.d.ts b/v5.3/output/lib-files/lib.dom.d.ts
-index fefdac220ed7931241c96844c66105a0b78ba2c3..84b1be551dd715ace4143c485216bce354456e8b 100644
+index fa98dbd790f973c032a173f8094e92ff86016696..4793be407cbfb4b4da9a10935e68d6e19a7ae1f1 100644
 --- a/v5.2/output/lib-files/lib.dom.d.ts
 +++ b/v5.3/output/lib-files/lib.dom.d.ts
 @@ -1445,6 +1445,7 @@ interface RTCInboundRtpStreamStats extends RTCReceivedRtpStreamStats {

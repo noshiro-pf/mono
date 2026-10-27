@@ -1,5 +1,5 @@
 diff --git a/v5.1/output/lib-files-branded/lib.dom.d.ts b/v5.2/output/lib-files-branded/lib.dom.d.ts
-index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b853eb2e4 100644
+index 530f1d413294bab74295b88dbf9b4f66a8421e93..af251d7d9f2f032e311d855e40352483edc6a220 100644
 --- a/v5.1/output/lib-files-branded/lib.dom.d.ts
 +++ b/v5.2/output/lib-files-branded/lib.dom.d.ts
 @@ -756,6 +756,7 @@ interface Keyframe {
@@ -77,7 +77,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
    deltaMode?: number;
    deltaX?: number;
 @@ -2341,9 +2372,9 @@ interface AbortSignal extends EventTarget {
- declare const AbortSignal: {
+ declare var AbortSignal: {
    prototype: AbortSignal;
    new (): AbortSignal;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort) */
@@ -106,7 +106,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
    name: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSKeyframesRule/appendRule) */
 @@ -3901,7 +3933,7 @@ interface CSSNumericValue extends CSSStyleValue {
- declare const CSSNumericValue: {
+ declare var CSSNumericValue: {
    prototype: CSSNumericValue;
    new (): CSSNumericValue;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/parse) */
@@ -152,7 +152,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
  
  declare const CSSStyleRule: {
 @@ -5369,9 +5409,9 @@ interface CSSStyleValue {
- declare const CSSStyleValue: {
+ declare var CSSStyleValue: {
    prototype: CSSStyleValue;
    new (): CSSStyleValue;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSStyleValue/parse) */
@@ -182,7 +182,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
    readonly types: ReadonlyArray<string>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ClipboardItem/getType) */
 @@ -6756,7 +6796,7 @@ interface DOMPoint extends DOMPointReadOnly {
- declare const DOMPoint: {
+ declare var DOMPoint: {
    prototype: DOMPoint;
    new (x?: number, y?: number, z?: number, w?: number): DOMPoint;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPoint/fromPoint) */
@@ -191,7 +191,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
  };
  
 @@ -6782,7 +6822,7 @@ interface DOMPointReadOnly {
- declare const DOMPointReadOnly: {
+ declare var DOMPointReadOnly: {
    prototype: DOMPointReadOnly;
    new (x?: number, y?: number, z?: number, w?: number): DOMPointReadOnly;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPointReadOnly/fromPoint) */
@@ -199,7 +199,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
    fromPoint(other?: DOMPointInit): DOMPointReadOnly;
  };
  
-@@ -6870,7 +6910,7 @@ declare const DOMRectReadOnly: {
+@@ -6870,7 +6910,7 @@ declare var DOMRectReadOnly: {
      width?: number,
      height?: number,
    ): DOMRectReadOnly;
@@ -336,7 +336,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/has) */
    has(name: string): boolean;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/set) */
-@@ -16159,7 +16213,7 @@ declare const IDBKeyRange: {
+@@ -16159,7 +16213,7 @@ declare var IDBKeyRange: {
    /**
     * Returns a new IDBKeyRange spanning from lower to upper. If lowerOpen is true, lower is not included in the range. If upperOpen is true, upper is not included in the range.
     *
@@ -345,7 +345,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
     */
    bound(
      lower: unknown,
-@@ -16170,19 +16224,19 @@ declare const IDBKeyRange: {
+@@ -16170,19 +16224,19 @@ declare var IDBKeyRange: {
    /**
     * Returns a new IDBKeyRange starting at key with no upper bound. If open is true, key is not included in the range.
     *
@@ -408,7 +408,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
    readonly tag: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/title) */
 @@ -19218,9 +19277,9 @@ interface Notification extends EventTarget {
- declare const Notification: {
+ declare var Notification: {
    prototype: Notification;
    new (title: string, options?: NotificationOptions): Notification;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/permission) */
@@ -420,7 +420,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
      deprecatedCallback?: NotificationPermissionCallback,
    ): Promise<NotificationPermission>;
 @@ -20158,7 +20217,7 @@ interface PerformanceObserver {
- declare const PerformanceObserver: {
+ declare var PerformanceObserver: {
    prototype: PerformanceObserver;
    new (callback: PerformanceObserverCallback): PerformanceObserver;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceObserver/supportedEntryTypes) */
@@ -452,7 +452,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
  };
  
 @@ -20776,7 +20842,7 @@ interface PushManager {
- declare const PushManager: {
+ declare var PushManager: {
    prototype: PushManager;
    new (): PushManager;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PushManager/supportedContentEncodings) */
@@ -488,7 +488,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
  };
  
 @@ -22082,9 +22148,11 @@ interface Response extends Body {
- declare const Response: {
+ declare var Response: {
    prototype: Response;
    new (body?: BodyInit | null, init?: ResponseInit): Response;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/error) */
@@ -526,7 +526,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
 +  decode(input?: AllowSharedBufferSource, options?: TextDecodeOptions): string;
  }
  
- declare const TextDecoder: {
+ declare var TextDecoder: {
 @@ -27342,6 +27407,19 @@ declare const TimeRanges: {
    new (): TimeRanges;
  };
@@ -548,7 +548,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
   * A single contact point on a touch-sensitive device. The contact point is commonly a finger or stylus and the device may be a touchscreen or trackpad.
   *
 @@ -27607,9 +27685,11 @@ interface URL {
- declare const URL: {
+ declare var URL: {
    prototype: URL;
    new (url: string | URL, base?: string | URL): URL;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/createObjectURL) */
@@ -606,7 +606,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
    readonly valueMissing: boolean;
  }
  
-@@ -31453,6 +31538,100 @@ declare const WebSocket: {
+@@ -31453,6 +31538,100 @@ declare var WebSocket: {
    readonly CLOSED: 3;
  };
  
@@ -638,7 +638,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
 +  ): Promise<WritableStream>;
 +}
 +
-+declare const WebTransport: {
++declare var WebTransport: {
 +  prototype: WebTransport;
 +  new (url: string | URL, options?: WebTransportOptions): WebTransport;
 +};
@@ -655,7 +655,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
 +  readonly writable: WritableStream;
 +}
 +
-+declare const WebTransportBidirectionalStream: {
++declare var WebTransportBidirectionalStream: {
 +  prototype: WebTransportBidirectionalStream;
 +  new (): WebTransportBidirectionalStream;
 +};
@@ -682,7 +682,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
 +  readonly writable: WritableStream;
 +}
 +
-+declare const WebTransportDatagramDuplexStream: {
++declare var WebTransportDatagramDuplexStream: {
 +  prototype: WebTransportDatagramDuplexStream;
 +  new (): WebTransportDatagramDuplexStream;
 +};
@@ -699,7 +699,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
 +  readonly streamErrorCode: number | null;
 +}
 +
-+declare const WebTransportError: {
++declare var WebTransportError: {
 +  prototype: WebTransportError;
 +  new (message?: string, options?: WebTransportErrorOptions): WebTransportError;
 +};
@@ -707,7 +707,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
  /**
   * Events that occur due to the user moving a mouse wheel or similar input device.
   *
-@@ -32617,96 +32796,120 @@ declare const console: Console;
+@@ -32617,96 +32796,120 @@ declare var console: Console;
  
  /** Holds useful CSS-related methods. No object with this interface are implemented: it contains only static methods and therefore is a utilitarian interface. */
  declare namespace CSS {
@@ -942,7 +942,7 @@ index 1ec4ca0d4d9e8e6d36d041d0f76601c07df91346..fb28868aa6454e39519dfa7e1c92081b
 - * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/error_event)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/error_event)
   */
- declare const onerror: OnErrorEventHandler;
+ declare var onerror: OnErrorEventHandler;
  /**
 @@ -33959,6 +34168,8 @@ declare const onresize: ((this: Window, ev: UIEvent) => unknown) | null;
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/scroll_event)

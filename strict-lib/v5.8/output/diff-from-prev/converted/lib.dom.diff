@@ -1,5 +1,5 @@
 diff --git a/v5.7/output/lib-files/lib.dom.d.ts b/v5.8/output/lib-files/lib.dom.d.ts
-index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7 100644
+index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425a2de70e3 100644
 --- a/v5.7/output/lib-files/lib.dom.d.ts
 +++ b/v5.8/output/lib-files/lib.dom.d.ts
 @@ -792,6 +792,26 @@ interface ImageDataSettings {
@@ -196,7 +196,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
  }
  
  declare const CSSKeyframeRule: {
-@@ -4230,7 +4296,8 @@ declare const CSSMatrixComponent: {
+@@ -4230,7 +4296,8 @@ declare var CSSMatrixComponent: {
   */
  interface CSSMediaRule extends CSSConditionRule {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMediaRule/media) */
@@ -351,7 +351,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSStyleRule/styleMap) */
    readonly styleMap: StylePropertyMap;
  }
-@@ -6029,6 +6132,16 @@ declare const CSSVariableReferenceValue: {
+@@ -6029,6 +6132,16 @@ declare var CSSVariableReferenceValue: {
    ): CSSVariableReferenceValue;
  };
  
@@ -475,7 +475,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
    matrixTransform(matrix?: DOMMatrixInit): DOMPoint;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPointReadOnly/toJSON) */
    toJSON(): unknown;
-@@ -7354,11 +7489,17 @@ declare const DOMPointReadOnly: {
+@@ -7354,11 +7489,17 @@ declare var DOMPointReadOnly: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMQuad) */
  interface DOMQuad {
@@ -493,7 +493,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
    toJSON(): unknown;
  }
  
-@@ -7376,9 +7517,13 @@ declare const DOMQuad: {
+@@ -7376,9 +7517,13 @@ declare var DOMQuad: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMRect) */
  interface DOMRect extends DOMRectReadOnly {
@@ -507,7 +507,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
    y: number;
  }
  
-@@ -7392,8 +7537,11 @@ declare const DOMRect: {
+@@ -7392,8 +7537,11 @@ declare var DOMRect: {
  type SVGRect = DOMRect;
  declare const SVGRect: typeof DOMRect;
  
@@ -605,7 +605,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
  }
  
  interface ElementContentEditable {
-@@ -9288,10 +9447,15 @@ declare const EncodedVideoChunk: {
+@@ -9288,10 +9447,15 @@ declare var EncodedVideoChunk: {
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent)
   */
  interface ErrorEvent extends Event {
@@ -1191,7 +1191,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
    readonly track: TextTrack;
    readonly NONE: 0;
    readonly LOADING: 1;
-@@ -17374,6 +17693,70 @@ declare const ImageData: {
+@@ -17374,6 +17693,70 @@ declare var ImageData: {
    ): ImageData;
  };
  
@@ -1217,7 +1217,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
 +  reset(): void;
 +}
 +
-+declare const ImageDecoder: {
++declare var ImageDecoder: {
 +  prototype: ImageDecoder;
 +  new (init: ImageDecoderInit): ImageDecoder;
 +  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ImageDecoder/isTypeSupported_static) */
@@ -1236,7 +1236,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
 +  selected: boolean;
 +}
 +
-+declare const ImageTrack: {
++declare var ImageTrack: {
 +  prototype: ImageTrack;
 +  new (): ImageTrack;
 +};
@@ -1254,7 +1254,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
 +  [index: number]: ImageTrack;
 +}
 +
-+declare const ImageTrackList: {
++declare var ImageTrackList: {
 +  prototype: ImageTrackList;
 +  new (): ImageTrackList;
 +};
@@ -1262,7 +1262,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
  interface ImportMeta {
    url: string;
    resolve(specifier: string): string;
-@@ -18889,7 +19272,39 @@ declare const MessageEvent: {
+@@ -18889,7 +19272,39 @@ declare var MessageEvent: {
    new <T>(type: string, eventInitDict?: MessageEventInit<T>): MessageEvent<T>;
  };
  
@@ -1447,7 +1447,16 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PublicKeyCredential/isConditionalMediationAvailable_static) */
    isConditionalMediationAvailable(): Promise<boolean>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PublicKeyCredential/isUserVerifyingPlatformAuthenticatorAvailable_static) */
-@@ -22597,7 +23102,7 @@ declare const ReadableStreamDefaultReader: {
+@@ -21718,7 +22223,7 @@ interface RTCDataChannel extends EventTarget {
+   ): void;
+ }
+ 
+-declare const RTCDataChannel: {
++declare var RTCDataChannel: {
+   prototype: RTCDataChannel;
+   new (): RTCDataChannel;
+ };
+@@ -22597,7 +23102,7 @@ declare var ReadableStreamDefaultReader: {
  
  interface ReadableStreamGenericReader {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/closed) */
@@ -1469,7 +1478,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
    readonly keepalive: boolean;
    /**
     * Returns request's HTTP method, which is "GET" by default.
-@@ -22876,7 +23385,8 @@ declare const Response: {
+@@ -22876,7 +23385,8 @@ declare var Response: {
   */
  interface SVGAElement extends SVGGraphicsElement, SVGURIReference {
    rel: string;
@@ -2118,7 +2127,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
    uniformMatrix2fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -31301,12 +31977,14 @@ declare const WebGLRenderingContext: {
+@@ -31301,12 +31977,14 @@ declare var WebGLRenderingContext: {
  interface WebGLRenderingContextBase {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/canvas) */
    readonly canvas: HTMLCanvasElement | OffscreenCanvas;
@@ -2275,7 +2284,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
    /**
     * Clones message and transmits it to worker's global environment. transfer can be passed as a list of objects that are to be transferred rather than cloned.
     *
-@@ -33135,11 +33807,11 @@ declare const WritableStreamDefaultController: {
+@@ -33135,11 +33807,11 @@ declare var WritableStreamDefaultController: {
   */
  interface WritableStreamDefaultWriter<W = unknown> {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/closed) */
@@ -2336,7 +2345,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
  declare const ontoggle: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/touchcancel_event) */
  declare const ontouchcancel:
-@@ -35235,10 +35899,14 @@ declare const ononline: ((this: Window, ev: Event) => unknown) | null;
+@@ -35235,10 +35899,14 @@ declare var ononline: ((this: Window, ev: Event) => unknown) | null;
  declare const onpagehide:
    | ((this: Window, ev: PageTransitionEvent) => unknown)
    | null;
@@ -2351,7 +2360,7 @@ index 4546fa2ff38cb7584edd0ec5acadf99995023b37..d41a20fb0ef7fe0c65ff9d3dde71b6cd
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/popstate_event) */
  declare const onpopstate: ((this: Window, ev: PopStateEvent) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/rejectionhandled_event) */
-@@ -35281,11 +35949,11 @@ declare const performance: Performance;
+@@ -35281,11 +35949,11 @@ declare var performance: Performance;
  declare function atob(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
  declare function btoa(data: string): string;

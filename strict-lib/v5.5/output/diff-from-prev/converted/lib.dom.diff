@@ -1,5 +1,5 @@
 diff --git a/v5.4/output/lib-files/lib.dom.d.ts b/v5.5/output/lib-files/lib.dom.d.ts
-index 1628b1dddf1ef71d9eec57f65fa11291daf35186..528279008c90f50d6b43cbe9dd242105538f6f2b 100644
+index 56c49c140d9cd2459fe531379fa39660154fb94c..63f4b615ea7026ad1d153334d9fb0d8cfd86a610 100644
 --- a/v5.4/output/lib-files/lib.dom.d.ts
 +++ b/v5.5/output/lib-files/lib.dom.d.ts
 @@ -225,6 +225,9 @@ interface ChannelSplitterOptions extends AudioNodeOptions {
@@ -99,7 +99,7 @@ index 1628b1dddf1ef71d9eec57f65fa11291daf35186..528279008c90f50d6b43cbe9dd242105
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/ariaBusy) */
    ariaBusy: string | null;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/ariaChecked) */
-@@ -2375,6 +2398,8 @@ declare const AbortSignal: {
+@@ -2375,6 +2398,8 @@ declare var AbortSignal: {
    new (): AbortSignal;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_static) */
    abort(reason?: unknown): AbortSignal;
@@ -108,7 +108,7 @@ index 1628b1dddf1ef71d9eec57f65fa11291daf35186..528279008c90f50d6b43cbe9dd242105
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/timeout_static) */
    timeout(milliseconds: number): AbortSignal;
  };
-@@ -4096,6 +4121,16 @@ declare const CSSScale: {
+@@ -4096,6 +4121,16 @@ declare var CSSScale: {
    new (x: CSSNumberish, y: CSSNumberish, z?: CSSNumberish): CSSScale;
  };
  
@@ -125,7 +125,7 @@ index 1628b1dddf1ef71d9eec57f65fa11291daf35186..528279008c90f50d6b43cbe9dd242105
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSSkew) */
  interface CSSSkew extends CSSTransformComponent {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSSkew/ax) */
-@@ -4131,6 +4166,14 @@ declare const CSSSkewY: {
+@@ -4131,6 +4166,14 @@ declare var CSSSkewY: {
    new (ay: CSSNumericValue): CSSSkewY;
  };
  
@@ -214,7 +214,7 @@ index 1628b1dddf1ef71d9eec57f65fa11291daf35186..528279008c90f50d6b43cbe9dd242105
  /**
   * An AudioNode that performs a Linear Convolution on a given AudioBuffer, often used to achieve a reverb effect. A ConvolverNode always has exactly one input and one output.
   *
-@@ -6509,6 +6577,19 @@ declare const CustomEvent: {
+@@ -6509,6 +6577,19 @@ declare var CustomEvent: {
    new <T>(type: string, eventInitDict?: CustomEventInit<T>): CustomEvent<T>;
  };
  

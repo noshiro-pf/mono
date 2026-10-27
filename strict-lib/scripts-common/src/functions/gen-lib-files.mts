@@ -7,7 +7,7 @@ import {
   getSrcFileList,
   type ConverterConfig,
 } from '../convert-dts/common.mjs';
-import { convert } from '../convert-dts/convert-main.mjs';
+import { convert, sharedGlobalVarNames } from '../convert-dts/convert-main.mjs';
 import { rewriteTsTypeForgeRefs } from './codemod/rewrite-ts-type-forge-refs.mjs';
 
 /** Generate files to `output/lib-files` and `output/lib-files-branded` */
@@ -37,6 +37,8 @@ const createDtsFiles = async (
     ctx.paths.strictTsLib.source.temp.codemodFixed.$,
   );
 
+  const sharedGlobals = sharedGlobalVarNames(srcFileList);
+
   const outDir =
     ctx.paths.strictTsLib.output[
       config.useBrandedNumber ? 'libFilesBranded' : 'libFiles'
@@ -51,7 +53,9 @@ const createDtsFiles = async (
         // Route ts-type-forge types through inline `import(...)` and drop the
         // global reference so the lib doesn't leak ts-type-forge's globals
         // into consumers.
-        rewriteTsTypeForgeRefs(convert(filename, config, tsVersion)(content)),
+        rewriteTsTypeForgeRefs(
+          convert(filename, config, tsVersion, sharedGlobals)(content),
+        ),
       );
 
       console.info(`${outputFile} generated.`);

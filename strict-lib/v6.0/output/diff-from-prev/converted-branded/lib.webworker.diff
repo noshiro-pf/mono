@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.webworker.d.ts b/v6.0/output/lib-files-branded/lib.webworker.d.ts
-index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b42c9f2c57 100644
+index febef2212c0dfcbefaf993de742d0830be65674f..f30542fd52f8e95b93851e580aa830e51662143b 100644
 --- a/v5.9/output/lib-files-branded/lib.webworker.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.webworker.d.ts
 @@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
@@ -617,7 +617,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/throwIfAborted)
     */
-@@ -1189,13 +1625,13 @@ declare const AbortSignal: {
+@@ -1189,13 +1625,13 @@ declare var AbortSignal: {
    prototype: AbortSignal;
    new (): AbortSignal;
    /**
@@ -745,7 +745,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BroadcastChannel/postMessage)
     */
-@@ -1678,7 +2114,7 @@ declare const CSSImageValue: {
+@@ -1678,7 +2114,7 @@ declare var CSSImageValue: {
   */
  interface CSSKeywordValue extends CSSStyleValue {
    /**
@@ -754,7 +754,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSKeywordValue/value)
     */
-@@ -1706,13 +2142,13 @@ declare const CSSMathClamp: {
+@@ -1706,13 +2142,13 @@ declare var CSSMathClamp: {
  };
  
  /**
@@ -770,7 +770,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathInvert/value)
     */
-@@ -1725,13 +2161,13 @@ declare const CSSMathInvert: {
+@@ -1725,13 +2161,13 @@ declare var CSSMathInvert: {
  };
  
  /**
@@ -786,7 +786,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathMax/values)
     */
-@@ -1744,13 +2180,13 @@ declare const CSSMathMax: {
+@@ -1744,13 +2180,13 @@ declare var CSSMathMax: {
  };
  
  /**
@@ -802,7 +802,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathMin/values)
     */
-@@ -1763,13 +2199,13 @@ declare const CSSMathMin: {
+@@ -1763,13 +2199,13 @@ declare var CSSMathMin: {
  };
  
  /**
@@ -818,7 +818,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathNegate/value)
     */
-@@ -1782,13 +2218,13 @@ declare const CSSMathNegate: {
+@@ -1782,13 +2218,13 @@ declare var CSSMathNegate: {
  };
  
  /**
@@ -834,7 +834,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathProduct/values)
     */
-@@ -1801,7 +2237,7 @@ declare const CSSMathProduct: {
+@@ -1801,7 +2237,7 @@ declare var CSSMathProduct: {
  };
  
  /**
@@ -843,7 +843,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathSum)
   */
-@@ -1826,7 +2262,7 @@ declare const CSSMathSum: {
+@@ -1826,7 +2262,7 @@ declare var CSSMathSum: {
   */
  interface CSSMathValue extends CSSNumericValue {
    /**
@@ -852,7 +852,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathValue/operator)
     */
-@@ -1839,13 +2275,13 @@ declare const CSSMathValue: {
+@@ -1839,13 +2275,13 @@ declare var CSSMathValue: {
  };
  
  /**
@@ -868,7 +868,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMatrixComponent/matrix)
     */
-@@ -1867,7 +2303,7 @@ declare const CSSMatrixComponent: {
+@@ -1867,7 +2303,7 @@ declare var CSSMatrixComponent: {
   */
  interface CSSNumericArray {
    /**
@@ -877,7 +877,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericArray/length)
     */
-@@ -1895,61 +2331,61 @@ declare const CSSNumericArray: {
+@@ -1895,61 +2331,61 @@ declare var CSSNumericArray: {
   */
  interface CSSNumericValue extends CSSStyleValue {
    /**
@@ -949,7 +949,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/type)
     */
-@@ -1962,13 +2398,13 @@ declare const CSSNumericValue: {
+@@ -1962,13 +2398,13 @@ declare var CSSNumericValue: {
  };
  
  /**
@@ -965,7 +965,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSPerspective/length)
     */
-@@ -1981,31 +2417,31 @@ declare const CSSPerspective: {
+@@ -1981,31 +2417,31 @@ declare var CSSPerspective: {
  };
  
  /**
@@ -1002,7 +1002,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSRotate/z)
     */
-@@ -2024,25 +2460,25 @@ declare const CSSRotate: {
+@@ -2024,25 +2460,25 @@ declare var CSSRotate: {
  };
  
  /**
@@ -1032,7 +1032,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSScale/z)
     */
-@@ -2055,19 +2491,19 @@ declare const CSSScale: {
+@@ -2055,19 +2491,19 @@ declare var CSSScale: {
  };
  
  /**
@@ -1055,7 +1055,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSSkew/ay)
     */
-@@ -2080,13 +2516,13 @@ declare const CSSSkew: {
+@@ -2080,13 +2516,13 @@ declare var CSSSkew: {
  };
  
  /**
@@ -1071,7 +1071,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSSkewX/ax)
     */
-@@ -2099,13 +2535,13 @@ declare const CSSSkewX: {
+@@ -2099,13 +2535,13 @@ declare var CSSSkewX: {
  };
  
  /**
@@ -1087,7 +1087,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSSkewY/ay)
     */
-@@ -2118,7 +2554,7 @@ declare const CSSSkewY: {
+@@ -2118,7 +2554,7 @@ declare var CSSSkewY: {
  };
  
  /**
@@ -1105,7 +1105,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSTransformComponent/toMatrix)
     */
-@@ -2158,25 +2594,25 @@ declare const CSSTransformComponent: {
+@@ -2158,25 +2594,25 @@ declare var CSSTransformComponent: {
  };
  
  /**
@@ -1135,7 +1135,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSTransformValue/toMatrix)
     */
-@@ -2198,25 +2634,25 @@ declare const CSSTransformValue: {
+@@ -2198,25 +2634,25 @@ declare var CSSTransformValue: {
  };
  
  /**
@@ -1165,7 +1165,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSTranslate/z)
     */
-@@ -2233,7 +2669,7 @@ declare const CSSTranslate: {
+@@ -2233,7 +2669,7 @@ declare var CSSTranslate: {
  };
  
  /**
@@ -1183,7 +1183,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSUnitValue/value)
     */
-@@ -2258,13 +2694,13 @@ declare const CSSUnitValue: {
+@@ -2258,13 +2694,13 @@ declare var CSSUnitValue: {
  };
  
  /**
@@ -1199,12 +1199,12 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSUnparsedValue/length)
     */
-@@ -2286,19 +2722,19 @@ declare const CSSUnparsedValue: {
+@@ -2286,19 +2722,19 @@ declare var CSSUnparsedValue: {
  };
  
  /**
 - * The **`CSSVariableReferenceValue`** interface of the CSS Typed Object Model API allows you to create a custom name for a built-in CSS value.
-+ * The **`CSSVariableReferenceValue`** interface of the CSS Typed Object Model API allows you to create a custom name for a built-in CSS value. This object functionality is sometimes called a "CSS variable" and serves the same purpose as the   const () function. The custom name must begin with two dashes.
++ * The **`CSSVariableReferenceValue`** interface of the CSS Typed Object Model API allows you to create a custom name for a built-in CSS value. This object functionality is sometimes called a "CSS variable" and serves the same purpose as the var() function. The custom name must begin with two dashes.
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSVariableReferenceValue)
   */
@@ -1222,7 +1222,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSVariableReferenceValue/variable)
     */
-@@ -2314,7 +2750,7 @@ declare const CSSVariableReferenceValue: {
+@@ -2314,7 +2750,7 @@ declare var CSSVariableReferenceValue: {
  };
  
  /**
@@ -1274,7 +1274,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Cache/put)
     */
-@@ -2389,25 +2825,25 @@ declare const Cache: {
+@@ -2389,25 +2825,25 @@ declare var Cache: {
   */
  interface CacheStorage {
    /**
@@ -1411,7 +1411,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CloseEvent/wasClean)
     */
-@@ -2871,12 +3307,14 @@ declare const CloseEvent: {
+@@ -2871,12 +3307,14 @@ declare var CloseEvent: {
  };
  
  /**
@@ -1427,7 +1427,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
    readonly writable: WritableStream<BufferSource>;
  }
  
-@@ -2893,28 +3331,28 @@ declare const CompressionStream: {
+@@ -2893,28 +3331,28 @@ declare var CompressionStream: {
   */
  interface CookieStore extends EventTarget {
    /**
@@ -1460,7 +1460,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CookieStore/set)
     */
-@@ -2928,7 +3366,7 @@ declare const CookieStore: {
+@@ -2928,7 +3366,7 @@ declare var CookieStore: {
  };
  
  /**
@@ -1469,7 +1469,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   * Available only in secure contexts.
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CookieStoreManager)
-@@ -2981,24 +3419,24 @@ declare const CountQueuingStrategy: {
+@@ -2981,24 +3419,24 @@ declare var CountQueuingStrategy: {
  };
  
  /**
@@ -1498,7 +1498,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
    /**
     * The **`randomUUID()`** method of the Crypto interface is used to generate a v4 UUID using a cryptographically secure random number generator.
     * Available only in secure contexts.
-@@ -3014,7 +3452,7 @@ declare const Crypto: {
+@@ -3014,7 +3452,7 @@ declare var Crypto: {
  };
  
  /**
@@ -1523,7 +1523,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CryptoKey/type)
     */
-@@ -3052,7 +3490,7 @@ declare const CryptoKey: {
+@@ -3052,7 +3490,7 @@ declare var CryptoKey: {
  };
  
  /**
@@ -1541,7 +1541,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     * @deprecated
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CustomEvent/initCustomEvent)
-@@ -3083,26 +3521,26 @@ declare const CustomEvent: {
+@@ -3083,26 +3521,26 @@ declare var CustomEvent: {
  };
  
  /**
@@ -1572,7 +1572,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMException/name)
     */
-@@ -3165,7 +3603,7 @@ declare const DOMException: {
+@@ -3165,7 +3603,7 @@ declare var DOMException: {
  };
  
  /**
@@ -1667,7 +1667,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrix/translateSelf)
     */
 @@ -3302,13 +3740,28 @@ interface DOMMatrix extends DOMMatrixReadOnly {
- declare const DOMMatrix: {
+ declare var DOMMatrix: {
    prototype: DOMMatrix;
    new (init?: string | readonly number[]): DOMMatrix;
 +  /**
@@ -1833,7 +1833,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/translate)
     */
 @@ -3489,37 +3942,52 @@ interface DOMMatrixReadOnly {
- declare const DOMMatrixReadOnly: {
+ declare var DOMMatrixReadOnly: {
    prototype: DOMMatrixReadOnly;
    new (init?: string | readonly number[]): DOMMatrixReadOnly;
 +  /**
@@ -1890,7 +1890,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPoint/z)
     */
-@@ -3530,7 +3998,7 @@ declare const DOMPoint: {
+@@ -3530,7 +3998,7 @@ declare var DOMPoint: {
    prototype: DOMPoint;
    new (x?: number, y?: number, z?: number, w?: number): DOMPoint;
    /**
@@ -1899,7 +1899,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPoint/fromPoint_static)
     */
-@@ -3544,37 +4012,37 @@ declare const DOMPoint: {
+@@ -3544,37 +4012,37 @@ declare var DOMPoint: {
   */
  interface DOMPointReadOnly {
    /**
@@ -1943,7 +1943,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPointReadOnly/toJSON)
     */
-@@ -3585,7 +4053,7 @@ declare const DOMPointReadOnly: {
+@@ -3585,7 +4053,7 @@ declare var DOMPointReadOnly: {
    prototype: DOMPointReadOnly;
    new (x?: number, y?: number, z?: number, w?: number): DOMPointReadOnly;
    /**
@@ -1952,7 +1952,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPointReadOnly/fromPoint_static)
     */
-@@ -3593,43 +4061,43 @@ declare const DOMPointReadOnly: {
+@@ -3593,43 +4061,43 @@ declare var DOMPointReadOnly: {
  };
  
  /**
@@ -2003,7 +2003,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMQuad/toJSON)
     */
-@@ -3644,7 +4112,17 @@ declare const DOMQuad: {
+@@ -3644,7 +4112,17 @@ declare var DOMQuad: {
      p3?: DOMPointInit,
      p4?: DOMPointInit,
    ): DOMQuad;
@@ -2021,7 +2021,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
    fromRect(other?: DOMRectInit): DOMQuad;
  };
  
-@@ -3655,13 +4133,13 @@ declare const DOMQuad: {
+@@ -3655,13 +4133,13 @@ declare var DOMQuad: {
   */
  interface DOMRect extends DOMRectReadOnly {
    /**
@@ -2037,7 +2037,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMRect/width)
     */
-@@ -3684,7 +4162,7 @@ declare const DOMRect: {
+@@ -3684,7 +4162,7 @@ declare var DOMRect: {
    prototype: DOMRect;
    new (x?: number, y?: number, width?: number, height?: number): DOMRect;
    /**
@@ -2046,7 +2046,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMRect/fromRect_static)
     */
-@@ -3698,55 +4176,55 @@ declare const DOMRect: {
+@@ -3698,55 +4176,55 @@ declare var DOMRect: {
   */
  interface DOMRectReadOnly {
    /**
@@ -2111,7 +2111,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMRectReadOnly/toJSON)
     */
-@@ -3762,7 +4240,7 @@ declare const DOMRectReadOnly: {
+@@ -3762,7 +4240,7 @@ declare var DOMRectReadOnly: {
      height?: number,
    ): DOMRectReadOnly;
    /**
@@ -2120,7 +2120,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMRectReadOnly/fromRect_static)
     */
-@@ -3770,7 +4248,7 @@ declare const DOMRectReadOnly: {
+@@ -3770,7 +4248,7 @@ declare var DOMRectReadOnly: {
  };
  
  /**
@@ -2138,7 +2138,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMStringList/item)
     */
-@@ -3802,12 +4280,14 @@ declare const DOMStringList: {
+@@ -3802,12 +4280,14 @@ declare var DOMStringList: {
  };
  
  /**
@@ -2208,7 +2208,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/EXT_texture_compression_rgtc)
   */
-@@ -4131,7 +4611,7 @@ declare const ErrorEvent: {
+@@ -4131,7 +4611,7 @@ declare var ErrorEvent: {
  };
  
  /**
@@ -2337,7 +2337,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventSource/close)
     */
-@@ -4357,7 +4837,7 @@ declare const EventSource: {
+@@ -4357,7 +4837,7 @@ declare var EventSource: {
  };
  
  /**
@@ -2362,7 +2362,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)
     */
-@@ -4396,19 +4876,19 @@ declare const EventTarget: {
+@@ -4396,19 +4876,19 @@ declare var EventTarget: {
  };
  
  /**
@@ -2519,7 +2519,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/File/webkitRelativePath)
     */
-@@ -4573,13 +5053,13 @@ declare const File: {
+@@ -4573,13 +5053,13 @@ declare var File: {
  };
  
  /**
@@ -2591,7 +2591,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileReader/readAsText)
     */
-@@ -4721,32 +5198,32 @@ declare const FileReader: {
+@@ -4721,32 +5198,32 @@ declare var FileReader: {
  };
  
  /**
@@ -2663,7 +2663,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileSystemDirectoryHandle/resolve)
     */
-@@ -4806,7 +5283,7 @@ declare const FileSystemDirectoryHandle: {
+@@ -4806,7 +5283,7 @@ declare var FileSystemDirectoryHandle: {
  };
  
  /**
@@ -2672,7 +2672,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   * Available only in secure contexts.
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileSystemFileHandle)
-@@ -4814,13 +5291,13 @@ declare const FileSystemDirectoryHandle: {
+@@ -4814,13 +5291,13 @@ declare var FileSystemDirectoryHandle: {
  interface FileSystemFileHandle extends FileSystemHandle {
    readonly kind: 'file';
    /**
@@ -2697,7 +2697,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileSystemFileHandle/getFile)
     */
-@@ -4841,26 +5318,26 @@ declare const FileSystemFileHandle: {
+@@ -4841,26 +5318,26 @@ declare var FileSystemFileHandle: {
  };
  
  /**
@@ -2728,7 +2728,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileSystemHandle/isSameEntry)
     */
-@@ -4880,25 +5357,25 @@ declare const FileSystemHandle: {
+@@ -4880,25 +5357,25 @@ declare var FileSystemHandle: {
   */
  interface FileSystemSyncAccessHandle {
    /**
@@ -2869,7 +2869,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/FontFaceSet/load)
     */
-@@ -5139,7 +5622,7 @@ declare const FontFaceSet: {
+@@ -5139,7 +5622,7 @@ declare var FontFaceSet: {
   */
  interface FontFaceSetLoadEvent extends Event {
    /**
@@ -2931,7 +2931,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/set)
     */
-@@ -5221,643 +5704,703 @@ declare const FormData: {
+@@ -5221,643 +5704,703 @@ declare var FormData: {
  };
  
  /**
@@ -2990,7 +2990,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): Promise<GPUAdapter | null>;
 +}
 +
-+declare const GPU: {
++declare var GPU: {
 +  prototype: GPU;
 +  new (): GPU;
 +};
@@ -3044,10 +3044,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  requestDevice(descriptor?: GPUDeviceDescriptor): Promise<GPUDevice>;
  }
  
--declare const Headers: {
+-declare var Headers: {
 -  prototype: Headers;
 -  new (init?: HeadersInit): Headers;
-+declare const GPUAdapter: {
++declare var GPUAdapter: {
 +  prototype: GPUAdapter;
 +  new (): GPUAdapter;
  };
@@ -3145,10 +3145,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly vendor: string;
  }
  
--declare const IDBCursor: {
+-declare var IDBCursor: {
 -  prototype: IDBCursor;
 -  new (): IDBCursor;
-+declare const GPUAdapterInfo: {
++declare var GPUAdapterInfo: {
 +  prototype: GPUAdapterInfo;
 +  new (): GPUAdapterInfo;
  };
@@ -3171,10 +3171,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -}
 +interface GPUBindGroup extends GPUObjectBase {}
  
--declare const IDBCursorWithValue: {
+-declare var IDBCursorWithValue: {
 -  prototype: IDBCursorWithValue;
 -  new (): IDBCursorWithValue;
-+declare const GPUBindGroup: {
++declare var GPUBindGroup: {
 +  prototype: GPUBindGroup;
 +  new (): GPUBindGroup;
  };
@@ -3192,7 +3192,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 + */
 +interface GPUBindGroupLayout extends GPUObjectBase {}
 +
-+declare const GPUBindGroupLayout: {
++declare var GPUBindGroupLayout: {
 +  prototype: GPUBindGroupLayout;
 +  new (): GPUBindGroupLayout;
 +};
@@ -3327,10 +3327,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  unmap(): void;
  }
  
--declare const IDBDatabase: {
+-declare var IDBDatabase: {
 -  prototype: IDBDatabase;
 -  new (): IDBDatabase;
-+declare const GPUBuffer: {
++declare var GPUBuffer: {
 +  prototype: GPUBuffer;
 +  new (): GPUBuffer;
  };
@@ -3389,10 +3389,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  unconfigure(): void;
  }
  
--declare const IDBFactory: {
+-declare var IDBFactory: {
 -  prototype: IDBFactory;
 -  new (): IDBFactory;
-+declare const GPUCanvasContext: {
++declare var GPUCanvasContext: {
 +  prototype: GPUCanvasContext;
 +  new (): GPUCanvasContext;
  };
@@ -3420,7 +3420,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  readonly multiEntry: boolean;
 +interface GPUCommandBuffer extends GPUObjectBase {}
 +
-+declare const GPUCommandBuffer: {
++declare var GPUCommandBuffer: {
 +  prototype: GPUCommandBuffer;
 +  new (): GPUCommandBuffer;
 +};
@@ -3555,7 +3555,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
 +}
 +
-+declare const GPUCommandEncoder: {
++declare var GPUCommandEncoder: {
 +  prototype: GPUCommandEncoder;
 +  new (): GPUCommandEncoder;
 +};
@@ -3581,10 +3581,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly messages: ReadonlyArray<GPUCompilationMessage>;
  }
  
--declare const IDBIndex: {
+-declare var IDBIndex: {
 -  prototype: IDBIndex;
 -  new (): IDBIndex;
-+declare const GPUCompilationInfo: {
++declare var GPUCompilationInfo: {
 +  prototype: GPUCompilationInfo;
 +  new (): GPUCompilationInfo;
  };
@@ -3652,10 +3652,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly type: GPUCompilationMessageType;
  }
  
--declare const IDBKeyRange: {
+-declare var IDBKeyRange: {
 -  prototype: IDBKeyRange;
 -  new (): IDBKeyRange;
-+declare const GPUCompilationMessage: {
++declare var GPUCompilationMessage: {
 +  prototype: GPUCompilationMessage;
 +  new (): GPUCompilationMessage;
 +};
@@ -3718,7 +3718,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  setPipeline(pipeline: GPUComputePipeline): void;
 +}
 +
-+declare const GPUComputePassEncoder: {
++declare var GPUComputePassEncoder: {
 +  prototype: GPUComputePassEncoder;
 +  new (): GPUComputePassEncoder;
  };
@@ -3734,7 +3734,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -interface IDBObjectStore {
 +interface GPUComputePipeline extends GPUObjectBase, GPUPipelineBase {}
 +
-+declare const GPUComputePipeline: {
++declare var GPUComputePipeline: {
 +  prototype: GPUComputePipeline;
 +  new (): GPUComputePipeline;
 +};
@@ -3967,7 +3967,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  put(value: unknown, key?: IDBValidKey): IDBRequest<IDBValidKey>;
 -}
 -
--declare const IDBObjectStore: {
+-declare var IDBObjectStore: {
 -  prototype: IDBObjectStore;
 -  new (): IDBObjectStore;
 -};
@@ -4048,10 +4048,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
    ): void;
  }
  
--declare const IDBOpenDBRequest: {
+-declare var IDBOpenDBRequest: {
 -  prototype: IDBOpenDBRequest;
 -  new (): IDBOpenDBRequest;
-+declare const GPUDevice: {
++declare var GPUDevice: {
 +  prototype: GPUDevice;
 +  new (): GPUDevice;
  };
@@ -4101,7 +4101,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly reason: GPUDeviceLostReason;
 +}
 +
-+declare const GPUDeviceLostInfo: {
++declare var GPUDeviceLostInfo: {
 +  prototype: GPUDeviceLostInfo;
 +  new (): GPUDeviceLostInfo;
 +};
@@ -4124,7 +4124,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly message: string;
 +}
 +
-+declare const GPUError: {
++declare var GPUError: {
 +  prototype: GPUError;
 +  new (): GPUError;
 +};
@@ -4137,7 +4137,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 + */
 +interface GPUExternalTexture extends GPUObjectBase {}
 +
-+declare const GPUExternalTexture: {
++declare var GPUExternalTexture: {
 +  prototype: GPUExternalTexture;
 +  new (): GPUExternalTexture;
 +};
@@ -4150,7 +4150,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 + */
 +interface GPUInternalError extends GPUError {}
 +
-+declare const GPUInternalError: {
++declare var GPUInternalError: {
 +  prototype: GPUInternalError;
 +  new (message: string): GPUInternalError;
 +};
@@ -4168,7 +4168,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 + */
 +interface GPUOutOfMemoryError extends GPUError {}
 +
-+declare const GPUOutOfMemoryError: {
++declare var GPUOutOfMemoryError: {
 +  prototype: GPUOutOfMemoryError;
 +  new (message: string): GPUOutOfMemoryError;
 +};
@@ -4216,10 +4216,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly reason: GPUPipelineErrorReason;
  }
  
--declare const IDBRequest: {
+-declare var IDBRequest: {
 -  prototype: IDBRequest;
 -  new (): IDBRequest;
-+declare const GPUPipelineError: {
++declare var GPUPipelineError: {
 +  prototype: GPUPipelineError;
 +  new (message: string, options: GPUPipelineErrorInit): GPUPipelineError;
  };
@@ -4237,7 +4237,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 + */
 +interface GPUPipelineLayout extends GPUObjectBase {}
 +
-+declare const GPUPipelineLayout: {
++declare var GPUPipelineLayout: {
 +  prototype: GPUPipelineLayout;
 +  new (): GPUPipelineLayout;
 +};
@@ -4281,7 +4281,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  destroy(): void;
 +}
 +
-+declare const GPUQuerySet: {
++declare var GPUQuerySet: {
 +  prototype: GPUQuerySet;
 +  new (): GPUQuerySet;
 +};
@@ -4380,10 +4380,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
    ): void;
  }
  
--declare const IDBTransaction: {
+-declare var IDBTransaction: {
 -  prototype: IDBTransaction;
 -  new (): IDBTransaction;
-+declare const GPUQueue: {
++declare var GPUQueue: {
 +  prototype: GPUQueue;
 +  new (): GPUQueue;
  };
@@ -4405,7 +4405,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  readonly newVersion: number | null;
 +interface GPURenderBundle extends GPUObjectBase {}
 +
-+declare const GPURenderBundle: {
++declare var GPURenderBundle: {
 +  prototype: GPURenderBundle;
 +  new (): GPURenderBundle;
 +};
@@ -4433,13 +4433,13 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  finish(descriptor?: GPURenderBundleDescriptor): GPURenderBundle;
  }
  
--declare const IDBVersionChangeEvent: {
+-declare var IDBVersionChangeEvent: {
 -  prototype: IDBVersionChangeEvent;
 -  new (
 -    type: string,
 -    eventInitDict?: IDBVersionChangeEventInit,
 -  ): IDBVersionChangeEvent;
-+declare const GPURenderBundleEncoder: {
++declare var GPURenderBundleEncoder: {
 +  prototype: GPURenderBundleEncoder;
 +  new (): GPURenderBundleEncoder;
  };
@@ -4528,7 +4528,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  close(): void;
 -}
 -
--declare const ImageBitmap: {
+-declare var ImageBitmap: {
 -  prototype: ImageBitmap;
 -  new (): ImageBitmap;
 -};
@@ -4550,7 +4550,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  transferFromImageBitmap(bitmap: ImageBitmap | null): void;
 -}
 -
--declare const ImageBitmapRenderingContext: {
+-declare var ImageBitmapRenderingContext: {
 -  prototype: ImageBitmapRenderingContext;
 -  new (): ImageBitmapRenderingContext;
 -};
@@ -4612,7 +4612,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
  }
  
--declare const ImageData: {
+-declare var ImageData: {
 -  prototype: ImageData;
 -  new (sw: number, sh: number, settings?: ImageDataSettings): ImageData;
 -  new (
@@ -4621,7 +4621,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -    sh?: number,
 -    settings?: ImageDataSettings,
 -  ): ImageData;
-+declare const GPURenderPassEncoder: {
++declare var GPURenderPassEncoder: {
 +  prototype: GPURenderPassEncoder;
 +  new (): GPURenderPassEncoder;
  };
@@ -4643,7 +4643,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  readonly complete: boolean;
 +interface GPURenderPipeline extends GPUObjectBase, GPUPipelineBase {}
 +
-+declare const GPURenderPipeline: {
++declare var GPURenderPipeline: {
 +  prototype: GPURenderPipeline;
 +  new (): GPURenderPipeline;
 +};
@@ -4656,7 +4656,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 + */
 +interface GPUSampler extends GPUObjectBase {}
 +
-+declare const GPUSampler: {
++declare var GPUSampler: {
 +  prototype: GPUSampler;
 +  new (): GPUSampler;
 +};
@@ -4679,7 +4679,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  getCompilationInfo(): Promise<GPUCompilationInfo>;
 +}
 +
-+declare const GPUShaderModule: {
++declare var GPUShaderModule: {
 +  prototype: GPUShaderModule;
 +  new (): GPUShaderModule;
 +};
@@ -4701,7 +4701,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
 +}
 +
-+declare const GPUSupportedFeatures: {
++declare var GPUSupportedFeatures: {
 +  prototype: GPUSupportedFeatures;
 +  new (): GPUSupportedFeatures;
 +};
@@ -4777,7 +4777,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly minUniformBufferOffsetAlignment: number;
 +}
 +
-+declare const GPUSupportedLimits: {
++declare var GPUSupportedLimits: {
 +  prototype: GPUSupportedLimits;
 +  new (): GPUSupportedLimits;
 +};
@@ -4835,7 +4835,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  reset(): void;
 -}
 -
--declare const ImageDecoder: {
+-declare var ImageDecoder: {
 -  prototype: ImageDecoder;
 -  new (init: ImageDecoderInit): ImageDecoder;
 +  readonly mipLevelCount: GPUIntegerCoordinateOut;
@@ -4894,10 +4894,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  destroy(): void;
  }
  
--declare const ImageTrack: {
+-declare var ImageTrack: {
 -  prototype: ImageTrack;
 -  new (): ImageTrack;
-+declare const GPUTexture: {
++declare var GPUTexture: {
 +  prototype: GPUTexture;
 +  new (): GPUTexture;
  };
@@ -4939,10 +4939,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -}
 +interface GPUTextureView extends GPUObjectBase {}
  
--declare const ImageTrackList: {
+-declare var ImageTrackList: {
 -  prototype: ImageTrackList;
 -  new (): ImageTrackList;
-+declare const GPUTextureView: {
++declare var GPUTextureView: {
 +  prototype: GPUTextureView;
 +  new (): GPUTextureView;
  };
@@ -4988,10 +4988,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly error: GPUError;
  }
  
--declare const Lock: {
+-declare var Lock: {
 -  prototype: Lock;
 -  new (): Lock;
-+declare const GPUUncapturedErrorEvent: {
++declare var GPUUncapturedErrorEvent: {
 +  prototype: GPUUncapturedErrorEvent;
 +  new (
 +    type: string,
@@ -5010,7 +5010,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -interface LockManager {
 +interface GPUValidationError extends GPUError {}
 +
-+declare const GPUValidationError: {
++declare var GPUValidationError: {
 +  prototype: GPUValidationError;
 +  new (message: string): GPUValidationError;
 +};
@@ -5081,10 +5081,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
  }
  
--declare const LockManager: {
+-declare var LockManager: {
 -  prototype: LockManager;
 -  new (): LockManager;
-+declare const Headers: {
++declare var Headers: {
 +  prototype: Headers;
 +  new (init?: HeadersInit): Headers;
  };
@@ -5170,7 +5170,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  update(value: unknown): IDBRequest<IDBValidKey>;
  }
  
--declare const MediaCapabilities: {
+-declare var MediaCapabilities: {
 -  prototype: MediaCapabilities;
 -  new (): MediaCapabilities;
 -};
@@ -5182,10 +5182,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 - */
 -interface MediaSourceHandle {}
 -
--declare const MediaSourceHandle: {
+-declare var MediaSourceHandle: {
 -  prototype: MediaSourceHandle;
 -  new (): MediaSourceHandle;
-+declare const IDBCursor: {
++declare var IDBCursor: {
 +  prototype: IDBCursor;
 +  new (): IDBCursor;
  };
@@ -5213,7 +5213,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -declare const MediaStreamTrackProcessor: {
 -  prototype: MediaStreamTrackProcessor;
 -  new (init: MediaStreamTrackProcessorInit): MediaStreamTrackProcessor;
-+declare const IDBCursorWithValue: {
++declare var IDBCursorWithValue: {
 +  prototype: IDBCursorWithValue;
 +  new (): IDBCursorWithValue;
  };
@@ -5253,7 +5253,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  readonly port2: MessagePort;
 -}
 -
--declare const MessageChannel: {
+-declare var MessageChannel: {
 -  prototype: MessageChannel;
 -  new (): MessageChannel;
 -};
@@ -5334,7 +5334,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  ): void;
 -}
 -
--declare const MessageEvent: {
+-declare var MessageEvent: {
 -  prototype: MessageEvent;
 -  new <T>(type: string, eventInitDict?: MessageEventInit<T>): MessageEvent<T>;
 -};
@@ -5382,7 +5382,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  message: MessageEvent;
 -  messageerror: MessageEvent;
 -}
-+declare const IDBDatabase: {
++declare var IDBDatabase: {
 +  prototype: IDBDatabase;
 +  new (): IDBDatabase;
 +};
@@ -5452,10 +5452,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  open(name: string, version?: number): IDBOpenDBRequest;
  }
  
--declare const MessagePort: {
+-declare var MessagePort: {
 -  prototype: MessagePort;
 -  new (): MessagePort;
-+declare const IDBFactory: {
++declare var IDBFactory: {
 +  prototype: IDBFactory;
 +  new (): IDBFactory;
  };
@@ -5507,7 +5507,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  setHeaderValue(value: string): Promise<void>;
 -}
 -
--declare const NavigationPreloadManager: {
+-declare var NavigationPreloadManager: {
 -  prototype: NavigationPreloadManager;
 -  new (): NavigationPreloadManager;
 -};
@@ -5654,7 +5654,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): IDBRequest<IDBCursor | null>;
 +}
 +
-+declare const IDBIndex: {
++declare var IDBIndex: {
 +  prototype: IDBIndex;
 +  new (): IDBIndex;
 +};
@@ -5720,7 +5720,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  includes(key: unknown): boolean;
 +}
 +
-+declare const IDBKeyRange: {
++declare var IDBKeyRange: {
 +  prototype: IDBKeyRange;
 +  new (): IDBKeyRange;
    /**
@@ -5776,7 +5776,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  ): void;
 -}
 -
--declare const Notification: {
+-declare var Notification: {
 -  prototype: Notification;
 -  new (title: string, options?: NotificationOptions): Notification;
 +  only(value: unknown): IDBKeyRange;
@@ -6136,7 +6136,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  put(value: unknown, key?: IDBValidKey): IDBRequest<IDBValidKey>;
 +}
 +
-+declare const IDBObjectStore: {
++declare var IDBObjectStore: {
 +  prototype: IDBObjectStore;
 +  new (): IDBObjectStore;
 +};
@@ -6189,10 +6189,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
    ): void;
  }
  
--declare const OffscreenCanvas: {
+-declare var OffscreenCanvas: {
 -  prototype: OffscreenCanvas;
 -  new (width: number, height: number): OffscreenCanvas;
-+declare const IDBOpenDBRequest: {
++declare var IDBOpenDBRequest: {
 +  prototype: IDBOpenDBRequest;
 +  new (): IDBOpenDBRequest;
  };
@@ -6226,7 +6226,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  success: Event;
  }
  
--declare const OffscreenCanvasRenderingContext2D: {
+-declare var OffscreenCanvasRenderingContext2D: {
 -  prototype: OffscreenCanvasRenderingContext2D;
 -  new (): OffscreenCanvasRenderingContext2D;
 -};
@@ -6250,7 +6250,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  addPath(path: Path2D, transform?: DOMMatrix2DInit): void;
 -}
 -
--declare const Path2D: {
+-declare var Path2D: {
 -  prototype: Path2D;
 -  new (path?: Path2D | string): Path2D;
 -};
@@ -6332,7 +6332,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
 +}
 +
-+declare const IDBRequest: {
++declare var IDBRequest: {
 +  prototype: IDBRequest;
 +  new (): IDBRequest;
 +};
@@ -6455,10 +6455,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
    ): void;
  }
  
--declare const Performance: {
+-declare var Performance: {
 -  prototype: Performance;
 -  new (): Performance;
-+declare const IDBTransaction: {
++declare var IDBTransaction: {
 +  prototype: IDBTransaction;
 +  new (): IDBTransaction;
  };
@@ -6510,10 +6510,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly oldVersion: number;
  }
  
--declare const PerformanceEntry: {
+-declare var PerformanceEntry: {
 -  prototype: PerformanceEntry;
 -  new (): PerformanceEntry;
-+declare const IDBVersionChangeEvent: {
++declare var IDBVersionChangeEvent: {
 +  prototype: IDBVersionChangeEvent;
 +  new (
 +    type: string,
@@ -6540,7 +6540,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  readonly detail: unknown;
 -}
 -
--declare const PerformanceMark: {
+-declare var PerformanceMark: {
 -  prototype: PerformanceMark;
 -  new (markName: string, markOptions?: PerformanceMarkOptions): PerformanceMark;
 -};
@@ -6569,10 +6569,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  close(): void;
  }
  
--declare const PerformanceMeasure: {
+-declare var PerformanceMeasure: {
 -  prototype: PerformanceMeasure;
 -  new (): PerformanceMeasure;
-+declare const ImageBitmap: {
++declare var ImageBitmap: {
 +  prototype: ImageBitmap;
 +  new (): ImageBitmap;
  };
@@ -6609,7 +6609,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  transferFromImageBitmap(bitmap: ImageBitmap | null): void;
  }
  
--declare const PerformanceObserver: {
+-declare var PerformanceObserver: {
 -  prototype: PerformanceObserver;
 -  new (callback: PerformanceObserverCallback): PerformanceObserver;
 -  /**
@@ -6618,7 +6618,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceObserver/supportedEntryTypes_static)
 -   */
 -  readonly supportedEntryTypes: ReadonlyArray<string>;
-+declare const ImageBitmapRenderingContext: {
++declare var ImageBitmapRenderingContext: {
 +  prototype: ImageBitmapRenderingContext;
 +  new (): ImageBitmapRenderingContext;
  };
@@ -6667,10 +6667,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly width: number;
  }
  
--declare const PerformanceObserverEntryList: {
+-declare var PerformanceObserverEntryList: {
 -  prototype: PerformanceObserverEntryList;
 -  new (): PerformanceObserverEntryList;
-+declare const ImageData: {
++declare var ImageData: {
 +  prototype: ImageData;
 +  new (sw: number, sh: number, settings?: ImageDataSettings): ImageData;
 +  new (
@@ -6768,7 +6768,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  reset(): void;
 +}
 +
-+declare const ImageDecoder: {
++declare var ImageDecoder: {
 +  prototype: ImageDecoder;
 +  new (init: ImageDecoderInit): ImageDecoder;
    /**
@@ -6827,7 +6827,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  selected: boolean;
 +}
 +
-+declare const ImageTrack: {
++declare var ImageTrack: {
 +  prototype: ImageTrack;
 +  new (): ImageTrack;
 +};
@@ -6890,10 +6890,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  [index: number]: ImageTrack;
  }
  
--declare const PerformanceResourceTiming: {
+-declare var PerformanceResourceTiming: {
 -  prototype: PerformanceResourceTiming;
 -  new (): PerformanceResourceTiming;
-+declare const ImageTrackList: {
++declare var ImageTrackList: {
 +  prototype: ImageTrackList;
 +  new (): ImageTrackList;
  };
@@ -6942,7 +6942,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly name: string;
 +}
 +
-+declare const Lock: {
++declare var Lock: {
 +  prototype: Lock;
 +  new (): Lock;
 +};
@@ -6982,10 +6982,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): Promise<Awaited<T>>;
  }
  
--declare const PerformanceServerTiming: {
+-declare var PerformanceServerTiming: {
 -  prototype: PerformanceServerTiming;
 -  new (): PerformanceServerTiming;
-+declare const LockManager: {
++declare var LockManager: {
 +  prototype: LockManager;
 +  new (): LockManager;
  };
@@ -7055,10 +7055,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): Promise<MediaCapabilitiesEncodingInfo>;
  }
  
--declare const PermissionStatus: {
+-declare var PermissionStatus: {
 -  prototype: PermissionStatus;
 -  new (): PermissionStatus;
-+declare const MediaCapabilities: {
++declare var MediaCapabilities: {
 +  prototype: MediaCapabilities;
 +  new (): MediaCapabilities;
  };
@@ -7080,10 +7080,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -}
 +interface MediaSourceHandle {}
  
--declare const Permissions: {
+-declare var Permissions: {
 -  prototype: Permissions;
 -  new (): Permissions;
-+declare const MediaSourceHandle: {
++declare var MediaSourceHandle: {
 +  prototype: MediaSourceHandle;
 +  new (): MediaSourceHandle;
  };
@@ -7121,7 +7121,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly readable: ReadableStream;
  }
  
--declare const ProgressEvent: {
+-declare var ProgressEvent: {
 -  prototype: ProgressEvent;
 -  new (type: string, eventInitDict?: ProgressEventInit): ProgressEvent;
 +declare const MediaStreamTrackProcessor: {
@@ -7158,13 +7158,13 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly port2: MessagePort;
  }
  
--declare const PromiseRejectionEvent: {
+-declare var PromiseRejectionEvent: {
 -  prototype: PromiseRejectionEvent;
 -  new (
 -    type: string,
 -    eventInitDict: PromiseRejectionEventInit,
 -  ): PromiseRejectionEvent;
-+declare const MessageChannel: {
++declare var MessageChannel: {
 +  prototype: MessageChannel;
 +  new (): MessageChannel;
  };
@@ -7232,7 +7232,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  subscribe(options?: PushSubscriptionOptionsInit): Promise<PushSubscription>;
 -}
 -
--declare const PushManager: {
+-declare var PushManager: {
 -  prototype: PushManager;
 -  new (): PushManager;
 +  readonly ports: ReadonlyArray<MessagePort>;
@@ -7263,7 +7263,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
 +}
 +
-+declare const MessageEvent: {
++declare var MessageEvent: {
 +  prototype: MessageEvent;
 +  new <T>(type: string, eventInitDict?: MessageEventInit<T>): MessageEvent<T>;
 +};
@@ -7378,7 +7378,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -declare const PushMessageData: {
 -  prototype: PushMessageData;
 -  new (): PushMessageData;
-+declare const MessagePort: {
++declare var MessagePort: {
 +  prototype: MessagePort;
 +  new (): MessagePort;
  };
@@ -7443,10 +7443,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  setHeaderValue(value: string): Promise<void>;
  }
  
--declare const PushSubscription: {
+-declare var PushSubscription: {
 -  prototype: PushSubscription;
 -  new (): PushSubscription;
-+declare const NavigationPreloadManager: {
++declare var NavigationPreloadManager: {
 +  prototype: NavigationPreloadManager;
 +  new (): NavigationPreloadManager;
  };
@@ -7499,7 +7499,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly gpu: GPU;
  }
  
--declare const PushSubscriptionOptions: {
+-declare var PushSubscriptionOptions: {
 -  prototype: PushSubscriptionOptions;
 -  new (): PushSubscriptionOptions;
 -};
@@ -7717,10 +7717,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
    ): void;
  }
  
--declare const RTCDataChannel: {
+-declare var RTCDataChannel: {
 -  prototype: RTCDataChannel;
 -  new (): RTCDataChannel;
-+declare const Notification: {
++declare var Notification: {
 +  prototype: Notification;
 +  new (title: string, options?: NotificationOptions): Notification;
 +  /**
@@ -7762,7 +7762,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly notification: Notification;
  }
  
--declare const RTCEncodedAudioFrame: {
+-declare var RTCEncodedAudioFrame: {
 -  prototype: RTCEncodedAudioFrame;
 -  new (): RTCEncodedAudioFrame;
 +declare const NotificationEvent: {
@@ -7810,7 +7810,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  getMetadata(): RTCEncodedVideoFrameMetadata;
 -}
 -
--declare const RTCEncodedVideoFrame: {
+-declare var RTCEncodedVideoFrame: {
 -  prototype: RTCEncodedVideoFrame;
 -  new (): RTCEncodedVideoFrame;
 -};
@@ -8027,7 +8027,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly FRAMEBUFFER_INCOMPLETE_VIEW_TARGETS_OVR: 0x9633;
  }
  
--declare const ReadableByteStreamController: {
+-declare var ReadableByteStreamController: {
 -  prototype: ReadableByteStreamController;
 -  new (): ReadableByteStreamController;
 -};
@@ -8155,7 +8155,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
  }
  
--declare const ReadableStream: {
+-declare var ReadableStream: {
 -  prototype: ReadableStream;
 -  new (
 -    underlyingSource: UnderlyingByteSource,
@@ -8169,7 +8169,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -    underlyingSource?: UnderlyingSource<R>,
 -    strategy?: QueuingStrategy<R>,
 -  ): ReadableStream<R>;
-+declare const OffscreenCanvas: {
++declare var OffscreenCanvas: {
 +  prototype: OffscreenCanvas;
 +  new (width: number, height: number): OffscreenCanvas;
  };
@@ -8217,12 +8217,12 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly canvas: OffscreenCanvas;
  }
  
--declare const ReadableStreamBYOBReader: {
+-declare var ReadableStreamBYOBReader: {
 -  prototype: ReadableStreamBYOBReader;
 -  new (
 -    stream: ReadableStream<Uint8Array<ArrayBuffer>>,
 -  ): ReadableStreamBYOBReader;
-+declare const OffscreenCanvasRenderingContext2D: {
++declare var OffscreenCanvasRenderingContext2D: {
 +  prototype: OffscreenCanvasRenderingContext2D;
 +  new (): OffscreenCanvasRenderingContext2D;
  };
@@ -8259,10 +8259,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  addPath(path: Path2D, transform?: DOMMatrix2DInit): void;
  }
  
--declare const ReadableStreamBYOBRequest: {
+-declare var ReadableStreamBYOBRequest: {
 -  prototype: ReadableStreamBYOBRequest;
 -  new (): ReadableStreamBYOBRequest;
-+declare const Path2D: {
++declare var Path2D: {
 +  prototype: Path2D;
 +  new (path?: Path2D | string): Path2D;
  };
@@ -8321,7 +8321,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  error(e?: unknown): void;
 -}
 -
--declare const ReadableStreamDefaultController: {
+-declare var ReadableStreamDefaultController: {
 -  prototype: ReadableStreamDefaultController;
 -  new (): ReadableStreamDefaultController;
 -};
@@ -8415,10 +8415,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
  }
  
--declare const ReadableStreamDefaultReader: {
+-declare var ReadableStreamDefaultReader: {
 -  prototype: ReadableStreamDefaultReader;
 -  new <R = unknown>(stream: ReadableStream<R>): ReadableStreamDefaultReader<R>;
-+declare const Performance: {
++declare var Performance: {
 +  prototype: Performance;
 +  new (): Performance;
  };
@@ -8480,10 +8480,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
    toJSON(): unknown;
  }
  
--declare const Report: {
+-declare var Report: {
 -  prototype: Report;
 -  new (): Report;
-+declare const PerformanceEntry: {
++declare var PerformanceEntry: {
 +  prototype: PerformanceEntry;
 +  new (): PerformanceEntry;
  };
@@ -8508,10 +8508,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly detail: unknown;
  }
  
--declare const ReportBody: {
+-declare var ReportBody: {
 -  prototype: ReportBody;
 -  new (): ReportBody;
-+declare const PerformanceMark: {
++declare var PerformanceMark: {
 +  prototype: PerformanceMark;
 +  new (markName: string, markOptions?: PerformanceMarkOptions): PerformanceMark;
  };
@@ -8535,7 +8535,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly detail: unknown;
 +}
 +
-+declare const PerformanceMeasure: {
++declare var PerformanceMeasure: {
 +  prototype: PerformanceMeasure;
 +  new (): PerformanceMeasure;
 +};
@@ -8572,13 +8572,13 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  takeRecords(): PerformanceEntryList;
  }
  
--declare const ReportingObserver: {
+-declare var ReportingObserver: {
 -  prototype: ReportingObserver;
 -  new (
 -    callback: ReportingObserverCallback,
 -    options?: ReportingObserverOptions,
 -  ): ReportingObserver;
-+declare const PerformanceObserver: {
++declare var PerformanceObserver: {
 +  prototype: PerformanceObserver;
 +  new (callback: PerformanceObserverCallback): PerformanceObserver;
 +  /**
@@ -8627,7 +8627,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  getEntriesByType(type: string): PerformanceEntryList;
 +}
 +
-+declare const PerformanceObserverEntryList: {
++declare var PerformanceObserverEntryList: {
 +  prototype: PerformanceObserverEntryList;
 +  new (): PerformanceObserverEntryList;
 +};
@@ -8738,7 +8738,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  clone(): Request;
 -}
 -
--declare const Request: {
+-declare var Request: {
 -  prototype: Request;
 -  new (input: RequestInfo | URL, init?: RequestInit): Request;
 -};
@@ -8817,7 +8817,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  clone(): Response;
 -}
 -
--declare const Response: {
+-declare var Response: {
 -  prototype: Response;
 -  new (body?: BodyInit | null, init?: ResponseInit): Response;
 +  readonly serverTiming: ReadonlyArray<PerformanceServerTiming>;
@@ -8850,7 +8850,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  toJSON(): unknown;
 +}
 +
-+declare const PerformanceResourceTiming: {
++declare var PerformanceResourceTiming: {
 +  prototype: PerformanceResourceTiming;
 +  new (): PerformanceResourceTiming;
  };
@@ -8950,13 +8950,13 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  toJSON(): unknown;
  }
  
--declare const SecurityPolicyViolationEvent: {
+-declare var SecurityPolicyViolationEvent: {
 -  prototype: SecurityPolicyViolationEvent;
 -  new (
 -    type: string,
 -    eventInitDict?: SecurityPolicyViolationEventInit,
 -  ): SecurityPolicyViolationEvent;
-+declare const PerformanceServerTiming: {
++declare var PerformanceServerTiming: {
 +  prototype: PerformanceServerTiming;
 +  new (): PerformanceServerTiming;
  };
@@ -9036,10 +9036,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
    ): void;
  }
  
--declare const ServiceWorker: {
+-declare var ServiceWorker: {
 -  prototype: ServiceWorker;
 -  new (): ServiceWorker;
-+declare const PermissionStatus: {
++declare var PermissionStatus: {
 +  prototype: PermissionStatus;
 +  new (): PermissionStatus;
  };
@@ -9083,7 +9083,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  query(permissionDesc: PermissionDescriptor): Promise<PermissionStatus>;
 +}
 +
-+declare const Permissions: {
++declare var Permissions: {
 +  prototype: Permissions;
 +  new (): Permissions;
 +};
@@ -9128,7 +9128,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly total: number;
 +}
 +
-+declare const ProgressEvent: {
++declare var ProgressEvent: {
 +  prototype: ProgressEvent;
 +  new (type: string, eventInitDict?: ProgressEventInit): ProgressEvent;
 +};
@@ -9187,10 +9187,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly reason: unknown;
  }
  
--declare const ServiceWorkerContainer: {
+-declare var ServiceWorkerContainer: {
 -  prototype: ServiceWorkerContainer;
 -  new (): ServiceWorkerContainer;
-+declare const PromiseRejectionEvent: {
++declare var PromiseRejectionEvent: {
 +  prototype: PromiseRejectionEvent;
 +  new (
 +    type: string,
@@ -9317,7 +9317,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  subscribe(options?: PushSubscriptionOptionsInit): Promise<PushSubscription>;
 +}
 +
-+declare const PushManager: {
++declare var PushManager: {
 +  prototype: PushManager;
 +  new (): PushManager;
    /**
@@ -9501,7 +9501,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  unsubscribe(): Promise<boolean>;
 +}
 +
-+declare const PushSubscription: {
++declare var PushSubscription: {
 +  prototype: PushSubscription;
 +  new (): PushSubscription;
 +};
@@ -9570,10 +9570,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly userVisibleOnly: boolean;
  }
  
--declare const ServiceWorkerRegistration: {
+-declare var ServiceWorkerRegistration: {
 -  prototype: ServiceWorkerRegistration;
 -  new (): ServiceWorkerRegistration;
-+declare const PushSubscriptionOptions: {
++declare var PushSubscriptionOptions: {
 +  prototype: PushSubscriptionOptions;
 +  new (): PushSubscriptionOptions;
  };
@@ -9733,7 +9733,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -declare const SharedWorkerGlobalScope: {
 -  prototype: SharedWorkerGlobalScope;
 -  new (): SharedWorkerGlobalScope;
-+declare const RTCDataChannel: {
++declare var RTCDataChannel: {
 +  prototype: RTCDataChannel;
 +  new (): RTCDataChannel;
  };
@@ -9777,10 +9777,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  getMetadata(): RTCEncodedAudioFrameMetadata;
  }
  
--declare const StorageManager: {
+-declare var StorageManager: {
 -  prototype: StorageManager;
 -  new (): StorageManager;
-+declare const RTCEncodedAudioFrame: {
++declare var RTCEncodedAudioFrame: {
 +  prototype: RTCEncodedAudioFrame;
 +  new (): RTCEncodedAudioFrame;
  };
@@ -9840,10 +9840,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  getMetadata(): RTCEncodedVideoFrameMetadata;
  }
  
--declare const StylePropertyMapReadOnly: {
+-declare var StylePropertyMapReadOnly: {
 -  prototype: StylePropertyMapReadOnly;
 -  new (): StylePropertyMapReadOnly;
-+declare const RTCEncodedVideoFrame: {
++declare var RTCEncodedVideoFrame: {
 +  prototype: RTCEncodedVideoFrame;
 +  new (): RTCEncodedVideoFrame;
  };
@@ -10122,10 +10122,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  error(e?: unknown): void;
  }
  
--declare const SubtleCrypto: {
+-declare var SubtleCrypto: {
 -  prototype: SubtleCrypto;
 -  new (): SubtleCrypto;
-+declare const ReadableByteStreamController: {
++declare var ReadableByteStreamController: {
 +  prototype: ReadableByteStreamController;
 +  new (): ReadableByteStreamController;
  };
@@ -10149,7 +10149,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  decode(input?: AllowSharedBufferSource, options?: TextDecodeOptions): string;
 -}
 -
--declare const TextDecoder: {
+-declare var TextDecoder: {
 -  prototype: TextDecoder;
 -  new (label?: string, options?: TextDecoderOptions): TextDecoder;
 -};
@@ -10205,7 +10205,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  tee(): [ReadableStream<R>, ReadableStream<R>];
  }
  
-+declare const ReadableStream: {
++declare var ReadableStream: {
 +  prototype: ReadableStream;
 +  new (
 +    underlyingSource: UnderlyingByteSource,
@@ -10249,10 +10249,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  releaseLock(): void;
  }
  
--declare const TextDecoderStream: {
+-declare var TextDecoderStream: {
 -  prototype: TextDecoderStream;
 -  new (label?: string, options?: TextDecoderOptions): TextDecoderStream;
-+declare const ReadableStreamBYOBReader: {
++declare var ReadableStreamBYOBReader: {
 +  prototype: ReadableStreamBYOBReader;
 +  new (
 +    stream: ReadableStream<Uint8Array<ArrayBuffer>>,
@@ -10297,10 +10297,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  respondWithNewView(view: ArrayBufferView<ArrayBuffer>): void;
  }
  
--declare const TextEncoder: {
+-declare var TextEncoder: {
 -  prototype: TextEncoder;
 -  new (): TextEncoder;
-+declare const ReadableStreamBYOBRequest: {
++declare var ReadableStreamBYOBRequest: {
 +  prototype: ReadableStreamBYOBRequest;
 +  new (): ReadableStreamBYOBRequest;
  };
@@ -10341,7 +10341,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  error(e?: unknown): void;
  }
  
-+declare const ReadableStreamDefaultController: {
++declare var ReadableStreamDefaultController: {
 +  prototype: ReadableStreamDefaultController;
 +  new (): ReadableStreamDefaultController;
 +};
@@ -10373,10 +10373,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  releaseLock(): void;
  }
  
--declare const TextEncoderStream: {
+-declare var TextEncoderStream: {
 -  prototype: TextEncoderStream;
 -  new (): TextEncoderStream;
-+declare const ReadableStreamDefaultReader: {
++declare var ReadableStreamDefaultReader: {
 +  prototype: ReadableStreamDefaultReader;
 +  new <R = unknown>(stream: ReadableStream<R>): ReadableStreamDefaultReader<R>;
  };
@@ -10426,7 +10426,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  takeRecords(): ReportList;
 +}
 +
-+declare const ReportingObserver: {
++declare var ReportingObserver: {
 +  prototype: ReportingObserver;
 +  new (
 +    callback: ReportingObserverCallback,
@@ -10522,7 +10522,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  readonly width: number;
 -}
 -
--declare const TextMetrics: {
+-declare var TextMetrics: {
 -  prototype: TextMetrics;
 -  new (): TextMetrics;
 -};
@@ -10550,7 +10550,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  readonly writable: WritableStream<I>;
 -}
 -
--declare const TransformStream: {
+-declare var TransformStream: {
 -  prototype: TransformStream;
 -  new <I = unknown, O = unknown>(
 -    transformer?: Transformer<I, O>,
@@ -10604,10 +10604,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  clone(): Request;
  }
  
--declare const TransformStreamDefaultController: {
+-declare var TransformStreamDefaultController: {
 -  prototype: TransformStreamDefaultController;
 -  new (): TransformStreamDefaultController;
-+declare const Request: {
++declare var Request: {
 +  prototype: Request;
 +  new (input: RequestInfo | URL, init?: RequestInit): Request;
  };
@@ -10696,7 +10696,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  clone(): Response;
 +}
 +
-+declare const Response: {
++declare var Response: {
 +  prototype: Response;
 +  new (body?: BodyInit | null, init?: ResponseInit): Response;
    /**
@@ -10757,10 +10757,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  yield(): Promise<void>;
  }
  
--declare const URL: {
+-declare var URL: {
 -  prototype: URL;
 -  new (url: string | URL, base?: string | URL): URL;
-+declare const Scheduler: {
++declare var Scheduler: {
 +  prototype: Scheduler;
 +  new (): Scheduler;
 +};
@@ -10894,9 +10894,9 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly violatedDirective: string;
  }
  
--declare const URLSearchParams: {
+-declare var URLSearchParams: {
 -  prototype: URLSearchParams;
-+declare const SecurityPolicyViolationEvent: {
++declare var SecurityPolicyViolationEvent: {
 +  prototype: SecurityPolicyViolationEvent;
    new (
 -    init?:
@@ -10988,10 +10988,10 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
  }
  
--declare const VideoColorSpace: {
+-declare var VideoColorSpace: {
 -  prototype: VideoColorSpace;
 -  new (init?: VideoColorSpaceInit): VideoColorSpace;
-+declare const ServiceWorker: {
++declare var ServiceWorker: {
 +  prototype: ServiceWorker;
 +  new (): ServiceWorker;
  };
@@ -11123,7 +11123,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
    ): void;
  }
  
--declare const VideoDecoder: {
+-declare var VideoDecoder: {
 -  prototype: VideoDecoder;
 -  new (init: VideoDecoderInit): VideoDecoder;
 -  /**
@@ -11132,7 +11132,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoDecoder/isConfigSupported_static)
 -   */
 -  isConfigSupported(config: VideoDecoderConfig): Promise<VideoDecoderSupport>;
-+declare const ServiceWorkerContainer: {
++declare var ServiceWorkerContainer: {
 +  prototype: ServiceWorkerContainer;
 +  new (): ServiceWorkerContainer;
  };
@@ -11293,7 +11293,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
    ): void;
  }
  
--declare const VideoEncoder: {
+-declare var VideoEncoder: {
 -  prototype: VideoEncoder;
 -  new (init: VideoEncoderInit): VideoEncoder;
 -  /**
@@ -11454,7 +11454,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
 +}
 +
-+declare const ServiceWorkerRegistration: {
++declare var ServiceWorkerRegistration: {
 +  prototype: ServiceWorkerRegistration;
 +  new (): ServiceWorkerRegistration;
 +};
@@ -11527,7 +11527,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
  }
  
--declare const VideoFrame: {
+-declare var VideoFrame: {
 -  prototype: VideoFrame;
 -  new (image: CanvasImageSource, init?: VideoFrameInit): VideoFrame;
 -  new (data: AllowSharedBufferSource, init: VideoFrameBufferInit): VideoFrame;
@@ -11569,7 +11569,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  persisted(): Promise<boolean>;
  }
  
-+declare const StorageManager: {
++declare var StorageManager: {
 +  prototype: StorageManager;
 +  new (): StorageManager;
 +};
@@ -11648,7 +11648,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
  }
  
-+declare const StylePropertyMapReadOnly: {
++declare var StylePropertyMapReadOnly: {
 +  prototype: StylePropertyMapReadOnly;
 +  new (): StylePropertyMapReadOnly;
 +};
@@ -12070,7 +12070,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): Promise<ArrayBuffer>;
 +}
 +
-+declare const SubtleCrypto: {
++declare var SubtleCrypto: {
 +  prototype: SubtleCrypto;
 +  new (): SubtleCrypto;
 +};
@@ -12089,7 +12089,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  setPriority(priority: TaskPriority): void;
 +}
 +
-+declare const TaskController: {
++declare var TaskController: {
 +  prototype: TaskController;
 +  new (init?: TaskControllerInit): TaskController;
 +};
@@ -12108,7 +12108,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly previousPriority: TaskPriority;
 +}
 +
-+declare const TaskPriorityChangeEvent: {
++declare var TaskPriorityChangeEvent: {
 +  prototype: TaskPriorityChangeEvent;
 +  new (
 +    type: string,
@@ -12158,7 +12158,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
    ): void;
  }
  
-+declare const TaskSignal: {
++declare var TaskSignal: {
 +  prototype: TaskSignal;
 +  new (): TaskSignal;
 +  /**
@@ -12190,7 +12190,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  decode(input?: AllowSharedBufferSource, options?: TextDecodeOptions): string;
 +}
  
--declare const WebGL2RenderingContext: {
+-declare var WebGL2RenderingContext: {
 -  prototype: WebGL2RenderingContext;
 -  new (): WebGL2RenderingContext;
 -  readonly READ_BUFFER: 0x0c02;
@@ -12256,7 +12256,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 -  readonly SAMPLER_3D: 0x8b5f;
 -  readonly SAMPLER_2D_SHADOW: 0x8b62;
 -  readonly FRAGMENT_SHADER_DERIVATIVE_HINT: 0x8b8b;
-+declare const TextDecoder: {
++declare var TextDecoder: {
 +  prototype: TextDecoder;
 +  new (label?: string, options?: TextDecoderOptions): TextDecoder;
 +};
@@ -12294,7 +12294,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly writable: WritableStream<BufferSource>;
 +}
 +
-+declare const TextDecoderStream: {
++declare var TextDecoderStream: {
 +  prototype: TextDecoderStream;
 +  new (label?: string, options?: TextDecoderOptions): TextDecoderStream;
 +};
@@ -12322,7 +12322,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): TextEncoderEncodeIntoResult;
 +}
 +
-+declare const TextEncoder: {
++declare var TextEncoder: {
 +  prototype: TextEncoder;
 +  new (): TextEncoder;
 +};
@@ -12348,7 +12348,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly writable: WritableStream<string>;
 +}
 +
-+declare const TextEncoderStream: {
++declare var TextEncoderStream: {
 +  prototype: TextEncoderStream;
 +  new (): TextEncoderStream;
 +};
@@ -12433,7 +12433,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly width: number;
 +}
 +
-+declare const TextMetrics: {
++declare var TextMetrics: {
 +  prototype: TextMetrics;
 +  new (): TextMetrics;
 +};
@@ -12458,7 +12458,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  readonly writable: WritableStream<I>;
 +}
 +
-+declare const TransformStream: {
++declare var TransformStream: {
 +  prototype: TransformStream;
 +  new <I = unknown, O = unknown>(
 +    transformer?: Transformer<I, O>,
@@ -12499,7 +12499,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  terminate(): void;
 +}
 +
-+declare const TransformStreamDefaultController: {
++declare var TransformStreamDefaultController: {
 +  prototype: TransformStreamDefaultController;
 +  new (): TransformStreamDefaultController;
 +};
@@ -12591,7 +12591,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  toJSON(): string;
 +}
 +
-+declare const URL: {
++declare var URL: {
 +  prototype: URL;
 +  new (url: string | URL, base?: string | URL): URL;
 +  /**
@@ -12697,7 +12697,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  test(input?: URLPatternInput, baseURL?: string | URL): boolean;
 +}
 +
-+declare const URLPattern: {
++declare var URLPattern: {
 +  prototype: URLPattern;
 +  new (
 +    input: URLPatternInput,
@@ -12768,7 +12768,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
 +}
 +
-+declare const URLSearchParams: {
++declare var URLSearchParams: {
 +  prototype: URLSearchParams;
 +  new (
 +    init?:
@@ -12817,7 +12817,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  toJSON(): VideoColorSpaceInit;
 +}
 +
-+declare const VideoColorSpace: {
++declare var VideoColorSpace: {
 +  prototype: VideoColorSpace;
 +  new (init?: VideoColorSpaceInit): VideoColorSpace;
 +};
@@ -12899,7 +12899,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
 +}
 +
-+declare const VideoDecoder: {
++declare var VideoDecoder: {
 +  prototype: VideoDecoder;
 +  new (init: VideoDecoderInit): VideoDecoder;
 +  /**
@@ -12987,7 +12987,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
 +}
 +
-+declare const VideoEncoder: {
++declare var VideoEncoder: {
 +  prototype: VideoEncoder;
 +  new (init: VideoEncoderInit): VideoEncoder;
 +  /**
@@ -13093,7 +13093,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): Promise<readonly PlaneLayout[]>;
 +}
 +
-+declare const VideoFrame: {
++declare var VideoFrame: {
 +  prototype: VideoFrame;
 +  new (image: CanvasImageSource, init?: VideoFrameInit): VideoFrame;
 +  new (data: AllowSharedBufferSource, init: VideoFrameBufferInit): VideoFrame;
@@ -13399,7 +13399,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +  ): void;
 +}
 +
-+declare const WGSLLanguageFeatures: {
++declare var WGSLLanguageFeatures: {
 +  prototype: WGSLLanguageFeatures;
 +  new (): WGSLLanguageFeatures;
 +};
@@ -13415,7 +13415,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
 +    WebGL2RenderingContextOverloads,
 +    WebGLRenderingContextBase {}
 +
-+declare const WebGL2RenderingContext: {
++declare var WebGL2RenderingContext: {
 +  prototype: WebGL2RenderingContext;
 +  new (): WebGL2RenderingContext;
 +  readonly READ_BUFFER: 0x0c02;
@@ -13514,7 +13514,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLActiveInfo/type)
     */
-@@ -12312,7 +14333,7 @@ declare const WebGLActiveInfo: {
+@@ -12312,7 +14333,7 @@ declare var WebGLActiveInfo: {
  };
  
  /**
@@ -13523,7 +13523,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLBuffer)
   */
-@@ -12324,7 +14345,7 @@ declare const WebGLBuffer: {
+@@ -12324,7 +14345,7 @@ declare var WebGLBuffer: {
  };
  
  /**
@@ -13532,7 +13532,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLContextEvent)
   */
-@@ -12343,7 +14364,7 @@ declare const WebGLContextEvent: {
+@@ -12343,7 +14364,7 @@ declare var WebGLContextEvent: {
  };
  
  /**
@@ -13541,7 +13541,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLFramebuffer)
   */
-@@ -12367,7 +14388,7 @@ declare const WebGLProgram: {
+@@ -12367,7 +14388,7 @@ declare var WebGLProgram: {
  };
  
  /**
@@ -13550,7 +13550,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLQuery)
   */
-@@ -12379,7 +14400,7 @@ declare const WebGLQuery: {
+@@ -12379,7 +14400,7 @@ declare var WebGLQuery: {
  };
  
  /**
@@ -13559,7 +13559,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderbuffer)
   */
-@@ -12391,7 +14412,7 @@ declare const WebGLRenderbuffer: {
+@@ -12391,7 +14412,7 @@ declare var WebGLRenderbuffer: {
  };
  
  /**
@@ -13584,7 +13584,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/getFramebufferAttachmentParameter) */
    getFramebufferAttachmentParameter(
      target: GLenum,
-@@ -13587,7 +15608,7 @@ declare const WebGLSampler: {
+@@ -13587,7 +15608,7 @@ declare var WebGLSampler: {
  };
  
  /**
@@ -13593,7 +13593,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLShader)
   */
-@@ -13599,7 +15620,7 @@ declare const WebGLShader: {
+@@ -13599,7 +15620,7 @@ declare var WebGLShader: {
  };
  
  /**
@@ -13602,7 +13602,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLShaderPrecisionFormat)
   */
-@@ -13642,7 +15663,7 @@ declare const WebGLSync: {
+@@ -13642,7 +15663,7 @@ declare var WebGLSync: {
  };
  
  /**
@@ -13611,7 +13611,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLTexture)
   */
-@@ -13654,7 +15675,7 @@ declare const WebGLTexture: {
+@@ -13654,7 +15675,7 @@ declare var WebGLTexture: {
  };
  
  /**
@@ -13620,7 +13620,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLTransformFeedback)
   */
-@@ -13666,7 +15687,7 @@ declare const WebGLTransformFeedback: {
+@@ -13666,7 +15687,7 @@ declare var WebGLTransformFeedback: {
  };
  
  /**
@@ -13709,7 +13709,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransport/incomingUnidirectionalStreams)
     */
-@@ -13863,7 +15884,7 @@ declare const WebTransport: {
+@@ -13863,7 +15884,7 @@ declare var WebTransport: {
  };
  
  /**
@@ -13718,7 +13718,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   * Available only in secure contexts.
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransportBidirectionalStream)
-@@ -13889,14 +15910,14 @@ declare const WebTransportBidirectionalStream: {
+@@ -13889,14 +15910,14 @@ declare var WebTransportBidirectionalStream: {
  };
  
  /**
@@ -13773,7 +13773,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransportError/streamErrorCode)
     */
-@@ -13967,31 +15992,31 @@ declare const WebTransportError: {
+@@ -13967,31 +15992,31 @@ declare var WebTransportError: {
  };
  
  /**
@@ -13992,7 +13992,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/getWriter)
     */
-@@ -14356,7 +16384,7 @@ declare const WritableStream: {
+@@ -14356,7 +16384,7 @@ declare var WritableStream: {
  };
  
  /**
@@ -14010,7 +14010,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController/error)
     */
-@@ -14381,49 +16409,49 @@ declare const WritableStreamDefaultController: {
+@@ -14381,49 +16409,49 @@ declare var WritableStreamDefaultController: {
  };
  
  /**
@@ -14169,7 +14169,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequestEventTarget)
   */
-@@ -14650,7 +16678,7 @@ declare const XMLHttpRequestEventTarget: {
+@@ -14650,7 +16678,7 @@ declare var XMLHttpRequestEventTarget: {
  };
  
  /**
@@ -14178,7 +14178,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequestUpload)
   */
-@@ -14689,6 +16717,7 @@ declare const XMLHttpRequestUpload: {
+@@ -14689,6 +16717,7 @@ declare var XMLHttpRequestUpload: {
  };
  
  declare namespace WebAssembly {
@@ -14659,14 +14659,14 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/location)
   */
- declare const location: WorkerLocation;
+ declare var location: WorkerLocation;
  /**
 - * The **`navigator`** read-only property of the WorkerGlobalScope interface returns the WorkerNavigator associated with the worker.
 + * The **`navigator`** read-only property of the WorkerGlobalScope interface returns the WorkerNavigator associated with the worker. It is a specific navigator object, mostly a subset of the Navigator for browsing scopes, but adapted to workers.
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/navigator)
   */
-@@ -15158,19 +17330,19 @@ declare const onunhandledrejection:
+@@ -15158,19 +17330,19 @@ declare var onunhandledrejection:
    | ((this: DedicatedWorkerGlobalScope, ev: PromiseRejectionEvent) => unknown)
    | null;
  /**
@@ -14675,7 +14675,7 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/self)
   */
- declare const self: WorkerGlobalScope & typeof globalThis;
+ declare var self: WorkerGlobalScope & typeof globalThis;
  /**
 - * The **`importScripts()`** method of the WorkerGlobalScope interface synchronously imports one or more scripts into the worker's scope.
 + * The **`importScripts()`** method of the WorkerGlobalScope interface synchronously imports one or more scripts into the scope of a classic worker (a worker constructed from a classic script).
@@ -14689,12 +14689,12 @@ index 10064f7e7b88a6b4eded6f77f36cfd082f674aa1..48134ef46afd36e5b7dbb08cf86bf5b4
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)
   */
-@@ -15195,6 +17367,8 @@ declare const isSecureContext: boolean;
- declare const origin: string;
+@@ -15195,6 +17367,8 @@ declare var isSecureContext: boolean;
+ declare var origin: string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/performance) */
- declare const performance: Performance;
+ declare var performance: Performance;
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/scheduler) */
-+declare const scheduler: Scheduler;
++declare var scheduler: Scheduler;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/atob) */
  declare function atob(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
