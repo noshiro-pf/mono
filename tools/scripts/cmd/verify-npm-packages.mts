@@ -721,10 +721,7 @@ const siblingOverrides = (
  * checkout — a version that does not have it. Removing the entry then only
  * pins the breakage. Wait for the release that fixes it.
  */
-const notYetPublished: ReadonlySet<string> = new Set([
-  'pr-merge-queue',
-  'pr-report-core',
-]);
+const notYetPublished: ReadonlySet<string> = new Set();
 
 /**
  * The published space pins an exact version, committed, rather than tracking
