@@ -1,0 +1,9 @@
+{
+  "name": "verify-pr-report-core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "pr-report-core": "0.0.5"
+  }
+}
