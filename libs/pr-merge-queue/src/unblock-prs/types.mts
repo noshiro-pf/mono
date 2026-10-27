@@ -208,6 +208,12 @@ export type Triage = Readonly<{
   bypass: ReadonlyMap<number, string>;
   /** Up to date with checks still running, or clean and about to merge. */
   inFlight: readonly PullRequest[];
+  /**
+   * Released pull requests — no `skip-ci` — whose checks could not be read:
+   * in flight as far as anything here can tell, so nothing else is released
+   * while there are any.
+   */
+  unreadReleased: readonly PullRequest[];
   /** Up to date, but a required check has failed. */
   failing: readonly Failing[];
   /**

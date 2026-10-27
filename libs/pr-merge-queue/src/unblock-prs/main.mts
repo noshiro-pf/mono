@@ -636,6 +636,17 @@ const runCycle = async (
     };
   }
 
+  // One whose checks could not be read may be running a matrix as much as
+  // one in flight is, and releasing another beside it starts a second; the
+  // next survey reads them again.
+  if (Arr.isNonEmpty(triaged.unreadReleased)) {
+    log(
+      `${triaged.unreadReleased.map((pr) => `#${pr.number}`).join(', ')}: released, and its checks could not be read; releasing nothing else until they can be.`,
+    );
+
+    return { state: state(mut_skipped), next: 'idle', settled: skipped };
+  }
+
   // Only when the queue has nothing to do: `main` is about to move again
   // otherwise, and a push now would be undone by the next merge.
   if (Arr.isEmpty(triaged.candidates)) {
