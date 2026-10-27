@@ -23,6 +23,9 @@ ignorePaths:
   # prose, so every one of them would otherwise need its own `words` entry.
   # The README beside them is prose and stays checked.
   - 'repo-settings/variables/**/*.json'
+  # GitHub's GraphQL schema, vendored verbatim; the README beside it is
+  # checked.
+  - tools/configs/github-graphql/schema.docs.graphql
   - '**/prior-art-research.md'
   - '**/prior-art-and-design-rationale.mdx'
   # --- mono-specific ---

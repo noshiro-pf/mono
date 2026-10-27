@@ -1012,7 +1012,7 @@ const referencedOf = (
         url: node.url,
         status: referenceStatusOf({
           kind: 'pull-request',
-          state: node.state,
+          state: node.pullRequestState,
           merged: node.merged,
         }),
       } as const);

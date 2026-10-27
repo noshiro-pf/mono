@@ -11,3 +11,6 @@ strict-lib
 # byte-for-byte (a formatter rewrite would erase what a fixture checks, e.g.
 # a `<T,>` trailing comma). See languages/sumi/docs/decisions.md (D-9).
 languages/sumi/conformance/fixtures
+# GitHub's GraphQL schema, vendored verbatim so that a refresh is a clean diff
+# against GitHub's copy. See tools/configs/github-graphql/README.md.
+tools/configs/github-graphql/schema.docs.graphql
