@@ -1,5 +1,5 @@
 diff --git a/v5.4/output/lib-files/lib.webworker.d.ts b/v5.5/output/lib-files/lib.webworker.d.ts
-index 0a863e4bcd9eddbd72c3149a069d38190874e1c7..d1ffded7404df9db20940cd794ded19487883615 100644
+index 2d27a9a77940b4327adae123befabede80e15a68..c03c1a0aae55648e2e0860c19a2221adf334277d 100644
 --- a/v5.4/output/lib-files/lib.webworker.d.ts
 +++ b/v5.5/output/lib-files/lib.webworker.d.ts
 @@ -555,6 +555,17 @@ interface ReadableStreamGetReaderOptions {
@@ -43,7 +43,7 @@ index 0a863e4bcd9eddbd72c3149a069d38190874e1c7..d1ffded7404df9db20940cd794ded194
  }
  
  interface StorageEstimate {
-@@ -1005,6 +1016,8 @@ declare const AbortSignal: {
+@@ -1005,6 +1016,8 @@ declare var AbortSignal: {
    new (): AbortSignal;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_static) */
    abort(reason?: unknown): AbortSignal;

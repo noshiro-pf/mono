@@ -22,6 +22,10 @@
     // Legacy monorepo contents, outside the pnpm workspace. Its dependencies
     // are never installed, so the `./**/configs/**/*.ts` include above would
     // otherwise surface hundreds of unresolvable-import errors.
-    "experimental"
+    "experimental",
+    // Checked against the generated strict library by the harnesses'
+    // `tsconfig.lib-check*.json`; its assertions (`globalThis.NaN` is an error
+    // there) fail against the stock library this program loads.
+    "strict-lib/configs/tsconfig/lib-check-entry.ts"
   ]
 }

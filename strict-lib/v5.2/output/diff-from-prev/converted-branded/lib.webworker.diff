@@ -1,5 +1,5 @@
 diff --git a/v5.1/output/lib-files-branded/lib.webworker.d.ts b/v5.2/output/lib-files-branded/lib.webworker.d.ts
-index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a80be7cd66 100644
+index e91c5f3dc8f9f02f3f9f8c53ad665f2f6f82496d..699fb266fd13361c13327c68623ff1abed126302 100644
 --- a/v5.1/output/lib-files-branded/lib.webworker.d.ts
 +++ b/v5.2/output/lib-files-branded/lib.webworker.d.ts
 @@ -459,7 +459,7 @@ interface NotificationOptions {
@@ -64,7 +64,7 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
    credentials?: RequestCredentials;
    name?: string;
 @@ -984,9 +1009,9 @@ interface AbortSignal extends EventTarget {
- declare const AbortSignal: {
+ declare var AbortSignal: {
    prototype: AbortSignal;
    new (): AbortSignal;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort) */
@@ -85,7 +85,7 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
    restore(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/save) */
 @@ -2348,7 +2375,7 @@ interface DOMPoint extends DOMPointReadOnly {
- declare const DOMPoint: {
+ declare var DOMPoint: {
    prototype: DOMPoint;
    new (x?: number, y?: number, z?: number, w?: number): DOMPoint;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPoint/fromPoint) */
@@ -94,7 +94,7 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
  };
  
 @@ -2371,7 +2398,7 @@ interface DOMPointReadOnly {
- declare const DOMPointReadOnly: {
+ declare var DOMPointReadOnly: {
    prototype: DOMPointReadOnly;
    new (x?: number, y?: number, z?: number, w?: number): DOMPointReadOnly;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPointReadOnly/fromPoint) */
@@ -102,7 +102,7 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
    fromPoint(other?: DOMPointInit): DOMPointReadOnly;
  };
  
-@@ -2445,7 +2472,7 @@ declare const DOMRectReadOnly: {
+@@ -2445,7 +2472,7 @@ declare var DOMRectReadOnly: {
      width?: number,
      height?: number,
    ): DOMRectReadOnly;
@@ -140,7 +140,7 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/has) */
    has(name: string): boolean;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/set) */
-@@ -3841,7 +3876,7 @@ declare const IDBKeyRange: {
+@@ -3841,7 +3876,7 @@ declare var IDBKeyRange: {
    /**
     * Returns a new IDBKeyRange spanning from lower to upper. If lowerOpen is true, lower is not included in the range. If upperOpen is true, upper is not included in the range.
     *
@@ -149,7 +149,7 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
     */
    bound(
      lower: unknown,
-@@ -3852,19 +3887,19 @@ declare const IDBKeyRange: {
+@@ -3852,19 +3887,19 @@ declare var IDBKeyRange: {
    /**
     * Returns a new IDBKeyRange starting at key with no upper bound. If open is true, key is not included in the range.
     *
@@ -182,7 +182,7 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
    readonly tag: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/title) */
 @@ -4710,7 +4747,7 @@ interface Notification extends EventTarget {
- declare const Notification: {
+ declare var Notification: {
    prototype: Notification;
    new (title: string, options?: NotificationOptions): Notification;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/permission) */
@@ -191,7 +191,7 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
  };
  
 @@ -5127,7 +5164,7 @@ interface PerformanceObserver {
- declare const PerformanceObserver: {
+ declare var PerformanceObserver: {
    prototype: PerformanceObserver;
    new (callback: PerformanceObserverCallback): PerformanceObserver;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceObserver/supportedEntryTypes) */
@@ -200,7 +200,7 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
  };
  
 @@ -5342,7 +5379,7 @@ interface PushManager {
- declare const PushManager: {
+ declare var PushManager: {
    prototype: PushManager;
    new (): PushManager;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PushManager/supportedContentEncodings) */
@@ -209,7 +209,7 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
  };
  
 @@ -5730,9 +5767,11 @@ interface Response extends Body {
- declare const Response: {
+ declare var Response: {
    prototype: Response;
    new (body?: BodyInit | null, init?: ResponseInit): Response;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/error) */
@@ -238,9 +238,9 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
 +  decode(input?: AllowSharedBufferSource, options?: TextDecodeOptions): string;
  }
  
- declare const TextDecoder: {
+ declare var TextDecoder: {
 @@ -6555,14 +6593,18 @@ interface URL {
- declare const URL: {
+ declare var URL: {
    prototype: URL;
    new (url: string | URL, base?: string | URL): URL;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/createObjectURL) */
@@ -278,7 +278,7 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
    /**
     * Sets the value associated to a given search parameter to the given value. If there were several values, delete the others.
     *
-@@ -10115,6 +10157,100 @@ declare const WebSocket: {
+@@ -10115,6 +10157,100 @@ declare var WebSocket: {
    readonly CLOSED: 3;
  };
  
@@ -310,7 +310,7 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
 +  ): Promise<WritableStream>;
 +}
 +
-+declare const WebTransport: {
++declare var WebTransport: {
 +  prototype: WebTransport;
 +  new (url: string | URL, options?: WebTransportOptions): WebTransport;
 +};
@@ -327,7 +327,7 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
 +  readonly writable: WritableStream;
 +}
 +
-+declare const WebTransportBidirectionalStream: {
++declare var WebTransportBidirectionalStream: {
 +  prototype: WebTransportBidirectionalStream;
 +  new (): WebTransportBidirectionalStream;
 +};
@@ -354,7 +354,7 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
 +  readonly writable: WritableStream;
 +}
 +
-+declare const WebTransportDatagramDuplexStream: {
++declare var WebTransportDatagramDuplexStream: {
 +  prototype: WebTransportDatagramDuplexStream;
 +  new (): WebTransportDatagramDuplexStream;
 +};
@@ -371,7 +371,7 @@ index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a8
 +  readonly streamErrorCode: number | null;
 +}
 +
-+declare const WebTransportError: {
++declare var WebTransportError: {
 +  prototype: WebTransportError;
 +  new (message?: string, options?: WebTransportErrorOptions): WebTransportError;
 +};

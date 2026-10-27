@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.dom.d.ts b/v6.0/output/lib-files/lib.dom.d.ts
-index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da897e9d4c 100644
+index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae66181fde4601 100644
 --- a/v5.9/output/lib-files/lib.dom.d.ts
 +++ b/v6.0/output/lib-files/lib.dom.d.ts
 @@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
@@ -1004,7 +1004,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/throwIfAborted)
     */
-@@ -2808,13 +3437,13 @@ declare const AbortSignal: {
+@@ -2808,13 +3437,13 @@ declare var AbortSignal: {
    prototype: AbortSignal;
    new (): AbortSignal;
    /**
@@ -1020,7 +1020,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static)
     */
-@@ -2828,13 +3457,13 @@ declare const AbortSignal: {
+@@ -2828,13 +3457,13 @@ declare var AbortSignal: {
  };
  
  /**
@@ -1511,7 +1511,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioData/copyTo)
     */
-@@ -3718,13 +4359,13 @@ declare const AudioDecoder: {
+@@ -3718,13 +4359,13 @@ declare var AudioDecoder: {
  };
  
  /**
@@ -1527,7 +1527,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioDestinationNode/maxChannelCount)
     */
-@@ -3825,67 +4466,67 @@ declare const AudioEncoder: {
+@@ -3825,67 +4466,67 @@ declare var AudioEncoder: {
  };
  
  /**
@@ -2173,7 +2173,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/text)
     */
-@@ -4725,7 +5366,7 @@ declare const Blob: {
+@@ -4725,7 +5366,7 @@ declare var Blob: {
  };
  
  /**
@@ -2223,7 +2223,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BroadcastChannel/postMessage)
     */
-@@ -4858,7 +5499,7 @@ declare const ByteLengthQueuingStrategy: {
+@@ -4858,7 +5499,7 @@ declare var ByteLengthQueuingStrategy: {
  };
  
  /**
@@ -2483,7 +2483,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSGroupingRule/insertRule)
     */
-@@ -5242,7 +5798,7 @@ declare const CSSImageValue: {
+@@ -5242,7 +5798,7 @@ declare var CSSImageValue: {
   */
  interface CSSImportRule extends CSSRule {
    /**
@@ -2575,7 +2575,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSLayerStatementRule/nameList)
     */
-@@ -5428,13 +5984,13 @@ declare const CSSMathClamp: {
+@@ -5428,13 +5984,13 @@ declare var CSSMathClamp: {
  };
  
  /**
@@ -2591,7 +2591,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathInvert/value)
     */
-@@ -5447,13 +6003,13 @@ declare const CSSMathInvert: {
+@@ -5447,13 +6003,13 @@ declare var CSSMathInvert: {
  };
  
  /**
@@ -2607,7 +2607,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathMax/values)
     */
-@@ -5466,13 +6022,13 @@ declare const CSSMathMax: {
+@@ -5466,13 +6022,13 @@ declare var CSSMathMax: {
  };
  
  /**
@@ -2623,7 +2623,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathMin/values)
     */
-@@ -5485,13 +6041,13 @@ declare const CSSMathMin: {
+@@ -5485,13 +6041,13 @@ declare var CSSMathMin: {
  };
  
  /**
@@ -2639,7 +2639,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathNegate/value)
     */
-@@ -5504,13 +6060,13 @@ declare const CSSMathNegate: {
+@@ -5504,13 +6060,13 @@ declare var CSSMathNegate: {
  };
  
  /**
@@ -2655,7 +2655,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathProduct/values)
     */
-@@ -5523,7 +6079,7 @@ declare const CSSMathProduct: {
+@@ -5523,7 +6079,7 @@ declare var CSSMathProduct: {
  };
  
  /**
@@ -2664,7 +2664,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathSum)
   */
-@@ -5548,7 +6104,7 @@ declare const CSSMathSum: {
+@@ -5548,7 +6104,7 @@ declare var CSSMathSum: {
   */
  interface CSSMathValue extends CSSNumericValue {
    /**
@@ -2673,7 +2673,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathValue/operator)
     */
-@@ -5561,13 +6117,13 @@ declare const CSSMathValue: {
+@@ -5561,13 +6117,13 @@ declare var CSSMathValue: {
  };
  
  /**
@@ -2689,7 +2689,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMatrixComponent/matrix)
     */
-@@ -5589,7 +6145,7 @@ declare const CSSMatrixComponent: {
+@@ -5589,7 +6145,7 @@ declare var CSSMatrixComponent: {
   */
  interface CSSMediaRule extends CSSConditionRule {
    /**
@@ -2716,7 +2716,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericArray/length)
     */
-@@ -5682,61 +6238,61 @@ declare const CSSNumericArray: {
+@@ -5682,61 +6238,61 @@ declare var CSSNumericArray: {
   */
  interface CSSNumericValue extends CSSStyleValue {
    /**
@@ -2788,7 +2788,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/type)
     */
-@@ -5747,13 +6303,46 @@ declare const CSSNumericValue: {
+@@ -5747,13 +6303,46 @@ declare var CSSNumericValue: {
    prototype: CSSNumericValue;
    new (): CSSNumericValue;
    /**
@@ -2836,7 +2836,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
  /**
   * **`CSSPageRule`** represents a single CSS @page rule.
   *
-@@ -5761,17 +6350,17 @@ declare const CSSNumericValue: {
+@@ -5761,17 +6350,17 @@ declare var CSSNumericValue: {
   */
  interface CSSPageRule extends CSSGroupingRule {
    /**
@@ -2873,7 +2873,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSPerspective/length)
     */
-@@ -5799,6 +6388,185 @@ declare const CSSPerspective: {
+@@ -5799,6 +6388,185 @@ declare var CSSPerspective: {
    new (length: CSSPerspectiveValue): CSSPerspective;
  };
  
@@ -3096,7 +3096,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSRotate/z)
     */
-@@ -5880,7 +6648,7 @@ declare const CSSRotate: {
+@@ -5880,7 +6648,7 @@ declare var CSSRotate: {
  };
  
  /**
@@ -3185,7 +3185,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSScale/z)
     */
-@@ -6005,13 +6775,13 @@ declare const CSSScale: {
+@@ -6005,13 +6775,13 @@ declare var CSSScale: {
   */
  interface CSSScopeRule extends CSSGroupingRule {
    /**
@@ -3224,7 +3224,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSSkew/ay)
     */
-@@ -6049,13 +6819,13 @@ declare const CSSSkew: {
+@@ -6049,13 +6819,13 @@ declare var CSSSkew: {
  };
  
  /**
@@ -3240,7 +3240,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSSkewX/ax)
     */
-@@ -6068,13 +6838,13 @@ declare const CSSSkewX: {
+@@ -6068,13 +6838,13 @@ declare var CSSSkewX: {
  };
  
  /**
@@ -5720,7 +5720,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  toString(): string;
 -}
 -
--declare const CSSStyleValue: {
+-declare var CSSStyleValue: {
 -  prototype: CSSStyleValue;
 -  new (): CSSStyleValue;
 +  insetBlockStart: string;
@@ -5782,7 +5782,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  toString(): string;
 -}
 -
--declare const CSSTransformComponent: {
+-declare var CSSTransformComponent: {
 -  prototype: CSSTransformComponent;
 -  new (): CSSTransformComponent;
 -};
@@ -5831,7 +5831,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  [index: number]: CSSTransformComponent;
 -}
 -
--declare const CSSTransformValue: {
+-declare var CSSTransformValue: {
 -  prototype: CSSTransformValue;
 -  new (transforms: readonly CSSTransformComponent[]): CSSTransformValue;
 -};
@@ -5913,7 +5913,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  z: CSSNumericValue;
 -}
 -
--declare const CSSTranslate: {
+-declare var CSSTranslate: {
 -  prototype: CSSTranslate;
 -  new (
 -    x: CSSNumericValue,
@@ -5948,7 +5948,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  value: number;
 -}
 -
--declare const CSSUnitValue: {
+-declare var CSSUnitValue: {
 -  prototype: CSSUnitValue;
 -  new (value: number, unit: string): CSSUnitValue;
 -};
@@ -5979,7 +5979,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  [index: number]: CSSUnparsedSegment;
 -}
 -
--declare const CSSUnparsedValue: {
+-declare var CSSUnparsedValue: {
 -  prototype: CSSUnparsedValue;
 -  new (members: readonly CSSUnparsedSegment[]): CSSUnparsedValue;
 -};
@@ -6010,7 +6010,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  variable: string;
 -}
 -
--declare const CSSVariableReferenceValue: {
+-declare var CSSVariableReferenceValue: {
 -  prototype: CSSVariableReferenceValue;
 -  new (
 -    variable: string,
@@ -6112,7 +6112,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  put(request: RequestInfo | URL, response: Response): Promise<void>;
 -}
 -
--declare const Cache: {
+-declare var Cache: {
 -  prototype: Cache;
 -  new (): Cache;
 -};
@@ -6174,7 +6174,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  open(cacheName: string): Promise<Cache>;
 -}
 -
--declare const CacheStorage: {
+-declare var CacheStorage: {
 -  prototype: CacheStorage;
 -  new (): CacheStorage;
 -};
@@ -6343,7 +6343,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  addColorStop(offset: number, color: string): void;
 -}
 -
--declare const CanvasGradient: {
+-declare var CanvasGradient: {
 -  prototype: CanvasGradient;
 -  new (): CanvasGradient;
 -};
@@ -6470,7 +6470,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  setTransform(transform?: DOMMatrix2DInit): void;
 -}
 -
--declare const CanvasPattern: {
+-declare var CanvasPattern: {
 -  prototype: CanvasPattern;
 -  new (): CanvasPattern;
 -};
@@ -6955,7 +6955,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  readonly wasClean: boolean;
 -}
 -
--declare const CloseEvent: {
+-declare var CloseEvent: {
 -  prototype: CloseEvent;
 -  new (type: string, eventInitDict?: CloseEventInit): CloseEvent;
 -};
@@ -7020,7 +7020,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  readonly writable: WritableStream<BufferSource>;
 -}
 -
--declare const CompressionStream: {
+-declare var CompressionStream: {
 -  prototype: CompressionStream;
 -  new (format: CompressionFormat): CompressionStream;
 -};
@@ -7239,7 +7239,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  ): void;
 -}
 -
--declare const CookieStore: {
+-declare var CookieStore: {
 -  prototype: CookieStore;
 -  new (): CookieStore;
 -};
@@ -7280,7 +7280,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  unsubscribe(subscriptions: readonly CookieStoreGetOptions[]): Promise<void>;
 -}
 -
--declare const CookieStoreManager: {
+-declare var CookieStoreManager: {
 -  prototype: CookieStoreManager;
 -  new (): CookieStoreManager;
 -};
@@ -7304,7 +7304,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  readonly size: QueuingStrategySize;
 -}
 -
--declare const CountQueuingStrategy: {
+-declare var CountQueuingStrategy: {
 -  prototype: CountQueuingStrategy;
 -  new (init: QueuingStrategyInit): CountQueuingStrategy;
 -};
@@ -7428,7 +7428,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  randomUUID(): `${string}-${string}-${string}-${string}-${string}`;
 -}
 -
--declare const Crypto: {
+-declare var Crypto: {
 -  prototype: Crypto;
 -  new (): Crypto;
 -};
@@ -7478,7 +7478,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  readonly usages: readonly KeyUsage[];
 -}
 -
--declare const CryptoKey: {
+-declare var CryptoKey: {
 -  prototype: CryptoKey;
 -  new (): CryptoKey;
 -};
@@ -7595,7 +7595,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  ): void;
 -}
 -
--declare const CustomEvent: {
+-declare var CustomEvent: {
 -  prototype: CustomEvent;
 -  new <T>(type: string, eventInitDict?: CustomEventInit<T>): CustomEvent<T>;
 -};
@@ -7679,7 +7679,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  readonly DATA_CLONE_ERR: 25;
 -}
 -
--declare const DOMException: {
+-declare var DOMException: {
 -  prototype: DOMException;
 -  new (message?: string, name?: string): DOMException;
 -  readonly INDEX_SIZE_ERR: 1;
@@ -7944,7 +7944,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  translateSelf(tx?: number, ty?: number, tz?: number): DOMMatrix;
 -}
 -
--declare const DOMMatrix: {
+-declare var DOMMatrix: {
 -  prototype: DOMMatrix;
 -  new (init?: string | readonly number[]): DOMMatrix;
 -  fromFloat32Array(array32: Float32Array<ArrayBuffer>): DOMMatrix;
@@ -8192,7 +8192,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  toString(): string;
 -}
 -
--declare const DOMMatrixReadOnly: {
+-declare var DOMMatrixReadOnly: {
 -  prototype: DOMMatrixReadOnly;
 -  new (init?: string | readonly number[]): DOMMatrixReadOnly;
 -  fromFloat32Array(array32: Float32Array<ArrayBuffer>): DOMMatrixReadOnly;
@@ -8266,7 +8266,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  z: number;
 -}
 -
--declare const DOMPoint: {
+-declare var DOMPoint: {
 -  prototype: DOMPoint;
 -  new (x?: number, y?: number, z?: number, w?: number): DOMPoint;
 +  scrollPaddingBlock: string;
@@ -8345,7 +8345,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  toJSON(): unknown;
 -}
 -
--declare const DOMPointReadOnly: {
+-declare var DOMPointReadOnly: {
 -  prototype: DOMPointReadOnly;
 -  new (x?: number, y?: number, z?: number, w?: number): DOMPointReadOnly;
 +  scrollPaddingLeft: string;
@@ -8421,7 +8421,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  toJSON(): unknown;
 -}
 -
--declare const DOMQuad: {
+-declare var DOMQuad: {
 -  prototype: DOMQuad;
 -  new (
 -    p1?: DOMPointInit,
@@ -8477,7 +8477,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  y: number;
 -}
 -
--declare const DOMRect: {
+-declare var DOMRect: {
 -  prototype: DOMRect;
 -  new (x?: number, y?: number, width?: number, height?: number): DOMRect;
 +  scrollbarWidth: string;
@@ -8615,7 +8615,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  toJSON(): unknown;
 -}
 -
--declare const DOMRectReadOnly: {
+-declare var DOMRectReadOnly: {
 -  prototype: DOMRectReadOnly;
 -  new (
 -    x?: number,
@@ -8670,7 +8670,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  [index: number]: string;
 -}
 -
--declare const DOMStringList: {
+-declare var DOMStringList: {
 -  prototype: DOMStringList;
 -  new (): DOMStringList;
 -};
@@ -9011,7 +9011,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  readonly writable: WritableStream<BufferSource>;
 -}
 -
--declare const DecompressionStream: {
+-declare var DecompressionStream: {
 -  prototype: DecompressionStream;
 -  new (format: CompressionFormat): DecompressionStream;
 -};
@@ -10604,7 +10604,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  readonly COMPRESSED_RGB_BPTC_SIGNED_FLOAT_EXT: 0x8e8e;
 -  readonly COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_EXT: 0x8e8f;
 -}
-+declare const CSSStyleValue: {
++declare var CSSStyleValue: {
 +  prototype: CSSStyleValue;
 +  new (): CSSStyleValue;
 +  /**
@@ -10686,7 +10686,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  fullscreenchange: Event;
 -  fullscreenerror: Event;
 -}
-+declare const CSSTransformComponent: {
++declare var CSSTransformComponent: {
 +  prototype: CSSTransformComponent;
 +  new (): CSSTransformComponent;
 +};
@@ -10747,7 +10747,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  [index: number]: CSSTransformComponent;
 +}
 +
-+declare const CSSTransformValue: {
++declare var CSSTransformValue: {
 +  prototype: CSSTransformValue;
 +  new (transforms: readonly CSSTransformComponent[]): CSSTransformValue;
 +};
@@ -10829,7 +10829,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  z: CSSNumericValue;
 +}
 +
-+declare const CSSTranslate: {
++declare var CSSTranslate: {
 +  prototype: CSSTranslate;
 +  new (
 +    x: CSSNumericValue,
@@ -10864,7 +10864,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  value: number;
 +}
 +
-+declare const CSSUnitValue: {
++declare var CSSUnitValue: {
 +  prototype: CSSUnitValue;
 +  new (value: number, unit: string): CSSUnitValue;
 +};
@@ -10895,13 +10895,13 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  [index: number]: CSSUnparsedSegment;
 +}
 +
-+declare const CSSUnparsedValue: {
++declare var CSSUnparsedValue: {
 +  prototype: CSSUnparsedValue;
 +  new (members: readonly CSSUnparsedSegment[]): CSSUnparsedValue;
 +};
 +
 +/**
-+ * The **`CSSVariableReferenceValue`** interface of the CSS Typed Object Model API allows you to create a custom name for a built-in CSS value. This object functionality is sometimes called a "CSS variable" and serves the same purpose as the   const () function. The custom name must begin with two dashes.
++ * The **`CSSVariableReferenceValue`** interface of the CSS Typed Object Model API allows you to create a custom name for a built-in CSS value. This object functionality is sometimes called a "CSS variable" and serves the same purpose as the var() function. The custom name must begin with two dashes.
 + *
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSVariableReferenceValue)
 + */
@@ -10930,7 +10930,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  variable: string;
 +}
 +
-+declare const CSSVariableReferenceValue: {
++declare var CSSVariableReferenceValue: {
 +  prototype: CSSVariableReferenceValue;
 +  new (
 +    variable: string,
@@ -11055,7 +11055,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  put(request: RequestInfo | URL, response: Response): Promise<void>;
 +}
 +
-+declare const Cache: {
++declare var Cache: {
 +  prototype: Cache;
 +  new (): Cache;
 +};
@@ -11374,7 +11374,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  open(cacheName: string): Promise<Cache>;
 +}
 +
-+declare const CacheStorage: {
++declare var CacheStorage: {
 +  prototype: CacheStorage;
 +  new (): CacheStorage;
 +};
@@ -11676,10 +11676,10 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  addColorStop(offset: number, color: string): void;
  }
  
--declare const EncodedAudioChunk: {
+-declare var EncodedAudioChunk: {
 -  prototype: EncodedAudioChunk;
 -  new (init: EncodedAudioChunkInit): EncodedAudioChunk;
-+declare const CanvasGradient: {
++declare var CanvasGradient: {
 +  prototype: CanvasGradient;
 +  new (): CanvasGradient;
  };
@@ -11834,10 +11834,10 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  setTransform(transform?: DOMMatrix2DInit): void;
  }
  
--declare const EncodedVideoChunk: {
+-declare var EncodedVideoChunk: {
 -  prototype: EncodedVideoChunk;
 -  new (init: EncodedVideoChunkInit): EncodedVideoChunk;
-+declare const CanvasPattern: {
++declare var CanvasPattern: {
 +  prototype: CanvasPattern;
 +  new (): CanvasPattern;
  };
@@ -12032,7 +12032,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  getClientRect(): DOMRect | null;
  }
  
--declare const ErrorEvent: {
+-declare var ErrorEvent: {
 -  prototype: ErrorEvent;
 -  new (type: string, eventInitDict?: ErrorEventInit): ErrorEvent;
 +declare const CaretPosition: {
@@ -12269,7 +12269,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  writeText(data: string): Promise<void>;
  }
  
--declare const Event: {
+-declare var Event: {
 -  prototype: Event;
 -  new (type: string, eventInitDict?: EventInit): Event;
 -  readonly NONE: 0;
@@ -12418,7 +12418,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  ): void;
 -}
 -
--declare const EventSource: {
+-declare var EventSource: {
 -  prototype: EventSource;
 -  new (url: string | URL, eventSourceInitDict?: EventSourceInit): EventSource;
 -  readonly CONNECTING: 0;
@@ -12473,10 +12473,10 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly wasClean: boolean;
  }
  
--declare const EventTarget: {
+-declare var EventTarget: {
 -  prototype: EventTarget;
 -  new (): EventTarget;
-+declare const CloseEvent: {
++declare var CloseEvent: {
 +  prototype: CloseEvent;
 +  new (type: string, eventInitDict?: CloseEventInit): CloseEvent;
  };
@@ -12581,7 +12581,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly writable: WritableStream<BufferSource>;
 +}
 +
-+declare const CompressionStream: {
++declare var CompressionStream: {
 +  prototype: CompressionStream;
 +  new (format: CompressionFormat): CompressionStream;
 +};
@@ -12629,7 +12629,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const File: {
+-declare var File: {
 -  prototype: File;
 +declare const ConstantSourceNode: {
 +  prototype: ConstantSourceNode;
@@ -12670,7 +12670,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly skipped: boolean;
  }
  
--declare const FileList: {
+-declare var FileList: {
 -  prototype: FileList;
 -  new (): FileList;
 +declare const ContentVisibilityAutoStateChangeEvent: {
@@ -12862,13 +12862,13 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const FileReader: {
+-declare var FileReader: {
 -  prototype: FileReader;
 -  new (): FileReader;
 -  readonly EMPTY: 0;
 -  readonly LOADING: 1;
 -  readonly DONE: 2;
-+declare const CookieStore: {
++declare var CookieStore: {
 +  prototype: CookieStore;
 +  new (): CookieStore;
  };
@@ -12912,7 +12912,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const FileSystem: {
 -  prototype: FileSystem;
 -  new (): FileSystem;
-+declare const CookieStoreManager: {
++declare var CookieStoreManager: {
 +  prototype: CookieStoreManager;
 +  new (): CookieStoreManager;
  };
@@ -12939,7 +12939,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly size: QueuingStrategySize;
 +}
 +
-+declare const CountQueuingStrategy: {
++declare var CountQueuingStrategy: {
 +  prototype: CountQueuingStrategy;
 +  new (init: QueuingStrategyInit): CountQueuingStrategy;
 +};
@@ -13044,7 +13044,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  store(credential: Credential): Promise<void>;
  }
  
--declare const FileSystemDirectoryHandle: {
+-declare var FileSystemDirectoryHandle: {
 -  prototype: FileSystemDirectoryHandle;
 -  new (): FileSystemDirectoryHandle;
 +declare const CredentialsContainer: {
@@ -13108,7 +13108,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  randomUUID(): `${string}-${string}-${string}-${string}-${string}`;
 +}
 +
-+declare const Crypto: {
++declare var Crypto: {
 +  prototype: Crypto;
 +  new (): Crypto;
 +};
@@ -13164,7 +13164,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const FileSystemEntry: {
 -  prototype: FileSystemEntry;
 -  new (): FileSystemEntry;
-+declare const CryptoKey: {
++declare var CryptoKey: {
 +  prototype: CryptoKey;
 +  new (): CryptoKey;
  };
@@ -13265,10 +13265,10 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const FileSystemFileHandle: {
+-declare var FileSystemFileHandle: {
 -  prototype: FileSystemFileHandle;
 -  new (): FileSystemFileHandle;
-+declare const CustomEvent: {
++declare var CustomEvent: {
 +  prototype: CustomEvent;
 +  new <T>(type: string, eventInitDict?: CustomEventInit<T>): CustomEvent<T>;
  };
@@ -13355,10 +13355,10 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly DATA_CLONE_ERR: 25;
  }
  
--declare const FileSystemHandle: {
+-declare var FileSystemHandle: {
 -  prototype: FileSystemHandle;
 -  new (): FileSystemHandle;
-+declare const DOMException: {
++declare var DOMException: {
 +  prototype: DOMException;
 +  new (message?: string, name?: string): DOMException;
 +  readonly INDEX_SIZE_ERR: 1;
@@ -13434,7 +13434,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  write(data: FileSystemWriteChunkType): Promise<void>;
 -}
 -
--declare const FileSystemWritableFileStream: {
+-declare var FileSystemWritableFileStream: {
 -  prototype: FileSystemWritableFileStream;
 -  new (): FileSystemWritableFileStream;
 -};
@@ -13646,7 +13646,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  translateSelf(tx?: number, ty?: number, tz?: number): DOMMatrix;
 +}
 +
-+declare const DOMMatrix: {
++declare var DOMMatrix: {
 +  prototype: DOMMatrix;
 +  new (init?: string | readonly number[]): DOMMatrix;
    /**
@@ -13659,7 +13659,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  load(): Promise<FontFace>;
 -}
 -
--declare const FontFace: {
+-declare var FontFace: {
 -  prototype: FontFace;
 -  new (
 -    family: string,
@@ -13816,7 +13816,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  ): void;
 -}
 -
--declare const FontFaceSet: {
+-declare var FontFaceSet: {
 -  prototype: FontFaceSet;
 -  new (): FontFaceSet;
 -};
@@ -13838,7 +13838,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  readonly fontfaces: ReadonlyArray<FontFace>;
 -}
 -
--declare const FontFaceSetLoadEvent: {
+-declare var FontFaceSetLoadEvent: {
 -  prototype: FontFaceSetLoadEvent;
 -  new (
 -    type: string,
@@ -13988,10 +13988,10 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  toString(): string;
  }
  
--declare const FormData: {
+-declare var FormData: {
 -  prototype: FormData;
 -  new (form?: HTMLFormElement, submitter?: HTMLElement | null): FormData;
-+declare const DOMMatrixReadOnly: {
++declare var DOMMatrixReadOnly: {
 +  prototype: DOMMatrixReadOnly;
 +  new (init?: string | readonly number[]): DOMMatrixReadOnly;
 +  /**
@@ -14107,7 +14107,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const GainNode: {
 -  prototype: GainNode;
 -  new (context: BaseAudioContext, options?: GainOptions): GainNode;
-+declare const DOMPoint: {
++declare var DOMPoint: {
 +  prototype: DOMPoint;
 +  new (x?: number, y?: number, z?: number, w?: number): DOMPoint;
 +  /**
@@ -14192,7 +14192,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  toJSON(): unknown;
 +}
 +
-+declare const DOMPointReadOnly: {
++declare var DOMPointReadOnly: {
 +  prototype: DOMPointReadOnly;
 +  new (x?: number, y?: number, z?: number, w?: number): DOMPointReadOnly;
    /**
@@ -14286,7 +14286,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const GamepadEvent: {
 -  prototype: GamepadEvent;
 -  new (type: string, eventInitDict: GamepadEventInit): GamepadEvent;
-+declare const DOMQuad: {
++declare var DOMQuad: {
 +  prototype: DOMQuad;
 +  new (
 +    p1?: DOMPointInit,
@@ -14355,7 +14355,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const GamepadHapticActuator: {
 -  prototype: GamepadHapticActuator;
 -  new (): GamepadHapticActuator;
-+declare const DOMRect: {
++declare var DOMRect: {
 +  prototype: DOMRect;
 +  new (x?: number, y?: number, width?: number, height?: number): DOMRect;
 +  /**
@@ -14519,7 +14519,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const GeolocationCoordinates: {
 -  prototype: GeolocationCoordinates;
 -  new (): GeolocationCoordinates;
-+declare const DOMRectReadOnly: {
++declare var DOMRectReadOnly: {
 +  prototype: DOMRectReadOnly;
 +  new (
 +    x?: number,
@@ -14578,7 +14578,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const GeolocationPosition: {
 -  prototype: GeolocationPosition;
 -  new (): GeolocationPosition;
-+declare const DOMStringList: {
++declare var DOMStringList: {
 +  prototype: DOMStringList;
 +  new (): DOMStringList;
  };
@@ -15450,7 +15450,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLAudioElement: {
 -  prototype: HTMLAudioElement;
 -  new (): HTMLAudioElement;
-+declare const DecompressionStream: {
++declare var DecompressionStream: {
 +  prototype: DecompressionStream;
 +  new (format: CompressionFormat): DecompressionStream;
  };
@@ -18850,7 +18850,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  copyTo(destination: AllowSharedBufferSource): void;
 +}
 +
-+declare const EncodedAudioChunk: {
++declare var EncodedAudioChunk: {
 +  prototype: EncodedAudioChunk;
 +  new (init: EncodedAudioChunkInit): EncodedAudioChunk;
 +};
@@ -18908,7 +18908,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  copyTo(destination: AllowSharedBufferSource): void;
 +}
 +
-+declare const EncodedVideoChunk: {
++declare var EncodedVideoChunk: {
 +  prototype: EncodedVideoChunk;
 +  new (init: EncodedVideoChunkInit): EncodedVideoChunk;
 +};
@@ -18966,7 +18966,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly message: string;
 +}
 +
-+declare const ErrorEvent: {
++declare var ErrorEvent: {
 +  prototype: ErrorEvent;
 +  new (type: string, eventInitDict?: ErrorEventInit): ErrorEvent;
 +};
@@ -19156,7 +19156,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly BUBBLING_PHASE: 3;
 +}
 +
-+declare const Event: {
++declare var Event: {
 +  prototype: Event;
 +  new (type: string, eventInitDict?: EventInit): Event;
 +  readonly NONE: 0;
@@ -19288,7 +19288,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLInputElement: {
 -  prototype: HTMLInputElement;
 -  new (): HTMLInputElement;
-+declare const EventSource: {
++declare var EventSource: {
 +  prototype: EventSource;
 +  new (url: string | URL, eventSourceInitDict?: EventSourceInit): EventSource;
 +  readonly CONNECTING: 0;
@@ -19355,7 +19355,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLLIElement: {
 -  prototype: HTMLLIElement;
 -  new (): HTMLLIElement;
-+declare const EventTarget: {
++declare var EventTarget: {
 +  prototype: EventTarget;
 +  new (): EventTarget;
 +};
@@ -19476,7 +19476,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLLegendElement: {
 -  prototype: HTMLLegendElement;
 -  new (): HTMLLegendElement;
-+declare const File: {
++declare var File: {
 +  prototype: File;
 +  new (
 +    fileBits: readonly BlobPart[],
@@ -19554,7 +19554,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  [index: number]: File;
 +}
 +
-+declare const FileList: {
++declare var FileList: {
 +  prototype: FileList;
 +  new (): FileList;
 +};
@@ -19705,7 +19705,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLLinkElement: {
 -  prototype: HTMLLinkElement;
 -  new (): HTMLLinkElement;
-+declare const FileReader: {
++declare var FileReader: {
 +  prototype: FileReader;
 +  new (): FileReader;
 +  readonly EMPTY: 0;
@@ -19923,7 +19923,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  resolve(possibleDescendant: FileSystemHandle): Promise<string[] | null>;
 +}
 +
-+declare const FileSystemDirectoryHandle: {
++declare var FileSystemDirectoryHandle: {
 +  prototype: FileSystemDirectoryHandle;
 +  new (): FileSystemDirectoryHandle;
 +};
@@ -20076,7 +20076,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  getFile(): Promise<File>;
 +}
 +
-+declare const FileSystemFileHandle: {
++declare var FileSystemFileHandle: {
 +  prototype: FileSystemFileHandle;
 +  new (): FileSystemFileHandle;
 +};
@@ -20123,7 +20123,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  isSameEntry(other: FileSystemHandle): Promise<boolean>;
 +}
 +
-+declare const FileSystemHandle: {
++declare var FileSystemHandle: {
 +  prototype: FileSystemHandle;
 +  new (): FileSystemHandle;
 +};
@@ -20182,7 +20182,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  write(data: FileSystemWriteChunkType): Promise<void>;
 +}
 +
-+declare const FileSystemWritableFileStream: {
++declare var FileSystemWritableFileStream: {
 +  prototype: FileSystemWritableFileStream;
 +  new (): FileSystemWritableFileStream;
 +};
@@ -20397,7 +20397,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  readonly HAVE_CURRENT_DATA: 2;
 -  readonly HAVE_FUTURE_DATA: 3;
 -  readonly HAVE_ENOUGH_DATA: 4;
-+declare const FontFace: {
++declare var FontFace: {
 +  prototype: FontFace;
 +  new (
 +    family: string,
@@ -20538,7 +20538,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLMetaElement: {
 -  prototype: HTMLMetaElement;
 -  new (): HTMLMetaElement;
-+declare const FontFaceSet: {
++declare var FontFaceSet: {
 +  prototype: FontFaceSet;
 +  new (): FontFaceSet;
  };
@@ -20563,7 +20563,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly fontfaces: ReadonlyArray<FontFace>;
 +}
 +
-+declare const FontFaceSetLoadEvent: {
++declare var FontFaceSetLoadEvent: {
 +  prototype: FontFaceSetLoadEvent;
 +  new (
 +    type: string,
@@ -20672,7 +20672,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLMeterElement: {
 -  prototype: HTMLMeterElement;
 -  new (): HTMLMeterElement;
-+declare const FormData: {
++declare var FormData: {
 +  prototype: FormData;
 +  new (form?: HTMLFormElement, submitter?: HTMLElement | null): FormData;
  };
@@ -20809,7 +20809,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLOListElement: {
 -  prototype: HTMLOListElement;
 -  new (): HTMLOListElement;
-+declare const GPU: {
++declare var GPU: {
 +  prototype: GPU;
 +  new (): GPU;
  };
@@ -20876,7 +20876,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  requestDevice(descriptor?: GPUDeviceDescriptor): Promise<GPUDevice>;
 +}
 +
-+declare const GPUAdapter: {
++declare var GPUAdapter: {
 +  prototype: GPUAdapter;
 +  new (): GPUAdapter;
 +};
@@ -20962,7 +20962,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly vendor: string;
 +}
 +
-+declare const GPUAdapterInfo: {
++declare var GPUAdapterInfo: {
 +  prototype: GPUAdapterInfo;
 +  new (): GPUAdapterInfo;
 +};
@@ -20975,7 +20975,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface GPUBindGroup extends GPUObjectBase {}
 +
-+declare const GPUBindGroup: {
++declare var GPUBindGroup: {
 +  prototype: GPUBindGroup;
 +  new (): GPUBindGroup;
 +};
@@ -20988,7 +20988,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface GPUBindGroupLayout extends GPUObjectBase {}
 +
-+declare const GPUBindGroupLayout: {
++declare var GPUBindGroupLayout: {
 +  prototype: GPUBindGroupLayout;
 +  new (): GPUBindGroupLayout;
 +};
@@ -21101,7 +21101,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLObjectElement: {
 -  prototype: HTMLObjectElement;
 -  new (): HTMLObjectElement;
-+declare const GPUBuffer: {
++declare var GPUBuffer: {
 +  prototype: GPUBuffer;
 +  new (): GPUBuffer;
  };
@@ -21183,7 +21183,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLOptGroupElement: {
 -  prototype: HTMLOptGroupElement;
 -  new (): HTMLOptGroupElement;
-+declare const GPUCanvasContext: {
++declare var GPUCanvasContext: {
 +  prototype: GPUCanvasContext;
 +  new (): GPUCanvasContext;
  };
@@ -21199,7 +21199,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -interface HTMLOptionElement extends HTMLElement {
 +interface GPUCommandBuffer extends GPUObjectBase {}
 +
-+declare const GPUCommandBuffer: {
++declare var GPUCommandBuffer: {
 +  prototype: GPUCommandBuffer;
 +  new (): GPUCommandBuffer;
 +};
@@ -21344,7 +21344,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLOptionElement: {
 -  prototype: HTMLOptionElement;
 -  new (): HTMLOptionElement;
-+declare const GPUCommandEncoder: {
++declare var GPUCommandEncoder: {
 +  prototype: GPUCommandEncoder;
 +  new (): GPUCommandEncoder;
  };
@@ -21370,7 +21370,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly messages: ReadonlyArray<GPUCompilationMessage>;
 +}
 +
-+declare const GPUCompilationInfo: {
++declare var GPUCompilationInfo: {
 +  prototype: GPUCompilationInfo;
 +  new (): GPUCompilationInfo;
 +};
@@ -21428,7 +21428,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly type: GPUCompilationMessageType;
 +}
 +
-+declare const GPUCompilationMessage: {
++declare var GPUCompilationMessage: {
 +  prototype: GPUCompilationMessage;
 +  new (): GPUCompilationMessage;
 +};
@@ -21480,7 +21480,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLOptionsCollection: {
 -  prototype: HTMLOptionsCollection;
 -  new (): HTMLOptionsCollection;
-+declare const GPUComputePassEncoder: {
++declare var GPUComputePassEncoder: {
 +  prototype: GPUComputePassEncoder;
 +  new (): GPUComputePassEncoder;
  };
@@ -21506,7 +21506,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface GPUComputePipeline extends GPUObjectBase, GPUPipelineBase {}
 +
-+declare const GPUComputePipeline: {
++declare var GPUComputePipeline: {
 +  prototype: GPUComputePipeline;
 +  new (): GPUComputePipeline;
 +};
@@ -21761,7 +21761,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLOutputElement: {
 -  prototype: HTMLOutputElement;
 -  new (): HTMLOutputElement;
-+declare const GPUDevice: {
++declare var GPUDevice: {
 +  prototype: GPUDevice;
 +  new (): GPUDevice;
  };
@@ -21821,7 +21821,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLParagraphElement: {
 -  prototype: HTMLParagraphElement;
 -  new (): HTMLParagraphElement;
-+declare const GPUDeviceLostInfo: {
++declare var GPUDeviceLostInfo: {
 +  prototype: GPUDeviceLostInfo;
 +  new (): GPUDeviceLostInfo;
  };
@@ -21877,7 +21877,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLParamElement: {
 -  prototype: HTMLParamElement;
 -  new (): HTMLParamElement;
-+declare const GPUError: {
++declare var GPUError: {
 +  prototype: GPUError;
 +  new (): GPUError;
  };
@@ -21913,7 +21913,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  ): void;
 +interface GPUExternalTexture extends GPUObjectBase {}
 +
-+declare const GPUExternalTexture: {
++declare var GPUExternalTexture: {
 +  prototype: GPUExternalTexture;
 +  new (): GPUExternalTexture;
 +};
@@ -21926,7 +21926,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface GPUInternalError extends GPUError {}
 +
-+declare const GPUInternalError: {
++declare var GPUInternalError: {
 +  prototype: GPUInternalError;
 +  new (message: string): GPUInternalError;
 +};
@@ -21947,7 +21947,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface GPUOutOfMemoryError extends GPUError {}
 +
-+declare const GPUOutOfMemoryError: {
++declare var GPUOutOfMemoryError: {
 +  prototype: GPUOutOfMemoryError;
 +  new (message: string): GPUOutOfMemoryError;
  };
@@ -22000,7 +22000,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLPreElement: {
 -  prototype: HTMLPreElement;
 -  new (): HTMLPreElement;
-+declare const GPUPipelineError: {
++declare var GPUPipelineError: {
 +  prototype: GPUPipelineError;
 +  new (message: string, options: GPUPipelineErrorInit): GPUPipelineError;
  };
@@ -22016,7 +22016,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -interface HTMLProgressElement extends HTMLElement {
 +interface GPUPipelineLayout extends GPUObjectBase {}
 +
-+declare const GPUPipelineLayout: {
++declare var GPUPipelineLayout: {
 +  prototype: GPUPipelineLayout;
 +  new (): GPUPipelineLayout;
 +};
@@ -22057,7 +22057,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  destroy(): void;
 +}
 +
-+declare const GPUQuerySet: {
++declare var GPUQuerySet: {
 +  prototype: GPUQuerySet;
 +  new (): GPUQuerySet;
 +};
@@ -22145,7 +22145,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const HTMLProgressElement: {
 -  prototype: HTMLProgressElement;
 -  new (): HTMLProgressElement;
-+declare const GPUQueue: {
++declare var GPUQueue: {
 +  prototype: GPUQueue;
 +  new (): GPUQueue;
  };
@@ -22161,7 +22161,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -interface HTMLQuoteElement extends HTMLElement {
 +interface GPURenderBundle extends GPUObjectBase {}
 +
-+declare const GPURenderBundle: {
++declare var GPURenderBundle: {
 +  prototype: GPURenderBundle;
 +  new (): GPURenderBundle;
 +};
@@ -22193,7 +22193,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  finish(descriptor?: GPURenderBundleDescriptor): GPURenderBundle;
 +}
 +
-+declare const GPURenderBundleEncoder: {
++declare var GPURenderBundleEncoder: {
 +  prototype: GPURenderBundleEncoder;
 +  new (): GPURenderBundleEncoder;
 +};
@@ -22410,7 +22410,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLScriptElement/supports_static)
 -   */
 -  supports(type: string): boolean;
-+declare const GPURenderPassEncoder: {
++declare var GPURenderPassEncoder: {
 +  prototype: GPURenderPassEncoder;
 +  new (): GPURenderPassEncoder;
  };
@@ -22426,7 +22426,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -interface HTMLSelectElement extends HTMLElement {
 +interface GPURenderPipeline extends GPUObjectBase, GPUPipelineBase {}
 +
-+declare const GPURenderPipeline: {
++declare var GPURenderPipeline: {
 +  prototype: GPURenderPipeline;
 +  new (): GPURenderPipeline;
 +};
@@ -22439,7 +22439,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface GPUSampler extends GPUObjectBase {}
 +
-+declare const GPUSampler: {
++declare var GPUSampler: {
 +  prototype: GPUSampler;
 +  new (): GPUSampler;
 +};
@@ -22462,7 +22462,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  getCompilationInfo(): Promise<GPUCompilationInfo>;
 +}
 +
-+declare const GPUShaderModule: {
++declare var GPUShaderModule: {
 +  prototype: GPUShaderModule;
 +  new (): GPUShaderModule;
 +};
@@ -22484,7 +22484,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
 +
-+declare const GPUSupportedFeatures: {
++declare var GPUSupportedFeatures: {
 +  prototype: GPUSupportedFeatures;
 +  new (): GPUSupportedFeatures;
 +};
@@ -22560,7 +22560,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly minUniformBufferOffsetAlignment: number;
 +}
 +
-+declare const GPUSupportedLimits: {
++declare var GPUSupportedLimits: {
 +  prototype: GPUSupportedLimits;
 +  new (): GPUSupportedLimits;
 +};
@@ -22664,7 +22664,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  destroy(): void;
 +}
 +
-+declare const GPUTexture: {
++declare var GPUTexture: {
 +  prototype: GPUTexture;
 +  new (): GPUTexture;
 +};
@@ -22677,7 +22677,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface GPUTextureView extends GPUObjectBase {}
 +
-+declare const GPUTextureView: {
++declare var GPUTextureView: {
 +  prototype: GPUTextureView;
 +  new (): GPUTextureView;
 +};
@@ -22700,7 +22700,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly error: GPUError;
 +}
 +
-+declare const GPUUncapturedErrorEvent: {
++declare var GPUUncapturedErrorEvent: {
 +  prototype: GPUUncapturedErrorEvent;
 +  new (
 +    type: string,
@@ -22716,7 +22716,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface GPUValidationError extends GPUError {}
 +
-+declare const GPUValidationError: {
++declare var GPUValidationError: {
 +  prototype: GPUValidationError;
 +  new (message: string): GPUValidationError;
 +};
@@ -25549,7 +25549,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  ): void;
 -}
 -
--declare const Headers: {
+-declare var Headers: {
 -  prototype: Headers;
 -  new (init?: HeadersInit): Headers;
 -};
@@ -25797,7 +25797,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  update(value: unknown): IDBRequest<IDBValidKey>;
 -}
 -
--declare const IDBCursor: {
+-declare var IDBCursor: {
 -  prototype: IDBCursor;
 -  new (): IDBCursor;
 -};
@@ -25840,7 +25840,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const IDBCursorWithValue: {
+-declare var IDBCursorWithValue: {
 -  prototype: IDBCursorWithValue;
 -  new (): IDBCursorWithValue;
 +declare const HTMLElement: {
@@ -25964,7 +25964,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const IDBDatabase: {
+-declare var IDBDatabase: {
 -  prototype: IDBDatabase;
 -  new (): IDBDatabase;
 +declare const HTMLEmbedElement: {
@@ -26015,7 +26015,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  open(name: string, version?: number): IDBOpenDBRequest;
 -}
 -
--declare const IDBFactory: {
+-declare var IDBFactory: {
 -  prototype: IDBFactory;
 -  new (): IDBFactory;
 -};
@@ -26163,7 +26163,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const IDBIndex: {
+-declare var IDBIndex: {
 -  prototype: IDBIndex;
 -  new (): IDBIndex;
 +declare const HTMLFieldSetElement: {
@@ -26245,7 +26245,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const IDBKeyRange: {
+-declare var IDBKeyRange: {
 -  prototype: IDBKeyRange;
 -  new (): IDBKeyRange;
 -  /**
@@ -26517,7 +26517,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  [name: string]: unknown;
  }
  
--declare const IDBObjectStore: {
+-declare var IDBObjectStore: {
 -  prototype: IDBObjectStore;
 -  new (): IDBObjectStore;
 +declare const HTMLFormElement: {
@@ -26596,7 +26596,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const IDBOpenDBRequest: {
+-declare var IDBOpenDBRequest: {
 -  prototype: IDBOpenDBRequest;
 -  new (): IDBOpenDBRequest;
 +/** @deprecated */
@@ -26690,7 +26690,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const IDBRequest: {
+-declare var IDBRequest: {
 -  prototype: IDBRequest;
 -  new (): IDBRequest;
 +/** @deprecated */
@@ -26802,7 +26802,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const IDBTransaction: {
+-declare var IDBTransaction: {
 -  prototype: IDBTransaction;
 -  new (): IDBTransaction;
 +declare const HTMLHRElement: {
@@ -26853,7 +26853,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const IDBVersionChangeEvent: {
+-declare var IDBVersionChangeEvent: {
 -  prototype: IDBVersionChangeEvent;
 -  new (
 -    type: string,
@@ -27001,7 +27001,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  close(): void;
 -}
 -
--declare const ImageBitmap: {
+-declare var ImageBitmap: {
 -  prototype: ImageBitmap;
 -  new (): ImageBitmap;
 -};
@@ -27033,7 +27033,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  transferFromImageBitmap(bitmap: ImageBitmap | null): void;
 -}
 -
--declare const ImageBitmapRenderingContext: {
+-declare var ImageBitmapRenderingContext: {
 -  prototype: ImageBitmapRenderingContext;
 -  new (): ImageBitmapRenderingContext;
 -};
@@ -27148,7 +27148,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  username: string;
  }
  
--declare const ImageData: {
+-declare var ImageData: {
 -  prototype: ImageData;
 -  new (sw: number, sh: number, settings?: ImageDataSettings): ImageData;
 -  new (
@@ -27243,7 +27243,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  reset(): void;
 -}
 -
--declare const ImageDecoder: {
+-declare var ImageDecoder: {
 -  prototype: ImageDecoder;
 -  new (init: ImageDecoderInit): ImageDecoder;
 +  name: string;
@@ -27331,7 +27331,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const ImageTrack: {
+-declare var ImageTrack: {
 -  prototype: ImageTrack;
 -  new (): ImageTrack;
 +declare const HTMLIFrameElement: {
@@ -27388,7 +27388,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  [index: number]: ImageTrack;
 -}
 -
--declare const ImageTrackList: {
+-declare var ImageTrackList: {
 -  prototype: ImageTrackList;
 -  new (): ImageTrackList;
 -};
@@ -28149,7 +28149,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  readonly name: string;
 -}
 -
--declare const Lock: {
+-declare var Lock: {
 -  prototype: Lock;
 -  new (): Lock;
 -};
@@ -28186,7 +28186,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  ): Promise<T>;
 -}
 -
--declare const LockManager: {
+-declare var LockManager: {
 -  prototype: LockManager;
 -  new (): LockManager;
 -};
@@ -28880,7 +28880,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const MediaCapabilities: {
+-declare var MediaCapabilities: {
 -  prototype: MediaCapabilities;
 -  new (): MediaCapabilities;
 +/** @deprecated */
@@ -30260,7 +30260,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
  
--declare const MediaSourceHandle: {
+-declare var MediaSourceHandle: {
 -  prototype: MediaSourceHandle;
 -  new (): MediaSourceHandle;
 +declare const HTMLOptGroupElement: {
@@ -30833,7 +30833,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const MessageChannel: {
+-declare var MessageChannel: {
 -  prototype: MessageChannel;
 -  new (): MessageChannel;
 +declare const HTMLPreElement: {
@@ -30904,7 +30904,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  ): void;
 -}
 -
--declare const MessageEvent: {
+-declare var MessageEvent: {
 -  prototype: MessageEvent;
 -  new <T>(type: string, eventInitDict?: MessageEventInit<T>): MessageEvent<T>;
 -};
@@ -31014,7 +31014,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const MessagePort: {
+-declare var MessagePort: {
 -  prototype: MessagePort;
 -  new (): MessagePort;
 +declare const HTMLQuoteElement: {
@@ -31919,7 +31919,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const NavigationPreloadManager: {
+-declare var NavigationPreloadManager: {
 -  prototype: NavigationPreloadManager;
 -  new (): NavigationPreloadManager;
 +declare const HTMLTableCaptionElement: {
@@ -33352,7 +33352,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const Notification: {
+-declare var Notification: {
 -  prototype: Notification;
 -  new (title: string, options?: NotificationOptions): Notification;
 +declare const HTMLTextAreaElement: {
@@ -33968,7 +33968,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const OffscreenCanvas: {
+-declare var OffscreenCanvas: {
 -  prototype: OffscreenCanvas;
 -  new (width: number, height: number): OffscreenCanvas;
 +declare const HTMLVideoElement: {
@@ -34017,7 +34017,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly oldURL: string;
  }
  
--declare const OffscreenCanvasRenderingContext2D: {
+-declare var OffscreenCanvasRenderingContext2D: {
 -  prototype: OffscreenCanvasRenderingContext2D;
 -  new (): OffscreenCanvasRenderingContext2D;
 +declare const HashChangeEvent: {
@@ -34116,7 +34116,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const OscillatorNode: {
 -  prototype: OscillatorNode;
 -  new (context: BaseAudioContext, options?: OscillatorOptions): OscillatorNode;
-+declare const Headers: {
++declare var Headers: {
 +  prototype: Headers;
 +  new (init?: HeadersInit): Headers;
  };
@@ -34422,7 +34422,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const PannerNode: {
 -  prototype: PannerNode;
 -  new (context: BaseAudioContext, options?: PannerOptions): PannerNode;
-+declare const IDBCursor: {
++declare var IDBCursor: {
 +  prototype: IDBCursor;
 +  new (): IDBCursor;
  };
@@ -34447,7 +34447,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly value: unknown;
 +}
 +
-+declare const IDBCursorWithValue: {
++declare var IDBCursorWithValue: {
 +  prototype: IDBCursorWithValue;
 +  new (): IDBCursorWithValue;
 +};
@@ -34600,7 +34600,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
-+declare const IDBDatabase: {
++declare var IDBDatabase: {
 +  prototype: IDBDatabase;
 +  new (): IDBDatabase;
 +};
@@ -34643,10 +34643,10 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  open(name: string, version?: number): IDBOpenDBRequest;
  }
  
--declare const Path2D: {
+-declare var Path2D: {
 -  prototype: Path2D;
 -  new (path?: Path2D | string): Path2D;
-+declare const IDBFactory: {
++declare var IDBFactory: {
 +  prototype: IDBFactory;
 +  new (): IDBFactory;
  };
@@ -34782,7 +34782,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const PaymentAddress: {
 -  prototype: PaymentAddress;
 -  new (): PaymentAddress;
-+declare const IDBIndex: {
++declare var IDBIndex: {
 +  prototype: IDBIndex;
 +  new (): IDBIndex;
  };
@@ -34841,7 +34841,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -    type: string,
 -    eventInitDict?: PaymentMethodChangeEventInit,
 -  ): PaymentMethodChangeEvent;
-+declare const IDBKeyRange: {
++declare var IDBKeyRange: {
 +  prototype: IDBKeyRange;
 +  new (): IDBKeyRange;
 +  /**
@@ -35171,7 +35171,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  put(value: unknown, key?: IDBValidKey): IDBRequest<IDBValidKey>;
 +}
 +
-+declare const IDBObjectStore: {
++declare var IDBObjectStore: {
 +  prototype: IDBObjectStore;
 +  new (): IDBObjectStore;
 +};
@@ -35227,7 +35227,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const PaymentResponse: {
 -  prototype: PaymentResponse;
 -  new (): PaymentResponse;
-+declare const IDBOpenDBRequest: {
++declare var IDBOpenDBRequest: {
 +  prototype: IDBOpenDBRequest;
 +  new (): IDBOpenDBRequest;
  };
@@ -35337,7 +35337,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
 +
-+declare const IDBRequest: {
++declare var IDBRequest: {
 +  prototype: IDBRequest;
 +  new (): IDBRequest;
 +};
@@ -35460,10 +35460,10 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const Performance: {
+-declare var Performance: {
 -  prototype: Performance;
 -  new (): Performance;
-+declare const IDBTransaction: {
++declare var IDBTransaction: {
 +  prototype: IDBTransaction;
 +  new (): IDBTransaction;
  };
@@ -35509,7 +35509,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly oldVersion: number;
 +}
 +
-+declare const IDBVersionChangeEvent: {
++declare var IDBVersionChangeEvent: {
 +  prototype: IDBVersionChangeEvent;
 +  new (
 +    type: string,
@@ -35538,7 +35538,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const PerformanceEntry: {
+-declare var PerformanceEntry: {
 -  prototype: PerformanceEntry;
 -  new (): PerformanceEntry;
 +declare const IIRFilterNode: {
@@ -35618,7 +35618,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const PerformanceEventTiming: {
 -  prototype: PerformanceEventTiming;
 -  new (): PerformanceEventTiming;
-+declare const ImageBitmap: {
++declare var ImageBitmap: {
 +  prototype: ImageBitmap;
 +  new (): ImageBitmap;
  };
@@ -35642,7 +35642,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  readonly detail: unknown;
 -}
 -
--declare const PerformanceMark: {
+-declare var PerformanceMark: {
 -  prototype: PerformanceMark;
 -  new (markName: string, markOptions?: PerformanceMarkOptions): PerformanceMark;
 -};
@@ -35665,10 +35665,10 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  transferFromImageBitmap(bitmap: ImageBitmap | null): void;
  }
  
--declare const PerformanceMeasure: {
+-declare var PerformanceMeasure: {
 -  prototype: PerformanceMeasure;
 -  new (): PerformanceMeasure;
-+declare const ImageBitmapRenderingContext: {
++declare var ImageBitmapRenderingContext: {
 +  prototype: ImageBitmapRenderingContext;
 +  new (): ImageBitmapRenderingContext;
  };
@@ -35792,7 +35792,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly width: number;
 +}
 +
-+declare const ImageData: {
++declare var ImageData: {
 +  prototype: ImageData;
 +  new (sw: number, sh: number, settings?: ImageDataSettings): ImageData;
 +  new (
@@ -35878,7 +35878,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const PerformanceNavigationTiming: {
 -  prototype: PerformanceNavigationTiming;
 -  new (): PerformanceNavigationTiming;
-+declare const ImageDecoder: {
++declare var ImageDecoder: {
 +  prototype: ImageDecoder;
 +  new (init: ImageDecoderInit): ImageDecoder;
 +  /**
@@ -35927,7 +35927,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  takeRecords(): PerformanceEntryList;
 -}
 -
--declare const PerformanceObserver: {
+-declare var PerformanceObserver: {
 -  prototype: PerformanceObserver;
 -  new (callback: PerformanceObserverCallback): PerformanceObserver;
 +  readonly repetitionCount: number;
@@ -35942,7 +35942,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  selected: boolean;
 +}
 +
-+declare const ImageTrack: {
++declare var ImageTrack: {
 +  prototype: ImageTrack;
 +  new (): ImageTrack;
  };
@@ -35993,10 +35993,10 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  [index: number]: ImageTrack;
  }
  
--declare const PerformanceObserverEntryList: {
+-declare var PerformanceObserverEntryList: {
 -  prototype: PerformanceObserverEntryList;
 -  new (): PerformanceObserverEntryList;
-+declare const ImageTrackList: {
++declare var ImageTrackList: {
 +  prototype: ImageTrackList;
 +  new (): ImageTrackList;
  };
@@ -36252,7 +36252,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly time: DOMHighResTimeStamp;
  }
  
--declare const PerformanceResourceTiming: {
+-declare var PerformanceResourceTiming: {
 -  prototype: PerformanceResourceTiming;
 -  new (): PerformanceResourceTiming;
 +declare const IntersectionObserverEntry: {
@@ -36316,7 +36316,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  toJSON(): unknown;
 -}
 -
--declare const PerformanceServerTiming: {
+-declare var PerformanceServerTiming: {
 -  prototype: PerformanceServerTiming;
 -  new (): PerformanceServerTiming;
 -};
@@ -36738,7 +36738,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly name: string;
  }
  
-+declare const Lock: {
++declare var Lock: {
 +  prototype: Lock;
 +  new (): Lock;
 +};
@@ -36784,7 +36784,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): Promise<Awaited<T>>;
 +}
 +
-+declare const LockManager: {
++declare var LockManager: {
 +  prototype: LockManager;
 +  new (): LockManager;
 +};
@@ -36851,7 +36851,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const PermissionStatus: {
+-declare var PermissionStatus: {
 -  prototype: PermissionStatus;
 -  new (): PermissionStatus;
 +declare const MIDIAccess: {
@@ -36880,7 +36880,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly port: MIDIPort | null;
  }
  
--declare const Permissions: {
+-declare var Permissions: {
 -  prototype: Permissions;
 -  new (): Permissions;
 +declare const MIDIConnectionEvent: {
@@ -37383,7 +37383,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const ProcessingInstruction: {
 -  prototype: ProcessingInstruction;
 -  new (): ProcessingInstruction;
-+declare const MediaCapabilities: {
++declare var MediaCapabilities: {
 +  prototype: MediaCapabilities;
 +  new (): MediaCapabilities;
  };
@@ -37427,7 +37427,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  readonly total: number;
 -}
 -
--declare const ProgressEvent: {
+-declare var ProgressEvent: {
 -  prototype: ProgressEvent;
 -  new (type: string, eventInitDict?: ProgressEventInit): ProgressEvent;
 -};
@@ -37459,7 +37459,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  toJSON(): unknown;
  }
  
--declare const PromiseRejectionEvent: {
+-declare var PromiseRejectionEvent: {
 -  prototype: PromiseRejectionEvent;
 -  new (
 -    type: string,
@@ -37627,7 +37627,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly mediaElement: HTMLMediaElement;
  }
  
--declare const PushManager: {
+-declare var PushManager: {
 -  prototype: PushManager;
 -  new (): PushManager;
 -  /**
@@ -37698,7 +37698,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly initDataType: string;
  }
  
--declare const PushSubscription: {
+-declare var PushSubscription: {
 -  prototype: PushSubscription;
 -  new (): PushSubscription;
 +declare const MediaEncryptedEvent: {
@@ -37743,7 +37743,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly MEDIA_ERR_SRC_NOT_SUPPORTED: 4;
  }
  
--declare const PushSubscriptionOptions: {
+-declare var PushSubscriptionOptions: {
 -  prototype: PushSubscriptionOptions;
 -  new (): PushSubscriptionOptions;
 +declare const MediaError: {
@@ -38171,7 +38171,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  [index: number]: string;
  }
  
--declare const RTCDataChannel: {
+-declare var RTCDataChannel: {
 -  prototype: RTCDataChannel;
 -  new (): RTCDataChannel;
 +declare const MediaList: {
@@ -38359,7 +38359,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly media: string;
  }
  
--declare const RTCEncodedAudioFrame: {
+-declare var RTCEncodedAudioFrame: {
 -  prototype: RTCEncodedAudioFrame;
 -  new (): RTCEncodedAudioFrame;
 +declare const MediaQueryListEvent: {
@@ -38436,7 +38436,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  getMetadata(): RTCEncodedVideoFrameMetadata;
 -}
 -
--declare const RTCEncodedVideoFrame: {
+-declare var RTCEncodedVideoFrame: {
 -  prototype: RTCEncodedVideoFrame;
 -  new (): RTCEncodedVideoFrame;
 -};
@@ -38783,7 +38783,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  gatheringstatechange: Event;
 -  selectedcandidatepairchange: Event;
 -  statechange: Event;
-+declare const MediaSourceHandle: {
++declare var MediaSourceHandle: {
 +  prototype: MediaSourceHandle;
 +  new (): MediaSourceHandle;
 +};
@@ -39391,7 +39391,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -    type: string,
 -    eventInitDict?: RTCPeerConnectionIceEventInit,
 -  ): RTCPeerConnectionIceEvent;
-+declare const MessageChannel: {
++declare var MessageChannel: {
 +  prototype: MessageChannel;
 +  new (): MessageChannel;
  };
@@ -39490,7 +39490,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/RTCRtpReceiver/getCapabilities_static)
 -   */
 -  getCapabilities(kind: string): RTCRtpCapabilities | null;
-+declare const MessageEvent: {
++declare var MessageEvent: {
 +  prototype: MessageEvent;
 +  new <T>(type: string, eventInitDict?: MessageEventInit<T>): MessageEvent<T>;
  };
@@ -39804,7 +39804,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const RTCStatsReport: {
 -  prototype: RTCStatsReport;
 -  new (): RTCStatsReport;
-+declare const MessagePort: {
++declare var MessagePort: {
 +  prototype: MessagePort;
 +  new (): MessagePort;
  };
@@ -40208,7 +40208,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  takeRecords(): MutationRecord[];
  }
  
--declare const ReadableByteStreamController: {
+-declare var ReadableByteStreamController: {
 -  prototype: ReadableByteStreamController;
 -  new (): ReadableByteStreamController;
 +declare const MutationObserver: {
@@ -40288,7 +40288,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  tee(): [ReadableStream<R>, ReadableStream<R>];
 -}
 -
--declare const ReadableStream: {
+-declare var ReadableStream: {
 -  prototype: ReadableStream;
 -  new (
 -    underlyingSource: UnderlyingByteSource,
@@ -40339,7 +40339,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly type: MutationRecordType;
  }
  
--declare const ReadableStreamBYOBReader: {
+-declare var ReadableStreamBYOBReader: {
 -  prototype: ReadableStreamBYOBReader;
 -  new (
 -    stream: ReadableStream<Uint8Array<ArrayBuffer>>,
@@ -40386,7 +40386,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  respondWithNewView(view: ArrayBufferView<ArrayBuffer>): void;
 -}
 -
--declare const ReadableStreamBYOBRequest: {
+-declare var ReadableStreamBYOBRequest: {
 -  prototype: ReadableStreamBYOBRequest;
 -  new (): ReadableStreamBYOBRequest;
 -};
@@ -40443,7 +40443,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  [index: number]: Attr;
  }
  
--declare const ReadableStreamDefaultController: {
+-declare var ReadableStreamDefaultController: {
 -  prototype: ReadableStreamDefaultController;
 -  new (): ReadableStreamDefaultController;
 +declare const NamedNodeMap: {
@@ -40481,7 +40481,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  releaseLock(): void;
 -}
 -
--declare const ReadableStreamDefaultReader: {
+-declare var ReadableStreamDefaultReader: {
 -  prototype: ReadableStreamDefaultReader;
 -  new <R = unknown>(stream: ReadableStream<R>): ReadableStreamDefaultReader<R>;
 -};
@@ -40612,7 +40612,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  toJSON(): unknown;
 -}
 -
--declare const Report: {
+-declare var Report: {
 -  prototype: Report;
 -  new (): Report;
 -};
@@ -40634,7 +40634,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  toJSON(): unknown;
 -}
 -
--declare const ReportBody: {
+-declare var ReportBody: {
 -  prototype: ReportBody;
 -  new (): ReportBody;
 -};
@@ -40675,7 +40675,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  scroll(): void;
  }
  
--declare const ReportingObserver: {
+-declare var ReportingObserver: {
 -  prototype: ReportingObserver;
 -  new (
 -    callback: ReportingObserverCallback,
@@ -40824,7 +40824,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  clone(): Request;
 -}
 -
--declare const Request: {
+-declare var Request: {
 -  prototype: Request;
 -  new (input: RequestInfo | URL, init?: RequestInit): Request;
 -};
@@ -41093,7 +41093,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  clone(): Response;
 -}
 -
--declare const Response: {
+-declare var Response: {
 -  prototype: Response;
 -  new (body?: BodyInit | null, init?: ResponseInit): Response;
 +  readonly index: number;
@@ -41430,7 +41430,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGAnimatedBoolean: {
 -  prototype: SVGAnimatedBoolean;
 -  new (): SVGAnimatedBoolean;
-+declare const NavigationPreloadManager: {
++declare var NavigationPreloadManager: {
 +  prototype: NavigationPreloadManager;
 +  new (): NavigationPreloadManager;
  };
@@ -43137,7 +43137,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGFEDiffuseLightingElement: {
 -  prototype: SVGFEDiffuseLightingElement;
 -  new (): SVGFEDiffuseLightingElement;
-+declare const Notification: {
++declare var Notification: {
 +  prototype: Notification;
 +  new (title: string, options?: NotificationOptions): Notification;
 +  /**
@@ -43657,7 +43657,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGFEFloodElement: {
 -  prototype: SVGFEFloodElement;
 -  new (): SVGFEFloodElement;
-+declare const OffscreenCanvas: {
++declare var OffscreenCanvas: {
 +  prototype: OffscreenCanvas;
 +  new (width: number, height: number): OffscreenCanvas;
  };
@@ -43714,7 +43714,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGFEFuncAElement: {
 -  prototype: SVGFEFuncAElement;
 -  new (): SVGFEFuncAElement;
-+declare const OffscreenCanvasRenderingContext2D: {
++declare var OffscreenCanvasRenderingContext2D: {
 +  prototype: OffscreenCanvasRenderingContext2D;
 +  new (): OffscreenCanvasRenderingContext2D;
  };
@@ -44601,7 +44601,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGFETileElement: {
 -  prototype: SVGFETileElement;
 -  new (): SVGFETileElement;
-+declare const Path2D: {
++declare var Path2D: {
 +  prototype: Path2D;
 +  new (path?: Path2D | string): Path2D;
  };
@@ -45432,7 +45432,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGImageElement: {
 -  prototype: SVGImageElement;
 -  new (): SVGImageElement;
-+declare const Performance: {
++declare var Performance: {
 +  prototype: Performance;
 +  new (): Performance;
  };
@@ -45524,7 +45524,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  readonly SVG_LENGTHTYPE_IN: 8;
 -  readonly SVG_LENGTHTYPE_PT: 9;
 -  readonly SVG_LENGTHTYPE_PC: 10;
-+declare const PerformanceEntry: {
++declare var PerformanceEntry: {
 +  prototype: PerformanceEntry;
 +  new (): PerformanceEntry;
  };
@@ -45682,7 +45682,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGLineElement: {
 -  prototype: SVGLineElement;
 -  new (): SVGLineElement;
-+declare const PerformanceMark: {
++declare var PerformanceMark: {
 +  prototype: PerformanceMark;
 +  new (markName: string, markOptions?: PerformanceMarkOptions): PerformanceMark;
  };
@@ -45707,7 +45707,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly detail: unknown;
 +}
 +
-+declare const PerformanceMeasure: {
++declare var PerformanceMeasure: {
 +  prototype: PerformanceMeasure;
 +  new (): PerformanceMeasure;
 +};
@@ -46009,7 +46009,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  takeRecords(): PerformanceEntryList;
 +}
 +
-+declare const PerformanceObserver: {
++declare var PerformanceObserver: {
 +  prototype: PerformanceObserver;
 +  new (callback: PerformanceObserverCallback): PerformanceObserver;
    /**
@@ -46078,7 +46078,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGMaskElement: {
 -  prototype: SVGMaskElement;
 -  new (): SVGMaskElement;
-+declare const PerformanceObserverEntryList: {
++declare var PerformanceObserverEntryList: {
 +  prototype: PerformanceObserverEntryList;
 +  new (): PerformanceObserverEntryList;
  };
@@ -46306,7 +46306,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGNumberList: {
 -  prototype: SVGNumberList;
 -  new (): SVGNumberList;
-+declare const PerformanceResourceTiming: {
++declare var PerformanceResourceTiming: {
 +  prototype: PerformanceResourceTiming;
 +  new (): PerformanceResourceTiming;
  };
@@ -46378,7 +46378,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGPathElement: {
 -  prototype: SVGPathElement;
 -  new (): SVGPathElement;
-+declare const PerformanceServerTiming: {
++declare var PerformanceServerTiming: {
 +  prototype: PerformanceServerTiming;
 +  new (): PerformanceServerTiming;
  };
@@ -46713,7 +46713,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGPolygonElement: {
 -  prototype: SVGPolygonElement;
 -  new (): SVGPolygonElement;
-+declare const PermissionStatus: {
++declare var PermissionStatus: {
 +  prototype: PermissionStatus;
 +  new (): PermissionStatus;
  };
@@ -46736,7 +46736,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  query(permissionDesc: PermissionDescriptor): Promise<PermissionStatus>;
 +}
 +
-+declare const Permissions: {
++declare var Permissions: {
 +  prototype: Permissions;
 +  new (): Permissions;
 +};
@@ -47209,7 +47209,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGRectElement: {
 -  prototype: SVGRectElement;
 -  new (): SVGRectElement;
-+declare const ProgressEvent: {
++declare var ProgressEvent: {
 +  prototype: ProgressEvent;
 +  new (type: string, eventInitDict?: ProgressEventInit): ProgressEvent;
  };
@@ -47236,7 +47236,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly reason: unknown;
 +}
 +
-+declare const PromiseRejectionEvent: {
++declare var PromiseRejectionEvent: {
 +  prototype: PromiseRejectionEvent;
 +  new (
 +    type: string,
@@ -47423,7 +47423,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  subscribe(options?: PushSubscriptionOptionsInit): Promise<PushSubscription>;
 +}
 +
-+declare const PushManager: {
++declare var PushManager: {
 +  prototype: PushManager;
 +  new (): PushManager;
    /**
@@ -47567,7 +47567,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGSVGElement: {
 -  prototype: SVGSVGElement;
 -  new (): SVGSVGElement;
-+declare const PushSubscription: {
++declare var PushSubscription: {
 +  prototype: PushSubscription;
 +  new (): PushSubscription;
  };
@@ -47623,7 +47623,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGScriptElement: {
 -  prototype: SVGScriptElement;
 -  new (): SVGScriptElement;
-+declare const PushSubscriptionOptions: {
++declare var PushSubscriptionOptions: {
 +  prototype: PushSubscriptionOptions;
 +  new (): PushSubscriptionOptions;
  };
@@ -47961,7 +47961,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGStyleElement: {
 -  prototype: SVGStyleElement;
 -  new (): SVGStyleElement;
-+declare const RTCDataChannel: {
++declare var RTCDataChannel: {
 +  prototype: RTCDataChannel;
 +  new (): RTCDataChannel;
  };
@@ -48135,7 +48135,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SVGTSpanElement: {
 -  prototype: SVGTSpanElement;
 -  new (): SVGTSpanElement;
-+declare const RTCEncodedAudioFrame: {
++declare var RTCEncodedAudioFrame: {
 +  prototype: RTCEncodedAudioFrame;
 +  new (): RTCEncodedAudioFrame;
  };
@@ -48194,7 +48194,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  getMetadata(): RTCEncodedVideoFrameMetadata;
 +}
 +
-+declare const RTCEncodedVideoFrame: {
++declare var RTCEncodedVideoFrame: {
 +  prototype: RTCEncodedVideoFrame;
 +  new (): RTCEncodedVideoFrame;
 +};
@@ -49433,7 +49433,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  getCapabilities(kind: string): RTCRtpCapabilities | null;
 +};
  
--declare const SecurityPolicyViolationEvent: {
+-declare var SecurityPolicyViolationEvent: {
 -  prototype: SecurityPolicyViolationEvent;
 +/**
 + * The **`RTCRtpScriptTransform`** interface of the WebRTC API is used to insert a WebRTC Encoded Transform (a TransformStream running in a worker thread) into the WebRTC sender and receiver pipelines.
@@ -49773,7 +49773,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const ServiceWorker: {
+-declare var ServiceWorker: {
 -  prototype: ServiceWorker;
 -  new (): ServiceWorker;
 +declare const RTCSctpTransport: {
@@ -49932,7 +49932,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly transceiver: RTCRtpTransceiver;
  }
  
--declare const ServiceWorkerContainer: {
+-declare var ServiceWorkerContainer: {
 -  prototype: ServiceWorkerContainer;
 -  new (): ServiceWorkerContainer;
 +declare const RTCTrackEvent: {
@@ -50111,7 +50111,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  ): void;
 -}
 -
--declare const ServiceWorkerRegistration: {
+-declare var ServiceWorkerRegistration: {
 -  prototype: ServiceWorkerRegistration;
 -  new (): ServiceWorkerRegistration;
 -};
@@ -50376,7 +50376,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  error(e?: unknown): void;
 +}
 +
-+declare const ReadableByteStreamController: {
++declare var ReadableByteStreamController: {
 +  prototype: ReadableByteStreamController;
 +  new (): ReadableByteStreamController;
 +};
@@ -50471,7 +50471,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SourceBuffer: {
 -  prototype: SourceBuffer;
 -  new (): SourceBuffer;
-+declare const ReadableStream: {
++declare var ReadableStream: {
 +  prototype: ReadableStream;
 +  new (
 +    underlyingSource: UnderlyingByteSource,
@@ -50553,7 +50553,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SourceBufferList: {
 -  prototype: SourceBufferList;
 -  new (): SourceBufferList;
-+declare const ReadableStreamBYOBReader: {
++declare var ReadableStreamBYOBReader: {
 +  prototype: ReadableStreamBYOBReader;
 +  new (
 +    stream: ReadableStream<Uint8Array<ArrayBuffer>>,
@@ -50599,7 +50599,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SpeechRecognitionAlternative: {
 -  prototype: SpeechRecognitionAlternative;
 -  new (): SpeechRecognitionAlternative;
-+declare const ReadableStreamBYOBRequest: {
++declare var ReadableStreamBYOBRequest: {
 +  prototype: ReadableStreamBYOBRequest;
 +  new (): ReadableStreamBYOBRequest;
  };
@@ -50653,7 +50653,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SpeechRecognitionResult: {
 -  prototype: SpeechRecognitionResult;
 -  new (): SpeechRecognitionResult;
-+declare const ReadableStreamDefaultController: {
++declare var ReadableStreamDefaultController: {
 +  prototype: ReadableStreamDefaultController;
 +  new (): ReadableStreamDefaultController;
  };
@@ -50694,7 +50694,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const SpeechRecognitionResultList: {
 -  prototype: SpeechRecognitionResultList;
 -  new (): SpeechRecognitionResultList;
-+declare const ReadableStreamDefaultReader: {
++declare var ReadableStreamDefaultReader: {
 +  prototype: ReadableStreamDefaultReader;
 +  new <R = unknown>(stream: ReadableStream<R>): ReadableStreamDefaultReader<R>;
  };
@@ -50865,7 +50865,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
  
 -declare const SpeechSynthesisErrorEvent: {
 -  prototype: SpeechSynthesisErrorEvent;
-+declare const ReportingObserver: {
++declare var ReportingObserver: {
 +  prototype: ReportingObserver;
    new (
 -    type: string,
@@ -51136,7 +51136,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const StaticRange: {
 -  prototype: StaticRange;
 -  new (init: StaticRangeInit): StaticRange;
-+declare const Request: {
++declare var Request: {
 +  prototype: Request;
 +  new (input: RequestInfo | URL, init?: RequestInit): Request;
  };
@@ -51369,7 +51369,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const StorageEvent: {
 -  prototype: StorageEvent;
 -  new (type: string, eventInitDict?: StorageEventInit): StorageEvent;
-+declare const Response: {
++declare var Response: {
 +  prototype: Response;
 +  new (body?: BodyInit | null, init?: ResponseInit): Response;
 +  /**
@@ -51480,7 +51480,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const StorageManager: {
+-declare var StorageManager: {
 -  prototype: StorageManager;
 -  new (): StorageManager;
 +declare const SVGAElement: {
@@ -51750,7 +51750,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  baseVal: boolean;
  }
  
--declare const StylePropertyMapReadOnly: {
+-declare var StylePropertyMapReadOnly: {
 -  prototype: StylePropertyMapReadOnly;
 -  new (): StylePropertyMapReadOnly;
 +declare const SVGAnimatedBoolean: {
@@ -52157,7 +52157,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly baseVal: SVGNumberList;
  }
  
--declare const SubtleCrypto: {
+-declare var SubtleCrypto: {
 -  prototype: SubtleCrypto;
 -  new (): SubtleCrypto;
 +declare const SVGAnimatedNumberList: {
@@ -52225,7 +52225,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  decode(input?: AllowSharedBufferSource, options?: TextDecodeOptions): string;
 -}
 -
--declare const TextDecoder: {
+-declare var TextDecoder: {
 -  prototype: TextDecoder;
 -  new (label?: string, options?: TextDecoderOptions): TextDecoder;
 -};
@@ -52268,7 +52268,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly baseVal: DOMRect;
  }
  
--declare const TextDecoderStream: {
+-declare var TextDecoderStream: {
 -  prototype: TextDecoderStream;
 -  new (label?: string, options?: TextDecoderOptions): TextDecoderStream;
 +declare const SVGAnimatedRect: {
@@ -52304,7 +52304,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  ): TextEncoderEncodeIntoResult;
 -}
 -
--declare const TextEncoder: {
+-declare var TextEncoder: {
 -  prototype: TextEncoder;
 -  new (): TextEncoder;
 -};
@@ -52332,7 +52332,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  baseVal: string;
  }
  
--declare const TextEncoderStream: {
+-declare var TextEncoderStream: {
 -  prototype: TextEncoderStream;
 -  new (): TextEncoderStream;
 +declare const SVGAnimatedString: {
@@ -52514,7 +52514,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const TextMetrics: {
+-declare var TextMetrics: {
 -  prototype: TextMetrics;
 -  new (): TextMetrics;
 +declare const SVGAnimationElement: {
@@ -53590,7 +53590,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const TransformStream: {
+-declare var TransformStream: {
 -  prototype: TransformStream;
 -  new <I = unknown, O = unknown>(
 -    transformer?: Transformer<I, O>,
@@ -53647,7 +53647,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  terminate(): void;
 -}
 -
--declare const TransformStreamDefaultController: {
+-declare var TransformStreamDefaultController: {
 -  prototype: TransformStreamDefaultController;
 -  new (): TransformStreamDefaultController;
 -};
@@ -54052,7 +54052,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  toJSON(): string;
 -}
 -
--declare const URL: {
+-declare var URL: {
 -  prototype: URL;
 -  new (url: string | URL, base?: string | URL): URL;
 -  /**
@@ -54171,7 +54171,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const URLSearchParams: {
+-declare var URLSearchParams: {
 -  prototype: URLSearchParams;
 -  new (
 -    init?:
@@ -54557,7 +54557,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const VideoColorSpace: {
+-declare var VideoColorSpace: {
 -  prototype: VideoColorSpace;
 -  new (init?: VideoColorSpaceInit): VideoColorSpace;
 +declare const SVGFEFuncRElement: {
@@ -54666,7 +54666,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const VideoDecoder: {
+-declare var VideoDecoder: {
 -  prototype: VideoDecoder;
 -  new (init: VideoDecoderInit): VideoDecoder;
 -  /**
@@ -54766,7 +54766,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const VideoEncoder: {
+-declare var VideoEncoder: {
 -  prototype: VideoEncoder;
 -  new (init: VideoEncoderInit): VideoEncoder;
 -  /**
@@ -55042,7 +55042,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const VideoFrame: {
+-declare var VideoFrame: {
 -  prototype: VideoFrame;
 -  new (image: CanvasImageSource, init?: VideoFrameInit): VideoFrame;
 -  new (data: AllowSharedBufferSource, init: VideoFrameBufferInit): VideoFrame;
@@ -56087,7 +56087,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
  
--declare const WebGL2RenderingContext: {
+-declare var WebGL2RenderingContext: {
 -  prototype: WebGL2RenderingContext;
 -  new (): WebGL2RenderingContext;
 -  readonly READ_BUFFER: 0x0c02;
@@ -58724,7 +58724,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly SVG_MEETORSLICE_SLICE: 2;
  }
  
--declare const WebGLActiveInfo: {
+-declare var WebGLActiveInfo: {
 -  prototype: WebGLActiveInfo;
 -  new (): WebGLActiveInfo;
 -};
@@ -58736,7 +58736,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 - */
 -interface WebGLBuffer {}
 -
--declare const WebGLBuffer: {
+-declare var WebGLBuffer: {
 -  prototype: WebGLBuffer;
 -  new (): WebGLBuffer;
 -};
@@ -58835,7 +58835,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const WebGLContextEvent: {
+-declare var WebGLContextEvent: {
 -  prototype: WebGLContextEvent;
 -  new (type: string, eventInit?: WebGLContextEventInit): WebGLContextEvent;
 +declare const SVGRadialGradientElement: {
@@ -58910,7 +58910,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
  
--declare const WebGLFramebuffer: {
+-declare var WebGLFramebuffer: {
 -  prototype: WebGLFramebuffer;
 -  new (): WebGLFramebuffer;
 +declare const SVGRectElement: {
@@ -59129,7 +59129,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
  
--declare const WebGLProgram: {
+-declare var WebGLProgram: {
 -  prototype: WebGLProgram;
 -  new (): WebGLProgram;
 +declare const SVGSVGElement: {
@@ -59174,7 +59174,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
  
--declare const WebGLQuery: {
+-declare var WebGLQuery: {
 -  prototype: WebGLQuery;
 -  new (): WebGLQuery;
 +declare const SVGScriptElement: {
@@ -59213,7 +59213,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
  
--declare const WebGLRenderbuffer: {
+-declare var WebGLRenderbuffer: {
 -  prototype: WebGLRenderbuffer;
 -  new (): WebGLRenderbuffer;
 +declare const SVGSetElement: {
@@ -59259,7 +59259,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
  
--declare const WebGLRenderingContext: {
+-declare var WebGLRenderingContext: {
 -  prototype: WebGLRenderingContext;
 -  new (): WebGLRenderingContext;
 -  readonly DEPTH_BUFFER_BIT: 0x00000100;
@@ -60756,7 +60756,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 - */
 -interface WebGLSampler {}
 -
--declare const WebGLSampler: {
+-declare var WebGLSampler: {
 -  prototype: WebGLSampler;
 -  new (): WebGLSampler;
 +declare const SVGTextContentElement: {
@@ -60798,7 +60798,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
  
--declare const WebGLShader: {
+-declare var WebGLShader: {
 -  prototype: WebGLShader;
 -  new (): WebGLShader;
 +declare const SVGTextElement: {
@@ -60870,7 +60870,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const WebGLShaderPrecisionFormat: {
+-declare var WebGLShaderPrecisionFormat: {
 -  prototype: WebGLShaderPrecisionFormat;
 -  new (): WebGLShaderPrecisionFormat;
 +declare const SVGTextPathElement: {
@@ -60951,7 +60951,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
  
--declare const WebGLSync: {
+-declare var WebGLSync: {
 -  prototype: WebGLSync;
 -  new (): WebGLSync;
 +declare const SVGTextPositioningElement: {
@@ -60968,7 +60968,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
   */
 -interface WebGLTexture {}
 -
--declare const WebGLTexture: {
+-declare var WebGLTexture: {
 -  prototype: WebGLTexture;
 -  new (): WebGLTexture;
 -};
@@ -60980,7 +60980,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 - */
 -interface WebGLTransformFeedback {}
 -
--declare const WebGLTransformFeedback: {
+-declare var WebGLTransformFeedback: {
 -  prototype: WebGLTransformFeedback;
 -  new (): WebGLTransformFeedback;
 -};
@@ -60992,7 +60992,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 - */
 -interface WebGLUniformLocation {}
 -
--declare const WebGLUniformLocation: {
+-declare var WebGLUniformLocation: {
 -  prototype: WebGLUniformLocation;
 -  new (): WebGLUniformLocation;
 -};
@@ -61004,7 +61004,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 - */
 -interface WebGLVertexArrayObject {}
 -
--declare const WebGLVertexArrayObject: {
+-declare var WebGLVertexArrayObject: {
 -  prototype: WebGLVertexArrayObject;
 -  new (): WebGLVertexArrayObject;
 -};
@@ -61110,7 +61110,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const WebSocket: {
+-declare var WebSocket: {
 -  prototype: WebSocket;
 -  new (url: string | URL, protocols?: string | readonly string[]): WebSocket;
 -  readonly CONNECTING: 0;
@@ -61223,7 +61223,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly SVG_TRANSFORM_SKEWY: 6;
  }
  
--declare const WebTransport: {
+-declare var WebTransport: {
 -  prototype: WebTransport;
 -  new (url: string | URL, options?: WebTransportOptions): WebTransport;
 +declare const SVGTransform: {
@@ -61267,7 +61267,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  readonly writable: WritableStream;
 -}
 -
--declare const WebTransportBidirectionalStream: {
+-declare var WebTransportBidirectionalStream: {
 -  prototype: WebTransportBidirectionalStream;
 -  new (): WebTransportBidirectionalStream;
 -};
@@ -61357,7 +61357,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  [index: number]: SVGTransform;
  }
  
--declare const WebTransportDatagramDuplexStream: {
+-declare var WebTransportDatagramDuplexStream: {
 -  prototype: WebTransportDatagramDuplexStream;
 -  new (): WebTransportDatagramDuplexStream;
 +declare const SVGTransformList: {
@@ -61397,7 +61397,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly SVG_UNIT_TYPE_OBJECTBOUNDINGBOX: 2;
  }
  
--declare const WebTransportError: {
+-declare var WebTransportError: {
 -  prototype: WebTransportError;
 -  new (message?: string, options?: WebTransportErrorOptions): WebTransportError;
 +declare const SVGUnitTypes: {
@@ -61665,7 +61665,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  yield(): Promise<void>;
 +}
 +
-+declare const Scheduler: {
++declare var Scheduler: {
 +  prototype: Scheduler;
 +  new (): Scheduler;
 +};
@@ -62049,7 +62049,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly violatedDirective: string;
 +}
 +
-+declare const SecurityPolicyViolationEvent: {
++declare var SecurityPolicyViolationEvent: {
 +  prototype: SecurityPolicyViolationEvent;
 +  new (
 +    type: string,
@@ -62370,7 +62370,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
 +
-+declare const ServiceWorker: {
++declare var ServiceWorker: {
 +  prototype: ServiceWorker;
 +  new (): ServiceWorker;
 +};
@@ -62498,7 +62498,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -declare const Window: {
 -  prototype: Window;
 -  new (): Window;
-+declare const ServiceWorkerContainer: {
++declare var ServiceWorkerContainer: {
 +  prototype: ServiceWorkerContainer;
 +  new (): ServiceWorkerContainer;
  };
@@ -62769,7 +62769,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -    options?: StructuredSerializeOptions,
 -  ): T;
 -}
-+declare const ServiceWorkerRegistration: {
++declare var ServiceWorkerRegistration: {
 +  prototype: ServiceWorkerRegistration;
 +  new (): ServiceWorkerRegistration;
 +};
@@ -62880,7 +62880,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const Worker: {
+-declare var Worker: {
 -  prototype: Worker;
 -  new (scriptURL: string | URL, options?: WorkerOptions): Worker;
 +declare const ShadowRoot: {
@@ -62972,7 +62972,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly assignedSlot: HTMLSlotElement | null;
  }
  
--declare const WritableStream: {
+-declare var WritableStream: {
 -  prototype: WritableStream;
 -  new <W = unknown>(
 -    underlyingSink?: UnderlyingSink<W>,
@@ -63015,7 +63015,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  error(e?: unknown): void;
 -}
 -
--declare const WritableStreamDefaultController: {
+-declare var WritableStreamDefaultController: {
 -  prototype: WritableStreamDefaultController;
 -  new (): WritableStreamDefaultController;
 -};
@@ -63128,7 +63128,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
  }
  
--declare const WritableStreamDefaultWriter: {
+-declare var WritableStreamDefaultWriter: {
 -  prototype: WritableStreamDefaultWriter;
 -  new <W = unknown>(stream: WritableStream<W>): WritableStreamDefaultWriter<W>;
 +declare const SourceBuffer: {
@@ -63508,7 +63508,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const XMLHttpRequest: {
+-declare var XMLHttpRequest: {
 -  prototype: XMLHttpRequest;
 -  new (): XMLHttpRequest;
 -  readonly UNSENT: 0;
@@ -63625,7 +63625,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly utterance: SpeechSynthesisUtterance;
  }
  
--declare const XMLHttpRequestEventTarget: {
+-declare var XMLHttpRequestEventTarget: {
 -  prototype: XMLHttpRequestEventTarget;
 -  new (): XMLHttpRequestEventTarget;
 +declare const SpeechSynthesisEvent: {
@@ -63752,7 +63752,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
    ): void;
  }
  
--declare const XMLHttpRequestUpload: {
+-declare var XMLHttpRequestUpload: {
 -  prototype: XMLHttpRequestUpload;
 -  new (): XMLHttpRequestUpload;
 +declare const SpeechSynthesisUtterance: {
@@ -64097,7 +64097,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  persisted(): Promise<boolean>;
 +}
 +
-+declare const StorageManager: {
++declare var StorageManager: {
 +  prototype: StorageManager;
 +  new (): StorageManager;
 +};
@@ -64497,7 +64497,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  /** [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/Reference/JavaScript_interface/validate_static) */
 -  function validate(bytes: BufferSource): boolean;
 -}
-+declare const StylePropertyMapReadOnly: {
++declare var StylePropertyMapReadOnly: {
 +  prototype: StylePropertyMapReadOnly;
 +  new (): StylePropertyMapReadOnly;
 +};
@@ -64773,7 +64773,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  warn(...data: readonly unknown[]): void;
 -}
 -
--declare const console: Console;
+-declare var console: Console;
 -
 -interface AudioDataOutputCallback {
 -  (output: AudioData): void;
@@ -64925,7 +64925,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -interface FileCallback {
 -  (file: File): void;
 -}
-+declare const SubtleCrypto: {
++declare var SubtleCrypto: {
 +  prototype: SubtleCrypto;
 +  new (): SubtleCrypto;
 +};
@@ -64949,7 +64949,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -interface FileSystemEntryCallback {
 -  (entry: FileSystemEntry): void;
 -}
-+declare const TaskController: {
++declare var TaskController: {
 +  prototype: TaskController;
 +  new (init?: TaskControllerInit): TaskController;
 +};
@@ -64973,7 +64973,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -interface FunctionStringCallback {
 -  (data: string): void;
 -}
-+declare const TaskPriorityChangeEvent: {
++declare var TaskPriorityChangeEvent: {
 +  prototype: TaskPriorityChangeEvent;
 +  new (
 +    type: string,
@@ -65048,7 +65048,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -interface OnBeforeUnloadEventHandlerNonNull {
 -  (event: Event): string | null;
 -}
-+declare const TaskSignal: {
++declare var TaskSignal: {
 +  prototype: TaskSignal;
 +  new (): TaskSignal;
 +  /**
@@ -65114,7 +65114,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -interface PositionErrorCallback {
 -  (positionError: GeolocationPositionError): void;
 -}
-+declare const TextDecoder: {
++declare var TextDecoder: {
 +  prototype: TextDecoder;
 +  new (label?: string, options?: TextDecoderOptions): TextDecoder;
 +};
@@ -65159,7 +65159,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -interface RTCSessionDescriptionCallback {
 -  (description: RTCSessionDescriptionInit): void;
 -}
-+declare const TextDecoderStream: {
++declare var TextDecoderStream: {
 +  prototype: TextDecoderStream;
 +  new (label?: string, options?: TextDecoderOptions): TextDecoderStream;
 +};
@@ -65192,7 +65192,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -interface ReportingObserverCallback {
 -  (reports: readonly Report[], observer: ReportingObserver): void;
 -}
-+declare const TextEncoder: {
++declare var TextEncoder: {
 +  prototype: TextEncoder;
 +  new (): TextEncoder;
 +};
@@ -65225,7 +65225,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -interface TransformerStartCallback<O> {
 -  (controller: TransformStreamDefaultController<O>): unknown;
 -}
-+declare const TextEncoderStream: {
++declare var TextEncoderStream: {
 +  prototype: TextEncoderStream;
 +  new (): TextEncoderStream;
 +};
@@ -65358,7 +65358,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -interface UnderlyingSinkStartCallback {
 -  (controller: WritableStreamDefaultController): unknown;
 -}
-+declare const TextMetrics: {
++declare var TextMetrics: {
 +  prototype: TextMetrics;
 +  new (): TextMetrics;
 +};
@@ -65700,7 +65700,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 -  track: HTMLTrackElement;
 -  u: HTMLElement;
 -  ul: HTMLUListElement;
--  const: HTMLElement;
+-  var: HTMLElement;
 -  video: HTMLVideoElement;
 -  wbr: HTMLElement;
 +/**
@@ -66196,7 +66196,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly writable: WritableStream<I>;
 +}
 +
-+declare const TransformStream: {
++declare var TransformStream: {
 +  prototype: TransformStream;
 +  new <I = unknown, O = unknown>(
 +    transformer?: Transformer<I, O>,
@@ -66241,7 +66241,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  terminate(): void;
 +}
 +
-+declare const TransformStreamDefaultController: {
++declare var TransformStreamDefaultController: {
 +  prototype: TransformStreamDefaultController;
 +  new (): TransformStreamDefaultController;
 +};
@@ -66515,7 +66515,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  toJSON(): string;
 +}
 +
-+declare const URL: {
++declare var URL: {
 +  prototype: URL;
 +  new (url: string | URL, base?: string | URL): URL;
 +  /**
@@ -66554,7 +66554,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 - * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/location)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLPattern)
   */
--declare const location: Location;
+-declare var location: Location;
 +interface URLPattern {
 +  /**
 +   * The **`hasRegExpGroups`** read-only property of the URLPattern interface is a boolean indicating whether or not any of the URLPattern components contain regular expression capturing groups.
@@ -66627,7 +66627,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  test(input?: URLPatternInput, baseURL?: string | URL): boolean;
 +}
 +
-+declare const URLPattern: {
++declare var URLPattern: {
 +  prototype: URLPattern;
 +  new (
 +    input: URLPatternInput,
@@ -66701,7 +66701,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
 +
-+declare const URLSearchParams: {
++declare var URLSearchParams: {
 +  prototype: URLSearchParams;
 +  new (
 +    init?:
@@ -66850,7 +66850,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 - * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/navigator)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/VTTRegion)
   */
--declare const navigator: Navigator;
+-declare var navigator: Navigator;
 +interface VTTRegion {
 +  id: string;
 +  lines: number;
@@ -66994,7 +66994,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  toJSON(): VideoColorSpaceInit;
 +}
 +
-+declare const VideoColorSpace: {
++declare var VideoColorSpace: {
 +  prototype: VideoColorSpace;
 +  new (init?: VideoColorSpaceInit): VideoColorSpace;
 +};
@@ -67135,7 +67135,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
 +
-+declare const VideoDecoder: {
++declare var VideoDecoder: {
 +  prototype: VideoDecoder;
 +  new (init: VideoDecoderInit): VideoDecoder;
 +  /**
@@ -67226,7 +67226,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
 +
-+declare const VideoEncoder: {
++declare var VideoEncoder: {
 +  prototype: VideoEncoder;
 +  new (init: VideoEncoderInit): VideoEncoder;
 +  /**
@@ -67335,7 +67335,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): Promise<PlaneLayout[]>;
 +}
 +
-+declare const VideoFrame: {
++declare var VideoFrame: {
 +  prototype: VideoFrame;
 +  new (image: CanvasImageSource, init?: VideoFrameInit): VideoFrame;
 +  new (data: AllowSharedBufferSource, init: VideoFrameBufferInit): VideoFrame;
@@ -67594,7 +67594,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 - * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/self)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_compressed_texture_astc)
   */
--declare const self: Window & typeof globalThis;
+-declare var self: Window & typeof globalThis;
 +interface WEBGL_compressed_texture_astc {
 +  /**
 +   * The **`WEBGL_compressed_texture_astc.getSupportedProfiles()`** method returns an array of strings containing the names of the ASTC profiles supported by the implementation.
@@ -68034,7 +68034,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
 +
-+declare const WGSLLanguageFeatures: {
++declare var WGSLLanguageFeatures: {
 +  prototype: WGSLLanguageFeatures;
 +  new (): WGSLLanguageFeatures;
 +};
@@ -68239,7 +68239,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +    WebGL2RenderingContextOverloads,
 +    WebGLRenderingContextBase {}
 +
-+declare const WebGL2RenderingContext: {
++declare var WebGL2RenderingContext: {
 +  prototype: WebGL2RenderingContext;
 +  new (): WebGL2RenderingContext;
 +  readonly READ_BUFFER: 0x0c02;
@@ -69927,7 +69927,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly type: GLenum;
 +}
 +
-+declare const WebGLActiveInfo: {
++declare var WebGLActiveInfo: {
 +  prototype: WebGLActiveInfo;
 +  new (): WebGLActiveInfo;
 +};
@@ -69939,7 +69939,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface WebGLBuffer {}
 +
-+declare const WebGLBuffer: {
++declare var WebGLBuffer: {
 +  prototype: WebGLBuffer;
 +  new (): WebGLBuffer;
 +};
@@ -69958,7 +69958,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly statusMessage: string;
 +}
 +
-+declare const WebGLContextEvent: {
++declare var WebGLContextEvent: {
 +  prototype: WebGLContextEvent;
 +  new (type: string, eventInit?: WebGLContextEventInit): WebGLContextEvent;
 +};
@@ -69970,7 +69970,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface WebGLFramebuffer {}
 +
-+declare const WebGLFramebuffer: {
++declare var WebGLFramebuffer: {
 +  prototype: WebGLFramebuffer;
 +  new (): WebGLFramebuffer;
 +};
@@ -69982,7 +69982,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface WebGLProgram {}
 +
-+declare const WebGLProgram: {
++declare var WebGLProgram: {
 +  prototype: WebGLProgram;
 +  new (): WebGLProgram;
 +};
@@ -69994,7 +69994,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface WebGLQuery {}
 +
-+declare const WebGLQuery: {
++declare var WebGLQuery: {
 +  prototype: WebGLQuery;
 +  new (): WebGLQuery;
 +};
@@ -70006,7 +70006,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface WebGLRenderbuffer {}
 +
-+declare const WebGLRenderbuffer: {
++declare var WebGLRenderbuffer: {
 +  prototype: WebGLRenderbuffer;
 +  new (): WebGLRenderbuffer;
 +};
@@ -70019,7 +70019,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +interface WebGLRenderingContext
 +  extends WebGLRenderingContextBase, WebGLRenderingContextOverloads {}
 +
-+declare const WebGLRenderingContext: {
++declare var WebGLRenderingContext: {
 +  prototype: WebGLRenderingContext;
 +  new (): WebGLRenderingContext;
 +  readonly DEPTH_BUFFER_BIT: 0x00000100;
@@ -71204,7 +71204,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface WebGLSampler {}
 +
-+declare const WebGLSampler: {
++declare var WebGLSampler: {
 +  prototype: WebGLSampler;
 +  new (): WebGLSampler;
 +};
@@ -71216,7 +71216,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface WebGLShader {}
 +
-+declare const WebGLShader: {
++declare var WebGLShader: {
 +  prototype: WebGLShader;
 +  new (): WebGLShader;
 +};
@@ -71247,7 +71247,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly rangeMin: GLint;
 +}
 +
-+declare const WebGLShaderPrecisionFormat: {
++declare var WebGLShaderPrecisionFormat: {
 +  prototype: WebGLShaderPrecisionFormat;
 +  new (): WebGLShaderPrecisionFormat;
 +};
@@ -71259,7 +71259,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface WebGLSync {}
 +
-+declare const WebGLSync: {
++declare var WebGLSync: {
 +  prototype: WebGLSync;
 +  new (): WebGLSync;
 +};
@@ -71271,7 +71271,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface WebGLTexture {}
 +
-+declare const WebGLTexture: {
++declare var WebGLTexture: {
 +  prototype: WebGLTexture;
 +  new (): WebGLTexture;
 +};
@@ -71283,7 +71283,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface WebGLTransformFeedback {}
 +
-+declare const WebGLTransformFeedback: {
++declare var WebGLTransformFeedback: {
 +  prototype: WebGLTransformFeedback;
 +  new (): WebGLTransformFeedback;
 +};
@@ -71295,7 +71295,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface WebGLUniformLocation {}
 +
-+declare const WebGLUniformLocation: {
++declare var WebGLUniformLocation: {
 +  prototype: WebGLUniformLocation;
 +  new (): WebGLUniformLocation;
 +};
@@ -71307,7 +71307,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + */
 +interface WebGLVertexArrayObject {}
 +
-+declare const WebGLVertexArrayObject: {
++declare var WebGLVertexArrayObject: {
 +  prototype: WebGLVertexArrayObject;
 +  new (): WebGLVertexArrayObject;
 +};
@@ -71410,7 +71410,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
 +
-+declare const WebSocket: {
++declare var WebSocket: {
 +  prototype: WebSocket;
 +  new (url: string | URL, protocols?: string | readonly string[]): WebSocket;
 +  readonly CONNECTING: 0;
@@ -71480,7 +71480,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): Promise<WritableStream>;
 +}
 +
-+declare const WebTransport: {
++declare var WebTransport: {
 +  prototype: WebTransport;
 +  new (url: string | URL, options?: WebTransportOptions): WebTransport;
 +};
@@ -71506,7 +71506,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly writable: WritableStream;
 +}
 +
-+declare const WebTransportBidirectionalStream: {
++declare var WebTransportBidirectionalStream: {
 +  prototype: WebTransportBidirectionalStream;
 +  new (): WebTransportBidirectionalStream;
 +};
@@ -71562,7 +71562,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly writable: WritableStream;
 +}
 +
-+declare const WebTransportDatagramDuplexStream: {
++declare var WebTransportDatagramDuplexStream: {
 +  prototype: WebTransportDatagramDuplexStream;
 +  new (): WebTransportDatagramDuplexStream;
 +};
@@ -71588,7 +71588,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  readonly streamErrorCode: number | null;
 +}
 +
-+declare const WebTransportError: {
++declare var WebTransportError: {
 +  prototype: WebTransportError;
 +  new (message?: string, options?: WebTransportErrorOptions): WebTransportError;
 +};
@@ -72391,7 +72391,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
 +
-+declare const Worker: {
++declare var Worker: {
 +  prototype: Worker;
 +  new (scriptURL: string | URL, options?: WorkerOptions): Worker;
 +};
@@ -72448,7 +72448,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  getWriter(): WritableStreamDefaultWriter<W>;
 +}
 +
-+declare const WritableStream: {
++declare var WritableStream: {
 +  prototype: WritableStream;
 +  new <W = unknown>(
 +    underlyingSink?: UnderlyingSink<W>,
@@ -72476,7 +72476,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  error(e?: unknown): void;
 +}
 +
-+declare const WritableStreamDefaultController: {
++declare var WritableStreamDefaultController: {
 +  prototype: WritableStreamDefaultController;
 +  new (): WritableStreamDefaultController;
 +};
@@ -72531,7 +72531,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  write(chunk?: W): Promise<void>;
 +}
 +
-+declare const WritableStreamDefaultWriter: {
++declare var WritableStreamDefaultWriter: {
 +  prototype: WritableStreamDefaultWriter;
 +  new <W = unknown>(stream: WritableStream<W>): WritableStreamDefaultWriter<W>;
 +};
@@ -72723,7 +72723,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
 +
-+declare const XMLHttpRequest: {
++declare var XMLHttpRequest: {
 +  prototype: XMLHttpRequest;
 +  new (): XMLHttpRequest;
 +  readonly UNSENT: 0;
@@ -72784,7 +72784,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
 +
-+declare const XMLHttpRequestEventTarget: {
++declare var XMLHttpRequestEventTarget: {
 +  prototype: XMLHttpRequestEventTarget;
 +  new (): XMLHttpRequestEventTarget;
 +};
@@ -72823,7 +72823,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  ): void;
 +}
 +
-+declare const XMLHttpRequestUpload: {
++declare var XMLHttpRequestUpload: {
 +  prototype: XMLHttpRequestUpload;
 +  new (): XMLHttpRequestUpload;
 +};
@@ -73634,7 +73634,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  warn(...data: readonly unknown[]): void;
 +}
 +
-+declare const console: Console;
++declare var console: Console;
 +
 +interface AudioDataOutputCallback {
 +  (output: AudioData): void;
@@ -73953,7 +73953,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 +  track: HTMLTrackElement;
 +  u: HTMLElement;
 +  ul: HTMLUListElement;
-+  const: HTMLElement;
++  var: HTMLElement;
 +  video: HTMLVideoElement;
 +  wbr: HTMLElement;
 +}
@@ -74202,7 +74202,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + *
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/location)
 + */
-+declare const location: Location;
++declare var location: Location;
 +/**
 + * Returns the **`locationbar`** object.
 + *
@@ -74233,7 +74233,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + *
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/navigator)
 + */
-+declare const navigator: Navigator;
++declare var navigator: Navigator;
 +/**
 + * Available only in secure contexts.
 + *
@@ -74366,7 +74366,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
 + *
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/self)
 + */
-+declare const self: Window & typeof globalThis;
++declare var self: Window & typeof globalThis;
 +/**
 + * The **`speechSynthesis`** read-only property of the Window object returns a SpeechSynthesis object, which is the entry point into using Web Speech API speech synthesis functionality.
 + *
@@ -74664,7 +74664,7 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLInputElement/invalid_event) */
  declare const oninvalid: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/keydown_event) */
-@@ -45763,7 +50978,7 @@ declare const onunhandledrejection:
+@@ -45763,7 +50978,7 @@ declare var onunhandledrejection:
    | ((this: Window, ev: PromiseRejectionEvent) => unknown)
    | null;
  /**
@@ -74673,12 +74673,12 @@ index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/unload_event)
   */
-@@ -45788,6 +51003,8 @@ declare const isSecureContext: boolean;
- declare const origin: string;
+@@ -45788,6 +51003,8 @@ declare var isSecureContext: boolean;
+ declare var origin: string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/performance) */
- declare const performance: Performance;
+ declare var performance: Performance;
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/scheduler) */
-+declare const scheduler: Scheduler;
++declare var scheduler: Scheduler;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/atob) */
  declare function atob(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */

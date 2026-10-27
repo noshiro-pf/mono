@@ -1,5 +1,5 @@
 diff --git a/v5.8/output/lib-files/lib.dom.d.ts b/v5.9/output/lib-files/lib.dom.d.ts
-index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d91760509da6120 100644
+index 158f7b99d2a85f66af7203dfe97e1425a2de70e3..9b1b7b6353ffe57c547508a6e9ada5463b83b636 100644
 --- a/v5.8/output/lib-files/lib.dom.d.ts
 +++ b/v5.9/output/lib-files/lib.dom.d.ts
 @@ -145,7 +145,7 @@ interface AudioDataInit {
@@ -517,7 +517,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    addEventListener<K extends keyof AbortSignalEventMap>(
      type: K,
 @@ -2642,42 +2807,58 @@ interface AbortSignal extends EventTarget {
- declare const AbortSignal: {
+ declare var AbortSignal: {
    prototype: AbortSignal;
    new (): AbortSignal;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_static) */
@@ -1354,7 +1354,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    addEventListener<K extends keyof AudioDecoderEventMap>(
      type: K,
 @@ -3171,17 +3709,25 @@ interface AudioDecoder extends EventTarget {
- declare const AudioDecoder: {
+ declare var AudioDecoder: {
    prototype: AudioDecoder;
    new (init: AudioDecoderInit): AudioDecoder;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioDecoder/isConfigSupported_static) */
@@ -1446,7 +1446,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    addEventListener<K extends keyof AudioEncoderEventMap>(
      type: K,
 @@ -3241,35 +3816,76 @@ interface AudioEncoder extends EventTarget {
- declare const AudioEncoder: {
+ declare var AudioEncoder: {
    prototype: AudioEncoder;
    new (init: AudioEncoderInit): AudioEncoder;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioEncoder/isConfigSupported_static) */
@@ -2277,7 +2277,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    text(): Promise<string>;
  }
  
-@@ -3804,11 +4724,23 @@ declare const Blob: {
+@@ -3804,11 +4724,23 @@ declare var Blob: {
    new (blobParts?: readonly BlobPart[], options?: BlobPropertyBag): Blob;
  };
  
@@ -2355,7 +2355,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BroadcastChannel/postMessage)
     */
-@@ -3901,12 +4837,16 @@ declare const BroadcastChannel: {
+@@ -3901,12 +4837,16 @@ declare var BroadcastChannel: {
  };
  
  /**
@@ -2374,7 +2374,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly highWaterMark: number;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ByteLengthQueuingStrategy/size) */
    readonly size: QueuingStrategySize<ArrayBufferView>;
-@@ -3918,7 +4858,7 @@ declare const ByteLengthQueuingStrategy: {
+@@ -3918,7 +4858,7 @@ declare var ByteLengthQueuingStrategy: {
  };
  
  /**
@@ -2752,7 +2752,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 + */
 +interface CSSImageValue extends CSSStyleValue {}
 +
- declare const CSSImageValue: {
+ declare var CSSImageValue: {
    prototype: CSSImageValue;
    new (): CSSImageValue;
  };
@@ -2902,7 +2902,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    value: string;
  }
  
-@@ -4161,9 +5374,17 @@ declare const CSSKeywordValue: {
+@@ -4161,9 +5374,17 @@ declare var CSSKeywordValue: {
    new (value: string): CSSKeywordValue;
  };
  
@@ -2942,7 +2942,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly nameList: ReadonlyArray<string>;
  }
  
-@@ -4198,9 +5427,17 @@ declare const CSSMathClamp: {
+@@ -4198,9 +5427,17 @@ declare var CSSMathClamp: {
    ): CSSMathClamp;
  };
  
@@ -2962,7 +2962,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly value: CSSNumericValue;
  }
  
-@@ -4209,9 +5446,17 @@ declare const CSSMathInvert: {
+@@ -4209,9 +5446,17 @@ declare var CSSMathInvert: {
    new (arg: CSSNumberish): CSSMathInvert;
  };
  
@@ -2982,7 +2982,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly values: CSSNumericArray;
  }
  
-@@ -4220,9 +5465,17 @@ declare const CSSMathMax: {
+@@ -4220,9 +5465,17 @@ declare var CSSMathMax: {
    new (...args: readonly CSSNumberish[]): CSSMathMax;
  };
  
@@ -3002,7 +3002,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly values: CSSNumericArray;
  }
  
-@@ -4231,9 +5484,17 @@ declare const CSSMathMin: {
+@@ -4231,9 +5484,17 @@ declare var CSSMathMin: {
    new (...args: readonly CSSNumberish[]): CSSMathMin;
  };
  
@@ -3022,7 +3022,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly value: CSSNumericValue;
  }
  
-@@ -4242,9 +5503,17 @@ declare const CSSMathNegate: {
+@@ -4242,9 +5503,17 @@ declare var CSSMathNegate: {
    new (arg: CSSNumberish): CSSMathNegate;
  };
  
@@ -3042,7 +3042,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly values: CSSNumericArray;
  }
  
-@@ -4253,9 +5522,17 @@ declare const CSSMathProduct: {
+@@ -4253,9 +5522,17 @@ declare var CSSMathProduct: {
    new (...args: readonly CSSNumberish[]): CSSMathProduct;
  };
  
@@ -3062,7 +3062,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly values: CSSNumericArray;
  }
  
-@@ -4264,9 +5541,17 @@ declare const CSSMathSum: {
+@@ -4264,9 +5541,17 @@ declare var CSSMathSum: {
    new (...args: readonly CSSNumberish[]): CSSMathSum;
  };
  
@@ -3082,7 +3082,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly operator: CSSMathOperator;
  }
  
-@@ -4275,9 +5560,17 @@ declare const CSSMathValue: {
+@@ -4275,9 +5560,17 @@ declare var CSSMathValue: {
    new (): CSSMathValue;
  };
  
@@ -3102,7 +3102,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    matrix: DOMMatrix;
  }
  
-@@ -4290,12 +5583,16 @@ declare const CSSMatrixComponent: {
+@@ -4290,12 +5583,16 @@ declare var CSSMatrixComponent: {
  };
  
  /**
@@ -3187,7 +3187,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly length: number;
    forEach(
      callbackfn: (
-@@ -4354,46 +5675,102 @@ declare const CSSNumericArray: {
+@@ -4354,46 +5675,102 @@ declare var CSSNumericArray: {
    new (): CSSNumericArray;
  };
  
@@ -3270,7 +3270,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    type(): CSSNumericType;
  }
  
- declare const CSSNumericValue: {
+ declare var CSSNumericValue: {
    prototype: CSSNumericValue;
    new (): CSSNumericValue;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/parse_static) */
@@ -3325,7 +3325,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    length: CSSPerspectiveValue;
  }
  
-@@ -4414,15 +5799,35 @@ declare const CSSPerspective: {
+@@ -4414,15 +5799,35 @@ declare var CSSPerspective: {
    new (length: CSSPerspectiveValue): CSSPerspective;
  };
  
@@ -3407,7 +3407,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    z: CSSNumberish;
  }
  
-@@ -4455,18 +5880,31 @@ declare const CSSRotate: {
+@@ -4455,18 +5880,31 @@ declare var CSSRotate: {
  };
  
  /**
@@ -3503,7 +3503,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    z: CSSNumberish;
  }
  
-@@ -4536,11 +5998,23 @@ declare const CSSScale: {
+@@ -4536,11 +5998,23 @@ declare var CSSScale: {
    new (x: CSSNumberish, y: CSSNumberish, z?: CSSNumberish): CSSScale;
  };
  
@@ -3557,7 +3557,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    ay: CSSNumericValue;
  }
  
-@@ -4562,9 +6048,17 @@ declare const CSSSkew: {
+@@ -4562,9 +6048,17 @@ declare var CSSSkew: {
    new (ax: CSSNumericValue, ay: CSSNumericValue): CSSSkew;
  };
  
@@ -3577,7 +3577,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    ax: CSSNumericValue;
  }
  
-@@ -4573,9 +6067,17 @@ declare const CSSSkewX: {
+@@ -4573,9 +6067,17 @@ declare var CSSSkewX: {
    new (ax: CSSNumericValue): CSSSkewX;
  };
  
@@ -3597,7 +3597,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    ay: CSSNumericValue;
  }
  
-@@ -4584,7 +6086,11 @@ declare const CSSSkewY: {
+@@ -4584,7 +6086,11 @@ declare var CSSSkewY: {
    new (ay: CSSNumericValue): CSSSkewY;
  };
  
@@ -3886,7 +3886,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    toString(): string;
  }
 @@ -5977,14 +7572,22 @@ interface CSSStyleValue {
- declare const CSSStyleValue: {
+ declare var CSSStyleValue: {
    prototype: CSSStyleValue;
    new (): CSSStyleValue;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSStyleValue/parse_static) */
@@ -3938,7 +3938,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    toMatrix(): DOMMatrix;
    toString(): string;
  }
-@@ -6009,13 +7624,29 @@ declare const CSSTransformComponent: {
+@@ -6009,13 +7624,29 @@ declare var CSSTransformComponent: {
    new (): CSSTransformComponent;
  };
  
@@ -3972,7 +3972,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    toMatrix(): DOMMatrix;
    forEach(
      callbackfn: (
-@@ -6033,9 +7664,17 @@ declare const CSSTransformValue: {
+@@ -6033,9 +7664,17 @@ declare var CSSTransformValue: {
    new (transforms: readonly CSSTransformComponent[]): CSSTransformValue;
  };
  
@@ -4026,7 +4026,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    z: CSSNumericValue;
  }
  
-@@ -6083,11 +7738,23 @@ declare const CSSTranslate: {
+@@ -6083,11 +7738,23 @@ declare var CSSTranslate: {
    ): CSSTranslate;
  };
  
@@ -4053,7 +4053,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    value: number;
  }
  
-@@ -6096,9 +7763,17 @@ declare const CSSUnitValue: {
+@@ -6096,9 +7763,17 @@ declare var CSSUnitValue: {
    new (value: number, unit: string): CSSUnitValue;
  };
  
@@ -4073,7 +4073,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly length: number;
    forEach(
      callbackfn: (
-@@ -6116,11 +7791,23 @@ declare const CSSUnparsedValue: {
+@@ -6116,11 +7791,23 @@ declare var CSSUnparsedValue: {
    new (members: readonly CSSUnparsedSegment[]): CSSUnparsedValue;
  };
  
@@ -4174,7 +4174,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    put(request: RequestInfo | URL, response: Response): Promise<void>;
  }
  
-@@ -6183,24 +7898,44 @@ declare const Cache: {
+@@ -6183,24 +7898,44 @@ declare var Cache: {
  };
  
  /**
@@ -4225,7 +4225,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    open(cacheName: string): Promise<Cache>;
  }
  
-@@ -6209,11 +7944,23 @@ declare const CacheStorage: {
+@@ -6209,11 +7944,23 @@ declare var CacheStorage: {
    new (): CacheStorage;
  };
  
@@ -4558,7 +4558,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CloseEvent/wasClean)
     */
-@@ -6820,7 +8642,7 @@ declare const CloseEvent: {
+@@ -6820,7 +8642,7 @@ declare var CloseEvent: {
  };
  
  /**
@@ -4605,7 +4605,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly writable: WritableStream<BufferSource>;
  }
  
-@@ -6869,9 +8700,17 @@ declare const CompressionStream: {
+@@ -6869,9 +8700,17 @@ declare var CompressionStream: {
    new (format: CompressionFormat): CompressionStream;
  };
  
@@ -4764,7 +4764,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 +  ): void;
 +}
 +
-+declare const CookieStore: {
++declare var CookieStore: {
 +  prototype: CookieStore;
 +  new (): CookieStore;
 +};
@@ -4796,7 +4796,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 +  unsubscribe(subscriptions: readonly CookieStoreGetOptions[]): Promise<void>;
 +}
 +
-+declare const CookieStoreManager: {
++declare var CookieStoreManager: {
 +  prototype: CookieStoreManager;
 +  new (): CookieStoreManager;
 +};
@@ -4816,7 +4816,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly highWaterMark: number;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CountQueuingStrategy/size) */
    readonly size: QueuingStrategySize;
-@@ -6958,14 +8943,23 @@ declare const CountQueuingStrategy: {
+@@ -6958,14 +8943,23 @@ declare var CountQueuingStrategy: {
  };
  
  /**
@@ -4912,7 +4912,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     * Available only in secure contexts.
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Crypto/randomUUID)
-@@ -7023,19 +9040,35 @@ declare const Crypto: {
+@@ -7023,19 +9040,35 @@ declare var Crypto: {
  };
  
  /**
@@ -4953,7 +4953,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly usages: readonly KeyUsage[];
  }
  
-@@ -7044,21 +9077,45 @@ declare const CryptoKey: {
+@@ -7044,21 +9077,45 @@ declare var CryptoKey: {
    new (): CryptoKey;
  };
  
@@ -5028,7 +5028,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     * @deprecated
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CustomEvent/initCustomEvent)
-@@ -7093,7 +9155,11 @@ declare const CustomEvent: {
+@@ -7093,7 +9155,11 @@ declare var CustomEvent: {
    new <T>(type: string, eventInitDict?: CustomEventInit<T>): CustomEvent<T>;
  };
  
@@ -5074,7 +5074,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly name: string;
    readonly INDEX_SIZE_ERR: 1;
    readonly DOMSTRING_SIZE_ERR: 2;
-@@ -7180,26 +9255,39 @@ declare const DOMException: {
+@@ -7180,26 +9255,39 @@ declare var DOMException: {
  };
  
  /**
@@ -5234,7 +5234,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    translateSelf(tx?: number, ty?: number, tz?: number): DOMMatrix;
  }
  
- declare const DOMMatrix: {
+ declare var DOMMatrix: {
    prototype: DOMMatrix;
    new (init?: string | readonly number[]): DOMMatrix;
 -  fromFloat32Array(array32: Float32Array): DOMMatrix;
@@ -5409,7 +5409,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    toString(): string;
  }
 @@ -7412,25 +9638,19 @@ interface DOMMatrixReadOnly {
- declare const DOMMatrixReadOnly: {
+ declare var DOMMatrixReadOnly: {
    prototype: DOMMatrixReadOnly;
    new (init?: string | readonly number[]): DOMMatrixReadOnly;
 -  fromFloat32Array(array32: Float32Array): DOMMatrixReadOnly;
@@ -5479,7 +5479,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    z: number;
  }
  
- declare const DOMPoint: {
+ declare var DOMPoint: {
    prototype: DOMPoint;
    new (x?: number, y?: number, z?: number, w?: number): DOMPoint;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPoint/fromPoint_static) */
@@ -5545,7 +5545,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    toJSON(): unknown;
  }
  
- declare const DOMPointReadOnly: {
+ declare var DOMPointReadOnly: {
    prototype: DOMPointReadOnly;
    new (x?: number, y?: number, z?: number, w?: number): DOMPointReadOnly;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPointReadOnly/fromPoint_static) */
@@ -5608,7 +5608,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    toJSON(): unknown;
  }
  
-@@ -7515,33 +9819,69 @@ declare const DOMQuad: {
+@@ -7515,33 +9819,69 @@ declare var DOMQuad: {
    fromRect(other?: DOMRectInit): DOMQuad;
  };
  
@@ -5649,7 +5649,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    y: number;
  }
  
- declare const DOMRect: {
+ declare var DOMRect: {
    prototype: DOMRect;
    new (x?: number, y?: number, width?: number, height?: number): DOMRect;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMRect/fromRect_static) */
@@ -5763,7 +5763,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    toJSON(): unknown;
  }
  
-@@ -7581,30 +9961,34 @@ declare const DOMRectReadOnly: {
+@@ -7581,30 +9961,34 @@ declare var DOMRectReadOnly: {
      width?: number,
      height?: number,
    ): DOMRectReadOnly;
@@ -5803,7 +5803,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMStringList/item)
     */
-@@ -7618,7 +10002,7 @@ declare const DOMStringList: {
+@@ -7618,7 +10002,7 @@ declare var DOMStringList: {
  };
  
  /**
@@ -6092,7 +6092,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly writable: WritableStream<BufferSource>;
  }
  
-@@ -7902,12 +10262,16 @@ declare const DecompressionStream: {
+@@ -7902,12 +10262,16 @@ declare var DecompressionStream: {
  };
  
  /**
@@ -7898,7 +7898,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    copyTo(destination: AllowSharedBufferSource): void;
  }
  
-@@ -9422,17 +12085,41 @@ declare const EncodedAudioChunk: {
+@@ -9422,17 +12085,41 @@ declare var EncodedAudioChunk: {
    new (init: EncodedAudioChunkInit): EncodedAudioChunk;
  };
  
@@ -7946,7 +7946,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    copyTo(destination: AllowSharedBufferSource): void;
  }
  
-@@ -9442,20 +12129,40 @@ declare const EncodedVideoChunk: {
+@@ -9442,20 +12129,40 @@ declare var EncodedVideoChunk: {
  };
  
  /**
@@ -7993,7 +7993,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly message: string;
  }
  
-@@ -9465,115 +12172,119 @@ declare const ErrorEvent: {
+@@ -9465,115 +12172,119 @@ declare var ErrorEvent: {
  };
  
  /**
@@ -8128,7 +8128,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/stopPropagation)
     */
-@@ -9593,7 +12304,11 @@ declare const Event: {
+@@ -9593,7 +12304,11 @@ declare var Event: {
    readonly BUBBLING_PHASE: 3;
  };
  
@@ -8184,7 +8184,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventSource/close)
     */
-@@ -9696,25 +12415,13 @@ declare const EventSource: {
+@@ -9696,25 +12415,13 @@ declare var EventSource: {
  };
  
  /**
@@ -8261,7 +8261,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly webkitRelativePath: string;
  }
  
-@@ -9784,14 +12503,22 @@ declare const File: {
+@@ -9784,14 +12503,22 @@ declare var File: {
  };
  
  /**
@@ -8364,7 +8364,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readAsText(blob: Blob, encoding?: string): void;
    readonly EMPTY: 0;
    readonly LOADING: 1;
-@@ -9894,11 +12650,23 @@ declare const FileReader: {
+@@ -9894,11 +12650,23 @@ declare var FileReader: {
    readonly DONE: 2;
  };
  
@@ -8477,7 +8477,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    resolve(possibleDescendant: FileSystemHandle): Promise<string[] | null>;
  }
  
-@@ -9960,9 +12761,17 @@ declare const FileSystemDirectoryHandle: {
+@@ -9960,9 +12761,17 @@ declare var FileSystemDirectoryHandle: {
    new (): FileSystemDirectoryHandle;
  };
  
@@ -8601,7 +8601,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    getFile(): Promise<File>;
  }
  
-@@ -10030,16 +12884,29 @@ declare const FileSystemFileHandle: {
+@@ -10030,16 +12884,29 @@ declare var FileSystemFileHandle: {
  };
  
  /**
@@ -8634,7 +8634,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    isSameEntry(other: FileSystemHandle): Promise<boolean>;
  }
  
-@@ -10049,16 +12916,29 @@ declare const FileSystemHandle: {
+@@ -10049,16 +12916,29 @@ declare var FileSystemHandle: {
  };
  
  /**
@@ -8667,7 +8667,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    write(data: FileSystemWriteChunkType): Promise<void>;
  }
  
-@@ -10068,12 +12948,16 @@ declare const FileSystemWritableFileStream: {
+@@ -10068,12 +12948,16 @@ declare var FileSystemWritableFileStream: {
  };
  
  /**
@@ -8837,7 +8837,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    load(font: string, text?: string): Promise<FontFace[]>;
    forEach(
      callbackfn: (value: FontFace, key: FontFace, parent: FontFaceSet) => void,
-@@ -10178,9 +13138,17 @@ declare const FontFaceSet: {
+@@ -10178,9 +13138,17 @@ declare var FontFaceSet: {
    new (): FontFaceSet;
  };
  
@@ -8913,7 +8913,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    set(name: string, value: string | Blob): void;
    set(name: string, value: string): void;
    set(name: string, blobValue: Blob, filename?: string): void;
-@@ -10234,10 +13226,14 @@ declare const FormData: {
+@@ -10234,10 +13226,14 @@ declare var FormData: {
    new (form?: HTMLFormElement, submitter?: HTMLElement | null): FormData;
  };
  
@@ -14667,7 +14667,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    set(name: string, value: string): void;
    forEach(
      callbackfn: (value: string, key: string, parent: Headers) => void,
-@@ -16708,11 +20227,23 @@ declare const Headers: {
+@@ -16708,11 +20227,23 @@ declare var Headers: {
    new (init?: HeadersInit): Headers;
  };
  
@@ -14860,7 +14860,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBCursor/update)
     */
-@@ -16851,13 +20416,13 @@ declare const IDBCursor: {
+@@ -16851,13 +20416,13 @@ declare var IDBCursor: {
  };
  
  /**
@@ -14942,7 +14942,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBDatabase/transaction)
     */
-@@ -16971,29 +20532,31 @@ declare const IDBDatabase: {
+@@ -16971,29 +20532,31 @@ declare var IDBDatabase: {
  };
  
  /**
@@ -14981,7 +14981,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBFactory/open)
     */
-@@ -17006,49 +20569,55 @@ declare const IDBFactory: {
+@@ -17006,49 +20569,55 @@ declare var IDBFactory: {
  };
  
  /**
@@ -15094,7 +15094,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBIndex/openKeyCursor)
     */
-@@ -17105,37 +20666,37 @@ declare const IDBIndex: {
+@@ -17105,37 +20666,37 @@ declare var IDBIndex: {
  };
  
  /**
@@ -15138,7 +15138,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBKeyRange/includes)
     */
-@@ -17146,7 +20707,7 @@ declare const IDBKeyRange: {
+@@ -17146,7 +20707,7 @@ declare var IDBKeyRange: {
    prototype: IDBKeyRange;
    new (): IDBKeyRange;
    /**
@@ -15147,7 +15147,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBKeyRange/bound_static)
     */
-@@ -17157,19 +20718,19 @@ declare const IDBKeyRange: {
+@@ -17157,19 +20718,19 @@ declare var IDBKeyRange: {
      upperOpen?: boolean,
    ): IDBKeyRange;
    /**
@@ -15170,7 +15170,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBKeyRange/upperBound_static)
     */
-@@ -17177,73 +20738,61 @@ declare const IDBKeyRange: {
+@@ -17177,73 +20738,61 @@ declare var IDBKeyRange: {
  };
  
  /**
@@ -15480,7 +15480,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBTransaction/objectStore)
     */
-@@ -17555,14 +21098,22 @@ declare const IDBTransaction: {
+@@ -17555,14 +21098,22 @@ declare var IDBTransaction: {
  };
  
  /**
@@ -15506,7 +15506,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly oldVersion: number;
  }
  
-@@ -17575,16 +21126,20 @@ declare const IDBVersionChangeEvent: {
+@@ -17575,16 +21126,20 @@ declare var IDBVersionChangeEvent: {
  };
  
  /**
@@ -15590,7 +15590,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ImageBitmap/close)
     */
-@@ -17633,16 +21204,20 @@ declare const ImageBitmap: {
+@@ -17633,16 +21204,20 @@ declare var ImageBitmap: {
    new (): ImageBitmap;
  };
  
@@ -15614,7 +15614,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ImageBitmapRenderingContext/transferFromImageBitmap)
     */
-@@ -17655,27 +21230,69 @@ declare const ImageBitmapRenderingContext: {
+@@ -17655,27 +21230,69 @@ declare var ImageBitmapRenderingContext: {
  };
  
  /**
@@ -15690,7 +15690,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ImageData/width)
     */
-@@ -17686,7 +21303,7 @@ declare const ImageData: {
+@@ -17686,7 +21303,7 @@ declare var ImageData: {
    prototype: ImageData;
    new (sw: number, sh: number, settings?: ImageDataSettings): ImageData;
    new (
@@ -15699,7 +15699,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
      sw: number,
      sh?: number,
      settings?: ImageDataSettings,
-@@ -17694,43 +21311,96 @@ declare const ImageData: {
+@@ -17694,43 +21311,96 @@ declare var ImageData: {
  };
  
  /**
@@ -15760,7 +15760,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    reset(): void;
  }
  
- declare const ImageDecoder: {
+ declare var ImageDecoder: {
    prototype: ImageDecoder;
    new (init: ImageDecoderInit): ImageDecoder;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ImageDecoder/isTypeSupported_static) */
@@ -15809,7 +15809,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    selected: boolean;
  }
  
-@@ -17739,15 +21409,35 @@ declare const ImageTrack: {
+@@ -17739,15 +21409,35 @@ declare var ImageTrack: {
    new (): ImageTrack;
  };
  
@@ -16404,7 +16404,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly name: string;
  }
  
-@@ -18110,20 +21981,29 @@ declare const Lock: {
+@@ -18110,20 +21981,29 @@ declare var Lock: {
  };
  
  /**
@@ -16439,7 +16439,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 +  ): Promise<T>;
  }
  
- declare const LockManager: {
+ declare var LockManager: {
 @@ -18136,20 +22016,33 @@ interface MIDIAccessEventMap {
  }
  
@@ -16679,7 +16679,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    encodingInfo(
      configuration: MediaEncodingConfiguration,
    ): Promise<MediaCapabilitiesEncodingInfo>;
-@@ -18431,21 +22395,41 @@ declare const MediaCapabilities: {
+@@ -18431,21 +22395,41 @@ declare var MediaCapabilities: {
  };
  
  /**
@@ -17469,7 +17469,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 + */
  interface MediaSourceHandle {}
  
- declare const MediaSourceHandle: {
+ declare var MediaSourceHandle: {
 @@ -19006,14 +23304,22 @@ interface MediaStreamEventMap {
  }
  
@@ -17741,7 +17741,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageChannel/port2)
     */
-@@ -19219,37 +23621,37 @@ declare const MessageChannel: {
+@@ -19219,37 +23621,37 @@ declare var MessageChannel: {
  };
  
  /**
@@ -17818,7 +17818,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/start)
     */
-@@ -19364,7 +23764,7 @@ declare const MessagePort: {
+@@ -19364,7 +23764,7 @@ declare var MessagePort: {
  };
  
  /**
@@ -18308,7 +18308,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    setHeaderValue(value: string): Promise<void>;
  }
  
-@@ -19719,7 +24299,7 @@ declare const NavigationPreloadManager: {
+@@ -19719,7 +24299,7 @@ declare var NavigationPreloadManager: {
  };
  
  /**
@@ -18908,7 +18908,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    addEventListener<K extends keyof NotificationEventMap>(
      type: K,
 @@ -20330,25 +25088,49 @@ interface Notification extends EventTarget {
- declare const Notification: {
+ declare var Notification: {
    prototype: Notification;
    new (title: string, options?: NotificationOptions): Notification;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/permission_static) */
@@ -19237,7 +19237,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/OffscreenCanvas/transferToImageBitmap)
     */
-@@ -20632,7 +25476,11 @@ declare const OffscreenCanvas: {
+@@ -20632,7 +25476,11 @@ declare var OffscreenCanvas: {
    new (width: number, height: number): OffscreenCanvas;
  };
  
@@ -19250,7 +19250,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
  interface OffscreenCanvasRenderingContext2D
    extends
      CanvasCompositing,
-@@ -20660,18 +25508,34 @@ declare const OffscreenCanvasRenderingContext2D: {
+@@ -20660,18 +25508,34 @@ declare var OffscreenCanvasRenderingContext2D: {
  };
  
  /**
@@ -19518,7 +19518,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Path2D/addPath)
     */
-@@ -20931,29 +25872,77 @@ declare const Path2D: {
+@@ -20931,29 +25872,77 @@ declare var Path2D: {
    new (path?: Path2D | string): Path2D;
  };
  
@@ -19938,7 +19938,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    toJSON(): unknown;
    addEventListener<K extends keyof PerformanceEventMap>(
      type: K,
-@@ -21249,20 +26368,40 @@ declare const Performance: {
+@@ -21249,20 +26368,40 @@ declare var Performance: {
  };
  
  /**
@@ -19985,7 +19985,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    toJSON(): unknown;
  }
  
-@@ -21271,17 +26410,41 @@ declare const PerformanceEntry: {
+@@ -21271,17 +26410,41 @@ declare var PerformanceEntry: {
    new (): PerformanceEntry;
  };
  
@@ -20052,7 +20052,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly detail: unknown;
  }
  
-@@ -21306,12 +26473,16 @@ declare const PerformanceMark: {
+@@ -21306,12 +26473,16 @@ declare var PerformanceMark: {
  };
  
  /**
@@ -20071,7 +20071,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly detail: unknown;
  }
  
-@@ -21321,25 +26492,28 @@ declare const PerformanceMeasure: {
+@@ -21321,25 +26492,28 @@ declare var PerformanceMeasure: {
  };
  
  /**
@@ -20224,7 +20224,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    takeRecords(): PerformanceEntryList;
  }
  
- declare const PerformanceObserver: {
+ declare var PerformanceObserver: {
    prototype: PerformanceObserver;
    new (callback: PerformanceObserverCallback): PerformanceObserver;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PerformanceObserver/supportedEntryTypes_static) */
@@ -20266,7 +20266,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    getEntriesByType(type: string): PerformanceEntryList;
  }
  
-@@ -21428,7 +26682,11 @@ declare const PerformanceObserverEntryList: {
+@@ -21428,7 +26682,11 @@ declare var PerformanceObserverEntryList: {
    new (): PerformanceObserverEntryList;
  };
  
@@ -20431,7 +20431,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    toJSON(): unknown;
  }
  
-@@ -21489,15 +26827,35 @@ declare const PerformanceResourceTiming: {
+@@ -21489,15 +26827,35 @@ declare var PerformanceResourceTiming: {
    new (): PerformanceResourceTiming;
  };
  
@@ -20472,7 +20472,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    toJSON(): unknown;
  }
  
-@@ -21507,139 +26865,161 @@ declare const PerformanceServerTiming: {
+@@ -21507,139 +26865,161 @@ declare var PerformanceServerTiming: {
  };
  
  /**
@@ -20673,7 +20673,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly state: PermissionState;
    addEventListener<K extends keyof PermissionStatusEventMap>(
      type: K,
-@@ -21710,9 +27102,17 @@ declare const PermissionStatus: {
+@@ -21710,9 +27102,17 @@ declare var PermissionStatus: {
    new (): PermissionStatus;
  };
  
@@ -20693,7 +20693,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    query(permissionDesc: PermissionDescriptor): Promise<PermissionStatus>;
  }
  
-@@ -21721,9 +27121,17 @@ declare const Permissions: {
+@@ -21721,9 +27121,17 @@ declare var Permissions: {
    new (): Permissions;
  };
  
@@ -20947,7 +20947,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly total: number;
  }
  
-@@ -21956,11 +27449,23 @@ declare const ProgressEvent: {
+@@ -21956,11 +27449,23 @@ declare var ProgressEvent: {
    new (type: string, eventInitDict?: ProgressEventInit): ProgressEvent;
  };
  
@@ -20974,7 +20974,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly reason: unknown;
  }
  
-@@ -21973,83 +27478,165 @@ declare const PromiseRejectionEvent: {
+@@ -21973,83 +27478,165 @@ declare var PromiseRejectionEvent: {
  };
  
  /**
@@ -21097,7 +21097,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    subscribe(options?: PushSubscriptionOptionsInit): Promise<PushSubscription>;
  }
  
- declare const PushManager: {
+ declare var PushManager: {
    prototype: PushManager;
    new (): PushManager;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PushManager/supportedContentEncodings_static) */
@@ -21161,7 +21161,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    unsubscribe(): Promise<boolean>;
  }
  
-@@ -22059,14 +27646,23 @@ declare const PushSubscription: {
+@@ -22059,14 +27646,23 @@ declare var PushSubscription: {
  };
  
  /**
@@ -21187,7 +21187,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly userVisibleOnly: boolean;
  }
  
-@@ -22075,11 +27671,23 @@ declare const PushSubscriptionOptions: {
+@@ -22075,11 +27671,23 @@ declare var PushSubscriptionOptions: {
    new (): PushSubscriptionOptions;
  };
  
@@ -21386,7 +21386,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    addEventListener<K extends keyof RTCDataChannelEventMap>(
      type: K,
      listener: (this: RTCDataChannel, ev: RTCDataChannelEventMap[K]) => unknown,
-@@ -22228,9 +27912,17 @@ declare const RTCDataChannel: {
+@@ -22228,9 +27912,17 @@ declare var RTCDataChannel: {
    new (): RTCDataChannel;
  };
  
@@ -21465,7 +21465,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    getMetadata(): RTCEncodedAudioFrameMetadata;
  }
  
-@@ -22305,15 +28021,31 @@ declare const RTCEncodedAudioFrame: {
+@@ -22305,15 +28021,31 @@ declare var RTCEncodedAudioFrame: {
    new (): RTCEncodedAudioFrame;
  };
  
@@ -21501,7 +21501,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    getMetadata(): RTCEncodedVideoFrameMetadata;
  }
  
-@@ -22322,17 +28054,41 @@ declare const RTCEncodedVideoFrame: {
+@@ -22322,17 +28054,41 @@ declare var RTCEncodedVideoFrame: {
    new (): RTCEncodedVideoFrame;
  };
  
@@ -22659,7 +22659,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    error(e?: unknown): void;
  }
  
-@@ -22995,30 +29250,54 @@ declare const ReadableByteStreamController: {
+@@ -22995,30 +29250,54 @@ declare var ReadableByteStreamController: {
  };
  
  /**
@@ -22721,7 +22721,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    tee(): [ReadableStream<R>, ReadableStream<R>];
  }
  
-@@ -23027,7 +29306,7 @@ declare const ReadableStream: {
+@@ -23027,7 +29306,7 @@ declare var ReadableStream: {
    new (
      underlyingSource: UnderlyingByteSource,
      strategy?: { highWaterMark?: number },
@@ -22730,7 +22730,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    new <R = unknown>(
      underlyingSource: UnderlyingDefaultSource<R>,
      strategy?: QueuingStrategy<R>,
-@@ -23038,29 +29317,59 @@ declare const ReadableStream: {
+@@ -23038,29 +29317,59 @@ declare var ReadableStream: {
    ): ReadableStream<R>;
  };
  
@@ -22759,7 +22759,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    releaseLock(): void;
  }
  
- declare const ReadableStreamBYOBReader: {
+ declare var ReadableStreamBYOBReader: {
    prototype: ReadableStreamBYOBReader;
 -  new (stream: ReadableStream<Uint8Array>): ReadableStreamBYOBReader;
 +  new (
@@ -22799,8 +22799,8 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 +  respondWithNewView(view: ArrayBufferView<ArrayBuffer>): void;
  }
  
- declare const ReadableStreamBYOBRequest: {
-@@ -23068,15 +29377,35 @@ declare const ReadableStreamBYOBRequest: {
+ declare var ReadableStreamBYOBRequest: {
+@@ -23068,15 +29377,35 @@ declare var ReadableStreamBYOBRequest: {
    new (): ReadableStreamBYOBRequest;
  };
  
@@ -22841,7 +22841,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    error(e?: unknown): void;
  }
  
-@@ -23085,13 +29414,25 @@ declare const ReadableStreamDefaultController: {
+@@ -23085,13 +29414,25 @@ declare var ReadableStreamDefaultController: {
    new (): ReadableStreamDefaultController;
  };
  
@@ -22951,7 +22951,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly url: string;
    toJSON(): unknown;
  }
-@@ -23174,9 +29551,17 @@ declare const Report: {
+@@ -23174,9 +29551,17 @@ declare var Report: {
    new (): Report;
  };
  
@@ -22971,7 +22971,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    toJSON(): unknown;
  }
  
-@@ -23185,13 +29570,29 @@ declare const ReportBody: {
+@@ -23185,13 +29570,29 @@ declare var ReportBody: {
    new (): ReportBody;
  };
  
@@ -23005,7 +23005,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    takeRecords(): ReportList;
  }
  
-@@ -23204,90 +29605,94 @@ declare const ReportingObserver: {
+@@ -23204,90 +29605,94 @@ declare var ReportingObserver: {
  };
  
  /**
@@ -23115,7 +23115,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    clone(): Request;
  }
  
-@@ -23296,13 +29701,29 @@ declare const Request: {
+@@ -23296,13 +29701,29 @@ declare var Request: {
    new (input: RequestInfo | URL, init?: RequestInit): Request;
  };
  
@@ -23292,7 +23292,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    clone(): Response;
  }
  
- declare const Response: {
+ declare var Response: {
    prototype: Response;
    new (body?: BodyInit | null, init?: ResponseInit): Response;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/error_static) */
@@ -26811,7 +26811,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly violatedDirective: string;
  }
  
-@@ -27161,61 +35227,159 @@ declare const SecurityPolicyViolationEvent: {
+@@ -27161,61 +35227,159 @@ declare var SecurityPolicyViolationEvent: {
  };
  
  /**
@@ -27999,7 +27999,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    has(property: string): boolean;
    forEach(
      callbackfn: (
-@@ -28096,25 +36638,53 @@ declare const StylePropertyMapReadOnly: {
+@@ -28096,25 +36638,53 @@ declare var StylePropertyMapReadOnly: {
  };
  
  /**
@@ -28261,7 +28261,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    wrapKey(
      format: KeyFormat,
      key: CryptoKey,
-@@ -28326,19 +36956,19 @@ declare const SubtleCrypto: {
+@@ -28326,19 +36956,19 @@ declare var SubtleCrypto: {
  };
  
  /**
@@ -28298,7 +28298,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 -   * Returns the result of running encoding's decoder. The method can be invoked zero or more times with options's stream set to true, and then once without options's stream (or set to false), to process a fragmented input. If the invocation without options's stream (or set to false) has no input, it's clearest to omit both arguments.
 -   *
 -   * ```
--   *   const  string = "", decoder = new TextDecoder(encoding), buffer;
+-   * var string = "", decoder = new TextDecoder(encoding), buffer;
 -   * while(buffer = next_chunk()) {
 -   *   string += decoder.decode(buffer, {stream:true});
 -   * }
@@ -28323,7 +28323,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
  interface TextDecoderStream extends GenericTransformStream, TextDecoderCommon {
    readonly readable: ReadableStream<string>;
    readonly writable: WritableStream<BufferSource>;
-@@ -28412,25 +37036,25 @@ declare const TextDecoderStream: {
+@@ -28412,25 +37036,25 @@ declare var TextDecoderStream: {
  };
  
  /**
@@ -28370,7 +28370,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly writable: WritableStream<string>;
  }
  
-@@ -28460,18 +37088,21 @@ declare const TextEncoderStream: {
+@@ -28460,18 +37088,21 @@ declare var TextEncoderStream: {
  };
  
  /**
@@ -28972,7 +28972,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly writable: WritableStream<I>;
  }
  
-@@ -28997,15 +37732,35 @@ declare const TransformStream: {
+@@ -28997,15 +37732,35 @@ declare var TransformStream: {
    ): TransformStream<I, O>;
  };
  
@@ -29013,7 +29013,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    terminate(): void;
  }
  
-@@ -29015,16 +37770,28 @@ declare const TransformStreamDefaultController: {
+@@ -29015,16 +37770,28 @@ declare var TransformStreamDefaultController: {
  };
  
  /**
@@ -29275,7 +29275,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    toJSON(): string;
  }
  
- declare const URL: {
+ declare var URL: {
    prototype: URL;
    new (url: string | URL, base?: string | URL): URL;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/canParse_static) */
@@ -29378,7 +29378,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    toString(): string;
    forEach(
      callbackfn: (value: string, key: string, parent: URLSearchParams) => void,
-@@ -29218,11 +38118,23 @@ declare const URLSearchParams: {
+@@ -29218,11 +38118,23 @@ declare var URLSearchParams: {
    ): URLSearchParams;
  };
  
@@ -29709,7 +29709,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    addEventListener<K extends keyof VideoDecoderEventMap>(
      type: K,
 @@ -29404,7 +38465,11 @@ interface VideoDecoder extends EventTarget {
- declare const VideoDecoder: {
+ declare var VideoDecoder: {
    prototype: VideoDecoder;
    new (init: VideoDecoderInit): VideoDecoder;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoDecoder/isConfigSupported_static) */
@@ -29785,7 +29785,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    addEventListener<K extends keyof VideoEncoderEventMap>(
      type: K,
 @@ -29459,39 +38553,103 @@ interface VideoEncoder extends EventTarget {
- declare const VideoEncoder: {
+ declare var VideoEncoder: {
    prototype: VideoEncoder;
    new (init: VideoEncoderInit): VideoEncoder;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoEncoder/isConfigSupported_static) */
@@ -29904,7 +29904,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    copyTo(
      destination: AllowSharedBufferSource,
      options?: VideoFrameCopyToOptions,
-@@ -29505,22 +38663,35 @@ declare const VideoFrame: {
+@@ -29505,22 +38663,35 @@ declare var VideoFrame: {
  };
  
  /**
@@ -30573,7 +30573,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly type: GLenum;
  }
  
-@@ -31594,7 +40935,7 @@ declare const WebGLActiveInfo: {
+@@ -31594,7 +40935,7 @@ declare var WebGLActiveInfo: {
  };
  
  /**
@@ -30582,7 +30582,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLBuffer)
   */
-@@ -31606,12 +40947,16 @@ declare const WebGLBuffer: {
+@@ -31606,12 +40947,16 @@ declare var WebGLBuffer: {
  };
  
  /**
@@ -30601,7 +30601,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly statusMessage: string;
  }
  
-@@ -31621,7 +40966,7 @@ declare const WebGLContextEvent: {
+@@ -31621,7 +40966,7 @@ declare var WebGLContextEvent: {
  };
  
  /**
@@ -30610,7 +30610,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLFramebuffer)
   */
-@@ -31633,7 +40978,7 @@ declare const WebGLFramebuffer: {
+@@ -31633,7 +40978,7 @@ declare var WebGLFramebuffer: {
  };
  
  /**
@@ -30619,7 +30619,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLProgram)
   */
-@@ -31644,7 +40989,11 @@ declare const WebGLProgram: {
+@@ -31644,7 +40989,11 @@ declare var WebGLProgram: {
    new (): WebGLProgram;
  };
  
@@ -30631,8 +30631,8 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 + */
  interface WebGLQuery {}
  
- declare const WebGLQuery: {
-@@ -31653,7 +41002,7 @@ declare const WebGLQuery: {
+ declare var WebGLQuery: {
+@@ -31653,7 +41002,7 @@ declare var WebGLQuery: {
  };
  
  /**
@@ -30641,7 +30641,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderbuffer)
   */
-@@ -31665,7 +41014,7 @@ declare const WebGLRenderbuffer: {
+@@ -31665,7 +41014,7 @@ declare var WebGLRenderbuffer: {
  };
  
  /**
@@ -30707,8 +30707,8 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 + */
  interface WebGLSampler {}
  
- declare const WebGLSampler: {
-@@ -32859,7 +42212,7 @@ declare const WebGLSampler: {
+ declare var WebGLSampler: {
+@@ -32859,7 +42212,7 @@ declare var WebGLSampler: {
  };
  
  /**
@@ -30717,7 +30717,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLShader)
   */
-@@ -32871,16 +42224,28 @@ declare const WebGLShader: {
+@@ -32871,16 +42224,28 @@ declare var WebGLShader: {
  };
  
  /**
@@ -30750,7 +30750,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly rangeMin: GLint;
  }
  
-@@ -32889,7 +42254,11 @@ declare const WebGLShaderPrecisionFormat: {
+@@ -32889,7 +42254,11 @@ declare var WebGLShaderPrecisionFormat: {
    new (): WebGLShaderPrecisionFormat;
  };
  
@@ -30762,8 +30762,8 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 + */
  interface WebGLSync {}
  
- declare const WebGLSync: {
-@@ -32898,7 +42267,7 @@ declare const WebGLSync: {
+ declare var WebGLSync: {
+@@ -32898,7 +42267,7 @@ declare var WebGLSync: {
  };
  
  /**
@@ -30772,7 +30772,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLTexture)
   */
-@@ -32909,7 +42278,11 @@ declare const WebGLTexture: {
+@@ -32909,7 +42278,11 @@ declare var WebGLTexture: {
    new (): WebGLTexture;
  };
  
@@ -30784,8 +30784,8 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 + */
  interface WebGLTransformFeedback {}
  
- declare const WebGLTransformFeedback: {
-@@ -32918,7 +42291,7 @@ declare const WebGLTransformFeedback: {
+ declare var WebGLTransformFeedback: {
+@@ -32918,7 +42291,7 @@ declare var WebGLTransformFeedback: {
  };
  
  /**
@@ -30794,7 +30794,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLUniformLocation)
   */
-@@ -32929,7 +42302,11 @@ declare const WebGLUniformLocation: {
+@@ -32929,7 +42302,11 @@ declare var WebGLUniformLocation: {
    new (): WebGLUniformLocation;
  };
  
@@ -30806,7 +30806,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 + */
  interface WebGLVertexArrayObject {}
  
- declare const WebGLVertexArrayObject: {
+ declare var WebGLVertexArrayObject: {
 @@ -32948,29 +42325,25 @@ interface WebSocketEventMap {
  }
  
@@ -30878,7 +30878,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)
     */
-@@ -33049,28 +42422,61 @@ declare const WebSocket: {
+@@ -33049,28 +42422,61 @@ declare var WebSocket: {
  };
  
  /**
@@ -30948,7 +30948,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    createUnidirectionalStream(
      options?: WebTransportSendStreamOptions,
    ): Promise<WritableStream>;
-@@ -33082,14 +42488,23 @@ declare const WebTransport: {
+@@ -33082,14 +42488,23 @@ declare var WebTransport: {
  };
  
  /**
@@ -30974,7 +30974,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly writable: WritableStream;
  }
  
-@@ -33099,22 +42514,47 @@ declare const WebTransportBidirectionalStream: {
+@@ -33099,22 +42514,47 @@ declare var WebTransportBidirectionalStream: {
  };
  
  /**
@@ -31028,7 +31028,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly readable: ReadableStream;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransportDatagramDuplexStream/writable) */
    readonly writable: WritableStream;
-@@ -33126,14 +42566,23 @@ declare const WebTransportDatagramDuplexStream: {
+@@ -33126,14 +42566,23 @@ declare var WebTransportDatagramDuplexStream: {
  };
  
  /**
@@ -31054,7 +31054,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    readonly streamErrorCode: number | null;
  }
  
-@@ -33143,18 +42592,34 @@ declare const WebTransportError: {
+@@ -33143,18 +42592,34 @@ declare var WebTransportError: {
  };
  
  /**
@@ -31652,7 +31652,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Worker/terminate)
     */
-@@ -33737,17 +43387,14 @@ declare const Worker: {
+@@ -33737,17 +43387,14 @@ declare var Worker: {
  };
  
  /**
@@ -31712,7 +31712,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    getWriter(): WritableStreamDefaultWriter<W>;
  }
  
-@@ -33784,14 +43447,22 @@ declare const WritableStream: {
+@@ -33784,14 +43447,22 @@ declare var WritableStream: {
  };
  
  /**
@@ -31738,7 +31738,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    error(e?: unknown): void;
  }
  
-@@ -33801,24 +43472,52 @@ declare const WritableStreamDefaultController: {
+@@ -33801,24 +43472,52 @@ declare var WritableStreamDefaultController: {
  };
  
  /**
@@ -31799,7 +31799,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
    write(chunk?: W): Promise<void>;
  }
  
-@@ -33828,7 +43527,7 @@ declare const WritableStreamDefaultWriter: {
+@@ -33828,7 +43527,7 @@ declare var WritableStreamDefaultWriter: {
  };
  
  /**
@@ -31990,7 +31990,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
  interface XMLHttpRequestEventTarget extends EventTarget {
    onabort: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
    onerror: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
-@@ -34086,7 +43779,11 @@ declare const XMLHttpRequestEventTarget: {
+@@ -34086,7 +43779,11 @@ declare var XMLHttpRequestEventTarget: {
    new (): XMLHttpRequestEventTarget;
  };
  
@@ -32003,7 +32003,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
  interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
    addEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(
      type: K,
-@@ -34122,12 +43819,16 @@ declare const XMLHttpRequestUpload: {
+@@ -34122,12 +43819,16 @@ declare var XMLHttpRequestUpload: {
  };
  
  /**
@@ -32244,7 +32244,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 -  warn(...data: readonly unknown[]): void;
 -}
 -
--declare const console: Console;
+-declare var console: Console;
 -
 -/** Holds useful CSS-related methods. No object with this interface are implemented: it contains only static methods and therefore is a utilitarian interface. */
 +/** The **`CSS`** interface holds useful CSS-related methods. */
@@ -32532,7 +32532,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 +  warn(...data: readonly unknown[]): void;
 +}
 +
-+declare const console: Console;
++declare var console: Console;
 +
  interface AudioDataOutputCallback {
    (output: AudioData): void;
@@ -32647,7 +32647,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 + *
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/location)
 + */
- declare const location: Location;
+ declare var location: Location;
  /**
 - * Returns true if the location bar is visible; otherwise, returns false.
 + * Returns the `locationbar` object.
@@ -32676,7 +32676,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 + *
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/navigator)
 + */
- declare const navigator: Navigator;
+ declare var navigator: Navigator;
  /**
   * Available only in secure contexts.
 @@ -35175,143 +45097,239 @@ declare const ondeviceorientationabsolute:
@@ -32799,7 +32799,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 + *
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/self)
 + */
- declare const self: Window & typeof globalThis;
+ declare var self: Window & typeof globalThis;
 -/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/speechSynthesis) */
 +/**
 + * The `speechSynthesis` read-only property of the Window object returns a SpeechSynthesis object, which is the entry point into using Web Speech API speech synthesis functionality.
@@ -33225,7 +33225,7 @@ index d41a20fb0ef7fe0c65ff9d3dde71b6cda411f7d7..93c7313e1079fd86829708d44d917605
 - * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/error_event)
 - */
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/error_event) */
- declare const onerror: OnErrorEventHandler;
+ declare var onerror: OnErrorEventHandler;
 -/**
 - * Fires when the object receives focus.
 - * @param ev The event.

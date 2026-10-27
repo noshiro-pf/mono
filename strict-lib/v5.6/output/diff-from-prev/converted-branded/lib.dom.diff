@@ -1,5 +1,5 @@
 diff --git a/v5.5/output/lib-files-branded/lib.dom.d.ts b/v5.6/output/lib-files-branded/lib.dom.d.ts
-index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc62117d105 100644
+index 8dbd784da7c35f03fb09ca37cd3edcda1a44f45b..19b0d9295607a3c74bb749995bd35fc6cd6449c1 100644
 --- a/v5.5/output/lib-files-branded/lib.dom.d.ts
 +++ b/v5.6/output/lib-files-branded/lib.dom.d.ts
 @@ -602,6 +602,11 @@ interface GetAnimationsOptions {
@@ -117,7 +117,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
    readonly styleSheet: CSSStyleSheet | null;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSImportRule/supportsText) */
    readonly supportsText: string | null;
-@@ -4003,7 +4010,7 @@ declare const CSSPerspective: {
+@@ -4003,7 +4010,7 @@ declare var CSSPerspective: {
  interface CSSPropertyRule extends CSSRule {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSPropertyRule/inherits) */
    readonly inherits: boolean;
@@ -126,7 +126,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
    readonly initialValue: string | null;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSPropertyRule/name) */
    readonly name: string;
-@@ -4121,8 +4128,11 @@ declare const CSSScale: {
+@@ -4121,8 +4128,11 @@ declare var CSSScale: {
    new (x: CSSNumberish, y: CSSNumberish, z?: CSSNumberish): CSSScale;
  };
  
@@ -344,7 +344,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
    matrixTransform(matrix?: DOMMatrixInit): DOMPoint;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPointReadOnly/toJSON) */
    toJSON(): unknown;
-@@ -6954,15 +6932,10 @@ declare const DOMPointReadOnly: {
+@@ -6954,15 +6932,10 @@ declare var DOMPointReadOnly: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMQuad) */
  interface DOMQuad {
@@ -361,7 +361,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
    toJSON(): unknown;
  }
 @@ -6990,6 +6963,7 @@ interface DOMRect extends DOMRectReadOnly {
- declare const DOMRect: {
+ declare var DOMRect: {
    prototype: DOMRect;
    new (x?: number, y?: number, width?: number, height?: number): DOMRect;
 +  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMRect/fromRect_static) */
@@ -488,7 +488,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
    readonly attributeStyleMap: StylePropertyMap;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/style) */
    readonly style: CSSStyleDeclaration;
-@@ -8863,15 +8834,10 @@ declare const EncodedVideoChunk: {
+@@ -8863,15 +8834,10 @@ declare var EncodedVideoChunk: {
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent)
   */
  interface ErrorEvent extends Event {
@@ -504,7 +504,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
    readonly message: string;
  }
  
-@@ -9162,23 +9128,11 @@ declare const EventTarget: {
+@@ -9162,23 +9128,11 @@ declare var EventTarget: {
    new (): EventTarget;
  };
  
@@ -2212,7 +2212,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
     */
    readonly objectStoreNames: DOMStringList;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBTransaction/abort_event) */
-@@ -17023,9 +16518,9 @@ declare const ImageData: {
+@@ -17023,9 +16518,9 @@ declare var ImageData: {
    ): ImageData;
  };
  
@@ -2258,7 +2258,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/MediaSourceHandle) */
 +interface MediaSourceHandle {}
 +
-+declare const MediaSourceHandle: {
++declare var MediaSourceHandle: {
 +  prototype: MediaSourceHandle;
 +  new (): MediaSourceHandle;
 +};
@@ -2363,7 +2363,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
 -  commit(): void;
  }
  
- declare const OffscreenCanvasRenderingContext2D: {
+ declare var OffscreenCanvasRenderingContext2D: {
 @@ -20900,15 +20379,11 @@ interface Plugin {
    /**
     * Returns the plugin's description.
@@ -2446,7 +2446,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
    /**
     * Returns a copy of the information that was provided to pushState() or replaceState().
     *
-@@ -21110,6 +20562,7 @@ declare const PromiseRejectionEvent: {
+@@ -21110,6 +20562,7 @@ declare var PromiseRejectionEvent: {
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PublicKeyCredential)
   */
  interface PublicKeyCredential extends Credential {
@@ -2537,7 +2537,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Range/deleteContents) */
    deleteContents(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Range/detach) */
-@@ -22292,6 +21749,7 @@ declare const Report: {
+@@ -22292,6 +21749,7 @@ declare var Report: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReportBody) */
  interface ReportBody {
@@ -2676,7 +2676,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
    onremovesourcebuffer: ((this: SourceBufferList, ev: Event) => unknown) | null;
    addEventListener<K extends keyof SourceBufferListEventMap>(
      type: K,
-@@ -27413,6 +26871,22 @@ declare const TextEncoderStream: {
+@@ -27413,6 +26871,22 @@ declare var TextEncoderStream: {
    new (): TextEncoderStream;
  };
  
@@ -2708,7 +2708,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
    onremovetrack: ((this: TextTrackList, ev: TrackEvent) => unknown) | null;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextTrackList/getTrackById) */
    getTrackById(id: string): TextTrack | null;
-@@ -28067,9 +27541,11 @@ declare const URL: {
+@@ -28067,9 +27541,11 @@ declare var URL: {
    prototype: URL;
    new (url: string | URL, base?: string | URL): URL;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/canParse_static) */
@@ -2768,7 +2768,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoDecoder/state) */
    readonly state: CodecState;
 @@ -28331,6 +27798,7 @@ interface VideoDecoder extends EventTarget {
- declare const VideoDecoder: {
+ declare var VideoDecoder: {
    prototype: VideoDecoder;
    new (init: VideoDecoderInit): VideoDecoder;
 +  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoDecoder/isConfigSupported_static) */
@@ -2792,7 +2792,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoEncoder/reset) */
    reset(): void;
 @@ -28383,6 +27853,7 @@ interface VideoEncoder extends EventTarget {
- declare const VideoEncoder: {
+ declare var VideoEncoder: {
    prototype: VideoEncoder;
    new (init: VideoEncoderInit): VideoEncoder;
 +  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoEncoder/isConfigSupported_static) */
@@ -2840,7 +2840,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
    compressedTexImage3D(
      target: GLenum,
      level: GLint,
-@@ -30865,6 +30354,7 @@ declare const WebGLRenderingContext: {
+@@ -30865,6 +30354,7 @@ declare var WebGLRenderingContext: {
  interface WebGLRenderingContextBase {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/canvas) */
    readonly canvas: HTMLCanvasElement | OffscreenCanvas;
@@ -2848,7 +2848,7 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
    drawingBufferColorSpace: PredefinedColorSpace;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/drawingBufferHeight) */
    readonly drawingBufferHeight: GLsizei;
-@@ -31821,7 +31311,7 @@ declare const WebGLVertexArrayObject: {
+@@ -31821,7 +31311,7 @@ declare var WebGLVertexArrayObject: {
    new (): WebGLVertexArrayObject;
  };
  
@@ -2988,25 +2988,25 @@ index fba800736065204f2494d4c26d27071f928c665c..bf2425fcda2d516a5a06587a882d6cc6
 - * [MDN Reference](https://developer.mozilla.org/docs/Web/API/caches)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/caches)
   */
- declare const caches: CacheStorage;
+ declare var caches: CacheStorage;
 -/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/crossOriginIsolated) */
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/crossOriginIsolated) */
- declare const crossOriginIsolated: boolean;
+ declare var crossOriginIsolated: boolean;
 -/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/crypto_property) */
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/crypto) */
- declare const crypto: Crypto;
+ declare var crypto: Crypto;
 -/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/indexedDB) */
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/indexedDB) */
- declare const indexedDB: IDBFactory;
+ declare var indexedDB: IDBFactory;
 -/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/isSecureContext) */
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/isSecureContext) */
- declare const isSecureContext: boolean;
+ declare var isSecureContext: boolean;
 -/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/origin) */
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/origin) */
- declare const origin: string;
+ declare var origin: string;
 -/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/performance_property) */
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/performance) */
- declare const performance: Performance;
+ declare var performance: Performance;
 -/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/atob) */
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/atob) */
  declare function atob(data: string): string;

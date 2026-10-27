@@ -33,7 +33,7 @@ const tableDataResult = fromPromise(
     if (!r.ok) {
       throw new Error(`HTTP ${r.status}`);
     }
-    /* embed-sample-code-ignore-this-line */ // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- `Response.json()` is `unknown` under the strict standard library, so this cast is what a reader would write. The line is stripped from the embedded output.
+    /* embed-sample-code-ignore-this-line */ /* eslint-disable-next-line total-functions/no-unsafe-type-assertion */ // @ts-expect-error `Response.json()` is `MutableJsonValue` under the strict standard library, whose arrays are mutable, so a cast to a readonly array is not one TypeScript accepts. The cast is still what a reader would write; this line is stripped from the embedded output.
     return r.json() as Promise<readonly Row[]>;
   }),
 );

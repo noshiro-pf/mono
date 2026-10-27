@@ -1,5 +1,5 @@
 diff --git a/v5.3/output/lib-files/lib.dom.d.ts b/v5.4/output/lib-files/lib.dom.d.ts
-index 84b1be551dd715ace4143c485216bce354456e8b..1628b1dddf1ef71d9eec57f65fa11291daf35186 100644
+index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660154fb94c 100644
 --- a/v5.3/output/lib-files/lib.dom.d.ts
 +++ b/v5.4/output/lib-files/lib.dom.d.ts
 @@ -142,6 +142,7 @@ interface AuthenticationExtensionsClientInputs {
@@ -388,7 +388,7 @@ index 84b1be551dd715ace4143c485216bce354456e8b..1628b1dddf1ef71d9eec57f65fa11291
 +  copyTo(destination: AllowSharedBufferSource): void;
  }
  
- declare const EncodedVideoChunk: {
+ declare var EncodedVideoChunk: {
 @@ -9147,7 +9191,11 @@ interface FileReader extends EventTarget {
    abort(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileReader/readAsArrayBuffer) */
@@ -621,7 +621,7 @@ index 84b1be551dd715ace4143c485216bce354456e8b..1628b1dddf1ef71d9eec57f65fa11291
    addEventListener<K extends keyof HTMLElementEventMap>(
      type: K,
      listener: (
-@@ -15811,6 +15888,44 @@ declare const Headers: {
+@@ -15811,6 +15888,44 @@ declare var Headers: {
    new (init?: HeadersInit): Headers;
  };
  
@@ -801,7 +801,7 @@ index 84b1be551dd715ace4143c485216bce354456e8b..1628b1dddf1ef71d9eec57f65fa11291
    getMetadata(): RTCEncodedAudioFrameMetadata;
  }
  
-@@ -21116,10 +21249,15 @@ declare const RTCEncodedAudioFrame: {
+@@ -21116,10 +21249,15 @@ declare var RTCEncodedAudioFrame: {
    new (): RTCEncodedAudioFrame;
  };
  
@@ -957,7 +957,7 @@ index 84b1be551dd715ace4143c485216bce354456e8b..1628b1dddf1ef71d9eec57f65fa11291
    ): Promise<PlaneLayout[]>;
  }
 @@ -28049,7 +28241,7 @@ interface VideoFrame {
- declare const VideoFrame: {
+ declare var VideoFrame: {
    prototype: VideoFrame;
    new (image: CanvasImageSource, init?: VideoFrameInit): VideoFrame;
 -  new (data: BufferSource, init: VideoFrameBufferInit): VideoFrame;
@@ -1018,7 +1018,7 @@ index 84b1be551dd715ace4143c485216bce354456e8b..1628b1dddf1ef71d9eec57f65fa11291
      drawcount: GLsizei,
    ): void;
  }
-@@ -28441,7 +28633,6 @@ declare const WebGL2RenderingContext: {
+@@ -28441,7 +28633,6 @@ declare var WebGL2RenderingContext: {
    readonly STENCIL: 0x1802;
    readonly RED: 0x1903;
    readonly RGB8: 0x8051;
@@ -1026,7 +1026,7 @@ index 84b1be551dd715ace4143c485216bce354456e8b..1628b1dddf1ef71d9eec57f65fa11291
    readonly RGB10_A2: 0x8059;
    readonly TEXTURE_BINDING_3D: 0x806a;
    readonly UNPACK_SKIP_IMAGES: 0x806d;
-@@ -28952,6 +29143,7 @@ declare const WebGL2RenderingContext: {
+@@ -28952,6 +29143,7 @@ declare var WebGL2RenderingContext: {
    readonly RENDERBUFFER: 0x8d41;
    readonly RGBA4: 0x8056;
    readonly RGB5_A1: 0x8057;
@@ -1371,7 +1371,7 @@ index 84b1be551dd715ace4143c485216bce354456e8b..1628b1dddf1ef71d9eec57f65fa11291
      srcLength?: GLuint,
    ): void;
  }
-@@ -30446,6 +30641,7 @@ declare const WebGLRenderingContext: {
+@@ -30446,6 +30641,7 @@ declare var WebGLRenderingContext: {
    readonly RENDERBUFFER: 0x8d41;
    readonly RGBA4: 0x8056;
    readonly RGB5_A1: 0x8057;
@@ -1523,7 +1523,7 @@ index 84b1be551dd715ace4143c485216bce354456e8b..1628b1dddf1ef71d9eec57f65fa11291
    warn(...data: readonly unknown[]): void;
  }
  
-@@ -32803,10 +33021,13 @@ declare const console: Console;
+@@ -32803,10 +33021,13 @@ declare var console: Console;
  
  /** Holds useful CSS-related methods. No object with this interface are implemented: it contains only static methods and therefore is a utilitarian interface. */
  declare namespace CSS {
@@ -1737,7 +1737,7 @@ index 84b1be551dd715ace4143c485216bce354456e8b..1628b1dddf1ef71d9eec57f65fa11291
    | ((this: Window, ev: PointerEvent) => unknown)
    | null;
 @@ -34366,7 +34606,11 @@ declare const onstorage: ((this: Window, ev: StorageEvent) => unknown) | null;
- declare const onunhandledrejection:
+ declare var onunhandledrejection:
    | ((this: Window, ev: PromiseRejectionEvent) => unknown)
    | null;
 -/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/unload_event) */

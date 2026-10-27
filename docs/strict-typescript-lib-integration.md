@@ -2760,3 +2760,60 @@ overload の形だけ書き写してある。
 `ts-codemod-lib` のほうは `comment: string` には**戻らない**。選択肢 2 では
 キャプチャは `string | undefined` なので、`isString` が
 `comment === undefined` の 1 行になったところまで。issue が予告していたとおり。
+
+## `globalThis.X` から消えていたグローバル（2026-10-28）
+
+#2484 で残りのパッケージを opt-in しようとして、`globalThis.location` ・
+`globalThis.navigator` ・ `globalThis.document` などが軒並み
+`Property 'location' does not exist on type 'typeof globalThis'` になった。
+
+### 原因
+
+変換器は `declare var X` を `declare const X` に書き換える。グローバルへの代入を
+型で禁じるためだが、`typeof globalThis` のプロパティになるのは `var` と
+`function` の宣言だけで、`const` は載らない。**書き換えたグローバルは
+すべて `globalThis.X` から消えていた**（`globalThis.Map` ・ `globalThis.NaN` も）。
+読み取り専用であることと `globalThis` に載ることは、型の上では両立しない。
+
+### どれを `var` に戻したか
+
+「別の書き方で、その名前が存在するどの環境からも届くなら隠してよい」を基準にした。
+
+- `NaN` は `Number.NaN`、`Map` は素の `Map`、`history` ・ `document` ・ `top` の
+  ようにウィンドウにしか無いものは `window.X` で届く。`const` のまま
+- **`lib.dom` と `lib.webworker` の両方が宣言する名前**（ウィンドウとワーカーの
+  共通メンバー。TypeScript 7.0 で 240 個。`fetch` 系のコンストラクタ、
+  `navigator` ・ `location` ・ `crypto` ・ `performance` ・ `self` ・ `console` など）は
+  `window` の無い環境にもある。Node.js にも `navigator` ・ `crypto` ・
+  `performance` がある。`globalThis.X` が唯一どこでも通じる書き方なので `var` に戻した
+
+代入の禁止は ESLint の `no-global-assign` が受け持つ。基準は変換器が毎回
+`lib.dom.d.ts` と `lib.webworker.d.ts` の `declare var` の共通部分として計算する
+（`sharedGlobalVarNames`）ので、TypeScript の版が上がっても手で保守する一覧は無い。
+
+### `@types/node` の `Response` が DOM のものに戻る
+
+`@types/node` は `var Response: typeof globalThis extends { onmessage: any;
+Response: infer T } ? T : typeof undici.Response` と宣言していて、DOM が
+`globalThis` に `Response` を載せていればそちらに譲る。`const` 化で DOM の
+`Response` が `globalThis` から消えていたので、**DOM lib を入れていても
+`fetch` の戻りは Node の undici の `Response`（`json(): Promise<unknown>`）だった**。
+`var` に戻すと strict lib の DOM の `Response`（`json(): Promise<MutableJsonValue>`）
+になる。
+
+これで `res.json() as Promise<readonly Row[]>` が `TS2352` になる（`MutableJsonValue`
+の配列は mutable なので、readonly 配列とは比較可能でない）。リポジトリ内では
+`libs/synstate` の samples 3 か所だけで、読者に見える行は `as Promise<readonly Row[]>`
+のまま残し、埋め込み時に落ちる直前の行で `@ts-expect-error` にした
+（ESLint の指令とは同じ行に並べてある）。
+
+### ついでに直ったもの
+
+名前空間の中の `var` を `const` にする規則は文字列パターン `'  var '` だったが、
+文字列パターンは空白を無視して照合されるので、実際には `var` という語すべてに
+当たっていた。`HTMLElementTagNameMap` の `var: HTMLElement`（`<var>` 要素）が
+`const: HTMLElement` に、コメント中の CSS の `var()` が `  const ()` になっていた。
+行頭のインデントに固定した正規表現にして、どちらも元に戻っている。
+
+回帰テストは `strict-lib/configs/tsconfig/lib-check-entry.ts` に足した
+（`globalThis.navigator` などが通ることと、`globalThis.NaN` が通らないこと）。

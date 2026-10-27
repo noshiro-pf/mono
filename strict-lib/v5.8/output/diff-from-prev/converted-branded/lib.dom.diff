@@ -1,5 +1,5 @@
 diff --git a/v5.7/output/lib-files-branded/lib.dom.d.ts b/v5.8/output/lib-files-branded/lib.dom.d.ts
-index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57fe5fe2891 100644
+index 75bfbbecd592920d51037f4aa3e02e82e6cd98ce..bb2e57feb89e0fffcd2ebb6aa858ef93d0189453 100644
 --- a/v5.7/output/lib-files-branded/lib.dom.d.ts
 +++ b/v5.8/output/lib-files-branded/lib.dom.d.ts
 @@ -792,6 +792,26 @@ interface ImageDataSettings {
@@ -196,7 +196,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
  }
  
  declare const CSSKeyframeRule: {
-@@ -4230,7 +4296,8 @@ declare const CSSMatrixComponent: {
+@@ -4230,7 +4296,8 @@ declare var CSSMatrixComponent: {
   */
  interface CSSMediaRule extends CSSConditionRule {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMediaRule/media) */
@@ -351,7 +351,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSStyleRule/styleMap) */
    readonly styleMap: StylePropertyMap;
  }
-@@ -6029,6 +6132,16 @@ declare const CSSVariableReferenceValue: {
+@@ -6029,6 +6132,16 @@ declare var CSSVariableReferenceValue: {
    ): CSSVariableReferenceValue;
  };
  
@@ -475,7 +475,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
    matrixTransform(matrix?: DOMMatrixInit): DOMPoint;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPointReadOnly/toJSON) */
    toJSON(): unknown;
-@@ -7354,11 +7489,17 @@ declare const DOMPointReadOnly: {
+@@ -7354,11 +7489,17 @@ declare var DOMPointReadOnly: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMQuad) */
  interface DOMQuad {
@@ -493,7 +493,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
    toJSON(): unknown;
  }
  
-@@ -7376,9 +7517,13 @@ declare const DOMQuad: {
+@@ -7376,9 +7517,13 @@ declare var DOMQuad: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMRect) */
  interface DOMRect extends DOMRectReadOnly {
@@ -507,7 +507,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
    y: number;
  }
  
-@@ -7392,8 +7537,11 @@ declare const DOMRect: {
+@@ -7392,8 +7537,11 @@ declare var DOMRect: {
  type SVGRect = DOMRect;
  declare const SVGRect: typeof DOMRect;
  
@@ -605,7 +605,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
  }
  
  interface ElementContentEditable {
-@@ -9288,10 +9447,15 @@ declare const EncodedVideoChunk: {
+@@ -9288,10 +9447,15 @@ declare var EncodedVideoChunk: {
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent)
   */
  interface ErrorEvent extends Event {
@@ -1191,7 +1191,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
    readonly track: TextTrack;
    readonly NONE: 0;
    readonly LOADING: 1;
-@@ -17376,6 +17695,70 @@ declare const ImageData: {
+@@ -17376,6 +17695,70 @@ declare var ImageData: {
    ): ImageData;
  };
  
@@ -1217,7 +1217,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
 +  reset(): void;
 +}
 +
-+declare const ImageDecoder: {
++declare var ImageDecoder: {
 +  prototype: ImageDecoder;
 +  new (init: ImageDecoderInit): ImageDecoder;
 +  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ImageDecoder/isTypeSupported_static) */
@@ -1236,7 +1236,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
 +  selected: boolean;
 +}
 +
-+declare const ImageTrack: {
++declare var ImageTrack: {
 +  prototype: ImageTrack;
 +  new (): ImageTrack;
 +};
@@ -1254,7 +1254,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
 +  [index: number]: ImageTrack;
 +}
 +
-+declare const ImageTrackList: {
++declare var ImageTrackList: {
 +  prototype: ImageTrackList;
 +  new (): ImageTrackList;
 +};
@@ -1262,7 +1262,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
  interface ImportMeta {
    url: string;
    resolve(specifier: string): string;
-@@ -18891,7 +19274,39 @@ declare const MessageEvent: {
+@@ -18891,7 +19274,39 @@ declare var MessageEvent: {
    new <T>(type: string, eventInitDict?: MessageEventInit<T>): MessageEvent<T>;
  };
  
@@ -1447,7 +1447,16 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PublicKeyCredential/isConditionalMediationAvailable_static) */
    isConditionalMediationAvailable(): Promise<boolean>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PublicKeyCredential/isUserVerifyingPlatformAuthenticatorAvailable_static) */
-@@ -22599,7 +23104,7 @@ declare const ReadableStreamDefaultReader: {
+@@ -21720,7 +22225,7 @@ interface RTCDataChannel extends EventTarget {
+   ): void;
+ }
+ 
+-declare const RTCDataChannel: {
++declare var RTCDataChannel: {
+   prototype: RTCDataChannel;
+   new (): RTCDataChannel;
+ };
+@@ -22599,7 +23104,7 @@ declare var ReadableStreamDefaultReader: {
  
  interface ReadableStreamGenericReader {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/closed) */
@@ -1469,7 +1478,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
    readonly keepalive: boolean;
    /**
     * Returns request's HTTP method, which is "GET" by default.
-@@ -22878,7 +23387,8 @@ declare const Response: {
+@@ -22878,7 +23387,8 @@ declare var Response: {
   */
  interface SVGAElement extends SVGGraphicsElement, SVGURIReference {
    rel: string;
@@ -2118,7 +2127,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
    uniformMatrix2fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -31305,12 +31981,14 @@ declare const WebGLRenderingContext: {
+@@ -31305,12 +31981,14 @@ declare var WebGLRenderingContext: {
  interface WebGLRenderingContextBase {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/canvas) */
    readonly canvas: HTMLCanvasElement | OffscreenCanvas;
@@ -2275,7 +2284,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
    /**
     * Clones message and transmits it to worker's global environment. transfer can be passed as a list of objects that are to be transferred rather than cloned.
     *
-@@ -33139,11 +33811,11 @@ declare const WritableStreamDefaultController: {
+@@ -33139,11 +33811,11 @@ declare var WritableStreamDefaultController: {
   */
  interface WritableStreamDefaultWriter<W = unknown> {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/closed) */
@@ -2336,7 +2345,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
  declare const ontoggle: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/touchcancel_event) */
  declare const ontouchcancel:
-@@ -35242,10 +35906,14 @@ declare const ononline: ((this: Window, ev: Event) => unknown) | null;
+@@ -35242,10 +35906,14 @@ declare var ononline: ((this: Window, ev: Event) => unknown) | null;
  declare const onpagehide:
    | ((this: Window, ev: PageTransitionEvent) => unknown)
    | null;
@@ -2351,7 +2360,7 @@ index e909d3a56c520dc6280466e698cc937f218aa770..a48e5a3c9f70518546b5b7a8fd13a57f
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/popstate_event) */
  declare const onpopstate: ((this: Window, ev: PopStateEvent) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/rejectionhandled_event) */
-@@ -35288,11 +35956,11 @@ declare const performance: Performance;
+@@ -35288,11 +35956,11 @@ declare var performance: Performance;
  declare function atob(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
  declare function btoa(data: string): string;

@@ -153,10 +153,62 @@ const modificationNotice = (filename: string): string =>
      */
   `;
 
+/**
+ * The globals that `lib.dom.d.ts` and `lib.webworker.d.ts` both declare with
+ * `declare var` — the members a window and a worker global scope share
+ * (`navigator`, `location`, `crypto`, `self`, the `fetch`-family constructors,
+ * …). See {@link declareGlobalsConst} for why they are kept apart.
+ */
+export const sharedGlobalVarNames = (
+  srcFileList: readonly Readonly<{ filename: string; content: string }>[],
+): ReadonlySet<string> => {
+  const declaredIn = (filename: string): ReadonlySet<string> =>
+    new Set(
+      srcFileList
+        .filter((file) => file.filename === filename)
+        .flatMap(({ content }) =>
+          Array.from(
+            content.matchAll(/^declare var ([\w$]+)/gmu),
+            (match) => match[1] ?? '',
+          ),
+        ),
+    );
+
+  const workerGlobals = declaredIn('lib.webworker.d.ts');
+
+  return new Set(
+    Array.from(declaredIn('lib.dom.d.ts')).filter((name) =>
+      workerGlobals.has(name),
+    ),
+  );
+};
+
+/**
+ * Rewrites `declare var X` to `declare const X`, so that the type checker
+ * rejects an assignment to a global — except for the names in `keepVar`.
+ *
+ * Only a `var` (or a function) declaration becomes a property of
+ * `typeof globalThis`; a `const` does not. Every rewritten name therefore
+ * disappears from `globalThis.X`, which is acceptable only where another
+ * spelling reaches it in every realm that has it: `Number.NaN` for `NaN`, a
+ * bare `Map`, `window.history` for what only a window has. A name a worker's
+ * global scope declares too exists where there is no `window` at all — and
+ * Node.js has `navigator`, `crypto` and `performance` as well — so `globalThis.X`
+ * is its one portable spelling, and it stays a `var`. Reassigning it is left to
+ * ESLint's `no-global-assign`.
+ */
+const declareGlobalsConst =
+  (keepVar: ReadonlySet<string>): MonoTypeFunction<string> =>
+  (src) =>
+    src.replaceAll(/\bdeclare var ([\w$]+)/gu, (match, name: string) =>
+      keepVar.has(name) ? match : `declare const ${name}`,
+    );
+
 export const convert = (
   filename: string,
   converterConfig: ConverterConfig,
   tsVersion: string,
+  sharedGlobals: ReadonlySet<string>,
 ): MonoTypeFunction<string> => {
   const options: ConverterOptions = {
     config: converterConfig,
@@ -203,14 +255,7 @@ export const convert = (
           },
         ),
 
-        replaceWithNoMatchCheck(
-          //
-          'declare var ',
-          'declare const ',
-          {
-            onNotFound: 'off',
-          },
-        ),
+        declareGlobalsConst(sharedGlobals),
         replaceWithNoMatchCheck(
           //
           'declare let ',
@@ -219,14 +264,13 @@ export const convert = (
             onNotFound: 'off',
           },
         ),
-        replaceWithNoMatchCheck(
-          //
-          '  var ',
-          '  const ',
-          {
-            onNotFound: 'off',
-          },
-        ),
+        // A `var` inside a namespace (`WebAssembly`, `Intl`, …). A regex
+        // anchored to the indentation, because a string pattern matches with
+        // its whitespace ignored and would rewrite the top-level `declare var`
+        // that `declareGlobalsConst` keeps.
+        replaceWithNoMatchCheck(/^( +)var /gmu, '$1const ', {
+          onNotFound: 'off',
+        }),
         replaceWithNoMatchCheck(
           //
           'readonly any[]',

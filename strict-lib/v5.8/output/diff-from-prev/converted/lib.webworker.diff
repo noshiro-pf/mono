@@ -1,5 +1,5 @@
 diff --git a/v5.7/output/lib-files/lib.webworker.d.ts b/v5.8/output/lib-files/lib.webworker.d.ts
-index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d5527e964 100644
+index 5d666e9b990ce7383b1421a44d6e7eb721a90465..23242dd9908cb7ac6ca958197bd22fb8b660ff26 100644
 --- a/v5.7/output/lib-files/lib.webworker.d.ts
 +++ b/v5.8/output/lib-files/lib.webworker.d.ts
 @@ -297,7 +297,7 @@ interface ExtendableMessageEventInit extends ExtendableEventInit {
@@ -114,7 +114,7 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
    matrixTransform(matrix?: DOMMatrixInit): DOMPoint;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPointReadOnly/toJSON) */
    toJSON(): unknown;
-@@ -2658,11 +2695,17 @@ declare const DOMPointReadOnly: {
+@@ -2658,11 +2695,17 @@ declare var DOMPointReadOnly: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMQuad) */
  interface DOMQuad {
@@ -132,7 +132,7 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
    toJSON(): unknown;
  }
  
-@@ -2680,9 +2723,13 @@ declare const DOMQuad: {
+@@ -2680,9 +2723,13 @@ declare var DOMQuad: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMRect) */
  interface DOMRect extends DOMRectReadOnly {
@@ -154,7 +154,7 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
    toJSON(): unknown;
  }
  
-@@ -2769,7 +2817,8 @@ declare const DecompressionStream: {
+@@ -2769,7 +2817,8 @@ declare var DecompressionStream: {
    new (format: CompressionFormat): DecompressionStream;
  };
  
@@ -190,7 +190,7 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/rtctransform_event) */
    onrtctransform:
      | ((this: DedicatedWorkerGlobalScope, ev: RTCTransformEvent) => unknown)
-@@ -2966,10 +3010,15 @@ declare const EncodedVideoChunk: {
+@@ -2966,10 +3010,15 @@ declare var EncodedVideoChunk: {
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent)
   */
  interface ErrorEvent extends Event {
@@ -215,7 +215,7 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/preloadResponse) */
    readonly preloadResponse: Promise<unknown>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/request) */
-@@ -3743,6 +3792,16 @@ declare const FormData: {
+@@ -3743,6 +3792,16 @@ declare var FormData: {
    new (): FormData;
  };
  
@@ -232,7 +232,7 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
  interface GenericTransformStream {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CompressionStream/readable) */
    readonly readable: ReadableStream;
-@@ -4659,6 +4718,70 @@ declare const ImageData: {
+@@ -4659,6 +4718,70 @@ declare var ImageData: {
    ): ImageData;
  };
  
@@ -258,7 +258,7 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
 +  reset(): void;
 +}
 +
-+declare const ImageDecoder: {
++declare var ImageDecoder: {
 +  prototype: ImageDecoder;
 +  new (init: ImageDecoderInit): ImageDecoder;
 +  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ImageDecoder/isTypeSupported_static) */
@@ -277,7 +277,7 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
 +  selected: boolean;
 +}
 +
-+declare const ImageTrack: {
++declare var ImageTrack: {
 +  prototype: ImageTrack;
 +  new (): ImageTrack;
 +};
@@ -295,7 +295,7 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
 +  [index: number]: ImageTrack;
 +}
 +
-+declare const ImageTrackList: {
++declare var ImageTrackList: {
 +  prototype: ImageTrackList;
 +  new (): ImageTrackList;
 +};
@@ -303,7 +303,7 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
  interface ImportMeta {
    url: string;
    resolve(specifier: string): string;
-@@ -4823,7 +4946,39 @@ declare const MessageEvent: {
+@@ -4823,7 +4946,39 @@ declare var MessageEvent: {
    new <T>(type: string, eventInitDict?: MessageEventInit<T>): MessageEvent<T>;
  };
  
@@ -357,7 +357,7 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
    /**
     * Disconnects the port, so that it is no longer active.
     *
-@@ -5753,6 +5904,85 @@ declare const PushSubscriptionOptions: {
+@@ -5753,6 +5904,85 @@ declare var PushSubscriptionOptions: {
    new (): PushSubscriptionOptions;
  };
  
@@ -435,7 +435,7 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
 +  ): void;
 +}
 +
-+declare const RTCDataChannel: {
++declare var RTCDataChannel: {
 +  prototype: RTCDataChannel;
 +  new (): RTCDataChannel;
 +};
@@ -443,7 +443,7 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/RTCEncodedAudioFrame) */
  interface RTCEncodedAudioFrame {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/RTCEncodedAudioFrame/data) */
-@@ -5942,7 +6172,7 @@ declare const ReadableStreamDefaultReader: {
+@@ -5942,7 +6172,7 @@ declare var ReadableStreamDefaultReader: {
  
  interface ReadableStreamGenericReader {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/closed) */
@@ -510,7 +510,7 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
    uniformMatrix2fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -9492,12 +9726,14 @@ declare const WebGLRenderingContext: {
+@@ -9492,12 +9726,14 @@ declare var WebGLRenderingContext: {
  };
  
  interface WebGLRenderingContextBase {
@@ -625,7 +625,7 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
  }
  
  declare const WorkerNavigator: {
-@@ -10989,11 +11227,11 @@ declare const WritableStreamDefaultController: {
+@@ -10989,11 +11227,11 @@ declare var WritableStreamDefaultController: {
   */
  interface WritableStreamDefaultWriter<W = unknown> {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/closed) */
@@ -644,17 +644,17 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
   */
  declare const name: string;
 -/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/message_event) */
--declare const onmessage:
+-declare var onmessage:
 -  | ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => unknown)
 -  | null;
 -/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/messageerror_event) */
--declare const onmessageerror:
+-declare var onmessageerror:
 -  | ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => unknown)
 -  | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/rtctransform_event) */
  declare const onrtctransform:
    | ((this: DedicatedWorkerGlobalScope, ev: RTCTransformEvent) => unknown)
-@@ -11697,11 +11927,11 @@ declare const performance: Performance;
+@@ -11697,11 +11927,11 @@ declare var performance: Performance;
  declare function atob(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
  declare function btoa(data: string): string;
@@ -703,11 +703,11 @@ index 3b31b360db64d344f90b7000bdaa0aa7e3fc4941..55c124fdb2cfbcf3226bd4381ebc572d
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/requestAnimationFrame) */
  declare function requestAnimationFrame(callback: FrameRequestCallback): number;
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/message_event) */
-+declare const onmessage:
++declare var onmessage:
 +  | ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => unknown)
 +  | null;
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/messageerror_event) */
-+declare const onmessageerror:
++declare var onmessageerror:
 +  | ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => unknown)
 +  | null;
  declare function addEventListener<

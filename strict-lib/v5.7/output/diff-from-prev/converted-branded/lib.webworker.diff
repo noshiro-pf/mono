@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files-branded/lib.webworker.d.ts b/v5.7/output/lib-files-branded/lib.webworker.d.ts
-index 402e0ef0aca42bc391cb73dcad9cb6a6c9c0e616..ad34194faa1019ed78c3cbb59c4d6c2e715eefb8 100644
+index 94726c029c563462b7a43297ba3d537fa7ef889f..3e73cb5b4c63328148e107d2976f56a11bc221fa 100644
 --- a/v5.6/output/lib-files-branded/lib.webworker.d.ts
 +++ b/v5.7/output/lib-files-branded/lib.webworker.d.ts
 @@ -71,6 +71,59 @@ interface AudioConfiguration {
@@ -168,7 +168,7 @@ index 402e0ef0aca42bc391cb73dcad9cb6a6c9c0e616..ad34194faa1019ed78c3cbb59c4d6c2e
 +  ): void;
 +}
 +
-+declare const AudioData: {
++declare var AudioData: {
 +  prototype: AudioData;
 +  new (init: AudioDataInit): AudioData;
 +};
@@ -221,7 +221,7 @@ index 402e0ef0aca42bc391cb73dcad9cb6a6c9c0e616..ad34194faa1019ed78c3cbb59c4d6c2e
 +  ): void;
 +}
 +
-+declare const AudioDecoder: {
++declare var AudioDecoder: {
 +  prototype: AudioDecoder;
 +  new (init: AudioDecoderInit): AudioDecoder;
 +  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioDecoder/isConfigSupported_static) */
@@ -276,7 +276,7 @@ index 402e0ef0aca42bc391cb73dcad9cb6a6c9c0e616..ad34194faa1019ed78c3cbb59c4d6c2e
 +  ): void;
 +}
 +
-+declare const AudioEncoder: {
++declare var AudioEncoder: {
 +  prototype: AudioEncoder;
 +  new (init: AudioEncoderInit): AudioEncoder;
 +  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioEncoder/isConfigSupported_static) */
@@ -304,7 +304,7 @@ index 402e0ef0aca42bc391cb73dcad9cb6a6c9c0e616..ad34194faa1019ed78c3cbb59c4d6c2e
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/formData) */
    formData(): Promise<FormData>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/json) */
-@@ -2031,7 +2260,10 @@ declare const CloseEvent: {
+@@ -2031,7 +2260,10 @@ declare var CloseEvent: {
  };
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CompressionStream) */
@@ -314,9 +314,9 @@ index 402e0ef0aca42bc391cb73dcad9cb6a6c9c0e616..ad34194faa1019ed78c3cbb59c4d6c2e
 +  readonly writable: WritableStream<BufferSource>;
 +}
  
- declare const CompressionStream: {
+ declare var CompressionStream: {
    prototype: CompressionStream;
-@@ -2205,27 +2437,49 @@ declare const DOMException: {
+@@ -2205,27 +2437,49 @@ declare var DOMException: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrix) */
  interface DOMMatrix extends DOMMatrixReadOnly {
@@ -366,7 +366,7 @@ index 402e0ef0aca42bc391cb73dcad9cb6a6c9c0e616..ad34194faa1019ed78c3cbb59c4d6c2e
    m44: number;
    invertSelf(): DOMMatrix;
    multiplySelf(other?: DOMMatrixInit): DOMMatrix;
-@@ -2267,29 +2521,51 @@ declare const DOMMatrix: {
+@@ -2267,29 +2521,51 @@ declare var DOMMatrix: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly) */
  interface DOMMatrixReadOnly {
@@ -418,7 +418,7 @@ index 402e0ef0aca42bc391cb73dcad9cb6a6c9c0e616..ad34194faa1019ed78c3cbb59c4d6c2e
    readonly m44: number;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/flipX) */
    flipX(): DOMMatrix;
-@@ -2483,7 +2759,10 @@ declare const DOMStringList: {
+@@ -2483,7 +2759,10 @@ declare var DOMStringList: {
  };
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DecompressionStream) */
@@ -428,9 +428,9 @@ index 402e0ef0aca42bc391cb73dcad9cb6a6c9c0e616..ad34194faa1019ed78c3cbb59c4d6c2e
 +  readonly writable: WritableStream<BufferSource>;
 +}
  
- declare const DecompressionStream: {
+ declare var DecompressionStream: {
    prototype: DecompressionStream;
-@@ -2493,7 +2772,7 @@ declare const DecompressionStream: {
+@@ -2493,7 +2772,7 @@ declare var DecompressionStream: {
  interface DedicatedWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
    message: MessageEvent;
    messageerror: MessageEvent;
@@ -466,7 +466,7 @@ index 402e0ef0aca42bc391cb73dcad9cb6a6c9c0e616..ad34194faa1019ed78c3cbb59c4d6c2e
 +  copyTo(destination: AllowSharedBufferSource): void;
 +}
 +
-+declare const EncodedAudioChunk: {
++declare var EncodedAudioChunk: {
 +  prototype: EncodedAudioChunk;
 +  new (init: EncodedAudioChunkInit): EncodedAudioChunk;
 +};
@@ -474,7 +474,7 @@ index 402e0ef0aca42bc391cb73dcad9cb6a6c9c0e616..ad34194faa1019ed78c3cbb59c4d6c2e
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/EncodedVideoChunk) */
  interface EncodedVideoChunk {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/EncodedVideoChunk/byteLength) */
-@@ -3329,25 +3627,29 @@ declare const FontFace: {
+@@ -3329,25 +3627,29 @@ declare var FontFace: {
    prototype: FontFace;
    new (
      family: string,
@@ -513,7 +513,7 @@ index 402e0ef0aca42bc391cb73dcad9cb6a6c9c0e616..ad34194faa1019ed78c3cbb59c4d6c2e
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FontFaceSet/status) */
 @@ -3384,7 +3686,7 @@ interface FontFaceSet extends EventTarget {
  
- declare const FontFaceSet: {
+ declare var FontFaceSet: {
    prototype: FontFaceSet;
 -  new (initialFaces: readonly FontFace[]): FontFaceSet;
 +  new (): FontFaceSet;
@@ -566,7 +566,7 @@ index 402e0ef0aca42bc391cb73dcad9cb6a6c9c0e616..ad34194faa1019ed78c3cbb59c4d6c2e
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PushMessageData/text) */
 @@ -5585,7 +5892,7 @@ interface ReadableStreamBYOBReader extends ReadableStreamGenericReader {
  
- declare const ReadableStreamBYOBReader: {
+ declare var ReadableStreamBYOBReader: {
    prototype: ReadableStreamBYOBReader;
 -  new (stream: ReadableStream): ReadableStreamBYOBReader;
 +  new (stream: ReadableStream<Uint8Array>): ReadableStreamBYOBReader;
@@ -680,7 +680,7 @@ index 402e0ef0aca42bc391cb73dcad9cb6a6c9c0e616..ad34194faa1019ed78c3cbb59c4d6c2e
  interface EncodedVideoChunkOutputCallback {
    (chunk: EncodedVideoChunk, metadata?: EncodedVideoChunkMetadata): void;
  }
-@@ -11284,7 +11599,7 @@ declare const onmessageerror:
+@@ -11284,7 +11599,7 @@ declare var onmessageerror:
    | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/rtctransform_event) */
  declare const onrtctransform:
