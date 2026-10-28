@@ -2,14 +2,15 @@
 
 # `open-pr`
 
-`pnpm run open-pr` — opens the pull request for the current branch the way
-this repository wants one opened: held by `skip-ci`, and never armed.
+`open-pr` — opens the pull request for the current branch the way the
+queue wants one opened: held by `skip-ci`, and never armed.
 
 - [日本語](#日本語)
 - [English](#english)
 
-The conventions this follows are `CLAUDE.md`'s: "Commits and pull requests"
-and "CI". This file describes what the script does with them.
+The conventions this follows are the queue's, described in
+`../unblock-prs/README.md`. This file describes what the script does with
+them.
 
 ## 日本語
 

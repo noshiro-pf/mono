@@ -1,12 +1,12 @@
 # `pr-report`
 
-`pnpm run pr-report` — the state of every open pull request, in one page.
+`pr-report` — the state of every open pull request, in one page.
 
 - [日本語](#日本語)
 - [English](#english)
 
-The conventions this reads are `CLAUDE.md`'s: "CI" and the `Merge-After:`
-trailer described in `../unblock-prs/README.md`. This file
+The conventions this reads are the queue's: the required checks and the
+`Merge-After:` trailer described in `../unblock-prs/README.md`. This file
 describes what the script does with them.
 
 ## 日本語
@@ -72,8 +72,8 @@ pnpm run pr-report -- --issues-limit 10 # open な issue の最大件数
 
 ### トークン
 
-`GH_TOKEN` か `GITHUB_TOKEN` があれば（この順に）使い、無ければ無認証で読みます。mono は
-public なので無認証でも動き、1回のレポートは匿名の 60 requests/hour に収まりま
+`GH_TOKEN` か `GITHUB_TOKEN` があれば（この順に）使い、無ければ無認証で読みます。public
+なリポジトリなら無認証でも動き、1回のレポートは匿名の 60 requests/hour に収まりま
 す（PR 1本あたり約3リクエスト = 20本程度まで。issue 一覧は全体で1リクエスト）。
 
 トークンがあると変わるのは2点だけです。レート制限が 5000/hour になることと、
