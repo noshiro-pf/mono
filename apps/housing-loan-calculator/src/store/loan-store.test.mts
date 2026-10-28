@@ -2,6 +2,7 @@ import {
   createMemoryBrowser,
   createRouter,
   type MemoryBrowser,
+  type Router,
 } from 'tiny-router-observable';
 import { defaultValues } from '../constants/index.mjs';
 import { calcAll } from '../functions/index.mjs';
@@ -36,6 +37,58 @@ describe(createLoanStore, () => {
     assert.deepStrictEqual(store.inputs.getSnapshot().value, {
       ...defaultValues,
       interestRatePercentPerYear: PercentFloat.cast(2),
+    });
+  });
+
+  test.each([
+    ['borrowing-total', 'abc'],
+    ['borrowing-total', ''],
+    ['borrowing-total', '12px'],
+    ['borrowing-total', 'Infinity'],
+    ['borrowing-period', 'abc'],
+    ['borrowing-period', '-1'],
+    ['borrowing-period', '1.5'],
+    ['interest-rate', 'abc'],
+    ['interest-rate', '-0.1'],
+    ['interest-rate', '101'],
+  ] as const)(
+    'keeps the default for %s=%s, which is not a number in its range',
+    (key, value) => {
+      const { store } = setup(`https://example.com/mono/loan/?${key}=${value}`);
+
+      assert.deepStrictEqual(store.inputs.getSnapshot().value, defaultValues);
+    },
+  );
+
+  test('accepts a rate of 100, a period of 1 and a total written with an exponent', () => {
+    const { store } = setup(
+      'https://example.com/mono/loan/?borrowing-total=1e3&borrowing-period=1&interest-rate=100',
+    );
+
+    assert.deepStrictEqual(store.inputs.getSnapshot().value, {
+      ...defaultValues,
+      borrowingTotalManYen: Yen.cast(1000),
+      borrowingPeriodYear: Year.cast(1),
+      interestRatePercentPerYear: PercentFloat.cast(100),
+    });
+  });
+
+  test('keeps the value before it when the URL changes to one that is not valid', () => {
+    const { store, router } = setup('https://example.com/mono/loan/');
+
+    store.setBorrowingTotalManYen(Yen.cast(4000));
+
+    store.setBorrowingPeriodYear(Year.cast(10));
+
+    store.setInterestRatePercentPerYear(PercentFloat.cast(0.8));
+
+    router.push('/?borrowing-total=abc&borrowing-period=-1&interest-rate=101');
+
+    assert.deepStrictEqual(store.inputs.getSnapshot().value, {
+      ...defaultValues,
+      borrowingTotalManYen: Yen.cast(4000),
+      borrowingPeriodYear: Year.cast(10),
+      interestRatePercentPerYear: PercentFloat.cast(0.8),
     });
   });
 
@@ -118,17 +171,17 @@ describe(createLoanStore, () => {
 type Setup = Readonly<{
   store: LoanStore;
   browser: MemoryBrowser;
+  router: Router;
 }>;
 
 const setup = (href: string): Setup => {
   const browser = createMemoryBrowser(href);
 
-  const store = createLoanStore({
-    router: createRouter({ basePath: '/mono/loan/', browser }),
-    calcDelayMs: 0,
-  });
+  const router = createRouter({ basePath: '/mono/loan/', browser });
 
-  return { store, browser } as const;
+  const store = createLoanStore({ router, calcDelayMs: 0 });
+
+  return { store, browser, router } as const;
 };
 
 const settle = async (): Promise<void> => {
