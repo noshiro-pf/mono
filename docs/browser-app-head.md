@@ -39,6 +39,9 @@ X は `twitter:title` などが無ければ `og:*` を読むので、`twitter:*`
 
 ## 公開するアプリとしないアプリ
 
+どこに公開するか（GitHub Pages か Firebase Hosting か）の基準は
+`docs/frontend-hosting.md`。
+
 **`og:url` を持つページを「公開している」とみなす。** 公開するアプリは上記を
 すべて備え、`og:url` と `og:image` を絶対 URL で書く。
 
