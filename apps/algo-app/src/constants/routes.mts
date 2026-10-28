@@ -1,30 +1,34 @@
-import type { ReadonlyURLSearchParams } from 'tiny-router-observable';
+import {
+  withSlash,
+  type ReadonlyURLSearchParams,
+} from 'tiny-router-observable';
 import type { DeepReadonly } from 'ts-type-forge';
-import { Router } from '../router.mjs';
-
-export const routes = {
-  main: '/',
-  createRoom: '/create',
-  rooms: '/rooms',
-} as const;
+import { routes } from './route-paths.mjs';
 
 export const params = {
+  roomId: 'id',
   playerId: 'player-id',
   replay: 'replay',
   observe: 'observe',
 } as const;
 
-// eslint-disable-next-line security/detect-non-literal-regexp
-const getRoomIdRegexp = new RegExp(
-  `^${routes.rooms}/(?<roomId>[^/]+)/.*$`,
-  'u',
-);
+/** The page of the room `roomId`. */
+export const roomPage = (roomId: string): string => {
+  const query = new URLSearchParams({ [params.roomId]: roomId });
 
-export const getRoomId = (path: string): string | undefined =>
-  getRoomIdRegexp.exec(path)?.groups?.['roomId'];
+  return `${withSlash(routes.rooms)}?${query.toString()}`;
+};
+
+export const getRoomId = (
+  path: string,
+  queryParams: ReadonlyURLSearchParams,
+): string | undefined =>
+  path === withSlash(routes.rooms)
+    ? (queryParams.get(params.roomId) ?? undefined)
+    : undefined;
 
 export const isMainPage = (path: string): boolean =>
-  path === routes.main || path === Router.utils.withSlash(routes.createRoom);
+  path === routes.main || path === withSlash(routes.createRoom);
 
 export const getParams = (
   queryParams: ReadonlyURLSearchParams,

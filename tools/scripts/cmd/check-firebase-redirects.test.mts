@@ -64,6 +64,82 @@ describe(findRedirectViolations, () => {
     );
   });
 
+  test('accepts rules for old paths ahead of the catch-all, and a site', () => {
+    const [catchAll] = redirectConfig(PAGES_URL).hosting.redirects;
+
+    assert.deepStrictEqual(
+      findRedirectViolations([
+        app({
+          firebaseJson: {
+            hosting: {
+              site: 'catan-dice',
+              public: 'public',
+              redirects: [
+                {
+                  regex: '^/game/([^/]+)/?$',
+                  destination: `${PAGES_URL}game/?id=:1`,
+                  type: 301,
+                },
+                catchAll,
+              ],
+            },
+          },
+          firebaserc: true,
+        }),
+      ]),
+      [],
+    );
+  });
+
+  test('reports a rule that sends an old path off the app’s page', () => {
+    const [catchAll] = redirectConfig(PAGES_URL).hosting.redirects;
+
+    assert.strictEqual(
+      findRedirectViolations([
+        app({
+          firebaseJson: {
+            hosting: {
+              public: 'public',
+              redirects: [
+                {
+                  regex: '^/game/([^/]+)/?$',
+                  destination: 'https://example.com/game/?id=:1',
+                  type: 301,
+                },
+                catchAll,
+              ],
+            },
+          },
+          firebaserc: true,
+        }),
+      ]).length,
+      1,
+    );
+  });
+
+  test('reports rules with no catch-all after them', () => {
+    assert.strictEqual(
+      findRedirectViolations([
+        app({
+          firebaseJson: {
+            hosting: {
+              public: 'public',
+              redirects: [
+                {
+                  regex: '^/game/([^/]+)/?$',
+                  destination: `${PAGES_URL}game/?id=:1`,
+                  type: 301,
+                },
+              ],
+            },
+          },
+          firebaserc: true,
+        }),
+      ]).length,
+      1,
+    );
+  });
+
   test('accepts a Firebase backend that hosts nothing', () => {
     assert.deepStrictEqual(
       findRedirectViolations([

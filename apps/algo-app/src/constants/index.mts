@@ -3,6 +3,7 @@ export * from './default-card-size.mjs';
 export * from './dictionary/index.mjs';
 export * from './directions.mjs';
 export * from './firebase.mjs';
+export * from './route-paths.mjs';
 export * from './routes.mjs';
 export * from './text.mjs';
 export * from './time.mjs';

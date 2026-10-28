@@ -148,19 +148,12 @@ export const findRedirectViolations = (
       return [];
     }
 
-    // `public` only has to name a directory that exists, which a deploy
-    // checks; the redirect comes first, so nothing in it is served.
-    const expected = {
-      ...redirectConfig(pagesUrl).hosting,
-      ...(isRecord(hosting) && typeof hosting['public'] === 'string'
-        ? { public: hosting['public'] }
-        : {}),
-    } as const;
+    const [catchAll] = redirectConfig(pagesUrl).hosting.redirects;
 
-    return fastDeepEqual(hosting, expected)
+    return isRedirectOnly(hosting, pagesUrl)
       ? []
       : [
-          `${dir}/firebase.json hosts something other than the redirect to ${pagesUrl}. Expected "hosting": ${JSON.stringify(expected)}`,
+          `${dir}/firebase.json hosts something other than redirects into ${pagesUrl}. Expected "hosting" with "public", optionally "site", and "redirects" of 301s into that page ending in ${JSON.stringify(catchAll)}.`,
         ];
   });
 
@@ -188,6 +181,60 @@ const slideDeckSites = async (): Promise<readonly Site[]> => {
     return { dir, pagesUrl: slideDeckUrl(path.basename(dir)) };
   });
 };
+
+/**
+ * Whether `hosting` does nothing but redirect into `pagesUrl`.
+ *
+ * Rules for old paths whose shape changed (`/rooms/<id>/` →
+ * `/rooms/?id=<id>`) may come first, as long as each is a 301 into the same
+ * page; the last is always the catch-all that keeps the path. `public` only
+ * has to name a directory that exists, which a deploy checks, and `site` picks
+ * the project's Hosting site; neither serves anything, as redirects come
+ * before files.
+ */
+const isRedirectOnly = (hosting: unknown, pagesUrl: string): boolean => {
+  if (
+    !isRecord(hosting) ||
+    Object.keys(hosting).some((key) => !hostingKeys.has(key)) ||
+    typeof hosting['public'] !== 'string' ||
+    !(hosting['site'] === undefined || typeof hosting['site'] === 'string')
+  ) {
+    return false;
+  }
+
+  const redirects = hosting['redirects'];
+
+  if (!Arr.isArray(redirects) || !Arr.isNonEmpty(redirects)) {
+    return false;
+  }
+
+  const [catchAll] = redirectConfig(pagesUrl).hosting.redirects;
+
+  return (
+    fastDeepEqual(redirects.at(-1), catchAll) &&
+    redirects.every(
+      (rule) =>
+        isRecord(rule) &&
+        rule['type'] === 301 &&
+        typeof rule['destination'] === 'string' &&
+        rule['destination'].startsWith(pagesUrl) &&
+        Object.keys(rule).every((key) => ruleKeys.has(key)),
+    )
+  );
+};
+
+const hostingKeys: ReadonlySet<string> = new Set<string>([
+  'public',
+  'site',
+  'redirects',
+]);
+
+const ruleKeys: ReadonlySet<string> = new Set<string>([
+  'source',
+  'regex',
+  'destination',
+  'type',
+]);
 
 /** The `hosting` of a `firebase.json`, or `undefined` when it hosts nothing. */
 const hostingOf = (firebaseJson: string): unknown => {

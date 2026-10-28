@@ -14,6 +14,7 @@ import * as path from 'node:path';
  * it, so renaming an app's directory moves its URL.
  */
 const pagesApps: readonly string[] = [
+  'algo-app',
   'annotation-tool',
   'cant-stop-probability',
   'catan-dice',
