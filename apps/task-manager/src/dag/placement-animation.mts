@@ -113,17 +113,28 @@ export const interpolateOpacities = (
     }),
   );
 
-/** Whether `a` and `b` put the same nodes in the same places. */
-export const samePositions = (
-  a: ReadonlyMap<GraphNodeId, Point>,
-  b: ReadonlyMap<GraphNodeId, Point>,
+/**
+ * Whether `a` and `b` put the same nodes in the same places, to within
+ * `SAME_PLACE`: as far as an arrangement drawn spread out at 「大」 and
+ * stored back can be off by rounding (`arrangementScale`).
+ */
+export const samePositions = <K,>(
+  a: ReadonlyMap<K, Point>,
+  b: ReadonlyMap<K, Point>,
 ): boolean =>
   a.size === b.size &&
   Array.from(a).every(([id, { x, y }]) => {
     const other = b.get(id);
 
-    return other?.x === x && other.y === y;
+    return (
+      other !== undefined &&
+      Math.abs(other.x - x) <= SAME_PLACE &&
+      Math.abs(other.y - y) <= SAME_PLACE
+    );
   });
+
+/** A millionth of a graph unit: far less than anything drawn. */
+const SAME_PLACE = 1e-6;
 
 /** Between two cells of the grid. */
 const GRID_GAP = 32;

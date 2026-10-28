@@ -11,7 +11,8 @@
  *
  * Every change to the arrangement is saved with every node where it is
  * shown — put by hand, or by ELK if it never was — so that what is on the
- * screen is what is stored, and a node never moves because ELK, laying out
+ * screen is what is stored (at 「大」, spread out: see below), and a node
+ * never moves because ELK, laying out
  * a changed graph or a new direction, would put it elsewhere. Until the
  * reader changes something nothing is written, and the direction follows the
  * screen. A drag is saved when it is dropped; the arrow keys, after a pause.
@@ -56,9 +57,12 @@
  * The node size (`view-model/node-size.mts`) is the size of every box: ELK
  * lays the DAG out again with it, and 「アーク」's column and 「タイル」's
  * rows follow it. A new size moves the nodes to their new places in the
- * same animation — in 「DAG」 once ELK has laid it out, and only the nodes
- * ELK places: a node put somewhere stays where it was put, its top-left
- * corner where it was — and asks for a fit. Nothing is saved for it.
+ * same animation — in 「DAG」 once ELK has laid it out — and asks for a
+ * fit. A node put somewhere keeps its top-left corner where it was put,
+ * except that the arrangement is stored as made at 「標準」 and drawn at 「大」
+ * spread out (`arrangementScale`), so that nodes put clear of each other
+ * stay clear; a move made at 「大」 is saved gathered back. Nothing is saved
+ * for a new size.
  *
  * ELK lays out the milestones that have a date in order of date: the graph
  * it is given has an edge from each to those of the next date
@@ -98,6 +102,7 @@ import { Arr, Num, unknownToString } from 'ts-data-forge';
 import {
   arcDiagramIds,
   arcDiagramNodes,
+  arrangementScale,
   diagramTaskIds,
   easeOutCubic,
   framePositions,
@@ -118,6 +123,7 @@ import {
   resizeNodes,
   sameDiagramOrder,
   samePositions,
+  scaleArrangement,
   startFrameBudget,
   tileDiagramNodes,
   withMemberMoved,
@@ -163,13 +169,17 @@ export type DagLayoutState = Readonly<
  */
 export type DagLayoutDeps<H, F> = Readonly<{
   state: InitializedObservable<DomainState>;
-  /** The saved arrangement; `undefined` while there is none. */
+  /**
+   * The saved arrangement, as made at 「標準」; `undefined` while there is
+   * none.
+   */
   stored: InitializedObservable<DagLayout | undefined>;
   /** The direction while nothing is saved. */
   defaultDirection: InitializedObservable<DagDirection>;
   /** Whether the DAG is on screen; nothing is laid out while it is not. */
   active: InitializedObservable<boolean>;
   layout: (input: LayoutInput) => Promise<GraphLayout>;
+  /** Saves the arrangement, as made at 「標準」. */
   save: (layout: DagLayout) => void;
   /** How long after the last arrow key a node moved by the keys is saved. */
   nudgeDelayMs: number;
@@ -212,7 +222,10 @@ export type DagLayoutDeps<H, F> = Readonly<{
 
 export type DagLayoutStore = Readonly<{
   autoLayout: InitializedObservable<DagLayoutState>;
-  /** The direction, and the positions of the nodes put somewhere. */
+  /**
+   * The direction, and the positions of the nodes put somewhere, as drawn:
+   * spread out from what is stored at 「大」 (`arrangementScale`).
+   */
   arrangement: InitializedObservable<DagLayout>;
   /** Goes up by one whenever the whole graph should be fitted to the view. */
   fitRequests: InitializedObservable<number>;
@@ -300,10 +313,20 @@ export const createDagLayoutStore = <H, F>(
   // timer, a layout coming back — is handed out by `publish`.
   let mut_autoLayout: DagLayoutState = { type: 'idle' } as const;
 
-  let mut_arrangement: DagLayout = initialArrangement(
+  // The arrangement as stored, which is as made at 「標準」.
+  let mut_stored: DagLayout = initialArrangement(
     deps.stored.getSnapshot().value,
     deps.defaultDirection.getSnapshot().value,
   );
+
+  // The node size `mut_arrangement` is drawn at: that of the automatic
+  // layout drawn with it, so that a new size moves nothing before ELK has
+  // laid the graph out at it, and then everything together (`resize`).
+  let mut_drawnAt: NodeSize = deps.nodeSize.getSnapshot().value;
+
+  // `mut_stored` as drawn at `mut_drawnAt`, spread out at 「大」
+  // (`arrangementScale`), and moved since by a move not yet saved.
+  let mut_arrangement: DagLayout = drawnArrangement(mut_stored, mut_drawnAt);
 
   let mut_fitRequests = 0;
 
@@ -725,19 +748,40 @@ export const createDagLayoutStore = <H, F>(
 
     const saved = frozen(next, members, replaced);
 
+    mut_stored = storedArrangement(saved, mut_stored, mut_drawnAt);
+
     mut_arrangement = saved;
 
-    deps.save(saved);
+    deps.save(mut_stored);
   };
 
-  const applyArrangeIfRequested = (laidOut: GraphLayout): void => {
+  /**
+   * Draws the arrangement at `size`, with an automatic layout made at it. A
+   * move not yet saved is carried along.
+   */
+  const drawAt = (size: NodeSize): void => {
+    if (size === mut_drawnAt) {
+      return;
+    }
+
+    mut_arrangement = drawnArrangement(
+      storedArrangement(getArrangement(), mut_stored, mut_drawnAt),
+      size,
+    );
+
+    mut_drawnAt = size;
+  };
+
+  /** `before`: where the nodes are drawn until then. */
+  const applyArrangeIfRequested = (
+    laidOut: GraphLayout,
+    before: ReadonlyMap<GraphNodeId, Point>,
+  ): void => {
     if (!mut_arrangeRequested) {
       return;
     }
 
     mut_arrangeRequested = false;
-
-    const before = positionsOf(placed());
 
     commit({
       direction: getArrangement().direction,
@@ -1168,7 +1212,7 @@ export const createDagLayoutStore = <H, F>(
     const current = getAutoLayout();
 
     if (current.type === 'ready') {
-      applyArrangeIfRequested(current.layout);
+      applyArrangeIfRequested(current.layout, positionsOf(placed()));
     }
   };
 
@@ -1182,14 +1226,23 @@ export const createDagLayoutStore = <H, F>(
       return;
     }
 
+    mut_stored = initialArrangement(stored, defaultDirection);
+
+    const redrawn = drawnArrangement(mut_stored, mut_drawnAt);
+
+    // Not for a write of this store's own, which comes back as it is drawn
+    // (to within rounding, at 「大」).
+    if (sameArrangement(redrawn, getArrangement())) {
+      return;
+    }
+
     const before = positionsOf(placed());
 
-    mut_arrangement = initialArrangement(stored, defaultDirection);
+    mut_arrangement = redrawn;
 
     const after = positionsOf(placed());
 
-    // Not for a write of this store's own, which comes back unchanged,
-    // nor outside the DAG, where nothing on screen moves.
+    // Nor outside the DAG, where nothing on screen moves.
     if (
       !onScreen() ||
       !isArrangeable(mut_viewMode) ||
@@ -1247,19 +1300,44 @@ export const createDagLayoutStore = <H, F>(
 
         const previousMadeFor = mut_shownMadeFor;
 
+        const sameMadeFor =
+          previous !== undefined &&
+          previousMadeFor?.direction === direction &&
+          previousMadeFor.size === size;
+
+        // Where the nodes are drawn until now, if 「自動整列」 is asked for
+        // or may be (`followStructure`).
+        const drawnBefore =
+          mut_arrangeRequested || sameMadeFor
+            ? positionsOf(placed())
+            : undefined;
+
         mut_autoLayout = { type: 'ready', layout: laidOut };
 
         mut_shownMadeFor = { direction, size };
 
-        if (
-          previous !== undefined &&
-          previousMadeFor?.direction === direction &&
-          previousMadeFor.size === size
-        ) {
+        if (sameMadeFor) {
           followStructure(previous, laidOut);
         }
 
-        applyArrangeIfRequested(laidOut);
+        // A node new to the graph, from where it would be put
+        // (`placeNodes`).
+        const before =
+          drawnBefore !== undefined && mut_arrangeRequested
+            ? new Map(
+                Array.from(
+                  positionsOf(placed()),
+                  ([id, at]) => [id, drawnBefore.get(id) ?? at] as const,
+                ),
+              )
+            : undefined;
+
+        // A layout of nothing is made at no size in particular.
+        drawAt(Arr.isEmpty(laidOut.nodes) ? mut_nodeSize : size);
+
+        if (before !== undefined) {
+          applyArrangeIfRequested(laidOut, before);
+        }
 
         moveAwaited();
 
@@ -1275,6 +1353,8 @@ export const createDagLayoutStore = <H, F>(
         mut_arrangeRequested = false;
 
         mut_awaitingFrom = undefined;
+
+        drawAt(mut_nodeSize);
 
         mut_shownMadeFor = undefined;
 
@@ -1311,6 +1391,11 @@ export const createDagLayoutStore = <H, F>(
     mut_nodeSize = size;
 
     resize(previous, size);
+
+    // With no automatic layout to wait for.
+    if (Arr.isEmpty(shownAutoLayout()?.nodes ?? [])) {
+      drawAt(size);
+    }
   };
 
   const followDiagramOrder = (ids: readonly GraphNodeId[]): void => {
@@ -1347,7 +1432,16 @@ export const createDagLayoutStore = <H, F>(
     ),
   );
 
-  const arrangement = published(merge([acted, storedFollowed]), getArrangement);
+  // Apart from the rest too, because the arrangement is drawn spread out at
+  // 「大」 (`arrangementScale`).
+  const nodeSizeFollowed = whileStarted(() =>
+    deps.nodeSize.pipe(following(followNodeSize)),
+  );
+
+  const arrangement = published(
+    merge([acted, storedFollowed, nodeSizeFollowed]),
+    getArrangement,
+  );
 
   const inputsFollowed = whileStarted(() =>
     merge([
@@ -1381,13 +1475,17 @@ export const createDagLayoutStore = <H, F>(
         }),
       ),
       deps.viewMode.pipe(following(followViewMode)),
-      deps.nodeSize.pipe(following(followNodeSize)),
       diagramOrder.pipe(following(followDiagramOrder)),
       arcOrder.pipe(following(followArcOrder)),
     ]).pipe(withInitialValue(undefined)),
   );
 
-  const changed = merge([acted, storedFollowed, inputsFollowed]);
+  const changed = merge([
+    acted,
+    storedFollowed,
+    nodeSizeFollowed,
+    inputsFollowed,
+  ]);
 
   const start = (): (() => void) => {
     setStarted(true);
@@ -1512,6 +1610,62 @@ const initialArrangement = (
     positions: new Map<GraphNodeId, Point>(),
     groupPositions: new Map<GroupId, Point>(),
   };
+
+/** `stored` as drawn at `nodeSize`. */
+const drawnArrangement = (stored: DagLayout, nodeSize: NodeSize): DagLayout =>
+  scaleArrangement(stored, arrangementScale(nodeSize));
+
+const storedPositions = <K,>(
+  drawn: ReadonlyMap<K, Point>,
+  previous: ReadonlyMap<K, Point>,
+  nodeSize: NodeSize,
+): ReadonlyMap<K, Point> => {
+  const by = arrangementScale(nodeSize);
+
+  return new Map(
+    Array.from(drawn, ([id, at]) => {
+      const was = previous.get(id);
+
+      return [
+        id,
+        was !== undefined && was.x * by.x === at.x && was.y * by.y === at.y
+          ? was
+          : { x: Num.div(at.x, by.x), y: Num.div(at.y, by.y) },
+      ] as const;
+    }),
+  );
+};
+
+/**
+ * `drawn`, drawn at `nodeSize`, as stored. A node or a frame drawn where
+ * `previous` has it keeps the position `previous` has, so that what did not
+ * move is written back as it was read, not off by rounding.
+ */
+const storedArrangement = (
+  drawn: DagLayout,
+  previous: DagLayout,
+  nodeSize: NodeSize,
+): DagLayout =>
+  arrangementScale(nodeSize).x === 1 && arrangementScale(nodeSize).y === 1
+    ? drawn
+    : ({
+        direction: drawn.direction,
+        positions: storedPositions(
+          drawn.positions,
+          previous.positions,
+          nodeSize,
+        ),
+        groupPositions: storedPositions(
+          drawn.groupPositions,
+          previous.groupPositions,
+          nodeSize,
+        ),
+      } as const);
+
+const sameArrangement = (a: DagLayout, b: DagLayout): boolean =>
+  a.direction === b.direction &&
+  samePositions(a.positions, b.positions) &&
+  samePositions(a.groupPositions, b.groupPositions);
 
 const withPosition = (
   positions: ReadonlyMap<GraphNodeId, Point>,

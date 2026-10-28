@@ -237,4 +237,19 @@ describe(samePositions, () => {
       ),
     );
   });
+
+  test('takes a rounding error for the same place', () => {
+    const a = positions([['task:a', { x: 11, y: 2 }]]);
+
+    assert.isTrue(
+      samePositions(
+        a,
+        positions([['task:a', { x: 10.999999999999998, y: 2 }]]),
+      ),
+    );
+
+    assert.isFalse(
+      samePositions(a, positions([['task:a', { x: 10.99, y: 2 }]])),
+    );
+  });
 });
