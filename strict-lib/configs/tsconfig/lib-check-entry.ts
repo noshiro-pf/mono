@@ -87,3 +87,31 @@ export const sharedGlobals: readonly object[] = [
 
 // @ts-expect-error `NaN` is `const`; `Number.NaN` reaches it everywhere.
 export const notOnGlobalThis: number = globalThis.NaN;
+
+/**
+ * #2586 — an entry of `Object.entries` on a record with optional keys could be
+ * `undefined`, so `for (const [key, value] of …)` did not compile.
+ *
+ * `ToObjectEntries` indexes a mapped type over `keyof R`, and that mapped type
+ * lacked `-?`: each optional key stayed optional, and indexing it added
+ * `undefined` to the entry itself. The value of an optional key may still be
+ * `undefined`, which the second assertion holds, so that a fix which strips
+ * optionality from `R` as well fails here.
+ */
+export const optionalKeyEntries = (
+  record: Readonly<{ a?: number; b?: string }>,
+): readonly string[] => {
+  const mut_lines: string[] = [];
+
+  for (const [key, value] of Object.entries(record)) {
+    mut_lines.push(`${key}=${String(value)}`);
+  }
+
+  return mut_lines;
+};
+
+export const optionalKeyValues = (
+  record: Readonly<{ a?: number; b?: string }>,
+): readonly (number | string)[] =>
+  // @ts-expect-error The value of an optional key may be `undefined`.
+  Object.entries(record).map(([, value]) => value);

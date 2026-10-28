@@ -49,8 +49,9 @@ describe('composition', () => {
     assert.isTrue(Object.keys(sumiRules).length > 0);
 
     // The type argument picks the plain-record overload: the strict standard
-    // library's record overload maps the optional keys of `sumiRules` to
-    // entries that may be `undefined`, which cannot be destructured (#2586).
+    // library's record overload also types the keys a wider object may carry,
+    // with the literals of every value widened (`'error'` to `string`), and
+    // `RuleEntry` does not accept those.
     for (const [ruleId, entry] of Object.entries<RuleEntry | undefined>(
       sumiRules,
     )) {

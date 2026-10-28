@@ -53,7 +53,7 @@ export const convertLibEs2017Object =
                         ? never
                         : readonly [string & {}, WidenLiteral<ValueOf<R>>])
                     | {
-                        ${readonlyModifier}[K in keyof R]: readonly [
+                        ${readonlyModifier}[K in keyof R]-?: readonly [
                           ToStr<keyof PickByValue<R, R[K]>>,
                           R[K],
                         ];

@@ -2904,14 +2904,21 @@ catch した値）に置き換えた。
 
 ### strict lib 側が直ったら戻す箇所（追加）
 
-| issue | 原因                                                                                 | 箇所                                                                                                   | 入れたもの                                  |
-| :---- | :----------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------- | :------------------------------------------ |
-| #2585 | `union` / `symmetricDifference` の `U` が `has` の広い引数から `string` に推論される | `languages/sumi/checker/src/rules/no-refinement-overload.mts`、`apps/task-manager/src/store/store.mts` | `union<T>(…)` の型引数                      |
-| #2586 | `ToObjectEntries` が省略可能なキーに `-?` を付けず、エントリが `undefined` を含む    | `languages/sumi/eslint-config/test/sumi-rules.test.mts`                                                | `Object.entries<RuleEntry \| undefined>(…)` |
+| issue | 原因                                                                                 | 箇所                                                                                                   | 入れたもの             |
+| :---- | :----------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------- | :--------------------- |
+| #2585 | `union` / `symmetricDifference` の `U` が `has` の広い引数から `string` に推論される | `languages/sumi/checker/src/rules/no-refinement-overload.mts`、`apps/task-manager/src/store/store.mts` | `union<T>(…)` の型引数 |
 
-どちらも単体で再現する（`ReadonlySet<'a' | 'b'>` 同士の `union` が
-`ReadonlySet<string>`、`{ a?: number }` を `for (const [k, v] of Object.entries(r))`
-で分割代入できない）。
+単体で再現する（`ReadonlySet<'a' | 'b'>` 同士の `union` が `ReadonlySet<string>`
+になる）。
+
+もう 1 件の #2586（`ToObjectEntries` の mapped type に `-?` が無く、省略可能なキー
+のエントリそのものが `undefined` を含んだため、`{ a?: number }` を
+`for (const [k, v] of Object.entries(r))` で分割代入できなかった）は converter で
+直した。回帰は `lib-check-entry.ts` が見る。`sumi-rules.test.mts` の型引数は
+残したが、理由は別で、戻す箇所ではない。record 用の overload は、より広い
+オブジェクトが持ちうるキーを `[string & {}, WidenLiteral<ValueOf<R>>]` で表すので、
+値のリテラルが広がり（`'error'` が `string`）、`RuleEntry` に代入できない。これは
+意図した挙動である。
 
 ### 再発防止
 
