@@ -1,4 +1,5 @@
 import { createState } from 'synstate';
+import { NATURAL_ZOOM, type DagZoom } from '../dag-zoom.mjs';
 import type { Entry, LoadedReport } from '../load-report.mjs';
 import {
   createIssuesViewStore,
@@ -375,6 +376,44 @@ describe(createIssuesViewStore, () => {
     assert.strictEqual(store.dagScale.getSnapshot().value, 1);
   });
 
+  test('starts at the zoom it is given, and hands every change to save as it starts', () => {
+    const { store, savedZoom } = setup({ initialZoom: { type: 'fit' } });
+
+    assert.isTrue(store.dagFitted.getSnapshot().value);
+
+    const stopStore = store.start();
+
+    // What it started at is written back, as the theme is.
+    assert.deepStrictEqual(savedZoom, [{ type: 'fit' }]);
+
+    // From the fit of a box not measured yet, which is the natural size.
+    store.zoomIn();
+
+    store.resetZoom();
+
+    assert.deepStrictEqual(savedZoom, [
+      { type: 'fit' },
+      { type: 'scale', scale: 1.1 },
+      { type: 'scale', scale: 1 },
+    ]);
+
+    stopStore();
+
+    store.zoomIn();
+
+    assert.strictEqual(savedZoom.length, 3);
+  });
+
+  test('a scale it is given is drawn as it is', () => {
+    const { store } = setup({ initialZoom: { type: 'scale', scale: 1.5 } });
+
+    assert.strictEqual(store.dagScale.getSnapshot().value, 1.5);
+
+    store.zoomIn();
+
+    assert.strictEqual(store.dagScale.getSnapshot().value, 1.75);
+  });
+
   test('the fit puts the whole graph in the box, and follows the box and the graph until a zoom', () => {
     const { store, setIssues } = setup();
 
@@ -471,6 +510,51 @@ describe(createIssuesViewStore, () => {
     assert.deepStrictEqual(store.layout.getSnapshot().value, natural);
   });
 
+  test('a scale it is given draws what has no edge where it goes by default, whatever the box', () => {
+    const issues = {
+      items: [
+        issueItem(1, []),
+        issueItem(2, [1]),
+        ...Array.from({ length: 12 }, (_, index) => issueItem(index + 3, [])),
+      ],
+      totalCount: 14,
+      endCursor: undefined,
+      referenced: [],
+    } as const;
+
+    const atNatural = setup();
+
+    atNatural.setIssues(issues);
+
+    const natural = atNatural.store.layout.getSnapshot().value;
+
+    const { store, setIssues } = setup({
+      initialZoom: { type: 'scale', scale: 0.5 },
+    });
+
+    setIssues(issues);
+
+    // A box the fit arranges them differently for.
+    const box = {
+      width: natural.width * 3,
+      height: natural.height / 3,
+    } as const;
+
+    const fitted = setup({ initialZoom: { type: 'fit' } });
+
+    fitted.setIssues(issues);
+
+    fitted.store.setDagBox(box);
+
+    assert.notDeepEqual(fitted.store.layout.getSnapshot().value, natural);
+
+    store.setDagBox(box);
+
+    assert.deepStrictEqual(store.layout.getSnapshot().value, natural);
+
+    assert.strictEqual(store.dagScale.getSnapshot().value, 0.5);
+  });
+
   test('stopped before the read answers, it neither applies nor saves', async () => {
     const { store, saved, savedHideDone, resolveLoad, resolveLoadHideDone } =
       setup();
@@ -495,9 +579,12 @@ describe(createIssuesViewStore, () => {
   });
 });
 
-const setup = (): Readonly<{
+const setup = (
+  options: Readonly<{ initialZoom?: DagZoom }> = {},
+): Readonly<{
   store: ReturnType<typeof createIssuesViewStore>;
   saved: readonly IssuesView[];
+  savedZoom: readonly DagZoom[];
   savedHideDone: readonly boolean[];
   resolveLoad: (stored: unknown) => void;
   rejectLoad: () => void;
@@ -512,6 +599,8 @@ const setup = (): Readonly<{
   loadMoreCalls: () => number;
 }> => {
   const mut_saved: IssuesView[] = [];
+
+  const mut_savedZoom: DagZoom[] = [];
 
   const mut_loadMore = { calls: 0 };
 
@@ -554,6 +643,10 @@ const setup = (): Readonly<{
     saveHidePending: (hide) => {
       mut_savedHidePending.push(hide);
     },
+    initialZoom: options.initialZoom ?? NATURAL_ZOOM,
+    saveZoom: (zoom) => {
+      mut_savedZoom.push(zoom);
+    },
     moreIssues,
     loadMoreIssues: () => {
       mut_loadMore.calls += 1;
@@ -563,6 +656,7 @@ const setup = (): Readonly<{
   return {
     store,
     saved: mut_saved,
+    savedZoom: mut_savedZoom,
     savedHideDone: mut_savedHideDone,
     resolveLoad: resolve,
     rejectLoad: () => {

@@ -25,16 +25,18 @@
  * than what is open. A page that failed is not asked for again on its own;
  * the button under the block is still there for that.
  *
- * How large the DAG is drawn (`dag-zoom.mts`) starts at the natural size
- * on every visit and is not kept: a zoom is for the graph in front of the
- * reader, which the next visit may not have. The fit is a way of drawing
- * rather than a scale, so that it keeps the whole graph in the box as the
- * box is resized and as the graph gains or loses nodes, until a zoom or the
- * natural size is chosen; a zoom from the fit starts at the scale it had.
- * The fit also chooses where the nodes with no edge go (`fitPlacement`):
- * in rows as long, and under, beside or around the rest, as lets the whole graph
- * be drawn the largest. A zoom from the fit keeps that arrangement, and the
- * natural size puts them back in the default one.
+ * How large the DAG is drawn is kept in the URL (`dag-zoom.mts`), as the
+ * layout is, rather than with the rest of this: it starts at `initialZoom`,
+ * read off the query string as the page opens, and every change is handed to
+ * `saveZoom` from `start` on.
+ *
+ * The fit is a way of drawing rather than a scale, so that it keeps the whole
+ * graph in the box as the box is resized and as the graph gains or loses nodes,
+ * until a zoom or the natural size is chosen; a zoom from the fit starts at the
+ * scale it had. The fit also chooses where the nodes with no edge go
+ * (`fitPlacement`): in rows as long, and under, beside or around the rest, as
+ * lets the whole graph be drawn the largest. A zoom from the fit keeps that
+ * arrangement, and the natural size puts them back in the default one.
  *
  * The graph the DAG draws, and where each of its nodes goes, are derived
  * here from the report and that switch, and passed on only when they
@@ -54,8 +56,10 @@ import { Arr, fastDeepEqual } from 'ts-data-forge';
 import {
   fitPlacement,
   fitScale,
+  NATURAL_ZOOM,
   zoomInFrom,
   zoomOutFrom,
+  type DagZoom,
   type Size,
 } from '../dag-zoom.mjs';
 import {
@@ -92,6 +96,9 @@ export type IssuesViewDeps = Readonly<{
   /** Whether the DAG left out what is pending, as it was saved. */
   loadHidePending: () => Promise<unknown>;
   saveHidePending: (hide: boolean) => void;
+  /** How large the DAG is drawn as the page opens. */
+  initialZoom: DagZoom;
+  saveZoom: (zoom: DagZoom) => void;
   /** How the last page of open issues asked for went. */
   moreIssues: InitializedObservable<MoreIssuesStatus>;
   /** Asks for the next page of open issues. */
@@ -146,7 +153,7 @@ export const createIssuesViewStore = (
   const [hidePending, setHidePending, { updateState: updateHidePending }] =
     createState(false);
 
-  const [zoom, setZoom] = createState<DagZoom>({ type: 'scale', scale: 1 });
+  const [zoom, setZoom] = createState<DagZoom>(deps.initialZoom);
 
   const [dagBox, setDagBox] = createState<Size>({ width: 0, height: 0 });
 
@@ -183,6 +190,8 @@ export const createIssuesViewStore = (
       stopped: false,
       saving: [],
     };
+
+    const zoomSaving = zoom.subscribe(deps.saveZoom);
 
     const reading = combine([deps.issues, deps.moreIssues]).subscribe(
       ([issues, more]) => {
@@ -255,6 +264,8 @@ export const createIssuesViewStore = (
       for (const subscription of mut_run.saving) {
         subscription.unsubscribe();
       }
+
+      zoomSaving.unsubscribe();
 
       reading.unsubscribe();
     };
@@ -349,10 +360,8 @@ export const createIssuesViewStore = (
     resetZoom: () => {
       setKept(undefined);
 
-      setZoom({ type: 'scale', scale: 1 });
+      setZoom(NATURAL_ZOOM);
     },
     start,
   };
 };
-
-type DagZoom = Readonly<{ type: 'fit' } | { type: 'scale'; scale: number }>;

@@ -1,7 +1,7 @@
 /**
  * The query string, which is where the page keeps what a reader chose — the
- * theme (`theme.mts`) and the layout (`layout.mts`) — so that a bookmark or a
- * pasted link opens the same way.
+ * theme (`theme.mts`), the layout (`layout.mts`) and the DAG's zoom
+ * (`dag-zoom.mts`) — so that a bookmark or a pasted link opens the same way.
  */
 
 export const currentSearch = (): string => globalThis.location.search;

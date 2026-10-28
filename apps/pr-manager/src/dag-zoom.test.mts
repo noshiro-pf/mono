@@ -1,10 +1,13 @@
 import {
   centreAt,
+  dagZoomFromSearch,
   fitPlacement,
   fitScale,
   MAX_SCALE,
   MIN_SCALE,
   scrollToCentre,
+  searchWithDagZoom,
+  ZOOM_STEPS,
   zoomInFrom,
   zoomOutFrom,
 } from './dag-zoom.mjs';
@@ -197,3 +200,103 @@ const chainAndFree = (chain: number, free: number): IssueGraph =>
       settled: false,
     })),
   }) as const;
+
+describe(dagZoomFromSearch, () => {
+  test('reads a scale in percent, and the fit', () => {
+    assert.deepStrictEqual(dagZoomFromSearch('?zoom=125'), {
+      type: 'scale',
+      scale: 1.25,
+    });
+
+    assert.deepStrictEqual(dagZoomFromSearch('?zoom=33'), {
+      type: 'scale',
+      scale: 0.33,
+    });
+
+    assert.deepStrictEqual(dagZoomFromSearch('?a=1&zoom=fit'), {
+      type: 'fit',
+    });
+  });
+
+  test('reads no parameter, or one it cannot read, as the natural size', () => {
+    for (const search of [
+      '',
+      '?zoom=',
+      '?zoom=big',
+      '?zoom=Fit',
+      '?zoom=-50',
+    ]) {
+      assert.deepStrictEqual(dagZoomFromSearch(search), {
+        type: 'scale',
+        scale: 1,
+      });
+    }
+  });
+
+  test('clamps a scale out of range to the nearest end', () => {
+    assert.deepStrictEqual(dagZoomFromSearch('?zoom=1'), {
+      type: 'scale',
+      scale: MIN_SCALE,
+    });
+
+    assert.deepStrictEqual(dagZoomFromSearch('?zoom=1000'), {
+      type: 'scale',
+      scale: MAX_SCALE,
+    });
+
+    // More digits than a number holds.
+    assert.deepStrictEqual(dagZoomFromSearch(`?zoom=${'9'.repeat(400)}`), {
+      type: 'scale',
+      scale: MAX_SCALE,
+    });
+  });
+});
+
+describe(searchWithDagZoom, () => {
+  test('writes a scale in percent, and the fit', () => {
+    assert.strictEqual(
+      searchWithDagZoom('', { type: 'scale', scale: 1.25 }),
+      '?zoom=125',
+    );
+
+    assert.strictEqual(
+      searchWithDagZoom('?zoom=125', { type: 'scale', scale: 0.33 }),
+      '?zoom=33',
+    );
+
+    assert.strictEqual(searchWithDagZoom('', { type: 'fit' }), '?zoom=fit');
+  });
+
+  test('writes the natural size as the absence of the parameter', () => {
+    assert.strictEqual(
+      searchWithDagZoom('?zoom=fit', { type: 'scale', scale: 1 }),
+      '',
+    );
+  });
+
+  test('keeps the other parameters where they were', () => {
+    assert.strictEqual(
+      searchWithDagZoom('?a=1&zoom=fit&b=2', { type: 'scale', scale: 2 }),
+      '?a=1&zoom=200&b=2',
+    );
+
+    assert.strictEqual(
+      searchWithDagZoom('?a=1&zoom=fit', { type: 'scale', scale: 1 }),
+      '?a=1',
+    );
+  });
+
+  test('what it writes reads back as it was, the fit and every step', () => {
+    assert.deepStrictEqual(
+      dagZoomFromSearch(searchWithDagZoom('', { type: 'fit' })),
+      { type: 'fit' },
+    );
+
+    for (const scale of ZOOM_STEPS) {
+      assert.deepStrictEqual(
+        dagZoomFromSearch(searchWithDagZoom('', { type: 'scale', scale })),
+        { type: 'scale', scale },
+      );
+    }
+  });
+});

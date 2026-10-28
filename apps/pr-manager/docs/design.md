@@ -112,8 +112,11 @@ has, Fit also rearranges the issues with no dependency either way: in longer
 or shorter rows, under the rest of the graph, beside it, or filling the room to
 its right before going on under it, whichever draws the whole graph the
 largest. A zoom from there keeps that arrangement; 100% puts
-them back under the rest. The zoom starts at
-100% on every visit.
+them back under the rest. The zoom is kept in the URL with the layout,
+`?zoom=125` for a scale in percent and `?zoom=fit` for the fit, so a reload or
+a bookmark draws the graph at the same size; 100% is the parameter's absence.
+A scale read back puts the issues with no dependency where they go by default,
+whatever arrangement the fit had chosen before the zoom.
 
 It **only reads**. Nothing here labels, rebases, merges or comments — that is
 `pnpm run unblock-prs`, run by a person — and a page that cannot do any of it
@@ -462,8 +465,8 @@ the DOM events as observables — which is what lets a test drive them with a
 `source`, and `store.mts` hands them the real ones. What is kept outside the
 page follows a store by subscription: storage follows the token, the URL
 and `<html>` follow the theme, the URL follows the layout (through
-`debounce`), IndexedDB follows the merge order's filters and the folded
-header once what it held has been read, and the Layout dialog opens and closes as the store says.
+`debounce`) and the DAG's zoom (on every step, there being no drag),
+IndexedDB follows the merge order's filters and the folded header once what it held has been read, and the Layout dialog opens and closes as the store says.
 
 **The view is synstate-dom**, which binds the stores' observables straight
 into the DOM: each component is called once, and a value that changes
