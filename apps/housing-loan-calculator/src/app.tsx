@@ -9,10 +9,10 @@ import {
   SummarySection,
 } from './components/index.mjs';
 import { dict } from './constants/index.mjs';
-import { isCalculating$ } from './store/index.mjs';
+import { loanStore } from './store/index.mjs';
 
 export const App = memoNamed('App', () => {
-  const isCalculating = useObservableValue(isCalculating$);
+  const isCalculating = useObservableValue(loanStore.isCalculating);
 
   return (
     <div

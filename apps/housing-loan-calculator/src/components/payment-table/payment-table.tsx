@@ -5,7 +5,7 @@ import { useObservableValue } from 'synstate-react-hooks';
 import { Arr, Uint32 } from 'ts-data-forge';
 import type { DeepReadonly, FixedLengthTuple } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
-import { calculatedValues$, store$ } from '../../store/index.mjs';
+import { loanStore } from '../../store/index.mjs';
 import { Yen } from '../../types/index.mjs';
 
 const headerCellStyle = {
@@ -24,14 +24,14 @@ const yenFormatter = new Intl.NumberFormat('ja-JP', {
 const formatYenValue = (value: Yen): string => yenFormatter.format(value);
 
 export const PaymentTable = memoNamed('PaymentTable', () => {
-  const { repaymentType } = useObservableValue(store$);
+  const { repaymentType } = useObservableValue(loanStore.inputs);
 
   const {
     borrowingBalanceYen,
     interestYen,
     monthlyPaymentTotalYen,
     monthlyPrincipalPaymentYen,
-  } = useObservableValue(calculatedValues$);
+  } = useObservableValue(loanStore.calculatedValues);
 
   const monthlyPayment = React.useMemo<readonly Yen[]>(
     () =>

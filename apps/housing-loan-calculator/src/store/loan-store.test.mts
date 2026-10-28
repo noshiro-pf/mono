@@ -1,0 +1,138 @@
+import {
+  createMemoryBrowser,
+  createRouter,
+  type MemoryBrowser,
+} from 'tiny-router-observable';
+import { defaultValues } from '../constants/index.mjs';
+import { calcAll } from '../functions/index.mjs';
+import { PercentFloat, Year, Yen } from '../types/index.mjs';
+import { createLoanStore, type LoanStore } from './loan-store.mjs';
+
+describe(createLoanStore, () => {
+  test('starts from the defaults when the URL names nothing', () => {
+    const { store } = setup('https://example.com/mono/loan/');
+
+    assert.deepStrictEqual(store.inputs.getSnapshot().value, defaultValues);
+  });
+
+  test('reads the inputs from the URL it was opened at', () => {
+    const { store } = setup(
+      'https://example.com/mono/loan/?repayment-type=principal-and-interest-equal-repayment&borrowing-total=3000&borrowing-period=20&interest-rate=1.2',
+    );
+
+    assert.deepStrictEqual(store.inputs.getSnapshot().value, {
+      repaymentType: 'principal-and-interest-equal-repayment',
+      borrowingTotalManYen: Yen.cast(3000),
+      borrowingPeriodYear: Year.cast(20),
+      interestRatePercentPerYear: PercentFloat.cast(1.2),
+    });
+  });
+
+  test('keeps the value before it for a parameter that is missing, or a repayment type that is not one', () => {
+    const { store } = setup(
+      'https://example.com/mono/loan/?repayment-type=monthly&interest-rate=2',
+    );
+
+    assert.deepStrictEqual(store.inputs.getSnapshot().value, {
+      ...defaultValues,
+      interestRatePercentPerYear: PercentFloat.cast(2),
+    });
+  });
+
+  test('a setter writes every input to the URL below the base path', () => {
+    const { store, browser } = setup('https://example.com/mono/loan/');
+
+    store.setBorrowingTotalManYen(Yen.cast(4000));
+
+    assert.strictEqual(browser.url().pathname, '/mono/loan/');
+
+    assert.deepStrictEqual(Object.fromEntries(browser.url().searchParams), {
+      'repayment-type': 'principal-equal-payment',
+      'borrowing-total': '4000',
+      'borrowing-period': '35',
+      'interest-rate': '0.5',
+    });
+
+    assert.strictEqual(
+      store.inputs.getSnapshot().value.borrowingTotalManYen,
+      Yen.cast(4000),
+    );
+  });
+
+  test('each setter changes its own input only', () => {
+    const { store } = setup('https://example.com/mono/loan/');
+
+    store.setRepaymentType('principal-and-interest-equal-repayment');
+
+    store.setBorrowingPeriodYear(Year.cast(10));
+
+    store.setInterestRatePercentPerYear(PercentFloat.cast(0.8));
+
+    assert.deepStrictEqual(store.inputs.getSnapshot().value, {
+      repaymentType: 'principal-and-interest-equal-repayment',
+      borrowingTotalManYen: defaultValues.borrowingTotalManYen,
+      borrowingPeriodYear: Year.cast(10),
+      interestRatePercentPerYear: PercentFloat.cast(0.8),
+    });
+  });
+
+  test('going back in the history brings back the inputs before', () => {
+    const { store, browser } = setup('https://example.com/mono/loan/');
+
+    store.setBorrowingPeriodYear(Year.cast(10));
+
+    store.setBorrowingPeriodYear(Year.cast(20));
+
+    browser.history.back();
+
+    assert.strictEqual(
+      store.inputs.getSnapshot().value.borrowingPeriodYear,
+      Year.cast(10),
+    );
+  });
+
+  test('calculates once the inputs stay still, and is calculating until then', async () => {
+    const { store } = setup('https://example.com/mono/loan/');
+
+    const mut_calculated: unknown[] = [];
+
+    store.calculatedValues.subscribe((values) => {
+      mut_calculated.push(values);
+    });
+
+    store.setBorrowingPeriodYear(Year.cast(10));
+
+    assert.isTrue(store.isCalculating.getSnapshot().value);
+
+    await settle();
+
+    assert.isFalse(store.isCalculating.getSnapshot().value);
+
+    assert.deepStrictEqual(
+      mut_calculated.at(-1),
+      calcAll(store.inputs.getSnapshot().value),
+    );
+  });
+});
+
+type Setup = Readonly<{
+  store: LoanStore;
+  browser: MemoryBrowser;
+}>;
+
+const setup = (href: string): Setup => {
+  const browser = createMemoryBrowser(href);
+
+  const store = createLoanStore({
+    router: createRouter({ basePath: '/mono/loan/', browser }),
+    calcDelayMs: 0,
+  });
+
+  return { store, browser } as const;
+};
+
+const settle = async (): Promise<void> => {
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 10);
+  });
+};

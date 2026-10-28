@@ -1,111 +1,16 @@
-import { scan, type InitializedObservable } from 'synstate';
-import type { RouterState } from 'tiny-router-observable';
-import { Num, pipe } from 'ts-data-forge';
-import { defaultValues, queryParamKey } from '../constants/index.mjs';
-import { Router } from '../router.mjs';
-import {
-  PercentFloat,
-  Year,
-  Yen,
-  type RepaymentType,
-  type Store,
-} from '../types/index.mjs';
-import { uriWithQueryParams } from '../utils/index.mjs';
-
 /**
- * The URL is the one place the inputs are kept: a value missing from it, or
- * not a valid one, stays as it was.
+ * The page's state, made once with the browser as its surroundings. What it
+ * does, and the tests of it, are in `loan-store.mts`; this file is only which
+ * real thing it is handed.
  */
-const storeFromQuery = (
-  prev: Store,
-  { searchParams: query }: RouterState,
-): Store => {
-  const paramsAsStr = {
-    repaymentType: query.get(queryParamKey.repaymentType),
-    borrowingTotal: query.get(queryParamKey.borrowingTotal),
-    borrowingPeriodMonth: query.get(queryParamKey.borrowingPeriodMonth),
-    interestRatePerMonth: query.get(queryParamKey.interestRatePerMonth),
-  } as const;
 
-  // `mapNullable` is the old `mapOptional`; `URLSearchParams.get` returns
-  // `null` rather than `undefined`, which it covers too.
-  const paramsAsNumber = {
-    borrowingTotal: pipe(paramsAsStr.borrowingTotal).mapNullable(Num.from)
-      .value,
-    borrowingPeriodMonth: pipe(paramsAsStr.borrowingPeriodMonth).mapNullable(
-      Num.from,
-    ).value,
-    interestRatePerMonth: pipe(paramsAsStr.interestRatePerMonth).mapNullable(
-      Num.from,
-    ).value,
-  } as const;
+import { createRouter } from 'tiny-router-observable';
+import { createLoanStore } from './loan-store.mjs';
 
-  return {
-    repaymentType:
-      paramsAsStr.repaymentType === 'principal-and-interest-equal-repayment' ||
-      paramsAsStr.repaymentType === 'principal-equal-payment'
-        ? paramsAsStr.repaymentType
-        : prev.repaymentType,
-    borrowingTotalManYen:
-      paramsAsNumber.borrowingTotal === undefined
-        ? prev.borrowingTotalManYen
-        : Yen.cast(paramsAsNumber.borrowingTotal),
-    borrowingPeriodYear:
-      paramsAsNumber.borrowingPeriodMonth === undefined
-        ? prev.borrowingPeriodYear
-        : Year.cast(paramsAsNumber.borrowingPeriodMonth),
-    interestRatePercentPerYear:
-      paramsAsNumber.interestRatePerMonth === undefined
-        ? prev.interestRatePercentPerYear
-        : PercentFloat.cast(paramsAsNumber.interestRatePerMonth),
-  };
-};
-
-const store$: InitializedObservable<Store> = Router.state.pipe(
-  scan(
-    storeFromQuery,
-    storeFromQuery(defaultValues, Router.state.getSnapshot().value),
-  ),
-);
-
-const setStore = (patch: Partial<Store>): void => {
-  const store = { ...store$.getSnapshot().value, ...patch } as const;
-
-  Router.push(
-    uriWithQueryParams('/', [
-      [queryParamKey.repaymentType, store.repaymentType],
-      [queryParamKey.borrowingTotal, store.borrowingTotalManYen],
-      [queryParamKey.borrowingPeriodMonth, store.borrowingPeriodYear],
-      [queryParamKey.interestRatePerMonth, store.interestRatePercentPerYear],
-    ]),
-  );
-};
-
-const setRepaymentType = (repaymentType: RepaymentType): void => {
-  setStore({ repaymentType });
-};
-
-// 借入金額（万円）
-const setBorrowingTotalManYen = (borrowingTotalManYen: Yen): void => {
-  setStore({ borrowingTotalManYen });
-};
-
-// 借入期間（年）
-const setBorrowingPeriodYear = (borrowingPeriodYear: Year): void => {
-  setStore({ borrowingPeriodYear });
-};
-
-// 年当たりの金利
-const setInterestRatePercentPerYear = (
-  interestRatePercentPerYear: PercentFloat,
-): void => {
-  setStore({ interestRatePercentPerYear });
-};
-
-export {
-  setBorrowingPeriodYear,
-  setBorrowingTotalManYen,
-  setInterestRatePercentPerYear,
-  setRepaymentType,
-  store$,
-};
+export const loanStore = createLoanStore({
+  // The app is served from `/mono/housing-loan-calculator/` on the
+  // repository's Pages site, and the settings live in the query string of
+  // that page, so the router has to keep the base when it writes one.
+  router: createRouter({ basePath: import.meta.env.BASE_URL }),
+  calcDelayMs: 500,
+});
