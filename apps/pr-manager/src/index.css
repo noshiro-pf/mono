@@ -1134,6 +1134,17 @@ a:focus-visible {
   margin: 0.25rem 0;
 }
 
+.how-to-use-commands {
+  background: var(--plane);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  margin: 0.25rem 0;
+  overflow-x: auto;
+  padding: 0.25rem 0.5rem;
+}
+
 .how-to-use code {
   background: var(--plane);
   border: 1px solid var(--hairline);

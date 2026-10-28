@@ -55,14 +55,24 @@ are in [`src/unblock-prs/README.md`](./src/unblock-prs/README.md);
   [`skip-ci-label.yml`](https://github.com/noshiro-pf/mono/blob/main/.github/workflows/skip-ci-label.yml) writes.
 - **A token** whose account can push to the repository, label and comment on
   pull requests, file issues and re-run workflows, in `GH_TOKEN` or
-  `GITHUB_TOKEN` (or `gh auth token`). `unblock-prs` arms auto-merge through
-  GitHub's GraphQL API, so run it where that is reachable.
+  `GITHUB_TOKEN` (or `gh auth token`). As a fine-grained token, that is
+  read and write on **Contents**, **Pull requests**, **Issues** and
+  **Actions**, and on **Workflows** too when the pull requests it rebases
+  change `.github/workflows/`; as a classic token, `repo` and `workflow`.
+  **The worker and the skill use the same account**: who owns a pull request
+  and who claimed it are read from the comments that account wrote, so a
+  token of another account sees nothing to do.
 - **Optionally, `.github/unblock-prs.json`**, which tells `unblock-prs`
   which failing checks it may fix by itself, and how: the commands that
   regenerate or reformat what a check found stale, run and pushed without a
   person. Its schema is
   [`src/unblock-prs/config.schema.json`](./src/unblock-prs/config.schema.json).
   Without it, every failing check is set aside for the skill or a person.
+  This repository's own
+  [`.github/unblock-prs.json`](https://github.com/noshiro-pf/mono/blob/main/.github/unblock-prs.json)
+  is an example.
+- **Optionally, `.github/unblock-prs.md`**, the guide the skill reads (see
+  "The Claude Code plugin").
 
 The checks a pull request has to pass are what GitHub's rules require on the
 default branch, or what `repo-settings/rulesets/main.json` declares where a
@@ -85,6 +95,25 @@ repository keeps its rulesets as code.
 4. **The skill** (below) or a person fixes what was set aside: `claim-pr`
    first, then `push-fixed-pr`, which hands it back to the queue.
 
+### Running the worker
+
+`unblock-prs` is meant to be left running, in a terminal of its own, on a
+machine with a clone of the repository and the token. Run it from the
+repository's root, through its package manager:
+
+```sh
+npx unblock-prs --dry-run --once   # what it would do, changing nothing
+npx unblock-prs                    # run until Ctrl+C
+```
+
+It rebases and fixes in throwaway `git worktree`s, so the checkout it runs
+from is never touched and you can keep working in it. It surveys every 30 seconds while the queue
+moves and every 5 minutes once it sits still; one Ctrl+C finishes the
+current step and stops. It arms auto-merge through GitHub's GraphQL API, so
+run it where that is reachable. `--help` lists the options;
+[`src/unblock-prs/README.md`](./src/unblock-prs/README.md), "Options", says
+what each does.
+
 [GitHub Pull Requests Manager](https://noshiro-pf.github.io/mono/pr-manager/)
 shows all of it on one page, on any repository that has a `merge-queued`
 label: the queue in its order, what was set aside and why, who claimed what,
@@ -102,11 +131,32 @@ a Claude Code plugin from this repository's marketplace:
 /plugin install pr-merge-queue@noshiro-pf
 ```
 
-Then run `/pr-merge-queue:unblock-prs` beside the worker, or under `/loop`.
-The skill reads the repository's own instructions first, and
-`.github/unblock-prs.md` if there is one: how its checks are reproduced, and
-which branches it generates rather than writes. The plugin's version is the
-package's, so the skill matches the commands of the same version.
+Then, in a Claude Code session in a clone of the repository, run
+`/pr-merge-queue:unblock-prs` for one round, or
+`/loop /pr-merge-queue:unblock-prs` to keep it going beside the worker. The
+session needs what the worker needs: the package installed in the
+repository, since the skill runs its commands (`npx claim-pr …`, or the
+repository's own scripts for them), and the worker's token in `GH_TOKEN`. The
+skill does not use the `gh` CLI.
+
+The skill reads the repository's own instructions first (`CLAUDE.md`,
+`AGENTS.md`), and `.github/unblock-prs.md` if there is one. Write there what
+the skill cannot guess:
+
+- how each required check is reproduced locally, and what has to run first
+  (an install, a build);
+- how a fix is committed (an amend onto one commit, a formatter to run);
+- which branches are generated rather than written, such as a dependency
+  update, and how one is generated again after a conflict.
+
+This repository's
+[`.github/unblock-prs.md`](https://github.com/noshiro-pf/mono/blob/main/.github/unblock-prs.md)
+is an example.
+
+The plugin's version is the package's, so the skill matches the commands of
+the same version. When you update the package, update the plugin too:
+`/plugin marketplace update noshiro-pf`, then `/plugin` to see the installed
+version.
 
 ## As a library
 
