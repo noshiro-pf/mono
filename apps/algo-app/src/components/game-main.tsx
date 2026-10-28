@@ -4,14 +4,9 @@ import { useObservableValue } from 'synstate-preact-hooks';
 import type { Rect } from 'ts-utils-additional';
 import { dictionary } from '../constants/index.mjs';
 import {
-  cardPositionsDispatcher,
-  confirmTossBalloonProps$,
-  decidedAnswerBalloonProps$,
-  displayValues$,
-  onTurnEndClick,
-  playerNamePositionsDispatcher,
-  selectAnswerBalloonProps$,
-  turnPlayerHighlighterPosition$,
+  displayStore,
+  gameStateStore,
+  positionStore,
 } from '../store/index.mjs';
 import type { DisplayValues } from '../types/index.mjs';
 import {
@@ -42,20 +37,24 @@ export const GameMain = memoNamed<Props>('GameMain', (props) => {
   const { tableSize, footerHeight, headerStyle, footerStyle } =
     useWindowSize(windowSize);
 
-  const displayValues: DisplayValues = useObservableValue(displayValues$);
-
-  const turnPlayerHighlighterPosition = useObservableValue(
-    turnPlayerHighlighterPosition$,
+  const displayValues: DisplayValues = useObservableValue(
+    displayStore.displayValues,
   );
 
-  const confirmTossBalloonProps = useObservableValue(confirmTossBalloonProps$);
+  const turnPlayerHighlighterPosition = useObservableValue(
+    displayStore.turnPlayerHighlighterPosition,
+  );
+
+  const confirmTossBalloonProps = useObservableValue(
+    displayStore.confirmTossBalloonProps,
+  );
 
   const selectAnswerBalloonProps = useObservableValue(
-    selectAnswerBalloonProps$,
+    displayStore.selectAnswerBalloonProps,
   );
 
   const decidedAnswerBalloonProps = useObservableValue(
-    decidedAnswerBalloonProps$,
+    displayStore.decidedAnswerBalloonProps,
   );
 
   return (
@@ -65,9 +64,11 @@ export const GameMain = memoNamed<Props>('GameMain', (props) => {
       </Header>
       <Main>
         <Table
-          cardPositionsDispatcher={cardPositionsDispatcher}
+          cardPositionsDispatcher={positionStore.cardPositionsDispatcher}
           displayValues={displayValues}
-          playerNamePositionsDispatcher={playerNamePositionsDispatcher}
+          playerNamePositionsDispatcher={
+            positionStore.playerNamePositionsDispatcher
+          }
           tableSize={tableSize}
           windowSize={windowSize}
         />
@@ -80,7 +81,7 @@ export const GameMain = memoNamed<Props>('GameMain', (props) => {
         <EndTurnButton
           disabled={displayValues.endTurnButtonDisabled}
           type={'button'}
-          onClick={onTurnEndClick}
+          onClick={gameStateStore.onTurnEndClick}
         >
           {dictionary.gameMain.endTurnButton}
         </EndTurnButton>

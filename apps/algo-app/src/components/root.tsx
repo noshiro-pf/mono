@@ -12,7 +12,7 @@ import {
   routes,
 } from '../constants/index.mjs';
 import { Router } from '../router.mjs';
-import { createRoom, db } from '../store/index.mjs';
+import { roomStore } from '../store/index.mjs';
 import { Button } from './bp/index.mjs';
 import { CreateRoomPage } from './create-room-page.js';
 import { GameMain } from './game-main.js';
@@ -48,11 +48,11 @@ export const Root = memoNamed('Root', () => {
 
   useEffect(() => {
     if (roomId !== undefined) {
-      db.setRoomId(roomId);
+      roomStore.setRoomId(roomId);
     }
   }, [roomId]);
 
-  useObservableEffect(createRoom.response$, (res) => {
+  useObservableEffect(roomStore.createRoom.response, (res) => {
     Router.push(roomPage(res.id));
   });
 

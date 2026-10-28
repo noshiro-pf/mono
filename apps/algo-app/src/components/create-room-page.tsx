@@ -2,8 +2,9 @@ import { useState } from 'better-preact-use-state';
 import { styled } from 'goober';
 import { memoNamed } from 'preact-utils';
 import { useCallback } from 'preact/hooks';
+import { useObservableValue } from 'synstate-preact-hooks';
 import { dictionary } from '../constants/index.mjs';
-import { createRoom } from '../store/index.mjs';
+import { roomStore } from '../store/index.mjs';
 import { ButtonPrimary, Input, Spinner } from './bp/index.mjs';
 
 const dc = dictionary.createRoom;
@@ -32,10 +33,10 @@ export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
   const disabled: boolean = username === '';
 
   const onCreateRoomButtonClick = useCallback(() => {
-    createRoom.dispatch({ username, password }).catch(console.error);
+    roomStore.createRoom.dispatch({ username, password }).catch(console.error);
   }, [username, password]);
 
-  const loading = createRoom.useIsWaitingResponse();
+  const loading = useObservableValue(roomStore.createRoom.isWaitingResponse);
 
   return (
     <Centering>
