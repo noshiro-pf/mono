@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+<!-- cspell:ignore xhigh -->
+
 Instructions for this repository, maintained by hand. There is no `AGENTS.md`.
 
 ## What belongs in this file
@@ -312,6 +314,14 @@ ingest the feed). Outside reports come through private vulnerability reporting
   hold one back, take `merge-queued` off. Run the local checks first and
   say in the description which ones — while the label is on they are the only
   checks the branch gets. Details in `libs/pr-merge-queue/src/open-pr/README.md`.
+- **The last step before `open-pr`, and before pushing any later amend, is
+  `/code-review xhigh`** of the diff from the base, generated output aside.
+  Fix each finding here, defer it to an issue, or dismiss it with the reason
+  in the description. Review again after a round that changed the diff,
+  rerunning the checks it touches; a round that changes nothing ends it.
+  Deferred issues are filed once the pull request exists, ending with
+  `Start-After:` naming it, and linked from its description. A security
+  finding deferred or dismissed goes to `mono-security`, never named here.
 - **A Claude Code session names itself in the description**, on a line of its
   own outside a code fence: `Claude-Session: [<title>](<session URL>)`, the
   title as it reads when the pull request is opened, or the URL alone when the
