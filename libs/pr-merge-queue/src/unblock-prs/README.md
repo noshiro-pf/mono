@@ -520,6 +520,12 @@ matrix の job まで読みます。どの失敗なら直せるか、何を実�
 | `fixers`  | 残りの失敗はすべて、どれかの `context` に一致しなければならない。最初に一致したものの `run` を実行する |
 | `after`   | 常に最後に実行するコマンド（フォーマッタ）                                                             |
 
+同じファイルの `generatedBranches` は、リポジトリが lockfile ごと生成するブラ
+ンチ（依存更新など）の一覧です。`branch` がブランチ名、`rebuild` が先端から作り
+直す方法です。この PR の `rebase-failed` は rebase で解かず、skill が `rebuild`
+で作り直します。`push-fixed-pr` は手で解いた push を断り、`rebuild` を案内しま
+す。
+
 `run` の `$1`〜`$9` は `context` のキャプチャで、シェル用にクォートして埋め込み
 ます。`fixers` は `stage` の小さい順、同じ `stage` ならコマンド順に実行します。
 
@@ -733,11 +739,11 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
   （`SET_ASIDE_REASONS`）もそこにあり、このスクリプトはそれを使うので、担当者
   の無い理由を書くことはできません（コンパイルが通りません）。`none` になるの
   は、このファイルの知らない理由が comment にあるときです。
-- 依存更新 PR（`chore/pnpm-update`）も他の PR と同じく skill の担当です。
-  ただし `rebase-failed` は rebase で解かず、`pnpm run rebuild-pnpm-update` で
-  `pnpm-update.yml` に `main` の先端から作り直させます。lockfile を含めて生成
-  されるブランチなので、手で解いた conflict は `minimumReleaseAge` の下で解決
-  されたことを誰も確かめていないからです。
+- `generatedBranches` に挙げたブランチも他の PR と同じく skill の担当です。
+  ただし `rebase-failed` は rebase で解かず、その `rebuild` で先端から作り直し
+  ます。lockfile を含めて生成されるブランチなので、手で解いた conflict は、生
+  成と同じ規則（`minimumReleaseAge` など）の下で解決されたことを誰も確かめて
+  いないからです。
 - `none` は `pnpm run report-unowned-prs` が issue にします（PR ごとに1本、
   本文の隠し行で既存の issue を見つけます）。`/unblock-prs` skill が毎回実行
   します。
@@ -1339,6 +1345,12 @@ they are not configured.
 | `fixers`  | every other failure has to match one `context`; the first that matches gives the `run` to run |
 | `after`   | commands run last, always (a formatter)                                                       |
 
+`generatedBranches` in the same file lists the branches the repository
+generates, lockfile and all (a dependency update): `branch` is the name and
+`rebuild` how it is built again from the tip. A `rebase-failed` on one is not
+rebased: the skill runs `rebuild`, and `push-fixed-pr` refuses a conflict
+resolved by hand and names `rebuild` instead.
+
 In `run`, `$1` to `$9` are `context`'s capture groups, shell-quoted. Fixers run
 by `stage`, lowest first, and within a stage by command.
 
@@ -1563,11 +1575,11 @@ the pull request the other's and nobody moved it (#2267).
   (`SET_ASIDE_REASONS`) is beside it and this script writes from it, so a
   reason with no owner does not compile. `none` is a reason in a comment that
   module does not know.
-- The dependency update (`chore/pnpm-update`) is the skill's like any other,
-  except that a `rebase-failed` on it is not rebased:
-  `pnpm run rebuild-pnpm-update` has `pnpm-update.yml` build it again from the
-  tip of `main`. The branch is generated, lockfile and all, and nothing checks
-  that a conflict resolved by hand was resolved under `minimumReleaseAge`.
+- A branch listed under `generatedBranches` is the skill's like any other,
+  except that a `rebase-failed` on it is not rebased: its `rebuild` builds it
+  again from the tip. The branch is generated, lockfile and all, and nothing
+  checks that a conflict resolved by hand was resolved under the rules the
+  generator follows (`minimumReleaseAge`, say).
 - `pnpm run report-unowned-prs` files an issue for each `none`, one per pull
   request, found again by a hidden line in its body. The `/unblock-prs` skill
   runs it every round.

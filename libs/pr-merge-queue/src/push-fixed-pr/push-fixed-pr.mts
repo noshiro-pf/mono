@@ -1,5 +1,4 @@
 import {
-  PNPM_UPDATE_BRANCH,
   SKIP_CI_LABEL,
   stackDescendants,
   type QueueComments,
@@ -15,7 +14,13 @@ import {
   sh,
 } from '../lib/index.mjs';
 import { readQueueState } from '../pr-report/index.mjs';
-import { pushLeased, restack, type BranchOf } from '../unblock-prs/index.mjs';
+import {
+  pushLeased,
+  readConfig,
+  restack,
+  type BranchOf,
+  type GeneratedBranch,
+} from '../unblock-prs/index.mjs';
 
 /** What `push-fixed-pr --help` prints. */
 export const PUSH_FIXED_PR_HELP = [
@@ -60,6 +65,12 @@ export const pushFixedPr = async (
     return Result.err(`${args.head} is not a commit here.`);
   }
 
+  const config = await readConfig();
+
+  if (Result.isErr(config)) {
+    return Result.err(config.value);
+  }
+
   const state = await readQueueState();
 
   if (Result.isErr(state)) {
@@ -75,6 +86,7 @@ export const pushFixedPr = async (
     entries: decided.entries,
     owner: owners.get(args.number),
     comments: queue.get(args.number),
+    generated: config.value?.generatedBranches ?? [],
   });
 
   if (decision.kind === 'refuse') {
@@ -121,7 +133,9 @@ export const pushFixedPr = async (
 /**
  * Whether `by` may push `head` to pull request `number`, and what that
  * involves: the lease, whether `skip-ci` has to go on first, and the layers
- * to carry along, lowest first.
+ * to carry along, lowest first. `generated` is the repository's
+ * `generatedBranches`: a conflict on one of those is resolved by its own
+ * `rebuild`, not by a push.
  */
 export const decidePush = ({
   number,
@@ -130,6 +144,7 @@ export const decidePush = ({
   entries,
   owner,
   comments,
+  generated,
 }: Readonly<{
   number: number;
   by: string;
@@ -137,6 +152,7 @@ export const decidePush = ({
   entries: readonly ReportEntry[];
   owner: QueueOwner | undefined;
   comments: QueueComments | undefined;
+  generated: readonly GeneratedBranch[];
 }>): Readonly<
   | {
       kind: 'push';
@@ -182,15 +198,16 @@ export const decidePush = ({
 
   // A generated branch, lockfile and all: its conflict is resolved by
   // generating it again from the tip, not by a rebase resolved by hand.
+  const generatedAs = generated.find(({ branch }) => branch === entry.headRef);
+
   if (
-    entry.headRef === PNPM_UPDATE_BRANCH &&
+    generatedAs !== undefined &&
     comments?.setAside?.says.kind === 'standing' &&
     comments.setAside.says.setAside.reason === 'rebase-failed'
   ) {
     return {
       kind: 'refuse',
-      reason:
-        'a conflict on the dependency update is resolved by building it again: pnpm run rebuild-pnpm-update',
+      reason: `${generatedAs.branch} is generated, so a conflict on it is resolved by building it again: ${generatedAs.rebuild}`,
     };
   }
 

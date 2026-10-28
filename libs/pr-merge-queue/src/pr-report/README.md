@@ -84,11 +84,13 @@ pnpm run pr-report -- --issues-limit 10 # open な issue の最大件数
 
 ### 判定の決まりごと
 
-- **required context の一覧は `repo-settings/rulesets/main.json` から読みます。**
-  ruleset を返す API は admin トークンを要求しますし、そのファイルが desired
-  state だからです。ただし root のファイルは `pnpm run repo-settings:apply` を
-  実行するまで GitHub には効かないので、適用前に足した context は全 PR で
-  missing として出ます — レポートがそう言うのは正しい挙動です。
+- **required context の一覧は GitHub がデフォルトブランチに課している rule か
+  ら読みます**（`rules/branches/{branch}`、読み取り権限で足ります）。ただしレ
+  ポート対象がチェックアウト自身のリポジトリで、そこに
+  `repo-settings/rulesets/main.json` があれば、desired state であるそのファイ
+  ルを読みます。適用前に足した context は全 PR で missing として出ます — レポー
+  トがそう言うのは正しい挙動です。`--repo` で別のリポジトリを指したときはファ
+  イルを読みません。
 - **`skipped` は合格として数えますが、`skipped` として報告します。** gated job は
   `skip-ci` のときと workflow が読まない diff のときに skip し、GitHub はそれを
   満たされたものとして扱うので、判定では合格に数えます。`passed` に畳み込まない
@@ -214,10 +216,13 @@ than once, the run in the check suite with the greatest id is the answer,
 which is how GitHub resolves it — not the newest run, which would call a pull
 request green that a stale red is holding.
 
-The required contexts come from `repo-settings/rulesets/main.json` rather than
-from the API, which wants an admin token. A context added there and not yet
-applied with `pnpm run repo-settings:apply` is reported as missing on every
-pull request, which is a fair thing for a report to say.
+The required contexts come from the rules GitHub enforces on the default
+branch (`rules/branches/{branch}`, which wants read access only). When the
+report is of the checkout's own repository and the checkout declares its
+ruleset in `repo-settings/rulesets/main.json`, that file is read instead, as
+the desired state: a context added there and not yet applied is reported as
+missing on every pull request, which is a fair thing for a report to say.
+With `--repo` naming another repository, the file is not read.
 
 It reads one page of a hundred pull requests and fails rather than reporting a
 part of them as the whole. Pull requests on a `Merge-After` cycle are named in

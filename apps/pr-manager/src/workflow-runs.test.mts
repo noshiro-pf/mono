@@ -1,6 +1,6 @@
 import { Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { DEFAULT_REPORT_SOURCE } from './constants.mjs';
+import type { ReportSource } from './constants.mjs';
 import {
   actionsQueryUrl,
   loadWorkflowRuns,
@@ -8,6 +8,9 @@ import {
   type RestFetch,
   type RestFetchInit,
 } from './workflow-runs.mjs';
+
+// The repository the fixtures were taken from.
+const SOURCE: ReportSource = { owner: 'noshiro-pf', repo: 'mono' } as const;
 
 describe(loadWorkflowRuns, () => {
   test('asks for each state, with the token, and lists what they found newest first', async () => {
@@ -23,7 +26,7 @@ describe(loadWorkflowRuns, () => {
       waiting: page([run({ id: 3, created_at: '2026-10-15T09:00:00Z' })]),
     });
 
-    const loaded = await loadWorkflowRuns(DEFAULT_REPORT_SOURCE, {
+    const loaded = await loadWorkflowRuns(SOURCE, {
       token: 'secret',
       fetchImpl,
     });
@@ -85,7 +88,7 @@ describe(loadWorkflowRuns, () => {
       in_progress: page([run({ id: 5 })]),
     });
 
-    const loaded = await loadWorkflowRuns(DEFAULT_REPORT_SOURCE, {
+    const loaded = await loadWorkflowRuns(SOURCE, {
       token: 'secret',
       fetchImpl,
     });
@@ -105,7 +108,7 @@ describe(loadWorkflowRuns, () => {
       in_progress: { total_count: 150, workflow_runs: [run({ id: 1 })] },
     });
 
-    const loaded = await loadWorkflowRuns(DEFAULT_REPORT_SOURCE, {
+    const loaded = await loadWorkflowRuns(SOURCE, {
       token: 'secret',
       fetchImpl,
     });
@@ -128,7 +131,7 @@ describe(loadWorkflowRuns, () => {
       ]),
     });
 
-    const loaded = await loadWorkflowRuns(DEFAULT_REPORT_SOURCE, {
+    const loaded = await loadWorkflowRuns(SOURCE, {
       token: 'secret',
       fetchImpl,
     });
@@ -149,7 +152,7 @@ describe(loadWorkflowRuns, () => {
   });
 
   test('fails when one state is refused', async () => {
-    const loaded = await loadWorkflowRuns(DEFAULT_REPORT_SOURCE, {
+    const loaded = await loadWorkflowRuns(SOURCE, {
       token: 'secret',
       fetchImpl: refusingStale,
     });
@@ -162,7 +165,7 @@ describe(loadWorkflowRuns, () => {
   });
 
   test('says when the REST budget is spent', async () => {
-    const loaded = await loadWorkflowRuns(DEFAULT_REPORT_SOURCE, {
+    const loaded = await loadWorkflowRuns(SOURCE, {
       token: 'secret',
       fetchImpl: spent,
     });
@@ -179,7 +182,7 @@ describe(loadWorkflowRuns, () => {
       queued: { total_count: 1, workflow_runs: [{ id: 'one' }] },
     });
 
-    const loaded = await loadWorkflowRuns(DEFAULT_REPORT_SOURCE, {
+    const loaded = await loadWorkflowRuns(SOURCE, {
       token: 'secret',
       fetchImpl,
     });
@@ -192,7 +195,7 @@ describe(loadWorkflowRuns, () => {
   });
 
   test('fails without the network, rather than throwing', async () => {
-    const loaded = await loadWorkflowRuns(DEFAULT_REPORT_SOURCE, {
+    const loaded = await loadWorkflowRuns(SOURCE, {
       token: 'secret',
       fetchImpl: offline,
     });
@@ -208,7 +211,7 @@ describe(loadWorkflowRuns, () => {
 describe(actionsQueryUrl, () => {
   test('is the Actions tab filtered to the states listed', () => {
     assert.strictEqual(
-      actionsQueryUrl(DEFAULT_REPORT_SOURCE),
+      actionsQueryUrl(SOURCE),
       'https://github.com/noshiro-pf/mono/actions?query=is%3Ain_progress+is%3Aqueued+is%3Awaiting+is%3Aaction_required+is%3Aneutral+is%3Astale',
     );
   });

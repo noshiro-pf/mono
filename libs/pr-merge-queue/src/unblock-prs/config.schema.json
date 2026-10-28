@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "unblock-prs configuration",
-  "description": "What a repository says about itself in .github/unblock-prs.json: the parts of an unblock-prs run that depend on how its CI is laid out. Labels, Merge-After: and the version pull request's branch are fixed conventions, not set here.",
+  "description": "What a repository says about itself in .github/unblock-prs.json: the parts of an unblock-prs run that depend on how its CI is laid out, and the branches it generates. Labels, Merge-After: and the version pull request's branch are fixed conventions, not set here.",
   "type": "object",
   "properties": {
     "$schema": { "type": "string" },
@@ -64,6 +64,25 @@
       },
       "required": ["ignore", "before", "prepare", "fixers", "after"],
       "additionalProperties": false
+    },
+    "generatedBranches": {
+      "description": "Branches the repository generates whole, lockfile and all, such as a dependency update. A conflict on one is resolved by building it again, never by a rebase resolved by hand: push-fixed-pr refuses that push, and the skill runs `rebuild` instead.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "branch": {
+            "description": "The pull request's head branch, exactly.",
+            "type": "string"
+          },
+          "rebuild": {
+            "description": "How the branch is built again from the tip of the default branch, as a person or the skill would run it; push-fixed-pr names it when it refuses.",
+            "type": "string"
+          }
+        },
+        "required": ["branch", "rebuild"],
+        "additionalProperties": false
+      }
     }
   },
   "required": [],

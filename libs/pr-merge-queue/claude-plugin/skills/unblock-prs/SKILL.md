@@ -82,8 +82,8 @@ what to do with it is what the issue asks.
 Each entry in `entries` of the report carries `owner` when the token is the
 worker's account (without one it is absent and there is nothing to do; a
 missing `owner` on one entry means its comments could not be read). This
-skill's pull requests are those whose `owner.owner` is `skill` — the
-dependency update (`chore/pnpm-update`) as much as any other — and whose
+skill's pull requests are those whose `owner.owner` is `skill` — a branch
+the repository generates as much as any other — and whose
 `claim` is not someone else's standing claim (`claim.applies` and
 `claim.says.claim.by` another claimant). `setAside.says.setAside.reason` says
 what to do with it: `rebase-failed` or `checks-failed`.
@@ -131,13 +131,13 @@ claim, report what conflicts, and leave the pull request.
 - `rebase-failed` — the rebase is the whole job. On an `auto-rebase` pull
   request that is not queued, do nothing more: its checks are not this run's
   business until someone queues it.
-- `rebase-failed` on **a branch the repository generates** — the dependency
-  update `chore/pnpm-update`, or whatever its guide names — no worktree and
+- `rebase-failed` on **a branch the repository generates** — one listed
+  under `generatedBranches` in `.github/unblock-prs.json` — no worktree and
   no rebase. The branch is generated, lockfile and all, so the conflict is
-  resolved by generating it again from the tip, the way the guide says; its
-  push is the hand-back, as step 4's is for any other, so skip step 4. With
-  no guide saying how, release the claim and report it. `push-fixed-pr`
-  refuses a hand resolution of the dependency update.
+  resolved by generating it again from the tip: run its `rebuild`, and what
+  the guide adds about it; its push is the hand-back, as step 4's is for any
+  other, so skip step 4. `push-fixed-pr` refuses a hand resolution of such a
+  branch.
 - `checks-failed` — reproduce the failure and fix it ("Fixing a failing
   check" below), commit it the way the repository's instructions say (an
   amend onto the branch's one commit, where they ask for one commit per pull

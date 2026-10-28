@@ -241,6 +241,25 @@ a:focus-visible {
   margin: 0.4rem 0 0;
 }
 
+/*
+ * The start page, shown when the URL names no repository: the form alone,
+ * a little wider than in the header.
+ */
+.start-page .repo-switch-form {
+  margin-top: 1rem;
+}
+
+.start-page-lead {
+  color: var(--ink-secondary);
+  margin: 0.5rem 0 0;
+  max-width: 40rem;
+}
+
+.start-page-more {
+  font-size: 0.875rem;
+  margin: 1.5rem 0 0;
+}
+
 .header-actions {
   align-items: center;
   display: flex;

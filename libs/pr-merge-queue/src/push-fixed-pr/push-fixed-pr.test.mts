@@ -100,8 +100,16 @@ const decide = (
             nowEpochMs: NOW,
           }),
     comments,
+    generated: GENERATED,
   });
 };
+
+const GENERATED = [
+  {
+    branch: 'chore/deps',
+    rebuild: 'run rebuild-deps <number> --by <claimant>',
+  },
+] as const;
 
 describe(decidePush, () => {
   test('pushes a claimed fix leased against the claimed head, putting skip-ci on first', () => {
@@ -175,8 +183,8 @@ describe(decidePush, () => {
     assert.strictEqual(decide([entry()]).kind, 'refuse');
   });
 
-  test('refuses a conflict on the dependency update, which is rebuilt instead', () => {
-    const update = entry({ headRef: 'chore/pnpm-update' });
+  test('refuses a conflict on a generated branch, which is rebuilt instead', () => {
+    const update = entry({ headRef: 'chore/deps' });
 
     const decided = decide([update], SET_ASIDE, claimedBy('me'));
 
@@ -184,7 +192,7 @@ describe(decidePush, () => {
 
     assert.include(
       decided.kind === 'refuse' ? decided.reason : '',
-      'rebuild-pnpm-update',
+      'run rebuild-deps',
     );
 
     assert.strictEqual(

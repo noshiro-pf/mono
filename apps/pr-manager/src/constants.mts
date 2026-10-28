@@ -2,33 +2,31 @@
 
 export type ReportSource = Readonly<{ owner: string; repo: string }>;
 
-/** The repository read when the URL names none. */
-export const DEFAULT_REPORT_SOURCE: ReportSource = {
-  owner: 'noshiro-pf',
-  repo: 'mono',
-} as const;
-
 /**
  * The repository the URL names, `?repo=owner/name`, so that the page can be
  * pointed at any repository the token can read and a bookmark keeps it.
- * Without the parameter, or with a value no repository can have, it is
- * {@link DEFAULT_REPORT_SOURCE}: the header names the repository read, so a
- * mistyped one shows as what it is. The value is read as the header's field
- * reads what is typed into it ({@link parseRepository}).
+ * `undefined` without the parameter, or with a value no repository can have:
+ * the page then asks which repository to read rather than picking one, so
+ * that nobody lands on a repository they did not choose. The value is read
+ * as the form's field reads what is typed into it ({@link parseRepository}).
  *
  * Read once, as the page opens: changing it is a navigation, not a choice
  * the page makes while it is open — which is also what keeps an answer about
  * one repository from landing on the page of another.
  */
-export const reportSourceFromSearch = (search: string): ReportSource => {
+export const reportSourceFromSearch = (
+  search: string,
+): ReportSource | undefined => {
+  const value = repositoryParam(search);
+
+  return value === undefined ? undefined : parseRepository(value);
+};
+
+/** `?repo=` as it is written, whether or not it names a repository. */
+export const repositoryParam = (search: string): string | undefined => {
   const params = new URLSearchParams(search);
 
-  const value = params.get(REPO_PARAM);
-
-  return (
-    (value === null ? undefined : parseRepository(value)) ??
-    DEFAULT_REPORT_SOURCE
-  );
+  return params.get(REPO_PARAM) ?? undefined;
 };
 
 /**
@@ -54,9 +52,7 @@ export const parseRepository = (value: string): ReportSource | undefined => {
 
 /**
  * `search` with `repo` naming `source`, the rest kept as it is, so that the
- * layout and the theme go along to the other repository. The repository read
- * without the parameter is written as no parameter, which keeps the address
- * of this repository's page the one it always was.
+ * layout and the theme go along to the other repository.
  */
 export const searchWithRepository = (
   search: string,
@@ -64,20 +60,11 @@ export const searchWithRepository = (
 ): string => {
   const params = new URLSearchParams(search);
 
-  if (
-    source.owner === DEFAULT_REPORT_SOURCE.owner &&
-    source.repo === DEFAULT_REPORT_SOURCE.repo
-  ) {
-    params.delete(REPO_PARAM);
-  } else {
-    params.set(REPO_PARAM, `${source.owner}/${source.repo}`);
-  }
+  params.set(REPO_PARAM, `${source.owner}/${source.repo}`);
 
   // `/` is left as it is, as a reader would type it: it means nothing
   // special in a query, and `repo=owner/name` is what the README says.
-  const written = params.toString().replaceAll('%2F', '/');
-
-  return written === '' ? '' : (`?${written}` as const);
+  return `?${params.toString().replaceAll('%2F', '/')}` as const;
 };
 
 /** The repository the report is about. */

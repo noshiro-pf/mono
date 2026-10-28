@@ -177,7 +177,7 @@ describe(queueOwner, () => {
     );
   });
 
-  test('gives the dependency update’s failure and its conflict to the skill', () => {
+  test('gives a generated branch’s failure and its conflict to the skill', () => {
     const update = { ...queued, headRef: 'chore/pnpm-update' } as const;
 
     assert.deepStrictEqual(
@@ -188,13 +188,13 @@ describe(queueOwner, () => {
       },
     );
 
-    // Not rebased by hand: the skill has `pnpm-update.yml` rebuild it.
+    // The same as for any other branch: which branches are generated, and
+    // how, is the repository's configuration, which the skill reads.
     assert.deepStrictEqual(
       queueOwner({ ...update, setAside: standing('rebase-failed') }),
       {
         owner: 'skill',
-        reason:
-          'set aside `rebase-failed` at its head; the skill has `pnpm-update.yml` rebuild it from main',
+        reason: 'set aside `rebase-failed` at its head; the skill fixes it',
       },
     );
   });

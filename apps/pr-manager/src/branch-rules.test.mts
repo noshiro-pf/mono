@@ -1,7 +1,10 @@
 import { Result } from 'ts-data-forge';
 import { loadBranchRules } from './branch-rules.mjs';
-import { DEFAULT_REPORT_SOURCE } from './constants.mjs';
+import type { ReportSource } from './constants.mjs';
 import type { RestFetch, RestFetchInit } from './workflow-runs.mjs';
+
+// The repository the fixtures were taken from.
+const SOURCE: ReportSource = { owner: 'noshiro-pf', repo: 'mono' } as const;
 
 describe(loadBranchRules, () => {
   test('adds up the rulesets on the branch and its classic protection', async () => {
@@ -36,7 +39,7 @@ describe(loadBranchRules, () => {
       },
     });
 
-    const loaded = await loadBranchRules(DEFAULT_REPORT_SOURCE, 'main', {
+    const loaded = await loadBranchRules(SOURCE, 'main', {
       token: 'secret',
       fetchImpl,
     });
@@ -75,7 +78,7 @@ describe(loadBranchRules, () => {
       },
     });
 
-    const loaded = await loadBranchRules(DEFAULT_REPORT_SOURCE, 'main', {
+    const loaded = await loadBranchRules(SOURCE, 'main', {
       token: 'secret',
       fetchImpl,
     });
@@ -103,7 +106,7 @@ describe(loadBranchRules, () => {
       },
     });
 
-    const loaded = await loadBranchRules(DEFAULT_REPORT_SOURCE, 'main', {
+    const loaded = await loadBranchRules(SOURCE, 'main', {
       token: 'secret',
       fetchImpl,
     });
@@ -116,7 +119,7 @@ describe(loadBranchRules, () => {
   test('puts the branch name in the path as one segment', async () => {
     const { fetchImpl, sent } = answering({ rules: [], branch: {} });
 
-    await loadBranchRules(DEFAULT_REPORT_SOURCE, 'release/1.x', {
+    await loadBranchRules(SOURCE, 'release/1.x', {
       token: 'secret',
       fetchImpl,
     });
@@ -129,7 +132,7 @@ describe(loadBranchRules, () => {
   });
 
   test('fails with a sentence when GitHub refuses', async () => {
-    const loaded = await loadBranchRules(DEFAULT_REPORT_SOURCE, 'main', {
+    const loaded = await loadBranchRules(SOURCE, 'main', {
       token: 'secret',
       fetchImpl: notFound,
     });
@@ -144,7 +147,7 @@ describe(loadBranchRules, () => {
   test('fails on an answer of another shape', async () => {
     const { fetchImpl } = answering({ rules: { rules: [] }, branch: {} });
 
-    const loaded = await loadBranchRules(DEFAULT_REPORT_SOURCE, 'main', {
+    const loaded = await loadBranchRules(SOURCE, 'main', {
       token: 'secret',
       fetchImpl,
     });
