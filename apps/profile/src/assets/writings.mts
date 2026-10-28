@@ -182,14 +182,14 @@ export const writings: readonly WritingsInfo[] = [
   },
   {
     id: 'dezero-slides',
-    link: 'https://slides-dezero-06-to-16.web.app/',
+    link: 'https://noshiro-pf.github.io/mono/slides/dezero-06-to-16/',
     title: 'ゼロから作るディープラーニング3 step06-16',
     subtitle: 'ゼロから作るディープラーニング3の社内輪読会で使用した資料',
     body: 'reveal.jsを用いて作成．',
   },
   {
     id: 'slides-chain-rule',
-    link: 'https://slides-chain-rule.web.app/',
+    link: 'https://noshiro-pf.github.io/mono/slides/chain-rule/',
     title: '連鎖律のやや厳密な証明',
     subtitle: '社内輪読会資料',
     body: 'reveal.jsを用いて作成．',

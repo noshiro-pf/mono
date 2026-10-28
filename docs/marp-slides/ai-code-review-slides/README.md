@@ -34,8 +34,13 @@ of `overview.md`.
 
 ## Rendering
 
-The deck carries no Marp dependency of its own; render it with the Marp CLI run
-ad hoc, the same way `llm-eslint-harness-slides` is rendered:
+Published at <https://noshiro-pf.github.io/mono/slides/ai-code-review/>:
+`deploy-pages.yml` renders every `docs/marp-slides/*/slides.md` with
+`pnpm run build:marp-slides` (the Marp CLI at a pinned version) and
+`build-pages-site.mts` serves each `slides.html` as its deck's page.
+
+The deck carries no Marp dependency of its own; render it locally with the Marp
+CLI run ad hoc, the same way `llm-eslint-harness-slides` is rendered:
 
 ```bash
 npx @marp-team/marp-cli docs/marp-slides/ai-code-review-slides/slides.md          # → slides.html

@@ -1,0 +1,12 @@
+{
+  "hosting": {
+    "public": "images",
+    "redirects": [
+      {
+        "regex": "^/(.*)$",
+        "destination": "https://noshiro-pf.github.io/mono/slides/dezero-06-to-16/:1",
+        "type": 301
+      }
+    ]
+  }
+}

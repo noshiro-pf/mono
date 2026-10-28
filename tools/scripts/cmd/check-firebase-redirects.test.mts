@@ -1,6 +1,7 @@
 import {
   findRedirectViolations,
   redirectConfig,
+  slideDeckUrl,
 } from './check-firebase-redirects.mjs';
 
 const PAGES_URL = 'https://noshiro-pf.github.io/mono/catan-dice/';
@@ -9,7 +10,7 @@ const app = (
   files: Readonly<{ firebaseJson?: unknown; firebaserc?: boolean }>,
 ): Parameters<typeof findRedirectViolations>[0][number] =>
   ({
-    packageDir: 'catan-dice',
+    dir: 'apps/catan-dice',
     pagesUrl: PAGES_URL,
     firebaseJson:
       files.firebaseJson === undefined
@@ -44,6 +45,20 @@ describe(findRedirectViolations, () => {
     assert.deepStrictEqual(
       findRedirectViolations([
         app({ firebaseJson: redirectConfig(PAGES_URL), firebaserc: true }),
+      ]),
+      [],
+    );
+  });
+
+  test('accepts the redirect whatever directory `public` names', () => {
+    assert.deepStrictEqual(
+      findRedirectViolations([
+        app({
+          firebaseJson: {
+            hosting: { ...redirectConfig(PAGES_URL).hosting, public: 'images' },
+          },
+          firebaserc: true,
+        }),
       ]),
       [],
     );
@@ -114,6 +129,15 @@ describe(findRedirectViolations, () => {
         }),
       ]).length,
       1,
+    );
+  });
+});
+
+describe(slideDeckUrl, () => {
+  test('is the deck’s directory below the site’s slides directory', () => {
+    assert.strictEqual(
+      slideDeckUrl('chain-rule'),
+      'https://noshiro-pf.github.io/mono/slides/chain-rule/',
     );
   });
 });

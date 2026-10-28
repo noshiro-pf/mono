@@ -36,6 +36,12 @@ export const PAGES_SITE_ROOT = '/mono/';
 /** The host the Pages site is served from. */
 export const PAGES_SITE_ORIGIN = 'https://noshiro-pf.github.io';
 
+/**
+ * Where the reveal.js decks under `docs/reveal-slides/` are served from, each
+ * in a directory of its own name below this one.
+ */
+export const PAGES_SLIDES_DIR = 'slides';
+
 /** Where the app rooted at `packageRoot` is served from, e.g. `pr-manager`. */
 export const pagesAppDir = (packageRoot: string): string => {
   const name = path.basename(packageRoot);

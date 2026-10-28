@@ -25,3 +25,7 @@ the name and description do not describe this deck.
 The deck carries no Marp dependency of its own — it was rendered with the
 Marp CLI run ad hoc (`npx @marp-team/marp-cli slides.md`). Nothing in this
 repository's `ws:*` commands touches this directory.
+
+Published at <https://noshiro-pf.github.io/mono/slides/llm-eslint-harness/>:
+`deploy-pages.yml` renders it with `pnpm run build:marp-slides`, and
+`build-pages-site.mts` serves the resulting `slides.html` as the deck's page.

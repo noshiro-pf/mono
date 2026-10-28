@@ -1832,6 +1832,11 @@ npm 依存は増やしていない。app のディレクトリで
 公開パスに揃えた（#2575）。公開 URL は変わらない。この文書のほかの節は
 当時の名前のまま残す。
 
+`slides/chain_rule` と `slides/dezero_06_to_16` も、同じ移行で
+`docs/reveal-slides/` に移し、`/mono/slides/<deck>/` で公開した（#2576）。
+パッケージではないので `apps/` には入れず、reveal.js は CDN から読む。
+`slides/template` は `experimental/` に残す。
+
 ## 移動の取りこぼし 2 件（2026-09-07）
 
 復元が一通り終わったところで `experimental/` を両方向に突き合わせた。

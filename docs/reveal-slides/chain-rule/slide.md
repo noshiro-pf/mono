@@ -82,9 +82,9 @@ $I$の各点で$f$が微分可能であるとき，$I \to \R^n$の函数 $x \map
 
 ## 合成函数の微分（連鎖律）
 
--   $U, W \subset \R$：開区間
--   $ f: U \to \R$，$ g: W \to \R$：函数
--   $ f(U) \subset W $ （合成可能）
+- $U, W \subset \R$：開区間
+- $ f: U \to \R$，$ g: W \to \R$：函数
+- $ f(U) \subset W $ （合成可能）
 
 $f$が$x \in U$で微分可能で，$g$が$y := f(x)$で微分可能とすれば，合成函数$\varphi := g \circ f$は微分可能で，
 
@@ -289,9 +289,9 @@ $\dlim_{\substack{h \to 0 \newline \blue{h \neq 0}}} \delta(k(h)) = 0$
 
 ## 合成函数の極限
 
--   $U, W \subset \R$
--   $ f: U \to \R$，$ g: W \to \R$：函数
--   $ f(U) \subset W $ （合成可能）
+- $U, W \subset \R$
+- $ f: U \to \R$，$ g: W \to \R$：函数
+- $ f(U) \subset W $ （合成可能）
 
 $a \subset \ol{U}$に対して，$b = \dlim_{x \to a}{f(x)}$が存在すれば，
 $b \in \ol{f(U)} \subset \ol{W}$．
@@ -303,10 +303,10 @@ $\dlim_{x \to a} (g \circ f)(x) = c$
 
 ## （準備）定理 a
 
--   $A \subset \R^n$
--   $f : A \to \R^m$：函数
--   $B \subset A$
--   $a \in \ol{B}$
+- $A \subset \R^n$
+- $f : A \to \R^m$：函数
+- $B \subset A$
+- $a \in \ol{B}$
 
 このとき，次の 1. と 2. は同値
 
@@ -379,9 +379,9 @@ $\square$.
 
 ## 合成函数の極限
 
--   $U, W \subset \R$
--   $ f: U \to \R$，$ g: W \to \R$：函数
--   $ f(U) \subset W $ （合成可能）
+- $U, W \subset \R$
+- $ f: U \to \R$，$ g: W \to \R$：函数
+- $ f(U) \subset W $ （合成可能）
 
 $a \subset \ol{U}$に対して，$b = \dlim_{x \to a}{f(x)}$が存在すれば，
 $b \in \ol{f(U)} \subset \ol{W}$．
@@ -413,9 +413,9 @@ $x_n \to a$ となる任意の $U$ の点列 `$(x_n)_{n \in \N}$` に対して�
 
 ## 合成関数の極限（**※嘘定理**）
 
--   $U, W \subset \R$
--   $ f: U \to \R$，$ g: W \to \R$：函数
--   $ f(U) \subset W $ （合成可能）
+- $U, W \subset \R$
+- $ f: U \to \R$，$ g: W \to \R$：函数
+- $ f(U) \subset W $ （合成可能）
 
 $a \subset \ol{U}$に対して，$b = \dlim_{\substack{x \to a \newline \blue{x \neq a}}}{f(x)}$が存在すれば，
 $b \in \ol{f(U)} \subset \ol{W}$．
@@ -508,4 +508,4 @@ $$\dlim_{h \to 0} k(h) = 0 \land \dlim_{k \to 0} \delta(k) = 0 \Rightarrow \dlim
 
 参考文献
 
--   東京大学出版会「解析入門 Ⅰ」 杉浦光夫著
+- 東京大学出版会「解析入門 Ⅰ」 杉浦光夫著
