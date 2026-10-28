@@ -25,6 +25,7 @@
     "strict-lib/v*/output/lib"
   ],
   "scripts": {
+    "build:marp-slides": "pnpm dlx @marp-team/marp-cli@4.5.1 docs/marp-slides/*/slides.md",
     "build:pages-site": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/build-pages-site.mts",
     "changeset:publish": "pnpm changeset publish",
     "changeset:version-packages": "pnpm changeset version && pnpm run strict-lib:fix:fmt && pnpm run strict-lib:gen:packages && pnpm install --no-frozen-lockfile && pnpm run gen:deps-graph && pnpm run gen:verify-npm-packages && pnpm run --filter=pr-merge-queue gen:plugin-version",

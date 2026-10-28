@@ -1,0 +1,23 @@
+version: '0.2'
+# Inherit the repository-wide settings. Required: when cspell runs with
+# this directory as its cwd, it stops at the nearest config and would
+# otherwise lose the root dictionaries and ignorePaths.
+import:
+  - '../../.cspell.config.yaml'
+words:
+  # The book the dezero deck reads, and the NumPy and Python names its code uses.
+  - dezero
+  - funcs
+  - isinstance
+  - isscalar
+  - ndarray
+  - numpy
+  - relu
+  # MathJax and the TeX commands and macros the decks typeset with.
+  - dlim
+  - infty
+  - mathbf
+  - mathjax
+  - mathrm
+  - sforall
+  - Mathematica

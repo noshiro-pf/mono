@@ -53,6 +53,10 @@ jobs:
       - name: Build the documentation site
         run: pnpm --filter @synstate/docs run build:astro
 
+      # Into `docs/marp-slides/<deck>/slides.html`, which the next step copies.
+      - name: Render the Marp decks
+        run: pnpm run build:marp-slides
+
       # Also copies the apps `tools/configs/pages-apps.mts` names, which
       # `ws:build` above has already built into their own `build/`.
       - name: Assemble the site

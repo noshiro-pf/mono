@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted, pathExists } from 'ts-repo-utils';
-import { pagesAppDirs } from '../../configs/pages-apps.mjs';
+import { PAGES_SLIDES_DIR, pagesAppDirs } from '../../configs/pages-apps.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -21,12 +21,15 @@ import { projectRootPath } from '../project-root-path.mjs';
  *   synstate-dom/         the same, for synstate-dom
  *   pr-manager/           the Pull Requests Manager app (Vite), and one
  *   …                     directory for each other app in `pages-apps.mts`
+ *   slides/               the reveal.js decks in `docs/reveal-slides/`,
+ *                         and the Marp decks in `docs/marp-slides/`
  *   ts-data-forge/        TypeDoc output
  *   …
  * ```
  *
  * Reads what each package has already produced — `pnpm run ws:build`,
- * `pnpm run ws:doc` and the Astro builds have to run first — and only copies.
+ * `pnpm run ws:doc`, the Astro builds and `pnpm run build:marp-slides` have to
+ * run first — and only copies.
  *
  * An app's directory here and the `base` its bundle was built with have to
  * agree, or the page loads and then asks for its script at a path nothing
@@ -96,6 +99,85 @@ export const buildPagesSite = async (): Promise<Result<number, string>> => {
     mut_published.push({ name: appDir, from: 'app' });
   }
 
+  const slidesOut = path.resolve(outDir, PAGES_SLIDES_DIR);
+
+  // A reveal.js deck and a Marp deck land side by side; one name for two
+  // decks would have the second silently overwrite the first.
+  const mut_deckDirs = new Set<string>();
+
+  // The reveal.js decks are copied as they are: each loads reveal.js from the
+  // CDN and needs no build. The Firebase files are the redirect from a deck's
+  // old address, and the README and the cspell config are for whoever edits
+  // the decks; none of them belongs on the site.
+  const revealSource = path.resolve(projectRootPath, 'docs/reveal-slides');
+
+  await fs.cp(revealSource, slidesOut, {
+    recursive: true,
+    filter: (source) => !notPublishedSlideFiles.has(path.basename(source)),
+  });
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  for (const entry of await fs.readdir(revealSource, { withFileTypes: true })) {
+    if (!entry.isDirectory()) {
+      continue;
+    }
+
+    mut_deckDirs.add(entry.name);
+
+    mut_published.push({
+      name: `${PAGES_SLIDES_DIR}/${entry.name}`,
+      from: 'reveal.js',
+    });
+  }
+
+  // A Marp deck is one self-contained `slides.html`, rendered beside its
+  // `slides.md` by `build:marp-slides` and served as its directory's page.
+  // A deck directory with no `slides.md` yet (an outline only) is skipped.
+  const marpSource = path.resolve(projectRootPath, 'docs/marp-slides');
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  for (const entry of await fs.readdir(marpSource, { withFileTypes: true })) {
+    const deckSource = path.resolve(marpSource, entry.name);
+
+    if (
+      !entry.isDirectory() ||
+      !(await pathExists(path.resolve(deckSource, 'slides.md')))
+    ) {
+      continue;
+    }
+
+    const rendered = path.resolve(deckSource, 'slides.html');
+
+    if (!(await pathExists(rendered))) {
+      return Result.err(
+        [
+          `${entry.name} has no rendered deck at ${rendered}.`,
+          'Run `pnpm run build:marp-slides` first.',
+        ].join('\n'),
+      );
+    }
+
+    const deckDir = entry.name.replace(/-slides$/u, '');
+
+    if (mut_deckDirs.has(deckDir)) {
+      return Result.err(
+        `Two decks would be served from ${PAGES_SLIDES_DIR}/${deckDir}/; rename one.`,
+      );
+    }
+
+    mut_deckDirs.add(deckDir);
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.mkdir(path.resolve(slidesOut, deckDir), { recursive: true });
+
+    await fs.copyFile(rendered, path.resolve(slidesOut, deckDir, 'index.html'));
+
+    mut_published.push({
+      name: `${PAGES_SLIDES_DIR}/${deckDir}`,
+      from: 'Marp',
+    });
+  }
+
   const indexPath = path.resolve(outDir, 'index.html');
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -103,6 +185,14 @@ export const buildPagesSite = async (): Promise<Result<number, string>> => {
 
   return Result.ok(mut_published.length);
 };
+
+/** What `docs/reveal-slides/` holds besides the decks and their assets. */
+const notPublishedSlideFiles: ReadonlySet<string> = new Set<string>([
+  'firebase.json',
+  '.firebaserc',
+  'README.md',
+  'cspell.config.yaml',
+]);
 
 /**
  * The hand-written documentation sites. Each one's `base` in

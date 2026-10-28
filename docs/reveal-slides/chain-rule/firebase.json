@@ -1,0 +1,12 @@
+{
+  "hosting": {
+    "public": "images",
+    "redirects": [
+      {
+        "regex": "^/(.*)$",
+        "destination": "https://noshiro-pf.github.io/mono/slides/chain-rule/:1",
+        "type": 301
+      }
+    ]
+  }
+}

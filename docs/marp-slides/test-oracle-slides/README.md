@@ -32,9 +32,11 @@ points here for the techniques.
 
 ## Rendering
 
-`slides.md` does not exist yet, so there is nothing to render here today. Once it
-does: the deck carries no Marp dependency of its own; render it with the Marp CLI
-run ad hoc, the same way the sibling decks are rendered:
+`slides.md` does not exist yet, so there is nothing to render or publish here
+today; once it does, `deploy-pages.yml` publishes it at
+<https://noshiro-pf.github.io/mono/slides/test-oracle/> with no further wiring.
+To render it locally: the deck carries no Marp dependency of its own; use the
+Marp CLI run ad hoc, the same way the sibling decks are rendered:
 
 ```bash
 npx @marp-team/marp-cli docs/marp-slides/test-oracle-slides/slides.md          # → slides.html

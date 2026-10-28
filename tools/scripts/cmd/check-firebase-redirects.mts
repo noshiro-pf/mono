@@ -8,61 +8,75 @@ import {
   Result,
   unknownToString,
 } from 'ts-data-forge';
-import { isDirectlyExecuted, pathExists } from 'ts-repo-utils';
+import { glob, isDirectlyExecuted, pathExists } from 'ts-repo-utils';
 import type { DeepReadonly } from 'ts-type-forge';
-import { pagesAppDirs, pagesAppUrl } from '../../configs/pages-apps.mjs';
+import {
+  PAGES_SITE_ORIGIN,
+  PAGES_SITE_ROOT,
+  PAGES_SLIDES_DIR,
+  pagesAppDirs,
+  pagesAppUrl,
+} from '../../configs/pages-apps.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
- * Fails when an app published to GitHub Pages has a `firebase.json` whose
- * `hosting` is anything but the redirect from its old Firebase Hosting site,
- * or has only one of `firebase.json` and `.firebaserc`. Pages serves the app;
- * a Firebase project behind it may hold its backend (Firestore, Auth), and
- * that is not this check's business.
+ * Fails when something served from the GitHub Pages site — an app, or a slide
+ * deck under `docs/reveal-slides/` — has a `firebase.json` whose `hosting` is
+ * anything but the redirect from its old Firebase Hosting site, or has only
+ * one of `firebase.json` and `.firebaserc`. Pages serves these; a Firebase
+ * project behind one may hold its backend (Firestore, Auth), and that is not
+ * this check's business.
  *
- * The apps that moved from Firebase Hosting to Pages keep their Firebase
- * project for a while, deployed once with this redirect so that links to the
- * old `*.web.app` address still arrive. The two files are there exactly as
- * long as the project is: when the project is deleted, both go. Nothing else
- * reads them, so a redirect pointing at the wrong directory, or a
- * `firebase.json` that serves `build/` again, would otherwise pass every check
- * and be found only by whoever followed an old link.
+ * What moved from Firebase Hosting to Pages keeps its Firebase project for a
+ * while, deployed once with this redirect so that links to the old `*.web.app`
+ * address still arrive. The two files are there exactly as long as the project
+ * is: when the project is deleted, both go. Nothing else reads them, so a
+ * redirect pointing at the wrong directory, or a `firebase.json` that serves
+ * the site again, would otherwise pass every check and be found only by
+ * whoever followed an old link.
  *
- * Deploy with `pnpm dlx firebase-tools deploy --only hosting` from the app's
- * directory. `public` is only there because Hosting requires one; the redirect
- * comes before static files, so nothing in it is ever served.
+ * Deploy with `pnpm dlx firebase-tools deploy --only hosting` from the
+ * directory holding the two files. `public` is only there because Hosting
+ * requires one; the redirect comes before static files, so nothing in it is
+ * ever served.
  */
 export const checkFirebaseRedirects = async (): Promise<
   Result<number, string>
 > => {
-  const apps = await Promise.all(
-    pagesAppDirs().map(async (packageDir) => {
-      const appDir = path.resolve(projectRootPath, 'apps', packageDir);
+  const sites = await Promise.all(
+    [...appSites(), ...(await slideDeckSites())].map(
+      async ({ dir, pagesUrl }) => {
+        const firebaseJsonPath = path.resolve(
+          projectRootPath,
+          dir,
+          'firebase.json',
+        );
 
-      const firebaseJsonPath = path.resolve(appDir, 'firebase.json');
-
-      return {
-        packageDir,
-        pagesUrl: pagesAppUrl(appDir),
-        firebaseJson: (await pathExists(firebaseJsonPath))
-          ? // eslint-disable-next-line security/detect-non-literal-fs-filename
-            await fs.readFile(firebaseJsonPath, 'utf8')
-          : undefined,
-        hasFirebaserc: await pathExists(path.resolve(appDir, '.firebaserc')),
-      };
-    }),
+        return {
+          dir,
+          pagesUrl,
+          firebaseJson: (await pathExists(firebaseJsonPath))
+            ? // eslint-disable-next-line security/detect-non-literal-fs-filename
+              await fs.readFile(firebaseJsonPath, 'utf8')
+            : undefined,
+          hasFirebaserc: await pathExists(
+            path.resolve(projectRootPath, dir, '.firebaserc'),
+          ),
+        };
+      },
+    ),
   );
 
-  const violations = findRedirectViolations(apps);
+  const violations = findRedirectViolations(sites);
 
   if (Arr.isNonEmpty(violations)) {
     return Result.err(
       [
-        `❌ ${violations.length} app(s) on GitHub Pages have Firebase files that are not the redirect from their old site:`,
+        `❌ ${violations.length} site(s) on GitHub Pages have Firebase files that are not the redirect from their old address:`,
         '',
         ...violations.map((v) => `  ${v}`),
         '',
-        'Pages serves these apps. A Firebase project behind one may hold its',
+        'Pages serves these. A Firebase project behind one may hold its',
         'backend, and may host only the redirect from its old address; when a',
         'project is deleted, firebase.json and .firebaserc go with it.',
       ].join('\n'),
@@ -70,14 +84,21 @@ export const checkFirebaseRedirects = async (): Promise<
   }
 
   return Result.ok(
-    apps.filter(
+    sites.filter(
       ({ firebaseJson }) =>
         firebaseJson !== undefined && hostingOf(firebaseJson) !== undefined,
     ).length,
   );
 };
 
-/** The one `firebase.json` an app on Pages may have. */
+/** Where a deck under `docs/reveal-slides/` is served on Pages. */
+export const slideDeckUrl = (deck: string): string =>
+  `${PAGES_SITE_ORIGIN}${PAGES_SITE_ROOT}${PAGES_SLIDES_DIR}/${deck}/` as const;
+
+/**
+ * The one `firebase.json` an app on Pages may have. Elsewhere `public` may
+ * name another directory, as long as it exists.
+ */
 export const redirectConfig = (
   pagesUrl: string,
 ): DeepReadonly<{
@@ -99,18 +120,17 @@ export const redirectConfig = (
     },
   }) as const;
 
-/** A line for each app whose Firebase files are not the redirect. */
+/** A line for each site whose Firebase files are not the redirect. */
 export const findRedirectViolations = (
-  apps: readonly Readonly<{
-    packageDir: string;
+  sites: readonly Readonly<{
+    /** The directory holding the files, relative to the repository root. */
+    dir: string;
     pagesUrl: string;
     firebaseJson: string | undefined;
     hasFirebaserc: boolean;
   }>[],
 ): readonly string[] =>
-  apps.flatMap(({ packageDir, pagesUrl, firebaseJson, hasFirebaserc }) => {
-    const dir = `apps/${packageDir}` as const;
-
+  sites.flatMap(({ dir, pagesUrl, firebaseJson, hasFirebaserc }) => {
     if (firebaseJson === undefined) {
       return hasFirebaserc
         ? [`${dir}/.firebaserc has no firebase.json beside it.`]
@@ -128,7 +148,14 @@ export const findRedirectViolations = (
       return [];
     }
 
-    const expected = redirectConfig(pagesUrl).hosting;
+    // `public` only has to name a directory that exists, which a deploy
+    // checks; the redirect comes first, so nothing in it is served.
+    const expected = {
+      ...redirectConfig(pagesUrl).hosting,
+      ...(isRecord(hosting) && typeof hosting['public'] === 'string'
+        ? { public: hosting['public'] }
+        : {}),
+    } as const;
 
     return fastDeepEqual(hosting, expected)
       ? []
@@ -136,6 +163,31 @@ export const findRedirectViolations = (
           `${dir}/firebase.json hosts something other than the redirect to ${pagesUrl}. Expected "hosting": ${JSON.stringify(expected)}`,
         ];
   });
+
+type Site = Readonly<{ dir: string; pagesUrl: string }>;
+
+const appSites = (): readonly Site[] =>
+  pagesAppDirs().map((packageDir) => ({
+    dir: `apps/${packageDir}`,
+    pagesUrl: pagesAppUrl(path.resolve(projectRootPath, 'apps', packageDir)),
+  }));
+
+/** Every directory under `docs/reveal-slides/` holding a deck's `index.html`. */
+const slideDeckSites = async (): Promise<readonly Site[]> => {
+  const listed = await glob('docs/reveal-slides/*/index.html', {
+    cwd: projectRootPath,
+  });
+
+  if (Result.isErr(listed)) {
+    throw new Error(unknownToString(listed.value));
+  }
+
+  return listed.value.toSorted().map((indexHtml) => {
+    const dir = path.dirname(indexHtml);
+
+    return { dir, pagesUrl: slideDeckUrl(path.basename(dir)) };
+  });
+};
 
 /** The `hosting` of a `firebase.json`, or `undefined` when it hosts nothing. */
 const hostingOf = (firebaseJson: string): unknown => {
@@ -158,6 +210,6 @@ if (isDirectlyExecuted(import.meta.url)) {
   }
 
   console.info(
-    `${result.value} app(s) on GitHub Pages still redirect from Firebase Hosting, each to its own page.`,
+    `${result.value} site(s) on GitHub Pages still redirect from Firebase Hosting, each to its own page.`,
   );
 }
