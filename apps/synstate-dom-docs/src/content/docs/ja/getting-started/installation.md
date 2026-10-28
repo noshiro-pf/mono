@@ -5,11 +5,13 @@ description: JSX の変換を設定し、最初のコンポーネントを描画
 
 ## インストール
 
-synstate-dom は 2 つの peer dependency と一緒にインストールする。これらはアプリが使うものと同じインスタンスでなければならない。
+synstate-dom は、アプリが状態を作るために import する synstate と一緒にインストールする。synstate は peer dependency なので、アプリと synstate-dom は同じインスタンスを共有する。
 
 ```sh
-npm install synstate-dom synstate ts-data-forge
+npm install synstate-dom synstate
 ```
+
+もう 1 つの peer dependency である ts-data-forge は synstate の dependency なので一緒に入る。アプリから import するようになったら（たとえば[制御構文](/mono/synstate-dom/ja/guides/control-flow/)の `Optional`）、自分で追加する。
 
 ## JSX の変換を設定する
 

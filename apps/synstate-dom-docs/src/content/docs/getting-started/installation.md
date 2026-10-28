@@ -5,11 +5,13 @@ description: Set up the JSX transform and render a first component.
 
 ## Install
 
-synstate-dom is installed with its two peer dependencies, which have to be the same instances the application uses:
+synstate-dom is installed with synstate, which the application imports to make its state. It is a peer dependency, so the application and synstate-dom share one instance:
 
 ```sh
-npm install synstate-dom synstate ts-data-forge
+npm install synstate-dom synstate
 ```
+
+The other peer dependency, ts-data-forge, is a dependency of synstate and comes with it. Add it yourself once the application imports it, for example for `Optional` in [Control flow](/mono/synstate-dom/guides/control-flow/).
 
 ## Configure the JSX transform
 
