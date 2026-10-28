@@ -1,4 +1,3 @@
-import { EmailAuthProvider } from 'firebase/auth';
 import { type InitializedObservable, combine, filter, map } from 'synstate';
 import { Result } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
@@ -90,7 +89,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
 
   const currentEmail: string = user.email ?? '';
 
-  const credential: AuthCredential = EmailAuthProvider.credential(
+  const credential: AuthCredential = api.auth.emailCredential(
     currentEmail,
     s.oldPassword.inputValue,
   );

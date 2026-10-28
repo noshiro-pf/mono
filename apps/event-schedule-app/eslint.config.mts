@@ -3,6 +3,8 @@ import {
   eslintConfigForPlaywright,
   eslintConfigForReact,
   eslintConfigForTypeScript,
+  mergeRestrictedImportsOptions,
+  restrictedImportsOptions,
   type FlatConfig,
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
@@ -42,6 +44,28 @@ export default [
       // is the same `Date` arithmetic `apps/ts-fortress-types` turns the rule
       // off for. Revisit when that floor moves.
       'unicorn/prefer-temporal': 'off',
+    }),
+  },
+  {
+    // Firebase is reached only through `src/api/`, which builds the `Api` the
+    // stores are handed — so a store's test can hand it a fake instead (#2094).
+    // Types may still be imported anywhere.
+    files: ['src/**'],
+    ignores: ['src/api/**'],
+    rules: defineKnownRules({
+      'no-restricted-imports': [
+        'error',
+        mergeRestrictedImportsOptions(restrictedImportsOptions, {
+          patterns: [
+            {
+              group: ['firebase/*', '@firebase/*'],
+              allowTypeImports: true,
+              message:
+                'Reach Firebase through the `Api` from src/api/, so that a test can hand a fake one in.',
+            },
+          ],
+        }),
+      ],
     }),
   },
   eslintConfigForPlaywright(['e2e/**']),

@@ -1,7 +1,7 @@
 import { EventSchedule } from 'event-schedule-app-shared';
 import { doc, getDoc } from 'firebase/firestore';
 import { Result, unknownToString } from 'ts-data-forge';
-import { firestoreEvents } from '../../initialize-firebase.mjs';
+import type { FirebaseHandles } from '../firebase.mjs';
 
 // import { httpsCallable } from 'firebase/functions';
 //
@@ -36,29 +36,31 @@ import { firestoreEvents } from '../../initialize-firebase.mjs';
 //     return Result.ok(fillEventSchedule(response));
 // });
 
-export const fetchEventSchedule = async (
-  id: string,
-): Promise<
-  Result<
-    EventSchedule,
-    Readonly<{ type: 'not-found' | 'others'; message: string }>
-  >
-> => {
-  try {
-    const res = await getDoc(doc(firestoreEvents, id));
+export const fetchEventSchedule =
+  ({ firestoreEvents }: FirebaseHandles) =>
+  async (
+    id: string,
+  ): Promise<
+    Result<
+      EventSchedule,
+      Readonly<{ type: 'not-found' | 'others'; message: string }>
+    >
+  > => {
+    try {
+      const res = await getDoc(doc(firestoreEvents, id));
 
-    if (!res.exists()) {
+      if (!res.exists()) {
+        return Result.err({
+          type: 'not-found' as const,
+          message: `event of id "${id}" not-found`,
+        });
+      }
+
+      return Result.ok(EventSchedule.fill(res.data()));
+    } catch (error: unknown) {
       return Result.err({
-        type: 'not-found' as const,
-        message: `event of id "${id}" not-found`,
+        type: 'others' as const,
+        message: unknownToString(error),
       });
     }
-
-    return Result.ok(EventSchedule.fill(res.data()));
-  } catch (error: unknown) {
-    return Result.err({
-      type: 'others' as const,
-      message: unknownToString(error),
-    });
-  }
-};
+  };

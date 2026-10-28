@@ -1,4 +1,3 @@
-import { EmailAuthProvider } from 'firebase/auth';
 import {
   type InitializedObservable,
   combine,
@@ -107,7 +106,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
 
   const currentEmail = user.email ?? '';
 
-  const credential: AuthCredential = EmailAuthProvider.credential(
+  const credential: AuthCredential = api.auth.emailCredential(
     currentEmail,
     s.password.inputValue,
   );

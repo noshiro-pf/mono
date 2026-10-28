@@ -1,61 +1,9 @@
-import {
-  createUser,
-  deleteUser,
-  googleSignInWithPopup,
-  reauthenticateWithCredential,
-  sendEmailVerification,
-  sendPasswordResetEmail,
-  signIn,
-  updateDisplayName,
-  updateEmail,
-  updatePassword,
-} from './auth/index.mjs';
-import {
-  addAnswer,
-  addEventSchedule,
-  archiveEventSchedule,
-  deleteAnswer,
-  fetchAnswers,
-  fetchEventListOfUser,
-  fetchEventSchedule,
-  sendReport,
-  setAuthorsEmail,
-  unarchiveEventSchedule,
-  updateAnswer,
-  updateEventSchedule,
-  verifyEmail,
-} from './crud/index.mjs';
+import { createApi } from './create-api.mjs';
+import { initializeFirebase } from './firebase.mjs';
 
-export const api = {
-  auth: {
-    createUser,
-    deleteUser,
-    reauthenticateWithCredential,
-    sendEmailVerification,
-    sendPasswordResetEmail,
-    signIn,
-    googleSignInWithPopup,
-    update: {
-      displayName: updateDisplayName,
-      email: updateEmail,
-      password: updatePassword,
-    },
-  },
-  event: {
-    add: addEventSchedule,
-    fetch: fetchEventSchedule,
-    update: updateEventSchedule,
-    archive: archiveEventSchedule,
-    unarchive: unarchiveEventSchedule,
-    setAuthorsEmail,
-    verifyEmail,
-  },
-  answers: {
-    add: addAnswer,
-    fetchList: fetchAnswers,
-    update: updateAnswer,
-    delete: deleteAnswer,
-  },
-  eventList: { fetch: fetchEventListOfUser },
-  sendReport,
-} as const;
+/**
+ * The app's one connection to Firebase, made when this module is first
+ * imported. The stores import it until each of them is made by a factory that
+ * takes an `Api` (#2094); then it moves to where the stores are made.
+ */
+export const api = createApi(initializeFirebase());
