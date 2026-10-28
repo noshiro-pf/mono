@@ -1,5 +1,6 @@
 // cspell:ignore unstub
 import {
+  createMemoryBrowser,
   createRouter,
   normalizeBasePath,
   prependBasePath,
@@ -55,100 +56,210 @@ describe(prependBasePath, () => {
 });
 
 describe(createRouter, () => {
-  let mut_router: Router | undefined;
-
-  afterEach(() => {
-    mut_router?.removeListener();
-
-    mut_router = undefined;
-
-    vi.unstubAllGlobals();
-  });
-
   test('without a base path, the pathname is the whole one', () => {
-    const currentUrl = openAt('https://example.com/career/');
+    const browser = createMemoryBrowser('https://example.com/career/');
 
-    mut_router = createRouter();
+    const router = createRouter({ browser });
 
-    expect(stateOf(mut_router).pathname).toBe('/career/');
+    expect(stateOf(router).pathname).toBe('/career/');
 
-    mut_router.push('/skills');
+    router.push('/skills');
 
-    expect(currentUrl().pathname).toBe('/skills/');
+    expect(browser.url().pathname).toBe('/skills/');
 
-    expect(stateOf(mut_router).pathname).toBe('/skills/');
+    expect(stateOf(router).pathname).toBe('/skills/');
   });
 
   test('the state shows the pathname below the base path', () => {
-    openAt('https://example.com/mono/profile/career/');
+    const browser = createMemoryBrowser(
+      'https://example.com/mono/profile/career/',
+    );
 
-    mut_router = createRouter({ basePath: '/mono/profile/' });
+    const router = createRouter({ basePath: '/mono/profile/', browser });
 
-    expect(stateOf(mut_router).pathname).toBe('/career/');
+    expect(stateOf(router).pathname).toBe('/career/');
 
-    expect(stateOf(mut_router).pathSegments).toStrictEqual(['career']);
+    expect(stateOf(router).pathSegments).toStrictEqual(['career']);
   });
 
   test('push and redirect put a root-relative path below the base path', () => {
-    const currentUrl = openAt('https://example.com/mono/profile/');
+    const browser = createMemoryBrowser('https://example.com/mono/profile/');
 
-    mut_router = createRouter({ basePath: '/mono/profile/' });
+    const router = createRouter({ basePath: '/mono/profile/', browser });
 
-    mut_router.push('/skills/');
+    router.push('/skills/');
 
-    expect(currentUrl().pathname).toBe('/mono/profile/skills/');
+    expect(browser.url().pathname).toBe('/mono/profile/skills/');
 
-    expect(stateOf(mut_router).pathname).toBe('/skills/');
+    expect(stateOf(router).pathname).toBe('/skills/');
 
-    mut_router.redirect('/career');
+    router.redirect('/career');
 
-    expect(currentUrl().pathname).toBe('/mono/profile/career/');
+    expect(browser.url().pathname).toBe('/mono/profile/career/');
 
-    expect(stateOf(mut_router).pathname).toBe('/career/');
+    expect(stateOf(router).pathname).toBe('/career/');
   });
 
   test('a query string pushed to the root stays on the page', () => {
-    const currentUrl = openAt('https://example.com/mono/loan/');
+    const browser = createMemoryBrowser('https://example.com/mono/loan/');
 
-    mut_router = createRouter({ basePath: '/mono/loan/' });
+    const router = createRouter({ basePath: '/mono/loan/', browser });
 
-    mut_router.push('/?a=1');
+    router.push('/?a=1');
 
-    expect(currentUrl().href).toBe('https://example.com/mono/loan/?a=1');
+    expect(browser.url().href).toBe('https://example.com/mono/loan/?a=1');
 
-    expect(stateOf(mut_router).pathname).toBe('/');
+    expect(stateOf(router).pathname).toBe('/');
 
-    expect(stateOf(mut_router).searchParams.get('a')).toBe('1');
+    expect(stateOf(router).searchParams.get('a')).toBe('1');
   });
 
   test('updateQueryParams keeps the base path', () => {
-    const currentUrl = openAt('https://example.com/mono/loan/?b=2');
+    const browser = createMemoryBrowser('https://example.com/mono/loan/?b=2');
 
-    mut_router = createRouter({ basePath: '/mono/loan/' });
+    const router = createRouter({ basePath: '/mono/loan/', browser });
 
-    mut_router.updateQueryParams((draft) => {
+    router.updateQueryParams((draft) => {
       draft.set('a', '1');
 
       return draft;
     });
 
-    expect(currentUrl().href).toBe('https://example.com/mono/loan/?a=1&b=2');
+    expect(browser.url().href).toBe('https://example.com/mono/loan/?a=1&b=2');
   });
 
   test('the redirect option reads and writes paths below the base path', () => {
-    const currentUrl = openAt('https://example.com/mono/profile/');
+    const browser = createMemoryBrowser('https://example.com/mono/profile/');
 
     const redirect = vi.fn((pathname: string) =>
       pathname === '/' ? '/career/' : undefined,
     );
 
-    mut_router = createRouter({ basePath: '/mono/profile/', redirect });
+    const router = createRouter({
+      basePath: '/mono/profile/',
+      redirect,
+      browser,
+    });
 
     expect(redirect).toHaveBeenCalledWith('/');
 
-    expect(currentUrl().pathname).toBe('/mono/profile/career/');
+    expect(browser.url().pathname).toBe('/mono/profile/career/');
 
-    expect(stateOf(mut_router).pathname).toBe('/career/');
+    expect(stateOf(router).pathname).toBe('/career/');
+  });
+
+  test('follows the history back and forward', () => {
+    const browser = createMemoryBrowser('https://example.com/');
+
+    const router = createRouter({ browser });
+
+    router.push('/a/');
+
+    router.push('/b/');
+
+    router.back();
+
+    expect(stateOf(router).pathname).toBe('/a/');
+
+    router.go(-1);
+
+    expect(stateOf(router).pathname).toBe('/');
+
+    router.forward();
+
+    expect(stateOf(router).pathname).toBe('/a/');
+  });
+
+  test('follows a move through the history it did not make, until the listener is removed', () => {
+    const browser = createMemoryBrowser('https://example.com/');
+
+    const router = createRouter({ browser });
+
+    router.push('/a/');
+
+    browser.history.back();
+
+    expect(stateOf(router).pathname).toBe('/');
+
+    router.removeListener();
+
+    browser.history.forward();
+
+    expect(stateOf(router).pathname).toBe('/');
+  });
+
+  test('without a browser, routes the real window', () => {
+    const currentUrl = openAt('https://example.com/career/');
+
+    const router = createRouter();
+
+    try {
+      expect(stateOf(router).pathname).toBe('/career/');
+
+      router.push('/skills');
+
+      expect(currentUrl().pathname).toBe('/skills/');
+
+      expect(stateOf(router).pathname).toBe('/skills/');
+    } finally {
+      router.removeListener();
+
+      vi.unstubAllGlobals();
+    }
+  });
+});
+
+describe(createMemoryBrowser, () => {
+  test('a push drops the entries ahead of the current one', () => {
+    const browser = createMemoryBrowser('https://example.com/');
+
+    browser.history.pushState({}, '', '/a/');
+
+    browser.history.pushState({}, '', '/b/');
+
+    browser.history.back();
+
+    browser.history.pushState({}, '', '/c/');
+
+    browser.history.forward();
+
+    expect(browser.url().pathname).toBe('/c/');
+
+    browser.history.back();
+
+    expect(browser.url().pathname).toBe('/a/');
+  });
+
+  test('a replace changes the current entry only', () => {
+    const browser = createMemoryBrowser('https://example.com/');
+
+    browser.history.pushState({}, '', '/a/');
+
+    browser.history.replaceState({}, '', '/b/');
+
+    expect(browser.url().pathname).toBe('/b/');
+
+    browser.history.back();
+
+    expect(browser.url().pathname).toBe('/');
+  });
+
+  test('fires popstate only when the entry changes', () => {
+    const browser = createMemoryBrowser('https://example.com/');
+
+    const listener = vi.fn();
+
+    browser.addEventListener('popstate', listener);
+
+    browser.history.back();
+
+    expect(listener).not.toHaveBeenCalled();
+
+    browser.history.pushState({}, '', '/a/');
+
+    browser.history.back();
+
+    expect(listener).toHaveBeenCalledOnce();
   });
 });
 

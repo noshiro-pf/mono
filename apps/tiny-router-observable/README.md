@@ -22,6 +22,26 @@ app were at the root.
 `push('/career/')` goes to `/mono/profile/career/`. A whole URL (a clicked
 link's `href`, or what `updateQueryParams` builds) is taken as it is.
 
+## Without a window
+
+`createRouter` reads and writes the real window unless it is handed a
+`browser`: a `RouterBrowser` is the location, the history methods and the
+`popstate` listener the router uses. `createMemoryBrowser(href)` is one kept in
+memory, so a store that owns a router can be created and tested in Node:
+
+```ts
+const browser = createMemoryBrowser('https://example.com/mono/loan/?a=1');
+
+const router = createRouter({ basePath: '/mono/loan/', browser });
+
+router.push('/?a=2');
+
+browser.url().search; // '?a=2'
+```
+
+`go`, `back` and `forward` fire `popstate` at once, where a browser fires it a
+moment later.
+
 ## What changed on the way back
 
 - `@noshiro/syncflow` → `synstate`, whose API has moved: `createState` returns a

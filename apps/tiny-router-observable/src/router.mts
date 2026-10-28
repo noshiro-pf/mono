@@ -66,6 +66,25 @@ export type Router = Readonly<{
   }>;
 }>;
 
+/**
+ * What the router reads and writes of the browser: the URL, the session
+ * history, and its `popstate` event. The real window is the default;
+ * `createMemoryBrowser` is one that lives in memory, for a test or anything
+ * else that runs without a window.
+ */
+export type RouterBrowser = Readonly<{
+  location: Readonly<{ href: string }>;
+  history: Readonly<{
+    pushState: (data: unknown, unused: string, url: string) => void;
+    replaceState: (data: unknown, unused: string, url: string) => void;
+    go: (delta?: number) => void;
+    forward: () => void;
+    back: () => void;
+  }>;
+  addEventListener: (type: 'popstate', listener: () => void) => void;
+  removeEventListener: (type: 'popstate', listener: () => void) => void;
+}>;
+
 export type RouterOptions = Readonly<{
   /**
    * The path the app is served under, e.g. `/mono/profile/` — pass
@@ -86,6 +105,9 @@ export type RouterOptions = Readonly<{
    * be a write while its update propagates.
    */
   redirect?: (pathname: string) => string | undefined;
+
+  /** The browser to route; the real window when left out. */
+  browser?: RouterBrowser;
 }>;
 
 /**
@@ -95,16 +117,18 @@ export type RouterOptions = Readonly<{
 export const createRouter = (routerOptions?: RouterOptions): Router => {
   const basePath = normalizeBasePath(routerOptions?.basePath ?? '/');
 
-  const getCurrentUrl = (): URL => new URL(globalThis.location.href);
+  const browser = routerOptions?.browser ?? globalBrowser();
+
+  const getCurrentUrl = (): URL => new URL(browser.location.href);
 
   /** The current URL, redirected first if `routerOptions.redirect` asks for it. */
   const readUrl = (): URL => {
     const to = routerOptions?.redirect?.(
-      stripBasePath(basePath, globalThis.location.pathname),
+      stripBasePath(basePath, getCurrentUrl().pathname),
     );
 
     if (to !== undefined) {
-      window.history.replaceState(
+      browser.history.replaceState(
         {},
         '',
         withSlash(prependBasePath(basePath, to)),
@@ -177,7 +201,7 @@ export const createRouter = (routerOptions?: RouterOptions): Router => {
   const push = (nextUrl: string, appendSlash: boolean = true): void => {
     const url = prependBasePath(basePath, nextUrl);
 
-    window.history.pushState({}, '', appendSlash ? withSlash(url) : url);
+    browser.history.pushState({}, '', appendSlash ? withSlash(url) : url);
 
     updateState();
   };
@@ -185,31 +209,31 @@ export const createRouter = (routerOptions?: RouterOptions): Router => {
   const redirect = (nextUrl: string, appendSlash: boolean = true): void => {
     const url = prependBasePath(basePath, nextUrl);
 
-    window.history.replaceState({}, '', appendSlash ? withSlash(url) : url);
+    browser.history.replaceState({}, '', appendSlash ? withSlash(url) : url);
 
     updateState();
   };
 
   const go = (delta?: number): void => {
-    window.history.go(delta);
+    browser.history.go(delta);
 
     updateState();
   };
 
   const forward = (): void => {
-    window.history.forward();
+    browser.history.forward();
 
     updateState();
   };
 
   const back = (): void => {
-    window.history.back();
+    browser.history.back();
 
     updateState();
   };
 
   // initialize
-  globalThis.addEventListener('popstate', updateState);
+  browser.addEventListener('popstate', updateState);
 
   return {
     state,
@@ -220,7 +244,7 @@ export const createRouter = (routerOptions?: RouterOptions): Router => {
     back,
     updateQueryParams,
     removeListener: () => {
-      globalThis.removeEventListener('popstate', updateState);
+      browser.removeEventListener('popstate', updateState);
     },
     utils: { splitToPathSegments, withSlash },
   };
@@ -231,8 +255,8 @@ export const createRouter = (routerOptions?: RouterOptions): Router => {
  *
  * Exported as well as reachable through `Router.utils`, so that a caller who
  * only needs this pure transformation does not have to construct a router —
- * `createRouter` reads `window.location` at call time, which a Node test
- * cannot do.
+ * `createRouter` without a `browser` reads `window.location` at call time,
+ * which a Node test cannot do.
  */
 export const withSlash = (path: string): string =>
   path.endsWith('/') || path.includes('/?')
@@ -240,6 +264,23 @@ export const withSlash = (path: string): string =>
     : path.includes('?')
       ? path.replaceAll('?', '/?')
       : (`${path}/` as const);
+
+/**
+ * The real window, read when a router is created: the location as
+ * `globalThis.location` (a worker has one too), the history as
+ * `window.history` (only a window has one).
+ */
+const globalBrowser = (): RouterBrowser =>
+  ({
+    location: globalThis.location,
+    history: window.history,
+    addEventListener: (type, listener) => {
+      globalThis.addEventListener(type, listener);
+    },
+    removeEventListener: (type, listener) => {
+      globalThis.removeEventListener(type, listener);
+    },
+  }) as const;
 
 const splitToPathSegments = (pathname: string): readonly string[] =>
   pathname.split('/').filter((s) => s !== '');
