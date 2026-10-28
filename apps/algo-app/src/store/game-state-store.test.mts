@@ -59,12 +59,14 @@ describe(createGameStateStore, () => {
     );
   });
 
-  test('writes the actions played here to the room, once it is known', () => {
+  test('writes each action played before the room is known, in order, once it is', () => {
     const { store, setRoom, written } = setup();
 
     store.start();
 
     store.onTurnEndClick();
+
+    store.onTossSubmit();
 
     assert.deepStrictEqual(written, []);
 
@@ -72,13 +74,66 @@ describe(createGameStateStore, () => {
 
     store.onTossCancel();
 
-    assert.deepStrictEqual(
-      written.map(([roomId, action]) => [roomId, action.type]),
-      [
-        ['a', 'goToNextTurn'],
-        ['a', 'cancelToss'],
+    assert.deepStrictEqual(writtenTypes(written), [
+      ['a', 'goToNextTurn'],
+      ['a', 'submitToss'],
+      ['a', 'cancelToss'],
+    ]);
+  });
+
+  test('writes to a room known before the store starts', () => {
+    const { store, setRoom, written } = setup();
+
+    setRoom(roomWithId('a'));
+
+    store.start();
+
+    store.onTossCancel();
+
+    assert.deepStrictEqual(writtenTypes(written), [['a', 'cancelToss']]);
+  });
+
+  test('a new snapshot of the room writes no action again', () => {
+    const { store, setRoom, written } = setup();
+
+    store.start();
+
+    setRoom(roomWithId('a'));
+
+    store.onTossCancel();
+
+    // Another player joining changes `players`. Written again, the action
+    // would reach every client twice, and a second `selectMyCard` unselects.
+    setRoom({
+      ...roomWithId('a'),
+      players: [
+        { name: 'alice', online: true },
+        { name: 'bob', online: true },
       ],
-    );
+    });
+
+    assert.deepStrictEqual(writtenTypes(written), [['a', 'cancelToss']]);
+  });
+
+  test('starting again after stop writes no action again', () => {
+    const { store, setRoom, written } = setup();
+
+    setRoom(roomWithId('a'));
+
+    const stopStore = store.start();
+
+    store.onTossCancel();
+
+    stopStore();
+
+    store.start();
+
+    store.onTossSubmit();
+
+    assert.deepStrictEqual(writtenTypes(written), [
+      ['a', 'cancelToss'],
+      ['a', 'submitToss'],
+    ]);
   });
 
   test('stop ends the writing', () => {
@@ -208,6 +263,11 @@ const selectMyCard = (card: Card): GameStateAction =>
     timestamp: serverTimestamp(),
     card,
   }) as const;
+
+const writtenTypes = (
+  written: Setup['written'],
+): readonly (readonly [string, GameStateAction['type']])[] =>
+  written.map(([roomId, action]) => [roomId, action.type] as const);
 
 const roomWithId = (id: string): Room =>
   ({

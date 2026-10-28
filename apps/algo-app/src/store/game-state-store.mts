@@ -27,7 +27,9 @@ import {
   Result,
   SafeUint,
   asSafeUint,
+  asUint32,
   isNotUndefined,
+  type SizeType,
 } from 'ts-data-forge';
 import type {
   DeepReadonly,
@@ -230,20 +232,54 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
   };
 
   const start = (): (() => void) => {
-    const writing = combine([
-      deps.room.pipe(filter(isNotUndefined)),
-      localGameStateActionSource,
-    ]).subscribe(([room, localAction]) => {
-      Result.fromPromise(deps.addAction(room.id, localAction))
-        .then(() => {
-          if (returnFalse()) {
-            console.log(room.id, localAction);
-          }
-        })
-        .catch((error: unknown) => {
-          console.error(error);
-        });
-    });
+    // Each action played here is written once. A new snapshot of the room
+    // (another player joining) re-emits the `combine`, so what to write is
+    // the actions played since the last emission, not the latest one; those
+    // played before the room is known are written, in order, once it is.
+    const knownRoom = deps.room.pipe(filter(isNotUndefined));
+
+    const playedHere = localGameStateActionSource.pipe(
+      scan<GameStateAction, readonly GameStateAction[]>(
+        (played, action) => Arr.toPushed(played, action),
+        [],
+      ),
+    );
+
+    const writing = combine([knownRoom, playedHere])
+      .pipe(
+        scan<
+          readonly [Room, readonly GameStateAction[]],
+          DeepReadonly<{
+            roomId: string | undefined;
+            toWrite: GameStateAction[];
+            numWritten: SizeType.Arr;
+          }>
+        >(
+          ({ numWritten }, [room, played]) => ({
+            roomId: room.id,
+            toWrite: Arr.skip(played, numWritten),
+            numWritten: Arr.length(played),
+          }),
+          { roomId: undefined, toWrite: [], numWritten: asUint32(0) },
+        ),
+      )
+      .subscribe(({ roomId, toWrite }) => {
+        if (roomId === undefined) {
+          return;
+        }
+
+        for (const localAction of toWrite) {
+          Result.fromPromise(deps.addAction(roomId, localAction))
+            .then(() => {
+              if (returnFalse()) {
+                console.log(roomId, localAction);
+              }
+            })
+            .catch((error: unknown) => {
+              console.error(error);
+            });
+        }
+      });
 
     const autoPlaying = autoPlay(deps.counter).subscribe((action) => {
       // turn off auto play
@@ -272,6 +308,12 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
 
     return () => {
       writing.unsubscribe();
+
+      // Unsubscribing leaves the nodes in the graph, where `playedHere` would
+      // keep every later action; completing both completes what they feed.
+      knownRoom.complete();
+
+      playedHere.complete();
 
       autoPlaying.unsubscribe();
 
