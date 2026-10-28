@@ -2,15 +2,16 @@
 
 # `unblock-prs`
 
-`pnpm run unblock-prs` — the worker that lands the merge queue. The
+`unblock-prs` — the worker that lands the merge queue. The
 `/unblock-prs` skill fixes what it sets aside, and nothing else.
 
 - [日本語](#日本語)
 - [English](#english)
 
-The authority for the conventions this reads is `CLAUDE.md`: "CI" and
-"Commits and pull requests". This file describes what the script does with
-them.
+This file describes the conventions the queue reads — the labels,
+`Merge-After:`, stacks — and what the script does with them. A repository's
+own guidance for the skill goes in `.github/unblock-prs.md` (see the package
+[README](../../README.md)).
 
 ## 日本語
 

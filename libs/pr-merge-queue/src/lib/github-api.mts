@@ -405,7 +405,7 @@ export const send = async ({
         Accept: accept,
         'X-GitHub-Api-Version': '2022-11-28',
         // GitHub rejects an API request without one.
-        'User-Agent': 'noshiro-pf-mono-tools',
+        'User-Agent': 'pr-merge-queue',
         ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
       },
       ...(body === undefined ? {} : { body }),
