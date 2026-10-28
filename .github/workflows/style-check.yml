@@ -131,11 +131,20 @@ jobs:
       # build — which is why this workflow has no `build` job the way
       # code-check.yml does.
       #
+      # ws:gen reads no package's own dist/, only its siblings', so it builds
+      # just the packages another member links to (`ws:build:deps`), skipping
+      # the apps' bundles. ws:doc also reads each package's own dist/, so it
+      # builds everything.
+      #
       # `ws:check:ext` used to be on this list and is not: `check-ext.mts`
       # globs file names under `src/` and `scripts/` and resolves nothing, so
       # the build it was paying for did nothing for it.
+      - name: Build the packages the others link to
+        if: matrix.command == 'ws:gen'
+        run: pnpm run ws:build:deps
+
       - name: Build all packages
-        if: matrix.command == 'ws:doc' || matrix.command == 'ws:gen'
+        if: matrix.command == 'ws:doc'
         run: pnpm run ws:build
 
       # The checkout is one commit deep; `git show` needs the base as well.
