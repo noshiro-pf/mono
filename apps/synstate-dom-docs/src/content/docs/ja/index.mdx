@@ -1,9 +1,9 @@
 ---
 title: synstate-dom
-description: synstate の Observable を DOM に直接束縛する、コンパイラなしの細粒度 UI ライブラリ。
+description: synstate の Observable を DOM に直接束縛する、コンパイラ不要の細粒度 UI ライブラリです。
 template: splash
 hero:
-    tagline: synstate の Observable を JSX にそのまま渡す。コンポーネントは 1 回だけ呼ばれ、以後は Observable に束縛された属性・プロパティ・テキストだけが変わる。コンパイラも仮想 DOM も使わない。
+    tagline: synstate の Observable を JSX にそのまま渡すだけ。コンポーネントは 1 回しか呼ばれず、その後は Observable に束縛した属性・プロパティ・テキストだけが書き換わります。コンパイラも仮想 DOM も使いません。
     actions:
         - text: はじめる
           link: /mono/synstate-dom/ja/getting-started/introduction/
@@ -17,27 +17,29 @@ hero:
 import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
 
 <Aside type="caution">
-    synstate-dom はまだ 0.x で、マイナーリリースで API が変わることがある。
+    synstate-dom はまだ 0.x なので、マイナーリリースでも API
+    が変わることがあります。
 </Aside>
 
 ## 特長
 
 <CardGrid>
-    <Card title="細粒度、1 回だけ呼ぶ" icon="rocket">
-        コンポーネント関数はマウント時に 1 回だけ呼ばれる。更新は synstate
-        のグラフを伝わり、束縛された DOM
-        の葉（属性・プロパティ・テキストノード）に直接書き込まれる。
+    <Card title="細粒度、呼ぶのは 1 回だけ" icon="rocket">
+        コンポーネント関数が呼ばれるのはマウント時の 1 回だけです。更新は
+        synstate のグラフを伝わって、束縛された DOM
+        の葉（属性・プロパティ・テキストノード）に直接書き込まれます。
     </Card>
-    <Card title="コンパイラなし" icon="setting">
+    <Card title="コンパイラ不要" icon="setting">
         TypeScript 標準の `"jsx": "react-jsx"` と `jsxImportSource`
-        だけで動く。設定する Babel や Vite のプラグインはない。
+        だけで動きます。Babel や Vite のプラグインを設定する必要はありません。
     </Card>
-    <Card title="リアクティビティを型で表す" icon="approve-check">
-        データを受け取るスロットは Observable・`constant(...)`・`view(...)`
-        だけを受け付け、素の値は受け付けない。スナップショットを誤って読むと、更新されないビューではなく型エラーになる。
+    <Card title="リアクティブかどうかが型でわかる" icon="approve-check">
+        データを受け取るスロットに渡せるのは
+        Observable・`constant(...)`・`view(...)`
+        だけで、素の値は渡せません。うっかりスナップショットを読んで渡しても、更新されないビューができあがるのではなく、型エラーになります。
     </Card>
-    <Card title="構造上リークしない" icon="random">
+    <Card title="そもそもリークしない作り" icon="random">
         `If`・`Match`・`For`
-        は表示するものをそれぞれのスコープでマウントする。分岐を閉じたり行を消したりすると、その中で作った派生と購読がすべて破棄される。
+        は、表示するものをそれぞれのスコープでマウントします。分岐を閉じたり行を消したりすると、その中で作った派生と購読はすべて破棄されます。
     </Card>
 </CardGrid>

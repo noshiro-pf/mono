@@ -3,11 +3,11 @@ title: Components
 description: Props that take Bindable values, read-once props, and children.
 ---
 
-A component is a function from props to `JSX.Element`, called once when it is mounted. There is no per-component state or effect API: state is a synstate observable, and what a component shows is bound to it.
+A component is a function from props to `JSX.Element`, and it is called once, when it mounts. There is no per-component state or effect API. State lives in synstate observables, and the component binds what it shows to them.
 
 ## Props are bindables
 
-A component that takes data takes `Bindable<T>`, so that its caller can pass an observable, a constant or a `view` alike:
+When a component takes data, type the prop as `Bindable<T>`. Its caller can then pass an observable, a constant or a `view`:
 
 ```tsx
 import { createState } from 'synstate';
@@ -54,11 +54,11 @@ const Inbox = (): JSX.Element => (
 render(Inbox, document.body);
 ```
 
-Props hold bindables rather than values that a later render would replace, so destructuring them loses nothing. With `mapBindable` and `derive` (see [Bindable values](/mono/synstate-dom/guides/bindable/#receiving-a-bindable-mapbindable-derive-toobservable)), a constant passed in stays a constant and never enters the graph.
+Props hold bindables, not values that a later render would replace, so you lose nothing by destructuring them. And with `mapBindable` and `derive` (see [Bindable values](/mono/synstate-dom/guides/bindable/#receiving-a-bindable-mapbindable-derive-toobservable)), a constant passed in stays a constant and never enters the graph.
 
 ## Read-once props
 
-A prop the component reads only once, as an initial value, is typed `Constant<T>`:
+If the component reads a prop only once, as an initial value, type it `Constant<T>`:
 
 ```tsx
 import { createState } from 'synstate';
@@ -86,7 +86,7 @@ const Stepper = ({
 export const Form = (): JSX.Element => <Stepper initial={constant(10)} />;
 ```
 
-The caller then has to write `initial={constant(10)}`: an observable or a plain number is a type error. That the value is read once shows in the type, not in a naming convention. Inside the component, a `Constant<T>` is used as a `T`.
+The caller then has to write `initial={constant(10)}`; an observable or a plain number is a type error. So the fact that the value is read only once shows up in the type, not in a naming convention. Inside the component, you use a `Constant<T>` just like a `T`.
 
 ## Children
 
@@ -114,12 +114,12 @@ export const Page = (): JSX.Element => (
 );
 ```
 
-`children` and elements passed as props are descriptions; they are mounted where the component puts them, as many times as it puts them. `Child` is what JSX accepts as a child: an element, a `Bindable<string | number>`, or an array of those.
+`children` and elements passed as props are descriptions. They mount wherever the component puts them, as many times as it puts them. `Child` is anything JSX accepts as a child: an element, a `Bindable<string | number>`, or an array of those.
 
 ## No context
 
-There is no `createContext`. Application state is a module-level store that any component imports. An observable that only one subtree should see is passed down through props, which costs nothing: a component is called once, so passing the same observable through intermediate components re-runs none of them.
+There is no `createContext`. Keep application state in a module-level store that any component can import. For an observable that only one subtree should see, pass it down through props. That costs nothing: each component is called once, so passing the same observable through the components in between re-runs none of them.
 
 ## Naming
 
-The library's own props carry no `$` suffix (`cond`, `items`, `value`): they take a `Bindable`, which may be a constant or a view as well as an observable. The samples name variables that hold an observable with a `$` suffix (`count$`, `item$`), as the synstate documentation does. Nothing enforces either; whether a component's own props carry the suffix is up to its author.
+The library's own props have no `$` suffix (`cond`, `items`, `value`), because they take a `Bindable`, which may be a constant or a view as well as an observable. The samples do give a `$` suffix to variables that hold an observable (`count$`, `item$`), as the synstate documentation does. Neither is enforced, and whether your own components' props carry the suffix is up to you.

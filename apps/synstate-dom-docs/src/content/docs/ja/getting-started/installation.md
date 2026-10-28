@@ -1,21 +1,21 @@
 ---
 title: インストール
-description: JSX の変換を設定し、最初のコンポーネントを描画する。
+description: JSX の変換を設定して、最初のコンポーネントを描画してみます。
 ---
 
 ## インストール
 
-synstate-dom は、アプリが状態を作るために import する synstate と一緒にインストールする。synstate は peer dependency なので、アプリと synstate-dom は同じインスタンスを共有する。
+synstate-dom は、アプリで状態を作るのに import する synstate と一緒にインストールします。synstate は peer dependency なので、アプリと synstate-dom は同じインスタンスを共有します。
 
 ```sh
 npm install synstate-dom synstate
 ```
 
-もう 1 つの peer dependency である ts-data-forge は synstate の dependency なので一緒に入る。アプリから import するようになったら（たとえば[制御構文](/mono/synstate-dom/ja/guides/control-flow/)の `Optional`）、自分で追加する。
+もう 1 つの peer dependency である ts-data-forge は synstate の dependency なので、一緒に入ってきます。アプリから直接 import するようになったら（たとえば[制御構文](/mono/synstate-dom/ja/guides/control-flow/)の `Optional`）、自分で追加してください。
 
 ## JSX の変換を設定する
 
-`tsconfig.json` で JSX の変換先を synstate-dom にする。必要なのはこれだけで、変換は TypeScript 自身のものなので、`jsxImportSource` を読むバンドラー（Vite、esbuild）はそのまま従う。
+`tsconfig.json` で、JSX の変換先を synstate-dom にします。必要なのはこれだけです。変換は TypeScript 自身のものなので、`jsxImportSource` を読むバンドラー（Vite、esbuild）ならそのまま従ってくれます。
 
 ```jsonc
 {
@@ -55,6 +55,6 @@ const unmount = render(Counter, document.body);
 unmount();
 ```
 
-`render(App, container)` は `<App />` ではなくコンポーネントそのものを受け取り、ルートスコープの中で 1 回だけ呼ぶ。返る関数はアプリをアンマウントする。アプリが作った購読と派生をすべて破棄し、ノードを取り除く。
+`render(App, container)` には `<App />` ではなくコンポーネントそのものを渡します。`render` はそれをルートスコープの中で 1 回だけ呼びます。戻り値の関数を呼ぶとアプリがアンマウントされ、アプリが作った購読と派生がすべて破棄されて、ノードも取り除かれます。
 
-JSX のテキストも `Bindable` なので、ラベルは `+1` ではなく `constant('+1')` と書く。理由は [Bindable](/mono/synstate-dom/ja/guides/bindable/) で説明する。
+JSX のテキストも `Bindable` なので、ラベルは `+1` ではなく `constant('+1')` と書きます。なぜそうするのかは [Bindable](/mono/synstate-dom/ja/guides/bindable/) で説明します。

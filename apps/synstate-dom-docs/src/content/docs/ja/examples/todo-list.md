@@ -1,9 +1,9 @@
 ---
 title: Todo リスト
-description: If、For、class のオブジェクト形式、ビュー専用の派生を使った Todo リスト。
+description: If、For、class のオブジェクト形式、ビュー専用の派生を使った Todo リストです。
 ---
 
-README の大きい方のサンプル。入力欄と、項目ができると現れるリスト、残りの件数を持つ。
+README に載せている大きい方のサンプルです。入力欄と、項目ができると現れるリスト、残りの件数を表示します。
 
 ```tsx
 import { createState, map } from 'synstate';
@@ -103,9 +103,9 @@ const TodoApp = (): JSX.Element => {
 render(TodoApp, document.body);
 ```
 
-見どころ:
+ポイント：
 
-- **`For` は `todo.id` ごとに 1 行を保つ。** Todo を切り替えると新しい配列が `todos$` に書かれるが、行の関数は再び呼ばれず、その行の `checked` プロパティ、`done` クラス、テキストだけが変わる。
-- **`remaining$` は `TodoApp` の中で作る。** このビューだけが読むからである。ルートスコープに属し、アンマウント時に破棄される。[ライフサイクルとスコープ](/mono/synstate-dom/ja/guides/lifecycle/#2-つの書き方)を参照。
-- **リストと「Nothing to do.」の段落はどちらも `If` に渡した記述である。** 一度にマウントされるのは片方だけで、切り替えるともう片方のスコープが `For` と行ごと破棄される。
-- **イベントハンドラは状態に書き込むだけ**（`setDraft`、`updateTodos`）で、Observable を作らない。
+- **`For` は `todo.id` ごとに 1 行を保ちます。** Todo を切り替えると新しい配列が `todos$` に書き込まれますが、行の関数がもう一度呼ばれることはありません。変わるのは、その行の `checked` プロパティ、`done` クラス、テキストだけです。
+- **`remaining$` は `TodoApp` の中で作っています。** このビューしか読まないからです。ルートスコープに属するので、アンマウント時に破棄されます。[ライフサイクルとスコープ](/mono/synstate-dom/ja/guides/lifecycle/#2-つの書き方)も見てください。
+- **リストと「Nothing to do.」の段落は、どちらも `If` に渡した記述です。** 一度にマウントされるのは片方だけで、切り替えるともう片方のスコープが `For` や行ごと破棄されます。
+- **イベントハンドラは状態に書き込むだけ**（`setDraft`、`updateTodos`）で、Observable は作りません。

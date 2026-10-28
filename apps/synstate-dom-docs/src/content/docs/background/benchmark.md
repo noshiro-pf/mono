@@ -5,7 +5,7 @@ description: synstate-dom against Solid, Preact + Signals, Preact, React and Van
 
 [`apps/synstate-dom-benchmark`](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-dom-benchmark) compares synstate-dom with Solid, Preact + Signals, Preact, React and VanJS on the operations of [js-framework-benchmark](https://github.com/krausest/js-framework-benchmark): creating, replacing, partially updating, selecting, swapping, removing, appending and clearing the rows of a table. It also compares them on three [scenarios](#scenarios) whose figures are derived from each other through a graph: two with diamonds of many lengths, and one in which most changes stop partway.
 
-The figures below are embedded from that app's [`RESULTS.md`](https://github.com/noshiro-pf/mono/blob/main/apps/synstate-dom-benchmark/RESULTS.md) and describe one machine. They compare the implementations with each other in this harness; they are not comparable with js-framework-benchmark's published tables.
+The figures below are embedded from that app's [`RESULTS.md`](https://github.com/noshiro-pf/mono/blob/main/apps/synstate-dom-benchmark/RESULTS.md) and come from a single machine. They are for comparing the implementations with each other in this harness, not with js-framework-benchmark's published tables.
 
 ## Results
 
@@ -37,7 +37,7 @@ Lower is better.
 
 ### Relative to synstate-dom
 
-Each library's time divided by synstate-dom's: below 1.00× is faster than synstate-dom, above it slower.
+Each library's time divided by synstate-dom's. Below 1.00× means faster than synstate-dom; above it means slower.
 
 <!-- benchmark:ratios -->
 
@@ -57,10 +57,10 @@ Each library's time divided by synstate-dom's: below 1.00× is faster than synst
 
 ## Reading the results
 
-In these runs, synstate-dom took between <!-- benchmark:reference-min -->0.97<!-- /benchmark -->× and <!-- benchmark:reference-max -->1.53<!-- /benchmark -->× Solid's time, depending on the operation. It is close to the fastest where only a few rows change (updating every 10th row, removing a row) and furthest behind where many rows are created; the table above shows where it is ahead of another library and where it is behind.
+In these runs, synstate-dom took between <!-- benchmark:reference-min -->0.97<!-- /benchmark -->× and <!-- benchmark:reference-max -->1.53<!-- /benchmark -->× Solid's time, depending on the operation. It is close to the fastest where only a few rows change (updating every 10th row, removing a row) and furthest behind where many rows are created; the table above shows, library by library, where it is ahead and where it falls behind.
 
-- **Creating rows** is where the absence of a compiler shows most. Solid clones a compiled `<template>` for each row; synstate-dom calls `createElement` for each node and binds each dynamic leaf with its own subscription. Each row also creates a synstate node for its item (and a second for its index, which this table does not take; see `For` in [Control flow](/mono/synstate-dom/guides/control-flow/#for)), and the time to create and dispose rows grows roughly with the number of nodes.
-- **Partial updates** take different paths. Solid, Preact + Signals and VanJS hold a signal per label and write to the 100 that change. synstate-dom replaces the whole array, as the documentation recommends; every row's `item$` compares its item with the previous one, and only the 100 rows whose item changed write to the DOM. Preact and React re-render the table from the new state, and only the `memo` rows whose props changed render again.
+- **Creating rows** is where having no compiler shows the most. Solid clones a compiled `<template>` for each row; synstate-dom calls `createElement` for each node and binds each dynamic leaf with its own subscription. Each row also creates a synstate node for its item (and a second for its index, which this table does not take; see `For` in [Control flow](/mono/synstate-dom/guides/control-flow/#for)), and the time to create and dispose rows grows roughly with the number of nodes.
+- **Partial updates** take a different path in each implementation. Solid, Preact + Signals and VanJS hold a signal per label and write to the 100 that change. synstate-dom replaces the whole array, as the documentation recommends; every row's `item$` compares its item with the previous one, and only the 100 rows whose item changed write to the DOM. Preact and React re-render the table from the new state, and only the `memo` rows whose props changed render again.
 - **Selecting a row** touches two rows in Solid, through `createSelector`, and re-renders two `memo` rows in Preact and React. In synstate-dom each row binds the selection with a `view`, so all 1,000 views run and each row's class is toggled; Preact + Signals likewise recomputes one `useComputed` per row.
 
 ## Scenarios
@@ -115,7 +115,7 @@ Each scenario also times building the screen, which builds the whole graph.
 
 - **Correctness comes first.** After each operation the harness compares the rendered cells with the figures a plain loop computes, and a library that rendered others is marked _wrong_ instead of timed. VanJS recomputes derived states in rounds, each rerunning the derivations that read a state the last round changed, and stops after 100 rounds; where a change has to travel further down the chain than that, it leaves stale figures on the screen. synstate-dom, Solid and Preact + Signals compute each figure once per change, after every figure it depends on.
 - **React and Preact have no graph.** They keep the inputs in one state and compute every figure in a loop when they render, so a change costs one pass over the whole calculation, whatever it reaches. At this size that pass is cheap, and they are compared here as the baseline a graph has to beat.
-- **Stopping at a figure that came out the same.** Solid and Preact + Signals do not pass a value on when it equals the last one. synstate-dom as written does: each figure is `combine` + `map`, which passes on every value it computes, so lengthening a task in the middle, or zooming within a level, recomputes everything downstream, though few figures change. It is measured a second time with a [`skipIfNoChange`](https://noshiro-pf.github.io/mono/synstate/reference/skip-if-no-change/) after every figure, which stops there, at the cost of a third node per figure and so a slower build.
+- **Stopping at a figure that came out the same.** Solid and Preact + Signals do not pass a value on when it equals the last one. synstate-dom as written does: each figure is `combine` + `map`, which passes on every value it computes, so lengthening a task in the middle, or zooming within a level, recomputes everything downstream, though few figures change. So synstate-dom is also measured a second time with a [`skipIfNoChange`](https://noshiro-pf.github.io/mono/synstate/reference/skip-if-no-change/) after every figure. That version does stop there, at the cost of a third node per figure and so a slower build.
 - **What a stop is worth depends on how a library notices a change.** A write in Solid and Preact + Signals first marks everything downstream as possibly stale, and the figures are then checked against their sources, so a change that stops at the level still visits all 10,000 labels. synstate visits only the children of a node that passed a value on, so with `skipIfNoChange` a change within a level costs the same whatever the size of the map below it. VanJS stops there too, because a state assigned the value it already has does not propagate. React and Preact keep the labels in a `useMemo` that depends on the level, and render the 51 rows again.
 
 A change here takes well under a millisecond. The scenarios therefore wait for the next task through a `MessageChannel` rather than a `setTimeout`, which the browser holds back to 4 ms, and one sample is the mean of 20 changes, alternating the operation and its reverse.

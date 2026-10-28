@@ -5,17 +5,17 @@ description: Set up the JSX transform and render a first component.
 
 ## Install
 
-synstate-dom is installed with synstate, which the application imports to make its state. It is a peer dependency, so the application and synstate-dom share one instance:
+Install synstate-dom together with synstate, which your application imports to create its state. synstate is a peer dependency, so your application and synstate-dom share one instance:
 
 ```sh
 npm install synstate-dom synstate
 ```
 
-The other peer dependency, ts-data-forge, is a dependency of synstate and comes with it. Add it yourself once the application imports it, for example for `Optional` in [Control flow](/mono/synstate-dom/guides/control-flow/).
+The other peer dependency, ts-data-forge, comes along as a dependency of synstate. Once your application imports it directly, for example for `Optional` in [Control flow](/mono/synstate-dom/guides/control-flow/), add it yourself.
 
 ## Configure the JSX transform
 
-Set the JSX transform to synstate-dom in `tsconfig.json`. Nothing else is needed: the transform is TypeScript's own, and any bundler that reads `jsxImportSource` (Vite, esbuild) follows it.
+Point the JSX transform at synstate-dom in `tsconfig.json`. That is all you need: the transform is TypeScript's own, so any bundler that reads `jsxImportSource` (Vite, esbuild) picks it up.
 
 ```jsonc
 {
@@ -55,6 +55,6 @@ const unmount = render(Counter, document.body);
 unmount();
 ```
 
-`render(App, container)` takes the component itself, not `<App />`, and calls it once inside a root scope. The function it returns unmounts the app: it disposes every subscription and derivation the app made and removes its nodes.
+`render(App, container)` takes the component itself, not `<App />`, and calls it once inside a root scope. It returns a function that unmounts the app: calling it disposes every subscription and derivation the app made and removes its nodes.
 
-Text in JSX is a `Bindable` too, which is why the label is `constant('+1')` rather than `+1`. [Bindable values](/mono/synstate-dom/guides/bindable/) explains why.
+Text in JSX is a `Bindable` too, so you write the label as `constant('+1')` rather than `+1`. [Bindable values](/mono/synstate-dom/guides/bindable/) explains the reason.

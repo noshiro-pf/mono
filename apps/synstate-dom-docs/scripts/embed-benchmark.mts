@@ -328,7 +328,7 @@ const render = (
   const environment =
     locale === 'en'
       ? (`Measured in \`${results.userAgent}\`. Each figure is the median of ${results.runs} runs, each measuring the libraries in a different order and each itself the median of its timed runs.` as const)
-      : (`計測環境は \`${results.userAgent}\`。各値は ${results.runs} 回の実行の中央値で、実行ごとにライブラリを計る順番を変え、各実行の値もその中で計った回の中央値である。` as const);
+      : (`計測環境は \`${results.userAgent}\` です。各値は ${results.runs} 回の実行の中央値です。実行ごとにライブラリを計る順番を変えていて、各実行の値もその中で計った回の中央値です。` as const);
 
   return {
     environment: { text: environment, block: true },

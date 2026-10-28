@@ -249,7 +249,7 @@ const render = (
   const environment =
     locale === 'en'
       ? (`Bundled by Vite ${bundleSize.viteVersion}. Versions: ${versions}.` as const)
-      : (`Vite ${bundleSize.viteVersion} でバンドルした。バージョンは ${versions}。` as const);
+      : (`Vite ${bundleSize.viteVersion} でバンドルしました。バージョンは ${versions} です。` as const);
 
   return {
     environment: { text: environment, block: true },
