@@ -3,7 +3,7 @@ title: Todo list
 description: A todo list with If, For, class objects and a derivation local to the view.
 ---
 
-The README's larger sample: an input, a list that appears once it has items, and a count of what is left.
+This is the larger sample from the README: an input, a list that appears once it has items, and a count of what is left.
 
 ```tsx
 import { createState, map } from 'synstate';
@@ -105,7 +105,7 @@ render(TodoApp, document.body);
 
 What to look at:
 
-- **`For` keeps one row per `todo.id`.** Toggling a todo writes a new array to `todos$`; the row's function is not called again, and only the `checked` property, the `done` class and the text of that row change.
+- **`For` keeps one row per `todo.id`.** When you toggle a todo, a new array is written to `todos$`, but the row's function is not called again: only that row's `checked` property, `done` class and text change.
 - **`remaining$` is created inside `TodoApp`**, since only this view reads it. It belongs to the root scope and is disposed on unmount. See [Lifecycle and scopes](/mono/synstate-dom/guides/lifecycle/#two-habits).
 - **The list and the "Nothing to do." paragraph are both descriptions** given to `If`. Only one is mounted at a time, and switching disposes the other's scope, `For` and its rows included.
-- **The event handlers write to states**: `setDraft`, `updateTodos`. They create no observables.
+- **The event handlers only write to states** (`setDraft`, `updateTodos`) and create no observables.

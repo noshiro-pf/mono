@@ -1,21 +1,21 @@
 ---
 title: Bindable
-description: constant、view と、データを受け取るスロットが受け付けるもの。
+description: constant と view、そしてデータを受け取るスロットに何を渡せるか。
 ---
 
-JSX でデータを受け取る場所（属性、DOM のプロパティ、テキストの子要素、ライブラリが提供するコンポーネントの props）は、すべて `Bindable<T>` を受け付ける。
+JSX でデータを受け取る場所（属性、DOM のプロパティ、テキストの子要素、ライブラリが提供するコンポーネントの props）は、どれも `Bindable<T>` を受け付けます。
 
-| `Bindable<T>` の種類       | 束縛したときの動作                                 |
-| :------------------------- | :------------------------------------------------- |
-| `InitializedObservable<T>` | 現在値を 1 回書き、以後は新しい値が来るたびに書く  |
-| `Constant<T>`              | 1 回だけ書く。購読しない                           |
-| `View<T>`                  | 元の Observable を購読し、値ごとに変換してから書く |
+| `Bindable<T>` の種類       | 束縛したときの動き                                  |
+| :------------------------- | :-------------------------------------------------- |
+| `InitializedObservable<T>` | 現在値を 1 回書き、その後は新しい値が来るたびに書く |
+| `Constant<T>`              | 1 回だけ書いて、購読はしない                        |
+| `View<T>`                  | 元の Observable を購読し、値ごとに変換してから書く  |
 
-完了済みの Observable（`just(...)` など）は、定数と同じく 1 回だけ書いて購読しない。
+完了済みの Observable（`just(...)` など）も、定数と同じく 1 回だけ書いて購読はしません。
 
 ## `constant`
 
-素の値は `Bindable` ではない。変わらない値は `constant(...)` で包み、変わらないことを明示する。
+素の値は `Bindable` ではありません。変わらない値は `constant(...)` で包んで、変わらないことをはっきり書きます。
 
 ```tsx
 import { createState } from 'synstate';
@@ -37,19 +37,19 @@ export const Plain = (): JSX.Element => <p>{'Hi'}</p>;
 export const Stale = (): JSX.Element => <p>{count$.getSnapshot().value}</p>;
 ```
 
-`constant` は引数をそのまま返す。`Constant<T>` は型の上にしかなく、実行時のコストはない。`constant('button')` はリテラル型 `Constant<'button'>` を保つ。
+`constant` は引数をそのまま返すだけです。`Constant<T>` は型の上にしか存在しないので、実行時のコストはかかりません。`constant('button')` と書けば、リテラル型 `Constant<'button'>` もそのまま保たれます。
 
-この規則は上の 2 つ目のエラーのためにある。`{count$.getSnapshot().value}` は状態を 1 回読み、二度と更新されない数値を書く。素の値を受け付けると、これがコンパイルを通り、最初の更新までは正しい数値を表示してしまう。ここではコンパイルが通らない。
+このルールがあるのは、上の 2 つ目のエラーを防ぐためです。`{count$.getSnapshot().value}` は状態を 1 回読むだけなので、二度と更新されない数値を書き込みます。素の値を受け付けてしまうと、これがコンパイルを通り、最初の更新までは正しい数値が表示されるので気づきにくくなります。synstate-dom ではこれがコンパイルエラーになります。
 
-データでないものは素の値を受け取る。イベントハンドラ、`ref`、`For` の `key` 関数、子要素を返す関数である。
+データでないものは素の値で渡します。イベントハンドラ、`ref`、`For` の `key` 関数、子要素を返す関数がそうです。
 
-- `null` と `undefined` は `constant` が拒否する。属性がないことは props の省略で表し、あったりなかったりする値は `InitializedObservable<T | undefined>` で表す。
-- `constant(obs$)` も型エラーになる。
-- `constant` が長ければ import 時に名前を変える。`import { constant as c } from 'synstate-dom'`。
+- `null` と `undefined` は `constant` に渡せません。属性がないことは props を省略して表し、あったりなかったりする値は `InitializedObservable<T | undefined>` で表します。
+- `constant(obs$)` も型エラーになります。
+- `constant` が長いと感じたら、import するときに名前を変えてください：`import { constant as c } from 'synstate-dom'`。
 
 ## `view`
 
-`view(source$, fn)` は Observable と軽い変換の組で、`Bindable` を置けるところならどこにでも渡せる。
+`view(source$, fn)` は、Observable と軽い変換をひとまとめにしたものです。`Bindable` を置ける場所ならどこにでも渡せます。
 
 ```tsx
 import { createState } from 'synstate';
@@ -74,21 +74,21 @@ export const Counter = (): JSX.Element => (
 );
 ```
 
-`view` は synstate のグラフにノードを作らない。束縛が `source$` を購読し、値ごとに `fn` を通してから書き込む。入力が 1 つなのでグリッチの起きようがなく、`count$.pipe(map(fn))` より短い。
+`view` は synstate のグラフにノードを作りません。束縛が `source$` を購読し、値が来るたびに `fn` を通してから書き込みます。入力が 1 つしかないのでグリッチが起きようがなく、`count$.pipe(map(fn))` と書くより短く済みます。
 
-`fn` は値が来るたびに、`view` を束縛した場所ごとに呼ばれる。同じ `view` を 2 か所に渡すと 2 回呼ばれ、結果は共有されない。重い変換や、複数の束縛先で使う値は `pipe(map(...))` でノードにする。
+`fn` は値が来るたびに、`view` を束縛した場所ごとに呼ばれます。同じ `view` を 2 か所に渡せば 2 回呼ばれ、結果は共有されません。重い変換や、複数の場所で使う値は `pipe(map(...))` でノードにしましょう。
 
 ## `Bindable` を受け取る側: `mapBindable`、`derive`、`toObservable`
 
-`label: Bindable<string>` を受け取ったコンポーネントは、`label` が定数かもしれないので `label.pipe(...)` と書けない。そのために 3 つの補助関数がある。
+`label: Bindable<string>` を受け取ったコンポーネントでは、`label` が定数かもしれないので `label.pipe(...)` とは書けません。そのために次の 3 つの補助関数を用意しています。
 
-| 関数                | 定数のとき                             | Observable のとき                      | `View` のとき                     |
-| :------------------ | :------------------------------------- | :------------------------------------- | :-------------------------------- |
-| `mapBindable(b, f)` | `f` を 1 回適用して定数を返す          | `b.pipe(map(f))`                       | 関数を合成した `View`。ノードなし |
-| `derive([a, b], f)` | すべて定数なら `f` を 1 回、定数を返す | 定数を `just` にして `combine` + `map` | Observable にしてから同じ         |
-| `toObservable(b)`   | `just(b)`                              | `b` そのもの                           | `source.pipe(map(fn))`            |
+| 関数                | 定数のとき                                   | Observable のとき                      | `View` のとき                           |
+| :------------------ | :------------------------------------------- | :------------------------------------- | :-------------------------------------- |
+| `mapBindable(b, f)` | `f` を 1 回適用して定数を返す                | `b.pipe(map(f))`                       | 関数を合成した `View`。ノードは作らない |
+| `derive([a, b], f)` | すべて定数なら `f` を 1 回適用して定数を返す | 定数を `just` にして `combine` + `map` | Observable にしてから同じ               |
+| `toObservable(b)`   | `just(b)`                                    | `b` そのもの                           | `source.pipe(map(fn))`                  |
 
-定数から派生したものは定数のままなので、ビューの静的な部分はグラフに入らない。
+定数から派生したものは定数のままなので、ビューの静的な部分がグラフに入ることはありません。
 
 ```tsx
 import { debounce, withInitialValue } from 'synstate';
@@ -136,4 +136,4 @@ export const SearchSummary = ({
 };
 ```
 
-`toObservable` は、operator を適用するなど Observable が本当に必要な場面に限る。定数を Observable にするとグラフに加わるが、`mapBindable` と `derive` ならそうならない。
+`toObservable` を使うのは、operator を適用したいときなど、本当に Observable が必要な場面だけにしてください。定数を Observable にするとグラフに加わってしまいますが、`mapBindable` と `derive` ならそうなりません。

@@ -3,7 +3,7 @@ title: Elements
 description: Attributes, properties, class, style, events, ref and SVG.
 ---
 
-The props of an intrinsic element are generated from `lib.dom.d.ts`, so the editor completes them and checks their types: each writable primitive DOM property of the element (`id`, `disabled`, `value`, `tabIndex`, …) as a `Bindable` of its type, `aria-*` and `data-*` as `Bindable<string>`, and one handler per event.
+The props of an intrinsic element are generated from `lib.dom.d.ts`, so your editor completes them and checks their types. Each writable primitive DOM property of the element (`id`, `disabled`, `value`, `tabIndex`, …) takes a `Bindable` of its type, `aria-*` and `data-*` take a `Bindable<string>`, and each event gets its own handler.
 
 ## Attributes and properties
 
@@ -45,7 +45,7 @@ export const SignUp = (): JSX.Element => (
 );
 ```
 
-- Most props are written with `setAttribute`. A few whose attribute and live value drift apart as the user interacts, such as `value`, `checked`, `selected` and `indeterminate`, are written as DOM properties instead (`element.value = v`).
+- Most props are written with `setAttribute`. A few, such as `value`, `checked`, `selected` and `indeterminate`, have an attribute that drifts apart from the live value as the user interacts; those are written as DOM properties instead (`element.value = v`).
 - A boolean attribute such as `disabled` takes a `Bindable<boolean>` and is removed while its value is `false`.
 
 ## `class` and `style`
@@ -76,8 +76,8 @@ export const Item = (): JSX.Element => (
 );
 ```
 
-- `class` is either one `Bindable<string>`, or an object with one `Bindable<boolean>` per class name, each toggled with `classList.toggle` on its own. Never both on one element: writing the whole class string would wipe the classes the object toggled.
-- `style` is either a `cssText` string, or an object with one `Bindable<string>` per CSS property. The keys are the hyphenated names (`'background-color'`, `'--accent'`), since each is written with `style.setProperty`.
+- `class` takes either one `Bindable<string>`, or an object with one `Bindable<boolean>` per class name, where each class is toggled on its own with `classList.toggle`. Do not use both on one element: writing the whole class string would wipe out the classes the object toggled.
+- `style` takes either a `cssText` string, or an object with one `Bindable<string>` per CSS property. Each property is written with `style.setProperty`, so the keys are the hyphenated names (`'background-color'`, `'--accent'`).
 
 ## Events and `ref`
 
@@ -116,7 +116,7 @@ export const Pad = (): JSX.Element => (
 );
 ```
 
-- A handler is named `on` followed by the event name in PascalCase: `onClick`, `onInput`, `onPointerDown`. `currentTarget` is narrowed to the element's type. A handler is a function, never an observable, and it is removed when the scope it was bound in is disposed.
+- A handler's name is `on` followed by the event name in PascalCase: `onClick`, `onInput`, `onPointerDown`. `currentTarget` is narrowed to the element's type. A handler is always a function, never an observable, and it is removed when the scope it was bound in is disposed.
 - `ref` is called once with the element, right after it is created and before anything is bound or its children are mounted.
 
 ## SVG
@@ -140,4 +140,4 @@ export const Dot = (): JSX.Element => (
 );
 ```
 
-The tags of `SVGElementTagNameMap` that HTML does not have are created in the SVG namespace. SVG properties cannot be read off `lib.dom.d.ts` the way HTML ones are (they are `SVGAnimatedLength` and the like), so SVG elements take a fixed list of attributes, each a `Bindable<number | string>`. `a`, `script`, `style` and `title` exist in HTML too and are always created as HTML elements.
+Tags from `SVGElementTagNameMap` that HTML does not have are created in the SVG namespace. Their props cannot be read off `lib.dom.d.ts` the way HTML ones are, because SVG properties are `SVGAnimatedLength` and the like. Instead, SVG elements take a fixed list of attributes, each a `Bindable<number | string>`. `a`, `script`, `style` and `title` exist in HTML too, so they are always created as HTML elements.

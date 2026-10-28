@@ -3,7 +3,7 @@ title: Control flow
 description: If, MatchOptional, MatchResult, For and Portal.
 ---
 
-A component runs once, so an `if` or an early `return` in its body is evaluated once and never again. What changes over time is chosen by components: `If`, `MatchOptional`, `MatchResult` and `For`. Each mounts what it shows in a [scope](/mono/synstate-dom/guides/lifecycle/) of its own and disposes that scope when it shows something else. None of them adds a wrapper element; each marks its place with a comment node.
+A component runs once, so an `if` or an early `return` in its body is evaluated once and never again. To choose something that changes over time, use a component: `If`, `MatchOptional`, `MatchResult` or `For`. Each mounts what it shows in a [scope](/mono/synstate-dom/guides/lifecycle/) of its own, and disposes that scope when it switches to something else. None of them adds a wrapper element; each marks its place with a comment node.
 
 ## `If`
 
@@ -24,9 +24,9 @@ export const App = (): JSX.Element => (
 );
 ```
 
-- `cond: Bindable<boolean>`, `then: JSX.Element`, `else?: JSX.Element`. Nothing is shown for an omitted `else`.
-- A JSX expression is a description, not DOM: writing both branches as props mounts only the one chosen.
-- The branch is rebuilt only when `cond` flips. Flipping disposes the previous branch's scope and removes its nodes. A constant `cond` mounts one branch once and subscribes to nothing.
+- `cond: Bindable<boolean>`, `then: JSX.Element`, `else?: JSX.Element`. If you omit `else`, nothing is shown on that side.
+- A JSX expression is a description, not DOM, so you can write both branches as props and only the chosen one mounts.
+- The branch is rebuilt only when `cond` flips, which disposes the previous branch's scope and removes its nodes. With a constant `cond`, `If` mounts one branch once and subscribes to nothing.
 
 ## `MatchOptional` and `MatchResult`
 
@@ -74,9 +74,9 @@ export const ParsedValue = (): JSX.Element => (
 );
 ```
 
-- `MatchOptional` takes a `Bindable<Optional<T>>`, `MatchResult` a `Bindable<Result<S, E>>`: the types of ts-data-forge.
-- The branch functions receive an observable of the value narrowed to `T` (or `S`, `E`). A branch is rebuilt only when the tag changes; while it stays the same, new values flow through that observable.
-- The observable is derived from `value`, not written to, so nothing is written while an update is propagating.
+- `MatchOptional` takes a `Bindable<Optional<T>>` and `MatchResult` a `Bindable<Result<S, E>>`, both types from ts-data-forge.
+- Each branch function receives an observable of the value narrowed to `T` (or `S`, `E`). The branch is rebuilt only when the tag changes; while the tag stays the same, new values just flow through that observable.
+- That observable is derived from `value` rather than written to, so nothing gets written while an update is still propagating.
 
 ## `For`
 
@@ -108,11 +108,11 @@ export const Table = (): JSX.Element => (
 );
 ```
 
-- `items: Bindable<readonly T[]>`, `key: (item: T, index: number) => unknown`, and as children a function `(item$, index$) => JSX.Element`. `index$` is made only when the function declares a second parameter, as in Solid; a row that does not need its position leaves it out, and each row then has one node less to create and to update.
+- `items: Bindable<readonly T[]>`, `key: (item: T, index: number) => unknown`, and as children a function `(item$, index$) => JSX.Element`. As in Solid, `index$` is created only when the function declares a second parameter. If a row does not need its position, leave the parameter out, and each row has one node fewer to create and update.
 - `key` is required, as in React. To match rows by position, say so with `key={(_, i) => i}`; there is no separate `Index` component.
-- The row function runs once per key. When the array changes, an existing row receives its new item and index through `item$` and `index$`, which are derived from `items`, and the row function is not called again. A new key gets a new row; a row whose key is gone has its scope disposed and its nodes removed.
-- Rows are reordered with as few moves as the longest increasing subsequence allows. An update that keeps every key in its place moves nothing, and one that keeps no key (clearing or replacing the whole list) removes the old rows' nodes at once.
-- A key that appears twice is reported with `console.error`, as React does. It does not break anything, but each duplicate is rebuilt on every update.
+- The row function runs once per key. When the array changes, an existing row receives its new item and index through `item$` and `index$` (both derived from `items`), and the row function is not called again. A new key gets a new row, and when a key goes away, its row's scope is disposed and its nodes removed.
+- `For` reorders rows with as few moves as the longest increasing subsequence allows. An update that keeps every key in place moves nothing, and one that keeps no key (clearing or replacing the whole list) removes the old rows' nodes in one go.
+- If a key appears twice, `For` reports it with `console.error`, as React does. Nothing breaks, but each duplicate is rebuilt on every update.
 
 ## `Portal`
 
@@ -141,9 +141,9 @@ export const Modal = (): JSX.Element => (
 );
 ```
 
-- Mounts its children into `target` (`document.body` when omitted) rather than where it is written, for a modal, a tooltip or a toast that has to escape an ancestor's `overflow: hidden` or `z-index`.
-- The children belong to the scope where `Portal` is written: closing the enclosing branch removes them too.
+- `Portal` mounts its children into `target` (`document.body` when omitted) instead of where you write it. Use it for a modal, a tooltip or a toast that has to escape an ancestor's `overflow: hidden` or `z-index`.
+- The children still belong to the scope where you wrote `Portal`, so closing the enclosing branch removes them too.
 
 ## Calling them as functions
 
-The control-flow components are plain functions that return a description, so `If({ cond, then: <A />, else: <B /> })` works the same as the JSX. There are no separate function forms such as `when(cond$, a, b)`: they are usually asked for to make the branches lazy, and a JSX expression already is.
+The control-flow components are plain functions that return a description, so writing `If({ cond, then: <A />, else: <B /> })` works the same as the JSX. There is no separate function form such as `when(cond$, a, b)`. People usually ask for one to make the branches lazy, and a JSX expression already is.

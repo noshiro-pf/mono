@@ -3,7 +3,7 @@ title: synstate-dom
 description: A compiler-free, fine-grained UI library that binds synstate observables directly to the DOM.
 template: splash
 hero:
-    tagline: Pass synstate observables straight to JSX. A component runs once; afterwards only the attributes, properties and text bound to an observable change. No compiler, no virtual DOM.
+    tagline: Pass synstate observables straight into JSX. Your component runs once, and after that only the attributes, properties and text you bound to an observable change. No compiler, no virtual DOM.
     actions:
         - text: Get Started
           link: /mono/synstate-dom/getting-started/introduction/
@@ -17,29 +17,30 @@ hero:
 import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
 
 <Aside type="caution">
-    synstate-dom is at version 0.x: its API may still change in a minor release.
+    synstate-dom is still at version 0.x, so its API may change in a minor
+    release.
 </Aside>
 
 ## Features
 
 <CardGrid>
     <Card title="Fine-grained, called once" icon="rocket">
-        A component function is called once, when it is mounted. An update
-        travels through the synstate graph and writes to the one DOM leaf bound
-        to it: an attribute, a property or a text node.
+        Your component function is called once, when it mounts. After that, an
+        update travels through the synstate graph and writes straight to the one
+        DOM leaf bound to it: an attribute, a property or a text node.
     </Card>
     <Card title="No compiler" icon="setting">
-        TypeScript's standard `"jsx": "react-jsx"` and `jsxImportSource` are all
-        it needs. There is no Babel or Vite plugin to configure.
+        All you need is TypeScript's standard `"jsx": "react-jsx"` and
+        `jsxImportSource`. There is no Babel or Vite plugin to configure.
     </Card>
     <Card title="Reactivity in the types" icon="approve-check">
-        A slot that takes data accepts an observable, a `constant(...)` or a
-        `view(...)`, never a plain value. Reading a snapshot by mistake is a
-        type error, not a view that silently stops updating.
+        Wherever JSX takes data, you pass an observable, a `constant(...)` or a
+        `view(...)`, never a plain value. So if you read a snapshot by mistake,
+        you get a type error instead of a view that silently stops updating.
     </Card>
     <Card title="No leaks by construction" icon="random">
-        `If`, `Match` and `For` mount what they show in a scope of their own.
-        Closing a branch or removing a row disposes every derivation and
-        subscription made inside it.
+        `If`, `Match` and `For` each mount what they show in a scope of their
+        own. Close a branch or remove a row, and every derivation and
+        subscription made inside it goes away with it.
     </Card>
 </CardGrid>
