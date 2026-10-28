@@ -17,7 +17,7 @@
 
 import { Arr } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import type { DeepReadonly, StrictPick } from 'ts-type-forge';
+import type { DeepReadonly, ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import type {
   DependencyGraph,
   DependencyGraphEdge,
@@ -46,6 +46,31 @@ export const COMPACT_TASK_NODE_SIZE = { width: 148, height: 32 } as const;
 
 export const COMPACT_MILESTONE_NODE_SIZE = { width: 140, height: 32 } as const;
 
+/**
+ * 「大」: up to three lines of title, and its due date under them. As high
+ * whatever the title, so that a title edited changes no layout, as at the
+ * other sizes.
+ */
+export const LARGE_TASK_NODE_SIZE = { width: 264, height: 96 } as const;
+
+/** Up to three lines of title, and its date under them. */
+export const LARGE_MILESTONE_NODE_SIZE = { width: 256, height: 96 } as const;
+
+/** Between the middles of the lines of a large node's title, of 13px text. */
+export const LARGE_NODE_LINE_HEIGHT = 17;
+
+const NODE_BOX_SIZES = {
+  standard: { task: TASK_NODE_SIZE, milestone: MILESTONE_NODE_SIZE },
+  compact: {
+    task: COMPACT_TASK_NODE_SIZE,
+    milestone: COMPACT_MILESTONE_NODE_SIZE,
+  },
+  large: { task: LARGE_TASK_NODE_SIZE, milestone: LARGE_MILESTONE_NODE_SIZE },
+} as const satisfies ReadonlyRecord<
+  NodeSize,
+  ReadonlyRecord<NodeRef['kind'], Size>
+>;
+
 export const dagDirections = ['right', 'down'] as const;
 
 export const DagDirectionCodec = t.enumType(dagDirections);
@@ -68,13 +93,7 @@ export const labelSize = (text: string): Size =>
 
 /** The box of a node of `kind` drawn at `nodeSize`. */
 export const nodeBoxSize = (kind: NodeRef['kind'], nodeSize: NodeSize): Size =>
-  nodeSize === 'compact'
-    ? kind === 'task'
-      ? COMPACT_TASK_NODE_SIZE
-      : COMPACT_MILESTONE_NODE_SIZE
-    : kind === 'task'
-      ? TASK_NODE_SIZE
-      : MILESTONE_NODE_SIZE;
+  NODE_BOX_SIZES[nodeSize][kind];
 
 /**
  * `nodes` where they are, each with the box of its kind at `nodeSize`: a

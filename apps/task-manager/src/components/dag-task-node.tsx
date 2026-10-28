@@ -1,6 +1,6 @@
 import type { InitializedObservable } from 'synstate';
-import { constant, If, view, type JSX } from 'synstate-dom';
-import type { TaskNodeView } from '../dag/index.mjs';
+import { constant, For, If, view, type JSX } from 'synstate-dom';
+import { LARGE_NODE_LINE_HEIGHT, type TaskNodeView } from '../dag/index.mjs';
 import { priorityLabels } from '../view-model/index.mjs';
 import type { DagNodeRecord } from './dag-canvas-scene.mjs';
 import { dagNodeHandlers } from './dag-node-handlers.mjs';
@@ -13,7 +13,8 @@ type Props = Readonly<{
 /**
  * A task: a rounded rectangle in the colour of its status, with its title and
  * due date — or, compact, its title alone, with the due date and priority in
- * its tooltip; the colour and the border say whether it can start either way.
+ * its tooltip; or, large, its title on up to three lines above the due date;
+ * the colour and the border say whether it can start at every size.
  * Its priority is drawn as the issue DAG of `pr-manager` draws one: a
  * pill across the top edge for any but 「中」, the default; a second outline
  * around 「最高」; and 「低」 and 「最低」 faint until pointed at.
@@ -28,7 +29,9 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
     () => record.getSnapshot().value.movable,
   );
 
-  const compact = view(record, (r) => r.compact);
+  const compact = view(record, (r) => r.size === 'compact');
+
+  const large = view(record, (r) => r.size === 'large');
 
   return (
     // An SVG has no <button>: the group takes its role, focus and keys.
@@ -38,7 +41,7 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
       class={view(
         record,
         (r) =>
-          `dag-node dag-task status-${r.view.status}${r.compact ? ' compact' : ''}${r.dragging ? ' dragging' : ''}${r.selected ? ' selected' : ''}`,
+          `dag-node dag-task status-${r.view.status}${r.size === 'standard' ? '' : ` ${r.size}`}${r.dragging ? ' dragging' : ''}${r.selected ? ' selected' : ''}`,
       )}
       data-e2e={constant('dag-node')}
       data-highlight={view(record, (r) => r.highlight)}
@@ -54,8 +57,8 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
       onKeyDown={onKeyDown}
     >
       <SvgTitle>
-        {view(record, ({ view: v, compact: isCompact }) =>
-          isCompact
+        {view(record, ({ view: v, size }) =>
+          size === 'compact'
             ? `${v.title}\n${v.due}・優先度 ${priorityLabels[v.priority]}`
             : v.title,
         )}
@@ -94,19 +97,46 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
           }
           else={
             <>
-              <text
-                class={constant('dag-node-title')}
-                x={constant(12)}
-                y={constant(22)}
-              >
-                {view(record, (r) => r.view.shortTitle)}
-              </text>
+              <If
+                cond={large}
+                then={
+                  <For
+                    items={view(record, (r) =>
+                      r.view.largeTitle.map((text, line) => ({
+                        text,
+                        y: largeLineY(r, line),
+                      })),
+                    )}
+                    key={(_, line) => line}
+                  >
+                    {(line$) => (
+                      <text
+                        class={constant('dag-node-title')}
+                        dominant-baseline={constant('central')}
+                        x={constant(12)}
+                        y={view(line$, ({ y }) => y)}
+                      >
+                        {view(line$, ({ text }) => text)}
+                      </text>
+                    )}
+                  </For>
+                }
+                else={
+                  <text
+                    class={constant('dag-node-title')}
+                    x={constant(12)}
+                    y={constant(22)}
+                  >
+                    {view(record, (r) => r.view.shortTitle)}
+                  </text>
+                }
+              />
               <text
                 class={view(record, (r) =>
                   r.view.overdue ? 'dag-node-meta overdue' : 'dag-node-meta',
                 )}
                 x={constant(12)}
-                y={constant(42)}
+                y={view(record, metaY)}
               >
                 {view(record, (r) => r.view.due)}
               </text>
@@ -119,11 +149,16 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
             <text
               class={constant('dag-node-warning')}
               dominant-baseline={view(record, (r) =>
-                r.compact ? 'central' : undefined,
+                r.size === 'compact' ? 'central' : undefined,
               )}
               text-anchor={constant('end')}
-              x={view(record, (r) => r.node.width - (r.compact ? 8 : 10))}
-              y={view(record, (r) => (r.compact ? r.node.height / 2 : 42))}
+              x={view(
+                record,
+                (r) => r.node.width - (r.size === 'compact' ? 8 : 10),
+              )}
+              y={view(record, (r) =>
+                r.size === 'compact' ? r.node.height / 2 : metaY(r),
+              )}
             >
               {constant('⚠')}
             </text>
@@ -162,7 +197,29 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
 };
 
 /** The corners: rounder on a standard node. */
-const cornerOf = (record: DagNodeRecord): number => (record.compact ? 6 : 8);
+const cornerOf = (record: DagNodeRecord): number =>
+  record.size === 'compact' ? 6 : 8;
+
+/** The baseline of the due date: {@link META_INSET} above the bottom. */
+const metaY = (record: DagNodeRecord): number =>
+  record.node.height - META_INSET;
+
+/**
+ * The middle of line `line` of a large node's title: its lines together in
+ * the middle of what the due date leaves above it.
+ */
+const largeLineY = (
+  record: DagNodeRecord<TaskNodeView>,
+  line: number,
+): number =>
+  (record.node.height - META_ROOM) / 2 +
+  (line - (record.view.largeTitle.length - 1) / 2) * LARGE_NODE_LINE_HEIGHT;
+
+/** As on a standard node, whose due date sits 42 down a 56 high box. */
+const META_INSET = 14;
+
+/** The due date's line at the bottom of a node, and the space above it. */
+const META_ROOM = 20;
 
 /** Between a 「最高」 task's shape and its second outline. */
 const RING_GAP = 4;

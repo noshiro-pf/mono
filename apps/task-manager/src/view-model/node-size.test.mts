@@ -40,7 +40,7 @@ describe('the labels of the sizes', () => {
   test('label every size', () => {
     assert.deepStrictEqual(
       nodeSizes.map((size) => nodeSizeLabels[size]),
-      ['標準', 'コンパクト'],
+      ['コンパクト', '標準', '大'],
     );
   });
 });
@@ -49,4 +49,6 @@ test('the stored setting keeps its key and its JSON', () => {
   assert.strictEqual(nodeSizeStorage.key, 'task-manager-app:node-size');
 
   assert.strictEqual(nodeSizeStorage.serialize('compact'), '"compact"');
+
+  assert.strictEqual(nodeSizeStorage.serialize('large'), '"large"');
 });
