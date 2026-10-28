@@ -7,11 +7,17 @@ import * as ts from 'typescript';
 
 /**
  * import文のrootからのパスを求める
+ *
+ * `readCompilerOptions` は tsconfig の compilerOptions を返す関数で、既定では
+ * カレントディレクトリの tsconfig.json を読む。テストが `typescript` を
+ * モジュールごと差し替えずにすむよう引数にしている。
  */
 export const resolveImportPath = (
   importPath: string,
   relativeFilePath: string | undefined,
   pathIndexMap: ReadonlyRecord<string, number>,
+  readCompilerOptions: () => ts.CompilerOptions | undefined = () =>
+    readTsConfig(process.cwd()),
 ): string => {
   // Maps importAlias to OriginalPath
   const mut_importAliasMap: MutableRecord<string, string> = {};
@@ -20,7 +26,7 @@ export const resolveImportPath = (
 
   // Load tsconfig option
   try {
-    const tsconfigOptions = readTsConfig(process.cwd());
+    const tsconfigOptions = readCompilerOptions();
 
     // If tsconfig file found
     if (tsconfigOptions?.paths !== undefined) {

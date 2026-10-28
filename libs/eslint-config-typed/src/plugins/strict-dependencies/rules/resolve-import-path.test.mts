@@ -1,41 +1,9 @@
 import type { ReadonlyRecord } from 'ts-type-forge';
-import * as ts from 'typescript';
+import type * as ts from 'typescript';
 import { resolveImportPath } from './resolve-import-path.mjs';
 
 // FIXME: https://github.com/knowledge-work/eslint-plugin-strict-dependencies/tree/v1.3.27 のテストをコピーしてきて
 // Codex でテスト・型チェックが通るようにさせただけなので、意味の無いテストになっていないかチェックして修正する
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-type TypeScriptModule = typeof import('typescript');
-
-const mut_actualFunctions = vi.hoisted<{
-  findConfigFile?: TypeScriptModule['findConfigFile'];
-  getParsedCommandLineOfConfigFile?: TypeScriptModule['getParsedCommandLineOfConfigFile'];
-}>(() => ({
-  findConfigFile: undefined,
-  getParsedCommandLineOfConfigFile: undefined,
-}));
-
-vi.mock(import('typescript'), async () => {
-  const actual = await vi.importActual<TypeScriptModule>('typescript');
-
-  mut_actualFunctions.findConfigFile = actual.findConfigFile;
-
-  mut_actualFunctions.getParsedCommandLineOfConfigFile =
-    actual.getParsedCommandLineOfConfigFile;
-
-  return {
-    ...actual,
-    findConfigFile: vi.fn(actual.findConfigFile),
-    getParsedCommandLineOfConfigFile: vi.fn(
-      actual.getParsedCommandLineOfConfigFile,
-    ),
-  };
-});
-
-const mockFindConfigFile = vi.mocked(ts.findConfigFile);
-
-const mockGetParsedCommandLine = vi.mocked(ts.getParsedCommandLineOfConfigFile);
 
 const compilerOptionsByFixture = {
   'no-paths': {},
@@ -97,38 +65,16 @@ const compilerOptionsByFixture = {
 
 type FixtureName = keyof typeof compilerOptionsByFixture;
 
-const restoreActual = (): void => {
-  if (
-    mut_actualFunctions.findConfigFile === undefined ||
-    mut_actualFunctions.getParsedCommandLineOfConfigFile === undefined
-  ) {
-    return;
-  }
-
-  mockFindConfigFile.mockImplementation(mut_actualFunctions.findConfigFile);
-
-  mockGetParsedCommandLine.mockImplementation(
-    mut_actualFunctions.getParsedCommandLineOfConfigFile,
-  );
-};
-
-const useFixture = (fixtureName: FixtureName | undefined): void => {
-  restoreActual();
-
-  if (fixtureName === undefined) {
-    return;
-  }
-
-  const compilerOptions = compilerOptionsByFixture[fixtureName];
-
-  mockFindConfigFile.mockReturnValue('tsconfig.json');
-
-  mockGetParsedCommandLine.mockReturnValue({
-    options: { ...compilerOptions },
-    fileNames: [],
-    errors: [],
-  });
-};
+/**
+ * Reads the compiler options of `fixtureName` in place of a tsconfig.json, or
+ * finds none for `undefined`.
+ */
+const readFixture =
+  (fixtureName: FixtureName | undefined) =>
+  (): ts.CompilerOptions | undefined =>
+    fixtureName === undefined
+      ? undefined
+      : ({ ...compilerOptionsByFixture[fixtureName] } as const);
 
 const aliasCases = [
   {
@@ -196,86 +142,102 @@ describe(resolveImportPath, () => {
   });
 
   test('should do nothing if tsconfig.json does not exist', () => {
-    useFixture(undefined);
-
-    expect(resolveImportPath('components/aaa/bbb', undefined, {})).toBe(
-      'components/aaa/bbb',
-    );
+    expect(
+      resolveImportPath(
+        'components/aaa/bbb',
+        undefined,
+        {},
+        readFixture(undefined),
+      ),
+    ).toBe('components/aaa/bbb');
   });
 
   test('should do nothing if no paths setting', () => {
-    useFixture('no-paths');
-
-    expect(resolveImportPath('components/aaa/bbb', undefined, {})).toBe(
-      'components/aaa/bbb',
-    );
-
-    useFixture(undefined);
+    expect(
+      resolveImportPath(
+        'components/aaa/bbb',
+        undefined,
+        {},
+        readFixture('no-paths'),
+      ),
+    ).toBe('components/aaa/bbb');
   });
 
   test.each(aliasCases)(
     'alias $label',
     ({ importPath, expected }: Readonly<(typeof aliasCases)[number]>) => {
-      useFixture('paths-basic');
+      const readCompilerOptions = readFixture('paths-basic');
 
-      expect(resolveImportPath('components/aaa/bbb', undefined, {})).toBe(
-        'components/aaa/bbb',
-      );
+      expect(
+        resolveImportPath(
+          'components/aaa/bbb',
+          undefined,
+          {},
+          readCompilerOptions,
+        ),
+      ).toBe('components/aaa/bbb');
 
-      expect(resolveImportPath(importPath, undefined, {})).toBe(expected);
-
-      useFixture(undefined);
+      expect(
+        resolveImportPath(importPath, undefined, {}, readCompilerOptions),
+      ).toBe(expected);
     },
   );
 
   test.each(baseUrlCases)(
     'baseUrl $fixtureName',
     ({ fixtureName, expected }: Readonly<(typeof baseUrlCases)[number]>) => {
-      useFixture(fixtureName);
+      const readCompilerOptions = readFixture(fixtureName);
 
-      expect(resolveImportPath('components/aaa/bbb', undefined, {})).toBe(
-        'components/aaa/bbb',
-      );
+      expect(
+        resolveImportPath(
+          'components/aaa/bbb',
+          undefined,
+          {},
+          readCompilerOptions,
+        ),
+      ).toBe('components/aaa/bbb');
 
-      expect(resolveImportPath('@/components/aaa/bbb', undefined, {})).toBe(
-        expected,
-      );
-
-      useFixture(undefined);
+      expect(
+        resolveImportPath(
+          '@/components/aaa/bbb',
+          undefined,
+          {},
+          readCompilerOptions,
+        ),
+      ).toBe(expected);
     },
   );
 
   test('should resolve path alias with specified index in pathIndexMap', () => {
-    useFixture('paths-multiple');
-
     expect(
-      resolveImportPath('@/components/aaa/bbb', undefined, {
-        '@/components/*': 1,
-      }),
+      resolveImportPath(
+        '@/components/aaa/bbb',
+        undefined,
+        { '@/components/*': 1 },
+        readFixture('paths-multiple'),
+      ),
     ).toBe('src/alternativeComponents/aaa/bbb');
-
-    useFixture(undefined);
   });
 
   test('should resolve path alias with default index when specified index does not exist', () => {
-    useFixture('paths-multiple');
-
     expect(
-      resolveImportPath('@/components/aaa/bbb', undefined, {
-        '@/components/*': 5,
-      }),
+      resolveImportPath(
+        '@/components/aaa/bbb',
+        undefined,
+        { '@/components/*': 5 },
+        readFixture('paths-multiple'),
+      ),
     ).toBe('src/components/aaa/bbb');
-
-    useFixture(undefined);
   });
 
   test('should resolve path alias with default index when pathIndexMap is empty', () => {
-    useFixture('paths-multiple');
-
-    expect(resolveImportPath('@/components/aaa/bbb', undefined, {})).toBe(
-      'src/components/aaa/bbb',
-    );
-
-    useFixture(undefined);
+    expect(
+      resolveImportPath(
+        '@/components/aaa/bbb',
+        undefined,
+        {},
+        readFixture('paths-multiple'),
+      ),
+    ).toBe('src/components/aaa/bbb');
   });
 });
