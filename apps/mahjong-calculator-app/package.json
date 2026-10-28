@@ -14,6 +14,8 @@
     "build": "vite build --config ./configs/vite.config.mts",
     "check:e2e": "playwright test --config ./configs/playwright.config.mts",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
+    "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && vitest --config ./configs/vitest.config.mts run",
+    "check:test:cov": "node ../../tools/scripts/cmd/assert-deps-built.mts && vitest --config ./configs/vitest.config.mts run --coverage",
     "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "dev": "vite --config ./configs/vite.config.mts",
     "fix:fmt": "pnpm run z:format-uncommitted --cwd .",
@@ -25,6 +27,8 @@
     "gen:index": "run-s gen:index:src fix:fmt",
     "gen:index:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --min-depth 1 --exclude 'assets/**'",
     "preview": "vite preview --config ./configs/vite.config.mts",
+    "test": "pnpm run check:test",
+    "watch:test": "vitest --config ./configs/vitest.config.mts watch",
     "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
     "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
     "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts",
@@ -42,6 +46,7 @@
   },
   "devDependencies": {
     "@playwright/test": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
@@ -54,6 +59,7 @@
     "prettier-plugin-packagejson": "catalog:",
     "ts-type-forge": "workspace:*",
     "tsx": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "catalog:"
   }
 }
