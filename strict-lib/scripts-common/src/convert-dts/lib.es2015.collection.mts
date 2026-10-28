@@ -6,10 +6,10 @@ import {
   replaceWithNoMatchCheck,
   replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import type { ConverterOptions } from './common.mjs';
+import { widenedLookupParam, type ConverterOptions } from './common.mjs';
 
 export const convertLibEs2015Collection =
-  ({ brandedNumber }: ConverterOptions): MonoTypeFunction<string> =>
+  ({ brandedNumber, tsLibShape }: ConverterOptions): MonoTypeFunction<string> =>
   (src) => {
     // TS 5.2 introduced `WeakKey`; 5.0 and 5.1 constrain the weak collections
     // to `object`.
@@ -20,12 +20,12 @@ export const convertLibEs2015Collection =
         replaceWithNoMatchCheck(
           // change Set.has() and Map.has() to accept widen literal types
           'has(key: K): boolean;',
-          'has(key: K | (WidenLiteral<K> & {})): boolean;',
+          `has(key: ${widenedLookupParam('K', tsLibShape)}): boolean;`,
         ),
 
         replaceWithNoMatchCheck(
           'has(value: T): boolean;',
-          'has(value: T | (WidenLiteral<T> & {})): boolean;',
+          `has(value: ${widenedLookupParam('T', tsLibShape)}): boolean;`,
         ),
 
         replaceWithNoMatchCheck(

@@ -14,7 +14,18 @@
  
  interface ReadonlySetLike<T> {
    /**
-@@ -34,19 +41,19 @@ interface Set<T> {
+@@ -23,7 +30,9 @@ interface ReadonlySetLike<T> {
+   /**
+    * @returns a boolean indicating whether an element with the specified value exists in the set-like or not.
+    */
+-  has(value: T): boolean;
++  has(
++    value: NoInfer<T | (import('ts-type-forge').WidenLiteral<T> & {})>,
++  ): boolean;
+   /**
+    * @returns the number of (unique) elements in the set-like.
+    */
+@@ -34,19 +43,19 @@ interface Set<T> {
    /**
     * @returns a new Set containing all the elements in this Set and also all the elements in the argument.
     */
@@ -38,7 +49,7 @@
    /**
     * @returns a boolean indicating whether all the elements in this Set are also in the argument.
     */
-@@ -65,19 +72,19 @@ interface ReadonlySet<T> {
+@@ -65,19 +74,19 @@ interface ReadonlySet<T> {
    /**
     * @returns a new Set containing all the elements in this Set and also all the elements in the argument.
     */

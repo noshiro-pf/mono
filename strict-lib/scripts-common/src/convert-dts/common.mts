@@ -28,6 +28,12 @@ export type TsLibShape = Readonly<{
    * return types. Emit the appropriate name in the replacement string.
    */
   hasArrayIterator: boolean;
+
+  /**
+   * TS 5.4 introduced the intrinsic `NoInfer<T>`. Earlier versions do not
+   * resolve the name, so a replacement that uses it must leave it out there.
+   */
+  hasNoInfer: boolean;
 }>;
 
 export type ConverterOptions = Readonly<{
@@ -54,7 +60,32 @@ export const tsLibShapeFor = (tsVersion: string): TsLibShape => {
   return {
     hasTypedArrayGeneric: atLeast(5, 7),
     hasArrayIterator: atLeast(5, 6),
+    hasNoInfer: atLeast(5, 4),
   };
+};
+
+/**
+ * The parameter type of a collection's `has`, which accepts the widened
+ * literal type so that a set of a literal union can be queried with a
+ * `string`:
+ *
+ * - TS >= 5.4: `NoInfer<T | (WidenLiteral<T> & {})>`
+ * - TS < 5.4: `T | (WidenLiteral<T> & {})`
+ *
+ * `NoInfer` keeps the widened type out of inference. A method parameter is
+ * bivariant, so wherever `T` is inferred structurally through `has` — from a
+ * `ReadonlySet<'a'>` into `union<U>(other: ReadonlySetLike<U>)`, from a
+ * `ReadonlySet<'a'>` context into `new Set(...)`'s `Set<T>`, from a `Set<'a'>`
+ * argument into a `ReadonlySet<T>` parameter — the widened parameter is a
+ * covariant candidate and widens `T` to `string`. Before TS 5.4 it still does.
+ */
+export const widenedLookupParam = (
+  typeParam: string,
+  tsLibShape: TsLibShape,
+): string => {
+  const widened = `${typeParam} | (WidenLiteral<${typeParam}> & {})`;
+
+  return tsLibShape.hasNoInfer ? `NoInfer<${widened}>` : widened;
 };
 
 /**

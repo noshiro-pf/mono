@@ -2842,7 +2842,8 @@ Response: infer T } ? T : typeof undici.Response` と宣言していて、DOM �
 同じ opt-in で `new Set(['task:a'])` が `ReadonlySet<GraphNodeId>` を満たさなくなる
 件も出た。strict lib の `ReadonlySet#has` は、リテラル union の Set でも広い型で
 引けるよう `T | (WidenLiteral<T> & {})` を取る（意図した宣言）。このせいで文脈型から
-`T` を推論しなくなり、`Set<string>` になる。stock lib では `new Set()` が
+`T` を推論しなくなり、`Set<string>` になる（TS 5.4 以降の bundle では #2585 で
+直った）。stock lib では `new Set()` が
 `Set<any>` になって何も落ちないので、**どちらの lib でも同じ型になる型引数を
 書く**のを正とし、`ts-restrictions/explicit-collection-type-arguments` で求める
 （引数なし、または配列リテラルのときだけ。式を渡すなら要素型はそこから決まる）。
@@ -2904,14 +2905,11 @@ catch した値）に置き換えた。
 
 ### strict lib 側が直ったら戻す箇所（追加）
 
-| issue | 原因                                                                                 | 箇所                                                                                                   | 入れたもの             |
-| :---- | :----------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------- | :--------------------- |
-| #2585 | `union` / `symmetricDifference` の `U` が `has` の広い引数から `string` に推論される | `languages/sumi/checker/src/rules/no-refinement-overload.mts`、`apps/task-manager/src/store/store.mts` | `union<T>(…)` の型引数 |
+ここに載っていた 2 件はどちらも直したので、残る回避は無い。#2585（`union` /
+`symmetricDifference` の `U` が `has` の広い引数から `string` に推論される）は
+「#2585 を直した」の節で直し、回避を戻した。
 
-単体で再現する（`ReadonlySet<'a' | 'b'>` 同士の `union` が `ReadonlySet<string>`
-になる）。
-
-もう 1 件の #2586（`ToObjectEntries` の mapped type に `-?` が無く、省略可能なキー
+#2586（`ToObjectEntries` の mapped type に `-?` が無く、省略可能なキー
 のエントリそのものが `undefined` を含んだため、`{ a?: number }` を
 `for (const [k, v] of Object.entries(r))` で分割代入できなかった）は converter で
 直した。回帰は `lib-check-entry.ts` が見る。`sumi-rules.test.mts` の型引数は
@@ -2927,3 +2925,80 @@ catch した値）に置き換えた。
 書いていること、`false` なら直前の行か同じ行にコメントで理由があることを確かめる。
 `tsconfig.json` を持たないメンバー（strict lib の bundle とハーネス）は対象外。
 今回の 30 件は、未宣言でも何も落ちないために溜まった。
+
+## #2585 を直した（2026-10-28）
+
+`ReadonlySet<'a' | 'b'>` 同士の `union` ・ `symmetricDifference` が
+`ReadonlySet<string>` になっていた（`Set#union` も同じ）。調べると、同じ根から
+ほかに 2 つの症状が出ていた。
+
+| 症状                                                                            | 推論の向き                                  |
+| :------------------------------------------------------------------------------ | :------------------------------------------ |
+| `x.union(y)` が `ReadonlySet<string>`                                           | `ReadonlySet<C>` → `ReadonlySetLike<U>`     |
+| `const s: ReadonlySet<C> = new Set(['a'])` が `Set<string>`（#2577 の件）       | 文脈型 `ReadonlySet<C>` → 戻り値の `Set<T>` |
+| `elementOf<T>(s: ReadonlySet<T>)` に `Set<C>` を渡すと `T = string`（`Map` も） | `Set<C>` → `ReadonlySet<T>`                 |
+
+### 原因
+
+strict lib の `has` は `T | (WidenLiteral<T> & {})` を取る。違う interface 同士
+（`Set` と `ReadonlySet` も別の interface）の推論はメンバーを構造的に比べるので、
+推論先の `has(value: T)` にこの広い引数が当たる。**メソッドの引数は bivariant
+なので、ここからの推論は反変ではなく共変の候補になり**、`keys()` などからの
+`'a' | 'b'` と合わさって `T` が広がる。`has` をプロパティ
+（`readonly has: (value: T) => boolean`）で書くと起きないことで確かめた。
+同じ interface 同士（`ReadonlySet<C>` → `ReadonlySet<T>`）は型引数から直接
+推論するので、もともと起きない。
+
+### 直し方
+
+`has` の引数を `NoInfer<T | (WidenLiteral<T> & {})>` にした（`common.mts` の
+`widenedLookupParam`）。`NoInfer` は TS 5.4 の intrinsic なので、5.0–5.3 では
+これまでどおり `NoInfer` なしのまま（`TsLibShape.hasNoInfer`）。
+
+- **`NoInfer` は推論先の側でだけ効く**。`Set#has` と `Map#has` には文脈型からの
+  `new Set` ・ `new Map` のため、`ReadonlySet#has` と `ReadonlyMap#has` には
+  引数で渡されたときのために要る（片方だけでは半分ずつしか直らないことを確かめた）。
+  `WeakSet` ・ `WeakMap` も同じ置換の対象だが、`WidenLiteral<object>` は
+  `object` のままなので違いはない
+- 代入可能性は変わらない。広く引けることもそのまま
+- **`ReadonlySetLike#has` も広げた**（`lib.es2025.collection.mts`。TS 5.5–5.9 では
+  `lib.esnext.collection.d.ts`、6.0 以降は `lib.es2025.collection.d.ts` にある）。
+  `ReadonlySetLike` は TS 5.5 で入ったもので、`has` を広げる規則
+  （`lib.es2015.collection.d.ts` だけが対象）より後にできた。意図して外したの
+  ではなく、変換器がこのファイルを持っていなかった。仕様上も `intersection` ・
+  `difference` ・ `isSubsetOf` ・ `isDisjointFrom` は受け手の要素で `other.has(e)`
+  を呼ぶので、`other` の要素でない値が渡るのが普通。広げるだけでは #2585 は
+  直らない（共変の候補が `C | (string & {})` になるだけ）
+- 実装側は困らない。`implements ReadonlySetLike<C>` が `has(value: C)` と書いても、
+  メソッドは bivariant なので通る
+- lib からは直せないものが残る。自分で書いた構造的な型
+  （`f<T>(s: { has(v: T): boolean })`）に `ReadonlySet<C>` を渡すと、推論先が
+  その型なのでやはり広がる
+
+`ts-restrictions/explicit-collection-type-arguments`（#2577）は残す。
+引数なしの `new Set()` は stock lib で `Set<any>`、strict lib で `Set<never>` と
+食い違ったままだから。配列リテラルについては、5.4 以降の strict lib でも
+文脈型から推論されるようになったので、strict lib 側の理由はなくなった。
+書き込み済みの型引数はそのままで害はない。
+
+### アサーション
+
+- `lib-check-entry.ts`（12 版すべて）: `union` と `symmetricDifference`。
+  TS 5.0–5.4 には Set のメソッドが無いので、`WithSetMethods` が代わりのメソッドを
+  足し、そこでは素通りになる。条件型で返り値を取り出す形にしなかったのは、
+  generic なメソッドから条件型で推論すると型引数が `unknown` に消え、宣言が
+  正しくても誤っていても同じ結果になるから
+- `lib-check-entry.since-5.4.ts`（v5.4 以降のハーネスだけが `files` に挙げる）:
+  文脈型からの `new Set` ・ `new Map` と、`Set` ・ `Map` を `ReadonlySet<T>` ・
+  `ReadonlyMap<K, V>` の引数に渡す場合。5.0–5.3 では成り立たないので分けた
+
+古い出力に戻すと、どのアサーションも落ちることを確かめた。
+
+### 戻したもの
+
+`union<T>(…)` の型引数とその理由のコメントを外した。
+
+| 箇所                                                          |  数 |
+| :------------------------------------------------------------ | --: |
+| `languages/sumi/checker/src/rules/no-refinement-overload.mts` |   3 |
+| `apps/task-manager/src/store/store.mts`                       |   1 |

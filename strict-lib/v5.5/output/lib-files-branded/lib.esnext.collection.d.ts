@@ -42,7 +42,9 @@ interface ReadonlySetLike<T> {
   /**
    * @returns a boolean indicating whether an element with the specified value exists in the set-like or not.
    */
-  has(value: T): boolean;
+  has(
+    value: NoInfer<T | (import('ts-type-forge').WidenLiteral<T> & {})>,
+  ): boolean;
   /**
    * @returns the number of (unique) elements in the set-like.
    */

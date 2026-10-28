@@ -1,0 +1,70 @@
+diff --git a/v5.3/output/lib-files-branded/lib.es2015.collection.d.ts b/v5.4/output/lib-files-branded/lib.es2015.collection.d.ts
+index d86858975169c5ce0027e801557de95c3745c69a..752abe88ce08dc4b28cb64cc9e6447640eb0684d 100644
+--- a/v5.3/output/lib-files-branded/lib.es2015.collection.d.ts
++++ b/v5.4/output/lib-files-branded/lib.es2015.collection.d.ts
+@@ -43,7 +43,9 @@ interface Map<K, V> {
+   /**
+    * @returns boolean indicating whether an element with the specified key exists or not.
+    */
+-  has(key: K | (import('ts-type-forge').WidenLiteral<K> & {})): boolean;
++  has(
++    key: NoInfer<K | (import('ts-type-forge').WidenLiteral<K> & {})>,
++  ): boolean;
+   /**
+    * Adds a new element with a specified key and value to the Map. If an element with the same key already exists, the element will be updated.
+    */
+@@ -67,7 +69,9 @@ interface ReadonlyMap<K, V> {
+     thisArg?: unknown,
+   ): void;
+   get(key: K): V | undefined;
+-  has(key: K | (import('ts-type-forge').WidenLiteral<K> & {})): boolean;
++  has(
++    key: NoInfer<K | (import('ts-type-forge').WidenLiteral<K> & {})>,
++  ): boolean;
+   readonly size: NumberType.ArraySize;
+ }
+ 
+@@ -84,7 +88,9 @@ interface WeakMap<K extends WeakKey, V> {
+   /**
+    * @returns a boolean indicating whether an element with the specified key exists or not.
+    */
+-  has(key: K | (import('ts-type-forge').WidenLiteral<K> & {})): boolean;
++  has(
++    key: NoInfer<K | (import('ts-type-forge').WidenLiteral<K> & {})>,
++  ): boolean;
+   /**
+    * Adds a new element with a specified key and value.
+    * @param key Must be an object or symbol.
+@@ -123,7 +129,9 @@ interface Set<T> {
+   /**
+    * @returns a boolean indicating whether an element with the specified value exists in the Set or not.
+    */
+-  has(value: T | (import('ts-type-forge').WidenLiteral<T> & {})): boolean;
++  has(
++    value: NoInfer<T | (import('ts-type-forge').WidenLiteral<T> & {})>,
++  ): boolean;
+   /**
+    * @returns the number of (unique) elements in Set.
+    */
+@@ -142,7 +150,9 @@ interface ReadonlySet<T> {
+     callbackfn: (value: T, value2: T, set: ReadonlySet<T>) => void,
+     thisArg?: unknown,
+   ): void;
+-  has(value: T | (import('ts-type-forge').WidenLiteral<T> & {})): boolean;
++  has(
++    value: NoInfer<T | (import('ts-type-forge').WidenLiteral<T> & {})>,
++  ): boolean;
+   readonly size: NumberType.ArraySize;
+ }
+ 
+@@ -159,7 +169,9 @@ interface WeakSet<T extends WeakKey> {
+   /**
+    * @returns a boolean indicating whether a value exists in the WeakSet or not.
+    */
+-  has(value: T | (import('ts-type-forge').WidenLiteral<T> & {})): boolean;
++  has(
++    value: NoInfer<T | (import('ts-type-forge').WidenLiteral<T> & {})>,
++  ): boolean;
+ }
+ 
+ interface WeakSetConstructor {

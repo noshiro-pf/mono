@@ -42,9 +42,12 @@ const collectionAnnotations = new Map<string, ReadonlySet<string>>([
  *
  * - The stock library declares `new <T = any>(values?: …)`, so
  *   `const s = new Set()` is a `Set<any>`, and nothing reports it.
- * - The strict standard library declares `ReadonlySet#has` to take
- *   `T | (WidenLiteral<T> & {})`, which widens what is inferred from a
- *   contextual `ReadonlySet<'a' | 'b'>` back to `string`, so
+ * - The strict standard library defaults the type arguments of a bare
+ *   `new Set()` / `new Map()` to `never`, so every later `add` / `set` is
+ *   an error there.
+ *   Its bundles for TypeScript before 5.4 also declare `Set#has` to take
+ *   `T | (WidenLiteral<T> & {})` without `NoInfer`, which widens what is
+ *   inferred from a contextual `ReadonlySet<'a' | 'b'>` back to `string`, so
  *   `const s: ReadonlySet<Id> = new Set(['task:a'])` fails with
  *   "`Set<string>` is not assignable to `ReadonlySet<Id>`" — an error that
  *   names no fix and invites a cast.
@@ -219,7 +222,8 @@ const annotationTypeArguments = (
  * The contextual type comes first — a `ReadonlySet<Id>` parameter, a
  * `ReadonlyMap<K, V>` property — when it is one of `collectionNames`: it is
  * what the author declared, while what TypeScript infers differs by library (a
- * literal-union element widened to `string` under the strict standard library,
+ * literal-union element widened to `string` under the strict standard library
+ * before TypeScript 5.4,
  * `number[]` for a declared `readonly number[]`, `never` for an empty `new
  * Map()`). What is inferred is the fallback, unless one of its arguments is
  * `any`, `unknown` or `never` — the inference this rule exists to replace, not

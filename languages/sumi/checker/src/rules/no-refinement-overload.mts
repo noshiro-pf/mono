@@ -288,11 +288,8 @@ const positionClasses = (
 
   const classes = typeofClasses(checker, type);
 
-  // `union`'s type argument is written out: under the strict standard
-  // library it is otherwise inferred as `string` from a set of a literal union,
-  // through the widened parameter of `ReadonlySet#has` (#2585).
   return mayBeAbsent
-    ? classes.union<TypeofClass>(new Set<TypeofClass>(['undefined']))
+    ? classes.union(new Set<TypeofClass>(['undefined']))
     : classes;
 };
 
@@ -362,7 +359,7 @@ const typeofClasses = (
     return type
       .getTypes()
       .reduce<ReadonlySet<TypeofClass>>(
-        (acc, member) => acc.union<TypeofClass>(typeofClasses(checker, member)),
+        (acc, member) => acc.union(typeofClasses(checker, member)),
         new Set<TypeofClass>(),
       );
   }
@@ -402,7 +399,7 @@ const widenObject = (
   classes: ReadonlySet<TypeofClass>,
 ): ReadonlySet<TypeofClass> =>
   classes.has('object')
-    ? classes.union<TypeofClass>(new Set<TypeofClass>(['function']))
+    ? classes.union(new Set<TypeofClass>(['function']))
     : classes;
 
 const objectClasses = (

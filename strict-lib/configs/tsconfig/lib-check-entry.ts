@@ -8,7 +8,8 @@
 //
 // Every harness's `tsconfig.lib-check.json` and
 // `tsconfig.lib-check.webworker.json` name this file, so one assertion added
-// here is checked by all twelve TypeScript minors in both flavors.
+// here is checked by all twelve TypeScript minors in both flavors. One that
+// holds only from TypeScript 5.4 on goes in `lib-check-entry.since-5.4.ts`.
 
 /**
  * #1840 — `ReturnType<typeof setTimeout>` came out `unknown`.
@@ -115,3 +116,38 @@ export const optionalKeyValues = (
 ): readonly (number | string)[] =>
   // @ts-expect-error The value of an optional key may be `undefined`.
   Object.entries(record).map(([, value]) => value);
+
+/**
+ * #2585 — `union` / `symmetricDifference` of two sets of a literal union came
+ * out `ReadonlySet<string>`.
+ *
+ * `ReadonlySetLike#has` takes the widened literal type, as `ReadonlySet#has`
+ * does. A method parameter is bivariant, so inferring `U` in
+ * `union<U>(other: ReadonlySetLike<U>)` took that parameter as a candidate next
+ * to `keys()`'s and widened `U`. The parameter is under `NoInfer` now.
+ *
+ * TS 5.0–5.4 have no Set methods, so there `WithSetMethods` adds stand-ins and
+ * the assertion holds trivially. It is a call rather than a conditional type,
+ * because inferring from a generic method in a conditional type erases its type
+ * parameter to `unknown` whether or not the declaration is right.
+ */
+type WithSetMethods<S> =
+  S extends Readonly<{
+    union: unknown;
+    symmetricDifference: unknown;
+  }>
+    ? S
+    : S &
+        Readonly<{
+          union: (other: S) => S;
+          symmetricDifference: (other: S) => S;
+        }>;
+
+type Letter = 'a' | 'b';
+
+declare const letters: WithSetMethods<ReadonlySet<Letter>>;
+
+export const unionOfLetters: ReadonlySet<Letter> = letters.union(letters);
+
+export const symmetricDifferenceOfLetters: ReadonlySet<Letter> =
+  letters.symmetricDifference(letters);

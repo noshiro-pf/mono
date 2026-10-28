@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2015.collection.d.ts b/v6.0/output/lib-files-branded/lib.es2015.collection.d.ts
-index d86858975169c5ce0027e801557de95c3745c69a..b79813d51a9fd978eba8dbc2462bceb277f37b55 100644
+index 752abe88ce08dc4b28cb64cc9e6447640eb0684d..0223ced1e3bdfd34c9fe22c2e303ee3f4f5aa1a7 100644
 --- a/v5.9/output/lib-files-branded/lib.es2015.collection.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2015.collection.d.ts
 @@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
@@ -24,7 +24,7 @@ index d86858975169c5ce0027e801557de95c3745c69a..b79813d51a9fd978eba8dbc2462bceb2
    clear(): void;
    /**
     * @returns true if an element in the Map existed and has been removed, or false if the element does not exist.
-@@ -106,7 +107,9 @@ interface Set<T> {
+@@ -112,7 +113,9 @@ interface Set<T> {
     * Appends a new element with a specified value to the end of the Set.
     */
    add(value: T): this;

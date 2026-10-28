@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files/lib.esnext.collection.d.ts b/v5.7/output/lib-files/lib.esnext.collection.d.ts
-index e9ccbd80ffdd6102cb451a0f8feae9e058626000..e70411b5308e2da6560e6f3a28a132abc0abc0b8 100644
+index ceddd14c779588e2224ebe39d5129645da2f6b51..469c09a7a55aee08757952ec2aca7a823d4d5e83 100644
 --- a/v5.6/output/lib-files/lib.esnext.collection.d.ts
 +++ b/v5.7/output/lib-files/lib.esnext.collection.d.ts
 @@ -22,17 +22,7 @@ and limitations under the License.

@@ -39,6 +39,7 @@ import { convertLibEs2022Object } from './lib.es2022.object.mjs';
 import { convertLibEs2023Array } from './lib.es2023.array.mjs';
 import { convertLibEs2024Arraybuffer } from './lib.es2024.arraybuffer.mjs';
 import { convertLibEs2024Sharedmemory } from './lib.es2024.sharedmemory.mjs';
+import { convertLibEs2025Collection } from './lib.es2025.collection.mjs';
 import { convertLibEsnextFloat16 } from './lib.esnext.float16.mjs';
 import { convertLibEsNextIterator } from './lib.esnext.iterator.mjs';
 
@@ -480,11 +481,19 @@ export const convert = (
               // `lib.esnext.{collection,object}.d.ts`; TS 5.7 promoted them to
               // `lib.es2024.{collection,object}.d.ts`. Route both filenames
               // through the same converter (tolerant for the esnext layout).
+              // The esnext file also carries `ReadonlySetLike` in TS 5.5–5.9,
+              // which TS 6.0 promoted to `lib.es2025.collection.d.ts`.
               case 'lib.esnext.collection.d.ts':
-                return convertGroupByCollection(options, true);
+                return composeMonoTypeFns(
+                  convertGroupByCollection(options, true),
+                  convertLibEs2025Collection(options, true),
+                );
 
               case 'lib.es2024.collection.d.ts':
                 return convertGroupByCollection(options, false);
+
+              case 'lib.es2025.collection.d.ts':
+                return convertLibEs2025Collection(options, false);
 
               case 'lib.esnext.object.d.ts':
                 return convertGroupByObject(options, true);
