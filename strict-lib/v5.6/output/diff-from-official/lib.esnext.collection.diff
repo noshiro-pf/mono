@@ -12,7 +12,18 @@
  /// <reference no-default-lib="true"/>
  
  interface MapConstructor {
-@@ -46,19 +53,19 @@ interface Set<T> {
+@@ -35,7 +42,9 @@ interface ReadonlySetLike<T> {
+   /**
+    * @returns a boolean indicating whether an element with the specified value exists in the set-like or not.
+    */
+-  has(value: T): boolean;
++  has(
++    value: NoInfer<T | (import('ts-type-forge').WidenLiteral<T> & {})>,
++  ): boolean;
+   /**
+    * @returns the number of (unique) elements in the set-like.
+    */
+@@ -46,19 +55,19 @@ interface Set<T> {
    /**
     * @returns a new Set containing all the elements in this Set and also all the elements in the argument.
     */
@@ -36,7 +47,7 @@
    /**
     * @returns a boolean indicating whether all the elements in this Set are also in the argument.
     */
-@@ -77,19 +84,19 @@ interface ReadonlySet<T> {
+@@ -77,19 +86,19 @@ interface ReadonlySet<T> {
    /**
     * @returns a new Set containing all the elements in this Set and also all the elements in the argument.
     */

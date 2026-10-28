@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files/lib.esnext.collection.d.ts b/v5.5/output/lib-files/lib.esnext.collection.d.ts
-index e2c379236110ac8c72692155b85a7bdf8415ba27..e9ccbd80ffdd6102cb451a0f8feae9e058626000 100644
+index e2c379236110ac8c72692155b85a7bdf8415ba27..ceddd14c779588e2224ebe39d5129645da2f6b51 100644
 --- a/v5.4/output/lib-files/lib.esnext.collection.d.ts
 +++ b/v5.5/output/lib-files/lib.esnext.collection.d.ts
-@@ -33,3 +33,80 @@ interface MapConstructor {
+@@ -33,3 +33,82 @@ interface MapConstructor {
      keySelector: (item: T, index: number) => K,
    ): Map<K, T[]>;
  }
@@ -15,7 +15,9 @@ index e2c379236110ac8c72692155b85a7bdf8415ba27..e9ccbd80ffdd6102cb451a0f8feae9e0
 +  /**
 +   * @returns a boolean indicating whether an element with the specified value exists in the set-like or not.
 +   */
-+  has(value: T): boolean;
++  has(
++    value: NoInfer<T | (import('ts-type-forge').WidenLiteral<T> & {})>,
++  ): boolean;
 +  /**
 +   * @returns the number of (unique) elements in the set-like.
 +   */

@@ -10,8 +10,8 @@
     "./scripts-common/src/**/*.mts",
     "./v*/scripts/**/*.mts"
   ],
-  // The entry the harnesses' `tsconfig.lib-check*.json` type-check against the
-  // generated lib. Its assertions are about that lib (`globalThis.NaN` is an
-  // error there), so they fail against the stock one this program loads.
-  "exclude": ["./configs/tsconfig/lib-check-entry.ts"]
+  // The entries the harnesses' `tsconfig.lib-check*.json` type-check against
+  // the generated lib. Their assertions are about that lib (`globalThis.NaN` is
+  // an error there), so they fail against the stock one this program loads.
+  "exclude": ["./configs/tsconfig/lib-check-entry*.ts"]
 }

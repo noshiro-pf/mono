@@ -1,9 +1,9 @@
 diff --git a/v6.0/output/lib-files-branded/lib.es2025.collection.d.ts b/v6.0/output/lib-files-branded/lib.es2025.collection.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..63052bc5904263b1c94f375d9dcd0d4505045370
+index 0000000000000000000000000000000000000000..b989d75275847fe8c8647cbdc472e2cf8cb9560a
 --- /dev/null
 +++ b/v6.0/output/lib-files-branded/lib.es2025.collection.d.ts
-@@ -0,0 +1,100 @@
+@@ -0,0 +1,102 @@
 +/*! *****************************************************************************
 +Copyright (c) Microsoft Corporation. All rights reserved.
 +Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -36,7 +36,9 @@ index 0000000000000000000000000000000000000000..63052bc5904263b1c94f375d9dcd0d45
 +  /**
 +   * @returns a boolean indicating whether an element with the specified value exists in the set-like or not.
 +   */
-+  has(value: T): boolean;
++  has(
++    value: NoInfer<T | (import('ts-type-forge').WidenLiteral<T> & {})>,
++  ): boolean;
 +  /**
 +   * @returns the number of (unique) elements in the set-like.
 +   */

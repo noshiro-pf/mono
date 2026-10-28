@@ -23,16 +23,18 @@
    ): void;
    /**
     * Returns a specified element from the Map object. If the value that is associated to the provided key is an object, then you will get a reference to that object and any change made to that object will effectively modify it inside the Map.
-@@ -37,7 +44,7 @@ interface Map<K, V> {
+@@ -37,7 +44,9 @@ interface Map<K, V> {
    /**
     * @returns boolean indicating whether an element with the specified key exists or not.
     */
 -  has(key: K): boolean;
-+  has(key: K | (import('ts-type-forge').WidenLiteral<K> & {})): boolean;
++  has(
++    key: NoInfer<K | (import('ts-type-forge').WidenLiteral<K> & {})>,
++  ): boolean;
    /**
     * Adds a new element with a specified key and value to the Map. If an element with the same key already exists, the element will be updated.
     */
-@@ -49,19 +56,19 @@ interface Map<K, V> {
+@@ -49,19 +58,21 @@ interface Map<K, V> {
  }
  
  interface MapConstructor {
@@ -54,20 +56,24 @@
    ): void;
    get(key: K): V | undefined;
 -  has(key: K): boolean;
-+  has(key: K | (import('ts-type-forge').WidenLiteral<K> & {})): boolean;
++  has(
++    key: NoInfer<K | (import('ts-type-forge').WidenLiteral<K> & {})>,
++  ): boolean;
    readonly size: number;
  }
  
-@@ -78,7 +85,7 @@ interface WeakMap<K extends WeakKey, V> {
+@@ -78,7 +89,9 @@ interface WeakMap<K extends WeakKey, V> {
    /**
     * @returns a boolean indicating whether an element with the specified key exists or not.
     */
 -  has(key: K): boolean;
-+  has(key: K | (import('ts-type-forge').WidenLiteral<K> & {})): boolean;
++  has(
++    key: NoInfer<K | (import('ts-type-forge').WidenLiteral<K> & {})>,
++  ): boolean;
    /**
     * Adds a new element with a specified key and value.
     * @param key Must be an object or symbol.
-@@ -87,12 +94,13 @@ interface WeakMap<K extends WeakKey, V> {
+@@ -87,12 +100,13 @@ interface WeakMap<K extends WeakKey, V> {
  }
  
  interface WeakMapConstructor {
@@ -85,7 +91,7 @@
  
  interface Set<T> {
    /**
-@@ -112,13 +120,13 @@ interface Set<T> {
+@@ -112,13 +126,15 @@ interface Set<T> {
     * Executes a provided function once per each value in the Set object, in insertion order.
     */
    forEach(
@@ -98,11 +104,13 @@
     * @returns a boolean indicating whether an element with the specified value exists in the Set or not.
     */
 -  has(value: T): boolean;
-+  has(value: T | (import('ts-type-forge').WidenLiteral<T> & {})): boolean;
++  has(
++    value: NoInfer<T | (import('ts-type-forge').WidenLiteral<T> & {})>,
++  ): boolean;
    /**
     * @returns the number of (unique) elements in Set.
     */
-@@ -126,17 +134,18 @@ interface Set<T> {
+@@ -126,17 +142,20 @@ interface Set<T> {
  }
  
  interface SetConstructor {
@@ -122,16 +130,20 @@
 +    thisArg?: unknown,
    ): void;
 -  has(value: T): boolean;
-+  has(value: T | (import('ts-type-forge').WidenLiteral<T> & {})): boolean;
++  has(
++    value: NoInfer<T | (import('ts-type-forge').WidenLiteral<T> & {})>,
++  ): boolean;
    readonly size: number;
  }
  
-@@ -153,11 +162,12 @@ interface WeakSet<T extends WeakKey> {
+@@ -153,11 +172,14 @@ interface WeakSet<T extends WeakKey> {
    /**
     * @returns a boolean indicating whether a value exists in the WeakSet or not.
     */
 -  has(value: T): boolean;
-+  has(value: T | (import('ts-type-forge').WidenLiteral<T> & {})): boolean;
++  has(
++    value: NoInfer<T | (import('ts-type-forge').WidenLiteral<T> & {})>,
++  ): boolean;
  }
  
  interface WeakSetConstructor {

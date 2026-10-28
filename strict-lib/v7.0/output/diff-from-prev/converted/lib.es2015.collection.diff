@@ -1,17 +1,17 @@
 diff --git a/v6.0/output/lib-files/lib.es2015.collection.d.ts b/v7.0/output/lib-files/lib.es2015.collection.d.ts
-index cf9815c01ba905e6f71f786cb9eaa1dd420bbf40..d8254c1aa928ba3e84a38a528492f9152c2e5624 100644
+index 81c80b4aa1504a819d04d7fc8276892a90d826ad..a847369ebddbd4e1e03b5ee517a78ea655b09c63 100644
 --- a/v6.0/output/lib-files/lib.es2015.collection.d.ts
 +++ b/v7.0/output/lib-files/lib.es2015.collection.d.ts
-@@ -128,7 +128,7 @@ interface Set<T> {
-    */
-   has(value: T | (import('ts-type-forge').WidenLiteral<T> & {})): boolean;
+@@ -136,7 +136,7 @@ interface Set<T> {
+     value: NoInfer<T | (import('ts-type-forge').WidenLiteral<T> & {})>,
+   ): boolean;
    /**
 -   * @returns the number of (unique) elements in Set.
 +   * @returns the number of (unique) elements in the Set.
     */
    readonly size: number;
  }
-@@ -141,11 +141,20 @@ interface SetConstructor {
+@@ -149,13 +149,22 @@ interface SetConstructor {
  declare const Set: SetConstructor;
  
  interface ReadonlySet<T> {
@@ -25,7 +25,9 @@ index cf9815c01ba905e6f71f786cb9eaa1dd420bbf40..d8254c1aa928ba3e84a38a528492f915
 +  /**
 +   * @returns a boolean indicating whether an element with the specified value exists in the Set or not.
 +   */
-   has(value: T | (import('ts-type-forge').WidenLiteral<T> & {})): boolean;
+   has(
+     value: NoInfer<T | (import('ts-type-forge').WidenLiteral<T> & {})>,
+   ): boolean;
 +  /**
 +   * @returns the number of (unique) elements in the Set.
 +   */

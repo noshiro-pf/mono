@@ -1,4 +1,7 @@
 {
   "extends": "../configs/tsconfig/tsconfig.lib-check.json",
-  "files": ["../configs/tsconfig/lib-check-entry.ts"]
+  "files": [
+    "../configs/tsconfig/lib-check-entry.ts",
+    "../configs/tsconfig/lib-check-entry.since-5.4.ts"
+  ]
 }

@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.esnext.collection.d.ts b/v6.0/output/lib-files/lib.esnext.collection.d.ts
-index e70411b5308e2da6560e6f3a28a132abc0abc0b8..dbeefb990a425cc4a95e38a4057993835ee4e57a 100644
+index 469c09a7a55aee08757952ec2aca7a823d4d5e83..dbeefb990a425cc4a95e38a4057993835ee4e57a 100644
 --- a/v5.9/output/lib-files/lib.esnext.collection.d.ts
 +++ b/v6.0/output/lib-files/lib.esnext.collection.d.ts
 @@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@ index e70411b5308e2da6560e6f3a28a132abc0abc0b8..dbeefb990a425cc4a95e38a405799383
  
  See the Apache Version 2.0 License for specific language governing permissions
  and limitations under the License.
-@@ -20,83 +20,34 @@ and limitations under the License.
+@@ -20,85 +20,34 @@ and limitations under the License.
   * files of the package this ships in.
   */
  
@@ -32,7 +32,9 @@ index e70411b5308e2da6560e6f3a28a132abc0abc0b8..dbeefb990a425cc4a95e38a405799383
 +   * If no element is associated with the specified key, a new element with the value `defaultValue` will be inserted into the Map and returned.
 +   * @returns The element associated with the specified key, which will be `defaultValue` if no element previously existed.
     */
--  has(value: T): boolean;
+-  has(
+-    value: NoInfer<T | (import('ts-type-forge').WidenLiteral<T> & {})>,
+-  ): boolean;
 +  getOrInsert(key: K, defaultValue: V): V;
    /**
 -   * @returns the number of (unique) elements in the set-like.
