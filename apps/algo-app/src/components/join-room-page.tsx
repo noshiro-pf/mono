@@ -2,8 +2,9 @@ import { useState } from 'better-preact-use-state';
 import { styled } from 'goober';
 import { memoNamed } from 'preact-utils';
 import { useCallback } from 'preact/hooks';
+import { useObservableValue } from 'synstate-preact-hooks';
 import { dictionary } from '../constants/index.mjs';
-import { db, joinRoom } from '../store/index.mjs';
+import { roomStore } from '../store/index.mjs';
 import { ButtonPrimary, Input, Spinner } from './bp/index.mjs';
 
 const dc = dictionary.joinRoom;
@@ -41,7 +42,7 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
 
   const [showPasswordError, setShowPasswordError] = useState<boolean>(false);
 
-  const room = db.useRoom();
+  const room = useObservableValue(roomStore.room);
 
   const onJoinRoomButtonClick = useCallback(() => {
     if (room === undefined) {
@@ -54,10 +55,10 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
       return;
     }
 
-    joinRoom.dispatch(roomId, username).catch(console.error);
+    roomStore.joinRoom.dispatch(roomId, username).catch(console.error);
   }, [room, roomId, username, password, setShowPasswordError]);
 
-  const loading = joinRoom.useIsWaitingResponse();
+  const loading = useObservableValue(roomStore.joinRoom.isWaitingResponse);
 
   return (
     <Centering>
