@@ -108,6 +108,11 @@ jobs:
           #
           # `build` used to regenerate all of it on every run, which put three
           # of the five minutes a full build took into every job that builds.
+          #
+          # `ws:gen` and `ws:doc` run the packages concurrently, in dependency
+          # order, unlike the `ws:check:test*` scripts: most of each package's
+          # share is starting `tsx` and Prettier, a single thread apiece, where
+          # a package's test runner already fills every core by itself.
           - ws:gen
 
     steps:
