@@ -25,7 +25,7 @@ const pagesApps: readonly string[] = [
   'pr-manager',
   'profile',
   'task-manager',
-];
+] as const;
 
 /**
  * The repository's Pages site is a project site, so everything it serves is
@@ -49,7 +49,8 @@ export const pagesAppDir = (packageRoot: string): string => {
   // Written before the `includes` guard: under the strict standard library
   // `includes` is a type predicate that also narrows when it is false, so
   // `name` would read as `never` inside the branch.
-  const notPublished = `pagesAppDir: "${name}" is not published to Pages. Add it to tools/configs/pages-apps.mts.`;
+  const notPublished =
+    `pagesAppDir: "${name}" is not published to Pages. Add it to tools/configs/pages-apps.mts.` as const;
 
   if (!pagesApps.includes(name)) {
     throw new Error(notPublished);
@@ -60,11 +61,11 @@ export const pagesAppDir = (packageRoot: string): string => {
 
 /** The same, as the URL prefix Vite writes into the built `index.html`. */
 export const pagesAppBase = (packageRoot: string): string =>
-  `${PAGES_SITE_ROOT}${pagesAppDir(packageRoot)}/`;
+  `${PAGES_SITE_ROOT}${pagesAppDir(packageRoot)}/` as const;
 
 /** The same, as the whole URL a page is reached at, e.g. for `og:url`. */
 export const pagesAppUrl = (packageRoot: string): string =>
-  `${PAGES_SITE_ORIGIN}${pagesAppBase(packageRoot)}`;
+  `${PAGES_SITE_ORIGIN}${pagesAppBase(packageRoot)}` as const;
 
 /** The directory name of every published app, under `apps/` and the site. */
 export const pagesAppDirs = (): readonly string[] => pagesApps;

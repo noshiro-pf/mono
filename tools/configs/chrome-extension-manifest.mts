@@ -27,22 +27,25 @@ export const writeManifestVersion = ({
   packageRoot: string;
   /** Vite's `build.outDir`, where `manifest.json` has been copied to. */
   outDir: string;
-}>): VitePlugin => ({
-  name: 'chrome-extension:manifest-version',
-  writeBundle: (): void => {
-    const manifestPath = path.resolve(outDir, 'manifest.json');
+}>): VitePlugin =>
+  ({
+    name: 'chrome-extension:manifest-version',
+    writeBundle: (): void => {
+      const manifestPath = path.resolve(outDir, 'manifest.json');
 
-    const packageJson = readJson(path.resolve(packageRoot, 'package.json'));
+      const packageJson = readJson(path.resolve(packageRoot, 'package.json'));
 
-    const version = isRecord(packageJson) ? packageJson['version'] : undefined;
+      const version = isRecord(packageJson)
+        ? packageJson['version']
+        : undefined;
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.writeFileSync(
-      manifestPath,
-      `${JSON.stringify(manifestWithVersion(readJson(manifestPath), version), undefined, 2)}\n`,
-    );
-  },
-});
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      fs.writeFileSync(
+        manifestPath,
+        `${JSON.stringify(manifestWithVersion(readJson(manifestPath), version), undefined, 2)}\n`,
+      );
+    },
+  }) as const;
 
 /**
  * `manifest` with `version` added, or an error saying why it cannot be.

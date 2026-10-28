@@ -33,8 +33,8 @@ export const extractSampleCode = (
   { stripTransformerDirectives = false }: ExtractSampleCodeOptions = {},
 ): string => {
   const ignoreLineKeywords = stripTransformerDirectives
-    ? [ignoreLineKeyword, transformerIgnoreLineKeyword]
-    : [ignoreLineKeyword];
+    ? ([ignoreLineKeyword, transformerIgnoreLineKeyword] as const)
+    : ([ignoreLineKeyword] as const);
 
   const lines = content.split('\n');
 
@@ -60,7 +60,7 @@ export const extractSampleCode = (
     { index: -1, kind: undefined },
     ...markers,
     { index: lines.length, kind: undefined },
-  ];
+  ] as const;
 
   return adjacentPairs(bounds)
     .filter(([start, end]) => start.kind !== 'below' && end.kind !== 'above')
