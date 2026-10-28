@@ -1,4 +1,4 @@
-import { DEFAULT_REPORT_SOURCE } from './constants.mjs';
+import type { ReportSource } from './constants.mjs';
 import {
   mergedPullRequestsUrl,
   newIssueUrl,
@@ -6,10 +6,13 @@ import {
   openPullRequestsUrl,
 } from './github-links.mjs';
 
+// The repository the fixtures were taken from.
+const SOURCE: ReportSource = { owner: 'noshiro-pf', repo: 'mono' } as const;
+
 describe(openPullRequestsUrl, () => {
   test("is the repository's open pull requests", () => {
     assert.strictEqual(
-      openPullRequestsUrl(DEFAULT_REPORT_SOURCE),
+      openPullRequestsUrl(SOURCE),
       'https://github.com/noshiro-pf/mono/pulls?q=is%3Apr+is%3Aopen',
     );
   });
@@ -25,7 +28,7 @@ describe(openPullRequestsUrl, () => {
 describe(mergedPullRequestsUrl, () => {
   test('is the search the block reads: merged on or after the day the window starts, in UTC', () => {
     assert.strictEqual(
-      mergedPullRequestsUrl(DEFAULT_REPORT_SOURCE, EARLY_ON_27TH_MS),
+      mergedPullRequestsUrl(SOURCE, EARLY_ON_27TH_MS),
       'https://github.com/noshiro-pf/mono/pulls?q=is%3Apr+is%3Amerged+merged%3A%3E%3D2026-10-20+sort%3Aupdated-desc',
     );
   });
@@ -41,7 +44,7 @@ describe(mergedPullRequestsUrl, () => {
 describe(openIssuesUrl, () => {
   test('is the open issues, most recently updated first, as the block lists them', () => {
     assert.strictEqual(
-      openIssuesUrl(DEFAULT_REPORT_SOURCE),
+      openIssuesUrl(SOURCE),
       'https://github.com/noshiro-pf/mono/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc',
     );
   });

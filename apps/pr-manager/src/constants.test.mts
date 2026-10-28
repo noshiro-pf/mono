@@ -1,7 +1,7 @@
 import {
-  DEFAULT_REPORT_SOURCE,
   parseRepository,
   reportSourceFromSearch,
+  repositoryParam,
   repositoryUrl,
   searchWithRepository,
 } from './constants.mjs';
@@ -23,18 +23,17 @@ describe(reportSourceFromSearch, () => {
     );
   });
 
-  test('is this repository without the parameter', () => {
-    assert.deepStrictEqual(reportSourceFromSearch(''), DEFAULT_REPORT_SOURCE);
+  // The page then asks which one to read rather than reading one nobody
+  // chose.
+  test('is none without the parameter', () => {
+    assert.isUndefined(reportSourceFromSearch(''));
 
-    assert.deepStrictEqual(
-      reportSourceFromSearch('?cols=2'),
-      DEFAULT_REPORT_SOURCE,
-    );
+    assert.isUndefined(reportSourceFromSearch('?cols=2'));
   });
 
   // Anything else would reach the query as a name GitHub cannot have, and
   // the reader would read an error about a repository they never named.
-  test('is this repository for a value that names no repository', () => {
+  test('is none for a value that names no repository', () => {
     for (const value of [
       'example-org',
       'example-org/',
@@ -44,11 +43,18 @@ describe(reportSourceFromSearch, () => {
       'org/..',
       'org/re po',
     ]) {
-      assert.deepStrictEqual(
-        reportSourceFromSearch(searchNaming(value)),
-        DEFAULT_REPORT_SOURCE,
-      );
+      assert.isUndefined(reportSourceFromSearch(searchNaming(value)));
     }
+  });
+});
+
+describe(repositoryParam, () => {
+  test('is `repo` as written, a value naming no repository included', () => {
+    expect(repositoryParam('?theme=dark&repo=example-org')).toBe('example-org');
+  });
+
+  test('is none without the parameter', () => {
+    assert.isUndefined(repositoryParam('?theme=dark'));
   });
 });
 
@@ -110,12 +116,10 @@ describe(searchWithRepository, () => {
     ).toBe('?theme=dark&repo=example-org/hello');
   });
 
-  test('drops `repo` for the repository read without it', () => {
+  test('adds `repo` to a query without one', () => {
     expect(
-      searchWithRepository('?repo=a/b&cols=2', DEFAULT_REPORT_SOURCE),
-    ).toBe('?cols=2');
-
-    expect(searchWithRepository('?repo=a/b', DEFAULT_REPORT_SOURCE)).toBe('');
+      searchWithRepository('', { owner: 'example-org', repo: 'hello' }),
+    ).toBe('?repo=example-org/hello');
   });
 });
 

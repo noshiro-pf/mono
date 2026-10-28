@@ -16,7 +16,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
-import { DEFAULT_REPORT_SOURCE } from './constants.mjs';
+import type { ReportSource } from './constants.mjs';
 import {
   CHECKS_QUERY,
   DETAILS_QUERY,
@@ -32,6 +32,9 @@ import {
   weekBefore,
   weeklyActivityQuery,
 } from './weekly-activity.mjs';
+
+// The repository the fixtures were taken from.
+const SOURCE: ReportSource = { owner: 'noshiro-pf', repo: 'mono' } as const;
 
 describe('the GraphQL queries', () => {
   test.each(QUERIES)(
@@ -84,7 +87,7 @@ const QUERIES: readonly FixedLengthTuple<2, string>[] = [
   [
     'weeklyActivityQuery',
     weeklyActivityQuery(
-      DEFAULT_REPORT_SOURCE,
+      SOURCE,
       weekBefore(/* 2026-10-18T13:00:00Z */ 1_792_328_400_000, 'Asia/Tokyo'),
       todayOf(/* 2026-10-18T13:00:00Z */ 1_792_328_400_000, 'Asia/Tokyo'),
     ).query,

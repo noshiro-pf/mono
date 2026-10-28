@@ -119,13 +119,15 @@ It **only reads**. Nothing here labels, rebases, merges or comments — that is
 `pnpm run unblock-prs`, run by a person — and a page that cannot do any of it
 is a page that is safe to leave open.
 
-## On another repository
+## Which repository
 
 `?repo=owner/name` is read once, as the page opens (`reportSourceFromSearch`
 in `constants.mts`), and the header's **change** writes it and opens the page
 again, so a read still out for one repository never lands on another's page.
-A value that names no repository reads `noshiro-pf/mono`, and the header names
-the repository read, so a mistyped one shows as what it is; a name GitHub
+Without it, or with a value that names no repository, `main.tsx` draws the
+start page (`src/start/`), which asks for one and loads neither the store nor
+the report: a repository read by default would be someone's own, open to a
+reader who never chose it. The header names the repository read; a name GitHub
 resolves to nothing for the token (`repository: null`) says so in place of the
 report. The page tells a repository run beside `unblock-prs` from one that is
 not by what it has rather than by a setting.

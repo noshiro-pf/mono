@@ -1,5 +1,5 @@
 import { Arr, Result } from 'ts-data-forge';
-import { DEFAULT_REPORT_SOURCE } from './constants.mjs';
+import type { ReportSource } from './constants.mjs';
 import type { Fetch, FetchInit } from './graphql.mjs';
 import {
   activitySearch,
@@ -13,6 +13,9 @@ import {
   weekBefore,
   weeklyActivityQuery,
 } from './weekly-activity.mjs';
+
+// The repository the fixtures were taken from.
+const SOURCE: ReportSource = { owner: 'noshiro-pf', repo: 'mono' } as const;
 
 const TOKYO = 'Asia/Tokyo';
 
@@ -153,12 +156,12 @@ describe(activitySearch, () => {
     const [day] = days;
 
     assert.strictEqual(
-      activitySearch(DEFAULT_REPORT_SOURCE, 'merged', day),
+      activitySearch(SOURCE, 'merged', day),
       'repo:noshiro-pf/mono is:pr is:merged merged:2026-10-11T00:00:00+09:00..2026-10-11T23:59:59+09:00',
     );
 
     assert.strictEqual(
-      activitySearch(DEFAULT_REPORT_SOURCE, 'closed', day),
+      activitySearch(SOURCE, 'closed', day),
       'repo:noshiro-pf/mono is:issue is:closed closed:2026-10-11T00:00:00+09:00..2026-10-11T23:59:59+09:00',
     );
   });
@@ -174,9 +177,7 @@ describe(activitySearch, () => {
 
     const [day] = days;
 
-    const url = new URL(
-      activitySearchUrl(DEFAULT_REPORT_SOURCE, 'merged', day),
-    );
+    const url = new URL(activitySearchUrl(SOURCE, 'merged', day));
 
     assert.strictEqual(
       `${url.origin}${url.pathname}`,
@@ -212,7 +213,7 @@ describe(weeklyActivityQuery, () => {
     const days = weekBefore(NOW_MS, TOKYO);
 
     const { query, variables } = weeklyActivityQuery(
-      DEFAULT_REPORT_SOURCE,
+      SOURCE,
       days,
       todayOf(NOW_MS, TOKYO),
     );
@@ -254,7 +255,7 @@ describe(loadWeeklyActivity, () => {
       },
     });
 
-    const loaded = await loadWeeklyActivity(DEFAULT_REPORT_SOURCE, {
+    const loaded = await loadWeeklyActivity(SOURCE, {
       token: 'secret',
       nowMs: NOW_MS,
       timeZone: TOKYO,
@@ -311,7 +312,7 @@ describe(loadWeeklyActivity, () => {
       ),
     });
 
-    const loaded = await loadWeeklyActivity(DEFAULT_REPORT_SOURCE, {
+    const loaded = await loadWeeklyActivity(SOURCE, {
       token: 'secret',
       nowMs: NOW_MS,
       timeZone: TOKYO,
@@ -327,7 +328,7 @@ describe(loadWeeklyActivity, () => {
       errors: [{ message: 'Something went wrong.', path: ['closed_0'] }],
     });
 
-    const loaded = await loadWeeklyActivity(DEFAULT_REPORT_SOURCE, {
+    const loaded = await loadWeeklyActivity(SOURCE, {
       token: 'secret',
       nowMs: NOW_MS,
       timeZone: TOKYO,
@@ -346,7 +347,7 @@ describe(loadWeeklyActivity, () => {
   test('an answer missing a count fails the week', async () => {
     const { fetchImpl } = answering({ data: { merged_0: { issueCount: 3 } } });
 
-    const loaded = await loadWeeklyActivity(DEFAULT_REPORT_SOURCE, {
+    const loaded = await loadWeeklyActivity(SOURCE, {
       token: 'secret',
       nowMs: NOW_MS,
       timeZone: TOKYO,

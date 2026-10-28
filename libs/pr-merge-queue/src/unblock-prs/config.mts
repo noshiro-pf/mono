@@ -2,11 +2,12 @@
  * What a repository says about itself in `.github/unblock-prs.json`: the
  * parts of the run that depend on how its CI is laid out.
  *
- * Only the auto-fix is here. The labels, `Merge-After:` and the version pull
- * request's branch (`changeset-release/<base>`) are conventions the PR
- * Manager page reads too, from repositories it has no configuration for, so
- * they are fixed in `pr-report-core` rather than set per repository. A
- * repository without the file gets everything but the auto-fix.
+ * The auto-fix, and the branches the repository generates rather than
+ * writes. The labels, `Merge-After:` and the version pull request's branch
+ * (`changeset-release/<base>`) are conventions the PR Manager page reads too,
+ * from repositories it has no configuration for, so they are fixed in
+ * `pr-report-core` rather than set per repository. A repository without the
+ * file gets everything but the auto-fix, and has no generated branches.
  *
  * The file's JSON Schema, `config.schema.json` beside this module, is
  * generated from {@link ConfigFileSchema}; a test holds it to the output.
@@ -45,8 +46,10 @@ export const configOf = (
   file: ConfigFile,
   source: string,
 ): Result<Config, string> => {
+  const generatedBranches = file.generatedBranches ?? [];
+
   if (file.autoFix === undefined) {
-    return Result.ok({ autoFix: undefined });
+    return Result.ok({ autoFix: undefined, generatedBranches });
   }
 
   const { ignore, before, prepare, fixers, after } = file.autoFix;
@@ -87,6 +90,7 @@ export const configOf = (
       })),
       after,
     },
+    generatedBranches,
   });
 };
 
@@ -152,11 +156,30 @@ export const ConfigFileSchema = t.annotate(
         },
       ),
     ),
+    generatedBranches: t.optional(
+      t.annotate(
+        t.array(
+          t.strictRecord({
+            branch: t.annotate(t.string(), {
+              description: "The pull request's head branch, exactly.",
+            }),
+            rebuild: t.annotate(t.string(), {
+              description:
+                'How the branch is built again from the tip of the default branch, as a person or the skill would run it; push-fixed-pr names it when it refuses.',
+            }),
+          }),
+        ),
+        {
+          description:
+            'Branches the repository generates whole, lockfile and all, such as a dependency update. A conflict on one is resolved by building it again, never by a rebase resolved by hand: push-fixed-pr refuses that push, and the skill runs `rebuild` instead.',
+        },
+      ),
+    ),
   }),
   {
     title: 'unblock-prs configuration',
     description:
-      "What a repository says about itself in .github/unblock-prs.json: the parts of an unblock-prs run that depend on how its CI is laid out. Labels, Merge-After: and the version pull request's branch are fixed conventions, not set here.",
+      "What a repository says about itself in .github/unblock-prs.json: the parts of an unblock-prs run that depend on how its CI is laid out, and the branches it generates. Labels, Merge-After: and the version pull request's branch are fixed conventions, not set here.",
   },
 );
 
@@ -164,7 +187,11 @@ export type ConfigFile = t.TypeOf<typeof ConfigFileSchema>;
 
 export type Config = Readonly<{
   autoFix: AutoFixConfig | undefined;
+  generatedBranches: readonly GeneratedBranch[];
 }>;
+
+/** A branch the repository builds rather than writes. */
+export type GeneratedBranch = Readonly<{ branch: string; rebuild: string }>;
 
 export type AutoFixConfig = Readonly<{
   ignore: readonly RegExp[];

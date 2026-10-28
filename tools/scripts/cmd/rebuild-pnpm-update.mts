@@ -4,12 +4,7 @@ import {
   resolveApiContext,
   rest,
 } from 'pr-merge-queue';
-import {
-  PNPM_UPDATE_BRANCH,
-  type QueueComments,
-  type QueueOwner,
-  type ReportEntry,
-} from 'pr-report-core';
+import type { QueueComments, QueueOwner, ReportEntry } from 'pr-report-core';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { isDirectlyExecuted } from 'ts-repo-utils';
@@ -153,6 +148,13 @@ export const parseRebuildArgs = (
 export type RebuildArgs = Readonly<{ number: number; by: string }>;
 
 const WORKFLOW = 'pnpm-update.yml';
+
+/**
+ * The branch `pnpm-update.yml` builds. `.github/unblock-prs.json` names it too,
+ * under `generatedBranches`, which is how `push-fixed-pr` and the skill know
+ * not to rebase it.
+ */
+const PNPM_UPDATE_BRANCH = 'chore/pnpm-update';
 
 if (isDirectlyExecuted(import.meta.url)) {
   const args = parseRebuildArgs(Arr.skip(process.argv, 2));

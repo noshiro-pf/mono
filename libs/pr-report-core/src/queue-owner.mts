@@ -40,8 +40,9 @@ export const QUEUE_OWNERS = ['worker', 'skill', 'human', 'none'] as const;
 
 /**
  * `skill` is the `/unblock-prs` skill, which fixes every queued pull request
- * the worker sets aside — the dependency update's (`chore/pnpm-update`)
- * included.
+ * the worker sets aside — a branch the repository generates included, which
+ * it builds again rather than rebases (`generatedBranches` in
+ * `.github/unblock-prs.json`).
  */
 export type QueueOwner = Readonly<{
   owner: 'human' | 'none' | 'skill' | 'worker';
@@ -214,13 +215,7 @@ export const queueOwner = (pr: QueueOwnerInput): QueueOwner | undefined => {
   const handedOff = skillHandOff(pr, setAside.reason, queued);
 
   return handedOff === undefined
-    ? {
-        owner: 'skill',
-        reason:
-          setAside.reason === 'rebase-failed' && isPnpmUpdate(pr)
-            ? `${said}; the skill has \`pnpm-update.yml\` rebuild it from main`
-            : `${said}; ${why}`,
-      }
+    ? { owner: 'skill', reason: `${said}; ${why}` }
     : { owner: 'human', reason: `${said}: ${handedOff}` };
 };
 
@@ -273,15 +268,6 @@ export const isSetAsideReason = (reason: string): reason is SetAsideReason =>
   KNOWN_REASONS.has(reason);
 
 const KNOWN_REASONS: ReadonlySet<string> = new Set(SET_ASIDE_REASONS);
-
-/**
- * The dependency update, which `pnpm-update.yml` builds from the default
- * branch: a conflict on it is resolved by building it again, not by a rebase.
- */
-export const PNPM_UPDATE_BRANCH = 'chore/pnpm-update';
-
-const isPnpmUpdate = (pr: QueueOwnerInput): boolean =>
-  pr.headRef === PNPM_UPDATE_BRANCH;
 
 /**
  * Why nothing in the queue can move `pr` until a person does something, if

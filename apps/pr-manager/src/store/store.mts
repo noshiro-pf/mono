@@ -12,7 +12,11 @@ import {
   createEventEmitter,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { reportSourceFromSearch, repositoryUrl } from '../constants.mjs';
+import {
+  reportSourceFromSearch,
+  repositoryUrl,
+  type ReportSource,
+} from '../constants.mjs';
 import { layoutFromLocation, saveLayout } from '../layout.mjs';
 import { loadIssuePage, loadReport } from '../load-report.mjs';
 import { readSetting, writeSetting } from '../settings-db.mjs';
@@ -37,8 +41,14 @@ import { createReader } from './reader.mjs';
 import { createThemeStore } from './theme-store.mjs';
 import { createTokenStore } from './token-store.mjs';
 
-/** The repository the page reads, as the URL named it when the page opened. */
-export const reportSource = reportSourceFromSearch(currentSearch());
+/**
+ * The repository the page reads, as the URL named it when the page opened.
+ * `main.tsx` loads this module only when it names one, and shows the start
+ * page otherwise.
+ */
+export const reportSource: ReportSource =
+  reportSourceFromSearch(currentSearch()) ??
+  unreachable('the store was loaded without ?repo= naming a repository');
 
 export const tokenStore = createTokenStore(browserStores());
 
@@ -207,4 +217,9 @@ function fromEvent(
   target.addEventListener(type, emit);
 
   return event$;
+}
+
+/** What cannot happen, said aloud if it does. */
+function unreachable(message: string): never {
+  throw new Error(message);
 }

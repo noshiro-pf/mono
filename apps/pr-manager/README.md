@@ -33,8 +33,9 @@ to work on it, is [`docs/design.md`](./docs/design.md).
    token**. It is kept in the tab only, unless you tick **Remember on this
    device**.
 
-Without `?repo=`, the page shows `noshiro-pf/mono`, the repository it was
-written for. The header always names the repository shown.
+Without `?repo=`, or with a value that names no repository, the page reads
+nothing and asks which repository to open. The header always names the
+repository shown.
 
 ## What you see
 

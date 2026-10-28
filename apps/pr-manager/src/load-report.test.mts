@@ -1,7 +1,7 @@
 import { writeSetAsideComment } from 'pr-report-core';
 import { Arr, isRecord, Json, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { DEFAULT_REPORT_SOURCE } from './constants.mjs';
+import type { ReportSource } from './constants.mjs';
 import type { FetchInit } from './graphql.mjs';
 import {
   appendIssues,
@@ -18,6 +18,9 @@ import {
   OPEN_PAGE_SIZE,
 } from './report-query.mjs';
 import type { RestFetchInit } from './workflow-runs.mjs';
+
+// The repository the fixtures were taken from.
+const SOURCE: ReportSource = { owner: 'noshiro-pf', repo: 'mono' } as const;
 
 describe(loadReport, () => {
   test('reads the pull requests, then how far each head is from its base', async () => {
@@ -68,7 +71,7 @@ describe(loadReport, () => {
       }),
     );
 
-    const loading = loadReport(DEFAULT_REPORT_SOURCE, {
+    const loading = loadReport(SOURCE, {
       token: 'token',
       nowMs: NOW_MS,
       fetchImpl,
@@ -126,7 +129,7 @@ describe(loadReport, () => {
       }),
     );
 
-    const loading = loadReport(DEFAULT_REPORT_SOURCE, {
+    const loading = loadReport(SOURCE, {
       token: 'token',
       nowMs: NOW_MS,
       fetchImpl,
@@ -322,7 +325,7 @@ describe(loadReport, () => {
       answer('Compare', { compare_7: null }),
     );
 
-    const { result } = await loadReport(DEFAULT_REPORT_SOURCE, {
+    const { result } = await loadReport(SOURCE, {
       token: 'token',
       nowMs: NOW_MS,
       fetchImpl,
@@ -580,7 +583,7 @@ describe(loadReport, () => {
       },
     );
 
-    const { result } = await loadReport(DEFAULT_REPORT_SOURCE, {
+    const { result } = await loadReport(SOURCE, {
       token: 'token',
       nowMs: NOW_MS,
       issueCount: 100,
@@ -1388,7 +1391,7 @@ describe(loadReport, () => {
           )
         : answerNow(route, init);
 
-    const { result } = await loadReport(DEFAULT_REPORT_SOURCE, {
+    const { result } = await loadReport(SOURCE, {
       token: 'token',
       nowMs: NOW_MS,
       fetchImpl,
@@ -1604,7 +1607,7 @@ describe(loadReport, () => {
       ),
     );
 
-    const { result } = await loadReport(DEFAULT_REPORT_SOURCE, {
+    const { result } = await loadReport(SOURCE, {
       token: 'token',
       nowMs: NOW_MS,
       fetchImpl,
@@ -1619,7 +1622,7 @@ describe(loadReport, () => {
   });
 
   test('words a token GitHub will not take', async () => {
-    const { result } = await loadReport(DEFAULT_REPORT_SOURCE, {
+    const { result } = await loadReport(SOURCE, {
       token: 'token',
       nowMs: NOW_MS,
       fetchImpl: refusingTheToken,
@@ -1631,7 +1634,7 @@ describe(loadReport, () => {
   });
 
   test("passes on GitHub's own words when it refuses the query", async () => {
-    const { result } = await loadReport(DEFAULT_REPORT_SOURCE, {
+    const { result } = await loadReport(SOURCE, {
       token: 'token',
       nowMs: NOW_MS,
       fetchImpl: refusingTheQuery,
@@ -1651,7 +1654,7 @@ describe(loadReport, () => {
       'x-ratelimit-reset': '1790000000',
     }));
 
-    const { rateLimit } = await loadReport(DEFAULT_REPORT_SOURCE, {
+    const { rateLimit } = await loadReport(SOURCE, {
       token: 'secret',
       nowMs: NOW_MS,
       fetchImpl,
@@ -1676,7 +1679,7 @@ describe(loadIssuePage, () => {
       issuesAnswer(issuePage(250, [31, 32], 'cursor-32')),
     );
 
-    const { result } = await loadIssuePage(DEFAULT_REPORT_SOURCE, {
+    const { result } = await loadIssuePage(SOURCE, {
       token: 'token',
       after: 'cursor-30',
       first: 100,
@@ -1707,7 +1710,7 @@ describe(loadIssuePage, () => {
       OpenIssues: [{ data: { repository: {} } }],
     });
 
-    const { result } = await loadIssuePage(DEFAULT_REPORT_SOURCE, {
+    const { result } = await loadIssuePage(SOURCE, {
       token: 'token',
       after: 'cursor-30',
       first: 100,
@@ -1820,7 +1823,7 @@ const load = async (
   fetchImpl: Fetch,
   issueCount?: number,
 ): Promise<LoadedReport> => {
-  const { result } = await loadReport(DEFAULT_REPORT_SOURCE, {
+  const { result } = await loadReport(SOURCE, {
     token: 'token',
     nowMs: NOW_MS,
     ...(issueCount === undefined ? {} : { issueCount }),

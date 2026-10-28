@@ -71,6 +71,29 @@ describe(configOf, () => {
     expect(config.value).toContain('autoFix.fixers[0].context');
   });
 
+  test('has no generated branches when the file names none', () => {
+    const config = configOf({ $schema: undefined, autoFix: undefined }, 'x');
+
+    assert.isTrue(Result.isOk(config));
+
+    assert.deepStrictEqual(config.value.generatedBranches, []);
+  });
+
+  test('reads the generated branches', () => {
+    const generatedBranches = [
+      { branch: 'chore/deps', rebuild: 'run rebuild-deps' },
+    ] as const;
+
+    const config = configOf(
+      { $schema: undefined, autoFix: undefined, generatedBranches },
+      'x',
+    );
+
+    assert.isTrue(Result.isOk(config));
+
+    assert.deepStrictEqual(config.value.generatedBranches, generatedBranches);
+  });
+
   test('leaves the auto-fix off when the file has none', () => {
     const config = configOf({ $schema: undefined, autoFix: undefined }, 'x');
 

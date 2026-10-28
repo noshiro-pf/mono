@@ -27,5 +27,11 @@
       }
     ],
     "after": ["pnpm run fix:fmt:diff"]
-  }
+  },
+  "generatedBranches": [
+    {
+      "branch": "chore/pnpm-update",
+      "rebuild": "pnpm run rebuild-pnpm-update -- <number> --by <claimant>"
+    }
+  ]
 }
