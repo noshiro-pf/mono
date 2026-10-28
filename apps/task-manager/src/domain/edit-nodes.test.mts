@@ -76,6 +76,38 @@ describe(editNodes, () => {
     );
   });
 
+  test('adds no label a task has in another case', () => {
+    assert.deepStrictEqual(
+      editNodes(state, [refA], edit({ addLabels: ['UI', 'Docs'] }), 5)
+        .updatedTasks,
+      [],
+    );
+  });
+
+  test('drops a label a task has twice, on an edit of its labels', () => {
+    assert.deepStrictEqual(
+      editNodes(
+        { ...state, tasks: [{ ...a, labels: ['ui', 'ui'] }] },
+        [refA],
+        edit({ addLabels: ['api'] }),
+        5,
+      ).updatedTasks,
+      [{ ...a, labels: ['ui', 'api'], updatedAt: 5 }],
+    );
+  });
+
+  test('changes the case of a label taken off and added in another case', () => {
+    assert.deepStrictEqual(
+      editNodes(
+        state,
+        [refA],
+        edit({ addLabels: ['UI'], removeLabels: ['ui'] }),
+        5,
+      ).updatedTasks,
+      [{ ...a, labels: ['docs', 'UI'], updatedAt: 5 }],
+    );
+  });
+
   test('keeps a label both added and taken off', () => {
     assert.deepStrictEqual(
       editNodes(

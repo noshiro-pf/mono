@@ -20,7 +20,7 @@ export type BulkEditState = Readonly<
       refs: readonly NodeRef[];
       /** `undefined` for 「変更しない」. */
       progress: Progress | undefined;
-      /** As the field holds them: separated by commas. */
+      /** The labels to add, separated by commas (`formatLabels`). */
       addLabels: string;
       /** Labels the tasks have that are ticked to take off. */
       removeLabels: readonly string[];
