@@ -90,11 +90,16 @@ Claude Code plugin that fixes what it sets aside. In short:
    squash merging and auto-merge, require status checks on the default branch
    with branches up to date, and make the workflows skip while `skip-ci` is
    on.
-3. Open pull requests with `open-pr`, label the ready ones `merge-queued`, and
-   leave `unblock-prs` running.
+3. Open pull requests with `npx open-pr`, label the ready ones
+   `merge-queued`, and leave `npx unblock-prs` running in a terminal of its
+   own (`--dry-run --once` first shows what it would do).
 4. Install the plugin for what it sets aside:
    `/plugin marketplace add noshiro-pf/mono`, then
-   `/plugin install pr-merge-queue@noshiro-pf`.
+   `/plugin install pr-merge-queue@noshiro-pf`, and run
+   `/loop /pr-merge-queue:unblock-prs` in a Claude Code session in the
+   repository, with the worker's token in `GH_TOKEN`: the skill sees only
+   what that account's comments hand it. `.github/unblock-prs.md` tells it how
+   the repository's checks are reproduced.
 
 The package's README, "Setting up a repository", has each step and why.
 

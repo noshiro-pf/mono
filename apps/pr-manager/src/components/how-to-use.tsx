@@ -10,7 +10,8 @@ import { followOpen } from './follow-open.mjs';
  *
  * A summary of the README's "What your repository can add", kept to the
  * rules a reader acts on while looking at the page; the README stays the
- * whole of it. `unblock-prs` is left out until its own conventions settle.
+ * whole of it. The merge queue gets the outline of its setup and a link to
+ * `pr-merge-queue`'s README, which has each step.
  *
  * A native `<dialog>` opened modal, as the other header dialogs are
  * (`view-settings.tsx`). Nothing else reads whether it is open, so the state
@@ -178,6 +179,53 @@ export const HowToUse = (): JSX.Element => {
           </ul>
         </section>
 
+        <section class={constant('how-to-use-section')}>
+          <h3 class={constant('how-to-use-heading')}>
+            {constant('With a merge queue')}
+          </h3>
+
+          <ul class={constant('how-to-use-list')}>
+            <li>
+              {constant('On a repository with a ')}
+              <code>{constant('merge-queued')}</code>
+              {constant(
+                ' label, the page also shows the queue: the queued pull requests in the order they land, what was set aside and why, who claimed what, and whose turn each one is.',
+              )}
+            </li>
+            <li>
+              {constant('The queue is the npm package ')}
+              <ExternalLink href={constant(MERGE_QUEUE_README_URL)}>
+                <code>{constant('pr-merge-queue')}</code>
+              </ExternalLink>
+              {constant(': open pull requests with ')}
+              <code>{constant('npx open-pr')}</code>
+              {constant(', label the ready ones ')}
+              <code>{constant('merge-queued')}</code>
+              {constant(', and leave ')}
+              <code>{constant('npx unblock-prs')}</code>
+              {constant(
+                ' running. It lands them one at a time and sets aside what it cannot fix by itself.',
+              )}
+            </li>
+            <li>
+              {constant('What it sets aside is fixed by the ')}
+              <code>{constant('unblock-prs')}</code>
+              {constant(' skill. In Claude Code:')}
+              <pre class={constant('how-to-use-commands')}>
+                {constant(PLUGIN_COMMANDS)}
+              </pre>
+              {constant(
+                'Give the session the worker’s token: the skill sees only what that account’s comments hand it.',
+              )}
+            </li>
+            <li>
+              {constant(
+                'The labels, repository settings and token the queue needs are in the package’s README, “Setting up a repository”.',
+              )}
+            </li>
+          </ul>
+        </section>
+
         <div class={constant('view-settings-actions how-to-use-actions')}>
           <button
             class={constant('header-button')}
@@ -195,5 +243,16 @@ export const HowToUse = (): JSX.Element => {
 /** The app's README on the default branch, which this dialog summarizes. */
 const README_URL =
   'https://github.com/noshiro-pf/mono/blob/main/apps/pr-manager/README.md';
+
+/** `pr-merge-queue`'s README, which says how to set up the queue. */
+const MERGE_QUEUE_README_URL =
+  'https://github.com/noshiro-pf/mono/blob/main/libs/pr-merge-queue/README.md';
+
+/** Install the skill's plugin and keep it going beside the worker. */
+const PLUGIN_COMMANDS = [
+  '/plugin marketplace add noshiro-pf/mono',
+  '/plugin install pr-merge-queue@noshiro-pf',
+  '/loop /pr-merge-queue:unblock-prs',
+].join('\n');
 
 const TITLE_ID = 'how-to-use-title';
