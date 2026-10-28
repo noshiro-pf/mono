@@ -52,6 +52,12 @@ export const Root = memoNamed('Root', () => {
     }
   }, [roomId]);
 
+  useEffect(() => {
+    if (playerId !== undefined) {
+      roomStore.setMyName(playerId);
+    }
+  }, [playerId]);
+
   useObservableEffect(roomStore.createRoom.response, (res) => {
     Router.push(roomPage(res.id));
   });

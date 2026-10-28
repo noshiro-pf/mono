@@ -12,9 +12,15 @@ export const params = {
   observe: 'observe',
 } as const;
 
-/** The page of the room `roomId`. */
-export const roomPage = (roomId: string): string => {
-  const query = new URLSearchParams({ [params.roomId]: roomId });
+/**
+ * The page of the room `roomId`: where a player joins it, or, with
+ * `playerId`, the game as that player.
+ */
+export const roomPage = (roomId: string, playerId?: string): string => {
+  const query = new URLSearchParams({
+    [params.roomId]: roomId,
+    ...(playerId === undefined ? {} : { [params.playerId]: playerId }),
+  });
 
   return `${withSlash(routes.rooms)}?${query.toString()}`;
 };
