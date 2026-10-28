@@ -17,7 +17,8 @@ import {
   type InitializedObservable,
 } from 'synstate';
 import type { Router, RouterState } from 'tiny-router-observable';
-import { Num, pipe } from 'ts-data-forge';
+import { isNullish, Num, Result } from 'ts-data-forge';
+import type * as t from 'ts-fortress';
 import { defaultValues, queryParamKey } from '../constants/index.mjs';
 import { calcAll } from '../functions/index.mjs';
 import {
@@ -102,6 +103,25 @@ export const createLoanStore = (deps: LoanDeps): LoanStore => {
 };
 
 /**
+ * `value` as a number of `type`, or `prev` when it is missing, not a finite
+ * number (`Num.safeParseFloat` refuses `''`, `'12px'` and `'Infinity'`, which
+ * `Number` reads as `0`, `NaN` and `Infinity`), or not one `type` accepts.
+ */
+const numberFromQuery = <A extends number>(
+  type: t.Type<A>,
+  value: string | null | undefined,
+  prev: A,
+): A => {
+  if (isNullish(value)) {
+    return prev;
+  }
+
+  const parsed = Num.safeParseFloat(value);
+
+  return Result.isOk(parsed) && type.is(parsed.value) ? parsed.value : prev;
+};
+
+/**
  * The URL is the one place the inputs are kept: a value missing from it, or
  * not a valid one, stays as it was.
  */
@@ -109,43 +129,28 @@ const storeFromQuery = (
   prev: Store,
   { searchParams: query }: RouterState,
 ): Store => {
-  const paramsAsStr = {
-    repaymentType: query.get(queryParamKey.repaymentType),
-    borrowingTotal: query.get(queryParamKey.borrowingTotal),
-    borrowingPeriodMonth: query.get(queryParamKey.borrowingPeriodMonth),
-    interestRatePerMonth: query.get(queryParamKey.interestRatePerMonth),
-  } as const;
-
-  // `mapNullable` is the old `mapOptional`; `URLSearchParams.get` returns
-  // `null` rather than `undefined`, which it covers too.
-  const paramsAsNumber = {
-    borrowingTotal: pipe(paramsAsStr.borrowingTotal).mapNullable(Num.from)
-      .value,
-    borrowingPeriodMonth: pipe(paramsAsStr.borrowingPeriodMonth).mapNullable(
-      Num.from,
-    ).value,
-    interestRatePerMonth: pipe(paramsAsStr.interestRatePerMonth).mapNullable(
-      Num.from,
-    ).value,
-  } as const;
+  const repaymentType = query.get(queryParamKey.repaymentType);
 
   return {
     repaymentType:
-      paramsAsStr.repaymentType === 'principal-and-interest-equal-repayment' ||
-      paramsAsStr.repaymentType === 'principal-equal-payment'
-        ? paramsAsStr.repaymentType
+      repaymentType === 'principal-and-interest-equal-repayment' ||
+      repaymentType === 'principal-equal-payment'
+        ? repaymentType
         : prev.repaymentType,
-    borrowingTotalManYen:
-      paramsAsNumber.borrowingTotal === undefined
-        ? prev.borrowingTotalManYen
-        : Yen.cast(paramsAsNumber.borrowingTotal),
-    borrowingPeriodYear:
-      paramsAsNumber.borrowingPeriodMonth === undefined
-        ? prev.borrowingPeriodYear
-        : Year.cast(paramsAsNumber.borrowingPeriodMonth),
-    interestRatePercentPerYear:
-      paramsAsNumber.interestRatePerMonth === undefined
-        ? prev.interestRatePercentPerYear
-        : PercentFloat.cast(paramsAsNumber.interestRatePerMonth),
+    borrowingTotalManYen: numberFromQuery(
+      Yen,
+      query.get(queryParamKey.borrowingTotal),
+      prev.borrowingTotalManYen,
+    ),
+    borrowingPeriodYear: numberFromQuery(
+      Year,
+      query.get(queryParamKey.borrowingPeriodMonth),
+      prev.borrowingPeriodYear,
+    ),
+    interestRatePercentPerYear: numberFromQuery(
+      PercentFloat,
+      query.get(queryParamKey.interestRatePerMonth),
+      prev.interestRatePercentPerYear,
+    ),
   };
 };
