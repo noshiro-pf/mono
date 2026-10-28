@@ -1,5 +1,11 @@
 # pr-merge-queue
 
+## 0.0.3
+
+### Patch Changes
+
+- 80f016b: Identify requests to GitHub as `pr-merge-queue` rather than by the repository it was written in, and describe the commands' conventions as the queue's own rather than as one repository's.
+
 ## 0.0.2
 
 ### Patch Changes
