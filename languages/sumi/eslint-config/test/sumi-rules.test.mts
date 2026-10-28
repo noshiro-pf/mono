@@ -50,7 +50,7 @@ describe('composition', () => {
 
     // The type argument picks the plain-record overload: the strict standard
     // library's record overload maps the optional keys of `sumiRules` to
-    // entries that may be `undefined`, which cannot be destructured.
+    // entries that may be `undefined`, which cannot be destructured (#2586).
     for (const [ruleId, entry] of Object.entries<RuleEntry | undefined>(
       sumiRules,
     )) {
