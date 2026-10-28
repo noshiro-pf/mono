@@ -3,9 +3,10 @@ import { nodeSizeStore } from '../store/index.mjs';
 import { nodeSizeLabels, nodeSizes } from '../view-model/index.mjs';
 
 /**
- * How big the nodes are drawn, in every view mode: 「標準」, a title and a
- * line of status and priority; 「コンパクト」, the title alone. One button
- * per size, the pressed one is the size shown. Kept on this device.
+ * How big the nodes are drawn, in every view mode: 「コンパクト」, the title
+ * alone; 「標準」, a title and its due date; 「大」, as 「標準」 with the
+ * title on up to three lines. One button per size, the pressed one is the
+ * size shown. Kept on this device.
  */
 export const NodeSizeField = (): JSX.Element => (
   <fieldset
@@ -40,7 +41,7 @@ export const NodeSizeField = (): JSX.Element => (
     </div>
     <p class={constant('settings-hint')} id={constant(HINT_ID)}>
       {constant(
-        '「コンパクト」はタイトルだけを 1 行で表示します。状態と優先度は色と、ポインタを重ねたときの説明で分かります。',
+        '「コンパクト」はタイトルだけを 1 行で表示します。状態と優先度は色と、ポインタを重ねたときの説明で分かります。「大」はタイトルを 3 行まで折り返して表示します。',
       )}
     </p>
   </fieldset>

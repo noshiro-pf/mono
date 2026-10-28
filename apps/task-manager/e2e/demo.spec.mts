@@ -1139,7 +1139,7 @@ const chooseAnimation = async (
 /** The node size `size`, chosen in 「表示設定」, and the nodes settled. */
 const chooseNodeSize = async (
   page: DeepReadonly<Page>,
-  size: 'standard' | 'compact',
+  size: 'standard' | 'compact' | 'large',
 ): Promise<void> => {
   await openSettings(page);
 
@@ -2224,6 +2224,106 @@ test(
     await expect.poll(async () => nodeHeights(page)).toStrictEqual([56]);
   },
 );
+
+test(
+  'draws large nodes in every mode, with a long title on several lines',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto(DEMO);
+
+    await settled(page);
+
+    await chooseNodeSize(page, 'large');
+
+    // Large: tasks and milestones alike 96 high.
+    await expect.poll(async () => nodeHeights(page)).toStrictEqual([96]);
+
+    const linesOf = async (
+      title: RegExp,
+    ): Promise<Readonly<{ title: readonly string[]; meta: string }>> =>
+      dagNode(page, title).evaluate((node) => ({
+        title: Array.from(
+          node.querySelectorAll('.dag-node-title'),
+          (line) => line.textContent,
+        ),
+        meta: node.querySelector('.dag-node-meta')?.textContent ?? '',
+      }));
+
+    // A title that fits on one line keeps to one, the due date under it.
+    expect.soft(await linesOf(/画面を実装する/u)).toStrictEqual({
+      title: ['画面を実装する'],
+      meta: expect.stringMatching(/^期限/u),
+    });
+
+    // A milestone: its date under its title, the check box before it.
+    const milestoneLines = async (
+      title: string,
+    ): Promise<
+      Readonly<{ title: readonly string[]; date: string; dateBelow: boolean }>
+    > =>
+      page
+        .getByTestId('dag-node')
+        .and(page.getByRole('button', { name: `マイルストーン「${title}」` }))
+        .evaluate((node) => {
+          const lines = Array.from(node.querySelectorAll('.dag-node-title'));
+
+          const date = node.querySelector('.dag-node-meta');
+
+          return {
+            title: lines.map((line) => line.textContent),
+            date: date?.textContent ?? '',
+            dateBelow:
+              date === null ||
+              Number(date.getAttribute('y')) >
+                Number(lines.at(-1)?.getAttribute('y')),
+          };
+        });
+
+    expect.soft(await milestoneLines('コードフリーズ')).toStrictEqual({
+      title: ['コードフリーズ'],
+      date: expect.stringMatching(/^日時 /u),
+      dateBelow: true,
+    });
+
+    expect.soft(await milestoneLines('リリース承認')).toStrictEqual({
+      title: ['☐ リリース承認'],
+      date: '',
+      dateBelow: true,
+    });
+
+    // A long one goes on to the next lines, the whole of it shown.
+    await addTask(page, LONG_TITLE);
+
+    const long = await linesOf(/画面一覧と各画面の/u);
+
+    expect.soft(long.title.length).toBeGreaterThan(1);
+
+    expect.soft(long.title.join('')).toBe(LONG_TITLE);
+
+    // アーク and タイル: the same boxes and lines.
+    await showMode(page, 'arc');
+
+    expect.soft(await nodeHeights(page)).toStrictEqual([96]);
+
+    expect.soft(await linesOf(/画面一覧と各画面の/u)).toStrictEqual(long);
+
+    await showMode(page, 'tile');
+
+    expect.soft(await nodeHeights(page)).toStrictEqual([96]);
+
+    expect.soft(await linesOf(/画面一覧と各画面の/u)).toStrictEqual(long);
+
+    await showMode(page, 'dag');
+
+    await chooseNodeSize(page, 'standard');
+
+    await expect.poll(async () => nodeHeights(page)).toStrictEqual([56]);
+  },
+);
+
+/** Too long for a standard node, short enough for three lines of a large one. */
+const LONG_TITLE =
+  '画面一覧と各画面の状態遷移をまとめてから、共通部品を先に実装する';
 
 /** The priority of each task of the sample data, by title. */
 const SAMPLE_PRIORITIES: readonly (readonly [string, number])[] = [

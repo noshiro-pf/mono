@@ -55,7 +55,7 @@ import {
   dataStore,
   nodeSizeStore,
 } from '../store/index.mjs';
-import { isArrangeable } from '../view-model/index.mjs';
+import { isArrangeable, type NodeSize } from '../view-model/index.mjs';
 
 /**
  * What the canvas draws (`dag-canvas.tsx`), derived from the stores and the
@@ -508,7 +508,7 @@ export const createDagCanvasScene = ({
                   highlight: highlightOf(highlighted?.nodes, node.id),
                   outside: outside.has(node.id),
                   opacity: fading?.get(node.id),
-                  compact: size === 'compact',
+                  size,
                 } satisfies DagNodeRecord;
               }
             }
@@ -688,8 +688,11 @@ export type DagNodeRecord<V extends NodeView = NodeView> = Readonly<{
   outside: boolean;
   /** While it fades out of or into a view mode; `undefined` for opaque. */
   opacity: number | undefined;
-  /** 「コンパクト」: smaller, and its title alone. */
-  compact: boolean;
+  /**
+   * The reader's node size: 「コンパクト」, smaller and its title alone;
+   * 「大」, its title on up to three lines.
+   */
+  size: NodeSize;
 }>;
 
 /** How a group's frame is drawn (`dag-group-frame.tsx`). */

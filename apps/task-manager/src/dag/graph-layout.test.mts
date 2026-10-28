@@ -9,7 +9,7 @@ import {
   type DomainState,
   type GraphNodeId,
 } from '../domain/index.mjs';
-import { DAY_MS } from '../view-model/index.mjs';
+import { DAY_MS, nodeSizes } from '../view-model/index.mjs';
 import { PLACEMENT_GAP, type Bounds } from './dag-layout.mjs';
 import { layoutWithElk } from './elk.mjs';
 import {
@@ -20,6 +20,8 @@ import {
   edgeLabel,
   fromElkGraph,
   labelSize,
+  LARGE_MILESTONE_NODE_SIZE,
+  LARGE_TASK_NODE_SIZE,
   layOutGraph,
   layoutInput,
   layoutKey,
@@ -188,7 +190,7 @@ describe('layoutInput, with groups', () => {
 });
 
 describe(nodeBoxSize, () => {
-  test('is the box of each kind at each size, compact the smaller', () => {
+  test('is the box of each kind at each size, compact the smaller and large the larger', () => {
     assert.deepStrictEqual(nodeBoxSize('task', 'standard'), TASK_NODE_SIZE);
 
     assert.deepStrictEqual(
@@ -206,6 +208,13 @@ describe(nodeBoxSize, () => {
       COMPACT_MILESTONE_NODE_SIZE,
     );
 
+    assert.deepStrictEqual(nodeBoxSize('task', 'large'), LARGE_TASK_NODE_SIZE);
+
+    assert.deepStrictEqual(
+      nodeBoxSize('milestone', 'large'),
+      LARGE_MILESTONE_NODE_SIZE,
+    );
+
     for (const kind of ['task', 'milestone'] as const) {
       const standard = nodeBoxSize(kind, 'standard');
 
@@ -214,6 +223,20 @@ describe(nodeBoxSize, () => {
       assert.isBelow(compact.width, standard.width);
 
       assert.isBelow(compact.height, standard.height);
+
+      const large = nodeBoxSize(kind, 'large');
+
+      assert.isAbove(large.width, standard.width);
+
+      assert.isAbove(large.height, standard.height);
+    }
+
+    // In 「アーク」 the milestones line up on the tasks' right side.
+    for (const size of nodeSizes) {
+      assert.isAtMost(
+        nodeBoxSize('milestone', size).width,
+        nodeBoxSize('task', size).width,
+      );
     }
   });
 });

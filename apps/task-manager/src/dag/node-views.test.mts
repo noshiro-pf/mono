@@ -63,6 +63,7 @@ describe(buildNodeViews, () => {
       title: 'B',
       shortTitle: 'B',
       compactTitle: 'B',
+      largeTitle: ['B'],
       status: 'in-progress',
       priority: 1,
       due: '期限 2026/10/09',
@@ -152,6 +153,65 @@ describe(buildNodeViews, () => {
     );
   });
 
+  test('wraps the whole title on a large node, where it fits on three lines', () => {
+    const view = buildNodeViews(state, 100).get('task:a');
+
+    assert.isDefined(view);
+
+    assert.isAbove(view.largeTitle.length, 1);
+
+    assert.strictEqual(view.largeTitle.join(''), view.title);
+  });
+
+  test('cuts the third line of a large node when the title is longer still', () => {
+    const long = 'あいうえおかきくけこ'.repeat(6);
+
+    const views = buildNodeViews(
+      {
+        tasks: state.tasks.map((task) => ({ ...task, title: long })),
+        milestones: state.milestones.map((milestone) => ({
+          ...milestone,
+          title: long,
+        })),
+      },
+      100,
+    );
+
+    for (const id of ['task:a', 'milestone:m'] as const) {
+      const lines = views.get(id)?.largeTitle ?? [];
+
+      assert.strictEqual(lines.length, 3);
+
+      assert.isTrue(lines.at(-1)?.endsWith('…') ?? false);
+    }
+  });
+
+  test('leaves room for the check box on the first line of a large awaiting milestone', () => {
+    const long = 'あいうえおかきくけこ'.repeat(6);
+
+    const views = buildNodeViews(
+      {
+        tasks: [],
+        milestones: state.milestones.map((milestone) => ({
+          ...milestone,
+          title: long,
+        })),
+      },
+      100,
+    );
+
+    const awaiting = views.get('milestone:m');
+
+    assert.isTrue(awaiting?.kind === 'milestone' && awaiting.awaitingCheck);
+
+    const [first, second] = awaiting.largeTitle;
+
+    assert.isBelow(textWidthUnits(first ?? ''), textWidthUnits(second ?? ''));
+
+    // 22 units a line inside the hexagon, the check box's 3 among them.
+    assert.isAtMost(textWidthUnits(`☐ ${first ?? ''}`), 22);
+  });
+
   test('leaves room for the warning on a compact task, and for the check box on a compact milestone', () => {
     const long = 'あいうえおかきくけこさしすせそ';
 
@@ -198,6 +258,7 @@ describe(buildNodeViews, () => {
       title: 'M',
       shortTitle: 'M',
       compactTitle: 'M',
+      largeTitle: ['M'],
       reached: false,
       awaitingCheck: true,
       date: undefined,

@@ -171,9 +171,10 @@ type Props = Readonly<{
  * keeping the first task of the first row in view where it was. A thin
  * thumb on the right says how far down the view is.
  *
- * Every node is drawn at the reader's node size, 「標準」 or 「コンパクト」
- * (`nodeSizeStore`) — a layout ELK made at the other size, while the next is
- * computed, at this one — and the edges are routed between those boxes.
+ * Every node is drawn at the reader's node size, 「コンパクト」, 「標準」 or
+ * 「大」 (`nodeSizeStore`) — a layout ELK made at another size, while the
+ * next is computed, at this one — and the edges are routed between those
+ * boxes.
  *
  * While the view changes mode, the edges are hidden; the nodes one of the
  * modes does not draw fade (`dagLayoutStore.animatedOpacities`), and the

@@ -1,9 +1,9 @@
 /**
- * What each node of the DAG shows at a time: its title cut to fit, both a
- * standard node and a compact one (`view-model/node-size.mts`), the state
- * that colours it — a task's display status, a milestone's reached or not —
- * a task's due date and priority, and a milestone's date. Separate from the
- * layout, which does not change with any of it.
+ * What each node of the DAG shows at a time: its title cut to fit a node of
+ * each size (`view-model/node-size.mts`), on up to three lines on a large
+ * one; the state that colours it — a task's display status, a milestone's
+ * reached or not —; a task's due date and priority, and a milestone's date.
+ * Separate from the layout, which does not change with any of it.
  */
 
 import type { DeepReadonly } from 'ts-type-forge';
@@ -26,7 +26,7 @@ import {
   formatShortDateTime,
   priorityLabels,
 } from '../view-model/index.mjs';
-import { truncateToUnits } from './truncate.mjs';
+import { truncateToUnits, wrapToUnits } from './truncate.mjs';
 
 /** `timeZone` is for the tests; the page passes none and gets the browser's. */
 export const buildNodeViews = (
@@ -64,6 +64,11 @@ export const buildNodeViews = (
             warning
               ? COMPACT_TASK_TITLE_UNITS - WARNING_UNITS
               : COMPACT_TASK_TITLE_UNITS,
+          ),
+          largeTitle: wrapToUnits(
+            task.title,
+            LARGE_TASK_TITLE_UNITS,
+            LARGE_TITLE_LINES,
           ),
           status: shown,
           priority: task.priority,
@@ -112,6 +117,14 @@ export const buildNodeViews = (
               ? COMPACT_MILESTONE_TITLE_UNITS - CHECK_BOX_UNITS
               : COMPACT_MILESTONE_TITLE_UNITS,
           ),
+          largeTitle: wrapToUnits(
+            milestone.title,
+            LARGE_MILESTONE_TITLE_UNITS,
+            LARGE_TITLE_LINES,
+            awaitingCheck
+              ? LARGE_MILESTONE_TITLE_UNITS - CHECK_BOX_UNITS
+              : LARGE_MILESTONE_TITLE_UNITS,
+          ),
           reached,
           awaitingCheck,
           date:
@@ -148,6 +161,8 @@ export type TaskNodeView = DeepReadonly<{
   shortTitle: string;
   /** Cut to fit a compact node, beside the warning if there is one. */
   compactTitle: string;
+  /** Broken into the lines of a large node, the last cut if need be. */
+  largeTitle: string[];
   status: DisplayStatus;
   priority: Priority;
   /** `期限 10/09 12:05`, `期限切れ 10/09 12:05` or `期限なし`: a node's second line. */
@@ -166,6 +181,11 @@ export type MilestoneNodeView = DeepReadonly<{
   shortTitle: string;
   /** Cut to fit a compact node, after the check box if there is one. */
   compactTitle: string;
+  /**
+   * Broken into the lines of a large node, the last cut if need be, the
+   * first after the check box if there is one.
+   */
+  largeTitle: string[];
   reached: boolean;
   awaitingCheck: boolean;
   /**
@@ -187,6 +207,18 @@ const COMPACT_TASK_TITLE_UNITS = 17;
 
 /** What fits inside a compact milestone's shape. */
 const COMPACT_MILESTONE_TITLE_UNITS = 15;
+
+/** What fits on each line of a large task node. */
+const LARGE_TASK_TITLE_UNITS = 32;
+
+/**
+ * What fits on each line inside a large milestone's shape, which narrows
+ * towards its top and bottom.
+ */
+const LARGE_MILESTONE_TITLE_UNITS = 22;
+
+/** The most lines of title a large node shows. */
+const LARGE_TITLE_LINES = 3;
 
 /** The warning at the end of a compact task's line, and the space before it. */
 const WARNING_UNITS = 2;
