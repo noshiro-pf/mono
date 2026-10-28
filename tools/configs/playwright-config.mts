@@ -27,7 +27,7 @@ export const definePlaywrightAppConfig = ({
 }>): PlaywrightTestConfig => {
   const port = appDevPort(packageRoot);
 
-  const baseURL = `http://localhost:${port}`;
+  const baseURL = `http://localhost:${port}` as const;
 
   return defineConfig({
     testDir: path.resolve(packageRoot, 'e2e'),

@@ -144,7 +144,7 @@
     "z:link-strict-lib": "strict-ts-lib-v7.0-link",
     "z:next-major-reminder": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/next-major-reminder.mts",
     "z:repo-settings": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/github-settings-as-code/src/cmd/repo-settings.mts",
-    "z:ts-codemod": "pnpm run z:ts-codemod:cmd --transformer append-as-const --transformer convert-to-readonly '{libs,apps,tools,languages}/**/{src,scripts,samples,test}/**/*.{ts,mts,tsx}' --exclude 'libs/ts-type-forge/{src,samples,scripts}/**' --exclude 'libs/eslint-plugin-ts-type-forge/{src,samples}/**'",
+    "z:ts-codemod": "pnpm run z:ts-codemod:cmd --transformer append-as-const --transformer convert-to-readonly '{tools,{libs,apps,languages}/**/{src,scripts,samples,test}}/**/*.{ts,mts,tsx}' --exclude 'libs/ts-type-forge/{src,samples,scripts}/**' --exclude 'libs/eslint-plugin-ts-type-forge/{src,samples}/**'",
     "z:ts-codemod:cmd": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/ts-codemod-cli/src/cmd/ts-codemod.mts"
   },
   "devDependencies": {

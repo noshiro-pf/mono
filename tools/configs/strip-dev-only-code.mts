@@ -40,7 +40,7 @@ export const devOnlyCode: StripDevOnlyCodeOptions = {
     'castDeepReadonly',
   ],
   removeComments: true,
-};
+} as const;
 
 /**
  * Runs `stripDevOnlyCodeInDir` over `distDir` with {@link devOnlyCode},

@@ -11,9 +11,9 @@ type BrowserProvider = NonNullable<
 >;
 
 type ProjectOverrides = DeepReadonly<{
-  includeSource?: readonly string[];
-  include?: readonly string[];
-  exclude?: readonly string[];
+  includeSource?: string[];
+  include?: string[];
+  exclude?: string[];
   testTimeout?: number;
 }>;
 
@@ -40,8 +40,8 @@ export const defineViteConfig = ({
   /** Omitted rather than defaulted, because Vitest's own default is `false`. */
   passWithNoTests?: boolean;
   coverage?: {
-    include?: readonly string[];
-    exclude?: readonly string[];
+    include?: string[];
+    exclude?: string[];
   };
   node?: ProjectOverrides;
   /** Pass `false` for a package with no browser tests. */
@@ -74,7 +74,7 @@ export const defineViteConfig = ({
          * each run: 6 of 6 runs pass with the list, 4 of 4 fail without it.
          * Warm, it passes either way — which is why this failed only in CI.
          */
-        optimizeDepsInclude?: readonly string[];
+        optimizeDepsInclude?: string[];
         /**
          * Defaults to `false` — see the comment on the emitted option. Pass
          * `true` to opt out and run the browser tests in parallel.
@@ -128,7 +128,7 @@ export const defineViteConfig = ({
               headless: true,
               screenshotFailures: false,
               provider: castMutable(browser.provider),
-              instances: [{ browser: 'chromium' as const }],
+              instances: [{ browser: 'chromium' }],
             },
           },
           optimizeDeps: {
@@ -138,8 +138,8 @@ export const defineViteConfig = ({
 
   const projects: readonly TestProjectConfiguration[] =
     browserProject === undefined
-      ? [nodeProject]
-      : [nodeProject, browserProject];
+      ? ([nodeProject] as const)
+      : ([nodeProject, browserProject] as const);
 
   return {
     test: {

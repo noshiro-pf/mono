@@ -103,11 +103,12 @@ export const generateRuleTypesFileContent = ({
 
   const pascalPrefix = toPascalCase(pluginPrefix);
 
-  const rulesTypeName = `Eslint${pascalPrefix}Rules`;
+  const rulesTypeName = `Eslint${pascalPrefix}Rules` as const;
 
-  const rulesOptionTypeName = `Eslint${pascalPrefix}RulesOption`;
+  const rulesOptionTypeName = `Eslint${pascalPrefix}RulesOption` as const;
 
-  const rulesObjectName = `${pascalPrefix.slice(0, 1).toLowerCase()}${pascalPrefix.slice(1)}Rules`;
+  const rulesObjectName =
+    `${pascalPrefix.slice(0, 1).toLowerCase()}${pascalPrefix.slice(1)}Rules` as const;
 
   const optionRules = rules.filter((rule) => rule.hasOptions);
 
