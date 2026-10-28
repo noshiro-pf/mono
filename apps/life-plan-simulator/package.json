@@ -1,6 +1,6 @@
 {
   "name": "life-plan-simulator",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "private": true,
   "description": "Life plan (income and expense) simulator, ported from a spreadsheet",
   "repository": {
