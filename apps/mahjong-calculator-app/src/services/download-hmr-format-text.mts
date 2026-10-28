@@ -2,12 +2,7 @@ import { Arr, Optional, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { doraHyouji2Dora } from '../constants/index.mjs';
 import { aka2Normal, hand2String, toTiles34 } from '../functions/index.mjs';
-import {
-  doraIndicators$,
-  handSorted$,
-  numRemainingTiles$,
-  turn$,
-} from '../store/index.mjs';
+import { calculatorStore } from '../store/index.mjs';
 import type { NumTiles, TileName, Turn } from '../types/index.mjs';
 import { downloadFile } from '../utils/index.mjs';
 
@@ -80,25 +75,26 @@ export const downloadHMRFormatText = (): Result<
     | { type: 'turn-is-undefined' }
   >
 > => {
-  const maybeHand = handSorted$.getSnapshot();
+  const maybeHand = calculatorStore.handSorted.getSnapshot();
 
   if (Optional.isNone(maybeHand)) {
     return Result.err({ type: 'hand-is-undefined' });
   }
 
-  const maybeTurn = turn$.getSnapshot();
+  const maybeTurn = calculatorStore.turn.getSnapshot();
 
   if (Optional.isNone(maybeTurn)) {
     return Result.err({ type: 'turn-is-undefined' });
   }
 
-  const maybeDoraIndicators = doraIndicators$.getSnapshot();
+  const maybeDoraIndicators = calculatorStore.doraIndicators.getSnapshot();
 
   if (Optional.isNone(maybeDoraIndicators)) {
     return Result.err({ type: 'doraIndicators-is-undefined' });
   }
 
-  const maybeNumRemainingTiles = numRemainingTiles$.getSnapshot();
+  const maybeNumRemainingTiles =
+    calculatorStore.numRemainingTiles.getSnapshot();
 
   if (Optional.isNone(maybeNumRemainingTiles)) {
     return Result.err({ type: 'numRemainingTiles-is-undefined' });

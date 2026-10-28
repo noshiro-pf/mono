@@ -1,12 +1,6 @@
 import { memoNamed } from 'preact-utils';
-import {
-  setBakaze,
-  setJikaze,
-  setTehaiType,
-  useBakaze,
-  useJikaze,
-  useTehaiType,
-} from '../store/index.mjs';
+import { useObservableValue } from 'synstate-preact-hooks';
+import { calculatorStore } from '../store/index.mjs';
 import {
   BakazeButtonGroup,
   JikazeButtonGroup,
@@ -14,18 +8,27 @@ import {
 } from './atoms/index.mjs';
 
 export const Calculator = memoNamed('Calculator', () => {
-  const bakaze = useBakaze();
+  const bakaze = useObservableValue(calculatorStore.bakaze);
 
-  const jikaze = useJikaze();
+  const jikaze = useObservableValue(calculatorStore.jikaze);
 
-  const tehaiType = useTehaiType();
+  const tehaiType = useObservableValue(calculatorStore.tehaiType);
 
   return (
     <div>
       <div>{'Calculator'}</div>
-      <BakazeButtonGroup selectedId={bakaze} onClick={setBakaze} />
-      <JikazeButtonGroup selectedId={jikaze} onClick={setJikaze} />
-      <TehaiTypeButtonGroup selectedId={tehaiType} onClick={setTehaiType} />
+      <BakazeButtonGroup
+        selectedId={bakaze}
+        onClick={calculatorStore.setBakaze}
+      />
+      <JikazeButtonGroup
+        selectedId={jikaze}
+        onClick={calculatorStore.setJikaze}
+      />
+      <TehaiTypeButtonGroup
+        selectedId={tehaiType}
+        onClick={calculatorStore.setTehaiType}
+      />
     </div>
   );
 });
