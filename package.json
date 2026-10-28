@@ -48,6 +48,7 @@
     "check:root:app-head": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-app-head.mts",
     "check:root:ci-commands": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-ci-commands.mts",
     "check:root:deps-built-guard": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-deps-built-guard.mts",
+    "check:root:dist-lib-replacement": "node ./tools/scripts/cmd/assert-deps-built.mts --workspace && tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-dist-lib-replacement.mts",
     "check:root:example-coverage": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-example-coverage.mts",
     "check:root:firebase-redirects": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-firebase-redirects.mts",
     "check:root:knip-config": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-knip-config.mts",

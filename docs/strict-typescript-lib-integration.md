@@ -300,6 +300,13 @@ changeset が要る。**ただしこの判断は後述の strict-typescript-lib#
 `.d.mts` が変わらないこと。`libReplacement` の有無で 2 通り emit して突き合わせる。
 `octokit-safe-types` では 15 ファイルすべて同一だった。
 
+**2026-10-28 追記: 手作業は要らなくなった。** `check:root:dist-lib-replacement`
+（#2485）が、`libReplacement: true` のメンバーのうち `configs/tsconfig.build.json`
+を持つものすべてについて、その config を `--libReplacement true` と `false` で
+コンパイルし、出力がバイト単位で同一であることを確かめる。CI では
+`code-check.yml` の `check:root` で走る。`build` が素の lib で走るのに何を測って
+いるのかは、`ts-repo-utils` の opt-in の節の「2026-10-28 追記」に書いた。
+
 **lint は `ws:check:lint` ではなく `ws:fix:lint` + `z:assert-repo-is-clean` で測る。**
 strict lib が緩くした指摘に付いていた `eslint-disable` は不要になるが、
 `reportUnusedDisableDirectives` の重大度は warning なので `ws:check:lint` は exit 0 の
@@ -1402,6 +1409,17 @@ opt-in のたびに、次の 2 つを確認する。
 としたら経路は 1 つだけで、**共有 config か `configs/tsconfig.build.json` の側に
 `libReplacement: true` が入ったとき**である。逆に言えば、宣言を strict lib で
 emit したくなった日には、この構造ごと考え直すことになる。
+
+**2026-10-28 追記: それでも CI で測る理由。** `dist` が opt-in で変わらないのは
+上のとおりだが、それとは別に「型チェックが見た宣言」と「公開される宣言」が一致
+している保証は無い。推論に任せた型（`export const ks = Object.keys(rec)` は
+`explicit-function-return-type` の対象外）は lib ごとに綴りが違い、そのとき
+テストは strict lib の綴りを確かめ、消費者は素の lib の綴りを受け取る。
+`check:root:dist-lib-replacement` は build config を両方の lib でコンパイルして
+突き合わせるので、この食い違いでも、build config の側に `libReplacement: true`
+が入った日の漏れでも落ちる。`--listFiles` で strict bundle が `true` のときだけ
+読まれていることも確かめるので、`github-settings-as-code` の節のように同じ lib
+同士を比べて「一致」と出ることはない。
 
 ## `ts-fortress` の opt-in（2026-08-22 計測、2026-08-24 再測）
 

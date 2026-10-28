@@ -110,8 +110,12 @@ const memberScripts = [
   'check:test:browser',
 ] as const;
 
-/** Root scripts that run a member script across the workspace. */
+/**
+ * Root scripts that run a member script, or compile the members, across the
+ * workspace.
+ */
 const rootWorkspaceScripts = [
+  'check:root:dist-lib-replacement',
   'ws:check:types',
   'ws:check:lint',
   'ws:fix:lint',
