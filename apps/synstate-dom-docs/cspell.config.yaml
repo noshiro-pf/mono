@@ -8,3 +8,5 @@ words:
   # In the browser's user agent string, which the benchmark pages embed from
   # RESULTS.md.
   - KHTML
+  # The package name `vanjs-core`, which the bundle size pages name.
+  - vanjs

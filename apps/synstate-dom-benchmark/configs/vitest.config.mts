@@ -1,32 +1,25 @@
 import { playwright } from '@vitest/browser-playwright';
-import solidPlugin from 'vite-plugin-solid';
 import { defineConfig } from 'vitest/config';
+import { createProductionConfig } from '../scripts/production-config.mjs';
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
+
+const productionConfig = createProductionConfig();
 
 /**
  * Runs `src/run.bench-browser.mts` in Chromium. Not a test suite: nothing
  * here runs in CI, and the run prints a table rather than asserting.
  */
 export default defineConfig({
+  ...productionConfig,
   root: workspaceRootPath,
-  // Production builds of every library, as an application would ship them:
-  // Solid and Preact carry development-only checks behind these.
-  mode: 'production',
   define: {
-    'process.env.NODE_ENV': JSON.stringify('production'),
+    ...productionConfig.define,
     // Which library the run measures first (`scripts/repeat-benchmark.mts`
     // turns it from run to run): the first one measured starts on a colder
     // browser than the rest.
     'process.env.BENCHMARK_ROTATE': JSON.stringify(
       process.env['BENCHMARK_ROTATE'] ?? '0',
     ),
-  },
-  resolve: {
-    conditions: ['module', 'browser', 'production'],
-  },
-  // The production JSX runtimes (`jsx`, not `jsxDEV`) for the same reason.
-  oxc: {
-    jsx: { development: false },
   },
   optimizeDeps: {
     // Named up front so that Vite does not discover them mid-run and reload
@@ -47,15 +40,6 @@ export default defineConfig({
       'synstate-dom > ts-data-forge > @sindresorhus/is',
     ],
   },
-  plugins: [
-    solidPlugin({
-      // Only Solid's files go through its compiler; the others keep the JSX
-      // transform their `@jsxImportSource` pragma names.
-      include: ['src/frameworks/solid.tsx', 'src/scenarios/*/solid.tsx'],
-      dev: false,
-      hot: false,
-    }),
-  ],
   test: {
     globals: true,
     // vite-plugin-solid defaults this to jsdom for Vitest; the run is in a

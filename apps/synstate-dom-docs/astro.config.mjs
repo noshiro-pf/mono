@@ -79,6 +79,7 @@ export default defineConfig({
           items: [
             { slug: 'background/without-a-compiler' },
             { slug: 'background/benchmark' },
+            { slug: 'background/bundle-size' },
           ],
         },
       ],

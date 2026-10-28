@@ -26,4 +26,4 @@ synstate-dom はまだ 0.x で、マイナーリリースで API が変わるこ
 ## 次に読むもの
 
 - [インストール](/mono/synstate-dom/ja/getting-started/installation/)で JSX の変換を設定し、カウンターを描画する。
-- [ベンチマーク](/mono/synstate-dom/ja/background/benchmark/)では、js-framework-benchmark の操作で Solid・Preact + Signals・Preact・React・VanJS と比べている。
+- [ベンチマーク](/mono/synstate-dom/ja/background/benchmark/)では、js-framework-benchmark の操作で Solid・Preact + Signals・Preact・React・VanJS と比べている。[バンドルサイズ](/mono/synstate-dom/ja/background/bundle-size/)では、同じアプリケーションに各ライブラリが足すサイズを比べている。

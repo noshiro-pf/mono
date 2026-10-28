@@ -26,4 +26,4 @@ synstate-dom is at version 0.x: its API may still change in a minor release. The
 ## Where to go next
 
 - [Installation](/mono/synstate-dom/getting-started/installation/) sets up the JSX transform and renders a counter.
-- [Benchmark](/mono/synstate-dom/background/benchmark/) compares synstate-dom with Solid, Preact + Signals, Preact, React and VanJS on the operations of js-framework-benchmark.
+- [Benchmark](/mono/synstate-dom/background/benchmark/) compares synstate-dom with Solid, Preact + Signals, Preact, React and VanJS on the operations of js-framework-benchmark, and [Bundle size](/mono/synstate-dom/background/bundle-size/) on what each adds to the same applications.
