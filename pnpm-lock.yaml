@@ -2620,6 +2620,9 @@ importers:
       tsx:
         specifier: 'catalog:'
         version: 4.23.15
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
       vite-plugin-solid:
         specifier: 2.11.14
         version: 2.11.14(solid-js@1.9.17)(supports-color@7.2.0)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))

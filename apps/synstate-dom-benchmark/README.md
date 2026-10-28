@@ -1,6 +1,6 @@
 # synstate-dom-benchmark
 
-Compares [synstate-dom](../../libs/synstate-dom) with Solid, Preact + Signals, Preact, React and VanJS on the operations of [js-framework-benchmark](https://github.com/krausest/js-framework-benchmark): create, replace, partially update, select, swap, remove, append and clear rows of a table. It also compares them on two [scenarios](#scenarios) whose figures depend on each other through diamonds of many lengths: a loan amortization table and a project schedule. The latest figures are in [`RESULTS.md`](./RESULTS.md).
+Compares [synstate-dom](../../libs/synstate-dom) with Solid, Preact + Signals, Preact, React and VanJS on the operations of [js-framework-benchmark](https://github.com/krausest/js-framework-benchmark): create, replace, partially update, select, swap, remove, append and clear rows of a table. It also compares them on two [scenarios](#scenarios) whose figures depend on each other through diamonds of many lengths: a loan amortization table and a project schedule. The latest figures are in [`RESULTS.md`](./RESULTS.md), and the size of each library's bundles in [`BUNDLE-SIZE.md`](./BUNDLE-SIZE.md).
 
 ## Running
 
@@ -48,3 +48,13 @@ Each scenario also times `mount`, which builds the whole graph.
 A change here costs well under a millisecond, less than the 4 ms to which the browser holds a nested `setTimeout`, so the scenarios wait for the next task through a `MessageChannel` instead. And since `performance.now()` is rounded to 0.1 ms, one sample is the mean of 20 changes, alternating the operation and its reverse, which reach the same figures; a build sample is the mean of 5 mounts.
 
 synstate-dom is measured twice. As written, each figure is `combine` + `map`, which passes on every value it computes, so an update goes on through figures that came out the same. With a `skipIfNoChange` after every figure, it stops there, as Solid and Preact + Signals do by default, at the cost of a third node per figure.
+
+## Bundle size
+
+`pnpm run bundle-size` (after `pnpm run ws:build`) bundles each library's implementations of one application at a time with Vite, minifies them, compresses them with gzip and Brotli, and writes the sizes to `BUNDLE-SIZE.md`. The configuration is the one the timed run uses (`scripts/production-config.mts`), so the code measured is the code timed, and every library is tree-shaken alike. The applications are:
+
+- **everything exported**: every export of the library's entry points (`scripts/measure-bundle-size.mts` lists them), kept whole; an upper bound rather than what an application ships. Preact's table uses `memo` from `preact/compat`, which this row does not count.
+- **counter** (`src/counter/`): a button that shows a count and adds one when clicked, the smallest application each library can be measured on.
+- **js-framework-benchmark table** (`src/frameworks/`) and the **loan**, **schedule** and **zoom scenarios** (`src/scenarios/`), as timed. synstate-dom's scenarios are measured as written, without `skipIfNoChange`.
+
+The code the implementations share, the row factory and the scenario models, is in every column. One run is enough: the sizes depend only on the sources and the installed versions.

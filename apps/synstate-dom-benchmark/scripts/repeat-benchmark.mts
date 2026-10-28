@@ -11,6 +11,7 @@ import {
   Result,
   unknownToString,
 } from 'ts-data-forge';
+import { mapInSequence } from './map-in-sequence.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 /**
@@ -400,21 +401,5 @@ const ratio = (value: number, base: number): string =>
   Num.isNonZero(base) && !Number.isNaN(value) && !Number.isNaN(base)
     ? (`${Num.div(value, base).toFixed(2)}×` as const)
     : '–';
-
-/** `Array#map` with an async callback, one element at a time. */
-const mapInSequence = async <T, R>(
-  items: readonly T[],
-  fn: (item: T) => Promise<R>,
-): Promise<readonly R[]> => {
-  const [head, ...rest] = items;
-
-  if (head === undefined) {
-    return [];
-  }
-
-  const first = await fn(head);
-
-  return Arr.toUnshifted(first)(await mapInSequence(rest, fn));
-};
 
 await main();

@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import { Arr, Num, Result, unknownToString } from 'ts-data-forge';
 import { formatFiles, isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { embedInto, type Embedded } from './embed-markers.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 /**
@@ -33,7 +34,11 @@ export const embedBenchmark = async (): Promise<Result<undefined, string>> => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const page = await fs.readFile(pagePath, 'utf8');
 
-      const embedded = embedInto(page, render(parsed.value, locale));
+      const embedded = embedInto(
+        page,
+        'benchmark',
+        render(parsed.value, locale),
+      );
 
       if (Result.isErr(embedded)) {
         return Result.err(`❌ ${pagePath}: ${embedded.value}`);
@@ -257,13 +262,6 @@ const cells = (line: string): readonly string[] =>
     .split('|')
     .map((cell) => cell.trim());
 
-/**
- * What a marker is replaced with. A block (a table, a paragraph) goes on lines
- * of its own so that Markdown still reads it as one; an inline figure stays
- * inside its sentence.
- */
-type Embedded = Readonly<{ text: string; block: boolean }>;
-
 /** What each marker on a page is replaced with. */
 const render = (
   results: Results,
@@ -358,56 +356,6 @@ const ratio = (value: number, base: number): string =>
 /** `parseResults` has already rejected a median that is not positive. */
 const ratioOf = (value: number, base: number): number =>
   Num.isNonZero(base) ? Num.div(value, base) : Number.NaN;
-
-/**
- * Replaces the content of every `<!-- benchmark:<key> -->…<!-- /benchmark -->`
- * span. A key the page uses and `values` lacks is an error, and so is a key in
- * `values` the page never uses: a table that quietly stopped being embedded is
- * the drift this script exists to prevent.
- */
-const embedInto = (
-  page: string,
-  values: ReadonlyRecord<string, Embedded>,
-): Result<string, string> => {
-  const mut_used = new Set<string>();
-
-  const mut_missing: string[] = [];
-
-  const replaced = page.replaceAll(
-    /<!-- benchmark:(?<key>[\w-]+) -->[\s\S]*?<!-- \/benchmark -->/gu,
-    (match, key: string | undefined) => {
-      const value = key === undefined ? undefined : values[key];
-
-      if (key === undefined || value === undefined) {
-        mut_missing.push(key ?? match);
-
-        return match;
-      }
-
-      mut_used.add(key);
-
-      return value.block
-        ? `<!-- benchmark:${key} -->\n\n${value.text}\n\n<!-- /benchmark -->`
-        : `<!-- benchmark:${key} -->${value.text}<!-- /benchmark -->`;
-    },
-  );
-
-  if (Arr.isNonEmpty(mut_missing)) {
-    return Result.err(
-      `no value for ${mut_missing.map((key) => `"benchmark:${key}"`).join(', ')}`,
-    );
-  }
-
-  const unused = Object.keys(values).filter((key) => !mut_used.has(key));
-
-  if (Arr.isNonEmpty(unused)) {
-    return Result.err(
-      `the page has no marker for ${unused.map((key) => `"benchmark:${key}"`).join(', ')}`,
-    );
-  }
-
-  return Result.ok(replaced);
-};
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await embedBenchmark();
