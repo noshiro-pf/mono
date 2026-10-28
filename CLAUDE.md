@@ -47,8 +47,8 @@ see "Japanese text".
 ## Repository layout
 
 - `libs/*` — published npm packages. `apps/*` — applications, private, each
-  still carrying `"exports": "./src/index.mts"` so siblings can resolve it. A
-  browser app's `<head>` (icons, link cards) follows `docs/browser-app-head.md`.
+  with `"exports": "./src/index.mts"` for siblings. Where a browser app is
+  hosted: `docs/frontend-hosting.md`; its `<head>`: `docs/browser-app-head.md`.
 - `tools/` — repository tooling; not a workspace member. `tools/configs/`
   holds shared config and the sample embedding scripts; `tools/scripts/cmd/`
   holds root-level `tsx` commands, one file each (a command that outgrows one
