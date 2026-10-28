@@ -64,7 +64,7 @@ declare namespace StrictLibInternals {
                   >,
                 ])
           | {
-              [K in keyof R]: readonly [
+              [K in keyof R]-?: readonly [
                 ToStr<keyof PickByValue<R, R[K]>>,
                 R[K],
               ];

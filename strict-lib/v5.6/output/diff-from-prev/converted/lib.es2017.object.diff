@@ -1,5 +1,5 @@
 diff --git a/v5.5/output/lib-files/lib.es2017.object.d.ts b/v5.6/output/lib-files/lib.es2017.object.d.ts
-index 2d37c7d79fd477771e2bc57083265e2c1bb93892..f0fd14e97cdf2949de0b10d378b8f638c0b86ba6 100644
+index fdf97a176a00cd6a4ad47166e43f0f09e0b73a26..2022fb0274b742dd04ae7fe12133c52665bfca29 100644
 --- a/v5.5/output/lib-files/lib.es2017.object.d.ts
 +++ b/v5.6/output/lib-files/lib.es2017.object.d.ts
 @@ -75,19 +75,19 @@ declare namespace StrictLibInternals {

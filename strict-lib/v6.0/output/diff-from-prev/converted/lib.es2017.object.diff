@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2017.object.d.ts b/v6.0/output/lib-files/lib.es2017.object.d.ts
-index f0fd14e97cdf2949de0b10d378b8f638c0b86ba6..58758e25ba73b70d12ad385ab58f52287126dc2b 100644
+index 2022fb0274b742dd04ae7fe12133c52665bfca29..fd67e16f721db8948fedd70e24c179aa2cb28b1b 100644
 --- a/v5.9/output/lib-files/lib.es2017.object.d.ts
 +++ b/v6.0/output/lib-files/lib.es2017.object.d.ts
 @@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
