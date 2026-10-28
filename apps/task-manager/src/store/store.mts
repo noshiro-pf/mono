@@ -239,7 +239,7 @@ export const dagSelectionStore = createDagSelectionStore({
   hidden: combine([dagHiddenNodes, dagOutsideNodes]).pipe(
     // `union`'s type argument is written out: under the strict standard library
     // it is otherwise inferred as `string` from a set of a literal union,
-    // through the widened parameter of `ReadonlySet#has`.
+    // through the widened parameter of `ReadonlySet#has` (#2585).
     map(([hidden, outside]): ReadonlySet<GraphNodeId> =>
       hidden.union<GraphNodeId>(outside),
     ),
