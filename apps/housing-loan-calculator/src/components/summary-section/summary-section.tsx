@@ -1,17 +1,19 @@
 import { memoNamed } from 'react-utils';
 import { useObservableValue } from 'synstate-react-hooks';
 import { dict } from '../../constants/index.mjs';
-import { calculatedValues$, store$ } from '../../store/index.mjs';
+import { loanStore } from '../../store/index.mjs';
 import { DataItem } from './data-item.js';
 
 export const SummarySection = memoNamed('SummarySection', () => {
-  const { repaymentType, borrowingTotalManYen } = useObservableValue(store$);
+  const { repaymentType, borrowingTotalManYen } = useObservableValue(
+    loanStore.inputs,
+  );
 
   const {
     fixedPrincipalYenPerMonth,
     fixedMonthlyPaymentsYen,
     interestSumManYen,
-  } = useObservableValue(calculatedValues$);
+  } = useObservableValue(loanStore.calculatedValues);
 
   return (
     <dl>

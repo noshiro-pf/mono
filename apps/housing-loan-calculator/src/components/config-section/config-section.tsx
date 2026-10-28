@@ -3,13 +3,7 @@ import styled from '@emotion/styled';
 import { memoNamed } from 'react-utils';
 import { useObservableValue } from 'synstate-react-hooks';
 import { dict } from '../../constants/index.mjs';
-import {
-  setBorrowingPeriodYear,
-  setBorrowingTotalManYen,
-  setInterestRatePercentPerYear,
-  setRepaymentType,
-  store$,
-} from '../../store/index.mjs';
+import { loanStore } from '../../store/index.mjs';
 import {
   PercentFloatNumericInput,
   YearNumericInput,
@@ -23,7 +17,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
     borrowingTotalManYen,
     borrowingPeriodYear,
     interestRatePercentPerYear,
-  } = useObservableValue(store$);
+  } = useObservableValue(loanStore.inputs);
 
   return (
     <>
@@ -35,7 +29,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
             cyId={'numericInput-borrowingTotalManYen'}
             min={0}
             value={borrowingTotalManYen}
-            onValueChange={setBorrowingTotalManYen}
+            onValueChange={loanStore.setBorrowingTotalManYen}
           />
         </Label>
       </ConfigElement>
@@ -46,7 +40,7 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
             cyId={'numericInput-borrowingPeriodYear'}
             min={1}
             value={borrowingPeriodYear}
-            onValueChange={setBorrowingPeriodYear}
+            onValueChange={loanStore.setBorrowingPeriodYear}
           />
         </Label>
       </ConfigElement>
@@ -58,14 +52,14 @@ export const ConfigSection = memoNamed('ConfigSection', () => {
             max={100}
             min={0}
             value={interestRatePercentPerYear}
-            onValueChange={setInterestRatePercentPerYear}
+            onValueChange={loanStore.setInterestRatePercentPerYear}
           />
         </Label>
       </ConfigElement>
       <ConfigElement data-e2e={'repaymentTypeRadioGroup'}>
         <RepaymentTypeRadioGroup
           repaymentType={repaymentType}
-          onRepaymentTypeChange={setRepaymentType}
+          onRepaymentTypeChange={loanStore.setRepaymentType}
         />
       </ConfigElement>
     </>
