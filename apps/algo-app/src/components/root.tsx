@@ -8,6 +8,7 @@ import {
   getParams,
   getRoomId,
   isMainPage,
+  roomPage,
   routes,
 } from '../constants/index.mjs';
 import { Router } from '../router.mjs';
@@ -35,7 +36,10 @@ export const Root = memoNamed('Root', () => {
 
   const showMain = useMemo(() => isMainPage(pathname), [pathname]);
 
-  const roomId = useMemo(() => getRoomId(pathname), [pathname]);
+  const roomId = useMemo(
+    () => getRoomId(pathname, queryParams),
+    [pathname, queryParams],
+  );
 
   const { playerId, replay, observe } = useMemo(
     () => getParams(queryParams),
@@ -49,7 +53,7 @@ export const Root = memoNamed('Root', () => {
   }, [roomId]);
 
   useObservableEffect(createRoom.response$, (res) => {
-    Router.push(`${routes.rooms}/${res.id}`);
+    Router.push(roomPage(res.id));
   });
 
   return (

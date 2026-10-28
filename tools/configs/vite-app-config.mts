@@ -1,6 +1,7 @@
 import viteReact from '@vitejs/plugin-react';
+import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type { UserConfig } from 'vite';
+import type { UserConfig, Plugin as VitePlugin } from 'vite';
 import { appDevPort } from './app-dev-ports.mjs';
 
 /**
@@ -30,6 +31,7 @@ export const defineViteAppConfig = ({
   framework,
   jsxImportSource,
   base,
+  routePaths,
 }: Readonly<{
   /** The package's root directory, i.e. the parent of `configs`. */
   packageRoot: string;
@@ -52,6 +54,14 @@ export const defineViteAppConfig = ({
    * their own domain.
    */
   base?: string;
+  /**
+   * The app's screens, as paths below `base` (`/create/`, `/plan/edit/`):
+   * the build writes a copy of `index.html` at each, so that GitHub Pages,
+   * which has no rewrites, has a page for a direct visit or a reload there.
+   * Only the finite set of screens goes here; a dynamic value such as an ID
+   * goes in the query string. See `docs/frontend-hosting.md`.
+   */
+  routePaths?: readonly string[];
 }>): UserConfig => {
   // `strictPort` so that a port already taken is an error rather than Vite
   // quietly moving to the next one — the e2e config points at this exact
@@ -71,6 +81,62 @@ export const defineViteAppConfig = ({
     server: { port, strictPort: true },
     preview: { port, strictPort: true },
 
-    plugins: framework === 'react' ? [viteReact({ jsxImportSource })] : [],
+    plugins: [
+      ...(framework === 'react' ? [viteReact({ jsxImportSource })] : []),
+      ...(routePaths === undefined ? [] : [routeEntryPages(routePaths)]),
+    ],
   };
 };
+
+/**
+ * Copies the built `index.html` to `<route>/index.html` under `outDir` for
+ * each of `routePaths`.
+ *
+ * The copies are the page itself: its asset URLs carry `base`, so it loads
+ * from any depth, and the app stays one page — it routes with
+ * `history.pushState`, and a copy is only what a direct visit or a reload of
+ * that path receives, as a server rewrite would serve it.
+ */
+export const writeRouteEntryPages = (
+  outDir: string,
+  routePaths: readonly string[],
+): void => {
+  const indexHtml = path.resolve(outDir, 'index.html');
+
+  for (const route of routePaths) {
+    const relative = route.slice(1, -1);
+
+    if (
+      relative === '' ||
+      !route.startsWith('/') ||
+      !route.endsWith('/') ||
+      relative.split('/').some((segment) => segment === '' || segment === '..')
+    ) {
+      throw new Error(
+        `routePaths: "${route}" is not a route below the root, like "/create/".`,
+      );
+    }
+
+    const routeDir = path.resolve(outDir, relative);
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.mkdirSync(routeDir, { recursive: true });
+
+    fs.copyFileSync(indexHtml, path.resolve(routeDir, 'index.html'));
+  }
+};
+
+const routeEntryPages = (routePaths: readonly string[]): VitePlugin =>
+  ({
+    name: 'vite-app-config:route-entry-pages',
+    apply: 'build',
+    writeBundle: ({ dir }): void => {
+      if (dir === undefined) {
+        throw new Error(
+          'route-entry-pages: the build has no output directory.',
+        );
+      }
+
+      writeRouteEntryPages(dir, routePaths);
+    },
+  }) as const;
