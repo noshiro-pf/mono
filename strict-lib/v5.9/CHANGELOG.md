@@ -1,5 +1,43 @@
 # strict-ts-lib-v5.9-source
 
+## 0.6.7
+
+### Patch Changes
+
+- 53c3abc: A set or map of a literal union keeps the literal union where its element type
+  is inferred:
+
+    - `union` and `symmetricDifference` of two `ReadonlySet<'a' | 'b'>` are
+      `ReadonlySet<'a' | 'b'>`, where they had been `ReadonlySet<string>`.
+    - `const s: ReadonlySet<'a' | 'b'> = new Set(['a'])`, and the same with
+      `new Map(...)` and a `ReadonlyMap`, infer the type arguments from the
+      annotation instead of failing with `Set<string>`.
+    - A `Set<'a' | 'b'>` passed to a parameter `ReadonlySet<T>` infers
+      `T = 'a' | 'b'`, where it had been `string`; the same for a `Map` passed to a
+      `ReadonlyMap<K, V>`.
+
+    The parameter of `has` on `Set`, `ReadonlySet`, `Map`, `ReadonlyMap`,
+    `WeakSet` and `WeakMap` is `NoInfer<T | (WidenLiteral<T> & {})>`. It still
+    accepts the widened type, so a `ReadonlySet<'a' | 'b'>` can be queried with a
+    `string`, but no longer takes part in inference. A method parameter is
+    bivariant, so where `T` was inferred structurally through `has` — between `Set`
+    and `ReadonlySet`, which are different interfaces — the widened parameter had
+    widened `T` to `string`. `NoInfer` was introduced in TypeScript 5.4, so the
+    bundles for 5.0 to 5.3 are unchanged.
+
+    `ReadonlySetLike#has`, the argument type of the ES2025 Set methods (TypeScript
+    5.5 and later), takes the same parameter. It had been left as `has(value: T)`.
+
+- 081639f: `Object.entries` on a record with optional keys returns entries that can be
+  destructured again: `for (const [key, value] of Object.entries(record))` no
+  longer fails with TS2488 when `record` is, say,
+  `Readonly<{ a?: number; b?: string }>`.
+
+    The mapped type behind the record overload kept each optional key optional, so
+    indexing it added `undefined` to the entry itself, not only to its value. The
+    value of an optional key is still `number | undefined`; the entry is
+    `readonly ['a', number | undefined]` rather than that or `undefined`.
+
 ## 0.6.6
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "pr-merge-queue",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": false,
   "description": "A merge queue for GitHub driven by labels and `Merge-After:` trailers: unblock-prs lands the queued pull requests one at a time, open-pr opens one the way the queue wants it, and pr-report, claim-pr, push-fixed-pr and report-unowned-prs read and hand over the queue",
   "keywords": [
