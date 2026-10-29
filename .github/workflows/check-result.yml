@@ -69,6 +69,7 @@ jobs:
           # A caller that passed nothing but the gate would otherwise pass
           # with nothing checked.
           if [ "$(jq '[keys[] | select(. != "gates")] | length' <<<"${NEEDS}")" -eq 0 ]; then
+            # shellcheck disable=SC2016 # literal backticks, not command substitution
             echo '::error::`needs` names no job besides `gates`, so there is nothing to judge.'
             exit 1
           fi

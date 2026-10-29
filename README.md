@@ -42,8 +42,8 @@ takes about fifteen minutes; the targeted commands under
 
 ### What some packages need beyond that
 
-Nothing above needs anything installed outside the repository. A few packages
-do:
+Nothing above but `check-all` needs anything installed outside the
+repository (see the end of this section). A few packages do:
 
 | what                                    | for                                                                                    |
 | :-------------------------------------- | :------------------------------------------------------------------------------------- |
@@ -53,6 +53,10 @@ do:
 
 Each package's own README says which of these it wants, and none of them is
 needed to build, test or lint.
+
+`check-all` is the exception: `check:root:actionlint`, which it runs through
+`check:root`, needs `actionlint` and `shellcheck` on `PATH` at the versions
+`.github/workflows/code-check.yml` pins, and names them when they are not.
 
 ## Structure
 

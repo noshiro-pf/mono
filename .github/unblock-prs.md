@@ -37,6 +37,10 @@ reproduces as `pnpm run check:knip`. Five checks do not follow that rule:
 | `Validate PR title`          | The PR title is not Conventional Commits — `PATCH /pulls/{n}`  |
 | `Validate commit count`      | The branch is more than one commit — squash it, see below      |
 
+`code-check (check:root)` also needs `actionlint` and `shellcheck` on `PATH`,
+at the versions `code-check.yml` pins; `check:root:actionlint` names them and
+where to get them when they are not there.
+
 `Validate PR title` is required because a squash merge takes the PR title as
 the commit title (`squash_merge_commit_title: PR_TITLE`), so the fix is the
 title itself, not the branch. It checks Conventional Commits and English;

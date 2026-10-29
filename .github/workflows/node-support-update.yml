@@ -138,6 +138,7 @@ jobs:
 
           title='Node.js canary is failing'
 
+          # shellcheck disable=SC2016 # literal backticks, not command substitution
           body="$(printf '%s\n' \
             'The scheduled Node.js canary failed: the build or the tests did not pass on the newest release, on a nightly of the next major, or on both.' \
             '' \
@@ -238,6 +239,7 @@ jobs:
           # and asking for it in the same request leaves no window in which
           # the pull request exists without it.
           if [ "$(gh pr view "$branch" --json state --jq .state 2>/dev/null)" != 'OPEN' ]; then
+            # shellcheck disable=SC2016 # literal backticks, not command substitution
             gh pr create \
               --base main \
               --head "$branch" \

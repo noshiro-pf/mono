@@ -134,6 +134,7 @@ jobs:
           summary="Every commit message must be written in English. These are not:"
           echo "::error::${summary}"
           printf '%s\n%s\n' "${summary}" "${offending}"
+          # shellcheck disable=SC2016 # literal backticks, not command substitution
           {
             echo "${summary}"
             echo
@@ -182,6 +183,7 @@ jobs:
           summary="A pull request is squashed into a single commit before it is merged, and this one has ${count}."
           echo "::error::${summary}"
           echo "${summary}"
+          # shellcheck disable=SC2016 # literal backticks and $(…), not substitutions
           {
             echo "${summary}"
             echo
