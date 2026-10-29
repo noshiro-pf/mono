@@ -32,6 +32,7 @@ describe(taskToDraft, () => {
       progress: 'not-started',
       priority: 3,
       dueDate: '2026-10-09T12:00',
+      dueAllDay: false,
       labels: 'docs, ui',
       estimateHours: '1.5',
       groupId: '',
@@ -47,6 +48,21 @@ describe(taskToDraft, () => {
     assert.strictEqual(draft.dueDate, '');
 
     assert.strictEqual(draft.estimateHours, '');
+  });
+
+  test('writes an all-day due date as its day alone', () => {
+    const draft = taskToDraft(
+      {
+        ...task,
+        dueDate: 1_791_557_999_999 /* 2026-10-09T23:59:59.999 in Tokyo */,
+        dueAllDay: true,
+      },
+      timeZone,
+    );
+
+    assert.strictEqual(draft.dueDate, '2026-10-09');
+
+    assert.isTrue(draft.dueAllDay);
   });
 });
 
@@ -65,6 +81,7 @@ describe(applyTaskDraft, () => {
       progress: 'not-started',
       priority: 1,
       dueDate: '2026-10-10T09:30',
+      dueAllDay: false,
       labels: 'a、b',
       estimateHours: ' 3 ',
       groupId: 'g',
@@ -83,6 +100,56 @@ describe(applyTaskDraft, () => {
         groupId: asGroupId('g'),
         updatedAt: now,
       }),
+    );
+  });
+
+  test('reads an all-day due date as the end of its day', () => {
+    const result = applyTaskDraft(
+      task,
+      {
+        ...taskToDraft(task, timeZone),
+        dueDate: '2026-10-10',
+        dueAllDay: true,
+      },
+      now,
+      timeZone,
+    );
+
+    assert.deepStrictEqual(
+      Result.map(result, ({ dueDate, dueAllDay }) => ({ dueDate, dueAllDay })),
+      Result.ok({
+        dueDate: 1_791_644_399_999 /* 2026-10-10T23:59:59.999 in Tokyo */,
+        dueAllDay: true,
+      }),
+    );
+  });
+
+  test('keeps an all-day due date not edited as it is, in another time zone too', () => {
+    const allDay: Task = {
+      ...task,
+      dueDate: 1_791_557_999_999 /* 2026-10-09T23:59:59.999 in Tokyo */,
+      dueAllDay: true,
+    } as const;
+
+    const laTime = 'America/Los_Angeles';
+
+    assert.deepStrictEqual(
+      applyTaskDraft(allDay, taskToDraft(allDay, laTime), now, laTime),
+      Result.ok({ ...allDay, updatedAt: now }),
+    );
+  });
+
+  test('is not all day without a due date', () => {
+    const result = applyTaskDraft(
+      task,
+      { ...taskToDraft(task, timeZone), dueDate: '', dueAllDay: true },
+      now,
+      timeZone,
+    );
+
+    assert.deepStrictEqual(
+      Result.map(result, ({ dueDate, dueAllDay }) => ({ dueDate, dueAllDay })),
+      Result.ok({ dueDate: undefined, dueAllDay: false }),
     );
   });
 

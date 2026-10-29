@@ -6,7 +6,7 @@ import {
   priorityLabels,
   type TaskRow,
 } from '../view-model/index.mjs';
-import { DueDate } from './due-date.js';
+import { DueDate, dueOf } from './due-date.js';
 import { LabelChips } from './label-chips.js';
 import { StatusBadge } from './status-badge.js';
 import { WarningBadge } from './warning-badge.js';
@@ -58,7 +58,7 @@ export const TaskTableRow = ({ row }: Props): JSX.Element => (
     </td>
     <td>
       <DueDate
-        dueDate={view(row, ({ task }) => task.dueDate)}
+        dueDate={view(row, ({ task }) => dueOf(task))}
         overdue={view(row, ({ overdue }) => overdue)}
       />
     </td>

@@ -69,6 +69,7 @@ describe(milestoneDraftInsight, () => {
       title: 'M',
       description: '',
       date: '1970-01-01T00:05',
+      dateAllDay: false,
       requiresManualCheck: true,
       checkedAt: undefined,
       dependencies: [],
@@ -103,6 +104,7 @@ describe(milestoneDraftInsight, () => {
   test('says which conditions are not met yet', () => {
     const draft = {
       date: '1970-01-01T00:05',
+      dateAllDay: false,
       requiresManualCheck: true,
       checkedAt: undefined,
       dependencies: [
@@ -140,6 +142,30 @@ describe(milestoneDraftInsight, () => {
         waitingForCheck: after.waitingForCheck,
       },
       { reachedAt: 300_000, waitingForDate: undefined, waitingForCheck: false },
+    );
+  });
+
+  test('waits for the start of the day of an all-day date', () => {
+    const insight = milestoneDraftInsight(
+      state,
+      m,
+      {
+        date: '1970-01-02',
+        dateAllDay: true,
+        requiresManualCheck: false,
+        checkedAt: undefined,
+        dependencies: [],
+      },
+      0,
+      'UTC',
+    );
+
+    assert.deepStrictEqual(
+      {
+        waitingForDate: insight.waitingForDate,
+        dateAllDay: insight.dateAllDay,
+      },
+      { waitingForDate: 86_400_000, dateAllDay: true },
     );
   });
 });

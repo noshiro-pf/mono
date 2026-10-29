@@ -2,6 +2,7 @@ export * from './animation-setting.mjs';
 export * from './dag-filter.mjs';
 export * from './dag-show-done.mjs';
 export * from './dag-view-mode.mjs';
+export * from './date-draft.mjs';
 export * from './datetime-local.mjs';
 export * from './dependency-edit.mjs';
 export * from './diagram-sort.mjs';

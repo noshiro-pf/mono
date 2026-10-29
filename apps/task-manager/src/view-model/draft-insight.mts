@@ -24,7 +24,7 @@ import {
   type Task,
   type TaskId,
 } from '../domain/index.mjs';
-import { optionalDateTime } from './task-draft.mjs';
+import { draftedDate } from './date-draft.mjs';
 
 export const taskDraftInsight = (
   state: DomainState,
@@ -67,6 +67,7 @@ export const milestoneDraftInsight = (
   id: MilestoneId,
   draft: DeepReadonly<{
     date: string;
+    dateAllDay: boolean;
     requiresManualCheck: boolean;
     checkedAt: number | undefined;
     dependencies: readonly Dependency[];
@@ -78,12 +79,19 @@ export const milestoneDraftInsight = (
     state.milestones.find((milestone) => milestone.id === id) ??
     createMilestone({ id, title: '', now });
 
-  const date = optionalDateTime(draft.date, timeZone);
+  const date = draftedDate(
+    draft.date,
+    draft.dateAllDay,
+    { at: stored.date, allDay: stored.dateAllDay },
+    'start',
+    timeZone,
+  );
 
   // A date still being typed counts as none until it is a date.
   const drafted: Milestone = {
     ...stored,
-    date: Result.isOk(date) ? date.value : undefined,
+    date: Result.isOk(date) ? date.value.at : undefined,
+    dateAllDay: Result.isOk(date) && date.value.allDay,
     requiresManualCheck: draft.requiresManualCheck,
     checkedAt: draft.checkedAt,
     dependencies: draft.dependencies,
@@ -97,6 +105,7 @@ export const milestoneDraftInsight = (
       drafted.date !== undefined && drafted.date > now
         ? drafted.date
         : undefined,
+    dateAllDay: drafted.dateAllDay,
     waitingForCheck:
       drafted.requiresManualCheck &&
       (drafted.checkedAt === undefined || drafted.checkedAt > now),
@@ -116,6 +125,8 @@ export type MilestoneDraftInsight = DeepReadonly<{
   reachedAt: number | undefined;
   /** The date of the milestone while it is still ahead. */
   waitingForDate: number | undefined;
+  /** Whether that date is a day alone. */
+  dateAllDay: boolean;
   /** Whether a manual check is required and not resolved. */
   waitingForCheck: boolean;
   /** The dependencies that do not hold. */

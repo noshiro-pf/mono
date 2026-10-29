@@ -22,8 +22,8 @@ import {
 } from '../domain/index.mjs';
 import {
   displayStatusLabels,
-  formatDateTime,
-  formatShortDateTime,
+  formatShortWhen,
+  formatWhen,
   priorityLabels,
 } from '../view-model/index.mjs';
 import { truncateToUnits, wrapToUnits } from './truncate.mjs';
@@ -75,7 +75,7 @@ export const buildNodeViews = (
           due:
             dueDate === undefined
               ? '期限なし'
-              : `${overdue ? '期限切れ' : '期限'} ${formatShortDateTime(dueDate, now, timeZone)}`,
+              : `${overdue ? '期限切れ' : '期限'} ${formatShortWhen(dueDate, task.dueAllDay, now, timeZone)}`,
           overdue,
           warning,
           ariaLabel: [
@@ -83,7 +83,7 @@ export const buildNodeViews = (
             `状態: ${displayStatusLabels[shown]}`,
             ...(dueDate === undefined
               ? []
-              : [`期限: ${formatDateTime(dueDate, timeZone)}`]),
+              : [`期限: ${formatWhen(dueDate, task.dueAllDay, timeZone)}`]),
             ...(overdue ? ['期限切れ'] : []),
             `優先度: ${priorityLabels[task.priority]}`,
             ...(warning ? ['依存が未解消のまま開始'] : []),
@@ -130,13 +130,13 @@ export const buildNodeViews = (
           date:
             date === undefined
               ? undefined
-              : `日時 ${formatShortDateTime(date, now, timeZone)}`,
+              : `日時 ${formatShortWhen(date, milestone.dateAllDay, now, timeZone)}`,
           ariaLabel: [
             `マイルストーン「${milestone.title}」`,
             reached ? '到達済み' : '未到達',
             ...(date === undefined
               ? []
-              : [`日時: ${formatDateTime(date, timeZone)}`]),
+              : [`日時: ${formatWhen(date, milestone.dateAllDay, timeZone)}`]),
             ...(awaitingCheck ? ['解消待ち'] : []),
           ].join(' '),
         },
@@ -165,7 +165,10 @@ export type TaskNodeView = DeepReadonly<{
   largeTitle: string[];
   status: DisplayStatus;
   priority: Priority;
-  /** `期限 10/09 12:05`, `期限切れ 10/09 12:05` or `期限なし`: a node's second line. */
+  /**
+   * `期限 10/09 12:05` (`期限 10/09` all day), `期限切れ 10/09 12:05` or
+   * `期限なし`: a node's second line.
+   */
   due: string;
   /** Past its due date and not done. */
   overdue: boolean;
@@ -189,7 +192,7 @@ export type MilestoneNodeView = DeepReadonly<{
   reached: boolean;
   awaitingCheck: boolean;
   /**
-   * `日時 10/09 12:05`, the date it waits for, as a task's due date is
+   * `日時 10/09 12:05` (`日時 10/09` all day), the date it waits for, as a task's due date is
    * written: a node's second line; `undefined` without one.
    */
   date: string | undefined;

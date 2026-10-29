@@ -77,6 +77,8 @@ export const taskFromDoc = (
       ...doc,
       id,
       dueDate: doc.dueDate ?? undefined,
+      // Not without a date, whatever was written.
+      dueAllDay: doc.dueDate !== null && (doc.dueAllDay ?? false),
       startedAt: doc.startedAt ?? undefined,
       completedAt: doc.completedAt ?? undefined,
       estimateHours: doc.estimateHours ?? undefined,
@@ -99,6 +101,7 @@ export const milestoneFromDoc = (
       ...doc,
       id,
       date: doc.date ?? undefined,
+      dateAllDay: doc.date !== null && (doc.dateAllDay ?? false),
       checkedAt: doc.checkedAt ?? undefined,
       groupId: doc.groupId ?? undefined,
     }),
@@ -188,6 +191,12 @@ const NullableFiniteNumberCodec = t.union([FiniteNumberCodec, t.nullType]);
 const NullableGroupIdCodec = t.optional(t.union([GroupIdCodec, t.nullType]));
 
 /**
+ * Whether a date is all day. Missing in what versions before all-day dates
+ * wrote, which is read as not.
+ */
+const OptionalBooleanCodec = t.optional(t.boolean());
+
+/**
  * A task without its id, a missing value `null`. The dependencies are the
  * domain's as they are.
  */
@@ -195,6 +204,7 @@ export const TaskDocCodec = t.record(
   {
     ...Obj.omit(TaskCodec.shape, ['id']),
     dueDate: NullableFiniteNumberCodec,
+    dueAllDay: OptionalBooleanCodec,
     startedAt: NullableFiniteNumberCodec,
     completedAt: NullableFiniteNumberCodec,
     estimateHours: NullableFiniteNumberCodec,
@@ -208,6 +218,7 @@ export const MilestoneDocCodec = t.record(
   {
     ...Obj.omit(MilestoneCodec.shape, ['id']),
     date: NullableFiniteNumberCodec,
+    dateAllDay: OptionalBooleanCodec,
     checkedAt: NullableFiniteNumberCodec,
     groupId: NullableGroupIdCodec,
   },

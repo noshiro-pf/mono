@@ -33,6 +33,7 @@ export type CreateMilestoneParams = Readonly<{
 const defaults = {
   description: '',
   date: undefined,
+  dateAllDay: false,
   requiresManualCheck: false,
   checkedAt: undefined,
   dependencies: [],

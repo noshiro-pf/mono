@@ -192,6 +192,11 @@ export const TaskCodec = t.record(
     progress: ProgressCodec,
     priority: PriorityCodec,
     dueDate: OptionalFiniteNumberCodec,
+    /**
+     * Whether `dueDate` is a day rather than a time: then it is the end of
+     * that day (23:59:59.999), on the wall clock it was set on.
+     */
+    dueAllDay: t.boolean(),
     createdAt: FiniteNumberCodec,
     updatedAt: FiniteNumberCodec,
     /** When the task started, while its progress is past `not-started`. */
@@ -218,6 +223,11 @@ export const MilestoneCodec = t.record(
     createdAt: FiniteNumberCodec,
     updatedAt: FiniteNumberCodec,
     date: OptionalFiniteNumberCodec,
+    /**
+     * Whether `date` is a day rather than a time: then it is the start of
+     * that day, on the wall clock it was set on.
+     */
+    dateAllDay: t.boolean(),
     requiresManualCheck: t.boolean(),
     /** Read only when `requiresManualCheck` is set. */
     checkedAt: OptionalFiniteNumberCodec,

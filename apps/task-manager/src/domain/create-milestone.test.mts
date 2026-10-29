@@ -12,6 +12,7 @@ describe(createMilestone, () => {
         createdAt: 1000,
         updatedAt: 1000,
         date: undefined,
+        dateAllDay: false,
         requiresManualCheck: false,
         checkedAt: undefined,
         dependencies: [],

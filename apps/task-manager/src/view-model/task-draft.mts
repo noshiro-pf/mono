@@ -15,7 +15,7 @@ import {
   type Progress,
   type Task,
 } from '../domain/index.mjs';
-import { fromDateTimeLocal, toDateTimeLocal } from './datetime-local.mjs';
+import { dateField, draftedDate } from './date-draft.mjs';
 import { formatLabels, parseLabels } from './labels.mjs';
 
 export const taskToDraft = (task: Task, timeZone?: string): TaskDraft =>
@@ -24,10 +24,8 @@ export const taskToDraft = (task: Task, timeZone?: string): TaskDraft =>
     description: task.description,
     progress: task.progress,
     priority: task.priority,
-    dueDate:
-      task.dueDate === undefined
-        ? ('' as const)
-        : toDateTimeLocal(task.dueDate, timeZone),
+    dueDate: dateField(task.dueDate, task.dueAllDay, timeZone),
+    dueAllDay: task.dueAllDay,
     labels: formatLabels(task.labels),
     estimateHours:
       task.estimateHours === undefined
@@ -54,7 +52,13 @@ export const applyTaskDraft = (
     return Result.err('タイトルを入力してください。');
   }
 
-  const dueDate = optionalDateTime(draft.dueDate, timeZone);
+  const dueDate = draftedDate(
+    draft.dueDate,
+    draft.dueAllDay,
+    { at: task.dueDate, allDay: task.dueAllDay },
+    'end',
+    timeZone,
+  );
 
   if (Result.isErr(dueDate)) {
     return Result.err('期限の日時が正しくありません。');
@@ -71,7 +75,8 @@ export const applyTaskDraft = (
     title,
     description: draft.description,
     priority: draft.priority,
-    dueDate: dueDate.value,
+    dueDate: dueDate.value.at,
+    dueAllDay: dueDate.value.allDay,
     labels: parseLabels(draft.labels),
     estimateHours: estimateHours.value,
     groupId: groupIdOfDraft(draft.groupId),
@@ -84,8 +89,13 @@ export type TaskDraft = DeepReadonly<{
   description: string;
   progress: Progress;
   priority: Priority;
-  /** As `<input type="datetime-local">` holds it; empty for none. */
+  /**
+   * As `<input type="datetime-local">` holds it — `YYYY-MM-DD` alone while
+   * `dueAllDay` — and empty for none.
+   */
   dueDate: string;
+  /** Whether the due date is a day, ending with it. */
+  dueAllDay: boolean;
   /** Comma-separated. */
   labels: string;
   /** Empty for none. */
@@ -93,20 +103,6 @@ export type TaskDraft = DeepReadonly<{
   /** The id of the group the task is in; empty for none. */
   groupId: string;
 }>;
-
-/** An empty field is `undefined`; anything else has to be a date and time. */
-export const optionalDateTime = (
-  value: string,
-  timeZone: string | undefined,
-): Result<number | undefined, undefined> => {
-  if (value.trim() === '') {
-    return Result.ok(undefined);
-  }
-
-  const epochMs = fromDateTimeLocal(value.trim(), timeZone);
-
-  return epochMs === undefined ? Result.err(undefined) : Result.ok(epochMs);
-};
 
 /** The group a draft's `groupId` field names; none for an empty one. */
 export const groupIdOfDraft = (value: string): GroupId | undefined =>

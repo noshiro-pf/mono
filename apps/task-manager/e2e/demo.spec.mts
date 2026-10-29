@@ -342,6 +342,65 @@ test('picks and clears a date', { tag: '@smoke' }, async ({ page }) => {
   await expect.soft(dueDate).toHaveValue('');
 });
 
+test(
+  'makes a due date all day, and timed again',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto(LIST);
+
+    await expect.soft(page.getByTestId('list-view')).toBeVisible();
+
+    const row = page
+      .getByTestId('task-row')
+      .filter({ hasText: 'API を実装する' });
+
+    await row.click();
+
+    const dialog = page.getByTestId('node-dialog');
+
+    const dueDate = dialog.getByLabel('期限');
+
+    const allDay = dialog.getByLabel('終日');
+
+    // Blueprint hides the switch's input under its track: a press is the
+    // label's.
+    const allDaySwitch = dialog.getByText('終日', { exact: true });
+
+    await expect.soft(allDay).not.toBeChecked();
+
+    const timed = await dueDate.inputValue();
+
+    await allDaySwitch.click();
+
+    // The day it had, with no time.
+    await expect.soft(dueDate).toHaveValue(timed.slice(0, 10));
+
+    await dialog.getByTestId('save').click();
+
+    await expect.soft(dialog).toBeHidden();
+
+    const dueCell = page
+      .getByRole('row')
+      .filter({ hasText: 'API を実装する' })
+      .getByRole('cell')
+      .filter({ hasText: timed.slice(0, 10) });
+
+    // The day alone, with no time.
+    await expect.soft(dueCell).toBeVisible();
+
+    await expect.soft(dueCell).not.toContainText(':');
+
+    await row.click();
+
+    await expect.soft(allDay).toBeChecked();
+
+    await allDaySwitch.click();
+
+    // The end of the day, as an all-day due date is.
+    await expect.soft(dueDate).toHaveValue(`${timed.slice(0, 10)} 23:59`);
+  },
+);
+
 test('moves a task’s progress', { tag: '@smoke' }, async ({ page }) => {
   await page.goto(LIST);
 

@@ -35,6 +35,7 @@ import {
   milestoneToDraft,
   removeRow,
   rowsFromDependencies,
+  switchDateField,
   taskToDraft,
   updateRow,
   type DependencyRow,
@@ -90,6 +91,11 @@ export type EditorStore = Readonly<{
   close: () => void;
   updateTaskDraft: (patch: Partial<TaskDraft>) => void;
   updateMilestoneDraft: (patch: Partial<MilestoneDraft>) => void;
+  /**
+   * Turns 「終日」 of the task's due date or the milestone's date on or off,
+   * keeping its day (`switchDateField`).
+   */
+  setAllDay: (allDay: boolean) => void;
   /** Resolves the manual check now. */
   check: () => void;
   uncheck: () => void;
@@ -270,6 +276,48 @@ export const createEditorStore = (deps: EditorDeps): EditorStore => {
           ? { ...current, draft: { ...current.draft, ...patch } }
           : current,
       );
+    },
+    setAllDay: (allDay) => {
+      updateOpen((current) => {
+        if (current.type === 'task') {
+          const task = findTask(current.ref.id);
+
+          return {
+            ...current,
+            draft: {
+              ...current.draft,
+              dueAllDay: allDay,
+              dueDate: switchDateField(
+                current.draft.dueDate,
+                allDay,
+                { at: task?.dueDate, allDay: task?.dueAllDay ?? false },
+                'end',
+                deps.timeZone,
+              ),
+            },
+          };
+        }
+
+        const milestone = findMilestone(current.ref.id);
+
+        return {
+          ...current,
+          draft: {
+            ...current.draft,
+            dateAllDay: allDay,
+            date: switchDateField(
+              current.draft.date,
+              allDay,
+              {
+                at: milestone?.date,
+                allDay: milestone?.dateAllDay ?? false,
+              },
+              'start',
+              deps.timeZone,
+            ),
+          },
+        };
+      });
     },
     check: () => {
       updateOpen((current) =>

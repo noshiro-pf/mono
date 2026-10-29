@@ -120,6 +120,62 @@ describe(createEditorStore, () => {
     assert.strictEqual(editorOf(setupped).type, 'closed');
   });
 
+  test('turns 「終日」 on and off, giving back the time it had', () => {
+    const setupped = setup();
+
+    setupped.setState({
+      ...initial,
+      tasks: [{ ...a, dueDate: 3 * DAY_MS + 9 * HOUR_MS }, b],
+    });
+
+    setupped.store.open({ kind: 'task', id: asTaskId('a') });
+
+    const dueOf = (): unknown => {
+      const current = editorOf(setupped);
+
+      return current.type === 'task'
+        ? [current.draft.dueDate, current.draft.dueAllDay]
+        : undefined;
+    };
+
+    setupped.store.setAllDay(true);
+
+    assert.deepStrictEqual(dueOf(), ['1970-01-04', true]);
+
+    setupped.store.setAllDay(false);
+
+    assert.deepStrictEqual(dueOf(), ['1970-01-04T09:00', false]);
+
+    setupped.store.updateTaskDraft({ dueDate: '1970-01-05T09:00' });
+
+    setupped.store.setAllDay(true);
+
+    setupped.store.setAllDay(false);
+
+    assert.deepStrictEqual(dueOf(), ['1970-01-05T23:59', false]);
+  });
+
+  test('turns 「終日」 on and off for a milestone, at the start of the day', () => {
+    const setupped = setup();
+
+    setupped.store.open({ kind: 'milestone', id: asMilestoneId('m') });
+
+    setupped.store.updateMilestoneDraft({ date: '1970-01-05T09:00' });
+
+    setupped.store.setAllDay(true);
+
+    setupped.store.setAllDay(false);
+
+    const current = editorOf(setupped);
+
+    assert.deepStrictEqual(
+      current.type === 'milestone'
+        ? [current.draft.date, current.draft.dateAllDay]
+        : undefined,
+      ['1970-01-05T00:00', false],
+    );
+  });
+
   test('does not open a node that is not stored', () => {
     const setupped = setup();
 

@@ -1597,8 +1597,17 @@ details[open] > .milestone-explanation-summary {
 
 /* blueprint-synstate's date picker in a form field. */
 
-.date-time-field .bp6-label {
+.date-time-field-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
   margin-bottom: 4px;
+}
+
+.date-time-field-head .bp6-label,
+.date-time-field-head .all-day {
+  margin: 0;
 }
 
 .date-time-field .bp6-popover-target {

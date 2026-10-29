@@ -1,7 +1,7 @@
 import type { InitializedObservable } from 'synstate';
 import { constant, If, view, type JSX } from 'synstate-dom';
 import { editorStore } from '../store/index.mjs';
-import { formatDateTime, type MilestoneRow } from '../view-model/index.mjs';
+import { formatWhen, type MilestoneRow } from '../view-model/index.mjs';
 
 type Props = Readonly<{
   row: InitializedObservable<MilestoneRow>;
@@ -43,7 +43,7 @@ export const MilestoneItem = ({ row }: Props): JSX.Element => (
               {view(row, ({ milestone }) =>
                 milestone.date === undefined
                   ? ''
-                  : formatDateTime(milestone.date),
+                  : formatWhen(milestone.date, milestone.dateAllDay),
               )}
             </span>
           }

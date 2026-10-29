@@ -8,6 +8,7 @@ import {
 import { Arr } from 'ts-data-forge';
 import {
   formatDateTime,
+  formatWhen,
   type MilestoneDraftInsight,
 } from '../view-model/index.mjs';
 
@@ -59,7 +60,9 @@ const waitingConditions = (
     : ([
         ...(insight.waitingForDate === undefined
           ? ([] as const)
-          : ([`日時（${formatDateTime(insight.waitingForDate)}）`] as const)),
+          : ([
+              `日時（${formatWhen(insight.waitingForDate, insight.dateAllDay)}）`,
+            ] as const)),
         ...(insight.waitingForCheck
           ? (['手動チェック'] as const)
           : ([] as const)),
