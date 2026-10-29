@@ -7,13 +7,13 @@ import { BpCheckbox, BpInput } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
 import { useObservableValue } from 'synstate-react-hooks';
 import { Arr, Result, match, tp } from 'ts-data-forge';
-import { api } from '../../../api/index.mjs';
 import { dict } from '../../../constants/index.mjs';
 import { createToaster, showToast } from '../../../functions/index.mjs';
 import {
   Auth,
   EventListPageFilterStore,
   EventListStore,
+  api,
   eventList$,
 } from '../../../store/index.mjs';
 import { Header } from '../../organisms/index.mjs';
