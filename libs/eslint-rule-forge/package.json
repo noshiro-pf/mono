@@ -1,6 +1,6 @@
 {
   "name": "eslint-rule-forge",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": false,
   "description": "Helpers for writing typescript-eslint rules that see through type wrappers and parentheses, and resolve what a file imports.",
   "keywords": [

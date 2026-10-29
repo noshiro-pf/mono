@@ -1,5 +1,15 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.20.1
+
+### Patch Changes
+
+- df02523: Update dependencies
+- df02523: Declare each rule's default options as `meta.defaultOptions` instead of the top-level `defaultOptions` that `@typescript-eslint/utils` 8.72 deprecates. ESLint 9.15 and later now merge them into `context.options` too, so a rule that is not configured sees its defaults there instead of an empty list; the defaults themselves are unchanged.
+- Updated dependencies [df02523]
+- Updated dependencies [df02523]
+    - eslint-rule-forge@0.3.2
+
 ## 5.20.0
 
 ### Minor Changes
