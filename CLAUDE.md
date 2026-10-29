@@ -262,6 +262,12 @@ not (see "Commits and pull requests").
 - **An issue that should wait for another issue or pull request ends with
   `Start-After: #N`**, for a prerequisite or only a better order; what it
   means, and which issues never carry one, is `docs/issue-start-after.md`.
+- **When a problem could recur, prefer the check that prevents the class to
+  fixing the instance**, however it surfaced: a review finding, a CI failure,
+  a bug after merge, a repeated review comment, a step someone must remember.
+  Add the check with the fix, defer it to an issue only when too large, or
+  say in the description why none is practical. Where to look for one, and
+  why prose here is the last resort: `docs/checks-over-fixes.md`.
 
 ## Security findings
 
