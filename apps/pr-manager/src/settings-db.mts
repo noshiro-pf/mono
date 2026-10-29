@@ -1,10 +1,11 @@
 /**
  * The page's own settings, kept in IndexedDB.
  *
- * A database rather than the URL the layout and the theme are kept in
- * (`layout.mts`), because what the merge order shows is a working choice
- * made again and again rather than a way of looking at the page worth
- * sharing in a link; and a database of the page's own name rather than a
+ * Only the header's fold is kept here (`header-store.mts`). What the page
+ * shows is kept in the URL (`url.mts`), so that a link opens it the same
+ * way; whether the header is folded is how much room this screen has to
+ * spare, not a way of looking at the page worth sharing in a link. A
+ * database of the page's own name rather than a
  * `localStorage` key, since that one store is shared by every app on the
  * origin. Like `localStorage` it is per browser, and gone when the site's
  * data is cleared.

@@ -8,93 +8,30 @@ import type { IssueItem, LoadedReport } from '../load-report.mjs';
 import { createIssuesListStore } from './issues-list-store.mjs';
 
 describe(createIssuesListStore, () => {
-  test('starts with everything shown, then takes what was saved, and saves nothing before it has read', async () => {
-    const { store, saved, resolveLoad } = setup();
-
-    store.start();
-
-    assert.deepStrictEqual(
-      store.view.getSnapshot().value,
-      DEFAULT_ISSUES_LIST_VIEW,
-    );
-
-    assert.deepStrictEqual(saved, []);
-
-    resolveLoad(STORED);
-
-    await settle();
+  test('starts at the view it is given, and hands every change to save from start on', () => {
+    const { store, saved } = setup(STORED);
 
     assert.deepStrictEqual(store.view.getSnapshot().value, STORED);
 
-    store.toggleLabel('enhancement');
+    store.setSort('updated');
 
-    assert.deepStrictEqual(saved.at(-1), {
-      ...STORED,
-      onlyLabels: ['bug', 'enhancement'],
-    });
-  });
-
-  test('a choice made before the saved one is read is kept, and saved', async () => {
-    const { store, saved, resolveLoad } = setup();
-
-    store.start();
-
-    store.setSort('priority');
-
-    resolveLoad(STORED);
-
-    await settle();
-
-    assert.deepStrictEqual(store.view.getSnapshot().value, {
-      ...DEFAULT_ISSUES_LIST_VIEW,
-      sort: 'priority',
-    });
-
-    assert.deepStrictEqual(saved.at(-1), {
-      ...DEFAULT_ISSUES_LIST_VIEW,
-      sort: 'priority',
-    });
-  });
-
-  test('a database that cannot be read leaves the default, and changes are still handed to save', async () => {
-    const { store, saved, rejectLoad } = setup();
-
-    store.start();
-
-    rejectLoad();
-
-    await settle();
-
-    assert.deepStrictEqual(
-      store.view.getSnapshot().value,
-      DEFAULT_ISSUES_LIST_VIEW,
-    );
-
-    store.togglePriority('low');
-
-    assert.deepStrictEqual(saved.at(-1), {
-      ...DEFAULT_ISSUES_LIST_VIEW,
-      hiddenPriorities: ['low'],
-    });
-  });
-
-  test('stopped before the read answers, it neither applies nor saves', async () => {
-    const { store, saved, resolveLoad } = setup();
+    // Nothing is handed over before it starts.
+    assert.deepStrictEqual(saved, []);
 
     const stopStore = store.start();
 
+    store.toggleLabel('enhancement');
+
+    assert.deepStrictEqual(saved, [
+      { ...STORED, sort: 'updated' },
+      { ...STORED, sort: 'updated', onlyLabels: ['bug', 'enhancement'] },
+    ]);
+
     stopStore();
 
-    resolveLoad(STORED);
+    store.togglePriority('low');
 
-    await settle();
-
-    assert.deepStrictEqual(
-      store.view.getSnapshot().value,
-      DEFAULT_ISSUES_LIST_VIEW,
-    );
-
-    assert.deepStrictEqual(saved, []);
+    assert.strictEqual(saved.length, 2);
   });
 
   test('derives the list and the counts from the issues and the view', () => {
@@ -135,14 +72,10 @@ describe(createIssuesListStore, () => {
     ]);
   });
 
-  test('the search narrows the list and the counts, and is not saved', async () => {
-    const { store, saved, setIssues, resolveLoad } = setup();
+  test('the search narrows the list and the counts, and is not saved', () => {
+    const { store, saved, setIssues } = setup();
 
     store.start();
-
-    resolveLoad(undefined);
-
-    await settle();
 
     setIssues([issue(1, []), issue(2, []), issue(12, [])]);
 
@@ -173,16 +106,14 @@ const STORED: IssuesListView = {
   sort: 'priority',
 } as const;
 
-const setup = (): Readonly<{
+const setup = (
+  initial: IssuesListView = DEFAULT_ISSUES_LIST_VIEW,
+): Readonly<{
   store: ReturnType<typeof createIssuesListStore>;
   saved: readonly IssuesListView[];
-  resolveLoad: (stored: unknown) => void;
-  rejectLoad: () => void;
   setIssues: (items: readonly IssueItem[]) => void;
 }> => {
   const mut_saved: IssuesListView[] = [];
-
-  const { promise, resolve, reject } = Promise.withResolvers<unknown>();
 
   const [issues, setIssues] = createState<LoadedReport['issues']>({
     items: [],
@@ -196,7 +127,7 @@ const setup = (): Readonly<{
   const store = createIssuesListStore({
     issues,
     graph,
-    load: () => promise,
+    initial,
     save: (view) => {
       mut_saved.push(view);
     },
@@ -205,10 +136,6 @@ const setup = (): Readonly<{
   return {
     store,
     saved: mut_saved,
-    resolveLoad: resolve,
-    rejectLoad: () => {
-      reject(new Error('blocked'));
-    },
     setIssues: (items) => {
       setIssues({
         items,
@@ -242,9 +169,3 @@ const issue = (number: number, labelNames: readonly string[]): IssueItem =>
     startAfter: [],
     misplacedMergeAfter: [],
   }) as const;
-
-const settle = async (): Promise<void> => {
-  await new Promise((resolve) => {
-    setTimeout(resolve, 0);
-  });
-};

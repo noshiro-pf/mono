@@ -8,93 +8,30 @@ import {
 import { createMergeOrderStore } from './merge-order-store.mjs';
 
 describe(createMergeOrderStore, () => {
-  test('starts with everything shown, then takes what was saved, and saves nothing before it has read', async () => {
-    const { store, saved, resolveLoad } = setup();
-
-    store.start();
-
-    assert.deepStrictEqual(
-      store.view.getSnapshot().value,
-      DEFAULT_MERGE_ORDER_VIEW,
-    );
-
-    assert.deepStrictEqual(saved, []);
-
-    resolveLoad(STORED);
-
-    await settle();
+  test('starts at the view it is given, and hands every change to save from start on', () => {
+    const { store, saved } = setup(STORED);
 
     assert.deepStrictEqual(store.view.getSnapshot().value, STORED);
 
-    store.toggleStatus('setAside');
+    store.toggleStatus('queued');
 
-    assert.deepStrictEqual(saved.at(-1), {
-      ...STORED,
-      hiddenStatuses: ['queued'],
-    });
-  });
-
-  test('a choice made before the saved one is read is kept, and saved', async () => {
-    const { store, saved, resolveLoad } = setup();
-
-    store.start();
-
-    store.setSort('priority');
-
-    resolveLoad(STORED);
-
-    await settle();
-
-    assert.deepStrictEqual(store.view.getSnapshot().value, {
-      ...DEFAULT_MERGE_ORDER_VIEW,
-      sort: 'priority',
-    });
-
-    assert.deepStrictEqual(saved.at(-1), {
-      ...DEFAULT_MERGE_ORDER_VIEW,
-      sort: 'priority',
-    });
-  });
-
-  test('a database that cannot be read leaves the default, and changes are still handed to save', async () => {
-    const { store, saved, rejectLoad } = setup();
-
-    store.start();
-
-    rejectLoad();
-
-    await settle();
-
-    assert.deepStrictEqual(
-      store.view.getSnapshot().value,
-      DEFAULT_MERGE_ORDER_VIEW,
-    );
-
-    store.togglePriority('low');
-
-    assert.deepStrictEqual(saved.at(-1), {
-      ...DEFAULT_MERGE_ORDER_VIEW,
-      hiddenPriorities: ['low'],
-    });
-  });
-
-  test('stopped before the read answers, it neither applies nor saves', async () => {
-    const { store, saved, resolveLoad } = setup();
+    // Nothing is handed over before it starts.
+    assert.deepStrictEqual(saved, []);
 
     const stopStore = store.start();
 
+    store.toggleStatus('setAside');
+
+    assert.deepStrictEqual(saved, [
+      { ...STORED, hiddenStatuses: ['setAside'] },
+      DEFAULT_MERGE_ORDER_VIEW,
+    ]);
+
     stopStore();
 
-    resolveLoad(STORED);
+    store.togglePriority('low');
 
-    await settle();
-
-    assert.deepStrictEqual(
-      store.view.getSnapshot().value,
-      DEFAULT_MERGE_ORDER_VIEW,
-    );
-
-    assert.deepStrictEqual(saved, []);
+    assert.strictEqual(saved.length, 2);
   });
 
   test('derives the tree and the counts from the report and the view', () => {
@@ -188,17 +125,15 @@ const STORED: MergeOrderView = {
   sort: 'order',
 } as const;
 
-const setup = (): Readonly<{
+const setup = (
+  initial: MergeOrderView = DEFAULT_MERGE_ORDER_VIEW,
+): Readonly<{
   store: ReturnType<typeof createMergeOrderStore>;
   saved: readonly MergeOrderView[];
-  resolveLoad: (stored: unknown) => void;
-  rejectLoad: () => void;
   setEntries: (entries: readonly Entry[]) => void;
   setQueue: (queue: boolean) => void;
 }> => {
   const mut_saved: MergeOrderView[] = [];
-
-  const { promise, resolve, reject } = Promise.withResolvers<unknown>();
 
   const [entries$, setEntries] = createState<readonly Entry[]>([]);
 
@@ -214,7 +149,7 @@ const setup = (): Readonly<{
     entries: entries$,
     roots,
     features,
-    load: () => promise,
+    initial,
     save: (view) => {
       mut_saved.push(view);
     },
@@ -223,10 +158,6 @@ const setup = (): Readonly<{
   return {
     store,
     saved: mut_saved,
-    resolveLoad: resolve,
-    rejectLoad: () => {
-      reject(new Error('blocked'));
-    },
     setQueue: (queue) => {
       setFeatures({ requiredChecks: true, codeOwnerReview: true, queue });
     },
@@ -238,12 +169,6 @@ const setup = (): Readonly<{
       );
     },
   };
-};
-
-const settle = async (): Promise<void> => {
-  await new Promise((resolve) => {
-    setTimeout(resolve, 0);
-  });
 };
 
 const entry = (number: number, labels: readonly string[]): Entry =>

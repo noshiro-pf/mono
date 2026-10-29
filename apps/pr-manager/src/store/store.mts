@@ -18,8 +18,20 @@ import {
   type ReportSource,
 } from '../constants.mjs';
 import { dagZoomFromLocation, saveDagZoom } from '../dag-zoom.mjs';
+import {
+  issuesListViewFromLocation,
+  saveIssuesListView,
+} from '../issues-list-view.mjs';
+import {
+  issuesViewSettingsFromLocation,
+  saveIssuesViewSettings,
+} from '../issues-view-settings.mjs';
 import { layoutFromLocation, saveLayout } from '../layout.mjs';
 import { loadIssuePage, loadReport } from '../load-report.mjs';
+import {
+  mergeOrderViewFromLocation,
+  saveMergeOrderView,
+} from '../merge-order-view.mjs';
 import { readSetting, writeSetting } from '../settings-db.mjs';
 import {
   applyTheme,
@@ -87,18 +99,12 @@ export const layoutStore = createLayoutStore({
   saveDelayMs: 300,
 });
 
-const MERGE_ORDER_VIEW_KEY = 'merge-order-view';
-
 export const mergeOrderStore = createMergeOrderStore({
   entries: reader.entries,
   roots: reader.roots,
   features: reader.features,
-  load: () => readSetting(MERGE_ORDER_VIEW_KEY),
-  // A choice that cannot be kept still applies for as long as the page is
-  // open, which is all a reader would notice.
-  save: (view) => {
-    writeSetting(MERGE_ORDER_VIEW_KEY, view).catch(() => undefined);
-  },
+  initial: mergeOrderViewFromLocation(),
+  save: saveMergeOrderView,
 });
 
 const HEADER_FOLDED_KEY = 'header-folded';
@@ -110,43 +116,23 @@ export const headerStore = createHeaderStore({
   },
 });
 
-const ISSUES_VIEW_KEY = 'issues-view';
-
-const ISSUES_DAG_HIDE_DONE_KEY = 'issues-dag-hide-done';
-
-const ISSUES_DAG_HIDE_PENDING_KEY = 'issues-dag-hide-pending';
-
 export const issuesViewStore = createIssuesViewStore({
   issues: reader.issues,
   entries: reader.entries,
   repoUrl: repositoryUrl(reportSource),
-  load: () => readSetting(ISSUES_VIEW_KEY),
-  save: (view) => {
-    writeSetting(ISSUES_VIEW_KEY, view).catch(() => undefined);
-  },
-  loadHideDone: () => readSetting(ISSUES_DAG_HIDE_DONE_KEY),
-  saveHideDone: (hide) => {
-    writeSetting(ISSUES_DAG_HIDE_DONE_KEY, hide).catch(() => undefined);
-  },
-  loadHidePending: () => readSetting(ISSUES_DAG_HIDE_PENDING_KEY),
-  saveHidePending: (hide) => {
-    writeSetting(ISSUES_DAG_HIDE_PENDING_KEY, hide).catch(() => undefined);
-  },
+  initial: issuesViewSettingsFromLocation(),
+  save: saveIssuesViewSettings,
   initialZoom: dagZoomFromLocation(),
   saveZoom: saveDagZoom,
   moreIssues: reader.moreIssues,
   loadMoreIssues: reader.loadMoreIssues,
 });
 
-const ISSUES_LIST_VIEW_KEY = 'issues-list-view';
-
 export const issuesListStore = createIssuesListStore({
   issues: reader.issues,
   graph: issuesViewStore.fullGraph,
-  load: () => readSetting(ISSUES_LIST_VIEW_KEY),
-  save: (view) => {
-    writeSetting(ISSUES_LIST_VIEW_KEY, view).catch(() => undefined);
-  },
+  initial: issuesListViewFromLocation(),
+  save: saveIssuesListView,
 });
 
 export const activityStore = createActivityStore({

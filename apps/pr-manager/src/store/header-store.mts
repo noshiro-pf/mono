@@ -2,9 +2,9 @@
  * Whether the header is folded into the toolbar: the title, the token panel
  * and the time of reading are kept to one line, and the actions stay.
  *
- * Kept as the merge order's view is (`merge-order-store.mts`), and for the
- * same reason: it is a working choice made again and again, not a way of
- * looking at the page worth sharing in a link. It starts unfolded, which is
+ * Kept in IndexedDB (`settings-db.mts`) rather than the URL that keeps the
+ * rest: it is how much room this screen has to spare, not a way of looking
+ * at the page worth sharing in a link. It starts unfolded, which is
  * what the page draws until `load` answers; only then is anything handed to
  * `save`, so the default never overwrites what was saved, and a toggle made
  * in that moment is kept over it.

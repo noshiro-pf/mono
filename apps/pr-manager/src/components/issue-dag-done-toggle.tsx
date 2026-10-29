@@ -5,8 +5,8 @@ import { issuesViewStore } from '../store/index.mjs';
  * Whether the DAG draws what is done: a switch shaped as the merge order's
  * priority chips are (`merge-order-filters.tsx`), pressed while it is drawn
  * and struck through while it is not, with how many nodes it covers. It
- * starts pressed, and the choice is kept across visits
- * (`issues-view-store.mts`).
+ * starts pressed, and the choice is kept in the URL
+ * (`issues-view-settings.mts`).
  */
 export const IssueDagDoneToggle = (): JSX.Element => (
   <button

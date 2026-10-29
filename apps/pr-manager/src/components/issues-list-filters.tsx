@@ -14,12 +14,11 @@ import { OfTotal } from './stat-tile.js';
 
 /**
  * What the list of open issues leads with: a search of the titles, matched
- * as it is typed whatever the case, and not kept across visits; the priorities, switches as the
+ * as it is typed whatever the case, and not kept in the URL; the priorities, switches as the
  * merge order's are (`merge-order-filters.tsx`); the start states, switches
  * likewise, in the DAG's words; `pending`, a switch as well, there while an
  * open issue carries it; the labels, each a pick; and the order. What each
- * does is `issues-list-view.mts`; the choice is kept across visits
- * (`settings-db.mts`).
+ * does is `issues-list-view.mts`, which keeps the choice in the URL.
  *
  * Each number is how many of what it counts the list shows, followed in
  * small by how many there are when that is more — the merge order's

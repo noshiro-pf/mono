@@ -27,7 +27,7 @@
  * **The search** is what the reader types: an issue is shown only when its
  * title holds it, whatever the case, and still not when its priority or its
  * labels leave it out. It narrows the list there and then, so it is not kept
- * across visits as the rest of the view is: it is held beside the view
+ * in the URL as the rest of the view is: it is held beside the view
  * (`issues-list-store.mts`) rather than in it.
  *
  * Sorted by priority, high comes first and "none" between mid and low, the
@@ -36,14 +36,22 @@
  * looking at, and what waits, the most recently updated first within each;
  * otherwise the list is in the order it is read, most recently updated
  * first. Everything is shown, by
- * update, by default; what the reader changes is kept (`settings-db.mts`).
+ * update, by default.
+ *
+ * **Kept in the query string** as the merge order's view is
+ * (`merge-order-view.mts`), with only what differs from
+ * {@link DEFAULT_ISSUES_LIST_VIEW} written: `issues.hidePriority=low.none`,
+ * `issues.hideStart=blocked.cycle`, `issues.hidePending=1`,
+ * `issues.sort=priority`, and a label picked as `issues.label=bug`, once
+ * for each, since a label's name can hold the `.` the others are joined
+ * with.
  */
 
 import { PENDING_LABEL, type IssueStartState } from 'pr-report-core';
-import { Arr, hasKey, isRecord, isString } from 'ts-data-forge';
+import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { IssueItem } from './load-report.mjs';
-import { known, toggled, type Count } from './merge-order-view.mjs';
+import { toggled, type Count } from './merge-order-view.mjs';
 import { isPending } from './pending.mjs';
 import {
   isPriorityLabel,
@@ -52,6 +60,15 @@ import {
   priorityOf,
   type Priority,
 } from './priority.mjs';
+import {
+  currentSearch,
+  flagParam,
+  namesParam,
+  rewriteSearch,
+  searchOf,
+  setFlagParam,
+  setNamesParam,
+} from './url.mjs';
 
 export type IssueSort = 'updated' | 'priority' | 'start';
 
@@ -300,42 +317,71 @@ export const withIssueSort = (
   sort: IssueSort,
 ): IssuesListView => ({ ...view, sort }) as const;
 
-/**
- * What was saved, read forgivingly: anything it cannot make sense of is the
- * default, and a priority it does not know is dropped, so a choice saved by
- * an older page still opens. A label is any name: one no open issue carries
- * is still listed, picked, for the reader to unpick.
- */
-export const parseIssuesListView = (stored: unknown): IssuesListView => {
-  if (!isRecord(stored)) {
-    return DEFAULT_ISSUES_LIST_VIEW;
-  }
+/** The view the query string asks for. */
+export const issuesListViewFromSearch = (search: string): IssuesListView => {
+  const params = new URLSearchParams(search);
 
-  const onlyLabels = hasKey(stored, 'onlyLabels')
-    ? stored.onlyLabels
-    : ([] as const);
+  const sort = params.get(PARAM.sort);
 
   return {
-    hiddenPriorities: known(
-      PRIORITIES,
-      hasKey(stored, 'hiddenPriorities') ? stored.hiddenPriorities : undefined,
-    ),
-    hiddenStarts: known(
-      ISSUE_STARTS,
-      hasKey(stored, 'hiddenStarts') ? stored.hiddenStarts : undefined,
-    ),
-    onlyLabels: Arr.isArray(onlyLabels)
-      ? Arr.uniq(onlyLabels.filter(isString)).toSorted((a, b) =>
-          a.localeCompare(b),
-        )
-      : [],
-    hidePending: hasKey(stored, 'hidePending') && stored.hidePending === true,
-    sort:
-      hasKey(stored, 'sort') &&
-      (stored.sort === 'priority' || stored.sort === 'start')
-        ? stored.sort
-        : 'updated',
+    hiddenPriorities: namesParam(PRIORITIES, params.getAll(PARAM.hidePriority)),
+    hiddenStarts: namesParam(ISSUE_STARTS, params.getAll(PARAM.hideStart)),
+    // The list offers no pick of the priorities or `pending`, which are
+    // switches of their own.
+    onlyLabels: Arr.uniq(
+      params
+        .getAll(PARAM.label)
+        .filter(
+          (labelName) =>
+            labelName !== '' &&
+            labelName !== PENDING_LABEL &&
+            !isPriorityLabel(labelName),
+        ),
+    ).toSorted((a, b) => a.localeCompare(b)),
+    hidePending: flagParam(params, PARAM.hidePending),
+    sort: sort === 'priority' || sort === 'start' ? sort : 'updated',
   };
+};
+
+/** The query string with `view` written in, the rest as it was. */
+export const searchWithIssuesListView = (
+  search: string,
+  view: IssuesListView,
+): string => {
+  const params = new URLSearchParams(search);
+
+  setNamesParam(params, PARAM.hidePriority, view.hiddenPriorities);
+
+  setNamesParam(params, PARAM.hideStart, view.hiddenStarts);
+
+  // Rewritten only when they changed, since writing them again moves them
+  // to the end of the query.
+  if (!Arr.eq(params.getAll(PARAM.label), view.onlyLabels)) {
+    params.delete(PARAM.label);
+
+    for (const labelName of view.onlyLabels) {
+      params.append(PARAM.label, labelName);
+    }
+  }
+
+  setFlagParam(params, PARAM.hidePending, view.hidePending);
+
+  if (view.sort === 'updated') {
+    params.delete(PARAM.sort);
+  } else {
+    params.set(PARAM.sort, view.sort);
+  }
+
+  return searchOf(params);
+};
+
+/** What the query string asks for, now. */
+export const issuesListViewFromLocation = (): IssuesListView =>
+  issuesListViewFromSearch(currentSearch());
+
+/** Writes the view into the address bar; see `rewriteSearch`. */
+export const saveIssuesListView = (view: IssuesListView): void => {
+  rewriteSearch((search) => searchWithIssuesListView(search, view));
 };
 
 const countUnder = (
@@ -353,6 +399,14 @@ const countUnder = (
     total: all.length,
   } as const;
 };
+
+const PARAM = {
+  hidePriority: 'issues.hidePriority',
+  hideStart: 'issues.hideStart',
+  label: 'issues.label',
+  hidePending: 'issues.hidePending',
+  sort: 'issues.sort',
+} as const;
 
 const NO_STARTS: IssueStarts = new Map<number, IssueStartState>();
 

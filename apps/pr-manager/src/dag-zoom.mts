@@ -8,14 +8,14 @@
  *
  * **Kept in the query string**, as the layout is (`layout.mts`): how large the
  * graph is drawn is part of how the page is looked at, so a reload or a
- * bookmark opens it at the same size. `zoom=125` is a scale in whole percent
- * and `zoom=fit` the fit; the natural size is the parameter's absence. A value
- * that is not `fit` or a whole number is the natural size, and a scale out of
- * range is clamped. Like the layout, it goes along to another repository
- * (`searchWithRepository`). What it does not keep is where a zoom from the fit
- * had put the nodes with no edge: a scale read back draws them where they go by
- * default, since that arrangement was chosen for a box the next visit may not
- * have.
+ * bookmark opens it at the same size. `dag.zoom=125` is a scale in whole
+ * percent and `dag.zoom=fit` the fit; the natural size is the parameter's
+ * absence. A value that is not `fit` or a whole number is the natural size, and
+ * a scale out of range is clamped. Like the layout, it goes along to another
+ * repository (`searchWithRepository`). What it does not keep is where a zoom
+ * from the fit had put the nodes with no edge: a scale read back draws them
+ * where they go by default, since that arrangement was chosen for a box the
+ * next visit may not have.
  */
 
 import { Num, Result } from 'ts-data-forge';
@@ -25,7 +25,7 @@ import {
   type ConnectedLayout,
   type GridPlacement,
 } from './issue-graph-layout.mjs';
-import { currentSearch, rewriteSearch } from './url.mjs';
+import { currentSearch, rewriteSearch, searchOf } from './url.mjs';
 
 /** The scales a zoom in or out moves between, smallest first. */
 export const ZOOM_STEPS = [
@@ -85,9 +85,7 @@ export const searchWithDagZoom = (search: string, zoom: DagZoom): string => {
     params.set(ZOOM_PARAM, percent.toString());
   }
 
-  const written = params.toString();
-
-  return written === '' ? '' : `?${written}`;
+  return searchOf(params);
 };
 
 /** What the query string asks for, now. */
@@ -215,7 +213,7 @@ export const scrollToCentre = (
     top: Math.max(0, centre.y * scale - box.height / 2),
   }) as const;
 
-const ZOOM_PARAM = 'zoom';
+const ZOOM_PARAM = 'dag.zoom';
 
 /** Whole percents, which is all that is written. */
 const PERCENT_PATTERN = /^\d+$/u;

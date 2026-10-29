@@ -16,7 +16,7 @@
  * was switched to dark and back follow the system again.
  */
 
-import { currentSearch, rewriteSearch } from './url.mjs';
+import { currentSearch, rewriteSearch, searchOf } from './url.mjs';
 
 /**
  * What the page is told to be. `auto` is no choice, and follows the system.
@@ -54,9 +54,7 @@ export const searchWithTheme = (search: string, theme: Theme): string => {
     params.set(THEME_PARAM, theme);
   }
 
-  const written = params.toString();
-
-  return written === '' ? '' : `?${written}`;
+  return searchOf(params);
 };
 
 export const effectiveTheme = (
