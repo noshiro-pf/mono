@@ -2,18 +2,12 @@
  * How the issues block shows the open issues: as the list, or as the DAG of
  * what each waits for (`Start-After:`).
  *
- * Kept as the header's fold is (`header-store.mts`), and for the same
- * reason: a working choice, not a way of looking at the page worth sharing in
- * a link. It starts as the list, which is what the page draws until `load`
- * answers; only then is anything handed to `save`, so the default never
- * overwrites what was saved, and a choice made in that moment is kept over
- * it.
- *
  * The DAG can leave out what is done (`omitDone`), so that what is left to
- * do is all it lays out. That switch is kept the same way, under its own
- * key, and starts off: the DAG shows everything until told otherwise. So
- * can what is labelled `pending` (`omitPending`), under a key of its own as
- * well: what is held back for now is not what is left to do.
+ * do is all it lays out; and what is labelled `pending` (`omitPending`), a
+ * switch of its own, since what is held back for now is not what is left to
+ * do. The view and both switches start as `initial`, which the page reads
+ * off the query string as it opens (`issues-view-settings.mts`), and every
+ * change is handed to `save` from `start` on.
  *
  * Every open issue is read, in either view: the first thirty come with the
  * report, so that the block has something to show as soon as the rest of
@@ -25,10 +19,9 @@
  * than what is open. A page that failed is not asked for again on its own;
  * the button under the block is still there for that.
  *
- * How large the DAG is drawn is kept in the URL (`dag-zoom.mts`), as the
- * layout is, rather than with the rest of this: it starts at `initialZoom`,
- * read off the query string as the page opens, and every change is handed to
- * `saveZoom` from `start` on.
+ * How large the DAG is drawn (`dag-zoom.mts`) is kept the same way, under
+ * a parameter of its own: it starts at `initialZoom`, and every change is
+ * handed to `saveZoom`.
  *
  * The fit is a way of drawing rather than a scale, so that it keeps the whole
  * graph in the box as the box is resized and as the graph gains or loses nodes,
@@ -50,9 +43,8 @@ import {
   map,
   skipIfNoChange,
   type InitializedObservable,
-  type Subscription,
 } from 'synstate';
-import { Arr, fastDeepEqual } from 'ts-data-forge';
+import { fastDeepEqual } from 'ts-data-forge';
 import {
   fitPlacement,
   fitScale,
@@ -75,27 +67,21 @@ import {
   omitPending,
   type IssueGraph,
 } from '../issue-graph.mjs';
+import type {
+  IssuesView,
+  IssuesViewSettings,
+} from '../issues-view-settings.mjs';
 import type { Entry, LoadedReport } from '../load-report.mjs';
 import type { MoreIssuesStatus } from './reader.mjs';
-
-export const issuesViews = ['list', 'dag'] as const;
-
-export type IssuesView = (typeof issuesViews)[number];
 
 export type IssuesViewDeps = Readonly<{
   issues: InitializedObservable<LoadedReport['issues']>;
   entries: InitializedObservable<readonly Entry[]>;
   /** `https://github.com/owner/name`, for a number nobody described. */
   repoUrl: string;
-  /** What was saved, as it was saved; it rejects when nothing can be read. */
-  load: () => Promise<unknown>;
-  save: (view: IssuesView) => void;
-  /** Whether the DAG left out what is done, as it was saved. */
-  loadHideDone: () => Promise<unknown>;
-  saveHideDone: (hide: boolean) => void;
-  /** Whether the DAG left out what is pending, as it was saved. */
-  loadHidePending: () => Promise<unknown>;
-  saveHidePending: (hide: boolean) => void;
+  /** The view and the DAG's switches as the page opens. */
+  initial: IssuesViewSettings;
+  save: (settings: IssuesViewSettings) => void;
   /** How large the DAG is drawn as the page opens. */
   initialZoom: DagZoom;
   saveZoom: (zoom: DagZoom) => void;
@@ -138,58 +124,36 @@ export type IssuesViewStore = Readonly<{
   fitDag: () => void;
   /** Back to the natural size. */
   resetZoom: () => void;
-  /** Reads what was saved, then saves every change; returns what stops it. */
+  /**
+   * Saves every change, and reads every page of the open issues, from now
+   * on; returns what stops both.
+   */
   start: () => () => void;
 }>;
 
 export const createIssuesViewStore = (
   deps: IssuesViewDeps,
 ): IssuesViewStore => {
-  const [view, setView] = createState<IssuesView>('list');
+  const [view, setView] = createState<IssuesView>(deps.initial.view);
 
-  const [hideDone, setHideDone, { updateState: updateHideDone }] =
-    createState(false);
+  const [hideDone, , { updateState: updateHideDone }] = createState(
+    deps.initial.hideDone,
+  );
 
-  const [hidePending, setHidePending, { updateState: updateHidePending }] =
-    createState(false);
+  const [hidePending, , { updateState: updateHidePending }] = createState(
+    deps.initial.hidePending,
+  );
 
   const [zoom, setZoom] = createState<DagZoom>(deps.initialZoom);
 
   const [dagBox, setDagBox] = createState<Size>({ width: 0, height: 0 });
 
-  // Whether the reader has chosen yet, for each.
-  const mut_reader = {
-    changedView: false,
-    changedHideDone: false,
-    changedHidePending: false,
-  };
-
-  const choose = (next: IssuesView): void => {
-    mut_reader.changedView = true;
-
-    setView(next);
-  };
-
-  const toggleHideDone = (): void => {
-    mut_reader.changedHideDone = true;
-
-    updateHideDone((current) => !current);
-  };
-
-  const toggleHidePending = (): void => {
-    mut_reader.changedHidePending = true;
-
-    updateHidePending((current) => !current);
-  };
-
   const start = (): (() => void) => {
-    const mut_run: {
-      stopped: boolean;
-      saving: readonly Subscription[];
-    } = {
-      stopped: false,
-      saving: [],
-    };
+    const saving = combine([view, hideDone, hidePending]).subscribe(
+      ([current, hideD, hideP]) => {
+        deps.save({ view: current, hideDone: hideD, hidePending: hideP });
+      },
+    );
 
     const zoomSaving = zoom.subscribe(deps.saveZoom);
 
@@ -201,69 +165,8 @@ export const createIssuesViewStore = (
       },
     );
 
-    const resume =
-      (apply: (stored: unknown) => void, saving: () => Subscription) =>
-      (stored: unknown): void => {
-        if (mut_run.stopped) {
-          return;
-        }
-
-        apply(stored);
-
-        mut_run.saving = Arr.toPushed(mut_run.saving, saving());
-      };
-
-    deps
-      .load()
-      .catch(() => undefined)
-      .then(
-        resume(
-          (stored) => {
-            if (!mut_reader.changedView) {
-              setView(stored === 'dag' ? 'dag' : 'list');
-            }
-          },
-          () => view.subscribe(deps.save),
-        ),
-      )
-      .catch(() => undefined);
-
-    deps
-      .loadHideDone()
-      .catch(() => undefined)
-      .then(
-        resume(
-          (stored) => {
-            if (!mut_reader.changedHideDone) {
-              setHideDone(stored === true);
-            }
-          },
-          () => hideDone.subscribe(deps.saveHideDone),
-        ),
-      )
-      .catch(() => undefined);
-
-    deps
-      .loadHidePending()
-      .catch(() => undefined)
-      .then(
-        resume(
-          (stored) => {
-            if (!mut_reader.changedHidePending) {
-              setHidePending(stored === true);
-            }
-          },
-          () => hidePending.subscribe(deps.saveHidePending),
-        ),
-      )
-      .catch(() => undefined);
-
     return () => {
-      mut_run.stopped = true;
-
-      for (const subscription of mut_run.saving) {
-        subscription.unsubscribe();
-      }
+      saving.unsubscribe();
 
       zoomSaving.unsubscribe();
 
@@ -348,9 +251,13 @@ export const createIssuesViewStore = (
     pendingCount,
     dagScale,
     dagFitted,
-    choose,
-    toggleHideDone,
-    toggleHidePending,
+    choose: setView,
+    toggleHideDone: () => {
+      updateHideDone((current) => !current);
+    },
+    toggleHidePending: () => {
+      updateHidePending((current) => !current);
+    },
     setDagBox,
     zoomIn: zoomBy(zoomInFrom),
     zoomOut: zoomBy(zoomOutFrom),

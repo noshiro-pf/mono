@@ -52,7 +52,7 @@ import type {
   ReadonlyRecord,
   StrictPick,
 } from 'ts-type-forge';
-import { currentSearch, rewriteSearch } from './url.mjs';
+import { currentSearch, rewriteSearch, searchOf } from './url.mjs';
 
 /** Said here rather than on each member, which `fix:codemod:full` drops (#2042). */
 export type BlockId = 'open' | 'queue' | 'runs' | 'merged' | 'issues';
@@ -319,9 +319,7 @@ export const searchWithLayout = (search: string, layout: Layout): string => {
     params.set(PARAM.hidden, layout.hidden.join(SEPARATOR));
   }
 
-  const written = params.toString();
-
-  return written === '' ? '' : `?${written}`;
+  return searchOf(params);
 };
 
 /** What the query string asks for, now. */

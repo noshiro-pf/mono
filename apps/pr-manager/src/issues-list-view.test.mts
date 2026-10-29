@@ -4,8 +4,9 @@ import {
   countIssues,
   DEFAULT_ISSUES_LIST_VIEW,
   isIssueShown,
+  issuesListViewFromSearch,
   matchesIssueTitle,
-  parseIssuesListView,
+  searchWithIssuesListView,
   toggleIssuePriority,
   toggleIssueStart,
   toggleLabel,
@@ -395,38 +396,36 @@ describe(toggleLabel, () => {
   });
 });
 
-describe(parseIssuesListView, () => {
-  test('reads back what was saved', () => {
+describe(issuesListViewFromSearch, () => {
+  test('reads back what was written', () => {
     const view: IssuesListView = {
       hiddenPriorities: ['low', 'none'],
-      hiddenStarts: ['blocked'],
-      onlyLabels: ['bug'],
+      hiddenStarts: ['in-progress', 'blocked'],
+      onlyLabels: ['bug', 'good first issue', 'v1.2'],
       hidePending: true,
       sort: 'start',
     } as const;
 
-    assert.deepStrictEqual(parseIssuesListView(view), view);
+    const search = searchWithIssuesListView('', view);
+
+    assert.strictEqual(
+      search,
+      '?issues.hidePriority=low.none&issues.hideStart=in-progress.blocked&issues.label=bug&issues.label=good+first+issue&issues.label=v1.2&issues.hidePending=1&issues.sort=start',
+    );
+
+    assert.deepStrictEqual(issuesListViewFromSearch(search), view);
   });
 
   test('anything it cannot make sense of is the default, and what it does not know is dropped', () => {
     assert.deepStrictEqual(
-      parseIssuesListView(undefined),
+      issuesListViewFromSearch(''),
       DEFAULT_ISSUES_LIST_VIEW,
     );
 
     assert.deepStrictEqual(
-      parseIssuesListView('priority'),
-      DEFAULT_ISSUES_LIST_VIEW,
-    );
-
-    assert.deepStrictEqual(
-      parseIssuesListView({
-        hiddenPriorities: ['urgent', 'mid'],
-        hiddenStarts: ['someday', 'cycle'],
-        onlyLabels: ['bug', 3, 'bug'],
-        hidePending: 'yes',
-        sort: 'title',
-      }),
+      issuesListViewFromSearch(
+        '?issues.hidePriority=urgent.mid&issues.hideStart=someday.cycle&issues.label=bug&issues.label=&issues.label=bug&issues.label=pending&issues.label=priority:high&issues.hidePending=yes&issues.sort=title',
+      ),
       {
         hiddenPriorities: ['mid'],
         hiddenStarts: ['cycle'],
@@ -434,6 +433,35 @@ describe(parseIssuesListView, () => {
         hidePending: false,
         sort: 'updated',
       },
+    );
+  });
+
+  test('the labels come in name order', () => {
+    assert.deepStrictEqual(
+      issuesListViewFromSearch('?issues.label=enhancement&issues.label=bug')
+        .onlyLabels,
+      ['bug', 'enhancement'],
+    );
+  });
+});
+
+describe(searchWithIssuesListView, () => {
+  test('leaves the labels where they are while they are the same', () => {
+    const search = '?issues.label=bug&dag.zoom=125';
+
+    assert.strictEqual(
+      searchWithIssuesListView(search, issuesListViewFromSearch(search)),
+      search,
+    );
+  });
+
+  test('writes the default as no parameter, and leaves the others where they were', () => {
+    assert.strictEqual(
+      searchWithIssuesListView(
+        '?a=1&issues.label=bug&issues.sort=priority&b=2',
+        DEFAULT_ISSUES_LIST_VIEW,
+      ),
+      '?a=1&b=2',
     );
   });
 });

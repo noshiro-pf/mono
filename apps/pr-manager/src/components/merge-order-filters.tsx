@@ -23,8 +23,8 @@ import { OfTotal, StatTile, StatToggle } from './stat-tile.js';
 /**
  * What the merge order leads with: the counts, each a switch for the pull
  * requests it counts with an `only` switch in its corner, then the
- * priorities, which are switches too, and the order. What a switch does is `merge-order-view.mts`; the choice is kept
- * across visits (`settings-db.mts`).
+ * priorities, which are switches too, and the order. What a switch does is `merge-order-view.mts`, which keeps the
+ * choice in the URL.
  *
  * Each number is what the list below shows (`countView` in
  * `merge-order-view.mts`), and, when the switches leave some of them out,

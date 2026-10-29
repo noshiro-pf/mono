@@ -15,8 +15,8 @@ type Props = Readonly<{
  * Where a reader names the repository to read: `owner/name`, or its address
  * on GitHub as the address bar has it.
  *
- * What it does is write `?repo=` and open the page there, the layout and the
- * theme kept. The page reads the repository once, as it opens
+ * What it does is write `?repo=` and open the page there, the rest of the
+ * query — the layout, the theme, the filters — kept. The page reads the repository once, as it opens
  * (`reportSourceFromSearch`), so a read still out for the one before cannot
  * land on the page of the next, and a bookmark of it opens the same one.
  *

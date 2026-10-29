@@ -19,8 +19,15 @@
  * landing what holds it up first, and "none" sits between mid and low.
  *
  * What is hidden gives its place to what is shown below it, so the tree
- * stays a tree. Everything is shown, in merge order, by default; what the
- * reader changes is kept (`settings-db.mts`).
+ * stays a tree. Everything is shown, in merge order, by default.
+ *
+ * **Kept in the query string**, as the layout is (`layout.mts`), so that a
+ * bookmark or a pasted link opens on the same pull requests; only what
+ * differs from {@link DEFAULT_MERGE_ORDER_VIEW} is written:
+ * `prs.hide=queued.setAside` (the statuses switched off),
+ * `prs.only=failing` (the ones picked), `prs.hidePriority=low.none` and
+ * `prs.sort=priority`. A name it does not know is dropped, so a URL written
+ * by an older page, or edited by hand, still opens.
  *
  * A draft is not one of the statuses: it is always shown, and its badge on
  * the card says what it is. Nor is being behind the base, which the card's
@@ -32,7 +39,7 @@ import {
   PENDING_LABEL,
   type TreeNode,
 } from 'pr-report-core';
-import { Arr, hasKey, isRecord } from 'ts-data-forge';
+import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { Entry, PageSummary } from './load-report.mjs';
 import {
@@ -41,6 +48,13 @@ import {
   priorityOf,
   type Priority,
 } from './priority.mjs';
+import {
+  currentSearch,
+  namesParam,
+  rewriteSearch,
+  searchOf,
+  setNamesParam,
+} from './url.mjs';
 
 /** Named after the count of {@link PageSummary} each one is. */
 export type StatusFilter =
@@ -73,8 +87,8 @@ export const statusFiltersOf = (
 /**
  * The view as it applies where only `available` is on offer: what it hides
  * or picks of the rest is ignored rather than forgotten, so the choice comes
- * back on a repository that has them — the choice is kept across visits,
- * and the page reads any repository the URL names.
+ * back on a repository that has them — the choice is in the URL, which goes
+ * along to another repository.
  */
 export const withAvailable = (
   view: MergeOrderView,
@@ -348,33 +362,53 @@ export const withSort = (
 ): MergeOrderView => ({ ...view, sort }) as const;
 
 /**
- * What was saved, read forgivingly: anything it cannot make sense of is the
- * default, and a name it does not know is dropped, so a choice saved by an
- * older page still opens.
+ * The view the query string asks for. A status both switched off and picked,
+ * which only a hand can write, is switched off.
  */
-export const parseMergeOrderView = (stored: unknown): MergeOrderView => {
-  if (!isRecord(stored)) {
-    return DEFAULT_MERGE_ORDER_VIEW;
-  }
+export const mergeOrderViewFromSearch = (search: string): MergeOrderView => {
+  const params = new URLSearchParams(search);
+
+  const hiddenStatuses = namesParam(STATUS_FILTERS, params.getAll(PARAM.hide));
 
   return {
-    hiddenStatuses: known(
-      STATUS_FILTERS,
-      hasKey(stored, 'hiddenStatuses') ? stored.hiddenStatuses : undefined,
+    hiddenStatuses,
+    onlyStatuses: namesParam(STATUS_FILTERS, params.getAll(PARAM.only)).filter(
+      (each) => !hiddenStatuses.includes(each),
     ),
-    onlyStatuses: known(
-      STATUS_FILTERS,
-      hasKey(stored, 'onlyStatuses') ? stored.onlyStatuses : undefined,
-    ),
-    hiddenPriorities: known(
-      PRIORITIES,
-      hasKey(stored, 'hiddenPriorities') ? stored.hiddenPriorities : undefined,
-    ),
-    sort:
-      hasKey(stored, 'sort') && stored.sort === 'priority'
-        ? 'priority'
-        : 'order',
+    hiddenPriorities: namesParam(PRIORITIES, params.getAll(PARAM.hidePriority)),
+    sort: params.get(PARAM.sort) === 'priority' ? 'priority' : 'order',
   };
+};
+
+/** The query string with `view` written in, the rest as it was. */
+export const searchWithMergeOrderView = (
+  search: string,
+  view: MergeOrderView,
+): string => {
+  const params = new URLSearchParams(search);
+
+  setNamesParam(params, PARAM.hide, view.hiddenStatuses);
+
+  setNamesParam(params, PARAM.only, view.onlyStatuses);
+
+  setNamesParam(params, PARAM.hidePriority, view.hiddenPriorities);
+
+  if (view.sort === 'priority') {
+    params.set(PARAM.sort, view.sort);
+  } else {
+    params.delete(PARAM.sort);
+  }
+
+  return searchOf(params);
+};
+
+/** What the query string asks for, now. */
+export const mergeOrderViewFromLocation = (): MergeOrderView =>
+  mergeOrderViewFromSearch(currentSearch());
+
+/** Writes the view into the address bar; see `rewriteSearch`. */
+export const saveMergeOrderView = (view: MergeOrderView): void => {
+  rewriteSearch((search) => searchWithMergeOrderView(search, view));
 };
 
 const countUnder = (
@@ -417,14 +451,12 @@ export const toggled = <T extends string>(
 ): readonly T[] =>
   all.filter((each) => (each === item) !== current.includes(each));
 
-/** The names in `all` that `stored` lists, in the order of `all`. */
-export const known = <T extends string>(
-  all: readonly T[],
-  stored: unknown,
-): readonly T[] =>
-  Arr.isArray(stored)
-    ? all.filter((each) => stored.includes(each))
-    : ([] as const);
+const PARAM = {
+  hide: 'prs.hide',
+  only: 'prs.only',
+  hidePriority: 'prs.hidePriority',
+  sort: 'prs.sort',
+} as const;
 
 const QUEUE_STATUSES: ReadonlySet<StatusFilter> = new Set<StatusFilter>([
   'queued',

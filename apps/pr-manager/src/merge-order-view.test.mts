@@ -11,7 +11,8 @@ import {
   countView,
   DEFAULT_MERGE_ORDER_VIEW,
   isShown,
-  parseMergeOrderView,
+  mergeOrderViewFromSearch,
+  searchWithMergeOrderView,
   STATUS_FILTERS,
   statusesOf,
   statusFiltersOf,
@@ -444,7 +445,7 @@ describe(statusFiltersOf, () => {
 });
 
 describe(withAvailable, () => {
-  // The choice is kept across visits, and across repositories: `only
+  // The choice is kept in the URL, which goes along to another repository: `only
   // queued`, chosen on one that runs the queue, would otherwise leave
   // nothing on one that does not, with no switch on screen to undo it.
   test('drops what it hides or picks of the statuses not on offer', () => {
@@ -467,79 +468,75 @@ describe(withAvailable, () => {
   });
 });
 
-describe(parseMergeOrderView, () => {
-  test('reads back what was saved', () => {
+describe(mergeOrderViewFromSearch, () => {
+  test('reads back what was written', () => {
     const view: MergeOrderView = {
       hiddenStatuses: ['queued', 'setAside'],
       onlyStatuses: ['failing'],
-      hiddenPriorities: ['low'],
+      hiddenPriorities: ['low', 'none'],
       sort: 'priority',
     } as const;
 
-    assert.deepStrictEqual(parseMergeOrderView(view), view);
+    const search = searchWithMergeOrderView('', view);
+
+    assert.strictEqual(
+      search,
+      '?prs.hide=queued.setAside&prs.only=failing&prs.hidePriority=low.none&prs.sort=priority',
+    );
+
+    assert.deepStrictEqual(mergeOrderViewFromSearch(search), view);
   });
 
-  test('forgives: nothing, or something else, is the default; an unknown name is dropped', () => {
+  test('forgives: nothing is the default, an unknown name is dropped, and the names come in their own order', () => {
     assert.deepStrictEqual(
-      parseMergeOrderView(undefined),
+      mergeOrderViewFromSearch(''),
       DEFAULT_MERGE_ORDER_VIEW,
     );
 
-    assert.deepStrictEqual(parseMergeOrderView('x'), DEFAULT_MERGE_ORDER_VIEW);
-
     assert.deepStrictEqual(
-      parseMergeOrderView({
-        hiddenStatuses: ['queued', 'gone', 3, 'queued'],
-        onlyStatuses: 'failing',
-        hiddenPriorities: 'low',
-        sort: 'size',
-      }),
-      { ...DEFAULT_MERGE_ORDER_VIEW, hiddenStatuses: ['queued'] },
+      mergeOrderViewFromSearch(
+        '?prs.hide=setAside.gone.queued.queued&prs.only=&prs.hidePriority=urgent&prs.sort=size',
+      ),
+      { ...DEFAULT_MERGE_ORDER_VIEW, hiddenStatuses: ['queued', 'setAside'] },
+    );
+  });
+
+  test('reads a list repeated as a hand may write it', () => {
+    assert.deepStrictEqual(
+      mergeOrderViewFromSearch('?prs.hide=failing&prs.hide=queued')
+        .hiddenStatuses,
+      ['queued', 'failing'],
+    );
+  });
+
+  test('a status both hidden and picked, as only a hand can write it, is hidden', () => {
+    assert.deepStrictEqual(
+      mergeOrderViewFromSearch('?prs.hide=failing&prs.only=failing.pending'),
+      {
+        ...DEFAULT_MERGE_ORDER_VIEW,
+        hiddenStatuses: ['failing'],
+        onlyStatuses: ['pending'],
+      },
+    );
+  });
+});
+
+describe(searchWithMergeOrderView, () => {
+  test('writes the default as no parameter, and leaves the others where they were', () => {
+    assert.strictEqual(
+      searchWithMergeOrderView(
+        '?a=1&prs.hide=queued&prs.sort=priority&b=2',
+        DEFAULT_MERGE_ORDER_VIEW,
+      ),
+      '?a=1&b=2',
     );
 
-    // Saved before anything could be picked.
-    assert.deepStrictEqual(
-      parseMergeOrderView({
-        hiddenStatuses: ['setAside'],
-        hiddenPriorities: [],
-        sort: 'order',
-      }),
-      { ...DEFAULT_MERGE_ORDER_VIEW, hiddenStatuses: ['setAside'] },
-    );
-
-    // Saved while behind base was a status: it is dropped, and what is
-    // behind is shown.
-    assert.deepStrictEqual(
-      parseMergeOrderView({
-        hiddenStatuses: ['queued', 'behind'],
-        onlyStatuses: ['behind'],
-        hiddenPriorities: [],
-        sort: 'order',
-      }),
-      { ...DEFAULT_MERGE_ORDER_VIEW, hiddenStatuses: ['queued'] },
-    );
-
-    // Saved while a draft was a status: it is dropped, and drafts are shown.
-    assert.deepStrictEqual(
-      parseMergeOrderView({
-        hiddenStatuses: ['queued', 'draft'],
-        onlyStatuses: ['draft'],
-        hiddenPriorities: [],
-        sort: 'order',
-      }),
-      { ...DEFAULT_MERGE_ORDER_VIEW, hiddenStatuses: ['queued'] },
-    );
-
-    // Saved while the counts had a mode switch: the mode is dropped.
-    assert.deepStrictEqual(
-      parseMergeOrderView({
-        statusMode: 'only',
-        hiddenStatuses: [],
+    assert.strictEqual(
+      searchWithMergeOrderView('?a=1', {
+        ...DEFAULT_MERGE_ORDER_VIEW,
         onlyStatuses: ['failing'],
-        hiddenPriorities: [],
-        sort: 'order',
       }),
-      { ...DEFAULT_MERGE_ORDER_VIEW, onlyStatuses: ['failing'] },
+      '?a=1&prs.only=failing',
     );
   });
 });

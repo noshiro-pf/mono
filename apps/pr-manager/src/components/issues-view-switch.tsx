@@ -1,5 +1,6 @@
 import { constant, view, type JSX, type View } from 'synstate-dom';
-import { issuesViewStore, type IssuesView } from '../store/index.mjs';
+import type { IssuesView } from '../issues-view-settings.mjs';
+import { issuesViewStore } from '../store/index.mjs';
 
 /**
  * The list or the DAG: two buttons side by side, the pressed one

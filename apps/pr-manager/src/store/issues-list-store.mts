@@ -2,12 +2,10 @@
  * Which open issues the list shows, and the list that leaves.
  *
  * What a choice does is `issues-list-view.mts`; this holds the current one
- * and derives from it, with the open issues, what the list draws. It is
- * kept as the merge order's is (`merge-order-store.mts`), and for the same
- * reasons: it starts as everything shown, by update, until `load` answers
- * with what was saved; only then is anything handed to `save`, so the
- * default never overwrites a saved choice; and a choice the reader made in
- * that moment is kept over the saved one.
+ * and derives from it, with the open issues, what the list draws. It starts
+ * as `initial`, which the page reads off the query string as it opens
+ * (`issues-list-view.mts`), and every change is handed to `save` from
+ * `start` on, as the merge order's is (`merge-order-store.mts`).
  *
  * The search is held beside the view, not in it, and so is never saved: it
  * starts empty on every visit.
@@ -20,7 +18,6 @@ import {
   map,
   skipIfNoChange,
   type InitializedObservable,
-  type Subscription,
 } from 'synstate';
 import { fastDeepEqual } from 'ts-data-forge';
 import {
@@ -31,8 +28,6 @@ import {
 import {
   arrangeIssues,
   countIssues,
-  DEFAULT_ISSUES_LIST_VIEW,
-  parseIssuesListView,
   toggleIssuePriority,
   toggleIssueStart,
   toggleLabel,
@@ -52,8 +47,7 @@ export type IssuesListDeps = Readonly<{
    * each issue's start state is read off.
    */
   graph: InitializedObservable<IssueGraph>;
-  /** What was saved, as it was saved; it rejects when nothing can be read. */
-  load: () => Promise<unknown>;
+  initial: IssuesListView;
   save: (view: IssuesListView) => void;
 }>;
 
@@ -76,55 +70,24 @@ export type IssuesListStore = Readonly<{
   togglePending: () => void;
   setSort: (sort: IssueSort) => void;
   setQuery: (query: string) => void;
-  /** Reads what was saved, then saves every change; returns what stops it. */
+  /** Saves every change from now on; returns what stops it. */
   start: () => () => void;
 }>;
 
 export const createIssuesListStore = (
   deps: IssuesListDeps,
 ): IssuesListStore => {
-  const [view, setView, { updateState: updateView }] =
-    createState<IssuesListView>(DEFAULT_ISSUES_LIST_VIEW);
+  const [view, , { updateState: updateView }] = createState<IssuesListView>(
+    deps.initial,
+  );
 
   const [query, setQuery] = createState<string>('');
 
-  // Whether the reader has chosen anything yet.
-  const mut_reader = { changed: false };
-
-  const change = (next: (current: IssuesListView) => IssuesListView): void => {
-    mut_reader.changed = true;
-
-    updateView(next);
-  };
-
   const start = (): (() => void) => {
-    const mut_run: { stopped: boolean; saving: Subscription | undefined } = {
-      stopped: false,
-      saving: undefined,
-    };
-
-    const resume = (stored: unknown): void => {
-      if (mut_run.stopped) {
-        return;
-      }
-
-      if (!mut_reader.changed) {
-        setView(parseIssuesListView(stored));
-      }
-
-      mut_run.saving = view.subscribe(deps.save);
-    };
-
-    deps
-      .load()
-      .catch(() => undefined)
-      .then(resume)
-      .catch(() => undefined);
+    const saving = view.subscribe(deps.save);
 
     return () => {
-      mut_run.stopped = true;
-
-      mut_run.saving?.unsubscribe();
+      saving.unsubscribe();
     };
   };
 
@@ -160,19 +123,19 @@ export const createIssuesListStore = (
       .pipe(skipIfNoChange(fastDeepEqual)),
     starts,
     togglePriority: (priority) => {
-      change((current) => toggleIssuePriority(current, priority));
+      updateView((current) => toggleIssuePriority(current, priority));
     },
     toggleStart: (which) => {
-      change((current) => toggleIssueStart(current, which));
+      updateView((current) => toggleIssueStart(current, which));
     },
     toggleLabel: (labelName) => {
-      change((current) => toggleLabel(current, labelName));
+      updateView((current) => toggleLabel(current, labelName));
     },
     togglePending: () => {
-      change(togglePendingIssues);
+      updateView(togglePendingIssues);
     },
     setSort: (sort) => {
-      change((current) => withIssueSort(current, sort));
+      updateView((current) => withIssueSort(current, sort));
     },
     setQuery,
     start,

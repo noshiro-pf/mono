@@ -74,8 +74,8 @@ DAG's words and colours, are switches too. The order is **updated**,
 be started (wait over, then free), what is in progress, what needs a look,
 what waits, what is on a cycle; the most recently updated first within each.
 Each switch and pick counts what the list shows of it, as the merge order's
-do, and the choice is kept in the browser. They apply to the list; the DAG
-draws every issue.
+do, and the choice is kept in the URL (below). They apply to the list; the
+DAG draws every issue.
 
 **Each issue in the list says how it stands for being started**: a badge for
 its start state, the numbers its `Start-After:` names, each coloured by where
@@ -103,7 +103,7 @@ blue an open pull request and the issues it closes, grey what is done. Each node
 shows its title and opens its page on GitHub. In the DAG, the **Done** chip beside the switch starts
 pressed; unpressed, it leaves out the issues closed as completed and the merged
 pull requests, with the waits on them that are over, so that only what is left
-to do is laid out. Both choices are kept in the browser. At the other end of
+to do is laid out. Both choices are kept in the URL. At the other end of
 the row, **−** and **+** zoom the graph out and in a step at a time about the
 middle of its box, **Fit** draws all of it in the box (never larger than its
 natural size, and following the box and the graph as they change until the
@@ -113,10 +113,10 @@ or shorter rows, under the rest of the graph, beside it, or filling the room to
 its right before going on under it, whichever draws the whole graph the
 largest. A zoom from there keeps that arrangement; 100% puts
 them back under the rest. The zoom is kept in the URL with the layout,
-`?zoom=125` for a scale in percent and `?zoom=fit` for the fit, so a reload or
-a bookmark draws the graph at the same size; 100% is the parameter's absence.
-A scale read back puts the issues with no dependency where they go by default,
-whatever arrangement the fit had chosen before the zoom.
+`?dag.zoom=125` for a scale in percent and `?dag.zoom=fit` for the fit, so a
+reload or a bookmark draws the graph at the same size; 100% is the parameter's
+absence. A scale read back puts the issues with no dependency where they go by
+default, whatever arrangement the fit had chosen before the zoom.
 
 It **only reads**. Nothing here labels, rebases, merges or comments — that is
 `pnpm run unblock-prs`, run by a person — and a page that cannot do any of it
@@ -161,8 +161,8 @@ What follows from what the repository has:
   is a pull request labelled `skip-ci` read as paused: elsewhere the label is
   no promise that its checks are held back, so their verdict stands. A
   choice made of them is ignored there and kept, so it is back on a
-  repository that has them: the merge order's filters are kept per browser,
-  not per repository.
+  repository that has them: the merge order's filters are in the URL, which
+  goes along to another repository.
 
 ## The merge order
 
@@ -231,11 +231,25 @@ What is hidden gives its place to what is shown below it, so a pull request
 waiting on a hidden one is drawn where that one was. And a pull request
 under more than one predecessor is expanded wherever it now comes first.
 
-Everything is shown, in merge order, until the reader changes it; the choice
-is kept in the browser's IndexedDB, in a database of the page's own name, so
-it is there on the next visit. Not in the URL like the layout and the theme:
-it is a working choice made again and again rather than a way of looking at
-the page worth sharing in a link.
+Everything is shown, in merge order, until the reader changes it.
+
+**What the page shows is kept in the URL**, as the layout and the theme are,
+so a bookmark or a pasted link opens on the same pull requests and issues,
+and two tabs can show two different ones. Only what differs from the default
+is written:
+
+- The merge order: `prs.hide=queued.setAside` (the statuses switched off),
+  `prs.only=failing` (the ones picked), `prs.hidePriority=low.none` and
+  `prs.sort=priority`.
+- The open issues: `issues=dag` (the DAG rather than the list),
+  `dag.hideDone=1`, `dag.hidePending=1` and `dag.zoom=125` or `dag.zoom=fit`
+  for the DAG; `issues.hidePriority=low`, `issues.hideStart=blocked.cycle`,
+  `issues.hidePending=1`, `issues.sort=priority` and `issues.label=bug`, once
+  per label picked, for the list. The search is not kept.
+
+A name it does not know is dropped, so a URL written by an older page, or
+edited by hand, still opens. A page opened without them shows everything,
+the usual way.
 
 ## Layout
 
@@ -296,8 +310,10 @@ of the window while the report scrolls under it; the same chevron unfolds it.
 Without a token the token panel stays, folded or not, since the page reads
 nothing until it has one.
 
-It starts unfolded, and whether it is folded is kept in IndexedDB beside the
-merge order's filters, for the same reason.
+It starts unfolded, and whether it is folded is kept in the browser's
+IndexedDB, in a database of the page's own name, rather than in the URL with
+the rest: it is how much room this screen has to spare, not a way of looking
+at the page worth sharing in a link.
 
 ## Opening a pull request in a split view
 
@@ -465,8 +481,8 @@ the DOM events as observables — which is what lets a test drive them with a
 `source`, and `store.mts` hands them the real ones. What is kept outside the
 page follows a store by subscription: storage follows the token, the URL
 and `<html>` follow the theme, the URL follows the layout (through
-`debounce`) and the DAG's zoom (on every step, there being no drag),
-IndexedDB follows the merge order's filters and the folded header once what it held has been read, and the Layout dialog opens and closes as the store says.
+`debounce`) and what the merge order and the open issues show (on every
+change, there being no drag), IndexedDB follows the folded header once what it held has been read, and the Layout dialog opens and closes as the store says.
 
 **The view is synstate-dom**, which binds the stores' observables straight
 into the DOM: each component is called once, and a value that changes

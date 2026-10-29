@@ -1,5 +1,7 @@
 /** Which repository this app reads, and how often. */
 
+import { searchOf } from './url.mjs';
+
 export type ReportSource = Readonly<{ owner: string; repo: string }>;
 
 /**
@@ -52,7 +54,8 @@ export const parseRepository = (value: string): ReportSource | undefined => {
 
 /**
  * `search` with `repo` naming `source`, the rest kept as it is, so that the
- * layout and the theme go along to the other repository.
+ * layout, the theme and what the page shows go along to the other
+ * repository.
  */
 export const searchWithRepository = (
   search: string,
@@ -62,9 +65,8 @@ export const searchWithRepository = (
 
   params.set(REPO_PARAM, `${source.owner}/${source.repo}`);
 
-  // `/` is left as it is, as a reader would type it: it means nothing
-  // special in a query, and `repo=owner/name` is what the README says.
-  return `?${params.toString().replaceAll('%2F', '/')}` as const;
+  // Spelt as every other writer spells it, `repo=owner/name` included.
+  return searchOf(params);
 };
 
 /** The repository the report is about. */

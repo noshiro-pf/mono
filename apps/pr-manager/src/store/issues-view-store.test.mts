@@ -1,77 +1,47 @@
 import { createState } from 'synstate';
 import { NATURAL_ZOOM, type DagZoom } from '../dag-zoom.mjs';
-import type { Entry, LoadedReport } from '../load-report.mjs';
 import {
-  createIssuesViewStore,
-  type IssuesView,
-} from './issues-view-store.mjs';
+  DEFAULT_ISSUES_VIEW_SETTINGS,
+  type IssuesViewSettings,
+} from '../issues-view-settings.mjs';
+import type { Entry, LoadedReport } from '../load-report.mjs';
+import { createIssuesViewStore } from './issues-view-store.mjs';
 import type { MoreIssuesStatus } from './reader.mjs';
 
 describe(createIssuesViewStore, () => {
-  test('starts as the list, then takes what was saved, and saves nothing before it has read', async () => {
-    const { store, saved, resolveLoad } = setup();
-
-    store.start();
-
-    assert.strictEqual(store.view.getSnapshot().value, 'list');
-
-    assert.deepStrictEqual(saved, []);
-
-    resolveLoad('dag');
-
-    await settle();
+  test('starts at the settings it is given, and hands every change to save from start on', () => {
+    const { store, saved } = setup({
+      initial: { view: 'dag', hideDone: true, hidePending: false },
+    });
 
     assert.strictEqual(store.view.getSnapshot().value, 'dag');
+
+    assert.isTrue(store.hideDone.getSnapshot().value);
+
+    assert.isFalse(store.hidePending.getSnapshot().value);
 
     store.choose('list');
 
-    assert.strictEqual(store.view.getSnapshot().value, 'list');
+    // Nothing is handed over before it starts.
+    assert.deepStrictEqual(saved, []);
 
-    assert.strictEqual(saved.at(-1), 'list');
-  });
+    const stopStore = store.start();
 
-  test('a choice made before the saved value is read is kept, and saved', async () => {
-    const { store, saved, resolveLoad } = setup();
+    store.toggleHideDone();
 
-    store.start();
+    store.toggleHidePending();
 
-    store.choose('dag');
+    assert.deepStrictEqual(saved, [
+      { view: 'list', hideDone: true, hidePending: false },
+      { view: 'list', hideDone: false, hidePending: false },
+      { view: 'list', hideDone: false, hidePending: true },
+    ]);
 
-    resolveLoad('list');
-
-    await settle();
-
-    assert.strictEqual(store.view.getSnapshot().value, 'dag');
-
-    assert.strictEqual(saved.at(-1), 'dag');
-  });
-
-  test('anything saved but a view it knows leaves the list', async () => {
-    const { store, resolveLoad } = setup();
-
-    store.start();
-
-    resolveLoad('graph');
-
-    await settle();
-
-    assert.strictEqual(store.view.getSnapshot().value, 'list');
-  });
-
-  test('a database that cannot be read leaves the list, and changes are still handed to save', async () => {
-    const { store, saved, rejectLoad } = setup();
-
-    store.start();
-
-    rejectLoad();
-
-    await settle();
-
-    assert.strictEqual(store.view.getSnapshot().value, 'list');
+    stopStore();
 
     store.choose('dag');
 
-    assert.strictEqual(saved.at(-1), 'dag');
+    assert.strictEqual(saved.length, 3);
   });
 
   test('builds the graph from the issues, and passes it on only when it changed', () => {
@@ -104,9 +74,8 @@ describe(createIssuesViewStore, () => {
     assert.strictEqual(mut_graphs.length, drawn);
   });
 
-  test('in either view, reads every page of the open issues, one page at a time', async () => {
-    const { store, resolveLoad, setIssues, setMoreIssues, loadMoreCalls } =
-      setup();
+  test('in either view, reads every page of the open issues, one page at a time', () => {
+    const { store, setIssues, setMoreIssues, loadMoreCalls } = setup();
 
     store.start();
 
@@ -126,9 +95,7 @@ describe(createIssuesViewStore, () => {
 
     assert.strictEqual(loadMoreCalls(), 2);
 
-    resolveLoad('dag');
-
-    await settle();
+    store.choose('dag');
 
     setMoreIssues({ type: 'loading' });
 
@@ -159,66 +126,6 @@ describe(createIssuesViewStore, () => {
     setMoreIssues({ type: 'idle' });
 
     assert.strictEqual(loadMoreCalls(), 0);
-  });
-
-  test('shows what is done until told to hide it, and takes the saved choice once read', async () => {
-    const { store, savedHideDone, resolveLoadHideDone } = setup();
-
-    store.start();
-
-    assert.isFalse(store.hideDone.getSnapshot().value);
-
-    assert.deepStrictEqual(savedHideDone, []);
-
-    resolveLoadHideDone(true);
-
-    await settle();
-
-    assert.isTrue(store.hideDone.getSnapshot().value);
-
-    store.toggleHideDone();
-
-    assert.isFalse(store.hideDone.getSnapshot().value);
-
-    assert.strictEqual(savedHideDone.at(-1), false);
-  });
-
-  test('a toggle made before the saved choice is read is kept, and saved', async () => {
-    const { store, savedHideDone, resolveLoadHideDone } = setup();
-
-    store.start();
-
-    store.toggleHideDone();
-
-    resolveLoadHideDone(false);
-
-    await settle();
-
-    assert.isTrue(store.hideDone.getSnapshot().value);
-
-    assert.strictEqual(savedHideDone.at(-1), true);
-  });
-
-  test('anything saved but true, or nothing readable, shows what is done', async () => {
-    const { store, rejectLoadHideDone } = setup();
-
-    store.start();
-
-    rejectLoadHideDone();
-
-    await settle();
-
-    assert.isFalse(store.hideDone.getSnapshot().value);
-
-    const other = setup();
-
-    other.store.start();
-
-    other.resolveLoadHideDone('yes');
-
-    await settle();
-
-    assert.isFalse(other.store.hideDone.getSnapshot().value);
   });
 
   test('hiding what is done takes it out of the graph and its layout, and counts it either way', () => {
@@ -255,64 +162,6 @@ describe(createIssuesViewStore, () => {
     store.toggleHideDone();
 
     assert.strictEqual(store.graph.getSnapshot().value.nodes.length, 3);
-  });
-
-  test('shows what is pending until told to hide it, takes the saved choice once read, and keeps a toggle made before', async () => {
-    const { store, savedHidePending, resolveLoadHidePending } = setup();
-
-    store.start();
-
-    assert.isFalse(store.hidePending.getSnapshot().value);
-
-    assert.deepStrictEqual(savedHidePending, []);
-
-    resolveLoadHidePending(true);
-
-    await settle();
-
-    assert.isTrue(store.hidePending.getSnapshot().value);
-
-    store.toggleHidePending();
-
-    assert.isFalse(store.hidePending.getSnapshot().value);
-
-    assert.strictEqual(savedHidePending.at(-1), false);
-
-    const other = setup();
-
-    other.store.start();
-
-    other.store.toggleHidePending();
-
-    other.resolveLoadHidePending(false);
-
-    await settle();
-
-    assert.isTrue(other.store.hidePending.getSnapshot().value);
-
-    assert.strictEqual(other.savedHidePending.at(-1), true);
-  });
-
-  test('anything saved but true, or nothing readable, shows what is pending', async () => {
-    const { store, rejectLoadHidePending } = setup();
-
-    store.start();
-
-    rejectLoadHidePending();
-
-    await settle();
-
-    assert.isFalse(store.hidePending.getSnapshot().value);
-
-    const other = setup();
-
-    other.store.start();
-
-    other.resolveLoadHidePending('yes');
-
-    await settle();
-
-    assert.isFalse(other.store.hidePending.getSnapshot().value);
   });
 
   test('hiding what is pending takes it out of the graph, with what is done or not, and counts it either way', () => {
@@ -554,65 +403,27 @@ describe(createIssuesViewStore, () => {
 
     assert.strictEqual(store.dagScale.getSnapshot().value, 0.5);
   });
-
-  test('stopped before the read answers, it neither applies nor saves', async () => {
-    const { store, saved, savedHideDone, resolveLoad, resolveLoadHideDone } =
-      setup();
-
-    const stopStore = store.start();
-
-    stopStore();
-
-    resolveLoad('dag');
-
-    resolveLoadHideDone(true);
-
-    await settle();
-
-    assert.strictEqual(store.view.getSnapshot().value, 'list');
-
-    assert.isFalse(store.hideDone.getSnapshot().value);
-
-    assert.deepStrictEqual(saved, []);
-
-    assert.deepStrictEqual(savedHideDone, []);
-  });
 });
 
 const setup = (
-  options: Readonly<{ initialZoom?: DagZoom }> = {},
+  options: Readonly<{
+    initial?: IssuesViewSettings;
+    initialZoom?: DagZoom;
+  }> = {},
 ): Readonly<{
   store: ReturnType<typeof createIssuesViewStore>;
-  saved: readonly IssuesView[];
+  saved: readonly IssuesViewSettings[];
   savedZoom: readonly DagZoom[];
-  savedHideDone: readonly boolean[];
-  resolveLoad: (stored: unknown) => void;
-  rejectLoad: () => void;
-  resolveLoadHideDone: (stored: unknown) => void;
-  rejectLoadHideDone: () => void;
-  savedHidePending: readonly boolean[];
-  resolveLoadHidePending: (stored: unknown) => void;
-  rejectLoadHidePending: () => void;
   setIssues: (next: LoadedReport['issues']) => void;
   setEntries: (next: readonly Entry[]) => void;
   setMoreIssues: (next: MoreIssuesStatus) => void;
   loadMoreCalls: () => number;
 }> => {
-  const mut_saved: IssuesView[] = [];
+  const mut_saved: IssuesViewSettings[] = [];
 
   const mut_savedZoom: DagZoom[] = [];
 
   const mut_loadMore = { calls: 0 };
-
-  const mut_savedHideDone: boolean[] = [];
-
-  const { promise, resolve, reject } = Promise.withResolvers<unknown>();
-
-  const hideDoneRead = Promise.withResolvers<unknown>();
-
-  const mut_savedHidePending: boolean[] = [];
-
-  const hidePendingRead = Promise.withResolvers<unknown>();
 
   const [issues, setIssues] = createState<LoadedReport['issues']>({
     items: [],
@@ -631,17 +442,9 @@ const setup = (
     issues,
     entries,
     repoUrl: 'https://github.com/o/r',
-    load: () => promise,
-    save: (view) => {
-      mut_saved.push(view);
-    },
-    loadHideDone: () => hideDoneRead.promise,
-    saveHideDone: (hide) => {
-      mut_savedHideDone.push(hide);
-    },
-    loadHidePending: () => hidePendingRead.promise,
-    saveHidePending: (hide) => {
-      mut_savedHidePending.push(hide);
+    initial: options.initial ?? DEFAULT_ISSUES_VIEW_SETTINGS,
+    save: (settings) => {
+      mut_saved.push(settings);
     },
     initialZoom: options.initialZoom ?? NATURAL_ZOOM,
     saveZoom: (zoom) => {
@@ -657,20 +460,6 @@ const setup = (
     store,
     saved: mut_saved,
     savedZoom: mut_savedZoom,
-    savedHideDone: mut_savedHideDone,
-    resolveLoad: resolve,
-    rejectLoad: () => {
-      reject(new Error('blocked'));
-    },
-    resolveLoadHideDone: hideDoneRead.resolve,
-    rejectLoadHideDone: () => {
-      hideDoneRead.reject(new Error('blocked'));
-    },
-    savedHidePending: mut_savedHidePending,
-    resolveLoadHidePending: hidePendingRead.resolve,
-    rejectLoadHidePending: () => {
-      hidePendingRead.reject(new Error('blocked'));
-    },
     setIssues,
     setEntries,
     setMoreIssues,
@@ -721,9 +510,3 @@ const pendingLabel = {
   color: 'ededed',
   description: '',
 } as const;
-
-const settle = async (): Promise<void> => {
-  await new Promise((resolve) => {
-    setTimeout(resolve, 0);
-  });
-};
