@@ -10,6 +10,8 @@ import {
   type EditorState,
 } from '../store/index.mjs';
 import {
+  formatLabels,
+  labelsByUse,
   parseLabels,
   priorityLabels,
   progressLabels,
@@ -20,7 +22,7 @@ import {
 import { DateTimeField } from './date-time-field.js';
 import { DependencyEditor } from './dependency-editor.js';
 import { GroupField } from './group-field.js';
-import { LabelChips } from './label-chips.js';
+import { LabelInput } from './label-input.js';
 import { StatusBadge } from './status-badge.js';
 import { WarningBadge } from './warning-badge.js';
 
@@ -55,6 +57,8 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
       ),
     ),
   );
+
+  const known$ = dataStore.state.pipe(map(labelsByUse));
 
   return (
     <>
@@ -161,22 +165,18 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
             });
           }}
         />
-        <label class={constant('bp6-label field field-wide')}>
-          {constant('ラベル（カンマ区切り）')}
-          <input
-            class={constant('bp6-input bp6-fill')}
-            type={constant('text')}
-            value={view(editor, ({ draft }) => draft.labels)}
-            onInput={(changed) => {
-              editorStore.updateTaskDraft({
-                labels: changed.currentTarget.value,
-              });
-            }}
-          />
-          <LabelChips
-            labels={view(editor, ({ draft }) => parseLabels(draft.labels))}
-          />
-        </label>
+        <LabelInput
+          caption={'ラベル'}
+          e2e={'task-labels'}
+          id={'task-labels'}
+          known={known$}
+          labels={editor
+            .pipe(map(({ draft }) => draft.labels))
+            .pipe(map(parseLabels))}
+          onChange={(labels) => {
+            editorStore.updateTaskDraft({ labels: formatLabels(labels) });
+          }}
+        />
         <label class={constant('bp6-label field field-wide')}>
           {constant('説明')}
           <textarea

@@ -412,6 +412,113 @@ fieldset {
   gap: 4px;
 }
 
+/* The labels of a form: chips, then the box the next one is typed in. */
+.label-input-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  height: auto;
+  padding: 3px 6px;
+  cursor: text;
+}
+
+.label-input-box:focus-within {
+  box-shadow:
+    inset 0 0 0 1px var(--focus),
+    0 0 0 2px color-mix(in srgb, var(--focus) 30%, transparent);
+}
+
+.label-input .label-chip {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* A long label is cut short rather than pushing its button out of the box. */
+.label-input .label-chip .label-chip-text {
+  flex-shrink: 1;
+  min-width: 0;
+  margin-right: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.label-input .label-chip .label-chip-remove {
+  min-width: 24px;
+  min-height: 24px;
+  margin: -4px -6px -4px 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.label-input-text {
+  flex: 1 1 8em;
+  min-width: 8em;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 24px;
+}
+
+.form-grid .label-input .field-label {
+  margin-bottom: 5px;
+}
+
+.label-input {
+  position: relative;
+}
+
+/*
+ * Over the form, so that opening and closing it moves nothing a press may
+ * be on; the form scrolls to it, as it is scrolled into view.
+ */
+.label-suggestions {
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  right: 0;
+  left: 0;
+  margin: 4px 0 0;
+  padding: 4px 0;
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  background: var(--surface);
+  box-shadow: 0 4px 12px rgb(17 20 24 / 20%);
+  list-style: none;
+}
+
+.label-suggestion {
+  min-height: 32px;
+  padding: 6px 10px;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.label-suggestion:hover,
+.label-suggestion.active {
+  background: color-mix(in srgb, var(--focus) 15%, transparent);
+}
+
+@media (pointer: coarse) {
+  .label-input .label-chip .label-chip-remove,
+  .label-suggestion {
+    min-height: var(--tap);
+  }
+
+  .label-input .label-chip .label-chip-remove {
+    min-width: var(--tap);
+  }
+}
+
 .due-date.overdue {
   color: var(--danger);
   font-weight: 600;

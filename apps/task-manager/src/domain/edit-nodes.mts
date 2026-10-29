@@ -1,5 +1,6 @@
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
+import { withLabelsAdded } from './labels.mjs';
 import { setProgress } from './set-progress.mjs';
 import type {
   DomainState,
@@ -75,11 +76,15 @@ export const editNodes = (
 export type NodeEdit = DeepReadonly<{
   /** The progress of every task; `undefined` leaves each as it is. */
   progress: Progress | undefined;
-  /** Given to every task that lacks them, after those it has. */
+  /**
+   * Given to every task that lacks them, after those it has; not one it has
+   * in another case or width (`sameLabel`).
+   */
   addLabels: string[];
   /**
-   * Taken off every task that has them — unless also in `addLabels`, which
-   * wins.
+   * Taken off every task that has them, spelled as it has them — unless
+   * also in `addLabels`, which wins. Taking a label off and adding it in
+   * another case changes its case.
    */
   removeLabels: string[];
   /** The group of every node, `to` none or a group; `undefined` leaves it. */
@@ -108,7 +113,7 @@ const editTask = (task: Task, edit: NodeEdit, now: number): Task => {
       !edit.removeLabels.includes(label) || edit.addLabels.includes(label),
   );
 
-  const labels = Arr.uniq([...kept, ...edit.addLabels]);
+  const labels = withLabelsAdded(Arr.uniq(kept), edit.addLabels);
 
   const groupId = edit.group === undefined ? task.groupId : edit.group.to;
 

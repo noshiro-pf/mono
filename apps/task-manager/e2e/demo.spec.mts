@@ -371,6 +371,123 @@ test('moves a task’s progress', { tag: '@smoke' }, async ({ page }) => {
 });
 
 test(
+  'suggests the labels in use, and edits a task’s labels as chips',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto(LIST);
+
+    await page
+      .getByTestId('task-row')
+      .filter({ hasText: '利用者向けドキュメントを書く' })
+      .click();
+
+    const dialog = page.getByTestId('node-dialog');
+
+    const chips = dialog.getByTestId('label-chip');
+
+    const box = dialog.getByTestId('task-labels');
+
+    const suggestions = dialog.getByTestId('label-suggestion');
+
+    await expect.soft(chips).toHaveText(['ドキュメント']);
+
+    // By the keys.
+    await box.fill('u');
+
+    await expect.soft(suggestions).toHaveText(['UI']);
+
+    await box.press('ArrowDown');
+
+    await box.press('Enter');
+
+    await expect.soft(chips).toHaveText(['ドキュメント', 'UI']);
+
+    await expect.soft(box).toHaveValue('');
+
+    await expect.soft(suggestions).toHaveCount(0);
+
+    // By a tap, from the middle of a label.
+    await box.fill('装');
+
+    await suggestions.filter({ hasText: '実装' }).click();
+
+    await expect.soft(chips).toHaveText(['ドキュメント', 'UI', '実装']);
+
+    // A new one, and Escape closes the list rather than the dialog.
+    await box.fill('新規');
+
+    await box.press('Enter');
+
+    await box.fill('ド');
+
+    await expect.soft(suggestions).toHaveCount(0);
+
+    await box.fill('企');
+
+    await expect.soft(suggestions).toHaveText(['企画']);
+
+    await box.press('Escape');
+
+    await expect.soft(suggestions).toHaveCount(0);
+
+    await expect.soft(dialog).toBeVisible();
+
+    await box.fill('');
+
+    await expect.soft(chips).toHaveText(['ドキュメント', 'UI', '実装', '新規']);
+
+    // A comma an IME is composing ends nothing until the composition does.
+    const ime = await page.context().newCDPSession(page);
+
+    await box.focus();
+
+    await ime.send('Input.imeSetComposition', {
+      text: 'せっけい、',
+      selectionStart: 5,
+      selectionEnd: 5,
+    });
+
+    await expect.soft(chips).toHaveText(['ドキュメント', 'UI', '実装', '新規']);
+
+    await expect.soft(box).toHaveValue('せっけい、');
+
+    await ime.send('Input.insertText', { text: '設計、' });
+
+    await expect
+      .soft(chips)
+      .toHaveText(['ドキュメント', 'UI', '実装', '新規', '設計']);
+
+    await expect.soft(box).toHaveValue('');
+
+    await dialog.getByRole('button', { name: 'ラベル「設計」を外す' }).click();
+
+    await dialog.getByRole('button', { name: 'ラベル「UI」を外す' }).click();
+
+    // Backspace in the empty box takes off the last one.
+    await box.press('Backspace');
+
+    await expect.soft(chips).toHaveText(['ドキュメント', '実装']);
+
+    // What is typed and not ended is saved too, and the list over the form
+    // does not take the press on 保存.
+    await box.fill('企画');
+
+    await expect.soft(suggestions).toHaveText(['企画']);
+
+    await dialog.getByTestId('save').click();
+
+    await expect.soft(dialog).toBeHidden();
+
+    await page
+      .getByTestId('task-row')
+      .filter({ hasText: '利用者向けドキュメントを書く' })
+      .click();
+
+    await expect.soft(chips).toHaveText(['ドキュメント', '実装', '企画']);
+  },
+);
+
+test(
   'keeps the dialog open when a drag from inside it ends outside',
   { tag: '@smoke' },
   async ({ page }) => {
@@ -2647,6 +2764,42 @@ test.describe('on a touch screen', () => {
     hasTouch: true,
     isMobile: true,
   });
+
+  test(
+    'adds a suggested label by a tap, and keeps typing',
+    { tag: '@smoke' },
+    async ({ page }) => {
+      await page.goto(LIST);
+
+      await page.getByText('利用者向けドキュメントを書く').first().tap();
+
+      const dialog = page.getByTestId('node-dialog');
+
+      const box = dialog.getByTestId('task-labels');
+
+      await box.tap();
+
+      await box.fill('装');
+
+      await dialog
+        .getByTestId('label-suggestion')
+        .filter({ hasText: '実装' })
+        .tap();
+
+      await expect
+        .soft(dialog.getByTestId('label-chip'))
+        .toHaveText(['ドキュメント', '実装']);
+
+      await expect.soft(box).toBeFocused();
+
+      const removeBox = await dialog
+        .getByRole('button', { name: 'ラベル「実装」を外す' })
+        .boundingBox();
+
+      // A tap target as big as the others.
+      expect.soft(removeBox?.height).toBeGreaterThanOrEqual(44);
+    },
+  );
 
   test(
     'edits 「並び順」 in the sheet with full-size tap targets',

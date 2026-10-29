@@ -97,16 +97,16 @@ test(
     const nodeDialog = page.getByTestId('node-dialog');
 
     await expect
-      .soft(nodeDialog.getByLabel('ラベル（カンマ区切り）'))
-      .toHaveValue('設計, e2e');
+      .soft(nodeDialog.getByTestId('label-chip'))
+      .toHaveText(['設計', 'e2e']);
 
     await nodeDialog.getByRole('button', { name: 'キャンセル' }).click();
 
     await api.click();
 
     await expect
-      .soft(nodeDialog.getByLabel('ラベル（カンマ区切り）'))
-      .toHaveValue('実装, e2e');
+      .soft(nodeDialog.getByTestId('label-chip'))
+      .toHaveText(['実装', 'e2e']);
 
     await expect.soft(nodeDialog.getByTestId('group-select')).toHaveValue('');
 

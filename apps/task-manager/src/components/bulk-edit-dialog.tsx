@@ -14,9 +14,14 @@ import {
   dataStore,
   type BulkEditState,
 } from '../store/index.mjs';
-import { parseLabels, progressLabels } from '../view-model/index.mjs';
+import {
+  formatLabels,
+  labelsByUse,
+  parseLabels,
+  progressLabels,
+} from '../view-model/index.mjs';
 import { followModal } from './follow-modal.mjs';
-import { LabelChips } from './label-chips.js';
+import { LabelInput } from './label-input.js';
 
 /**
  * 「一括編集」: the progress and the labels of every task selected on the
@@ -164,23 +169,18 @@ const BulkEditForm = ({
                     ))}
                   </HtmlSelect>
                 </label>
-                <label class={constant('bp6-label field field-wide')}>
-                  {constant('追加するラベル（カンマ区切り）')}
-                  <input
-                    class={constant('bp6-input bp6-fill')}
-                    data-e2e={constant('bulk-add-labels')}
-                    type={constant('text')}
-                    value={view(editor, ({ addLabels }) => addLabels)}
-                    onInput={(changed) => {
-                      bulkEditStore.setAddLabels(changed.currentTarget.value);
-                    }}
-                  />
-                  <LabelChips
-                    labels={view(editor, ({ addLabels }) =>
-                      parseLabels(addLabels),
-                    )}
-                  />
-                </label>
+                <LabelInput
+                  caption={'追加するラベル'}
+                  e2e={'bulk-add-labels'}
+                  id={'bulk-add-labels'}
+                  known={dataStore.state.pipe(map(labelsByUse))}
+                  labels={editor
+                    .pipe(map(({ addLabels }) => addLabels))
+                    .pipe(map(parseLabels))}
+                  onChange={(labels) => {
+                    bulkEditStore.setAddLabels(formatLabels(labels));
+                  }}
+                />
                 <If
                   cond={view(labels$, Arr.isNonEmpty)}
                   then={
