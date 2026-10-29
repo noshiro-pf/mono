@@ -3,8 +3,8 @@
 import { Result } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import type { Milestone } from '../domain/index.mjs';
-import { toDateTimeLocal } from './datetime-local.mjs';
-import { groupIdOfDraft, optionalDateTime } from './task-draft.mjs';
+import { dateField, draftedDate } from './date-draft.mjs';
+import { groupIdOfDraft } from './task-draft.mjs';
 
 export const milestoneToDraft = (
   milestone: Milestone,
@@ -13,10 +13,8 @@ export const milestoneToDraft = (
   ({
     title: milestone.title,
     description: milestone.description,
-    date:
-      milestone.date === undefined
-        ? ('' as const)
-        : toDateTimeLocal(milestone.date, timeZone),
+    date: dateField(milestone.date, milestone.dateAllDay, timeZone),
+    dateAllDay: milestone.dateAllDay,
     requiresManualCheck: milestone.requiresManualCheck,
     checkedAt: milestone.checkedAt,
     groupId: milestone.groupId ?? '',
@@ -40,7 +38,13 @@ export const applyMilestoneDraft = (
     return Result.err('タイトルを入力してください。');
   }
 
-  const date = optionalDateTime(draft.date, timeZone);
+  const date = draftedDate(
+    draft.date,
+    draft.dateAllDay,
+    { at: milestone.date, allDay: milestone.dateAllDay },
+    'start',
+    timeZone,
+  );
 
   if (Result.isErr(date)) {
     return Result.err('日時が正しくありません。');
@@ -50,7 +54,8 @@ export const applyMilestoneDraft = (
     ...milestone,
     title,
     description: draft.description,
-    date: date.value,
+    date: date.value.at,
+    dateAllDay: date.value.allDay,
     requiresManualCheck: draft.requiresManualCheck,
     checkedAt: draft.requiresManualCheck ? draft.checkedAt : undefined,
     groupId: groupIdOfDraft(draft.groupId),
@@ -61,8 +66,10 @@ export const applyMilestoneDraft = (
 export type MilestoneDraft = DeepReadonly<{
   title: string;
   description: string;
-  /** As `<input type="datetime-local">` holds it; empty for none. */
+  /** As a task's `dueDate`. */
   date: string;
+  /** Whether the date is a day, reached as it starts. */
+  dateAllDay: boolean;
   requiresManualCheck: boolean;
   /** Set by the 「解消」 button, cleared by 「未解消に戻す」. */
   checkedAt: number | undefined;

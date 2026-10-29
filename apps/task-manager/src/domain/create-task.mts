@@ -34,6 +34,7 @@ const defaults = {
   progress: 'not-started',
   priority: 3,
   dueDate: undefined,
+  dueAllDay: false,
   startedAt: undefined,
   completedAt: undefined,
   labels: [],

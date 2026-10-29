@@ -1,9 +1,13 @@
 import {
   DAY_MS,
+  formatDate,
   formatDateTime,
   formatEstimate,
   formatLag,
+  formatShortDate,
   formatShortDateTime,
+  formatShortWhen,
+  formatWhen,
   HOUR_MS,
   MINUTE_MS,
 } from './format.mjs';
@@ -53,6 +57,52 @@ describe(formatDateTime, () => {
     assert.strictEqual(
       formatDateTime(1_791_515_100_000 /* 2026-10-09T03:05:00Z */, 'UTC'),
       '2026/10/09 03:05',
+    );
+  });
+});
+
+describe(formatDate, () => {
+  test('writes the date alone, in the given time zone', () => {
+    // 2026-10-09T23:59:59.999 in Tokyo, the end of an all-day due date.
+    const endOfDay = 1_791_557_999_999;
+
+    assert.strictEqual(formatDate(endOfDay, 'Asia/Tokyo'), '2026/10/09');
+
+    assert.strictEqual(formatDate(endOfDay, 'UTC'), '2026/10/09');
+  });
+});
+
+describe(formatShortDate, () => {
+  const at = 1_791_515_100_000; /* 2026-10-09T03:05:00Z */
+
+  test('leaves the year out within the year of now', () => {
+    assert.strictEqual(
+      formatShortDate(at, at + 30 * DAY_MS, 'Asia/Tokyo'),
+      '10/09',
+    );
+  });
+
+  test('writes the year in another year', () => {
+    assert.strictEqual(
+      formatShortDate(at, at + 365 * DAY_MS, 'Asia/Tokyo'),
+      '2026/10/09',
+    );
+  });
+});
+
+describe(formatWhen, () => {
+  test('writes an all-day date without its time', () => {
+    const at = 1_791_515_100_000; /* 2026-10-09T03:05:00Z */
+
+    assert.strictEqual(formatWhen(at, true, 'Asia/Tokyo'), '2026/10/09');
+
+    assert.strictEqual(formatWhen(at, false, 'Asia/Tokyo'), '2026/10/09 12:05');
+
+    assert.strictEqual(formatShortWhen(at, true, at, 'Asia/Tokyo'), '10/09');
+
+    assert.strictEqual(
+      formatShortWhen(at, false, at, 'Asia/Tokyo'),
+      '10/09 12:05',
     );
   });
 });

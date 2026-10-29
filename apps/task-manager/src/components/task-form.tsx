@@ -136,7 +136,9 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
         <DateTimeField
           id={'task-due-date'}
           label={'期限'}
+          allDay={view(editor, ({ draft }) => draft.dueAllDay)}
           value={view(editor, ({ draft }) => draft.dueDate)}
+          onAllDayChange={editorStore.setAllDay}
           onChange={(dueDate) => {
             editorStore.updateTaskDraft({ dueDate });
           }}

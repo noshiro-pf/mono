@@ -55,6 +55,7 @@ const fullTask: Task = createTask({
   progress: 'done',
   priority: 1,
   dueDate: 9000,
+  dueAllDay: true,
   startedAt: 2000,
   completedAt: 3000,
   labels: ['docs', 'ui'],
@@ -84,6 +85,7 @@ const fullMilestone: Milestone = createMilestone({
   now: 1000,
   description: 'v1',
   date: 5000,
+  dateAllDay: true,
   requiresManualCheck: true,
   checkedAt: 6000,
   dependencies: [
@@ -121,6 +123,11 @@ describe(taskToDoc, () => {
     expectType<TaskDoc['groupId'], GroupId | null | undefined>('=');
 
     expectType<MilestoneDoc['groupId'], GroupId | null | undefined>('=');
+
+    // Optional, for what versions before all-day dates wrote.
+    expectType<TaskDoc['dueAllDay'], boolean | undefined>('=');
+
+    expectType<MilestoneDoc['dateAllDay'], boolean | undefined>('=');
 
     expectType<keyof TaskDoc, StrictExclude<keyof Task, 'id'>>('=');
 
@@ -190,6 +197,7 @@ describe('what is written', () => {
       'progress',
       'priority',
       'dueDate',
+      'dueAllDay',
       'createdAt',
       'updatedAt',
       'startedAt',
@@ -299,6 +307,27 @@ describe(taskFromDoc, () => {
     );
   });
 
+  test('reads a due date written before all-day dates as with a time', () => {
+    const { dueAllDay, ...before } = writtenTask(fullTask);
+
+    assert.strictEqual(dueAllDay, true);
+
+    assert.deepStrictEqual(
+      taskFromDoc('t1', before),
+      Result.ok({ ...fullTask, dueAllDay: false }),
+    );
+  });
+
+  test('reads a task all day with no due date as not all day', () => {
+    assert.deepStrictEqual(
+      Result.map(
+        taskFromDoc('t2', { ...writtenTask(emptyTask), dueAllDay: true }),
+        ({ dueAllDay }) => dueAllDay,
+      ),
+      Result.ok(false),
+    );
+  });
+
   test('rejects an empty group id', () => {
     assert.isTrue(
       Result.isErr(
@@ -386,6 +415,17 @@ describe(taskFromDoc, () => {
 });
 
 describe(milestoneFromDoc, () => {
+  test('reads a date written before all-day dates as with a time', () => {
+    const { dateAllDay, ...before } = writtenMilestone(fullMilestone);
+
+    assert.strictEqual(dateAllDay, true);
+
+    assert.deepStrictEqual(
+      milestoneFromDoc('m1', before),
+      Result.ok({ ...fullMilestone, dateAllDay: false }),
+    );
+  });
+
   test('round-trips a milestone with every field set', () => {
     assert.deepStrictEqual(
       milestoneFromDoc('m1', writtenMilestone(fullMilestone)),

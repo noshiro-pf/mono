@@ -12,6 +12,7 @@ describe(createTask, () => {
         progress: 'not-started',
         priority: 3,
         dueDate: undefined,
+        dueAllDay: false,
         createdAt: 1000,
         updatedAt: 1000,
         startedAt: undefined,

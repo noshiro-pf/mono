@@ -221,6 +221,7 @@ describe('the record types', () => {
         progress: Progress;
         priority: Priority;
         dueDate: number | undefined;
+        dueAllDay: boolean;
         createdAt: number;
         updatedAt: number;
         startedAt: number | undefined;
@@ -243,6 +244,7 @@ describe('the record types', () => {
         createdAt: number;
         updatedAt: number;
         date: number | undefined;
+        dateAllDay: boolean;
         requiresManualCheck: boolean;
         checkedAt: number | undefined;
         dependencies: Dependency[];

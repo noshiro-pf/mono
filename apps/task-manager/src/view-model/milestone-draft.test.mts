@@ -25,6 +25,7 @@ describe(milestoneToDraft, () => {
       title: 'リリース',
       description: '',
       date: '2026-10-09T12:00',
+      dateAllDay: false,
       requiresManualCheck: true,
       checkedAt: undefined,
       groupId: '',
@@ -45,6 +46,52 @@ describe(applyMilestoneDraft, () => {
     );
   });
 
+  test('reads an all-day date as the start of its day, and writes it back as its day', () => {
+    const result = applyMilestoneDraft(
+      milestone,
+      {
+        ...milestoneToDraft(milestone, timeZone),
+        date: '2026-10-10',
+        dateAllDay: true,
+      },
+      now,
+      timeZone,
+    );
+
+    assert.deepStrictEqual(
+      Result.map(result, ({ date, dateAllDay }) => ({ date, dateAllDay })),
+      Result.ok({
+        date: 1_791_558_000_000 /* 2026-10-10T00:00 in Tokyo */,
+        dateAllDay: true,
+      }),
+    );
+
+    assert.strictEqual(
+      milestoneToDraft(Result.unwrapThrow(result), timeZone).date,
+      '2026-10-10',
+    );
+  });
+
+  test('keeps an all-day date not edited as it is, in another time zone too', () => {
+    const allDay: Milestone = {
+      ...milestone,
+      date: 1_791_558_000_000 /* 2026-10-10T00:00 in Tokyo */,
+      dateAllDay: true,
+    } as const;
+
+    const laTime = 'America/Los_Angeles';
+
+    assert.deepStrictEqual(
+      applyMilestoneDraft(
+        allDay,
+        milestoneToDraft(allDay, laTime),
+        now,
+        laTime,
+      ),
+      Result.ok({ ...allDay, updatedAt: now }),
+    );
+  });
+
   test('reads the fields back, the check included', () => {
     assert.deepStrictEqual(
       applyMilestoneDraft(
@@ -53,6 +100,7 @@ describe(applyMilestoneDraft, () => {
           title: ' 公開 ',
           description: 'v1',
           date: '',
+          dateAllDay: false,
           requiresManualCheck: true,
           checkedAt: 40_000,
           groupId: 'g',

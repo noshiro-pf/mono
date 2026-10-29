@@ -85,9 +85,45 @@ export const formatShortDateTime = (
   now: number,
   timeZone?: string,
 ): string =>
-  yearFormat(timeZone).format(epochMs) === yearFormat(timeZone).format(now)
-    ? monthDayTimeFormat(timeZone).format(epochMs)
-    : dateFormat(timeZone).format(epochMs);
+  (sameYear(epochMs, now, timeZone) ? monthDayTimeFormat : dateFormat)(
+    timeZone,
+  ).format(epochMs);
+
+/** `2026/10/09`: an all-day date, with no time. */
+export const formatDate = (epochMs: number, timeZone?: string): string =>
+  dateFormat(timeZone).format(epochMs);
+
+/**
+ * `10/09` within the year of `now`, and `2026/10/09` outside it: an all-day
+ * date as {@link formatShortDateTime} writes a time.
+ */
+export const formatShortDate = (
+  epochMs: number,
+  now: number,
+  timeZone?: string,
+): string =>
+  (sameYear(epochMs, now, timeZone) ? monthDayFormat : dateFormat)(
+    timeZone,
+  ).format(epochMs);
+
+/** A due date or a milestone's date: its day alone when it is all day. */
+export const formatWhen = (
+  epochMs: number,
+  allDay: boolean,
+  timeZone?: string,
+): string =>
+  allDay ? formatDate(epochMs, timeZone) : formatDateTime(epochMs, timeZone);
+
+/** As {@link formatWhen}, short. */
+export const formatShortWhen = (
+  epochMs: number,
+  allDay: boolean,
+  now: number,
+  timeZone?: string,
+): string =>
+  allDay
+    ? formatShortDate(epochMs, now, timeZone)
+    : formatShortDateTime(epochMs, now, timeZone);
 
 /** `3時間`, `1.5時間`, or nothing without an estimate. */
 export const formatEstimate = (hours: number | undefined): string =>
@@ -120,6 +156,13 @@ const monthDayTimeFormat = (
     ...(timeZone === undefined ? {} : { timeZone }),
   });
 
+const monthDayFormat = (timeZone: string | undefined): Intl.DateTimeFormat =>
+  new Intl.DateTimeFormat('ja-JP', {
+    month: '2-digit',
+    day: '2-digit',
+    ...(timeZone === undefined ? {} : { timeZone }),
+  });
+
 const dateFormat = (timeZone: string | undefined): Intl.DateTimeFormat =>
   new Intl.DateTimeFormat('ja-JP', {
     year: 'numeric',
@@ -133,3 +176,14 @@ const yearFormat = (timeZone: string | undefined): Intl.DateTimeFormat =>
     year: 'numeric',
     ...(timeZone === undefined ? {} : { timeZone }),
   });
+
+/** Whether `a` and `b` are in one year of `timeZone`'s calendar. */
+const sameYear = (
+  a: number,
+  b: number,
+  timeZone: string | undefined,
+): boolean => {
+  const year = yearFormat(timeZone);
+
+  return year.format(a) === year.format(b);
+};

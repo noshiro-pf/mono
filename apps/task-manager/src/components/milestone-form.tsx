@@ -87,7 +87,9 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
           <DateTimeField
             id={'milestone-date'}
             label={'日時（この日時になると到達）'}
+            allDay={view(editor, ({ draft }) => draft.dateAllDay)}
             value={view(editor, ({ draft }) => draft.date)}
+            onAllDayChange={editorStore.setAllDay}
             onChange={(date) => {
               editorStore.updateMilestoneDraft({ date });
             }}

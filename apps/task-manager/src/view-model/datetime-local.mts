@@ -9,12 +9,63 @@
  */
 
 import { Arr, Num, Result } from 'ts-data-forge';
-import { HOUR_MS, MINUTE_MS } from './format.mjs';
+import { DAY_MS, HOUR_MS, MINUTE_MS } from './format.mjs';
 
 export const toDateTimeLocal = (epochMs: number, timeZone?: string): string => {
   const { year, month, day, hour, minute } = wallClock(epochMs, timeZone);
 
   return `${pad(year, 4)}-${pad(month, 2)}-${pad(day, 2)}T${pad(hour, 2)}:${pad(minute, 2)}`;
+};
+
+/** The day of `epochMs` on the wall clock: `YYYY-MM-DD`. */
+export const toDateLocal = (epochMs: number, timeZone?: string): string =>
+  toDateTimeLocal(epochMs, timeZone).slice(0, DATE_LENGTH);
+
+/**
+ * The first instant of the day `value` (`YYYY-MM-DD`) names on the wall
+ * clock of `timeZone`, or its last (the millisecond before the next day's
+ * first), or `undefined` when it is not a real day alone. A day whose
+ * midnight the clocks skip starts as they go forward.
+ */
+export const fromDateLocal = (
+  value: string,
+  edge: DayEdge,
+  timeZone?: string,
+): number | undefined => {
+  const fields = parseFields(`${value}T00:00`);
+
+  if (fields === undefined || !isValidWallClock(fields)) {
+    return undefined;
+  }
+
+  if (edge === 'start') {
+    return startOfDay(value, timeZone);
+  }
+
+  const next = startOfDay(
+    toDateLocal(wallClockAsUtc(fields) + DAY_MS, 'UTC'),
+    timeZone,
+  );
+
+  return next === undefined ? undefined : next - 1;
+};
+
+/**
+ * What a date field holds once it is made all day — its day alone — or
+ * timed again, at `edge`'s time of the day; empty stays empty.
+ */
+export const switchAllDay = (
+  value: string,
+  allDay: boolean,
+  edge: DayEdge,
+): string => {
+  if (value === '') {
+    return '';
+  }
+
+  const day = value.slice(0, DATE_LENGTH);
+
+  return allDay ? day : `${day}T${edge === 'start' ? '00:00' : '23:59'}`;
 };
 
 /**
@@ -43,6 +94,9 @@ export const fromDateTimeLocal = (
   return asUtc - offsetAt(firstGuess, timeZone);
 };
 
+/** Which end of an all-day date's day it stands for. */
+export type DayEdge = 'start' | 'end';
+
 type WallClock = Readonly<{
   year: number;
   month: number;
@@ -53,6 +107,30 @@ type WallClock = Readonly<{
 }>;
 
 const SECOND_MS = 1000;
+
+/** The length of `YYYY-MM-DD`. */
+const DATE_LENGTH = 10;
+
+/**
+ * The first instant of the day `value` on the wall clock of `timeZone`: its
+ * midnight — the first, of one that comes twice — or where the clocks skip
+ * that, the hour after; `undefined` when it is not a real day (the day after
+ * the year 9999).
+ */
+const startOfDay = (
+  value: string,
+  timeZone: string | undefined,
+): number | undefined => {
+  const midnight = fromDateTimeLocal(`${value}T00:00`, timeZone);
+
+  return midnight === undefined
+    ? undefined
+    : toDateLocal(midnight - HOUR_MS, timeZone) === value
+      ? midnight - HOUR_MS
+      : toDateLocal(midnight, timeZone) === value
+        ? midnight
+        : midnight + HOUR_MS;
+};
 
 /**
  * `YYYY-MM-DDTHH:mm`, or with `:ss` after it, as numbers — not yet checked to

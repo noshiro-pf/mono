@@ -5,10 +5,12 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
-import { formatDateTime } from '../view-model/index.mjs';
+import type { Task } from '../domain/index.mjs';
+import { formatWhen } from '../view-model/index.mjs';
 
 type Props = Readonly<{
-  dueDate: Bindable<number | undefined>;
+  /** With whether it is a day alone, written without a time. */
+  dueDate: Bindable<Readonly<{ at: number; allDay: boolean }> | undefined>;
   overdue: Bindable<boolean>;
 }>;
 
@@ -19,7 +21,7 @@ export const DueDate = ({ dueDate, overdue }: Props): JSX.Element => (
     then={
       <span class={{ 'due-date': constant(true), overdue }}>
         {mapBindable(dueDate, (date) =>
-          date === undefined ? '' : formatDateTime(date),
+          date === undefined ? '' : formatWhen(date.at, date.allDay),
         )}
         <If
           cond={overdue}
@@ -31,3 +33,11 @@ export const DueDate = ({ dueDate, overdue }: Props): JSX.Element => (
     }
   />
 );
+
+/** What {@link DueDate} shows of `task`. */
+export const dueOf = (
+  task: Task,
+): Readonly<{ at: number; allDay: boolean }> | undefined =>
+  task.dueDate === undefined
+    ? undefined
+    : ({ at: task.dueDate, allDay: task.dueAllDay } as const);
