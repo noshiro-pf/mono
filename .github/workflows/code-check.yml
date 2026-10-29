@@ -1,4 +1,4 @@
-# cspell:ignore vitest
+# cspell:ignore vitest rhysd
 
 name: Code Check
 
@@ -180,6 +180,42 @@ jobs:
       - name: Install Playwright Browsers
         if: matrix.command == 'ws:check:test:browser' || startsWith(matrix.command, 'ws:check:test:cov') || matrix.command == 'ws:check:e2e'
         run: pnpm exec playwright install chromium
+
+      # `check:root:actionlint` needs actionlint, and the shellcheck it runs
+      # over the workflows' `run:` blocks (not those of `.github/actions/`,
+      # which actionlint does not lint); the runner image's own shellcheck is
+      # whatever that image ships. Release binaries, each checked against the
+      # SHA-256 of its asset, put first on PATH. Nothing moves these pins:
+      # `update-actions` reads `uses:` lines and `pnpm-update.yml` reads npm,
+      # so a new version is a hand edit of the version and its digest, which
+      # the Releases API reports as the asset's `digest`
+      # (`GET /repos/rhysd/actionlint/releases/tags/v<version>`, and the same
+      # for `koalaman/shellcheck`). The `linux_amd64` / `x86_64` assets are
+      # the ones `ubuntu-latest` runs. `check-actionlint.mts` reads the two
+      # `*_VERSION` values from here and refuses any other version locally.
+      - name: Install actionlint and shellcheck
+        if: matrix.command == 'check:root'
+        env:
+          ACTIONLINT_VERSION: 1.7.12
+          ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+          SHELLCHECK_VERSION: 0.11.0
+          SHELLCHECK_SHA256: b7af85e41cc99489dcc21d66c6d5f3685138f06d34651e6d34b42ec6d54fe6f6
+        run: |
+          set -euo pipefail
+          bin="${RUNNER_TEMP}/workflow-lint-bin"
+          mkdir -p "${bin}"
+
+          curl -fsSL --retry 3 --retry-all-errors -o "${RUNNER_TEMP}/actionlint.tar.gz" \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  ${RUNNER_TEMP}/actionlint.tar.gz" | sha256sum --check --strict -
+          tar -xzf "${RUNNER_TEMP}/actionlint.tar.gz" -C "${bin}" actionlint
+
+          curl -fsSL --retry 3 --retry-all-errors -o "${RUNNER_TEMP}/shellcheck.tar.gz" \
+            "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.gz"
+          echo "${SHELLCHECK_SHA256}  ${RUNNER_TEMP}/shellcheck.tar.gz" | sha256sum --check --strict -
+          tar -xzf "${RUNNER_TEMP}/shellcheck.tar.gz" -C "${bin}" --strip-components=1 "shellcheck-v${SHELLCHECK_VERSION}/shellcheck"
+
+          echo "${bin}" >>"${GITHUB_PATH}"
 
       - name: Download the build output
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2

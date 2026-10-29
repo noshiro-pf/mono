@@ -162,13 +162,13 @@ A missing `dist/` is named by the check that needs it; **a stale one is not**.
 aid: what it skips and where it is narrower than CI is listed at the end of
 `check-all.mts`. `pnpm run fmt` belongs on every change.
 
-| the diff touches            | run                                                                                       |
-| :-------------------------- | :---------------------------------------------------------------------------------------- |
-| TypeScript in a package     | that package's `check:types`, `fix:lint`, `check:test`, and `fix:codemod:diff`            |
-| `tools/`                    | `check:root:types`, `check:root:lint`, `check:root:test`, `fix:codemod:diff`              |
-| Markdown or prose           | `check:md`, `check:cspell`, `check:prose`                                                 |
-| a `package.json`, lockfile  | `check:knip`, `check:published-deps`, `gen:deps-graph`, and a build of what depends on it |
-| workflows, `repo-settings/` | nothing but `fmt` and `check:cspell` reads them locally                                   |
+| the diff touches            | run                                                                                                         |
+| :-------------------------- | :---------------------------------------------------------------------------------------------------------- |
+| TypeScript in a package     | that package's `check:types`, `fix:lint`, `check:test`, and `fix:codemod:diff`                              |
+| `tools/`                    | `check:root:types`, `check:root:lint`, `check:root:test`, `fix:codemod:diff`                                |
+| Markdown or prose           | `check:md`, `check:cspell`, `check:prose`                                                                   |
+| a `package.json`, lockfile  | `check:knip`, `check:published-deps`, `gen:deps-graph`, and a build of what depends on it                   |
+| workflows, `repo-settings/` | `fmt`, `check:cspell`; for workflows also the guards their README lists, `check:root:actionlint` among them |
 
 `fix:codemod:diff` is in both TypeScript rows because no lint rule stands
 behind the codemod — `prefer-as-const` rewrites `as 'foo'` and says nothing

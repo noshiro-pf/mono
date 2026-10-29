@@ -77,12 +77,15 @@
     "prettier-plugin-packagejson",
   ],
 
-  // System binaries, not something to install:
+  // Binaries from outside npm, not something a dependency could provide:
   // - `diff`, invoked by `libs/synstate/scripts/cmd/generate-sample-diffs.mts`.
   // - `pass` and `openssl`, invoked by
   //   `apps/split-view-extension/scripts/pack-crx.mts` — the signing key is
   //   read out of `pass`, and `openssl` derives the extension id from it.
-  "ignoreBinaries": ["diff", "openssl", "pass"],
+  // - `actionlint`, invoked by `tools/scripts/cmd/check-actionlint.mts`; CI
+  //   installs a pinned release binary (`code-check.yml`), and no npm package
+  //   distributes the official one.
+  "ignoreBinaries": ["actionlint", "diff", "openssl", "pass"],
 
   "workspaces": {
     // **A new entry goes after the previous entry's closing `},`**, never

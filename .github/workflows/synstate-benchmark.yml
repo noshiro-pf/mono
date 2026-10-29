@@ -179,6 +179,7 @@ jobs:
         if: steps.baseline.outputs.cache-matched-key == ''
         run: |
           set -euo pipefail
+          # shellcheck disable=SC2016 # literal backticks, not command substitution
           {
             echo '### No baseline for these library versions'
             echo

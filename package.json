@@ -45,6 +45,7 @@
     "check:prose:readme-sample-coverage": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-readme-sample-coverage.mts",
     "check:published-deps": "node ./tools/scripts/cmd/assert-deps-built.mts && pnpm run z:eslint --config ./tools/configs/eslint.published-deps.mts --no-config-lookup '{libs,apps}/*/src/**/*.{mts,ts,tsx}' './eslint.config.mts' '{libs,apps}/*/eslint.config.mts' --quiet",
     "check:root": "pnpm run '/check:root:.*/'",
+    "check:root:actionlint": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-actionlint.mts",
     "check:root:app-head": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-app-head.mts",
     "check:root:ci-commands": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-ci-commands.mts",
     "check:root:deps-built-guard": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-deps-built-guard.mts",

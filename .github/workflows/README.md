@@ -754,9 +754,13 @@ Nothing checks this; a review does.
   aggregate job"). Its verdict is reused by tree, so a result that depends on
   anything else must skip the aggregate with `no_verdict` rather than
   conclude (see "Reusing a verdict").
-- **Local guards that read this directory**: `check:root:ci-commands`,
-  `check:root:workflow-event-name`, `check:root:node-support`. `fmt` and `check:cspell` read it too; CI itself
+- **Local guards that read this directory**: `check:root:actionlint`,
+  `check:root:ci-commands`, `check:root:workflow-event-name`,
+  `check:root:node-support`. `fmt` and `check:cspell` read it too; CI itself
   runs nothing on a workflow change until the pull request runs.
+- **`check:root:actionlint` needs `actionlint` and `shellcheck` on `PATH`**,
+  at exactly the versions `code-check.yml` pins for CI. No update workflow
+  moves them; that step's comment says how to bump them.
 - **`.github/workflows/` and `.github/actions/` are owned in
   `.github/CODEOWNERS`**, so a change there waits for the owner's review, and
   a bot's pull request that touches either does not auto-merge. The action

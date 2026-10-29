@@ -59,10 +59,12 @@ jobs:
           if [ "${LABELLED}" = 'true' ]; then
             state='pending'
             description='The skip-ci label is on. Take it off to run the checks and unblock the merge.'
+            # shellcheck disable=SC2016 # literal backticks, not command substitution
             summary='The `skip-ci` label is on this pull request, so the checks were skipped and `no-skip-ci-label` is left `pending`, which holds the merge. Take the label off: removing it fires `unlabeled`, runs the checks, and writes `success` here.'
           else
             state='success'
             description='No skip-ci label.'
+            # shellcheck disable=SC2016 # literal backticks, not command substitution
             summary='No `skip-ci` label on this pull request: `no-skip-ci-label` is `success` and holds nothing.'
           fi
 
