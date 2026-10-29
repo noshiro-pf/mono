@@ -1,4 +1,5 @@
 import { constant, view, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { nodeSizeStore } from '../store/index.mjs';
 import { nodeSizeLabels, nodeSizes } from '../view-model/index.mjs';
 
@@ -14,7 +15,7 @@ export const NodeSizeField = (): JSX.Element => (
     class={constant('settings-field')}
   >
     <legend class={constant('settings-field-label')}>
-      {constant('ノード')}
+      {constant(m.settings.nodeSize)}
     </legend>
     <div class={constant('bp6-button-group')}>
       {nodeSizes.map((size) => (
@@ -40,9 +41,7 @@ export const NodeSizeField = (): JSX.Element => (
       ))}
     </div>
     <p class={constant('settings-hint')} id={constant(HINT_ID)}>
-      {constant(
-        '「コンパクト」はタイトルだけを 1 行で表示します。状態と優先度は色と、ポインタを重ねたときの説明で分かります。「大」はタイトルを 3 行まで折り返して表示します。',
-      )}
+      {constant(m.settings.nodeSizeHint)}
     </p>
   </fieldset>
 );

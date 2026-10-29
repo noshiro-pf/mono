@@ -12,6 +12,7 @@ import {
 import { Arr } from 'ts-data-forge';
 import { taskLabels } from '../dag/index.mjs';
 import { asGroupId } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import { dagFilterStore, dataStore } from '../store/index.mjs';
 import { isDagFilterEmpty } from '../view-model/index.mjs';
 
@@ -41,7 +42,7 @@ export const DagFilterField = (): JSX.Element => {
       class={constant('settings-field')}
     >
       <legend class={constant('settings-field-label')}>
-        {constant('絞り込み')}
+        {constant(m.settings.filter)}
       </legend>
       <If
         cond={view(groups, Arr.isNonEmpty)}
@@ -50,7 +51,7 @@ export const DagFilterField = (): JSX.Element => {
             class={constant('settings-field-control dag-filter-choices')}
           >
             <legend class={constant('dag-filter-kind')}>
-              {constant('グループ')}
+              {constant(m.settings.groups)}
             </legend>
             <For items={groups} key={(group) => group.id}>
               {(group$) => (
@@ -68,7 +69,7 @@ export const DagFilterField = (): JSX.Element => {
             <Choice
               checked={view(filter, (f) => f.groups.includes(undefined))}
               e2e={'dag-filter-group'}
-              title={constant('グループなし')}
+              title={constant(m.settings.noGroup)}
               value={constant('')}
               onChange={onGroupChange}
             />
@@ -82,7 +83,7 @@ export const DagFilterField = (): JSX.Element => {
             class={constant('settings-field-control dag-filter-choices')}
           >
             <legend class={constant('dag-filter-kind')}>
-              {constant('ラベル')}
+              {constant(m.fields.labels)}
             </legend>
             <For items={labels$} key={(label) => label}>
               {(label$) => (
@@ -100,7 +101,7 @@ export const DagFilterField = (): JSX.Element => {
             <Choice
               checked={view(filter, (f) => f.labels.includes(undefined))}
               e2e={'dag-filter-label'}
-              title={constant('ラベルなし')}
+              title={constant(m.settings.noLabel)}
               value={constant('')}
               onChange={onLabelChange}
             />
@@ -109,9 +110,7 @@ export const DagFilterField = (): JSX.Element => {
       />
       <p class={constant('settings-hint')} id={constant(HINT_ID)}>
         {mapBindable(nothingToChoose, (nothing) =>
-          nothing
-            ? 'グループを作るか、タスクにラベルを付けると、ここで絞り込めます。'
-            : 'どれかに当てはまるものを、グループとラベルの両方を選んだときは両方に当てはまるものを表示します。ラベルで絞るとき、マイルストーンは残ったタスクとつながるものだけを表示します。絞り込みの外でも、直接つながるノードは薄く表示します。',
+          nothing ? m.settings.filterEmptyHint : m.settings.filterHint,
         )}
       </p>
       <If
@@ -123,7 +122,7 @@ export const DagFilterField = (): JSX.Element => {
             type={constant('button')}
             onClick={dagFilterStore.clear}
           >
-            {constant('絞り込みを解除')}
+            {constant(m.settings.clearFilter)}
           </button>
         }
       />

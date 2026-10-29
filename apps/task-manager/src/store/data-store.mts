@@ -27,7 +27,6 @@ import {
   type Observable as SynstateObservable,
 } from 'synstate';
 import { Arr, Result } from 'ts-data-forge';
-import type { ReadonlyRecord } from 'ts-type-forge';
 import type { DagLayout } from '../dag/index.mjs';
 import {
   addDependency,
@@ -36,7 +35,6 @@ import {
   removeDependency,
   removeGroup,
   removeNodes,
-  type DependencyRefusal,
   type DomainState,
   type Group,
   type GroupId,
@@ -45,6 +43,7 @@ import {
   type NodeRef,
   type Task,
 } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import type { ProjectSnapshot, Repository } from '../repository/index.mjs';
 import type { Session } from './session-store.mjs';
 
@@ -179,10 +178,7 @@ export const createDataStore = (deps: DataDeps): DataStore => {
           next(mut_last.loaded);
         },
         error: (error) => {
-          deps.reportError(
-            'データを読み込めませんでした。権限の設定か接続を確認してください。',
-            error,
-          );
+          deps.reportError(m.data.loadFailed, error);
 
           mut_last.loaded = { ...mut_last.loaded, failed: true };
 
@@ -237,7 +233,7 @@ export const createDataStore = (deps: DataDeps): DataStore => {
 
   const fedLayout = followFed<DagLayout | undefined>(
     undefined,
-    'DAG の配置を読み込めませんでした。',
+    m.data.layoutLoadFailed,
     (repository, observer) => repository.subscribeDagLayout(observer),
   );
 
@@ -248,7 +244,7 @@ export const createDataStore = (deps: DataDeps): DataStore => {
 
   const fedGroups = followFed<readonly Group[]>(
     [],
-    'グループを読み込めませんでした。',
+    m.data.groupsLoadFailed,
     (repository, observer) => repository.subscribeGroups(observer),
   );
 
@@ -286,15 +282,13 @@ export const createDataStore = (deps: DataDeps): DataStore => {
     const current = currentRepository();
 
     if (current === undefined) {
-      deps.reportError(
-        `${describe}できませんでした（サインインしていません）。`,
-      );
+      deps.reportError(m.data.notSignedIn(describe));
 
       return;
     }
 
     run(current).catch((error: unknown) => {
-      deps.reportError(`${describe}できませんでした。`, error);
+      deps.reportError(m.data.failed(describe), error);
     });
   };
 
@@ -313,10 +307,10 @@ export const createDataStore = (deps: DataDeps): DataStore => {
     dagLayout,
     projectLoad,
     putTask: (task) => {
-      write('タスクを保存', (repository) => repository.putTask(task));
+      write(m.data.saveTask, (repository) => repository.putTask(task));
     },
     putMilestone: (milestone) => {
-      write('マイルストーンを保存', (repository) =>
+      write(m.data.saveMilestone, (repository) =>
         repository.putMilestone(milestone),
       );
     },
@@ -325,7 +319,7 @@ export const createDataStore = (deps: DataDeps): DataStore => {
         return;
       }
 
-      write('削除', (repository) =>
+      write(m.data.delete, (repository) =>
         repository.deleteNodes(refs, removeNodes(getState(), refs, deps.now())),
       );
     },
@@ -334,7 +328,7 @@ export const createDataStore = (deps: DataDeps): DataStore => {
 
       if (Result.isErr(result)) {
         deps.reportError(
-          `依存を追加できませんでした（${refusalReasons[result.value]}）。`,
+          m.data.dependencyRefused(m.data.refusals[result.value]),
         );
 
         return;
@@ -343,9 +337,11 @@ export const createDataStore = (deps: DataDeps): DataStore => {
       const updated = result.value;
 
       if (updated.kind === 'task') {
-        write('タスクを保存', (repository) => repository.putTask(updated.task));
+        write(m.data.saveTask, (repository) =>
+          repository.putTask(updated.task),
+        );
       } else {
-        write('マイルストーンを保存', (repository) =>
+        write(m.data.saveMilestone, (repository) =>
           repository.putMilestone(updated.milestone),
         );
       }
@@ -363,18 +359,20 @@ export const createDataStore = (deps: DataDeps): DataStore => {
       }
 
       if (updated.kind === 'task') {
-        write('タスクを保存', (repository) => repository.putTask(updated.task));
+        write(m.data.saveTask, (repository) =>
+          repository.putTask(updated.task),
+        );
       } else {
-        write('マイルストーンを保存', (repository) =>
+        write(m.data.saveMilestone, (repository) =>
           repository.putMilestone(updated.milestone),
         );
       }
     },
     putGroup: (group) => {
-      write('グループを保存', (repository) => repository.putGroup(group));
+      write(m.data.saveGroup, (repository) => repository.putGroup(group));
     },
     deleteGroup: (id) => {
-      write('グループを削除', (repository) =>
+      write(m.data.deleteGroup, (repository) =>
         repository.deleteGroup(id, removeGroup(getState(), id, deps.now())),
       );
     },
@@ -385,7 +383,7 @@ export const createDataStore = (deps: DataDeps): DataStore => {
         return;
       }
 
-      write('グループを変更', (repository) =>
+      write(m.data.changeGroup, (repository) =>
         regrouped.kind === 'task'
           ? repository.putTask(regrouped.task)
           : repository.putMilestone(regrouped.milestone),
@@ -401,10 +399,10 @@ export const createDataStore = (deps: DataDeps): DataStore => {
         return;
       }
 
-      write('まとめて保存', (repository) => repository.putNodes(edited));
+      write(m.data.saveAll, (repository) => repository.putNodes(edited));
     },
     putDagLayout: (layout) => {
-      write('DAG の配置を保存', (repository) =>
+      write(m.data.saveLayout, (repository) =>
         repository.putDagLayout(layout, deps.now()),
       );
     },
@@ -418,13 +416,6 @@ export const createDataStore = (deps: DataDeps): DataStore => {
     start,
   };
 };
-
-const refusalReasons = {
-  missing: 'タスクかマイルストーンが見つかりません',
-  self: '自分自身には依存できません',
-  duplicate: 'すでに依存しています',
-  cycle: '循環する依存になります',
-} as const satisfies ReadonlyRecord<DependencyRefusal, string>;
 
 /**
  * The repository of whoever is signed in, `undefined` while nobody is, and

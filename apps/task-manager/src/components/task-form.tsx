@@ -3,6 +3,7 @@ import { combine, map, type InitializedObservable } from 'synstate';
 import { constant, If, view, type JSX } from 'synstate-dom';
 import type { RelaxedExtract } from 'ts-type-forge';
 import { priorities, progresses } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import {
   clockStore,
   dataStore,
@@ -64,7 +65,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
     <>
       <div class={constant('form-grid')}>
         <label class={constant('bp6-label field field-wide')}>
-          {constant('タイトル')}
+          {constant(m.fields.title)}
           <input
             class={constant('bp6-input bp6-fill')}
             data-e2e={constant('title-input')}
@@ -79,7 +80,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
           />
         </label>
         <label class={constant('bp6-label field')}>
-          {constant('進捗')}
+          {constant(m.fields.progress)}
           <HtmlSelect
             data-e2e={constant('progress-select')}
             fill
@@ -102,7 +103,9 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
           </HtmlSelect>
         </label>
         <div class={constant('field')}>
-          <span class={constant('field-label')}>{constant('状態')}</span>
+          <span class={constant('field-label')}>
+            {constant(m.fields.status)}
+          </span>
           <span class={constant('badges')} data-e2e={constant('draft-status')}>
             <StatusBadge displayStatus={view(insight$, (i) => i.status)} />
             <If
@@ -112,7 +115,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
           </span>
         </div>
         <label class={constant('bp6-label field')}>
-          {constant('優先度')}
+          {constant(m.fields.priority)}
           <HtmlSelect
             fill
             value={view(editor, ({ draft }) => draft.priority.toString())}
@@ -128,14 +131,19 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
           >
             {priorities.map((priority) => (
               <option value={constant(priority.toString())}>
-                {constant(`${priority}（${priorityLabels[priority]}）`)}
+                {constant(
+                  m.common.withNote(
+                    priority.toString(),
+                    priorityLabels[priority],
+                  ),
+                )}
               </option>
             ))}
           </HtmlSelect>
         </label>
         <DateTimeField
           id={'task-due-date'}
-          label={'期限'}
+          label={m.fields.dueDate}
           allDay={view(editor, ({ draft }) => draft.dueAllDay)}
           value={view(editor, ({ draft }) => draft.dueDate)}
           onAllDayChange={editorStore.setAllDay}
@@ -144,7 +152,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
           }}
         />
         <label class={constant('bp6-label field')}>
-          {constant('見積（時間）')}
+          {constant(m.fields.estimateHours)}
           <input
             class={constant('bp6-input bp6-fill')}
             inputMode={constant('decimal')}
@@ -168,7 +176,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
           }}
         />
         <LabelInput
-          caption={'ラベル'}
+          caption={m.fields.labels}
           e2e={'task-labels'}
           id={'task-labels'}
           known={known$}
@@ -180,7 +188,7 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
           }}
         />
         <label class={constant('bp6-label field field-wide')}>
-          {constant('説明')}
+          {constant(m.fields.description)}
           <textarea
             class={constant('bp6-input bp6-fill')}
             rows={constant(3)}
@@ -194,11 +202,9 @@ export const TaskForm = ({ editor }: Props): JSX.Element => {
         </label>
       </div>
       <fieldset class={constant('condition-group')}>
-        <legend>{constant('着手条件（すべて満たされると着手可）')}</legend>
+        <legend>{constant(m.nodeDialog.startConditions)}</legend>
         <p class={constant('bp6-text-muted condition-hint')}>
-          {constant(
-            '特定の日時や外部要因を待つときは、マイルストーンを作って依存させます。',
-          )}
+          {constant(m.nodeDialog.startConditionsHint)}
         </p>
         <DependencyEditor
           checks={checks$}

@@ -3,6 +3,7 @@
 import { Result } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import type { Milestone } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import { dateField, draftedDate } from './date-draft.mjs';
 import { groupIdOfDraft } from './task-draft.mjs';
 
@@ -35,7 +36,7 @@ export const applyMilestoneDraft = (
   const title = draft.title.trim();
 
   if (title === '') {
-    return Result.err('タイトルを入力してください。');
+    return Result.err(m.drafts.titleRequired);
   }
 
   const date = draftedDate(
@@ -47,7 +48,7 @@ export const applyMilestoneDraft = (
   );
 
   if (Result.isErr(date)) {
-    return Result.err('日時が正しくありません。');
+    return Result.err(m.drafts.invalidDate);
   }
 
   return Result.ok({

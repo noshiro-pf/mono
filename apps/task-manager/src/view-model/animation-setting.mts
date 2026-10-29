@@ -10,6 +10,7 @@
 
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { m } from '../i18n/index.mjs';
 import { persistedSetting } from './persisted-setting.mjs';
 
 export const animationSettings = ['auto', 'on', 'off'] as const;
@@ -27,11 +28,8 @@ export const animationSettingStorage = persistedSetting(AnimationSettingCodec, {
   key: 'task-manager-app:animation',
 });
 
-export const animationSettingLabels = {
-  auto: '自動',
-  on: 'オン',
-  off: 'オフ',
-} as const satisfies ReadonlyRecord<AnimationSetting, string>;
+export const animationSettingLabels: ReadonlyRecord<AnimationSetting, string> =
+  m.settings.animations;
 
 /**
  * Whether the nodes are animated under `setting`, for a reader who does or

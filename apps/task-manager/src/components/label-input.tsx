@@ -8,6 +8,7 @@ import {
 import { constant, For, If, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { withLabelsAdded } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import {
   parseLabels,
   spellAsInUse,
@@ -342,7 +343,7 @@ export const LabelInput = ({
                 {label$}
               </span>
               <button
-                aria-label={view(label$, (label) => `ラベル「${label}」を外す`)}
+                aria-label={view(label$, (label) => m.labels.remove(label))}
                 class={constant('label-chip-remove')}
                 type={constant('button')}
                 value={label$}
@@ -429,7 +430,7 @@ export const LabelInput = ({
         cond={shown$}
         then={
           <ul
-            aria-label={constant(`${caption}の候補`)}
+            aria-label={constant(m.labels.suggestions(caption))}
             class={constant('label-suggestions')}
             id={constant(listId)}
             // A press on it, between its options too, keeps the focus, and

@@ -6,6 +6,7 @@ import {
   type JSX,
 } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
+import { m } from '../i18n/index.mjs';
 import {
   formatDateTime,
   formatWhen,
@@ -35,15 +36,17 @@ export const MilestoneReachState = ({ insight }: Props): JSX.Element => {
       >
         {mapBindable(insight, ({ reachedAt }) =>
           reachedAt === undefined
-            ? '◇ 未到達'
-            : `◆ 到達済み（${formatDateTime(reachedAt)}）`,
+            ? m.nodeDialog.unreached
+            : m.nodeDialog.reachedAt(formatDateTime(reachedAt)),
         )}
       </span>
       <If
         cond={mapBindable(waiting, Arr.isNonEmpty)}
         then={
           <span class={constant('bp6-text-muted')}>
-            {mapBindable(waiting, (w) => `待っている条件: ${w.join('、')}`)}
+            {mapBindable(waiting, (w) =>
+              m.nodeDialog.waitingFor(w.join(m.common.conditionSeparator)),
+            )}
           </span>
         }
       />
@@ -61,12 +64,16 @@ const waitingConditions = (
         ...(insight.waitingForDate === undefined
           ? ([] as const)
           : ([
-              `日時（${formatWhen(insight.waitingForDate, insight.dateAllDay)}）`,
+              m.nodeDialog.waitingForDate(
+                formatWhen(insight.waitingForDate, insight.dateAllDay),
+              ),
             ] as const)),
         ...(insight.waitingForCheck
-          ? (['手動チェック'] as const)
+          ? ([m.nodeDialog.waitingForCheck] as const)
           : ([] as const)),
         ...(Arr.isNonEmpty(insight.unmet)
-          ? ([`依存（未充足 ${insight.unmet.length} 件）`] as const)
+          ? ([
+              m.nodeDialog.waitingForDependencies(insight.unmet.length),
+            ] as const)
           : ([] as const)),
       ] as const);

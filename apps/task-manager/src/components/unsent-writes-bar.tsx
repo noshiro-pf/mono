@@ -1,4 +1,5 @@
 import { constant, If, view, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { sessionStore } from '../store/index.mjs';
 
 /**
@@ -15,25 +16,21 @@ export const UnsentWritesBar = (): JSX.Element => (
         data-e2e={constant('unsent-writes')}
         role={constant('alert')}
       >
-        <span>
-          {constant(
-            'オフライン中の変更がまだ送信されていないため、サインアウトしませんでした。いまサインアウトすると、この変更は失われます。',
-          )}
-        </span>
+        <span>{constant(m.unsentWrites.message)}</span>
         <span class={constant('unsent-writes-actions')}>
           <button
             class={constant('bp6-button bp6-intent-danger')}
             type={constant('button')}
             onClick={sessionStore.discardUnsentWritesAndSignOut}
           >
-            {constant('変更を破棄してサインアウト')}
+            {constant(m.unsentWrites.discard)}
           </button>
           <button
             class={constant('bp6-button bp6-minimal')}
             type={constant('button')}
             onClick={sessionStore.cancelSignOut}
           >
-            {constant('サインアウトしない')}
+            {constant(m.unsentWrites.stay)}
           </button>
         </span>
       </div>

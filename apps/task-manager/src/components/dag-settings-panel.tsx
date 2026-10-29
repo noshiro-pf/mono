@@ -1,4 +1,5 @@
 import { constant, If, view, type JSX, type View } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { dagViewModeStore, uiStore } from '../store/index.mjs';
 import { AnimationSettingField } from './animation-setting-field.js';
 import { DagFilterField } from './dag-filter-field.js';
@@ -9,6 +10,7 @@ import {
 import { DagShowDoneField } from './dag-show-done-field.js';
 import { DiagramSortField } from './diagram-sort-field.js';
 import { followModal } from './follow-modal.mjs';
+import { LanguageField } from './language-field.js';
 import { NodeSizeField } from './node-size-field.js';
 import { listenInScope } from './scope-effects.mjs';
 
@@ -18,7 +20,7 @@ import { listenInScope } from './scope-effects.mjs';
  * whether the done tasks are drawn, the node size and the
  * animation, which apply to every view mode, and the order of 「アーク」 and
  * 「タイル」, shown in those two only: in 「DAG」 the reader places the nodes,
- * and an order would change nothing.
+ * and an order would change nothing. Last, the language of the whole page.
  *
  * A native `<dialog>` opened modal, so that the focus goes into it and stays
  * there, and Escape, the close button and a press outside it close it, the
@@ -90,10 +92,10 @@ export const DagSettingsPanel = (): JSX.Element => {
       <div class={constant('settings-panel-content')}>
         <div class={constant('settings-panel-header')}>
           <h2 class={constant('bp6-heading')} id={constant(TITLE_ID)}>
-            {constant('表示設定')}
+            {constant(m.settings.title)}
           </h2>
           <button
-            aria-label={constant('閉じる')}
+            aria-label={constant(m.common.close)}
             class={constant('bp6-button bp6-minimal')}
             data-e2e={constant('dag-settings-close')}
             type={constant('button')}
@@ -111,6 +113,7 @@ export const DagSettingsPanel = (): JSX.Element => {
             then={<DiagramSortField />}
           />
           <AnimationSettingField />
+          <LanguageField />
         </div>
       </div>
     </dialog>

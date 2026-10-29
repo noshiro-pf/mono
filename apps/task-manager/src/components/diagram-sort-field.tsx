@@ -1,4 +1,5 @@
 import { constant, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { diagramSortStore } from '../store/index.mjs';
 import { SortEditor } from './sort-editor.js';
 
@@ -13,19 +14,17 @@ export const DiagramSortField = (): JSX.Element => (
     class={constant('settings-field')}
   >
     <legend class={constant('settings-field-label')}>
-      {constant('並び順')}
+      {constant(m.settings.diagramSort)}
     </legend>
     <SortEditor
       actions={diagramSortStore}
       data-e2e={'diagram-sort-editor'}
-      emptyNote={'キーがありません。タイトルの昇順で並べます。'}
-      label={'並び順のキー'}
+      emptyNote={m.settings.noDiagramSortKeys}
+      label={m.settings.diagramSortKeys}
       sort={diagramSortStore.sort}
     />
     <p class={constant('settings-hint')} id={constant(HINT_ID)}>
-      {constant(
-        '「アーク」と「タイル」で共通の並び順。上のキーから順に比べ、同じなら次のキーで比べます。',
-      )}
+      {constant(m.settings.diagramSortHint)}
     </p>
   </fieldset>
 );

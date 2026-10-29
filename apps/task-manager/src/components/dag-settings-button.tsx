@@ -1,5 +1,6 @@
 import { Icon } from 'blueprint-synstate';
 import { constant, If, view, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { dagFilterStore, narrowStore, uiStore } from '../store/index.mjs';
 import {
   isDagFilterEmpty,
@@ -32,7 +33,7 @@ export const DagSettingsButton = (): JSX.Element => (
   >
     <Icon icon={'cog'} />
     <span class={constant('dag-settings-button-text')}>
-      {constant('表示設定')}
+      {constant(m.settings.title)}
     </span>
     <If
       cond={view(dagFilterStore.filter, (filter) => !isDagFilterEmpty(filter))}
@@ -40,10 +41,10 @@ export const DagSettingsButton = (): JSX.Element => (
         <span
           class={constant('dag-settings-filtered')}
           data-e2e={constant('dag-filtered')}
-          title={constant('絞り込み中')}
+          title={constant(m.settings.filtering)}
         >
           <span class={constant('visually-hidden')}>
-            {constant('（絞り込み中）')}
+            {constant(m.settings.filteringSuffix)}
           </span>
         </span>
       }

@@ -10,6 +10,7 @@ import {
   type DomainState,
   type GraphNodeId,
 } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import { dependencyTypeLabels, formatLag } from '../view-model/index.mjs';
 import { edgeLabel } from './graph-layout.mjs';
 
@@ -32,14 +33,16 @@ export const arcEdges = (state: DomainState): readonly ArcEdge[] => {
 
     const kind = edge.type === undefined ? '' : dependencyTypeLabels[edge.type];
 
-    const how = [kind, lag].filter((part) => part !== '').join('・');
+    const how = [kind, lag]
+      .filter((part) => part !== '')
+      .join(m.common.listSeparator);
 
     return {
       id: edge.id,
       from: edge.from,
       to: edge.to,
       label: edgeLabel(edge),
-      ariaLabel: `${titleOf(edge.from)} → ${titleOf(edge.to)}${how === '' ? '' : `（${how}）`}`,
+      ariaLabel: m.dag.edgeLabel(titleOf(edge.from), titleOf(edge.to), how),
     };
   });
 };

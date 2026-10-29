@@ -1,6 +1,7 @@
 import { combine, map, type InitializedObservable } from 'synstate';
 import { constant, If, view, type JSX } from 'synstate-dom';
 import type { RelaxedExtract } from 'ts-type-forge';
+import { m } from '../i18n/index.mjs';
 import {
   clockStore,
   dataStore,
@@ -57,7 +58,7 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
       <MilestoneExplanation collapsed={view(editor, ({ isNew }) => !isNew)} />
       <div class={constant('form-grid')}>
         <label class={constant('bp6-label field field-wide')}>
-          {constant('タイトル')}
+          {constant(m.fields.title)}
           <input
             class={constant('bp6-input bp6-fill')}
             data-e2e={constant('title-input')}
@@ -81,12 +82,12 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
         />
       </div>
       <fieldset class={constant('condition-group')}>
-        <legend>{constant('到達条件（すべて満たすと到達）')}</legend>
+        <legend>{constant(m.nodeDialog.reachConditions)}</legend>
         <MilestoneReachState insight={insight$} />
         <div class={constant('form-grid')}>
           <DateTimeField
             id={'milestone-date'}
-            label={'日時（この日時になると到達）'}
+            label={m.nodeDialog.milestoneDate}
             allDay={view(editor, ({ draft }) => draft.dateAllDay)}
             value={view(editor, ({ draft }) => draft.date)}
             onAllDayChange={editorStore.setAllDay}
@@ -107,7 +108,7 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
                 }}
               />
               <span class={constant('bp6-control-indicator')} />
-              {constant('手動チェックが必要（「解消」を押すと到達）')}
+              {constant(m.nodeDialog.requiresCheck)}
             </label>
             <If
               cond={view(editor, ({ draft }) => draft.requiresManualCheck)}
@@ -120,14 +121,14 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
                     )}
                     then={
                       <>
-                        <span>{constant('未解消')}</span>
+                        <span>{constant(m.nodeDialog.unchecked)}</span>
                         <button
                           class={constant('bp6-button bp6-intent-success')}
                           data-e2e={constant('check-button')}
                           type={constant('button')}
                           onClick={editorStore.check}
                         >
-                          {constant('解消')}
+                          {constant(m.nodeDialog.check)}
                         </button>
                       </>
                     }
@@ -137,7 +138,9 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
                           {view(editor, ({ draft }) =>
                             draft.checkedAt === undefined
                               ? ''
-                              : `解消済み（${formatDateTime(draft.checkedAt)}）`,
+                              : m.nodeDialog.checkedAt(
+                                  formatDateTime(draft.checkedAt),
+                                ),
                           )}
                         </span>
                         <button
@@ -145,7 +148,7 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
                           type={constant('button')}
                           onClick={editorStore.uncheck}
                         >
-                          {constant('未解消に戻す')}
+                          {constant(m.nodeDialog.uncheck)}
                         </button>
                       </>
                     }
@@ -157,7 +160,7 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
         </div>
         <fieldset class={constant('condition-dependencies')}>
           <legend class={constant('condition-sub-label')}>
-            {constant('依存')}
+            {constant(m.fields.dependencies)}
           </legend>
           <DependencyEditor
             checks={checks$}
@@ -167,7 +170,7 @@ export const MilestoneForm = ({ editor }: Props): JSX.Element => {
         </fieldset>
       </fieldset>
       <label class={constant('bp6-label field description-field')}>
-        {constant('説明')}
+        {constant(m.fields.description)}
         <textarea
           class={constant('bp6-input bp6-fill')}
           rows={constant(3)}

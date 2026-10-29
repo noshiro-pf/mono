@@ -8,6 +8,7 @@ import {
   createEventEmitter,
   type Observable as SynstateObservable,
 } from 'synstate';
+import { Arr } from 'ts-data-forge';
 import type { Mutable } from 'ts-type-forge';
 import type { PersistedSetting } from './view-model/index.mjs';
 
@@ -98,8 +99,37 @@ export const mediaQuery = (
   };
 };
 
+/**
+ * The browser's languages, the most preferred first; a browser that hides
+ * them, or names none, gives its one language, or none at all.
+ */
+export const browserLanguages = (): readonly string[] => {
+  const { languages, language } = navigator as Partial<Navigator>;
+
+  return Arr.isArray(languages) && Arr.isNonEmpty(languages)
+    ? languages
+    : typeof language === 'string'
+      ? [language]
+      : [];
+};
+
+/**
+ * Loads the page again with `search` as the URL's query, in place of this
+ * entry of the history.
+ */
+export const reloadWithSearch = (search: string): void => {
+  const { pathname, search: current, hash } = globalThis.location;
+
+  // To the same URL with a `#…`, `replace` would only scroll.
+  if (search === current) {
+    globalThis.location.reload();
+  } else {
+    globalThis.location.replace(`${pathname}${search}${hash}`);
+  }
+};
+
 /** What is stored under `key`, or nothing if storage cannot be read. */
-const readStorage = (key: string): string | null => {
+export const readStorage = (key: string): string | null => {
   try {
     return localStorage.getItem(key);
   } catch {
@@ -107,10 +137,24 @@ const readStorage = (key: string): string | null => {
   }
 };
 
-const writeStorage = (key: string, value: string): void => {
+/** Whether `value` was stored: a preference not kept loses only that. */
+export const writeStorage = (key: string, value: string): boolean => {
   try {
     localStorage.setItem(key, value);
+
+    return true;
   } catch {
-    // Not kept between visits, which is all a preference loses.
+    return false;
+  }
+};
+
+/** Whether nothing is left stored under `key`, which a full storage allows. */
+export const removeStorage = (key: string): boolean => {
+  try {
+    localStorage.removeItem(key);
+
+    return true;
+  } catch {
+    return false;
   }
 };

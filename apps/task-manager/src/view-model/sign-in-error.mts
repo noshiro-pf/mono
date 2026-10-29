@@ -1,4 +1,5 @@
 import { hasKey, isRecord, isString, unknownToString } from 'ts-data-forge';
+import { m } from '../i18n/index.mjs';
 
 /**
  * What to tell the reader when signing in failed, from the error Firebase
@@ -16,7 +17,7 @@ export const describeSignInError = (error: unknown): string | undefined => {
 
   return (
     known ??
-    `サインインできませんでした（${stringProperty(error, 'message') ?? unknownToString(error)}）。`
+    m.signIn.failed(stringProperty(error, 'message') ?? unknownToString(error))
   );
 };
 
@@ -27,18 +28,9 @@ const SILENT_CODES: ReadonlySet<string> = new Set<string>([
 ]);
 
 const MESSAGES: ReadonlyMap<string, string> = new Map<string, string>([
-  [
-    'auth/popup-blocked',
-    'ポップアップがブロックされました。このページのポップアップを許可して、もう一度お試しください。',
-  ],
-  [
-    'auth/unauthorized-domain',
-    'このドメインからのサインインは許可されていません。Firebase の承認済みドメインに追加してください。',
-  ],
-  [
-    'auth/network-request-failed',
-    'ネットワークに接続できませんでした。接続を確認して、もう一度お試しください。',
-  ],
+  ['auth/popup-blocked', m.signIn.popupBlocked],
+  ['auth/unauthorized-domain', m.signIn.unauthorizedDomain],
+  ['auth/network-request-failed', m.signIn.network],
 ]);
 
 const stringProperty = (value: unknown, key: string): string | undefined =>

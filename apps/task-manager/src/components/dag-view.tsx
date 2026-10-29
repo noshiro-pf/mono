@@ -2,6 +2,7 @@ import { combine, map, type InitializedObservable } from 'synstate';
 import { constant, If, MatchOptional, view, type JSX } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
 import type { GraphLayout } from '../dag/index.mjs';
+import { m } from '../i18n/index.mjs';
 import {
   dagLayoutStore,
   dagViewModeStore,
@@ -56,7 +57,7 @@ export const DagView = (): JSX.Element => {
         )}
         then={
           <p class={constant('bp6-text-muted dag-message')}>
-            {constant('タスクもマイルストーンもまだありません。')}
+            {constant(m.dag.empty)}
           </p>
         }
         else={
@@ -69,7 +70,7 @@ export const DagView = (): JSX.Element => {
               >
                 {view(autoLayout, (layoutState) =>
                   layoutState.type === 'error'
-                    ? `レイアウトを計算できませんでした（${layoutState.message}）。`
+                    ? m.dag.layoutFailed(layoutState.message)
                     : '',
                 )}
               </p>
@@ -80,7 +81,7 @@ export const DagView = (): JSX.Element => {
                 some={(laidOut$) => <DagScreen layout={laidOut$} />}
                 none={
                   <output class={constant('bp6-text-muted dag-message')}>
-                    {constant('レイアウトを計算中…')}
+                    {constant(m.dag.layingOut)}
                   </output>
                 }
               />

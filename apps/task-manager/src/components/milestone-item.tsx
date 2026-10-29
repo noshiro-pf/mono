@@ -1,5 +1,6 @@
 import type { InitializedObservable } from 'synstate';
 import { constant, If, view, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { editorStore } from '../store/index.mjs';
 import { formatWhen, type MilestoneRow } from '../view-model/index.mjs';
 
@@ -29,7 +30,7 @@ export const MilestoneItem = ({ row }: Props): JSX.Element => (
         )}
       >
         {view(row, ({ reachedAt }) =>
-          reachedAt === undefined ? '◇ 未到達' : '◆ 到達済み',
+          reachedAt === undefined ? m.list.unreached : m.list.reached,
         )}
       </span>
       <span class={constant('milestone-title')}>
@@ -59,7 +60,7 @@ export const MilestoneItem = ({ row }: Props): JSX.Element => (
               )}
             >
               {view(row, ({ awaitingCheck }) =>
-                awaitingCheck ? '要確認' : '確認済み',
+                awaitingCheck ? m.list.awaitingCheck : m.list.checked,
               )}
             </span>
           }

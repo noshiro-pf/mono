@@ -2,6 +2,7 @@ import { HtmlSelect } from 'blueprint-synstate';
 import type { InitializedObservable } from 'synstate';
 import { constant, For, If, view, type JSX } from 'synstate-dom';
 import { dependencyTypes } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import { editorStore } from '../store/index.mjs';
 import {
   dependencyTypeLabels,
@@ -54,7 +55,7 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
     >
       <div class={constant('dependency-row-fields')}>
         <label class={constant('bp6-label dependency-source')}>
-          {constant('依存先')}
+          {constant(m.dependencies.source)}
           <HtmlSelect
             aria-describedby={view(row, ({ check }) =>
               check?.status === 'error' ? errorId : undefined,
@@ -71,7 +72,9 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
               });
             }}
           >
-            <option value={constant('')}>{constant('選んでください')}</option>
+            <option value={constant('')}>
+              {constant(m.dependencies.choose)}
+            </option>
             <If
               cond={view(
                 row,
@@ -81,7 +84,7 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
               )}
               then={
                 <option value={view(row, (r) => r.row.source)}>
-                  {constant('（見つからない依存先）')}
+                  {constant(m.dependencies.missingSource)}
                 </option>
               }
             />
@@ -98,7 +101,7 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
           cond={view(row, (r) => r.row.source.startsWith('task:'))}
           then={
             <label class={constant('bp6-label dependency-type')}>
-              {constant('種類')}
+              {constant(m.dependencies.type)}
               <HtmlSelect
                 data-e2e={constant('dependency-type')}
                 fill
@@ -116,7 +119,10 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
                 {dependencyTypes.map((type) => (
                   <option value={constant(type)}>
                     {constant(
-                      `${dependencyTypeLabels[type]}（${type === 'finish-to-start' ? 'FS' : 'SS'}）`,
+                      m.common.withNote(
+                        dependencyTypeLabels[type],
+                        type === 'finish-to-start' ? 'FS' : 'SS',
+                      ),
                     )}
                   </option>
                 ))}
@@ -125,17 +131,21 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
           }
           else={
             <div class={constant('dependency-type')}>
-              <span class={constant('field-label')}>{constant('種類')}</span>
+              <span class={constant('field-label')}>
+                {constant(m.dependencies.type)}
+              </span>
               <span class={constant('dependency-type-fixed bp6-text-muted')}>
                 {view(row, (r) =>
-                  r.row.source.startsWith('milestone:') ? '到達後' : '―',
+                  r.row.source.startsWith('milestone:')
+                    ? m.dependencies.afterReached
+                    : m.dependencies.noType,
                 )}
               </span>
             </div>
           }
         />
         <label class={constant('bp6-label dependency-lag-days')}>
-          {constant('ずらす日数')}
+          {constant(m.dependencies.lagDays)}
           <input
             class={constant('bp6-input bp6-fill')}
             data-e2e={constant('dependency-lag-days')}
@@ -152,7 +162,7 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
           />
         </label>
         <label class={constant('bp6-label dependency-lag-hours')}>
-          {constant('時間')}
+          {constant(m.dependencies.lagHours)}
           <input
             class={constant('bp6-input bp6-fill')}
             data-e2e={constant('dependency-lag-hours')}
@@ -169,7 +179,7 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
           />
         </label>
         <button
-          aria-label={view(row, ({ name }) => `${name}を外す`)}
+          aria-label={view(row, ({ name }) => m.dependencies.removeRow(name))}
           class={constant('bp6-button bp6-minimal dependency-remove')}
           data-e2e={constant('dependency-remove')}
           type={constant('button')}
@@ -177,7 +187,7 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
             editorStore.removeDependencyRow(key);
           }}
         >
-          {constant('外す')}
+          {constant(m.common.remove)}
         </button>
       </div>
       <If
@@ -208,7 +218,9 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
                       `bp6-tag bp6-minimal ${met === true ? 'bp6-intent-success' : 'bp6-intent-warning'}`,
                   )}
                 >
-                  {view(row, ({ met }) => (met === true ? '充足' : '未充足'))}
+                  {view(row, ({ met }) =>
+                    met === true ? m.dependencies.met : m.dependencies.unmet,
+                  )}
                 </span>
               </p>
             }

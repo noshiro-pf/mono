@@ -20,6 +20,7 @@ import {
   type Priority,
   type TaskId,
 } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import {
   displayStatusLabels,
   formatShortWhen,
@@ -74,20 +75,22 @@ export const buildNodeViews = (
           priority: task.priority,
           due:
             dueDate === undefined
-              ? '期限なし'
-              : `${overdue ? '期限切れ' : '期限'} ${formatShortWhen(dueDate, task.dueAllDay, now, timeZone)}`,
+              ? m.dag.noDue
+              : (overdue ? m.dag.overdue : m.dag.due)(
+                  formatShortWhen(dueDate, task.dueAllDay, now, timeZone),
+                ),
           overdue,
           warning,
           ariaLabel: [
-            `タスク「${task.title}」`,
-            `状態: ${displayStatusLabels[shown]}`,
+            m.dag.taskLabel(task.title),
+            m.dag.statusPart(displayStatusLabels[shown]),
             ...(dueDate === undefined
               ? []
-              : [`期限: ${formatWhen(dueDate, task.dueAllDay, timeZone)}`]),
-            ...(overdue ? ['期限切れ'] : []),
-            `優先度: ${priorityLabels[task.priority]}`,
-            ...(warning ? ['依存が未解消のまま開始'] : []),
-          ].join(' '),
+              : [m.dag.duePart(formatWhen(dueDate, task.dueAllDay, timeZone))]),
+            ...(overdue ? [m.dag.overduePart] : []),
+            m.dag.priorityPart(priorityLabels[task.priority]),
+            ...(warning ? [m.dag.warningPart] : []),
+          ].join(m.dag.partSeparator),
         },
       ];
     },
@@ -130,15 +133,21 @@ export const buildNodeViews = (
           date:
             date === undefined
               ? undefined
-              : `日時 ${formatShortWhen(date, milestone.dateAllDay, now, timeZone)}`,
+              : m.dag.milestoneDate(
+                  formatShortWhen(date, milestone.dateAllDay, now, timeZone),
+                ),
           ariaLabel: [
-            `マイルストーン「${milestone.title}」`,
-            reached ? '到達済み' : '未到達',
+            m.dag.milestoneLabel(milestone.title),
+            reached ? m.dag.reachedPart : m.dag.unreachedPart,
             ...(date === undefined
               ? []
-              : [`日時: ${formatWhen(date, milestone.dateAllDay, timeZone)}`]),
-            ...(awaitingCheck ? ['解消待ち'] : []),
-          ].join(' '),
+              : [
+                  m.dag.datePart(
+                    formatWhen(date, milestone.dateAllDay, timeZone),
+                  ),
+                ]),
+            ...(awaitingCheck ? [m.dag.awaitingCheckPart] : []),
+          ].join(m.dag.partSeparator),
         },
       ];
     },

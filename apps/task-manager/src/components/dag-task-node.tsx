@@ -1,6 +1,11 @@
 import type { InitializedObservable } from 'synstate';
 import { constant, For, If, view, type JSX } from 'synstate-dom';
-import { LARGE_NODE_LINE_HEIGHT, type TaskNodeView } from '../dag/index.mjs';
+import {
+  LARGE_NODE_LINE_HEIGHT,
+  textWidthUnits,
+  type TaskNodeView,
+} from '../dag/index.mjs';
+import { m } from '../i18n/index.mjs';
 import { priorityLabels } from '../view-model/index.mjs';
 import type { DagNodeRecord } from './dag-canvas-scene.mjs';
 import { dagNodeHandlers } from './dag-node-handlers.mjs';
@@ -59,7 +64,7 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
       <SvgTitle>
         {view(record, ({ view: v, size }) =>
           size === 'compact'
-            ? `${v.title}\n${v.due}・優先度 ${priorityLabels[v.priority]}`
+            ? m.dag.compactTitle(v.title, v.due, priorityLabels[v.priority])
             : v.title,
         )}
       </SvgTitle>
@@ -224,8 +229,17 @@ const META_ROOM = 20;
 /** Between a 「最高」 task's shape and its second outline. */
 const RING_GAP = 4;
 
-/** Wide enough for 「最高」 in 10px bold. */
-const PRIORITY_WIDTH = 32;
+/** Room either side of the label. */
+const PRIORITY_PADDING = 8;
+
+/** About the width of a narrow character in the pill's 10px bold. */
+const PRIORITY_UNIT_WIDTH = 6;
+
+/** Wide enough for the longest priority label, 「最高」 or `Highest`. */
+const PRIORITY_WIDTH =
+  Math.max(...Object.values(priorityLabels).map(textWidthUnits)) *
+    PRIORITY_UNIT_WIDTH +
+  PRIORITY_PADDING;
 
 /** Centred on the top edge, so half of it stands above the node. */
 const PRIORITY_HEIGHT = 14;

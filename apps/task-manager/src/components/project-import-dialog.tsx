@@ -1,4 +1,5 @@
 import { constant, If, view, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { projectFileStore, type ProjectImport } from '../store/index.mjs';
 import { followModal } from './follow-modal.mjs';
 
@@ -29,7 +30,7 @@ export const ProjectImportDialog = (): JSX.Element => (
   >
     <div class={constant('bp6-dialog-header')}>
       <h2 class={constant('bp6-heading')} id={constant(TITLE_ID)}>
-        {constant('プロジェクトを読み込む')}
+        {constant(m.projectFile.title)}
       </h2>
     </div>
     <div class={constant('bp6-dialog-body node-dialog-body')}>
@@ -79,7 +80,7 @@ export const ProjectImportDialog = (): JSX.Element => (
                 type={constant('button')}
                 onClick={projectFileStore.close}
               >
-                {constant('キャンセル')}
+                {constant(m.common.cancel)}
               </button>
               <button
                 class={constant('bp6-button bp6-intent-danger')}
@@ -87,7 +88,7 @@ export const ProjectImportDialog = (): JSX.Element => (
                 type={constant('button')}
                 onClick={projectFileStore.confirm}
               >
-                {constant('置き換える')}
+                {constant(m.projectFile.replace)}
               </button>
             </>
           }
@@ -98,7 +99,7 @@ export const ProjectImportDialog = (): JSX.Element => (
               type={constant('button')}
               onClick={projectFileStore.close}
             >
-              {constant('閉じる')}
+              {constant(m.common.close)}
             </button>
           }
         />
@@ -109,11 +110,16 @@ export const ProjectImportDialog = (): JSX.Element => (
 
 const message = (state: ProjectImport): string =>
   state.type === 'confirming'
-    ? (`いまのプロジェクトを「${state.fileName}」の内容（タスク ${state.snapshot.state.tasks.length}・マイルストーン ${state.snapshot.state.milestones.length}・グループ ${state.snapshot.groups.length}）で置き換えます。いまのタスク・マイルストーン・グループと DAG の配置はすべて消えます。置き換える前に、いまのプロジェクトをファイルに書き出します。` as const)
+    ? m.projectFile.confirm(
+        state.fileName,
+        state.snapshot.state.tasks.length,
+        state.snapshot.state.milestones.length,
+        state.snapshot.groups.length,
+      )
     : state.type === 'refused'
-      ? (`「${state.fileName}」は読み込めません。` as const)
+      ? m.projectFile.refused(state.fileName)
       : state.type === 'importing'
-        ? '書き込み中です。閉じても書き込みは続きますが、終わる前にページを閉じたり、読み込み直したり、サインアウトしたりすると、置き換える前のタスクなどが消えずに残ることがあります。'
+        ? m.projectFile.importing
         : '';
 
 const isConfirming = (state: ProjectImport): boolean =>

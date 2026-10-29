@@ -1,6 +1,7 @@
 import { constant, If, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { nodeRefOf } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import {
   bulkDeleteStore,
   bulkEditStore,
@@ -18,7 +19,7 @@ export const DagSelectionBar = (): JSX.Element => (
     cond={view(dagSelectionStore.selected, Arr.isNonEmpty)}
     then={
       <div
-        aria-label={constant('選択したノード')}
+        aria-label={constant(m.dag.selection)}
         class={constant('dag-selection-bar')}
         data-e2e={constant('dag-selection-bar')}
         role={constant('toolbar')}
@@ -28,9 +29,8 @@ export const DagSelectionBar = (): JSX.Element => (
           then={
             <>
               <output data-e2e={constant('dag-bulk-delete-question')}>
-                {view(
-                  dagSelectionStore.selected,
-                  (ids) => `${ids.length} 件を依存ごと削除しますか？`,
+                {view(dagSelectionStore.selected, (ids) =>
+                  m.dag.confirmDeleteSelected(ids.length),
                 )}
               </output>
               <button
@@ -39,23 +39,22 @@ export const DagSelectionBar = (): JSX.Element => (
                 type={constant('button')}
                 onClick={bulkDeleteStore.confirm}
               >
-                {constant('削除する')}
+                {constant(m.common.confirmDelete)}
               </button>
               <button
                 class={constant('bp6-button bp6-minimal')}
                 type={constant('button')}
                 onClick={bulkDeleteStore.cancel}
               >
-                {constant('やめる')}
+                {constant(m.common.keep)}
               </button>
             </>
           }
           else={
             <>
               <output data-e2e={constant('dag-selection-count')}>
-                {view(
-                  dagSelectionStore.selected,
-                  (ids) => `${ids.length} 件を選択中`,
+                {view(dagSelectionStore.selected, (ids) =>
+                  m.dag.selected(ids.length),
                 )}
               </output>
               <button
@@ -70,7 +69,7 @@ export const DagSelectionBar = (): JSX.Element => (
                   );
                 }}
               >
-                {constant('一括編集')}
+                {constant(m.dag.bulkEdit)}
               </button>
               <button
                 class={constant('bp6-button bp6-minimal bp6-intent-danger')}
@@ -78,7 +77,7 @@ export const DagSelectionBar = (): JSX.Element => (
                 type={constant('button')}
                 onClick={bulkDeleteStore.request}
               >
-                {constant('削除')}
+                {constant(m.common.delete)}
               </button>
               <button
                 class={constant('bp6-button bp6-minimal')}
@@ -86,7 +85,7 @@ export const DagSelectionBar = (): JSX.Element => (
                 type={constant('button')}
                 onClick={dagSelectionStore.clear}
               >
-                {constant('選択解除')}
+                {constant(m.dag.clearSelection)}
               </button>
             </>
           }

@@ -6,6 +6,7 @@ import {
   type JSX,
 } from 'synstate-dom';
 import type { Task } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import { formatWhen } from '../view-model/index.mjs';
 
 type Props = Readonly<{
@@ -26,7 +27,9 @@ export const DueDate = ({ dueDate, overdue }: Props): JSX.Element => (
         <If
           cond={overdue}
           then={
-            <span class={constant('overdue-mark')}>{constant('期限切れ')}</span>
+            <span class={constant('overdue-mark')}>
+              {constant(m.list.overdue)}
+            </span>
           }
         />
       </span>

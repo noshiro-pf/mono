@@ -59,6 +59,7 @@ import {
   type GraphNodeId,
   type GroupId,
 } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import {
   animationSettingStore,
   dagLayoutStore,
@@ -1185,9 +1186,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
                   'bp6-active': view(lassoTool$, (tool) => tool === 'freehand'),
                 }}
                 data-e2e={constant('dag-lasso-tool')}
-                title={constant(
-                  '背景のドラッグで囲んだノードを選びます（Shift を押しながらのドラッグでも選べます）',
-                )}
+                title={constant(m.dag.lassoTitle)}
                 type={constant('button')}
                 onClick={() => {
                   updateLassoTool((tool) =>
@@ -1195,7 +1194,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
                   );
                 }}
               >
-                {constant('なげなわ')}
+                {constant(m.dag.lasso)}
               </button>
               <button
                 aria-pressed={view(lassoTool$, (tool) =>
@@ -1209,9 +1208,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
                   ),
                 }}
                 data-e2e={constant('dag-rectangle-tool')}
-                title={constant(
-                  '背景のドラッグで描いた矩形に入るノードを選びます',
-                )}
+                title={constant(m.dag.rectangleTitle)}
                 type={constant('button')}
                 onClick={() => {
                   updateLassoTool((tool) =>
@@ -1219,7 +1216,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
                   );
                 }}
               >
-                {constant('矩形選択')}
+                {constant(m.dag.rectangle)}
               </button>
             </>
           }
@@ -1229,7 +1226,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
           then={
             <>
               <button
-                aria-label={constant('拡大')}
+                aria-label={constant(m.dag.zoomIn)}
                 class={constant('bp6-button')}
                 data-e2e={constant('dag-zoom-in')}
                 type={constant('button')}
@@ -1240,7 +1237,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
                 {constant('＋')}
               </button>
               <button
-                aria-label={constant('縮小')}
+                aria-label={constant(m.dag.zoomOut)}
                 class={constant('bp6-button')}
                 data-e2e={constant('dag-zoom-out')}
                 type={constant('button')}
@@ -1260,7 +1257,9 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
           onClick={pressFit}
         >
           {view(combine([mode, arcZoom$]), ([current, zoom]) =>
-            current === 'arc' && zoom === 'whole' ? '等倍表示' : '全体表示',
+            current === 'arc' && zoom === 'whole'
+              ? m.dag.actualSize
+              : m.dag.fitAll,
           )}
         </button>
       </div>
@@ -1293,11 +1292,7 @@ type SvgTarget = Readonly<{ currentTarget: SVGSVGElement }>;
 type SvgPointerEvent = PointerEvent & SvgTarget;
 
 /** What the canvas shows, for a screen reader. */
-const captions = {
-  dag: '依存関係グラフ。ノードを選ぶと詳細を開きます。ノードはドラッグか矢印キーで動かせます。ノードの縁の丸からほかのノードへドラッグすると、ドロップしたノードがそのノードに依存します。依存の矢印を選ぶと、削除ボタンか Delete キーで削除できます。背景のドラッグで移動、ホイールかピンチで拡大縮小できます。Shift を押しながら、または「なげなわ」をオンにして背景をドラッグすると、囲んだノードを選び、まとめて動かしたり一括編集したりできます。',
-  arc: 'アークダイアグラム。タスクをタイトル順に縦に並べ、マイルストーンをそれを待つタスクの上に入れて、依存を右側の弧で示します。ノードを選ぶと詳細を開きます。ドラッグで移動、ホイールかピンチで拡大縮小できます。',
-  tile: 'タスクをタイトル順に左上から横に並べ、幅に収まらない分は次の行に折り返します。依存は示しません。タスクを選ぶと詳細を開きます。ホイール、ドラッグ、Page Up・Page Down・Home・End キーで縦にスクロールできます。',
-} as const satisfies ReadonlyRecord<DagViewMode, string>;
+const captions: ReadonlyRecord<DagViewMode, string> = m.dag.descriptions;
 
 /** An arrowhead the edges end in, drawn in the colour of `id`'s class. */
 const arrowMarker = (id: string): JSX.Element => (

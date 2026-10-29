@@ -7,6 +7,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { dataStore } from '../store/index.mjs';
 
 type Props = Readonly<{
@@ -22,7 +23,7 @@ type Props = Readonly<{
  */
 export const GroupField = ({ value, onChange }: Props): JSX.Element => (
   <label class={constant('bp6-label field')}>
-    {constant('グループ')}
+    {constant(m.fields.group)}
     <HtmlSelect
       data-e2e={constant('group-select')}
       fill
@@ -31,7 +32,7 @@ export const GroupField = ({ value, onChange }: Props): JSX.Element => (
       )}
       onChange={onChange}
     >
-      <option value={constant('')}>{constant('なし')}</option>
+      <option value={constant('')}>{constant(m.common.none)}</option>
       <For items={dataStore.groups} key={(group) => group.id}>
         {(group$) => (
           <option value={view(group$, ({ id }) => id)}>

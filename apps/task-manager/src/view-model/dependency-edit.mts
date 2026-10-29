@@ -19,6 +19,7 @@ import {
   type NodeRef,
   type TaskId,
 } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import { dependencyTypeLabels, formatLag } from './format.mjs';
 import { lagFromParts, lagToParts } from './lag.mjs';
 
@@ -99,18 +100,21 @@ export const validateRows = (
     const ref = refs.get(source);
 
     if (ref === undefined) {
-      return error('依存先が見つかりません。外してください。');
+      return error(m.dependencies.sourceMissing);
     }
 
     if (rows.slice(0, index).some((earlier) => earlier.source === source)) {
-      return error(`${nodeTitle(state, ref)} にはすでに依存しています。`);
+      return error(m.dependencies.alreadyDependsOn(nodeTitle(state, ref)));
     }
 
     if (wouldCreateCycle(state, dependent, ref)) {
       return error(
         nodeId(dependent) === source
-          ? '自分自身には依存できません。'
-          : `${nodeTitle(state, ref)} は ${nodeTitle(state, dependent)} に依存しているため、循環する依存になります。`,
+          ? m.dependencies.self
+          : m.dependencies.cycle(
+              nodeTitle(state, ref),
+              nodeTitle(state, dependent),
+            ),
       );
     }
 
@@ -186,7 +190,11 @@ export const dependencySourceOptions = (
 
       return {
         value: id,
-        label: `${ref.kind === 'task' ? 'タスク' : 'マイルストーン'}: ${nodeTitle(state, ref)}${done ? '（完了）' : ''}`,
+        label: m.dependencies.option(
+          m.nodeKinds[ref.kind],
+          nodeTitle(state, ref),
+          done,
+        ),
         ref,
         done,
       };
@@ -215,11 +223,13 @@ export const describeDependency = (
 ): string => {
   const waitsFor = isTaskDependency(dependency)
     ? dependencyTypeLabels[dependency.type]
-    : '到達後';
+    : m.dependencies.afterReached;
 
-  const lag = formatLag(dependency.lagMs);
-
-  return `${nodeTitle(state, dependency.from)} の${waitsFor}${lag === '' ? '' : ` ${lag}`}`;
+  return m.dependencies.describe(
+    nodeTitle(state, dependency.from),
+    waitsFor,
+    formatLag(dependency.lagMs),
+  );
 };
 
 /**
@@ -233,9 +243,9 @@ export const parseSourceValue = (value: string): GraphNodeId | '' =>
 export const nodeTitle = (state: DomainState, ref: NodeRef): string =>
   ref.kind === 'task'
     ? (state.tasks.find(({ id }) => id === ref.id)?.title ??
-      '（削除されたタスク）')
+      m.dependencies.deletedTask)
     : (state.milestones.find(({ id }) => id === ref.id)?.title ??
-      '（削除されたマイルストーン）');
+      m.dependencies.deletedMilestone);
 
 /** An empty part is zero. */
 const parseLag = ({
@@ -249,14 +259,12 @@ const parseLag = ({
   );
 
   if (Result.isErr(days) || Result.isErr(hours)) {
-    return Result.err('ずらす時間は数で入力してください。');
+    return Result.err(m.dependencies.lagNotNumber);
   }
 
   const lagMs = lagFromParts(days.value, hours.value);
 
-  return lagMs < 0
-    ? Result.err('ずらす時間は 0 以上にしてください。')
-    : Result.ok(lagMs);
+  return lagMs < 0 ? Result.err(m.dependencies.lagNegative) : Result.ok(lagMs);
 };
 
 export type SourceOption = DeepReadonly<{

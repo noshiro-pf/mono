@@ -2,6 +2,7 @@ import type { InitializedObservable } from 'synstate';
 import { constant, If, MatchOptional, view, type JSX } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
 import type { RelaxedExclude } from 'ts-type-forge';
+import { m } from '../i18n/index.mjs';
 import { editorStore, type EditorState } from '../store/index.mjs';
 import { DeleteControls } from './delete-controls.js';
 import { followModal } from './follow-modal.mjs';
@@ -65,15 +66,15 @@ const NodeForm = ({
         {view(editor, ({ type, isNew }) =>
           type === 'task'
             ? isNew
-              ? '新しいタスク'
-              : 'タスク'
+              ? m.nodeDialog.newTask
+              : m.nodeKinds.task
             : isNew
-              ? '新しいマイルストーン'
-              : 'マイルストーン',
+              ? m.nodeDialog.newMilestone
+              : m.nodeKinds.milestone,
         )}
       </h2>
       <button
-        aria-label={constant('閉じる')}
+        aria-label={constant(m.common.close)}
         class={constant('bp6-button bp6-minimal')}
         type={constant('button')}
         onClick={editorStore.close}
@@ -122,14 +123,14 @@ const NodeForm = ({
           type={constant('button')}
           onClick={editorStore.close}
         >
-          {constant('キャンセル')}
+          {constant(m.common.cancel)}
         </button>
         <button
           class={constant('bp6-button bp6-intent-primary')}
           data-e2e={constant('save')}
           type={constant('submit')}
         >
-          {constant('保存')}
+          {constant(m.common.save)}
         </button>
       </div>
     </div>

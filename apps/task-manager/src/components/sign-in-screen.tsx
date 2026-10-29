@@ -5,7 +5,9 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { sessionStore } from '../store/index.mjs';
+import { LanguageField } from './language-field.js';
 
 type Props = Readonly<{
   error: Bindable<string | undefined>;
@@ -16,12 +18,8 @@ type Props = Readonly<{
 export const SignInScreen = ({ error, signingIn }: Props): JSX.Element => (
   <main class={constant('center-screen')}>
     <div class={constant('bp6-card bp6-elevation-1 sign-in-card')}>
-      <h1 class={constant('bp6-heading')}>{constant('タスク管理')}</h1>
-      <p>
-        {constant(
-          'タスクとマイルストーンの依存関係から、いま着手できるものを示します。',
-        )}
-      </p>
+      <h1 class={constant('bp6-heading')}>{constant(m.app.title)}</h1>
+      <p>{constant(m.signIn.lead)}</p>
       <button
         class={constant('bp6-button bp6-intent-primary bp6-large')}
         data-e2e={constant('sign-in')}
@@ -30,7 +28,7 @@ export const SignInScreen = ({ error, signingIn }: Props): JSX.Element => (
         onClick={sessionStore.signIn}
       >
         {mapBindable(signingIn, (busy) =>
-          busy ? 'サインイン中…' : 'Google でサインイン',
+          busy ? m.signIn.signingIn : m.signIn.signIn,
         )}
       </button>
       <If
@@ -44,6 +42,7 @@ export const SignInScreen = ({ error, signingIn }: Props): JSX.Element => (
           </p>
         }
       />
+      <LanguageField />
     </div>
   </main>
 );

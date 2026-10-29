@@ -9,6 +9,7 @@ import {
 } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { sortKeys, type SortSpec } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import {
   sortKeyLabels,
   unusedSortKeys,
@@ -74,7 +75,7 @@ export const SortEditor = ({
         then={
           <label class={constant('sort-add')}>
             <span class={constant('visually-hidden')}>
-              {constant('キーを追加')}
+              {constant(m.sort.addKey)}
             </span>
             <HtmlSelect
               value={constant('')}
@@ -91,7 +92,9 @@ export const SortEditor = ({
                 }
               }}
             >
-              <option value={constant('')}>{constant('＋キーを追加…')}</option>
+              <option value={constant('')}>
+                {constant(m.sort.addKeyOption)}
+              </option>
               <For items={unused} key={(key) => key}>
                 {(key$) => (
                   <option value={key$}>
