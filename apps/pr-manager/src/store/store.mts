@@ -17,6 +17,7 @@ import {
   repositoryUrl,
   type ReportSource,
 } from '../constants.mjs';
+import { dagZoomFromLocation, saveDagZoom } from '../dag-zoom.mjs';
 import { layoutFromLocation, saveLayout } from '../layout.mjs';
 import { loadIssuePage, loadReport } from '../load-report.mjs';
 import { readSetting, writeSetting } from '../settings-db.mjs';
@@ -131,6 +132,8 @@ export const issuesViewStore = createIssuesViewStore({
   saveHidePending: (hide) => {
     writeSetting(ISSUES_DAG_HIDE_PENDING_KEY, hide).catch(() => undefined);
   },
+  initialZoom: dagZoomFromLocation(),
+  saveZoom: saveDagZoom,
   moreIssues: reader.moreIssues,
   loadMoreIssues: reader.loadMoreIssues,
 });

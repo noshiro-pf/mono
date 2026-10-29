@@ -28,7 +28,7 @@ to work on it, is [`docs/design.md`](./docs/design.md).
    **change** beside the repository's name in the header and type
    `owner/name`, or paste the repository's address from the address bar
    (`https://github.com/owner/name/pulls` works too). Bookmark it: the
-   repository, the layout and the theme are all in the URL.
+   repository, the layout, the theme and the DAG's zoom are all in the URL.
 3. **Paste the token** into the panel at the top and press **Use this
    token**. It is kept in the tab only, unless you tick **Remember on this
    device**.

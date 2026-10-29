@@ -5,15 +5,27 @@
  * so that a turn in and a turn out come back to where they started and 100%
  * is always one of them; the fit is whatever puts the whole graph in the box,
  * and may fall between two steps.
+ *
+ * **Kept in the query string**, as the layout is (`layout.mts`): how large the
+ * graph is drawn is part of how the page is looked at, so a reload or a
+ * bookmark opens it at the same size. `zoom=125` is a scale in whole percent
+ * and `zoom=fit` the fit; the natural size is the parameter's absence. A value
+ * that is not `fit` or a whole number is the natural size, and a scale out of
+ * range is clamped. Like the layout, it goes along to another repository
+ * (`searchWithRepository`). What it does not keep is where a zoom from the fit
+ * had put the nodes with no edge: a scale read back draws them where they go by
+ * default, since that arrangement was chosen for a box the next visit may not
+ * have.
  */
 
-import { Num } from 'ts-data-forge';
+import { Num, Result } from 'ts-data-forge';
 import {
   placeGrid,
   placementsFor,
   type ConnectedLayout,
   type GridPlacement,
 } from './issue-graph-layout.mjs';
+import { currentSearch, rewriteSearch } from './url.mjs';
 
 /** The scales a zoom in or out moves between, smallest first. */
 export const ZOOM_STEPS = [
@@ -23,6 +35,69 @@ export const ZOOM_STEPS = [
 export const MIN_SCALE = ZOOM_STEPS[0];
 
 export const MAX_SCALE = ZOOM_STEPS.at(-1) ?? 1;
+
+/**
+ * How the DAG is drawn: to fit its box, whatever the scale that takes, or at
+ * a scale.
+ */
+export type DagZoom = Readonly<
+  { type: 'fit' } | { type: 'scale'; scale: number }
+>;
+
+export const NATURAL_ZOOM: DagZoom = { type: 'scale', scale: 1 } as const;
+
+export const dagZoomFromSearch = (search: string): DagZoom => {
+  const params = new URLSearchParams(search);
+
+  const value = params.get(ZOOM_PARAM);
+
+  if (value === 'fit') {
+    return { type: 'fit' };
+  }
+
+  if (value === null || !PERCENT_PATTERN.test(value)) {
+    return NATURAL_ZOOM;
+  }
+
+  return {
+    type: 'scale',
+    // Digits too many for a number are past the largest scale.
+    scale: Num.clamp(
+      Result.unwrapOkOr(Num.safeParseFloat(value), MAX_SCALE * 100) / 100,
+      MIN_SCALE,
+      MAX_SCALE,
+    ),
+  };
+};
+
+/**
+ * The query string with the zoom written into it, and the other parameters
+ * left as they were.
+ */
+export const searchWithDagZoom = (search: string, zoom: DagZoom): string => {
+  const params = new URLSearchParams(search);
+
+  const percent = zoom.type === 'fit' ? 'fit' : Math.round(zoom.scale * 100);
+
+  if (percent === 100) {
+    params.delete(ZOOM_PARAM);
+  } else {
+    params.set(ZOOM_PARAM, percent.toString());
+  }
+
+  const written = params.toString();
+
+  return written === '' ? '' : `?${written}`;
+};
+
+/** What the query string asks for, now. */
+export const dagZoomFromLocation = (): DagZoom =>
+  dagZoomFromSearch(currentSearch());
+
+/** Writes the zoom into the address bar; see `rewriteSearch`. */
+export const saveDagZoom = (zoom: DagZoom): void => {
+  rewriteSearch((search) => searchWithDagZoom(search, zoom));
+};
 
 export type Size = Readonly<{ width: number; height: number }>;
 
@@ -139,6 +214,11 @@ export const scrollToCentre = (
     left: Math.max(0, centre.x * scale - box.width / 2),
     top: Math.max(0, centre.y * scale - box.height / 2),
   }) as const;
+
+const ZOOM_PARAM = 'zoom';
+
+/** Whole percents, which is all that is written. */
+const PERCENT_PATTERN = /^\d+$/u;
 
 /** A scale this close to a step is that step. */
 const EPSILON = 1e-6;
