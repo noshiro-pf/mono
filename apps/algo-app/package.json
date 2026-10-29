@@ -54,6 +54,7 @@
     "eslint-plugin-ts-data-forge": "workspace:*",
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
+    "firebase-tools": "catalog:",
     "npm-run-all2": "catalog:",
     "preact": "catalog:",
     "prettier": "catalog:",

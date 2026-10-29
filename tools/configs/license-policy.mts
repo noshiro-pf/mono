@@ -1,4 +1,4 @@
-// cspell:ignore elkjs istextorbinary noto resvg
+// cspell:ignore elkjs istextorbinary noto Odysseas resvg
 
 /**
  * Which licenses a dependency may carry, read by `check:root:licenses`
@@ -37,6 +37,10 @@
  *   that moves from one non-allowed license to another fails again rather than
  *   inheriting the old judgement. A trailing `*` covers a package's
  *   per-platform binaries, of which only the current platform's is installed.
+ * - **`Unknown` is what pnpm reports for a package with no `license` field**,
+ *   and for every package when nothing is installed. An exception under it
+ *   names one package by its exact name, never with a `*`, and says what
+ *   that package's license files say.
  * - **An exception nothing installed matches fails the check.** Delete it
  *   with the dependency, as with a `cspell` word.
  * - **When the check fails on the `pnpm-update` pull request, the fix is a
@@ -167,6 +171,24 @@ export const licensePolicy = {
       packages: ['markdown-it-anchor'],
       reason:
         'A public-domain dedication with a fallback grant to anyone for any purpose and no conditions, not even a notice. Kept off `allowed` as a class because, unlike CC0, it says nothing about jurisdictions where copyright cannot be waived (Japan among them), and leans on its grant sentence there. Reached only through the root devDependency `zenn-cli` (via `zenn-markdown-html`), which renders the Zenn preview locally; up to 0.5.4 `zenn-cli` bundled it into its own `dist/`, so it is not new code, only newly visible. Tooling only, unmodified, not redistributed.',
+    },
+    {
+      license: 'BSD',
+      packages: ['url-template'],
+      reason:
+        'Not an SPDX identifier, only an old way of writing one: the LICENSE file is BSD-3-Clause in substance — the same three conditions and disclaimer, with “the author” where the SPDX text has “the copyright holder” and its contributors — which `allowed` already lets through. Reached only through `firebase-tools` (via `@google-cloud/cloud-sql-connector` → `@googleapis/sqladmin` → `googleapis-common`), a devDependency of the apps on Firebase that runs as a CLI — the emulators, the rules tests and `deploy-firestore.yml` — and that no app imports, so nothing of it reaches a bundle. Tooling only, unmodified, not redistributed.',
+    },
+    {
+      license: 'Unknown',
+      packages: ['valid-url'],
+      reason:
+        'Its `package.json` declares no `license`, but its LICENSE file is the MIT text word for word (Copyright 2013 Odysseas Tsatalos and oDesk Corporation), which `allowed` already lets through. Reached only through `firebase-tools` (via `superstatic` → `join-path`); see `url-template`. Tooling only, unmodified, not redistributed. What to watch: this entry goes stale, and fails, once a release declares a `license`; delete it then.',
+    },
+    {
+      license: 'public domain',
+      packages: ['deep-freeze'],
+      reason:
+        'A one-line dedication to the public domain. It has the problem that keeps `Unlicense` above off `allowed` — where copyright cannot be waived (Japan among them) a dedication alone may not hold — and lacks even the fallback grant `Unlicense` leans on there, leaving only the evident intent. It adds that the code is based in part on an MDN sample; MDN puts code samples added since August 2010 in the public domain and earlier ones under MIT, whose notice this package does not carry — which matters only to a copy that is redistributed, and this one is not. The package is one 13-line function. Reached only through `firebase-tools` (via `exegesis`); see `url-template`. Tooling only, unmodified, not redistributed.',
     },
   ],
 } as const satisfies LicensePolicy;

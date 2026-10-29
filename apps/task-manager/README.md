@@ -233,7 +233,7 @@ pnpm run build        # build/ に出力。GitHub Pages へは deploy-pages.yml 
 （Authentication と Firestore）に接続する。先にこのディレクトリで起動しておく。
 
 ```sh
-firebase emulators:start   # firebase-tools と Java 21 以上が必要
+pnpm exec firebase emulators:start   # Java 21 以上が必要
 ```
 
 | エミュレータ   | ポート |
@@ -272,8 +272,8 @@ firebase emulators:start   # firebase-tools と Java 21 以上が必要
   トークン、プロジェクトの一覧・更新・削除、ほかのコレクションは拒まれる。
 
 `emulators:exec` が空のエミュレータを起動し、テストが終われば止める。Java 21 以上が
-要り、`firebase-tools` は `pnpm dlx` で取るので入れておく必要はない。`firebase.json` の
-ポートを使うため、`firebase emulators:start` を動かしているときは先に止める。
+要り、`firebase-tools` はこのパッケージの devDependency なので入れておく必要はない。`firebase.json` の
+ポートを使うため、`pnpm exec firebase emulators:start` を動かしているときは先に止める。
 ほかのテストと同じく `ws:build` のあとに走らせる。
 
 このスクリプトは `check:*` に入れていない。どの CI のランナーにも Java と
@@ -296,14 +296,15 @@ firebase emulators:start   # firebase-tools と Java 21 以上が必要
 Firebase プロジェクトは `task-manager-app-d0cae`（`.firebaserc`）。次はリポジトリの
 CI では行われないので、オーナーが手で行う。
 
-1. **セキュリティルールのデプロイ**: `pnpm run test:rules` が通ることを確かめてから、
-   このディレクトリで `firebase deploy --only firestore:rules`。`firestore.rules` を変更しただけでは
-   反映されない。`firebase-tools` は依存に入れていないので、手元に入れて使う。
-2. **承認済みドメイン**: Authentication → 設定 → 承認済みドメインに `localhost` と
+1. **承認済みドメイン**: Authentication → 設定 → 承認済みドメインに `localhost` と
    `noshiro-pf.github.io` を入れる。
-3. **ログインプロバイダ**: Authentication → ログイン方法で Google を有効にする。
+2. **ログインプロバイダ**: Authentication → ログイン方法で Google を有効にする。
    `firestore.rules` も Google でサインインしたトークンしか受け付けないので、
    ほかのプロバイダを有効にしてもデータには触れない。
+
+セキュリティルールは、`firestore.rules` を変えた変更が `main` に入ると
+`deploy-firestore.yml` がデプロイする（`docs/firestore-deploy.md`）。`test:rules` は
+CI では走らないので、マージ前に手元で通しておく。
 
 サインインはポップアップで行う。ページ（`noshiro-pf.github.io`）と認証ドメイン
 （`firebaseapp.com`）が別のため、リダイレクト方式は Safari（iOS のすべてのブラウザ）の

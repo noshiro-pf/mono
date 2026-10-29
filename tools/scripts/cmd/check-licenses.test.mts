@@ -1,4 +1,4 @@
-import { Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import type { LicensePolicy } from '../../configs/license-policy.mjs';
 import {
   collectViolations,
@@ -173,6 +173,91 @@ describe(collectViolations, () => {
       ]),
       ['c@1.0.0 (Unknown)'],
     );
+  });
+
+  test('an `Unknown` exception lets through the package it names', () => {
+    const withUnknown = {
+      ...policy,
+      exceptions: Arr.toPushed(policy.exceptions, {
+        license: 'Unknown',
+        packages: ['c'],
+        reason: 'MIT in LICENSE.',
+      }),
+    } as const satisfies LicensePolicy;
+
+    assert.deepStrictEqual(
+      collectViolations(
+        [
+          installedOf('c', 'Unknown'),
+          installedOf('d', 'Unknown'),
+          installedOf('axe-core', 'MPL-2.0'),
+          installedOf('lightningcss', 'MPL-2.0'),
+          installedOf('lightningcss-linux-x64-gnu', 'MPL-2.0'),
+        ],
+        withUnknown,
+      ).map(({ subject }) => subject),
+      ['d@1.0.0 (Unknown)'],
+    );
+  });
+
+  test.each([
+    { case: 'matching something', installed: ['c-linux'] },
+    { case: 'matching nothing, reported once', installed: [] },
+  ] as const)('an `Unknown` exception with a wildcard fails, $case', (c) => {
+    const withUnknownWildcard = {
+      ...policy,
+      exceptions: Arr.toPushed(policy.exceptions, {
+        license: 'Unknown',
+        packages: ['c-*'],
+        reason: 'MIT in LICENSE.',
+      }),
+    } as const satisfies LicensePolicy;
+
+    const violations = collectViolations(
+      [
+        ...c.installed.map((name) => installedOf(name, 'Unknown')),
+        installedOf('axe-core', 'MPL-2.0'),
+        installedOf('lightningcss', 'MPL-2.0'),
+        installedOf('lightningcss-linux-x64-gnu', 'MPL-2.0'),
+      ],
+      withUnknownWildcard,
+    );
+
+    assert.deepStrictEqual(
+      violations.map(({ subject }) => subject),
+      ["exception 'c-*' (Unknown)"],
+    );
+
+    assert.isTrue(
+      violations[0]?.message.includes('more than one package') === true,
+    );
+  });
+
+  test('`Unknown` in `allowed` fails', () => {
+    const withUnknownAllowed = {
+      ...policy,
+      allowed: Arr.toPushed(policy.allowed, {
+        license: 'Unknown',
+        note: 'Anything.',
+      }),
+    } as const satisfies LicensePolicy;
+
+    const violations = collectViolations(
+      [
+        installedOf('c', 'Unknown'),
+        installedOf('axe-core', 'MPL-2.0'),
+        installedOf('lightningcss', 'MPL-2.0'),
+        installedOf('lightningcss-linux-x64-gnu', 'MPL-2.0'),
+      ],
+      withUnknownAllowed,
+    );
+
+    assert.deepStrictEqual(
+      violations.map(({ subject }) => subject),
+      ["allowed 'Unknown'"],
+    );
+
+    assert.isTrue(violations[0]?.message.includes('as a class') === true);
   });
 
   test('an exception matching nothing installed is stale', () => {

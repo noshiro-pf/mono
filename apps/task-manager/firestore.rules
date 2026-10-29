@@ -1,7 +1,9 @@
 rules_version = '2';
 
-// Deployed by hand: `firebase deploy --only firestore:rules` from this
-// directory (see README.md). Editing this file changes nothing until then.
+// Deployed by `deploy-firestore.yml` when a push to main changes this file
+// (docs/firestore-deploy.md), on the same push that deploy-pages.yml
+// publishes the app with. `pnpm run test:rules` runs nowhere in CI, so run it
+// before merging a change here.
 //
 // Layout:
 //   projects/{projectId}                        { name, ownerUid, memberUids, createdAt }
@@ -15,7 +17,8 @@ rules_version = '2';
 //
 // The rules decide who may touch a project, and little more: a document's
 // shape is checked by the app when it reads it (`src/repository/converters.mts`),
-// and the rules are deployed by hand, so they may lag behind the app.
+// and the rules and the app are deployed by separate jobs, so for a while one
+// may run ahead of the other.
 service cloud.firestore {
   match /databases/{database}/documents {
     // Google is the only provider the app offers (README: Firebase の手作業).

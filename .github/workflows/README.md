@@ -27,6 +27,7 @@ GitHub shows a `.github/README.md` in place of the root one.
 | `pnpm-update.yml`                | schedule                               | none; opens `chore/pnpm-update`         |
 | `node-support-update.yml`        | schedule                               | none; opens `chore/node-support-update` |
 | `deploy-pages.yml`               | `push` to `main`                       | none                                    |
+| `deploy-firestore.yml`           | `push` to `main`; `workflow_dispatch`  | none                                    |
 | `link-check.yml`                 | pull requests, path-filtered; schedule | none; other people's servers decide it  |
 
 The required contexts are listed in `repo-settings/rulesets/main.json`. Every
@@ -220,7 +221,8 @@ written, rather than every job that takes the steps.
   `engine-strict` in `node-version-compatibility.yml` and deliberately not in
   `node-support-update.yml`'s canary, `ignore-scripts` in `release.yml`'s
   publishing job, `install: false` in `pnpm-update.yml`, which changes pnpm
-  before it installs anything.
+  before it installs anything, and in `deploy-firestore.yml`, which installs
+  one app rather than the workspace.
 - **The checkout stays in the caller.** A local action is read from the
   workspace, so it cannot be resolved before something has checked it out.
 - **A composite action is a file in the tree**, read when its step starts
@@ -657,8 +659,8 @@ to this.
 
 ## Jobs that hold a key
 
-Three workflows push, open pull requests or publish: `pnpm-update.yml`,
-`node-support-update.yml`, `release.yml`. Each runs
+Four workflows push, open pull requests, publish or deploy: `pnpm-update.yml`,
+`node-support-update.yml`, `release.yml`, `deploy-firestore.yml`. Each runs
 third-party code somewhere in the same run (`pnpm install` and every `tsx`
 invocation execute the dependency tree; `allowBuilds` gates install scripts,
 not the import-time code of the toolchain), and each holds a key that can
@@ -692,6 +694,9 @@ config either), and the job that holds the key installs nothing and runs
 nothing out of the working tree. `pnpm-update.yml` crosses a patch,
 `release.yml` a `dist/` tarball.
 `node-support-update.yml` is the one that is not split, and says why.
+`deploy-firestore.yml` holds a Google Cloud credential and has nothing to
+split off: it builds nothing, installs with `--ignore-scripts`, and the one
+third-party tree it runs is firebase-tools, the tool that uses the credential.
 
 ### Pushing a branch and opening a pull request
 

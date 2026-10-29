@@ -1,3 +1,5 @@
 {
+  "FIREBASE_DEPLOY_SERVICE_ACCOUNT": "firestore-deploy@noshiro-pf-ci.iam.gserviceaccount.com",
+  "FIREBASE_DEPLOY_WORKLOAD_IDENTITY_PROVIDER": "projects/837003254043/locations/global/workloadIdentityPools/github/providers/noshiro-pf-mono",
   "REPO_AUTOMATION_BOT_CLIENT_ID": "Iv23lilpiDh0twq2PErv"
 }

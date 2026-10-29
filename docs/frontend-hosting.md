@@ -117,5 +117,7 @@ Firebase をバックエンドとして使い続けるアプリ（`algo-app`、
 が redirect 以外を host していないこと（規則はどれも Pages の URL の中への
 301 で、最後が catch-all）と、2 つのファイルが対で揃っていることを確かめる。
 
-Firebase に残るアプリ（Hosting・Functions・セキュリティルール）の自動デプロイは
-#2160。
+`algo-app`・`life-plan-simulator`・`task-manager` の Firestore のルールと
+インデックスは `deploy-firestore.yml` が自動でデプロイする
+（`docs/firestore-deploy.md`）。実ユーザーのいる `event-schedule-app` と
+`poll-discord-app` のデプロイは、まだ手で行う。

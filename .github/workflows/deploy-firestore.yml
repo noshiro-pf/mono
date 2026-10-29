@@ -1,0 +1,248 @@
+name: Deploy Firestore rules
+
+# Deploys the Firestore security rules and indexes of the apps in `TARGETS`
+# when a push to main changes them. Their frontends are on GitHub Pages, which
+# deploy-pages.yml publishes on the same push, so the rules go out alongside
+# the code that relies on them rather than with the next version bump.
+#
+# `TARGETS` names each app and its Firebase project explicitly. The other
+# `firebase.json` files in `apps/` either belong to an app with real users,
+# whose deploys are still made by hand, or only redirect an old Hosting URL to
+# Pages and are deployed once. Adding an app here deploys nothing until its
+# rules next change; dispatch the workflow for it once.
+#
+# The key is a Workload Identity Federation credential for a service account
+# that may only replace rules and indexes. The provider admits only this
+# workflow on main in the `firebase-deploy` environment; the setup is in
+# docs/firestore-deploy.md.
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+    inputs:
+      app:
+        description: The app whose rules and indexes to deploy as they are on the branch
+        type: choice
+        options:
+          - algo-app
+          - life-plan-simulator
+          - task-manager
+
+permissions: {}
+
+env:
+  # The `.firebaserc` of each app has to name the same project; the deploy job
+  # checks. The `workflow_dispatch` options above list the same apps.
+  TARGETS: >-
+    [
+      { "app": "algo-app", "project": "algo-app-45270" },
+      { "app": "life-plan-simulator", "project": "life-plan-simulator-9eab3" },
+      { "app": "task-manager", "project": "task-manager-app-d0cae" }
+    ]
+
+jobs:
+  plan:
+    name: Pick the apps to deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: read
+
+    outputs:
+      targets: ${{ steps.pick.outputs.targets }}
+
+    steps:
+      # Only the history is read; no file in the tree is.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: .github/workflows
+
+      # Compares the files themselves, not `version`: a library release bumps
+      # every dependent app's version without touching its rules.
+      - name: Pick the apps whose rules or indexes changed
+        id: pick
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          APP: ${{ inputs.app }}
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$EVENT_NAME" == 'workflow_dispatch' ]]; then
+            targets="$(jq -c --arg app "$APP" '[.[] | select(.app == $app)]' <<<"$TARGETS")"
+            if [[ "$targets" == '[]' ]]; then
+              echo "::error::${APP} is not in TARGETS."
+              exit 1
+            fi
+          elif [[ "$BEFORE" =~ ^0+$ ]]; then
+            # No previous commit to compare against: deploy everything.
+            targets="$(jq -c '.' <<<"$TARGETS")"
+          else
+            git fetch --no-tags --depth=1 --filter=blob:none origin "$BEFORE"
+            changed=()
+            for app in $(jq -r '.[].app' <<<"$TARGETS"); do
+              dir="apps/${app}"
+              # 1 is "differs"; anything else is git failing, not a change.
+              status=0
+              git diff --quiet "$BEFORE" "$SHA" -- \
+                "${dir}/firebase.json" \
+                "${dir}/.firebaserc" \
+                "${dir}/firestore.rules" \
+                "${dir}/firestore.indexes.json" || status=$?
+              case "$status" in
+                0) ;;
+                1) changed+=("$app") ;;
+                *) exit "$status" ;;
+              esac
+            done
+            targets="$(jq -c --args '[.[] | select(.app | IN($ARGS.positional[]))]' "${changed[@]}" <<<"$TARGETS")"
+          fi
+
+          echo "Deploying: ${targets}"
+          echo "targets=${targets}" >>"${GITHUB_OUTPUT}"
+
+  deploy:
+    name: Deploy ${{ matrix.app }}
+    needs: plan
+    if: needs.plan.outputs.targets != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.plan.outputs.targets) }}
+
+    # One deploy per project at a time, and never cancelled halfway. Jobs enter
+    # the group in the order their plan jobs finish, not the order of the
+    # pushes, so a job can start after a newer push's job has deployed; the
+    # first step below makes that job stand down rather than deploy older rules.
+    concurrency:
+      group: deploy-firestore-${{ matrix.project }}
+      cancel-in-progress: false
+
+    # Limited to main. The Workload Identity provider also requires this name
+    # in the token, so a run without it gets no credential.
+    environment:
+      name: firebase-deploy
+      url: https://console.firebase.google.com/project/${{ matrix.project }}/firestore/rules
+
+    permissions:
+      contents: read
+      id-token: write # to exchange for the service account's credential
+
+    # A rules deploy builds nothing, so the job installs the one app with its
+    # install scripts off and runs nothing from what that brings but
+    # firebase-tools, the tool that uses the key. Its version, and that of
+    # everything it depends on, comes from `pnpm-lock.yaml` (the `catalog:`
+    # entry), held to `minimumReleaseAge` and moved by pnpm-update.yml.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # If main has moved on and changed this app's files since this run's
+      # commit, a later run has this app in its matrix and deploys the newer
+      # files, before or after this job. Deploying here could only put the
+      # older ones back.
+      - name: Check that main has not changed the files since
+        id: current
+        env:
+          DIR: apps/${{ matrix.app }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin main
+          status=0
+          git diff --quiet "$SHA" FETCH_HEAD -- \
+            "${DIR}/firebase.json" \
+            "${DIR}/.firebaserc" \
+            "${DIR}/firestore.rules" \
+            "${DIR}/firestore.indexes.json" || status=$?
+          case "$status" in
+            0) echo 'current=true' >>"${GITHUB_OUTPUT}" ;;
+            1)
+              echo "::notice::main has changed ${DIR} since ${SHA}; the run for that change deploys it."
+              echo 'current=false' >>"${GITHUB_OUTPUT}"
+              ;;
+            *) exit "$status" ;;
+          esac
+
+      # `install: false`: the step below installs the one app, not the
+      # workspace.
+      - name: Set up pnpm and Node.js
+        if: steps.current.outputs.current == 'true'
+        uses: ./.github/actions/setup
+        with:
+          install: false
+
+      - name: Install firebase-tools
+        if: steps.current.outputs.current == 'true'
+        env:
+          DIR: apps/${{ matrix.app }}
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile --ignore-scripts --filter "./${DIR}"
+          "${DIR}/node_modules/.bin/firebase" --version
+
+      # `firebase deploy` runs any `predeploy` / `postdeploy` command the
+      # config names, which would run the tree with the key in hand.
+      - name: Check the Firebase config
+        if: steps.current.outputs.current == 'true'
+        working-directory: apps/${{ matrix.app }}
+        env:
+          PROJECT: ${{ matrix.project }}
+        run: |
+          set -euo pipefail
+          default="$(jq -r '.projects.default' .firebaserc)"
+          if [[ "$default" != "$PROJECT" ]]; then
+            echo "::error::.firebaserc names ${default}, but TARGETS names ${PROJECT}."
+            exit 1
+          fi
+          if jq -e '[.. | objects | keys[]] | any(. == "predeploy" or . == "postdeploy")' firebase.json >/dev/null; then
+            echo '::error::firebase.json names a predeploy or postdeploy hook.'
+            exit 1
+          fi
+
+      # The two variables hold the values docs/firestore-deploy.md sets up. An
+      # empty one would otherwise surface as the auth action's own complaint
+      # about its inputs.
+      - name: Check the Google Cloud variables
+        if: steps.current.outputs.current == 'true'
+        env:
+          PROVIDER: ${{ vars.FIREBASE_DEPLOY_WORKLOAD_IDENTITY_PROVIDER }}
+          SERVICE_ACCOUNT: ${{ vars.FIREBASE_DEPLOY_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$PROVIDER" || -z "$SERVICE_ACCOUNT" ]]; then
+            echo '::error::FIREBASE_DEPLOY_WORKLOAD_IDENTITY_PROVIDER and FIREBASE_DEPLOY_SERVICE_ACCOUNT have to be set; see docs/firestore-deploy.md.'
+            exit 1
+          fi
+
+      - name: Authenticate to Google Cloud
+        if: steps.current.outputs.current == 'true'
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ vars.FIREBASE_DEPLOY_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.FIREBASE_DEPLOY_SERVICE_ACCOUNT }}
+
+      # Without `--force`, indexes deployed by hand and missing from
+      # `firestore.indexes.json` are reported and kept, not deleted.
+      - name: Deploy the rules and indexes
+        if: steps.current.outputs.current == 'true'
+        working-directory: apps/${{ matrix.app }}
+        env:
+          PROJECT: ${{ matrix.project }}
+        # The binary itself, not `pnpm exec`: pnpm installs the whole workspace,
+        # install scripts included, before running anything when it finds
+        # `node_modules` incomplete, which a filtered install leaves it.
+        run: ./node_modules/.bin/firebase deploy --only firestore --project "$PROJECT" --non-interactive

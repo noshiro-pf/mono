@@ -125,10 +125,11 @@ CI では行われないので、オーナーが手で行う。
    `firestore.rules` も Google でサインインしたトークンしか受け付けない。
 2. **承認済みドメイン**: Authentication → 設定 → 承認済みドメインに `localhost` と
    `noshiro-pf.github.io` を入れる。
-3. **セキュリティルールのデプロイ**: Firestore を作り、`pnpm run test:rules` が
-   通ることを確かめてから、このディレクトリで
-   `firebase deploy --only firestore:rules`。`firestore.rules` を変更しただけでは
-   反映されない。`firebase-tools` は依存に入れていないので、手元に入れて使う。
+3. **Firestore の作成**: Firestore を作る。
+
+セキュリティルールは、`firestore.rules` を変えた変更が `main` に入ると
+`deploy-firestore.yml` がデプロイする（`docs/firestore-deploy.md`）。`test:rules` は
+CI では走らないので、マージ前に手元で通しておく。
 
 ## Run
 
@@ -156,7 +157,7 @@ The dev server connects to local Firebase emulators (Authentication and
 Firestore), not to a real project. Start them first, in this directory:
 
 ```sh
-firebase emulators:start   # needs firebase-tools and Java 21 or later
+pnpm exec firebase emulators:start   # needs Java 21 or later
 ```
 
 | Emulator       | Port |
@@ -188,4 +189,5 @@ users, signed-out access, tokens from providers other than Google and every
 other path are refused. `emulators:exec` starts and stops the emulator, so stop
 a running `firebase emulators:start` first. It needs Java 21 or later and is
 not a `check:` script, because no CI runner has Java and the emulator. Run it by
-hand before deploying a change to `firestore.rules`.
+hand before merging a change to `firestore.rules`: `deploy-firestore.yml`
+deploys it as soon as it reaches `main`.
