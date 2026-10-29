@@ -24,7 +24,6 @@ import type {
   NotificationSettingsWithEmail,
 } from '../../types/index.mjs';
 import { mapNoneToUndefined } from '../../utils/index.mjs';
-import { Auth } from '../store.mjs';
 import { createToggleSectionState } from '../utils/index.mjs';
 
 type ReturnValues = Readonly<{
@@ -32,7 +31,14 @@ type ReturnValues = Readonly<{
   commonStateHandlers: EventScheduleSettingCommonStateHandler;
 }>;
 
-export const createEventScheduleSettingStore = (): ReturnValues => {
+export type EventScheduleSettingDeps = Readonly<{
+  /** The signed-in user: the event's author, and the email notified by default. */
+  fireAuthUser$: InitializedObservable<EventScheduleSettingUser | undefined>;
+}>;
+
+export const createEventScheduleSettingStore = (
+  deps: EventScheduleSettingDeps,
+): ReturnValues => {
   const [title$, setTitle, { resetState: resetTitle }] = createState<string>(
     eventScheduleInitialValue.title,
   );
@@ -76,7 +82,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
     createState<AnswerIconSettings>(eventScheduleInitialValue.answerIcons);
 
   const initialNotificationSettingsWithEmailFilled$ = combine([
-    Auth.fireAuthUser$,
+    deps.fireAuthUser$,
     answerDeadline$,
   ]).pipe(
     map(([user, answerDeadline]) => ({
@@ -167,7 +173,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
       answerDeadline$,
       answerIcons$,
       notificationSettingsWithEmail$,
-      Auth.fireAuthUser$,
+      deps.fireAuthUser$,
     ]).pipe(
       map(
         ([
@@ -310,3 +316,10 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
 
   return { commonState$, commonStateHandlers };
 };
+
+/** What the settings read of the signed-in user. */
+export type EventScheduleSettingUser = Readonly<{
+  uid: string;
+  displayName: string | null;
+  email: string | null;
+}>;
