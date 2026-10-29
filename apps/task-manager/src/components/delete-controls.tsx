@@ -1,4 +1,5 @@
 import { constant, If, type Bindable, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { editorStore } from '../store/index.mjs';
 
 type Props = Readonly<{
@@ -14,24 +15,24 @@ export const DeleteControls = ({ confirming }: Props): JSX.Element => (
     cond={confirming}
     then={
       <fieldset
-        aria-label={constant('削除の確認')}
+        aria-label={constant(m.common.deleteConfirmation)}
         class={constant('delete-confirm')}
       >
-        <span>{constant('依存ごと削除しますか？')}</span>
+        <span>{constant(m.nodeDialog.confirmDelete)}</span>
         <button
           class={constant('bp6-button bp6-intent-danger')}
           data-e2e={constant('confirm-delete')}
           type={constant('button')}
           onClick={editorStore.confirmDelete}
         >
-          {constant('削除する')}
+          {constant(m.common.confirmDelete)}
         </button>
         <button
           class={constant('bp6-button')}
           type={constant('button')}
           onClick={editorStore.cancelDelete}
         >
-          {constant('やめる')}
+          {constant(m.common.keep)}
         </button>
       </fieldset>
     }
@@ -42,7 +43,7 @@ export const DeleteControls = ({ confirming }: Props): JSX.Element => (
         type={constant('button')}
         onClick={editorStore.requestDelete}
       >
-        {constant('削除')}
+        {constant(m.common.delete)}
       </button>
     }
   />

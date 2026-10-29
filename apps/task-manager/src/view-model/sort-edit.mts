@@ -16,22 +16,11 @@ import {
   type SortOrder,
   type SortSpec,
 } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 
-export const sortKeyLabels = {
-  title: 'タイトル',
-  dueDate: '期限',
-  priority: '優先度',
-  status: '状態',
-  depth: '依存の深さ',
-  createdAt: '作成日時',
-  updatedAt: '更新日時',
-  estimate: '見積',
-} as const satisfies ReadonlyRecord<SortKey, string>;
+export const sortKeyLabels: ReadonlyRecord<SortKey, string> = m.sort.keys;
 
-export const sortOrderLabels = {
-  asc: '昇順',
-  desc: '降順',
-} as const satisfies ReadonlyRecord<SortOrder, string>;
+export const sortOrderLabels: ReadonlyRecord<SortOrder, string> = m.sort.orders;
 
 /** Appends `key`, ascending, unless it is already a sort key. */
 export const addSortKey = (

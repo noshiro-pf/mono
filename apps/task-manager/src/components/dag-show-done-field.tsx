@@ -1,4 +1,5 @@
 import { constant, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { dagShowDoneStore } from '../store/index.mjs';
 
 /**
@@ -21,12 +22,10 @@ export const DagShowDoneField = (): JSX.Element => (
         }}
       />
       <span class={constant('bp6-control-indicator')} />
-      {constant('完了済みのタスク・到達済みのマイルストーンを表示')}
+      {constant(m.settings.showDone)}
     </label>
     <p class={constant('settings-hint')} id={constant(HINT_ID)}>
-      {constant(
-        'オフのあいだは、完了したタスクと到達したマイルストーン、そこからの依存の線を描きません。リストの「完了を隠す」とは別の設定です。',
-      )}
+      {constant(m.settings.showDoneHint)}
     </p>
   </div>
 );

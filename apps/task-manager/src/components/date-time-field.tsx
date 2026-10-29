@@ -1,5 +1,6 @@
 import { DateInput } from 'blueprint-synstate';
 import { constant, If, type Bindable, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { NARROW_QUERY } from '../store/index.mjs';
 
 type Props = Readonly<{
@@ -19,7 +20,7 @@ type Props = Readonly<{
 }>;
 
 /**
- * A labelled date and time to the minute, in Japanese, picked with
+ * A labelled date and time to the minute, in the page's language, picked with
  * blueprint-synstate's `DateInput`: a calendar with 「今日」 and 「クリア」
  * under it, on the browser's wall clock — what the drafts hold. The hours
  * and minutes have arrow buttons, which are easier to hit on a phone than
@@ -39,16 +40,16 @@ export const DateTimeField = ({
 }: Props): JSX.Element => {
   // What the calendar takes, all day or not.
   const shared = {
-    clearButtonText: 'クリア',
+    clearButtonText: m.dateField.clear,
     fill: true,
     id,
     // No on-screen keyboard: on a phone the calendar is the way in, and the
     // keyboard would cover it. A hardware keyboard still types a date.
     inputMode: 'none',
     labels: DATE_PICKER_LABELS,
-    locale: 'ja',
+    locale: m.dateInputLocale,
     showActionsBar: true,
-    todayButtonText: '今日',
+    todayButtonText: m.dateField.today,
     value,
     onChange,
     onInputFocus: scrollFieldIntoView,
@@ -70,19 +71,17 @@ export const DateTimeField = ({
             }}
           />
           <span class={constant('bp6-control-indicator')} />
-          {constant('終日')}
+          {constant(m.dateField.allDay)}
         </label>
       </div>
       <If
         cond={allDay}
-        then={
-          <DateInput {...shared} placeholder={'日付を選ぶ（例: 2026/10/09）'} />
-        }
+        then={<DateInput {...shared} placeholder={m.dateField.pickDate} />}
         else={
           <DateInput
             {...shared}
             closeOnSelection={false}
-            placeholder={'日時を選ぶ（例: 2026/10/09 18:00）'}
+            placeholder={m.dateField.pickDateTime}
             timePickerProps={TIME_PICKER_PROPS}
             timePrecision={'minute'}
           />
@@ -104,20 +103,20 @@ const scrollFieldIntoView = (input: HTMLInputElement): void => {
 };
 
 const DATE_PICKER_LABELS = {
-  previousMonth: '前の月',
-  nextMonth: '次の月',
-  month: '月',
-  year: '年',
+  previousMonth: m.dateField.previousMonth,
+  nextMonth: m.dateField.nextMonth,
+  month: m.dateField.month,
+  year: m.dateField.year,
 } as const;
 
 const TIME_PICKER_PROPS = {
   showArrowButtons: true,
   labels: {
-    hours: '時',
-    minutes: '分',
-    increaseHours: '1 時間進める',
-    decreaseHours: '1 時間戻す',
-    increaseMinutes: '1 分進める',
-    decreaseMinutes: '1 分戻す',
+    hours: m.dateField.hours,
+    minutes: m.dateField.minutes,
+    increaseHours: m.dateField.increaseHours,
+    decreaseHours: m.dateField.decreaseHours,
+    increaseMinutes: m.dateField.increaseMinutes,
+    decreaseMinutes: m.dateField.decreaseMinutes,
   },
 } as const;

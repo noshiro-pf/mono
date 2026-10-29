@@ -15,6 +15,7 @@ import {
   type Progress,
   type Task,
 } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import { dateField, draftedDate } from './date-draft.mjs';
 import { formatLabels, parseLabels } from './labels.mjs';
 
@@ -49,7 +50,7 @@ export const applyTaskDraft = (
   const title = draft.title.trim();
 
   if (title === '') {
-    return Result.err('タイトルを入力してください。');
+    return Result.err(m.drafts.titleRequired);
   }
 
   const dueDate = draftedDate(
@@ -61,13 +62,13 @@ export const applyTaskDraft = (
   );
 
   if (Result.isErr(dueDate)) {
-    return Result.err('期限の日時が正しくありません。');
+    return Result.err(m.drafts.invalidDue);
   }
 
   const estimateHours = optionalNonNegativeNumber(draft.estimateHours);
 
   if (Result.isErr(estimateHours)) {
-    return Result.err('見積は 0 以上の数で入力してください。');
+    return Result.err(m.drafts.invalidEstimate);
   }
 
   return Result.ok({

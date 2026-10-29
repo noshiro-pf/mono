@@ -2,6 +2,7 @@ import type { InitializedObservable } from 'synstate';
 import { constant, If, MatchOptional, view, type JSX } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
 import type { RelaxedExclude } from 'ts-type-forge';
+import { m } from '../i18n/index.mjs';
 import { groupEditorStore, type GroupEditorState } from '../store/index.mjs';
 import { followModal } from './follow-modal.mjs';
 
@@ -60,10 +61,12 @@ const GroupForm = ({
   >
     <div class={constant('bp6-dialog-header')}>
       <h2 class={constant('bp6-heading')} id={constant(TITLE_ID)}>
-        {view(editor, ({ isNew }) => (isNew ? '新しいグループ' : 'グループ'))}
+        {view(editor, ({ isNew }) =>
+          isNew ? m.groups.newGroup : m.nodeKinds.group,
+        )}
       </h2>
       <button
-        aria-label={constant('閉じる')}
+        aria-label={constant(m.common.close)}
         class={constant('bp6-button bp6-minimal')}
         type={constant('button')}
         onClick={groupEditorStore.close}
@@ -84,7 +87,7 @@ const GroupForm = ({
         }
       />
       <label class={constant('bp6-label field')}>
-        {constant('グループ名')}
+        {constant(m.groups.name)}
         <input
           class={constant('bp6-input bp6-fill')}
           data-e2e={constant('group-title-input')}
@@ -96,11 +99,7 @@ const GroupForm = ({
           }}
         />
       </label>
-      <p class={constant('bp6-text-muted')}>
-        {constant(
-          'DAG でノードを枠の中へドラッグするとグループに入り、枠の外へドラッグすると外れます。',
-        )}
-      </p>
+      <p class={constant('bp6-text-muted')}>{constant(m.groups.hint)}</p>
     </div>
     <div class={constant('bp6-dialog-footer node-dialog-footer')}>
       <If
@@ -111,26 +110,24 @@ const GroupForm = ({
             cond={view(editor, ({ confirmingDelete }) => confirmingDelete)}
             then={
               <fieldset
-                aria-label={constant('削除の確認')}
+                aria-label={constant(m.common.deleteConfirmation)}
                 class={constant('delete-confirm')}
               >
-                <span>
-                  {constant('グループを削除しますか？（ノードは残ります）')}
-                </span>
+                <span>{constant(m.groups.confirmDelete)}</span>
                 <button
                   class={constant('bp6-button bp6-intent-danger')}
                   data-e2e={constant('confirm-delete-group')}
                   type={constant('button')}
                   onClick={groupEditorStore.confirmDelete}
                 >
-                  {constant('削除する')}
+                  {constant(m.common.confirmDelete)}
                 </button>
                 <button
                   class={constant('bp6-button')}
                   type={constant('button')}
                   onClick={groupEditorStore.cancelDelete}
                 >
-                  {constant('やめる')}
+                  {constant(m.common.keep)}
                 </button>
               </fieldset>
             }
@@ -141,7 +138,7 @@ const GroupForm = ({
                 type={constant('button')}
                 onClick={groupEditorStore.requestDelete}
               >
-                {constant('削除')}
+                {constant(m.common.delete)}
               </button>
             }
           />
@@ -153,14 +150,14 @@ const GroupForm = ({
           type={constant('button')}
           onClick={groupEditorStore.close}
         >
-          {constant('キャンセル')}
+          {constant(m.common.cancel)}
         </button>
         <button
           class={constant('bp6-button bp6-intent-primary')}
           data-e2e={constant('save-group')}
           type={constant('submit')}
         >
-          {constant('保存')}
+          {constant(m.common.save)}
         </button>
       </div>
     </div>

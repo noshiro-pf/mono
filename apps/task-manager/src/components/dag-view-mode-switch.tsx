@@ -1,4 +1,5 @@
 import { constant, view, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { dagViewModeStore } from '../store/index.mjs';
 import { dagViewModeLabels, dagViewModes } from '../view-model/index.mjs';
 
@@ -9,7 +10,7 @@ import { dagViewModeLabels, dagViewModes } from '../view-model/index.mjs';
  */
 export const DagViewModeSwitch = (): JSX.Element => (
   <fieldset
-    aria-label={constant('表示形式')}
+    aria-label={constant(m.dag.viewMode)}
     class={constant('bp6-button-group')}
   >
     {dagViewModes.map((mode) => (

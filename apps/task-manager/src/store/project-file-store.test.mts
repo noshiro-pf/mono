@@ -275,6 +275,30 @@ describe(createProjectFileStore, () => {
     assert.strictEqual(replaced.length, 1);
   });
 
+  test('is importing until the writes end, closed or not', async () => {
+    const pending = Promise.withResolvers<undefined>();
+
+    const { store } = setup(async () => {
+      await pending.promise;
+    });
+
+    assert.isFalse(store.importing.getSnapshot().value);
+
+    store.openFile('p.json', projectFileText(incoming, NOW));
+
+    store.confirm();
+
+    store.close();
+
+    assert.isTrue(store.importing.getSnapshot().value);
+
+    pending.resolve(undefined);
+
+    await flush();
+
+    assert.isFalse(store.importing.getSnapshot().value);
+  });
+
   test('replaces nothing when the backup cannot be made', () => {
     const { store, failDownload, replaced, errors, importState } = setup();
 
@@ -379,6 +403,29 @@ describe(createProjectFileStore, () => {
     setLoad('loading');
 
     assert.deepStrictEqual(importState(), { type: 'idle' });
+
+    stop();
+  });
+
+  test('is no longer importing once the project starts loading over', () => {
+    const { store, setLoad } = setup(
+      () =>
+        new Promise(() => {
+          // Never settles, as writes of a session that ended may not.
+        }),
+    );
+
+    const stop = store.start();
+
+    store.openFile('p.json', projectFileText(incoming, NOW));
+
+    store.confirm();
+
+    assert.isTrue(store.importing.getSnapshot().value);
+
+    setLoad('loading');
+
+    assert.isFalse(store.importing.getSnapshot().value);
 
     stop();
   });

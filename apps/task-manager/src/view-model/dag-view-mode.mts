@@ -16,6 +16,7 @@
 
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { m } from '../i18n/index.mjs';
 import { persistedSetting } from './persisted-setting.mjs';
 
 export const dagViewModes = ['dag', 'arc', 'tile'] as const;
@@ -32,11 +33,8 @@ export const dagViewModeStorage = persistedSetting(DagViewModeCodec, {
   key: 'task-manager-app:dag-view-mode',
 });
 
-export const dagViewModeLabels = {
-  dag: 'DAG',
-  arc: 'アーク',
-  tile: 'タイル',
-} as const satisfies ReadonlyRecord<DagViewMode, string>;
+export const dagViewModeLabels: ReadonlyRecord<DagViewMode, string> =
+  m.dag.viewModes;
 
 /**
  * Whether the nodes are drawn where the reader put them — so that they can

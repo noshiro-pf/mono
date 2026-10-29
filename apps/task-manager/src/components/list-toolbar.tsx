@@ -1,4 +1,5 @@
 import { constant, view, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { listSettingsStore } from '../store/index.mjs';
 import { SortEditor } from './sort-editor.js';
 
@@ -19,17 +20,17 @@ export const ListToolbar = (): JSX.Element => (
         }}
       />
       <span class={constant('bp6-control-indicator')} />
-      {constant('完了を隠す')}
+      {constant(m.list.hideDone)}
     </label>
     <details class={constant('sort-details')}>
       <summary class={constant('bp6-button sort-summary')}>
-        {constant('並べ替え')}
+        {constant(m.list.sort)}
       </summary>
       <SortEditor
         actions={listSettingsStore}
         data-e2e={'list-sort-editor'}
-        emptyNote={'並べ替えのキーはありません。'}
-        label={'並べ替えのキー'}
+        emptyNote={m.list.noSortKeys}
+        label={m.list.sortKeys}
         sort={view(listSettingsStore.settings, ({ sort }) => sort)}
       />
     </details>

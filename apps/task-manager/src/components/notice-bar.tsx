@@ -1,4 +1,5 @@
 import { constant, If, view, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { uiStore } from '../store/index.mjs';
 
 /** The last thing that went wrong — a write refused, a listener cut off. */
@@ -16,7 +17,7 @@ export const NoticeBar = (): JSX.Element => (
           type={constant('button')}
           onClick={uiStore.dismissNotice}
         >
-          {constant('閉じる')}
+          {constant(m.common.close)}
         </button>
       </div>
     }

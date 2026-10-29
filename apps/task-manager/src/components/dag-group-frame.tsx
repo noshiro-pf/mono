@@ -1,6 +1,7 @@
 import type { InitializedObservable } from 'synstate';
 import { constant, view, type JSX } from 'synstate-dom';
 import { frameTitle, GROUP_HEADER, GROUP_PADDING } from '../dag/index.mjs';
+import { m } from '../i18n/index.mjs';
 import { groupEditorStore } from '../store/index.mjs';
 import type { DagFrameRecord } from './dag-canvas-scene.mjs';
 import { SvgTitle } from './svg-title.js';
@@ -44,7 +45,7 @@ export const DagGroupFrame = ({ record }: Props): JSX.Element => {
       {/* An SVG has no <button>: the title takes its role, focus and keys. */}
       {}
       <g
-        aria-label={view(record, (r) => `グループ「${r.title}」`)}
+        aria-label={view(record, (r) => m.dag.group(r.title))}
         class={constant('dag-group-header')}
         data-e2e={constant('dag-group-header')}
         data-group-id={constant(id)}

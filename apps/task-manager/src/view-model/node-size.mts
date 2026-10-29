@@ -12,6 +12,7 @@
 
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { m } from '../i18n/index.mjs';
 import { persistedSetting } from './persisted-setting.mjs';
 
 export const nodeSizes = ['compact', 'standard', 'large'] as const;
@@ -28,8 +29,5 @@ export const nodeSizeStorage = persistedSetting(NodeSizeCodec, {
   key: 'task-manager-app:node-size',
 });
 
-export const nodeSizeLabels = {
-  compact: 'コンパクト',
-  standard: '標準',
-  large: '大',
-} as const satisfies ReadonlyRecord<NodeSize, string>;
+export const nodeSizeLabels: ReadonlyRecord<NodeSize, string> =
+  m.settings.nodeSizes;

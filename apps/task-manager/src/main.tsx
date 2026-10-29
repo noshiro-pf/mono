@@ -1,5 +1,6 @@
 import { render } from 'synstate-dom';
 import { App } from './app.js';
+import { lang, m } from './i18n/index.mjs';
 import './index.css';
 import type { Backend } from './repository/index.mjs';
 import { attachBackend, startStore } from './store/index.mjs';
@@ -10,6 +11,15 @@ const container = document.querySelector('#root');
 if (container === null) {
   throw new Error('Could not find the root element');
 }
+
+// `index.html` is written in Japanese; the page says what it is shown in.
+document.documentElement.setAttribute('lang', lang);
+
+document.querySelector('title')?.replaceChildren(m.app.title);
+
+document
+  .querySelector('meta[name="description"]')
+  ?.setAttribute('content', m.app.description);
 
 startStore();
 

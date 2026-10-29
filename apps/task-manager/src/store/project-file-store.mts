@@ -17,11 +17,12 @@
  * a document that could not be read, it leaves where it is.
  */
 
-import { createState, type InitializedObservable } from 'synstate';
+import { createState, map, type InitializedObservable } from 'synstate';
 import { Result } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import type { DagLayout } from '../dag/index.mjs';
 import type { DomainState, Group } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import {
   parseProjectFile,
   projectFileText,
@@ -60,6 +61,8 @@ export type ProjectFileStore = Readonly<{
   confirm: () => void;
   /** Closes the dialog; writes already started go on. */
   close: () => void;
+  /** Whether an import's writes are still being sent, the dialog closed or not. */
+  importing: InitializedObservable<boolean>;
   /**
    * Starts following the project's loading: when it starts over — signing
    * out, or in as somebody else — what was asked about it is dropped.
@@ -87,22 +90,21 @@ export const createProjectFileStore = (
   const [importState, setImportState, { getSnapshot }] =
     createState<ProjectImport>({ type: 'idle' });
 
-  // The import whose writes are still being sent, if any: another one then
-  // would delete what this one writes, or the other way round.
-  const mut_pending: { current: Promise<void> | undefined } = {
-    current: undefined,
-  };
+  // The import whose writes are still being sent, by its `importing`, if
+  // any: another one then would delete what this one writes, or the other
+  // way round.
+  const [writing, setWriting, { getSnapshot: getWriting }] = createState<
+    ProjectImport | undefined
+  >(undefined);
 
   /** The project as it stands, or why it cannot be had yet. */
   const current = (): Result<ProjectSnapshot, string> => {
     switch (deps.load.getSnapshot().value) {
       case 'loading':
-        return Result.err('まだ読み込み中です。少し待ってからもう一度どうぞ。');
+        return Result.err(m.projectFile.stillLoading);
 
       case 'failed':
-        return Result.err(
-          'プロジェクトの一部を読み込めなかったため、プロジェクト全体を扱えません。ページを読み込み直してください。',
-        );
+        return Result.err(m.projectFile.partlyLoaded);
 
       case 'loaded':
         return Result.ok({
@@ -131,7 +133,7 @@ export const createProjectFileStore = (
     } catch (error: unknown) {
       console.error(error);
 
-      return Result.err('ファイルを書き出せませんでした。');
+      return Result.err(m.projectFile.exportFailed);
     }
 
     return Result.ok(fileName);
@@ -139,15 +141,14 @@ export const createProjectFileStore = (
 
   return {
     importState,
+    importing: writing.pipe(map((which) => which !== undefined)),
     exportProject: () => {
       const exported =
-        mut_pending.current === undefined
+        getWriting() === undefined
           ? Result.flatMap(current(), (snapshot) =>
               download(snapshot, 'task-manager'),
             )
-          : Result.err(
-              '読み込みの書き込みがまだ終わっていません。終わってから書き出してください。',
-            );
+          : Result.err(m.projectFile.exportWhileImporting);
 
       if (Result.isErr(exported)) {
         deps.reportError(exported.value);
@@ -174,11 +175,10 @@ export const createProjectFileStore = (
         return;
       }
 
-      if (mut_pending.current !== undefined) {
+      if (getWriting() !== undefined) {
         setImportState({
           ...asked,
-          problem:
-            '前の読み込みの書き込みがまだ終わっていません。終わってからもう一度どうぞ。',
+          problem: m.projectFile.importWhileImporting,
         });
 
         return;
@@ -205,25 +205,31 @@ export const createProjectFileStore = (
 
       setImportState(importing);
 
-      const pending = deps
+      setWriting(importing);
+
+      const end = (): void => {
+        if (getWriting() === importing) {
+          setWriting(undefined);
+        }
+
+        if (getSnapshot() === importing) {
+          setImportState({ type: 'idle' });
+        }
+      };
+
+      deps
         .replaceProject(asked.snapshot, previous.value)
         .catch((error: unknown) => {
           deps.reportError(
-            `「${asked.fileName}」の読み込みの途中で失敗しました。一部だけ書き換わっているかもしれません。直前に書き出した「${backup.value}」を読み込めば元に戻せます。`,
+            m.projectFile.importFailed(asked.fileName, backup.value),
             error,
           );
         })
-        .finally(() => {
-          if (mut_pending.current === pending) {
-            mut_pending.current = undefined;
-          }
-
-          if (getSnapshot() === importing) {
-            setImportState({ type: 'idle' });
-          }
+        .finally(end)
+        // Only a failure to tell, or `end`'s own, is left for the console.
+        .catch((error: unknown) => {
+          console.error(error);
         });
-
-      mut_pending.current = pending;
     },
     close: () => {
       setImportState({ type: 'idle' });
@@ -244,7 +250,7 @@ export const createProjectFileStore = (
 
         // A sign-out stops the writes of the session it ends, whether or
         // not their promise ever settles.
-        mut_pending.current = undefined;
+        setWriting(undefined);
 
         setImportState({ type: 'idle' });
       });

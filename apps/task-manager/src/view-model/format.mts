@@ -1,7 +1,9 @@
 /**
- * How values are written on the page, in Japanese. Everything that depends on
- * the time zone takes it, so the tests can pin one; the page passes nothing
- * and gets the browser's.
+ * How values are written on the page, in its language (`i18n/`); the
+ * examples here are the Japanese. Dates and times are numeric,
+ * `2026/10/09 12:05`, in every language. Everything that depends on the
+ * time zone takes it, so the tests can pin one; the page passes nothing and
+ * gets the browser's.
  */
 
 import type { ReadonlyRecord } from 'ts-type-forge';
@@ -11,6 +13,7 @@ import type {
   Priority,
   Progress,
 } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 
 export const MINUTE_MS = 60_000;
 
@@ -18,33 +21,15 @@ export const HOUR_MS = 3_600_000;
 
 export const DAY_MS = 86_400_000;
 
-export const progressLabels = {
-  'not-started': '未着手',
-  'in-progress': '作業中',
-  'in-review': 'レビュー中',
-  done: '完了',
-} as const satisfies ReadonlyRecord<Progress, string>;
+export const progressLabels: ReadonlyRecord<Progress, string> = m.progress;
 
-export const displayStatusLabels = {
-  ready: '着手可',
-  blocked: '待ち',
-  'in-progress': '作業中',
-  'in-review': 'レビュー中',
-  done: '完了',
-} as const satisfies ReadonlyRecord<DisplayStatus, string>;
+export const displayStatusLabels: ReadonlyRecord<DisplayStatus, string> =
+  m.displayStatus;
 
-export const priorityLabels = {
-  1: '最高',
-  2: '高',
-  3: '中',
-  4: '低',
-  5: '最低',
-} as const satisfies ReadonlyRecord<Priority, string>;
+export const priorityLabels: ReadonlyRecord<Priority, string> = m.priority;
 
-export const dependencyTypeLabels = {
-  'finish-to-start': '完了後',
-  'start-to-start': '開始後',
-} as const satisfies ReadonlyRecord<DependencyType, string>;
+export const dependencyTypeLabels: ReadonlyRecord<DependencyType, string> =
+  m.dependencyType;
 
 /**
  * A lag as it is labelled on an edge: `+3日`, `+1日2時間`, `-5時間`, or
@@ -64,12 +49,12 @@ export const formatLag = (lagMs: number): string => {
   const minutes = totalMinutes % MINUTES_PER_HOUR;
 
   const parts = [
-    days === 0 ? ('' as const) : (`${days}日` as const),
-    hours === 0 ? ('' as const) : (`${hours}時間` as const),
-    minutes === 0 ? ('' as const) : (`${minutes}分` as const),
-  ] as const;
+    days === 0 ? undefined : m.duration.days(days),
+    hours === 0 ? undefined : m.duration.hours(hours),
+    minutes === 0 ? undefined : m.duration.minutes(minutes),
+  ].filter((part) => part !== undefined);
 
-  return `${lagMs < 0 ? '-' : '+'}${parts.join('')}`;
+  return `${lagMs < 0 ? '-' : '+'}${parts.join(m.duration.separator)}`;
 };
 
 /** `2026/10/09 12:05`. */
@@ -127,14 +112,21 @@ export const formatShortWhen = (
 
 /** `3時間`, `1.5時間`, or nothing without an estimate. */
 export const formatEstimate = (hours: number | undefined): string =>
-  hours === undefined ? '' : (`${hours}時間` as const);
+  hours === undefined ? '' : m.duration.hours(hours);
 
 const MINUTES_PER_HOUR = 60;
+
+/**
+ * Year, month, day, as the date input shows and reads them
+ * (`date-time-field.tsx`), whatever the language: a day before the month,
+ * or after it, would be misread by somebody.
+ */
+const DATE_LOCALE = 'ja-JP';
 
 const MINUTES_PER_DAY = 1440;
 
 const dateTimeFormat = (timeZone: string | undefined): Intl.DateTimeFormat =>
-  new Intl.DateTimeFormat('ja-JP', {
+  new Intl.DateTimeFormat(DATE_LOCALE, {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -147,7 +139,7 @@ const dateTimeFormat = (timeZone: string | undefined): Intl.DateTimeFormat =>
 const monthDayTimeFormat = (
   timeZone: string | undefined,
 ): Intl.DateTimeFormat =>
-  new Intl.DateTimeFormat('ja-JP', {
+  new Intl.DateTimeFormat(DATE_LOCALE, {
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
@@ -157,14 +149,14 @@ const monthDayTimeFormat = (
   });
 
 const monthDayFormat = (timeZone: string | undefined): Intl.DateTimeFormat =>
-  new Intl.DateTimeFormat('ja-JP', {
+  new Intl.DateTimeFormat(DATE_LOCALE, {
     month: '2-digit',
     day: '2-digit',
     ...(timeZone === undefined ? {} : { timeZone }),
   });
 
 const dateFormat = (timeZone: string | undefined): Intl.DateTimeFormat =>
-  new Intl.DateTimeFormat('ja-JP', {
+  new Intl.DateTimeFormat(DATE_LOCALE, {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',

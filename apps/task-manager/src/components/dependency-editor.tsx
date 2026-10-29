@@ -7,6 +7,7 @@ import {
 import { constant, For, If, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import type { Dependency, NodeRef } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import { dataStore, editorStore } from '../store/index.mjs';
 import {
   dependencySourceOptions,
@@ -73,8 +74,8 @@ export const DependencyEditor = ({
               : undefined,
           name:
             check?.status === 'ok'
-              ? `「${describeDependency(state, check.dependency)}」`
-              : `依存 ${index + 1}`,
+              ? m.common.quoted(describeDependency(state, check.dependency))
+              : m.dependencies.row(index + 1),
           options: shownSourceOptions(options, showDone, row.source),
         };
       }),
@@ -87,7 +88,7 @@ export const DependencyEditor = ({
         cond={view(rows$, Arr.isEmpty)}
         then={
           <p class={constant('bp6-text-muted')}>
-            {constant('依存はありません。')}
+            {constant(m.dependencies.none)}
           </p>
         }
         else={
@@ -108,7 +109,7 @@ export const DependencyEditor = ({
           type={constant('button')}
           onClick={onAdd}
         >
-          {constant('依存を追加')}
+          {constant(m.dependencies.add)}
         </button>
         <If
           cond={view(options$, (options) => options.some(({ done }) => done))}
@@ -128,7 +129,7 @@ export const DependencyEditor = ({
                 }}
               />
               <span class={constant('bp6-control-indicator')} />
-              {constant('完了したタスクも選択肢に出す')}
+              {constant(m.dependencies.showDone)}
             </label>
           }
         />

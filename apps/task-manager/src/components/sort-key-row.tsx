@@ -1,6 +1,7 @@
 import type { InitializedObservable } from 'synstate';
 import { constant, derive, view, type Bindable, type JSX } from 'synstate-dom';
 import type { SortSpec } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import {
   sortKeyLabels,
   sortOrderLabels,
@@ -29,10 +30,8 @@ export const SortKeyRow = ({
       </span>
       <span class={constant('sort-key-controls')}>
         <button
-          aria-label={view(
-            spec,
-            (s) =>
-              `${label(s)}の順序を切り替え（現在: ${sortOrderLabels[s.order]}）`,
+          aria-label={view(spec, (s) =>
+            m.sort.toggleOrder(label(s), sortOrderLabels[s.order]),
           )}
           class={constant('bp6-button bp6-small')}
           type={constant('button')}
@@ -40,10 +39,12 @@ export const SortKeyRow = ({
             actions.toggleOrder(currentIndex());
           }}
         >
-          {view(spec, (s) => (s.order === 'asc' ? '昇順 ↑' : '降順 ↓'))}
+          {view(spec, (s) =>
+            s.order === 'asc' ? m.sort.ascending : m.sort.descending,
+          )}
         </button>
         <button
-          aria-label={view(spec, (s) => `${label(s)}を上へ`)}
+          aria-label={view(spec, (s) => m.sort.moveUp(label(s)))}
           class={constant('bp6-button bp6-small bp6-minimal')}
           disabled={view(index, (i) => i === 0)}
           type={constant('button')}
@@ -54,7 +55,7 @@ export const SortKeyRow = ({
           {constant('▲')}
         </button>
         <button
-          aria-label={view(spec, (s) => `${label(s)}を下へ`)}
+          aria-label={view(spec, (s) => m.sort.moveDown(label(s)))}
           class={constant('bp6-button bp6-small bp6-minimal')}
           disabled={derive([index, count], (i, n) => i === n - 1)}
           type={constant('button')}
@@ -65,7 +66,7 @@ export const SortKeyRow = ({
           {constant('▼')}
         </button>
         <button
-          aria-label={view(spec, (s) => `${label(s)}を外す`)}
+          aria-label={view(spec, (s) => m.sort.remove(label(s)))}
           class={constant('bp6-button bp6-small bp6-minimal')}
           type={constant('button')}
           onClick={() => {

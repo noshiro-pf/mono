@@ -1,5 +1,6 @@
 import { constant, If, view, type JSX } from 'synstate-dom';
 import type { DagDirection } from '../dag/index.mjs';
+import { m } from '../i18n/index.mjs';
 import { dagLayoutStore, dagViewModeStore } from '../store/index.mjs';
 import { isArrangeable } from '../view-model/index.mjs';
 import { DagSettingsButton } from './dag-settings-button.js';
@@ -35,11 +36,11 @@ export const DagToolbar = ({ toolbarRef }: Props): JSX.Element => (
       then={
         <>
           <fieldset
-            aria-label={constant('伸ばす向き')}
+            aria-label={constant(m.dag.direction)}
             class={constant('bp6-button-group')}
           >
-            {directionButton('right', '右へ')}
-            {directionButton('down', '下へ')}
+            {directionButton('right', m.dag.right)}
+            {directionButton('down', m.dag.down)}
           </fieldset>
           <button
             class={constant('bp6-button')}
@@ -47,7 +48,7 @@ export const DagToolbar = ({ toolbarRef }: Props): JSX.Element => (
             type={constant('button')}
             onClick={dagLayoutStore.autoArrange}
           >
-            {constant('自動整列')}
+            {constant(m.dag.arrange)}
           </button>
         </>
       }

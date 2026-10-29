@@ -1,15 +1,16 @@
 import { constant, view, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { uiStore } from '../store/index.mjs';
 import type { View } from '../view-model/index.mjs';
 
 /** The list or the DAG: two buttons, the pressed one is what is shown. */
 export const ViewSwitch = (): JSX.Element => (
   <fieldset
-    aria-label={constant('表示')}
+    aria-label={constant(m.views.label)}
     class={constant('bp6-button-group view-switch')}
   >
-    {viewButton('list', 'リスト')}
-    {viewButton('dag', 'DAG')}
+    {viewButton('list', m.views.list)}
+    {viewButton('dag', m.views.dag)}
   </fieldset>
 );
 

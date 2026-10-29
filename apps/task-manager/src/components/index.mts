@@ -32,6 +32,7 @@ export * from './group-dialog.js';
 export * from './group-field.js';
 export * from './label-chips.js';
 export * from './label-input.js';
+export * from './language-field.js';
 export * from './list-toolbar.js';
 export * from './list-view.js';
 export * from './main-screen.js';

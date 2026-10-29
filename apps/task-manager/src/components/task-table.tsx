@@ -1,4 +1,5 @@
 import { constant, For, type Bindable, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import type { TaskRow } from '../view-model/index.mjs';
 import { TaskTableRow } from './task-table-row.js';
 
@@ -11,12 +12,12 @@ export const TaskTable = ({ rows }: Props): JSX.Element => (
   <table class={constant('bp6-html-table bp6-interactive task-table')}>
     <thead>
       <tr>
-        <th scope={constant('col')}>{constant('状態')}</th>
-        <th scope={constant('col')}>{constant('タイトル')}</th>
-        <th scope={constant('col')}>{constant('優先度')}</th>
-        <th scope={constant('col')}>{constant('期限')}</th>
-        <th scope={constant('col')}>{constant('ラベル')}</th>
-        <th scope={constant('col')}>{constant('見積')}</th>
+        <th scope={constant('col')}>{constant(m.fields.status)}</th>
+        <th scope={constant('col')}>{constant(m.fields.title)}</th>
+        <th scope={constant('col')}>{constant(m.fields.priority)}</th>
+        <th scope={constant('col')}>{constant(m.fields.dueDate)}</th>
+        <th scope={constant('col')}>{constant(m.fields.labels)}</th>
+        <th scope={constant('col')}>{constant(m.fields.estimate)}</th>
       </tr>
     </thead>
     <tbody>

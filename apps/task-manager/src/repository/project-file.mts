@@ -18,6 +18,7 @@ import { Arr, hasKey, isRecord, isString, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { DagLayout } from '../dag/index.mjs';
 import type { DomainState, Group } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import {
   DagLayoutDocCodec,
   dagLayoutFromDoc,
@@ -68,7 +69,7 @@ export const projectFileText = (
   );
 
 /**
- * The project `text` holds, or what is wrong with it: in Japanese, naming
+ * The project `text` holds, or what is wrong with it: in the page's language, naming
  * the record, then the codecs' own messages of which field is wrong.
  */
 export const parseProjectFile = (
@@ -77,7 +78,7 @@ export const parseProjectFile = (
   const json = Result.fromThrowable(() => JSON.parse(text) as unknown);
 
   if (Result.isErr(json)) {
-    return Result.err(['JSON として読めません。']);
+    return Result.err([m.projectFile.notJson]);
   }
 
   const head = ProjectFileHeadCodec.validate(json.value);
@@ -92,21 +93,21 @@ export const parseProjectFile = (
     head.value.tasks,
     taskFromDoc,
     (task) => TaskDocCodec.prune(taskToDoc(task)),
-    'タスク',
+    m.nodeKinds.task,
   );
 
   const milestones = readRecords(
     head.value.milestones,
     milestoneFromDoc,
     (milestone) => MilestoneDocCodec.prune(milestoneToDoc(milestone)),
-    'マイルストーン',
+    m.nodeKinds.milestone,
   );
 
   const groups = readRecords(
     head.value.groups,
     groupFromDoc,
     (group) => GroupDocCodec.prune(groupToDoc(group)),
-    'グループ',
+    m.nodeKinds.group,
   );
 
   const dagLayout: Result<DagLayout | undefined, readonly string[]> =
@@ -129,9 +130,9 @@ export const parseProjectFile = (
   }
 
   const duplicates = [
-    ...duplicateIds(tasks.value, 'タスク'),
-    ...duplicateIds(milestones.value, 'マイルストーン'),
-    ...duplicateIds(groups.value, 'グループ'),
+    ...duplicateIds(tasks.value, m.nodeKinds.task),
+    ...duplicateIds(milestones.value, m.nodeKinds.milestone),
+    ...duplicateIds(groups.value, m.nodeKinds.group),
   ] as const;
 
   return Arr.isNonEmpty(duplicates)
@@ -195,16 +196,15 @@ const headErrors = (
   !isRecord(file) ||
   !hasKey(file, 'format') ||
   file.format !== PROJECT_FILE_FORMAT
-    ? ([
-        'このアプリが書き出したプロジェクトのファイルではありません。',
-      ] as const)
+    ? ([m.projectFile.notProjectFile] as const)
     : hasKey(file, 'version') && file.version !== PROJECT_FILE_VERSION
       ? ([
-          `形式の版 ${JSON.stringify(file.version)} は読めません（読めるのは ${PROJECT_FILE_VERSION}）。`,
+          m.projectFile.unknownVersion(
+            JSON.stringify(file.version),
+            PROJECT_FILE_VERSION,
+          ),
         ] as const)
-      : Arr.toUnshifted('プロジェクトのファイルの形が正しくありません。')(
-          messages,
-        );
+      : Arr.toUnshifted(m.projectFile.malformed)(messages);
 
 /**
  * Whether Firestore takes `name` as a map key's: not `__…__`, and short
@@ -230,7 +230,7 @@ const isUsableId = (id: string): boolean =>
 /**
  * Each of `records` read by `fromDoc` with the id beside it, or a message
  * for each that is not one, or that `toDoc` makes too large to store,
- * naming it by its place: `タスク 3 件目: …`.
+ * naming it by its place: `タスク 3 件目: …` in Japanese.
  */
 const readRecords = <A,>(
   records: readonly unknown[],
@@ -239,18 +239,16 @@ const readRecords = <A,>(
   kind: string,
 ): Result<readonly A[], readonly string[]> => {
   const results = records.map((record, index) => {
-    const place = `${kind} ${index + 1} 件目` as const;
+    const place = m.projectFile.record(kind, index + 1);
 
     if (!isRecord(record) || !hasKey(record, 'id') || !isString(record.id)) {
-      return Result.err([`${place}: id がありません。`]);
+      return Result.err([m.projectFile.missingId(place)]);
     }
 
     const { id } = record;
 
     if (!isUsableId(id)) {
-      return Result.err([
-        `${place}: id「${id}」は使えません（空、「/」を含むもの、「.」「..」、「__」で始まり「__」で終わるもの、1300 バイトを超えるものは使えません）。`,
-      ]);
+      return Result.err([m.projectFile.unusableId(place, id)]);
     }
 
     const read = fromDoc(id, record);
@@ -261,7 +259,7 @@ const readRecords = <A,>(
 
     // As it would be written, without what this version leaves out.
     return docBytes(toDoc(read.value)) > MAX_RECORD_BYTES
-      ? Result.err([`${place}: 大きすぎます（1 MB まで）。`])
+      ? Result.err([m.projectFile.recordTooLarge(place)])
       : read;
   });
 
@@ -290,7 +288,7 @@ const readLayout = (data: unknown): Result<DagLayout, readonly string[]> => {
   const layout = dagLayoutFromDoc(data);
 
   if (Result.isErr(layout)) {
-    return Result.err(layout.value.map((error) => `DAG の配置: ${error}`));
+    return Result.err(layout.value.map((error) => m.projectFile.layout(error)));
   }
 
   const unusable = [
@@ -302,20 +300,18 @@ const readLayout = (data: unknown): Result<DagLayout, readonly string[]> => {
     layout.value.positions.size + layout.value.groupPositions.size >
     MAX_LAYOUT_POSITIONS
   ) {
-    return Result.err([
-      `DAG の配置: 位置が多すぎます（${MAX_LAYOUT_POSITIONS} まで）。`,
-    ]);
+    return Result.err([m.projectFile.tooManyPositions(MAX_LAYOUT_POSITIONS)]);
   }
 
   if (Arr.isNonEmpty(unusable)) {
     return Result.err(
-      unusable.map((key) => `DAG の配置: 「${key}」の位置は保存できません。`),
+      unusable.map((key) => m.projectFile.unusablePosition(key)),
     );
   }
 
   return docBytes(DagLayoutDocCodec.prune(dagLayoutToDoc(layout.value, 0))) >
     MAX_RECORD_BYTES
-    ? Result.err(['DAG の配置: 大きすぎます（1 MB まで）。'])
+    ? Result.err([m.projectFile.layoutTooLarge])
     : layout;
 };
 
@@ -333,7 +329,7 @@ const duplicateIds = (
   return Arr.generate(function* () {
     for (const [id, same] of byId) {
       if (same.length > 1) {
-        yield `${kind}の id「${id}」が ${same.length} 回あります。`;
+        yield m.projectFile.duplicateId(kind, id, same.length);
       }
     }
   });

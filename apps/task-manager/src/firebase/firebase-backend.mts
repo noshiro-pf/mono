@@ -51,6 +51,7 @@ import {
 import type { DeepReadonly } from 'ts-type-forge';
 import firebaseJson from '../../firebase.json' with { type: 'json' };
 import { getDocData, putDoc, type DocTarget } from '../api/index.mjs';
+import { lang, m } from '../i18n/index.mjs';
 import {
   personalProjectDoc,
   ProjectDocCodec,
@@ -81,7 +82,13 @@ export const createFirebaseBackend = (): Backend => {
       )
     : undefined;
 
-  const auth = getAuth(app);
+  const mut_auth = getAuth(app);
+
+  // Google's sign-in page, and Firebase's own messages, in the page's
+  // language; Firebase takes it only as a property.
+  mut_auth.languageCode = lang;
+
+  const auth = mut_auth;
 
   if (emulators !== undefined) {
     connectAuthEmulator(auth, emulators.authUrl, { disableWarnings: true });
@@ -164,7 +171,8 @@ export const createFirebaseBackend = (): Backend => {
             if (generation === mut_generation) {
               listener({
                 type: 'signed-in',
-                userName: user.displayName ?? user.email ?? 'サインイン中',
+                userName:
+                  user.displayName ?? user.email ?? m.header.signedInFallback,
                 repository: createFirestoreRepository(firestore, user.uid),
               });
             }

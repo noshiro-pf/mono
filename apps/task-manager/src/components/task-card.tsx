@@ -1,5 +1,6 @@
 import type { InitializedObservable } from 'synstate';
 import { constant, If, view, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { editorStore } from '../store/index.mjs';
 import {
   formatEstimate,
@@ -35,7 +36,9 @@ export const TaskCard = ({ row }: Props): JSX.Element => (
           then={<WarningBadge />}
         />
         <span class={constant('task-card-priority')}>
-          {view(row, ({ task }) => `優先度 ${priorityLabels[task.priority]}`)}
+          {view(row, ({ task }) =>
+            m.list.priority(priorityLabels[task.priority]),
+          )}
         </span>
       </span>
       <span class={constant('task-card-title')}>
@@ -53,9 +56,8 @@ export const TaskCard = ({ row }: Props): JSX.Element => (
           )}
           then={
             <span>
-              {view(
-                row,
-                ({ task }) => `見積 ${formatEstimate(task.estimateHours)}`,
+              {view(row, ({ task }) =>
+                m.list.estimate(formatEstimate(task.estimateHours)),
               )}
             </span>
           }

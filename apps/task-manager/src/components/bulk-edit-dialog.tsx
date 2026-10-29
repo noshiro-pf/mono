@@ -9,6 +9,7 @@ import {
   progresses,
   type NodeEdit,
 } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import {
   bulkEditStore,
   dataStore,
@@ -109,10 +110,10 @@ const BulkEditForm = ({
     >
       <div class={constant('bp6-dialog-header')}>
         <h2 class={constant('bp6-heading')} id={constant(TITLE_ID)}>
-          {constant('一括編集')}
+          {constant(m.bulkEdit.title)}
         </h2>
         <button
-          aria-label={constant('閉じる')}
+          aria-label={constant(m.common.close)}
           class={constant('bp6-button bp6-minimal')}
           type={constant('button')}
           onClick={bulkEditStore.close}
@@ -127,16 +128,16 @@ const BulkEditForm = ({
         >
           {view(counts$, ({ tasks, milestones }) =>
             [
-              tasks > 0 ? `タスク ${tasks} 件` : undefined,
-              milestones > 0 ? `マイルストーン ${milestones} 件` : undefined,
+              tasks > 0 ? m.bulkEdit.tasks(tasks) : undefined,
+              milestones > 0 ? m.bulkEdit.milestones(milestones) : undefined,
             ]
               .filter((part) => part !== undefined)
-              .join('・'),
+              .join(m.common.listSeparator),
           )}
-          {constant('を変更します。「変更しない」の項目はそのままです。')}
+          {constant(m.bulkEdit.lead)}
           {view(counts$, ({ tasks, milestones }) =>
             milestones > 0 && tasks > 0
-              ? 'マイルストーンには進捗とラベルはありません。'
+              ? m.bulkEdit.milestonesHaveNoProgress
               : '',
           )}
         </p>
@@ -146,7 +147,7 @@ const BulkEditForm = ({
             then={
               <>
                 <label class={constant('bp6-label field')}>
-                  {constant('進捗')}
+                  {constant(m.fields.progress)}
                   <HtmlSelect
                     data-e2e={constant('bulk-progress-select')}
                     fill
@@ -160,7 +161,7 @@ const BulkEditForm = ({
                     }}
                   >
                     <option value={constant(KEEP)}>
-                      {constant('変更しない')}
+                      {constant(m.common.unchanged)}
                     </option>
                     {progresses.map((progress) => (
                       <option value={constant(progress)}>
@@ -170,7 +171,7 @@ const BulkEditForm = ({
                   </HtmlSelect>
                 </label>
                 <LabelInput
-                  caption={'追加するラベル'}
+                  caption={m.bulkEdit.addLabels}
                   e2e={'bulk-add-labels'}
                   id={'bulk-add-labels'}
                   known={dataStore.state.pipe(map(labelsByUse))}
@@ -188,7 +189,7 @@ const BulkEditForm = ({
                       class={constant('field field-wide bulk-remove-labels')}
                     >
                       <legend class={constant('field-label')}>
-                        {constant('外すラベル')}
+                        {constant(m.bulkEdit.removeLabels)}
                       </legend>
                       <For items={labels$} key={(label) => label}>
                         {(label$) => (
@@ -225,7 +226,7 @@ const BulkEditForm = ({
             }
           />
           <label class={constant('bp6-label field')}>
-            {constant('グループ')}
+            {constant(m.fields.group)}
             <HtmlSelect
               data-e2e={constant('bulk-group-select')}
               fill
@@ -246,8 +247,10 @@ const BulkEditForm = ({
                 );
               }}
             >
-              <option value={constant(KEEP)}>{constant('変更しない')}</option>
-              <option value={constant(NONE)}>{constant('なし')}</option>
+              <option value={constant(KEEP)}>
+                {constant(m.common.unchanged)}
+              </option>
+              <option value={constant(NONE)}>{constant(m.common.none)}</option>
               <For items={dataStore.groups} key={(group) => group.id}>
                 {(group$) => (
                   <option value={view(group$, ({ id }) => `${GROUP}${id}`)}>
@@ -267,14 +270,14 @@ const BulkEditForm = ({
             type={constant('button')}
             onClick={bulkEditStore.close}
           >
-            {constant('キャンセル')}
+            {constant(m.common.cancel)}
           </button>
           <button
             class={constant('bp6-button bp6-intent-primary')}
             data-e2e={constant('bulk-save')}
             type={constant('submit')}
           >
-            {constant('保存')}
+            {constant(m.common.save)}
           </button>
         </div>
       </div>

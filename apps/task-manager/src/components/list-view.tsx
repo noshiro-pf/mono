@@ -1,6 +1,7 @@
 import { combine, map } from 'synstate';
 import { constant, If, view, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
+import { m } from '../i18n/index.mjs';
 import {
   clockStore,
   dataStore,
@@ -32,7 +33,7 @@ export const ListView = (): JSX.Element => {
       >
         <div class={constant('section-header')}>
           <h2 class={constant('section-title')} id={constant(TASKS_HEADING_ID)}>
-            {constant('タスク')}
+            {constant(m.list.tasks)}
           </h2>
           <ListToolbar />
         </div>
@@ -40,7 +41,7 @@ export const ListView = (): JSX.Element => {
           cond={view(dataStore.status, (status) => status === 'loading')}
           then={
             <output class={constant('bp6-text-muted')}>
-              {constant('読み込み中…')}
+              {constant(m.app.loading)}
             </output>
           }
           else={
@@ -48,9 +49,7 @@ export const ListView = (): JSX.Element => {
               cond={view(rows$, Arr.isEmpty)}
               then={
                 <p class={constant('bp6-text-muted')}>
-                  {constant(
-                    '表示するタスクはありません。「＋タスク」から追加できます。',
-                  )}
+                  {constant(m.list.noTasks)}
                 </p>
               }
               else={

@@ -1,4 +1,5 @@
 import { constant, If, type Bindable, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 
 type Props = Readonly<{
   /** Folded into a `<details>`, for a milestone that already exists. */
@@ -40,36 +41,16 @@ export const MilestoneExplanation = ({ collapsed }: Props): JSX.Element => (
 
 const ExplanationBody = (): JSX.Element => (
   <>
-    <p>
-      {constant(
-        '作業そのものではなく、タスクが着手可能になるタイミングを表す目印です（所要時間ゼロ）。下の到達条件がすべて満たされると「到達」し、このマイルストーンに依存するタスクが着手可（Ready）になります。',
-      )}
-    </p>
+    <p>{constant(m.milestoneExplanation.what)}</p>
     <ul>
-      <li>
-        {constant(
-          '日時: その日時になると到達します（例: 10/9 以降に着手したいタスクの前に置く）。',
-        )}
-      </li>
-      <li>
-        {constant(
-          '手動チェック: 「解消」を押すと到達します（例: 先方の返答待ちなど、外部要因のブロッカー）。',
-        )}
-      </li>
-      <li>
-        {constant(
-          '依存: タスクの完了・開始や、ほかのマイルストーンの到達を待ちます（例: 複数のタスクの完了をまとめた「実装完了」）。',
-        )}
-      </li>
+      <li>{constant(m.milestoneExplanation.date)}</li>
+      <li>{constant(m.milestoneExplanation.check)}</li>
+      <li>{constant(m.milestoneExplanation.dependency)}</li>
     </ul>
-    <p>
-      {constant(
-        '条件を何も指定しないと、作成した時点で到達済みになります。条件が後から満たされなくなった場合（依存先のタスクを差し戻したなど）は、未到達に戻ります。',
-      )}
-    </p>
+    <p>{constant(m.milestoneExplanation.none)}</p>
   </>
 );
 
-const HEADING = 'マイルストーンとは';
+const HEADING = m.milestoneExplanation.heading;
 
 const HEADING_ID = 'milestone-explanation-heading';

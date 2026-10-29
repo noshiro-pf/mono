@@ -6,6 +6,7 @@ import {
   type JSX,
 } from 'synstate-dom';
 import type { Mutable } from 'ts-type-forge';
+import { m } from '../i18n/index.mjs';
 import {
   editorStore,
   groupEditorStore,
@@ -21,7 +22,7 @@ type Props = Readonly<{
 
 export const AppHeader = ({ userName }: Props): JSX.Element => (
   <header class={constant('app-header')}>
-    <h1 class={constant('app-title')}>{constant('タスク管理')}</h1>
+    <h1 class={constant('app-title')}>{constant(m.app.title)}</h1>
     <ViewSwitch />
     <div class={constant('header-actions')}>
       <button
@@ -30,7 +31,7 @@ export const AppHeader = ({ userName }: Props): JSX.Element => (
         type={constant('button')}
         onClick={editorStore.createTask}
       >
-        {constant('＋タスク')}
+        {constant(m.header.addTask)}
       </button>
       <button
         class={constant('bp6-button')}
@@ -38,7 +39,7 @@ export const AppHeader = ({ userName }: Props): JSX.Element => (
         type={constant('button')}
         onClick={editorStore.createMilestone}
       >
-        {constant('＋マイルストーン')}
+        {constant(m.header.addMilestone)}
       </button>
       {/* Drawn in 「DAG」 alone, and chosen in a node's dialog in any view. */}
       <button
@@ -47,23 +48,23 @@ export const AppHeader = ({ userName }: Props): JSX.Element => (
         type={constant('button')}
         onClick={groupEditorStore.create}
       >
-        {constant('＋グループ')}
+        {constant(m.header.addGroup)}
       </button>
       <button
         class={constant('bp6-button bp6-minimal')}
         data-e2e={constant('export-project')}
-        title={constant('プロジェクトをファイルに書き出す')}
+        title={constant(m.header.exportTitle)}
         type={constant('button')}
         onClick={projectFileStore.exportProject}
       >
-        {constant('書き出す')}
+        {constant(m.header.export)}
       </button>
       {/* The input is hidden; the label is what is clicked, and chosen by keyboard. */}
       <label
         class={constant('bp6-button bp6-minimal project-import-button')}
-        title={constant('ファイルからプロジェクトを読み込む')}
+        title={constant(m.header.importTitle)}
       >
-        {constant('読み込む')}
+        {constant(m.header.import)}
         <input
           accept={constant('.json,application/json')}
           class={constant('visually-hidden')}
@@ -86,7 +87,7 @@ export const AppHeader = ({ userName }: Props): JSX.Element => (
                 .catch((error: unknown) => {
                   console.error(error);
 
-                  uiStore.showNotice(`「${file.name}」を読めませんでした。`);
+                  uiStore.showNotice(m.header.unreadableFile(file.name));
                 });
             }
           }}
@@ -95,12 +96,12 @@ export const AppHeader = ({ userName }: Props): JSX.Element => (
       <button
         class={constant('bp6-button bp6-minimal')}
         disabled={view(sessionStore.signOutState, (state) => state !== 'idle')}
-        title={mapBindable(userName, (name) => `${name} としてサインイン中`)}
+        title={mapBindable(userName, (name) => m.header.signedInAs(name))}
         type={constant('button')}
         onClick={sessionStore.signOut}
       >
         {view(sessionStore.signOutState, (state) =>
-          state === 'waiting' ? 'サインアウト中…' : 'サインアウト',
+          state === 'waiting' ? m.header.signingOut : m.header.signOut,
         )}
       </button>
     </div>

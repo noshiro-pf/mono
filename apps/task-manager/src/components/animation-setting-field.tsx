@@ -1,5 +1,6 @@
 import { HtmlSelect } from 'blueprint-synstate';
 import { constant, type JSX } from 'synstate-dom';
+import { m } from '../i18n/index.mjs';
 import { animationSettingStore } from '../store/index.mjs';
 import {
   animationSettingLabels,
@@ -16,7 +17,7 @@ export const AnimationSettingField = (): JSX.Element => (
   <div class={constant('settings-field')}>
     <label class={constant('settings-field-control')}>
       <span class={constant('settings-field-label')}>
-        {constant('アニメーション')}
+        {constant(m.settings.animation)}
       </span>
       <HtmlSelect
         aria-describedby={constant(HINT_ID)}
@@ -40,9 +41,7 @@ export const AnimationSettingField = (): JSX.Element => (
       </HtmlSelect>
     </label>
     <p class={constant('settings-hint')} id={constant(HINT_ID)}>
-      {constant(
-        'ノードが位置へ移るときのアニメーション。「自動」は端末の「視差効果を減らす」に従います。どの設定でも、動きが重いときは途中で止めてすぐ位置に置きます。',
-      )}
+      {constant(m.settings.animationHint)}
     </p>
   </div>
 );

@@ -45,6 +45,7 @@ import {
   type GraphNodeId,
   type GroupId,
 } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 import {
   clockStore,
   dagHiddenNodes,
@@ -583,7 +584,10 @@ export const createDagCanvasScene = ({
         : Optional.some({
             at: selected.at,
             scale,
-            label: `「${nodeViews.get(selected.edge.to)?.title ?? ''}」の「${nodeViews.get(selected.edge.from)?.title ?? ''}」への依存を削除`,
+            label: m.dag.deleteEdge(
+              nodeViews.get(selected.edge.to)?.title ?? '',
+              nodeViews.get(selected.edge.from)?.title ?? '',
+            ),
             from: selected.edge.from,
             to: selected.edge.to,
           }),

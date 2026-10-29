@@ -8,6 +8,7 @@
 import { createState, type InitializedObservable } from 'synstate';
 import type { RelaxedExtract } from 'ts-type-forge';
 import { asGroupId, type Group, type GroupId } from '../domain/index.mjs';
+import { m } from '../i18n/index.mjs';
 
 export type GroupEditorState = Readonly<
   | { type: 'closed' }
@@ -105,7 +106,7 @@ export const createGroupEditorStore = (
       const title = current.title.trim();
 
       if (title === '') {
-        setEditor({ ...current, error: 'グループ名を入力してください。' });
+        setEditor({ ...current, error: m.groups.nameRequired });
 
         return;
       }
