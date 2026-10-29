@@ -10,7 +10,7 @@ import {
   showToast,
 } from '../../functions/index.mjs';
 import { createReducerWithActions } from '../../utils/index.mjs';
-import { Router } from '../router.mjs';
+import { Router } from '../store.mjs';
 
 const dc = dict.register;
 

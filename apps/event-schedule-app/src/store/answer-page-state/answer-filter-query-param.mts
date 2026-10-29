@@ -21,7 +21,7 @@ import {
   type AnswerRank,
   type AnswersScore,
 } from '../../types/index.mjs';
-import { Router } from '../router.mjs';
+import { Router } from '../store.mjs';
 
 const keyDef = Routes.queryParamKey.answerTableState;
 

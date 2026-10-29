@@ -16,7 +16,7 @@ import {
   showToast,
 } from '../../functions/index.mjs';
 import { createReducerWithActions } from '../../utils/index.mjs';
-import { Auth } from '../auth.mjs';
+import { Auth } from '../store.mjs';
 import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state.mjs';
 
 const dc = dict.accountSettings;

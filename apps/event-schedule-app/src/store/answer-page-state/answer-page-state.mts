@@ -40,9 +40,8 @@ import {
 import type { AnswerSelectionValue } from '../../types/index.mjs';
 import { Obj } from '../../utils-ported/index.mjs';
 import { createReducerWithActions } from '../../utils/index.mjs';
-import { Auth } from '../auth.mjs';
 import { AnswersStore, eventSchedule$ } from '../fetching-state/index.mjs';
-import { Router } from '../router.mjs';
+import { Auth, Router } from '../store.mjs';
 
 const toast = createToaster();
 

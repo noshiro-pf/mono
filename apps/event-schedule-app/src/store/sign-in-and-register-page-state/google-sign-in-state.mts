@@ -3,7 +3,7 @@ import { Optional, Result } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { Routes, dict } from '../../constants/index.mjs';
 import { createToaster, showToast } from '../../functions/index.mjs';
-import { Router } from '../router.mjs';
+import { Router } from '../store.mjs';
 
 const dc = dict.register;
 

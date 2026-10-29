@@ -24,7 +24,7 @@ import type {
   NotificationSettingsWithEmail,
 } from '../../types/index.mjs';
 import { mapNoneToUndefined } from '../../utils/index.mjs';
-import { Auth } from '../auth.mjs';
+import { Auth } from '../store.mjs';
 import { createToggleSectionState } from '../utils/index.mjs';
 
 type ReturnValues = Readonly<{

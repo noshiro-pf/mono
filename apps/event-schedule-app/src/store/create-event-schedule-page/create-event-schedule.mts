@@ -33,7 +33,7 @@ import {
 import type { EventScheduleSettingCommonState } from '../../types/index.mjs';
 import { toAbsolutePath } from '../../utils-ported/index.mjs';
 import { now } from '../../utils/index.mjs';
-import { Auth } from '../auth.mjs';
+import { Auth } from '../store.mjs';
 import { createEventScheduleSettingStore } from './event-schedule-setting-common.mjs';
 
 const toast = createToaster();

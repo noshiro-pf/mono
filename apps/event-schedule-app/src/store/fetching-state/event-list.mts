@@ -19,8 +19,8 @@ import { Result, isNotUndefined, tp } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { fetchThrottleTime } from '../../constants/index.mjs';
 import { createReducerWithActions } from '../../utils/index.mjs';
-import { Auth } from '../auth.mjs';
 import { EventListPageFilterStore } from '../event-list-page-state/index.mjs';
+import { Auth } from '../store.mjs';
 
 const [fetchEventList$, fetchEventList] = createEventEmitter();
 
