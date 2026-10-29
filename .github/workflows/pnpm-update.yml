@@ -1,16 +1,19 @@
 name: pnpm update
 
-# Runs this repository's own `update-packages` and `update-actions` scripts
-# together with `pnpm self-update`, and opens a single bundled pull request that
+# Runs this repository's own `update-packages`, `update-actions` and
+# `update-release-binaries` scripts together with `pnpm self-update`, and opens
+# a single bundled pull request that
 # auto-merges once CI passes. It runs twice a week and always rebuilds from
 # main, so the pull request follows main rather than accumulating a new one per
 # run.
 #
 # This replaces Dependabot entirely: the npm dependencies come from
 # `update-packages` (whose skip rules — `update.ignoreDeps`,
-# `minimumReleaseAge` — live in pnpm-workspace.yaml), and the action pins in
-# `.github/workflows/` and `.github/actions/` come from `update-actions`.
-# There is no .github/dependabot.yml.
+# `minimumReleaseAge` — live in pnpm-workspace.yaml), the action pins in
+# `.github/workflows/` and `.github/actions/` come from `update-actions`, and
+# the release binaries in `tools/configs/release-binaries.json` (actionlint,
+# shellcheck) from `update-release-binaries`. There is no
+# .github/dependabot.yml.
 #
 # `update-packages` also carries `--filter '!./strict-lib/v*/output/lib'`, which
 # is the one skip that cannot live in pnpm-workspace.yaml. Those twelve
@@ -99,9 +102,9 @@ jobs:
         with:
           persist-credentials: false
 
-      # `install: false`: the two steps below change pnpm and the action pins
-      # before anything is installed, and "Update dependencies" installs once
-      # they have.
+      # `install: false`: the three steps below change pnpm, the action pins
+      # and the release-binary pins before anything is installed, and "Update
+      # dependencies" installs once they have.
       - name: Set up pnpm and Node.js
         uses: ./.github/actions/setup
         with:
@@ -144,6 +147,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node ./tools/scripts/cmd/mature-updates.mts actions
+
+      # The same, for the binaries `check:root:actionlint` downloads
+      # (actionlint, shellcheck): a version and one SHA-256 per platform in
+      # `tools/configs/release-binaries.json`, the digests read from the
+      # Releases API. How far it moves on its own is in the script's header.
+      - name: Update the release-binary pins
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node ./tools/scripts/cmd/mature-updates.mts release-binaries
 
       - name: Update dependencies
         run: |
@@ -279,10 +291,12 @@ jobs:
           # job that holds the key — `pnpm install` and
           # `verify:npm-packages:published:update` write manifests, the
           # lockfile and the catalog, `update-changeset` writes one changeset,
-          # and `update-actions` moves the action pins in the workflows and in
+          # `update-actions` moves the action pins in the workflows and in
           # the composite actions under `.github/actions/` — the two places
           # `mature-updates.mts` reads; a third has to be named in both, or
-          # its pins stop moving without a word. A patch reaching
+          # its pins stop moving without a word — and
+          # `update-release-binaries` rewrites
+          # `tools/configs/release-binaries.json`. A patch reaching
           # beyond that is not a dependency update whatever it is, and this is
           # the last point before it becomes a commit that auto-merges.
           #
@@ -313,12 +327,33 @@ jobs:
             | grep -Ev '(^|/)package\.json$' \
             | grep -Ev '^\.changeset/[^/]+\.md$' \
             | grep -Ev '^\.github/workflows/[^/]+\.ya?ml$' \
-            | grep -Ev '^\.github/actions/(.+/)?action\.ya?ml$' || true)"
+            | grep -Ev '^\.github/actions/(.+/)?action\.ya?ml$' \
+            | grep -Ev '^tools/configs/release-binaries\.json$' || true)"
 
           if [ -n "$unexpected" ]; then
             echo '::error::The patch carries paths a dependency update does not write, so it is not one; refusing to commit it.'
             printf '%s\n' "$unexpected"
             exit 1
+          fi
+
+          # The pin file decides which binary every `check:root` downloads and
+          # runs, and `update-release-binaries` changes only its `version` and
+          # `sha256` values. A repository, an asset name or a path in the
+          # archive changing is not a version moving, so the file is compared
+          # with those two values taken out, and anything else refuses it.
+          # The two values are spliced into a download URL and a path, so
+          # every tool's version and every asset's digest has to be there and
+          # look like what it is, too (`\A`/`\z`, since jq's `$` also matches
+          # before a trailing newline).
+          pins='tools/configs/release-binaries.json'
+          if ! git diff --cached --quiet -- "$pins"; then
+            strip='map_values(del(.version) | .assets |= map_values(del(.sha256)))'
+            well_formed='[.[] | (.version | type == "string" and test("\\A[0-9]+\\.[0-9]+\\.[0-9]+\\z")), (.assets[] | .sha256 | type == "string" and test("\\A[0-9a-f]{64}\\z"))] | all'
+            if [ "$(git show "HEAD:${pins}" | jq -S "$strip")" != "$(jq -S "$strip" "$pins")" ] ||
+              [ "$(jq "$well_formed" "$pins")" != 'true' ]; then
+              echo "::error::The patch changes ${pins} beyond well-formed versions and digests; refusing to commit it."
+              exit 1
+            fi
           fi
 
           git commit -m "chore: update dependencies"
@@ -342,6 +377,6 @@ jobs:
               --head "$branch" \
               --label merge-queued \
               --title "chore: update dependencies" \
-              --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm run update-actions\` + \`pnpm self-update\`. The latter two go through \`tools/scripts/cmd/mature-updates.mts\`, which holds pnpm itself and the action pins to \`minimumReleaseAge\` the way pnpm holds npm dependencies. Action pins move within their major only, so a major waits for a human. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
+              --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm run update-actions\` + \`pnpm run update-release-binaries\` + \`pnpm self-update\`. The latter three go through \`tools/scripts/cmd/mature-updates.mts\`, which holds pnpm itself, the action pins and the release-binary pins (actionlint, shellcheck) to \`minimumReleaseAge\` the way pnpm holds npm dependencies. Action pins move within their major only, and release-binary pins within their major or, for a \`0.x\` version, their minor, so the next one waits for a human. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
           fi
           gh pr merge --auto --squash "$branch"

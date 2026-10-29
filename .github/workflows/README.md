@@ -242,7 +242,9 @@ written, rather than every job that takes the steps.
   or passes `NODE_AUTH_TOKEN` to the install.
 - **Composite actions live under `.github/actions/`**, which is where
   `update-actions` reads pins besides the workflows, and the only other path
-  `pnpm-update.yml`'s `commit` job accepts in its patch. An action anywhere
+  under `.github/` that `pnpm-update.yml`'s `commit` job accepts in its patch
+  (outside it, the manifests, the lockfile, a changeset and
+  `tools/configs/release-binaries.json`). An action anywhere
   else keeps its pins where they are, and nothing reports it.
 
 ### The gate: `check-gates.yml`
@@ -758,9 +760,10 @@ Nothing checks this; a review does.
   `check:root:ci-commands`, `check:root:workflow-event-name`,
   `check:root:node-support`. `fmt` and `check:cspell` read it too; CI itself
   runs nothing on a workflow change until the pull request runs.
-- **`check:root:actionlint` needs `actionlint` and `shellcheck` on `PATH`**,
-  at exactly the versions `code-check.yml` pins for CI. No update workflow
-  moves them; that step's comment says how to bump them.
+  `check:root:actionlint` also lints the composite actions' `run:` blocks,
+  which actionlint does not read on its own. It downloads the actionlint and
+  shellcheck that `tools/configs/release-binaries.json` pins, so it needs
+  nothing installed; `pnpm-update.yml` moves those pins.
 - **`.github/workflows/` and `.github/actions/` are owned in
   `.github/CODEOWNERS`**, so a change there waits for the owner's review, and
   a bot's pull request that touches either does not auto-merge. The action
