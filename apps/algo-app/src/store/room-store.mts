@@ -29,6 +29,11 @@ export type RoomStore = Readonly<{
   /** Watches this room instead of the one before it, once started. */
   setRoomId: (roomId: string) => void;
   myName: InitializedObservable<string | undefined>;
+  /**
+   * Names this player, for a page opened as one: the name lives in memory
+   * only, so a reload knows it only from the page's query.
+   */
+  setMyName: (myName: string) => void;
   createRoom: Readonly<{
     /** The room just created, with its id. */
     response: SynstateObservable<Room>;
@@ -157,6 +162,7 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
     actionsFromDb,
     setRoomId,
     myName,
+    setMyName,
     createRoom,
     joinRoom,
     start,

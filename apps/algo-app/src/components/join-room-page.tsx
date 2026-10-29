@@ -3,7 +3,8 @@ import { styled } from 'goober';
 import { memoNamed } from 'preact-utils';
 import { useCallback } from 'preact/hooks';
 import { useObservableValue } from 'synstate-preact-hooks';
-import { dictionary } from '../constants/index.mjs';
+import { dictionary, roomPage } from '../constants/index.mjs';
+import { Router } from '../router.mjs';
 import { roomStore } from '../store/index.mjs';
 import { ButtonPrimary, Input, Spinner } from './bp/index.mjs';
 
@@ -14,7 +15,6 @@ type Props = Readonly<{ roomId: string }>;
 export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
   /*
     TODO:
-    local state に自分の名前を追加
     roomに自分の名前があればゲーム開始前画面を表示
    */
 
@@ -38,11 +38,12 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
       [setUsername],
     );
 
-  const disabled: boolean = username === '';
+  const room = useObservableValue(roomStore.room);
+
+  // Joining checks the password against the room, so it waits for the room.
+  const disabled: boolean = username === '' || room === undefined;
 
   const [showPasswordError, setShowPasswordError] = useState<boolean>(false);
-
-  const room = useObservableValue(roomStore.room);
 
   const onJoinRoomButtonClick = useCallback(() => {
     if (room === undefined) {
@@ -55,7 +56,14 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
       return;
     }
 
-    roomStore.joinRoom.dispatch(roomId, username).catch(console.error);
+    // Navigated once the join has settled rather than from a subscriber, so
+    // the router is not written to while the store's update propagates.
+    roomStore.joinRoom
+      .dispatch(roomId, username)
+      .then(() => {
+        Router.push(roomPage(roomId, username));
+      })
+      .catch(console.error);
   }, [room, roomId, username, password, setShowPasswordError]);
 
   const loading = useObservableValue(roomStore.joinRoom.isWaitingResponse);

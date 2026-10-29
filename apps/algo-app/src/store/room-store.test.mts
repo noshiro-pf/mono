@@ -63,6 +63,16 @@ describe(createRoomStore, () => {
     assert.deepStrictEqual(api.watching(), []);
   });
 
+  test('setMyName names the player, as a page opened as that player does', () => {
+    const { store } = setup();
+
+    assert.isUndefined(store.myName.getSnapshot().value);
+
+    store.setMyName('bob');
+
+    assert.strictEqual(store.myName.getSnapshot().value, 'bob');
+  });
+
   test('createRoom saves a room with the player in it, and answers with its id', async () => {
     const { store, api } = setup();
 
