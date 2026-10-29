@@ -3,6 +3,10 @@ language: en
 allowCompoundWords: true
 caseSensitive: false
 ignoreRandomStrings: true
+# `.changeset` stays checked, never listed here: a changeset's words belong in
+# the config of the package it names, since `changeset version` copies its
+# body into that package's changelog, which is checked there
+# (`check:cspell:changeset`).
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml

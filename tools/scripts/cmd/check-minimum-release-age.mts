@@ -8,10 +8,10 @@ import { projectRootPath } from '../project-root-path.mjs';
 /**
  * Fails when a `minimumReleaseAgeExclude` entry would outlive its reason.
  *
- * CLAUDE.md ("Dependencies") states the rule: an entry is a waiver, not a
- * policy, so it names a version and `minimumReleaseAgeExcludePrune` drops it
- * once the lockfile stops resolving it. Two spellings defeat that, and pnpm
- * takes both without a word:
+ * `pnpm-workspace.yaml`, above the list, states the rule: an entry is a
+ * waiver, not a policy, so it names a version and
+ * `minimumReleaseAgeExcludePrune` drops it once the lockfile stops resolving
+ * it. Two spellings defeat that, and pnpm takes both without a word:
  *
  * - **A bare name exempts every version, for good.** Measured on pnpm 12.3.4:
  *   with `- vite` on the list, `pnpm update --latest` took a release published

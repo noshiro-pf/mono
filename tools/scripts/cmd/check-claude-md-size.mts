@@ -56,7 +56,7 @@ export const countLines = (text: string): number =>
  * The most lines `CLAUDE.md` may have. Raising it is a decision: say why in
  * the commit that does it.
  */
-const LINE_BUDGET = 560;
+const LINE_BUDGET = 541;
 
 const CLAUDE_MD = 'CLAUDE.md';
 
