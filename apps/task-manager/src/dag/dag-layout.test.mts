@@ -1,4 +1,4 @@
-import { asGroupId, type GraphNodeId } from '../domain/index.mjs';
+import { asGroupId, type GraphNodeId, type GroupId } from '../domain/index.mjs';
 import {
   arrowKeyDelta,
   defaultDirection,
@@ -10,6 +10,7 @@ import {
   PLACEMENT_GAP,
   placeNodes,
   positionsOf,
+  scaleArrangement,
 } from './dag-layout.mjs';
 import type { LaidOutEdge, LaidOutNode } from './graph-layout.mjs';
 import type { Point } from './pan-zoom.mjs';
@@ -161,6 +162,30 @@ describe(positionsOf, () => {
         ['task:a', { x: 24, y: 24 }],
         ['milestone:m', { x: 200, y: 30 }],
       ]),
+    );
+  });
+});
+
+describe(scaleArrangement, () => {
+  test('multiplies where every node and every frame is, and keeps the direction', () => {
+    const g = asGroupId('g');
+
+    assert.deepStrictEqual(
+      scaleArrangement(
+        {
+          direction: 'down',
+          positions: new Map<GraphNodeId, Point>([
+            ['task:a', { x: 10, y: -20 }],
+          ]),
+          groupPositions: new Map<GroupId, Point>([[g, { x: 4, y: 6 }]]),
+        },
+        { x: 1.5, y: 2 },
+      ),
+      {
+        direction: 'down',
+        positions: new Map<GraphNodeId, Point>([['task:a', { x: 15, y: -40 }]]),
+        groupPositions: new Map<GroupId, Point>([[g, { x: 6, y: 12 }]]),
+      },
     );
   });
 });

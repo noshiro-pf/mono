@@ -1,8 +1,9 @@
 import { createState } from 'synstate';
-import { Arr } from 'ts-data-forge';
+import { Arr, Num } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import {
   ARC_NODE_GAP,
+  arrangementScale,
   COMPACT_MILESTONE_NODE_SIZE,
   COMPACT_TASK_NODE_SIZE,
   EMPTY_GROUP_SIZE,
@@ -10,6 +11,7 @@ import {
   GROUP_PADDING,
   MILESTONE_NODE_SIZE,
   PLACEMENT_GAP,
+  scaleArrangement,
   TASK_NODE_SIZE,
   TILE_NODE_GAP,
   type DagDirection,
@@ -373,6 +375,25 @@ const setup = (
     saved: mut_saved,
   };
 };
+
+/**
+ * Two tasks put somewhere, as stored: where `task:a` is does not come back
+ * the same from 「大」 by multiplying and dividing.
+ */
+const spreadStored: DagLayout = {
+  direction: 'right',
+  positions: new Map<GraphNodeId, Point>([
+    ['task:a', { x: 11, y: 22 }],
+    ['task:b', { x: 300, y: 40 }],
+  ]),
+  groupPositions: new Map<GroupId, Point>(),
+} as const;
+
+/** `spreadStored` as drawn at 「大」. */
+const spreadAtLarge: ReadonlyMap<GraphNodeId, Point> = scaleArrangement(
+  spreadStored,
+  arrangementScale('large'),
+).positions;
 
 const positions = (
   entries: readonly (readonly [GraphNodeId, Point])[],
@@ -1936,6 +1957,324 @@ describe(createDagLayoutStore, () => {
       assert.strictEqual(store.fitRequests.getSnapshot().value, fits + 1);
 
       assert.deepStrictEqual(saved, []);
+    });
+
+    test('at 「大」, draws what is stored spread out', async () => {
+      const { store } = await shown({
+        stored: spreadStored,
+        nodeSize: 'large',
+      });
+
+      assert.deepStrictEqual(
+        store.arrangement.getSnapshot().value.positions,
+        spreadAtLarge,
+      );
+    });
+
+    test('switched to 「大」, spreads the nodes put somewhere once ELK has laid it out, and writes nothing', async () => {
+      const { store, deferred, clock, saved, setNodeSize } = await shown({
+        stored: spreadStored,
+      });
+
+      setNodeSize('large');
+
+      // Nothing moves until the new layout is there.
+      assert.deepStrictEqual(
+        store.arrangement.getSnapshot().value,
+        spreadStored,
+      );
+
+      deferred.resolve(1, 60);
+
+      await settle();
+
+      assert.deepStrictEqual(animated(store), spreadStored.positions);
+
+      clock.advance(ANIMATION_MS);
+
+      assert.isUndefined(animated(store));
+
+      assert.deepStrictEqual(
+        store.arrangement.getSnapshot().value.positions,
+        spreadAtLarge,
+      );
+
+      setNodeSize('standard');
+
+      deferred.resolve(2, 60);
+
+      await settle();
+
+      // Drawn again from what is stored, not off by rounding.
+      assert.deepStrictEqual(
+        store.arrangement.getSnapshot().value,
+        spreadStored,
+      );
+
+      assert.deepStrictEqual(saved, []);
+    });
+
+    test('switched to 「大」 outside the DAG, spreads the arrangement too once ELK has laid it out', async () => {
+      const { store, deferred, setNodeSize } = await shown({
+        stored: spreadStored,
+        viewMode: 'tile',
+      });
+
+      setNodeSize('large');
+
+      deferred.resolve(1, 60);
+
+      await settle();
+
+      assert.deepStrictEqual(
+        store.arrangement.getSnapshot().value.positions,
+        spreadAtLarge,
+      );
+    });
+
+    test('at 「大」, saves a move as at 「標準」, the nodes not moved as they were read, and moves nothing when it comes back', async () => {
+      const { store, saved, setStored } = await shown({
+        stored: spreadStored,
+        nodeSize: 'large',
+      });
+
+      const scale = arrangementScale('large');
+
+      store.moveNode('task:b', { x: 50, y: 30 });
+
+      assert.deepStrictEqual(saved, [
+        {
+          direction: 'right',
+          positions: positions([
+            ['task:a', { x: 11, y: 22 }],
+            ['task:b', { x: Num.div(50, scale.x), y: Num.div(30, scale.y) }],
+          ]),
+          groupPositions: new Map<GroupId, Point>(),
+        },
+      ]);
+
+      const drawn = store.arrangement.getSnapshot().value;
+
+      assert.deepStrictEqual(drawn.positions.get('task:b'), { x: 50, y: 30 });
+
+      setStored(saved[0]);
+
+      assert.strictEqual(store.arrangement.getSnapshot().value, drawn);
+
+      assert.isUndefined(animated(store));
+    });
+
+    test('carries a move not yet saved to 「大」, and saves it as at 「標準」', async () => {
+      const { store, deferred, saved, timer, setNodeSize } = await shown({
+        stored: spreadStored,
+      });
+
+      store.nudgeNode('task:b', { x: 8, y: 0 });
+
+      setNodeSize('large');
+
+      deferred.resolve(1, 60);
+
+      await settle();
+
+      assert.deepStrictEqual(saved, []);
+
+      timer.fire();
+
+      const written = saved[0]?.positions;
+
+      assert.isDefined(written);
+
+      // Not moved: as it was read.
+      assert.deepStrictEqual(written.get('task:a'), { x: 11, y: 22 });
+
+      assert.closeTo(written.get('task:b')?.x ?? Number.NaN, 308, 1e-9);
+
+      assert.closeTo(written.get('task:b')?.y ?? Number.NaN, 40, 1e-9);
+    });
+
+    test('「自動整列」 asked for while ELK lays out 「大」 moves the nodes from where they were drawn', async () => {
+      const { store, deferred, saved, setNodeSize } = await shown({
+        stored: spreadStored,
+      });
+
+      setNodeSize('large');
+
+      store.autoArrange();
+
+      deferred.resolve(1, 60);
+
+      await settle();
+
+      assert.deepStrictEqual(animated(store), spreadStored.positions);
+
+      const scale = arrangementScale('large');
+
+      assert.deepStrictEqual(
+        saved[0]?.positions,
+        positions([
+          ['task:a', { x: 0, y: 0 }],
+          ['task:b', { x: Num.div(60, scale.x), y: 0 }],
+        ]),
+      );
+    });
+
+    test('a DAG still as 「自動整列」 left it moves a node new to it from where it would be put', async () => {
+      const { store, deferred, clock, setState } = await shown();
+
+      store.autoArrange();
+
+      clock.advance(ANIMATION_MS);
+
+      setState(three);
+
+      deferred.resolve(1, 120);
+
+      await settle();
+
+      const start = animated(store)?.get('task:c');
+
+      assert.isDefined(start);
+
+      assert.notDeepEqual(start, { x: 240, y: 0 });
+
+      clock.advance(ANIMATION_MS);
+
+      assert.deepStrictEqual(
+        store.arrangement.getSnapshot().value.positions.get('task:c'),
+        { x: 240, y: 0 },
+      );
+    });
+
+    test('「自動整列」 asked for while ELK lays out 「大」 moves a node ELK placed from where it was drawn', async () => {
+      const { store, deferred, setNodeSize } = await shown({
+        stored: {
+          direction: 'right',
+          positions: positions([['task:a', { x: 0, y: 300 }]]),
+          groupPositions: new Map<GroupId, Point>(),
+        },
+      });
+
+      setNodeSize('large');
+
+      store.autoArrange();
+
+      deferred.resolve(1, 400);
+
+      await settle();
+
+      assert.deepStrictEqual(animated(store)?.get('task:b'), { x: 100, y: 0 });
+
+      assert.deepStrictEqual(animated(store)?.get('task:a'), { x: 0, y: 300 });
+    });
+
+    test('draws the arrangement at the size of the automatic layout drawn with it', async () => {
+      const { store, deferred, setNodeSize, setActive } = await shown({
+        stored: spreadStored,
+      });
+
+      setNodeSize('large');
+
+      setActive(false);
+
+      setNodeSize('compact');
+
+      deferred.resolve(1, 60);
+
+      await settle();
+
+      // Laid out at 「大」.
+      assert.deepStrictEqual(
+        store.arrangement.getSnapshot().value.positions,
+        spreadAtLarge,
+      );
+
+      setActive(true);
+
+      deferred.resolve(2, 60);
+
+      await settle();
+
+      assert.deepStrictEqual(
+        store.arrangement.getSnapshot().value,
+        spreadStored,
+      );
+    });
+
+    test('a move before ELK has laid out a size changed off screen saves the nodes where they are drawn', async () => {
+      const { store, saved, setNodeSize, setActive } = await shown();
+
+      setActive(false);
+
+      setNodeSize('large');
+
+      setActive(true);
+
+      store.moveNode('task:a', { x: 0, y: 200 });
+
+      assert.deepStrictEqual(saved, [
+        {
+          direction: 'right',
+          positions: positions([
+            ['task:a', { x: 0, y: 200 }],
+            ['task:b', { x: 100, y: 0 }],
+          ]),
+          groupPositions: new Map<GroupId, Point>(),
+        },
+      ]);
+    });
+
+    test('with every node hidden, spreads the arrangement at once', async () => {
+      const { store, deferred, setNodeSize, setHidden } = await shown({
+        stored: spreadStored,
+      });
+
+      setHidden(new Set<GraphNodeId>(['task:a', 'task:b']));
+
+      deferred.resolve(1, 60);
+
+      await settle();
+
+      const requests = deferred.requests.length;
+
+      setNodeSize('large');
+
+      // No layout to wait for.
+      assert.strictEqual(deferred.requests.length, requests);
+
+      assert.deepStrictEqual(
+        store.arrangement.getSnapshot().value.positions,
+        spreadAtLarge,
+      );
+    });
+
+    test('carries a move not yet saved back from 「大」, the nodes not moved as they were read', async () => {
+      const { store, deferred, saved, timer, setNodeSize } = await shown({
+        stored: spreadStored,
+        nodeSize: 'large',
+      });
+
+      store.nudgeNode('task:b', { x: 8, y: 0 });
+
+      setNodeSize('standard');
+
+      deferred.resolve(1, 60);
+
+      await settle();
+
+      timer.fire();
+
+      const written = saved[0]?.positions;
+
+      assert.isDefined(written);
+
+      assert.deepStrictEqual(written.get('task:a'), { x: 11, y: 22 });
+
+      assert.closeTo(
+        written.get('task:b')?.x ?? Number.NaN,
+        300 + Num.div(8, arrangementScale('large').x),
+        1e-9,
+      );
     });
 
     test('jumps with the animation 「オフ」', async () => {

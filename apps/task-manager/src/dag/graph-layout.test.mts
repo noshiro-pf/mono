@@ -13,6 +13,7 @@ import { DAY_MS, nodeSizes } from '../view-model/index.mjs';
 import { PLACEMENT_GAP, type Bounds } from './dag-layout.mjs';
 import { layoutWithElk } from './elk.mjs';
 import {
+  arrangementScale,
   clearOfFrames,
   COMPACT_MILESTONE_NODE_SIZE,
   COMPACT_TASK_NODE_SIZE,
@@ -186,6 +187,42 @@ describe('layoutInput, with groups', () => {
         ]),
       ),
     );
+  });
+});
+
+describe(arrangementScale, () => {
+  test('is none at 「標準」 and 「コンパクト」', () => {
+    assert.deepStrictEqual(arrangementScale('standard'), { x: 1, y: 1 });
+
+    assert.deepStrictEqual(arrangementScale('compact'), { x: 1, y: 1 });
+  });
+
+  test('at 「大」, spreads two boxes of either kind put clear of each other at 「標準」 clear of each other again', () => {
+    const scale = arrangementScale('large');
+
+    for (const kind of ['task', 'milestone'] as const) {
+      const standard = nodeBoxSize(kind, 'standard');
+
+      const large = nodeBoxSize(kind, 'large');
+
+      assert.isAtLeast(standard.width * scale.x, large.width);
+
+      assert.isAtLeast(standard.height * scale.y, large.height);
+    }
+
+    // And no more than the box that grew most needs.
+    for (const dimension of ['width', 'height'] as const) {
+      assert.isTrue(
+        (['task', 'milestone'] as const).some(
+          (kind) =>
+            Math.abs(
+              nodeBoxSize(kind, 'standard')[dimension] *
+                scale[dimension === 'width' ? 'x' : 'y'] -
+                nodeBoxSize(kind, 'large')[dimension],
+            ) < 1e-9,
+        ),
+      );
+    }
   });
 });
 

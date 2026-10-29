@@ -15,7 +15,12 @@
  * the layout has to be computed again.
  */
 
-import { Arr } from 'ts-data-forge';
+import {
+  Arr,
+  asPositiveFiniteNumber,
+  Num,
+  type PositiveFiniteNumber,
+} from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { DeepReadonly, ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import type {
@@ -94,6 +99,16 @@ export const labelSize = (text: string): Size =>
 /** The box of a node of `kind` drawn at `nodeSize`. */
 export const nodeBoxSize = (kind: NodeRef['kind'], nodeSize: NodeSize): Size =>
   NODE_BOX_SIZES[nodeSize][kind];
+
+/**
+ * How much farther apart than stored an arrangement is drawn at `nodeSize`.
+ * An arrangement is stored as made at 「標準」, and drawn at 「大」 spread out
+ * by as much as the widest-grown and the tallest-grown box grew, so that
+ * nodes put clear of each other at 「標準」 stay clear; at 「コンパクト」 it is
+ * drawn as stored.
+ */
+export const arrangementScale = (nodeSize: NodeSize): Scale =>
+  nodeSize === 'large' ? SPREAD_AT_LARGE : UNSCALED;
 
 /**
  * `nodes` where they are, each with the box of its kind at `nodeSize`: a
@@ -612,6 +627,40 @@ export type LaidOutEdge = DeepReadonly<{
   /** The order in time of two milestones rather than a dependency. */
   implied: boolean;
 }>;
+
+/** How much farther apart along each axis. */
+export type Scale = Readonly<{
+  x: PositiveFiniteNumber;
+  y: PositiveFiniteNumber;
+}>;
+
+const UNSCALED: Scale = {
+  x: asPositiveFiniteNumber(1),
+  y: asPositiveFiniteNumber(1),
+} as const;
+
+/** How much each kind of box grows from 「標準」 to 「大」, across and down. */
+const GROWTHS_AT_LARGE: readonly Point[] = Arr.generate(function* () {
+  const standards = new Map<string, Size>(
+    Object.entries(NODE_BOX_SIZES.standard),
+  );
+
+  for (const [kind, large] of Object.entries(NODE_BOX_SIZES.large)) {
+    const standard = standards.get(kind);
+
+    if (standard !== undefined) {
+      yield {
+        x: Num.div(large.width, asPositiveFiniteNumber(standard.width)),
+        y: Num.div(large.height, asPositiveFiniteNumber(standard.height)),
+      };
+    }
+  }
+});
+
+const SPREAD_AT_LARGE: Scale = {
+  x: asPositiveFiniteNumber(Math.max(...GROWTHS_AT_LARGE.map(({ x }) => x))),
+  y: asPositiveFiniteNumber(Math.max(...GROWTHS_AT_LARGE.map(({ y }) => y))),
+} as const;
 
 /** How far apart ELK keeps two nodes of a layer. */
 const NODE_SPACING = 28;

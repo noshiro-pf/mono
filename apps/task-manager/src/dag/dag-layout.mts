@@ -5,6 +5,8 @@
  * (`projects/{projectId}/settings/dagLayout`).
  *
  * A node is drawn where it was put, and where ELK puts it if it never was.
+ * What is stored is as made at 「標準」, and is drawn spread out at 「大」
+ * (`arrangementScale`).
  * Once some node was put somewhere, a node that never was — one added since
  * the last arrangement — is put next to the nodes it is joined to and those
  * in its group, as ELK has it, and moved clear of every other node
@@ -74,6 +76,19 @@ export const positionsOf = (
   nodes: readonly LaidOutNode[],
 ): ReadonlyMap<GraphNodeId, Point> =>
   new Map(nodes.map(({ id, x, y }) => [id, { x, y }]));
+
+/**
+ * `layout` with every position, of a node or a frame, multiplied by `by`;
+ * `layout` itself when that moves nothing.
+ */
+export const scaleArrangement = (layout: DagLayout, by: Point): DagLayout =>
+  by.x === 1 && by.y === 1
+    ? layout
+    : ({
+        direction: layout.direction,
+        positions: scalePositions(layout.positions, by),
+        groupPositions: scalePositions(layout.groupPositions, by),
+      } as const);
 
 /**
  * Where a node that was at `nodeAt` when the pointer went down at `from` is,
@@ -317,3 +332,14 @@ const placeEach = (
 
   return auto.map((node) => mut_placed.get(node.id) ?? node);
 };
+
+const scalePositions = <K,>(
+  positions: ReadonlyMap<K, Point>,
+  by: Point,
+): ReadonlyMap<K, Point> =>
+  new Map(
+    Array.from(positions, ([id, { x, y }]) => [
+      id,
+      { x: x * by.x, y: y * by.y },
+    ]),
+  );
