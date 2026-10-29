@@ -67,6 +67,7 @@ export const noTypeOnlyCodec: TSESLint.RuleModule<MessageIds, Options> = {
     messages: {
       typeOnlyCodec: `\`{{name}}\` is a codec used only as a type: nothing reads its value. Declare \`type {{typeName}}\` directly instead of deriving it with \`${TYPE_OF}<typeof {{name}}>\`, and remove the codec.`,
     },
+    defaultOptions: [{}],
   },
 
   create: (context) => {
@@ -129,7 +130,6 @@ export const noTypeOnlyCodec: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [{}],
 } as const;
 
 /** A codec and the name of the type alias derived from it. */

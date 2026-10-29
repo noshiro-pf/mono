@@ -40,8 +40,8 @@ export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
       preferAssertIsFalseOverExpectFalse:
         'Use assert.isFalse(X) instead of expect(X).toBe(false)',
     },
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
 

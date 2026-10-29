@@ -53,8 +53,8 @@ export const preferAssertStrictEqualForPrimitivesRule: TSESLint.RuleModule<
       replaceWithStrictEqual:
         'Replace with assert.strictEqual (changes the result for NaN and -0).',
     },
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
 

@@ -18,6 +18,7 @@ export const noEnums = createRule<readonly [], 'errorStringGeneric'>({
       errorStringGeneric: "Don't declare enums.",
     },
     schema: [],
+    defaultOptions: [],
   },
   create: (context) => ({
     TSEnumDeclaration: (node) => {
@@ -27,7 +28,6 @@ export const noEnums = createRule<readonly [], 'errorStringGeneric'>({
       } as const);
     },
   }),
-  defaultOptions: [],
 } as const) satisfies RuleModule<
   string,
   readonly unknown[],

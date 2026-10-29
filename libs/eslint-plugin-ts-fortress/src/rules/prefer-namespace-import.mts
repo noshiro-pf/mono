@@ -78,6 +78,7 @@ export const preferNamespaceImport: TSESLint.RuleModule<MessageIds, Options> = {
       useNamespaceImport: `Import \`${TS_FORTRESS_MODULE}\` as a namespace (\`import * as {{namespaceName}} from '${TS_FORTRESS_MODULE}';\`) and reach its exports through it, rather than importing them by name.`,
       removeSideEffectImport: `\`import '${TS_FORTRESS_MODULE}';\` binds no name, and \`${TS_FORTRESS_MODULE}\` declares \`sideEffects: false\`, so it does nothing. Remove it and import the namespace where its exports are needed.`,
     },
+    defaultOptions: [{ namespaceName: DEFAULT_NAMESPACE_NAME }],
   },
 
   create: (context) => {
@@ -154,7 +155,6 @@ export const preferNamespaceImport: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [{ namespaceName: DEFAULT_NAMESPACE_NAME }],
 } as const;
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */

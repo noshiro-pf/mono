@@ -18,6 +18,7 @@ export const noPartialDivision = createRule({
         'Division is partial. You should wrap it in a wrapper that returns undefined when the denominator is zero.',
     },
     schema: [],
+    defaultOptions: [],
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
@@ -84,7 +85,6 @@ export const noPartialDivision = createRule({
       },
     };
   },
-  defaultOptions: [],
 } as const);
 
 // TODO find a way to get ahold of a BigIntLiteralType without type assertions.

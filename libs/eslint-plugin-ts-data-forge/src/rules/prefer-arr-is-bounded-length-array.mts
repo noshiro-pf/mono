@@ -32,6 +32,7 @@ export const preferArrIsBoundedLengthArray: TSESLint.RuleModule<
       useIsBoundedLengthArray:
         'Replace `{{original}}` with `Arr.isBoundedLengthArray({{arrayName}}, {{min}}, {{max}})` from ts-data-forge.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -141,5 +142,4 @@ export const preferArrIsBoundedLengthArray: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;

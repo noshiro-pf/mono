@@ -50,6 +50,7 @@ export const preferReadonlyOrMutableRecord: TSESLint.RuleModule<
         'Use {{alternatives}} from ts-type-forge instead of the built-in `{{name}}`.',
       replaceWith: 'Replace `{{name}}` with `{{replacement}}`.',
     },
+    defaultOptions: [{ importStyle: DEFAULT_IMPORT_STYLE }],
   },
 
   create: (context) => {
@@ -70,5 +71,4 @@ export const preferReadonlyOrMutableRecord: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [{ importStyle: DEFAULT_IMPORT_STYLE }],
 } as const;

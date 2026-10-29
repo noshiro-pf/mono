@@ -116,6 +116,7 @@ export const preferCanonicalLengthGuard: TSESLint.RuleModule<
     fixable: 'code',
     schema: [],
     messages: MESSAGES,
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -180,7 +181,6 @@ export const preferCanonicalLengthGuard: TSESLint.RuleModule<
       },
     ]);
   },
-  defaultOptions: [],
 } as const;
 
 /**

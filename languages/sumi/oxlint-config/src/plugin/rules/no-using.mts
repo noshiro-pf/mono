@@ -13,8 +13,8 @@ export const noUsing = createRule({
         '`{{kind}}` declarations are not allowed in Sumi lint (D-30): release resources explicitly in the callback passed to Result.fromThrowable.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     VariableDeclaration: (node) => {
       if (node.kind === 'using' || node.kind === 'await using') {

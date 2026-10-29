@@ -46,6 +46,7 @@ export const noIdentityMap: TSESLint.RuleModule<MessageIds, Options> = {
       identityMap:
         '`map((x) => x)` changes no value; it only stops a value `Object.is` the one before, which is what `skipIfNoChange()` says. Use `skipIfNoChange()`, or remove the operator when nothing needs stopping.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -174,7 +175,6 @@ export const noIdentityMap: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /**

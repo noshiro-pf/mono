@@ -33,6 +33,7 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
       useArrSumBy:
         'Replace with `Arr.sumBy({{arrayName}}, {{mapper}})` from ts-data-forge.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -306,5 +307,4 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;

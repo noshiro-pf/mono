@@ -38,6 +38,7 @@ export const noUnboundedCounterPipe: TSESLint.RuleModule<MessageIds, Options> =
         unboundedCounterPipe:
           'This `counter(...)` is piped without being named and without a `times` option, so nothing can ever stop it. Pass `{ times: N }`, or bind the counter to a name and complete it when it is no longer needed.',
       },
+      defaultOptions: [],
     },
 
     create: (context) => {
@@ -75,7 +76,6 @@ export const noUnboundedCounterPipe: TSESLint.RuleModule<MessageIds, Options> =
         },
       };
     },
-    defaultOptions: [],
   } as const;
 
 /** `x.pipe` or `x['pipe']`. */

@@ -47,8 +47,8 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
       useAssert:
         'Use `assert.deepStrictEqual(X, Y)` instead of `expect(X).toStrictEqual(Y)`.',
     },
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => {
     const sourceCode = context.sourceCode;
 

@@ -57,6 +57,7 @@ export const displayNameRule: TSESLint.RuleModule<MessageIds, Options> = {
       mismatchedDisplayName:
         'displayName should match the component name "{{componentName}}"',
     },
+    defaultOptions: [{ ignoreName: [] }],
   },
   create: (context) => {
     const options = context.options[0] ?? {};
@@ -134,7 +135,6 @@ export const displayNameRule: TSESLint.RuleModule<MessageIds, Options> = {
       VariableDeclarator: checkComponent,
     };
   },
-  defaultOptions: [{ ignoreName: [] }],
 } as const;
 
 const normalizeNames = (

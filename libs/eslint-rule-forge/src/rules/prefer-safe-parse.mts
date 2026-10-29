@@ -123,6 +123,7 @@ const createSafeParseRule = <MessageId extends string>(
       fixable: 'code',
       schema: [],
       messages,
+      defaultOptions: [],
     },
 
     create: (context) => {
@@ -211,7 +212,6 @@ const createSafeParseRule = <MessageId extends string>(
         },
       };
     },
-    defaultOptions: [],
   } as const;
 };
 

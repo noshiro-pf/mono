@@ -1,6 +1,5 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import dedent from 'dedent';
 import { noPartialArrayReduce } from './no-partial-array-reduce.mjs';
 
@@ -148,7 +147,6 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -162,7 +160,6 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -175,7 +172,6 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -189,7 +185,6 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -203,7 +198,6 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -216,7 +210,6 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -230,7 +223,6 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -245,7 +237,6 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -263,7 +254,6 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },

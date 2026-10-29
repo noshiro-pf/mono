@@ -58,8 +58,8 @@ export const requireAsConst = createRule({
         '`{{name}}` infers a mutable type from this literal. Write `as const` so it is readonly, or name the binding `mut_{{name}}` if it is meant to be mutated (D-62).',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     VariableDeclaration: (node) => {
       if (node.kind !== 'const') {

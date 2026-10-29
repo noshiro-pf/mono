@@ -1,6 +1,5 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import dedent from 'dedent';
 import { noPartialStringNormalize } from './no-partial-string-normalize.mjs';
 
@@ -84,7 +83,6 @@ ruleTester.run('no-partial-string-normalize', noPartialStringNormalize, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -96,7 +94,6 @@ ruleTester.run('no-partial-string-normalize', noPartialStringNormalize, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -109,7 +106,6 @@ ruleTester.run('no-partial-string-normalize', noPartialStringNormalize, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -122,7 +118,6 @@ ruleTester.run('no-partial-string-normalize', noPartialStringNormalize, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -139,7 +134,6 @@ ruleTester.run('no-partial-string-normalize', noPartialStringNormalize, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },

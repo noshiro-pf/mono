@@ -16,6 +16,7 @@ export const banUseImperativeHandleHook: TSESLint.RuleModule<MessageIds> = {
       disallowUseImperativeHandle:
         'Move logic to parent component instead of using React.useImperativeHandle.',
     },
+    defaultOptions: [],
   },
   create: (context) => ({
     CallExpression: (node: DeepReadonly<TSESTree.CallExpression>) => {
@@ -27,5 +28,4 @@ export const banUseImperativeHandleHook: TSESLint.RuleModule<MessageIds> = {
       }
     },
   }),
-  defaultOptions: [],
 } as const;

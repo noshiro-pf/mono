@@ -16,6 +16,7 @@ export const importStarRule: TSESLint.RuleModule<MessageIds> = {
         "This expression makes '{{ module }}' non-tree-shakable.",
     },
     schema: [],
+    defaultOptions: [],
   },
   create: (context) => ({
     ImportNamespaceSpecifier: (node) => {
@@ -27,7 +28,6 @@ export const importStarRule: TSESLint.RuleModule<MessageIds> = {
       checkModuleNamespaceUsage(node, context, moduleName, identifier);
     },
   }),
-  defaultOptions: [],
 } as const;
 
 const getModuleSpecifier = (node: TSESTree.ImportNamespaceSpecifier): string =>

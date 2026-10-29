@@ -13,8 +13,8 @@ export const noClass = createRule({
         'class is not allowed in Sumi (D-12): write a closure-based factory function with a structural interface instead.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     ClassDeclaration: (node) => {
       context.report({ node, messageId: 'noClass' });

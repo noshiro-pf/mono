@@ -23,8 +23,8 @@ const reactApiRule: TSESLint.RuleModule<'reactApiDetected', readonly []> = {
     messages: {
       reactApiDetected: 'React API call detected',
     },
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     CallExpression: (node) => {
       if (isReactApiCall(context, node, 'memo')) {
@@ -42,8 +42,8 @@ const reactMemoArrowRule: TSESLint.RuleModule<'arrowDetected', readonly []> = {
     messages: {
       arrowDetected: 'React.memo received arrow function',
     },
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     CallExpression: (node) => {
       if (!isReactApiCall(context, node, 'memo')) {

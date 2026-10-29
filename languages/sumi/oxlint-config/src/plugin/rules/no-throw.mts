@@ -13,8 +13,8 @@ export const noThrow = createRule({
         'throw is not allowed in Sumi: return Result.err(...) and wrap throwing APIs at the boundary with Result.fromThrowable.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     ThrowStatement: (node) => {
       context.report({ node, messageId: 'noThrow' });

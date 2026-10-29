@@ -13,8 +13,8 @@ export const noThis = createRule({
         '`this` is not allowed in Sumi (D-12): with classes gone, state lives in closure variables.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     ThisExpression: (node) => {
       context.report({ node, messageId: 'noThis' });

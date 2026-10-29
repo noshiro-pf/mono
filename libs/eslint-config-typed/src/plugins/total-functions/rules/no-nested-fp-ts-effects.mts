@@ -16,6 +16,7 @@ export const noNestedFpTsEffects = createRule({
       errorStringGeneric: 'Do not nest these fp-ts effects.',
     },
     schema: [],
+    defaultOptions: [],
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
@@ -66,5 +67,4 @@ export const noNestedFpTsEffects = createRule({
       },
     };
   },
-  defaultOptions: [],
 } as const);

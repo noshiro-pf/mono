@@ -38,6 +38,7 @@ export const createPreferArrayIsArray = ({
       fixable: 'code',
       schema: [],
       messages: { useIsArray: text },
+      defaultOptions: [],
     },
 
     create: (context) => {
@@ -94,7 +95,6 @@ export const createPreferArrayIsArray = ({
         },
       };
     },
-    defaultOptions: [],
   } as const;
 };
 

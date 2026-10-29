@@ -102,7 +102,35 @@ namespace ArrayType {
  *  ```
  */
 namespace AwaitThenable {
-  export type RuleEntry = Linter.StringSeverity;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "allowMixedPromiseArrays": {
+   *         "type": "boolean",
+   *         "description": "Whether to allow promise aggregators to receive iterables mixing Promise and non-Promise values, as long as at least one value may be a Promise."
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Whether to allow promise aggregators to receive iterables mixing Promise and non-Promise values, as long as at least one value may be a Promise.
+     */
+    allowMixedPromiseArrays?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -10585,6 +10613,7 @@ export type TypeScriptEslintRules = Readonly<{
 
 export type TypeScriptEslintRulesOption = Readonly<{
   '@typescript-eslint/array-type': ArrayType.Options;
+  '@typescript-eslint/await-thenable': AwaitThenable.Options;
   '@typescript-eslint/ban-ts-comment': BanTsComment.Options;
   '@typescript-eslint/class-literal-property-style': ClassLiteralPropertyStyle.Options;
   '@typescript-eslint/class-methods-use-this': ClassMethodsUseThis.Options;

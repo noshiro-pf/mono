@@ -27,8 +27,8 @@ export const preferAssertIsFalseOverAssertNotOkRule: TSESLint.RuleModule<
       preferAssertIsFalseOverAssertNotOk:
         'Use assert.isFalse(X) instead of assert.isNotOk(X), assert.notOk(X).',
     },
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     MemberExpression: (node) => {
       if (

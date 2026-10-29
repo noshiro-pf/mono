@@ -76,6 +76,7 @@ export const preferDedent: TSESLint.RuleModule<MessageIds, Options> = {
       preferDedent:
         'This template literal spans source lines, so its value carries whatever indentation the source has and changes if the surrounding code is re-indented. Tag it with `dedent` and indent it with the code around it, or build the string from an array of lines with `.join(...)`.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => ({
@@ -96,5 +97,4 @@ export const preferDedent: TSESLint.RuleModule<MessageIds, Options> = {
       context.report({ node, messageId: 'preferDedent' });
     },
   }),
-  defaultOptions: [],
 } as const;

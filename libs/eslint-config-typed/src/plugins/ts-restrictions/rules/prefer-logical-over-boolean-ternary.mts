@@ -71,6 +71,7 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
     messages: {
       preferLogical: 'Write this ternary as `{{replacement}}`.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -210,7 +211,6 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /** `true` or `false`, through any `as`, `satisfies` or `!` around it. */

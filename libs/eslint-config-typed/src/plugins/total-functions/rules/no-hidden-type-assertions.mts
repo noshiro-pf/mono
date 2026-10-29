@@ -48,6 +48,7 @@ export const noHiddenTypeAssertions = createRule({
         'Do not use hidden type assertions. Specify `unknown` or `never` instead of an arbitrary type argument.',
     },
     schema: [],
+    defaultOptions: [],
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
@@ -314,7 +315,6 @@ export const noHiddenTypeAssertions = createRule({
       },
     };
   },
-  defaultOptions: [],
 } as const);
 
 const hasTypeNode = (

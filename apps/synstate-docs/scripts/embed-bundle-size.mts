@@ -82,12 +82,12 @@ const replacePlaceholder = (
   // Replacer functions are used so that `$&`, `$1`, ... inside `replacement`
   // are treated as literal text rather than substitution patterns.
   return content
-    .replace(
+    .replaceAll(
       htmlPattern,
       () =>
         `<!-- bundle-size:${name} -->${replacement}<!-- /bundle-size:${name} -->`,
     )
-    .replace(
+    .replaceAll(
       jsxPattern,
       () =>
         `{/* bundle-size:${name} */}${replacement}{/* /bundle-size:${name} */}`,

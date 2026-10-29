@@ -68,7 +68,7 @@
     "typescript-native": "npm:typescript@7.0.2"
   },
   "engines": {
-    "node": ">=22.22.2",
+    "node": ">=22.23.4",
     "pnpm": ">=9.0.0"
   },
   "volta": {

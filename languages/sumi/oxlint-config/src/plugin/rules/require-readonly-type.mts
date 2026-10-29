@@ -72,8 +72,8 @@ export const requireReadonlyType = createRule<readonly [], MessageIds>({
       reference: '`{{name}}` is a mutable type; write {{alternative}} in Sumi.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     TSArrayType: (node) => {
       if (isExcluded(node) || isCovered(node, 'array')) {

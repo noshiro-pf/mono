@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "pr-merge-queue": "0.0.0"
+    "pr-merge-queue": "0.0.3"
   }
 }

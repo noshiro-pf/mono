@@ -12,8 +12,8 @@ export const noInOperator = createRule({
       noIn: 'The `in` operator is not allowed in Sumi: it walks the prototype chain and narrows imprecisely. Use `isRecord` + `hasKey` from ts-data-forge.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     BinaryExpression: (node) => {
       if (node.operator === 'in') {

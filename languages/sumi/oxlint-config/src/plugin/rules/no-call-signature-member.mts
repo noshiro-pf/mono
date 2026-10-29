@@ -50,8 +50,8 @@ export const noCallSignatureMember = createRule({
         'A construct signature is not a type member in Sumi (D-58): write a constructor type `new (…) => R`.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     TSCallSignatureDeclaration: (node) => {
       context.report({ node, messageId: 'callSignature' });

@@ -2,7 +2,7 @@
   "policy": "reactive",
   "knownBroken": null,
   "targets": {
-    "minimum": "22.22.2",
+    "minimum": "22.23.4",
     "lts": "24.22.1",
     "current": "26.12.1"
   }

@@ -17,6 +17,7 @@ export const noUnsafeTypeAssertion = createRule({
       errorStringGeneric: 'This type assertion is not type-safe.',
     },
     schema: [],
+    defaultOptions: [],
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
@@ -64,5 +65,4 @@ export const noUnsafeTypeAssertion = createRule({
       TSAsExpression: reportUnsafe,
     };
   },
-  defaultOptions: [],
 } as const);

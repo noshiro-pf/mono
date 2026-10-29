@@ -63,6 +63,7 @@ export const preferCanonicalMutableRecord: TSESLint.RuleModule<
       useMutableRecord:
         'Replace `{{original}}` with `{{replacement}}` from ts-type-forge.',
     },
+    defaultOptions: [{ importStyle: DEFAULT_IMPORT_STYLE }],
   },
 
   create: (context) => {
@@ -155,5 +156,4 @@ export const preferCanonicalMutableRecord: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [{ importStyle: DEFAULT_IMPORT_STYLE }],
 } as const;

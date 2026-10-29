@@ -60,6 +60,7 @@ export const jsxBooleanLogicalOperands: TSESLint.RuleModule<
       nonBooleanLeft:
         'In JSX, `{{operator}}` takes booleans on both sides, and its left operand is not one. Compare it explicitly (`n !== 0`, `s !== ""`), or use `??` for a fallback.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -148,7 +149,6 @@ export const jsxBooleanLogicalOperands: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /** Expressions that need parentheses as the test of a ternary. */

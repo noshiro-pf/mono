@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "@playwright/test": "catalog:",
-    "@types/chrome": "^0.3.5",
+    "@types/chrome": "^0.3.6",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "eslint": "catalog:",

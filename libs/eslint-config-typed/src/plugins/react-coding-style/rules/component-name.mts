@@ -51,6 +51,7 @@ export const componentNameRule: TSESLint.RuleModule<MessageIds, Options> = {
       componentNameDoesNotMatch:
         'The component name should match {{ pattern }}.',
     },
+    defaultOptions: [],
   },
   create: (context) => {
     const option = context.options[0];
@@ -100,5 +101,4 @@ export const componentNameRule: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;

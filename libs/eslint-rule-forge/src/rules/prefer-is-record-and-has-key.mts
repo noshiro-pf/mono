@@ -39,6 +39,7 @@ export const createPreferIsRecordAndHasKey = ({
         useIsRecordAndHasKey: `Replace \`{{original}}\` with \`isRecord({{objName}}) && hasKey({{objName}}, {{keyName}})\` from ${moduleName}.`,
         useHasKey: `Replace \`{{original}}\` with \`hasKey({{objName}}, {{keyName}})\` from ${moduleName}.`,
       },
+      defaultOptions: [],
     },
 
     create: (context) => {
@@ -238,7 +239,6 @@ export const createPreferIsRecordAndHasKey = ({
         },
       };
     },
-    defaultOptions: [],
   }) as const;
 
 /**

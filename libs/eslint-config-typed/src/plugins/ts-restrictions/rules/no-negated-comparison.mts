@@ -55,6 +55,7 @@ export const noNegatedComparison: TSESLint.RuleModule<MessageIds, Options> = {
         'Invert the comparison instead of negating it, if no operand can be NaN: `{{replacement}}`. `!(a < b)` is true for NaN, and `a >= b` is not.',
       invertComparison: 'Replace with `{{replacement}}`.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -169,7 +170,6 @@ export const noNegatedComparison: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /**

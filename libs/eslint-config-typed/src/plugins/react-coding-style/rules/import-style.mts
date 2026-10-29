@@ -49,6 +49,7 @@ export const importStyleRule: TSESLint.RuleModule<MessageIds, Options> = {
       namedImportRequired:
         "React should be imported as named imports like `import { useState } from 'react'`.",
     },
+    defaultOptions: [],
   },
   create: (context) => {
     const options = context.options[0] ?? {};
@@ -110,5 +111,4 @@ export const importStyleRule: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;

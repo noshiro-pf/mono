@@ -23,6 +23,7 @@ export const noPrematureFpTsEffects = createRule({
         "Ensure you aren't interpreting this fp-ts effect until the very end of your program.",
     },
     schema: [],
+    defaultOptions: [],
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
@@ -59,5 +60,4 @@ export const noPrematureFpTsEffects = createRule({
       },
     };
   },
-  defaultOptions: [],
 } as const);

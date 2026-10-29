@@ -24,6 +24,7 @@ export const componentVarTypeAnnotationRule: TSESLint.RuleModule<MessageIds> = {
       disallowReactFunctionalComponentTypes:
         'Use React.memo<Props>((props) => { ... }) instead.',
     },
+    defaultOptions: [],
   },
   create: (context) => ({
     TSTypeReference: (node: DeepReadonly<TSESTree.TSTypeReference>) => {
@@ -35,7 +36,6 @@ export const componentVarTypeAnnotationRule: TSESLint.RuleModule<MessageIds> = {
       }
     },
   }),
-  defaultOptions: [],
 } as const;
 
 const isReactFunctionalComponentReference = (

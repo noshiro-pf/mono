@@ -25,6 +25,7 @@ export const requireStrictMode = createRule({
         'Do not disable the strictPropertyInitialization compiler option.',
     },
     schema: [],
+    defaultOptions: [],
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
@@ -63,5 +64,4 @@ export const requireStrictMode = createRule({
       },
     };
   },
-  defaultOptions: [],
 } as const);

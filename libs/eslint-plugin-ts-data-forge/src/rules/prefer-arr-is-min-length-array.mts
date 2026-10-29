@@ -34,6 +34,7 @@ export const preferArrIsMinLengthArray: TSESLint.RuleModule<
       useIsMinLengthArray:
         'Replace `{{original}}` with `Arr.isMinLengthArray({{arrayName}}, {{length}})` from ts-data-forge.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -142,5 +143,4 @@ export const preferArrIsMinLengthArray: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;

@@ -1,7 +1,7 @@
+/* eslint-disable import-x/unambiguous */
 /* transformer-ignore */
 /* eslint-disable total-functions/no-partial-division */
 /* eslint-disable @stylistic/padding-line-between-statements */
-/* eslint-disable import-x/unambiguous */
 /* Top-level mutable state written from inside handlers is the whole
    point of this sample: it is the imperative counterpart of
    06-reactive-table.mts, where synstate keeps the derived values in

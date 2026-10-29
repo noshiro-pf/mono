@@ -100,7 +100,7 @@ jobs:
       # No `--engine-strict` here, unlike node-version-compatibility.yml, and
       # not by oversight. A semver range matches a prerelease only when one of
       # its comparators names the same `major.minor.patch` *and* carries a
-      # prerelease tag, so `>=22.22.2` does not match `27.0.0-nightly…` — the
+      # prerelease tag, so `>=22.23.4` does not match `27.0.0-nightly…` — the
       # install would fail on every nightly run whatever `engines.node` said,
       # which is the one outcome that would tell us nothing.
       - name: Set up pnpm, Node.js for `${{ matrix.channel }}` and the dependencies

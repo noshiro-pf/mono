@@ -144,6 +144,7 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
         replaceTypeGuard:
           'Unnecessary `{{from}}` call: the argument can only be narrowed by `{{to}}`. Use `{{to}}` instead.',
       },
+      defaultOptions: [{}],
     },
 
     create: (context) => {
@@ -326,7 +327,6 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
         },
       };
     },
-    defaultOptions: [{}],
   } as const;
 
 /** What the rule concludes about a guard call from one type of its argument. */

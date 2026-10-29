@@ -81,7 +81,7 @@
     "ts-data-forge": ">=14.10.0"
   },
   "engines": {
-    "node": ">=22.22.2",
+    "node": ">=22.23.4",
     "pnpm": ">=9.0.0"
   },
   "publishConfig": {

@@ -92,6 +92,7 @@ export const noUnnecessaryArrayFrom: TSESLint.RuleModule<MessageIds, Options> =
         unnecessaryArrayFrom:
           '`Array.from()` is unnecessary here because `{{methodName}}` already returns a new array. Call `.{{methodName}}()` directly on the array.',
       },
+      defaultOptions: [],
     },
 
     create: (context) => {
@@ -168,7 +169,6 @@ export const noUnnecessaryArrayFrom: TSESLint.RuleModule<MessageIds, Options> =
         },
       };
     },
-    defaultOptions: [],
   } as const;
 
 const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>

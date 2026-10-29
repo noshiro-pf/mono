@@ -30,6 +30,7 @@ export const reactMemoPropsArgumentNameRule: TSESLint.RuleModule<MessageIds> = {
       propsParamMustBeIdentifier:
         "The props of a component containing a return statement are limited to a variable named 'props'.",
     },
+    defaultOptions: [],
   },
   create: (context) => ({
     CallExpression: (node: DeepReadonly<TSESTree.CallExpression>) => {
@@ -68,5 +69,4 @@ export const reactMemoPropsArgumentNameRule: TSESLint.RuleModule<MessageIds> = {
       });
     },
   }),
-  defaultOptions: [],
 } as const;

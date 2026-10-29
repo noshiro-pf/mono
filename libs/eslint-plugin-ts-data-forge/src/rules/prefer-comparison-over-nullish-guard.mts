@@ -116,6 +116,7 @@ export const preferComparisonOverNullishGuard: TSESLint.RuleModule<
       preferComparison:
         'Prefer `{{comparison}}` over calling `{{name}}` with an explicit argument.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -171,5 +172,4 @@ export const preferComparisonOverNullishGuard: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;

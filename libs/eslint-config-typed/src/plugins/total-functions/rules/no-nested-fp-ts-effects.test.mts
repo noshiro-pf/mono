@@ -1,6 +1,5 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import dedent from 'dedent';
 import { noNestedFpTsEffects } from './no-nested-fp-ts-effects.mjs';
 
@@ -99,7 +98,6 @@ ruleTester.run('no-async-effect-within-io', noNestedFpTsEffects, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -124,7 +122,6 @@ ruleTester.run('no-async-effect-within-io', noNestedFpTsEffects, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -143,7 +140,6 @@ ruleTester.run('no-async-effect-within-io', noNestedFpTsEffects, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },

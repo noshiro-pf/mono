@@ -1,6 +1,5 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { requireStrictMode } from './require-strict-mode.mjs';
 
 const ruleTesterForTSConfig = (config: string): RuleTester =>
@@ -40,7 +39,6 @@ nonStrictRuleTester.run('require-strict-mode', requireStrictMode, {
       errors: [
         {
           messageId: 'strict',
-          type: AST_NODE_TYPES.Program,
         },
       ],
     },
@@ -63,7 +61,6 @@ nonNoUncheckedIndexedAccessRuleTester.run(
         errors: [
           {
             messageId: 'noUncheckedIndexedAccess',
-            type: AST_NODE_TYPES.Program,
           },
         ],
       },
@@ -84,7 +81,6 @@ strictFunctionTypesRuleTester.run('require-strict-mode', requireStrictMode, {
       errors: [
         {
           messageId: 'strictFunctionTypes',
-          type: AST_NODE_TYPES.Program,
         },
       ],
     },

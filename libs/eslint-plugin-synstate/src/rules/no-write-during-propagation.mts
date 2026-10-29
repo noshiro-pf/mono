@@ -64,6 +64,7 @@ export const noWriteDuringPropagation: TSESLint.RuleModule<
       writeThroughCall:
         'This calls `{{name}}`, which writes to a synstate state, from a subscriber or a projection, while the update that called it is still propagating. The write is not part of the graph, so subscribers can see intermediate states, and a write back into the same update loops. Derive the value with `pipe` (`map`, `combine`, …) instead.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -287,7 +288,6 @@ export const noWriteDuringPropagation: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /** An element of an array pattern by index, or a property of an object pattern by key. */

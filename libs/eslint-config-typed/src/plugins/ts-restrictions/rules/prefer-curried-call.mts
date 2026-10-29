@@ -75,6 +75,7 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
       replaceWithFunction:
         'Replace `{{original}}` with `{{replacement}}` (only if `{{replacement}}` does not need `globalThis` as its receiver).',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -347,7 +348,6 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /**
