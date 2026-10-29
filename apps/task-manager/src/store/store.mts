@@ -11,6 +11,7 @@
 
 import { combine, map, skipIfNoChange } from 'synstate';
 import {
+  downloadJson,
   fromEvent,
   loadSetting,
   mediaQuery,
@@ -56,6 +57,7 @@ import { createGroupEditorStore } from './group-editor-store.mjs';
 import { createListSettingsStore } from './list-settings-store.mjs';
 import { createMediaStore } from './media-store.mjs';
 import { createNodeSizeStore } from './node-size-store.mjs';
+import { createProjectFileStore } from './project-file-store.mjs';
 import { createSessionStore } from './session-store.mjs';
 import { createUiStore } from './ui-store.mjs';
 import { createViewQuerySync } from './view-query-sync.mjs';
@@ -76,16 +78,19 @@ const initialViewQuery = parseViewQuery(readLocationSearch());
 
 export const uiStore = createUiStore({ initialView: initialViewQuery.view });
 
+/** Shows `message` in the notice bar, and `error` in the console. */
+const reportError = (message: string, error?: unknown): void => {
+  if (error !== undefined) {
+    console.error(error);
+  }
+
+  uiStore.showNotice(message);
+};
+
 export const dataStore = createDataStore({
   session: sessionStore.session,
   now: () => Date.now(),
-  reportError: (message, error) => {
-    if (error !== undefined) {
-      console.error(error);
-    }
-
-    uiStore.showNotice(message);
-  },
+  reportError,
 });
 
 export const clockStore = createClockStore({
@@ -253,6 +258,18 @@ export const bulkDeleteStore = createBulkDeleteStore({
   deleteNodes: dataStore.deleteNodes,
 });
 
+export const projectFileStore = createProjectFileStore({
+  state: dataStore.state,
+  groups: dataStore.groups,
+  dagLayout: dataStore.dagLayout,
+  load: dataStore.projectLoad,
+  now: () => Date.now(),
+  timeZone: undefined,
+  download: downloadJson,
+  replaceProject: dataStore.replaceProject,
+  reportError,
+});
+
 /**
  * Starts the timers and the listeners. Called once, from `main.tsx`, before
  * the first render, so the page is drawn dark from the start on a dark
@@ -273,6 +290,7 @@ export const startStore = (): (() => void) => {
     dagShowDoneStore.start(),
     dagLayoutStore.start(),
     dagSelectionStore.start(),
+    projectFileStore.start(),
     viewQuerySync.start(),
   ] as const;
 

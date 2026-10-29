@@ -15,7 +15,11 @@ import {
   createMemoryRepository,
   type Repository,
 } from '../repository/index.mjs';
-import { createDataStore, EMPTY_STATE } from './data-store.mjs';
+import {
+  createDataStore,
+  EMPTY_STATE,
+  type ProjectLoad,
+} from './data-store.mjs';
 import type { Session } from './session-store.mjs';
 
 const a = createTask({ id: asTaskId('a'), title: 'A', now: 0 });
@@ -483,5 +487,124 @@ describe(createDataStore, () => {
 
       assert.deepStrictEqual(errors, ['DAG の配置を保存できませんでした。']);
     });
+  });
+});
+
+/** What stops a subscription that holds nothing. */
+const stopNothing = (): void => {};
+
+describe('the whole project of the data store', () => {
+  test('has loaded only once the nodes, groups and layout all have', () => {
+    const { store, setSession } = setup();
+
+    const load = (): ProjectLoad => store.projectLoad.getSnapshot().value;
+
+    assert.strictEqual(load(), 'loading');
+
+    const memory = createMemoryRepository(initial);
+
+    // The nodes arrive, and the groups and the layout do not yet.
+    const mut_feeds: (() => void)[] = [];
+
+    const repository: Repository = {
+      ...memory,
+      subscribeGroups: (observer) => {
+        mut_feeds.push(() => {
+          observer.next([]);
+        });
+
+        return stopNothing;
+      },
+      subscribeDagLayout: (observer) => {
+        mut_feeds.push(() => {
+          observer.next(undefined);
+        });
+
+        return stopNothing;
+      },
+    } as const;
+
+    setSession(signedIn(repository));
+
+    assert.strictEqual(store.status.getSnapshot().value, 'ready');
+
+    assert.strictEqual(load(), 'loading');
+
+    for (const feed of mut_feeds) {
+      feed();
+    }
+
+    assert.strictEqual(load(), 'loaded');
+
+    setSession({ type: 'signed-out', error: undefined, signingIn: false });
+
+    assert.strictEqual(load(), 'loading');
+  });
+
+  test('has failed to load when the groups or the layout fail', () => {
+    const { store, setSession, errors } = setup();
+
+    setSession(
+      signedIn({
+        ...createMemoryRepository(initial),
+        subscribeGroups: (observer) => {
+          observer.error(new Error('permission-denied'));
+
+          return stopNothing;
+        },
+      }),
+    );
+
+    assert.strictEqual(store.projectLoad.getSnapshot().value, 'failed');
+
+    assert.deepStrictEqual(errors, ['グループを読み込めませんでした。']);
+  });
+
+  test('has failed to load when the nodes fail', () => {
+    const { store, setSession } = setup();
+
+    setSession(
+      signedIn({
+        ...createMemoryRepository(initial),
+        subscribe: (observer) => {
+          observer.error(new Error('permission-denied'));
+
+          return stopNothing;
+        },
+      }),
+    );
+
+    assert.strictEqual(store.projectLoad.getSnapshot().value, 'failed');
+  });
+
+  test('is replaced through the repository', async () => {
+    const { store, setSession } = setup();
+
+    setSession(signedIn(createMemoryRepository(initial)));
+
+    await store.replaceProject(
+      {
+        state: { tasks: [a], milestones: [m] },
+        groups: [],
+        dagLayout: undefined,
+      },
+      { state: initial, groups: [], dagLayout: undefined },
+    );
+
+    assert.deepStrictEqual(store.state.getSnapshot().value, {
+      tasks: [a],
+      milestones: [m],
+    });
+  });
+
+  test('rejects a replacement while nobody is signed in', async () => {
+    const { store } = setup();
+
+    await expect(
+      store.replaceProject(
+        { state: EMPTY_STATE, groups: [], dagLayout: undefined },
+        { state: EMPTY_STATE, groups: [], dagLayout: undefined },
+      ),
+    ).rejects.toThrow('Not signed in.');
   });
 });

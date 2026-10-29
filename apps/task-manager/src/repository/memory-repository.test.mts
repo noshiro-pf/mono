@@ -1,5 +1,6 @@
 import type { DagLayout, Point } from '../dag/index.mjs';
 import {
+  asGroupId,
   asMilestoneId,
   asTaskId,
   createMilestone,
@@ -140,8 +141,8 @@ describe('the DAG layout of a memory repository', () => {
 
     return {
       layouts: mut_layouts,
-      next: (next) => {
-        mut_layouts.push(next);
+      next: (stored) => {
+        mut_layouts.push(stored);
       },
       error: () => {},
     };
@@ -195,5 +196,57 @@ describe('the DAG layout of a memory repository', () => {
     await repository.putDagLayout(layout, 100);
 
     assert.strictEqual(observer.states.length, 1);
+  });
+});
+
+describe('replacing the project of a memory repository', () => {
+  test('hands the subscribers the new nodes, groups and layout', async () => {
+    const layout: DagLayout = {
+      direction: 'down',
+      positions: new Map<GraphNodeId, Point>(),
+      groupPositions: new Map<GroupId, Point>(),
+    } as const;
+
+    const repository = createMemoryRepository(initial, layout, [
+      { id: asGroupId('g'), title: 'G', createdAt: 0, updatedAt: 0 },
+    ]);
+
+    const observer = record();
+
+    const mut_groups: unknown[] = [];
+
+    const mut_layouts: unknown[] = [];
+
+    repository.subscribe(observer);
+
+    repository.subscribeGroups({
+      next: (groups) => {
+        mut_groups.push(groups);
+      },
+      error: () => {},
+    });
+
+    repository.subscribeDagLayout({
+      next: (stored) => {
+        mut_layouts.push(stored);
+      },
+      error: () => {},
+    });
+
+    const next: DomainState = { tasks: [a], milestones: [] } as const;
+
+    await repository.replaceProject(
+      { state: next, groups: [], dagLayout: undefined },
+      { state: initial, groups: [], dagLayout: layout },
+      5,
+    );
+
+    assert.deepStrictEqual(observer.states.at(-1), next);
+
+    assert.deepStrictEqual(mut_groups.at(-1), []);
+
+    assert.deepStrictEqual(mut_layouts.at(-1), undefined);
+
+    assert.strictEqual(mut_layouts.length, 2);
   });
 });

@@ -69,6 +69,19 @@ export const switchAllDay = (
 };
 
 /**
+ * `YYYY-MM-DD-HHmmss`, the wall clock of `timeZone` at `epochMs` to the
+ * second: for a file name, which sorts by it.
+ */
+export const toFileStamp = (epochMs: number, timeZone?: string): string => {
+  const { year, month, day, hour, minute, second } = wallClock(
+    epochMs,
+    timeZone,
+  );
+
+  return `${pad(year, 4)}-${pad(month, 2)}-${pad(day, 2)}-${pad(hour, 2)}${pad(minute, 2)}${pad(second, 2)}`;
+};
+
+/**
  * The instant `value` names on the wall clock of `timeZone`, or `undefined`
  * when it is empty or not a real date and time. In a daylight-saving gap or
  * overlap it picks one of the instants that zone could mean.

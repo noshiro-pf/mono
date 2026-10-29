@@ -7,6 +7,7 @@ import { GroupDialog } from './group-dialog.js';
 import { ListView } from './list-view.js';
 import { NodeDialog } from './node-dialog.js';
 import { NoticeBar } from './notice-bar.js';
+import { ProjectImportDialog } from './project-import-dialog.js';
 import { UnsentWritesBar } from './unsent-writes-bar.js';
 
 type Props = Readonly<{
@@ -15,7 +16,7 @@ type Props = Readonly<{
 
 /**
  * The app once signed in: the header, the list or the DAG, and the dialogs
- * of a node, of a group, and of 「一括編集」.
+ * of a node, of a group, of 「一括編集」 and of reading a project file.
  */
 export const MainScreen = ({ userName }: Props): JSX.Element => (
   <div class={constant('main-screen')}>
@@ -30,5 +31,6 @@ export const MainScreen = ({ userName }: Props): JSX.Element => (
     <NodeDialog />
     <GroupDialog />
     <BulkEditDialog />
+    <ProjectImportDialog />
   </div>
 );

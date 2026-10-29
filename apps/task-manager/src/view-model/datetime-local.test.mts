@@ -4,7 +4,17 @@ import {
   switchAllDay,
   toDateLocal,
   toDateTimeLocal,
+  toFileStamp,
 } from './datetime-local.mjs';
+
+describe(toFileStamp, () => {
+  test('writes the wall clock of the time zone, to the second', () => {
+    assert.strictEqual(
+      toFileStamp(1_791_515_142_000 /* 2026-10-09T03:05:42Z */, 'Asia/Tokyo'),
+      '2026-10-09-120542',
+    );
+  });
+});
 
 describe(toDateTimeLocal, () => {
   test('writes the instant as the wall clock of the time zone', () => {

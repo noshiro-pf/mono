@@ -13,6 +13,7 @@
  */
 
 import {
+  combine,
   source as createSource,
   createState,
   filter,
@@ -44,10 +45,12 @@ import {
   type NodeRef,
   type Task,
 } from '../domain/index.mjs';
-import type { Repository } from '../repository/index.mjs';
+import type { ProjectSnapshot, Repository } from '../repository/index.mjs';
 import type { Session } from './session-store.mjs';
 
 export type DataStatus = 'idle' | 'loading' | 'ready';
+
+export type ProjectLoad = 'loading' | 'loaded' | 'failed';
 
 export type DataDeps = Readonly<{
   session: InitializedObservable<Session>;
@@ -64,6 +67,12 @@ export type DataStore = Readonly<{
   groups: InitializedObservable<readonly Group[]>;
   /** The project's DAG layout; `undefined` while it has none. */
   dagLayout: InitializedObservable<DagLayout | undefined>;
+  /**
+   * Whether the nodes, the groups and the layout have all loaded — the
+   * whole project, unlike `status`, which waits for the nodes alone — or
+   * one of them failed to.
+   */
+  projectLoad: InitializedObservable<ProjectLoad>;
   putTask: (task: Task) => void;
   putMilestone: (milestone: Milestone) => void;
   /**
@@ -92,6 +101,15 @@ export type DataStore = Readonly<{
    */
   editNodes: (refs: readonly NodeRef[], edit: NodeEdit) => void;
   putDagLayout: (layout: DagLayout) => void;
+  /**
+   * Replaces `previous`, the project as it stands, with `next`, as the
+   * repository's `replaceProject` says. Unlike the other writes, a failure
+   * is the caller's to report: the promise rejects.
+   */
+  replaceProject: (
+    next: ProjectSnapshot,
+    previous: ProjectSnapshot,
+  ) => Promise<void>;
   /** Starts following the session, and returns what stops it. */
   start: () => () => void;
 }>;
@@ -142,48 +160,118 @@ export const createDataStore = (deps: DataDeps): DataStore => {
       .pipe(withInitialValue(signedOut));
 
   const loaded = follow<Loaded>(
-    { state: EMPTY_STATE, status: 'idle' },
-    { state: EMPTY_STATE, status: 'loading' },
-    (repository, next) =>
-      repository.subscribe({
+    { state: EMPTY_STATE, status: 'idle', failed: false },
+    { state: EMPTY_STATE, status: 'loading', failed: false },
+    (repository, next) => {
+      const mut_last: { loaded: Loaded } = {
+        loaded: { state: EMPTY_STATE, status: 'loading', failed: false },
+      };
+
+      return repository.subscribe({
         next: (loadedState) => {
-          next({ state: loadedState, status: 'ready' });
+          // Once failed, a listener that is left does not make it whole.
+          mut_last.loaded = {
+            state: loadedState,
+            status: 'ready',
+            failed: mut_last.loaded.failed,
+          };
+
+          next(mut_last.loaded);
         },
         error: (error) => {
           deps.reportError(
             'データを読み込めませんでした。権限の設定か接続を確認してください。',
             error,
           );
+
+          mut_last.loaded = { ...mut_last.loaded, failed: true };
+
+          next(mut_last.loaded);
         },
-      }),
+      });
+    },
   );
 
-  const state = loaded.pipe(map(({ state: next }) => next));
+  const state = loaded
+    .pipe(map(({ state: next }) => next))
+    .pipe(skipIfNoChange());
 
   const dataStatus = loaded.pipe(map((current) => current.status));
 
   const getState = (): DomainState => state.getSnapshot().value;
 
-  const dagLayout = follow<DagLayout | undefined>(
-    undefined,
-    undefined,
-    (repository, next) =>
-      repository.subscribeDagLayout({
-        next,
-        error: (error) => {
-          deps.reportError('DAG の配置を読み込めませんでした。', error);
+  /**
+   * What `subscribeTo` hands on, as `follow` does, with whether it has yet —
+   * or failed, and so never will: the value then stays the last one.
+   */
+  const followFed = <A,>(
+    empty: A,
+    failure: string,
+    subscribeTo: (
+      repository: Repository,
+      observer: Readonly<{
+        next: (value: A) => void;
+        error: (error: unknown) => void;
+      }>,
+    ) => () => void,
+  ): InitializedObservable<Fed<A>> => {
+    const waiting: Fed<A> = { value: empty, fed: 'waiting' } as const;
+
+    return follow<Fed<A>>(waiting, waiting, (repository, next) => {
+      const mut_last = { value: empty };
+
+      return subscribeTo(repository, {
+        next: (value) => {
+          mut_last.value = value;
+
+          next({ value, fed: 'fed' });
         },
-      }),
+        error: (error) => {
+          deps.reportError(failure, error);
+
+          next({ value: mut_last.value, fed: 'failed' });
+        },
+      });
+    });
+  };
+
+  const fedLayout = followFed<DagLayout | undefined>(
+    undefined,
+    'DAG の配置を読み込めませんでした。',
+    (repository, observer) => repository.subscribeDagLayout(observer),
   );
 
-  const groups = follow<readonly Group[]>([], [], (repository, next) =>
-    repository.subscribeGroups({
-      next,
-      error: (error) => {
-        deps.reportError('グループを読み込めませんでした。', error);
-      },
-    }),
+  // The same value again, as a failure hands it on, is no change.
+  const dagLayout = fedLayout
+    .pipe(map(({ value }) => value))
+    .pipe(skipIfNoChange());
+
+  const fedGroups = followFed<readonly Group[]>(
+    [],
+    'グループを読み込めませんでした。',
+    (repository, observer) => repository.subscribeGroups(observer),
   );
+
+  const groups = fedGroups
+    .pipe(map(({ value }) => value))
+    .pipe(skipIfNoChange());
+
+  const projectLoad = combine([loaded, fedGroups, fedLayout])
+    .pipe(
+      map(
+        ([
+          { status, failed },
+          { fed: groupsFed },
+          { fed: layoutFed },
+        ]): ProjectLoad =>
+          failed || groupsFed === 'failed' || layoutFed === 'failed'
+            ? 'failed'
+            : status === 'ready' && groupsFed === 'fed' && layoutFed === 'fed'
+              ? 'loaded'
+              : 'loading',
+      ),
+    )
+    .pipe(skipIfNoChange());
 
   const currentRepository = (): Repository | undefined => {
     const repository = followed.getSnapshot().value;
@@ -223,6 +311,7 @@ export const createDataStore = (deps: DataDeps): DataStore => {
     status: dataStatus,
     groups,
     dagLayout,
+    projectLoad,
     putTask: (task) => {
       write('タスクを保存', (repository) => repository.putTask(task));
     },
@@ -319,6 +408,13 @@ export const createDataStore = (deps: DataDeps): DataStore => {
         repository.putDagLayout(layout, deps.now()),
       );
     },
+    replaceProject: (next, previous) => {
+      const current = currentRepository();
+
+      return current === undefined
+        ? Promise.reject(new Error('Not signed in.'))
+        : current.replaceProject(next, previous, deps.now());
+    },
     start,
   };
 };
@@ -336,7 +432,15 @@ const refusalReasons = {
  */
 type Followed = Repository | undefined | 'stopped';
 
-type Loaded = Readonly<{ state: DomainState; status: DataStatus }>;
+/** `failed` once the subscription has failed, and so stopped. */
+type Loaded = Readonly<{
+  state: DomainState;
+  status: DataStatus;
+  failed: boolean;
+}>;
+
+/** What a repository's subscription hands on, and whether it has yet. */
+type Fed<A> = Readonly<{ value: A; fed: 'waiting' | 'fed' | 'failed' }>;
 
 const repositoryOf = (session: Session): Repository | undefined =>
   session.type === 'signed-in' ? session.repository : undefined;
