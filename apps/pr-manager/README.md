@@ -65,14 +65,14 @@ token account's budget, and stops while the tab is hidden.
 The page is useful on any repository as it is. These conventions, all
 optional, make it say more; **How to use** in the header sums them up:
 
-| Write this                                                                      | and the page                                      |
-| :------------------------------------------------------------------------------ | :------------------------------------------------ |
-| `Merge-After: #N` on a line of a pull request's description                     | draws it under #N in the merge order              |
-| `Start-After: #N` on a line of an issue's description, or GitHub's "blocked by" | draws the issue after #N in the DAG               |
-| a `priority:high`, `priority:mid` or `priority:low` label                       | filters and sorts by it                           |
-| a `pending` label                                                               | counts it as held back, and can hide it           |
-| required status checks in a ruleset or branch protection rule                   | judges the checks by those alone, not every check |
-| a ruleset asking for code owner review, and a `CODEOWNERS` file                 | shows which pull requests wait for a code owner   |
+| Write this                                                                      | and the page                                         |
+| :------------------------------------------------------------------------------ | :--------------------------------------------------- |
+| `Merge-After: #N` on a line of a pull request's description                     | draws it under #N in the merge order                 |
+| `Start-After: #N` on a line of an issue's description, or GitHub's "blocked by" | draws the issue after #N in the DAG                  |
+| a `priority:high`, `priority:mid` or `priority:low` label                       | filters and sorts by it                              |
+| a `pending` label                                                               | counts it as held back, can hide it or show it alone |
+| required status checks in a ruleset or branch protection rule                   | judges the checks by those alone, not every check    |
+| a ruleset asking for code owner review, and a `CODEOWNERS` file                 | shows which pull requests wait for a code owner      |
 
 What `Start-After:` means, and how an issue's wait carries over to the pull
 request closing it, is

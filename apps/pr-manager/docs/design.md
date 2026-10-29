@@ -63,19 +63,29 @@ first thirty come with the rest of the page, and the others follow a hundred at
 a time, each page added to the list as it comes in. A page that fails leaves a
 button under the list to ask for it again.
 
-**The open issues can be narrowed and sorted.** The `priority:high`,
-`priority:mid` and `priority:low` labels are switches, with **none** for an
-issue carrying no one of them (or more than one), as they are in the merge
-order. Every other label an open issue carries is a pick: once any is picked,
-only the issues carrying one picked are listed, still not those whose priority
-is switched off. **The start states** (`docs/issue-start-after.md`), in the
-DAG's words and colours, are switches too. The order is **updated**,
-**priority** — high first, none between mid and low — or **start**: what can
-be started (wait over, then free), what is in progress, what needs a look,
-what waits, what is on a cycle; the most recently updated first within each.
-Each switch and pick counts what the list shows of it, as the merge order's
-do, and the choice is kept in the URL (below). They apply to the list; the
-DAG draws every issue.
+**The open issues can be narrowed and sorted.** They lead with counts, as the
+merge order does: **open**, how many are shown of how many are open, then the
+`priority:high`, `priority:mid` and `priority:low` labels, with **none** for an
+issue carrying no one of them (or more than one), joined into one control, and
+**pending**, the `pending` label, beside them on its own. Each is a switch with
+an **only** button in its corner, as the merge order's statuses are, and the
+counts are there in the List and in the DAG alike. Two priorities picked show
+the issues of either, since an issue has one; pending picked with a priority
+shows the issues that are both. Every
+other label an open issue carries is a pick: once any is picked, only the issues
+carrying one picked are listed, still not those whose priority is switched off.
+**The start states** (`docs/issue-start-after.md`), in the DAG's words and
+colours, are switches too. The order is **updated**, **priority** — high first,
+none between mid and low — or **start**: what can be started (wait over, then
+free), what is in progress, what needs a look, what waits, what is on a cycle;
+the most recently updated first within each. Each switch and pick counts what
+the list shows of it, as the merge order's do, and the choice is kept in the URL
+(below). The priorities and pending apply to both views, and the DAG's counts
+are of what it draws; the rest apply to the list alone. The DAG leaves out the
+issues they do not show, with what only they wait on and the pull requests that
+close only them; one that an issue drawn waits on stays, alone, since it is why
+that issue waits, and is not counted as shown. Pending switched off leaves out
+every node labelled `pending` in the DAG, pull requests too.
 
 **Each issue in the list says how it stands for being started**: a badge for
 its start state, the numbers its `Start-After:` names, each coloured by where
@@ -99,12 +109,14 @@ issue dependencies GitHub records ("blocked by"), which count the same
 rounded box, the problem angular and what settles it round; an edge runs from
 what is waited for to what waits. Green is an issue that can be started (a thick
 border when it waited and need not any more), brown and dashed one that waits,
-blue an open pull request and the issues it closes, grey what is done. Each node
-shows its title and opens its page on GitHub. In the DAG, the **Done** chip beside the switch starts
-pressed; unpressed, it leaves out the issues closed as completed and the merged
-pull requests, with the waits on them that are over, so that only what is left
-to do is laid out. Both choices are kept in the URL. At the other end of
-the row, **−** and **+** zoom the graph out and in a step at a time about the
+blue an open pull request and the issues it closes, grey what closed
+unfinished. Each node shows its title and opens its page on GitHub. What is
+done — an issue closed as completed, a merged pull request — is not drawn, nor
+are the waits on it that are over, so that only what is left to do is laid out;
+it is still read, since whether what an issue names is done is what says the
+issue can be started, and the list names it. What closed unfinished is drawn,
+since the issue waiting on it needs a look. The choice is kept in the URL.
+At the other end of the row, **−** and **+** zoom the graph out and in a step at a time about the
 middle of its box, **Fit** draws all of it in the box (never larger than its
 natural size, and following the box and the graph as they change until the
 next zoom), and **100%** puts it back at its natural size. To use the room it
@@ -241,11 +253,12 @@ is written:
 - The merge order: `prs.hide=queued.setAside` (the statuses switched off),
   `prs.only=failing` (the ones picked), `prs.hidePriority=low.none` and
   `prs.sort=priority`.
-- The open issues: `issues=dag` (the DAG rather than the list),
-  `dag.hideDone=1`, `dag.hidePending=1` and `dag.zoom=125` or `dag.zoom=fit`
-  for the DAG; `issues.hidePriority=low`, `issues.hideStart=blocked.cycle`,
-  `issues.hidePending=1`, `issues.sort=priority` and `issues.label=bug`, once
-  per label picked, for the list. The search is not kept.
+- The open issues: `issues=dag` (the DAG rather than the list), and
+  `dag.zoom=125` or `dag.zoom=fit` for the DAG; `issues.hidePriority=low`,
+  `issues.onlyPriority=high`, and `issues.hidePending=1` or
+  `issues.onlyPending=1` for both; `issues.hideStart=blocked.cycle`,
+  `issues.sort=priority` and `issues.label=bug`, once per label picked, for
+  the list. The search is not kept.
 
 A name it does not know is dropped, so a URL written by an older page, or
 edited by hand, still opens. A page opened without them shows everything,

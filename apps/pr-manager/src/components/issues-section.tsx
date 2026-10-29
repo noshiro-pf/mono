@@ -1,4 +1,12 @@
-import { constant, derive, For, If, view, type JSX } from 'synstate-dom';
+import {
+  constant,
+  derive,
+  For,
+  If,
+  mapBindable,
+  view,
+  type JSX,
+} from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { newIssueUrl, openIssuesUrl } from '../github-links.mjs';
 import {
@@ -8,12 +16,11 @@ import {
   reportSource,
 } from '../store/index.mjs';
 import { ExternalLink } from './external-link.js';
-import { IssueDagDoneToggle } from './issue-dag-done-toggle.js';
-import { IssueDagPendingToggle } from './issue-dag-pending-toggle.js';
 import { IssueDagZoom } from './issue-dag-zoom.js';
 import { IssueDag } from './issue-dag.js';
 import { IssueStartRow } from './issue-start-row.js';
 import { IssuesListFilters } from './issues-list-filters.js';
+import { IssuesSummary } from './issues-summary.js';
 import { IssuesViewSwitch } from './issues-view-switch.js';
 import { LabelChip } from './label-chip.js';
 import { LoadMoreIssues } from './load-more-issues.js';
@@ -21,11 +28,13 @@ import { Timestamp } from './timestamp.js';
 
 /**
  * What is open that is not a pull request, most recently updated first, by
- * priority or by start state, and narrowed by priority, start state,
- * `pending`, label and a search of the titles (`issues-list-filters.tsx`).
- * Each row says how the issue stands for being started and what it waits for
- * (`issue-start-row.tsx`). The DAG is not narrowed by any of them: what an
- * issue waits for is drawn whole, save what it is told to leave out itself.
+ * priority or by start state, and narrowed by priority and `pending`
+ * (`issues-summary.tsx`) and by start state, label and a search of the titles
+ * (`issues-list-filters.tsx`). Each row says how the issue stands for being
+ * started and what it waits for (`issue-start-row.tsx`). The DAG is narrowed
+ * by the priorities and `pending` alone, which lead either view with how many
+ * issues are shown of how many are open: what an issue drawn waits on is
+ * drawn, whatever its priority (`omitFilteredIssues`).
  *
  * Last, because it is the one section that is not about the queue: a reader
  * asks "what is in flight" first and "what is waiting to be started" second.
@@ -39,9 +48,8 @@ import { Timestamp } from './timestamp.js';
  * is there while some are not listed, for a page that failed.
  *
  * Or, switched to it, the DAG of what each waits for (`issue-dag.tsx`), with
- * switches beside the List / DAG one for whether it draws what is done and
- * what is pending, and the zoom
- * at the other end of the row.
+ * the zoom at the other end of the row from the List / DAG switch. What is
+ * done — closed as completed, or merged — it never draws.
  */
 export const IssuesSection = (): JSX.Element => {
   const issues$ = reader.issues;
@@ -79,25 +87,23 @@ export const IssuesSection = (): JSX.Element => {
       <div class={constant('issues-toolbar')}>
         <IssuesViewSwitch />
 
-        <If
-          cond={dag}
-          then={
-            <>
-              <IssueDagDoneToggle />
-              <IssueDagPendingToggle />
-              <IssueDagZoom />
-            </>
-          }
-        />
+        <If cond={dag} then={<IssueDagZoom />} />
       </div>
 
       <If
         cond={derive(
-          [reading, issuesViewStore.view, issues$],
-          (isReading, shown, { items }) =>
-            !isReading && shown === 'list' && Arr.isNonEmpty(items),
+          [reading, issues$],
+          (isReading, { items }) => !isReading && Arr.isNonEmpty(items),
         )}
-        then={<IssuesListFilters />}
+        then={
+          <>
+            <IssuesSummary />
+            <If
+              cond={mapBindable(dag, (shown) => !shown)}
+              then={<IssuesListFilters />}
+            />
+          </>
+        }
       />
 
       <If
@@ -134,8 +140,8 @@ const IssueList = (): JSX.Element => (
           <p class={constant('section-note')}>
             {view(issuesListStore.query, (query) =>
               query.trim() === ''
-                ? 'No open issue has the priorities and labels picked.'
-                : 'No open issue with the priorities and labels picked has a title matching the search.',
+                ? 'No open issue has the priorities, pending and labels picked.'
+                : 'No open issue with the priorities, pending and labels picked has a title matching the search.',
             )}
           </p>
         }

@@ -197,7 +197,6 @@ const chainAndFree = (chain: number, free: number): IssueGraph =>
       from: index + 1,
       to: index + 2,
       kind: 'start-after',
-      settled: false,
     })),
   }) as const;
 

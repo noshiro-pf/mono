@@ -20,6 +20,7 @@ import {
 } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
+import { isIssueFilterShown, type IssueFilter } from './issue-filter.mjs';
 import type { Entry, IssueItem, ReferencedItem } from './load-report.mjs';
 import { isPending } from './pending.mjs';
 import { priorityOf, type Priority } from './priority.mjs';
@@ -64,11 +65,6 @@ export type IssueGraphEdge = Readonly<{
    * from an issue to a pull request that closes it.
    */
   kind: 'closes' | 'start-after';
-  /**
-   * Whether the wait is over: what it runs from is done. Such an edge is
-   * still drawn, since it is why the issue reads as ready, but faintly.
-   */
-  settled: boolean;
 }>;
 
 export type IssueGraph = Readonly<{
@@ -179,22 +175,18 @@ export const buildIssueGraph = ({
     (a, b) => a.number - b.number,
   );
 
-  const stateOf = new Map(nodes.map(({ number, state }) => [number, state]));
-
   const edges: readonly IssueGraphEdge[] = [
     ...issues.flatMap(({ number, startAfter }) =>
       startAfter.map((from): IssueGraphEdge => ({
         from,
         to: number,
         kind: 'start-after',
-        settled: stateOf.get(from) === 'done',
       })),
     ),
     ...closing.map(({ issue, pull }): IssueGraphEdge => ({
       from: issue,
       to: pull,
       kind: 'closes',
-      settled: false,
     })),
   ] as const;
 
@@ -245,6 +237,13 @@ export const issueStartsOf = (
   );
 };
 
+/**
+ * Whether the node is a listed issue — an open issue the page read, whose
+ * priority it knows — rather than what one names or what closes one.
+ */
+export const isListedIssue = (node: IssueGraphNode): boolean =>
+  isIssueStartState(node.state);
+
 /** Whether a node's state is a listed issue's rather than where it stands. */
 const isIssueStartState = (state: IssueNodeState): state is IssueStartState =>
   state !== 'abandoned' &&
@@ -264,26 +263,131 @@ export const omitDone = (graph: IssueGraph): IssueGraph =>
   omitNodes(graph, ({ state }) => state === 'done');
 
 /**
- * The graph without what is labelled `pending`, and without the edges that
- * run from it or to it. How the rest stands is left as it was: an issue
- * waiting on one still waits, which its tooltip says. The graph given is
- * handed back when nothing in it is pending.
+ * The graph without what is labelled `pending`, the edges that run from it
+ * or to it, and what is left with no edge for it (see {@link omitNodes}).
+ * How the rest stands is left as it was: an issue waiting on one still
+ * waits, which its tooltip says. The graph given is handed back when
+ * nothing in it is pending.
  */
 export const omitPending = (graph: IssueGraph): IssueGraph =>
   omitNodes(graph, ({ pending }) => pending);
 
+/**
+ * The graph without the listed issues `filter` leaves out by their priority
+ * or by whether they are pending (`issue-filter.mts`, which the list reads
+ * the same one from), save those an issue left in waits on, and without
+ * what is left with no edge for them (see {@link omitNodes}).
+ *
+ * An issue left out that one left in waits on is kept, as what that one waits
+ * on is kept when it is not a listed issue: it is why that issue waits. It is
+ * drawn without what it waits on in turn or the pull requests that close it,
+ * save what is drawn for another, since it is there for the other's sake, and
+ * it is not counted among the issues shown (`countIssueFilter`). Only a
+ * listed issue is left out by `filter`, since nothing else here has its labels
+ * read for a reason of its own; what is pending is taken out whatever it is by
+ * {@link omitPending}, while it is switched off. The graph given is handed back
+ * when `filter` leaves out no listed issue.
+ */
+export const omitFilteredIssues = (
+  graph: IssueGraph,
+  filter: IssueFilter,
+): IssueGraph => {
+  const filtered = new Set(
+    graph.nodes
+      .filter(
+        (node) =>
+          isListedIssue(node) &&
+          !isIssueFilterShown(node.priority, node.pending, filter),
+      )
+      .map(({ number }) => number),
+  );
+
+  if (filtered.size === 0) {
+    return graph;
+  }
+
+  // What an issue left in waits on.
+  const kept = new Set(
+    graph.edges
+      .filter(
+        ({ from, to, kind }) =>
+          kind === 'start-after' && filtered.has(from) && !filtered.has(to),
+      )
+      .map(({ from }) => from),
+  );
+
+  const gone = new Set(
+    Array.from(filtered).filter((number) => !kept.has(number)),
+  );
+
+  // What is not a listed issue is drawn for an issue drawn for its own
+  // sake: one that waits on it, or one it closes. A kept issue brings
+  // nothing of its own.
+  const anchored = new Set(
+    graph.edges.flatMap(({ from, to, kind }) =>
+      kind === 'start-after'
+        ? filtered.has(to)
+          ? []
+          : [from]
+        : filtered.has(from)
+          ? []
+          : [to],
+    ),
+  );
+
+  const drawn = new Set(
+    graph.nodes
+      .filter(({ number }) => !gone.has(number))
+      .filter((node) => isListedIssue(node) || anchored.has(node.number))
+      .map(({ number }) => number),
+  );
+
+  // Between what is drawn, every edge stays.
+  return {
+    nodes: graph.nodes.filter(({ number }) => drawn.has(number)),
+    edges: graph.edges.filter(
+      ({ from, to }) => drawn.has(from) && drawn.has(to),
+    ),
+  };
+};
+
+/**
+ * The graph without what `omitted` says, the edges that run from it or to
+ * it, and what is not a listed issue and is left with no edge: what only
+ * the nodes taken out name, and an open pull request that closes only
+ * them. Such a node is drawn only for the issues it is linked to. The graph
+ * given is handed back when nothing is taken out.
+ */
 const omitNodes = (
   graph: IssueGraph,
   omitted: (node: IssueGraphNode) => boolean,
 ): IssueGraph => {
   const gone = new Set(graph.nodes.filter(omitted).map(({ number }) => number));
 
-  return gone.size === 0
-    ? graph
-    : {
-        nodes: graph.nodes.filter(({ number }) => !gone.has(number)),
-        edges: graph.edges.filter(
-          ({ from, to }) => !gone.has(from) && !gone.has(to),
-        ),
-      };
+  if (gone.size === 0) {
+    return graph;
+  }
+
+  return withLinked(
+    graph.nodes.filter(({ number }) => !gone.has(number)),
+    graph.edges.filter(({ from, to }) => !gone.has(from) && !gone.has(to)),
+  );
+};
+
+/**
+ * `nodes` and `edges`, less what is not a listed issue and is linked by none
+ * of `edges`: such a node is drawn only for the issues it is linked to.
+ */
+const withLinked = (
+  nodes: readonly IssueGraphNode[],
+  edges: readonly IssueGraphEdge[],
+): IssueGraph => {
+  const linked = new Set(edges.flatMap(({ from, to }) => [from, to]));
+
+  return {
+    nodes: nodes.filter(
+      (node) => isListedIssue(node) || linked.has(node.number),
+    ),
+    edges,
+  };
 };

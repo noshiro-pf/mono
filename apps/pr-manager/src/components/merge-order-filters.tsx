@@ -15,7 +15,7 @@ import {
   type MergeOrderSort,
   type StatusFilter,
 } from '../merge-order-view.mjs';
-import { PRIORITIES, type Priority } from '../priority.mjs';
+import { PRIORITIES, PRIORITY_NAMES } from '../priority.mjs';
 import { mergeOrderStore, reader } from '../store/index.mjs';
 import type { StatusRole } from '../verdict.mjs';
 import { OfTotal, StatTile, StatToggle } from './stat-tile.js';
@@ -178,13 +178,6 @@ const STATUS_TONES = {
   awaitingReview: 'warning',
   pending: undefined,
 } as const satisfies ReadonlyRecord<StatusFilter, StatusRole | undefined>;
-
-const PRIORITY_NAMES = {
-  high: 'high',
-  mid: 'mid',
-  low: 'low',
-  none: 'none',
-} as const satisfies ReadonlyRecord<Priority, string>;
 
 const sortBy = (sort: MergeOrderSort) => (): void => {
   mergeOrderStore.setSort(sort);

@@ -35,6 +35,17 @@ type ToggleProps = Props &
     onOnly: () => void;
     /** Whether what it counts is picked to be shown alone. */
     only: Bindable<boolean>;
+    /**
+     * What it counts, as its tooltips name it; the pull requests under
+     * `label` unless said otherwise.
+     */
+    subject?: string;
+    /**
+     * How picking it goes with what else is picked: `either` adds to it, as
+     * one more of the same kind; `both` narrows it, as another kind
+     * (`issue-filter.mts`). `either` unless said otherwise.
+     */
+    pickWith?: 'either' | 'both';
   }>;
 
 /**
@@ -65,40 +76,48 @@ export const StatToggle = ({
   pressed,
   onOnly,
   only,
-}: ToggleProps): JSX.Element => (
-  <div class={constant('stat-cell')}>
-    <button
-      aria-pressed={mapBindable(pressed, String)}
-      class={constant('stat-tile stat-toggle')}
-      data-only={mapBindable(only, String)}
-      data-status={tone}
-      title={mapBindable(pressed, (shown) =>
-        shown
-          ? `Shown. Click to hide the pull requests that are ${label}.`
-          : `Hidden. Click to show the pull requests that are ${label}.`,
-      )}
-      type={constant('button')}
-      onClick={onToggle}
-    >
-      <StatValue total={total} value={value} />
-      <span class={constant('stat-label')}>{constant(label)}</span>
-    </button>
-    <button
-      aria-label={constant(`Show only ${label}`)}
-      aria-pressed={mapBindable(only, String)}
-      class={constant('stat-only')}
-      title={mapBindable(only, (picked) =>
-        picked
-          ? `Picked. Click to stop showing only the pull requests that are ${label}.`
-          : `Click to show only the pull requests that are ${label}, and any others picked.`,
-      )}
-      type={constant('button')}
-      onClick={onOnly}
-    >
-      {mapBindable(only, (picked) => (picked ? '✓ only' : 'only'))}
-    </button>
-  </div>
-);
+  subject,
+  pickWith = 'either',
+}: ToggleProps): JSX.Element => {
+  const what = subject ?? `the pull requests that are ${label}`;
+
+  return (
+    <div class={constant('stat-cell')}>
+      <button
+        aria-pressed={mapBindable(pressed, String)}
+        class={constant('stat-tile stat-toggle')}
+        data-only={mapBindable(only, String)}
+        data-status={tone}
+        title={mapBindable(pressed, (shown) =>
+          shown
+            ? `Shown. Click to hide ${what}.`
+            : `Hidden. Click to show ${what}.`,
+        )}
+        type={constant('button')}
+        onClick={onToggle}
+      >
+        <StatValue total={total} value={value} />
+        <span class={constant('stat-label')}>{constant(label)}</span>
+      </button>
+      <button
+        aria-label={constant(`Show only ${subject ?? label}`)}
+        aria-pressed={mapBindable(only, String)}
+        class={constant('stat-only')}
+        title={mapBindable(only, (picked) =>
+          picked
+            ? `Picked. Click to stop showing only ${what}.`
+            : pickWith === 'either'
+              ? `Click to show only ${what}, and any others picked.`
+              : `Click to show only ${what}, of what the rest shows.`,
+        )}
+        type={constant('button')}
+        onClick={onOnly}
+      >
+        {mapBindable(only, (picked) => (picked ? '✓ only' : 'only'))}
+      </button>
+    </div>
+  );
+};
 
 /**
  * ` of N` after a count that leaves some out, and nothing after one that

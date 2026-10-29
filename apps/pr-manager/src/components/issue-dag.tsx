@@ -10,7 +10,7 @@ import {
 import { Arr, Optional } from 'ts-data-forge';
 import type { IssueGraphLayout, LaidOutEdge } from '../issue-graph-layout.mjs';
 import type { IssueGraph } from '../issue-graph.mjs';
-import { issuesViewStore } from '../store/index.mjs';
+import { issuesListStore, issuesViewStore, reader } from '../store/index.mjs';
 import { dagBox } from './dag-box.mjs';
 import { IssueDagLegend } from './issue-dag-legend.js';
 import { IssueDagNode, type PlacedNode } from './issue-dag-node.js';
@@ -36,7 +36,19 @@ export const IssueDag = (): JSX.Element => (
   <If
     cond={view(issuesViewStore.graph, ({ nodes }) => Arr.isNonEmpty(nodes))}
     then={<Dag />}
-    else={<p class={constant('section-note')}>{constant('No open issues.')}</p>}
+    else={
+      <p class={constant('section-note')}>
+        {derive(
+          [reader.issues, issuesListStore.filter, issuesViewStore.counts],
+          ({ items }, { hidePending }, { open, pending }) =>
+            Arr.isEmpty(items)
+              ? 'No open issues.'
+              : hidePending && pending.total === open.total
+                ? 'Every open issue is pending.'
+                : 'No open issue has the priorities and pending shown.',
+        )}
+      </p>
+    }
   />
 );
 
@@ -94,9 +106,6 @@ const Dag = (): JSX.Element => {
                   class={constant('issue-dag-edge')}
                   d={view(edge$, ({ path }) => path)}
                   data-kind={view(edge$, ({ kind }) => kind)}
-                  data-settled={view(edge$, ({ settled }) =>
-                    settled.toString(),
-                  )}
                   // The kind is in the key, so it is the one the row was
                   // made with.
                   marker-end={
@@ -119,7 +128,7 @@ const Dag = (): JSX.Element => {
                 x={view(at$, ({ x }) => x)}
                 y={view(at$, ({ y }) => y)}
               >
-                {constant('No dependencies either way')}
+                {constant('No dependencies drawn either way')}
               </text>
             )}
           />

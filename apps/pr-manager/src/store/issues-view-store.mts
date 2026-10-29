@@ -2,11 +2,15 @@
  * How the issues block shows the open issues: as the list, or as the DAG of
  * what each waits for (`Start-After:`).
  *
- * The DAG can leave out what is done (`omitDone`), so that what is left to
- * do is all it lays out; and what is labelled `pending` (`omitPending`), a
- * switch of its own, since what is held back for now is not what is left to
- * do. The view and both switches start as `initial`, which the page reads
- * off the query string as it opens (`issues-view-settings.mts`), and every
+ * The DAG leaves out what is done (`omitDone`), so that what is left to do
+ * is all it lays out — what is done is closed or merged, and is read only
+ * for how an issue that names it stands; what is labelled `pending`
+ * (`omitPending`) when it is switched off, since what is held back for now
+ * is not what is left to do; and the issues the priorities and `pending`
+ * leave out (`omitFilteredIssues`), which both views read
+ * (`issues-list-store.mts`), with how many issues each of them has drawn of
+ * how many are open. The view starts as `initial`, which the page reads off
+ * the query string as it opens (`issues-view-settings.mts`), and every
  * change is handed to `save` from `start` on.
  *
  * Every open issue is read, in either view: the first thirty come with the
@@ -31,10 +35,11 @@
  * lets the whole graph be drawn the largest. A zoom from the fit keeps that
  * arrangement, and the natural size puts them back in the default one.
  *
- * The graph the DAG draws, and where each of its nodes goes, are derived
- * here from the report and that switch, and passed on only when they
- * changed: a poll that moved a pull request's checks changes the entries,
- * not the graph, and lays nothing out again.
+ * The whole graph is {@link createIssueGraph}'s, which the list reads each
+ * issue's start state off too. The graph the DAG draws, and where each of
+ * its nodes goes, are derived here from it and those switches, and passed
+ * on only when they changed: a poll that moved a pull request's checks
+ * changes the entries, not the graph, and lays nothing out again.
  */
 
 import {
@@ -54,6 +59,7 @@ import {
   type DagZoom,
   type Size,
 } from '../dag-zoom.mjs';
+import type { IssueFilter } from '../issue-filter.mjs';
 import {
   defaultPlacement,
   layoutConnected,
@@ -63,10 +69,18 @@ import {
 } from '../issue-graph-layout.mjs';
 import {
   buildIssueGraph,
+  isListedIssue,
   omitDone,
+  omitFilteredIssues,
   omitPending,
   type IssueGraph,
+  type IssueGraphNode,
 } from '../issue-graph.mjs';
+import {
+  countIssueFilter,
+  type IssueFacts,
+  type IssueFilterCounts,
+} from '../issues-list-view.mjs';
 import type {
   IssuesView,
   IssuesViewSettings,
@@ -76,10 +90,11 @@ import type { MoreIssuesStatus } from './reader.mjs';
 
 export type IssuesViewDeps = Readonly<{
   issues: InitializedObservable<LoadedReport['issues']>;
-  entries: InitializedObservable<readonly Entry[]>;
-  /** `https://github.com/owner/name`, for a number nobody described. */
-  repoUrl: string;
-  /** The view and the DAG's switches as the page opens. */
+  /** The whole graph, what is done included ({@link createIssueGraph}). */
+  graph: InitializedObservable<IssueGraph>;
+  /** The priorities and `pending` the list shows, which the DAG draws too. */
+  filter: InitializedObservable<IssueFilter>;
+  /** The view as the page opens. */
   initial: IssuesViewSettings;
   save: (settings: IssuesViewSettings) => void;
   /** How large the DAG is drawn as the page opens. */
@@ -93,29 +108,22 @@ export type IssuesViewDeps = Readonly<{
 
 export type IssuesViewStore = Readonly<{
   view: InitializedObservable<IssuesView>;
-  /** Whether the DAG leaves out what is done. */
-  hideDone: InitializedObservable<boolean>;
-  /** Whether the DAG leaves out what is labelled `pending`. */
-  hidePending: InitializedObservable<boolean>;
   /**
-   * The graph the DAG draws: without what is done, and what is pending,
-   * when that is hidden.
+   * The graph the DAG draws: without what is done, what is pending when
+   * that is hidden, and the issues the priorities and `pending` leave out.
    */
   graph: InitializedObservable<IssueGraph>;
-  /** The whole graph, what is done included: what the list reads from. */
-  fullGraph: InitializedObservable<IssueGraph>;
   layout: InitializedObservable<IssueGraphLayout>;
-  /** How many nodes are done, whether or not they are drawn. */
-  doneCount: InitializedObservable<number>;
-  /** How many nodes are pending, whether or not they are drawn. */
-  pendingCount: InitializedObservable<number>;
+  /**
+   * How many open issues the DAG draws, of how many there are, in all, for
+   * each priority and for `pending`, counted as the list counts its own.
+   */
+  counts: InitializedObservable<IssueFilterCounts>;
   /** What the layout's units are multiplied by to draw the DAG. */
   dagScale: InitializedObservable<number>;
   /** Whether the DAG is drawn to fit its box, whatever the scale that takes. */
   dagFitted: InitializedObservable<boolean>;
   choose: (view: IssuesView) => void;
-  toggleHideDone: () => void;
-  toggleHidePending: () => void;
   /** The room the DAG's box has for the graph, as last measured. */
   setDagBox: (box: Size) => void;
   zoomIn: () => void;
@@ -136,24 +144,14 @@ export const createIssuesViewStore = (
 ): IssuesViewStore => {
   const [view, setView] = createState<IssuesView>(deps.initial.view);
 
-  const [hideDone, , { updateState: updateHideDone }] = createState(
-    deps.initial.hideDone,
-  );
-
-  const [hidePending, , { updateState: updateHidePending }] = createState(
-    deps.initial.hidePending,
-  );
-
   const [zoom, setZoom] = createState<DagZoom>(deps.initialZoom);
 
   const [dagBox, setDagBox] = createState<Size>({ width: 0, height: 0 });
 
   const start = (): (() => void) => {
-    const saving = combine([view, hideDone, hidePending]).subscribe(
-      ([current, hideD, hideP]) => {
-        deps.save({ view: current, hideDone: hideD, hidePending: hideP });
-      },
-    );
+    const saving = view.subscribe((current) => {
+      deps.save({ view: current });
+    });
 
     const zoomSaving = zoom.subscribe(deps.saveZoom);
 
@@ -174,26 +172,31 @@ export const createIssuesViewStore = (
     };
   };
 
-  const fullGraph = combine([deps.issues, deps.entries])
+  const withoutDone = deps.graph.pipe(map(omitDone));
+
+  // `pending` switched off before the rest, so that what an issue waits on is
+  // kept for it only while that issue is drawn.
+  const graph = combine([withoutDone, deps.filter])
     .pipe(
-      map(([issues, entries]) =>
-        buildIssueGraph({
-          repoUrl: deps.repoUrl,
-          issues: issues.items,
-          referenced: issues.referenced,
-          pulls: entries,
-        }),
+      map(([open, filter]) =>
+        omitFilteredIssues(
+          filter.hidePending ? omitPending(open) : open,
+          filter,
+        ),
       ),
     )
     .pipe(skipIfNoChange(fastDeepEqual));
 
-  const graph = combine([fullGraph, hideDone, hidePending])
+  const counts = combine([deps.graph, deps.filter])
     .pipe(
-      map(([full, hideD, hideP]) => {
-        const withoutDone = hideD ? omitDone(full) : full;
-
-        return hideP ? omitPending(withoutDone) : withoutDone;
-      }),
+      map(([full, filter]) =>
+        countIssueFilter(
+          full.nodes.filter(isListedIssue),
+          NODE_FACTS,
+          () => true,
+          filter,
+        ),
+      ),
     )
     .pipe(skipIfNoChange(fastDeepEqual));
 
@@ -232,32 +235,14 @@ export const createIssuesViewStore = (
     setZoom({ type: 'scale', scale: step(dagScale.getSnapshot().value) });
   };
 
-  const doneCount = fullGraph.pipe(
-    map(({ nodes }) => nodes.filter(({ state }) => state === 'done').length),
-  );
-
-  const pendingCount = fullGraph.pipe(
-    map(({ nodes }) => nodes.filter(({ pending }) => pending).length),
-  );
-
   return {
     view,
-    hideDone,
-    hidePending,
     graph,
-    fullGraph,
     layout,
-    doneCount,
-    pendingCount,
+    counts,
     dagScale,
     dagFitted,
     choose: setView,
-    toggleHideDone: () => {
-      updateHideDone((current) => !current);
-    },
-    toggleHidePending: () => {
-      updateHidePending((current) => !current);
-    },
     setDagBox,
     zoomIn: zoomBy(zoomInFrom),
     zoomOut: zoomBy(zoomOutFrom),
@@ -272,3 +257,38 @@ export const createIssuesViewStore = (
     start,
   };
 };
+
+/**
+ * The open issues as the graph of what each waits for (`issue-graph.mts`),
+ * what is done included, since that is why an issue reads as ready: what
+ * the DAG draws from (`createIssuesViewStore`) and what the list reads each
+ * issue's start state off (`issues-list-store.mts`). Passed on only when it
+ * changed.
+ */
+export const createIssueGraph = ({
+  issues,
+  entries,
+  repoUrl,
+}: Readonly<{
+  issues: InitializedObservable<LoadedReport['issues']>;
+  entries: InitializedObservable<readonly Entry[]>;
+  /** `https://github.com/owner/name`, for a number nobody described. */
+  repoUrl: string;
+}>): InitializedObservable<IssueGraph> =>
+  combine([issues, entries])
+    .pipe(
+      map(([read, pulls]) =>
+        buildIssueGraph({
+          repoUrl,
+          issues: read.items,
+          referenced: read.referenced,
+          pulls,
+        }),
+      ),
+    )
+    .pipe(skipIfNoChange(fastDeepEqual));
+
+const NODE_FACTS: IssueFacts<IssueGraphNode> = {
+  priority: (node) => node.priority,
+  pending: (node) => node.pending,
+} as const;

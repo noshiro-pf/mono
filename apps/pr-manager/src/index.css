@@ -584,7 +584,7 @@ a:focus-visible {
   padding: calc(0.75rem - 1px) calc(0.9rem - 1px);
 }
 
-.summary-row[data-picking='true']
+:is(.summary-row, .stat-group)[data-picking='true']
   .stat-toggle[data-only='false'][aria-pressed='true']
   :is(.stat-value, .stat-label) {
   color: var(--ink-muted);
@@ -674,7 +674,7 @@ a:focus-visible {
 
 /* Faded or struck through with the count it follows. */
 .stat-toggle[aria-pressed='false'] .count-total,
-.summary-row[data-picking='true']
+:is(.summary-row, .stat-group)[data-picking='true']
   .stat-toggle[data-only='false'][aria-pressed='true']
   .count-total,
 .filter-chip[aria-pressed='false'] .count-total {
@@ -2160,7 +2160,126 @@ a:focus-visible {
 }
 
 /*
- * The list's priorities, labels and order, laid out as the merge order's
+ * How many issues either view shows, the priorities and `pending` as
+ * switches, as the merge order's counts are, closer to what they count. The
+ * priorities are one control, their tiles joined edge to edge, and
+ * `pending` stands beside it on its own (`issues-summary.tsx`): a row that
+ * wraps rather than a grid, so that the joined tiles wrap as one, onto a row
+ * of their own where the four do not fit beside the rest.
+ */
+.issues-summary.summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.issues-summary > :is(.stat-tile, .stat-cell) {
+  flex: 1 1 7.5rem;
+}
+
+.issues-summary > .stat-group {
+  flex: 4 1 30rem;
+}
+
+.stat-group {
+  display: flex;
+  min-width: 0;
+}
+
+.stat-group > .stat-cell {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/*
+ * The tiles share their edges: each overlaps the one before by the
+ * hairline, and the one hovered, focused or picked is drawn over the tiles
+ * beside it, so that its outline is whole. Hidden, a tile keeps the solid
+ * edge it shares, and is told by its struck-through number alone.
+ */
+.stat-group > .stat-cell + .stat-cell {
+  margin-left: -1px;
+}
+
+.stat-group > .stat-cell:is(:hover, :focus-within),
+.stat-group > .stat-cell:has(> .stat-toggle[data-only='true']) {
+  z-index: 1;
+}
+
+.stat-group > .stat-cell > .stat-toggle {
+  border-radius: 0;
+}
+
+.stat-group > .stat-cell:first-child > .stat-toggle {
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+
+.stat-group > .stat-cell:last-child > .stat-toggle {
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.stat-group > .stat-cell > .stat-toggle[aria-pressed='false'] {
+  border-color: var(--border-ring);
+  border-style: solid;
+}
+
+/*
+ * Where the row cannot hold all six tiles at their least (six of 7.5rem and
+ * the two gaps), `open` and `pending` side by side and the joined tiles on a
+ * row of their own under them, packed densely so that `pending` takes the
+ * room beside `open` the joined tiles leave, rather than a row each. Where
+ * the four are narrower than a tile can hold its number and its `only`
+ * beside each other, two rows of two.
+ */
+.issues-summary-box {
+  container: issues-summary / inline-size;
+}
+
+@container issues-summary (width < 46.5rem) {
+  .issues-summary.summary-row {
+    display: grid;
+    grid-auto-flow: row dense;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .issues-summary > .stat-group {
+    grid-column: 1 / -1;
+  }
+}
+
+@container issues-summary (width < 32rem) {
+  .issues-summary > .stat-group {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat-group > .stat-cell + .stat-cell:nth-child(odd) {
+    margin-left: 0;
+  }
+
+  .stat-group > .stat-cell:nth-child(n + 3) {
+    margin-top: -1px;
+  }
+
+  .stat-group > .stat-cell:nth-child(1) > .stat-toggle {
+    border-radius: var(--radius) 0 0 0;
+  }
+
+  .stat-group > .stat-cell:nth-child(2) > .stat-toggle {
+    border-radius: 0 var(--radius) 0 0;
+  }
+
+  .stat-group > .stat-cell:nth-child(3) > .stat-toggle {
+    border-radius: 0 0 0 var(--radius);
+  }
+
+  .stat-group > .stat-cell:nth-child(4) > .stat-toggle {
+    border-radius: 0 0 var(--radius) 0;
+  }
+}
+
+/*
+ * The list's start states, labels and order, laid out as the merge order's
  * controls are, above the list and under the List / DAG switch.
  */
 .issues-list-controls {
@@ -2300,10 +2419,6 @@ a:focus-visible {
   stroke-width: 1.5;
 }
 
-.issue-dag-edge[data-settled='true'] {
-  stroke: var(--baseline);
-}
-
 .issue-dag-edge[data-kind='closes'] {
   stroke: var(--dag-progress);
   stroke-dasharray: 5 4;
@@ -2394,13 +2509,11 @@ a:focus-visible {
   --dag-colour: var(--dag-progress);
 }
 
-.issue-dag [data-state='done'],
 .issue-dag [data-state='abandoned'],
 .issue-dag [data-state='unknown'] {
   --dag-colour: var(--dag-over);
 }
 
-.issue-dag-node[data-state='done'] .issue-dag-title,
 .issue-dag-node[data-state='abandoned'] .issue-dag-title,
 .issue-dag-node[data-state='unknown'] .issue-dag-title {
   fill: var(--ink-secondary);
