@@ -43,6 +43,7 @@ export * from './milestone-section.js';
 export * from './node-dialog.js';
 export * from './node-size-field.js';
 export * from './notice-bar.js';
+export * from './project-import-dialog.js';
 export * from './scope-effects.mjs';
 export * from './sign-in-screen.js';
 export * from './sort-editor.js';

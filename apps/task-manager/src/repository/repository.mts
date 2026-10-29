@@ -14,6 +14,7 @@ import type {
   NodeRef,
   Task,
 } from '../domain/index.mjs';
+import type { ProjectSnapshot } from './project-file.mjs';
 
 export type Repository = Readonly<{
   /**
@@ -61,6 +62,22 @@ export type Repository = Readonly<{
   subscribeDagLayout: (observer: DagLayoutObserver) => () => void;
   /** Replaces the DAG's layout, stamped `updatedAt`. */
   putDagLayout: (layout: DagLayout, updatedAt: number) => Promise<void>;
+  /**
+   * Replaces the project `previous` — as this repository handed it to its
+   * subscribers — with `next`, keeping `next`'s ids: what `next` has is
+   * written, then what only `previous` has is deleted; the layout, stamped
+   * `updatedAt`, is written if `next` has one, and deleted if only
+   * `previous` has. A document never handed on, one that could not be read,
+   * is otherwise left as it is. More writes
+   * than one batch takes are split (`api/firestore-io.mts`), so a failure
+   * can leave part of it written — never what is deleted before what is
+   * written — and the promise then rejects.
+   */
+  replaceProject: (
+    next: ProjectSnapshot,
+    previous: ProjectSnapshot,
+    updatedAt: number,
+  ) => Promise<void>;
 }>;
 
 export type RepositoryObserver = Readonly<{

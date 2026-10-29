@@ -14,6 +14,7 @@ export * from './group-editor-store.mjs';
 export * from './list-settings-store.mjs';
 export * from './media-store.mjs';
 export * from './node-size-store.mjs';
+export * from './project-file-store.mjs';
 export * from './session-store.mjs';
 export * from './store.mjs';
 export * from './ui-store.mjs';

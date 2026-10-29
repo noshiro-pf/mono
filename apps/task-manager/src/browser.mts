@@ -8,6 +8,7 @@ import {
   createEventEmitter,
   type Observable as SynstateObservable,
 } from 'synstate';
+import type { Mutable } from 'ts-type-forge';
 import type { PersistedSetting } from './view-model/index.mjs';
 
 /** The setting stored on this device, or its default. */
@@ -59,6 +60,27 @@ export const fromEvent = (
   target.addEventListener(type, emit);
 
   return event$;
+};
+
+/** Hands the reader the JSON `text` as a file named `fileName` to save. */
+export const downloadJson = (fileName: string, text: string): void => {
+  const url = URL.createObjectURL(
+    new Blob([text], { type: 'application/json' }),
+  );
+
+  const mut_link: Mutable<HTMLAnchorElement> = document.createElement('a');
+
+  mut_link.href = url;
+
+  mut_link.download = fileName;
+
+  mut_link.click();
+
+  // Not at once: some browsers, Safari among them, read the URL only after
+  // the click has returned, and fail the download if it is gone.
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 40_000);
 };
 
 /** A media query, as the `MediaDeps` of `createMediaStore`. */

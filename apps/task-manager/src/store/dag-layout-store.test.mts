@@ -933,6 +933,40 @@ describe(createDagLayoutStore, () => {
       });
     });
 
+    test('keeps a layout written with nodes none of which it had, as an import writes', async () => {
+      const { store, deferred, saved, setState, setStored } = await shown();
+
+      store.autoArrange();
+
+      await settle();
+
+      const imported: DagLayout = {
+        direction: 'right',
+        positions: positions([
+          ['task:x', { x: 1000, y: 1000 }],
+          ['task:y', { x: 2000, y: 2000 }],
+        ]),
+        groupPositions: new Map<GroupId, Point>(),
+      } as const;
+
+      const writes = saved.length;
+
+      // The nodes first; the order the two subscriptions hand them on in.
+      setState({ tasks: mixed.tasks, milestones: [] });
+
+      setStored(imported);
+
+      assert.strictEqual(deferred.requests.length, 2);
+
+      deferred.resolve(1, 300);
+
+      await settle();
+
+      assert.strictEqual(saved.length, writes);
+
+      assert.deepStrictEqual(store.arrangement.getSnapshot().value, imported);
+    });
+
     test('writes nothing while nothing was ever saved', async () => {
       const { deferred, saved, setState } = await shown();
 

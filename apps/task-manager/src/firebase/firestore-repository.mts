@@ -18,6 +18,7 @@ import { Result } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import {
   commitBatch,
+  commitInBatches,
   putDoc,
   watchCollection,
   watchDoc,
@@ -197,6 +198,47 @@ export const createFirestoreRepository = (
       }),
     putDagLayout: (layout, updatedAt) =>
       putDoc(dagLayout, dagLayoutToDoc(layout, updatedAt)),
+    replaceProject: async (next, previous, updatedAt) => {
+      // What is written is sent, and confirmed, before anything is
+      // deleted, so that a failure leaves more than before, never less.
+      await commitInBatches(firestore, (batch) => {
+        for (const task of next.state.tasks) {
+          batch.set(taskDoc(task.id), taskToDoc(task));
+        }
+
+        for (const milestone of next.state.milestones) {
+          batch.set(milestoneDoc(milestone.id), milestoneToDoc(milestone));
+        }
+
+        for (const group of next.groups) {
+          batch.set(groupDoc(group.id), groupToDoc(group));
+        }
+
+        if (next.dagLayout !== undefined) {
+          batch.set(dagLayout, dagLayoutToDoc(next.dagLayout, updatedAt));
+        }
+      });
+
+      await commitInBatches(firestore, (batch) => {
+        if (next.dagLayout === undefined && previous.dagLayout !== undefined) {
+          batch.delete(dagLayout.ref);
+        }
+
+        for (const [collectionRef, before, after] of [
+          [tasks, previous.state.tasks, next.state.tasks],
+          [milestones, previous.state.milestones, next.state.milestones],
+          [groups, previous.groups, next.groups],
+        ] as const) {
+          const kept = new Set<string>(after.map(({ id }) => id));
+
+          for (const { id } of before) {
+            if (!kept.has(id)) {
+              batch.delete(doc(collectionRef, id));
+            }
+          }
+        }
+      });
+    },
   };
 };
 

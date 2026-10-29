@@ -59,6 +59,14 @@ export const createMemoryRepository = (
     }
   };
 
+  const updateLayout = (next: DagLayout | undefined): void => {
+    mut_layout = next;
+
+    for (const observer of mut_layoutObservers) {
+      observer.next(mut_layout);
+    }
+  };
+
   return {
     subscribe: (observer) => {
       mut_observers.add(observer);
@@ -118,13 +126,17 @@ export const createMemoryRepository = (
       };
     },
     putDagLayout: (layout) => {
-      mut_layout = layout;
-
-      for (const observer of mut_layoutObservers) {
-        observer.next(mut_layout);
-      }
+      updateLayout(layout);
 
       return Promise.resolve();
+    },
+    // The nodes first, as Firestore's listeners hand them on.
+    replaceProject: async ({ state, groups, dagLayout }) => {
+      await update(state);
+
+      updateGroups(groups);
+
+      updateLayout(dagLayout);
     },
   };
 };
