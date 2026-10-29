@@ -9,7 +9,7 @@ export const typescriptEslintRules = {
     'error',
     { default: 'array', readonly: 'array' },
   ],
-  '@typescript-eslint/await-thenable': 'error',
+  '@typescript-eslint/await-thenable': withDefaultOption('error'),
   '@typescript-eslint/ban-ts-comment': withDefaultOption('error'),
   '@typescript-eslint/ban-tslint-comment': 'error',
   '@typescript-eslint/no-restricted-types': [

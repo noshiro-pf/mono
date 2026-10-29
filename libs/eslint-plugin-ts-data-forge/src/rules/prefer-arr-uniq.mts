@@ -45,6 +45,7 @@ export const preferArrUniq: TSESLint.RuleModule<MessageIds, Options> = {
       suggestArrUniq:
         'Replace with `Arr.uniq({{arrayName}})` from ts-data-forge (the result becomes a readonly array).',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -213,7 +214,6 @@ export const preferArrUniq: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /**

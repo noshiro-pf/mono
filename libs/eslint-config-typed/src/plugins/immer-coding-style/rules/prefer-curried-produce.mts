@@ -40,6 +40,7 @@ export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
       useCurriedProduce:
         'Use the curried overload of `produce`: `produce(recipe)` instead of `(state) => produce(state, recipe)`.',
     },
+    defaultOptions: [],
   },
   create: (context) => {
     const sourceCode = context.sourceCode;
@@ -99,7 +100,6 @@ export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 type ReportContext = Readonly<{

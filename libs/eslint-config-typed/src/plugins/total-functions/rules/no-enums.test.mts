@@ -1,6 +1,5 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import dedent from 'dedent';
 import { noEnums } from './no-enums.mjs';
 
@@ -28,7 +27,6 @@ ruleTester.run<'errorStringGeneric', readonly []>('no-enums', noEnums, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSEnumDeclaration,
         },
       ],
     },
@@ -43,7 +41,6 @@ ruleTester.run<'errorStringGeneric', readonly []>('no-enums', noEnums, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSEnumDeclaration,
         },
       ],
     },
@@ -58,7 +55,6 @@ ruleTester.run<'errorStringGeneric', readonly []>('no-enums', noEnums, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSEnumDeclaration,
         },
       ],
     },

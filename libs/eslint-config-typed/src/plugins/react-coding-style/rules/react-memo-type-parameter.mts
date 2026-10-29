@@ -32,6 +32,7 @@ export const reactMemoTypeParameterRule: TSESLint.RuleModule<MessageIds> = {
       omitTypeParameterWhenPropsEmpty:
         'Remove the type parameter from React.memo when the component does not accept props.',
     },
+    defaultOptions: [],
   },
   create: (context) => ({
     CallExpression: (node: DeepReadonly<TSESTree.CallExpression>) => {
@@ -87,7 +88,6 @@ export const reactMemoTypeParameterRule: TSESLint.RuleModule<MessageIds> = {
       }
     },
   }),
-  defaultOptions: [],
 } as const;
 
 const isPropsTypeReference = (

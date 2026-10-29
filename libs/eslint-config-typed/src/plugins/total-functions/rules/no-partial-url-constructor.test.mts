@@ -1,6 +1,5 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import dedent from 'dedent';
 import { noPartialUrlConstructor } from './no-partial-url-constructor.mjs';
 
@@ -59,7 +58,6 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.NewExpression,
         },
       ],
     },
@@ -71,7 +69,6 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
       errors: [
         {
           messageId: 'errorStringWillDefinitelyThrow',
-          type: AST_NODE_TYPES.Literal,
         },
       ],
     },
@@ -83,7 +80,6 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
       errors: [
         {
           messageId: 'errorStringWillDefinitelyThrow',
-          type: AST_NODE_TYPES.NewExpression,
         },
       ],
     },
@@ -95,7 +91,6 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
       errors: [
         {
           messageId: 'errorStringWillDefinitelyThrow',
-          type: AST_NODE_TYPES.NewExpression,
         },
       ],
     },
@@ -108,7 +103,6 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
     //   errors: [
     //     {
     //       messageId: 'errorStringWillDefinitelyThrow',
-    //       type: AST_NODE_TYPES.Literal,
     //     },
     //   ],
     // },
@@ -120,7 +114,6 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
     //   errors: [
     //     {
     //       messageId: 'errorStringWillDefinitelyThrow',
-    //       type: AST_NODE_TYPES.Literal,
     //     },
     //   ],
     // },
@@ -132,7 +125,6 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
     //   errors: [
     //     {
     //       messageId: 'errorStringWillDefinitelyThrow',
-    //       type: AST_NODE_TYPES.Literal,
     //     },
     //   ],
     // },
@@ -145,7 +137,6 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
       errors: [
         {
           messageId: 'errorStringWillDefinitelyThrow',
-          type: AST_NODE_TYPES.Literal,
         },
       ],
     },
@@ -188,11 +179,9 @@ describe('no-partial-url-constructor through type wrappers', () => {
         errors: [
           {
             messageId: 'errorStringWillDefinitelyThrow',
-            type: AST_NODE_TYPES.TSSatisfiesExpression,
           },
           {
             messageId: 'errorStringWillDefinitelyThrow',
-            type: AST_NODE_TYPES.NewExpression,
           },
         ],
       },

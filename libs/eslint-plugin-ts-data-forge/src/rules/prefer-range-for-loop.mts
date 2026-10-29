@@ -31,6 +31,7 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
       useRangeForLoop:
         'Replace with `for (const {{varName}} of range({{begin}}, {{end}}))` from ts-data-forge.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -262,7 +263,6 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 const isNegatedLiteral = (

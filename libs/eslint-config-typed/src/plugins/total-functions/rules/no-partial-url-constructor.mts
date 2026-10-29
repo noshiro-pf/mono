@@ -25,6 +25,7 @@ export const noPartialUrlConstructor = createRule({
         "Don't use the URL constructor directly because it can throw and because URLs are mutable. Instead, use `readonlyURL` from the readonly-types package.",
     },
     schema: [],
+    defaultOptions: [],
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
@@ -116,7 +117,6 @@ export const noPartialUrlConstructor = createRule({
       },
     };
   },
-  defaultOptions: [],
 } as const);
 
 const isValidUrl = (s: string, base?: string): boolean => URL.canParse(s, base);

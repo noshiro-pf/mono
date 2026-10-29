@@ -51,8 +51,8 @@ export const noNumberCall: TSESLint.RuleModule<'noNumberCall'> = {
         messages: { noNumberCall: 'Use `toNumber` instead of `Number`.' },
         fixable: 'code',
         schema: [],
+        defaultOptions: [],
     },
-    defaultOptions: [],
     create: (context) => ({
         CallExpression: (node) => {
             // Judge the syntax on the expression inside the wrappers ...
@@ -153,8 +153,8 @@ export const preferIsNullish: TSESLint.RuleModule<'preferIsNullish'> = {
         messages: { preferIsNullish: 'Use `isNullish`.' },
         fixable: 'code',
         schema: [],
+        defaultOptions: [],
     },
-    defaultOptions: [],
     create: (context) => {
         const program = context.sourceCode.ast;
 

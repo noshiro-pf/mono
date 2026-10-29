@@ -17,8 +17,8 @@ export const preferIsNullish: TSESLint.RuleModule<'preferIsNullish'> = {
     messages: { preferIsNullish: 'Use `isNullish`.' },
     fixable: 'code',
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => {
     const program = context.sourceCode.ast;
 

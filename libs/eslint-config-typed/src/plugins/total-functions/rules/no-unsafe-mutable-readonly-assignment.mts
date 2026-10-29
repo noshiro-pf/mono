@@ -31,6 +31,7 @@ export const noUnsafeMutableReadonlyAssignment = createRule({
         'Unsafe "{{ sourceImmutability }}" to "{{ destinationImmutability }}" assignment. Source: "{{ sourceType }}", destination: "{{ destinationType }}"',
     },
     schema: [],
+    defaultOptions: [],
   },
   create: createNoUnsafeAssignmentRule(
     (
@@ -103,5 +104,4 @@ export const noUnsafeMutableReadonlyAssignment = createRule({
       return allSafe ? 'safe' : 'unsafe';
     },
   ),
-  defaultOptions: [],
 } as const);

@@ -32,8 +32,8 @@ export const noInternalModuleImport = createRule({
         '`{{specifier}}` is an internal path of `{{packageName}}`, which has no `exports` map. Import the package by its name.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => {
     const check = (source: DeepReadonly<TSESTree.Node> | null): void => {
       if (source === null) {

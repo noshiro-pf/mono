@@ -53,6 +53,7 @@ export const preferPipeMapNullable: TSESLint.RuleModule<MessageIds, Options> = {
       suggestMapNullable:
         'Replace `.map({{mapNullableName}}(…))` with `.mapNullable(…)` (the inferred type may be widened, or a comment or type assertion dropped).',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -283,7 +284,6 @@ export const preferPipeMapNullable: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /**

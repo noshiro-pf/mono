@@ -141,6 +141,7 @@ export const preferCanonicalLengthCast: TSESLint.RuleModule<
       useCanonicalCast:
         'Use `{{arrName}}.{{replacement}}(...)` instead of `{{arrName}}.{{cast}}({{boundsText}})`: with these bounds the result type is the same (or stricter), and `{{replacement}}` names the constraint directly.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -197,7 +198,6 @@ export const preferCanonicalLengthCast: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /** The `Arr.<cast>` method name of `node`, or `undefined` for other calls. */

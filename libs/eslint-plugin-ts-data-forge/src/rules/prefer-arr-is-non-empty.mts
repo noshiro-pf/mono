@@ -30,6 +30,7 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
       useIsNonEmpty:
         'Replace `{{original}}` with `Arr.isNonEmpty({{arrayName}})` from ts-data-forge.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -125,5 +126,4 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;

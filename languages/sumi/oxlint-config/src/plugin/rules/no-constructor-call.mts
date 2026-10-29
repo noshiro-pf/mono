@@ -50,8 +50,8 @@ export const noConstructorCall = createRule({
         '`{{name}}(...)` is not allowed in Sumi (D-15): it is an implicit conversion. Use {{alternative}} instead.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => {
     const check = (callee: DeepReadonly<TSESTree.Expression>): void => {
       // `(Number satisfies NumberConstructor)('1')` and

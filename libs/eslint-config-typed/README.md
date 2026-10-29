@@ -63,7 +63,7 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
 
 ## Requirements
 
-- Node.js >= 22.22.2
+- Node.js >= 22.23.4
 - ESLint >= 9.0.0
 - TypeScript >= 5.0.0 < 7.0.0 (for TypeScript projects)
 

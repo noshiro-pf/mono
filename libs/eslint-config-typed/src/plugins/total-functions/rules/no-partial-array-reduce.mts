@@ -30,6 +30,7 @@ export const noPartialArrayReduce = createRule({
         'Array.prototype.reduce() is partial. It will throw if the array is empty. Provide an initial value or prove the array is non-empty to prevent this error.',
     },
     schema: [],
+    defaultOptions: [],
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
@@ -153,5 +154,4 @@ export const noPartialArrayReduce = createRule({
       },
     };
   },
-  defaultOptions: [],
 } as const);

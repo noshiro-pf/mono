@@ -12,8 +12,8 @@ export const noUnsafeOptionalPropertyAssignment = createRule({
     messages: {},
     schema: [],
     deprecated: true,
+    defaultOptions: [],
   },
 
   create: () => ({}),
-  defaultOptions: [],
 } as const);

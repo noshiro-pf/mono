@@ -88,6 +88,7 @@ export const explicitCollectionTypeArguments: TSESLint.RuleModule<
       addInferredTypeArguments:
         'Write the type arguments TypeScript infers here: `{{typeArguments}}`.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -161,7 +162,6 @@ export const explicitCollectionTypeArguments: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /**

@@ -29,8 +29,8 @@ export const preferAssertIsTrueOverAssertRule: TSESLint.RuleModule<
       preferAssertIsTrueOverAssert:
         'Use assert.isTrue(X) instead of {{method}}(X).',
     },
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     CallExpression: (node) => {
       // assert(X) -> assert.isTrue(X)

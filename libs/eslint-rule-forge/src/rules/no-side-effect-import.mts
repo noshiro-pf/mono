@@ -28,6 +28,7 @@ export const createNoSideEffectImport = ({
       fixable: 'code',
       schema: [],
       messages: { removeSideEffectImport: message },
+      defaultOptions: [],
     },
 
     create: (context) => ({
@@ -43,7 +44,6 @@ export const createNoSideEffectImport = ({
         });
       },
     }),
-    defaultOptions: [],
   }) as const;
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */

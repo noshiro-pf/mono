@@ -20,8 +20,8 @@ export const noNamespaceObjectUse = createRule({
         'The namespace object `{{name}}` may only be used through property access (`{{name}}.member`): using it as a value is not tree-shakable.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     ImportNamespaceSpecifier: (node) => {
       for (const variable of context.sourceCode.getDeclaredVariables(node)) {

@@ -20,8 +20,8 @@ export const noSetter = createRule({
         'Setters are not allowed in Sumi (D-33): an assignment must not run code, and a setter is a mutation. Use an explicit function property (`setX: (v) => ...`).',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     Property: (node) => {
       if (node.kind === 'set') {

@@ -1,6 +1,5 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import dedent from 'dedent';
 import { noPrematureFpTsEffects } from './no-premature-fp-ts-effects.mjs';
 
@@ -67,7 +66,6 @@ ruleTester.run('no-premature-fp-ts-effects', noPrematureFpTsEffects, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -85,7 +83,6 @@ ruleTester.run('no-premature-fp-ts-effects', noPrematureFpTsEffects, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -101,7 +98,6 @@ ruleTester.run('no-premature-fp-ts-effects', noPrematureFpTsEffects, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },

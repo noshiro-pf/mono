@@ -26,6 +26,7 @@ export const propsTypeAnnotationStyleRule: TSESLint.RuleModule<MessageIds> = {
       disallowPropsTypeAnnotation:
         'Replace `React.memo((props: Props) => { ... })` with `React.memo<Props>((props) => { ... })`.',
     },
+    defaultOptions: [],
   },
   create: (context) => ({
     CallExpression: (node: DeepReadonly<TSESTree.CallExpression>) => {
@@ -53,5 +54,4 @@ export const propsTypeAnnotationStyleRule: TSESLint.RuleModule<MessageIds> = {
       }
     },
   }),
-  defaultOptions: [],
 } as const;

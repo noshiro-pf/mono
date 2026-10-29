@@ -32,8 +32,8 @@ export const noMixedStarExport = createRule({
         '`export * as {{name}} from` is an explicit export of `{{name}}` and may not share a file with `export * from` (Sumi D-52). Move it into its own module and `export * from` it.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     Program: (program) => {
       if (!program.body.some(isStarExport)) {

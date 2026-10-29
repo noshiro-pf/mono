@@ -132,6 +132,7 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
       useCanonicalType:
         'Use `{{replacement}}(...)` instead of `{{original}}({{boundsText}}, ...)`: with these bounds both build exactly the same type, and `{{replacement}}` names the constraint directly (and reports it on validation failure).',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -261,7 +262,6 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */

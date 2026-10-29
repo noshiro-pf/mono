@@ -1,6 +1,5 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import dedent from 'dedent';
 import { noPartialDivision } from './no-partial-division.mjs';
 
@@ -97,7 +96,6 @@ ruleTester.run('no-partial-division', noPartialDivision, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.BinaryExpression,
         },
       ],
     },
@@ -109,7 +107,6 @@ ruleTester.run('no-partial-division', noPartialDivision, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.BinaryExpression,
         },
       ],
     },
@@ -121,7 +118,6 @@ ruleTester.run('no-partial-division', noPartialDivision, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.BinaryExpression,
         },
       ],
     },
@@ -133,7 +129,6 @@ ruleTester.run('no-partial-division', noPartialDivision, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.BinaryExpression,
         },
       ],
     },
@@ -145,7 +140,6 @@ ruleTester.run('no-partial-division', noPartialDivision, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.BinaryExpression,
         },
       ],
     },
@@ -159,7 +153,6 @@ ruleTester.run('no-partial-division', noPartialDivision, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.BinaryExpression,
         },
       ],
     },
@@ -173,7 +166,6 @@ ruleTester.run('no-partial-division', noPartialDivision, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.BinaryExpression,
         },
       ],
     },
@@ -187,7 +179,6 @@ ruleTester.run('no-partial-division', noPartialDivision, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.BinaryExpression,
         },
       ],
     },
@@ -200,7 +191,6 @@ ruleTester.run('no-partial-division', noPartialDivision, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.BinaryExpression,
         },
       ],
     },
@@ -213,7 +203,6 @@ ruleTester.run('no-partial-division', noPartialDivision, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.BinaryExpression,
         },
       ],
     },
@@ -226,7 +215,6 @@ ruleTester.run('no-partial-division', noPartialDivision, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.BinaryExpression,
         },
       ],
     },

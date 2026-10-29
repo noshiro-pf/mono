@@ -22,6 +22,7 @@ export const useMemoHooksStyleRule: TSESLint.RuleModule<MessageIds> = {
       disallowUseMemoTypeAnnotation:
         'The variable type T should be annotated as `React.useMemo<T>` or `const v: T = React.useMemo(...)`.',
     },
+    defaultOptions: [],
   },
   create: (context) => ({
     CallExpression: (node: DeepReadonly<TSESTree.CallExpression>) => {
@@ -54,7 +55,6 @@ export const useMemoHooksStyleRule: TSESLint.RuleModule<MessageIds> = {
       }
     },
   }),
-  defaultOptions: [],
 } as const;
 
 /**

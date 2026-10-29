@@ -86,6 +86,7 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
       useObjFilterMap:
         'Replace this `Object.fromEntries(Object.entries(…).flatMap(…))` round trip with `Obj.filterMap` from ts-data-forge, which keeps the key types of the record in the result type.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -218,7 +219,6 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /**

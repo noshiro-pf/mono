@@ -35,7 +35,7 @@
     "event-schedule-app-shared": "workspace:*",
     "firebase-admin": "^14.5.0",
     "firebase-functions": "^7.4.0",
-    "nodemailer": "^10.1.7",
+    "nodemailer": "^10.2.0",
     "ts-data-forge": "workspace:*",
     "ts-fortress": "workspace:*",
     "ts-fortress-types": "workspace:*"
@@ -58,6 +58,6 @@
     "vitest": "catalog:"
   },
   "engines": {
-    "node": ">=22.22.2"
+    "node": ">=22.23.4"
   }
 }

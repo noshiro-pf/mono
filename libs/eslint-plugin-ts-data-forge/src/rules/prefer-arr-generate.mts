@@ -100,6 +100,7 @@ export const preferArrGenerate: TSESLint.RuleModule<MessageIds, Options> = {
       suggestArrGenerate:
         'Replace with a loop in `Arr.generate` from ts-data-forge (check the element type, and that the result may be readonly).',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -335,7 +336,6 @@ export const preferArrGenerate: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /** The parts of a filter-and-map callback that the rewrite keeps. */

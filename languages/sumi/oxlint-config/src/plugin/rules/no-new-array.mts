@@ -22,8 +22,8 @@ export const noNewArray = createRule({
         '`new Array(...)` is not allowed in Sumi: a single numeric argument creates holes. Use an array literal, or `Arr.newArray` / `Arr.seq` from ts-data-forge.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     NewExpression: (node) => {
       if (globalReferenceName(context.sourceCode, node.callee) === 'Array') {

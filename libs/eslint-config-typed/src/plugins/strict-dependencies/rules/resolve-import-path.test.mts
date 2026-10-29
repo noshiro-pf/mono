@@ -5,6 +5,8 @@ import { resolveImportPath } from './resolve-import-path.mjs';
 // FIXME: https://github.com/knowledge-work/eslint-plugin-strict-dependencies/tree/v1.3.27 のテストをコピーしてきて
 // Codex でテスト・型チェックが通るようにさせただけなので、意味の無いテストになっていないかチェックして修正する
 
+// `baseUrl` is deprecated in TypeScript 6.0, but the rule still resolves legacy
+// `baseUrl`-relative `paths`, so the fixtures below have to set it.
 const compilerOptionsByFixture = {
   'no-paths': {},
   'paths-basic': {
@@ -15,42 +17,49 @@ const compilerOptionsByFixture = {
     },
   },
   'base-url-dot': {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- see the note above the table
     baseUrl: '.',
     paths: {
       '@/components/': ['components/'],
     },
   },
   'base-url-dot-slash': {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- see the note above the table
     baseUrl: './',
     paths: {
       '@/components/': ['components/'],
     },
   },
   'base-url-parent': {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- see the note above the table
     baseUrl: '../',
     paths: {
       '@/components/': ['components/'],
     },
   },
   'base-url-src': {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- see the note above the table
     baseUrl: 'src',
     paths: {
       '@/components/': ['components/'],
     },
   },
   'base-url-dot-src': {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- see the note above the table
     baseUrl: './src',
     paths: {
       '@/components/': ['components/'],
     },
   },
   'base-url-src-slash': {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- see the note above the table
     baseUrl: 'src/',
     paths: {
       '@/components/': ['components/'],
     },
   },
   'base-url-dot-src-slash': {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- see the note above the table
     baseUrl: './src/',
     paths: {
       '@/components/': ['components/'],

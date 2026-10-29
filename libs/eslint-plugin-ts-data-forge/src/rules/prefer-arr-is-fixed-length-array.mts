@@ -33,6 +33,7 @@ export const preferArrIsFixedLengthArray: TSESLint.RuleModule<
       useIsFixedLengthArray:
         'Replace `{{original}}` with `Arr.isFixedLengthArray({{arrayName}}, {{length}})` from ts-data-forge.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -139,5 +140,4 @@ export const preferArrIsFixedLengthArray: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;

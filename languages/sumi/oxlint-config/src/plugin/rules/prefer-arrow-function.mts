@@ -22,8 +22,8 @@ export const preferArrowFunction = createRule({
         'A `function` declaration is allowed in Sumi only when it carries overload signatures (D-13): write `{{name}}` as an arrow function.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     FunctionExpression: (node) => {
       if (node.generator) {

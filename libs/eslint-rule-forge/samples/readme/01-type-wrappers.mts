@@ -9,8 +9,8 @@ export const noNumberCall: TSESLint.RuleModule<'noNumberCall'> = {
     messages: { noNumberCall: 'Use `toNumber` instead of `Number`.' },
     fixable: 'code',
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     CallExpression: (node) => {
       // Judge the syntax on the expression inside the wrappers ...

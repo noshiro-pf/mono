@@ -27,8 +27,8 @@ export const preferAssertDeepStrictEqualOverDeepEqualRule: TSESLint.RuleModule<
       preferAssertDeepStrictEqual:
         'Use assert.deepStrictEqual(X) instead of assert.deepEqual(X).',
     },
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     MemberExpression: (node) => {
       if (

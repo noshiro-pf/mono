@@ -89,6 +89,7 @@ export const strictDependenciesRule: TSESLint.RuleModule<
         },
       },
     ],
+    defaultOptions: [[]],
   },
 
   create: (context) => {
@@ -192,7 +193,6 @@ export const strictDependenciesRule: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [[]],
 } as const;
 
 /**

@@ -58,6 +58,7 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
       incompleteDestructuring:
         'Not all properties are destructured. Missing: {{missingProps}}',
     },
+    defaultOptions: [{ alwaysCheckReactComponentProps: true }],
   },
 
   create: (context) => {
@@ -262,7 +263,6 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [{ alwaysCheckReactComponentProps: true }],
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

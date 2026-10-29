@@ -74,6 +74,7 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
       useIsNonEmpty:
         'Replace `{{original}}` with `SafeArray.isNonEmpty({{arrayName}})` from ts-std-forge: the comparison narrows nothing, so `{{arrayName}}[0]` stays `| undefined`.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -164,7 +165,6 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /**

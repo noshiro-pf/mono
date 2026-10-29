@@ -24,8 +24,8 @@ export const genericArrowTrailingComma = createRule({
         'Write a single-type-parameter arrow function as `<{{name}},>(...)` (D-11): the trailing comma is what disambiguates it from JSX, and Sumi spells it that way in every file.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     ArrowFunctionExpression: (node) => {
       // (oxlint hands over `null`, not `undefined`, for an absent declaration;

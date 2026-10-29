@@ -5,6 +5,6 @@
   "type": "module",
   "dependencies": {
     "react": ">=16.8.0",
-    "synstate-react-hooks-compat": "4.1.0"
+    "synstate-react-hooks-compat": "6.0.0"
   }
 }

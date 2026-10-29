@@ -174,6 +174,7 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
       preferArrScanAccumulate:
         'Rebuilding the accumulator array on every step copies it each time. `Arr.scan` from ts-data-forge accumulates in one pass and returns the initial value followed by every intermediate one.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -556,7 +557,6 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /**

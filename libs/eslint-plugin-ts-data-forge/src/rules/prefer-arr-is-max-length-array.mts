@@ -34,6 +34,7 @@ export const preferArrIsMaxLengthArray: TSESLint.RuleModule<
       useIsMaxLengthArray:
         'Replace `{{original}}` with `Arr.isMaxLengthArray({{arrayName}}, {{length}})` from ts-data-forge.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -142,5 +143,4 @@ export const preferArrIsMaxLengthArray: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;

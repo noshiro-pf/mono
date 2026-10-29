@@ -1,6 +1,5 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import dedent from 'dedent';
 import { noUnsafeMutableReadonlyAssignment } from './no-unsafe-mutable-readonly-assignment.mjs';
 
@@ -595,7 +594,6 @@ ruleTester.run(
         errors: [
           {
             messageId: 'errorStringGeneric',
-            type: AST_NODE_TYPES.VariableDeclaration,
           },
         ],
       },
@@ -615,7 +613,6 @@ ruleTester.run(
       //   errors: [
       //     {
       //       messageId: "errorStringGeneric",
-      //       type: AST_NODE_TYPES.Identifier,
       //     },
       //   ],
       // },
@@ -634,7 +631,6 @@ ruleTester.run(
         errors: [
           {
             messageId: 'errorStringGeneric',
-            type: AST_NODE_TYPES.Identifier,
           },
         ],
       },
@@ -653,7 +649,6 @@ ruleTester.run(
         errors: [
           {
             messageId: 'errorStringGeneric',
-            type: AST_NODE_TYPES.ReturnStatement,
           },
         ],
       },
@@ -670,7 +665,6 @@ ruleTester.run(
         errors: [
           {
             messageId: 'errorStringGeneric',
-            type: AST_NODE_TYPES.VariableDeclaration,
           },
         ],
       },
@@ -691,7 +685,6 @@ ruleTester.run(
         errors: [
           {
             messageId: 'errorStringGeneric',
-            type: AST_NODE_TYPES.VariableDeclaration,
           },
         ],
       },
@@ -712,7 +705,6 @@ ruleTester.run(
         errors: [
           {
             messageId: 'errorStringGeneric',
-            type: AST_NODE_TYPES.VariableDeclaration,
           },
         ],
       },
@@ -733,7 +725,6 @@ ruleTester.run(
         errors: [
           {
             messageId: 'errorStringGeneric',
-            type: AST_NODE_TYPES.VariableDeclaration,
           },
         ],
       },
@@ -752,7 +743,6 @@ ruleTester.run(
         errors: [
           {
             messageId: 'errorStringGeneric',
-            type: AST_NODE_TYPES.YieldExpression,
           },
         ],
       },
@@ -822,7 +812,6 @@ ruleTester.run(
         errors: [
           {
             messageId: 'errorStringGeneric',
-            type: AST_NODE_TYPES.VariableDeclaration,
           },
         ],
       },
@@ -871,15 +860,12 @@ describe('no-unsafe-mutable-readonly-assignment through type wrappers', () => {
           errors: [
             {
               messageId: 'errorStringGeneric',
-              type: AST_NODE_TYPES.TSAsExpression,
             },
             {
               messageId: 'errorStringGeneric',
-              type: AST_NODE_TYPES.TSAsExpression,
             },
             {
               messageId: 'errorStringGeneric',
-              type: AST_NODE_TYPES.TSTypeAssertion,
             },
           ],
         },
@@ -895,7 +881,6 @@ describe('no-unsafe-mutable-readonly-assignment through type wrappers', () => {
           errors: [
             {
               messageId: 'errorStringGeneric',
-              type: AST_NODE_TYPES.TSAsExpression,
             },
           ],
         },

@@ -6,6 +6,6 @@
   "dependencies": {
     "@preact/signals": ">=1.0.0",
     "preact": ">=10.0.0",
-    "synstate-preact-signals": "4.1.0"
+    "synstate-preact-signals": "6.0.0"
   }
 }

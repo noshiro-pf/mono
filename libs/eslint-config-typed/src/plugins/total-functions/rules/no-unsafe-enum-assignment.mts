@@ -12,8 +12,8 @@ export const noUnsafeEnumAssignment = createRule({
     messages: {},
     schema: [],
     deprecated: true,
+    defaultOptions: [],
   },
 
   create: () => ({}),
-  defaultOptions: [],
 } as const);

@@ -58,6 +58,7 @@ export const requireReactMemoRule: TSESLint.RuleModule<MessageIds, Options> = {
       requireReactMemo:
         'The component "{{ componentName }}" should be memoized. Rewrite as `const {{ componentName }} = React.memo<Props>((props) => { ... });`.',
     },
+    defaultOptions: [{ ignoreName: [] }],
   },
   create: (context) => {
     const options = context.options[0] ?? {};
@@ -116,7 +117,6 @@ export const requireReactMemoRule: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [{ ignoreName: [] }],
 } as const;
 
 const normalizeNames = (

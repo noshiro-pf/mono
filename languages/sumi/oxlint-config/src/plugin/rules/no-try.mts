@@ -13,8 +13,8 @@ export const noTry = createRule({
         'try..catch is not allowed in Sumi: catch exceptions only at the boundary with Result.fromThrowable / Result.fromPromise, and return a Result.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     TryStatement: (node) => {
       context.report({ node, messageId: 'noTry' });

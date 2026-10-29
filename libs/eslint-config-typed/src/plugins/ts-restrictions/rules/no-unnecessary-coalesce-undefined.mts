@@ -55,6 +55,7 @@ export const noUnnecessaryCoalesceUndefined: TSESLint.RuleModule<
       unnecessaryCoalesceUndefined:
         '`?? undefined` is unnecessary because the left-hand side type does not include `null`. Remove it.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -173,7 +174,6 @@ export const noUnnecessaryCoalesceUndefined: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>

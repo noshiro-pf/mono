@@ -146,6 +146,7 @@ export const preferSchemaOverGuardChain: TSESLint.RuleModule<
     messages: {
       preferSchema: `\`{{name}}\` is narrowed by {{count}} hand-written guards in one expression. That is a shape declaration, so declare it: a \`${TS_FORTRESS_MODULE}\` type (\`t.record({ ... })\`) names it once, and \`validate\` returns what was different instead of \`false\`.`,
     },
+    defaultOptions: [{}],
   },
 
   create: (context) => {
@@ -234,7 +235,6 @@ export const preferSchemaOverGuardChain: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [{}],
 } as const;
 
 /**

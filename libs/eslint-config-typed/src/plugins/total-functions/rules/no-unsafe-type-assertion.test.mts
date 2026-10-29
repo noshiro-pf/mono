@@ -1,6 +1,5 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import dedent from 'dedent';
 import { noUnsafeTypeAssertion } from './no-unsafe-type-assertion.mjs';
 
@@ -117,7 +116,6 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSAsExpression,
         },
       ],
     },
@@ -131,7 +129,6 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSAsExpression,
         },
       ],
     },
@@ -142,7 +139,6 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSAsExpression,
         },
       ],
     },
@@ -153,7 +149,6 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSAsExpression,
         },
       ],
     },
@@ -164,7 +159,6 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSAsExpression,
         },
       ],
     },
@@ -175,7 +169,6 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSAsExpression,
         },
       ],
     },
@@ -186,7 +179,6 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSAsExpression,
         },
       ],
     },
@@ -197,7 +189,6 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSAsExpression,
         },
       ],
     },
@@ -213,7 +204,6 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSAsExpression,
         },
       ],
     },
@@ -229,7 +219,6 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSAsExpression,
         },
       ],
     },
@@ -240,7 +229,6 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSAsExpression,
         },
       ],
     },
@@ -251,7 +239,6 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSAsExpression,
         },
       ],
     },
@@ -262,7 +249,6 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.TSAsExpression,
         },
       ],
     },

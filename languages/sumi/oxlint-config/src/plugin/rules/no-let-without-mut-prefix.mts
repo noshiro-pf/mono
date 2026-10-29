@@ -21,8 +21,8 @@ export const noLetWithoutMutPrefix = createRule({
         '`let {{name}}` is not allowed in Sumi: use `const`, or name the binding `mut_{{name}}` if it really is reassigned (D-14: `mut_` is the only mutability marker).',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     VariableDeclaration: (node) => {
       if (node.kind !== 'let') {

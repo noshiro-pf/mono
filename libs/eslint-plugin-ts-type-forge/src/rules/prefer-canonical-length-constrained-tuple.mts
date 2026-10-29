@@ -64,6 +64,12 @@ export const preferCanonicalLengthConstrainedTuple: TSESLint.RuleModule<
       useCanonicalTuple:
         'Replace `{{original}}` with `{{replacement}}` from ts-type-forge.',
     },
+    defaultOptions: [
+      {
+        importStyle: DEFAULT_IMPORT_STYLE,
+        maxLength: DEFAULT_MAX_TUPLE_LENGTH,
+      },
+    ],
   },
 
   create: (context) => {
@@ -110,9 +116,6 @@ export const preferCanonicalLengthConstrainedTuple: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [
-    { importStyle: DEFAULT_IMPORT_STYLE, maxLength: DEFAULT_MAX_TUPLE_LENGTH },
-  ],
 } as const;
 
 /**

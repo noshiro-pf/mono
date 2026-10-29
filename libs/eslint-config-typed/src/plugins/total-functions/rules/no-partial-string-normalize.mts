@@ -33,6 +33,7 @@ export const noPartialStringNormalize = createRule({
         'String.prototype.normalize() is partial. Wrap it in a wrapper that catches the error and returns undefined.',
     },
     schema: [],
+    defaultOptions: [],
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
@@ -159,7 +160,6 @@ export const noPartialStringNormalize = createRule({
       },
     };
   },
-  defaultOptions: [],
 } as const);
 
 const SAFE_FORMS: ReadonlySet<string> = new Set<string>([

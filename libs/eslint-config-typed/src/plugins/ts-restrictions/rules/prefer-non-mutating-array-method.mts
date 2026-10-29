@@ -105,6 +105,7 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
       preferNonMutatingMethod:
         'Mutating a throw-away `Array.from()` copy with `{{mutatingMethod}}` is roundabout. Use `{{replacement}}` on the original array instead.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -284,7 +285,6 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>

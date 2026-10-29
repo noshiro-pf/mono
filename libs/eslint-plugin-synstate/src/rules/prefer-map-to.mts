@@ -44,6 +44,7 @@ export const preferMapTo: TSESLint.RuleModule<MessageIds, Options> = {
       preferMapTo:
         '`map` does not pass on a result equal to the one it holds, so this emits once and then never again. Use `mapTo(...)`, which emits on every source value.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -142,7 +143,6 @@ export const preferMapTo: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /**

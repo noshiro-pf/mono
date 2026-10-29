@@ -59,6 +59,7 @@ export const noStringSpread: TSESLint.RuleModule<MessageIds, Options> = {
       noStringSpread:
         'Spreading a `string` splits it into individual characters and yields a `string[]` indistinguishable from spreading an array, so accidental string spreads go unnoticed. Spread an array or object instead; if a character split is intended, make it explicit with `Array.from(str)`.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -121,5 +122,4 @@ export const noStringSpread: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;

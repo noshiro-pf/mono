@@ -33,6 +33,7 @@ export const createPreferIsNonNullObject = ({
       messages: {
         useIsNonNullObject: `Replace the object/null check with \`isNonNullObject()\` from ${moduleName}.`,
       },
+      defaultOptions: [],
     },
 
     create: (context) => {
@@ -92,7 +93,6 @@ export const createPreferIsNonNullObject = ({
         },
       };
     },
-    defaultOptions: [],
   }) as const;
 
 /**

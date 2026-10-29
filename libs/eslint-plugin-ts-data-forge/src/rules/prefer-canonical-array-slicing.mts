@@ -192,6 +192,7 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
       preferCanonicalArraySlicing:
         'Replace with `{{replacement}}` from ts-data-forge.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -877,5 +878,4 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;

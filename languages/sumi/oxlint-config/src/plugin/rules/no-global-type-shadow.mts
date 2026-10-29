@@ -35,8 +35,8 @@ export const noGlobalTypeShadow = createRule<Options, 'shadow'>({
         additionalProperties: false,
       },
     ],
+    defaultOptions: [{ libs: ['esnext'] }],
   },
-  defaultOptions: [{ libs: ['esnext'] }],
   create: (context, [options]) => {
     const names = globalTypeNames(options.libs);
 

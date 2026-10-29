@@ -30,6 +30,7 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
       useBrandedNumberCastFunction:
         'Replace `as {{typeName}}` with `{{functionName}}()` from ts-data-forge.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -112,7 +113,6 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 const getBrandedNumberTypeInfo = (

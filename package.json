@@ -167,7 +167,7 @@
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
     "jiti": "catalog:",
-    "knip": "6.42.0",
+    "knip": "6.42.1",
     "markdownlint": "catalog:",
     "markdownlint-cli2": "catalog:",
     "npm-run-all2": "catalog:",
@@ -190,11 +190,11 @@
     "typescript-native": "npm:typescript@7.0.2",
     "vite": "catalog:",
     "vitest": "catalog:",
-    "zenn-cli": "^0.5.6"
+    "zenn-cli": "^0.5.7"
   },
-  "packageManager": "pnpm@12.14.0",
+  "packageManager": "pnpm@12.15.0",
   "engines": {
-    "node": ">=22.22.2",
+    "node": ">=22.23.4",
     "pnpm": ">=9.0.0"
   },
   "volta": {

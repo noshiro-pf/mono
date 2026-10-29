@@ -104,6 +104,7 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
       removeUnnecessaryLogicalOr:
         'This `|| …` is unnecessary: the left-hand side can never be nullish, and any falsy value it can hold equals the right-hand side value, so the expression always evaluates to the left-hand side. Remove the `|| …`.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -549,7 +550,6 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /**

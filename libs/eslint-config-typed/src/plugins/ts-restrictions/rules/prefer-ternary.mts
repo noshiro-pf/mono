@@ -69,6 +69,7 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
         'This `if` statement can be replaced by a ternary expression.',
       preferTernarySuggestion: 'Use a ternary expression.',
     },
+    defaultOptions: ['always'],
   },
 
   create: (context) => {
@@ -463,7 +464,6 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: ['always'],
 } as const;
 
 type Arm = Readonly<{

@@ -49,6 +49,7 @@ export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
       redundantSkipIfNoChange:
         '`{{operator}}` already stops a value equal (`Object.is`) to the one before it, so this `skipIfNoChange()` compares again for nothing. Remove it.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -150,7 +151,6 @@ export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /**

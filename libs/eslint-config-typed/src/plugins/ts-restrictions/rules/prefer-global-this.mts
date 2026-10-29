@@ -57,6 +57,7 @@ export const preferGlobalThis: TSESLint.RuleModule<MessageIds, Options> = {
     messages: {
       'prefer-global-this/error': 'Prefer `{{replacement}}` over `{{value}}`.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -123,7 +124,6 @@ export const preferGlobalThis: TSESLint.RuleModule<MessageIds, Options> = {
 
     return upstream.create(upstreamContext);
   },
-  defaultOptions: [],
 } as const;
 
 /**

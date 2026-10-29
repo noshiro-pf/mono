@@ -160,6 +160,7 @@ export const noRestrictedCastName: TSESLint.RuleModule<MessageIds, Options> = {
       restrictedCast:
         'Type assertion with "{{typeName}}" is not allowed{{fixMessage}}',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -279,7 +280,6 @@ export const noRestrictedCastName: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /**

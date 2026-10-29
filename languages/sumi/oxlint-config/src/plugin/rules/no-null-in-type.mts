@@ -24,8 +24,8 @@ export const noNullInType = createRule({
         'The `null` type is not allowed in Sumi: "no value" is `undefined`. Normalize a `null` from outside at the boundary (`?? undefined`) so it never reaches a declaration.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     TSNullKeyword: (node) => {
       // `typeof x === 'object' && x !== null` narrowing is an expression, not

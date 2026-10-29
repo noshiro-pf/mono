@@ -13,8 +13,8 @@ export const noDecorator = createRule({
         'decorators are not allowed in Sumi: compose behavior with higher-order functions instead.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     Decorator: (node) => {
       context.report({ node, messageId: 'noDecorator' });

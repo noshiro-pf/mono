@@ -13,8 +13,8 @@ export const noEnum = createRule({
         'enum is not allowed in Sumi (D-4, erasable syntax only): use a union of string literals or an `as const` object.',
     },
     schema: [],
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     TSEnumDeclaration: (node) => {
       context.report({ node, messageId: 'noEnum' });

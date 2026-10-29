@@ -55,6 +55,7 @@ export const noThrowInOperator: TSESLint.RuleModule<MessageIds, Options> = {
       throwThroughCall:
         'This calls `{{name}}`, which throws, in a function a synstate operator calls while an update propagates. The exception stops the update midway: the nodes it already reached hold the new value, the rest keep the old one, and the error reaches whoever wrote to the source. Make `{{name}}` return a `Result` (`Result.err(...)`) instead, and handle the error downstream (`mapResultOk`, `unwrapResultOk`, `filter(Result.isOk)`).',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -183,7 +184,6 @@ export const noThrowInOperator: TSESLint.RuleModule<MessageIds, Options> = {
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 /**

@@ -30,8 +30,8 @@ export const probeRule = (
       messages: { result: '{{result}}' },
       schema: [],
       ...(fix === undefined ? {} : { fixable: 'code' }),
+      defaultOptions: [],
     },
-    defaultOptions: [],
     create: (context) => ({
       CallExpression: (node) => {
         const [argument] = node.arguments;

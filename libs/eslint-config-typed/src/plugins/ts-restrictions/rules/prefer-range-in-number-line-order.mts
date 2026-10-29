@@ -55,6 +55,7 @@ export const preferRangeInNumberLineOrder: TSESLint.RuleModule<
         'Write the range in the order of the number line: `{{replacement}}`.',
       reorderRange: 'Replace with `{{replacement}}`.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -254,7 +255,6 @@ export const preferRangeInNumberLineOrder: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 type RelationalOperator = '<' | '<=' | '>' | '>=';

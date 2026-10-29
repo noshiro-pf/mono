@@ -67,6 +67,7 @@ export const preferOptionalChainOverTernary: TSESLint.RuleModule<
     messages: {
       preferOptionalChain: 'Write this ternary as `{{replacement}}`.',
     },
+    defaultOptions: [],
   },
 
   create: (context) => {
@@ -213,7 +214,6 @@ export const preferOptionalChainOverTernary: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
 } as const;
 
 type NullishCheck = Readonly<{

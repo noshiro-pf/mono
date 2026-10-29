@@ -28,8 +28,8 @@ export const preferAssertIsTrueOverNegatedAssertIsFalseRule: TSESLint.RuleModule
       preferAssertIsTrueOverNegatedAssertIsFalse:
         'Use assert.isTrue(X) instead of assert.isFalse(!X).',
     },
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (context) => ({
     CallExpression: (node) => {
       const callee = skipTypeWrappers(node.callee);

@@ -1,6 +1,5 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import dedent from 'dedent';
 import { noHiddenTypeAssertions } from './no-hidden-type-assertions.mjs';
 
@@ -193,7 +192,6 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -212,7 +210,6 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -230,7 +227,6 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -249,7 +245,6 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -270,7 +265,6 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -287,7 +281,6 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -304,7 +297,6 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
@@ -323,19 +315,15 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
       errors: [
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
         {
           messageId: 'errorStringGeneric',
-          type: AST_NODE_TYPES.CallExpression,
         },
       ],
     },
