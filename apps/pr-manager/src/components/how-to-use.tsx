@@ -154,7 +154,7 @@ export const HowToUse = (): JSX.Element => {
             <li>
               <code>{constant('pending')}</code>
               {constant(
-                ': counted as held back, and the pending switches hide it.',
+                ': counted as held back; the pending switches hide it, or show it alone.',
               )}
             </li>
           </ul>

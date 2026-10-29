@@ -7,10 +7,12 @@ import {
   issuesListViewFromSearch,
   matchesIssueTitle,
   searchWithIssuesListView,
+  toggleIssuePending,
+  toggleIssuePendingOnly,
   toggleIssuePriority,
+  toggleIssuePriorityOnly,
   toggleIssueStart,
   toggleLabel,
-  togglePendingIssues,
   withIssueSort,
   type IssuesListView,
 } from './issues-list-view.mjs';
@@ -31,6 +33,51 @@ describe(isIssueShown, () => {
     assert.isFalse(isIssueShown(issue(2, ['bug']), view));
 
     assert.isTrue(isIssueShown(issue(3, ['priority:low']), view));
+  });
+
+  test('with priorities picked, an issue is shown only when its priority is one of them', () => {
+    const view = toggleIssuePriorityOnly(
+      toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'high'),
+      'none',
+    );
+
+    assert.isTrue(isIssueShown(issue(1, ['priority:high']), view));
+
+    assert.isTrue(isIssueShown(issue(2, ['bug']), view));
+
+    assert.isFalse(isIssueShown(issue(3, ['priority:mid']), view));
+  });
+
+  test('under a pick, switching on one not picked picks it too, and switching off one picked unpicks it', () => {
+    const picked = toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'high');
+
+    const both = toggleIssuePriority(picked, 'mid');
+
+    assert.deepStrictEqual(both.onlyPriorities, ['high', 'mid']);
+
+    assert.deepStrictEqual(both.hiddenPriorities, []);
+
+    const hidden = toggleIssuePriority(both, 'high');
+
+    assert.deepStrictEqual(hidden.onlyPriorities, ['mid']);
+
+    assert.deepStrictEqual(hidden.hiddenPriorities, ['high']);
+  });
+
+  test('a priority is never both hidden and picked', () => {
+    const hidden = toggleIssuePriority(DEFAULT_ISSUES_LIST_VIEW, 'high');
+
+    const picked = toggleIssuePriorityOnly(hidden, 'high');
+
+    assert.deepStrictEqual(picked.hiddenPriorities, []);
+
+    assert.deepStrictEqual(picked.onlyPriorities, ['high']);
+
+    const hiddenAgain = toggleIssuePriority(picked, 'high');
+
+    assert.deepStrictEqual(hiddenAgain.hiddenPriorities, ['high']);
+
+    assert.deepStrictEqual(hiddenAgain.onlyPriorities, []);
   });
 
   test('with labels picked, an issue is shown when it carries any of them', () => {
@@ -60,9 +107,9 @@ describe(isIssueShown, () => {
   });
 });
 
-describe(togglePendingIssues, () => {
+describe(toggleIssuePending, () => {
   test('hides the issues labelled pending, and shows them again', () => {
-    const view = togglePendingIssues(DEFAULT_ISSUES_LIST_VIEW);
+    const view = toggleIssuePending(DEFAULT_ISSUES_LIST_VIEW);
 
     assert.isFalse(isIssueShown(issue(1, ['pending']), view));
 
@@ -71,18 +118,58 @@ describe(togglePendingIssues, () => {
     assert.isTrue(isIssueShown(issue(3, ['bug']), view));
 
     assert.isTrue(
-      isIssueShown(issue(1, ['pending']), togglePendingIssues(view)),
+      isIssueShown(issue(1, ['pending']), toggleIssuePending(view)),
     );
   });
 
   test('a picked label does not show what is hidden as pending', () => {
-    const view = togglePendingIssues(
+    const view = toggleIssuePending(
       toggleLabel(DEFAULT_ISSUES_LIST_VIEW, 'bug'),
     );
 
     assert.isFalse(isIssueShown(issue(1, ['bug', 'pending']), view));
 
     assert.isTrue(isIssueShown(issue(2, ['bug']), view));
+  });
+
+  test('switching off pending while it is picked unpicks it', () => {
+    const view = toggleIssuePending(
+      toggleIssuePendingOnly(DEFAULT_ISSUES_LIST_VIEW),
+    );
+
+    assert.isTrue(view.hidePending);
+
+    assert.isFalse(view.onlyPending);
+  });
+});
+
+describe(toggleIssuePendingOnly, () => {
+  test('picked, only the issues labelled pending are shown, of the priorities shown', () => {
+    const view = toggleIssuePendingOnly(
+      toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'high'),
+    );
+
+    assert.isTrue(isIssueShown(issue(1, ['pending', 'priority:high']), view));
+
+    // Picking pending does not bring in what the priorities leave out, nor
+    // picking a priority what pending leaves out.
+    assert.isFalse(isIssueShown(issue(2, ['pending', 'priority:low']), view));
+
+    assert.isFalse(isIssueShown(issue(3, ['priority:high']), view));
+
+    assert.isTrue(
+      isIssueShown(issue(3, ['priority:high']), toggleIssuePendingOnly(view)),
+    );
+  });
+
+  test('picking pending while it is switched off switches it back on', () => {
+    const view = toggleIssuePendingOnly(
+      toggleIssuePending(DEFAULT_ISSUES_LIST_VIEW),
+    );
+
+    assert.isFalse(view.hidePending);
+
+    assert.isTrue(view.onlyPending);
   });
 });
 
@@ -140,9 +227,11 @@ describe(arrangeIssues, () => {
   test('leaves out what the view hides, in either order', () => {
     const view: IssuesListView = {
       hiddenPriorities: ['none'],
+      onlyPriorities: [],
       hiddenStarts: [],
       onlyLabels: ['bug'],
       hidePending: false,
+      onlyPending: false,
       sort: 'priority',
     } as const;
 
@@ -245,6 +334,21 @@ describe(countIssues, () => {
     );
   });
 
+  test('with a priority picked, it reads the list, and the rest read what picking them too would add', () => {
+    const counts = countIssues(
+      ISSUES,
+      toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'high'),
+    );
+
+    assert.deepStrictEqual(counts.open, { shown: 1, total: 6 });
+
+    assert.deepStrictEqual(counts.priorities.high, { shown: 1, total: 1 });
+
+    assert.deepStrictEqual(counts.priorities.low, { shown: 1, total: 1 });
+
+    assert.deepStrictEqual(counts.priorities.none, { shown: 3, total: 3 });
+  });
+
   test('a label reads what picking it would show, picked or not', () => {
     const counts = countIssues(
       ISSUES,
@@ -292,7 +396,7 @@ describe(countIssues, () => {
 
     const hidden = countIssues(
       items,
-      togglePendingIssues(toggleIssuePriority(DEFAULT_ISSUES_LIST_VIEW, 'low')),
+      toggleIssuePending(toggleIssuePriority(DEFAULT_ISSUES_LIST_VIEW, 'low')),
     );
 
     assert.deepStrictEqual(hidden.open, { shown: 1, total: 3 });
@@ -301,6 +405,33 @@ describe(countIssues, () => {
     assert.deepStrictEqual(hidden.pending, { shown: 1, total: 2 });
 
     assert.deepStrictEqual(hidden.labels[0]?.count, { shown: 1, total: 2 });
+  });
+
+  test('pending picked, the priorities read what is pending of each, and pending reads what the priorities show', () => {
+    const items = [
+      issue(1, ['pending', 'priority:high']),
+      issue(2, ['pending', 'priority:low']),
+      issue(3, ['priority:high']),
+      issue(4, []),
+    ] as const;
+
+    const counts = countIssues(
+      items,
+      toggleIssuePendingOnly(
+        toggleIssuePriorityOnly(DEFAULT_ISSUES_LIST_VIEW, 'high'),
+      ),
+    );
+
+    assert.deepStrictEqual(counts.open, { shown: 1, total: 4 });
+
+    assert.deepStrictEqual(counts.pending, { shown: 1, total: 2 });
+
+    assert.deepStrictEqual(counts.priorities, {
+      high: { shown: 1, total: 2 },
+      mid: { shown: 0, total: 0 },
+      low: { shown: 1, total: 1 },
+      none: { shown: 0, total: 1 },
+    });
   });
 
   test('a picked label no open issue carries is still listed, so that it can be unpicked', () => {
@@ -400,9 +531,11 @@ describe(issuesListViewFromSearch, () => {
   test('reads back what was written', () => {
     const view: IssuesListView = {
       hiddenPriorities: ['low', 'none'],
+      onlyPriorities: ['high'],
       hiddenStarts: ['in-progress', 'blocked'],
       onlyLabels: ['bug', 'good first issue', 'v1.2'],
       hidePending: true,
+      onlyPending: false,
       sort: 'start',
     } as const;
 
@@ -410,10 +543,53 @@ describe(issuesListViewFromSearch, () => {
 
     assert.strictEqual(
       search,
-      '?issues.hidePriority=low.none&issues.hideStart=in-progress.blocked&issues.label=bug&issues.label=good+first+issue&issues.label=v1.2&issues.hidePending=1&issues.sort=start',
+      '?issues.hidePriority=low.none&issues.onlyPriority=high&issues.hideStart=in-progress.blocked&issues.label=bug&issues.label=good+first+issue&issues.label=v1.2&issues.hidePending=1&issues.sort=start',
     );
 
     assert.deepStrictEqual(issuesListViewFromSearch(search), view);
+
+    const picked: IssuesListView = {
+      ...DEFAULT_ISSUES_LIST_VIEW,
+      onlyPending: true,
+    } as const;
+
+    assert.strictEqual(
+      searchWithIssuesListView('', picked),
+      '?issues.onlyPending=1',
+    );
+
+    assert.deepStrictEqual(
+      issuesListViewFromSearch('?issues.onlyPending=1'),
+      picked,
+    );
+  });
+
+  test("the DAG's own pending switch an older page wrote switches pending off for both views", () => {
+    assert.isTrue(issuesListViewFromSearch('?dag.hidePending=1').hidePending);
+
+    // What the issues' own parameters say comes first.
+    assert.isFalse(
+      issuesListViewFromSearch('?dag.hidePending=1&issues.onlyPending=1')
+        .hidePending,
+    );
+
+    assert.strictEqual(
+      searchWithIssuesListView(
+        '?dag.hidePending=1',
+        issuesListViewFromSearch('?dag.hidePending=1'),
+      ),
+      '?dag.hidePending=1&issues.hidePending=1',
+    );
+  });
+
+  test('pending both switched off and picked, which only a hand can write, is switched off', () => {
+    const view = issuesListViewFromSearch(
+      '?issues.hidePending=1&issues.onlyPending=1',
+    );
+
+    assert.isTrue(view.hidePending);
+
+    assert.isFalse(view.onlyPending);
   });
 
   test('anything it cannot make sense of is the default, and what it does not know is dropped', () => {
@@ -424,13 +600,16 @@ describe(issuesListViewFromSearch, () => {
 
     assert.deepStrictEqual(
       issuesListViewFromSearch(
-        '?issues.hidePriority=urgent.mid&issues.hideStart=someday.cycle&issues.label=bug&issues.label=&issues.label=bug&issues.label=pending&issues.label=priority:high&issues.hidePending=yes&issues.sort=title',
+        '?issues.hidePriority=urgent.mid&issues.onlyPriority=mid.low&issues.hideStart=someday.cycle&issues.label=bug&issues.label=&issues.label=bug&issues.label=pending&issues.label=priority:high&issues.hidePending=yes&issues.sort=title',
       ),
       {
         hiddenPriorities: ['mid'],
+        // Switched off and picked is switched off.
+        onlyPriorities: ['low'],
         hiddenStarts: ['cycle'],
         onlyLabels: ['bug'],
         hidePending: false,
+        onlyPending: false,
         sort: 'updated',
       },
     );

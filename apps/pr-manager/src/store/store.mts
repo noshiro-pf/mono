@@ -47,7 +47,10 @@ import { loadWorkflowRuns } from '../workflow-runs.mjs';
 import { createActivityStore } from './activity-store.mjs';
 import { createHeaderStore } from './header-store.mjs';
 import { createIssuesListStore } from './issues-list-store.mjs';
-import { createIssuesViewStore } from './issues-view-store.mjs';
+import {
+  createIssueGraph,
+  createIssuesViewStore,
+} from './issues-view-store.mjs';
 import { createLayoutStore } from './layout-store.mjs';
 import { createMergeOrderStore } from './merge-order-store.mjs';
 import { createReader } from './reader.mjs';
@@ -116,23 +119,29 @@ export const headerStore = createHeaderStore({
   },
 });
 
-export const issuesViewStore = createIssuesViewStore({
+const issueGraph = createIssueGraph({
   issues: reader.issues,
   entries: reader.entries,
   repoUrl: repositoryUrl(reportSource),
+});
+
+export const issuesListStore = createIssuesListStore({
+  issues: reader.issues,
+  graph: issueGraph,
+  initial: issuesListViewFromLocation(),
+  save: saveIssuesListView,
+});
+
+export const issuesViewStore = createIssuesViewStore({
+  issues: reader.issues,
+  graph: issueGraph,
+  filter: issuesListStore.filter,
   initial: issuesViewSettingsFromLocation(),
   save: saveIssuesViewSettings,
   initialZoom: dagZoomFromLocation(),
   saveZoom: saveDagZoom,
   moreIssues: reader.moreIssues,
   loadMoreIssues: reader.loadMoreIssues,
-});
-
-export const issuesListStore = createIssuesListStore({
-  issues: reader.issues,
-  graph: issuesViewStore.fullGraph,
-  initial: issuesListViewFromLocation(),
-  save: saveIssuesListView,
 });
 
 export const activityStore = createActivityStore({

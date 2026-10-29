@@ -1,8 +1,10 @@
 import type { Label } from 'pr-report-core';
+import { DEFAULT_ISSUE_FILTER } from './issue-filter.mjs';
 import {
   buildIssueGraph,
   issueStartsOf,
   omitDone,
+  omitFilteredIssues,
   omitPending,
   type OpenPullRequestFacts,
 } from './issue-graph.mjs';
@@ -35,11 +37,11 @@ describe(buildIssueGraph, () => {
     );
 
     assert.deepStrictEqual(graph.edges, [
-      { from: 1, to: 2, kind: 'start-after', settled: false },
+      { from: 1, to: 2, kind: 'start-after' },
     ]);
   });
 
-  test('draws what a declaration names as GitHub described it, and its edge settled once done', () => {
+  test('draws what a declaration names as GitHub described it', () => {
     const graph = build({
       issues: [issue(5, [3, 4])],
       referenced: [
@@ -76,8 +78,6 @@ describe(buildIssueGraph, () => {
         },
       ],
     );
-
-    assert.isTrue(graph.edges.every(({ settled }) => settled));
   });
 
   test('draws an open pull request a declaration names as open, and what waits on it as blocked', () => {
@@ -153,9 +153,9 @@ describe(buildIssueGraph, () => {
     );
 
     assert.deepStrictEqual(graph.edges, [
-      { from: 1, to: 2, kind: 'start-after', settled: false },
-      { from: 1, to: 7, kind: 'closes', settled: false },
-      { from: 2, to: 8, kind: 'closes', settled: false },
+      { from: 1, to: 2, kind: 'start-after' },
+      { from: 1, to: 7, kind: 'closes' },
+      { from: 2, to: 8, kind: 'closes' },
     ]);
   });
 
@@ -339,10 +339,205 @@ describe(omitPending, () => {
     assert.deepStrictEqual(shown.edges, []);
   });
 
+  test('takes out what is left with no edge that is not a listed issue', () => {
+    const graph = build({
+      issues: [issue(5, [3], ['pending']), issue(6, [])],
+      referenced: [referencedItem(3, 'issue', 'abandoned')],
+    });
+
+    assert.deepStrictEqual(
+      omitPending(graph).nodes.map(({ number }) => number),
+      [6],
+    );
+  });
+
   test('hands back the graph it was given when nothing in it is pending', () => {
     const graph = build({ issues: [issue(1, []), issue(2, [1])] });
 
     assert.strictEqual(omitPending(graph), graph);
+  });
+});
+
+describe(omitFilteredIssues, () => {
+  test('takes out the listed issues of a priority not shown, with what only they name or have closed', () => {
+    const graph = build({
+      issues: [
+        issue(1, [9], ['priority:high']),
+        issue(2, [1, 8], ['priority:low']),
+        issue(3, [8]),
+      ],
+      referenced: [referencedItem(8, 'issue', 'waiting')],
+      pulls: [pull(7, [2], ['priority:high']), pull(6, [3])],
+    });
+
+    const shown = omitFilteredIssues(graph, {
+      ...DEFAULT_ISSUE_FILTER,
+      hiddenPriorities: ['low'],
+      onlyPriorities: [],
+    });
+
+    // #9, past the end of the list, waits on nothing and is waited on by #1;
+    // #8 is still named by #3; #7 closed only #2.
+    assert.deepStrictEqual(
+      shown.nodes.map(({ number }) => number),
+      [1, 3, 6, 8, 9],
+    );
+
+    assert.deepStrictEqual(
+      shown.edges.map(({ from, to, kind }) => [from, to, kind]),
+      [
+        [9, 1, 'start-after'],
+        [8, 3, 'start-after'],
+        [3, 6, 'closes'],
+      ],
+    );
+  });
+
+  test('keeps one left out that an issue left in waits on, alone, since it is why that one waits', () => {
+    const graph = build({
+      issues: [
+        issue(1, [2], ['priority:high']),
+        issue(2, [3, 9], ['priority:low']),
+        issue(3, [], ['priority:low']),
+      ],
+      pulls: [pull(7, [2])],
+    });
+
+    const shown = omitFilteredIssues(graph, {
+      ...DEFAULT_ISSUE_FILTER,
+      hiddenPriorities: [],
+      onlyPriorities: ['high'],
+    });
+
+    assert.deepStrictEqual(
+      shown.nodes.map(({ number, state }) => [number, state]),
+      [
+        [1, 'blocked'],
+        [2, 'blocked'],
+      ],
+    );
+
+    assert.deepStrictEqual(
+      shown.edges.map(({ from, to, kind }) => [from, to, kind]),
+      [[2, 1, 'start-after']],
+    );
+  });
+
+  test('keeps every edge between issues drawn, a cycle through one kept included', () => {
+    const graph = build({
+      issues: [
+        issue(1, [2], ['priority:high']),
+        issue(2, [3], ['priority:low']),
+        issue(3, [], ['priority:high']),
+        issue(4, [5], ['priority:high']),
+        issue(5, [4], ['priority:low']),
+      ],
+    });
+
+    const shown = omitFilteredIssues(graph, {
+      ...DEFAULT_ISSUE_FILTER,
+      hiddenPriorities: [],
+      onlyPriorities: ['high'],
+    });
+
+    assert.deepStrictEqual(
+      shown.edges.map(({ from, to }) => [from, to]),
+      [
+        [2, 1],
+        [3, 2],
+        [5, 4],
+        [4, 5],
+      ],
+    );
+  });
+
+  test('keeps the edges a kept issue has to what is drawn for another', () => {
+    const graph = build({
+      issues: [
+        issue(1, [3], ['priority:low']),
+        issue(2, [1, 3, 4], ['priority:high']),
+      ],
+      referenced: [referencedItem(3, 'issue', 'abandoned')],
+      pulls: [pull(4, [1])],
+    });
+
+    const shown = omitFilteredIssues(graph, {
+      ...DEFAULT_ISSUE_FILTER,
+      hiddenPriorities: ['low'],
+      onlyPriorities: [],
+    });
+
+    assert.deepStrictEqual(
+      shown.nodes.map(({ number }) => number),
+      [1, 2, 3, 4],
+    );
+
+    assert.deepStrictEqual(
+      shown.edges.map(({ from, to, kind }) => [from, to, kind]),
+      [
+        [3, 1, 'start-after'],
+        [1, 2, 'start-after'],
+        [3, 2, 'start-after'],
+        [4, 2, 'start-after'],
+        [1, 4, 'closes'],
+      ],
+    );
+  });
+
+  test('with priorities picked, keeps only the listed issues of them', () => {
+    const graph = build({
+      issues: [
+        issue(1, [], ['priority:high']),
+        issue(2, [], ['priority:mid']),
+        issue(3, []),
+      ],
+    });
+
+    assert.deepStrictEqual(
+      omitFilteredIssues(graph, {
+        ...DEFAULT_ISSUE_FILTER,
+        hiddenPriorities: [],
+        onlyPriorities: ['high', 'none'],
+      }).nodes.map(({ number }) => number),
+      [1, 3],
+    );
+  });
+
+  test('with pending picked, keeps only the listed issues labelled pending, and what one of them waits on', () => {
+    const graph = build({
+      issues: [
+        issue(1, [], ['priority:high']),
+        issue(2, [1], ['pending']),
+        issue(3, []),
+      ],
+      pulls: [pull(7, [3])],
+    });
+
+    const shown = omitFilteredIssues(graph, {
+      ...DEFAULT_ISSUE_FILTER,
+      onlyPending: true,
+    });
+
+    // #1 is why #2 waits; #7 closed only #3.
+    assert.deepStrictEqual(
+      shown.nodes.map(({ number }) => number),
+      [1, 2],
+    );
+  });
+
+  test('hands back the graph it was given when every priority in it is shown', () => {
+    const graph = build({
+      issues: [issue(1, [], ['priority:high']), issue(2, [1])],
+    });
+
+    assert.strictEqual(
+      omitFilteredIssues(graph, {
+        ...DEFAULT_ISSUE_FILTER,
+        hiddenPriorities: ['low'],
+        onlyPriorities: [],
+      }),
+      graph,
+    );
   });
 });
 

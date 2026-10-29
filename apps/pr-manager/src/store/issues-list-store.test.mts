@@ -1,4 +1,5 @@
 import { createState } from 'synstate';
+import { DEFAULT_ISSUE_FILTER } from '../issue-filter.mjs';
 import type { IssueGraph } from '../issue-graph.mjs';
 import {
   DEFAULT_ISSUES_LIST_VIEW,
@@ -32,6 +33,34 @@ describe(createIssuesListStore, () => {
     store.togglePriority('low');
 
     assert.strictEqual(saved.length, 2);
+  });
+
+  test('passes on the priorities and pending alone, and only when they changed', () => {
+    const { store } = setup();
+
+    const mut_filters: unknown[] = [];
+
+    store.filter.subscribe((filter) => {
+      mut_filters.push(filter);
+    });
+
+    store.setSort('priority');
+
+    store.toggleLabel('bug');
+
+    store.toggleStart('blocked');
+
+    assert.deepStrictEqual(mut_filters, [DEFAULT_ISSUE_FILTER]);
+
+    store.togglePriorityOnly('high');
+
+    store.togglePendingOnly();
+
+    assert.deepStrictEqual(mut_filters, [
+      DEFAULT_ISSUE_FILTER,
+      { ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['high'] },
+      { ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['high'], onlyPending: true },
+    ]);
   });
 
   test('derives the list and the counts from the issues and the view', () => {
@@ -100,9 +129,11 @@ describe(createIssuesListStore, () => {
 
 const STORED: IssuesListView = {
   hiddenPriorities: ['none'],
+  onlyPriorities: [],
   hiddenStarts: [],
   onlyLabels: ['bug'],
   hidePending: false,
+  onlyPending: false,
   sort: 'priority',
 } as const;
 

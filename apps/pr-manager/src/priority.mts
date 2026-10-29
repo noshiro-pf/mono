@@ -36,12 +36,44 @@ export const priorityOf = (labels: readonly Label[]): Priority => {
   return Arr.isFixedLengthArray(1, carried) ? carried[0][0] : 'none';
 };
 
+/** Whether the priority is switched on, and picked when any is. */
+export const isPriorityShown = (
+  priority: Priority,
+  filter: PriorityFilter,
+): boolean =>
+  !filter.hiddenPriorities.includes(priority) &&
+  (!Arr.isNonEmpty(filter.onlyPriorities) ||
+    filter.onlyPriorities.includes(priority));
+
 /**
  * Whether the label is one of the `priority:*` ones, which a view reads as a
  * {@link Priority} rather than as a label.
  */
 export const isPriorityLabel = (labelName: string): boolean =>
   PRIORITY_LABELS.some(([, each]) => each === labelName);
+
+/** What each priority is called on its switch. */
+export const PRIORITY_NAMES = {
+  high: 'high',
+  mid: 'mid',
+  low: 'low',
+  none: 'none',
+} as const satisfies ReadonlyRecord<Priority, string>;
+
+/**
+ * Which priorities a view shows: what is switched off, and what is picked
+ * ("only"), as the merge order's statuses are (`merge-order-view.mts`). The
+ * open issues' list and their DAG read the same one (`issues-list-view.mts`).
+ */
+export type PriorityFilter = Readonly<{
+  /**
+   * What is switched off rather than on, as the merge order keeps it, so
+   * that the two read alike.
+   */
+  hiddenPriorities: readonly Priority[];
+  /** What is picked; nothing picked is no narrowing. */
+  onlyPriorities: readonly Priority[];
+}>;
 
 /**
  * Lower first, in a sort by priority. No priority is between mid and low:

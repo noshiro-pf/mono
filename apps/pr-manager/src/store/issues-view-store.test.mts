@@ -1,24 +1,24 @@
 import { createState } from 'synstate';
 import { NATURAL_ZOOM, type DagZoom } from '../dag-zoom.mjs';
+import { DEFAULT_ISSUE_FILTER, type IssueFilter } from '../issue-filter.mjs';
 import {
   DEFAULT_ISSUES_VIEW_SETTINGS,
   type IssuesViewSettings,
 } from '../issues-view-settings.mjs';
 import type { Entry, LoadedReport } from '../load-report.mjs';
-import { createIssuesViewStore } from './issues-view-store.mjs';
+import {
+  createIssueGraph,
+  createIssuesViewStore,
+} from './issues-view-store.mjs';
 import type { MoreIssuesStatus } from './reader.mjs';
 
 describe(createIssuesViewStore, () => {
   test('starts at the settings it is given, and hands every change to save from start on', () => {
     const { store, saved } = setup({
-      initial: { view: 'dag', hideDone: true, hidePending: false },
+      initial: { view: 'dag' },
     });
 
     assert.strictEqual(store.view.getSnapshot().value, 'dag');
-
-    assert.isTrue(store.hideDone.getSnapshot().value);
-
-    assert.isFalse(store.hidePending.getSnapshot().value);
 
     store.choose('list');
 
@@ -27,21 +27,15 @@ describe(createIssuesViewStore, () => {
 
     const stopStore = store.start();
 
-    store.toggleHideDone();
+    store.choose('dag');
 
-    store.toggleHidePending();
-
-    assert.deepStrictEqual(saved, [
-      { view: 'list', hideDone: true, hidePending: false },
-      { view: 'list', hideDone: false, hidePending: false },
-      { view: 'list', hideDone: false, hidePending: true },
-    ]);
+    assert.deepStrictEqual(saved, [{ view: 'list' }, { view: 'dag' }]);
 
     stopStore();
 
-    store.choose('dag');
+    store.choose('list');
 
-    assert.strictEqual(saved.length, 3);
+    assert.strictEqual(saved.length, 2);
   });
 
   test('builds the graph from the issues, and passes it on only when it changed', () => {
@@ -61,7 +55,7 @@ describe(createIssuesViewStore, () => {
     });
 
     assert.deepStrictEqual(store.graph.getSnapshot().value.edges, [
-      { from: 1, to: 2, kind: 'start-after', settled: false },
+      { from: 1, to: 2, kind: 'start-after' },
     ]);
 
     assert.strictEqual(store.layout.getSnapshot().value.nodes.length, 2);
@@ -128,7 +122,7 @@ describe(createIssuesViewStore, () => {
     assert.strictEqual(loadMoreCalls(), 0);
   });
 
-  test('hiding what is done takes it out of the graph and its layout, and counts it either way', () => {
+  test('never draws what is done, and keeps what closed unfinished', () => {
     const { store, setIssues } = setup();
 
     setIssues({
@@ -140,15 +134,6 @@ describe(createIssuesViewStore, () => {
 
     assert.deepStrictEqual(
       store.graph.getSnapshot().value.nodes.map(({ number }) => number),
-      [3, 4, 5],
-    );
-
-    assert.strictEqual(store.doneCount.getSnapshot().value, 1);
-
-    store.toggleHideDone();
-
-    assert.deepStrictEqual(
-      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
       [4, 5],
     );
 
@@ -157,15 +142,14 @@ describe(createIssuesViewStore, () => {
       [4, 5],
     );
 
-    assert.strictEqual(store.doneCount.getSnapshot().value, 1);
-
-    store.toggleHideDone();
-
-    assert.strictEqual(store.graph.getSnapshot().value.nodes.length, 3);
+    // The wait on what is done is over, and is not drawn either.
+    assert.deepStrictEqual(store.graph.getSnapshot().value.edges, [
+      { from: 4, to: 5, kind: 'start-after' },
+    ]);
   });
 
-  test('hiding what is pending takes it out of the graph, with what is done or not, and counts it either way', () => {
-    const { store, setIssues } = setup();
+  test('hiding what is pending takes it out of the graph, and counts it either way', () => {
+    const { store, setIssues, setFilter } = setup();
 
     setIssues({
       items: [
@@ -174,33 +158,218 @@ describe(createIssuesViewStore, () => {
       ],
       totalCount: 2,
       endCursor: undefined,
-      referenced: [referencedIssue(3, 'done')],
+      referenced: [referencedIssue(3, 'abandoned')],
     });
 
-    assert.strictEqual(store.pendingCount.getSnapshot().value, 1);
+    assert.deepStrictEqual(store.counts.getSnapshot().value.pending, {
+      shown: 1,
+      total: 1,
+    });
 
-    store.toggleHidePending();
+    setFilter({ ...DEFAULT_ISSUE_FILTER, hidePending: true });
 
-    assert.deepStrictEqual(
-      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
-      [3, 6],
-    );
-
-    store.toggleHideDone();
-
+    // #3 is drawn only for #5, which waited on it.
     assert.deepStrictEqual(
       store.layout.getSnapshot().value.nodes.map(({ number }) => number),
       [6],
     );
 
-    assert.strictEqual(store.pendingCount.getSnapshot().value, 1);
+    // Switched off, pending reads what switching it on would draw.
+    assert.deepStrictEqual(store.counts.getSnapshot().value, {
+      open: { shown: 1, total: 2 },
+      priorities: {
+        high: { shown: 0, total: 0 },
+        mid: { shown: 0, total: 0 },
+        low: { shown: 0, total: 0 },
+        none: { shown: 1, total: 2 },
+      },
+      pending: { shown: 1, total: 1 },
+    });
 
-    store.toggleHidePending();
+    setFilter(DEFAULT_ISSUE_FILTER);
 
     assert.deepStrictEqual(
       store.graph.getSnapshot().value.nodes.map(({ number }) => number),
-      [5, 6],
+      [3, 5, 6],
     );
+  });
+
+  test('draws the priorities the list shows, and counts the open issues it draws of each', () => {
+    const { store, setIssues, setFilter } = setup();
+
+    setIssues({
+      items: [
+        { ...issueItem(1, [9]), labels: [priorityLabel('high')] },
+        { ...issueItem(2, [1]), labels: [priorityLabel('low')] },
+        { ...issueItem(3, []), labels: [priorityLabel('low'), pendingLabel] },
+        issueItem(4, []),
+      ],
+      totalCount: 4,
+      endCursor: undefined,
+      referenced: [referencedIssue(9, 'waiting')],
+    });
+
+    assert.deepStrictEqual(store.counts.getSnapshot().value, {
+      open: { shown: 4, total: 4 },
+      priorities: {
+        high: { shown: 1, total: 1 },
+        mid: { shown: 0, total: 0 },
+        low: { shown: 2, total: 2 },
+        none: { shown: 1, total: 1 },
+      },
+      pending: { shown: 1, total: 1 },
+    });
+
+    setFilter({ ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['low'] });
+
+    // #1 stays, alone, since #2 waits on it; #9, which only #1 waits on,
+    // goes with it.
+    assert.deepStrictEqual(
+      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
+      [1, 2, 3],
+    );
+
+    // What an issue drawn waits on stays, though nobody read its priority.
+    setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['low'] });
+
+    assert.deepStrictEqual(
+      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
+      [1, 4, 9],
+    );
+
+    setFilter({
+      ...DEFAULT_ISSUE_FILTER,
+      hiddenPriorities: ['low'],
+      hidePending: true,
+    });
+
+    // A priority switched off counts what switching it on would draw.
+    assert.deepStrictEqual(store.counts.getSnapshot().value, {
+      open: { shown: 2, total: 4 },
+      priorities: {
+        high: { shown: 1, total: 1 },
+        mid: { shown: 0, total: 0 },
+        low: { shown: 1, total: 2 },
+        none: { shown: 1, total: 1 },
+      },
+      // #3 is low, which is still hidden.
+      pending: { shown: 0, total: 1 },
+    });
+  });
+
+  test('pending picked, draws only what is pending of the priorities shown, and what that waits on', () => {
+    const { store, setIssues, setFilter } = setup();
+
+    setIssues({
+      items: [
+        { ...issueItem(1, []), labels: [priorityLabel('high')] },
+        {
+          ...issueItem(2, [1]),
+          labels: [priorityLabel('high'), pendingLabel],
+        },
+        { ...issueItem(3, []), labels: [priorityLabel('low'), pendingLabel] },
+        issueItem(4, []),
+      ],
+      totalCount: 4,
+      endCursor: undefined,
+      referenced: [],
+    });
+
+    setFilter({
+      ...DEFAULT_ISSUE_FILTER,
+      onlyPriorities: ['high'],
+      onlyPending: true,
+    });
+
+    // #1 is not pending, and stays only because #2 waits on it.
+    assert.deepStrictEqual(
+      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
+      [1, 2],
+    );
+
+    assert.deepStrictEqual(store.counts.getSnapshot().value, {
+      open: { shown: 1, total: 4 },
+      priorities: {
+        high: { shown: 1, total: 2 },
+        mid: { shown: 0, total: 0 },
+        low: { shown: 1, total: 1 },
+        none: { shown: 0, total: 1 },
+      },
+      pending: { shown: 1, total: 2 },
+    });
+  });
+
+  test('hiding what is pending brings back nothing the priorities left out, and counts only what they leave', () => {
+    const { store, setIssues, setFilter } = setup();
+
+    setIssues({
+      items: [
+        {
+          ...issueItem(5, [3]),
+          labels: [priorityLabel('low'), pendingLabel],
+        },
+        issueItem(6, []),
+        { ...issueItem(7, []), labels: [pendingLabel] },
+      ],
+      totalCount: 3,
+      endCursor: undefined,
+      referenced: [referencedIssue(3, 'abandoned')],
+    });
+
+    setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['low'] });
+
+    assert.deepStrictEqual(
+      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
+      [6, 7],
+    );
+
+    assert.deepStrictEqual(store.counts.getSnapshot().value.pending, {
+      shown: 1,
+      total: 2,
+    });
+
+    setFilter({
+      ...DEFAULT_ISSUE_FILTER,
+      hiddenPriorities: ['low'],
+      hidePending: true,
+    });
+
+    assert.deepStrictEqual(
+      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
+      [6],
+    );
+  });
+
+  test('keeps what a hidden pending issue waits on only for that issue', () => {
+    const { store, setIssues, setFilter } = setup();
+
+    setIssues({
+      items: [
+        { ...issueItem(1, []), labels: [priorityLabel('low')] },
+        {
+          ...issueItem(2, [1]),
+          labels: [priorityLabel('high'), pendingLabel],
+        },
+      ],
+      totalCount: 2,
+      endCursor: undefined,
+      referenced: [],
+    });
+
+    setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['low'] });
+
+    assert.deepStrictEqual(
+      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
+      [1, 2],
+    );
+
+    setFilter({
+      ...DEFAULT_ISSUE_FILTER,
+      hiddenPriorities: ['low'],
+      hidePending: true,
+    });
+
+    assert.deepStrictEqual(store.graph.getSnapshot().value.nodes, []);
   });
 
   test('draws the DAG at its natural size until told otherwise, and steps a zoom in and out', () => {
@@ -416,6 +585,7 @@ const setup = (
   savedZoom: readonly DagZoom[];
   setIssues: (next: LoadedReport['issues']) => void;
   setEntries: (next: readonly Entry[]) => void;
+  setFilter: (next: IssueFilter) => void;
   setMoreIssues: (next: MoreIssuesStatus) => void;
   loadMoreCalls: () => number;
 }> => {
@@ -434,14 +604,20 @@ const setup = (
 
   const [entries, setEntries] = createState<readonly Entry[]>([]);
 
+  const [filter, setFilter] = createState<IssueFilter>(DEFAULT_ISSUE_FILTER);
+
   const [moreIssues, setMoreIssues] = createState<MoreIssuesStatus>({
     type: 'idle',
   });
 
   const store = createIssuesViewStore({
     issues,
-    entries,
-    repoUrl: 'https://github.com/o/r',
+    graph: createIssueGraph({
+      issues,
+      entries,
+      repoUrl: 'https://github.com/o/r',
+    }),
+    filter,
     initial: options.initial ?? DEFAULT_ISSUES_VIEW_SETTINGS,
     save: (settings) => {
       mut_saved.push(settings);
@@ -462,6 +638,7 @@ const setup = (
     savedZoom: mut_savedZoom,
     setIssues,
     setEntries,
+    setFilter,
     setMoreIssues,
     loadMoreCalls: () => mut_loadMore.calls,
   };
@@ -510,3 +687,10 @@ const pendingLabel = {
   color: 'ededed',
   description: '',
 } as const;
+
+const priorityLabel = (priority: 'high' | 'mid' | 'low') =>
+  ({
+    name: `priority:${priority}`,
+    color: 'ededed',
+    description: '',
+  }) as const;

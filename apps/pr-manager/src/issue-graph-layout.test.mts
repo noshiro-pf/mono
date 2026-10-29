@@ -380,7 +380,7 @@ describe(placementsFor, () => {
 });
 
 const edge = (from: number, to: number): IssueGraphEdge =>
-  ({ from, to, kind: 'start-after', settled: false }) as const;
+  ({ from, to, kind: 'start-after' }) as const;
 
 const graph = (
   numbers: readonly number[],

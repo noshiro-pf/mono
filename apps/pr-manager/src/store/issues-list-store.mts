@@ -9,6 +9,10 @@
  *
  * The search is held beside the view, not in it, and so is never saved: it
  * starts empty on every visit.
+ *
+ * The priorities and `pending` in the view are the DAG's too
+ * (`issues-view-store.mts`): switched off or picked here, they are for either
+ * view.
  */
 
 import type { IssueStartState } from 'pr-report-core';
@@ -20,6 +24,7 @@ import {
   type InitializedObservable,
 } from 'synstate';
 import { fastDeepEqual } from 'ts-data-forge';
+import type { IssueFilter } from '../issue-filter.mjs';
 import {
   issueStartsOf,
   type IssueGraph,
@@ -28,10 +33,12 @@ import {
 import {
   arrangeIssues,
   countIssues,
+  toggleIssuePending,
+  toggleIssuePendingOnly,
   toggleIssuePriority,
+  toggleIssuePriorityOnly,
   toggleIssueStart,
   toggleLabel,
-  togglePendingIssues,
   withIssueSort,
   type IssuesListCounts,
   type IssuesListView,
@@ -43,7 +50,7 @@ import type { Priority } from '../priority.mjs';
 export type IssuesListDeps = Readonly<{
   issues: InitializedObservable<LoadedReport['issues']>;
   /**
-   * The issues' graph, what is done included (`issues-view-store.mts`), which
+   * The issues' graph, what is done included (`createIssueGraph`), which
    * each issue's start state is read off.
    */
   graph: InitializedObservable<IssueGraph>;
@@ -53,6 +60,12 @@ export type IssuesListDeps = Readonly<{
 
 export type IssuesListStore = Readonly<{
   view: InitializedObservable<IssuesListView>;
+  /**
+   * The priorities and `pending` of the view alone, which the DAG reads
+   * (`issues-view-store.mts`); passed on only when they changed, so that a
+   * change to the rest of the view derives nothing there.
+   */
+  filter: InitializedObservable<IssueFilter>;
   /** What the reader typed to search the titles by; empty is no search. */
   query: InitializedObservable<string>;
   /**
@@ -65,9 +78,11 @@ export type IssuesListStore = Readonly<{
   /** How each listed issue stands for being started, by number. */
   starts: InitializedObservable<ReadonlyMap<number, IssueStart>>;
   togglePriority: (priority: Priority) => void;
+  togglePriorityOnly: (priority: Priority) => void;
   toggleStart: (which: IssueStartState) => void;
   toggleLabel: (labelName: string) => void;
   togglePending: () => void;
+  togglePendingOnly: () => void;
   setSort: (sort: IssueSort) => void;
   setQuery: (query: string) => void;
   /** Saves every change from now on; returns what stops it. */
@@ -104,6 +119,23 @@ export const createIssuesListStore = (
 
   return {
     view,
+    filter: view
+      .pipe(
+        map(
+          ({
+            hiddenPriorities,
+            onlyPriorities,
+            hidePending,
+            onlyPending,
+          }): IssueFilter => ({
+            hiddenPriorities,
+            onlyPriorities,
+            hidePending,
+            onlyPending,
+          }),
+        ),
+      )
+      .pipe(skipIfNoChange(fastDeepEqual)),
     query,
     // Passed on only when it changed: a poll that moved nothing of the
     // issues lays nothing out again.
@@ -125,6 +157,9 @@ export const createIssuesListStore = (
     togglePriority: (priority) => {
       updateView((current) => toggleIssuePriority(current, priority));
     },
+    togglePriorityOnly: (priority) => {
+      updateView((current) => toggleIssuePriorityOnly(current, priority));
+    },
     toggleStart: (which) => {
       updateView((current) => toggleIssueStart(current, which));
     },
@@ -132,7 +167,10 @@ export const createIssuesListStore = (
       updateView((current) => toggleLabel(current, labelName));
     },
     togglePending: () => {
-      updateView(togglePendingIssues);
+      updateView(toggleIssuePending);
+    },
+    togglePendingOnly: () => {
+      updateView(toggleIssuePendingOnly);
     },
     setSort: (sort) => {
       updateView((current) => withIssueSort(current, sort));

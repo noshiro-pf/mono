@@ -7,22 +7,21 @@ import {
   type LabelCount,
 } from '../issues-list-view.mjs';
 import { chipColors } from '../label-color.mjs';
-import { PRIORITIES } from '../priority.mjs';
 import { issuesListStore } from '../store/index.mjs';
 import { explainState, stateLabels } from './issue-dag-states.mjs';
 import { OfTotal } from './stat-tile.js';
 
 /**
- * What the list of open issues leads with: a search of the titles, matched
- * as it is typed whatever the case, and not kept in the URL; the priorities, switches as the
- * merge order's are (`merge-order-filters.tsx`); the start states, switches
- * likewise, in the DAG's words; `pending`, a switch as well, there while an
- * open issue carries it; the labels, each a pick; and the order. What each
- * does is `issues-list-view.mts`, which keeps the choice in the URL.
+ * What the list of open issues leads with: a search of the titles, matched as
+ * it is typed whatever the case, and not kept in the URL; the start states,
+ * switches as the merge order's priorities are (`merge-order-filters.tsx`), in
+ * the DAG's words; the labels, each a pick; and the order. What each does is
+ * `issues-list-view.mts`, which keeps the choice in the URL.
  *
  * Each number is how many of what it counts the list shows, followed in
  * small by how many there are when that is more — the merge order's
- * counts, for issues.
+ * counts, for issues. The priorities and `pending` are above these, with the
+ * counts (`issues-summary.tsx`), since the DAG reads them too.
  */
 export const IssuesListFilters = (): JSX.Element => {
   const { view: view$, counts: counts$ } = issuesListStore;
@@ -40,35 +39,6 @@ export const IssuesListFilters = (): JSX.Element => {
           issuesListStore.setQuery(typed.currentTarget.value);
         }}
       />
-
-      <fieldset
-        aria-label={constant('Priority')}
-        class={constant('filter-group')}
-      >
-        <span class={constant('filter-group-name')}>
-          {constant('priority')}
-        </span>
-        {PRIORITIES.map((priority) => (
-          <button
-            aria-pressed={view(view$, ({ hiddenPriorities }) =>
-              (!hiddenPriorities.includes(priority)).toString(),
-            )}
-            class={constant('filter-chip')}
-            type={constant('button')}
-            onClick={() => {
-              issuesListStore.togglePriority(priority);
-            }}
-          >
-            {constant(priority)}
-            <span class={constant('filter-chip-count')}>
-              {view(counts$, ({ priorities }) => priorities[priority].shown)}
-              <OfTotal
-                count={view(counts$, ({ priorities }) => priorities[priority])}
-              />
-            </span>
-          </button>
-        ))}
-      </fieldset>
 
       <fieldset
         aria-label={constant('Start state')}
@@ -95,31 +65,6 @@ export const IssuesListFilters = (): JSX.Element => {
           </button>
         ))}
       </fieldset>
-
-      <If
-        cond={view(counts$, ({ pending }) => pending.total > 0)}
-        then={
-          <button
-            aria-pressed={view(view$, ({ hidePending }) =>
-              (!hidePending).toString(),
-            )}
-            class={constant('filter-chip')}
-            title={view(view$, ({ hidePending }) =>
-              hidePending
-                ? 'Show the issues labelled pending again'
-                : 'Leave out the issues labelled pending',
-            )}
-            type={constant('button')}
-            onClick={togglePending}
-          >
-            {constant('pending')}
-            <span class={constant('filter-chip-count')}>
-              {view(counts$, ({ pending }) => pending.shown)}
-              <OfTotal count={view(counts$, ({ pending }) => pending)} />
-            </span>
-          </button>
-        }
-      />
 
       <If
         cond={view(counts$, ({ labels }) => Arr.isNonEmpty(labels))}
@@ -232,10 +177,6 @@ const LabelPick = ({
       </span>
     </button>
   );
-};
-
-const togglePending = (): void => {
-  issuesListStore.togglePending();
 };
 
 const sortBy = (sort: IssueSort) => (): void => {
