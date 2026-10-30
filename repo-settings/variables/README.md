@@ -5,9 +5,11 @@ GitHub の現在値で撮り直すのは `pnpm run repo-settings:backup variable
 
 JSON にコメントが書けないので、何のための値かはここに置いてある。
 
-| 変数                            | 何か                                                                                                                                                                                                                                                                           |
-| :------------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `REPO_AUTOMATION_BOT_CLIENT_ID` | GitHub App `noshiro-repo-automation-bot`（App ID: 4478721）の client id。Contents / Pull requests / Issues 権限を持ち、`release.yml`、`pnpm-update.yml`、`node-support-update.yml` が App token を発行するのに使う。実際に使う権限は各ワークフローの `permission-*` 入力で絞る |
+| 変数                                         | 何か                                                                                                                                                                                                                                                                           |
+| :------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `FIREBASE_DEPLOY_SERVICE_ACCOUNT`            | `deploy-firestore.yml` がなりすますデプロイ用サービスアカウント（GCP project `noshiro-pf-ci`）。Firestore のルールとインデックスを更新するロールだけを持つ。作り方は `docs/firestore-deploy.md`                                                                                |
+| `FIREBASE_DEPLOY_WORKLOAD_IDENTITY_PROVIDER` | 上のサービスアカウントと GitHub Actions の OIDC トークンを交換する Workload Identity provider の完全な名前（`837003254043` は `noshiro-pf-ci` の project 番号）。このリポジトリの `main` で `firebase-deploy` environment を名指す `deploy-firestore.yml` だけを通す           |
+| `REPO_AUTOMATION_BOT_CLIENT_ID`              | GitHub App `noshiro-repo-automation-bot`（App ID: 4478721）の client id。Contents / Pull requests / Issues 権限を持ち、`release.yml`、`pnpm-update.yml`、`node-support-update.yml` が App token を発行するのに使う。実際に使う権限は各ワークフローの `permission-*` 入力で絞る |
 
 **秘密をここに書かないこと。** repository variable は API でも Actions の
 ログでも平文で読める。秘密は secret 側にあり、そちらはこのツールの管理外。

@@ -24,6 +24,7 @@ catalog:
   dedent: 1.7.2
   esbuild: 0.28.2
   eslint: 10.13.0
+  firebase-tools: 15.34.1
   immer: 11.2.7
   jiti: 2.7.0
   jotai: 3.0.1
@@ -174,6 +175,10 @@ allowBuilds:
   '@firebase/util': false
   esbuild: true
   protobufjs: false
+  # An optional dependency of `superstatic`, the Hosting server inside
+  # `firebase-tools`; nothing here serves Hosting through it (the rules deploy
+  # and the Firestore emulator do not load it), so its native build stays off.
+  re2: false
   sharp: true # apps/synstate-docs (Astro)
   unrs-resolver: true
 

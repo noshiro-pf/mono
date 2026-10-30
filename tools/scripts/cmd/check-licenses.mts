@@ -39,6 +39,9 @@ import { projectRootPath } from '../project-root-path.mjs';
  * `libs/*` install then read as stale. Without an install every package
  * comes back `Unknown`, so `Unknown` is a failure rather than a gap: a check
  * that passes because it saw nothing is the one shape this must not have.
+ * An exception may still let `Unknown` through for a package whose license
+ * files someone has read, but only by its exact name — a wildcard there, or
+ * `Unknown` in `allowed`, would be the gap again, and fails.
  */
 export const checkLicenses = (): Result<CheckSummary, string> => {
   const installed = readInstalledLicenses();
@@ -147,7 +150,10 @@ export const matchesPackagePattern = (
     ? name.length >= pattern.length && name.startsWith(pattern.slice(0, -1))
     : name === pattern;
 
-/** Everything the policy does not let through, and every exception it no longer needs. */
+/**
+ * Everything the policy does not let through, every exception it no longer
+ * needs, and every entry that would let `Unknown` through as a class.
+ */
 export const collectViolations = (
   installed: readonly InstalledLicense[],
   policy: LicensePolicy,
@@ -184,10 +190,14 @@ export const collectViolations = (
     ];
   });
 
-  const stale = Arr.generate<Violation>(function* () {
+  const badExceptions = Arr.generate<Violation>(function* () {
     for (const { license, packages } of policy.exceptions) {
       for (const pattern of packages) {
-        if (
+        const subject = `exception '${pattern}' (${license})` as const;
+
+        if (license === UNKNOWN_LICENSE && pattern.endsWith(WILDCARD)) {
+          yield { subject, message: REASONS['unknown-wildcard'] };
+        } else if (
           installed.every(
             (entry) =>
               !(
@@ -196,16 +206,24 @@ export const collectViolations = (
               ),
           )
         ) {
-          yield {
-            subject: `exception '${pattern}' (${license})`,
-            message: REASONS['stale-exception'],
-          };
+          yield { subject, message: REASONS['stale-exception'] };
         }
       }
     }
   });
 
-  return [...notLetThrough, ...stale];
+  const unknownAllowed: readonly Violation[] = policy.allowed.some(
+    ({ license }) => license === UNKNOWN_LICENSE,
+  )
+    ? ([
+        {
+          subject: `allowed '${UNKNOWN_LICENSE}'`,
+          message: REASONS['unknown-allowed'],
+        },
+      ] as const)
+    : ([] as const);
+
+  return [...notLetThrough, ...badExceptions, ...unknownAllowed];
 };
 
 /**
@@ -335,8 +353,22 @@ const REASONS = {
 
   unknown: [
     'declares no license. If every package reads like this, `node_modules` is',
-    'not installed. Otherwise find the license in the package itself and',
-    'write an exception naming it — `Unknown` is never the thing to allow.',
+    'not installed. Otherwise read the license files in the package itself',
+    'against the use, as for any exception; letting it through is an',
+    'exception under `Unknown` that names this package alone and says which',
+    'license the files carry.',
+  ].join(' '),
+
+  'unknown-wildcard': [
+    'lets `Unknown` through for more than one package. `Unknown` is what',
+    'every package reads as without an install, so an `Unknown` exception',
+    'names each package, whose license files someone has read.',
+  ].join(' '),
+
+  'unknown-allowed': [
+    'lets every package that declares no license through. `Unknown` is what',
+    'every package reads as without an install, so it can never be allowed',
+    'as a class; write an exception naming each package instead.',
   ].join(' '),
 
   'stale-exception': [

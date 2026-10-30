@@ -1,7 +1,9 @@
 rules_version = '2';
 
-// Deployed by hand: `firebase deploy --only firestore:rules` from this
-// directory (see README.md). Editing this file changes nothing until then.
+// Deployed by `deploy-firestore.yml` when a push to main changes this file
+// (docs/firestore-deploy.md), on the same push that deploy-pages.yml
+// publishes the app with. `pnpm run test:rules` runs nowhere in CI, so run it
+// before merging a change here.
 //
 // Layout:
 //   users/{uid}/plans/{planId}   { name, createdAt, updatedAt, input }
@@ -9,8 +11,8 @@ rules_version = '2';
 // Each user has any number of plans, and nobody else can see them. The
 // rules decide who may touch a plan and which fields it has; what the fields
 // hold is checked by the app when it reads them
-// (`src/repository/plan-doc.mts`), and the rules are deployed by hand, so
-// they may lag behind the app.
+// (`src/repository/plan-doc.mts`), and the rules and the app are deployed by
+// separate jobs, so for a while one may run ahead of the other.
 service cloud.firestore {
   match /databases/{database}/documents {
     // Google is the only provider the app offers (README: Firebase の手作業).

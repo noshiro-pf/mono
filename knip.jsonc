@@ -82,7 +82,11 @@
   // - `pass` and `openssl`, invoked by
   //   `apps/split-view-extension/scripts/pack-crx.mts` — the signing key is
   //   read out of `pass`, and `openssl` derives the extension id from it.
-  "ignoreBinaries": ["diff", "openssl", "pass"],
+  //
+  // And one that is installed, but not at the root: `firebase`, which
+  // `.github/workflows/deploy-firestore.yml` runs from the deployed app's own
+  // `node_modules/.bin` (each app declares `firebase-tools`).
+  "ignoreBinaries": ["diff", "firebase", "openssl", "pass"],
 
   "workspaces": {
     // **A new entry goes after the previous entry's closing `},`**, never
@@ -482,6 +486,9 @@
     "apps/algo-app": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],
+      // The CLI that `.github/workflows/deploy-firestore.yml` deploys this
+      // app's Firestore rules with; no script here runs it.
+      "ignoreDependencies": ["firebase-tools"],
     },
 
     // Not an Astro site like the entry below assumes: a single entry point.

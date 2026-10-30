@@ -28,10 +28,11 @@ package's `watch:build` to have the emulator pick up changes to the functions.
 
 The emulators load `firestore.rules`, so what they let the app do is what
 production lets it do. Nothing in CI reads the rules; a change there takes
-effect only with `pnpm dlx firebase-tools deploy --only firestore:rules`.
+effect only with `pnpm exec firebase deploy --only firestore:rules`.
 
 The Firestore and Pub/Sub emulators need Java (JDK 21 or later), and the
-emulators run through `pnpm dlx firebase-tools`, so nothing else is installed.
+emulators run through the `firebase-tools` this package declares, so nothing
+else is installed.
 
 ### End-to-end tests
 
