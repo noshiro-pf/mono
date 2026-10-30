@@ -45,6 +45,10 @@ import {
  * a scenario the data picks out — which one a library does worst in — since
  * the cell has to name it in the page's language; such an entry carries one
  * spelling per language, and `embed-benchmark.mts` takes the page's.
+ *
+ * The per-library table's ratio cells carry their own markup, the `×` and the
+ * emphasis the page explains under the table, so they are cells rather than
+ * numbers: prose quoting one of those figures has a plain key of its own.
  */
 export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
   ({
@@ -348,6 +352,10 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       Math.min(...summarySlowestSpreads()),
       1,
     ),
+    // The figure the paragraph on Preact Signals sets beside SynState's. The
+    // per-library table's cell carries markup, so the prose has its own key.
+    'summary/preact-signals-worst-over-fastest':
+      worstCaseText('Preact Signals'),
 
     // The headline on the introduction and the landing page: SynState's worst
     // case (the figure above) beside the range the other libraries' worst
@@ -359,21 +367,7 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     // that row's fastest library, among the rows that measured it. Which row
     // that is is what a re-measurement can change, so the scenario is derived
     // too; and so is the mark on a library some rows did not measure.
-    ...Object.fromEntries(
-      summaryLibraries().flatMap((library) => {
-        const { scenario } = worstSummaryRow(library);
-
-        // `Preact Signals` → `preact-signals`: a marker key has no spaces.
-        const key = library.toLowerCase().replaceAll(' ', '-');
-
-        return [
-          [`summary/worst/${key}-library`, partialMarked(library)],
-          [`summary/worst/${key}-scenario`, scenario.name],
-          [`summary/worst/${key}-fastest`, scenario.fastest()],
-          [`summary/worst/${key}-over-fastest`, worstCaseText(library)],
-        ] as const;
-      }),
-    ),
+    ...worstCaseRows(),
 
     // Summary: how each library's cost grows when the deep chain gets four
     // times deeper at the same update count — the worst-case growth the page
@@ -590,13 +584,21 @@ const ms = (value: number): string =>
     : (`${count(Math.round(value))} ms` as const);
 
 /**
+ * Whether {@link factor} prints `value` with one decimal: below 10 once
+ * rounded to that decimal, the way `toFixed` rounds it, so that 9.96 prints as
+ * `10` rather than `10.0`.
+ */
+const inSingleDigits = (value: number): boolean =>
+  value < 10 && value.toFixed(1) !== '10.0';
+
+/**
  * A ratio as the summary quotes it: one decimal below 10, where "3.6×" and
  * "4×" say different things, and whole numbers above it, as {@link ratio}.
  */
 const factor = (numerator: number, denominator: number): string => {
   const value = divide(numerator, denominator);
 
-  return value < 10 ? value.toFixed(1) : count(Math.round(value));
+  return inSingleDigits(value) ? value.toFixed(1) : count(Math.round(value));
 };
 
 const ratio = (numerator: number, denominator: number): string =>
@@ -818,6 +820,9 @@ type SummaryScenario = Readonly<{
   timedOut: (library: string) => boolean;
 }>;
 
+/** A library's worst summary row, from {@link worstSummaryRow}. */
+type WorstRow = Readonly<{ scenario: SummaryScenario; spread: number }>;
+
 /**
  * The summary table's rows, in its order. A name is spelled as that table's
  * first column spells it, the point of the sweep included.
@@ -933,15 +938,17 @@ const FAN_OUT_SUMMARY_FORMS: ReadonlyRecord<string, string> = {
 const summaryLibraries = (): readonly string[] =>
   summaryScenarios()[0]?.libraries ?? [];
 
+/** Whether every summary row measured `library`. */
+const inEveryScenario = (library: string): boolean =>
+  summaryScenarios().every((s) => s.libraries.includes(library));
+
 /**
  * The libraries other than SynState that every summary row measured, in the
  * per-library table's order.
  */
 const otherEveryScenarioLibraries = (): readonly string[] =>
   summaryLibraries().filter(
-    (library) =>
-      library !== 'SynState' &&
-      summaryScenarios().every((s) => s.libraries.includes(library)),
+    (library) => library !== 'SynState' && inEveryScenario(library),
   );
 
 /**
@@ -950,17 +957,13 @@ const otherEveryScenarioLibraries = (): readonly string[] =>
  * only. Language-neutral, like {@link glitchMarked}.
  */
 const partialMarked = (library: string): string =>
-  summaryScenarios().every((s) => s.libraries.includes(library))
-    ? library
-    : (`${library} ※3` as const);
+  inEveryScenario(library) ? library : (`${library} ※3` as const);
 
 /**
  * The summary row where `library` is furthest from that row's fastest, among
  * the rows that measured it.
  */
-const worstSummaryRow = (
-  library: string,
-): Readonly<{ scenario: SummaryScenario; spread: number }> => {
+const worstSummaryRow = (library: string): WorstRow => {
   const [worst] = summaryScenarios()
     .filter((scenario) => scenario.libraries.includes(library))
     .map((scenario) => ({ scenario, spread: scenario.spread(library) }))
@@ -974,10 +977,63 @@ const worstSummaryRow = (
 };
 
 /** A library's worst case, from {@link worstSummaryRow}, as the summary quotes it. */
-const worstCaseText = (library: string): string => {
-  const { scenario, spread } = worstSummaryRow(library);
+const worstCaseText = (
+  library: string,
+  { scenario, spread }: WorstRow = worstSummaryRow(library),
+): string => spreadText(spread, scenario.timedOut(library));
 
-  return spreadText(spread, scenario.timedOut(library));
+/**
+ * A library's worst case, `worst` from {@link worstSummaryRow}, as the
+ * per-library table's cell prints it, `×` included; emphasized when it stays in
+ * single digits, as the libraries that hold up in every scenario. Only a
+ * library every summary row measured qualifies, since a worst case over some
+ * rows alone (※3) says less. The class is styled in `src/styles/custom.css`.
+ */
+const worstCaseCell = (library: string, worst: WorstRow): string => {
+  const text = `${worstCaseText(library, worst)}×` as const;
+
+  return !worst.scenario.timedOut(library) &&
+    inSingleDigits(worst.spread) &&
+    inEveryScenario(library)
+    ? (`<strong class="benchmark-emphasis">${text}</strong>` as const)
+    : text;
+};
+
+/**
+ * The per-library table's cells, from {@link worstSummaryRow}.
+ *
+ * The note under the table explains the emphasis {@link worstCaseCell} gives,
+ * so a re-measurement that leaves no cell emphasized is an error rather than a
+ * note describing nothing on the page.
+ */
+const worstCaseRows = (): ReadonlyRecord<string, BenchmarkNumber> => {
+  const rows = summaryLibraries().map((library) => {
+    const worst = worstSummaryRow(library);
+
+    return {
+      // `Preact Signals` → `preact-signals`: a marker key has no spaces.
+      key: library.toLowerCase().replaceAll(' ', '-'),
+      library: partialMarked(library),
+      scenario: worst.scenario.name,
+      fastest: worst.scenario.fastest(),
+      cell: worstCaseCell(library, worst),
+    };
+  });
+
+  if (rows.every(({ cell }) => !cell.startsWith('<strong'))) {
+    throw new Error(
+      '❌ no library holds its worst case in single digits: remove the note on the emphasis under the per-library table',
+    );
+  }
+
+  return Object.fromEntries(
+    rows.flatMap(({ key, library, scenario, fastest, cell }) => [
+      [`summary/worst/${key}-library`, library],
+      [`summary/worst/${key}-scenario`, scenario],
+      [`summary/worst/${key}-fastest`, fastest],
+      [`summary/worst/${key}-over-fastest-cell`, cell],
+    ]),
+  );
 };
 
 /**
@@ -991,12 +1047,12 @@ const othersWorstCaseRange = (): ReadonlyRecord<string, string> => {
   // end smaller than the lower one.
   const sorted = otherEveryScenarioLibraries()
     .map((library) => {
-      const { scenario, spread } = worstSummaryRow(library);
+      const worst = worstSummaryRow(library);
 
       return {
         library,
-        spread,
-        text: spreadText(spread, scenario.timedOut(library)),
+        spread: worst.spread,
+        text: worstCaseText(library, worst),
       };
     })
     .toSorted((a, b) => a.spread - b.spread);

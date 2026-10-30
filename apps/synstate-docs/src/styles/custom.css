@@ -5,3 +5,10 @@ table td,
 table th {
   word-break: keep-all;
 }
+
+/* Figures the benchmark page singles out (`benchmark-numbers.mts` decides
+   which). Starlight's `-high` shade is dark in the light theme and light in
+   the dark theme, so the color keeps its contrast in both. */
+.benchmark-emphasis {
+  color: var(--sl-color-green-high);
+}
