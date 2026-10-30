@@ -102,6 +102,8 @@ What each library provides for each requirement, and where the code below writes
 
 [^jotai-abort]: Jotai aborts a read's `signal` when a dependency changes and the atom is read again, not when its last subscriber leaves.
 
+The notes after each listing mark a strength with ✅, a drawback with ⚠️, and a trade-off or a side note with ℹ️.
+
 ## SynState
 
 ```tsx
@@ -165,12 +167,13 @@ export const createSearch = () => {
 };
 ```
 
-- **Each requirement is one operator** on one pipeline, read top to bottom in the order the query goes through them. Adding another (a minimum query length, a retry) is one more `pipe`.
-- **`map` deduplicates.** It passes on a result only when it differs from the previous one (`Object.is`), so the trimmed query needs no `skipIfNoChange` after it.
-- **Cancellation is the structure, not code.** `switchMap` completes the previous inner observable, `fromAbortablePromise` aborts its `AbortController` when it completes, and the `AbortError` that follows is swallowed. Nothing checks `signal.aborted`.
-- **An error is a value.** `fromAbortablePromise` emits `Result.ok` or `Result.err` and never throws into the pipeline, so a failed request cannot end it, wherever the error is handled.
-- **`searchState` always has a value**, readable with `getSnapshot()` or `useObservableValue`, and the pipeline runs whether anything subscribes or not.
-- **Teardown disposes, it does not complete.** `scope.dispose()` drops `debounce`'s pending query instead of emitting it, and aborts the request in flight.
+- ✅ **Each requirement is one operator** on one pipeline, read top to bottom in the order the query goes through them. Adding another (a minimum query length, a retry) is one more `pipe`.
+- ✅ **`map` deduplicates.** It passes on a result only when it differs from the previous one (`Object.is`), so the trimmed query needs no `skipIfNoChange` after it.
+- ✅ **Cancellation is the structure, not code.** `switchMap` completes the previous inner observable, `fromAbortablePromise` aborts its `AbortController` when it completes, and the `AbortError` that follows is swallowed. Nothing checks `signal.aborted`.
+- ✅ **An error is a value.** `fromAbortablePromise` emits `Result.ok` or `Result.err` and never throws into the pipeline, so a failed request cannot end it, wherever the error is handled.
+- ✅ **`searchState` always has a value**, readable with `getSnapshot()` or `useObservableValue`, and the pipeline runs whether anything subscribes or not.
+- ✅ **Teardown disposes, it does not complete.** `scope.dispose()` drops `debounce`'s pending query instead of emitting it, and aborts the request in flight.
+- ⚠️ **The operators have to be learned.** Reading the pipeline takes knowing what `debounce`, `switchMap` and `fromAbortablePromise` guarantee, as it does with RxJS.
 
 ## RxJS
 
@@ -229,11 +232,12 @@ export const createSearch = () => {
 };
 ```
 
-- **The same vocabulary as SynState**, and as short. The differences are in what the operators guarantee.
-- **Where `catchError` goes decides whether the search box survives its first error.** Inside `switchMap` it replaces the failed request; one level out, the error completes the outer pipe and later queries are ignored for good. Neither placement is a type error.
-- **There is no current value** until a `BehaviorSubject` (or `shareReplay`) holds one, and **nothing runs until something subscribes**. The code subscribes once and hands out the `BehaviorSubject`, because each subscriber to a cold pipeline would send requests of its own.
-- **`fromFetch` covers `fetch` only.** SynState's `fromAbortablePromise` takes any `(signal) => Promise`.
-- **Derived values are not glitch-free.** A search box has no diamond of its own, but once something combines two values derived from the same source, RxJS emits it once per path, the first time with one input stale ([How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/)).
+- ℹ️ **The same vocabulary as SynState**, and as short. The differences are in what the operators guarantee.
+- ⚠️ **Where `catchError` goes decides whether the search box survives its first error.** Inside `switchMap` it replaces the failed request; one level out, the error completes the outer pipe and later queries are ignored for good. Neither placement is a type error.
+- ⚠️ **There is no current value** until a `BehaviorSubject` (or `shareReplay`) holds one.
+- ℹ️ **Nothing runs until something subscribes**, and each subscriber to a cold pipeline would send requests of its own, so the code subscribes once and hands out the `BehaviorSubject`.
+- ⚠️ **`fromFetch` covers `fetch` only.** SynState's `fromAbortablePromise` takes any `(signal) => Promise`.
+- ⚠️ **Derived values are not glitch-free.** A search box has no diamond of its own, but once something combines two values derived from the same source, RxJS emits it once per path, the first time with one input stale ([How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/)).
 
 ## MobX
 
@@ -324,9 +328,9 @@ export const createSearch = () => {
 };
 ```
 
-- **MobX tracks state, not time.** Everything after "the trimmed query changed" is imperative code: the timer, the controller, the stale-response checks and the state transitions.
-- **Deduplication needs its own variable.** `reaction` compares with the last _typed_ query, while the requirement is about the last one the debounce let through.
-- **Three things to release** on teardown, each in its own variable; forgetting one leaves a timer or a request running.
+- ⚠️ **MobX tracks state, not time.** Everything after "the trimmed query changed" is imperative code: the timer, the controller, the stale-response checks and the state transitions.
+- ⚠️ **Deduplication needs its own variable.** `reaction` compares with the last _typed_ query, while the requirement is about the last one the debounce let through.
+- ⚠️ **Three things to release** on teardown, each in its own variable; forgetting one leaves a timer or a request running.
 
 ## Jotai
 
@@ -414,11 +418,11 @@ const fetchSearchState = async (
 };
 ```
 
-- **Cancellation is built in**, the closest any non-Observable library here comes: the read function gets a `signal` that a new query aborts, and a stale promise is never shown.
-- **Loading without Suspense takes two atoms.** `unwrap` replaces the pending promise with a fallback that cannot see the query, so a derived atom adds it. The blank query is returned synchronously rather than from an `async` function, or it too would show `loading` until its promise settled.
-- **`AbortSignal.any`** joins Jotai's signal with the one for disposal; it needs Chrome 116, Firefox 124, Safari 17.4 or Node 20.3, or newer.
-- **The read must catch.** An async atom that rejects throws when read, and needs an error boundary in React.
-- **Nothing runs until something subscribes**, which is Jotai's design: an atom no component reads costs nothing, and a fetch no component reads is never sent.
+- ✅ **Cancellation is built in**, the closest any non-Observable library here comes: the read function gets a `signal` that a new query aborts, and a stale promise is never shown.
+- ⚠️ **Loading without Suspense takes two atoms.** `unwrap` replaces the pending promise with a fallback that cannot see the query, so a derived atom adds it. The blank query is returned synchronously rather than from an `async` function, or it too would show `loading` until its promise settled.
+- ⚠️ **Disposal takes `AbortSignal.any`**, which joins Jotai's signal with the one for disposal; it needs Chrome 116, Firefox 124, Safari 17.4 or Node 20.3, or newer.
+- ⚠️ **The read must catch.** An async atom that rejects throws when read, and needs an error boundary in React.
+- ℹ️ **Nothing runs until something subscribes**, which is Jotai's design: an atom no component reads costs nothing, and a fetch no component reads is never sent.
 
 ## Redux Toolkit
 
@@ -555,10 +559,10 @@ const {
 } = searchSlice.actions;
 ```
 
-- **The listener middleware is a small task runner**: `cancelActiveListeners()` cancels the previous run, which rejects its `delay()` and aborts its `signal`. Debounce and cancellation are both built from it.
-- **It takes two listeners.** With one, every keystroke would abort the request in flight, and typing back to the query in flight would be deduplicated against a request that no longer exists, leaving `loading` on screen for good.
-- **Every transition is an action**: six action types and a stored debounced query for one search box. In return, Redux DevTools shows each of them.
-- **RTK Query** (`createApi`) caches and deduplicates requests per argument, but debouncing that argument is still the application's job. This page compares each library's own primitives, not data-fetching layers.
+- ✅ **The listener middleware is a small task runner**: `cancelActiveListeners()` cancels the previous run, which rejects its `delay()` and aborts its `signal`. Debounce and cancellation are both built from it.
+- ⚠️ **It takes two listeners.** With one, every keystroke would abort the request in flight, and typing back to the query in flight would be deduplicated against a request that no longer exists, leaving `loading` on screen for good.
+- ℹ️ **Every transition is an action**: six action types and a stored debounced query for one search box. In return, Redux DevTools shows each of them.
+- ℹ️ **RTK Query** (`createApi`) caches and deduplicates requests per argument, but debouncing that argument is still the application's job. This page compares each library's own primitives, not data-fetching layers.
 
 ## Solid
 
@@ -638,9 +642,9 @@ export const createSearch = () =>
     });
 ```
 
-- **`createResource` is Solid's async primitive** and covers the loading and error states and stale responses.
-- **Everything around it is by hand**: the debounce, the `AbortController` the fetcher is not given, the blank query (a `false` source keeps the last value instead of clearing it), and the order of checks the resource's states need.
-- **`onCleanup` makes teardown uniform**: `createRoot`'s `dispose()` runs every cleanup registered under it.
+- ✅ **`createResource` is Solid's async primitive** and covers the loading and error states and stale responses.
+- ⚠️ **Everything around it is by hand**: the debounce, the `AbortController` the fetcher is not given, the blank query (a `false` source keeps the last value instead of clearing it), and the order of checks the resource's states need.
+- ✅ **`onCleanup` makes teardown uniform**: `createRoot`'s `dispose()` runs every cleanup registered under it.
 
 ## Preact Signals
 
@@ -716,8 +720,8 @@ export const createSearch = () => {
 };
 ```
 
-- **The smallest API on this page**: `signal` and `effect`. An effect's returned cleanup runs before its next run and on dispose, which is enough for both the debounce and the abort.
-- **Everything else is written by hand**: the loading state, the stale-response checks and the error state are writes to a signal from inside an effect.
+- ✅ **The smallest API on this page**: `signal` and `effect`. An effect's returned cleanup runs before its next run and on dispose, which is enough for both the debounce and the abort.
+- ⚠️ **Everything else is written by hand**: the loading state, the stale-response checks and the error state are writes to a signal from inside an effect.
 
 ## What the Comparison Shows
 
