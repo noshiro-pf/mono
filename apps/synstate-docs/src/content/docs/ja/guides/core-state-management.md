@@ -82,6 +82,8 @@ setA(1);
 
 書き込み元と値の間に重い副作用や `await` がある場合は、それも `fromPromise` や `switchMap` などでグラフに組み込みます。イベントハンドラー、タイマー、`queueMicrotask` のコールバックからの書き込みは伝播の外で実行されるので、対象外です。
 
+[`eslint-plugin-synstate`](/mono/synstate/ja/getting-started/installation/#eslint-プラグイン) の `synstate/no-write-during-propagation` ルールは、`subscribe` のコールバックや `pipe` の中のオペレーターからの書き込みを、実行前に、書かれた場所で報告します。対象は `synstate` 自体から import した関数で、hooks パッケージや Preact Signals パッケージが再エクスポートしたものにはまだ対応していません。
+
 ## `setState` と `updateState` を分離した設計
 
 React の `useState` では、setter 関数が直接の値と更新関数の両方を受け取れるようにオーバーロードされています：

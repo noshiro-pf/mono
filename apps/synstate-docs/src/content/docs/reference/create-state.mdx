@@ -67,7 +67,7 @@ setFilters({ label: 'bug', page: 2 });
 assert.deepStrictEqual(queryHistory, ['label:bug page:1', 'label:bug page:2']);
 ```
 
-`equals` is called with the current and the next state. When it returns `true`, the update is not passed on: no subscriber, and nothing derived from the state, is told of it, and the current state is kept along with its identity (`setState`, `updateState` and `resetState` returns the current state rather than the next). Decide this where the state is held rather than downstream with [`skipIfNoChange`](../skip-if-no-change/): an update passed on here reaches whatever reads the state directly before any operator can thin it out.
+`equals` is called with the current and the next state. When it returns `true`, the update is not passed on: no subscriber, and nothing derived from the state, is told of it, and the current state is kept along with its identity (`setState`, `updateState` and `resetState` return the current state rather than the next). Decide this where the state is held rather than downstream with [`skipIfNoChange`](../skip-if-no-change/): an update passed on here reaches whatever reads the state directly before any operator can thin it out.
 
 `equals` defaults to `Object.is`, so writing the value already held passes nothing on. Pass `equals: () => false` to pass on every update, equal or not.
 

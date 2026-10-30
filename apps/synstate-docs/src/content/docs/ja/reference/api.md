@@ -119,7 +119,7 @@ SynStateはアプリケーションの状態を管理するためのシンプル
 
 - **`useObservableValue(observable$)`**: Observableを購読し、現在の値をコンポーネントの状態として返す。内部的に`useSyncExternalStore`を使用し、Observableが値を発行するとコンポーネントが再レンダリングされる。
 - **`useObservableValue(observable$, fallback)`**: 上記と同じ。初期値を持たないObservableに対するフォールバック値を指定。
-- **`useObservableEffect(observable$, fn)`**: Observableが値を発行するたびに副作用を実行。アンマウント時に自動的にサブスクリプションを解除。
+- **`useObservableEffect(observable$, fn)`**: コンポーネントがマウントされている間 `fn` を購読する（[詳細](/mono/synstate/ja/guides/react-integration/#マウント中の副作用useobservableeffect)）。
 - **`useValueAsObservable(value)`**: コンポーネントのpropやstateの値をsynstateのObservableに変換。React/Preactの状態をObservableグラフに橋渡しする際に有用。
 
 #### 状態ラッパー

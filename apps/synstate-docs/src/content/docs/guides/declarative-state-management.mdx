@@ -233,7 +233,7 @@ This works for the simple case, but it has several structural problems:
 4. **Fragile to change** — adding a new derived value (e.g., a "total matching rows" counter) means finding the right place inside `updateTable()` and hoping you do not break the ordering.
 5. **No partial updates** — even if only `currentPageInput` changes, `updateTable()` recalculates everything from scratch.
 6. **Debounce is hard** — adding debounce to the filter inputs requires manually managing timers, and the page reset must now happen after the debounce fires, not immediately — further complicating the event handlers.
-7. **Data fetching is entangled** — `fetchData()` must call `updateTable()` after loading, handle errors separately with `try/catch`, manage an `fetchError` state variable, and if the user changes filters while a fetch is in progress, the result may arrive stale.
+7. **Data fetching is entangled** — `fetchData()` must call `updateTable()` after loading and handle its errors separately with `try/catch`.
 
 ## The Reactive Approach
 
@@ -334,7 +334,7 @@ Every problem from the imperative version is resolved:
 1. **Explicit dependencies** — each derived value declares exactly what it depends on. `pageLength` depends on `filteredRows` and `itemsPerPage` — this is directly visible in the code.
 2. **Automatic propagation** — when `filterName` changes, the system automatically propagates through `headerValues` → `filteredRows` → `pageLength` → `currentPage` → `tableSliced`. No manual `updateTable()` needed.
 3. **Page reset is centralized** — `pageReset` reacts to `pageLength` changes in one place. No need to duplicate "reset to page 1" across every filter handler.
-4. **Data fetching and error handling are declarative** — `fromPromise(fetch(...))` integrates server data into the same dependency graph as a `Result` type. Success and error are both reactive values — `fetchError` is just another derived Observable, not a separate mutable variable managed with `try/catch`.
+4. **Data fetching and error handling are declarative** — `fromPromise(fetch(...))` integrates server data into the same dependency graph as a `Result` type. Success and error are both reactive values — `fetchError` is just another derived Observable, not the outcome of a `try/catch` around the fetch.
 5. **Correct by construction** — you cannot accidentally reorder updates. The dependency graph determines the execution order.
 6. **Debounce is just an operator** — `.pipe(debounce(300))` handles all the timer complexity in one line.
 7. **Composable** — adding a new derived value is one more `derive(...)`. No existing code needs to change.

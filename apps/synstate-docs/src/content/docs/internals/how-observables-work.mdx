@@ -110,7 +110,7 @@ subscription.unsubscribe();
 What SynState adds to the minimal version does not change the picture:
 
 - An Observable also holds its current value (`getSnapshot()`), and a new subscriber receives it immediately.
-- Derived Observables such as `map` and `combine` are not chained through `subscribe`. When one is created, it registers an update function with the root it descends from, and the root keeps those functions in a list sorted by depth. `next` on the root walks that list once, in order, which is how SynState avoids glitches ([How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/)). The list is built when the graph is built, and walking it is still a synchronous loop.
+- Derived Observables such as `map` and `combine` are not chained through `subscribe`. When one is created, it registers with its parents and takes a depth one greater than the deepest of them. During an update, such as the one `next` on a root starts, every Observable that emits puts its children into a queue with one bucket per depth, and the node that started the update empties the buckets shallowest first, so each child runs once, after all of its parents have, which is how SynState avoids glitches ([How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/)). The depths are fixed when the graph is built, and emptying the queue is still a synchronous loop.
 - Completion (`complete`) is handled as well.
 
 The core is [`ObservableBaseClass`](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/class/observable-base-class.mts): `subscribe` adds to a `Set` of subscribers, and `setNext` stores the value and calls each subscriber in a `for` loop.

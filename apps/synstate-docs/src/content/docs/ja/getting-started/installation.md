@@ -1,6 +1,6 @@
 ---
 title: インストール
-description: SynState と React・Preact 向けフレームワーク連携パッケージ、ESLint プラグインを npm / yarn / pnpm でインストールする方法。
+description: SynState と React・Preact・Preact Signals 向けフレームワーク連携パッケージ、ESLint プラグインを npm / yarn / pnpm でインストールする方法。
 sidebar:
     order: 2
 ---
@@ -46,6 +46,20 @@ Preact を使用している場合は、コンパニオン hooks パッケージ
 ```bash
 npm add synstate-preact-hooks
 ```
+
+### Preact Signals
+
+hooks の代わりに [Preact Signals](https://preactjs.com/guide/v10/signals/) で描画する場合は、ブリッジパッケージを peer dependency の `preact`・`@preact/signals` と一緒にインストールしてください：
+
+```bash
+npm add synstate-preact-signals preact @preact/signals
+```
+
+Observable と signal を相互に変換する関数（`toSignal`・`fromSignal`）を提供し、その `createState`・`createReducer`・`createBooleanState` は hook の代わりに `ReadonlySignal` を返します。hooks パッケージと同じく `synstate` の関数を再エクスポートしています。[Preact Signals デモ](/mono/synstate/ja/preact-signals/demo/)を参照してください。
+
+### synstate-dom（フレームワークなし）
+
+[synstate-dom](/mono/synstate-dom/ja/) は SynState の上に作られた、コンパイラを使わない UI ライブラリで、仮想 DOM もフレームワークも介さずに Observable を DOM に直接束縛します。[インストール方法](/mono/synstate-dom/ja/getting-started/installation/)と API は専用のドキュメントサイトにあります。
 
 ### ESLint プラグイン
 

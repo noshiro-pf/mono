@@ -71,7 +71,7 @@ const temperature$ = derive([mode$, celsius$, fahrenheit$], (mode, c, f) =>
 );
 ```
 
-When `fahrenheit$` changes in celsius mode, `map` produces the same output value. SynState's equality comparison prevents further downstream propagation. The "oversubscription" cost is **one function call plus one equality comparison**. Meanwhile, dynamic tracking requires dependency set diffing, subscription removal, and re-subscription on every evaluation. SynState's benchmarks show that this dynamic tracking overhead exceeds the cost of the oversubscription in the scenarios tested.
+When `fahrenheit$` changes in celsius mode, the projection of `derive` returns the same value as before, and SynState's equality comparison stops the update there. The "oversubscription" cost is **one function call plus one equality comparison**. Dynamic tracking avoids that call, and pays instead for keeping the dependency set up to date: every rerun of a derivation compares what it read with what it read last time, and a mode switch also removes subscriptions and adds new ones. Which of the two costs more depends on how often the inactive branch is written, compared with how often the active one is and how often the mode switches; [the benchmark below](#the-cost-of-oversubscription-benchmark-verification) measures the case where only the inactive branch is written.
 
 ### Dynamic Collections
 

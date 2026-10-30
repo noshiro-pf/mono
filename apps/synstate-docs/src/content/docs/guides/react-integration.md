@@ -207,6 +207,41 @@ const Greeting = (): React.JSX.Element => {
 
 Observables created from `createState` (or any `pipe` chain that preserves the initial value) are `InitializedObservable<T>` and never need a fallback.
 
+## Side Effects While Mounted: `useObservableEffect`
+
+`useObservableEffect(observable$, fn)` subscribes `fn` when the component mounts and unsubscribes it when the component unmounts, for a side effect that should run only while the component is mounted and that does not change what it renders, such as scrolling back to the top when the query changes. `fn` is called at once with the current value, if there is one, and then on every emission. The hook returns nothing and does not re-render the component:
+
+```tsx
+import type * as React from 'react';
+import { createState, useObservableEffect } from 'synstate-react-hooks';
+
+// Written by the search box
+export const [, setQuery, { state: query$ }] = createState('');
+
+// Written by the code that fetches the results
+export const [useResults, setResults] = createState<readonly string[]>([]);
+
+const ResultList = (): React.JSX.Element => {
+    const results = useResults();
+
+    // Called on mount with the current query, then on every change, until
+    // unmount: the page starts at the top and goes back there for a new query
+    useObservableEffect(query$, () => {
+        window.scrollTo({ top: 0 });
+    });
+
+    return (
+        <ul>
+            {results.map((r) => (
+                <li key={r}>{r}</li>
+            ))}
+        </ul>
+    );
+};
+```
+
+Both arguments are read once, on mount: `fn` sees the props and state of the first render only, and passing another Observable later does not resubscribe. Read anything that changes from the Observable, and give each Observable its own component (a `key` remounts it). `fn`'s return value is ignored; a cleanup on unmount goes in a `React.useEffect` of your own. `fn` is a subscriber, so it must not write to a state: that is a [write during propagation](/mono/synstate/guides/core-state-management/#do-not-write-to-state-while-an-update-propagates), and the ESLint rule does not see it here. A side effect that does not belong to a component, such as saving a state to `localStorage`, is a `subscribe` at module scope. To pass a prop or a component state into the graph, the other way round, use `useValueAsObservable(value)` (see the [API reference](/mono/synstate/reference/api/#hooks)).
+
 ## React v17 or Earlier
 
 If you're using React 16.8–17 (without `useSyncExternalStore`), install `synstate-react-hooks-compat`:
