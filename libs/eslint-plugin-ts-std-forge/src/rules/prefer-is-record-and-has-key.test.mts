@@ -85,13 +85,22 @@ describe('prefer-is-record-and-has-key', () => {
           const a = Object.hasOwn(rec, 'a');
           const b = Object.hasOwn(unk, 'b');
         `,
-        output: dedent`
-          import { isRecord, hasKey } from 'ts-std-forge';
-          declare const rec: Record<string, unknown>;
-          declare const unk: unknown;
-          const a = hasKey(rec, 'a');
-          const b = (isRecord(unk) && hasKey(unk, 'b'));
-        `,
+        output: [
+          dedent`
+            import { hasKey } from 'ts-std-forge';
+            declare const rec: Record<string, unknown>;
+            declare const unk: unknown;
+            const a = hasKey(rec, 'a');
+            const b = Object.hasOwn(unk, 'b');
+          `,
+          dedent`
+            import { hasKey, isRecord } from 'ts-std-forge';
+            declare const rec: Record<string, unknown>;
+            declare const unk: unknown;
+            const a = hasKey(rec, 'a');
+            const b = (isRecord(unk) && hasKey(unk, 'b'));
+          `,
+        ],
         errors: [
           { messageId: 'useHasKey' },
           { messageId: 'useIsRecordAndHasKey' },

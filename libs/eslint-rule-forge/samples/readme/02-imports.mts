@@ -1,10 +1,10 @@
 import type { TSESLint } from '@typescript-eslint/utils';
 import {
+  bindValueImports,
   buildCalleeResolver,
-  buildNamedImportFix,
   getImportDeclarations,
-  getImportedLocalName,
   hasForeignBinding,
+  type ValueImportBinding,
 } from 'eslint-rule-forge';
 
 const MODULE = 'my-lib';
@@ -20,9 +20,9 @@ export const preferIsNullish: TSESLint.RuleModule<'preferIsNullish'> = {
     defaultOptions: [],
   },
   create: (context) => {
-    const program = context.sourceCode.ast;
+    const sourceCode = context.sourceCode;
 
-    const declarations = getImportDeclarations(program, MODULE);
+    const declarations = getImportDeclarations(sourceCode.ast, MODULE);
 
     // `isNull(x)`, `n(x)` after `import { isNull as n }` and `lib.isNull(x)`
     // after `import * as lib` all call `isNull`.
@@ -36,28 +36,29 @@ export const preferIsNullish: TSESLint.RuleModule<'preferIsNullish'> = {
           return;
         }
 
-        const importedAs = getImportedLocalName(declarations, 'isNullish');
+        // `lib.isNullish` needs no import. Otherwise `isNullish` is written by
+        // the name it is imported as, added to the existing named import, or
+        // has its `type` dropped; `undefined` when none of that can bind it.
+        const binding: ValueImportBinding | undefined = resolved.isNamespace
+          ? { localNames: ['isNullish'], edits: () => [] }
+          : bindValueImports(sourceCode, MODULE, ['isNullish']);
 
-        const name = resolved.isNamespace
-          ? 'isNullish'
-          : (importedAs ?? 'isNullish');
-
-        // A local `isNullish` that is not `my-lib`'s would capture the call.
-        const canFix =
-          resolved.isNamespace ||
-          !hasForeignBinding(context.sourceCode, node, name, MODULE);
+        const name = binding?.localNames[0];
 
         context.report({
           node,
           messageId: 'preferIsNullish',
-          fix: canFix
-            ? (fixer) => [
-                ...(importedAs !== undefined || resolved.isNamespace
-                  ? []
-                  : buildNamedImportFix(fixer, program, MODULE, [name])),
-                fixer.replaceText(resolved.propertyNode, name),
-              ]
-            : null,
+          fix:
+            binding === undefined ||
+            name === undefined ||
+            // A local `isNullish` that is not `my-lib`'s would capture the call.
+            (!resolved.isNamespace &&
+              hasForeignBinding(sourceCode, node, name, MODULE))
+              ? null
+              : (fixer) => [
+                  ...binding.edits(fixer),
+                  fixer.replaceText(resolved.propertyNode, name),
+                ],
         });
       },
     };

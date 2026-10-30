@@ -5,11 +5,8 @@ import {
 } from '@typescript-eslint/utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
-import {
-  buildNamedImportFix,
-  getImportDeclarations,
-  getNamedImports,
-} from '../imports.mjs';
+import { hasForeignBinding } from '../bindings.mjs';
+import { bindValueImports } from '../imports.mjs';
 import { getArgumentText } from '../parentheses.mjs';
 import {
   isIdentifierNamed,
@@ -111,8 +108,6 @@ const createSafeParseRule = <MessageId extends string>(
     ) => boolean;
   }>,
 ): TSESLint.RuleModule<MessageId, readonly []> => {
-  const parseFunction = `${namespace}.${method}` as const;
-
   // Sorted, as an import sorter would write them.
   const requiredImports = [namespace, 'Result'].toSorted();
 
@@ -128,10 +123,6 @@ const createSafeParseRule = <MessageId extends string>(
 
     create: (context) => {
       const sourceCode = context.sourceCode;
-
-      const program = sourceCode.ast;
-
-      const moduleImports = getImportDeclarations(program, moduleName);
 
       const mut_nodesToFix: {
         node: TSESTree.CallExpression;
@@ -169,19 +160,22 @@ const createSafeParseRule = <MessageId extends string>(
           mut_nodesToFix.push({ node, argExpression: firstArg });
         },
         'Program:exit': () => {
-          const namedImports = getNamedImports(moduleImports);
-
-          const missingImports = requiredImports.filter(
-            (name) => !namedImports.includes(name),
+          const binding = bindValueImports(
+            sourceCode,
+            moduleName,
+            requiredImports,
           );
 
-          // The import fix lives on the first report only:
-          // `insertTextBefore(program, …)` produces overlapping ranges
-          // otherwise and only one of them would survive a pass.
-          for (const [
-            index,
-            { node, argExpression },
-          ] of mut_nodesToFix.entries()) {
+          const localNameOf = (name: string): string | undefined =>
+            binding?.localNames[requiredImports.indexOf(name)];
+
+          const namespaceName = localNameOf(namespace);
+
+          const resultName = localNameOf('Result');
+
+          // Every fix brings its names into scope itself, so that one applied
+          // alone (an editor's quick fix) is complete.
+          for (const { node, argExpression } of mut_nodesToFix) {
             const argText = getArgumentText(sourceCode, argExpression);
 
             context.report({
@@ -191,22 +185,21 @@ const createSafeParseRule = <MessageId extends string>(
                 original: sourceCode.getText(node),
                 argName: argText,
               },
-              fix: (fixer) => {
-                const core =
-                  `Result.unwrapOkOr(${parseFunction}(${argText}), Number.NaN)` as const;
-
-                const importFixes =
-                  index === 0 && missingImports.length > 0
-                    ? buildNamedImportFix(
-                        fixer,
-                        program,
-                        moduleName,
-                        missingImports,
-                      )
-                    : ([] as const);
-
-                return [...importFixes, fixer.replaceText(node, core)];
-              },
+              fix:
+                binding === undefined ||
+                namespaceName === undefined ||
+                resultName === undefined ||
+                [namespaceName, resultName].some((name) =>
+                  hasForeignBinding(sourceCode, node, name, moduleName),
+                )
+                  ? null
+                  : (fixer) => [
+                      ...binding.edits(fixer),
+                      fixer.replaceText(
+                        node,
+                        `${resultName}.unwrapOkOr(${namespaceName}.${method}(${argText}), Number.NaN)`,
+                      ),
+                    ],
             });
           }
         },

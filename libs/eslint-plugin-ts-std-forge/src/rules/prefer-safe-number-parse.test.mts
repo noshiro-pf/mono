@@ -118,8 +118,7 @@ describe('prefer-safe-number-parse', () => {
           const n = parseFloat(s);
         `,
         output: dedent`
-          import { SafeNumber } from 'ts-std-forge';
-          import { Result } from 'ts-std-forge';
+          import { Result, SafeNumber } from 'ts-std-forge';
           declare const s: string;
           const n = Result.unwrapOkOr(SafeNumber.parse(s), Number.NaN);
         `,
@@ -189,12 +188,20 @@ describe('prefer-safe-number-parse through type wrappers', () => {
           const a = (Number as NumberConstructor)(s);
           const b = Number!.parseFloat(s);
         `,
-        output: dedent`
-          import { Result, SafeNumber } from 'ts-std-forge';
-          declare const s: string;
-          const a = Result.unwrapOkOr(SafeNumber.parse(s), Number.NaN);
-          const b = Result.unwrapOkOr(SafeNumber.parse(s), Number.NaN);
-        `,
+        output: [
+          dedent`
+            import { Result, SafeNumber } from 'ts-std-forge';
+            declare const s: string;
+            const a = Result.unwrapOkOr(SafeNumber.parse(s), Number.NaN);
+            const b = Number!.parseFloat(s);
+          `,
+          dedent`
+            import { Result, SafeNumber } from 'ts-std-forge';
+            declare const s: string;
+            const a = Result.unwrapOkOr(SafeNumber.parse(s), Number.NaN);
+            const b = Result.unwrapOkOr(SafeNumber.parse(s), Number.NaN);
+          `,
+        ],
         errors: [
           { messageId: 'useSafeParseFloat' },
           { messageId: 'useSafeParseFloat' },

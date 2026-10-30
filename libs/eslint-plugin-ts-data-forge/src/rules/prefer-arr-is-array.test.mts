@@ -72,11 +72,18 @@ ruleTester.run('prefer-arr-is-array', preferArrIsArray, {
         const result1 = Array.isArray(value1);
         const result2 = Array.isArray(value2);
       `,
-      output: dedent`
-        import { Arr } from 'ts-data-forge';
-        const result1 = Arr.isArray(value1);
-        const result2 = Arr.isArray(value2);
-      `,
+      output: [
+        dedent`
+          import { Arr } from 'ts-data-forge';
+          const result1 = Arr.isArray(value1);
+          const result2 = Array.isArray(value2);
+        `,
+        dedent`
+          import { Arr } from 'ts-data-forge';
+          const result1 = Arr.isArray(value1);
+          const result2 = Arr.isArray(value2);
+        `,
+      ],
       errors: [{ messageId: 'useIsArray' }, { messageId: 'useIsArray' }],
     },
   ],
@@ -152,6 +159,81 @@ describe('prefer-arr-is-array with parenthesized operands', () => {
           import { Arr } from 'ts-data-forge';
           const result = Arr.isArray?.(value);
         `,
+        errors: [{ messageId: 'useIsArray' }],
+      },
+    ],
+  });
+});
+
+describe('prefer-arr-is-array brings Arr into scope', () => {
+  ruleTester.run('prefer-arr-is-array', preferArrIsArray, {
+    valid: [],
+    invalid: [
+      {
+        name: 'after a leading directive',
+        code: dedent`
+          'use client';
+          const result = Array.isArray(value);
+        `,
+        output: dedent`
+          'use client';
+          import { Arr } from 'ts-data-forge';
+          const result = Arr.isArray(value);
+        `,
+        errors: [{ messageId: 'useIsArray' }],
+      },
+      {
+        name: 'in the existing named import',
+        code: dedent`
+          import { Num } from 'ts-data-forge';
+          const result = Array.isArray(value);
+        `,
+        output: dedent`
+          import { Num, Arr } from 'ts-data-forge';
+          const result = Arr.isArray(value);
+        `,
+        errors: [{ messageId: 'useIsArray' }],
+      },
+      {
+        name: 'an inline type import becomes a value import',
+        code: dedent`
+          import { type Arr } from 'ts-data-forge';
+          const result = Array.isArray(value);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const result = Arr.isArray(value);
+        `,
+        errors: [{ messageId: 'useIsArray' }],
+      },
+      {
+        name: 'no fix when a type-only declaration imports it',
+        code: dedent`
+          import type { Arr } from 'ts-data-forge';
+          const result = Array.isArray(value);
+        `,
+        output: null,
+        errors: [{ messageId: 'useIsArray' }],
+      },
+      {
+        name: 'the local name of an aliased import',
+        code: dedent`
+          import { Arr as A } from 'ts-data-forge';
+          const result = Array.isArray(value);
+        `,
+        output: dedent`
+          import { Arr as A } from 'ts-data-forge';
+          const result = A.isArray(value);
+        `,
+        errors: [{ messageId: 'useIsArray' }],
+      },
+      {
+        name: 'no fix when something else is named Arr where the call is',
+        code: dedent`
+          const Arr = 1;
+          const result = Array.isArray(value);
+        `,
+        output: null,
         errors: [{ messageId: 'useIsArray' }],
       },
     ],

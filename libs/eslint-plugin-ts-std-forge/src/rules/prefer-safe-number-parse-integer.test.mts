@@ -147,12 +147,20 @@ describe('prefer-safe-number-parse-integer through type wrappers', () => {
           const a = (parseInt as typeof parseInt)(s);
           const b = (Number as NumberConstructor)!.parseInt(s, 10);
         `,
-        output: dedent`
-          import { Result, SafeNumber } from 'ts-std-forge';
-          declare const s: string;
-          const a = Result.unwrapOkOr(SafeNumber.parseInteger(s), Number.NaN);
-          const b = Result.unwrapOkOr(SafeNumber.parseInteger(s), Number.NaN);
-        `,
+        output: [
+          dedent`
+            import { Result, SafeNumber } from 'ts-std-forge';
+            declare const s: string;
+            const a = Result.unwrapOkOr(SafeNumber.parseInteger(s), Number.NaN);
+            const b = (Number as NumberConstructor)!.parseInt(s, 10);
+          `,
+          dedent`
+            import { Result, SafeNumber } from 'ts-std-forge';
+            declare const s: string;
+            const a = Result.unwrapOkOr(SafeNumber.parseInteger(s), Number.NaN);
+            const b = Result.unwrapOkOr(SafeNumber.parseInteger(s), Number.NaN);
+          `,
+        ],
         errors: [
           { messageId: 'useSafeParseInt' },
           { messageId: 'useSafeParseInt' },

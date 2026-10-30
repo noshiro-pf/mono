@@ -3,11 +3,8 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import {
-  buildNamedImportFix,
-  getImportDeclarations,
-  getNamedImports,
-} from '../imports.mjs';
+import { hasForeignBinding } from '../bindings.mjs';
+import { bindValueImports } from '../imports.mjs';
 import { getRangeWithParens, parenthesesDepth } from '../parentheses.mjs';
 import { skipTypeWrappers } from '../type-wrappers.mjs';
 
@@ -39,11 +36,8 @@ export const createPreferIsNonNullObject = ({
     create: (context) => {
       const sourceCode = context.sourceCode;
 
-      const program = sourceCode.ast;
-
-      const moduleImports = getImportDeclarations(program, moduleName);
-
-      const mut_pairsToFix: NonNullObjectPair[] = [];
+      const mut_pairsToFix: (NonNullObjectPair &
+        Readonly<{ chain: TSESTree.LogicalExpression }>)[] = [];
 
       return {
         LogicalExpression: (node) => {
@@ -52,42 +46,43 @@ export const createPreferIsNonNullObject = ({
             return;
           }
 
-          mut_pairsToFix.push(...findNonNullObjectPairs(sourceCode, node));
+          mut_pairsToFix.push(
+            ...findNonNullObjectPairs(sourceCode, node).map((pair) => ({
+              ...pair,
+              chain: node,
+            })),
+          );
         },
         'Program:exit': () => {
-          const hasIsNonNullObjectImport =
-            getNamedImports(moduleImports).includes('isNonNullObject');
+          const binding = bindValueImports(sourceCode, moduleName, [
+            'isNonNullObject',
+          ]);
 
-          // The import fix lives on the first report only:
-          // `insertTextBefore(program, …)` produces overlapping ranges
-          // otherwise and only one of them would survive a pass. A first
-          // report silenced by an `eslint-disable` comment therefore takes
-          // the import with it.
-          for (const [
-            index,
-            { range, identifierName },
-          ] of mut_pairsToFix.entries()) {
+          const localName = binding?.localNames[0];
+
+          // Every fix brings `isNonNullObject` into scope itself, so that one
+          // applied alone (an editor's quick fix) is complete.
+          for (const { range, identifierName, chain } of mut_pairsToFix) {
+            const loc = {
+              start: sourceCode.getLocFromIndex(range[0]),
+              end: sourceCode.getLocFromIndex(range[1]),
+            } as const;
+
             context.report({
-              loc: {
-                start: sourceCode.getLocFromIndex(range[0]),
-                end: sourceCode.getLocFromIndex(range[1]),
-              },
+              loc,
               messageId: 'useIsNonNullObject',
-              fix: (fixer) => {
-                const replacement = `isNonNullObject(${identifierName})`;
-
-                const importFixes =
-                  index === 0 && !hasIsNonNullObjectImport
-                    ? buildNamedImportFix(fixer, program, moduleName, [
-                        'isNonNullObject',
-                      ])
-                    : [];
-
-                return [
-                  ...importFixes,
-                  fixer.replaceTextRange(range, replacement),
-                ];
-              },
+              fix:
+                binding === undefined ||
+                localName === undefined ||
+                hasForeignBinding(sourceCode, chain, localName, moduleName)
+                  ? null
+                  : (fixer) => [
+                      ...binding.edits(fixer),
+                      fixer.replaceTextRange(
+                        range,
+                        `${localName}(${identifierName})`,
+                      ),
+                    ],
             });
           }
         },

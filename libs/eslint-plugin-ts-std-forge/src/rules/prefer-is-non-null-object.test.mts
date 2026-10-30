@@ -180,14 +180,24 @@ describe('prefer-is-non-null-object in other forms', () => {
           const y = a && typeof u === 'object' && u !== null;
           const z = a && u !== null && (typeof u === 'object') && b;
         `,
-        output: dedent`
-          import { isNonNullObject } from 'ts-std-forge';
-          declare const a: boolean;
-          declare const b: boolean;
-          const x = isNonNullObject(u) && 'k' in u;
-          const y = a && isNonNullObject(u);
-          const z = a && isNonNullObject(u) && b;
-        `,
+        output: [
+          dedent`
+            import { isNonNullObject } from 'ts-std-forge';
+            declare const a: boolean;
+            declare const b: boolean;
+            const x = isNonNullObject(u) && 'k' in u;
+            const y = a && typeof u === 'object' && u !== null;
+            const z = a && u !== null && (typeof u === 'object') && b;
+          `,
+          dedent`
+            import { isNonNullObject } from 'ts-std-forge';
+            declare const a: boolean;
+            declare const b: boolean;
+            const x = isNonNullObject(u) && 'k' in u;
+            const y = a && isNonNullObject(u);
+            const z = a && isNonNullObject(u) && b;
+          `,
+        ],
         errors: [
           { messageId: 'useIsNonNullObject' },
           { messageId: 'useIsNonNullObject' },
@@ -200,11 +210,18 @@ describe('prefer-is-non-null-object in other forms', () => {
           declare const v: unknown;
           const ok = typeof u === 'object' && u !== null && v !== null && typeof v === 'object';
         `,
-        output: dedent`
-          import { isNonNullObject } from 'ts-std-forge';
-          declare const v: unknown;
-          const ok = isNonNullObject(u) && isNonNullObject(v);
-        `,
+        output: [
+          dedent`
+            import { isNonNullObject } from 'ts-std-forge';
+            declare const v: unknown;
+            const ok = isNonNullObject(u) && v !== null && typeof v === 'object';
+          `,
+          dedent`
+            import { isNonNullObject } from 'ts-std-forge';
+            declare const v: unknown;
+            const ok = isNonNullObject(u) && isNonNullObject(v);
+          `,
+        ],
         errors: [
           { messageId: 'useIsNonNullObject' },
           { messageId: 'useIsNonNullObject' },
