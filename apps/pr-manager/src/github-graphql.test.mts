@@ -4,7 +4,8 @@
  * GitHub answers a query it cannot read with an error and no data, and a
  * query is a string, so nothing short of a request to GitHub says one is
  * wrong. A new query, fixed or built per pull request, issue or day,
- * belongs in {@link QUERIES}.
+ * belongs in {@link QUERIES}; the second test names any query in the source
+ * that none of them contains.
  *
  * The schema is GitHub's public one, vendored under
  * `tools/configs/github-graphql/` (its `README.md` says from where, and how
@@ -16,6 +17,9 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
+// `tools/` is not a package and has no barrel; it is reached by relative path.
+// eslint-disable-next-line import-x/no-relative-packages, import-x/no-internal-modules
+import { queriesNotSent } from '../../../tools/configs/github-graphql-source-queries.mjs';
 import type { ReportSource } from './constants.mjs';
 import {
   CHECKS_QUERY,
@@ -43,6 +47,16 @@ describe('the GraphQL queries', () => {
       assert.deepStrictEqual(errorsOf(query), []);
     },
   );
+
+  test('include every query written in the source (one they do not, or its shape, belongs in `QUERIES`)', () => {
+    assert.deepStrictEqual(
+      queriesNotSent(
+        import.meta.dirname,
+        QUERIES.map(([, query]) => query),
+      ),
+      [],
+    );
+  });
 });
 
 /**
