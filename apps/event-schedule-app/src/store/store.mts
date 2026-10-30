@@ -9,7 +9,13 @@
 
 import { api } from '../api/index.mjs';
 import { fetchThrottleTime } from '../constants/index.mjs';
-import { createToaster, fetchHolidaysJson } from '../functions/index.mjs';
+import {
+  EventScheduleAppLocalStorage,
+  createToaster,
+  fetchHolidaysJson,
+} from '../functions/index.mjs';
+import { toAbsolutePath } from '../utils-ported/index.mjs';
+import { now } from '../utils/index.mjs';
 import {
   createAnswerFilterAndSortStore,
   createAnswerFilterQueryParam,
@@ -17,6 +23,10 @@ import {
   createAnswerTableStore,
 } from './answer-page-state/index.mjs';
 import { createAuthStore } from './auth-store.mjs';
+import {
+  createCreateEventScheduleStore,
+  createEditEventScheduleStore,
+} from './create-event-schedule-page/index.mjs';
 import { createEventListFilterStore } from './event-list-page-state/index.mjs';
 import { createErrorType } from './fetched-values-state.mjs';
 import {
@@ -97,9 +107,37 @@ export const AnswerPageStore = createAnswerPageStore({
   toast: createToaster(),
 });
 
+export const CreateEventScheduleStore = createCreateEventScheduleStore({
+  api,
+  auth: Auth,
+  storage: {
+    restore: EventScheduleAppLocalStorage.restoreCreateEventPageTemp,
+    save: EventScheduleAppLocalStorage.saveCreateEventPageTemp,
+  },
+  writeToClipboard: (text) =>
+    // https://stackoverflow.com/questions/51805395/navigator-clipboard-is-undefined
+    globalThis.isSecureContext
+      ? globalThis.navigator.clipboard.writeText(text)
+      : Promise.resolve(),
+  toAbsolutePath,
+  now,
+  saveDelayMs: 500,
+  toast: createToaster(),
+});
+
+export const EditEventScheduleStore = createEditEventScheduleStore({
+  api,
+  fireAuthUser$: Auth.fireAuthUser$,
+  answers: AnswersStore,
+  eventSchedule: EventScheduleStore,
+  router: Router,
+  toast: createToaster(),
+});
+
 /**
  * Starts listening to the auth state and the screen width, fetches the
- * holidays, and starts reading the event, its answers and the event list.
+ * holidays, starts reading the event, its answers and the event list, and
+ * starts keeping the create page's settings in local storage.
  * Called once, from `main.tsx`, before the first render.
  *
  * Still made on import: the router (which reads `location`) and `api` (which
@@ -122,12 +160,16 @@ export const startStore = (): (() => void) => {
 
   const stopEventList = EventListStore.start();
 
+  const stopCreateEventSchedule = CreateEventScheduleStore.start();
+
   return () => {
     stopEventSchedule();
 
     stopAnswers();
 
     stopEventList();
+
+    stopCreateEventSchedule();
 
     stopAuth();
 
