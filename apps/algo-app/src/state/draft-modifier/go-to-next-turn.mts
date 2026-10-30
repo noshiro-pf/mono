@@ -4,13 +4,16 @@ import type { GameState } from '../../types/index.mjs';
 
 export const goToNextTurn = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  draft: DeepMutable<GameState>,
+  mut_draft: DeepMutable<GameState>,
 ): void => {
-  draft.currentPlayerIndex = incrementPlayerIndex(draft.currentPlayerIndex, 1);
+  mut_draft.currentPlayerIndex = incrementPlayerIndex(
+    mut_draft.currentPlayerIndex,
+    1,
+  );
 
-  draft.phase = 'ph010_selectMyCardToToss';
+  mut_draft.phase = 'ph010_selectMyCardToToss';
 
-  draft.decidedAnswerBalloonIsOpen = false;
+  mut_draft.decidedAnswerBalloonIsOpen = false;
 
-  draft.judgeOnDecidedAnswerIsOpen = false;
+  mut_draft.judgeOnDecidedAnswerIsOpen = false;
 };

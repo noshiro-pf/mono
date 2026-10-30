@@ -19,7 +19,4 @@ export const eslintTotalFunctionsRules = {
 
   'total-functions/no-nested-fp-ts-effects': 'off',
   'total-functions/no-hidden-type-assertions': 'off',
-
-  'total-functions/no-unsafe-enum-assignment': 0,
-  'total-functions/no-unsafe-optional-property-assignment': 0,
 } as const satisfies EslintTotalFunctionsRules;

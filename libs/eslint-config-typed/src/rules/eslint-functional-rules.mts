@@ -3,19 +3,15 @@ import {
   type EslintFunctionalRules,
 } from '../types/index.mjs';
 
-// The names `functional/immutable-data` lets be mutated (and, but for `draft`,
-// `functional/no-let` lets be reassigned); a property is matched only by the
-// `ignoreAccessorPattern` below (`**.mut_**`).
+// The names `functional/immutable-data` lets be mutated and `functional/no-let`
+// lets be reassigned (an immer recipe's draft included: name it `mut_draft`); a
+// property is matched only by the `ignoreAccessorPattern` below (`**.mut_**`).
 // The codemod counterpart is ts-codemod-lib's `DEFAULT_MUTABLE_PREFIXES`
 // (`libs/ts-codemod-lib/src/functions/constants/mutable-prefixes.mts`), the
 // default prefixes of the names `convert-to-readonly` and `append-as-const`
-// leave mutable, property names included; change them together.
-const ignoredMutablePattern = [
-  '^draft', // allow immer.js draft object
-  '^mut_',
-  '^_mut_',
-  '^#mut_',
-] as const;
+// leave mutable, property names included;
+// `eslint-functional-rules.test.mts` holds the two to the same prefixes.
+const ignoredMutablePattern = ['^mut_'] as const;
 
 /** @link {https://github.com/jonaskello/eslint-plugin-functional} */
 export const eslintFunctionalRules = {
@@ -48,9 +44,7 @@ export const eslintFunctionalRules = {
     {
       allowInForLoopInit: false,
       allowInFunctions: false,
-      ignoreIdentifierPattern: ignoredMutablePattern.filter(
-        (p) => p !== '^draft',
-      ),
+      ignoreIdentifierPattern: ignoredMutablePattern,
     },
   ],
   'functional/prefer-property-signatures': withDefaultOption('error'),

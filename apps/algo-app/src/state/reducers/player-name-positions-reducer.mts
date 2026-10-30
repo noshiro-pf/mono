@@ -15,6 +15,6 @@ export const playerNamePositionsReducer: Reducer<
   ReadonlyRecord<NWES, Rect> | undefined,
   readonly [NWES, Rect]
 > = (state, [direction, rect]) =>
-  produce(state ?? initialState(), (draft) => {
-    draft[direction] = rect;
+  produce(state ?? initialState(), (mut_draft) => {
+    mut_draft[direction] = rect;
   });

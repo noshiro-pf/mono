@@ -40,7 +40,7 @@ export default defineConfig([
         {
           allowInForLoopInit: true,
           allowInFunctions: false,
-          ignoreIdentifierPattern: ['^mut_', '^_mut_', '^#mut_'],
+          ignoreIdentifierPattern: ['^mut_'],
         },
       ],
     }),

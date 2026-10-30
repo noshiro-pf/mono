@@ -1,12 +1,5 @@
 # Next major
 
-- Remove the rules `total-functions/no-unsafe-enum-assignment` and
-  `total-functions/no-unsafe-optional-property-assignment`.
-
-    Both are deprecated and do nothing; they are registered, and switched off in
-    `eslintTotalFunctionsRules`, only so that a configuration naming them keeps
-    loading. Delete any mention of them from your configuration.
-
 ## Undecided
 
 - Stop resolving `baseUrl`-relative `paths` in `strict-dependencies`.

@@ -122,21 +122,6 @@ namespace NoPrematureFpTsEffects {
 }
 
 /**
- * @description Bans unsafe enum assignment.
- * @link https://github.com/danielnixon/eslint-plugin-total-functions
- *
- *  ```md
- *  | key        | value   |
- *  | :--------- | :------ |
- *  | type       | problem |
- *  | deprecated | true    |
- *  ```
- */
-namespace NoUnsafeEnumAssignment {
-  export type RuleEntry = 0;
-}
-
-/**
  * @description Bans unsafe assignment from mutable to readonly types.
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
@@ -149,21 +134,6 @@ namespace NoUnsafeEnumAssignment {
  */
 namespace NoUnsafeMutableReadonlyAssignment {
   export type RuleEntry = Linter.StringSeverity;
-}
-
-/**
- * @description Bans unsafe assignment to optional properties.
- * @link https://github.com/danielnixon/eslint-plugin-total-functions
- *
- *  ```md
- *  | key        | value   |
- *  | :--------- | :------ |
- *  | type       | problem |
- *  | deprecated | true    |
- *  ```
- */
-namespace NoUnsafeOptionalPropertyAssignment {
-  export type RuleEntry = 0;
 }
 
 /**
@@ -224,8 +194,4 @@ export type EslintTotalFunctionsRules = Readonly<{
   'total-functions/no-unsafe-readonly-mutable-assignment': NoUnsafeReadonlyMutableAssignment.RuleEntry;
   'total-functions/no-unsafe-type-assertion': NoUnsafeTypeAssertion.RuleEntry;
   'total-functions/require-strict-mode': RequireStrictMode.RuleEntry;
-
-  // deprecated
-  'total-functions/no-unsafe-enum-assignment': NoUnsafeEnumAssignment.RuleEntry;
-  'total-functions/no-unsafe-optional-property-assignment': NoUnsafeOptionalPropertyAssignment.RuleEntry;
 }>;
