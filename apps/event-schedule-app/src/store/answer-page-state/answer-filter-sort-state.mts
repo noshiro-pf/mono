@@ -34,7 +34,7 @@ import type {
   DetailedFilterIcon,
 } from '../../types/index.mjs';
 import { createReducerWithActions } from '../../utils/index.mjs';
-import { AnswersStore, eventSchedule$ } from '../fetching-state/index.mjs';
+import { AnswersStore, eventSchedule$ } from '../store.mjs';
 import { AnswerFilterQueryParam } from './answer-filter-query-param.mjs';
 
 const [

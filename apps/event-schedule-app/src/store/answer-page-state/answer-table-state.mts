@@ -29,7 +29,7 @@ import type {
   AnswerTableCellPosition,
 } from '../../types/index.mjs';
 import { ymd2day } from '../../utils/index.mjs';
-import { eventSchedule$ } from '../fetching-state/index.mjs';
+import { eventSchedule$ } from '../store.mjs';
 import {
   AnswerFilterAndSortStore,
   answersFiltered$,

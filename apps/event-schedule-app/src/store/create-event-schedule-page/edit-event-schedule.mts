@@ -18,8 +18,7 @@ import {
   showToast,
   type EventSettingsPageDiffResult,
 } from '../../functions/index.mjs';
-import { AnswersStore, EventScheduleStore } from '../fetching-state/index.mjs';
-import { Router } from '../store.mjs';
+import { AnswersStore, EventScheduleStore, Router } from '../store.mjs';
 import { createEventScheduleSettingStore } from './event-schedule-setting-common.mjs';
 
 const toast = createToaster();
