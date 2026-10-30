@@ -78,3 +78,9 @@ words:
   - wireit
   - ymdhm
   - zenn
+# A sample diff (`gen:sample-diffs`) is TypeScript with +/- prefixes; read
+# without the TypeScript dictionaries it would flag the package names they
+# know.
+overrides:
+  - filename: 'libs/synstate/samples/**/ja/*.diff'
+    languageId: typescript

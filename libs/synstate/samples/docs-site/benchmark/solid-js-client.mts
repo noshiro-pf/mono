@@ -10,7 +10,7 @@
  *
  * `apps/synstate-docs/src/components/throughput-demo/adapters/solid-js-client.mts` is the same
  * module for the other half of the benchmark, and the two must import the same
- * build.
+ * build. `../async-comparison/solid-js-client.mts` re-exports this one.
  */
 // eslint-disable-next-line import-x/no-internal-modules, import-x/extensions, no-restricted-imports -- the client build has no export condition Node picks; see above.
 export * from 'solid-js/dist/solid.js';

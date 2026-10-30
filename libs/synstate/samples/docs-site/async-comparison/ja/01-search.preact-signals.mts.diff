@@ -1,0 +1,60 @@
+--- en/01-search.preact-signals.mts
++++ ja/01-search.preact-signals.mts
+@@ -1,4 +1,5 @@
+ import { effect, signal } from '@preact/signals-core';
++import { testSearch } from '../search-test-suite.mjs';
+ import {
+   debounceMs,
+   fetchItems,
+@@ -6,20 +7,19 @@
+   toErrorMessage,
+   type SearchState,
+ } from './00-search-api.mjs';
+-import { testSearch } from './search-test-suite.mjs';
+ 
+ // embed-sample-code-ignore-above
+ export const createSearch = () => {
+   const query = signal('');
+ 
+-  // A signal ignores a write equal to its value,
+-  // so a query that did not change triggers nothing.
++  // signal は今の値と等しい書き込みを無視するので、
++  // 変わっていないクエリは何も引き起こさない。
+   const debouncedQuery = signal('');
+ 
+   const searchState = signal<SearchState>(idleState);
+ 
+-  // There is no debounce; an effect whose cleanup clears the timer
+-  // runs again on every keystroke.
++  // debounce はない。クリーンアップでタイマーを解除する effect が
++  // キー入力のたびに再実行される。
+   const disposeDebounce = effect(() => {
+     const q = query.value.trim();
+ 
+@@ -52,7 +52,7 @@
+         }
+       })
+       .catch((error: unknown) => {
+-        // A replaced request rejects with an AbortError; it reports nothing.
++        // 置き換えられたリクエストは AbortError で reject される。何も反映しない。
+         if (!controller.signal.aborted) {
+           searchState.value = {
+             status: 'error',
+@@ -62,7 +62,7 @@
+         }
+       });
+ 
+-    // The cleanup runs before the next query's run, and on dispose.
++    // クリーンアップは次のクエリでの実行の前と、dispose のときに走る。
+     return () => {
+       controller.abort();
+     };
+@@ -81,7 +81,7 @@
+ // embed-sample-code-ignore-below
+ 
+ if (import.meta.vitest !== undefined) {
+-  testSearch('Preact Signals', () => {
++  testSearch('Preact Signals (ja)', () => {
+     const { query, searchState, dispose } = createSearch();
+ 
+     return {

@@ -72,5 +72,6 @@ MobX's `observer()` HOC tracks observable access during rendering, which conflic
 - [Declarative State Management](/mono/synstate/guides/declarative-state-management/) — understand the reactive programming model with concrete examples.
 - [React Integration](/mono/synstate/guides/react-integration/) — use SynState with React.
 - [Library Comparison](/mono/synstate/guides/library-comparison/library-comparison/) — how SynState compares to RxJS, Jotai, MobX, and others.
+- [Async Logic Compared](/mono/synstate/guides/library-comparison/async-comparison/) — one production-grade search box written with seven libraries.
 - [Performance Benchmark](/mono/synstate/guides/library-comparison/benchmark/) — quantitative throughput comparisons.
 - [Interactive Demos](/mono/synstate/guides/library-comparison/interactive-demo/) — see the differences in action.

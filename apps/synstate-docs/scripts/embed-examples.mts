@@ -132,6 +132,18 @@ const jaReferenceDocuments: DeepReadonly<
 
 // --- Document → Sample mapping ---
 
+/** One per code block of the async comparison page, en and ja alike. */
+const asyncComparisonSamples = [
+  '00-search-api.mts',
+  '01-search.synstate.mts',
+  '01-search.rxjs.mts',
+  '01-search.mobx.mts',
+  '01-search.jotai.mts',
+  '01-search.redux.mts',
+  '01-search.solid.mts',
+  '01-search.preact-signals.mts',
+] as const;
+
 const jaDocsBase = 'src/content/docs/ja';
 
 const documents: DeepReadonly<
@@ -475,6 +487,25 @@ const documents: DeepReadonly<
       '05-conditional-fan-out.solid.mts',
       '05-conditional-fan-out.preact-signals.mts',
     ],
+  },
+  {
+    mdPath: path.resolve(
+      workspaceRootPath,
+      'src/content/docs/guides/library-comparison/async-comparison.md',
+    ),
+    samplesDir: path.resolve(synstateSamplesRoot, 'docs-site/async-comparison'),
+    sampleCodeFiles: asyncComparisonSamples,
+  },
+  {
+    mdPath: path.resolve(
+      workspaceRootPath,
+      `${jaDocsBase}/guides/library-comparison/async-comparison.md`,
+    ),
+    samplesDir: path.resolve(
+      synstateSamplesRoot,
+      'docs-site/async-comparison/ja',
+    ),
+    sampleCodeFiles: asyncComparisonSamples,
   },
   {
     mdPath: path.resolve(

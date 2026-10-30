@@ -1,0 +1,81 @@
+--- en/01-search.redux.mts
++++ ja/01-search.redux.mts
+@@ -5,6 +5,7 @@
+   createSlice,
+   type PayloadAction,
+ } from '@reduxjs/toolkit';
++import { testSearch } from '../search-test-suite.mjs';
+ import {
+   debounceMs,
+   fetchItems,
+@@ -13,19 +14,18 @@
+   type Item,
+   type SearchState,
+ } from './00-search-api.mjs';
+-import { testSearch } from './search-test-suite.mjs';
+ 
+ // embed-sample-code-ignore-above
+ export const createSearch = () => {
+   const listener = createListenerMiddleware<Readonly<{ search: SliceState }>>();
+ 
+-  // Debounce: each keystroke cancels the run still waiting in `delay`.
++  // debounce：キー入力のたびに、`delay` で待機中の実行をキャンセルする。
+   listener.startListening({
+     actionCreator: queryChanged,
+     effect: async (action, api) => {
+       api.cancelActiveListeners();
+ 
+-      await api.delay(debounceMs); // rejects once this run is cancelled
++      await api.delay(debounceMs); // この実行がキャンセルされると reject される
+ 
+       const q = action.payload.trim();
+ 
+@@ -35,8 +35,8 @@
+     },
+   });
+ 
+-  // Fetch: a separate listener, so that a keystroke does not cancel
+-  // a request; only the next debounced query does, by aborting `signal`.
++  // fetch：キー入力でリクエストがキャンセルされないよう listener を分ける。
++  // キャンセルするのは次の debounce 済みクエリだけで、`signal` の中断による。
+   listener.startListening({
+     actionCreator: queryDebounced,
+     effect: async (action, api) => {
+@@ -55,8 +55,8 @@
+       try {
+         const items = await fetchItems(q, api.signal);
+ 
+-        // A cancelled run reports nothing, whether its request
+-        // settled before the abort or rejected because of it.
++        // キャンセルされた実行は、リクエストが中断前に決着していても、
++        // 中断で reject されても、何も反映しない。
+         if (!api.signal.aborted) {
+           api.dispatch(searchSucceeded({ query: q, items }));
+         }
+@@ -81,7 +81,7 @@
+     setQuery: (q: string) => {
+       store.dispatch(queryChanged(q));
+     },
+-    // Cancels every running listener: the timer and the request.
++    // 実行中の listener をすべてキャンセルする：タイマーもリクエストも。
+     dispose: () => {
+       listener.clearListeners();
+     },
+@@ -93,7 +93,7 @@
+   searchState: SearchState;
+ }>;
+ 
+-// Only the debounce listener reads it; no reducer does.
++// これを読むのは debounce の listener だけで、reducer は読まない。
+ const queryChanged = createAction<string>('search/queryChanged');
+ 
+ const searchSlice = createSlice({
+@@ -143,7 +143,7 @@
+ // embed-sample-code-ignore-below
+ 
+ if (import.meta.vitest !== undefined) {
+-  testSearch('Redux Toolkit', () => {
++  testSearch('Redux Toolkit (ja)', () => {
+     const { store, setQuery, dispose } = createSearch();
+ 
+     return {

@@ -13,6 +13,7 @@ import { workspaceRootPath } from '../workspace-root-path.mjs';
 const sampleDirs: readonly string[] = [
   'samples/docs-site/introduction',
   'samples/docs-site/why-reactive',
+  'samples/docs-site/async-comparison',
 ] as const;
 
 type DiffOutcome = 'generated' | 'skipped';

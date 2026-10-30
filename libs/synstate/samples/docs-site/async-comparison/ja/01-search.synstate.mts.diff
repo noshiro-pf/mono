@@ -1,0 +1,65 @@
+--- en/01-search.synstate.mts
++++ ja/01-search.synstate.mts
+@@ -10,6 +10,7 @@
+   type Observable,
+ } from 'synstate';
+ import { Result } from 'ts-data-forge';
++import { testSearch } from '../search-test-suite.mjs';
+ import {
+   debounceMs,
+   fetchItems,
+@@ -17,29 +18,28 @@
+   toErrorMessage,
+   type SearchState,
+ } from './00-search-api.mjs';
+-import { testSearch } from './search-test-suite.mjs';
+ 
+ // embed-sample-code-ignore-above
+ export const createSearch = () => {
+-  // Everything created inside `run` is torn down by `scope.dispose()`.
+-  // A search box that lives as long as the page can skip the scope.
++  // `run` の中で作ったものはすべて `scope.dispose()` で破棄される。
++  // ページと同じだけ生きる検索ボックスなら scope は要らない。
+   const scope = createScope();
+ 
+   return scope.run(() => {
+     const [query, setQuery] = createState('');
+ 
+     const searchState = query
+-      .pipe(debounce(debounceMs)) // wait for typing to pause
+-      .pipe(map((q) => q.trim())) // map passes on only a changed query
++      .pipe(debounce(debounceMs)) // 入力が止まるのを待つ
++      .pipe(map((q) => q.trim())) // map は変化したクエリだけを流す
+       .pipe(
+-        // A newer query completes the previous inner observable,
+-        // and completing it aborts its request.
++        // 新しいクエリが前の内部 Observable を complete し、
++        // complete によってそのリクエストが中断される。
+         switchMap((q): Observable<SearchState> =>
+           q === ''
+             ? just(idleState)
+             : fromAbortablePromise((signal) => fetchItems(q, signal))
+                 .pipe(
+-                  // A rejection arrives as a value: Result.err(error)
++                  // reject は値として届く：Result.err(error)
+                   map((result): SearchState =>
+                     Result.isOk(result)
+                       ? { status: 'success', query: q, items: result.value }
+@@ -51,7 +51,7 @@
+                   ),
+                 )
+                 .pipe(
+-                  // emitted as soon as the request starts
++                  // リクエストの開始と同時に発行される
+                   withInitialValue<SearchState>({
+                     status: 'loading',
+                     query: q,
+@@ -73,7 +73,7 @@
+ // embed-sample-code-ignore-below
+ 
+ if (import.meta.vitest !== undefined) {
+-  testSearch('SynState', () => {
++  testSearch('SynState (ja)', () => {
+     const { setQuery, searchState, dispose } = createSearch();
+ 
+     return {

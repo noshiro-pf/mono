@@ -118,6 +118,8 @@ const results = query
 
 タイマーの管理も AbortController の手動管理も古いクロージャのリスクもありません。`fromAbortablePromise` は `AbortSignal` を受け取り `fetch` に渡します。`switchMap` が新しい内部 Observable に切り替えると、前の Observable が complete され、実行中のリクエストが自動的に abort されます。パイプラインはコンポーネントのライフサイクルの外に存在するため、再レンダリングやアンマウントの影響を受けず、どのコンポーネントが結果を利用しても同じように動作します。
 
+[非同期処理の比較](/mono/synstate/ja/guides/library-comparison/async-comparison/)では、この検索ボックスを本番品質（ローディングとエラーの状態、空のクエリ、破棄）まで仕上げて、SynState・RxJS・MobX・Jotai・Redux Toolkit・Solid・Preact Signals で書き比べています。
+
 ---
 
 ここまで見てきたパターン — 宣言的な依存関係、自動的な伝播、合成可能な非同期オペレーター — は、相互接続された状態の数が増えるほど真価を発揮します。実際の例で確認してみましょう。
