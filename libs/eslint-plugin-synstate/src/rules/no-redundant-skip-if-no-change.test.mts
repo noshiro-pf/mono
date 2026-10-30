@@ -243,6 +243,19 @@ ruleTester.run('no-redundant-skip-if-no-change', noRedundantSkipIfNoChange, {
       errors: [{ messageId: 'redundantSkipIfNoChange' }],
       output: null,
     },
+    {
+      name: 'the outer `.pipe` in a wrapper or parentheses: reported, not fixed',
+      code: dedent`
+        import { map, skipIfNoChange } from 'synstate';
+        const x$ = (a$.pipe(map(f)).pipe as Pipe)(skipIfNoChange());
+        const y$ = (a$.pipe(map(f)).pipe)(skipIfNoChange());
+      `,
+      errors: [
+        { messageId: 'redundantSkipIfNoChange' },
+        { messageId: 'redundantSkipIfNoChange' },
+      ],
+      output: null,
+    },
   ],
 });
 

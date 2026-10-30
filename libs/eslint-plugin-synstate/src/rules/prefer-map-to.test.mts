@@ -121,8 +121,7 @@ ruleTester.run('prefer-map-to', preferMapTo, {
       `,
       errors: [{ messageId: 'preferMapTo' }],
       output: dedent`
-        import { mapTo } from 'synstate';
-        import { map } from 'synstate';
+        import { map, mapTo } from 'synstate';
         const started$ = fetch$.pipe(mapTo(true));
       `,
     },
@@ -134,8 +133,7 @@ ruleTester.run('prefer-map-to', preferMapTo, {
       `,
       errors: [{ messageId: 'preferMapTo' }],
       output: dedent`
-        import { mapTo } from 'synstate';
-        import { map } from 'synstate';
+        import { map, mapTo } from 'synstate';
         const action$ = reset$.pipe(mapTo('reset' as const));
       `,
     },
@@ -232,21 +230,6 @@ ruleTester.run('prefer-map-to', preferMapTo, {
       `,
     },
     {
-      name: 'the import is added once for several reports',
-      code: dedent`
-        import { map } from 'synstate';
-        const a$ = x$.pipe(map(() => true));
-        const b$ = y$.pipe(map(() => false));
-      `,
-      errors: [{ messageId: 'preferMapTo' }, { messageId: 'preferMapTo' }],
-      output: dedent`
-        import { mapTo } from 'synstate';
-        import { map } from 'synstate';
-        const a$ = x$.pipe(mapTo(true));
-        const b$ = y$.pipe(mapTo(false));
-      `,
-    },
-    {
       name: 'a local `mapTo` that is not synstate’s: reported, not fixed',
       code: dedent`
         import { map } from 'synstate';
@@ -338,6 +321,154 @@ describe('prefer-map-to through type wrappers', () => {
         `,
         errors: [{ messageId: 'preferMapTo' }],
         output: null,
+      },
+    ],
+  });
+});
+
+describe('prefer-map-to bringing `mapTo` into scope', () => {
+  ruleTester.run('prefer-map-to', preferMapTo, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a leading directive stays first',
+        code: dedent`
+          'use client';
+          import { map } from 'synstate';
+          const on$ = opened$.pipe(map(() => true));
+        `,
+        errors: [{ messageId: 'preferMapTo' }],
+        output: dedent`
+          'use client';
+          import { map, mapTo } from 'synstate';
+          const on$ = opened$.pipe(mapTo(true));
+        `,
+      },
+      {
+        name: 'the name joins the value import, not a type-only one',
+        code: dedent`
+          import type { Observable } from 'synstate';
+          import { map } from 'synstate';
+          const on$: Observable<boolean> = opened$.pipe(map(() => true));
+        `,
+        errors: [{ messageId: 'preferMapTo' }],
+        output: dedent`
+          import type { Observable } from 'synstate';
+          import { map, mapTo } from 'synstate';
+          const on$: Observable<boolean> = opened$.pipe(mapTo(true));
+        `,
+      },
+      {
+        name: 'the name joins the import with value specifiers, not one with only type ones',
+        code: dedent`
+          import { type Observable } from 'synstate';
+          import { map } from 'synstate';
+          const on$: Observable<boolean> = opened$.pipe(map(() => true));
+        `,
+        errors: [{ messageId: 'preferMapTo' }],
+        output: dedent`
+          import { type Observable } from 'synstate';
+          import { map, mapTo } from 'synstate';
+          const on$: Observable<boolean> = opened$.pipe(mapTo(true));
+        `,
+      },
+      {
+        name: 'a comment beside a namespace property stays, since only the property is rewritten',
+        code: dedent`
+          import * as S from 'synstate';
+          const on$ = opened$.pipe(S./* keep */ map(() => true));
+        `,
+        errors: [{ messageId: 'preferMapTo' }],
+        output: dedent`
+          import * as S from 'synstate';
+          const on$ = opened$.pipe(S./* keep */ mapTo(true));
+        `,
+      },
+      {
+        name: 'a type-only specifier becomes a value one',
+        code: dedent`
+          import { map, type mapTo as constant } from 'synstate';
+          const on$ = opened$.pipe(map(() => true));
+        `,
+        errors: [{ messageId: 'preferMapTo' }],
+        output: dedent`
+          import { map, mapTo as constant } from 'synstate';
+          const on$ = opened$.pipe(constant(true));
+        `,
+      },
+      {
+        name: 'imported by a type-only declaration: reported, not fixed',
+        code: dedent`
+          import type { mapTo } from 'synstate';
+          import { map } from 'synstate';
+          const on$ = opened$.pipe(map(() => true));
+        `,
+        errors: [{ messageId: 'preferMapTo' }],
+        output: null,
+      },
+      {
+        name: 'an aliased type-only import leaves the name free',
+        code: dedent`
+          import type { mapTo as MapTo } from 'synstate';
+          import { map } from 'synstate';
+          const on$ = opened$.pipe(map(() => true));
+        `,
+        errors: [{ messageId: 'preferMapTo' }],
+        output: dedent`
+          import type { mapTo as MapTo } from 'synstate';
+          import { map, mapTo } from 'synstate';
+          const on$ = opened$.pipe(mapTo(true));
+        `,
+      },
+      {
+        name: 'another synstate export imported under the name: reported, not fixed',
+        code: dedent`
+          import { map as mapTo } from 'synstate';
+          const on$ = opened$.pipe(mapTo(() => true));
+        `,
+        errors: [{ messageId: 'preferMapTo' }],
+        output: null,
+      },
+      {
+        name: 'a comment the fix would delete: reported, not fixed',
+        code: dedent`
+          import { map, mapTo } from 'synstate';
+          const a$ = x$.pipe(map(() /* why */ => true));
+          const b$ = x$.pipe((/* keep */ map)(() => true));
+          const c$ = x$.pipe(map(() => true /* kept */));
+        `,
+        errors: [
+          { messageId: 'preferMapTo' },
+          { messageId: 'preferMapTo' },
+          { messageId: 'preferMapTo' },
+        ],
+        output: dedent`
+          import { map, mapTo } from 'synstate';
+          const a$ = x$.pipe(map(() /* why */ => true));
+          const b$ = x$.pipe((/* keep */ map)(() => true));
+          const c$ = x$.pipe(mapTo(true /* kept */));
+        `,
+      },
+      {
+        name: 'each fix brings the import itself',
+        code: dedent`
+          import { map } from 'synstate';
+          const a$ = x$.pipe(map(() => true));
+          const b$ = y$.pipe(map(() => false));
+        `,
+        errors: [{ messageId: 'preferMapTo' }, { messageId: 'preferMapTo' }],
+        output: [
+          dedent`
+            import { map, mapTo } from 'synstate';
+            const a$ = x$.pipe(mapTo(true));
+            const b$ = y$.pipe(map(() => false));
+          `,
+          dedent`
+            import { map, mapTo } from 'synstate';
+            const a$ = x$.pipe(mapTo(true));
+            const b$ = y$.pipe(mapTo(false));
+          `,
+        ],
       },
     ],
   });

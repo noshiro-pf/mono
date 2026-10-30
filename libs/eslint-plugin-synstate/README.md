@@ -79,8 +79,8 @@ export default [
 `map` passes on a result only when it is not `Object.is` the one it holds, so
 `x$.pipe(map((x) => x))` changes no value and only stops one equal to the
 value before. That is `skipIfNoChange()`, written as something that reads like
-it does nothing; the rule rewrites it to `skipIfNoChange()`, adding the import
-when the file has none. Remove the operator instead when nothing needs
+it does nothing; the rule rewrites it to `skipIfNoChange()`, adding the name
+to the file's synstate import when it is missing. Remove the operator instead when nothing needs
 stopping.
 
 Reported is a `map` given one function, not `async`, that returns its one
@@ -91,8 +91,9 @@ syntax in the call — an annotated parameter or return type, type arguments, or
 `map` was written for, so such a call is reported without a fix; to widen the
 type, annotate the variable that holds the result instead. `map` is
 recognized imported from `synstate` by name, under an alias or through a
-namespace import. A callee in a type wrapper, a comment in the call, or a file
-where `skipIfNoChange` names something else is reported without a fix.
+namespace import. A callee in a type wrapper, a comment the rewrite would drop,
+or a file where `skipIfNoChange` names something else or is imported
+under that name by `import type` is reported without a fix.
 
 ### `no-redundant-skip-if-no-change`
 
@@ -231,13 +232,15 @@ Every `.pipe` whose one operator is `map`, called on `combine(...)` or its alias
 `combineLatest(...)`, is reported, unless the `map` is one `prefer-map-to` or
 `no-identity-map` reports (`map(() => c)`, `map((xs) => xs)`). The fix
 turns an array pattern into the parameters (`([a, b]) =>` to `(a, b) =>`) and
-a name into a rest parameter (`(xs) =>` to `(...xs) =>`), adding the import of
-`derive` when the file has none. It is not offered for a mapping function that is not an arrow function
+a name into a rest parameter (`(xs) =>` to `(...xs) =>`), adding `derive` to
+the file's synstate import when it is missing. It is not offered for a mapping function that is not an arrow function
 written in place, a parameter with a type annotation, a default, a `?` or a
 hole, a `combine(...)` or its `.pipe` in a type wrapper or parentheses, a
 `combine` or `map` callee in a type wrapper, a parameter followed by a comma,
-type arguments on any of the three calls, or a comment between the calls,
-which the rewrite would drop.
+type arguments on any of the three calls, or a comment between the calls or
+in the parentheses around the `combine` callee, which the rewrite would drop,
+or a file where `derive` names something else or is imported under that name by
+`import type`.
 
 ### `prefer-map-to`
 
@@ -246,7 +249,8 @@ that a derived value that did not change wakes nothing below it. A `map` that
 turns events into a constant — `click$.pipe(map(() => true))`,
 `reset$.pipe(map(() => 'reset' as const))` — therefore emits on the first event
 and on none after it. `mapTo(true)` emits on every one, and the rule rewrites
-the call to it, adding the import when the file has none.
+the call to it, adding the name to the file's synstate import when it is
+missing.
 
 Only a body that is the same value every time it runs is reported, because
 `mapTo` evaluates its value once: a literal other than a regular expression, a
@@ -261,8 +265,9 @@ for — give the `map` `{ equals: () => false }`; the rule cannot tell such a
 
 `map` is recognized imported from `synstate` by name, under an alias or
 through a namespace import, and the body is read through `as`, `satisfies`,
-`!` and parentheses, which the fix keeps. A callee in a type wrapper, or a file
-where `mapTo` names something else, is reported without a fix.
+`!` and parentheses, which the fix keeps. A callee in a type wrapper, a comment
+outside the body that the rewrite would drop, or a file where `mapTo` names
+something else or is imported under that name by `import type`, is reported without a fix.
 
 ## License
 

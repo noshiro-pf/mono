@@ -4,7 +4,11 @@ import {
   TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
+import {
+  isIdentifierNamed,
+  isTypeWrapper,
+  skipTypeWrappers,
+} from 'eslint-rule-forge';
 
 export type FunctionNode =
   | TSESTree.ArrowFunctionExpression
@@ -119,6 +123,44 @@ export const isPipeArgument = (
     pipeCallee.type === AST_NODE_TYPES.MemberExpression &&
     isPropertyNamed(pipeCallee, 'pipe')
   );
+};
+
+/**
+ * `node` as `receiver.pipe(operator)`, or `undefined` when it is not a `.pipe`
+ * call with one argument.
+ */
+export const pipeCallOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+):
+  | Readonly<{
+      receiver: TSESTree.Expression;
+      operator: TSESTree.Expression;
+    }>
+  | undefined => {
+  if (
+    node.type !== AST_NODE_TYPES.CallExpression ||
+    node.arguments.length !== 1
+  ) {
+    return undefined;
+  }
+
+  const [operator] = node.arguments;
+
+  if (
+    operator === undefined ||
+    operator.type === AST_NODE_TYPES.SpreadElement
+  ) {
+    return undefined;
+  }
+
+  const callee = skipTypeWrappers(node.callee);
+
+  return callee.type === AST_NODE_TYPES.MemberExpression &&
+    !callee.computed &&
+    isIdentifierNamed(callee.property, 'pipe')
+    ? { receiver: callee.object, operator }
+    : undefined;
 };
 
 /** `x.name` or `x['name']`. */

@@ -5,15 +5,13 @@ import {
 } from '@typescript-eslint/utils';
 import {
   buildCalleeResolver,
-  buildNamedImportFix,
   getImportDeclarations,
-  getImportedLocalName,
   getRangeWithParens,
   skipTypeWrappers,
-  type ResolvedCallee,
 } from 'eslint-rule-forge';
+import { hasCommentWithin } from './comments.mjs';
 import { SYNSTATE_MODULE } from './constants.mjs';
-import { isShadowedCallee, replacementCallee } from './synstate-callee.mjs';
+import { buildCalleeRewriter, isShadowedCallee } from './synstate-callee.mjs';
 
 type Options = readonly [];
 
@@ -52,9 +50,7 @@ export const noIdentityMap: TSESLint.RuleModule<MessageIds, Options> = {
   create: (context) => {
     const sourceCode = context.sourceCode;
 
-    const program = sourceCode.ast;
-
-    const imports = getImportDeclarations(program, SYNSTATE_MODULE);
+    const imports = getImportDeclarations(sourceCode.ast, SYNSTATE_MODULE);
 
     if (imports.length === 0) {
       return {};
@@ -62,16 +58,11 @@ export const noIdentityMap: TSESLint.RuleModule<MessageIds, Options> = {
 
     const resolveCallee = buildCalleeResolver(imports);
 
-    const importedSkipIfNoChange = getImportedLocalName(
+    const rewriteCallee = buildCalleeRewriter(
+      sourceCode,
       imports,
       'skipIfNoChange',
     );
-
-    const mut_reports: Readonly<{
-      node: TSESTree.CallExpression;
-      resolved: ResolvedCallee;
-      fixable: boolean;
-    }>[] = [];
 
     return {
       CallExpression: (node) => {
@@ -97,81 +88,34 @@ export const noIdentityMap: TSESLint.RuleModule<MessageIds, Options> = {
           return;
         }
 
-        const replaced = [node.callee.range[0], node.range[1]] as const;
+        // What follows the callee becomes `()`; a comment there would go with
+        // it. One around the callee is `buildCalleeRewriter`'s to refuse.
+        const replaced = [
+          getRangeWithParens(sourceCode, node.callee)[1],
+          node.range[1],
+        ] as const;
 
-        mut_reports.push({
+        const fixable =
+          !identity.hasTypeSyntax &&
+          node.typeArguments === undefined &&
+          !node.optional &&
+          !hasCommentWithin(sourceCode, node, [replaced]);
+
+        const calleeRewrite = fixable
+          ? rewriteCallee(node, resolved)
+          : undefined;
+
+        context.report({
           node,
-          resolved,
-          fixable:
-            !identity.hasTypeSyntax &&
-            node.typeArguments === undefined &&
-            !node.optional &&
-            sourceCode
-              .getAllComments()
-              .every(
-                (comment) =>
-                  !(
-                    replaced[0] <= comment.range[0] &&
-                    comment.range[1] <= replaced[1]
-                  ),
-              ),
+          messageId: 'identityMap',
+          fix:
+            calleeRewrite === undefined
+              ? null
+              : (fixer) => [
+                  ...calleeRewrite(fixer),
+                  fixer.replaceTextRange(replaced, '()'),
+                ],
         });
-      },
-      'Program:exit': () => {
-        // The import goes with the first report that needs it, and with no
-        // other: two insertions at the start of the file conflict, and one
-        // of them would be dropped.
-        let mut_importPlanned = false;
-
-        for (const { node, resolved, fixable } of mut_reports) {
-          const calleeText = fixable
-            ? replacementCallee(
-                sourceCode,
-                node,
-                resolved,
-                'skipIfNoChange',
-                importedSkipIfNoChange,
-              )
-            : undefined;
-
-          const addsImport =
-            calleeText !== undefined &&
-            !resolved.isNamespace &&
-            importedSkipIfNoChange === undefined &&
-            !mut_importPlanned;
-
-          if (addsImport) {
-            mut_importPlanned = true;
-          }
-
-          context.report({
-            node,
-            messageId: 'identityMap',
-            fix:
-              calleeText === undefined
-                ? null
-                : (fixer) => [
-                    ...(addsImport
-                      ? buildNamedImportFix(fixer, program, SYNSTATE_MODULE, [
-                          'skipIfNoChange',
-                        ])
-                      : []),
-                    resolved.isNamespace
-                      ? fixer.replaceText(resolved.propertyNode, calleeText)
-                      : fixer.replaceTextRange(
-                          getRangeWithParens(sourceCode, node.callee),
-                          calleeText,
-                        ),
-                    fixer.replaceTextRange(
-                      [
-                        getRangeWithParens(sourceCode, node.callee)[1],
-                        node.range[1],
-                      ],
-                      '()',
-                    ),
-                  ],
-          });
-        }
       },
     };
   },

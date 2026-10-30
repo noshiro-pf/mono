@@ -101,8 +101,7 @@ ruleTester.run('no-identity-map', noIdentityMap, {
       `,
       errors: [{ messageId: 'identityMap' }],
       output: dedent`
-        import { skipIfNoChange } from 'synstate';
-        import { map } from 'synstate';
+        import { map, skipIfNoChange } from 'synstate';
         const a$ = x$.pipe(skipIfNoChange());
       `,
     },
@@ -166,21 +165,6 @@ ruleTester.run('no-identity-map', noIdentityMap, {
       output: dedent`
         import { map as project, skipIfNoChange } from 'synstate';
         const a$ = x$.pipe(skipIfNoChange());
-      `,
-    },
-    {
-      name: 'the import is added once for several reports',
-      code: dedent`
-        import { map } from 'synstate';
-        const a$ = x$.pipe(map((x) => x));
-        const b$ = y$.pipe(map((y) => y));
-      `,
-      errors: [{ messageId: 'identityMap' }, { messageId: 'identityMap' }],
-      output: dedent`
-        import { skipIfNoChange } from 'synstate';
-        import { map } from 'synstate';
-        const a$ = x$.pipe(skipIfNoChange());
-        const b$ = y$.pipe(skipIfNoChange());
       `,
     },
     {
@@ -300,6 +284,94 @@ describe('no-identity-map through type wrappers', () => {
           import { map, skipIfNoChange } from 'synstate';
           const a$ = x$.pipe(skipIfNoChange() satisfies unknown);
         `,
+      },
+    ],
+  });
+});
+
+describe('no-identity-map bringing `skipIfNoChange` into scope', () => {
+  ruleTester.run('no-identity-map', noIdentityMap, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a leading directive stays first',
+        code: dedent`
+          'use client';
+          import { map } from 'synstate';
+          const a$ = x$.pipe(map((x) => x));
+        `,
+        errors: [{ messageId: 'identityMap' }],
+        output: dedent`
+          'use client';
+          import { map, skipIfNoChange } from 'synstate';
+          const a$ = x$.pipe(skipIfNoChange());
+        `,
+      },
+      {
+        name: 'the name joins the value import, not a type-only one',
+        code: dedent`
+          import type { Observable } from 'synstate';
+          import { map } from 'synstate';
+          const a$: Observable<number> = x$.pipe(map((x) => x));
+        `,
+        errors: [{ messageId: 'identityMap' }],
+        output: dedent`
+          import type { Observable } from 'synstate';
+          import { map, skipIfNoChange } from 'synstate';
+          const a$: Observable<number> = x$.pipe(skipIfNoChange());
+        `,
+      },
+      {
+        name: 'a type-only specifier becomes a value one',
+        code: dedent`
+          import { map, type skipIfNoChange } from 'synstate';
+          const a$ = x$.pipe(map((x) => x));
+        `,
+        errors: [{ messageId: 'identityMap' }],
+        output: dedent`
+          import { map, skipIfNoChange } from 'synstate';
+          const a$ = x$.pipe(skipIfNoChange());
+        `,
+      },
+      {
+        name: 'imported by a type-only declaration: reported, not fixed',
+        code: dedent`
+          import type { skipIfNoChange } from 'synstate';
+          import { map } from 'synstate';
+          const a$ = x$.pipe(map((x) => x));
+        `,
+        errors: [{ messageId: 'identityMap' }],
+        output: null,
+      },
+      {
+        name: 'a comment in parentheses around the callee: reported, not fixed',
+        code: dedent`
+          import { map, skipIfNoChange } from 'synstate';
+          const a$ = x$.pipe((/* keep */ map)((x) => x));
+        `,
+        errors: [{ messageId: 'identityMap' }],
+        output: null,
+      },
+      {
+        name: 'each fix brings the import itself',
+        code: dedent`
+          import { map } from 'synstate';
+          const a$ = x$.pipe(map((x) => x));
+          const b$ = y$.pipe(map((y) => y));
+        `,
+        errors: [{ messageId: 'identityMap' }, { messageId: 'identityMap' }],
+        output: [
+          dedent`
+            import { map, skipIfNoChange } from 'synstate';
+            const a$ = x$.pipe(skipIfNoChange());
+            const b$ = y$.pipe(map((y) => y));
+          `,
+          dedent`
+            import { map, skipIfNoChange } from 'synstate';
+            const a$ = x$.pipe(skipIfNoChange());
+            const b$ = y$.pipe(skipIfNoChange());
+          `,
+        ],
       },
     ],
   });

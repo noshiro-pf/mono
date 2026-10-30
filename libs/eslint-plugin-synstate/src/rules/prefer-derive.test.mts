@@ -67,8 +67,7 @@ ruleTester.run('prefer-derive', preferDerive, {
         const sum$ = combine([a$, b$]).pipe(map(([a, b]) => a + b));
       `,
       output: dedent`
-        import { derive } from 'synstate';
-        import { combine, map } from 'synstate';
+        import { combine, map, derive } from 'synstate';
         const sum$ = derive([a$, b$], (a, b) => a + b);
       `,
       errors: [{ messageId: 'preferDerive' }],
@@ -100,7 +99,7 @@ ruleTester.run('prefer-derive', preferDerive, {
       errors: [{ messageId: 'preferDerive' }, { messageId: 'preferDerive' }],
     },
     {
-      name: '`equals` is passed on, and the import is added once',
+      name: '`equals` is passed on',
       code: dedent`
         import { combine, map } from 'synstate';
         const p$ = combine([a$, b$]).pipe(
@@ -110,14 +109,22 @@ ruleTester.run('prefer-derive', preferDerive, {
         const r$ = combine([a$]).pipe(map(([a]) => a + 1));
         const t$ = combine([a$]).pipe(map(() => Date.now()));
       `,
-      output: dedent`
-        import { derive } from 'synstate';
-        import { combine, map } from 'synstate';
-        const p$ = derive([a$, b$], (a, b) => ({ a, b }), { equals: (x, y) => x.a === y.a });
-        const q$ = combineLatestLike;
-        const r$ = derive([a$], (a) => a + 1);
-        const t$ = derive([a$], () => Date.now());
-      `,
+      output: [
+        dedent`
+          import { combine, map, derive } from 'synstate';
+          const p$ = derive([a$, b$], (a, b) => ({ a, b }), { equals: (x, y) => x.a === y.a });
+          const q$ = combineLatestLike;
+          const r$ = combine([a$]).pipe(map(([a]) => a + 1));
+          const t$ = combine([a$]).pipe(map(() => Date.now()));
+        `,
+        dedent`
+          import { combine, map, derive } from 'synstate';
+          const p$ = derive([a$, b$], (a, b) => ({ a, b }), { equals: (x, y) => x.a === y.a });
+          const q$ = combineLatestLike;
+          const r$ = derive([a$], (a) => a + 1);
+          const t$ = derive([a$], () => Date.now());
+        `,
+      ],
       errors: [
         { messageId: 'preferDerive' },
         { messageId: 'preferDerive' },
@@ -297,6 +304,115 @@ describe('prefer-derive through type wrappers', () => {
           import { combine, derive, map } from 'synstate';
           const s$ = derive([a$, b$], (a, b): number => (a + b) as number);
         `,
+      },
+    ],
+  });
+});
+
+describe('prefer-derive bringing `derive` into scope', () => {
+  ruleTester.run('prefer-derive', preferDerive, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a leading directive stays first',
+        code: dedent`
+          'use client';
+          import { combine, map } from 'synstate';
+          const sum$ = combine([a$, b$]).pipe(map(([a, b]) => a + b));
+        `,
+        errors: [{ messageId: 'preferDerive' }],
+        output: dedent`
+          'use client';
+          import { combine, map, derive } from 'synstate';
+          const sum$ = derive([a$, b$], (a, b) => a + b);
+        `,
+      },
+      {
+        name: 'the name joins the value import, not a type-only one',
+        code: dedent`
+          import type { Observable } from 'synstate';
+          import { combine, map } from 'synstate';
+          const sum$: Observable<number> = combine([a$, b$]).pipe(map(([a, b]) => a + b));
+        `,
+        errors: [{ messageId: 'preferDerive' }],
+        output: dedent`
+          import type { Observable } from 'synstate';
+          import { combine, map, derive } from 'synstate';
+          const sum$: Observable<number> = derive([a$, b$], (a, b) => a + b);
+        `,
+      },
+      {
+        name: 'a type-only specifier becomes a value one',
+        code: dedent`
+          import { combine, type derive, map } from 'synstate';
+          const sum$ = combine([a$, b$]).pipe(map(([a, b]) => a + b));
+        `,
+        errors: [{ messageId: 'preferDerive' }],
+        output: dedent`
+          import { combine, derive, map } from 'synstate';
+          const sum$ = derive([a$, b$], (a, b) => a + b);
+        `,
+      },
+      {
+        name: 'a comment after `type` stays when `type` is dropped',
+        code: dedent`
+          import { combine, map, type /* keep */ derive } from 'synstate';
+          const sum$ = combine([a$, b$]).pipe(map(([a, b]) => a + b));
+        `,
+        errors: [{ messageId: 'preferDerive' }],
+        output: dedent`
+          import { combine, map, /* keep */ derive } from 'synstate';
+          const sum$ = derive([a$, b$], (a, b) => a + b);
+        `,
+      },
+      {
+        name: 'a comment in the parentheses around the combine callee: reported, not fixed',
+        code: dedent`
+          import { combine, map } from 'synstate';
+          const sum$ = (/* keep */ combine)([a$, b$]).pipe(map(([a, b]) => a + b));
+        `,
+        errors: [{ messageId: 'preferDerive' }],
+        output: null,
+      },
+      {
+        name: 'imported by a type-only declaration: reported, not fixed',
+        code: dedent`
+          import type { derive } from 'synstate';
+          import { combine, map } from 'synstate';
+          const sum$ = combine([a$, b$]).pipe(map(([a, b]) => a + b));
+        `,
+        errors: [{ messageId: 'preferDerive' }],
+        output: null,
+      },
+      {
+        name: 'another synstate export imported under the name: reported, not fixed',
+        code: dedent`
+          import { combine, map, merge as derive } from 'synstate';
+          const sum$ = combine([a$, b$]).pipe(map(([a, b]) => a + b));
+        `,
+        errors: [{ messageId: 'preferDerive' }],
+        output: null,
+      },
+      {
+        name: 'each fix brings the import itself',
+        code: dedent`
+          import { combine, map } from 'synstate';
+          const sum$ = combine([a$, b$]).pipe(map(([a, b]) => a + b));
+          const diff$ = combine([a$, b$]).pipe(map(([a, b]) => a - b));
+        `,
+        errors: [{ messageId: 'preferDerive' }, { messageId: 'preferDerive' }],
+        output: [
+          dedent`
+            import { combine, map, derive } from 'synstate';
+            const sum$ = derive([a$, b$], (a, b) => a + b);
+            const diff$ = combine([a$, b$]).pipe(map(([a, b]) => a - b));
+          `,
+          dedent`
+            import { combine, map, derive } from 'synstate';
+            const sum$ = derive([a$, b$], (a, b) => a + b);
+            const diff$ = derive([a$, b$], (a, b) => a - b);
+          `,
+        ],
       },
     ],
   });
