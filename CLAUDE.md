@@ -306,7 +306,9 @@ ingest the feed). Outside reports come through private vulnerability reporting
   after**, in screenshots in its description: light and dark, and a phone
   width where the layout changes. Pushing them to `main` of the public
   `noshiro-pf/mono-screenshots` is part of the work; never commit them here.
-  `docs/pr-screenshots.md` says how.
+  The description carries both the images and links to that repository's
+  viewer — the table `pnpm run pr-screenshots -- <n>` prints, never links
+  alone. `docs/pr-screenshots.md` says how.
 - **The last step before `open-pr`, and before pushing any later amend, is
   `/code-review high`** of the diff from the base, generated output aside.
   Fix each finding here, defer it to an issue, or dismiss it with the reason
