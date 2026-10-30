@@ -1,8 +1,9 @@
 import type { QueueComments, QueueOwner, ReportEntry } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
+import type { StrictPick } from 'ts-type-forge';
 import { resolveApiContext, rest, viewerLogin } from '../lib/index.mjs';
-import { readQueueState } from '../pr-report/index.mjs';
+import { readQueueState, type QueueState } from '../pr-report/index.mjs';
 
 /** What `report-unowned-prs --help` prints. */
 export const REPORT_UNOWNED_PRS_HELP = [
@@ -35,12 +36,14 @@ export const REPORT_UNOWNED_PRS_HELP = [
  *
  * The `/unblock-prs` skill runs it on every round. It reads the owners as
  * every other command does (`pr-report/queue.mts`) and writes as the token's
- * account, which has to be the one `unblock-prs` runs as.
+ * account, which has to be the one `unblock-prs` runs as. A caller that has
+ * just read the queue passes what it read as `read`.
  */
 export const reportUnownedPrs = async (
   dryRun: boolean,
+  read?: StrictPick<QueueState, 'decided' | 'owners' | 'queue'>,
 ): Promise<Result<string, string>> => {
-  const state = await readQueueState();
+  const state = read === undefined ? await readQueueState() : Result.ok(read);
 
   if (Result.isErr(state)) {
     return Result.err(`cannot read the queue: ${state.value}`);

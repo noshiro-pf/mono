@@ -178,6 +178,11 @@ waits 20–30 minutes when there is nothing. Nothing needs to be watched in
 between — a pull request set aside meanwhile waits for the next round, and
 the worker carries on without it.
 
+Without a session, the package's `run-unblock-prs-skill` starts `claude -p` on
+this skill when step 1 would find something, on the Claude API. It hands each
+session one pull request, with the claimant and where the worktrees go. Those
+instructions take the place of this section.
+
 ## Fixing a failing check
 
 What is left by the time the worker sets a pull request aside `checks-failed`

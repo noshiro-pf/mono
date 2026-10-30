@@ -195,9 +195,15 @@ export type AutoFixPlan = Readonly<{
  * temp directory is often a tmpfs. Not the git directory or `~/.cache`
  * either: `fix:fmt:diff` skips every file with a `.git`, `.cache`, `dist`,
  * `build` or `out` segment anywhere in its absolute path, so a worktree under
- * one is formatted by nothing.
+ * one is formatted by nothing. `run-unblock-prs-skill` puts its sessions'
+ * worktrees here too, for the same reasons.
  */
-const WORKTREE_ROOT = path.join(os.homedir(), '.local', 'state', 'unblock-prs');
+export const WORKTREE_ROOT = path.join(
+  os.homedir(),
+  '.local',
+  'state',
+  'unblock-prs',
+);
 
 /**
  * The first fixer `name` matches, with its command: `$1` to `$9` replaced by
