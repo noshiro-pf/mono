@@ -29,6 +29,7 @@ GitHub shows a `.github/README.md` in place of the root one.
 | `deploy-pages.yml`               | `push` to `main`                       | none                                    |
 | `deploy-firestore.yml`           | `push` to `main`; `workflow_dispatch`  | none                                    |
 | `link-check.yml`                 | pull requests, path-filtered; schedule | none; other people's servers decide it  |
+| `e2e-production.yml`             | schedule; `workflow_dispatch`          | none; the live sites decide it          |
 
 The required contexts are listed in `repo-settings/rulesets/main.json`. Every
 one of them is either an aggregate job (see "The aggregate job") or a job that
@@ -221,8 +222,8 @@ written, rather than every job that takes the steps.
   `engine-strict` in `node-version-compatibility.yml` and deliberately not in
   `node-support-update.yml`'s canary, `ignore-scripts` in `release.yml`'s
   publishing job, `install: false` in `pnpm-update.yml`, which changes pnpm
-  before it installs anything, and in `deploy-firestore.yml`, which installs
-  one app rather than the workspace.
+  before it installs anything, and in `deploy-firestore.yml` and
+  `e2e-production.yml`, which install one app rather than the workspace.
 - **The checkout stays in the caller.** A local action is read from the
   workspace, so it cannot be resolved before something has checked it out.
 - **A composite action is a file in the tree**, read when its step starts

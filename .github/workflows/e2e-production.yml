@@ -1,0 +1,76 @@
+name: E2E (production)
+
+# Runs the end-to-end tests of the deployed apps against the sites themselves,
+# once a day. The pull request checks test the tree, through a dev server; a
+# site that a deploy by hand, an expired certificate or a Firebase change has
+# broken fails none of them, and this is what notices.
+#
+# It reports no required status check: its verdict is a function of the live
+# site and of Firebase, not of the tree, so it would hold merges for things
+# no pull request can fix. A failed scheduled run mails whoever last changed
+# the schedule.
+#
+# The tests write to the production Firestore and put back what they write;
+# `apps/event-schedule-app/e2e/production.spec.mts` says how.
+on:
+  schedule:
+    # 06:17 JST; off the hour, when GitHub's scheduled runs bunch up.
+    - cron: '17 21 * * *'
+
+  workflow_dispatch:
+
+# The tests share one event in production, so two runs at once would read
+# each other's writes. Not cancelled halfway, so that a run gets to put the
+# event back; a run that is cut off anyway is put right by the next one.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  event-schedule-app:
+    name: event-schedule-app
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # `install: false`: the step below installs the one app, not the
+      # workspace.
+      - name: Set up pnpm and Node.js
+        uses: ./.github/actions/setup
+        with:
+          install: false
+
+      # The specs import nothing from the workspace, so the app's own
+      # dependencies are all the tests need, and nothing is built.
+      - name: Install the app and its browser
+        env:
+          DIR: apps/event-schedule-app
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile --ignore-scripts --filter "./${DIR}"
+          "${DIR}/node_modules/.bin/playwright" install chromium
+
+      # The secret is in the same job as the install, which the split in "Jobs
+      # that hold a key" in README.md would keep apart. It is not split off
+      # because the id admits nothing beyond what anyone gets by creating an
+      # anonymous event of their own: edit that event and answer it. Kept
+      # secret, it keeps strangers from editing the event the tests read.
+      #
+      # The binary itself, not `pnpm run`: pnpm installs the whole workspace
+      # before running anything when it finds `node_modules` incomplete, which
+      # a filtered install leaves it.
+      - name: Run the tests
+        working-directory: apps/event-schedule-app
+        env:
+          EVENT_SCHEDULE_APP_E2E_EVENT_ID: ${{ secrets.EVENT_SCHEDULE_APP_E2E_EVENT_ID }}
+        run: ./node_modules/.bin/playwright test --config ./configs/playwright.production.config.mts
