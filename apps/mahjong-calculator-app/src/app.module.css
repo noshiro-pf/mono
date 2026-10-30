@@ -1,0 +1,5 @@
+.root {
+  min-height: 100vh;
+  min-width: 700px;
+  max-width: 1000px;
+}

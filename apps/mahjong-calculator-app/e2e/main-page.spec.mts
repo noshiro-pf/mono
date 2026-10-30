@@ -17,9 +17,16 @@ test(
     const option = (displayName: string): Locator =>
       jikaze.getByRole('radio', { name: displayName });
 
+    // The label is what shows the choice: filled with the primary colour.
+    // Its class name is a CSS Module's, scoped and so not stable to name.
+    const label = (displayName: string): Locator =>
+      jikaze.getByText(displayName);
+
+    const selectedFill = 'rgb(0, 123, 255)';
+
     await expect.soft(option('東')).toBeChecked();
 
-    await expect.soft(jikaze.getByText('東')).toHaveClass('selected');
+    await expect.soft(label('東')).toHaveCSS('background-color', selectedFill);
 
     await jikaze.getByText('南').click();
 
@@ -27,10 +34,11 @@ test(
 
     await expect.soft(option('東')).not.toBeChecked();
 
-    // What shows the choice is the label's class, which the store sets.
-    await expect.soft(jikaze.getByText('南')).toHaveClass('selected');
+    await expect.soft(label('南')).toHaveCSS('background-color', selectedFill);
 
-    await expect.soft(jikaze.getByText('東')).not.toHaveClass('selected');
+    await expect
+      .soft(label('東'))
+      .not.toHaveCSS('background-color', selectedFill);
 
     await option('南').press('ArrowRight');
 
@@ -38,9 +46,11 @@ test(
 
     await expect.soft(option('南')).not.toBeChecked();
 
-    await expect.soft(jikaze.getByText('西')).toHaveClass('selected');
+    await expect.soft(label('西')).toHaveCSS('background-color', selectedFill);
 
-    await expect.soft(jikaze.getByText('南')).not.toHaveClass('selected');
+    await expect
+      .soft(label('南'))
+      .not.toHaveCSS('background-color', selectedFill);
 
     // The other groups keep their own selection.
     await expect

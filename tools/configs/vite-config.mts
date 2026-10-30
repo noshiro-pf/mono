@@ -163,6 +163,11 @@ const projectConfig = (packageRoot: string, overrides?: ProjectOverrides) =>
     dir: packageRoot,
     globals: true,
     restoreMocks: true,
+    // Left out of `css.include`, a CSS Module is stubbed with a default
+    // export only, so `import * as styles` (the form the generated
+    // `*.module.d.css.ts` declares, see `gen-css-module-types.mts`) reads
+    // `undefined` for every class under test while the types say `string`.
+    css: { include: [/\.module\.css(?:$|\?)/u] },
     hideSkippedTests: true,
     includeSource: castMutable(overrides?.includeSource) ?? [
       'src/**/*.mts',
