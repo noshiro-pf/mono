@@ -1,6 +1,6 @@
 ---
 title: Components
-description: Props that take Bindable values, read-once props, and children.
+description: Props that take Bindable values and need no special handling, read-once props, and children.
 ---
 
 A component is a function from props to `JSX.Element`, and it is called once, when it mounts. There is no per-component state or effect API. State lives in synstate observables, and the component binds what it shows to them.
@@ -54,7 +54,119 @@ const Inbox = (): JSX.Element => (
 render(Inbox, document.body);
 ```
 
-Props hold bindables, not values that a later render would replace, so you lose nothing by destructuring them. And with `mapBindable` and `derive` (see [Bindable values](/mono/synstate-dom/guides/bindable/#receiving-a-bindable-mapbindable-derive-toobservable)), a constant passed in stays a constant and never enters the graph.
+With `mapBindable` and `derive` (see [Bindable values](/mono/synstate-dom/guides/bindable/#receiving-a-bindable-mapbindable-derive-toobservable)), a constant passed in stays a constant and never enters the graph.
+
+## Props are plain JavaScript
+
+A prop that takes data holds a bindable (an observable, a constant or a view) itself, not a value read from it, so nothing about it is special. The usual JavaScript ways of handling a function's arguments all work on props, and the updates keep flowing:
+
+```tsx
+import { createState } from 'synstate';
+import {
+    constant,
+    derive,
+    If,
+    mapBindable,
+    type Bindable,
+    type JSX,
+} from 'synstate-dom';
+
+type CountedTextAreaProps = Readonly<{
+    label: Bindable<string>;
+    value: Bindable<string>;
+    onInput: (value: string) => void;
+    maxLength?: Bindable<number>;
+}>;
+
+type FieldProps = Readonly<{ hint: Bindable<string> }> & CountedTextAreaProps;
+
+// A helper takes bindables and returns one, like any other function.
+const remainingOf = (
+    value: Bindable<string>,
+    maxLength: Bindable<number>,
+): Bindable<number> => derive([value, maxLength], (v, max) => max - v.length);
+
+// A component called only while its branch is mounted, so its text is
+// derived only while it is shown.
+const CharactersLeft = ({
+    count,
+}: Readonly<{ count: Bindable<number> }>): JSX.Element => (
+    <small>{mapBindable(count, (n) => `${n} characters left`)}</small>
+);
+
+const CountedTextArea = ({
+    label,
+    value,
+    onInput,
+    // A default is a destructuring default.
+    maxLength = constant(140),
+}: CountedTextAreaProps): JSX.Element => {
+    // Computed in the component body and kept in a variable, and it still
+    // updates: `remaining` is a bindable derived from the props, not a number
+    // read once.
+    const remaining = remainingOf(value, maxLength);
+
+    return (
+        <span>
+            <label>
+                {label}
+                <textarea
+                    value={value}
+                    onInput={(event) => {
+                        onInput(event.currentTarget.value);
+                    }}
+                />
+            </label>
+            {/* The price: a derived value that updates is built as a bindable,
+          and an element shown depending on an updating value is `If`,
+          not `&&` or `? :`. */}
+            <If
+                cond={mapBindable(remaining, (n) => n < 0)}
+                then={<strong>{constant('Too long')}</strong>}
+                else={<CharactersLeft count={remaining} />}
+            />
+        </span>
+    );
+};
+
+// The props this component does not use itself are forwarded with a rest
+// pattern.
+const Field = ({ hint, ...textArea }: FieldProps): JSX.Element => (
+    <div>
+        <CountedTextArea {...textArea} />
+        <p>{hint}</p>
+    </div>
+);
+
+const [draft$, setDraft] = createState('');
+
+export const Compose = (): JSX.Element => (
+    <Field
+        label={constant('Message')}
+        hint={constant('Plain text only.')}
+        value={draft$}
+        onInput={setDraft}
+    />
+);
+```
+
+- Destructure props.
+- Give a prop a default with a destructuring default: `maxLength = constant(140)`.
+- Forward the props you do not use with a rest pattern, `{ hint, ...textArea }`, and spread them onto another component.
+- Compute something in the component body, keep it in a variable, or pass props to a helper function.
+
+In Solid, each of these comes with a rule. Props are an object of getters, so reading one in the component body, outside JSX and outside a tracking scope such as `createMemo` or `createEffect`, reads it only once. Destructuring is such a read. A default therefore needs `mergeProps`, forwarding the rest needs `splitProps`, and a value computed in the component body has to be wrapped in `createMemo` or a function. Break the rule and the code still compiles and shows the first value; it just stops updating. Lint (`solid/reactivity`, `solid/no-destructure`) can point that out, but `tsc` cannot. synstate-dom has no such rules for handling props: what updates is whatever has a `Bindable` type.
+
+### The price: derived values are built as bindables
+
+That freedom comes from props being bindables rather than values, and it cuts the other way too. In Solid, a derived value is an expression, such as `{props.maxLength - props.value.length}` in JSX, and the compiler keeps it up to date. In synstate-dom you cannot write that expression inline. You pass the computation to a function that builds the derivation as a new bindable:
+
+- from one input: `mapBindable` (or, when you hold an observable, `view` or `pipe(map(...))`);
+- from several inputs: `derive([a, b], fn)`;
+- anything that waits, filters or debounces: synstate's operators, reached through `toObservable`, with `withInitialValue` before the result is bound;
+- an element shown depending on an updating value: `If` given a `Bindable<boolean>` (or `MatchOptional` / `MatchResult`), not `&&` or `? :` around JSX.
+
+So the same component takes more code than in Solid, and writing it means knowing these helpers and, beyond them, synstate's operators. In return, each derivation is a value with a type that you can name, keep and pass on, as `remaining` is above.
 
 ## Read-once props
 

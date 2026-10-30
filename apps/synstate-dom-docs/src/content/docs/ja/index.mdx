@@ -36,7 +36,9 @@ import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
     <Card title="リアクティブかどうかが型でわかる" icon="approve-check">
         データを受け取るスロットに渡せるのは
         Observable・`constant(...)`・`view(...)`
-        だけで、素の値は渡せません。うっかりスナップショットを読んで渡しても、更新されないビューができあがるのではなく、型エラーになります。
+        だけで、素の値は渡せません。うっかりスナップショットを読んで渡しても、更新されないビューができあがるのではなく、型エラーになります。props
+        も値を読み出したものではなく Bindable
+        そのものなので、分割代入しても、デフォルト値を付けても壊れません。
     </Card>
     <Card title="そもそもリークしない作り" icon="random">
         `If`・`Match`・`For`

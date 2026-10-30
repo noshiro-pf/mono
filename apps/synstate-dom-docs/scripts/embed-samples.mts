@@ -59,8 +59,9 @@ const pageSamples: readonly (readonly [
     'guides/components.md',
     [
       readmeSample('03-bindable-props.tsx'),
-      'components/02-read-once.tsx',
-      'components/03-children.tsx',
+      'components/02-plain-javascript.tsx',
+      'components/03-read-once.tsx',
+      'components/04-children.tsx',
     ],
   ],
   [

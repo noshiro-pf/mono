@@ -18,6 +18,8 @@ synstate-dom はまだ 0.x なので、マイナーリリースでも API が変
 
     Solid では、シグナルを読んだ式を渡しても固定値を渡しても props の型は同じ素の `T` です。なので、リアクティブに更新させたい値とそうでない値を型で区別できず、間違った方を型で弾くこともできません。コンポーネント本体で props を一度だけ読んだり分割代入したりすると更新は黙って止まってしまい、それに気づかせてくれるのは lint（eslint-plugin-solid の `solid/reactivity` と `solid/no-destructure`）だけです。synstate-dom では、更新されるかどうかは `Bindable` 型かどうかそのものなので、シグネチャを見ればわかりますし、`tsc` がチェックしてくれます。
 
+    また props は値を読み出したものではなく `Bindable` そのものなので、props だからといって特別な扱いは要りません。分割代入しても、デフォルト値を付けても、残りをまとめて渡しても、コンポーネント本体で計算しても構いません。その代わり、更新し続けたい派生値は JSX の中の式ではなく、Bindable として（`mapBindable` や `derive` で）組み立てる必要があります。詳しくは [props は普通の JavaScript の値](/mono/synstate-dom/ja/guides/components/#props-は普通の-javascript-の値)を見てください。
+
 - **後始末はスコープがしてくれます。** `If` / `Match` の各分岐と `For` の各行は、それぞれスコープの中でマウントされます。マウント中に作った派生と購読はそのスコープに属し、スコープと一緒に破棄されます。詳しくは[ライフサイクルとスコープ](/mono/synstate-dom/ja/guides/lifecycle/)を見てください。
 
 ## （まだ）しないこと
