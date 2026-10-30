@@ -1634,21 +1634,15 @@ importers:
 
   apps/mahjong-calculator-app:
     dependencies:
-      goober:
-        specifier: ^2.1.19
-        version: 2.1.19(csstype@3.2.3)
       html2canvas:
         specifier: ^1.4.1
         version: 1.4.1
-      preact-utils:
-        specifier: workspace:*
-        version: link:../preact-utils
       synstate:
         specifier: workspace:*
         version: link:../../libs/synstate
-      synstate-preact-hooks:
+      synstate-dom:
         specifier: workspace:*
-        version: link:../../libs/synstate-preact-hooks
+        version: link:../../libs/synstate-dom
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
@@ -1683,9 +1677,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      preact:
-        specifier: 'catalog:'
-        version: 10.29.8(preact-render-to-string@6.8.1)
       prettier:
         specifier: 'catalog:'
         version: 3.9.10

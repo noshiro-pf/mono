@@ -1,9 +1,23 @@
-import { createElement } from 'preact';
-import { memoNamed } from 'preact-utils';
-import { Obj } from 'ts-data-forge';
-import type { DeepReadonly } from 'ts-type-forge';
+import type { Bindable, JSX } from 'synstate-dom';
 import type { TehaiType } from '../../types/index.mjs';
-import { ButtonGroupTyped } from '../bootstrap/index.mjs';
+import { ButtonGroup } from '../bootstrap/index.mjs';
+
+type Props = Readonly<{
+  selectedId: Bindable<TehaiType>;
+  onClick: (id: TehaiType) => void;
+}>;
+
+export const TehaiTypeButtonGroup = ({
+  selectedId,
+  onClick,
+}: Props): JSX.Element => (
+  <ButtonGroup
+    buttons={tehaiTypeButtons}
+    label={'手牌の種類'}
+    selectedId={selectedId}
+    onClick={onClick}
+  />
+);
 
 const tehaiTypeButtons = [
   { id: 'normal', displayName: '一般手' },
@@ -13,17 +27,3 @@ const tehaiTypeButtons = [
   id: TehaiType;
   displayName: string;
 }>[];
-
-type Props = DeepReadonly<{
-  selectedId: TehaiType;
-  onClick: (id: TehaiType) => void;
-}>;
-
-export const TehaiTypeButtonGroup = memoNamed<Props>(
-  'TehaiTypeButtonGroup',
-  (props) =>
-    createElement(
-      ButtonGroupTyped<TehaiType>,
-      Obj.merge(props, { buttons: tehaiTypeButtons }),
-    ),
-);

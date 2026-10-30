@@ -1,5 +1,5 @@
-import { memoNamed } from 'preact-utils';
+import { constant, type JSX } from 'synstate-dom';
 
-export const Description = memoNamed('Description', () => (
-  <div>{'Description'}</div>
-));
+export const Description = (): JSX.Element => (
+  <div>{constant('Description')}</div>
+);

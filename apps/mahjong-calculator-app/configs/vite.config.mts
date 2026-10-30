@@ -4,5 +4,5 @@ import { defineViteAppConfig } from '../../../tools/configs/vite-app-config.mjs'
 
 export default defineViteAppConfig({
   packageRoot: workspaceRootPath,
-  framework: 'preact',
+  framework: 'synstate-dom',
 });
