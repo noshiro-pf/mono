@@ -61,7 +61,8 @@ workflow が、どの ref と environment で動いているか」を書いた O
 ### 一度だけ行う設定
 
 pool とサービスアカウントは、デプロイ専用の GCP project `noshiro-pf-ci` に置く
-（2026-10-29 に下の手順で作成済み）。アプリの project のどれかに置くと、その
+（2026-10-29 に下の手順で作成済み。`firebaserules` などの 3 つの API は
+2026-10-30 に足した）。アプリの project のどれかに置くと、その
 project を消したときにほかのアプリのデプロイまで止まるため。作り直すときや
 アプリを足すときは、同じ手順を使う。
 
@@ -70,7 +71,14 @@ HOST_PROJECT=noshiro-pf-ci
 HOST_NUMBER="$(gcloud projects describe "$HOST_PROJECT" --format='value(projectNumber)')"
 SA="firestore-deploy@${HOST_PROJECT}.iam.gserviceaccount.com"
 
+# 前の 3 つは pool・サービスアカウントの作成と、トークンの交換・なりすまし用。
+# 後の 3 つは firebase-tools が呼ぶ API。サービスアカウントで呼んだ分はデプロイ先
+# ではなくこの project の利用として数えられるので、ここでも有効にしておく。
+# 2026-10-30 の最初のデプロイが Rules API の 403 で落ちて分かった。firestore
+# （インデックス）と firebase（project の取得）は、同じ理由で要る見込みで先に
+# 有効にしたもので、まだそれで落ちたことはない。
 gcloud services enable iam.googleapis.com iamcredentials.googleapis.com sts.googleapis.com \
+  firebaserules.googleapis.com firestore.googleapis.com firebase.googleapis.com \
   --project "$HOST_PROJECT"
 
 gcloud iam workload-identity-pools create github \
