@@ -257,9 +257,9 @@ not (see "Commits and pull requests").
   "Commits and pull requests"); merge or add `merge-queued`; run the `gh` CLI
   (it is a person's account; use the GitHub API); access `~/.ssh` or other
   sensitive directories.
-- **An issue that should wait for another issue or pull request ends with
-  `Start-After: #N`**, for a prerequisite or only a better order; what it
-  means, and which issues never carry one, is `docs/issue-start-after.md`.
+- **Work on an issue starts with `pnpm run start-issue -- <N>`**, and one that
+  should wait, even for a better order, ends with **`Start-After: #N`**; which
+  issues never carry one is in `docs/issue-start-after.md`.
 - **When a problem could recur, prefer the check that prevents the class to
   fixing the instance**, however it surfaced: a review finding, a CI failure,
   a bug after merge, a repeated review comment, a step someone must remember.

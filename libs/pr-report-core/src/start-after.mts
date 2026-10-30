@@ -5,6 +5,7 @@
  */
 
 import { Arr } from 'ts-data-forge';
+import { IN_PROGRESS_LABEL, PLANNED_LABEL } from './labels.mjs';
 import { findMergeAfterCycles, parseStartAfter } from './merge-after.mjs';
 
 /**
@@ -48,19 +49,57 @@ export const waitsFor = (
 ): readonly number[] => Arr.uniq(parseStartAfter(body).concat(blockedBy));
 
 /**
- * How an issue is shown: its {@link StartState}, or `in-progress` when it is
- * startable and an open pull request closes it. Kept apart from the start
- * state in the rules (`docs/issue-start-after.md`): one that is blocked or
- * on a cycle says so whether or not someone has started it.
+ * How an issue is shown: its {@link StartState}, or how far someone has got
+ * with it when it is startable ({@link IssueProgress}). Kept apart from the
+ * start state in the rules (`docs/issue-start-after.md`): one that is blocked
+ * or on a cycle says so whether or not someone has started it.
  */
-export type IssueStartState = StartState | 'in-progress';
+export type IssueStartState = StartState | 'in-progress' | 'planned';
 
-/** The {@link IssueStartState} of an issue, given whether it is worked on. */
+/**
+ * How far someone has got with an issue, whatever it waits for:
+ *
+ * - `in-progress` — an open pull request closes it, or it is labelled
+ *   `in-progress` (`labels.mts`), which is how it says so before there is one.
+ * - `planned` — it is labelled `planned`: someone means to start it next.
+ * - `none` — neither.
+ */
+export type IssueProgress = 'in-progress' | 'none' | 'planned';
+
+/**
+ * The {@link IssueProgress} of an issue carrying `labels`, given whether an
+ * open pull request closes it. Being worked on wins over being planned: one
+ * carrying both was started without the plan being taken off.
+ */
+export const progressOf = (
+  labels: readonly Readonly<{ name: string }>[],
+  closedByOpenPull: boolean,
+): IssueProgress =>
+  closedByOpenPull || hasLabel(labels, IN_PROGRESS_LABEL)
+    ? 'in-progress'
+    : hasLabel(labels, PLANNED_LABEL)
+      ? 'planned'
+      : 'none';
+
+/**
+ * Whether `labels` holds `name`, whatever its case. GitHub's label names
+ * are: adding `in-progress` to a repository that has `In-Progress` puts that
+ * one on, so an exact match would not see the label it just added.
+ */
+export const hasLabel = (
+  labels: readonly Readonly<{ name: string }>[],
+  name: string,
+): boolean =>
+  labels.some((label) => label.name.toLowerCase() === name.toLowerCase());
+
+/** The {@link IssueStartState} of an issue, given how far it has got. */
 export const withProgress = (
   state: StartState,
-  worked: boolean,
+  progress: IssueProgress,
 ): IssueStartState =>
-  worked && (state === 'free' || state === 'ready') ? 'in-progress' : state;
+  progress !== 'none' && (state === 'free' || state === 'ready')
+    ? progress
+    : state;
 
 /** The issues an open pull request closes: the ones being worked on. */
 export const issuesInProgress = (

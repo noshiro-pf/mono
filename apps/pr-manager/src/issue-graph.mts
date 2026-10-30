@@ -8,14 +8,16 @@
  * waited for to what waits — a `Start-After:` — or from an issue to a pull
  * request that closes it, which is the work on that issue under way. How an
  * issue stands is `pr-report-core`'s `decideStartStates`; this adds where
- * everything else stands, whether a startable issue is being worked on, and
- * the `priority:*` label of what the page read the labels of, and whether
- * it is labelled `pending`.
+ * everything else stands, how far someone has got with a startable issue, and
+ * the `priority:*` label of what the page read the labels of, whether it is
+ * labelled `pending`, and whether `in-progress` or `planned`.
  */
 
 import {
   decideStartStates,
+  progressOf,
   withProgress,
+  type IssueProgress,
   type IssueStartState,
 } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
@@ -29,8 +31,8 @@ import { priorityOf, type Priority } from './priority.mjs';
  * How a node is drawn.
  *
  * A listed issue takes its {@link IssueStartState}: its start state, or
- * `in-progress` when it is startable and an open pull request closes it
- * (`pr-report-core`'s `withProgress`). Anything else is where it
+ * `in-progress` or `planned` when it is startable and an open pull request
+ * closes it or its labels say so (`pr-report-core`'s `withProgress`). Anything else is where it
  * stands: `open` for an open pull request, and for an open issue past the end
  * of the list, whose own declarations were not read; `done`, `abandoned` or
  * `unknown` for the rest, as `ReferenceStatus` says.
@@ -55,6 +57,13 @@ export type IssueGraphNode = Readonly<{
    * back for now; read where the priority is, and `false` elsewhere.
    */
   pending: boolean;
+  /**
+   * What its `in-progress` or `planned` label says
+   * (`pr-report-core`'s `progressOf`, with no pull request), read where the
+   * priority is and `none` elsewhere: the state shows it only when the issue
+   * is startable, and the tooltip says it whatever the state.
+   */
+  marked: IssueProgress;
 }>;
 
 export type IssueGraphEdge = Readonly<{
@@ -116,14 +125,20 @@ export const buildIssueGraph = ({
   const issueNodes = issues.map((issue): IssueGraphNode => {
     const state = startStates.get(issue.number) ?? 'free';
 
+    const marked = progressOf(issue.labels, false);
+
     return {
       number: issue.number,
       kind: 'issue',
       title: issue.title,
       url: issue.url,
-      state: withProgress(state, worked.has(issue.number)),
+      state: withProgress(
+        state,
+        worked.has(issue.number) ? 'in-progress' : marked,
+      ),
       priority: priorityOf(issue.labels),
       pending: isPending(issue.labels),
+      marked,
     };
   });
 
@@ -145,6 +160,7 @@ export const buildIssueGraph = ({
         state: 'open',
         priority: priorityOf(pull.labels),
         pending: isPending(pull.labels),
+        marked: 'none',
       };
     }
 
@@ -159,6 +175,7 @@ export const buildIssueGraph = ({
           state: 'unknown',
           priority: 'none',
           pending: false,
+          marked: 'none',
         }
       : {
           number,
@@ -168,6 +185,7 @@ export const buildIssueGraph = ({
           state: item.status === 'waiting' ? 'open' : item.status,
           priority: 'none',
           pending: false,
+          marked: 'none',
         };
   });
 
@@ -196,6 +214,8 @@ export const buildIssueGraph = ({
 /** How a listed issue stands for being started, as its row says it. */
 export type IssueStart = Readonly<{
   state: IssueStartState;
+  /** What its `in-progress` or `planned` label says, as its node has it. */
+  marked: IssueProgress;
   /** What its `Start-After:` names, as the graph draws each, in its order. */
   named: readonly IssueGraphNode[];
 }>;
@@ -213,13 +233,14 @@ export const issueStartsOf = (
   return new Map(
     Arr.generate(function* () {
       for (const { number, startAfter } of issues) {
-        const state = byNumber.get(number)?.state;
+        const listed = byNumber.get(number);
 
-        if (state !== undefined && isIssueStartState(state)) {
+        if (listed !== undefined && isIssueStartState(listed.state)) {
           yield [
             number,
             {
-              state,
+              state: listed.state,
+              marked: listed.marked,
               named: Arr.generate(function* () {
                 for (const each of startAfter) {
                   const node = byNumber.get(each);

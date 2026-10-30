@@ -9,6 +9,7 @@ import {
   decideStartStates,
   inheritStartAfter,
   issuesInProgress,
+  progressOf,
   withProgress,
   type ReferenceStatus,
 } from './start-after.mjs';
@@ -83,8 +84,8 @@ export const buildReport = ({
 
 /**
  * Each open issue with how it stands for being started
- * (`docs/issue-start-after.md`): its start state, or `in-progress` when it
- * is startable and an open pull request closes it, and where each thing it
+ * (`docs/issue-start-after.md`): its start state, or how far someone has
+ * got with it when it is startable (`progressOf`), and where each thing it
  * names stands.
  */
 const reportIssues = (
@@ -109,7 +110,7 @@ const reportIssues = (
     ...issue,
     start: withProgress(
       states.get(issue.number) ?? 'free',
-      worked.has(issue.number),
+      progressOf(issue.labels, worked.has(issue.number)),
     ),
     named: issue.startAfter.map((number) => ({
       number,

@@ -2,6 +2,7 @@ import {
   decideStartStates,
   inheritStartAfter,
   issuesInProgress,
+  progressOf,
   referenceStatusOf,
   waitsFor,
   withProgress,
@@ -313,20 +314,66 @@ describe(waitsFor, () => {
 });
 
 describe(withProgress, () => {
-  test('a startable issue an open pull request closes is in progress', () => {
-    assert.strictEqual(withProgress('free', true), 'in-progress');
+  test('a startable issue someone has got to says how far', () => {
+    assert.strictEqual(withProgress('free', 'in-progress'), 'in-progress');
 
-    assert.strictEqual(withProgress('ready', true), 'in-progress');
+    assert.strictEqual(withProgress('ready', 'in-progress'), 'in-progress');
 
-    assert.strictEqual(withProgress('ready', false), 'ready');
+    assert.strictEqual(withProgress('free', 'planned'), 'planned');
+
+    assert.strictEqual(withProgress('ready', 'none'), 'ready');
   });
 
   test('one that is not startable says why, worked on or not', () => {
-    assert.strictEqual(withProgress('blocked', true), 'blocked');
+    assert.strictEqual(withProgress('blocked', 'in-progress'), 'blocked');
 
-    assert.strictEqual(withProgress('cycle', true), 'cycle');
+    assert.strictEqual(withProgress('cycle', 'in-progress'), 'cycle');
 
-    assert.strictEqual(withProgress('attention', true), 'attention');
+    assert.strictEqual(withProgress('attention', 'planned'), 'attention');
+  });
+});
+
+describe(progressOf, () => {
+  test('an open pull request closing it is in progress', () => {
+    assert.strictEqual(progressOf([], true), 'in-progress');
+  });
+
+  test('so is the in-progress label, with no pull request yet', () => {
+    assert.strictEqual(
+      progressOf([{ name: 'bug' }, { name: 'in-progress' }], false),
+      'in-progress',
+    );
+  });
+
+  test('the planned label is planned', () => {
+    assert.strictEqual(progressOf([{ name: 'planned' }], false), 'planned');
+  });
+
+  test('being worked on wins over being planned', () => {
+    assert.strictEqual(progressOf([{ name: 'planned' }], true), 'in-progress');
+
+    assert.strictEqual(
+      progressOf([{ name: 'planned' }, { name: 'in-progress' }], false),
+      'in-progress',
+    );
+  });
+
+  test('neither, or a label only like them, is none', () => {
+    assert.strictEqual(progressOf([], false), 'none');
+
+    assert.strictEqual(
+      progressOf([{ name: 'in-progress-x' }, { name: 'planned-later' }], false),
+      'none',
+    );
+  });
+
+  test('reads a label whatever its case, as GitHub does', () => {
+    assert.strictEqual(
+      progressOf([{ name: 'In-Progress' }], false),
+      'in-progress',
+    );
+
+    assert.strictEqual(progressOf([{ name: 'Planned' }], false), 'planned');
   });
 });
 

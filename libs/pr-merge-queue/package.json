@@ -2,7 +2,7 @@
   "name": "pr-merge-queue",
   "version": "0.0.4",
   "private": false,
-  "description": "A merge queue for GitHub driven by labels and `Merge-After:` trailers: unblock-prs lands the queued pull requests one at a time, open-pr opens one the way the queue wants it, and pr-report, claim-pr, push-fixed-pr and report-unowned-prs read and hand over the queue",
+  "description": "A merge queue for GitHub driven by labels and `Merge-After:` trailers: unblock-prs lands the queued pull requests one at a time, open-pr opens one the way the queue wants it, pr-report, claim-pr, push-fixed-pr and report-unowned-prs read and hand over the queue, and start-issue marks an issue as started",
   "keywords": [
     "github",
     "pull-request",
@@ -39,6 +39,7 @@
     "pr-report": "./dist/cmd/pr-report.mjs",
     "push-fixed-pr": "./dist/cmd/push-fixed-pr.mjs",
     "report-unowned-prs": "./dist/cmd/report-unowned-prs.mjs",
+    "start-issue": "./dist/cmd/start-issue.mjs",
     "unblock-prs": "./dist/cmd/unblock-prs.mjs"
   },
   "files": [
@@ -68,7 +69,7 @@
     "gen": "run-s gen:index gen:config-schema gen:plugin-version",
     "gen:config-schema": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-config-schema.mts",
     "gen:index": "run-s gen:index:src fix:fmt",
-    "gen:index:src": "pnpm run z:gen-index-ts ./src/lib,./src/open-pr,./src/unblock-prs,./src/pr-report,./src/claim-pr,./src/push-fixed-pr,./src/report-unowned-prs --index-ext .mts --export-ext .mjs --target-ext .mts",
+    "gen:index:src": "pnpm run z:gen-index-ts ./src/lib,./src/open-pr,./src/unblock-prs,./src/pr-report,./src/claim-pr,./src/push-fixed-pr,./src/report-unowned-prs,./src/start-issue --index-ext .mts --export-ext .mjs --target-ext .mts",
     "gen:plugin-version": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-plugin-version.mts",
     "test": "pnpm run check:test",
     "watch:test": "pnpm run z:vitest:node watch",

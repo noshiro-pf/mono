@@ -14,14 +14,15 @@ The commands read the repository from `origin` in the current directory and
 authenticate with `GH_TOKEN` or `GITHUB_TOKEN`, falling back to `gh auth token`
 when neither is set.
 
-| command              | what it does                                                                       |
-| :------------------- | :--------------------------------------------------------------------------------- |
-| `open-pr`            | pushes the current branch and opens its pull request, held by `skip-ci`            |
-| `unblock-prs`        | lands the `merge-queued` pull requests one at a time, in the order they declare    |
-| `pr-report`          | reports every open pull request: merge order, required checks, how far behind      |
-| `claim-pr`           | claims a pull request `unblock-prs` set aside, so that nothing else touches it     |
-| `push-fixed-pr`      | pushes the fix to a pull request you claimed and hands it back to the queue        |
-| `report-unowned-prs` | files an issue for each queued pull request that everyone is waiting on others for |
+| command              | what it does                                                                         |
+| :------------------- | :----------------------------------------------------------------------------------- |
+| `open-pr`            | pushes the current branch and opens its pull request, held by `skip-ci`              |
+| `unblock-prs`        | lands the `merge-queued` pull requests one at a time, in the order they declare      |
+| `pr-report`          | reports every open pull request: merge order, required checks, how far behind        |
+| `claim-pr`           | claims a pull request `unblock-prs` set aside, so that nothing else touches it       |
+| `push-fixed-pr`      | pushes the fix to a pull request you claimed and hands it back to the queue          |
+| `report-unowned-prs` | files an issue for each queued pull request that everyone is waiting on others for   |
+| `start-issue`        | labels an issue `in-progress` before work starts, refusing one someone is already on |
 
 Each one prints its options with `--help`. How the queue reads a pull request
 (the labels, `Merge-After:`, stacks) and what `unblock-prs` does at each step
@@ -39,6 +40,8 @@ are in [`src/unblock-prs/README.md`](./src/unblock-prs/README.md);
   waits). `blocks-release` is needed only with a changesets version pull
   request: the release waits for every open pull request carrying it.
   `priority:high` and `priority:low` order the queue and are optional.
+  `in-progress` and `planned`, which `start-issue` puts on and takes off,
+  are optional too: they mark an issue as started, or as meant to be next.
 - **Merging.** Squash merging and auto-merge allowed in the repository's
   settings, and a ruleset (or branch protection rule) on the default branch
   that requires status checks with "Require branches to be up to date before

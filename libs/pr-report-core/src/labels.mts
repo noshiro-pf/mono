@@ -77,3 +77,23 @@ export const PRIORITY_MID_LABEL = 'priority:mid';
  * `unblock-prs`: what is held is simply not labelled `merge-queued`.
  */
 export const PENDING_LABEL = 'pending';
+
+/**
+ * The label that says someone has started an issue, before there is a pull
+ * request to say so. `start-issue` puts it on, and refuses an issue that
+ * already carries it, so that two sessions do not pick up the same one; the
+ * Pull Requests Manager page and `pr-report` show a startable issue carrying
+ * it as in progress, as they show one an open pull request closes
+ * (`start-after.mts`'s `progressOf`). Nothing takes it off when the work
+ * merges: the issue closes, and the label with it stops mattering.
+ */
+export const IN_PROGRESS_LABEL = 'in-progress';
+
+/**
+ * The label that says someone means to start an issue next. It holds nothing
+ * back — `start-issue` takes it off as it puts {@link IN_PROGRESS_LABEL} on —
+ * and only tells whoever is choosing what to start that this one is spoken
+ * for; the page and `pr-report` show a startable issue carrying it as
+ * planned.
+ */
+export const PLANNED_LABEL = 'planned';

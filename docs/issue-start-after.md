@@ -102,8 +102,29 @@ issue の着手状態は、次のうち最初に当てはまるもの。
   それがさらに何を待っているかは関係ない。
 - 「着手可」と「制約なし」を分けるのは、待っていたものが済んで始められるように
   なった issue を目立たせるため。
-- 着手状態とは別に、その issue を閉じる開いた pull request があれば「着手済み」と
-  表示する（`pr-report-core` の `withProgress`）。
+- 着手できる（`ready` か `free`）issue は、着手状態の代わりに進み具合を表示する
+  （`pr-report-core` の `progressOf` と `withProgress`）。その issue を閉じる開いた
+  pull request があるか、`in-progress` ラベルが付いていれば「着手済み」
+  （`in-progress`）、`planned` ラベルが付いていれば「着手予定」（`planned`）。
+  待ちや循環の issue は、ラベルが付いていてもそちらを表示する。
+
+## 着手の印 — `in-progress` と `planned`
+
+**`in-progress` ラベルは、pull request がまだ無い着手を表す。** 開いた pull request
+は着手を示すが、それができるまでの間、着手済みの issue は未着手と見分けがつかず、
+別の作業者が同じ issue を拾ってしまう。
+
+- **着手するときは `pnpm run start-issue -- <N>` を実行する**（`pr-merge-queue` の
+  `start-issue`）。`in-progress` を付け、`planned` を外す。
+- **既に `in-progress` が付いているか、閉じる開いた pull request があると拒否する。**
+  誰かが作業中かもしれないので、着手するかどうかは人が決める。続けてよいと言われた
+  ときだけ `--force` を付けて再実行する。
+- 作業をやめたときは `--release` で外す。マージで issue が閉じれば、ラベルは
+  そのまま残っても意味を持たない。
+
+**`planned` ラベルは、次に着手するつもりの issue に人が付ける。** 何も止めず、
+何を始めるか選ぶ人に「これは予定が入っている」と伝えるだけ。`start-issue` が
+`in-progress` と入れ替える。
 
 ## pull request への引き継ぎ
 
@@ -149,5 +170,5 @@ GitHub の依存関係は issue 同士しか結べないので、pull request �
 - 解析は `libs/pr-report-core` にあり、`Merge-After:` と共有する
   （`merge-after.mts` の `parseStartAfter`）。`other/repo#5` は同じリポジトリの
   `#5` と読まない。
-- 判定は `start-after.mts`（`decideStartStates`、`withProgress`、
+- 判定は `start-after.mts`（`decideStartStates`、`progressOf`、`withProgress`、
   `inheritStartAfter`）。循環の検出には `findMergeAfterCycles` を使う。

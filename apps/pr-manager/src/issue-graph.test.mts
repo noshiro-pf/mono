@@ -107,6 +107,7 @@ describe(buildIssueGraph, () => {
         state: 'attention',
         priority: 'none',
         pending: false,
+        marked: 'none',
       },
       {
         number: 9,
@@ -116,6 +117,7 @@ describe(buildIssueGraph, () => {
         state: 'unknown',
         priority: 'none',
         pending: false,
+        marked: 'none',
       },
     ]);
   });
@@ -131,6 +133,43 @@ describe(buildIssueGraph, () => {
       [
         [2, 'open'],
         [5, 'blocked'],
+      ],
+    );
+  });
+
+  test('reads the in-progress and planned labels of an issue that could be started, with no pull request yet', () => {
+    const graph = build({
+      issues: [
+        issue(1, [], ['in-progress']),
+        issue(2, [], ['planned']),
+        // Planned while still waiting: what it waits for is what matters.
+        issue(3, [1], ['planned']),
+        issue(4, []),
+      ],
+    });
+
+    assert.deepStrictEqual(
+      graph.nodes.map(({ number, state, marked }) => ({
+        number,
+        state,
+        marked,
+      })),
+      [
+        { number: 1, state: 'in-progress', marked: 'in-progress' },
+        { number: 2, state: 'planned', marked: 'planned' },
+        { number: 3, state: 'blocked', marked: 'planned' },
+        { number: 4, state: 'free', marked: 'none' },
+      ],
+    );
+
+    assert.deepStrictEqual(
+      Array.from(
+        issueStartsOf(graph, [issue(1, []), issue(3, [1])]),
+        ([number, { state, marked }]) => ({ number, state, marked }),
+      ),
+      [
+        { number: 1, state: 'in-progress', marked: 'in-progress' },
+        { number: 3, state: 'blocked', marked: 'planned' },
       ],
     );
   });
