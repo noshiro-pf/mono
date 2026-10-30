@@ -1049,6 +1049,55 @@ describe(appendAsConstTransformer, () => {
         expected: 'const draft = { a: [1] } as const, _mut_b = [2] as const;',
       },
       {
+        name: 'a variable annotated with a mutable type gets no as const',
+        source: dedent`
+          const a: MutableFoo = { b: [1] };
+          const c: ns.MutableFoo | undefined = { b: [1] };
+          const d: readonly MutableFoo[] = [{ b: [1] }];
+          const f: mut_Foo = { b: [1] };
+          const g: import('./m').MutableFoo = { b: [1] };
+          const h = { b: [1] } satisfies MutableFoo;
+          const i = (): MutableFoo => ({ b: [1] });
+          const j: typeof mut_x = [1];
+          const k: typeof mut_y.items = [1];
+          const l: typeof import('./m').mut_z = [1];
+          const m: InstanceType<typeof MutableStore> = { items: [] };
+          const n: InstanceType<typeof import('./m').MutableStore> = { items: [] };
+          const o = ((): MutableFoo => ({ b: [1] }));
+          const p = cond ? ({ b: [1] } satisfies MutableFoo) : q;
+          const e: Foo = { b: [1] };
+        `,
+        expected: dedent`
+          const a: MutableFoo = { b: [1] };
+          const c: ns.MutableFoo | undefined = { b: [1] };
+          const d: readonly MutableFoo[] = [{ b: [1] }];
+          const f: mut_Foo = { b: [1] };
+          const g: import('./m').MutableFoo = { b: [1] };
+          const h = { b: [1] } satisfies MutableFoo;
+          const i = (): MutableFoo => ({ b: [1] });
+          const j: typeof mut_x = [1];
+          const k: typeof mut_y.items = [1];
+          const l: typeof import('./m').mut_z = [1];
+          const m: InstanceType<typeof MutableStore> = { items: [] };
+          const n: InstanceType<typeof import('./m').MutableStore> = { items: [] };
+          const o = ((): MutableFoo => ({ b: [1] }));
+          const p = cond ? ({ b: [1] } satisfies MutableFoo) : q;
+          const e: Foo = { b: [1] } as const;
+        `,
+      },
+      {
+        name: 'mutableTypePrefixes replaces the default',
+        source: dedent`
+          const a: MutableFoo = { b: [1] };
+          const c: MyFoo = { b: [1] };
+        `,
+        expected: dedent`
+          const a: MutableFoo = { b: [1] } as const;
+          const c: MyFoo = { b: [1] };
+        `,
+        options: { mutableTypePrefixes: ['My'] },
+      },
+      {
         name: 'the prefixes named in the option replace the default',
         source: 'const draft = { a: [1] }, mut_b = [2];',
         expected: 'const draft = { a: [1] }, mut_b = [2] as const;',

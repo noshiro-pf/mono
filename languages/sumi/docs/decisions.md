@@ -649,7 +649,7 @@
 - **理由**:
     - **推論された型だけが readonly 強制の抜け穴だった。** 書かれる型は `require-readonly-type` が、引数は `prefer-readonly-parameter-types` が readonly にする。D-42 で戻り値型も書かれる。残る「型が書かれない場所」のうち、可変な型を生むのは配列・オブジェクトリテラルで、`const target = { a: 1 }` は `{ a: number }` になり、以後の `target.a = 2` をコンパイラは受け付ける
     - **D-45 はこの穴を `mut_` 側の規則に任せていた**（「破壊的操作は `mut_` 側の規則が担う」）。しかし `no-mutation-without-mut-prefix` は checker のルールで、**型に readonly が現れない限り、Sumi sugar で readonly をデフォルトにする codemod(D-3)の材料にもならない**。`as const` があれば、無注釈の束縛も注釈と同じく字面に readonly 性を持つ
-    - **このリポジトリの運用の追認である。** `ts-codemod-lib` の `append-as-const` が `mut_` 以外のリテラルに `as const` を機械的に付けており([spec/future-syntax.md](./spec/future-syntax.md) の候補 9)、dogfood 対象の synstate 3 パッケージ（92 ファイル）は導入時点で違反 0 件だった。codemod はプリミティブにも付ける（免除は Sumi と同じ D-14 の `mut_` だけ。4.0.0 より前は `_mut_` / `draft` も免除していた）が、Sumi が要求するのは readonly に効く範囲だけ
+    - **このリポジトリの運用の追認である。** `ts-codemod-lib` の `append-as-const` が `mut_` 以外のリテラルに `as const` を機械的に付けており([spec/future-syntax.md](./spec/future-syntax.md) の候補 9)、dogfood 対象の synstate 3 パッケージ（92 ファイル）は導入時点で違反 0 件だった。codemod はプリミティブにも付ける（免除は Sumi と同じ D-14 の `mut_` と、4.0.0 で加わった、`Mutable` / `mut_` 始まりの型や `typeof mut_x` に代入される値（注釈・`satisfies`・アロー関数の戻り値）。4.0.0 より前は `_mut_` / `draft` も免除していた）が、Sumi が要求するのは readonly に効く範囲だけ
     - **判断 3 は判断 1 の帰結。** リテラル由来の値が readonly になると、それへの書き込みはコンパイラが拒否する。checker が同じ行を重ねて報告しても情報は増えず、`sumi check` の出力で同じ誤りが 2 件に数えられる
 - **帰結**:
     - `no-mutation-without-mut-prefix` の役割は「**型が書き込みを許しているのに、名前が `mut_` でない**」ケースに絞られる: `new Map()` など literal 以外から作った値、`Object.assign` / `Reflect.set`（引数が `object`）、`Readonly<Date>` の setter（mapped type はメソッドを消さない）、可変な型を返す外部 API の値、`mut_` 値の別名、そして `as` を挟んだ代入(`(t.a as number) = 3` はコンパイラが通す — 実測)。代入・`delete`・破壊的メソッドの 3 種類はどれも残る

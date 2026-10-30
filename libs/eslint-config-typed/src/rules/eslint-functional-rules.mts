@@ -8,9 +8,11 @@ import {
 // property is matched only by the `ignoreAccessorPattern` below (`**.mut_**`).
 // The codemod counterpart is ts-codemod-lib's `DEFAULT_MUTABLE_PREFIXES`
 // (`libs/ts-codemod-lib/src/functions/constants/mutable-prefixes.mts`), the
-// default prefixes of the names `convert-to-readonly` and `append-as-const`
-// leave mutable, property names included;
-// `eslint-functional-rules.test.mts` holds the two to the same prefixes.
+// default prefixes of the variable and property names `convert-to-readonly`
+// leaves mutable (and of the variable names `append-as-const` does);
+// `eslint-functional-rules.test.mts` holds the two to the same prefixes. Type
+// names have their own `DEFAULT_MUTABLE_TYPE_PREFIXES`, which no ESLint rule
+// reads.
 const ignoredMutablePattern = ['^mut_'] as const;
 
 /** @link {https://github.com/jonaskello/eslint-plugin-functional} */
