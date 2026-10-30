@@ -35,11 +35,9 @@
     "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
   },
   "dependencies": {
-    "goober": "^2.1.19",
     "html2canvas": "^1.4.1",
-    "preact-utils": "workspace:*",
     "synstate": "workspace:*",
-    "synstate-preact-hooks": "workspace:*",
+    "synstate-dom": "workspace:*",
     "ts-data-forge": "workspace:*",
     "ts-fortress": "workspace:*",
     "ts-utils-additional": "workspace:*"
@@ -53,7 +51,6 @@
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
     "npm-run-all2": "catalog:",
-    "preact": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",

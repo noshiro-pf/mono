@@ -1,117 +1,68 @@
-import { styled } from 'goober';
-import { createElement } from 'preact';
-import { memoNamed } from 'preact-utils';
-import * as Preact from 'preact/hooks';
-import { Obj } from 'ts-data-forge';
-import type { DeepReadonly } from 'ts-type-forge';
+import { constant, mapBindable, type Bindable, type JSX } from 'synstate-dom';
 
-type PropsTyped<T> = DeepReadonly<{
-  selectedId: T;
-  buttons: {
+type Props<T> = Readonly<{
+  label: string;
+  selectedId: Bindable<T>;
+  buttons: readonly Readonly<{
     id: T;
     displayName: string;
-  }[];
+  }>[];
   onClick: (id: T) => void;
 }>;
 
-type Props = PropsTyped<string>;
+/**
+ * Bootstrap の `btn-group` を真似た、一つだけ選べるボタンの並び。見た目は
+ * `index.css` の `.button-group` で、選ばれているものに `selected` が付く。
+ *
+ * 中身は radio の組なので、キーボードでは組ごとに Tab で入り、矢印キーで選び
+ * 直せる。radio 自体は見えなくしてある。
+ */
+export const ButtonGroup = <T,>({
+  label,
+  selectedId,
+  buttons,
+  onClick,
+}: Props<T>): JSX.Element => {
+  // 同じ `label` の組が二つあっても一つの radio の組にならないよう、名前は
+  // 呼ばれるたびに変える。
+  const name = nextGroupName();
 
-export const ButtonGroupTyped = <T,>(
-  props: PropsTyped<T>,
-): preact.VNode<PropsTyped<T>> | null =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  createElement(
-    ButtonGroup,
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    props as unknown as Props,
-  ) as unknown as preact.VNode<PropsTyped<T>>;
+  return (
+    <div
+      aria-label={constant(label)}
+      class={constant('button-group')}
+      role={constant('radiogroup')}
+    >
+      {buttons.map((btn) => {
+        const selected = mapBindable(selectedId, (id) => id === btn.id);
 
-export const ButtonGroup = memoNamed<Props>(
-  'ButtonGroup',
-  ({ buttons, selectedId, onClick }) => {
-    const buttonWithHandler = Preact.useMemo(
-      () =>
-        buttons.map((btn) =>
-          Obj.merge(btn, {
-            onClick: () => {
-              onClick(btn.id);
-            },
-          }),
-        ),
-      [buttons, onClick],
-    );
+        return (
+          <label class={{ selected }}>
+            <input
+              // synstate-dom は書いた順に設定するので、radio にしてから選ぶ。
+              type={constant('radio')}
+              name={constant(name)}
+              // 再読み込みで store と食い違う選択をブラウザが戻さないように。
+              autocomplete={constant('off')}
+              checked={selected}
+              onChange={() => {
+                onClick(btn.id);
+              }}
+            />
+            {constant(btn.displayName)}
+          </label>
+        );
+      })}
+    </div>
+  );
+};
 
-    return (
-      <Root role={'radiogroup'}>
-        {buttonWithHandler.map((btn) => (
-          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-          <div
-            key={btn.id}
-            className={btn.id === selectedId ? 'selected' : undefined}
-            onClick={btn.onClick}
-          >
-            {btn.displayName}
-          </div>
-        ))}
-      </Root>
-    );
-  },
-);
+const nextGroupName = (() => {
+  let mut_count = 0;
 
-const Root = styled('div')`
-  position: relative;
-  display: inline-flex;
-  vertical-align: middle;
+  return (): string => {
+    mut_count += 1;
 
-  & > * {
-    &:not(:last-child) {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-
-    &:not(:first-child) {
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-    }
-    &:not(:first-child) {
-      margin-left: -1px;
-    }
-
-    &:active {
-      z-index: 1;
-    }
-
-    &:focus {
-      box-shadow: 0 0 0 0.2rem #007bff80;
-    }
-
-    &:not(:disabled) {
-      cursor: pointer;
-    }
-
-    margin-bottom: 0;
-    position: relative;
-    flex: 1 1 auto;
-
-    display: inline-block;
-    font-weight: 400;
-    text-align: center;
-    vertical-align: middle;
-    user-select: none;
-    border: 1px solid transparent;
-    padding: 0.375rem 0.75rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    border-radius: 0.25rem;
-
-    border-color: #007bff;
-
-    &:not(.selected) {
-      color: #007bff;
-    }
-    &.selected {
-      color: #fff;
-      background-color: #007bff;
-    }
-  }
-`;
+    return `button-group-${mut_count}`;
+  };
+})();

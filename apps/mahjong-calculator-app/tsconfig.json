@@ -6,7 +6,7 @@
   "compilerOptions": {
     "libReplacement": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "preact"
+    "jsxImportSource": "synstate-dom"
   },
   "include": ["./src", "./test", "./e2e", "./scripts", "./configs"]
 }
