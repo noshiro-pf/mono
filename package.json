@@ -98,6 +98,7 @@
     "repo-settings:apply": "pnpm run z:repo-settings apply",
     "repo-settings:backup": "pnpm run z:repo-settings backup",
     "report-unowned-prs": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/pr-merge-queue/src/cmd/report-unowned-prs.mts",
+    "review-findings-digest": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/review-findings-digest/main.mts",
     "start-issue": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/pr-merge-queue/src/cmd/start-issue.mts",
     "strict-lib:check:lint": "pnpm run z:eslint --config ./strict-lib/eslint.config.mts './strict-lib/**/*.mts'",
     "strict-lib:check:types": "tsc -p ./strict-lib/tsconfig.tooling.json --noEmit",
