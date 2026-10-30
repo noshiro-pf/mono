@@ -56,6 +56,9 @@ type EditorCommon = DeepReadonly<{
   confirmingDelete: boolean;
 }>;
 
+// `draft` is a default ignore prefix of ts-codemod-lib, which would leave the
+// members below unwrapped and `draft` mutable.
+// transformer-ignore-next-line convert-to-readonly
 export type EditorState =
   | Readonly<{ type: 'closed' }>
   | (EditorCommon &

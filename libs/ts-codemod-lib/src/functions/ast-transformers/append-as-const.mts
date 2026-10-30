@@ -16,6 +16,9 @@ const TRANSFORMER_NAME = 'append-as-const';
 export const appendAsConstTransformer = (
   options?: AppendAsConstTransformerOptions,
 ): TsMorphTransformer => {
+  // The ESLint counterpart is `ignoredMutablePattern` in
+  // `libs/eslint-config-typed/src/rules/eslint-functional-rules.mts`; change
+  // the two together.
   const ignorePrefixes = ISet.create(
     options?.ignorePrefixes ?? ['mut_', '#mut_', '_mut_', 'draft'],
   );

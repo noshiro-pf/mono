@@ -86,7 +86,7 @@ Converts TypeScript type definitions to readonly types. This transformer helps i
 
 Options:
 
-- `ignorePrefixes`: Array of string prefixes for identifiers that should not be made readonly (default: `['mut_', '#mut_', '_mut_', 'draft']`)
+- `ignorePrefixes`: Array of string prefixes for identifiers that should not be made readonly (default: `['mut_', '#mut_', '_mut_', 'draft']`). A type literal with a property, a method or an accessor of such a prefix is not wrapped with `Readonly<...>`, which would make that member readonly too; its other members are marked `readonly` one by one instead, and a `Readonly<...>` written around it is taken off. It is wrapped as before when it also has a member that cannot be marked `readonly` by itself (a method signature or an accessor without such a prefix, or a property or index signature not yet `readonly` that an ignore comment skips), or when it is a member of a `Readonly<...>` intersection beside a type that may be an array
 - `DeepReadonly.typeName`: Custom name for the DeepReadonly type utility (default: `"DeepReadonly"`)
 - `recordStyle`: Output style used when making `Record<K, V>` readonly (default: `"ReadonlyRecord"`). `"ReadonlyRecord"` uses the `ReadonlyRecord` type utility provided by `ts-type-forge` (no import statement is added, so it has to be available in the transformed code, e.g. globally via `ts-type-forge`'s `global.d.mts`), while `"Readonly<Record>"` uses only built-in utility types (`Readonly<Record<K, V>>`). Whichever style is selected, `Record<K, V>`, `Readonly<Record<K, V>>`, `ReadonlyRecord<K, V>`, and redundant wrappers such as `Readonly<ReadonlyRecord<K, V>>` are all unified to that style.
 
@@ -102,13 +102,32 @@ type User = {
     mut_items: string[]; // With ignorePrefixes: ['mut_']
 };
 
-// After
-type User2 = Readonly<{
-    id: number;
-    description: string;
-    preferences: ReadonlyMap<string, string>;
-    friendIds: readonly number[];
+// After (not wrapped with `Readonly`, which would make `mut_items` readonly
+// too; the other members are marked `readonly` one by one instead)
+type User2 = {
+    readonly id: number;
+    readonly description: string;
+    readonly preferences: ReadonlyMap<string, string>;
+    readonly friendIds: readonly number[];
     mut_items: string[]; // Not made readonly due to 'mut_' prefix
+};
+
+// Before
+type Account = {
+    id: number;
+    profile: {
+        name: string;
+        mut_tags: string[];
+    };
+};
+
+// After (only the literal holding `mut_tags` is left unwrapped)
+type Account2 = Readonly<{
+    id: number;
+    profile: {
+        readonly name: string;
+        mut_tags: string[];
+    };
 }>;
 
 // A type literal that declares a call or construct signature is marked

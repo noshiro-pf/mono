@@ -22,6 +22,11 @@ import {
  * member that `Readonly` still means something to (see `staysOutsideReadonly`):
  * taking such a member out of the `Readonly` it was written under would drop
  * its readonly-ness.
+ *
+ * `keptUnwrapped` names the further type literals the caller leaves unwrapped
+ * (one with a property of an ignored prefix, such as `mut_`), which stay out of
+ * that group as one with a call or construct signature does — except under a
+ * `Readonly` intersection with a member that may be an array.
  */
 export const groupUnionIntersectionTypes = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -30,10 +35,13 @@ export const groupUnionIntersectionTypes = (
     operator,
     underReadonly,
     deepReadonlyTypeName,
+    keptUnwrapped = () => false,
   }: Readonly<{
     operator: '&' | '|';
     underReadonly: boolean;
     deepReadonlyTypeName: string;
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    keptUnwrapped?: (node: tsm.TypeLiteralNode) => boolean;
   }>,
 ): Readonly<{
   primitives:
@@ -109,6 +117,28 @@ export const groupUnionIntersectionTypes = (
     others: undefined,
   };
 
+  // Taking a literal out of `Readonly<A & { mut_x: X }>` leaves
+  // `Readonly<A> & { mut_x: X }`, which is another type when `A` may be an
+  // array (see `isMergeableReadonlyTypeReferenceNode`). So `keptUnwrapped` is
+  // honoured under `Readonly<... & ...>` only when every member that stays
+  // under it is an object type.
+  const honoursKeptUnwrapped =
+    !underReadonly ||
+    operator === '|' ||
+    types.every((t_) => {
+      const t = removeParentheses(t_);
+
+      return (
+        isAtomicTypeNode(t) ||
+        t.isKind(tsm.SyntaxKind.ArrayType) ||
+        t.isKind(tsm.SyntaxKind.TupleType) ||
+        isReadonlyTupleOrArrayTypeNode(t) ||
+        t.isKind(tsm.SyntaxKind.TypeLiteral) ||
+        isMergeableReadonlyTypeReferenceNode(t, operator) ||
+        staysOutsideReadonly(t, deepReadonlyTypeName)
+      );
+    });
+
   for (const [i, t_] of types.entries()) {
     const t = removeParentheses(t_);
 
@@ -143,14 +173,15 @@ export const groupUnionIntersectionTypes = (
       continue;
     }
 
-    // A type literal that declares a call or construct signature is deliberately
-    // not grouped here: this group is joined and wrapped in a single
-    // `Readonly<...>`, which such a literal does not survive. It falls through
-    // to `others`, which leaves it as written. See
+    // A type literal that declares a call or construct signature, or one the
+    // caller keeps unwrapped, is deliberately not grouped here: this group is
+    // joined and wrapped in a single `Readonly<...>`, which such a literal does
+    // not survive. It falls through to `others`, which leaves it as written. See
     // `hasCallOrConstructSignature`.
     if (
       (t.isKind(tsm.SyntaxKind.TypeLiteral) &&
-        !hasCallOrConstructSignature(t)) ||
+        !hasCallOrConstructSignature(t) &&
+        !(honoursKeptUnwrapped && keptUnwrapped(t))) ||
       isMergeableReadonlyTypeReferenceNode(t, operator) ||
       (underReadonly && !staysOutsideReadonly(t, deepReadonlyTypeName))
     ) {

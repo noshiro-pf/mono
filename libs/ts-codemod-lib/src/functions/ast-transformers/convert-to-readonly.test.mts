@@ -3926,6 +3926,413 @@ describe(convertToReadonlyTransformer, () => {
     ])('$name', testFn);
   });
 
+  describe('Type literals with a property of an ignored prefix', () => {
+    // `Readonly<T>` would make the ignored property readonly too, so such a
+    // literal is left unwrapped and its other members are marked readonly in
+    // place, as an interface's are.
+    test.each([
+      {
+        name: 'Members other than the ignored one are marked readonly in place',
+        source: dedent`
+          type T = { mut_a: number[]; b: string[]; readonly c: number };
+        `,
+        expected: dedent`
+          type T = { mut_a: number[]; readonly b: readonly string[]; readonly c: number };
+        `,
+      },
+      {
+        name: 'An ignored property already marked readonly is left as written',
+        source: dedent`
+          type T = { readonly mut_a: number[]; b: string[] };
+        `,
+        expected: dedent`
+          type T = { readonly mut_a: number[]; readonly b: readonly string[] };
+        `,
+      },
+      {
+        name: 'A string literal name or a computed name of a literal is recognized',
+        source: dedent`
+          type T = { "mut_a": number[]; ['mut_b']: number[]; [\`mut_c\`]: number[]; d: string[] };
+        `,
+        expected: dedent`
+          type T = { "mut_a": number[]; ['mut_b']: number[]; [\`mut_c\`]: number[]; readonly d: readonly string[] };
+        `,
+      },
+      {
+        name: 'An index signature alongside is marked readonly in place',
+        source: dedent`
+          type T = { mut_a: number[]; [key: string]: unknown };
+        `,
+        expected: dedent`
+          type T = { mut_a: number[]; readonly [key: string]: unknown };
+        `,
+      },
+      {
+        name: 'Every configured prefix is recognized',
+        source: dedent`
+          type T = { draftItems: number[]; b: string[] };
+          type U = { mutable_items: number[]; b: string[] };
+        `,
+        expected: dedent`
+          type T = { draftItems: number[]; readonly b: readonly string[] };
+          type U = { mutable_items: number[]; readonly b: readonly string[] };
+        `,
+        options: { ignorePrefixes: ['draft', 'mutable_'] },
+      },
+      {
+        name: 'The "_mut_" prefix is recognized by default',
+        source: dedent`
+          type T = { _mut_items: number[]; b: string[] };
+        `,
+        expected: dedent`
+          type T = { _mut_items: number[]; readonly b: readonly string[] };
+        `,
+      },
+      {
+        name: 'Ancestors are wrapped with the shallow Readonly only',
+        source: dedent`
+          type T = {
+            a: {
+              b: {
+                mut_c: number[];
+                d: string[];
+              };
+            };
+          };
+        `,
+        expected: dedent`
+          type T = Readonly<{
+            a: Readonly<{
+              b: {
+                mut_c: number[];
+                readonly d: readonly string[];
+              };
+            }>;
+          }>;
+        `,
+      },
+      {
+        name: 'Nested in an interface',
+        source: dedent`
+          interface I {
+            a: { mut_b: number[]; c: string[] };
+          }
+        `,
+        expected: dedent`
+          interface I {
+            readonly a: { mut_b: number[]; readonly c: readonly string[] };
+          }
+        `,
+      },
+      {
+        name: 'As an array element',
+        source: dedent`
+          type T = { mut_a: number[] }[];
+        `,
+        expected: dedent`
+          type T = readonly { mut_a: number[] }[];
+        `,
+      },
+      {
+        name: 'In a union, it is not merged into the Readonly of the others',
+        source: dedent`
+          type T = { mut_a: number[]; b: string } | { c: number[] } | { d: string };
+        `,
+        expected: dedent`
+          type T = { mut_a: number[]; readonly b: string } | Readonly<{ c: readonly number[] } | { d: string }>;
+        `,
+      },
+      {
+        name: 'In an intersection, it is not merged into the Readonly of the others',
+        source: dedent`
+          type T = { mut_a: number[]; b: string } & { c: number[] };
+        `,
+        expected: dedent`
+          type T = { mut_a: number[]; readonly b: string } & Readonly<{ c: readonly number[] }>;
+        `,
+      },
+      {
+        name: 'In an intersection under Readonly, it is taken out',
+        source: dedent`
+          type T = Readonly<{ mut_a: number[]; b: string } & { c: string }>;
+        `,
+        expected: dedent`
+          type T = { mut_a: number[]; readonly b: string } & Readonly<{ c: string }>;
+        `,
+      },
+      {
+        // Such a `Readonly` is also what earlier versions wrote.
+        name: 'A Readonly written around it is taken off',
+        source: dedent`
+          type T = Readonly<{ mut_a: number[]; b: string[] }>;
+        `,
+        expected: dedent`
+          type T = { mut_a: number[]; readonly b: readonly string[] };
+        `,
+      },
+      {
+        name: 'Nested Readonly written around it are taken off',
+        source: dedent`
+          type T = Readonly<Readonly<{ mut_a: number[]; b: string }>>;
+        `,
+        expected: dedent`
+          type T = { mut_a: number[]; readonly b: string };
+        `,
+      },
+      {
+        name: 'A Readonly written around it in a union is taken off',
+        source: dedent`
+          type T = Readonly<{ mut_a: number[]; b: string }> | { c: string };
+        `,
+        expected: dedent`
+          type T = { mut_a: number[]; readonly b: string } | Readonly<{ c: string }>;
+        `,
+      },
+      {
+        name: 'A Readonly written around it under a Readonly union is taken off',
+        source: dedent`
+          type T = Readonly<Readonly<{ mut_a: number[] }> | { c: string }>;
+        `,
+        expected: dedent`
+          type T = { mut_a: number[] } | Readonly<{ c: string }>;
+        `,
+      },
+      {
+        // That member gets no `readonly` of its own, so the wrapper stays.
+        name: 'A member skipped by the ignore comment keeps the Readonly',
+        source: dedent`
+          type T = Readonly<{
+            // transformer-ignore-next-line
+            b: string[];
+            mut_a: number[];
+          }>;
+        `,
+        expected: dedent`
+          type T = Readonly<{
+            // transformer-ignore-next-line
+            b: string[];
+            mut_a: number[];
+          }>;
+        `,
+      },
+      {
+        name: 'A literal skipped by the ignore comment keeps the Readonly',
+        source: dedent`
+          type T = Readonly<
+            // transformer-ignore-next-line
+            { mut_a: number[]; b: string[] }
+          >;
+        `,
+        expected: dedent`
+          type T = Readonly<
+            // transformer-ignore-next-line
+            { mut_a: number[]; b: string[] }
+          >;
+        `,
+      },
+      {
+        name: 'A literal skipped by the ignore comment in an intersection under Readonly stays under it',
+        source: dedent`
+          type T = Readonly<
+            { c: string } &
+            // transformer-ignore-next-line
+            { mut_a: number[]; b: string[] }
+          >;
+        `,
+        expected: dedent`
+          type T = Readonly<
+            { c: string } &
+            // transformer-ignore-next-line
+            { mut_a: number[]; b: string[] }
+          >;
+        `,
+      },
+      {
+        name: 'An ignored property skipped by the ignore comment does not keep the Readonly',
+        source: dedent`
+          type T = {
+            // transformer-ignore-next-line
+            mut_a: number[];
+            b: string[];
+          };
+        `,
+        expected: dedent`
+          type T = {
+            // transformer-ignore-next-line
+            mut_a: number[];
+            readonly b: readonly string[];
+          };
+        `,
+      },
+      {
+        // `Readonly` is what makes a method or an accessor readonly, and
+        // neither takes a `readonly` modifier.
+        name: 'A literal with a method signature or an accessor is wrapped as before',
+        source: dedent`
+          type T = { mut_a: number[]; f(): void; b: string[] };
+          type U = Readonly<{ mut_a: number[]; get g(): string; set g(v: string) }>;
+        `,
+        expected: dedent`
+          type T = Readonly<{ mut_a: number[]; f(): void; b: readonly string[] }>;
+          type U = Readonly<{ mut_a: number[]; get g(): string; set g(v: string) }>;
+        `,
+      },
+      {
+        // `Readonly<A> & { ... }` would make an array `A` readonly.
+        name: 'In an intersection under Readonly beside a type that may be an array, it stays under it',
+        source: dedent`
+          type T<A> = Readonly<A & { mut_a: number[]; b: string }>;
+        `,
+        expected: dedent`
+          type T<A> = Readonly<A & { mut_a: number[]; readonly b: string }>;
+        `,
+      },
+      {
+        name: 'In an intersection under Readonly beside a primitive, it is taken out',
+        source: dedent`
+          type T = Readonly<string & { mut_a: number[]; b: string }>;
+        `,
+        expected: dedent`
+          type T = string & { mut_a: number[]; readonly b: string };
+        `,
+      },
+      {
+        name: 'An accessor or a method of an ignored prefix is left as written',
+        source: dedent`
+          type T = { get mut_x(): number[]; set mut_x(v: number[]); mut_f(a: string[]): void; b: string[] };
+        `,
+        expected: dedent`
+          type T = { get mut_x(): number[]; set mut_x(v: number[]); mut_f(a: string[]): void; readonly b: readonly string[] };
+        `,
+      },
+      {
+        name: 'A comment after the literal is kept when the Readonly is taken off',
+        source: dedent`
+          type T = Readonly<{ mut_a: number[]; b: string } /* note */>;
+          type U = Readonly<{ mut_a: number[] } // note
+          >[];
+        `,
+        expected: dedent`
+          type T = /* note */ { mut_a: number[]; readonly b: string };
+          type U =
+            // note
+            readonly { mut_a: number[] }[];
+        `,
+      },
+      {
+        name: 'A Readonly written around a single-member union of a literal with a call signature is kept',
+        source: dedent`
+          type T = Readonly<| { (): void; mut_a: number[] }>;
+        `,
+        expected: dedent`
+          type T = Readonly<{ (): void; mut_a: number[] }>;
+        `,
+      },
+      {
+        name: 'A Readonly written around a literal with a call signature is kept',
+        source: dedent`
+          type T = Readonly<{ (): void; mut_a: number[]; b: string }>;
+        `,
+        expected: dedent`
+          type T = Readonly<{ (): void; mut_a: number[]; b: string }>;
+        `,
+      },
+      {
+        name: 'A member that needs no wrapper does not keep the Readonly',
+        source: dedent`
+          type T = {
+            mut_a: number[];
+            mut_f(): void;
+            // transformer-ignore-next-line
+            readonly b: string;
+          };
+        `,
+        expected: dedent`
+          type T = {
+            mut_a: number[];
+            mut_f(): void;
+            // transformer-ignore-next-line
+            readonly b: string;
+          };
+        `,
+      },
+      {
+        name: 'A Readonly written around it under an indexed access is taken off',
+        source: dedent`
+          type T = Readonly<{ mut_a: number[]; b: string[] }>['b'];
+        `,
+        expected: dedent`
+          type T = { mut_a: number[]; b: readonly string[] }['b'];
+        `,
+      },
+      {
+        name: 'A DeepReadonly written explicitly is kept',
+        source: dedent`
+          type T = DeepReadonly<{ a: { mut_b: number[]; c: string[] } }>;
+        `,
+        expected: dedent`
+          type T = DeepReadonly<{ a: { mut_b: number[]; c: string[] } }>;
+        `,
+      },
+      {
+        name: 'Under an indexed access',
+        source: dedent`
+          type T = { mut_a: number[]; b: string[] }['b'];
+        `,
+        expected: dedent`
+          type T = { mut_a: number[]; b: readonly string[] }['b'];
+        `,
+      },
+      {
+        name: 'Without the prefix configured, the literal is wrapped',
+        source: dedent`
+          type T = { mut_a: number[]; b: string[] };
+        `,
+        expected: dedent`
+          type T = Readonly<{ mut_a: readonly number[]; b: readonly string[] }>;
+        `,
+        options: { ignorePrefixes: [] },
+      },
+    ])('$name', testFn);
+
+    test.each([
+      dedent`
+        type T = {
+          a: { mut_b: number[]; c: string[] } | { d: number[] };
+          mut_e: { f: string[] };
+        };
+      `,
+      'type T = Readonly<{ mut_a: number[]; b: string }> | { c: string };',
+      'type T = Readonly<{ mut_a: number[]; b: string }> & { c: string };',
+      'type T = Readonly<{ mut_a: number[] }> | Readonly<{ c: string }>;',
+      'type T = Readonly<Readonly<{ mut_a: number[] }> | { c: string }>;',
+      'type T = Readonly<{ mut_a: number[]; b: string } & { c: string }>;',
+      'type T = { a: string } | { mut_b: number[] } | { c: string };',
+      'type T<A> = Readonly<A & { mut_a: number[]; b: string }>;',
+      'type T = Readonly<string & { mut_a: number[]; b: string }>;',
+      'type T = Readonly<string[] & { mut_a: number[]; b: string }>;',
+      'type T = Readonly<(() => void) & { mut_a: number[]; b: string }>;',
+      'type T = Readonly<{ mut_a: number[] } & { c: string } & string>;',
+      'type T = Readonly<{ mut_a: number[]; b: string } /* note */>;',
+      'type T = Readonly<{ mut_a: number[] } // note\n>[];',
+      'type T = Readonly<{ mut_a: number[] } /* c */> | { d: string };',
+      'type T = Readonly<\n  // transformer-ignore-next-line\n  { mut_a: number[]; b: string[] }\n>;',
+    ])(
+      'a type literal with an ignored property reaches a fixed point: %s',
+      (code) => {
+        const once = transformSourceCode(code, false, [
+          convertToReadonlyTransformer(),
+        ]);
+
+        const twice = transformSourceCode(once, false, [
+          convertToReadonlyTransformer(),
+        ]);
+
+        expect(twice).toBe(once);
+      },
+    );
+  });
+
   describe('Call and construct signatures', () => {
     // `Readonly<T>` is a mapped type over `keyof T`, and a call or construct
     // signature is not a property, so wrapping a type literal that carries one
@@ -4477,10 +4884,10 @@ describe(convertToReadonlyTransformer, () => {
           type T = { mut_value: number[]; normalValue: string[] }
         `,
         expected: dedent`
-          type T = Readonly<{
+          type T = {
             mut_value: number[];
-            normalValue: readonly string[];
-          }>;
+            readonly normalValue: readonly string[];
+          };
         `,
         options: { ignorePrefixes: ['mut_'] },
       },
@@ -4490,11 +4897,11 @@ describe(convertToReadonlyTransformer, () => {
           type T = { mut_value: number[]; mutable_data: string[]; normalValue: boolean[] };
         `,
         expected: dedent`
-          type T = Readonly<{
+          type T = {
             mut_value: number[];
             mutable_data: string[];
-            normalValue: readonly boolean[];
-          }>;
+            readonly normalValue: readonly boolean[];
+          };
         `,
         options: { ignorePrefixes: ['mut_', 'mutable_'] },
       },
@@ -4510,10 +4917,10 @@ describe(convertToReadonlyTransformer, () => {
         `,
         expected: dedent`
           type T = Readonly<{
-            data: Readonly<{
+            data: {
               mut_items: number[];
-              items: readonly string[];
-            }>;
+              readonly items: readonly string[];
+            };
           }>;
         `,
         options: { ignorePrefixes: ['mut_'] },
@@ -4566,11 +4973,11 @@ describe(convertToReadonlyTransformer, () => {
           };
         `,
         expected: dedent`
-          type T = Readonly<{
+          type T = {
             mut_items: {
               [key: string]: number[];
             };
-          }>;
+          };
         `,
         options: { ignorePrefixes: ['mut_'] },
       },
@@ -4721,12 +5128,14 @@ describe(convertToReadonlyTransformer, () => {
         options: { ignorePrefixes: ['mut_'] },
       },
       {
+        // The binding pattern itself is not looked at (see the TODO in
+        // `transformNode`); the type literal is left as is for its properties.
         name: 'Object binding pattern in variable declaration (not implemented)',
         source: dedent`
           const { mut_arr, mut_obj }: { mut_arr: string[], mut_obj: number[] } = { mut_arr: [], mut_obj: [] };
         `,
         expected: dedent`
-          const { mut_arr, mut_obj }: Readonly<{ mut_arr: string[], mut_obj: number[] }> = { mut_arr: [], mut_obj: [] };
+          const { mut_arr, mut_obj }: { mut_arr: string[], mut_obj: number[] } = { mut_arr: [], mut_obj: [] };
         `,
         options: { ignorePrefixes: ['mut_'] },
       },
