@@ -1,5 +1,8 @@
 <!-- cspell:ignore ENOENT iset -->
 
+<!-- Paths in the upstream repository and inside a bundle, and one that moved since. -->
+<!-- doc-paths-ignore: docs/first-release.md libs/es2022/package.json libs/synstate/scripts/cmd/embed-examples-utils.mts -->
+
 # `strict-typescript-lib` を mono に統合するか
 
 ## 結論
@@ -912,7 +915,7 @@ GitHub Release をやめてよい根拠は、npm が正の経路になったこ�
 **初回 publish の手作業だけは残る。** npm の trusted publisher はパッケージごとに
 設定するもので、そのパッケージが npm に存在しないと設定できない。新しい TypeScript
 系統（v7.1 …）を足すときだけ、上流の `docs/first-release.md` と同じ手順が要る。
-移行時にこの文書も mono へ持ってくる。
+この文書は移行時に `strict-lib/docs/first-release.md` として mono へ持ってきた。
 
 **README の更新も移行に含める。** インストール手順の URL 例を消し、npm を正として
 書き直す。リポジトリへのリンクも `noshiro-pf/mono` に向け直す。
@@ -2301,7 +2304,8 @@ strict lib では `Response.json()` が `any` ではなく `unknown` を返す�
 
 直すと**ドキュメントに埋め込まれるコードが変わってしまう**ため #1761 では
 保留にしたが、**埋め込みスクリプトに逃げ道があった**。
-`libs/synstate/scripts/cmd/embed-examples-utils.mts` は
+当時の `libs/synstate/scripts/cmd/embed-examples-utils.mts`
+（今は `tools/configs/embed-examples-utils.mts`）は
 
 ```ts
 const ignoreLineKeywords = [

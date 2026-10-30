@@ -1,5 +1,8 @@
 <!-- cspell:ignore catan dezero firebaserc idfn Ymdhm -->
 
+<!-- Paths under experimental/packages/, and paths that were renamed or removed since. -->
+<!-- doc-paths-ignore: tools/eslint-custom-rules apps/io-ts-types apps/better-preact-use-state apps/event-schedule-app/configs/playwright.config.ts -->
+
 # `experimental/` の棚卸し
 
 `experimental/packages` に 74 個のワークスペースプロジェクトがある。step 3 の

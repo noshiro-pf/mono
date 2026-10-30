@@ -30,6 +30,8 @@
 `array/` は `math/variance` と `getShuffled` だけ。`zipArrays` などは `Tpl` や
 旧 `pipe().chain()` に依存していて、利用者が現れた時に移行するのが自然。
 
+<!-- doc-paths-ignore: src/color/functions/hsl-to-rgb.old.mts.md -->
+
 `src/color/functions/hsl-to-rgb.old.mts.md`（旧実装を Markdown に退避した
 49 行のファイル）も持ち込んでいない。現行の `hsl-to-rgb.mts` があるので、
 残しても読み手を迷わせるだけになる。

@@ -18,8 +18,8 @@ comes back to `apps/` as a private package.
 - `@noshiro/ts-utils` → `ts-data-forge`, and the types that used to be global
   (`SafeUint`, `DeepReadonly`, `LowerAlphabet`) are imported from
   `ts-type-forge`.
-- `Arr.isArrayOfLength3` and its siblings are gone; [`src/utils`](./src/utils)
-  has `hasLength` and `hasMinLength` in their place.
+- `Arr.isArrayOfLength3` and its siblings are gone; `ts-data-forge`'s
+  `Arr.isFixedLengthTuple` and `Arr.isMinLengthTuple` are used in their place.
 - `Arr.last` returns an `Optional` now, `toUint32`/`toSafeUint` are
   `asUint32`/`asSafeUint`, and `Num.safeParseInt` returns a `Result`.
 
