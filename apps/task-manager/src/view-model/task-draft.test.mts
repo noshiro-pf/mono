@@ -85,7 +85,7 @@ describe(applyTaskDraft, () => {
       labels: 'a、b',
       estimateHours: ' 3 ',
       groupId: 'g',
-    };
+    } as const;
 
     assert.deepStrictEqual(
       applyTaskDraft(task, draft, now, timeZone),

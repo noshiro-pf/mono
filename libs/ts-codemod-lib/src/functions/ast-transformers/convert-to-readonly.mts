@@ -2,6 +2,7 @@ import {
   Arr,
   expectType,
   ISet,
+  isRecord,
   isString,
   mapNullable,
   match,
@@ -14,6 +15,7 @@ import type {
   StrictExclude,
   StrictExtract,
 } from 'ts-type-forge';
+import { DEFAULT_MUTABLE_PREFIXES } from '../constants/index.mjs';
 import {
   hasCallOrConstructSignature,
   hasDisableNextLineComment,
@@ -59,13 +61,17 @@ export const convertToReadonlyTransformer = (
   const DeepReadonlyTypeName =
     options?.DeepReadonly?.typeName ?? 'DeepReadonly';
 
-  // The ESLint counterpart is `ignoredMutablePattern` in
-  // `libs/eslint-config-typed/src/rules/eslint-functional-rules.mts`; change
-  // the two together. (ESLint matches a property access by its own
-  // `ignoreAccessorPattern`, `**.mut_**`, instead.)
-  const ignorePrefixes = ISet.create(
-    options?.ignorePrefixes ?? ['mut_', '#mut_', '_mut_', 'draft'],
-  );
+  // Removed in 4.0.0; a caller without types would otherwise lose it silently.
+  const untypedOptions: unknown = options;
+
+  if (
+    isRecord(untypedOptions) &&
+    untypedOptions['ignorePrefixes'] !== undefined
+  ) {
+    throw new Error(
+      `The "ignorePrefixes" option of ${TRANSFORMER_NAME} was replaced by "mutableVariablePrefixes" and "mutablePropertyPrefixes".`,
+    );
+  }
 
   const optionsInternal: ReadonlyTransformerOptionsInternal = {
     DeepReadonly: {
@@ -73,7 +79,12 @@ export const convertToReadonlyTransformer = (
       applyLevel: 'keep',
     },
     ignoreEmptyObjectTypes: options?.ignoreEmptyObjectTypes ?? true,
-    ignoredPrefixes: ignorePrefixes,
+    mutableVariablePrefixes: ISet.create(
+      options?.mutableVariablePrefixes ?? DEFAULT_MUTABLE_PREFIXES,
+    ),
+    mutablePropertyPrefixes: ISet.create(
+      options?.mutablePropertyPrefixes ?? DEFAULT_MUTABLE_PREFIXES,
+    ),
     recordStyle: options?.recordStyle ?? 'ReadonlyRecord',
     debugPrint: options?.debug === true ? console.debug : () => {},
     replaceNode:
@@ -139,9 +150,22 @@ export type ReadonlyTransformerOptions = DeepReadonly<{
   ignoreEmptyObjectTypes?: boolean;
 
   /**
-   * A mute keywords to ignore the readonly conversion.
+   * Prefixes of the names of variables, parameters (but for a constructor
+   * parameter property, which `mutablePropertyPrefixes` decides), functions,
+   * type aliases, interfaces and classes that are left mutable: their types
+   * are not made readonly.
    *
-   * (e.g. `"mut_"`)
+   * @default ['mut_']
+   */
+  mutableVariablePrefixes?: string[];
+
+  /**
+   * Prefixes of the names of properties, methods and accessors (of type
+   * literals, interfaces and classes, constructor parameter properties
+   * included) that are left mutable: they get no `readonly`, and their types
+   * are not made readonly. A private name is matched with or after its `#`, so
+   * both `mut_` and `#mut_` cover `#mut_x`. Of a named tuple member with such a prefix, only the type
+   * is kept; the tuple is still made `readonly`.
    *
    * A type literal with a property, a method or an accessor of such a prefix
    * is not wrapped with `Readonly<...>`, which would make that member readonly
@@ -153,9 +177,9 @@ export type ReadonlyTransformerOptions = DeepReadonly<{
    * it is a member of a `Readonly<...>` intersection beside a type that may be
    * an array.
    *
-   * @default ['mut_', '#mut_', '_mut_', 'draft']
+   * @default ['mut_']
    */
-  ignorePrefixes?: string[];
+  mutablePropertyPrefixes?: string[];
 
   /**
    * The output style used when making `Record<K, V>` readonly.
@@ -190,7 +214,9 @@ type ReadonlyTransformerOptionsInternal = Readonly<{
 
   ignoreEmptyObjectTypes: boolean;
 
-  ignoredPrefixes: ISet<string>;
+  mutableVariablePrefixes: ISet<string>;
+
+  mutablePropertyPrefixes: ISet<string>;
 
   recordStyle: 'Readonly<Record>' | 'ReadonlyRecord';
 
@@ -230,24 +256,26 @@ const transformNode = (
     return;
   }
 
-  // check for ignorePrefix
+  // check for mutableVariablePrefixes
   if (node.isKind(tsm.SyntaxKind.VariableDeclaration)) {
     const nodeName = node.getName();
 
-    if (options.ignoredPrefixes.some((p) => nodeName.startsWith(p))) {
+    if (options.mutableVariablePrefixes.some((p) => nodeName.startsWith(p))) {
       // Skip conversion for variable declarations with ignored prefixes
       // Example: const mut_foo: string[] = []; -> remains as is, without appending `as const`
-      options.debugPrint('skipped variable declaration by ignorePrefixes');
+      options.debugPrint(
+        'skipped variable declaration by mutableVariablePrefixes',
+      );
 
       return;
     }
 
-    // TODO: Support ignoredPrefixes in ArrayBindingPattern
+    // TODO: Support mutableVariablePrefixes in ArrayBindingPattern
     // if (ts.isArrayBindingPattern(nodeName)) {
     //   // for (const [i, el] of nodeName.elements.entries())
     // }
 
-    // TODO: Support ignoredPrefixes in ObjectBindingPattern
+    // TODO: Support mutableVariablePrefixes in ObjectBindingPattern
     // if (ts.isObjectBindingPattern(nodeName)) {
     //   // for (const [i, el] of nodeName.elements.entries())
     // }
@@ -258,7 +286,9 @@ const transformNode = (
   if (
     (node.isKind(tsm.SyntaxKind.FunctionDeclaration) ||
       node.isKind(tsm.SyntaxKind.FunctionExpression)) &&
-    options.ignoredPrefixes.some((p) => node.getName()?.startsWith(p) === true)
+    options.mutableVariablePrefixes.some(
+      (p) => node.getName()?.startsWith(p) === true,
+    )
   ) {
     return;
   }
@@ -266,17 +296,21 @@ const transformNode = (
   if (node.isKind(tsm.SyntaxKind.Parameter)) {
     const nodeName = node.getName();
 
-    if (options.ignoredPrefixes.some((p) => nodeName.startsWith(p))) {
-      // Skip readonly conversion for variable declarations with ignored prefixes
-      // Example: const mut_foo: string[] = []; -> remains as is, without readonly conversion
+    if (
+      mutablePrefixesOfParameter(node, options).some((p) =>
+        nodeName.startsWith(p),
+      )
+    ) {
+      // Skip readonly conversion for parameters with mutable prefixes
+      // Example: (mut_foo: string[]) => {} -> remains as is, without readonly conversion
       return;
     }
 
-    // TODO: Support ignoredPrefixes in ArrayBindingPattern
+    // TODO: Support mutableVariablePrefixes in ArrayBindingPattern
     // if (ts.isArrayBindingPattern(nodeName)) {
     // }
 
-    // TODO: Support ignoredPrefixes in ObjectBindingPattern
+    // TODO: Support mutableVariablePrefixes in ObjectBindingPattern
     // if (ts.isObjectBindingPattern(nodeName)) {
     // }
   }
@@ -285,7 +319,7 @@ const transformNode = (
   // Example: type mut_Foo = number[]; -> remains as number[] without readonly
   if (
     node.isKind(tsm.SyntaxKind.TypeAliasDeclaration) &&
-    options.ignoredPrefixes.some((p) => node.getName().startsWith(p))
+    options.mutableVariablePrefixes.some((p) => node.getName().startsWith(p))
   ) {
     return;
   }
@@ -365,7 +399,9 @@ const transformNode = (
   if (node.isKind(tsm.SyntaxKind.InterfaceDeclaration)) {
     // Skip readonly conversion for interface declarations with ignored prefixes
     // Example: interface mut_Interface {...} -> properties remain without readonly
-    if (options.ignoredPrefixes.some((p) => node.getName().startsWith(p))) {
+    if (
+      options.mutableVariablePrefixes.some((p) => node.getName().startsWith(p))
+    ) {
       return;
     }
 
@@ -378,7 +414,7 @@ const transformNode = (
     // Skip readonly conversion for class declarations with ignored prefixes
     // Example: class mut_Class {...} -> properties remain without readonly
     if (
-      options.ignoredPrefixes.some(
+      options.mutableVariablePrefixes.some(
         (p) => node.getName()?.startsWith(p) === true,
       )
     ) {
@@ -1002,7 +1038,11 @@ const transformTupleTypeNode = (
 
     for (const el of node.getElements()) {
       if (el.isKind(tsm.SyntaxKind.NamedTupleMember)) {
-        if (options.ignoredPrefixes.every((p) => !el.getName().startsWith(p))) {
+        if (
+          options.mutablePropertyPrefixes.every(
+            (p) => !el.getName().startsWith(p),
+          )
+        ) {
           transformNode(el.getTypeNode(), nextReadonlyContextValue, options);
         }
       } else {
@@ -1362,7 +1402,9 @@ const transformConstructorParameter = (
 
   const name = param.getName();
 
-  if (options.ignoredPrefixes.some((p) => name.startsWith(p))) {
+  if (
+    mutablePrefixesOfParameter(param, options).some((p) => name.startsWith(p))
+  ) {
     return;
   }
 
@@ -2097,17 +2139,19 @@ const checkIfPropertyNameShouldBeIgnored = (
     // mut_x: number[]
     (nameNode.isKind(tsm.SyntaxKind.Identifier) &&
       pipe(nameNode.getText()).map((nm) =>
-        options.ignoredPrefixes.some((p) => nm.startsWith(p)),
+        options.mutablePropertyPrefixes.some((p) => nm.startsWith(p)),
       ).value) ||
     // "mut_x": number[]
     (nameNode.isKind(tsm.SyntaxKind.StringLiteral) &&
       pipe(nameNode.getLiteralValue()).map((nm) =>
-        options.ignoredPrefixes.some((p) => nm.startsWith(p)),
+        options.mutablePropertyPrefixes.some((p) => nm.startsWith(p)),
       ).value) ||
-    //  #memberName: number[] (class only)
+    //  #memberName: number[] (class only), matched with or after its `#`
     (nameNode.isKind(tsm.SyntaxKind.PrivateIdentifier) &&
       pipe(nameNode.getText()).map((nm) =>
-        options.ignoredPrefixes.some((p) => nm.startsWith(`#${p}`)),
+        options.mutablePropertyPrefixes.some(
+          (p) => nm.startsWith(p) || nm.startsWith(`#${p}`),
+        ),
       ).value) ||
     // ['mut_x']: number[], [`mut_x`]: number[]
     (nameNode.isKind(tsm.SyntaxKind.ComputedPropertyName) &&
@@ -2118,7 +2162,7 @@ const checkIfPropertyNameShouldBeIgnored = (
         ) {
           const nm = exp.getLiteralValue();
 
-          return options.ignoredPrefixes.some((p) => nm.startsWith(p));
+          return options.mutablePropertyPrefixes.some((p) => nm.startsWith(p));
         }
 
         return false;
@@ -2209,3 +2253,16 @@ const takesOffReadonly = (
   isLeftUnwrapped(node, options) &&
   !hasCallOrConstructSignature(node) &&
   !hasDisableNextLineCommentAround(node);
+
+/**
+ * A parameter property is a property of the class, as a `PropertyDeclaration`
+ * is; any other parameter is a variable.
+ */
+const mutablePrefixesOfParameter = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  param: tsm.ParameterDeclaration,
+  options: ReadonlyTransformerOptionsInternal,
+): ISet<string> =>
+  param.isParameterProperty()
+    ? options.mutablePropertyPrefixes
+    : options.mutableVariablePrefixes;

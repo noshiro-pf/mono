@@ -1,6 +1,7 @@
-import { Arr, ISet } from 'ts-data-forge';
+import { Arr, ISet, isRecord } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
 import type { DeepReadonly } from 'ts-type-forge';
+import { DEFAULT_MUTABLE_PREFIXES } from '../constants/index.mjs';
 import {
   hasDisableNextLineComment,
   isAsConstNode,
@@ -16,16 +17,23 @@ const TRANSFORMER_NAME = 'append-as-const';
 export const appendAsConstTransformer = (
   options?: AppendAsConstTransformerOptions,
 ): TsMorphTransformer => {
-  // The ESLint counterpart is `ignoredMutablePattern` in
-  // `libs/eslint-config-typed/src/rules/eslint-functional-rules.mts`; change
-  // the two together.
-  const ignorePrefixes = ISet.create(
-    options?.ignorePrefixes ?? ['mut_', '#mut_', '_mut_', 'draft'],
-  );
+  // Removed in 4.0.0; a caller without types would otherwise lose it silently.
+  const untypedOptions: unknown = options;
+
+  if (
+    isRecord(untypedOptions) &&
+    untypedOptions['ignorePrefixes'] !== undefined
+  ) {
+    throw new Error(
+      `The "ignorePrefixes" option of ${TRANSFORMER_NAME} was renamed to "mutableVariablePrefixes".`,
+    );
+  }
 
   const optionsInternal: AppendAsConstTransformerOptionsInternal = {
     applyLevel: options?.applyLevel ?? 'avoidInFunctionArgs',
-    ignoredPrefixes: ignorePrefixes,
+    mutableVariablePrefixes: ISet.create(
+      options?.mutableVariablePrefixes ?? DEFAULT_MUTABLE_PREFIXES,
+    ),
     removeAsConstForConstTypeParameters:
       options?.removeAsConstForConstTypeParameters ?? true,
 
@@ -66,13 +74,12 @@ export type AppendAsConstTransformerOptions = DeepReadonly<{
   applyLevel?: 'all' | 'avoidInFunctionArgs';
 
   /**
-   * A mute keywords to ignore the readonly conversion.
+   * Prefixes of the names of variables that are left mutable: their
+   * initializers get no `as const`.
    *
-   * (e.g. `"mut_"`)
-   *
-   * @default ['mut_', '#mut_', '_mut_', 'draft']
+   * @default ['mut_']
    */
-  ignorePrefixes?: string[];
+  mutableVariablePrefixes?: string[];
 
   /**
    * Whether to remove redundant `as const` assertions from call arguments
@@ -96,7 +103,7 @@ export type AppendAsConstTransformerOptions = DeepReadonly<{
 
 type AppendAsConstTransformerOptionsInternal = DeepReadonly<{
   applyLevel: 'all' | 'avoidInFunctionArgs';
-  ignoredPrefixes: ISet<string>;
+  mutableVariablePrefixes: ISet<string>;
   removeAsConstForConstTypeParameters: boolean;
 
   debugPrint: (...args: readonly unknown[]) => void;
@@ -146,11 +153,13 @@ const transformNode = (
   if (node.isKind(tsm.SyntaxKind.VariableDeclaration)) {
     const nodeName = node.getName();
 
-    // check for ignorePrefix
-    if (options.ignoredPrefixes.some((p) => nodeName.startsWith(p))) {
+    // check for mutableVariablePrefixes
+    if (options.mutableVariablePrefixes.some((p) => nodeName.startsWith(p))) {
       // Skip conversion for variable declarations with ignored prefixes
       // Example: const mut_foo: string[] = []; -> remains as is, without appending `as const`
-      options.debugPrint('skipped variable declaration by ignorePrefixes');
+      options.debugPrint(
+        'skipped variable declaration by mutableVariablePrefixes',
+      );
 
       return;
     }
@@ -192,13 +201,13 @@ const transformNode = (
     }
 
     // const [a, b] = ...;
-    // TODO: Support ignoredPrefixes in ArrayBindingPattern
+    // TODO: Support mutableVariablePrefixes in ArrayBindingPattern
     // if (ts.isArrayBindingPattern(nodeName)) {
     //   // for (const [i, el] of nodeName.elements.entries())
     // }
 
     // const { x, y } = ...;
-    // TODO: Support ignoredPrefixes in ObjectBindingPattern
+    // TODO: Support mutableVariablePrefixes in ObjectBindingPattern
     // if (ts.isObjectBindingPattern(nodeName)) {
     //   // for (const [i, el] of nodeName.elements.entries())
     // }

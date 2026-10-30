@@ -31,7 +31,7 @@ export const taskDraftInsight = (
   id: TaskId,
   draft: DeepReadonly<{
     progress: Progress;
-    dependencies: readonly Dependency[];
+    dependencies: Dependency[];
   }>,
   now: number,
 ): TaskDraftInsight => {
@@ -47,7 +47,7 @@ export const taskDraftInsight = (
     startedAt:
       draft.progress === 'not-started' ? undefined : (stored.startedAt ?? now),
     dependencies: draft.dependencies,
-  };
+  } as const;
 
   const context = buildEvaluationContext(state);
 
@@ -70,7 +70,7 @@ export const milestoneDraftInsight = (
     dateAllDay: boolean;
     requiresManualCheck: boolean;
     checkedAt: number | undefined;
-    dependencies: readonly Dependency[];
+    dependencies: Dependency[];
   }>,
   now: number,
   timeZone?: string,
@@ -95,7 +95,7 @@ export const milestoneDraftInsight = (
     requiresManualCheck: draft.requiresManualCheck,
     checkedAt: draft.checkedAt,
     dependencies: draft.dependencies,
-  };
+  } as const;
 
   const evaluator = createEvaluator(buildEvaluationContext(state), now);
 
