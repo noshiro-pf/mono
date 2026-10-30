@@ -1,5 +1,11 @@
 import * as path from 'node:path';
-import { Arr, isNonEmptyString, mapNullable } from 'ts-data-forge';
+import {
+  Arr,
+  isNonEmptyString,
+  isString,
+  mapNullable,
+  Obj,
+} from 'ts-data-forge';
 import type { MutableRecord, ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 
@@ -10,7 +16,8 @@ import * as ts from 'typescript';
  *
  * `readCompilerOptions` は tsconfig の compilerOptions を返す関数で、既定では
  * カレントディレクトリの tsconfig.json を読む。テストが `typescript` を
- * モジュールごと差し替えずにすむよう引数にしている。
+ * モジュールごと差し替えずにすむよう引数にしている。返す `paths` の値は
+ * カレントディレクトリからの相対パスとして扱う。
  */
 export const resolveImportPath = (
   importPath: string,
@@ -43,17 +50,8 @@ export const resolveImportPath = (
           continue;
         }
 
-        const pathValue: string =
-          mapNullable(pathIndex, (i) => value[i]) ?? value[0];
-
-        // `baseUrl` is deprecated in TypeScript 6.0, but this rule still
-        // needs to read it (if present) to resolve legacy `baseUrl`-relative
-        // `paths` entries the same way `tsc` does.
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        const { baseUrl } = tsconfigOptions;
-
         mut_importAliasMap[key] =
-          baseUrl !== undefined ? path.join(baseUrl, pathValue) : pathValue;
+          mapNullable(pathIndex, (i) => value[i]) ?? value[0];
       }
     }
   } catch {
@@ -80,22 +78,19 @@ export const resolveImportPath = (
   return path.normalize(absolutePath);
 };
 
-const readTsConfig = (tsconfigPath: string): ts.CompilerOptions | undefined => {
-  // プロジェクトルート探索: tsconfigPath がディレクトリならその中を探す
-  const basePath = ts.sys.directoryExists(tsconfigPath)
-    ? tsconfigPath
-    : path.dirname(tsconfigPath);
-
+/**
+ * Reads the tsconfig.json found from `cwd` upward, with `paths` rewritten as
+ * relative to `cwd`.
+ */
+export const readTsConfig = (cwd: string): ts.CompilerOptions | undefined => {
   const found = ts.findConfigFile(
-    basePath,
+    cwd,
     (filePath) => ts.sys.fileExists(filePath),
-    ts.sys.directoryExists(tsconfigPath)
-      ? 'tsconfig.json'
-      : path.basename(tsconfigPath),
+    'tsconfig.json',
   );
 
   if (found === undefined) {
-    // tsconfig not found under: ${tsconfigPath}
+    // tsconfig not found under: ${cwd}
     return undefined;
   }
 
@@ -122,5 +117,31 @@ const readTsConfig = (tsconfigPath: string): ts.CompilerOptions | undefined => {
 
   // undefined: 'Failed to parse tsconfig.'
   // result.options: 正規化済みの compilerOptions
-  return result?.options;
+  if (result?.options.paths === undefined) {
+    return result?.options;
+  }
+
+  // `baseUrl` is not read: `paths` are relative to the tsconfig.json that
+  // declares them, as `tsc` resolves them without `baseUrl`. That is
+  // `pathsBasePath` (internal to TypeScript) when it is an `extends` base.
+  const pathsBasePath = result.options['pathsBasePath'];
+
+  const baseDir = isString(pathsBasePath) ? pathsBasePath : path.dirname(found);
+
+  return {
+    ...result.options,
+    paths: Obj.map(result.options.paths, (values) =>
+      values.map((value) => relativeTo(cwd, baseDir, value)),
+    ),
+  };
+};
+
+/** Rewrites `value`, relative to `baseDir`, as relative to `cwd`. */
+const relativeTo = (cwd: string, baseDir: string, value: string): string => {
+  const relative = path.relative(cwd, path.resolve(baseDir, value));
+
+  const nonEmpty = relative === '' ? '.' : relative;
+
+  // `path.resolve` drops a trailing slash, which an alias with one relies on.
+  return value.endsWith('/') ? `${nonEmpty}/` : nonEmpty;
 };
