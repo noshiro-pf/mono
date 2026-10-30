@@ -170,6 +170,9 @@ catalogs:
     '@preact/signals':
       specifier: 2.11.3
       version: 2.11.3
+    '@preact/signals-core':
+      specifier: 1.14.4
+      version: 1.14.4
     '@reduxjs/toolkit':
       specifier: 2.13.0
       version: 2.13.0
@@ -281,6 +284,9 @@ catalogs:
     rxjs:
       specifier: 7.8.2
       version: 7.8.2
+    solid-js:
+      specifier: 1.9.17
+      version: 1.9.17
     tsx:
       specifier: 4.23.15
       version: 4.23.15
@@ -2520,6 +2526,9 @@ importers:
       '@astrojs/markdown-remark':
         specifier: 7.3.4
         version: 7.3.4(supports-color@7.2.0)
+      '@preact/signals-core':
+        specifier: 'catalog:'
+        version: 1.14.4
       '@reduxjs/toolkit':
         specifier: 'catalog:'
         version: 2.13.0(react@19.3.1)
@@ -2562,6 +2571,9 @@ importers:
       rxjs:
         specifier: 'catalog:'
         version: 7.8.2
+      solid-js:
+        specifier: 'catalog:'
+        version: 1.9.17
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
@@ -4293,6 +4305,9 @@ importers:
         specifier: workspace:^
         version: link:../ts-type-forge
     devDependencies:
+      '@preact/signals-core':
+        specifier: 'catalog:'
+        version: 1.14.4
       '@reduxjs/toolkit':
         specifier: 'catalog:'
         version: 2.13.0(react@19.3.1)
@@ -4344,6 +4359,9 @@ importers:
       rxjs:
         specifier: 'catalog:'
         version: 7.8.2
+      solid-js:
+        specifier: 'catalog:'
+        version: 1.9.17
       synstate-react-hooks:
         specifier: workspace:*
         version: link:../synstate-react-hooks

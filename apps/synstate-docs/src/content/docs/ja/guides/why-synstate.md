@@ -30,7 +30,7 @@ SynState は Observable パターンの上に構築されています。状態�
 
 実際にどのように機能するか、命令的なコードとの比較については[宣言的な状態管理](/mono/synstate/ja/guides/declarative-state-management/)を参照してください。
 
-## 高パフォーマンス、グリッチフリー
+## グリッチフリーで、コストは線形
 
 Observable パターン自体は新しいものではありません。RxJS が何年もかけて普及させてきました。しかし RxJS には**グリッチ問題**という根本的な正確性の課題があります。複数の派生値が共通のソースを持つとき、`combineLatest` は一部の入力が更新されたが他はまだ古いままの不整合な中間状態を emit してしまいます。この問題は依存グラフが複雑になるほど深刻化します。例えば、1つのソースから複数の派生値を作り再び結合する「ダイアモンド型」の依存関係では、結合の数に応じて冗長な計算が $O(n^2)$ にスケールし、さらにこのダイアモンドが直列に連なると $O(D^n)$（$D$ = 1段あたりの分岐数）と指数関数的に増大します。
 
@@ -44,6 +44,8 @@ SynState はこれを**深さ順伝播**アルゴリズムで解決していま�
 | **設計の焦点**              | 汎用的な非同期イベント処理                                                              | 状態管理が第一、非同期オペレーター（`debounce`、`switchMap` 等）も完全サポート |
 
 詳細な説明は [SynState はグリッチをどう解決したか](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/)を参照してください。
+
+比較の相手は RxJS だけではありません。Preact Signals と Solid もグリッチフリーで $O(n)$ です。Solid に対しては、[ベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)は小さなグラフで SynState に有利な結果を示しています。Preact Signals に対しては一貫した勝者はなく、シナリオによってどちらかが速いため、Preact Signals との違いは速度ではありません。SynState が加えるのは、前の節のオペレーター群を同じグリッチフリーなグラフの上で使えることです。Preact Signals では、debounce やキャンセル、最新のリクエストへの切り替えは effect の中に手で書くコードになります。単独で使うときに各ライブラリで何が必要かは [React の外での動作](/mono/synstate/ja/guides/library-comparison/library-comparison/#react-の外での動作)を参照してください。
 
 ## React Compiler と完全互換
 

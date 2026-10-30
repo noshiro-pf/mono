@@ -6,6 +6,7 @@
 catalog:
   '@playwright/test': 1.64.1
   '@preact/signals': 2.11.3
+  '@preact/signals-core': 1.14.4
   '@reduxjs/toolkit': 2.13.0
   '@testing-library/dom': 10.4.2
   '@testing-library/preact': 3.2.4
@@ -43,6 +44,7 @@ catalog:
   react: 19.3.1
   react-dom: 19.3.1
   rxjs: 7.8.2
+  solid-js: 1.9.17
   tsx: 4.23.15
   typedoc: 0.28.20
   typedoc-github-theme: 0.4.0

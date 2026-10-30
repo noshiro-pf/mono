@@ -1,4 +1,3 @@
-import type { SafeUint } from 'ts-type-forge';
 /**
  * Deep Chain Throughput Benchmark
  *
@@ -6,11 +5,13 @@ import type { SafeUint } from 'ts-type-forge';
  * (apps/synstate-docs/src/components/throughput-demo/adapters/) to ensure
  * the benchmark measures the same reactive chain topology.
  */
-import * as path from 'node:path';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import { performance } from 'node:perf_hooks';
-import { asSafeUint, range } from 'ts-data-forge';
-import { workspaceRootPath } from '../workspace-root-path.mjs';
+import { Arr, asSafeUint, range } from 'ts-data-forge';
+import type {
+  Point,
+  SpringAdapter,
+} from '../../src/components/spring-demo/index.mjs';
 import {
   type BenchmarkSeries,
   formatBenchmarkCell,
@@ -28,6 +29,12 @@ const MEASURE_ROUNDS = 5;
 /** Abort if a single measurement exceeds this threshold */
 const TIMEOUT_MS = 5000;
 
+/** The chain depth {@link assertReacts} sets an adapter up with. */
+const VERIFY_DEPTH = 3;
+
+/** The updates {@link assertReacts} drives an adapter through. */
+const VERIFY_UPDATES = 10;
+
 const PARAMS: readonly (readonly [k: number, depth: number])[] = [
   [100, 50],
   [500, 50],
@@ -41,66 +48,52 @@ const PARAMS: readonly (readonly [k: number, depth: number])[] = [
 
 // --- Import adapters from the docs throughput demo ---
 
-// A path rather than an import so that this stays the one module the runner
-// loads dynamically, alongside the scenario files. The adapters are in this
-// package now — the reason it used to be a cross-package path (a library must
-// not depend on an application) went away with the move.
-const docsAdaptersDir = path.resolve(
-  workspaceRootPath,
-  'src/components/throughput-demo/adapters/index.mjs',
-);
+// Dynamically, so that the adapters, and the libraries they import, load after
+// `selectProductionBuilds` (see production-builds.mts).
+const adapters =
+  await import('../../src/components/throughput-demo/adapters/index.mjs');
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
-const adapters: any = await import(docsAdaptersDir);
-
-const CANVAS_WIDTH = 500;
-
-const CANVAS_HEIGHT = 400;
+// The demo's canvas, whose centre the adapters start their chains at, and the
+// spring step each stage takes, which `expectedPoints` models.
+const { CANVAS_WIDTH, CANVAS_HEIGHT, SPRING_FACTOR, lerp } = adapters;
 
 const ORBIT_RADIUS = 150;
 
 const ORBIT_SPEED = 0.05;
 
-type Adapter = Readonly<{
-  name: string;
-  setup: (
-    chainDepth: SafeUint,
-    callbacks: Readonly<{ onEmit: (points: readonly unknown[]) => void }>,
-  ) => void;
-  onMouseMove: (pos: Readonly<{ x: number; y: number }>) => void;
-  cleanup: () => void;
-}>;
-
 type AdapterEntry = Readonly<{
   label: string;
-  createAdapter: () => Adapter;
+  createAdapter: () => SpringAdapter;
 }>;
 
 const entries: readonly AdapterEntry[] = [
   {
     label: '**SynState**',
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, total-functions/no-unsafe-type-assertion
-    createAdapter: adapters.createSynStateThroughputAdapter as () => Adapter,
+    createAdapter: adapters.createSynStateThroughputAdapter,
   },
   {
     label: 'RxJS',
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, total-functions/no-unsafe-type-assertion
-    createAdapter: adapters.createRxJSThroughputAdapter as () => Adapter,
+    createAdapter: adapters.createRxJSThroughputAdapter,
   },
   {
     label: 'Jotai',
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, total-functions/no-unsafe-type-assertion
-    createAdapter: adapters.createJotaiThroughputAdapter as () => Adapter,
+    createAdapter: adapters.createJotaiThroughputAdapter,
   },
   {
     label: 'MobX',
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, total-functions/no-unsafe-type-assertion
-    createAdapter: adapters.createMobXThroughputAdapter as () => Adapter,
+    createAdapter: adapters.createMobXThroughputAdapter,
   },
   {
     label: 'Redux',
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, total-functions/no-unsafe-type-assertion
-    createAdapter: adapters.createReduxThroughputAdapter as () => Adapter,
+    createAdapter: adapters.createReduxThroughputAdapter,
+  },
+  {
+    label: 'Solid',
+    createAdapter: adapters.createSolidThroughputAdapter,
+  },
+  {
+    label: 'Preact Signals',
+    createAdapter: adapters.createPreactSignalsThroughputAdapter,
   },
 ] as const;
 
@@ -115,7 +108,7 @@ const median = (sorted: readonly number[]): number => {
 /**
  * Run one measurement: setup adapter with given depth, push K updates, cleanup.
  */
-const runOnce = (adapter: Adapter, k: number, depth: number): number => {
+const runOnce = (adapter: SpringAdapter, k: number, depth: number): number => {
   adapter.setup(asSafeUint(depth), {
     onEmit: () => {
       // no-op — just consume the emission
@@ -146,12 +139,110 @@ const runOnce = (adapter: Adapter, k: number, depth: number): number => {
 };
 
 /**
+ * The head and stages {@link assertReacts} expects: from the canvas centre,
+ * each update moves the head to (i, i) and each stage a spring step towards
+ * the stage before it, in chain order.
+ */
+const expectedPoints = (): readonly Point[] => {
+  const start: Point = { x: CANVAS_WIDTH / 2, y: CANVAS_HEIGHT / 2 } as const;
+
+  let mut_head = start;
+
+  let mut_stages: readonly Point[] = Array.from(
+    { length: VERIFY_DEPTH },
+    () => start,
+  );
+
+  for (const mut_i of range(1, asSafeUint(VERIFY_UPDATES + 1))) {
+    mut_head = { x: mut_i, y: mut_i };
+
+    let mut_prev = mut_head;
+
+    mut_stages = mut_stages.map((stage) => {
+      mut_prev = lerp(stage, mut_prev, SPRING_FACTOR);
+
+      return mut_prev;
+    });
+  }
+
+  return Arr.toUnshifted(mut_head)(mut_stages);
+};
+
+/**
+ * Fails the run when an adapter does not compute the chain: fewer emissions
+ * than updates, or last points other than the spring model's.
+ *
+ * The timed runs' `onEmit` consumes the points and checks nothing, so a chain
+ * that never propagates would be timed as a very fast one. That is what a
+ * Solid adapter importing `solid-js` gets under Node — the server build, in
+ * which no effect runs. At least one emission per update rather than exactly
+ * one, because RxJS's `combineLatest` emits once per stage (see the page).
+ */
+const assertReacts = (entry: AdapterEntry): void => {
+  const adapter = entry.createAdapter();
+
+  let mut_emissions = 0;
+
+  let mut_last: readonly Point[] = [];
+
+  adapter.setup(asSafeUint(VERIFY_DEPTH), {
+    onEmit: (points) => {
+      mut_emissions += 1;
+
+      mut_last = points;
+    },
+  });
+
+  const afterSetup = mut_emissions;
+
+  for (const mut_i of range(1, asSafeUint(VERIFY_UPDATES + 1))) {
+    adapter.onMouseMove({ x: mut_i, y: mut_i });
+  }
+
+  adapter.cleanup();
+
+  const emitted = mut_emissions - afterSetup;
+
+  if (emitted < VERIFY_UPDATES) {
+    console.error(
+      `❌ ${entry.label}: ${emitted.toString()} emissions for ${VERIFY_UPDATES.toString()} updates — the chain does not propagate`,
+    );
+
+    process.exit(1);
+  }
+
+  const expected = expectedPoints();
+
+  const matches =
+    mut_last.length === expected.length &&
+    expected.every((point, i) => {
+      const actual = mut_last[i];
+
+      return (
+        actual !== undefined &&
+        Math.abs(actual.x - point.x) < 1e-9 &&
+        Math.abs(actual.y - point.y) < 1e-9
+      );
+    });
+
+  if (matches) {
+    return;
+  }
+
+  console.error(
+    `❌ ${entry.label}: the last points ${JSON.stringify(mut_last)} are not the spring model's ${JSON.stringify(expected)}`,
+  );
+
+  process.exit(1);
+};
+
+/**
  * Runs the measured rounds for a single parameter pair, bailing out as soon as a
  * round exceeds the timeout. Extracted into its own function so that the round
  * loop is not nested inside the entry/parameter loops.
  */
 const measureRounds = (
-  adapter: Adapter,
+  adapter: SpringAdapter,
   k: number,
   depth: number,
 ): Readonly<{ times: readonly number[]; timedOut: boolean }> => {
@@ -175,11 +266,19 @@ const measureRounds = (
 };
 
 /**
- * Measures every parameter pair for a single adapter. Extracted into its own
- * function so that the parameter loop is not nested inside the entry loop.
+ * Measures every parameter pair for a single adapter, after
+ * {@link assertReacts}, which ends the run if the adapter does not compute the
+ * chain. Extracted into its own function so that the parameter loop is not
+ * nested inside the entry loop.
  */
 const measureEntry = (entry: AdapterEntry): readonly (number | null)[] => {
   const { label, createAdapter } = entry;
+
+  // Just before this library's own rounds rather than every library's check
+  // up front, so that the shared `lerp` has seen no library measured after
+  // this one: the check adds only this library's own points and the model's
+  // plain ones.
+  assertReacts(entry);
 
   const mut_values: (number | null)[] = [];
 

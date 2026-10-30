@@ -66,6 +66,7 @@
   },
   "devDependencies": {
     "@astrojs/markdown-remark": "7.3.4",
+    "@preact/signals-core": "catalog:",
     "@reduxjs/toolkit": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
@@ -80,6 +81,7 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "rxjs": "catalog:",
+    "solid-js": "catalog:",
     "ts-data-forge": "workspace:*",
     "ts-repo-utils": "workspace:*"
   }

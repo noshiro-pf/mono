@@ -16,10 +16,7 @@
   //
   // - `files` and `exports`: an export nothing imports yet is what unfinished
   //   work looks like, and failing CI for it makes the check something to work
-  //   around. knip also cannot see every use: `run-benchmark-deep-chain.mts`
-  //   reaches the throughput adapters through `await import(<computed path>)`
-  //   assigned to `any`, so `createRxJSThroughputAdapter` reads as unused
-  //   while being the RxJS row of that benchmark.
+  //   around.
   // - `duplicates`: 21 hits, every one an alias this repository publishes on
   //   purpose (`combine`/`combineLatest`, `foldl`/`reduce`, …).
   // - `types`: the hits are types a `types.mts` exports as the vocabulary of

@@ -30,7 +30,7 @@ SynState is built on the Observable pattern — a model where state is represent
 
 To see how this works in practice — and how it compares to imperative code — see [Declarative State Management](/mono/synstate/guides/declarative-state-management/).
 
-## High Performance, Glitch-Free
+## Glitch-Free, at Linear Cost
 
 The Observable pattern is not new — RxJS has popularized it for years. However, RxJS has a fundamental correctness issue known as the **glitch problem**: when multiple derived values share a common source, `combineLatest` can emit inconsistent intermediate states where some inputs have updated but others have not. This problem worsens as the dependency graph grows more complex. For example, in "diamond" dependencies — where a single source fans out to multiple derived values that are then recombined — the redundant computations scale as $O(n^2)$ with the number of recombinations, and when such diamonds are chained in series, the cost grows exponentially — $O(D^n)$ where $D$ is the number of branches per stage.
 
@@ -44,6 +44,8 @@ SynState solves this with a **depth-ordered propagation** algorithm that guarant
 | **Design focus**            | General-purpose asynchronous event processing                                    | State management first, with full async operator support (`debounce`, `switchMap`, etc.) |
 
 For a detailed explanation, see [How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/).
+
+RxJS is not the only library to compare against. Preact Signals and Solid are glitch-free and $O(n)$ as well. Against Solid, the [benchmark](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page) favours SynState on small graphs; against Preact Signals it names no consistent winner, each being faster in some scenarios, so speed is not what sets SynState apart from it. What SynState adds is the operator set of the previous section on the same glitch-free graph: with Preact Signals, a debounce, a cancellation or a switch to the latest request is code written by hand inside an effect. See [Running Outside React](/mono/synstate/guides/library-comparison/library-comparison/#running-outside-react) for what each library takes when used on its own.
 
 ## Fully Compatible with React Compiler
 

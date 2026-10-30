@@ -21,8 +21,9 @@
  * - The same two libraries with `switchMap` (the "(switchMap)" rows): only
  *   the selected branch is subscribed, as in the dynamic graphs below.
  *
- * - Dynamic graphs (Jotai, MobX): the inactive branch is not in the
- *   dependency set, so updates do not trigger recomputation at all.
+ * - Dynamic graphs (Jotai, MobX, Solid, Preact Signals): the inactive branch
+ *   is not in the dependency set, so updates do not trigger recomputation at
+ *   all.
  */
 import * as path from 'node:path';
 import { range } from 'ts-data-forge';
@@ -73,6 +74,11 @@ const entries: readonly BenchmarkEntry[] = [
   { label: 'Jotai', file: '05-conditional-fan-out.jotai.mts' },
   { label: 'MobX', file: '05-conditional-fan-out.mobx.mts' },
   { label: 'Redux', file: '05-conditional-fan-out.redux.mts' },
+  { label: 'Solid', file: '05-conditional-fan-out.solid.mts' },
+  {
+    label: 'Preact Signals',
+    file: '05-conditional-fan-out.preact-signals.mts',
+  },
 ] as const;
 
 const median = (sorted: readonly number[]): number => {

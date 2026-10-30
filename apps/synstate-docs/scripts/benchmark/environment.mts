@@ -12,7 +12,7 @@ import { scenarioDir } from './paths.mjs';
  * a number is only comparable with another measured against the same versions,
  * and CI re-measures exactly when one of these moves. So it has to name every
  * library any scenario imports — `benchmark:conditional-fan-out` compares
- * against four of them, `benchmark:derived-chain` against six.
+ * against six of them, `benchmark:derived-chain` against eight.
  */
 export const comparisonLibraries = [
   'synstate',
@@ -22,6 +22,8 @@ export const comparisonLibraries = [
   '@reduxjs/toolkit',
   'zustand',
   'valtio',
+  'solid-js',
+  '@preact/signals-core',
 ] as const;
 
 /**

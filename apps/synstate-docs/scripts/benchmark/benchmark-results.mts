@@ -62,7 +62,9 @@ export const formatBenchmarkCell = (
 ): string =>
   value === null
     ? (`> ${timeoutMs.toString()} ms` as const)
-    : (`${value.toFixed(1)} ms` as const);
+    : // From the hundredths the JSON keeps (see `normalize`), so that a cell
+      // and a sentence quoting the same value from the JSON round alike.
+      (`${toHundredths(value).toFixed(1)} ms` as const);
 
 /**
  * Renders a single-point scenario's rows as the Markdown table the docs embed.
@@ -286,7 +288,10 @@ const padCell = (
  * part of the library's name. And a raw measurement carries every digit the
  * clock produced, so the JSON would disagree with the table it was written
  * with and would churn the diff on every run; each value is rounded to the
- * precision its table column shows.
+ * precision its table column shows, and a sweep's values to one digit more.
+ * A sweep's cell shows tenths of a millisecond, and the fastest row of the
+ * cascaded diamond is a few tenths: it is the denominator of that scenario's
+ * ratios, which a tenth would move by up to half.
  */
 const normalize = (
   data: BenchmarkResults,
@@ -299,7 +304,7 @@ const normalize = (
         xLabels: data.xLabels,
         series: data.series.map((s) => ({
           label: plainLabel(s.label),
-          values: s.values.map((v) => (v === null ? null : round(v, 1))),
+          values: s.values.map((v) => (v === null ? null : toHundredths(v))),
         })),
       } as const)
     : ({
@@ -307,15 +312,15 @@ const normalize = (
         meta: { ...data.meta, environment },
         rows: data.rows.map((r) => ({
           label: plainLabel(r.label),
-          median: round(r.median, 2),
-          min: round(r.min, 2),
-          max: round(r.max, 2),
-          p95: round(r.p95, 2),
+          median: toHundredths(r.median),
+          min: toHundredths(r.min),
+          max: toHundredths(r.max),
+          p95: toHundredths(r.p95),
           opsPerSec: r.opsPerSec,
         })),
       } as const);
 
 const plainLabel = (label: string): string => label.replaceAll('*', '');
 
-const round = (value: number, digits: 1 | 2): number =>
-  Result.unwrapOkOr(Num.safeParseFloat(value.toFixed(digits)), Number.NaN);
+const toHundredths = (value: number): number =>
+  Result.unwrapOkOr(Num.safeParseFloat(value.toFixed(2)), Number.NaN);

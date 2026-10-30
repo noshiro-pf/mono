@@ -6,6 +6,8 @@ import {
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   eslintImportsRules,
+  mergeRestrictedImportsOptions,
+  restrictedImportsOptions,
   typescriptEslintRules,
   type FlatConfig,
 } from 'eslint-config-typed';
@@ -112,6 +114,33 @@ export default [
         {
           whitelist: ['synstate-react-hooks', 'synstate-react-hooks-compat'],
         },
+      ],
+    }),
+  },
+
+  // Solid's root export is its server build under Node, where nothing
+  // reacts; the benchmark imports the client build through one shim
+  // (`solid-js-client.mts`, beside the files it serves), and a bare import
+  // would measure a graph that never updates.
+  {
+    files: ['samples/docs-site/benchmark/**'],
+    ignores: ['**/*.d.mts'],
+    rules: defineKnownRules({
+      'no-restricted-imports': [
+        'error',
+        mergeRestrictedImportsOptions(restrictedImportsOptions, {
+          // `solid-js/store`, `solid-js/web` and the rest resolve to server
+          // builds too. The shim's own deep import is exempted beside it, and
+          // a type-only import is allowed, since it is erased.
+          patterns: [
+            {
+              regex: String.raw`^solid-js(?:/|$)`,
+              allowTypeImports: true,
+              message:
+                "Import Solid through './solid-js-client.mjs', whose client build reacts under Node.",
+            },
+          ],
+        }),
       ],
     }),
   },

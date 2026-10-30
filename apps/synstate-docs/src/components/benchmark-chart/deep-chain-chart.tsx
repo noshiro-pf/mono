@@ -35,6 +35,8 @@ const colors = {
   Jotai: '#f59e0b',
   MobX: '#8b5cf6',
   Redux: '#14b8a6',
+  Solid: '#ec4899',
+  'Preact Signals': '#84cc16',
 } as const;
 
 // The bar chart wants one group per (K, M) point, and takes the labels from
