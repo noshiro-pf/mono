@@ -1,5 +1,13 @@
 ## [2.2.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.4...v2.2.5) (2026-08-09)
 
+## 3.5.1
+
+### Patch Changes
+
+- 3a17c76: `convert-to-readonly` no longer wraps a type literal that has a property, a method or an accessor of an ignored prefix (`ignorePrefixes`, `mut_` among the defaults) with `Readonly<...>`, which made that property readonly too. Such a literal is now marked `readonly` member by member, as an interface is, and the ignored member is left as written: `{ mut_a: number[]; b: string[] }` becomes `{ mut_a: number[]; readonly b: readonly string[] }` rather than `Readonly<{ mut_a: number[]; b: readonly string[] }>`. A `Readonly<...>` around such a literal, including one an earlier version wrote, is taken off the same way, and in a union or intersection the literal is kept out of the `Readonly<...>` the other type literals are merged into. Only that literal is affected: its ancestors are still wrapped with the shallow `Readonly<...>`, which leaves a nested property mutable, `convert-to-readonly` never adds a `DeepReadonly`, and a `DeepReadonly<...>` in the source is kept. A literal that also has a method signature or an accessor without such a prefix (which take no `readonly` modifier), or a property or index signature skipped by a `transformer-ignore-next-line` comment, keeps its `Readonly<...>`, so that none of those changes; so does a `Readonly<...>` written around a literal with a call or construct signature, and one around an intersection with a member that may be an array. A computed property name written as a template literal without substitutions (``[`mut_a`]``) is now recognized as well.
+
+    `draft` stays among the default prefixes, so a property named `draft` (`{ draft: boolean; tag: string }`) is now left mutable the same way. To keep such a type wrapped, put `// transformer-ignore-next-line convert-to-readonly` above it, or, calling the library, name the prefixes in `ignorePrefixes` without `draft` (`ts-codemod-cli` has no option for them).
+
 ## 3.5.0
 
 ### Minor Changes

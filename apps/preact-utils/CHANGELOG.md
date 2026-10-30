@@ -1,5 +1,12 @@
 # preact-utils
 
+## 0.0.18
+
+### Patch Changes
+
+- Updated dependencies [388a021]
+    - synstate@6.1.0
+
 ## 0.0.17
 
 ### Patch Changes
