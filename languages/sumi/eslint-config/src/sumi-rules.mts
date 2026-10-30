@@ -36,21 +36,13 @@ export const sumiRules = defineKnownRules({
   // the remaining cases with `+= 1` (spec/variables-and-mutation.md).
   'no-plusplus': ['error', { allowForLoopAfterthoughts: false }],
 
-  // 🔧 functional/no-let (D-14): `mut_` is the only mutable-name prefix; the
-  // base config's `^_mut_` / `^#mut_` variants are dropped.
-  'functional/no-let': [
-    'error',
-    {
-      allowInForLoopInit: false,
-      allowInFunctions: false,
-      ignoreIdentifierPattern: ['^mut_'],
-    },
-  ],
+  // functional/no-let (D-14) is the base config's: `mut_` is its only
+  // mutable-name prefix too.
 
-  // 🔧 functional/immutable-data (D-14, D-12): `^draft` is dropped — an immer
-  // draft must be named `mut_draft`. The base config's `this`/`super` ignores
-  // and ignoreClasses become dead weight under the class ban (D-12) and are
-  // dropped with it. The remaining accessor entries are practical boundary
+  // 🔧 functional/immutable-data (D-14, D-12): `mut_` is the only mutable-name
+  // prefix, as in the base config (an immer draft is `mut_draft`). The base
+  // config's `this`/`super` ignores and ignoreClasses become dead weight under
+  // the class ban (D-12) and are dropped with it. The remaining accessor entries are practical boundary
   // exceptions the spec has yet to codify (enforcement-map 備考).
   'functional/immutable-data': [
     'error',

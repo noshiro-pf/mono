@@ -45,6 +45,6 @@ export const cardPositionsReducer: Reducer<
   ReadonlyRecord<CardColor, FixedLengthTuple<12, Rect>> | undefined,
   readonly [CardColor, CardNumber, Rect]
 > = (state, [color, number, rect]) =>
-  produce(state ?? initialState(), (draft) => {
-    draft[color][number] = rect;
+  produce(state ?? initialState(), (mut_draft) => {
+    mut_draft[color][number] = rect;
   });

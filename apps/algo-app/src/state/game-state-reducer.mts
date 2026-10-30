@@ -23,12 +23,15 @@ const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
   state,
   action,
 ) =>
-  produce(state, (draft) => {
-    draft.answerSelected = answerSelectedReducer(state.answerSelected, action);
+  produce(state, (mut_draft) => {
+    mut_draft.answerSelected = answerSelectedReducer(
+      state.answerSelected,
+      action,
+    );
 
     switch (state.phase) {
       case 'ph010_selectMyCardToToss':
-        draft.cardChosenToToss = cardChosenToTossReducer(
+        mut_draft.cardChosenToToss = cardChosenToTossReducer(
           state.cardChosenToToss,
           action,
         );
@@ -37,7 +40,7 @@ const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
 
       case 'ph020_firstAnswer':
       case 'ph030_continuousAnswer':
-        draft.cardChosenToAttack = cardChosenToAttackReducer(
+        mut_draft.cardChosenToAttack = cardChosenToAttackReducer(
           state.cardChosenToAttack,
           action,
         );
@@ -45,27 +48,27 @@ const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
         break;
     }
 
-    draft.cardChosenToBeAttacked = cardChosenToBeAttackedReducer(
+    mut_draft.cardChosenToBeAttacked = cardChosenToBeAttackedReducer(
       state.cardChosenToBeAttacked,
       action,
     );
 
-    draft.confirmTossBalloonIsOpen = confirmTossBalloonIsOpenReducer(
+    mut_draft.confirmTossBalloonIsOpen = confirmTossBalloonIsOpenReducer(
       state.confirmTossBalloonIsOpen,
       action,
     );
 
-    draft.selectAnswerBalloonIsOpen = selectAnswerBalloonIsOpenReducer(
+    mut_draft.selectAnswerBalloonIsOpen = selectAnswerBalloonIsOpenReducer(
       state.selectAnswerBalloonIsOpen,
       action,
     );
 
-    draft.decidedAnswerBalloonIsOpen = decidedAnswerBalloonIsOpenReducer(
+    mut_draft.decidedAnswerBalloonIsOpen = decidedAnswerBalloonIsOpenReducer(
       state.decidedAnswerBalloonIsOpen,
       action,
     );
 
-    draft.readonly = readonlyReducer(draft.readonly, action);
+    mut_draft.readonly = readonlyReducer(mut_draft.readonly, action);
 
     switch (action.type) {
       case 'selectMyCard':
@@ -84,19 +87,19 @@ const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
           return;
         }
 
-        tossCard(draft, state.cardChosenToToss);
+        tossCard(mut_draft, state.cardChosenToToss);
 
-        draft.phase = 'ph020_firstAnswer';
+        mut_draft.phase = 'ph020_firstAnswer';
 
         break;
 
       case 'submitAnswer':
-        draft.readonly = true;
+        mut_draft.readonly = true;
 
         break;
 
       case 'showJudgeOnDecidedAnswer':
-        if (draft.answerSelected === undefined) {
+        if (mut_draft.answerSelected === undefined) {
           console.warn(
             'gameState.answerSelected should not be undefined here.',
           );
@@ -104,7 +107,7 @@ const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
           return;
         }
 
-        if (draft.cardChosenToBeAttacked === undefined) {
+        if (mut_draft.cardChosenToBeAttacked === undefined) {
           console.warn(
             'gameState.cardChosenToBeAttacked should not be undefined here.',
           );
@@ -112,20 +115,20 @@ const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
           return;
         }
 
-        draft.judgeResult = cardEq(
-          draft.answerSelected,
-          draft.cardChosenToBeAttacked,
+        mut_draft.judgeResult = cardEq(
+          mut_draft.answerSelected,
+          mut_draft.cardChosenToBeAttacked,
         )
           ? 'o'
           : 'x';
 
-        switch (draft.judgeResult) {
+        switch (mut_draft.judgeResult) {
           case 'o':
-            faceUpCard(draft, draft.cardChosenToBeAttacked);
+            faceUpCard(mut_draft, mut_draft.cardChosenToBeAttacked);
 
             break;
           case 'x':
-            faceUpCard(draft, draft.cardChosenToAttack);
+            faceUpCard(mut_draft, mut_draft.cardChosenToAttack);
 
             break;
         }
@@ -133,17 +136,17 @@ const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
         break;
 
       case 'hideDecidedAnswerBalloon':
-        switch (draft.judgeResult) {
+        switch (mut_draft.judgeResult) {
           case 'x':
-            draft.cardChosenToAttack = undefined;
+            mut_draft.cardChosenToAttack = undefined;
 
-            goToNextTurn(draft);
+            goToNextTurn(mut_draft);
 
             break;
           case 'o':
-            switch (draft.phase) {
+            switch (mut_draft.phase) {
               case 'ph020_firstAnswer':
-                draft.phase = 'ph030_continuousAnswer';
+                mut_draft.phase = 'ph030_continuousAnswer';
 
                 break;
               case 'ph010_selectMyCardToToss':
@@ -156,12 +159,12 @@ const gameStateReducer1Step: Reducer<GameState, GameStateAction> = (
             break;
         }
 
-        draft.judgeResult = undefined;
+        mut_draft.judgeResult = undefined;
 
         break;
 
       case 'goToNextTurn':
-        goToNextTurn(draft);
+        goToNextTurn(mut_draft);
 
         break;
     }

@@ -6,7 +6,8 @@
  * The ESLint counterpart is `ignoredMutablePattern` in
  * `libs/eslint-config-typed/src/rules/eslint-functional-rules.mts` (and, for a
  * property, the `ignoreAccessorPattern` of `functional/immutable-data` there);
- * change them together.
+ * `libs/eslint-config-typed/src/rules/eslint-functional-rules.test.mts` fails
+ * when the two differ; it reads this package's `dist/`, so build first.
  */
 export const DEFAULT_MUTABLE_PREFIXES: readonly string[] = Object.freeze([
   'mut_',

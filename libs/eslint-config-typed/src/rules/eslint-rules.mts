@@ -124,14 +124,6 @@ export const restrictedSyntax = [
   //   selector: "TSAsExpression[typeAnnotation.typeName.name!='const']",
   //   message: "Don't use `as`.",
   // },
-
-  // TODO
-  // {
-  //   selector:
-  //     "Identifier[name='draft'][parent.parent.callee.name!='produce'][parent.parent.parent.parent.parent.parent.callee.name!='produce']",
-  //   message:
-  //     "Don't use the identifier name `draft` except in immer produce function.",
-  // },
 ] as const satisfies EslintRulesOption['no-restricted-syntax'];
 
 /**

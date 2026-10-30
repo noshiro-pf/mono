@@ -608,9 +608,9 @@ const initialState: State = {
 
 const newItems = ['newItem1', 'newItem2'] as const;
 
-const updatedState = produce(initialState, (draft) => {
-    // draft.items expects mutable array, but newItems is readonly
-    draft.items = castMutable(newItems); // Safe cast for assignment
+const updatedState = produce(initialState, (mut_draft) => {
+    // mut_draft.items expects mutable array, but newItems is readonly
+    mut_draft.items = castMutable(newItems); // Safe cast for assignment
 });
 
 assert.deepStrictEqual(initialState.items, ['item1', 'item2']);
