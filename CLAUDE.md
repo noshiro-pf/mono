@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-<!-- cspell:ignore xhigh -->
-
 Instructions for this repository, maintained by hand. There is no `AGENTS.md`.
 
 ## What belongs in this file
@@ -310,7 +308,7 @@ ingest the feed). Outside reports come through private vulnerability reporting
   `noshiro-pf/mono-screenshots` is part of the work; never commit them here.
   `docs/pr-screenshots.md` says how.
 - **The last step before `open-pr`, and before pushing any later amend, is
-  `/code-review xhigh`** of the diff from the base, generated output aside.
+  `/code-review high`** of the diff from the base, generated output aside.
   Fix each finding here, defer it to an issue, or dismiss it with the reason
   in the description. Review again after a round that changed the diff,
   rerunning the checks it touches; a round that changes nothing ends it.
