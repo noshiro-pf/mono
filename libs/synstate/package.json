@@ -46,7 +46,7 @@
     "fmt": "pnpm run fix:fmt",
     "gen": "run-s gen:index gen:readme gen:jsdoc gen:sample-diffs",
     "gen:index": "run-s gen:index:src fix:fmt",
-    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts --exclude \"core/class/**\" --exclude \"core/utils/**\"",
+    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts --exclude \"core/class/**\" --exclude \"core/utils/**\" --exclude utils/state-source.mts",
     "gen:jsdoc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples-in-jsdoc.mts",
     "gen:readme": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples.mts",
     "gen:sample-diffs": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/generate-sample-diffs.mts",

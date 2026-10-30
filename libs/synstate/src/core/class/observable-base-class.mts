@@ -23,6 +23,7 @@ import type {
 } from '../types/index.mjs';
 import {
   getCurrentScopeInternals,
+  issueUnqueuedToken,
   notUpdatedYet,
   observableBrand,
   toSubscriber,
@@ -176,6 +177,25 @@ export class ObservableBaseClass<
         s.onNext(nextValue);
       }
     }
+  }
+
+  /**
+   * Stores `nextValue` and returns `true` when nothing observes this
+   * observable — no child to queue and no subscriber to call — so that the
+   * caller need not open an update; returns `false`, storing nothing,
+   * otherwise. The value still gets a token of its own, so that whoever
+   * stored the last one sees that it emitted.
+   */
+  protected setNextIfUnobserved(nextValue: A): boolean {
+    if (this.hasChild || this.hasSubscriber) {
+      return false;
+    }
+
+    this.#mut_updateToken = issueUnqueuedToken();
+
+    this.#mut_snapshot = Optional.some(nextValue);
+
+    return true;
   }
 
   /**

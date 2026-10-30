@@ -1,26 +1,6 @@
 import type { InitializedObservable } from '../core/index.mjs';
-import { createReducer, type StateOptions } from './create-reducer.mjs';
-
-type Action<S> = Readonly<
-  | {
-      type: 'set';
-      nextState: S;
-    }
-  | {
-      type: 'update';
-      updateFn: (a: S) => S;
-    }
->;
-
-const reducer = <S,>(state: S, action: Action<S>): S => {
-  switch (action.type) {
-    case 'set':
-      return action.nextState;
-
-    case 'update':
-      return action.updateFn(state);
-  }
-};
+import type { StateOptions } from './create-reducer.mjs';
+import { createStateSource } from './state-source.mjs';
 
 /**
  * Creates a reactive state container with getter and setter methods.
@@ -161,19 +141,22 @@ export const createState = <S,>(
     initialState: S;
   }>,
 ] => {
-  const [state, dispatch, { getSnapshot }] = createReducer<S, Action<S>>(
-    reducer,
+  const { state, getSnapshot, commit } = createStateSource(
     initialState,
     options,
   );
 
-  const updateState = (updateFn: (prev: S) => S): S =>
-    dispatch({ type: 'update', updateFn });
+  // Each compares with the state the write started from, as `dispatch`
+  // does, and builds nothing on the way.
+  const updateState = (updateFn: (prev: S) => S): S => {
+    const currentState = getSnapshot();
 
-  const setState = (nextState: S): S => dispatch({ type: 'set', nextState });
+    return commit(currentState, updateFn(currentState));
+  };
 
-  const resetState = (): S =>
-    dispatch({ type: 'set', nextState: initialState });
+  const setState = (nextState: S): S => commit(getSnapshot(), nextState);
+
+  const resetState = (): S => commit(getSnapshot(), initialState);
 
   return [
     state,

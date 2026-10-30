@@ -18,8 +18,9 @@ import type { UpdateToken } from '../types/index.mjs';
 import type { ChildNode } from './observable-node.mjs';
 
 /**
- * How many `startUpdate` calls are running, across every observable, and
- * the token of the outermost one.
+ * How many updates are propagating, across every observable, and the token
+ * of the outermost one. A write nothing observes opens none
+ * (`setNextIfUnobserved`).
  */
 const mut_propagation: {
   depth: number;
@@ -28,7 +29,7 @@ const mut_propagation: {
 
 /**
  * Work deferred by {@link runAfterPropagation}, run once the outermost
- * `startUpdate` has reached every descendant.
+ * update has reached every descendant.
  */
 const mut_afterPropagation: (() => void)[] = [];
 
@@ -57,7 +58,10 @@ export const runAfterPropagation = (task: () => void): void => {
   }
 };
 
-/** Brackets one `startUpdate`; see {@link endPropagation}. */
+/**
+ * Brackets one update a `startUpdate` opens (a write nothing observes opens
+ * none); see {@link endPropagation}.
+ */
 export const beginPropagation = (updateToken: UpdateToken): void => {
   if (mut_propagation.depth === 0) {
     mut_propagation.outermostToken = updateToken;
@@ -67,8 +71,8 @@ export const beginPropagation = (updateToken: UpdateToken): void => {
 };
 
 /**
- * Ends one `startUpdate`, and runs the deferred work once the outermost one
- * has ended.
+ * Ends one update, and runs the deferred work once the outermost one has
+ * ended.
  */
 export const endPropagation = (): void => {
   mut_propagation.depth -= 1;

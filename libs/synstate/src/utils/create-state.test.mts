@@ -77,6 +77,24 @@ describe(createState, () => {
     assert.deepStrictEqual(seen, [held]);
   });
 
+  test('updateState compares the result with the state updateFn was given', () => {
+    const [state, setState, { updateState }] = createState(0);
+
+    const seen = record(state);
+
+    // updateFn writes the state itself, then returns what it was given:
+    // equal to that, so nothing more is written and 5 stays.
+    updateState((prev) => {
+      setState(5);
+
+      return prev;
+    });
+
+    assert.deepStrictEqual(seen, [0, 5]);
+
+    assert.strictEqual(state.getSnapshot().value, 5);
+  });
+
   describe('keepEqualParts', () => {
     type Report = Readonly<{
       summary: Readonly<{ open: number }>;

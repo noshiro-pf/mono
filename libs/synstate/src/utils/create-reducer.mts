@@ -1,6 +1,7 @@
-import { replaceEqualDeep, type ReplaceEqualDeepOptions } from 'ts-data-forge';
+import type { ReplaceEqualDeepOptions } from 'ts-data-forge';
 import type { Reducer } from 'ts-type-forge';
-import { source, type InitializedObservable } from '../core/index.mjs';
+import type { InitializedObservable } from '../core/index.mjs';
+import { createStateSource } from './state-source.mjs';
 
 /**
  * Creates a reducer-based state management container following the Redux pattern.
@@ -91,32 +92,16 @@ export const createReducer = <S, A>(
     initialState: S;
   }>,
 ] => {
-  const state = source<S>(initialState);
-
-  const equals = options?.equals ?? Object.is;
-
-  const keepEqualParts = options?.keepEqualParts ?? false;
-
-  const keepOptions =
-    typeof keepEqualParts === 'boolean' ? undefined : keepEqualParts;
+  const { state, getSnapshot, commit } = createStateSource(
+    initialState,
+    options,
+  );
 
   const dispatch = (action: A): S => {
-    const currentState = state.getSnapshot().value;
+    const currentState = getSnapshot();
 
-    const reduced = reducer(currentState, action);
-
-    const nextState =
-      keepEqualParts === false
-        ? reduced
-        : replaceEqualDeep(currentState, reduced, keepOptions);
-
-    // Once completed, `next` keeps the state held and returns it.
-    return equals(currentState, nextState)
-      ? currentState
-      : state.next(nextState);
+    return commit(currentState, reducer(currentState, action));
   };
-
-  const getSnapshot = (): S => state.getSnapshot().value;
 
   return [state, dispatch, { getSnapshot, initialState }] as const;
 };
