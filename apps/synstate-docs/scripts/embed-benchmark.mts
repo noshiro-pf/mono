@@ -106,7 +106,7 @@ const embedOneTarget = async (
 
   if (!exists) {
     console.info(
-      `⚠ ${resultsFile} not found. Run \`pnpm --filter synstate run benchmark\` first. Skipping.`,
+      `⚠ ${resultsFile} not found. Run \`pnpm --filter @synstate/docs run benchmark\` first. Skipping.`,
     );
 
     return markdown;
