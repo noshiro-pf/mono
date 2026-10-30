@@ -1,6 +1,6 @@
 {
   "name": "synstate-react-hooks",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "description": "Type-safe State Management Library for TypeScript/JavaScript",
   "repository": {
     "type": "git",

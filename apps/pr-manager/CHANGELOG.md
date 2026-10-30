@@ -1,5 +1,13 @@
 # pr-manager
 
+## 0.0.15
+
+### Patch Changes
+
+- Updated dependencies [388a021]
+    - synstate@6.1.0
+    - synstate-dom@0.4.0
+
 ## 0.0.14
 
 ### Patch Changes

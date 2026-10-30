@@ -1,5 +1,13 @@
 # synstate-dom-benchmark
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [388a021]
+    - synstate@6.1.0
+    - synstate-dom@0.4.0
+
 ## 0.0.4
 
 ### Patch Changes

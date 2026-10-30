@@ -1,5 +1,14 @@
 # profile
 
+## 0.0.19
+
+### Patch Changes
+
+- Updated dependencies [388a021]
+    - synstate-preact-hooks@6.1.0
+    - preact-utils@0.0.18
+    - tiny-router-observable@0.0.21
+
 ## 0.0.18
 
 ### Patch Changes
