@@ -13,7 +13,7 @@ import {
   createReducerWithActions,
   createToggleState,
 } from '../../utils/index.mjs';
-import { Router } from '../router.mjs';
+import { Router } from '../store.mjs';
 import { GoogleSignInStore } from './google-sign-in-state.mjs';
 
 const dc = dict.register;

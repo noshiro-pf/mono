@@ -12,7 +12,7 @@ import { createState } from 'synstate-react-hooks';
 import { Result, isNotUndefined } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { fetchThrottleTime } from '../../constants/index.mjs';
-import { Router } from '../router.mjs';
+import { Router } from '../store.mjs';
 
 const [fetchEventSchedule$, fetchEventSchedule] = createEventEmitter();
 

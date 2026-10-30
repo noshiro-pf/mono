@@ -1,6 +1,9 @@
 import { createRoot } from 'react-dom/client';
 import { App } from './app.js';
 import './index.css';
+import { startStore } from './store/index.mjs';
+
+startStore();
 
 const container = document.querySelector('#root');
 

@@ -19,7 +19,7 @@ import {
 import { createReducerWithActions } from '../utils/index.mjs';
 import { EditEventScheduleStore } from './create-event-schedule-page/index.mjs';
 import { eventSchedule$ } from './fetching-state/index.mjs';
-import { Router } from './router.mjs';
+import { Router } from './store.mjs';
 
 const dc = dict.answerPage.eventInfo.verifyEmailDialog;
 

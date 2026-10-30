@@ -17,7 +17,7 @@ import { Result, isNotUndefined } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { fetchThrottleTime } from '../../constants/index.mjs';
 import { createReducerWithActions } from '../../utils/index.mjs';
-import { Router } from '../router.mjs';
+import { Router } from '../store.mjs';
 import { EventScheduleStore } from './event-schedule.mjs';
 
 const [fetchAnswers$, fetchAnswers] = createEventEmitter();
