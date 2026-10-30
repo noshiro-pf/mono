@@ -452,9 +452,6 @@ export type ActionPin = Readonly<{
   tag: string;
 }>;
 
-// `draft` is a default ignore prefix of ts-codemod-lib, which would leave this
-// type unwrapped and `draft` mutable.
-// transformer-ignore-next-line convert-to-readonly
 export type Release = Readonly<{
   tag: string;
   publishedAt: string | undefined;

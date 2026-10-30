@@ -231,9 +231,6 @@ export type IssueDeclarations = Readonly<{
 }>;
 
 /** The counts a report leads with. */
-// `draft` is a default ignore prefix of ts-codemod-lib, which would leave this
-// type unwrapped and `draft` mutable.
-// transformer-ignore-next-line convert-to-readonly
 export type Summary = Readonly<{
   open: number;
   /** Labelled `merge-queued`: the author saying it is to be landed. */

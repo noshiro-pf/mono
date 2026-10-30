@@ -1013,7 +1013,25 @@ describe(appendAsConstTransformer, () => {
     ])('$name', testFn);
   });
 
-  describe('ignorePrefixes option (mut_ prefix)', () => {
+  describe('mutableVariablePrefixes option (mut_ prefix)', () => {
+    test('the removed ignorePrefixes option is refused', () => {
+      expect(() =>
+        appendAsConstTransformer(
+          // @ts-expect-error removed in 4.0.0
+          { ignorePrefixes: ['mut_'] },
+        ),
+      ).toThrow('mutableVariablePrefixes');
+    });
+
+    test('an unset ignorePrefixes option is accepted', () => {
+      expect(() =>
+        appendAsConstTransformer(
+          // @ts-expect-error removed in 4.0.0
+          { ignorePrefixes: undefined },
+        ),
+      ).not.toThrow();
+    });
+
     test.each([
       {
         name: 'single variable with mut_ prefix',
@@ -1024,6 +1042,17 @@ describe(appendAsConstTransformer, () => {
         name: 'multiple variables with mut_ prefix',
         source: 'const mut_a = [1, 2], mut_b = { c: 3 };',
         expected: 'const mut_a = [1, 2], mut_b = { c: 3 };',
+      },
+      {
+        name: '"draft" and "_mut_" are not default prefixes',
+        source: 'const draft = { a: [1] }, _mut_b = [2];',
+        expected: 'const draft = { a: [1] } as const, _mut_b = [2] as const;',
+      },
+      {
+        name: 'the prefixes named in the option replace the default',
+        source: 'const draft = { a: [1] }, mut_b = [2];',
+        expected: 'const draft = { a: [1] }, mut_b = [2] as const;',
+        options: { mutableVariablePrefixes: ['draft'] },
       },
     ])('$name', testFn);
   });

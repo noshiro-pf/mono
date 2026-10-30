@@ -1980,6 +1980,7 @@ describe(convertToReadonlyTransformer, () => {
               }
             }
           `,
+          options: { mutablePropertyPrefixes: ['_mut_'] },
         },
         {
           name: 'Method with "draft" prefix',
@@ -1997,6 +1998,7 @@ describe(convertToReadonlyTransformer, () => {
               }
             }
           `,
+          options: { mutablePropertyPrefixes: ['draft'] },
         },
         {
           name: 'Method without mut_ prefix should be transformed',
@@ -3977,15 +3979,20 @@ describe(convertToReadonlyTransformer, () => {
           type T = { draftItems: number[]; readonly b: readonly string[] };
           type U = { mutable_items: number[]; readonly b: readonly string[] };
         `,
-        options: { ignorePrefixes: ['draft', 'mutable_'] },
+        options: {
+          mutableVariablePrefixes: ['draft', 'mutable_'],
+          mutablePropertyPrefixes: ['draft', 'mutable_'],
+        },
       },
       {
-        name: 'The "_mut_" prefix is recognized by default',
+        name: '"mut_" alone is the default: it covers "#mut_" and no longer "_mut_"',
         source: dedent`
           type T = { _mut_items: number[]; b: string[] };
+          class C { #mut_items: number[] = []; c: string[] = []; }
         `,
         expected: dedent`
-          type T = { _mut_items: number[]; readonly b: readonly string[] };
+          type T = Readonly<{ _mut_items: readonly number[]; b: readonly string[] }>;
+          class C { #mut_items: number[] = []; readonly c: readonly string[] = []; }
         `,
       },
       {
@@ -4291,7 +4298,7 @@ describe(convertToReadonlyTransformer, () => {
         expected: dedent`
           type T = Readonly<{ mut_a: readonly number[]; b: readonly string[] }>;
         `,
-        options: { ignorePrefixes: [] },
+        options: { mutableVariablePrefixes: [], mutablePropertyPrefixes: [] },
       },
     ])('$name', testFn);
 
@@ -4849,7 +4856,7 @@ describe(convertToReadonlyTransformer, () => {
     ])('$name', testFn);
   });
 
-  describe('ignorePrefixes option', () => {
+  describe('mutableVariablePrefixes and mutablePropertyPrefixes options', () => {
     test.each([
       {
         name: 'Variable declarations',
@@ -4889,7 +4896,10 @@ describe(convertToReadonlyTransformer, () => {
             readonly normalValue: readonly string[];
           };
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Multiple ignore prefixes',
@@ -4903,7 +4913,10 @@ describe(convertToReadonlyTransformer, () => {
             readonly normalValue: readonly boolean[];
           };
         `,
-        options: { ignorePrefixes: ['mut_', 'mutable_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_', 'mutable_'],
+          mutablePropertyPrefixes: ['mut_', 'mutable_'],
+        },
       },
       {
         name: 'Ignore prefix in nested properties',
@@ -4923,7 +4936,10 @@ describe(convertToReadonlyTransformer, () => {
             };
           }>;
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Ignore prefix in interface',
@@ -4939,7 +4955,10 @@ describe(convertToReadonlyTransformer, () => {
             readonly roles: readonly string[];
           }
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Ignore prefixes for various name node types in interface',
@@ -4961,7 +4980,10 @@ describe(convertToReadonlyTransformer, () => {
             readonly ['mu'  + 't_d']: readonly string[]; // ComputedPropertyName
           }
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Ignore prefix with index signature',
@@ -4979,7 +5001,10 @@ describe(convertToReadonlyTransformer, () => {
             };
           };
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Index signature in ignored property',
@@ -4997,7 +5022,10 @@ describe(convertToReadonlyTransformer, () => {
             };
           }
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Type alias with ignored prefix',
@@ -5011,7 +5039,10 @@ describe(convertToReadonlyTransformer, () => {
             items: string[];
           };
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Function with ignored prefix',
@@ -5021,7 +5052,10 @@ describe(convertToReadonlyTransformer, () => {
         expected: dedent`
           function mut_process(data: string[]): number[] { return []; }
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Class with ignored prefix',
@@ -5035,7 +5069,10 @@ describe(convertToReadonlyTransformer, () => {
             items: string[] = [];
           }
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Variable declaration with ignored prefix',
@@ -5045,7 +5082,10 @@ describe(convertToReadonlyTransformer, () => {
         expected: dedent`
           const mut_items: string[] = []
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Generic type with ignored prefix',
@@ -5059,7 +5099,10 @@ describe(convertToReadonlyTransformer, () => {
             items: T[];
           };
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Union type with ignored prefix members',
@@ -5075,7 +5118,10 @@ describe(convertToReadonlyTransformer, () => {
             data: string[];
           };
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Property with ignored prefix in class',
@@ -5091,7 +5137,10 @@ describe(convertToReadonlyTransformer, () => {
             readonly items: readonly number[] = [];
           }
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Method parameter with ignored prefix',
@@ -5105,7 +5154,10 @@ describe(convertToReadonlyTransformer, () => {
             process(mut_data: string[], data: readonly number[]) {}
           }
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Function expression with ignored prefix',
@@ -5115,7 +5167,10 @@ describe(convertToReadonlyTransformer, () => {
         expected: dedent`
           const fn = function mut_process(data: string[]): number[] { return []; }
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Array binding pattern in variable declaration (not implemented)',
@@ -5125,7 +5180,10 @@ describe(convertToReadonlyTransformer, () => {
         expected: dedent`
           const [mut_first, mut_second]: readonly [readonly string[], readonly number[]] = [[], []];
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         // The binding pattern itself is not looked at (see the TODO in
@@ -5137,7 +5195,10 @@ describe(convertToReadonlyTransformer, () => {
         expected: dedent`
           const { mut_arr, mut_obj }: { mut_arr: string[], mut_obj: number[] } = { mut_arr: [], mut_obj: [] };
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Parameter with ignored prefix in class constructor',
@@ -5151,7 +5212,10 @@ describe(convertToReadonlyTransformer, () => {
             constructor(mut_config: string[]) {}
           }
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Parameter with ignored prefix in type literal method',
@@ -5165,7 +5229,10 @@ describe(convertToReadonlyTransformer, () => {
             process(mut_data: string[]): void;
           }>;
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Multiple parameters with ignored prefix',
@@ -5179,7 +5246,10 @@ describe(convertToReadonlyTransformer, () => {
             update(mut_id: string, mut_data: object[], data: readonly string[]): void;
           }
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
         name: 'Arrow function with ignored prefix parameters',
@@ -5189,18 +5259,173 @@ describe(convertToReadonlyTransformer, () => {
         expected: dedent`
           const handler = (mut_event: Event[], event: readonly CustomEvent[]) => {};
         `,
-        options: { ignorePrefixes: ['mut_'] },
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: ['mut_'],
+        },
       },
       {
-        name: 'Arrow function parameters with "draft" prefix (default)',
+        name: '"draft" is not a default prefix',
         source: dedent`
           const handler = (draft: Event[], event: CustomEvent[]) => {};
+          type T = { draft: boolean; items: string[] };
         `,
         expected: dedent`
-          const handler = (draft: Event[], event: readonly CustomEvent[]) => {};
+          const handler = (draft: readonly Event[], event: readonly CustomEvent[]) => {};
+          type T = Readonly<{ draft: boolean; items: readonly string[] }>;
         `,
       },
+      {
+        name: 'Variable and property prefixes are separate',
+        source: dedent`
+          const handler = (draft: Event[]) => {};
+          type T = { draft: boolean; items: string[] };
+        `,
+        expected: dedent`
+          const handler = (draft: Event[]) => {};
+          type T = Readonly<{ draft: boolean; items: readonly string[] }>;
+        `,
+        options: { mutableVariablePrefixes: ['draft'] },
+      },
+      {
+        name: 'Each kind of name is matched against its own list: variables',
+        source: dedent`
+          type mut_T = { a: string[] };
+          interface mut_I { a: string[] }
+          class mut_C { a: string[] = []; }
+          function mut_f(a: string[]): void {}
+          const mut_x: string[] = [];
+          type U = [mut_a: string[], b: string[]];
+          class D { #mut_p: string[] = []; 'mut_q': string[] = []; }
+          type V = { mut_r: string[]; s: string[] };
+          interface J { mut_a: string[]; f(mut_p: string[]): void }
+          type W = { mut_m(): string[]; b: string[] };
+          class E { mut_m(x: string[]): string[] { return []; } get mut_g(): string[] { return []; } }
+        `,
+        expected: dedent`
+          type mut_T = { a: string[] };
+          interface mut_I { a: string[] }
+          class mut_C { a: string[] = []; }
+          function mut_f(a: string[]): void {}
+          const mut_x: string[] = [];
+          type U = readonly [mut_a: readonly string[], b: readonly string[]];
+          class D { readonly #mut_p: readonly string[] = []; readonly 'mut_q': readonly string[] = []; }
+          type V = Readonly<{ mut_r: readonly string[]; s: readonly string[] }>;
+          interface J { readonly mut_a: readonly string[]; f(mut_p: string[]): void }
+          type W = Readonly<{ mut_m(): readonly string[]; b: readonly string[] }>;
+          class E { mut_m(x: readonly string[]): readonly string[] { return []; } get mut_g(): readonly string[] { return []; } }
+        `,
+        options: {
+          mutableVariablePrefixes: ['mut_'],
+          mutablePropertyPrefixes: [],
+        },
+      },
+      {
+        name: 'Each kind of name is matched against its own list: properties',
+        source: dedent`
+          type mut_T = { a: string[] };
+          interface mut_I { a: string[] }
+          class mut_C { a: string[] = []; }
+          function mut_f(a: string[]): void {}
+          const mut_x: string[] = [];
+          type U = [mut_a: string[], b: string[]];
+          class D { #mut_p: string[] = []; 'mut_q': string[] = []; }
+          type V = { mut_r: string[]; s: string[] };
+          interface J { mut_a: string[]; f(mut_p: string[]): void }
+          type W = { mut_m(): string[]; b: string[] };
+          class E { mut_m(x: string[]): string[] { return []; } get mut_g(): string[] { return []; } }
+        `,
+        expected: dedent`
+          type mut_T = Readonly<{ a: readonly string[] }>;
+          interface mut_I { readonly a: readonly string[] }
+          class mut_C { readonly a: readonly string[] = []; }
+          function mut_f(a: readonly string[]): void {}
+          const mut_x: readonly string[] = [];
+          type U = readonly [mut_a: string[], b: readonly string[]];
+          class D { #mut_p: string[] = []; 'mut_q': string[] = []; }
+          type V = { mut_r: string[]; readonly s: readonly string[] };
+          interface J { mut_a: string[]; f(mut_p: readonly string[]): void }
+          type W = { mut_m(): string[]; readonly b: readonly string[] };
+          class E { mut_m(x: string[]): string[] { return []; } get mut_g(): string[] { return []; } }
+        `,
+        options: {
+          mutableVariablePrefixes: [],
+          mutablePropertyPrefixes: ['mut_'],
+        },
+      },
+      {
+        name: 'A property prefix with a "#" covers private names only',
+        source: dedent`
+          class C { #mut_a: string[] = []; mut_b: string[] = []; }
+        `,
+        expected: dedent`
+          class C { #mut_a: string[] = []; readonly mut_b: readonly string[] = []; }
+        `,
+        options: { mutablePropertyPrefixes: ['#mut_'] },
+      },
+      {
+        name: 'A property prefix does not apply to variables',
+        source: dedent`
+          const handler = (draft: Event[]) => {};
+          type T = { draft: boolean; items: string[] };
+        `,
+        expected: dedent`
+          const handler = (draft: readonly Event[]) => {};
+          type T = { draft: boolean; readonly items: readonly string[] };
+        `,
+        options: { mutablePropertyPrefixes: ['draft'] },
+      },
+      {
+        name: 'A constructor parameter property is a property',
+        source: dedent`
+          class C {
+            draftA: string[] = [];
+            constructor(private draftB: string[], readonly draftD: string[], draftC: string[]) {}
+          }
+        `,
+        expected: dedent`
+          class C {
+            draftA: string[] = [];
+            constructor(private draftB: string[], readonly draftD: string[], draftC: readonly string[]) {}
+          }
+        `,
+        options: { mutablePropertyPrefixes: ['draft'] },
+      },
+      {
+        name: 'A constructor parameter that is not a property is a variable',
+        source: dedent`
+          class C {
+            draftA: string[] = [];
+            constructor(private draftB: string[], draftC: string[]) {}
+          }
+        `,
+        expected: dedent`
+          class C {
+            readonly draftA: readonly string[] = [];
+            constructor(private readonly draftB: readonly string[], draftC: string[]) {}
+          }
+        `,
+        options: { mutableVariablePrefixes: ['draft'] },
+      },
     ])('$name', testFn);
+
+    test('the removed ignorePrefixes option is refused', () => {
+      expect(() =>
+        convertToReadonlyTransformer(
+          // @ts-expect-error removed in 4.0.0
+          { ignorePrefixes: ['mut_'] },
+        ),
+      ).toThrow('mutableVariablePrefixes');
+    });
+
+    test('an unset ignorePrefixes option is accepted', () => {
+      expect(() =>
+        convertToReadonlyTransformer(
+          // @ts-expect-error removed in 4.0.0
+          { ignorePrefixes: undefined },
+        ),
+      ).not.toThrow();
+    });
   });
 
   describe('Disable comment handling', () => {

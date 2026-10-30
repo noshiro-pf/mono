@@ -9,7 +9,7 @@ type User = {
   description: string;
   preferences: Map<string, string>;
   friendIds: number[];
-  mut_items: string[]; // With ignorePrefixes: ['mut_']
+  mut_items: string[]; // With mutablePropertyPrefixes: ['mut_']
 };
 
 // After (not wrapped with `Readonly`, which would make `mut_items` readonly
