@@ -1,7 +1,10 @@
 import { Arr, ISet, isRecord } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
 import type { DeepReadonly } from 'ts-type-forge';
-import { DEFAULT_MUTABLE_PREFIXES } from '../constants/index.mjs';
+import {
+  DEFAULT_MUTABLE_PREFIXES,
+  DEFAULT_MUTABLE_TYPE_PREFIXES,
+} from '../constants/index.mjs';
 import {
   hasDisableNextLineComment,
   isAsConstNode,
@@ -33,6 +36,9 @@ export const appendAsConstTransformer = (
     applyLevel: options?.applyLevel ?? 'avoidInFunctionArgs',
     mutableVariablePrefixes: ISet.create(
       options?.mutableVariablePrefixes ?? DEFAULT_MUTABLE_PREFIXES,
+    ),
+    mutableTypePrefixes: ISet.create(
+      options?.mutableTypePrefixes ?? DEFAULT_MUTABLE_TYPE_PREFIXES,
     ),
     removeAsConstForConstTypeParameters:
       options?.removeAsConstForConstTypeParameters ?? true,
@@ -75,11 +81,22 @@ export type AppendAsConstTransformerOptions = DeepReadonly<{
 
   /**
    * Prefixes of the names of variables that are left mutable: their
-   * initializers get no `as const`.
+   * initializers get no `as const`, nor does a value annotated with their type
+   * (`typeof mut_x`).
    *
    * @default ['mut_']
    */
   mutableVariablePrefixes?: string[];
+
+  /**
+   * Prefixes of the names of mutable types (see `convert-to-readonly`): a
+   * variable whose type annotation names such a type, an expression that
+   * `satisfies` one and an arrow function body returning one get no
+   * `as const`, which would make them unassignable to it.
+   *
+   * @default ['Mutable', 'mut_']
+   */
+  mutableTypePrefixes?: string[];
 
   /**
    * Whether to remove redundant `as const` assertions from call arguments
@@ -104,6 +121,7 @@ export type AppendAsConstTransformerOptions = DeepReadonly<{
 type AppendAsConstTransformerOptionsInternal = DeepReadonly<{
   applyLevel: 'all' | 'avoidInFunctionArgs';
   mutableVariablePrefixes: ISet<string>;
+  mutableTypePrefixes: ISet<string>;
   removeAsConstForConstTypeParameters: boolean;
 
   debugPrint: (...args: readonly unknown[]) => void;
@@ -179,6 +197,18 @@ const transformNode = (
       return;
     }
 
+    // Example: const foo: MutableFoo = { a: [] }; -> remains as is, because
+    // `as const` would make the initializer unassignable to `MutableFoo`
+    const typeNode = node.getTypeNode();
+
+    if (refersToMutableType(typeNode, options)) {
+      options.debugPrint(
+        'skipped variable declaration annotated with a mutable type',
+      );
+
+      return;
+    }
+
     const declarationKindKeywords = node
       .getVariableStatement()
       ?.getDeclarationKindKeywords()
@@ -230,6 +260,14 @@ const transformNode = (
 
   // pass by ([X satisfies ...] -> X)
   if (tsm.Node.isSatisfiesExpression(node)) {
+    // Example: { a: [] } satisfies MutableFoo -> remains as is, because
+    // `as const` would make it fail to satisfy `MutableFoo`
+    if (refersToMutableType(node.getTypeNode(), options)) {
+      options.debugPrint('skipped satisfies expression with a mutable type');
+
+      return;
+    }
+
     transformNode(node.getExpression(), context, options);
 
     return;
@@ -248,6 +286,14 @@ const transformNode = (
 
   // pass by arrow function body ([() => X] -> X)
   if (tsm.Node.isArrowFunction(node)) {
+    // Example: (): MutableFoo => ({ a: [] }) -> remains as is, because
+    // `as const` would make the body unassignable to `MutableFoo`
+    if (refersToMutableType(node.getReturnTypeNode(), options)) {
+      options.debugPrint('skipped arrow function with a mutable return type');
+
+      return;
+    }
+
     const body = node.getBody();
 
     transformNode(body, context, options);
@@ -693,4 +739,83 @@ const isBareConstTypeParameterReference = (
     Arr.isEmpty(typeNode.getTypeArguments()) &&
     constTypeParameterNames.has(typeName.getText())
   );
+};
+
+/** `ns.MutableFoo` -> `MutableFoo` */
+const lastNameOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  entityName: tsm.EntityName,
+): string =>
+  (tsm.Node.isQualifiedName(entityName)
+    ? entityName.getRight()
+    : entityName
+  ).getText();
+
+/** `mut_x.items` -> `mut_x` */
+const firstNameOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  entityName: tsm.EntityName,
+): string =>
+  tsm.Node.isQualifiedName(entityName)
+    ? firstNameOf(entityName.getLeft())
+    : entityName.getText();
+
+const startsWithAny = (prefixes: ISet<string>, name: string): boolean =>
+  prefixes.some((p) => name.startsWith(p));
+
+/**
+ * The name a `typeof` starts from: a variable (`mut_x`) or a class, which
+ * `convert-to-readonly` leaves mutable by its type prefix (`MutableStore`).
+ */
+const isMutableValueName = (
+  name: string,
+  options: AppendAsConstTransformerOptionsInternal,
+): boolean =>
+  startsWithAny(options.mutableVariablePrefixes, name) ||
+  startsWithAny(options.mutableTypePrefixes, name);
+
+/**
+ * Whether `typeNode` names a type of a `mutableTypePrefixes` prefix anywhere
+ * in it (`MutableFoo`, `ns.MutableFoo[]`, `import('./m').MutableFoo | X`), or
+ * the type of a variable of a `mutableVariablePrefixes` prefix or a class of
+ * a `mutableTypePrefixes` one (`typeof mut_x`, `typeof MutableStore`). It reads names only, so an alias of another name for such
+ * a type is missed.
+ */
+const refersToMutableType = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  typeNode: tsm.TypeNode | undefined,
+  options: AppendAsConstTransformerOptionsInternal,
+): boolean => {
+  if (typeNode === undefined) {
+    return false;
+  }
+
+  const refers = (n: tsm.Node): boolean => {
+    if (n.isKind(tsm.SyntaxKind.TypeReference)) {
+      return startsWithAny(
+        options.mutableTypePrefixes,
+        lastNameOf(n.getTypeName()),
+      );
+    }
+
+    if (n.isKind(tsm.SyntaxKind.ImportType)) {
+      const qualifier = n.getQualifier();
+
+      return (
+        qualifier !== undefined &&
+        // typeof import('./m').mut_x names a value
+        (n.compilerNode.isTypeOf
+          ? isMutableValueName(firstNameOf(qualifier), options)
+          : startsWithAny(options.mutableTypePrefixes, lastNameOf(qualifier)))
+      );
+    }
+
+    // typeof mut_x, typeof mut_x.items, typeof MutableClass
+    return (
+      n.isKind(tsm.SyntaxKind.TypeQuery) &&
+      isMutableValueName(firstNameOf(n.getExprName()), options)
+    );
+  };
+
+  return refers(typeNode) || typeNode.getFirstDescendant(refers) !== undefined;
 };

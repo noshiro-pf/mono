@@ -47,9 +47,10 @@ type MessageIds =
  * `mut_`-prefixed parameters, variables, type aliases and properties;
  * anything under `DeepReadonly<>` or `Mutable<>`; the direct argument of
  * `Readonly<>`. Unlike the codemod it accepts every readonly spelling and
- * normalizes nothing. Parameters are the one place the codemod's `mut_`
- * exemption is not mirrored: a parameter is readonly whatever its name
- * (spec/readonly.md), as the type-aware parameter rule also insists.
+ * normalizes nothing. Two exemptions of the codemod are not mirrored: a
+ * parameter is readonly whatever its name (spec/readonly.md), as the
+ * type-aware parameter rule also insists, and a type name is exempt only for
+ * `mut_` (D-14), not for the codemod's default `Mutable` type prefix.
  */
 export const requireReadonlyType = createRule<readonly [], MessageIds>({
   meta: {

@@ -4879,10 +4879,10 @@ describe(convertToReadonlyTransformer, () => {
       {
         name: 'Type aliases',
         source: dedent`
-          type mut_Foo = number[]
+          type MutableFoo = number[]
         `,
         expected: dedent`
-          type mut_Foo = number[]
+          type MutableFoo = number[]
         `,
       },
       {
@@ -5030,12 +5030,12 @@ describe(convertToReadonlyTransformer, () => {
       {
         name: 'Type alias with ignored prefix',
         source: dedent`
-          type mut_Config = {
+          type MutableConfig = {
             items: string[];
           };
         `,
         expected: dedent`
-          type mut_Config = {
+          type MutableConfig = {
             items: string[];
           };
         `,
@@ -5060,12 +5060,12 @@ describe(convertToReadonlyTransformer, () => {
       {
         name: 'Class with ignored prefix',
         source: dedent`
-          class mut_Store {
+          class MutableStore {
             items: string[] = [];
           }
         `,
         expected: dedent`
-          class mut_Store {
+          class MutableStore {
             items: string[] = [];
           }
         `,
@@ -5090,12 +5090,12 @@ describe(convertToReadonlyTransformer, () => {
       {
         name: 'Generic type with ignored prefix',
         source: dedent`
-          type mut_List<T> = {
+          type MutableList<T> = {
             items: T[]
           }
         `,
         expected: dedent`
-          type mut_List<T> = {
+          type MutableList<T> = {
             items: T[];
           };
         `,
@@ -5107,14 +5107,14 @@ describe(convertToReadonlyTransformer, () => {
       {
         name: 'Union type with ignored prefix members',
         source: dedent`
-          type Result = mut_Success | Error;
-          type mut_Success = {
+          type Result = MutableSuccess | Error;
+          type MutableSuccess = {
             data: string[]
           };
         `,
         expected: dedent`
-          type Result = mut_Success | Error;
-          type mut_Success = {
+          type Result = MutableSuccess | Error;
+          type MutableSuccess = {
             data: string[];
           };
         `,
@@ -5276,6 +5276,25 @@ describe(convertToReadonlyTransformer, () => {
         `,
       },
       {
+        name: '"Mutable" and "mut_" are the default type prefixes',
+        source: dedent`
+          type MutableFoo = { a: string[] };
+          interface MutableBar { a: string[] }
+          class MutableBaz { a: string[] = []; }
+          const Q = class MutableQ { a: string[] = []; };
+          type mut_Qux = { a: string[] };
+          type Foo = { a: MutableFoo[] };
+        `,
+        expected: dedent`
+          type MutableFoo = { a: string[] };
+          interface MutableBar { a: string[] }
+          class MutableBaz { a: string[] = []; }
+          const Q = class MutableQ { a: string[] = []; };
+          type mut_Qux = { a: string[] };
+          type Foo = Readonly<{ a: readonly MutableFoo[] }>;
+        `,
+      },
+      {
         name: 'Variable and property prefixes are separate',
         source: dedent`
           const handler = (draft: Event[]) => {};
@@ -5303,9 +5322,9 @@ describe(convertToReadonlyTransformer, () => {
           class E { mut_m(x: string[]): string[] { return []; } get mut_g(): string[] { return []; } }
         `,
         expected: dedent`
-          type mut_T = { a: string[] };
-          interface mut_I { a: string[] }
-          class mut_C { a: string[] = []; }
+          type mut_T = Readonly<{ a: readonly string[] }>;
+          interface mut_I { readonly a: readonly string[] }
+          class mut_C { readonly a: readonly string[] = []; }
           function mut_f(a: string[]): void {}
           const mut_x: string[] = [];
           type U = readonly [mut_a: readonly string[], b: readonly string[]];
@@ -5317,6 +5336,41 @@ describe(convertToReadonlyTransformer, () => {
         `,
         options: {
           mutableVariablePrefixes: ['mut_'],
+          mutableTypePrefixes: [],
+          mutablePropertyPrefixes: [],
+        },
+      },
+      {
+        name: 'Each kind of name is matched against its own list: types',
+        source: dedent`
+          type mut_T = { a: string[] };
+          interface mut_I { a: string[] }
+          class mut_C { a: string[] = []; }
+          function mut_f(a: string[]): void {}
+          const mut_x: string[] = [];
+          type U = [mut_a: string[], b: string[]];
+          class D { #mut_p: string[] = []; 'mut_q': string[] = []; }
+          type V = { mut_r: string[]; s: string[] };
+          interface J { mut_a: string[]; f(mut_p: string[]): void }
+          type W = { mut_m(): string[]; b: string[] };
+          class E { mut_m(x: string[]): string[] { return []; } get mut_g(): string[] { return []; } }
+        `,
+        expected: dedent`
+          type mut_T = { a: string[] };
+          interface mut_I { a: string[] }
+          class mut_C { a: string[] = []; }
+          function mut_f(a: readonly string[]): void {}
+          const mut_x: readonly string[] = [];
+          type U = readonly [mut_a: readonly string[], b: readonly string[]];
+          class D { readonly #mut_p: readonly string[] = []; readonly 'mut_q': readonly string[] = []; }
+          type V = Readonly<{ mut_r: readonly string[]; s: readonly string[] }>;
+          interface J { readonly mut_a: readonly string[]; f(mut_p: readonly string[]): void }
+          type W = Readonly<{ mut_m(): readonly string[]; b: readonly string[] }>;
+          class E { mut_m(x: readonly string[]): readonly string[] { return []; } get mut_g(): readonly string[] { return []; } }
+        `,
+        options: {
+          mutableVariablePrefixes: [],
+          mutableTypePrefixes: ['mut_'],
           mutablePropertyPrefixes: [],
         },
       },
@@ -5350,6 +5404,7 @@ describe(convertToReadonlyTransformer, () => {
         `,
         options: {
           mutableVariablePrefixes: [],
+          mutableTypePrefixes: [],
           mutablePropertyPrefixes: ['mut_'],
         },
       },

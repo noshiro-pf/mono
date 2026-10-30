@@ -76,7 +76,6 @@ export type EdgeHighlight = Readonly<{
 export type EdgeKind = 'queue' | 'already' | 'emitted' | 'stale' | 'call';
 
 /** The mutable state a simulator keeps per node. */
-// transformer-ignore-next-line convert-to-readonly
 export type MutableNodeState = {
   history: HistoryEntry[];
   token: number;

@@ -298,7 +298,7 @@ mut_t[2]; // 型エラー(「index 2 は無い」)
 
 ### リポジトリの現況 — 既に機械化されている
 
-`as const` はソースに **1,937 箇所**あり、`ts-codemod-lib` の `append-as-const` transformer が機械的に付与している。その transformer の免除は既定で `mutableVariablePrefixes: ['mut_']` だけである（4.0.0 より前は `ignorePrefixes: ['mut_', '#mut_', '_mut_', 'draft']`） — つまりこのリポジトリの運用は既に **「`mut_` 以外のリテラルには `as const` を付ける」** であり、判定は D-14 の `mut_` 規律とちょうど一致している。
+`as const` はソースに **1,937 箇所**あり、`ts-codemod-lib` の `append-as-const` transformer が機械的に付与している。その transformer の免除は既定で `mutableVariablePrefixes: ['mut_']` と、`MutableFoo` / `mut_Foo` 型への代入（型注釈・`satisfies`・アロー関数の戻り値型）を見る `mutableTypePrefixes: ['Mutable', 'mut_']` である（`typeof mut_x` への代入も免除する）（4.0.0 より前は `ignorePrefixes: ['mut_', '#mut_', '_mut_', 'draft']`） — つまりこのリポジトリの運用は既に **「`mut_` 以外のリテラルには `as const` を付ける」** であり、判定は D-14 の `mut_` 規律と一致している（例外は `Mutable` 始まりの型名への代入で、これは型名に `mut_` を書かない PascalCase の都合による）。
 
 つまり **readonly 側の需要は既に機械化されている**。候補 9 で新しいのは mutable 側で、そこは codemod の対象外（`mut_` は `mutableVariablePrefixes` に入っている）である一方、前節のとおり式の形が存在しない。**readonly 側は追認、mutable 側は新設**という非対称な構図になる。
 

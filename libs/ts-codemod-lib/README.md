@@ -51,7 +51,8 @@ Options:
 - `applyLevel`: `'all'` or `'avoidInFunctionArgs'` (default: `'avoidInFunctionArgs'`)
     - `'avoidInFunctionArgs'`: Avoids adding `as const` inside function call arguments
     - `'all'`: Applies `as const` everywhere
-- `mutableVariablePrefixes`: Array of string prefixes for variable names that should not have `as const` added (default: `['mut_']`)
+- `mutableVariablePrefixes`: Array of string prefixes for variable names that should not have `as const` added; a value annotated with their type (`typeof mut_x`) is left without one too (default: `['mut_']`)
+- `mutableTypePrefixes`: Array of string prefixes for type names: a variable whose type annotation names such a type, an expression that `satisfies` one, or the expression body of an arrow function returning one, gets no `as const`, which would make it unassignable to that type (default: `['Mutable', 'mut_']`); so does a value annotated with the type of a class of such a name (`InstanceType<typeof MutableStore>`). Only names are read, so an alias of another name for such a type is not recognized
 - `removeAsConstForConstTypeParameters`: Whether to remove redundant `as const` assertions from call arguments whose corresponding parameter type is exactly a `const`-modified type parameter (default: `true`). Only applies when the callee resolves to a single call signature within the transformed file itself; imported callees, overloads, calls with explicit type arguments and spread arguments are left as they are.
 
 Example:
@@ -86,9 +87,10 @@ Converts TypeScript type definitions to readonly types. This transformer helps i
 
 Options:
 
-- `mutableVariablePrefixes`: Array of string prefixes for the names of variables, parameters, functions, type aliases, interfaces and classes whose types should not be made readonly (default: `['mut_']`). A constructor parameter property is decided by `mutablePropertyPrefixes` instead
+- `mutableVariablePrefixes`: Array of string prefixes for the names of variables, parameters and functions whose types should not be made readonly (default: `['mut_']`). A constructor parameter property is decided by `mutablePropertyPrefixes` instead
+- `mutableTypePrefixes`: Array of string prefixes for the names of type aliases, interfaces and classes (a named class expression included) whose declarations should not be made readonly (default: `['Mutable', 'mut_']`)
 - `mutablePropertyPrefixes`: Array of string prefixes for the names of properties, methods and accessors (constructor parameter properties included; a private name is matched with or after its `#`, so both `mut_` and `#mut_` cover `#mut_x`) that should not be made readonly (default: `['mut_']`). Of a named tuple member with such a prefix, only the type is kept; the tuple is still made `readonly`.. A type literal with a property, a method or an accessor of such a prefix is not wrapped with `Readonly<...>`, which would make that member readonly too; its other members are marked `readonly` one by one instead, and a `Readonly<...>` written around it is taken off. It is wrapped as before when it also has a member that cannot be marked `readonly` by itself (a method signature or an accessor without such a prefix, or a property or index signature not yet `readonly` that an ignore comment skips), or when it is a member of a `Readonly<...>` intersection beside a type that may be an array
-- A list given to `mutableVariablePrefixes` or `mutablePropertyPrefixes` replaces the default; to add to it, spread `DEFAULT_MUTABLE_PREFIXES` (`[...DEFAULT_MUTABLE_PREFIXES, 'draft']`)
+- A list given to `mutableVariablePrefixes`, `mutableTypePrefixes` or `mutablePropertyPrefixes` replaces the default; to add to it, spread `DEFAULT_MUTABLE_PREFIXES` (`[...DEFAULT_MUTABLE_PREFIXES, 'draft']`) or `DEFAULT_MUTABLE_TYPE_PREFIXES`
 - `DeepReadonly.typeName`: Custom name for the DeepReadonly type utility (default: `"DeepReadonly"`)
 - `recordStyle`: Output style used when making `Record<K, V>` readonly (default: `"ReadonlyRecord"`). `"ReadonlyRecord"` uses the `ReadonlyRecord` type utility provided by `ts-type-forge` (no import statement is added, so it has to be available in the transformed code, e.g. globally via `ts-type-forge`'s `global.d.mts`), while `"Readonly<Record>"` uses only built-in utility types (`Readonly<Record<K, V>>`). Whichever style is selected, `Record<K, V>`, `Readonly<Record<K, V>>`, `ReadonlyRecord<K, V>`, and redundant wrappers such as `Readonly<ReadonlyRecord<K, V>>` are all unified to that style.
 

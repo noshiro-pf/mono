@@ -15,7 +15,10 @@ import type {
   StrictExclude,
   StrictExtract,
 } from 'ts-type-forge';
-import { DEFAULT_MUTABLE_PREFIXES } from '../constants/index.mjs';
+import {
+  DEFAULT_MUTABLE_PREFIXES,
+  DEFAULT_MUTABLE_TYPE_PREFIXES,
+} from '../constants/index.mjs';
 import {
   hasCallOrConstructSignature,
   hasDisableNextLineComment,
@@ -69,7 +72,7 @@ export const convertToReadonlyTransformer = (
     untypedOptions['ignorePrefixes'] !== undefined
   ) {
     throw new Error(
-      `The "ignorePrefixes" option of ${TRANSFORMER_NAME} was replaced by "mutableVariablePrefixes" and "mutablePropertyPrefixes".`,
+      `The "ignorePrefixes" option of ${TRANSFORMER_NAME} was replaced by "mutableVariablePrefixes", "mutableTypePrefixes" and "mutablePropertyPrefixes".`,
     );
   }
 
@@ -81,6 +84,9 @@ export const convertToReadonlyTransformer = (
     ignoreEmptyObjectTypes: options?.ignoreEmptyObjectTypes ?? true,
     mutableVariablePrefixes: ISet.create(
       options?.mutableVariablePrefixes ?? DEFAULT_MUTABLE_PREFIXES,
+    ),
+    mutableTypePrefixes: ISet.create(
+      options?.mutableTypePrefixes ?? DEFAULT_MUTABLE_TYPE_PREFIXES,
     ),
     mutablePropertyPrefixes: ISet.create(
       options?.mutablePropertyPrefixes ?? DEFAULT_MUTABLE_PREFIXES,
@@ -151,13 +157,21 @@ export type ReadonlyTransformerOptions = DeepReadonly<{
 
   /**
    * Prefixes of the names of variables, parameters (but for a constructor
-   * parameter property, which `mutablePropertyPrefixes` decides), functions,
-   * type aliases, interfaces and classes that are left mutable: their types
-   * are not made readonly.
+   * parameter property, which `mutablePropertyPrefixes` decides) and
+   * functions that are left mutable: their types are not made readonly.
    *
    * @default ['mut_']
    */
   mutableVariablePrefixes?: string[];
+
+  /**
+   * Prefixes of the names of type aliases, interfaces, class declarations and
+   * named class expressions that are left mutable: their declarations are not
+   * made readonly.
+   *
+   * @default ['Mutable', 'mut_']
+   */
+  mutableTypePrefixes?: string[];
 
   /**
    * Prefixes of the names of properties, methods and accessors (of type
@@ -215,6 +229,8 @@ type ReadonlyTransformerOptionsInternal = Readonly<{
   ignoreEmptyObjectTypes: boolean;
 
   mutableVariablePrefixes: ISet<string>;
+
+  mutableTypePrefixes: ISet<string>;
 
   mutablePropertyPrefixes: ISet<string>;
 
@@ -316,10 +332,10 @@ const transformNode = (
   }
 
   // Skip readonly conversion for type alias declarations with ignored prefixes
-  // Example: type mut_Foo = number[]; -> remains as number[] without readonly
+  // Example: type MutableFoo = number[]; -> remains as number[] without readonly
   if (
     node.isKind(tsm.SyntaxKind.TypeAliasDeclaration) &&
-    options.mutableVariablePrefixes.some((p) => node.getName().startsWith(p))
+    hasMutableTypeName(node.getName(), options)
   ) {
     return;
   }
@@ -398,10 +414,8 @@ const transformNode = (
 
   if (node.isKind(tsm.SyntaxKind.InterfaceDeclaration)) {
     // Skip readonly conversion for interface declarations with ignored prefixes
-    // Example: interface mut_Interface {...} -> properties remain without readonly
-    if (
-      options.mutableVariablePrefixes.some((p) => node.getName().startsWith(p))
-    ) {
+    // Example: interface MutableInterface {...} -> properties remain without readonly
+    if (hasMutableTypeName(node.getName(), options)) {
       return;
     }
 
@@ -410,14 +424,18 @@ const transformNode = (
     return;
   }
 
+  // Example: const C = class MutableClass {...} -> properties remain without readonly
+  if (
+    node.isKind(tsm.SyntaxKind.ClassExpression) &&
+    hasMutableTypeName(node.getName(), options)
+  ) {
+    return;
+  }
+
   if (node.isKind(tsm.SyntaxKind.ClassDeclaration)) {
     // Skip readonly conversion for class declarations with ignored prefixes
-    // Example: class mut_Class {...} -> properties remain without readonly
-    if (
-      options.mutableVariablePrefixes.some(
-        (p) => node.getName()?.startsWith(p) === true,
-      )
-    ) {
+    // Example: class MutableClass {...} -> properties remain without readonly
+    if (hasMutableTypeName(node.getName(), options)) {
       return;
     }
 
@@ -2253,6 +2271,14 @@ const takesOffReadonly = (
   isLeftUnwrapped(node, options) &&
   !hasCallOrConstructSignature(node) &&
   !hasDisableNextLineCommentAround(node);
+
+/** Whether a type alias, interface or class name starts with a `mutableTypePrefixes` entry. */
+const hasMutableTypeName = (
+  name: string | undefined,
+  options: ReadonlyTransformerOptionsInternal,
+): boolean =>
+  name !== undefined &&
+  options.mutableTypePrefixes.some((p) => name.startsWith(p));
 
 /**
  * A parameter property is a property of the class, as a `PropertyDeclaration`

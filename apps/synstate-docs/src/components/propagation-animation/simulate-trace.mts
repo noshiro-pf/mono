@@ -1135,7 +1135,6 @@ type SimNode = {
   queuedFor: string | undefined;
 };
 
-// transformer-ignore-next-line convert-to-readonly
 type MutableModule = {
   propagationDepth: number;
   outermostToken: string | undefined;
@@ -1143,16 +1142,13 @@ type MutableModule = {
   bucketSets: MutableBuckets[];
 };
 
-// transformer-ignore-next-line convert-to-readonly
 type MutableBuckets = MutableBucket[];
 
-// transformer-ignore-next-line convert-to-readonly
 type MutableBucket = {
   readonly nodes: (string | undefined)[];
   length: number;
 };
 
-// transformer-ignore-next-line convert-to-readonly
 type MutableQueue = {
   readonly token: string;
   readonly base: number;
@@ -1163,7 +1159,6 @@ type MutableQueue = {
   queuedDespiteMark: Set<string> | undefined;
 };
 
-// transformer-ignore-next-line convert-to-readonly
 type MutableRun = {
   tokenCount: number;
   freshTokens: string[];
