@@ -1,0 +1,37 @@
+--- en/02-count-events.preact-signals.mts
++++ ja/02-count-events.preact-signals.mts
+@@ -4,12 +4,12 @@
+ if (import.meta.vitest !== undefined) {
+   test('counting events written as an effect (Preact Signals)', () => {
+     // embed-sample-code-ignore-above
+-    // A click on a list item, sent as the item's id.
++    // リスト項目のクリック。項目の id として送る。
+     const clicked = signal<string | undefined>(undefined);
+ 
+     const clickCount = signal(0);
+ 
+-    // scan((n) => n + 1, 0), written as an effect.
++    // scan((n) => n + 1, 0) を effect で書いたもの。
+     effect(() => {
+       if (clicked.value !== undefined) {
+         clickCount.value = clickCount.peek() + 1;
+@@ -18,16 +18,16 @@
+ 
+     clicked.value = 'A';
+ 
+-    clicked.value = 'A'; // the same item again: an equal value, dropped
++    clicked.value = 'A'; // 同じ項目をもう一度: 同値なので捨てられる
+ 
+     batch(() => {
+-      // two clicks handled in one batch: the effect sees only the last
++      // 1 つの batch で処理した 2 回のクリック: effect は最後のものしか見ない
+       clicked.value = 'B';
+ 
+       clicked.value = 'C';
+     });
+ 
+-    // 4 clicks, counted as 2
++    // 4 回のクリックが 2 回と数えられる
+     // embed-sample-code-ignore-below
+     assert.strictEqual(clickCount.value, 2);
+   });

@@ -29,13 +29,14 @@ const tablePages: readonly string[] = [
 ] as const;
 
 /**
- * Pages that quote a benchmark figure without showing a table.
+ * Pages that may quote a benchmark figure without showing a table.
  *
- * The introduction and the landing page each open with "up to N× faster than
- * Jotai", which is the first number a reader sees and the last one anyone
- * thinks to update: both said 30× and 16× against a run that gave 20× and
- * 13×. They carry the same markers as the benchmark page, in the spelling
- * their format allows — see `inlineMarkers`.
+ * None does now: the introduction and the landing page used to open with
+ * "up to N× faster than Jotai", which is the first number a reader sees and
+ * the last one anyone thinks to update, and now link to the benchmark summary
+ * instead. They stay listed so that a marker written there again, in the
+ * spelling the page's format allows (see `inlineMarkers`), is filled, and
+ * {@link assertEveryRatioMarked} fails on a ratio quoted there without one.
  */
 const quotingPages: readonly string[] = [
   path.resolve(
@@ -221,6 +222,31 @@ const inlineMarkers: readonly Readonly<{
 ] as const;
 
 /**
+ * Fails on a ratio such as `13×`, `13x`, `13倍` or `$13\times$` that a quoting page states
+ * outside a marker, which no re-measurement would update. The benchmark page
+ * itself is exempt: its tables and their prose state ratios the generator does
+ * not own. A quoting page that needs `4×4` for something else can say it in
+ * words.
+ */
+const assertEveryRatioMarked = (
+  markdown: string,
+  targetMarkdownFile: string,
+): void => {
+  const unmarked = /\d[\d.,]*(?:\s*(?:×|倍|\\times)|(?<=\d)x\b)/u.exec(
+    inlineMarkers.reduce(
+      (mut_content, { pattern }) => mut_content.replaceAll(pattern, ''),
+      markdown,
+    ),
+  );
+
+  if (unmarked !== null) {
+    throw new Error(
+      `❌ a benchmark ratio with no bench marker in ${path.relative(workspaceRootPath, targetMarkdownFile)}: '${unmarked[0]}'. Quote it through a marker, or link to the benchmark page instead.`,
+    );
+  }
+};
+
+/**
  * Fails on an emphasis Prettier could not round-trip.
  *
  * Measured on this file: in some paragraphs — not all, and what makes the
@@ -308,6 +334,10 @@ const embedBenchmark = async (): Promise<void> => {
       targetMarkdownFile,
       mut_usedKeys,
     );
+
+    if (quotingPages.includes(targetMarkdownFile)) {
+      assertEveryRatioMarked(mut_markdown, targetMarkdownFile);
+    }
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(targetMarkdownFile, mut_markdown, 'utf8');

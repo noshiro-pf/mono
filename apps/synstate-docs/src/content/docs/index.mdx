@@ -27,9 +27,9 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
         `debounce`, `throttle`, `switchMap`, and more — handle complex async
         flows in a unified, declarative API without external libraries.
     </Card>
-    <Card title="Predictable Performance" icon="rocket">
+    <Card title="Glitch-Free Through Every Operator" icon="approve-check">
 
-Glitch-free O(n) propagation, within **{/* bench:summary/synstate-worst-over-fastest */}2.4{/* /bench */}×** of the fastest library in each of the six benchmark scenarios. Among the other libraries measured in all six, worst cases range from {/* bench:summary/others-least-worst-over-fastest */}2.0{/* /bench */}× ({/* bench:summary/others-least-worst-library */}Preact Signals{/* /bench */}) to {/* bench:summary/others-most-worst-over-fastest */}> 16,129{/* /bench */}× ({/* bench:summary/others-most-worst-library */}RxJS{/* /bench */}). Speed is not where SynState stands out; [Why SynState?](/mono/synstate/guides/why-synstate/#glitch-free-at-linear-cost) says what does. See [the benchmark summary](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page).
+Every update is one depth-ordered pass over what it reaches, the ones `debounce` or `switchMap` start later included, so no subscriber sees a half-updated graph, and an update costs in proportion to the nodes it reaches rather than the paths between them. [Operators on Signals](/mono/synstate/guides/library-comparison/operators-on-signals/) shows what an operator written as an effect loses; [the benchmark summary](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page) compares speed scenario by scenario.
 
     </Card>
     <Card title="Lightweight" icon="seti:favicon">

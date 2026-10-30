@@ -1,6 +1,7 @@
 import { Arr } from 'ts-data-forge';
 import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
-import type { Lang, LocalizedText, Scenario } from './scenario.mjs';
+import type { Lang, LocalizedText } from '../constants.mjs';
+import type { Scenario } from './scenario.mjs';
 
 /** What a simulator hands the player: the graph, its code, and the frames. */
 export type Trace = Readonly<{

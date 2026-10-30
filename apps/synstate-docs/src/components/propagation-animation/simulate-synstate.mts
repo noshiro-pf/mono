@@ -1,4 +1,5 @@
 import { Arr } from 'ts-data-forge';
+import type { LocalizedText } from '../constants.mjs';
 import {
   byCount,
   freezeStates,
@@ -11,12 +12,7 @@ import {
   type Frame,
   type Trace,
 } from './frame.mjs';
-import type {
-  Evaluation,
-  LocalizedText,
-  Scenario,
-  ScenarioNode,
-} from './scenario.mjs';
+import type { Evaluation, Scenario, ScenarioNode } from './scenario.mjs';
 
 /**
  * Runs the scenario's inputs through a model of synstate's propagation and

@@ -1,8 +1,4 @@
-import type { ReadonlyRecord } from 'ts-type-forge';
-
-export type Lang = 'en' | 'ja';
-
-export type LocalizedText = ReadonlyRecord<Lang, string>;
+import type { LocalizedText } from '../constants.mjs';
 
 /**
  * A graph to animate. `nodes` is in creation order, the source first: a

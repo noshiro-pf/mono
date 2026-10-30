@@ -10,11 +10,20 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 
-const sampleDirs: readonly string[] = [
-  'samples/docs-site/introduction',
-  'samples/docs-site/why-reactive',
-  'samples/docs-site/async-comparison',
-] as const;
+const docsSiteDir = path.resolve(workspaceRootPath, 'samples/docs-site');
+
+// eslint-disable-next-line security/detect-non-literal-fs-filename
+const docsSiteEntries = await fs.readdir(docsSiteDir, { withFileTypes: true });
+
+/**
+ * Every docs-site sample directory, read from the disk rather than listed, so
+ * that a new directory with a `ja/` translation gets its diffs without anyone
+ * remembering to add it here. A directory without `ja/` is skipped below.
+ */
+const sampleDirs: readonly string[] = docsSiteEntries
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => `samples/docs-site/${entry.name}`)
+  .toSorted();
 
 type DiffOutcome = 'generated' | 'skipped';
 
@@ -123,8 +132,6 @@ for (const dir of sampleDirs) {
     .catch(() => false);
 
   if (!jaDirExists) {
-    console.info(`⚠ No ja/ directory found in ${dir}. Skipping.`);
-
     continue;
   }
 

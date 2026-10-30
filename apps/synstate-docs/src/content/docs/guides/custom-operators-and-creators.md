@@ -72,14 +72,14 @@ createSyncChildObservable(
 
 ### Tools
 
-| Tool                         | Meaning                                                                                                |
-| :--------------------------- | :----------------------------------------------------------------------------------------------------- |
-| `setNext(value, token)`      | Emit `value` in the update `token` names                                                               |
-| `getSnapshot()`              | This observable's current value                                                                        |
-| `complete()`                 | Complete this observable now                                                                           |
-| `completeAfterPropagation()` | Complete it once the current update has reached every descendant (`take`)                              |
-| `onComplete(teardown)`       | Register a teardown (clear timers, unsubscribe), run once when the observable completes or is disposed |
-| `startUpdate(value)`         | Async children only: emit `value` in a new update of its own                                           |
+| Tool                         | Meaning                                                                                                              |
+| :--------------------------- | :------------------------------------------------------------------------------------------------------------------- |
+| `setNext(value, token)`      | Emit `value` in the update `token` names                                                                             |
+| `getSnapshot()`              | This observable's current value                                                                                      |
+| `complete()`                 | Complete this observable now                                                                                         |
+| `completeAfterPropagation()` | Complete it once the current update has reached every descendant (`take`)                                            |
+| `onComplete(teardown)`       | Register a teardown (clear timers, unsubscribe), run once when the observable completes or is disposed               |
+| `startUpdate(value)`         | Async children only: emit `value` in a new update of its own, or only store it while nothing observes the observable |
 
 ### Returning more than `tryUpdate`
 
@@ -93,7 +93,7 @@ createSyncChildObservable(
 
 ## An async operator
 
-An async child emits later through `startUpdate`, which starts an update of its own and propagates it to everything derived from the observable. The timers are created in `init`, next to the teardown that clears them. `debounce` also returns a `flush` that passes on the value its timer still holds when it completes.
+An async child emits later through `startUpdate`, which starts an update of its own and propagates it to everything derived from the observable. While nothing is derived from it and nothing subscribes, it only stores the value. The timers are created in `init`, next to the teardown that clears them. `debounce` also returns a `flush` that passes on the value its timer still holds when it completes.
 
 ```ts
 import { Optional } from 'ts-data-forge';

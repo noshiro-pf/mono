@@ -1,0 +1,25 @@
+--- en/01-async-step.synstate.mts
++++ ja/01-async-step.synstate.mts
+@@ -17,18 +17,18 @@
+ export const createSearchView = (): SearchView => {
+   const [query, setQuery] = createState('a');
+ 
+-  // A newer query completes the previous inner observable,
+-  // which cancels its request.
++  // 新しいクエリは前の内側の Observable を完了させ、
++  // それがリクエストを取り消す。
+   const searchState = query.pipe(
+     switchMap((q) =>
+       timer(answerMs)
+         .pipe(map((): SearchState => ({ status: 'success', query: q })))
+-        // emitted in the same update as the query
++        // クエリと同じ更新の中で出る
+         .pipe(withInitialValue<SearchState>({ status: 'loading', query: q })),
+     ),
+   );
+ 
+-  // What the page shows: the query in the box, and what the list is for.
++  // ページに表示するもの: 入力欄のクエリと、リストがどのクエリの結果か。
+   const view = combine([query, searchState]).pipe(
+     map(([q, state]) => showView(q, state)),
+   );

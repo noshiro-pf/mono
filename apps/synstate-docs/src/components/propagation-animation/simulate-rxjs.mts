@@ -1,4 +1,5 @@
 import { Arr } from 'ts-data-forge';
+import type { LocalizedText } from '../constants.mjs';
 import {
   byCount,
   freezeStates,
@@ -11,7 +12,7 @@ import {
   type MutableNodeState,
   type Trace,
 } from './frame.mjs';
-import type { LocalizedText, Scenario, ScenarioNode } from './scenario.mjs';
+import type { Scenario, ScenarioNode } from './scenario.mjs';
 
 /**
  * Runs the scenario through a model of RxJS's push propagation: a node that

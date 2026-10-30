@@ -6,6 +6,14 @@ import { defineConfig } from 'astro/config';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
 
+/**
+ * The component directories rendered with Preact. Each is excluded from the
+ * React integration and included in the Preact one from this one list, since
+ * a Preact component the React plugin also claims gets React Fast Refresh
+ * injected into it.
+ */
+const preactComponentDirs = ['preact-signals-demo', 'signals-operators-demo'];
+
 export default defineConfig({
   site: 'https://noshiro-pf.github.io',
   // Served from this repository's Pages now, not the archived `synstate`
@@ -25,13 +33,15 @@ export default defineConfig({
     // JS — which makes `.mts` modules under `src/components/` fail to parse
     // ("Type assertion expressions can only be used in TypeScript files").
     react({
-      include: [
-        '**/components/**/*.{jsx,tsx}',
-        '!**/components/preact-signals-demo/**',
-      ],
+      include: ['**/components/**/*.{jsx,tsx}'],
+      // `exclude`, not a `!` pattern in `include`: the matcher ORs the entries
+      // of `include`, so a negated one there removes nothing.
+      exclude: preactComponentDirs.map((dir) => `**/components/${dir}/**`),
     }),
     preact({
-      include: ['**/components/preact-signals-demo/**/*.{jsx,tsx}'],
+      include: preactComponentDirs.map(
+        (dir) => `**/components/${dir}/**/*.{jsx,tsx}`,
+      ),
     }),
     starlight({
       title: 'SynState',

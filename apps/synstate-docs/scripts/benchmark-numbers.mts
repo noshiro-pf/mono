@@ -500,12 +500,6 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       ja: '誰も読まない分岐への書き込みは MobX・Solid・Preact Signals にはほとんど何のコストもかかりませんが、Jotai には `store.set()` 1回分がまるごとかかります',
     }),
 
-    // The headline on the introduction and the landing page: SynState's worst
-    // case (the figure above) beside the range the other libraries' worst
-    // cases span, each end named. A library measured in some scenarios only is
-    // left out, since its worst case is over those alone.
-    ...othersWorstCaseRange(),
-
     // Summary: for each library, the summary row where it is furthest from
     // that row's fastest library, among the rows that measured it. Which row
     // that is is what a re-measurement can change, so the scenario is derived
@@ -601,9 +595,10 @@ const singleState: StatsData = singleStateJson;
 
 /**
  * The derived chain. The headline on the introduction and the landing page
- * used to be read from it ("N× faster than Jotai and M× faster than Redux");
- * it now sets worst cases side by side instead, because one scenario chosen
- * for its gap says more about the choice than about the libraries.
+ * used to be read from it ("N× faster than Jotai and M× faster than Redux"),
+ * and later set worst cases side by side; it now quotes no number, because
+ * one ratio chosen for its gap says more about the choice than about the
+ * libraries, and the benchmark page sets every scenario out.
  */
 const derivedChain: StatsData = derivedChainJson;
 
@@ -1356,11 +1351,15 @@ const pointSpread = (data: SeriesData, label: string, xLabel: string): number =>
  * where the row timed out, which makes the figure a lower bound.
  */
 const spreadText = (spread: number, timedOut: boolean): string =>
-  timedOut
+  lowerBoundMarked(factor(spread, 1), timedOut);
+
+/** `figure`, marked `>` where it is a lower bound. */
+const lowerBoundMarked = (figure: string, isLowerBound: boolean): string =>
+  isLowerBound
     ? // A no-break space, so that a narrow column does not wrap the mark away
       // from its number.
-      (`>\u{A0}${factor(spread, 1)}` as const)
-    : factor(spread, 1);
+      (`>\u{A0}${figure}` as const)
+    : figure;
 
 const slowestSpreadText = (
   data: SeriesData,
@@ -1400,7 +1399,16 @@ type SummaryScenario = Readonly<{
   fastest: () => string;
   spread: (library: string) => number;
   timedOut: (library: string) => boolean;
+  /**
+   * What one update costs `library` and the fastest library, in nanoseconds,
+   * or `undefined` where the scenario's time is not a per-update cost (the
+   * cascaded diamond spreads building its graph over too few updates). Where
+   * `library` timed out, its cost is the timeout's, a lower bound.
+   */
+  perUpdateNs: (library: string) => PerUpdateNs | undefined;
 }>;
+
+type PerUpdateNs = Readonly<{ library: number; fastest: number }>;
 
 /** A library's worst summary row, from {@link worstSummaryRow}. */
 type WorstRow = Readonly<{ scenario: SummaryScenario; spread: number }>;
@@ -1440,6 +1448,7 @@ const summaryScenarios = (): readonly SummaryScenario[] =>
       },
       deepChain,
       DEEP_MAX,
+      deepChainUpdates(DEEP_MAX),
     ),
     seriesScenario(
       {
@@ -1448,11 +1457,15 @@ const summaryScenarios = (): readonly SummaryScenario[] =>
       },
       cascadedDiamond,
       CASCADED_MAX,
+      // Each measurement builds the graph as well as updating it, and makes
+      // only 100 updates, so the building is most of what it times.
+      undefined,
     ),
     seriesScenario(
       fanOutSummaryName(),
       conditionalFanOut,
       fanOutLastLabel(),
+      updates(conditionalFanOut),
       FAN_OUT_SUMMARY_FORMS,
     ),
   ] as const;
@@ -1480,6 +1493,10 @@ const statsScenario = (
     fastest: () => markFastest(fastestRow(data)),
     spread: (library) => rowSpread(data, library),
     timedOut: () => false,
+    perUpdateNs: (library) => ({
+      library: nsPerUpdate(median(data, library), updates(data)),
+      fastest: nsPerUpdate(median(data, fastestRow(data)), updates(data)),
+    }),
   }) as const;
 
 /**
@@ -1491,6 +1508,7 @@ const seriesScenario = (
   name: Localized,
   data: SeriesData,
   xLabel: string,
+  updatesAtPoint: number | undefined,
   forms: ReadonlyRecord<string, string> = {},
 ): SummaryScenario => {
   const form = (library: string): string => forms[library] ?? library;
@@ -1505,8 +1523,56 @@ const seriesScenario = (
     fastest: () => fastestAt(data, xLabel),
     spread: (library) => pointSpread(data, form(library), xLabel),
     timedOut: (library) => valueAt(data, form(library), xLabel) === null,
+    perUpdateNs: (library) => {
+      if (updatesAtPoint === undefined) {
+        return undefined;
+      }
+
+      const value = valueAt(data, form(library), xLabel);
+
+      return {
+        library: nsPerUpdate(value ?? timeout(data), updatesAtPoint),
+        fastest: nsPerUpdate(
+          at(data, fastestAt(data, xLabel), xLabel),
+          updatesAtPoint,
+        ),
+      };
+    },
   };
 };
+
+/**
+ * The update count of a deep chain point: `'K=1000, M=200'` → `1000`. The
+ * results record none for the sweep, as it varies by point.
+ */
+const deepChainUpdates = (xLabel: string): number => {
+  const kPart = xLabel
+    .split(',')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith('K='));
+
+  if (kPart === undefined) {
+    throw new Error(`❌ no update count K in the column heading '${xLabel}'`);
+  }
+
+  return param(kPart);
+};
+
+const nsPerUpdate = (totalMs: number, updateCount: number): number =>
+  divide(totalMs * NS_PER_MS, updateCount);
+
+/**
+ * A per-update cost as the per-library table prints it, in nanoseconds,
+ * microseconds or milliseconds, whichever keeps the figure under 1,000, with
+ * a tenth below 10. Each bound is read off the rounded figure, so that 999.6 ns
+ * prints as `1.0 µs`, never `1000 ns`.
+ */
+const durationNs = (ns: number): string =>
+  Math.round(ns) < 1000
+    ? (`${factor(ns, 1)} ns` as const)
+    : Math.round(divide(ns, 1000)) < 1000
+      ? (`${factor(ns, 1000)} µs` as const)
+      : (`${factor(ns, NS_PER_MS)} ms` as const);
 
 /**
  * The fan-out row the summary counts for a library measured both ways: the
@@ -1529,15 +1595,6 @@ const summaryLibraries = (): readonly string[] =>
 /** Whether every summary row measured `library`. */
 const inEveryScenario = (library: string): boolean =>
   summaryScenarios().every((s) => s.libraries.includes(library));
-
-/**
- * The libraries other than SynState that every summary row measured, in the
- * per-library table's order.
- */
-const otherEveryScenarioLibraries = (): readonly string[] =>
-  summaryLibraries().filter(
-    (library) => library !== 'SynState' && inEveryScenario(library),
-  );
 
 /**
  * A library name, with the footnote mark the page explains when some summary
@@ -1605,6 +1662,7 @@ const worstCaseRows = (): ReadonlyRecord<string, BenchmarkNumber> => {
       scenario: worst.scenario.name,
       fastest: worst.scenario.fastest(),
       cell: worstCaseCell(library, worst),
+      perUpdate: perUpdateCell(library, worst),
     };
   });
 
@@ -1615,11 +1673,12 @@ const worstCaseRows = (): ReadonlyRecord<string, BenchmarkNumber> => {
   }
 
   return Object.fromEntries(
-    rows.flatMap(({ key, library, scenario, fastest, cell }) => [
+    rows.flatMap(({ key, library, scenario, fastest, cell, perUpdate }) => [
       [`summary/worst/${key}-library`, library],
       [`summary/worst/${key}-scenario`, scenario],
       [`summary/worst/${key}-fastest`, fastest],
       [`summary/worst/${key}-over-fastest-cell`, cell],
+      [`summary/worst/${key}-per-update`, perUpdate],
     ]),
   );
 };
@@ -1653,42 +1712,19 @@ const CASCADED_DIAMOND = '#scenario-cascaded-diamond';
 const FAN_OUT = '#scenario-conditional-fan-out';
 
 /**
- * The headline's range of the other libraries' worst cases: of
- * {@link otherEveryScenarioLibraries}, the one whose worst case is nearest the
- * fastest library and the one whose worst case is furthest from it.
+ * What one update costs in a library's worst row, beside what it costs the
+ * fastest library there: a ratio says how far apart two libraries are, and
+ * these say whether that is nanoseconds or milliseconds. A row whose time is
+ * not a per-update cost prints an em dash, and a timed-out one a lower bound
+ * marked as {@link spreadText} marks its ratio; the note under the table
+ * explains both.
  */
-const othersWorstCaseRange = (): ReadonlyRecord<string, string> => {
-  // A timed-out worst case sorts by its lower bound, which `spreadText`
-  // prints with `>`: placing it after every measured one could print an upper
-  // end smaller than the lower one.
-  const sorted = otherEveryScenarioLibraries()
-    .map((library) => {
-      const worst = worstSummaryRow(library);
+const perUpdateCell = (library: string, worst: WorstRow): string => {
+  const ns = worst.scenario.perUpdateNs(library);
 
-      return {
-        library,
-        spread: worst.spread,
-        text: worstCaseText(library, worst),
-      };
-    })
-    .toSorted((a, b) => a.spread - b.spread);
-
-  const least = sorted[0];
-
-  const most = sorted.at(-1);
-
-  if (least === undefined || most === undefined || least === most) {
-    throw new Error(
-      '❌ the headline range needs two other libraries that took part in every scenario',
-    );
-  }
-
-  return {
-    'summary/others-least-worst-library': least.library,
-    'summary/others-least-worst-over-fastest': least.text,
-    'summary/others-most-worst-library': most.library,
-    'summary/others-most-worst-over-fastest': most.text,
-  };
+  return ns === undefined
+    ? '\u{2014}'
+    : `${lowerBoundMarked(durationNs(ns.library), worst.scenario.timedOut(library))} / ${durationNs(ns.fastest)}`;
 };
 
 /** The slowest library's distance from the fastest in each summary row. */
@@ -1781,11 +1817,9 @@ const medianOf = (values: readonly number[]): number | undefined =>
  */
 const nsPerBranchPerUpdate = (): string =>
   count(
-    Math.round(
-      divide(
-        at(conditionalFanOut, SYNSTATE_NAIVE, fanOutLastLabel()) * NS_PER_MS,
-        param(fanOutLastLabel()) * updates(conditionalFanOut),
-      ),
+    nsPerUpdate(
+      at(conditionalFanOut, SYNSTATE_NAIVE, fanOutLastLabel()),
+      param(fanOutLastLabel()) * updates(conditionalFanOut),
     ),
   );
 
