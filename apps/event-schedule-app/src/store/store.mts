@@ -9,7 +9,13 @@
 
 import { api } from '../api/index.mjs';
 import { fetchThrottleTime } from '../constants/index.mjs';
-import { fetchHolidaysJson } from '../functions/index.mjs';
+import { createToaster, fetchHolidaysJson } from '../functions/index.mjs';
+import {
+  createAnswerFilterAndSortStore,
+  createAnswerFilterQueryParam,
+  createAnswerPageStore,
+  createAnswerTableStore,
+} from './answer-page-state/index.mjs';
 import { createAuthStore } from './auth-store.mjs';
 import { createEventListFilterStore } from './event-list-page-state/index.mjs';
 import { createErrorType } from './fetched-values-state.mjs';
@@ -67,14 +73,39 @@ export const EventListStore = createEventListStore({
 
 export const { eventList$ } = EventListStore;
 
+const answerFilterQueryParam = createAnswerFilterQueryParam({ router: Router });
+
+export const AnswerFilterAndSortStore = createAnswerFilterAndSortStore({
+  answers$: AnswersStore.answers$,
+  eventSchedule$,
+  queryParam: answerFilterQueryParam,
+});
+
+export const { answersFiltered$ } = AnswerFilterAndSortStore;
+
+export const AnswerTableStore = createAnswerTableStore({
+  eventSchedule$,
+  filterAndSort: AnswerFilterAndSortStore,
+});
+
+export const AnswerPageStore = createAnswerPageStore({
+  api,
+  answers: AnswersStore,
+  auth: Auth,
+  router: Router,
+  eventSchedule$,
+  toast: createToaster(),
+});
+
 /**
  * Starts listening to the auth state and the screen width, fetches the
  * holidays, and starts reading the event, its answers and the event list.
  * Called once, from `main.tsx`, before the first render.
  *
- * The router (which reads `location`) and `api` (which connects to Firebase)
- * are still made on import, because the stores not yet made by a factory read
- * them at the top level of their modules.
+ * Still made on import: the router (which reads `location`) and `api` (which
+ * connects to Firebase), because the stores not yet made by a factory read
+ * them at the top level of their modules; and each page's toaster (which adds
+ * an element to `document.body`), as their modules made it before.
  */
 export const startStore = (): (() => void) => {
   const stopAuth = Auth.start();
