@@ -6,16 +6,14 @@ import {
 } from '@typescript-eslint/utils';
 import {
   buildCalleeResolver,
-  buildNamedImportFix,
   getArgumentText,
   getImportDeclarations,
-  getImportedLocalName,
   getRangeWithParens,
   skipTypeWrappers,
-  type ResolvedCallee,
 } from 'eslint-rule-forge';
+import { hasCommentWithin } from './comments.mjs';
 import { SYNSTATE_MODULE } from './constants.mjs';
-import { isShadowedCallee, replacementCallee } from './synstate-callee.mjs';
+import { buildCalleeRewriter, isShadowedCallee } from './synstate-callee.mjs';
 
 type Options = readonly [];
 
@@ -50,19 +48,11 @@ export const preferMapTo: TSESLint.RuleModule<MessageIds, Options> = {
   create: (context) => {
     const sourceCode = context.sourceCode;
 
-    const program = sourceCode.ast;
-
-    const imports = getImportDeclarations(program, SYNSTATE_MODULE);
+    const imports = getImportDeclarations(sourceCode.ast, SYNSTATE_MODULE);
 
     const resolveCallee = buildCalleeResolver(imports);
 
-    const importedMapTo = getImportedLocalName(imports, 'mapTo');
-
-    const mut_reports: Readonly<{
-      node: TSESTree.CallExpression;
-      resolved: ResolvedCallee;
-      body: TSESTree.Expression;
-    }>[] = [];
+    const rewriteCallee = buildCalleeRewriter(sourceCode, imports, 'mapTo');
 
     return {
       CallExpression: (node) => {
@@ -88,58 +78,31 @@ export const preferMapTo: TSESLint.RuleModule<MessageIds, Options> = {
           return;
         }
 
-        mut_reports.push({ node, resolved, body });
-      },
-      'Program:exit': () => {
-        // The import goes with the first report that needs it, and with no
-        // other: two insertions at the start of the file conflict, and one
-        // of them would be dropped.
-        let mut_importPlanned = false;
+        const argumentRange = getRangeWithParens(sourceCode, argument);
 
-        for (const { node, resolved, body } of mut_reports) {
-          const calleeText = replacementCallee(
-            sourceCode,
-            node,
-            resolved,
-            'mapTo',
-            importedMapTo,
-          );
+        // The function around the body goes; a comment there would go with
+        // it. One around the callee is `buildCalleeRewriter`'s to refuse.
+        const calleeRewrite = hasCommentWithin(sourceCode, node, [
+          [argumentRange[0], body.range[0]],
+          [body.range[1], argumentRange[1]],
+        ])
+          ? undefined
+          : rewriteCallee(node, resolved);
 
-          const addsImport =
-            calleeText !== undefined &&
-            !resolved.isNamespace &&
-            importedMapTo === undefined &&
-            !mut_importPlanned;
-
-          if (addsImport) {
-            mut_importPlanned = true;
-          }
-
-          context.report({
-            node,
-            messageId: 'preferMapTo',
-            fix:
-              calleeText === undefined
-                ? null
-                : (fixer) => [
-                    ...(addsImport
-                      ? buildNamedImportFix(fixer, program, SYNSTATE_MODULE, [
-                          'mapTo',
-                        ])
-                      : []),
-                    resolved.isNamespace
-                      ? fixer.replaceText(resolved.propertyNode, calleeText)
-                      : fixer.replaceTextRange(
-                          getRangeWithParens(sourceCode, node.callee),
-                          calleeText,
-                        ),
-                    fixer.replaceTextRange(
-                      getRangeWithParens(sourceCode, node.arguments[0] ?? node),
-                      getArgumentText(sourceCode, body),
-                    ),
-                  ],
-          });
-        }
+        context.report({
+          node,
+          messageId: 'preferMapTo',
+          fix:
+            calleeRewrite === undefined
+              ? null
+              : (fixer) => [
+                  ...calleeRewrite(fixer),
+                  fixer.replaceTextRange(
+                    argumentRange,
+                    getArgumentText(sourceCode, body),
+                  ),
+                ],
+        });
       },
     };
   },

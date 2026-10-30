@@ -8,9 +8,12 @@ import {
   getImportDeclarations,
   getRangeWithParens,
   isIdentifierNamed,
+  isTypeWrapper,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
+import { hasCommentWithin } from './comments.mjs';
 import { SYNSTATE_MODULE } from './constants.mjs';
+import { pipeCallOf } from './functions.mjs';
 import { isShadowedCallee } from './synstate-callee.mjs';
 
 type Options = readonly [];
@@ -135,18 +138,19 @@ export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
           node.range[1],
         ] as const;
 
-        const hasComment = sourceCode
-          .getAllComments()
-          .some(
-            (comment) =>
-              removed[0] <= comment.range[0] && comment.range[1] <= removed[1],
-          );
+        // A wrapper or parentheses around `x.pipe` would lose their closing
+        // half with it.
+        const fixable =
+          !isTypeWrapper(node.callee) &&
+          getRangeWithParens(sourceCode, node.callee)[0] ===
+            node.callee.range[0] &&
+          !hasCommentWithin(sourceCode, node, [removed]);
 
         context.report({
           node: skip,
           messageId: 'redundantSkipIfNoChange',
           data: { operator },
-          fix: hasComment ? null : (fixer) => fixer.removeRange(removed),
+          fix: fixable ? (fixer) => fixer.removeRange(removed) : null,
         });
       },
     };
@@ -167,44 +171,6 @@ const builtOnMap = [
   'unwrapResultOk',
   'unwrapResultErr',
 ] as const;
-
-/**
- * `node` as `receiver.pipe(operator)`, or `undefined` when it is not a `.pipe`
- * call with one argument.
- */
-const pipeCallOf = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
-):
-  | Readonly<{
-      receiver: TSESTree.Expression;
-      operator: TSESTree.Expression;
-    }>
-  | undefined => {
-  if (
-    node.type !== AST_NODE_TYPES.CallExpression ||
-    node.arguments.length !== 1
-  ) {
-    return undefined;
-  }
-
-  const [operator] = node.arguments;
-
-  if (
-    operator === undefined ||
-    operator.type === AST_NODE_TYPES.SpreadElement
-  ) {
-    return undefined;
-  }
-
-  const callee = skipTypeWrappers(node.callee);
-
-  return callee.type === AST_NODE_TYPES.MemberExpression &&
-    !callee.computed &&
-    isIdentifierNamed(callee.property, 'pipe')
-    ? { receiver: callee.object, operator }
-    : undefined;
-};
 
 /** Whether `skipIfNoChange(...)` compares with `Object.is`: given nothing, or `Object.is`. */
 const comparesWithObjectIs = (

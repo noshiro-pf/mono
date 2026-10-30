@@ -5,19 +5,18 @@ import {
 } from '@typescript-eslint/utils';
 import {
   buildCalleeResolver,
-  buildNamedImportFix,
   getImportDeclarations,
-  getImportedLocalName,
   getRangeWithParens,
-  isIdentifierNamed,
   isTypeWrapper,
   skipTypeWrappers,
   type ResolvedCallee,
 } from 'eslint-rule-forge';
+import { hasCommentWithin } from './comments.mjs';
 import { SYNSTATE_MODULE } from './constants.mjs';
+import { pipeCallOf } from './functions.mjs';
 import { identityOf } from './no-identity-map.mjs';
 import { constantBodyOf } from './prefer-map-to.mjs';
-import { isShadowedCallee, replacementCallee } from './synstate-callee.mjs';
+import { buildCalleeRewriter, isShadowedCallee } from './synstate-callee.mjs';
 
 type Options = readonly [];
 
@@ -59,13 +58,11 @@ export const preferDerive: TSESLint.RuleModule<MessageIds, Options> = {
   create: (context) => {
     const sourceCode = context.sourceCode;
 
-    const program = sourceCode.ast;
-
-    const imports = getImportDeclarations(program, SYNSTATE_MODULE);
+    const imports = getImportDeclarations(sourceCode.ast, SYNSTATE_MODULE);
 
     const resolveCallee = buildCalleeResolver(imports);
 
-    const importedDerive = getImportedLocalName(imports, 'derive');
+    const rewriteCallee = buildCalleeRewriter(sourceCode, imports, 'derive');
 
     /** `expression` as a call of synstate's export among `names`. */
     const synstateCallOf = (
@@ -89,13 +86,6 @@ export const preferDerive: TSESLint.RuleModule<MessageIds, Options> = {
         ? { call, resolved }
         : undefined;
     };
-
-    const mut_reports: Readonly<{
-      node: TSESTree.CallExpression;
-      combine: TSESTree.CallExpression;
-      combineCallee: ResolvedCallee;
-      map: TSESTree.CallExpression;
-    }>[] = [];
 
     return {
       CallExpression: (node) => {
@@ -122,70 +112,26 @@ export const preferDerive: TSESLint.RuleModule<MessageIds, Options> = {
           return;
         }
 
-        mut_reports.push({
+        const calleeRewrite = rewriteCallee(combine.call, combine.resolved);
+
+        const edits =
+          calleeRewrite === undefined
+            ? undefined
+            : rewriteOf(sourceCode, node, combine.call, map.call);
+
+        context.report({
           node,
-          combine: combine.call,
-          combineCallee: combine.resolved,
-          map: map.call,
+          messageId: 'preferDerive',
+          fix:
+            calleeRewrite === undefined || edits === undefined
+              ? null
+              : (fixer) => [
+                  ...calleeRewrite(fixer),
+                  ...edits.map(({ range, text }) =>
+                    fixer.replaceTextRange(range, text),
+                  ),
+                ],
         });
-      },
-      'Program:exit': () => {
-        // The import goes with the first report that needs it, and with no
-        // other: two insertions at the start of the file conflict, and one
-        // of them would be dropped.
-        let mut_importPlanned = false;
-
-        for (const { node, combine, combineCallee, map } of mut_reports) {
-          const calleeText = replacementCallee(
-            sourceCode,
-            combine,
-            combineCallee,
-            'derive',
-            importedDerive,
-          );
-
-          const edits =
-            calleeText === undefined
-              ? undefined
-              : rewriteOf(sourceCode, node, combine, map);
-
-          const addsImport =
-            edits !== undefined &&
-            !combineCallee.isNamespace &&
-            importedDerive === undefined &&
-            !mut_importPlanned;
-
-          if (addsImport) {
-            mut_importPlanned = true;
-          }
-
-          context.report({
-            node,
-            messageId: 'preferDerive',
-            fix:
-              calleeText === undefined || edits === undefined
-                ? null
-                : (fixer) => [
-                    ...(addsImport
-                      ? buildNamedImportFix(fixer, program, SYNSTATE_MODULE, [
-                          'derive',
-                        ])
-                      : []),
-                    combineCallee.isNamespace
-                      ? fixer.replaceText(
-                          combineCallee.propertyNode,
-                          calleeText,
-                        )
-                      : fixer.replaceTextRange(
-                          getRangeWithParens(sourceCode, combine.callee),
-                          calleeText,
-                        ),
-                    ...edits.map(({ range, text }) =>
-                      fixer.replaceTextRange(range, text),
-                    ),
-                  ],
-          });
-        }
       },
     };
   },
@@ -288,7 +234,7 @@ const rewriteOf = (
     node.typeArguments !== undefined ||
     map.typeArguments !== undefined ||
     // A wrapper written for the type of `map` would go with it (one around
-    // `combine` is `replacementCallee`'s to refuse).
+    // `combine` is `buildCalleeRewriter`'s to refuse).
     isTypeWrapper(map.callee) ||
     callee.type !== AST_NODE_TYPES.MemberExpression ||
     callee.object !== combine ||
@@ -319,15 +265,7 @@ const rewriteOf = (
     node.range[1],
   ] as const;
 
-  const hasComment = sourceCode
-    .getAllComments()
-    .some((comment) =>
-      [between, after].some(
-        ([start, end]) => start <= comment.range[0] && comment.range[1] <= end,
-      ),
-    );
-
-  return hasComment
+  return hasCommentWithin(sourceCode, node, [between, after])
     ? undefined
     : [{ range: between, text: ', ' }, ...params, { range: after, text: ')' }];
 };
@@ -365,35 +303,3 @@ const hasPlainArguments = (
   call.arguments.every(
     (argument) => argument.type !== AST_NODE_TYPES.SpreadElement,
   );
-
-/**
- * `node` as `receiver.pipe(operator)`, or `undefined` when it is not a `.pipe`
- * call with one argument.
- */
-const pipeCallOf = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.CallExpression,
-):
-  | Readonly<{
-      receiver: TSESTree.Expression;
-      operator: TSESTree.Expression;
-    }>
-  | undefined => {
-  const [operator] = node.arguments;
-
-  if (
-    operator === undefined ||
-    node.arguments.length !== 1 ||
-    operator.type === AST_NODE_TYPES.SpreadElement
-  ) {
-    return undefined;
-  }
-
-  const callee = skipTypeWrappers(node.callee);
-
-  return callee.type === AST_NODE_TYPES.MemberExpression &&
-    !callee.computed &&
-    isIdentifierNamed(callee.property, 'pipe')
-    ? { receiver: callee.object, operator }
-    : undefined;
-};
