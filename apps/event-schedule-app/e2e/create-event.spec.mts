@@ -1,5 +1,4 @@
 import { expect, type Page, test } from '@playwright/test';
-import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 
 // Writes to Firestore, so it runs against the emulators, through
@@ -23,13 +22,13 @@ test('create event', { tag: '@emulators' }, async ({ page, context }) => {
 
     await createPage.getByTestId('note').fill('ノート（仮）');
 
-    for (const _ of Arr.range(0, 2)) {
-      // eslint-disable-next-line no-await-in-loop
-      await createPage
-        .getByTestId('datetime-list')
-        .getByTestId('add-button')
-        .click();
-    }
+    const addButton = createPage
+      .getByTestId('datetime-list')
+      .getByTestId('add-button');
+
+    await addButton.click();
+
+    await addButton.click();
 
     await createPage.getByTestId('create-button').click();
   }

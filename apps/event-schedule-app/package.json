@@ -12,8 +12,9 @@
   "type": "module",
   "scripts": {
     "build": "vite build --config ./configs/vite.config.mts",
-    "check:e2e": "playwright test --config ./configs/playwright.config.mts --grep-invert @emulators",
+    "check:e2e": "playwright test --config ./configs/playwright.config.mts --grep-invert '@emulators|@production'",
     "check:e2e:emulators": "pnpm --dir ../event-schedule-app-functions run build && firebase emulators:exec --only functions,firestore,pubsub \"playwright test --config ./configs/playwright.config.mts --grep @emulators\"",
+    "check:e2e:production": "playwright test --config ./configs/playwright.production.config.mts",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
     "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && vitest --config ./configs/vitest.config.mts run",
     "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",

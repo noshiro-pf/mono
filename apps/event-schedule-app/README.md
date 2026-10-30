@@ -37,13 +37,36 @@ else is installed.
 ### End-to-end tests
 
 ```sh
-pnpm run check:e2e            # what CI runs; leaves out the @emulators tests
+pnpm run check:e2e            # what CI runs; leaves out @emulators and @production
 pnpm run check:e2e:emulators  # the tests that write to Firestore
+pnpm run check:e2e:production # the @smoke and @production tests, against the site
 ```
 
 `check:e2e:emulators` starts its own emulators with empty data
 (`firebase emulators:exec`), so stop `pnpm run emulators` first: they listen
 on the same ports. No workflow runs it yet, since no runner has Java.
+
+`check:e2e:production` is run daily by
+[`e2e-production.yml`](../../.github/workflows/e2e-production.yml) against
+<https://event-schedule-app.web.app> and the production Firestore. So that the
+database does not grow with every run, it creates no event — nothing can
+delete one — and works on one fixture event instead: it reads it, adds an
+answer and deletes it, and edits the notes and sets them back.
+`e2e/production.spec.mts` has the details. The fixture is made once, by hand:
+
+1. Signed out, create an event at <https://event-schedule-app.web.app> with
+   the default answer deadline (none) and notifications (off). The title and
+   dates are free; the first run overwrites the notes.
+2. Store the id from its URL (`/event/<id>/`) as the repository secret
+   `EVENT_SCHEDULE_APP_E2E_EVENT_ID`, and do not post the URL anywhere: it is
+   all it takes to edit the event.
+
+To try a change to the tests before it meets production, point them at
+`pnpm run dev` and the emulators, with an event created there:
+
+```sh
+E2E_BASE_URL=http://localhost:5188 EVENT_SCHEDULE_APP_E2E_EVENT_ID=<id> pnpm run check:e2e:production
+```
 
 ### Firestore structure
 

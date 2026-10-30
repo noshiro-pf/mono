@@ -513,6 +513,14 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
     // the emulators are wired into a workflow.
   },
   {
+    directory: 'apps/event-schedule-app',
+    scriptName: 'check:e2e:production',
+    // The end-to-end tests against the deployed site, which
+    // `e2e-production.yml` runs daily (through the binary, after installing
+    // this app alone). What they judge is the site, not the tree, so a pull
+    // request check would fail for nothing the branch did.
+  },
+  {
     scriptName: 'check:cspell',
     // The package-scoped spell check. The root `check:cspell` reads the whole
     // repository, so the per-package script exists to be run by hand in a
