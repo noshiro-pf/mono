@@ -152,8 +152,18 @@ jobs:
       - name: Build
         run: pnpm run ws:build
 
+      # The tables only, without `gen:benchmark-doc`: a near tie in one noisy
+      # re-measurement must not fail the job that judges drift. A sentence the
+      # committed tables no longer support fails `Build` instead (`ws:build`
+      # runs the docs app's `doc`); a page left stale against its tables is
+      # style-check's `ws:gen` to catch. `fix:fmt` gives the tables the layout
+      # they are committed in, so the diff below counts changed numbers, not
+      # reformatted lines.
       - name: Measure
-        run: pnpm --filter @synstate/docs run benchmark
+        run: |
+          set -euo pipefail
+          pnpm --filter @synstate/docs run z:benchmark:measure
+          pnpm --filter @synstate/docs run fix:fmt
 
       # What the measurement would change if it were committed. On `main` with
       # no baseline yet, this is the diff to commit; on a pull request it is
@@ -282,7 +292,7 @@ jobs:
         if: steps.committed.outputs.drifted == 'true'
         run: |
           set -euo pipefail
-          echo '::error title=Benchmark tables drifted::The committed tables in apps/synstate-docs/src/data do not describe this code and these library versions. If the change is meant to move the numbers, replace them with the files of the synstate-benchmark-to-commit-${{ github.run_id }} artifact, then run pnpm --filter @synstate/docs run gen:benchmark-doc and pnpm run fmt, and commit the result.'
+          echo '::error title=Benchmark tables drifted::The committed tables in apps/synstate-docs/src/data do not describe this code and these library versions. If the change is meant to move the numbers, replace them with the files of the synstate-benchmark-to-commit-${{ github.run_id }} artifact, then run pnpm --filter @synstate/docs run gen:benchmark-doc until it passes, fixing what each error names (a sentence the tables no longer support is rewritten), run pnpm run fmt, and commit the result.'
           exit 1
 
   # The one required status check for this workflow, reported as

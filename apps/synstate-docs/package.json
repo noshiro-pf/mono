@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "benchmark": "run-s z:build:synstate z:benchmark:derived-chain z:benchmark:cascaded-diamond z:benchmark:conditional-fan-out z:benchmark:deep-chain gen:benchmark-doc fix:fmt",
+    "benchmark": "run-s z:build:synstate z:benchmark:measure gen:benchmark-doc fix:fmt",
     "benchmark:cascaded-diamond": "run-s z:build:synstate z:benchmark:cascaded-diamond gen:benchmark-doc fix:fmt",
     "benchmark:conditional-fan-out": "run-s z:build:synstate z:benchmark:conditional-fan-out gen:benchmark-doc fix:fmt",
     "benchmark:deep-chain": "run-s z:build:synstate z:benchmark:deep-chain gen:benchmark-doc fix:fmt",
@@ -41,6 +41,7 @@
     "z:benchmark:conditional-fan-out": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/run-conditional-fan-out.mts",
     "z:benchmark:deep-chain": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/run-deep-chain.mts",
     "z:benchmark:derived-chain": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/run-derived-chain.mts",
+    "z:benchmark:measure": "run-s z:benchmark:derived-chain z:benchmark:cascaded-diamond z:benchmark:conditional-fan-out z:benchmark:deep-chain",
     "z:benchmark:version-key": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/print-version-key.mts",
     "z:build:synstate": "pnpm --filter synstate run build",
     "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write"

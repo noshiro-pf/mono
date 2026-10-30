@@ -1,5 +1,5 @@
 import { Arr, Num, Result } from 'ts-data-forge';
-import type { ReadonlyRecord } from 'ts-type-forge';
+import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
 import {
   cascadedDiamond as cascadedDiamondJson,
   conditionalFanOut as conditionalFanOutJson,
@@ -119,6 +119,92 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       median(diamond, 'Preact Signals'),
       median(diamond, 'SynState'),
     ),
+    'derived-chain/rxjs-over-synstate': factor(
+      median(derivedChain, 'RxJS'),
+      median(derivedChain, 'SynState'),
+    ),
+    'diamond/rxjs-over-synstate': factor(
+      median(diamond, 'RxJS'),
+      median(diamond, 'SynState'),
+    ),
+
+    // The comparative words around the small-graph figures (see
+    // `compared`): which side of SynState a library falls on is what a
+    // re-measurement moves, so the word is derived with the number.
+    'compare/derived-chain/rxjs-speed': compared(
+      'RxJS against SynState in the derived chain',
+      [medians(derivedChain, 'RxJS', 'SynState')],
+      SPEED,
+    ),
+    'compare/diamond/rxjs-speed': compared(
+      'RxJS against SynState in the diamond',
+      [medians(diamond, 'RxJS', 'SynState')],
+      SPEED,
+    ),
+    'compare/derived-chain/preact-signals-speed': compared(
+      'Preact Signals against SynState in the derived chain',
+      [medians(derivedChain, 'Preact Signals', 'SynState')],
+      SPEED,
+    ),
+    'compare/derived-graphs/preact-signals-speed': compared(
+      'Preact Signals against SynState in the derived chain and the diamond',
+      [
+        medians(derivedChain, 'Preact Signals', 'SynState'),
+        medians(diamond, 'Preact Signals', 'SynState'),
+      ],
+      SPEED,
+    ),
+    'compare/derived-graphs/heavy-speed': compared(
+      'Solid, MobX, Jotai and Redux against SynState in the derived chain and the diamond',
+      [derivedChain, diamond].flatMap((data) =>
+        HEAVY_LIBRARIES.map((library) => medians(data, library, 'SynState')),
+      ),
+      SPEED_PLURAL,
+    ),
+    'compare/diamond/rxjs-pass-cost': compared(
+      "RxJS's two passes against SynState's one in the diamond",
+      [medians(diamond, 'RxJS', 'SynState')],
+      PASS_COST,
+    ),
+    'compare/small-graphs/preact-signals-overhead': compared(
+      'Preact Signals against SynState in the single state, the derived chain and the diamond',
+      SMALL_GRAPHS.map((data) => medians(data, 'Preact Signals', 'SynState')),
+      OVERHEAD_AT_MOST,
+    ),
+    'compare/small-graphs/synstate-vs-heavy-overhead': compared(
+      'SynState against Solid, MobX, Jotai and Redux in the single state, the derived chain and the diamond',
+      SMALL_GRAPHS.flatMap((data) =>
+        HEAVY_LIBRARIES.map((library) => medians(data, 'SynState', library)),
+      ),
+      OVERHEAD,
+    ),
+    'compare/small-graphs/synstate-vs-preact-signals-overhead': compared(
+      'SynState against Preact Signals in the single state, the derived chain and the diamond',
+      SMALL_GRAPHS.map((data) => medians(data, 'SynState', 'Preact Signals')),
+      OVERHEAD,
+    ),
+    'compare/single-state/synstate-vs-zustand-overhead': compared(
+      'SynState against Zustand in the single state',
+      [medians(singleState, 'SynState', 'Zustand')],
+      OVERHEAD,
+    ),
+    'compare/small-graphs/synstate-vs-rxjs-overhead': compared(
+      'SynState against RxJS in the single state, the derived chain and the diamond',
+      SMALL_GRAPHS.map((data) => medians(data, 'SynState', 'RxJS')),
+      OVERHEAD,
+    ),
+    'compare/preact-signals-winner': compared(
+      'Preact Signals against SynState in the single state, the deep chain (K=1000, M=200) and the diamond',
+      [
+        medians(singleState, 'Preact Signals', 'SynState'),
+        [
+          at(deepChain, 'Preact Signals', DEEP_MAX),
+          at(deepChain, 'SynState', DEEP_MAX),
+        ],
+        medians(diamond, 'Preact Signals', 'SynState'),
+      ],
+      WINNER,
+    ),
 
     // Scenario: Deep Chain Throughput
     'deep-chain/timeout': ms(timeout(deepChain)),
@@ -142,6 +228,16 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     'deep-chain/redux-over-synstate@k1000-m200': factor(
       at(deepChain, 'Redux', DEEP_MAX),
       at(deepChain, 'SynState', DEEP_MAX),
+    ),
+    'compare/deep-chain/redux-factor': compared(
+      'Redux against SynState at every point of the deep chain',
+      everyPoint(deepChain, 'Redux', 'SynState'),
+      SMALL_FACTOR,
+    ),
+    'compare/deep-chain/redux-factor-either-way': compared(
+      'Redux against SynState on both sides at the points of the deep chain',
+      everyPoint(deepChain, 'Redux', 'SynState'),
+      SMALL_FACTOR_EITHER_WAY,
     ),
     'deep-chain/synstate@k500-m100': ms(at(deepChain, 'SynState', DEEP_MID)),
     'deep-chain/rxjs@k500-m100': ms(at(deepChain, 'RxJS', DEEP_MID)),
@@ -221,6 +317,25 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     ),
     'cascaded-diamond/preact-signals@max-n': ms(
       at(cascadedDiamond, 'Preact Signals', CASCADED_MAX),
+    ),
+    'cascaded-diamond/mobx-over-synstate-typical': typicalFactor(
+      'MobX against SynState in the cascaded diamond',
+      everyPoint(cascadedDiamond, 'MobX', 'SynState'),
+    ),
+    // Whether a row stays flat across the sweep (see `rowTrend`).
+    'compare/cascaded-diamond/synstate-growth': rowTrend(
+      "SynState's cascaded diamond row",
+      cascadedDiamond,
+      'SynState',
+      [CASCADED_MIN, CASCADED_MAX],
+      'flat',
+    ),
+    'compare/cascaded-diamond/jotai-growth': rowTrend(
+      "Jotai's cascaded diamond row",
+      cascadedDiamond,
+      'Jotai',
+      [CASCADED_MIN, CASCADED_MAX],
+      'grows',
     ),
 
     // Scenario: Conditional Fan-Out
@@ -356,6 +471,28 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     // per-library table's cell carries markup, so the prose has its own key.
     'summary/preact-signals-worst-over-fastest':
       worstCaseText('Preact Signals'),
+    // Clauses that name or explain a library's worst row as a scenario the
+    // prose then describes, and so hold only while the data pick it.
+    'summary/rxjs-worst-label': whileWorstIn('RxJS', CASCADED_DIAMOND, {
+      en: "RxJS's worst row",
+      ja: 'RxJS の最悪の行である',
+    }),
+    'summary/mobx-worst-label': whileWorstIn('MobX', DEEP_CHAIN, {
+      en: "MobX's worst row",
+      ja: 'MobX の最悪の行である',
+    }),
+    'summary/redux-worst-label': whileWorstIn('Redux', FAN_OUT, {
+      en: "Redux's worst row",
+      ja: 'Redux の最悪の行である',
+    }),
+    'summary/synstate-worst-explained': whileWorstIn('SynState', FAN_OUT, {
+      en: "that is already the `switchMap` form, which holds no branch nobody reads: what remains is SynState's cost of a write that reaches no node",
+      ja: 'これはすでに誰も読まない分岐を持たない `switchMap` の形での数字です。残っているのは、どのノードにも届かない書き込みの SynState でのコストです',
+    }),
+    'summary/jotai-worst-explained': whileWorstIn('Jotai', FAN_OUT, {
+      en: 'where a write to a branch nobody reads costs MobX, Solid and Preact Signals almost nothing and Jotai a whole `store.set()`',
+      ja: '誰も読まない分岐への書き込みは MobX・Solid・Preact Signals にはほとんど何のコストもかかりませんが、Jotai には `store.set()` 1回分がまるごとかかります',
+    }),
 
     // The headline on the introduction and the landing page: SynState's worst
     // case (the figure above) beside the range the other libraries' worst
@@ -603,6 +740,436 @@ const factor = (numerator: number, denominator: number): string => {
 
 const ratio = (numerator: number, denominator: number): string =>
   count(Math.round(divide(numerator, denominator)));
+
+/**
+ * Where one measurement falls against another, in the steps the prose has
+ * words for. Judged on the larger of the ratio and its inverse, as
+ * {@link factor} prints it, so that "X against Y" and "Y against X" always
+ * land on mirrored steps — the page compares in both directions. A ratio
+ * above 1 changes step where its printed figure does; one below 1 is judged
+ * from the other side, so a printed 0.8× can fall on either side of `level`:
+ * symmetry is the property the prose needs, since it compares both ways.
+ *
+ * - `level`: within {@link LEVEL_WITHIN}× either way (up to 1.2× as printed,
+ *   0.8× from the other side) — about the spread of one scenario between runs,
+ *   so neither is ahead;
+ * - `below` / `above`: further than that, up to {@link FAR_BEYOND}× either way;
+ * - `far-below` / `far-above`: beyond {@link FAR_BEYOND}×.
+ */
+type Relation = 'far-below' | 'below' | 'level' | 'above' | 'far-above';
+
+/**
+ * A {@link Relation}, or the span the relations of several pairs cover, lower
+ * step first — the only order {@link compared} writes one in.
+ */
+type Span =
+  | Relation
+  | 'far-below..below'
+  | 'far-below..level'
+  | 'far-below..above'
+  | 'far-below..far-above'
+  | 'below..level'
+  | 'below..above'
+  | 'below..far-above'
+  | 'level..above'
+  | 'level..far-above'
+  | 'above..far-above';
+
+const SPANS: readonly Span[] = [
+  'far-below',
+  'below',
+  'level',
+  'above',
+  'far-above',
+  'far-below..below',
+  'far-below..level',
+  'far-below..above',
+  'far-below..far-above',
+  'below..level',
+  'below..above',
+  'below..far-above',
+  'level..above',
+  'level..far-above',
+  'above..far-above',
+] as const;
+
+const LEVEL_WITHIN = 1.2;
+
+const FAR_BEYOND = 3;
+
+const RELATIONS: readonly Relation[] = [
+  'far-below',
+  'below',
+  'level',
+  'above',
+  'far-above',
+] as const;
+
+const relationOf = (numerator: number, denominator: number): Relation => {
+  const value = divide(numerator, denominator);
+
+  // Both quotients rather than the inverse of one, so that the mirrored
+  // comparison computes exactly the same number.
+  const larger = Math.max(value, divide(denominator, numerator));
+
+  // What `factor` prints for the larger side, read back as a number.
+  const parsed = Num.safeParseFloat(factor(larger, 1).replaceAll(',', ''));
+
+  if (Result.isErr(parsed)) {
+    throw new Error(`❌ cannot read back the ratio ${larger.toString()}`);
+  }
+
+  const printed = parsed.value;
+
+  const step = printed <= LEVEL_WITHIN ? 0 : printed <= FAR_BEYOND ? 1 : 2;
+
+  return value < 1
+    ? (['level', 'below', 'far-below'] as const)[step]
+    : (['level', 'above', 'far-above'] as const)[step];
+};
+
+/**
+ * The words a sentence uses for how the `pairs` (numerator, denominator)
+ * compare, keyed by their {@link Relation} — one, or the span `low..high`
+ * when the pairs fall in several (`'level..above'`: level in some, above in
+ * the rest).
+ *
+ * The numbers beside a comparative have been derived for a while; the word
+ * was typed in, so a re-measurement that moved a library from ahead of
+ * SynState to level with it left "faster than" in front of a 0.9×. Here a
+ * sentence states which relations it has words for, and a measurement in any
+ * other is an error naming the sentence: the data now say something the
+ * sentence cannot, and it has to be rewritten rather than reworded by hand.
+ */
+const compared = (
+  sentence: string,
+  pairs: readonly FixedLengthTuple<2, number>[],
+  words: Partial<ReadonlyRecord<Span, Localized>>,
+): Localized => {
+  const indices = pairs.map(([numerator, denominator]) =>
+    RELATIONS.indexOf(relationOf(numerator, denominator)),
+  );
+
+  const low = RELATIONS[Math.min(...indices)];
+
+  const high = RELATIONS[Math.max(...indices)];
+
+  const written = low === high ? low : (`${low ?? ''}..${high ?? ''}` as const);
+
+  const span = SPANS.find((candidate) => candidate === written);
+
+  const wording = span === undefined ? undefined : words[span];
+
+  if (wording === undefined) {
+    throw new Error(
+      `❌ ${sentence}: the measurements are now '${written}', which the sentence has no wording for — rewrite it against the tables`,
+    );
+  }
+
+  return wording;
+};
+
+/**
+ * The median of the `pairs`' ratios, for "stays close to SynState as N grows,
+ * typically N× its time". Not the furthest pair, which the sentence used to
+ * quote as a bound at every point: the pairs it is used on are both below a
+ * millisecond, where one point of a re-measurement on a shared runner can land
+ * several times off its neighbors, so a bound over every point said more about
+ * the noisiest run than about the library.
+ *
+ * Two errors, each judged on medians for the same reason: beyond
+ * {@link TYPICAL_AT_MOST}× either way, since the sentences that quote one set
+ * such a row against one that grows without limit, a contrast an order of
+ * magnitude no longer makes; and a ratio whose later half of the sweep is more
+ * than {@link FLAT_WITHIN}× its earlier half, which no longer stays close as
+ * $N$ grows. `pairs` are in sweep order, as {@link everyPoint} yields them.
+ */
+const typicalFactor = (
+  sentence: string,
+  pairs: readonly FixedLengthTuple<2, number>[],
+): string => {
+  const ratios = pairs.map(([numerator, denominator]) =>
+    divide(numerator, denominator),
+  );
+
+  const half = Math.floor(divide(ratios.length, 2));
+
+  const value = medianOf(ratios);
+
+  const earlier = medianOf(ratios.slice(0, half));
+
+  const later = medianOf(ratios.slice(ratios.length - half));
+
+  if (value === undefined || earlier === undefined || later === undefined) {
+    throw new Error(
+      `❌ ${sentence}: there are too few pairs to judge a trend across the sweep`,
+    );
+  }
+
+  const apart = Math.max(value, divide(1, value));
+
+  if (apart > TYPICAL_AT_MOST) {
+    throw new Error(
+      `❌ ${sentence}: the pairs are now typically ${factor(apart, 1)}× apart, too far for a sentence about staying close — rewrite it against the tables`,
+    );
+  }
+
+  if (later > earlier * FLAT_WITHIN) {
+    throw new Error(
+      `❌ ${sentence}: the ratio now grows across the sweep (${factor(earlier, 1)}× in its earlier half, ${factor(later, 1)}× in its later half), which a sentence about staying close as N grows cannot say — rewrite it against the tables`,
+    );
+  }
+
+  return factor(value, 1);
+};
+
+const TYPICAL_AT_MOST = 10;
+
+/** One library's median beside another's, as a pair for {@link compared}. */
+const medians = (
+  data: StatsData,
+  numerator: string,
+  denominator: string,
+): FixedLengthTuple<2, number> =>
+  [median(data, numerator), median(data, denominator)] as const;
+
+/**
+ * One library's measurement beside another's at every point of a sweep. A
+ * point either did not complete is an error rather than left out: a sentence
+ * about every point would otherwise skip the one where the two are furthest
+ * apart, and a median across the sweep would be taken over fewer points than
+ * it says.
+ */
+const everyPoint = (
+  data: SeriesData,
+  numerator: string,
+  denominator: string,
+): readonly FixedLengthTuple<2, number>[] =>
+  Arr.generate(function* () {
+    for (const xLabel of data.xLabels) {
+      const n = valueAt(data, numerator, xLabel);
+
+      const d = valueAt(data, denominator, xLabel);
+
+      if (n === null || d === null) {
+        throw new Error(
+          `❌ ${n === null ? numerator : denominator} did not complete '${xLabel}', so no sentence can compare it with ${n === null ? denominator : numerator} at every point`,
+        );
+      }
+
+      yield [n, d] as const;
+    }
+  });
+
+/** "X is faster than SynState" — the subject's time over SynState's. */
+const SPEED = {
+  'far-below': { en: 'faster than', ja: 'より高速' },
+  'far-below..below': { en: 'faster than', ja: 'より高速' },
+  below: { en: 'faster than', ja: 'より高速' },
+  level: { en: 'about as fast as', ja: 'とほぼ同じ速さ' },
+  above: { en: 'slower than', ja: 'より低速' },
+  'above..far-above': { en: 'slower than', ja: 'より低速' },
+  'far-above': { en: 'slower than', ja: 'より低速' },
+} as const;
+
+/** "Solid, MobX, Jotai and Redux are slower", with no object after it. */
+const SPEED_PLURAL = {
+  above: { en: 'slower', ja: 'より低速' },
+  'above..far-above': { en: 'slower', ja: 'より低速' },
+  'far-above': { en: 'slower', ja: 'より低速' },
+} as const;
+
+/** "Twice a very cheap pass costs less than one ordered pass." */
+const PASS_COST = {
+  'far-below': { en: 'less than', ja: 'より安い' },
+  below: { en: 'less than', ja: 'より安い' },
+  level: { en: 'about as much as', ja: 'とほぼ同じ' },
+} as const;
+
+/** "Its per-update overhead is close to SynState's" — subject over object. */
+const OVERHEAD = {
+  'far-below': { en: 'well below', ja: 'よりかなり小さい' },
+  'far-below..below': { en: 'below', ja: 'より小さい' },
+  below: { en: 'below', ja: 'より小さい' },
+  'far-below..level': { en: 'at or below', ja: 'と同程度かそれより小さい' },
+  'below..level': { en: 'at or below', ja: 'と同程度かそれより小さい' },
+  level: { en: 'close to', ja: 'と同程度' },
+  'level..above': { en: 'at or above', ja: 'と同程度かそれより大きい' },
+  'level..far-above': { en: 'at or above', ja: 'と同程度かそれより大きい' },
+  above: { en: 'above', ja: 'より大きい' },
+  'above..far-above': { en: 'above', ja: 'より大きい' },
+  'far-above': { en: 'well above', ja: 'よりかなり大きい' },
+} as const;
+
+/**
+ * "Against Preact Signals these results name no consistent winner" — Preact
+ * Signals' time over SynState's in each scenario the sentence lists. The
+ * sentence goes on "it takes N× as long as SynState", so Preact Signals stays
+ * the subject whichever way it falls.
+ */
+const WINNER = {
+  ...sameFor(['far-below', 'far-below..below', 'below'], {
+    en: 'it is ahead of SynState in all three',
+    ja: '3つすべてで Preact Signals が速くなっています',
+  }),
+  ...sameFor(['far-below..level', 'below..level'], {
+    en: 'it is ahead of SynState in some and level with it in the rest',
+    ja: 'Preact Signals が速いシナリオと、SynState と同程度のシナリオがあります',
+  }),
+  ...sameFor(
+    [
+      'far-below..above',
+      'far-below..far-above',
+      'below..above',
+      'below..far-above',
+      'level',
+    ],
+    {
+      en: 'these results name no consistent winner',
+      ja: 'これらの結果に一貫した勝者はありません',
+    },
+  ),
+  ...sameFor(['level..above', 'level..far-above'], {
+    en: 'it trails SynState in some and is level with it in the rest',
+    ja: 'SynState が速いシナリオと、SynState と同程度のシナリオがあります',
+  }),
+  ...sameFor(['above', 'above..far-above', 'far-above'], {
+    en: 'it trails SynState in all three',
+    ja: '3つすべてで SynState が速くなっています',
+  }),
+} as const;
+
+/**
+ * "Its cost stays within a small factor of SynState's" — no point beyond
+ * {@link FAR_BEYOND}× either way.
+ */
+const SMALL_FACTOR = sameFor(
+  ['below', 'below..level', 'below..above', 'level', 'level..above', 'above'],
+  { en: 'a small factor', ja: '小さな定数倍' },
+);
+
+/** {@link SMALL_FACTOR}, for a sentence that says it is so on both sides. */
+const SMALL_FACTOR_EITHER_WAY = sameFor(['below..above'], {
+  en: 'a small factor',
+  ja: '小さな定数倍',
+});
+
+/**
+ * "Its per-update overhead is close to SynState's, because a rerun allocates
+ * nothing" — {@link OVERHEAD} for a sentence whose reason explains a cost no
+ * higher than SynState's, and so has no wording for one above it.
+ */
+const OVERHEAD_AT_MOST = {
+  'far-below': OVERHEAD['far-below'],
+  'far-below..below': OVERHEAD['far-below..below'],
+  below: OVERHEAD.below,
+  'far-below..level': OVERHEAD['far-below..level'],
+  'below..level': OVERHEAD['below..level'],
+  level: OVERHEAD.level,
+} as const;
+
+/** One wording for each of `spans`. */
+function sameFor(
+  spans: readonly Span[],
+  words: Localized,
+): Partial<ReadonlyRecord<Span, Localized>> {
+  return Object.fromEntries(spans.map((span) => [span, words] as const));
+}
+
+/**
+ * "SynState's row stays flat" / "Jotai's row grows": the mean of the last three
+ * points of a sweep against the mean of the first three, so that one point —
+ * under a millisecond, where a point moves by half between runs — decides
+ * nothing. Flat is within {@link FLAT_WITHIN}× either way, for the same reason.
+ * Each sentence names the one trend its reasoning explains; any other is an
+ * error naming it.
+ */
+const rowTrend = (
+  sentence: string,
+  data: SeriesData,
+  label: string,
+  quoted: FixedLengthTuple<2, string>,
+  expected: 'flat' | 'grows',
+): Localized => {
+  const [end, start] = endOverStart(data, label);
+
+  const change = divide(end, start);
+
+  const trend =
+    change > FLAT_WITHIN
+      ? 'grows'
+      : change * FLAT_WITHIN < 1
+        ? 'falls'
+        : 'flat';
+
+  if (trend !== expected) {
+    throw new Error(
+      `❌ ${sentence}: the row now ${trend} (${factor(end, start)}× from start to end), which the sentence does not explain — rewrite it against the tables`,
+    );
+  }
+
+  // The sentence quotes two points beside the word, as `ms` prints them: a
+  // flat row must not show them more than `FLAT_WITHIN` apart, nor a growing
+  // one show the later point lower.
+  const [from, to] = quoted.map((xLabel) => shownMs(at(data, label, xLabel)));
+
+  const shownFlat =
+    from !== undefined &&
+    to !== undefined &&
+    (from === to ||
+      (from > 0 &&
+        to > 0 &&
+        Math.max(divide(to, from), divide(from, to)) <= FLAT_WITHIN));
+
+  const shownGrowing = from !== undefined && to !== undefined && to > from;
+
+  if (trend === 'flat' ? !shownFlat : !shownGrowing) {
+    throw new Error(
+      `❌ ${sentence}: the points quoted beside the word (${quoted.join(', ')}) no longer show the row ${trend === 'flat' ? 'flat' : 'growing'}`,
+    );
+  }
+
+  return trend === 'flat'
+    ? { en: 'stays flat', ja: 'ほぼ横ばいです' }
+    : { en: 'grows', ja: '増えます' };
+};
+
+const FLAT_WITHIN = 2;
+
+/** A measurement as {@link ms} prints it, with the same rounding, as a number. */
+const shownMs = (value: number): number => {
+  if (value >= 100) {
+    return Math.round(value);
+  }
+
+  const parsed = Num.safeParseFloat(value.toFixed(1));
+
+  if (Result.isErr(parsed)) {
+    throw new Error(`❌ cannot read back the measurement ${value.toString()}`);
+  }
+
+  return parsed.value;
+};
+
+/** A row's last three points against its first three, each side the mean. */
+const endOverStart = (
+  data: SeriesData,
+  label: string,
+): FixedLengthTuple<2, number> => {
+  const { values } = row(data, label);
+
+  const mean = (points: readonly (number | null)[]): number => {
+    const measured = points.filter((v): v is number => v !== null);
+
+    if (measured.length !== points.length || !Arr.isNonEmpty(measured)) {
+      throw new Error(`❌ ${label} did not complete every end of the sweep`);
+    }
+
+    return divide(Arr.sum(measured), measured.length);
+  };
+
+  return [mean(Arr.takeLast(values, 3)), mean(Arr.take(values, 3))] as const;
+};
 
 /** Digits in groups of three, as every number in the prose is written. */
 const count = (value: number): string => {
@@ -1037,6 +1604,34 @@ const worstCaseRows = (): ReadonlyRecord<string, BenchmarkNumber> => {
 };
 
 /**
+ * `clause`, which names or explains `library`'s worst summary row as the
+ * scenario at `anchor` — or an error once the data pick another row for it,
+ * since the clause would then describe a scenario that is not its worst.
+ */
+const whileWorstIn = (
+  library: string,
+  anchor: string,
+  clause: Localized,
+): Localized => {
+  const worst = worstSummaryRow(library).scenario.name;
+
+  if (!worst.en.includes(`(${anchor})`)) {
+    throw new Error(
+      `❌ ${library}'s worst row is now ${worst.en}, not ${anchor}: rewrite the sentence that describes it`,
+    );
+  }
+
+  return clause;
+};
+
+/** The summary scenarios' anchors on the English page, for {@link whileWorstIn}. */
+const DEEP_CHAIN = '#scenario-deep-chain-throughput';
+
+const CASCADED_DIAMOND = '#scenario-cascaded-diamond';
+
+const FAN_OUT = '#scenario-conditional-fan-out';
+
+/**
  * The headline's range of the other libraries' worst cases: of
  * {@link otherEveryScenarioLibraries}, the one whose worst case is nearest the
  * fastest library and the one whose worst case is furthest from it.
@@ -1094,6 +1689,26 @@ const summarySlowestSpreads = (): readonly number[] =>
     ),
   ] as const;
 
+/**
+ * The scenarios the prose calls the small graphs: one update reaches a handful
+ * of nodes, so what is measured is each library's overhead per update.
+ */
+const SMALL_GRAPHS: readonly StatsData[] = [
+  singleState,
+  derivedChain,
+  diamond,
+] as const;
+
+/**
+ * The libraries the summary sets well apart from SynState on the small graphs.
+ */
+const HEAVY_LIBRARIES: readonly string[] = [
+  'Solid',
+  'MobX',
+  'Jotai',
+  'Redux',
+] as const;
+
 /** The libraries whose subscribers see intermediate values in a diamond. */
 const GLITCHING_LIBRARIES: readonly string[] = ['RxJS'] as const;
 
@@ -1122,11 +1737,7 @@ const median = (data: StatsData, label: string): number => {
  * the figure the sentence quotes as "regardless of B".
  */
 const typical = (data: SeriesData, label: string): number => {
-  const measured = row(data, label)
-    .values.filter((v) => v !== null)
-    .toSorted((a, b) => a - b);
-
-  const value = measured[Math.floor(divide(measured.length, 2))];
+  const value = medianOf(row(data, label).values.filter((v) => v !== null));
 
   if (value === undefined) {
     throw new Error(`❌ ${label} has no measurements at all`);
@@ -1134,6 +1745,13 @@ const typical = (data: SeriesData, label: string): number => {
 
   return value;
 };
+
+/**
+ * The middle of `values`, the upper one on an even count; `undefined` when
+ * there are none.
+ */
+const medianOf = (values: readonly number[]): number | undefined =>
+  values.toSorted((a, b) => a - b)[Math.floor(divide(values.length, 2))];
 
 /**
  * The slope of SynState's fan-out row in nanoseconds, which is the figure that
