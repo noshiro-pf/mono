@@ -9,10 +9,12 @@ import { fileURLToPath } from 'node:url';
 import * as util from 'node:util';
 import { Arr, isNonNullObject } from 'ts-data-forge';
 import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
+import type { ReleaseBinaryPin } from '../lib/release-binaries.mjs';
 import {
   compareVersions,
   parseActionPinLine,
   parseStableVersion,
+  releaseLine,
   renderActionPin,
   selectMaturePnpmVersion,
   selectMatureRelease,
@@ -241,6 +243,7 @@ describe('actions', () => {
         publishedDaysAgo === undefined ? undefined : daysAgo(publishedDaysAgo),
       draft: flags?.draft ?? false,
       prerelease: flags?.prerelease ?? false,
+      assets: [],
     }) as const;
 
   const checkoutReleases: readonly Release[] = [
@@ -265,7 +268,7 @@ describe('actions', () => {
       assert.deepStrictEqual(selection, {
         target: 'v7.0.2',
         heldBack: ['v7.0.3'],
-        majorsWaiting: ['8', '9'],
+        linesWaiting: ['8', '9'],
       });
     });
 
@@ -279,7 +282,7 @@ describe('actions', () => {
       assert.deepStrictEqual(selection, {
         target: undefined,
         heldBack: ['v7.0.3'],
-        majorsWaiting: ['8', '9'],
+        linesWaiting: ['8', '9'],
       });
     });
 
@@ -293,7 +296,7 @@ describe('actions', () => {
       assert.deepStrictEqual(selection, {
         target: undefined,
         heldBack: [],
-        majorsWaiting: ['8', '9'],
+        linesWaiting: ['8', '9'],
       });
     });
 
@@ -312,7 +315,7 @@ describe('actions', () => {
       assert.deepStrictEqual(selection, {
         target: 'v7.0.2',
         heldBack: ['v7.0.3'],
-        majorsWaiting: [],
+        linesWaiting: [],
       });
     });
 
@@ -326,7 +329,7 @@ describe('actions', () => {
       assert.deepStrictEqual(selection, {
         target: '1.2.4',
         heldBack: [],
-        majorsWaiting: [],
+        linesWaiting: [],
       });
     });
   });
@@ -523,12 +526,12 @@ describe('actions', () => {
 
       assert.include(
         stdout,
-        'actions/checkout: v7.0.1 -> v7.0.2 (held back by minimumReleaseAge: [v7.0.3]; majors waiting for a human: [8])\n',
+        'actions/checkout: v7.0.1 -> v7.0.2 (held back by minimumReleaseAge: [v7.0.3]; newer lines waiting for a human: [8])\n',
       );
 
       assert.include(
         stdout,
-        'pnpm/action-setup: v6.1.0 unchanged (held back by minimumReleaseAge: []; majors waiting for a human: [])\n',
+        'pnpm/action-setup: v6.1.0 unchanged (held back by minimumReleaseAge: []; newer lines waiting for a human: [])\n',
       );
 
       assert.include(stdout, 'Moved 4 action pin(s).\n');
@@ -583,6 +586,364 @@ describe('actions', () => {
       server.closeAllConnections();
 
       server.close();
+    }
+  });
+});
+
+const binaryRelease = (tag: string, publishedDaysAgo: number): Release =>
+  ({
+    tag,
+    publishedAt: daysAgo(publishedDaysAgo),
+    draft: false,
+    prerelease: false,
+    assets: [],
+  }) as const;
+
+describe('release-binaries', () => {
+  describe('selectMatureRelease with releaseLine', () => {
+    test('treats a 0.x minor as the major: 0.11.x moves, 0.12 waits', () => {
+      const selection = selectMatureRelease(
+        [
+          binaryRelease('v0.12.0', 30),
+          binaryRelease('v0.11.2', 3),
+          binaryRelease('v0.11.1', 20),
+          binaryRelease('v0.11.0', 60),
+          binaryRelease('v1.0.0', 30),
+        ],
+        'v0.11.0',
+        cutoffDaysAgo(7),
+        releaseLine,
+      );
+
+      assert.deepStrictEqual(selection, {
+        target: 'v0.11.1',
+        heldBack: ['v0.11.2'],
+        linesWaiting: ['0.12', '1'],
+      });
+    });
+
+    test('never moves a 0.0.x on its own', () => {
+      const selection = selectMatureRelease(
+        [binaryRelease('v0.0.4', 30), binaryRelease('v0.0.3', 60)],
+        'v0.0.3',
+        cutoffDaysAgo(7),
+        releaseLine,
+      );
+
+      assert.deepStrictEqual(selection, {
+        target: undefined,
+        heldBack: [],
+        linesWaiting: ['0.0.4'],
+      });
+    });
+
+    test('moves a 1.x within its major, as the action pins do', () => {
+      const selection = selectMatureRelease(
+        [
+          binaryRelease('v2.0.0', 30),
+          binaryRelease('v1.8.0', 30),
+          binaryRelease('v1.7.12', 60),
+        ],
+        'v1.7.12',
+        cutoffDaysAgo(7),
+        releaseLine,
+      );
+
+      assert.deepStrictEqual(selection, {
+        target: 'v1.8.0',
+        heldBack: [],
+        linesWaiting: ['2'],
+      });
+    });
+  });
+
+  test('runs on node alone and rewrites the version and the digests in place', async () => {
+    const realNow = Temporal.Now.instant();
+
+    const realDaysAgo = (days: number): string =>
+      realNow.subtract({ hours: days * hoursPerDay }).toString();
+
+    const dir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'mature-updates-release-binaries-'),
+    );
+
+    const configDir = path.join(dir, 'tools', 'configs');
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.mkdirSync(configDir, { recursive: true });
+
+    const configPath = path.join(configDir, 'release-binaries.json');
+
+    const pin = (
+      repository: string,
+      version: string,
+      digest: string,
+    ): ReleaseBinaryPin =>
+      ({
+        repository,
+        version,
+        binary: 'tool',
+        assets: {
+          'linux-x64': {
+            name: 'tool_{version}_linux_amd64.tar.gz',
+            sha256: digest.repeat(64),
+          },
+          'darwin-arm64': {
+            name: 'tool_{version}_darwin_arm64.tar.gz',
+            sha256: digest.repeat(64),
+          },
+        },
+      }) as const;
+
+    // A key the file does not define survives a move: JSON has no comments,
+    // so a note is a field, and a rewrite must not drop it.
+    const moves = (version: string, digest: string) => {
+      const base = pin('owner/moves', version, digest);
+
+      return {
+        ...base,
+        note: 'kept',
+        assets: {
+          ...base.assets,
+          'linux-x64': { ...base.assets['linux-x64'], note: 'kept too' },
+        },
+      } as const;
+    };
+
+    const before = {
+      moves: moves('1.2.3', '1'),
+      zero: pin('owner/zero', '0.11.0', '2'),
+      undigested: pin('owner/undigested', '1.0.0', '3'),
+      unshipped: pin('owner/unshipped', '1.0.0', '4'),
+      reuploaded: pin('owner/reuploaded', '1.0.0', '5'),
+      fallback: pin('owner/fallback', '1.0.0', '6'),
+      untagged: pin('owner/untagged', '1.0.0', '8'),
+    } as const;
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(configPath, `${JSON.stringify(before, undefined, 2)}\n`);
+
+    installFakePnpm(dir, '{}');
+
+    const assets = (
+      version: string,
+      digest: string,
+      uploadedDaysAgo = 30,
+    ): unknown =>
+      [
+        {
+          name: `tool_${version}_linux_amd64.tar.gz`,
+          digest: `sha256:${digest.repeat(64)}`,
+          updated_at: realDaysAgo(uploadedDaysAgo),
+        },
+        {
+          name: `tool_${version}_darwin_arm64.tar.gz`,
+          digest: `sha256:${digest.repeat(64)}`,
+          updated_at: realDaysAgo(30),
+        },
+        {
+          name: `tool_${version}_windows_amd64.zip`,
+          digest: 'sha256:00',
+          updated_at: realDaysAgo(30),
+        },
+      ] as const;
+
+    const releasesByRepo: ReadonlyRecord<string, readonly unknown[]> = {
+      'owner/moves': [
+        { tag_name: 'v1.3.0', published_at: realDaysAgo(1), assets: [] },
+        {
+          tag_name: 'v1.2.5',
+          published_at: realDaysAgo(20),
+          assets: assets('1.2.5', 'a'),
+        },
+        {
+          tag_name: 'v1.2.3',
+          published_at: realDaysAgo(90),
+          assets: assets('1.2.3', '1'),
+        },
+      ],
+      'owner/zero': [
+        {
+          tag_name: 'v0.12.0',
+          published_at: realDaysAgo(30),
+          assets: assets('0.12.0', 'b'),
+        },
+        {
+          tag_name: 'v0.11.0',
+          published_at: realDaysAgo(90),
+          assets: assets('0.11.0', '2'),
+        },
+      ],
+      // Mature and in range, but one asset has no digest to pin.
+      'owner/undigested': [
+        {
+          tag_name: 'v1.0.1',
+          published_at: realDaysAgo(30),
+          assets: [
+            {
+              name: 'tool_1.0.1_linux_amd64.tar.gz',
+              digest: `sha256:${'c'.repeat(64)}`,
+            },
+            { name: 'tool_1.0.1_darwin_arm64.tar.gz', digest: null },
+          ],
+        },
+        {
+          tag_name: 'v1.0.0',
+          published_at: realDaysAgo(90),
+          assets: assets('1.0.0', '3'),
+        },
+      ],
+      // Mature and in range, but without the darwin-arm64 asset at all.
+      'owner/unshipped': [
+        {
+          tag_name: 'v1.0.1',
+          published_at: realDaysAgo(30),
+          assets: [
+            {
+              name: 'tool_1.0.1_linux_amd64.tar.gz',
+              digest: `sha256:${'d'.repeat(64)}`,
+              updated_at: realDaysAgo(30),
+            },
+          ],
+        },
+      ],
+      // The newest mature release re-uploaded a file yesterday; the one
+      // before it is taken instead of nothing.
+      'owner/fallback': [
+        {
+          tag_name: 'v1.0.2',
+          published_at: realDaysAgo(60),
+          assets: assets('1.0.2', 'f', 1),
+        },
+        {
+          tag_name: 'v1.0.1',
+          published_at: realDaysAgo(60),
+          assets: assets('1.0.1', '7'),
+        },
+      ],
+      // Mature, but tagged without the `v` the download URL is built with.
+      'owner/untagged': [
+        {
+          tag_name: '1.0.1',
+          published_at: realDaysAgo(60),
+          assets: assets('1.0.1', '9'),
+        },
+      ],
+      // Published long ago, with one file uploaded yesterday.
+      'owner/reuploaded': [
+        {
+          tag_name: 'v1.0.1',
+          published_at: realDaysAgo(60),
+          assets: assets('1.0.1', 'e', 1),
+        },
+      ],
+    } as const;
+
+    const mut_requests: string[] = [];
+
+    const server = http.createServer((req, res) => {
+      const url = new URL(req.url ?? '/', 'http://localhost');
+
+      mut_requests.push(`${req.headers.authorization ?? ''} ${url.pathname}`);
+
+      const releases = /^\/repos\/([^/]+\/[^/]+)\/releases$/u.exec(
+        url.pathname,
+      );
+
+      if (releases?.[1] === undefined) {
+        res.writeHead(404);
+
+        res.end('unexpected route');
+
+        return;
+      }
+
+      res.setHeader('content-type', 'application/json');
+
+      res.end(
+        JSON.stringify(
+          url.searchParams.get('page') === '1'
+            ? (releasesByRepo[releases[1]] ?? [])
+            : [],
+        ),
+      );
+    });
+
+    await new Promise<void>((resolve) => {
+      server.listen(0, '127.0.0.1', resolve);
+    });
+
+    try {
+      const address = server.address();
+
+      const port = isNonNullObject(address) ? address.port : 0;
+
+      const stdout = await runScript(['release-binaries'], {
+        cwd: dir,
+        binDir: dir,
+        env: {
+          GITHUB_API_URL: `http://127.0.0.1:${port}`,
+          GH_TOKEN: 'fake-token',
+        },
+      });
+
+      assert.include(
+        stdout,
+        'moves (owner/moves): v1.2.3 -> v1.2.5 (held back by minimumReleaseAge: [v1.3.0]; newer lines waiting for a human: [])\n',
+      );
+
+      assert.include(
+        stdout,
+        'zero (owner/zero): v0.11.0 unchanged (held back by minimumReleaseAge: []; newer lines waiting for a human: [0.12])\n',
+      );
+
+      assert.include(
+        stdout,
+        '::warning::undigested: v1.0.1 has no SHA-256 digest for tool_1.0.1_darwin_arm64.tar.gz; not taken.\n',
+      );
+
+      assert.include(
+        stdout,
+        '::warning::unshipped: v1.0.1 has no asset named tool_1.0.1_darwin_arm64.tar.gz; not taken.\n',
+      );
+
+      assert.include(
+        stdout,
+        'reuploaded: tool_1.0.1_linux_amd64.tar.gz of v1.0.1 was uploaded after the cutoff; not taken.\nreuploaded (owner/reuploaded): v1.0.0 unchanged (held back by minimumReleaseAge: [v1.0.1]; ',
+      );
+
+      assert.include(
+        stdout,
+        'fallback: tool_1.0.2_linux_amd64.tar.gz of v1.0.2 was uploaded after the cutoff; not taken.\nfallback (owner/fallback): v1.0.0 -> v1.0.1 (held back by minimumReleaseAge: [v1.0.2]; ',
+      );
+
+      assert.include(stdout, 'Moved 2 release-binary pin(s).\n');
+
+      assert.deepStrictEqual(
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        JSON.parse(fs.readFileSync(configPath, 'utf8')),
+        {
+          ...before,
+          moves: moves('1.2.5', 'a'),
+          fallback: pin('owner/fallback', '1.0.1', '7'),
+        },
+      );
+
+      assert.deepStrictEqual(mut_requests.toSorted(), [
+        'Bearer fake-token /repos/owner/fallback/releases',
+        'Bearer fake-token /repos/owner/moves/releases',
+        'Bearer fake-token /repos/owner/reuploaded/releases',
+        'Bearer fake-token /repos/owner/undigested/releases',
+        'Bearer fake-token /repos/owner/unshipped/releases',
+        'Bearer fake-token /repos/owner/untagged/releases',
+        'Bearer fake-token /repos/owner/zero/releases',
+      ]);
+    } finally {
+      server.closeAllConnections();
+
+      server.close();
+
+      fs.rmSync(dir, { recursive: true, force: true });
     }
   });
 });

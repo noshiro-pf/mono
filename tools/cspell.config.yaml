@@ -1,0 +1,10 @@
+version: '0.2'
+# Inherit the repository-wide settings. Required: the root `check:cspell`
+# applies the nearest config to each file, so without the import every file
+# under tools/ would lose the root dictionaries and ignorePaths.
+import:
+  - '../.cspell.config.yaml'
+words:
+  # actionlint's author, in configs/release-binaries.json, which as JSON
+  # takes no `cspell:ignore`.
+  - rhysd

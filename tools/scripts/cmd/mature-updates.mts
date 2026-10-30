@@ -6,15 +6,19 @@ import { fileURLToPath } from 'node:url';
 // prefers: Node erases the former and keeps the latter as a bare
 // `import {} from 'ts-type-forge'`, which fails to resolve before
 // `pnpm install`. The test's runtime-import check guards this.
-import type { ReadonlyRecord, StrictOmit } from 'ts-type-forge';
+import type { MutableRecord, ReadonlyRecord, StrictOmit } from 'ts-type-forge';
+// Erased the same way: the module itself imports packages this cannot load.
+import type { ReleaseBinaryPin } from '../lib/release-binaries.mjs';
 
 /**
- * The two updates `pnpm-update.yml` makes that pnpm's own `minimumReleaseAge`
- * does not reach, held to the same age it applies to npm dependencies.
+ * The three updates `pnpm-update.yml` makes that pnpm's own
+ * `minimumReleaseAge` does not reach, held to the same age it applies to npm
+ * dependencies.
  *
  * ```sh
- * node ./tools/scripts/cmd/mature-updates.mts pnpm     # pnpm itself
- * node ./tools/scripts/cmd/mature-updates.mts actions  # the action pins
+ * node ./tools/scripts/cmd/mature-updates.mts pnpm              # pnpm itself
+ * node ./tools/scripts/cmd/mature-updates.mts actions           # the action pins
+ * node ./tools/scripts/cmd/mature-updates.mts release-binaries  # tools/configs/release-binaries.json
  * ```
  *
  * **`pnpm`** pins the newest pnpm that is already older than the hold.
@@ -47,6 +51,20 @@ import type { ReadonlyRecord, StrictOmit } from 'ts-type-forge';
  * still waits for a human, as before; it is reported, not taken. Set
  * `GH_TOKEN` (the workflow passes `GITHUB_TOKEN`) or the unauthenticated
  * rate limit, shared across a runner's whole IP range, will be hit.
+ *
+ * **`release-binaries`** moves each tool in `tools/configs/release-binaries.json`
+ * (actionlint and shellcheck, which `check:root:actionlint` downloads) to the
+ * newest release older than the hold, within its line: the range a caret
+ * draws, so the major, or for a `0.x` version the minor (a `0.0.x` one never
+ * moves on its own). So actionlint 1.x moves on its own and 2.0 waits for a
+ * human; shellcheck 0.11.x moves on its own and 0.12 waits. The tag is
+ * `v<version>`, and each platform's new SHA-256 is the `digest` the Releases
+ * API reports for that asset. The hold applies to each asset's upload too,
+ * since a file can be replaced long after its release was published. A
+ * release that cannot be taken — an asset missing or without a digest (a
+ * warning), or uploaded too recently — gives way to the next one down the
+ * line, never to an unverified pin. A new tool goes in the file with the same
+ * shape and needs nothing here.
  *
  * **Run with `node`, not `tsx`.** The workflow calls this before
  * `pnpm install`, so nothing from `node_modules` exists yet — no `tsx`, no
@@ -81,9 +99,17 @@ export const main = async (argv: readonly string[]): Promise<void> => {
       break;
     }
 
+    case 'release-binaries': {
+      await updateReleaseBinaryPins();
+
+      break;
+    }
+
     case undefined:
     default: {
-      console.error('Usage: node mature-updates.mts <pnpm | actions>');
+      console.error(
+        'Usage: node mature-updates.mts <pnpm | actions | release-binaries>',
+      );
 
       process.exit(2);
     }
@@ -273,21 +299,23 @@ export const updateActionPins = async (
 };
 
 /**
- * Among `releases`, the newest of the same major as `currentTag` that is newer
- * than it and was published at or before `cutoff`; the same-major releases
- * the hold keeps back (newer than the chosen one, or than the current pin
- * when nothing is chosen); and the majors that wait for a human. Drafts and
- * prereleases are not candidates.
+ * Among `releases`, the newest on the same line as `currentTag` that is newer
+ * than it and was published at or before `cutoff`; the same-line releases the
+ * hold keeps back (newer than the chosen one, or than the current pin when
+ * nothing is chosen); and the newer lines that wait for a human. Drafts and
+ * prereleases are not candidates. A line is the major unless `lineOf` says
+ * otherwise.
  */
 export const selectMatureRelease = (
   releases: readonly Release[],
   currentTag: string,
   cutoff: number,
+  lineOf: (version: StableVersion) => string = ({ major }) => major,
 ): ReleaseSelection => {
   const current = parseStableVersion(stripTagPrefix(currentTag));
 
   if (current === undefined) {
-    return { target: undefined, heldBack: [], majorsWaiting: [] };
+    return { target: undefined, heldBack: [], linesWaiting: [] };
   }
 
   const stable = releases
@@ -302,12 +330,17 @@ export const selectMatureRelease = (
     )
     .toSorted((a, b) => compareVersions(a.parsed, b.parsed));
 
-  const newerSameMajor = stable.filter(
-    ({ parsed }) =>
-      parsed.major === current.major && compareVersions(parsed, current) > 0,
+  const currentLine = lineOf(current);
+
+  const newer = stable.filter(
+    ({ parsed }) => compareVersions(parsed, current) > 0,
   );
 
-  const mature = newerSameMajor.filter(({ release }) => {
+  const newerSameLine = newer.filter(
+    ({ parsed }) => lineOf(parsed) === currentLine,
+  );
+
+  const mature = newerSameLine.filter(({ release }) => {
     const publishedAt = toEpochMilliseconds(release.publishedAt);
 
     return publishedAt !== undefined && publishedAt <= cutoff;
@@ -319,21 +352,32 @@ export const selectMatureRelease = (
 
   return {
     target: target?.release.tag,
-    heldBack: newerSameMajor
+    heldBack: newerSameLine
       .filter(({ parsed }) => compareVersions(parsed, floor) > 0)
       .map(({ release }) => release.tag),
+    // `newer` is in ascending order, and so are the lines taken from it.
     // eslint-disable-next-line ts-data-forge/prefer-arr-uniq -- ts-data-forge is not installed when this runs (see the header).
-    majorsWaiting: Array.from(
+    linesWaiting: Array.from(
       new Set(
-        stable
-          .filter(
-            ({ parsed }) => compareDigits(parsed.major, current.major) > 0,
-          )
-          .map(({ parsed }) => parsed.major),
+        newer
+          .map(({ parsed }) => lineOf(parsed))
+          .filter((line) => line !== currentLine),
       ),
-    ).toSorted(compareDigits),
+    ),
   };
 };
+
+/**
+ * The line a release-binary pin moves within: the range a caret puts around
+ * it. Its major; for a `0.x` version, `0.<minor>`; for a `0.0.x` one, the
+ * version itself, which then never moves on its own.
+ */
+export const releaseLine = ({ major, minor, patch }: StableVersion): string =>
+  major !== '0'
+    ? major
+    : minor !== '0'
+      ? (`0.${minor}` as const)
+      : (`0.0.${patch}` as const);
 
 /**
  * `uses: owner/repo[/path]@<40-hex sha> # vX.Y.Z` — the shape
@@ -413,12 +457,21 @@ export type Release = Readonly<{
   publishedAt: string | undefined;
   draft: boolean;
   prerelease: boolean;
+  assets: readonly ReleaseAsset[];
+}>;
+
+export type ReleaseAsset = Readonly<{
+  name: string;
+  /** `sha256:<hex>`, as the Releases API reports it; absent on old uploads. */
+  digest: string | undefined;
+  /** When the file was last uploaded, which can be long after `publishedAt`. */
+  updatedAt: string | undefined;
 }>;
 
 export type ReleaseSelection = Readonly<{
   target: string | undefined;
   heldBack: readonly string[];
-  majorsWaiting: readonly string[];
+  linesWaiting: readonly string[];
 }>;
 
 export type GitHubApi = Readonly<{
@@ -481,19 +534,25 @@ const listPinnedFiles = (githubDir: string): readonly string[] => {
 const describeSelection = (
   pin: ActionPin,
   selection: ReleaseSelection,
+): string => describeMove(pin.repo, pin.tag, selection);
+
+const describeMove = (
+  subject: string,
+  currentTag: string,
+  selection: ReleaseSelection,
 ): string => {
   const move =
     selection.target === undefined
-      ? (`${pin.tag} unchanged` as const)
-      : (`${pin.tag} -> ${selection.target}` as const);
+      ? (`${currentTag} unchanged` as const)
+      : (`${currentTag} -> ${selection.target}` as const);
 
   const heldBack =
     `held back by minimumReleaseAge: [${selection.heldBack.join(', ')}]` as const;
 
   const majors =
-    `majors waiting for a human: [${selection.majorsWaiting.join(', ')}]` as const;
+    `newer lines waiting for a human: [${selection.linesWaiting.join(', ')}]` as const;
 
-  return `${pin.repo}: ${move} (${heldBack}; ${majors})`;
+  return `${subject}: ${move} (${heldBack}; ${majors})`;
 };
 
 const stripTagPrefix = (tag: string): string => tag.replace(/^v/u, '');
@@ -617,7 +676,297 @@ const parseRelease = (raw: ReadonlyRecord<string, unknown>): Release =>
       typeof raw['published_at'] === 'string' ? raw['published_at'] : undefined,
     draft: raw['draft'] === true,
     prerelease: raw['prerelease'] === true,
+    assets: isListOfRecords(raw['assets'])
+      ? raw['assets'].map((asset) => ({
+          name: typeof asset['name'] === 'string' ? asset['name'] : '',
+          digest:
+            typeof asset['digest'] === 'string' ? asset['digest'] : undefined,
+          updatedAt:
+            typeof asset['updated_at'] === 'string'
+              ? asset['updated_at']
+              : undefined,
+        }))
+      : ([] as const),
   }) as const;
+
+// ---------------------------------------------------------------------------
+// `release-binaries`
+// ---------------------------------------------------------------------------
+
+export const updateReleaseBinaryPins = async (
+  options: Readonly<{
+    configPath?: string;
+    api?: GitHubApi;
+    now?: number;
+  }> = {},
+): Promise<void> => {
+  const configPath =
+    options.configPath ??
+    path.join(process.cwd(), 'tools', 'configs', 'release-binaries.json');
+
+  const api = options.api ?? createGitHubApi();
+
+  const now = options.now ?? Temporal.Now.instant().epochMilliseconds;
+
+  const hold = readMinimumReleaseAge();
+
+  const cutoff = now - hold.milliseconds;
+
+  console.log(describeHold(hold, cutoff));
+
+  const tools = parseReleaseBinaryPins(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- the pin file.
+    JSON.parse(fs.readFileSync(configPath, 'utf8')),
+  );
+
+  const mut_next: MutableRecord<string, unknown> = {};
+
+  const mut_moved: string[] = [];
+
+  for (const { name, pin, raw } of tools) {
+    const currentTag = `v${pin.version}` as const;
+
+    // Only `v<version>` tags: that is the tag the download URL is built
+    // from (`tools/scripts/lib/release-binaries.mts`).
+    const fetched = await api.releases(pin.repository, currentTag);
+
+    const releases = fetched.filter(({ tag }) => tag.startsWith('v'));
+
+    const move = findMove(name, pin, releases, cutoff);
+
+    // The move actually made, and everything newer on the line as held back
+    // — what the hold kept and what `findMove` could not take, the lines it
+    // printed saying why. With no cutoff, nothing newer is taken.
+    console.log(
+      describeMove(`${name} (${pin.repository})`, currentTag, {
+        ...selectMatureRelease(
+          releases,
+          move?.release.tag ?? currentTag,
+          Number.NEGATIVE_INFINITY,
+          releaseLine,
+        ),
+        target: move?.release.tag,
+      }),
+    );
+
+    mut_next[name] =
+      move === undefined ? raw : movePin(raw, move.release.tag, move.digests);
+
+    if (move !== undefined) {
+      mut_moved.push(name);
+    }
+  }
+
+  // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- ts-data-forge is not installed when this runs (see the header).
+  if (mut_moved.length > 0) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- the pin file.
+    fs.writeFileSync(configPath, `${JSON.stringify(mut_next, undefined, 2)}\n`);
+  }
+
+  console.log(`Moved ${mut_moved.length} release-binary pin(s).`);
+};
+
+/**
+ * The newest release `pin` can move to and its digests: the one
+ * `selectMatureRelease` picks, or, when that one cannot be taken
+ * ({@link readAssetDigests}), the next one down the same line.
+ */
+const findMove = (
+  name: string,
+  pin: ReleaseBinaryPin,
+  releases: readonly Release[],
+  cutoff: number,
+):
+  | Readonly<{ release: Release; digests: ReadonlyRecord<string, string> }>
+  | undefined => {
+  const currentTag = `v${pin.version}` as const;
+
+  const { target } = selectMatureRelease(
+    releases,
+    currentTag,
+    cutoff,
+    releaseLine,
+  );
+
+  const release = releases.find(({ tag }) => tag === target);
+
+  if (release === undefined) {
+    return undefined;
+  }
+
+  const digests = readAssetDigests(name, pin, release, cutoff);
+
+  return digests === undefined
+    ? findMove(
+        name,
+        pin,
+        releases.filter((candidate) => candidate !== release),
+        cutoff,
+      )
+    : { release, digests };
+};
+
+/**
+ * The SHA-256 of each of `pin`'s assets in `release`, by platform, or
+ * `undefined` when the move cannot be made: an asset the release does not
+ * carry or one with no digest (both warned about, since they need a person),
+ * or one uploaded after `cutoff`. A release's files can be uploaded or
+ * replaced long after it was published, so the hold applies to each of them
+ * as well as to the release.
+ */
+const readAssetDigests = (
+  name: string,
+  pin: ReleaseBinaryPin,
+  release: Release,
+  cutoff: number,
+): ReadonlyRecord<string, string> | undefined => {
+  const version = stripTagPrefix(release.tag);
+
+  const entries = Object.entries(pin.assets).map(
+    ([platform, { name: template }]) => {
+      const assetName = template.replaceAll('{version}', () => version);
+
+      const asset = release.assets.find(
+        (candidate) => candidate.name === assetName,
+      );
+
+      const uploadedAt = toEpochMilliseconds(asset?.updatedAt);
+
+      return {
+        platform,
+        assetName,
+        found: asset !== undefined,
+        uploadedAt,
+        mature: uploadedAt !== undefined && uploadedAt <= cutoff,
+        sha256: /^sha256:(?<hex>[0-9a-f]{64})$/u.exec(asset?.digest ?? '')
+          ?.groups?.['hex'],
+      };
+    },
+  );
+
+  const missing = entries.find(({ found }) => !found);
+
+  if (missing !== undefined) {
+    console.log(
+      `::warning::${name}: ${release.tag} has no asset named ${missing.assetName}; not taken.`,
+    );
+
+    return undefined;
+  }
+
+  const undigested = entries.find(({ sha256 }) => sha256 === undefined);
+
+  if (undigested !== undefined) {
+    console.log(
+      `::warning::${name}: ${release.tag} has no SHA-256 digest for ${undigested.assetName}; not taken.`,
+    );
+
+    return undefined;
+  }
+
+  const young = entries.find(({ mature }) => !mature);
+
+  if (young !== undefined) {
+    console.log(
+      young.uploadedAt === undefined
+        ? `${name}: ${young.assetName} of ${release.tag} has no upload time to hold it to; not taken.`
+        : `${name}: ${young.assetName} of ${release.tag} was uploaded after the cutoff; not taken.`,
+    );
+
+    return undefined;
+  }
+
+  return Object.fromEntries(
+    entries.map(({ platform, sha256 }) => [platform, sha256 ?? '']),
+  );
+};
+
+/**
+ * `raw` with its version and digests replaced and everything else, a key
+ * this does not know included, as it was.
+ */
+const movePin = (
+  raw: ReadonlyRecord<string, unknown>,
+  tag: string,
+  digests: ReadonlyRecord<string, string>,
+): unknown => {
+  const assets = isRecord(raw['assets']) ? raw['assets'] : ({} as const);
+
+  return {
+    ...raw,
+    version: stripTagPrefix(tag),
+    // eslint-disable-next-line ts-data-forge/prefer-obj-over-entries-round-trip -- ts-data-forge is not installed when this runs (see the header).
+    assets: Object.fromEntries(
+      Object.entries(assets).map(([platform, asset]) => [
+        platform,
+        { ...(isRecord(asset) ? asset : {}), sha256: digests[platform] },
+      ]),
+    ),
+  };
+};
+
+/**
+ * Each tool's pin, read for what this needs, and its JSON as written, which a
+ * move rewrites. Not `parseReleaseBinaryPins` from
+ * `../lib/release-binaries.mts`, which `check:root:actionlint` reads the file
+ * with: that module imports packages that are not installed when this runs
+ * (see the header). Its stricter check of the digests is what fails a
+ * malformed file.
+ */
+const parseReleaseBinaryPins = (
+  json: unknown,
+): readonly Readonly<{
+  name: string;
+  pin: ReleaseBinaryPin;
+  raw: ReadonlyRecord<string, unknown>;
+}>[] => {
+  if (!isRecord(json)) {
+    throw new Error('tools/configs/release-binaries.json is not an object.');
+  }
+
+  return Object.entries(json).map(([name, raw]) => {
+    const pin = parseReleaseBinaryPin(raw);
+
+    if (pin === undefined || !isRecord(raw)) {
+      throw new Error(
+        `tools/configs/release-binaries.json: "${name}" is not { repository, version, binary, assets: { <platform>: { name, sha256 } } }.`,
+      );
+    }
+
+    return { name, pin, raw };
+  });
+};
+
+const parseReleaseBinaryPin = (raw: unknown): ReleaseBinaryPin | undefined => {
+  if (!isRecord(raw)) {
+    return undefined;
+  }
+
+  const { repository, version, binary, assets } = raw;
+
+  if (
+    typeof repository !== 'string' ||
+    typeof version !== 'string' ||
+    typeof binary !== 'string' ||
+    !isRecord(assets) ||
+    // Spliced into URLs; `parseStableVersion` is what a move is made with.
+    parseStableVersion(version) === undefined
+  ) {
+    return undefined;
+  }
+
+  const entries = Object.entries(assets).map(([platform, asset]) =>
+    isRecord(asset) &&
+    typeof asset['name'] === 'string' &&
+    typeof asset['sha256'] === 'string'
+      ? ([platform, { name: asset['name'], sha256: asset['sha256'] }] as const)
+      : undefined,
+  );
+
+  return entries.every((entry) => entry !== undefined)
+    ? { repository, version, binary, assets: Object.fromEntries(entries) }
+    : undefined;
+};
 
 // ---------------------------------------------------------------------------
 // shared
