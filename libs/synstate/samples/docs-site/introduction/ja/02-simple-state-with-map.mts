@@ -1,11 +1,6 @@
 /* eslint-disable @stylistic/padding-line-between-statements */
 // embed-sample-code-ignore-above
-import {
-  combine,
-  createState,
-  type InitializedObservable,
-  map,
-} from 'synstate';
+import { createState, derive, type InitializedObservable, map } from 'synstate';
 
 const [count, setCount] = createState<number>(0);
 
@@ -15,9 +10,10 @@ console.log(count.getSnapshot().value); // 0
 // pipe で新しい Observable を派生
 const doubled: InitializedObservable<number> = count.pipe(map((n) => n * 2));
 
-// 複数の Observable を結合
-const combined: InitializedObservable<string> = combine([count, doubled]).pipe(
-  map(([c, d]) => `(${c}, ${d})`),
+// 複数の Observable から 1 つの値を派生
+const combined: InitializedObservable<string> = derive(
+  [count, doubled],
+  (c, d) => `(${c}, ${d})`,
 );
 
 // 変更を購読

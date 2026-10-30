@@ -330,6 +330,15 @@ describe('prefer-map-to through type wrappers', () => {
         errors: [{ messageId: 'preferMapTo' }],
         output: null,
       },
+      {
+        name: 'a namespace callee in `as`: reported, not fixed',
+        code: dedent`
+          import * as S from 'synstate';
+          const on$ = opened$.pipe((S.map as typeof S.map)(() => true));
+        `,
+        errors: [{ messageId: 'preferMapTo' }],
+        output: null,
+      },
     ],
   });
 });

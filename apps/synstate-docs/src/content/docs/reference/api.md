@@ -39,6 +39,7 @@ For complex scenarios, SynState provides observable-based APIs:
 ### Combination
 
 - [`combine(observables)`](../combine/): Combine latest values from multiple sources (alias: `combineLatest`).
+- [`derive(observables, fn)`](../derive/): Derive one value from the latest values of multiple sources, as one observable.
 - [`merge(observables)`](../merge/): Merge multiple streams.
 - [`zip(observables)`](../zip/): Pair values by index.
 

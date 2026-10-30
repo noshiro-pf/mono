@@ -84,6 +84,21 @@ namespace NoWriteDuringPropagation {
 }
 
 /**
+ * @description Require `derive(parents, fn)` instead of `combine(parents).pipe(map(fn))`, which is two observables and builds a tuple on every update.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferDerive {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Require `mapTo(c)` instead of `map(() => c)`, since `map` stops every result after the first as equal, while `mapTo` emits on every source value.
  *
  *  ```md
@@ -104,6 +119,7 @@ export type EslintSynstateRules = Readonly<{
   'synstate/no-throw-in-operator': NoThrowInOperator.RuleEntry;
   'synstate/no-unbounded-counter-pipe': NoUnboundedCounterPipe.RuleEntry;
   'synstate/no-write-during-propagation': NoWriteDuringPropagation.RuleEntry;
+  'synstate/prefer-derive': PreferDerive.RuleEntry;
   'synstate/prefer-map-to': PreferMapTo.RuleEntry;
 }>;
 

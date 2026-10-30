@@ -1,6 +1,6 @@
 --- en/06-reactive-table.mts
 +++ ja/06-reactive-table.mts
-@@ -19,15 +19,15 @@
+@@ -20,15 +20,15 @@
  const renderError = (_error: unknown): void => {};
  // embed-sample-code-ignore-above
  
@@ -19,7 +19,7 @@
  const tableDataResult = fromPromise(
    fetch('/api/rows').then((r) => {
      if (!r.ok) {
-@@ -38,7 +38,7 @@
+@@ -39,7 +39,7 @@
    }),
  );
  
@@ -28,17 +28,17 @@
  const headerValues = combine([filterName, filterEmail, filterGender]).pipe(
    debounce(300),
  );
-@@ -46,7 +46,7 @@
- const filteredRows = combine([headerValues, tableDataResult]).pipe(
-   map(([filters, result]) =>
+@@ -48,7 +48,7 @@
+   [headerValues, tableDataResult],
+   (filters, result) =>
      Result.isErr(result)
 -      ? [] // show empty table on error
 +      ? [] // エラー時は空テーブルを表示
        : result.value.filter(
            (row) =>
              row.name.includes(filters[0]) &&
-@@ -56,20 +56,20 @@
-   ),
+@@ -57,20 +57,20 @@
+         ),
  );
  
 -// Error state is also a derived value — no separate error variable needed
@@ -49,8 +49,8 @@
  
 -// Derived: page count
 +// 派生： ページ数
- const pageLength = combine([filteredRows, itemsPerPage]).pipe(
-   map(([rows, perPage]) => Math.ceil(rows.length / perPage)),
+ const pageLength = derive([filteredRows, itemsPerPage], (rows, perPage) =>
+   Math.ceil(rows.length / perPage),
  );
  
 -// Reset page to 1 whenever pageLength changes (filters or itemsPerPage changed)
@@ -61,18 +61,18 @@
 +// 派生： 現在のページ — ユーザー入力と自動リセットを merge し、クランプ
  const currentPage = merge([
    pageReset,
-   combine([pageInput, pageLength]).pipe(
-@@ -77,7 +77,7 @@
+   derive([pageInput, pageLength], (page, maxPage) =>
+@@ -78,7 +78,7 @@
    ),
  ]);
  
 -// Output: visible table rows
 +// 出力： 表示するテーブル行
- const tableSliced = combine([filteredRows, currentPage, itemsPerPage]).pipe(
-   map(([rows, page, perPage]) => {
-     const start = (page - 1) * perPage;
-@@ -85,10 +85,10 @@
-   }),
+ const tableSliced = derive(
+   [filteredRows, currentPage, itemsPerPage],
+   (rows, page, perPage) => {
+@@ -87,10 +87,10 @@
+   },
  );
  
 -// Subscribe to render — called automatically when any dependency changes

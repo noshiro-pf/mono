@@ -1,4 +1,4 @@
-import { collectToArray, combine, counter, filter, map, take } from 'synstate';
+import { collectToArray, counter, derive, filter, map, take } from 'synstate';
 
 if (import.meta.vitest !== undefined) {
   test('filter-diamond-example', async () => {
@@ -13,7 +13,7 @@ if (import.meta.vitest !== undefined) {
     const D = A.pipe(filter((n) => n % 2 === 0));
     // 0, 2, 4, ...  (odd values are skipped)
 
-    const C = combine([B, D]).pipe(map(([b, d]) => b + d));
+    const C = derive([B, D], (b, d) => b + d);
     // sum of B and D: 0, 10, 22, 32, 44, 54, 66, ...
 
     const E = D.pipe(map((n) => n * 10));

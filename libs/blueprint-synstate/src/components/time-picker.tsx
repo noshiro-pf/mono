@@ -1,4 +1,4 @@
-import { combine, createState, map } from 'synstate';
+import { createState, derive, map } from 'synstate';
 import {
   constant,
   toObservable,
@@ -130,14 +130,12 @@ export const TimePicker = ({
   );
 
   const renderInput = (unit: Unit): JSX.Element => {
-    const text$ = combine([time$, editing$]).pipe(
-      map(([time, editing]) =>
-        Optional.isSome(editing) && editing.value.unit === unit
-          ? editing.value.text
-          : unit === 'hour'
-            ? time.hour.toString()
-            : pad2(time.minute),
-      ),
+    const text$ = derive([time$, editing$], (time, editing) =>
+      Optional.isSome(editing) && editing.value.unit === unit
+        ? editing.value.text
+        : unit === 'hour'
+          ? time.hour.toString()
+          : pad2(time.minute),
     );
 
     return (

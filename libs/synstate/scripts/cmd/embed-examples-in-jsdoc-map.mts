@@ -154,6 +154,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/combine-example.mts'],
   },
   {
+    sourcePath: 'src/core/combine/derive.mts',
+    sampleFiles: ['samples/src/derive-example.mts'],
+  },
+  {
     sourcePath: 'src/core/combine/merge.mts',
     sampleFiles: ['samples/src/merge-example.mts'],
   },

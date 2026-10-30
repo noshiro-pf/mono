@@ -7,6 +7,7 @@ import {
   combine,
   createState,
   debounce,
+  derive,
   fromPromise,
   map,
   mapTo,
@@ -43,8 +44,9 @@ const headerValues = combine([filterName, filterEmail, filterGender]).pipe(
   debounce(300),
 );
 
-const filteredRows = combine([headerValues, tableDataResult]).pipe(
-  map(([filters, result]) =>
+const filteredRows = derive(
+  [headerValues, tableDataResult],
+  (filters, result) =>
     Result.isErr(result)
       ? [] // show empty table on error
       : result.value.filter(
@@ -53,7 +55,6 @@ const filteredRows = combine([headerValues, tableDataResult]).pipe(
             row.email.includes(filters[1]) &&
             row.gender.includes(filters[2]),
         ),
-  ),
 );
 
 // Error state is also a derived value — no separate error variable needed
@@ -62,8 +63,8 @@ const fetchError = tableDataResult.pipe(
 );
 
 // Derived: page count
-const pageLength = combine([filteredRows, itemsPerPage]).pipe(
-  map(([rows, perPage]) => Math.ceil(rows.length / perPage)),
+const pageLength = derive([filteredRows, itemsPerPage], (rows, perPage) =>
+  Math.ceil(rows.length / perPage),
 );
 
 // Reset page to 1 whenever pageLength changes (filters or itemsPerPage changed)
@@ -72,17 +73,18 @@ const pageReset = pageLength.pipe(mapTo(1));
 // Derived: current page — merge user input and auto-reset, then clamp
 const currentPage = merge([
   pageReset,
-  combine([pageInput, pageLength]).pipe(
-    map(([page, maxPage]) => Math.max(1, Math.min(page, maxPage))),
+  derive([pageInput, pageLength], (page, maxPage) =>
+    Math.max(1, Math.min(page, maxPage)),
   ),
 ]);
 
 // Output: visible table rows
-const tableSliced = combine([filteredRows, currentPage, itemsPerPage]).pipe(
-  map(([rows, page, perPage]) => {
+const tableSliced = derive(
+  [filteredRows, currentPage, itemsPerPage],
+  (rows, page, perPage) => {
     const start = (page - 1) * perPage;
     return rows.slice(start, start + perPage);
-  }),
+  },
 );
 
 // Subscribe to render — called automatically when any dependency changes

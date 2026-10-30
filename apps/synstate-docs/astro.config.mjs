@@ -193,6 +193,7 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { slug: 'reference/combine' },
+                { slug: 'reference/derive' },
                 { slug: 'reference/merge' },
                 { slug: 'reference/zip' },
               ],

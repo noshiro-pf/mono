@@ -1,4 +1,4 @@
-import { combine, createState, map } from 'synstate';
+import { createState, derive, map } from 'synstate';
 
 // embed-sample-code-ignore-above
 export const runBenchmark = (n: number): number => {
@@ -8,7 +8,7 @@ export const runBenchmark = (n: number): number => {
 
   const tripled = counter.pipe(map((x) => x * 3));
 
-  const sum = combine([doubled, tripled]).pipe(map(([d, t]) => d + t));
+  const sum = derive([doubled, tripled], (d, t) => d + t);
 
   let mut_lastValue = 0;
 

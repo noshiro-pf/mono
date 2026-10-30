@@ -109,6 +109,14 @@ namespace SynStateInternals {
       ? InitializedCombineObservableImpl<Cast<Unwrap<OS>>>
       : CombineObservableImpl<Unwrap<OS>>;
 
+  export type DeriveObservableRefinedImpl<
+    B,
+    OS extends NonEmptyTuple<Observable<unknown>>,
+  > =
+    EveryInitialized<OS> extends true
+      ? InitializedSyncChildObservable<B, Cast<Unwrap<OS>>>
+      : SyncChildObservable<B, Unwrap<OS>>;
+
   type InitializedZipObservableImpl<A extends NonEmptyUnknownList> =
     InitializedSyncChildObservable<A, A>;
 
@@ -188,6 +196,16 @@ export type CombineObservable<A extends NonEmptyUnknownList> =
 export type CombineObservableRefined<
   OS extends NonEmptyTuple<Observable<unknown>>,
 > = SynStateInternals.CombineObservableRefinedImpl<OS>;
+
+export type DeriveObservable<
+  B,
+  A extends NonEmptyUnknownList,
+> = SyncChildObservable<B, A>;
+
+export type DeriveObservableRefined<
+  B,
+  OS extends NonEmptyTuple<Observable<unknown>>,
+> = SynStateInternals.DeriveObservableRefinedImpl<B, OS>;
 
 export type ZipObservable<A extends NonEmptyUnknownList> =
   SynStateInternals.ZipObservableImpl<A>;

@@ -281,6 +281,15 @@ describe('no-identity-map through type wrappers', () => {
         output: null,
       },
       {
+        name: 'a namespace callee in `as`: reported, not fixed',
+        code: dedent`
+          import * as S from 'synstate';
+          const a$ = x$.pipe((S.map as typeof S.map)((x) => x));
+        `,
+        errors: [{ messageId: 'identityMap' }],
+        output: null,
+      },
+      {
         name: 'the call in `satisfies`, the wrapper kept',
         code: dedent`
           import { map, skipIfNoChange } from 'synstate';

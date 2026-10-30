@@ -27,59 +27,59 @@
   "rows": [
     {
       "label": "SynState",
-      "median": 15.68,
-      "min": 14.92,
-      "max": 17,
-      "p95": 16.89,
-      "opsPerSec": 6379191
+      "median": 14.31,
+      "min": 13.63,
+      "max": 17.39,
+      "p95": 17.22,
+      "opsPerSec": 6987058
     },
     {
       "label": "RxJS",
-      "median": 7.62,
-      "min": 7.38,
-      "max": 8.26,
-      "p95": 7.93,
-      "opsPerSec": 13127528
+      "median": 7.39,
+      "min": 7.25,
+      "max": 7.71,
+      "p95": 7.65,
+      "opsPerSec": 13525056
     },
     {
       "label": "MobX",
-      "median": 109.67,
-      "min": 109.17,
-      "max": 128.61,
-      "p95": 126.07,
-      "opsPerSec": 911835
+      "median": 106.87,
+      "min": 105.9,
+      "max": 117.63,
+      "p95": 112.41,
+      "opsPerSec": 935722
     },
     {
       "label": "Jotai",
-      "median": 756.89,
-      "min": 742.13,
-      "max": 769.21,
-      "p95": 768.69,
-      "opsPerSec": 132119
+      "median": 748.57,
+      "min": 734.7,
+      "max": 768.09,
+      "p95": 764.26,
+      "opsPerSec": 133588
     },
     {
       "label": "Redux",
-      "median": 305.05,
-      "min": 299.45,
-      "max": 325.82,
-      "p95": 325.61,
-      "opsPerSec": 327813
+      "median": 289,
+      "min": 277.63,
+      "max": 309.78,
+      "p95": 305.08,
+      "opsPerSec": 346017
     },
     {
       "label": "Solid",
-      "median": 90.88,
-      "min": 90.59,
-      "max": 93.16,
-      "p95": 91.78,
-      "opsPerSec": 1100304
+      "median": 85.77,
+      "min": 85.32,
+      "max": 88.05,
+      "p95": 86.89,
+      "opsPerSec": 1165940
     },
     {
       "label": "Preact Signals",
-      "median": 15.88,
-      "min": 15.77,
-      "max": 20.7,
-      "p95": 19.49,
-      "opsPerSec": 6297786
+      "median": 13.45,
+      "min": 13.34,
+      "max": 15.51,
+      "p95": 14,
+      "opsPerSec": 7435013
     }
   ]
 }

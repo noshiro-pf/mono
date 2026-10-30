@@ -17,6 +17,7 @@ import {
   formatBenchmarkCell,
   writeBenchmarkResults,
 } from './benchmark-results.mjs';
+import { isMeasuringChild, measureEachInOwnProcess } from './own-process.mjs';
 import { resultsDir } from './paths.mjs';
 import { selectProductionBuilds } from './production-builds.mjs';
 
@@ -274,10 +275,9 @@ const measureRounds = (
 const measureEntry = (entry: AdapterEntry): readonly (number | null)[] => {
   const { label, createAdapter } = entry;
 
-  // Just before this library's own rounds rather than every library's check
-  // up front, so that the shared `lerp` has seen no library measured after
-  // this one: the check adds only this library's own points and the model's
-  // plain ones.
+  // In this library's own process (see `measureEachInOwnProcess`), so that
+  // the shared `lerp` has seen no other library: the check adds only this
+  // library's own points and the model's plain ones.
   assertReacts(entry);
 
   const mut_values: (number | null)[] = [];
@@ -325,9 +325,11 @@ const measureEntry = (entry: AdapterEntry): readonly (number | null)[] => {
   return mut_values;
 };
 
-console.info(
-  `\n## Deep Chain Throughput (${WARMUP_ROUNDS.toString()} warmup + ${MEASURE_ROUNDS.toString()} measured, timeout=${TIMEOUT_MS.toString()} ms)\n`,
-);
+if (!isMeasuringChild) {
+  console.info(
+    `\n## Deep Chain Throughput (${WARMUP_ROUNDS.toString()} warmup + ${MEASURE_ROUNDS.toString()} measured, timeout=${TIMEOUT_MS.toString()} ms)\n`,
+  );
+}
 
 // Column headers
 const colHeaders = PARAMS.map(
@@ -341,9 +343,13 @@ const mut_tableLines: string[] = [
   `| ------- | ${PARAMS.map(() => '----------:').join(' | ')} |`,
 ];
 
-for (const entry of entries) {
-  const values = measureEntry(entry);
+const measured = await measureEachInOwnProcess(
+  import.meta.url,
+  entries,
+  measureEntry,
+);
 
+for (const [entry, values] of measured) {
   mut_series.push({ label: entry.label, values });
 
   mut_tableLines.push(

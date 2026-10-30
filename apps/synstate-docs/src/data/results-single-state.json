@@ -27,75 +27,75 @@
   "rows": [
     {
       "label": "SynState",
-      "median": 4.44,
-      "min": 4.35,
-      "max": 6.41,
-      "p95": 6.08,
-      "opsPerSec": 22533226
+      "median": 4.46,
+      "min": 4.31,
+      "max": 7.11,
+      "p95": 5.37,
+      "opsPerSec": 22417220
     },
     {
       "label": "RxJS",
-      "median": 4.36,
-      "min": 4.32,
-      "max": 4.53,
-      "p95": 4.53,
-      "opsPerSec": 22940655
+      "median": 4.24,
+      "min": 4.15,
+      "max": 4.38,
+      "p95": 4.37,
+      "opsPerSec": 23573803
     },
     {
       "label": "MobX",
-      "median": 56.48,
-      "min": 55.85,
-      "max": 73.99,
-      "p95": 72.31,
-      "opsPerSec": 1770507
+      "median": 56.55,
+      "min": 56.34,
+      "max": 66.58,
+      "p95": 60.41,
+      "opsPerSec": 1768203
     },
     {
       "label": "Jotai",
-      "median": 186.39,
-      "min": 183.54,
-      "max": 189.84,
-      "p95": 187.21,
-      "opsPerSec": 536516
+      "median": 186.15,
+      "min": 183.68,
+      "max": 188.51,
+      "p95": 186.92,
+      "opsPerSec": 537202
     },
     {
       "label": "Redux",
-      "median": 120.64,
-      "min": 119.9,
-      "max": 122.83,
-      "p95": 121.78,
-      "opsPerSec": 828914
+      "median": 119.93,
+      "min": 118.24,
+      "max": 123,
+      "p95": 122.15,
+      "opsPerSec": 833842
     },
     {
       "label": "Solid",
-      "median": 29.05,
-      "min": 28.72,
-      "max": 29.29,
-      "p95": 29.13,
-      "opsPerSec": 3442186
+      "median": 26.94,
+      "min": 26.78,
+      "max": 27.41,
+      "p95": 27.31,
+      "opsPerSec": 3711827
     },
     {
       "label": "Preact Signals",
-      "median": 5.59,
-      "min": 5.49,
-      "max": 5.76,
-      "p95": 5.72,
-      "opsPerSec": 17889379
+      "median": 5.32,
+      "min": 5.25,
+      "max": 5.54,
+      "p95": 5.43,
+      "opsPerSec": 18800627
     },
     {
       "label": "Zustand",
-      "median": 5.75,
-      "min": 5.62,
-      "max": 6.03,
-      "p95": 5.95,
-      "opsPerSec": 17395432
+      "median": 5.54,
+      "min": 5.45,
+      "max": 5.81,
+      "p95": 5.78,
+      "opsPerSec": 18063120
     },
     {
       "label": "Valtio",
-      "median": 46.05,
-      "min": 45.66,
-      "max": 46.84,
-      "p95": 46.75,
-      "opsPerSec": 2171373
+      "median": 47.34,
+      "min": 47.03,
+      "max": 64.47,
+      "p95": 51.04,
+      "opsPerSec": 2112435
     }
   ]
 }

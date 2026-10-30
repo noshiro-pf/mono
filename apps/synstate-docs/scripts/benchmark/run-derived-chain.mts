@@ -7,6 +7,7 @@ import {
   renderStatsTable,
   writeBenchmarkResults,
 } from './benchmark-results.mjs';
+import { measureEachInOwnProcess } from './own-process.mjs';
 import { resultsDir, scenarioDir } from './paths.mjs';
 import { selectProductionBuilds } from './production-builds.mjs';
 
@@ -98,58 +99,67 @@ const p95 = (sorted: readonly number[]): number =>
 const formatNumber = (n: number): string =>
   n.toLocaleString('en-US', { maximumFractionDigits: 0 });
 
-const runScenario = async (scenario: Scenario): Promise<void> => {
+/** One library in one scenario: what a process of its own measures. */
+type ScenarioEntry = Readonly<{
+  scenario: Scenario;
+  entry: BenchmarkEntry;
+}>;
+
+/** Checks one library's result, then times its rounds. */
+const measureEntry = async ({
+  scenario,
+  entry,
+}: ScenarioEntry): Promise<readonly number[]> => {
+  const filePath = path.resolve(scenarioDir, entry.file);
+
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  const mod = (await import(filePath)) as BenchmarkModule;
+
+  // Verify correctness
+  const check = mod.runBenchmark(1000);
+
+  const expectedCheck = (scenario.expectedValue / N) * 1000;
+
+  if (check !== expectedCheck) {
+    console.error(
+      `❌ ${entry.name}: expected ${expectedCheck.toString()} but got ${check.toString()}`,
+    );
+
+    process.exit(1);
+  }
+
+  // Warmup
+  for (const _ of range(0, WARMUP_ROUNDS)) {
+    mod.runBenchmark(N);
+  }
+
+  // Measure
+  const mut_times: number[] = [];
+
+  for (const _ of range(0, MEASURE_ROUNDS)) {
+    const start = performance.now();
+
+    mod.runBenchmark(N);
+
+    const end = performance.now();
+
+    mut_times.push(end - start);
+  }
+
+  console.info(`  ✓ ${scenario.title}: ${entry.name} done`);
+
+  return mut_times;
+};
+
+const writeScenario = async (
+  scenario: Scenario,
+  results: readonly Readonly<{ name: string; times: readonly number[] }>[],
+): Promise<void> => {
   console.info(
     `\n## ${scenario.title} (N=${formatNumber(N)}, ${WARMUP_ROUNDS} warmup + ${MEASURE_ROUNDS} measured rounds)\n`,
   );
 
-  const mut_results: { name: string; times: number[] }[] = [];
-
-  for (const entry of scenario.entries) {
-    const filePath = path.resolve(scenarioDir, entry.file);
-
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    const mod = (await import(filePath)) as BenchmarkModule;
-
-    // Verify correctness
-    const check = mod.runBenchmark(1000);
-
-    const expectedCheck = (scenario.expectedValue / N) * 1000;
-
-    if (check !== expectedCheck) {
-      console.error(
-        `❌ ${entry.name}: expected ${expectedCheck.toString()} but got ${check.toString()}`,
-      );
-
-      process.exit(1);
-    }
-
-    // Warmup
-    for (const _ of range(0, WARMUP_ROUNDS)) {
-      mod.runBenchmark(N);
-    }
-
-    // Measure
-    const mut_times: number[] = [];
-
-    for (const _ of range(0, MEASURE_ROUNDS)) {
-      const start = performance.now();
-
-      mod.runBenchmark(N);
-
-      const end = performance.now();
-
-      mut_times.push(end - start);
-    }
-
-    mut_results.push({ name: entry.name, times: mut_times });
-
-    console.info(`  ✓ ${entry.name} done`);
-  }
-
-  console.info('');
-
-  const rows: readonly BenchmarkStats[] = mut_results.map(({ name, times }) => {
+  const rows: readonly BenchmarkStats[] = results.map(({ name, times }) => {
     const sorted = times.toSorted((a, b) => a - b);
 
     const med = median(sorted);
@@ -179,6 +189,21 @@ const runScenario = async (scenario: Scenario): Promise<void> => {
   });
 };
 
+const items: readonly ScenarioEntry[] = scenarios.flatMap((scenario) =>
+  scenario.entries.map((entry) => ({ scenario, entry })),
+);
+
+const measured = await measureEachInOwnProcess(
+  import.meta.url,
+  items,
+  measureEntry,
+);
+
 for (const scenario of scenarios) {
-  await runScenario(scenario);
+  await writeScenario(
+    scenario,
+    measured
+      .filter(([item]) => item.scenario === scenario)
+      .map(([item, times]) => ({ name: item.entry.name, times })),
+  );
 }

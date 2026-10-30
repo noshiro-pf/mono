@@ -52,6 +52,7 @@ const jsdocExampleMappings: DeepReadonly<
     'create-event-emitter-example.mts',
   ],
   ['src/core/operators/debounce.mts', 'debounce', 'debounce-example.mts'],
+  ['src/core/combine/derive.mts', 'derive', 'derive-example.mts'],
   ['src/core/operators/filter.mts', 'filter', 'filter-example.mts'],
   [
     'src/core/create/from-promise.mts',

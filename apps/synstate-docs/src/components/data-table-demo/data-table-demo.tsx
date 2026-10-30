@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {
-  combine,
   createState,
   debounce,
+  derive,
   type InitializedObservable,
   map,
 } from 'synstate';
@@ -166,11 +166,10 @@ namespace State {
 
   const [filterGenderState, setFilterGender] = createState('');
 
-  export const filterValuesState = combine([
-    filterNameState,
-    filterEmailState,
-    filterGenderState,
-  ]).pipe(map(([fullName, email, gender]) => ({ fullName, email, gender })));
+  export const filterValuesState = derive(
+    [filterNameState, filterEmailState, filterGenderState],
+    (fullName, email, gender) => ({ fullName, email, gender }),
+  );
 
   const [itemsPerPageInputState, setItemsPerPageInput] = createState(10);
 
@@ -200,19 +199,17 @@ namespace State {
   );
 
   // Derived: page length
-  export const pageLengthState = combine([
-    filteredRowsState,
-    itemsPerPageNormalized,
-  ]).pipe(
+  export const pageLengthState = derive(
+    [filteredRowsState, itemsPerPageNormalized],
     // eslint-disable-next-line total-functions/no-partial-division
-    map(([rows, perPage]) => Math.max(1, Math.ceil(rows.length / perPage))),
+    (rows, perPage) => Math.max(1, Math.ceil(rows.length / perPage)),
   );
 
   // Derived: current page (clamped to valid range)
-  export const currentPageState = combine([
-    pageInputState,
-    pageLengthState,
-  ]).pipe(map(([input, maxPage]) => Math.max(1, Math.min(input, maxPage))));
+  export const currentPageState = derive(
+    [pageInputState, pageLengthState],
+    (input, maxPage) => Math.max(1, Math.min(input, maxPage)),
+  );
 
   // Output: table view (combines all derived values atomically — no glitch)
   type TableView = Readonly<{
@@ -223,12 +220,9 @@ namespace State {
     totalFiltered: number;
   }>;
 
-  export const tableViewState = combine([
-    filteredRowsState,
-    currentPageState,
-    itemsPerPageNormalized,
-  ]).pipe(
-    map(([rows, page, perPage]): TableView => {
+  export const tableViewState = derive(
+    [filteredRowsState, currentPageState, itemsPerPageNormalized],
+    (rows, page, perPage): TableView => {
       const startIdx = (page - 1) * perPage;
 
       return {
@@ -238,7 +232,7 @@ namespace State {
         rangeEnd: Math.min(startIdx + perPage, rows.length),
         totalFiltered: rows.length,
       };
-    }),
+    },
   );
 
   // ---------------------------------------------------------------------------

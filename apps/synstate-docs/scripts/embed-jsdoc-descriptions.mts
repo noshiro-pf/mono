@@ -41,6 +41,7 @@ const jsdocMappings: DeepReadonly<
     'createValueEmitter',
   ],
   ['debounce', 'src/core/operators/debounce.mts', 'debounce'],
+  ['derive', 'src/core/combine/derive.mts', 'derive'],
   ['filter', 'src/core/operators/filter.mts', 'filter'],
   [
     'from-abortable-promise',

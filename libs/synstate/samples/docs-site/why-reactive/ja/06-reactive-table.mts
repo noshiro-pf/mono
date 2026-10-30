@@ -7,6 +7,7 @@ import {
   combine,
   createState,
   debounce,
+  derive,
   fromPromise,
   map,
   mapTo,
@@ -43,8 +44,9 @@ const headerValues = combine([filterName, filterEmail, filterGender]).pipe(
   debounce(300),
 );
 
-const filteredRows = combine([headerValues, tableDataResult]).pipe(
-  map(([filters, result]) =>
+const filteredRows = derive(
+  [headerValues, tableDataResult],
+  (filters, result) =>
     Result.isErr(result)
       ? [] // エラー時は空テーブルを表示
       : result.value.filter(
@@ -53,7 +55,6 @@ const filteredRows = combine([headerValues, tableDataResult]).pipe(
             row.email.includes(filters[1]) &&
             row.gender.includes(filters[2]),
         ),
-  ),
 );
 
 // エラー状態も派生値 — 別のミュータブル変数は不要
@@ -62,8 +63,8 @@ const fetchError = tableDataResult.pipe(
 );
 
 // 派生： ページ数
-const pageLength = combine([filteredRows, itemsPerPage]).pipe(
-  map(([rows, perPage]) => Math.ceil(rows.length / perPage)),
+const pageLength = derive([filteredRows, itemsPerPage], (rows, perPage) =>
+  Math.ceil(rows.length / perPage),
 );
 
 // pageLength が変わったらページを1にリセット
@@ -72,17 +73,18 @@ const pageReset = pageLength.pipe(mapTo(1));
 // 派生： 現在のページ — ユーザー入力と自動リセットを merge し、クランプ
 const currentPage = merge([
   pageReset,
-  combine([pageInput, pageLength]).pipe(
-    map(([page, maxPage]) => Math.max(1, Math.min(page, maxPage))),
+  derive([pageInput, pageLength], (page, maxPage) =>
+    Math.max(1, Math.min(page, maxPage)),
   ),
 ]);
 
 // 出力： 表示するテーブル行
-const tableSliced = combine([filteredRows, currentPage, itemsPerPage]).pipe(
-  map(([rows, page, perPage]) => {
+const tableSliced = derive(
+  [filteredRows, currentPage, itemsPerPage],
+  (rows, page, perPage) => {
     const start = (page - 1) * perPage;
     return rows.slice(start, start + perPage);
-  }),
+  },
 );
 
 // subscribe で描画 — 依存が変化すると自動的に呼ばれる

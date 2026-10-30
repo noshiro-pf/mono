@@ -148,9 +148,10 @@ export const preferMapTo: TSESLint.RuleModule<MessageIds, Options> = {
 /**
  * The body of `argument` when it is an arrow function that returns the same
  * value every time it runs: simple parameters, which run nothing, and an
- * expression body that {@link isConstant} accepts.
+ * expression body that {@link isConstant} accepts. `prefer-derive` reads it
+ * too, to leave such a `map` to this rule.
  */
-const constantBodyOf = (
+export const constantBodyOf = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   sourceCode: TSESLint.SourceCode,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

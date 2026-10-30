@@ -71,6 +71,7 @@ export default [
 | `no-throw-in-operator`           | Disallow `throw` in a function passed to a synstate operator. The exception stops the update midway, leaving part of the graph updated; return a `Result` instead.                   |
 | `no-unbounded-counter-pipe`      | Disallow calling `.pipe` directly on `counter(...)` when it has no `times` option. Nothing holds the counter, so nothing can complete it, and it never ends.                         |
 | `no-write-during-propagation`    | Disallow writing to a synstate state or source from a subscriber or a projection. The write starts an update inside the one that called it, outside the graph synstate orders.       |
+| `prefer-derive`                  | Require `derive(parents, fn)` instead of `combine(parents).pipe(map(fn))`, which is two observables and builds a tuple on every update. Fixable.                                     |
 | `prefer-map-to`                  | Require `mapTo(c)` instead of `map(() => c)`. `map` stops a result equal to the one it holds, so a `map` to a constant emits once and never again. Fixable.                          |
 
 ### `no-identity-map`
@@ -215,6 +216,28 @@ covers a write in a function the callback merely defines (a `setTimeout`
 callback, which runs after the update, so it is correct), a setter passed as an
 argument or kept in an object, and a function imported from another file and
 called from the callback.
+
+### `prefer-derive`
+
+`combine(parents)` emits a tuple of its parents' latest values, so deriving one
+value from several — `combine([a$, b$]).pipe(map(([a, b]) => a + b))` — takes
+two observables, and every update builds a tuple only for `map` to take apart.
+`derive([a$, b$], (a, b) => a + b)` is one observable that calls the function
+with the values as arguments. It stops a result `Object.is` the one it holds,
+as `map` does, and takes `map`'s `equals` as its own, so the rewrite changes
+nothing that is emitted.
+
+Every `.pipe` whose one operator is `map`, called on `combine(...)` or its alias
+`combineLatest(...)`, is reported, unless the `map` is one `prefer-map-to` or
+`no-identity-map` reports (`map(() => c)`, `map((xs) => xs)`). The fix
+turns an array pattern into the parameters (`([a, b]) =>` to `(a, b) =>`) and
+a name into a rest parameter (`(xs) =>` to `(...xs) =>`), adding the import of
+`derive` when the file has none. It is not offered for a mapping function that is not an arrow function
+written in place, a parameter with a type annotation, a default, a `?` or a
+hole, a `combine(...)` or its `.pipe` in a type wrapper or parentheses, a
+`combine` or `map` callee in a type wrapper, a parameter followed by a comma,
+type arguments on any of the three calls, or a comment between the calls,
+which the rewrite would drop.
 
 ### `prefer-map-to`
 

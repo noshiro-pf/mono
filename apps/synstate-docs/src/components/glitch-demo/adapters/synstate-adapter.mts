@@ -1,4 +1,4 @@
-import { combine, map, source } from 'synstate';
+import { derive, map, source } from 'synstate';
 import type { Adapter, Point, Subscription } from '../types.mjs';
 
 export const createSynStateAdapter = (): Adapter => {
@@ -15,9 +15,7 @@ export const createSynStateAdapter = (): Adapter => {
 
       const derivedY = mut_mousePos.pipe(map((pos) => pos.y));
 
-      const combined = combine([derivedX, derivedY]).pipe(
-        map(([x, y]) => ({ x, y })),
-      );
+      const combined = derive([derivedX, derivedY], (x, y) => ({ x, y }));
 
       mut_subscription = combined.subscribe(onEmit);
     },

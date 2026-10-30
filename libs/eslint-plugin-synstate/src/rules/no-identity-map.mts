@@ -181,9 +181,10 @@ export const noIdentityMap: TSESLint.RuleModule<MessageIds, Options> = {
  * Whether `argument`, read through its type wrappers, is a function that
  * returns its one parameter, and whether type syntax is written anywhere on
  * the way: around the function or the result, or on the parameter or the
- * return type. `undefined` when it is not such a function.
+ * return type. `undefined` when it is not such a function. `prefer-derive`
+ * reads it too, to leave such a `map` to this rule.
  */
-const identityOf = (
+export const identityOf = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   argument: TSESTree.CallExpressionArgument,
 ): Readonly<{ hasTypeSyntax: boolean }> | undefined => {
