@@ -6,11 +6,17 @@ import {
   formatTickLabel,
   generateLinearTicks,
   generateLogTicks,
+  lineStyleOf,
 } from './chart-utils.mjs';
 
 type DataSeries = Readonly<{
   label: string;
   color: string;
+  /**
+   * A form written naively on purpose: drawn dashed, thinner and beneath the
+   * others, so that it does not read as the library's own line.
+   */
+  naive?: boolean;
   /** Values in ms. `undefined` means timed out / not measured. */
   values: readonly (number | undefined)[];
 }>;
@@ -74,6 +80,11 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
         // eslint-disable-next-line total-functions/no-partial-division
         (i / (xLabels.length - 1)) * PLOT_W;
 
+  // The naive forms first, so that the lines they cross are drawn over them
+  const drawOrder = series.toSorted(
+    (a, b) => Number(b.naive === true) - Number(a.naive === true),
+  );
+
   // Y-axis tick values
   const yTicks = logScale
     ? generateLogTicks(yMin, yMax)
@@ -115,7 +126,9 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
           ) : undefined}
 
           {/* Data lines + dots */}
-          {series.map((s) => {
+          {drawOrder.map((s) => {
+            const style = lineStyleOf(s.naive);
+
             const points = s.values
               .map((v, i) =>
                 v !== undefined
@@ -142,7 +155,8 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
                   d={linePath}
                   fill={'none'}
                   stroke={s.color}
-                  strokeWidth={2}
+                  strokeDasharray={style.strokeDasharray}
+                  strokeWidth={style.strokeWidth}
                 />
                 {points.map((p) => (
                   <circle
@@ -150,7 +164,7 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
                     cx={p.x}
                     cy={p.y}
                     fill={s.color}
-                    r={3}
+                    r={style.dotRadius}
                   />
                 ))}
               </g>

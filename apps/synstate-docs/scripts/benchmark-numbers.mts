@@ -6,6 +6,7 @@ import {
   deepChain as deepChainJson,
   derivedChain as derivedChainJson,
   diamond as diamondJson,
+  isNaiveForm,
   singleState as singleStateJson,
 } from '../src/data/index.mjs';
 
@@ -352,14 +353,14 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     'fan-out/rxjs-switch-map-typical': ms(
       typical(conditionalFanOut, 'RxJS (switchMap)'),
     ),
-    'fan-out/synstate@min-b': ms(
-      at(conditionalFanOut, 'SynState', FAN_OUT_MIN),
+    'fan-out/synstate-naive@min-b': ms(
+      at(conditionalFanOut, SYNSTATE_NAIVE, FAN_OUT_MIN),
     ),
-    'fan-out/synstate-last-measured-b': param(fanOutLastLabel()).toString(),
-    'fan-out/synstate@last-measured-b': ms(
-      at(conditionalFanOut, 'SynState', fanOutLastLabel()),
+    'fan-out/last-measured-b': param(fanOutLastLabel()).toString(),
+    'fan-out/synstate-naive@last-measured-b': ms(
+      at(conditionalFanOut, SYNSTATE_NAIVE, fanOutLastLabel()),
     ),
-    'fan-out/synstate-ns-per-branch-per-update': nsPerBranchPerUpdate(),
+    'fan-out/synstate-naive-ns-per-branch-per-update': nsPerBranchPerUpdate(),
     'fan-out/redux@min-b': ms(at(conditionalFanOut, 'Redux', FAN_OUT_MIN)),
     'fan-out/redux@last-measured-b': ms(
       at(conditionalFanOut, 'Redux', fanOutLastLabel()),
@@ -436,25 +437,30 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     'summary/fan-out-scenario': fanOutSummaryName(),
     'summary/fan-out-fastest': fastestAt(conditionalFanOut, fanOutLastLabel()),
     // SynState written with `switchMap`, the form that follows the selector as
-    // MobX and Jotai do; the `combine` form is in the footnote beside it, and
-    // is left out of the slowest column for the same reason.
+    // MobX and Jotai do; the naive `derive` form is in the footnote beside it,
+    // and the naive forms are left out of the slowest column for the same
+    // reason.
     'summary/fan-out-synstate-over-fastest': factor(
-      pointSpread(conditionalFanOut, 'SynState (switchMap)', fanOutLastLabel()),
+      pointSpread(
+        conditionalFanOut,
+        FAN_OUT_SUMMARY_FORMS['SynState'] ?? 'SynState',
+        fanOutLastLabel(),
+      ),
       1,
     ),
-    'summary/fan-out-synstate-combine-over-fastest': factor(
-      pointSpread(conditionalFanOut, 'SynState', fanOutLastLabel()),
+    'summary/fan-out-synstate-naive-over-fastest': factor(
+      pointSpread(conditionalFanOut, SYNSTATE_NAIVE, fanOutLastLabel()),
       1,
     ),
     'summary/fan-out-slowest': slowestAt(
       conditionalFanOut,
       fanOutLastLabel(),
-      FAN_OUT_SUMMARY_EXCLUDED,
+      fanOutSummaryExcluded(),
     ),
     'summary/fan-out-slowest-over-fastest': slowestSpreadText(
       conditionalFanOut,
       fanOutLastLabel(),
-      FAN_OUT_SUMMARY_EXCLUDED,
+      fanOutSummaryExcluded(),
     ),
     // The two figures the sentence under the summary table sets side by side:
     // SynState's worst distance from the fastest across the six rows, and the
@@ -688,6 +694,12 @@ const CASCADED_MAX = 'N=20';
 
 const FAN_OUT_MIN = 'B=2';
 
+/**
+ * SynState's fan-out row written naively, with a `derive` over every branch:
+ * the row that grows with $B$, which the fan-out prose quotes as such.
+ */
+const SYNSTATE_NAIVE = 'SynState (naive derive)';
+
 /** Where RxJS first exceeds the timeout, and the last depth it survived. */
 const rxjsTimeoutLabel = (): string =>
   firstTimeoutLabel(cascadedDiamond, 'RxJS');
@@ -705,11 +717,11 @@ const rxjsLastLabel = (): string => lastMeasuredLabel(cascadedDiamond, 'RxJS');
  * quotes the largest branch count that was actually measured, and names it.
  */
 const fanOutLastLabel = (): string =>
-  lastMeasuredLabel(conditionalFanOut, 'SynState');
+  lastMeasuredLabel(conditionalFanOut, SYNSTATE_NAIVE);
 
-/** The largest branch count at which SynState still beats Jotai. */
+/** The largest branch count at which SynState's naive form still beats Jotai. */
 const fanOutCrossoverLabel = (): string =>
-  lastAheadLabel(conditionalFanOut, 'SynState', 'Jotai');
+  lastAheadLabel(conditionalFanOut, SYNSTATE_NAIVE, 'Jotai');
 
 /**
  * Renders a measurement the way the prose quotes one: a tenth of a millisecond
@@ -1364,10 +1376,13 @@ const slowestSpreadText = (
 };
 
 /**
- * The fan-out rows the summary leaves out: SynState written with a `combine`
- * over every branch, which the summary replaces with its `switchMap` form.
+ * The fan-out rows the summary leaves out: the naive forms (`isNaiveForm`, the
+ * same test that dashes them in the chart), SynState and RxJS written with a
+ * `derive` / `combineLatest` over every branch, which the summary replaces with
+ * their `switchMap` forms.
  */
-const FAN_OUT_SUMMARY_EXCLUDED: readonly string[] = ['SynState'] as const;
+const fanOutSummaryExcluded = (): readonly string[] =>
+  conditionalFanOut.series.map((s) => s.label).filter(isNaiveForm);
 
 /** SynState's distance from the fastest in each row of the summary table. */
 const summarySynStateSpreads = (): readonly number[] =>
@@ -1443,7 +1458,8 @@ const summaryScenarios = (): readonly SummaryScenario[] =>
   ] as const;
 
 /**
- * The fan-out row's name. Its point is the last one SynState finished, which a
+ * The fan-out row's name. Its point is the last one SynState's naive form
+ * finished — the row that grows with $B$, so the first to time out — which a
  * slower machine can move, so the summary table's first column reads it from
  * here too.
  */
@@ -1468,7 +1484,8 @@ const statsScenario = (
 
 /**
  * A sweep read at one point. `forms` names, for a library measured in more
- * than one form, the row the summary counts for it.
+ * than one form, the row the summary counts for it; that row stands for the
+ * library in `libraries`, since no row of such a library carries its bare name.
  */
 const seriesScenario = (
   name: Localized,
@@ -1478,9 +1495,13 @@ const seriesScenario = (
 ): SummaryScenario => {
   const form = (library: string): string => forms[library] ?? library;
 
+  const libraryOf = (label: string): string =>
+    Object.entries(forms).find(([, formLabel]) => formLabel === label)?.[0] ??
+    label;
+
   return {
     name,
-    libraries: data.series.map((s) => s.label),
+    libraries: data.series.map((s) => libraryOf(s.label)),
     fastest: () => fastestAt(data, xLabel),
     spread: (library) => pointSpread(data, form(library), xLabel),
     timedOut: (library) => valueAt(data, form(library), xLabel) === null,
@@ -1684,7 +1705,7 @@ const summarySlowestSpreads = (): readonly number[] =>
     ),
     pointSpread(
       conditionalFanOut,
-      slowestAt(conditionalFanOut, fanOutLastLabel(), FAN_OUT_SUMMARY_EXCLUDED),
+      slowestAt(conditionalFanOut, fanOutLastLabel(), fanOutSummaryExcluded()),
       fanOutLastLabel(),
     ),
   ] as const;
@@ -1754,7 +1775,7 @@ const medianOf = (values: readonly number[]): number | undefined =>
   values.toSorted((a, b) => a - b)[Math.floor(divide(values.length, 2))];
 
 /**
- * The slope of SynState's fan-out row in nanoseconds, which is the figure that
+ * The slope of SynState's naive fan-out row in nanoseconds, which is the figure that
  * makes "linear in B" concrete: the largest measured branch count's cost
  * spread over its branches and over the updates the runner drove.
  */
@@ -1762,7 +1783,7 @@ const nsPerBranchPerUpdate = (): string =>
   count(
     Math.round(
       divide(
-        at(conditionalFanOut, 'SynState', fanOutLastLabel()) * NS_PER_MS,
+        at(conditionalFanOut, SYNSTATE_NAIVE, fanOutLastLabel()) * NS_PER_MS,
         param(fanOutLastLabel()) * updates(conditionalFanOut),
       ),
     ),

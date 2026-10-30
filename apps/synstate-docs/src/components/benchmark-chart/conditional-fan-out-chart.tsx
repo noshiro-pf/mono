@@ -7,9 +7,10 @@ import { BenchmarkLineChart } from './benchmark-line-chart.js';
 
 /**
  * Conditional Fan-Out chart — shows ms vs branch count B.
- * SynState scales linearly with B (its `derive` reads all branches); with
- * `switchMap` it follows the selected branch only and stays flat.
- * MobX is constant (inactive branch has no observers).
+ * SynState with `switchMap`, its natural form, follows the selected branch only
+ * and stays flat; the dashed "(naive derive)" line, a `derive` over every
+ * branch, scales linearly with B. MobX is constant (inactive branch has no
+ * observers).
  */
 export const ConditionalFanOutChart = React.memo(() => (
   <BenchmarkLineChart

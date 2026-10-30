@@ -57,7 +57,7 @@ const nodes: readonly NodeDef[] = [
   {
     id: 'result',
     label: 'result',
-    sublabel: 'combine \u{2192} map',
+    sublabel: 'branch[selector]',
     color: '#818cf8',
     col: 1,
     row: 2,
