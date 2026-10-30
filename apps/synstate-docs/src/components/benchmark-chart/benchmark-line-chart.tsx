@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Arr, PositiveSafeInt } from 'ts-data-forge';
+import { ChartLegend } from './chart-legend.js';
 import {
   createToY,
   formatTickLabel,
@@ -79,177 +80,154 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
     : generateLinearTicks(PositiveSafeInt.fromNumber(yMax));
 
   return (
-    <svg
-      style={svgStyle}
-      viewBox={`0 0 ${CHART_WIDTH.toString()} ${CHART_HEIGHT.toString()}`}
-    >
-      <g
-        transform={`translate(${PADDING.left.toString()}, ${PADDING.top.toString()})`}
+    <div style={figureStyle}>
+      <svg
+        style={svgStyle}
+        viewBox={`0 0 ${CHART_WIDTH.toString()} ${CHART_HEIGHT.toString()}`}
       >
-        {/* Grid lines */}
-        {yTicks.map((tick) => (
-          <line
-            key={tick}
-            stroke={'var(--sl-color-gray-5, #e5e7eb)'}
-            strokeWidth={0.5}
-            x1={0}
-            x2={PLOT_W}
-            y1={toY(tick)}
-            y2={toY(tick)}
-          />
-        ))}
+        <g
+          transform={`translate(${PADDING.left.toString()}, ${PADDING.top.toString()})`}
+        >
+          {/* Grid lines */}
+          {yTicks.map((tick) => (
+            <line
+              key={tick}
+              stroke={'var(--sl-color-gray-5, #e5e7eb)'}
+              strokeWidth={0.5}
+              x1={0}
+              x2={PLOT_W}
+              y1={toY(tick)}
+              y2={toY(tick)}
+            />
+          ))}
 
-        {/* Timeout line */}
-        {timeoutMs !== undefined && timeoutMs <= yMax ? (
+          {/* Timeout line */}
+          {timeoutMs !== undefined && timeoutMs <= yMax ? (
+            <line
+              stroke={'#ef4444'}
+              strokeDasharray={'6,4'}
+              strokeWidth={1}
+              x1={0}
+              x2={PLOT_W}
+              y1={toY(timeoutMs)}
+              y2={toY(timeoutMs)}
+            />
+          ) : undefined}
+
+          {/* Data lines + dots */}
+          {series.map((s) => {
+            const points = s.values
+              .map((v, i) =>
+                v !== undefined
+                  ? {
+                      x: toX(i),
+                      y: toY(logScale ? Math.max(v, yMin) : v),
+                      value: v,
+                    }
+                  : undefined,
+              )
+              .filter((p): p is NonNullable<typeof p> => p !== undefined);
+
+            const linePath = points
+              .map((p, i) =>
+                i === 0
+                  ? `M ${p.x.toString()} ${p.y.toString()}`
+                  : `L ${p.x.toString()} ${p.y.toString()}`,
+              )
+              .join(' ');
+
+            return (
+              <g key={s.label}>
+                <path
+                  d={linePath}
+                  fill={'none'}
+                  stroke={s.color}
+                  strokeWidth={2}
+                />
+                {points.map((p) => (
+                  <circle
+                    key={`${p.x.toString()}-${p.y.toString()}`}
+                    cx={p.x}
+                    cy={p.y}
+                    fill={s.color}
+                    r={3}
+                  />
+                ))}
+              </g>
+            );
+          })}
+
+          {/* Y-axis */}
           <line
-            stroke={'#ef4444'}
-            strokeDasharray={'6,4'}
+            stroke={'var(--sl-color-gray-3, #6b7280)'}
+            strokeWidth={1}
+            x1={0}
+            x2={0}
+            y1={0}
+            y2={PLOT_H}
+          />
+          {yTicks.map((tick) => (
+            <text
+              key={tick}
+              dominantBaseline={'middle'}
+              fill={'var(--sl-color-gray-3, #6b7280)'}
+              fontSize={11}
+              textAnchor={'end'}
+              x={-8}
+              y={toY(tick)}
+            >
+              {formatTickLabel(tick)}
+            </text>
+          ))}
+
+          {/* Y-axis label */}
+          <text
+            dominantBaseline={'middle'}
+            fill={'var(--sl-color-gray-3, #6b7280)'}
+            fontSize={12}
+            textAnchor={'middle'}
+            transform={`translate(${(-PADDING.left + 16).toString()}, ${(PLOT_H / 2).toString()}) rotate(-90)`}
+          >
+            {yAxisLabel}
+          </text>
+
+          {/* X-axis */}
+          <line
+            stroke={'var(--sl-color-gray-3, #6b7280)'}
             strokeWidth={1}
             x1={0}
             x2={PLOT_W}
-            y1={toY(timeoutMs)}
-            y2={toY(timeoutMs)}
+            y1={PLOT_H}
+            y2={PLOT_H}
           />
-        ) : undefined}
-
-        {/* Data lines + dots */}
-        {series.map((s) => {
-          const points = s.values
-            .map((v, i) =>
-              v !== undefined
-                ? {
-                    x: toX(i),
-                    y: toY(logScale ? Math.max(v, yMin) : v),
-                    value: v,
-                  }
-                : undefined,
-            )
-            .filter((p): p is NonNullable<typeof p> => p !== undefined);
-
-          const linePath = points
-            .map((p, i) =>
-              i === 0
-                ? `M ${p.x.toString()} ${p.y.toString()}`
-                : `L ${p.x.toString()} ${p.y.toString()}`,
-            )
-            .join(' ');
-
-          return (
-            <g key={s.label}>
-              <path
-                d={linePath}
-                fill={'none'}
-                stroke={s.color}
-                strokeWidth={2}
-              />
-              {points.map((p) => (
-                <circle
-                  key={`${p.x.toString()}-${p.y.toString()}`}
-                  cx={p.x}
-                  cy={p.y}
-                  fill={s.color}
-                  r={3}
-                />
-              ))}
-            </g>
-          );
-        })}
-
-        {/* Y-axis */}
-        <line
-          stroke={'var(--sl-color-gray-3, #6b7280)'}
-          strokeWidth={1}
-          x1={0}
-          x2={0}
-          y1={0}
-          y2={PLOT_H}
-        />
-        {yTicks.map((tick) => (
-          <text
-            key={tick}
-            dominantBaseline={'middle'}
-            fill={'var(--sl-color-gray-3, #6b7280)'}
-            fontSize={11}
-            textAnchor={'end'}
-            x={-8}
-            y={toY(tick)}
-          >
-            {formatTickLabel(tick)}
-          </text>
-        ))}
-
-        {/* Y-axis label */}
-        <text
-          dominantBaseline={'middle'}
-          fill={'var(--sl-color-gray-3, #6b7280)'}
-          fontSize={12}
-          textAnchor={'middle'}
-          transform={`translate(${(-PADDING.left + 16).toString()}, ${(PLOT_H / 2).toString()}) rotate(-90)`}
-        >
-          {yAxisLabel}
-        </text>
-
-        {/* X-axis */}
-        <line
-          stroke={'var(--sl-color-gray-3, #6b7280)'}
-          strokeWidth={1}
-          x1={0}
-          x2={PLOT_W}
-          y1={PLOT_H}
-          y2={PLOT_H}
-        />
-        {xLabels.map((label, i) => (
-          <text
-            key={label}
-            dominantBaseline={'hanging'}
-            fill={'var(--sl-color-gray-3, #6b7280)'}
-            fontSize={11}
-            textAnchor={'middle'}
-            x={toX(i)}
-            y={PLOT_H + 8}
-          >
-            {label}
-          </text>
-        ))}
-
-        {/* Legend */}
-        {series.map((s, i) => {
-          const lx = 8;
-
-          const ly = i * 18 + 4;
-
-          return (
-            <g key={s.label}>
-              <line
-                stroke={s.color}
-                strokeWidth={2}
-                x1={lx}
-                x2={lx + 20}
-                y1={ly}
-                y2={ly}
-              />
-              <circle cx={lx + 10} cy={ly} fill={s.color} r={3} />
-              <text
-                dominantBaseline={'middle'}
-                fill={'var(--sl-color-text, #1f2937)'}
-                fontSize={11}
-                x={lx + 26}
-                y={ly}
-              >
-                {s.label.replaceAll('**', '')}
-              </text>
-            </g>
-          );
-        })}
-      </g>
-    </svg>
+          {xLabels.map((label, i) => (
+            <text
+              key={label}
+              dominantBaseline={'hanging'}
+              fill={'var(--sl-color-gray-3, #6b7280)'}
+              fontSize={11}
+              textAnchor={'middle'}
+              x={toX(i)}
+              y={PLOT_H + 8}
+            >
+              {label}
+            </text>
+          ))}
+        </g>
+      </svg>
+      <ChartLegend marker={'line'} series={series} />
+    </div>
   );
 });
 
 BenchmarkLineChart.displayName = 'BenchmarkLineChart';
 
-const svgStyle: React.CSSProperties = {
-  width: '100%',
+const figureStyle = {
   maxWidth: `${CHART_WIDTH.toString()}px`,
+} as const;
+
+const svgStyle: React.CSSProperties = {
+  display: 'block',
+  width: '100%',
   height: 'auto',
 } as const;

@@ -20,16 +20,6 @@ export const CascadedDiamondChart = React.memo(() => (
 
 CascadedDiamondChart.displayName = 'CascadedDiamondChart';
 
-const colors = {
-  SynState: '#3b82f6',
-  RxJS: '#ef4444',
-  Jotai: '#f59e0b',
-  MobX: '#8b5cf6',
-  Redux: '#14b8a6',
-  Solid: '#ec4899',
-  'Preact Signals': '#84cc16',
-} as const;
-
-const series = toColouredSeries(cascadedDiamondResults, colors);
+const series = toColouredSeries(cascadedDiamondResults);
 
 const xLabels = cascadedDiamondResults.xLabels;

@@ -29,16 +29,6 @@ export const DeepChainChart = React.memo(() => (
 
 DeepChainChart.displayName = 'DeepChainChart';
 
-const colors = {
-  SynState: '#3b82f6',
-  RxJS: '#ef4444',
-  Jotai: '#f59e0b',
-  MobX: '#8b5cf6',
-  Redux: '#14b8a6',
-  Solid: '#ec4899',
-  'Preact Signals': '#84cc16',
-} as const;
-
 // The bar chart wants one group per (K, M) point, and takes the labels from
 // the group; the newline keeps K and M on separate lines under the axis.
 const groups = toGroups(deepChainResults).map(({ label, values }) => ({
@@ -46,13 +36,11 @@ const groups = toGroups(deepChainResults).map(({ label, values }) => ({
   values,
 }));
 
-const series = toColouredSeries(deepChainResults, colors).map(
-  ({ label, color }) => ({ label, color }),
-);
+const series = toColouredSeries(deepChainResults);
 
 const style = {
   textAlign: 'center',
   fontSize: '0.85em',
   color: 'var(--sl-color-gray-3, #6b7280)',
-  marginTop: '-0.5em',
+  marginTop: '0.5em',
 } as const;
