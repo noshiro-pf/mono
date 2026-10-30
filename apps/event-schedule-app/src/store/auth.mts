@@ -1,7 +1,7 @@
 import { type InitializedObservable, map } from 'synstate';
 import { createState, useObservableValue } from 'synstate-react-hooks';
+import { api } from '../api/index.mjs';
 import { Routes } from '../constants/index.mjs';
-import { fbAuth } from '../initialize-firebase.mjs';
 import { clog } from '../utils/index.mjs';
 import { Router } from './router.mjs';
 
@@ -23,17 +23,17 @@ const usePasswordProviderIncluded = (): boolean =>
   useObservableValue(passwordProviderIncluded$);
 
 const emitAuthStateChange = (): void => {
-  setFireAuthUser(fbAuth.currentUser ?? undefined);
+  setFireAuthUser(api.auth.currentUser());
 };
 
-fbAuth.onAuthStateChanged((user) => {
+api.auth.onAuthStateChanged((user) => {
   clog('onAuthStateChanged', user);
 
-  setFireAuthUser(user ?? undefined);
+  setFireAuthUser(user);
 });
 
 const signOut = async (): Promise<void> => {
-  await fbAuth.signOut();
+  await api.auth.signOut();
 
   Router.push(Routes.routes.signInPage);
 };
