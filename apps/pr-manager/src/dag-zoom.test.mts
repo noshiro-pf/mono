@@ -192,6 +192,7 @@ const chainAndFree = (chain: number, free: number): IssueGraph =>
       state: 'free',
       priority: 'none',
       pending: false,
+      marked: 'none',
     })),
     edges: Array.from({ length: chain - 1 }, (_, index) => ({
       from: index + 1,

@@ -405,6 +405,7 @@ const START_WORDS = {
   free: 'free',
   ready: 'ready',
   'in-progress': 'in progress',
+  planned: 'planned',
   attention: 'needs a look',
   blocked: 'waiting',
   cycle: 'on a Start-After cycle',

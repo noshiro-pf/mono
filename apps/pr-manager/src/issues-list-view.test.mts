@@ -502,6 +502,7 @@ describe('the start states', () => {
     assert.deepStrictEqual(counts.starts, {
       ready: { shown: 2, total: 2 },
       free: { shown: 1, total: 1 },
+      planned: { shown: 0, total: 0 },
       'in-progress': { shown: 1, total: 1 },
       attention: { shown: 0, total: 0 },
       blocked: { shown: 1, total: 1 },

@@ -40,7 +40,7 @@
  *
  * Sorted by priority, high comes first and "none" between mid and low, the
  * most recently updated first within each; sorted by start state, what can
- * be started first — ready, then free — then what is under way, what wants
+ * be started first — ready, then free — then what is planned, what is under way, what wants
  * looking at, and what waits, the most recently updated first within each;
  * otherwise the list is in the order it is read, most recently updated
  * first. Everything is shown, by
@@ -91,6 +91,7 @@ export type IssueSort = 'updated' | 'priority' | 'start';
 export const ISSUE_STARTS = [
   'ready',
   'free',
+  'planned',
   'in-progress',
   'attention',
   'blocked',
@@ -318,6 +319,7 @@ export const countIssues = (
     starts: {
       ready: underStart('ready'),
       free: underStart('free'),
+      planned: underStart('planned'),
       'in-progress': underStart('in-progress'),
       attention: underStart('attention'),
       blocked: underStart('blocked'),

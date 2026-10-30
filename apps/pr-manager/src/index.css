@@ -1846,6 +1846,11 @@ a:focus-visible {
   --dag-colour: var(--dag-good);
 }
 
+.issue-start[data-state='planned'],
+.issue-start-named a[data-state='planned'] {
+  --dag-colour: var(--dag-planned);
+}
+
 .issue-start[data-state='in-progress'],
 .issue-start-named a[data-state='in-progress'],
 .issue-start-named a[data-state='open'] {
@@ -2339,8 +2344,9 @@ a:focus-visible {
 
 /*
  * The colours of where a node stands, as the task manager's DAG has them:
- * green for what can be started, amber and dashed for what waits, blue for
- * what is being worked on, grey for what is over. A tint of the colour
+ * green for what can be started, violet for what someone means to start
+ * next, amber and dashed for what waits, blue for what is being worked on,
+ * grey for what is over. A tint of the colour
  * fills the shape and the colour itself draws its outline; the words are in
  * the legend and the tooltip, so the colour never says it alone.
  */
@@ -2351,6 +2357,7 @@ a:focus-visible {
   --dag-waiting: light-dark(#935610, #f0b35a);
   --dag-attention: light-dark(#b4501f, #ec835a);
   --dag-critical: var(--status-critical);
+  --dag-planned: light-dark(#7a4fc4, #a98ae8);
   --dag-progress: var(--accent);
   --dag-over: var(--ink-muted);
 }
@@ -2475,6 +2482,10 @@ a:focus-visible {
 /* What has just become startable stands out from what always was. */
 .issue-dag-node[data-state='ready'] .issue-dag-shape {
   stroke-width: 3;
+}
+
+.issue-dag [data-state='planned'] {
+  --dag-colour: var(--dag-planned);
 }
 
 .issue-dag [data-state='in-progress'] {

@@ -379,6 +379,36 @@ describe(buildReport, () => {
 
     assert.strictEqual(report.issues[0]?.start, 'attention');
   });
+
+  test('reads the in-progress and planned labels of a startable issue', () => {
+    const report = buildReport({
+      repo: { owner: 'o', name: 'r' },
+      defaultBranch: 'main',
+      generatedAt: '2026-10-24T00:00:00Z',
+      required: [],
+      authenticated: true,
+      pulls: [],
+      merged: [],
+      mergedWithinDays: 7,
+      issues: [
+        labelled(1, [], 'in-progress'),
+        labelled(2, [], 'planned'),
+        // Blocked says so, whatever is planned for it.
+        labelled(3, [1], 'planned'),
+      ],
+      issuesLimit: 30,
+      references: new Map<number, ReferenceStatus>(),
+    });
+
+    assert.deepStrictEqual(
+      report.issues.map(({ number, start }) => ({ number, start })),
+      [
+        { number: 1, start: 'in-progress' },
+        { number: 2, start: 'planned' },
+        { number: 3, start: 'blocked' },
+      ],
+    );
+  });
 });
 
 const issue = (
@@ -397,4 +427,14 @@ const issue = (
     comments: 0,
     startAfter,
     misplacedMergeAfter,
+  }) as const;
+
+const labelled = (
+  number: number,
+  startAfter: readonly number[],
+  name: string,
+): OpenIssue =>
+  ({
+    ...issue(number, startAfter),
+    labels: [{ name, color: 'cccccc', description: '' }],
   }) as const;

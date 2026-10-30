@@ -15,6 +15,7 @@ import { ExternalLink } from './external-link.js';
 import {
   describeNode,
   explainState,
+  markedNote,
   stateLabels,
 } from './issue-dag-states.mjs';
 import { separator } from './linked-issues.js';
@@ -40,8 +41,10 @@ export const IssueStartRow = ({ issue, start }: Props): JSX.Element => (
           <span
             class={constant('badge issue-start')}
             data-state={view(some$, ({ state }) => state)}
-            title={view(some$, ({ state }) =>
-              explainState({ kind: 'issue', state }),
+            title={view(some$, ({ state, marked }) =>
+              Arr.toUnshifted(explainState({ kind: 'issue', state, marked }))(
+                markedNote({ state, marked }),
+              ).join('\n'),
             )}
           >
             {view(some$, ({ state }) => stateLabels[state])}

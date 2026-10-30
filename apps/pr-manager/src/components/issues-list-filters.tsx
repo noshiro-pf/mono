@@ -51,7 +51,11 @@ export const IssuesListFilters = (): JSX.Element => {
               (!hiddenStarts.includes(start)).toString(),
             )}
             class={constant('filter-chip')}
-            title={constant(explainState({ kind: 'issue', state: start }))}
+            title={constant(
+              start === 'in-progress'
+                ? 'an open pull request closes it, or it is labelled in-progress.'
+                : explainState({ kind: 'issue', state: start, marked: 'none' }),
+            )}
             type={constant('button')}
             onClick={() => {
               issuesListStore.toggleStart(start);

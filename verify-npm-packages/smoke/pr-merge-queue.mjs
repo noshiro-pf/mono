@@ -11,6 +11,7 @@ const commands = [
   'pr-report',
   'push-fixed-pr',
   'report-unowned-prs',
+  'start-issue',
   'unblock-prs',
 ];
 

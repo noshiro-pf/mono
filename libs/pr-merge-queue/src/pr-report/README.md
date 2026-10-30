@@ -46,8 +46,8 @@ rebase・マージ・コメントは一切しません（それは `unblock-prs`
   最初に持つ疑問（昨日キューに入れたものは入ったのか）に答えます。
 - **open な issue** — 更新の新しい順に最大 30 件。「やることは何か」を別タブ
   無しで答えるためです。件数が上限に達したときは見出しに `+` を付けます。
-  それぞれに着手状態（`ready`、`waiting`、`needs a look`、`in progress`、
-  `on a Start-After cycle`。制約なしは書きません）と、`Start-After:` が名指す
+  それぞれに着手状態（`ready`、`waiting`、`needs a look`、`planned`、
+  `in progress`、`on a Start-After cycle`。制約なしは書きません）と、`Start-After:` が名指す
   ものの状態（`after #N (open)` など）を出します（`docs/issue-start-after.md`）。
   名指したものが一覧にも open な PR にも無ければ、1件につき1リクエスト読みます。
   GitHub の issue の依存関係（blocked by）も `Start-After:` と同じに読み、依存が
@@ -167,7 +167,7 @@ layer below means that layer moved and this one was not restacked), and — the
 two sections that are not about the queue — what merged recently and which
 issues are open (the most recently updated thirty, `--issues-limit`, with a `+`
 on a full list). Each issue says how it stands for being started — `ready`,
-`waiting`, `needs a look`, `in progress` or `on a Start-After cycle`, and
+`waiting`, `needs a look`, `planned`, `in progress` or `on a Start-After cycle`, and
 nothing when it is free — and where each thing its `Start-After:` names
 stands, as `after #N (open)` (`docs/issue-start-after.md`; one request for
 each named number that is neither listed nor an open pull request). GitHub's
