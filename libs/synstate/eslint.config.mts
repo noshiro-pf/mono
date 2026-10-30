@@ -45,7 +45,9 @@ export default [
             ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
             'zustand/vanilla',
             'jotai/vanilla',
+            'jotai/vanilla/utils',
             'valtio/vanilla',
+            'rxjs/fetch',
           ],
         },
       ],
@@ -118,12 +120,25 @@ export default [
     }),
   },
 
-  // Solid's root export is its server build under Node, where nothing
-  // reacts; the benchmark imports the client build through one shim
-  // (`solid-js-client.mts`, beside the files it serves), and a bare import
-  // would measure a graph that never updates.
+  // Each sample's `createSearch` returns its library's own handle (an
+  // observable, an atom, a store), whose inferred type is what the page shows;
+  // spelled out, it would bury the code being compared.
   {
-    files: ['samples/docs-site/benchmark/**'],
+    files: ['samples/docs-site/async-comparison/**/01-search.*.mts'],
+    rules: defineKnownRules({
+      '@typescript-eslint/explicit-function-return-type': 'off',
+    }),
+  },
+
+  // Solid's root export is its server build under Node, where nothing
+  // reacts; the benchmark and the async comparison import the client build
+  // through a shim (`solid-js-client.mts`, beside the files it serves), and a
+  // bare import would measure, or test, a graph that never updates.
+  {
+    files: [
+      'samples/docs-site/benchmark/**',
+      'samples/docs-site/async-comparison/**',
+    ],
     ignores: ['**/*.d.mts'],
     rules: defineKnownRules({
       'no-restricted-imports': [
@@ -137,7 +152,7 @@ export default [
               regex: String.raw`^solid-js(?:/|$)`,
               allowTypeImports: true,
               message:
-                "Import Solid through './solid-js-client.mjs', whose client build reacts under Node.",
+                'Import Solid through the `solid-js-client.mjs` shim at the top of this sample directory, whose client build reacts under Node.',
             },
           ],
         }),

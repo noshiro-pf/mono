@@ -72,5 +72,6 @@ MobX の `observer()` HOC はレンダリング中に observable へのアクセ
 - [宣言的な状態管理](/mono/synstate/ja/guides/declarative-state-management/) — 具体的な例でリアクティブプログラミングモデルを理解する。
 - [React 連携](/mono/synstate/ja/guides/react-integration/) — SynState を React で使う。
 - [ライブラリ比較](/mono/synstate/ja/guides/library-comparison/library-comparison/) — SynState と RxJS、Jotai、MobX 等の比較。
+- [非同期処理の比較](/mono/synstate/ja/guides/library-comparison/async-comparison/) — 本番品質の検索ボックスを7つのライブラリで書き比べる。
 - [パフォーマンスベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/) — スループットの定量比較。
 - [インタラクティブデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/) — 違いを体感する。

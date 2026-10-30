@@ -1,0 +1,29 @@
+--- en/00-search-api.mts
++++ ja/00-search-api.mts
+@@ -3,7 +3,7 @@
+ // embed-sample-code-ignore-above
+ export type Item = Readonly<{ id: string; title: string }>;
+ 
+-/** What the search box shows. Every implementation on this page produces it. */
++/** 検索ボックスが表示するもの。このページのすべての実装がこれを生成する。 */
+ export type SearchState = Readonly<
+   | { status: 'idle' }
+   | { status: 'loading'; query: string }
+@@ -21,7 +21,7 @@
+   return `/api/search?${params.toString()}`;
+ };
+ 
+-/** Rejects on a non-2xx status and on a body that is not a list of items. */
++/** 2xx 以外のステータスと、アイテムの配列でないボディで reject する。 */
+ export const parseResponse = async (
+   response: Response,
+ ): Promise<readonly Item[]> => {
+@@ -38,7 +38,7 @@
+   return body;
+ };
+ 
+-/** `fetch` rejects with an `AbortError` once `signal` is aborted. */
++/** `signal` が中断されると `fetch` は `AbortError` で reject する。 */
+ export const fetchItems = (
+   query: string,
+   /* embed-sample-code-ignore-this-line */ // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- `fetch` takes a mutable `AbortSignal`.

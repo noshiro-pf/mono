@@ -1,0 +1,87 @@
+--- en/01-search.solid.mts
++++ ja/01-search.solid.mts
+@@ -1,11 +1,4 @@
+-import {
+-  debounceMs,
+-  fetchItems,
+-  idleState,
+-  toErrorMessage,
+-  type SearchState,
+-} from './00-search-api.mjs';
+-import { testSearch } from './search-test-suite.mjs';
++import { testSearch } from '../search-test-suite.mjs';
+ import {
+   createEffect,
+   createMemo,
+@@ -13,19 +6,26 @@
+   createRoot,
+   createSignal,
+   onCleanup,
+-} from './solid-js-client.mjs';
++} from '../solid-js-client.mjs';
++import {
++  debounceMs,
++  fetchItems,
++  idleState,
++  toErrorMessage,
++  type SearchState,
++} from './00-search-api.mjs';
+ 
+ // embed-sample-code-ignore-above
+ export const createSearch = () =>
+   createRoot((dispose) => {
+     const [query, setQuery] = createSignal('');
+ 
+-    // A signal ignores a write equal to its value,
+-    // so a query that did not change triggers nothing.
++    // signal は今の値と等しい書き込みを無視するので、
++    // 変わっていないクエリは何も引き起こさない。
+     const [debouncedQuery, setDebouncedQuery] = createSignal('');
+ 
+-    // There is no debounce; an effect whose cleanup clears the timer
+-    // runs again on every keystroke.
++    // debounce はない。クリーンアップでタイマーを解除する effect が
++    // キー入力のたびに再実行される。
+     createEffect(() => {
+       const q = query().trim();
+ 
+@@ -36,9 +36,9 @@
+       });
+     });
+ 
+-    // createResource ignores a stale response but hands the fetcher no
+-    // AbortSignal. One controller per query, aborted by the cleanup that
+-    // runs when the query changes and when the root is disposed:
++    // createResource は古いレスポンスを無視するが、fetcher に AbortSignal を
++    // 渡さない。クエリごとに controller を作り、クエリが変わったときと
++    // root が破棄されたときに走るクリーンアップで中断する。
+     const signal = createMemo(() => {
+       debouncedQuery();
+ 
+@@ -51,7 +51,7 @@
+       return controller.signal;
+     });
+ 
+-    // A `false` source fetches nothing (and keeps the last value).
++    // ソースが `false` なら何も fetch しない（そして最後の値を保持する）。
+     const [items] = createResource(
+       () => {
+         const q = debouncedQuery();
+@@ -68,7 +68,7 @@
+         return idleState;
+       }
+ 
+-      // Reading an errored resource throws; ask for its state first.
++      // エラーになったリソースを読むと例外が投げられるので、先に state を確かめる。
+       switch (items.state) {
+         case 'errored':
+           return {
+@@ -92,7 +92,7 @@
+ // embed-sample-code-ignore-below
+ 
+ if (import.meta.vitest !== undefined) {
+-  testSearch('Solid', () => {
++  testSearch('Solid (ja)', () => {
+     const { setQuery, searchState, dispose } = createSearch();
+ 
+     return {

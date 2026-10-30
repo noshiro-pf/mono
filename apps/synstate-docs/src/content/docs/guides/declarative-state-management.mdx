@@ -118,6 +118,8 @@ const results = query
 
 No timers to manage, no manual abort controller lifecycle, no stale closure risks. `fromAbortablePromise` receives an `AbortSignal` and passes it to `fetch` — when `switchMap` switches to a new inner Observable, it completes the previous one, which automatically aborts the in-flight request. The pipeline lives outside the component lifecycle, so it is unaffected by re-renders or unmounting, and works identically regardless of which component consumes the result.
 
+[Async Logic Compared](/mono/synstate/guides/library-comparison/async-comparison/) writes this search box to production standard (loading and error states, blank queries, teardown) with SynState, RxJS, MobX, Jotai, Redux Toolkit, Solid and Preact Signals, side by side.
+
 ---
 
 The patterns above — declarative dependencies, automatic propagation, composable async operators — really shine when the number of interconnected state values grows. Let's see this in a real-world example.

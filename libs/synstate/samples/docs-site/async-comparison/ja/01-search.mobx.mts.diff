@@ -1,0 +1,64 @@
+--- en/01-search.mobx.mts
++++ ja/01-search.mobx.mts
+@@ -1,4 +1,5 @@
+ import { action, observable, reaction } from 'mobx';
++import { testSearch } from '../search-test-suite.mjs';
+ import {
+   debounceMs,
+   fetchItems,
+@@ -6,13 +7,12 @@
+   toErrorMessage,
+   type SearchState,
+ } from './00-search-api.mjs';
+-import { testSearch } from './search-test-suite.mjs';
+ 
+ // embed-sample-code-ignore-above
+ export const createSearch = () => {
+   const query = observable.box('');
+ 
+-  // `deep: false`: the state is replaced as a whole, never mutated.
++  // `deep: false`：状態は丸ごと置き換え、書き換えない。
+   const searchState = observable.box<SearchState>(idleState, { deep: false });
+ 
+   let mut_timer: ReturnType<typeof setTimeout> | undefined;
+@@ -26,7 +26,7 @@
+   });
+ 
+   const search = (q: string): void => {
+-    mut_controller?.abort(); // cancel the request this query replaces
++    mut_controller?.abort(); // このクエリが置き換えるリクエストをキャンセル
+ 
+     if (q === '') {
+       setSearchState(idleState);
+@@ -47,7 +47,7 @@
+         }
+       })
+       .catch((error: unknown) => {
+-        // A replaced request rejects with an AbortError; it reports nothing.
++        // 置き換えられたリクエストは AbortError で reject される。何も反映しない。
+         if (!controller.signal.aborted) {
+           setSearchState({
+             status: 'error',
+@@ -58,10 +58,10 @@
+       });
+   };
+ 
+-  // reaction's `delay` option runs the effect `delay` ms after the
+-  // *first* change, which throttles; a debounce is written by hand.
++  // reaction の `delay` オプションは「最初の」変更から `delay` ms 後に
++  // effect を実行するので throttle になる。debounce は手で書く。
+   const disposeReaction = reaction(
+-    () => query.get(), // untrimmed: a typed space restarts the wait too
++    () => query.get(), // trim しない：空白の入力でも待ち直す
+     (typed) => {
+       clearTimeout(mut_timer);
+ 
+@@ -96,7 +96,7 @@
+ // embed-sample-code-ignore-below
+ 
+ if (import.meta.vitest !== undefined) {
+-  testSearch('MobX', () => {
++  testSearch('MobX (ja)', () => {
+     const { setQuery, searchState, dispose } = createSearch();
+ 
+     return {

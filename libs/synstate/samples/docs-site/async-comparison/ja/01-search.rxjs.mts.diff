@@ -1,0 +1,58 @@
+--- en/01-search.rxjs.mts
++++ ja/01-search.rxjs.mts
+@@ -11,6 +11,7 @@
+   type Observable,
+ } from 'rxjs';
+ import { fromFetch } from 'rxjs/fetch';
++import { testSearch } from '../search-test-suite.mjs';
+ import {
+   debounceMs,
+   idleState,
+@@ -19,22 +20,21 @@
+   toErrorMessage,
+   type SearchState,
+ } from './00-search-api.mjs';
+-import { testSearch } from './search-test-suite.mjs';
+ 
+ // embed-sample-code-ignore-above
+ export const createSearch = () => {
+   const query$ = new Subject<string>();
+ 
+-  // An RxJS observable holds no current value; a BehaviorSubject keeps one.
++  // RxJS の Observable は現在値を持たない。BehaviorSubject が保持する。
+   const searchState$ = new BehaviorSubject<SearchState>(idleState);
+ 
+   const subscription = query$
+     .pipe(
+-      debounceTime(debounceMs), // wait for typing to pause
++      debounceTime(debounceMs), // 入力が止まるのを待つ
+       map((q) => q.trim()),
+-      distinctUntilChanged(), // skip a query that did not change
+-      // A newer query unsubscribes from the previous request,
+-      // and fromFetch aborts a request it is unsubscribed from.
++      distinctUntilChanged(), // 変わっていないクエリは飛ばす
++      // 新しいクエリは前のリクエストの購読を解除し、
++      // fromFetch は購読解除されたリクエストを中断する。
+       switchMap((q): Observable<SearchState> =>
+         q === ''
+           ? of(idleState)
+@@ -44,8 +44,8 @@
+                 query: q,
+                 items,
+               })),
+-              // Caught inside switchMap: an error that reached the outer
+-              // pipe would end it, and the search box with it.
++              // switchMap の内側で捕捉する。外側のパイプに届いたエラーは
++              // パイプを終わらせ、検索ボックスも止まる。
+               catchError((error: unknown) =>
+                 of<SearchState>({
+                   status: 'error',
+@@ -74,7 +74,7 @@
+ // embed-sample-code-ignore-below
+ 
+ if (import.meta.vitest !== undefined) {
+-  testSearch('RxJS', () => {
++  testSearch('RxJS (ja)', () => {
+     const { setQuery, searchState$, dispose } = createSearch();
+ 
+     return {
