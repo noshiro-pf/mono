@@ -10,6 +10,7 @@ if (import.meta.vitest !== undefined) {
 
     const message = match<
       Status,
+      /* embed-sample-code-ignore-this-line */ // transformer-ignore-next-line convert-to-readonly
       Readonly<{ draft: string; review: string; published: string }>
     >(status, {
       draft: 'Work in progress',

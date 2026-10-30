@@ -154,6 +154,9 @@ export type Merged = MergedPullRequest & Readonly<{ mergedAtEpochMs: number }>;
  * it counts is still being read for any pull request, because a count of
  * the ones read so far would be a number that is wrong until it is not.
  */
+// `draft` is a default ignore prefix of ts-codemod-lib, which would leave this
+// type unwrapped and `draft` mutable.
+// transformer-ignore-next-line convert-to-readonly
 export type PageSummary = Readonly<{
   open: number;
   /** Labelled `merge-queued`: the author saying it is to be landed. */

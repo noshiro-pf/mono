@@ -59,6 +59,10 @@ export const convertToReadonlyTransformer = (
   const DeepReadonlyTypeName =
     options?.DeepReadonly?.typeName ?? 'DeepReadonly';
 
+  // The ESLint counterpart is `ignoredMutablePattern` in
+  // `libs/eslint-config-typed/src/rules/eslint-functional-rules.mts`; change
+  // the two together. (ESLint matches a property access by its own
+  // `ignoreAccessorPattern`, `**.mut_**`, instead.)
   const ignorePrefixes = ISet.create(
     options?.ignorePrefixes ?? ['mut_', '#mut_', '_mut_', 'draft'],
   );
@@ -138,6 +142,16 @@ export type ReadonlyTransformerOptions = DeepReadonly<{
    * A mute keywords to ignore the readonly conversion.
    *
    * (e.g. `"mut_"`)
+   *
+   * A type literal with a property, a method or an accessor of such a prefix
+   * is not wrapped with `Readonly<...>`, which would make that member readonly
+   * too; its other members are marked `readonly` one by one instead, and a
+   * `Readonly<...>` written around it is taken off. It is wrapped as before
+   * when it also has a member that cannot be marked `readonly` by itself (a
+   * method signature or an accessor without such a prefix, or a property or
+   * index signature not yet `readonly` that an ignore comment skips), or when
+   * it is a member of a `Readonly<...>` intersection beside a type that may be
+   * an array.
    *
    * @default ['mut_', '#mut_', '_mut_', 'draft']
    */
@@ -421,6 +435,8 @@ const transformNode = (
  * - `tr(Readonly<Readonly<E>>) |-> Readonly<tr(E)>`
  * - `tr(DeepReadonly<Readonly<E>>) |-> DeepReadonly<tr(E)>`
  * - `tr(Readonly<number>) |-> number`
+ * - `tr(Readonly<{ mut_x: X; y: Y }>) |-> { mut_x: X; readonly y: tr(Y) }` (see
+ *   `isLeftUnwrapped`)
  * - `tr(Readonly<E[]>) |-> readonly tr(E)[]`
  * - `tr(Readonly<[E1, E2, E3]>) |-> readonly [tr(E1), tr(E2), tr(E3)]`
  * - `tr(Readonly<readonly E[]>) |-> readonly tr(E)[]`
@@ -647,14 +663,29 @@ const transformTypeReferenceNode = (
       );
     }
 
+    // Read before the recursion, which may replace the node.
+    const typeArgumentBefore = removeParentheses(typeArguments[0]);
+
+    // Readonly<{ mut_x: X; y: Y }> -> { mut_x: X; readonly y: Y }
+    // `Readonly` would make the property of an ignored prefix readonly too, so
+    // it is taken off, and the literal is transformed where nothing wraps it,
+    // which marks its other members readonly in place. See `takesOffReadonly`.
+    const takesOffWrapper =
+      readonlyContext.type !== 'DeepReadonly' &&
+      readonlyContext.indexedAccessDepth === 0 &&
+      typeArgumentBefore.isKind(tsm.SyntaxKind.TypeLiteral) &&
+      takesOffReadonly(typeArgumentBefore, options);
+
     // Recursive processing
     transformNode(
       typeArguments[0],
-      nextReadonlyContext({
-        currentReadonlyContext: readonlyContext,
-        nextReadonlyContextType: 'Readonly',
-        indexedAccessDepthChange: 'keep',
-      }),
+      takesOffWrapper
+        ? initialReadonlyContext
+        : nextReadonlyContext({
+            currentReadonlyContext: readonlyContext,
+            nextReadonlyContextType: 'Readonly',
+            indexedAccessDepthChange: 'keep',
+          }),
       options,
     );
 
@@ -691,6 +722,29 @@ const transformTypeReferenceNode = (
     // Readonly<{ ... }>[I] -> { ... }[I]
     if (readonlyContext.indexedAccessDepth > 0) {
       options.replaceNode(node, unwrappedText);
+
+      return;
+    }
+
+    // Readonly<Readonly<{ mut_x: X }>> -> { mut_x: X } as well: the inner
+    // `Readonly` has already been taken off the literal.
+    if (
+      takesOffWrapper ||
+      (T.isKind(tsm.SyntaxKind.TypeLiteral) && takesOffReadonly(T, options))
+    ) {
+      // The comments after the literal, which nothing else carries over, go
+      // in front of it: a line comment after it would end the type with a
+      // line break, which a following `[]` cannot be parsed across.
+      const commentsAfterT = commentsBetween(
+        node.getSourceFile(),
+        T.getEnd(),
+        node.getEnd(),
+      );
+
+      options.replaceNode(
+        node,
+        `${commentsInFrontOfT}${commentsAfterT}${T.getText()}`,
+      );
 
       return;
     }
@@ -1085,10 +1139,13 @@ const transformTypeLiteralNode = (
   const wrappingApplies =
     readonlyContext.type === 'none' && readonlyContext.indexedAccessDepth === 0;
 
-  // A call or construct signature does not survive `Readonly<T>`, so a literal
-  // carrying one is left unwrapped and marked readonly member by member
-  // instead. See `hasCallOrConstructSignature`.
-  const skipWrapping = wrappingApplies && hasCallOrConstructSignature(node);
+  // A call or construct signature does not survive `Readonly<T>`, and a
+  // property of an ignored prefix (`mut_`) must stay mutable, so a literal
+  // carrying either is left unwrapped and marked readonly member by member
+  // instead. See `hasCallOrConstructSignature` and `isLeftUnwrapped`.
+  const skipWrapping =
+    wrappingApplies &&
+    (hasCallOrConstructSignature(node) || isLeftUnwrapped(node, options));
 
   // Recursive processing
   transformMembers(
@@ -1393,16 +1450,25 @@ const transformUnionOrIntersectionTypeNodeImpl = (
     memberText: string,
   ): string => `${leadingCommentsOfMember(node, member)}${memberText}` as const;
 
+  // Whether a type literal member is wrapped at all; under `DeepReadonly` or an
+  // indexed access none is.
+  const wrapsTypeLiterals =
+    nextReadonlyContextValue.type !== 'DeepReadonly' &&
+    nextReadonlyContextValue.indexedAccessDepth === 0;
+
+  // `Readonly<A & { b: B }>`: `A` stays under the `Readonly`, which the
+  // handler of `Readonly` then takes off as redundant.
+  const underReadonly =
+    readonlyContext.type === 'Readonly' &&
+    readonlyContext.indexedAccessDepth === 0 &&
+    isTypeArgumentOfReadonly(node);
+
   const { primitives, arraysAndTuples, typeLiterals, others } =
     groupUnionIntersectionTypes(newTypes, {
       operator,
-      // `Readonly<A & { b: B }>`: `A` stays under the `Readonly`, which the
-      // handler of `Readonly` then takes off as redundant.
-      underReadonly:
-        readonlyContext.type === 'Readonly' &&
-        readonlyContext.indexedAccessDepth === 0 &&
-        isTypeArgumentOfReadonly(node),
+      underReadonly,
       deepReadonlyTypeName: options.DeepReadonly.typeName,
+      keptUnwrapped: (t) => wrapsTypeLiterals && takesOffReadonly(t, options),
     });
 
   options.debugPrint({ primitives, arraysAndTuples, typeLiterals, others });
@@ -1445,9 +1511,7 @@ const transformUnionOrIntersectionTypeNodeImpl = (
               ),
             ),
             op: operator,
-            wrapWithReadonly:
-              nextReadonlyContextValue.type !== 'DeepReadonly' &&
-              nextReadonlyContextValue.indexedAccessDepth === 0,
+            wrapWithReadonly: wrapsTypeLiterals,
           }),
         ] as const);
 
@@ -1909,6 +1973,17 @@ const transformMembers = (
       continue;
     }
 
+    // A method or an accessor of an ignored prefix is left as written, as in a
+    // class.
+    if (
+      (mb.isKind(tsm.SyntaxKind.MethodSignature) ||
+        mb.isKind(tsm.SyntaxKind.GetAccessor) ||
+        mb.isKind(tsm.SyntaxKind.SetAccessor)) &&
+      checkIfPropertyNameShouldBeIgnored(mb.getNameNode(), options)
+    ) {
+      continue;
+    }
+
     if (mb.isKind(tsm.SyntaxKind.IndexSignature)) {
       transformIndexSignatureDeclaration(
         mb,
@@ -2034,10 +2109,13 @@ const checkIfPropertyNameShouldBeIgnored = (
       pipe(nameNode.getText()).map((nm) =>
         options.ignoredPrefixes.some((p) => nm.startsWith(`#${p}`)),
       ).value) ||
-    // [`mut_x`]: number[]
+    // ['mut_x']: number[], [`mut_x`]: number[]
     (nameNode.isKind(tsm.SyntaxKind.ComputedPropertyName) &&
       pipe(nameNode.getExpression()).map((exp) => {
-        if (exp.isKind(tsm.SyntaxKind.StringLiteral)) {
+        if (
+          exp.isKind(tsm.SyntaxKind.StringLiteral) ||
+          exp.isKind(tsm.SyntaxKind.NoSubstitutionTemplateLiteral)
+        ) {
           const nm = exp.getLiteralValue();
 
           return options.ignoredPrefixes.some((p) => nm.startsWith(p));
@@ -2047,3 +2125,87 @@ const checkIfPropertyNameShouldBeIgnored = (
       }).value)
   );
 };
+
+/**
+ * Whether a type literal is left without `Readonly<...>` and marked readonly
+ * member by member, because it has a property, a method or an accessor of an
+ * ignored prefix (`{ mut_x: X[] }`), which `transformMembers` leaves mutable
+ * and `Readonly<T>` would not.
+ *
+ * It keeps its `Readonly<...>` when that would leave another member mutable,
+ * since only a property or index signature can be marked `readonly` itself:
+ *
+ * - a method signature or an accessor, which `Readonly<T>` makes readonly too,
+ *   unless its name has an ignored prefix as well;
+ * - a property or index signature the ignore comment skips (as
+ *   `transformMembers` does), which gets no `readonly` of its own, unless it
+ *   is `readonly` already.
+ */
+const isLeftUnwrapped = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: tsm.TypeLiteralNode,
+  options: ReadonlyTransformerOptionsInternal,
+): boolean => {
+  const members = node.getMembers();
+
+  const isMethodOrAccessor = (
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    mb: tsm.TypeElementTypes,
+  ): mb is
+    | tsm.MethodSignature
+    | tsm.GetAccessorDeclaration
+    | tsm.SetAccessorDeclaration =>
+    mb.isKind(tsm.SyntaxKind.MethodSignature) ||
+    mb.isKind(tsm.SyntaxKind.GetAccessor) ||
+    mb.isKind(tsm.SyntaxKind.SetAccessor);
+
+  const isIgnoredMember = (
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    mb: tsm.TypeElementTypes,
+  ): boolean =>
+    (mb.isKind(tsm.SyntaxKind.PropertySignature) || isMethodOrAccessor(mb)) &&
+    checkIfPropertyNameShouldBeIgnored(mb.getNameNode(), options);
+
+  const needsReadonlyWrapper = (
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    mb: tsm.TypeElementTypes,
+  ): boolean =>
+    !isIgnoredMember(mb) &&
+    (isMethodOrAccessor(mb) ||
+      ((mb.isKind(tsm.SyntaxKind.PropertySignature) ||
+        mb.isKind(tsm.SyntaxKind.IndexSignature)) &&
+        !mb.hasModifier(tsm.SyntaxKind.ReadonlyKeyword) &&
+        hasDisableNextLineComment(mb)));
+
+  return members.some(isIgnoredMember) && !members.some(needsReadonlyWrapper);
+};
+
+/** Whether `node`, or a parenthesized type around it, carries the ignore comment. */
+const hasDisableNextLineCommentAround = (node: tsm.Node): boolean => {
+  if (hasDisableNextLineComment(node, TRANSFORMER_NAME)) {
+    return true;
+  }
+
+  const parent = node.getParent();
+
+  return (
+    parent?.isKind(tsm.SyntaxKind.ParenthesizedType) === true &&
+    hasDisableNextLineCommentAround(parent)
+  );
+};
+
+/**
+ * Whether a type literal that is already wrapped, or would be merged into the
+ * `Readonly<...>` of a union or intersection, is taken out of it. See
+ * `isLeftUnwrapped`; in addition, the ignore comment leaves the literal where
+ * it is, and taking `Readonly` off one with a call or construct signature
+ * would bring back the signature it dropped.
+ */
+const takesOffReadonly = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: tsm.TypeLiteralNode,
+  options: ReadonlyTransformerOptionsInternal,
+): boolean =>
+  isLeftUnwrapped(node, options) &&
+  !hasCallOrConstructSignature(node) &&
+  !hasDisableNextLineCommentAround(node);

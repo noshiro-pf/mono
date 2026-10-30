@@ -3,6 +3,13 @@ import {
   type EslintFunctionalRules,
 } from '../types/index.mjs';
 
+// The names `functional/immutable-data` lets be mutated (and, but for `draft`,
+// `functional/no-let` lets be reassigned); a property is matched only by the
+// `ignoreAccessorPattern` below (`**.mut_**`).
+// The codemod counterpart is the default `ignorePrefixes` of ts-codemod-lib's
+// `convert-to-readonly` and `append-as-const`
+// (`libs/ts-codemod-lib/src/functions/ast-transformers/`), which leave names
+// with these prefixes mutable, property names included; change them together.
 const ignoredMutablePattern = [
   '^draft', // allow immer.js draft object
   '^mut_',

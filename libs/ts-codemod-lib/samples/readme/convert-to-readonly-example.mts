@@ -12,13 +12,33 @@ type User = {
   mut_items: string[]; // With ignorePrefixes: ['mut_']
 };
 
-// After
-type User2 = Readonly<{
-  id: number;
-  description: string;
-  preferences: ReadonlyMap<string, string>;
-  friendIds: readonly number[];
+// After (not wrapped with `Readonly`, which would make `mut_items` readonly
+// too; the other members are marked `readonly` one by one instead)
+type User2 = {
+  readonly id: number;
+  readonly description: string;
+  readonly preferences: ReadonlyMap<string, string>;
+  readonly friendIds: readonly number[];
   mut_items: string[]; // Not made readonly due to 'mut_' prefix
+};
+
+// Before
+/* embed-sample-code-ignore-this-line */ // transformer-ignore-next-line
+type Account = {
+  id: number;
+  profile: {
+    name: string;
+    mut_tags: string[];
+  };
+};
+
+// After (only the literal holding `mut_tags` is left unwrapped)
+type Account2 = Readonly<{
+  id: number;
+  profile: {
+    readonly name: string;
+    mut_tags: string[];
+  };
 }>;
 
 // A type literal that declares a call or construct signature is marked
@@ -61,13 +81,25 @@ if (import.meta.vitest !== undefined) {
 
     expectType<
       User2,
-      Readonly<{
-        id: number;
-        description: string;
-        preferences: ReadonlyMap<string, string>;
-        friendIds: readonly number[];
+      {
+        readonly id: number;
+        readonly description: string;
+        readonly preferences: ReadonlyMap<string, string>;
+        readonly friendIds: readonly number[];
         mut_items: string[];
-      }>
+      }
+    >('=');
+
+    expectType<
+      Account['profile']['mut_tags'],
+      // transformer-ignore-next-line
+      string[]
+    >('=');
+
+    expectType<
+      Account2['profile'],
+      // transformer-ignore-next-line
+      { readonly name: string; mut_tags: string[] }
     >('=');
 
     // `Readonly<T>` maps over `keyof T`, which here is `'separators'` alone:
