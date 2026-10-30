@@ -22,18 +22,6 @@ export const ConditionalFanOutChart = React.memo(() => (
 
 ConditionalFanOutChart.displayName = 'ConditionalFanOutChart';
 
-const colors = {
-  SynState: '#3b82f6',
-  'SynState (switchMap)': '#93c5fd',
-  RxJS: '#ef4444',
-  'RxJS (switchMap)': '#fca5a5',
-  Jotai: '#f59e0b',
-  MobX: '#8b5cf6',
-  Redux: '#14b8a6',
-  Solid: '#ec4899',
-  'Preact Signals': '#84cc16',
-} as const;
-
-const series = toColouredSeries(conditionalFanOutResults, colors);
+const series = toColouredSeries(conditionalFanOutResults);
 
 const xLabels = conditionalFanOutResults.xLabels;

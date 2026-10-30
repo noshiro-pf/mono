@@ -1,8 +1,8 @@
-import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   cascadedDiamond,
   conditionalFanOut,
   deepChain,
+  libraryColorOf,
 } from '../../data/index.mjs';
 
 /**
@@ -33,14 +33,17 @@ export const cascadedDiamondResults: SeriesResults = cascadedDiamond;
 export const conditionalFanOutResults: SeriesResults = conditionalFanOut;
 
 /**
- * Pairs each library's measurements with the colour the chart draws it in.
+ * Pairs each library's measurements with the colour every chart draws it in
+ * (`libraryColorOf`).
+ *
+ * The grey fallback is never drawn on a committed page: `gen:benchmark-doc`
+ * fails on a results label that has no colour.
  *
  * `undefined` rather than `null` for a timed-out point, because that is what
  * the chart components treat as "no marker here".
  */
 export const toColouredSeries = (
   results: SeriesResults,
-  colors: ReadonlyRecord<string, string>,
 ): readonly Readonly<{
   label: string;
   color: string;
@@ -48,7 +51,7 @@ export const toColouredSeries = (
 }>[] =>
   results.series.map(({ label, values }) => ({
     label,
-    color: colors[label] ?? '#6b7280',
+    color: libraryColorOf(label) ?? '#6b7280',
     values: values.map((v) => v ?? undefined),
   }));
 

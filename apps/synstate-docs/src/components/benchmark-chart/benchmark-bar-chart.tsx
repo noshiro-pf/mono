@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Arr, PositiveSafeInt } from 'ts-data-forge';
+import { ChartLegend } from './chart-legend.js';
 import {
   createToY,
   formatTickLabel,
@@ -92,152 +93,130 @@ export const BenchmarkBarChart = React.memo<Props>((props) => {
     : generateLinearTicks(PositiveSafeInt.fromNumber(yMax));
 
   return (
-    <svg
-      style={svgStyle}
-      viewBox={`0 0 ${CHART_WIDTH.toString()} ${CHART_HEIGHT.toString()}`}
-    >
-      <g
-        transform={`translate(${PADDING.left.toString()}, ${PADDING.top.toString()})`}
+    <div style={figureStyle}>
+      <svg
+        style={svgStyle}
+        viewBox={`0 0 ${CHART_WIDTH.toString()} ${CHART_HEIGHT.toString()}`}
       >
-        {/* Grid lines */}
-        {yTicks.map((tick) => (
+        <g
+          transform={`translate(${PADDING.left.toString()}, ${PADDING.top.toString()})`}
+        >
+          {/* Grid lines */}
+          {yTicks.map((tick) => (
+            <line
+              key={tick}
+              stroke={'var(--sl-color-gray-5, #e5e7eb)'}
+              strokeWidth={0.5}
+              x1={0}
+              x2={PLOT_W}
+              y1={toY(tick)}
+              y2={toY(tick)}
+            />
+          ))}
+
+          {/* Bars */}
+          {groups.map((group, gi) =>
+            group.values.map((value, bi) => {
+              const x = barX(gi, bi);
+
+              const y = toY(value);
+
+              const height = PLOT_H - y;
+
+              return (
+                <rect
+                  key={`${group.label}-${series[bi]?.label ?? bi.toString()}`}
+                  fill={series[bi]?.color ?? '#999'}
+                  height={Math.max(0, height)}
+                  rx={1.5}
+                  width={actualBarWidth}
+                  x={x}
+                  y={y}
+                />
+              );
+            }),
+          )}
+
+          {/* Y-axis */}
           <line
-            key={tick}
-            stroke={'var(--sl-color-gray-5, #e5e7eb)'}
-            strokeWidth={0.5}
+            stroke={'var(--sl-color-gray-3, #6b7280)'}
+            strokeWidth={1}
             x1={0}
-            x2={PLOT_W}
-            y1={toY(tick)}
-            y2={toY(tick)}
+            x2={0}
+            y1={0}
+            y2={PLOT_H}
           />
-        ))}
+          {yTicks.map((tick) => (
+            <text
+              key={tick}
+              dominantBaseline={'middle'}
+              fill={'var(--sl-color-gray-3, #6b7280)'}
+              fontSize={11}
+              textAnchor={'end'}
+              x={-8}
+              y={toY(tick)}
+            >
+              {formatTickLabel(tick)}
+            </text>
+          ))}
 
-        {/* Bars */}
-        {groups.map((group, gi) =>
-          group.values.map((value, bi) => {
-            const x = barX(gi, bi);
-
-            const y = toY(value);
-
-            const height = PLOT_H - y;
-
-            return (
-              <rect
-                key={`${group.label}-${series[bi]?.label ?? bi.toString()}`}
-                fill={series[bi]?.color ?? '#999'}
-                height={Math.max(0, height)}
-                rx={1.5}
-                width={actualBarWidth}
-                x={x}
-                y={y}
-              />
-            );
-          }),
-        )}
-
-        {/* Y-axis */}
-        <line
-          stroke={'var(--sl-color-gray-3, #6b7280)'}
-          strokeWidth={1}
-          x1={0}
-          x2={0}
-          y1={0}
-          y2={PLOT_H}
-        />
-        {yTicks.map((tick) => (
+          {/* Y-axis label */}
           <text
-            key={tick}
             dominantBaseline={'middle'}
             fill={'var(--sl-color-gray-3, #6b7280)'}
-            fontSize={11}
-            textAnchor={'end'}
-            x={-8}
-            y={toY(tick)}
+            fontSize={12}
+            textAnchor={'middle'}
+            transform={`translate(${(-PADDING.left + 16).toString()}, ${(PLOT_H / 2).toString()}) rotate(-90)`}
           >
-            {formatTickLabel(tick)}
+            {yAxisLabel}
           </text>
-        ))}
 
-        {/* Y-axis label */}
-        <text
-          dominantBaseline={'middle'}
-          fill={'var(--sl-color-gray-3, #6b7280)'}
-          fontSize={12}
-          textAnchor={'middle'}
-          transform={`translate(${(-PADDING.left + 16).toString()}, ${(PLOT_H / 2).toString()}) rotate(-90)`}
-        >
-          {yAxisLabel}
-        </text>
+          {/* X-axis */}
+          <line
+            stroke={'var(--sl-color-gray-3, #6b7280)'}
+            strokeWidth={1}
+            x1={0}
+            x2={PLOT_W}
+            y1={PLOT_H}
+            y2={PLOT_H}
+          />
+          {groups.map((group, gi) => {
+            const cx = groupCenterX(gi);
 
-        {/* X-axis */}
-        <line
-          stroke={'var(--sl-color-gray-3, #6b7280)'}
-          strokeWidth={1}
-          x1={0}
-          x2={PLOT_W}
-          y1={PLOT_H}
-          y2={PLOT_H}
-        />
-        {groups.map((group, gi) => {
-          const cx = groupCenterX(gi);
+            const parts = group.label.split('\n');
 
-          const parts = group.label.split('\n');
-
-          return (
-            <text
-              key={group.label}
-              fill={'var(--sl-color-gray-3, #6b7280)'}
-              fontSize={10}
-              textAnchor={'middle'}
-              x={cx}
-              y={PLOT_H + 12}
-            >
-              {parts.map((part, pi) => (
-                <tspan key={part} dy={pi === 0 ? 0 : 12} x={cx}>
-                  {part}
-                </tspan>
-              ))}
-            </text>
-          );
-        })}
-
-        {/* Legend (top-left) */}
-        {series.map((s, i) => {
-          const lx = 8;
-
-          const ly = i * 18 + 4;
-
-          return (
-            <g key={s.label}>
-              <rect
-                fill={s.color}
-                height={10}
-                rx={2}
-                width={14}
-                x={lx}
-                y={ly - 5}
-              />
+            return (
               <text
-                dominantBaseline={'middle'}
-                fill={'var(--sl-color-text, #1f2937)'}
-                fontSize={11}
-                x={lx + 20}
-                y={ly}
+                key={group.label}
+                fill={'var(--sl-color-gray-3, #6b7280)'}
+                fontSize={10}
+                textAnchor={'middle'}
+                x={cx}
+                y={PLOT_H + 12}
               >
-                {s.label}
+                {parts.map((part, pi) => (
+                  <tspan key={part} dy={pi === 0 ? 0 : 12} x={cx}>
+                    {part}
+                  </tspan>
+                ))}
               </text>
-            </g>
-          );
-        })}
-      </g>
-    </svg>
+            );
+          })}
+        </g>
+      </svg>
+      <ChartLegend marker={'swatch'} series={series} />
+    </div>
   );
 });
 
 BenchmarkBarChart.displayName = 'BenchmarkBarChart';
 
-const svgStyle: React.CSSProperties = {
-  width: '100%',
+const figureStyle = {
   maxWidth: `${CHART_WIDTH.toString()}px`,
+} as const;
+
+const svgStyle: React.CSSProperties = {
+  display: 'block',
+  width: '100%',
   height: 'auto',
 } as const;
