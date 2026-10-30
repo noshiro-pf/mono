@@ -2,12 +2,10 @@
  * The app's state, made once with the browser and Firebase as its
  * surroundings. What each part does, and the tests of it, are in the modules
  * this puts together — this file is only which real thing each is handed.
- *
- * The stores not yet made by a factory (#2094) import what they need of these
- * from here.
+ * Nothing else creates a store, or reaches Firebase other than through `api`.
  */
 
-import { api } from '../api/index.mjs';
+import { createApi, initializeFirebase } from '../api/index.mjs';
 import { fetchThrottleTime } from '../constants/index.mjs';
 import {
   EventScheduleAppLocalStorage,
@@ -44,6 +42,17 @@ import {
   createResetPasswordPageStore,
   createSignInPageStore,
 } from './sign-in-and-register-page-state/index.mjs';
+import {
+  createDeleteAccountCreatedWithGoogleStore,
+  createDeleteAccountPageStore,
+  createUpdateDisplayNamePageStore,
+  createUpdateEmailPageStore,
+  createUpdatePasswordPageStore,
+  createUpdateUserInfoDialogStore,
+} from './update-user-info-page-state/index.mjs';
+
+/** The app's one connection to Firebase. */
+export const api = createApi(initializeFirebase());
 
 export const Router = createAppRouter();
 
@@ -175,16 +184,53 @@ export const SignInPageStore = createSignInPageStore({
   toast: createToaster(),
 });
 
+export const UpdateUserInfoDialogStore = createUpdateUserInfoDialogStore();
+
+export const DeleteAccountPageStore = createDeleteAccountPageStore({
+  api,
+  auth: Auth,
+  dialog: UpdateUserInfoDialogStore,
+  toast: createToaster(),
+});
+
+export const DeleteAccountCreatedWithGoogleStore =
+  createDeleteAccountCreatedWithGoogleStore({
+    api,
+    auth: Auth,
+    dialog: UpdateUserInfoDialogStore,
+    toast: createToaster(),
+  });
+
+export const UpdateDisplayNamePageStore = createUpdateDisplayNamePageStore({
+  api,
+  auth: Auth,
+  dialog: UpdateUserInfoDialogStore,
+  toast: createToaster(),
+});
+
+export const UpdateEmailPageStore = createUpdateEmailPageStore({
+  api,
+  auth: Auth,
+  dialog: UpdateUserInfoDialogStore,
+  toast: createToaster(),
+});
+
+export const UpdatePasswordPageStore = createUpdatePasswordPageStore({
+  api,
+  auth: Auth,
+  dialog: UpdateUserInfoDialogStore,
+  toast: createToaster(),
+});
+
 /**
  * Starts listening to the auth state and the screen width, fetches the
  * holidays, starts reading the event, its answers and the event list, and
  * starts keeping the create page's settings in local storage.
  * Called once, from `main.tsx`, before the first render.
  *
- * Still made on import: the router (which reads `location`) and `api` (which
- * connects to Firebase), because the stores not yet made by a factory read
- * them at the top level of their modules; and each page's toaster (which adds
- * an element to `document.body`), as their modules made it before.
+ * Made on import, not here, because components import the stores by name:
+ * the router (which reads `location`), `api` (which connects to Firebase) and
+ * each page's toaster (which adds an element to `document.body`).
  */
 export const startStore = (): (() => void) => {
   const stopAuth = Auth.start();
