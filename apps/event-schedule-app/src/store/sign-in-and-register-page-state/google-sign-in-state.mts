@@ -1,63 +1,94 @@
+import type { Toaster } from '@blueprintjs/core';
+import type { InitializedObservable } from 'synstate';
 import { createBooleanState } from 'synstate-react-hooks';
 import { Optional, Result } from 'ts-data-forge';
-import { api } from '../../api/index.mjs';
+import type { StrictPick } from 'ts-type-forge';
 import { Routes, dict } from '../../constants/index.mjs';
-import { createToaster, showToast } from '../../functions/index.mjs';
-import { Router } from '../store.mjs';
+import { showToast } from '../../functions/index.mjs';
+import type { AppRouter } from '../router-store.mjs';
 
-const dc = dict.register;
+export type GoogleSignInDeps = Readonly<{
+  api: Readonly<{
+    auth: Readonly<{
+      /** Only whether it went through is read. */
+      googleSignInWithPopup: () => Promise<Result<unknown, unknown>>;
+    }>;
+  }>;
+  router: StrictPick<AppRouter, 'pageToBack$' | 'redirect'>;
+  /** Where the page says whether it went through. */
+  toast: Promise<Toaster>;
+}>;
 
-const toast = createToaster();
+/**
+ * Signing in with Google, from the sign-in or the register page, and going
+ * back to the page signing in was asked from.
+ */
+export const createGoogleSignInStore = (
+  deps: GoogleSignInDeps,
+): GoogleSignIn => {
+  const dc = dict.register;
 
-const [
-  useGoogleSignInButtonDisabled,
-  {
-    getSnapshot: getGoogleSignInButtonDisabledStateSnapshot,
-    state: googleSignInButtonDisabledState,
-    setTrue: disableGoogleSignInButton,
-    setFalse: enableGoogleSignInButton,
-  },
-] = createBooleanState(false);
+  const [
+    useGoogleSignInButtonDisabled,
+    {
+      getSnapshot: getGoogleSignInButtonDisabledStateSnapshot,
+      state: googleSignInButtonDisabledState,
+      setTrue: disableGoogleSignInButton,
+      setFalse: enableGoogleSignInButton,
+    },
+  ] = createBooleanState(false);
 
-const googleSignInSubmit = async (
-  pageToBack: string | undefined,
-): Promise<void> => {
-  disableGoogleSignInButton();
+  const googleSignInSubmit = async (
+    pageToBack: string | undefined,
+  ): Promise<void> => {
+    disableGoogleSignInButton();
 
-  const signInResult = await api.auth.googleSignInWithPopup();
+    const signInResult = await deps.api.auth.googleSignInWithPopup();
 
-  enableGoogleSignInButton();
+    enableGoogleSignInButton();
 
-  if (Result.isErr(signInResult)) {
-    showToast({
-      toast,
-      message: dc.message.error.unknownErrorOnSignIn,
-      intent: 'danger',
-    });
-  } else {
-    showToast({ toast, message: dc.message.success.signIn, intent: 'success' });
-
-    if (pageToBack !== undefined) {
-      Router.redirect(pageToBack);
+    if (Result.isErr(signInResult)) {
+      showToast({
+        toast: deps.toast,
+        message: dc.message.error.unknownErrorOnSignIn,
+        intent: 'danger',
+      });
     } else {
-      Router.redirect(Routes.routes.createPage);
+      showToast({
+        toast: deps.toast,
+        message: dc.message.success.signIn,
+        intent: 'success',
+      });
+
+      if (pageToBack !== undefined) {
+        deps.router.redirect(pageToBack);
+      } else {
+        deps.router.redirect(Routes.routes.createPage);
+      }
     }
-  }
+  };
+
+  const googleSignInClickHandler = (): void => {
+    if (getGoogleSignInButtonDisabledStateSnapshot()) {
+      return;
+    }
+
+    // TODO: use toast
+    googleSignInSubmit(
+      Optional.unwrap(deps.router.pageToBack$.getSnapshot()),
+    ).catch(console.error);
+  };
+
+  return {
+    googleSignInButtonDisabledState,
+    useGoogleSignInButtonDisabled,
+    googleSignInClickHandler,
+  } as const;
 };
 
-const googleSignInClickHandler = (): void => {
-  if (getGoogleSignInButtonDisabledStateSnapshot()) {
-    return;
-  }
-
-  // TODO: use toast
-  googleSignInSubmit(Optional.unwrap(Router.pageToBack$.getSnapshot())).catch(
-    console.error,
-  );
-};
-
-export const GoogleSignInStore = {
-  googleSignInButtonDisabledState,
-  useGoogleSignInButtonDisabled,
-  googleSignInClickHandler,
-} as const;
+export type GoogleSignIn = Readonly<{
+  /** Whether a Google sign-in is under way. */
+  googleSignInButtonDisabledState: InitializedObservable<boolean>;
+  useGoogleSignInButtonDisabled: () => boolean;
+  googleSignInClickHandler: () => void;
+}>;

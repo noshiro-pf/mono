@@ -38,6 +38,12 @@ import {
 import { createHolidaysStore } from './holidays-store.mjs';
 import { createMediaStore } from './media-store.mjs';
 import { createAppRouter } from './router-store.mjs';
+import {
+  createGoogleSignInStore,
+  createRegisterPageStore,
+  createResetPasswordPageStore,
+  createSignInPageStore,
+} from './sign-in-and-register-page-state/index.mjs';
 
 export const Router = createAppRouter();
 
@@ -140,6 +146,32 @@ export const ConfirmEmailDialogStore = createConfirmEmailDialogStore({
   router: Router,
   eventSchedule$,
   editEventSchedule: EditEventScheduleStore,
+  toast: createToaster(),
+});
+
+export const GoogleSignInStore = createGoogleSignInStore({
+  api,
+  router: Router,
+  toast: createToaster(),
+});
+
+export const RegisterPageStore = createRegisterPageStore({
+  api,
+  router: Router,
+  googleSignIn: GoogleSignInStore,
+  toast: createToaster(),
+});
+
+export const ResetPasswordPageStore = createResetPasswordPageStore({
+  api,
+  router: Router,
+  toast: createToaster(),
+});
+
+export const SignInPageStore = createSignInPageStore({
+  api,
+  router: Router,
+  googleSignIn: GoogleSignInStore,
   toast: createToaster(),
 });
 
