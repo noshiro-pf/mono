@@ -13,7 +13,7 @@
 
 </p>
 
-**SynState** is a lightweight, high-performance, type-safe state management library for TypeScript/JavaScript applications. Perfect for building reactive global state and event-driven systems in React, Vue, and other frameworks.
+**SynState** is a lightweight, glitch-free, type-safe state management library for TypeScript/JavaScript applications. Perfect for building reactive global state and event-driven systems in React, Vue, and other frameworks.
 
 "SynState" is named after "Synchronized + State." It represents a sound synchronized state through a **glitch-free**[^1] Observable implementation.
 
@@ -22,7 +22,7 @@
 ## Features
 
 - 🎯 **Simple State Management**: Easy-to-use `createState` and `createReducer` similar to React useState/useReducer for global state
-- ⚡ **High Performance**: Optimized for fast state updates and minimal re-renders
+- ⚡ **Predictable Performance**: Each update visits the nodes it reaches once each, so its cost grows with the size of the graph, never with the number of paths through it ([benchmark](https://noshiro-pf.github.io/mono/synstate/guides/library-comparison/benchmark/))
 - 🎨 **Type-Safe**: Full TypeScript support with precise type inference
 - 🚀 **Lightweight**: <!-- bundle-size:synstate -->~6.6 kB min+gzip<!-- /bundle-size:synstate --> with two external runtime dependencies ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge) and [ts-std-forge](https://www.npmjs.com/package/ts-std-forge), and the first depends on the second)
 - 🌐 **Framework Agnostic**: Works with React, Vue, Svelte, or vanilla JavaScript

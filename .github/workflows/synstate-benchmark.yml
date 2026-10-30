@@ -103,8 +103,11 @@ jobs:
       # measured against a baseline of the old one reads as drift on `main`
       # until then. The digest of every workspace package's source (SynState
       # and whatever it is built from, without a list to keep) and of the
-      # benchmark itself therefore joins the key; test files are left out,
-      # since they change nothing measured.
+      # benchmark itself — the scenario files, the runners, and the deep
+      # chain's adapters and the spring-demo modules they load, which live
+      # with the interactive demos — therefore
+      # joins the key; test files are left out, since they change nothing
+      # measured.
       #
       # The `vN` is for a change of what is measured that none of that sees,
       # and bumping it is what makes `main` re-measure; without it the
@@ -113,7 +116,7 @@ jobs:
       - name: Compute the baseline cache key
         id: key
         env:
-          SOURCE_DIGEST: ${{ hashFiles('libs/*/src/**', '!libs/*/src/**/*.test.mts', 'libs/synstate/samples/docs-site/benchmark/**', 'apps/synstate-docs/scripts/benchmark/**') }}
+          SOURCE_DIGEST: ${{ hashFiles('libs/*/src/**', '!libs/*/src/**/*.test.mts', 'libs/synstate/samples/docs-site/benchmark/**', 'apps/synstate-docs/scripts/benchmark/**', 'apps/synstate-docs/src/components/throughput-demo/adapters/**', '!apps/synstate-docs/src/components/throughput-demo/adapters/**/*.test.mts', 'apps/synstate-docs/src/components/spring-demo/**/*.mts', '!apps/synstate-docs/src/components/spring-demo/**/*.test.mts') }}
         run: |
           set -euo pipefail
           libs="$(pnpm --filter @synstate/docs run --silent z:benchmark:version-key)"

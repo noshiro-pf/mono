@@ -6,62 +6,80 @@
     "environment": {
       "runner": "github-actions",
       "runnerImage": "ubuntu24",
-      "node": "v26.12.0",
-      "platform": "Linux 6.17.0-1022-azure",
+      "node": "v26.12.1",
+      "platform": "Linux 7.0.0-1017-azure",
       "arch": "x64",
-      "cpu": "AMD EPYC 9V45 96-Core Processor",
-      "measuredOn": "2026-10-25",
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "measuredOn": "2026-10-30",
       "libraries": {
-        "synstate": "4.1.0",
+        "synstate": "6.0.0",
         "rxjs": "7.8.2",
         "jotai": "3.0.1",
-        "mobx": "7.0.6",
+        "mobx": "7.1.0",
         "@reduxjs/toolkit": "2.13.0",
         "zustand": "5.0.15",
-        "valtio": "2.3.2"
+        "valtio": "2.3.2",
+        "solid-js": "1.9.17",
+        "@preact/signals-core": "1.14.4"
       }
     }
   },
   "rows": [
     {
       "label": "SynState",
-      "median": 10.6,
-      "min": 10.39,
-      "max": 11.53,
-      "p95": 11.16,
-      "opsPerSec": 9430385
+      "median": 15.68,
+      "min": 14.92,
+      "max": 17,
+      "p95": 16.89,
+      "opsPerSec": 6379191
     },
     {
       "label": "RxJS",
-      "median": 3.88,
-      "min": 3.83,
-      "max": 4.27,
-      "p95": 3.96,
-      "opsPerSec": 25781944
+      "median": 7.62,
+      "min": 7.38,
+      "max": 8.26,
+      "p95": 7.93,
+      "opsPerSec": 13127528
     },
     {
       "label": "MobX",
-      "median": 66.15,
-      "min": 65.7,
-      "max": 85.14,
-      "p95": 84.59,
-      "opsPerSec": 1511762
+      "median": 109.67,
+      "min": 109.17,
+      "max": 128.61,
+      "p95": 126.07,
+      "opsPerSec": 911835
     },
     {
       "label": "Jotai",
-      "median": 437.38,
-      "min": 424.28,
-      "max": 496.64,
-      "p95": 454.28,
-      "opsPerSec": 228636
+      "median": 756.89,
+      "min": 742.13,
+      "max": 769.21,
+      "p95": 768.69,
+      "opsPerSec": 132119
     },
     {
       "label": "Redux",
-      "median": 162.83,
-      "min": 159.98,
-      "max": 178.76,
-      "p95": 176.54,
-      "opsPerSec": 614119
+      "median": 305.05,
+      "min": 299.45,
+      "max": 325.82,
+      "p95": 325.61,
+      "opsPerSec": 327813
+    },
+    {
+      "label": "Solid",
+      "median": 90.88,
+      "min": 90.59,
+      "max": 93.16,
+      "p95": 91.78,
+      "opsPerSec": 1100304
+    },
+    {
+      "label": "Preact Signals",
+      "median": 15.88,
+      "min": 15.77,
+      "max": 20.7,
+      "p95": 19.49,
+      "opsPerSec": 6297786
     }
   ]
 }

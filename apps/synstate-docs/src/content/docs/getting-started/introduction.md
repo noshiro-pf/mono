@@ -9,16 +9,16 @@ sidebar:
   <img src="/mono/synstate/synstate-logo.png" alt="SynState Logo" width="400" />
 </p>
 
-**SynState** is a lightweight, high-performance state management library for TypeScript/JavaScript. Simple global state that scales to complex async pipelines — with built-in `debounce`, `switchMap`, and more. Fully compatible with React Compiler.
+**SynState** is a lightweight, glitch-free state management library for TypeScript/JavaScript. Simple global state that scales to complex async pipelines — with built-in `debounce`, `switchMap`, and more. Fully compatible with React Compiler.
 
 "SynState" is named after "Synchronized + State." Derived values are always kept in sync through glitch-free propagation — no inconsistent intermediate states. (Details: [How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/))
 
 ## Features
 
 - 🎯 **Simple State Management**: Easy-to-use `createState` and `createReducer` similar to React `useState`/`useReducer`, but for global state.
-- ⚡ **High Performance**: Glitch-free $O(n)$ propagation with no scenario where it falls far behind — within <!-- bench:summary/synstate-worst-over-fastest -->2.8<!-- /bench -->× of the fastest library in each of the six benchmark scenarios, while <!-- bench:summary/others-worst-libraries -->RxJS, MobX, Jotai and Redux<!-- /bench --> each trail the fastest by <!-- bench:summary/others-worst-over-fastest-least -->29<!-- /bench -->× or more in at least one. See [benchmarks](/mono/synstate/guides/library-comparison/benchmark/).
-- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~6.6 kB min+gzip<!-- /bundle-size:synstate --> with two external runtime dependencies ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge) and [ts-std-forge](https://www.npmjs.com/package/ts-std-forge), and the first depends on the second).
 - 🔧 **Built-in Async Operators**: `debounce`, `throttle`, `switchMap`, and more — handle complex async flows in a unified, declarative API without external libraries.
+- ⚡ **Predictable Performance**: Glitch-free $O(n)$ propagation — within <!-- bench:summary/synstate-worst-over-fastest -->5.1<!-- /bench -->× of the fastest library in each of the six benchmark scenarios, where the worst cases of the other libraries measured in all six range from <!-- bench:summary/others-least-worst-over-fastest -->2.1<!-- /bench -->× (<!-- bench:summary/others-least-worst-library -->Preact Signals<!-- /bench -->) to <!-- bench:summary/others-most-worst-over-fastest -->> 15,625<!-- /bench -->× (<!-- bench:summary/others-most-worst-library -->RxJS<!-- /bench -->). Speed is not where SynState stands out; [Why SynState?](/mono/synstate/guides/why-synstate/#glitch-free-at-linear-cost) says what does. See [benchmarks](/mono/synstate/guides/library-comparison/benchmark/).
+- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~6.6 kB min+gzip<!-- /bundle-size:synstate --> with two external runtime dependencies ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge) and [ts-std-forge](https://www.npmjs.com/package/ts-std-forge), and the first depends on the second).
 - ⚛️ **React-Optimized**: Fully compatible with [React Compiler](https://react.dev/learn/react-compiler). `synstate-react-hooks` lets you add global state to any component in just a few lines.
 - 🌐 **Framework Agnostic**: Core library works as-is with vanilla JavaScript, Vue, Svelte, or any framework. For React and Preact, hooks wrappers (`synstate-react-hooks` / `synstate-preact-hooks`) are available. For Preact, a [Preact Signals integration](/mono/synstate/preact-signals/demo/) (`synstate-preact-signals`) is also provided for fine-grained DOM updates without component re-renders.
 

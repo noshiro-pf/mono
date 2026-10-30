@@ -45,6 +45,8 @@ const scenarios: readonly Scenario[] = [
       { name: 'MobX', file: '00-single-state.mobx.mts' },
       { name: 'Jotai', file: '00-single-state.jotai.mts' },
       { name: 'Redux', file: '00-single-state.redux.mts' },
+      { name: 'Solid', file: '00-single-state.solid.mts' },
+      { name: 'Preact Signals', file: '00-single-state.preact-signals.mts' },
       { name: 'Zustand', file: '00-single-state.zustand.mts' },
       { name: 'Valtio', file: '00-single-state.valtio.mts' },
     ],
@@ -59,6 +61,8 @@ const scenarios: readonly Scenario[] = [
       { name: 'MobX', file: '01-derived-chain.mobx.mts' },
       { name: 'Jotai', file: '01-derived-chain.jotai.mts' },
       { name: 'Redux', file: '01-derived-chain.redux.mts' },
+      { name: 'Solid', file: '01-derived-chain.solid.mts' },
+      { name: 'Preact Signals', file: '01-derived-chain.preact-signals.mts' },
     ],
   },
   {
@@ -71,6 +75,11 @@ const scenarios: readonly Scenario[] = [
       { name: 'MobX', file: '02-diamond-dependency.mobx.mts' },
       { name: 'Jotai', file: '02-diamond-dependency.jotai.mts' },
       { name: 'Redux', file: '02-diamond-dependency.redux.mts' },
+      { name: 'Solid', file: '02-diamond-dependency.solid.mts' },
+      {
+        name: 'Preact Signals',
+        file: '02-diamond-dependency.preact-signals.mts',
+      },
     ],
   },
 ] as const;

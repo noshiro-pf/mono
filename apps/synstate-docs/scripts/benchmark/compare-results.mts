@@ -65,8 +65,6 @@ const main = async (): Promise<void> => {
   );
 };
 
-const LIBRARIES = ['SynState', 'RxJS', 'Jotai', 'MobX'] as const;
-
 const scenarios = [
   { title: 'single state', file: 'results-single-state.json' },
   { title: 'derived chain', file: 'results.json' },
@@ -112,7 +110,10 @@ const compareScenario = (
     };
   }
 
-  const measured = LIBRARIES.flatMap((label) =>
+  // The current run's rows, read from the file rather than named here, so that
+  // a library or a form both runs measured is compared without a list to keep.
+  // One the baseline lacks has nothing to be compared with and is left out.
+  const measured = labelsOf(current).flatMap((label) =>
     pointsOf(current).flatMap((point) =>
       comparePoint(label, point, baseline, current),
     ),
@@ -120,13 +121,13 @@ const compareScenario = (
 
   return {
     synstate: measured
-      .filter((m) => m.label === 'SynState')
+      .filter((m) => isSynState(m.label))
       .map(
         (m) =>
-          `| ${scenario.title} | ${m.point} | ${m.baseline} ms | ${m.current} ms | ${m.ratio}x |`,
+          `| ${scenario.title}${formOf(m.label)} | ${m.point} | ${m.baseline} ms | ${m.current} ms | ${m.ratio}x |`,
       ),
     calibration: measured
-      .filter((m) => m.label !== 'SynState')
+      .filter((m) => !isSynState(m.label))
       .map((m) => `${m.label} ${scenario.title} ${m.point}: ${m.ratio}x`),
   };
 };
@@ -179,6 +180,18 @@ const readScenario = async (
     : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       (JSON.parse(read.value) as unknown as Results);
 };
+
+/** SynState's rows: the plain one and a form such as `SynState (switchMap)`. */
+const isSynState = (label: string): boolean =>
+  label === 'SynState' || label.startsWith('SynState (');
+
+/** ` (switchMap)` for `SynState (switchMap)`, `''` for `SynState`. */
+const formOf = (label: string): string => label.slice('SynState'.length);
+
+const labelsOf = (results: Results): readonly string[] =>
+  results.kind === 'stats'
+    ? results.rows.map((r) => r.label)
+    : results.series.map((s) => s.label);
 
 /** `''` for a single-point scenario, the sweep's labels for a swept one. */
 const pointsOf = (results: Results): readonly string[] =>

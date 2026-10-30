@@ -66,6 +66,7 @@
     "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
+    "@preact/signals-core": "catalog:",
     "@reduxjs/toolkit": "catalog:",
     "@sumi-lang/cli": "workspace:*",
     "@types/react": "catalog:",
@@ -83,6 +84,7 @@
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
     "rxjs": "catalog:",
+    "solid-js": "catalog:",
     "synstate-react-hooks": "workspace:*",
     "synstate-react-hooks-compat": "workspace:*",
     "ts-repo-utils": "workspace:*",

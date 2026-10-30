@@ -1,9 +1,9 @@
 ---
 title: SynState
-description: A lightweight, high-performance state management library for TypeScript with built-in async operators and React Compiler support.
+description: A lightweight, glitch-free state management library for TypeScript with built-in async operators and React Compiler support.
 template: splash
 hero:
-    tagline: A lightweight, high-performance state management library for TypeScript/JavaScript. Simple global state that scales to complex async pipelines — with built-in debounce, switchMap, and more. Fully compatible with React Compiler.
+    tagline: A lightweight, glitch-free state management library for TypeScript/JavaScript. Simple global state that scales to complex async pipelines — with built-in debounce, switchMap, and more. Fully compatible with React Compiler.
     actions:
         - text: Get Started
           link: /mono/synstate/getting-started/introduction/
@@ -23,18 +23,18 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
         Easy-to-use `createState` and `createReducer` similar to React
         `useState` / `useReducer` for global state.
     </Card>
-    <Card title="High Performance" icon="rocket">
+    <Card title="Built-in Async Operators" icon="setting">
+        `debounce`, `throttle`, `switchMap`, and more — handle complex async
+        flows in a unified, declarative API without external libraries.
+    </Card>
+    <Card title="Predictable Performance" icon="rocket">
 
-Glitch-free O(n) propagation with no scenario where it falls far behind: in each of the six benchmark scenarios, within **{/* bench:summary/synstate-worst-over-fastest */}2.8{/* /bench */}×** of the fastest library, while {/* bench:summary/others-worst-libraries */}RxJS, MobX, Jotai and Redux{/* /bench */} each trail the fastest by {/* bench:summary/others-worst-over-fastest-least */}29{/* /bench */}× or more in at least one. See [the benchmark summary](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page).
+Glitch-free O(n) propagation, within **{/* bench:summary/synstate-worst-over-fastest */}5.1{/* /bench */}×** of the fastest library in each of the six benchmark scenarios. Among the other libraries measured in all six, worst cases range from {/* bench:summary/others-least-worst-over-fastest */}2.1{/* /bench */}× ({/* bench:summary/others-least-worst-library */}Preact Signals{/* /bench */}) to {/* bench:summary/others-most-worst-over-fastest */}> 15,625{/* /bench */}× ({/* bench:summary/others-most-worst-library */}RxJS{/* /bench */}). Speed is not where SynState stands out; [Why SynState?](/mono/synstate/guides/why-synstate/#glitch-free-at-linear-cost) says what does. See [the benchmark summary](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page).
 
     </Card>
     <Card title="Lightweight" icon="seti:favicon">
         {/* bundle-size:synstate */}~6.6 kB min+gzip{/* /bundle-size:synstate */} with two external runtime dependencies,
         one of which depends on the other.
-    </Card>
-    <Card title="Built-in Async Operators" icon="setting">
-        `debounce`, `throttle`, `switchMap`, and more — handle complex async
-        flows in a unified, declarative API without external libraries.
     </Card>
     <Card title="React-Optimized" icon="seti:react">
         Fully compatible with React Compiler. `synstate-react-hooks` lets you

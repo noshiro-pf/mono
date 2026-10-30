@@ -1,9 +1,9 @@
 ---
 title: SynState
-description: TypeScript 向けの軽量・高性能な状態管理ライブラリ。非同期オペレーター内蔵、React Compiler 完全互換。
+description: TypeScript 向けの軽量でグリッチフリーな状態管理ライブラリ。非同期オペレーター内蔵、React Compiler 完全互換。
 template: splash
 hero:
-    tagline: TypeScript/JavaScript 向けの軽量・高性能な状態管理ライブラリ。シンプルなグローバル状態から、debounce や switchMap を使った複雑な非同期パイプラインまで統一 API で記述。React Compiler と完全互換。
+    tagline: TypeScript/JavaScript 向けの軽量でグリッチフリーな状態管理ライブラリ。シンプルなグローバル状態から、debounce や switchMap を使った複雑な非同期パイプラインまで統一 API で記述。React Compiler と完全互換。
     actions:
         - text: はじめる
           link: /mono/synstate/ja/getting-started/introduction/
@@ -23,19 +23,19 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
         React の `useState` / `useReducer` に似た使いやすい `createState` と
         `createReducer` でグローバル状態を管理。
     </Card>
-    <Card title="高パフォーマンス" icon="rocket">
+    <Card title="非同期オペレーター内蔵" icon="setting">
+        `debounce`、`throttle`、`switchMap` など —
+        複雑な非同期処理を外部ライブラリなしに統一的な宣言的 API で記述。
+    </Card>
+    <Card title="安定したパフォーマンス" icon="rocket">
 
-グリッチフリー O(n) 伝搬で、極端に遅くなるシナリオがありません。ベンチマークの6つのシナリオすべてで最速のライブラリの**{/* bench:summary/synstate-worst-over-fastest */}2.8{/* /bench */}倍以内**に収まり、{/* bench:summary/others-worst-libraries */}RxJS・MobX・Jotai・Redux{/* /bench */} はいずれも少なくとも1つのシナリオで最速の{/* bench:summary/others-worst-over-fastest-least */}29{/* /bench */}倍以上の時間がかかります。[ベンチマークの概要](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)を参照。
+グリッチフリー O(n) 伝搬で、ベンチマークの6つのシナリオすべてで最速のライブラリの<strong>{/* bench:summary/synstate-worst-over-fastest */}5.1{/* /bench */}倍以内</strong>に収まります。6つすべてで計測した他のライブラリの最悪ケースは、{/* bench:summary/others-least-worst-library */}Preact Signals{/* /bench */} の{/* bench:summary/others-least-worst-over-fastest */}2.1{/* /bench */}倍から {/* bench:summary/others-most-worst-library */}RxJS{/* /bench */} の{/* bench:summary/others-most-worst-over-fastest */}> 15,625{/* /bench */}倍までです。速度は SynState が最も際立つ点ではありません。何が際立つかは [SynState の強み](/mono/synstate/ja/guides/why-synstate/#グリッチフリーでコストは線形)を参照。[ベンチマークの概要](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)を参照。
 
     </Card>
     <Card title="軽量" icon="seti:favicon">
 
 {/* bundle-size:synstate */}~6.6 kB min+gzip{/* /bundle-size:synstate */}、外部ランタイム依存は 2 つ（一方がもう一方に依存している）。
 
-    </Card>
-    <Card title="非同期オペレーター内蔵" icon="setting">
-        `debounce`、`throttle`、`switchMap` など —
-        複雑な非同期処理を外部ライブラリなしに統一的な宣言的 API で記述。
     </Card>
     <Card title="React 最適化" icon="seti:react">
         React Compiler と完全互換。`synstate-react-hooks`

@@ -88,12 +88,32 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       median(singleState, 'Jotai'),
       median(singleState, 'SynState'),
     ),
+    'single-state/solid-over-synstate': factor(
+      median(singleState, 'Solid'),
+      median(singleState, 'SynState'),
+    ),
+    'single-state/preact-signals-over-synstate': factor(
+      median(singleState, 'Preact Signals'),
+      median(singleState, 'SynState'),
+    ),
 
     // Scenario: Derived Chain / Diamond Dependency
     'derived-chain/updates': count(updates(derivedChain)),
     'derived-chain/jotai-over-synstate': ratio(
       median(derivedChain, 'Jotai'),
       median(derivedChain, 'SynState'),
+    ),
+    'derived-chain/solid-over-synstate': factor(
+      median(derivedChain, 'Solid'),
+      median(derivedChain, 'SynState'),
+    ),
+    'derived-chain/preact-signals-over-synstate': factor(
+      median(derivedChain, 'Preact Signals'),
+      median(derivedChain, 'SynState'),
+    ),
+    'diamond/preact-signals-over-synstate': factor(
+      median(diamond, 'Preact Signals'),
+      median(diamond, 'SynState'),
     ),
 
     // Scenario: Deep Chain Throughput
@@ -124,6 +144,22 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     'deep-chain/jotai@k500-m100': ms(at(deepChain, 'Jotai', DEEP_MID)),
     'deep-chain/mobx@k500-m100': ms(at(deepChain, 'MobX', DEEP_MID)),
     'deep-chain/redux@k500-m100': ms(at(deepChain, 'Redux', DEEP_MID)),
+    'deep-chain/solid@k1000-m200': ms(at(deepChain, 'Solid', DEEP_MAX)),
+    'deep-chain/solid-over-synstate@k1000-m200': factor(
+      at(deepChain, 'Solid', DEEP_MAX),
+      at(deepChain, 'SynState', DEEP_MAX),
+    ),
+    'deep-chain/solid@k500-m100': ms(at(deepChain, 'Solid', DEEP_MID)),
+    'deep-chain/preact-signals@k1000-m200': ms(
+      at(deepChain, 'Preact Signals', DEEP_MAX),
+    ),
+    'deep-chain/preact-signals-over-synstate@k1000-m200': factor(
+      at(deepChain, 'Preact Signals', DEEP_MAX),
+      at(deepChain, 'SynState', DEEP_MAX),
+    ),
+    'deep-chain/preact-signals@k500-m100': ms(
+      at(deepChain, 'Preact Signals', DEEP_MID),
+    ),
 
     // Scenario: Cascaded Diamond
     'cascaded-diamond/timeout': ms(timeout(cascadedDiamond)),
@@ -170,11 +206,27 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       at(cascadedDiamond, 'Redux', CASCADED_MAX),
       at(cascadedDiamond, 'SynState', CASCADED_MAX),
     ),
+    'cascaded-diamond/solid@min-n': ms(
+      at(cascadedDiamond, 'Solid', CASCADED_MIN),
+    ),
+    'cascaded-diamond/solid@max-n': ms(
+      at(cascadedDiamond, 'Solid', CASCADED_MAX),
+    ),
+    'cascaded-diamond/preact-signals@min-n': ms(
+      at(cascadedDiamond, 'Preact Signals', CASCADED_MIN),
+    ),
+    'cascaded-diamond/preact-signals@max-n': ms(
+      at(cascadedDiamond, 'Preact Signals', CASCADED_MAX),
+    ),
 
     // Scenario: Conditional Fan-Out
     'fan-out/updates-math': `$K = ${count(updates(conditionalFanOut)).replace(',', '{,}')}$`,
     'fan-out/mobx-typical': ms(typical(conditionalFanOut, 'MobX')),
     'fan-out/jotai-typical': ms(typical(conditionalFanOut, 'Jotai')),
+    'fan-out/solid-typical': ms(typical(conditionalFanOut, 'Solid')),
+    'fan-out/preact-signals-typical': ms(
+      typical(conditionalFanOut, 'Preact Signals'),
+    ),
     'fan-out/synstate-switch-map-typical': ms(
       typical(conditionalFanOut, 'SynState (switchMap)'),
     ),
@@ -262,6 +314,7 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       cascadedDiamond,
       CASCADED_MAX,
     ),
+    'summary/fan-out-scenario': fanOutSummaryName(),
     'summary/fan-out-fastest': fastestAt(conditionalFanOut, fanOutLastLabel()),
     // SynState written with `switchMap`, the form that follows the selector as
     // MobX and Jotai do; the `combine` form is in the footnote beside it, and
@@ -297,21 +350,10 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     ),
 
     // The headline on the introduction and the landing page: SynState's worst
-    // case (the figure above) against the other libraries' worst cases. A
-    // library measured in some scenarios only is left out, since its worst
-    // case is over those alone.
-    'summary/others-worst-libraries': {
-      en: listed(otherEveryScenarioLibraries()),
-      ja: otherEveryScenarioLibraries().join('・'),
-    },
-    'summary/others-worst-over-fastest-least': factor(
-      Math.min(
-        ...otherEveryScenarioLibraries().map(
-          (library) => worstSummaryRow(library).spread,
-        ),
-      ),
-      1,
-    ),
+    // case (the figure above) beside the range the other libraries' worst
+    // cases span, each end named. A library measured in some scenarios only is
+    // left out, since its worst case is over those alone.
+    ...othersWorstCaseRange(),
 
     // Summary: for each library, the summary row where it is furthest from
     // that row's fastest library, among the rows that measured it. Which row
@@ -319,20 +361,16 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     // too; and so is the mark on a library some rows did not measure.
     ...Object.fromEntries(
       summaryLibraries().flatMap((library) => {
-        const { scenario, spread } = worstSummaryRow(library);
+        const { scenario } = worstSummaryRow(library);
 
-        const key = library.toLowerCase();
+        // `Preact Signals` → `preact-signals`: a marker key has no spaces.
+        const key = library.toLowerCase().replaceAll(' ', '-');
 
         return [
           [`summary/worst/${key}-library`, partialMarked(library)],
           [`summary/worst/${key}-scenario`, scenario.name],
           [`summary/worst/${key}-fastest`, scenario.fastest()],
-          [
-            `summary/worst/${key}-over-fastest`,
-            scenario.timedOut(library)
-              ? (`>\u{A0}${factor(spread, 1)}` as const)
-              : factor(spread, 1),
-          ],
+          [`summary/worst/${key}-over-fastest`, worstCaseText(library)],
         ] as const;
       }),
     ),
@@ -359,6 +397,14 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
     'summary/deep-chain-redux-growth': factor(
       at(deepChain, 'Redux', DEEP_MAX),
       at(deepChain, 'Redux', DEEP_SHALLOW),
+    ),
+    'summary/deep-chain-solid-growth': factor(
+      at(deepChain, 'Solid', DEEP_MAX),
+      at(deepChain, 'Solid', DEEP_SHALLOW),
+    ),
+    'summary/deep-chain-preact-signals-growth': factor(
+      at(deepChain, 'Preact Signals', DEEP_MAX),
+      at(deepChain, 'Preact Signals', DEEP_SHALLOW),
     ),
   }) as const;
 
@@ -724,6 +770,17 @@ const pointSpread = (data: SeriesData, label: string, xLabel: string): number =>
     at(data, fastestAt(data, xLabel), xLabel),
   );
 
+/**
+ * A distance from the fastest library as the summary quotes it, marked `>`
+ * where the row timed out, which makes the figure a lower bound.
+ */
+const spreadText = (spread: number, timedOut: boolean): string =>
+  timedOut
+    ? // A no-break space, so that a narrow column does not wrap the mark away
+      // from its number.
+      (`>\u{A0}${factor(spread, 1)}` as const)
+    : factor(spread, 1);
+
 const slowestSpreadText = (
   data: SeriesData,
   xLabel: string,
@@ -731,13 +788,10 @@ const slowestSpreadText = (
 ): string => {
   const slowest = slowestAt(data, xLabel, excluded);
 
-  const value = factor(pointSpread(data, slowest, xLabel), 1);
-
-  return valueAt(data, slowest, xLabel) === null
-    ? // A no-break space, so that a narrow column does not wrap the mark away
-      // from its number.
-      (`>\u{A0}${value}` as const)
-    : value;
+  return spreadText(
+    pointSpread(data, slowest, xLabel),
+    valueAt(data, slowest, xLabel) === null,
+  );
 };
 
 /**
@@ -809,15 +863,23 @@ const summaryScenarios = (): readonly SummaryScenario[] =>
       CASCADED_MAX,
     ),
     seriesScenario(
-      {
-        en: `[Conditional fan-out](#scenario-conditional-fan-out) (${fanOutLastLabel()})`,
-        ja: `[条件付きファンアウト](#シナリオ-条件付きファンアウト)（${fanOutLastLabel()}）`,
-      },
+      fanOutSummaryName(),
       conditionalFanOut,
       fanOutLastLabel(),
       FAN_OUT_SUMMARY_FORMS,
     ),
   ] as const;
+
+/**
+ * The fan-out row's name. Its point is the last one SynState finished, which a
+ * slower machine can move, so the summary table's first column reads it from
+ * here too.
+ */
+const fanOutSummaryName = (): Localized =>
+  ({
+    en: `[Conditional fan-out](#scenario-conditional-fan-out) (${fanOutLastLabel()})`,
+    ja: `[条件付きファンアウト](#シナリオ-条件付きファンアウト)（${fanOutLastLabel()}）`,
+  }) as const;
 
 const statsScenario = (
   name: Localized,
@@ -882,12 +944,6 @@ const otherEveryScenarioLibraries = (): readonly string[] =>
       summaryScenarios().every((s) => s.libraries.includes(library)),
   );
 
-/** `a, b and c`: names joined as an English sentence lists them. */
-const listed = (names: readonly string[]): string =>
-  Arr.isMaxLengthArray(1, names)
-    ? names.join('')
-    : (`${Arr.butLast(names).join(', ')} and ${names.at(-1) ?? ''}` as const);
-
 /**
  * A library name, with the footnote mark the page explains when some summary
  * rows did not measure the library, so that its worst case is over the others
@@ -915,6 +971,52 @@ const worstSummaryRow = (
   }
 
   return worst;
+};
+
+/** A library's worst case, from {@link worstSummaryRow}, as the summary quotes it. */
+const worstCaseText = (library: string): string => {
+  const { scenario, spread } = worstSummaryRow(library);
+
+  return spreadText(spread, scenario.timedOut(library));
+};
+
+/**
+ * The headline's range of the other libraries' worst cases: of
+ * {@link otherEveryScenarioLibraries}, the one whose worst case is nearest the
+ * fastest library and the one whose worst case is furthest from it.
+ */
+const othersWorstCaseRange = (): ReadonlyRecord<string, string> => {
+  // A timed-out worst case sorts by its lower bound, which `spreadText`
+  // prints with `>`: placing it after every measured one could print an upper
+  // end smaller than the lower one.
+  const sorted = otherEveryScenarioLibraries()
+    .map((library) => {
+      const { scenario, spread } = worstSummaryRow(library);
+
+      return {
+        library,
+        spread,
+        text: spreadText(spread, scenario.timedOut(library)),
+      };
+    })
+    .toSorted((a, b) => a.spread - b.spread);
+
+  const least = sorted[0];
+
+  const most = sorted.at(-1);
+
+  if (least === undefined || most === undefined || least === most) {
+    throw new Error(
+      '❌ the headline range needs two other libraries that took part in every scenario',
+    );
+  }
+
+  return {
+    'summary/others-least-worst-library': least.library,
+    'summary/others-least-worst-over-fastest': least.text,
+    'summary/others-most-worst-library': most.library,
+    'summary/others-most-worst-over-fastest': most.text,
+  };
 };
 
 /** The slowest library's distance from the fastest in each summary row. */
