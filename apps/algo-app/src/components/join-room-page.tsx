@@ -1,154 +1,118 @@
-import { useState } from 'better-preact-use-state';
-import { styled } from 'goober';
-import { memoNamed } from 'preact-utils';
-import { useCallback } from 'preact/hooks';
-import { useObservableValue } from 'synstate-preact-hooks';
+import {
+  createBooleanState,
+  createState,
+  type InitializedObservable,
+} from 'synstate';
+import { constant, derive, If, type JSX } from 'synstate-dom';
 import { dictionary, roomPage } from '../constants/index.mjs';
 import { Router } from '../router.mjs';
 import { roomStore } from '../store/index.mjs';
-import { ButtonPrimary, Input, Spinner } from './bp/index.mjs';
+import { Button, Input, Spinner } from './bp/index.mjs';
+import * as styles from './room-form.module.css';
 
 const dc = dictionary.joinRoom;
 
-type Props = Readonly<{ roomId: string }>;
+type Props = Readonly<{ roomId: InitializedObservable<string> }>;
 
-export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
+export const JoinRoomPage = ({ roomId }: Props): JSX.Element => {
   /*
     TODO:
     roomに自分の名前があればゲーム開始前画面を表示
    */
 
-  const [password, setPassword] = useState<string>('');
+  const [password, setPassword, { getSnapshot: getPassword }] =
+    createState<string>('');
 
-  const [username, setUsername] = useState<string>('');
+  const [username, setUsername, { getSnapshot: getUsername }] =
+    createState<string>('');
 
-  const onPasswordInput: preact.GenericEventHandler<HTMLInputElement> =
-    useCallback(
-      (ev) => {
-        setPassword(ev.currentTarget.value);
-      },
-      [setPassword],
-    );
+  const [showPasswordError, { setTrue: setShowPasswordError }] =
+    createBooleanState(false);
 
-  const onUsernameInput: preact.GenericEventHandler<HTMLInputElement> =
-    useCallback(
-      (ev) => {
-        setUsername(ev.currentTarget.value);
-      },
-      [setUsername],
-    );
+  const room = roomStore.room;
 
-  const room = useObservableValue(roomStore.room);
+  const loading = roomStore.joinRoom.isWaitingResponse;
 
-  // Joining checks the password against the room, so it waits for the room.
-  const disabled: boolean = username === '' || room === undefined;
+  const onJoinRoomButtonClick = (): void => {
+    const currentRoom = room.getSnapshot().value;
 
-  const [showPasswordError, setShowPasswordError] = useState<boolean>(false);
-
-  const onJoinRoomButtonClick = useCallback(() => {
-    if (room === undefined) {
+    if (currentRoom === undefined) {
       return;
     }
 
-    if (room.password !== '' && room.password !== password) {
-      setShowPasswordError(true);
+    if (currentRoom.password !== '' && currentRoom.password !== getPassword()) {
+      setShowPasswordError();
 
       return;
     }
+
+    const id = roomId.getSnapshot().value;
+
+    const name = getUsername();
 
     // Navigated once the join has settled rather than from a subscriber, so
     // the router is not written to while the store's update propagates.
     roomStore.joinRoom
-      .dispatch(roomId, username)
+      .dispatch(id, name)
       .then(() => {
-        Router.push(roomPage(roomId, username));
+        Router.push(roomPage(id, name));
       })
       .catch(console.error);
-  }, [room, roomId, username, password, setShowPasswordError]);
-
-  const loading = useObservableValue(roomStore.joinRoom.isWaitingResponse);
+  };
 
   return (
-    <Centering>
-      <FormRect>
-        <Block>
-          <Label>{dc.gamePassword.label}</Label>
+    <div class={constant(styles.centering)}>
+      <div class={constant(styles.form)}>
+        <div class={constant(styles.block)}>
+          <div class={constant(styles.label)}>
+            {constant(dc.gamePassword.label)}
+          </div>
           <Input
             disabled={loading}
-            type={'text'}
+            label={dc.gamePassword.label}
             value={password}
-            onInput={onPasswordInput}
+            onValueChange={setPassword}
           />
-          {showPasswordError ? (
-            <ErrorMessage>
-              {dictionary.joinRoom.gamePassword.notMatch}
-            </ErrorMessage>
-          ) : undefined}
-        </Block>
-        <Block>
-          <Label>{dc.username.label}</Label>
+          <If
+            cond={showPasswordError}
+            then={
+              <div class={constant(styles.error)}>
+                {constant(dc.gamePassword.notMatch)}
+              </div>
+            }
+          />
+        </div>
+        <div class={constant(styles.block)}>
+          <div class={constant(styles.label)}>
+            {constant(dc.username.label)}
+          </div>
           <Input
             disabled={loading}
-            type={'text'}
+            label={dc.username.label}
             value={username}
-            onInput={onUsernameInput}
+            onValueChange={setUsername}
           />
-        </Block>
-        <ButtonWrapper>
-          <ButtonPrimary
-            disabled={disabled || loading}
-            type={'button'}
+        </div>
+        <div class={constant(styles.buttonWrapper)}>
+          <Button
+            intent={'primary'}
+            // Joining checks the password against the room, so it waits for
+            // the room.
+            disabled={derive(
+              [username, room, loading],
+              (name, r, isLoading) =>
+                name === '' || r === undefined || isLoading,
+            )}
             onClick={onJoinRoomButtonClick}
           >
-            {loading ? <Spinner size={20} /> : <span>{dc.button}</span>}
-          </ButtonPrimary>
-        </ButtonWrapper>
-      </FormRect>
-    </Centering>
+            <If
+              cond={loading}
+              else={<span>{constant(dc.button)}</span>}
+              then={<Spinner size={20} />}
+            />
+          </Button>
+        </div>
+      </div>
+    </div>
   );
-});
-
-const Centering = styled('div')`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgb(255 255 255) 0%,
-    rgb(202 202 202) 100%
-  );
-`;
-
-const FormRect = styled('div')`
-  width: 400px;
-  height: 500px;
-  border-radius: 10px;
-  background-color: white;
-  filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
-
-  padding: 40px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const Block = styled('div')`
-  margin: 10px;
-  padding: 10px;
-`;
-
-const Label = styled('div')`
-  font-weight: bold;
-  margin-bottom: 5px;
-`;
-
-const ButtonWrapper = styled('div')`
-  margin: 10px;
-`;
-
-const ErrorMessage = styled('div')`
-  font-size: small;
-  color: red;
-`;
+};

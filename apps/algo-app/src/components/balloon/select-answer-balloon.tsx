@@ -1,23 +1,27 @@
-import { styled } from 'goober';
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
-import { Arr, match } from 'ts-data-forge';
+import { combine, map, type InitializedObservable } from 'synstate';
+import { constant, view, type JSX } from 'synstate-dom';
+import { Arr } from 'ts-data-forge';
 import type { RectSize } from 'ts-utils-additional';
 import { dictionary, outlineColorDef } from '../../constants/index.mjs';
 import type { SelectAnswerBalloonProps } from '../../types/index.mjs';
 import { Button } from '../bp/index.mjs';
-import { CardComponent } from '../card/index.mjs';
 import {
-  createBalloonBody,
-  createBalloonWithDownArrow,
-  createBalloonWithLeftArrow,
-  createBalloonWithRightArrow,
-  createBalloonWithUpArrow,
-} from './balloon-base.js';
-import { calcBalloonPosition } from './calc-balloon-position.mjs';
+  CardComponent,
+  faceUpCard,
+  isSameCardDisplay,
+} from '../card/index.mjs';
+import {
+  balloonClasses,
+  balloonPositionStyle,
+  balloonSizeStyle,
+} from './balloon-base.mjs';
+import * as balloonStyles from './balloon.module.css';
+import * as styles from './select-answer-balloon.module.css';
 import { smallestCardSize } from './small-card-size.mjs';
 
-type Props = SelectAnswerBalloonProps;
+type Props = Readonly<{
+  props: InitializedObservable<SelectAnswerBalloonProps>;
+}>;
 
 const balloonPaddingPx = 5;
 
@@ -28,135 +32,81 @@ const balloonSize: RectSize = {
   height: 150,
 } as const;
 
-const marginBetweenCardAndBalloon = 10;
+export const SelectAnswerBalloon = ({ props }: Props): JSX.Element => {
+  // Only these two of `props` change how the cards look; the rest, such as
+  // where the balloon is, need not draw them again.
+  const choice = combine([
+    props.pipe(map(({ cardColor }) => cardColor)),
+    props.pipe(map(({ selectedNumber }) => selectedNumber)),
+  ]);
 
-export const SelectAnswerBalloon = memoNamed<Props>(
-  'SelectAnswerBalloon',
-  ({
-    anchorCardRect,
-    arrowDirection,
-    cardColor,
-    selectedNumber,
-    onSelectedNumberChange,
-    submitAnswer,
-    onCancelClick,
-    submitButtonIsDisabled,
-  }) => {
-    const rootStyle = useMemo<preact.CSSProperties>(
-      () =>
-        calcBalloonPosition({
-          anchorCardRect,
-          arrowDirection,
-          balloonSize,
-          marginBetweenCardAndBalloon,
-        }),
-      [anchorCardRect, arrowDirection],
-    );
-
-    const Balloon = useMemo(
-      () =>
-        match(arrowDirection, {
-          S: BalloonWithDownArrow,
-          E: BalloonWithRightArrow,
-          N: BalloonWithUpArrow,
-          W: BalloonWithLeftArrow,
-        }),
-      [arrowDirection],
-    );
-
-    const cards = useMemo(
-      () =>
-        Arr.seq(12).map(
-          (n) =>
-            ({
-              key: n,
-              number: n,
-              color: cardColor,
-              visibilityFromMe: 'faceUp',
-              size: smallestCardSize,
-              isClickable: true,
-              float: 'never',
-              showOutline: selectedNumber === n ? 'always' : 'onHover',
-              outlineColor:
-                selectedNumber === n
-                  ? outlineColorDef.red
-                  : outlineColorDef.green,
-              onClick: () => {
-                onSelectedNumberChange(n);
-              },
-            }) as const,
-        ),
-      [cardColor, onSelectedNumberChange, selectedNumber],
-    );
-
-    return (
-      <Balloon style={rootStyle}>
-        <BalloonContent>
-          <CardsWrapper>
-            {cards.map((c) => (
-              <CardComponent
-                key={c.key}
-                color={c.color}
-                float={c.float}
-                isClickable={c.isClickable}
-                number={c.number}
-                outlineColor={c.outlineColor}
-                showOutline={c.showOutline}
-                size={c.size}
-                visibilityFromMe={c.visibilityFromMe}
-                onClick={c.onClick}
-              />
-            ))}
-          </CardsWrapper>
-          <Buttons>
-            <Button onClick={onCancelClick}>{dictionary.cancel}</Button>
-            <Button
-              disabled={submitButtonIsDisabled || selectedNumber === undefined}
-              onClick={submitAnswer}
-            >
-              {dictionary.submitAnswer}
-            </Button>
-          </Buttons>
-        </BalloonContent>
-      </Balloon>
-    );
-  },
-);
-
-const BalloonBody = createBalloonBody(balloonSize);
-
-const BalloonWithDownArrow = createBalloonWithDownArrow(BalloonBody);
-
-const BalloonWithUpArrow = createBalloonWithUpArrow(BalloonBody);
-
-const BalloonWithLeftArrow = createBalloonWithLeftArrow(BalloonBody);
-
-const BalloonWithRightArrow = createBalloonWithRightArrow(BalloonBody);
-
-const BalloonContent = styled('div')`
-  width: ${balloonSize.width}px;
-  height: ${balloonSize.height}px;
-  padding: ${balloonPaddingPx}px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-`;
-
-const CardsWrapper = styled('div')`
-  display: flex;
-  flex-wrap: wrap;
-  /* cards */
-  & > * {
-    margin: ${cardMarginPx}px;
-  }
-`;
-
-const Buttons = styled('div')`
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 5px;
-
-  & > * {
-    margin: ${cardMarginPx}px;
-  }
-`;
+  return (
+    <div
+      class={balloonClasses(view(props, (p) => p.arrowDirection))}
+      style={{
+        ...balloonSizeStyle(balloonSize),
+        ...balloonPositionStyle(props, balloonSize),
+      }}
+    >
+      <div
+        class={constant(styles.content)}
+        style={{
+          ...balloonSizeStyle(balloonSize),
+          padding: constant(`${balloonPaddingPx}px`),
+          '--card-margin': constant(`${cardMarginPx}px`),
+        }}
+      >
+        <div class={constant(styles.cards)}>
+          {Arr.seq(12).map((n) => (
+            <CardComponent
+              card={choice.pipe(
+                map(
+                  ([cardColor, selectedNumber]) =>
+                    faceUpCard(
+                      { color: cardColor, number: n },
+                      selectedNumber === n
+                        ? {
+                            isClickable: true,
+                            showOutline: 'always',
+                            outlineColor: outlineColorDef.red,
+                          }
+                        : { isClickable: true, showOutline: 'onHover' },
+                    ),
+                  { equals: isSameCardDisplay },
+                ),
+              )}
+              size={constant(smallestCardSize)}
+              onClick={() => {
+                props.getSnapshot().value.onSelectedNumberChange(n);
+              }}
+            />
+          ))}
+        </div>
+        <div
+          class={constant(
+            `${balloonStyles.buttons} ${balloonStyles.buttonsEnd}`,
+          )}
+        >
+          <Button
+            onClick={() => {
+              props.getSnapshot().value.onCancelClick();
+            }}
+          >
+            {constant(dictionary.cancel)}
+          </Button>
+          <Button
+            disabled={view(
+              props,
+              (p) => p.submitButtonIsDisabled || p.selectedNumber === undefined,
+            )}
+            onClick={() => {
+              props.getSnapshot().value.submitAnswer();
+            }}
+          >
+            {constant(dictionary.submitAnswer)}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};

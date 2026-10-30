@@ -1,19 +1,26 @@
-import { styled } from 'goober';
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, type JSX } from 'synstate-dom';
 import type { RectSize } from 'ts-utils-additional';
-import { dictionary, outlineColorDef } from '../../constants/index.mjs';
+import { dictionary } from '../../constants/index.mjs';
 import type { ConfirmTossBalloonProps } from '../../types/index.mjs';
 import { Button } from '../bp/index.mjs';
-import { CardComponent } from '../card/index.mjs';
 import {
-  createBalloonBody,
-  createBalloonWithDownArrow,
-} from './balloon-base.js';
-import { calcBalloonPosition } from './calc-balloon-position.mjs';
+  CardComponent,
+  faceUpCard,
+  isSameCardDisplay,
+} from '../card/index.mjs';
+import {
+  balloonClasses,
+  balloonPositionStyle,
+  balloonSizeStyle,
+} from './balloon-base.mjs';
+import * as balloonStyles from './balloon.module.css';
+import * as styles from './confirm-toss-balloon.module.css';
 import { smallCardSize, smallestCardSize } from './small-card-size.mjs';
 
-type Props = ConfirmTossBalloonProps;
+type Props = Readonly<{
+  props: InitializedObservable<ConfirmTossBalloonProps>;
+}>;
 
 const balloonPaddingPx = 5;
 
@@ -24,113 +31,74 @@ const balloonSize: RectSize = {
   height: 100,
 } as const;
 
-const marginBetweenCardAndBalloon = 10;
+export const ConfirmTossBalloon = ({ props }: Props): JSX.Element => {
+  const position = props.pipe(
+    map(
+      ({ anchorCardRect }) =>
+        ({ anchorCardRect, arrowDirection: 'S' }) as const,
+    ),
+  );
 
-export const ConfirmTossBalloon = memoNamed<Props>(
-  'ConfirmTossBalloon',
-  ({ card, anchorCardRect, submit, cancel }) => {
-    const rootStyle = useMemo<preact.CSSProperties>(
-      () =>
-        calcBalloonPosition({
-          anchorCardRect,
-          arrowDirection: 'S',
-          balloonSize,
-          marginBetweenCardAndBalloon,
-        }),
-      [anchorCardRect],
-    );
-
-    const cardWithStyle = useMemo(
-      () =>
-        ({
-          number: card.number,
-          color: card.color,
-          visibilityFromMe: 'faceUp',
-          size: smallestCardSize,
-          isClickable: true,
-          float: 'never',
-          showOutline: 'never',
-          outlineColor: outlineColorDef.green,
-        }) as const,
-      [card],
-    );
-
-    return (
-      <BalloonWithDownArrowTranslated style={rootStyle}>
-        <BalloonContent>
-          <CardAndMessage>
-            <CardWrapper>
-              <CardComponent
-                color={cardWithStyle.color}
-                float={cardWithStyle.float}
-                isClickable={cardWithStyle.isClickable}
-                number={cardWithStyle.number}
-                outlineColor={cardWithStyle.outlineColor}
-                showOutline={cardWithStyle.showOutline}
-                size={cardWithStyle.size}
-                visibilityFromMe={cardWithStyle.visibilityFromMe}
-              />
-            </CardWrapper>
-            <Message>
-              <div>{dictionary.submitTossMessage[0]}</div>
-              <div>{dictionary.submitTossMessage[1]}</div>
-            </Message>
-          </CardAndMessage>
-          <Buttons>
-            <div>
-              <Button onClick={cancel}>{dictionary.cancel}</Button>
-            </div>
-            <div>
-              <Button onClick={submit}>{dictionary.submitToss}</Button>
-            </div>
-          </Buttons>
-        </BalloonContent>
-      </BalloonWithDownArrowTranslated>
-    );
-  },
-);
-
-const BalloonBody = createBalloonBody(balloonSize);
-
-const BalloonWithDownArrow = createBalloonWithDownArrow(BalloonBody);
-
-const BalloonWithDownArrowTranslated = styled(BalloonWithDownArrow)`
-  transform: translateY(-20px);
-`;
-
-const BalloonContent = styled('div')`
-  width: ${balloonSize.width}px;
-  height: ${balloonSize.height}px;
-  padding: ${balloonPaddingPx}px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const CardAndMessage = styled('div')`
-  display: flex;
-  justify-content: space-around;
-`;
-
-const Message = styled('div')`
-  color: white;
-  margin-left: 10px;
-  margin-right: 10px;
-`;
-
-const CardWrapper = styled('div')`
-  display: flex;
-  flex-wrap: wrap;
-  margin: ${cardMarginPx}px;
-`;
-
-const Buttons = styled('div')`
-  display: flex;
-  justify-content: center;
-  margin-bottom: 5px;
-
-  & > * {
-    margin: ${cardMarginPx}px;
-  }
-`;
+  return (
+    <div
+      class={{
+        ...balloonClasses(constant('S')),
+        [styles.balloon]: constant(true),
+      }}
+      style={{
+        ...balloonSizeStyle(balloonSize),
+        ...balloonPositionStyle(position, balloonSize),
+      }}
+    >
+      <div
+        class={constant(styles.content)}
+        style={{
+          ...balloonSizeStyle(balloonSize),
+          padding: constant(`${balloonPaddingPx}px`),
+          '--card-margin': constant(`${cardMarginPx}px`),
+        }}
+      >
+        <div class={constant(styles.cardAndMessage)}>
+          <div class={constant(styles.card)}>
+            <CardComponent
+              card={props.pipe(
+                map(({ card }) => faceUpCard(card, { isClickable: true }), {
+                  equals: isSameCardDisplay,
+                }),
+              )}
+              size={constant(smallestCardSize)}
+            />
+          </div>
+          <div class={constant(styles.message)}>
+            <div>{constant(dictionary.submitTossMessage[0])}</div>
+            <div>{constant(dictionary.submitTossMessage[1])}</div>
+          </div>
+        </div>
+        <div
+          class={constant(
+            `${balloonStyles.buttons} ${balloonStyles.buttonsCenter}`,
+          )}
+        >
+          <div>
+            <Button
+              onClick={() => {
+                props.getSnapshot().value.cancel();
+              }}
+            >
+              {constant(dictionary.cancel)}
+            </Button>
+          </div>
+          <div>
+            <Button
+              onClick={() => {
+                props.getSnapshot().value.submit();
+              }}
+            >
+              {constant(dictionary.submitToss)}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

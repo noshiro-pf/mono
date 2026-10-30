@@ -1,0 +1,30 @@
+.wrapper {
+  color: white;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.inTurn {
+  margin: 10px;
+  border-radius: 30px;
+}
+
+.name {
+  font-size: 18px;
+  font-weight: bold;
+  padding: 10px;
+  background-color: #3d3d3d;
+  border-radius: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: var(--z-player-name);
+}
+
+.inTurn .name {
+  background-color: var(--in-turn-color);
+}

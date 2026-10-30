@@ -1,22 +1,23 @@
-import { styled } from 'goober';
-import { memoNamed } from 'preact-utils';
-import { useMemo } from 'preact/hooks';
-import { match } from 'ts-data-forge';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, view, type JSX } from 'synstate-dom';
 import type { RectSize } from 'ts-utils-additional';
-import { zIndex } from '../../constants/index.mjs';
 import type { DecidedAnswerBalloonProps } from '../../types/index.mjs';
-import { CardComponent } from '../card/index.mjs';
 import {
-  createBalloonBody,
-  createBalloonWithDownArrow,
-  createBalloonWithLeftArrow,
-  createBalloonWithRightArrow,
-  createBalloonWithUpArrow,
-} from './balloon-base.js';
-import { calcBalloonPosition } from './calc-balloon-position.mjs';
+  CardComponent,
+  faceUpCard,
+  isSameCardDisplay,
+} from '../card/index.mjs';
+import {
+  balloonClasses,
+  balloonPositionStyle,
+  balloonSizeStyle,
+} from './balloon-base.mjs';
+import * as styles from './decided-answer-balloon.module.css';
 import { smallCardSize } from './small-card-size.mjs';
 
-type Props = DecidedAnswerBalloonProps;
+type Props = Readonly<{
+  props: InitializedObservable<DecidedAnswerBalloonProps>;
+}>;
 
 const balloonPaddingPx = 5;
 
@@ -27,132 +28,86 @@ const balloonSize: RectSize = {
 
 const symbolSize: number = smallCardSize.height;
 
-const marginBetweenCardAndBalloon = 10;
+export const DecidedAnswerBalloon = ({ props }: Props): JSX.Element => {
+  const symbolStyle = {
+    top: constant(`${(balloonSize.height - symbolSize) / 2}px`),
+    left: constant(`${(balloonSize.width - symbolSize) / 2}px`),
+  } as const;
 
-export const DecidedAnswerBalloon = memoNamed<Props>(
-  'DecidedAnswerBalloon',
-  ({ anchorCardRect, arrowDirection, card, showSymbol }) => {
-    const positionStyle = useMemo<preact.CSSProperties>(
-      () =>
-        calcBalloonPosition({
-          anchorCardRect,
-          arrowDirection,
-          balloonSize,
-          marginBetweenCardAndBalloon,
-        }),
-      [anchorCardRect, arrowDirection],
-    );
-
-    const Balloon = useMemo(
-      () =>
-        match(arrowDirection, {
-          S: BalloonWithDownArrow,
-          E: BalloonWithRightArrow,
-          N: BalloonWithUpArrow,
-          W: BalloonWithLeftArrow,
-        }),
-      [arrowDirection],
-    );
-
-    const oStyle = useMemo(
-      () => ({ opacity: showSymbol === 'o' ? 1 : 0 }),
-      [showSymbol],
-    );
-
-    const xStyle = useMemo(
-      () => ({ opacity: showSymbol === 'x' ? 1 : 0 }),
-      [showSymbol],
-    );
-
-    return (
-      <Wrapper style={positionStyle}>
-        <Balloon>
-          <BalloonContent>
-            <CardComponent
-              color={card.color}
-              float={'never'}
-              isClickable={false}
-              number={card.number}
-              showOutline={'never'}
-              size={smallCardSize}
-              visibilityFromMe={'faceUp'}
-            />
-          </BalloonContent>
-        </Balloon>
-
-        <SymbolSvg
-          fill={'none'}
-          height={symbolSize}
-          style={oStyle}
-          viewBox={'0 0 100 100'}
-          width={symbolSize}
-          xmlns={'http://www.w3.org/2000/svg'}
+  return (
+    <div
+      class={constant(styles.balloon)}
+      style={{
+        ...balloonSizeStyle(balloonSize),
+        ...balloonPositionStyle(props, balloonSize),
+      }}
+    >
+      <div
+        class={balloonClasses(view(props, (p) => p.arrowDirection))}
+        style={balloonSizeStyle(balloonSize)}
+      >
+        <div
+          class={constant(styles.content)}
+          style={{ padding: constant(`${balloonPaddingPx}px`) }}
         >
-          <circle
-            cx={'50'}
-            cy={'50'}
-            r={'45.5'}
-            stroke={'#FF0000'}
-            strokeWidth={'9'}
+          <CardComponent
+            card={props.pipe(
+              map(({ card }) => faceUpCard(card), {
+                equals: isSameCardDisplay,
+              }),
+            )}
+            size={constant(smallCardSize)}
           />
-        </SymbolSvg>
+        </div>
+      </div>
 
-        <SymbolSvg
-          fill={'none'}
-          height={symbolSize}
-          style={xStyle}
-          viewBox={'0 0 104 104'}
-          width={symbolSize}
-          xmlns={'http://www.w3.org/2000/svg'}
-        >
-          <rect
-            fill={'#FF0000'}
-            height={'9'}
-            transform={'rotate(-45 0 96.8735)'}
-            width={'137'}
-            y={'96.8735'}
-          />
-          <rect
-            fill={'#FF0000'}
-            height={'9'}
-            transform={'rotate(-135 96.9924 103.356)'}
-            width={'137'}
-            x={'96.9924'}
-            y={'103.356'}
-          />
-        </SymbolSvg>
-      </Wrapper>
-    );
-  },
-);
+      <svg
+        class={constant(styles.symbol)}
+        fill={constant('none')}
+        height={constant(symbolSize)}
+        style={{
+          ...symbolStyle,
+          opacity: view(props, (p) => (p.showSymbol === 'o' ? '1' : '0')),
+        }}
+        viewBox={constant('0 0 100 100')}
+        width={constant(symbolSize)}
+      >
+        <circle
+          cx={constant('50')}
+          cy={constant('50')}
+          r={constant('45.5')}
+          stroke={constant('#FF0000')}
+          stroke-width={constant('9')}
+        />
+      </svg>
 
-const BalloonBody = createBalloonBody(balloonSize);
-
-const BalloonWithDownArrow = createBalloonWithDownArrow(BalloonBody);
-
-const BalloonWithUpArrow = createBalloonWithUpArrow(BalloonBody);
-
-const BalloonWithLeftArrow = createBalloonWithLeftArrow(BalloonBody);
-
-const BalloonWithRightArrow = createBalloonWithRightArrow(BalloonBody);
-
-const BalloonContent = styled('div')`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: ${balloonPaddingPx}px;
-`;
-
-const Wrapper = styled('div')`
-  position: absolute;
-  width: ${balloonSize.width}px;
-  height: ${balloonSize.height}px;
-`;
-
-const SymbolSvg = styled('svg')`
-  position: absolute;
-  z-index: ${zIndex.balloon};
-  top: calc(${(balloonSize.height - symbolSize) / 2}px);
-  left: calc(${(balloonSize.width - symbolSize) / 2}px);
-  transition: opacity 0.3s ease;
-`;
+      <svg
+        class={constant(styles.symbol)}
+        fill={constant('none')}
+        height={constant(symbolSize)}
+        style={{
+          ...symbolStyle,
+          opacity: view(props, (p) => (p.showSymbol === 'x' ? '1' : '0')),
+        }}
+        viewBox={constant('0 0 104 104')}
+        width={constant(symbolSize)}
+      >
+        <rect
+          fill={constant('#FF0000')}
+          height={constant('9')}
+          transform={constant('rotate(-45 0 96.8735)')}
+          width={constant('137')}
+          y={constant('96.8735')}
+        />
+        <rect
+          fill={constant('#FF0000')}
+          height={constant('9')}
+          transform={constant('rotate(-135 96.9924 103.356)')}
+          width={constant('137')}
+          x={constant('96.9924')}
+          y={constant('103.356')}
+        />
+      </svg>
+    </div>
+  );
+};

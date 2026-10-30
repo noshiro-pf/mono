@@ -1,0 +1,12 @@
+/* The track sizes are set inline from the table's size. */
+.table {
+  background-color: #c4c4c4;
+  border-radius: 20px;
+  display: grid;
+  grid-template-areas:
+    '. . n . .'
+    '. . N . .'
+    'w W . E e'
+    '. . S . .'
+    '. . s . .';
+}

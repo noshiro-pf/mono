@@ -1,0 +1,8 @@
+.cards {
+  display: flex;
+  padding: var(--my-cards-gap);
+}
+
+.cards > * {
+  margin: var(--my-cards-gap);
+}

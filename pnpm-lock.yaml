@@ -445,30 +445,18 @@ importers:
 
   apps/algo-app:
     dependencies:
-      better-preact-use-state:
-        specifier: workspace:*
-        version: link:../../libs/better-preact-use-state
       firebase:
         specifier: ^12.19.0
         version: 12.19.0
-      goober:
-        specifier: ^2.1.19
-        version: 2.1.19(csstype@3.2.3)
       immer:
         specifier: ^11.2.7
         version: 11.2.7
-      preact-utils:
-        specifier: workspace:*
-        version: link:../preact-utils
-      resize-observer-preact-hooks:
-        specifier: workspace:*
-        version: link:../resize-observer-preact-hooks
       synstate:
         specifier: workspace:*
         version: link:../../libs/synstate
-      synstate-preact-hooks:
+      synstate-dom:
         specifier: workspace:*
-        version: link:../../libs/synstate-preact-hooks
+        version: link:../../libs/synstate-dom
       tiny-router-observable:
         specifier: workspace:*
         version: link:../tiny-router-observable
@@ -506,9 +494,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      preact:
-        specifier: 'catalog:'
-        version: 10.29.8(preact-render-to-string@6.8.1)
       prettier:
         specifier: 'catalog:'
         version: 3.9.10

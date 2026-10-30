@@ -1,122 +1,73 @@
-import { useState } from 'better-preact-use-state';
-import { styled } from 'goober';
-import { memoNamed } from 'preact-utils';
-import { useCallback } from 'preact/hooks';
-import { useObservableValue } from 'synstate-preact-hooks';
+import { createState } from 'synstate';
+import { constant, derive, If, type JSX } from 'synstate-dom';
 import { dictionary } from '../constants/index.mjs';
 import { roomStore } from '../store/index.mjs';
-import { ButtonPrimary, Input, Spinner } from './bp/index.mjs';
+import { Button, Input, Spinner } from './bp/index.mjs';
+import * as styles from './room-form.module.css';
 
 const dc = dictionary.createRoom;
 
-export const CreateRoomPage = memoNamed('CreateRoomPage', () => {
-  const [password, setPassword] = useState<string>('');
+export const CreateRoomPage = (): JSX.Element => {
+  const [password, setPassword, { getSnapshot: getPassword }] =
+    createState<string>('');
 
-  const [username, setUsername] = useState<string>('');
+  const [username, setUsername, { getSnapshot: getUsername }] =
+    createState<string>('');
 
-  const onPasswordInput: preact.GenericEventHandler<HTMLInputElement> =
-    useCallback(
-      (ev) => {
-        setPassword(ev.currentTarget.value);
-      },
-      [setPassword],
-    );
+  const loading = roomStore.createRoom.isWaitingResponse;
 
-  const onUsernameInput: preact.GenericEventHandler<HTMLInputElement> =
-    useCallback(
-      (ev) => {
-        setUsername(ev.currentTarget.value);
-      },
-      [setUsername],
-    );
-
-  const disabled: boolean = username === '';
-
-  const onCreateRoomButtonClick = useCallback(() => {
-    roomStore.createRoom.dispatch({ username, password }).catch(console.error);
-  }, [username, password]);
-
-  const loading = useObservableValue(roomStore.createRoom.isWaitingResponse);
+  const onCreateRoomButtonClick = (): void => {
+    roomStore.createRoom
+      .dispatch({ username: getUsername(), password: getPassword() })
+      .catch(console.error);
+  };
 
   return (
-    <Centering>
-      <FormRect>
-        <Block>
-          <Label>{dc.gamePassword.label}</Label>
+    <div class={constant(styles.centering)}>
+      <div class={constant(styles.form)}>
+        <div class={constant(styles.block)}>
+          <div class={constant(styles.label)}>
+            {constant(dc.gamePassword.label)}
+          </div>
           <Input
             disabled={loading}
+            label={dc.gamePassword.label}
             placeholder={dc.gamePassword.placeholder}
-            type={'text'}
             value={password}
-            onInput={onPasswordInput}
+            onValueChange={setPassword}
           />
-        </Block>
-        <Block>
-          <Label>{dc.username.label}</Label>
+        </div>
+        <div class={constant(styles.block)}>
+          <div class={constant(styles.label)}>
+            {constant(dc.username.label)}
+          </div>
           <Input
             disabled={loading}
+            label={dc.username.label}
             placeholder={dc.username.placeholder}
-            type={'text'}
             value={username}
-            onInput={onUsernameInput}
+            onValueChange={setUsername}
           />
-        </Block>
-        <ButtonWrapper>
-          <ButtonPrimary
-            disabled={disabled || loading}
-            type={'button'}
+        </div>
+        <div class={constant(styles.buttonWrapper)}>
+          <Button
+            intent={'primary'}
+            disabled={derive(
+              [username, loading],
+              (name, isLoading) => name === '' || isLoading,
+            )}
             onClick={onCreateRoomButtonClick}
           >
-            <ButtonContent>
-              {loading ? <Spinner size={20} /> : <span>{dc.button}</span>}
-            </ButtonContent>
-          </ButtonPrimary>
-        </ButtonWrapper>
-      </FormRect>
-    </Centering>
+            <div class={constant(styles.createButtonContent)}>
+              <If
+                cond={loading}
+                else={<span>{constant(dc.button)}</span>}
+                then={<Spinner size={20} />}
+              />
+            </div>
+          </Button>
+        </div>
+      </div>
+    </div>
   );
-});
-
-const Centering = styled('div')`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgb(255 255 255) 0%,
-    rgb(202 202 202) 100%
-  );
-`;
-
-const FormRect = styled('div')`
-  width: 400px;
-  height: 500px;
-  border-radius: 10px;
-  background-color: white;
-  filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
-
-  padding: 40px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const Block = styled('div')`
-  margin: 10px;
-  padding: 10px;
-`;
-
-const Label = styled('div')`
-  font-weight: bold;
-  margin-bottom: 5px;
-`;
-
-const ButtonWrapper = styled('div')`
-  margin: 10px;
-`;
-
-const ButtonContent = styled('div')`
-  width: 70px;
-`;
+};

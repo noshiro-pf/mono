@@ -1,0 +1,12 @@
+.area {
+  max-width: 100%;
+  max-height: 100%;
+  position: relative;
+}
+
+.rotate {
+  position: absolute;
+  z-index: var(--z-cards);
+  display: flex;
+  justify-content: space-between;
+}

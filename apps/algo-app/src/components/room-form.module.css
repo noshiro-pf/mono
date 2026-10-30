@@ -1,0 +1,48 @@
+.centering {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgb(255 255 255) 0%,
+    rgb(202 202 202) 100%
+  );
+}
+
+.form {
+  width: 400px;
+  height: 500px;
+  border-radius: 10px;
+  background-color: white;
+  filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.25));
+
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.block {
+  margin: 10px;
+  padding: 10px;
+}
+
+.label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.buttonWrapper {
+  margin: 10px;
+}
+
+.createButtonContent {
+  width: 70px;
+}
+
+.error {
+  font-size: small;
+  color: red;
+}
