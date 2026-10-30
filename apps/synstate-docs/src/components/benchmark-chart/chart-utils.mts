@@ -2,6 +2,22 @@
 
 import { Arr, asPositiveSafeInt, PositiveSafeInt } from 'ts-data-forge';
 
+/**
+ * How a line chart draws a series, in the plot and in the legend alike: a
+ * naive form dashed, thinner and with smaller dots, so that it does not read
+ * as its library's own line.
+ */
+export const lineStyleOf = (
+  naive: boolean | undefined,
+): Readonly<{
+  strokeDasharray: string | undefined;
+  strokeWidth: number;
+  dotRadius: number;
+}> =>
+  naive === true
+    ? ({ strokeDasharray: '5,3', strokeWidth: 1.5, dotRadius: 2 } as const)
+    : ({ strokeDasharray: undefined, strokeWidth: 2, dotRadius: 3 } as const);
+
 export const formatTickLabel = (v: number): string =>
   v >= 1000
     ? (`${(v / 1000).toString()}s` as const)

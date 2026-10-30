@@ -1,7 +1,13 @@
 import * as React from 'react';
+import { lineStyleOf } from './chart-utils.mjs';
 
 type Props = Readonly<{
-  series: readonly Readonly<{ label: string; color: string }>[];
+  series: readonly Readonly<{
+    label: string;
+    color: string;
+    /** Drawn dashed and thinner, as the line chart draws it. */
+    naive?: boolean;
+  }>[];
   /** A line with a dot for a line chart, a filled box for a bar chart. */
   marker: 'line' | 'swatch';
 }>;
@@ -16,45 +22,50 @@ type Props = Readonly<{
  */
 export const ChartLegend = React.memo<Props>(({ series, marker }) => (
   <ul className={'not-content'} style={listStyle}>
-    {series.map((s) => (
-      <li key={s.label} style={itemStyle}>
-        <svg
-          aria-hidden={true}
-          height={MARKER_HEIGHT}
-          viewBox={`0 0 ${MARKER_WIDTH.toString()} ${MARKER_HEIGHT.toString()}`}
-          width={MARKER_WIDTH}
-        >
-          {marker === 'line' ? (
-            <>
-              <line
-                stroke={s.color}
-                strokeWidth={2}
-                x1={0}
-                x2={MARKER_WIDTH}
-                y1={MARKER_HEIGHT / 2}
-                y2={MARKER_HEIGHT / 2}
-              />
-              <circle
-                cx={MARKER_WIDTH / 2}
-                cy={MARKER_HEIGHT / 2}
+    {series.map((s) => {
+      const style = lineStyleOf(s.naive);
+
+      return (
+        <li key={s.label} style={itemStyle}>
+          <svg
+            aria-hidden={true}
+            height={MARKER_HEIGHT}
+            viewBox={`0 0 ${MARKER_WIDTH.toString()} ${MARKER_HEIGHT.toString()}`}
+            width={MARKER_WIDTH}
+          >
+            {marker === 'line' ? (
+              <>
+                <line
+                  stroke={s.color}
+                  strokeDasharray={style.strokeDasharray}
+                  strokeWidth={style.strokeWidth}
+                  x1={0}
+                  x2={MARKER_WIDTH}
+                  y1={MARKER_HEIGHT / 2}
+                  y2={MARKER_HEIGHT / 2}
+                />
+                <circle
+                  cx={MARKER_WIDTH / 2}
+                  cy={MARKER_HEIGHT / 2}
+                  fill={s.color}
+                  r={style.dotRadius}
+                />
+              </>
+            ) : (
+              <rect
                 fill={s.color}
-                r={3}
+                height={SWATCH_HEIGHT}
+                rx={2}
+                width={SWATCH_WIDTH}
+                x={(MARKER_WIDTH - SWATCH_WIDTH) / 2}
+                y={(MARKER_HEIGHT - SWATCH_HEIGHT) / 2}
               />
-            </>
-          ) : (
-            <rect
-              fill={s.color}
-              height={SWATCH_HEIGHT}
-              rx={2}
-              width={SWATCH_WIDTH}
-              x={(MARKER_WIDTH - SWATCH_WIDTH) / 2}
-              y={(MARKER_HEIGHT - SWATCH_HEIGHT) / 2}
-            />
-          )}
-        </svg>
-        {s.label}
-      </li>
-    ))}
+            )}
+          </svg>
+          {s.label}
+        </li>
+      );
+    })}
   </ul>
 ));
 

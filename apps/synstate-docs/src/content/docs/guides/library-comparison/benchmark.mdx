@@ -31,7 +31,7 @@ In no scenario does SynState take more than {/* bench:summary/synstate-worst-ove
 
 ※1 RxJS is not glitch-free: in a diamond its subscriber also sees a combination of an old and a new value ([RxJS glitch](#scenario-diamond-dependency)). Among the libraries that are, {/* bench:summary/diamond-fastest-glitch-free */}Preact Signals{/* /bench */} is the fastest.
 
-※2 SynState written with `switchMap`, which follows the selected branch only, as MobX, Jotai, Solid and Preact Signals do. Written with a `derive` over every branch, it is {/* bench:summary/fan-out-synstate-combine-over-fastest */}754{/* /bench */}×; the [scenario](#scenario-conditional-fan-out) shows both. That form is also left out of the slowest column.
+※2 SynState written with `switchMap`, which follows the selected branch only, as MobX, Jotai, Solid and Preact Signals do. Written naively, with a `derive` over every branch, it is {/* bench:summary/fan-out-synstate-naive-over-fastest */}754{/* /bench */}×; the [scenario](#scenario-conditional-fan-out) shows both, the naive one dashed. The naive forms of SynState and RxJS are also left out of the slowest column.
 
 A ratio marked `>` is a library that did not complete within the timeout ({/* bench:cascaded-diamond/timeout */}5,000 ms{/* /bench */}), divided as if it had taken exactly that long.
 
@@ -970,8 +970,8 @@ The graph has B branches and a selector, a source that says which branch the res
 
 The key difference between libraries is **whether `branch[1]` has any observers (subscribers)**:
 
-- **Static subscriptions (SynState, RxJS)**: `derive` (SynState) and `combineLatest` (RxJS) subscribe to all branches at construction time, so `branch[1]` has an observer. When `branch[1]` is updated, the node fires, the projection produces the same value as before, and equality comparison prevents downstream propagation. Cost scales with B because every update reads all B branches.
-- **The same two with `switchMap` (the "(switchMap)" rows)**: `selector.pipe(switchMap((sel) => branches[sel]))` subscribes to the selected branch only, and to another one when the selector changes, so `branch[1]` has no observer here either. This is how SynState and RxJS express a dynamic dependency.
+- **SynState and RxJS with `switchMap` (the "(switchMap)" rows)**: `selector.pipe(switchMap((sel) => branches[sel]))` subscribes to the selected branch only, and to another one when the selector changes, so `branch[1]` has no observer, as in the dynamic subscriptions below. This is how SynState and RxJS express a dynamic dependency.
+- **The same two written naively, as static subscriptions (the "(naive …)" rows, dashed in the chart)**: a `derive` (SynState) or `combineLatest` (RxJS) over the selector and every branch subscribes to all branches at construction time, so `branch[1]` has an observer. When `branch[1]` is updated, the node fires, the projection produces the same value as before, and equality comparison prevents downstream propagation. Cost scales with B because every update reads all B branches. These rows are here to show what holding a branch nobody reads costs, not as a way either library is meant to be written.
 - **Dynamic subscriptions (Jotai, MobX, Solid, Preact Signals)**: The `computed`, memo or derived atom only subscribes to observables that were actually read during its last run. When `selector = 0`, only `branch[0].get()` is called, so `branch[1]`'s observer list is **empty**. Updating `branch[1]` has nothing to notify — nothing happens.
 - **One store (Redux)**: there is no per-branch subscription to have or not have. Every dispatch runs the reducer and calls every subscriber, whichever branch it changed, and the subscriber's selector reads the selected branch only. The write itself copies the `branches` array, so part of the cost grows with B.
 
@@ -979,11 +979,11 @@ The key difference between libraries is **whether `branch[1]` has any observers 
 
 {/* benchmark-result-conditional-fan-out */}
 | Library | B=2 | B=5 | B=10 | B=20 | B=50 | B=100 | B=200 | B=500 | B=1000 |
-| ------------------------ | -------: | -------: | -------: | -------: | -------: | -------: | -------: | -------: | -------: |
-| **SynState** | 10.9 ms | 11.6 ms | 14.3 ms | 20.2 ms | 38.9 ms | 71.6 ms | 140.3 ms | 312.4 ms | 685.7 ms |
+| --------------------------- | -------: | -------: | -------: | -------: | -------: | -------: | -------: | -------: | -------: |
 | **SynState** (switchMap) | 4.8 ms | 3.4 ms | 3.4 ms | 3.5 ms | 3.8 ms | 3.5 ms | 3.6 ms | 6.2 ms | 4.0 ms |
-| RxJS | 8.8 ms | 8.4 ms | 8.5 ms | 8.8 ms | 10.5 ms | 11.5 ms | 17.0 ms | 33.6 ms | 60.4 ms |
+| **SynState** (naive derive) | 10.9 ms | 11.6 ms | 14.3 ms | 20.2 ms | 38.9 ms | 71.6 ms | 140.3 ms | 312.4 ms | 685.7 ms |
 | RxJS (switchMap) | 3.4 ms | 2.9 ms | 2.8 ms | 2.8 ms | 2.8 ms | 2.8 ms | 2.8 ms | 3.0 ms | 3.2 ms |
+| RxJS (naive combineLatest) | 8.8 ms | 8.4 ms | 8.5 ms | 8.8 ms | 10.5 ms | 11.5 ms | 17.0 ms | 33.6 ms | 60.4 ms |
 | Jotai | 136.2 ms | 135.6 ms | 135.7 ms | 136.6 ms | 136.3 ms | 135.6 ms | 135.9 ms | 135.7 ms | 136.3 ms |
 | MobX | 1.5 ms | 1.5 ms | 1.4 ms | 1.4 ms | 1.4 ms | 1.4 ms | 1.4 ms | 1.5 ms | 1.5 ms |
 | Redux | 117.4 ms | 116.7 ms | 118.8 ms | 122.7 ms | 118.8 ms | 125.2 ms | 129.4 ms | 151.8 ms | 178.9 ms |
@@ -993,14 +993,16 @@ The key difference between libraries is **whether `branch[1]` has any observers 
 
 <ConditionalFanOutChart />
 
+The dashed lines are the naive forms. SynState's own line is the solid "SynState (switchMap)".
+
 ### Key observations
 
 - **MobX**, **Solid** and **Preact Signals** are the fastest in this scenario. `computed(() => branches[selector.get()].get())` subscribes only to `selector` and `branches[0]` at runtime, so `branches[1]`'s observer list is empty. Updating `branches[1]` has no one to notify — the cost is constant regardless of B: ~{/* bench:fan-out/mobx-typical */}1.4 ms{/* /bench */} for MobX, ~{/* bench:fan-out/solid-typical */}0.7 ms{/* /bench */} for Solid and ~{/* bench:fan-out/preact-signals-typical */}1.1 ms{/* /bench */} for Preact Signals. What is left is each library's cost of a write with no observer: a comparison of the value, plus a version bump in Preact Signals.
-- **SynState**'s cost scales linearly with B because `derive` subscribes to all branches at construction time, so any branch update fires it. The linear trend is clearly visible in the chart: from {/* bench:fan-out/synstate@min-b */}10.9 ms{/* /bench */} at B=2 to {/* bench:fan-out/synstate@last-measured-b */}686 ms{/* /bench */} at B={/* bench:fan-out/synstate-last-measured-b */}1000{/* /bench */} (≈{/* bench:fan-out/synstate-ns-per-branch-per-update */}7{/* /bench */} ns per branch per update, over {/* bench:fan-out/updates-math */}$K = 100{,}000${/* /bench */} updates).
-- **SynState with `switchMap`** stays at ~{/* bench:fan-out/synstate-switch-map-typical */}3.6 ms{/* /bench */} regardless of B, and **RxJS with `switchMap`** at ~{/* bench:fan-out/rxjs-switch-map-typical */}2.8 ms{/* /bench */}: an update of `branch[1]` reaches no node in either. What the SynState row above measures is the `derive` over every branch it was written with, not a limit of the model.
-- **RxJS** uses the same static `combineLatest` approach. Its cost also scales with B but more slowly than SynState, because `combineLatest` does not perform equality comparison — it always emits, and the subscriber does minimal work (assigning a value).
-- **Jotai** uses dynamic subscriptions like MobX — `resultAtom` does not subscribe to the inactive branch, so no recomputation is triggered. However, `store.set()` itself performs bookkeeping operations (invalidation checks) inside the atom store, producing a constant overhead of ~{/* bench:fan-out/jotai-typical */}136 ms{/* /bench */} regardless of B. This makes Jotai slower than SynState for B≤{/* bench:fan-out/jotai-slower-through-b */}100{/* /bench */}.
-- **Redux** takes {/* bench:fan-out/redux@min-b */}117 ms{/* /bench */} at B=2 and {/* bench:fan-out/redux@last-measured-b */}179 ms{/* /bench */} at B={/* bench:fan-out/synstate-last-measured-b */}1000{/* /bench */}. Most of it is the dispatch and the subscriber call every update pays whatever B is; what grows with B is the copy of the `branches` array.
+- **SynState with `switchMap`** stays at ~{/* bench:fan-out/synstate-switch-map-typical */}3.6 ms{/* /bench */} regardless of B, and **RxJS with `switchMap`** at ~{/* bench:fan-out/rxjs-switch-map-typical */}2.8 ms{/* /bench */}: an update of `branch[1]` reaches no node in either.
+- **SynState written naively** grows linearly with B because its `derive` subscribes to all branches at construction time, so any branch update fires it. The dashed line shows the trend: from {/* bench:fan-out/synstate-naive@min-b */}10.9 ms{/* /bench */} at B=2 to {/* bench:fan-out/synstate-naive@last-measured-b */}686 ms{/* /bench */} at B={/* bench:fan-out/last-measured-b */}1000{/* /bench */} (≈{/* bench:fan-out/synstate-naive-ns-per-branch-per-update */}7{/* /bench */} ns per branch per update, over {/* bench:fan-out/updates-math */}$K = 100{,}000${/* /bench */} updates). What this row measures is the `derive` over every branch it was written with, not a limit of the model.
+- **RxJS written naively** uses the same static approach with `combineLatest`. Its cost also scales with B but more slowly than SynState's naive form, because `combineLatest` does not perform equality comparison — it always emits, and the subscriber does minimal work (assigning a value).
+- **Jotai** uses dynamic subscriptions like MobX — `resultAtom` does not subscribe to the inactive branch, so no recomputation is triggered. However, `store.set()` itself performs bookkeeping operations (invalidation checks) inside the atom store, producing a constant overhead of ~{/* bench:fan-out/jotai-typical */}136 ms{/* /bench */} regardless of B. This makes Jotai slower than even SynState's naive form for B≤{/* bench:fan-out/jotai-slower-through-b */}100{/* /bench */}.
+- **Redux** takes {/* bench:fan-out/redux@min-b */}117 ms{/* /bench */} at B=2 and {/* bench:fan-out/redux@last-measured-b */}179 ms{/* /bench */} at B={/* bench:fan-out/last-measured-b */}1000{/* /bench */}. Most of it is the dispatch and the subscriber call every update pays whatever B is; what grows with B is the copy of the `branches` array.
 
     :::note[This benchmark is an intentionally favorable scenario for dynamic subscriptions]
     This benchmark is designed to illustrate the theoretical difference between static and dynamic subscriptions, and **intentionally constructs conditions most favorable to the dynamic subscription side**. Even so, the static libraries written the natural way, with `switchMap`, stay within a few milliseconds: SynState ~{/* bench:fan-out/synstate-switch-map-typical */}3.6 ms{/* /bench */} and RxJS ~{/* bench:fan-out/rxjs-switch-map-typical */}2.8 ms{/* /bench */} against MobX's ~{/* bench:fan-out/mobx-typical */}1.4 ms{/* /bench */} and Solid's ~{/* bench:fan-out/solid-typical */}0.7 ms{/* /bench */}, at every branch count, over {/* bench:fan-out/updates-math */}$K = 100{,}000${/* /bench */} updates.
@@ -1012,7 +1014,52 @@ The key difference between libraries is **whether `branch[1]` has any observers 
 
 ### Implementation details
 
-#### SynState
+#### SynState (`switchMap`)
+
+```tsx
+export const runBenchmark = (k: number, branchCount: number): number => {
+    const [selector] = createState(0);
+
+    const branches: DeepReadonly<
+        {
+            source: Observable<number>;
+            set: (v: number) => void;
+        }[]
+    > = Arr.zeros(asUint32(branchCount)).map(() => {
+        const [source, setSource] = createState(0);
+
+        return { source, set: setSource };
+    });
+
+    // Dynamic dependency: only follows the branch selected by selector
+    const result = selector.pipe(
+        switchMap((sel) => branches[sel]?.source ?? just(0)),
+    );
+
+    let mut_lastValue = 0;
+
+    const subscription = result.subscribe((v) => {
+        mut_lastValue = v;
+    });
+
+    // Update an INACTIVE branch (branch 1, while selector = 0)
+    const inactiveBranch = branches[1];
+
+    if (inactiveBranch === undefined) {
+        throw new Error('need at least 2 branches');
+    }
+
+    for (let mut_i = 1; mut_i <= k; mut_i++) {
+        inactiveBranch.set(mut_i);
+    }
+
+    subscription.unsubscribe();
+
+    return mut_lastValue;
+};
+```
+
+#### SynState (naive `derive`)
 
 ```tsx
 export const runBenchmark = (k: number, branchCount: number): number => {
@@ -1065,52 +1112,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 };
 ```
 
-#### SynState (`switchMap`)
-
-```tsx
-export const runBenchmark = (k: number, branchCount: number): number => {
-    const [selector] = createState(0);
-
-    const branches: DeepReadonly<
-        {
-            source: Observable<number>;
-            set: (v: number) => void;
-        }[]
-    > = Arr.zeros(asUint32(branchCount)).map(() => {
-        const [source, setSource] = createState(0);
-
-        return { source, set: setSource };
-    });
-
-    // Dynamic dependency: only follows the branch selected by selector
-    const result = selector.pipe(
-        switchMap((sel) => branches[sel]?.source ?? just(0)),
-    );
-
-    let mut_lastValue = 0;
-
-    const subscription = result.subscribe((v) => {
-        mut_lastValue = v;
-    });
-
-    // Update an INACTIVE branch (branch 1, while selector = 0)
-    const inactiveBranch = branches[1];
-
-    if (inactiveBranch === undefined) {
-        throw new Error('need at least 2 branches');
-    }
-
-    for (let mut_i = 1; mut_i <= k; mut_i++) {
-        inactiveBranch.set(mut_i);
-    }
-
-    subscription.unsubscribe();
-
-    return mut_lastValue;
-};
-```
-
-#### RxJS
+#### RxJS (`switchMap`)
 
 ```tsx
 export const runBenchmark = (k: number, branchCount: number): number => {
@@ -1120,15 +1122,8 @@ export const runBenchmark = (k: number, branchCount: number): number => {
         asUint32(branchCount),
     ).map(() => new BehaviorSubject(0));
 
-    // `combineLatest` only infers the element types from an array literal.
-    // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
-    const result = combineLatest([selector, ...branches]).pipe(
-        map((values) => {
-            const sel = values[0];
-
-            return values[sel + 1] ?? 0;
-        }),
-    );
+    // Dynamic dependency: only follows the branch selected by selector
+    const result = selector.pipe(switchMap((sel) => branches[sel] ?? of(0)));
 
     let mut_lastValue = 0;
 
@@ -1153,7 +1148,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 };
 ```
 
-#### RxJS (`switchMap`)
+#### RxJS (naive `combineLatest`)
 
 ```tsx
 export const runBenchmark = (k: number, branchCount: number): number => {
@@ -1163,8 +1158,15 @@ export const runBenchmark = (k: number, branchCount: number): number => {
         asUint32(branchCount),
     ).map(() => new BehaviorSubject(0));
 
-    // Dynamic dependency: only follows the branch selected by selector
-    const result = selector.pipe(switchMap((sel) => branches[sel] ?? of(0)));
+    // `combineLatest` only infers the element types from an array literal.
+    // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
+    const result = combineLatest([selector, ...branches]).pipe(
+        map((values) => {
+            const sel = values[0];
+
+            return values[sel + 1] ?? 0;
+        }),
+    );
 
     let mut_lastValue = 0;
 
@@ -1450,7 +1452,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 - **Redux** (Deep Chain, Conditional Fan-Out): the reducer is a plain function matched against a `createAction`, not a `createSlice` reducer. An Immer draft of $M$ points or $B$ branches would be created and finalized element by element on every update, and that would measure Immer rather than the store. The first three scenarios keep `createSlice`, where the state is one number.
 - **Redux** (Deep Chain): a selector cannot read its own previous output, so the `scan` chain is the reducer's loop over each stage's stored position. Like MobX's, that is imperative code, and Redux's row measures it as such.
 - **Zustand** and **Valtio** (Single State only): neither vanilla API has a derived-value node (Valtio's `derive` is a separate package), so in the other scenarios they could only compute the derived value inline in the subscriber — fewer nodes than the graph the other libraries build, and so not the same measurement. They take part only where no library derives anything. For Valtio, the third argument `true` to `subscribe` makes notification synchronous, so that the subscriber fires on every mutation (Valtio batches asynchronously by default).
-- **RxJS** (Diamond, Cascaded Diamond, Conditional Fan-Out): `combineLatest` produces a tuple that a following `map` turns into the value, so each merge is two nodes where SynState's `derive`, MobX's `computed` and Jotai's derived atom are one. That costs it one node and one array per merge, and it is how RxJS writes a merge.
+- **RxJS** (Diamond, Cascaded Diamond, and Conditional Fan-Out's naive row): `combineLatest` produces a tuple that a following `map` turns into the value, so each merge is two nodes where SynState's `derive`, MobX's `computed` and Jotai's derived atom are one. That costs it one node and one array per merge, and it is how RxJS writes a merge.
 - **MobX** (Deep Chain): a `computed` cannot read its own previous output, so the `scan` chain is written as `observable.box`es that one `reaction` updates in a loop inside a single action. That is imperative code, not a chain of derived nodes, and MobX's row measures it as such.
 - **RxJS** (Diamond Dependency): `combineLatest` fires the subscriber twice per source update due to the [glitch problem](/mono/synstate/internals/how-synstate-solved-the-glitch/). The benchmark measures wall-clock time including this extra work, which reflects the real-world cost of diamond dependencies in RxJS.
 - **Solid**: the scenarios import `solid-js/dist/solid.js`, the build a bundler picks for the browser. The root export of `solid-js` resolves to its server build under Node's `node` condition, where a memo is computed once and an effect never runs, so in this Node benchmark it would measure nothing. The functions are the same ones an application imports from `solid-js`. Every graph is created inside `createRoot`, which is what lets it be disposed, and the subscriber is a `createEffect`. Solid 1.9 is measured: Solid 2.0, whose core is published on its own as `@solidjs/signals`, was a release candidate when this was written.
@@ -1460,7 +1462,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 - **MobX**: `reaction` is used instead of `autorun` to match other libraries' subscribe-and-record pattern. `runInAction` wraps each mutation as required by MobX strict mode.
 - **Jotai**: `store.sub()` does not pass the current value to the callback, so an additional `store.get()` call is made inside the listener. The initial value is also read via `store.get()` before subscribing.
 - Except in the deep chain, all libraries create their state, derived values, and subscriptions inside the benchmark function, so setup cost is included in the measurement. The deep chain builds its graph before the timer starts.
-- **Conditional Fan-Out**: SynState and RxJS are measured twice, with a static `derive` / `combineLatest` over every branch and with `switchMap`, which subscribes to the selected branch only, as MobX, Jotai, Solid and Preact Signals do.
+- **Conditional Fan-Out**: SynState and RxJS are measured twice, naively with a static `derive` / `combineLatest` over every branch (the "(naive …)" rows) and with `switchMap`, which subscribes to the selected branch only, as MobX, Jotai, Solid and Preact Signals do.
 
 ## Analysis: Where Each Library's Time Goes
 

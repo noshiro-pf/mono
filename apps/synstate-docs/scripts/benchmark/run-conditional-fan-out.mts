@@ -7,19 +7,23 @@
  * Graph topology:
  *   selector ─┐
  *   branch[0] ─┤
- *   branch[1] ─┼─ combine/select → result
+ *   branch[1] ─┼─ select → result
  *   ...        │
  *   branch[B-1]┘
  *
  * Only branch[selector] is "active". The benchmark updates an
  * INACTIVE branch K times and measures propagation cost.
  *
- * - Static graphs (SynState, RxJS): combine fires on every update,
- *   map produces the same value, equality check prevents downstream
- *   propagation. Cost scales with B (number of branches).
+ * - SynState and RxJS with `switchMap` (the "(switchMap)" rows), the way
+ *   they write a dynamic dependency: only the selected branch is subscribed,
+ *   as in the dynamic graphs below.
  *
- * - The same two libraries with `switchMap` (the "(switchMap)" rows): only
- *   the selected branch is subscribed, as in the dynamic graphs below.
+ * - The same two written naively, as a static graph (the "(naive …)" rows):
+ *   a `derive` / `combineLatest` over every branch fires on every update, the
+ *   projection produces the same value, and an equality check prevents
+ *   downstream propagation. Cost scales with B (number of branches). These
+ *   rows show what holding every branch costs, not how either library is
+ *   meant to be used, and the chart draws them dashed.
  *
  * - Dynamic graphs (Jotai, MobX, Solid, Preact Signals): the inactive branch
  *   is not in the dependency set, so updates do not trigger recomputation at
@@ -62,15 +66,21 @@ type BenchmarkEntry = Readonly<{
 }>;
 
 const entries: readonly BenchmarkEntry[] = [
-  { label: '**SynState**', file: '05-conditional-fan-out.synstate.mts' },
   {
     label: '**SynState** (switchMap)',
     file: '05-conditional-fan-out.synstate-switch-map.mts',
   },
-  { label: 'RxJS', file: '05-conditional-fan-out.rxjs.mts' },
+  {
+    label: '**SynState** (naive derive)',
+    file: '05-conditional-fan-out.synstate.mts',
+  },
   {
     label: 'RxJS (switchMap)',
     file: '05-conditional-fan-out.rxjs-switch-map.mts',
+  },
+  {
+    label: 'RxJS (naive combineLatest)',
+    file: '05-conditional-fan-out.rxjs.mts',
   },
   { label: 'Jotai', file: '05-conditional-fan-out.jotai.mts' },
   { label: 'MobX', file: '05-conditional-fan-out.mobx.mts' },

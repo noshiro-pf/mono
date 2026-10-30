@@ -2,6 +2,7 @@ import {
   cascadedDiamond,
   conditionalFanOut,
   deepChain,
+  isNaiveForm,
   libraryColorOf,
 } from '../../data/index.mjs';
 
@@ -34,7 +35,8 @@ export const conditionalFanOutResults: SeriesResults = conditionalFanOut;
 
 /**
  * Pairs each library's measurements with the colour every chart draws it in
- * (`libraryColorOf`).
+ * (`libraryColorOf`), and marks the rows written naively on purpose
+ * (`isNaiveForm`), which a line chart draws dashed.
  *
  * The grey fallback is never drawn on a committed page: `gen:benchmark-doc`
  * fails on a results label that has no colour.
@@ -47,11 +49,13 @@ export const toColouredSeries = (
 ): readonly Readonly<{
   label: string;
   color: string;
+  naive: boolean;
   values: readonly (number | undefined)[];
 }>[] =>
   results.series.map(({ label, values }) => ({
     label,
     color: libraryColorOf(label) ?? '#6b7280',
+    naive: isNaiveForm(label),
     values: values.map((v) => v ?? undefined),
   }));
 
