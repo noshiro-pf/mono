@@ -1,12 +1,13 @@
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type * as ts from 'typescript';
-import { resolveImportPath } from './resolve-import-path.mjs';
+import { readTsConfig, resolveImportPath } from './resolve-import-path.mjs';
 
 // FIXME: https://github.com/knowledge-work/eslint-plugin-strict-dependencies/tree/v1.3.27 のテストをコピーしてきて
 // Codex でテスト・型チェックが通るようにさせただけなので、意味の無いテストになっていないかチェックして修正する
 
-// `baseUrl` is deprecated in TypeScript 6.0, but the rule still resolves legacy
-// `baseUrl`-relative `paths`, so the fixtures below have to set it.
 const compilerOptionsByFixture = {
   'no-paths': {},
   'paths-basic': {
@@ -16,51 +17,10 @@ const compilerOptionsByFixture = {
       '@/components/*': ['components/*'],
     },
   },
-  'base-url-dot': {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated -- see the note above the table
-    baseUrl: '.',
-    paths: {
-      '@/components/': ['components/'],
-    },
-  },
-  'base-url-dot-slash': {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated -- see the note above the table
-    baseUrl: './',
-    paths: {
-      '@/components/': ['components/'],
-    },
-  },
-  'base-url-parent': {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated -- see the note above the table
-    baseUrl: '../',
-    paths: {
-      '@/components/': ['components/'],
-    },
-  },
+  // `paths` are resolved from the tsconfig.json whatever `baseUrl` says.
   'base-url-src': {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated -- see the note above the table
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- the fixture is about the deprecated option
     baseUrl: 'src',
-    paths: {
-      '@/components/': ['components/'],
-    },
-  },
-  'base-url-dot-src': {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated -- see the note above the table
-    baseUrl: './src',
-    paths: {
-      '@/components/': ['components/'],
-    },
-  },
-  'base-url-src-slash': {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated -- see the note above the table
-    baseUrl: 'src/',
-    paths: {
-      '@/components/': ['components/'],
-    },
-  },
-  'base-url-dot-src-slash': {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated -- see the note above the table
-    baseUrl: './src/',
     paths: {
       '@/components/': ['components/'],
     },
@@ -102,40 +62,6 @@ const aliasCases = [
     expected: 'components/aaa/bbb',
   },
 ] as const;
-
-const baseUrlCases = [
-  {
-    fixtureName: 'base-url-dot',
-    expected: 'components/aaa/bbb',
-  },
-  {
-    fixtureName: 'base-url-dot-slash',
-    expected: 'components/aaa/bbb',
-  },
-  {
-    fixtureName: 'base-url-parent',
-    expected: '../components/aaa/bbb',
-  },
-  {
-    fixtureName: 'base-url-src',
-    expected: 'src/components/aaa/bbb',
-  },
-  {
-    fixtureName: 'base-url-dot-src',
-    expected: 'src/components/aaa/bbb',
-  },
-  {
-    fixtureName: 'base-url-src-slash',
-    expected: 'src/components/aaa/bbb',
-  },
-  {
-    fixtureName: 'base-url-dot-src-slash',
-    expected: 'src/components/aaa/bbb',
-  },
-] as const satisfies readonly Readonly<{
-  fixtureName: FixtureName;
-  expected: string;
-}>[];
 
 describe(resolveImportPath, () => {
   test('should resolve relative path', () => {
@@ -192,30 +118,16 @@ describe(resolveImportPath, () => {
     },
   );
 
-  test.each(baseUrlCases)(
-    'baseUrl $fixtureName',
-    ({ fixtureName, expected }: Readonly<(typeof baseUrlCases)[number]>) => {
-      const readCompilerOptions = readFixture(fixtureName);
-
-      expect(
-        resolveImportPath(
-          'components/aaa/bbb',
-          undefined,
-          {},
-          readCompilerOptions,
-        ),
-      ).toBe('components/aaa/bbb');
-
-      expect(
-        resolveImportPath(
-          '@/components/aaa/bbb',
-          undefined,
-          {},
-          readCompilerOptions,
-        ),
-      ).toBe(expected);
-    },
-  );
+  test('should ignore baseUrl', () => {
+    expect(
+      resolveImportPath(
+        '@/components/aaa/bbb',
+        undefined,
+        {},
+        readFixture('base-url-src'),
+      ),
+    ).toBe('components/aaa/bbb');
+  });
 
   test('should resolve path alias with specified index in pathIndexMap', () => {
     expect(
@@ -250,3 +162,120 @@ describe(resolveImportPath, () => {
     ).toBe('src/components/aaa/bbb');
   });
 });
+
+describe(readTsConfig, () => {
+  test('should resolve paths from the directory of tsconfig.json', () => {
+    expect(
+      resolveWithTsconfig(
+        { paths: { '@/*': ['./src/*'] } },
+        '.',
+        '@/components/aaa',
+      ),
+    ).toBe('src/components/aaa');
+  });
+
+  test('should keep a trailing slash of a paths entry', () => {
+    expect(
+      resolveWithTsconfig(
+        { paths: { '@/components/': ['src/components/'] } },
+        '.',
+        '@/components/aaa',
+      ),
+    ).toBe('src/components/aaa');
+  });
+
+  test('should resolve a paths entry naming the directory of tsconfig.json', () => {
+    expect(
+      resolveWithTsconfig({ paths: { '@/': ['./'] } }, '.', '@/components/aaa'),
+    ).toBe('components/aaa');
+  });
+
+  test('should resolve paths from a tsconfig.json found above the working directory', () => {
+    expect(
+      resolveWithTsconfig(
+        { paths: { '@/*': ['./src/*'] } },
+        'packages/a',
+        '@/components/aaa',
+      ),
+    ).toBe('../../src/components/aaa');
+  });
+
+  test('should resolve paths from the directory of the tsconfig.json declaring them', () => {
+    expect(
+      resolveWithFiles(
+        {
+          'configs/tsconfig.base.json': {
+            compilerOptions: { paths: { '@/*': ['../src/*'] } },
+          },
+          'tsconfig.json': {
+            extends: './configs/tsconfig.base.json',
+            files: [],
+          },
+        },
+        '.',
+        '@/components/aaa',
+      ),
+    ).toBe('src/components/aaa');
+  });
+
+  test('should ignore baseUrl', () => {
+    expect(
+      resolveWithTsconfig(
+        {
+          baseUrl: 'src',
+          ignoreDeprecations: '6.0',
+          paths: { '@/*': ['./lib/*'] },
+        },
+        '.',
+        '@/components/aaa',
+      ),
+    ).toBe('lib/components/aaa');
+  });
+});
+
+/**
+ * Writes `files` (JSON, by path) into a new directory, runs
+ * `resolveImportPath` with `readTsConfig` from `cwdSubdirectory` of it, and
+ * removes the directory.
+ */
+const resolveWithFiles = (
+  files: ReadonlyRecord<string, unknown>,
+  cwdSubdirectory: string,
+  importPath: string,
+): string => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'resolve-import-path-'));
+
+  try {
+    for (const [filePath, content] of Object.entries(files)) {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      fs.mkdirSync(path.dirname(path.join(root, filePath)), {
+        recursive: true,
+      });
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      fs.writeFileSync(path.join(root, filePath), JSON.stringify(content));
+    }
+
+    const cwd = path.join(root, cwdSubdirectory);
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.mkdirSync(cwd, { recursive: true });
+
+    return resolveImportPath(importPath, undefined, {}, () =>
+      readTsConfig(cwd),
+    );
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+};
+
+const resolveWithTsconfig = (
+  compilerOptions: ReadonlyRecord<string, unknown>,
+  cwdSubdirectory: string,
+  importPath: string,
+): string =>
+  resolveWithFiles(
+    { 'tsconfig.json': { compilerOptions, files: [] } },
+    cwdSubdirectory,
+    importPath,
+  );
