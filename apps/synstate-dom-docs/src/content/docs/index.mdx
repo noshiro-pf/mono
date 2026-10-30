@@ -36,7 +36,9 @@ import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
     <Card title="Reactivity in the types" icon="approve-check">
         Wherever JSX takes data, you pass an observable, a `constant(...)` or a
         `view(...)`, never a plain value. So if you read a snapshot by mistake,
-        you get a type error instead of a view that silently stops updating.
+        you get a type error instead of a view that silently stops updating. And
+        a prop holds the bindable itself, not a value read from it, so you can
+        destructure props or give them defaults without breaking anything.
     </Card>
     <Card title="No leaks by construction" icon="random">
         `If`, `Match` and `For` each mount what they show in a scope of their

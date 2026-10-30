@@ -18,6 +18,8 @@ synstate-dom is still at version 0.x, so its API may change in a minor release. 
 
     In Solid, a prop has the plain type `T` whether the caller passed a signal read or a fixed value. The types cannot tell a value that should update from one that should not, so they cannot reject the wrong one either. If you read a prop once in the component body, or destructure props, the updates silently stop, and only lint rules (`solid/reactivity` and `solid/no-destructure` of eslint-plugin-solid) will point it out. In synstate-dom, whether something updates comes down to whether it is a `Bindable`: you can see it in the signature, and `tsc` checks it.
 
+    And since a prop holds the `Bindable` itself, not a value read from it, props need no special handling: you can destructure them, give them defaults, forward the rest, or compute from them in the component body. The price is that a value derived from props that should keep updating is built as a bindable (with `mapBindable` or `derive`) rather than written as an expression in JSX. See [Props are plain JavaScript](/mono/synstate-dom/guides/components/#props-are-plain-javascript).
+
 - **Scopes clean up after you.** Each branch of `If` / `Match` and each row of `For` mounts in a scope. Any derivation or subscription created while it mounts belongs to that scope and is disposed with it. See [Lifecycle and scopes](/mono/synstate-dom/guides/lifecycle/).
 
 ## What it is not (yet)
