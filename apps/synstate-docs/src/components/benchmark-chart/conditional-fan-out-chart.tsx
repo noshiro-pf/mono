@@ -7,7 +7,7 @@ import { BenchmarkLineChart } from './benchmark-line-chart.js';
 
 /**
  * Conditional Fan-Out chart — shows ms vs branch count B.
- * SynState scales linearly with B (combine includes all branches); with
+ * SynState scales linearly with B (its `derive` reads all branches); with
  * `switchMap` it follows the selected branch only and stays flat.
  * MobX is constant (inactive branch has no observers).
  */

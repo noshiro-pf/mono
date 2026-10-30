@@ -13,6 +13,7 @@ export {
   createSyncChildObservable,
   createValueEmitter,
   debounce,
+  derive,
   distinctUntilChanged,
   empty,
   filter,

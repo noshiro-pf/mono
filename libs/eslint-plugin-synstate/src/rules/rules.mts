@@ -4,6 +4,7 @@ import { noRedundantSkipIfNoChange } from './no-redundant-skip-if-no-change.mjs'
 import { noThrowInOperator } from './no-throw-in-operator.mjs';
 import { noUnboundedCounterPipe } from './no-unbounded-counter-pipe.mjs';
 import { noWriteDuringPropagation } from './no-write-during-propagation.mjs';
+import { preferDerive } from './prefer-derive.mjs';
 import { preferMapTo } from './prefer-map-to.mjs';
 
 export const synstateRules = {
@@ -12,5 +13,6 @@ export const synstateRules = {
   'no-throw-in-operator': noThrowInOperator,
   'no-unbounded-counter-pipe': noUnboundedCounterPipe,
   'no-write-during-propagation': noWriteDuringPropagation,
+  'prefer-derive': preferDerive,
   'prefer-map-to': preferMapTo,
 } as const satisfies ESLintPlugin['rules'];

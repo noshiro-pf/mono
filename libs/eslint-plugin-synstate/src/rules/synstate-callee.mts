@@ -53,12 +53,12 @@ export const replacementCallee = (
   exportName: string,
   importedName: string | undefined,
 ): string | undefined => {
-  if (resolved.isNamespace) {
-    return exportName;
-  }
-
   if (isTypeWrapper(node.callee)) {
     return undefined;
+  }
+
+  if (resolved.isNamespace) {
+    return exportName;
   }
 
   const name = importedName ?? exportName;

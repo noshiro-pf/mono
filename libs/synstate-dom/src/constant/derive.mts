@@ -1,7 +1,6 @@
 import {
-  combine,
+  derive as deriveObservable,
   isObservable,
-  map,
   type InitializedObservable,
 } from 'synstate';
 import { Arr } from 'ts-data-forge';
@@ -16,22 +15,22 @@ import { toObservable } from './to-observable.mjs';
  * When every input is a constant, `fn` runs once and the result is a constant:
  * a static part of the view never enters the graph. Otherwise the constants
  * become `just` and the views are turned into observables, and the result is
- * `combine(...).pipe(map(...))`.
+ * synstate's `derive` over them: one observable, which passes on a result only
+ * when it is not `Object.is` the one it holds.
  */
 export const derive = <const BS extends NonEmptyTuple<Bindable<unknown>>, R>(
   bindables: BS,
   fn: (...values: BindableValues<BS>) => R,
 ): Bindable<R> => {
-  // `values` holds, position by position, the value of each of `bindables`:
-  // the constants themselves, or what `combine` emits for their observables.
-  // The checker cannot follow a position through `Arr.map` and `combine`,
-  // which carry one element type for the whole tuple.
-  const apply = (values: readonly unknown[]): R =>
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- see above
-    fn(...(values as BindableValues<BS>));
+  // `fn` is called with the value of each of `bindables`, position by
+  // position: the constants themselves, or their observables' values. The
+  // checker cannot follow a position through `Arr.map`, which carries one
+  // element type for the whole tuple.
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- see above
+  const project = fn as (...values: readonly unknown[]) => R;
 
   if (Arr.every(bindables, isConstant)) {
-    return asConstant(apply(bindables));
+    return asConstant(project(...bindables));
   }
 
   const observables: NonEmptyTuple<InitializedObservable<unknown>> = Arr.map(
@@ -39,7 +38,7 @@ export const derive = <const BS extends NonEmptyTuple<Bindable<unknown>>, R>(
     toObservable,
   );
 
-  return combine(observables).pipe(map(apply));
+  return deriveObservable(observables, project);
 };
 
 /** The value types of a tuple of {@link Bindable}s, position by position. */

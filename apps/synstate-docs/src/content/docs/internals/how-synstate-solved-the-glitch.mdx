@@ -24,7 +24,7 @@ Consider the following Observable graph:
 In SynState code:
 
 ```tsx
-import { collectToArray, combine, counter, map, take } from 'synstate';
+import { collectToArray, counter, derive, map, take } from 'synstate';
 
 const counterObservable = counter(1000 /* ms */);
 // 0, 1, 2, 3, ...
@@ -35,9 +35,7 @@ const multipliedBy10 = counterObservable.pipe(map((count) => count * 10));
 const multipliedBy1000 = counterObservable.pipe(map((count) => count * 1000));
 // 0, 1000, 2000, 3000, ...
 
-const sum = combine([multipliedBy10, multipliedBy1000]).pipe(
-    map(([a, b]) => a + b),
-);
+const sum = derive([multipliedBy10, multipliedBy1000], (a, b) => a + b);
 // 0, 1010, 2020, 3030, ...
 
 const resultPromise = collectToArray(sum.pipe(take(5)));
@@ -49,7 +47,7 @@ const result = await resultPromise;
 assert.deepStrictEqual(result, [0, 1010, 2020, 3030, 4040]);
 ```
 
-Both `multipliedBy10` and `multipliedBy1000` (the two inputs to `combine`) originate from the same source (`counterObservable`). Whenever `counterObservable` emits a new value, both inputs to `combine` should update **together** — and `sum` should always equal `counter * 1010`.
+Both `multipliedBy10` and `multipliedBy1000` (the two inputs to `derive`) originate from the same source (`counterObservable`). Whenever `counterObservable` emits a new value, both inputs to `derive` should update **together** — and `sum` should always equal `counter * 1010`.
 
 ## What Happens in RxJS (Glitch)
 
@@ -157,7 +155,7 @@ This approach is described in detail in, for example, the paper [_Deprecating th
 2. The propagation loop dequeues the node with the **lowest level**, validates (evaluates) it, and enqueues its dependent nodes (which are on greater levels) into the queue.
 3. This continues until the queue is empty.
 
-Because the queue always processes lower-level nodes first, by the time a `combine` (or any multi-parent node) is dequeued, all of its parents are guaranteed to have already been updated in this cycle. The intermediate state — where one parent has updated but another has not — is never observed by any downstream node.
+Because the queue always processes lower-level nodes first, by the time a `derive` (or any multi-parent node) is dequeued, all of its parents are guaranteed to have already been updated in this cycle. The intermediate state — where one parent has updated but another has not — is never observed by any downstream node.
 
 Let's trace the priority queue approach step by step using the diamond example. Each node has a **level** based on its position in the graph:
 
@@ -165,7 +163,7 @@ Let's trace the priority queue approach step by step using the diamond example. 
 counter             → level 0
 multipliedBy10      → level 1
 multipliedBy1000    → level 1
-sum (combine + map) → level 2
+sum (derive)        → level 2
 ```
 
 When `counter` changes from `0` to `1`, the propagation proceeds as follows:
@@ -213,7 +211,7 @@ SynState's key insight is that a node's place in the update order is known when 
 
 ### A queue bucketed by depth
 
-When an observable is created via `.pipe()` or a combinator (`combine`, `merge`, `zip`), SynState computes its **depth** — the length of the longest path from any root source:
+When an observable is created via `.pipe()` or a combinator (`combine`, `derive`, `merge`, `zip`), SynState computes its **depth** — the length of the longest path from any root source:
 
 - **Root observables**: `depth = 0`.
 - **Child observables**: `depth = 1 + max(parent depths)`.
@@ -260,7 +258,7 @@ Applying this to the diamond example:
 depth 0:  counter            ← source emits
 depth 1:  multipliedBy10     ← updated first  (depth 1)
 depth 1:  multipliedBy1000   ← updated next   (depth 1)
-depth 2:  sum (combine)      ← updated last   (depth 2); both inputs are up-to-date
+depth 2:  sum (derive)       ← updated last   (depth 2); both inputs are up-to-date
 ```
 
 The output of `sum` in SynState is:
@@ -298,7 +296,7 @@ const B = A.pipe(map((n) => n * 10));
 const D = A.pipe(filter((n) => n % 2 === 0));
 // 0, 2, 4, ...  (odd values are skipped)
 
-const C = combine([B, D]).pipe(map(([b, d]) => b + d));
+const C = derive([B, D], (b, d) => b + d);
 // sum of B and D: 0, 10, 22, 32, 44, 54, 66, ...
 
 const E = D.pipe(map((n) => n * 10));
@@ -326,15 +324,24 @@ This creates a simple invariant: **a node's `updateToken` equals the current cyc
 Each operator is a subclass of `SyncChildObservableClass` or `AsyncChildObservableClass`, and overrides `tryUpdate`, which the manager calls with the token:
 
 ```ts
-// Simplified from CombineObservableClass
+// Simplified from DeriveObservableClass, which `combine` is built on
 override tryUpdate(updateToken: UpdateToken): void {
+    let updated = false;
+
+    for (const [i, parent] of this.parents.entries()) {
+        this.values[i] = parent.getSnapshot().value;
+
+        if (parent.updateToken === updateToken) {
+            updated = true;
+        }
+    }
+
     // Skip only if ALL parents were skipped in this cycle
-    if (this.parents.every((o) => o.updateToken !== updateToken)) {
+    if (!updated) {
         return;
     }
 
-    const parentValues = this.parents.map((a) => a.getSnapshot());
-    // ... emit the combined value with this.setNext(..., updateToken) ...
+    // ... this.setNext(this.project(...this.values), updateToken) ...
 }
 ```
 
@@ -377,7 +384,7 @@ SynState achieves glitch-free propagation in $O(n)$ by exploiting two properties
 
 ### Cycle detection
 
-SynState's propagation model assumes the dependency graph is a **DAG** (directed acyclic graph). The public API guarantees this by construction: a new observable's parents exist before it and cannot change afterwards, so no observable can become its own ancestor. On top of that, SynState verifies it with a **cycle check at construction time** in development — whenever a new observable is created via `.pipe()` or a combinator (`combine`, `merge`, `zip`), a depth-first traversal of the ancestor chain verifies that no node appears as its own ancestor. If a cycle is detected, an error is thrown immediately:
+SynState's propagation model assumes the dependency graph is a **DAG** (directed acyclic graph). The public API guarantees this by construction: a new observable's parents exist before it and cannot change afterwards, so no observable can become its own ancestor. On top of that, SynState verifies it with a **cycle check at construction time** in development — whenever a new observable is created via `.pipe()` or a combinator (`combine`, `derive`, `merge`, `zip`), a depth-first traversal of the ancestor chain verifies that no node appears as its own ancestor. If a cycle is detected, an error is thrown immediately:
 
 ```
 Circular dependency detected in observable graph:

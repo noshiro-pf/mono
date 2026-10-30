@@ -1,4 +1,4 @@
-import { collectToArray, combine, counter, map, take } from 'synstate';
+import { collectToArray, counter, derive, map, take } from 'synstate';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -15,9 +15,7 @@ if (import.meta.vitest !== undefined) {
     );
     // 0, 1000, 2000, 3000, ...
 
-    const sum = combine([multipliedBy10, multipliedBy1000]).pipe(
-      map(([a, b]) => a + b),
-    );
+    const sum = derive([multipliedBy10, multipliedBy1000], (a, b) => a + b);
     // 0, 1010, 2020, 3030, ...
 
     const resultPromise = collectToArray(sum.pipe(take(5)));

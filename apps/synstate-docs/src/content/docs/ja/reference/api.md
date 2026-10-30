@@ -39,6 +39,7 @@ SynStateはアプリケーションの状態を管理するためのシンプル
 ### 結合
 
 - [`combine(observables)`](../combine/): 複数のソースから最新の値を結合（別名： `combineLatest`）。
+- [`derive(observables, fn)`](../derive/): 複数のソースの最新値から 1 つの値を、1 つの Observable として派生。
 - [`merge(observables)`](../merge/): 複数のストリームをマージ。
 - [`zip(observables)`](../zip/): インデックスごとに値をペアリング。
 

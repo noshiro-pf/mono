@@ -17,8 +17,8 @@ sidebar:
 
 - 🎯 **Simple State Management**: Easy-to-use `createState` and `createReducer` similar to React `useState`/`useReducer`, but for global state.
 - 🔧 **Built-in Async Operators**: `debounce`, `throttle`, `switchMap`, and more — handle complex async flows in a unified, declarative API without external libraries.
-- ⚡ **Predictable Performance**: Glitch-free $O(n)$ propagation — within <!-- bench:summary/synstate-worst-over-fastest -->5.1<!-- /bench -->× of the fastest library in each of the six benchmark scenarios, where the worst cases of the other libraries measured in all six range from <!-- bench:summary/others-least-worst-over-fastest -->2.1<!-- /bench -->× (<!-- bench:summary/others-least-worst-library -->Preact Signals<!-- /bench -->) to <!-- bench:summary/others-most-worst-over-fastest -->> 15,625<!-- /bench -->× (<!-- bench:summary/others-most-worst-library -->RxJS<!-- /bench -->). Speed is not where SynState stands out; [Why SynState?](/mono/synstate/guides/why-synstate/#glitch-free-at-linear-cost) says what does. See [benchmarks](/mono/synstate/guides/library-comparison/benchmark/).
-- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~6.6 kB min+gzip<!-- /bundle-size:synstate --> with two external runtime dependencies ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge) and [ts-std-forge](https://www.npmjs.com/package/ts-std-forge), and the first depends on the second).
+- ⚡ **Predictable Performance**: Glitch-free $O(n)$ propagation — within <!-- bench:summary/synstate-worst-over-fastest -->4.3<!-- /bench -->× of the fastest library in each of the six benchmark scenarios, where the worst cases of the other libraries measured in all six range from <!-- bench:summary/others-least-worst-over-fastest -->1.8<!-- /bench -->× (<!-- bench:summary/others-least-worst-library -->Preact Signals<!-- /bench -->) to <!-- bench:summary/others-most-worst-over-fastest -->> 15,625<!-- /bench -->× (<!-- bench:summary/others-most-worst-library -->RxJS<!-- /bench -->). Speed is not where SynState stands out; [Why SynState?](/mono/synstate/guides/why-synstate/#glitch-free-at-linear-cost) says what does. See [benchmarks](/mono/synstate/guides/library-comparison/benchmark/).
+- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~6.7 kB min+gzip<!-- /bundle-size:synstate --> with two external runtime dependencies ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge) and [ts-std-forge](https://www.npmjs.com/package/ts-std-forge), and the first depends on the second).
 - ⚛️ **React-Optimized**: Fully compatible with [React Compiler](https://react.dev/learn/react-compiler). `synstate-react-hooks` lets you add global state to any component in just a few lines.
 - 🌐 **Framework Agnostic**: Core library works as-is with vanilla JavaScript, Vue, Svelte, or any framework. For React and Preact, hooks wrappers (`synstate-react-hooks` / `synstate-preact-hooks`) are available. For Preact, a [Preact Signals integration](/mono/synstate/preact-signals/demo/) (`synstate-preact-signals`) is also provided for fine-grained DOM updates without component re-renders.
 
@@ -62,15 +62,10 @@ getSnapshot(); // read current value synchronously (0)
 
 ## Deriving Values with `pipe`
 
-SynState's power comes from composing Observables. Use `pipe` to derive new values and `combine` to merge multiple sources:
+SynState's power comes from composing Observables. Use `pipe` to derive new values and `derive` to compute one value from several sources:
 
 ```tsx
-import {
-    combine,
-    createState,
-    type InitializedObservable,
-    map,
-} from 'synstate';
+import { createState, derive, type InitializedObservable, map } from 'synstate';
 
 const [count, setCount] = createState<number>(0);
 
@@ -80,9 +75,10 @@ console.log(count.getSnapshot().value); // 0
 // Derive new Observables using pipe
 const doubled: InitializedObservable<number> = count.pipe(map((n) => n * 2));
 
-// Combine multiple Observables
-const combined: InitializedObservable<string> = combine([count, doubled]).pipe(
-    map(([c, d]) => `(${c}, ${d})`),
+// Derive one value from several Observables
+const combined: InitializedObservable<string> = derive(
+    [count, doubled],
+    (c, d) => `(${c}, ${d})`,
 );
 
 // Subscribe to changes

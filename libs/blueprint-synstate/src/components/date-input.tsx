@@ -1,4 +1,4 @@
-import { combine, createState, map, onScopeDispose } from 'synstate';
+import { createState, derive, map, onScopeDispose } from 'synstate';
 import {
   constant,
   If,
@@ -148,22 +148,18 @@ export const DateInput = ({
 
   const disabled$ = toObservable(disabled ?? constant(false));
 
-  const open$ = combine([isOpen$, disabled$]).pipe(
-    map(([isOpen, isDisabled]) => isOpen && !isDisabled),
+  const open$ = derive(
+    [isOpen$, disabled$],
+    (isOpen, isDisabled) => isOpen && !isDisabled,
   );
 
-  const text$ = combine([focused$, typed$, shown$]).pipe(
-    map(([focused, typed, shown]) => (focused ? typed : shown.text)),
+  const text$ = derive([focused$, typed$, shown$], (focused, typed, shown) =>
+    focused ? typed : shown.text,
   );
 
-  const targetClass$ = combine([
-    open$,
-    shown$,
-    focused$,
-    typed$,
-    disabled$,
-  ]).pipe(
-    map(([open, shown, focused, typed, isDisabled]) =>
+  const targetClass$ = derive(
+    [open$, shown$, focused$, typed$, disabled$],
+    (open, shown, focused, typed, isDisabled) =>
       [
         'bp6-input-group',
         ...(fill ? ['bp6-fill'] : []),
@@ -180,7 +176,6 @@ export const DateInput = ({
         'bp6-popover-target',
         ...(open ? ['bp6-popover-open'] : []),
       ].join(' '),
-    ),
   );
 
   const mut_elements: {
@@ -472,8 +467,8 @@ export const DateInput = ({
                 />
                 <DatePicker
                   {...pickerOptions}
-                  value={combine([value$, shown$]).pipe(
-                    map(([current, shown]) => (shown.error ? '' : current)),
+                  value={derive([value$, shown$], (current, shown) =>
+                    shown.error ? '' : current,
                   )}
                   onChange={(next) => {
                     changeFromPicker(next, false);

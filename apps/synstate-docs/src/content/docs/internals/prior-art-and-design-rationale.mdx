@@ -66,8 +66,8 @@ When `modeAtom` is `'celsius'`, changes to `fahrenheitAtom` do not trigger recal
 In SynState, the same logic is expressed with a static graph:
 
 ```tsx
-const temperature$ = combine([mode$, celsius$, fahrenheit$]).pipe(
-    map(([mode, c, f]) => (mode === 'celsius' ? c : f)),
+const temperature$ = derive([mode$, celsius$, fahrenheit$], (mode, c, f) =>
+    mode === 'celsius' ? c : f,
 );
 ```
 
@@ -200,11 +200,11 @@ When `auth$` becomes `null`, the in-flight fetch is automatically aborted and `g
 
 Michel Weststrate, the creator of MobX, states: "An important principle behind the design of MobX is that a minimal, consistent set of subscriptions can only be achieved if subscriptions are determined at run-time."[^weststrate]
 
-What does this mean concretely? In MobX and Jotai, a `computed` or derived atom only subscribes to observables that were actually accessed via `.get()` during its execution. When a conditional branch changes the execution path, the subscription set itself changes dynamically. In contrast, SynState's `combine` subscribes to all sources at construction time, regardless of which branch is currently active.
+What does this mean concretely? In MobX and Jotai, a `computed` or derived atom only subscribes to observables that were actually accessed via `.get()` during its execution. When a conditional branch changes the execution path, the subscription set itself changes dynamically. In contrast, SynState's `derive` subscribes to all sources at construction time, regardless of which branch is currently active.
 
-This difference is most pronounced for **updates to observables outside the subscription set**. With dynamic subscriptions, no observer is registered on the inactive observable, so update notifications never occur. With static subscriptions, `combine` fires and incurs the cost of `map` + equality comparison.
+This difference is most pronounced for **updates to observables outside the subscription set**. With dynamic subscriptions, no observer is registered on the inactive observable, so update notifications never occur. With static subscriptions, `derive` fires and incurs the cost of the projection + equality comparison.
 
-To quantitatively verify this, we ran a [Conditional Fan-Out benchmark](/mono/synstate/guides/library-comparison/benchmark/#scenario-conditional-fan-out). The results confirm that the oversubscription cost **exists in theory**. In MobX, the inactive branch's observer list is empty, making updates zero-cost. SynState's `combine` includes all branches, so the cost scales linearly with B.
+To quantitatively verify this, we ran a [Conditional Fan-Out benchmark](/mono/synstate/guides/library-comparison/benchmark/#scenario-conditional-fan-out). The results confirm that the oversubscription cost **exists in theory**. In MobX, the inactive branch's observer list is empty, making updates zero-cost. SynState's `derive` includes all branches, so the cost scales linearly with B.
 
 However, the benchmark scenario — a fixed selector with a large volume of updates to an inactive branch — is unlikely to occur in real applications. If unused data is being frequently updated, that is an application-level design issue to be addressed regardless of the library's subscription model. Additionally, each selector switch in dynamic-subscription libraries requires rebuilding the subscription set (unsubscribing from old dependencies and subscribing to new ones), a cost that the benchmark does not include.
 
@@ -230,13 +230,13 @@ In other words, the state computation graph and UI subscription management can b
 
 ## Mental Model Alignment with React
 
-React uses **explicit dependency declaration** — `useMemo(() => ..., [dep1, dep2])`. SynState's `pipe(map(...))` and `combine([a$, b$])` share a similar structure with this declarative model:
+React uses **explicit dependency declaration** — `useMemo(() => ..., [dep1, dep2])`. SynState's `pipe(map(...))` and `derive([a$, b$], ...)` share a similar structure with this declarative model:
 
-| React                               | SynState                                         |
-| :---------------------------------- | :----------------------------------------------- |
-| `useMemo(() => count * 2, [count])` | `count.pipe(map((n) => n * 2))`                  |
-| `useMemo(() => a + b, [a, b])`      | `combine([a$, b$]).pipe(map(([a, b]) => a + b))` |
-| Explicit dependency arrays          | Explicit `combine` / `pipe` declarations         |
+| React                               | SynState                                |
+| :---------------------------------- | :-------------------------------------- |
+| `useMemo(() => count * 2, [count])` | `count.pipe(map((n) => n * 2))`         |
+| `useMemo(() => a + b, [a, b])`      | `derive([a$, b$], (a, b) => a + b)`     |
+| Explicit dependency arrays          | Explicit `derive` / `pipe` declarations |
 
 SynState extends the mental model React developers already know — "declare dependencies explicitly, and the system propagates automatically" — from component scope to global state. The key differences are that SynState Observables are independent of the component lifecycle, push-based (only affected values recompute), and composable with async operators like `debounce`, `throttle`, and `switchMap`.
 
@@ -249,7 +249,7 @@ Based on the analysis above, SynState's design decision can be summarized as fol
 - **React integration**: The `useSyncExternalStore` subscription layer is sufficient; making the graph dynamic was not necessary.
 - **React mental model**: SynState's explicit dependency declarations share a similar structure with React's `useMemo` model.
 
-In libraries with dynamic graphs, dependencies are declared implicitly by calling `get()` inside a function. SynState's explicit dependency declarations via `combine` / `pipe`, on the other hand, make dependencies visually apparent in the code — much like React's `useMemo` dependency arrays. SynState builds on this explicit model to achieve zero-runtime-cost static graphs with glitch-free O(n) propagation.
+In libraries with dynamic graphs, dependencies are declared implicitly by calling `get()` inside a function. SynState's explicit dependency declarations via `derive` / `pipe`, on the other hand, make dependencies visually apparent in the code — much like React's `useMemo` dependency arrays. SynState builds on this explicit model to achieve zero-runtime-cost static graphs with glitch-free O(n) propagation.
 
 ## References
 

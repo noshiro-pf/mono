@@ -1,11 +1,6 @@
 /* eslint-disable @stylistic/padding-line-between-statements */
 // embed-sample-code-ignore-above
-import {
-  combine,
-  createState,
-  type InitializedObservable,
-  map,
-} from 'synstate';
+import { createState, derive, type InitializedObservable, map } from 'synstate';
 
 const [count, setCount] = createState<number>(0);
 
@@ -15,9 +10,10 @@ console.log(count.getSnapshot().value); // 0
 // Derive new Observables using pipe
 const doubled: InitializedObservable<number> = count.pipe(map((n) => n * 2));
 
-// Combine multiple Observables
-const combined: InitializedObservable<string> = combine([count, doubled]).pipe(
-  map(([c, d]) => `(${c}, ${d})`),
+// Derive one value from several Observables
+const combined: InitializedObservable<string> = derive(
+  [count, doubled],
+  (c, d) => `(${c}, ${d})`,
 );
 
 // Subscribe to changes

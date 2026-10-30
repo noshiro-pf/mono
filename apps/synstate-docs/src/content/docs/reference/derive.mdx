@@ -1,0 +1,91 @@
+---
+prev: false
+next: false
+title: derive
+---
+
+import { MarbleDiagram } from '../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+Derives one value from the latest values of several observables: one
+observable that calls `project` with them, as arguments, and emits the
+result unless it equals the one already held.
+
+It emits once every parent has a value, and then whenever any of them
+emits, as `combine` does; but where `combine(parents).pipe(map(fn))` is two
+observables and a tuple per update, `derive` is one, and passes the values
+as arguments (a rest parameter in `project` collects them into an array
+again).
+The comparison is `Object.is` unless `equals` says otherwise.
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 15, label: '100', color: colors.yellow },
+                { t: 55, label: '120', color: colors.orange },
+            ],
+        },
+        {
+            marbles: [
+                { t: 30, label: '2', color: colors.blue },
+                { t: 80, label: '3', color: colors.purple },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 30, label: '200', color: colors.blue },
+            { t: 55, label: '240', color: colors.orange },
+            { t: 80, label: '360', color: colors.purple },
+        ],
+    }}
+    operator="derive((p, q) => p * q)"
+/>
+
+## Example
+
+```tsx
+//  Timeline:
+//
+//  price$     100         120
+//  quantity$        2            3
+//  total$           200   240    360
+//
+//  Explanation:
+//  - derive waits for every parent to have a value
+//  - Then calls the projection with their latest values whenever one emits
+
+const price$ = source<number>();
+
+const quantity$ = source<number>();
+
+const total$ = derive(
+    [price$, quantity$],
+    (price, quantity) => price * quantity,
+);
+
+const totalHistory: number[] = [];
+
+total$.subscribe((total) => {
+    totalHistory.push(total);
+});
+
+price$.next(100); // nothing yet: quantity$ has no value
+
+quantity$.next(2); // 200
+
+price$.next(120); // 240
+
+quantity$.next(3); // 360
+
+assert.deepStrictEqual(totalHistory, [200, 240, 360]);
+```
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/combine/derive.mts)
+{/* /source-link */}

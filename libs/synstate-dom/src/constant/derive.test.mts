@@ -1,4 +1,4 @@
-import { createState, isObservable } from 'synstate';
+import { createState, isChildObservable, isObservable } from 'synstate';
 import { expectType } from 'ts-data-forge';
 import type { Bindable } from './bindable.mjs';
 import { constant } from './constant.mjs';
@@ -60,5 +60,29 @@ describe(derive, () => {
     setLabel('b');
 
     assert.strictEqual(result$.getSnapshot().value, '2-B');
+  });
+
+  test('observables give one observable, whose parents are the inputs', () => {
+    const [a$, setA] = createState(1);
+
+    const [b$] = createState(2);
+
+    const fn = vi.fn((a: number, b: number) => a + b);
+
+    const result = derive([a$, b$], fn);
+
+    const result$ = toObservable(result);
+
+    assert.isTrue(isChildObservable(result$));
+
+    if (isChildObservable(result$)) {
+      assert.deepStrictEqual(result$.parents, [a$, b$]);
+    }
+
+    setA(2);
+
+    assert.strictEqual(result$.getSnapshot().value, 4);
+
+    expect(fn).toHaveBeenCalledTimes(2);
   });
 });

@@ -29,12 +29,12 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     </Card>
     <Card title="安定したパフォーマンス" icon="rocket">
 
-グリッチフリー O(n) 伝搬で、ベンチマークの6つのシナリオすべてで最速のライブラリの<strong>{/* bench:summary/synstate-worst-over-fastest */}5.1{/* /bench */}倍以内</strong>に収まります。6つすべてで計測した他のライブラリの最悪ケースは、{/* bench:summary/others-least-worst-library */}Preact Signals{/* /bench */} の{/* bench:summary/others-least-worst-over-fastest */}2.1{/* /bench */}倍から {/* bench:summary/others-most-worst-library */}RxJS{/* /bench */} の{/* bench:summary/others-most-worst-over-fastest */}> 15,625{/* /bench */}倍までです。速度は SynState が最も際立つ点ではありません。何が際立つかは [SynState の強み](/mono/synstate/ja/guides/why-synstate/#グリッチフリーでコストは線形)を参照。[ベンチマークの概要](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)を参照。
+グリッチフリー O(n) 伝搬で、ベンチマークの6つのシナリオすべてで最速のライブラリの<strong>{/* bench:summary/synstate-worst-over-fastest */}4.3{/* /bench */}倍以内</strong>に収まります。6つすべてで計測した他のライブラリの最悪ケースは、{/* bench:summary/others-least-worst-library */}Preact Signals{/* /bench */} の{/* bench:summary/others-least-worst-over-fastest */}1.8{/* /bench */}倍から {/* bench:summary/others-most-worst-library */}RxJS{/* /bench */} の{/* bench:summary/others-most-worst-over-fastest */}> 15,625{/* /bench */}倍までです。速度は SynState が最も際立つ点ではありません。何が際立つかは [SynState の強み](/mono/synstate/ja/guides/why-synstate/#グリッチフリーでコストは線形)を参照。[ベンチマークの概要](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)を参照。
 
     </Card>
     <Card title="軽量" icon="seti:favicon">
 
-{/* bundle-size:synstate */}~6.6 kB min+gzip{/* /bundle-size:synstate */}、外部ランタイム依存は 2 つ（一方がもう一方に依存している）。
+{/* bundle-size:synstate */}~6.7 kB min+gzip{/* /bundle-size:synstate */}、外部ランタイム依存は 2 つ（一方がもう一方に依存している）。
 
     </Card>
     <Card title="React 最適化" icon="seti:react">

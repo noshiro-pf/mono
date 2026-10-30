@@ -24,7 +24,7 @@ import FilterDiamondDepGraph from '../../../../components/dep-graph/filter-diamo
 SynState のコードでは：
 
 ```tsx
-import { collectToArray, combine, counter, map, take } from 'synstate';
+import { collectToArray, counter, derive, map, take } from 'synstate';
 
 const counterObservable = counter(1000 /* ms */);
 // 0, 1, 2, 3, ...
@@ -35,9 +35,7 @@ const multipliedBy10 = counterObservable.pipe(map((count) => count * 10));
 const multipliedBy1000 = counterObservable.pipe(map((count) => count * 1000));
 // 0, 1000, 2000, 3000, ...
 
-const sum = combine([multipliedBy10, multipliedBy1000]).pipe(
-    map(([a, b]) => a + b),
-);
+const sum = derive([multipliedBy10, multipliedBy1000], (a, b) => a + b);
 // 0, 1010, 2020, 3030, ...
 
 const resultPromise = collectToArray(sum.pipe(take(5)));
@@ -49,7 +47,7 @@ const result = await resultPromise;
 assert.deepStrictEqual(result, [0, 1010, 2020, 3030, 4040]);
 ```
 
-`multipliedBy10` と `multipliedBy1000`（`combine` への2つの入力）はどちらも同じソース（`counterObservable`）から派生しています。`counterObservable` が新しい値を発行するたびに、`combine` への両方の入力は**同時に**更新されるべきであり、`sum` は常に `counter * 1010` に等しくなるはずです。
+`multipliedBy10` と `multipliedBy1000`（`derive` への2つの入力）はどちらも同じソース（`counterObservable`）から派生しています。`counterObservable` が新しい値を発行するたびに、`derive` への両方の入力は**同時に**更新されるべきであり、`sum` は常に `counter * 1010` に等しくなるはずです。
 
 ## RxJS で起こること（グリッチ）
 
@@ -157,7 +155,7 @@ RxJS のようなプッシュ型ライブラリでは、`combineLatest` が一�
 2. 伝搬ループは**最低レベル**のノードをデキューし、検証（評価）して、その依存ノード（より高いレベルにある）をキューに追加します。
 3. キューが空になるまでこれを続けます。
 
-キューは常に低レベルのノードを先に処理するため、`combine`（または任意のマルチ親ノード）がデキューされるまでに、そのすべての親はこのサイクルで既に更新されていることが保証されます。一方の親は更新されたがもう一方はまだという中間状態は、下流のノードからは決して観測されません。
+キューは常に低レベルのノードを先に処理するため、`derive`（または任意のマルチ親ノード）がデキューされるまでに、そのすべての親はこのサイクルで既に更新されていることが保証されます。一方の親は更新されたがもう一方はまだという中間状態は、下流のノードからは決して観測されません。
 
 ダイヤモンドの例を使って優先度キューアプローチをステップごとにトレースしてみましょう。各ノードにはグラフ内の位置に基づく**レベル**があります：
 
@@ -165,7 +163,7 @@ RxJS のようなプッシュ型ライブラリでは、`combineLatest` が一�
 counter             → level 0
 multipliedBy10      → level 1
 multipliedBy1000    → level 1
-sum (combine + map) → level 2
+sum (derive)        → level 2
 ```
 
 `counter` が `0` から `1` に変化すると、伝搬は以下のように進みます：
@@ -213,7 +211,7 @@ SynState の重要な洞察は、更新順序におけるノードの位置が�
 
 ### 深さごとのバケットに分けたキュー
 
-Observable が `.pipe()` またはコンビネータ（`combine`、`merge`、`zip`）を介して作成されると、SynState はその**深さ** — 任意のルートソースからの最長パスの長さ — を計算します：
+Observable が `.pipe()` またはコンビネータ（`combine`、`derive`、`merge`、`zip`）を介して作成されると、SynState はその**深さ** — 任意のルートソースからの最長パスの長さ — を計算します：
 
 - **ルート Observable**： `depth = 0`.
 - **子 Observable**： `depth = 1 + max(parent depths)`.
@@ -260,7 +258,7 @@ SynState の Observable 型は `RootObservable`、`SyncChildObservable`、`Async
 depth 0:  counter            ← source emits
 depth 1:  multipliedBy10     ← updated first  (depth 1)
 depth 1:  multipliedBy1000   ← updated next   (depth 1)
-depth 2:  sum (combine)      ← updated last   (depth 2); both inputs are up-to-date
+depth 2:  sum (derive)       ← updated last   (depth 2); both inputs are up-to-date
 ```
 
 SynState における `sum` の出力は：
@@ -298,7 +296,7 @@ const B = A.pipe(map((n) => n * 10));
 const D = A.pipe(filter((n) => n % 2 === 0));
 // 0, 2, 4, ...  (odd values are skipped)
 
-const C = combine([B, D]).pipe(map(([b, d]) => b + d));
+const C = derive([B, D], (b, d) => b + d);
 // sum of B and D: 0, 10, 22, 32, 44, 54, 66, ...
 
 const E = D.pipe(map((n) => n * 10));
@@ -326,15 +324,24 @@ SynState はこれを、各更新サイクルに一意のアイデンティテ�
 各演算子は `SyncChildObservableClass` または `AsyncChildObservableClass` のサブクラスで、マネージャーがトークンを渡して呼ぶ `tryUpdate` をオーバーライドします：
 
 ```ts
-// Simplified from CombineObservableClass
+// Simplified from DeriveObservableClass, which `combine` is built on
 override tryUpdate(updateToken: UpdateToken): void {
+    let updated = false;
+
+    for (const [i, parent] of this.parents.entries()) {
+        this.values[i] = parent.getSnapshot().value;
+
+        if (parent.updateToken === updateToken) {
+            updated = true;
+        }
+    }
+
     // Skip only if ALL parents were skipped in this cycle
-    if (this.parents.every((o) => o.updateToken !== updateToken)) {
+    if (!updated) {
         return;
     }
 
-    const parentValues = this.parents.map((a) => a.getSnapshot());
-    // ... emit the combined value with this.setNext(..., updateToken) ...
+    // ... this.setNext(this.project(...this.values), updateToken) ...
 }
 ```
 
@@ -377,7 +384,7 @@ SynState は、依存関係グラフの2つの性質を活用して $O(n)$ で�
 
 ### 循環依存の検出
 
-SynState の伝搬モデルは、依存関係グラフが **DAG**（有向非巡回グラフ）であることを前提としています。これは公開 API の作りによって保証されています。新しい Observable の親はそれより先に存在し、後から変えられないので、どの Observable も自分自身の祖先にはなれません。そのうえで SynState は、開発環境で**構築時に循環チェック**を実行してこれを確かめます。`.pipe()` またはコンビネータ（`combine`、`merge`、`zip`）を介して新しい Observable が作成されるたびに、祖先チェーンの深さ優先探索により、自分自身が祖先に含まれていないことを検証します。循環が検出された場合、即座にエラーがスローされます：
+SynState の伝搬モデルは、依存関係グラフが **DAG**（有向非巡回グラフ）であることを前提としています。これは公開 API の作りによって保証されています。新しい Observable の親はそれより先に存在し、後から変えられないので、どの Observable も自分自身の祖先にはなれません。そのうえで SynState は、開発環境で**構築時に循環チェック**を実行してこれを確かめます。`.pipe()` またはコンビネータ（`combine`、`derive`、`merge`、`zip`）を介して新しい Observable が作成されるたびに、祖先チェーンの深さ優先探索により、自分自身が祖先に含まれていないことを検証します。循環が検出された場合、即座にエラーがスローされます：
 
 ```
 Circular dependency detected in observable graph:

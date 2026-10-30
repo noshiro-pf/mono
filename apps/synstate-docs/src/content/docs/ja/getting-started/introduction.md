@@ -17,8 +17,8 @@ sidebar:
 
 - 🎯 **シンプルな状態管理**： React の `useState`/`useReducer` に似た使いやすい `createState` と `createReducer`（グローバル状態向け）。
 - 🔧 **非同期オペレーター内蔵**： `debounce`、`throttle`、`switchMap` など — 複雑な非同期処理を外部ライブラリなしに統一的な宣言的 API で記述。
-- ⚡ **安定したパフォーマンス**： グリッチフリー $O(n)$ 伝搬で、ベンチマークの6つのシナリオすべてで最速のライブラリの<!-- bench:summary/synstate-worst-over-fastest -->5.1<!-- /bench -->倍以内に収まります — 6つすべてで計測した他のライブラリの最悪ケースは <!-- bench:summary/others-least-worst-library -->Preact Signals<!-- /bench --> の<!-- bench:summary/others-least-worst-over-fastest -->2.1<!-- /bench -->倍から <!-- bench:summary/others-most-worst-library -->RxJS<!-- /bench --> の<!-- bench:summary/others-most-worst-over-fastest -->> 15,625<!-- /bench -->倍までです。速度は SynState が最も際立つ点ではありません。何が際立つかは [SynState の強み](/mono/synstate/ja/guides/why-synstate/#グリッチフリーでコストは線形)を参照。[ベンチマーク結果](/mono/synstate/ja/guides/library-comparison/benchmark/)を参照。
-- 🚀 **軽量**： <!-- bundle-size:synstate -->~6.6 kB min+gzip<!-- /bundle-size:synstate -->、外部ランタイム依存は [ts-data-forge](https://www.npmjs.com/package/ts-data-forge) と [ts-std-forge](https://www.npmjs.com/package/ts-std-forge) の 2 つ（前者が後者に依存している）。
+- ⚡ **安定したパフォーマンス**： グリッチフリー $O(n)$ 伝搬で、ベンチマークの6つのシナリオすべてで最速のライブラリの<!-- bench:summary/synstate-worst-over-fastest -->4.3<!-- /bench -->倍以内に収まります — 6つすべてで計測した他のライブラリの最悪ケースは <!-- bench:summary/others-least-worst-library -->Preact Signals<!-- /bench --> の<!-- bench:summary/others-least-worst-over-fastest -->1.8<!-- /bench -->倍から <!-- bench:summary/others-most-worst-library -->RxJS<!-- /bench --> の<!-- bench:summary/others-most-worst-over-fastest -->> 15,625<!-- /bench -->倍までです。速度は SynState が最も際立つ点ではありません。何が際立つかは [SynState の強み](/mono/synstate/ja/guides/why-synstate/#グリッチフリーでコストは線形)を参照。[ベンチマーク結果](/mono/synstate/ja/guides/library-comparison/benchmark/)を参照。
+- 🚀 **軽量**： <!-- bundle-size:synstate -->~6.7 kB min+gzip<!-- /bundle-size:synstate -->、外部ランタイム依存は [ts-data-forge](https://www.npmjs.com/package/ts-data-forge) と [ts-std-forge](https://www.npmjs.com/package/ts-std-forge) の 2 つ（前者が後者に依存している）。
 - ⚛️ **React 最適化**： [React Compiler](https://react.dev/learn/react-compiler) と完全互換。`synstate-react-hooks` により数行でコンポーネントにグローバル状態を導入。
 - 🌐 **フレームワーク非依存**： コアはバニラ JavaScript、Vue、Svelte など任意のフレームワークでそのまま動作。React / Preact 向けには hooks ラッパー（`synstate-react-hooks` / `synstate-preact-hooks`）、Preact 向けにはさらに [Preact Signals 連携](/mono/synstate/ja/preact-signals/demo/)（`synstate-preact-signals`）も用意。
 
@@ -62,15 +62,10 @@ getSnapshot(); // 現在の値を同期的に読み取り（0）
 
 ## `pipe` で値を派生する
 
-SynState の力は Observable の合成にあります。`pipe` で新しい値を派生し、`combine` で複数のソースを結合します：
+SynState の力は Observable の合成にあります。`pipe` で新しい値を派生し、`derive` で複数のソースから 1 つの値を計算します：
 
 ```tsx
-import {
-    combine,
-    createState,
-    type InitializedObservable,
-    map,
-} from 'synstate';
+import { createState, derive, type InitializedObservable, map } from 'synstate';
 
 const [count, setCount] = createState<number>(0);
 
@@ -80,9 +75,10 @@ console.log(count.getSnapshot().value); // 0
 // pipe で新しい Observable を派生
 const doubled: InitializedObservable<number> = count.pipe(map((n) => n * 2));
 
-// 複数の Observable を結合
-const combined: InitializedObservable<string> = combine([count, doubled]).pipe(
-    map(([c, d]) => `(${c}, ${d})`),
+// 複数の Observable から 1 つの値を派生
+const combined: InitializedObservable<string> = derive(
+    [count, doubled],
+    (c, d) => `(${c}, ${d})`,
 );
 
 // 変更を購読

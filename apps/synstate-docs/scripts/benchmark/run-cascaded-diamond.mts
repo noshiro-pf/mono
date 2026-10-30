@@ -21,6 +21,7 @@ import {
   formatBenchmarkCell,
   writeBenchmarkResults,
 } from './benchmark-results.mjs';
+import { isMeasuringChild, measureEachInOwnProcess } from './own-process.mjs';
 import { resultsDir, scenarioDir } from './paths.mjs';
 import { selectProductionBuilds } from './production-builds.mjs';
 
@@ -162,9 +163,11 @@ const measureEntry = (
   return mut_values;
 };
 
-console.info(
-  `\n## Cascaded Diamond (K=${K.toString()} updates, ${WARMUP_ROUNDS.toString()} warmup + ${MEASURE_ROUNDS.toString()} measured, timeout=${TIMEOUT_MS.toString()} ms)\n`,
-);
+if (!isMeasuringChild) {
+  console.info(
+    `\n## Cascaded Diamond (K=${K.toString()} updates, ${WARMUP_ROUNDS.toString()} warmup + ${MEASURE_ROUNDS.toString()} measured, timeout=${TIMEOUT_MS.toString()} ms)\n`,
+  );
+}
 
 // Column headers
 const colHeaders = DEPTHS.map((d) => `N=${d.toString()}`);
@@ -176,14 +179,20 @@ const mut_tableLines: string[] = [
   `| ------- | ${DEPTHS.map(() => '----------:').join(' | ')} |`,
 ];
 
-for (const entry of entries) {
-  const filePath = path.resolve(scenarioDir, entry.file);
+const measured = await measureEachInOwnProcess(
+  import.meta.url,
+  entries,
+  async (entry) => {
+    const filePath = path.resolve(scenarioDir, entry.file);
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const mod: BenchmarkModule = await import(filePath);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const mod: BenchmarkModule = await import(filePath);
 
-  const values = measureEntry(entry, mod);
+    return measureEntry(entry, mod);
+  },
+);
 
+for (const [entry, values] of measured) {
   mut_series.push({ label: entry.label, values });
 
   mut_tableLines.push(

@@ -1,6 +1,6 @@
 // cspell:ignore vhidden
 
-import { combine, createState, map, onScopeDispose } from 'synstate';
+import { createState, derive, map, onScopeDispose } from 'synstate';
 import {
   constant,
   For,
@@ -255,8 +255,9 @@ export const DatePicker = ({
     });
   };
 
-  const focusTarget$ = combine([display$, value$, focused$]).pipe(
-    map(([index, current, focused]) => {
+  const focusTarget$ = derive(
+    [display$, value$, focused$],
+    (index, current, focused) => {
       const isTarget = (day: WallClock): boolean =>
         monthIndexOf(day) === index && isDayInRange(day, min, max);
 
@@ -278,7 +279,7 @@ export const DatePicker = ({
       const target = candidates.find(isTarget);
 
       return target === undefined ? '' : dayKey(target);
-    }),
+    },
   );
 
   const minIndex = monthIndexOf(min);

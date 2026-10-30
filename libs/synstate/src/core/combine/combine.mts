@@ -1,12 +1,5 @@
-// Sumi bans classes, `this`, method syntax and writes to `this` outside a
-// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
-// so those rules are waived here (D-63).
-// @sumi-expect-error-file classes/no-class
-// @sumi-expect-error-file banned-syntax/no-this
-// @sumi-expect-error-file functions/prefer-arrow-function
-import { Arr, expectType, Optional } from 'ts-data-forge';
-import type { NonEmptyTuple, Tuple } from 'ts-type-forge';
-import { SyncChildObservableClass } from '../class/index.mjs';
+import { expectType } from 'ts-data-forge';
+import type { NonEmptyTuple } from 'ts-type-forge';
 import { source } from '../create/index.mjs';
 import { withInitialValue } from '../operators/index.mjs';
 import type {
@@ -14,12 +7,10 @@ import type {
   CombineObservableRefined,
   InitializedObservable,
   InitializedSyncChildObservable,
-  NonEmptyUnknownList,
   Observable,
   SyncChildObservable,
-  UpdateToken,
-  Wrap,
 } from '../types/index.mjs';
+import { derive } from './derive.mjs';
 
 /**
  * Combines multiple observables into a single observable that emits an array of their latest values.
@@ -81,9 +72,12 @@ import type {
 export const combine = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): CombineObservableRefined<OS> =>
+  // `derive` collecting the values into a new array on every update, which is
+  // never `Object.is` the one before, so every update is passed on.
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  new CombineObservableClass(
+  derive(
     parents,
+    (...values) => values,
   ) as unknown as CombineObservableRefined<OS>;
 
 /**
@@ -91,65 +85,6 @@ export const combine = <const OS extends NonEmptyTuple<Observable<unknown>>>(
  * @see combine
  */
 export const combineLatest = combine;
-
-class CombineObservableClass<const A extends NonEmptyUnknownList>
-  extends SyncChildObservableClass<A, A>
-  implements CombineObservable<A>
-{
-  constructor(parents: Wrap<A>) {
-    const parentsValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
-      parents,
-      (p) => p.getSnapshot(),
-    );
-
-    // The annotation on `initialValue` is what replaces the type assertion.
-    // `Arr.map` carries a single result element type, so it reports `A[number]`
-    // at every position, and `Tuple.MapTo<A[number], A>` — the uniform mapping
-    // — is *not* assignable back to `A`. The positional
-    // `Readonly<{ [K in keyof A]: A[K] }>` is, and TypeScript accepts the
-    // uniform result into it because the two mapped types share `keyof A`. So
-    // it is the annotation, not an assertion, that records the position-wise
-    // fact the checker cannot derive on its own.
-    const initialValue: Optional<Readonly<{ [K in keyof A]: A[K] }>> =
-      Arr.every(parentsValues, Optional.isSome)
-        ? Optional.some(Arr.map(parentsValues, (c) => c.value))
-        : Optional.none;
-
-    super({
-      parents,
-      initialValue,
-    });
-
-    this.attach();
-  }
-
-  override tryUpdate(updateToken: UpdateToken): void {
-    const parents = this.parents;
-
-    if (parents.every((o) => o.updateToken !== updateToken)) {
-      return; // all parents are skipped
-    }
-
-    // Same shape-preserving chain as the initial value: `Arr.map` (not the
-    // native one, which drops the tuple shape) into the uniform
-    // `Tuple.MapTo`, then a positional annotation to get back to `A`.
-    const parentValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
-      parents,
-      (a) => a.getSnapshot(),
-    );
-
-    if (!Arr.every(parentValues, Optional.isSome)) {
-      return;
-    }
-
-    const nextValue: Readonly<{ [K in keyof A]: A[K] }> = Arr.map(
-      parentValues,
-      (a) => a.value,
-    );
-
-    this.setNext(nextValue, updateToken);
-  }
-}
 
 if (import.meta.vitest !== undefined) {
   test('type test', () => {

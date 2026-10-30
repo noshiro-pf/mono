@@ -52,6 +52,7 @@ const referencePageSamples: DeepReadonly<
   ],
   ['create-value-emitter', 'create-event-emitter-example.mts'],
   ['debounce', 'debounce-example.mts'],
+  ['derive', 'derive-example.mts'],
   ['filter', 'filter-example.mts'],
   ['from-abortable-promise', 'from-abortable-promise-example.mts'],
   ['from-promise', 'from-promise-example.mts'],

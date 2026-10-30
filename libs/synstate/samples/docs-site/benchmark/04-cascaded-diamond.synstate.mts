@@ -1,4 +1,4 @@
-import { combine, createState, map } from 'synstate';
+import { createState, derive, map } from 'synstate';
 import { asSafeUint, range } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
@@ -14,7 +14,7 @@ export const runBenchmark = (k: number, depth: number): number => {
 
     const right = prev.pipe(map((x) => x + 2));
 
-    mut_current = combine([left, right]).pipe(map(([l, r]) => l + r));
+    mut_current = derive([left, right], (l, r) => l + r);
   }
 
   let mut_lastValue = 0;
