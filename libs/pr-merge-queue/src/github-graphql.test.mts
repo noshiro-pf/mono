@@ -12,7 +12,8 @@
  * The requests are captured rather than read out of the source, because
  * most are built at run time — an alias per pull request — and the shape
  * that goes out is what has to be valid. A function that sends a new query
- * belongs in {@link sendEveryQuery}.
+ * belongs in {@link sendEveryQuery}; the second test names any query in the
+ * source that none of the captured requests contains.
  *
  * The schema is GitHub's public one, vendored under
  * `tools/configs/github-graphql/` (its `README.md` says from where, and how
@@ -24,6 +25,9 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
+// `tools/` is not a package and has no barrel; it is reached by relative path.
+// eslint-disable-next-line import-x/no-relative-packages, import-x/no-internal-modules
+import { queriesNotSent } from '../../../tools/configs/github-graphql-source-queries.mjs';
 import { parseJson, type ApiContext } from './lib/index.mjs';
 import { markReady } from './open-pr/index.mjs';
 import { createClient } from './pr-report/index.mjs';
@@ -56,6 +60,18 @@ describe('the GraphQL requests', () => {
         { operation, errors: [] },
       );
     }
+  });
+
+  test('carry every query written in the source (a function that sends one they do not belongs in `sendEveryQuery`)', async () => {
+    const sent = await sendEveryQuery();
+
+    assert.deepStrictEqual(
+      queriesNotSent(
+        import.meta.dirname,
+        sent.map(({ query }) => query),
+      ),
+      [],
+    );
   });
 });
 

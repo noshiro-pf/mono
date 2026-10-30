@@ -13,6 +13,11 @@ The tests that check the GraphQL requests against it read it from here:
 GitHub answers a query it cannot read with an error and no data, and a query
 is a string, so nothing else says one is wrong before it reaches GitHub.
 
+Each test checks only the queries it is given, so each also fails on a query
+written in its package's `src/` that none of them contains.
+`../github-graphql-source-queries.mts` finds those, and says what it counts
+as a query.
+
 ## Refreshing it
 
 ```sh

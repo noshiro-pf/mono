@@ -82,9 +82,10 @@ the answer this procedure exists to rule out.
   send against GitHub's schema (`github-graphql.test.mts` in
   `libs/pr-merge-queue`, where a function that sends a new query joins
   `sendEveryQuery`, and in `apps/pr-manager`, where a new query joins
-  `QUERIES`). That registration is itself a step someone has to remember,
-  which #2642 is about. SQL, HTML or a shell command in a string ask the same
-  question.
+  `QUERIES`). That registration was itself a step someone had to remember,
+  until the fix for #2642 added a second test to each, which fails on a query
+  written in the source that none of the validated ones contains. SQL, HTML or a shell
+  command in a string ask the same question.
 - **A discipline that did not hold.** `CLAUDE.md` states its own admission
   test, and the file still had to be cut back from four digits. What was
   missing was a moment at which growth is noticed;
