@@ -369,4 +369,36 @@ describe(DateInput, () => {
 
     unmount();
   });
+
+  test('the Enter or Escape that ends a composition of an input method takes nothing', async () => {
+    fixNow();
+
+    const { value$, onChange, changes } = controlled('');
+
+    const { container, unmount } = mountInto(() => (
+      <DateInput {...RANGE} value={value$} onChange={onChange} />
+    ));
+
+    const input = one<HTMLInputElement>(container, 'input');
+
+    input.focus();
+
+    await settle();
+
+    type(input, '2031/3/4');
+
+    press(input, 'Enter', { isComposing: true });
+
+    // Safari's, after the composition has ended.
+    press(input, 'Enter', { keyCode: 229 });
+
+    // Safari's Escape that cancels a composition, which leaves the input.
+    press(input, 'Escape', { keyCode: 229 });
+
+    assert.strictEqual(document.activeElement, input);
+
+    assert.deepStrictEqual(changes, []);
+
+    unmount();
+  });
 });

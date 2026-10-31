@@ -15,7 +15,7 @@ import {
   TIME_UNIT_MAX,
   type TimeOfDay,
 } from '../date/index.mjs';
-import { parseInteger, uniqueId } from '../internal/index.mjs';
+import { isImeKeyDown, parseInteger, uniqueId } from '../internal/index.mjs';
 import { Icon } from './icon.js';
 
 /** What a {@link TimePicker} reads out; Blueprint's wording by default. */
@@ -178,6 +178,11 @@ export const TimePicker = ({
           );
         }}
         onKeyDown={(event) => {
+          // Keys that pick, confirm or cancel what an input method is composing.
+          if (isImeKeyDown(event)) {
+            return;
+          }
+
           switch (event.key) {
             case 'ArrowUp':
               event.preventDefault();
@@ -218,14 +223,12 @@ export const TimePicker = ({
         disabled ? 'bp6-timepicker bp6-disabled' : 'bp6-timepicker',
       )}
     >
-      {showArrowButtons ? (
-        <div class={constant('bp6-timepicker-arrow-row')}>
-          {renderArrow('hour', true)}
-          {renderArrow('minute', true)}
-        </div>
-      ) : (
-        []
-      )}
+      {/* The rows are there without the arrows too, as in Blueprint's. */}
+      <div class={constant('bp6-timepicker-arrow-row')}>
+        {showArrowButtons
+          ? [renderArrow('hour', true), renderArrow('minute', true)]
+          : []}
+      </div>
       <div class={constant('bp6-timepicker-input-row')}>
         {renderInput('hour')}
         <span class={constant('bp6-timepicker-divider-text')}>
@@ -233,14 +236,11 @@ export const TimePicker = ({
         </span>
         {renderInput('minute')}
       </div>
-      {showArrowButtons ? (
-        <div class={constant('bp6-timepicker-arrow-row')}>
-          {renderArrow('hour', false)}
-          {renderArrow('minute', false)}
-        </div>
-      ) : (
-        []
-      )}
+      <div class={constant('bp6-timepicker-arrow-row')}>
+        {showArrowButtons
+          ? [renderArrow('hour', false), renderArrow('minute', false)]
+          : []}
+      </div>
     </div>
   );
 };

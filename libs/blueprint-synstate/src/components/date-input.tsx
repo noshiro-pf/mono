@@ -23,6 +23,7 @@ import {
 import {
   ARROW_SIZE,
   createAfterUpdate,
+  isImeKeyDown,
   listenInScope,
   placeBottomStart,
   uniqueId,
@@ -552,6 +553,12 @@ export const DateInput = ({
             }
           }}
           onKeyDown={(event) => {
+            // Keys that pick, confirm or cancel what an input method is
+            // composing.
+            if (isImeKeyDown(event)) {
+              return;
+            }
+
             const isOpen = open$.getSnapshot().value;
 
             switch (event.key) {

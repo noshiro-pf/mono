@@ -86,6 +86,27 @@ describe(NumericInput, () => {
     unmount();
   });
 
+  test('reads out the number the text shows, as it is typed', () => {
+    const { input, unmount } = setUp(3);
+
+    assert.strictEqual(input.getAttribute('aria-valuenow'), '3');
+
+    type(input, '-');
+
+    assert.isFalse(input.hasAttribute('aria-valuenow'));
+
+    type(input, '7');
+
+    assert.strictEqual(input.getAttribute('aria-valuenow'), '7');
+
+    // A number, but none a spin button can read out.
+    type(input, 'Infinity');
+
+    assert.isFalse(input.hasAttribute('aria-valuenow'));
+
+    unmount();
+  });
+
   test('rewrites the text, and tells no one, when it stands for the value already', () => {
     const { input, changes, unmount } = setUp(3);
 
@@ -346,6 +367,20 @@ describe(NumericInput, () => {
     assert.strictEqual(input.value, '12');
 
     assert.deepStrictEqual(changes, []);
+
+    unmount();
+  });
+
+  test('an arrow key with the key code of an input method steps, as Android’s virtual keyboard sends every key', () => {
+    const { input, changes, unmount } = setUp(3);
+
+    assert.isFalse(press(input, 'ArrowUp', { code: 'ArrowUp', keyCode: 229 }));
+
+    document.dispatchEvent(
+      new KeyboardEvent('keyup', { key: 'ArrowUp', code: 'ArrowUp' }),
+    );
+
+    assert.deepStrictEqual(changes, [3.5]);
 
     unmount();
   });

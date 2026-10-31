@@ -26,11 +26,15 @@ export const BoundedNumericInput = <N extends number>({
   onValueChange,
   toValue,
   min,
-  max = Number.POSITIVE_INFINITY,
+  max,
   integer = false,
   'data-e2e': e2e,
 }: Props<N>): JSX.Element => {
-  const bounded = normalizeBounded({ min, max, integer });
+  const bounded = normalizeBounded({
+    min,
+    max: max ?? Number.POSITIVE_INFINITY,
+    integer,
+  });
 
   return (
     <NumericInput
@@ -39,6 +43,8 @@ export const BoundedNumericInput = <N extends number>({
       encode={encode}
       fill
       inputClass={styles.input}
+      max={max === undefined ? undefined : constant(max)}
+      min={constant(min)}
       normalize={(n) => toValue(bounded(n))}
       selectAllOnFocus
       value={value}

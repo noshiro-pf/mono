@@ -84,17 +84,22 @@ Behavior follows Blueprint's with a controlled value, including what may surpris
 A numeric input is built in two layers, as every numeric input in this repository is (see [`articles/numeric-input-interface.md`](../../articles/numeric-input-interface.md)):
 
 - `NumericInputView` is stateless and controlled, and its value is the **text**: it shows `value` and hands every keystroke to `onValueChange` as a string.
-- `NumericInput` holds that text, uncontrolled while the user types, and decodes it only when it is committed — on blur, on Enter, or by a step of the buttons or the arrow keys, which repeats while held and stops at a bound. Then `normalize` makes it a value, the text is rewritten from the value, and `onValueChange` is told if it changed.
+- `NumericInput` holds that text, uncontrolled while the user types, and makes it the value only when it is committed — on blur, on Enter, or by a step of the buttons or the arrow keys, which repeats while held and stops at a bound. Then `normalize` makes a value of what `decode` reads, the text is rewritten from the value, and `onValueChange` is told if it changed. `decode` is also read whenever the text changes, for the number the spin button reads out, so it takes half-typed text without throwing.
 
 Never give a numeric input a number as its controlled value: what the user is half way through typing, such as `-`, `3.` or `1e`, would collapse into `NaN` or a rounded number on the next keystroke. A value that is not a plain number, such as one that may be empty, is held by a layer of its own on top of `NumericInputView`.
 
 ```tsx
 import { NumericInput } from 'blueprint-synstate';
 import { createState } from 'synstate';
-import { render } from 'synstate-dom';
+import { constant, render } from 'synstate-dom';
 
 // The value is a number; what the user is typing stays text until committed.
 const [rate$, setRate] = createState(1.5);
+
+// The bounds `normalize` holds the value to, read out as the spin button's.
+const minRate = 0;
+
+const maxRate = 20;
 
 const unmount = render(
     () => (
@@ -102,10 +107,15 @@ const unmount = render(
             // `NaN` for text that is not a number, which `normalize` replaces.
             decode={Number.parseFloat}
             encode={(rate) => rate.toFixed(2)}
+            max={constant(maxRate)}
+            min={constant(minRate)}
             normalize={(rate) =>
-                Number.isFinite(rate)
-                    ? Math.min(20, Math.max(0, Math.round(rate * 100) / 100))
-                    : 0
+                Number.isNaN(rate)
+                    ? minRate
+                    : Math.min(
+                          maxRate,
+                          Math.max(minRate, Math.round(rate * 100) / 100),
+                      )
             }
             step={0.05}
             value={rate$}

@@ -98,7 +98,58 @@ describe(TimePicker, () => {
     // Without the arrows, the fields are no spinbuttons.
     assert.isNull(minute.getAttribute('role'));
 
-    assert.strictEqual(all(container, '.bp6-timepicker-arrow-row').length, 0);
+    // The rows are there, empty, as in Blueprint's markup.
+    assert.strictEqual(all(container, '.bp6-timepicker-arrow-row').length, 2);
+
+    assert.strictEqual(
+      all(container, '.bp6-timepicker-arrow-button').length,
+      0,
+    );
+
+    unmount();
+  });
+
+  test('keys that an input method is composing with step nothing and keep the focus', () => {
+    const { value$, onChange, changes } = controlled('10:30');
+
+    const { container, unmount } = mountInto(() => (
+      <TimePicker value={value$} onChange={onChange} />
+    ));
+
+    const minute = one<HTMLInputElement>(
+      container,
+      'input.bp6-timepicker-minute',
+    );
+
+    minute.focus();
+
+    assert.isTrue(press(minute, 'ArrowUp', { isComposing: true }));
+
+    // Safari's Enter that confirms a composition, after it has ended.
+    assert.isTrue(press(minute, 'Enter', { keyCode: 229 }));
+
+    assert.deepStrictEqual(changes, []);
+
+    assert.strictEqual(document.activeElement, minute);
+
+    unmount();
+  });
+
+  test('an arrow key with the key code of an input method steps, as Android’s virtual keyboard may send', () => {
+    const { value$, onChange, changes } = controlled('10:30');
+
+    const { container, unmount } = mountInto(() => (
+      <TimePicker value={value$} onChange={onChange} />
+    ));
+
+    const minute = one<HTMLInputElement>(
+      container,
+      'input.bp6-timepicker-minute',
+    );
+
+    assert.isFalse(press(minute, 'ArrowUp', { keyCode: 229 }));
+
+    assert.deepStrictEqual(changes, ['10:31']);
 
     unmount();
   });
