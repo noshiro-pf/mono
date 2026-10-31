@@ -825,11 +825,311 @@ describe(createReader, () => {
       });
     });
   });
+
+  describe('the report kept from the last visit', () => {
+    test('is shown at once while the first read is out, and the read replaces it', async () => {
+      const { reader, loads, cache, clock } = setup(DEVICE_TOKEN);
+
+      clock.set(5_000);
+
+      reader.start();
+
+      assert.strictEqual(cache.loads(), 1);
+
+      await cache.answer(readAt(1_000));
+
+      assert.deepStrictEqual(shown(reader), { status: READY, readAt: 1_000 });
+
+      // The age is measured from now, not from the epoch.
+      assert.strictEqual(reader.nowMs.getSnapshot().value, 5_000);
+
+      assert.isTrue(reader.fetching.getSnapshot().value);
+
+      await answer(loads, 0, Result.ok(readAt(5_000)), LIMIT);
+
+      assert.deepStrictEqual(shown(reader), { status: READY, readAt: 5_000 });
+
+      assert.isFalse(reader.fetching.getSnapshot().value);
+    });
+
+    test('is not taken apart by the first read answering part by part', async () => {
+      const { reader, loads, cache } = setup(DEVICE_TOKEN);
+
+      reader.start();
+
+      await cache.answer({ ...readAt(1_000), merged: [MERGED] });
+
+      loads[0]?.onProgress?.({ ...readAt(5_000), reading: ['merged'] });
+
+      assert.deepStrictEqual(reader.merged.getSnapshot().value, [MERGED]);
+
+      assert.deepStrictEqual(reader.reading.getSnapshot().value, []);
+
+      assert.strictEqual(reader.readAt.getSnapshot().value, 1_000);
+    });
+
+    test('arriving after the first part of the read, it is not shown', async () => {
+      const { reader, loads, cache } = setup(DEVICE_TOKEN);
+
+      reader.start();
+
+      loads[0]?.onProgress?.({ ...readAt(5_000), reading: ['merged'] });
+
+      await cache.answer(readAt(1_000));
+
+      assert.strictEqual(reader.readAt.getSnapshot().value, 5_000);
+    });
+
+    test('gives way to the failure of the first read, said as loudly as with nothing kept', async () => {
+      const { reader, loads, cache, clock, timers } = setup(DEVICE_TOKEN);
+
+      clock.set(5_000);
+
+      reader.start();
+
+      await cache.answer(readAt(1_000));
+
+      await answer(loads, 0, Result.err('Bad credentials'), LIMIT);
+
+      // A token that expired since the last visit would otherwise leave a
+      // report days old on screen, with a note in the header.
+      assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, {
+        type: 'failed',
+        message: 'Bad credentials',
+      });
+
+      // And the next read draws its parts as they answer, as a first does.
+      timers.fire(POLL_INTERVAL_MS);
+
+      loads[1]?.onProgress?.({ ...readAt(6_000), reading: ['merged'] });
+
+      assert.deepStrictEqual(shown(reader), { status: READY, readAt: 6_000 });
+    });
+
+    test('is replaced by the first read even when the clock has been put back since', async () => {
+      const { reader, loads, cache, clock } = setup(DEVICE_TOKEN);
+
+      clock.set(5_000);
+
+      reader.start();
+
+      await cache.answer(readAt(9_000));
+
+      await answer(loads, 0, Result.ok(readAt(5_000)), LIMIT);
+
+      assert.strictEqual(reader.readAt.getSnapshot().value, 5_000);
+    });
+
+    test('is kept from a whole read, and is gone with the token', async () => {
+      const { reader, loads, cache, setToken, clock } = setup(DEVICE_TOKEN);
+
+      clock.set(5_000);
+
+      reader.start();
+
+      await cache.answer(undefined);
+
+      loads[0]?.onProgress?.({ ...readAt(5_000), reading: ['merged'] });
+
+      assert.deepStrictEqual(cache.saved(), []);
+
+      await answer(loads, 0, Result.ok(readAt(5_000)), LIMIT);
+
+      assert.deepStrictEqual(
+        cache.saved().map((report) => report.readAtEpochMs),
+        [5_000],
+      );
+
+      setToken(undefined);
+
+      assert.strictEqual(cache.cleared(), 1);
+    });
+
+    test('is kept at most every minute, and when the tab is hidden', async () => {
+      const { reader, loads, cache, clock, timers, visibility } =
+        setup(DEVICE_TOKEN);
+
+      const kept = (): readonly number[] =>
+        cache.saved().map((report) => report.readAtEpochMs);
+
+      clock.set(5_000);
+
+      reader.start();
+
+      await answer(loads, 0, Result.ok(readAt(5_000)), LIMIT);
+
+      clock.set(20_000);
+
+      timers.fire(POLL_INTERVAL_MS);
+
+      await answer(loads, 1, Result.ok(readAt(20_000)), LIMIT);
+
+      // Within the minute, not kept yet.
+      assert.deepStrictEqual(kept(), [5_000]);
+
+      visibility.hide();
+
+      assert.deepStrictEqual(kept(), [5_000, 20_000]);
+
+      // Hidden again with nothing newer read, nothing more is kept.
+      visibility.show();
+
+      visibility.hide();
+
+      assert.deepStrictEqual(kept(), [5_000, 20_000]);
+
+      // A minute after the last one kept, a whole read is kept as it answers.
+      clock.set(80_000);
+
+      await answer(loads, 2, Result.ok(readAt(80_000)), LIMIT);
+
+      assert.deepStrictEqual(kept(), [5_000, 20_000, 80_000]);
+
+      // And one read since then is kept on hiding the tab.
+      visibility.show();
+
+      clock.set(90_000);
+
+      await answer(loads, 3, Result.ok(readAt(90_000)), LIMIT);
+
+      assert.deepStrictEqual(kept(), [5_000, 20_000, 80_000]);
+
+      visibility.hide();
+
+      assert.deepStrictEqual(kept(), [5_000, 20_000, 80_000, 90_000]);
+    });
+
+    test('is not drawn when the token moved to the tab while it was read', async () => {
+      const { reader, cache, setToken } = setup(DEVICE_TOKEN);
+
+      reader.start();
+
+      setToken({ ...DEVICE_TOKEN, store: 'session' });
+
+      await cache.answer(readAt(1_000));
+
+      assert.strictEqual(reader.loadStatus.getSnapshot().value, LOADING);
+    });
+
+    test('gives way, issues and all, to the first read, even after a page listed on from it', async () => {
+      const { reader, loads, issueLoads, cache, clock } = setup(DEVICE_TOKEN);
+
+      clock.set(5_000);
+
+      reader.start();
+
+      await cache.answer(withIssues(1_000, [1], 'c1'));
+
+      reader.loadMoreIssues();
+
+      await answerIssues(issueLoads, 0, Result.ok(issueList([2], 'c2')));
+
+      assert.deepStrictEqual(listed(reader), [1, 2]);
+
+      await answer(loads, 0, Result.ok(withIssues(5_000, [3], 'c3')), LIMIT);
+
+      assert.deepStrictEqual(listed(reader), [3]);
+
+      // And the next read lists as many as were asked for.
+      clock.set(20_000);
+
+      reader.refresh();
+
+      assert.strictEqual(
+        loads.at(-1)?.issueCount,
+        ISSUES_LIMIT + ISSUES_PAGE_SIZE,
+      );
+    });
+
+    test('is gone when the token moves from the device to the tab', () => {
+      const { reader, cache, setToken } = setup(DEVICE_TOKEN);
+
+      reader.start();
+
+      assert.strictEqual(cache.cleared(), 0);
+
+      setToken({ ...DEVICE_TOKEN, store: 'session' });
+
+      assert.strictEqual(cache.cleared(), 1);
+    });
+
+    test('is neither read nor kept for a token kept only in the tab', async () => {
+      const { reader, loads, cache } = setup(TOKEN_A);
+
+      reader.start();
+
+      assert.strictEqual(cache.loads(), 0);
+
+      await answer(loads, 0, Result.ok(readAt(5_000)), LIMIT);
+
+      assert.deepStrictEqual(cache.saved(), []);
+
+      // What an earlier token kept on the device may have left goes.
+      assert.isAtLeast(cache.cleared(), 1);
+    });
+  });
+
+  test('says when a read is out, a poll as much as the first', async () => {
+    const { reader, loads, timers } = setup(TOKEN_A);
+
+    reader.start();
+
+    assert.isTrue(reader.fetching.getSnapshot().value);
+
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
+
+    assert.isFalse(reader.fetching.getSnapshot().value);
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    assert.isTrue(reader.fetching.getSnapshot().value);
+
+    loads[1]?.reject(new Error('boom'));
+
+    await settle();
+
+    assert.isFalse(reader.fetching.getSnapshot().value);
+  });
+
+  test('a load that throws rather than rejects is not a read left out for good', async () => {
+    const [token] = createState<StoredToken | undefined>(TOKEN_A);
+
+    const reader = createReader({
+      token,
+      load: () => {
+        throw new Error('boom');
+      },
+      loadRuns: () => Promise.resolve(Result.err('unread')),
+      loadIssues: () => Promise.reject(new Error('unused')),
+      now: () => 0,
+      counter: () => source<number>(),
+      isVisible: () => true,
+      visibilityChange: source<undefined>(),
+      cache: {
+        load: () => Promise.resolve(undefined),
+        save: () => undefined,
+        clear: () => undefined,
+      },
+    });
+
+    reader.start();
+
+    await settle();
+
+    assert.isFalse(reader.fetching.getSnapshot().value);
+
+    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, {
+      type: 'failed',
+      message: 'boom',
+    });
+  });
 });
 
 const TOKEN_B: StoredToken = { value: 'b', store: 'session' } as const;
 
 const TOKEN_A: StoredToken = { value: 'a', store: 'session' } as const;
+
+const DEVICE_TOKEN: StoredToken = { value: 'd', store: 'device' } as const;
 
 const LIMIT: RateLimit = {
   limit: 5000,
@@ -874,6 +1174,14 @@ type Setup = Readonly<{
     show: () => void;
   }>;
   setToken: (token: StoredToken | undefined) => unknown;
+  cache: Readonly<{
+    /** How many times the reader asked for the report kept. */
+    loads: () => number;
+    /** Answers the newest of those asks. */
+    answer: (report: LoadedReport | undefined) => Promise<void>;
+    saved: () => readonly LoadedReport[];
+    cleared: () => number;
+  }>;
   timers: Readonly<{
     /** Ticks the newest timer of this interval. */
     fire: (ms: number) => void;
@@ -883,6 +1191,12 @@ type Setup = Readonly<{
     running: (ms: number) => number;
   }>;
 }>;
+
+const settle = async (): Promise<void> => {
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 0);
+  });
+};
 
 const setup = (initialToken: StoredToken | undefined): Setup => {
   const [token, setToken] = createState<StoredToken | undefined>(initialToken);
@@ -894,6 +1208,12 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
   const mut_issueLoads: PendingIssueLoad[] = [];
 
   const mut_clock = { nowMs: 0 };
+
+  const mut_cacheLoads: ((report: LoadedReport | undefined) => void)[] = [];
+
+  const mut_saved: LoadedReport[] = [];
+
+  const mut_cleared = { count: 0 };
 
   /** One `counter` stand-in per timer the reader asks for, oldest first. */
   const mut_counters: Readonly<{
@@ -954,6 +1274,18 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
     },
     isVisible: () => mut_visibility.visible,
     visibilityChange,
+    cache: {
+      load: async () =>
+        new Promise((resolve) => {
+          mut_cacheLoads.push(resolve);
+        }),
+      save: (report) => {
+        mut_saved.push(report);
+      },
+      clear: () => {
+        mut_cleared.count += 1;
+      },
+    },
   });
 
   return {
@@ -968,6 +1300,16 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
     },
     visibility: mut_visibility,
     setToken,
+    cache: {
+      loads: () => mut_cacheLoads.length,
+      answer: async (report) => {
+        mut_cacheLoads.at(-1)?.(report);
+
+        await settle();
+      },
+      saved: () => mut_saved,
+      cleared: () => mut_cleared.count,
+    },
     timers: {
       fire: (ms: number) => {
         countersOf(ms).at(-1)?.next(1);
@@ -977,12 +1319,6 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
         countersOf(ms).filter((counter) => !counter.isCompleted).length,
     },
   } as const;
-};
-
-const settle = async (): Promise<void> => {
-  await new Promise<void>((resolve) => {
-    setTimeout(resolve, 0);
-  });
 };
 
 const answer = async (

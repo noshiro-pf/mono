@@ -1,11 +1,12 @@
 /**
  * The page's own settings, kept in IndexedDB.
  *
- * Only the header's fold is kept here (`header-store.mts`). What the page
- * shows is kept in the URL (`url.mts`), so that a link opens it the same
- * way; whether the header is folded is how much room this screen has to
- * spare, not a way of looking at the page worth sharing in a link. A
- * database of the page's own name rather than a
+ * The header's fold is kept here (`header-store.mts`), and the last report
+ * read of each repository, for the next visit to show while it reads its own
+ * (`report-cache.mts`). What the page shows is kept in the URL (`url.mts`),
+ * so that a link opens it the same way; whether the header is folded is how
+ * much room this screen has to spare, not a way of looking at the page worth
+ * sharing in a link. A database of the page's own name rather than a
  * `localStorage` key, since that one store is shared by every app on the
  * origin. Like `localStorage` it is per browser, and gone when the site's
  * data is cleared.

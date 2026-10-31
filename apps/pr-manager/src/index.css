@@ -2076,6 +2076,41 @@ a:focus-visible {
   width: 1px;
 }
 
+/*
+ * Beside when the report was read, while a newer read is out. It turns
+ * whatever the reader's motion setting, as the running workflow's ring does:
+ * a still ring would say nothing about whether the page is waiting.
+ */
+.fetching-indicator {
+  color: var(--accent);
+  margin-left: 0.5em;
+  white-space: nowrap;
+}
+
+.fetching-indicator[data-active='false'] {
+  visibility: hidden;
+}
+
+.fetching-indicator svg {
+  height: 1em;
+  stroke: currentcolor;
+  vertical-align: -0.125em;
+  width: 1em;
+}
+
+.fetching-indicator[data-active='true'] svg {
+  animation: run-state-turn 1s linear infinite;
+}
+
+.fetching-track {
+  opacity: 0.3;
+}
+
+.fetching-label {
+  font-size: 0.875em;
+  margin-left: 0.3em;
+}
+
 @keyframes run-state-turn {
   to {
     transform: rotate(1turn);

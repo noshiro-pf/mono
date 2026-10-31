@@ -9,6 +9,7 @@ export * from './commit-divergence.js';
 export * from './cycles-section.js';
 export * from './dag-box.mjs';
 export * from './external-link.js';
+export * from './fetching-indicator.js';
 export * from './follow-open.mjs';
 export * from './header-fold-toggle.js';
 export * from './how-to-use.js';

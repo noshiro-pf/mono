@@ -45,6 +45,7 @@ import {
 import {
   asRefreshing,
   LOADING,
+  READY,
   settle,
   type LoadStatus,
 } from '../load-state.mjs';
@@ -53,6 +54,7 @@ import {
   type BudgetSample,
   type RateLimit,
 } from '../rate-limit.mjs';
+import type { ReportCache } from '../report-cache.mjs';
 import { ISSUES_LIMIT, ISSUES_PAGE_SIZE } from '../report-query.mjs';
 import type { StoredToken } from '../token.mjs';
 import type { WorkflowRunList } from '../workflow-runs.mjs';
@@ -91,6 +93,15 @@ export type ReaderDeps = Readonly<{
   isVisible: () => boolean;
   /** Emits whenever the tab is shown or hidden. */
   visibilityChange: SynstateObservable<unknown>;
+  /**
+   * The last whole report, kept on the device so that a tab opened later
+   * has something to show before its first read answers — which is the
+   * slowest moment of the page, every part of the report being asked for at
+   * once. Kept only beside a token kept on the device: a reader who keeps
+   * their token in the tab alone has asked for nothing read with it to
+   * outlast the tab.
+   */
+  cache: ReportCache;
 }>;
 
 export type Reader = Readonly<{
@@ -126,6 +137,13 @@ export type Reader = Readonly<{
   issues: InitializedObservable<LoadedReport['issues']>;
   /** The sections below the merge order that have not answered yet. */
   reading: InitializedObservable<readonly SectionPart[]>;
+  /**
+   * Whether a read of the report is out: the first, a poll or a Refresh.
+   * What is on screen may be minutes old — kept from the last visit, or the
+   * last poll before the tab was hidden — and this is what says a newer one
+   * is on its way.
+   */
+  fetching: InitializedObservable<boolean>;
   /** The workflow runs still going, as the last read of them left them. */
   runs: InitializedObservable<RunsStatus>;
   /** How the last {@link loadMoreIssues} went. */
@@ -195,6 +213,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     counter,
     isVisible,
     visibilityChange,
+    cache,
   } = deps;
 
   // While `start` has been called and its stop has not. What only goes on
@@ -341,6 +360,22 @@ export const createReader = (deps: ReaderDeps): Reader => {
   // rather than a state.
   let mut_issueCount = ISSUES_LIMIT;
 
+  // How many reads of the report are out.
+  const [outstanding, , { updateState: updateOutstanding }] = createState(0);
+
+  const fetching = outstanding
+    .pipe(map((count) => count > 0))
+    .pipe(skipIfNoChange());
+
+  // Whether the report on screen is the one kept from the last visit, which
+  // the parts of the first read must not take apart: they would put a
+  // placeholder where the kept report has data. A whole read replaces it.
+  let mut_showingKept = false;
+
+  // The kept report is asked for once, by the first read: after that the
+  // page has a report of its own, newer than any kept one.
+  let mut_keptAsked = false;
+
   const getReadAt = (): number => getReport().readAtEpochMs;
 
   const getIssues = (): ReportParts['issues'] => getReport().issues;
@@ -357,6 +392,71 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
   const currentToken = (): string | undefined =>
     token.getSnapshot().value?.value;
+
+  const onDevice = (): boolean => token.getSnapshot().value?.store === 'device';
+
+  /** Shows the report kept from the last visit, if nothing is shown yet. */
+  const showKept = (tokenValue: string): void => {
+    cache
+      .load(tokenValue)
+      .then((kept) => {
+        if (
+          kept === undefined ||
+          !onDevice() ||
+          currentToken() !== tokenValue ||
+          getLoadStatus().type !== 'loading'
+        ) {
+          return;
+        }
+
+        setNowMs(now());
+
+        writeReport(kept, true);
+
+        mut_showingKept = true;
+
+        setLoadStatus(READY);
+      })
+      .catch(() => undefined);
+  };
+
+  // The newest whole report, and when one was last kept. A whole report
+  // comes every poll, and keeping it is a structured clone and a write of the
+  // whole of it; the next visit needs only a recent one. So it is kept at
+  // most every {@link KEEP_EVERY_MS}, and when the tab is hidden. Closing a
+  // tab hides it first, but the write may not finish before the page goes,
+  // so the report a later visit shows can be up to that interval older than
+  // the last one this tab read.
+  let mut_newestWhole: LoadedReport | undefined = undefined;
+
+  let mut_keptAtMs: number | undefined = undefined;
+
+  const keepNewest = (): void => {
+    const tokenValue = currentToken();
+
+    if (
+      mut_newestWhole === undefined ||
+      tokenValue === undefined ||
+      !onDevice()
+    ) {
+      return;
+    }
+
+    cache.save(mut_newestWhole, tokenValue);
+
+    mut_newestWhole = undefined;
+
+    mut_keptAtMs = now();
+  };
+
+  /** Keeps a whole report for the next visit, where the token is kept too. */
+  const keep = (whole: LoadedReport): void => {
+    mut_newestWhole = whole;
+
+    if (mut_keptAtMs === undefined || now() - mut_keptAtMs >= KEEP_EVERY_MS) {
+      keepNewest();
+    }
+  };
 
   const read = (): void => {
     const tokenValue = currentToken();
@@ -390,14 +490,39 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
       measureBudget(answeredLimit);
 
-      const settled = settle(getLoadStatus(), getReadAt(), result, startedAtMs);
+      // The report kept from the last visit is not this page's own read:
+      // the first read is settled as if nothing were shown. Its failure is
+      // the page's failure, said as loudly as it would be with nothing kept —
+      // a token that has expired since is otherwise a page quietly showing a
+      // report days old — and a kept report read by a clock that has since
+      // been put back cannot outrank the read that replaces it.
+      const showingKept = mut_showingKept;
+
+      const settled = settle(
+        showingKept ? LOADING : getLoadStatus(),
+        getReadAt(),
+        result,
+        startedAtMs,
+      );
+
+      // Settled as a first read, it either failed or brought a report:
+      // either way the kept one is no longer what the page shows.
+      mut_showingKept = false;
 
       // The report before the status, so that a page shown for the first
       // time is shown with its parts already in place. Its issues are left
       // out when it was asked for before `loadMoreIssues` added a page: it
       // lists fewer than the page now shows, and would take that page away.
       if (settled.report !== undefined) {
-        writeReport(settled.report, issueCount >= mut_issueCount);
+        // Over the kept report, its issues go too, even where a page was
+        // listed after them meanwhile: that page was read on from an old
+        // list. The count it raised stays, so the next read lists as many.
+        writeReport(
+          settled.report,
+          showingKept || issueCount >= mut_issueCount,
+        );
+
+        keep(settled.report);
       }
 
       setLoadStatus(settled.status);
@@ -405,7 +530,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
     const onProgress = progressive
       ? (partial: LoadedReport): void => {
-          if (currentToken() !== tokenValue) {
+          if (mut_showingKept || currentToken() !== tokenValue) {
             return;
           }
 
@@ -446,12 +571,28 @@ export const createReader = (deps: ReaderDeps): Reader => {
         applyRuns(Result.err(unknownToString(error)));
       });
 
-    load(tokenValue, startedAtMs, issueCount, onProgress)
+    if (!mut_keptAsked && progressive && onDevice()) {
+      showKept(tokenValue);
+    }
+
+    mut_keptAsked = true;
+
+    updateOutstanding((count) => count + 1);
+
+    // Called by an async function, so that a `load` that throws rather than
+    // rejects still settles it, and the count still goes down.
+    const loading = async (): Promise<Answered<LoadedReport>> =>
+      load(tokenValue, startedAtMs, issueCount, onProgress);
+
+    loading()
       .then(({ result, rateLimit: answeredLimit }) => {
         apply(result, answeredLimit);
       })
       .catch((error: unknown) => {
         apply(Result.err(unknownToString(error)), undefined);
+      })
+      .finally(() => {
+        updateOutstanding((count) => count - 1);
       });
   };
 
@@ -520,6 +661,23 @@ export const createReader = (deps: ReaderDeps): Reader => {
   };
 
   const start = (): (() => void) => {
+    // Nothing read with a token is kept past a tab the reader keeps it in
+    // alone, or past forgetting it. Moving a token from the device to the
+    // tab is not a change of token, so this follows where it is kept rather
+    // than {@link tokenChanged}. Cleared on the first value too, when it is
+    // not a device token: one kept earlier may have left a report behind. A
+    // token replaced by another is the cache's to tell apart
+    // (`report-cache.mts`), since another tab may still be reading with it.
+    const keptSubscription = token.subscribe((stored) => {
+      if (stored?.store === 'device') {
+        return;
+      }
+
+      mut_newestWhole = undefined;
+
+      cache.clear();
+    });
+
     // The first read, and a read on every change of token, which is how a
     // reader finds out whether GitHub takes the one they pasted.
     const tokenSubscription = tokenChanged.subscribe((tokenValue) => {
@@ -527,6 +685,8 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
       if (tokenValue === undefined) {
         mut_runsShownFromMs = 0;
+
+        mut_showingKept = false;
       } else {
         read();
       }
@@ -573,6 +733,8 @@ export const createReader = (deps: ReaderDeps): Reader => {
         startPolling();
       } else {
         stopPolling();
+
+        keepNewest();
       }
     });
 
@@ -580,6 +742,8 @@ export const createReader = (deps: ReaderDeps): Reader => {
 
     return () => {
       tokenSubscription.unsubscribe();
+
+      keptSubscription.unsubscribe();
 
       visibilitySubscription.unsubscribe();
 
@@ -609,6 +773,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     features,
     issues,
     reading,
+    fetching,
     runs,
     moreIssues,
     rateLimit,
@@ -670,6 +835,9 @@ const EMPTY_PARTS: ReportParts = {
   },
   reading: [],
 } as const;
+
+/** How often at most a whole report is kept for the next visit. */
+const KEEP_EVERY_MS = 60_000;
 
 const RUNS_READING: RunsStatus = { type: 'reading' } as const;
 
