@@ -1,0 +1,46 @@
+--- en/01-async-step.preact-signals.mts
++++ ja/01-async-step.preact-signals.mts
+@@ -12,7 +12,7 @@
+ 
+   const searchState = signal<SearchState>({ status: 'loading', query: 'a' });
+ 
+-  // What the page shows: the query in the box, and what the list is for.
++  // ページに表示するもの: 入力欄のクエリと、リストがどのクエリの結果か。
+   const view = computed(() => showView(query.value, searchState.value));
+ 
+   // transformer-ignore-next-line convert-to-readonly, append-as-const
+@@ -24,7 +24,7 @@
+     });
+   };
+ 
+-  // switchMap((q) => request(q)), written as an effect.
++  // switchMap((q) => request(q)) を effect で書いたもの。
+   const search = (): void => {
+     effect(() => {
+       const q = query.value;
+@@ -35,14 +35,14 @@
+         searchState.value = { status: 'success', query: q };
+       }, answerMs);
+ 
+-      // A newer query cancels the request in flight.
++      // 新しいクエリが実行中のリクエストを取り消す。
+       return () => {
+         clearTimeout(answer);
+       };
+     });
+   };
+ 
+-  // Nothing but the order the two effects are created in differs.
++  // 違うのは 2 つの effect を作る順番だけ。
+   if (viewCreatedFirst) {
+     watchView();
+ 
+@@ -77,7 +77,7 @@
+         setQuery('ab');
+ 
+         assert.deepStrictEqual(viewLog.slice(before), [
+-          'ab / success for a', // the new query, the old list
++          'ab / success for a', // 新しいクエリと古いリスト
+           'ab / loading for ab',
+         ]);
+ 

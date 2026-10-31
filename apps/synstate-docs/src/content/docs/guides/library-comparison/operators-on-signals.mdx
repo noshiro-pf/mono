@@ -1,0 +1,225 @@
+---
+title: Operators on Signals
+description: Why SynState's operators are not built on a signals library such as Preact Signals — what an operator written as an effect loses, with two demos to try.
+sidebar:
+    order: 7
+---
+
+import SignalsOperatorsDemo from '../../../../components/signals-operators-demo/signals-operators-demo-island.astro';
+
+The [benchmark](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page) names no consistent winner between SynState and Preact Signals, which raises a fair question: why not keep Preact Signals and add SynState's operators on top? A pure transform carries over as it is, since that is what a `computed` is. An operator that keeps state, waits or starts a request cannot be a `computed`, and becomes an `effect` that writes a signal. Written that way, it loses the two things SynState's operators keep: every reader sees a consistent graph, and every emission is an event.
+
+The examples on this page use `@preact/signals-core`, and each one that runs a library is a test against it.
+
+## What Carries Over
+
+| Kind of operator                         | Examples                                        | Written with Preact Signals as                            | What is lost                                                                                                           |
+| ---------------------------------------- | ----------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Pure synchronous transform               | `map`, `derive`, `getKey`, `mapResultOk`        | a `computed`                                              | nothing                                                                                                                |
+| A choice among signals that exist        | `switchMap` to one of several states            | a `computed` that reads `branches[selector.value]`        | nothing: the dependency follows the read                                                                               |
+| State carried from one value to the next | `scan`, `pairwise`, `skip`, `take`              | an effect that writes a signal                            | events (an equal write is dropped, a batch delivers its last write), consistency for readers created earlier, laziness |
+| Time                                     | `debounce`, `throttle`, `audit`, `timer`        | an effect that sets a timer and writes a signal           | laziness, and the pending value a completion flushes                                                                   |
+| A request or a stream per value          | `switchMap`, `mergeMap`, `fromAbortablePromise` | an effect that writes a signal, and aborts in its cleanup | consistency for readers created earlier, when the inner value arrives at once (a loading state)                        |
+| Completion                               | `take`, `takeUntil`                             | a second signal that says "done"                          | completion passed on to everything downstream                                                                          |
+
+The rows that lose something are the ones the next two sections run.
+
+## An Async Step: The New Query With the Old List
+
+The search box of [Async Logic Compared](/mono/synstate/guides/library-comparison/async-comparison/), reduced to its async step: a query, a request per query, and a view that shows the query beside what the list is for. Preact Signals has no `switchMap`, so the request is an effect that writes `searchState`, as on that page, and the view is another effect. The state, the request and what the view prints are shared by both versions:
+
+```tsx
+/** What the list under the search box shows. */
+export type SearchState = Readonly<{
+    status: 'loading' | 'success';
+    query: string;
+}>;
+
+/** What each version returns: a way to type, and every run of the view. */
+export type SearchView = Readonly<{
+    setQuery: (query: string) => void;
+    viewLog: readonly string[];
+}>;
+
+/** How long a request takes to answer. A timer stands in for it below. */
+export const answerMs = 100;
+
+export const showView = (query: string, state: SearchState): string =>
+    `${query} / ${state.status} for ${state.query}` as const;
+```
+
+```tsx
+export const createSearchView = (viewCreatedFirst: boolean): SearchView => {
+    const query = signal('a');
+
+    const searchState = signal<SearchState>({ status: 'loading', query: 'a' });
+
+    // What the page shows: the query in the box, and what the list is for.
+    const view = computed(() => showView(query.value, searchState.value));
+
+    const viewLog: string[] = [];
+
+    const watchView = (): void => {
+        effect(() => {
+            viewLog.push(view.value);
+        });
+    };
+
+    // switchMap((q) => request(q)), written as an effect.
+    const search = (): void => {
+        effect(() => {
+            const q = query.value;
+
+            searchState.value = { status: 'loading', query: q };
+
+            const answer = setTimeout(() => {
+                searchState.value = { status: 'success', query: q };
+            }, answerMs);
+
+            // A newer query cancels the request in flight.
+            return () => {
+                clearTimeout(answer);
+            };
+        });
+    };
+
+    // Nothing but the order the two effects are created in differs.
+    if (viewCreatedFirst) {
+        watchView();
+
+        search();
+    } else {
+        search();
+
+        watchView();
+    }
+
+    return {
+        setQuery: (q) => {
+            query.value = q;
+        },
+        viewLog,
+    };
+};
+```
+
+Once the answer for `a` has arrived, `setQuery('ab')` runs the view twice when it was created first: with `ab / success for a`, the new query beside the list for the old one, and then with `ab / loading for ab`. Created after the search effect, it runs once, with `ab / loading for ab`. A write reaches both effects, and here they run in the order they were created, not in the order one depends on the other. The `computed` between them is glitch-free when it is read; the effect that writes `searchState` is outside what that guarantee covers.
+
+In SynState, the request is a node of the graph:
+
+```tsx
+export const createSearchView = (): SearchView => {
+    const [query, setQuery] = createState('a');
+
+    // A newer query completes the previous inner observable,
+    // which cancels its request.
+    const searchState = query.pipe(
+        switchMap((q) =>
+            timer(answerMs)
+                .pipe(map((): SearchState => ({ status: 'success', query: q })))
+                // emitted in the same update as the query
+                .pipe(
+                    withInitialValue<SearchState>({
+                        status: 'loading',
+                        query: q,
+                    }),
+                ),
+        ),
+    );
+
+    // What the page shows: the query in the box, and what the list is for.
+    const view = combine([query, searchState]).pipe(
+        map(([q, state]) => showView(q, state)),
+    );
+
+    const viewLog: string[] = [];
+
+    view.subscribe((v) => {
+        viewLog.push(v);
+    });
+
+    return { setQuery, viewLog };
+};
+```
+
+`switchMap` passes on the inner observable's first value, the loading state, within the update that changed the query, so `view`, below both, runs once with `ab / loading for ab`, and once more with `ab / success for ab` when the answer arrives. (`switchMap` projects the queries written from here on, not the `'a'` that `query` holds when it is created, so nothing is requested for `a`.) There is no order to get wrong: where a node runs is decided by its depth in the graph, not by when it was created.
+
+Type in the box below. The Preact Signals view starts out created before the search effect, so every keystroke adds a row marked in red to its panel; switch the order and type again, and the red rows stop.
+
+<SignalsOperatorsDemo demo="search-view" lang="en" />
+
+Not every library is in this position. Jotai's async atoms and Solid's `createResource` are derived nodes of their own graphs, and the same view written with them (`unwrap`, `resource.loading`) runs once per query. MobX, where the request is a `reaction` that writes an observable, behaves as Preact Signals does. The [Evaluation Models](/mono/synstate/guides/library-comparison/library-comparison/#evaluation-models) table lists each library.
+
+## A Stateful Step: Events Counted as Values
+
+A signal holds a current value. A write equal to the value it holds (`!==`) changes nothing and notifies no one, and the effects a `batch` reaches run once, after its last write. Both are right for state. An operator that counts or pairs events needs every one of them, and over a signal it gets values.
+
+```tsx
+import { batch, effect, signal } from '@preact/signals-core';
+
+// A click on a list item, sent as the item's id.
+const clicked = signal<string | undefined>(undefined);
+
+const clickCount = signal(0);
+
+// scan((n) => n + 1, 0), written as an effect.
+effect(() => {
+    if (clicked.value !== undefined) {
+        clickCount.value = clickCount.peek() + 1;
+    }
+});
+
+clicked.value = 'A';
+
+clicked.value = 'A'; // the same item again: an equal value, dropped
+
+batch(() => {
+    // two clicks handled in one batch: the effect sees only the last
+    clicked.value = 'B';
+
+    clicked.value = 'C';
+});
+
+// 4 clicks, counted as 2
+```
+
+In SynState, an emitter's every emission is an event, whatever its value:
+
+```tsx
+import { createValueEmitter, scan } from 'synstate';
+
+// A click on a list item, sent as the item's id.
+const [clicked, click] = createValueEmitter<string>();
+
+const clickCount = clicked.pipe(scan((n) => n + 1, 0));
+
+let mut_count = 0;
+
+clickCount.subscribe((n) => {
+    mut_count = n;
+});
+
+click('A');
+
+click('A'); // every emission is an event, equal or not
+
+click('B');
+
+click('C');
+
+// 4 clicks, counted as 4
+```
+
+`createState` drops an equal value as a signal does, because it holds a state; an event goes through `createValueEmitter` or `source`, which do not. With Preact Signals alone, the click handler would count the click itself. That works, and it is the point: the counting is code at the place that writes, not an operator that can be put after any signal.
+
+<SignalsOperatorsDemo demo="event-count" lang="en" />
+
+## What Fixing It Would Take
+
+For the effect-based operators to be glitch-free, each would have to run before every effect that reads what it writes: in depth order. Preact Signals exposes neither a node's depth nor the order its effects run in, so the operators would have to keep depths of their own and route their writes through a queue of their own. That is SynState's depth-ordered queue, rebuilt on top of Preact Signals, with Preact Signals' own marking and version checks still paid underneath. Counting events would also mean wrapping every write in a new object and keeping writes out of batches, which is using signals as an event stream.
+
+An effect also subscribes to everything it reads and runs again on every change, whether or not anything reads what it writes. Below an effect-based operator, the graph is therefore eager, as SynState's is, and the lazy `computed` and the dependency tracking that make Preact Signals fast in the benchmark apply to the `computed` parts only.
+
+## Using Both
+
+The two fit together at the boundary instead. `synstate-preact-signals` turns an Observable into a Preact signal (`toSignal`) and a signal into an Observable (`fromSignal`), so the pipeline — `debounce`, `switchMap`, a request — can be SynState, and the binding to the DOM Preact Signals. See [the Preact Signals demo](/mono/synstate/preact-signals/demo/).

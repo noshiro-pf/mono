@@ -1,4 +1,4 @@
-import type { LocalizedText } from './scenario.mjs';
+import type { LocalizedText } from '../constants.mjs';
 
 /**
  * One step of a traced update: every field the propagation reads or writes,

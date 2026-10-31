@@ -146,6 +146,14 @@ const asyncComparisonSamples = [
 
 const jaDocsBase = 'src/content/docs/ja';
 
+const operatorsOnSignalsSamples = [
+  '00-search-request.mts',
+  '01-async-step.preact-signals.mts',
+  '01-async-step.synstate.mts',
+  '02-count-events.preact-signals.mts',
+  '02-count-events.synstate.mts',
+] as const;
+
 const documents: DeepReadonly<
   {
     mdPath: string;
@@ -508,6 +516,28 @@ const documents: DeepReadonly<
       'docs-site/async-comparison/ja',
     ),
     sampleCodeFiles: asyncComparisonSamples,
+  },
+  {
+    mdPath: path.resolve(
+      workspaceRootPath,
+      'src/content/docs/guides/library-comparison/operators-on-signals.mdx',
+    ),
+    samplesDir: path.resolve(
+      synstateSamplesRoot,
+      'docs-site/operators-on-signals',
+    ),
+    sampleCodeFiles: operatorsOnSignalsSamples,
+  },
+  {
+    mdPath: path.resolve(
+      workspaceRootPath,
+      `${jaDocsBase}/guides/library-comparison/operators-on-signals.mdx`,
+    ),
+    samplesDir: path.resolve(
+      synstateSamplesRoot,
+      'docs-site/operators-on-signals/ja',
+    ),
+    sampleCodeFiles: operatorsOnSignalsSamples,
   },
   {
     mdPath: path.resolve(

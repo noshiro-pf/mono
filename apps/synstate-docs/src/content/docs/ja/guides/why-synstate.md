@@ -45,7 +45,7 @@ SynState はこれを**深さ順伝播**アルゴリズムで解決していま�
 
 詳細な説明は [SynState はグリッチをどう解決したか](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/)を参照してください。
 
-比較の相手は RxJS だけではありません。Preact Signals と Solid もグリッチフリーで $O(n)$ です。Solid に対しては、[ベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)は小さなグラフで SynState に有利な結果を示しています。Preact Signals に対しては一貫した勝者はなく、シナリオによってどちらかが速いため、Preact Signals との違いは速度ではありません。SynState が加えるのは、前の節のオペレーター群を同じグリッチフリーなグラフの上で使えることです。Preact Signals では、debounce やキャンセル、最新のリクエストへの切り替えは effect の中に手で書くコードになります。単独で使うときに各ライブラリで何が必要かは [React の外での動作](/mono/synstate/ja/guides/library-comparison/library-comparison/#react-の外での動作)を参照してください。
+比較の相手は RxJS だけではありません。Preact Signals と Solid もグリッチフリーで $O(n)$ です。Solid に対しては、[ベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)は小さなグラフで SynState に有利な結果を示しています。Preact Signals に対しては一貫した勝者はなく、シナリオによってどちらかが速いため、Preact Signals との違いは速度ではありません。SynState が加えるのは、前の節のオペレーター群を同じグリッチフリーなグラフの上で使えることです。Preact Signals では、debounce やキャンセル、最新のリクエストへの切り替えは effect の中に手で書くコードになり、signal に書き込む effect はそのグリッチフリーの保証の外にあります（[Signals の上の operator](/mono/synstate/ja/guides/library-comparison/operators-on-signals/)）。単独で使うときに各ライブラリで何が必要かは [React の外での動作](/mono/synstate/ja/guides/library-comparison/library-comparison/#react-の外での動作)を参照してください。
 
 ## React Compiler と完全互換
 

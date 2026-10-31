@@ -1,0 +1,181 @@
+---
+import { EventCountDemo } from './event-count-demo.jsx';
+import { SearchViewDemo } from './search-view-demo.jsx';
+import type { Lang } from '../constants.mjs';
+
+type Props = Readonly<{
+  demo: 'search-view' | 'event-count';
+  lang: Lang;
+}>;
+
+const { demo, lang } = Astro.props;
+---
+
+{
+  demo === 'search-view' ? (
+    <SearchViewDemo client:only="preact" lang={lang} />
+  ) : (
+    <EventCountDemo client:only="preact" lang={lang} />
+  )
+}
+
+<style is:global>
+  /*
+   * Global, because Preact renders the demos, but bundled only into the page
+   * that renders this island.
+   */
+  .signals-demo {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+  }
+
+  .signals-demo * + * {
+    margin-top: 0;
+  }
+
+  .signals-demo-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 0.75rem;
+  }
+
+  .signals-demo-controls button,
+  .signals-demo-field input {
+    padding: 0.35rem 0.9rem;
+    border: 1px solid var(--sl-color-gray-4);
+    border-radius: 0.25rem;
+    background: var(--sl-color-bg-nav);
+    color: var(--sl-color-text);
+    font-size: var(--sl-text-sm);
+  }
+
+  .signals-demo-controls button {
+    cursor: pointer;
+  }
+
+  .signals-demo-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-2);
+  }
+
+  .signals-demo-field input {
+    width: 10rem;
+  }
+
+  .signals-demo-order {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-size: var(--sl-text-sm);
+  }
+
+  .signals-demo-order legend {
+    width: 100%;
+    margin-bottom: 0.25rem;
+    padding: 0;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-2);
+  }
+
+  .signals-demo-order label {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .signals-demo-panels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .signals-demo-panel h3 {
+    margin: 0 0 0.5rem;
+    font-size: var(--sl-text-sm);
+  }
+
+  .signals-demo-log {
+    height: 12rem;
+    margin: 0;
+    padding: 0.5rem;
+    overflow-y: auto;
+    list-style: none;
+    border-radius: 0.25rem;
+    background: var(--sl-color-gray-6);
+    font-size: var(--sl-text-xs);
+  }
+
+  .signals-demo-log li {
+    margin: 0;
+    padding: 0.15rem 0.35rem;
+    border-radius: 0.2rem;
+  }
+
+  .signals-demo-log code {
+    background: none;
+    padding: 0;
+  }
+
+
+  .signals-demo-glitch {
+    background: var(--sl-color-red-low);
+    color: var(--sl-color-red-high);
+  }
+
+  .signals-demo-badge {
+    margin-left: 0.5rem;
+    font-weight: 600;
+  }
+
+  .signals-demo-counts .signals-demo-badge {
+    display: block;
+    margin: 0;
+    font-size: var(--sl-text-xs);
+  }
+
+  .signals-demo-counts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0 0;
+  }
+
+  .signals-demo-counts > div {
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.25rem;
+    background: var(--sl-color-gray-6);
+  }
+
+  .signals-demo-counts > div.signals-demo-glitch {
+    background: var(--sl-color-red-low);
+  }
+
+  .signals-demo-counts dt {
+    font-size: var(--sl-text-xs);
+    font-weight: normal;
+  }
+
+  .signals-demo-counts dd {
+    margin: 0;
+    padding: 0;
+    font-size: var(--sl-text-2xl);
+    font-weight: 600;
+  }
+
+  .signals-demo-caption {
+    margin: 0.75rem 0 0;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+  }
+</style>

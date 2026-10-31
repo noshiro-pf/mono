@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Arr, Num } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import type { Lang } from './scenario.mjs';
+import type { Lang } from '../constants.mjs';
 import {
   traceCode,
   traceNodesOf,

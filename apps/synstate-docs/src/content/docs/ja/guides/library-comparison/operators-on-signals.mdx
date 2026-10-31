@@ -1,0 +1,225 @@
+---
+title: Signals の上の operator
+description: SynState の operator を Preact Signals のような signal ライブラリの上に作らない理由 — effect で書いた operator が失うものを、試せる 2 つのデモで示します。
+sidebar:
+    order: 7
+---
+
+import SignalsOperatorsDemo from '../../../../../components/signals-operators-demo/signals-operators-demo-island.astro';
+
+[ベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)は SynState と Preact Signals のどちらが一貫して速いとも言っていません。そこで当然の疑問が出ます。Preact Signals を使い、その上に SynState の operator を足せばよいのではないか、と。純粋な変換はそのまま載ります。それが `computed` だからです。一方、状態を持つ operator、待つ operator、リクエストを始める operator は `computed` にできず、signal に書き込む `effect` になります。そう書くと、SynState の operator が保っている 2 つの性質を失います。どの読み手も整合したグラフを見ること、そして 1 回の発行が 1 つのイベントであることです。
+
+このページの例は `@preact/signals-core` を使っており、ライブラリを動かす例はどれもそれに対して実行するテストです。
+
+## そのまま載るもの
+
+| operator の種類                | 例                                              | Preact Signals での書き方                    | 失うもの                                                                                                     |
+| ------------------------------ | ----------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| 純粋な同期変換                 | `map`、`derive`、`getKey`、`mapResultOk`        | `computed`                                   | なし                                                                                                         |
+| 既にある signal から選ぶ       | 複数の状態の 1 つへの `switchMap`               | `branches[selector.value]` を読む `computed` | なし。依存は読んだものに付いていく                                                                           |
+| 値から値へ状態を持ち越す       | `scan`、`pairwise`、`skip`、`take`              | signal に書く effect                         | イベント（同値の書き込みは捨てられ、batch は最後の書き込みだけを届ける）、先に作った読み手の整合性、遅延評価 |
+| 時間                           | `debounce`、`throttle`、`audit`、`timer`        | タイマーを置いて signal に書く effect        | 遅延評価と、完了時に吐き出される保留中の値                                                                   |
+| 値ごとのリクエストやストリーム | `switchMap`、`mergeMap`、`fromAbortablePromise` | signal に書き、cleanup で中断する effect     | 内側の値がすぐに出る場合（読み込み中の状態）の、先に作った読み手の整合性                                     |
+| 完了                           | `take`、`takeUntil`                             | 「終わった」を表す 2 つ目の signal           | 下流すべてへの完了の伝播                                                                                     |
+
+何かを失う行のうち 2 つを、次の 2 つの節で動かします。
+
+## 非同期の段: 新しいクエリと古いリスト
+
+[非同期処理の比較](/mono/synstate/ja/guides/library-comparison/async-comparison/)の検索欄を、非同期の段だけに絞ったものです。クエリ、クエリごとのリクエスト、そしてクエリとリストがどのクエリの結果かを並べて表示する view があります。Preact Signals には `switchMap` がないので、リクエストはあのページと同じく `searchState` に書く effect になり、view はもう 1 つの effect になります。状態、リクエスト、view が表示する文字列は両方の版で共通です。
+
+```tsx
+/** 検索欄の下のリストが表示しているもの。 */
+export type SearchState = Readonly<{
+    status: 'loading' | 'success';
+    query: string;
+}>;
+
+/** 各版が返すもの: 入力する手段と、view の実行のすべて。 */
+export type SearchView = Readonly<{
+    setQuery: (query: string) => void;
+    viewLog: readonly string[];
+}>;
+
+/** リクエストが応答するまでの時間。以下ではタイマーで代用する。 */
+export const answerMs = 100;
+
+export const showView = (query: string, state: SearchState): string =>
+    `${query} / ${state.status} for ${state.query}` as const;
+```
+
+```tsx
+export const createSearchView = (viewCreatedFirst: boolean): SearchView => {
+    const query = signal('a');
+
+    const searchState = signal<SearchState>({ status: 'loading', query: 'a' });
+
+    // ページに表示するもの: 入力欄のクエリと、リストがどのクエリの結果か。
+    const view = computed(() => showView(query.value, searchState.value));
+
+    const viewLog: string[] = [];
+
+    const watchView = (): void => {
+        effect(() => {
+            viewLog.push(view.value);
+        });
+    };
+
+    // switchMap((q) => request(q)) を effect で書いたもの。
+    const search = (): void => {
+        effect(() => {
+            const q = query.value;
+
+            searchState.value = { status: 'loading', query: q };
+
+            const answer = setTimeout(() => {
+                searchState.value = { status: 'success', query: q };
+            }, answerMs);
+
+            // 新しいクエリが実行中のリクエストを取り消す。
+            return () => {
+                clearTimeout(answer);
+            };
+        });
+    };
+
+    // 違うのは 2 つの effect を作る順番だけ。
+    if (viewCreatedFirst) {
+        watchView();
+
+        search();
+    } else {
+        search();
+
+        watchView();
+    }
+
+    return {
+        setQuery: (q) => {
+            query.value = q;
+        },
+        viewLog,
+    };
+};
+```
+
+答え `a` が届いた後で `setQuery('ab')` を呼ぶと、view を先に作った場合は view が 2 回実行されます。1 回目は `ab / success for a`、つまり新しいクエリと古いクエリのリストの組で、2 回目が `ab / loading for ab` です。検索の effect より後に作ると、`ab / loading for ab` で 1 回だけ実行されます。書き込みは両方の effect に届き、ここでは effect は作った順に実行され、一方が他方に依存する順ではありません。間にある `computed` は読まれたときにはグリッチフリーですが、`searchState` に書く effect はその保証の外にあります。
+
+SynState では、リクエストはグラフのノードです。
+
+```tsx
+export const createSearchView = (): SearchView => {
+    const [query, setQuery] = createState('a');
+
+    // 新しいクエリは前の内側の Observable を完了させ、
+    // それがリクエストを取り消す。
+    const searchState = query.pipe(
+        switchMap((q) =>
+            timer(answerMs)
+                .pipe(map((): SearchState => ({ status: 'success', query: q })))
+                // クエリと同じ更新の中で出る
+                .pipe(
+                    withInitialValue<SearchState>({
+                        status: 'loading',
+                        query: q,
+                    }),
+                ),
+        ),
+    );
+
+    // ページに表示するもの: 入力欄のクエリと、リストがどのクエリの結果か。
+    const view = combine([query, searchState]).pipe(
+        map(([q, state]) => showView(q, state)),
+    );
+
+    const viewLog: string[] = [];
+
+    view.subscribe((v) => {
+        viewLog.push(v);
+    });
+
+    return { setQuery, viewLog };
+};
+```
+
+`switchMap` は内側の Observable の最初の値（読み込み中の状態）を、クエリを変えたのと同じ更新の中で渡します。そのため両方の下にある `view` は `ab / loading for ab` で 1 回実行され、答えが届くと `ab / success for ab` でもう 1 回実行されます。（`switchMap` が射影するのはこれ以降に書かれたクエリで、`query` が作られたときに持っている `'a'` ではないので、`a` についてはリクエストしません。）間違える順番はありません。ノードがどこで実行されるかは、作った時期ではなくグラフの中の深さで決まるからです。
+
+下の入力欄に文字を打ってみてください。Preact Signals の view は最初は検索の effect より前に作られているので、キー入力のたびにその欄に赤い行が増えます。順番を切り替えてもう一度打つと、赤い行は出なくなります。
+
+<SignalsOperatorsDemo demo="search-view" lang="ja" />
+
+どのライブラリも同じ立場というわけではありません。Jotai の非同期 atom と Solid の `createResource` はそれぞれのグラフの派生ノードで、同じ view をそれらで書くと（`unwrap`、`resource.loading`）クエリ 1 回につき 1 回実行されます。リクエストを observable に書く `reaction` で表す MobX は、Preact Signals と同じ振る舞いになります。ライブラリごとの一覧は[評価モデル](/mono/synstate/ja/guides/library-comparison/library-comparison/#評価モデル)の表にあります。
+
+## 状態を持つ段: イベントが値として数えられる
+
+signal が持つのは現在の値です。持っている値と等しい書き込み（`!==`）は何も変えず誰にも通知せず、`batch` が届く effect は最後の書き込みの後に 1 回だけ実行されます。どちらも状態としては正しい振る舞いです。しかしイベントを数えたり組にしたりする operator にはイベントが 1 つ残らず必要で、signal の上では値しか受け取れません。
+
+```tsx
+import { batch, effect, signal } from '@preact/signals-core';
+
+// リスト項目のクリック。項目の id として送る。
+const clicked = signal<string | undefined>(undefined);
+
+const clickCount = signal(0);
+
+// scan((n) => n + 1, 0) を effect で書いたもの。
+effect(() => {
+    if (clicked.value !== undefined) {
+        clickCount.value = clickCount.peek() + 1;
+    }
+});
+
+clicked.value = 'A';
+
+clicked.value = 'A'; // 同じ項目をもう一度: 同値なので捨てられる
+
+batch(() => {
+    // 1 つの batch で処理した 2 回のクリック: effect は最後のものしか見ない
+    clicked.value = 'B';
+
+    clicked.value = 'C';
+});
+
+// 4 回のクリックが 2 回と数えられる
+```
+
+SynState では、emitter の発行は値に関わらずすべてイベントです。
+
+```tsx
+import { createValueEmitter, scan } from 'synstate';
+
+// リスト項目のクリック。項目の id として送る。
+const [clicked, click] = createValueEmitter<string>();
+
+const clickCount = clicked.pipe(scan((n) => n + 1, 0));
+
+let mut_count = 0;
+
+clickCount.subscribe((n) => {
+    mut_count = n;
+});
+
+click('A');
+
+click('A'); // 同値かどうかに関わらず、発行はすべてイベント
+
+click('B');
+
+click('C');
+
+// 4 回のクリックが 4 回と数えられる
+```
+
+`createState` は状態を持つものなので、signal と同じく同値を捨てます。イベントは同値を捨てない `createValueEmitter` か `source` で送ります。Preact Signals だけで書くなら、クリックのハンドラーが自分でクリックを数えるでしょう。それで動きますし、それこそが要点です。数える処理は書き込む場所に書くコードであって、どの signal の後にも置ける operator ではありません。
+
+<SignalsOperatorsDemo demo="event-count" lang="ja" />
+
+## 直すには何が要るか
+
+effect で書いた operator をグリッチフリーにするには、それぞれが、自分の書いたものを読むすべての effect より先に、つまり深さ順に実行される必要があります。Preact Signals はノードの深さも effect の実行順も公開していないので、operator は自前の深さを持ち、書き込みを自前のキューに通すことになります。それは SynState の深さ順のキューを Preact Signals の上に作り直すことで、その下では Preact Signals 自身の印付けと version の確認も払い続けます。イベントを数えるには、書き込みのたびに新しいオブジェクトで包み、batch の外で書く必要もあります。それは signal をイベント列として使うことです。
+
+また effect は読んだものすべてを購読し、書いたものを誰かが読むかどうかに関わらず、変化のたびに再実行されます。そのため effect で書いた operator より下のグラフは SynState と同じく先行評価になり、ベンチマークで Preact Signals を速くしている遅延評価の `computed` と依存の追跡は、`computed` の部分にしか効きません。
+
+## 両方を使う
+
+両者は境界で組み合わせるのが合っています。`synstate-preact-signals` は Observable を Preact の signal に（`toSignal`）、signal を Observable に（`fromSignal`）変換するので、`debounce`、`switchMap`、リクエストといったパイプラインを SynState で書き、DOM への束縛を Preact Signals に任せられます。[Preact Signals のデモ](/mono/synstate/ja/preact-signals/demo/)を参照してください。

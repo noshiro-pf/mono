@@ -17,3 +17,8 @@ export type MarbleColor = Readonly<{
   fill: string;
   text: string;
 }>;
+
+/** The languages the docs are written in, as the demos take them. */
+export type Lang = 'en' | 'ja';
+
+export type LocalizedText = ReadonlyRecord<Lang, string>;

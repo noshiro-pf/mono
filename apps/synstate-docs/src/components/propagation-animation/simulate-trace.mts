@@ -1,6 +1,6 @@
 import { Arr, asUint32 } from 'ts-data-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
-import type { LocalizedText } from './scenario.mjs';
+import type { LocalizedText } from '../constants.mjs';
 import {
   undefinedText,
   type CodeLine,
@@ -618,6 +618,15 @@ export const traceUpdates = (
 
     const root = nodeOf(rootId);
 
+    // The captions below narrate the update a write opens; a write to a root
+    // nothing observes (`setNextIfUnobserved`) opens none, which this
+    // simulator does not model.
+    if (Arr.isEmpty(root.children)) {
+      throw new Error(
+        `❌ ${rootId} has no children: the trace does not model a write that opens no update`,
+      );
+    }
+
     const depth = root.def.depth;
 
     const outer = mut_run.queues.at(-1);
@@ -658,18 +667,18 @@ export const traceUpdates = (
         } as const);
 
     record({
-      code: ['su1', 'ou1', 'ou2', 'ou3'],
+      code: ['suu', 'su1', 'ou1', 'ou2', 'ou3'],
       locals: [{ name: 'depth', value: depth.toString() }],
       activeNode: rootId,
       caption:
         outer === undefined
           ? {
-              en: `${call} calls ${rootId}.next(${input.toString()}), which starts an update. openUpdate raises level to 1 and takes the bucket set of that level. ${setText.en} The UpdateQueue ${token} gets base = ${rootId}.depth + 1 = ${(depth + 1).toString()}, so bucket 0 holds depth ${(depth + 1).toString()}. ${token} is the update's token and its queue at once.`,
-              ja: `${call} は ${rootId}.next(${input.toString()}) を呼び、更新が始まります。openUpdate は level を 1 に上げ、その段のバケットの組を取ります。${setText.ja}UpdateQueue ${token} は base = ${rootId}.depth + 1 = ${(depth + 1).toString()} で、バケット 0 は深さ ${(depth + 1).toString()} です。${token} はこの更新のトークンであり、同時にキューでもあります。`,
+              en: `${call} calls ${rootId}.next(${input.toString()}). ${rootId} has children, so setNextIfUnobserved stores nothing and returns false: the write starts an update. openUpdate raises level to 1 and takes the bucket set of that level. ${setText.en} The UpdateQueue ${token} gets base = ${rootId}.depth + 1 = ${(depth + 1).toString()}, so bucket 0 holds depth ${(depth + 1).toString()}. ${token} is the update's token and its queue at once.`,
+              ja: `${call} は ${rootId}.next(${input.toString()}) を呼びます。${rootId} には子があるので、setNextIfUnobserved は何も保存せず false を返し、書き込みは更新を始めます。openUpdate は level を 1 に上げ、その段のバケットの組を取ります。${setText.ja}UpdateQueue ${token} は base = ${rootId}.depth + 1 = ${(depth + 1).toString()} で、バケット 0 は深さ ${(depth + 1).toString()} です。${token} はこの更新のトークンであり、同時にキューでもあります。`,
             }
           : {
-              en: `${call} calls ${rootId}.next(${input.toString()}). propagation.depth > 0, so ${rootId} warns once that it was written to during an update, and then starts one anyway. openUpdate raises level to ${level.toString()}: ${outer.token} still uses bucketSets[${(outer.level - 1).toString()}], so ${token} takes the next set. ${setText.en} ${token} gets base = ${(depth + 1).toString()}.`,
-              ja: `${call} は ${rootId}.next(${input.toString()}) を呼びます。propagation.depth > 0 なので、${rootId} は更新中に書き込まれたことを一度だけ警告し、そのうえで更新を始めます。openUpdate は level を ${level.toString()} に上げます。${outer.token} が bucketSets[${(outer.level - 1).toString()}] を使っているので、${token} は次の組を取ります。${setText.ja}${token} は base = ${(depth + 1).toString()} です。`,
+              en: `${call} calls ${rootId}.next(${input.toString()}). propagation.depth > 0, so ${rootId} warns once that it was written to during an update. It has children, so setNextIfUnobserved returns false, and it starts an update anyway. openUpdate raises level to ${level.toString()}: ${outer.token} still uses bucketSets[${(outer.level - 1).toString()}], so ${token} takes the next set. ${setText.en} ${token} gets base = ${(depth + 1).toString()}.`,
+              ja: `${call} は ${rootId}.next(${input.toString()}) を呼びます。propagation.depth > 0 なので、${rootId} は更新中に書き込まれたことを一度だけ警告します。子があるので setNextIfUnobserved は false を返し、そのうえで更新を始めます。openUpdate は level を ${level.toString()} に上げます。${outer.token} が bucketSets[${(outer.level - 1).toString()}] を使っているので、${token} は次の組を取ります。${setText.ja}${token} は base = ${(depth + 1).toString()} です。`,
             },
     });
 
@@ -830,6 +839,7 @@ export const traceUpdates = (
 export const traceCode = [
   ['h1', '// ManagerObservableClass: a root, such as A'],
   ['su0', 'startUpdate(nextValue) {'],
+  ['suu', '  if (this.setNextIfUnobserved(nextValue)) return;'],
   ['su1', '  const token = openUpdate(this.depth);'],
   ['su2', '  beginPropagation(token);'],
   ['su3', '  this.setNext(nextValue, token);'],

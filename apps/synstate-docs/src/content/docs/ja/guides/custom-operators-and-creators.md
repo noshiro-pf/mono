@@ -79,7 +79,7 @@ createSyncChildObservable(
 | `complete()`                 | この observable をすぐに完了させる                                                                     |
 | `completeAfterPropagation()` | 今の更新がすべての子孫に届いてから完了させる（`take`）                                                 |
 | `onComplete(teardown)`       | 後始末（タイマーの解除、購読の解除）を登録する。完了したとき、または dispose されたときに 1 回だけ走る |
-| `startUpdate(value)`         | 非同期の子のみ。自分で新しい更新を始めて `value` を出す                                                |
+| `startUpdate(value)`         | 非同期の子のみ。自分で新しい更新を始めて `value` を出す。誰も観測していない間は値を保存するだけ        |
 
 ### `tryUpdate` 以外も返す
 
@@ -93,7 +93,7 @@ createSyncChildObservable(
 
 ## 非同期の operator
 
-非同期の子は `startUpdate` で後から値を出します。`startUpdate` は自分で更新を始め、その observable から派生したすべてに伝搬させます。タイマーは `init` の中で作り、それを解除する後始末と並べて書きます。`debounce` は、完了するときにタイマーが持っている値を流す `flush` も返しています。
+非同期の子は `startUpdate` で後から値を出します。`startUpdate` は自分で更新を始め、その observable から派生したすべてに伝搬させます。派生したものも購読者もない間は、値を保存するだけです。タイマーは `init` の中で作り、それを解除する後始末と並べて書きます。`debounce` は、完了するときにタイマーが持っている値を流す `flush` も返しています。
 
 ```ts
 import { Optional } from 'ts-data-forge';

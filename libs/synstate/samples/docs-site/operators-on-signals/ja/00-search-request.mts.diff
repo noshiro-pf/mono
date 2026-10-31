@@ -1,0 +1,23 @@
+--- en/00-search-request.mts
++++ ja/00-search-request.mts
+@@ -1,17 +1,17 @@
+ // embed-sample-code-ignore-above
+-/** What the list under the search box shows. */
++/** 検索欄の下のリストが表示しているもの。 */
+ export type SearchState = Readonly<{
+   status: 'loading' | 'success';
+   query: string;
+ }>;
+ 
+-/** What each version returns: a way to type, and every run of the view. */
++/** 各版が返すもの: 入力する手段と、view の実行のすべて。 */
+ export type SearchView = Readonly<{
+   setQuery: (query: string) => void;
+   viewLog: readonly string[];
+ }>;
+ 
+-/** How long a request takes to answer. A timer stands in for it below. */
++/** リクエストが応答するまでの時間。以下ではタイマーで代用する。 */
+ export const answerMs = 100;
+ 
+ export const showView = (query: string, state: SearchState): string =>

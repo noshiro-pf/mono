@@ -1,0 +1,27 @@
+--- en/02-count-events.synstate.mts
++++ ja/02-count-events.synstate.mts
+@@ -4,7 +4,7 @@
+ if (import.meta.vitest !== undefined) {
+   test('counting events with scan (SynState)', () => {
+     // embed-sample-code-ignore-above
+-    // A click on a list item, sent as the item's id.
++    // リスト項目のクリック。項目の id として送る。
+     const [clicked, click] = createValueEmitter<string>();
+ 
+     const clickCount = clicked.pipe(scan((n) => n + 1, 0));
+@@ -17,13 +17,13 @@
+ 
+     click('A');
+ 
+-    click('A'); // every emission is an event, equal or not
++    click('A'); // 同値かどうかに関わらず、発行はすべてイベント
+ 
+     click('B');
+ 
+     click('C');
+ 
+-    // 4 clicks, counted as 4
++    // 4 回のクリックが 4 回と数えられる
+     // embed-sample-code-ignore-below
+     assert.strictEqual(mut_count, 4);
+   });
