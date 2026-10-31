@@ -179,3 +179,35 @@ test(
     await expect.soft(numericInputBorrowingPeriodYear).toHaveValue('30');
   },
 );
+
+test(
+  'an input commits a number past its bound as the bound',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/');
+
+    const {
+      numericInputBorrowingTotalManYen,
+      numericInputBorrowingPeriodYear,
+      numericInputInterestRatePerYear,
+    } = getElements(page);
+
+    await numericInputBorrowingTotalManYen.fill('5000000');
+
+    await numericInputBorrowingTotalManYen.blur();
+
+    await expect.soft(numericInputBorrowingTotalManYen).toHaveValue('1000000');
+
+    await numericInputBorrowingPeriodYear.fill('-3');
+
+    await numericInputBorrowingPeriodYear.blur();
+
+    await expect.soft(numericInputBorrowingPeriodYear).toHaveValue('1');
+
+    await numericInputInterestRatePerYear.fill('150');
+
+    await numericInputInterestRatePerYear.blur();
+
+    await expect.soft(numericInputInterestRatePerYear).toHaveValue('100');
+  },
+);

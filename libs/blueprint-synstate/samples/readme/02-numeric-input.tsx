@@ -5,7 +5,8 @@ import { constant, render } from 'synstate-dom';
 // The value is a number; what the user is typing stays text until committed.
 const [rate$, setRate] = createState(1.5);
 
-// The bounds `normalize` holds the value to, read out as the spin button's.
+// The bounds a committed number is clamped to before `normalize`, which are
+// also read out as the spin button's.
 const minRate = 0;
 
 const maxRate = 20;
@@ -18,10 +19,10 @@ const unmount = render(
       encode={(rate) => rate.toFixed(2)}
       max={constant(maxRate)}
       min={constant(minRate)}
+      // Given a number already in the bounds, which are on its 0.01 grid, or
+      // `NaN`.
       normalize={(rate) =>
-        Number.isNaN(rate)
-          ? minRate
-          : Math.min(maxRate, Math.max(minRate, Math.round(rate * 100) / 100))
+        Number.isNaN(rate) ? minRate : Math.round(rate * 100) / 100
       }
       step={0.05}
       value={rate$}

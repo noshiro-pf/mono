@@ -1,6 +1,6 @@
 import { NumericInput, NumericInputView } from 'blueprint-synstate';
 import { createState } from 'synstate';
-import { constant } from 'synstate-dom';
+import { constant, type Bindable } from 'synstate-dom';
 import { all, mountInto, one, press, settle, type } from './helpers.mjs';
 
 describe(NumericInputView, () => {
@@ -581,6 +581,228 @@ describe(NumericInput, () => {
   });
 });
 
+describe('NumericInput with min and max', () => {
+  test('clamps a committed number to the bounds before normalize sees it', () => {
+    const { input, changes, normalized, unmount } = setUpBounded({
+      min: constant(0),
+      max: constant(100),
+    });
+
+    type(input, '150');
+
+    input.dispatchEvent(new FocusEvent('blur'));
+
+    type(input, '-5');
+
+    press(input, 'Enter');
+
+    assert.deepStrictEqual(normalized, [100, 0]);
+
+    assert.deepStrictEqual(changes, [100, 0]);
+
+    assert.strictEqual(input.value, '0');
+
+    assert.strictEqual(input.getAttribute('aria-valuemin'), '0');
+
+    assert.strictEqual(input.getAttribute('aria-valuemax'), '100');
+
+    // A number the text shows is read out within the bounds; text that is none
+    // reads out no value.
+    type(input, '150');
+
+    assert.strictEqual(input.getAttribute('aria-valuenow'), '100');
+
+    type(input, '-3');
+
+    assert.strictEqual(input.getAttribute('aria-valuenow'), '0');
+
+    type(input, 'abc');
+
+    assert.isFalse(input.hasAttribute('aria-valuenow'));
+
+    unmount();
+  });
+
+  test('hands text that is no number to normalize as NaN, unclamped, and clamps what it starts from', () => {
+    const { input, changes, normalized, unmount } = setUpBounded({
+      min: constant(10),
+      max: constant(100),
+    });
+
+    type(input, 'abc');
+
+    input.dispatchEvent(new FocusEvent('blur'));
+
+    // normalize(NaN) is 5, the start, which the clamp raises to 10.
+    assert.deepStrictEqual(normalized, [Number.NaN, 10]);
+
+    assert.deepStrictEqual(changes, [10]);
+
+    unmount();
+  });
+
+  test('a step from text that is no number starts from normalize(NaN) clamped', () => {
+    const { input, up, changes, unmount } = setUpBounded({
+      min: constant(10),
+      max: constant(100),
+    });
+
+    type(input, 'abc');
+
+    up.click();
+
+    // normalize(NaN) is 5, clamped to 10, and a step of 0.5 from there.
+    assert.deepStrictEqual(changes, [10.5]);
+
+    unmount();
+  });
+
+  test('a step from text past a bound lands on the bound, as in Blueprint’s', () => {
+    const { input, down, changes, unmount } = setUpBounded({
+      min: constant(0),
+      max: constant(100),
+    });
+
+    type(input, '150');
+
+    down.click();
+
+    assert.deepStrictEqual(changes, [100]);
+
+    unmount();
+  });
+
+  test('a held step from text past a bound lands on the bound and goes on toward the range', () => {
+    vi.useFakeTimers({
+      toFake: ['setTimeout', 'setInterval', 'clearTimeout', 'clearInterval'],
+    });
+
+    onTestFinished(() => {
+      vi.useRealTimers();
+    });
+
+    const { input, down, changes, unmount } = setUpBounded({
+      min: constant(0),
+      max: constant(100),
+    });
+
+    type(input, '150');
+
+    down.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+
+    vi.advanceTimersToNextTimer();
+
+    vi.advanceTimersToNextTimer();
+
+    assert.deepStrictEqual(changes, [100, 99.5]);
+
+    document.dispatchEvent(new MouseEvent('mouseup'));
+
+    unmount();
+  });
+
+  test('clamps a number too large for a double, decoded as Infinity, to max', () => {
+    const { input, changes, unmount } = setUpBounded({
+      min: constant(0),
+      max: constant(100),
+      decode: Number,
+    });
+
+    type(input, '1e400');
+
+    input.dispatchEvent(new FocusEvent('blur'));
+
+    assert.deepStrictEqual(changes, [100]);
+
+    unmount();
+  });
+
+  test('a step stops at max, which normalize knows nothing of', () => {
+    const { input, up, changes, unmount } = setUpBounded({
+      min: constant(0),
+      max: constant(10),
+      initial: 9.5,
+    });
+
+    up.click();
+
+    up.click();
+
+    assert.deepStrictEqual(changes, [10]);
+
+    assert.strictEqual(input.value, '10');
+
+    unmount();
+  });
+
+  test('a held arrow key stops repeating at min, with no max given', () => {
+    vi.useFakeTimers({
+      toFake: ['setTimeout', 'setInterval', 'clearTimeout', 'clearInterval'],
+    });
+
+    onTestFinished(() => {
+      vi.useRealTimers();
+    });
+
+    const [value$, setValue] = createState(1);
+
+    const mut_changes: number[] = [];
+
+    const { container, unmount } = mountInto(() => (
+      <NumericInput
+        decode={Number.parseFloat}
+        encode={(n) => n.toString()}
+        min={constant(0)}
+        normalize={(n) => (Number.isNaN(n) ? 0 : n)}
+        step={0.5}
+        value={value$}
+        onValueChange={(n) => {
+          mut_changes.push(n);
+
+          setValue(n);
+        }}
+      />
+    ));
+
+    const input = one<HTMLInputElement>(container, 'input');
+
+    press(input, 'ArrowDown', { code: 'ArrowDown' });
+
+    vi.advanceTimersToNextTimer();
+
+    vi.advanceTimersToNextTimer();
+
+    vi.advanceTimersToNextTimer();
+
+    assert.deepStrictEqual(mut_changes, [0.5, 0]);
+
+    assert.strictEqual(vi.getTimerCount(), 0);
+
+    unmount();
+  });
+
+  test('clamps to the bounds as they are when the text is committed', () => {
+    const [max$, setMax] = createState(100);
+
+    const { input, changes, unmount } = setUpBounded({
+      min: constant(0),
+      max: max$,
+    });
+
+    setMax(50);
+
+    type(input, '80');
+
+    input.dispatchEvent(new FocusEvent('blur'));
+
+    assert.deepStrictEqual(changes, [50]);
+
+    assert.strictEqual(input.getAttribute('aria-valuemax'), '50');
+
+    unmount();
+  });
+});
+
 const clampAndRound = (n: number): number =>
   Number.isFinite(n)
     ? Math.min(100, Math.max(0, Math.round(n * 100) / 100))
@@ -627,6 +849,68 @@ const setUp = (
     down,
     changes: mut_changes,
     setValue,
+    unmount,
+  };
+};
+
+const setUpBounded = ({
+  min,
+  max,
+  initial = 5,
+  decode = Number.parseFloat,
+}: Readonly<{
+  min: Bindable<number>;
+  max: Bindable<number>;
+  initial?: number;
+  decode?: (text: string) => number;
+}>): Readonly<{
+  input: HTMLInputElement;
+  up: HTMLButtonElement;
+  down: HTMLButtonElement;
+  changes: readonly number[];
+  /** What `normalize` was called with. */
+  normalized: readonly number[];
+  unmount: () => void;
+}> => {
+  const [value$, setValue] = createState(initial);
+
+  const mut_changes: number[] = [];
+
+  const mut_normalized: number[] = [];
+
+  const { container, unmount } = mountInto(() => (
+    <NumericInput
+      decode={decode}
+      encode={(n) => n.toString()}
+      max={max}
+      min={min}
+      normalize={(n) => {
+        mut_normalized.push(n);
+
+        return Number.isNaN(n) ? initial : Math.round(n * 100) / 100;
+      }}
+      step={0.5}
+      value={value$}
+      onValueChange={(n) => {
+        mut_changes.push(n);
+
+        setValue(n);
+      }}
+    />
+  ));
+
+  const [up, down] = all<HTMLButtonElement>(container, 'button');
+
+  assert.isDefined(up);
+
+  assert.isDefined(down);
+
+  return {
+    input: one<HTMLInputElement>(container, 'input'),
+    up,
+    down,
+    changes: mut_changes,
+    normalized: mut_normalized,
     unmount,
   };
 };
