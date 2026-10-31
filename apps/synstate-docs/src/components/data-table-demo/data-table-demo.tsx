@@ -1,10 +1,14 @@
 import * as React from 'react';
 import {
   createState,
+  createValueEmitter,
   debounce,
   derive,
   type InitializedObservable,
   map,
+  mapTo,
+  merge,
+  withInitialValue,
 } from 'synstate';
 import { useObservableValue } from 'synstate-react-hooks';
 import { Arr, asPositiveInt16, Num, Result } from 'ts-data-forge';
@@ -19,18 +23,14 @@ import { sampleCsvRows } from './sample-data.mjs';
  * A data table with column filtering, pagination, and debounced filter inputs,
  * built entirely with SynState observables.
  *
- * Observable dependency graph:
+ * Observable dependency graph (parents ─▶ child):
  *
  * ```
- * filterName   ─(debounce)─┐
- * filterEmail  ─(debounce)─┼─▶ filteredRows ─┬─▶ pageLength ──▶ currentPage
- * filterGender ─(debounce)─┘        │        │                       │
- *                                   │        │                       │
- * itemsPerPage ─────────────────────┼────────┘                       │
- *       │                           │                                │
- *       └───────────────────────────┼────────────────────────────────┤
- *                                   └──────────▶ tableView ◀─────────┘
- * pageInput ──────────────────────────────────────────────────▶ (currentPage)
+ * filterName, filterEmail, filterGender ─(debounce)─▶ filteredRows
+ * filteredRows, itemsPerPage                  ─▶ pageLength
+ * filteredRows, itemsPerPage                  ─▶ pageReset (mapTo 1)
+ * pageRequest, pageReset, pageLength          ─▶ currentPage (merge, clamp)
+ * filteredRows, currentPage, itemsPerPage     ─▶ tableView
  * ```
  *
  * `filteredRows`, `pageLength`, `currentPage`, and `tableView` share
@@ -178,9 +178,11 @@ namespace State {
       map((v) => asPositiveInt16(Num.roundToInt(Num.clamp(10, 50)(v)))),
     );
 
-  const [pageInputState, setPageInput] = createState(1);
+  // An event, not a state: asking for the page held before a reset again
+  // must reach the table.
+  const [pageRequest, requestPage] = createValueEmitter<number>();
 
-  // Derived: filtered rows (each filter is debounced independently)
+  // Derived: filtered rows (the three filters are debounced together)
   const filteredRowsState = filterValuesState.pipe(debounce(DEBOUNCE_MS)).pipe(
     map(({ fullName, email, gender }) => {
       const nameLower = fullName.toLowerCase();
@@ -205,10 +207,18 @@ namespace State {
     (rows, perPage) => Math.max(1, Math.ceil(rows.length / perPage)),
   );
 
-  // Derived: current page (clamped to valid range)
+  // Back to page 1 whenever the rows or the page size change
+  const pageReset = merge([filteredRowsState, itemsPerPageNormalized]).pipe(
+    mapTo(1),
+  );
+
+  // Derived: current page — the latest request or reset, clamped to valid range
   export const currentPageState = derive(
-    [pageInputState, pageLengthState],
-    (input, maxPage) => Math.max(1, Math.min(input, maxPage)),
+    [
+      merge([pageRequest, pageReset]).pipe(withInitialValue(1)),
+      pageLengthState,
+    ],
+    (page, maxPage) => Math.max(1, Math.min(page, maxPage)),
   );
 
   // Output: table view (combines all derived values atomically — no glitch)
@@ -265,8 +275,6 @@ namespace State {
     );
 
     setItemsPerPageInput(v);
-
-    setPageInput(1);
   };
 
   export const handleCurrentPageChange = (
@@ -274,9 +282,12 @@ namespace State {
   ): void => {
     const numValue = Num.safeParseFloat(e.target.value);
 
-    const v = Math.max(1, Result.isErr(numValue) ? 1 : numValue.value);
+    const v = Math.max(
+      1,
+      Result.isErr(numValue) ? 1 : Num.roundToInt(numValue.value),
+    );
 
-    setPageInput(v);
+    requestPage(v);
   };
 }
 
