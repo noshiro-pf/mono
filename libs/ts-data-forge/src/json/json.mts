@@ -3,8 +3,7 @@ import type {
   UintRangeInclusive,
   UnknownRecord,
 } from 'ts-type-forge';
-import { Arr } from '../array/index.mjs';
-import { pipe, Result } from '../functional/index.mjs';
+import { Result } from '../functional/index.mjs';
 import { isRecord } from '../guard/index.mjs';
 import { castMutable, unknownToString } from '../others/index.mjs';
 
@@ -323,63 +322,24 @@ export namespace Json {
     value: UnknownRecord,
     space?: UintRangeInclusive<1, 10> | string,
   ): Result<string | undefined, string> => {
-    const allKeys = pipe(keysDeep(value))
-      .map(Arr.uniq)
-      .map((ks) => ks.toSorted()).value;
+    // The keys are collected by a first pass with a function replacer, which
+    // `JSON.stringify` calls at every nesting level with the value after
+    // `toJSON`, so the allowlist of the second pass misses none of them. The
+    // allowlist also fixes the order, sorting integer-like keys as strings.
+    const mut_keys = new Set<string>();
 
-    return stringifySelected(value, allKeys, space);
-  };
-}
-
-/**
- * @param obj - The record to extract keys from. Must be a plain object.
- * @param mut_keys - A mutable array to accumulate the collected keys. This
- *   array will be modified in-place by the function for performance reasons.
- * @internal
- * Recursively collects all property keys from a nested object structure.
- *
- * This helper function traverses an object and its nested objects and arrays,
- * collecting all string keys found at any level of nesting. The function mutates
- * the provided keys array for performance reasons.
- */
-const keysDeepImpl = (
-  obj: UnknownRecord,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  mut_keys: string[],
-): void => {
-  for (const [k, v] of Object.entries(obj)) {
-    mut_keys.push(k);
-
-    if (isRecord(v)) {
-      keysDeepImpl(v, mut_keys);
-    }
-
-    if (Array.isArray(v)) {
-      for (const li of v) {
-        if (isRecord(li)) {
-          keysDeepImpl(li, mut_keys);
+    const collected = stringify(value, (_key, v) => {
+      if (isRecord(v)) {
+        for (const k of Object.keys(v)) {
+          mut_keys.add(k);
         }
       }
-    }
-  }
-};
 
-/**
- * @param obj - The record to extract keys from. Must be a plain object.
- * @returns A readonly array of all string keys found in the object and its
- *   nested objects/arrays. May contain duplicates if the same key appears at
- *   multiple levels.
- * @internal
- * Extracts all property keys from a nested object structure into a flat array.
- *
- * This function serves as a safe wrapper around `keysDeepImpl`, creating a new
- * mutable array and passing it to the recursive implementation. The result
- * contains all keys found at any level of nesting within the input object.
- */
-const keysDeep = (obj: UnknownRecord): readonly string[] => {
-  const mut_keys: string[] = [];
+      return v;
+    });
 
-  keysDeepImpl(obj, mut_keys);
-
-  return mut_keys;
-};
+    return Result.isErr(collected)
+      ? collected
+      : stringifySelected(value, Array.from(mut_keys).toSorted(), space);
+  };
+}
