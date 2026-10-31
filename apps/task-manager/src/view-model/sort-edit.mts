@@ -2,8 +2,8 @@
  * Editing a list of sort keys, first one deciding — what the sort editor
  * (`components/sort-editor.tsx`) offers, for the list's settings
  * (`list-settings.mts`) and for the order of 「アーク」 and 「タイル」
- * (`diagram-sort.mts`) alike. A key is in the list at most once, and the
- * list may be empty.
+ * (`diagram-sort.mts`) alike. A key is in the list at most once, and the list
+ * may be empty.
  */
 
 import { Arr } from 'ts-data-forge';

@@ -11,9 +11,9 @@ import * as ts from 'typescript';
  * needs no pattern of its own. Only the position is taken from the tree; the
  * edit is a text splice, so comments and formatting are kept as they are.
  *
- * `mapFn` receives the source text of the declaration from its first token
- * (the leading JSDoc is not included) to its closing brace, and its result
- * replaces that span. The usual leaf is `replaceWithNoMatchCheck`, whose
+ * `mapFn` receives the source text of the declaration from its first token (the
+ * leading JSDoc is not included) to its closing brace, and its result replaces
+ * that span. The usual leaf is `replaceWithNoMatchCheck`, whose
  * not-found check then applies within the declaration only.
  *
  * Declarations nested in a namespace (`declare namespace Intl { interface
@@ -21,8 +21,8 @@ import * as ts from 'typescript';
  *
  * Where the name is declared more than once in the file — declaration merging,
  * as `lib.es5.d.ts` does for `String`, `Number` and `Date` to add the `Intl`
- * overloads at its end — only the first declaration in source order is
- * touched, which is also what the start/end regex found.
+ * overloads at its end — only the first declaration in source order is touched,
+ * which is also what the start/end regex found.
  *
  * @throws {Error} If the file declares no interface of that name.
  */

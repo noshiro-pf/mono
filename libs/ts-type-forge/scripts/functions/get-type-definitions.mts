@@ -88,9 +88,9 @@ const collectExports = async (filePath: string): Promise<FileEntry> => {
     const { types, namespaces } = extractTypeExports(content);
 
     // Skip `TSTypeForgeInternals_`-prefixed exports (e.g.
-    // `TSTypeForgeInternals_SmallIntIndexMax`) that may live alongside
-    // public types in a regular module file — they're internal opt-in
-    // helpers, not part of the user-facing surface.
+    // `TSTypeForgeInternals_SmallIntIndexMax`) that may live alongside public
+    // types in a regular module file — they're internal opt-in helpers, not
+    // part of the user-facing surface.
     const isInternal = (name: string): boolean =>
       name.startsWith('TSTypeForgeInternals_');
 

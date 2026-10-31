@@ -10,8 +10,8 @@ export type Options = Readonly<{
   /** A file to take the body from; only the trailer, or nothing, when absent. */
   bodyFile: string | undefined;
   /**
-   * What to target; the repository's default branch when absent. Another
-   * open pull request's branch stacks it on that pull request.
+   * What to target; the repository's default branch when absent. Another open
+   * pull request's branch stacks it on that pull request.
    */
   base: string | undefined;
   /** Pull requests to declare with `Merge-After:`, in the order given. */

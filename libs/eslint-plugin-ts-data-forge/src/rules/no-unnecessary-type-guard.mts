@@ -566,8 +566,8 @@ const verdictOf = (
     }
 
     case 'record':
-      // Every member already satisfies `UnknownRecord`, or none can ever be
-      // a non-null, non-array object.
+      // Every member already satisfies `UnknownRecord`, or none can ever be a
+      // non-null, non-array object.
       return parts.every((p) => isGuaranteedRecord(p, checker))
         ? ({ kind: 'constant', value: true } as const)
         : parts.every((p) => isGuaranteedNotRecord(p, checker))
@@ -603,8 +603,8 @@ const verdictOf = (
  * Whether `verdict`, drawn from one layer's type, also holds for `type`. A
  * constant has to come out the same. A replacement holds where the rule would
  * suggest the same one, or where the guard and its replacement are the same
- * constant: under `x!` on a `string | null`, `isNonNullish` and `isNotNull`
- * are both always `true` on `string`.
+ * constant: under `x!` on a `string | null`, `isNonNullish` and `isNotNull` are
+ * both always `true` on `string`.
  */
 const holdsOn = (
   verdict: Verdict,

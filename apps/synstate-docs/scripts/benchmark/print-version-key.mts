@@ -12,8 +12,8 @@ import {
  * every push and committing whatever the noise gave it.
  *
  * Written out rather than hashed, because a cache key is read by people: a
- * glance at the entry says which versions it holds, and a key that changed
- * says which one moved. It deliberately does not cover the runner image or the
+ * glance at the entry says which versions it holds, and a key that changed says
+ * which one moved. It deliberately does not cover the runner image or the
  * Node version; the workflow prefixes those itself, for the same reason.
  */
 const main = async (): Promise<void> => {

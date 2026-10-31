@@ -125,8 +125,8 @@ type IMapMappedInterface<K, V, KM extends MapSetKeyType> = Readonly<{
   // Reducing a value
 
   /**
-   * Checks if all elements in the map satisfy a predicate. Also supports a
-   * type predicate overload that narrows the type of values in the map if the
+   * Checks if all elements in the map satisfy a predicate. Also supports a type
+   * predicate overload that narrows the type of values in the map if the
    * predicate returns true for all elements.
    *
    * @example

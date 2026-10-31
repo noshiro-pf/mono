@@ -64,8 +64,8 @@ describe(placeLabels, () => {
   });
 
   test('keeps two labels apart', () => {
-    // Two edges one over the other, so close that the labels in their
-    // middles would overlap.
+    // Two edges one over the other, so close that the labels in their middles
+    // would overlap.
     const c = task('c', 0, 10);
 
     const d = task('d', 820, 10);

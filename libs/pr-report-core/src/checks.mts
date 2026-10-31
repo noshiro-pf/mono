@@ -6,36 +6,36 @@ import type { ChecksSummary, ContextState } from './types.mjs';
 /**
  * What every context reported, from a head commit's check runs.
  *
- * A name appears more than once whenever two check suites reported it, and on
- * a queued pull request that is the normal case rather than the odd one: the
- * run the `opened` event starts is cancelled by the `labeled` event's, and
- * both stay on the commit — the cancelled one leaving its `*-result`
- * aggregate concluded `failure`, because an `if: always()` job that asserts
- * on cancelled `needs` fails.
+ * A name appears more than once whenever two check suites reported it, and on a
+ * queued pull request that is the normal case rather than the odd one: the run
+ * the `opened` event starts is cancelled by the `labeled` event's, and both
+ * stay on the commit — the cancelled one leaving its `*-result` aggregate
+ * concluded `failure`, because an `if: always()` job that asserts on cancelled
+ * `needs` fails.
  *
- * **The newest check suite wins, and that is not the same as the newest
- * run.** GitHub resolves a required context to the run in the suite with the
- * greatest id, so where the cancelled suite happens to have been created
- * after the one that superseded it, the stale red is what holds the merge —
- * however much later the green one finished. Every suite of one push is
- * created in the same second, so which of them got the higher id is not
- * something the repository decides.
+ * **The newest check suite wins, and that is not the same as the newest run.**
+ * GitHub resolves a required context to the run in the suite with the greatest
+ * id, so where the cancelled suite happens to have been created after the one
+ * that superseded it, the stale red is what holds the merge — however much
+ * later the green one finished. Every suite of one push is created in the same
+ * second, so which of them got the higher id is not something the repository
+ * decides.
  *
  * This is why the rule is not "the newest `started_at`", which reads more
  * natural and would call such a pull request green while GitHub blocks it.
- * A report that says a blocked pull request will merge is worse than one
- * that says a green one will not: `CLAUDE.md`'s "Commits and pull requests"
- * says to ignore the red the cancelled run leaves, and this is the case where
+ * A report that says a blocked pull request will merge is worse than one that
+ * says a green one will not: `CLAUDE.md`'s "Commits and pull requests" says to
+ * ignore the red the cancelled run leaves, and this is the case where
  * GitHub does not.
  *
  * **A run whose workflow has a newer round still going is pending.** An
- * aggregate has no run in a round until the jobs it waits on are done, so
- * until then the only run of its name is the previous round's — on a pull
- * request whose label events started two rounds, the red the second left on
- * the first (#2191). That run is what GitHub shows, but not what it will
- * answer with: the newer round is in the suite with the greater id, and its
- * aggregate will be the newest run of the name. Where the newer round has
- * finished without one, the older run stands, as it does on GitHub.
+ * aggregate has no run in a round until the jobs it waits on are done, so until
+ * then the only run of its name is the previous round's — on a pull request
+ * whose label events started two rounds, the red the second left on the first
+ * (#2191). That run is what GitHub shows, but not what it will answer with: the
+ * newer round is in the suite with the greater id, and its aggregate will be
+ * the newest run of the name. Where the newer round has finished without one,
+ * the older run stands, as it does on GitHub.
  */
 export const statesFromCheckRuns = (
   runs: readonly CheckRunReport[],
@@ -101,9 +101,9 @@ export type CheckRunReport = Readonly<{
   /**
    * The workflow run its suite is, where it is one: the workflow, so that a
    * newer round of it can be told from an unrelated suite, and whether the
-   * round has finished, which its runs alone do not say — an aggregate's run
-   * is created only once every job before it has completed. `undefined` for
-   * a run no workflow made, or where the workflow runs could not be read.
+   * round has finished, which its runs alone do not say — an aggregate's run is
+   * created only once every job before it has completed. `undefined` for a run
+   * no workflow made, or where the workflow runs could not be read.
    */
   round: Readonly<{ workflowId: number; completed: boolean }> | undefined;
 }>;
@@ -114,12 +114,12 @@ export type CheckRunReport = Readonly<{
  * A run that has not completed is pending whatever it concluded last — the
  * conclusion of a re-run is the previous verdict until the new one finishes.
  * A `skipped` conclusion is reported as `skipped` and counted as met by
- * {@link summarizeChecks}, because GitHub counts it as met: the gated jobs
- * skip on `skip-ci` and on a diff the workflow does not read, and reading
- * that as a failure would call every gated pull request red.
+ * {@link summarizeChecks}, because GitHub counts it as met: the gated jobs skip
+ * on `skip-ci` and on a diff the workflow does not read, and reading that as a
+ * failure would call every gated pull request red.
  * Everything else that finished — `cancelled`, `stale`, `timed_out`,
- * `action_required` — is something a reader has to act on, so it is a
- * failure here even where GitHub is vaguer about it.
+ * `action_required` — is something a reader has to act on, so it is a failure
+ * here even where GitHub is vaguer about it.
  */
 export const classifyCheckRun = (
   status: string,
@@ -141,12 +141,12 @@ const PASSING_CONCLUSIONS: ReadonlySet<string> = new Set<string>([
 /**
  * Whether any run on the head commit has not finished, or any round has not.
  *
- * Every run, not only the required ones: the aggregates are `if: always()`
- * and have no run in the newest round until the jobs they wait on are done,
- * so "every required context has reported" is true of a commit halfway
- * through a round — with the reports coming from the round before. And the
- * round, not only its runs: between the last job finishing and the aggregate
- * being created, every run there is has completed.
+ * Every run, not only the required ones: the aggregates are `if: always()` and
+ * have no run in the newest round until the jobs they wait on are done, so
+ * "every required context has reported" is true of a commit halfway through a
+ * round — with the reports coming from the round before. And the round, not
+ * only its runs: between the last job finishing and the aggregate being
+ * created, every run there is has completed.
  */
 export const anyRunInProgress = (runs: readonly CheckRunReport[]): boolean =>
   runs.some(
@@ -154,10 +154,10 @@ export const anyRunInProgress = (runs: readonly CheckRunReport[]): boolean =>
   );
 
 /**
- * What every context has reported on one commit, from both places GitHub
- * keeps them. The aggregate jobs are check runs; `no-skip-ci-label` is a
- * commit status, so reading only the first would report the context that
- * holds every labelled pull request as missing.
+ * What every context has reported on one commit, from both places GitHub keeps
+ * them. The aggregate jobs are check runs; `no-skip-ci-label` is a commit
+ * status, so reading only the first would report the context that holds every
+ * labelled pull request as missing.
  *
  * `state` is a commit status's as the REST API spells it, in lower case.
  */
@@ -165,9 +165,9 @@ export const reportedContexts = (
   runs: readonly CheckRunReport[],
   statuses: readonly Readonly<{ context: string; state: string }>[],
 ): ReadonlyMap<string, ContextState> => {
-  // A commit status and a check run of the same name are two requirements,
-  // not one reported twice: GitHub asks both to pass. So the stricter of
-  // the two is kept rather than whichever was read second.
+  // A commit status and a check run of the same name are two requirements, not
+  // one reported twice: GitHub asks both to pass. So the stricter of the two is
+  // kept rather than whichever was read second.
   const mut_states = new Map<string, ContextState>(statesFromCheckRuns(runs));
 
   for (const { context, state } of statuses) {
@@ -189,12 +189,11 @@ export const reportedContexts = (
 /**
  * What a context reported that is both a check run and a commit status.
  *
- * Not "the status wins", which is what this used to assume. GitHub's own
- * answer is that neither does: "If a check and a commit status have the same
- * name, both must pass when that name is required." So the stricter of the
- * two is the verdict, and a green status cannot cover a red check run of the
- * same name. A skip beside a pass is a skip: both are met, but only one of
- * them ran.
+ * Not "the status wins", which is what this used to assume. GitHub's own answer
+ * is that neither does: "If a check and a commit status have the same name,
+ * both must pass when that name is required." So the stricter of the two is the
+ * verdict, and a green status cannot cover a red check run of the same name. A
+ * skip beside a pass is a skip: both are met, but only one of them ran.
  */
 export const combineContextStates = (
   a: ContextState,
@@ -210,8 +209,8 @@ export const combineContextStates = (
 
 /**
  * What one commit status has reported. `no-skip-ci-label` is one of these
- * rather than a check run, so a report that read only check runs would call
- * the context that holds every labelled pull request "missing".
+ * rather than a check run, so a report that read only check runs would call the
+ * context that holds every labelled pull request "missing".
  */
 export const classifyCommitStatus = (state: string): ContextState => {
   switch (state) {
@@ -231,24 +230,24 @@ export const classifyCommitStatus = (state: string): ContextState => {
  * requires and no others: a failing job nothing requires does not block a
  * merge, and listing it would bury the one that does.
  *
- * `paused` outranks the rest. While `skip-ci` is on, the checks a reader
- * sees are whatever survived from before the label went on — typically the
- * red left by the `opened` run that the `labeled` run cancelled. Calling
- * that "failing" would make every queued pull request look broken; the
- * failures are still listed, because they are what a reader asks about.
+ * `paused` outranks the rest. While `skip-ci` is on, the checks a reader sees
+ * are whatever survived from before the label went on — typically the red left
+ * by the `opened` run that the `labeled` run cancelled. Calling that "failing"
+ * would make every queued pull request look broken; the failures are still
+ * listed, because they are what a reader asks about.
  *
  * `running` is the third thing that makes a verdict provisional, beside a
- * required context that is pending and one that has not reported. Without it
- * a commit mid-round reads as settled out of the round before — which is how
- * a failing pull request (#2031) came to show a tick.
+ * required context that is pending and one that has not reported. Without it a
+ * commit mid-round reads as settled out of the round before — which is how a
+ * failing pull request (#2031) came to show a tick.
  *
  * **Off the covered base, a context that never reported is not awaited.**
  * The contexts are the ones the ruleset asks of `main`, and a workflow that
- * runs only on pull requests into `main` never reports on a stacked one —
- * which kept #2103, every check of it green, "running" until it was moved
- * onto `main`. Such a context is {@link ChecksSummary.notRun} instead, but
- * only once some required context has reported: before the first check
- * suite, nothing having come is not a pass over zero contexts.
+ * runs only on pull requests into `main` never reports on a stacked one — which
+ * kept #2103, every check of it green, "running" until it was moved onto
+ * `main`. Such a context is {@link ChecksSummary.notRun} instead, but only once
+ * some required context has reported: before the first check suite, nothing
+ * having come is not a pass over zero contexts.
  */
 export const summarizeChecks = ({
   required,

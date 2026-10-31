@@ -52,9 +52,8 @@ export const writeManifestVersion = ({
  *
  * `version` is checked against what Chrome loads — one to four dot-separated
  * integers, each 0 to 65535 with no leading zero — because Chrome's own error
- * comes only when the extension is loaded, long after the build that could
- * have said so. A changesets prerelease version (`1.2.3-next.0`) is one it
- * refuses.
+ * comes only when the extension is loaded, long after the build that could have
+ * said so. A changesets prerelease version (`1.2.3-next.0`) is one it refuses.
  */
 export const manifestWithVersion = (
   manifest: unknown,

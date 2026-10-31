@@ -18,8 +18,8 @@ import {
   type DocTarget,
 } from './firestore-io.mjs';
 
-// Nothing here reaches a server: `setDoc` is replaced, and what it was
-// handed is what is checked.
+// Nothing here reaches a server: `setDoc` is replaced, and what it was handed
+// is what is checked.
 vi.mock(import('firebase/firestore'), async (importOriginal) => ({
   ...(await importOriginal()),
   setDoc: vi.fn(() => Promise.resolve()),

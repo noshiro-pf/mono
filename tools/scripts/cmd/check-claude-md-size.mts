@@ -15,15 +15,14 @@ import { projectRootPath } from '../project-root-path.mjs';
  *
  * The budget is a tripwire, not a target. It sits a little above the file's
  * size when it was set, so that an ordinary edit passes and a steady
- * accumulation does not. When it trips, the intended fix is to move a rule
- * out — into a comment in the file it is about, or that area's README — and
- * leave a pointer behind. Raising {@link LINE_BUDGET} is allowed, and is the
- * point of keeping it here: it becomes an edit that shows in a diff, with its
- * reason in the commit message, rather than something that happens by
- * default.
+ * accumulation does not. When it trips, the intended fix is to move a rule out
+ * — into a comment in the file it is about, or that area's README — and leave a
+ * pointer behind. Raising {@link LINE_BUDGET} is allowed, and is the point of
+ * keeping it here: it becomes an edit that shows in a diff, with its reason in
+ * the commit message, rather than something that happens by default.
  *
- * Lines rather than words, because Prettier wraps the file at 80 columns, so
- * a line is a stable unit of prose and one that `wc -l` agrees with.
+ * Lines rather than words, because Prettier wraps the file at 80 columns, so a
+ * line is a stable unit of prose and one that `wc -l` agrees with.
  */
 export const checkClaudeMdSize = (
   claudeMd: string,
@@ -53,8 +52,8 @@ export const countLines = (text: string): number =>
   text === '' ? 0 : text.replace(TRAILING_NEWLINE, '').split('\n').length;
 
 /**
- * The most lines `CLAUDE.md` may have. Raising it is a decision: say why in
- * the commit that does it.
+ * The most lines `CLAUDE.md` may have. Raising it is a decision: say why in the
+ * commit that does it.
  */
 const LINE_BUDGET = 547;
 

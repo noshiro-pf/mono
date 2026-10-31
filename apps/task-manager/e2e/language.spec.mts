@@ -24,8 +24,8 @@ test(
       .soft(page.getByRole('columnheader', { name: 'Priority' }))
       .toBeVisible();
 
-    // Choosing Japanese keeps it, and takes `?lang=en` out of the URL so
-    // that it no longer wins.
+    // Choosing Japanese keeps it, and takes `?lang=en` out of the URL so that
+    // it no longer wins.
     await page.goto(`${GRAPH}&lang=en`);
 
     await page.getByTestId('dag-settings').click();

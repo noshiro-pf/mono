@@ -402,8 +402,8 @@ describe(DatePicker, () => {
 
     await settle();
 
-    // November is shown, and the value moves with the month, as Blueprint
-    // moves it.
+    // November is shown, and the value moves with the month, as Blueprint moves
+    // it.
     assert.strictEqual(
       one<HTMLSelectElement>(container, 'select[name="months"]').value,
       '10',

@@ -43,10 +43,10 @@ import {
  * A link into `experimental/` is not resolved, for the reason
  * `isUnderExperimental` gives.
  *
- * A URL pinned to a commit or another branch is not read; it says what it
- * meant when it was written. A URL with a placeholder in its path
- * (`{path}`, `${…}`) is a template, and is not read either. Heading anchors
- * are not checked: GitHub's slugs are its own and change with the heading.
+ * A URL pinned to a commit or another branch is not read; it says what it meant
+ * when it was written. A URL with a placeholder in its path (`{path}`, `${…}`)
+ * is a template, and is not read either. Heading anchors are not checked:
+ * GitHub's slugs are its own and change with the heading.
  *
  * External URLs are not this check's business; `link-check.yml` runs lychee
  * over the same files on a schedule, where a site that is down for an hour
@@ -121,9 +121,9 @@ export const checkMonoLinks = async (): Promise<
 
 /**
  * Every link in `fileText` that this check resolves, in the order they are
- * read. `relativePath` is the file's path from the repository root; it is
- * what a relative link is resolved from and what decides whether relative
- * links are read at all.
+ * read. `relativePath` is the file's path from the repository root; it is what
+ * a relative link is resolved from and what decides whether relative links are
+ * read at all.
  */
 export const findMonoLinks = (
   fileText: string,
@@ -203,8 +203,8 @@ type CheckSummary = Readonly<{
 
 /**
  * The files whose absolute URLs are read besides the repository's own
- * Markdown: the SynState docs site and the SynState packages, whose code
- * builds links to source files.
+ * Markdown: the SynState docs site and the SynState packages, whose code builds
+ * links to source files.
  */
 const SCOPE_PATTERN =
   /^(?:apps\/synstate-docs|libs\/synstate[^/]*|libs\/eslint-plugin-synstate)\//u;
@@ -222,8 +222,8 @@ const SCANNED_EXTENSIONS: ReadonlySet<string> = new Set<string>([
 ]);
 
 /**
- * An absolute URL into this repository on `main`, up to whitespace, a quote,
- * a bracket or a backtick. The query and the fragment are split off after.
+ * An absolute URL into this repository on `main`, up to whitespace, a quote, a
+ * bracket or a backtick. The query and the fragment are split off after.
  */
 const MONO_URL =
   /https:\/\/github\.com\/noshiro-pf\/mono\/(?:blob|tree|raw|edit)\/main\/[^\s"'`<>()[\]]+/gu;
@@ -232,9 +232,9 @@ const MONO_URL =
 const BRANCH_SEGMENT = '/main/';
 
 /**
- * A Markdown link or image whose destination is a relative path: not a URL
- * with a scheme (`https:`, `mailto:`), not an anchor in the same document, not
- * a path from a site's root, not `<…>`.
+ * A Markdown link or image whose destination is a relative path: not a URL with
+ * a scheme (`https:`, `mailto:`), not an anchor in the same document, not a
+ * path from a site's root, not `<…>`.
  */
 const MARKDOWN_RELATIVE_LINK = /\]\((?![a-z][\d+.a-z-]*:|[#/<])[^\s()]+\)/giu;
 

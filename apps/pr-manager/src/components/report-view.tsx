@@ -15,22 +15,21 @@ import { QueueSection } from './queue-section.js';
 import { WorkflowRunsSection } from './workflow-runs-section.js';
 
 /**
- * A report that loaded: the five blocks — the merge order under the counts
- * that filter it, the queue `unblock-prs` works through, the workflow runs
- * still going, what landed, and what is open that is not a pull request —
- * laid out as the reader arranged them
- * (`layout.mts`).
+ * A report that loaded: the five blocks — the merge order under the counts that
+ * filter it, the queue `unblock-prs` works through, the workflow runs still
+ * going, what landed, and what is open that is not a pull request — laid out as
+ * the reader arranged them (`layout.mts`).
  *
  * Each part is its own observable, which the store changes only when a read
  * changed that part (`store/reader.mts`), so a poll that found nothing new
- * rewrites none of this. The time of reading, which every read does change,
- * is not here but in the header (`read-from-github.tsx`).
+ * rewrites none of this. The time of reading, which every read does change, is
+ * not here but in the header (`read-from-github.tsx`).
  */
 export const ReportView = (): JSX.Element => <BlockLayout blocks={blocks} />;
 
 /**
- * What each block holds: descriptions, mounted where the layout puts them,
- * and again if a block moves to another column.
+ * What each block holds: descriptions, mounted where the layout puts them, and
+ * again if a block moves to another column.
  */
 const blocks: ReadonlyRecord<BlockId, JSX.Element> = {
   open: (

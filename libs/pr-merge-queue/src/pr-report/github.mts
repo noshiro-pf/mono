@@ -28,9 +28,9 @@ import { currentEpochMs, parseJson, send } from '../lib/index.mjs';
 import { parseClosingIssueRefs } from './linked-issues.mjs';
 
 /**
- * How many pull requests are read. A repository with more open than this has
- * a different problem than an unreadable report, so this fails loudly rather
- * than paginating and reporting half of it as the whole.
+ * How many pull requests are read. A repository with more open than this has a
+ * different problem than an unreadable report, so this fails loudly rather than
+ * paginating and reporting half of it as the whole.
  */
 const PAGE_SIZE = 100;
 
@@ -61,8 +61,8 @@ const PullRequestSchema = t.record({
   ),
   merged_at: t.union([t.string(), t.nullType]),
   // `null` until auto-merge is armed, and an object describing it after.
-  // Only its presence is read: what the report answers is whether anything
-  // will land the pull request once the checks go green.
+  // Only its presence is read: what the report answers is whether anything will
+  // land the pull request once the checks go green.
   auto_merge: t.union([t.record({}), t.nullType]),
   // `repo` is `null` for a head whose fork has been deleted. Read so that a
   // fork's branch is not taken for the parent of a stacked pull request.
@@ -80,10 +80,10 @@ const ComparisonSchema = t.record({
   ahead_by: t.number(),
   behind_by: t.number(),
   /**
-   * The commits the head has that the base does not, oldest first, so the
-   * last is the head commit — read for its date, which comes free with the
-   * counts rather than as a request of its own. Truncated on a long branch,
-   * which is why its length is checked against `ahead_by` before use.
+   * The commits the head has that the base does not, oldest first, so the last
+   * is the head commit — read for its date, which comes free with the counts
+   * rather than as a request of its own. Truncated on a long branch, which is
+   * why its length is checked against `ahead_by` before use.
    */
   commits: t.array(
     t.record({
@@ -116,8 +116,8 @@ const DependenciesSummarySchema = t.optional(
 );
 
 /**
- * GitHub answers pull requests from the issues endpoint too, and the only
- * thing telling one apart in the answer is the `pull_request` key.
+ * GitHub answers pull requests from the issues endpoint too, and the only thing
+ * telling one apart in the answer is the `pull_request` key.
  */
 const IssueListSchema = t.array(
   t.record({
@@ -223,8 +223,8 @@ export type Client = Readonly<{
   /** What pull requests target unless they are stacked. */
   defaultBranch: (repo: RepoRef) => Promise<Result<string, string>>;
   /**
-   * The contexts GitHub requires on `branch`, every ruleset that applies to
-   * it together (`pr-report-core`'s `requirementsOfRules`).
+   * The contexts GitHub requires on `branch`, every ruleset that applies to it
+   * together (`pr-report-core`'s `requirementsOfRules`).
    */
   requiredContexts: (
     repo: RepoRef,
@@ -234,8 +234,8 @@ export type Client = Readonly<{
     repo: RepoRef,
   ) => Promise<Result<readonly PullRequestFacts[], string>>;
   /**
-   * The pull requests that landed in the last `withinDays` days, newest
-   * first. One request: the closed list, sorted by when it last changed.
+   * The pull requests that landed in the last `withinDays` days, newest first.
+   * One request: the closed list, sorted by when it last changed.
    */
   merged: (
     repo: RepoRef,
@@ -244,9 +244,9 @@ export type Client = Readonly<{
   ) => Promise<Result<readonly MergedPullRequest[], string>>;
   /**
    * What the queue's comments say on each of `pulls` — the set-aside comment
-   * `unblock-prs` writes and the claim of whoever is fixing it — by the
-   * token's own account, which is what both are trusted by. Empty without a
-   * token, or one whose account cannot be read.
+   * `unblock-prs` writes and the claim of whoever is fixing it — by the token's
+   * own account, which is what both are trusted by. Empty without a token, or
+   * one whose account cannot be read.
    */
   queueComments: (
     repo: RepoRef,
@@ -259,19 +259,19 @@ export type Client = Readonly<{
     limit: number,
   ) => Promise<Result<readonly OpenIssue[], string>>;
   /**
-   * Whether each of `numbers` is an open issue, and what its body declares
-   * with `Start-After:`: one request each, for the issues the open pull
-   * requests close that the open list did not cover. One that cannot be read
-   * is left out, and declares nothing.
+   * Whether each of `numbers` is an open issue, and what its body declares with
+   * `Start-After:`: one request each, for the issues the open pull requests
+   * close that the open list did not cover. One that cannot be read is left
+   * out, and declares nothing.
    */
   issueBodies: (
     repo: RepoRef,
     numbers: readonly number[],
   ) => Promise<ReadonlyMap<number, IssueBody>>;
   /**
-   * Where each of `numbers` — what the issues' `Start-After:` names beyond
-   * the open lists — stands: one request each, an issue or a pull request
-   * alike. One that cannot be read is left out, and is unknown.
+   * Where each of `numbers` — what the issues' `Start-After:` names beyond the
+   * open lists — stands: one request each, an issue or a pull request alike.
+   * One that cannot be read is left out, and is unknown.
    */
   references: (
     repo: RepoRef,
@@ -289,9 +289,9 @@ export type IssueBody = Readonly<{
  * A client for the public REST API, using a token when one is in the
  * environment and going without when there is not.
  *
- * Unauthenticated works because the repository is public, and one report a
- * day fits inside the 60 requests an hour an anonymous caller gets — roughly
- * three per pull request, for the comparison and the two kinds of check.
+ * Unauthenticated works because the repository is public, and one report a day
+ * fits inside the 60 requests an hour an anonymous caller gets — roughly three
+ * per pull request, for the comparison and the two kinds of check.
  * A token raises that to 5000 and, through one GraphQL query, replaces the
  * issue links read out of the bodies with the ones GitHub itself holds.
  */
@@ -300,11 +300,11 @@ export const createClient = (
   baseUrl = 'https://api.github.com',
 ): Client => {
   /**
-   * Set by the first answer that says the quota is spent. Every call after
-   * one of those fails the same way, and each failure is swallowed into
-   * "nothing reported" — a branch with no commit counts and a pull request
-   * with no checks. A report that says that is worse than no report, so the
-   * flag turns the whole run into one error naming the cause.
+   * Set by the first answer that says the quota is spent. Every call after one
+   * of those fails the same way, and each failure is swallowed into "nothing
+   * reported" — a branch with no commit counts and a pull request with no
+   * checks. A report that says that is worse than no report, so the flag turns
+   * the whole run into one error naming the cause.
    */
   const mut_state = { rateLimited: false };
 
@@ -375,9 +375,9 @@ export const createClient = (
 
     return {
       comparison: { aheadBy: ahead_by, behindBy: behind_by },
-      // Only when the list is whole: on a branch too long for one answer
-      // the last commit listed is not the head. A branch level with its
-      // base has no commit of its own to date.
+      // Only when the list is whole: on a branch too long for one answer the
+      // last commit listed is not the head. A branch level with its base has no
+      // commit of its own to date.
       headCommittedAt:
         commits.length === ahead_by
           ? commits.at(-1)?.commit.committer.date
@@ -389,11 +389,11 @@ export const createClient = (
    * Every check run on one commit, across as many pages as it takes.
    *
    * One page is not enough and has not been for a while: each package
-   * contributes two codecov runs, and the aggregates, the matrix jobs and
-   * the gates are on top of that. A commit that overflows the page would
-   * quietly lose whichever required contexts fell off the end, and the
-   * report would call them "missing" — the one wording that reads as "CI has
-   * not got to it yet" rather than "this report did not look".
+   * contributes two codecov runs, and the aggregates, the matrix jobs and the
+   * gates are on top of that. A commit that overflows the page would quietly
+   * lose whichever required contexts fell off the end, and the report would
+   * call them "missing" — the one wording that reads as "CI has not got to it
+   * yet" rather than "this report did not look".
    */
   const checkRuns = async (
     prefix: string,
@@ -436,10 +436,10 @@ export const createClient = (
   };
 
   /**
-   * Which workflow each check suite on one commit is a run of, and whether
-   * that run has finished — what the check runs do not say, and what tells
-   * a newer round still going from an unrelated suite. Empty when it cannot
-   * be read, which leaves the verdict as it was before rounds were read.
+   * Which workflow each check suite on one commit is a run of, and whether that
+   * run has finished — what the check runs do not say, and what tells a newer
+   * round still going from an unrelated suite. Empty when it cannot be read,
+   * which leaves the verdict as it was before rounds were read.
    */
   const workflowRounds = async (
     repo: RepoRef,
@@ -511,9 +511,9 @@ export const createClient = (
 
   /**
    * The issues of `repo` GitHub records as blocking `issue` — its issue
-   * dependencies, read as its `Start-After:` is (`waitsFor`). Asked only
-   * when the issue's summary says it has any, so an issue with none costs
-   * nothing; one that cannot be read is taken as having none.
+   * dependencies, read as its `Start-After:` is (`waitsFor`). Asked only when
+   * the issue's summary says it has any, so an issue with none costs nothing;
+   * one that cannot be read is taken as having none.
    */
   const blockedByOf = async (
     repo: RepoRef,
@@ -543,10 +543,10 @@ export const createClient = (
   };
 
   /**
-   * The issues GitHub itself says each pull request closes — the sidebar
-   * list, which includes a link made by hand and so knows more than the body
-   * does. Only GraphQL exposes it, and GraphQL refuses an anonymous caller,
-   * which is why this is the one thing a token buys.
+   * The issues GitHub itself says each pull request closes — the sidebar list,
+   * which includes a link made by hand and so knows more than the body does.
+   * Only GraphQL exposes it, and GraphQL refuses an anonymous caller, which is
+   * why this is the one thing a token buys.
    */
   const closingIssues = async (
     repo: RepoRef,
@@ -641,8 +641,8 @@ export const createClient = (
       const mut_read = new Map<number, QueueComments>();
 
       for (const pr of pulls) {
-        // The first page, oldest first: each comment is edited in place, so
-        // it stays where it was first posted.
+        // The first page, oldest first: each comment is edited in place, so it
+        // stays where it was first posted.
         const listed = await getJson(
           `/repos/${repo.owner}/${repo.name}/issues/${pr.number}/comments?per_page=${PAGE_SIZE}`,
           CommentListSchema,
@@ -674,9 +674,8 @@ export const createClient = (
 
     issues: async (repo, limit) => {
       // A full page rather than `limit`: pull requests come back from this
-      // endpoint too and are filtered out after, so asking for exactly the
-      // cap would let a run of recently updated pull requests crowd the
-      // issues out.
+      // endpoint too and are filtered out after, so asking for exactly the cap
+      // would let a run of recently updated pull requests crowd the issues out.
       const listed = await getJson(
         `/repos/${repo.owner}/${repo.name}/issues?state=open&per_page=${PAGE_SIZE}&sort=updated&direction=desc`,
         IssueListSchema,
@@ -772,12 +771,11 @@ export const createClient = (
 
     merged: async (repo, withinDays, limit) => {
       // Sorted by `updated`, not by when they merged: GitHub does not sort
-      // closed pull requests by merge time, and `updated` is the closest
-      // thing that is monotonic enough for a window this short. The filter
-      // below is what decides membership; the sort only decides what one
-      // page of a hundred contains, and a hundred pull requests updated more
-      // recently than a merge inside the window is not a state this
-      // repository reaches.
+      // closed pull requests by merge time, and `updated` is the closest thing
+      // that is monotonic enough for a window this short. The filter below is
+      // what decides membership; the sort only decides what one page of a
+      // hundred contains, and a hundred pull requests updated more recently
+      // than a merge inside the window is not a state this repository reaches.
       const listed = await getJson(
         `/repos/${repo.owner}/${repo.name}/pulls?state=closed&per_page=${PAGE_SIZE}&sort=updated&direction=desc`,
         PullRequestListSchema,

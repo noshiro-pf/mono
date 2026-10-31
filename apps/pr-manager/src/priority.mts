@@ -67,8 +67,8 @@ export const PRIORITY_NAMES = {
  */
 export type PriorityFilter = Readonly<{
   /**
-   * What is switched off rather than on, as the merge order keeps it, so
-   * that the two read alike.
+   * What is switched off rather than on, as the merge order keeps it, so that
+   * the two read alike.
    */
   hiddenPriorities: readonly Priority[];
   /** What is picked; nothing picked is no narrowing. */
@@ -77,8 +77,7 @@ export type PriorityFilter = Readonly<{
 
 /**
  * Lower first, in a sort by priority. No priority is between mid and low:
- * what nobody has ranked is not known to matter less than what was ranked
- * low.
+ * what nobody has ranked is not known to matter less than what was ranked low.
  */
 export const PRIORITY_RANK = {
   high: 0,

@@ -9,12 +9,12 @@ import { fixturesRootPath, listFixtures } from '../src/index.mjs';
  * The bridge check: the ESLint preset (@sumi-lang/eslint-config, the bridge
  * engine since D-43) runs over the whole corpus, and what it reports is
  * compared with the `@sumi-expect-error` markers — the equivalence gate
- * languages/sumi/docs/conformance-corpus.md asks for while more than one
- * engine is live.
+ * languages/sumi/docs/conformance-corpus.md asks for while more than one engine
+ * is live.
  *
- * Narrower than the engine check (`engine.test.mts`) in two ways, both
- * because the bridge is a different preset rather than a second
- * implementation of the same one:
+ * Narrower than the engine check (`engine.test.mts`) in two ways, both because
+ * the bridge is a different preset rather than a second implementation of the
+ * same one:
  *
  * - Only the neutral IDs the bridge has ESLint rules for are compared, and
  *   only diagnostics of those rules count. eslint-config-typed carries
@@ -24,9 +24,9 @@ import { fixturesRootPath, listFixtures } from '../src/index.mjs';
  *   routinely reported by two rules at once (`eqeqeq` and `no-eq-null`).
  *
  * Which ESLint rules stand for which neutral ID is @sumi-lang/cli's
- * `eslintRulesByRuleId`, the table `sumi check` uses to switch those rules
- * off. Reading the same table is the point: it claims that the rules it lists
- * do the whole job of the ID, and this is where that claim is tested.
+ * `eslintRulesByRuleId`, the table `sumi check` uses to switch those rules off.
+ * Reading the same table is the point: it claims that the rules it lists do the
+ * whole job of the ID, and this is where that claim is tested.
  */
 
 const adjacentOverloadLineDivergence =
@@ -150,8 +150,8 @@ const fixtures = listFixtures(fixturesRootPath).fixtures;
 
 const eslint = new ESLint({
   cwd: packageRootPath,
-  // Only the preset under test: the package's own eslint.config.mts ignores
-  // the fixtures, which is right for linting the package and wrong here.
+  // Only the preset under test: the package's own eslint.config.mts ignores the
+  // fixtures, which is right for linting the package and wrong here.
   overrideConfigFile: path.resolve(
     packageRootPath,
     'configs/eslint-bridge.config.mts',

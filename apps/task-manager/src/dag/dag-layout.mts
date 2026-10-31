@@ -7,10 +7,9 @@
  * A node is drawn where it was put, and where ELK puts it if it never was.
  * What is stored is as made at 「標準」, and is drawn spread out at 「大」
  * (`arrangementScale`).
- * Once some node was put somewhere, a node that never was — one added since
- * the last arrangement — is put next to the nodes it is joined to and those
- * in its group, as ELK has it, and moved clear of every other node
- * (`placeNodes`).
+ * Once some node was put somewhere, a node that never was — one added since the
+ * last arrangement — is put next to the nodes it is joined to and those in its
+ * group, as ELK has it, and moved clear of every other node (`placeNodes`).
  *
  * The frames of the groups are drawn round their nodes (`group-frames.mts`),
  * and only where an empty one is drawn is stored.
@@ -37,20 +36,20 @@ export const defaultDirection = (narrow: boolean): DagDirection =>
   narrow ? 'down' : 'right';
 
 /**
- * How far `placeNodes` keeps a node it moves from every other node: as far
- * as ELK keeps two nodes of a layer apart (`elk.spacing.nodeNode`).
+ * How far `placeNodes` keeps a node it moves from every other node: as far as
+ * ELK keeps two nodes of a layer apart (`elk.spacing.nodeNode`).
  */
 export const PLACEMENT_GAP = 28;
 
 /**
  * `auto`, each node moved to its stored position if it has one. While no
- * position is stored, every node stays where ELK has it; once one is, a
- * node with none is first moved as far as, on average, the nodes `edges`
- * join it to, and the others of its group of `groups`, were moved from
- * where ELK has them, so that it keeps its place beside them; then, if it
- * comes within `PLACEMENT_GAP` of another node, to the nearest place that
- * does not, below rather than above on a tie. The nodes are taken in the
- * order of `auto`, each one placed clear of those placed before it.
+ * position is stored, every node stays where ELK has it; once one is, a node
+ * with none is first moved as far as, on average, the nodes `edges` join it to,
+ * and the others of its group of `groups`, were moved from where ELK has them,
+ * so that it keeps its place beside them; then, if it comes within
+ * `PLACEMENT_GAP` of another node, to the nearest place that does not, below
+ * rather than above on a tie. The nodes are taken in the order of `auto`, each
+ * one placed clear of those placed before it.
  */
 export const placeNodes = (
   auto: readonly LaidOutNode[],
@@ -92,8 +91,8 @@ export const scaleArrangement = (layout: DagLayout, by: Point): DagLayout =>
 
 /**
  * Where a node that was at `nodeAt` when the pointer went down at `from` is,
- * with the pointer at `to`: moved as far as the pointer on the screen, which
- * is less in the graph the more it is zoomed in. Whole units, so that what is
+ * with the pointer at `to`: moved as far as the pointer on the screen, which is
+ * less in the graph the more it is zoomed in. Whole units, so that what is
  * stored stays short.
  */
 export const dragPosition = (
@@ -161,10 +160,10 @@ export const nodesBounds = (
 
 /**
  * `node` where it is if no box of `others` comes within `gap` of it, and
- * otherwise at the nearest place none does. The nearest such place is one
- * where the box, along one of its sides, is `gap` from a side of another,
- * so only those places, and the box's own, are tried. The one past every
- * other box always is clear.
+ * otherwise at the nearest place none does. The nearest such place is one where
+ * the box, along one of its sides, is `gap` from a side of another, so only
+ * those places, and the box's own, are tried. The one past every other box
+ * always is clear.
  */
 export const clearOf = <B extends Bounds>(
   node: B,
@@ -247,8 +246,8 @@ const averageShift = (shifts: readonly Point[]): Point =>
     : ({ x: 0, y: 0 } as const);
 
 /**
- * Every node `edges` join each node to, either way, and every other node of
- * its group of `groups`.
+ * Every node `edges` join each node to, either way, and every other node of its
+ * group of `groups`.
  */
 const neighborsOf = (
   edges: readonly LaidOutEdge[],
@@ -275,8 +274,8 @@ const neighborsOf = (
 };
 
 /**
- * `auto`, each node `positions` has moved there, and the rest put clear of
- * the others (`placeNodes`).
+ * `auto`, each node `positions` has moved there, and the rest put clear of the
+ * others (`placeNodes`).
  */
 const placeEach = (
   auto: readonly LaidOutNode[],

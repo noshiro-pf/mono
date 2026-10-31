@@ -27,9 +27,9 @@ export type Type<A> = Readonly<{
   fill: (a: unknown) => A;
 
   /**
-   * Recursively removes value paths that are not represented by the type
-   * (e.g. excess record properties). Unlike `fill`, it never fills in default
-   * values, so the input must already be of type `A`.
+   * Recursively removes value paths that are not represented by the type (e.g.
+   * excess record properties). Unlike `fill`, it never fills in default values,
+   * so the input must already be of type `A`.
    *
    * NOTE: The parameter is intentionally a naked type parameter
    * (`<B extends A>(a: B) => A`) rather than `(a: A) => A`:
@@ -45,17 +45,16 @@ export type Type<A> = Readonly<{
    *    Inference onto the naked type parameter `B` skips that check, while
    *    `B extends A` still rejects inputs with missing keys.
    *
-   * (A bivariance hack such as `{ m(a: A): A }['m']` would solve 1 but not
-   * 2.)
+   * (A bivariance hack such as `{ m(a: A): A }['m']` would solve 1 but not 2.)
    */
   prune: <B extends A>(a: B) => A;
   validate: (a: unknown) => Result<A, readonly ValidationError[]>;
 
   /**
-   * What the type is built from, readable at runtime: the kind of type and
-   * the types it is composed of (see {@link TypeStructure}). Every type the
-   * package constructs carries one; a `Type` written by hand may not, and is
-   * then opaque to whatever reads it (`toJsonSchema` among them).
+   * What the type is built from, readable at runtime: the kind of type and the
+   * types it is composed of (see {@link TypeStructure}). Every type the package
+   * constructs carries one; a `Type` written by hand may not, and is then
+   * opaque to whatever reads it (`toJsonSchema` among them).
    */
   structure?: TypeStructure;
 
@@ -89,8 +88,8 @@ export type TypeAnnotations<A = unknown> = Partial<
 
 /**
  * A JSON Schema `format`: one of the formats the draft 2020-12 vocabulary
- * defines, or any other string, which JSON Schema leaves to the tools that
- * read it (OpenAPI's `int32` or `password`, for example).
+ * defines, or any other string, which JSON Schema leaves to the tools that read
+ * it (OpenAPI's `int32` or `password`, for example).
  */
 export type JsonSchemaFormat =
   | 'date-time'
@@ -119,10 +118,10 @@ export type JsonSchemaFormat =
  *
  * It records what the type was built from and nothing it computes: the
  * constraint values of `string` / `number` / `bigint` are on the type's own
- * `constraints` (see `WithConstraints`), whether a record member is optional
- * is the member type's `optional`, and a predicate passed to `refine`,
- * `brand` or `templateLiteral` stays a closure — such a type says only that
- * it narrows its base type.
+ * `constraints` (see `WithConstraints`), whether a record member is optional is
+ * the member type's `optional`, and a predicate passed to `refine`, `brand` or
+ * `templateLiteral` stays a closure — such a type says only that it narrows its
+ * base type.
  *
  * - `record` — `shape` as given, and whether excess properties are rejected.
  *   The record operations (`pick`, `omit`, `partial`, `required`,
@@ -260,9 +259,9 @@ export type ExcessPropertyOption = 'allow' | 'reject';
  * The shape a record type is built from: a record of property names to the
  * {@link Type} validating each one.
  *
- * It is the bound of the `shape` argument of `record` / `strictRecord`, and
- * the type argument of the {@link WithShape} those return, so naming it is
- * what lets a caller write its own helper over a record type's shape.
+ * It is the bound of the `shape` argument of `record` / `strictRecord`, and the
+ * type argument of the {@link WithShape} those return, so naming it is what
+ * lets a caller write its own helper over a record type's shape.
  */
 export type UnknownShape = ReadonlyRecord<string, UnknownType>;
 

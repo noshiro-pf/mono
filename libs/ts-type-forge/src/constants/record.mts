@@ -1,8 +1,8 @@
 import type { ReadonlyRecord } from '../others/index.mjs';
 
 /**
- * Represents a generic readonly record (object) type where keys are strings
- * and values are of type `unknown`.
+ * Represents a generic readonly record (object) type where keys are strings and
+ * values are of type `unknown`.
  *
  * This is a safer alternative to `Record<string, any>` or `{ [key: string]: any }`
  * as it uses `unknown` instead of `any`, providing better type safety while

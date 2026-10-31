@@ -22,9 +22,9 @@ import {
 } from './check-next-major.mjs';
 
 /**
- * Holds a breaking release of a workspace package until every published
- * package that re-exports it is given a breaking release too, and lists the
- * other dependents for review.
+ * Holds a breaking release of a workspace package until every published package
+ * that re-exports it is given a breaking release too, and lists the other
+ * dependents for review.
  *
  * changesets releases the dependents of a released package as a dependency
  * update, with a `patch` — even when the dependency's release is a major, and
@@ -62,8 +62,8 @@ import {
  * A breaking bump is `major`, or `minor` while the package is still `0.x`.
  * The dependents checked are the published workspace packages, other than the
  * strict standard library bundles: a changeset never names one (they release
- * through their `-source` harnesses, see CLAUDE.md), so no advice here could
- * be followed for them.
+ * through their `-source` harnesses, see CLAUDE.md), so no advice here could be
+ * followed for them.
  *
  * Where detection is wrong, {@link OVERRIDES} corrects it. The check fails on
  * an override that has gone stale: an edge that is no longer a runtime
@@ -85,8 +85,8 @@ export const checkDependentReleases = ({
   groups: readonly ReleaseGroup[];
   packages: readonly WorkspacePackage[];
   /**
-   * Per dependent, the packages its `src/` re-exports from, each with the
-   * files that do.
+   * Per dependent, the packages its `src/` re-exports from, each with the files
+   * that do.
    */
   reExports: ReadonlyMap<string, ReadonlyMap<string, readonly string[]>>;
   overrides: readonly ExposureOverride[];
@@ -258,14 +258,14 @@ export const checkDependentReleases = ({
 };
 
 /**
- * The packages a module re-exports from, by bare specifier: what it exports
- * as the very binding it imports. That is an `export … from '<dep>'`
- * statement; an imported binding exported by a separate `export { … }` or
- * `export default`; and an exported alias of one — `export type T = Imported`
- * (whose type arguments, if any, are its own type parameters in order), or
- * `export const v = imported` (or a member of it). A type or a value built
- * from an import, such as `DeepReadonly<{ … }>` or `f()`, is not one. Relative
- * and absolute specifiers name no package.
+ * The packages a module re-exports from, by bare specifier: what it exports as
+ * the very binding it imports. That is an `export … from '<dep>'` statement; an
+ * imported binding exported by a separate `export { … }` or `export default`;
+ * and an exported alias of one — `export type T = Imported` (whose type
+ * arguments, if any, are its own type parameters in order), or
+ * `export const v = imported` (or a member of it). A type or a value built from
+ * an import, such as `DeepReadonly<{ … }>` or `f()`, is not one. Relative and
+ * absolute specifiers name no package.
  */
 export const findReExportedPackages = (
   fileName: string,
@@ -369,8 +369,8 @@ export type WorkspacePackage = Readonly<{
   name: string;
   version: string;
   /**
-   * Whether a changeset naming it releases it to consumers: false for a
-   * private package, and for the strict standard library bundles.
+   * Whether a changeset naming it releases it to consumers: false for a private
+   * package, and for the strict standard library bundles.
    */
   released: boolean;
   /**
@@ -387,8 +387,8 @@ export type ReleaseGroup = Readonly<{
 }>;
 
 /**
- * A correction of what detection says about the edges from `dependency` to
- * each of `dependents`.
+ * A correction of what detection says about the edges from `dependency` to each
+ * of `dependents`.
  */
 export type ExposureOverride = Readonly<{
   dependency: string;
@@ -507,9 +507,9 @@ const isExported = (statement: DeepReadonly<ts.Statement>): boolean =>
   );
 
 /**
- * The binding an expression names, through parentheses, `as`, `satisfies`,
- * `!`, `<T>` and member access: `a` of `(a.b as T)!`. `undefined` for any
- * other expression, such as a call.
+ * The binding an expression names, through parentheses, `as`, `satisfies`, `!`,
+ * `<T>` and member access: `a` of `(a.b as T)!`. `undefined` for any other
+ * expression, such as a call.
  */
 const aliasedBinding = (
   expression: DeepReadonly<ts.Expression>,

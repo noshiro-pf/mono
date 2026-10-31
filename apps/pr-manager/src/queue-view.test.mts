@@ -225,8 +225,8 @@ describe(queueViewOf, () => {
     assert.deepStrictEqual(view.slots, []);
   });
 
-  // A conflict recorded against a base that has since moved is the worker's
-  // to try again, as its next survey does.
+  // A conflict recorded against a base that has since moved is the worker's to
+  // try again, as its next survey does.
   test('takes back one set aside for a reason the base moved under', () => {
     const view = queueViewOf(
       input([

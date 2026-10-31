@@ -29,8 +29,8 @@ export const runBenchmark = (n: number): number => {
 
   // `lruMemoize`, not the default `weakMapMemoize`. Every input here is a new
   // number that never repeats, and `weakMapMemoize` keeps every distinct
-  // primitive it has seen: one round would cache 100,000 results it never
-  // hits, and that memory and GC would be measured as Redux's cost.
+  // primitive it has seen: one round would cache 100,000 results it never hits,
+  // and that memory and GC would be measured as Redux's cost.
   const selectDoubled = createSelector(
     selectCounter,
     (counter) => counter * 2,

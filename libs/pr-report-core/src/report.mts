@@ -29,8 +29,8 @@ import type {
 /**
  * Reads the declared merge order and the check verdicts out of the facts.
  *
- * Nothing here talks to GitHub, which is what lets the whole shape of a
- * report be tested against a handful of literals.
+ * Nothing here talks to GitHub, which is what lets the whole shape of a report
+ * be tested against a handful of literals.
  */
 export const buildReport = ({
   repo,
@@ -96,8 +96,8 @@ export const buildEntries = ({
 }: Readonly<{
   /**
    * The contexts the ruleset requires, or `undefined` for a repository that
-   * declares none: each pull request is then judged over every context
-   * reported on its head.
+   * declares none: each pull request is then judged over every context reported
+   * on its head.
    */
   required: readonly string[] | undefined;
   defaultBranch: string;
@@ -195,9 +195,9 @@ export const buildEntries = ({
 
 /**
  * Each open issue with how it stands for being started
- * (`docs/issue-start-after.md`): its start state, or how far someone has
- * got with it when it is startable (`progressOf`), and where each thing it
- * names stands.
+ * (`docs/issue-start-after.md`): its start state, or how far someone has got
+ * with it when it is startable (`progressOf`), and where each thing it names
+ * stands.
  */
 const reportIssues = (
   issues: readonly OpenIssue[],
@@ -243,8 +243,8 @@ const NO_DECLARATIONS: IssueDeclarations = {
 
 /**
  * The issues a pull request closes that may still declare an order: any not
- * known to be closed. One read from the body without a token has an
- * `unknown` state, and is given the benefit of the doubt.
+ * known to be closed. One read from the body without a token has an `unknown`
+ * state, and is given the benefit of the doubt.
  */
 const notKnownClosed = (
   linkedIssues: PullRequestFacts['linkedIssues'],

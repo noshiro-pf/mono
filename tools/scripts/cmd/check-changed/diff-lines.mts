@@ -9,18 +9,18 @@ import { Num, Result } from 'ts-data-forge';
  * count of `0` is a deletion that wrote nothing. A deleted file (`+++
  * /dev/null`) and a binary file (no hunk) contribute no lines.
  *
- * Git quotes a path holding a double quote, a backslash or a control
- * character even under `core.quotePath=false`; such a path is skipped rather
- * than guessed at, since nothing in this repository is named that way.
+ * Git quotes a path holding a double quote, a backslash or a control character
+ * even under `core.quotePath=false`; such a path is skipped rather than guessed
+ * at, since nothing in this repository is named that way.
  */
 export const parseAddedLines = (
   diff: string,
 ): ReadonlyMap<string, readonly number[]> => {
   const mut_result = new Map<string, readonly number[]>();
 
-  // `inHeader` is the stretch between `diff --git` and the first hunk, the
-  // only place a `+++ ` line is a header rather than an added line whose
-  // text begins `++ `.
+  // `inHeader` is the stretch between `diff --git` and the first hunk, the only
+  // place a `+++ ` line is a header rather than an added line whose text begins
+  // `++ `.
   const mut_current: { file: string | undefined; inHeader: boolean } = {
     file: undefined,
     inHeader: false,
@@ -89,8 +89,8 @@ export const formatLineRanges = (
 
   const sorted = Array.from(present).toSorted((a, b) => a - b);
 
-  // In sorted order the n-th line with no predecessor and the n-th line with
-  // no successor are the two ends of the n-th range.
+  // In sorted order the n-th line with no predecessor and the n-th line with no
+  // successor are the two ends of the n-th range.
   const ends = sorted.filter((line) => !present.has(line + 1));
 
   const ranges = sorted

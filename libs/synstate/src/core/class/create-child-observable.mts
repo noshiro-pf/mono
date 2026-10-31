@@ -31,17 +31,16 @@ export type SyncChildObservableTools<A> = Readonly<{
   complete: () => void;
 
   /**
-   * Completes this observable once the update now propagating has reached
-   * every descendant, so that they see the value just passed on first.
+   * Completes this observable once the update now propagating has reached every
+   * descendant, so that they see the value just passed on first.
    */
   completeAfterPropagation: () => void;
 
   /**
    * Registers a teardown (clear timers, unsubscribe inner observables, …) to
-   * run when this observable completes or is disposed, in the order
-   * registered. Called from `init`, it lets the teardown close over what
-   * `init` creates. Registered once the observable has completed, the
-   * teardown runs at once.
+   * run when this observable completes or is disposed, in the order registered.
+   * Called from `init`, it lets the teardown close over what `init` creates.
+   * Registered once the observable has completed, the teardown runs at once.
    */
   onComplete: (teardown: () => void) => void;
 }>;
@@ -57,21 +56,20 @@ export type AsyncChildObservableTools<A> = Readonly<{
   SyncChildObservableTools<A>;
 
 /**
- * What a sync child's `init` may return instead of `tryUpdate` alone: the
- * hooks the factory calls, which read the state `init` creates.
+ * What a sync child's `init` may return instead of `tryUpdate` alone: the hooks
+ * the factory calls, which read the state `init` creates.
  */
 export type SyncChildObservableHooks = Readonly<{
   /**
-   * Called with the token of every update in which a parent of this
-   * observable emitted.
+   * Called with the token of every update in which a parent of this observable
+   * emitted.
    */
   tryUpdate: (updateToken: UpdateToken) => void;
 
   /**
-   * Whether this observable can emit nothing more although some parent is
-   * still live, asked whenever a parent completes. `true` completes it then,
-   * as all parents completing does (`zip` once a completed source's queue is
-   * empty).
+   * Whether this observable can emit nothing more although some parent is still
+   * live, asked whenever a parent completes. `true` completes it then, as all
+   * parents completing does (`zip` once a completed source's queue is empty).
    */
   canEmitNoMore?: () => boolean;
 }>;
@@ -84,8 +82,8 @@ export type SyncChildObservableHooks = Readonly<{
 export type AsyncChildObservableHooks = SyncChildObservableHooks &
   Readonly<{
     /**
-     * Run at the beginning of `complete()`, before the teardowns, and never
-     * by `dispose()`: passes on what this observable still holds through
+     * Run at the beginning of `complete()`, before the teardowns, and never by
+     * `dispose()`: passes on what this observable still holds through
      * `startUpdate`, so that its subscribers see it before they see the
      * completion. A disposed observable has no one left to tell.
      */
@@ -96,11 +94,11 @@ type ChildObservableConfigBase<P extends NonEmptyUnknownList> = Readonly<{
   parents: Wrap<P>;
 
   /**
-   * Defaults to one more than the deepest parent. An update reaches
-   * observables in ascending depth, so an observable `tryUpdate` reads with
-   * `getSnapshot` without being its child (`withCurrentValueFrom`'s second
-   * source) has to be shallower than this one too, or this one reads its value
-   * from before the update: pass `1 + Math.max(...)` over both then.
+   * Defaults to one more than the deepest parent. An update reaches observables
+   * in ascending depth, so an observable `tryUpdate` reads with `getSnapshot`
+   * without being its child (`withCurrentValueFrom`'s second source) has to be
+   * shallower than this one too, or this one reads its value from before the
+   * update: pass `1 + Math.max(...)` over both then.
    */
   depth?: number;
 }>;
@@ -122,15 +120,15 @@ export type InitializedChildObservableConfig<
   }>;
 
 /**
- * Creates a sync-child observable: one derived from `parents` that emits, if
- * at all, in the same update as they do. `map`, `filter`, `combine` and the
- * other synchronous operators are built with it.
+ * Creates a sync-child observable: one derived from `parents` that emits, if at
+ * all, in the same update as they do. `map`, `filter`, `combine` and the other
+ * synchronous operators are built with it.
  *
  * `init` runs during construction and receives the tools. It returns
  * `tryUpdate`, which is called with the token of every update in which some
- * parent of this observable emitted — a parent that did not emit in that
- * update has a different `updateToken`; to emit, call `setNext` with the
- * token received — or an object holding `tryUpdate` and the other hooks
+ * parent of this observable emitted — a parent that did not emit in that update
+ * has a different `updateToken`; to emit, call `setNext` with the token
+ * received — or an object holding `tryUpdate` and the other hooks
  * ({@link SyncChildObservableHooks}). State the hooks share can live inside
  * `init`, next to the teardown it registers with the `onComplete` tool.
  * `init` may complete the observable; it is then never registered to its
@@ -211,8 +209,8 @@ export const createInitializedSyncChildObservable = <
  * Creates an async-child observable: one derived from `parents` that may emit
  * later, in an update of its own, through `startUpdate` (`debounce`,
  * `switchMap`). It may also emit synchronously with `setNext`, as a sync child
- * does. See {@link createSyncChildObservable} for the `init` contract; an
- * async child's `init` may also return a `flush` hook
+ * does. See {@link createSyncChildObservable} for the `init` contract; an async
+ * child's `init` may also return a `flush` hook
  * ({@link AsyncChildObservableHooks}).
  */
 export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(

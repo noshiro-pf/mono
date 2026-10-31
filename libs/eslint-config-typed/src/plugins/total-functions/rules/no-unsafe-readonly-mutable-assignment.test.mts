@@ -197,8 +197,8 @@ ruleTester.run(
           func(readonlyA);
         `,
       },
-      // multiple type signatures (no matching signature)
-      // we don't bother flagging this because TypeScript itself will catch it
+      // multiple type signatures (no matching signature) we don't bother
+      // flagging this because TypeScript itself will catch it
       {
         filename: 'file.ts',
         code: dedent`

@@ -1,8 +1,8 @@
 import { mountableTag } from '../internal/index.mjs';
 
 /**
- * What a JSX expression evaluates to: a description that creates DOM nodes
- * when mounted, not the nodes themselves (SPEC.md 6.1).
+ * What a JSX expression evaluates to: a description that creates DOM nodes when
+ * mounted, not the nodes themselves (SPEC.md 6.1).
  *
  * The children of a JSX element are evaluated before the element, so a
  * description that created its nodes at once would create both branches of
@@ -11,8 +11,8 @@ import { mountableTag } from '../internal/index.mjs';
  * It is an object rather than a function: a props object with a `then` prop
  * holding a function would be taken for a thenable.
  *
- * The same description may be mounted any number of times; each mount
- * creates new nodes.
+ * The same description may be mounted any number of times; each mount creates
+ * new nodes.
  */
 export type Mountable = Readonly<{
   [mountableTag]: true;

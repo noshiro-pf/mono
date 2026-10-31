@@ -9,8 +9,8 @@ const [useCount, setCount, { state: count$ }] = createState(0);
 // Derived InitializedObservable — no fallback needed.
 const doubled$ = count$.pipe(map((n) => n * 2));
 
-// Imagine an Observable<string> that has no initial value
-// (e.g. one waiting on an async source).
+// Imagine an Observable<string> that has no initial value (e.g. one waiting on
+// an async source).
 declare const userName$: Observable<string>;
 
 const Profile = (): React.JSX.Element => {

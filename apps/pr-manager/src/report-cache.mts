@@ -1,25 +1,25 @@
 /**
- * The last whole report of a repository, kept in the page's IndexedDB
- * database (`settings-db.mts`) for the next tab to show while it reads its
- * own (`ReportCache` in `store/reader.mts`).
+ * The last whole report of a repository, kept in the page's IndexedDB database
+ * (`settings-db.mts`) for the next tab to show while it reads its own
+ * (`ReportCache` in `store/reader.mts`).
  *
  * **Kept per build.** The report is the page's own shape, not GitHub's, and
- * nothing validates it on the way back: a report kept by another build of
- * the page is not read at all, rather than drawn by code that expects
- * another shape. `build` names the sources the build was made from
+ * nothing validates it on the way back: a report kept by another build of the
+ * page is not read at all, rather than drawn by code that expects another
+ * shape. `build` names the sources the build was made from
  * (`PR_MANAGER_BUILD_ID`, which the Vite config writes in), so a deploy that
  * changes them forgets every report kept before it.
  *
- * **Kept per token.** A report is what one token could read, and another
- * token — another account, with less access — is not shown it. The token
- * itself is not kept: a SHA-256 of it is, which is enough to tell it from
- * another and nothing to read with. This holds across tabs, which share the
- * database but not their tokens: a tab still reading with a token replaced
- * in another can write its report, but not have it shown to the new one.
+ * **Kept per token.** A report is what one token could read, and another token
+ * — another account, with less access — is not shown it. The token itself is
+ * not kept: a SHA-256 of it is, which is enough to tell it from another and
+ * nothing to read with. This holds across tabs, which share the database but
+ * not their tokens: a tab still reading with a token replaced in another can
+ * write its report, but not have it shown to the new one.
  *
- * Every function here settles, whatever IndexedDB does: a browser that has
- * none or refuses it (a private window can) keeps nothing, which is a page
- * that waits for its first read as it did before.
+ * Every function here settles, whatever IndexedDB does: a browser that has none
+ * or refuses it (a private window can) keeps nothing, which is a page that
+ * waits for its first read as it did before.
  */
 
 import { isRecord, Result } from 'ts-data-forge';
@@ -90,8 +90,8 @@ type Kept = Readonly<{
 }>;
 
 /**
- * The SHA-256 of `token`, in hex; `undefined` where the browser will not
- * hash (a page served over plain HTTP has no `crypto.subtle`).
+ * The SHA-256 of `token`, in hex; `undefined` where the browser will not hash
+ * (a page served over plain HTTP has no `crypto.subtle`).
  */
 const fingerprint = async (token: string): Promise<string | undefined> => {
   try {

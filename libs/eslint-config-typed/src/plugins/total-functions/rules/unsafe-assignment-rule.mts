@@ -56,9 +56,9 @@ export const createNoUnsafeAssignmentRule =
 
     const checker = program.getTypeChecker();
 
-    // Special handling for array methods that return mutable arrays but that
-    // we know are shallow copies and therefore safe to have their result
-    // assigned to a readonly array.
+    // Special handling for array methods that return mutable arrays but that we
+    // know are shallow copies and therefore safe to have their result assigned
+    // to a readonly array.
     const isSafeAssignmentFromArrayMethod = (
       sourceExpression: TSESTree.Expression | undefined,
       destinationType: Type,
@@ -85,8 +85,8 @@ export const createNoUnsafeAssignmentRule =
         // and the assignment is from calling a member (obj.method(...))
         sourceExpression?.type === AST_NODE_TYPES.CallExpression &&
         sourceExpression.callee.type === AST_NODE_TYPES.MemberExpression &&
-        // and the thing being called is an array
-        // (so we can avoid permitting calls to array methods on other types)
+        // and the thing being called is an array (so we can avoid permitting
+        // calls to array methods on other types)
         checker.isArrayType(
           checker.getTypeAtLocation(
             parserServices.esTreeNodeToTSNodeMap.get(
@@ -115,11 +115,11 @@ export const createNoUnsafeAssignmentRule =
 
     /**
      * A type assertion is an assignment of its operand to the asserted type.
-     * Without this, `mutable as Readonly<T>` passes: every other listener
-     * takes the source type from the assertion, which is already the
-     * destination type. The operand's type is read through any wrappers
-     * inside it, so `x as unknown as T` is judged from `x` to `T`. `as const`
-     * is left to the listener of the position it stands in.
+     * Without this, `mutable as Readonly<T>` passes: every other listener takes
+     * the source type from the assertion, which is already the destination
+     * type. The operand's type is read through any wrappers inside it, so
+     * `x as unknown as T` is judged from `x` to `T`. `as const` is left to the
+     * listener of the position it stands in.
      */
     const checkTypeAssertion = (
       node: TSESTree.TSAsExpression | TSESTree.TSTypeAssertion,

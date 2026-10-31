@@ -27,9 +27,9 @@ export const runBenchmark = (k: number, depth: number): number => {
   // eslint-disable-next-line unicorn/consistent-function-scoping
   let mut_current = (state: Readonly<{ value: number }>): number => state.value;
 
-  // Each stage is two selectors over the previous one and a third over both,
-  // as in the other libraries. `lruMemoize` for the reason the diamond
-  // scenario gives: every input is a number that never repeats.
+  // Each stage is two selectors over the previous one and a third over both, as
+  // in the other libraries. `lruMemoize` for the reason the diamond scenario
+  // gives: every input is a number that never repeats.
   for (const _i of range(0, asSafeUint(depth))) {
     const prev = mut_current;
 

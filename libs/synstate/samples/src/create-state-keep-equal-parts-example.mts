@@ -41,8 +41,8 @@ if (import.meta.vitest !== undefined) {
 
     assert.strictEqual(report.getSnapshot().value, held);
 
-    // An edited title: a new report and a new array, while the summary is
-    // the one held, so `summary` is not told of it.
+    // An edited title: a new report and a new array, while the summary is the
+    // one held, so `summary` is not told of it.
     setReport({
       summary: { open: 1 },
       pulls: [{ number: 1, title: 'one (edited)' }],

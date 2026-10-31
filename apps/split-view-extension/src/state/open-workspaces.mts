@@ -144,8 +144,8 @@ const tabIsOpen = async (tabId: string): Promise<boolean> => {
 
     return true;
   } catch {
-    // Closed, or closed while the service worker was asleep and never taken
-    // off the list.
+    // Closed, or closed while the service worker was asleep and never taken off
+    // the list.
     return false;
   }
 };

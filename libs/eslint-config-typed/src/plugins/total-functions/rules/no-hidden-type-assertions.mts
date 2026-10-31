@@ -167,8 +167,8 @@ export const noHiddenTypeAssertions = createRule({
     };
 
     /**
-     * Whether a call signature of `type` is a hidden type assertion: generic
-     * in a type parameter that only its return type uses.
+     * Whether a call signature of `type` is a hidden type assertion: generic in
+     * a type parameter that only its return type uses.
      */
     const hasHiddenTypeAssertionSignature = (type: Type): boolean =>
       type.getCallSignatures().some((signature) => {
@@ -197,8 +197,8 @@ export const noHiddenTypeAssertions = createRule({
      * Whether the callee is a cast (`as` or `<T>`) of a function whose
      * signature is a hidden type assertion: `(parse as () => Foo)()` picks
      * `Foo` for `parse`'s type parameter as surely as `parse<Foo>()` does, and
-     * the cast is not reported by `no-unsafe-type-assertion`, since the
-     * generic function is assignable to every instantiation of it. Every layer
+     * the cast is not reported by `no-unsafe-type-assertion`, since the generic
+     * function is assignable to every instantiation of it. Every layer
      * under the outermost cast is asked, so that `parse as unknown as () =>
      * Foo` is seen too. A call whose result is `unknown` or `never` asserts
      * nothing.
@@ -272,8 +272,8 @@ export const noHiddenTypeAssertions = createRule({
           return;
         }
 
-        // Of all the type parameters that appear in the return type,
-        // are they all set to `unknown` type arguments in this specific call?
+        // Of all the type parameters that appear in the return type, are they
+        // all set to `unknown` type arguments in this specific call?
         // If so, this is safe even if the function being called is a hidden type assertion.
         const allCorrespondingTypeArgumentsAreUnknownType =
           typeParamsUsedInReturnType.every(({ index, typeParameter }) => {

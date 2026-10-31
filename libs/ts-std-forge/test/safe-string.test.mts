@@ -86,8 +86,8 @@ describe('SafeString.fromCodePoint', () => {
 
       assert.strictEqual(Result.isErr(result), thrown);
 
-      // Every engine throw must be classified in advance — 'unexpected'
-      // never appears for a spec-defined condition.
+      // Every engine throw must be classified in advance — 'unexpected' never
+      // appears for a spec-defined condition.
       assert.strictEqual(
         Result.isErr(result) && result.value.kind !== 'unexpected',
         thrown,

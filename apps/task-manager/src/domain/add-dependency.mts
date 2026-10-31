@@ -10,10 +10,10 @@ import type {
 } from './types.mjs';
 
 /**
- * Why `dependent` cannot be made to depend on `source`, or `undefined` when
- * it can: either of them is not stored, they are the same node, `dependent`
- * already depends on `source` (one edge per pair, as the dialog keeps it),
- * or the edge would close a cycle.
+ * Why `dependent` cannot be made to depend on `source`, or `undefined` when it
+ * can: either of them is not stored, they are the same node, `dependent`
+ * already depends on `source` (one edge per pair, as the dialog keeps it), or
+ * the edge would close a cycle.
  */
 export const dependencyRefusal = (
   state: DomainState,
@@ -41,10 +41,10 @@ export const dependencyRefusal = (
 };
 
 /**
- * `dependent` as stored, made to depend on `source` at `now`: the
- * dependency it gets is the one a new row of the dialog starts as — on a
- * task, until it is done (`finish-to-start`) — with no lag, after the ones
- * it has. Refused as {@link dependencyRefusal} says.
+ * `dependent` as stored, made to depend on `source` at `now`: the dependency it
+ * gets is the one a new row of the dialog starts as — on a task, until it is
+ * done (`finish-to-start`) — with no lag, after the ones it has. Refused as
+ * {@link dependencyRefusal} says.
  */
 export const addDependency = (
   state: DomainState,

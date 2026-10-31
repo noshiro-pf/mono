@@ -5,9 +5,9 @@ import * as path from 'node:path';
 import { runClaude } from './claude.mjs';
 
 /**
- * A stand-in for `claude` on `PATH`: it writes the stream `FAKE_CLAUDE`
- * names, the way `claude -p --output-format stream-json` does, and echoes
- * its arguments in the result.
+ * A stand-in for `claude` on `PATH`: it writes the stream `FAKE_CLAUDE` names,
+ * the way `claude -p --output-format stream-json` does, and echoes its
+ * arguments in the result.
  */
 const FAKE_CLAUDE = dedent`
   #!/usr/bin/env node

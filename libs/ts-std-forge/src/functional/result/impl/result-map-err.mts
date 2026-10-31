@@ -5,8 +5,8 @@ import { isOk } from './result-is-ok.mjs';
 import type { UnwrapErr, UnwrapOk } from './types.mjs';
 
 /**
- * Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the
- * error value. If the `Result` is `Result.Ok`, returns the original `Ok`.
+ * Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the error
+ * value. If the `Result` is `Result.Ok`, returns the original `Ok`.
  *
  * @example
  *
@@ -48,9 +48,9 @@ export function mapErr<R extends UnknownResult, E2>(
 // The returned function is generic over the *whole* result, mirroring the
 // direct overload above, rather than fixing its parameter to `Result<S, E>`.
 // Fixing it makes the curried form unusable from a caller that is itself
-// generic over the result: with `E` bound to `UnwrapErr<R>` at currying time the
-// parameter becomes `Result<...>` in terms of `R`, and TypeScript cannot show
-// a bare `R extends UnknownResult` is assignable to that — although every
+// generic over the result: with `E` bound to `UnwrapErr<R>` at currying time
+// the parameter becomes `Result<...>` in terms of `R`, and TypeScript cannot
+// show a bare `R extends UnknownResult` is assignable to that — although every
 // concrete instantiation of `R` is.
 //
 // The conditional is what keeps the check: `R` is inferred from the argument

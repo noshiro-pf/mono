@@ -7,13 +7,12 @@ type Props = Readonly<{
 }>;
 
 /**
- * What the page shows when the URL names no repository: the question of
- * which one to read, and nothing else.
+ * What the page shows when the URL names no repository: the question of which
+ * one to read, and nothing else.
  *
- * The page reads no repository it was not pointed at. One read by default
- * would be someone's own, and a reader who never chose it could act on it
- * from here — file an issue, follow a pull request — without noticing whose
- * it is.
+ * The page reads no repository it was not pointed at. One read by default would
+ * be someone's own, and a reader who never chose it could act on it from here —
+ * file an issue, follow a pull request — without noticing whose it is.
  */
 export const StartPage = ({ invalid }: Props): JSX.Element => (
   <main class={constant('page start-page')}>

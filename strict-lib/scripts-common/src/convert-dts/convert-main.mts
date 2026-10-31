@@ -94,11 +94,11 @@ export const convert = (
       composeMonoTypeFns(
         // Keep the leading Microsoft copyright banner, and say under it that
         // the file is not the original. The lib files are Apache-2.0, whose
-        // section 4 asks exactly this of a derivative work: retain the
-        // notices the source carries, and mark modified files as modified.
+        // section 4 asks exactly this of a derivative work: retain the notices
+        // the source carries, and mark modified files as modified.
         // Matched as a regex (the whole `/*! … */` block at the top of the
-        // file) rather than a literal, because the exact wording drifts
-        // between TypeScript releases — e.g. TS 6.0 fixed the long-standing
+        // file) rather than a literal, because the exact wording drifts between
+        // TypeScript releases — e.g. TS 6.0 fixed the long-standing
         // "MERCHANTABLITY" typo to "MERCHANTABILITY" — and with the no-match
         // check on, a release that drops the banner fails here rather than
         // shipping without it.
@@ -326,8 +326,8 @@ export const convert = (
                 return convertLibEs2022Object(options);
 
               case 'lib.es2021.string.d.ts':
-                // `String.prototype.replaceAll`, whose replacement callback
-                // has to be typed the same way as `replace`'s.
+                // `String.prototype.replaceAll`, whose replacement callback has
+                // to be typed the same way as `replace`'s.
                 return convertStringReplacerArgs;
 
               case 'lib.es2022.string.d.ts':
@@ -519,8 +519,8 @@ const skipForStubFile =
 
 /**
  * The notice that follows the Microsoft banner in every generated file. Each
- * file is published inside a bundle that also carries `LICENSE` and
- * `NOTICE`, which is where the derivation is spelled out once.
+ * file is published inside a bundle that also carries `LICENSE` and `NOTICE`,
+ * which is where the derivation is spelled out once.
  */
 const modificationNotice = (filename: string): string =>
   dedent`

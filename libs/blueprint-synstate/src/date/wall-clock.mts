@@ -2,14 +2,13 @@ import { Optional } from 'ts-data-forge';
 import { localNoon, parseInteger } from '../internal/index.mjs';
 
 /**
- * A date and a time of day to the minute, as a wall clock shows them: no
- * time zone, no seconds. `month` is 1 to 12, as written, not `Date`'s 0 to
- * 11.
+ * A date and a time of day to the minute, as a wall clock shows them: no time
+ * zone, no seconds. `month` is 1 to 12, as written, not `Date`'s 0 to 11.
  *
- * What the pickers hold. Their values are the strings of
- * `<input type="date">` and `<input type="datetime-local">`
- * (`YYYY-MM-DD`, `YYYY-MM-DDTHH:mm`), which {@link parseWallClock} reads and
- * {@link toDateValue} and {@link toDateTimeValue} write.
+ * What the pickers hold. Their values are the strings of `<input type="date">`
+ * and `<input type="datetime-local">` (`YYYY-MM-DD`, `YYYY-MM-DDTHH:mm`), which
+ * {@link parseWallClock} reads and {@link toDateValue} and
+ * {@link toDateTimeValue} write.
  */
 export type WallClock = Readonly<{
   year: number;
@@ -20,9 +19,9 @@ export type WallClock = Readonly<{
 }>;
 
 /**
- * Reads `YYYY-MM-DD` or `YYYY-MM-DDTHH:mm` (seconds, if any, are dropped),
- * and nothing for anything else, a day that the month does not have
- * included. A date alone is at 00:00.
+ * Reads `YYYY-MM-DD` or `YYYY-MM-DDTHH:mm` (seconds, if any, are dropped), and
+ * nothing for anything else, a day that the month does not have included. A
+ * date alone is at 00:00.
  */
 export const parseWallClock = (value: string): Optional<WallClock> => {
   const matched = DATE_TIME_PATTERN.exec(value) ?? DATE_PATTERN.exec(value);
@@ -46,8 +45,8 @@ export const parseWallClock = (value: string): Optional<WallClock> => {
 };
 
 /**
- * `parts` as a {@link WallClock} when every field is in range, the day
- * within its month.
+ * `parts` as a {@link WallClock} when every field is in range, the day within
+ * its month.
  */
 export const wallClockFromParts = (parts: WallClock): Optional<WallClock> =>
   isIntegerIn(parts.year, 1, 9999) &&
@@ -115,8 +114,8 @@ export const addMonths = (clock: WallClock, months: number): WallClock => {
 };
 
 /**
- * The month of `clock` as one number, `year * 12 + month - 1`: months
- * compare and subtract as numbers do.
+ * The month of `clock` as one number, `year * 12 + month - 1`: months compare
+ * and subtract as numbers do.
  */
 export const monthIndexOf = ({
   year,
@@ -180,10 +179,10 @@ export const dayOfWeek = ({ year, month, day }: WallClock): number =>
   localNoon(year, month, day).getDay();
 
 /**
- * The weeks a month is drawn in, from the week of its first day to the week
- * of its last, each seven days from `weekStartsOn` (0 for Sunday), the days
- * of the months before and after included, all at 00:00. Four to six weeks,
- * as the month needs.
+ * The weeks a month is drawn in, from the week of its first day to the week of
+ * its last, each seven days from `weekStartsOn` (0 for Sunday), the days of the
+ * months before and after included, all at 00:00. Four to six weeks, as the
+ * month needs.
  */
 export const monthWeeks = (
   year: number,

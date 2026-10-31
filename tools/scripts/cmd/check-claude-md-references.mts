@@ -8,12 +8,12 @@ import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
  *
  * Every rule moved out of `CLAUDE.md` and into the file it is about leaves a
  * pointer behind, and a pointer is the one kind of prose that can be wrong
- * without being unclear: `see "CI diff gates" in CLAUDE.md` reads perfectly
- * and sends the reader to a heading that was renamed. Nothing else notices —
- * the file it names exists, the sentence parses, and the reader who does not
+ * without being unclear: `see "CI diff gates" in CLAUDE.md` reads perfectly and
+ * sends the reader to a heading that was renamed. Nothing else notices — the
+ * file it names exists, the sentence parses, and the reader who does not
  * already know the rule is exactly the reader who cannot tell. Thirteen such
- * pointers had accumulated by the time this was written, all from one pass
- * that shortened the headings.
+ * pointers had accumulated by the time this was written, all from one pass that
+ * shortened the headings.
  *
  * A citation is read in four shapes, and nothing else is read at all:
  *
@@ -28,12 +28,12 @@ import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
  * - `see "Japanese text"` inside `CLAUDE.md` itself, which is how its sections
  *   point at each other.
  *
- * Backticks are ignored on both sides, so `see "strict-lib/"` finds the
- * heading written `` ### `strict-lib/` ``. Case is not: a heading quoted with
- * the wrong case is a quotation of something that was never written.
+ * Backticks are ignored on both sides, so `see "strict-lib/"` finds the heading
+ * written `` ### `strict-lib/` ``. Case is not: a heading quoted with the wrong
+ * case is a quotation of something that was never written.
  *
- * Lines are joined before scanning, with a leading `//`, `*` or `#` dropped,
- * so a citation that wraps across two comment lines still reads as one.
+ * Lines are joined before scanning, with a leading `//`, `*` or `#` dropped, so
+ * a citation that wraps across two comment lines still reads as one.
  */
 export const checkClaudeMdReferences = async (): Promise<
   Result<CheckSummary, string>
@@ -83,8 +83,8 @@ export const collectHeadings = (claudeMd: string): readonly string[] =>
 /**
  * Every section of `CLAUDE.md` that `fileText` claims to send a reader to.
  *
- * `selfReferences` is on for `CLAUDE.md` itself, where a pointer names no
- * file and `see "…"` is the whole of the form.
+ * `selfReferences` is on for `CLAUDE.md` itself, where a pointer names no file
+ * and `see "…"` is the whole of the form.
  */
 export const collectCitations = (
   fileText: string,
@@ -143,8 +143,8 @@ const CITATION_LEADING =
 /**
  * `CLAUDE.md の「CI」節`. The 節 is what separates a citation from a quote.
  *
- * The corner brackets are escaped rather than written, because a halfwidth
- * `(` directly after one is what `check:prose:japanese-parentheses` reports —
+ * The corner brackets are escaped rather than written, because a halfwidth `(`
+ * directly after one is what `check:prose:japanese-parentheses` reports —
  * and its `--fix` would rewrite this pattern's own grouping to `（）`.
  */
 const CITATION_JAPANESE =
@@ -177,8 +177,8 @@ const IGNORED_PREFIXES: readonly string[] = [
  * This check's own two files, whose text is the thing it looks for.
  *
  * The fixtures name sections that do not exist on purpose, and the
- * implementation cannot describe a citation without writing one — the shapes
- * in the header above are read as four citations of `"A"`, `"B"`, `"C"` and a
+ * implementation cannot describe a citation without writing one — the shapes in
+ * the header above are read as four citations of `"A"`, `"B"`, `"C"` and a
  * heading that was renamed. `check-japanese-parentheses.mts` excludes its own
  * fixtures by exact path for the same reason, and by exact path rather than a
  * directive comment so that the exclusion is visible from here.

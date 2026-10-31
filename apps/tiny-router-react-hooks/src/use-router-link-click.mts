@@ -33,8 +33,8 @@ export const createRouterLinkClickHandler =
 
     ev.preventDefault();
 
-    // If the URL hasn't changed, a regular <a> will do a replace instead of
-    // a push, so do the same here.
+    // If the URL hasn't changed, a regular <a> will do a replace instead of a
+    // push, so do the same here.
     const replace =
       replaceProp === true || createPath(globalThis.location) === href;
 

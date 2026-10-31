@@ -18,9 +18,9 @@ import { projectRootPath } from '../project-root-path.mjs';
  * missing `dist/` and says to run `pnpm run ws:build` (see its header).
  *
  * Which `dist/` a script needs is the guard's to work out from the dependency
- * graph; what is listed here is only which scripts run it. A new package
- * gets the wiring from copying another's scripts, and this is what notices
- * when it did not.
+ * graph; what is listed here is only which scripts run it. A new package gets
+ * the wiring from copying another's scripts, and this is what notices when it
+ * did not.
  */
 export const checkDepsBuiltGuard = async (): Promise<
   Result<number, string>

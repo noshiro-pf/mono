@@ -36,22 +36,22 @@ import { projectRootPath } from '../project-root-path.mjs';
  *     What would decide it.
  * ```
  *
- * An item is a top-level list item, together with everything indented under
- * it. Write it in English and as a consumer will read it: applying it means
- * making the change, moving the item's text into the changeset that releases
- * it (whose body becomes the package's `CHANGELOG.md`), and deleting the item.
+ * An item is a top-level list item, together with everything indented under it.
+ * Write it in English and as a consumer will read it: applying it means making
+ * the change, moving the item's text into the changeset that releases it (whose
+ * body becomes the package's `CHANGELOG.md`), and deleting the item.
  * A file whose last item is gone is deleted too, so that a `NEXT_MAJOR.md`
- * exists exactly when something is waiting. Where the change is the removal
- * of an API, mark it `@deprecated` in the source as well, which is what tells
+ * exists exactly when something is waiting. Where the change is the removal of
+ * an API, mark it `@deprecated` in the source as well, which is what tells
  * consumers ahead of time.
  *
- * An item under a heading reading `Undecided` is a candidate: a breaking
- * change that may or may not be made, or that waits on other work. It does
- * not hold a release — "not this time" is a candidate's normal answer, and
- * holding every breaking release on a question would only teach people to
- * delete it — but it is listed on the version pull request, which is the
- * moment to decide. Deciding is moving it above the heading, or deleting it
- * when the answer is no.
+ * An item under a heading reading `Undecided` is a candidate: a breaking change
+ * that may or may not be made, or that waits on other work. It does not hold a
+ * release — "not this time" is a candidate's normal answer, and holding every
+ * breaking release on a question would only teach people to delete it — but it
+ * is listed on the version pull request, which is the moment to decide.
+ * Deciding is moving it above the heading, or deleting it when the answer is
+ * no.
  *
  * The check fails when
  *
@@ -63,10 +63,10 @@ import { projectRootPath } from '../project-root-path.mjs';
  * - a `NEXT_MAJOR.md` has no items, or does not sit beside a `package.json`
  *   naming a package, so that nothing would ever hold a release for it.
  *
- * Only the version pull request raises a version, so the first case holds
- * that and nothing else. A breaking changeset may reach `main` ahead of the
- * pull requests that apply the remaining items — a stack of them, applying
- * one item each, is the usual shape — and the release waits for them there.
+ * Only the version pull request raises a version, so the first case holds that
+ * and nothing else. A breaking changeset may reach `main` ahead of the pull
+ * requests that apply the remaining items — a stack of them, applying one item
+ * each, is the usual shape — and the release waits for them there.
  * `next-major-reminder.mts` lists what it is waiting for on the version pull
  * request from the moment the changeset lands.
  *
@@ -329,8 +329,8 @@ const VERSION = /^(\d+)\.(\d+)\.\d/u;
 
 /**
  * Whether `bump` breaks consumers of a package at `version`: under semver a
- * `0.x` package signals a breaking change with its minor, and changesets
- * would take a `major` there to `1.0.0`, which is breaking as well.
+ * `0.x` package signals a breaking change with its minor, and changesets would
+ * take a `major` there to `1.0.0`, which is breaking as well.
  */
 export const isBreaking = (bump: Bump, version: string): boolean =>
   bump === 'major' || (bump === 'minor' && version.startsWith('0.'));
@@ -528,8 +528,8 @@ const readBaseVersions = (
 
 /**
  * The commit the versions are compared with: `NEXT_MAJOR_BASE`, or the merge
- * base of `HEAD` and `origin/main`. A base that is not in the clone is an
- * error rather than a base with no packages, which would pass every release.
+ * base of `HEAD` and `origin/main`. A base that is not in the clone is an error
+ * rather than a base with no packages, which would pass every release.
  */
 const resolveBase = (): string => {
   const fromEnv = process.env['NEXT_MAJOR_BASE'];

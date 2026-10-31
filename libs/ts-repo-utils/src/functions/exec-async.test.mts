@@ -367,8 +367,8 @@ describe('exec-async', () => {
     });
 
     test('should handle union types when encoding is not const', async () => {
-      // Test that when we don't know the encoding at compile time,
-      // we need to check the type at runtime
+      // Test that when we don't know the encoding at compile time, we need to
+      // check the type at runtime
       const randomEncoding = Math.random() > 0.5 ? 'utf8' : 'buffer';
 
       // NOTE: the two branches look alike but `randomEncoding` is narrowed

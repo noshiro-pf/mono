@@ -57,8 +57,8 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
 
   const mut_problems: MarkerProblem[] = [];
 
-  // Whether no code line has been seen yet, which is where a file-scoped
-  // marker may stand, and whether that header is inside a block comment.
+  // Whether no code line has been seen yet, which is where a file-scoped marker
+  // may stand, and whether that header is inside a block comment.
   let mut_inHeader = true;
 
   let mut_inBlockComment = false;
@@ -183,9 +183,9 @@ const nextLineDirectivePrefixes = [
 ] as const;
 
 /**
- * Whether `line` is another linter's directive for the line after it — the
- * one kind of comment line a marker reaches past. Any other comment is a line
- * a marker can mean: a diagnostic can sit on the comment itself (`// @ts-ignore`
+ * Whether `line` is another linter's directive for the line after it — the one
+ * kind of comment line a marker reaches past. Any other comment is a line a
+ * marker can mean: a diagnostic can sit on the comment itself (`// @ts-ignore`
  * is one).
  */
 const isNextLineDirective = (line: string): boolean =>

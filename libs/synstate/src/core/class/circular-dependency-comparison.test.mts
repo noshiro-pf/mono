@@ -49,8 +49,8 @@ describe('circular dependency comparison', () => {
         );
 
         // Simulate a cycle: mut_childA → childB → mut_childA
-        // In normal usage this is impossible — the check runs in every
-        // child constructor before the reference becomes available.
+        // In normal usage this is impossible — the check runs in every child
+        // constructor before the reference becomes available.
         Object.defineProperty(mut_childA, 'parents', {
           value: [childB],
           writable: false,

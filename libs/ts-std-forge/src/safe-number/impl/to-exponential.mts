@@ -1,14 +1,13 @@
 import type { UintRangeInclusive } from 'ts-type-forge';
 
 /**
- * Formats a number in exponential notation, made total by its parameter
- * type.
+ * Formats a number in exponential notation, made total by its parameter type.
  *
  * `Number.prototype.toExponential` throws a `RangeError` only when
  * `fractionDigits` is outside 0–100 (and `value` is finite). With
- * `fractionDigits` typed as the `0 | 1 | ... | 100` literal range, that
- * failure is unrepresentable at compile time, so the function returns the
- * string directly. When `fractionDigits` is omitted, as many digits as
+ * `fractionDigits` typed as the `0 | 1 | ... | 100` literal range, that failure
+ * is unrepresentable at compile time, so the function returns the string
+ * directly. When `fractionDigits` is omitted, as many digits as
  * necessary are used. A caller holding a plain `number` narrows it first;
  * one that defeats the type system gets the raw `RangeError`, by design.
  *

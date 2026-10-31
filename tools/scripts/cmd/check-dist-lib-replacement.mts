@@ -17,26 +17,26 @@ import { projectRootPath } from '../project-root-path.mjs';
 /**
  * Fails when what a package's `build` compiles would change with the standard
  * library: each `configs/tsconfig.build.json` is compiled twice, with
- * `--libReplacement true` and `false`, and the two outputs have to be
- * identical byte for byte.
+ * `--libReplacement true` and `false`, and the two outputs have to be identical
+ * byte for byte.
  *
  * A package that opts in is type-checked against the strict library
  * (`tsconfig.json`) but built against the stock one, because
  * `configs/tsconfig.build.json` extends the shared configs rather than
  * `tsconfig.json`, and none of them sets `libReplacement`. That is sound only
- * while the two libraries spell every emitted declaration the same way. A
- * type inferred from a library call — `export const keys = Object.keys(r)`,
- * which `explicit-function-return-type` does not reach — is spelled
- * differently by each, and the strict spelling names `StrictLibInternals`,
- * which no consumer has. Before this, the comparison was made by hand at each
+ * while the two libraries spell every emitted declaration the same way. A type
+ * inferred from a library call — `export const keys = Object.keys(r)`, which
+ * `explicit-function-return-type` does not reach — is spelled differently by
+ * each, and the strict spelling names `StrictLibInternals`, which no consumer
+ * has. Before this, the comparison was made by hand at each
  * opt-in (docs/strict-typescript-lib-integration.md), and a change after it
  * failed nothing.
  *
  * Only the compiler is run, into a temporary directory: the strip pass and
- * whatever else `build` does after it are deterministic, so identical
- * compiler output is identical `dist/`. Each run's `--listFiles` has to show
- * the strict bundle loaded with `true` and not with `false`, so that a match
- * cannot come from two runs on the same library.
+ * whatever else `build` does after it are deterministic, so identical compiler
+ * output is identical `dist/`. Each run's `--listFiles` has to show the strict
+ * bundle loaded with `true` and not with `false`, so that a match cannot come
+ * from two runs on the same library.
  *
  * The packages compared are the workspace members whose `tsconfig.json` sets
  * `libReplacement` to `true` and that have a `configs/tsconfig.build.json`.
@@ -185,8 +185,8 @@ const BUNDLE_NAME = 'strict-ts-lib-v7.0';
 const CONCURRENCY = 3;
 
 /**
- * The native compiler, the one `build` runs. See the comment on `nativeTsc`
- * in a library's `scripts/cmd/build.mts`.
+ * The native compiler, the one `build` runs. See the comment on `nativeTsc` in
+ * a library's `scripts/cmd/build.mts`.
  */
 const nativeTsc = path.resolve(
   projectRootPath,
@@ -317,8 +317,8 @@ const compareTarget = async ({
   strictLibRoot: string;
   workDir: string;
 }>): Promise<string | undefined> => {
-  // Both output directories sit at the same depth, so the relative source
-  // paths written into the source maps are the same on both sides.
+  // Both output directories sit at the same depth, so the relative source paths
+  // written into the source maps are the same on both sides.
   const outDir = (libReplacement: boolean): string =>
     path.join(
       workDir,

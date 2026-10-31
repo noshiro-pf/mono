@@ -1,6 +1,6 @@
 // Sumi bans classes, `this`, method syntax and writes to `this` outside a
-// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
-// so those rules are waived here (D-63).
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why), so
+// those rules are waived here (D-63).
 // @sumi-expect-error-file classes/no-class
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
@@ -20,19 +20,19 @@ import type {
 
 /**
  * Passes on each value with every part deeply equal to the same part of the
- * value passed on before replaced by that part, and skips a value deeply
- * equal to it altogether (structural sharing). A reader of a part that did
- * not change keeps the object it has, so `skipIfNoChange()` with `Object.is`
- * stops it. Superset of `skipIfNoChange(fastDeepEqual)`.
+ * value passed on before replaced by that part, and skips a value deeply equal
+ * to it altogether (structural sharing). A reader of a part that did not change
+ * keeps the object it has, so `skipIfNoChange()` with `Object.is` stops it.
+ * Superset of `skipIfNoChange(fastDeepEqual)`.
  *
  * **Prefer keeping references where the value is written** — compare before
- * `setState`, and skip it when nothing changed — so that nothing downstream
- * has anything to undo. The `keepEqualParts` option of `createState` and
- * `createReducer` does it for a state written whole, and `replaceEqualDeep`
- * of ts-data-forge does it for any other write. This operator lets every
- * update that changes nothing reach the source and everything up to it, and
- * walks the whole value again on each one; reach for it when the source is
- * not yours to change (a stream that arrives whole from outside).
+ * `setState`, and skip it when nothing changed — so that nothing downstream has
+ * anything to undo. The `keepEqualParts` option of `createState` and
+ * `createReducer` does it for a state written whole, and `replaceEqualDeep` of
+ * ts-data-forge does it for any other write. This operator lets every update
+ * that changes nothing reach the source and everything up to it, and walks the
+ * whole value again on each one; reach for it when the source is not yours to
+ * change (a stream that arrives whole from outside).
  *
  * Array items are matched by index; pass `{ key }` to match them by key, an
  * item for which `key` returns `undefined` being matched by index. Only plain
@@ -51,10 +51,9 @@ import type {
  *   cards: { id: number; text: string }[];
  * }>;
  *
- * // A stream that arrives whole from outside (a WebSocket, say), each
- * // message a new object even when nothing changed. A state you write
- * // yourself takes `createState(initial, { keepEqualParts: true })`
- * // instead.
+ * // A stream that arrives whole from outside (a WebSocket, say), each message
+ * // a new object even when nothing changed. A state you write yourself takes
+ * // `createState(initial, { keepEqualParts: true })` instead.
  * const message$ = source<Board>();
  *
  * const board$ = message$.pipe(keepEqualParts());

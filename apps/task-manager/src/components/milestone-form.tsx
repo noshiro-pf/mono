@@ -27,10 +27,10 @@ type Props = Readonly<{
 }>;
 
 /**
- * A milestone's fields: what a milestone is, its title and its group, then
- * the conditions under which it is reached — its date, its manual check
- * (resolved and reopened here) and its dependencies — with whether it is
- * reached as drafted and what it still waits for, and its description last.
+ * A milestone's fields: what a milestone is, its title and its group, then the
+ * conditions under which it is reached — its date, its manual check (resolved
+ * and reopened here) and its dependencies — with whether it is reached as
+ * drafted and what it still waits for, and its description last.
  */
 export const MilestoneForm = ({ editor }: Props): JSX.Element => {
   const checks$ = combine([dataStore.state, editor]).pipe(

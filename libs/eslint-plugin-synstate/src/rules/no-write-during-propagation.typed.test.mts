@@ -3,8 +3,8 @@ import { RuleTester } from '@typescript-eslint/rule-tester';
 import dedent from 'dedent';
 import { noWriteDuringPropagation } from './no-write-during-propagation.mjs';
 
-// With type information, a setter imported from another file is followed to
-// the factory call that made it: `test/fixtures/store.mts`.
+// With type information, a setter imported from another file is followed to the
+// factory call that made it: `test/fixtures/store.mts`.
 const ruleTester = new RuleTester({
   languageOptions: {
     parser,

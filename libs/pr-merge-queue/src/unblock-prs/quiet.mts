@@ -1,7 +1,7 @@
 /**
- * How long the loop sleeps when there is nothing to do: briefly while the
- * list is still changing, so a pull request queued a moment ago is picked up
- * in seconds, and at the idle interval once it has sat still for a while.
+ * How long the loop sleeps when there is nothing to do: briefly while the list
+ * is still changing, so a pull request queued a moment ago is picked up in
+ * seconds, and at the idle interval once it has sat still for a while.
  */
 
 import { isRecord } from 'ts-data-forge';
@@ -15,12 +15,12 @@ export const initialQuiet: Quiet = {
 } as const;
 
 /**
- * The part of a survey triage reads: the base, and for every open pull
- * request its head, merge state, labels, auto-merge, draft flag and body —
- * the body because that is where `Merge-After:` is declared — and what the
- * reviews hold, which triage reads separately: an approval or a resolved
- * conversation is exactly what a held pull request is waiting for. The title
- * is left out, as is the order GitHub lists things in.
+ * The part of a survey triage reads: the base, and for every open pull request
+ * its head, merge state, labels, auto-merge, draft flag and body — the body
+ * because that is where `Merge-After:` is declared — and what the reviews hold,
+ * which triage reads separately: an approval or a resolved conversation is
+ * exactly what a held pull request is waiting for. The title is left out, as is
+ * the order GitHub lists things in.
  */
 export const surveyFingerprint = (
   survey: StrictPick<Survey, 'baseSha' | 'pullRequests'>,

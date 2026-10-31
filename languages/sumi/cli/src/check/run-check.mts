@@ -57,8 +57,8 @@ export type CheckResult = Readonly<
       }>;
 
       /**
-       * Markers that named a diagnostic which did not appear. A failure in
-       * its own right — the directive is an assertion, not a mute button.
+       * Markers that named a diagnostic which did not appear. A failure in its
+       * own right — the directive is an assertion, not a mute button.
        */
       unusedExpectErrors: readonly UnusedExpectError[];
 
@@ -77,8 +77,7 @@ export type CheckResult = Readonly<
  * Runs the whole Sumi lint check for one project: locked compilerOptions
  * validation, then the native type check, then the oxlint preset over exactly
  * the files the project's program contains (so the two never disagree about
- * what is in scope), then the type-aware checker (D-55) over the same
- * project.
+ * what is in scope), then the type-aware checker (D-55) over the same project.
  *
  * `project` is a tsconfig path or a directory holding `tsconfig.json`.
  */
@@ -131,8 +130,8 @@ export const runCheck = (project: string): Result<CheckResult, string> => {
   // Both engines at once, because a neutral rule ID is the whole of what a
   // marker says and which engine answered it is not part of that (D-51; the
   // corpus merges the two lists for the same reason). Applying the markers to
-  // one engine at a time would report every marker the other engine answered
-  // as unused.
+  // one engine at a time would report every marker the other engine answered as
+  // unused.
   const expectErrors = applyExpectErrors(
     config.value.files,
     lintResult.diagnostics,

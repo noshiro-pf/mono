@@ -42,8 +42,8 @@ describe(markAsPanic, () => {
     const marked = markAsPanic(original);
 
     // The same object, so nothing about it is lost. `Object.is` rather than
-    // `===` because the two static types no longer overlap once the mark is
-    // in the result type.
+    // `===` because the two static types no longer overlap once the mark is in
+    // the result type.
     assert.isTrue(Object.is(marked, original));
 
     assert.isTrue(isPanicError(marked));
@@ -148,9 +148,9 @@ describe('boundary functions rethrow a panic', () => {
       () => Result.expectToBe(Result.err('e'), 'm'),
     ] as const;
 
-    // `thrownBy` returns `undefined` when nothing was thrown, so the
-    // assertion fails on a function that stopped throwing — a bare
-    // `try` / `catch` would pass vacuously instead.
+    // `thrownBy` returns `undefined` when nothing was thrown, so the assertion
+    // fails on a function that stopped throwing — a bare `try` / `catch` would
+    // pass vacuously instead.
     for (const fn of failing) {
       assert.isTrue(isPanicError(thrownBy(fn)));
     }

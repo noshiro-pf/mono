@@ -5,10 +5,10 @@ if (import.meta.vitest !== undefined) {
   test('simple-glitch-example (Zustand)', async () => {
     // embed-sample-code-ignore-above
     // Zustand uses a single store object, similar to Redux.
-    // Derived values are computed via selector functions
-    // that read from the store's state snapshot.
-    // Since all selectors read from the same snapshot,
-    // there is no propagation graph and thus no diamond dependency.
+    // Derived values are computed via selector functions that read from the
+    // store's state snapshot.
+    // Since all selectors read from the same snapshot, there is no propagation
+    // graph and thus no diamond dependency.
 
     const store = createStore<Readonly<{ counter: number }>>()(() => ({
       counter: 0,
@@ -44,8 +44,8 @@ if (import.meta.vitest !== undefined) {
       }, 100);
     });
 
-    // Zustand selectors always read from a single consistent state snapshot,
-    // so diamond dependencies are structurally impossible — no glitch.
+    // Zustand selectors always read from a single consistent state snapshot, so
+    // diamond dependencies are structurally impossible — no glitch.
     assert.deepStrictEqual(valueHistory, [0, 1010, 2020, 3030, 4040]);
 
     // embed-sample-code-ignore-below

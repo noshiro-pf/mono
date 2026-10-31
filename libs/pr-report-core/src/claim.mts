@@ -4,25 +4,24 @@
  *
  * `unblock-prs` leaves a set-aside pull request alone until its head moves —
  * or, for every reason but `checks-failed` and `awaiting-bypass`, until the
- * base does, when it tries the rebase again. A session fixing that pull
- * request is then racing the script, and a second session, or the one that
- * opened the pull request and is woken by the set-aside comment, may be
- * fixing the same failure. The leases on every push keep any of them from
- * overwriting another's work, but not from doing it twice. So whoever starts
- * on one says so first in a comment whose first line is a hidden record this
- * module writes and reads, and everyone else — the script included — leaves
- * that pull request to it.
+ * base does, when it tries the rebase again. A session fixing that pull request
+ * is then racing the script, and a second session, or the one that opened the
+ * pull request and is woken by the set-aside comment, may be fixing the same
+ * failure. The leases on every push keep any of them from overwriting another's
+ * work, but not from doing it twice. So whoever starts on one says so first in
+ * a comment whose first line is a hidden record this module writes and reads,
+ * and everyone else — the script included — leaves that pull request to it.
  *
  * **It lasts while the head is the one it claimed**, and for at most
  * {@link CLAIM_LIFETIME_MINUTES}. The push that carries the fix moves the head
- * and so ends the claim with nothing left to clean up; that push is what
- * hands the pull request back to the script, as it always was. The lifetime is
- * for a claimant that stopped without pushing. A claimant that needs longer
- * writes the claim again.
+ * and so ends the claim with nothing left to clean up; that push is what hands
+ * the pull request back to the script, as it always was. The lifetime is for a
+ * claimant that stopped without pushing. A claimant that needs longer writes
+ * the claim again.
  *
  * **One comment per pull request, edited in place**, like the set-aside one;
- * a claim that has ended is simply written over. Of several, the oldest is
- * the one, so two claimants writing at once both read back the same answer.
+ * a claim that has ended is simply written over. Of several, the oldest is the
+ * one, so two claimants writing at once both read back the same answer.
  *
  * **Only the comments the reader's own account wrote count**, as for the
  * set-aside comment (`set-aside.mts`): the repository is public. `by` is what

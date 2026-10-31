@@ -1,8 +1,8 @@
 /**
  * The text of the page in the language it is shown in (`lang`), as `m`:
- * `m.common.close`, `m.dag.selected(3)`. Every language has the same keys,
- * and the same parameters for each function, as the Japanese
- * (`messages-ja.mts`): one missing in another language is a type error.
+ * `m.common.close`, `m.dag.selected(3)`. Every language has the same keys, and
+ * the same parameters for each function, as the Japanese (`messages-ja.mts`):
+ * one missing in another language is a type error.
  */
 
 import {
@@ -58,9 +58,9 @@ export const messagesOf = (language: Lang): Messages =>
 export const m: Messages = messagesOf(lang);
 
 /**
- * Whether choosing `choice` would change nothing: the URL asks for no
- * language, and it is what this page was loaded by and what is kept still,
- * which another tab may have changed since.
+ * Whether choosing `choice` would change nothing: the URL asks for no language,
+ * and it is what this page was loaded by and what is kept still, which another
+ * tab may have changed since.
  */
 export const isLangChoiceKept = (choice: LangSetting): boolean =>
   langAskedByUrl === undefined &&
@@ -69,8 +69,8 @@ export const isLangChoiceKept = (choice: LangSetting): boolean =>
 
 /**
  * Keeps `choice` on this device and loads the page again by it, taking any
- * `?lang=` out of the URL so that it does not win over the choice — or,
- * where nothing can be kept, asking for the language chosen in the URL.
+ * `?lang=` out of the URL so that it does not win over the choice — or, where
+ * nothing can be kept, asking for the language chosen in the URL.
  */
 export const chooseLang = (choice: LangSetting): void => {
   const kept =

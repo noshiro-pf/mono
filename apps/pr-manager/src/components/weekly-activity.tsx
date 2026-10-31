@@ -27,21 +27,20 @@ import { ExternalLink } from './external-link.js';
 import { followOpen } from './follow-open.mjs';
 
 /**
- * The "Activity" button and the dialog it opens: how many pull requests
- * merged and how many issues closed so far today, and on each of the last
- * seven days, in the reader's time zone (`weekly-activity.mts`). Today is a
- * section of its own, below the week so that the rows read in order, and
- * outside its total, because it is still going: its counts say what time
- * they are as of.
+ * The "Activity" button and the dialog it opens: how many pull requests merged
+ * and how many issues closed so far today, and on each of the last seven days,
+ * in the reader's time zone (`weekly-activity.mts`). Today is a section of its
+ * own, below the week so that the rows read in order, and outside its total,
+ * because it is still going: its counts say what time they are as of.
  *
- * A dialog rather than a block, so that it takes none of the page until it
- * is asked for. A native `<dialog>` opened modal, as the layout settings are
+ * A dialog rather than a block, so that it takes none of the page until it is
+ * asked for. A native `<dialog>` opened modal, as the layout settings are
  * (`view-settings.tsx`): focus and Escape are the browser's, and the element
  * follows the store's `open`.
  *
- * Each count is a link to the same search on GitHub. The bars share one
- * scale across both columns and both sections, so a day's two bars can be
- * compared as well as the days, today among them.
+ * Each count is a link to the same search on GitHub. The bars share one scale
+ * across both columns and both sections, so a day's two bars can be compared as
+ * well as the days, today among them.
  */
 export const WeeklyActivity = (): JSX.Element => {
   const status$ = activityStore.status;

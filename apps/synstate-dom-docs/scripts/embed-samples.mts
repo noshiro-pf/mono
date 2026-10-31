@@ -20,8 +20,8 @@ const readmeSample = (file: string): string =>
 
 /**
  * Each page and the samples that fill its code fences, in order. The English
- * page and its Japanese translation show the same code, so both are listed
- * from one entry.
+ * page and its Japanese translation show the same code, so both are listed from
+ * one entry.
  */
 const pageSamples: readonly (readonly [
   page: string,

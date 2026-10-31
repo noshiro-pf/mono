@@ -1,7 +1,7 @@
 /**
- * The positions in `values` of one longest strictly increasing subsequence,
- * in O(n log n). `For` keeps the rows at these positions in place and moves
- * only the others (SPEC.md 8.4).
+ * The positions in `values` of one longest strictly increasing subsequence, in
+ * O(n log n). `For` keeps the rows at these positions in place and moves only
+ * the others (SPEC.md 8.4).
  */
 export const longestIncreasingSubsequence = (
   values: readonly number[],

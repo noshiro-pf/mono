@@ -14,9 +14,8 @@ const distDir = path.resolve(projectRootPath, './dist');
  * alias "typescript-native" because the "typescript" package must stay on 6.x
  * for tools that require the JS compiler API (typescript-eslint,
  * prettier-plugin-organize-imports, ...), which TypeScript 7 no longer
- * provides. Invoked via an explicit path because both packages declare a
- * `tsc` bin and the winner of the `node_modules/.bin/tsc` conflict is not
- * guaranteed.
+ * provides. Invoked via an explicit path because both packages declare a `tsc`
+ * bin and the winner of the `node_modules/.bin/tsc` conflict is not guaranteed.
  */
 const nativeTsc = path.resolve(
   projectRootPath,
@@ -77,13 +76,12 @@ const build = async (): Promise<void> => {
 
       // `dist/types.d.mts` is what package.json advertises as the package's
       // types entry, so this shim owns the name. A `src/types.mts` would
-      // compile to the same path and be overwritten here -- silently, since
-      // the build still succeeds and only the emitted types degrade. Fail
-      // instead. (The ADT variant types live in `src/adt-types.mts` for this
-      // reason.)
+      // compile to the same path and be overwritten here -- silently, since the
+      // build still succeeds and only the emitted types degrade. Fail instead.
+      // (The ADT variant types live in `src/adt-types.mts` for this reason.)
       //
-      // The check is on the source, not on the emitted file: `src/types.mts`
-      // is the only source path that compiles to this name anyway.
+      // The check is on the source, not on the emitted file: `src/types.mts` is
+      // the only source path that compiles to this name anyway.
       const reservedSourceFile = path.resolve(
         projectRootPath,
         './src/types.mts',

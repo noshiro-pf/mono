@@ -56,9 +56,9 @@ export const eslintConfigForTypeScriptWithoutRules = ({
     },
   ] as const;
 
-// Omit `.d.ts` because 1) TypeScript compilation already confirms that
-// types are resolved, and 2) it would mask an unresolved
-// `.ts`/`.tsx`/`.js`/`.jsx` implementation.
+// Omit `.d.ts` because 1) TypeScript compilation already confirms that types
+// are resolved, and 2) it would mask an unresolved `.ts`/`.tsx`/`.js`/`.jsx`
+// implementation.
 const typeScriptExtensions = ['.ts', '.tsx', '.cts', '.mts'] as const;
 
 const allExtensions = [
@@ -118,8 +118,8 @@ const buildVersionedTypesConditionNames = (
  * `ts_version_5.5_and_above_is_required.d.ts`. TypeScript reads the versioned
  * key. The resolver behind `import-x/resolver: { typescript: ... }` matches
  * condition names as literal strings and knows nothing about versions, so it
- * takes the plain `types` branch and resolves *every* subpath of such a
- * package — `jotai`, `jotai/utils`, `jotai/vanilla` — to that one stub.
+ * takes the plain `types` branch and resolves *every* subpath of such a package
+ * — `jotai`, `jotai/utils`, `jotai/vanilla` — to that one stub.
  *
  * Nothing reports the mis-resolution itself; what fails is a rule two steps
  * away from it. Two imports from one package become the same module to
@@ -212,8 +212,8 @@ if (import.meta.vitest !== undefined) {
       // Returned, not thrown: this runs while the config is being built.
       assert.deepStrictEqual(buildVersionedTypesConditionNames('-1.0'), []);
 
-      // `Number('')` is 0, so a missing component used to read as minor 0
-      // and produce a full list for a version string that has none.
+      // `Number('')` is 0, so a missing component used to read as minor 0 and
+      // produce a full list for a version string that has none.
       assert.deepStrictEqual(buildVersionedTypesConditionNames('6.'), []);
 
       assert.deepStrictEqual(buildVersionedTypesConditionNames('6.  '), []);

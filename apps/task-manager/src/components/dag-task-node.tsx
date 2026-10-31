@@ -210,8 +210,8 @@ const metaY = (record: DagNodeRecord): number =>
   record.node.height - META_INSET;
 
 /**
- * The middle of line `line` of a large node's title: its lines together in
- * the middle of what the due date leaves above it.
+ * The middle of line `line` of a large node's title: its lines together in the
+ * middle of what the due date leaves above it.
  */
 const largeLineY = (
   record: DagNodeRecord<TaskNodeView>,

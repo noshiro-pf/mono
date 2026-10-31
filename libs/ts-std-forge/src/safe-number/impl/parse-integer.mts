@@ -8,9 +8,9 @@ import { Result } from '../../functional/index.mjs';
  *
  * `Number.parseInt` ignores trailing non-numeric characters (`'123abc'` →
  * `123`) and `Number` coerces blank input to `0`. The input is accepted only
- * when both `Number` and `Number.parseInt` agree it is a finite number, and
- * the `Number` result is truncated toward zero — which rejects blank input
- * and trailing garbage, and turns `'-12.9'` into `-12`.
+ * when both `Number` and `Number.parseInt` agree it is a finite number, and the
+ * `Number` result is truncated toward zero — which rejects blank input and
+ * trailing garbage, and turns `'-12.9'` into `-12`.
  *
  * This is the single implementation of the conversion: ts-data-forge's
  * `Num.safeParseInt` delegates here since D-49 (c) and only adds its own

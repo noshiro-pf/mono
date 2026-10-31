@@ -8,9 +8,9 @@ import { repoRoot, resolveRepo } from '../lib/index.mjs';
 import type { Client } from './github.mjs';
 
 /**
- * The required contexts: from the checkout's
- * `repo-settings/rulesets/main.json` where the repository declares its
- * ruleset there (`parseRuleset` says why the declaration rather than
+ * The required contexts: from the checkout's `repo-settings/rulesets/main.json`
+ * where the repository declares its ruleset there (`parseRuleset` says why the
+ * declaration rather than
  * GitHub), and otherwise from what GitHub enforces on the default branch.
  *
  * The file is read only when `repo` is the checkout's own repository: with

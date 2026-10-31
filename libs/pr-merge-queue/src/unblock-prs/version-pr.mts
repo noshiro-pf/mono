@@ -2,9 +2,9 @@
  * The version pull request — `changeset-release/<base>`, opened and rewritten
  * by `changesets/action` — and what holds it back.
  *
- * It is the one pull request here that is derived rather than written. On
- * every push to the base the release workflow rebuilds the branch from the
- * tip, force-pushes it, and overwrites the title and body through
+ * It is the one pull request here that is derived rather than written. On every
+ * push to the base the release workflow rebuilds the branch from the tip,
+ * force-pushes it, and overwrites the title and body through
  * `updatePullRequest`. Two consequences shape everything in this file:
  *
  * - **Nothing written in its body survives.** A `Merge-After:` trailer put
@@ -37,8 +37,8 @@ export const isVersionPullRequest = (
 
 /**
  * What to report while pull requests labelled `blocks-release` are open.
- * Nothing here can clear it: a `blocks-release` pull request ends when a
- * person merges or closes it.
+ * Nothing here can clear it: a `blocks-release` pull request ends when a person
+ * merges or closes it.
  */
 export const releaseBlockedNote = (
   pr: PullRequest,
@@ -54,8 +54,8 @@ export const releaseBlockedNote = (
   }) as const;
 
 /**
- * What to report while the branch was built on a stale tip, which the
- * release workflow's next run rebuilds.
+ * What to report while the branch was built on a stale tip, which the release
+ * workflow's next run rebuilds.
  */
 export const releaseStaleNote = (
   pr: PullRequest,
@@ -68,13 +68,13 @@ export const releaseStaleNote = (
 
 /**
  * Whether the branch was built on the current tip of the base — the question
- * `mergeStateStatus` is asked everywhere else here, asked of git instead —
- * or, when git cannot say, the note to report.
+ * `mergeStateStatus` is asked everywhere else here, asked of git instead — or,
+ * when git cannot say, the note to report.
  *
- * GitHub's answer is computed asynchronously and cached, and being wrong
- * about this one releases a set the branch was built before, so it is worth
- * a fetch. `git merge-base` rather than `--is-ancestor`, whose "no" is an
- * exit status this module could not tell apart from a git that failed.
+ * GitHub's answer is computed asynchronously and cached, and being wrong about
+ * this one releases a set the branch was built before, so it is worth a fetch.
+ * `git merge-base` rather than `--is-ancestor`, whose "no" is an exit status
+ * this module could not tell apart from a git that failed.
  */
 export const isRebuiltOnBaseTip = async (
   pr: PullRequest,

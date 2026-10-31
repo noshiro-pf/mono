@@ -253,8 +253,8 @@ describe(queueStanding, () => {
     );
   });
 
-  // Otherwise it would hold itself for as long as it existed, with nothing
-  // able to take the label off — a `Merge-After` cycle by another name.
+  // Otherwise it would hold itself for as long as it existed, with nothing able
+  // to take the label off — a `Merge-After` cycle by another name.
   test('never holds the release by its own label', () => {
     const release = facts({
       number: 1,
@@ -338,8 +338,8 @@ describe(orderCandidates, () => {
   });
 
   // Priority comes before every rank but the demotion, the release included:
-  // a release can be declared urgent, and a change declared able to wait
-  // goes out in the release after.
+  // a release can be declared urgent, and a change declared able to wait goes
+  // out in the release after.
   test('takes priority:high first and priority:low last, before what sat green', () => {
     assert.deepStrictEqual(
       order(
@@ -384,8 +384,8 @@ describe(orderCandidates, () => {
     );
   });
 
-  // Picked early, it is released, goes green and is set aside for a person,
-  // and the cycle it took went to nothing that could merge on its own.
+  // Picked early, it is released, goes green and is set aside for a person, and
+  // the cycle it took went to nothing that could merge on its own.
   test('puts one only a bypass merges with priority:low, unless labelled priority:high', () => {
     assert.deepStrictEqual(
       order(

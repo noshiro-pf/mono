@@ -58,10 +58,10 @@ export const convertLibEs2015Collection =
         // `prototype`, by contrast, is deliberately left as the `Readonly*`
         // form the pipeline already produced (mirroring
         // `ArrayConstructor.prototype: readonly unknown[]`). It must NOT be
-        // narrowed to `never`: `prototype` is what the `extends` clause
-        // checks a subclass's static side against, so `prototype: Set<never>`
-        // makes every `class X extends Set<T>` / `class X extends Map<K, V>`
-        // fail with TS2417.
+        // narrowed to `never`: `prototype` is what the `extends` clause checks
+        // a subclass's static side against, so `prototype: Set<never>` makes
+        // every `class X extends Set<T>` / `class X extends Map<K, V>` fail
+        // with TS2417.
         replaceWithinInterface({
           name: 'MapConstructor',
           mapFn: composeMonoTypeFns(

@@ -33,9 +33,9 @@ import { sampleCsvRows } from './sample-data.mjs';
  * filteredRows, currentPage, itemsPerPage     ─▶ tableView
  * ```
  *
- * `filteredRows`, `pageLength`, `currentPage`, and `tableView` share
- * common ancestors — multiple overlapping diamonds. SynState's atomic
- * propagation ensures `tableView` always sees a consistent snapshot.
+ * `filteredRows`, `pageLength`, `currentPage`, and `tableView` share common
+ * ancestors — multiple overlapping diamonds. SynState's atomic propagation
+ * ensures `tableView` always sees a consistent snapshot.
  */
 export const DataTableDemo = React.memo(() => {
   // Subscribe to source values (for input display — immediate, not debounced)
@@ -181,8 +181,8 @@ namespace State {
       map((v) => asPositiveInt16(Num.roundToInt(Num.clamp(10, 50)(v)))),
     );
 
-  // An event, not a state: asking for the page held before a reset again
-  // must reach the table.
+  // An event, not a state: asking for the page held before a reset again must
+  // reach the table.
   const [pageRequest, requestPage] = createValueEmitter<number>();
 
   // Derived: filtered rows (the three filters are debounced together)

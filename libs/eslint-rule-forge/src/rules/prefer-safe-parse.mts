@@ -51,8 +51,8 @@ export const createPreferSafeParseInt = (
         return false;
       }
 
-      // Only base 10: accept a missing radix or an explicit literal `10`,
-      // read through its type wrappers, which leave the value as it is.
+      // Only base 10: accept a missing radix or an explicit literal `10`, read
+      // through its type wrappers, which leave the value as it is.
       const radix =
         args[1] === undefined ? undefined : skipTypeWrappers(args[1]);
 
@@ -151,8 +151,7 @@ const createSafeParseRule = <MessageId extends string>(
 
           const firstArg = node.arguments[0];
 
-          // A spread argument (`parseInt(...rest)`) cannot be rewritten
-          // safely.
+          // A spread argument (`parseInt(...rest)`) cannot be rewritten safely.
           if (
             firstArg === undefined ||
             firstArg.type === AST_NODE_TYPES.SpreadElement
@@ -162,11 +161,11 @@ const createSafeParseRule = <MessageId extends string>(
 
           // The argument must be purely `string` at every layer of type
           // wrappers: the value's own type is what the original sees at run
-          // time (`parseInt(1e21 as unknown as string)` is 1, the rewrite
-          // 1e21; `Number(true as unknown as string)` is 1, the rewrite NaN),
-          // and the type a wrapper states is what the fix, which keeps the
-          // wrapper, hands the parse function's `string` parameter. Without
-          // type information, skip.
+          // time (`parseInt(1e21 as unknown as string)` is 1, the rewrite 1e21;
+          // `Number(true as unknown as string)` is 1, the rewrite NaN), and the
+          // type a wrapper states is what the fix, which keeps the wrapper,
+          // hands the parse function's `string` parameter. Without type
+          // information, skip.
           if (!typeHoldsAtEveryLayer(sourceCode, firstArg, isStringType)) {
             return;
           }

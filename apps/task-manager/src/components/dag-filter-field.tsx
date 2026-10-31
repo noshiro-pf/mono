@@ -20,9 +20,9 @@ import { isDagFilterEmpty } from '../view-model/index.mjs';
  * 「絞り込み」: the groups and the labels the graph screen shows, in every
  * view mode — a theme at a time — each from every group there is and every
  * label on a task, with 「グループなし」 and 「ラベルなし」 after them. A
- * section of either kind is left out while there is nothing to choose in
- * it. What a choice leaves of the graph is `dag/node-filter.mts`'s; it is
- * kept in the URL (`view-model/dag-filter.mts`).
+ * section of either kind is left out while there is nothing to choose in it.
+ * What a choice leaves of the graph is `dag/node-filter.mts`'s; it is kept in
+ * the URL (`view-model/dag-filter.mts`).
  */
 export const DagFilterField = (): JSX.Element => {
   const { filter } = dagFilterStore;

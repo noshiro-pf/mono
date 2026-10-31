@@ -33,14 +33,14 @@ export type RuleCases = Readonly<{
 
 /**
  * Runs one rule over a set of valid / invalid cases, in the shape the ESLint
- * `RuleTester` uses — which is what the plugin rules under `libs/eslint-*`
- * are tested with, so a rule reads the same wherever it lives.
+ * `RuleTester` uses — which is what the plugin rules under `libs/eslint-*` are
+ * tested with, so a rule reads the same wherever it lives.
  *
- * Every case becomes a file in one temporary project, and the whole project
- * is checked once: opening a program is the expensive part (~66 ms), and a
- * project per case would pay it per case. The cases are therefore compiled
- * together, so each one must stand alone as a module — give a binding a name
- * no other case uses if it would otherwise collide, or keep it local.
+ * Every case becomes a file in one temporary project, and the whole project is
+ * checked once: opening a program is the expensive part (~66 ms), and a project
+ * per case would pay it per case. The cases are therefore compiled together, so
+ * each one must stand alone as a module — give a binding a name no other case
+ * uses if it would otherwise collide, or keep it local.
  *
  * Call it inside a `describe`; it declares one `test` per case.
  */

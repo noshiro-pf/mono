@@ -97,8 +97,8 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
 
     /**
      * The chain as one statement: what every branch starts with (`return `,
-     * `v = `), and the values it chooses between. `undefined` when the
-     * branches do not start alike or break one of the conditions above.
+     * `v = `), and the values it chooses between. `undefined` when the branches
+     * do not start alike or break one of the conditions above.
      */
     const foldChain = (chain: Chain): Folded | undefined => {
       const { arms, fallback } = chain;
@@ -163,8 +163,8 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
           return undefined;
         }
 
-        // `return a ? true : false` is `return a` or `return !!a`, which is
-        // not this rule's to say.
+        // `return a ? true : false` is `return a` or `return !!a`, which is not
+        // this rule's to say.
         return returned.every(isBooleanLiteral)
           ? undefined
           : { prefix: 'return ', leaves: returned };
@@ -211,11 +211,11 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
      * covers.
      *
      * A comment in the range leaves nowhere for the fix to put it. Where
-     * unicorn would report, that is still reported, without a fix. A chain
-     * only this rule would fold is left alone instead: the comments there
-     * are nearly always one per guard, saying why it is there, and folding
-     * them into a nested ternary by hand would not read better. The part of
-     * the chain below the last comment is still checked on its own.
+     * unicorn would report, that is still reported, without a fix. A chain only
+     * this rule would fold is left alone instead: the comments there are nearly
+     * always one per guard, saying why it is there, and folding them into a
+     * nested ternary by hand would not read better. The part of the chain below
+     * the last comment is still checked on its own.
      */
     const chainProblem = (
       node: DeepReadonly<TSESTree.IfStatement>,
@@ -580,12 +580,12 @@ const siblingOf = (
 };
 
 /**
- * Every branch of the chain starting at `start`, in order, and the
- * fallback that follows the last.
+ * Every branch of the chain starting at `start`, in order, and the fallback
+ * that follows the last.
  *
- * A branch with an `else` continues into it. A branch without one
- * continues into the statement after the chain, which it can reach only
- * by not returning — so a branch that falls through must return.
+ * A branch with an `else` continues into it. A branch without one continues
+ * into the statement after the chain, which it can reach only by not returning
+ * — so a branch that falls through must return.
  */
 const collectChain = (
   start: DeepReadonly<TSESTree.IfStatement>,
@@ -677,8 +677,8 @@ const isSingleLine = (node: DeepReadonly<TSESTree.Node>): boolean =>
   node.loc.start.line === node.loc.end.line;
 
 /**
- * The `@typescript-eslint/utils` helpers take mutable nodes; the rule only
- * ever reads them.
+ * The `@typescript-eslint/utils` helpers take mutable nodes; the rule only ever
+ * reads them.
  */
 const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion

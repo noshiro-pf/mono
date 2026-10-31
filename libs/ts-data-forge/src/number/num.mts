@@ -120,8 +120,8 @@ export namespace Num {
    *
    * assert.strictEqual(Result.unwrapOk(Num.safeParseInt('  ')), undefined);
    *
-   * // A value that overflows to Infinity is not an integer either, even
-   * // though native `parseInt` reads a 1 out of it.
+   * // A value that overflows to Infinity is not an integer either, even though
+   * // native `parseInt` reads a 1 out of it.
    *
    * assert.strictEqual(Number.parseInt('1e400', 10), 1);
    *
@@ -135,10 +135,10 @@ export namespace Num {
    */
   export const safeParseInt = (s: string): Result<Int, Error> =>
     // The parsing itself is `SafeNumber.parseInteger` (Sumi D-49 (c)): one
-    // implementation, in the package that owns the standard-library
-    // boundary. What stays here is this function's own contract — the `Int`
-    // brand on the success side, and an `Error` rather than a tagged record
-    // on the failure side.
+    // implementation, in the package that owns the standard-library boundary.
+    // What stays here is this function's own contract — the `Int` brand on the
+    // success side, and an `Error` rather than a tagged record on the failure
+    // side.
     Result.match(SafeNumber.parseInteger(s), {
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       ok: (n) => Result.ok(n as Int),
@@ -213,10 +213,10 @@ export namespace Num {
    */
   export const safeParseFloat = (s: string): Result<FiniteNumber, Error> =>
     // The parsing itself is `SafeNumber.parse` (Sumi D-49 (c)): one
-    // implementation, in the package that owns the standard-library
-    // boundary. What stays here is this function's own contract — the
-    // `FiniteNumber` brand on the success side, and an `Error` rather than a
-    // tagged record on the failure side.
+    // implementation, in the package that owns the standard-library boundary.
+    // What stays here is this function's own contract — the `FiniteNumber`
+    // brand on the success side, and an `Error` rather than a tagged record on
+    // the failure side.
     Result.match(SafeNumber.parse(s), {
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       ok: (n) => Result.ok(n as FiniteNumber),

@@ -30,8 +30,8 @@ describe(isRecord, () => {
 
   describe('arrays are not records', () => {
     test('type-level: arrays are not assignable to UnknownRecord', () => {
-      // Arrays have a number index signature but no string index signature,
-      // so they are assignable to `ReadonlyRecord<number, unknown>` but not to
+      // Arrays have a number index signature but no string index signature, so
+      // they are assignable to `ReadonlyRecord<number, unknown>` but not to
       // `UnknownRecord` (= `ReadonlyRecord<string, unknown>`).
       expectType<readonly number[], ReadonlyRecord<number, unknown>>('<=');
 
@@ -66,9 +66,9 @@ describe(isRecord, () => {
   describe('other non-null objects are records', () => {
     // These are not statically assignable to `UnknownRecord` either, but the
     // guard intentionally admits them: every property read through
-    // `UnknownRecord` is typed `unknown`, so the narrowing is type-safe, and
-    // it keeps `isRecord(u) && hasKey(u, k)` usable for probing instances
-    // such as caught `Error` objects.
+    // `UnknownRecord` is typed `unknown`, so the narrowing is type-safe, and it
+    // keeps `isRecord(u) && hasKey(u, k)` usable for probing instances such as
+    // caught `Error` objects.
     test('Date is a record', () => {
       expectType<Date, UnknownRecord>('!<=');
 

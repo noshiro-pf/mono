@@ -102,9 +102,9 @@ chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => {
 
 if (SPLIT_VIEW_DIAGNOSTICS) {
   // A debugging API the browser does not offer throws here. Uncaught, that
-  // would stop the worker's module halfway through its first run: the
-  // listeners above would stay registered, but every function they call is
-  // declared further down and would never be assigned, so the GitHub button
+  // would stop the worker's module halfway through its first run: the listeners
+  // above would stay registered, but every function they call is declared
+  // further down and would never be assigned, so the GitHub button
   // would fail with "<name> is not a function". The diagnostics are an extra;
   // losing them must not take the worker with them.
   try {
@@ -193,9 +193,9 @@ if (SPLIT_VIEW_DIAGNOSTICS) {
  * Opens every saved split view in a tab of its own, when none is open, and says
  * whether it did.
  *
- * The one to bring to the front is the list's active one, or the first when
- * the active one is not on the list: a click on the button has to end on a
- * split view, not on the tab it was clicked from.
+ * The one to bring to the front is the list's active one, or the first when the
+ * active one is not on the list: a click on the button has to end on a split
+ * view, not on the tab it was clicked from.
  */
 const reopenEverySplitView = async (): Promise<boolean> => {
   const registry = await loadWorkspaceRegistry();
@@ -325,12 +325,11 @@ type OpenerTab = Readonly<Pick<chrome.tabs.Tab, 'id' | 'index' | 'windowId'>>;
 /**
  * The context menu's item was chosen on a pull request.
  *
- * The title, the issue and the session are read by the GitHub content
- * script, which is asked to do so and answers with an `open`, so the split
- * view is the button's, and the PR Manager's. A tab it is not in — a link to a
- * pull request on another site, or a GitHub tab loaded before the extension
- * was — refuses the message, and the pull request is opened with what the
- * address alone says.
+ * The title, the issue and the session are read by the GitHub content script,
+ * which is asked to do so and answers with an `open`, so the split view is the
+ * button's, and the PR Manager's. A tab it is not in — a link to a pull request
+ * on another site, or a GitHub tab loaded before the extension was — refuses
+ * the message, and the pull request is opened with what the address alone says.
  */
 const openPullRequestFromMenu = async (
   url: string,
@@ -375,9 +374,9 @@ const openPullRequestFromMenu = async (
  * The context menu's two items: one on a link to a pull request, wherever the
  * link is, and one on a pull request's own page.
  *
- * Created on install and on update, which is when Chrome forgets them; they
- * are removed first because an update keeps them in some versions, and
- * creating an id twice is an error.
+ * Created on install and on update, which is when Chrome forgets them; they are
+ * removed first because an update keeps them in some versions, and creating an
+ * id twice is an error.
  */
 const createContextMenus = async (): Promise<void> => {
   await chrome.contextMenus.removeAll();
@@ -402,8 +401,8 @@ const linkMenuItemId = 'open-pull-request-link';
 const pageMenuItemId = 'open-pull-request-page';
 
 /**
- * What Chrome shows the items for. Wider than a pull request — a match
- * pattern cannot say "digits" — and narrowed by `pullRequestOf` on the click.
+ * What Chrome shows the items for. Wider than a pull request — a match pattern
+ * cannot say "digits" — and narrowed by `pullRequestOf` on the click.
  */
 const pullRequestUrlPattern = 'https://github.com/*/*/pull/*';
 
@@ -516,8 +515,8 @@ const forgetTab = async (tabId: number): Promise<void> => {
 
   // The page cannot take itself off the list of open split views — the tab is
   // gone by the time it would — so this is where a closed one is forgotten.
-  // "Open every split view" checks the browser as well, because a tab that
-  // went while the worker was asleep is not announced to anybody.
+  // "Open every split view" checks the browser as well, because a tab that went
+  // while the worker was asleep is not announced to anybody.
   await forgetOpenSplitViewTab(tabId);
 
   await removeHeaderRule(tabId);

@@ -6,11 +6,10 @@
  *
  * Every check job ends with `z:assert-repo-is-clean`, so a `fix:` or `gen:`
  * entry of the check matrices fails by _changing_ files rather than by
- * reporting anything, and the fix is to run the same command and commit what
- * it wrote. That much is mechanical; everything else a failing check asks for
- * is the skill's, or a person's, and is left to them. Which jobs are shaped
- * like that, and what reproduces each, is the repository's to say
- * (`config.mts`).
+ * reporting anything, and the fix is to run the same command and commit what it
+ * wrote. That much is mechanical; everything else a failing check asks for is
+ * the skill's, or a person's, and is left to them. Which jobs are shaped like
+ * that, and what reproduces each, is the repository's to say (`config.mts`).
  */
 
 import * as os from 'node:os';
@@ -27,13 +26,13 @@ import { lastLines, stopRequested } from './util.mjs';
  * Tries once to fix the checks that failed on `head` by running the fixers
  * their matrix entries name, and pushes the result when there is one.
  *
- * Only when **every** failed job is such an entry: one real failure beside
- * them means the push would put the pull request through a matrix that fails
- * anyway, so the whole of it is left to whoever fixes the real one.
+ * Only when **every** failed job is such an entry: one real failure beside them
+ * means the push would put the pull request through a matrix that fails anyway,
+ * so the whole of it is left to whoever fixes the real one.
  *
  * The fixers run in a throwaway worktree, installed and built as CI installs
- * and builds, so the checkout this runs from is never touched. Where it goes
- * is {@link WORKTREE_ROOT}'s to say.
+ * and builds, so the checkout this runs from is never touched. Where it goes is
+ * {@link WORKTREE_ROOT}'s to say.
  *
  * The branch has to be exactly one commit on top of the base, and the fix is
  * amended onto it — a pull request is one commit (`Validate commit count`), and
@@ -113,11 +112,11 @@ export const autoFix = async (
  * What to run for the jobs that failed, or why nothing is to be run.
  *
  * `states` is every context on the head commit. A failed context the
- * configuration ignores (an aggregate, only the echo of a job that failed
- * under it) is not read; every other failure has to match one of its fixers,
- * whose command is the whole of what reproduces the job — a job that runs a
- * command and then asserts a clean tree. `config` is the repository's
- * (`config.mts`); without one nothing is fixed.
+ * configuration ignores (an aggregate, only the echo of a job that failed under
+ * it) is not read; every other failure has to match one of its fixers, whose
+ * command is the whole of what reproduces the job — a job that runs a command
+ * and then asserts a clean tree. `config` is the repository's (`config.mts`);
+ * without one nothing is fixed.
  */
 export const planAutoFix = (
   states: ReadonlyMap<string, ContextState>,
@@ -192,11 +191,11 @@ export type AutoFixPlan = Readonly<{
 /**
  * Not the OS temp directory the rebase uses: an install is a `node_modules`
  * tree, which the pnpm store hard-links only within one filesystem, and the
- * temp directory is often a tmpfs. Not the git directory or `~/.cache`
- * either: `fix:fmt:diff` skips every file with a `.git`, `.cache`, `dist`,
- * `build` or `out` segment anywhere in its absolute path, so a worktree under
- * one is formatted by nothing. `run-unblock-prs-skill` puts its sessions'
- * worktrees here too, for the same reasons.
+ * temp directory is often a tmpfs. Not the git directory or `~/.cache` either:
+ * `fix:fmt:diff` skips every file with a `.git`, `.cache`, `dist`, `build` or
+ * `out` segment anywhere in its absolute path, so a worktree under one is
+ * formatted by nothing. `run-unblock-prs-skill` puts its sessions' worktrees
+ * here too, for the same reasons.
  */
 export const WORKTREE_ROOT = path.join(
   os.homedir(),
@@ -207,8 +206,8 @@ export const WORKTREE_ROOT = path.join(
 
 /**
  * The first fixer `name` matches, with its command: `$1` to `$9` replaced by
- * the capture groups, shell-quoted, since a context's name is whatever the
- * job that reported it chose.
+ * the capture groups, shell-quoted, since a context's name is whatever the job
+ * that reported it chose.
  */
 const fixerFor = (
   name: string,
@@ -241,9 +240,9 @@ const declined = (detail: string): AutoFixed =>
   ({ kind: 'declined', detail }) as const;
 
 /**
- * The part that happens inside the worktree, so that removing it afterwards
- * is one statement in the caller. Every command here resolves to a `Result`,
- * so the caller's next line always runs.
+ * The part that happens inside the worktree, so that removing it afterwards is
+ * one statement in the caller. Every command here resolves to a `Result`, so
+ * the caller's next line always runs.
  */
 const fixInWorktree = async (
   pr: PullRequest,

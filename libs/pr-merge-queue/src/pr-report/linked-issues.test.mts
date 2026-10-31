@@ -45,8 +45,8 @@ describe(parseClosingIssueRefs, () => {
   });
 
   test('a bare reference is not a link', () => {
-    // `#12` on its own is a cross-reference; GitHub closes nothing for it,
-    // and neither does this.
+    // `#12` on its own is a cross-reference; GitHub closes nothing for it, and
+    // neither does this.
     assert.deepStrictEqual(parseClosingIssueRefs('see #12', repo), []);
   });
 

@@ -10,8 +10,8 @@ import { distPath } from './store-package.mjs';
  * else can check: that the redirect happens, that the links are rewritten, that
  * a click on one goes where the link says, that a reload answers what the
  * address says rather than what the click before it said, that the tab title
- * carries the number of the pull request or issue — and that none of it
- * happens twice.
+ * carries the number of the pull request or issue — and that none of it happens
+ * twice.
  *
  * **It never touches github.com.** Every request to that origin is fulfilled
  * from a fixture here, which is what makes this deterministic, and is also what
@@ -102,10 +102,9 @@ const main = async (): Promise<void> => {
      * `isDone` is what makes the `/stripped/` check below deterministic. That
      * fixture rewrites its own address on a 200ms interval and the ticks here
      * are 100ms, so an address that has merely stopped moving is as likely to
-     * be one the interval has not reached yet: the check passed or failed
-     * about evenly without this. Returning the last address rather than
-     * throwing keeps a genuine failure a reported difference rather than a
-     * stack trace.
+     * be one the interval has not reached yet: the check passed or failed about
+     * evenly without this. Returning the last address rather than throwing
+     * keeps a genuine failure a reported difference rather than a stack trace.
      */
     const settledUrl = async (
       previous: string,
@@ -323,8 +322,8 @@ const main = async (): Promise<void> => {
       'pull request fixture',
     );
 
-    // What GitHub does on a client-side navigation: the address moves without
-    // a document load, and the page sets a new title. Once with the title
+    // What GitHub does on a client-side navigation: the address moves without a
+    // document load, and the page sets a new title. Once with the title
     // arriving after the address, which is the order that would stack a second
     // number in front of the first if the old one were taken for the page's.
     await visit(`${origin}/noshiro-pf/mono/pull/1`);
@@ -396,8 +395,8 @@ const main = async (): Promise<void> => {
     // `/refreshing/` is the fixture that behaves like GitHub's "Refresh"
     // button, shown on a diff once the pull request has been pushed to: a link
     // to the page's own bare path, handled by a router that refreshes it in
-    // place. A link to the page it is on is left to the site, so the refresh
-    // is no load at all and leaves the bare path the router wrote.
+    // place. A link to the page it is on is left to the site, so the refresh is
+    // no load at all and leaves the bare path the router wrote.
     await visit(
       `${origin}/refreshing/mono/pull/1/files?w=1&show-viewed-files=false`,
     );
@@ -424,9 +423,9 @@ const main = async (): Promise<void> => {
       `2 page loads, at ${origin}/refreshing/mono/pull/1/files?w=1&show-viewed-files=false`,
     );
 
-    // A split-view pane is a frame, which a content script is not injected
-    // into unless it asks. The frame opens the bare diff, so this is the
-    // redirect, inside it.
+    // A split-view pane is a frame, which a content script is not injected into
+    // unless it asks. The frame opens the bare diff, so this is the redirect,
+    // inside it.
     await visit(`${origin}/frame-host`);
 
     check(
@@ -467,10 +466,9 @@ const loopWatchMs = 2500;
  *
  * Enough of a pull request page to click through: the tab links the extension
  * rewrites, two it must leave alone, the branches links whose treatment depends
- * on the page they are read from, and — under `/stripped/` and
- * `/refreshing/` — the address-bar rewriting and the in-place navigation the
- * real site does. `/frame-host` is a page
- * holding a diff in a frame, as a split view does.
+ * on the page they are read from, and — under `/stripped/` and `/refreshing/` —
+ * the address-bar rewriting and the in-place navigation the real site does.
+ * `/frame-host` is a page holding a diff in a frame, as a split view does.
  */
 const fixtureFor = (url: string): string => {
   const { pathname } = new URL(url);
@@ -534,9 +532,9 @@ const addressRewritingScript = [
 ].join('\n');
 
 /**
- * What GitHub's "Refresh" button on a diff does: it is a link to the page's
- * own path, query and fragment dropped, and the router navigates there in
- * place. The router has the click before the anchor does, as a listener on the
+ * What GitHub's "Refresh" button on a diff does: it is a link to the page's own
+ * path, query and fragment dropped, and the router navigates there in place.
+ * The router has the click before the anchor does, as a listener on the
  * document in the capture phase, so one on the anchor never hears of it.
  *
  * It navigates to the route it holds — the path — and not to the anchor's

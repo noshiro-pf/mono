@@ -22,8 +22,8 @@ const DEFAULT_DIRECTIVE_KEYWORD = '@check-destructuring-completeness';
 /**
  * Reports an object destructuring that leaves out properties of its source,
  * when a directive comment asks for it or the destructured object is a React
- * component's props. Type wrappers are seen through: `props satisfies Props`
- * is still the props, whose own type lists the properties, and a component
+ * component's props. Type wrappers are seen through: `props satisfies Props` is
+ * still the props, whose own type lists the properties, and a component
  * returning `(<div />) satisfies React.ReactNode` is still a component.
  */
 export const checkDestructuringCompleteness: TSESLint.RuleModule<
@@ -178,8 +178,8 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
       }
 
       // Destructuring `null` / `undefined` throws, so only the non-nullable
-      // part of the type can be destructured: `props!` with a nullable
-      // `props` reads the properties of the rest.
+      // part of the type can be destructured: `props!` with a nullable `props`
+      // reads the properties of the rest.
       const layerProps = typeWrapperLayers(tsSourceNode).map((layer) => {
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         const tsNode = esTreeNodeToTSNodeMap.get(layer as never);
@@ -195,17 +195,17 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
       });
 
       // A property is missing only when the type has it at every type-wrapper
-      // layer: a cast does not add one the value lacks, and a cast widening
-      // the value (`props as Pick<Props, 'a'>`) is the author saying the rest
-      // are not there.
+      // layer: a cast does not add one the value lacks, and a cast widening the
+      // value (`props as Pick<Props, 'a'>`) is the author saying the rest are
+      // not there.
       const objectProps = (layerProps[0] ?? []).filter((prop) =>
         layerProps.every((props) => props.includes(prop)),
       );
 
       const collected = collectDestructuredPropNames(objectPattern.properties);
 
-      // Dynamic computed properties cannot be resolved statically,
-      // so skip completeness check when they are present.
+      // Dynamic computed properties cannot be resolved statically, so skip
+      // completeness check when they are present.
       if (collected.hasDynamicComputedKey) {
         return;
       }

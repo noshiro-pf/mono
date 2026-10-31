@@ -1,6 +1,6 @@
 // Sumi bans classes, `this`, method syntax and writes to `this` outside a
-// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
-// so those rules are waived here (D-63).
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why), so
+// those rules are waived here (D-63).
 // @sumi-expect-error-file classes/no-class
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
@@ -126,9 +126,9 @@ class SwitchMapObservableClass<A, B>
   readonly #mapToObservable: (curr: A) => Observable<B>;
 
   /**
-   * The scope the operator was created in, so that each inner scope is
-   * disposed with it; the projection itself runs during propagation, when the
-   * current scope is whatever happens to be running.
+   * The scope the operator was created in, so that each inner scope is disposed
+   * with it; the projection itself runs during propagation, when the current
+   * scope is whatever happens to be running.
    */
   readonly #ownerScope: Scope | undefined;
 

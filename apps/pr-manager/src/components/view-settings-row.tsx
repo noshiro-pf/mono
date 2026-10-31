@@ -33,11 +33,11 @@ type Props = Readonly<{
 
 /**
  * One block in the layout settings, with a button for each thing the pointer
- * can do to it on the page: up, down, across to the column on its left or
- * its right, and its height — or, when the blocks fill the window, its share
- * of it — and one to hide it or show it again. A hidden block can still be
- * moved, so that it comes back where it is wanted, but its size is not
- * offered until it is shown. A button that could do nothing is left out rather than disabled, so
+ * can do to it on the page: up, down, across to the column on its left or its
+ * right, and its height — or, when the blocks fill the window, its share of it
+ * — and one to hide it or show it again. A hidden block can still be moved, so
+ * that it comes back where it is wanted, but its size is not offered until it
+ * is shown. A button that could do nothing is left out rather than disabled, so
  * tabbing along the row stops only where something can happen.
  */
 export const ViewSettingsRow = ({
@@ -59,8 +59,8 @@ export const ViewSettingsRow = ({
     ),
   );
 
-  // Read when pressed, so that a handler never acts on a place it was drawn
-  // at before a move.
+  // Read when pressed, so that a handler never acts on a place it was drawn at
+  // before a move.
   const current = (): Row => row$.getSnapshot().value;
 
   const leftName = view(row$, ({ columns }) =>
@@ -214,9 +214,9 @@ type Row = Readonly<{
   hidden: boolean;
   /**
    * Nothing in the repository for it — the queue, where there is no
-   * `merge-queued` label (`RepoFeatures` in `load-report.mts`) — so it is
-   * drawn nowhere, whatever {@link hidden} says, and showing it is not
-   * offered. It can still be moved, for a repository that has it.
+   * `merge-queued` label (`RepoFeatures` in `load-report.mts`) — so it is drawn
+   * nowhere, whatever {@link hidden} says, and showing it is not offered. It
+   * can still be moved, for a repository that has it.
    */
   absent: boolean;
 }>;

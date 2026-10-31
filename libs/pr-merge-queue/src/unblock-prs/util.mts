@@ -12,18 +12,18 @@ import { log } from '../lib/index.mjs';
  *
  * One per process, and it is never reset: an `AbortController` cannot be
  * un-aborted, and nothing here wants to be. The stop it carries means "this
- * run is over" — the loop in `main.mts` leaves, the process exits, and a
- * second SIGINT does not wait for any of that (`installStopHandlers` arms
+ * run is over" — the loop in `main.mts` leaves, the process exits, and a second
+ * SIGINT does not wait for any of that (`installStopHandlers` arms
  * `process.exit(130)` for it). The signal handlers it serves are
  * process-scoped too, so a controller of the same scope is the honest shape.
  *
- * What that rules out is calling the loop twice in one process: the second
- * call would find the signal already aborted and return immediately. So the
- * loop has one caller, the `unblock-prs` command (`src/cmd/unblock-prs.mts`),
- * which runs it once, and it is not exported from the package.
+ * What that rules out is calling the loop twice in one process: the second call
+ * would find the signal already aborted and return immediately. So the loop has
+ * one caller, the `unblock-prs` command (`src/cmd/unblock-prs.mts`), which runs
+ * it once, and it is not exported from the package.
  * `run-unblock-prs-skill` stops its own loop by the same signal, in a process
- * of its own, and counts on both of the above: never reset, and a second
- * signal that exits at once.
+ * of its own, and counts on both of the above: never reset, and a second signal
+ * that exits at once.
  */
 const stopController = new AbortController();
 

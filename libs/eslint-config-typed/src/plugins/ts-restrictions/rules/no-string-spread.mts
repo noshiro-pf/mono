@@ -39,9 +39,8 @@ const DEFERRED_TYPE_FLAGS =
  * iterable position. The only case TypeScript accepts yet is genuinely
  * error-prone is `string`, so that is exactly what this rule targets.
  *
- * If a character split is really intended, spell it out with
- * `Array.from(str)` (identical to the spread, code-point aware) or
- * `str.split('')`.
+ * If a character split is really intended, spell it out with `Array.from(str)`
+ * (identical to the spread, code-point aware) or `str.split('')`.
  *
  * A spread argument wrapped in `as` / `satisfies` / `!` / `<T>` is flagged when
  * the value or any wrapper around it is string-like, so that a cast

@@ -7,8 +7,8 @@ if (import.meta.vitest !== undefined) {
   test(createBooleanState, () => {
     // embed-sample-code-ignore-above
     // Menu drawer open/close state.
-    // setTrue and setFalse can be passed directly as callbacks
-    // — no need to create wrapper functions like `() => setState(true)`.
+    // setTrue and setFalse can be passed directly as callbacks — no need to
+    // create wrapper functions like `() => setState(true)`.
     const [menuOpen$, { setTrue: openMenu, setFalse: closeMenu }] =
       createBooleanState(false);
 

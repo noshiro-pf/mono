@@ -2,11 +2,10 @@
  * The page's state, made once with the browser as its surroundings.
  *
  * Components bind the stores' observables to the DOM and call the stores'
- * actions; none of them holds the app's state. A derivation only one view
- * reads is made in that view's component, so that it exists only while the
- * view is shown. What each store does,
- * and the tests of it, are in the modules this puts together — this file is
- * only which real thing each of them is handed.
+ * actions; none of them holds the app's state. A derivation only one view reads
+ * is made in that view's component, so that it exists only while the view is
+ * shown. What each store does, and the tests of it, are in the modules this
+ * puts together — this file is only which real thing each of them is handed.
  */
 
 import { combine, map, skipIfNoChange } from 'synstate';
@@ -71,8 +70,8 @@ export const NARROW_QUERY = '(max-width: 599px)';
 export const sessionStore = createSessionStore();
 
 /**
- * What the URL asked to show when the page loaded: the screen, and the
- * graph's mode, which wins over the one kept on this device.
+ * What the URL asked to show when the page loaded: the screen, and the graph's
+ * mode, which wins over the one kept on this device.
  */
 const initialViewQuery = parseViewQuery(readLocationSearch());
 
@@ -169,8 +168,8 @@ export const dagFilterStore = createDagFilterStore({
 });
 
 /**
- * What the graph screen leaves out (`dag/hidden-nodes.mts`) and what its
- * filter leaves of the rest (`dag/node-filter.mts`).
+ * What the graph screen leaves out (`dag/hidden-nodes.mts`) and what its filter
+ * leaves of the rest (`dag/node-filter.mts`).
  */
 const dagFilteredNodes = combine([
   dataStore.state,
@@ -210,8 +209,8 @@ export const dagLayoutStore = createDagLayoutStore({
   animationSetting: animationSettingStore.setting,
   animationMs: PLACEMENT_ANIMATION_MS,
   now: () => performance.now(),
-  // Not `requestAnimationFrame` itself, which would be called on this
-  // object rather than on `window`, and throw.
+  // Not `requestAnimationFrame` itself, which would be called on this object
+  // rather than on `window`, and throw.
   requestFrame: (callback) =>
     requestAnimationFrame(() => {
       callback();
@@ -271,9 +270,8 @@ export const projectFileStore = createProjectFileStore({
 });
 
 /**
- * Starts the timers and the listeners. Called once, from `main.tsx`, before
- * the first render, so the page is drawn dark from the start on a dark
- * system.
+ * Starts the timers and the listeners. Called once, from `main.tsx`, before the
+ * first render, so the page is drawn dark from the start on a dark system.
  */
 export const startStore = (): (() => void) => {
   const stops = [

@@ -1,17 +1,16 @@
 /**
  * Every read from Cloud Firestore and every write to it. Outside `src/api/`
- * nothing may import Firestore's reads and writes (`eslint.config.mts`), so
- * the functions here are all the ways there are.
+ * nothing may import Firestore's reads and writes (`eslint.config.mts`), so the
+ * functions here are all the ways there are.
  *
- * **Every write prunes.** A write names its document with a
- * {@link DocTarget} — the reference and the codec of what the document holds
- * — and what reaches the database is the codec's `prune` of the value: what
- * the codec describes and nothing more, however many fields the value
- * carries at run time, nested ones included.
+ * **Every write prunes.** A write names its document with a {@link DocTarget} —
+ * the reference and the codec of what the document holds — and what reaches the
+ * database is the codec's `prune` of the value: what the codec describes and
+ * nothing more, however many fields the value carries at run time, nested ones
+ * included.
  *
- * Reading hands back what is stored as `unknown`: it is data somebody else
- * may have written, and validating it is the caller's
- * (`repository/plan-doc.mts`).
+ * Reading hands back what is stored as `unknown`: it is data somebody else may
+ * have written, and validating it is the caller's (`repository/plan-doc.mts`).
  */
 
 import {
@@ -37,8 +36,8 @@ export const deleteDocAt = (
 ): Promise<void> => deleteDoc(ref);
 
 /**
- * Hands `observer.next` the documents of `ref` once they have loaded, and
- * again on every change after, local writes included. Returns what stops it.
+ * Hands `observer.next` the documents of `ref` once they have loaded, and again
+ * on every change after, local writes included. Returns what stops it.
  */
 export const watchCollection = (
   ref: DeepReadonly<CollectionReference>,

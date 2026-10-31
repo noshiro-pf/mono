@@ -1,9 +1,9 @@
 import { extractSampleCode } from './embed-examples-utils.mjs';
 
 /**
- * The fixtures are written as arrays of lines rather than as `dedent`
- * literals: what every case here is about is leading whitespace, which
- * `dedent` exists to remove.
+ * The fixtures are written as arrays of lines rather than as `dedent` literals:
+ * what every case here is about is leading whitespace, which `dedent` exists to
+ * remove.
  */
 describe('extractSampleCode', () => {
   test('keeps a sample that carries no marker, trimmed', () => {

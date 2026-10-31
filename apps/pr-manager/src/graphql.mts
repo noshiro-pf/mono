@@ -1,20 +1,20 @@
 /**
- * One request to GitHub's GraphQL API, and every way it can go wrong worded
- * for the reader of the page.
+ * One request to GitHub's GraphQL API, and every way it can go wrong worded for
+ * the reader of the page.
  *
  * GraphQL rather than REST because of how each one charges. REST charges a
  * request, and reading one pull request takes three of them — the comparison
- * against its base and the two kinds of check — so a page that polled
- * twenty pull requests over REST would spend 5,000 an hour in well under an
- * hour. GraphQL charges a query by the size of what it asks for, and one
- * query asks about every open pull request at once: against this
- * repository, about 9 points for the whole report, a handful of queries.
+ * against its base and the two kinds of check — so a page that polled twenty
+ * pull requests over REST would spend 5,000 an hour in well under an hour.
+ * GraphQL charges a query by the size of what it asks for, and one query asks
+ * about every open pull request at once: against this repository, about 9
+ * points for the whole report, a handful of queries.
  *
- * What it costs is the token. GraphQL answers nobody without one, which is
- * why the page asks for one before it reads anything.
+ * What it costs is the token. GraphQL answers nobody without one, which is why
+ * the page asks for one before it reads anything.
  *
- * The things this depends on GitHub doing across origins, all measured from
- * a `noshiro-pf.github.io` origin: the endpoint answers the preflight with
+ * The things this depends on GitHub doing across origins, all measured from a
+ * `noshiro-pf.github.io` origin: the endpoint answers the preflight with
  * `Access-Control-Allow-Origin: *` and allows `Authorization`, and it exposes
  * the `X-RateLimit-*` headers to scripts, which here describe the GraphQL
  * budget rather than the REST one.
@@ -48,8 +48,8 @@ export type GraphqlRequest = Readonly<{
    */
   token: string;
   /**
-   * The network. Taken as an argument rather than reached for, so that a
-   * test hands in the answer it wants to test against instead of replacing a
+   * The network. Taken as an argument rather than reached for, so that a test
+   * hands in the answer it wants to test against instead of replacing a
    * global and having to put it back.
    */
   fetchImpl?: Fetch;
@@ -68,10 +68,10 @@ export type Answered<T> = Readonly<{
 }>;
 
 /**
- * What a query answered: its `data`, and the errors GitHub reported beside
- * it. Both at once, because GraphQL answers a query that partly failed with
- * `200`, the parts it could answer, and a list of the parts it could not —
- * and only the caller knows which parts it can do without.
+ * What a query answered: its `data`, and the errors GitHub reported beside it.
+ * Both at once, because GraphQL answers a query that partly failed with `200`,
+ * the parts it could answer, and a list of the parts it could not — and only
+ * the caller knows which parts it can do without.
  */
 export type GraphqlAnswer = Readonly<{
   data: unknown;
@@ -90,8 +90,8 @@ const GRAPHQL_URL = 'https://api.github.com/graphql';
  * Asks, and turns every answer that is not data into a sentence.
  *
  * A query that GitHub refused outright — a `data` of `null` — is a failure
- * here, with GitHub's own words. One that came back with data and some
- * errors is not: that is the caller's to judge.
+ * here, with GitHub's own words. One that came back with data and some errors
+ * is not: that is the caller's to judge.
  */
 export const askGraphql = async (
   request: GraphqlRequest,
@@ -158,10 +158,10 @@ export const askGraphql = async (
  *
  * GraphQL puts a `null` in a list for an item the token may not see, rather
  * than leaving it out — a pull request here closes an issue in a private
- * repository, and a token with no scopes gets `null` where that issue would
- * be. Nothing on this page can show an item it was not allowed to read, so it
- * is dropped here, once, instead of every schema and every reader having to
- * allow for it. Only `nodes`: a `null` anywhere else is a value the schema has
+ * repository, and a token with no scopes gets `null` where that issue would be.
+ * Nothing on this page can show an item it was not allowed to read, so it is
+ * dropped here, once, instead of every schema and every reader having to allow
+ * for it. Only `nodes`: a `null` anywhere else is a value the schema has
  * something to say about.
  */
 export const withoutNullNodes = (value: unknown): unknown => {
@@ -181,17 +181,17 @@ export const withoutNullNodes = (value: unknown): unknown => {
 };
 
 /**
- * Written as a wrapper rather than handed over bare, because `fetch`
- * detached from the global it belongs to is not callable in every engine.
+ * Written as a wrapper rather than handed over bare, because `fetch` detached
+ * from the global it belongs to is not callable in every engine.
  */
 const askGitHub: Fetch = async (route, init) => fetch(route, init);
 
 const UNAUTHORIZED = 401;
 
 /**
- * The refusals a reader can do something about, said in terms of the thing
- * they would do. The rest are given by their status, which is at least
- * something to search for.
+ * The refusals a reader can do something about, said in terms of the thing they
+ * would do. The rest are given by their status, which is at least something to
+ * search for.
  */
 const refusal = (response: Response): string =>
   response.status === UNAUTHORIZED

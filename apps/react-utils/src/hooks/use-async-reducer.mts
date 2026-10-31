@@ -12,8 +12,8 @@ export const useAsyncDispatchFunction = <S, A>(
   reducer: Reducer<S, A>,
   updateState: UpdateStateFn<S>,
 ): AsyncDispatch<S, A> => {
-  // hold resolution function for all setState calls still unresolved
-  // `mut_` because the queue is appended to in place; without the prefix the
+  // hold resolution function for all setState calls still unresolved `mut_`
+  // because the queue is appended to in place; without the prefix the
   // repository's codemod turns it readonly and the `push` below stops
   // compiling.
   const mut_resolvers = React.useRef<((_state: S) => void)[]>([]);

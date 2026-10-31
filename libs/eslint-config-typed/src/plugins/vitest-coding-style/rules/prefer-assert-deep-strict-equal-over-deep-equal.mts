@@ -7,8 +7,8 @@ type MessageIds = 'preferAssertDeepStrictEqual';
 type Options = readonly [];
 
 /**
- * `assert.deepEqual(X, Y)` becomes `assert.deepStrictEqual(X, Y)`. The
- * receiver and the call are read through `as`, `satisfies`, `!` and `<T>`
+ * `assert.deepEqual(X, Y)` becomes `assert.deepStrictEqual(X, Y)`. The receiver
+ * and the call are read through `as`, `satisfies`, `!` and `<T>`
  * (`(assert as typeof assert).deepEqual(X, Y)`, `assert.deepEqual!(X, Y)`),
  * which the fix leaves in place.
  */

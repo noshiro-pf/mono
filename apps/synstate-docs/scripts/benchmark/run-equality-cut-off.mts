@@ -10,18 +10,17 @@
  *                    ...
  *                    └─ view[W-1] → subscriber
  *
- * `bucket` is `Math.floor(source / 1000)`, so it changes on one update in
- * 1000 and is equal to its previous value on the rest. `view[i]` is
- * `bucket + i`, each with a subscriber of its own: W readers of one derived
- * flag, as many components read an "is the list empty" flag under a list that
- * changes on every keystroke. The benchmark writes the source K times.
+ * `bucket` is `Math.floor(source / 1000)`, so it changes on one update in 1000
+ * and is equal to its previous value on the rest. `view[i]` is `bucket + i`,
+ * each with a subscriber of its own: W readers of one derived flag, as many
+ * components read an "is the list empty" flag under a list that changes on
+ * every keystroke. The benchmark writes the source K times.
  *
  * Every library here, except the naive RxJS row, compares a derived value and
  * stops at an equal one; what differs is how much of the subgraph below it is
- * visited first. RxJS
- * compares only where `distinctUntilChanged` is written, so it is measured
- * with it and, naively, without it (the "(naive …)" row, which the chart
- * draws dashed).
+ * visited first. RxJS compares only where `distinctUntilChanged` is written, so
+ * it is measured with it and, naively, without it (the "(naive …)" row, which
+ * the chart draws dashed).
  */
 import * as path from 'node:path';
 import { Num, range } from 'ts-data-forge';
@@ -125,8 +124,7 @@ const measureRounds = (
 
 /**
  * Measures every view count for a single benchmark entry. Extracted into its
- * own function so that the view-count loop is not nested inside the entry
- * loop.
+ * own function so that the view-count loop is not nested inside the entry loop.
  */
 const measureEntry = (
   entry: BenchmarkEntry,
@@ -143,8 +141,8 @@ const measureEntry = (
       continue;
     }
 
-    // Verify correctness: after 2500 writes the bucket is 2, so the views
-    // hold 2, 3, …, W + 1.
+    // Verify correctness: after 2500 writes the bucket is 2, so the views hold
+    // 2, 3, …, W + 1.
     const check = mod.runBenchmark(2500, width);
 
     if (check !== expectedCheck(width)) {

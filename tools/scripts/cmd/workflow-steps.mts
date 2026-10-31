@@ -3,8 +3,8 @@ import * as fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 // A top-level `import type`, not the inline `import { type … }`: Node erases
 // the former and keeps the latter as a bare `import {} from 'ts-type-forge'`,
-// which fails to resolve before `pnpm install`. The test's runtime-import
-// check guards this.
+// which fails to resolve before `pnpm install`. The test's runtime-import check
+// guards this.
 import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**
@@ -18,25 +18,25 @@ import type { ReadonlyRecord } from 'ts-type-forge';
  *
  * **Inputs arrive as environment variables named after the input**,
  * upper-cased with `-` as `_` (`engine-strict` is `ENGINE_STRICT`), and each
- * is checked against the values it may take. A composite action's inputs and
- * a `workflow_call` input of `type: string` reach a step as plain strings, so
- * a misspelt `true` would otherwise read as `false` and drop the difference
- * the caller asked for without a word.
+ * is checked against the values it may take. A composite action's inputs and a
+ * `workflow_call` input of `type: string` reach a step as plain strings, so a
+ * misspelt `true` would otherwise read as `false` and drop the difference the
+ * caller asked for without a word.
  *
  * **Only a step whose job is to run the tree anyway belongs here.** A file in
  * the tree is read when the step runs, after the steps before it — `pnpm`
  * itself, which `setup-node` runs for its cache — could have rewritten it;
- * a `run:` block is fixed earlier. That changes nothing for a step that goes
- * on to run `pnpm install` or `pnpm run`, since whatever could rewrite this
- * file runs there with the same reach. A step that must not trust the tree —
- * the path check in pnpm-update.yml's `commit` job — stays inline. See
- * "Setup" in .github/workflows/README.md.
+ * a `run:` block is fixed earlier. That changes nothing for a step that goes on
+ * to run `pnpm install` or `pnpm run`, since whatever could rewrite this file
+ * runs there with the same reach. A step that must not trust the tree — the
+ * path check in pnpm-update.yml's `commit` job — stays inline. See "Setup" in
+ * .github/workflows/README.md.
  *
- * **Run with `node`, not `tsx` or `pnpm run`.** `install` runs before
- * anything is installed, and on every Node the setup action is given: the
- * `minimum` of tools/configs/node-support.json included. So this imports
- * only `node:*` modules at runtime, uses only erasable syntax, and uses no
- * `Temporal`, which that Node does not have. The test holds all three.
+ * **Run with `node`, not `tsx` or `pnpm run`.** `install` runs before anything
+ * is installed, and on every Node the setup action is given: the `minimum` of
+ * tools/configs/node-support.json included. So this imports only `node:*`
+ * modules at runtime, uses only erasable syntax, and uses no `Temporal`, which
+ * that Node does not have. The test holds all three.
  */
 export const main = (argv: readonly string[]): void => {
   const command = argv[2];
@@ -147,22 +147,21 @@ export const installArgs = (
 // ---------------------------------------------------------------------------
 
 /**
- * `run`: the `pnpm` arguments that answer `should_run` (the script writes it
- * to `GITHUB_OUTPUT` itself), after fetching `fetch` when it is set.
+ * `run`: the `pnpm` arguments that answer `should_run` (the script writes it to
+ * `GITHUB_OUTPUT` itself), after fetching `fetch` when it is set.
  * `run-everything`: there is nothing to diff against.
  *
- * A pull request's diff is against its base: `origin/main`, or for one
- * stacked on another pull request that one's branch, so that a layer is
- * judged on its own changes and not on those of the layers below it, which
- * their own pull requests judge. Once the layer below merges, GitHub moves
- * this one onto main and the diff is against main again — the same changes.
+ * A pull request's diff is against its base: `origin/main`, or for one stacked
+ * on another pull request that one's branch, so that a layer is judged on its
+ * own changes and not on those of the layers below it, which their own pull
+ * requests judge. Once the layer below merges, GitHub moves this one onto main
+ * and the diff is against main again — the same changes.
  *
  * On a push to main the base would be HEAD itself: the diff comes back empty
  * and reads as "nothing relevant changed", so every caller would skip and
- * report `skipped`, which satisfies a required check. There it is against
- * what main pointed at before the push, and with no such commit — a manual
- * run, or the first push to the branch — everything runs rather than
- * nothing.
+ * report `skipped`, which satisfies a required check. There it is against what
+ * main pointed at before the push, and with no such commit — a manual run, or
+ * the first push to the branch — everything runs rather than nothing.
  */
 export const planDiffCheck = (
   env: Env,

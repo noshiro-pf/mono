@@ -12,11 +12,10 @@ import { projectRootPath } from '../project-root-path.mjs';
  *
  * Japanese has no interword space, so a halfwidth `(` sits flush against the
  * character before it and a fullwidth one carries its own half-width of side
- * bearing. Mixing the two inside one document is the sort of difference that
- * is invisible while writing a line and obvious once the lines sit next to
- * each other — and it is not a thing a person reliably notices in review,
- * which is why it is asked of the whole repository here rather than left to
- * the author.
+ * bearing. Mixing the two inside one document is the sort of difference that is
+ * invisible while writing a line and obvious once the lines sit next to each
+ * other — and it is not a thing a person reliably notices in review, which is
+ * why it is asked of the whole repository here rather than left to the author.
  *
  * What it asks is deliberately narrow, so that the answer is never a judgement
  * call: a pair is reported only when the text it encloses *is itself
@@ -24,8 +23,8 @@ import { projectRootPath } from '../project-root-path.mjs';
  * or the one after `)` with at most one space skipped. `Num.div(a, b)`,
  * `toHaveText('合計')` and `(TS 7)` are therefore all left alone, the first two
  * because nothing Japanese touches the parentheses and the third because the
- * text inside them is not Japanese. Parentheses around a purely Latin run are
- * a matter of house style that this check has no opinion about.
+ * text inside them is not Japanese. Parentheses around a purely Latin run are a
+ * matter of house style that this check has no opinion about.
  *
  * A space on the left is deliberately *not* skipped, though one on the right
  * is. What follows a parenthetical is the sentence carrying on, so Japanese
@@ -143,8 +142,8 @@ export const findHalfwidthParentheses = (
  * `fileText` with every pair {@link findHalfwidthParentheses} reports written
  * fullwidth.
  *
- * The spaces the halfwidth pair needed go with it. A halfwidth `(` is set
- * flush against the character before it, so Japanese prose writes a space to
+ * The spaces the halfwidth pair needed go with it. A halfwidth `(` is set flush
+ * against the character before it, so Japanese prose writes a space to
  * keep the line breathing; a fullwidth `（` carries that space inside the
  * glyph, and leaving the written one behind sets a space and a half —
  * `コマンド （…）` rather than `コマンド（…）`. So one space immediately inside
@@ -153,8 +152,8 @@ export const findHalfwidthParentheses = (
  * between `）` and a Latin word stays: that is the word's own.
  *
  * The pairs on a line are rewritten right to left, because dropping those
- * spaces shortens the line and would otherwise move the pairs found after
- * them. The whole pass repeats until the text stops changing, which is what
+ * spaces shortens the line and would otherwise move the pairs found after them.
+ * The whole pass repeats until the text stops changing, which is what
  * carries a nested pair: `(あ(い)う)` is reported as `(い)` on the first pass
  * and as the outer pair on the second.
  */
@@ -317,16 +316,16 @@ const IGNORED_PATTERN = /^strict-lib\/v[\d.]+\//u;
  * This check's own fixtures, which are deliberately the thing it forbids.
  *
  * Every `'速度(実測)を測る。'` in that file is an input the rule has to report,
- * so a scan that read it would fail on the test that proves the scan works,
- * and the only way out would be to spell the fixtures in escapes — which is
- * to stop them being readable as the text they stand for. The conformance
- * corpus under `languages/sumi/conformance/fixtures/` is excluded from
+ * so a scan that read it would fail on the test that proves the scan works, and
+ * the only way out would be to spell the fixtures in escapes — which is to stop
+ * them being readable as the text they stand for. The conformance corpus under
+ * `languages/sumi/conformance/fixtures/` is excluded from
  * Prettier for the same reason: a pass over a fixture erases what the fixture
  * checks.
  *
  * It is an exact path rather than a directive comment in the file, because a
- * directive the scan looks for would be a string this very file has to
- * contain, and containing it would exempt the check from itself.
+ * directive the scan looks for would be a string this very file has to contain,
+ * and containing it would exempt the check from itself.
  */
 const IGNORED_PATHS: ReadonlySet<string> = new Set<string>([
   'tools/scripts/cmd/check-japanese-parentheses.test.mts',
@@ -385,8 +384,8 @@ const enclosesJapaneseProse = (
   // and what follows the parenthetical is the sentence carrying on in
   // Japanese. A space on the *left* says much less: `確定 (independent of any
   // pending 提案).` and `"9月4日 (土)" 15` are an English sentence and a
-  // sample of a quoted input, and both would read back as Japanese prose if
-  // the character before the space were enough. Two spaces are alignment — a
+  // sample of a quoted input, and both would read back as Japanese prose if the
+  // character before the space were enough. Two spaces are alignment — a
   // Markdown table, a column of comments — and are not read as prose either,
   // which a single skip gives for nothing.
   const next =

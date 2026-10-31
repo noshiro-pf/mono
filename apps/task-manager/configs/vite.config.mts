@@ -8,17 +8,17 @@ import { pagesAppBase } from '../../../tools/configs/pages-apps.mjs';
 const shared: UserConfig = defineViteAppConfig({
   packageRoot: workspaceRootPath,
   framework: 'synstate-dom',
-  // Served from the repository's Pages site rather than a host of its own,
-  // so the asset URLs carry the whole prefix. The table it comes from is the
-  // one `build-pages-site.mts` copies by.
+  // Served from the repository's Pages site rather than a host of its own, so
+  // the asset URLs carry the whole prefix. The table it comes from is the one
+  // `build-pages-site.mts` copies by.
   base: pagesAppBase(workspaceRootPath),
 });
 
 /**
  * ELK is under the Eclipse Public License 2.0, which asks that a distributed
  * copy keep its notice and say where the source is. The minifier drops the
- * notice the file carries, so it is put back in front of the chunk ELK ends
- * up in, after minification. See the elkjs entry in
+ * notice the file carries, so it is put back in front of the chunk ELK ends up
+ * in, after minification. See the elkjs entry in
  * `tools/configs/license-policy.mts`.
  */
 const ELK_NOTICE = [
@@ -40,10 +40,10 @@ export default {
       },
     },
   },
-  // Every third-party module the page reaches, named up front. The dev
-  // server otherwise finds some only when they are first loaded — those
-  // behind `main.tsx`'s dynamic imports (the backend, ELK), and those the
-  // workspace siblings import — optimizes them then and reloads the page,
+  // Every third-party module the page reaches, named up front. The dev server
+  // otherwise finds some only when they are first loaded — those behind
+  // `main.tsx`'s dynamic imports (the backend, ELK), and those the workspace
+  // siblings import — optimizes them then and reloads the page,
   // mid-run for the e2e suite. One this package does not depend on itself is
   // named through the sibling that does.
   optimizeDeps: {

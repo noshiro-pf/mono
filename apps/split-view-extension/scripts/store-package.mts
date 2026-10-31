@@ -8,8 +8,8 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
  * Stages `dist/` as the Chrome Web Store wants it, and says which version it
  * is.
  *
- * Three things have to come off on the way, which is why the package is a
- * copy rather than `dist/` itself:
+ * Three things have to come off on the way, which is why the package is a copy
+ * rather than `dist/` itself:
  *
  * - **`key` in the manifest.** The store assigns an id from the key it holds
  *   and refuses a manifest that names one. It stays in `public/manifest.json`
@@ -58,9 +58,9 @@ export const stageForStore = (): Readonly<{
 
 /**
  * The built manifest as the store takes it: without `key` and
- * `web_accessible_resources`, which only the unpacked build under the pinned
- * id has any use for. `key` is handed back, for `pack:crx` to report which id
- * it implies.
+ * `web_accessible_resources`, which only the unpacked build under the pinned id
+ * has any use for. `key` is handed back, for `pack:crx` to report which id it
+ * implies.
  */
 export const storeManifestOf = (
   manifest: UnknownRecord,
@@ -88,8 +88,8 @@ export const distPath = path.resolve(workspaceRootPath, 'dist');
 
 /**
  * Where everything that gets uploaded is written. Not cleared wholesale by
- * anything here: the screenshots live beside the packages and take a browser
- * to make.
+ * anything here: the screenshots live beside the packages and take a browser to
+ * make.
  */
 export const packPath = path.resolve(workspaceRootPath, 'pack');
 

@@ -188,8 +188,8 @@ describe(queueOwner, () => {
       },
     );
 
-    // The same as for any other branch: which branches are generated, and
-    // how, is the repository's configuration, which the skill reads.
+    // The same as for any other branch: which branches are generated, and how,
+    // is the repository's configuration, which the skill reads.
     assert.deepStrictEqual(
       queueOwner({ ...update, setAside: standing('rebase-failed') }),
       {

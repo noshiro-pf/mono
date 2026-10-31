@@ -24,8 +24,8 @@ export type ReadonlyURLSearchParams = DeepReadonly<
 
 export type RouterState = Readonly<{
   /**
-   * `window.location.pathname`, below `RouterOptions.basePath` — `/career/`
-   * for `/mono/profile/career/` when the base path is `/mono/profile/`.
+   * `window.location.pathname`, below `RouterOptions.basePath` — `/career/` for
+   * `/mono/profile/career/` when the base path is `/mono/profile/`.
    */
   pathname: string;
 
@@ -100,9 +100,9 @@ export type RouterOptions = Readonly<{
 
   /**
    * The path to replace `pathname` with, or `undefined` to keep it. It is
-   * applied to every URL before `state` shows it — the first one included —
-   * so that nobody has to redirect from a subscriber of `state`, which would
-   * be a write while its update propagates.
+   * applied to every URL before `state` shows it — the first one included — so
+   * that nobody has to redirect from a subscriber of `state`, which would be a
+   * write while its update propagates.
    */
   redirect?: (pathname: string) => string | undefined;
 
@@ -267,8 +267,8 @@ export const withSlash = (path: string): string =>
 
 /**
  * The real window, read when a router is created: the location as
- * `globalThis.location` (a worker has one too), the history as
- * `window.history` (only a window has one).
+ * `globalThis.location` (a worker has one too), the history as `window.history`
+ * (only a window has one).
  */
 const globalBrowser = (): RouterBrowser =>
   ({

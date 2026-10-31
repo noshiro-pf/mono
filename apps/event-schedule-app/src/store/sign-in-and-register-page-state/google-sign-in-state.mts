@@ -20,8 +20,8 @@ export type GoogleSignInDeps = Readonly<{
 }>;
 
 /**
- * Signing in with Google, from the sign-in or the register page, and going
- * back to the page signing in was asked from.
+ * Signing in with Google, from the sign-in or the register page, and going back
+ * to the page signing in was asked from.
  */
 export const createGoogleSignInStore = (
   deps: GoogleSignInDeps,

@@ -177,8 +177,8 @@ describe(tuple, () => {
 
       const resultValue1 = Result.unwrapThrow(result);
 
-      // Note: tuple validation may create new arrays for type safety
-      // so we check for structural equality rather than reference equality
+      // Note: tuple validation may create new arrays for type safety so we
+      // check for structural equality rather than reference equality
 
       assert.deepStrictEqual(resultValue1, input);
 

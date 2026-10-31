@@ -11,9 +11,9 @@ import type { QueueState } from '../pr-report/index.mjs';
  * `attempted` is the keys handed to earlier rounds. A pull request the skill
  * gives up on — a decision it leaves to a person, a failure it could not
  * reproduce — stays the skill's at the same head, and the skill under `/loop`
- * would try it again every round. Here every try is paid for, so it waits
- * for the head or the set-aside to move instead; a restart forgets the keys
- * and tries each once more.
+ * would try it again every round. Here every try is paid for, so it waits for
+ * the head or the set-aside to move instead; a restart forgets the keys and
+ * tries each once more.
  */
 export const surveyQueue = (
   state: StrictPick<QueueState, 'decided' | 'owners' | 'queue'>,
@@ -86,21 +86,21 @@ export const keyPrefix = (number: number, headSha: string): string =>
 export type Candidate = Readonly<{
   number: number;
   /**
-   * The pull request, its head and the reason it was set aside, as one
-   * string: a round that leaves it unfixed leaves all three as they were,
-   * and a push or a new reason changes one. Not the base the set-aside was
-   * written at: the worker writes a `rebase-failed` one again each time the
-   * default branch moves and the rebase still conflicts, and that is the
-   * same conflict, not a new one to pay for.
+   * The pull request, its head and the reason it was set aside, as one string:
+   * a round that leaves it unfixed leaves all three as they were, and a push or
+   * a new reason changes one. Not the base the set-aside was written at: the
+   * worker writes a `rebase-failed` one again each time the default branch
+   * moves and the rebase still conflicts, and that is the same conflict, not a
+   * new one to pay for.
    */
   key: string;
 }>;
 
 export type Survey = Readonly<{
   /**
-   * The skill's, unclaimed, and not yet handed to a round as they stand, in
-   * the order step 1 of the skill takes them: `priority:high` first,
-   * `priority:low` last, the lowest number first within each.
+   * The skill's, unclaimed, and not yet handed to a round as they stand, in the
+   * order step 1 of the skill takes them: `priority:high` first, `priority:low`
+   * last, the lowest number first within each.
    */
   fresh: readonly Candidate[];
   /** The skill's, unclaimed, and left by an earlier round as they stand. */

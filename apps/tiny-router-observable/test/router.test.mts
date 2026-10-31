@@ -26,8 +26,8 @@ describe(stripBasePath, () => {
     ['/mono/profile/', '/mono/profile/career/', '/career/'],
     ['/mono/profile/', '/mono/profile/', '/'],
     ['/mono/profile/', '/mono/profile', '/'],
-    // Outside the base: there is nothing to strip, and inventing a path
-    // would hide where the page really is.
+    // Outside the base: there is nothing to strip, and inventing a path would
+    // hide where the page really is.
     ['/mono/profile/', '/other/', '/other/'],
     // A directory whose name only begins with the base's last segment.
     ['/mono/profile/', '/mono/profile-old/', '/mono/profile-old/'],
@@ -265,8 +265,8 @@ describe(createMemoryBrowser, () => {
 
 /**
  * Stands in for the browser's globals: just the location and the history
- * methods the router calls, with each URL resolved against the current one
- * as `history.pushState` does. Returns a reader of the current URL.
+ * methods the router calls, with each URL resolved against the current one as
+ * `history.pushState` does. Returns a reader of the current URL.
  *
  * The location is stubbed both on its own and on `window`, because the router
  * reads it as `globalThis.location` (a worker has one too) and the history as

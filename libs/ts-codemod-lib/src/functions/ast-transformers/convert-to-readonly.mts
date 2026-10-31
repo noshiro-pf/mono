@@ -157,8 +157,8 @@ export type ReadonlyTransformerOptions = DeepReadonly<{
 
   /**
    * Prefixes of the names of variables, parameters (but for a constructor
-   * parameter property, which `mutablePropertyPrefixes` decides) and
-   * functions that are left mutable: their types are not made readonly.
+   * parameter property, which `mutablePropertyPrefixes` decides) and functions
+   * that are left mutable: their types are not made readonly.
    *
    * @default ['mut_']
    */
@@ -181,8 +181,8 @@ export type ReadonlyTransformerOptions = DeepReadonly<{
    * both `mut_` and `#mut_` cover `#mut_x`. Of a named tuple member with such a prefix, only the type
    * is kept; the tuple is still made `readonly`.
    *
-   * A type literal with a property, a method or an accessor of such a prefix
-   * is not wrapped with `Readonly<...>`, which would make that member readonly
+   * A type literal with a property, a method or an accessor of such a prefix is
+   * not wrapped with `Readonly<...>`, which would make that member readonly
    * too; its other members are marked `readonly` one by one instead, and a
    * `Readonly<...>` written around it is taken off. It is wrapped as before
    * when it also has a member that cannot be marked `readonly` by itself (a
@@ -517,8 +517,8 @@ const readonlyRecordText = (
 
 /**
  * The comments in `[from, to)` of a source file, each followed by what keeps
- * the next token off it, and nothing else in that range — no whitespace, and
- * no token such as a separator or a parenthesis.
+ * the next token off it, and nothing else in that range — no whitespace, and no
+ * token such as a separator or a parenthesis.
  */
 const commentsBetween = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -707,8 +707,8 @@ const hasDisableNextLineCommentAround = (node: tsm.Node): boolean => {
  * Whether a type literal that is already wrapped, or would be merged into the
  * `Readonly<...>` of a union or intersection, is taken out of it. See
  * `isLeftUnwrapped`; in addition, the ignore comment leaves the literal where
- * it is, and taking `Readonly` off one with a call or construct signature
- * would bring back the signature it dropped.
+ * it is, and taking `Readonly` off one with a call or construct signature would
+ * bring back the signature it dropped.
  */
 const takesOffReadonly = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -1021,9 +1021,9 @@ const transformTypeReferenceNode = (
       takesOffWrapper ||
       (T.isKind(tsm.SyntaxKind.TypeLiteral) && takesOffReadonly(T, options))
     ) {
-      // The comments after the literal, which nothing else carries over, go
-      // in front of it: a line comment after it would end the type with a
-      // line break, which a following `[]` cannot be parsed across.
+      // The comments after the literal, which nothing else carries over, go in
+      // front of it: a line comment after it would end the type with a line
+      // break, which a following `[]` cannot be parsed across.
       const commentsAfterT = commentsBetween(
         node.getSourceFile(),
         T.getEnd(),
@@ -1707,12 +1707,12 @@ const transformUnionTypeNode = (
 };
 
 /**
- * The text of `inner`, a type `removeParentheses` took out of `outer`, with
- * the comments in `outer`'s full text in front of it — before the parentheses
- * and inside them — and without the parentheses.
+ * The text of `inner`, a type `removeParentheses` took out of `outer`, with the
+ * comments in `outer`'s full text in front of it — before the parentheses and
+ * inside them — and without the parentheses.
  *
- * `inner.getFullText()` would drop those before the parentheses, which are
- * as much a part of `outer` as the rest of it.
+ * `inner.getFullText()` would drop those before the parentheses, which are as
+ * much a part of `outer` as the rest of it.
  */
 const textWithoutParentheses = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -1752,8 +1752,8 @@ const unionToString = ({
 }>): string => {
   // The members are joined with a separator that supplies its own space, so
   // whitespace left at a member's edge would accumulate: every run of the
-  // transformer would add one more space before every member but the first,
-  // and a file would never reach a fixed point. Trimming keeps the comments in
+  // transformer would add one more space before every member but the first, and
+  // a file would never reach a fixed point. Trimming keeps the comments in
   // front of a member, which are not whitespace.
   const types = typesRaw.map((s) => s.trim());
 
@@ -1873,10 +1873,10 @@ const isTypeArgumentOfReadonly = (
  * `replaceWithText` overwrites a node from its `getStart()`, so whatever lies
  * in front of that stays in the file by itself. With no leading `|` / `&`, the
  * first member starts there too, and its comments are the type's: repeating
- * them in the replacement would copy them once per run. Every other member
- * has a separator in front of it, and a comment before the separator belongs
- * to no member's full text, so it is gone once the separator is rewritten. It
- * goes with the member after it, like the comments after the separator.
+ * them in the replacement would copy them once per run. Every other member has
+ * a separator in front of it, and a comment before the separator belongs to no
+ * member's full text, so it is gone once the separator is rewritten. It goes
+ * with the member after it, like the comments after the separator.
  *
  * `member` may be the type inside a member's parentheses; the comments inside
  * them are collected too, and the parentheses are not.
@@ -1900,9 +1900,9 @@ const leadingCommentsOfMember = (
  * `Readonly<T>` |-> the text of `T`, to be spliced into a union (`|`) or an
  * intersection (`&`) of the members it is merged with.
  *
- * `T` is wrapped in parentheses for precedence safety (a function type
- * argument needs them), unless it is a union spliced into a union or an
- * intersection spliced into an intersection, which needs none.
+ * `T` is wrapped in parentheses for precedence safety (a function type argument
+ * needs them), unless it is a union spliced into a union or an intersection
+ * spliced into an intersection, which needs none.
  */
 const readonlyTypeArgTextSplicedInto = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -1957,8 +1957,8 @@ const transformUnionOrIntersectionTypeNodeImpl = (
     nextReadonlyContextValue.type !== 'DeepReadonly' &&
     nextReadonlyContextValue.indexedAccessDepth === 0;
 
-  // `Readonly<A & { b: B }>`: `A` stays under the `Readonly`, which the
-  // handler of `Readonly` then takes off as redundant.
+  // `Readonly<A & { b: B }>`: `A` stays under the `Readonly`, which the handler
+  // of `Readonly` then takes off as redundant.
   const underReadonly =
     readonlyContext.type === 'Readonly' &&
     readonlyContext.indexedAccessDepth === 0 &&
@@ -2122,20 +2122,16 @@ const transformParenthesizedTypeNode = (
   const T = node.getTypeNode();
 
   if (
-    // remove () if T is TypeReferenceNode
-    // e.g. `(Readonly<A>) |-> Readonly<A>`
+    // remove () if T is TypeReferenceNode e.g. `(Readonly<A>) |-> Readonly<A>`
     T.isKind(tsm.SyntaxKind.TypeReference) ||
-    // remove () if T is ArrayTypeNode
-    // e.g. `(A[]) |-> A[]`
+    // remove () if T is ArrayTypeNode e.g. `(A[]) |-> A[]`
     T.isKind(tsm.SyntaxKind.ArrayType) ||
-    // remove () if T is TupleTypeNode
-    // e.g. `([A]) |-> [A]`
+    // remove () if T is TupleTypeNode e.g. `([A]) |-> [A]`
     T.isKind(tsm.SyntaxKind.TupleType) ||
-    // remove () if T is PrimitiveTypeNode
-    // e.g. `(number) |-> number`
+    // remove () if T is PrimitiveTypeNode e.g. `(number) |-> number`
     isAtomicTypeNode(T) ||
-    // remove () if T is TypeLiteralNode
-    // e.g. `({ member: V }) |-> { member: V }`
+    // remove () if T is TypeLiteralNode e.g.
+    // `({ member: V }) |-> { member: V }`
     T.isKind(tsm.SyntaxKind.TypeLiteral) ||
     // collapse redundant nested parentheses if T is itself a ParenthesizedType
     // e.g. `((X)) |-> (X)`

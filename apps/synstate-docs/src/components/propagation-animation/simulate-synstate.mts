@@ -16,17 +16,17 @@ import type { Evaluation, Scenario, ScenarioNode } from './scenario.mjs';
 
 /**
  * Runs the scenario's inputs through a model of synstate's propagation and
- * records one frame per step: an update opens its queue, the source emits,
- * each queued node is taken out and visited, and each visit either emits
- * (queueing the node's children) or skips.
+ * records one frame per step: an update opens its queue, the source emits, each
+ * queued node is taken out and visited, and each visit either emits (queueing
+ * the node's children) or skips.
  *
- * The model follows `libs/synstate/PROPAGATION.md`: one bucket per depth
- * below the manager, a child queued at most once per update however many of
- * its parents emit, buckets drained shallowest first, and a node that does
- * not emit queueing nothing.
+ * The model follows `libs/synstate/PROPAGATION.md`: one bucket per depth below
+ * the manager, a child queued at most once per update however many of its
+ * parents emit, buckets drained shallowest first, and a node that does not emit
+ * queueing nothing.
  *
- * Without `tokens`, the update tokens are left out of the drawing, the code
- * and the captions, for a graph in which every node emits.
+ * Without `tokens`, the update tokens are left out of the drawing, the code and
+ * the captions, for a graph in which every node emits.
  */
 export const simulateSynState = (
   scenario: Scenario,

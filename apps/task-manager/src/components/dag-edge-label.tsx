@@ -8,9 +8,8 @@ type Props<A> = Readonly<{
 }>;
 
 /**
- * An edge's label, `SS` for start-to-start and the lag, in a box on the
- * middle of the edge (`dag-edge.tsx`) or at the apex of the arc
- * (`dag-arc-edge.tsx`).
+ * An edge's label, `SS` for start-to-start and the lag, in a box on the middle
+ * of the edge (`dag-edge.tsx`) or at the apex of the arc (`dag-arc-edge.tsx`).
  */
 export const DagEdgeLabel = <A,>({ source, pick }: Props<A>): JSX.Element => {
   const box = (value: A): LabelBox => pick(value).labelBox ?? NO_BOX;

@@ -228,8 +228,8 @@ const findCodecPairs = (
       : statement,
   );
 
-  // Codec name to the alias derived from it; the first alias wins when a
-  // codec has several, which only changes the name the message quotes.
+  // Codec name to the alias derived from it; the first alias wins when a codec
+  // has several, which only changes the name the message quotes.
   const mut_typeNames = new Map<string, string>();
 
   for (const statement of statements) {
@@ -346,8 +346,8 @@ const isInTypeQuery = (node: TSESTree.Node): boolean =>
 
 /**
  * Whether a reference reads the codec's value at runtime. Its own
- * initialization, `typeof X` in a type, and the name in an export list are
- * not reads.
+ * initialization, `typeof X` in a type, and the name in an export list are not
+ * reads.
  */
 const isValueUse = (reference: TSESLint.Scope.Reference): boolean =>
   reference.init !== true &&
@@ -361,8 +361,8 @@ const isValueUse = (reference: TSESLint.Scope.Reference): boolean =>
  * Whether another file of the TypeScript program reads the value this file
  * exports under a given name, or an entry point re-exports it. Answers "yes"
  * for every name when it cannot tell: when the file was parsed without type
- * information, or when the entry points come from a package.json that cannot
- * be traced back to source.
+ * information, or when the entry points come from a package.json that cannot be
+ * traced back to source.
  */
 const buildCrossFileCheck = (
   context: Readonly<TSESLint.RuleContext<MessageIds, Options>>,

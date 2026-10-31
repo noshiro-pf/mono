@@ -19,8 +19,8 @@ export const createMountable = <P,>(
   props: P,
   key?: unknown,
 ): Mountable => {
-  // The transform takes `key` out of the props and passes it on its own. It
-  // is put back for a component: `For` takes its `key` function as a prop.
+  // The transform takes `key` out of the props and passes it on its own. It is
+  // put back for a component: `For` takes its `key` function as a prop.
   const propsWithKey = key === undefined ? props : ({ ...props, key } as const);
 
   return typeof type === 'string'

@@ -5,8 +5,8 @@ import { asNonZeroSafeInt, Num } from 'ts-data-forge';
 /**
  * How long ago, in the largest unit that is still more than one.
  *
- * Both instants are milliseconds since the epoch, so this is subtraction
- * rather than date parsing. `now` is a parameter so that the answer is a
+ * Both instants are milliseconds since the epoch, so this is subtraction rather
+ * than date parsing. `now` is a parameter so that the answer is a
  * function of its arguments: a report is only as useful as it is fresh, and
  * the timestamp alone does not say whether it is.
  */

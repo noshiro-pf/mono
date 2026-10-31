@@ -24,8 +24,8 @@ describe(claudeArgs, () => {
   test('runs the skill in print mode, before every variadic flag', () => {
     const args = claudeArgs(round);
 
-    // `--allowedTools` takes every word up to the next flag, so the prompt
-    // has to come before it.
+    // `--allowedTools` takes every word up to the next flag, so the prompt has
+    // to come before it.
     assert.deepStrictEqual(Arr.take(args, 2), ['-p', '/unblock-prs']);
 
     assert.strictEqual(flagValue(args, '--output-format'), 'stream-json');

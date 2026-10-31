@@ -109,8 +109,8 @@ export const SearchSummary = ({
     query,
     hits,
 }: SearchSummaryProps): JSX.Element => {
-    // A constant `hits` gives a constant, an observable a `map` node, and a
-    // view a composed view.
+    // A constant `hits` gives a constant, an observable a `map` node, and a view
+    // a composed view.
     const hitsLabel = mapBindable(hits, (n) =>
         n === 1 ? '1 hit' : `${n} hits`,
     );

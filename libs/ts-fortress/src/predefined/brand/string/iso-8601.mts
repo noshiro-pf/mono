@@ -70,10 +70,8 @@ const parseDigits = (digits: string | undefined): number | undefined => {
 };
 
 const isValidDate = (str: string): boolean => {
-  // str must have passed the ISO8601 check
-  // this check is meant to catch invalid dates
-  // like 2009-02-31
-  // first check for ordinal dates
+  // str must have passed the ISO8601 check this check is meant to catch invalid
+  // dates like 2009-02-31 first check for ordinal dates
   const ordinalMatch = /^(\d{4})-?(\d{3})([ T]\.*|$)/u.exec(str) ?? undefined;
 
   if (ordinalMatch !== undefined) {
@@ -95,9 +93,9 @@ const isValidDate = (str: string): boolean => {
 
   const year = parseDigits(match?.[1]);
 
-  // An absent month or day is an empty capture, which leaves the part
-  // unchecked rather than reading as `0` (the reduced forms `2009` and
-  // `2009-05` are valid ISO 8601).
+  // An absent month or day is an empty capture, which leaves the part unchecked
+  // rather than reading as `0` (the reduced forms `2009` and `2009-05` are
+  // valid ISO 8601).
   const month = parseDigits(match?.[2]);
 
   const date = parseDigits(match?.[3]);

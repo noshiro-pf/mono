@@ -22,15 +22,15 @@ type MessageIds = 'preferNumberLineOrder' | 'reorderRange';
  * | `min > x \|\| x > max`   | `x < min \|\| max < x`   |
  * | `max < x \|\| x < min`   | `x < min \|\| max < x`   |
  *
- * A range check is two relational comparisons joined by `&&` or `||`,
- * adjacent in a chain of that operator, that share one operand — the value
- * tested — which is smaller than the other operand in one comparison and
- * larger in the other. A shared operand that is a literal is a bound, not a
- * value tested, and `a < 0 && 0 < b` is left alone.
+ * A range check is two relational comparisons joined by `&&` or `||`, adjacent
+ * in a chain of that operator, that share one operand — the value tested —
+ * which is smaller than the other operand in one comparison and larger in the
+ * other. A shared operand that is a literal is a bound, not a value tested, and
+ * `a < 0 && 0 < b` is left alone.
  *
  * A comparison, and the operands compared, are recognized through any `as`,
- * `satisfies` or `!`: in `((x >= min) satisfies boolean) && max >= x` the
- * range is still there, and so is the value tested in `(x as number)`.
+ * `satisfies` or `!`: in `((x >= min) satisfies boolean) && max >= x` the range
+ * is still there, and so is the value tested in `(x as number)`.
  *
  * Writing `a > b` as `b < a` is exact, `NaN` included. It does evaluate the
  * operands in the other order, and moving the lower bound's comparison first
@@ -74,8 +74,8 @@ export const preferRangeInNumberLineOrder: TSESLint.RuleModule<
       tokensOf(skipTypeWrappers(a)) === tokensOf(skipTypeWrappers(b));
 
     /**
-     * The text of one side of `node`, with the parentheses and comments
-     * written between it and the operator.
+     * The text of one side of `node`, with the parentheses and comments written
+     * between it and the operator.
      */
     const sideText = (
       node: RelationalComparison,
@@ -315,8 +315,8 @@ const isLiteralLike = (node: DeepReadonly<TSESTree.Expression>): boolean =>
     Arr.isEmpty(node.expressions));
 
 /**
- * Whether `node`, as the right operand of a relational comparison, would
- * need parentheses.
+ * Whether `node`, as the right operand of a relational comparison, would need
+ * parentheses.
  */
 const bindsAsLooseAsRelational = (
   node: DeepReadonly<TSESTree.Expression>,

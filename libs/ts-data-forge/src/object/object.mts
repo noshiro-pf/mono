@@ -337,8 +337,8 @@ export namespace Obj {
    * This is what `Object.fromEntries(Object.entries(record).map(...))` cannot
    * express: an entries array carries no evidence that it still covers every
    * key of the record it came from, so its element type is all the return type
-   * can be built from. Going through a mapped type instead states the
-   * invariant that a value-only transform preserves the key set.
+   * can be built from. Going through a mapped type instead states the invariant
+   * that a value-only transform preserves the key set.
    *
    * **Key handling**: keys reach the callback the way `Object.entries` yields
    * them, so a numeric key `1` arrives as `'1'`. Symbol-keyed properties are

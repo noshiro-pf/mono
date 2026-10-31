@@ -9,17 +9,17 @@ import { Num } from '../src/index.mjs';
  * the dependency runs this way (Sumi D-49).
  *
  * `Num.safeParseFloat` and `Num.safeParseInt` delegate to `SafeNumber.parse`
- * and `SafeNumber.parseInteger` and add their own contract on top: the brand
- * on the success side, an `Error` rather than a tagged record on the failure
- * side. These cases pin that.
+ * and `SafeNumber.parseInteger` and add their own contract on top: the brand on
+ * the success side, an `Error` rather than a tagged record on the failure side.
+ * These cases pin that.
  *
  * Everything else the two packages share — `PanicError` and the ADT core — is
  * one implementation re-exported from here, and is tested where it lives.
  */
 
 // Inputs that separate the traps: whitespace and blank input, which `Number`
-// coerces to 0; trailing garbage, which `parseInt` accepts; and `1e400`,
-// which `Number` turns into Infinity while `parseInt` reads as 1.
+// coerces to 0; trailing garbage, which `parseInt` accepts; and `1e400`, which
+// `Number` turns into Infinity while `parseInt` reads as 1.
 const parseSweep = [
   '42',
   '-12.9',
@@ -92,9 +92,9 @@ describe('Num.safeParseInt is SafeNumber.parseInteger plus a brand', () => {
 
   test('rejects a value that is not finite', () => {
     // `Number('1e400')` is Infinity while `parseInt('1e400', 10)` is 1, so
-    // requiring only that the two agree would let Infinity through as an
-    // `Int`. Delegating to `SafeNumber.parseInteger`, which also checks
-    // finiteness, closed that hole (Sumi D-49 (c)).
+    // requiring only that the two agree would let Infinity through as an `Int`.
+    // Delegating to `SafeNumber.parseInteger`, which also checks finiteness,
+    // closed that hole (Sumi D-49 (c)).
     assert.isTrue(Result.isErr(Num.safeParseInt('1e400')));
   });
 

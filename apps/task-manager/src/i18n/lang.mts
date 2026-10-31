@@ -1,11 +1,11 @@
 /**
  * Which language the page is shown in: `?lang=en` or `?lang=ja` when the URL
  * says, otherwise the one chosen on this device, otherwise the first of the
- * browser's languages the page has, otherwise English. Outside a browser it
- * is Japanese (`messages.mts`).
+ * browser's languages the page has, otherwise English. Outside a browser it is
+ * Japanese (`messages.mts`).
  *
- * The language is decided once, when the page loads: choosing one stores it
- * and loads the page again (`chooseLang`).
+ * The language is decided once, when the page loads: choosing one stores it and
+ * loads the page again (`chooseLang`).
  */
 
 import type { ReadonlyRecord } from 'ts-type-forge';
@@ -60,9 +60,9 @@ export const parseLangSetting = (stored: string | null): LangSetting =>
 
 /**
  * The URL's query, `?` and all or empty, to load the page again with after
- * `choice` is made: without `?lang=` once the choice is `kept` on this
- * device, so that it decides — or, where nothing can be kept, asking for
- * the language chosen.
+ * `choice` is made: without `?lang=` once the choice is `kept` on this device,
+ * so that it decides — or, where nothing can be kept, asking for the language
+ * chosen.
  */
 export const searchAfterChoice = ({
   search,
@@ -95,8 +95,8 @@ const parseLang = (value: string | null): Lang | undefined =>
   langs.find((lang) => lang === value);
 
 /**
- * A language tag's language, `en-GB`, `ja_JP` or `JA` as well as `en`, if
- * the page has it.
+ * A language tag's language, `en-GB`, `ja_JP` or `JA` as well as `en`, if the
+ * page has it.
  */
 const parseTag = (tag: string): Lang | undefined =>
   parseLang(tag.split(/[-_]/u, 1)[0]?.toLowerCase() ?? null);

@@ -103,8 +103,8 @@ export const eslintFunctionalRules = {
   // whether or not anything in it was readonly to begin with, so every type it
   // has touched is in the form the rule wants before the rule ever sees it.
   // Measured against this repository: with the transformer's output in place,
-  // the rule reports nothing at all across `libs/`, `apps/` and `tools/`,
-  // while requiring type information to say so.
+  // the rule reports nothing at all across `libs/`, `apps/` and `tools/`, while
+  // requiring type information to say so.
   //
   // Two mechanisms enforcing one convention is the thing to avoid rather than
   // the belt and braces it looks like: they can only ever agree or disagree,

@@ -7,8 +7,8 @@ type Props = Readonly<{
 }>;
 
 /**
- * Delete, in two steps: the first press asks, the second deletes — the node
- * and every dependency on it.
+ * Delete, in two steps: the first press asks, the second deletes — the node and
+ * every dependency on it.
  */
 export const DeleteControls = ({ confirming }: Props): JSX.Element => (
   <If

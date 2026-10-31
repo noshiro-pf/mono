@@ -19,8 +19,8 @@ type Props = Readonly<{
   label: string;
   /**
    * `undefined` unless the number says something is wrong. A tile that is
-   * coloured whatever it reads has spent the colour before there is anything
-   * to spend it on.
+   * coloured whatever it reads has spent the colour before there is anything to
+   * spend it on.
    */
   tone?: Bindable<StatusRole | undefined>;
 }>;
@@ -36,13 +36,13 @@ type ToggleProps = Props &
     /** Whether what it counts is picked to be shown alone. */
     only: Bindable<boolean>;
     /**
-     * What it counts, as its tooltips name it; the pull requests under
-     * `label` unless said otherwise.
+     * What it counts, as its tooltips name it; the pull requests under `label`
+     * unless said otherwise.
      */
     subject?: string;
     /**
-     * How picking it goes with what else is picked: `either` adds to it, as
-     * one more of the same kind; `both` narrows it, as another kind
+     * How picking it goes with what else is picked: `either` adds to it, as one
+     * more of the same kind; `both` narrows it, as another kind
      * (`issue-filter.mts`). `either` unless said otherwise.
      */
     pickWith?: 'either' | 'both';
@@ -50,9 +50,8 @@ type ToggleProps = Props &
 
 /**
  * One headline number. A row of these rather than a chart: counts with no
- * shared scale and no order between them is a table at best, and a bar
- * chart of unrelated magnitudes would invite a comparison that means
- * nothing.
+ * shared scale and no order between them is a table at best, and a bar chart of
+ * unrelated magnitudes would invite a comparison that means nothing.
  */
 export const StatTile = ({ value, total, label, tone }: Props): JSX.Element => (
   <div class={constant('stat-tile')} data-status={tone}>
@@ -63,9 +62,9 @@ export const StatTile = ({ value, total, label, tone }: Props): JSX.Element => (
 
 /**
  * A {@link StatTile} that is also a switch for what it counts, with an `only`
- * switch of its own beside it rather than inside it, since a button cannot
- * hold another; it is drawn over the tile's corner, always rather than on
- * hover, because the page is opened on phones too.
+ * switch of its own beside it rather than inside it, since a button cannot hold
+ * another; it is drawn over the tile's corner, always rather than on hover,
+ * because the page is opened on phones too.
  */
 export const StatToggle = ({
   value,
@@ -120,8 +119,8 @@ export const StatToggle = ({
 };
 
 /**
- * ` of N` after a count that leaves some out, and nothing after one that
- * does not.
+ * ` of N` after a count that leaves some out, and nothing after one that does
+ * not.
  */
 export const OfTotal = ({
   count,

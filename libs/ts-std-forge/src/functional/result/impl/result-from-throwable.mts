@@ -11,8 +11,8 @@ import { ok } from './result-ok.mjs';
  * This is a fundamental utility for converting traditional exception-based
  * error handling into Result-based error handling. Any thrown value is
  * converted to an Error object for consistent error handling. A `PanicError`
- * (thrown by `panic` or the unwrap functions) is rethrown instead: a bug is
- * not a recoverable failure.
+ * (thrown by `panic` or the unwrap functions) is rethrown instead: a bug is not
+ * a recoverable failure.
  *
  * If the function executes successfully, returns `Result.Ok` with the result.
  * If the function throws, returns `Result.Err` with the caught error.

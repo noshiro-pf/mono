@@ -8,8 +8,8 @@
  *
  * This is ts-data-forge's `Arr.isEmptyTuple` under the shorter name. There the
  * suffix separates the structural guard from the branded `Arr.isEmpty`, which
- * narrows to `FixedLengthArray<0, E>`; this package has no number brands
- * (D-26 / D-39), so there is only one guard to name.
+ * narrows to `FixedLengthArray<0, E>`; this package has no number brands (D-26
+ * / D-39), so there is only one guard to name.
  *
  * @example
  *

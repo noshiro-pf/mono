@@ -1,10 +1,10 @@
 /**
  * The loan's inputs and what is calculated from them.
  *
- * The URL is the one place the inputs are kept: `deps.router` is read for
- * them, and every setter pushes a URL with the new value instead of holding
- * it. So the settings can be shared as a link, and the browser's back button
- * undoes one. The tests hand it a router over `createMemoryBrowser`.
+ * The URL is the one place the inputs are kept: `deps.router` is read for them,
+ * and every setter pushes a URL with the new value instead of holding it. So
+ * the settings can be shared as a link, and the browser's back button undoes
+ * one. The tests hand it a router over `createMemoryBrowser`.
  */
 
 import {
@@ -122,8 +122,8 @@ const numberFromQuery = <A extends number>(
 };
 
 /**
- * The URL is the one place the inputs are kept: a value missing from it, or
- * not a valid one, stays as it was.
+ * The URL is the one place the inputs are kept: a value missing from it, or not
+ * a valid one, stays as it was.
  */
 const storeFromQuery = (
   prev: Store,

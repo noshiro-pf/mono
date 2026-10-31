@@ -2,11 +2,11 @@
  * What a label chip looks like, worked out from the colour GitHub holds.
  *
  * The chip is the label's own colour with black or white on it, which is what
- * makes a GitHub label what it is at a glance and what a reader of this
- * page already reads without thinking. The only decision is which of the two inks,
+ * makes a GitHub label what it is at a glance and what a reader of this page
+ * already reads without thinking. The only decision is which of the two inks,
  * and that is computed rather than guessed: `#ededed` and `#0e8a16` are both
- * label colours this repository uses, and the same ink on both is unreadable
- * on one of them.
+ * label colours this repository uses, and the same ink on both is unreadable on
+ * one of them.
  */
 
 import {
@@ -20,8 +20,8 @@ export type ChipColors = Readonly<{
   background: string;
   text: string;
   /**
-   * A hairline of the ink at low alpha rather than a colour of its own, so
-   * that a chip whose colour is close to the surface still has an edge.
+   * A hairline of the ink at low alpha rather than a colour of its own, so that
+   * a chip whose colour is close to the surface still has an edge.
    */
   border: string;
 }>;
@@ -30,17 +30,17 @@ export type ChipColors = Readonly<{
  * The three colours for one label.
  *
  * `color` is what the GitHub API sends: six hex digits with no `#`. Anything
- * else — an empty string, or a value GitHub has never sent — falls back to the grey GitHub gives a
- * new label, because a chip that is the wrong colour is better than a page
- * that is not there.
+ * else — an empty string, or a value GitHub has never sent — falls back to the
+ * grey GitHub gives a new label, because a chip that is the wrong colour is
+ * better than a page that is not there.
  */
 export const chipColors = (color: string): ChipColors => {
   const rgb = parseHex(color) ?? parseHex(FALLBACK) ?? BLACK;
 
   const luminance = relativeLuminance(rgb);
 
-  // Whichever of the two inks contrasts more. Between them they clear 4.5:1
-  // on every colour but the mid-greys, where the better one still clears 4.4.
+  // Whichever of the two inks contrasts more. Between them they clear 4.5:1 on
+  // every colour but the mid-greys, where the better one still clears 4.4.
   const onWhite = contrastRatio(luminance, WHITE_LUMINANCE);
 
   const onBlack = contrastRatio(luminance, BLACK_LUMINANCE);

@@ -1,7 +1,7 @@
 /**
- * Evaluates dependencies on the current state: a dependency holds from the
- * time its source got where it waits for — as the source is now, not as it
- * once was — plus its lag.
+ * Evaluates dependencies on the current state: a dependency holds from the time
+ * its source got where it waits for — as the source is now, not as it once was
+ * — plus its lag.
  *
  * - On a task, `finish-to-start` waits for the task to be `done` (from its
  *   `completedAt`), and `start-to-start` for it to be past `not-started`
@@ -22,10 +22,9 @@ import {
 } from './types.mjs';
 
 /**
- * An evaluator for one state at one time. Milestones are evaluated at most
- * once each per evaluator, so evaluating many dependencies through one
- * evaluator shares the work. A milestone on a dependency cycle is never
- * reached.
+ * An evaluator for one state at one time. Milestones are evaluated at most once
+ * each per evaluator, so evaluating many dependencies through one evaluator
+ * shares the work. A milestone on a dependency cycle is never reached.
  */
 export const createEvaluator = (
   context: EvaluationContext,
@@ -106,19 +105,18 @@ export const createEvaluator = (
 
 export type Evaluator = Readonly<{
   /**
-   * When the source of `dependency` got where it waits for (before the lag),
-   * or `undefined` if it has not.
+   * When the source of `dependency` got where it waits for (before the lag), or
+   * `undefined` if it has not.
    */
   sourceEventAt: (dependency: Dependency) => number | undefined;
   /**
-   * From when `dependency` holds, or `undefined` if it does not hold at
-   * `now`.
+   * From when `dependency` holds, or `undefined` if it does not hold at `now`.
    */
   satisfiedSince: (dependency: Dependency) => number | undefined;
   /**
    * When `milestone` was reached — the latest of its date, its check and its
-   * dependencies, each of which must have happened by `now`; its
-   * `createdAt` if it has none of them — or `undefined` if it has not been.
+   * dependencies, each of which must have happened by `now`; its `createdAt` if
+   * it has none of them — or `undefined` if it has not been.
    */
   milestoneReachedAt: (milestone: Milestone) => number | undefined;
 }>;

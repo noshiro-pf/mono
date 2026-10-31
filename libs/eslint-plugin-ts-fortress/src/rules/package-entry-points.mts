@@ -6,22 +6,22 @@ import type * as ts from 'typescript';
 
 /**
  * The source files behind what the `package.json` nearest to `fileName`
- * publishes — `exports`, and the legacy `main` / `module` / `types` /
- * `typings` fields — as file names of `program`.
+ * publishes — `exports`, and the legacy `main` / `module` / `types` / `typings`
+ * fields — as file names of `program`.
  *
- * A target that is a file of the program is taken as it is. One that is not
- * — the usual case, `./dist/index.mjs` — is traced back to source: the
- * output extension is dropped, a leading `dist`, `lib`, `build`, `out`, `esm`
- * or `cjs` directory (or the program's `outDir`) becomes `src` (or its
- * `rootDir`), and every TypeScript and JavaScript extension is tried.
- * Conditions of one subpath describe the same module, so a subpath is
- * resolved when any of its targets is; `types: './dist/types.d.mts'` written
- * by a build step need not have a source of its own.
+ * A target that is a file of the program is taken as it is. One that is not —
+ * the usual case, `./dist/index.mjs` — is traced back to source: the output
+ * extension is dropped, a leading `dist`, `lib`, `build`, `out`, `esm` or `cjs`
+ * directory (or the program's `outDir`) becomes `src` (or its `rootDir`), and
+ * every TypeScript and JavaScript extension is tried.
+ * Conditions of one subpath describe the same module, so a subpath is resolved
+ * when any of its targets is; `types: './dist/types.d.mts'` written by a build
+ * step need not have a source of its own.
  *
  * `undefined` when some subpath resolves to no file of the program: the
- * package's public surface is then not known, and the caller must not treat
- * an export as private. A directory with no `package.json` above it, or one
- * that publishes nothing, has no entry points — an application.
+ * package's public surface is then not known, and the caller must not treat an
+ * export as private. A directory with no `package.json` above it, or one that
+ * publishes nothing, has no entry points — an application.
  */
 export const packageEntryPoints = (
   program: ts.Program,
@@ -136,8 +136,8 @@ const leafTargets = (value: unknown): readonly string[] =>
 
 /**
  * The code targets of each subpath the manifest publishes, one list per
- * subpath. Targets that are not code (`./package.json`, a stylesheet) are
- * left out, and a subpath left with none is dropped.
+ * subpath. Targets that are not code (`./package.json`, a stylesheet) are left
+ * out, and a subpath left with none is dropped.
  */
 const subpathTargets = (
   manifest: ReadonlyRecord<string, unknown>,
@@ -173,8 +173,8 @@ const subpathTargets = (
 const toPosix = (p: string): string => p.replaceAll('\\', '/');
 
 /**
- * Where the source of an output path would be: the extension swapped for
- * each source extension, under the output directory and under `src` (or the
+ * Where the source of an output path would be: the extension swapped for each
+ * source extension, under the output directory and under `src` (or the
  * program's `rootDir`) in its place.
  */
 const sourceCandidates = (

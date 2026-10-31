@@ -90,9 +90,9 @@ const isPipeProperty = (
       member.property.name === 'pipe';
 
 /**
- * Whether `callee` calls the `counter` synstate exports: by a named import,
- * an aliased one or a namespace import, and through type wrappers. A local
- * binding that shadows the import is not synstate's.
+ * Whether `callee` calls the `counter` synstate exports: by a named import, an
+ * aliased one or a namespace import, and through type wrappers. A local binding
+ * that shadows the import is not synstate's.
  */
 const isSynstateCounter = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -122,10 +122,10 @@ const mayBeTimesKey = (
 };
 
 /**
- * Whether the arguments of `counter(...)` may carry a `times` option. Only
- * what the source shows is judged: options passed as a variable, spread in,
- * or keyed by a computed name might hold `times`, and are given the benefit
- * of the doubt.
+ * Whether the arguments of `counter(...)` may carry a `times` option. Only what
+ * the source shows is judged: options passed as a variable, spread in, or keyed
+ * by a computed name might hold `times`, and are given the benefit of the
+ * doubt.
  */
 const mayStopByItself = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

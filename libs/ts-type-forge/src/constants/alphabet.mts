@@ -3,8 +3,8 @@
  * Represents the set of lowercase English alphabet letters.
  * A union of string literals from `'a'` to `'z'`.
  *
- * Useful for type-safe operations that require lowercase letters only,
- * such as CSS class naming, identifier validation, or alphabet-based algorithms.
+ * Useful for type-safe operations that require lowercase letters only, such as
+ * CSS class naming, identifier validation, or alphabet-based algorithms.
  *
  * @example
  * ```ts
@@ -51,8 +51,8 @@ export type UpperAlphabet = Uppercase<LowerAlphabet>;
  * Represents the set of both lowercase and uppercase English alphabet letters.
  * A union of `LowerAlphabet` and `UpperAlphabet`, covering all 52 English letters.
  *
- * Useful for general alphabetic character validation, text processing,
- * and type-safe operations that work with any English letter.
+ * Useful for general alphabetic character validation, text processing, and
+ * type-safe operations that work with any English letter.
  *
  * @example
  * ```ts

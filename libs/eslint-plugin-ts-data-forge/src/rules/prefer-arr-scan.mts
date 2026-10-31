@@ -45,8 +45,8 @@ type AccumulationCandidate = Readonly<{
   call: TSESTree.CallExpression;
   /**
    * What the call is replaced with, after the name `Arr` is bound to
-   * (`scan(xs, f, init)`), or `undefined` when the rewrite could not be
-   * derived and the report carries no fix.
+   * (`scan(xs, f, init)`), or `undefined` when the rewrite could not be derived
+   * and the report carries no fix.
    */
   replacement: string | undefined;
 }>;
@@ -280,12 +280,12 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
       // `acc.at(-1)` is `T | undefined` only because `at` can go out of bounds,
       // which a seeded accumulator never does. So once the value `scan` carries
       // is known not to be nullish, a `?? fallback` guarding the read is dead
-      // and the fix takes it with the read — leaving it would hand the author an
-      // unnecessary condition that no rule can fix for them. Every layer of
-      // type wrappers is asked (see typeWrapperLayers): the value under an
-      // `as` / `!` is what `scan` carries at run time (`[init!]` may still
-      // hold `undefined`), and a wider type a wrapper states is the author
-      // saying it may be nullish.
+      // and the fix takes it with the read — leaving it would hand the author
+      // an unnecessary condition that no rule can fix for them. Every layer of
+      // type wrappers is asked (see typeWrapperLayers): the value under an `as`
+      // / `!` is what `scan` carries at run time (`[init!]` may still hold
+      // `undefined`), and a wider type a wrapper states is the author saying it
+      // may be nullish.
       const carriesNullish = [seed, element].some((node) =>
         typeWrapperLayers(node).some(isNullish),
       );

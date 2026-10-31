@@ -4,9 +4,9 @@ import type { BoolNot } from '../others/index.mjs';
  * Checks if a given type `T` is exactly the `any` type.
  *
  * It uses the `0 extends 1 & T` trick: `1 & T` collapses to a type that `0`
- * extends only when `T` is `any` (for any other type, `1 & T` is `1`, a
- * subtype of `1`, or `never`). This avoids conditional type distribution and
- * does not require writing `any` in the implementation.
+ * extends only when `T` is `any` (for any other type, `1 & T` is `1`, a subtype
+ * of `1`, or `never`). This avoids conditional type distribution and does not
+ * require writing `any` in the implementation.
  *
  * @template T - The type to check.
  * @returns `true` if `T` is `any`, `false` otherwise.

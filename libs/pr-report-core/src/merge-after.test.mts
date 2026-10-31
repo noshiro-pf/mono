@@ -51,9 +51,9 @@ describe(parseMergeAfter, () => {
     );
   });
 
-  // The fence markers and the column they sit in are what these two are
-  // about, so the fixtures are arrays of lines rather than a template
-  // literal: what `dedent` would remove is what is being tested.
+  // The fence markers and the column they sit in are what these two are about,
+  // so the fixtures are arrays of lines rather than a template literal: what
+  // `dedent` would remove is what is being tested.
   test('ignores a trailer inside a fenced code block', () => {
     assert.deepStrictEqual(
       parseMergeAfter(

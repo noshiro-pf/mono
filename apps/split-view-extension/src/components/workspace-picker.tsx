@@ -68,8 +68,8 @@ export const WorkspacePicker = memoNamed(
       setEditing((shown) => !shown);
     }, []);
 
-    // Switching is the one action that leaves the popover about something
-    // else, so it closes it; the rest are edits to the workspace it is open on.
+    // Switching is the one action that leaves the popover about something else,
+    // so it closes it; the rest are edits to the workspace it is open on.
     React.useEffect(() => {
       setEditing(false);
     }, [activeId]);
@@ -196,18 +196,18 @@ const WorkspaceEditor = memoNamed(
     const [draft, setDraft] = React.useState(entry.name);
 
     /**
-     * Whether deleting has been asked for once. A saved layout is not
-     * something to lose to a mis-click, and a second click is a cheaper guard
-     * than a modal.
+     * Whether deleting has been asked for once. A saved layout is not something
+     * to lose to a mis-click, and a second click is a cheaper guard than a
+     * modal.
      */
     const [confirming, setConfirming] = React.useState(false);
 
     /**
      * Bumped after a file is chosen, to replace the `input` element.
      *
-     * A file input holds on to what was chosen, so choosing the same file
-     * twice fires no second `change`. Replacing the element is the way to
-     * clear that without assigning to `value`.
+     * A file input holds on to what was chosen, so choosing the same file twice
+     * fires no second `change`. Replacing the element is the way to clear that
+     * without assigning to `value`.
      */
     const [importNonce, setImportNonce] = React.useState(0);
 

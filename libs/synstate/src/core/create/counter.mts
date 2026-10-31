@@ -1,6 +1,6 @@
 // Sumi bans classes, `this`, method syntax and writes to `this` outside a
-// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
-// so those rules are waived here (D-63).
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why), so
+// those rules are waived here (D-63).
 // @sumi-expect-error-file classes/no-class
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
@@ -12,9 +12,9 @@ import type { CounterObservable, TimerId } from '../types/index.mjs';
 
 /**
  * Creates an observable that emits incremental numbers at a specified interval.
- * Emits 0 in the macrotask right after `start()` (which runs at creation
- * unless `startManually` is set), then 1, 2, 3, ... every interval. A
- * subscriber added after that 0 has been emitted does not receive it.
+ * Emits 0 in the macrotask right after `start()` (which runs at creation unless
+ * `startManually` is set), then 1, 2, 3, ... every interval. A subscriber added
+ * after that 0 has been emitted does not receive it.
  *
  * @param intervalMilliSeconds - The interval duration in milliseconds
  * @param options - Optional settings

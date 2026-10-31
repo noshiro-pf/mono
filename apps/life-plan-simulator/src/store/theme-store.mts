@@ -1,6 +1,6 @@
 /**
- * The colour theme: light, dark, or whichever the system is set to. The
- * setting is this browser's, kept in localStorage, not the account's.
+ * The colour theme: light, dark, or whichever the system is set to. The setting
+ * is this browser's, kept in localStorage, not the account's.
  *
  * Dark is Blueprint's `bp6-dark` on `<body>`, which its style sheets and
  * `index.css` draw everything under.

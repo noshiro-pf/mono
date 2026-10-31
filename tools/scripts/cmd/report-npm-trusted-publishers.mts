@@ -27,8 +27,8 @@ import { projectRootPath } from '../project-root-path.mjs';
  * calling `GET /-/package/<pkg>/trust` directly, so that npm does the
  * authentication: the endpoint needs a logged-in account with 2FA, and npm is
  * what knows how to prompt for an OTP or open the web login. The first lookup
- * will usually ask for 2FA; tick "skip two-factor authentication for the next
- * 5 minutes" on the npm website and the rest go through without asking.
+ * will usually ask for 2FA; tick "skip two-factor authentication for the next 5
+ * minutes" on the npm website and the rest go through without asking.
  *
  * A workspace package is compared with what `release.yml` presents to npm —
  * {@link expectedConfig}. Anything else is only reported.
@@ -84,8 +84,8 @@ export const reportNpmTrustedPublishers = async (
  * hands each configuration to the output layer as an already stringified JSON
  * text, and in `--json` mode that layer keeps only the first non-object item
  * and stringifies it again — so what arrives is a JSON string whose content is
- * the JSON of the first configuration. This accepts that, a plain object and
- * an array alike, so a fix on npm's side does not break it. The registry only
+ * the JSON of the first configuration. This accepts that, a plain object and an
+ * array alike, so a fix on npm's side does not break it. The registry only
  * allows one configuration per package, so keeping the first loses nothing.
  */
 export const parseTrustListOutput = (
@@ -146,8 +146,8 @@ export const diffFromExpected = (config: TrustConfig): readonly string[] =>
     config.environment === expectedConfig.environment
       ? undefined
       : `environment is ${config.environment ?? '(none)'}`,
-    // A configuration made before npm had permissions carries none, and
-    // allows publishing.
+    // A configuration made before npm had permissions carries none, and allows
+    // publishing.
     config.permissions === undefined ||
     config.permissions.includes(PUBLISH_PERMISSION)
       ? undefined
@@ -289,8 +289,8 @@ const readPublishablePackageNames = async (): Promise<readonly string[]> => {
 };
 
 /**
- * Runs npm with stdin and stderr passed through, so that its OTP prompt and
- * web login URL reach the terminal while stdout is captured.
+ * Runs npm with stdin and stderr passed through, so that its OTP prompt and web
+ * login URL reach the terminal while stdout is captured.
  */
 const runNpm = (
   args: readonly string[],

@@ -228,11 +228,10 @@ const cmdResultToFiles = async ({
     ],
     {
       silent: options?.silent ?? false,
-      // Run git from the repository root so that `git ls-files` (which
-      // defaults to cwd-relative paths) and other commands return paths
-      // relative to the repository root, matching the `path.join(gitRoot, …)`
-      // computation below regardless of the caller's current working
-      // directory.
+      // Run git from the repository root so that `git ls-files` (which defaults
+      // to cwd-relative paths) and other commands return paths relative to the
+      // repository root, matching the `path.join(gitRoot, …)` computation below
+      // regardless of the caller's current working directory.
       cwd: gitRoot,
     },
   );

@@ -57,8 +57,8 @@ export const calcAll = ({
 
   /* 1. 彩度・明度を固定し色相を横軸としたときの相対輝度分布 */
 
-  // `Arr.max` returns `Optional`; the list is non-empty so it is always
-  // `Some`, and 0 is what the `isNonZero` guard below rejects anyway.
+  // `Arr.max` returns `Optional`; the list is non-empty so it is always `Some`,
+  // and 0 is what the `isNonZero` guard below rejects anyway.
   const maxLuminanceInList = Optional.unwrapOr(
     Arr.max(luminanceList),
     asNonNegativeFiniteNumber(0),
@@ -71,8 +71,8 @@ export const calcAll = ({
         : asNonNegativeFiniteNumber(0),
     );
 
-  // Type annotations are added to avoid
-  // "Type instantiation is excessively deep and possibly infinite." error
+  // Type annotations are added to avoid "Type instantiation is excessively deep
+  // and possibly infinite." error
   const relativeLuminanceDistribution = Arr.zip<
     NonEmptyArray<Hsl>,
     NonEmptyArray<NonNegativeFiniteNumber>

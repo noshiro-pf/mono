@@ -1,12 +1,12 @@
 /**
  * A scenario: a screen whose figures are derived from a few inputs through a
- * graph (with diamonds of many lengths, or where most changes stop partway),
- * as opposed to the table of js-framework-benchmark, where each row depends
- * on its own data only.
+ * graph (with diamonds of many lengths, or where most changes stop partway), as
+ * opposed to the table of js-framework-benchmark, where each row depends on its
+ * own data only.
  *
  * Every scenario computes many values and shows few of them ("compute big,
- * display small"), so that what is timed is mostly the propagation through
- * the graph rather than the DOM.
+ * display small"), so that what is timed is mostly the propagation through the
+ * graph rather than the DOM.
  */
 export type ScenarioFramework<App> = Readonly<{
   name: string;
@@ -19,8 +19,8 @@ export type ScenarioAppBase = Readonly<{ dispose: () => void }>;
 
 /**
  * A change to the inputs of a freshly mounted screen, and the change back.
- * Both are timed, alternately: they reach the same figures, so each costs
- * what the other does.
+ * Both are timed, alternately: they reach the same figures, so each costs what
+ * the other does.
  */
 export type ScenarioCase<App> = Readonly<{
   name: string;

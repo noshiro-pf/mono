@@ -12,8 +12,8 @@ const UNKNOWN_RECORD_MODULE = 'ts-type-forge';
 const UNKNOWN_RECORD_NAME = 'UnknownRecord';
 
 /**
- * Replaces `Readonly<Record<string, unknown>>`, `Record<string, unknown>`,
- * and index signatures `[k: string]: unknown` with `UnknownRecord`.
+ * Replaces `Readonly<Record<string, unknown>>`, `Record<string, unknown>`, and
+ * index signatures `[k: string]: unknown` with `UnknownRecord`.
  *
  * When a replacement occurs, also inserts
  * `import { type UnknownRecord } from 'ts-type-forge';` at the top of the

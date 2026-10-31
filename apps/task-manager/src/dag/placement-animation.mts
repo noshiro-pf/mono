@@ -1,7 +1,7 @@
 /**
  * The geometry of the DAG's placement animation: the nodes move in a short
- * tween to where they are put — from a plain grid, in the order they were
- * made, when the DAG is first shown, and from where they were after
+ * tween to where they are put — from a plain grid, in the order they were made,
+ * when the DAG is first shown, and from where they were after
  * 「自動整列」 or a layout saved elsewhere arriving. When it plays is the
  * store's (`dag-layout-store.mts`); this is where each node is at a time.
  */
@@ -16,9 +16,9 @@ import type { Point } from './pan-zoom.mjs';
 export const PLACEMENT_ANIMATION_MS = 700;
 
 /**
- * `nodes`, in the order given, in a grid about the shape of `frame` and
- * centred on it: along the rows when the graph grows to the right, down the
- * columns when it grows down.
+ * `nodes`, in the order given, in a grid about the shape of `frame` and centred
+ * on it: along the rows when the graph grows to the right, down the columns
+ * when it grows down.
  */
 export const initialGridPositions = (
   nodes: readonly LaidOutNode[],
@@ -73,8 +73,8 @@ export const easeOutCubic = (t: number): number =>
   1 - (1 - Num.clamp(t, 0, 1)) ** 3;
 
 /**
- * Each node of `to` a share `t` of the way there from where it is in
- * `from`; a node not in `from` is already there.
+ * Each node of `to` a share `t` of the way there from where it is in `from`; a
+ * node not in `from` is already there.
  */
 export const interpolatePositions = (
   from: ReadonlyMap<GraphNodeId, Point>,
@@ -96,9 +96,9 @@ export const interpolatePositions = (
   );
 
 /**
- * The opacity of each node of `to` a share `t` of the way there from what it
- * is in `from`; a node not in `from` is already there. For the nodes a view
- * mode does not show, which fade out of it and into the next.
+ * The opacity of each node of `to` a share `t` of the way there from what it is
+ * in `from`; a node not in `from` is already there. For the nodes a view mode
+ * does not show, which fade out of it and into the next.
  */
 export const interpolateOpacities = (
   from: ReadonlyMap<GraphNodeId, number>,

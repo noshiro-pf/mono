@@ -2,12 +2,12 @@
  * What GitHub says is left of the GraphQL budget this page is spending.
  *
  * Worth showing rather than assuming: the budget belongs to the token's
- * account, not to the page, so whatever else that account does with GraphQL
- * — `gh` included — spends the same 5,000 points an hour, and a number on
- * screen is the difference between that and "the page is broken".
+ * account, not to the page, so whatever else that account does with GraphQL —
+ * `gh` included — spends the same 5,000 points an hour, and a number on screen
+ * is the difference between that and "the page is broken".
  *
- * GitHub names these headers in `Access-Control-Expose-Headers`, which is
- * what makes them readable from a page served somewhere else.
+ * GitHub names these headers in `Access-Control-Expose-Headers`, which is what
+ * makes them readable from a page served somewhere else.
  */
 
 import { Num, Result } from 'ts-data-forge';
@@ -23,9 +23,9 @@ export type RateLimit = Readonly<{
 }>;
 
 /**
- * Absent rather than guessed when GitHub says nothing, which is what a
- * response from a cache or a test double looks like. The page shows nothing
- * in that case instead of claiming a budget it has not been told about.
+ * Absent rather than guessed when GitHub says nothing, which is what a response
+ * from a cache or a test double looks like. The page shows nothing in that case
+ * instead of claiming a budget it has not been told about.
  */
 export const readRateLimit = (headers: Headers): RateLimit | undefined => {
   const remaining = readCount(headers, 'x-ratelimit-remaining');
@@ -54,16 +54,16 @@ export const isRunningLow = (rateLimit: RateLimit): boolean =>
 export type BudgetSample = Readonly<{ rateLimit: RateLimit; atMs: number }>;
 
 /**
- * How often to read so that the page spends about half of the account's
- * budget — what reading every {@link POLL_INTERVAL_MS} spends on this
- * repository — measured by what the budget went down by between two reads:
+ * How often to read so that the page spends about half of the account's budget
+ * — what reading every {@link POLL_INTERVAL_MS} spends on this repository —
+ * measured by what the budget went down by between two reads:
  * a larger repository costs more a read, and is read less often rather than
  * spending the whole budget, never less often than
  * {@link MAX_POLL_INTERVAL_MS}. Anything else the account spends in between
  * counts too, which slows the page rather than the account's other work.
  *
- * The interval it has, when the two say nothing about the cost: no read
- * before, a window that refilled in between, or no time between them.
+ * The interval it has, when the two say nothing about the cost: no read before,
+ * a window that refilled in between, or no time between them.
  */
 export const pollIntervalFor = ({
   intervalMs,
@@ -94,8 +94,8 @@ export const pollIntervalFor = ({
     previous.rateLimit.remaining - current.rateLimit.remaining,
   );
 
-  // What one read costs, over what an hour allows, is the share of an hour
-  // a read has to be apart from the next.
+  // What one read costs, over what an hour allows, is the share of an hour a
+  // read has to be apart from the next.
   const wantedMs = Num.div(
     Num.div(spent * intervalMs, elapsedMs) * MS_PER_HOUR,
     allowedPerHour,
@@ -131,7 +131,7 @@ const readCount = (headers: Headers, header: string): number | undefined => {
 
   const value = Result.unwrapOkOr(Num.safeParseInt(raw), Number.NaN);
 
-  // `parseInt` answers `NaN` for a header that is present and not a number,
-  // and this is a value the page does arithmetic with.
+  // `parseInt` answers `NaN` for a header that is present and not a number, and
+  // this is a value the page does arithmetic with.
   return Number.isSafeInteger(value) && value >= 0 ? value : undefined;
 };

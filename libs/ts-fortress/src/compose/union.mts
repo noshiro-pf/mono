@@ -50,29 +50,29 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
   type T = UnionTypeValue<Types>;
 
   /**
-   * Where `fill` and `defaultValue` come from when the value is not a member
-   * of the union: the explicit `defaultType`, else the first member.
+   * Where `fill` and `defaultValue` come from when the value is not a member of
+   * the union: the explicit `defaultType`, else the first member.
    *
    * Deferred like every other default-value source in the package, and
-   * deliberately so although nothing here needs it: both operands exist by
-   * the time `union` is called, so this one would hold a plain `const`. The
-   * types whose default is built from *another* type's cannot — `record`
-   * reads each member's `defaultValue`, `tuple` and the length-constrained
-   * arrays read the element's, `recursion` calls the definition — and for a
-   * type defined in terms of itself, forcing that at construction does not
-   * terminate. One shape across all of them is easier to trust than a
+   * deliberately so although nothing here needs it: both operands exist by the
+   * time `union` is called, so this one would hold a plain `const`. The types
+   * whose default is built from *another* type's cannot — `record` reads each
+   * member's `defaultValue`, `tuple` and the length-constrained arrays read the
+   * element's, `recursion` calls the definition — and for a type defined in
+   * terms of itself, forcing that at construction does not terminate. One shape
+   * across all of them is easier to trust than a
    * per-constructor judgement about which reads are safe to make eager.
    *
-   * Only `defaultValue` and `fill` are ever read, and both are covariant in
-   * the value type, so the assertion widens rather than lies — the first
-   * member's default value *is* one of the union's values. The compiler
-   * cannot see that: `types[0]` resolves against the bound
+   * Only `defaultValue` and `fill` are ever read, and both are covariant in the
+   * value type, so the assertion widens rather than lies — the first member's
+   * default value *is* one of the union's values. The compiler cannot see that:
+   * `types[0]` resolves against the bound
    * `readonly [UnknownType, ...UnknownType[]]`, so which member it is has
    * already been erased to `Type<unknown>` here.
    *
    * Asserting the whole `UnionType<Types>` instead would be unsound, because
-   * that also promises `is` and `prune`, and the first member answers both
-   * only for its own values.
+   * that also promises `is` and `prune`, and the first member answers both only
+   * for its own values.
    */
   type DefaultSource = StrictPick<Type<T>, 'defaultValue' | 'fill'>;
 
@@ -87,9 +87,9 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
     options?.typeName ?? `(${toUnionString(types.map((a) => a.typeName))})`;
 
   /**
-   * A union nested directly inside this one contributes its own members
-   * instead of itself. `A | (B | C)` and `A | B | C` describe the same set of
-   * values, so this changes nothing about what the union accepts.
+   * A union nested directly inside this one contributes its own members instead
+   * of itself. `A | (B | C)` and `A | B | C` describe the same set of values,
+   * so this changes nothing about what the union accepts.
    *
    * It was introduced for the error path. Reporting the member closest to a
    * rejected value starts by filing each member under a single runtime type
@@ -99,11 +99,11 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
    * all and the union falls back to listing the categories it accepts.
    * Flattened, the `42` member competes on its own and is reported.
    *
-   * Two things deliberately stay unflattened: `typeName` and the member
-   * listing use the members as they were written, so a nested union that
-   * carries a name of its own keeps it; and a `recursion` member's
-   * `structure` is a `recursion`, read without running its definition, so a
-   * type defined in terms of itself stays a single opaque member.
+   * Two things deliberately stay unflattened: `typeName` and the member listing
+   * use the members as they were written, so a nested union that carries a name
+   * of its own keeps it; and a `recursion` member's `structure` is a
+   * `recursion`, read without running its definition, so a type defined in
+   * terms of itself stays a single opaque member.
    *
    * See `documents/union-closest-member-heuristic.md`.
    */
@@ -134,9 +134,9 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
       ]);
     }
 
-    // The member listing is too long to be a readable error message, so
-    // narrow the report down to the members whose runtime type category
-    // (derived from each member's default value) matches the value.
+    // The member listing is too long to be a readable error message, so narrow
+    // the report down to the members whose runtime type category (derived from
+    // each member's default value) matches the value.
     const actualCategory = runtimeTypeNameOf(a);
 
     const candidates = memberTypes
@@ -227,13 +227,13 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
 /**
  * How close a member is to a value it rejected.
  *
- * `score` is the number of checks the member failed minus the number it
- * passed, so a member is credited for what the value does satisfy. Plain error
- * counting would let a small unrelated member (one missing key) outrank a large
- * member the value nearly satisfies (two wrong fields out of ten), while a
- * ratio would do the opposite and let a large member win with a long list of
- * errors just because it also has many keys. Subtracting keeps both the failed
- * and the passed checks in absolute terms.
+ * `score` is the number of checks the member failed minus the number it passed,
+ * so a member is credited for what the value does satisfy. Plain error counting
+ * would let a small unrelated member (one missing key) outrank a large member
+ * the value nearly satisfies (two wrong fields out of ten), while a ratio would
+ * do the opposite and let a large member win with a long list of errors just
+ * because it also has many keys. Subtracting keeps both the failed and the
+ * passed checks in absolute terms.
  *
  * Members with the same score are ordered by how much they satisfied, so the
  * one that recognized more of the value comes first.

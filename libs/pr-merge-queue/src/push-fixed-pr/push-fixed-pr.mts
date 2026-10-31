@@ -39,20 +39,20 @@ export const PUSH_FIXED_PR_HELP = [
 /**
  * Hands a fixed pull request back to the worker: pushes the commit a session
  * made onto the branch it claimed, under `skip-ci`, and carries the layers
- * stacked on it along — with the worker's own code (`pushLeased`, `restack`
- * in `unblock-prs/rebase.mts`), so that a session's push is the push the
- * worker would have made.
+ * stacked on it along — with the worker's own code (`pushLeased`, `restack` in
+ * `unblock-prs/rebase.mts`), so that a session's push is the push the worker
+ * would have made.
  *
  * ```sh
  * push-fixed-pr 2267 --by <session URL> --head <commit>
  * ```
  *
  * It refuses unless the pull request is a skill's (`pr-report-core`'s
- * `queue-owner.mts`, read as every other command reads it) and the claim on
- * it is `--by`'s: the claim is what kept the worker off it, and its head is
- * the lease. `<commit>` is the fix, already in this repository's objects —
- * any worktree of it will do. The push moves the head, which ends the claim
- * and resolves the set-aside: from then on the pull request is the worker's.
+ * `queue-owner.mts`, read as every other command reads it) and the claim on it
+ * is `--by`'s: the claim is what kept the worker off it, and its head is the
+ * lease. `<commit>` is the fix, already in this repository's objects — any
+ * worktree of it will do. The push moves the head, which ends the claim and
+ * resolves the set-aside: from then on the pull request is the worker's.
  */
 export const pushFixedPr = async (
   args: PushArgs,
@@ -132,8 +132,8 @@ export const pushFixedPr = async (
 
 /**
  * Whether `by` may push `head` to pull request `number`, and what that
- * involves: the lease, whether `skip-ci` has to go on first, and the layers
- * to carry along, lowest first. `generated` is the repository's
+ * involves: the lease, whether `skip-ci` has to go on first, and the layers to
+ * carry along, lowest first. `generated` is the repository's
  * `generatedBranches`: a conflict on one of those is resolved by its own
  * `rebuild`, not by a push.
  */

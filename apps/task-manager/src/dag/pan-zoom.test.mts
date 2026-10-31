@@ -119,8 +119,8 @@ describe(fitBoundsTransform, () => {
 
     assert.deepStrictEqual(fitted, { x: 50, y: 100, scale: 0.5 });
 
-    // The box's corners land on the screen where `fitViewTransform` puts a
-    // box at the origin.
+    // The box's corners land on the screen where `fitViewTransform` puts a box
+    // at the origin.
     assert.deepStrictEqual(toScreen(fitted, -100, 50), [0, 125]);
 
     assert.deepStrictEqual(toScreen(fitted, 900, 550), [500, 375]);

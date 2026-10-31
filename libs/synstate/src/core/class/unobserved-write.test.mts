@@ -6,8 +6,8 @@ import { debounce, map, switchMap } from '../operators/index.mjs';
 import { writeDuringPropagationWarning } from './root-observable-class.mjs';
 
 // A write to an observable with no child and no subscriber stores the value
-// without opening an update (`ManagerObservableClass.startUpdate`). These
-// pin what that must not change.
+// without opening an update (`ManagerObservableClass.startUpdate`). These pin
+// what that must not change.
 describe('a write nothing observes', () => {
   test('is held, and a later subscriber receives the last one', () => {
     const s$ = source<number>(0);
@@ -98,8 +98,8 @@ describe('a write nothing observes', () => {
 
     a$.next(6);
 
-    // merge passes on the parents that emitted in an update: only b$, then
-    // only a$, never the value a$ was given while nothing observed it.
+    // merge passes on the parents that emitted in an update: only b$, then only
+    // a$, never the value a$ was given while nothing observed it.
     assert.deepStrictEqual(mut_merged, [1, 6]);
 
     assert.deepStrictEqual(mut_derived, [

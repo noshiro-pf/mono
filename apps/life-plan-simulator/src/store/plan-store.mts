@@ -1,13 +1,13 @@
 /**
  * The plans of whoever is signed in, which one is open, and its inputs.
  *
- * Follows the session: signing in subscribes to that user's repository,
- * signing out drops it. Writes go to the repository and come back through
- * the subscription — the repository hands local writes back at once, so
- * there is one way the plans change, not two. The plan open is the one last
- * chosen on this device, or the first when that one is gone; its inputs are
- * handed on only when they differ, so a change to another plan does not
- * recompute this one.
+ * Follows the session: signing in subscribes to that user's repository, signing
+ * out drops it. Writes go to the repository and come back through the
+ * subscription — the repository hands local writes back at once, so there is
+ * one way the plans change, not two. The plan open is the one last chosen on
+ * this device, or the first when that one is gone; its inputs are handed on
+ * only when they differ, so a change to another plan does not recompute this
+ * one.
  */
 
 import {
@@ -61,8 +61,8 @@ export type PlanStore = Readonly<{
   /** Copies the open plan, and opens the copy. */
   duplicatePlan: () => void;
   /**
-   * Creates a plan with these inputs, read from a file, and opens it. Without
-   * a name it gets the one {@link createPlan} would give.
+   * Creates a plan with these inputs, read from a file, and opens it. Without a
+   * name it gets the one {@link createPlan} would give.
    */
   addPlan: (name: string | undefined, input: SimulationInput) => void;
   renamePlan: (name: string) => void;
@@ -285,10 +285,10 @@ const repositoryOf = (s: Session): PlanRepository | undefined =>
   s.type === 'signed-in' ? s.repository : undefined;
 
 /**
- * What `subscribe` hands `next`, as an observable whose value is `first`
- * until then. What it hands while it is being subscribed to — the memory
- * repository hands its plans at once — is the observable's initial value
- * rather than a write.
+ * What `subscribe` hands `next`, as an observable whose value is `first` until
+ * then. What it hands while it is being subscribed to — the memory repository
+ * hands its plans at once — is the observable's initial value rather than a
+ * write.
  */
 const fromFeed = <A,>(
   first: A,

@@ -132,8 +132,8 @@ describe(summarizeChecks, () => {
 
   // #2463: `skip-ci` came off while the round it was put on for was still
   // being cancelled, so that round's aggregate went red 22 seconds after the
-  // new round's first check started. Its workflow's own new run, queued
-  // behind it by the concurrency group, is what says it is the round before.
+  // new round's first check started. Its workflow's own new run, queued behind
+  // it by the concurrency group, is what says it is the round before.
   test('waits on a required check whose workflow has a newer run still running', () => {
     const summary = summarizeChecks(
       [
@@ -274,10 +274,10 @@ describe(summarizeChecks, () => {
     assert.deepStrictEqual(summary.failed, ['code-check-result / result']);
   });
 
-  // The worker arms a pull request it judges green, and an armed pull
-  // request stacked on a branch no ruleset covers merges into it at once.
-  // So a required context that has not reported is waited for wherever the
-  // pull request points, unlike in `pr-report`'s `notRun`.
+  // The worker arms a pull request it judges green, and an armed pull request
+  // stacked on a branch no ruleset covers merges into it at once.
+  // So a required context that has not reported is waited for wherever the pull
+  // request points, unlike in `pr-report`'s `notRun`.
   test('waits on a required context that has not reported, whatever the base', () => {
     const summary = summarizeChecks([check('no-skip-ci-label')], required, []);
 

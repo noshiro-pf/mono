@@ -2,8 +2,8 @@ import type { Err, Ok } from '../../../adt-types.mjs';
 import type { UnknownResult } from '../result.mjs';
 
 /**
- * Extracts the success value type `S` from a `Result.Ok<S>`. If the `Result`
- * is `Result.Err<E>`, resolves to `never`.
+ * Extracts the success value type `S` from a `Result.Ok<S>`. If the `Result` is
+ * `Result.Err<E>`, resolves to `never`.
  *
  * @template R The `UnknownResult` type to unwrap.
  */
@@ -11,8 +11,8 @@ export type UnwrapOk<R extends UnknownResult> =
   R extends Ok<infer S> ? S : never;
 
 /**
- * Extracts the error value type `E` from a `Result.Err<E>`. If the `Result`
- * is `Result.Ok<S>`, resolves to `never`.
+ * Extracts the error value type `E` from a `Result.Err<E>`. If the `Result` is
+ * `Result.Ok<S>`, resolves to `never`.
  *
  * @template R The `UnknownResult` type to unwrap.
  */

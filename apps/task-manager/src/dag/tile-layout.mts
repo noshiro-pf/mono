@@ -1,12 +1,12 @@
 /**
  * 「タイル」's layout: the tasks alone, with no edges, in rows from the top
- * left across the width of the canvas, as many to a row as fit and wrapping
- * to the next, in the order the diagrams share (`diagram-order.mts`). The
- * view is never zoomed and is read by scrolling down (`tile-scroll.mts`).
+ * left across the width of the canvas, as many to a row as fit and wrapping to
+ * the next, in the order the diagrams share (`diagram-order.mts`). The view is
+ * never zoomed and is read by scrolling down (`tile-scroll.mts`).
  *
- * The positions follow from the data and the width of the canvas, so they
- * are never saved and nobody moves a node; a change of width moves them to
- * their new rows.
+ * The positions follow from the data and the width of the canvas, so they are
+ * never saved and nobody moves a node; a change of width moves them to their
+ * new rows.
  */
 
 import { Num } from 'ts-data-forge';
@@ -22,8 +22,8 @@ export const TILE_NODE_GAP = 16;
 export const TILE_MARGIN = 16;
 
 /**
- * How many nodes `nodeWidth` wide fit across `available`, `gap` apart: at
- * least one, which a canvas narrower than a node still shows.
+ * How many nodes `nodeWidth` wide fit across `available`, `gap` apart: at least
+ * one, which a canvas narrower than a node still shows.
  */
 export const tileColumns = (
   nodeWidth: number,
@@ -64,8 +64,8 @@ export const tileAvailableWidth = (canvasWidth: number): number =>
 
 /**
  * The tasks `ids`, in the diagrams' order (`diagramTaskIds`), in rows
- * `available` wide, each the size of a task at `nodeSize` — the smaller,
- * the more to a row; none while the width of the canvas is not known.
+ * `available` wide, each the size of a task at `nodeSize` — the smaller, the
+ * more to a row; none while the width of the canvas is not known.
  */
 export const tileDiagramNodes = (
   ids: readonly GraphNodeId[],

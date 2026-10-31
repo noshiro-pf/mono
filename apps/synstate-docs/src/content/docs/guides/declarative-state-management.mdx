@@ -261,12 +261,12 @@ const [filterEmail, setFilterEmail] = createState('');
 const [filterGender, setFilterGender] = createState('');
 const [itemsPerPage, setItemsPerPage] = createState(10);
 
-// A page request is an event: asking for page 2 again after a reset must
-// reach the table, which a state would drop as equal to the value it holds
+// A page request is an event: asking for page 2 again after a reset must reach
+// the table, which a state would drop as equal to the value it holds
 const [pageRequest, requestPage] = createValueEmitter<number>();
 
-// Fetch table data from server
-// fromPromise emits Result.Ok(rows) on success, Result.Err(error) on failure
+// Fetch table data from server fromPromise emits Result.Ok(rows) on success,
+// Result.Err(error) on failure
 const tableDataResult = fromPromise(
     fetch('/api/rows').then((r) => {
         if (!r.ok) {

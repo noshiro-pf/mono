@@ -47,11 +47,11 @@ const greetingGraceMs = 800;
  * it stops and says so.
  *
  * Two: one clear is what the ordinary case needs, and the second covers the
- * clear that arrives too early — a worker registered while the page was
- * loading is not there yet when the clear runs, so the load after it is
- * answered from the worker after all. Past that, the thing keeping the pane
- * from loading is not a worker, and a pane that reloads every second is worse
- * than a pane that says it did not load.
+ * clear that arrives too early — a worker registered while the page was loading
+ * is not there yet when the clear runs, so the load after it is answered from
+ * the worker after all. Past that, the thing keeping the pane from loading is
+ * not a worker, and a pane that reloads every second is worse than a pane that
+ * says it did not load.
  */
 const maxAutomaticClears = 2;
 
@@ -59,9 +59,9 @@ const maxAutomaticClears = 2;
  * The backstop, for a frame that does not even get as far as loading.
  *
  * A request the server never answers has no `load` event to read, and neither
- * has an address Chrome refuses to navigate to — it keeps the frame on
- * whatever it was showing. Long, because all that is being waited for here is
- * the first byte.
+ * has an address Chrome refuses to navigate to — it keeps the frame on whatever
+ * it was showing. Long, because all that is being waited for here is the first
+ * byte.
  */
 const noAnswerTimeoutMs = 10_000;
 
@@ -139,8 +139,8 @@ const PaneMenuItem = memoNamed(
  * The width at which a pane's toolbar stops holding everything.
  *
  * Below it the zoom controls, the sandbox toggle, the split buttons and "open
- * in a new tab" move into the menu. Above it they are inline and the menu
- * holds only what is always in it.
+ * in a new tab" move into the menu. Above it they are inline and the menu holds
+ * only what is always in it.
  */
 const compactPaneWidthPx = 440;
 
@@ -251,8 +251,7 @@ export const PaneFrame = memoNamed(
     const [fallbackDismissed, setFallbackDismissed] = React.useState(false);
 
     /**
-     * Automatic service-worker clears made since the last document that
-     * loaded.
+     * Automatic service-worker clears made since the last document that loaded.
      *
      * A budget, because a site that registers its worker on every visit turns
      * the automatic clear into a loop otherwise: the clear gets the page back,
@@ -290,9 +289,9 @@ export const PaneFrame = memoNamed(
     const mut_leavingFor = React.useRef<string | undefined>(undefined);
 
     /**
-     * Loads the pane afresh, in a new element: at the address a link was
-     * taking it to when the frame said so, and at the last address it
-     * reported otherwise.
+     * Loads the pane afresh, in a new element: at the address a link was taking
+     * it to when the frame said so, and at the last address it reported
+     * otherwise.
      *
      * The document that failed is the one a link led to, so reloading the last
      * page that reported would put the user back where they clicked.
@@ -686,9 +685,9 @@ export const PaneFrame = memoNamed(
 
     // A helper frame that never answers — its address answered by the site's
     // worker as well, or not reachable at all — is given up on, so that the
-    // pane says it did not load instead of waiting on it for good. Nothing
-    // else ends the wait: the button to clear again would set the address the
-    // helper already has.
+    // pane says it did not load instead of waiting on it for good. Nothing else
+    // ends the wait: the button to clear again would set the address the helper
+    // already has.
     React.useEffect(() => {
       if (resetUrl === undefined) {
         return undefined;
@@ -779,18 +778,17 @@ export const PaneFrame = memoNamed(
     /**
      * Zoom, as `zoom` rather than as a `transform`.
      *
-     * Measured, because the two look the same on paper: with a scale
-     * transform the frame's renderer rasterizes at 1x and the compositor
-     * stretches the result — `devicePixelRatio` inside the frame stays 1 and
-     * the text is soft. `zoom` on the element propagates into the frame as an
-     * effective zoom, so `devicePixelRatio` there becomes the zoom and the
-     * page is rasterized at that scale, which is what the browser's own zoom
-     * does.
+     * Measured, because the two look the same on paper: with a scale transform
+     * the frame's renderer rasterizes at 1x and the compositor stretches the
+     * result — `devicePixelRatio` inside the frame stays 1 and the text is
+     * soft. `zoom` on the element propagates into the frame as an effective
+     * zoom, so `devicePixelRatio` there becomes the zoom and the page is
+     * rasterized at that scale, which is what the browser's own zoom does.
      *
      * The layout is the same either way: percentages resolve in the zoomed
-     * space, so `width: 100%` still fills the pane and the site is laid out
-     * for the viewport it appears to have — narrower as you zoom in, wider as
-     * you zoom out.
+     * space, so `width: 100%` still fills the pane and the site is laid out for
+     * the viewport it appears to have — narrower as you zoom in, wider as you
+     * zoom out.
      */
     const frameStyle = React.useMemo<React.CSSProperties>(
       () => (pane.zoom === 1 ? {} : { zoom: pane.zoom }),
@@ -871,8 +869,8 @@ export const PaneFrame = memoNamed(
      *
      * The two service-worker actions are in it whatever the pane's width,
      * because they are rare, they are hard to label in an icon, and a menu row
-     * has room to say what they do. The rest of it is what a narrow pane has
-     * no room for inline.
+     * has room to say what they do. The rest of it is what a narrow pane has no
+     * room for inline.
      */
     const menuItems = React.useMemo<readonly PaneMenuAction[]>(
       () => [

@@ -6,8 +6,8 @@ import { followModal } from './follow-modal.mjs';
 /**
  * 「読み込む」 of a project file (`project-file-store.mts`): what replacing
  * the project with it means, asked before anything is written; why a file
- * cannot be read; and that it is being written, which goes on if it is
- * closed. A native `<dialog>` as the node's is (`node-dialog.tsx`).
+ * cannot be read; and that it is being written, which goes on if it is closed.
+ * A native `<dialog>` as the node's is (`node-dialog.tsx`).
  */
 export const ProjectImportDialog = (): JSX.Element => (
   <dialog

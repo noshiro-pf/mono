@@ -6,10 +6,11 @@ import * as ts from 'typescript';
  * re-exports it.
  *
  * Answered from the import and export declarations of every file in the
- * program, nothing more, and it errs towards "used" wherever they do not
- * decide it: a non-type import counts as a value use whatever the importer does
- * with it, and a namespace or a module that leaves the file whole (a dynamic
- * `import()`, `export { ns }`, `f(ns)`) uses every export. A type-only import or
+ * program, nothing more, and it errs towards "used" wherever they do not decide
+ * it: a non-type import counts as a value use whatever the importer does with
+ * it, and a namespace or a module that leaves the file whole (a dynamic
+ * `import()`, `export { ns }`, `f(ns)`) uses every export. A type-only import
+ * or
  * re-export is never a use. A re-export is followed to what imports the
  * re-exporting file, so a barrel is transparent.
  *
@@ -51,9 +52,9 @@ type NamespaceImportEdge = Readonly<{
 type NamespaceMembers = ReadonlySet<string> | 'all';
 
 /**
- * Keyed by the program, so that every file one program lints shares one scan
- * of the import declarations, and an edit that yields a new program yields a
- * new scan.
+ * Keyed by the program, so that every file one program lints shares one scan of
+ * the import declarations, and an edit that yields a new program yields a new
+ * scan.
  */
 const importEdgesCache = new WeakMap<
   ts.Program,
@@ -396,8 +397,8 @@ const importEdges = (
       collectStatementEdges(sourceFile, statement, add);
     }
 
-    // Walking the whole file is the expensive part, so only the files that
-    // can contain a call worth finding pay for it.
+    // Walking the whole file is the expensive part, so only the files that can
+    // contain a call worth finding pay for it.
     if (DYNAMIC_IMPORT_PATTERN.test(sourceFile.text)) {
       collectDynamicImportEdges(sourceFile, add);
     }

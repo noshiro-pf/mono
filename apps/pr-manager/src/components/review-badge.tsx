@@ -13,10 +13,10 @@ type Props = Readonly<{ review: Bindable<CodeOwnerReview> }>;
 /**
  * Whether the pull request waits for a code owner to approve it.
  *
- * `main`'s ruleset asks for no approvals in general, but for a code owner's
- * on the paths `CODEOWNERS` lists — so a pull request touching one stays
- * green and never merges, and nothing on it says why. Shown only when that is
- * the case, or when it cannot be told.
+ * `main`'s ruleset asks for no approvals in general, but for a code owner's on
+ * the paths `CODEOWNERS` lists — so a pull request touching one stays green and
+ * never merges, and nothing on it says why. Shown only when that is the case,
+ * or when it cannot be told.
  */
 export const ReviewBadge = ({ review }: Props): JSX.Element => (
   <If

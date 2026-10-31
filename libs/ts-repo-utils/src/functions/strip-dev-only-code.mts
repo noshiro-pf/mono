@@ -11,11 +11,11 @@ import { glob } from './glob.mjs';
  * The source files of the libraries in this repository carry code that only
  * exists for the type checker and the test runner: `expectType<A, B>('=')`
  * assertions, the `if (<import.meta>.vitest !== undefined) { ... }` blocks
- * holding in-source tests, and calls to identity functions such as `castMutable`
- * whose only purpose is to change the static type of their argument. The
- * compiler emits all of it as-is. This pass removes it from the emitted
- * `.mjs`, so that a bundler and its tree-shaking are not needed to keep it
- * out of the published package.
+ * holding in-source tests, and calls to identity functions such as
+ * `castMutable` whose only purpose is to change the static type of their
+ * argument. The compiler emits all of it as-is. This pass removes it from the
+ * emitted `.mjs`, so that a bundler and its tree-shaking are not needed to keep
+ * it out of the published package.
  *
  * What is removed:
  *
@@ -45,10 +45,10 @@ import { glob } from './glob.mjs';
  *   read by nobody and is most of the file. A `#!` line and the pragma
  *   comments (`//# sourceMappingURL=`) are kept.
  *
- * The pass never rewrites the tree. It walks it, collects `[start, end)`
- * ranges of text to erase, and erases them all at the end. Two kinds of range
- * come out of that walk, and the difference between them matters to anything
- * that goes on to ask whether a node survived:
+ * The pass never rewrites the tree. It walks it, collects `[start, end)` ranges
+ * of text to erase, and erases them all at the end. Two kinds of range come out
+ * of that walk, and the difference between them matters to anything that goes
+ * on to ask whether a node survived:
  *
  * - A **whole-node** range covers a node completely. Every removed statement
  *   is one of these.
@@ -61,17 +61,17 @@ import { glob } from './glob.mjs';
  * different questions, and only the second one is safe to prune imports by.
  * See {@link isErasedBy} and {@link isNodeErasedBy}.
  *
- * Every line break is kept when a range is removed, so the line numbers of
- * the output are the line numbers of the input and the source map the
- * compiler emitted for the file stays valid line for line. What follows a
- * removed range on the same line shifts left, and a line something was
- * erased from loses the whitespace that erasing left at its end.
+ * Every line break is kept when a range is removed, so the line numbers of the
+ * output are the line numbers of the input and the source map the compiler
+ * emitted for the file stays valid line for line. What follows a removed range
+ * on the same line shifts left, and a line something was erased from loses the
+ * whitespace that erasing left at its end.
  *
- * It fails rather than leaving something behind: a removable call in a
- * position it cannot remove (`() => expectType('=')`, an argument, an
- * operand) or a `<import.meta>.vitest` outside the guard it recognizes is
- * reported as an error, so that a shape the pass does not know about breaks
- * the build instead of shipping.
+ * It fails rather than leaving something behind: a removable call in a position
+ * it cannot remove (`() => expectType('=')`, an argument, an operand) or a
+ * `<import.meta>.vitest` outside the guard it recognizes is reported as an
+ * error, so that a shape the pass does not know about breaks the build instead
+ * of shipping.
  *
  * (`<import.meta>.vitest` stands for that property access written out: this
  * module must not contain it verbatim, because Vitest takes any source file
@@ -119,8 +119,8 @@ export const stripDevOnlyCode = (
     return Result.err(leftover);
   }
 
-  // Only the statement ranges here: a call inside a removed statement needs
-  // no unwrapping, and every one of those ranges covers a whole node, so a
+  // Only the statement ranges here: a call inside a removed statement needs no
+  // unwrapping, and every one of those ranges covers a whole node, so a
   // position test answers the question.
   const calleeRanges = collectUnwrappedCallees(
     sourceFile,
@@ -209,8 +209,8 @@ export const stripDevOnlyCodeInDir = async (
 
 export type StripDevOnlyCodeOptions = Readonly<{
   /**
-   * Functions whose call statements are removed, by the name they are called
-   * by in the emitted code (`expectType`, say). A call to one of these in any
+   * Functions whose call statements are removed, by the name they are called by
+   * in the emitted code (`expectType`, say). A call to one of these in any
    * other position is an error. Only list functions whose arguments have no
    * side effects to lose: the whole statement goes, arguments included.
    */
@@ -219,20 +219,20 @@ export type StripDevOnlyCodeOptions = Readonly<{
   /**
    * Identity functions whose calls are replaced by their single argument
    * (`castMutable`, say). Only list functions that return their argument
-   * unchanged: a function that validates at runtime, such as a branded
-   * number's `asUint32`, is not one of these.
+   * unchanged: a function that validates at runtime, such as a branded number's
+   * `asUint32`, is not one of these.
    */
   unwrapIdentityCalls: readonly string[];
 
   /**
-   * Whether to remove the comments as well. The JSDoc the compiler copies
-   * into the JavaScript is the same text it puts in the `.d.mts`, which is
-   * where an editor reads it from, so the copy in the JavaScript is dead
-   * weight — two thirds of `ts-data-forge`'s, measured. `removeComments` in
-   * the compiler cannot be used for this: it strips the `.d.mts` too.
+   * Whether to remove the comments as well. The JSDoc the compiler copies into
+   * the JavaScript is the same text it puts in the `.d.mts`, which is where an
+   * editor reads it from, so the copy in the JavaScript is dead weight — two
+   * thirds of `ts-data-forge`'s, measured. `removeComments` in the compiler
+   * cannot be used for this: it strips the `.d.mts` too.
    *
-   * Unlike the two lists above this has a default, because it says what to
-   * do rather than what this repository's functions mean.
+   * Unlike the two lists above this has a default, because it says what to do
+   * rather than what this repository's functions mean.
    *
    * @default false
    */
@@ -256,8 +256,8 @@ type IsNodeErased = (start: number, end: number) => boolean;
 /**
  * Whether the character at `pos` is erased.
  *
- * Read as "is this node gone?" this is only correct where every range covers
- * a whole node, which is true of the statement ranges and of nothing else.
+ * Read as "is this node gone?" this is only correct where every range covers a
+ * whole node, which is true of the statement ranges and of nothing else.
  * {@link isNodeErasedBy} is the one to reach for otherwise.
  */
 const isErasedBy =
@@ -269,9 +269,9 @@ const isErasedBy =
  * Whether a node is erased in its entirety, rather than merely beginning in
  * erased text.
  *
- * Unwrapping an identity call is what makes the two different, because the
- * part it erases is the part the node starts with. Written out with the
- * positions of `castMutable(newArray(n))`:
+ * Unwrapping an identity call is what makes the two different, because the part
+ * it erases is the part the node starts with. Written out with the positions of
+ * `castMutable(newArray(n))`:
  *
  * ```text
  * castMutable(newArray(n))
@@ -281,14 +281,14 @@ const isErasedBy =
  *
  * The call node spans `[0, 24)` and so begins at 0, inside the first erased
  * range — while `newArray` at 12 goes on to the output untouched. A walk that
- * skips a subtree whenever the subtree *starts* in erased text therefore
- * never reaches the argument, and every name the argument uses comes back
+ * skips a subtree whenever the subtree *starts* in erased text therefore never
+ * reaches the argument, and every name the argument uses comes back
  * unreferenced.
  *
  * That is precisely how the pruning below deleted the `newArray` import out
- * from under the call that still made it. Nothing downstream noticed: the
- * type check reads `src/`, where the import is still written, and only the
- * built module is missing it, so the first `Arr.scan` call at run time threw
+ * from under the call that still made it. Nothing downstream noticed: the type
+ * check reads `src/`, where the import is still written, and only the built
+ * module is missing it, so the first `Arr.scan` call at run time threw
  * `ReferenceError: newArray is not defined`.
  */
 const isNodeErasedBy =
@@ -389,9 +389,9 @@ const hasStatements = (
   ts.isDefaultClause(node);
 
 /**
- * A removed statement takes its leading comments with it, except that the
- * first statement of a file keeps whatever precedes it: that is the file
- * header, not a comment on the statement.
+ * A removed statement takes its leading comments with it, except that the first
+ * statement of a file keeps whatever precedes it: that is the file header, not
+ * a comment on the statement.
  */
 const statementEraseStart = (
   statement: DeepReadonly<ts.Statement>,
@@ -505,8 +505,8 @@ const findLeftover = (
  * Whether an expression reads the same in any position without parentheses
  * around it. Only the forms that bind tighter than anything around them
  * qualify; an object literal is left out because `() => ({ a })` needs its
- * parentheses, and a function or class expression because a statement
- * starting with one would become a declaration.
+ * parentheses, and a function or class expression because a statement starting
+ * with one would become a declaration.
  */
 const standsAloneWithoutParentheses = (
   node: DeepReadonly<ts.Expression>,
@@ -527,14 +527,13 @@ const standsAloneWithoutParentheses = (
   node.kind === ts.SyntaxKind.NullKeyword;
 
 /**
- * Erases `f(` and `)` around the argument of every identity function `f`,
- * or only the `f` when the argument needs the parentheses to keep its
- * meaning.
+ * Erases `f(` and `)` around the argument of every identity function `f`, or
+ * only the `f` when the argument needs the parentheses to keep its meaning.
  *
  * The ranges this returns are **partial**: each one erases a piece of a call
- * expression whose argument survives, and the piece starts where the call
- * does. Anything that later asks "is this node gone?" against them has to ask
- * by containment — see {@link isNodeErasedBy}.
+ * expression whose argument survives, and the piece starts where the call does.
+ * Anything that later asks "is this node gone?" against them has to ask by
+ * containment — see {@link isNodeErasedBy}.
  */
 const collectUnwrappedCallees = (
   sourceFile: DeepReadonly<ts.SourceFile>,
@@ -668,9 +667,9 @@ const collectReferencedNames = (
 
 /**
  * Erases import bindings that no identifier outside the erased ranges refers
- * to. The reference count is deliberately generous: a shadowing local
- * variable, a label or a shorthand property of the same name all count as
- * references, so the worst case is a dead import that stays.
+ * to. The reference count is deliberately generous: a shadowing local variable,
+ * a label or a shorthand property of the same name all count as references, so
+ * the worst case is a dead import that stays.
  */
 const collectUnusedImports = (
   sourceFile: DeepReadonly<ts.SourceFile>,
@@ -753,12 +752,12 @@ const collectUnusedImports = (
 /**
  * Every comment in the file, except the ones that carry meaning to a tool
  * rather than to a reader: a `#!` line (which the parser reports as its own
- * kind of trivia, not as a comment) and the `//#` pragmas that name the
- * source map.
+ * kind of trivia, not as a comment) and the `//#` pragmas that name the source
+ * map.
  *
  * Comments are collected from the trivia around each token rather than by
- * scanning the text, so that a `/` that divides is never taken for the start
- * of a regular expression.
+ * scanning the text, so that a `/` that divides is never taken for the start of
+ * a regular expression.
  */
 const collectComments = (
   sourceFile: DeepReadonly<ts.SourceFile>,
@@ -815,10 +814,9 @@ const eraseRanges = (source: string, ranges: readonly EraseRange[]): string => {
     mut_erased.fill(true, start, end);
   }
 
-  // Line numbers survive, so a line of the output is the line of the input
-  // with the same index, and only a line something was erased from can have
-  // picked up trailing whitespace — the space before a removed trailing
-  // comment, say.
+  // Line numbers survive, so a line of the output is the line of the input with
+  // the same index, and only a line something was erased from can have picked
+  // up trailing whitespace — the space before a removed trailing comment, say.
   const mut_touchedLines = new Set<number>();
 
   const mut_lineCursor = { current: 0 };

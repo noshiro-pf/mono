@@ -32,8 +32,8 @@ const remainingOf = (
   maxLength: Bindable<number>,
 ): Bindable<number> => derive([value, maxLength], (v, max) => max - v.length);
 
-// A component called only while its branch is mounted, so its text is
-// derived only while it is shown.
+// A component called only while its branch is mounted, so its text is derived
+// only while it is shown.
 const CharactersLeft = ({
   count,
 }: Readonly<{ count: Bindable<number> }>): JSX.Element => (

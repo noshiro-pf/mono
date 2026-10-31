@@ -19,9 +19,9 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
  * The panes are pointed at pages this script serves itself, because a
  * screenshot of somebody else's site is theirs and not ours to publish, and
  * because a screenshot has to keep working when the sites in it change.
- * **Point `demoUrls` at whatever you actually use before uploading**: a
- * listing is more convincing showing the tool doing its job than showing
- * placeholders doing nothing.
+ * **Point `demoUrls` at whatever you actually use before uploading**: a listing
+ * is more convincing showing the tool doing its job than showing placeholders
+ * doing nothing.
  */
 const main = async (): Promise<void> => {
   assertBuildIsPresent();
@@ -119,8 +119,8 @@ const main = async (): Promise<void> => {
 
     await shoot('1-grid.png');
 
-    // Zoomed out, which is the thing a pane can do that a browser window
-    // cannot do to a quarter of itself.
+    // Zoomed out, which is the thing a pane can do that a browser window cannot
+    // do to a quarter of itself.
     await page
       .locator('.pane >> nth=1 >> .pane__button[title*="Zoom out"]')
       .click();

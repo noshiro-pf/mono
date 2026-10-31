@@ -27,8 +27,8 @@ export const saveSetting =
 export const readLocationSearch = (): string => globalThis.location.search;
 
 /**
- * Puts `search` in place of the URL's query, keeping the rest of the URL
- * and adding no entry to the history.
+ * Puts `search` in place of the URL's query, keeping the rest of the URL and
+ * adding no entry to the history.
  */
 export const replaceLocationSearch = (search: string): void => {
   const { pathname, hash } = globalThis.location;
@@ -43,14 +43,14 @@ export const replaceLocationSearch = (search: string): void => {
       `${pathname}${search}${hash}`,
     );
   } catch {
-    // Safari refuses after too many calls in a row; a reload then shows
-    // the screen the URL last said, which is all that is lost.
+    // Safari refuses after too many calls in a row; a reload then shows the
+    // screen the URL last said, which is all that is lost.
   }
 };
 
 /**
- * A DOM event as an observable, listened to for as long as the page is
- * open — which is as long as anything in the store lives.
+ * A DOM event as an observable, listened to for as long as the page is open —
+ * which is as long as anything in the store lives.
  */
 export const fromEvent = (
   target: Readonly<EventTarget>,
@@ -77,8 +77,8 @@ export const downloadJson = (fileName: string, text: string): void => {
 
   mut_link.click();
 
-  // Not at once: some browsers, Safari among them, read the URL only after
-  // the click has returned, and fail the download if it is gone.
+  // Not at once: some browsers, Safari among them, read the URL only after the
+  // click has returned, and fail the download if it is gone.
   setTimeout(() => {
     URL.revokeObjectURL(url);
   }, 40_000);
@@ -100,8 +100,8 @@ export const mediaQuery = (
 };
 
 /**
- * The browser's languages, the most preferred first; a browser that hides
- * them, or names none, gives its one language, or none at all.
+ * The browser's languages, the most preferred first; a browser that hides them,
+ * or names none, gives its one language, or none at all.
  */
 export const browserLanguages = (): readonly string[] => {
   const { languages, language } = navigator as Partial<Navigator>;
@@ -114,8 +114,8 @@ export const browserLanguages = (): readonly string[] => {
 };
 
 /**
- * Loads the page again with `search` as the URL's query, in place of this
- * entry of the history.
+ * Loads the page again with `search` as the URL's query, in place of this entry
+ * of the history.
  */
 export const reloadWithSearch = (search: string): void => {
   const { pathname, search: current, hash } = globalThis.location;

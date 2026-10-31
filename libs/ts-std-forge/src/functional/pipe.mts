@@ -140,8 +140,7 @@ type PipeMapOptional<A extends UnknownOptional> = Readonly<{
   /**
    * Maps the value inside an Optional using Optional.map semantics. If the
    * Optional is None, the transformation is skipped and None is propagated.
-   * If the Optional is Some, the transformation is applied to the inner
-   * value.
+   * If the Optional is Some, the transformation is applied to the inner value.
    *
    * @example
    *

@@ -59,9 +59,9 @@ import { isVersionPullRequest } from './version-pr.mjs';
  * turn, or the new head of the layer below for a restack. `upstream`, when
  * given, is the commit below the branch's own commits, and makes the rebase
  * `git rebase --onto <onto> <upstream>`: exactly the commits after it are
- * replayed, whatever their patches look like upstream. `required` says what
- * to do when the branch does not contain it: fail, or fall back to a plain
- * rebase, which drops commits already upstream by their patches.
+ * replayed, whatever their patches look like upstream. `required` says what to
+ * do when the branch does not contain it: fail, or fall back to a plain rebase,
+ * which drops commits already upstream by their patches.
  */
 type RebaseTarget = Readonly<{
   onto: string;
@@ -72,9 +72,9 @@ type RebaseTarget = Readonly<{
 
 /**
  * Force-pushes `sha` to `branch`, leased against `lease`: `moved` when the
- * lease lost to someone else's push, an error when the push was refused for
- * any other reason. The worker's rebases and restacks push through here, and
- * so does `push-fixed-pr`, which a session runs.
+ * lease lost to someone else's push, an error when the push was refused for any
+ * other reason. The worker's rebases and restacks push through here, and so
+ * does `push-fixed-pr`, which a session runs.
  */
 export const pushLeased = async (
   branch: string,
@@ -82,9 +82,9 @@ export const pushLeased = async (
   lease: string,
   cwd?: string,
 ): Promise<Result<'moved' | 'pushed', string>> => {
-  // The lease names the SHA the survey saw, not the remote-tracking ref: a
-  // bare `--force-with-lease` compares against whatever the last fetch
-  // left, which is exactly the race this is meant to lose safely.
+  // The lease names the SHA the survey saw, not the remote-tracking ref: a bare
+  // `--force-with-lease` compares against whatever the last fetch left, which
+  // is exactly the race this is meant to lose safely.
   const pushed = await git(
     `git push --force-with-lease=${sh(`${branch}:${lease}`)} origin ${sh(`${sha}:refs/heads/${branch}`)}`,
     cwd,
@@ -94,8 +94,8 @@ export const pushLeased = async (
     return Result.ok('pushed');
   }
 
-  // A lease that lost is someone else pushing in the time the rebase took,
-  // and that is not a reason to set the pull request aside.
+  // A lease that lost is someone else pushing in the time the rebase took, and
+  // that is not a reason to set the pull request aside.
   const remoteHeadNow = await remoteSha(branch);
 
   return Result.isOk(remoteHeadNow) && remoteHeadNow.value !== lease
@@ -104,24 +104,24 @@ export const pushLeased = async (
 };
 
 /**
- * Brings one pull request as close to merging as this script can: onto the
- * tip of the base, with the layers stacked on it carried along, armed, and
- * out from under `skip-ci`.
+ * Brings one pull request as close to merging as this script can: onto the tip
+ * of the base, with the layers stacked on it carried along, armed, and out from
+ * under `skip-ci`.
  *
  * The order is the point. While `skip-ci` is on, the push the rebase makes
- * fires a `synchronize` whose every check workflow skips, so it costs
- * nothing; removing the label afterwards fires `unlabeled`, and the matrix
- * that starts then runs once, on the head that will actually be merged. Doing
- * it the other way round starts a full matrix on the pre-rebase head and has
- * the push cancel it through the concurrency group. Arming comes between
- * the two, so that while it happens the label still holds the merge.
+ * fires a `synchronize` whose every check workflow skips, so it costs nothing;
+ * removing the label afterwards fires `unlabeled`, and the matrix that starts
+ * then runs once, on the head that will actually be merged. Doing it the other
+ * way round starts a full matrix on the pre-rebase head and has the push cancel
+ * it through the concurrency group. Arming comes between the two, so that while
+ * it happens the label still holds the merge.
  *
  * A pull request GitHub moved off a stack is rebased with `--onto` from the
  * head its merged parent was merged at, when it still contains that head —
  * GitHub's own rebase on retargeting can fail, and then the branch still
- * carries the parent's commits, whose patches match the squash commit only
- * if nothing changed them on the way in. Otherwise the plain rebase drops
- * them by patch, as it always has.
+ * carries the parent's commits, whose patches match the squash commit only if
+ * nothing changed them on the way in. Otherwise the plain rebase drops them by
+ * patch, as it always has.
  *
  * A rebase that changes nothing is a failure only when there was no label to
  * take off either: then GitHub's `BEHIND` or `DIRTY` was stale and the survey
@@ -129,18 +129,18 @@ export const pushLeased = async (
  * is simply one whose only obstacle was the label.
  *
  * A branch that moves while this is moving it is someone else moving the same
- * pull request — the skill runs beside this script, and a person may push —
- * so it resolves to `moved` and leaves the rest to that someone. Recording it
- * as a failure would set a pull request aside for being worked on, and trying
- * the next candidate would start a second matrix beside the one the other
- * writer is about to start.
+ * pull request — the skill runs beside this script, and a person may push — so
+ * it resolves to `moved` and leaves the rest to that someone. Recording it as a
+ * failure would set a pull request aside for being worked on, and trying the
+ * next candidate would start a second matrix beside the one the other writer is
+ * about to start.
  *
  * The version pull request is the exception: only the label comes off it.
- * `changesets/action` rebuilds that branch from the tip of the base itself
- * and force-pushes the result, so rebasing it here would be a second thing
+ * `changesets/action` rebuilds that branch from the tip of the base itself and
+ * force-pushes the result, so rebasing it here would be a second thing
  * force-pushing one branch — and would carry the old version commit onto a
- * tip whose changesets it never consumed. Triage has already established
- * that the branch is on the tip; there is nothing left to move.
+ * tip whose changesets it never consumed. Triage has already established that
+ * the branch is on the tip; there is nothing left to move.
  */
 export const advance = async (
   api: ApiContext,
@@ -150,8 +150,8 @@ export const advance = async (
 ): Promise<Result<Advanced, RebaseFailure>> => {
   if (isVersionPullRequest(pr, defaultBranch)) {
     if (!isSkipCiLabelled(pr)) {
-      // Triage only ever offers this one while it is paused, so nothing to
-      // take off means the survey is a release behind.
+      // Triage only ever offers this one while it is paused, so nothing to take
+      // off means the survey is a release behind.
       return Result.ok({ kind: 'stale-merge-state' });
     }
 
@@ -229,15 +229,15 @@ export const advance = async (
 
 /**
  * Rebases every pull request GitHub moved onto the default branch when the
- * layer below it merged, and that still carries that layer's commits, off
- * them: `--onto` from the head the layer merged at to the squash commit it
- * merged as, carrying the layers stacked on it along. `stack.mts` says why
- * this waits for no queue, and why the tree comes out as it went in.
+ * layer below it merged, and that still carries that layer's commits, off them:
+ * `--onto` from the head the layer merged at to the squash commit it merged as,
+ * carrying the layers stacked on it along. `stack.mts` says why this waits for
+ * no queue, and why the tree comes out as it went in.
  *
- * Nothing is armed or released: `skip-ci` stays as it is, and a push under
- * it fires a `synchronize` whose every check skips. Resolves to whether any
- * branch moved — by this, or by someone else under it — since either makes
- * the heads the survey read stale.
+ * Nothing is armed or released: `skip-ci` stays as it is, and a push under it
+ * fires a `synchronize` whose every check skips. Resolves to whether any branch
+ * moved — by this, or by someone else under it — since either makes the heads
+ * the survey read stale.
  */
 export const restackRetargeted = async (
   api: ApiContext,
@@ -269,10 +269,10 @@ export const restackRetargeted = async (
 };
 
 /**
- * Rebases the pull requests that asked for it and are paused by `skip-ci`
- * and behind the default branch onto it, carrying the layers stacked on each
- * along, so that a stack waiting for review or for its turn keeps a diff of
- * its own changes only. The push runs no checks: the label skips every workflow.
+ * Rebases the pull requests that asked for it and are paused by `skip-ci` and
+ * behind the default branch onto it, carrying the layers stacked on each along,
+ * so that a stack waiting for review or for its turn keeps a diff of its own
+ * changes only. The push runs no checks: the label skips every workflow.
  * `stack.mts` says which pull requests are eligible.
  *
  * A rebase that conflicts, or a push that is refused, is a set-aside like any
@@ -393,13 +393,13 @@ export const restackBehind = async (
 };
 
 /**
- * Carries every layer stacked on `pr` along after it moved from its old head
- * to `head`: each is replayed with `--onto` from the head it was on to the
- * one that replaced it, lowest layer first so that each finds its own new
- * base already pushed. A layer that cannot be moved, or that someone else
- * moved first, is reported and left where it is, and so is everything on
- * it; none of this stops `pr` itself, whose turn it is. `push-fixed-pr`
- * carries a session's layers along through here too.
+ * Carries every layer stacked on `pr` along after it moved from its old head to
+ * `head`: each is replayed with `--onto` from the head it was on to the one
+ * that replaced it, lowest layer first so that each finds its own new base
+ * already pushed. A layer that cannot be moved, or that someone else moved
+ * first, is reported and left where it is, and so is everything on it; none of
+ * this stops `pr` itself, whose turn it is. `push-fixed-pr` carries a session's
+ * layers along through here too.
  */
 export const restack = async (
   pr: BranchOf,
@@ -464,8 +464,8 @@ export const restack = async (
 
 /**
  * Arms auto-merge on the pull request this cycle picked, having first asked
- * whether it is still what triage saw: open, on the default branch, queued,
- * at `head`. A head other than that is someone else moving it, as in
+ * whether it is still what triage saw: open, on the default branch, queued, at
+ * `head`. A head other than that is someone else moving it, as in
  * `removeSkipCiLabel`.
  *
  * Called for one it rebases after the push and before `skip-ci` comes off, so
@@ -474,16 +474,16 @@ export const restack = async (
  *
  * Nothing else arms one. `open-pr` opens a pull request with none, and the
  * author queueing it with `merge-queued` is the request to land it. Arming at
- * pick time rather than at opening is what keeps a stacked pull request
- * unarmed while it is stacked: its base is another pull request's branch,
- * which no ruleset covers, so armed there it would merge into that branch
- * the moment nothing held it. It is picked only once GitHub has moved it onto
- * the default branch, where the ruleset gates the merge.
+ * pick time rather than at opening is what keeps a stacked pull request unarmed
+ * while it is stacked: its base is another pull request's branch, which no
+ * ruleset covers, so armed there it would merge into that branch the moment
+ * nothing held it. It is picked only once GitHub has moved it onto the default
+ * branch, where the ruleset gates the merge.
  *
- * `merge-queued` is the only thing read as permission, so one that has lost
- * its auto-merge — GitHub disarms it when the base changes, and a person may
- * switch it off — is armed again when it is next picked. Holding one back is
- * taking `merge-queued` off.
+ * `merge-queued` is the only thing read as permission, so one that has lost its
+ * auto-merge — GitHub disarms it when the base changes, and a person may switch
+ * it off — is armed again when it is next picked. Holding one back is taking
+ * `merge-queued` off.
  */
 export const armOnPick = async (
   api: ApiContext,
@@ -543,10 +543,10 @@ export const armOnPick = async (
 };
 
 /**
- * The part that happens inside the worktree, so that removing it afterwards
- * is one statement in the caller rather than a `finally`. Every path here
- * resolves to a `Result` — `git` turns a failing command into one — so the
- * caller's next line always runs.
+ * The part that happens inside the worktree, so that removing it afterwards is
+ * one statement in the caller rather than a `finally`. Every path here resolves
+ * to a `Result` — `git` turns a failing command into one — so the caller's next
+ * line always runs.
  */
 const rebaseInWorktree = async (
   pr: BranchOf,
@@ -624,8 +624,8 @@ const rebaseInWorktree = async (
   const ontoHead = await git(`git rev-parse ${sh(target.onto)}`, worktreeDir);
 
   if (Result.isOk(ontoHead) && sha === ontoHead.value.trim()) {
-    // The rebase left the branch at what it was rebased onto: every commit
-    // on it had a patch already there, so `git rebase` skipped the lot.
+    // The rebase left the branch at what it was rebased onto: every commit on
+    // it had a patch already there, so `git rebase` skipped the lot.
     // Pushing that would leave a pull request with no commits in it, which
     // auto-merge will never merge, so leave the branch alone and say what
     // happened.
@@ -655,14 +655,14 @@ const rebaseInWorktree = async (
 /**
  * Rebases the pull request's branch in a throwaway worktree and
  * force-pushes the result, expecting the remote branch to still be at the
- * head the survey saw. Resolves to the new head, or to `moved` when the
- * branch is no longer where the survey saw it.
+ * head the survey saw. Resolves to the new head, or to `moved` when the branch
+ * is no longer where the survey saw it.
  *
  * The worktree is detached, so the checkout this runs from is never touched,
  * and it is removed on the way out of every path: the work inside it is a
  * function of its own, and this one removes the worktree after it returns
- * however it returned. A process killed mid-rebase leaves one behind, which
- * is what the `removeWorktree` before `git worktree add` is for.
+ * however it returned. A process killed mid-rebase leaves one behind, which is
+ * what the `removeWorktree` before `git worktree add` is for.
  */
 const rebaseAndPush = async (
   pr: BranchOf,
@@ -716,9 +716,9 @@ const rebaseAndPush = async (
 type Rebased = Readonly<{ kind: 'moved' } | { kind: 'rebased'; head: string }>;
 
 /**
- * Takes `skip-ci` off, having first asked GitHub whether the pull request
- * still wants it. Removing the label starts a CI matrix, and the survey it
- * was decided on is a rebase old by now.
+ * Takes `skip-ci` off, having first asked GitHub whether the pull request still
+ * wants it. Removing the label starts a CI matrix, and the survey it was
+ * decided on is a rebase old by now.
  */
 const removeSkipCiLabel = async (
   api: ApiContext,
@@ -773,8 +773,8 @@ const removeSkipCiLabel = async (
  * The layer this pull request was stacked on, if GitHub moved it onto the
  * default branch when that layer merged — and so the head below its own
  * commits, if GitHub did not rebase it. Anything that cannot be read is
- * `undefined`, and the rebase falls back to dropping commits by their
- * patches, which a one-commit layer squash-merged unchanged also survives.
+ * `undefined`, and the rebase falls back to dropping commits by their patches,
+ * which a one-commit layer squash-merged unchanged also survives.
  */
 const stackedOnMerged = async (
   api: ApiContext,
@@ -811,8 +811,8 @@ const stackedOnMerged = async (
 };
 
 /**
- * The branch the pull request's timeline says GitHub moved it off, if it
- * did. A timeline that cannot be read says nothing.
+ * The branch the pull request's timeline says GitHub moved it off, if it did. A
+ * timeline that cannot be read says nothing.
  */
 const retargetedFromTimeline = async (
   api: ApiContext,
@@ -833,8 +833,8 @@ const retargetedFromTimeline = async (
 };
 
 /**
- * Whether the pull request's head, as the survey saw it, contains `sha`,
- * having fetched the branch and `refspecs` to find out.
+ * Whether the pull request's head, as the survey saw it, contains `sha`, having
+ * fetched the branch and `refspecs` to find out.
  */
 const carries = async (
   pr: PullRequest,
@@ -859,9 +859,9 @@ const carries = async (
 };
 
 /**
- * One layer of `restackRetargeted`. Whatever cannot be read or done is said
- * and left: the layer is where GitHub put it, which is where it would be
- * without this.
+ * One layer of `restackRetargeted`. Whatever cannot be read or done is said and
+ * left: the layer is where GitHub put it, which is where it would be without
+ * this.
  */
 const restackOffMerged = async (
   api: ApiContext,

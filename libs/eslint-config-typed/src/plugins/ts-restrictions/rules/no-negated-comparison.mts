@@ -32,8 +32,8 @@ type MessageIds =
  * The comparison is found through any `as`, `satisfies` or `!`:
  * `!((a === b) satisfies boolean)` is `a !== b`. An operand's type has to
  * exclude `NaN` at every wrapper layer: a `number` cast to a brand that
- * excludes it may still be one, and a cast widening such a brand to `number`
- * is the author saying it may be.
+ * excludes it may still be one, and a cast widening such a brand to `number` is
+ * the author saying it may be.
  *
  * `!!(a === b)` is a conversion to boolean, not a negation, and is left alone.
  * A comment the fix would drop leaves the report without a fix.
@@ -174,9 +174,9 @@ export const noNegatedComparison: TSESLint.RuleModule<MessageIds, Options> = {
 
 /**
  * Whether the comparison, taking the negation's place, needs parentheses to
- * keep binding as tightly. It does anywhere an operator binding tighter than
- * a comparison could take an operand from it: under a unary operator, in
- * another binary expression, as the object of a member access, and so on.
+ * keep binding as tightly. It does anywhere an operator binding tighter than a
+ * comparison could take an operand from it: under a unary operator, in another
+ * binary expression, as the object of a member access, and so on.
  */
 const needsParentheses = (
   node: DeepReadonly<TSESTree.UnaryExpression>,

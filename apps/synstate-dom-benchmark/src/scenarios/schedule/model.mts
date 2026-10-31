@@ -7,15 +7,14 @@ import type { Cells } from '../scenario.mjs';
  *
  * Each task starts when the last of its predecessors finishes (the forward
  * pass), must finish before the first of its successors has to start (the
- * backward pass, from the end of the project), and its slack is the
- * difference. A task depends on several predecessors, and the end of the
- * project on every task that nothing depends on, so the derived values form
- * diamonds of every length: a task's slack joins the forward pass at its own
- * depth with the backward pass that came back from the end of the whole
- * project.
+ * backward pass, from the end of the project), and its slack is the difference.
+ * A task depends on several predecessors, and the end of the project on every
+ * task that nothing depends on, so the derived values form diamonds of every
+ * length: a task's slack joins the forward pass at its own depth with the
+ * backward pass that came back from the end of the whole project.
  *
- * Each task's duration is an input of its own, as a schedule whose rows can
- * be edited has. The signal-based implementations make one derived value per
+ * Each task's duration is an input of its own, as a schedule whose rows can be
+ * edited has. The signal-based implementations make one derived value per
  * figure, so that the graph is as large as the calculation; React and Preact
  * compute the figures in a loop when they render.
  */
@@ -103,8 +102,8 @@ export const lastTasks: readonly number[] = tasks
 
 /**
  * How many tasks are shown: the last ones, as a table scrolled to the end
- * would. The rest are computed and not displayed, so that the DOM does not
- * hide the cost of the calculation.
+ * would. The rest are computed and not displayed, so that the DOM does not hide
+ * the cost of the calculation.
  */
 export const shownCount = 50;
 

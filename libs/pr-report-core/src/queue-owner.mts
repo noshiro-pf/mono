@@ -4,26 +4,26 @@
  * Who is to move each pull request in the queue next: the worker
  * (`pnpm run unblock-prs`), a skill, a person, or — which is a bug — nobody.
  *
- * The worker and the `/unblock-prs` skill move the same queue side by side
- * and cannot see each other. Each used to decide for itself whether a
+ * The worker and the `/unblock-prs` skill move the same queue side by side and
+ * cannot see each other. Each used to decide for itself whether a
  * set-aside still stood, from its own reading of the tip of the default
- * branch, and when the two readings differed each left the pull request to
- * the other (#2267). So the answer is decided here, once, and every reader
- * asks this function: the worker before it acts, `pr-report` for the skill,
+ * branch, and when the two readings differed each left the pull request to the
+ * other (#2267). So the answer is decided here, once, and every reader asks
+ * this function: the worker before it acts, `pr-report` for the skill,
  * `claim-pr` before it lets a claim be written, and `report-unowned-prs` to
  * turn `none` into an issue.
  *
  * **It reads the comments and the pull request, never the tip of the base.**
- * The set-aside comment is the hand-off: it stands until the worker rewrites
- * it as resolved — when the head moves, when a retry is asked for, or, for a
+ * The set-aside comment is the hand-off: it stands until the worker rewrites it
+ * as resolved — when the head moves, when a retry is asked for, or, for a
  * reason tied to the base, when the base moves and the worker takes the pull
- * request back to try again. Until then it is the skill's or a person's, and
- * a worker that has stopped running leaves it so rather than nobody's.
+ * request back to try again. Until then it is the skill's or a person's, and a
+ * worker that has stopped running leaves it so rather than nobody's.
  *
  * **Every reason the worker sets aside for has an owner**
  * ({@link setAsideOwner}, exhaustive over {@link SET_ASIDE_REASONS}), so `none`
- * is only ever a combination nothing here expected: a reason this module
- * does not know, written by a worker newer than the reader.
+ * is only ever a combination nothing here expected: a reason this module does
+ * not know, written by a worker newer than the reader.
  */
 
 import { claimApplies, type ClaimComment } from './claim.mjs';
@@ -40,8 +40,8 @@ export const QUEUE_OWNERS = ['worker', 'skill', 'human', 'none'] as const;
 
 /**
  * `skill` is the `/unblock-prs` skill, which fixes every queued pull request
- * the worker sets aside — a branch the repository generates included, which
- * it builds again rather than rebases (`generatedBranches` in
+ * the worker sets aside — a branch the repository generates included, which it
+ * builds again rather than rebases (`generatedBranches` in
  * `.github/unblock-prs.json`).
  */
 export type QueueOwner = Readonly<{
@@ -96,8 +96,8 @@ export const queueOwner = (pr: QueueOwnerInput): QueueOwner | undefined => {
     return { owner: 'human', reason: unmovable };
   }
 
-  // A layer waits for the one below whatever it says, and the worker carries
-  // it along when that one moves.
+  // A layer waits for the one below whatever it says, and the worker carries it
+  // along when that one moves.
   if (pr.stackedOn !== undefined) {
     return {
       owner: 'worker',
@@ -173,12 +173,12 @@ export const isSetAsideReason = (reason: string): reason is SetAsideReason =>
   KNOWN_REASONS.has(reason);
 
 /**
- * Whose a pull request set aside for `reason` is, while the comment stands
- * at its head. A skill's reason is one a session can fix by pushing: a
- * conflict to resolve, a failure to reproduce. A person's is one only a
- * setting, a permission, a review or a merge by hand clears, and the comment
- * says which. A `switch` with no default, so a reason added to
- * {@link SET_ASIDE_REASONS} without an owner fails to compile.
+ * Whose a pull request set aside for `reason` is, while the comment stands at
+ * its head. A skill's reason is one a session can fix by pushing: a conflict to
+ * resolve, a failure to reproduce. A person's is one only a setting, a
+ * permission, a review or a merge by hand clears, and the comment says which. A
+ * `switch` with no default, so a reason added to {@link SET_ASIDE_REASONS}
+ * without an owner fails to compile.
  */
 const setAsideOwner = (
   reason: SetAsideReason,
@@ -254,8 +254,8 @@ export type QueueOwnerInput = Readonly<{
 }>;
 
 /**
- * The set-aside `comment` says, if it stands at `headSha` with no retry
- * asked for. The base is not read: see the module comment.
+ * The set-aside `comment` says, if it stands at `headSha` with no retry asked
+ * for. The base is not read: see the module comment.
  */
 const standingAt = (
   comment: SetAsideComment | undefined,
@@ -270,8 +270,8 @@ const standingAt = (
 const KNOWN_REASONS: ReadonlySet<string> = new Set(SET_ASIDE_REASONS);
 
 /**
- * Why nothing in the queue can move `pr` until a person does something, if
- * so: the worker passes these over with a note, and no skill takes them up.
+ * Why nothing in the queue can move `pr` until a person does something, if so:
+ * the worker passes these over with a note, and no skill takes them up.
  */
 const unmovableReason = (pr: QueueOwnerInput): string | undefined =>
   pr.isDraft

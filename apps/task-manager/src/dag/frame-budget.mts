@@ -1,23 +1,21 @@
 /**
- * Whether an animation is running smoothly enough to go on, judged by the
- * time between its frames. A device that cannot keep up — a large graph, a
- * slow phone, a busy tab — is better served by the end state at once than by
- * a slide show: the placement animation (`dag-layout-store.mts`) stops and
- * puts every node in its place when the budget is exceeded, whatever the
- * reader's animation setting.
+ * Whether an animation is running smoothly enough to go on, judged by the time
+ * between its frames. A device that cannot keep up — a large graph, a slow
+ * phone, a busy tab — is better served by the end state at once than by a slide
+ * show: the placement animation (`dag-layout-store.mts`) stops and puts every
+ * node in its place when the budget is exceeded, whatever the reader's
+ * animation setting.
  *
- * Fed the time the animation started and then the time of each frame. The
- * first interval, from the start to the first frame, is not counted: it
- * includes rendering the first positions, which is the setup, not the
- * animation.
+ * Fed the time the animation started and then the time of each frame. The first
+ * interval, from the start to the first frame, is not counted: it includes
+ * rendering the first positions, which is the setup, not the animation.
  */
 
 import { Num } from 'ts-data-forge';
 
 /**
- * The longest average interval between frames that is smooth enough: a
- * little over 1000 / 30, so a steady 30 fps passes and anything slower does
- * not.
+ * The longest average interval between frames that is smooth enough: a little
+ * over 1000 / 30, so a steady 30 fps passes and anything slower does not.
  */
 export const FRAME_BUDGET_AVERAGE_MS = 34;
 

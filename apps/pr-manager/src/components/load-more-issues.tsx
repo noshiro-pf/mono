@@ -16,8 +16,8 @@ type Props = Readonly<{
 }>;
 
 /**
- * The button under the open issues that lists the next page of them, and
- * why it did not if it did not.
+ * The button under the open issues that lists the next page of them, and why it
+ * did not if it did not.
  */
 export const LoadMoreIssues = ({ notListed }: Props): JSX.Element => {
   const loading = view(reader.moreIssues, ({ type }) => type === 'loading');

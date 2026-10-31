@@ -1,15 +1,14 @@
 /**
  * The screen shown — the list or the graph — and, on the graph's screen, its
  * view mode (`dag-view-mode.mts`), as the URL's query: `?view=list`, `?mode=arc`.
- * Read when the page loads, so that a reload, or a link, opens the screen
- * that was shown, and written as either changes (`store/view-query-sync.mts`).
+ * Read when the page loads, so that a reload, or a link, opens the screen that
+ * was shown, and written as either changes (`store/view-query-sync.mts`).
  *
  * The graph, the default, is written as no `view` at all, and the mode only
  * when the graph is shown; `?view=dag`, from a link made before the graph was
  * the default, is read and then taken out. A value the page does not know is
- * read as no value: the graph for the screen, and for the mode the one kept
- * on this device. Every other parameter (`?storage=memory`) is left where it
- * is.
+ * read as no value: the graph for the screen, and for the mode the one kept on
+ * this device. Every other parameter (`?storage=memory`) is left where it is.
  */
 
 import { dagViewModes, type DagViewMode } from './dag-view-mode.mjs';

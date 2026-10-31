@@ -515,8 +515,8 @@ export const runBenchmark = (n: number): number => {
 
     // `lruMemoize`, not the default `weakMapMemoize`. Every input here is a new
     // number that never repeats, and `weakMapMemoize` keeps every distinct
-    // primitive it has seen: one round would cache 100,000 results it never
-    // hits, and that memory and GC would be measured as Redux's cost.
+    // primitive it has seen: one round would cache 100,000 results it never hits,
+    // and that memory and GC would be measured as Redux's cost.
     const selectDoubled = createSelector(
         selectCounter,
         (counter) => counter * 2,
@@ -774,8 +774,8 @@ export const runBenchmark = (n: number): number => {
 
     // `lruMemoize`, not the default `weakMapMemoize`. Every input here is a new
     // number that never repeats, and `weakMapMemoize` keeps every distinct
-    // primitive it has seen: one round would cache 100,000 results it never
-    // hits, and that memory and GC would be measured as Redux's cost.
+    // primitive it has seen: one round would cache 100,000 results it never hits,
+    // and that memory and GC would be measured as Redux's cost.
     const selectDoubled = createSelector(
         selectCounter,
         (counter) => counter * 2,
@@ -1309,9 +1309,9 @@ export const runBenchmark = (k: number, branchCount: number): number => {
         branches: Arr.zeros(asUint32(branchCount)),
     } as const;
 
-    // A plain reducer rather than `createSlice`: an Immer draft of the
-    // `branches` array would be finalized element by element on every update,
-    // and that would be measured as Redux's cost.
+    // A plain reducer rather than `createSlice`: an Immer draft of the `branches`
+    // array would be finalized element by element on every update, and that would
+    // be measured as Redux's cost.
     const store = configureStore({
         reducer: (
             state: State | undefined,
@@ -1635,8 +1635,8 @@ export const runBenchmark = (k: number, width: number): number => {
 export const runBenchmark = (k: number, width: number): number => {
     const sourceAtom = atom(0);
 
-    // Equal to its previous value on 999 updates in 1000. A derived atom
-    // compares its result with `Object.is` and does not change when it is equal.
+    // Equal to its previous value on 999 updates in 1000. A derived atom compares
+    // its result with `Object.is` and does not change when it is equal.
     const bucketAtom = atom((get) => Math.floor(get(sourceAtom) / 1000));
 
     const store = createStore();

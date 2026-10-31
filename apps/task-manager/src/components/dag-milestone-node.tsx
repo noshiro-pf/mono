@@ -14,12 +14,11 @@ type Props = Readonly<{
 }>;
 
 /**
- * A milestone: a hexagon, filled once reached and outlined (dashed) before,
- * so it reads as a point to wait for rather than work to do, with its title
- * and, if it has one, its date under it; smaller when compact, its title cut
- * shorter and its date in its tooltip; larger when large, its title on up to
- * three lines. Opened and moved as a task is
- * (`dag-node-handlers.mts`).
+ * A milestone: a hexagon, filled once reached and outlined (dashed) before, so
+ * it reads as a point to wait for rather than work to do, with its title and,
+ * if it has one, its date under it; smaller when compact, its title cut shorter
+ * and its date in its tooltip; larger when large, its title on up to three
+ * lines. Opened and moved as a task is (`dag-node-handlers.mts`).
  */
 export const DagMilestoneNode = ({ record }: Props): JSX.Element => {
   const { node: first } = record.getSnapshot().value;
@@ -111,8 +110,8 @@ export const DagMilestoneNode = ({ record }: Props): JSX.Element => {
 const LINE_HEIGHT = 18;
 
 /**
- * The lines of its title — one, cut to fit, or on a large node up to three
- * — with the check box before the first if it is awaited.
+ * The lines of its title — one, cut to fit, or on a large node up to three —
+ * with the check box before the first if it is awaited.
  */
 const titleLines = ({
   view: v,
@@ -140,8 +139,8 @@ const withDate = (record: DagNodeRecord<MilestoneNodeView>): boolean =>
   record.size !== 'compact' && record.view.date !== undefined;
 
 /**
- * The middle of line `line` of the `titleLinesShown` lines of the title and
- * the date under it, all of them together in the middle of the node.
+ * The middle of line `line` of the `titleLinesShown` lines of the title and the
+ * date under it, all of them together in the middle of the node.
  */
 const lineY = (
   record: DagNodeRecord<MilestoneNodeView>,

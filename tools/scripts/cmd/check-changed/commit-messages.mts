@@ -3,22 +3,22 @@
 import { Arr } from 'ts-data-forge';
 
 /**
- * The checks `lint-pull-request.yml` makes of a pull request's commits, made
- * of the branch before it is pushed.
+ * The checks `lint-pull-request.yml` makes of a pull request's commits, made of
+ * the branch before it is pushed.
  *
  * **The language pattern is read from the workflow, not restated.** The
  * workflow keeps it as `JAPANESE_PATTERN` in its `env:`, a PCRE for `grep -P`;
  * {@link readJapanesePattern} takes that line and {@link pcreToRegExp} turns
- * its `\x{…}` escapes into the `\u{…}` a `u`-flag `RegExp` reads. The
- * workflow cannot call a script instead, because it runs on
- * `pull_request_target` without a checkout (README.md there says why), so the
- * one copy lives in the YAML and this side follows it.
+ * its `\x{…}` escapes into the `\u{…}` a `u`-flag `RegExp` reads. The workflow
+ * cannot call a script instead, because it runs on `pull_request_target`
+ * without a checkout (README.md there says why), so the one copy lives in the
+ * YAML and this side follows it.
  *
  * **The title check is approximated.** `action-semantic-pull-request` checks
  * the title against Conventional Commits with its default type list, and
  * `open-pr` takes the title from the tip's subject; the subject is checked
- * against {@link CONVENTIONAL_TYPES}, that action's default, as a warning
- * only, since `open-pr --title` can still give the pull request another one.
+ * against {@link CONVENTIONAL_TYPES}, that action's default, as a warning only,
+ * since `open-pr --title` can still give the pull request another one.
  */
 export const checkCommitMessages = ({
   commits,
@@ -66,9 +66,9 @@ export type Commit = Readonly<{ sha: string; message: string }>;
 
 /**
  * The `JAPANESE_PATTERN` value of `lint-pull-request.yml`, as a `RegExp`, or
- * `undefined` when the workflow no longer declares it in the shape read here
- * — which the caller reports, since a check that silently passes is the thing
- * to avoid.
+ * `undefined` when the workflow no longer declares it in the shape read here —
+ * which the caller reports, since a check that silently passes is the thing to
+ * avoid.
  */
 export const readJapanesePattern = (
   workflowYaml: string,
@@ -122,8 +122,8 @@ const CONVENTIONAL_TYPE_SET: ReadonlySet<string> = new Set<string>(
   CONVENTIONAL_TYPES,
 );
 
-// `type(scope)!: description`, the scope and the `!` optional, read a part at
-// a time rather than by one pattern with a quantified group.
+// `type(scope)!: description`, the scope and the `!` optional, read a part at a
+// time rather than by one pattern with a quantified group.
 const TYPE_PREFIX = /^[a-z]+/u;
 
 const SCOPE = /^\([^()]+\)/u;

@@ -23,10 +23,9 @@ type Board = DeepReadonly<{
     cards: { id: number; text: string }[];
 }>;
 
-// A stream that arrives whole from outside (a WebSocket, say), each
-// message a new object even when nothing changed. A state you write
-// yourself takes `createState(initial, { keepEqualParts: true })`
-// instead.
+// A stream that arrives whole from outside (a WebSocket, say), each message
+// a new object even when nothing changed. A state you write yourself takes
+// `createState(initial, { keepEqualParts: true })` instead.
 const message$ = source<Board>();
 
 const board$ = message$.pipe(keepEqualParts());

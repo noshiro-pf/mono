@@ -6,19 +6,19 @@ import { oxlintCodeToRuleId } from './rule-id-mapping.mjs';
  * Sumi preset, each as a problem for `sumi check` to report (D-60).
  *
  * `respectEslintDisableDirectives: false` keeps `eslint-disable*` from
- * answering a Sumi diagnostic, but `oxlint-disable*` is oxlint's own
- * directive, which no option turns off. So a directive is reported when
- * oxlint would apply it to a rule the preset enables: when it names no rule
- * (it then silences all of them), or names one whose last segment is a preset
- * rule's name — oxlint matches a rule by that segment alone, so
+ * answering a Sumi diagnostic, but `oxlint-disable*` is oxlint's own directive,
+ * which no option turns off. So a directive is reported when oxlint would apply
+ * it to a rule the preset enables: when it names no rule (it then silences all
+ * of them), or names one whose last segment is a preset rule's name — oxlint
+ * matches a rule by that segment alone, so
  * `total-functions/no-unsafe-type-assertion` silences
- * `typescript(no-unsafe-type-assertion)`. A directive naming only other
- * rules is left alone: the repository disables a rule moved from ESLint to
- * oxlint that way (`tools/configs/oxlint-rules.mts`).
+ * `typescript(no-unsafe-type-assertion)`. A directive naming only other rules
+ * is left alone: the repository disables a rule moved from ESLint to oxlint
+ * that way (`tools/configs/oxlint-rules.mts`).
  *
- * Comments are found line by line, as the markers are: a comment is text
- * after `//` or `/*` whose first word is the directive. A string that holds
- * such text is read as one too, which errs towards reporting.
+ * Comments are found line by line, as the markers are: a comment is text after
+ * `//` or `/*` whose first word is the directive. A string that holds such text
+ * is read as one too, which errs towards reporting.
  */
 export const findSumiSilencingDirectives = (
   sourceText: string,
@@ -77,8 +77,8 @@ const presetRulesByName: ReadonlyMap<string, PresetRule> = new Map(
 );
 
 /**
- * The text of each comment that starts on `lineText`: what follows every
- * `//` and every `/*`, up to the `*\/` that closes a block comment.
+ * The text of each comment that starts on `lineText`: what follows every `//`
+ * and every `/*`, up to the `*\/` that closes a block comment.
  */
 const commentBodies = (lineText: string): readonly string[] =>
   Array.from(lineText.matchAll(/\/\/|\/\*/gu), (match) => {

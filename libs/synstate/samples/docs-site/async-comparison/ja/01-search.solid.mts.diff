@@ -32,14 +32,14 @@
    createRoot((dispose) => {
      const [query, setQuery] = createSignal('');
  
--    // A signal ignores a write equal to its value,
--    // so a query that did not change triggers nothing.
+-    // A signal ignores a write equal to its value, so a query that did not
+-    // change triggers nothing.
 +    // signal は今の値と等しい書き込みを無視するので、
 +    // 変わっていないクエリは何も引き起こさない。
      const [debouncedQuery, setDebouncedQuery] = createSignal('');
  
--    // There is no debounce; an effect whose cleanup clears the timer
--    // runs again on every keystroke.
+-    // There is no debounce; an effect whose cleanup clears the timer runs again
+-    // on every keystroke.
 +    // debounce はない。クリーンアップでタイマーを解除する effect が
 +    // キー入力のたびに再実行される。
      createEffect(() => {
@@ -50,8 +50,8 @@
      });
  
 -    // createResource ignores a stale response but hands the fetcher no
--    // AbortSignal. One controller per query, aborted by the cleanup that
--    // runs when the query changes and when the root is disposed:
+-    // AbortSignal. One controller per query, aborted by the cleanup that runs
+-    // when the query changes and when the root is disposed:
 +    // createResource は古いレスポンスを無視するが、fetcher に AbortSignal を
 +    // 渡さない。クエリごとに controller を作り、クエリが変わったときと
 +    // root が破棄されたときに走るクリーンアップで中断する。

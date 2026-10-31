@@ -20,8 +20,8 @@ export const AnimationChip = React.memo<Props>((props) => {
 
   const ref = React.useRef<SVGGElement>(null);
 
-  // Where the chip first appeared: it flies in from the parent that queued
-  // it, once, when it is mounted.
+  // Where the chip first appeared: it flies in from the parent that queued it,
+  // once, when it is mounted.
   const mounted = React.useRef({ from, to, chip, reduceMotion });
 
   React.useLayoutEffect(() => {

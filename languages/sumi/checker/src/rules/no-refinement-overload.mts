@@ -17,8 +17,8 @@ import {
 import type { Rule } from '../engine/index.mjs';
 
 /**
- * `functions/no-refinement-overload` — an overload set's signatures can be
- * told apart at run time (Sumi spec/functions.md, D-58 judgement 1, #1952).
+ * `functions/no-refinement-overload` — an overload set's signatures can be told
+ * apart at run time (Sumi spec/functions.md, D-58 judgement 1, #1952).
  *
  * An overload set is one body behind several signatures, and the body can only
  * choose what to do by looking at its arguments. Overloads are therefore
@@ -33,8 +33,8 @@ import type { Rule } from '../engine/index.mjs';
  * function filter<A>(pred: (a: A) => boolean): Op<A, A>;
  * ```
  *
- * Every pair of signatures in the set is compared, and a pair is legal when
- * one of three means separates it:
+ * Every pair of signatures in the set is compared, and a pair is legal when one
+ * of three means separates it:
  *
  * 1. **Arity** — the ranges of argument counts they accept (required count to
  *    total count, unbounded with a rest parameter) do not overlap. Read from
@@ -54,9 +54,9 @@ import type { Rule } from '../engine/index.mjs';
  * both.
  *
  * `functions/unified-signatures` reports the part of this that syntax decides
- * (same return type, one parameter differing); this rule is the part that
- * needs types. Each later signature is reported once, against the first
- * earlier one it cannot be told apart from.
+ * (same return type, one parameter differing); this rule is the part that needs
+ * types. Each later signature is reported once, against the first earlier one
+ * it cannot be told apart from.
  *
  * The object classification follows the issue's definition and is not
  * exhaustive: a type such as `{ length: number }` also accepts a string or a
@@ -108,9 +108,9 @@ export const noRefinementOverload: Rule = {
  * The overload signatures of the set whose first declaration is `node`, or
  * `undefined` when `node` is not the first — so each set is read once. The
  * declarations are adjacent (`functions/adjacent-overload-signatures`), so the
- * set is the run of same-named `function` declarations starting here, minus
- * the implementation. An ambient set (`declare function`) has no
- * implementation and is all signatures.
+ * set is the run of same-named `function` declarations starting here, minus the
+ * implementation. An ambient set (`declare function`) has no implementation and
+ * is all signatures.
  */
 const overloadSetStartingAt = (
   // `FunctionDeclaration` is TypeScript's own interface, declared mutable.
@@ -226,9 +226,9 @@ const objectClasses = (
     : new Set<TypeofClass>(['object']);
 
 /**
- * What `typeof` may answer for a value of `type`. Checked in this order
- * because `boolean` and an enum are unions to the checker, and their flags
- * already say everything.
+ * What `typeof` may answer for a value of `type`. Checked in this order because
+ * `boolean` and an enum are unions to the checker, and their flags already say
+ * everything.
  */
 const typeofClasses = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -261,9 +261,9 @@ const typeofClasses = (
   }
 
   if (type.isIntersectionType()) {
-    // A member with no call signature does not rule out a function, so
-    // members are intersected as "object or function" and the whole decides
-    // between the two.
+    // A member with no call signature does not rule out a function, so members
+    // are intersected as "object or function" and the whole decides between the
+    // two.
     const classes = type
       .getTypes()
       .map((member) => widenObject(typeofClasses(checker, member)))
@@ -292,8 +292,8 @@ const typeofClasses = (
 };
 
 /**
- * The `typeof` classes an argument at `index` may have: those of the
- * parameter type, plus `undefined` where the argument may be left out.
+ * The `typeof` classes an argument at `index` may have: those of the parameter
+ * type, plus `undefined` where the argument may be left out.
  */
 const positionClasses = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -356,8 +356,8 @@ const literalKeys = (type: Type): readonly string[] | undefined => {
 };
 
 /**
- * The literal values property `name` can hold on `members`, or `undefined`
- * when some member lacks it or it is not a union of literals.
+ * The literal values property `name` can hold on `members`, or `undefined` when
+ * some member lacks it or it is not a union of literals.
  */
 const tagValues = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -390,9 +390,8 @@ const tagValues = (
 
 /**
  * Whether some property both sides have is, on each, a union of literals with
- * no value in common. The names come from the first member of `a`; a name
- * some member lacks yields no tag (`tagValues`), which is what a discriminant
- * needs.
+ * no value in common. The names come from the first member of `a`; a name some
+ * member lacks yields no tag (`tagValues`), which is what a discriminant needs.
  */
 const hasDisjointTag = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -416,8 +415,8 @@ const hasDisjointTag = (
 const isDistinguishable = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   checker: Checker,
-  // A `Clause` holds TypeScript's own declaration and signature, which
-  // this package does not get to restate as readonly.
+  // A `Clause` holds TypeScript's own declaration and signature, which this
+  // package does not get to restate as readonly.
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   a: Clause,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

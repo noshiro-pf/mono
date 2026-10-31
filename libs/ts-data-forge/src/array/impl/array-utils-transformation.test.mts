@@ -71,8 +71,8 @@ describe('Arr transformations', () => {
 
     test('should preserve the tuple shape under a generic parameter', () => {
       // A caller that is itself generic over the tuple cannot resolve a
-      // conditional return type, so `map` has to report the homomorphic
-      // mapping directly for a parameter that carries no length brand.
+      // conditional return type, so `map` has to report the homomorphic mapping
+      // directly for a parameter that carries no length brand.
       const mapValues = <const T extends readonly Readonly<{ v: unknown }>[]>(
         boxes: T,
       ): Readonly<{ [K in keyof T]: unknown }> => map(boxes, (b) => b.v);

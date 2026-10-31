@@ -7,9 +7,9 @@ import {
 } from './wall-clock.mjs';
 
 /**
- * The days from `minDate` to `maxDate`, each at 00:00, or Blueprint's
- * defaults for the one omitted or unreadable: 1 January 20 years before
- * `today`, and six months after it.
+ * The days from `minDate` to `maxDate`, each at 00:00, or Blueprint's defaults
+ * for the one omitted or unreadable: 1 January 20 years before `today`, and six
+ * months after it.
  */
 export const dateRange = (
   today: WallClock,

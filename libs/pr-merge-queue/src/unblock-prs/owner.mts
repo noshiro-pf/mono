@@ -3,11 +3,11 @@
  * `queueOwner`, the one function `pr-report`, `claim-pr` and every other
  * command a session runs read it through, given the facts GitHub returned.
  *
- * The set-aside comes from the records, which by the time triage reads them
- * are what this account's comments say (`settleSkips`): a record the base
- * moved under is pruned as its comment is rewritten as resolved, and one an
- * earlier run left is taken up from its comment. The claims are the ones
- * that still hold (`claims.mts`).
+ * The set-aside comes from the records, which by the time triage reads them are
+ * what this account's comments say (`settleSkips`): a record the base moved
+ * under is pruned as its comment is rewritten as resolved, and one an earlier
+ * run left is taken up from its comment. The claims are the ones that still
+ * hold (`claims.mts`).
  */
 
 import { queueOwner, type Claim, type QueueOwner } from 'pr-report-core';

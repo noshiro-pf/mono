@@ -1,6 +1,6 @@
 // Sumi bans classes, `this`, method syntax and writes to `this` outside a
-// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
-// so those rules are waived here (D-63).
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why), so
+// those rules are waived here (D-63).
 // @sumi-expect-error-file classes/no-class
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
@@ -79,9 +79,9 @@ class SourceObservableClass<A>
     });
   }
 
-  // Returns the value held after the call: `nextValue`, or, once completed,
-  // the value already there — `undefined` only on a source that never had
-  // one, whose `next` is typed `void`.
+  // Returns the value held after the call: `nextValue`, or, once completed, the
+  // value already there — `undefined` only on a source that never had one,
+  // whose `next` is typed `void`.
   next(nextValue: A): A | undefined {
     if (this.isCompleted) {
       return Optional.unwrap(this.getSnapshot());

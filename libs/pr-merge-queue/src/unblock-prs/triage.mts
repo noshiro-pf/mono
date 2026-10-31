@@ -121,8 +121,8 @@ export const triage = async (
 ): Promise<Triage> => {
   const sorted = pullRequests.toSorted((a, b) => a.number - b.number);
 
-  // The stacks, the declared order and what holds the release, as every
-  // reader of the queue reads them (`pr-report-core`'s `queue-order.mts`).
+  // The stacks, the declared order and what holds the release, as every reader
+  // of the queue reads them (`pr-report-core`'s `queue-order.mts`).
   const graph = queueGraph(
     sorted.map((pr) => ({
       number: pr.number,
@@ -187,8 +187,8 @@ export const triage = async (
       ),
   }));
 
-  // Released and watched as ever, but never armed: auto-merge would wait for
-  // an approval nobody may give. See `review-hold.mts` in `pr-report-core`.
+  // Released and watched as ever, but never armed: auto-merge would wait for an
+  // approval nobody may give. See `review-hold.mts` in `pr-report-core`.
   const bypass: ReadonlyMap<number, string> = new Map(
     Arr.generate(function* () {
       for (const [prNumber, hold] of Array.from(holds)) {
@@ -209,9 +209,9 @@ export const triage = async (
         .map(({ pr }) => pr),
       { ...base, bypass },
     ),
-    // Anything this cycle may pick — a candidate, or one in flight — that
-    // has no auto-merge yet, however it came to have none: `merge-queued`
-    // is the one thing that says whether a pull request may merge.
+    // Anything this cycle may pick — a candidate, or one in flight — that has
+    // no auto-merge yet, however it came to have none: `merge-queued` is the
+    // one thing that says whether a pull request may merge.
     toArm: new Set(
       Arr.generate(function* () {
         for (const { pr, result } of classified) {
@@ -260,9 +260,8 @@ export const triage = async (
 };
 
 /**
- * The cycle's order: `pr-report-core`'s `orderCandidates`, which says why,
- * with what this run has demoted (`demotions.mts`) and what only a bypass
- * merges.
+ * The cycle's order: `pr-report-core`'s `orderCandidates`, which says why, with
+ * what this run has demoted (`demotions.mts`) and what only a bypass merges.
  */
 export const orderCandidates = (
   candidates: readonly PullRequest[],
@@ -361,8 +360,8 @@ export const bypassPhrase = (reason: string | undefined): string =>
     : (`, leave auto-merge off (${reason}, so it needs a bypass merge)` as const);
 
 /**
- * What the pull request's priority label, or needing a bypass merge, did to
- * its place, as a phrase.
+ * What the pull request's priority label, or needing a bypass merge, did to its
+ * place, as a phrase.
  */
 export const priorityPhrase = (pr: PullRequest, bypass: boolean): string => {
   // `pickPriorityRank` ranks it with `priority:low` unless it is `high`.
@@ -395,8 +394,8 @@ export const priorityPhrase = (pr: PullRequest, bypass: boolean): string => {
  * without them. The review rules are what `pr-report-core`'s `review-hold.mts`
  * asks about.
  *
- * Rules that cannot be read require nothing: the watch falls back to judging
- * by what has reported, on a longer leash, and no review holds anything.
+ * Rules that cannot be read require nothing: the watch falls back to judging by
+ * what has reported, on a longer leash, and no review holds anything.
  */
 const readRules = async (
   api: ApiContext,
@@ -442,9 +441,9 @@ type Settled = Readonly<{
 }>;
 
 /**
- * The pull request's place in one of GitHub's native stacks (`stack.mts`),
- * if it is in one. One whose stack cannot be read is taken to be in none,
- * and GitHub's refusal to arm it, should it come, sets it aside.
+ * The pull request's place in one of GitHub's native stacks (`stack.mts`), if
+ * it is in one. One whose stack cannot be read is taken to be in none, and
+ * GitHub's refusal to arm it, should it come, sets it aside.
  */
 const inNativeStack = async (
   api: ApiContext,
@@ -464,9 +463,9 @@ const inNativeStack = async (
 };
 
 /**
- * The required checks of a pull request nothing here can move — waiting on
- * its checks, or held by one that failed — or the note to report when they
- * cannot be read.
+ * The required checks of a pull request nothing here can move — waiting on its
+ * checks, or held by one that failed — or the note to report when they cannot
+ * be read.
  */
 const readChecks = async (
   api: ApiContext,
@@ -483,8 +482,8 @@ const readChecks = async (
   }
 
   // Pending and passed are both in flight here, but a red left by the round
-  // before is not a failure while this round runs, and the checks still
-  // running are what tell the two apart.
+  // before is not a failure while this round runs, and the checks still running
+  // are what tell the two apart.
   const running = await listRunningChecks(api, pr.number);
 
   if (Result.isErr(running)) {
@@ -500,8 +499,8 @@ const readChecks = async (
 };
 
 /**
- * Asks `queueStanding` where `pr` stands, reading what it asks for — and
- * only that, since each read is a request — until it can say.
+ * Asks `queueStanding` where `pr` stands, reading what it asks for — and only
+ * that, since each read is a request — until it can say.
  */
 const settle = async (
   api: ApiContext,
@@ -680,9 +679,9 @@ const readReviewHolds = async (
 };
 
 /**
- * Whether GitHub says merging this pull request into the base conflicts. It
- * is a candidate all the same — see `queueStanding` — but a less promising
- * one, so it is reported and ordered apart from the rest.
+ * Whether GitHub says merging this pull request into the base conflicts. It is
+ * a candidate all the same — see `queueStanding` — but a less promising one, so
+ * it is reported and ordered apart from the rest.
  */
 const isConflicting = (pr: PullRequest): boolean =>
   pr.mergeStateStatus === 'DIRTY';

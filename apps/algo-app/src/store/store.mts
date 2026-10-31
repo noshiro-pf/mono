@@ -47,8 +47,8 @@ export const displayStore = createDisplayStore({
 });
 
 /**
- * Starts watching the room, writing the actions played here and the auto
- * play. Called once, from `main.tsx`, before the first render.
+ * Starts watching the room, writing the actions played here and the auto play.
+ * Called once, from `main.tsx`, before the first render.
  */
 export const startStore = (): (() => void) => {
   const stopRoom = roomStore.start();

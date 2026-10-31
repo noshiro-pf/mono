@@ -13,8 +13,8 @@ import { testSearch } from './search-test-suite.mjs';
 export const createSearch = () => {
   const store = createStore();
 
-  // A primitive atom ignores a write equal to its value,
-  // so a query that did not change triggers nothing.
+  // A primitive atom ignores a write equal to its value, so a query that did
+  // not change triggers nothing.
   const debouncedQueryAtom = atom('');
 
   // Jotai has no debounce; a timer restarted on every keystroke.
@@ -28,9 +28,9 @@ export const createSearch = () => {
     }, debounceMs);
   };
 
-  // Jotai aborts `signal` when a dependency changes and the atom is
-  // read again, and ignores the promise it returned. Unsubscribing does
-  // not abort it, so disposal brings a signal of its own.
+  // Jotai aborts `signal` when a dependency changes and the atom is read again,
+  // and ignores the promise it returned. Unsubscribing does not abort it, so
+  // disposal brings a signal of its own.
   const disposal = new AbortController();
 
   const resultAtom = atom(
@@ -43,8 +43,8 @@ export const createSearch = () => {
     },
   );
 
-  // An async atom suspends; unwrap turns the pending promise into a
-  // fallback value, which carries no query of its own.
+  // An async atom suspends; unwrap turns the pending promise into a fallback
+  // value, which carries no query of its own.
   const unwrappedAtom = unwrap(resultAtom, () => undefined);
 
   const searchStateAtom = atom(
@@ -55,8 +55,8 @@ export const createSearch = () => {
       },
   );
 
-  // Nothing is computed, and no request sent, until an atom is
-  // subscribed to (useAtomValue in a component does this).
+  // Nothing is computed, and no request sent, until an atom is subscribed to
+  // (useAtomValue in a component does this).
   const unsubscribe = store.sub(searchStateAtom, () => {});
 
   return {

@@ -50,8 +50,8 @@ export const JoinRoomPage = ({ roomId }: Props): JSX.Element => {
 
     const name = getUsername();
 
-    // Navigated once the join has settled rather than from a subscriber, so
-    // the router is not written to while the store's update propagates.
+    // Navigated once the join has settled rather than from a subscriber, so the
+    // router is not written to while the store's update propagates.
     roomStore.joinRoom
       .dispatch(id, name)
       .then(() => {
@@ -96,8 +96,8 @@ export const JoinRoomPage = ({ roomId }: Props): JSX.Element => {
         <div class={constant(styles.buttonWrapper)}>
           <Button
             intent={'primary'}
-            // Joining checks the password against the room, so it waits for
-            // the room.
+            // Joining checks the password against the room, so it waits for the
+            // room.
             disabled={derive(
               [username, room, loading],
               (name, r, isLoading) =>

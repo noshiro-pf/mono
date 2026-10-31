@@ -10,11 +10,10 @@ import type { DomainState, NodeRef } from './types.mjs';
 /**
  * A dependency cycle, or `undefined` when the graph is a DAG.
  *
- * The cycle is listed in edge direction — each node is depended on by the
- * next — and closed, its first node repeated at the end: `[a, b, a]` means b
- * depends on a and a on b, and a self-dependency is `[a, a]`. The search
- * visits nodes in the order of `listNodes`, so the same state gives the same
- * cycle.
+ * The cycle is listed in edge direction — each node is depended on by the next
+ * — and closed, its first node repeated at the end: `[a, b, a]` means b depends
+ * on a and a on b, and a self-dependency is `[a, a]`. The search visits nodes
+ * in the order of `listNodes`, so the same state gives the same cycle.
  */
 export const findCycle = (
   state: DomainState,
@@ -38,8 +37,8 @@ export const findCycle = (
 };
 
 /**
- * Whether making `dependent` depend on `source` would close a cycle — that
- * is, whether `source` already depends on `dependent`, directly or not.
+ * Whether making `dependent` depend on `source` would close a cycle — that is,
+ * whether `source` already depends on `dependent`, directly or not.
  * Depending on oneself is a cycle. Check this before applying an edit.
  */
 export const wouldCreateCycle = (

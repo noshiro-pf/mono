@@ -1,8 +1,8 @@
 /**
- * What the list shows for each task and milestone at a time: the stored
- * record with what is derived from it — its status, the warnings — sorted
- * and filtered as the settings say. Computed whole, from the state and the
- * clock, so a component only draws.
+ * What the list shows for each task and milestone at a time: the stored record
+ * with what is derived from it — its status, the warnings — sorted and filtered
+ * as the settings say. Computed whole, from the state and the clock, so a
+ * component only draws.
  */
 
 import type { DeepReadonly } from 'ts-type-forge';

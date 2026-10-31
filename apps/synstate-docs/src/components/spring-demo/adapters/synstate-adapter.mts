@@ -46,9 +46,9 @@ export const createSynStateSpringAdapter = (): SpringAdapter => {
         // No chain depth — just emit the head
         mut_subscription = head.pipe(map((pos) => [pos])).subscribe(onEmit);
       } else {
-        // Combine head + all stages into a single Point[]
-        // `as const` needs a literal, and `combine` needs the tuple type only
-        // the literal produces.
+        // Combine head + all stages into a single Point[] `as const` needs a
+        // literal, and `combine` needs the tuple type only the literal
+        // produces.
         // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
         const allPoints = combine([head, ...mut_stages]).pipe(
           map((points) => points),

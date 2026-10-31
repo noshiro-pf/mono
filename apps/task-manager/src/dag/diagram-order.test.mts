@@ -136,8 +136,8 @@ describe(diagramTaskIds, () => {
         'task:p',
       ]);
 
-      // Then the title, descending: s ahead of r, both blocked at 1000; at
-      // 6000 the milestone is reached, r is ready too, and goes ahead of q.
+      // Then the title, descending: s ahead of r, both blocked at 1000; at 6000
+      // the milestone is reached, r is ready too, and goes ahead of q.
       assert.deepStrictEqual(
         diagramTaskIds(
           graph,

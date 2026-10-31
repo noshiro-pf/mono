@@ -49,15 +49,14 @@ type Props = Readonly<{
 
 /**
  * Blueprint's `TimePicker` to the minute on a 24-hour clock, in its markup:
- * an hours and a minutes field, `:` between them, and with
- * `showArrowButtons` a row of chevrons above and below.
+ * an hours and a minutes field, `:` between them, and with `showArrowButtons` a
+ * row of chevrons above and below.
  *
- * As Blueprint's does, a field is typed in freely and read when it loses
- * the focus or Enter is pressed: a number in range becomes the value, and
- * anything else is put back. A field holding something out of range is
- * drawn as an error meanwhile. ArrowUp and ArrowDown and the chevrons step
- * the unit by one, round from 23 to 0 and from 59 to 0 without carrying into
- * the hour.
+ * As Blueprint's does, a field is typed in freely and read when it loses the
+ * focus or Enter is pressed: a number in range becomes the value, and anything
+ * else is put back. A field holding something out of range is drawn as an error
+ * meanwhile. ArrowUp and ArrowDown and the chevrons step the unit by one, round
+ * from 23 to 0 and from 59 to 0 without carrying into the hour.
  */
 export const TimePicker = ({
   value,

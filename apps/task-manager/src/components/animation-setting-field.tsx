@@ -10,8 +10,8 @@ import {
 /**
  * Whether the nodes move to their places in an animation: 「自動」 as the
  * system asks, 「オン」 always, 「オフ」 never. Kept on this device. The
- * hint says what no option shows: under any of them, an animation the
- * device cannot draw smoothly stops with every node in its place.
+ * hint says what no option shows: under any of them, an animation the device
+ * cannot draw smoothly stops with every node in its place.
  */
 export const AnimationSettingField = (): JSX.Element => (
   <div class={constant('settings-field')}>

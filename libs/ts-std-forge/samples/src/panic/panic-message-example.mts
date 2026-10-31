@@ -1,5 +1,5 @@
-// The example is the function it defines, so it stays where a reader
-// meets it rather than being hoisted out of the snippet.
+// The example is the function it defines, so it stays where a reader meets it
+// rather than being hoisted out of the snippet.
 /* eslint-disable unicorn/consistent-function-scoping */
 // Example: src/panic/panic.mts (panic, message)
 import { panic } from 'ts-std-forge';

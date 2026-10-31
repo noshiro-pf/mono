@@ -6,9 +6,9 @@ import type { SortContext } from './sort-tasks.mjs';
 import type { DisplayStatus, DomainState, TaskId } from './types.mjs';
 
 /**
- * What `sortTasks` needs to sort the tasks of `state` by status and by
- * depth, at `now`: every task's display status, and every task's dependency
- * depth over the whole state — none with a cycle, where depth means nothing.
+ * What `sortTasks` needs to sort the tasks of `state` by status and by depth,
+ * at `now`: every task's display status, and every task's dependency depth over
+ * the whole state — none with a cycle, where depth means nothing.
  * One place for the list and the diagrams, so that they agree.
  */
 export const taskSortContext = (

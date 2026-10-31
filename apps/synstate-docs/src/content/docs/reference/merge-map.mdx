@@ -13,9 +13,9 @@ Projects each source value to an observable and merges all inner observables.
 Unlike `switchMap`, does not cancel previous inner observables.
 
 Each projection runs in a scope of its own (see `createScope`): what it
-creates is disposed when `mergeMap` completes. An observable it only
-returns — one created outside the projection and shared with others — is
-unsubscribed and left running.
+creates is disposed when `mergeMap` completes. An observable it only returns
+— one created outside the projection and shared with others — is unsubscribed
+and left running.
 {/* /jsdoc-description */}
 
 ## Marble Diagram

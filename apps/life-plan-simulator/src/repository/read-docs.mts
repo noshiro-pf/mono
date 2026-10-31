@@ -1,10 +1,10 @@
 import { Result } from 'ts-data-forge';
 
 /**
- * The records among `docs` that validate, in creation order, with a warning
- * for each one that does not. An invalid document is skipped rather than
- * failing the whole collection: one bad record — written by hand, or by a
- * future version — should not take every other one off the screen.
+ * The records among `docs` that validate, in creation order, with a warning for
+ * each one that does not. An invalid document is skipped rather than failing
+ * the whole collection: one bad record — written by hand, or by a future
+ * version — should not take every other one off the screen.
  */
 export const readValidDocs = <
   T extends Readonly<{ createdAt: number; id: string }>,

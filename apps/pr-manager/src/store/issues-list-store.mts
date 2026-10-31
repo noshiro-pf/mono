@@ -1,11 +1,11 @@
 /**
  * Which open issues the list shows, and the list that leaves.
  *
- * What a choice does is `issues-list-view.mts`; this holds the current one
- * and derives from it, with the open issues, what the list draws. It starts
- * as `initial`, which the page reads off the query string as it opens
- * (`issues-list-view.mts`), and every change is handed to `save` from
- * `start` on, as the merge order's is (`merge-order-store.mts`).
+ * What a choice does is `issues-list-view.mts`; this holds the current one and
+ * derives from it, with the open issues, what the list draws. It starts as
+ * `initial`, which the page reads off the query string as it opens
+ * (`issues-list-view.mts`), and every change is handed to `save` from `start`
+ * on, as the merge order's is (`merge-order-store.mts`).
  *
  * The search is held beside the view, not in it, and so is never saved: it
  * starts empty on every visit.
@@ -52,8 +52,8 @@ import type { Priority } from '../priority.mjs';
 export type IssuesListDeps = Readonly<{
   issues: InitializedObservable<LoadedReport['issues']>;
   /**
-   * The issues' graph, what is done included (`createIssueGraph`), which
-   * each issue's start state is read off.
+   * The issues' graph, what is done included (`createIssueGraph`), which each
+   * issue's start state is read off.
    */
   graph: InitializedObservable<IssueGraph>;
   initial: IssuesListView;
@@ -71,8 +71,8 @@ export type IssuesListStore = Readonly<{
   /** What the reader typed to search the titles by; empty is no search. */
   query: InitializedObservable<string>;
   /**
-   * The open issues with what the view and the search hide taken out, in
-   * the view's order.
+   * The open issues with what the view and the search hide taken out, in the
+   * view's order.
    */
   items: InitializedObservable<readonly IssueItem[]>;
   /** What the priorities and the labels read, as the view leaves them. */
@@ -145,8 +145,8 @@ export const createIssuesListStore = (
       )
       .pipe(skipIfNoChange(fastDeepEqual)),
     query,
-    // Passed on only when it changed: a poll that moved nothing of the
-    // issues lays nothing out again.
+    // Passed on only when it changed: a poll that moved nothing of the issues
+    // lays nothing out again.
     items: combine([deps.issues, view, query, startStates])
       .pipe(
         map(([issues, current, typed, states]) =>

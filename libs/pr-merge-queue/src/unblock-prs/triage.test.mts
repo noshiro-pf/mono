@@ -2,8 +2,8 @@ import { describeAction, orderCandidates, priorityPhrase } from './triage.mjs';
 import type { PullRequest } from './types.mjs';
 
 describe(orderCandidates, () => {
-  // The ranks themselves are `pr-report-core`'s; what this run demoted is
-  // what only the worker knows.
+  // The ranks themselves are `pr-report-core`'s; what this run demoted is what
+  // only the worker knows.
 
   // Last of all, the release included: the release is known to be able to
   // merge, and this one is known to have sat green without merging.

@@ -18,9 +18,8 @@ const tsconfigPath = path.resolve(
  * alias "typescript-native" because the "typescript" package must stay on 6.x
  * for tools that require the JS compiler API (typescript-eslint, typedoc,
  * prettier-plugin-organize-imports, ...), which TypeScript 7 no longer
- * provides. Invoked via an explicit path because both packages declare a
- * `tsc` bin and the winner of the `node_modules/.bin/tsc` conflict is not
- * guaranteed.
+ * provides. Invoked via an explicit path because both packages declare a `tsc`
+ * bin and the winner of the `node_modules/.bin/tsc` conflict is not guaranteed.
  */
 const nativeTsc = path.resolve(
   projectRootPath,
@@ -59,8 +58,8 @@ const build = async (): Promise<void> => {
   });
 
   // The compiler emits the type tests, the in-source tests and each
-  // declaration's JSDoc into the JavaScript as written. What goes is listed
-  // in `tools/configs/strip-dev-only-code.mts`.
+  // declaration's JSDoc into the JavaScript as written. What goes is listed in
+  // `tools/configs/strip-dev-only-code.mts`.
   await logStep({
     startMessage: 'Stripping development-only code from dist',
     action: () =>

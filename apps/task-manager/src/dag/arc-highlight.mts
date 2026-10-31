@@ -1,7 +1,7 @@
 /**
  * What the arc diagram brings forward while the pointer is over a node or a
- * node has the focus: its arcs, both ways, and the nodes at their other
- * ends. Everything else is dimmed until it is left.
+ * node has the focus: its arcs, both ways, and the nodes at their other ends.
+ * Everything else is dimmed until it is left.
  */
 
 import { Arr } from 'ts-data-forge';

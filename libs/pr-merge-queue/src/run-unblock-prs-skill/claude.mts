@@ -14,8 +14,8 @@ import { log } from '../lib/index.mjs';
 
 /**
  * The arguments for `claude`. The prompt comes straight after `-p`, because
- * `--allowedTools`, `--disallowedTools` and `--add-dir` each take every word
- * up to the next flag.
+ * `--allowedTools`, `--disallowedTools` and `--add-dir` each take every word up
+ * to the next flag.
  */
 export const claudeArgs = (round: Round): readonly string[] =>
   [
@@ -47,8 +47,8 @@ export const claudeArgs = (round: Round): readonly string[] =>
   ] as const;
 
 /**
- * What the session is told besides the skill: what `/loop` and a person
- * would otherwise have settled, and what this command has done already.
+ * What the session is told besides the skill: what `/loop` and a person would
+ * otherwise have settled, and what this command has done already.
  */
 export const roundInstructions = (round: Round): string =>
   [
@@ -130,11 +130,10 @@ export const parseStreamLine = (line: string): StreamEvent | undefined => {
 };
 
 /**
- * Whether the session may go on: billed to the API key, and running the
- * skill it was asked to. Claude Code reports `ANTHROPIC_API_KEY` whenever
- * that variable is set, even where something that comes before it is what
- * authenticates, so this is the second line: {@link sessionEnv} is the
- * first.
+ * Whether the session may go on: billed to the API key, and running the skill
+ * it was asked to. Claude Code reports `ANTHROPIC_API_KEY` whenever that
+ * variable is set, even where something that comes before it is what
+ * authenticates, so this is the second line: {@link sessionEnv} is the first.
  */
 export const checkInit = (
   init: InitEvent,
@@ -165,8 +164,8 @@ export const checkInit = (
 };
 
 /**
- * `env` for the session, without {@link OTHER_CREDENTIALS}, and which of
- * them it dropped.
+ * `env` for the session, without {@link OTHER_CREDENTIALS}, and which of them
+ * it dropped.
  */
 export const sessionEnv = (
   env: Readonly<NodeJS.ProcessEnv>,
@@ -185,20 +184,19 @@ export const sessionEnv = (
 };
 
 /**
- * Runs `claude` with `args` in `cwd` and `env`, logging what the model
- * writes, and stopping it as soon as its first event fails
- * {@link checkInit}. One that exits before that event is refused too: it
- * cannot run with these arguments (an older Claude Code, say), and will not
- * next time either. Its stderr is passed through.
+ * Runs `claude` with `args` in `cwd` and `env`, logging what the model writes,
+ * and stopping it as soon as its first event fails {@link checkInit}. One that
+ * exits before that event is refused too: it cannot run with these arguments
+ * (an older Claude Code, say), and will not next time either. Its stderr is
+ * passed through.
  *
- * A SIGTERM this command receives is passed on, since one sent to this
- * process alone (`kill`, a container's stop) would otherwise leave the
- * session running to the end of its budget. So is a SIGINT when there is no
- * terminal; with one, Ctrl+C reaches the session from the terminal already.
+ * A SIGTERM this command receives is passed on, since one sent to this process
+ * alone (`kill`, a container's stop) would otherwise leave the session running
+ * to the end of its budget. So is a SIGINT when there is no terminal; with one,
+ * Ctrl+C reaches the session from the terminal already.
  *
- * It ends on `close`, once the output has been read to the end, or soon
- * after `exit` when something the session started still holds that output
- * open.
+ * It ends on `close`, once the output has been read to the end, or soon after
+ * `exit` when something the session started still holds that output open.
  */
 export const runClaude = async (
   cwd: string,
@@ -260,8 +258,8 @@ export const runClaude = async (
       resolve(outcome);
     };
 
-    // Without a pid it could not be started. With one, `error` is a signal
-    // that could not be sent, and `close` still comes.
+    // Without a pid it could not be started. With one, `error` is a signal that
+    // could not be sent, and `close` still comes.
     child.on('error', (error) => {
       if (child.pid !== undefined) {
         log(`claude: ${unknownToString(error)}`);
@@ -283,8 +281,8 @@ export const runClaude = async (
         return;
       }
 
-      // The check below is the gate, so a stream that does not open with
-      // what it reads is not run at all.
+      // The check below is the gate, so a stream that does not open with what
+      // it reads is not run at all.
       if (!mut_started && event.kind !== 'init') {
         mut_refused =
           'the Claude Code session did not open with its init event, so how it authenticated cannot be checked; stopped it';
@@ -396,8 +394,8 @@ export type ResultEvent = Readonly<{
 export type ClaudeOutcome = RefusedOutcome | RanOutcome;
 
 /**
- * No session ran: `checkInit` stopped it (`init`), or it could not be
- * started or exited before its first event (`start`).
+ * No session ran: `checkInit` stopped it (`init`), or it could not be started
+ * or exited before its first event (`start`).
  */
 export type RefusedOutcome = Readonly<{
   kind: 'refused';
@@ -416,12 +414,11 @@ export type RanOutcome = Readonly<{
  * What the session may do without asking, which with `--permission-mode
  * dontAsk` is everything it may do at all: nobody is there to be asked.
  *
- * `Bash` is whole, because reproducing a check is running the repository's
- * own commands, and those run whatever the repository says; a narrower list
- * would refuse the fix without keeping anything out. A `deny` in the
- * repository's `.claude/settings.json` wins over these, once Claude Code
- * reads that file: only after the folder has been trusted in an interactive
- * session.
+ * `Bash` is whole, because reproducing a check is running the repository's own
+ * commands, and those run whatever the repository says; a narrower list would
+ * refuse the fix without keeping anything out. A `deny` in the repository's
+ * `.claude/settings.json` wins over these, once Claude Code reads that file:
+ * only after the folder has been trusted in an interactive session.
  */
 const ALLOWED_TOOLS = [
   'Read',
@@ -434,10 +431,10 @@ const ALLOWED_TOOLS = [
 
 /**
  * The skill's "Never" list, where a rule can say it: `gh` acts as whoever
- * logged it in, and the only push is `push-fixed-pr`'s. These are prefix
- * rules against a slip, not a boundary: `git -C <dir> push` or `curl` with
- * the token passes them. What bounds the session is the token's permissions
- * and the machine it runs on.
+ * logged it in, and the only push is `push-fixed-pr`'s. These are prefix rules
+ * against a slip, not a boundary: `git -C <dir> push` or `curl` with the token
+ * passes them. What bounds the session is the token's permissions and the
+ * machine it runs on.
  */
 const DISALLOWED_TOOLS = [
   'Bash(gh)',

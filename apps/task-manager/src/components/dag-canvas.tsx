@@ -97,64 +97,63 @@ type Props = Readonly<{
 }>;
 
 /**
- * The graph as SVG: every node where it was put, or where ELK has it, and
- * the edges drawn between them (`dag/edge-routing.mts`). The background can
- * be panned by dragging, the whole zoomed with the wheel or two fingers and
- * fitted to the screen; a node can be dragged to a new place, which is saved
- * when it is dropped. What a pointer does is `dag/gesture.mts`, and what is
- * drawn where is `dag-canvas-scene.mts`; this forwards the events and draws.
+ * The graph as SVG: every node where it was put, or where ELK has it, and the
+ * edges drawn between them (`dag/edge-routing.mts`). The background can be
+ * panned by dragging, the whole zoomed with the wheel or two fingers and fitted
+ * to the screen; a node can be dragged to a new place, which is saved when it
+ * is dropped. What a pointer does is `dag/gesture.mts`, and what is drawn where
+ * is `dag-canvas-scene.mts`; this forwards the events and draws.
  *
- * A tap on a node opens it, a drag that starts on one moves it: `gesture`
- * says whether the press moved, and a click after a drag is swallowed before
- * it reaches the node.
+ * A tap on a node opens it, a drag that starts on one moves it: `gesture` says
+ * whether the press moved, and a click after a drag is swallowed before it
+ * reaches the node.
  *
  * In 「DAG」 the groups are frames under the nodes (`dag/group-frames.mts`).
  * A node dropped with its centre in a frame goes into that group, and one
- * dropped outside every frame into none; while it is dragged, the frames
- * stay as they were when it was picked up, the one it would go into and the
- * one it would leave marked. A frame dragged by its title moves with its
- * nodes, and a tap on the title opens the group. `touch-action: none`
- * (`index.css`) keeps the browser from scrolling or zooming the page
- * instead.
+ * dropped outside every frame into none; while it is dragged, the frames stay
+ * as they were when it was picked up, the one it would go into and the one it
+ * would leave marked. A frame dragged by its title moves with its nodes, and a
+ * tap on the title opens the group. `touch-action: none` (`index.css`) keeps
+ * the browser from scrolling or zooming the page instead.
  *
  * In 「DAG」, a mouse or pen near a node's outline — outside the node or just
  * inside (`reachAt`) — shows a handle there (`dag/connect-handle.mts`), and a
  * drag from it draws an arrow instead of moving the node. Dropped on another
  * node, the arrow makes that node depend on the one it was drawn from
  * (`dataStore.addDependency`), unless that would be refused — a dependency
- * already there, or a cycle — which the node it is over shows before the
- * drop, and a notice says after it. Escape gives the arrow up before it is
- * dropped, wherever the focus is. A touch has no pointer to come near with,
- * and so no handle.
+ * already there, or a cycle — which the node it is over shows before the drop,
+ * and a notice says after it. Escape gives the arrow up before it is dropped,
+ * wherever the focus is. A touch has no pointer to come near with, and so no
+ * handle.
  *
  * In 「DAG」, an edge pointed at is drawn in the focus colour, and a click on
- * it selects it and shows a button there (`dag-edge-delete.tsx`) that
- * deletes the dependency it stands for (`dataStore.removeDependency`); the
- * button has the focus, so Delete or Backspace deletes it too, and Escape, a
- * click anywhere else or anything that moves the edge leaves it as it is.
+ * it selects it and shows a button there (`dag-edge-delete.tsx`) that deletes
+ * the dependency it stands for (`dataStore.removeDependency`); the button has
+ * the focus, so Delete or Backspace deletes it too, and Escape, a click
+ * anywhere else or anything that moves the edge leaves it as it is.
  *
  * In 「DAG」, a drag on the background with Shift held — or with
  * 「なげなわ」 on, which a touch needs — draws a lasso (`dag/lasso.mts`)
  * instead of panning; with 「矩形選択」 on, it drags out a rectangle from
- * where it went down, with Shift held or not. Either tool turns the other
- * off. The nodes the lasso or the rectangle closes round are selected
+ * where it went down, with Shift held or not. Either tool turns the other off.
+ * The nodes the lasso or the rectangle closes round are selected
  * (`dagSelectionStore`) in place of what was; a tap on the background, or
  * Escape, selects none. A drag that starts on a selected node moves every
  * selected node with it, each staying in its group, whose frame follows
  * it; 「一括編集」 (`dag-selection-bar.tsx`) is what moves them to another.
  *
- * While the nodes move to their places (`dagLayoutStore.animatedPositions`)
- * the edges are plain curves, and they are routed round the nodes once the
- * nodes are there; a press or a key on the canvas puts them there at once.
- * A dragged node's edges are routed at every move — unless that has taken
- * too long, when the rest of the drag draws them as plain curves and leaves
- * the others as they were, and the drop routes them all.
+ * While the nodes move to their places (`dagLayoutStore.animatedPositions`) the
+ * edges are plain curves, and they are routed round the nodes once the nodes
+ * are there; a press or a key on the canvas puts them there at once.
+ * A dragged node's edges are routed at every move — unless that has taken too
+ * long, when the rest of the drag draws them as plain curves and leaves the
+ * others as they were, and the drop routes them all.
  *
  * In 「アーク」 the tasks and the milestones are in a column
- * (`dagLayoutStore.arcNodes`) with arcs beside it (`dag/arc-geometry.mts`),
- * and do not move: a press on one pans as one on the background does, and a
- * tap still opens it. Pointing at a node, or focusing it, brings its arcs
- * and the nodes at their other ends forward and dims the rest
+ * (`dagLayoutStore.arcNodes`) with arcs beside it (`dag/arc-geometry.mts`), and
+ * do not move: a press on one pans as one on the background does, and a tap
+ * still opens it. Pointing at a node, or focusing it, brings its arcs and the
+ * nodes at their other ends forward and dims the rest
  * (`dag/arc-highlight.mts`). The view shows the whole column, between the
  * toolbar and the buttons at the bottom, however small that makes it; the
  * button there, 「等倍表示」, puts it at its natural size from the top, below
@@ -162,24 +161,23 @@ type Props = Readonly<{
  * Changing mode shows the whole column again.
  *
  * In 「タイル」 the tasks are in rows across the canvas
- * (`dagLayoutStore.tileNodes`), with no edges, at zoom 1, and the view is
- * only scrolled down and up (`dag/tile-scroll.mts`): by the wheel, a drag
- * anywhere — on a task too, which a tap still opens — and Page Up, Page
- * Down, Home and End, with the focus on a task, on the canvas, which takes
- * it in this mode, or nowhere; a task given the focus is scrolled into view.
+ * (`dagLayoutStore.tileNodes`), with no edges, at zoom 1, and the view is only
+ * scrolled down and up (`dag/tile-scroll.mts`): by the wheel, a drag anywhere —
+ * on a task too, which a tap still opens — and Page Up, Page
+ * Down, Home and End, with the focus on a task, on the canvas, which takes it
+ * in this mode, or nowhere; a task given the focus is scrolled into view.
  * The canvas reports its width (`dagLayoutStore.setTileWidth`); when it
- * changes, the tasks move to their new rows and the view follows them,
- * keeping the first task of the first row in view where it was. A thin
- * thumb on the right says how far down the view is.
+ * changes, the tasks move to their new rows and the view follows them, keeping
+ * the first task of the first row in view where it was. A thin thumb on the
+ * right says how far down the view is.
  *
  * Every node is drawn at the reader's node size, 「コンパクト」, 「標準」 or
  * 「大」 (`nodeSizeStore`) — a layout ELK made at another size, while the
- * next is computed, at this one — and the edges are routed between those
- * boxes.
+ * next is computed, at this one — and the edges are routed between those boxes.
  *
- * While the view changes mode, the edges are hidden; the nodes one of the
- * modes does not draw fade (`dagLayoutStore.animatedOpacities`), and the
- * view moves to the new mode's fit at the nodes' pace
+ * While the view changes mode, the edges are hidden; the nodes one of the modes
+ * does not draw fade (`dagLayoutStore.animatedOpacities`), and the view moves
+ * to the new mode's fit at the nodes' pace
  * (`dagLayoutStore.animationProgress`), so that what fades stays in sight.
  * The edges fade in once they are back, when the reader's setting animates.
  */
@@ -234,10 +232,9 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     { updateState: updateArcZoom, getSnapshot: getArcZoom },
   ] = createState<ArcZoom>('whole');
 
-  // The node of the canvas the reader is pointing at — under the pointer,
-  // or failing that, the one with the keyboard focus — for the arc
-  // diagram's highlight. A touch points at a node for as long as the finger
-  // is on it.
+  // The node of the canvas the reader is pointing at — under the pointer, or
+  // failing that, the one with the keyboard focus — for the arc diagram's
+  // highlight. A touch points at a node for as long as the finger is on it.
   const [hovered$, setHovered] = createState<GraphNodeId | undefined>(
     undefined,
   );
@@ -279,8 +276,8 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     );
   };
 
-  // From above the buttons at the bottom to the bottom of the canvas: what
-  // a fit keeps clear of, so that nothing is fitted under them.
+  // From above the buttons at the bottom to the bottom of the canvas: what a
+  // fit keeps clear of, so that nothing is fitted under them.
   const bottomInset = (): number => {
     const element = mut_elements.wrapper;
 
@@ -485,8 +482,8 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
 
   const observer = new ResizeObserver(onResize);
 
-  // Measured once it is in the document, before the first paint, so the
-  // rows are there to be drawn from the start.
+  // Measured once it is in the document, before the first paint, so the rows
+  // are there to be drawn from the start.
   afterUpdate(() => {
     const element = mut_elements.wrapper;
 
@@ -505,8 +502,8 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
 
   // Show all of it when it is first drawn, when nodes come or go, after
   // 「自動整列」, when the node size changes and when the mode changes — not
-  // when a node is moved. Following the nodes, if they move, for a change
-  // of mode and whatever the store asks a fit for.
+  // when a node is moved. Following the nodes, if they move, for a change of
+  // mode and whatever the store asks a fit for.
   const mut_fitted: {
     mode: DagViewMode;
     requests: number;
@@ -575,8 +572,8 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     });
   });
 
-  // No handle outside the mode the reader arranges, nor while the nodes
-  // move to their places: it would be on a node that is not there.
+  // No handle outside the mode the reader arranges, nor while the nodes move to
+  // their places: it would be on a node that is not there.
   subscribeInScope(scene.connectable, (nodes) => {
     if (Arr.isNonEmpty(nodes)) {
       return;
@@ -675,8 +672,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
   const onPointerMove = (moved: SvgPointerEvent): void => {
     const before = mut_gesture;
 
-    // Nothing pressed: a mouse or pen hovering, which may be near an
-    // outline.
+    // Nothing pressed: a mouse or pen hovering, which may be near an outline.
     if (!Arr.isNonEmpty(before.pointers)) {
       setHandle(
         moved.pointerType === 'touch'
@@ -695,8 +691,8 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
 
     mut_gesture = next.gesture;
 
-    // Once it is a drag, the pointer belongs to the canvas even when it
-    // leaves it — not before, so that a tap still clicks the node.
+    // Once it is a drag, the pointer belongs to the canvas even when it leaves
+    // it — not before, so that a tap still clicks the node.
     if (!before.dragging && next.gesture.dragging) {
       moved.currentTarget.setPointerCapture(moved.pointerId);
     }
@@ -796,8 +792,8 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     setHandle(undefined);
   };
 
-  // A click that was not a drag, which the capture below lets through: on
-  // an edge, it selects it; anywhere else, it leaves none selected.
+  // A click that was not a drag, which the capture below lets through: on an
+  // edge, it selects it; anywhere else, it leaves none selected.
   const onClick = (clicked: MouseEvent & SvgTarget): void => {
     const element =
       clicked.target instanceof Element
@@ -898,9 +894,9 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     }
   };
 
-  // Focus is followed as it bubbles up from the node. Written once the
-  // update under way has finished: a focused node that goes is blurred while
-  // the update that removes it propagates.
+  // Focus is followed as it bubbles up from the node. Written once the update
+  // under way has finished: a focused node that goes is blurred while the
+  // update that removes it propagates.
   const onFocusIn = (focusedIn: FocusEvent): void => {
     const id = nodeIdOf(focusedIn.target);
 
@@ -960,8 +956,8 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
   );
 
   // In 「タイル」, the rows are cut off at the toolbar's bottom edge as they
-  // scroll up, as a scrolled box would cut them, rather than showing
-  // through it.
+  // scroll up, as a scrolled box would cut them, rather than showing through
+  // it.
   const clipTop = tileFrameShown.pipe(
     map((frame) =>
       frame === undefined ? undefined : frame.topInset - TOOLBAR_CLEARANCE,
@@ -1001,8 +997,8 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
       </figcaption>
       <svg
         ref={(svg) => {
-          // A click after a drag is swallowed here, before it reaches the
-          // node or the edge it ends on.
+          // A click after a drag is swallowed here, before it reaches the node
+          // or the edge it ends on.
           listenInScope(
             svg,
             'click',
@@ -1310,8 +1306,8 @@ const arrowMarker = (id: string): JSX.Element => (
 );
 
 /**
- * A row of the nodes as a task's, or as a milestone's. A node's id is the
- * one or the other for good, so a row stays what it starts as.
+ * A row of the nodes as a task's, or as a milestone's. A node's id is the one
+ * or the other for good, so a row stays what it starts as.
  */
 const taskRecordOf = ({
   view: nodeView,
@@ -1401,8 +1397,8 @@ const grabOf = (
 /**
  * What a drag ends with: a frame dragged by its title moves there with its
  * nodes; a node `selected` with others moves as far with them, each in its
- * group; any other node is put there, in the group of the frame it was
- * dropped in, of those it was picked up among, or in none.
+ * group; any other node is put there, in the group of the frame it was dropped
+ * in, of those it was picked up among, or in none.
  */
 const dropDragged = (
   dropped: NodeDrag,

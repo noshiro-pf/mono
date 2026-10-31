@@ -10,8 +10,8 @@ export type RulesetRequirements = Readonly<{
   /** The contexts a pull request has to satisfy. */
   requiredContexts: readonly string[];
   /**
-   * Whether a change to a path `.github/CODEOWNERS` lists waits for one of
-   * its owners to approve it.
+   * Whether a change to a path `.github/CODEOWNERS` lists waits for one of its
+   * owners to approve it.
    */
   requireCodeOwnerReview: boolean;
   /** Whether every review conversation has to be resolved first. */
@@ -23,11 +23,10 @@ export type RulesetRequirements = Readonly<{
  * `pnpm run pr-report`, which reads the checkout. The file is the desired
  * state; what GitHub enforces is {@link requirementsOfRules} over
  * `rules/branches/{branch}`, which `unblock-prs` and the Pull Requests
- * Manager read and which wants no more than read access. The gap is that a
- * file under `repo-settings/` changes nothing until
- * `pnpm run repo-settings:apply` runs, so a context added here and not
- * applied is reported as missing on every pull request — which is a fair
- * thing for a report to say out loud.
+ * Manager read and which wants no more than read access. The gap is that a file
+ * under `repo-settings/` changes nothing until `pnpm run repo-settings:apply`
+ * runs, so a context added here and not applied is reported as missing on every
+ * pull request — which is a fair thing for a report to say out loud.
  *
  * `source` names the file in the messages.
  */
@@ -98,8 +97,8 @@ const RulesetSchema = t.record({ rules: t.array(t.unknown()) });
 
 /**
  * One rule of the several kinds a ruleset holds. The others carry entirely
- * different parameters, so each rule is tried against this and the ones that
- * do not match are simply not the rule being looked for.
+ * different parameters, so each rule is tried against this and the ones that do
+ * not match are simply not the rule being looked for.
  *
  * Written here rather than taken from `octokit-safe-types`, whose
  * `RepositoryRule` is the whole union: validating against it would refuse a
@@ -126,8 +125,8 @@ const ConversationResolutionRuleSchema = t.record({
 
 /**
  * The rules as read: `ruleset.test.mts` checks each against GitHub's API
- * description, so that a field read here that GitHub renames or retypes
- * fails the type check.
+ * description, so that a field read here that GitHub renames or retypes fails
+ * the type check.
  */
 export type RequiredStatusChecksRule = t.TypeOf<
   typeof RequiredStatusChecksRuleSchema

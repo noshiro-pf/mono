@@ -40,11 +40,11 @@ import type {
  * For an input with no length-constraint brand each member delegates to its
  * `List` counterpart, so a plain tuple keeps mapping exactly as before.
  *
- * When a value carries *both* — which is the normal shape a ts-data-forge
- * guard produces, since `Arr.isMinLengthArray(3, xs)` narrows to
- * `MinLengthArray<3, E> & Xs` — the result carries both as well. The brand
- * half is recomputed as above, and the tuple half is re-derived by rebuilding
- * the exact tuple and running the plain `List` operation on it, so `Tail` of a
+ * When a value carries *both* — which is the normal shape a ts-data-forge guard
+ * produces, since `Arr.isMinLengthArray(3, xs)` narrows to
+ * `MinLengthArray<3, E> & Xs` — the result carries both as well. The brand half
+ * is recomputed as above, and the tuple half is re-derived by rebuilding the
+ * exact tuple and running the plain `List` operation on it, so `Tail` of a
  * branded five-tuple answers a four-element result *and* names its four
  * positions, rather than merely "at least two".
  *
@@ -70,9 +70,9 @@ import type {
  * | `Partition<N>`        | each chunk `(1, N)`                  |
  * | `Head` / `Last`       | returns an element, not an array     |
  *
- * Subtraction saturates at `0`, and an absent upper bound stays absent —
- * except under `Take` / `TakeLast`, which impose one. `Concat` and `Zip` are
- * unbounded above as soon as either side is.
+ * Subtraction saturates at `0`, and an absent upper bound stays absent — except
+ * under `Take` / `TakeLast`, which impose one. `Concat` and `Zip` are unbounded
+ * above as soon as either side is.
  *
  * `Flatten` has deliberately no counterpart; see the note at the end of the
  * namespace for why.
@@ -98,8 +98,8 @@ import type {
  */
 export namespace ConstrainedList {
   /**
-   * Reverses `Ar`, keeping its length constraint — reversing changes no
-   * length, so the bounds carry over untouched and no arithmetic is needed.
+   * Reverses `Ar`, keeping its length constraint — reversing changes no length,
+   * so the bounds carry over untouched and no arithmetic is needed.
    *
    * @template Ar - The array type to reverse.
    */

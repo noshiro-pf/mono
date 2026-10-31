@@ -14,11 +14,11 @@ import { toNodes, type Mountable, type MountedNodes } from '../jsx/index.mjs';
  * the value of `value` (SPEC.md 8.1–8.3).
  *
  * The branch is rebuilt only when `keyOf` gives a different key: within the
- * same key the branch keeps its nodes and its scope, and it is up to the
- * branch to follow the value (`MatchOptional` hands it an observable derived
- * from `value`). Each branch is mounted in a scope of its own, a child of the
- * scope the switch was mounted in; disposing the branch's scope removes its
- * nodes, so the switch's own nodes stay accurate however often it switches.
+ * same key the branch keeps its nodes and its scope, and it is up to the branch
+ * to follow the value (`MatchOptional` hands it an observable derived from
+ * `value`). Each branch is mounted in a scope of its own, a child of the scope
+ * the switch was mounted in; disposing the branch's scope removes its nodes, so
+ * the switch's own nodes stay accurate however often it switches.
  *
  * `branch` runs inside the new scope, so whatever it creates belongs to the
  * branch.

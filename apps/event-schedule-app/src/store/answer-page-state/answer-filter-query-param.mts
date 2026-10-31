@@ -29,8 +29,8 @@ export type AnswerFilterQueryParamDeps = Readonly<{
 }>;
 
 /**
- * The answer table's sort and filters, written to and read from the URL's
- * query string, so that a link opens the table as it was.
+ * The answer table's sort and filters, written to and read from the URL's query
+ * string, so that a link opens the table as it was.
  */
 export const createAnswerFilterQueryParam = (
   deps: AnswerFilterQueryParamDeps,

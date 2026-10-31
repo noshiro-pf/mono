@@ -30,9 +30,9 @@ const GLYPH = {
  * The report as Markdown, for pasting into GitHub or a conversation with
  * Claude.
  *
- * The merge order is a nested list rather than a table because the nesting
- * *is* the information — a table would have to spell the tree back out in a
- * column, and a reader would have to rebuild it.
+ * The merge order is a nested list rather than a table because the nesting *is*
+ * the information — a table would have to spell the tree back out in a column,
+ * and a reader would have to rebuild it.
  */
 export const renderMarkdown = (report: PrReport): string => {
   if (!Arr.isNonEmpty(report.entries)) {
@@ -153,9 +153,9 @@ const title = (report: PrReport): string =>
 const heading = (report: PrReport): string => `# ${title(report)}` as const;
 
 /**
- * One line saying how much there is and how much of it wants attention, so
- * that a reader who opens the report and closes it again has still learnt
- * the only thing a daily report has to tell them. The Pull Requests
+ * One line saying how much there is and how much of it wants attention, so that
+ * a reader who opens the report and closes it again has still learnt the only
+ * thing a daily report has to tell them. The Pull Requests
  * Manager page leads with the same counts, from the same {@link summarize}.
  */
 const summary = (report: PrReport): string => {
@@ -176,8 +176,8 @@ const refs = (numbers: readonly number[]): string =>
 
 /**
  * What the issues it closes add to its order (`inheritStartAfter`): the open
- * pull requests it now merges after, which the tree already draws it under,
- * and the open issues they name that nobody has started, which hold nothing.
+ * pull requests it now merges after, which the tree already draws it under, and
+ * the open issues they name that nobody has started, which hold nothing.
  */
 const inheritedOrder = (entry: ReportEntry): readonly string[] =>
   [
@@ -200,10 +200,10 @@ const autoMerge = (entry: ReportEntry): string | undefined =>
 
 /**
  * `+3 / -12`: three commits of its own, twelve of its base it has not got.
- * The second number is the one that matters — the ruleset blocks a branch
- * that is behind `main`, and a stacked one behind the layer below it shows
- * that layer's old commits in its diff — so anything but `-0` is a rebase
- * waiting to happen.
+ * The second number is the one that matters — the ruleset blocks a branch that
+ * is behind `main`, and a stacked one behind the layer below it shows that
+ * layer's old commits in its diff — so anything but `-0` is a rebase waiting to
+ * happen.
  */
 const commits = (entry: ReportEntry): string =>
   entry.comparison === undefined
@@ -220,14 +220,14 @@ const issues = (entry: ReportEntry, markdown: boolean): string | undefined =>
     : undefined;
 
 /**
- * Which required contexts are red, because "failing" without the name of
- * what failed is a second click for every reader of the report.
+ * Which required contexts are red, because "failing" without the name of what
+ * failed is a second click for every reader of the report.
  *
- * While `skip-ci` is on, red is the normal state rather than news: the
- * `opened` run is cancelled by the `labeled` run that supersedes it and
- * leaves `*-result` checks red naming nothing, and no run since has been
- * allowed to start. Reported as stale, so that a reader is not sent to open
- * a run that was never about the current commit.
+ * While `skip-ci` is on, red is the normal state rather than news: the `opened`
+ * run is cancelled by the `labeled` run that supersedes it and leaves
+ * `*-result` checks red naming nothing, and no run since has been allowed to
+ * start. Reported as stale, so that a reader is not sent to open a run that was
+ * never about the current commit.
  */
 const failures = (checks: ChecksSummary): string | undefined => {
   if (!Arr.isNonEmpty(checks.failed)) {
@@ -293,10 +293,10 @@ const cyclesSection = (report: PrReport): readonly string[] =>
 /**
  * What landed, and when.
  *
- * Below the queue rather than above it, because the queue is what a reader
- * can act on and this is what they no longer have to. Omitted entirely when
- * nothing merged inside the window, rather than left as an empty heading
- * saying the report looked.
+ * Below the queue rather than above it, because the queue is what a reader can
+ * act on and this is what they no longer have to. Omitted entirely when nothing
+ * merged inside the window, rather than left as an empty heading saying the
+ * report looked.
  */
 const mergedSection = (
   report: PrReport,
@@ -333,8 +333,8 @@ const mergedSection = (
 /**
  * How an issue stands for being started (`docs/issue-start-after.md`), unless
  * it is free, which is the ordinary case; what its `Start-After:` names and
- * where each stands; and a `Merge-After:` in its body, which is not read on
- * an issue and is said so that it can be fixed.
+ * where each stands; and a `Merge-After:` in its body, which is not read on an
+ * issue and is said so that it can be fixed.
  */
 const startDetail = (issue: ReportIssue): readonly string[] =>
   [
@@ -356,10 +356,10 @@ const startDetail = (issue: ReportIssue): readonly string[] =>
 /**
  * What is open that is not a pull request.
  *
- * Last, after what merged, because it is the one section that is not about
- * the queue at all: a reader asks "what is in flight" first and "what is
- * waiting to be started" second. A list as long as its cap says `+`, since
- * it may not be all of them.
+ * Last, after what merged, because it is the one section that is not about the
+ * queue at all: a reader asks "what is in flight" first and "what is waiting to
+ * be started" second. A list as long as its cap says `+`, since it may not be
+ * all of them.
  */
 const issuesSection = (
   report: PrReport,

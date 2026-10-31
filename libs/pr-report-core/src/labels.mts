@@ -1,23 +1,23 @@
 /**
- * The labels this repository's queue is made of. They exist only on GitHub,
- * so these strings, and the ones in `.github/workflows/`, are the whole of
- * their declaration: `unblock-prs` and `open-pr` act on them, and
- * `pr-report` and the Pull Requests Manager page report them.
+ * The labels this repository's queue is made of. They exist only on GitHub, so
+ * these strings, and the ones in `.github/workflows/`, are the whole of their
+ * declaration: `unblock-prs` and `open-pr` act on them, and `pr-report` and the
+ * Pull Requests Manager page report them.
  */
 
 /**
- * The label that says "not yet": the check workflows skip while it is on
- * and `skip-ci-label.yml` holds the merge with a `pending` `no-skip-ci-label`
- * status. It is a label, deliberately — a `skip-ci` in the title means
- * nothing to any workflow.
+ * The label that says "not yet": the check workflows skip while it is on and
+ * `skip-ci-label.yml` holds the merge with a `pending` `no-skip-ci-label`
+ * status. It is a label, deliberately — a `skip-ci` in the title means nothing
+ * to any workflow.
  */
 export const SKIP_CI_LABEL = 'skip-ci';
 
 /**
- * The label that says a pull request has been reviewed and is waiting its
- * turn. It is the whole of `unblock-prs`'s scope rule: a pull request without
- * it is passed over in silence, and one with it is rebased, released from
- * `skip-ci` and watched when its turn comes.
+ * The label that says a pull request has been reviewed and is waiting its turn.
+ * It is the whole of `unblock-prs`'s scope rule: a pull request without it is
+ * passed over in silence, and one with it is rebased, released from `skip-ci`
+ * and watched when its turn comes.
  */
 export const MERGE_QUEUED_LABEL = 'merge-queued';
 
@@ -25,17 +25,16 @@ export const MERGE_QUEUED_LABEL = 'merge-queued';
  * The label a pull request carries to say the next release must contain it:
  * while it is open, the version pull request is not picked.
  *
- * It exists because the version pull request is the one pull request whose
- * body cannot declare a `Merge-After:` — `changesets/action` overwrites the
- * title and body of it on every push to the base — so the ordering is
- * declared from the other side, by the pull request the release is waiting
- * for. A label rather than a trailer for the same reason `merge-queued` is
- * one: this repository is public, and a label needs write access while a
- * comment does not.
+ * It exists because the version pull request is the one pull request whose body
+ * cannot declare a `Merge-After:` — `changesets/action` overwrites the title
+ * and body of it on every push to the base — so the ordering is declared from
+ * the other side, by the pull request the release is waiting for. A label
+ * rather than a trailer for the same reason `merge-queued` is one: this
+ * repository is public, and a label needs write access while a comment does
+ * not.
  *
- * Nothing ever takes it off. The constraint is "open", so it ends when the
- * pull request merges or is closed, and there is no state left behind to
- * clean up.
+ * Nothing ever takes it off. The constraint is "open", so it ends when the pull
+ * request merges or is closed, and there is no state left behind to clean up.
  */
 export const BLOCKS_RELEASE_LABEL = 'blocks-release';
 
@@ -43,22 +42,22 @@ export const BLOCKS_RELEASE_LABEL = 'blocks-release';
  * The label that asks `unblock-prs` to keep a pull request on the tip of the
  * default branch while it waits, so that its diff stays readable for review.
  * It is honoured only together with `skip-ci`, under which the push runs no
- * checks, and only when the queue has nothing to do. `open-pr` puts it on
- * every layer of a stack: one above the bottom is carried along by the layer
- * below, and needs the label of its own once that layer merges and it is
- * moved onto the default branch.
+ * checks, and only when the queue has nothing to do. `open-pr` puts it on every
+ * layer of a stack: one above the bottom is carried along by the layer below,
+ * and needs the label of its own once that layer merges and it is moved onto
+ * the default branch.
  */
 export const AUTO_REBASE_LABEL = 'auto-rebase';
 
 /**
  * The labels that move a pull request within `unblock-prs`'s pick order:
- * among the ones it may pick, those labelled `priority:high` go first and
- * those labelled `priority:low` last, the version pull request included.
- * They decide nothing else — what `Merge-After:`, a stack or
- * `blocks-release` holds back stays held, and a pull request already in
- * flight is watched whatever it carries. One carrying both counts as
- * neither. {@link PRIORITY_MID_LABEL} is not read there: it is the same as
- * carrying neither.
+ * among the ones it may pick, those labelled `priority:high` go first and those
+ * labelled `priority:low` last, the version pull request included.
+ * They decide nothing else — what `Merge-After:`, a stack or `blocks-release`
+ * holds back stays held, and a pull request already in flight is watched
+ * whatever it carries. One carrying both counts as neither.
+ * {@link PRIORITY_MID_LABEL} is not read there: it is the same as carrying
+ * neither.
  */
 export const PRIORITY_HIGH_LABEL = 'priority:high';
 
@@ -72,8 +71,8 @@ export const PRIORITY_MID_LABEL = 'priority:mid';
 
 /**
  * The label that says the author is holding a pull request back for now.
- * Also on GitHub, and read only by the Pull Requests Manager page, whose
- * merge order counts it and can hide what carries it. It asks nothing of
+ * Also on GitHub, and read only by the Pull Requests Manager page, whose merge
+ * order counts it and can hide what carries it. It asks nothing of
  * `unblock-prs`: what is held is simply not labelled `merge-queued`.
  */
 export const PENDING_LABEL = 'pending';
@@ -82,8 +81,8 @@ export const PENDING_LABEL = 'pending';
  * The label that says someone has started an issue, before there is a pull
  * request to say so. `start-issue` puts it on, and refuses an issue that
  * already carries it, so that two sessions do not pick up the same one; the
- * Pull Requests Manager page and `pr-report` show a startable issue carrying
- * it as in progress, as they show one an open pull request closes
+ * Pull Requests Manager page and `pr-report` show a startable issue carrying it
+ * as in progress, as they show one an open pull request closes
  * (`start-after.mts`'s `progressOf`). Nothing takes it off when the work
  * merges: the issue closes, and the label with it stops mattering.
  */
@@ -92,8 +91,7 @@ export const IN_PROGRESS_LABEL = 'in-progress';
 /**
  * The label that says someone means to start an issue next. It holds nothing
  * back — `start-issue` takes it off as it puts {@link IN_PROGRESS_LABEL} on —
- * and only tells whoever is choosing what to start that this one is spoken
- * for; the page and `pr-report` show a startable issue carrying it as
- * planned.
+ * and only tells whoever is choosing what to start that this one is spoken for;
+ * the page and `pr-report` show a startable issue carrying it as planned.
  */
 export const PLANNED_LABEL = 'planned';

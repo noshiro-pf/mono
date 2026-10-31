@@ -133,10 +133,9 @@ export const isSameArrayText = (
  * Parses a `<array>.length <op> <bound>` comparison (in either operand order)
  * into its array expression, integer-literal/`const` `bound`, and whether it is
  * a lower (`min`) or upper (`max`) length bound. Returns `undefined` for
- * anything else. The comparison, the length and the bound are read through
- * type wrappers; the
- * `bound` returned is the literal or constant underneath, since a wrapper such
- * as `as number` would only widen the length a guard narrows to.
+ * anything else. The comparison, the length and the bound are read through type
+ * wrappers; the `bound` returned is the literal or constant underneath, since a
+ * wrapper such as `as number` would only widen the length a guard narrows to.
  *
  * - `xs.length >= n` / `n <= xs.length` → `min`
  * - `xs.length <= n` / `n >= xs.length` → `max`

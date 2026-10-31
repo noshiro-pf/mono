@@ -36,8 +36,8 @@ export const typeCheck = (tsconfigPath: string): TypeCheckResult => {
   return {
     // The compiler prints each file relative to its working directory — this
     // process's, which is also what makes the printed output usable from the
-    // terminal it ran in. Resolved against the project directory instead,
-    // every filename came out wrong but its basename.
+    // terminal it ran in. Resolved against the project directory instead, every
+    // filename came out wrong but its basename.
     diagnostics: parseDiagnostics(output, process.cwd()),
     output,
   };
@@ -95,10 +95,10 @@ const parseDiagnosticLine = (
 };
 
 /**
- * `src/a.mts(3,7): error TS2322: Type 'string' is not ...` — a diagnostic
- * with a location — or `error TS5083: Cannot read file ...` without one.
- * Continuation lines of a multi-line message carry no `error TS` marker and
- * are skipped (the caller prints the compiler's own text in full).
+ * `src/a.mts(3,7): error TS2322: Type 'string' is not ...` — a diagnostic with
+ * a location — or `error TS5083: Cannot read file ...` without one.
+ * Continuation lines of a multi-line message carry no `error TS` marker and are
+ * skipped (the caller prints the compiler's own text in full).
  */
 const parseDiagnostics = (
   output: string,

@@ -150,16 +150,16 @@ export const applyTransformationsToFile = async (
  * statement of `code` by itself, for transformers that read and rewrite only
  * inside the statement they are visiting.
  *
- * Each replacement a ts-morph transformer makes reparses the source file it
- * is in, so over a whole file the transformation is quadratic in its length,
- * and the larger rule files here (one `namespace` per rule) took the better
- * part of a minute each. One statement at a time it is linear.
+ * Each replacement a ts-morph transformer makes reparses the source file it is
+ * in, so over a whole file the transformation is quadratic in its length, and
+ * the larger rule files here (one `namespace` per rule) took the better part of
+ * a minute each. One statement at a time it is linear.
  *
  * Every statement but the first is transformed behind a `;` that is removed
  * again, so that its leading comments start after a token, as they do in the
- * file; at the start of a file, the comments on the same line as the
- * statement before would count as its own. What follows the last statement
- * is kept as it is.
+ * file; at the start of a file, the comments on the same line as the statement
+ * before would count as its own. What follows the last statement is kept as it
+ * is.
  */
 const transformEachStatement = (
   code: string,

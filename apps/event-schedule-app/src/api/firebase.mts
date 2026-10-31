@@ -26,8 +26,8 @@ export type FirebaseHandles = DeepReadonly<{
 }>;
 
 /**
- * Connects to Firebase — to the emulators in development. Called once, when
- * the app's API is made.
+ * Connects to Firebase — to the emulators in development. Called once, when the
+ * app's API is made.
  */
 export const initializeFirebase = (): FirebaseHandles => {
   const fbApp = initializeApp(firebaseConfig);

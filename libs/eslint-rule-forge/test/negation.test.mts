@@ -87,8 +87,8 @@ describe(negationOf, () => {
         ['s < t', 's >= t'],
         ['n < 1', 'undefined'],
         ['1 < 2', '1 >= 2'],
-        // De Morgan, each side negated the same way, or with `!` when it has
-        // no short negation.
+        // De Morgan, each side negated the same way, or with `!` when it has no
+        // short negation.
         ['n === 0 || s === ""', 'n !== 0 && s !== ""'],
         ['a && f()', '!a || !f()'],
         ['!a || n < m', 'a && !(n < m)'],

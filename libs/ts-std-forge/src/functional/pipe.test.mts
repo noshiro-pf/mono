@@ -134,8 +134,8 @@ describe(pipe, () => {
     // collapses to `number | undefined` instead of `D | undefined`.
     //
     // The explicit `D | undefined` return annotation is itself the assertion:
-    // were the brand lost, `.value` would be `number | undefined` and the
-    // body would fail to compile.
+    // were the brand lost, `.value` would be `number | undefined` and the body
+    // would fail to compile.
     const decodeBranded = <D extends number>(
       input: string,
       parse: (s: string) => D | undefined,

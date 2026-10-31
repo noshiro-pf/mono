@@ -306,8 +306,8 @@ export const traceUpdates = (
   };
 
   /**
-   * `setNext`: stores the value and the token, queues the children, and
-   * calls the subscriber.
+   * `setNext`: stores the value and the token, queues the children, and calls
+   * the subscriber.
    */
   const setNext = (
     id: string,
@@ -508,8 +508,8 @@ export const traceUpdates = (
 
     let mut_markTold = false;
 
-    // `size` grows while the buckets are visited, which a `range` built at
-    // the start would miss.
+    // `size` grows while the buckets are visited, which a `range` built at the
+    // start would miss.
     // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
     for (let mut_index = 0; mut_index < mut_q.size; mut_index += 1) {
       const i = mut_index.toString();
@@ -619,8 +619,8 @@ export const traceUpdates = (
     const root = nodeOf(rootId);
 
     // The captions below narrate the update a write opens; a write to a root
-    // nothing observes (`setNextIfUnobserved`) opens none, which this
-    // simulator does not model.
+    // nothing observes (`setNextIfUnobserved`) opens none, which this simulator
+    // does not model.
     if (Arr.isEmpty(root.children)) {
       throw new Error(
         `❌ ${rootId} has no children: the trace does not model a write that opens no update`,
@@ -997,8 +997,8 @@ const timesFormula =
 
 const traceScenarios: ReadonlyRecord<TraceScenarioName, Scenario> = {
   /**
-   * The filter diamond of "How SynState Solved the Glitch", with `combine`
-   * and the `map` after it as the two nodes they are.
+   * The filter diamond of "How SynState Solved the Glitch", with `combine` and
+   * the `map` after it as the two nodes they are.
    */
   filterDiamond: {
     nodes: [

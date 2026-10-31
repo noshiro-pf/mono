@@ -2,8 +2,8 @@ import { createRule } from './create-rule.mjs';
 
 /**
  * `jsx/generic-arrow-trailing-comma` — an arrow function with a single type
- * parameter is written `<T,>(...)`, in every file (D-11): the trailing comma
- * is what keeps the generic unambiguous under the JSX grammar, and writing it
+ * parameter is written `<T,>(...)`, in every file (D-11): the trailing comma is
+ * what keeps the generic unambiguous under the JSX grammar, and writing it
  * everywhere keeps the spelling independent of the file extension.
  *
  * A constrained parameter (`<T extends X>`) is exempt: the constraint already

@@ -76,8 +76,8 @@ export function number(
   }
 
   return attachConstraints(
-    // The constraints are what the refinement checks, and they are on the
-    // type itself, so it describes itself as the primitive it refines.
+    // The constraints are what the refinement checks, and they are on the type
+    // itself, so it describes itself as the primitive it refines.
     withStructure(
       refine({
         baseType,
@@ -145,8 +145,8 @@ export type NumberRangeConstraints = StrictPick<
 
 /**
  * The constraint values carried by a {@link number} type created with the
- * constraints `C`: every key of {@link NumberTypeConstraints}, taking the
- * value `C` gives it and `undefined` for the keys `C` leaves out.
+ * constraints `C`: every key of {@link NumberTypeConstraints}, taking the value
+ * `C` gives it and `undefined` for the keys `C` leaves out.
  *
  * @example
  * ```ts

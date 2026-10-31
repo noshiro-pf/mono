@@ -2,8 +2,8 @@ import { Result } from '../../result/index.mjs';
 import type { AsyncResult } from '../async-result.mjs';
 
 /**
- * Maps an `AsyncResult<S, E>` to `AsyncResult<S, E2>` by applying a function
- * to the error value. The mapping function may be synchronous or return a
+ * Maps an `AsyncResult<S, E>` to `AsyncResult<S, E2>` by applying a function to
+ * the error value. The mapping function may be synchronous or return a
  * `Promise`; both are handled transparently. If the `AsyncResult` resolves to
  * `Ok`, the original `Ok` is passed through and the function is not called.
  *
@@ -39,10 +39,10 @@ export function mapErr<S, E, E2>(
 
 // Curried version
 //
-// Unlike `Result.mapErr`, the returned function can simply be generic over
-// `S`: an `AsyncResult` is a `Promise`, not a discriminated union, so there
-// is no literal-narrowing problem that would require the whole-result
-// generic trick used by the synchronous combinators.
+// Unlike `Result.mapErr`, the returned function can simply be generic over `S`:
+// an `AsyncResult` is a `Promise`, not a discriminated union, so there is no
+// literal-narrowing problem that would require the whole-result generic trick
+// used by the synchronous combinators.
 export function mapErr<E, E2>(
   mapFn: (error: E) => E2 | Promise<E2>,
 ): <S>(asyncResult: AsyncResult<S, E>) => AsyncResult<S, E2>;

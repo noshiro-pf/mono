@@ -15,9 +15,9 @@ import { hasCommentWithin } from './comments.mjs';
 import { SYNSTATE_MODULE } from './constants.mjs';
 
 /**
- * Whether the identifier that decides what `callee` calls — the callee, or
- * the namespace object — is bound by something other than an import from one
- * of `moduleNames` (synstate alone by default) where it is read.
+ * Whether the identifier that decides what `callee` calls — the callee, or the
+ * namespace object — is bound by something other than an import from one of
+ * `moduleNames` (synstate alone by default) where it is read.
  */
 export const isShadowedCallee = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -54,14 +54,14 @@ export const isShadowedCallee = (
  * returns the edits, or `undefined` when they cannot be made: the callee is in
  * a type wrapper written for the type of the export it calls, a comment inside
  * the parentheses around a named callee would go with it, the name would be
- * something that is not synstate's at the call, or no value import can take
- * the name (see {@link importedBindingOf}).
+ * something that is not synstate's at the call, or no value import can take the
+ * name (see {@link importedBindingOf}).
  *
  * Each fix brings the export into scope itself rather than leaving that to
- * another report's: an editor applies one fix at a time, and a fix that loses
- * a conflict with another rule's in the same pass is dropped. Fixes that all
- * add the name overlap, so `--fix` applies one per pass, and the rest in the
- * next, by when the file imports it.
+ * another report's: an editor applies one fix at a time, and a fix that loses a
+ * conflict with another rule's in the same pass is dropped. Fixes that all add
+ * the name overlap, so `--fix` applies one per pass, and the rest in the next,
+ * by when the file imports it.
  */
 export const buildCalleeRewriter = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

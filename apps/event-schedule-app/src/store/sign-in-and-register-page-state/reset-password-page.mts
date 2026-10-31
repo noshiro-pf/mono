@@ -22,8 +22,8 @@ export type ResetPasswordPageDeps = Readonly<{
 }>;
 
 /**
- * The reset-password form on the sign-in page, and sending the email
- * through `deps.api`.
+ * The reset-password form on the sign-in page, and sending the email through
+ * `deps.api`.
  */
 export const createResetPasswordPageStore = (
   deps: ResetPasswordPageDeps,

@@ -1,8 +1,8 @@
 /**
- * The Japanese text of the page: the language the app was written in, and
- * the shape every other language's text has (`Messages`). A string here is
- * shown as it is; a function puts the values it takes into its sentence,
- * which is how word order is left to each language.
+ * The Japanese text of the page: the language the app was written in, and the
+ * shape every other language's text has (`Messages`). A string here is shown as
+ * it is; a function puts the values it takes into its sentence, which is how
+ * word order is left to each language.
  */
 
 export const ja = {

@@ -9,8 +9,8 @@ type Props = Readonly<{
 /**
  * The glyph a badge carries beside its word.
  *
- * Inline rather than an `<img>`: it inherits `currentColor` from the badge,
- * so one drawing serves every status colour and dark mode, and the page's
+ * Inline rather than an `<img>`: it inherits `currentColor` from the badge, so
+ * one drawing serves every status colour and dark mode, and the page's
  * `img-src` never comes into it. `aria-hidden` because the word beside it is
  * the label.
  */

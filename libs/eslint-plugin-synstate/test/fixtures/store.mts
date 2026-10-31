@@ -1,6 +1,6 @@
-// The other file of `no-write-during-propagation.typed.test.mts`: states
-// made here and imported there, as a store module and the code subscribing
-// to it would be.
+// The other file of `no-write-during-propagation.typed.test.mts`: states made
+// here and imported there, as a store module and the code subscribing to it
+// would be.
 import * as synstate from 'synstate';
 import { createState, source } from 'synstate';
 

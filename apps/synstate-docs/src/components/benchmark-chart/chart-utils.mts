@@ -3,9 +3,9 @@
 import { Arr, asPositiveSafeInt, PositiveSafeInt } from 'ts-data-forge';
 
 /**
- * How a line chart draws a series, in the plot and in the legend alike: a
- * naive form dashed, thinner and with smaller dots, so that it does not read
- * as its library's own line.
+ * How a line chart draws a series, in the plot and in the legend alike: a naive
+ * form dashed, thinner and with smaller dots, so that it does not read as its
+ * library's own line.
  */
 export const lineStyleOf = (
   naive: boolean | undefined,

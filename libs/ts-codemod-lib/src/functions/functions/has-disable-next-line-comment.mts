@@ -84,9 +84,9 @@ export const hasDisableNextLineComment = (
         }
       }
 
-      // If we found *any* comment on the preceding line, but it wasn't
-      // the correct ignore comment, then the node is not ignored by
-      // a comment on the *immediately* preceding line. Stop checking further back.
+      // If we found *any* comment on the preceding line, but it wasn't the
+      // correct ignore comment, then the node is not ignored by a comment on
+      // the *immediately* preceding line. Stop checking further back.
       return false;
     }
 
@@ -140,8 +140,8 @@ const countLessThan = (sorted: readonly number[], value: number): number => {
  * unlike in the compiler's own line map).
  *
  * ts-morph scans the text from its start on every call, which made this
- * check, asked of every node a transformer visits, quadratic in the size of
- * the file. The newline positions are collected once per compiler source file
+ * check, asked of every node a transformer visits, quadratic in the size of the
+ * file. The newline positions are collected once per compiler source file
  * instead. ts-morph replaces that object whenever the file is edited, so an
  * entry never outlives the text it was collected from.
  */

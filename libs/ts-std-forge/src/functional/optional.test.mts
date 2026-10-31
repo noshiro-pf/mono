@@ -146,8 +146,8 @@ describe('Optional test', () => {
     });
 
     test('curried form is usable from a caller generic over the optional', () => {
-      // The motivating case: with the curried parameter fixed to
-      // `Optional<S>`, `S` binds to `Optional.Unwrap<O>` here and a bare
+      // The motivating case: with the curried parameter fixed to `Optional<S>`,
+      // `S` binds to `Optional.Unwrap<O>` here and a bare
       // `O extends UnknownOptional` is not assignable to
       // `Optional<Optional.Unwrap<O>>`, so this only compiles because the
       // returned function is generic over the whole optional.

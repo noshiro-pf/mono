@@ -3,9 +3,8 @@
  * test:rules`, which starts the emulator and sets `FIRESTORE_EMULATOR_HOST`;
  * `check:test` does not read this directory (README.md: ルールのテスト).
  *
- * Each case starts from the same data (`seed`): Bob's personal project, and
- * a project of Bob's that lists Alice as a member. Carol is a member of
- * neither.
+ * Each case starts from the same data (`seed`): Bob's personal project, and a
+ * project of Bob's that lists Alice as a member. Carol is a member of neither.
  */
 import {
   initializeTestEnvironment,
@@ -374,9 +373,8 @@ const firestoreFor = (actor: Actor): Firestore =>
   ).firestore();
 
 /**
- * Whether the rules let the operation through. Any error other than a
- * refusal by the rules is rethrown, so that a broken case does not pass as
- * `denied`.
+ * Whether the rules let the operation through. Any error other than a refusal
+ * by the rules is rethrown, so that a broken case does not pass as `denied`.
  */
 const outcome = async (
   operation: Promise<unknown>,

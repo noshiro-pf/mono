@@ -52,8 +52,8 @@ export const solidZoom: ScenarioFramework<ZoomApp> = {
         </table>
       );
 
-      // A `<table>` expression is a `HTMLTableElement` at run time; Solid
-      // types every JSX expression as its broader `JSX.Element`.
+      // A `<table>` expression is a `HTMLTableElement` at run time; Solid types
+      // every JSX expression as its broader `JSX.Element`.
       if (element instanceof Node) {
         container.append(element);
       }

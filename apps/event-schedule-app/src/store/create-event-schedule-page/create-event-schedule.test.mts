@@ -95,8 +95,8 @@ describe(createCreateEventScheduleStore, () => {
 
     await settle(saveDelayMs * 5);
 
-    // `skip(1)` drops the first settled change after start, as it did when
-    // the subscription was made on import: only the second is saved.
+    // `skip(1)` drops the first settled change after start, as it did when the
+    // subscription was made on import: only the second is saved.
     assert.deepStrictEqual(calls, ['storage.save second']);
   });
 

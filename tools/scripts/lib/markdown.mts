@@ -1,7 +1,7 @@
 /**
  * The little of Markdown that more than one guard has to tell apart: what is
- * code and what is prose. A link or a path written in code is an example,
- * not a reference.
+ * code and what is prose. A link or a path written in code is an example, not a
+ * reference.
  */
 
 import { Arr } from 'ts-data-forge';
@@ -61,8 +61,8 @@ type Fence = Readonly<{ char: string; length: number }>;
 /**
  * An opening or closing fence: three or more backticks or tildes, indented by
  * anything (a fence in a list item is indented by the item) and behind any
- * number of `>` (a fence in a blockquote or an alert), then the info
- * string. Only a fence with no info string closes one, and a backtick fence's
+ * number of `>` (a fence in a blockquote or an alert), then the info string.
+ * Only a fence with no info string closes one, and a backtick fence's
  * info string has no backtick — ```` ```ts``` と書く ```` is a code span at
  * the start of a line, not a fence.
  */

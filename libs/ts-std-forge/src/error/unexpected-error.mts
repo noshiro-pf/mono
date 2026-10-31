@@ -7,8 +7,8 @@
  * residue — conditions the spec leaves to the engine, such as the maximum
  * string length `String.prototype.repeat` can produce — which cannot be
  * predicted portably. Those throws are caught by the `Result.fromThrowable`
- * backstop and surfaced with this kind, with the engine's `Error` attached
- * as `cause`.
+ * backstop and surfaced with this kind, with the engine's `Error` attached as
+ * `cause`.
  */
 export type UnexpectedError = Readonly<{
   kind: 'unexpected';

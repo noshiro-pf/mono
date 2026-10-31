@@ -65,9 +65,8 @@ export const tsLibShapeFor = (tsVersion: string): TsLibShape => {
 };
 
 /**
- * The parameter type of a collection's `has`, which accepts the widened
- * literal type so that a set of a literal union can be queried with a
- * `string`:
+ * The parameter type of a collection's `has`, which accepts the widened literal
+ * type so that a set of a literal union can be queried with a `string`:
  *
  * - TS >= 5.4: `NoInfer<T | (WidenLiteral<T> & {})>`
  * - TS < 5.4: `T | (WidenLiteral<T> & {})`
@@ -235,8 +234,8 @@ const brandedNumbers = [
 
   'NewArrayMaxSize',
 
-  // YearEnum is not present in ts-type-forge globals; we add it as an alias
-  // of SafeUint inside the generated `declare namespace NumberType`.
+  // YearEnum is not present in ts-type-forge globals; we add it as an alias of
+  // SafeUint inside the generated `declare namespace NumberType`.
   'YearEnum',
 
   ...brandedNumberFromTypeUtils,
@@ -437,8 +436,8 @@ const tupleMap = <T extends readonly unknown[], B>(
 ): Readonly<{ [K in keyof T]: B }> =>
   tpl.map(mapFn) as Readonly<{ [K in keyof T]: B }>;
 
-// Typed as a set of plain strings so `.has` accepts any `brandedNumbers` key
-// (a wider type than the `brandedNumberFromTypeUtils` element type).
+// Typed as a set of plain strings so `.has` accepts any `brandedNumbers` key (a
+// wider type than the `brandedNumberFromTypeUtils` element type).
 const typeUtilsGlobalSet: ReadonlySet<string> = new Set(
   brandedNumberFromTypeUtils,
 );

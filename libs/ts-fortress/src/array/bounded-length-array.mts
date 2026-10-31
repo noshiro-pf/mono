@@ -19,9 +19,9 @@ export type { BoundedLengthArray } from 'ts-type-forge';
  * range `[min, max]`, typed as the branded {@link BoundedLengthArray} instead
  * of the union of tuple types produced by `boundedLengthTuple`.
  *
- * Because the length constraint lives only in the brand, no union of tuples
- * of the element type is ever constructed, which keeps type-checking cheap
- * even when `A` is a large type.
+ * Because the length constraint lives only in the brand, no union of tuples of
+ * the element type is ever constructed, which keeps type-checking cheap even
+ * when `A` is a large type.
  */
 export function boundedLengthArray<
   Min extends SupportedLength,
@@ -41,9 +41,8 @@ export function boundedLengthArray<
 
 // Only the lower bound is in `SupportedLength`, so the upper bound is dropped from
 // the result type and only the "at least `min`" guarantee is kept.
-// A length inside the supported range is also a `number`: nothing at run
-// time tells the clauses apart, so the set only refines the return type
-// (#1952).
+// A length inside the supported range is also a `number`: nothing at run time
+// tells the clauses apart, so the set only refines the return type (#1952).
 // @sumi-expect-error functions/no-refinement-overload
 export function boundedLengthArray<Min extends SupportedLength, A>(
   min: Min,

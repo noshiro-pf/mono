@@ -12,20 +12,20 @@ import { isDirectlyExecuted } from 'ts-repo-utils';
 /**
  * Resolves a conflict on the dependency update the way that branch is made:
  * by having `pnpm-update.yml` build it again from the tip of the default
- * branch, rather than by a rebase. The branch is generated — the lockfile
- * above all — and a hand-resolved lockfile is one nothing checked was
- * resolved under `minimumReleaseAge`.
+ * branch, rather than by a rebase. The branch is generated — the lockfile above
+ * all — and a hand-resolved lockfile is one nothing checked was resolved under
+ * `minimumReleaseAge`.
  *
  * ```sh
  * pnpm run rebuild-pnpm-update -- <number> --by <session URL>
  * ```
  *
  * It refuses unless the pull request is `chore/pnpm-update`, is the skill's
- * (`pr-report-core`'s `queue-owner.mts`, read as every other command reads
- * it) because the worker set it aside `rebase-failed`, and is claimed by
- * `--by`. The workflow force-pushes the branch when it finishes, which moves
- * the head: the claim ends, the set-aside is resolved, and the pull request
- * is the worker's again — as `push-fixed-pr` hands back any other.
+ * (`pr-report-core`'s `queue-owner.mts`, read as every other command reads it)
+ * because the worker set it aside `rebase-failed`, and is claimed by `--by`.
+ * The workflow force-pushes the branch when it finishes, which moves the head:
+ * the claim ends, the set-aside is resolved, and the pull request is the
+ * worker's again — as `push-fixed-pr` hands back any other.
  */
 export const rebuildPnpmUpdate = async (
   args: RebuildArgs,
@@ -73,8 +73,8 @@ export const rebuildPnpmUpdate = async (
 };
 
 /**
- * Why `by` may not have the dependency update rebuilt, or `undefined` when
- * it may.
+ * Why `by` may not have the dependency update rebuilt, or `undefined` when it
+ * may.
  */
 export const decideRebuild = ({
   entry,

@@ -1,6 +1,6 @@
 // Sumi bans classes, `this`, method syntax and writes to `this` outside a
-// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
-// so those rules are waived here (D-63).
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why), so
+// those rules are waived here (D-63).
 // @sumi-expect-error-file classes/no-class
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
@@ -175,8 +175,8 @@ if (import.meta.vitest !== undefined) {
 
     expectType<typeof _inferred, Observable<number>>('=');
 
-    // A generic guard is what a single signature with a union parameter
-    // loses (it infers `unknown`), and why this set stays overloaded.
+    // A generic guard is what a single signature with a union parameter loses
+    // (it infers `unknown`), and why this set stays overloaded.
     const _generic = s.pipe(filter(isNotUndefined));
 
     expectType<typeof _generic, Observable<number>>('=');

@@ -16,14 +16,14 @@ type Props = Readonly<{
 }>;
 
 /**
- * That `unblock-prs` passed this pull request over, when it did. Why is in
- * the comment it left, whose prose the page does not read: the badge names
- * the reason, and its title where the comment is.
+ * That `unblock-prs` passed this pull request over, when it did. Why is in the
+ * comment it left, whose prose the page does not read: the badge names the
+ * reason, and its title where the comment is.
  *
  * Read from that comment rather than from GitHub's `mergeable`: the script
- * rebases, and whether a rebase goes through is its answer to give, not a
- * merge check's. Once the base has moved the next run tries again, so the
- * badge stops being a status and becomes a note.
+ * rebases, and whether a rebase goes through is its answer to give, not a merge
+ * check's. Once the base has moved the next run tries again, so the badge stops
+ * being a status and becomes a note.
  */
 export const SetAsideBadge = ({ entry }: Props): JSX.Element => (
   <MatchOptional

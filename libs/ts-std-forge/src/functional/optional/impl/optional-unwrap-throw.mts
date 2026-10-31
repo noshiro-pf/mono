@@ -4,8 +4,8 @@ import { isSome } from './optional-is-some.mjs';
 import type { Unwrap } from './types.mjs';
 
 /**
- * Unwraps an `Optional`, returning the contained value. Throws an error if
- * the `Optional` is `None`.
+ * Unwraps an `Optional`, returning the contained value. Throws an error if the
+ * `Optional` is `None`.
  *
  * This is a safer alternative to direct value access when you know the
  * Optional should contain a value. Use this method when an empty Optional

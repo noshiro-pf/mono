@@ -1,8 +1,8 @@
 /**
  * The page's state, made once with the browser as its surroundings.
  *
- * The components bind its values straight into the DOM and call its
- * actions; none of them holds state of its own. What each part does, and the tests of
+ * The components bind its values straight into the DOM and call its actions;
+ * none of them holds state of its own. What each part does, and the tests of
  * it, are in the modules this puts together — this file is only which real
  * thing each of them is handed.
  */
@@ -60,8 +60,8 @@ import { createTokenStore } from './token-store.mjs';
 
 /**
  * The repository the page reads, as the URL named it when the page opened.
- * `main.tsx` loads this module only when it names one, and shows the start
- * page otherwise.
+ * `main.tsx` loads this module only when it names one, and shows the start page
+ * otherwise.
  */
 export const reportSource: ReportSource =
   reportSourceFromSearch(currentSearch()) ??
@@ -165,9 +165,9 @@ export const activityStore = createActivityStore({
 });
 
 /**
- * Starts the timers and the listeners. Called once, from `main.tsx`, before
- * the first render: the theme is written to `<html>` as it starts, so a page
- * opened with `?theme=` never draws a frame of the other one.
+ * Starts the timers and the listeners. Called once, from `main.tsx`, before the
+ * first render: the theme is written to `<html>` as it starts, so a page opened
+ * with `?theme=` never draws a frame of the other one.
  */
 export const startStore = (): (() => void) => {
   const stopToken = tokenStore.start();

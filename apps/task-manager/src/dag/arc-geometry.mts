@@ -1,21 +1,21 @@
 /**
  * The arcs of the arc diagram as curves: from the right side of the node
- * depended on to the right side of the node that waits, bulging to the
- * right, as in a classic arc diagram with its nodes in a column.
+ * depended on to the right side of the node that waits, bulging to the right,
+ * as in a classic arc diagram with its nodes in a column.
  *
  * Each arc is one cubic Bézier curve whose control points lie level with its
- * ends, {@link ARC_BULGE} times the vertical distance to their right: it
- * leaves and arrives horizontally — at right angles to the side — so the
- * arrowhead, which follows the last tangent, points straight into the
- * target, and it approximates a semicircle on the line between its ends.
+ * ends, {@link ARC_BULGE} times the vertical distance to their right: it leaves
+ * and arrives horizontally — at right angles to the side — so the arrowhead,
+ * which follows the last tangent, points straight into the target, and it
+ * approximates a semicircle on the line between its ends.
  *
- * Every arc at a node meets its right side at its own point, spread along
- * it — on a milestone, on the slanted sides of its hexagon, which come in
- * as far from its right corner as they are from its middle — in an order
- * that nests the arcs on each side rather than crossing them
- * (`compareSlots`). Arcs whose spans overlap without one taking in the other
- * still cross, as they must. The longest come first, so that drawn in order
- * the short ones stay on top and visible.
+ * Every arc at a node meets its right side at its own point, spread along it —
+ * on a milestone, on the slanted sides of its hexagon, which come in as far
+ * from its right corner as they are from its middle — in an order that nests
+ * the arcs on each side rather than crossing them (`compareSlots`). Arcs whose
+ * spans overlap without one taking in the other still cross, as they must. The
+ * longest come first, so that drawn in order the short ones stay on top and
+ * visible.
  */
 
 import { Arr, Num } from 'ts-data-forge';
@@ -133,8 +133,8 @@ export const arcGeometries = (
 };
 
 /**
- * The box around the column and the arcs beside it, labels included,
- * `margin` wider on each side.
+ * The box around the column and the arcs beside it, labels included, `margin`
+ * wider on each side.
  */
 export const arcContentBounds = (
   nodes: readonly LaidOutNode[],
@@ -194,11 +194,11 @@ const offsetOf = ({ node, other }: SlotEnd): number =>
 const inverse = (x: number): number => (Num.isNonZero(x) ? Num.div(1, x) : 0);
 
 /**
- * Down a node's right side: the arcs to nodes above it, nearest first, then
- * the arcs to nodes below it, farthest first. On each side a longer arc then
- * meets the node nearer the middle than a shorter one, which keeps it
- * outside the shorter. That is the order of `1 / dy`, where `dy` is how far
- * below the node the other end is; ties — two arcs to one node — go by id.
+ * Down a node's right side: the arcs to nodes above it, nearest first, then the
+ * arcs to nodes below it, farthest first. On each side a longer arc then meets
+ * the node nearer the middle than a shorter one, which keeps it outside the
+ * shorter. That is the order of `1 / dy`, where `dy` is how far below the node
+ * the other end is; ties — two arcs to one node — go by id.
  */
 const compareSlots = (a: SlotEnd, b: SlotEnd): number => {
   const byOther = inverse(offsetOf(a)) - inverse(offsetOf(b));
@@ -214,8 +214,8 @@ const compareSlots = (a: SlotEnd, b: SlotEnd): number => {
 
 /**
  * The `index`th of `count` points evenly spread down `node`'s right side:
- * for a milestone, on its hexagon (`dag-milestone-node.tsx`), whose sides
- * slant in at 45° from the corner in the middle.
+ * for a milestone, on its hexagon (`dag-milestone-node.tsx`), whose sides slant
+ * in at 45° from the corner in the middle.
  */
 const rightSidePoint = (
   node: LaidOutNode,

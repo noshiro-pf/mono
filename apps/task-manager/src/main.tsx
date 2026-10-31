@@ -29,10 +29,10 @@ render(App, container);
  * The Firebase backend — or, in a development build asked for with
  * `?storage=memory`, the in-memory demo, which needs no sign-in.
  *
- * Both are loaded after the first render, so the page draws before Firebase
- * has loaded. `import.meta.env.DEV` is replaced with `false` in a production
- * build, which makes the demo branch dead code: neither it nor the sample
- * data is in the published bundle.
+ * Both are loaded after the first render, so the page draws before Firebase has
+ * loaded. `import.meta.env.DEV` is replaced with `false` in a production build,
+ * which makes the demo branch dead code: neither it nor the sample data is in
+ * the published bundle.
  */
 const loadBackend = async (): Promise<Backend> => {
   if (

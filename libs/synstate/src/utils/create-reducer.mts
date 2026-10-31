@@ -111,18 +111,18 @@ export const createReducer = <S, A>(
  */
 export type StateOptions<S> = Readonly<{
   /**
-   * Whether the next state is the same as the current one. When it says so,
-   * the update is not passed on — no subscriber, and nothing derived from
-   * the state, is told of it — and the current state is kept, along with its
-   * identity: `setState` and the like return the current state rather than
-   * the next.
+   * Whether the next state is the same as the current one. When it says so, the
+   * update is not passed on — no subscriber, and nothing derived from the
+   * state, is told of it — and the current state is kept, along with its
+   * identity: `setState` and the like return the current state rather than the
+   * next.
    *
    * Decide here, where the state is held, rather than downstream with
-   * `skipIfNoChange`: an update passed on here reaches whatever reads the
-   * state directly before any operator can thin it out.
+   * `skipIfNoChange`: an update passed on here reaches whatever reads the state
+   * directly before any operator can thin it out.
    *
-   * Defaults to `Object.is`, so writing the value already held passes
-   * nothing on. Pass `() => false` to pass on every update, equal or not.
+   * Defaults to `Object.is`, so writing the value already held passes nothing
+   * on. Pass `() => false` to pass on every update, equal or not.
    *
    * @param current - The state held now
    * @param next - The state the update would set
@@ -132,8 +132,8 @@ export type StateOptions<S> = Readonly<{
   /**
    * Whether an update keeps the parts of the state it did not change. With
    * `true`, the next state is compared with the current one before it is
-   * written, and every part of it deeply equal to the same part of the
-   * current state is replaced by that part (`replaceEqualDeep` of
+   * written, and every part of it deeply equal to the same part of the current
+   * state is replaced by that part (`replaceEqualDeep` of
    * ts-data-forge): a reader of an unchanged part keeps the object it has, so
    * `map`, comparing with `Object.is`, stops there. When the whole next state is
    * deeply equal, the current state is kept and nothing is passed on, so
@@ -146,14 +146,14 @@ export type StateOptions<S> = Readonly<{
    * arrays are walked into; a `Map`, a `Set`, a `Date` or a class instance is
    * compared and kept whole.
    *
-   * Prefer this over `keepEqualParts()` downstream: keeping the parts where
-   * the state is written means no update with nothing in it is passed on at
-   * all, and nothing downstream has anything to undo.
+   * Prefer this over `keepEqualParts()` downstream: keeping the parts where the
+   * state is written means no update with nothing in it is passed on at all,
+   * and nothing downstream has anything to undo.
    *
-   * Defaults to `false`: the next state is written as given. With it on,
-   * each update compares deeply every part of the next state that is not
-   * the very object of the current one; a state whose updates already keep
-   * what they do not change, as `{ ...prev, x }` does, gains nothing from it.
+   * Defaults to `false`: the next state is written as given. With it on, each
+   * update compares deeply every part of the next state that is not the very
+   * object of the current one; a state whose updates already keep what they do
+   * not change, as `{ ...prev, x }` does, gains nothing from it.
    */
   keepEqualParts?: boolean | ReplaceEqualDeepOptions;
 }>;

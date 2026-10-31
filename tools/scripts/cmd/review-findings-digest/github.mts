@@ -105,9 +105,9 @@ export const selectMerged = (
   seen: readonly PullListItem[],
 ): readonly MergedListItem[] => {
   // A pull request updated while the pages are read moves to the top of the
-  // list. That can push one already read onto the next page, read twice
-  // (kept once here), or take one not yet read onto a page already read,
-  // missed: for a run of a few seconds, an accepted gap.
+  // list. That can push one already read onto the next page, read twice (kept
+  // once here), or take one not yet read onto a page already read, missed: for
+  // a run of a few seconds, an accepted gap.
   const merged = Arr.uniqBy(seen, (pull) => pull.number)
     .filter((pull): pull is MergedListItem => pull.merged_at !== null)
     .toSorted((a, b) => b.merged_at.localeCompare(a.merged_at));
@@ -120,8 +120,8 @@ export const selectMerged = (
 /**
  * Whether a page after the ones in `seen` could still hold a pull request
  * `range` selects. The pages are sorted by `updated_at`, newest first, and a
- * pull request is updated when it merges, so every one on a later page
- * merged no later than the oldest update seen so far.
+ * pull request is updated when it merges, so every one on a later page merged
+ * no later than the oldest update seen so far.
  */
 export const needsNextPage = (
   range: PullRange,

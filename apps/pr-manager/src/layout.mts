@@ -2,27 +2,27 @@
  * How the page's five blocks are laid out, and how that is kept in the URL.
  *
  * **The blocks** are the merge order (with the cycles under it), the queue
- * `unblock-prs` works through, the workflow runs still going, what merged,
- * and the open issues. They can be put in one
- * column, two or three, in any order, and the dividers between the columns
- * move. Any of them can be hidden: a hidden block keeps its place, its height
- * and its share, so showing it again puts it back where it was, and the
- * blocks around it share out the column as if it were not there.
+ * `unblock-prs` works through, the workflow runs still going, what merged, and
+ * the open issues. They can be put in one column, two or three, in any order,
+ * and the dividers between the columns move. Any of them can be hidden: a
+ * hidden block keeps its place, its height and its share, so showing it again
+ * puts it back where it was, and the blocks around it share out the column as
+ * if it were not there.
  *
- * **Their heights** are one of two modes. In `natural`, the page is as tall
- * as its blocks: each can be given a height, and then scrolls on its own,
- * and without one it is as tall as what it holds. In `fill`, the page is as
- * tall as the window and never scrolls; each column's height is shared out
- * among its blocks by their shares, and only a block scrolls. A share is a
- * weight, not a percentage, so that moving a block from one column to the
- * other leaves the rest of each as they were. Each mode keeps its numbers
- * while the other is on, so switching back finds them where they were.
+ * **Their heights** are one of two modes. In `natural`, the page is as tall as
+ * its blocks: each can be given a height, and then scrolls on its own, and
+ * without one it is as tall as what it holds. In `fill`, the page is as tall as
+ * the window and never scrolls; each column's height is shared out among its
+ * blocks by their shares, and only a block scrolls. A share is a weight, not a
+ * percentage, so that moving a block from one column to the other leaves the
+ * rest of each as they were. Each mode keeps its numbers while the other is on,
+ * so switching back finds them where they were.
  *
- * **Kept in the query string**, as the theme is (`theme.mts`), and for the
- * same reasons: a bookmark or a pasted link opens the same way, and nothing
- * is added to a `localStorage` every app on the origin shares. Only what
- * differs from {@link DEFAULT_LAYOUT} is written, so a page laid out the
- * usual way has a URL that says nothing about it:
+ * **Kept in the query string**, as the theme is (`theme.mts`), and for the same
+ * reasons: a bookmark or a pasted link opens the same way, and nothing is added
+ * to a `localStorage` every app on the origin shares. Only what differs from
+ * {@link DEFAULT_LAYOUT} is written, so a page laid out the usual way has a URL
+ * that says nothing about it:
  *
  * - `cols=2`, `cols=3`: two or three columns. Absent is one; alone, it
  *   splits the blocks as the settings would.
@@ -42,8 +42,8 @@
  * - `hide=runs.merged`: the blocks hidden, in the usual order.
  *
  * Reading forgives: an unknown or repeated block is dropped, a missing one is
- * put back at the end of the left column, and a number out of range is
- * clamped. A URL written by an older page, or edited by hand, still opens.
+ * put back at the end of the left column, and a number out of range is clamped.
+ * A URL written by an older page, or edited by hand, still opens.
  */
 
 import { Arr, asPositiveInt, Num, Obj, Result } from 'ts-data-forge';
@@ -60,8 +60,8 @@ export type BlockId = 'open' | 'queue' | 'runs' | 'merged' | 'issues';
 /**
  * The usual order. The queue comes under the merge order, being a strip that
  * says which of the pull requests above goes next; the runs come next, being
- * the CI those pull requests wait for, and before what merged: what is going
- * on now before what is over.
+ * the CI those pull requests wait for, and before what merged: what is going on
+ * now before what is over.
  */
 export const BLOCK_IDS = [
   'open',
@@ -86,8 +86,8 @@ export type HeightMode = 'natural' | 'fill';
 export type ColumnCount = 1 | 2 | 3;
 
 /**
- * `0` is the left column, then the middle one with three, and the right
- * one: `1` with two columns, `2` with three.
+ * `0` is the left column, then the middle one with three, and the right one:
+ * `1` with two columns, `2` with three.
  */
 export type ColumnIndex = 0 | 1 | 2;
 
@@ -97,8 +97,8 @@ export type LineIndex = 0 | 1;
 export type Layout = Readonly<{
   columns: ColumnCount;
   /**
-   * Top down. With one column `left` is every block and the others are
-   * empty; `middle` is empty but with three.
+   * Top down. With one column `left` is every block and the others are empty;
+   * `middle` is empty but with three.
    */
   left: readonly BlockId[];
   middle: readonly BlockId[];
@@ -108,13 +108,13 @@ export type Layout = Readonly<{
   /**
    * With three columns, where the lines between them are, in percent of the
    * width from the left; in order, and every column at least
-   * {@link MIN_THIRD_WIDTH} wide. Kept apart from {@link Layout.split}, so
-   * that going from two columns to three and back finds each where it was.
+   * {@link MIN_THIRD_WIDTH} wide. Kept apart from {@link Layout.split}, so that
+   * going from two columns to three and back finds each where it was.
    */
   lines: FixedLengthTuple<2, number>;
   /**
-   * In CSS pixels. A block without one is as tall as what it holds. Read in
-   * the `natural` mode only.
+   * In CSS pixels. A block without one is as tall as what it holds. Read in the
+   * `natural` mode only.
    */
   heights: Partial<ReadonlyRecord<BlockId, number>>;
   mode: HeightMode;
@@ -131,9 +131,9 @@ export type Layout = Readonly<{
 }>;
 
 /**
- * The line between two blocks of a column being dragged in the `fill` mode,
- * as it was when the drag started: where the pointer was, and the blocks'
- * heights as drawn and their shares.
+ * The line between two blocks of a column being dragged in the `fill` mode, as
+ * it was when the drag started: where the pointer was, and the blocks' heights
+ * as drawn and their shares.
  */
 export type BoundaryDrag = Readonly<{
   upper: BlockId;
@@ -242,8 +242,8 @@ export const layoutFromSearch = (search: string): Layout => {
     hidden: hiddenInOrder(blockList(params.get(PARAM.hidden))),
   } as const;
 
-  // `?cols=2` or `?cols=3` alone, as typed by hand, splits the columns the
-  // way the settings would rather than leaving the others empty.
+  // `?cols=2` or `?cols=3` alone, as typed by hand, splits the columns the way
+  // the settings would rather than leaving the others empty.
   return columns !== 1 &&
     !params.has(PARAM.left) &&
     !params.has(PARAM.middle) &&
@@ -334,13 +334,13 @@ export const saveLayout = (layout: Layout): void => {
 /**
  * Two columns from one put the first block on the left and the rest on the
  * right, which is the split that leaves the merge order the most room — the
- * queue staying under it when it follows it, since it is a strip about the
- * pull requests above; three
- * from one put the last block on the right as well, and the rest between.
+ * queue staying under it when it follows it, since it is a strip about the pull
+ * requests above; three from one put the last block on the right as well, and
+ * the rest between.
  * Columns that already hold something are kept: three from two keep the left
  * column and split the right one's last block off it, and two from three put
- * the middle column at the top of the right one. Fewer from more otherwise
- * keep the order left to right, and the same number is left as it is.
+ * the middle column at the top of the right one. Fewer from more otherwise keep
+ * the order left to right, and the same number is left as it is.
  */
 export const withColumns = (layout: Layout, columns: ColumnCount): Layout => {
   const { left, middle, right } = layout;
@@ -440,9 +440,9 @@ export const columnWidths = (layout: Layout): readonly number[] => {
 
 /**
  * Takes `block` out of wherever it is and puts it at `target`, whose index
- * counts the blocks already there without it. A column past the last drawn
- * is the last: with one column there is only the left, and with two `1` and
- * `2` are both the right.
+ * counts the blocks already there without it. A column past the last drawn is
+ * the last: with one column there is only the left, and with two `1` and `2`
+ * are both the right.
  */
 export const moveBlock = (
   layout: Layout,
@@ -545,9 +545,9 @@ export const sharePercents = (
 /**
  * Where a boundary drag puts the line when the pointer is at `y`: the upper
  * block as tall as it was plus how far the pointer moved, the lower one the
- * rest, neither under {@link MIN_FILL_HEIGHT}, and their shares split the
- * same way. Their total share stays what it was, so the other blocks of the
- * column keep their heights. Nothing changes for blocks not drawn.
+ * rest, neither under {@link MIN_FILL_HEIGHT}, and their shares split the same
+ * way. Their total share stays what it was, so the other blocks of the column
+ * keep their heights. Nothing changes for blocks not drawn.
  */
 export const withBoundaryAt = (
   layout: Layout,
@@ -585,9 +585,9 @@ export const withSplit = (layout: Layout, split: number): Layout =>
   }) as const;
 
 /**
- * Moves the line between two columns to `at`, in percent of the width: with
- * two columns that is the split, and with three one of the lines, the other
- * staying where it is and every column keeping {@link MIN_THIRD_WIDTH}.
+ * Moves the line between two columns to `at`, in percent of the width: with two
+ * columns that is the split, and with three one of the lines, the other staying
+ * where it is and every column keeping {@link MIN_THIRD_WIDTH}.
  */
 export const withLineAt = (
   layout: Layout,
@@ -614,8 +614,8 @@ export const withLineAt = (
 
 /**
  * Gives the two columns beside a line the same width, out of what they had
- * between them, which leaves the third of three as it was. With two columns,
- * it evens the split.
+ * between them, which leaves the third of three as it was. With two columns, it
+ * evens the split.
  */
 export const withEvenLine = (layout: Layout, line: LineIndex): Layout => {
   if (layout.columns !== 3) {
@@ -756,12 +756,11 @@ const arrangeMentioned = (
 };
 
 /**
- * Every block exactly once: the first mention wins, and what is not
- * mentioned goes to the end of the left column — but for the queue, which
- * goes under the merge order, wherever that is, being a strip about the pull
- * requests in it. With fewer than three columns, the middle's blocks go to
- * the top of the right one, as {@link withColumns} puts them; with one, every
- * block is on the left.
+ * Every block exactly once: the first mention wins, and what is not mentioned
+ * goes to the end of the left column — but for the queue, which goes under the
+ * merge order, wherever that is, being a strip about the pull requests in it.
+ * With fewer than three columns, the middle's blocks go to the top of the right
+ * one, as {@link withColumns} puts them; with one, every block is on the left.
  */
 const arrange = (
   columns: ColumnCount,
@@ -783,8 +782,8 @@ const arrange = (
 };
 
 /**
- * The first block, with the queue when it comes right after the merge
- * order, and the rest.
+ * The first block, with the queue when it comes right after the merge order,
+ * and the rest.
  */
 const leadApart = (
   ids: readonly BlockId[],

@@ -42,9 +42,9 @@ export const toCardDisplay = (display: CardDisplay): CardDisplay =>
   }) as const;
 
 /**
- * Whether two displays draw the same card the same way: the `equals` of a
- * `map` to a display, so that an update that changes nothing on the card
- * redraws nothing.
+ * Whether two displays draw the same card the same way: the `equals` of a `map`
+ * to a display, so that an update that changes nothing on the card redraws
+ * nothing.
  */
 export const isSameCardDisplay = (a: CardDisplay, b: CardDisplay): boolean =>
   cardDisplayKeys.every((key) => a[key] === b[key]);

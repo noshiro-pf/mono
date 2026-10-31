@@ -219,9 +219,9 @@ export const App = memoNamed('App', () => {
   /**
    * Whether the extension may act on the sites at all. Chrome's per-extension
    * "site access" setting and an enterprise policy can both withhold this, and
-   * a rule the extension may not apply is installed, correct, and never
-   * matches anything — which is indistinguishable from a broken rule until you
-   * look here.
+   * a rule the extension may not apply is installed, correct, and never matches
+   * anything — which is indistinguishable from a broken rule until you look
+   * here.
    */
   const [hostAccessGranted, setHostAccessGranted] = React.useState(true);
 
@@ -313,8 +313,8 @@ export const App = memoNamed('App', () => {
   /** Origins whose service workers a pane removes without being asked. */
   const [resetOrigins, setResetOrigins] = React.useState<readonly string[]>([]);
 
-  // Another tab's toggle has to reach this one's panes too: read once, the
-  // list stayed as it was here until this tab was reloaded.
+  // Another tab's toggle has to reach this one's panes too: read once, the list
+  // stayed as it was here until this tab was reloaded.
   React.useEffect(() => watchServiceWorkerResetOrigins(setResetOrigins), []);
 
   const handleToggleResetOrigin = React.useCallback(
@@ -353,11 +353,11 @@ export const App = memoNamed('App', () => {
       await ensureRule();
 
       // The URL says which split view this tab shows, and may say what it
-      // shows. `?ws=` wins where there is one — it is what a reload, a
-      // restored session and a bookmark carry — and the list's `activeId`
-      // answers when there is not, which is the toolbar button's case. A URL
-      // that describes a view without naming one is a new split view, as `+`
-      // makes one: it gets an id of its own and a place on the list.
+      // shows. `?ws=` wins where there is one — it is what a reload, a restored
+      // session and a bookmark carry — and the list's `activeId` answers when
+      // there is not, which is the toolbar button's case. A URL that describes
+      // a view without naming one is a new split view, as `+` makes one: it
+      // gets an id of its own and a place on the list.
       const request = readWorkspaceUrl();
 
       const resolved = await resolveWorkspace(
@@ -743,8 +743,8 @@ export const App = memoNamed('App', () => {
 
   // The tab's own title and favicon, so that a window of split views can be
   // told apart in the tab strip. Worked out first and applied only when it
-  // changes: the view changes on every pointer move of a splitter drag, and
-  // the favicon is drawn on a canvas.
+  // changes: the view changes on every pointer move of a splitter drag, and the
+  // favicon is drawn on a canvas.
   const tabIdentity = React.useMemo(() => {
     const { workspaceId: shown, state: shownState } = session;
 
@@ -837,8 +837,8 @@ export const App = memoNamed('App', () => {
   // Saving is debounced because a splitter drag changes the state on every
   // pointer move; `pagehide` is what covers a tab closed inside the window.
   //
-  // The URL is written at the same moment as storage, and only then: it is
-  // the same snapshot, so a reload finds the two in agreement, and the browser
+  // The URL is written at the same moment as storage, and only then: it is the
+  // same snapshot, so a reload finds the two in agreement, and the browser
   // throttles a page that rewrites its history entry on every pointer move.
   React.useEffect(() => {
     const { workspaceId: saveTo, state: toSave } = session;
@@ -955,9 +955,9 @@ export const App = memoNamed('App', () => {
    * Follows a pane being dragged, and drops it.
    *
    * On `window` and against the computed rectangles rather than on the panes
-   * themselves, for the reason the splitter drag is: a pointer over a pane is
-   * a pointer over an `iframe`, which belongs to the framed site. The stage
-   * turns pointer events off for the frames while this is going on.
+   * themselves, for the reason the splitter drag is: a pointer over a pane is a
+   * pointer over an `iframe`, which belongs to the framed site. The stage turns
+   * pointer events off for the frames while this is going on.
    */
   React.useEffect(() => {
     const element = stageRef.current;

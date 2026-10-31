@@ -230,8 +230,8 @@ describe(loadReport, () => {
     // The last part to answer is the read's own answer, not progress.
     assert.strictEqual(mut_progress.length, 6);
 
-    // Drawn only once the comparisons have answered: a queue drawn without
-    // them would put a head behind its base in the wrong place.
+    // Drawn only once the comparisons have answered: a queue drawn without them
+    // would put a head behind its base in the wrong place.
     assert.isUndefined(mut_progress.at(-1)?.queue);
 
     assert.isDefined(result.value.queue);
@@ -671,8 +671,8 @@ describe(loadReport, () => {
       ],
     );
 
-    // A `Merge-After:` on an issue is not read as one, and is kept to be
-    // shown as the slip it is.
+    // A `Merge-After:` on an issue is not read as one, and is kept to be shown
+    // as the slip it is.
     assert.deepStrictEqual(
       loaded.issues.items.map(({ misplacedMergeAfter }) => misplacedMergeAfter),
       [[], [2225], []],
@@ -1444,8 +1444,8 @@ describe(loadReport, () => {
     });
   });
 
-  // Most repositories but this one: the page is still the merge order and
-  // the checks, judged over whatever reported.
+  // Most repositories but this one: the page is still the merge order and the
+  // checks, judged over whatever reported.
   test('where the default branch requires nothing, judges every context reported on the head', async () => {
     const { fetchImpl } = answering(
       report(
@@ -1840,8 +1840,8 @@ type Answers = ReadonlyRecord<string, readonly unknown[]>;
 
 type Sent = Readonly<{
   /**
-   * The operation name, `PullRequests` for `query PullRequests(…`, and for
-   * the two REST requests `BranchRules` and `Branch`.
+   * The operation name, `PullRequests` for `query PullRequests(…`, and for the
+   * two REST requests `BranchRules` and `Branch`.
    */
   operation: string;
   route: string;
@@ -1886,10 +1886,10 @@ const named = (sent: readonly Sent[], operation: string): readonly Sent[] =>
   sent.filter((each) => each.operation === operation);
 
 /**
- * A `fetch` that answers each query with the next answer `parts` give for
- * its name — `{}` once they run out — and keeps what it was asked. By name
- * rather than by order, because the parts of a read go out together and
- * answer in whatever order they finish.
+ * A `fetch` that answers each query with the next answer `parts` give for its
+ * name — `{}` once they run out — and keeps what it was asked. By name rather
+ * than by order, because the parts of a read go out together and answer in
+ * whatever order they finish.
  */
 const answering = (
   ...parts: readonly (Answers | (() => ReadonlyRecord<string, string>))[]
@@ -2019,8 +2019,8 @@ const restAnswers = ({
   ({ BranchRules: [rules], Branch: [branch] }) as const;
 
 /**
- * A page of open pull requests, the last one when `endCursor` is
- * `undefined`, as each of the three queries that list them answers it.
+ * A page of open pull requests, the last one when `endCursor` is `undefined`,
+ * as each of the three queries that list them answers it.
  */
 const openPage = (
   nodes: readonly unknown[],
@@ -2038,9 +2038,9 @@ const issuesAnswer = (page: unknown): Answers =>
   answer('OpenIssues', { issues: page });
 
 /**
- * Every query a read sends but the follow-ups, answered from one set of
- * pull requests: each of the three that list them is handed the whole node
- * and reads the fields it asks for.
+ * Every query a read sends but the follow-ups, answered from one set of pull
+ * requests: each of the three that list them is handed the whole node and reads
+ * the fields it asks for.
  */
 const report = (
   openNodes: readonly unknown[],

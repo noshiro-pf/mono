@@ -1,30 +1,30 @@
 /**
  * Why `unblock-prs` set a pull request aside, written where GitHub keeps it.
  *
- * The script decides on someone's machine and says so on standard output,
- * which is where nobody can see it afterwards. So each time it sets a pull
- * request aside it also writes a comment on that pull request — one per pull
- * request, edited in place from then on — whose first line is a hidden
- * record this module writes and reads back, and whose last line is a task
- * box a person ticks to have the script try again. What lies between is
- * prose for whoever reads it, and nothing reads it back. The Pull Requests
+ * The script decides on someone's machine and says so on standard output, which
+ * is where nobody can see it afterwards. So each time it sets a pull request
+ * aside it also writes a comment on that pull request — one per pull request,
+ * edited in place from then on — whose first line is a hidden record this
+ * module writes and reads back, and whose last line is a task box a person
+ * ticks to have the script try again. What lies between is prose for whoever
+ * reads it, and nothing reads it back. The Pull Requests
  * Manager page and the script itself read the record; anyone else reads the
  * prose on the pull request.
  *
  * **A comment rather than a commit status**, which is what it used to be. A
- * status has no state that means "for information": `failure` left a red ✗ on
- * a context nothing requires, until the next push, with 140 characters to say
+ * status has no state that means "for information": `failure` left a red ✗ on a
+ * context nothing requires, until the next push, with 140 characters to say
  * why, and nobody could take it off or ask for another try. **Rather than the
  * body**, because the author, a session and `open-pr` write the body too, the
  * REST API has no conditional update to keep an edit made in between, and the
  * version pull request's body is rewritten on every push to the base.
  *
- * **Only the comments the reader's own account wrote count.** The repository
- * is public, so anyone can post a comment that starts with the marker; the
- * script and the page both ask GitHub for `viewerDidAuthor` and read nothing
- * else — the account that runs `unblock-prs` is the one that looks at the
- * page. A task box in someone else's comment can be ticked only by those who
- * can write to the repository, so the retry is not open to outsiders either.
+ * **Only the comments the reader's own account wrote count.** The repository is
+ * public, so anyone can post a comment that starts with the marker; the script
+ * and the page both ask GitHub for `viewerDidAuthor` and read nothing else —
+ * the account that runs `unblock-prs` is the one that looks at the page. A task
+ * box in someone else's comment can be ticked only by those who can write to
+ * the repository, so the retry is not open to outsiders either.
  *
  * **Its own record rather than GitHub's `mergeable`.** That answers whether
  * *merging* the branch conflicts, from a cached background computation; the
@@ -32,8 +32,8 @@
  * parent was squash-merged and on a cache that has not caught up. Only the
  * script knows what the rebase said.
  *
- * **It lasts exactly as long as the state it was reached in.** The record
- * names the head and the base it was reached at; a push moves the head, and
+ * **It lasts exactly as long as the state it was reached in.** The record names
+ * the head and the base it was reached at; a push moves the head, and
  * {@link setAsideApplies} is where a moved head and a moved base are judged,
  * for the script and the page alike. Once it no longer applies, or a person
  * asked for a retry, the script rewrites the comment to one resolved line
@@ -60,9 +60,9 @@ export type SetAside = Readonly<{
 }>;
 
 /**
- * What one of the script's comments says: a pull request still set aside,
- * and whether a person has ticked the retry box on it, or one that was and
- * is not any more.
+ * What one of the script's comments says: a pull request still set aside, and
+ * whether a person has ticked the retry box on it, or one that was and is not
+ * any more.
  */
 export type SetAsideComment = Readonly<
   | { kind: 'resolved' }
@@ -70,9 +70,9 @@ export type SetAsideComment = Readonly<
 >;
 
 /**
- * The record line, `prose`, and an empty retry box on the last line. The
- * whole SHAs rather than short ones, because what reads them back compares
- * them with the head and the base.
+ * The record line, `prose`, and an empty retry box on the last line. The whole
+ * SHAs rather than short ones, because what reads them back compares them with
+ * the head and the base.
  */
 export const writeSetAsideComment = (
   setAside: SetAside,
@@ -148,11 +148,11 @@ export const setAsideApplies = (
  * judged the head.
  *
  * Every reason clears when the base moves, because a moved base is the one
- * thing the script knows how to act on — a rebase that conflicted may not
- * any more — except two whose head a rebase would only put through the same
- * matrix again: `checks-failed`, which the push that carries the fix clears,
- * and `awaiting-bypass`, green and waiting for a ruleset bypass merge, which
- * does not wait for the base.
+ * thing the script knows how to act on — a rebase that conflicted may not any
+ * more — except two whose head a rebase would only put through the same matrix
+ * again: `checks-failed`, which the push that carries the fix clears, and
+ * `awaiting-bypass`, green and waiting for a ruleset bypass merge, which does
+ * not wait for the base.
  */
 export const setAsideStillApplies = (
   setAside: Readonly<{ reason: string; baseSha: string }>,

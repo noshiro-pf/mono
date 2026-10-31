@@ -23,8 +23,8 @@ const entryPointFilePath = path.resolve(srcDir, 'entry-point.mts');
  *
  * Not part of `build` — the output is committed, and a build that rewrites
  * sources is a build that cannot run beside its siblings (see "Build" in
- * CLAUDE.md). `pnpm run ws:gen` is the repository-wide
- * form, and CI runs it and then asserts the tree is clean.
+ * CLAUDE.md). `pnpm run ws:gen` is the repository-wide form, and CI runs it and
+ * then asserts the tree is clean.
  */
 const gen = async (): Promise<void> => {
   await logStep({

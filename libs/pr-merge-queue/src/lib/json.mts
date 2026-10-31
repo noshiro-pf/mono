@@ -6,8 +6,8 @@ import * as t from 'ts-fortress';
 
 /**
  * `text` parsed and validated against `schema`. `source` names where the text
- * came from — a file, an API route, a command — so that the message says
- * which answer was wrong, not only how.
+ * came from — a file, an API route, a command — so that the message says which
+ * answer was wrong, not only how.
  */
 export const parseJson = <A,>(
   text: string,

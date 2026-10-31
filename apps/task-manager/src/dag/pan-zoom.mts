@@ -89,8 +89,8 @@ export const fitBoundsTransform = (
 
 /**
  * {@link fitBoundsTransform} into the part of the view below `topInset` and
- * above `bottomInset`: all of `bounds` in sight, clear of what covers the
- * top and the bottom of the view, such as the toolbar over the graph and the
+ * above `bottomInset`: all of `bounds` in sight, clear of what covers the top
+ * and the bottom of the view, such as the toolbar over the graph and the
  * buttons under it.
  */
 export const fitBelowTransform = (
@@ -118,10 +118,10 @@ export const fitBelowTransform = (
 
 /**
  * `bounds` at its natural size, with its top `topInset` below the view's:
- * for content that is long rather than wide, such as the arc diagram's
- * column, read by panning down it. Centred if it is no wider than the view
- * less `padding` on each side; otherwise it starts at the left, for the rest
- * to be panned to.
+ * for content that is long rather than wide, such as the arc diagram's column,
+ * read by panning down it. Centred if it is no wider than the view less
+ * `padding` on each side; otherwise it starts at the left, for the rest to be
+ * panned to.
  */
 export const actualSizeTopTransform = (
   bounds: Point & Size,
@@ -143,8 +143,8 @@ export const actualSizeTopTransform = (
 };
 
 /**
- * The view a share `t` of the way from `from` to `to`: for a view that
- * follows nodes moving to a new layout, at the pace they move.
+ * The view a share `t` of the way from `from` to `to`: for a view that follows
+ * nodes moving to a new layout, at the pace they move.
  */
 export const interpolateTransform = (
   from: ViewTransform,
@@ -160,8 +160,7 @@ export const interpolateTransform = (
 /**
  * Where a two-finger gesture that started at `from` with the transform `start`
  * has got to at `to`: zoomed by how much the distance between the fingers
- * changed, and moved so that the content point that was between them still
- * is.
+ * changed, and moved so that the content point that was between them still is.
  */
 export const pinchViewTransform = (
   start: ViewTransform,
@@ -197,8 +196,8 @@ export const contentPointAt = (transform: ViewTransform, on: Point): Point =>
 /**
  * How much one wheel event zooms: a `deltaY` away from the reader zooms in.
  * Exponential, so a turn in and the same turn out cancel. `deltaMode` is the
- * event's: `1` counts lines (Firefox with a mouse wheel), which are taken as
- * 16 pixels each.
+ * event's: `1` counts lines (Firefox with a mouse wheel), which are taken as 16
+ * pixels each.
  */
 export const wheelZoomFactor = (
   deltaY: number,

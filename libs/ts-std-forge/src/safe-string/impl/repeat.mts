@@ -11,11 +11,10 @@ import { Result } from '../../functional/index.mjs';
  * tagged `Err`. The count is deliberately a plain `number`, not a branded
  * integer type: its domain (any non-negative safe integer) has no
  * literal-range type, and demanding a brand cast at every call site would be
- * a detour for callers (and busywork Sumi v2's native integer type would
- * later obsolete). The spec also lets the engine throw when the resulting
- * string would exceed its implementation-defined maximum length; that
- * residue cannot be predicted portably and surfaces as the `'unexpected'`
- * fallback.
+ * a detour for callers (and busywork Sumi v2's native integer type would later
+ * obsolete). The spec also lets the engine throw when the resulting string
+ * would exceed its implementation-defined maximum length; that residue cannot
+ * be predicted portably and surfaces as the `'unexpected'` fallback.
  *
  * @example
  *

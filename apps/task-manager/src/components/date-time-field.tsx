@@ -22,9 +22,9 @@ type Props = Readonly<{
 /**
  * A labelled date and time to the minute, in the page's language, picked with
  * blueprint-synstate's `DateInput`: a calendar with 「今日」 and 「クリア」
- * under it, on the browser's wall clock — what the drafts hold. The hours
- * and minutes have arrow buttons, which are easier to hit on a phone than
- * the fields.
+ * under it, on the browser's wall clock — what the drafts hold. The hours and
+ * minutes have arrow buttons, which are easier to hit on a phone than the
+ * fields.
  *
  * The calendar stays open when a day is picked, so that the time can be set
  * after it. With 「終日」 on, the calendar picks a day alone, and closes on
@@ -92,9 +92,9 @@ export const DateTimeField = ({
 };
 
 /**
- * On a phone the calendar takes about half the screen, so a field low in
- * the dialog is first scrolled to the top of it, leaving the room below for
- * the calendar.
+ * On a phone the calendar takes about half the screen, so a field low in the
+ * dialog is first scrolled to the top of it, leaving the room below for the
+ * calendar.
  */
 const scrollFieldIntoView = (input: HTMLInputElement): void => {
   if (matchMedia(NARROW_QUERY).matches) {

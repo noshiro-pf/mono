@@ -31,15 +31,15 @@ import type { SupportedLength } from '../supported-length.mjs';
  * ```
  */
 // The `IsUnion<MaxLength>` guard is a type-checker performance safeguard. The
-// brand value `IndexInclusive<MaxLength>` distributes over a union
-// `MaxLength`, materializing `0 | 1 | ... | k` once per member. In real usage
-// `MaxLength` is a single literal, so this never happens — except when a
-// consumer's deferred conditional forces this type's *constraint*, where
-// `MaxLength` widens to its bound `SupportedLength` (the whole `0 | ... | 2048`
-// union). That single instantiation expands the brand across all 2049 lengths
-// and generates millions of types. Collapsing the union case to plain `string`
-// (a sound supertype of the branded type) keeps that constraint cheap while
-// leaving every concrete single-literal result identical.
+// brand value `IndexInclusive<MaxLength>` distributes over a union `MaxLength`,
+// materializing `0 | 1 | ... | k` once per member. In real usage `MaxLength` is
+// a single literal, so this never happens — except when a consumer's deferred
+// conditional forces this type's *constraint*, where `MaxLength` widens to its
+// bound `SupportedLength` (the whole `0 | ... | 2048` union). That single
+// instantiation expands the brand across all 2049 lengths and generates
+// millions of types. Collapsing the union case to plain `string` (a sound
+// supertype of the branded type) keeps that constraint cheap while leaving
+// every concrete single-literal result identical.
 export type MaxLengthString<MaxLength extends SupportedLength> =
   IsUnion<MaxLength> extends true
     ? string

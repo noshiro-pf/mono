@@ -5,10 +5,10 @@ import * as path from 'node:path';
  * name, which is also the directory each one is served from.
  *
  * Two places need this and they must not disagree: Vite writes the asset URLs
- * at build time from `base`, and `build-pages-site.mts` decides where the
- * files land. A mismatch is a page that loads and then asks for its script at
- * a path nothing serves — a blank screen with a 404 in the console and no
- * failing check anywhere, since both halves did exactly what they were told.
+ * at build time from `base`, and `build-pages-site.mts` decides where the files
+ * land. A mismatch is a page that loads and then asks for its script at a path
+ * nothing serves — a blank screen with a 404 in the console and no failing
+ * check anywhere, since both halves did exactly what they were told.
  *
  * The site directory is the package directory, not a second name kept beside
  * it, so renaming an app's directory moves its URL.
@@ -72,8 +72,8 @@ export const pagesAppUrl = (packageRoot: string): string =>
 export const pagesAppDirs = (): readonly string[] => pagesApps;
 
 /**
- * The hand-written documentation sites. Each one's `base` in
- * `astro.config.mjs` is `/mono/<siteDir>/`, and has to stay so.
+ * The hand-written documentation sites. Each one's `base` in `astro.config.mjs`
+ * is `/mono/<siteDir>/`, and has to stay so.
  * `synstate-dom-docs` embeds nothing at build time, so `ws:build` builds it;
  * `deploy-pages.yml` rebuilds only `synstate-docs`, after `ws:doc`.
  * `check:prose:site-fragments` reads the pages of each.

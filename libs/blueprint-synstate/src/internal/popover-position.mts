@@ -16,10 +16,10 @@ type Rect = Readonly<{
 
 /**
  * Where Blueprint's popover with placement `bottom-start` goes, as Popper
- * places it there: below the target by half the arrow's size, its left edge
- * at the target's; above instead when it fits there and not below; moved
- * sideways to stay in the viewport. The arrow points at the middle of the
- * target, kept within the popover.
+ * places it there: below the target by half the arrow's size, its left edge at
+ * the target's; above instead when it fits there and not below; moved sideways
+ * to stay in the viewport. The arrow points at the middle of the target, kept
+ * within the popover.
  */
 export const placeBottomStart = (
   target: Rect,

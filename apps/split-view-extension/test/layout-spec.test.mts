@@ -126,8 +126,8 @@ describe('parseLayoutSpec', () => {
 
     assert.deepStrictEqual(reread, specs);
 
-    // And the panes come back in the order the presets number them, which
-    // is the order `url=` parameters are read in.
+    // And the panes come back in the order the presets number them, which is
+    // the order `url=` parameters are read in.
     assert.deepStrictEqual(
       specs.map((spec) => {
         const parsed = parseLayoutSpec(spec);

@@ -106,8 +106,8 @@ export const solidLoan: ScenarioFramework<LoanApp> = {
         </table>
       );
 
-      // A `<table>` expression is a `HTMLTableElement` at run time; Solid
-      // types every JSX expression as its broader `JSX.Element`.
+      // A `<table>` expression is a `HTMLTableElement` at run time; Solid types
+      // every JSX expression as its broader `JSX.Element`.
       if (element instanceof Node) {
         container.append(element);
       }

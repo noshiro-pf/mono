@@ -41,8 +41,8 @@ export type QueueComment<A> = Readonly<{
 }>;
 
 /**
- * Reads `comments`, oldest first, for the oldest comment of each kind: each
- * is one comment edited in place, and of several the oldest is the one.
+ * Reads `comments`, oldest first, for the oldest comment of each kind: each is
+ * one comment edited in place, and of several the oldest is the one.
  */
 export const readQueueComments = (
   comments: readonly OwnComment[],

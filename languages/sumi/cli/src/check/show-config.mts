@@ -14,8 +14,8 @@ export type EffectiveTsConfig = Readonly<{
 
 /**
  * Resolves a project's effective configuration through the native compiler's
- * `--showConfig` — the same resolution the type check uses, so what the
- * lock is checked against is exactly what the compiler sees.
+ * `--showConfig` — the same resolution the type check uses, so what the lock is
+ * checked against is exactly what the compiler sees.
  */
 export const showConfig = (
   tsconfigPath: string,

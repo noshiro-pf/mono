@@ -22,10 +22,10 @@ export const milestoneToDraft = (
   }) as const;
 
 /**
- * `milestone` with the draft applied at `now`, or a message saying which
- * field is wrong. A milestone that no longer needs a manual check loses the
- * one it had, so turning the requirement back on asks for a new one. The
- * dependencies are left as they are on `milestone`.
+ * `milestone` with the draft applied at `now`, or a message saying which field
+ * is wrong. A milestone that no longer needs a manual check loses the one it
+ * had, so turning the requirement back on asks for a new one. The dependencies
+ * are left as they are on `milestone`.
  */
 export const applyMilestoneDraft = (
   milestone: Milestone,

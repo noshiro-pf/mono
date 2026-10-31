@@ -5,8 +5,8 @@ import { subscribeInScope } from './scope-effects.mjs';
 /**
  * Measures the element given to the returned `ref` after every value of
  * `measureOn`, the current one included — once the update that brought it has
- * been drawn — and reports its rect when it differs from the last one
- * reported, so that an update that moved nothing writes nothing.
+ * been drawn — and reports its rect when it differs from the last one reported,
+ * so that an update that moved nothing writes nothing.
  *
  * The measurements requested during one update are taken together: every rect
  * is read before any is reported, since a report writes positions that the page

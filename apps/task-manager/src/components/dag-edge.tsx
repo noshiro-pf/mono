@@ -8,19 +8,18 @@ type Props = Readonly<{
 }>;
 
 /**
- * A dependency, from the node depended on to the node that waits: a curve,
- * or a path round the nodes in its way (`dag/edge-routing.mts`), ending in
- * an arrowhead, which the marker turns along the path's last tangent —
- * straight into the node. Its label, `SS` for start-to-start and the lag,
- * sits on the middle of the path.
+ * A dependency, from the node depended on to the node that waits: a curve, or a
+ * path round the nodes in its way (`dag/edge-routing.mts`), ending in an
+ * arrowhead, which the marker turns along the path's last tangent — straight
+ * into the node. Its label, `SS` for start-to-start and the lag, sits on the
+ * middle of the path.
  *
- * A wider, unpainted stroke along the path takes the pointer, so that the
- * line is easy to point at: pointed at, it is drawn in the focus colour, and
+ * A wider, unpainted stroke along the path takes the pointer, so that the line
+ * is easy to point at: pointed at, it is drawn in the focus colour, and
  * clicked, it is selected (`dag-canvas.tsx`) and stays so.
  *
- * An `implied` edge, the order in time of two milestones, is drawn dashed
- * and with nothing to point at: it is no dependency, so there is nothing to
- * delete.
+ * An `implied` edge, the order in time of two milestones, is drawn dashed and
+ * with nothing to point at: it is no dependency, so there is nothing to delete.
  */
 export const DagEdge = ({ record }: Props): JSX.Element => {
   const path = view(record, ({ edge }) => edge.path);

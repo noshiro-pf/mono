@@ -23,20 +23,20 @@ type MessageIds = 'throwInOperator' | 'throwThroughCall';
 
 /**
  * A synstate operator calls its functions while an update propagates, and
- * nothing in synstate catches what they throw: the exception stops the
- * update where it is and reaches whoever wrote to the source. The nodes the
- * update already reached hold the new value and the rest keep the old one,
- * until the next update. A pure function that returns a `Result` keeps the
- * failure a value, which the graph carries on like any other.
+ * nothing in synstate catches what they throw: the exception stops the update
+ * where it is and reaches whoever wrote to the source. The nodes the update
+ * already reached hold the new value and the rest keep the old one, until the
+ * next update. A pure function that returns a `Result` keeps the failure a
+ * value, which the graph carries on like any other.
  *
  * Reported: a `throw` directly in a function passed to a synstate operator
- * called in `.pipe(…)` — as an argument, or as a property of an options
- * object (`map(f, { equals })`) — unless a `try` with a `catch` in the same
+ * called in `.pipe(…)` — as an argument, or as a property of an options object
+ * (`map(f, { equals })`) — unless a `try` with a `catch` in the same
  * function encloses it. A function passed by name counts when this file
- * defines it, and so does a function of this file the callback calls, at
- * any depth, reported at the call. A throw in a function the callback only
- * defines, or in an `async` function, does not run in the update and is not
- * reported. A call that throws without a `throw` of this file is not seen.
+ * defines it, and so does a function of this file the callback calls, at any
+ * depth, reported at the call. A throw in a function the callback only defines,
+ * or in an `async` function, does not run in the update and is not reported. A
+ * call that throws without a `throw` of this file is not seen.
  *
  * The cost is one look at each call and each `throw`; nothing is followed
  * unless the file has a `throw`.
@@ -188,8 +188,8 @@ export const noThrowInOperator: TSESLint.RuleModule<MessageIds, Options> = {
 
 /**
  * Whether the body of `fn` runs when it is called. An `async` function's
- * `throw` rejects the promise it returns, and a generator's waits for the
- * first `next()`.
+ * `throw` rejects the promise it returns, and a generator's waits for the first
+ * `next()`.
  */
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const runsWhenCalled = (fn: FunctionNode): boolean =>
@@ -230,9 +230,8 @@ const escapingFunctionOf = (
 };
 
 /**
- * The expressions in an argument of an operator that may be functions it
- * calls: the argument, or each property of an options object
- * (`map(f, { equals })`).
+ * The expressions in an argument of an operator that may be functions it calls:
+ * the argument, or each property of an options object (`map(f, { equals })`).
  */
 const functionValuesOf = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

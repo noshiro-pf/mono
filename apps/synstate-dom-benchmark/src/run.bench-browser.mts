@@ -203,8 +203,8 @@ test('js-framework-benchmark operations', async () => {
 });
 
 /**
- * Checks that an implementation renders what the others do, so that the
- * timings compare the same work.
+ * Checks that an implementation renders what the others do, so that the timings
+ * compare the same work.
  */
 const verify = async (app: BenchApp, container: HTMLElement): Promise<void> => {
   const rows = (): readonly HTMLTableRowElement[] =>
@@ -297,8 +297,8 @@ const toMarkdown = (results: readonly Result[]): string => {
 };
 
 /**
- * The scenarios' table, one row per operation in the order measured. A
- * library that rendered the wrong figures has `wrong` in place of a time.
+ * The scenarios' table, one row per operation in the order measured. A library
+ * that rendered the wrong figures has `wrong` in place of a time.
  */
 const scenariosToMarkdown = (results: readonly ScenarioResult[]): string => {
   const operations = Arr.uniq(results.map((r) => r.operation));

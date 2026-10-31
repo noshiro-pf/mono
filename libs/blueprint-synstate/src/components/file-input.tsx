@@ -28,11 +28,11 @@ type Props = Readonly<{
 }>;
 
 /**
- * Blueprint's `FileInput`: the native file input, hidden, under a box with
- * a button, all in a `<label>` so that clicking anywhere opens the chooser.
+ * Blueprint's `FileInput`: the native file input, hidden, under a box with a
+ * button, all in a `<label>` so that clicking anywhere opens the chooser.
  *
- * The box's text is not changed when a file is chosen; that is the
- * caller's, through `text` and `hasSelection`, as it is with Blueprint.
+ * The box's text is not changed when a file is chosen; that is the caller's,
+ * through `text` and `hasSelection`, as it is with Blueprint.
  */
 export const FileInput = ({
   onInputChange,

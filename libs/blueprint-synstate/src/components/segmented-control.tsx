@@ -34,9 +34,9 @@ type Props<T extends string> = Readonly<{
 
 /**
  * Blueprint's `SegmentedControl` as a `radiogroup`: one {@link Button} per
- * option, the chosen one solid and the rest minimal. Only the chosen one is
- * in the tab order, and the arrow keys choose the one before or after it,
- * wrapping round, as with radio buttons.
+ * option, the chosen one solid and the rest minimal. Only the chosen one is in
+ * the tab order, and the arrow keys choose the one before or after it, wrapping
+ * round, as with radio buttons.
  */
 export const SegmentedControl = <T extends string>({
   options,

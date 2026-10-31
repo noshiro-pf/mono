@@ -27,8 +27,8 @@ import {
 
 /**
  * Each duration is a state, and every figure is a node of its own, made with
- * `combine` and `map` from the figures it is computed from. The cells bind
- * the figures directly; a number is written as its text.
+ * `combine` and `map` from the figures it is computed from. The cells bind the
+ * figures directly; a number is written as its text.
  *
  * Measured twice: as written, and with a `skipIfNoChange` after every figure
  * (see {@link FigureOutput}).

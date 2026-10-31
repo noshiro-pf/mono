@@ -2,10 +2,10 @@
  * Scrolling 「タイル」 (`tile-layout.mts`): down and up only, never zoomed.
  * The offset is how far the content has been scrolled up, in pixels — the
  * view's transform (`tileViewTransform`) puts the top of the first row
- * `topInset` below the top of the canvas, less the offset. The rows are seen
- * in a part of the canvas `visible` high, below the toolbar; the offset runs
- * from 0, the first row at the top of it, to where the last row is at its
- * bottom, and stays 0 for content that it shows whole.
+ * `topInset` below the top of the canvas, less the offset. The rows are seen in
+ * a part of the canvas `visible` high, below the toolbar; the offset runs from
+ * 0, the first row at the top of it, to where the last row is at its bottom,
+ * and stays 0 for content that it shows whole.
  */
 
 import { Num } from 'ts-data-forge';
@@ -27,8 +27,8 @@ export const clampTileScroll = (
 ): number => Num.clamp(offset, 0, maxTileScroll(content, visible));
 
 /**
- * Where `key` scrolls to from `offset`: Page Down and Page Up by most of
- * what is visible, so a row stays in sight across the page, Home to the top and End
+ * Where `key` scrolls to from `offset`: Page Down and Page Up by most of what
+ * is visible, so a row stays in sight across the page, Home to the top and End
  * to the bottom. `undefined` for any other key, which scrolls nothing.
  */
 export const tileKeyScroll = (
@@ -56,8 +56,8 @@ export const tileKeyScroll = (
 };
 
 /**
- * How far one wheel event scrolls, in pixels: `deltaMode` is the event's —
- * `1` counts lines, taken as 16 pixels each, and `2` pages, `visible` each.
+ * How far one wheel event scrolls, in pixels: `deltaMode` is the event's — `1`
+ * counts lines, taken as 16 pixels each, and `2` pages, `visible` each.
  */
 export const wheelScrollPixels = (
   deltaY: number,
@@ -68,8 +68,8 @@ export const wheelScrollPixels = (
 
 /**
  * The least scroll from `offset` that shows the node from `nodeTop` to
- * `nodeBottom` in the `visible` height — its top, if it is taller — for a
- * node given the focus.
+ * `nodeBottom` in the `visible` height — its top, if it is taller — for a node
+ * given the focus.
  */
 export const revealTileScroll = (
   offset: number,
@@ -84,11 +84,11 @@ export const revealTileScroll = (
       : offset;
 
 /**
- * The offset that keeps the first node of the first row in view at
- * `offset`, nodes `nodeHeight` high, as far from the top after the nodes
- * move from `before` to `after` as it was — when a change of width makes
- * the rows longer or shorter. `ids` are in order, row by row; the result is
- * to be clamped to the content as it is after.
+ * The offset that keeps the first node of the first row in view at `offset`,
+ * nodes `nodeHeight` high, as far from the top after the nodes move from
+ * `before` to `after` as it was — when a change of width makes the rows longer
+ * or shorter. `ids` are in order, row by row; the result is to be clamped to
+ * the content as it is after.
  */
 export const anchoredTileScroll = <K,>(
   ids: readonly K[],
@@ -113,9 +113,9 @@ export const anchoredTileScroll = <K,>(
 };
 
 /**
- * The scroll indicator's thumb in a track `track` high: as tall a share of
- * it as `visible` is of the content, and as far down it as the offset is
- * of the way. `undefined` when there is nothing to scroll.
+ * The scroll indicator's thumb in a track `track` high: as tall a share of it
+ * as `visible` is of the content, and as far down it as the offset is of the
+ * way. `undefined` when there is nothing to scroll.
  */
 export const tileScrollThumb = (
   offset: number,

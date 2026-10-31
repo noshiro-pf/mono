@@ -316,10 +316,10 @@ export function toFilled<
 // For an array or tuple that carries no length brand the homomorphic mapping
 // already covers every case the conditional spelled out — a fixed-length tuple
 // keeps its length, `readonly [A, ...A[]]` stays non-empty, and `readonly A[]`
-// stays unbounded. Stating it directly is what keeps this usable from a
-// caller that is itself generic over the array: a conditional a *generic* `Ar`
-// cannot decide stays deferred, and its branded branch is then not assignable
-// to the caller's own mapping.
+// stays unbounded. Stating it directly is what keeps this usable from a caller
+// that is itself generic over the array: a conditional a *generic* `Ar` cannot
+// decide stays deferred, and its branded branch is then not assignable to the
+// caller's own mapping.
 export function toFilled<const Ar extends readonly unknown[], const V>(
   array: Ar,
   value: V,

@@ -40,9 +40,9 @@ const reportIntervalMs = 1000;
  * How often a page on an always-clear origin looks for a worker registered
  * since the last look.
  *
- * A site registers its worker whenever it likes — GitHub does it a moment
- * after the page has loaded — so one look at `load` misses it, and the worker
- * it misses is the one that answers the pane's next navigation. One
+ * A site registers its worker whenever it likes — GitHub does it a moment after
+ * the page has loaded — so one look at `load` misses it, and the worker it
+ * misses is the one that answers the pane's next navigation. One
  * `getRegistrations()` a second, and only on an origin on the list.
  */
 const serviceWorkerSweepIntervalMs = 1000;
@@ -181,12 +181,12 @@ const main = (): void => {
   });
 
   /**
-   * Forwards `Ctrl`+wheel — and a trackpad pinch, which Chrome reports as one
-   * — so that it zooms this pane rather than the whole browser tab.
+   * Forwards `Ctrl`+wheel — and a trackpad pinch, which Chrome reports as one —
+   * so that it zooms this pane rather than the whole browser tab.
    *
-   * Not passive, because `preventDefault` is what stops the browser zooming
-   * the tab underneath us. The page does the zooming: it scales the `iframe`
-   * from outside, which works whether or not this script is running.
+   * Not passive, because `preventDefault` is what stops the browser zooming the
+   * tab underneath us. The page does the zooming: it scales the `iframe` from
+   * outside, which works whether or not this script is running.
    */
   addEventListener(
     'wheel',

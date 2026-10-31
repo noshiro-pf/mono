@@ -1,8 +1,8 @@
 import { DAY_MS, HOUR_MS } from './format.mjs';
 
 /**
- * A lag as the editor shows it: whole days, and the hours left over (which
- * may have a fraction). A lead — a negative lag — has both parts negative.
+ * A lag as the editor shows it: whole days, and the hours left over (which may
+ * have a fraction). A lead — a negative lag — has both parts negative.
  */
 export const lagToParts = (lagMs: number): LagParts => {
   const days = Math.trunc(lagMs / DAY_MS);

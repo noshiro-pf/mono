@@ -1,17 +1,16 @@
 /**
- * A project as one JSON file — its tasks, milestones and groups, and the
- * layout of its DAG — to keep, to move to another account, or to hand to
- * another tool.
+ * A project as one JSON file — its tasks, milestones and groups, and the layout
+ * of its DAG — to keep, to move to another account, or to hand to another tool.
  *
  * The records are written as they are stored in Firestore (`converters.mts`,
  * pruned to the documents' codecs as `api/firestore-io.mts` does) with their
- * ids beside them, and read back through the same converters: so
- * a file is checked as a document is, and a field this version does not know
- * is left out. A file is read whole or not at all: any record that is not
- * one, or that Firestore would refuse, or an id used twice refuses it,
- * saying what is wrong. A dependency on a node the file does not have, or a
- * cycle, does not: the app shows either as it is (never met, never
- * reached), and a project can hold them — so its own backup must load.
+ * ids beside them, and read back through the same converters: so a file is
+ * checked as a document is, and a field this version does not know is left out.
+ * A file is read whole or not at all: any record that is not one, or that
+ * Firestore would refuse, or an id used twice refuses it, saying what is wrong.
+ * A dependency on a node the file does not have, or a cycle, does not: the app
+ * shows either as it is (never met, never reached), and a project can hold them
+ * — so its own backup must load.
  */
 
 import { Arr, hasKey, isRecord, isString, Result } from 'ts-data-forge';
@@ -172,16 +171,15 @@ const ProjectFileHeadCodec = t.record({
 });
 
 /**
- * The largest record a file may hold, as Firestore counts it
- * (`doc-bytes.mts`): under its 1 MiB of a document, which also counts the
- * document's name.
+ * The largest record a file may hold, as Firestore counts it (`doc-bytes.mts`):
+ * under its 1 MiB of a document, which also counts the document's name.
  */
 const MAX_RECORD_BYTES = 1_046_000;
 
 /**
- * The most positions the layout document can hold: each is three of the
- * 20,000 fields Firestore takes a document (`<id>`, `x`, `y`), and four of
- * its 40,000 index entries.
+ * The most positions the layout document can hold: each is three of the 20,000
+ * fields Firestore takes a document (`<id>`, `x`, `y`), and four of its 40,000
+ * index entries.
  */
 const MAX_LAYOUT_POSITIONS = 6600;
 
@@ -207,8 +205,8 @@ const headErrors = (
       : Arr.toUnshifted(m.projectFile.malformed)(messages);
 
 /**
- * Whether Firestore takes `name` as a map key's: not `__…__`, and short
- * enough for the field path `positions.<name>.x` to fit in 1500 bytes.
+ * Whether Firestore takes `name` as a map key's: not `__…__`, and short enough
+ * for the field path `positions.<name>.x` to fit in 1500 bytes.
  */
 const isUsableFieldName = (name: string): boolean =>
   !(name.length >= 4 && name.startsWith('__') && name.endsWith('__')) &&
@@ -216,8 +214,8 @@ const isUsableFieldName = (name: string): boolean =>
 
 /**
  * Whether Firestore takes `id` as a document's: not empty, no `/`, not `.`
- * or `..`, not `__…__` — and short enough to be a key of the layout too,
- * where it is `task:<id>`.
+ * or `..`, not `__…__` — and short enough to be a key of the layout too, where
+ * it is `task:<id>`.
  */
 const isUsableId = (id: string): boolean =>
   id !== '' &&
@@ -228,8 +226,8 @@ const isUsableId = (id: string): boolean =>
   utf8Bytes(id) <= 1300;
 
 /**
- * Each of `records` read by `fromDoc` with the id beside it, or a message
- * for each that is not one, or that `toDoc` makes too large to store,
+ * Each of `records` read by `fromDoc` with the id beside it, or a message for
+ * each that is not one, or that `toDoc` makes too large to store,
  * naming it by its place: `タスク 3 件目: …` in Japanese.
  */
 const readRecords = <A,>(
@@ -281,8 +279,8 @@ const readRecords = <A,>(
 };
 
 /**
- * The layout `data` holds, unless Firestore would refuse one of its keys,
- * or its size.
+ * The layout `data` holds, unless Firestore would refuse one of its keys, or
+ * its size.
  */
 const readLayout = (data: unknown): Result<DagLayout, readonly string[]> => {
   const layout = dagLayoutFromDoc(data);

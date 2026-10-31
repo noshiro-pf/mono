@@ -15,9 +15,9 @@ import { projectRootPath } from '../project-root-path.mjs';
  * `strict-ts-lib-v7.0`'s linker, run by the root `prepare` script, writes one
  * symlink per lib group so that lookup finds the strict declarations.
  *
- * Without the links both quietly fall back to TypeScript's own declarations
- * and stop enforcing anything — no error, just a weaker check. That is the
- * failure this exists to make loud.
+ * Without the links both quietly fall back to TypeScript's own declarations and
+ * stop enforcing anything — no error, just a weaker check. That is the failure
+ * this exists to make loud.
  */
 export const checkStrictLibLinks = async (): Promise<
   Result<number, string>
@@ -72,8 +72,8 @@ export const checkStrictLibLinks = async (): Promise<
 };
 
 /**
- * One bundle serves both compilers. TypeScript 6.0.3 compiles this lib set
- * with `skipLibCheck: false` and no errors, which is why the package declares
+ * One bundle serves both compilers. TypeScript 6.0.3 compiles this lib set with
+ * `skipLibCheck: false` and no errors, which is why the package declares
  * `typescript >=6.0.0 <8.0.0` and why there is no second bundle here.
  */
 const BUNDLE_NAME = 'strict-ts-lib-v7.0';

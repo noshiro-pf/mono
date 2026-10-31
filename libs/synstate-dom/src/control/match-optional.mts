@@ -13,10 +13,10 @@ import { mountSwitch } from './mount-switch.mjs';
  * Mounts `some` while `value` holds a value and `none` while it is empty
  * (SPEC.md 8.3).
  *
- * `some` is called once per change from empty to present, with an observable
- * of the value narrowed to `T`. While the value stays present, new values flow
- * through that observable rather than rebuilding the branch. It is derived
- * from `value`, not written to, so nothing is written during propagation.
+ * `some` is called once per change from empty to present, with an observable of
+ * the value narrowed to `T`. While the value stays present, new values flow
+ * through that observable rather than rebuilding the branch. It is derived from
+ * `value`, not written to, so nothing is written during propagation.
  */
 export const MatchOptional = <T,>({
   value,

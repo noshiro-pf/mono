@@ -22,8 +22,8 @@ export function enumType<const Values extends NonEmptyTuple<Primitive>>(
 
 // When `allowAnyString` is on, the result type keeps autocomplete for the
 // listed members via the `T | (string & {})` idiom while still accepting any
-// other string, and at runtime the value is validated as a plain string
-// (i.e. it behaves like `string()`).
+// other string, and at runtime the value is validated as a plain string (i.e.
+// it behaves like `string()`).
 export function enumType<const Values extends NonEmptyTuple<string>>(
   values: Values,
   options: Readonly<{

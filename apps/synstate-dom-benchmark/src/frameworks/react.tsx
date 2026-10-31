@@ -11,8 +11,8 @@ import {
 
 /**
  * React as js-framework-benchmark's keyed hooks implementation writes it: the
- * table is one state, re-rendered with keys, and each row is a `memo`
- * component that re-renders only when its label or its selection changes.
+ * table is one state, re-rendered with keys, and each row is a `memo` component
+ * that re-renders only when its label or its selection changes.
  *
  * An operation here is a plain call rather than a click, which React would
  * schedule as a default update; `flushSync` renders it at once, as a click

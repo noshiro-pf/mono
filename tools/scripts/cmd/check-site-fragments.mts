@@ -24,8 +24,8 @@ import {
  *
  * Starlight gives each heading an id slugged from its text with
  * github-slugger, as Astro's `rehypeHeadingIds` does. Rewording a heading —
- * in Japanese, changing one particle is enough — changes the id, and every
- * link to it then lands at the top of the page with nothing failing.
+ * in Japanese, changing one particle is enough — changes the id, and every link
+ * to it then lands at the top of the page with nothing failing.
  * `check:prose:mono-links` resolves links into the repository; this resolves
  * links into the sites:
  *
@@ -43,11 +43,11 @@ import {
  * The ids a page has are read from its source, so that this stays buildless:
  * its ATX headings (`## …`), outside fences, slugged in order from the text
  * they render to; the `id` attributes written in it; and `_top`, which
- * Starlight gives the title. A setext heading, a heading written in HTML, one
- * a component renders, one with inline math on a site that renders it (its
- * text is what KaTeX renders) and one with a character reference this check
- * does not know are not seen, and a link to one is reported; write the
- * heading in plain Markdown, or give the element an `id` in the page.
+ * Starlight gives the title. A setext heading, a heading written in HTML, one a
+ * component renders, one with inline math on a site that renders it (its text
+ * is what KaTeX renders) and one with a character reference this check does not
+ * know are not seen, and a link to one is reported; write the heading in plain
+ * Markdown, or give the element an `id` in the page.
  */
 export const checkSiteFragments = async (): Promise<
   Result<CheckSummary, string>
@@ -313,8 +313,8 @@ const HREF_ATTRIBUTE =
   /(?<![\w-])href=\{?(?:"(?<double>[^"]+)"|'(?<single>[^']+)')/gu;
 
 /**
- * A full URL, up to whitespace, a quote, a bracket or a backtick; which of
- * them point into a site is decided by their origin.
+ * A full URL, up to whitespace, a quote, a bracket or a backtick; which of them
+ * point into a site is decided by their origin.
  */
 const FULL_URL = /https:\/\/[^\s"'`<>()[\]]+/gu;
 
@@ -346,8 +346,8 @@ const LINK = /\[(?<text>[^\]]*)\]\([^)]*\)/gu;
 const TAG = /<\/?[A-Za-z][^>]*>/gu;
 
 /**
- * `*`, `~` and a run of `_` that is not inside a word: CommonMark does not
- * read `snake_case_name` as emphasis.
+ * `*`, `~` and a run of `_` that is not inside a word: CommonMark does not read
+ * `snake_case_name` as emphasis.
  */
 const EMPHASIS = /[*~]+|(?<![\p{L}\p{N}])_+|_+(?![\p{L}\p{N}])/gu;
 
@@ -355,8 +355,8 @@ const EMPHASIS = /[*~]+|(?<![\p{L}\p{N}])_+|_+(?![\p{L}\p{N}])/gu;
 const ESCAPE = /\\([!-/:-@[-`{-~])/gu;
 
 /**
- * Where an escaped character is moved to while a heading is read: the
- * private use area, which no heading holds.
+ * Where an escaped character is moved to while a heading is read: the private
+ * use area, which no heading holds.
  */
 const MASK_BASE = 0xe0_00;
 
@@ -495,8 +495,8 @@ const toSiteLink = (
 };
 
 /**
- * The character a decimal, hexadecimal or named character reference stands
- * for, or `undefined` when this check does not know.
+ * The character a decimal, hexadecimal or named character reference stands for,
+ * or `undefined` when this check does not know.
  */
 const decodedReference = (reference: string): string | undefined => {
   // `&` and `;`.
@@ -519,8 +519,8 @@ const decodedReference = (reference: string): string | undefined => {
     ? Number.parseInt(digits, 16)
     : Result.unwrapOkOr(Num.safeParseInt(digits), Number.NaN);
 
-  // CommonMark replaces U+0000, a surrogate and a code point past Unicode
-  // with U+FFFD.
+  // CommonMark replaces U+0000, a surrogate and a code point past Unicode with
+  // U+FFFD.
   return codePoint === 0 ||
     (0xd8_00 <= codePoint && codePoint <= 0xdf_ff) ||
     codePoint > 0x10_ff_ff
@@ -564,17 +564,16 @@ const unmasked = (text: string): string =>
  * renders, or a named character reference it does not know. Code spans and
  * backslash-escaped characters are kept as written, a link keeps its text,
  * an image and an HTML or JSX tag leave nothing, emphasis goes and character
- * references are decoded. An MDX expression is kept as written, as Astro
- * does.
+ * references are decoded. An MDX expression is kept as written, as Astro does.
  */
 const renderedText = (
   markdown: string,
   rendersMath: boolean,
 ): string | undefined => {
-  // An escaped character is literal text: masked, it is neither a backtick
-  // of a code span, nor emphasis, nor a bracket of a link, nor the `$` of
-  // math, nor the `&` of a reference. In a code span a backslash is kept and
-  // the slugger then drops it, so masking there changes nothing.
+  // An escaped character is literal text: masked, it is neither a backtick of a
+  // code span, nor emphasis, nor a bracket of a link, nor the `$` of math, nor
+  // the `&` of a reference. In a code span a backslash is kept and the slugger
+  // then drops it, so masking there changes nothing.
   const parts = markdown
     .replaceAll(ESCAPE, (_, char) =>
       String.fromCodePoint(MASK_BASE + (char?.codePointAt(0) ?? 0)),

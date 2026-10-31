@@ -129,8 +129,8 @@ describe(layoutFromSearch, () => {
     ]);
   });
 
-  // It is a strip about the pull requests in the merge order, so a URL
-  // written before it puts it under that, in whichever column it is.
+  // It is a strip about the pull requests in the merge order, so a URL written
+  // before it puts it under that, in whichever column it is.
   test('a URL written before the queue block puts it under the merge order', () => {
     assert.deepStrictEqual(
       layoutFromSearch(

@@ -22,19 +22,19 @@ import { OfTotal, StatTile, StatToggle } from './stat-tile.js';
 
 /**
  * What the merge order leads with: the counts, each a switch for the pull
- * requests it counts with an `only` switch in its corner, then the
- * priorities, which are switches too, and the order. What a switch does is `merge-order-view.mts`, which keeps the
- * choice in the URL.
+ * requests it counts with an `only` switch in its corner, then the priorities,
+ * which are switches too, and the order. What a switch does is
+ * `merge-order-view.mts`, which keeps the choice in the URL.
  *
  * Each number is what the list below shows (`countView` in
- * `merge-order-view.mts`), and, when the switches leave some of them out,
- * how many there are in all beside it in small: the list is what a reader
- * counts against, and the whole is still a glance away. `open` is the one
- * count that is not a switch: hiding every open pull request is not a view
- * of them. The first three counts are `pr-report-core`'s, the same
- * `pnpm run pr-report` leads with, less its `draft` and `behind`, which are
- * not drawn: a draft is always shown, and its card's badge says so, and how
- * far behind the base a pull request is is its card's ahead / behind bar.
+ * `merge-order-view.mts`), and, when the switches leave some of them out, how
+ * many there are in all beside it in small: the list is what a reader counts
+ * against, and the whole is still a glance away. `open` is the one count that
+ * is not a switch: hiding every open pull request is not a view of them. The
+ * first three counts are `pr-report-core`'s, the same `pnpm run pr-report`
+ * leads with, less its `draft` and `behind`, which are not drawn: a draft is
+ * always shown, and its card's badge says so, and how far behind the base a
+ * pull request is is its card's ahead / behind bar.
  * `set aside` and `awaiting code owner` are what stops a pull request that
  * is otherwise ready, and are only this page's, as is `pending`, the
  * `pending` label an author puts on what they are holding back, which is

@@ -40,8 +40,8 @@ export type AnswerTableDeps = Readonly<{
 }>;
 
 /**
- * The answer table's rows and cells, as filtered and sorted, and how the
- * table is shown.
+ * The answer table's rows and cells, as filtered and sorted, and how the table
+ * is shown.
  */
 export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
   const answerSelectionMap$: InitializedObservable<

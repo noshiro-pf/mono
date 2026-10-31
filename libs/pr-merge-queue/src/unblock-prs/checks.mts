@@ -1,6 +1,6 @@
 /**
- * What the merge is waiting for, read from the head commit's checks and
- * judged against the contexts the ruleset requires.
+ * What the merge is waiting for, read from the head commit's checks and judged
+ * against the contexts the ruleset requires.
  */
 
 import {
@@ -15,8 +15,8 @@ import { graphqlQuery, type ApiContext } from '../lib/index.mjs';
 import type { ChecksSummary } from './types.mjs';
 
 /**
- * One check on the head, in the shape `gh pr checks --json` printed, which
- * is what this script read until it called the API itself.
+ * One check on the head, in the shape `gh pr checks --json` printed, which is
+ * what this script read until it called the API itself.
  */
 export type ReportedCheck = Readonly<{
   name: string;
@@ -32,8 +32,8 @@ export type ReportedCheck = Readonly<{
 }>;
 
 /**
- * A check on the head that has not finished, when it started, and the
- * workflow run it is a job of.
+ * A check on the head that has not finished, when it started, and the workflow
+ * run it is a job of.
  */
 export type RunningCheck = Readonly<{
   name: string;
@@ -58,12 +58,12 @@ export const listRequiredChecks = async (
 /**
  * The checks on the head commit that have not finished, required or not.
  *
- * A required aggregate has no run in a new round until the jobs it waits on
- * are done, so until then the required ones answer with the round before.
+ * A required aggregate has no run in a new round until the jobs it waits on are
+ * done, so until then the required ones answer with the round before.
  * When that round was the one `skip-ci` skipped, every aggregate reads
  * `skipped` and the commit looks green halfway through its matrix. Anything
- * still running is what says the round is not over, and when it started is
- * what tells a failure of the round before from one of this round.
+ * still running is what says the round is not over, and when it started is what
+ * tells a failure of the round before from one of this round.
  */
 export const listRunningChecks = async (
   api: ApiContext,
@@ -81,12 +81,12 @@ export const listRunningChecks = async (
   );
 
 /**
- * What the head commit's checks say, as `gh pr checks` said it: each check
- * run and commit status in a bucket, and of the runs of one job in one
- * workflow and event only the latest — a re-run, or the round `skip-ci`
- * cancelled under the one now running — so that a superseded failure does
- * not speak for its context. `which` is `'required'` for only what GitHub
- * says this pull request requires.
+ * What the head commit's checks say, as `gh pr checks` said it: each check run
+ * and commit status in a bucket, and of the runs of one job in one workflow and
+ * event only the latest — a re-run, or the round `skip-ci` cancelled under the
+ * one now running — so that a superseded failure does not speak for its
+ * context. `which` is `'required'` for only what GitHub says this pull request
+ * requires.
  *
  * Unlike `gh`, the survivors keep the order GitHub listed them in. A commit
  * status's start and finish are both when it was set, the one time it has.
@@ -123,28 +123,27 @@ export type CheckContextNode = t.TypeOf<typeof CheckContextNodeSchema>;
 /**
  * `checks` is what {@link listRequiredChecks} reported for the head commit;
  * `requiredContexts` is what the ruleset asks for. The difference between the
- * two is the point: a context in the second and not the first has not
- * reported yet, and GitHub will not merge until it does. `running` is every
- * check on the head that has not finished ({@link listRunningChecks}); while
- * it is not empty the required ones may be the round before speaking, so
- * they cannot pass the pull request.
+ * two is the point: a context in the second and not the first has not reported
+ * yet, and GitHub will not merge until it does. `running` is every check on the
+ * head that has not finished ({@link listRunningChecks}); while it is not empty
+ * the required ones may be the round before speaking, so they cannot pass the
+ * pull request.
  *
- * Nor can they fail it when they finished before the round still running
- * began: the round `skip-ci` cancelled, as `open-pr` opens every pull request
- * under it, leaves its aggregates red, and reading that red as this round's
- * set a pull request aside while its first real round was under way (#2246).
- * Such a failure waits for the round to end, as a check not yet reported
- * does. So does one that finished after the round began but whose workflow
- * has a newer run still going: the round `skip-ci` was put on for can take
- * long enough to be cancelled that its aggregate goes red after the round
- * taking its place has started, and only the run that replaced it says it is
- * the round before (#2463). A failure of this round still fails the pull
- * request at once.
+ * Nor can they fail it when they finished before the round still running began:
+ * the round `skip-ci` cancelled, as `open-pr` opens every pull request under
+ * it, leaves its aggregates red, and reading that red as this round's set a
+ * pull request aside while its first real round was under way (#2246).
+ * Such a failure waits for the round to end, as a check not yet reported does.
+ * So does one that finished after the round began but whose workflow has a
+ * newer run still going: the round `skip-ci` was put on for can take long
+ * enough to be cancelled that its aggregate goes red after the round taking its
+ * place has started, and only the run that replaced it says it is the round
+ * before (#2463). A failure of this round still fails the pull request at once.
  *
- * The verdict itself is `pr-report-core`'s `summarizeChecks`, which
- * `pr-report` and the page reach theirs through, so the worker and the report
- * cannot disagree about one; what is here turns what GitHub reports into
- * the states that reads.
+ * The verdict itself is `pr-report-core`'s `summarizeChecks`, which `pr-report`
+ * and the page reach theirs through, so the worker and the report cannot
+ * disagree about one; what is here turns what GitHub reports into the states
+ * that reads.
  */
 export const summarizeChecks = (
   checks: readonly ReportedCheck[],
@@ -200,13 +199,12 @@ export const summarizeChecks = (
     reported: mut_reported,
     // `skip-ci` is the queue's to read (`queueStanding`), not the checks'.
     paused: false,
-    // No checks at all means they have not been reported yet — which is
-    // also all that can be said when the ruleset could not be read.
+    // No checks at all means they have not been reported yet — which is also
+    // all that can be said when the ruleset could not be read.
     running: Arr.isNonEmpty(stillRunning) || !Arr.isNonEmpty(checks),
-    // A required context that has not reported is waited for wherever the
-    // pull request points: the worker arms what it judges green, and an
-    // armed pull request stacked on a branch no ruleset covers merges into
-    // it at once.
+    // A required context that has not reported is waited for wherever the pull
+    // request points: the worker arms what it judges green, and an armed pull
+    // request stacked on a branch no ruleset covers merges into it at once.
     baseCovered: true,
   });
 
@@ -231,8 +229,8 @@ export const describeWaitingOn = (summary: ChecksSummary): string => {
 };
 
 /**
- * One page of the head commit's contexts, from `after` on; `null` when the
- * head has no rollup yet.
+ * One page of the head commit's contexts, from `after` on; `null` when the head
+ * has no rollup yet.
  */
 const readRollupPage = async (
   api: ApiContext,
@@ -394,8 +392,8 @@ const ChecksAnswerSchema = t.record({
 const ZERO_TIME = '0001-01-01T00:00:00Z';
 
 /**
- * Which runs supersede each other: a commit status by its context, a check
- * run by its name, workflow and event, as `gh` told them apart.
+ * Which runs supersede each other: a commit status by its context, a check run
+ * by its name, workflow and event, as `gh` told them apart.
  */
 const keyOf = (context: CheckContextNode): string =>
   context.__typename === 'StatusContext'
@@ -413,9 +411,9 @@ const startedAtOf = (context: CheckContextNode): string =>
     : context.startedAt) ?? ZERO_TIME;
 
 /**
- * A check run's conclusion, or its status while it runs, or a commit
- * status's state, in `gh pr checks`'s buckets. Anything else — `QUEUED`,
- * `IN_PROGRESS`, `PENDING`, `EXPECTED`, `STALE` — is waited for.
+ * A check run's conclusion, or its status while it runs, or a commit status's
+ * state, in `gh pr checks`'s buckets. Anything else — `QUEUED`, `IN_PROGRESS`,
+ * `PENDING`, `EXPECTED`, `STALE` — is waited for.
  */
 const bucketOf = (state: string): string => {
   switch (state) {

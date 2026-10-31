@@ -18,9 +18,9 @@ export const mergeAfterTrailer = (
 /**
  * What to declare with `Merge-After:`: what was asked for, and — for a pull
  * request stacked on another — that one first. The base already says it, and
- * `unblock-prs` and the reports read the base alone; the trailer is written
- * as well so that the order is stated in the body like every other, and
- * survives the base being moved by hand.
+ * `unblock-prs` and the reports read the base alone; the trailer is written as
+ * well so that the order is stated in the body like every other, and survives
+ * the base being moved by hand.
  */
 export const withStackParent = (
   mergeAfter: readonly number[],
@@ -46,10 +46,10 @@ export const mergeBeforeNote = (
 
 /**
  * `body` with `numbers` declared in it as well: added to its first
- * `Merge-After:` line outside a fenced code block, or in a line of their own
- * at the top when it has none. The numbers are what the issues it closes
- * start after and the body does not yet say, or the pull request just opened
- * with `--merge-before` this one (`openPullRequest`).
+ * `Merge-After:` line outside a fenced code block, or in a line of their own at
+ * the top when it has none. The numbers are what the issues it closes start
+ * after and the body does not yet say, or the pull request just opened with
+ * `--merge-before` this one (`openPullRequest`).
  */
 export const withMergeAfter = (
   body: string,

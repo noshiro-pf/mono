@@ -2,8 +2,7 @@ import type { LocalizedText } from '../constants.mjs';
 
 /**
  * A graph to animate. `nodes` is in creation order, the source first: a
- * parent's children are queued in the order they were created, as in
- * synstate.
+ * parent's children are queued in the order they were created, as in synstate.
  */
 export type Scenario = Readonly<{
   nodes: readonly ScenarioNode[];

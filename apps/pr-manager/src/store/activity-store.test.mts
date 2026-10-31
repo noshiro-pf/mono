@@ -43,8 +43,8 @@ describe(createActivityStore, () => {
 
     store.openDialog();
 
-    // Today is still going, so it is asked again; the week held stays on
-    // screen meanwhile rather than "Counting…".
+    // Today is still going, so it is asked again; the week held stays on screen
+    // meanwhile rather than "Counting…".
     assert.strictEqual(loads.length, 2);
 
     assert.strictEqual(todayMergedOf(store), 1);

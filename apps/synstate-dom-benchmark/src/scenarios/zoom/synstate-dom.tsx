@@ -21,8 +21,8 @@ import {
 
 /**
  * The zoom is a state, the level a node mapped from it, and every label a node
- * mapped from the level. The cells bind the figures with `view`, which
- * formats them without adding a node.
+ * mapped from the level. The cells bind the figures with `view`, which formats
+ * them without adding a node.
  *
  * Measured twice: as written, and with a `skipIfNoChange` after every figure
  * (see {@link FigureOutput}), the level included.

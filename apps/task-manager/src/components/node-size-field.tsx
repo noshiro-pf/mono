@@ -6,8 +6,8 @@ import { nodeSizeLabels, nodeSizes } from '../view-model/index.mjs';
 /**
  * How big the nodes are drawn, in every view mode: 「コンパクト」, the title
  * alone; 「標準」, a title and its due date; 「大」, as 「標準」 with the
- * title on up to three lines. One button per size, the pressed one is the
- * size shown. Kept on this device.
+ * title on up to three lines. One button per size, the pressed one is the size
+ * shown. Kept on this device.
  */
 export const NodeSizeField = (): JSX.Element => (
   <fieldset

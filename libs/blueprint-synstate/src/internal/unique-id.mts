@@ -1,8 +1,8 @@
 const mut_counts = new Map<string, number>();
 
 /**
- * `prefix-0`, `prefix-1`, … — an id unique on the page, counted per prefix
- * as Blueprint's `Utils.uniqueId` counts them.
+ * `prefix-0`, `prefix-1`, … — an id unique on the page, counted per prefix as
+ * Blueprint's `Utils.uniqueId` counts them.
  */
 export const uniqueId = (prefix: string): string => {
   const count = mut_counts.get(prefix) ?? 0;

@@ -12,10 +12,10 @@ import {
  * 「表示設定」, at the right end of the graph screen's toolbar: opens the
  * panel of the settings that apply to every view mode
  * (`dag-settings-panel.tsx`), which gives the focus back to it on closing.
- * A gear, and its name beside it where there is room; on a narrow screen
- * the name is for assistive technology alone (`index.css`). While the
- * graph is filtered (`dag-filter-field.tsx`), a dot on it says so, since
- * nothing else on the screen does.
+ * A gear, and its name beside it where there is room; on a narrow screen the
+ * name is for assistive technology alone (`index.css`). While the graph is
+ * filtered (`dag-filter-field.tsx`), a dot on it says so, since nothing else on
+ * the screen does.
  */
 export const DagSettingsButton = (): JSX.Element => (
   <button
@@ -56,8 +56,8 @@ export const DagSettingsButton = (): JSX.Element => (
 export const DAG_SETTINGS_BUTTON_ID = 'dag-settings-button';
 
 /**
- * Where the panel opens now, from where the button is and how wide the
- * screen is (`view-model/settings-panel.mts`).
+ * Where the panel opens now, from where the button is and how wide the screen
+ * is (`view-model/settings-panel.mts`).
  */
 export const currentSettingsPlacement = (): SettingsPanelPlacement => {
   const page = document.documentElement;

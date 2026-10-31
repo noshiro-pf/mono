@@ -7,9 +7,9 @@ import {
 /**
  * What `stripDevOnlyCode` removes from the `dist/` of the libraries here.
  *
- * `ts-repo-utils` supplies the mechanism and no names: which functions are
- * safe to remove is knowledge about the code being built, and this is where
- * that knowledge lives for this repository. A package's `scripts/cmd/build.mts`
+ * `ts-repo-utils` supplies the mechanism and no names: which functions are safe
+ * to remove is knowledge about the code being built, and this is where that
+ * knowledge lives for this repository. A package's `scripts/cmd/build.mts`
  * calls {@link stripDistDevOnlyCode} after the native `tsc` has emitted.
  *
  * - `removeCallStatements` — statements that exist for the type checker only.
@@ -25,11 +25,11 @@ import {
  *   thirds of `ts-data-forge`'s emitted JavaScript. The compiler's own
  *   `removeComments` cannot do this: it strips the `.d.mts` as well.
  *
- * **`unwrapIdentityCalls` takes `(x) => x` and nothing else.** The pass
- * deletes the call and keeps the argument, so a function that validates —
- * `asUint32`, which throws on a value out of range — would have its check
- * removed from `dist/` while the source still reads as if it were there. The
- * four below are casts the type system asks for and the runtime does not see.
+ * **`unwrapIdentityCalls` takes `(x) => x` and nothing else.** The pass deletes
+ * the call and keeps the argument, so a function that validates — `asUint32`,
+ * which throws on a value out of range — would have its check removed from
+ * `dist/` while the source still reads as if it were there. The four below are
+ * casts the type system asks for and the runtime does not see.
  */
 export const devOnlyCode: StripDevOnlyCodeOptions = {
   removeCallStatements: ['expectType'],
@@ -47,9 +47,9 @@ export const devOnlyCode: StripDevOnlyCodeOptions = {
  * throwing when a file cannot be stripped.
  *
  * It throws rather than returning the `Result` it gets because the build
- * scripts report a failed step in two different ways — some take a promise of
- * a `Result`, some a function that may throw — and a helper that throws is
- * one line at either kind of call site.
+ * scripts report a failed step in two different ways — some take a promise of a
+ * `Result`, some a function that may throw — and a helper that throws is one
+ * line at either kind of call site.
  */
 export const stripDistDevOnlyCode = async (distDir: string): Promise<void> => {
   const result = await stripDevOnlyCodeInDir(distDir, devOnlyCode);

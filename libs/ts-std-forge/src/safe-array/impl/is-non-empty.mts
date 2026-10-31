@@ -4,8 +4,8 @@ import type { NonEmptyTuple } from 'ts-type-forge';
  * Type guard that checks whether an array has at least one element.
  *
  * `array.length > 0` says the same thing at runtime and nothing at all to the
- * checker: `array[0]` stays `E | undefined` under
- * `noUncheckedIndexedAccess`, and the usual way out is a non-null assertion.
+ * checker: `array[0]` stays `E | undefined` under `noUncheckedIndexedAccess`,
+ * and the usual way out is a non-null assertion.
  * Narrowing to `NonEmptyTuple<E>` makes the first element `E` instead, so the
  * guard replaces the assertion rather than joining it.
  *

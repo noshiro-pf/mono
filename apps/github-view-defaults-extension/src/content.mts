@@ -257,10 +257,9 @@ const suppressClientSideNavigation = (clickEvent: Event): void => {
  * page, before any of GitHub's scripts has run. A listener on each anchor in
  * the bubble phase was what this was at first, and it hears of a click only
  * after everything that listens on the way down, GitHub's router among them.
- * Stopped here, the click reaches nothing on the page, not
- * even the icon inside a tab it landed on; the anchor still follows its `href`,
- * because that is the browser's default action and nothing is left that could
- * prevent it.
+ * Stopped here, the click reaches nothing on the page, not even the icon inside
+ * a tab it landed on; the anchor still follows its `href`, because that is the
+ * browser's default action and nothing is left that could prevent it.
  *
  * The anchor is patched again here, before it is judged, because the click is
  * the last moment its `href` can be made right: the observer gives a new anchor

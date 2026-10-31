@@ -8,12 +8,12 @@ import { Arr } from 'ts-data-forge';
  * Sorts the changed paths into the packages they belong to and the
  * repository-wide areas they touch.
  *
- * A path belongs to the workspace member whose directory is its longest
- * prefix. Under a package, a path the code gate ignores (`proseGate`, the
- * patterns `z:check-should-run:code-checks` gives `code-check.yml`) touches
- * the package's documents only: its generators run, its type check and tests
- * do not, as CI's would not. `strict-lib/` is one area whatever member a path
- * is in, because its harnesses are checked by the root `strict-lib:*` scripts
+ * A path belongs to the workspace member whose directory is its longest prefix.
+ * Under a package, a path the code gate ignores (`proseGate`, the patterns
+ * `z:check-should-run:code-checks` gives `code-check.yml`) touches the
+ * package's documents only: its generators run, its type check and tests do
+ * not, as CI's would not. `strict-lib/` is one area whatever member a path is
+ * in, because its harnesses are checked by the root `strict-lib:*` scripts
  * rather than their own; `experimental/` is outside everything.
  */
 export const classifyChanges = ({
@@ -46,10 +46,10 @@ export const classifyChanges = ({
     );
 
     // CI runs `check:root` on every diff its code gate lets through, and the
-    // guards in it read package files too (`check:root:example-coverage`
-    // reads `src/`, `check:root:tsconfig-paths` every tsconfig), so any such
-    // change asks for them. The root program's own type check, lint and
-    // tests are slower and read only what the root `tsconfig.json` takes in.
+    // guards in it read package files too (`check:root:example-coverage` reads
+    // `src/`, `check:root:tsconfig-paths` every tsconfig), so any such change
+    // asks for them. The root program's own type check, lint and tests are
+    // slower and read only what the root `tsconfig.json` takes in.
     if (!prose) {
       mut_areas.add('root-guards');
     }
@@ -76,8 +76,8 @@ export const classifyChanges = ({
       mut_areas.add('manifest');
     }
 
-    // Only its tooling's checks: the generators rewrite thousands of files
-    // and are `strict-lib-gen.yml`'s, as they are not `check-all`'s either.
+    // Only its tooling's checks: the generators rewrite thousands of files and
+    // are `strict-lib-gen.yml`'s, as they are not `check-all`'s either.
     if (file.startsWith('strict-lib/')) {
       mut_areas.add('strict-lib');
 
@@ -201,8 +201,8 @@ export const buildPlan = ({
       ...packageStep(pkg, 'check', 'check:types'),
       // `check:test` with coverage turned on rather than `check:test:cov`,
       // which in some packages runs the browser project as well. A
-      // `check:test:cov` is what says the package's Vitest has coverage set
-      // up, and that its `check:test` ends in `vitest`.
+      // `check:test:cov` is what says the package's Vitest has coverage set up,
+      // and that its `check:test` ends in `vitest`.
       ...packageStep(
         pkg,
         'check',
@@ -237,9 +237,9 @@ export const buildPlan = ({
     // (`check:prose:dependent-releases` reads `src/` for re-exports).
     rootStep('check', 'check:prose'),
 
-    // `check:cspell` reads the whole repository; the changed files are what
-    // can have changed its verdict. Given paths, cspell still finds each
-    // file's nearest `cspell.config.yaml`.
+    // `check:cspell` reads the whole repository; the changed files are what can
+    // have changed its verdict. Given paths, cspell still finds each file's
+    // nearest `cspell.config.yaml`.
     ...(areas.has('spell-config')
       ? [rootStep('check', 'check:cspell')]
       : spellChecked.some(isSpellCheckedByCi)
@@ -310,8 +310,8 @@ export const isSpellCheckedByCi = (file: string): boolean =>
   file.split('/').every((segment) => !segment.startsWith('.'));
 
 /**
- * The `--paths-ignore` values of a `z:check-should-run:*` script, read from
- * its command line so that the list is the gate's own.
+ * The `--paths-ignore` values of a `z:check-should-run:*` script, read from its
+ * command line so that the list is the gate's own.
  */
 export const parsePathsIgnore = (command: string): readonly string[] =>
   Array.from(command.matchAll(PATHS_IGNORE), (match) => match[1] ?? '');
@@ -360,8 +360,8 @@ export type Step = Readonly<{
   args: readonly string[];
   /**
    * Present on a test step whose coverage is read afterwards; `main.mts`
-   * appends the reporter options, which `pnpm run` hands to the script's
-   * last command, `vitest`.
+   * appends the reporter options, which `pnpm run` hands to the script's last
+   * command, `vitest`.
    */
   coverage?: Readonly<{ packageDir: string }>;
 }>;
@@ -488,8 +488,8 @@ const ROOT_PROGRAM_CHECKS: ReadonlySet<string> = new Set<string>([
 /**
  * Whether the root program reads a path: tools/, the root configuration, and
  * what the root `tsconfig.json` includes from anywhere (`configs/`,
- * `eslint.config*.mts`, `vite.config.mts`, `.markdownlint-cli2.mjs`). Taking
- * in too much costs a slower run; too little, a type error CI finds first.
+ * `eslint.config*.mts`, `vite.config.mts`, `.markdownlint-cli2.mjs`). Taking in
+ * too much costs a slower run; too little, a type error CI finds first.
  */
 const isRootProgramFile = (file: string): boolean => {
   const name = basename(file);

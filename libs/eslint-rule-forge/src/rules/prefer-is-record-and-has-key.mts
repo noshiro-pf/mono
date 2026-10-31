@@ -45,11 +45,11 @@ export const createPreferIsRecordAndHasKey = ({
       /**
        * Whether the `isRecord(...)` half of the rewrite would be dead code
        * because the object already satisfies `hasKey`'s
-       * `R extends UnknownRecord` constraint, at every layer of type
-       * wrappers: an array cast to a record is still rejected by `isRecord`,
-       * and a record widened to one that may be an array is the author saying
-       * it may need the guard. Without type information nothing is known, so
-       * the guard is kept.
+       * `R extends UnknownRecord` constraint, at every layer of type wrappers:
+       * an array cast to a record is still rejected by `isRecord`, and a record
+       * widened to one that may be an array is the author saying it may need
+       * the guard. Without type information nothing is known, so the guard is
+       * kept.
        */
       const isKnownRecord = (
         // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

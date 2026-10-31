@@ -27,8 +27,8 @@ import type {
  * Converts a type to a JSON Schema (draft 2020-12, the dialect OpenAPI 3.1
  * uses) describing the JSON values the type accepts.
  *
- * The schema is read off each type's `structure` and `constraints`, so it
- * says what the type was built from:
+ * The schema is read off each type's `structure` and `constraints`, so it says
+ * what the type was built from:
  *
  * - `string` / `number` constraints become `minLength`, `pattern`, `minimum`,
  *   `multipleOf` and the like; `int` and `safeInteger` make it an `integer`.
@@ -60,13 +60,13 @@ import type {
  * names, beside the schema of the type they are on. An example the type does
  * not accept, or one that is not JSON, is an error.
  *
- * Default values are not written as `default`: every type has one, so
- * writing it would tell a client that every property may be left out.
+ * Default values are not written as `default`: every type has one, so writing
+ * it would tell a client that every property may be left out.
  *
  * A type no JSON value can be of — `bigint`, `symbol`, `undefinedType`,
  * `MapType`, `SetType` — is an error, and so is a type without a `structure`
- * (one written by hand rather than built by this package). As a union
- * member it is left out instead, since a JSON value is never of it:
+ * (one written by hand rather than built by this package). As a union member it
+ * is left out instead, since a JSON value is never of it:
  * `nullable(t.string())` is a string.
  *
  * @example
@@ -166,8 +166,8 @@ type Defs = Readonly<{
   nameOf: (resolve: () => UnknownType) => string | undefined;
   /**
    * Gives the recursion a name: `typeName` with the characters a JSON
-   * Pointer or a URI fragment would have to escape replaced, and numbered
-   * when another recursion has it already.
+   * Pointer or a URI fragment would have to escape replaced, and numbered when
+   * another recursion has it already.
    */
   name: (resolve: () => UnknownType, typeName: string) => string;
   define: (name: string, schema: JsonSchema) => void;
@@ -243,8 +243,7 @@ const numberOrUndefined = (value: unknown): number | undefined =>
   isNumber(value) ? value : undefined;
 
 /**
- * Every result's schema, combined by `combine`, or every error any of them
- * had.
+ * Every result's schema, combined by `combine`, or every error any of them had.
  */
 const collect = (
   results: readonly ConversionResult[],
@@ -330,8 +329,8 @@ const tighten = (
   }) as const;
 
 /**
- * The bounds as keywords, a bound left out where the other one on the same
- * side is at least as tight.
+ * The bounds as keywords, a bound left out where the other one on the same side
+ * is at least as tight.
  */
 const boundsSchema = ({
   minimum,
@@ -437,11 +436,10 @@ const boundsOf = (schema: JsonSchema): Bounds =>
   }) as const;
 
 /**
- * `base` narrowed by what the brand keys of a predefined branded number
- * state. The keys are the ones `ts-type-forge` defines its number brands by
- * (`Int` is `Brand<number, 'Finite' | 'Int', 'NaNValue'>`), so a brand that
- * carries one claims what it means. A schema that is not a number's is
- * returned as it is.
+ * `base` narrowed by what the brand keys of a predefined branded number state.
+ * The keys are the ones `ts-type-forge` defines its number brands by (`Int` is
+ * `Brand<number, 'Finite' | 'Int', 'NaNValue'>`), so a brand that carries one
+ * claims what it means. A schema that is not a number's is returned as it is.
  */
 const brandedNumberSchema = (
   base: JsonSchema,
@@ -638,9 +636,9 @@ const flattenUnionMembers = (
 
 /**
  * The key at which every member is a record with a required literal, each
- * member's literal different from the others', if there is one: the members
- * are then mutually exclusive, which is what `oneOf` and an OpenAPI
- * `discriminator` say.
+ * member's literal different from the others', if there is one: the members are
+ * then mutually exclusive, which is what `oneOf` and an OpenAPI `discriminator`
+ * say.
  */
 const discriminatorOf = (
   members: readonly UnknownType[],
@@ -680,8 +678,8 @@ const unionSchema = (
   defs: Defs,
   path: readonly string[],
 ): ConversionResult => {
-  // A union nested directly in this one contributes its members, as it does
-  // for validation.
+  // A union nested directly in this one contributes its members, as it does for
+  // validation.
   const members = flattenUnionMembers(structure.memberTypes);
 
   const converted = members.map((member) => ({

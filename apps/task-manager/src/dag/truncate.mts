@@ -1,10 +1,10 @@
 /**
  * Cutting a title to fit a node of the DAG, where SVG text does not wrap or
  * clip by itself. Widths are estimated in units of a narrow character: a CJK
- * character or an emoji is two. Close enough for a label, and it needs no
- * font measurement, so it can be done before anything is drawn. Text is cut
- * between the characters a reader sees (grapheme clusters), never inside an
- * emoji sequence or before a combining mark.
+ * character or an emoji is two. Close enough for a label, and it needs no font
+ * measurement, so it can be done before anything is drawn. Text is cut between
+ * the characters a reader sees (grapheme clusters), never inside an emoji
+ * sequence or before a combining mark.
  */
 
 import { hasKey, isRecord } from 'ts-data-forge';
@@ -19,16 +19,15 @@ export const truncateToUnits = (text: string, maxUnits: number): string =>
   truncateChars(graphemes(text), maxUnits);
 
 /**
- * `text`, its spaces at either end dropped and each run of them one space,
- * as SVG draws it, broken into at most `maxLines` lines of `maxUnits` each
- * — the first `firstLineUnits`, for what goes before it. A line is broken
- * between any two characters, as Japanese is, except inside a word of
- * narrow characters, beside a no-break space, before a closing bracket or
- * punctuation and after an opening one (`mayBreakAt`), at the last place
- * that fits; a space at the break is dropped. A word longer than a line is
- * broken where the line is full, rather than moved to the next, and so is a
- * line with no place to break it. What does not fit on the last line is cut
- * there as `truncateToUnits` cuts it.
+ * `text`, its spaces at either end dropped and each run of them one space, as
+ * SVG draws it, broken into at most `maxLines` lines of `maxUnits` each — the
+ * first `firstLineUnits`, for what goes before it. A line is broken between any
+ * two characters, as Japanese is, except inside a word of narrow characters,
+ * beside a no-break space, before a closing bracket or punctuation and after an
+ * opening one (`mayBreakAt`), at the last place that fits; a space at the break
+ * is dropped. A word longer than a line is broken where the line is full,
+ * rather than moved to the next, and so is a line with no place to break it.
+ * What does not fit on the last line is cut there as `truncateToUnits` cuts it.
  */
 export const wrapToUnits = (
   text: string,
@@ -68,10 +67,10 @@ export const wrapToUnits = (
 const ELLIPSIS_UNITS = 1;
 
 /**
- * What a cluster of more than one code point is made with: a mark or
- * another extender (a variation selector, a half-width sound mark, a tag),
- * an emoji modifier, a flag's half or a joiner. Text with none of them is
- * one code point a character, and is split without the slower segmenter.
+ * What a cluster of more than one code point is made with: a mark or another
+ * extender (a variation selector, a half-width sound mark, a tag), an emoji
+ * modifier, a flag's half or a joiner. Text with none of them is one code point
+ * a character, and is split without the slower segmenter.
  */
 const CLUSTERED =
   /[\p{M}\p{Grapheme_Extend}\p{Emoji_Modifier}\p{Regional_Indicator}\u{200D}\u{0E33}\u{0EB3}]/u;
@@ -94,9 +93,9 @@ const WORD_JOINERS = new Set<string>(['’', '\u{A0}', '\u{202F}', '\u{2011}']);
 
 /**
  * Drawn wide, two units: East Asian wide and full-width characters —
- * Hangul, CJK, kana, full-width forms — and, to err on the side of cutting
- * too soon, punctuation (but `…`), symbols and emoji that Japanese fonts
- * may draw wide.
+ * Hangul, CJK, kana, full-width forms — and, to err on the side of cutting too
+ * soon, punctuation (but `…`), symbols and emoji that Japanese fonts may draw
+ * wide.
  */
 const WIDE_RANGES: readonly FixedLengthTuple<2, number>[] = [
   [0x11_00, 0x11_5f],
@@ -169,8 +168,7 @@ const isWordChar = (char: string | undefined): boolean =>
   (WORD_JOINERS.has(char) || (charUnits(char) === 1 && !isHalfWidthKana(char)));
 
 /**
- * How many of `chars`, from the first, fit in `maxUnits`; at least
- * `atLeast`.
+ * How many of `chars`, from the first, fit in `maxUnits`; at least `atLeast`.
  */
 const lineEnd = (
   chars: readonly string[],
@@ -200,9 +198,9 @@ const truncateChars = (chars: readonly string[], maxUnits: number): string =>
         .trimEnd()}…` as const);
 
 /**
- * Whether a break before `chars[index]` puts no closing character at the
- * start of a line and no opening one at the end — spaces between them,
- * which the break drops, aside.
+ * Whether a break before `chars[index]` puts no closing character at the start
+ * of a line and no opening one at the end — spaces between them, which the
+ * break drops, aside.
  */
 const keepsBrackets = (chars: readonly string[], index: number): boolean => {
   let mut_after = index;
@@ -224,8 +222,8 @@ const keepsBrackets = (chars: readonly string[], index: number): boolean => {
 };
 
 /**
- * Whether a line may be broken before `chars[index]`: not inside a word,
- * not beside a no-break space, and not where `keepsBrackets` says no.
+ * Whether a line may be broken before `chars[index]`: not inside a word, not
+ * beside a no-break space, and not where `keepsBrackets` says no.
  */
 const mayBreakAt = (chars: readonly string[], index: number): boolean =>
   !(isWordChar(chars[index - 1]) && isWordChar(chars[index])) &&
@@ -234,12 +232,11 @@ const mayBreakAt = (chars: readonly string[], index: number): boolean =>
   keepsBrackets(chars, index);
 
 /**
- * Where to break `chars`, of which those before `end` fit on a line
- * `maxUnits` wide: at the last place it may be broken, unless what that
- * puts on the next line could not fit on a line either — a word longer than
- * a line — or there is no such place after the first character; then where
- * the line is full, but before a closing character that would start the
- * next.
+ * Where to break `chars`, of which those before `end` fit on a line `maxUnits`
+ * wide: at the last place it may be broken, unless what that puts on the next
+ * line could not fit on a line either — a word longer than a line — or there is
+ * no such place after the first character; then where the line is full, but
+ * before a closing character that would start the next.
  */
 const lastBreak = (
   chars: readonly string[],
@@ -262,8 +259,8 @@ const lastBreak = (
     return mut_forced;
   }
 
-  // What the break at `mut_allowed` would put on the next line, up to its
-  // next place to break, looked at no further than a line can hold.
+  // What the break at `mut_allowed` would put on the next line, up to its next
+  // place to break, looked at no further than a line can hold.
   let mut_next = mut_allowed;
 
   let mut_units = 0;

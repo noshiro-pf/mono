@@ -22,8 +22,8 @@ type Props = Readonly<{
  * One instant, said twice: how long ago in the text, and exactly when in the
  * reader's own time zone on hover.
  *
- * Nothing at all when there is none, rather than a dash: a row of empty
- * labels is a row a reader has to check every time to find it still empty.
+ * Nothing at all when there is none, rather than a dash: a row of empty labels
+ * is a row a reader has to check every time to find it still empty.
  */
 export const Timestamp = ({ label, iso }: Props): JSX.Element => (
   <MatchOptional

@@ -1,18 +1,17 @@
 /**
- * A preference kept in `localStorage` between visits, on this device only,
- * as the JSON of a value of `codec` under `key`. Every app under
+ * A preference kept in `localStorage` between visits, on this device only, as
+ * the JSON of a value of `codec` under `key`. Every app under
  * `noshiro-pf.github.io` shares that storage, hence the prefixed keys. The
- * reading and writing themselves are `browser.mts`'s; this says what is
- * written and how what is read back is taken.
+ * reading and writing themselves are `browser.mts`'s; this says what is written
+ * and how what is read back is taken.
  *
- * What is read back is validated, and anything that is not a setting — an
- * older format, a hand edit — gives the codec's default rather than an
- * error: these are preferences, not data. It goes through the codec's
- * `fill`, so a record that is partly broken keeps the fields that are fine
- * and has the default in place of each broken or missing one (field by
- * field, in the elements of an array too), and fields the codec does not
- * know are dropped. `normalize` then tidies what was read, the default
- * included.
+ * What is read back is validated, and anything that is not a setting — an older
+ * format, a hand edit — gives the codec's default rather than an error: these
+ * are preferences, not data. It goes through the codec's `fill`, so a record
+ * that is partly broken keeps the fields that are fine and has the default in
+ * place of each broken or missing one (field by field, in the elements of an
+ * array too), and fields the codec does not know are dropped. `normalize` then
+ * tidies what was read, the default included.
  */
 
 import { Json, Result } from 'ts-data-forge';

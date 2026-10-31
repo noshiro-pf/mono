@@ -5,8 +5,8 @@ import type { Index, NegativeIndex } from '../type-level-integer/index.mjs';
  * Represents an unsigned 8-bit integer.
  * A union of integer literals from `0` to `255` (2^8 - 1).
  *
- * Useful for representing byte values, color channel values (RGB),
- * or any data that fits within 8 bits of unsigned integer range.
+ * Useful for representing byte values, color channel values (RGB), or any data
+ * that fits within 8 bits of unsigned integer range.
  *
  * @example
  * ```ts
@@ -23,8 +23,8 @@ export type Uint8 = Index<256>;
  * Represents an unsigned 9-bit integer.
  * A union of integer literals from `0` to `511` (2^9 - 1).
  *
- * Less commonly used than 8-bit or 16-bit integers, but useful for
- * specific protocols or data formats that require 9-bit precision.
+ * Less commonly used than 8-bit or 16-bit integers, but useful for specific
+ * protocols or data formats that require 9-bit precision.
  *
  * @example
  * ```ts
@@ -223,8 +223,8 @@ export type Sexagesimal = Index<60>;
  * Represents a percentage value as an integer.
  * A union of integer literals from `0` to `100`.
  *
- * Useful for representing progress, completion rates, or any value
- * that can be expressed as a whole number percentage.
+ * Useful for representing progress, completion rates, or any value that can be
+ * expressed as a whole number percentage.
  *
  * @example
  * ```ts

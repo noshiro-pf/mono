@@ -35,9 +35,9 @@ const isUndefinedType = (type: ts.Type): boolean =>
 /**
  * Removes `x ?? undefined` when the type of `x` excludes `null`. Both operands
  * are read through type wrappers: `?? (undefined satisfies undefined)` is
- * matched, and the type asked is that of the value, so `x! ?? undefined` with
- * a nullable `x` is left alone. The fix keeps the left-hand side's wrappers
- * and parentheses.
+ * matched, and the type asked is that of the value, so `x! ?? undefined` with a
+ * nullable `x` is left alone. The fix keeps the left-hand side's wrappers and
+ * parentheses.
  */
 export const noUnnecessaryCoalesceUndefined: TSESLint.RuleModule<
   MessageIds,
@@ -124,8 +124,8 @@ export const noUnnecessaryCoalesceUndefined: TSESLint.RuleModule<
 
         // Confirm the right-hand side really is the `undefined` value and not a
         // shadowed binding (e.g. `const undefined = 123`), in which case
-        // `x ?? undefined` is not equivalent to `x`. A cast would vouch for
-        // the shadowed binding, so the unwrapped identifier is asked.
+        // `x ?? undefined` is not equivalent to `x`. A cast would vouch for the
+        // shadowed binding, so the unwrapped identifier is asked.
         const rightTsNode = parserServices.esTreeNodeToTSNodeMap.get(right);
 
         if (!isUndefinedType(checker.getTypeAtLocation(rightTsNode))) {
@@ -162,8 +162,8 @@ export const noUnnecessaryCoalesceUndefined: TSESLint.RuleModule<
               return null;
             }
 
-            // Remove from the end of the left operand's last token (its
-            // closing parenthesis included, so `(a, b) ?? undefined` keeps its
+            // Remove from the end of the left operand's last token (its closing
+            // parenthesis included, so `(a, b) ?? undefined` keeps its
             // parentheses) to the end of the whole expression.
             return fixer.removeRange([
               tokenBeforeOperator.range[1],

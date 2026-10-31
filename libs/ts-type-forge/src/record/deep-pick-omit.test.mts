@@ -401,16 +401,16 @@ import type { DeepOmit, DeepPick } from './deep-pick-omit.mjs';
  * branch guard (see the note on it in `deep-pick-omit.mts`).
  *
  * Tightening its `ReadonlyRecord<string, any>` to `UnknownRecord` stops the
- * recursion one level early for every type without an implicit index
- * signature: `DeepPick` collapses the value to `{}` and `DeepOmit` becomes a
+ * recursion one level early for every type without an implicit index signature:
+ * `DeepPick` collapses the value to `{}` and `DeepOmit` becomes a
  * no-op. Each assertion below fails if that happens.
  */
 {
   // Class instance types are the fixture on purpose — they are the shape that
-  // gets no implicit index signature and survives this repo's autofixes. Do
-  // not "simplify" them into object type aliases: those do get one, and the
-  // assertions would then pass under either spelling. (`interface` works too
-  // in principle, but `consistent-type-definitions` rewrites it into an alias.)
+  // gets no implicit index signature and survives this repo's autofixes. Do not
+  // "simplify" them into object type aliases: those do get one, and the
+  // assertions would then pass under either spelling. (`interface` works too in
+  // principle, but `consistent-type-definitions` rewrites it into an alias.)
   class Leaf {
     x: number = 0;
     y: string = '';

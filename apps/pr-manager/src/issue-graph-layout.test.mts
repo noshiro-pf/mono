@@ -248,8 +248,8 @@ describe(placeGrid, () => {
 
     assert.isTrue(label.x > connectedRight);
 
-    // Level with the top of the connected parts, as the label under them
-    // is with the space under them.
+    // Level with the top of the connected parts, as the label under them is
+    // with the space under them.
     assert.strictEqual(
       Math.min(...grid.map(({ y }) => y)),
       Math.min(...layout.nodes.map(({ y }) => y)) + 31,

@@ -24,8 +24,8 @@ import {
  * then rewrites every `package.json` field derived from it.
  *
  * **`targets.minimum` is not refreshed.** It is the `engines.node` floor of
- * every published package, so moving it is a breaking change for consumers —
- * a decision, taken when a release line is dropped or an API is adopted, not
+ * every published package, so moving it is a breaking change for consumers — a
+ * decision, taken when a release line is dropped or an API is adopted, not
  * something a weekly job does because a patch shipped. Passing
  * `--allow-minimum-change` opts into it explicitly, and the summary says what
  * the new floor would be so the number can be reviewed before it is taken.
@@ -70,9 +70,9 @@ export const updateNodeSupport = async (
     await writeTargets(config, desired);
   }
 
-  // Always run, changes or not: a manifest can drift from the config on its
-  // own — a package added with the wrong floor, say — and this is the job
-  // that would notice on a week when Node released nothing.
+  // Always run, changes or not: a manifest can drift from the config on its own
+  // — a package added with the wrong floor, say — and this is the job that
+  // would notice on a week when Node released nothing.
   const propagated = await checkNodeSupport({ fix: true });
 
   if (Result.isErr(propagated)) {
@@ -216,10 +216,10 @@ const desiredTargets = (
  *
  * `today` is the date of the newest Node release rather than a wall clock, so
  * this script has no clock dependency at all: the same two inputs always give
- * the same output, which is what makes a scheduled job that opens pull
- * requests reviewable. The newest release is days old at worst, and the only
- * thing this feeds is a warning about a line going EOL — a boundary that moves
- * once every few years and is reported rather than acted on.
+ * the same output, which is what makes a scheduled job that opens pull requests
+ * reviewable. The newest release is days old at worst, and the only thing this
+ * feeds is a warning about a line going EOL — a boundary that moves once every
+ * few years and is reported rather than acted on.
  *
  * Both sides are `YYYY-MM-DD`, so the comparison is a plain string comparison.
  */

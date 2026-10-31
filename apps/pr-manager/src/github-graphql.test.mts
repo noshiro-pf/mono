@@ -1,15 +1,15 @@
 /**
  * Every GraphQL query the page sends, checked against GitHub's own schema.
  *
- * GitHub answers a query it cannot read with an error and no data, and a
- * query is a string, so nothing short of a request to GitHub says one is
- * wrong. A new query, fixed or built per pull request, issue or day,
- * belongs in {@link QUERIES}; the second test names any query in the source
- * that none of them contains.
+ * GitHub answers a query it cannot read with an error and no data, and a query
+ * is a string, so nothing short of a request to GitHub says one is wrong. A new
+ * query, fixed or built per pull request, issue or day, belongs in
+ * {@link QUERIES}; the second test names any query in the source that none of
+ * them contains.
  *
  * The schema is GitHub's public one, vendored under
- * `tools/configs/github-graphql/` (its `README.md` says from where, and how
- * to refresh it). `libs/pr-merge-queue` checks its own requests the same way.
+ * `tools/configs/github-graphql/` (its `README.md` says from where, and how to
+ * refresh it). `libs/pr-merge-queue` checks its own requests the same way.
  */
 
 import { buildSchema, parse, validate, type GraphQLSchema } from 'graphql';
@@ -119,9 +119,9 @@ const errorsOf = (query: string): readonly string[] => {
 
 /**
  * GitHub's schema as GitHub publishes it, built once. Built without its own
- * validation: GitHub's SDL does not pass every rule `graphql` checks a
- * schema against (an interface field that is not deprecated where an
- * implementation's is), and what is checked here is the queries.
+ * validation: GitHub's SDL does not pass every rule `graphql` checks a schema
+ * against (an interface field that is not deprecated where an implementation's
+ * is), and what is checked here is the queries.
  */
 const githubSchema = (() => {
   let mut_schema: GraphQLSchema | undefined = undefined;

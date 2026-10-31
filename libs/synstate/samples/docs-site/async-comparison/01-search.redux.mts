@@ -35,8 +35,8 @@ export const createSearch = () => {
     },
   });
 
-  // Fetch: a separate listener, so that a keystroke does not cancel
-  // a request; only the next debounced query does, by aborting `signal`.
+  // Fetch: a separate listener, so that a keystroke does not cancel a request;
+  // only the next debounced query does, by aborting `signal`.
   listener.startListening({
     actionCreator: queryDebounced,
     effect: async (action, api) => {
@@ -55,8 +55,8 @@ export const createSearch = () => {
       try {
         const items = await fetchItems(q, api.signal);
 
-        // A cancelled run reports nothing, whether its request
-        // settled before the abort or rejected because of it.
+        // A cancelled run reports nothing, whether its request settled before
+        // the abort or rejected because of it.
         if (!api.signal.aborted) {
           api.dispatch(searchSucceeded({ query: q, items }));
         }

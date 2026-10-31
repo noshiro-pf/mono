@@ -13,13 +13,13 @@ export type ClaudeSession = Readonly<{
 
 /**
  * `Claude-Session: [<title>](https://claude.ai/code/session_…)`, or the URL
- * alone, anywhere in the body and outside a fenced code block — the same
- * line `Merge-After:` draws, for the same reason: a document showing what a
- * trailer looks like must not become one.
+ * alone, anywhere in the body and outside a fenced code block — the same line
+ * `Merge-After:` draws, for the same reason: a document showing what a trailer
+ * looks like must not become one.
  *
- * Only a URL of a Claude Code session is taken. The first of them is opened
- * in a pane of the split view, so a trailer is not a way to put an arbitrary
- * page in front of whoever opens it.
+ * Only a URL of a Claude Code session is taken. The first of them is opened in
+ * a pane of the split view, so a trailer is not a way to put an arbitrary page
+ * in front of whoever opens it.
  *
  * In the order written, once per URL: a pull request continued in a second
  * session names both.

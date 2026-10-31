@@ -1,17 +1,18 @@
 /**
  * What the page asks GitHub, and the shape it expects back.
  *
- * **One query per part of the page**, sent together rather than as one
- * query, because GitHub answers a query only once all of it is ready, and
- * the parts take very different times. Measured against this repository:
- * the pull requests the merge order is drawn from take about a second; their check results about three; the one
- * query that asked for everything took four and a half, and the page drew
- * nothing until then. Apart, the merge order is on screen after the first,
- * and each badge and section fills in as its own query answers.
+ * **One query per part of the page**, sent together rather than as one query,
+ * because GitHub answers a query only once all of it is ready, and the parts
+ * take very different times. Measured against this repository:
+ * the pull requests the merge order is drawn from take about a second; their
+ * check results about three; the one query that asked for everything took four
+ * and a half, and the page drew nothing until then. Apart, the merge order is
+ * on screen after the first, and each badge and section fills in as its own
+ * query answers.
  *
- * **A follow-up** asks for what could only be named after an answer: how
- * far each head is from its base, once the heads are known, and the next
- * page of any list that did not fit in one.
+ * **A follow-up** asks for what could only be named after an answer: how far
+ * each head is from its base, once the heads are known, and the next page of
+ * any list that did not fit in one.
  */
 
 import { MERGE_QUEUED_LABEL, SET_ASIDE_COMMENT_SCAN } from 'pr-report-core';
@@ -22,31 +23,31 @@ import type { ReadonlyRecord } from 'ts-type-forge';
  * How many open pull requests one page of each query that lists them covers.
  * It is most of what a query costs — the points are counted from the sizes
  * asked for, not from what comes back — so it is what this repository needs
- * rather than GitHub's most, and a repository with more is read a page more
- * at a time.
+ * rather than GitHub's most, and a repository with more is read a page more at
+ * a time.
  */
 export const OPEN_PAGE_SIZE = 50;
 
 /**
- * How many pages of them a read follows: {@link OPEN_PAGE_SIZE} times this
- * is the most open pull requests the page reports. A repository with more has
- * a different problem than an unreadable page, so a read that finds more
- * fails loudly rather than reporting part of them as the whole.
+ * How many pages of them a read follows: {@link OPEN_PAGE_SIZE} times this is
+ * the most open pull requests the page reports. A repository with more has a
+ * different problem than an unreadable page, so a read that finds more fails
+ * loudly rather than reporting part of them as the whole.
  */
 export const MAX_OPEN_PAGES = 10;
 
 /**
- * How many of the pull requests merged in the window are looked through for
- * the latest to merge, most recently updated first: search cannot sort by
- * merge time, and one updated since it merged — a comment, a label — sorts
- * ahead of one merged later. The section lists twenty.
+ * How many of the pull requests merged in the window are looked through for the
+ * latest to merge, most recently updated first: search cannot sort by merge
+ * time, and one updated since it merged — a comment, a label — sorts ahead of
+ * one merged later. The section lists twenty.
  */
 const MERGED_SCAN = 50;
 
 /**
- * How many open issues a read lists, most recently updated first — the
- * same number `pnpm run pr-report` defaults to. Enough to see what is
- * open without the section becoming the page; the rest are a page of
+ * How many open issues a read lists, most recently updated first — the same
+ * number `pnpm run pr-report` defaults to. Enough to see what is open without
+ * the section becoming the page; the rest are a page of
  * {@link ISSUES_PAGE_SIZE} each, read when the reader asks for them.
  */
 export const ISSUES_LIMIT = 30;
@@ -82,10 +83,10 @@ const CLOSING_ISSUES =
   `closingIssuesReferences(first: 10) { nodes { ${ISSUE_FIELDS} } }` as const;
 
 /**
- * An open pull request's closing issues, with the bodies their
- * `Start-After:` is read from: the pull request inherits it as a merge order
- * (`docs/issue-start-after.md`). A merged one inherits nothing, so its
- * closing issues are read without.
+ * An open pull request's closing issues, with the bodies their `Start-After:`
+ * is read from: the pull request inherits it as a merge order
+ * (`docs/issue-start-after.md`). A merged one inherits nothing, so its closing
+ * issues are read without.
  */
 const OPEN_CLOSING_ISSUES =
   `closingIssuesReferences(first: 10) { nodes { ${ISSUE_FIELDS} body ${BLOCKED_BY} } }` as const;
@@ -126,11 +127,11 @@ const OPEN_PULLS =
 
 /**
  * The open pull requests as the merge order draws them — what each is, the
- * branch it is of, its labels, what its body declares — the `CODEOWNERS` on
- * the default branch (`HEAD`) wherever GitHub would find it, and whether the
- * repository has the label `unblock-prs`'s queue is made of. The one query
- * the page waits for before it draws anything. What the default branch
- * requires is REST's (`branch-rules.mts`), asked once this names the branch.
+ * branch it is of, its labels, what its body declares — the `CODEOWNERS` on the
+ * default branch (`HEAD`) wherever GitHub would find it, and whether the
+ * repository has the label `unblock-prs`'s queue is made of. The one query the
+ * page waits for before it draws anything. What the default branch requires is
+ * REST's (`branch-rules.mts`), asked once this names the branch.
  */
 export const PULL_REQUESTS_QUERY = [
   'query PullRequests($owner: String!, $name: String!, $after: String) {',
@@ -158,9 +159,9 @@ export const PULL_REQUESTS_QUERY = [
 ].join('\n');
 
 /**
- * What every context reported on each open pull request's head. Its own
- * query because it is the slowest part by far: each check run is followed to
- * the workflow it belongs to, which is what tells a superseded round from the
+ * What every context reported on each open pull request's head. Its own query
+ * because it is the slowest part by far: each check run is followed to the
+ * workflow it belongs to, which is what tells a superseded round from the
  * current one.
  */
 export const CHECKS_QUERY = [
@@ -178,12 +179,12 @@ export const CHECKS_QUERY = [
 ].join('\n');
 
 /**
- * What only the badges, the linked issues on each card and the queue are
- * read from: the issues the body closes, the reviews and the changed files a
- * code owner's approval is decided over, the recent comments a set-aside
- * record or a claim is found among, and what the queue's order turns on —
- * whether a merge would conflict, the unresolved conversations, and a place
- * in one of GitHub's native stacks (`queue-view.mts`).
+ * What only the badges, the linked issues on each card and the queue are read
+ * from: the issues the body closes, the reviews and the changed files a code
+ * owner's approval is decided over, the recent comments a set-aside record or a
+ * claim is found among, and what the queue's order turns on — whether a merge
+ * would conflict, the unresolved conversations, and a place in one of GitHub's
+ * native stacks (`queue-view.mts`).
  */
 export const DETAILS_QUERY = [
   'query PullRequestDetails($owner: String!, $name: String!, $after: String) {',
@@ -229,9 +230,9 @@ export const MERGED_QUERY = [
 ].join('\n');
 
 /**
- * What {@link MERGED_QUERY} searches for: the repository's pull requests
- * merged on or after the day `sinceMs` falls on, in UTC — a day being as fine
- * as search goes, the rest is cut by the merge time itself.
+ * What {@link MERGED_QUERY} searches for: the repository's pull requests merged
+ * on or after the day `sinceMs` falls on, in UTC — a day being as fine as
+ * search goes, the rest is cut by the merge time itself.
  */
 export const mergedSearch = (
   repo: Readonly<{ owner: string; name: string }>,
@@ -261,8 +262,8 @@ export const OPEN_ISSUES_QUERY = [
 ].join('\n');
 
 /**
- * What a follow-up can be asked to fetch for one pull request. Each becomes
- * one aliased field, so a single request covers all of them.
+ * What a follow-up can be asked to fetch for one pull request. Each becomes one
+ * aliased field, so a single request covers all of them.
  */
 export type FollowUp = Readonly<
   | {
@@ -287,8 +288,8 @@ export type FollowUpName = 'Compare' | 'MoreChecks' | 'MoreFiles';
 
 /**
  * One query for a list of follow-ups, with every value that came from
- * GitHub passed as a variable rather than written into the query text: a
- * branch name is chosen by whoever opened the pull request.
+ * GitHub passed as a variable rather than written into the query text: a branch
+ * name is chosen by whoever opened the pull request.
  *
  * The aliases are `compare_N`, `contexts_N` and `files_N`, `N` being the pull
  * request number, which is what {@link followUpAlias} reads them back by.
@@ -320,10 +321,10 @@ export const followUpAlias = (followUp: FollowUp): string =>
   `${followUp.kind}_${followUp.number}` as const;
 
 /**
- * One query for the issues a body closes by keyword that GitHub has not
- * linked, so that each is listed as a linked one is, with the body its
- * `Start-After:` is read from. The aliases are
- * `issue_N`, which is what {@link issueAlias} reads them back by.
+ * One query for the issues a body closes by keyword that GitHub has not linked,
+ * so that each is listed as a linked one is, with the body its `Start-After:`
+ * is read from. The aliases are `issue_N`, which is what {@link issueAlias}
+ * reads them back by.
  */
 export const issuesQuery = (
   numbers: readonly number[],
@@ -352,11 +353,11 @@ export const issueAlias = (number: number): string =>
   `issue_${number}` as const;
 
 /**
- * One query for what the open issues' `Start-After:` declarations name that
- * is not itself a listed issue: what has closed or merged, an open pull
- * request, and an open issue past the end of the list. Issues and pull
- * requests share their numbers, so one field answers for either. The aliases
- * are `ref_N`, which is what {@link referenceAlias} reads them back by.
+ * One query for what the open issues' `Start-After:` declarations name that is
+ * not itself a listed issue: what has closed or merged, an open pull request,
+ * and an open issue past the end of the list. Issues and pull requests share
+ * their numbers, so one field answers for either. The aliases are `ref_N`,
+ * which is what {@link referenceAlias} reads them back by.
  */
 export const referencesQuery = (
   numbers: readonly number[],
@@ -431,8 +432,8 @@ const followUpPart = (
 };
 
 // `state` is an `IssueState` on one and a `PullRequestState` on the other, and
-// GraphQL does not let one response key carry two types: a selection that
-// asks both under the same name is invalid, so the pull request's is aliased.
+// GraphQL does not let one response key carry two types: a selection that asks
+// both under the same name is invalid, so the pull request's is aliased.
 const REFERENCE_FIELDS = [
   '__typename',
   '... on Issue { number title url state stateReason }',
@@ -475,8 +476,8 @@ const BlockedBySchema = t.record({
 export type BlockedByNodes = t.TypeOf<typeof BlockedBySchema>;
 
 /**
- * {@link IssueSchema} with what it waits for: the body `Start-After:` is
- * read from, and its issue dependencies.
+ * {@link IssueSchema} with what it waits for: the body `Start-After:` is read
+ * from, and its issue dependencies.
  */
 export const IssueWithBodySchema = t.record({
   number: t.number(),
@@ -603,9 +604,9 @@ const PullRequestDetailsSchema = t.record({
   }),
   files: FilesPageSchema,
   /**
-   * Where `unblock-prs` says why it set the pull request aside, among the
-   * rest. `pr-report-core`'s `set-aside.mts` says why only the ones the
-   * viewer wrote are read.
+   * Where `unblock-prs` says why it set the pull request aside, among the rest.
+   * `pr-report-core`'s `set-aside.mts` says why only the ones the viewer wrote
+   * are read.
    */
   comments: t.record({
     nodes: t.array(

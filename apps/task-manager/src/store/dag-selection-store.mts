@@ -2,8 +2,8 @@
  * The nodes selected on the DAG — by the lasso or the rectangle
  * (`dag/lasso.mts`) — which a drag of one of them moves together and
  * 「一括編集」 edits together (`bulk-edit-store.mts`). Selected nodes that
- * are gone, or hidden, drop out of it, and the whole of it is dropped when
- * the DAG stops being drawn in the mode the reader arranges.
+ * are gone, or hidden, drop out of it, and the whole of it is dropped when the
+ * DAG stops being drawn in the mode the reader arranges.
  */
 
 import {
@@ -47,8 +47,8 @@ export type DagSelectionStore = Readonly<{
 export const createDagSelectionStore = (
   deps: DagSelectionDeps,
 ): DagSelectionStore => {
-  // While `start` has been called and its stop has not; `active` is
-  // followed only then.
+  // While `start` has been called and its stop has not; `active` is followed
+  // only then.
   const [started, setStarted] = createState(false);
 
   const [chose, setChosen] = createValueEmitter<readonly GraphNodeId[]>();

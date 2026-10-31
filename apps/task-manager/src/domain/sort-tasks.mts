@@ -8,15 +8,13 @@ import {
 } from './types.mjs';
 
 /**
- * `tasks` sorted by `keys` lexicographically: an earlier key decides, and a
- * tie falls through to the next one, then to the id (compared by code unit),
- * so the result does not depend on the input order. A task with no value for
- * a key — no due date, no estimate, no entry in `depthById` or
- * `displayStatusById` — comes last whichever the order. Status follows the
- * order of {@link displayStatuses}, and priority ascending puts `1` (the
- * highest) first.
- * Titles are compared with an `Intl.Collator` for `locale`, by default
- * `'ja'`.
+ * `tasks` sorted by `keys` lexicographically: an earlier key decides, and a tie
+ * falls through to the next one, then to the id (compared by code unit), so the
+ * result does not depend on the input order. A task with no value for a key —
+ * no due date, no estimate, no entry in `depthById` or `displayStatusById` —
+ * comes last whichever the order. Status follows the order of
+ * {@link displayStatuses}, and priority ascending puts `1` (the highest) first.
+ * Titles are compared with an `Intl.Collator` for `locale`, by default `'ja'`.
  *
  * Returns a new array; `tasks` is left as it is.
  */
@@ -83,8 +81,8 @@ export type SortContext = Readonly<{
    */
   depthById?: ReadonlyMap<TaskId, number>;
   /**
-   * The `status` sort key, from `displayStatus` — which depends on the time,
-   * so it is computed by the caller along with everything else it shows.
+   * The `status` sort key, from `displayStatus` — which depends on the time, so
+   * it is computed by the caller along with everything else it shows.
    */
   displayStatusById?: ReadonlyMap<TaskId, DisplayStatus>;
   /** For comparing titles. Defaults to `'ja'`. */

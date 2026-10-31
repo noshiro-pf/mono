@@ -3,8 +3,8 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 // A top-level `import type`, not the inline `import { type … }` the lint
 // prefers: Node erases the former and keeps the latter as a bare
-// `import {} from 'ts-type-forge'`, which fails to resolve before
-// `ws:build`. The test's runtime-import check guards this.
+// `import {} from 'ts-type-forge'`, which fails to resolve before `ws:build`.
+// The test's runtime-import check guards this.
 import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**
@@ -16,21 +16,21 @@ import type { ReadonlyRecord } from 'ts-type-forge';
  * node ./tools/scripts/cmd/assert-deps-built.mts --workspace  # every member
  * ```
  *
- * Without it a missing `dist/` surfaces as `TS2307: Cannot find module`
- * buried among the implicit-`any` errors it causes, or as a Vite "Failed to
- * resolve entry", none of which says that a build is what is missing.
+ * Without it a missing `dist/` surfaces as `TS2307: Cannot find module` buried
+ * among the implicit-`any` errors it causes, or as a Vite "Failed to resolve
+ * entry", none of which says that a build is what is missing.
  *
- * **Nothing here lists which commands or packages need `dist/`**; that would
- * go stale the day a package gains a dependency. What a check needs is read
- * off the dependency graph: every package linked into the package's
- * `node_modules` from inside the repository (any of `dependencies`,
- * `peerDependencies`, `devDependencies`), and from there, transitively, what
- * those link through `dependencies` and `peerDependencies` — the fields a
- * consumer sees. For each one, every file its `exports`, `main`, `module` and
- * `types` name has to exist. A package that exports its sources
- * (`"exports": "./src/index.mts"`) passes with no build, and a script run
- * by `tsx --tsconfig tools/configs/tsconfig.tsx.json`, which resolves our
- * packages to their sources, does not need this at all.
+ * **Nothing here lists which commands or packages need `dist/`**; that would go
+ * stale the day a package gains a dependency. What a check needs is read off
+ * the dependency graph: every package linked into the package's `node_modules`
+ * from inside the repository (any of `dependencies`, `peerDependencies`,
+ * `devDependencies`), and from there, transitively, what those link through
+ * `dependencies` and `peerDependencies` — the fields a consumer sees. For each
+ * one, every file its `exports`, `main`, `module` and `types` name has to
+ * exist. A package that exports its sources (`"exports": "./src/index.mts"`)
+ * passes with no build, and a script run by
+ * `tsx --tsconfig tools/configs/tsconfig.tsx.json`, which resolves our packages
+ * to their sources, does not need this at all.
  *
  * The answer is for the package, not for one tool: a `check:types` that never
  * loads the `eslint-config-typed` its lint config imports is still asked to
@@ -72,8 +72,8 @@ export const main = (argv: readonly string[]): void => {
 };
 
 /**
- * Every package whose build output a check started in one of `startDirs`
- * would resolve and does not find, in the order they are first reached.
+ * Every package whose build output a check started in one of `startDirs` would
+ * resolve and does not find, in the order they are first reached.
  */
 export const findMissingBuilds = (
   rootDir: string,
@@ -95,10 +95,10 @@ export const findMissingBuilds = (
     .filter(({ missing }) => missing.length > 0);
 
 /**
- * Every package of the repository a check started in one of `startDirs`
- * would resolve through `node_modules`, built or not, in the order they are
- * first reached. `ws:build:deps` builds exactly these, so that this guard
- * passes everywhere `--workspace` would run it.
+ * Every package of the repository a check started in one of `startDirs` would
+ * resolve through `node_modules`, built or not, in the order they are first
+ * reached. `ws:build:deps` builds exactly these, so that this guard passes
+ * everywhere `--workspace` would run it.
  */
 export const findLinkedPackages = (
   rootDir: string,
@@ -156,8 +156,8 @@ export const workspaceStartDirs = (rootDir: string): readonly string[] =>
 
 /**
  * The files an import of the package can resolve to, as written in its
- * manifest. Subpath patterns (`./*`) are skipped: what they match is not
- * known without the importer.
+ * manifest. Subpath patterns (`./*`) are skipped: what they match is not known
+ * without the importer.
  */
 export const entryPointTargets = (manifest: unknown): readonly string[] => {
   if (!isRecord(manifest)) {
@@ -231,8 +231,8 @@ const realpathOrUndefined = (p: string): string | undefined => {
 };
 
 /**
- * The repository's own packages that `packageDir` links to through `fields`,
- * by where pnpm's symlink points. A third-party package resolves into
+ * The repository's own packages that `packageDir` links to through `fields`, by
+ * where pnpm's symlink points. A third-party package resolves into
  * `node_modules/.pnpm`, and a dependency that is not linked at all is the
  * install's to report, not this.
  */

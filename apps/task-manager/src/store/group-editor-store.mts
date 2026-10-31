@@ -1,8 +1,8 @@
 /**
  * The dialog of one group: its title, for creating it or renaming it, and
- * deleting it — which takes its nodes out of it and leaves them as they
- * are. Nothing is written until `save` or `confirmDelete`; a rename is
- * written onto the group as it is stored at that moment.
+ * deleting it — which takes its nodes out of it and leaves them as they are.
+ * Nothing is written until `save` or `confirmDelete`; a rename is written onto
+ * the group as it is stored at that moment.
  */
 
 import { createState, type InitializedObservable } from 'synstate';

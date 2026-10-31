@@ -17,9 +17,9 @@ const tester = new RuleTester({
 });
 
 /**
- * The fixtures are lists of source lines rather than template literals,
- * because most of them contain a template literal themselves and nesting the
- * two costs more in backslashes than it saves.
+ * The fixtures are lists of source lines rather than template literals, because
+ * most of them contain a template literal themselves and nesting the two costs
+ * more in backslashes than it saves.
  */
 const lines = (...xs: readonly string[]): string => xs.join('\n');
 

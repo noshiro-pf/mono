@@ -32,8 +32,8 @@ export const createSearch = () => {
       .pipe(debounce(debounceMs)) // wait for typing to pause
       .pipe(map((q) => q.trim())) // map passes on only a changed query
       .pipe(
-        // A newer query completes the previous inner observable,
-        // and completing it aborts its request.
+        // A newer query completes the previous inner observable, and completing
+        // it aborts its request.
         switchMap((q): Observable<SearchState> =>
           q === ''
             ? just(idleState)

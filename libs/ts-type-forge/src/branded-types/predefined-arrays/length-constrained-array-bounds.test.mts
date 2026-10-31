@@ -121,8 +121,8 @@ expectType<ChangeArrayElement<readonly number[], string>, readonly string[]>(
 
 expectType<ChangeArrayElement<readonly [], string>, readonly []>('=');
 
-// A mutable input maps homomorphically too, rather than picking up a brand
-// made out of its own mutating methods.
+// A mutable input maps homomorphically too, rather than picking up a brand made
+// out of its own mutating methods.
 expectType<ChangeArrayElement<number[], string>, readonly string[]>('=');
 
 expectType<

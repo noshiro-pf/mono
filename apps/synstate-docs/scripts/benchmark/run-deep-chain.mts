@@ -2,8 +2,8 @@
  * Deep Chain Throughput Benchmark
  *
  * Reuses the exact same adapter code as the interactive throughput demo
- * (apps/synstate-docs/src/components/throughput-demo/adapters/) to ensure
- * the benchmark measures the same reactive chain topology.
+ * (apps/synstate-docs/src/components/throughput-demo/adapters/) to ensure the
+ * benchmark measures the same reactive chain topology.
  */
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import { performance } from 'node:perf_hooks';
@@ -141,8 +141,8 @@ const runOnce = (adapter: SpringAdapter, k: number, depth: number): number => {
 
 /**
  * The head and stages {@link assertReacts} expects: from the canvas centre,
- * each update moves the head to (i, i) and each stage a spring step towards
- * the stage before it, in chain order.
+ * each update moves the head to (i, i) and each stage a spring step towards the
+ * stage before it, in chain order.
  */
 const expectedPoints = (): readonly Point[] => {
   const start: Point = { x: CANVAS_WIDTH / 2, y: CANVAS_HEIGHT / 2 } as const;
@@ -275,9 +275,9 @@ const measureRounds = (
 const measureEntry = (entry: AdapterEntry): readonly (number | null)[] => {
   const { label, createAdapter } = entry;
 
-  // In this library's own process (see `measureEachInOwnProcess`), so that
-  // the shared `lerp` has seen no other library: the check adds only this
-  // library's own points and the model's plain ones.
+  // In this library's own process (see `measureEachInOwnProcess`), so that the
+  // shared `lerp` has seen no other library: the check adds only this library's
+  // own points and the model's plain ones.
   assertReacts(entry);
 
   const mut_values: (number | null)[] = [];

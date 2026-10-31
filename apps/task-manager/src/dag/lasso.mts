@@ -1,10 +1,10 @@
 /**
- * The lasso: a loop drawn on the canvas round the nodes to select. A node is
- * in it when its centre is, so that a loop drawn loosely round a node takes
- * it, and one that only clips its corner does not. Everything is in content
+ * The lasso: a loop drawn on the canvas round the nodes to select. A node is in
+ * it when its centre is, so that a loop drawn loosely round a node takes it,
+ * and one that only clips its corner does not. Everything is in content
  * coordinates; the loop is closed from its last point back to its first.
- * A rectangle (`rectangleLoop`) is a loop of its four corners, and selects
- * the same way.
+ * A rectangle (`rectangleLoop`) is a loop of its four corners, and selects the
+ * same way.
  */
 
 import { Arr, Num } from 'ts-data-forge';
@@ -44,8 +44,8 @@ export const lassoPathData = (loop: readonly Point[]): string =>
     : (`${loop.map(({ x, y }, index) => `${index === 0 ? 'M' : 'L'} ${x} ${y}`).join(' ')} Z` as const);
 
 /**
- * Whether `point` is inside `polygon`, by the even-odd rule: a ray from it
- * to the right crosses the outline an odd number of times.
+ * Whether `point` is inside `polygon`, by the even-odd rule: a ray from it to
+ * the right crosses the outline an odd number of times.
  */
 const encloses = (polygon: readonly Point[], point: Point): boolean =>
   polygon.reduce((inside, a, index) => {

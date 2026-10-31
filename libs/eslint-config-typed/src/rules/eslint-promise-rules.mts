@@ -9,8 +9,8 @@ export const eslintPromiseRules = {
   'promise/no-nesting': 'error',
   'promise/no-promise-in-callback': withDefaultOption('error'),
 
-  // When using promise.then(...).catch(...),
-  // this rule points out that errors thrown in callbacks within then() will be caught by the catch().
+  // When using promise.then(...).catch(...), this rule points out that errors
+  // thrown in callbacks within then() will be caught by the catch().
   // However, this doesn't seem like a valid reason to prohibit writing callbacks inside then(), so we disable it.
   'promise/no-callback-in-promise': 'off',
 

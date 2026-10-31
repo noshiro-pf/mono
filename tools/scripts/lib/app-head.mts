@@ -1,9 +1,9 @@
 // cspell:ignore apos
 /**
- * What a browser app's `index.html` says about itself in `<head>`: the tab
- * and home-screen icons and the link card. Read by `check-app-head.mts`, which
- * asks it of every app, and by `gen-app-images.mts`, which draws the images
- * it names. `docs/browser-app-head.md` says what belongs there and why.
+ * What a browser app's `index.html` says about itself in `<head>`: the tab and
+ * home-screen icons and the link card. Read by `check-app-head.mts`, which asks
+ * it of every app, and by `gen-app-images.mts`, which draws the images it
+ * names. `docs/browser-app-head.md` says what belongs there and why.
  */
 
 import { Arr, Num, Result } from 'ts-data-forge';
@@ -71,8 +71,8 @@ export type AppHead = Readonly<{
   lang: string | undefined;
   title: string | undefined;
   /**
-   * `<meta>` contents keyed by `name` or `property` (`description`,
-   * `og:image`, `twitter:card`, ...). The first of a repeated key wins.
+   * `<meta>` contents keyed by `name` or `property` (`description`, `og:image`,
+   * `twitter:card`, ...). The first of a repeated key wins.
    */
   meta: ReadonlyMap<string, string>;
   links: readonly Readonly<{ rel: string; href: string }>[];

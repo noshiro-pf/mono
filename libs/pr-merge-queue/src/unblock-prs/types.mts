@@ -56,16 +56,16 @@ export type BranchOf = StrictPick<
 >;
 
 /**
- * Why a pull request was set aside: `pr-report-core`'s list, where each
- * reason is given its owner (`queue-owner.mts`), so that a reason this
- * script writes is one every reader knows.
+ * Why a pull request was set aside: `pr-report-core`'s list, where each reason
+ * is given its owner (`queue-owner.mts`), so that a reason this script writes
+ * is one every reader knows.
  */
 export type SkipReason = SetAsideReason;
 
 /**
- * Why a pull request is being left alone, and the state it was in at the
- * time. A record stops applying as soon as that state changes: a push to the
- * branch clears every reason, and every reason but `checks-failed` and
+ * Why a pull request is being left alone, and the state it was in at the time.
+ * A record stops applying as soon as that state changes: a push to the branch
+ * clears every reason, and every reason but `checks-failed` and
  * `awaiting-bypass` also clears when the base moves. `awaiting-bypass` is the
  * one that is not a failure: every required check is green on a pull request
  * nothing but a ruleset bypass will merge, and what is left is a person's
@@ -87,8 +87,8 @@ export type SkipRecord = Readonly<{
 export type SkipRecords = ReadonlyMap<number, SkipRecord>;
 
 /**
- * One of this account's set-aside comments on a pull request, and what it
- * says. `pr-report-core`'s `set-aside.mts` says what it is.
+ * One of this account's set-aside comments on a pull request, and what it says.
+ * `pr-report-core`'s `set-aside.mts` says what it is.
  */
 export type OwnSetAsideComment = Readonly<{
   /** The REST id, which editing it takes. */
@@ -155,8 +155,8 @@ export type TriageBase = Readonly<{
 
 /**
  * Which open issues each open pull request closes, and each such issue's
- * `Start-After:`, which the pull request closing it inherits as a merge
- * order (`docs/issue-start-after.md`).
+ * `Start-After:`, which the pull request closing it inherits as a merge order
+ * (`docs/issue-start-after.md`).
  */
 export type IssueOrder = Readonly<{
   closes: ReadonlyMap<number, readonly number[]>;
@@ -164,9 +164,8 @@ export type IssueOrder = Readonly<{
 }>;
 
 /**
- * What triage decides each pull request against: the survey, and what the
- * open pull requests say about one another (`pr-report-core`'s
- * `queue-order.mts`).
+ * What triage decides each pull request against: the survey, and what the open
+ * pull requests say about one another (`pr-report-core`'s `queue-order.mts`).
  */
 export type TriageContext = TriageBase & QueueContext;
 
@@ -186,16 +185,14 @@ export type Triage = Readonly<{
   /** How many of the surveyed pull requests this script has anything to say about. */
   inScope: number;
   /**
-   * The queued pull requests this cycle may act on — behind the base, or
-   * paused by `skip-ci`, or both — with nothing they declared `Merge-After`
-   * on still open, and on the default branch rather than stacked. Lowest
-   * number first.
+   * The queued pull requests this cycle may act on — behind the base, or paused
+   * by `skip-ci`, or both — with nothing they declared `Merge-After` on still
+   * open, and on the default branch rather than stacked. Lowest number first.
    */
   candidates: readonly PullRequest[];
   /**
-   * The candidates and the pull requests in flight that have no auto-merge
-   * yet, which this script arms when it picks them. See `armOnPick` in
-   * `rebase.mts`.
+   * The candidates and the pull requests in flight that have no auto-merge yet,
+   * which this script arms when it picks them. See `armOnPick` in `rebase.mts`.
    */
   toArm: ReadonlySet<number>;
   /** Which open pull request each stacked one is on: child → parent. */
@@ -217,9 +214,9 @@ export type Triage = Readonly<{
   /** Up to date, but a required check has failed. */
   failing: readonly Failing[];
   /**
-   * Queued pull requests that would have been picked or watched but for
-   * their review — an owner's approval or a conversation still open — each
-   * as a note like the ones below.
+   * Queued pull requests that would have been picked or watched but for their
+   * review — an owner's approval or a conversation still open — each as a note
+   * like the ones below.
    */
   held: readonly string[];
   /** Everything else, with the reason it was set aside. */
@@ -234,8 +231,8 @@ export type Triage = Readonly<{
 }>;
 
 /**
- * One change of a pull request's base, from its timeline. `stack.mts` reads
- * the last of them to tell which branch GitHub moved a layer off.
+ * One change of a pull request's base, from its timeline. `stack.mts` reads the
+ * last of them to tell which branch GitHub moved a layer off.
  */
 export type BaseChange = Readonly<{ from: string; to: string }>;
 
@@ -254,8 +251,8 @@ export type WatchOutcome =
   | 'skip-ci-labelled';
 
 /**
- * How a watch ended, and for an outcome that sets the pull request aside,
- * what its comment says: `detail` and, when checks failed, which.
+ * How a watch ended, and for an outcome that sets the pull request aside, what
+ * its comment says: `detail` and, when checks failed, which.
  */
 export type Watched = Readonly<{
   outcome: WatchOutcome;
@@ -265,17 +262,17 @@ export type Watched = Readonly<{
 
 /**
  * Pull request number → the branch it was last seen stacked on: every layer
- * of a stack, and one whose parent has left the open list while GitHub has
- * yet to move it off that parent's branch. A layer that leaves this map by
- * landing on the default branch is one `stack.mts` may have to rebase off
- * the layer that merged below it.
+ * of a stack, and one whose parent has left the open list while GitHub has yet
+ * to move it off that parent's branch. A layer that leaves this map by landing
+ * on the default branch is one `stack.mts` may have to rebase off the layer
+ * that merged below it.
  */
 export type StackedOn = ReadonlyMap<number, string>;
 
 /**
- * A pull request on the default branch that may have been moved there when
- * the layer below it merged: `from` is that layer's branch, or `undefined`
- * when it has to be read from the pull request's timeline.
+ * A pull request on the default branch that may have been moved there when the
+ * layer below it merged: `from` is that layer's branch, or `undefined` when it
+ * has to be read from the pull request's timeline.
  */
 export type RetargetedLayer = Readonly<{
   pr: PullRequest;
@@ -292,9 +289,9 @@ export type Quiet = Readonly<{
 
 /**
  * What one run carries from cycle to cycle: the pull requests it has given up
- * on, the ones it picks last, the ones it has acted on and last saw open,
- * where the base was when it last looked, how long the list has sat still,
- * and which pull requests were stacked on what.
+ * on, the ones it picks last, the ones it has acted on and last saw open, where
+ * the base was when it last looked, how long the list has sat still, and which
+ * pull requests were stacked on what.
  */
 export type LoopState = Readonly<{
   skipped: SkipRecords;
@@ -311,18 +308,17 @@ export type CycleResult = Readonly<{
   next: 'idle' | 'stop' | 'survey';
   /**
    * The records the cycle acted from — what it carried over, less what no
-   * longer applied, plus what the comments on the pull requests said. A
-   * record in `state` that is not among these, or differs from its entry, is
-   * one this cycle set aside, and the one its comment has to say.
+   * longer applied, plus what the comments on the pull requests said. A record
+   * in `state` that is not among these, or differs from its entry, is one this
+   * cycle set aside, and the one its comment has to say.
    */
   settled: SkipRecords;
 }>;
 
 /**
  * How far `advance` got with one pull request. `moved` is the branch moving
- * under it — someone else, the skill or a person, is taking that pull
- * request forward — which is neither progress nor a failure of the pull
- * request.
+ * under it — someone else, the skill or a person, is taking that pull request
+ * forward — which is neither progress nor a failure of the pull request.
  */
 export type Advanced = Readonly<
   | { kind: 'advanced'; head: string }
@@ -331,9 +327,9 @@ export type Advanced = Readonly<
 >;
 
 /**
- * What `autoFix` did about a failed head. `declined` covers everything that
- * is not a fixer's diff and everything that went wrong on the way; either way
- * the failure stands and is the skill's. `moved` is what it is for `advance`.
+ * What `autoFix` did about a failed head. `declined` covers everything that is
+ * not a fixer's diff and everything that went wrong on the way; either way the
+ * failure stands and is the skill's. `moved` is what it is for `advance`.
  */
 export type AutoFixed = Readonly<
   | { kind: 'declined'; detail: string }

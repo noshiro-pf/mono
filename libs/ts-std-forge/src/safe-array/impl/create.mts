@@ -13,8 +13,8 @@ const maxArrayLength = 2 ** 32 - 1;
  *
  * `Array(n)` is a constructor call whose function form means something else
  * entirely (`Array(1, 2)` is a two-element array, `Array(2)` a two-element
- * hole), which is why Sumi forbids it (D-15 / D-41). Its failure mode is
- * split in two, and both halves are why this returns a `Result`:
+ * hole), which is why Sumi forbids it (D-15 / D-41). Its failure mode is split
+ * in two, and both halves are why this returns a `Result`:
  *
  * - `Array(-1)`, `Array(1.5)` and `Array(2 ** 32)` throw a `RangeError`. That
  *   is the spec-defined condition, validated here before the array is built
@@ -66,8 +66,8 @@ export const create = <const V,>(
   length: number,
   init: V,
 ): Result<readonly V[], CreateError> => {
-  // `isSafeInteger` rather than `isInteger`: the two agree on everything at
-  // or below `maxArrayLength`, which is well inside the safe range.
+  // `isSafeInteger` rather than `isInteger`: the two agree on everything at or
+  // below `maxArrayLength`, which is well inside the safe range.
   if (!Number.isSafeInteger(length) || length < 0 || maxArrayLength < length) {
     return Result.err({ kind: 'invalid-length', length });
   }

@@ -26,15 +26,15 @@ type Props = Readonly<{ placed$: InitializedObservable<PlacedNode> }>;
  * (`index.css`), and a link to it on GitHub. An issue is a box with pointed
  * ends and a pull request a rounded box, so the two read apart before the
  * colour does — the issue angular, as the problem it raises, and the pull
- * request rounded, as what settles it. Its number is on a pill across the
- * left of the top edge, and its `priority:*` label a word on a pill across the
+ * request rounded, as what settles it. Its number is on a pill across the left
+ * of the top edge, and its `priority:*` label a word on a pill across the
  * right, both in ink rather than a colour, since the shape and the colour
- * already say what it is and where it stands; the number is the quieter of
- * the two, as what identifies a node rather than what ranks it. A high one
- * also gets a second outline around the shape, and a low one is drawn faint,
- * as is one labelled `pending`, held back for now. The number, the state,
- * the priority and whether it is pending are in the tooltip, which is also
- * what a screen reader announces.
+ * already say what it is and where it stands; the number is the quieter of the
+ * two, as what identifies a node rather than what ranks it. A high one also
+ * gets a second outline around the shape, and a low one is drawn faint, as is
+ * one labelled `pending`, held back for now. The number, the state, the
+ * priority and whether it is pending are in the tooltip, which is also what a
+ * screen reader announces.
  *
  * A row of the DAG keyed by its number, so the number, and with it the kind,
  * the URL and the width of the number's pill, are the ones it was made with;

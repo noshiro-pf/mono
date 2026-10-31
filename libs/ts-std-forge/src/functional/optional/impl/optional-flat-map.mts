@@ -5,8 +5,8 @@ import { unwrap } from './optional-unwrap.mjs';
 import type { Unwrap } from './types.mjs';
 
 /**
- * Applies a function that returns an `Optional` to the value in an
- * `Some`. If the input is `None`, returns `None`.
+ * Applies a function that returns an `Optional` to the value in an `Some`. If
+ * the input is `None`, returns `None`.
  * This is the monadic bind operation for `Optional`.
  *
  * @example

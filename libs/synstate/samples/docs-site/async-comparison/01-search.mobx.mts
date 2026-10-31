@@ -58,8 +58,8 @@ export const createSearch = () => {
       });
   };
 
-  // reaction's `delay` option runs the effect `delay` ms after the
-  // *first* change, which throttles; a debounce is written by hand.
+  // reaction's `delay` option runs the effect `delay` ms after the *first*
+  // change, which throttles; a debounce is written by hand.
   const disposeReaction = reaction(
     () => query.get(), // untrimmed: a typed space restarts the wait too
     (typed) => {

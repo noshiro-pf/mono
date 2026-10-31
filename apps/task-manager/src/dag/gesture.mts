@@ -1,29 +1,29 @@
 /**
- * Pan with one pointer, pinch with two, drag a node with one that went down
- * on it, and tell a tap from a drag — as a reducer over pointer events, so
- * the canvas component only forwards them.
+ * Pan with one pointer, pinch with two, drag a node with one that went down on
+ * it, and tell a tap from a drag — as a reducer over pointer events, so the
+ * canvas component only forwards them.
  *
  * Every gesture is measured from where it started (the transform and the
  * pointers when the number of pointers last changed), not from the previous
  * move, so rounding does not accumulate. A press that moves less than
  * {@link DRAG_THRESHOLD_PX} is a tap; `dragging` stays set after the release
- * until the next press, so the click that follows a drag can be told apart
- * and swallowed.
+ * until the next press, so the click that follows a drag can be told apart and
+ * swallowed.
  *
- * A node being dragged follows the pointer (`nodeDrag`) and is dropped where
- * it is when that pointer lifts — the one moment its position is saved. A
- * press on a node's handle draws an arrow from it instead (`connectDrag`),
- * which ends where the pointer lifts. A second finger turns either press
- * into a pinch, which leaves the node where it was and draws nothing. A
- * group's frame, grabbed by its title, is dragged as a node is. A press
- * the canvas says draws a lasso (`lasso.mts`) draws one from where it went
- * down through every point it moves to (`lasso`) — or, for a rectangle, the
- * rectangle from there to where the pointer is now — which ends where the
- * pointer lifts; a second finger turns it into a pinch as well.
+ * A node being dragged follows the pointer (`nodeDrag`) and is dropped where it
+ * is when that pointer lifts — the one moment its position is saved. A press on
+ * a node's handle draws an arrow from it instead (`connectDrag`), which ends
+ * where the pointer lifts. A second finger turns either press into a pinch,
+ * which leaves the node where it was and draws nothing. A group's frame,
+ * grabbed by its title, is dragged as a node is. A press the canvas says draws
+ * a lasso (`lasso.mts`) draws one from where it went down through every point
+ * it moves to (`lasso`) — or, for a rectangle, the rectangle from there to
+ * where the pointer is now — which ends where the pointer lifts; a second
+ * finger turns it into a pinch as well.
  *
  * An arrow being drawn can be given up before it is dropped
- * ({@link cancelConnect}, on Escape): the rest of that press then draws,
- * drags and pans nothing, and its release connects nothing.
+ * ({@link cancelConnect}, on Escape): the rest of that press then draws, drags
+ * and pans nothing, and its release connects nothing.
  */
 
 import { Arr } from 'ts-data-forge';
@@ -52,9 +52,9 @@ export const IDLE_GESTURE: Gesture = {
 } as const;
 
 /**
- * A pointer went down — on what `grab` says, a node to drag, a handle to
- * draw an arrow from or the background to draw a lasso on, or on the
- * background to pan.
+ * A pointer went down — on what `grab` says, a node to drag, a handle to draw
+ * an arrow from or the background to draw a lasso on, or on the background to
+ * pan.
  */
 export const pointerDown = (
   gesture: Gesture,
@@ -202,8 +202,8 @@ export const pointerMove = (
 
 /**
  * Gives up the arrow being drawn, or about to be by a press on a handle:
- * until the pointer lifts it draws nothing, and the click after the release
- * is swallowed. Anything else is left as it is.
+ * until the pointer lifts it draws nothing, and the click after the release is
+ * swallowed. Anything else is left as it is.
  */
 export const cancelConnect = (gesture: Gesture): Gesture => {
   const { start } = gesture;
@@ -221,10 +221,9 @@ export const cancelConnect = (gesture: Gesture): Gesture => {
 };
 
 /**
- * The pointer `id` lifted, with `transform` on screen, and the node it
- * dropped if it was dragging one, the arrow it drew if it was drawing one,
- * or the lasso it drew. A pinch that loses a finger becomes a pan from
- * where it is.
+ * The pointer `id` lifted, with `transform` on screen, and the node it dropped
+ * if it was dragging one, the arrow it drew if it was drawing one, or the lasso
+ * it drew. A pinch that loses a finger becomes a pan from where it is.
  */
 export const pointerUp = (
   gesture: Gesture,
@@ -263,8 +262,8 @@ export type TrackedPointer = Readonly<{ id: number }> & Point;
 export type Grab = NodeGrab | ConnectGrab | LassoGrab;
 
 /**
- * The node a pointer went down on, or the group by its key, and where it
- * was then: the node's top-left corner, or the frame's.
+ * The node a pointer went down on, or the group by its key, and where it was
+ * then: the node's top-left corner, or the frame's.
  */
 export type NodeGrab = Readonly<{
   kind: 'node';
@@ -283,8 +282,8 @@ export type ConnectGrab = Readonly<{
 }>;
 
 /**
- * The background, pressed to draw a lasso on rather than to pan: a loop
- * drawn freehand, or a rectangle dragged out from corner to corner.
+ * The background, pressed to draw a lasso on rather than to pan: a loop drawn
+ * freehand, or a rectangle dragged out from corner to corner.
  */
 export type LassoGrab = Readonly<{ kind: 'lasso'; shape: LassoShape }>;
 
@@ -300,8 +299,8 @@ export type NodeDrag = Readonly<{
 }>;
 
 /**
- * An arrow being drawn from the handle of `from` at `anchor` to the pointer
- * at `to`, both in content coordinates.
+ * An arrow being drawn from the handle of `from` at `anchor` to the pointer at
+ * `to`, both in content coordinates.
  */
 export type ConnectDrag = Readonly<{
   from: GraphNodeId;
@@ -325,8 +324,8 @@ export type Gesture = DeepReadonly<{
   nodeDrag: NodeDrag | undefined;
   connectDrag: ConnectDrag | undefined;
   /**
-   * The lasso being drawn, in content coordinates: where the press went
-   * down, then every point it has moved to; or a rectangle's four corners.
+   * The lasso being drawn, in content coordinates: where the press went down,
+   * then every point it has moved to; or a rectangle's four corners.
    */
   lasso: Point[] | undefined;
 }>;

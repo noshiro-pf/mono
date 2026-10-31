@@ -178,10 +178,10 @@ describe('parseNodeSupportConfig', () => {
   });
 
   // The one that pins the `Result.safeTry` refactor: `targets` is unwrapped
-  // before `knownBroken`, so the first `Err` is the one that comes back and
-  // the second parse never decides the message. A `safeTry` body that kept
-  // going, or that reordered the two unwraps, would report the knownBroken
-  // error here instead.
+  // before `knownBroken`, so the first `Err` is the one that comes back and the
+  // second parse never decides the message. A `safeTry` body that kept going,
+  // or that reordered the two unwraps, would report the knownBroken error here
+  // instead.
   test('reports the first failure when targets and knownBroken are both invalid', () => {
     const result = parseNodeSupportConfig({
       ...validConfig,
@@ -198,8 +198,8 @@ describe('parseNodeSupportConfig', () => {
     );
   });
 
-  // The policy check reads `knownBroken`, so it can only run once both
-  // unwraps have succeeded — an invalid `targets` has to win over it.
+  // The policy check reads `knownBroken`, so it can only run once both unwraps
+  // have succeeded — an invalid `targets` has to win over it.
   test('reports the targets failure before the policy/knownBroken conflict', () => {
     const result = parseNodeSupportConfig({
       ...validConfig,

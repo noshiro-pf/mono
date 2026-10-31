@@ -34,9 +34,9 @@ const trimBlankLines = (text: string): string =>
 
 /**
  * Strips `source`, checks that the line count is unchanged, and returns the
- * result without the blank lines at either end. Those lines stand where
- * removed code was, and a `dedent` literal cannot express them, so a test
- * compares what is left against a `dedent` literal.
+ * result without the blank lines at either end. Those lines stand where removed
+ * code was, and a `dedent` literal cannot express them, so a test compares what
+ * is left against a `dedent` literal.
  */
 const stripKeepingLines = (source: string): string => {
   const stripped = strip(source);
@@ -209,12 +209,12 @@ describe(stripDevOnlyCode, () => {
 
   test("keeps the imports an unwrapped cast's argument uses", () => {
     // Unwrapping erases `castMutable(` and the closing `)`, and the first of
-    // those ranges starts where the call itself starts. So a walk that skips
-    // a subtree beginning in erased text skips the argument too, and the
-    // names it uses come back unreferenced — while the argument is exactly
-    // what the output keeps. `ts-data-forge@14.6.3` shipped `Arr.scan` and
-    // `Arr.fill` calling `newArray`, `asPositiveUint32` and `copy` with the
-    // imports for them deleted.
+    // those ranges starts where the call itself starts. So a walk that skips a
+    // subtree beginning in erased text skips the argument too, and the names it
+    // uses come back unreferenced — while the argument is exactly what the
+    // output keeps. `ts-data-forge@14.6.3` shipped `Arr.scan` and `Arr.fill`
+    // calling `newArray`, `asPositiveUint32` and `copy` with the imports for
+    // them deleted.
     assert.strictEqual(
       stripKeepingLines(
         dedent`
@@ -245,11 +245,11 @@ describe(stripDevOnlyCode, () => {
 
   test("keeps the cast's own import when another use of it survives", () => {
     // There is no rule that removes an identity cast's import by name, and
-    // there could not be: `castMutable` is unwrapped in one place here and
-    // left alone in the other, so the name is still referenced and has to
-    // stay imported. What removes it in the ordinary case is the one general
-    // rule — an import binding nothing in the output refers to any more goes
-    // — which is also what removes `expectType`'s import above.
+    // there could not be: `castMutable` is unwrapped in one place here and left
+    // alone in the other, so the name is still referenced and has to stay
+    // imported. What removes it in the ordinary case is the one general rule —
+    // an import binding nothing in the output refers to any more goes — which
+    // is also what removes `expectType`'s import above.
     assert.strictEqual(
       stripKeepingLines(
         dedent`

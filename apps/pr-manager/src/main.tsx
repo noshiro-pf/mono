@@ -11,8 +11,8 @@ if (container === null) {
 }
 
 // The report and its store are loaded only once the URL names a repository:
-// the store reads that repository as it is made, and without one the page
-// asks which to read (`StartPage`).
+// the store reads that repository as it is made, and without one the page asks
+// which to read (`StartPage`).
 if (reportSourceFromSearch(currentSearch()) === undefined) {
   const { StartPage } = await import('./start/index.mjs');
 

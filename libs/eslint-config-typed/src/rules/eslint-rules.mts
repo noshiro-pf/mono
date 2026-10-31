@@ -40,12 +40,12 @@ export const restrictedGlobals = [
 
 export const restrictedGlobalsForBrowser = [
   ...restrictedGlobals,
-  // The bare names are ambiguous with react-router's `location`, `history`
-  // and `navigator`. The spelling each message names is the one the
+  // The bare names are ambiguous with react-router's `location`, `history` and
+  // `navigator`. The spelling each message names is the one the
   // `prefer-global-this` rules accept: `location` and `navigator` exist where
   // there is no `window` (a worker; Node.js has a `navigator`), and the strict
-  // standard library keeps them on `typeof globalThis`; `history` is a
-  // window's alone, and that library declares it off `globalThis`.
+  // standard library keeps them on `typeof globalThis`; `history` is a window's
+  // alone, and that library declares it off `globalThis`.
   {
     name: 'location',
     message: "Use 'globalThis.location' instead.",
@@ -162,8 +162,8 @@ export const restrictedImportsOptions = {
  * Concatenates the `paths` and the `patterns` of `options`, in order.
  *
  * A config that sets `no-restricted-imports` replaces the options an earlier
- * config set, so one that adds a restriction has to set the earlier ones
- * again: `['error', mergeRestrictedImportsOptions(restrictedImportsOptionsForPreact, mine)]`.
+ * config set, so one that adds a restriction has to set the earlier ones again:
+ * `['error', mergeRestrictedImportsOptions(restrictedImportsOptionsForPreact, mine)]`.
  */
 export const mergeRestrictedImportsOptions = (
   ...options: readonly RestrictedImportsOptions[]
@@ -183,8 +183,8 @@ export const eslintRules = {
    */
 
   // The following rules can be used in some cases. See the README for more
-  // information. (These are marked with `0` instead of `"off"` so that a
-  // script can distinguish them.)
+  // information. (These are marked with `0` instead of `"off"` so that a script
+  // can distinguish them.)
   //
   // `curly` is taken back out of this list. eslint-config-prettier turns it off
   // only because `multi-line` and `multi-or-nest` decide by line breaks, which

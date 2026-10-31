@@ -18,8 +18,8 @@ type ArrayToUnion<A extends readonly unknown[]> = A extends readonly []
 /**
  * Brands a primitive type.
  *
- * The constraint values the base type carries (see {@link WithConstraints})
- * are carried over to the branded type, so that
+ * The constraint values the base type carries (see {@link WithConstraints}) are
+ * carried over to the branded type, so that
  * `t.brand({ baseType: t.number(0, { min: 0, max: 10 }), ... }).constraints`
  * still reads `min` and `max`. `C` is inferred from `baseType.constraints`;
  * branding a base type that carries none adds no `constraints` property.

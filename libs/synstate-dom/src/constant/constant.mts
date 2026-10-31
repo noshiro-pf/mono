@@ -6,8 +6,8 @@ import { asConstant } from '../internal/index.mjs';
  * A value that is written once and never updated. A brand that exists only in
  * the type system: at run time it is the value itself.
  *
- * A slot that takes data accepts a `Constant<T>` but not a plain `T`, so that
- * a value read once and never updated (`count$.getSnapshot().value`) is a type
+ * A slot that takes data accepts a `Constant<T>` but not a plain `T`, so that a
+ * value read once and never updated (`count$.getSnapshot().value`) is a type
  * error rather than a binding that silently stays stale.
  */
 export type Constant<T> = Brand<T, 'synstate-dom/Constant'>;

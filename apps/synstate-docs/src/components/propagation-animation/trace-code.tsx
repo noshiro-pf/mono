@@ -39,9 +39,9 @@ export const TraceCode = React.memo<Props>((props) => {
 
     const bottom = lastLine.offsetTop + lastLine.offsetHeight;
 
-    // Centers the lines run, or, when they do not fit, keeps the last
-    // ones in view: those are the lines the step is about. Scrolls the
-    // pane only, never the page.
+    // Centers the lines run, or, when they do not fit, keeps the last ones in
+    // view: those are the lines the step is about. Scrolls the pane only, never
+    // the page.
     pre.scrollTop = Math.max(
       0,
       bottom - firstTop <= pre.clientHeight

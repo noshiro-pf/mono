@@ -19,30 +19,30 @@ import { StatTile, StatToggle } from './stat-tile.js';
 
 /**
  * What the open issues lead with, in either view: how many are shown of how
- * many are open, then the priorities, then `pending` and `in progress`, each
- * a switch for the
- * issues it counts with an `only` switch in its corner — the merge order's
- * counts (`merge-order-filters.tsx`), for issues. What a switch does is
- * `issues-list-view.mts`, which keeps the choice in the URL; the list and the
+ * many are open, then the priorities, then `pending` and `in progress`, each a
+ * switch for the issues it counts with an `only` switch in its corner — the
+ * merge order's counts (`merge-order-filters.tsx`), for issues. What a switch
+ * does is `issues-list-view.mts`, which keeps the choice in the URL; the list
+ * and the
  * DAG show the same issues.
  *
- * The priorities are joined into one control, since they are one question
- * asked of every issue, which has exactly one of them: picking two shows
- * either. `pending` and `in progress` stand apart, as other questions:
- * picked with a priority, each shows what is both (`issue-filter.mts`). Once
- * a priority is picked, the priorities neither picked nor hidden fade, and
+ * The priorities are joined into one control, since they are one question asked
+ * of every issue, which has exactly one of them: picking two shows either.
+ * `pending` and `in progress` stand apart, as other questions:
+ * picked with a priority, each shows what is both (`issue-filter.mts`). Once a
+ * priority is picked, the priorities neither picked nor hidden fade, and
  * `pending` and `in progress` do not, since it is not they that decide them.
  *
- * `open` is how many issues the view shown draws for their own sake — the
- * list, after its own switches and the search too (`countIssues`), or the
+ * `open` is how many issues the view shown draws for their own sake — the list,
+ * after its own switches and the search too (`countIssues`), or the
  * DAG (`issues-view-store.mts`), which also draws an issue left out that one
  * drawn waits on and does not count it. Each priority, and `pending`, is how
  * many of it showing it would draw, and so is `in progress`. Beside each, in
  * small, how many there are in all when that is more. A priority is pressed
  * while its issues are shown: one neither hidden nor picked while another is
- * picked is not, and pressing it picks it too. `pending` is there while an
- * open issue carries it, and `in progress` while an open issue is under way,
- * or while either is switched off or picked, so that it can be undone.
+ * picked is not, and pressing it picks it too. `pending` is there while an open
+ * issue carries it, and `in progress` while an open issue is under way, or
+ * while either is switched off or picked, so that it can be undone.
  */
 export const IssuesSummary = (): JSX.Element => {
   const counts$ = derive(

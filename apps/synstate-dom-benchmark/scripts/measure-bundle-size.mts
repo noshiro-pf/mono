@@ -8,18 +8,18 @@ import { createProductionConfig } from './production-config.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 /**
- * Bundles each library's implementations under `src/` as an application
- * would ship them, and writes their sizes to BUNDLE-SIZE.md.
+ * Bundles each library's implementations under `src/` as an application would
+ * ship them, and writes their sizes to BUNDLE-SIZE.md.
  *
  * ```sh
  * pnpm run bundle-size
  * ```
  *
- * Every bundle is built by the same Vite, with the configuration the timed
- * run uses (`scripts/production-config.mts`), so that the code measured here is the
- * code timed there and each library is tree-shaken alike. A bundle is
- * minified and then compressed with gzip and with Brotli at their highest
- * levels, as a server would precompress it.
+ * Every bundle is built by the same Vite, with the configuration the timed run
+ * uses (`scripts/production-config.mts`), so that the code measured here is the
+ * code timed there and each library is tree-shaken alike. A bundle is minified
+ * and then compressed with gzip and with Brotli at their highest levels, as a
+ * server would precompress it.
  *
  * Unlike the timings, the sizes depend on nothing but the sources and the
  * installed versions, so one run is enough. Needs `pnpm run ws:build` first,

@@ -25,13 +25,13 @@ type MessageIds = 'booleanOperands' | 'nonBooleanLeft';
  * | `{a && <X />}`   | `{a ? <X /> : undefined}` | `{a ? <X /> : false}` |
  * | `{a \|\| <X />}` | `{a ? undefined : <X />}` | `{a ? true : <X />}`  |
  *
- * The fix applies when the left operand is a boolean, and keeps what comes
- * out: a child `false`, `true` and `undefined` all render nothing, and an
- * attribute keeps the exact `false` / `true` it was given. A left operand that
- * is not a boolean is only reported. Turning it into a ternary's test would
- * change what is rendered (no more `0`) and still not be a boolean, so the
- * comparison it stands for (`n !== 0`, `s !== ''`, or `??` for a fallback) is
- * the author's to write.
+ * The fix applies when the left operand is a boolean, and keeps what comes out:
+ * a child `false`, `true` and `undefined` all render nothing, and an attribute
+ * keeps the exact `false` / `true` it was given. A left operand that is not a
+ * boolean is only reported. Turning it into a ternary's test would change what
+ * is rendered (no more `0`) and still not be a boolean, so the comparison it
+ * stands for (`n !== 0`, `s !== ''`, or `??` for a fallback) is the author's to
+ * write.
  *
  * An operand is "in JSX" when its value can come out of the braces: the
  * expression in `{…}` itself, a branch of a ternary there, or an operand of a
@@ -162,8 +162,8 @@ const LOOSER_THAN_TERNARY_TEST: ReadonlySet<AST_NODE_TYPES> =
   ]);
 
 /**
- * Whether every value of `type` is `true` or `false`. `never` holds none, so
- * it is one; `any`, `unknown` and an unconstrained type parameter are not.
+ * Whether every value of `type` is `true` or `false`. `never` holds none, so it
+ * is one; `any`, `unknown` and an unconstrained type parameter are not.
  */
 const typeIsBoolean = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

@@ -1,28 +1,28 @@
 /**
  * The domain records as Firestore documents, and back.
  *
- * A document holds a record minus its `id`, which is the document id. A
- * missing value (`undefined` in the domain) is written as `null` — Firestore
- * rejects `undefined`, and an explicit `null` keeps every field present, so a
- * document says what it does not have rather than leaving it to be guessed.
+ * A document holds a record minus its `id`, which is the document id. A missing
+ * value (`undefined` in the domain) is written as `null` — Firestore rejects
+ * `undefined`, and an explicit `null` keeps every field present, so a document
+ * says what it does not have rather than leaving it to be guessed.
  * A dependency on a milestone has no `type` field at all, as in the domain.
- * So the document codecs are the domain's (`domain/types.mts`) with the id
- * left out and `null` in place of `undefined`, and nothing else.
+ * So the document codecs are the domain's (`domain/types.mts`) with the id left
+ * out and `null` in place of `undefined`, and nothing else.
  *
  * Reading validates everything: a document is data somebody else may have
  * written, by hand or with another version of this app. Fields this version
  * does not know are ignored rather than rejected, so a newer version can add
  * some without breaking an older tab: the domain codec's `prune` drops them.
  *
- * Writing: the functions here only give a document its shape, and may
- * carry along whatever else the value they were made from has at run time
- * (the id included). What is written is pruned to the document's codec by
- * the only functions that write (`api/firestore-io.mts`).
+ * Writing: the functions here only give a document its shape, and may carry
+ * along whatever else the value they were made from has at run time (the id
+ * included). What is written is pruned to the document's codec by the only
+ * functions that write (`api/firestore-io.mts`).
  *
  * The DAG's layout (`projects/{projectId}/settings/dagLayout`) holds the
- * positions as a map from node id to point, and those of the groups' frames
- * as one from group id to point. A position of a node or a group that no
- * longer exists is read like any other and left unused.
+ * positions as a map from node id to point, and those of the groups' frames as
+ * one from group id to point. A position of a node or a group that no longer
+ * exists is read like any other and left unused.
  */
 
 import { Arr, Obj, Result } from 'ts-data-forge';
@@ -185,8 +185,8 @@ export type ProjectDoc = t.TypeOf<typeof ProjectDocCodec>;
 const NullableFiniteNumberCodec = t.union([FiniteNumberCodec, t.nullType]);
 
 /**
- * A group a node is in, `null` for none. Missing in what versions before
- * groups wrote, which is read as none.
+ * A group a node is in, `null` for none. Missing in what versions before groups
+ * wrote, which is read as none.
  */
 const NullableGroupIdCodec = t.optional(t.union([GroupIdCodec, t.nullType]));
 

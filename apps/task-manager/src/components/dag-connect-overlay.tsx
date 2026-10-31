@@ -10,11 +10,11 @@ type Props = Readonly<{
 
 /**
  * Drawing a dependency, over the nodes (`dag-canvas.tsx`): the handle on a
- * node's outline where the pointer is near it, a circle a press there draws
- * an arrow from; then the arrow, from that circle to the pointer, and the
- * node it would join outlined — dashed and in the danger colour when the
- * dependency would be refused. Takes no pointer events: the canvas finds the
- * nodes under the pointer itself.
+ * node's outline where the pointer is near it, a circle a press there draws an
+ * arrow from; then the arrow, from that circle to the pointer, and the node it
+ * would join outlined — dashed and in the danger colour when the dependency
+ * would be refused. Takes no pointer events: the canvas finds the nodes under
+ * the pointer itself.
  */
 export const DagConnectOverlay = ({ overlay }: Props): JSX.Element => (
   <g

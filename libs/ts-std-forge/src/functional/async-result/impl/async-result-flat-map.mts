@@ -3,10 +3,10 @@ import type { AsyncResult } from '../async-result.mjs';
 import type { UnknownAsyncResult, UnwrapErr, UnwrapOk } from './types.mjs';
 
 /**
- * Applies a function that returns an `AsyncResult` or a `Result` to the
- * success value of an `AsyncResult`. If the input resolves to `Err`, the
- * original `Err` is passed through and the function is not called. This is
- * the monadic bind operation for `AsyncResult`.
+ * Applies a function that returns an `AsyncResult` or a `Result` to the success
+ * value of an `AsyncResult`. If the input resolves to `Err`, the original `Err`
+ * is passed through and the function is not called. This is the monadic bind
+ * operation for `AsyncResult`.
  *
  * @example
  *
@@ -45,10 +45,10 @@ export function flatMap<S, E, R2 extends UnknownAsyncResult | UnknownResult>(
 // The function's return type is captured as a whole (`R2`) and unwrapped with
 // `UnwrapOk` / `UnwrapErr`, instead of being written as
 // `AsyncResult<S2, E2> | Result<S2, E2>` with separate `S2` / `E2` type
-// parameters. With the union form, inference for `E2` collects a candidate
-// from matching `Ok<S2>` against `Err<E2>` (both have a `value` property), so
-// `E2` ends up as the success type and the call fails to type-check even for
-// a function annotated as returning `Result<S2, E2>`.
+// parameters. With the union form, inference for `E2` collects a candidate from
+// matching `Ok<S2>` against `Err<E2>` (both have a `value` property), so `E2`
+// ends up as the success type and the call fails to type-check even for a
+// function annotated as returning `Result<S2, E2>`.
 export function flatMap<S, R2 extends UnknownAsyncResult | UnknownResult>(
   flatMapFn: (value: S) => R2,
 ): <E>(

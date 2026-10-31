@@ -47,8 +47,8 @@ export const eslintImportsRules = {
   'import-x/no-useless-path-segments': withDefaultOption('error'),
   'import-x/no-relative-parent-imports': 'off',
 
-  // Neither option fits: the style is `import type { A }` when every binding
-  // is a type and `import { a, type B }` otherwise, which
+  // Neither option fits: the style is `import type { A }` when every binding is
+  // a type and `import { a, type B }` otherwise, which
   // @typescript-eslint/consistent-type-imports,
   // @typescript-eslint/no-import-type-side-effects and import-x/no-duplicates
   // (prefer-inline) enforce together.

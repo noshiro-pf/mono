@@ -100,8 +100,8 @@ describe('union - closest member selection', () => {
   });
 
   describe('the discriminant names no variant', () => {
-    // Every variant fails on `kind`, so what separates them is how much of
-    // the rest of the value they accept: `radius: 5` satisfies the circle.
+    // Every variant fails on `kind`, so what separates them is how much of the
+    // rest of the value they accept: `radius: 5` satisfies the circle.
     const value = { kind: 'triangle', radius: 5 } as const;
 
     test('the members report 1 / 2 / 3 errors', () => {

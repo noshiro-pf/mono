@@ -43,8 +43,8 @@
        });
    };
  
--  // reaction's `delay` option runs the effect `delay` ms after the
--  // *first* change, which throttles; a debounce is written by hand.
+-  // reaction's `delay` option runs the effect `delay` ms after the *first*
+-  // change, which throttles; a debounce is written by hand.
 +  // reaction の `delay` オプションは「最初の」変更から `delay` ms 後に
 +  // effect を実行するので throttle になる。debounce は手で書く。
    const disposeReaction = reaction(

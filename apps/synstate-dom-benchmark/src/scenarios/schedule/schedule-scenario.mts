@@ -38,9 +38,9 @@ const lengthenCase = (
 /**
  * The critical path of 1,000 tasks, with the last 50 shown. Lengthening the
  * first task moves nearly every figure; lengthening one in the middle moves a
- * few dozen, because the slack of the tasks around it absorbs the change, so
- * a library that stops at a value that did not change does much less work
- * than one that recomputes everything downstream.
+ * few dozen, because the slack of the tasks around it absorbs the change, so a
+ * library that stops at a value that did not change does much less work than
+ * one that recomputes everything downstream.
  */
 export const scheduleScenario: Scenario<ScheduleApp> = {
   buildName: 'schedule: build the schedule',

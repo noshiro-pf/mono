@@ -9,10 +9,10 @@ const MAX_CODE_POINT = 0x10_ffff;
  * `String.fromCodePoint` throws a `RangeError` when a code point is not an
  * integer in the range 0–0x10FFFF. Unlike the digit/radix parameters, that
  * domain cannot be expressed as a literal-range type, and a branded integer
- * type would not remove the upper-bound failure while forcing a cast onto
- * every literal call site — so this wrapper keeps plain `number` parameters
- * and validates each code point up front instead, reporting the first
- * invalid one (with its value and position) as a tagged `Err`.
+ * type would not remove the upper-bound failure while forcing a cast onto every
+ * literal call site — so this wrapper keeps plain `number` parameters and
+ * validates each code point up front instead, reporting the first invalid one
+ * (with its value and position) as a tagged `Err`.
  *
  * @example
  *

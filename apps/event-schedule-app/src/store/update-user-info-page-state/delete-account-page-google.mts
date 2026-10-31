@@ -46,8 +46,8 @@ export type DeleteAccountCreatedWithGoogleDeps<User, ReauthCredential> =
   }>;
 
 /**
- * The dialog that deletes an account made with Google: confirming the
- * email, signing in with Google again, and deleting the user.
+ * The dialog that deletes an account made with Google: confirming the email,
+ * signing in with Google again, and deleting the user.
  */
 export const createDeleteAccountCreatedWithGoogleStore = <
   User extends AccountUser,

@@ -13,14 +13,14 @@ export type GenSynstateReExportOptions = Readonly<{
 }>;
 
 /**
- * Writes the module through which a package that wraps synstate re-exports
- * it: every value but `excludes`, and every type. The types are read from the
+ * Writes the module through which a package that wraps synstate re-exports it:
+ * every value but `excludes`, and every type. The types are read from the
  * declarations synstate publishes, so it must be built first; the caller
  * formats the file.
  *
  * The names are listed rather than spread from `import * as synstate`, which
- * bundlers could not tree-shake, or written as `export *`, whose
- * `createState` would clash with the package's own.
+ * bundlers could not tree-shake, or written as `export *`, whose `createState`
+ * would clash with the package's own.
  */
 export const genSynstateReExport = async ({
   outFile,
@@ -79,8 +79,8 @@ export const synstateReExportSource = ({
 };
 
 /**
- * The names `declarationFile` exports as types only, sorted: what
- * `Object.keys` of the module namespace cannot see.
+ * The names `declarationFile` exports as types only, sorted: what `Object.keys`
+ * of the module namespace cannot see.
  */
 export const typeOnlyExportsOf = (
   declarationFile: string,

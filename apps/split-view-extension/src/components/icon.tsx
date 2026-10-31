@@ -24,9 +24,9 @@ export type IconName =
  * They were emoji and arrows — 🔒, ⬌, ↗, ⠿ — which is a font's idea of what
  * those mean rather than ours: the grip came out as a smudge on one platform
  * and the padlocks as the same glyph on another, and `−` had to be swapped
- * twice to find a minus of the right width. A dozen paths of our own render
- * the same everywhere and weigh a couple of kilobytes, against the hundreds an
- * icon set costs for a toolbar this size.
+ * twice to find a minus of the right width. A dozen paths of our own render the
+ * same everywhere and weigh a couple of kilobytes, against the hundreds an icon
+ * set costs for a toolbar this size.
  *
  * All of them are 16x16 strokes in `currentColor`, so a pane's toolbar goes on
  * colouring them through the CSS it already has — dim, active, warning — and
@@ -69,10 +69,9 @@ type IconShape = Readonly<{
   /**
    * Solid shapes, also in `currentColor`.
    *
-   * A 14px icon has room for about three strokes across, so anything that
-   * would be a thin outlined box — a pane, a padlock's body — is drawn solid
-   * instead. Outlined, the interior closes up and the shape stops being
-   * readable.
+   * A 14px icon has room for about three strokes across, so anything that would
+   * be a thin outlined box — a pane, a padlock's body — is drawn solid instead.
+   * Outlined, the interior closes up and the shape stops being readable.
    */
   fills?: readonly string[];
   /** Heavier where the shape is dots rather than lines. */

@@ -211,7 +211,7 @@ const shouldSkipFile = (
 ): boolean =>
   ignoredTransformers !== undefined &&
   // Empty array means ignore all transformers (file-level ignore without
-  // specific transformers); otherwise check if the transformer is in the
-  // ignore list
+  // specific transformers); otherwise check if the transformer is in the ignore
+  // list
   (Arr.isEmpty(ignoredTransformers) ||
     ignoredTransformers.includes(transformerName));

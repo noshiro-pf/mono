@@ -23,8 +23,8 @@ const tablePages: readonly string[] = [
 /**
  * Pages that may quote a benchmark figure without showing a table.
  *
- * The introduction and the landing page used to open with "up to N× faster
- * than Jotai", which is the first number a reader sees and the last one anyone
+ * The introduction and the landing page used to open with "up to N× faster than
+ * Jotai", which is the first number a reader sees and the last one anyone
  * thinks to update, and now link to the benchmark summary instead. They stay
  * listed so that a marker written there again, in the spelling the page's
  * format allows (see `inlineMarkers`), is filled, and
@@ -165,8 +165,8 @@ const pageLanguage = (markdownFile: string): 'en' | 'ja' =>
  * `benchmarkNumbers`.
  *
  * The tables above are embedded whole; the sentences around them quote single
- * numbers out of the same measurements, and those used to be typed in by hand
- * — which is how a paragraph came to describe a run two re-measurements old.
+ * numbers out of the same measurements, and those used to be typed in by hand —
+ * which is how a paragraph came to describe a run two re-measurements old.
  * The markers are a pair rather than a placeholder so that the number stays
  * readable in the `.mdx` source and shows up in the diff when it moves.
  */
@@ -209,8 +209,8 @@ const embedInlineNumbers = (
  * `embed-bundle-size.mts` already lives with. A page is only ever one of the
  * two, so running both passes over it is a no-op for the form it does not use.
  *
- * `[\s\S]*?` rather than something that excludes `{`: an entry whose value is
- * a whole `$…$` expression carries braces of its own, and KaTeX's thousands
+ * `[\s\S]*?` rather than something that excludes `{`: an entry whose value is a
+ * whole `$…$` expression carries braces of its own, and KaTeX's thousands
  * separator is written `100{,}000`.
  */
 const inlineMarkers: readonly Readonly<{

@@ -10,14 +10,13 @@ import { colors } from '../../../components/constants.mjs';
 
 {/* jsdoc-description */}
 Derives one value from the latest values of several observables: one
-observable that calls `project` with them, as arguments, and emits the
-result unless it equals the one already held.
+observable that calls `project` with them, as arguments, and emits the result
+unless it equals the one already held.
 
-It emits once every parent has a value, and then whenever any of them
-emits, as `combine` does; but where `combine(parents).pipe(map(fn))` is two
-observables and a tuple per update, `derive` is one, and passes the values
-as arguments (a rest parameter in `project` collects them into an array
-again).
+It emits once every parent has a value, and then whenever any of them emits,
+as `combine` does; but where `combine(parents).pipe(map(fn))` is two
+observables and a tuple per update, `derive` is one, and passes the values as
+arguments (a rest parameter in `project` collects them into an array again).
 The comparison is `Object.is` unless `equals` says otherwise.
 {/* /jsdoc-description */}
 

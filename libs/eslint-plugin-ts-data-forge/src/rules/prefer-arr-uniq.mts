@@ -55,8 +55,8 @@ export const preferArrUniq: TSESLint.RuleModule<MessageIds, Options> = {
 
     const esTreeNodeToTSNodeMap = services?.esTreeNodeToTSNodeMap;
 
-    // Without type information the rule cannot tell an array of primitives
-    // from an array of objects, and would suggest code that does not compile.
+    // Without type information the rule cannot tell an array of primitives from
+    // an array of objects, and would suggest code that does not compile.
     if (checker === undefined || esTreeNodeToTSNodeMap === undefined) {
       return {};
     }

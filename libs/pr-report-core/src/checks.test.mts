@@ -17,11 +17,11 @@ describe(classifyCheckRun, () => {
     assert.strictEqual(classifyCheckRun('in_progress', 'failure'), 'pending');
   });
 
-  // The gated jobs skip on `skip-ci` and on a diff the workflow does not
-  // read; GitHub counts that as met, so reading it as a failure would call
-  // every gated pull request red. `summarizeChecks` still counts it as met —
-  // but it is reported as what it was, because folding it into `passed` is
-  // what let a failing pull request show a tick.
+  // The gated jobs skip on `skip-ci` and on a diff the workflow does not read;
+  // GitHub counts that as met, so reading it as a failure would call every
+  // gated pull request red. `summarizeChecks` still counts it as met — but it
+  // is reported as what it was, because folding it into `passed` is what let a
+  // failing pull request show a tick.
   test('a skipped job is reported as skipped, not as passed', () => {
     assert.strictEqual(classifyCheckRun('completed', 'skipped'), 'skipped');
 
@@ -114,10 +114,9 @@ describe(summarizeChecks, () => {
 
   test('`skip-ci` is a pause, and the detail is still reported', () => {
     // While the label is on, the gated jobs boot no runner and
-    // `no-skip-ci-label` sits `pending` by design. Calling that "failing"
-    // would make every queued pull request look broken; the red left by the
-    // cancelled `opened` run is still listed, because it is what a reader
-    // asks about.
+    // `no-skip-ci-label` sits `pending` by design. Calling that "failing" would
+    // make every queued pull request look broken; the red left by the cancelled
+    // `opened` run is still listed, because it is what a reader asks about.
     const summary = summarizeChecks({
       required,
       reported: new Map<string, ContextState>([
@@ -207,9 +206,9 @@ describe(summarizeChecks, () => {
   });
 
   // #2103, stacked on `chore/pnpm-update`: `lint-pull-request.yml` runs on
-  // pull requests into `main` only, so its three contexts never came, and
-  // the page kept calling a pull request whose checks had all passed
-  // "checks running".
+  // pull requests into `main` only, so its three contexts never came, and the
+  // page kept calling a pull request whose checks had all passed "checks
+  // running".
   describe('on a base the ruleset does not cover', () => {
     const withLint = Arr.toPushed(required, 'Validate PR title');
 
@@ -235,8 +234,8 @@ describe(summarizeChecks, () => {
     });
 
     test('while nothing required has reported, everything is still coming', () => {
-      // Between a push and the first check suite, a head commit has nothing
-      // on it at all; that is not a pass over zero contexts.
+      // Between a push and the first check suite, a head commit has nothing on
+      // it at all; that is not a pass over zero contexts.
       const summary = summarizeChecks({
         required: withLint,
         reported: new Map<string, ContextState>(),
@@ -331,8 +330,8 @@ describe(statesFromCheckRuns, () => {
     // `test-node-versions-result`, the one context of the five that blocked
     // #2021: the cancelled suite happens to have the greater id, so GitHub
     // reports the failure however much later the green one finished. Reading
-    // the newest `started_at` instead would call this pull request green
-    // while GitHub blocks it.
+    // the newest `started_at` instead would call this pull request green while
+    // GitHub blocks it.
     const states = statesFromCheckRuns([
       run(
         'test-node-versions-result / result',
@@ -496,11 +495,11 @@ describe(anyRunInProgress, () => {
  * The state #2031 was in when the page showed it a tick.
  *
  * `skip-ci` came off, which started a new round. The old round's
- * `code-check-result` had concluded `skipped` and was the only run of that
- * name on the commit — the new round's aggregate does not exist until the
- * jobs it waits on are done. Folding `skipped` into `passed` then made the
- * pull request look settled and green, two minutes before
- * `code-check-result` concluded `failure`.
+ * `code-check-result` had concluded `skipped` and was the only run of that name
+ * on the commit — the new round's aggregate does not exist until the jobs it
+ * waits on are done. Folding `skipped` into `passed` then made the pull request
+ * look settled and green, two minutes before `code-check-result` concluded
+ * `failure`.
  */
 describe('a required context in a superseded round', () => {
   const required = [
@@ -607,9 +606,9 @@ describe('a required context in a superseded round', () => {
  * `skip-ci` came off, which started a round, and `merge-queued` went on a
  * minute later, which started another and cancelled the first — whose
  * `*-result` aggregates, `if: always()` over cancelled `needs`, concluded
- * `failure`. The newer round was still at its matrix, so its aggregates did
- * not exist yet, and the red of the cancelled one was the only run of each
- * name on the commit.
+ * `failure`. The newer round was still at its matrix, so its aggregates did not
+ * exist yet, and the red of the cancelled one was the only run of each name on
+ * the commit.
  */
 describe('a required context whose workflow has a newer round running', () => {
   const codeCheck = 359_266_435;
@@ -659,8 +658,8 @@ describe('a required context whose workflow has a newer round running', () => {
       conclusion: undefined,
       round: { workflowId: codeCheck, completed: false },
     },
-    // Style Check has finished every job it has created, but the round is
-    // not over: its aggregate is created only after that.
+    // Style Check has finished every job it has created, but the round is not
+    // over: its aggregate is created only after that.
     {
       id: 114_375_644_790,
       checkSuiteId: 103_247_840_622,
@@ -719,8 +718,8 @@ describe('a required context whose workflow has a newer round running', () => {
   });
 
   // The rule is not "an older round never counts": where the newer round
-  // finished without a run of that name, GitHub answers with the older run,
-  // and so does this.
+  // finished without a run of that name, GitHub answers with the older run, and
+  // so does this.
   test('a finished round that never ran the job does not hide the older run', () => {
     const states = statesFromCheckRuns([
       runs[0],
@@ -737,9 +736,9 @@ describe('a required context whose workflow has a newer round running', () => {
     assert.strictEqual(states.get('code-check-result / result'), 'failed');
   });
 
-  // Nor "the round still running wins": GitHub resolves a context to the
-  // suite with the greatest id, and where the cancelled one has it, its red
-  // holds the merge however the other round goes.
+  // Nor "the round still running wins": GitHub resolves a context to the suite
+  // with the greatest id, and where the cancelled one has it, its red holds the
+  // merge however the other round goes.
   test('a cancelled round with the greater id still holds the merge', () => {
     const states = statesFromCheckRuns([
       {

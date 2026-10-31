@@ -1,13 +1,12 @@
 /**
- * Where each node of the issue graph (`issue-graph.mts`) is drawn, and the
- * path of each edge: a layered drawing, read left to right, in which every
- * edge runs from one column to a later one.
+ * Where each node of the issue graph (`issue-graph.mts`) is drawn, and the path
+ * of each edge: a layered drawing, read left to right, in which every edge runs
+ * from one column to a later one.
  *
- * Written here rather than taken from a layout library, because the graphs
- * are small — thirty issues and what they name — and the page holds a
- * reader's token: what it loads is kept to what it needs (`vite.config.mts`
- * says why). The steps are the usual ones for a layered drawing, each kept
- * simple:
+ * Written here rather than taken from a layout library, because the graphs are
+ * small — thirty issues and what they name — and the page holds a reader's
+ * token: what it loads is kept to what it needs (`vite.config.mts` says why).
+ * The steps are the usual ones for a layered drawing, each kept simple:
  *
  * 1. **Components.** Each connected part is laid out on its own and the parts
  *    stacked, largest first; the nodes with no edge at all go last, in a grid
@@ -26,8 +25,8 @@
  *    the order and the gaps allow (`levelColumn`).
  * 5. **Paths.** Straight through each placeholder, curved between columns.
  *
- * Nothing here reads a title: a node's box is the same for every node, so
- * the drawing depends on the structure alone.
+ * Nothing here reads a title: a node's box is the same for every node, so the
+ * drawing depends on the structure alone.
  */
 
 import { Arr, asUint32, Num } from 'ts-data-forge';
@@ -39,8 +38,8 @@ export const NODE_WIDTH = 208;
 export const NODE_HEIGHT = 44;
 
 /**
- * How far a node's priority pill (`issue-dag-node.tsx`) reaches above its
- * top edge, which the label over the grid keeps clear of.
+ * How far a node's priority pill (`issue-dag-node.tsx`) reaches above its top
+ * edge, which the label over the grid keeps clear of.
  */
 export const PRIORITY_OVERHANG = 7;
 
@@ -73,10 +72,10 @@ export const layoutIssueGraph = (graph: IssueGraph): IssueGraphLayout => {
 };
 
 /**
- * The connected parts laid out, stacked from the top, and what is left for
- * the grid: everything that does not depend on where the grid goes, which is
- * the costly part, so that the grid can be tried in several places
- * (`placeGrid`) without laying the rest out again.
+ * The connected parts laid out, stacked from the top, and what is left for the
+ * grid: everything that does not depend on where the grid goes, which is the
+ * costly part, so that the grid can be tried in several places (`placeGrid`)
+ * without laying the rest out again.
  */
 export type ConnectedLayout = Readonly<{
   nodes: readonly LaidOutNode[];
@@ -92,8 +91,8 @@ export type ConnectedLayout = Readonly<{
 /**
  * Where the nodes with no edge go, in rows `columns` wide: `under` the
  * connected parts; `beside` them, to their right from the top; or `around`
- * them, filling the columns to their right from the top while the parts
- * take the left of the rows, then going on under them as wide as the rest.
+ * them, filling the columns to their right from the top while the parts take
+ * the left of the rows, then going on under them as wide as the rest.
  * The columns of `around` are counted from the left edge of the drawing, so
  * that those to the right of the parts line up with those under them.
  */
@@ -103,8 +102,8 @@ export type GridPlacement = Readonly<{
 }>;
 
 export const layoutConnected = (graph: IssueGraph): ConnectedLayout => {
-  // A node that names itself is a cycle the node's colour already says; it
-  // has no other end to draw a path to.
+  // A node that names itself is a cycle the node's colour already says; it has
+  // no other end to draw a path to.
   const edges = graph.edges.filter(({ from, to }) => from !== to);
 
   const numbers = graph.nodes.map(({ number }) => number);
@@ -155,8 +154,8 @@ export const layoutConnected = (graph: IssueGraph): ConnectedLayout => {
 
 /**
  * The grid under the connected parts, as many to a row as the widest of them
- * has columns — at least {@link MIN_GRID_COLUMNS}, so that a short graph
- * does not leave a long column, and at most {@link MAX_GRID_COLUMNS}.
+ * has columns — at least {@link MIN_GRID_COLUMNS}, so that a short graph does
+ * not leave a long column, and at most {@link MAX_GRID_COLUMNS}.
  */
 export const defaultPlacement = (parts: ConnectedLayout): GridPlacement =>
   ({
@@ -171,8 +170,8 @@ export const defaultPlacement = (parts: ConnectedLayout): GridPlacement =>
  * Every placement worth trying for `parts`, the default first: under them,
  * each width of grid from one node to all of them in a row; beside them,
  * the same; and around them, each width that leaves a column to their right,
- * while the parts are tall enough for a row beside them. Nothing is beside
- * or around parts that are not there.
+ * while the parts are tall enough for a row beside them. Nothing is beside or
+ * around parts that are not there.
  */
 export const placementsFor = (
   parts: ConnectedLayout,
@@ -242,8 +241,8 @@ export const placeGrid = (
 };
 
 /**
- * The connected parts of the graph, edges read both ways: largest first,
- * then by lowest number; each lowest number first.
+ * The connected parts of the graph, edges read both ways: largest first, then
+ * by lowest number; each lowest number first.
  */
 export const connectedGroups = (
   numbers: readonly number[],
@@ -282,8 +281,8 @@ export const connectedGroups = (
 
 /**
  * Each node's column: what it waits for is in an earlier one, and what waits
- * for it in a later one. An edge that runs back along a cycle — found by a
- * walk from the lowest numbers — is read the other way round.
+ * for it in a later one. An edge that runs back along a cycle — found by a walk
+ * from the lowest numbers — is read the other way round.
  */
 export const assignColumns = (
   numbers: readonly number[],
@@ -338,10 +337,10 @@ export const countCrossings = (
 /**
  * The heights of one column's nodes, top edges, in the order they are in:
  * each as near as can be to where it is `wanted`, no two closer than their
- * heights and `gap`. A least-squares fit under those constraints, which is
- * an isotonic regression once each node's position is measured from where it
- * would be with every gap closed — the pool-adjacent-violators algorithm, in
- * which a run of nodes that wants to overlap moves as one, to its mean.
+ * heights and `gap`. A least-squares fit under those constraints, which is an
+ * isotonic regression once each node's position is measured from where it would
+ * be with every gap closed — the pool-adjacent-violators algorithm, in which a
+ * run of nodes that wants to overlap moves as one, to its mean.
  */
 export const levelColumn = (
   items: readonly Readonly<{
@@ -397,9 +396,9 @@ const columnsIn = (width: number): number =>
 
 /**
  * Where the label over the grid goes, and the `index`th cell of it, for
- * `placement`. A placement that has no room for what it asks — beside or
- * around parts that are not there, around parts too short for a row beside
- * them or with no column to their right — is the grid under them.
+ * `placement`. A placement that has no room for what it asks — beside or around
+ * parts that are not there, around parts too short for a row beside them or
+ * with no column to their right — is the grid under them.
  */
 const gridOf = (
   parts: ConnectedLayout,
@@ -506,8 +505,8 @@ const LEVEL_SWEEPS = 8;
 type Block = Readonly<{ value: number; weight: number; size: number }>;
 
 /**
- * `blocks` with the last merged into the one before it for as long as it
- * wants to be above it, each merge putting the two at their weighted mean.
+ * `blocks` with the last merged into the one before it for as long as it wants
+ * to be above it, each merge putting the two at their weighted mean.
  */
 const poolBack = (blocks: readonly Block[]): readonly Block[] => {
   const last = blocks.at(-1);
@@ -597,8 +596,8 @@ const orderColumns = (
 
   const outOf = groupBy(links, 'from', 'to');
 
-  // The order slots were made in, which is lowest number first and then
-  // each edge's placeholders: a start that keeps related slots close.
+  // The order slots were made in, which is lowest number first and then each
+  // edge's placeholders: a start that keeps related slots close.
   const initial = range(0, columnCount).map((column) =>
     slots.filter((slot) => slot.column === column).map(({ id }) => id),
   );
@@ -673,17 +672,17 @@ const orderColumns = (
 };
 
 /**
- * The top of every slot, each column levelled with its neighbors in turn,
- * left to right and back. A placeholder weighs more than a node, so that a
- * long edge is drawn straight and the nodes move to it.
+ * The top of every slot, each column levelled with its neighbors in turn, left
+ * to right and back. A placeholder weighs more than a node, so that a long edge
+ * is drawn straight and the nodes move to it.
  */
 const levelHeights = (
   order: readonly (readonly string[])[],
   slots: ReadonlyMap<string, Slot>,
   links: readonly Readonly<{ from: string; to: string }>[],
 ): ReadonlyMap<string, number> => {
-  // Neighbors both ways: a node is levelled with what leads into it and
-  // with what it leads to.
+  // Neighbors both ways: a node is levelled with what leads into it and with
+  // what it leads to.
   const neighbors = groupBy(
     links.flatMap(({ from, to }) => [
       { from, to },

@@ -12,8 +12,8 @@ import { probeRule, textOf } from './probe-rule.mjs';
 
 const ruleTester = new RuleTester();
 
-// A mutable node gives back a mutable expression and a readonly node a
-// readonly one.
+// A mutable node gives back a mutable expression and a readonly node a readonly
+// one.
 expectType<
   ReturnType<typeof skipTypeWrappers<TSESTree.Expression>>,
   TSESTree.Expression

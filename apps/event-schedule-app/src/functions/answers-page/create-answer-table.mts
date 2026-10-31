@@ -18,8 +18,8 @@ export const createAnswerTable = (
 ): IMapMapped<
   DatetimeRange,
   // `readonly …[]` rather than `DeepReadonly<…[]>`: the map is built from
-  // tuples that are already readonly, and the deep form makes a different
-  // type that `IMapMapped.create` does not produce.
+  // tuples that are already readonly, and the deep form makes a different type
+  // that `IMapMapped.create` does not produce.
   readonly (readonly [
     iconId: AnswerIconIdWithNone,
     point: AnswerIconPoint,

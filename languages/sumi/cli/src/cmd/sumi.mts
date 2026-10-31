@@ -7,8 +7,8 @@ import { runCheck, type CheckResult } from '../check/index.mjs';
 
 /**
  * The `sumi` command (D-46). One verb set for every tier; a project's tier
- * decides what a verb does. Only the lint tier exists, so `check` is the
- * verb that works; the others are reserved and say so.
+ * decides what a verb does. Only the lint tier exists, so `check` is the verb
+ * that works; the others are reserved and say so.
  */
 
 const check = cmd.command({

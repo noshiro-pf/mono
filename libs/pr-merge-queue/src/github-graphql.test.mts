@@ -1,23 +1,22 @@
 // cspell:ignore unstub
 /**
- * Every GraphQL request the commands send, checked against GitHub's own
- * schema.
+ * Every GraphQL request the commands send, checked against GitHub's own schema.
  *
  * GitHub answers a query it cannot read with an error and no data, and the
- * commands report that as "could not read …" and go on: a selection left
- * open once stopped `unblock-prs` from reading any pull request's checks,
- * and it released a second pull request beside one still running. Nothing
- * short of a request to GitHub said so, because the queries are strings.
+ * commands report that as "could not read …" and go on: a selection left open
+ * once stopped `unblock-prs` from reading any pull request's checks, and it
+ * released a second pull request beside one still running. Nothing short of a
+ * request to GitHub said so, because the queries are strings.
  *
- * The requests are captured rather than read out of the source, because
- * most are built at run time — an alias per pull request — and the shape
- * that goes out is what has to be valid. A function that sends a new query
- * belongs in {@link sendEveryQuery}; the second test names any query in the
- * source that none of the captured requests contains.
+ * The requests are captured rather than read out of the source, because most
+ * are built at run time — an alias per pull request — and the shape that goes
+ * out is what has to be valid. A function that sends a new query belongs in
+ * {@link sendEveryQuery}; the second test names any query in the source that
+ * none of the captured requests contains.
  *
  * The schema is GitHub's public one, vendored under
- * `tools/configs/github-graphql/` (its `README.md` says from where, and how
- * to refresh it).
+ * `tools/configs/github-graphql/` (its `README.md` says from where, and how to
+ * refresh it).
  */
 
 import { buildSchema, parse, validate, type GraphQLSchema } from 'graphql';
@@ -83,11 +82,10 @@ const firstFieldOf = (query: string): string =>
 
 /**
  * Calls every function that sends a GraphQL request, with `fetch` answering
- * each request with nothing GitHub would accept, and resolves to what was
- * sent. The answers are errors, so each function stops at its first
- * request — except `ClosingIssues`, answered so that `readIssueOrder` goes
- * on to ask about the issue the body closes and the pull request does not
- * link.
+ * each request with nothing GitHub would accept, and resolves to what was sent.
+ * The answers are errors, so each function stops at its first request — except
+ * `ClosingIssues`, answered so that `readIssueOrder` goes on to ask about the
+ * issue the body closes and the pull request does not link.
  */
 const sendEveryQuery = async (): Promise<readonly Sent[]> => {
   const mut_sent: Sent[] = [];
@@ -162,8 +160,8 @@ const sendEveryQuery = async (): Promise<readonly Sent[]> => {
 };
 
 /**
- * What GitHub would answer `ClosingIssues` with for a pull request whose
- * body closes #5 in words and links nothing.
+ * What GitHub would answer `ClosingIssues` with for a pull request whose body
+ * closes #5 in words and links nothing.
  */
 const CLOSING_ISSUES_ANSWER = {
   data: {
@@ -195,9 +193,9 @@ const errorsOf = (query: string): readonly string[] => {
 
 /**
  * GitHub's schema as GitHub publishes it, built once. Built without its own
- * validation: GitHub's SDL does not pass every rule `graphql` checks a
- * schema against (an interface field that is not deprecated where an
- * implementation's is), and what is checked here is the queries.
+ * validation: GitHub's SDL does not pass every rule `graphql` checks a schema
+ * against (an interface field that is not deprecated where an implementation's
+ * is), and what is checked here is the queries.
  */
 const githubSchema = (() => {
   let mut_schema: GraphQLSchema | undefined = undefined;

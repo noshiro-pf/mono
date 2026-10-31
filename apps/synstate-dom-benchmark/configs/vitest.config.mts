@@ -6,8 +6,8 @@ import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
 const productionConfig = createProductionConfig();
 
 /**
- * Runs `src/run.bench-browser.mts` in Chromium. Not a test suite: nothing
- * here runs in CI, and the run prints a table rather than asserting.
+ * Runs `src/run.bench-browser.mts` in Chromium. Not a test suite: nothing here
+ * runs in CI, and the run prints a table rather than asserting.
  */
 export default defineConfig({
   ...productionConfig,
@@ -22,8 +22,8 @@ export default defineConfig({
     ),
   },
   optimizeDeps: {
-    // Named up front so that Vite does not discover them mid-run and reload
-    // the page; see `optimizeDepsInclude` in tools/configs/vite-config.mts.
+    // Named up front so that Vite does not discover them mid-run and reload the
+    // page; see `optimizeDepsInclude` in tools/configs/vite-config.mts.
     include: [
       '@preact/signals',
       'preact',

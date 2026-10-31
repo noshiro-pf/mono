@@ -7,18 +7,18 @@ import { fastDeepEqual } from './fast-deep-equal.mjs';
  * replaced by that part of `current` (structural sharing). When the whole of
  * `next` is deeply equal to `current`, `current` itself is returned, so an
  * `Object.is` comparison of the result with `current` tells whether anything
- * changed, and a reader that compares by reference sees a new object only
- * where the value really changed.
+ * changed, and a reader that compares by reference sees a new object only where
+ * the value really changed.
  *
  * Only plain objects and arrays are walked into. Anything else — a `Map`, a
  * `Set`, a `Date`, a class instance — is compared whole with
  * {@link fastDeepEqual} and kept or replaced whole.
  *
  * Array items are matched by index. Give `key` to match them by key instead:
- * an item for which it returns something other than `undefined` is matched
- * with the item of `current` it returns the same key for, and an item it
- * returns `undefined` for is still matched by index. The one `key` is used
- * for the arrays at every depth.
+ * an item for which it returns something other than `undefined` is matched with
+ * the item of `current` it returns the same key for, and an item it returns
+ * `undefined` for is still matched by index. The one `key` is used for the
+ * arrays at every depth.
  *
  * Neither argument is changed. The result shares objects with both, so it
  * relies on neither being changed afterwards.
@@ -91,17 +91,17 @@ export const replaceEqualDeep = <T,>(
   next: T,
   options?: ReplaceEqualDeepOptions,
 ): T =>
-  // The walk sees `unknown`; what it returns is `current`, `next`, or a copy
-  // of `next`'s shape whose parts are parts of either, so it is a `T`.
+  // The walk sees `unknown`; what it returns is `current`, `next`, or a copy of
+  // `next`'s shape whose parts are parts of either, so it is a `T`.
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   replace(current, next, options?.key) as T;
 
 /** Options of {@link replaceEqualDeep}. */
 export type ReplaceEqualDeepOptions = Readonly<{
   /**
-   * The key an array item is matched by. Items it returns `undefined` for
-   * are matched by index. Keys are compared with `SameValueZero`, as `Map`
-   * compares them.
+   * The key an array item is matched by. Items it returns `undefined` for are
+   * matched by index. Keys are compared with `SameValueZero`, as `Map` compares
+   * them.
    */
   key?: (item: unknown) => unknown;
 }>;
@@ -146,9 +146,9 @@ const indexByKey = (
   return mut_byKey;
 };
 
-// Each walk returns `current` when every part of the result is the same part
-// of `current`, `next` when every part is the same part of `next` (nothing
-// was reused, so no copy is needed), and the copy otherwise.
+// Each walk returns `current` when every part of the result is the same part of
+// `current`, `next` when every part is the same part of `next` (nothing was
+// reused, so no copy is needed), and the copy otherwise.
 
 const replaceArray = (
   current: readonly unknown[],

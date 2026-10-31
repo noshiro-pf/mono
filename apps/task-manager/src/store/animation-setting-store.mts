@@ -1,7 +1,7 @@
 /**
- * The animation setting (`view-model/animation-setting.mts`), saved whenever
- * it changes. Whether the nodes move is the DAG layout store's to decide,
- * from this and the system's request for less motion.
+ * The animation setting (`view-model/animation-setting.mts`), saved whenever it
+ * changes. Whether the nodes move is the DAG layout store's to decide, from
+ * this and the system's request for less motion.
  */
 
 import { createState, type InitializedObservable } from 'synstate';

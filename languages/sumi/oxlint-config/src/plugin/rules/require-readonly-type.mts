@@ -35,15 +35,15 @@ type MessageIds =
   | 'reference';
 
 /**
- * `readonly/require-readonly-type` — every type annotation is written
- * readonly (spec/readonly.md): arrays and tuples carry `readonly`, object
- * type members carry `readonly` (or the literal sits in `Readonly<>` /
- * `DeepReadonly<>`), mapped types keep `readonly`, and the mutable
+ * `readonly/require-readonly-type` — every type annotation is written readonly
+ * (spec/readonly.md): arrays and tuples carry `readonly`, object type members
+ * carry `readonly` (or the literal sits in `Readonly<>` / `DeepReadonly<>`),
+ * mapped types keep `readonly`, and the mutable
  * standard-library references (`Array` / `Map` / `Set` / `Record`) are
  * replaced by their readonly counterparts.
  *
- * The decisions are a check-only fork of ts-codemod-lib's
- * `convert-to-readonly` (D-45): the same nodes and the same exclusions —
+ * The decisions are a check-only fork of ts-codemod-lib's `convert-to-readonly`
+ * (D-45): the same nodes and the same exclusions —
  * `mut_`-prefixed parameters, variables, type aliases and properties;
  * anything under `DeepReadonly<>` or `Mutable<>`; the direct argument of
  * `Readonly<>`. Unlike the codemod it accepts every readonly spelling and
@@ -171,8 +171,8 @@ type Kind = 'array' | 'tuple' | 'reference' | 'mapped';
 
 /**
  * Whether the position already makes the node readonly (the codemod leaves
- * these alone). Unions and intersections are looked through (parentheses do
- * not exist in the AST): `Readonly<A | B>` covers both members.
+ * these alone). Unions and intersections are looked through (parentheses do not
+ * exist in the AST): `Readonly<A | B>` covers both members.
  *
  * - `readonly T[]` / `readonly [A]`: the readonly type operator.
  * - The direct type argument of `Readonly<>` (arrays, tuples, literals,
@@ -220,8 +220,8 @@ const isCovered = (node: AnyNode, kind: Kind): boolean => {
   }
 
   if (mut_parent.type === AST_NODE_TYPES.TSConditionalType) {
-    // The distribution guard (`[A] extends [B]`, `A[] extends B[]`) — in
-    // effect only when the check type itself is a tuple or an array.
+    // The distribution guard (`[A] extends [B]`, `A[] extends B[]`) — in effect
+    // only when the check type itself is a tuple or an array.
     const checkType = mut_parent.checkType;
 
     return (

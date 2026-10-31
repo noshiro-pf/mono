@@ -28,9 +28,9 @@ import { LabelInput } from './label-input.js';
  * 「一括編集」: the progress and the labels of every task selected on the
  * DAG, and the group of every node selected, changed together
  * (`bulk-edit-store.mts`). Each starts at 「変更しない」; labels are added
- * from a field, as a task's are typed, and taken off by ticking those the
- * tasks have. A milestone has no progress and no labels, and with no task
- * selected those fields are left out. A native `<dialog>` as the node's is
+ * from a field, as a task's are typed, and taken off by ticking those the tasks
+ * have. A milestone has no progress and no labels, and with no task selected
+ * those fields are left out. A native `<dialog>` as the node's is
  * (`node-dialog.tsx`).
  */
 export const BulkEditDialog = (): JSX.Element => (

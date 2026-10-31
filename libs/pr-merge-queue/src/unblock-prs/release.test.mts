@@ -85,8 +85,8 @@ describe(firstInReleaseOrder, () => {
     );
   });
 
-  // Kept released, it goes green only to be set aside for a person, while
-  // the one paused for it could have merged on its own.
+  // Kept released, it goes green only to be set aside for a person, while the
+  // one paused for it could have merged on its own.
   test('puts one only a bypass merges with priority:low, unless labelled priority:high', () => {
     const released = [
       pullRequest({ number: 1 }),
@@ -180,9 +180,9 @@ describe(yieldsTo, () => {
   test('keeps its release against one that was already released when the survey picked it', () => {
     // Released before the survey — a person took `skip-ci` off, or labelled
     // `merge-queued` one that never had it — and not in flight, or the survey
-    // would have watched it: waiting on its declared order, held by its
-    // review, conflicting. It is still released on the next survey, so
-    // yielding to it would release and pause the same pull request forever.
+    // would have watched it: waiting on its declared order, held by its review,
+    // conflicting. It is still released on the next survey, so yielding to it
+    // would release and pause the same pull request forever.
     const other = pullRequest({ number: 3, labels: [queued, high] });
 
     assert.isUndefined(

@@ -5,9 +5,9 @@ import { createRule } from './create-rule.mjs';
 import { globalReferenceName } from './global-reference.mjs';
 
 /**
- * The built-ins that have both a `new` form and a call form whose call form
- * is an implicit conversion (or a different operation). `Symbol()` and
- * `BigInt()` are deliberately absent: they have no `new` form (D-41).
+ * The built-ins that have both a `new` form and a call form whose call form is
+ * an implicit conversion (or a different operation). `Symbol()` and `BigInt()`
+ * are deliberately absent: they have no `new` form (D-41).
  */
 const bannedCallees: ReadonlyMap<string, string> = new Map<string, string>([
   ['Boolean', 'an explicit comparison such as `x !== undefined`'],
@@ -30,13 +30,13 @@ const bannedCallees: ReadonlyMap<string, string> = new Map<string, string>([
 
 /**
  * `banned-syntax/no-constructor-call` — calling a built-in constructor as a
- * plain function (`Number(x)`, `String(x)`, ...) is banned (D-15 / D-41): it
- * is an implicit conversion whose intent is not in the name and whose failure
- * is a sentinel. A locally declared binding of the same name is not the
+ * plain function (`Number(x)`, `String(x)`, ...) is banned (D-15 / D-41): it is
+ * an implicit conversion whose intent is not in the name and whose failure is a
+ * sentinel. A locally declared binding of the same name is not the
  * global and is left alone. A type wrapper around the callee
  * (`(Number satisfies NumberConstructor)(x)`) is looked through, the global
- * object's property (`globalThis.Number(x)`) is the same constructor, and a
- * tag (`` Number`1` ``) is called as a function too.
+ * object's property (`globalThis.Number(x)`) is the same constructor, and a tag
+ * (`` Number`1` ``) is called as a function too.
  */
 export const noConstructorCall = createRule({
   meta: {
@@ -55,8 +55,8 @@ export const noConstructorCall = createRule({
   create: (context) => {
     const check = (callee: DeepReadonly<TSESTree.Expression>): void => {
       // `(Number satisfies NumberConstructor)('1')` and
-      // `globalThis.Number('1')` still call `Number`; a user declaration of
-      // the same name shadows the global and is not our case.
+      // `globalThis.Number('1')` still call `Number`; a user declaration of the
+      // same name shadows the global and is not our case.
       const name = globalReferenceName(context.sourceCode, callee);
 
       if (name === undefined) {

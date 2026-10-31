@@ -1,13 +1,12 @@
 /**
- * The arc diagram's layout: the tasks and the milestones, one below another
- * in a single column, with the dependencies drawn as arcs beside it
- * (`arc-edges.mts`, `arc-geometry.mts`). The tasks keep the order the
- * diagrams share (`diagram-order.mts`); each milestone goes in among them
- * next to what it is joined to (`arcDiagramIds`), so that an arc through it
- * stays short.
+ * The arc diagram's layout: the tasks and the milestones, one below another in
+ * a single column, with the dependencies drawn as arcs beside it
+ * (`arc-edges.mts`, `arc-geometry.mts`). The tasks keep the order the diagrams
+ * share (`diagram-order.mts`); each milestone goes in among them next to what
+ * it is joined to (`arcDiagramIds`), so that an arc through it stays short.
  *
- * The positions follow from the data alone, so they are never saved and
- * nobody moves a node: the stored arrangement is the DAG's only.
+ * The positions follow from the data alone, so they are never saved and nobody
+ * moves a node: the stored arrangement is the DAG's only.
  */
 
 import { Arr } from 'ts-data-forge';
@@ -27,17 +26,16 @@ export const ARC_NODE_GAP = 16;
 
 /**
  * The column of `state`: the tasks `taskIds`, in that order, and every
- * milestone of `state` among them — just above the first node that waits
- * for it, through milestones too; for one no task waits for, just below the
- * last node it waits for; for one that waits for no task either, just
- * above the first milestone that waits for it; for one joined to nothing,
- * at the end. Milestones that would go in the same place go in the order
- * they hold, one that waits for another below it, and otherwise in the
- * order of `state`.
+ * milestone of `state` among them — just above the first node that waits for
+ * it, through milestones too; for one no task waits for, just below the last
+ * node it waits for; for one that waits for no task either, just above the
+ * first milestone that waits for it; for one joined to nothing, at the end.
+ * Milestones that would go in the same place go in the order they hold, one
+ * that waits for another below it, and otherwise in the order of `state`.
  *
- * `state` is what is drawn: a task in it but not in `taskIds` is left out,
- * and places nothing. The editor never saves a cycle; a walk round one in
- * the data stops where it started.
+ * `state` is what is drawn: a task in it but not in `taskIds` is left out, and
+ * places nothing. The editor never saves a cycle; a walk round one in the data
+ * stops where it started.
  */
 export const arcDiagramIds = (
   taskIds: readonly GraphNodeId[],
@@ -49,16 +47,16 @@ export const arcDiagramIds = (
 
   const dependents = buildDependentIds(state);
 
-  // A place in the column: a task at its index, a milestone half a place
-  // above or below the task it goes next to.
+  // A place in the column: a task at its index, a milestone half a place above
+  // or below the task it goes next to.
   const taskPlace = (id: GraphNodeId, side: number): readonly number[] => {
     const index = taskIndex.get(id);
 
     return index === undefined ? [] : [index + side];
   };
 
-  // Each walk goes one way only: down through what waits, or up through
-  // what is waited for.
+  // Each walk goes one way only: down through what waits, or up through what is
+  // waited for.
   const above = walk((id, visit) =>
     least(
       (dependents.get(id) ?? []).flatMap((dependent) =>
@@ -129,9 +127,9 @@ export const arcDiagramIds = (
 };
 
 /**
- * The nodes `ids` down the column, in the order given (`arcDiagramIds`),
- * each the size of its kind at `nodeSize`, {@link ARC_NODE_GAP} apart: the
- * smaller the nodes, the closer the column. Their right sides, where the
+ * The nodes `ids` down the column, in the order given (`arcDiagramIds`), each
+ * the size of its kind at `nodeSize`, {@link ARC_NODE_GAP} apart: the smaller
+ * the nodes, the closer the column. Their right sides, where the
  * arcs are, line up, with the tasks' left edge at x = 0.
  */
 export const arcDiagramNodes = (
@@ -168,9 +166,9 @@ const HALF = 0.5;
 const isTask = (id: GraphNodeId): boolean => id.startsWith('task:');
 
 /**
- * `step` for every node, each worked out once. `step` is handed the walk
- * itself (`walkOn`) for the nodes next to the one it is at; a node it
- * reaches again before it is done — round a cycle — is `undefined`.
+ * `step` for every node, each worked out once. `step` is handed the walk itself
+ * (`walkOn`) for the nodes next to the one it is at; a node it reaches again
+ * before it is done — round a cycle — is `undefined`.
  */
 const walk = (
   step: (

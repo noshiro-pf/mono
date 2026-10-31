@@ -22,10 +22,10 @@ export const toDateLocal = (epochMs: number, timeZone?: string): string =>
   toDateTimeLocal(epochMs, timeZone).slice(0, DATE_LENGTH);
 
 /**
- * The first instant of the day `value` (`YYYY-MM-DD`) names on the wall
- * clock of `timeZone`, or its last (the millisecond before the next day's
- * first), or `undefined` when it is not a real day alone. A day whose
- * midnight the clocks skip starts as they go forward.
+ * The first instant of the day `value` (`YYYY-MM-DD`) names on the wall clock
+ * of `timeZone`, or its last (the millisecond before the next day's first), or
+ * `undefined` when it is not a real day alone. A day whose midnight the clocks
+ * skip starts as they go forward.
  */
 export const fromDateLocal = (
   value: string,
@@ -51,8 +51,8 @@ export const fromDateLocal = (
 };
 
 /**
- * What a date field holds once it is made all day — its day alone — or
- * timed again, at `edge`'s time of the day; empty stays empty.
+ * What a date field holds once it is made all day — its day alone — or timed
+ * again, at `edge`'s time of the day; empty stays empty.
  */
 export const switchAllDay = (
   value: string,
@@ -69,8 +69,8 @@ export const switchAllDay = (
 };
 
 /**
- * `YYYY-MM-DD-HHmmss`, the wall clock of `timeZone` at `epochMs` to the
- * second: for a file name, which sorts by it.
+ * `YYYY-MM-DD-HHmmss`, the wall clock of `timeZone` at `epochMs` to the second:
+ * for a file name, which sorts by it.
  */
 export const toFileStamp = (epochMs: number, timeZone?: string): string => {
   const { year, month, day, hour, minute, second } = wallClock(

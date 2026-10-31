@@ -1,14 +1,13 @@
 import type { UintRangeInclusive } from 'ts-type-forge';
 
 /**
- * Formats a number in fixed-point notation, made total by its parameter
- * type.
+ * Formats a number in fixed-point notation, made total by its parameter type.
  *
- * `Number.prototype.toFixed` throws a `RangeError` only when
- * `fractionDigits` is outside 0–100. With `fractionDigits` typed as the
- * `0 | 1 | ... | 100` literal range (the same refinement the strict TS lib
- * applies), that failure is unrepresentable at compile time, so the function
- * returns the string directly. A caller holding a plain `number` narrows it
+ * `Number.prototype.toFixed` throws a `RangeError` only when `fractionDigits`
+ * is outside 0–100. With `fractionDigits` typed as the `0 | 1 | ... | 100`
+ * literal range (the same refinement the strict TS lib applies), that failure
+ * is unrepresentable at compile time, so the function returns the string
+ * directly. A caller holding a plain `number` narrows it
  * first (truncating explicitly with `Math.trunc` if it may be fractional);
  * one that defeats the type system gets the raw `RangeError`, by design.
  *

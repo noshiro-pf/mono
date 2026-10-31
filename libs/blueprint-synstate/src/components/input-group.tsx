@@ -26,12 +26,11 @@ type Props = Readonly<{
 }>;
 
 /**
- * Blueprint's `InputGroup`: `input.bp6-input` in `div.bp6-input-group`,
- * which carries the modifier classes. No icons or elements beside the input.
+ * Blueprint's `InputGroup`: `input.bp6-input` in `div.bp6-input-group`, which
+ * carries the modifier classes. No icons or elements beside the input.
  *
- * Unlike React's `onChange`, synstate-dom's is the DOM's `change`, which
- * fires when the value is committed; `onInput` is the one for every
- * keystroke.
+ * Unlike React's `onChange`, synstate-dom's is the DOM's `change`, which fires
+ * when the value is committed; `onInput` is the one for every keystroke.
  */
 export const InputGroup = ({
   value,

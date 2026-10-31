@@ -1,6 +1,6 @@
 /**
- * The arcs of the arc diagram, which draws the tasks and the milestones as
- * the DAG does: one for every dependency, between the two nodes it joins.
+ * The arcs of the arc diagram, which draws the tasks and the milestones as the
+ * DAG does: one for every dependency, between the two nodes it joins.
  */
 
 import type { DeepReadonly } from 'ts-type-forge';

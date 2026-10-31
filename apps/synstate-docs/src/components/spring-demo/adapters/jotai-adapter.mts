@@ -68,8 +68,8 @@ export const createJotaiSpringAdapter = (): SpringAdapter => {
         return;
       }
 
-      // Set the source atom — Jotai's pull-based engine recomputes
-      // the selectAtom chain on the next read (in the subscriber callback)
+      // Set the source atom — Jotai's pull-based engine recomputes the
+      // selectAtom chain on the next read (in the subscriber callback)
       mut_store.set(mut_mousePosAtom, pos);
     },
     cleanup: () => {

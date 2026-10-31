@@ -1,14 +1,13 @@
 /**
- * Which part of the graph the graph screen shows: the nodes of some groups,
- * the tasks with some labels, or both — a theme at a time, when the whole is
- * too large to read. A view only: nothing is moved, and every node keeps its
- * place in the arrangement (`dag/node-filter.mts` says what it leaves out).
+ * Which part of the graph the graph screen shows: the nodes of some groups, the
+ * tasks with some labels, or both — a theme at a time, when the whole is too
+ * large to read. A view only: nothing is moved, and every node keeps its place
+ * in the arrangement (`dag/node-filter.mts` says what it leaves out).
  *
  * Kept in the URL's query, as `?group=<id>&label=<label>`, one parameter per
  * choice, so that a theme can be bookmarked; an empty value is 「グループなし」
  * or 「ラベルなし」. Written while the graph is shown only, as its mode is
- * (`store/view-query-sync.mts`), and every other parameter is left where it
- * is.
+ * (`store/view-query-sync.mts`), and every other parameter is left where it is.
  */
 
 import { Arr } from 'ts-data-forge';

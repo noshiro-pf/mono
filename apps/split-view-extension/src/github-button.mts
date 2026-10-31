@@ -51,8 +51,8 @@ const main = (): void => {
 
   style.replaceSync(css);
 
-  // A constructed style sheet rather than a `<style>`, which GitHub's CSP
-  // would be asked about.
+  // A constructed style sheet rather than a `<style>`, which GitHub's CSP would
+  // be asked about.
   mut_shadow.adoptedStyleSheets = [style];
 
   mut_shadow.append(mut_button);
@@ -65,8 +65,8 @@ const main = (): void => {
 
   document.documentElement.append(mut_host);
 
-  // Moving between pages within github.com changes the address without
-  // loading a document, so it is the history entry that is watched.
+  // Moving between pages within github.com changes the address without loading
+  // a document, so it is the history entry that is watched.
   window.navigation.addEventListener('currententrychange', showOnPullRequests);
 
   /**
@@ -205,9 +205,9 @@ const readConversation = async (
  * session it names from its conversation page, and asks the service worker to
  * open the split view.
  *
- * The conversation page is fetched rather than read off the document on
- * screen: the diff has none of them, and a pull request named in a link is not
- * on screen at all. The fetch is same-origin, so it sees what the user sees,
+ * The conversation page is fetched rather than read off the document on screen:
+ * the diff has none of them, and a pull request named in a link is not on
+ * screen at all. The fetch is same-origin, so it sees what the user sees,
  * private repositories included. When it fails, or GitHub's markup has moved,
  * the split view opens all the same, without the issue or the session.
  */

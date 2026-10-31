@@ -28,9 +28,9 @@ export const runBenchmark = (k: number, branchCount: number): number => {
     branches: Arr.zeros(asUint32(branchCount)),
   } as const;
 
-  // A plain reducer rather than `createSlice`: an Immer draft of the
-  // `branches` array would be finalized element by element on every update,
-  // and that would be measured as Redux's cost.
+  // A plain reducer rather than `createSlice`: an Immer draft of the `branches`
+  // array would be finalized element by element on every update, and that would
+  // be measured as Redux's cost.
   const store = configureStore({
     reducer: (
       state: State | undefined,

@@ -35,8 +35,8 @@ export const definePlaywrightAppConfig = ({
     // One worker, everywhere. Each of these suites is backed by a single Vite
     // dev server for a single app, and the heavier apps do enough work on load
     // — `cant-stop-probability` builds a 165-row probability table — that
-    // parallel contexts starve one another: measured, its three tests timed
-    // out at 30s each in parallel and passed in 3.6s in sequence. There is no
+    // parallel contexts starve one another: measured, its three tests timed out
+    // at 30s each in parallel and passed in 3.6s in sequence. There is no
     // parallelism to win here, only flakiness.
     fullyParallel: false,
     workers: 1,

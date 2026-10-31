@@ -10,10 +10,10 @@ import {
 } from '../internal/index.mjs';
 
 /**
- * Binds every prop of an intrinsic element except `ref` and `children`
- * (SPEC.md 7): `class`, `style`, event handlers, the DOM properties of
- * `propertyNames`, and attributes for the rest. Subscriptions and listeners
- * are released when the current scope is disposed.
+ * Binds every prop of an intrinsic element except `ref` and `children` (SPEC.md
+ * 7): `class`, `style`, event handlers, the DOM properties of `propertyNames`,
+ * and attributes for the rest. Subscriptions and listeners are released when
+ * the current scope is disposed.
  */
 export const bindProps = (
   element: Element,
@@ -25,8 +25,8 @@ export const bindProps = (
 };
 
 /**
- * `true` writes an empty attribute, and `false`, `undefined` and `null`
- * remove it.
+ * `true` writes an empty attribute, and `false`, `undefined` and `null` remove
+ * it.
  */
 const writeAttribute = (
   element: Element,
@@ -49,8 +49,8 @@ const writeAttribute = (
 };
 
 /**
- * Every value is a `Bindable` at run time: what is neither an observable nor
- * a view is a constant. An omitted prop is `undefined`, which is not.
+ * Every value is a `Bindable` at run time: what is neither an observable nor a
+ * view is a constant. An omitted prop is `undefined`, which is not.
  */
 const isBindable = (value: unknown): value is Bindable<unknown> =>
   value !== undefined && value !== null;

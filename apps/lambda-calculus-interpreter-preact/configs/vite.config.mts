@@ -7,8 +7,8 @@ import { pagesAppBase } from '../../../tools/configs/pages-apps.mjs';
 export default defineViteAppConfig({
   packageRoot: workspaceRootPath,
   framework: 'preact',
-  // Served from the repository's Pages site rather than a host of its own,
-  // so the asset URLs carry the whole prefix. The table it comes from is the
-  // one `build-pages-site.mts` copies by.
+  // Served from the repository's Pages site rather than a host of its own, so
+  // the asset URLs carry the whole prefix. The table it comes from is the one
+  // `build-pages-site.mts` copies by.
   base: pagesAppBase(workspaceRootPath),
 });

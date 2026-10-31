@@ -56,15 +56,15 @@ export const noNullPropagation: Rule = {
  * The name of a variable declaration that carries no type annotation, or
  * `undefined` for anything else.
  *
- * Restricting the checker query to these is what keeps the pass cheap: the
- * walk visits every node, and asking about each one would cost a round trip
- * per node.
+ * Restricting the checker query to these is what keeps the pass cheap: the walk
+ * visits every node, and asking about each one would cost a round trip per
+ * node.
  *
  * Variable declarations and the bindings a destructuring pattern introduces,
  * for now. A binding element can carry no annotation at all, so every one is
  * examined; a variable declaration whose name is a pattern resolves to the
- * pattern's own type, which is the tuple or object rather than a member, so
- * the two do not report the same fault twice.
+ * pattern's own type, which is the tuple or object rather than a member, so the
+ * two do not report the same fault twice.
  *
  * A parameter or a property that this codebase writes always carries an
  * annotation, which the syntactic rule covers; the ones that do not are

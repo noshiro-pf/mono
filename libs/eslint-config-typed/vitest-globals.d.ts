@@ -349,8 +349,8 @@ type OverriddenAssert = Readonly<{
   isNotFunction: <T>(value: T) => void;
 
   /**
-   * Asserts that value is an object of type 'Object'
-   * (as revealed by Object.prototype.toString).
+   * Asserts that value is an object of type 'Object' (as revealed by
+   * Object.prototype.toString).
    *
    * T   Type of value.
    * @param value   Actual value.
@@ -359,8 +359,8 @@ type OverriddenAssert = Readonly<{
   isObject: <T>(value: T) => void;
 
   /**
-   * Asserts that value is not an object of type 'Object'
-   * (as revealed by Object.prototype.toString).
+   * Asserts that value is not an object of type 'Object' (as revealed by
+   * Object.prototype.toString).
    *
    * T   Type of value.
    * @param value   Actual value.
@@ -1278,8 +1278,8 @@ type OverriddenAssert = Readonly<{
   notExtensible: <T>(object: T) => void;
 
   /**
-   * Asserts that object is sealed (can have new properties added to it
-   * and its existing properties cannot be removed).
+   * Asserts that object is sealed (can have new properties added to it and its
+   * existing properties cannot be removed).
    *
    * T   Type of object
    * @param object   Actual value.
@@ -1287,8 +1287,8 @@ type OverriddenAssert = Readonly<{
   isSealed: <T>(object: T) => void;
 
   /**
-   * Asserts that object is sealed (can have new properties added to it
-   * and its existing properties cannot be removed).
+   * Asserts that object is sealed (can have new properties added to it and its
+   * existing properties cannot be removed).
    *
    * T   Type of object
    * @param object   Actual value.
@@ -1312,8 +1312,8 @@ type OverriddenAssert = Readonly<{
   notSealed: <T>(object: T) => void;
 
   /**
-   * Asserts that object is frozen (cannot have new properties added to it
-   * and its existing properties cannot be removed).
+   * Asserts that object is frozen (cannot have new properties added to it and
+   * its existing properties cannot be removed).
    *
    * T   Type of object
    * @param object   Actual value.
@@ -1321,8 +1321,8 @@ type OverriddenAssert = Readonly<{
   isFrozen: <T>(object: T) => void;
 
   /**
-   * Asserts that object is frozen (cannot have new properties added to it
-   * and its existing properties cannot be removed).
+   * Asserts that object is frozen (cannot have new properties added to it and
+   * its existing properties cannot be removed).
    *
    * T   Type of object
    * @param object   Actual value.
@@ -1350,8 +1350,8 @@ type OverriddenAssert = Readonly<{
   /**
    * Asserts that the target does not contain any values. For arrays and
    * strings, it checks the length property. For Map and Set instances, it
-   * checks the size property. For non-function objects, it gets the count
-   * of own enumerable string keys.
+   * checks the size property. For non-function objects, it gets the count of
+   * own enumerable string keys.
    *
    * T   Type of object
    * @param object   Actual value.
@@ -1529,8 +1529,8 @@ type OverriddenAssert = Readonly<{
   nestedProperty: <T>(object: T, property: string) => void;
 
   /**
-   * Asserts that object does not have a property named by property,
-   * which can be a string using dot- and bracket-notation for nested reference.
+   * Asserts that object does not have a property named by property, which can
+   * be a string using dot- and bracket-notation for nested reference.
    * The property cannot exist on the object nor anywhere in its prototype chain.
    *
    * T   Type of object.

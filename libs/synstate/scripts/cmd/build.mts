@@ -17,8 +17,8 @@ const monorepoRootPath = path.resolve(workspaceRootPath, '../..');
  * prettier-plugin-organize-imports, ...), which TypeScript 7 no longer
  * provides. It is hoisted to the monorepo root's node_modules (not this
  * package's own node_modules), and invoked via an explicit path because both
- * packages declare a `tsc` bin and the winner of the
- * `node_modules/.bin/tsc` conflict is not guaranteed.
+ * packages declare a `tsc` bin and the winner of the `node_modules/.bin/tsc`
+ * conflict is not guaranteed.
  */
 const nativeTsc = path.resolve(
   monorepoRootPath,

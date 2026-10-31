@@ -39,10 +39,10 @@ type MessageIds = 'preferNonMutatingMethod';
  *
  * The `Array.from()` call is found through type wrappers, which the fix keeps
  * (`(Array.from(xs) as T[]).sort()` → `(xs as T[]).toSorted()`), and the
- * argument's type is that of its value, not of a cast around it. A
- * `satisfies` around the call that the argument itself does not meet keeps
- * the copy: `(Array.from(xs) satisfies number[])` with `xs: readonly number[]`
- * would not type-check as `xs satisfies number[]`.
+ * argument's type is that of its value, not of a cast around it. A `satisfies`
+ * around the call that the argument itself does not meet keeps the copy:
+ * `(Array.from(xs) satisfies number[])` with `xs: readonly number[]` would not
+ * type-check as `xs satisfies number[]`.
  */
 const MUTATING_METHOD_NAMES: ReadonlySet<string> = new Set<string>([
   'fill',
@@ -216,8 +216,8 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
 
         const sourceCode = context.sourceCode;
 
-        // `getText` leaves out the parentheses around a comma expression,
-        // which an argument list needs.
+        // `getText` leaves out the parentheses around a comma expression, which
+        // an argument list needs.
         const argsText = node.arguments
           .map((argument) =>
             argument.type === AST_NODE_TYPES.SequenceExpression
@@ -265,8 +265,8 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
           messageId: 'preferNonMutatingMethod',
           data: { mutatingMethod: methodName, replacement },
           // The `Array.from(...)` call and the `<method>(...)` part are
-          // replaced separately, so that wrappers around the call and the
-          // `?.` between them are kept.
+          // replaced separately, so that wrappers around the call and the `?.`
+          // between them are kept.
           fix: (fixer) => {
             const objectText = toMemberObjectText(
               sourceCode.getText(arg),

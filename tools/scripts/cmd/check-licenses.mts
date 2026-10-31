@@ -21,24 +21,23 @@ import { projectRootPath } from '../project-root-path.mjs';
  *
  * **An allow-list rather than a comparison with the previous state**, which is
  * what "block when a license changes" first suggests. A comparison needs the
- * previous state to be somewhere: a committed snapshot of every package
- * changes whenever a transitive dependency appears, so the block becomes
- * routine and stops being read; one computed inside the workflow has to be
- * carried into the job that opens the pull request, and an approval has to be
- * remembered or the next run blocks again. The list has no state, the
- * approval is an edit to it on `main`, and it catches the relicensing that
- * happens in practice — an open-source license replaced by BUSL, SSPL or a
- * custom text lands outside any allow-list. What it lets through unremarked
- * is a move _within_ the list (MIT to Apache-2.0), where there is nothing to
- * do about it anyway.
+ * previous state to be somewhere: a committed snapshot of every package changes
+ * whenever a transitive dependency appears, so the block becomes routine and
+ * stops being read; one computed inside the workflow has to be carried into the
+ * job that opens the pull request, and an approval has to be remembered or the
+ * next run blocks again. The list has no state, the approval is an edit to it
+ * on `main`, and it catches the relicensing that happens in practice — an
+ * open-source license replaced by BUSL, SSPL or a custom text lands outside any
+ * allow-list. What it lets through unremarked is a move _within_ the list (MIT
+ * to Apache-2.0), where there is nothing to do about it anyway.
  *
  * It reads `pnpm licenses list --recursive --json`, which reads the installed
- * `node_modules` and the network not at all. `--recursive` is what takes in
- * the workspace members' dependencies: since pnpm 12.7 the listing without it
+ * `node_modules` and the network not at all. `--recursive` is what takes in the
+ * workspace members' dependencies: since pnpm 12.7 the listing without it
  * covers the root project alone, and the exceptions for what only `apps/*` and
- * `libs/*` install then read as stale. Without an install every package
- * comes back `Unknown`, so `Unknown` is a failure rather than a gap: a check
- * that passes because it saw nothing is the one shape this must not have.
+ * `libs/*` install then read as stale. Without an install every package comes
+ * back `Unknown`, so `Unknown` is a failure rather than a gap: a check that
+ * passes because it saw nothing is the one shape this must not have.
  * An exception may still let `Unknown` through for a package whose license
  * files someone has read, but only by its exact name — a wildcard there, or
  * `Unknown` in `allowed`, would be the gap again, and fails.
@@ -67,9 +66,9 @@ export const checkLicenses = (): Result<CheckSummary, string> => {
  * `pnpm licenses list --recursive --json`, which groups by license:
  * `{ "MIT": [{ name, versions, license, … }], … }`.
  *
- * A package whose versions disagree appears once under each license
- * (`argparse` is Python-2.0 at 2.x and PSF-2.0 at 3.x), so the pair is the
- * unit and not the name.
+ * A package whose versions disagree appears once under each license (`argparse`
+ * is Python-2.0 at 2.x and PSF-2.0 at 3.x), so the pair is the unit and not the
+ * name.
  */
 export const parseLicensesOutput = (
   output: string,
@@ -109,8 +108,8 @@ export const parseLicensesOutput = (
  *
  * `OR` is the licensee's choice, so one allowed alternative is enough; `AND`
  * binds to every part. That is as far as this reads: nesting, `WITH` and
- * anything else are answered `false`, which sends the package to the
- * exceptions where a person reads the expression.
+ * anything else are answered `false`, which sends the package to the exceptions
+ * where a person reads the expression.
  */
 export const isAllowedExpression = (
   expression: string,
@@ -138,9 +137,9 @@ export const isAllowedExpression = (
  * `true` when an exception's package pattern speaks for `name`: the name
  * itself, or with a trailing `*` every name that continues the prefix.
  *
- * The `*` is for per-platform binaries (`lightningcss-linux-x64-gnu`), of
- * which an install has only its own platform's — a list of exact names would
- * be stale on every machine but one.
+ * The `*` is for per-platform binaries (`lightningcss-linux-x64-gnu`), of which
+ * an install has only its own platform's — a list of exact names would be stale
+ * on every machine but one.
  */
 export const matchesPackagePattern = (
   pattern: string,
@@ -227,10 +226,9 @@ export const collectViolations = (
 };
 
 /**
- * The installed licenses as a Markdown table, most common first, each with
- * what the policy says about it. A license the policy does not cover is
- * marked rather than left out — this is the view for deciding what to do
- * about one.
+ * The installed licenses as a Markdown table, most common first, each with what
+ * the policy says about it. A license the policy does not cover is marked
+ * rather than left out — this is the view for deciding what to do about one.
  */
 export const formatReport = (
   installed: readonly InstalledLicense[],

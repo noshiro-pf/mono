@@ -7,10 +7,10 @@ if (import.meta.vitest !== undefined) {
   test('simple-glitch-example (Redux)', async () => {
     // embed-sample-code-ignore-above
     // Redux uses a single immutable state tree.
-    // Derived values are computed via "selectors" — pure functions
-    // that read from the state snapshot.
-    // Since all selectors read from the same snapshot,
-    // there is no propagation graph and thus no diamond dependency.
+    // Derived values are computed via "selectors" — pure functions that read
+    // from the state snapshot.
+    // Since all selectors read from the same snapshot, there is no propagation
+    // graph and thus no diamond dependency.
 
     const counterSlice = createSlice({
       name: 'counter',
@@ -70,8 +70,8 @@ if (import.meta.vitest !== undefined) {
       }, 100);
     });
 
-    // Redux selectors always read from a single consistent state snapshot,
-    // so diamond dependencies are structurally impossible — no glitch.
+    // Redux selectors always read from a single consistent state snapshot, so
+    // diamond dependencies are structurally impossible — no glitch.
     assert.deepStrictEqual(valueHistory, [0, 1010, 2020, 3030, 4040]);
 
     // embed-sample-code-ignore-below

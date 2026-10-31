@@ -2,16 +2,16 @@ import { Result } from '../../result/index.mjs';
 import type { AsyncResult } from '../async-result.mjs';
 
 /**
- * Maps an `AsyncResult<S, E>` to `AsyncResult<S2, E>` by applying a function
- * to the success value. The mapping function may be synchronous or return a
+ * Maps an `AsyncResult<S, E>` to `AsyncResult<S2, E>` by applying a function to
+ * the success value. The mapping function may be synchronous or return a
  * `Promise`; both are handled transparently. If the `AsyncResult` resolves to
  * `Err`, the original `Err` is passed through and the function is not called.
  *
  * If `mapFn` throws or returns a rejecting Promise, the rejection propagates
  * as-is — it is **not** caught and converted into an `Err`. `map` performs no
- * implicit error conversion; write a fallible step as
- * `AsyncResult.flatMap` combined with `AsyncResult.fromThrowable` instead, so
- * that the error type stays explicit.
+ * implicit error conversion; write a fallible step as `AsyncResult.flatMap`
+ * combined with `AsyncResult.fromThrowable` instead, so that the error type
+ * stays explicit.
  *
  * @example
  *

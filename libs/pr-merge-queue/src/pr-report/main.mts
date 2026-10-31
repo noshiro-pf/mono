@@ -55,9 +55,9 @@ import { readRequiredContexts } from './repo-settings.mjs';
  *   it next** (`owner`: `worker`, `skill`, `human` or `none`; `queue.mts`),
  *   which is how a session working the queue picks what to fix.
  *
- * It reads and prints. Nothing here labels, rebases, merges or comments —
- * that is `unblock-prs`, and keeping the report incapable of it is what makes
- * it safe to run anywhere, on a schedule, with a read-only token or none.
+ * It reads and prints. Nothing here labels, rebases, merges or comments — that
+ * is `unblock-prs`, and keeping the report incapable of it is what makes it
+ * safe to run anywhere, on a schedule, with a read-only token or none.
  */
 export const prReport = async (
   options: Options,
@@ -94,8 +94,8 @@ export const prReport = async (
 
   // One more request, and the one section that is not about what is open:
   // what landed. A report that only lists the queue cannot answer "did the
-  // thing I queued yesterday go in", which is the first question a reader of
-  // a daily report has.
+  // thing I queued yesterday go in", which is the first question a reader of a
+  // daily report has.
   const merged = await client.merged(
     repo.value,
     options.mergedDays,
@@ -106,17 +106,17 @@ export const prReport = async (
     return merged;
   }
 
-  // And one more for what is open that is not a pull request, so that "what
-  // is there to do" is answered in one place rather than two.
+  // And one more for what is open that is not a pull request, so that "what is
+  // there to do" is answered in one place rather than two.
   const issues = await client.issues(repo.value, options.issuesLimit);
 
   if (Result.isErr(issues)) {
     return issues;
   }
 
-  // And one request for each issue the open pull requests close that the
-  // open list did not cover, whose `Start-After:` the pull request closing
-  // it inherits as a merge order.
+  // And one request for each issue the open pull requests close that the open
+  // list did not cover, whose `Start-After:` the pull request closing it
+  // inherits as a merge order.
   const issueDeclarations = await declarationsOf(
     client,
     repo.value,
@@ -124,8 +124,8 @@ export const prReport = async (
     issues.value,
   );
 
-  // And one for each thing the issues' `Start-After:` names that is neither
-  // a listed issue nor an open pull request, to say where it stands.
+  // And one for each thing the issues' `Start-After:` names that is neither a
+  // listed issue nor an open pull request, to say where it stands.
   const references = await client.references(
     repo.value,
     namedBeyond(facts.value, issues.value),
@@ -159,9 +159,9 @@ export const prReport = async (
 };
 
 /**
- * What the open issues listed, and the ones the open pull requests close
- * beyond them, declare with `Start-After:`. A closing issue already known to
- * be closed is not read: it closes nothing that is still to do.
+ * What the open issues listed, and the ones the open pull requests close beyond
+ * them, declare with `Start-After:`. A closing issue already known to be closed
+ * is not read: it closes nothing that is still to do.
  */
 const declarationsOf = async (
   client: Client,
@@ -217,11 +217,11 @@ const namedBeyond = (
 };
 
 /**
- * The report with its maps turned into objects, because `JSON.stringify`
- * writes a `Map` as `{}` and would quietly drop every check verdict, and with
- * what the queue's comments say on each entry (absent when there is none)
- * and who moves it next (absent outside the queue, or when its comments
- * could not be read; `queue.mts`).
+ * The report with its maps turned into objects, because `JSON.stringify` writes
+ * a `Map` as `{}` and would quietly drop every check verdict, and with what the
+ * queue's comments say on each entry (absent when there is none) and who moves
+ * it next (absent outside the queue, or when its comments could not be read;
+ * `queue.mts`).
  */
 const serializable = (
   report: PrReport,

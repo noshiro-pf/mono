@@ -1,10 +1,10 @@
 /**
  * Where the labels of the edges (「SS」, 「+3日」) are drawn: on the middle
- * of the edge, unless that puts the label over a node, over another label,
- * or across other edges — then at the place along the edge, nearest its
- * middle, that covers the least of those: a node or a label before any
- * edge. The labels are placed in the order of their edges' ids, so that the
- * order of the input does not matter.
+ * of the edge, unless that puts the label over a node, over another label, or
+ * across other edges — then at the place along the edge, nearest its middle,
+ * that covers the least of those: a node or a label before any edge. The labels
+ * are placed in the order of their edges' ids, so that the order of the input
+ * does not matter.
  */
 
 import { Arr, asPositiveInt, asUint32, Num } from 'ts-data-forge';
@@ -91,8 +91,8 @@ const OVER_LABEL = 1000;
 const OVER_EDGE = 10;
 
 /**
- * The places along an edge a label may go, as shares of its length: from
- * the middle outwards, never so near an end that it covers the arrowhead.
+ * The places along an edge a label may go, as shares of its length: from the
+ * middle outwards, never so near an end that it covers the arrowhead.
  */
 const SHARES = [0.5, 0.4, 0.6, 0.3, 0.7, 0.2, 0.8] as const;
 

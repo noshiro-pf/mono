@@ -29,8 +29,8 @@ import {
 
 /**
  * The inputs are states, and every figure is a node of its own, made with
- * `combine` and `map` from the figures it is computed from. The cells bind
- * the figures with `view`, which formats them without adding a node.
+ * `combine` and `map` from the figures it is computed from. The cells bind the
+ * figures with `view`, which formats them without adding a node.
  *
  * Measured twice: as written, and with a `skipIfNoChange` after every figure
  * (see {@link FigureOutput}).

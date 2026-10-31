@@ -406,8 +406,8 @@ export const genericMapToStaysHomomorphic = <
   >('=');
 };
 
-// The mapping is uniform, not positional: every slot gets the same `E`, so
-// even `MapTo<T[number], T>` is not assignable back to the tuple it came from.
+// The mapping is uniform, not positional: every slot gets the same `E`, so even
+// `MapTo<T[number], T>` is not assignable back to the tuple it came from.
 // A caller that needs to recover `T` has to spell the positional
 // `Readonly<{ [K in keyof T]: T[K] }>` itself.
 

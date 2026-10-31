@@ -13,9 +13,9 @@ import { pagesAppBase } from '../../../tools/configs/pages-apps.mjs';
 const base: UserConfig = defineViteAppConfig({
   packageRoot: workspaceRootPath,
   framework: 'preact',
-  // Served from the repository's Pages site rather than a host of its own,
-  // so the asset URLs carry the whole prefix. The table it comes from is the
-  // one `build-pages-site.mts` copies by.
+  // Served from the repository's Pages site rather than a host of its own, so
+  // the asset URLs carry the whole prefix. The table it comes from is the one
+  // `build-pages-site.mts` copies by.
   base: pagesAppBase(workspaceRootPath),
   // Each tab is a path, which Pages can only answer with a page there.
   routePaths: routeList,

@@ -12,12 +12,12 @@ import { projectRootPath } from '../project-root-path.mjs';
  * Writes each package's LICENSE from the license its own `package.json`
  * declares, and refuses to write anything it cannot state exactly.
  *
- * **The `license` field decides, not the file.** A LICENSE file is a copy of
- * a text; the field is the claim npm shows and the one a consumer reads
- * first. Deriving the file from the field is what keeps them from saying
- * different things — a package cannot end up shipping this Apache-2.0 text
- * under a manifest that says MIT, because the text it gets is the text its
- * own declaration names.
+ * **The `license` field decides, not the file.** A LICENSE file is a copy of a
+ * text; the field is the claim npm shows and the one a consumer reads first.
+ * Deriving the file from the field is what keeps them from saying different
+ * things — a package cannot end up shipping this Apache-2.0 text under a
+ * manifest that says MIT, because the text it gets is the text its own
+ * declaration names.
  *
  * Three guarantees, and only the last needs a pinned constant:
  *
@@ -40,13 +40,13 @@ import { projectRootPath } from '../project-root-path.mjs';
  * the root LICENSE is its verified text, so that text is the whole of
  * {@link licenseTextsFrom}. A package declaring anything else fails, naming
  * what supporting it would take — storing that license's text and pinning its
- * hash — rather than being quietly given the wrong file. Teaching this a
- * second license is a change to make when there is a second license, against
- * a real example.
+ * hash — rather than being quietly given the wrong file. Teaching this a second
+ * license is a change to make when there is a second license, against a real
+ * example.
  *
- * None of it needs the network. `--verify-upstream` is how the pinned
- * constant is re-derived from apache.org by hand; CI never runs it, because a
- * check that fetches is a check that fails when the fetch does.
+ * None of it needs the network. `--verify-upstream` is how the pinned constant
+ * is re-derived from apache.org by hand; CI never runs it, because a check that
+ * fetches is a check that fails when the fetch does.
  *
  * Not to be confused with `check:root:licenses`
  * (`tools/scripts/cmd/check-licenses.mts`), which reads the licenses of the
@@ -120,17 +120,17 @@ export const genLicenseFiles = async (): Promise<
  * and it is a property of the manifests rather than of the working tree.
  *
  * A LICENSE earns its place by travelling with the artifact. npm puts one in
- * the tarball, so a published package needs it. A private package is
- * conveyed to nobody by npm, and where its output *is* distributed — a served
- * site, an extension's zip — what governs is whether the license is inside
- * that artifact, which a file sitting in the source directory does not
- * achieve. Putting one there would be decoration, in a public repository
- * whose root LICENSE already governs everything in it. So private packages
- * get none, and {@link collectViolations} reports one that has appeared.
+ * the tarball, so a published package needs it. A private package is conveyed
+ * to nobody by npm, and where its output *is* distributed — a served site, an
+ * extension's zip — what governs is whether the license is inside that
+ * artifact, which a file sitting in the source directory does not achieve.
+ * Putting one there would be decoration, in a public repository whose root
+ * LICENSE already governs everything in it. So private packages get none, and
+ * {@link collectViolations} reports one that has appeared.
  *
- * A package with no `license` field yields no target and is reported there
- * too: the field is the declaration, and guessing it is the one thing this
- * script must not do.
+ * A package with no `license` field yields no target and is reported there too:
+ * the field is the declaration, and guessing it is the one thing this script
+ * must not do.
  */
 export const collectLicenseTargets = (
   manifests: readonly PackageManifest[],
@@ -154,9 +154,9 @@ export const collectLicenseTargets = (
  * **Every package declares a license, private ones included.** Nothing else
  * asks: measured on npm 11 and pnpm 12, a missing `license` field is not a
  * warning at `install`, at `pack` or at `publish` — the registry simply shows
- * the package as having none. It is the field a consumer reads first, and for
- * a package that is private today it is the statement that is already right
- * when it stops being private.
+ * the package as having none. It is the field a consumer reads first, and for a
+ * package that is private today it is the statement that is already right when
+ * it stops being private.
  *
  * `experimental/` is exempt throughout: its contents are snapshots of other
  * repositories, imported under whatever license they carried.
@@ -201,8 +201,8 @@ export const collectViolations = (
 /**
  * The license texts this script can write, by SPDX identifier.
  *
- * One entry, and the root LICENSE is it. A second means storing that
- * license's text where this can read it and pinning its hash the way
+ * One entry, and the root LICENSE is it. A second means storing that license's
+ * text where this can read it and pinning its hash the way
  * {@link CANONICAL_LICENSE_SHA256} pins this one — an unverified copy is the
  * problem this script exists to prevent, not a shortcut it may take.
  */
@@ -417,9 +417,9 @@ const toRepoRelative = (absolute: string): string =>
  * Every workspace package, with the `package.json` fields this reads and
  * whether a LICENSE sits beside it.
  *
- * `pnpm ls` rather than a glob for manifests, so that what counts as a
- * package here is what counts as one everywhere else. A glob would also reach
- * the per-group manifests the strict-lib bundles generate beside their
+ * `pnpm ls` rather than a glob for manifests, so that what counts as a package
+ * here is what counts as one everywhere else. A glob would also reach the
+ * per-group manifests the strict-lib bundles generate beside their
  * declarations, which name no package anyone installs and are kept out of the
  * tarball on purpose.
  */
@@ -500,9 +500,9 @@ const dirnameOf = (repoRelativePath: string): string => {
 /**
  * Tracked LICENSE files that sit in no package.
  *
- * Finding these is the only thing the file list is used for. What gets
- * written is decided by the declarations alone — a file's existence must not
- * be what makes it correct, or a stray copy would keep itself alive.
+ * Finding these is the only thing the file list is used for. What gets written
+ * is decided by the declarations alone — a file's existence must not be what
+ * makes it correct, or a stray copy would keep itself alive.
  */
 const collectOrphanLicenseFiles = (
   manifests: readonly PackageManifest[],

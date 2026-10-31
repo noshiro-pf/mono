@@ -271,8 +271,8 @@ const saved = [
     { key: 'priority', order: 'asc' },
 ] as const;
 
-// By default, an invalid element is replaced with its filled value,
-// so the unknown key turns into the default key 'title'
+// By default, an invalid element is replaced with its filled value, so the
+// unknown key turns into the default key 'title'
 assert.deepStrictEqual(t.array(SortSpec).fill(saved), [
     { key: 'title', order: 'desc' },
     { key: 'priority', order: 'asc' },

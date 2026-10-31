@@ -126,8 +126,8 @@ export const embedExamplesInJsDoc = async ({
           );
         }
 
-        // The JSDoc line prefix of the opening fence line (e.g. ` * `),
-        // reused to indent the embedded sample lines.
+        // The JSDoc line prefix of the opening fence line (e.g. ` * `), reused
+        // to indent the embedded sample lines.
         const lineStartIndex =
           mut_rest.lastIndexOf('\n', codeBlockStartIndex) + 1;
 

@@ -12,8 +12,8 @@ type Size = Readonly<{
 export const useResizeObserverRef = <E extends Element = Element>(
   setSize: (v: Size) => void,
 ): React.RefObject<E | null> => {
-  // The `resize-observer` polyfill this used is no longer needed: every
-  // browser this app targets ships `ResizeObserver`, and `lib.dom` types it.
+  // The `resize-observer` polyfill this used is no longer needed: every browser
+  // this app targets ships `ResizeObserver`, and `lib.dom` types it.
   const rootResizeObserver = React.useMemo(
     () =>
       new ResizeObserver((entries) => {

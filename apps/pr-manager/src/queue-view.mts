@@ -3,12 +3,12 @@
 /**
  * `unblock-prs`'s queue as the Queue block draws it: the pull request it is
  * running, the ones it would pick next in the order it would pick them, the
- * ones whose turn has not come, and — outside the queue — the ones set
- * aside, claimed or otherwise left to someone else.
+ * ones whose turn has not come, and — outside the queue — the ones set aside,
+ * claimed or otherwise left to someone else.
  *
- * Decided by `pr-report-core`'s `queue-order.mts`, the code the worker
- * decides with, from what the page has read. Two things the worker reads
- * differently are made up from what the page has:
+ * Decided by `pr-report-core`'s `queue-order.mts`, the code the worker decides
+ * with, from what the page has read. Two things the worker reads differently
+ * are made up from what the page has:
  *
  * - **The merge state.** GraphQL serves `mergeStateStatus` only under a
  *   preview header, so it is put together from `mergeable` and the
@@ -51,8 +51,8 @@ export type QueueInput = Readonly<{
   rules: ReviewRules;
   pulls: readonly QueuePull[];
   /**
-   * The `Start-After:` of each issue whose body was read, which a pull
-   * request closing it inherits as a merge order. Absent, none is.
+   * The `Start-After:` of each issue whose body was read, which a pull request
+   * closing it inherits as a merge order. Absent, none is.
    */
   startAfterOf?: ReadonlyMap<number, readonly number[]>;
 }>;
@@ -144,8 +144,8 @@ export const queueViewOf = ({
     );
 
     // The set-aside as the worker holds it: one recorded against a base that
-    // has moved, for a reason the move may clear, is taken back and tried
-    // again (`setAsideApplies`).
+    // has moved, for a reason the move may clear, is taken back and tried again
+    // (`setAsideApplies`).
     const setAside =
       comments.setAside?.applies === true ? comments.setAside.says : undefined;
 

@@ -4,11 +4,11 @@
  * previous month, day 32 of January is February 1, month 13 is the next
  * January.
  *
- * Built with the setters, which take plain numbers: the strict standard
- * library narrows the `Date` constructor's month to 0–11 and its day to 1–31,
- * so `new Date(year, month - 1, day + days)` does not type-check there even
- * though ECMA-262 defines the carry. Noon, because no daylight saving
- * transition reaches it.
+ * Built with the setters, which take plain numbers: the strict standard library
+ * narrows the `Date` constructor's month to 0–11 and its day to 1–31, so
+ * `new Date(year, month - 1, day + days)` does not type-check there even though
+ * ECMA-262 defines the carry. Noon, because no daylight saving transition
+ * reaches it.
  */
 export const localNoon = (year: number, month: number, day: number): Date => {
   const mut_date = new Date(0);

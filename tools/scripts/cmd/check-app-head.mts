@@ -13,21 +13,21 @@ import {
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
- * Fails when a browser app's `index.html` (every `apps/*\/index.html`) names
- * an icon or link-card image that is not there, or is published and lacks
- * what a home screen or a link card needs.
+ * Fails when a browser app's `index.html` (every `apps/*\/index.html`) names an
+ * icon or link-card image that is not there, or is published and lacks what a
+ * home screen or a link card needs.
  *
  * None of it fails anywhere else. A missing icon is a 404 in the console and
  * the browser's blank page on the tab; a relative or mis-sized `og:image` is a
- * link card on X, Slack or Discord with no picture, noticed once someone
- * shares the URL; an `og:url` naming another app's site sends crawlers there.
+ * link card on X, Slack or Discord with no picture, noticed once someone shares
+ * the URL; an `og:url` naming another app's site sends crawlers there.
  * What each tag is for is `docs/browser-app-head.md`.
  *
  * "Published" is read from the page: one carrying `og:url` is published there.
  * An app in `tools/configs/pages-apps.mts` is published and must carry the
  * Pages URL it is served from. One with a `.firebaserc` may or may not be
- * deployed — the Firebase site of an app since moved to Pages still answers,
- * or not — so its `og:url`, when present, must name that project's site.
+ * deployed — the Firebase site of an app since moved to Pages still answers, or
+ * not — so its `og:url`, when present, must name that project's site.
  */
 export const checkAppHead = (): Promise<Result<number, string>> =>
   Result.safeTry(async function* () {
@@ -130,8 +130,8 @@ const FILE_LINK_RELATIONS: ReadonlySet<string> = new Set<string>([
 ]);
 
 /**
- * What a published page carries besides `og:url`. `twitter:title` and the
- * like are not asked for: X reads `og:*` when they are absent.
+ * What a published page carries besides `og:url`. `twitter:title` and the like
+ * are not asked for: X reads `og:*` when they are absent.
  */
 const PUBLISHED_META = [
   'description',

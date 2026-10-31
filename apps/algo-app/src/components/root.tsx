@@ -47,8 +47,8 @@ export const Root = (): JSX.Element => {
     map(({ searchParams }) => getParams(searchParams).playerId),
   );
 
-  // The store and the router are written once the update that changed the
-  // value has finished, not from inside it.
+  // The store and the router are written once the update that changed the value
+  // has finished, not from inside it.
   const afterUpdate = createAfterUpdate();
 
   subscribeInScope(roomId, (id) => {

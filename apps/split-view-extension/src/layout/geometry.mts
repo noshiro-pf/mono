@@ -39,9 +39,9 @@ export type PaneDropTarget = Readonly<{
 /**
  * How much of a pane, along each edge, means "this side" rather than "swap".
  *
- * A quarter: large enough to hit without aiming, small enough that the middle
- * — the gesture the user reaches for first, and the only one that cannot
- * change the shape of the layout — is most of the pane.
+ * A quarter: large enough to hit without aiming, small enough that the middle —
+ * the gesture the user reaches for first, and the only one that cannot change
+ * the shape of the layout — is most of the pane.
  */
 const edgeShare = 0.25;
 
@@ -49,10 +49,10 @@ const edgeShare = 0.25;
  * Which pane the pointer is over, and what dropping there would do.
  *
  * It hit-tests the rectangles the layout was drawn from rather than the DOM,
- * because the DOM answer is wrong here: a pointer over a pane is a pointer
- * over an `iframe`, and that belongs to the framed site. The page turns
- * pointer events off for the frames while a drag is in progress and works out
- * where the pointer is from the same numbers it positioned the panes with.
+ * because the DOM answer is wrong here: a pointer over a pane is a pointer over
+ * an `iframe`, and that belongs to the framed site. The page turns pointer
+ * events off for the frames while a drag is in progress and works out where the
+ * pointer is from the same numbers it positioned the panes with.
  *
  * The pane being dragged is not a target: dropping onto itself does nothing,
  * and an indicator over it would suggest otherwise.

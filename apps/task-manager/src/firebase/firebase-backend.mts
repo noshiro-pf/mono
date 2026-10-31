@@ -2,29 +2,29 @@
  * The {@link Backend} of the published app: Google sign-in with Firebase
  * Auth, and each user's personal project in Cloud Firestore.
  *
- * **A popup, never a redirect.** The page is served from
- * `noshiro-pf.github.io` and the auth domain is `firebaseapp.com`; a
- * redirect sign-in hands its result back through storage on the auth
- * domain, which Safari's storage partitioning (and so every browser on iOS)
- * keeps from the page, and the sign-in silently does nothing.
+ * **A popup, never a redirect.** The page is served from `noshiro-pf.github.io`
+ * and the auth domain is `firebaseapp.com`; a redirect sign-in hands its result
+ * back through storage on the auth domain, which Safari's storage partitioning
+ * (and so every browser on iOS) keeps from the page, and the sign-in silently
+ * does nothing.
  *
- * **Offline**: Firestore keeps its cache in IndexedDB, shared between tabs,
- * so the data opens without a network and writes made offline are sent
- * when it is back.
+ * **Offline**: Firestore keeps its cache in IndexedDB, shared between tabs, so
+ * the data opens without a network and writes made offline are sent when it is
+ * back.
  *
  * **Signing out deletes that cache**, which would otherwise leave the data
- * readable on a shared device. An instance can delete its cache only once
- * it has been terminated, and a terminated one cannot be used again, so
- * every sign-out — here, in another tab, or the one a page starts with —
- * terminates the instance, deletes the cache and starts a new one, which a
+ * readable on a shared device. An instance can delete its cache only once it
+ * has been terminated, and a terminated one cannot be used again, so every
+ * sign-out — here, in another tab, or the one a page starts with — terminates
+ * the instance, deletes the cache and starts a new one, which a
  * sign-in waits for. Another tab still holding the cache terminates its own
  * instance when asked to delete it.
  *
- * **Emulators**: a development build connects Auth and Firestore to the
- * local emulators unless told otherwise (`emulator-mode.mts`). It then keeps
- * the Firestore cache in memory: the IndexedDB cache is keyed by project,
- * not by server, so the emulator's data and the real project's, both opened
- * from `localhost`, would otherwise share one cache.
+ * **Emulators**: a development build connects Auth and Firestore to the local
+ * emulators unless told otherwise (`emulator-mode.mts`). It then keeps the
+ * Firestore cache in memory: the IndexedDB cache is keyed by project, not by
+ * server, so the emulator's data and the real project's, both opened from
+ * `localhost`, would otherwise share one cache.
  */
 
 import { initializeApp } from 'firebase/app';
@@ -84,8 +84,8 @@ export const createFirebaseBackend = (): Backend => {
 
   const mut_auth = getAuth(app);
 
-  // Google's sign-in page, and Firebase's own messages, in the page's
-  // language; Firebase takes it only as a property.
+  // Google's sign-in page, and Firebase's own messages, in the page's language;
+  // Firebase takes it only as a property.
   mut_auth.languageCode = lang;
 
   const auth = mut_auth;
@@ -132,8 +132,8 @@ export const createFirebaseBackend = (): Backend => {
 
   return {
     watchSession: (listener) => {
-      // A sign-out while the project is still being set up must not be
-      // followed by the signed-in session that set-up finishes with.
+      // A sign-out while the project is still being set up must not be followed
+      // by the signed-in session that set-up finishes with.
       let mut_generation = 0;
 
       return onAuthStateChanged(auth, (user) => {
@@ -204,9 +204,9 @@ export const createFirebaseBackend = (): Backend => {
 };
 
 /**
- * Creates `projects/{uid}` on a user's first sign-in. The rules let a user
- * read that one document before it exists, and create it only for their own
- * uid, as its owner and only member.
+ * Creates `projects/{uid}` on a user's first sign-in. The rules let a user read
+ * that one document before it exists, and create it only for their own uid, as
+ * its owner and only member.
  */
 const ensurePersonalProject = async (
   firestore: DeepReadonly<Firestore>,

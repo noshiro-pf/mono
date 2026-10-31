@@ -19,12 +19,12 @@ type Options = readonly [];
  * `X` and `Y` are primitives: a deep comparison has nothing to descend into,
  * and `strictEqual` says what the test means.
  *
- * The two are not the same comparison on numbers. Vitest's `deepStrictEqual`
- * is Chai's `deepEqual`, which treats `NaN` as equal to itself and `-0` as
- * unequal to `0`, while `strictEqual` is `===`. They disagree only when both
- * sides are `NaN`, or both are zeros, so the call is fixed when either side's
- * type rules that out — `assert.deepStrictEqual(n, 3)`, where `3` is neither —
- * and otherwise gets a suggestion, so that a test pinning `NaN` or `-0` is not
+ * The two are not the same comparison on numbers. Vitest's `deepStrictEqual` is
+ * Chai's `deepEqual`, which treats `NaN` as equal to itself and `-0` as unequal
+ * to `0`, while `strictEqual` is `===`. They disagree only when both sides are
+ * `NaN`, or both are zeros, so the call is fixed when either side's type rules
+ * that out — `assert.deepStrictEqual(n, 3)`, where `3` is neither — and
+ * otherwise gets a suggestion, so that a test pinning `NaN` or `-0` is not
  * silently inverted. A number literal type `0` may hold `-0`.
  *
  * The receiver and the call are read through `as`, `satisfies`, `!` and `<T>`,
@@ -71,9 +71,9 @@ export const preferAssertStrictEqualForPrimitivesRule: TSESLint.RuleModule<
       );
 
     /**
-     * How an argument is typed at every layer of its wrappers: `'other'` if
-     * any layer may be a non-primitive, otherwise `'nan-or-zero'` if any layer
-     * may be `NaN`, `0` or `-0`, otherwise `'primitive'`.
+     * How an argument is typed at every layer of its wrappers: `'other'` if any
+     * layer may be a non-primitive, otherwise `'nan-or-zero'` if any layer may
+     * be `NaN`, `0` or `-0`, otherwise `'primitive'`.
      */
     const classify = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -124,8 +124,8 @@ export const preferAssertStrictEqualForPrimitivesRule: TSESLint.RuleModule<
 
         const { property } = node;
 
-        // Only the method name is rewritten, so the receiver keeps whatever
-        // it is called here.
+        // Only the method name is rewritten, so the receiver keeps whatever it
+        // is called here.
         const fix = (fixer: TSESLint.RuleFixer): TSESLint.RuleFix =>
           fixer.replaceText(property, 'strictEqual');
 

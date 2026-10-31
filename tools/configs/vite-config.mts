@@ -23,8 +23,8 @@ type ProjectOverrides = DeepReadonly<{
  *
  * What is shared is the shape: the coverage provider, the Node.js project's
  * settings, and the browser project with its `fileParallelism` workaround.
- * What each package passes is what it genuinely does differently — which
- * files are tests, which are in-source tests, what to alias.
+ * What each package passes is what it genuinely does differently — which files
+ * are tests, which are in-source tests, what to alias.
  */
 export const defineViteConfig = ({
   packageRoot,
@@ -70,8 +70,8 @@ export const defineViteConfig = ({
          * — because a bare name is resolved from the package root, where pnpm
          * has not put it.
          *
-         * Measured on `synstate`, deleting its `node_modules/.vite` before
-         * each run: 6 of 6 runs pass with the list, 4 of 4 fail without it.
+         * Measured on `synstate`, deleting its `node_modules/.vite` before each
+         * run: 6 of 6 runs pass with the list, 4 of 4 fail without it.
          * Warm, it passes either way — which is why this failed only in CI.
          */
         optimizeDepsInclude?: string[];
@@ -96,12 +96,12 @@ export const defineViteConfig = ({
       // What a test changes outside its module — fake timers, a stubbed
       // global or environment variable, the working directory — it restores
       // before it ends, since the next file in the worker runs on whatever is
-      // left. A module mock cannot be kept to its file at all: a module
-      // another file has already imported in the worker keeps the real
-      // dependency, so whether the mock applies depends on the order the
-      // files ran in. A package whose tests mock a module is therefore run
-      // isolated, decided here rather than declared, so that adding the first
-      // `vi.mock` cannot forget it.
+      // left. A module mock cannot be kept to its file at all: a module another
+      // file has already imported in the worker keeps the real dependency, so
+      // whether the mock applies depends on the order the files ran in. A
+      // package whose tests mock a module is therefore run isolated, decided
+      // here rather than declared, so that adding the first `vi.mock` cannot
+      // forget it.
       isolate: usesModuleMocks(packageRoot),
       typecheck: {
         tsconfig: path.resolve(packageRoot, './configs/tsconfig.test.json'),
@@ -117,8 +117,8 @@ export const defineViteConfig = ({
             name: 'Browser',
             alias: castMutable(alias),
             ...projectConfig(packageRoot, browser),
-            // Browser mode fetches each test file over the Vite dev server,
-            // and requesting them one at a time narrows the window in which a
+            // Browser mode fetches each test file over the Vite dev server, and
+            // requesting them one at a time narrows the window in which a
             // mid-run reload can catch a file in flight. `optimizeDepsInclude`
             // is what removes the reload itself; see the comment there.
             fileParallelism: browser.fileParallelism ?? false,
@@ -160,8 +160,8 @@ export const defineViteConfig = ({
 
 /**
  * Whether a file under the package's `src/`, `test/` or `samples/` calls
- * `vi.mock` or `vi.doMock`. Any such file counts, test or not: a false
- * positive costs speed, a false negative an order-dependent failure.
+ * `vi.mock` or `vi.doMock`. Any such file counts, test or not: a false positive
+ * costs speed, a false negative an order-dependent failure.
  */
 export const usesModuleMocks = (packageRoot: string): boolean =>
   fs

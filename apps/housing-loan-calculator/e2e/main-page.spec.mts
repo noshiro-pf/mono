@@ -168,8 +168,8 @@ test(
     // An input commits its value when it loses focus.
     await numericInputBorrowingPeriodYear.blur();
 
-    // The query string is written to the app's own page on the Pages site,
-    // not to the site's root.
+    // The query string is written to the app's own page on the Pages site, not
+    // to the site's root.
     await expect.soft(page).toHaveURL(/\/mono\/housing-loan-calculator\/\?/u);
 
     await page.reload();

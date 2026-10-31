@@ -11,9 +11,9 @@ import { colors } from '../../../components/constants.mjs';
 {/* jsdoc-description */}
 Combines multiple observables by pairing their emissions by index.
 Waits for all sources to emit their nth value before emitting the nth tuple.
-Completes once a completed source has no value left to pair, as RxJS's
-`zip` does: at once if it completes with nothing queued, otherwise after
-the tuple that takes its last queued value.
+Completes once a completed source has no value left to pair, as RxJS's `zip`
+does: at once if it completes with nothing queued, otherwise after the tuple
+that takes its last queued value.
 {/* /jsdoc-description */}
 
 ## Marble Diagram

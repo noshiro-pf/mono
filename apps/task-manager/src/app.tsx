@@ -7,8 +7,8 @@ import {
 import { sessionStore } from './store/index.mjs';
 
 /**
- * A personal task manager whose core is the dependency graph between tasks
- * and milestones: what can be started now follows from what it waits for.
+ * A personal task manager whose core is the dependency graph between tasks and
+ * milestones: what can be started now follows from what it waits for.
  *
  * Which screen is up follows the session alone, and each is built once per
  * change of screen; everything below binds the store's observables.

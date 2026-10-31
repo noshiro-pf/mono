@@ -9,9 +9,9 @@ import { appDevPort } from './app-dev-ports.mjs';
  * `<package-root>/configs`.
  *
  * What every app shares is the shape: the package directory is the Vite root
- * (so `index.html` and `public/` are found where they sit), and the output
- * goes to `build/` — the directory `build-pages-site.mts` copies for an app on
- * the GitHub Pages site, and the one `firebase.json` serves for an app on
+ * (so `index.html` and `public/` are found where they sit), and the output goes
+ * to `build/` — the directory `build-pages-site.mts` copies for an app on the
+ * GitHub Pages site, and the one `firebase.json` serves for an app on
  * Firebase Hosting.
  *
  * Preact and synstate-dom apps pass no plugin. Vite's esbuild transform reads
@@ -38,20 +38,20 @@ export const defineViteAppConfig = ({
   framework: 'preact' | 'react' | 'synstate-dom';
   /**
    * Passed to `@vitejs/plugin-react` so that the build agrees with the
-   * package's `tsconfig.json`. Emotion's `css` prop needs
-   * `'@emotion/react'`; leave it off where the tsconfig does.
+   * package's `tsconfig.json`. Emotion's `css` prop needs `'@emotion/react'`;
+   * leave it off where the tsconfig does.
    */
   jsxImportSource?: string;
   /**
    * The path the built site is served under, for an app published to GitHub
    * Pages rather than to a Firebase host of its own. Pages serves this
    * repository at `/mono/`, and `build-pages-site.mts` puts each app in a
-   * directory below that, so the asset URLs Vite writes have to carry the
-   * whole prefix — the default `/` would ask the browser for
+   * directory below that, so the asset URLs Vite writes have to carry the whole
+   * prefix — the default `/` would ask the browser for
    * `noshiro-pf.github.io/assets/…` and get the user page's 404.
    *
-   * Left off by the Firebase-hosted apps, which are served at the root of
-   * their own domain.
+   * Left off by the Firebase-hosted apps, which are served at the root of their
+   * own domain.
    */
   base?: string;
   /**
@@ -89,13 +89,13 @@ export const defineViteAppConfig = ({
 };
 
 /**
- * Copies the built `index.html` to `<route>/index.html` under `outDir` for
- * each of `routePaths`.
+ * Copies the built `index.html` to `<route>/index.html` under `outDir` for each
+ * of `routePaths`.
  *
- * The copies are the page itself: its asset URLs carry `base`, so it loads
- * from any depth, and the app stays one page — it routes with
- * `history.pushState`, and a copy is only what a direct visit or a reload of
- * that path receives, as a server rewrite would serve it.
+ * The copies are the page itself: its asset URLs carry `base`, so it loads from
+ * any depth, and the app stays one page — it routes with `history.pushState`,
+ * and a copy is only what a direct visit or a reload of that path receives, as
+ * a server rewrite would serve it.
  */
 export const writeRouteEntryPages = (
   outDir: string,

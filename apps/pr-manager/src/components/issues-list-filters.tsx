@@ -19,10 +19,10 @@ import { OfTotal } from './stat-tile.js';
  * each a pick; and the order. What each does is `issues-list-view.mts`, which
  * keeps the choice in the URL.
  *
- * Each number is how many of what it counts the list shows, followed in
- * small by how many there are when that is more — the merge order's
- * counts, for issues. The priorities, `pending` and `in progress` are above
- * these, with the counts (`issues-summary.tsx`), since the DAG reads them too.
+ * Each number is how many of what it counts the list shows, followed in small
+ * by how many there are when that is more — the merge order's counts, for
+ * issues. The priorities, `pending` and `in progress` are above these, with the
+ * counts (`issues-summary.tsx`), since the DAG reads them too.
  */
 export const IssuesListFilters = (): JSX.Element => {
   const { view: view$, counts: counts$ } = issuesListStore;
@@ -133,10 +133,10 @@ export const IssuesListFilters = (): JSX.Element => {
 };
 
 /**
- * One label: its name beside a dot of GitHub's colour for it, and how many
- * open issues carry it. Pressed (`aria-pressed`) is picked, which is drawn
- * in the accent, as the merge order's `only` is: a label not picked is not
- * hidden, and is not struck through as a switched-off priority is.
+ * One label: its name beside a dot of GitHub's colour for it, and how many open
+ * issues carry it. Pressed (`aria-pressed`) is picked, which is drawn in the
+ * accent, as the merge order's `only` is: a label not picked is not hidden, and
+ * is not struck through as a switched-off priority is.
  *
  * A row keyed by the label's name, so the name is the one it was made with.
  */

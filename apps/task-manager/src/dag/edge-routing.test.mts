@@ -141,8 +141,8 @@ const assertContinuous = (geometry: EdgeGeometry): void => {
 };
 
 /**
- * For the tests that route many edges: room for a slow machine, not a bound
- * on how fast routing is.
+ * For the tests that route many edges: room for a slow machine, not a bound on
+ * how fast routing is.
  */
 const HEAVY_TEST_TIMEOUT_MS = 30_000;
 
@@ -164,9 +164,9 @@ const seeded = (seed: number): (() => number) => {
 };
 
 /**
- * Nodes scattered over a grid of cells, at most one to a cell and at least
- * 48 apart, with edges between them in every direction — forwards,
- * backwards, across — as a hand-made arrangement can have.
+ * Nodes scattered over a grid of cells, at most one to a cell and at least 48
+ * apart, with edges between them in every direction — forwards, backwards,
+ * across — as a hand-made arrangement can have.
  */
 const scattered = (
   seed: number,

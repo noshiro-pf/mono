@@ -2,9 +2,9 @@ import { Arr, Num } from 'ts-data-forge';
 import type { Cells } from '../scenario.mjs';
 
 /**
- * The loan every implementation under this directory renders: a fixed-rate
- * loan repaid monthly over {@link months} months, with a prepayment that can
- * be entered for any month. The screen shows one row per year and a summary.
+ * The loan every implementation under this directory renders: a fixed-rate loan
+ * repaid monthly over {@link months} months, with a prepayment that can be
+ * entered for any month. The screen shows one row per year and a summary.
  *
  * Month by month,
  *
@@ -14,14 +14,14 @@ import type { Cells } from '../scenario.mjs';
  *
  * so the balance of one month reaches the next month's balance by three paths
  * of different lengths, and the diamonds are chained {@link months} deep. The
- * monthly rate and the payment enter every month, which adds diamonds that
- * span the whole chain.
+ * monthly rate and the payment enter every month, which adds diamonds that span
+ * the whole chain.
  *
- * The signal-based implementations make one derived value per figure, so
- * that the graph is as large as the calculation; React and Preact compute the
- * figures in a loop when they render. Every implementation computes each
- * figure with the functions below, in the same order, so that they all render
- * the same digits.
+ * The signal-based implementations make one derived value per figure, so that
+ * the graph is as large as the calculation; React and Preact compute the
+ * figures in a loop when they render. Every implementation computes each figure
+ * with the functions below, in the same order, so that they all render the same
+ * digits.
  */
 export type LoanApp = Readonly<{
   /** The annual interest rate, in percent. */
@@ -106,8 +106,8 @@ export const yearCells = (
   [(year + 1).toString(), yen(interest), yen(repaid), yen(balance)] as const;
 
 /**
- * Every figure, computed in one loop over the months: what React and Preact
- * do when they render, and what the harness checks the others against.
+ * Every figure, computed in one loop over the months: what React and Preact do
+ * when they render, and what the harness checks the others against.
  */
 export const computeLoan = (inputs: LoanInputs): Cells => {
   const monthlyRate = monthlyRateOf(inputs.annualRate);

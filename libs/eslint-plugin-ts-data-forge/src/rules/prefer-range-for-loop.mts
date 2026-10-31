@@ -33,8 +33,8 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
 
     /**
      * Whether `node` is the same value on every iteration: a literal, or a
-     * variable that is never reassigned anywhere (not only in the loop, since
-     * a function the loop calls could reassign it). The loop reads its end and
+     * variable that is never reassigned anywhere (not only in the loop, since a
+     * function the loop calls could reassign it). The loop reads its end and
      * its step on every iteration, and `range` reads them once.
      */
     const isStableBound = (
@@ -103,8 +103,8 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
           return;
         }
 
-        // Check test: i < end. The loop variable and the step are read
-        // through type wrappers: `(i satisfies number) < n` tests `i`, and
+        // Check test: i < end. The loop variable and the step are read through
+        // type wrappers: `(i satisfies number) < n` tests `i`, and
         // `i += 0 as number` still steps by 0.
         if (
           node.test?.type !== AST_NODE_TYPES.BinaryExpression ||
@@ -166,8 +166,8 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
             }
           } else if (isNegatedLiteral(stepValue)) {
             // `i += -1` under `i < end` never gets there, and `range` with a
-            // negative step yields nothing: no fix that type-checks would
-            // keep that.
+            // negative step yields nothing: no fix that type-checks would keep
+            // that.
             return;
           } else {
             // Variable step like i += step. Its type is left to the type

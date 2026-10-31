@@ -8,9 +8,9 @@ import type {
 } from './types.mjs';
 
 /**
- * The node `ref` of `state` moved into the group `groupId`, or into none,
- * with `updatedAt` set to `now`; `undefined` if there is no such node, or
- * it is in that group already.
+ * The node `ref` of `state` moved into the group `groupId`, or into none, with
+ * `updatedAt` set to `now`; `undefined` if there is no such node, or it is in
+ * that group already.
  */
 export const regroupNode = (
   state: DomainState,
@@ -37,9 +37,9 @@ export const regroupNode = (
 };
 
 /**
- * What deleting the group `groupId` has to write with it: every node of
- * `state` that was in it, now in none, with `updatedAt` set to `now`. The
- * nodes stay; only the group goes.
+ * What deleting the group `groupId` has to write with it: every node of `state`
+ * that was in it, now in none, with `updatedAt` set to `now`. The nodes stay;
+ * only the group goes.
  */
 export const removeGroup = (
   state: DomainState,

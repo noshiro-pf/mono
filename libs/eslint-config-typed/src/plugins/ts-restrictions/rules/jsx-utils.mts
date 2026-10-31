@@ -8,9 +8,9 @@ import type { DeepReadonly } from 'ts-type-forge';
  *
  * The value of `node` is the value of the `{…}` around it when every step up
  * passes it through unchanged — a branch of a ternary (not its test), an
- * operand of `&&` / `||` / `??`, or a type-only wrapper. `{a ? b : c}` puts
- * `b` and `c` in JSX, and `{(a && b) || c}` puts `a`, `b` and `c` there, since
- * each can be the value that comes out. The test of a ternary never is.
+ * operand of `&&` / `||` / `??`, or a type-only wrapper. `{a ? b : c}` puts `b`
+ * and `c` in JSX, and `{(a && b) || c}` puts `a`, `b` and `c` there, since each
+ * can be the value that comes out. The test of a ternary never is.
  */
 export const jsxValuePositionOf = (
   node: DeepReadonly<TSESTree.Node>,

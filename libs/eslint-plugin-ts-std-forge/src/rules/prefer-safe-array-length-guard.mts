@@ -84,8 +84,8 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
      * answer is no: `.length` is also a string's, a function's and a
      * `TypedArray`'s, and none of those can be handed to the guard. It has to
      * be one at every layer of type wrappers: a string cast to an array is
-     * still a string, and the fix, which keeps the wrapper, hands the guard
-     * the type the outermost layer states.
+     * still a string, and the fix, which keeps the wrapper, hands the guard the
+     * type the outermost layer states.
      */
     const isArrayLike = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -207,8 +207,8 @@ const matchLengthComparison = (
     return undefined;
   }
 
-  // `xs.length === ys.length` has `.length` on both sides and no literal
-  // bound, so the bound check below rejects it.
+  // `xs.length === ys.length` has `.length` on both sides and no literal bound,
+  // so the bound check below rejects it.
   if (
     boundSide.type !== AST_NODE_TYPES.Literal ||
     typeof boundSide.value !== 'number'

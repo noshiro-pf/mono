@@ -19,26 +19,26 @@ import type { BenchmarkEnvironment } from './benchmark/environment.mjs';
  * workflow runs them on its fresh measurement (`check-measurement.mts`) — which
  * it does not hand to `gen:benchmark-doc`, so that a near tie in one noisy
  * re-measurement does not fail the job that judges drift. Without that, a
- * measurement the page could not be generated from at all (two scenarios on
- * two dates, a library with no colour) would become a cached baseline before
- * anyone tried to commit it.
+ * measurement the page could not be generated from at all (two scenarios on two
+ * dates, a library with no colour) would become a cached baseline before anyone
+ * tried to commit it.
  *
  * Here rather than under `scripts/benchmark/`, whose every file is part of the
- * workflow's baseline cache key: a change to a check measures nothing, and
- * must not make `main` re-measure.
+ * workflow's baseline cache key: a change to a check measures nothing, and must
+ * not make `main` re-measure.
  */
 
 /**
  * Where every table on the page was measured, or `undefined` when some table
- * records nothing: those predate the pinned runner, and the page says so
- * rather than inventing a machine for them.
+ * records nothing: those predate the pinned runner, and the page says so rather
+ * than inventing a machine for them.
  *
  * The scenarios must agree, the date included — `benchmark` measures all of
  * them in one pass, and re-measuring one alone (`benchmark:deep-chain`) is
- * useful on one machine and misleading across two, so a disagreement fails
- * here rather than being averaged into a claim. Each runner stamps the date
- * itself, so the workflow pins one for the whole pass
- * (`BENCHMARK_MEASURED_ON`, read in `scripts/benchmark/environment.mts`).
+ * useful on one machine and misleading across two, so a disagreement fails here
+ * rather than being averaged into a claim. Each runner stamps the date itself,
+ * so the workflow pins one for the whole pass (`BENCHMARK_MEASURED_ON`, read in
+ * `scripts/benchmark/environment.mts`).
  */
 export const recordedEnvironment = (): RecordedEnvironment | undefined => {
   const recorded = allResults
@@ -124,9 +124,9 @@ export type RecordedEnvironment = Readonly<{
 }>;
 
 /**
- * Every field a runner records, each compared on its own. The type check
- * below keeps it complete: a field added to what the runners write and not
- * here would let two machines that differ only in it pass as one.
+ * Every field a runner records, each compared on its own. The type check below
+ * keeps it complete: a field added to what the runners write and not here would
+ * let two machines that differ only in it pass as one.
  */
 const ENVIRONMENT_KEYS = [
   'runner',
@@ -145,9 +145,9 @@ expectType<keyof RecordedEnvironment, keyof BenchmarkEnvironment>('=');
 
 /**
  * What these checks read of a results file. `updates`, which every runner
- * writes, is here only so that `meta` is not a weak type: TypeScript refuses
- * an object that shares no property with a type whose every property is
- * optional, and so would refuse the very tables without an environment that
+ * writes, is here only so that `meta` is not a weak type: TypeScript refuses an
+ * object that shares no property with a type whose every property is optional,
+ * and so would refuse the very tables without an environment that
  * {@link recordedEnvironment} tolerates.
  */
 type ResultsWithEnvironment = Readonly<{
@@ -155,8 +155,8 @@ type ResultsWithEnvironment = Readonly<{
 }>;
 
 /**
- * Every committed table: each is a table on the page, so the environment it
- * was measured in has to agree with the others' or the page's one-sentence
+ * Every committed table: each is a table on the page, so the environment it was
+ * measured in has to agree with the others' or the page's one-sentence
  * description of where the numbers come from is false.
  */
 const allResults: readonly ResultsWithEnvironment[] = [

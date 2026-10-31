@@ -1,6 +1,6 @@
 // Sumi bans classes, `this`, method syntax and writes to `this` outside a
-// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
-// so those rules are waived here (D-63).
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why), so
+// those rules are waived here (D-63).
 // @sumi-expect-error-file classes/no-class
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
@@ -83,8 +83,8 @@ class SkipUntilObservableClass<A>
       initialValue: Optional.none,
     });
 
-    // A notifier that already holds a value, or has completed, would stop
-    // the skipping inside `subscribe`, before the subscription is stored.
+    // A notifier that already holds a value, or has completed, would stop the
+    // skipping inside `subscribe`, before the subscription is stored.
     this.#mut_isSkipping =
       Optional.isNone(notifier.getSnapshot()) && !notifier.isCompleted;
 

@@ -9,13 +9,12 @@ import { ExternalLink } from './external-link.js';
  * Where a reader gives the page a token, and — the part that matters more —
  * where they are told which one to make.
  *
- * Open until there is a token, because the page reads nothing without one,
- * and closed after, because then it has nothing left to ask. What is behind
- * it is the recipe and the reason for it: GraphQL answers nobody without a
- * token, but reading a public repository needs no permission at all, so the
- * token this page wants is the weakest GitHub can mint. Saying so is what
- * keeps a reader from reaching for `repo` because it sounded like the one
- * that works.
+ * Open until there is a token, because the page reads nothing without one, and
+ * closed after, because then it has nothing left to ask. What is behind it is
+ * the recipe and the reason for it: GraphQL answers nobody without a token, but
+ * reading a public repository needs no permission at all, so the token this
+ * page wants is the weakest GitHub can mint. Saying so is what keeps a reader
+ * from reaching for `repo` because it sounded like the one that works.
  */
 export const TokenPanel = (): JSX.Element => {
   const { token } = tokenStore;
@@ -122,14 +121,14 @@ const INPUT_ID = 'github-token';
 const REMEMBER_ID = 'github-token-remember';
 
 /**
- * What GitHub allows, said before it has answered for the first time. Only
- * the fallback: the numbers on screen after that are GitHub's own.
+ * What GitHub allows, said before it has answered for the first time. Only the
+ * fallback: the numbers on screen after that are GitHub's own.
  */
 const GRAPHQL_LIMIT = 5000;
 
 /**
- * The budget belongs to the token's account, so anything else that account
- * does with GraphQL spends it too.
+ * The budget belongs to the token's account, so anything else that account does
+ * with GraphQL spends it too.
  */
 const RUNNING_LOW =
   ' Running low — the budget is shared with everything else this account does with GraphQL, and it resets within the hour.';
@@ -170,9 +169,8 @@ const stateWords = (
  *
  * Deliberately specific. "Read-only access" is the kind of instruction that
  * gets read as `repo` on the classic page, which is write access to every
- * private repository the account can see — so the classic recipe here is
- * *tick nothing*, in those words, with GitHub's own sentence about what that
- * grants.
+ * private repository the account can see — so the classic recipe here is *tick
+ * nothing*, in those words, with GitHub's own sentence about what that grants.
  */
 const TokenHelp = (): JSX.Element => (
   <details class={constant('token-help')}>

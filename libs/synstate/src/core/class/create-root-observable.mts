@@ -8,8 +8,8 @@ import type { RootObservable } from '../types/index.mjs';
 import { RootObservableClass } from './root-observable-class.mjs';
 
 /**
- * The tools a custom root's `init` receives: the `protected` methods a
- * subclass of `RootObservableClass` inherits.
+ * The tools a custom root's `init` receives: the `protected` methods a subclass
+ * of `RootObservableClass` inherits.
  */
 export type RootObservableTools<A> = Readonly<{
   /** Emits `nextValue` and propagates the update to all descendants. */
@@ -23,9 +23,9 @@ export type RootObservableTools<A> = Readonly<{
   complete: () => void;
 
   /**
-   * Registers a teardown (clear timers, abort requests, remove listeners, …)
-   * to run at the beginning of `complete()`, in the order registered. Called
-   * from `init`, it lets the teardown close over what `init` creates.
+   * Registers a teardown (clear timers, abort requests, remove listeners, …) to
+   * run at the beginning of `complete()`, in the order registered. Called from
+   * `init`, it lets the teardown close over what `init` creates.
    * Registered once the observable has completed — `init` may complete it
    * synchronously first — the teardown runs at once.
    */
@@ -37,13 +37,13 @@ export type RootObservableConfig<A> = Readonly<{
 }>;
 
 /**
- * Creates a root observable, for a custom creator written without a class
- * of its own.
+ * Creates a root observable, for a custom creator written without a class of
+ * its own.
  *
- * `init` runs during construction, receives the tools, and returns extra
- * public members to merge into the observable (e.g. `next` for a source,
- * `start` for a timer). It may register asynchronous callbacks that use the
- * tools, and may call `complete` synchronously.
+ * `init` runs during construction, receives the tools, and returns extra public
+ * members to merge into the observable (e.g. `next` for a source, `start` for a
+ * timer). It may register asynchronous callbacks that use the tools, and may
+ * call `complete` synchronously.
  */
 export const createRootObservable = <
   A,

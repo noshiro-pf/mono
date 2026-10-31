@@ -85,8 +85,8 @@ export type DatePickerOptions = Readonly<{
 type Props = DatePickerOptions &
   Readonly<{
     /**
-     * `YYYY-MM-DDTHH:mm` with a `timePrecision`, `YYYY-MM-DD` without, and
-     * `''` for none.
+     * `YYYY-MM-DDTHH:mm` with a `timePrecision`, `YYYY-MM-DD` without, and `''`
+     * for none.
      */
     value: Bindable<string>;
     onChange: (value: string) => void;
@@ -151,8 +151,8 @@ export const DatePicker = ({
     ),
   );
 
-  // The day of the month the value was last on, which a change of month
-  // keeps; Blueprint's `selectedDay`.
+  // The day of the month the value was last on, which a change of month keeps;
+  // Blueprint's `selectedDay`.
   const mut_memory: { selectedDay: number } = {
     selectedDay: Optional.isSome(initial) ? initial.value.day : 1,
   };
@@ -165,8 +165,8 @@ export const DatePicker = ({
 
   const afterUpdate = createAfterUpdate();
 
-  // The month shown follows the value. Written once the update that brought
-  // the value has finished, since a state is not written while another is
+  // The month shown follows the value. Written once the update that brought the
+  // value has finished, since a state is not written while another is
   // propagating.
   subscribeInScope(value$, (current) => {
     if (Optional.isSome(current)) {

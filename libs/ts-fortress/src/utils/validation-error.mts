@@ -117,8 +117,8 @@ export type ValidationErrorDetails = Readonly<
 
 /**
  * Describes which `string` constraint (see the `string` codec) a value failed,
- * together with the constraint's configured value. `value` doubles as the
- * value shown in the constructor-time "defaultValue ... does not satisfy the
+ * together with the constraint's configured value. `value` doubles as the value
+ * shown in the constructor-time "defaultValue ... does not satisfy the
  * constraint ..." message, so it mirrors the raw constraint input (the flag
  * constraints carry `true`, `regex` carries its `source`).
  */
@@ -212,8 +212,8 @@ export const validationErrorToMessage = (
  * Human-readable name for the runtime type of a value.
  *
  * `typeof` reports a bare `"object"` for `null` and for every non-primitive,
- * which makes an error message unable to distinguish a plain object from
- * `null` or from the basic containers, so those are named individually.
+ * which makes an error message unable to distinguish a plain object from `null`
+ * or from the basic containers, so those are named individually.
  */
 export const runtimeTypeNameOf = (value: unknown): string =>
   value === null
@@ -246,8 +246,8 @@ type ActualValueView = Readonly<{
 }>;
 
 /**
- * Converts an array of validation errors to an array of string messages
- * (for backward compatibility)
+ * Converts an array of validation errors to an array of string messages (for
+ * backward compatibility)
  */
 export const validationErrorsToMessages = (
   errors: readonly ValidationError[],
@@ -334,13 +334,13 @@ const withUnmatchedReason = (
     : (`${summary} ${unmatchedReason}` as const);
 
 /**
- * Renders the subject of the trailing `"... was passed."` clause, prefixed
- * with the value's runtime type (`<string> type value "purple"`).
+ * Renders the subject of the trailing `"... was passed."` clause, prefixed with
+ * the value's runtime type (`<string> type value "purple"`).
  *
  * `unmatchedReason` is used only when the value is too long to print: for a
- * type that accepts several shapes (a union, an enum, an intersection),
- * naming the runtime type alone reads as if that type were acceptable, so the
- * reason why the value was rejected has to be spelled out instead.
+ * type that accepts several shapes (a union, an enum, an intersection), naming
+ * the runtime type alone reads as if that type were acceptable, so the reason
+ * why the value was rejected has to be spelled out instead.
  */
 const typedValueClause = (
   actualValue: ActualValueView,

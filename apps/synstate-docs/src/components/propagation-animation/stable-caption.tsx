@@ -9,10 +9,10 @@ type Props = Readonly<{
 }>;
 
 /**
- * The caption of the step shown, in a box as tall as the tallest caption at
- * the current width, so that what follows it — the controls — stays put as
- * the steps change. Every caption is laid out, hidden, in the same grid cell
- * as the one shown.
+ * The caption of the step shown, in a box as tall as the tallest caption at the
+ * current width, so that what follows it — the controls — stays put as the
+ * steps change. Every caption is laid out, hidden, in the same grid cell as the
+ * one shown.
  */
 export const StableCaption = React.memo<Props>((props) => {
   const { captions, current, style } = props;

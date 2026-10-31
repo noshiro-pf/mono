@@ -167,8 +167,8 @@ export const buildCoverageGraph = (
 /**
  * The scripts one script body runs, as patterns rather than names: a body may
  * name a script (`pnpm run check:md`), a regular expression pnpm expands over
- * the manifest (`pnpm run '/check:prose:.-/'`), or a glob `npm-run-all`
- * expands the same way (`run-p check:test:-`).
+ * the manifest (`pnpm run '/check:prose:.-/'`), or a glob `npm-run-all` expands
+ * the same way (`run-p check:test:-`).
  *
  * `recursive` holds what a `pnpm run --recursive` reaches, which is the named
  * script of every workspace package rather than a sibling of the caller. That
@@ -183,16 +183,15 @@ export const resolveScriptInvocations = (body: string): ScriptInvocations => {
   for (const matched of body.matchAll(PNPM_RUN)) {
     const tokens = tokenize(matched.groups?.['args'] ?? '');
 
-    // Everything before the script name is a flag of pnpm's own
-    // (`--recursive`, `--if-present`); everything after it is an argument
-    // handed to the script, and an argument can change what the script does.
+    // Everything before the script name is a flag of pnpm's own (`--recursive`,
+    // `--if-present`); everything after it is an argument handed to the script,
+    // and an argument can change what the script does.
     // `verify:npm-packages:published` is `pnpm run verify:npm-packages
     // --published`, and what `--published` selects — the versions pinned
-    // under verify-npm-packages/published rather than tarballs packed from
-    // the checkout — is a different question from the one the bare script
-    // asks. Whether a variant still covers the script it wraps is a
-    // judgement, so it belongs in {@link DECLARED_COVERAGE} rather than being
-    // read off the body.
+    // under verify-npm-packages/published rather than tarballs packed from the
+    // checkout — is a different question from the one the bare script asks.
+    // Whether a variant still covers the script it wraps is a judgement, so it
+    // belongs in {@link DECLARED_COVERAGE} rather than being read off the body.
     const targetIndex = tokens.findIndex((token) => !token.startsWith('-'));
 
     const target = targetIndex === -1 ? undefined : tokens[targetIndex];
@@ -247,11 +246,11 @@ export const matchScriptNames = (
  *
  * Only jobs that run on the same Node are compared. A workflow that pins an
  * explicit `node-version` is running its commands *because* of the version,
- * which is the whole of `node-version-compatibility.yml`: its
- * `ws:check:test` is covered by `code-check`'s `ws:check:test:cov` on paper
- * and is not the same check, because the Node underneath differs. Which
- * versions that matrix may name is `check-node-support.mts`'s question, and it
- * is the one that caught `current` naming the same Node as `volta.node`.
+ * which is the whole of `node-version-compatibility.yml`: its `ws:check:test`
+ * is covered by `code-check`'s `ws:check:test:cov` on paper and is not the same
+ * check, because the Node underneath differs. Which versions that matrix may
+ * name is `check-node-support.mts`'s question, and it is the one that caught
+ * `current` naming the same Node as `volta.node`.
  */
 export const findRedundantCommands = (
   workflows: readonly CheckWorkflow[],
@@ -304,9 +303,9 @@ export const findRedundantCommands = (
  *
  * A script is a check when its name says so, because that is what the verb
  * namespaces in CLAUDE.md make a name mean: `check:` reads and reports, and a
- * `check:` script nothing runs is the failure this half exists to find. What
- * is deliberately not run is {@link UNCOVERED_BY_DESIGN}, with the reason
- * beside it.
+ * `check:` script nothing runs is the failure this half exists to find. What is
+ * deliberately not run is {@link UNCOVERED_BY_DESIGN}, with the reason beside
+ * it.
  */
 export const findUncoveredCommands = (
   workflows: readonly CheckWorkflow[],
@@ -379,8 +378,8 @@ const ROOT_DIRECTORY = '.';
 /**
  * A workflow is one of the repository's checks when it triggers on
  * `pull_request`, which is exactly the six named in CLAUDE.md.
- * `lint-pull-request.yml` and `skip-ci-label.yml` use `pull_request_target`
- * and run no repository command; `check-gates.yml` is reached through
+ * `lint-pull-request.yml` and `skip-ci-label.yml` use `pull_request_target` and
+ * run no repository command; `check-gates.yml` is reached through
  * `workflow_call`. The rest — the release, the dependency updates, the Pages
  * deploy — run commands that nothing about a pull request depends on, so a
  * check only they reach is a check no pull request gets.
@@ -397,8 +396,8 @@ const PNPM_RUN = /pnpm run (?<args>[^&|;\n]*)/gu;
 const RUN_ALL = /\brun-[sp] (?<args>[^&|;\n]*)/gu;
 
 /**
- * `pnpm run ${{ matrix.<key> }}`, which is how both matrix workflows invoke
- * the entry they are running.
+ * `pnpm run ${{ matrix.<key> }}`, which is how both matrix workflows invoke the
+ * entry they are running.
  */
 const MATRIX_COMMAND = /pnpm run \$\{\{ matrix\.(?<key>[a-z_]+) \}\}/gu;
 
@@ -471,8 +470,8 @@ const DECLARED_COVERAGE: readonly CoverageDeclaration[] = [
 /**
  * Checks no check workflow runs, on purpose.
  *
- * An entry is a claim that something else already covers the script, or that
- * it is not a check a pull request needs; either way the reason is the point.
+ * An entry is a claim that something else already covers the script, or that it
+ * is not a check a pull request needs; either way the reason is the point.
  */
 const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
   {
@@ -498,25 +497,25 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
   {
     directory: ROOT_DIRECTORY,
     scriptName: 'ws:check:lint',
-    // `code-check.yml` runs `ws:fix:lint` as two halves,
-    // `ws:fix:lint:apps` and `ws:fix:lint:non-apps`, which between them reach
-    // every package's `fix:lint` — and through it `check:lint`. Neither half
-    // covers the root command on its own, so no `DECLARED_COVERAGE` edge says
-    // so; that the halves partition the packages is in their filters.
+    // `code-check.yml` runs `ws:fix:lint` as two halves, `ws:fix:lint:apps` and
+    // `ws:fix:lint:non-apps`, which between them reach every package's
+    // `fix:lint` — and through it `check:lint`. Neither half covers the root
+    // command on its own, so no `DECLARED_COVERAGE` edge says so; that the
+    // halves partition the packages is in their filters.
   },
   {
     // Every package that defines one.
     scriptName: 'check-all',
-    // The per-package aggregate. Everything in it is covered by the root
-    // `ws:` command for the same check, which is what CI runs.
+    // The per-package aggregate. Everything in it is covered by the root `ws:`
+    // command for the same check, which is what CI runs.
   },
   {
     directory: 'apps/event-schedule-app',
     scriptName: 'check:e2e:emulators',
     // The end-to-end test that writes to Firestore, run against the Firebase
     // emulators, which need Java and firebase-tools that no runner sets up.
-    // `check:e2e` runs the rest of the suite; this one is run by hand until
-    // the emulators are wired into a workflow.
+    // `check:e2e` runs the rest of the suite; this one is run by hand until the
+    // emulators are wired into a workflow.
   },
   {
     directory: 'apps/event-schedule-app',
@@ -585,14 +584,14 @@ const toCommandId = (directory: string, scriptName: string): CommandId =>
  * Whether a script's name says it is a check a pull request should get.
  *
  * The verb namespaces in CLAUDE.md are what make a name mean this: `check:`
- * reads and reports, so a `check:` script nothing runs is a question nobody
- * is asking. A leading scope is skipped, so `ws:check:types` and
+ * reads and reports, so a `check:` script nothing runs is a question nobody is
+ * asking. A leading scope is skipped, so `ws:check:types` and
  * `strict-lib:check:lint` count too, and `verify:` joins them — what
  * verify-npm-packages/ reads is the published artifact rather than the source,
  * which is a check by every meaning except the prefix.
  *
- * The `z:` namespace is this repository's plumbing: a script another script
- * or a workflow's own glue invokes, never a check in its own right.
+ * The `z:` namespace is this repository's plumbing: a script another script or
+ * a workflow's own glue invokes, never a check in its own right.
  * `z:check-should-run` is the diff gate, which check-gates.yml calls through
  * `workflow_call` — a workflow that triggers on nothing and so is not one of
  * the six below.

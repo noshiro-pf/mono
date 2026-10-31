@@ -8,8 +8,8 @@ import {
 } from '../data.mjs';
 
 /**
- * The table as SPEC.md has an application write it: the rows are one
- * immutable array in a state, and `For` derives each row's value from it.
+ * The table as SPEC.md has an application write it: the rows are one immutable
+ * array in a state, and `For` derives each row's value from it.
  */
 export const synstateDom: Framework = {
   name: 'synstate-dom',

@@ -5,8 +5,8 @@ import { record } from '../record/index.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { union } from './union.mjs';
 
-// These tests pin down the error messages produced when a value fails to
-// match a union type, especially for unions whose member listing is long.
+// These tests pin down the error messages produced when a value fails to match
+// a union type, especially for unions whose member listing is long.
 
 describe('union - error messages', () => {
   // A discriminated union whose full member listing is too long to be a
@@ -123,8 +123,8 @@ describe('union - error messages', () => {
 
     test('a value too long to print is reported as matching no member', () => {
       // Printing the value is what tells the reader why it was rejected, so
-      // when it has to be omitted the message says so instead of reporting
-      // only its runtime type (which is a type the union does accept).
+      // when it has to be omitted the message says so instead of reporting only
+      // its runtime type (which is a type the union does accept).
       const result = color.validate('purple'.repeat(10));
 
       assert.isTrue(Result.isErr(result));

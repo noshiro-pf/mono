@@ -318,8 +318,8 @@ const getHandleMidpointAndOffset = (
 
   const sizeKey = useOppositeDimension ? 'height' : 'width';
 
-  // "bottom" value seems to be consistently incorrect, so explicitly
-  // calculate it using the window offset instead.
+  // "bottom" value seems to be consistently incorrect, so explicitly calculate
+  // it using the window offset instead.
   const handleOffset = handleRect.left;
 
   return { handleMidpoint: handleRect[sizeKey] / 2, handleOffset };

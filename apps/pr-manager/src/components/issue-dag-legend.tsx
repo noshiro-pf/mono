@@ -4,8 +4,8 @@ import { issuesViewStore } from '../store/index.mjs';
 import { legendStates, stateLabels } from './issue-dag-states.mjs';
 
 /**
- * What the colours and the shapes of the DAG mean — only those it draws,
- * so the key stays as short as the graph lets it.
+ * What the colours and the shapes of the DAG mean — only those it draws, so the
+ * key stays as short as the graph lets it.
  */
 export const IssueDagLegend = (): JSX.Element => {
   const graph$ = issuesViewStore.graph;

@@ -27,8 +27,8 @@ type Props = Readonly<{
   size: Bindable<Partial<RectSize>>;
   onClick?: () => void;
   /**
-   * Reports where the card is after every value of `measureOn`, the current
-   * one included: once the update that brought it has been drawn.
+   * Reports where the card is after every value of `measureOn`, the current one
+   * included: once the update that brought it has been drawn.
    */
   rectReport?: Readonly<{
     measureOn: InitializedObservable<unknown>;

@@ -1,8 +1,8 @@
 /**
- * What a dialog shows about the node as drafted — its status, the
- * dependencies that do not hold — so that adding a dependency or changing
- * the progress shows its effect before it is saved. The dependencies are
- * those the dialog's rows would save (`validDependencies`).
+ * What a dialog shows about the node as drafted — its status, the dependencies
+ * that do not hold — so that adding a dependency or changing the progress shows
+ * its effect before it is saved. The dependencies are those the dialog's rows
+ * would save (`validDependencies`).
  */
 
 import { Result } from 'ts-data-forge';
@@ -39,8 +39,8 @@ export const taskDraftInsight = (
     state.tasks.find((task) => task.id === id) ??
     createTask({ id, title: '', now });
 
-  // The start time is kept from the stored task; a task drafted into
-  // progress has not started yet, but is evaluated as if it had.
+  // The start time is kept from the stored task; a task drafted into progress
+  // has not started yet, but is evaluated as if it had.
   const drafted: Task = {
     ...stored,
     progress: draft.progress,

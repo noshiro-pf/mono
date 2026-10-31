@@ -15,10 +15,10 @@ import { mapInSequence } from './map-in-sequence.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 /**
- * Runs `pnpm run benchmark` several times and writes the median of the runs
- * to RESULTS.md, with each library's time as a ratio of synstate-dom's. One
- * run moves by 10–30% from the next on the same machine, more than most
- * changes worth measuring, so a figure worth quoting is a median of several.
+ * Runs `pnpm run benchmark` several times and writes the median of the runs to
+ * RESULTS.md, with each library's time as a ratio of synstate-dom's. One run
+ * moves by 10–30% from the next on the same machine, more than most changes
+ * worth measuring, so a figure worth quoting is a median of several.
  *
  * ```sh
  * pnpm run benchmark:repeat                          # 5 runs
@@ -26,15 +26,14 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
  * pnpm run benchmark:repeat -- --baseline origin/main
  * ```
  *
- * Each run measures the libraries in a different order
- * (`BENCHMARK_ROTATE`), so that no library is always the one measured on a
- * cold browser.
+ * Each run measures the libraries in a different order (`BENCHMARK_ROTATE`), so
+ * that no library is always the one measured on a cold browser.
  *
  * With `--baseline <git ref>`, the ref is checked out in a temporary worktree,
  * installed and built, and its benchmark runs alternately with this one's, so
  * that both see the same machine. The comparison is printed, not written:
- * RESULTS.md stays this tree's. The other libraries' columns show how much
- * the machine moved between the two.
+ * RESULTS.md stays this tree's. The other libraries' columns show how much the
+ * machine moved between the two.
  *
  * Needs `pnpm run ws:build` first, like `pnpm run benchmark`.
  */
@@ -308,11 +307,11 @@ const median = (samples: readonly number[]): number => {
 };
 
 /**
- * The median of each cell over `tables`, which must share their layout. A
- * cell that is `NaN` (`wrong`) in any run is `NaN`. Rounded as RESULTS.md
- * prints it, so that a ratio here is the one a reader gets from the medians
- * shown, as the docs site's embedding computes it; a scenario's figure is a
- * tenth of a millisecond, where the rounding moves a ratio by 5%.
+ * The median of each cell over `tables`, which must share their layout. A cell
+ * that is `NaN` (`wrong`) in any run is `NaN`. Rounded as RESULTS.md prints it,
+ * so that a ratio here is the one a reader gets from the medians shown, as the
+ * docs site's embedding computes it; a scenario's figure is a tenth of a
+ * millisecond, where the rounding moves a ratio by 5%.
  */
 const medianTable = (tables: readonly Table[]): Table => {
   const [first] = tables;
@@ -378,8 +377,8 @@ const ratioTable = (table: Table): string => {
 };
 
 /**
- * Each library's median before and after, with the change as a ratio. A
- * library only one side measures is left out.
+ * Each library's median before and after, with the change as a ratio. A library
+ * only one side measures is left out.
  */
 const comparisonTable = (before: Table, after: Table): string => {
   const shared = after.columns.filter((c) => before.columns.includes(c));

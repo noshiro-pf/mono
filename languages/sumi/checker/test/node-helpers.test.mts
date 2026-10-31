@@ -10,8 +10,8 @@ import {
 import { runRules, wrapperLayers, type Rule } from '../src/index.mjs';
 
 /**
- * Reports the initializer of every `const probe… = …`, with the text of each
- * of its {@link wrapperLayers} joined by ` | `.
+ * Reports the initializer of every `const probe… = …`, with the text of each of
+ * its {@link wrapperLayers} joined by ` | `.
  */
 const layersProbe: Rule = {
   ruleId: 'test/wrapper-layers',

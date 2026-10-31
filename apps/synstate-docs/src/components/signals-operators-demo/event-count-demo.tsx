@@ -8,8 +8,8 @@ import { eventCountText as text } from './text.mjs';
 type Props = Readonly<{ lang: Lang }>;
 
 /**
- * Clicks counted twice: by an effect over a signal of the clicked item's id,
- * as Preact Signals has no `scan`, and by SynState's `scan` over an emitter.
+ * Clicks counted twice: by an effect over a signal of the clicked item's id, as
+ * Preact Signals has no `scan`, and by SynState's `scan` over an emitter.
  */
 export const EventCountDemo = ({ lang }: Props): preact.JSX.Element => {
   const [generation, setGeneration] = useState(0);

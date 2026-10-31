@@ -1,18 +1,18 @@
 /**
  * The dependency graph laid out by ELK's layered algorithm: what goes in
- * (`layoutInput`, then `toElkGraph`) and what comes back (`fromElkGraph`) —
- * the position of every node, and the box of every group. ELK lays out the
- * nodes alone, an empty group as a box of its own, and the groups are made
- * room for afterwards (`clearOfFrames`). Edges are drawn by
- * `edge-routing.mts` from wherever the nodes end up, so ELK's routes are not
- * read; the edges and their labels go in so that it leaves room for them.
+ * (`layoutInput`, then `toElkGraph`) and what comes back (`fromElkGraph`) — the
+ * position of every node, and the box of every group. ELK lays out the nodes
+ * alone, an empty group as a box of its own, and the groups are made room for
+ * afterwards (`clearOfFrames`). Edges are drawn by `edge-routing.mts` from
+ * wherever the nodes end up, so ELK's routes are not read; the edges and their
+ * labels go in so that it leaves room for them.
  *
  * Nodes have a fixed size per kind and per the reader's node size
  * (`nodeBoxSize`), and their titles are cut to fit (`truncate.mts`), so the
  * layout depends on the structure alone — the nodes, the edges and their
- * labels, the groups and who is in them — and on the node size, and not on
- * the titles: `layoutKey` changes only when one of those does, which is when
- * the layout has to be computed again.
+ * labels, the groups and who is in them — and on the node size, and not on the
+ * titles: `layoutKey` changes only when one of those does, which is when the
+ * layout has to be computed again.
  */
 
 import {
@@ -41,8 +41,8 @@ import { textWidthUnits } from './truncate.mjs';
 export const TASK_NODE_SIZE = { width: 184, height: 56 } as const;
 
 /**
- * A title, and its date under it: as high as a task, so that a date given
- * or taken away changes no layout.
+ * A title, and its date under it: as high as a task, so that a date given or
+ * taken away changes no layout.
  */
 export const MILESTONE_NODE_SIZE = { width: 168, height: 56 } as const;
 
@@ -53,8 +53,8 @@ export const COMPACT_MILESTONE_NODE_SIZE = { width: 140, height: 32 } as const;
 
 /**
  * 「大」: up to three lines of title, and its due date under them. As high
- * whatever the title, so that a title edited changes no layout, as at the
- * other sizes.
+ * whatever the title, so that a title edited changes no layout, as at the other
+ * sizes.
  */
 export const LARGE_TASK_NODE_SIZE = { width: 264, height: 96 } as const;
 
@@ -111,8 +111,8 @@ export const arrangementScale = (nodeSize: NodeSize): Scale =>
   nodeSize === 'large' ? SPREAD_AT_LARGE : UNSCALED;
 
 /**
- * `nodes` where they are, each with the box of its kind at `nodeSize`: a
- * layout made at another size, drawn at this one until it is made again.
+ * `nodes` where they are, each with the box of its kind at `nodeSize`: a layout
+ * made at another size, drawn at this one until it is made again.
  */
 export const resizeNodes = (
   nodes: readonly LaidOutNode[],
@@ -128,8 +128,8 @@ export const resizeNodes = (
 
 /**
  * What ELK is given: the nodes of `graph` at `nodeSize`, its edges, and the
- * `groups` of them, in the order they are listed. A member that is not a
- * node of `graph` is left out.
+ * `groups` of them, in the order they are listed. A member that is not a node
+ * of `graph` is left out.
  */
 export const layoutInput = (
   graph: DependencyGraph,
@@ -171,8 +171,8 @@ export const toElkGraph = (input: LayoutInput): ElkNode => {
   const nodeBoxes = new Map(input.nodes.map((node) => [node.id, node]));
 
   // Each group's members one after another, where its first one is: in the
-  // order of the model, which ELK keeps where it costs no crossing, they
-  // tend to come out side by side, which keeps the frames small.
+  // order of the model, which ELK keeps where it costs no crossing, they tend
+  // to come out side by side, which keeps the frames small.
   const ordered = input.nodes.flatMap(({ id }): readonly GraphNodeId[] => {
     const group = groupOf.get(id);
 
@@ -193,17 +193,17 @@ export const toElkGraph = (input: LayoutInput): ElkNode => {
       'elk.direction': elkDirection(input.direction),
       'elk.edgeRouting': 'ORTHOGONAL',
       // Fewer crossings for more time, which stays well under a second at a
-      // hundred nodes: 30 crossed a sixth fewer edges there than the
-      // default 7, and 100 no fewer again.
+      // hundred nodes: 30 crossed a sixth fewer edges there than the default 7,
+      // and 100 no fewer again.
       'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
       'elk.layered.thoroughness': '30',
-      // The same graph comes out the same, and close to the order the
-      // nodes and edges were made in, unless that crosses more edges.
+      // The same graph comes out the same, and close to the order the nodes and
+      // edges were made in, unless that crosses more edges.
       'elk.layered.considerModelOrder.strategy': 'NODES_AND_EDGES',
-      // Shorter, straighter edges than BRANDES_KOEPF: on the sample data
-      // and on three tasks one of which skips another's layer, no edge
-      // needs routing round a node, and at a hundred nodes the edges are
-      // 10–20 % shorter for as many crossings.
+      // Shorter, straighter edges than BRANDES_KOEPF: on the sample data and on
+      // three tasks one of which skips another's layer, no edge needs routing
+      // round a node, and at a hundred nodes the edges are 10–20 % shorter for
+      // as many crossings.
       'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
       'elk.padding': ELK_PADDING,
     },
@@ -226,11 +226,11 @@ export const toElkGraph = (input: LayoutInput): ElkNode => {
       sources: [from],
       targets: [to],
       // At the head, which ELK makes room for between the two layers. In the
-      // middle, it would be a node of a layer of its own, which every
-      // labelled edge would skip: a layer between two members of a group
-      // that only what is not in it could go into, to be moved out of the
-      // frame (`clearOfFrames`) and leave the layer empty inside it. Where
-      // the label is drawn, `edge-routing.mts` decides.
+      // middle, it would be a node of a layer of its own, which every labelled
+      // edge would skip: a layer between two members of a group that only what
+      // is not in it could go into, to be moved out of the frame
+      // (`clearOfFrames`) and leave the layer empty inside it. Where the label
+      // is drawn, `edge-routing.mts` decides.
       labels:
         label === ''
           ? []
@@ -246,10 +246,10 @@ export const toElkGraph = (input: LayoutInput): ElkNode => {
 };
 
 /**
- * The positions ELK chose, in the order of `input`, then moved apart across
- * the layers until nothing is inside a frame but its members
- * (`clearOfFrames`). A node or a group ELK did not place (which it does not
- * do) is at the origin rather than dropped.
+ * The positions ELK chose, in the order of `input`, then moved apart across the
+ * layers until nothing is inside a frame but its members (`clearOfFrames`). A
+ * node or a group ELK did not place (which it does not do) is at the origin
+ * rather than dropped.
  */
 export const fromElkGraph = (
   input: LayoutInput,
@@ -277,14 +277,14 @@ export const fromElkGraph = (
 /**
  * `input` laid out by `elk` (`toElkGraph`, then `fromElkGraph`).
  *
- * ELK lays out each part of a graph that no edge joins to the rest on its
- * own, and packs the parts in rows. A group with members in more than one
- * part has its frame drawn round the rows of other parts between them,
- * which `clearOfFrames` then moves out of the frame, leaving the rows empty
- * inside it. So when a group joins parts no edge does, each set of nodes
- * that edges and groups join is laid out on its own, and those are packed
- * as ELK packs the parts of a graph, as boxes, `PLACEMENT_GAP` apart so
- * that no frame comes closer than that to what it does not hold.
+ * ELK lays out each part of a graph that no edge joins to the rest on its own,
+ * and packs the parts in rows. A group with members in more than one part has
+ * its frame drawn round the rows of other parts between them, which
+ * `clearOfFrames` then moves out of the frame, leaving the rows empty inside
+ * it. So when a group joins parts no edge does, each set of nodes that edges
+ * and groups join is laid out on its own, and those are packed as ELK packs the
+ * parts of a graph, as boxes, `PLACEMENT_GAP` apart so that no frame comes
+ * closer than that to what it does not hold.
  */
 export const layOutGraph = async (
   input: LayoutInput,
@@ -373,28 +373,27 @@ export const layOutGraph = async (
 };
 
 /**
- * `layout` with its nodes and groups moved across the layers — down when
- * the graph grows to the right, to the right when it grows down — so that
- * no frame of a group (`frameAround`) comes within `PLACEMENT_GAP` of a
- * node or a frame it does not hold, and each group's box is its frame. Two
- * nodes, or a node and an empty group, are kept as far apart as they were.
+ * `layout` with its nodes and groups moved across the layers — down when the
+ * graph grows to the right, to the right when it grows down — so that no frame
+ * of a group (`frameAround`) comes within `PLACEMENT_GAP` of a node or a frame
+ * it does not hold, and each group's box is its frame. Two nodes, or a node and
+ * an empty group, are kept as far apart as they were.
  *
  * First the members of each group are drawn together across the layers
  * (`closeGapsBetweenMembers`): a band across the frame that no member is in
- * holds only what is not in the group, which is about to be moved out of
- * it, and would be left as an empty band in the frame — as wide as the rest
- * of the graph, when a member depends on, or is depended on by, a node in
- * the middle of another group.
+ * holds only what is not in the group, which is about to be moved out of it,
+ * and would be left as an empty band in the frame — as wide as the rest of the
+ * graph, when a member depends on, or is depended on by, a node in the middle
+ * of another group.
  *
- * A frame and the nodes in it move as one, and so does each node in no
- * group. Taken from the top (from the left), each moves just past those
- * before it in its way, so nothing moves along the layers and no edge turns
- * back, and what ELK put clear of the rest stays where it is.
+ * A frame and the nodes in it move as one, and so does each node in no group.
+ * Taken from the top (from the left), each moves just past those before it in
+ * its way, so nothing moves along the layers and no edge turns back, and what
+ * ELK put clear of the rest stays where it is.
  *
- * ELK is not given the groups to lay out (`elk.hierarchyHandling`), since
- * it then lays the inside of each group out first: one that a dependency
- * leaves and comes back into is in its own way, and ELK turns that edge
- * back.
+ * ELK is not given the groups to lay out (`elk.hierarchyHandling`), since it
+ * then lays the inside of each group out first: one that a dependency leaves
+ * and comes back into is in its own way, and ELK turns that edge back.
  */
 export const clearOfFrames = (
   direction: DagDirection,
@@ -471,9 +470,8 @@ export const clearOfFrames = (
         .map((other) => {
           const end = other.bounds[across] + other.bounds[acrossSize];
 
-          // Two nodes no closer than ELK put them, which is less apart
-          // than `PLACEMENT_GAP` between the parts of a graph that no
-          // edge joins.
+          // Two nodes no closer than ELK put them, which is less apart than
+          // `PLACEMENT_GAP` between the parts of a graph that no edge joins.
           const gap =
             block.frame || other.frame
               ? PLACEMENT_GAP
@@ -526,11 +524,11 @@ export const clearOfFrames = (
 };
 
 /**
- * `nodes` with the members of each of `groups` moved across the layers, up
- * when the graph grows to the right, left when it grows down, until no two
- * bands of them across the frame are more than `NODE_SPACING` apart, which
- * is as close as ELK puts two nodes of a layer. Within a band, and among
- * what is in no group, nothing moves.
+ * `nodes` with the members of each of `groups` moved across the layers, up when
+ * the graph grows to the right, left when it grows down, until no two bands of
+ * them across the frame are more than `NODE_SPACING` apart, which is as close
+ * as ELK puts two nodes of a layer. Within a band, and among what is in no
+ * group, nothing moves.
  */
 const closeGapsBetweenMembers = (
   direction: DagDirection,
@@ -669,9 +667,9 @@ const NODE_SPACING = 28;
 const spacingOptions = {
   'elk.spacing.nodeNode': NODE_SPACING.toString(),
   'elk.layered.spacing.nodeNodeBetweenLayers': '56',
-  // An edge that skips a layer passes between two of its nodes, where
-  // it is routed (`edge-routing.mts`) more than 20 from each: room for
-  // it, and for two side by side.
+  // An edge that skips a layer passes between two of its nodes, where it is
+  // routed (`edge-routing.mts`) more than 20 from each: room for it, and for
+  // two side by side.
   'elk.spacing.edgeNode': '24',
   'elk.spacing.edgeEdge': '16',
   'elk.layered.spacing.edgeNodeBetweenLayers': '24',
@@ -685,10 +683,10 @@ const elkDirection = (direction: DagDirection): 'RIGHT' | 'DOWN' =>
   direction === 'right' ? 'RIGHT' : 'DOWN';
 
 /**
- * The parts of `input` that neither an edge nor a group joins to the rest,
- * each with its nodes, edges and groups in the order of `input`, and an
- * empty group a part of its own after them; or `undefined` when no group
- * joins two parts that no edge does.
+ * The parts of `input` that neither an edge nor a group joins to the rest, each
+ * with its nodes, edges and groups in the order of `input`, and an empty group
+ * a part of its own after them; or `undefined` when no group joins two parts
+ * that no edge does.
  */
 const partsJoinedByGroups = (
   input: LayoutInput,
@@ -783,8 +781,8 @@ const partId = (index: number): string => `part:${index}` as const;
 const elkGroupId = (id: GroupId): string => `group:${id}` as const;
 
 /**
- * What `clearOfFrames` moves as one: a group's frame round its members, a
- * group with none, or a node in none.
+ * What `clearOfFrames` moves as one: a group's frame round its members, a group
+ * with none, or a node in none.
  */
 type Block = Readonly<{
   key: string;

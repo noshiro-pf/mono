@@ -38,8 +38,8 @@ type Props = Readonly<{
  * type into. The button stays below the rows, wherever they end.
  *
  * A done task is left out of the 依存先 choices — it is rarely what a node
- * starts to wait for — unless the switch beside the button, shown while
- * there is one to choose, asks for it; a row that already has one keeps it.
+ * starts to wait for — unless the switch beside the button, shown while there
+ * is one to choose, asks for it; a row that already has one keeps it.
  * The switch is off whenever the dialog opens: it is made with the form.
  */
 export const DependencyEditor = ({

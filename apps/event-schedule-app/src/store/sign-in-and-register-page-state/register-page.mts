@@ -42,8 +42,8 @@ export type RegisterPageDeps<User> = Readonly<{
 }>;
 
 /**
- * The register page: the form, creating the user through `deps.api`, and
- * going back to the page registering was asked from.
+ * The register page: the form, creating the user through `deps.api`, and going
+ * back to the page registering was asked from.
  */
 export const createRegisterPageStore = <User,>(
   deps: RegisterPageDeps<User>,

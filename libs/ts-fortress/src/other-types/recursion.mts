@@ -65,8 +65,8 @@ import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
  *
  * type OddNumber = Readonly<{ type: 'odd'; next: EvenNumber | null }>;
  *
- * // IMPORTANT: For mutual recursion, place terminal types (like nullType)
- * // first in unions, or provide explicit defaultValue
+ * // IMPORTANT: For mutual recursion, place terminal types (like nullType) first
+ * // in unions, or provide explicit defaultValue
  * const EvenNumber: t.Type<EvenNumber> = t.recursion('EvenNumber', () =>
  *   t.record({
  *     type: t.literal('even'),
@@ -118,8 +118,8 @@ import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
  *
  * type OddNumber = Readonly<{ type: 'odd'; next?: EvenNumber }>;
  *
- * // When using optional fields in mutually recursive types,
- * // use forceUndefinedDefault to avoid infinite loops when accessing defaultValue
+ * // When using optional fields in mutually recursive types, use
+ * // forceUndefinedDefault to avoid infinite loops when accessing defaultValue
  * const EvenNumber: t.Type<EvenNumber> = t.recursion('EvenNumber', () =>
  *   t.record({
  *     type: t.literal('even'),

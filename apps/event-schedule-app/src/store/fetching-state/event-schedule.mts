@@ -76,8 +76,8 @@ export const createEventScheduleStore = (
     const mut_run = { stopped: false };
 
     const subscriptions: readonly Subscription[] = [
-      // Read on request (the first is made below), and again whenever the
-      // page moves to another event.
+      // Read on request (the first is made below), and again whenever the page
+      // moves to another event.
       merge([
         fetchEventScheduleThrottled$,
         refetchEventScheduleAfterWrite$,

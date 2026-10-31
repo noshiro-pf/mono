@@ -32,8 +32,8 @@ type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
 
   /**
    * One more than the deepest observable this one is derived from; 0 for a
-   * root. An update reaches observables in ascending depth, so every parent
-   * has emitted before its child reads it.
+   * root. An update reaches observables in ascending depth, so every parent has
+   * emitted before its child reads it.
    */
   depth: Kind extends 'root' ? 0 : number;
 
@@ -173,9 +173,9 @@ export type Operator<A, B> =
   | KeepInitialValueOperator<A, B>;
 
 /**
- * Tells an observable made by synstate from any other value, by the brand
- * every observable carries. Checking for a `subscribe` method instead would
- * also accept plain values that happen to have one.
+ * Tells an observable made by synstate from any other value, by the brand every
+ * observable carries. Checking for a `subscribe` method instead would also
+ * accept plain values that happen to have one.
  *
  * @example
  *
@@ -223,8 +223,8 @@ export type WrapInitialized<A extends readonly unknown[]> = Readonly<{
 // type GetDestTypeOfOperator<Op extends Operator<unknown, unknown>> =
 //   Op extends Operator<unknown, infer B> ? B : never;
 
-// Only the members meant for users are public; the rest live on the
-// internal node types in `core/class` (#2117).
+// Only the members meant for users are public; the rest live on the internal
+// node types in `core/class` (#2117).
 expectType<
   keyof Observable<unknown>,
   | typeof observableBrand

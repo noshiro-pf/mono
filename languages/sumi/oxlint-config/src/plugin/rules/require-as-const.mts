@@ -16,19 +16,19 @@ const MUT_PREFIX = 'mut_';
  * const origin: Readonly<{ x: number }> = { x: 0 }; // fine — annotated
  * ```
  *
- * `sumi/require-readonly-type` makes every *written* type readonly; this is
- * the same promise for the types that are not written. Without it an
- * unannotated literal is the one place a mutable type enters a non-`mut_`
- * binding, and the compiler accepts every write through it. With it, a write
- * to such a binding is a compiler error (TS2540 / TS2542 / TS2704), which is
- * why `mutation/no-mutation-without-mut-prefix` leaves those to the compiler.
+ * `sumi/require-readonly-type` makes every *written* type readonly; this is the
+ * same promise for the types that are not written. Without it an unannotated
+ * literal is the one place a mutable type enters a non-`mut_` binding, and the
+ * compiler accepts every write through it. With it, a write to such a binding
+ * is a compiler error (TS2540 / TS2542 / TS2704), which is why
+ * `mutation/no-mutation-without-mut-prefix` leaves those to the compiler.
  *
  * The literal is found through what passes its type on unchanged: `satisfies`,
  * both branches of a conditional, and both operands of `??`. An assertion to
- * any other type (`[] as readonly number[]`) states the type itself and is
- * left alone, as is a literal nested in a call, a function body or another
- * literal — a parameter and a return type are annotated, and `as const`
- * reaches the whole literal it is on.
+ * any other type (`[] as readonly number[]`) states the type itself and is left
+ * alone, as is a literal nested in a call, a function body or another literal —
+ * a parameter and a return type are annotated, and `as const` reaches the whole
+ * literal it is on.
  *
  * Out of scope, deliberately:
  *
@@ -98,10 +98,10 @@ export const requireAsConst = createRule({
 });
 
 /**
- * The literals whose type becomes the binding's type: the expression itself,
- * or what `satisfies`, a conditional and `??` pass through. Every other
- * expression — `as const` and any other assertion included — decides the type
- * itself, and contributes nothing.
+ * The literals whose type becomes the binding's type: the expression itself, or
+ * what `satisfies`, a conditional and `??` pass through. Every other expression
+ * — `as const` and any other assertion included — decides the type itself, and
+ * contributes nothing.
  */
 const inferredLiterals = (
   expression: DeepReadonly<TSESTree.Expression>,

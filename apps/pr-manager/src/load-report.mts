@@ -1,19 +1,18 @@
 /**
  * Reading the report out of GitHub, straight from the page.
  *
- * There is no report file any more: every read asks GitHub about the open
- * pull requests as they are now, so pressing **Refresh** shows what GitHub
- * shows. What is decided about them — the verdict over the required
- * contexts, the merge order the `Merge-After:` trailers and the stacks
- * declare, the counts —
+ * There is no report file any more: every read asks GitHub about the open pull
+ * requests as they are now, so pressing **Refresh** shows what GitHub shows.
+ * What is decided about them — the verdict over the required contexts, the
+ * merge order the `Merge-After:` trailers and the stacks declare, the counts —
  * is `pr-report-core`, the same code `pnpm run pr-report` decides it with.
  * What is added here is what only this page reports: why `unblock-prs` set a
  * pull request aside, and whether it waits for a code owner.
  *
  * A read is several queries sent at once, one per part of the page
- * (`report-query.mts` says why), and the report is put together from
- * whatever of them has answered: a part still out is marked as being read
- * rather than left looking empty.
+ * (`report-query.mts` says why), and the report is put together from whatever
+ * of them has answered: a part still out is marked as being read rather than
+ * left looking empty.
  */
 
 import {
@@ -105,10 +104,10 @@ import type { RestFetch } from './workflow-runs.mjs';
 
 /**
  * What `unblock-prs` said when it last set the pull request aside, read from
- * the record its comment on the pull request starts with. `current` is
- * whether it still applies: set aside against a base that has since moved,
- * the next run tries again. `retry` is a person having ticked the comment's
- * retry box, which the next run acts on.
+ * the record its comment on the pull request starts with. `current` is whether
+ * it still applies: set aside against a base that has since moved, the next run
+ * tries again. `retry` is a person having ticked the comment's retry box, which
+ * the next run acts on.
  */
 export type SetAsideView = SetAside &
   Readonly<{ current: boolean; retry: boolean; url: string }>;
@@ -135,14 +134,14 @@ export type Entry = ReportEntry &
     claudeSessions: readonly ClaudeSession[];
     /**
      * Why the head's checks were not judged although they were read: it has
-     * more results than a read follows. `checks` is then the stand-in for
-     * none reported, which the page does not show as a verdict.
+     * more results than a read follows. `checks` is then the stand-in for none
+     * reported, which the page does not show as a verdict.
      */
     checksUnread: string | undefined;
     /**
-     * The parts not read yet. What a listed part fills in holds a stand-in
-     * — no checks reported, no comparison, no review asked for — which the
-     * page does not show as if it had been read.
+     * The parts not read yet. What a listed part fills in holds a stand-in — no
+     * checks reported, no comparison, no review asked for — which the page does
+     * not show as if it had been read.
      */
     reading: readonly EntryPart[];
   }>;
@@ -150,9 +149,9 @@ export type Entry = ReportEntry &
 export type Merged = MergedPullRequest & Readonly<{ mergedAtEpochMs: number }>;
 
 /**
- * The counts the merge order leads with. A count is `undefined` while what
- * it counts is still being read for any pull request, because a count of
- * the ones read so far would be a number that is wrong until it is not.
+ * The counts the merge order leads with. A count is `undefined` while what it
+ * counts is still being read for any pull request, because a count of the ones
+ * read so far would be a number that is wrong until it is not.
  */
 export type PageSummary = Readonly<{
   open: number;
@@ -169,16 +168,16 @@ export type PageSummary = Readonly<{
 }>;
 
 /**
- * What the repository has of what this repository runs, which decides what
- * the page has to say. Without any of it the page is still the merge order,
- * the stacks, the checks and the issues' dependencies; that is how it is used
- * on most other repositories.
+ * What the repository has of what this repository runs, which decides what the
+ * page has to say. Without any of it the page is still the merge order, the
+ * stacks, the checks and the issues' dependencies; that is how it is used on
+ * most other repositories.
  */
 export type RepoFeatures = Readonly<{
   /**
-   * Whether the default branch requires any context, by a ruleset or a
-   * classic protection rule (`branch-rules.mts`). Without one, each pull
-   * request is judged over every context reported on its head.
+   * Whether the default branch requires any context, by a ruleset or a classic
+   * protection rule (`branch-rules.mts`). Without one, each pull request is
+   * judged over every context reported on its head.
    */
   requiredChecks: boolean;
   /**
@@ -203,9 +202,9 @@ export type LoadedReport = Readonly<{
   /** When the read this was built from started. */
   readAtEpochMs: number;
   /**
-   * The contexts the default branch requires, or `undefined` where it
-   * requires none, or its rules have not answered yet, and each pull request
-   * is judged over every context reported on its head.
+   * The contexts the default branch requires, or `undefined` where it requires
+   * none, or its rules have not answered yet, and each pull request is judged
+   * over every context reported on its head.
    */
   required: readonly string[] | undefined;
   features: RepoFeatures;
@@ -218,14 +217,14 @@ export type LoadedReport = Readonly<{
   /** The open issues, most recently updated first. */
   issues: IssueList;
   /**
-   * `unblock-prs`'s queue (`queue-view.mts`), or `undefined` until the
-   * checks, the comparisons and the details have all answered: a queue drawn
-   * from some of them would put a pull request in a place it is not in.
+   * `unblock-prs`'s queue (`queue-view.mts`), or `undefined` until the checks,
+   * the comparisons and the details have all answered: a queue drawn from some
+   * of them would put a pull request in a place it is not in.
    */
   queue: QueueView | undefined;
   /**
-   * The sections not read yet. A listed section's list is empty because it
-   * has not answered, not because there is nothing in it.
+   * The sections not read yet. A listed section's list is empty because it has
+   * not answered, not because there is nothing in it.
    */
   reading: readonly SectionPart[];
 }>;
@@ -238,9 +237,8 @@ export type IssueList = Readonly<{
   /** Where the next page starts; `undefined` once every one is listed. */
   endCursor: string | undefined;
   /**
-   * What the items' `Start-After:` declarations name that was read for
-   * them, lowest number first; a number GitHub would not describe is not in
-   * it.
+   * What the items' `Start-After:` declarations name that was read for them,
+   * lowest number first; a number GitHub would not describe is not in it.
    */
   referenced: readonly ReferencedItem[];
 }>;
@@ -280,9 +278,9 @@ export type LoadRequest = Readonly<{
   issueCount?: number;
   /**
    * Handed the report as it stands each time a part of it answers, from the
-   * moment the pull requests have — so that a page with nothing on it yet
-   * can draw the merge order without waiting for the slowest query. Not
-   * called for the last part: that is the report the read resolves to.
+   * moment the pull requests have — so that a page with nothing on it yet can
+   * draw the merge order without waiting for the slowest query. Not called for
+   * the last part: that is the report the read resolves to.
    */
   onProgress?: (report: LoadedReport) => void;
   /** GraphQL's and REST's both: the default branch's rules are REST's. */
@@ -292,20 +290,19 @@ export type LoadRequest = Readonly<{
 /**
  * The report, or a sentence a reader can act on.
  *
- * Seven parts, all asked for at once: the pull requests, their check
- * results, their details, how far each head is from its base, what the
- * default branch requires of them, what merged lately, and the open issues.
- * Only the comparison and the rules wait, for the pull requests' heads and
- * the default branch's name.
- * Some parts may need one more query — the rest of a list that did not fit
- * in one page, which is rare and bounded by {@link MAX_FOLLOW_UP_ROUNDS}, or
- * what an issue a body closes by keyword, unlinked by GitHub, is called —
- * and the open issues past the first page are read only when more are asked
- * for.
+ * Seven parts, all asked for at once: the pull requests, their check results,
+ * their details, how far each head is from its base, what the default branch
+ * requires of them, what merged lately, and the open issues.
+ * Only the comparison and the rules wait, for the pull requests' heads and the
+ * default branch's name.
+ * Some parts may need one more query — the rest of a list that did not fit in
+ * one page, which is rare and bounded by {@link MAX_FOLLOW_UP_ROUNDS}, or what
+ * an issue a body closes by keyword, unlinked by GitHub, is called — and the
+ * open issues past the first page are read only when more are asked for.
  *
  * A part that fails fails the read, with what the pull requests' query said
- * first: a report with a part missing is what {@link LoadRequest.onProgress}
- * is for, and the read itself either has all of it or says why not.
+ * first: a report with a part missing is what {@link LoadRequest.onProgress} is
+ * for, and the read itself either has all of it or says why not.
  */
 export const loadReport = async (
   source: ReportSource,
@@ -445,8 +442,8 @@ export type IssuePageRequest = Readonly<{
 }>;
 
 /**
- * The open issues after `after`, in the order the report lists them: the
- * next page of {@link LoadedReport.issues}, to be put after it with
+ * The open issues after `after`, in the order the report lists them: the next
+ * page of {@link LoadedReport.issues}, to be put after it with
  * {@link appendIssues}.
  */
 export const loadIssuePage = async (
@@ -499,9 +496,9 @@ export const loadIssuePage = async (
 
 /**
  * `page` put after `held`. An issue already listed is not listed again: the
- * list is by last update, and one updated between the two reads can be met
- * in both. What either read for the declarations is kept, the page's
- * description of a number winning, being the newer.
+ * list is by last update, and one updated between the two reads can be met in
+ * both. What either read for the declarations is kept, the page's description
+ * of a number winning, being the newer.
  */
 export const appendIssues = (held: IssueList, page: IssueList): IssueList => {
   const listed = new Set(held.items.map(({ number }) => number));
@@ -578,16 +575,16 @@ type DetailsPart = DetailsState &
   Readonly<{
     linkedIssues: readonly LinkedIssue[];
     /**
-     * The `Start-After:` of each issue it closes, which it inherits as a
-     * merge order; an issue GitHub would not describe is not in it.
+     * The `Start-After:` of each issue it closes, which it inherits as a merge
+     * order; an issue GitHub would not describe is not in it.
      */
     startAfter: ReadonlyMap<number, readonly number[]>;
   }>;
 
 /**
- * How many follow-ups one part may make. Each is one request of about a
- * point; ten is a thousand check results or changed files for the pull
- * request with the most, which is past anything this repository produces.
+ * How many follow-ups one part may make. Each is one request of about a point;
+ * ten is a thousand check results or changed files for the pull request with
+ * the most, which is past anything this repository produces.
  */
 const MAX_FOLLOW_UP_ROUNDS = 10;
 
@@ -692,9 +689,9 @@ const readPullRequests = async (
     ask,
     query: PULL_REQUESTS_QUERY,
     schema: PullRequestsDataSchema,
-    // What GitHub answers for a name it cannot resolve for this token,
-    // whether there is no such repository or it is one the token may not
-    // read: it does not say which, so the sentence names both.
+    // What GitHub answers for a name it cannot resolve for this token, whether
+    // there is no such repository or it is one the token may not read: it does
+    // not say which, so the sentence names both.
     refusal: (answer) =>
       repositoryOf(answer) === null
         ? `GitHub shows this token no repository ${repo.owner}/${repo.name}. Check the name, or, if it is private, give the page a token that can read it.`
@@ -746,13 +743,12 @@ const fieldsOf =
   };
 
 /**
- * Asks for whatever is left to follow up, folds the answer in, and goes
- * round again until nothing is left or the rounds run out. One round at a
- * time, because each round's questions are the previous round's cursors.
+ * Asks for whatever is left to follow up, folds the answer in, and goes round
+ * again until nothing is left or the rounds run out. One round at a time,
+ * because each round's questions are the previous round's cursors.
  *
- * A page that did not arrive fails the part: a verdict over half the
- * checks, or a review state over half the files, would be a guess presented
- * as a fact.
+ * A page that did not arrive fails the part: a verdict over half the checks, or
+ * a review state over half the files, would be a guess presented as a fact.
  */
 const followUpRounds = async <S extends Readonly<{ number: number }>>({
   operationName,
@@ -850,14 +846,14 @@ const applyContexts = (
 };
 
 /**
- * The check results on every open pull request's head, all of them: a
- * verdict over the first hundred of a head with more would be a guess
- * presented as a fact, so a head whose results do not end within
- * {@link MAX_FOLLOW_UP_ROUNDS} pages is not judged (its `contextsAfter`
- * still set), and its card says so. Not the read failing: a head relabelled
- * in a loop collects a round of check runs per label event, and one such
- * pull request would otherwise take the verdicts and the queue of every
- * other one with it, on every read until it merged.
+ * The check results on every open pull request's head, all of them: a verdict
+ * over the first hundred of a head with more would be a guess presented as a
+ * fact, so a head whose results do not end within {@link MAX_FOLLOW_UP_ROUNDS}
+ * pages is not judged (its `contextsAfter` still set), and its card says so.
+ * Not the read failing: a head relabelled in a loop collects a round of check
+ * runs per label event, and one such pull request would otherwise take the
+ * verdicts and the queue of every other one with it, on every read until it
+ * merged.
  */
 const readChecks = async (
   ask: Ask,
@@ -964,12 +960,12 @@ const startAfterOfNodes = (
 };
 
 /**
- * What GitHub calls the issues in `numbers`, keyed by number, as a linked
- * one would be listed, and what each declares with `Start-After:`. Nothing
- * is asked when there are none, which is so for every pull request into the
- * default branch. An issue GitHub will not describe — deleted, or moved to
- * another repository — is left out rather than failing the read, and is
- * listed by its number alone.
+ * What GitHub calls the issues in `numbers`, keyed by number, as a linked one
+ * would be listed, and what each declares with `Start-After:`. Nothing is asked
+ * when there are none, which is so for every pull request into the default
+ * branch. An issue GitHub will not describe — deleted, or moved to another
+ * repository — is left out rather than failing the read, and is listed by its
+ * number alone.
  */
 const describeIssues = async ({
   repo,
@@ -1090,9 +1086,9 @@ const linkedIssuesOf = (
 
 /**
  * Each open pull request's details, with the issues its body closes. The
- * changed files are paged through only when the default branch asks for a
- * code owner's review, since that is all they are read for — which its rules
- * say, so this waits for them before asking for more pages.
+ * changed files are paged through only when the default branch asks for a code
+ * owner's review, since that is all they are read for — which its rules say, so
+ * this waits for them before asking for more pages.
  */
 const readDetails = async (
   ask: Ask,
@@ -1177,8 +1173,8 @@ const readDetails = async (
 };
 
 /**
- * How far each head is from its base. A comparison GitHub could not make is
- * a gap the page can show — "ahead / behind unread" — so its error is not a
+ * How far each head is from its base. A comparison GitHub could not make is a
+ * gap the page can show — "ahead / behind unread" — so its error is not a
  * failure of the read.
  */
 const readComparisons = async (
@@ -1331,13 +1327,13 @@ const readMerged = async (
 };
 
 /**
- * `listed` and the pages after it, until they have asked for `count` or
- * listed every open issue. One page at a time, because each page starts
- * where the last ended.
+ * `listed` and the pages after it, until they have asked for `count` or listed
+ * every open issue. One page at a time, because each page starts where the last
+ * ended.
  *
- * Counted in what was asked for rather than what came back: an issue the
- * token may not see comes back as nothing (`withoutNullNodes`), and a list
- * one short of `count` would otherwise ask for one more page on every read.
+ * Counted in what was asked for rather than what came back: an issue the token
+ * may not see comes back as nothing (`withoutNullNodes`), and a list one short
+ * of `count` would otherwise ask for one more page on every read.
  */
 const listIssuesUpTo = async ({
   listed,
@@ -1446,11 +1442,11 @@ const referencedOf = (
       } as const);
 
 /**
- * `list` with what its declarations name described: one query for every
- * number named that is not an item of `list`, and none when there is no such
- * number. Each page is described as it is read (`loadIssuePage`), so a
- * number an earlier page lists may be asked about again; that costs a field,
- * where finding out would cost the read its independence.
+ * `list` with what its declarations name described: one query for every number
+ * named that is not an item of `list`, and none when there is no such number.
+ * Each page is described as it is read (`loadIssuePage`), so a number an
+ * earlier page lists may be asked about again; that costs a field, where
+ * finding out would cost the read its independence.
  */
 const withReferences = async ({
   list,
@@ -1518,9 +1514,9 @@ type DescribedIssues = Readonly<{
 }>;
 
 /**
- * The later of two budgets: the one with the later reset, or within one
- * window the one with less left. The parts answer in no particular order, so
- * the last to answer need not be the last GitHub counted.
+ * The later of two budgets: the one with the later reset, or within one window
+ * the one with less left. The parts answer in no particular order, so the last
+ * to answer need not be the last GitHub counted.
  */
 const newerLimit = (
   held: RateLimit | undefined,
@@ -1679,9 +1675,9 @@ const factsOf = (
 
 /**
  * What the viewer's `unblock-prs` comment on this pull request says, when it
- * says the pull request is set aside at the head it is at now. Once the
- * branch has been pushed the record is someone else's head's, and the
- * script rewrites the comment as resolved on its next survey.
+ * says the pull request is set aside at the head it is at now. Once the branch
+ * has been pushed the record is someone else's head's, and the script rewrites
+ * the comment as resolved on its next survey.
  */
 const setAsideOf = (
   pr: OpenPullRequest,
@@ -1793,9 +1789,9 @@ const assemble = ({
     const checks = known.checks?.get(pr.number);
 
     return {
-      // Results reported on another head — a push that landed between the
-      // two queries — are not this head's, and the next read has them. Nor
-      // are any judged before the rules say which of them count.
+      // Results reported on another head — a push that landed between the two
+      // queries — are not this head's, and the next read has them. Nor are any
+      // judged before the rules say which of them count.
       checks:
         requirements !== undefined && checks?.headSha === pr.headRefOid
           ? checks
@@ -1814,8 +1810,8 @@ const assemble = ({
 
   const report = buildEntries({
     required,
-    // `skip-ci` holds the checks back where `unblock-prs` runs, and is
-    // anyone's label anywhere else.
+    // `skip-ci` holds the checks back where `unblock-prs` runs, and is anyone's
+    // label anywhere else.
     skipCiPauses: queue,
     defaultBranch,
     pulls: pulls.map((pr) => factsOf(pr, partsOf(pr))),

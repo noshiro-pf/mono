@@ -13,8 +13,8 @@ import { defineKnownRules, withDefaultOption } from 'eslint-config-typed';
 export const sumiRules = defineKnownRules({
   // 🔧 eqeqeq: the base config allows `== null` ({ null: 'ignore' } +
   // no-eq-null off) as the undefined-or-null check idiom. Sumi bans the null
-  // type itself (spec/null-undefined.md), so the idiom has nothing to match
-  // and strict equality becomes total.
+  // type itself (spec/null-undefined.md), so the idiom has nothing to match and
+  // strict equality becomes total.
   eqeqeq: ['error', 'always'],
   'no-eq-null': 'error',
 
@@ -70,22 +70,23 @@ export const sumiRules = defineKnownRules({
   // normalizing external null to undefined at the boundary requires it.
   'unicorn/no-null': ['error', { checkStrictEquality: false }],
 
-  // ⏻ id-denylist (D-17): `fn` is reserved for the Sumi sugar function-declaration
-  // keyword. The rule also reports *defining* an own object property named
-  // `fn` — stricter than D-17, which reserves declaration names only; reads
+  // ⏻ id-denylist (D-17): `fn` is reserved for the Sumi sugar
+  // function-declaration keyword. The rule also reports *defining* an own
+  // object property named `fn` — stricter than D-17, which reserves declaration
+  // names only; reads
   // and the `{ fn: renamed }` escape hatch pass (verified by test). The 🆕
   // custom rule can narrow this later if the deviation bites.
   'id-denylist': ['error', 'fn'],
 
   // ⏻ functional/no-classes + no-this-expressions (D-12): classes are banned
-  // outright; `this` with them. no-invalid-this stays on in the base config
-  // as defense in depth.
+  // outright; `this` with them. no-invalid-this stays on in the base config as
+  // defense in depth.
   'functional/no-classes': withDefaultOption('error'),
   'functional/no-this-expressions': 'error',
 
-  // ⏻ functional/no-throw-statements: `throw` is banned everywhere in user
-  // code (spec/exceptions.md); errors travel as Result. The boundary code
-  // that wraps throwing APIs lives in ts-std-forge / ts-data-forge, outside
-  // code linted by this preset.
+  // ⏻ functional/no-throw-statements: `throw` is banned everywhere in user code
+  // (spec/exceptions.md); errors travel as Result. The boundary code that wraps
+  // throwing APIs lives in ts-std-forge / ts-data-forge, outside code linted by
+  // this preset.
   'functional/no-throw-statements': ['error', { allowToRejectPromises: false }],
 });

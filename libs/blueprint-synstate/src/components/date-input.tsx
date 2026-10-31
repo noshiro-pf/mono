@@ -33,8 +33,8 @@ import { DatePicker, type DatePickerOptions } from './date-picker.js';
 type Props = DatePickerOptions &
   Readonly<{
     /**
-     * `YYYY-MM-DDTHH:mm` with a `timePrecision`, `YYYY-MM-DD` without, and
-     * `''` for none.
+     * `YYYY-MM-DDTHH:mm` with a `timePrecision`, `YYYY-MM-DD` without, and `''`
+     * for none.
      */
     value: Bindable<string>;
     onChange: (value: string) => void;
@@ -65,9 +65,9 @@ type Props = DatePickerOptions &
  * Blueprint's `DateInput`: a text input that opens a {@link DatePicker} in a
  * popover hanging below it, in Blueprint's markup.
  *
- * The popover is drawn in place, after the input, rather than in a portal,
- * and positioned `fixed`: inside a modal `<dialog>`, which is in the top
- * layer, a portal on `<body>` would be drawn behind the dialog and be inert.
+ * The popover is drawn in place, after the input, rather than in a portal, and
+ * positioned `fixed`: inside a modal `<dialog>`, which is in the top layer, a
+ * portal on `<body>` would be drawn behind the dialog and be inert.
  * In place it is inside the dialog, and is not clipped by a scrolling body.
  *
  * It behaves as Blueprint's does with a controlled value:
@@ -82,9 +82,8 @@ type Props = DatePickerOptions &
  * - Picking a day closes the calendar with `closeOnSelection`, unless the
  *   month or the time changed with it.
  *
- * Unlike Blueprint's, Escape while the calendar is open is kept from the
- * page, so that the `<dialog>` it is in stays open and the next Escape
- * closes it.
+ * Unlike Blueprint's, Escape while the calendar is open is kept from the page,
+ * so that the `<dialog>` it is in stays open and the next Escape closes it.
  */
 export const DateInput = ({
   value,
@@ -164,8 +163,8 @@ export const DateInput = ({
         'bp6-input-group',
         ...(fill ? ['bp6-fill'] : []),
         ...(isDisabled ? ['bp6-disabled'] : []),
-        // Blueprint's `shouldShowErrorStyling`: not while a correction is
-        // being typed.
+        // Blueprint's `shouldShowErrorStyling`: not while a correction is being
+        // typed.
         ...(shown.error &&
         (!focused ||
           typed === invalidDateMessage ||
@@ -182,8 +181,8 @@ export const DateInput = ({
     target: HTMLDivElement | undefined;
     input: HTMLInputElement | undefined;
     content: HTMLDivElement | undefined;
-    // The next focus of the input comes from closing the calendar, and
-    // does not open it again.
+    // The next focus of the input comes from closing the calendar, and does not
+    // open it again.
     suppressOpen: boolean;
   } = {
     target: undefined,

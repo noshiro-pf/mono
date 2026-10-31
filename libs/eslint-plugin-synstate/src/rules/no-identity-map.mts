@@ -18,18 +18,17 @@ type Options = readonly [];
 type MessageIds = 'identityMap';
 
 /**
- * `map` passes on a result only when it is not `Object.is` the one it holds,
- * so `map((x) => x)` changes no value and only stops a repeated one: it is
- * `skipIfNoChange()` under a name that says it does nothing. The rule
- * rewrites it to `skipIfNoChange()`, which keeps what it does and says so.
+ * `map` passes on a result only when it is not `Object.is` the one it holds, so
+ * `map((x) => x)` changes no value and only stops a repeated one: it is
+ * `skipIfNoChange()` under a name that says it does nothing. The rule rewrites
+ * it to `skipIfNoChange()`, which keeps what it does and says so.
  *
  * Reported: `map` given one function, not `async`, that returns its one
  * parameter — an arrow, or a function whose body is that `return`. A `map`
- * given `equals` is left alone, since its author has said how results
- * compare. Type syntax in the call — an annotated parameter or return type,
- * type arguments, `as`, `satisfies` or `!` around the function or the
- * result — may be what the `map` is written for, so such a call is reported
- * without a fix.
+ * given `equals` is left alone, since its author has said how results compare.
+ * Type syntax in the call — an annotated parameter or return type, type
+ * arguments, `as`, `satisfies` or `!` around the function or the result — may
+ * be what the `map` is written for, so such a call is reported without a fix.
  */
 export const noIdentityMap: TSESLint.RuleModule<MessageIds, Options> = {
   meta: {
@@ -123,8 +122,8 @@ export const noIdentityMap: TSESLint.RuleModule<MessageIds, Options> = {
 
 /**
  * Whether `argument`, read through its type wrappers, is a function that
- * returns its one parameter, and whether type syntax is written anywhere on
- * the way: around the function or the result, or on the parameter or the
+ * returns its one parameter, and whether type syntax is written anywhere on the
+ * way: around the function or the result, or on the parameter or the
  * return type. `undefined` when it is not such a function. `prefer-derive`
  * reads it too, to leave such a `map` to this rule.
  */

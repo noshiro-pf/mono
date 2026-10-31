@@ -27,8 +27,8 @@ const serverRows: readonly Row[] = Array.from({ length: 25 }, (_, i) => ({
   email: `user${i}@example.com`,
   gender: i % 3 === 0 ? 'female' : 'male',
 }));
-// The server the sample talks to: 25 rows `user0` … `user24`. The visible
-// code calls `fetch` as it would in a browser; this stands in for it.
+// The server the sample talks to: 25 rows `user0` … `user24`. The visible code
+// calls `fetch` as it would in a browser; this stands in for it.
 // eslint-disable-next-line @typescript-eslint/no-shadow
 const fetch = (_url: string): Promise<Response> =>
   Promise.resolve(Response.json(serverRows));
@@ -40,12 +40,12 @@ const [filterEmail, setFilterEmail] = createState('');
 const [filterGender, setFilterGender] = createState('');
 const [itemsPerPage, setItemsPerPage] = createState(10);
 
-// A page request is an event: asking for page 2 again after a reset must
-// reach the table, which a state would drop as equal to the value it holds
+// A page request is an event: asking for page 2 again after a reset must reach
+// the table, which a state would drop as equal to the value it holds
 const [pageRequest, requestPage] = createValueEmitter<number>();
 
-// Fetch table data from server
-// fromPromise emits Result.Ok(rows) on success, Result.Err(error) on failure
+// Fetch table data from server fromPromise emits Result.Ok(rows) on success,
+// Result.Err(error) on failure
 const tableDataResult = fromPromise(
   fetch('/api/rows').then((r) => {
     if (!r.ok) {
@@ -124,8 +124,8 @@ if (import.meta.vitest !== undefined) {
 
   /**
    * Runs `body` from page 1 of all 25 rows, 10 per page, on fake timers.
-   * Vitest does not isolate this package's test files, so the timers go
-   * back to real ones whatever `body` does.
+   * Vitest does not isolate this package's test files, so the timers go back to
+   * real ones whatever `body` does.
    */
   const fromPage1 =
     (body: () => Promise<void> | undefined) => async (): Promise<void> => {

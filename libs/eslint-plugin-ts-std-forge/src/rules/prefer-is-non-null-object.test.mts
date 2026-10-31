@@ -53,9 +53,9 @@ ruleTester.run('prefer-is-non-null-object', preferIsNonNullObject, {
   ],
 });
 
-// The replacement names the bare identifier: that is the reference both
-// halves narrow, and a wrapper around the argument would stop the guard from
-// narrowing it.
+// The replacement names the bare identifier: that is the reference both halves
+// narrow, and a wrapper around the argument would stop the guard from narrowing
+// it.
 describe('prefer-is-non-null-object through type wrappers', () => {
   ruleTester.run('prefer-is-non-null-object', preferIsNonNullObject, {
     valid: [

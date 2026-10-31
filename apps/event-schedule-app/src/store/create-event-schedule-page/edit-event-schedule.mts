@@ -49,8 +49,8 @@ export type EditEventScheduleDeps = Readonly<{
 }>;
 
 /**
- * The edit page: the event as the database has it, the settings being
- * changed, what differs, and the event saved back through `deps.api`.
+ * The edit page: the event as the database has it, the settings being changed,
+ * what differs, and the event saved back through `deps.api`.
  */
 export const createEditEventScheduleStore = (
   deps: EditEventScheduleDeps,

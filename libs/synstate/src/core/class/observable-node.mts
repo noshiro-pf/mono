@@ -38,10 +38,9 @@ export type ChildNode = NodeInternals &
   }>;
 
 /**
- * The one place a public observable is seen as the node it is. Every
- * observable is built by a synstate class, and the public types carry a
- * brand an object literal cannot supply, so this holds for every value of
- * those types.
+ * The one place a public observable is seen as the node it is. Every observable
+ * is built by a synstate class, and the public types carry a brand an object
+ * literal cannot supply, so this holds for every value of those types.
  */
 export const toNode = <A,>(observable: Observable<A>): ObservableNode<A> =>
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion

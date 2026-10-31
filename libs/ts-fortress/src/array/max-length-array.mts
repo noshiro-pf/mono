@@ -14,9 +14,9 @@ export type { MaxLengthArray } from 'ts-type-forge';
  * typed as the branded {@link MaxLengthArray} instead of the union of tuple
  * types produced by `maxLengthTuple`.
  *
- * Because the length constraint lives only in the brand, no union of tuples
- * of the element type is ever constructed, which keeps type-checking cheap
- * even when `A` is a large type.
+ * Because the length constraint lives only in the brand, no union of tuples of
+ * the element type is ever constructed, which keeps type-checking cheap even
+ * when `A` is a large type.
  */
 export function maxLengthArray<N extends SupportedLength, A>(
   maxLength: N,
@@ -31,9 +31,8 @@ export function maxLengthArray<N extends SupportedLength, A>(
 
 // For bounds outside `SupportedLength` (`0..2048`) the length cannot be encoded in the brand,
 // so the result length is left unconstrained (`readonly A[]`).
-// A length inside the supported range is also a `number`: nothing at run
-// time tells the clauses apart, so the set only refines the return type
-// (#1952).
+// A length inside the supported range is also a `number`: nothing at run time
+// tells the clauses apart, so the set only refines the return type (#1952).
 // @sumi-expect-error functions/no-refinement-overload
 export function maxLengthArray<A>(
   maxLength: number,

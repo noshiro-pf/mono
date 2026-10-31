@@ -27,8 +27,8 @@ import type { Rule, RuleContext } from '../engine/index.mjs';
 
 /**
  * `mutation/no-mutation-without-mut-prefix` — a destructive operation is
- * allowed only on a path some segment of which carries the `mut_` prefix
- * (Sumi spec/variables-and-mutation.md, D-14 / D-27).
+ * allowed only on a path some segment of which carries the `mut_` prefix (Sumi
+ * spec/variables-and-mutation.md, D-14 / D-27).
  *
  * This is the other half of the `mut_` discipline. `functional/no-let` covers
  * rebinding a variable, which syntax settles; what is left is mutating what a
@@ -243,11 +243,11 @@ const dateSetterNames: readonly string[] = [
 ] as const;
 
 /**
- * The mutators, by the interface that declares them, each with the copying
- * form to suggest. Grouping by owner is what separates `xs.sort()` from a
- * `sort` of one's own: the name alone selects a candidate, and the declaring
- * interface decides — which is also why the suggestion is looked up by owner,
- * since `set` means one thing on a `Map` and another on a `Uint8Array`.
+ * The mutators, by the interface that declares them, each with the copying form
+ * to suggest. Grouping by owner is what separates `xs.sort()` from a `sort` of
+ * one's own: the name alone selects a candidate, and the declaring interface
+ * decides — which is also why the suggestion is looked up by owner, since `set`
+ * means one thing on a `Map` and another on a `Uint8Array`.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects
  */
@@ -407,8 +407,8 @@ const freshValueMembersByOwner: ReadonlyMap<
 ]);
 
 /**
- * The names along an access path, root first. A segment that is not a name —
- * a computed index, a call in the middle of the chain — contributes nothing,
+ * The names along an access path, root first. A segment that is not a name — a
+ * computed index, a call in the middle of the chain — contributes nothing,
  * which is what keeps `xs[mut_i] = 1` from reading as permitted.
  */
 const pathSegments = (node: TsNode): readonly string[] => {
@@ -457,8 +457,8 @@ const pathText = (node: TsNode): string => {
 };
 
 /**
- * Whether the value being mutated was made on the spot: a literal, a `new`,
- * or a call to a member that returns a new collection.
+ * Whether the value being mutated was made on the spot: a literal, a `new`, or
+ * a call to a member that returns a new collection.
  */
 const isFreshValue = (
   // `Checker` and `Node` are TypeScript's own interfaces, declared mutable;
@@ -488,8 +488,8 @@ const isFreshValue = (
     return false;
   }
 
-  // Fresh only if every layer of the receiver says so: the exemption spares
-  // a report, so no layer may contradict it (see `wrapperLayers`).
+  // Fresh only if every layer of the receiver says so: the exemption spares a
+  // report, so no layer may contradict it (see `wrapperLayers`).
   return ownersOf(checker, callee).every(
     (owner) =>
       owner !== undefined &&
@@ -505,10 +505,10 @@ const hasDefault = (node: TsNode): boolean =>
 /**
  * What an assignment target writes to, unwrapped: the target itself, or the
  * elements of a destructuring pattern, nested patterns and rest elements
- * included. A shorthand property (`({ a } = obj)`) rebinds a variable, which
- * is `functional/no-let`'s, and a target with a default (`[o.a = 1] = xs`) is
- * left out because its `o.a = 1` is an assignment node of its own, visited
- * and reported on its own.
+ * included. A shorthand property (`({ a } = obj)`) rebinds a variable, which is
+ * `functional/no-let`'s, and a target with a default (`[o.a = 1] = xs`) is left
+ * out because its `o.a = 1` is an assignment node of its own, visited and
+ * reported on its own.
  */
 const assignedTargets = (node: TsNode): readonly TsNode[] => {
   const target = unwrap(node);
@@ -539,8 +539,8 @@ const assignedTargets = (node: TsNode): readonly TsNode[] => {
 };
 
 /**
- * Assignment through an access path: the target of `=`, a compound operator,
- * or a `for … of` / `for … in` header, or each access a destructuring pattern
+ * Assignment through an access path: the target of `=`, a compound operator, or
+ * a `for … of` / `for … in` header, or each access a destructuring pattern
  * there assigns to.
  */
 const reportAssignedAccess = (

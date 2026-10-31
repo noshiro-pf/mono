@@ -10,10 +10,9 @@ import {
 import { createScheduleOperations } from './schedule-operations.mjs';
 
 /**
- * Preact without Signals, written as the React implementation is: the
- * durations are one state, and the render computes every figure in a
- * `useMemo`. Preact renders a state change in a microtask, which the harness
- * waits for.
+ * Preact without Signals, written as the React implementation is: the durations
+ * are one state, and the render computes every figure in a `useMemo`. Preact
+ * renders a state change in a microtask, which the harness waits for.
  */
 export const preactSchedule: ScenarioFramework<ScheduleApp> = {
   name: 'Preact',

@@ -11,8 +11,8 @@ import { listMergedPulls, type PullRange } from './github.mjs';
 /**
  * The options of `review-findings-digest`, which prints a digest of the
  * `## Review` sections of merged pull requests: the rounds each one ran, and
- * its findings counted by class, for finding the classes that recur and
- * deserve a check (`docs/checks-over-fixes.md`). See `README.md`.
+ * its findings counted by class, for finding the classes that recur and deserve
+ * a check (`docs/checks-over-fixes.md`). See `README.md`.
  *
  * Resolves to `'help'` for `--help`. `today` (`YYYY-MM-DD`, UTC) is what the
  * default `--since`, 30 days back, counts from.

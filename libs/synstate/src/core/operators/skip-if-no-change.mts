@@ -1,6 +1,6 @@
 // Sumi bans classes, `this`, method syntax and writes to `this` outside a
-// `mut_` binding; an observable is a class (`ObservableBaseClass` says why),
-// so those rules are waived here (D-63).
+// `mut_` binding; an observable is a class (`ObservableBaseClass` says why), so
+// those rules are waived here (D-63).
 // @sumi-expect-error-file classes/no-class
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
@@ -104,8 +104,8 @@ class SkipIfNoChangeObservableClass<A>
       initialValue: parentObservable.getSnapshot(),
     });
 
-    // parentObservable.snapshot has value
-    // if parentObservable is InitializedObservable
+    // parentObservable.snapshot has value if parentObservable is
+    // InitializedObservable
     this.#mut_previousValue = parentObservable.getSnapshot();
 
     this.#eq = eq;

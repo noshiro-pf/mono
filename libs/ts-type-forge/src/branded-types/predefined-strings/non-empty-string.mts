@@ -5,8 +5,8 @@ import type { MinLengthString } from './length-constrained-string.mjs';
  * character).
  *
  * Defined as an alias of {@link MinLengthString}`<1>`, so it participates in
- * the length-constraint subtyping relation: a `NonEmptyString` is assignable
- * to `MinLengthString<0>`, and any `MinLengthString<N>` with `N >= 1` (or
+ * the length-constraint subtyping relation: a `NonEmptyString` is assignable to
+ * `MinLengthString<0>`, and any `MinLengthString<N>` with `N >= 1` (or
  * `FixedLengthString<N>` with `N >= 1`) is assignable to `NonEmptyString`.
  *
  * @example

@@ -30,13 +30,13 @@ import { listLibraryDirs } from '../lib/repo-files.mjs';
  *
  * The division is deliberate — this asks only whether the check runs, never
  * whether it would pass. Two implementations of "is this `@example` mapped"
- * would be two things to keep in agreement, and the one that silently
- * disagreed would be the one nobody read.
+ * would be two things to keep in agreement, and the one that silently disagreed
+ * would be the one nobody read.
  *
  * Scope is `libs/*` — the published packages, the ones whose JSDoc ships in
  * `.d.mts` and becomes the TypeDoc output, and the ones that have a `samples/`
- * directory to be embedded from. `apps/*` publishes nothing and has no
- * samples, so an `@example` there is a comment in a private program.
+ * directory to be embedded from. `apps/*` publishes nothing and has no samples,
+ * so an `@example` there is a comment in a private program.
  */
 export const checkExampleCoverage = async (): Promise<
   Result<Readonly<{ packages: number; withExamples: number }>, string>
@@ -107,10 +107,10 @@ type Violation = Readonly<{
 
 /**
  * Files under `src/` that never carry a hand-written `@example`: the barrels
- * `gen:index` generates, the entry point, the ambient globals, and the tests. Kept in
- * step with `defaultExemptFileNames` in
- * `tools/configs/embed-examples-in-jsdoc.mts`, whose check they are exempt
- * from for the same reason.
+ * `gen:index` generates, the entry point, the ambient globals, and the tests.
+ * Kept in step with `defaultExemptFileNames` in
+ * `tools/configs/embed-examples-in-jsdoc.mts`, whose check they are exempt from
+ * for the same reason.
  */
 const isExempt = (filePath: string): boolean =>
   filePath.endsWith('.test.mts') ||
@@ -179,8 +179,8 @@ const fileExists = async (filePath: string): Promise<boolean> =>
  * would look at them, or `undefined` when the wiring is whole.
  *
  * "Reaches it from `doc`" is read two ways because the repository writes it two
- * ways: a `doc` script that chains `gen:jsdoc` (the `synstate` family), or
- * a `gen-docs.mts` that imports the embedder and calls it (everywhere else).
+ * ways: a `doc` script that chains `gen:jsdoc` (the `synstate` family), or a
+ * `gen-docs.mts` that imports the embedder and calls it (everywhere else).
  */
 const findWiringViolation = async (
   packageDir: string,

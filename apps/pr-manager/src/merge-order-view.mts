@@ -1,37 +1,37 @@
 /**
  * Which pull requests the merge order shows, and in what order.
  *
- * **The statuses** are the counts the merge order leads with. Each is a
- * switch: a pull request under any status switched off is hidden, whatever
- * else it is, so switching off `queued` leaves what is still waiting to be
- * looked at, and one under none of them is shown. Each can also be picked
- * ("only"): once any is, a pull request is shown only when it is under one
- * picked, whatever else it is, and still not under one switched off. "Only
- * failing" is not a set of statuses switched off, which is why picking is
- * its own choice: hiding the rest would still show what is under none of
- * them, and hide what is failing and also queued. A status is never both,
- * so picking one switches it back on, and switching one off unpicks it.
+ * **The statuses** are the counts the merge order leads with. Each is a switch:
+ * a pull request under any status switched off is hidden, whatever else it is,
+ * so switching off `queued` leaves what is still waiting to be looked at, and
+ * one under none of them is shown. Each can also be picked ("only"): once any
+ * is, a pull request is shown only when it is under one picked, whatever else
+ * it is, and still not under one switched off. "Only failing" is not a set of
+ * statuses switched off, which is why picking is its own choice: hiding the
+ * rest would still show what is under none of them, and hide what is failing
+ * and also queued. A status is never both, so picking one switches it back on,
+ * and switching one off unpicks it.
  *
- * **The priorities** are the `priority:*` labels, and "none" for a pull
- * request carrying no one of them; it is hidden when its priority is
- * switched off. Sorted by priority, siblings in the tree are ordered by the
- * best priority anywhere below them, since landing what is high means
- * landing what holds it up first, and "none" sits between mid and low.
+ * **The priorities** are the `priority:*` labels, and "none" for a pull request
+ * carrying no one of them; it is hidden when its priority is switched off.
+ * Sorted by priority, siblings in the tree are ordered by the best priority
+ * anywhere below them, since landing what is high means landing what holds it
+ * up first, and "none" sits between mid and low.
  *
- * What is hidden gives its place to what is shown below it, so the tree
- * stays a tree. Everything is shown, in merge order, by default.
+ * What is hidden gives its place to what is shown below it, so the tree stays a
+ * tree. Everything is shown, in merge order, by default.
  *
  * **Kept in the query string**, as the layout is (`layout.mts`), so that a
- * bookmark or a pasted link opens on the same pull requests; only what
- * differs from {@link DEFAULT_MERGE_ORDER_VIEW} is written:
- * `prs.hide=queued.setAside` (the statuses switched off),
- * `prs.only=failing` (the ones picked), `prs.hidePriority=low.none` and
- * `prs.sort=priority`. A name it does not know is dropped, so a URL written
- * by an older page, or edited by hand, still opens.
+ * bookmark or a pasted link opens on the same pull requests; only what differs
+ * from {@link DEFAULT_MERGE_ORDER_VIEW} is written:
+ * `prs.hide=queued.setAside` (the statuses switched off), `prs.only=failing`
+ * (the ones picked), `prs.hidePriority=low.none` and `prs.sort=priority`. A
+ * name it does not know is dropped, so a URL written by an older page, or
+ * edited by hand, still opens.
  *
- * A draft is not one of the statuses: it is always shown, and its badge on
- * the card says what it is. Nor is being behind the base, which the card's
- * ahead / behind bar says. A choice saved while either was one drops it.
+ * A draft is not one of the statuses: it is always shown, and its badge on the
+ * card says what it is. Nor is being behind the base, which the card's ahead /
+ * behind bar says. A choice saved while either was one drops it.
  */
 
 import {
@@ -72,8 +72,8 @@ export const STATUS_FILTERS = [
  * The statuses on offer. `queued` and `set aside` are `unblock-prs`'s, and
  * `awaiting code owner` is what a ruleset on the default branch asks for, so
  * where the repository does not run the one or ask for the other
- * (`RepoFeatures` in `load-report.mts`) they are counts that are always
- * nought, and switches that do nothing; they are left out there.
+ * (`RepoFeatures` in `load-report.mts`) they are counts that are always nought,
+ * and switches that do nothing; they are left out there.
  */
 export const statusFiltersOf = (
   features: Readonly<{ queue: boolean; codeOwnerReview: boolean }>,
@@ -85,10 +85,10 @@ export const statusFiltersOf = (
   );
 
 /**
- * The view as it applies where only `available` is on offer: what it hides
- * or picks of the rest is ignored rather than forgotten, so the choice comes
- * back on a repository that has them — the choice is in the URL, which goes
- * along to another repository.
+ * The view as it applies where only `available` is on offer: what it hides or
+ * picks of the rest is ignored rather than forgotten, so the choice comes back
+ * on a repository that has them — the choice is in the URL, which goes along to
+ * another repository.
  */
 export const withAvailable = (
   view: MergeOrderView,
@@ -120,8 +120,8 @@ export type MergeOrderSort = 'order' | 'priority';
 
 export type MergeOrderView = Readonly<{
   /**
-   * What is switched off rather than on, so that a status added later is
-   * shown to a reader whose choice was saved before it existed.
+   * What is switched off rather than on, so that a status added later is shown
+   * to a reader whose choice was saved before it existed.
    */
   hiddenStatuses: readonly StatusFilter[];
   /** What is picked; nothing picked is no narrowing. */
@@ -174,13 +174,12 @@ export const arrangeMergeOrder = (
 
 /**
  * The forest with what is not `shown` taken out, and siblings ordered by the
- * lowest `rank` in what is shown of them and below them, then by number —
- * the order `pr-report-core` draws them in, so ranking nothing changes
- * nothing.
+ * lowest `rank` in what is shown of them and below them, then by number — the
+ * order `pr-report-core` draws them in, so ranking nothing changes nothing.
  *
- * A pull request with several predecessors is expanded where it is first
- * drawn now, which hiding and sorting can move, and is a `repeated` line
- * everywhere after; a hidden one is neither.
+ * A pull request with several predecessors is expanded where it is first drawn
+ * now, which hiding and sorting can move, and is a `repeated` line everywhere
+ * after; a hidden one is neither.
  */
 export const arrangeForest = (
   roots: readonly TreeNode[],
@@ -287,11 +286,11 @@ export type MergeOrderCounts = Readonly<{
 /**
  * What each count reads: how many the list shows, of how many are open.
  *
- * A count is also a switch, and one switched off would read nothing at all
- * if it counted the list alone, which is no help to whoever is deciding
- * whether to switch it back on. So each kind is counted with its own switch
- * on, and every other as it is: switched on, that is how many of the list
- * are under it; switched off, how many switching it on would bring back.
+ * A count is also a switch, and one switched off would read nothing at all if
+ * it counted the list alone, which is no help to whoever is deciding whether to
+ * switch it back on. So each kind is counted with its own switch on, and every
+ * other as it is: switched on, that is how many of the list are under it;
+ * switched off, how many switching it on would bring back.
  */
 export const countView = (
   entries: readonly Entry[],

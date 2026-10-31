@@ -1,7 +1,7 @@
 /**
- * The app's state, made once with the browser and Firebase as its
- * surroundings. What each part does, and the tests of it, are in the modules
- * this puts together — this file is only which real thing each is handed.
+ * The app's state, made once with the browser and Firebase as its surroundings.
+ * What each part does, and the tests of it, are in the modules this puts
+ * together — this file is only which real thing each is handed.
  * Nothing else creates a store, or reaches Firebase other than through `api`.
  */
 

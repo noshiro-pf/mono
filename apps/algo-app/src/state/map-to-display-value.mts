@@ -104,10 +104,10 @@ const mapPlayers6CardsToDisplayValue = ({
   myPlayerIndex: PlayerIndex;
   onCardClick: (card: Card, playerDirectionFromMe: NWES) => void;
 }>): FixedLengthTuple<6, CardWithDisplayValue> =>
-  // Written as `Arr.map(sortCards(…), …)` rather than
-  // `pipe().map(Arr.map(…))`: `fix:lint` rewrites the latter into `Arr.map`'s
-  // curried overload, which cannot infer the element type from the callback
-  // alone and leaves every parameter `unknown`.
+  // Written as `Arr.map(sortCards(…), …)` rather than `pipe().map(Arr.map(…))`:
+  // `fix:lint` rewrites the latter into `Arr.map`'s curried overload, which
+  // cannot infer the element type from the callback alone and leaves every
+  // parameter `unknown`.
   Arr.map(sortCards(player6Cards), (c) => {
     const isAns = cardEq(gameState.cardChosenToBeAttacked, c);
 

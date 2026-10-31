@@ -28,9 +28,9 @@ export const pullRequestOf = (address: string): PullRequest | undefined => {
 };
 
 /**
- * An issue's address, without its query or fragment, or `undefined` when
- * the link is to anything else — which is what is checked of a link read off
- * a page before a pane is pointed at it.
+ * An issue's address, without its query or fragment, or `undefined` when the
+ * link is to anything else — which is what is checked of a link read off a page
+ * before a pane is pointed at it.
  */
 export const issueUrlOf = (address: string): string | undefined =>
   repositoryItemOf(address, 'issues')?.url;
@@ -39,8 +39,8 @@ export const issueUrlOf = (address: string): string | undefined =>
  * The title of a pull request, out of GitHub's tab title for any of its tabs:
  * `<title> by <author> · Pull Request #<number> · <owner>/<repo> · GitHub`.
  *
- * The author is the last ` by ` before the `·`, so a title with a ` by ` of
- * its own keeps it. A `#<number> ` in front, which `github-view-defaults-extension`
+ * The author is the last ` by ` before the `·`, so a title with a ` by ` of its
+ * own keeps it. A `#<number> ` in front, which `github-view-defaults-extension`
  * puts there, is taken off. Any other shape is `undefined`, and the tab is then
  * titled with the number alone.
  */
@@ -73,25 +73,23 @@ export const pullRequestTitleOf = (
 };
 
 /**
- * A Claude Code session's address, or `undefined` for anything else — which
- * is what is checked of a link read off a page before a pane is pointed at
- * it.
+ * A Claude Code session's address, or `undefined` for anything else — which is
+ * what is checked of a link read off a page before a pane is pointed at it.
  */
 export const claudeSessionUrlOf = (address: string): string | undefined =>
   claudeSessionUrlPattern.test(address) ? address : undefined;
 
 /**
  * The first Claude Code session a pull request's description names on a
- * `Claude-Session:` line — `Claude-Session: [<title>](<url>)`, or the URL
- * alone — as the PR Manager reads it
- * (`apps/pr-manager/src/claude-session.mts`): at the start of a line, in
+ * `Claude-Session:` line — `Claude-Session: [<title>](<url>)`, or the URL alone
+ * — as the PR Manager reads it (`apps/pr-manager/src/claude-session.mts`): at
+ * the start of a line, in
  * any case, and only a `https://claude.ai/code/session_…` URL, so a trailer is
  * not a way to put an arbitrary page in a pane.
  *
- * The description is read off GitHub's rendering of it, with each link
- * written back as `[<text>](<href>)` — a bare URL is rendered as a link to
- * itself — and the code blocks left out, which is where the PR Manager does
- * not look either.
+ * The description is read off GitHub's rendering of it, with each link written
+ * back as `[<text>](<href>)` — a bare URL is rendered as a link to itself — and
+ * the code blocks left out, which is where the PR Manager does not look either.
  */
 export const claudeSessionUrlOfBody = (body: string): string | undefined =>
   Array.from(body.matchAll(trailerLinePattern), (line) =>
@@ -100,19 +98,18 @@ export const claudeSessionUrlOfBody = (body: string): string | undefined =>
 
 /**
  * The query string of `split.html` that opens a pull request as the PR
- * Manager's links do (`apps/pr-manager/src/split-view.mts`): the diff,
- * without whitespace changes or the files already viewed, beside the
- * conversation at 7:3. When the pull request closes an issue or names the
+ * Manager's links do (`apps/pr-manager/src/split-view.mts`): the diff, without
+ * whitespace changes or the files already viewed, beside the conversation at
+ * 7:3. When the pull request closes an issue or names the
  * Claude Code session it was written in, the right half is shared with it at
  * 1:1 — the conversation beside the issue, the session beside the
- * conversation — and with both, the issue beside the conversation stacked
- * over the session. The session is next to the diff unless the issue is there
- * too.
+ * conversation — and with both, the issue beside the conversation stacked over
+ * the session. The session is next to the diff unless the issue is there too.
  *
  * Beside the diff alone, the conversation is at 100%, as the diff and the
  * session always are: its 30% is wide enough to read at full size. The
- * conversation and the issue are at 75% when they share the right half, so
- * that more of each fits.
+ * conversation and the issue are at 75% when they share the right half, so that
+ * more of each fits.
  *
  * Every pull request opened this way reuses one saved split view,
  * `github-pull-request`, rather than adding one to the list each time. It is
@@ -269,10 +266,10 @@ const narrow = 0.75;
 
 /**
  * The diff, the middle column and the right column at 2:1:1, as the diff and
- * the middle column in the left three quarters beside the right column, so
- * that closing the middle pane widens the diff. The PR Manager's
- * `threeColumns` (`apps/pr-manager/src/split-view.mts`) says why the
- * ratios are not 75% and 2/3.
+ * the middle column in the left three quarters beside the right column, so that
+ * closing the middle pane widens the diff. The PR Manager's `threeColumns`
+ * (`apps/pr-manager/src/split-view.mts`) says why the ratios are not 75% and
+ * 2/3.
  */
 const threeColumns = 'r75.1r66.8ppp';
 

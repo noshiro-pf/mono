@@ -16,9 +16,9 @@ const { table, tbody, td, tr } = van.tags;
 
 /**
  * The zoom is a state, the level a `van.derive` reading it, and every label a
- * `van.derive` reading the level. Each cell is bound to a function that
- * formats a figure. A state assigned the value it already has does not
- * propagate, so a change within a level stops at the level.
+ * `van.derive` reading the level. Each cell is bound to a function that formats
+ * a figure. A state assigned the value it already has does not propagate, so a
+ * change within a level stops at the level.
  */
 export const vanjsZoom: ScenarioFramework<ZoomApp> = {
   name: 'VanJS',

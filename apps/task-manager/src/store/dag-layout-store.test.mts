@@ -76,8 +76,8 @@ const mixed: DomainState = {
 } as const;
 
 /**
- * A stand-in for ELK: the nodes `step` apart in the direction asked for, in
- * the order given.
+ * A stand-in for ELK: the nodes `step` apart in the direction asked for, in the
+ * order given.
  */
 const laidOut = (input: LayoutInput | undefined, step: number): GraphLayout =>
   ({
@@ -480,8 +480,8 @@ const arcColumn = (store: DagLayoutStore): ReadonlyMap<GraphNodeId, Point> =>
   );
 
 /**
- * The DAG shown with `mixed`, its animation run out, and the canvas said to
- * be `width` wide.
+ * The DAG shown with `mixed`, its animation run out, and the canvas said to be
+ * `width` wide.
  */
 const shownWithWidth = async (
   width: number,
@@ -1425,9 +1425,9 @@ describe(createDagLayoutStore, () => {
   });
 
   describe('the view mode', () => {
-    // ELK's places for `mixed`: x (0, 0), y (100, 0), m (200, 0). The
-    // column, by title: y (Alpha) at the top, x (Zeta) below it, and m,
-    // joined to neither, at the end, its right side lined up with theirs.
+    // ELK's places for `mixed`: x (0, 0), y (100, 0), m (200, 0). The column,
+    // by title: y (Alpha) at the top, x (Zeta) below it, and m, joined to
+    // neither, at the end, its right side lined up with theirs.
     const dagPlaces = positions([
       ['task:x', { x: 0, y: 0 }],
       ['task:y', { x: 100, y: 0 }],
@@ -2849,8 +2849,8 @@ describe(createDagLayoutStore, () => {
   });
 
   describe('the order of アーク and タイル', () => {
-    // `mixed` by title: y (Alpha), then x (Zeta); the other way round by
-    // title descending. Either way, m, joined to neither, is last.
+    // `mixed` by title: y (Alpha), then x (Zeta); the other way round by title
+    // descending. Either way, m, joined to neither, is last.
     const arcStep = TASK_NODE_SIZE.height + ARC_NODE_GAP;
 
     const lastMilestone = [
@@ -3029,8 +3029,8 @@ describe(createDagLayoutStore, () => {
     });
 
     test('follows the time, for an order by status', async () => {
-      // y waits for a milestone dated 5000: blocked until then, after x,
-      // which is ready; both ready from then, and y (Alpha) first by title.
+      // y waits for a milestone dated 5000: blocked until then, after x, which
+      // is ready; both ready from then, and y (Alpha) first by title.
       const gate = asMilestoneId('gate');
 
       const gated: DomainState = {
@@ -3240,8 +3240,8 @@ describe(createDagLayoutStore, () => {
     });
 
     test('still count for the order by status', async () => {
-      // y waits for x, which is done: ready, as is z, after y by title —
-      // and blocked, after z, were x not counted.
+      // y waits for x, which is done: ready, as is z, after y by title — and
+      // blocked, after z, were x not counted.
       const done: DomainState = {
         tasks: [
           createTask({

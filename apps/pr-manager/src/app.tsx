@@ -35,30 +35,30 @@ import {
 /**
  * GitHub Pull Requests Manager.
  *
- * Reads the open pull requests straight from GitHub and shows what is
- * holding each one up — the merge order the `Merge-After:` trailers declare,
- * the verdict of the contexts the default branch requires, how far each branch is
- * from its base, whether it conflicts with it, and whether it waits for a
- * code owner — with what merged in the last week below.
+ * Reads the open pull requests straight from GitHub and shows what is holding
+ * each one up — the merge order the `Merge-After:` trailers declare, the
+ * verdict of the contexts the default branch requires, how far each branch is
+ * from its base, whether it conflicts with it, and whether it waits for a code
+ * owner — with what merged in the last week below.
  *
  * It only reads. Nothing here labels, rebases, merges or comments: that is
- * `unblock-prs`, run by a person, and a page that cannot do any of it is a
- * page that is safe to leave open — which is what this is for, so it keeps
- * itself current rather than going stale behind a tab. When it reads is
- * `store/reader.mts`; this only draws what the store holds, and is called
- * once: every part of the page below is bound to the store values it shows.
+ * `unblock-prs`, run by a person, and a page that cannot do any of it is a page
+ * that is safe to leave open — which is what this is for, so it keeps itself
+ * current rather than going stale behind a tab. When it reads is
+ * `store/reader.mts`; this only draws what the store holds, and is called once:
+ * every part of the page below is bound to the store values it shows.
  *
- * The header folds into a one-line toolbar that stays at the top of the
- * window (`HeaderFoldToggle`), for a reader who wants the room for the
- * report: the title shrinks, the token panel and the line saying when the
- * report was read go, and the actions stay where they were. Its height is
- * handed to the stylesheet as `--header-height`, which is how far below the
- * top of the window the merge order's counts stop when they stay in view
- * under it (`index.css`): the toolbar wraps onto a second line on a narrow
- * screen, so that is not a length the stylesheet could know.
+ * The header folds into a one-line toolbar that stays at the top of the window
+ * (`HeaderFoldToggle`), for a reader who wants the room for the report: the
+ * title shrinks, the token panel and the line saying when the report was read
+ * go, and the actions stay where they were. Its height is handed to the
+ * stylesheet as `--header-height`, which is how far below the top of the window
+ * the merge order's counts stop when they stay in view under it (`index.css`):
+ * the toolbar wraps onto a second line on a narrow screen, so that is not a
+ * length the stylesheet could know.
  *
- * In the layout's `fill` mode (`layout.mts`) the page is as tall as the
- * window and does not scroll; the blocks share what the header leaves.
+ * In the layout's `fill` mode (`layout.mts`) the page is as tall as the window
+ * and does not scroll; the blocks share what the header leaves.
  */
 export const App = (): JSX.Element => {
   const { loadStatus } = reader;
@@ -191,8 +191,8 @@ const TITLE = 'GitHub Pull Requests Manager';
 
 /**
  * Hands the header's border-box height to `setHeight` whenever it changes,
- * until the page goes. The toolbar wraps onto a second line on a narrow
- * screen, so the height is measured rather than known.
+ * until the page goes. The toolbar wraps onto a second line on a narrow screen,
+ * so the height is measured rather than known.
  */
 const observeHeight =
   (setHeight: (height: number) => void) =>

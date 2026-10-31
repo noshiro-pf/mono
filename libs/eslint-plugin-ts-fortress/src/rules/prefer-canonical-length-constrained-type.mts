@@ -211,9 +211,9 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
               replacement: localName,
               boundsText: boundsText(node, rewrite, sourceCode),
             },
-            // Every fix brings the name into scope itself, so that one
-            // applied alone (an editor's quick fix) is complete. An import
-            // that cannot bind it as a value (`import type`) leaves no fix.
+            // Every fix brings the name into scope itself, so that one applied
+            // alone (an editor's quick fix) is complete. An import that cannot
+            // bind it as a value (`import type`) leaves no fix.
             fix:
               binding === undefined
                 ? null
@@ -244,8 +244,8 @@ const skipLiteralPreservingWrappers = (node: TSESTree.Node): TSESTree.Node =>
     : node;
 
 /**
- * A non-negative integer literal's value, or `undefined` for anything else —
- * a computed bound cannot be matched against the rewrite table.
+ * A non-negative integer literal's value, or `undefined` for anything else — a
+ * computed bound cannot be matched against the rewrite table.
  *
  * Read through `satisfies` and `as const`, which leave the literal's type as it
  * is, but not through any other `as`: `1 as number` widens the bound the
@@ -344,11 +344,11 @@ const boundsText = (
 
 /**
  * Removes the length arguments the rewrite drops. Each removal runs from the
- * dropped argument's first token — the outermost of the parentheses the
- * source puts around it, which `node.range` leaves out — up to the token after
- * the comma that follows it. So the argument's own parentheses, the comma and
- * any whitespace and comments after it go with it, while the next argument
- * keeps its parentheses; the ranges never overlap.
+ * dropped argument's first token — the outermost of the parentheses the source
+ * puts around it, which `node.range` leaves out — up to the token after the
+ * comma that follows it. So the argument's own parentheses, the comma and any
+ * whitespace and comments after it go with it, while the next argument keeps
+ * its parentheses; the ranges never overlap.
  */
 const dropBoundsFix = (
   fixer: TSESLint.RuleFixer,
@@ -357,12 +357,12 @@ const dropBoundsFix = (
   sourceCode: TSESLint.SourceCode,
 ): readonly TSESLint.RuleFix[] =>
   rewrite.bounds.flatMap((_, index) => {
-    // Read before the `includes` below, not after. The strict standard
-    // library types `includes` as `searchElement is T` — that is what lets a
-    // literal union narrow a wider value — but the predicate applies to the
-    // false branch too, and here `keep` is `readonly number[]` against a
-    // `number`, so `index` narrows to `never` past the guard. A false
-    // `includes` means "not in this array", not "not of this type".
+    // Read before the `includes` below, not after. The strict standard library
+    // types `includes` as `searchElement is T` — that is what lets a literal
+    // union narrow a wider value — but the predicate applies to the false
+    // branch too, and here `keep` is `readonly number[]` against a `number`, so
+    // `index` narrows to `never` past the guard. A false `includes` means "not
+    // in this array", not "not of this type".
     const dropped = node.arguments[index];
 
     if (dropped === undefined || rewrite.keep.includes(index)) {

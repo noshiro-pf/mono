@@ -18,17 +18,17 @@ import { SvgTitle } from './svg-elements.js';
 
 /**
  * The open issues as a graph of what each waits for, read left to right:
- * an arrow runs from what an issue's `Start-After:` names to the issue, and
- * a dashed line from an issue to an open pull request that closes it. Each
- * node is a link to its page on GitHub. Where everything goes is
- * `issue-graph-layout.mts`; this only draws it, in a box that scrolls when
- * the graph is wider or taller than it. In a block that scrolls on its own
- * the box takes what room the block has (`index.css`); elsewhere it is at
- * most 70% of the window's height.
+ * an arrow runs from what an issue's `Start-After:` names to the issue, and a
+ * dashed line from an issue to an open pull request that closes it. Each node
+ * is a link to its page on GitHub. Where everything goes is
+ * `issue-graph-layout.mts`; this only draws it, in a box that scrolls when the
+ * graph is wider or taller than it. In a block that scrolls on its own the box
+ * takes what room the block has (`index.css`); elsewhere it is at most 70% of
+ * the window's height.
  *
  * Drawn at the scale the zoom above it chose (`issue-dag-zoom.tsx`): the
- * `viewBox` stays the layout's, and the size the SVG takes on the page is
- * what is scaled, so that the box scrolls over the graph at any size.
+ * `viewBox` stays the layout's, and the size the SVG takes on the page is what
+ * is scaled, so that the box scrolls over the graph at any size.
  * Rounded down to whole pixels, which a fit relies on to leave the box no
  * scroll bar to draw.
  */
@@ -133,8 +133,8 @@ const Dag = (): JSX.Element => {
                   class={constant('issue-dag-edge')}
                   d={view(edge$, ({ path }) => path)}
                   data-kind={view(edge$, ({ kind }) => kind)}
-                  // The kind is in the key, so it is the one the row was
-                  // made with.
+                  // The kind is in the key, so it is the one the row was made
+                  // with.
                   marker-end={
                     edge$.getSnapshot().value.kind === 'start-after'
                       ? constant('url(#issue-dag-arrow)')

@@ -22,11 +22,11 @@ export type Forest = Readonly<{
  * nothing and is dropped — the pull request it named has merged, which is
  * exactly the constraint being satisfied.
  *
- * Two things a forest cannot hold are handled rather than drawn. A pull
- * request that declared several predecessors appears under each of them, but
- * is expanded under the first only ({@link TreeNode.repeated} marks the rest),
- * so a diamond does not duplicate everything below it. A pull request on a
- * cycle is left out altogether and reported through {@link Forest.cycles}:
+ * Two things a forest cannot hold are handled rather than drawn. A pull request
+ * that declared several predecessors appears under each of them, but is
+ * expanded under the first only ({@link TreeNode.repeated} marks the rest), so
+ * a diamond does not duplicate everything below it. A pull request on a cycle
+ * is left out altogether and reported through {@link Forest.cycles}:
  * every member of a cycle waits, in the end, for itself, so there is no
  * position in a merge order to draw it at.
  */

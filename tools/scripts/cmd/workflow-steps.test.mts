@@ -53,8 +53,8 @@ describe('readChoice / readBoolean', () => {
   });
 
   test('a boolean is `true` or `false` and nothing else', () => {
-    // A misspelt flag would otherwise read as `false`, and drop the
-    // difference the caller asked for without a word.
+    // A misspelt flag would otherwise read as `false`, and drop the difference
+    // the caller asked for without a word.
     assert.deepStrictEqual(
       readBoolean({ ENGINE_STRICT: 'true' }, 'engine-strict'),
       {
@@ -230,8 +230,8 @@ describe('check-diff', () => {
 });
 
 /**
- * Fake `pnpm` and `git` on `PATH` that echo what they were asked to do, so
- * the run shows the exact command lines without touching anything.
+ * Fake `pnpm` and `git` on `PATH` that echo what they were asked to do, so the
+ * run shows the exact command lines without touching anything.
  */
 const makeBinDir = (): string => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'workflow-steps-'));
@@ -351,9 +351,9 @@ describe('the script, run the way the workflows run it', () => {
   });
 
   test('the script needs nothing but Node itself', () => {
-    // It runs before anything is installed, and on every Node the setup
-    // action is given — the `minimum` of tools/configs/node-support.json
-    // included, which has no `Temporal`.
+    // It runs before anything is installed, and on every Node the setup action
+    // is given — the `minimum` of tools/configs/node-support.json included,
+    // which has no `Temporal`.
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     const source = fs.readFileSync(scriptPath, 'utf8');

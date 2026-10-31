@@ -86,10 +86,10 @@ export const insertPaneBeside = (
  * Exchanges two panes' places in the tree.
  *
  * This is what dropping a pane onto the middle of another does, and it moves
- * the *layout* rather than the pages: each pane keeps its address, its
- * history, its scroll position and its sandbox setting, and takes the other's
- * rectangle. Nothing reloads, because an `iframe` element never moves — only
- * the rectangle it is positioned into does.
+ * the *layout* rather than the pages: each pane keeps its address, its history,
+ * its scroll position and its sandbox setting, and takes the other's rectangle.
+ * Nothing reloads, because an `iframe` element never moves — only the rectangle
+ * it is positioned into does.
  *
  * A pane the tree does not have is refused outright rather than half-applied:
  * renaming one leaf to an id nothing else knows would drop a pane out of the

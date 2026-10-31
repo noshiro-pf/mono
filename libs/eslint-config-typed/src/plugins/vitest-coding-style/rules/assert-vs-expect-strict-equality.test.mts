@@ -2,14 +2,14 @@
  * What `assert.deepStrictEqual` and `expect(...).toStrictEqual` actually do,
  * pinned as executable tests.
  *
- * These tests assert nothing about the lint rules in this directory. They
- * exist because the trade-off behind `no-expect-to-strict-equal` is not
+ * These tests assert nothing about the lint rules in this directory. They exist
+ * because the trade-off behind `no-expect-to-strict-equal` is not
  * self-evident from the two names: `deepStrictEqual` reads like Node.js's
- * `node:assert` function of the same name, which *does* compare prototypes,
- * and Vitest's is a different function that does not. What the rule buys in
+ * `node:assert` function of the same name, which *does* compare prototypes, and
+ * Vitest's is a different function that does not. What the rule buys in
  * exchange is a compile-time check that `toStrictEqual` does not perform at
- * all. If a future Vitest or Chai release moves either side, these fail and
- * the rule's rationale gets revisited instead of silently going stale.
+ * all. If a future Vitest or Chai release moves either side, these fail and the
+ * rule's rationale gets revisited instead of silently going stale.
  *
  * `expect(...)` is written in its `.not` form throughout, because the direct
  * form is what `no-expect-to-strict-equal` and
@@ -56,8 +56,8 @@ test('Vitest `assert.deepStrictEqual` is Chai `deepEqual`, not the Node.js funct
   // `deepEqual`; see the last test in this file.)
   assert.isTrue(chai.assert.deepStrictEqual === chai.assert.deepEqual);
 
-  // `strictEqual` and `equal`, by contrast, really are two different
-  // functions — the alias-looking name is not a reliable signal either way.
+  // `strictEqual` and `equal`, by contrast, really are two different functions
+  // — the alias-looking name is not a reliable signal either way.
   assert.isFalse(chai.assert.strictEqual === chai.assert.equal);
 });
 
@@ -111,8 +111,8 @@ test('the two agree on `Map`, `Set`, `NaN` and `-0`', () => {
 });
 
 test('`assert.deepStrictEqual` type-checks its two arguments; `toStrictEqual` does not', () => {
-  // `deepStrictEqual: <T>(actual: T, expected: T) => void` binds both
-  // arguments to one type parameter, so a mismatched pair does not compile.
+  // `deepStrictEqual: <T>(actual: T, expected: T) => void` binds both arguments
+  // to one type parameter, so a mismatched pair does not compile.
   assert.throws(() => {
     // @ts-expect-error `'1'` is not assignable to the `number` inferred from `1`
     assert.deepStrictEqual(1, '1'); // eslint-disable-line vitest-coding-style/prefer-assert-strict-equal-for-primitives -- this test is about deepStrictEqual
@@ -121,8 +121,8 @@ test('`assert.deepStrictEqual` type-checks its two arguments; `toStrictEqual` do
   // `toStrictEqual: <E>(expected: E) => void` leaves `E` unconstrained, so the
   // same mismatch compiles. The *absence* of a `@ts-expect-error` on the next
   // line is the assertion — adding one would itself become an error. (The
-  // values are wrapped in objects only because `vitest/prefer-to-be` sends
-  // bare primitives to `toBe`.)
+  // values are wrapped in objects only because `vitest/prefer-to-be` sends bare
+  // primitives to `toBe`.)
   expect({ value: 1 }).not.toStrictEqual({ value: '1' });
 });
 
@@ -147,8 +147,8 @@ test("Chai's loose APIs are unreachable through the `assert` global, which is na
 
   // None of the loose members survive on the global: `equal` / `notEqual`
   // (`==`), `deepEqual` (the very function `deepStrictEqual` aliases, kept
-  // under one name only), and `ok` / `notOk` / `isOk` / `isNotOk`
-  // (truthiness rather than `true` / `false`). See `vitest-globals.d.ts`.
+  // under one name only), and `ok` / `notOk` / `isOk` / `isNotOk` (truthiness
+  // rather than `true` / `false`). See `vitest-globals.d.ts`.
   expectType<
     keyof typeof assert &
       (

@@ -40,19 +40,19 @@ type MessageIds =
  * the curried form also requires the callee and `...rest` to be free of side
  * effects, since they are then evaluated once rather than on every call.
  *
- * A global the host provides (`requestAnimationFrame`, `setTimeout`, `fetch`
- * in the default libraries) may have to be called on `globalThis` — passed as
- * an object's property, it throws `Illegal invocation` — so `(a) => f(a)` is
- * left alone for one. ECMAScript's own global functions (`parseFloat`,
- * `String`, `Boolean`, ...) do not read `this` and are fixed as usual. Any
- * other global ambient declaration (a `.d.ts` outside the default libraries,
+ * A global the host provides (`requestAnimationFrame`, `setTimeout`, `fetch` in
+ * the default libraries) may have to be called on `globalThis` — passed as an
+ * object's property, it throws `Illegal invocation` — so `(a) => f(a)` is left
+ * alone for one. ECMAScript's own global functions (`parseFloat`, `String`,
+ * `Boolean`, ...) do not read `this` and are fixed as usual. Any other global
+ * ambient declaration (a `.d.ts` outside the default libraries,
  * `declare global`) cannot be judged, so it is reported with a suggestion
  * rather than fixed.
  *
  * The callee is found through type wrappers and judged by its type at every
  * layer: a cast cannot lend it a curried signature, and one widening it to a
- * type that takes more arguments is the author saying it may read them. The
- * fix keeps the wrappers,
+ * type that takes more arguments is the author saying it may read them. The fix
+ * keeps the wrappers,
  * parenthesizing a callee that needs it: `(c ? g : h)(a, 1)` → `(c ? g : h)(1)`.
  */
 export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
@@ -460,9 +460,9 @@ const isCallableWith = (
   argCount <= signatureMaxArgs(signature);
 
 /**
- * `true` when `type` has a curried call signature accepting exactly
- * `restCount` arguments and returning a function that accepts one argument —
- * i.e. `f(...rest)` is the curried form of `f(a, ...rest)`.
+ * `true` when `type` has a curried call signature accepting exactly `restCount`
+ * arguments and returning a function that accepts one argument — i.e.
+ * `f(...rest)` is the curried form of `f(a, ...rest)`.
  */
 const hasCurriedSignature = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -553,9 +553,9 @@ const isPureExpression = (node: DeepReadonly<TSESTree.Node>): boolean => {
 };
 
 /**
- * The function-valued properties of ECMAScript's global object, which read
- * no `this` and so may be passed as values. `eval` is left out: passing it
- * turns a direct `eval` into an indirect one.
+ * The function-valued properties of ECMAScript's global object, which read no
+ * `this` and so may be passed as values. `eval` is left out: passing it turns a
+ * direct `eval` into an indirect one.
  */
 const ECMASCRIPT_GLOBAL_FUNCTIONS: ReadonlySet<string> = new Set<string>([
   'AggregateError',

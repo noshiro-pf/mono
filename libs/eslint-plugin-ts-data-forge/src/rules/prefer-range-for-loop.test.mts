@@ -309,8 +309,8 @@ describe('prefer-range-for-loop where the rewrite would change behavior', () => 
         errors: [{ messageId: 'useRangeForLoop' }],
       },
       {
-        // The type checker judges it: a `number` step makes the fixed call
-        // fail to type-check.
+        // The type checker judges it: a `number` step makes the fixed call fail
+        // to type-check.
         name: 'a variable step is fixed without asking its type',
         code: dedent`
           declare const n: number;

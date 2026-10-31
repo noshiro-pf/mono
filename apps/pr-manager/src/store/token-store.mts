@@ -1,11 +1,11 @@
 /**
  * The reader's token, and the form they give it in.
  *
- * Read from storage once, when the store is made, so that a reader who
- * ticked "remember" does not have to paste it again. After that the store
- * is the one copy that is changed, and storage follows it: once started,
- * each change of `token` is written through `token.mts`, so no action has
- * to remember to write both.
+ * Read from storage once, when the store is made, so that a reader who ticked
+ * "remember" does not have to paste it again. After that the store is the one
+ * copy that is changed, and storage follows it: once started, each change of
+ * `token` is written through `token.mts`, so no action has to remember to write
+ * both.
  */
 
 import {

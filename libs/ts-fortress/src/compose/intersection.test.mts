@@ -505,8 +505,8 @@ describe(intersection, () => {
       );
 
       test('keeps nested paths of every member (deep merge)', () => {
-        // A shallow merge of the pruned member results would drop `pos.x`
-        // here, because the later member also prunes the shared `pos` key.
+        // A shallow merge of the pruned member results would drop `pos.x` here,
+        // because the later member also prunes the shared `pos` key.
         assert.deepStrictEqual(
           targetType.prune({ pos: { x: 1, y: 2, z: 9 }, a: 1, b: 2, c: 9 }),
           { pos: { x: 1, y: 2 }, a: 1, b: 2 },

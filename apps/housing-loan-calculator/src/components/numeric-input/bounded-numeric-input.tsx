@@ -18,8 +18,8 @@ type Props<N extends number> = Readonly<{
 
 /**
  * A numeric input of the page: right-aligned, the width of its row, and
- * committed as a number in `[min, max]`. Text that is no number is committed
- * as `min`, which is also where a step from it starts.
+ * committed as a number in `[min, max]`. Text that is no number is committed as
+ * `min`, which is also where a step from it starts.
  */
 export const BoundedNumericInput = <N extends number>({
   value,

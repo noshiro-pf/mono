@@ -4,9 +4,9 @@
  * (`repository/plan-doc.mts`). Every read and write goes through
  * `api/firestore-io.mts`, which prunes each document written to its codec.
  *
- * The listener hands back local writes at once, and the persistent cache
- * set up in `firebase-backend.mts` keeps the plans readable — and writable,
- * queued — offline.
+ * The listener hands back local writes at once, and the persistent cache set up
+ * in `firebase-backend.mts` keeps the plans readable — and writable, queued —
+ * offline.
  */
 
 import { collection, doc, type Firestore } from 'firebase/firestore';

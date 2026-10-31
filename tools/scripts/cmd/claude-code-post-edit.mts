@@ -12,21 +12,21 @@ import type { UnknownRecord } from 'ts-type-forge';
  * back to the model on stderr with exit code 2, which is how a `PostToolUse`
  * hook speaks to it (the edit has already happened; nothing is blocked).
  *
- * **Fast, or it is a net loss.** Prettier takes about half a second and
- * oxlint a fifth of one. ESLint is not run: this repository's configs are
+ * **Fast, or it is a net loss.** Prettier takes about half a second and oxlint
+ * a fifth of one. ESLint is not run: this repository's configs are
  * type-aware, and one file costs the whole package's program — 5 s in
- * `split-view-extension`, 12 s in `ts-data-forge`, on every edit. The
- * package's `fix:lint`, or `pnpm run check-changed`, runs it once at the end.
+ * `split-view-extension`, 12 s in `ts-data-forge`, on every edit. The package's
+ * `fix:lint`, or `pnpm run check-changed`, runs it once at the end.
  *
  * **Silent when it cannot run.** No repository root above the file, no
- * `node_modules`, a file outside the repository, under `experimental/`
- * (nothing checks it), under `strict-lib/` (oxfmt owns it, not Prettier), in
- * `node_modules/` or a `dist/`, or a deleted file: exit 0 with nothing
- * printed. A tool that fails to start, rather than finding something, is
- * silent too, so a broken toolchain never reads as a finding about the edit.
+ * `node_modules`, a file outside the repository, under `experimental/` (nothing
+ * checks it), under `strict-lib/` (oxfmt owns it, not Prettier), in
+ * `node_modules/` or a `dist/`, or a deleted file: exit 0 with nothing printed.
+ * A tool that fails to start, rather than finding something, is silent too, so
+ * a broken toolchain never reads as a finding about the edit.
  *
- * **Run with `node`, not `tsx`.** The hook starts on whatever Node the
- * session has, possibly before `pnpm install`, so this imports only `node:*`
+ * **Run with `node`, not `tsx`.** The hook starts on whatever Node the session
+ * has, possibly before `pnpm install`, so this imports only `node:*`
  * modules at runtime, uses only erasable syntax and no `Temporal`; the test
  * holds that. `$CLAUDE_PROJECT_DIR`, which the hook command uses to find this
  * file, names the checkout the session started in, not a worktree it moved to;
@@ -60,11 +60,11 @@ export const main = (stdin: string): number => {
     [
       '--write',
       '--ignore-unknown',
-      // An import added by one edit and first used by the next would
-      // otherwise be removed in between by prettier-plugin-organize-imports.
+      // An import added by one edit and first used by the next would otherwise
+      // be removed in between by prettier-plugin-organize-imports.
       // Prettier warns that it does not know the option before the plugin
-      // loads, and then honors it; `error` keeps that warning out of what
-      // the model is shown.
+      // loads, and then honors it; `error` keeps that warning out of what the
+      // model is shown.
       '--organize-imports-skip-destructive-code-actions=true',
       '--log-level=error',
       file,
@@ -87,8 +87,8 @@ export const main = (stdin: string): number => {
 
   const findings = [
     // Prettier exits 2 for a file it cannot parse and for its own failures
-    // alike (a plugin that does not load, a broken config); only the first
-    // is about the edit, and only it says `SyntaxError`.
+    // alike (a plugin that does not load, a broken config); only the first is
+    // about the edit, and only it says `SyntaxError`.
     ...(prettier.status === 2 && prettier.stderr.includes('SyntaxError')
       ? ([
           `Prettier could not format ${relative}:\n${prettier.stderr.trim()}`,

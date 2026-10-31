@@ -9,8 +9,8 @@ type Props = Readonly<{
 }>;
 
 /**
- * A workflow run's state as the Actions tab draws it: a ring turning for one
- * in progress, a dot for one queued. Both in the status amber, which is what
+ * A workflow run's state as the Actions tab draws it: a ring turning for one in
+ * progress, a dot for one queued. Both in the status amber, which is what
  * GitHub gives them. The ring turns whatever the reader's motion setting
  * (`index.css`).
  *

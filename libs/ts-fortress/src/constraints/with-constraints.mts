@@ -6,10 +6,10 @@ import type { Type, UnknownType } from '../type.mjs';
  * The carrier of the constraint values a {@link Type} was created with.
  *
  * Constrained primitives (`number`, `string`, `bigint` and the branded types
- * built on them) expose the constraints they were given as
- * a plain, fully-enumerated record, so that the numbers a schema validates
- * against can also drive a form (`min` / `max` / `step` on an `<input>`, a
- * character counter, ...) instead of being written down a second time.
+ * built on them) expose the constraints they were given as a plain,
+ * fully-enumerated record, so that the numbers a schema validates against can
+ * also drive a form (`min` / `max` / `step` on an `<input>`, a character
+ * counter, ...) instead of being written down a second time.
  *
  * Every key of the constraint set is present, so a constraint that _was_
  * specified is read without `?.`; one that was not is typed `undefined`.
@@ -102,9 +102,9 @@ export const attachConstraints = <A, C>(
   constraints: C,
 ): ConstrainedType<A, C> =>
   // Property descriptors rather than a spread: `union`, `record`, `recursion`
-  // and the array types expose `defaultValue` as a lazy, memoized getter, and
-  // a spread would call it here — which for a recursive type never
-  // terminates — and freeze whatever it returned into a plain value.
+  // and the array types expose `defaultValue` as a lazy, memoized getter, and a
+  // spread would call it here — which for a recursive type never terminates —
+  // and freeze whatever it returned into a plain value.
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   Object.defineProperties(
     {},

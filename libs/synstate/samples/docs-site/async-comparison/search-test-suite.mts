@@ -1,8 +1,8 @@
 // cspell:ignore unstub
 /**
  * The behavior every implementation on the "Async Logic Compared" page shares,
- * as one test suite each sample runs against itself. The page compares how
- * the code reads; this suite is what makes it a comparison of equals.
+ * as one test suite each sample runs against itself. The page compares how the
+ * code reads; this suite is what makes it a comparison of equals.
  */
 import { debounceMs, type Item, type SearchState } from './00-search-api.mjs';
 
@@ -10,8 +10,8 @@ export const testSearch = (
   libraryName: string,
   createHandle: () => SearchHandle,
 ): void => {
-  // Every case runs twice: against `fetch`, whose aborted request rejects,
-  // and against a promise API that ignores its signal and answers anyway.
+  // Every case runs twice: against `fetch`, whose aborted request rejects, and
+  // against a promise API that ignores its signal and answers anyway.
   describe.each([
     { honorsAbort: true, against: 'fetch' },
     { honorsAbort: false, against: 'a promise API that ignores its signal' },

@@ -5,9 +5,9 @@ import { Result } from '../../functional/index.mjs';
  * Converts a `Date` to an ISO 8601 string without throwing.
  *
  * `Date.prototype.toISOString` throws a `RangeError` when the date holds an
- * invalid time value (`NaN`). This wrapper validates that condition up front
- * — via `Number.isNaN(date.getTime())`, the same check the spec performs —
- * and returns the failure as a tagged `Err`.
+ * invalid time value (`NaN`). This wrapper validates that condition up front —
+ * via `Number.isNaN(date.getTime())`, the same check the spec performs — and
+ * returns the failure as a tagged `Err`.
  *
  * @example
  *

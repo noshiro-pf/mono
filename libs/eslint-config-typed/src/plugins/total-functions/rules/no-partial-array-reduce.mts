@@ -47,8 +47,8 @@ export const noPartialArrayReduce = createRule({
     return {
       CallExpression: (node) => {
         // We only care if this call is a member expression.
-        // `xs.reduce!(f)` and `(xs.reduce satisfies unknown)(f)` call the
-        // same method.
+        // `xs.reduce!(f)` and `(xs.reduce satisfies unknown)(f)` call the same
+        // method.
 
         const callee = skipTypeWrappers(node.callee);
 

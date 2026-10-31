@@ -162,9 +162,8 @@ describe('diff', () => {
         await fs.writeFile(testFilePath, 'test content');
 
         // Invoke getUntrackedFiles from the subdirectory (not from repo root).
-        // Without the cwd fix, git ls-files would return paths relative to
-        // the subdirectory, which would then be incorrectly joined with
-        // gitRoot.
+        // Without the cwd fix, git ls-files would return paths relative to the
+        // subdirectory, which would then be incorrectly joined with gitRoot.
         const originalCwd = process.cwd();
 
         process.chdir(subDir);

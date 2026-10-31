@@ -454,8 +454,8 @@ describe('string with constraints', () => {
     // the branded length-constrained types) are encoded in the result brand.
     // A larger literal or a non-literal `number` collapses the result type to
     // plain `string` to keep the type-level computation cheap, while the
-    // runtime constraint applies regardless. Non-integer bounds and bounds
-    // less than 1 throw at construction time.
+    // runtime constraint applies regardless. Non-integer bounds and bounds less
+    // than 1 throw at construction time.
 
     test('the largest supported literal (2048) is encoded in the brand', () => {
       const longDefault: string = 'x'.repeat(2048);
@@ -516,8 +516,8 @@ describe('string with constraints', () => {
 
     test('the default value is only length-checked at runtime for an out-of-range bound', () => {
       // With an in-range literal bound, a too-short default is already a
-      // compile error; with an out-of-range bound it compiles and the check
-      // is deferred to runtime.
+      // compile error; with an out-of-range bound it compiles and the check is
+      // deferred to runtime.
       const shortDefault: string = 'hi';
 
       expect(() => string(shortDefault, { minLength: 2049 })).toThrow(

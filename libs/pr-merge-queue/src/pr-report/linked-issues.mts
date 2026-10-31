@@ -15,13 +15,13 @@ const CLOSING_REFERENCE =
   /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\b[^\S\n]*:?[^\S\n]*(?:#(?<number>\d+)|https:\/\/github\.com\/(?<owner>[\w.-]+)\/(?<repo>[\w.-]+)\/issues\/(?<urlNumber>\d+))\b/giu;
 
 /**
- * The issue numbers a body declares this pull request closes, in the order
- * they first appear.
+ * The issue numbers a body declares this pull request closes, in the order they
+ * first appear.
  *
  * Read from the body rather than from GitHub's own list because that list is
- * only in the GraphQL API, which needs a token. What this misses is a link
- * made by hand in the sidebar, and a reference to another repository's issue
- * — deliberately, since neither can be rendered as a local `#N`.
+ * only in the GraphQL API, which needs a token. What this misses is a link made
+ * by hand in the sidebar, and a reference to another repository's issue —
+ * deliberately, since neither can be rendered as a local `#N`.
  *
  * Fenced code is skipped for the same reason `Merge-After:` skips it.
  */

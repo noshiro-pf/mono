@@ -35,8 +35,8 @@ const preamble = dedent`
 `;
 
 /**
- * Runs the transformer over `code` in {@link project}, and returns what it
- * made of it.
+ * Runs the transformer over `code` in {@link project}, and returns what it made
+ * of it.
  */
 const transformInProject = (
   code: string,
@@ -93,14 +93,14 @@ const testFn = async ({
  * fraction of a millisecond. Sixty of those took `check:test:cov` past Vitest's
  * timeout on CI.
  *
- * Reusing the project is half of the answer and the smaller half — measured,
- * it takes a case from ~300 ms to ~260 ms, because what an edit invalidates is
- * the program, not the parsed library behind it. Naming the libraries the
- * cases actually need is the rest: together they bring a case to ~25 ms.
+ * Reusing the project is half of the answer and the smaller half — measured, it
+ * takes a case from ~300 ms to ~260 ms, because what an edit invalidates is the
+ * program, not the parsed library behind it. Naming the libraries the cases
+ * actually need is the rest: together they bring a case to ~25 ms.
  *
  * What that leaves out — `transformSourceCode` itself, and the transformer
- * against the full library — is what the tests at the bottom of this file
- * still cover.
+ * against the full library — is what the tests at the bottom of this file still
+ * cover.
  */
 const project = new tsm.Project({
   useInMemoryFileSystem: true,

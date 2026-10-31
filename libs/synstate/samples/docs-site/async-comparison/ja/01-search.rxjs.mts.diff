@@ -28,8 +28,8 @@
 +      debounceTime(debounceMs), // 入力が止まるのを待つ
        map((q) => q.trim()),
 -      distinctUntilChanged(), // skip a query that did not change
--      // A newer query unsubscribes from the previous request,
--      // and fromFetch aborts a request it is unsubscribed from.
+-      // A newer query unsubscribes from the previous request, and fromFetch
+-      // aborts a request it is unsubscribed from.
 +      distinctUntilChanged(), // 変わっていないクエリは飛ばす
 +      // 新しいクエリは前のリクエストの購読を解除し、
 +      // fromFetch は購読解除されたリクエストを中断する。
@@ -40,8 +40,8 @@
                  query: q,
                  items,
                })),
--              // Caught inside switchMap: an error that reached the outer
--              // pipe would end it, and the search box with it.
+-              // Caught inside switchMap: an error that reached the outer pipe
+-              // would end it, and the search box with it.
 +              // switchMap の内側で捕捉する。外側のパイプに届いたエラーは
 +              // パイプを終わらせ、検索ボックスも止まる。
                catchError((error: unknown) =>

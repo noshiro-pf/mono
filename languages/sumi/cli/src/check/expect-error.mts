@@ -11,11 +11,11 @@ import { Arr } from 'ts-data-forge';
 /**
  * A `@sumi-expect-error` marker that no diagnostic answered.
  *
- * This is the half of the directive that makes it worth having. A comment
- * that only silences a diagnostic rots in place once the code around it is
- * fixed; one that fails when the diagnostic stops appearing cannot
- * (`@ts-expect-error` is the same bargain, and D-51 chose the spelling to
- * make the resemblance the point).
+ * This is the half of the directive that makes it worth having. A comment that
+ * only silences a diagnostic rots in place once the code around it is fixed;
+ * one that fails when the diagnostic stops appearing cannot (`@ts-expect-error`
+ * is the same bargain, and D-51 chose the spelling to make the resemblance the
+ * point).
  */
 export type UnusedExpectError = Readonly<{
   filename: string;
@@ -30,8 +30,8 @@ export type UnusedExpectError = Readonly<{
 /**
  * A comment that starts like a marker but is not one: malformed, applying to
  * nothing, or a `@sumi-expect-error-file` below code (D-63). It suppresses
- * nothing, so without this report the diagnostic it meant would come back
- * with no word about why.
+ * nothing, so without this report the diagnostic it meant would come back with
+ * no word about why.
  */
 export type InvalidExpectError = Readonly<{
   filename: string;
@@ -41,9 +41,9 @@ export type InvalidExpectError = Readonly<{
 
 /**
  * An `oxlint-disable*` comment that silences a rule of the Sumi preset. oxlint
- * applies it before `sumi check` sees a diagnostic, and no option turns it
- * off, so the comment itself is reported: `@sumi-expect-error` is the one way
- * to answer a Sumi diagnostic (D-60).
+ * applies it before `sumi check` sees a diagnostic, and no option turns it off,
+ * so the comment itself is reported: `@sumi-expect-error` is the one way to
+ * answer a Sumi diagnostic (D-60).
  */
 export type SilencingDirective = Readonly<{
   filename: string;
@@ -83,11 +83,11 @@ type Entry = Readonly<
  * diagnostics, and finds the `oxlint-disable*` comments that would answer one
  * in their place.
  *
- * A marker names a neutral rule ID and applies to the next line that is
- * neither a marker nor another linter's next-line directive, exactly as it does
- * in the conformance corpus — one spelling, one meaning (D-51). A diagnostic it
- * names on that line is suppressed; a marker nothing answered comes back in
- * `unused` for the caller to report.
+ * A marker names a neutral rule ID and applies to the next line that is neither
+ * a marker nor another linter's next-line directive, exactly as it does in the
+ * conformance corpus — one spelling, one meaning (D-51). A diagnostic it names
+ * on that line is suppressed; a marker nothing answered comes back in `unused`
+ * for the caller to report.
  *
  * Both engines are matched in one pass, because which of them produced a
  * diagnostic is not something a marker can say: the oxlint preset and the
@@ -97,8 +97,8 @@ type Entry = Readonly<
  *
  * Only lint diagnostics are covered. A compiler error already has
  * `@ts-expect-error`, which TypeScript itself checks for staleness the same
- * way, and two comments for one job would only raise the question of which
- * one applies.
+ * way, and two comments for one job would only raise the question of which one
+ * applies.
  *
  * A marker naming a rule that did fire on that line but under a different ID
  * counts as unused, and the diagnostic stands. That is deliberate: the

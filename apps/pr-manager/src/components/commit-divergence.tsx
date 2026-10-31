@@ -18,8 +18,8 @@ type Props = Readonly<{
   entry: Bindable<Entry>;
   /**
    * The largest count on either side anywhere in the report, so that a bar on
-   * one card can be compared with a bar on another. A per-card scale would
-   * draw `-2` and `-39` the same length.
+   * one card can be compared with a bar on another. A per-card scale would draw
+   * `-2` and `-39` the same length.
    */
   scaleMax: Bindable<number>;
 }>;
@@ -30,9 +30,9 @@ type Props = Readonly<{
  *
  * This is a diverging quantity — commits the head has that the base does not,
  * against commits the base has that the head does not — so it gets the
- * diverging pair and a neutral middle rather than two arbitrary hues. Behind
- * is the arm that matters: the ruleset refuses to merge a branch that is
- * behind, so anything but zero on the left is a rebase waiting to happen.
+ * diverging pair and a neutral middle rather than two arbitrary hues. Behind is
+ * the arm that matters: the ruleset refuses to merge a branch that is behind,
+ * so anything but zero on the left is a rebase waiting to happen.
  *
  * Both numbers are written out beside the bars. A reader should never have to
  * measure a bar to learn a count that is three characters long.
@@ -110,8 +110,8 @@ export const CommitDivergence = ({ entry, scaleMax }: Props): JSX.Element => (
 
 /**
  * A zero draws nothing at all rather than a sliver: "nothing on this side" is
- * the answer the reader wants most often, and a hairline that could be
- * rounding is the one way to get it wrong.
+ * the answer the reader wants most often, and a hairline that could be rounding
+ * is the one way to get it wrong.
  */
 const share = (count: number, scaleMax: number): string =>
   count === 0 || !Num.isNonZero(scaleMax)

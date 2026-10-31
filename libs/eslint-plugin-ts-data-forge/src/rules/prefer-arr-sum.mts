@@ -67,9 +67,9 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
 
         const reducer = node.arguments[0];
 
-        // The initial value and the operands of the body are read through
-        // type wrappers: `0 as number` is still 0, `(b satisfies number)` is
-        // still `b`. Types are asked of the values underneath too.
+        // The initial value and the operands of the body are read through type
+        // wrappers: `0 as number` is still 0, `(b satisfies number)` is still
+        // `b`. Types are asked of the values underneath too.
         const initialValue = skipTypeWrappers(node.arguments[1]);
 
         // Check initial value is 0

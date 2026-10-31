@@ -35,9 +35,9 @@ export const splitTypedLabels = (
 };
 
 /**
- * Every label on a task, once each, in any case: the most used first, then
- * by name. A label used in several cases is counted in all of them, and
- * spelled as it is most used.
+ * Every label on a task, once each, in any case: the most used first, then by
+ * name. A label used in several cases is counted in all of them, and spelled as
+ * it is most used.
  */
 export const labelsByUse = (state: DomainState): readonly string[] => {
   const spellings = Arr.countBy(
@@ -76,9 +76,9 @@ export const spellAsInUse = (
   labels.map((label) => known.find((each) => sameLabel(each, label)) ?? label);
 
 /**
- * The labels of `known`, in its order, to suggest for `typed`: those that
- * start with it, then those that contain it, ignoring case, without those
- * `chosen` has in any case; none while nothing is typed.
+ * The labels of `known`, in its order, to suggest for `typed`: those that start
+ * with it, then those that contain it, ignoring case, without those `chosen`
+ * has in any case; none while nothing is typed.
  */
 export const suggestLabels = (
   known: readonly string[],

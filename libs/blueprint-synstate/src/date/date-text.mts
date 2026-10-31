@@ -27,9 +27,9 @@ export const formatDateText = (
 
 /**
  * What a `DateInput` reads from its text when nothing else is given: a date
- * with `/` or `-` between year, month and day, one or two digits for the
- * month and the day, then, after a space or `T`, the time as `H:mm` if at
- * all; spaces around it are ignored. A date alone is at
+ * with `/` or `-` between year, month and day, one or two digits for the month
+ * and the day, then, after a space or `T`, the time as `H:mm` if at all; spaces
+ * around it are ignored. A date alone is at
  * 00:00, and the time is dropped where `timePrecision` sets none.
  */
 export const parseDateText = (

@@ -18,8 +18,8 @@ import {
  * exactly `length` elements.
  *
  * This is the structural counterpart of `asFixedLengthArray`: it produces a
- * tuple type rather than the branded `FixedLengthArray`. Prefer the branded
- * one unless you specifically need the structural type — the brand keeps
+ * tuple type rather than the branded `FixedLengthArray`. Prefer the branded one
+ * unless you specifically need the structural type — the brand keeps
  * type-checking cost independent of the element type and of the bound.
  *
  * The length argument comes first, matching the type-parameter order of
@@ -255,8 +255,7 @@ export function asBoundedLengthTuple(
 }
 
 /**
- * Casts an array to the structural empty tuple after checking that it is
- * empty.
+ * Casts an array to the structural empty tuple after checking that it is empty.
  *
  * This is the structural counterpart of `asEmptyArray`, and the length-0
  * specialization of {@link asFixedLengthTuple}.

@@ -1,10 +1,10 @@
 /**
  * How large the issue DAG is drawn (`issue-dag.tsx`): the layout's units
- * (`issue-graph-layout.mts`) times a scale, in a box that scrolls. A zoom in
- * or out moves to the next of a fixed set of steps, as a browser's zoom does,
- * so that a turn in and a turn out come back to where they started and 100%
- * is always one of them; the fit is whatever puts the whole graph in the box,
- * and may fall between two steps.
+ * (`issue-graph-layout.mts`) times a scale, in a box that scrolls. A zoom in or
+ * out moves to the next of a fixed set of steps, as a browser's zoom does, so
+ * that a turn in and a turn out come back to where they started and 100% is
+ * always one of them; the fit is whatever puts the whole graph in the box, and
+ * may fall between two steps.
  *
  * **Kept in the query string**, as the layout is (`layout.mts`): how large the
  * graph is drawn is part of how the page is looked at, so a reload or a
@@ -37,8 +37,8 @@ export const MIN_SCALE = ZOOM_STEPS[0];
 export const MAX_SCALE = ZOOM_STEPS.at(-1) ?? 1;
 
 /**
- * How the DAG is drawn: to fit its box, whatever the scale that takes, or at
- * a scale.
+ * How the DAG is drawn: to fit its box, whatever the scale that takes, or at a
+ * scale.
  */
 export type DagZoom = Readonly<
   { type: 'fit' } | { type: 'scale'; scale: number }
@@ -71,8 +71,8 @@ export const dagZoomFromSearch = (search: string): DagZoom => {
 };
 
 /**
- * The query string with the zoom written into it, and the other parameters
- * left as they were.
+ * The query string with the zoom written into it, and the other parameters left
+ * as they were.
  */
 export const searchWithDagZoom = (search: string, zoom: DagZoom): string => {
   const params = new URLSearchParams(search);
@@ -106,12 +106,12 @@ export type ScrollBox = Size & Readonly<{ left: number; top: number }>;
 
 /**
  * The scale at which all of `content` is in `box`: never larger than the
- * natural size, which a graph of two nodes would otherwise be blown up to,
- * and never smaller than {@link MIN_SCALE}, below which no title can be read.
+ * natural size, which a graph of two nodes would otherwise be blown up to, and
+ * never smaller than {@link MIN_SCALE}, below which no title can be read.
  * Rounded down, so that the graph drawn at it is never a fraction of a pixel
- * larger than the box, which would give the box a scroll bar to take away
- * the room the fit was worked out for. A box not measured yet, which has no
- * room to fit anything into, leaves the natural size.
+ * larger than the box, which would give the box a scroll bar to take away the
+ * room the fit was worked out for. A box not measured yet, which has no room to
+ * fit anything into, leaves the natural size.
  */
 export const fitScale = (content: Size, box: Size): number => {
   if (
@@ -134,10 +134,9 @@ export const fitScale = (content: Size, box: Size): number => {
 
 /**
  * Where the nodes with no edge go for the fit: of every placement
- * (`placementsFor`), the one that lets the whole graph be drawn the largest
- * in `box` — a wide box takes them in longer rows, beside the connected
- * parts or around them, and a tall one in shorter rows under them. The
- * first is the
+ * (`placementsFor`), the one that lets the whole graph be drawn the largest in
+ * `box` — a wide box takes them in longer rows, beside the connected parts or
+ * around them, and a tall one in shorter rows under them. The first is the
  * default, which is kept while nothing does better, so that a graph that
  * already fits at its natural size is drawn as it always is.
  */
@@ -170,11 +169,10 @@ export const zoomOutFrom = (scale: number): number =>
 
 /**
  * The point of `content`, in the layout's units, at the middle of `box` while
- * it is drawn at `scale`: what a zoom keeps where it is. Across which the
- * whole of it is in the box, it is the middle of the content instead, since
- * the middle of the box may be past its end and what is looked at is all of
- * it. Content drawn at no size at all has nothing at the middle but its
- * start.
+ * it is drawn at `scale`: what a zoom keeps where it is. Across which the whole
+ * of it is in the box, it is the middle of the content instead, since the
+ * middle of the box may be past its end and what is looked at is all of it.
+ * Content drawn at no size at all has nothing at the middle but its start.
  */
 export const centreAt = (
   box: ScrollBox,
@@ -200,8 +198,8 @@ export const centreAt = (
 /**
  * Where to scroll `box` so that `centre` is at its middle with the graph drawn
  * at `scale`. A point too near the start of the graph to be at the middle
- * leaves the box scrolled to the start; the browser keeps a scroll past the
- * end within the end itself.
+ * leaves the box scrolled to the start; the browser keeps a scroll past the end
+ * within the end itself.
  */
 export const scrollToCentre = (
   centre: Point,

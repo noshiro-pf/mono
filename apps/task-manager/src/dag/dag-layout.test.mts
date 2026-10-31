@@ -78,8 +78,8 @@ describe(placeNodes, () => {
       Point
     >([['task:a', { x: 200, y: 30 }]]);
 
-    // Above `a`, as close as `PLACEMENT_GAP` allows: closer than below,
-    // to the left or to the right.
+    // Above `a`, as close as `PLACEMENT_GAP` allows: closer than below, to the
+    // left or to the right.
     assert.deepStrictEqual(placeNodes([nodeA, nodeM], [], positions), [
       { ...nodeA, x: 200, y: 30 },
       { ...nodeM, x: 200, y: 30 - nodeM.height - PLACEMENT_GAP },

@@ -893,8 +893,8 @@ describe('recursive prune', () => {
 
     test('keeps every value of a mixed structure', () => {
       // Every path of a JsonValue is represented by the type, so nothing is
-      // removed; the structure must survive the recursive rebuild
-      // (records via keyValueRecord, arrays via array, primitives as-is).
+      // removed; the structure must survive the recursive rebuild (records via
+      // keyValueRecord, arrays via array, primitives as-is).
       const x = { a: [1, 'two', { b: null }], c: true } as const;
 
       assert.deepStrictEqual(JsonValue.prune(x), {

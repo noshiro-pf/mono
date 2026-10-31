@@ -10,15 +10,15 @@ import type {
 } from './types.mjs';
 
 /**
- * `state` without the nodes `refs`, and without every dependency on any of
- * them — what deleting nodes has to write in one go, so that no other node
- * is left waiting for something that no longer exists (a dependency on a
- * missing node never holds).
+ * `state` without the nodes `refs`, and without every dependency on any of them
+ * — what deleting nodes has to write in one go, so that no other node is left
+ * waiting for something that no longer exists (a dependency on a missing node
+ * never holds).
  *
- * `updatedTasks` and `updatedMilestones` are the nodes kept whose
- * dependencies changed, with `updatedAt` set to `now`; the other nodes are
- * returned as they were. A node that does not exist is still cleaned out of
- * the dependencies that name it.
+ * `updatedTasks` and `updatedMilestones` are the nodes kept whose dependencies
+ * changed, with `updatedAt` set to `now`; the other nodes are returned as they
+ * were. A node that does not exist is still cleaned out of the dependencies
+ * that name it.
  */
 export const removeNodes = (
   state: DomainState,

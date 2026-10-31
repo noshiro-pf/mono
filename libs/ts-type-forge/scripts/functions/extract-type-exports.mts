@@ -2,10 +2,10 @@
  * Shared parser for `export type` and `export namespace` declarations.
  *
  * Walks the source character-by-character so it tolerates `declare global`
- * blocks, quoted strings, nested braces, and generic-parameter lists. Used
- * by both `gen-global` (which emits an ambient mirror of every public type)
- * and `get-type-definitions` (which builds the README's type listing with
- * line links).
+ * blocks, quoted strings, nested braces, and generic-parameter lists. Used by
+ * both `gen-global` (which emits an ambient mirror of every public type) and
+ * `get-type-definitions` (which builds the README's type listing with line
+ * links).
  */
 
 export type TypeExport = Readonly<{
@@ -30,8 +30,8 @@ export type FileExports = Readonly<{
 export const extractTypeExports = (content: string): FileExports => {
   // Replace block and line comments with spaces to preserve offsets while
   // keeping newlines so the line counter below stays accurate. Line comments
-  // may contain apostrophes (e.g. "shouldn't") that the string-skip logic
-  // below would otherwise misread as a string opener.
+  // may contain apostrophes (e.g. "shouldn't") that the string-skip logic below
+  // would otherwise misread as a string opener.
   const cleaned = content
     .replaceAll(/\/\*[\s\S]*?\*\//gu, (m) => m.replaceAll(/[^\n]/gu, ' '))
     .replaceAll(/\/\/[^\n]*/gu, (m) => m.replaceAll(/[^\n]/gu, ' '));

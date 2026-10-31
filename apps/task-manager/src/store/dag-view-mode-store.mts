@@ -1,7 +1,6 @@
 /**
- * The graph screen's view mode (`view-model/dag-view-mode.mts`), saved
- * whenever it changes. Moving the nodes between the modes is the DAG layout
- * store's.
+ * The graph screen's view mode (`view-model/dag-view-mode.mts`), saved whenever
+ * it changes. Moving the nodes between the modes is the DAG layout store's.
  */
 
 import { createState, type InitializedObservable } from 'synstate';

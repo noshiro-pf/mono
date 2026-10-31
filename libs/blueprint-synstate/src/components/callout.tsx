@@ -11,8 +11,8 @@ type Props = Readonly<{
   /** A heading (`h5.bp6-heading`) above the body. */
   title?: Bindable<string>;
   /**
-   * The icon before the title and body; by default the one Blueprint draws
-   * for the intent, and none for `none`. `false` draws none.
+   * The icon before the title and body; by default the one Blueprint draws for
+   * the intent, and none for `none`. `false` draws none.
    */
   icon?: IconName | false;
   /** Less padding (`bp6-compact`). */

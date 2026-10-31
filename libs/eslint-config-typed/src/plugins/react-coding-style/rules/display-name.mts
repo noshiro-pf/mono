@@ -20,8 +20,8 @@ type MessageIds = 'missingDisplayName' | 'mismatchedDisplayName';
  * Rule to require displayName property for React components
  * This helps with debugging and component identification in React DevTools
  *
- * Type wrappers (`as`, `satisfies`, `!`, `<T>`) are looked through on the
- * memo call, on the `C.displayName = ...` statement, on the component in
+ * Type wrappers (`as`, `satisfies`, `!`, `<T>`) are looked through on the memo
+ * call, on the `C.displayName = ...` statement, on the component in
  * `C.displayName` and on the assigned name.
  */
 export const displayNameRule: TSESLint.RuleModule<MessageIds, Options> = {

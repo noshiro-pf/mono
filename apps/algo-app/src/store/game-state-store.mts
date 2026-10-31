@@ -233,9 +233,9 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
 
   const start = (): (() => void) => {
     // Each action played here is written once. A new snapshot of the room
-    // (another player joining) re-emits the `combine`, so what to write is
-    // the actions played since the last emission, not the latest one; those
-    // played before the room is known are written, in order, once it is.
+    // (another player joining) re-emits the `combine`, so what to write is the
+    // actions played since the last emission, not the latest one; those played
+    // before the room is known are written, in order, once it is.
     const knownRoom = deps.room.pipe(filter(isNotUndefined));
 
     const playedHere = localGameStateActionSource.pipe(
@@ -477,8 +477,8 @@ const actionsToAutoPlayStream = (
   numSkip: SafeUintWithSmallInt,
 ): SynstateObservable<GameStateAction> => {
   // Counting emissions with `scan` emits `actions[i]` on the i-th tick.
-  // `skip` shifts the timer's own value, so the count has to be kept
-  // separately rather than read off the tick.
+  // `skip` shifts the timer's own value, so the count has to be kept separately
+  // rather than read off the tick.
   const ticks = counter(autoPlaySpeedRate * 1000);
 
   return (Num.isPositive(numSkip) ? ticks.pipe(skip(numSkip)) : ticks)

@@ -7,10 +7,10 @@ import type { IndexInclusive } from '../type-level-integer/index.mjs';
  * `MinLengthArray` / `BoundedLengthArray` / `FixedLengthArray`).
  *
  * The brand encodings rely on `MakeTuple`, which breaks down near the
- * compiler's 10,000-element tuple limit; this cap is kept well below that
- * limit so that an excessive length fails with a clear constraint error
- * instead of a cryptic deep-instantiation error, and so that the worst-case
- * cost of a single brand stays bounded.
+ * compiler's 10,000-element tuple limit; this cap is kept well below that limit
+ * so that an excessive length fails with a clear constraint error instead of a
+ * cryptic deep-instantiation error, and so that the worst-case cost of a single
+ * brand stays bounded.
  *
  * Exported so that downstream libraries (e.g. runtime guards and validators)
  * can share the same boundary instead of hard-coding their own.

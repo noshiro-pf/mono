@@ -24,8 +24,8 @@ const preferDescribeFunctionTitle =
   plugin.rules['prefer-describe-function-title'];
 
 describe(eslintConfigForVitest, () => {
-  // Without `settings.vitest.typecheck`, the rule takes any import named as
-  // the title for a function and autofixes the string into a reference to it.
+  // Without `settings.vitest.typecheck`, the rule takes any import named as the
+  // title for a function and autofixes the string into a reference to it.
   assert.isDefined(preferDescribeFunctionTitle);
 
   tester.run('prefer-describe-function-title', preferDescribeFunctionTitle, {

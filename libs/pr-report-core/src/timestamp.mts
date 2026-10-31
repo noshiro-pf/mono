@@ -1,20 +1,20 @@
 /**
- * GitHub's timestamps, as the numbers the page and the claims
- * (`claim.mts`) do arithmetic with.
+ * GitHub's timestamps, as the numbers the page and the claims (`claim.mts`) do
+ * arithmetic with.
  */
 
 import { Arr, Num, Result } from 'ts-data-forge';
 
 /**
- * Milliseconds since the epoch, or `undefined` for a string that is not
- * the one shape GitHub sends: `2026-09-24T09:39:18Z`, UTC, sometimes with a
- * fraction of a second.
+ * Milliseconds since the epoch, or `undefined` for a string that is not the one
+ * shape GitHub sends: `2026-09-24T09:39:18Z`, UTC, sometimes with a fraction of
+ * a second.
  *
- * Counted out field by field rather than handed to `Date`, whose parse is
- * left to the engine for anything but the exact format ECMAScript defines
- * and whose months count from zero, and rather than to `Temporal`, which not
- * every browser the page may be opened in has yet, nor every Node.js version
- * this package is tested on.
+ * Counted out field by field rather than handed to `Date`, whose parse is left
+ * to the engine for anything but the exact format ECMAScript defines and whose
+ * months count from zero, and rather than to `Temporal`, which not every
+ * browser the page may be opened in has yet, nor every Node.js version this
+ * package is tested on.
  */
 export const epochMsOf = (timestamp: string): number | undefined => {
   if (!timestamp.endsWith('Z')) {
@@ -65,10 +65,10 @@ const SECONDS_PER_HOUR = 3600;
 const SECONDS_PER_DAY = 86_400;
 
 /**
- * Days from 1970-01-01 to a date of the proleptic Gregorian calendar, with
- * the month counted from 1. Howard Hinnant's `days_from_civil`: the year is
- * taken to start in March, so the leap day falls at its end and every month
- * before it has a fixed length.
+ * Days from 1970-01-01 to a date of the proleptic Gregorian calendar, with the
+ * month counted from 1. Howard Hinnant's `days_from_civil`: the year is taken
+ * to start in March, so the leap day falls at its end and every month before it
+ * has a fixed length.
  */
 const daysFromCivil = (year: number, month: number, day: number): number => {
   const marchYear = month <= 2 ? year - 1 : year;

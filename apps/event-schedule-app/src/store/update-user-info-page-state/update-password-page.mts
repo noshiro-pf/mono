@@ -39,8 +39,8 @@ export type UpdatePasswordPageDeps<User, ReauthCredential> = Readonly<{
 }>;
 
 /**
- * The dialog that changes the user's password: signing in again with the
- * old one, then changing it.
+ * The dialog that changes the user's password: signing in again with the old
+ * one, then changing it.
  */
 export const createUpdatePasswordPageStore = <
   User extends AccountUser,

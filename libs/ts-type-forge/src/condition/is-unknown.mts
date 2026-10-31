@@ -5,8 +5,8 @@ import type { IsAny } from './is-any.mjs';
  * Checks if a given type `T` is exactly the `unknown` type.
  *
  * `unknown extends T` holds only for `T = unknown` or `T = any`, so `any` is
- * excluded first via `IsAny`. The check does not distribute over unions
- * (the checked type appears on the right-hand side of `extends`).
+ * excluded first via `IsAny`. The check does not distribute over unions (the
+ * checked type appears on the right-hand side of `extends`).
  *
  * @template T - The type to check.
  * @returns `true` if `T` is `unknown`, `false` otherwise.

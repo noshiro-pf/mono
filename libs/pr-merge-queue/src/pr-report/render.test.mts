@@ -229,8 +229,8 @@ describe(renderMarkdown, () => {
     assert.isFalse(rendered.includes('no auto-merge'));
   });
 
-  // The ordinary state of a queued pull request: `unblock-prs` arms it when
-  // it picks it, so its absence until then is not news.
+  // The ordinary state of a queued pull request: `unblock-prs` arms it when it
+  // picks it, so its absence until then is not news.
   test('says nothing about a queued pull request not yet armed', () => {
     const rendered = renderMarkdown(
       report([

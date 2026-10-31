@@ -7,8 +7,8 @@ import { workspaceRootPath } from '../workspace-root-path.mjs';
  * They did not move here with the runners. They are synstate usage samples:
  * type-checked in that package against the comparison libraries it devDepends
  * on (`rxjs`, `jotai`, `mobx`, `@reduxjs/toolkit`, `zustand`, `valtio`), and
- * embedded into this site as the code listings beside each table. What moved
- * is the measuring, which is a documentation concern — the numbers exist only
+ * embedded into this site as the code listings beside each table. What moved is
+ * the measuring, which is a documentation concern — the numbers exist only
  * because the docs quote them.
  */
 export const scenarioDir = path.resolve(
@@ -25,8 +25,8 @@ export const scenarioDir = path.resolve(
  * chart components) was here and reached them by a
  * `../../../../../libs/synstate/...` import.
  *
- * Flat rather than a `benchmark/` subdirectory, because `src/data/index.mts`
- * is what the chart components are allowed to import:
+ * Flat rather than a `benchmark/` subdirectory, because `src/data/index.mts` is
+ * what the chart components are allowed to import:
  * `import-x/no-internal-modules` permits `../../<dir>/index.mjs` and nothing
  * deeper.
  */

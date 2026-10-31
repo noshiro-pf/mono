@@ -1,8 +1,8 @@
 import type { Progress, Task } from './types.mjs';
 
 /**
- * `task` moved to `progress` at `now`, with `startedAt` and `completedAt`
- * kept describing the current progress — dependencies are evaluated on it:
+ * `task` moved to `progress` at `now`, with `startedAt` and `completedAt` kept
+ * describing the current progress — dependencies are evaluated on it:
  *
  * - Starting (leaving `not-started`) sets `startedAt`; moving among the
  *   started progresses keeps it.
