@@ -198,10 +198,12 @@ export const buildNamedImportFix = (
  * - Imported as a value: that local name, and no edit.
  * - Imported by `import { type x }`: the edit drops `type`, keeping a comment
  *   after it.
- * - Not imported: the edit adds it to the first named import from the module
- *   that has a value specifier, or else to any named import from it that is
- *   not `import type`. Adding it there rather than in a new declaration keeps
- *   `import-x/no-duplicates` satisfied. Failing that, it goes into braces
+ * - Not imported: the edit adds it to the braces of the first import from the
+ *   module that has a value specifier, or else of the first other one with
+ *   braces that is not `import type`, empty braces included (`import {}`,
+ *   `import D, {}`).
+ *   Adding it there rather than in a new declaration keeps
+ *   `import-x/no-duplicates` satisfied. Failing that, it goes into new braces
  *   after a lone default import (`import D, { x }`), and when the module has
  *   neither, a new declaration goes after the directive prologue
  *   ({@link buildNamedImportFix}).
@@ -252,18 +254,7 @@ export const bindValueImports = (
 
   const toAdd = defined.flatMap((b) => (b.isAdded ? [b.localName] : []));
 
-  const host = (
-    named.find(isValueImport) ?? named.find(isNotTypeOnly)
-  )?.declaration.specifiers.at(-1);
-
-  // `import D from 'm'` takes `, { x }`: a second declaration beside it would
-  // be a duplicate.
-  const defaultHost = declarations.find(
-    (declaration) =>
-      declaration.importKind !== 'type' &&
-      declaration.specifiers.length === 1 &&
-      declaration.specifiers[0]?.type === AST_NODE_TYPES.ImportDefaultSpecifier,
-  )?.specifiers[0];
+  const hosts = hostsFor(declarations);
 
   return {
     localNames: defined.map((b) => b.localName),
@@ -271,13 +262,84 @@ export const bindValueImports = (
       ...defined.flatMap((b) => b.edits(fixer)),
       ...(toAdd.length === 0
         ? []
-        : host !== undefined
-          ? [fixer.insertTextAfter(host, `, ${toAdd.join(', ')}`)]
-          : defaultHost !== undefined
-            ? [fixer.insertTextAfter(defaultHost, `, { ${toAdd.join(', ')} }`)]
-            : buildNamedImportFix(fixer, program, moduleName, toAdd)),
+        : addToFirstHost(fixer, sourceCode, moduleName, hosts, toAdd)),
     ],
   };
+};
+
+/**
+ * The edits that import `moduleName`'s types `names` the file does not import
+ * yet: added to an existing `import type { … }` from the module (`, X`), else
+ * as `type X` to another import from it, chosen as {@link bindValueImports}
+ * chooses one, and only failing those as a new
+ * `import { type X } from '<module>'` after the directive prologue. Adding to
+ * an existing declaration keeps `import-x/no-duplicates` satisfied. Whether the
+ * file binds a name to something else is the caller's to check.
+ */
+export const addTypeImports = (
+  fixer: TSESLint.RuleFixer,
+  sourceCode: TSESLint.SourceCode,
+  moduleName: string,
+  names: readonly string[],
+): readonly TSESLint.RuleFix[] => {
+  if (names.length === 0) {
+    return [];
+  }
+
+  const declarations = getImportDeclarations(sourceCode.ast, moduleName);
+
+  const typeOnlyFix = firstFix(
+    declarations.filter(isTypeOnlyDeclaration),
+    (declaration) => addToImportBraces(fixer, sourceCode, declaration, names),
+  );
+
+  return typeOnlyFix !== undefined
+    ? [typeOnlyFix]
+    : addToFirstHost(
+        fixer,
+        sourceCode,
+        moduleName,
+        hostsFor(declarations),
+        names.map((name) => `type ${name}`),
+      );
+};
+
+/**
+ * Adds `specifiers` to the `{ … }` of `declaration`: after its last named
+ * specifier, or inside empty braces (`import d, {} from …`). `undefined` when
+ * the declaration has no braces (a default or namespace import alone) or there
+ * is nothing to add. The braces of import attributes (`with { … }`) are not
+ * taken for them.
+ */
+export const addToImportBraces = (
+  fixer: TSESLint.RuleFixer,
+  sourceCode: TSESLint.SourceCode,
+  declaration: TSESTree.ImportDeclaration,
+  specifiers: readonly string[],
+): TSESLint.RuleFix | undefined => {
+  if (specifiers.length === 0) {
+    return undefined;
+  }
+
+  const lastNamed = declaration.specifiers
+    .filter(
+      (specifier): specifier is TSESTree.ImportSpecifier =>
+        specifier.type === AST_NODE_TYPES.ImportSpecifier,
+    )
+    .at(-1);
+
+  if (lastNamed !== undefined) {
+    return fixer.insertTextAfter(lastNamed, `, ${specifiers.join(', ')}`);
+  }
+
+  const openingBrace = sourceCode.getFirstToken(declaration, {
+    filter: (token) =>
+      token.value === '{' && token.range[1] <= declaration.source.range[0],
+  });
+
+  return openingBrace === null
+    ? undefined
+    : fixer.insertTextAfter(openingBrace, ` ${specifiers.join(', ')} `);
 };
 
 /** The exported name `specifier` imports: `x` for `import { x as y }`. */
@@ -287,6 +349,56 @@ export const importedNameOf = (
   specifier.imported.type === AST_NODE_TYPES.Identifier
     ? specifier.imported.name
     : specifier.imported.value;
+
+/** The first fix `toFix` gives for `declarations`, trying them in order. */
+const firstFix = (
+  declarations: readonly TSESTree.ImportDeclaration[],
+  toFix: (
+    declaration: TSESTree.ImportDeclaration,
+  ) => TSESLint.RuleFix | undefined,
+): TSESLint.RuleFix | undefined => {
+  for (const declaration of declarations) {
+    const fix = toFix(declaration);
+
+    if (fix !== undefined) {
+      return fix;
+    }
+  }
+
+  return undefined;
+};
+
+/**
+ * Adds `specifiers` to the braces of the first of `hosts` that has them, else
+ * puts braces after a lone default import among them (`import D, { x }`): a
+ * second declaration beside it would be a duplicate. Failing both, a new
+ * declaration importing them from `moduleName`.
+ */
+const addToFirstHost = (
+  fixer: TSESLint.RuleFixer,
+  sourceCode: TSESLint.SourceCode,
+  moduleName: string,
+  hosts: readonly TSESTree.ImportDeclaration[],
+  specifiers: readonly string[],
+): readonly TSESLint.RuleFix[] => {
+  const intoBraces = firstFix(hosts, (declaration) =>
+    addToImportBraces(fixer, sourceCode, declaration, specifiers),
+  );
+
+  if (intoBraces !== undefined) {
+    return [intoBraces];
+  }
+
+  const defaultHost = hosts.find(
+    (declaration) =>
+      declaration.specifiers.length === 1 &&
+      declaration.specifiers[0]?.type === AST_NODE_TYPES.ImportDefaultSpecifier,
+  )?.specifiers[0];
+
+  return defaultHost !== undefined
+    ? [fixer.insertTextAfter(defaultHost, `, { ${specifiers.join(', ')} }`)]
+    : buildNamedImportFix(fixer, sourceCode.ast, moduleName, specifiers);
+};
 
 /** What {@link bindValueImports} gives. */
 export type ValueImportBinding = Readonly<{
@@ -302,13 +414,46 @@ type NamedSpecifier = Readonly<{
   specifier: TSESTree.ImportSpecifier;
 }>;
 
+/** `import type …`. */
+const isTypeOnlyDeclaration = (
+  declaration: TSESTree.ImportDeclaration,
+): boolean => declaration.importKind === 'type';
+
 /** The declaration is not `import type`. */
 const isNotTypeOnly = ({ declaration }: NamedSpecifier): boolean =>
-  declaration.importKind !== 'type';
+  !isTypeOnlyDeclaration(declaration);
 
 /** Neither `specifier` nor its declaration says `type`. */
 const isValueImport = ({ declaration, specifier }: NamedSpecifier): boolean =>
   isNotTypeOnly({ declaration, specifier }) && specifier.importKind !== 'type';
+
+/**
+ * The declarations a name can be added to, in the order to try them: those that
+ * are not `import type`, the ones with a value specifier first, since one
+ * holding only `type` specifiers is erased (and flagged by
+ * `no-import-type-side-effects`) unless a value joins it.
+ */
+const hostsFor = (
+  declarations: readonly TSESTree.ImportDeclaration[],
+): readonly TSESTree.ImportDeclaration[] => {
+  const notTypeOnly = declarations.filter(
+    (declaration) => !isTypeOnlyDeclaration(declaration),
+  );
+
+  const hasValueSpecifier = (
+    declaration: TSESTree.ImportDeclaration,
+  ): boolean =>
+    declaration.specifiers.some(
+      (specifier) =>
+        specifier.type === AST_NODE_TYPES.ImportSpecifier &&
+        isValueImport({ declaration, specifier }),
+    );
+
+  return [
+    ...notTypeOnly.filter(hasValueSpecifier),
+    ...notTypeOnly.filter((declaration) => !hasValueSpecifier(declaration)),
+  ];
+};
 
 const bindingOf = (
   sourceCode: TSESLint.SourceCode,

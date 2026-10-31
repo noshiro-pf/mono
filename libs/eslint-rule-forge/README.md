@@ -138,6 +138,8 @@ The range and the text of a node leave out the parentheses written around it.
 | `buildCalleeResolver`   | which export a callee calls, through aliases, namespace imports and type wrappers                    |
 | `bindValueImports`      | the local names to write for exports, and the edits binding them as values (in the existing import)  |
 | `buildNamedImportFix`   | a fix inserting a new `import { … } from '<module>';` after the directive prologue                   |
+| `addTypeImports`        | the edits importing types: into an `import type { … }`, else as `type X` into another import         |
+| `addToImportBraces`     | a fix adding specifiers to a declaration's braces, empty ones included, or `undefined` without any   |
 | `hasForeignBinding`     | whether a name, at a node, is bound to something other than the module's import (a fix must give up) |
 | `isLocallyBound`        | whether a name, at a node, is declared in the file rather than a global or a standard-library type   |
 | `hasCommentWithin`      | whether a comment inside a node lies in ranges a fix would delete (the fix must give up)             |

@@ -251,8 +251,9 @@ options.
   the type and never touches imports.
 - `'named'` — the fix additionally imports the name when the file does not
   import it yet: added to an existing `import type { … }` from `ts-type-forge`,
-  else to an `import { … }` from it (as `type X`), else after a lone default
-  import, and otherwise as a new `import { type … } from 'ts-type-forge';`.
+  else to an `import { … }` from it (as `type X`, empty braces included), else
+  after a lone default import, and otherwise as a new
+  `import { type … } from 'ts-type-forge';`.
 
 Either way, if the file already imports the target type from `ts-type-forge`
 (possibly under an alias), the fix reuses that binding.

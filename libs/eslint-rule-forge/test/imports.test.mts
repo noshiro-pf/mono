@@ -3,6 +3,7 @@ import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import dedent from 'dedent';
 import { Linter } from 'eslint';
 import {
+  addTypeImports,
   bindValueImports,
   buildCalleeResolver,
   buildNamedImportFix,
@@ -329,6 +330,83 @@ ruleTester.run('bindValueImports', probeBinding(['f']), {
       errors: [{ messageId: 'result', data: { result: 'f' } }],
     },
     {
+      name: 'added inside the empty braces of a lone `import {}`',
+      code: dedent`
+        import {} from 'm';
+        probe(0);
+      `,
+      output: dedent`
+        import { f } from 'm';
+        probe(0);
+      `,
+      errors: [{ messageId: 'result', data: { result: 'f' } }],
+    },
+    {
+      name: 'added inside the empty braces after a default import',
+      code: dedent`
+        import D, {} from 'm';
+        probe(0);
+      `,
+      output: dedent`
+        import D, { f } from 'm';
+        probe(0);
+      `,
+      errors: [{ messageId: 'result', data: { result: 'f' } }],
+    },
+    {
+      name: 'a declaration with a value specifier before earlier empty braces',
+      code: dedent`
+        import {} from 'm';
+        import { a } from 'm';
+        probe(0);
+      `,
+      output: dedent`
+        import {} from 'm';
+        import { a, f } from 'm';
+        probe(0);
+      `,
+      errors: [{ messageId: 'result', data: { result: 'f' } }],
+    },
+    {
+      name: 'existing braces before new ones after a default import',
+      code: dedent`
+        import D from 'm';
+        import { type A } from 'm';
+        probe(0);
+      `,
+      output: dedent`
+        import D from 'm';
+        import { type A, f } from 'm';
+        probe(0);
+      `,
+      errors: [{ messageId: 'result', data: { result: 'f' } }],
+    },
+    {
+      name: 'the braces of import attributes are not the import braces',
+      code: dedent`
+        import D from 'm' with { type: 'json' };
+        probe(0);
+      `,
+      output: dedent`
+        import D, { f } from 'm' with { type: 'json' };
+        probe(0);
+      `,
+      errors: [{ messageId: 'result', data: { result: 'f' } }],
+    },
+    {
+      name: 'the empty braces of `import type {}` do not take a value',
+      code: dedent`
+        import type {} from 'm';
+        probe(0);
+      `,
+      output: dedent`
+        import { f } from 'm';
+        import type {} from 'm';
+        probe(0);
+      `,
+      errors: [{ messageId: 'result', data: { result: 'f' } }],
+    },
+    {
       name: 'a new declaration after a directive',
       code: dedent`
         'use client';
@@ -373,6 +451,60 @@ ruleTester.run(
         errors: [{ messageId: 'result', data: { result: '(none)' } }],
       },
     ],
+  },
+);
+
+ruleTester.run(
+  'addTypeImports',
+  probeRule(
+    () => 'added',
+    // Once, as a rule fixes only what the file does not import yet.
+    (context, fixer) =>
+      getNamedImports(
+        getImportDeclarations(context.sourceCode.ast, 'm'),
+      ).includes('T')
+        ? []
+        : addTypeImports(fixer, context.sourceCode, 'm', ['T', 'U']),
+  ),
+  {
+    valid: [],
+    invalid: [
+      ["import type { A } from 'm';", "import type { A, T, U } from 'm';"],
+      ["import type {} from 'm';", "import type { T, U } from 'm';"],
+      ["import { a } from 'm';", "import { a, type T, type U } from 'm';"],
+      ["import D, {} from 'm';", "import D, { type T, type U } from 'm';"],
+      ["import D from 'm';", "import D, { type T, type U } from 'm';"],
+      [
+        "import { a } from 'm';\nimport type { A } from 'm';",
+        "import { a } from 'm';\nimport type { A, T, U } from 'm';",
+      ],
+      [
+        "import { type V } from 'm';",
+        "import { type V, type T, type U } from 'm';",
+      ],
+      ["import {} from 'm';", "import { type T, type U } from 'm';"],
+      [
+        "import {} from 'm';\nimport { a } from 'm';",
+        "import {} from 'm';\nimport { a, type T, type U } from 'm';",
+      ],
+      [
+        "import { type V } from 'm';\nimport { a } from 'm';",
+        "import { type V } from 'm';\nimport { a, type T, type U } from 'm';",
+      ],
+      [
+        "import type D from 'm';",
+        // `import type D, { … }` is not allowed.
+        "import { type T, type U } from 'm';\nimport type D from 'm';",
+      ],
+      [
+        "import * as m from 'm';",
+        "import { type T, type U } from 'm';\nimport * as m from 'm';",
+      ],
+    ].map(([imports, output]) => ({
+      code: `${imports}\nprobe(0);`,
+      output: `${output}\nprobe(0);`,
+      errors: [{ messageId: 'result', data: { result: 'added' } }],
+    })),
   },
 );
 
