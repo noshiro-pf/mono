@@ -768,8 +768,8 @@ Nothing checks this; a review does.
   `check:root:ci-commands`, `check:root:workflow-event-name`,
   `check:root:node-support`. `fmt` and `check:cspell` read it too; CI itself
   runs nothing on a workflow change until the pull request runs.
-  `check:root:actionlint` also lints the composite actions' `run:` blocks,
-  which actionlint does not read on its own. It downloads the actionlint and
+  `check:root:actionlint` also lints the composite actions' steps, which
+  actionlint does not read on its own. It downloads the actionlint and
   shellcheck that `tools/configs/release-binaries.json` pins, so it needs
   nothing installed; `pnpm-update.yml` moves those pins.
 - **`.github/workflows/` and `.github/actions/` are owned in

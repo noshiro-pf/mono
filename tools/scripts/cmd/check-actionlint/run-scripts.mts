@@ -2,9 +2,9 @@ import { Arr, Num, Result } from 'ts-data-forge';
 
 /**
  * The `run:` scripts of a composite action's `runs.steps`, each with its
- * `shell:` and where in `action.yml` it starts; the names of its `inputs`
- * and the `id`s of its steps, which a script's expressions may reference;
- * and what could not be read.
+ * `shell:` and where in `action.yml` it starts; the lines of `runs.steps`
+ * itself, which are linted as they are written; the names of its `inputs`,
+ * which its expressions may reference; and what could not be read.
  *
  * A line scanner rather than a YAML parser, as the workflow guards here read
  * workflows: the shape is one sequence of steps whose `shell:` and `run:` sit
@@ -22,23 +22,25 @@ export const extractRunScripts = (
   text: string,
 ): Readonly<{
   scripts: readonly RunScript[];
+  steps: StepsBlock | undefined;
   inputs: readonly string[];
-  stepIds: readonly string[];
   problems: readonly string[];
 }> => {
   // CRLF line endings read as LF, as YAML reads them.
   const lines = text.replaceAll('\r\n', '\n').split('\n');
 
-  const steps = readSteps(lines);
-
-  const consumed = new Set(steps.flatMap(({ body }) => body));
-
-  const deepest = steps.reduce(
-    (deepestSoFar, { keyIndent }) => Math.max(deepestSoFar, keyIndent),
-    Arr.isEmpty(steps) ? Number.POSITIVE_INFINITY : 0,
-  );
-
   const { runsLine, runsEnd } = findRuns(lines);
+
+  const range = findStepsRange(lines, runsLine, runsEnd);
+
+  const parsedSteps = readSteps(lines, range);
+
+  const consumed = new Set(parsedSteps.flatMap(({ body }) => body));
+
+  const deepest = parsedSteps.reduce(
+    (deepestSoFar, { keyIndent }) => Math.max(deepestSoFar, keyIndent),
+    Arr.isEmpty(parsedSteps) ? Number.POSITIVE_INFINITY : 0,
+  );
 
   // Only what is under `runs:` can be a step, and a comment or a script it
   // read is not a key.
@@ -52,20 +54,39 @@ export const extractRunScripts = (
       isRunKey(line),
   ).length;
 
-  const read = steps.filter(({ hasRun }) => hasRun).length;
+  const read = parsedSteps.filter(({ hasRun }) => hasRun).length;
 
   const scripts = Arr.generate(function* () {
-    for (const { script } of steps) {
+    for (const { script } of parsedSteps) {
       if (script !== undefined) {
         yield script;
       }
     }
   });
 
+  // A composite action whose steps this could not find would otherwise be
+  // passed over without a word.
+  const flowStyle = findFlowStyle(lines, runsLine, runsEnd, consumed);
+
+  const missingSteps =
+    range === undefined &&
+    !Arr.isNonEmpty(flowStyle) &&
+    lines.some(
+      (line, index) =>
+        runsLine < index &&
+        index < runsEnd &&
+        /^ +using: *["']?composite["']?$/u.test(withoutComment(line)),
+    )
+      ? ([
+          `${Math.max(runsLine, 0) + 1}: no block sequence under \`runs.steps\` of a composite action`,
+        ] as const)
+      : ([] as const);
+
   const problems = [
-    ...findFlowStyle(lines, runsLine, runsEnd, consumed),
+    ...missingSteps,
+    ...flowStyle,
     ...Arr.generate(function* () {
-      for (const { problem } of steps) {
+      for (const { problem } of parsedSteps) {
         if (problem !== undefined) {
           yield problem;
         }
@@ -75,14 +96,15 @@ export const extractRunScripts = (
 
   return {
     scripts,
+    steps:
+      range === undefined
+        ? undefined
+        : {
+            line: range.firstDash + 1,
+            dashIndent: range.dashIndent,
+            lines: lines.slice(range.firstDash, range.blockEnd),
+          },
     inputs: readInputNames(lines),
-    stepIds: Arr.generate(function* () {
-      for (const { id } of steps) {
-        if (id !== undefined) {
-          yield id;
-        }
-      }
-    }),
     problems:
       runKeys === read
         ? problems
@@ -93,7 +115,13 @@ export const extractRunScripts = (
   };
 };
 
+/** `line` without a trailing ` # comment` or trailing blanks. */
+export const withoutComment = (line: string): string =>
+  line.replace(/\s#.*$/u, '').trimEnd();
+
 export type RunScript = Readonly<{
+  /** The 1-based line of `action.yml` the step's `run:` key is on. */
+  runLine: number;
   /** The 1-based line of `action.yml` the script's first line is on. */
   line: number;
   /** How many columns of that line, and the lines after it, come first. */
@@ -103,10 +131,24 @@ export type RunScript = Readonly<{
   script: string;
 }>;
 
+/** The block sequence of `runs.steps`, as written. */
+export type StepsBlock = Readonly<{
+  /** The 1-based line of `action.yml` its first item is on. */
+  line: number;
+  /** The indentation of its items' `-`. */
+  dashIndent: number;
+  lines: readonly string[];
+}>;
+
+type StepsRange = Readonly<{
+  firstDash: number;
+  blockEnd: number;
+  dashIndent: number;
+}>;
+
 type Step = Readonly<{
   /** Where this step's keys start. */
   keyIndent: number;
-  id: string | undefined;
   hasRun: boolean;
   /** The line indices a block scalar's script took. */
   body: readonly number[];
@@ -141,10 +183,6 @@ const readShell = (value: string | undefined): string | undefined => {
 
   return shell === undefined || shell === '' ? undefined : shell;
 };
-
-/** `line` without a trailing ` # comment` or trailing blanks. */
-const withoutComment = (line: string): string =>
-  line.replace(/\s#.*$/u, '').trimEnd();
 
 const findIndexFrom = (
   lines: readonly string[],
@@ -233,17 +271,11 @@ const readStep = (
     }
   });
 
-  const idValue = keys.find(({ key }) => key === 'id')?.value;
-
-  const id =
-    idValue === undefined ? undefined : readInlineScalar(idValue)?.trim();
-
   const run = keys.find(({ key }) => key === 'run');
 
   if (run === undefined) {
     return {
       keyIndent,
-      id,
       hasRun: false,
       body: [],
       script: undefined,
@@ -256,7 +288,6 @@ const readStep = (
   const problemAt = (index: number, problem: string): Step =>
     ({
       keyIndent,
-      id,
       hasRun: true,
       body: [],
       script: undefined,
@@ -327,10 +358,10 @@ const readStep = (
 
     return {
       keyIndent,
-      id,
       hasRun: true,
       body: body.map((_, offset) => run.index + 1 + offset),
       script: {
+        runLine: run.index + 1,
         line: run.index + 2,
         column: indent,
         shell,
@@ -362,10 +393,10 @@ const readStep = (
 
   return {
     keyIndent,
-    id,
     hasRun: true,
     body: [],
     script: {
+      runLine: run.index + 1,
       line: run.index + 1,
       column:
         keyIndent +
@@ -400,11 +431,21 @@ const findRuns = (
   return { runsLine, runsEnd };
 };
 
-const readSteps = (lines: readonly string[]): readonly Step[] => {
-  const { runsLine, runsEnd } = findRuns(lines);
+const isDashLine = (line: string, dashIndent: number): boolean =>
+  indentOf(line) === dashIndent && line.slice(dashIndent).startsWith('-');
 
+/**
+ * The lines of `runs.steps`'s block sequence, from its first item to the line
+ * after its last (0-based, end exclusive), and the column of its dashes, or
+ * `undefined` when there is no such sequence.
+ */
+const findStepsRange = (
+  lines: readonly string[],
+  runsLine: number,
+  runsEnd: number,
+): StepsRange | undefined => {
   if (runsLine === -1) {
-    return [];
+    return undefined;
   }
 
   const stepsLine = findIndexFrom(lines, runsLine + 1, (line) =>
@@ -412,7 +453,7 @@ const readSteps = (lines: readonly string[]): readonly Step[] => {
   );
 
   if (stepsLine === undefined || stepsLine > runsEnd) {
-    return [];
+    return undefined;
   }
 
   const stepsIndent = indentOf(lines[stepsLine] ?? '');
@@ -428,13 +469,10 @@ const readSteps = (lines: readonly string[]): readonly Step[] => {
     dash === undefined ||
     (dash['indent'] ?? '').length < stepsIndent
   ) {
-    return [];
+    return undefined;
   }
 
   const dashIndent = (dash['indent'] ?? '').length;
-
-  const isDashLine = (line: string): boolean =>
-    indentOf(line) === dashIndent && line.slice(dashIndent).startsWith('-');
 
   const blockEnd =
     findIndexFrom(
@@ -443,12 +481,25 @@ const readSteps = (lines: readonly string[]): readonly Step[] => {
       (line) =>
         isContent(line) &&
         (indentOf(line) < dashIndent ||
-          (indentOf(line) === dashIndent && !isDashLine(line))),
+          (indentOf(line) === dashIndent && !isDashLine(line, dashIndent))),
     ) ?? lines.length;
+
+  return { firstDash, blockEnd, dashIndent };
+};
+
+const readSteps = (
+  lines: readonly string[],
+  range: StepsRange | undefined,
+): readonly Step[] => {
+  if (range === undefined) {
+    return [];
+  }
+
+  const { firstDash, blockEnd, dashIndent } = range;
 
   const starts = Arr.generate(function* () {
     for (const [offset, line] of lines.slice(firstDash, blockEnd).entries()) {
-      if (isDashLine(line)) {
+      if (isDashLine(line, dashIndent)) {
         yield firstDash + offset;
       }
     }
