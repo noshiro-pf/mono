@@ -164,7 +164,10 @@ describe('checkActionlint', () => {
 
     assert.include(result.value, '# shellcheck disable=SC<number> # why');
 
-    assert.include(result.value, 'tools/configs/release-binaries.json');
+    assert.include(
+      result.value,
+      'pnpm run update-release-binaries -- --to actionlint@<x.y.z>',
+    );
   });
 
   test('does not read a bad option, a fatal error or a signal as findings', async () => {

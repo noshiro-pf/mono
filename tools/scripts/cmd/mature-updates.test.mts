@@ -7,7 +7,13 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as util from 'node:util';
-import { Arr, isNonNullObject } from 'ts-data-forge';
+import {
+  Arr,
+  asUint32,
+  hasKey,
+  isNonNullObject,
+  isRecord,
+} from 'ts-data-forge';
 import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import type { ReleaseBinaryPin } from '../lib/release-binaries.mjs';
 import {
@@ -946,6 +952,284 @@ describe('release-binaries', () => {
       fs.rmSync(dir, { recursive: true, force: true });
     }
   });
+});
+
+describe('release-binaries --to', () => {
+  // Every step spawns `node`, a dozen in all, which outlasts the default 5 s
+  // on a loaded runner.
+  test(
+    'moves the one tool named to the version given, across its line, under the same hold',
+    { timeout: 30_000 },
+    async () => {
+      const realNow = Temporal.Now.instant();
+
+      const realDaysAgo = (days: number): string =>
+        realNow.subtract({ hours: days * hoursPerDay }).toString();
+
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mature-updates-to-'));
+
+      const configDir = path.join(dir, 'tools', 'configs');
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      fs.mkdirSync(configDir, { recursive: true });
+
+      const configPath = path.join(configDir, 'release-binaries.json');
+
+      const pin = (
+        repository: string,
+        version: string,
+        digest: string,
+      ): ReleaseBinaryPin =>
+        ({
+          repository,
+          version,
+          binary: 'tool',
+          assets: {
+            'linux-x64': {
+              name: 'tool_{version}_linux_amd64.tar.gz',
+              sha256: digest.repeat(64),
+            },
+          },
+        }) as const;
+
+      const before = {
+        jump: pin('owner/jump', '1.7.12', '1'),
+        // Has a mature release on its line, which a `--to` for another tool
+        // must leave alone.
+        other: pin('owner/other', '1.0.0', '2'),
+      } as const;
+
+      const beforeText = `${JSON.stringify(before, undefined, 2)}\n` as const;
+
+      installFakePnpm(dir, '{}');
+
+      const release = (
+        tag: string,
+        publishedDaysAgo: number,
+        digest: string,
+        extra: ReadonlyRecord<string, unknown> = {},
+      ): unknown =>
+        ({
+          tag_name: tag,
+          published_at: realDaysAgo(publishedDaysAgo),
+          assets: [
+            {
+              name: `tool_${tag.slice(1)}_linux_amd64.tar.gz`,
+              digest: `sha256:${digest.repeat(64)}`,
+              updated_at: realDaysAgo(publishedDaysAgo),
+            },
+          ],
+          ...extra,
+        }) as const;
+
+      const releasesByRepo: ReadonlyRecord<string, readonly unknown[]> = {
+        'owner/jump': [
+          release('v2.1.0', 2, 'b'),
+          release('v2.0.1', 30, 'c', { prerelease: true }),
+          release('v2.0.0', 30, 'a'),
+          release('v1.9.0', 30, 'e', { draft: true }),
+          release('v1.8.0', 60, 'f', {
+            assets: [
+              {
+                name: 'tool_1.8.0_linux_amd64.tar.gz',
+                digest: `sha256:${'f'.repeat(64)}`,
+                updated_at: realDaysAgo(1),
+              },
+            ],
+          }),
+          release('v1.7.12', 90, '1'),
+          release('v1.7.11', 120, '0'),
+          release('v1.6.0', 200, '6', { published_at: null }),
+        ],
+        'owner/other': [release('v1.0.1', 30, 'd'), release('v1.0.0', 90, '2')],
+      } as const;
+
+      const mut_requests: string[] = [];
+
+      const server = http.createServer((req, res) => {
+        const url = new URL(req.url ?? '/', 'http://localhost');
+
+        mut_requests.push(url.pathname);
+
+        const byTag =
+          /^\/repos\/([^/]+\/[^/]+)\/releases\/tags\/([^/]+)$/u.exec(
+            url.pathname,
+          );
+
+        const found =
+          byTag?.[1] === undefined
+            ? undefined
+            : (releasesByRepo[byTag[1]] ?? []).find(
+                (candidate) =>
+                  isRecord(candidate) && candidate['tag_name'] === byTag[2],
+              );
+
+        // GitHub has no tag route for a draft either.
+        if (
+          found === undefined ||
+          (isRecord(found) && found['draft'] === true)
+        ) {
+          res.writeHead(404);
+
+          res.end('{"message":"Not Found"}');
+
+          return;
+        }
+
+        res.setHeader('content-type', 'application/json');
+
+        res.end(JSON.stringify(found));
+      });
+
+      await new Promise<void>((resolve) => {
+        server.listen(0, '127.0.0.1', resolve);
+      });
+
+      try {
+        const address = server.address();
+
+        const port = isNonNullObject(address) ? address.port : 0;
+
+        const run = (to: string): Promise<string> =>
+          // With the `--` that `pnpm run … -- --to` forwards.
+          runScript(['release-binaries', '--', '--to', to], {
+            cwd: dir,
+            binDir: dir,
+            env: {
+              GITHUB_API_URL: `http://127.0.0.1:${port}`,
+              GH_TOKEN: 'fake-token',
+            },
+          });
+
+        /** What a run that must fail printed on stderr, once it has failed. */
+        const runFailing = async (to: string): Promise<string> => {
+          try {
+            await run(to);
+          } catch (error: unknown) {
+            return isRecord(error) &&
+              hasKey(error, 'stderr') &&
+              typeof error.stderr === 'string'
+              ? error.stderr
+              : '';
+          }
+
+          throw new Error(`release-binaries --to ${to} passed`);
+        };
+
+        const readPins = (): unknown =>
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
+        for (const [to, message] of [
+          [
+            'jump@2.1.0',
+            'jump: v2.1.0 was published after the cutoff; not taken.',
+          ],
+          ['jump@2.0.1', 'jump: v2.0.1 is a draft or a prerelease; not taken.'],
+          [
+            'jump@1.6.0',
+            'jump: v1.6.0 has no publication time to hold it to; not taken.',
+          ],
+          [
+            'jump@1.9.0',
+            'jump: owner/jump has no published release v1.9.0, or cannot be read.',
+          ],
+          [
+            'jump@1.8.0',
+            'jump: tool_1.8.0_linux_amd64.tar.gz of v1.8.0 was uploaded after the cutoff; not taken.',
+          ],
+          [
+            'jump@3.0.0',
+            'jump: owner/jump has no published release v3.0.0, or cannot be read.',
+          ],
+          [
+            'nope@1.0.0',
+            'tools/configs/release-binaries.json pins no tool named "nope".',
+          ],
+          [
+            'jump@2.0',
+            'Usage: node mature-updates.mts release-binaries [--to <tool>@<x.y.z>]',
+          ],
+        ] as const) {
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          fs.writeFileSync(configPath, beforeText);
+
+          assert.include(await runFailing(to), message);
+
+          assert.deepStrictEqual(readPins(), before);
+        }
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.writeFileSync(configPath, beforeText);
+
+        const firstRequest = mut_requests.length;
+
+        const stdout = await run('jump@2.0.0');
+
+        assert.include(stdout, 'jump (owner/jump): v1.7.12 -> v2.0.0 (--to)\n');
+
+        assert.include(stdout, 'Moved 1 release-binary pin(s).\n');
+
+        assert.deepStrictEqual(readPins(), {
+          ...before,
+          jump: pin('owner/jump', '2.0.0', 'a'),
+        });
+
+        assert.deepStrictEqual(Arr.skip(mut_requests, asUint32(firstRequest)), [
+          '/repos/owner/jump/releases/tags/v2.0.0',
+        ]);
+
+        // The same version again rewrites nothing, and says so.
+        assert.include(
+          await run('jump@2.0.0'),
+          'jump (owner/jump): v2.0.0 unchanged (--to)\n',
+        );
+
+        // A digest that differs on the same version is refused: the upload
+        // was replaced, which is reported rather than re-pinned.
+        const replacedPins = {
+          ...before,
+          jump: pin('owner/jump', '2.0.0', '9'),
+        } as const;
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.writeFileSync(
+          configPath,
+          `${JSON.stringify(replacedPins, undefined, 2)}\n`,
+        );
+
+        assert.include(
+          await runFailing('jump@2.0.0'),
+          `jump: the linux-x64 asset of v2.0.0 is ${'a'.repeat(64)}, not the pinned digest; not re-pinned. Either the version was edited by hand without its digests (put back the version last pinned, then use --to), or the file was uploaded again, which is worth reporting.`,
+        );
+
+        assert.deepStrictEqual(readPins(), replacedPins);
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.writeFileSync(
+          configPath,
+          `${JSON.stringify({ ...before, jump: pin('owner/jump', '2.0.0', 'a') }, undefined, 2)}\n`,
+        );
+
+        // And back down, below the current pin and its line.
+        assert.include(
+          await run('jump@1.7.11'),
+          'jump (owner/jump): v2.0.0 -> v1.7.11 (--to)\n',
+        );
+
+        assert.deepStrictEqual(readPins(), {
+          ...before,
+          jump: pin('owner/jump', '1.7.11', '0'),
+        });
+      } finally {
+        server.closeAllConnections();
+
+        server.close();
+
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    },
+  );
 });
 
 describe('shared', () => {
