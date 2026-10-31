@@ -423,6 +423,26 @@ export const priorityRankOfLabels = (labels: readonly string[]): 0 | 1 | 2 => {
 };
 
 /**
+ * {@link priorityRankOfLabels}, for a pull request that `bypass` says only a
+ * ruleset bypass merges ({@link ReviewHold}): that one ranks with
+ * `priority:low` unless labelled `priority:high` — alone, since the two
+ * together count as neither. Picked, it is released, goes green and is set
+ * aside for a person, so the cycle spent on it lands nothing; picked last,
+ * it still has its checks run. `priority:high` is a person saying they want
+ * that verdict now, and is the one way to ask for it, so it still counts.
+ */
+export const pickPriorityRank = (
+  labels: readonly string[],
+  bypass: boolean,
+): 0 | 1 | 2 => {
+  const rank = priorityRankOfLabels(labels);
+
+  return bypass && rank !== 0
+    ? priorityRankOfLabels([PRIORITY_LOW_LABEL])
+    : rank;
+};
+
+/**
  * The order the worker picks candidates in. The declared order has already
  * been applied, as a gate rather than a sort, so this is lowest number first
  * within these ranks, outermost first:
@@ -432,7 +452,9 @@ export const priorityRankOfLabels = (labels: readonly string[]): 0 | 1 | 2 => {
  *    else is not known to sit without merging, and this is.
  * 2. `priority:high` before the rest, `priority:low` after them. It is a
  *    person's declaration, so it outranks the two guesses below — and the
- *    version pull request reads it too.
+ *    version pull request reads it too. One only a ruleset bypass merges
+ *    counts as `priority:low` unless labelled `priority:high`
+ *    ({@link pickPriorityRank}).
  * 3. What GitHub only *thinks* conflicts goes after the rest: a rebase the
  *    worker is sure of is worth spending the cycle on before one it is
  *    guessing at.
@@ -450,6 +472,7 @@ export const orderCandidates = <P,>(
   context: Readonly<{
     defaultBranch: string;
     demoted: (candidate: P) => boolean;
+    bypass: (candidate: P) => boolean;
   }>,
 ): readonly P[] => {
   const rank = (candidate: P): number => {
@@ -462,14 +485,13 @@ export const orderCandidates = <P,>(
         : 0;
   };
 
+  const priorityRank = (candidate: P): number =>
+    pickPriorityRank(factsOf(candidate).labels, context.bypass(candidate));
+
   return candidates
     .toSorted((a, b) => factsOf(a).number - factsOf(b).number)
     .toSorted((a, b) => rank(a) - rank(b))
-    .toSorted(
-      (a, b) =>
-        priorityRankOfLabels(factsOf(a).labels) -
-        priorityRankOfLabels(factsOf(b).labels),
-    )
+    .toSorted((a, b) => priorityRank(a) - priorityRank(b))
     .toSorted(
       (a, b) => Number(context.demoted(a)) - Number(context.demoted(b)),
     );

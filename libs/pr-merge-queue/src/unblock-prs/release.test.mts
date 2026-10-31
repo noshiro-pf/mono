@@ -43,6 +43,7 @@ describe(firstInReleaseOrder, () => {
       firstInReleaseOrder(
         [pullRequest({ number: 12 }), pullRequest({ number: 7 })],
         'main',
+        noBypass,
       )?.number,
       7,
     );
@@ -56,6 +57,7 @@ describe(firstInReleaseOrder, () => {
           pullRequest({ number: 12 }),
         ],
         'main',
+        noBypass,
       )?.number,
       12,
     );
@@ -72,16 +74,47 @@ describe(firstInReleaseOrder, () => {
       }),
     ] as const;
 
-    assert.strictEqual(firstInReleaseOrder(released, 'main')?.number, 3);
+    assert.strictEqual(
+      firstInReleaseOrder(released, 'main', noBypass)?.number,
+      3,
+    );
 
     assert.strictEqual(
-      firstInReleaseOrder(Arr.take(released, 2), 'main')?.number,
+      firstInReleaseOrder(Arr.take(released, 2), 'main', noBypass)?.number,
       2,
     );
   });
 
+  // Kept released, it goes green only to be set aside for a person, while
+  // the one paused for it could have merged on its own.
+  test('puts one only a bypass merges with priority:low, unless labelled priority:high', () => {
+    const released = [
+      pullRequest({ number: 1 }),
+      pullRequest({ number: 2, labels: [queued, low] }),
+      pullRequest({ number: 3 }),
+    ] as const;
+
+    assert.strictEqual(
+      firstInReleaseOrder(
+        released,
+        'main',
+        new Map<number, string>([[1, '@someone owns it']]),
+      )?.number,
+      3,
+    );
+
+    assert.strictEqual(
+      firstInReleaseOrder(
+        [pullRequest({ number: 1, labels: [queued, high] }), released[2]],
+        'main',
+        new Map<number, string>([[1, '@someone owns it']]),
+      )?.number,
+      1,
+    );
+  });
+
   test('is undefined for nothing', () => {
-    assert.isUndefined(firstInReleaseOrder([], 'main'));
+    assert.isUndefined(firstInReleaseOrder([], 'main', noBypass));
   });
 });
 
@@ -108,8 +141,24 @@ describe(yieldsTo, () => {
         new Map<number, QueueOwner>([[3, worker]]),
         new Set<number>([3, 7]),
         'main',
+        noBypass,
       )?.number,
       3,
+    );
+  });
+
+  test('keeps its release against one only a bypass merges', () => {
+    const other = pullRequest({ number: 3, labels: [queued] });
+
+    assert.isUndefined(
+      yieldsTo(
+        target,
+        [target, other],
+        new Map<number, QueueOwner>([[3, worker]]),
+        new Set<number>([3, 7]),
+        'main',
+        new Map<number, string>([[3, '@someone owns it']]),
+      ),
     );
   });
 
@@ -123,6 +172,7 @@ describe(yieldsTo, () => {
         new Map<number, QueueOwner>([[12, worker]]),
         new Set<number>([7, 12]),
         'main',
+        noBypass,
       ),
     );
   });
@@ -142,6 +192,7 @@ describe(yieldsTo, () => {
         new Map<number, QueueOwner>([[3, worker]]),
         new Set<number>([7]),
         'main',
+        noBypass,
       ),
     );
   });
@@ -158,6 +209,7 @@ describe(yieldsTo, () => {
         new Map<number, QueueOwner>([[3, skill]]),
         new Set<number>([3, 7]),
         'main',
+        noBypass,
       ),
     );
 
@@ -168,6 +220,7 @@ describe(yieldsTo, () => {
         new Map<number, QueueOwner>(),
         new Set<number>([3, 7]),
         'main',
+        noBypass,
       ),
     );
   });
@@ -182,6 +235,7 @@ describe(yieldsTo, () => {
         new Map<number, QueueOwner>([[3, worker]]),
         new Set<number>([3, 7]),
         'main',
+        noBypass,
       ),
     );
   });
@@ -213,3 +267,5 @@ const pullRequest = (
     labels: [],
     ...fields,
   }) as const;
+
+const noBypass: ReadonlyMap<number, string> = new Map<number, string>();

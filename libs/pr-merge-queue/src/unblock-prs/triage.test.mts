@@ -1,4 +1,4 @@
-import { describeAction, orderCandidates } from './triage.mjs';
+import { describeAction, orderCandidates, priorityPhrase } from './triage.mjs';
 import type { PullRequest } from './types.mjs';
 
 describe(orderCandidates, () => {
@@ -23,6 +23,7 @@ describe(orderCandidates, () => {
           {
             defaultBranch: 'main',
             demoted: new Map<number, string>([[1, 'a'.repeat(40)]]),
+            bypass: new Map<number, string>(),
           },
         ),
       ),
@@ -41,10 +42,67 @@ describe(orderCandidates, () => {
           {
             defaultBranch: 'main',
             demoted: new Map<number, string>([[1, 'a'.repeat(40)]]),
+            bypass: new Map<number, string>(),
           },
         ),
       ),
       [1, 2],
+    );
+  });
+
+  test('puts one only a bypass merges behind the rest', () => {
+    assert.deepStrictEqual(
+      numbers(
+        orderCandidates(
+          [
+            pullRequest({ number: 1 }),
+            pullRequest({ number: 2, mergeStateStatus: 'DIRTY' }),
+          ],
+          {
+            defaultBranch: 'main',
+            demoted: new Map<number, string>(),
+            bypass: new Map<number, string>([[1, '@someone owns it']]),
+          },
+        ),
+      ),
+      [2, 1],
+    );
+  });
+});
+
+describe(priorityPhrase, () => {
+  const labelSets = [
+    [],
+    [{ name: 'priority:low' }],
+    [{ name: 'priority:high' }],
+    [{ name: 'priority:high' }, { name: 'priority:low' }],
+  ] as const;
+
+  test('says what the priority label did', () => {
+    assert.deepStrictEqual(
+      labelSets.map((labels) =>
+        priorityPhrase(pullRequest({ number: 1, labels }), false),
+      ),
+      [
+        '',
+        ' — behind the rest, by priority:low',
+        ' — ahead of the rest, by priority:high',
+        ' — labelled both priority:high and priority:low, so neither counts',
+      ],
+    );
+  });
+
+  test('says one only a bypass merges goes behind the rest, unless priority:high', () => {
+    assert.deepStrictEqual(
+      labelSets.map((labels) =>
+        priorityPhrase(pullRequest({ number: 1, labels }), true),
+      ),
+      [
+        ' — behind the rest, as only a bypass merges it',
+        ' — behind the rest, by priority:low, and as only a bypass merges it',
+        ' — ahead of the rest, by priority:high',
+        ' — labelled both priority:high and priority:low, so neither counts — behind the rest, as only a bypass merges it',
+      ],
     );
   });
 });

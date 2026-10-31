@@ -207,7 +207,7 @@ export const triage = async (
       classified
         .filter(({ result }) => result.kind === 'candidate')
         .map(({ pr }) => pr),
-      base,
+      { ...base, bypass },
     ),
     // Anything this cycle may pick — a candidate, or one in flight — that
     // has no auto-merge yet, however it came to have none: `merge-queued`
@@ -261,15 +261,21 @@ export const triage = async (
 
 /**
  * The cycle's order: `pr-report-core`'s `orderCandidates`, which says why,
- * with what this run has demoted (`demotions.mts`).
+ * with what this run has demoted (`demotions.mts`) and what only a bypass
+ * merges.
  */
 export const orderCandidates = (
   candidates: readonly PullRequest[],
-  context: Readonly<{ defaultBranch: string; demoted: Demotions }>,
+  context: Readonly<{
+    defaultBranch: string;
+    demoted: Demotions;
+    bypass: ReadonlyMap<number, string>;
+  }>,
 ): readonly PullRequest[] =>
   orderQueueCandidates(candidates, factsOf, {
     defaultBranch: context.defaultBranch,
     demoted: (pr) => isDemoted(context.demoted, pr),
+    bypass: (pr) => context.bypass.has(pr.number),
   });
 
 export const reportTriage = (
@@ -317,7 +323,7 @@ export const reportTriage = (
 
   for (const [position, pr] of triaged.candidates.entries()) {
     log(
-      `  #${pr.number}: ${position === 0 ? 'next' : `${position} ahead of it`} — ${describeAction(pr, defaultBranch, triaged)}${isDemoted(context.demoted, pr) ? ' — last, because it sat green without merging' : ''}${priorityPhrase(pr)} — ${pr.title}`,
+      `  #${pr.number}: ${position === 0 ? 'next' : `${position} ahead of it`} — ${describeAction(pr, defaultBranch, triaged)}${isDemoted(context.demoted, pr) ? ' — last, because it sat green without merging' : ''}${priorityPhrase(pr, triaged.bypass.has(pr.number))} — ${pr.title}`,
     );
   }
 };
@@ -353,6 +359,31 @@ export const bypassPhrase = (reason: string | undefined): string =>
   reason === undefined
     ? ''
     : (`, leave auto-merge off (${reason}, so it needs a bypass merge)` as const);
+
+/**
+ * What the pull request's priority label, or needing a bypass merge, did to
+ * its place, as a phrase.
+ */
+export const priorityPhrase = (pr: PullRequest, bypass: boolean): string => {
+  // `pickPriorityRank` ranks it with `priority:low` unless it is `high`.
+  const asBypassOnly = 'as only a bypass merges it';
+
+  const behindForBypass = ` — behind the rest, ${asBypassOnly}` as const;
+
+  switch (priorityOf(pr)) {
+    case 'high':
+      return ` — ahead of the rest, by ${PRIORITY_HIGH_LABEL}`;
+
+    case 'low':
+      return ` — behind the rest, by ${PRIORITY_LOW_LABEL}${bypass ? `, and ${asBypassOnly}` : ''}`;
+
+    case 'both':
+      return ` — labelled both ${PRIORITY_HIGH_LABEL} and ${PRIORITY_LOW_LABEL}, so neither counts${bypass ? behindForBypass : ''}`;
+
+    case 'none':
+      return bypass ? behindForBypass : '';
+  }
+};
 
 /**
  * What the rules on the default branch require, as GitHub applies them.
@@ -655,20 +686,3 @@ const readReviewHolds = async (
  */
 const isConflicting = (pr: PullRequest): boolean =>
   pr.mergeStateStatus === 'DIRTY';
-
-/** What the pull request's priority label did to its place, as a phrase. */
-const priorityPhrase = (pr: PullRequest): string => {
-  switch (priorityOf(pr)) {
-    case 'high':
-      return ` — ahead of the rest, by ${PRIORITY_HIGH_LABEL}`;
-
-    case 'low':
-      return ` — behind the rest, by ${PRIORITY_LOW_LABEL}`;
-
-    case 'both':
-      return ` — labelled both ${PRIORITY_HIGH_LABEL} and ${PRIORITY_LOW_LABEL}, so neither counts`;
-
-    case 'none':
-      return '';
-  }
-};

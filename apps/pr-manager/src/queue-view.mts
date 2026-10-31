@@ -198,6 +198,7 @@ export const queueViewOf = ({
     return {
       ...each,
       facts,
+      bypass: hold?.kind === 'bypass',
       standing: withReviewHold(
         queueStanding(facts, context, readsOf(each.pull)),
         facts.mergeState,
@@ -216,7 +217,7 @@ export const queueViewOf = ({
     byNumber.filter(({ standing }) => standing.kind === 'candidate'),
     ({ facts }) => facts,
     // What a run of the worker has demoted is not known here.
-    { defaultBranch, demoted: () => false },
+    { defaultBranch, demoted: () => false, bypass: ({ bypass }) => bypass },
   );
 
   const rest = byNumber.filter(({ standing }) => isWaiting(standing));
