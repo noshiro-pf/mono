@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-synstate",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "private": false,
   "description": "ESLint rules that catch synstate observables nothing can stop.",
   "keywords": [

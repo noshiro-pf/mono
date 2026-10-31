@@ -1,6 +1,6 @@
 {
   "name": "pr-report-core",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "private": false,
   "description": "What a GitHub merge queue driven by labels and `Merge-After:` trailers decides about the open pull requests — verdicts, merge order, stacks, owners — with no I/O, shared by the GitHub Pull Requests Manager page and the unblock-prs worker",
   "keywords": [
