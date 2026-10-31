@@ -137,7 +137,8 @@ terminates. `build` and `doc` write untracked output. Consequences:
 
 - `pnpm run '/^check:[^:]*$/'` runs a package's checks in parallel; that is
   safe for `check:` only, so `fix:` and `gen:` keep ordered `run-s`
-  aggregates. `check-all` keeps its hyphen to stay out of the glob.
+  aggregates. `check-all` and `check-changed` keep their hyphen to stay out of
+  the glob.
 - `test` and `fmt` are aliases for `check:test` and `fix:fmt`. Keep them, add
   no more.
 - Root guards live in two globbed namespaces, **chosen by what the guard
@@ -156,26 +157,14 @@ Main entry points: `ws:build[:deps]`, `ws:gen`, `ws:check:types`, `ws:fix:lint`,
 `gen:deps-graph`, `fmt`, `fix:fmt[:diff|:full]`, `fix:codemod[:diff|:full]`.
 A missing `dist/` is named by the check that needs it; **a stale one is not**.
 
-**Run the checks the diff touches, not `check-all`.** `check-all` is a human
-aid: what it skips and where it is narrower than CI is listed at the end of
-`check-all.mts`. `pnpm run fmt` belongs on every change.
-
-| the diff touches            | run                                                                                                         |
-| :-------------------------- | :---------------------------------------------------------------------------------------------------------- |
-| TypeScript in a package     | that package's `check:types`, `fix:lint`, `check:test`, and `fix:codemod:diff`                              |
-| `tools/`                    | `check:root:types`, `check:root:lint`, `check:root:test`, `fix:codemod:diff`                                |
-| Markdown or prose           | `check:md`, `check:cspell`, `check:prose`                                                                   |
-| a `package.json`, lockfile  | `check:knip`, `check:published-deps`, `gen:deps-graph`, and a build of what depends on it                   |
-| workflows, `repo-settings/` | `fmt`, `check:cspell`; for workflows also the guards their README lists, `check:root:actionlint` among them |
-
-`fix:codemod:diff` is in both TypeScript rows because no lint rule stands
-behind the codemod — `prefer-as-const` rewrites `as 'foo'` and says nothing
-about an `as const` that is missing — so `code-check (fix:codemod:full)` is
-otherwise the first thing to mention it.
-
-A targeted run can miss a file another package's generator writes; CI's
-`assert-repo-is-clean` catches it once `skip-ci` is off. Read `git status`
-before pushing.
+**Run `pnpm run check-changed`, not `check-all`**, after every change
+(`--base <branch>` for a stacked one). It runs what the diff touches, fails on
+a generator that changed the tree, and reads the commits and changesets;
+`tools/scripts/cmd/check-changed/README.md` says what it runs and leaves to
+CI. It does not build what depends on a changed package: run
+`ws:build:deps` first when other packages consume the change. `check-all` is
+a human aid (its limits end `check-all.mts`). A generator of a package the
+diff does not touch can still write; read `git status` before pushing.
 
 ### Samples and generated documentation
 
@@ -245,8 +234,8 @@ not (see "Commits and pull requests").
 
 ## Session rules
 
-- After code changes, run `pnpm run fmt` and the checks the diff touches, and
-  fix what they report. **Before turning a lint rule off, try fixing the
+- After code changes, run `pnpm run check-changed` (see "Commands") and
+  fix what it reports. **Before turning a lint rule off, try fixing the
   code**; the rules below say the intended fix. Where a rule's premise fails
   (code run by `page.evaluate`), turn it off narrowly with a reason, by
   `eslint-disable-next-line` or a `files` override, not by reworking the rule.

@@ -31,9 +31,10 @@ round dismissed, costs as much as the first.
 
 ## Before the first round
 
-1. Run the checks the diff touches (`CLAUDE.md`, "Commands") and fix what
-   they report. A review is the most expensive way to learn that a barrel,
-   a generated README or a codemod result is stale.
+1. Run `pnpm run check-changed` (`CLAUDE.md`, "Commands"), which runs the
+   checks the diff touches, and fix what it reports. A review is the most
+   expensive way to learn that a barrel, a generated README or a codemod
+   result is stale.
 2. Read the diff once yourself, with the sections of
    [`review-checklists.md`](./review-checklists.md) that apply. You already
    have the context; a reviewer has to rebuild it.
@@ -72,7 +73,7 @@ round dismissed, costs as much as the first.
       local branch onto it first — `git fetch`, then
       `git rebase --onto origin/<branch> <the head you knew>` — or the review
       reads the whole commit again.
-- **After each round's fixes, rerun the checks they touch** — the fixes are
+- **After each round's fixes, run `check-changed` again** — the fixes are
   code, and with `skip-ci` on the local checks are the only ones the branch
   gets.
 - **Keep a ledger.** The description draft lists each finding as fixed,
