@@ -1,8 +1,8 @@
 import { NumericInput } from 'blueprint-synstate';
 import { constant, type Bindable, type JSX } from 'synstate-dom';
-import { Num, Result } from 'ts-data-forge';
 import * as styles from './bounded-numeric-input.module.css';
-import { normalizeBounded } from './normalize-bounded.mjs';
+import { decodeNumber } from './decode-number.mjs';
+import { normalizeNumber } from './normalize-number.mjs';
 
 type Props<N extends number> = Readonly<{
   value: Bindable<N>;
@@ -19,8 +19,9 @@ type Props<N extends number> = Readonly<{
 
 /**
  * A numeric input of the page: right-aligned, the width of its row, and
- * committed as a number in `[min, max]`. Text that is no number is committed as
- * `min`, which is also where a step from it starts.
+ * committed as a number in `[min, max]`, which `NumericInput` clamps to. Text
+ * that is no number is committed as `min`, which is also where a step from it
+ * starts; a number too large for a double, as the bound it is past.
  */
 export const BoundedNumericInput = <N extends number>({
   value,
@@ -31,27 +32,23 @@ export const BoundedNumericInput = <N extends number>({
   integer = false,
   'data-e2e': e2e,
 }: Props<N>): JSX.Element => {
-  const bounded = normalizeBounded({ min, max, integer });
+  const normalize = normalizeNumber({ fallback: min, integer });
 
   return (
     <NumericInput
       data-e2e={constant(e2e)}
-      decode={decode}
+      decode={decodeNumber}
       encode={encode}
       fill
       inputClass={styles.input}
       max={constant(max)}
       min={constant(min)}
-      normalize={(n) => toValue(bounded(n))}
+      normalize={(n) => toValue(normalize(n))}
       selectAllOnFocus
       value={value}
       onValueChange={onValueChange}
     />
   );
 };
-
-/** `NaN` for text that is no finite number, which `normalize` replaces. */
-const decode = (text: string): number =>
-  Result.unwrapOkOr(Num.safeParseFloat(text), Number.NaN);
 
 const encode = (value: number): string => value.toString();

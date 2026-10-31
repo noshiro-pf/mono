@@ -54,13 +54,15 @@ type ViewProps = Readonly<{
   /**
    * The number the text shows, read out by assistive technology as the spin
    * button's value: of the text as it is being typed, as in Blueprint's, so not
-   * the committed value. {@link NumericInput} passes its decoded text.
+   * the committed value. {@link NumericInput} passes its decoded text clamped
+   * to its bounds, which ARIA asks of the value, where Blueprint's passes the
+   * text's number as it is.
    */
   'aria-valuenow'?: Bindable<number | undefined>;
   /**
-   * The lower bound read out by assistive technology. It bounds nothing: the
-   * bound is whoever commits the text, as `normalize` in {@link NumericInput},
-   * and passes the same number here.
+   * The lower bound read out by assistive technology. It bounds nothing here:
+   * the bound is whoever commits the text, as {@link NumericInput} does with
+   * the same prop.
    */
   min?: Bindable<number>;
   /** As `min`, for the upper bound. */
@@ -206,17 +208,35 @@ type Props<N extends number> = Readonly<
     encode: (value: N) => string;
     /**
      * The number a text stands for; `NaN` for none, which `normalize` mends.
-     * A step from such a text starts from `normalize(NaN)`. It is also read
-     * whenever the text changes, for the number the spin button reads out, so
-     * it takes half-typed text such as `-` without throwing.
+     * A step from such a text starts from `normalize(NaN)`, clamped. It is also
+     * read whenever the text changes, for the number the spin button reads out,
+     * so it takes half-typed text such as `-` without throwing.
      */
     decode: (text: string) => number;
-    /** The value a number is committed as: clamped, rounded, `NaN` replaced. */
+    /**
+     * The value a number is committed as: rounded, `NaN` replaced, and made an
+     * `N`. It is given the number already clamped to `min` and `max`, so it is
+     * finite, or `NaN` for text that is no number, or ±`Infinity` past a bound
+     * that is not given. For `NaN`, its result is clamped and given back to it,
+     * so it keeps a number it has made as it is.
+     */
     normalize: (value: number) => N;
     /** What a button or an arrow key adds or takes away; 1 by default. */
     step?: number;
+    /**
+     * The lower bound: a committed number below it is raised to it before
+     * `normalize`, a step stops at it, and assistive technology reads it out.
+     * It is not above `max`, and `normalize` keeps it as it is (a bound off the
+     * grid it rounds to would let a rounded number past it). A value from
+     * outside is shown as it is, and clamped when it is next committed.
+     */
+    min?: Bindable<number>;
+    /** As `min`, for the upper bound. */
+    max?: Bindable<number>;
   } & StrictOmit<
     ViewProps,
+    | 'max'
+    | 'min'
     | 'onBlur'
     | 'onDecrementClick'
     | 'onDecrementMouseDown'
@@ -235,12 +255,13 @@ type Props<N extends number> = Readonly<
  *
  * Nothing the user types becomes the value until it is committed — on blur, on
  * Enter, or by a step — so half-typed text such as `-` or `3.` stays as it is;
- * only then does `normalize` make a value of what `decode` reads, the text is
- * rewritten from that value, and `onValueChange` is told. Holding a button with
- * the main mouse button, or an arrow key, steps again after 400 ms, then every
- * 40 ms, until it is released, the window loses focus (and for a key, the
- * input) or a bound stops the value; Enter or Space on a focused button steps
- * once.
+ * only then is what `decode` reads clamped to `min` and `max`, `normalize`
+ * makes a value of it, the text is rewritten from that value, and
+ * `onValueChange` is told. One pair of bounds is both what is clamped to and
+ * what assistive technology reads out. Holding a button with the main mouse
+ * button, or an arrow key, steps again after 400 ms, then every 40 ms, until it
+ * is released, the window loses focus (and for a key, the input) or a bound
+ * stops the value; Enter or Space on a focused button steps once.
  *
  * This split, stateless text in the view and the state that decodes it here, is
  * how every numeric input in this repository is built (see
@@ -254,9 +275,22 @@ export const NumericInput = <N extends number>({
   decode,
   normalize,
   step = 1,
+  min,
+  max,
   ...viewProps
 }: Props<N>): JSX.Element => {
   const value$ = toObservable(value);
+
+  const min$ = min === undefined ? undefined : toObservable(min);
+
+  const max$ = max === undefined ? undefined : toObservable(max);
+
+  /** `n` within the bounds as they are now; `NaN` stays `NaN`. */
+  const clamp = (n: number): number =>
+    Math.min(
+      max$?.getSnapshot().value ?? Number.POSITIVE_INFINITY,
+      Math.max(min$?.getSnapshot().value ?? Number.NEGATIVE_INFINITY, n),
+    );
 
   const [text$, setText] = createState(encode(value$.getSnapshot().value));
 
@@ -278,13 +312,20 @@ export const NumericInput = <N extends number>({
 
   mut_following = true;
 
-  /** Commits the text plus `delta`; `false` when that is no other number, as at a bound. */
+  /**
+   * Commits the text plus `delta`; `false` when that is no other number, as at
+   * a bound.
+   */
   const commit = (delta: number): boolean => {
     const decoded = decode(text$.getSnapshot().value);
 
-    const next = normalize(
-      (Number.isNaN(decoded) ? normalize(Number.NaN) : decoded) + delta,
-    );
+    const start = Number.isNaN(decoded)
+      ? clamp(normalize(Number.NaN))
+      : decoded;
+
+    // Clamped after the step, as in Blueprint's: a step from text past a bound
+    // lands on the bound.
+    const next = normalize(clamp(start + delta));
 
     setText(encode(next));
 
@@ -360,11 +401,15 @@ export const NumericInput = <N extends number>({
   return (
     <NumericInputView
       {...viewProps}
+      max={max}
+      min={min}
       // The number the text shows, as Blueprint's reads it from its own text.
+      // A number the text shows is read out clamped, so that it stays within
+      // the bounds read out with it; text that is none reads out no value.
       aria-valuenow={view(text$, (text) => {
-        const decoded = decode(text);
+        const clamped = clamp(decode(text));
 
-        return Number.isFinite(decoded) ? decoded : undefined;
+        return Number.isFinite(clamped) ? clamped : undefined;
       })}
       value={text$}
       onBlur={() => {
