@@ -163,4 +163,4 @@ tools の `onComplete` は `init` の中から後始末を登録するので、`
 
 ## できないこと
 
-observable の型には、利用者に必要なメンバーだけがあります。`id`、`kind`、`parents`（子のみ）、`getSnapshot`、`isCompleted`、`updateToken`、`depth`、`subscribe`、`pipe`、`complete`、`dispose` です。伝搬が読むメンバー（`tryUpdate`、`addChild` など）は実行時には存在しますが型にはなく、型をオブジェクトリテラルで満たすこともできません。伝搬はこれらのメンバーがあることを前提にしているので、observable は必ず上の factory のどれかで作ります。
+observable の型には、利用者に必要なメンバーだけがあります。`kind`、`parents`（子のみ）、`getSnapshot`、`isCompleted`、`updateToken`、`depth`、`subscribe`、`pipe`、`complete`、`dispose` です。伝搬が読むメンバー（`tryUpdate`、`addChild` など）は実行時には存在しますが型にはなく、型をオブジェクトリテラルで満たすこともできません。伝搬はこれらのメンバーがあることを前提にしているので、observable は必ず上の factory のどれかで作ります。

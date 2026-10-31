@@ -20,7 +20,7 @@ sidebar:
 - ⚡ **安定したパフォーマンス**： グリッチフリー $O(n)$ 伝搬で、ベンチマークの6つのシナリオすべてで最速のライブラリの<!-- bench:summary/synstate-worst-over-fastest -->2.4<!-- /bench -->倍以内に収まります — 6つすべてで計測した他のライブラリの最悪ケースは <!-- bench:summary/others-least-worst-library -->Preact Signals<!-- /bench --> の<!-- bench:summary/others-least-worst-over-fastest -->2.0<!-- /bench -->倍から <!-- bench:summary/others-most-worst-library -->RxJS<!-- /bench --> の<!-- bench:summary/others-most-worst-over-fastest -->> 16,129<!-- /bench -->倍までです。速度は SynState が最も際立つ点ではありません。何が際立つかは [SynState の強み](/mono/synstate/ja/guides/why-synstate/#グリッチフリーでコストは線形)を参照。[ベンチマーク結果](/mono/synstate/ja/guides/library-comparison/benchmark/)を参照。
 - 🚀 **軽量**： <!-- bundle-size:synstate -->~6.8 kB min+gzip<!-- /bundle-size:synstate -->、外部ランタイム依存は [ts-data-forge](https://www.npmjs.com/package/ts-data-forge) と [ts-std-forge](https://www.npmjs.com/package/ts-std-forge) の 2 つ（前者が後者に依存している）。
 - ⚛️ **React 最適化**： [React Compiler](https://react.dev/learn/react-compiler) と完全互換。`synstate-react-hooks` により数行でコンポーネントにグローバル状態を導入。
-- 🌐 **フレームワーク非依存**： コアはバニラ JavaScript、Vue、Svelte など任意のフレームワークでそのまま動作。React / Preact 向けには hooks ラッパー（`synstate-react-hooks` / `synstate-preact-hooks`）、Preact 向けにはさらに [Preact Signals 連携](/mono/synstate/ja/preact-signals/demo/)（`synstate-preact-signals`）も用意。
+- 🌐 **フレームワーク非依存**： コアはバニラ JavaScript、Vue、Svelte など任意のフレームワークでそのまま動作。React / Preact 向けには hooks ラッパー（`synstate-react-hooks` / `synstate-preact-hooks`）、Preact 向けにはさらに [Preact Signals 連携](/mono/synstate/ja/preact-signals/demo/)（`synstate-preact-signals`）も用意。フレームワークを使わない場合は、[synstate-dom](/mono/synstate-dom/ja/) が Observable を DOM に直接束縛します。
 
 ## 簡単な例
 

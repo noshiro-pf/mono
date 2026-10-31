@@ -207,6 +207,41 @@ const Greeting = (): React.JSX.Element => {
 
 `createState` から得られる Observable や、初期値を保持する `pipe` チェーンから得られる Observable は `InitializedObservable<T>` であるため、フォールバックは不要です。
 
+## マウント中の副作用：`useObservableEffect`
+
+`useObservableEffect(observable$, fn)` は、コンポーネントのマウント時に `fn` を購読し、アンマウント時に購読を解除します。クエリが変わったら先頭までスクロールするといった、コンポーネントがマウントされている間だけ実行したい、描画内容を変えない副作用に使います。`fn` は現在値があればそれですぐに呼ばれ、その後は値が発行されるたびに呼ばれます。戻り値はなく、コンポーネントを再レンダリングしません：
+
+```tsx
+import type * as React from 'react';
+import { createState, useObservableEffect } from 'synstate-react-hooks';
+
+// Written by the search box
+export const [, setQuery, { state: query$ }] = createState('');
+
+// Written by the code that fetches the results
+export const [useResults, setResults] = createState<readonly string[]>([]);
+
+const ResultList = (): React.JSX.Element => {
+    const results = useResults();
+
+    // Called on mount with the current query, then on every change, until
+    // unmount: the page starts at the top and goes back there for a new query
+    useObservableEffect(query$, () => {
+        window.scrollTo({ top: 0 });
+    });
+
+    return (
+        <ul>
+            {results.map((r) => (
+                <li key={r}>{r}</li>
+            ))}
+        </ul>
+    );
+};
+```
+
+2つの引数はどちらもマウント時に一度だけ読まれます。`fn` に見えるのは最初のレンダリング時の props と state だけで、後から別の Observable を渡しても購読し直しません。変わる値は Observable から読み、Observable ごとにコンポーネントを分けてください（`key` を変えれば再マウントされます）。`fn` の戻り値は無視されます。アンマウント時の後始末は、別の `React.useEffect` に書いてください。`fn` は subscriber なので、state に書き込んではいけません。それは[伝播中の書き込み](/mono/synstate/ja/guides/core-state-management/#更新の伝播中に状態へ書き込まない)で、ここでは ESLint ルールも検出できません。`localStorage` への保存のように、コンポーネントに属さない副作用はモジュールスコープでの `subscribe` で書きます。逆に props やコンポーネントの state をグラフに渡すには `useValueAsObservable(value)` を使います（[API リファレンス](/mono/synstate/ja/reference/api/#フック)を参照）。
+
 ## React v17 以前
 
 React 16.8–17（`useSyncExternalStore` なし）を使用している場合は、`synstate-react-hooks-compat` をインストールしてください：

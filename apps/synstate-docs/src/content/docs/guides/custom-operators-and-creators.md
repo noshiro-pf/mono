@@ -163,4 +163,4 @@ The `onComplete` tool registers a teardown from inside `init`, so it can close o
 
 ## What you cannot do
 
-The observable types carry only what users need: `id`, `kind`, `parents` (on children), `getSnapshot`, `isCompleted`, `updateToken`, `depth`, `subscribe`, `pipe`, `complete` and `dispose`. The members propagation reads (`tryUpdate`, `addChild`, …) exist at run time but are not part of the types, and the types cannot be satisfied with an object literal: every observable has to come from one of the factories above, because propagation relies on those members being there.
+The observable types carry only what users need: `kind`, `parents` (on children), `getSnapshot`, `isCompleted`, `updateToken`, `depth`, `subscribe`, `pipe`, `complete` and `dispose`. The members propagation reads (`tryUpdate`, `addChild`, …) exist at run time but are not part of the types, and the types cannot be satisfied with an object literal: every observable has to come from one of the factories above, because propagation relies on those members being there.

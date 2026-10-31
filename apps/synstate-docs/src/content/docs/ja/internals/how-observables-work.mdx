@@ -110,7 +110,7 @@ subscription.unsubscribe();
 SynState が最小版に加えているものも、この構図を変えません：
 
 - Observable は現在値も保持しており（`getSnapshot()`）、新しい subscriber にはそれがすぐに渡されます。
-- `map` や `combine` のような派生 Observable は `subscribe` で連鎖しているわけではありません。生成時に、自分の祖先にあたるルートに更新関数を登録し、ルートはそれらを深さ順にソートしたリストとして保持します。ルートの `next` はそのリストを先頭から一度だけ順に辿り、これによって SynState はグリッチを回避しています（[SynState がグリッチを解決した方法](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/)）。リストはグラフの構築時に作られ、それを辿るのはやはり同期的なループです。
+- `map` や `combine` のような派生 Observable は `subscribe` で連鎖しているわけではありません。生成時に親へ自分を登録し、最も深い親より 1 つ大きい深さを持ちます。ルートの `next` が始めるような更新の中では、発行した Observable がそれぞれ自分の子を深さごとのバケットからなるキューに入れ、その更新を始めたノードがバケットを浅いほうから順に空にしていきます。そのため各子はすべての親が済んだあとに一度だけ実行され、これによって SynState はグリッチを回避しています（[SynState がグリッチを解決した方法](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/)）。深さはグラフの構築時に決まり、キューを空にするのもやはり同期的なループです。
 - 完了処理（`complete`）も扱います。
 
 中核は [`ObservableBaseClass`](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/class/observable-base-class.mts) です。`subscribe` は subscriber の `Set` に追加し、`setNext` は値を保存して各 subscriber を `for` ループで呼び出します。

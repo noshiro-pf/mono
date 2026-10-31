@@ -127,7 +127,7 @@ assert.deepStrictEqual(result, [0, 10, 1010, 1020, 2020, 2030, 3030]);
 
 ## Is This Just a Contrived Example?
 
-The `counter × 1000 + counter + 10` formula above is clearly artificial, but the underlying pattern — **diamond dependencies** — is surprisingly common in everyday UI code. Any time two or more pieces of derived state share a common ancestor, you have a diamond.
+The `counter × 10 + counter × 1000` formula above is clearly artificial, but the underlying pattern — **diamond dependencies** — is surprisingly common in everyday UI code. Any time two or more pieces of derived state share a common ancestor, you have a diamond.
 
 ### Real-World Example: Data Table with Filters
 
