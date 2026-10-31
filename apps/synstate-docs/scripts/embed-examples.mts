@@ -585,6 +585,28 @@ const documents: DeepReadonly<
       'signal-bridge-demo.tsx',
     ],
   },
+  {
+    mdPath: path.resolve(
+      workspaceRootPath,
+      'src/content/docs/synstate-dom/introduction.mdx',
+    ),
+    samplesDir: path.resolve(
+      workspaceRootPath,
+      'src/components/synstate-dom-demo',
+    ),
+    sampleCodeFiles: ['counter-demo.tsx', 'search-demo.tsx', 'todo-demo.tsx'],
+  },
+  {
+    mdPath: path.resolve(
+      workspaceRootPath,
+      `${jaDocsBase}/synstate-dom/introduction.mdx`,
+    ),
+    samplesDir: path.resolve(
+      workspaceRootPath,
+      'src/components/synstate-dom-demo',
+    ),
+    sampleCodeFiles: ['counter-demo.tsx', 'search-demo.tsx', 'todo-demo.tsx'],
+  },
   ...referenceDocuments,
   ...jaReferenceDocuments,
 ] as const;

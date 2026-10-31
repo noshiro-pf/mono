@@ -1,6 +1,6 @@
 /* Japanese table cells: a ja table wraps where its en counterpart does, and
    scrolls only where it scrolls too (`e2e/table-overflow.spec.mts` checks
-   this on every page).
+   this on every page with a Markdown table).
    - Headers break between phrases (`auto-phrase`, Chromium only; elsewhere
      the declaration is dropped and they break as body cells do), so that a
      short header such as ライブラリ is not split.

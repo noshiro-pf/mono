@@ -1,0 +1,411 @@
+---
+title: synstate-dom の紹介
+description: SynState で UI を作るおすすめの手段 synstate-dom の紹介です。コンポーネントは一度だけ実行され、Observable は DOM に直接束縛されます。インタラクティブなデモ付き。
+sidebar:
+    order: 1
+---
+
+import SynstateDomDemo from '../../../../components/synstate-dom-demo/synstate-dom-demo-island.astro';
+
+[synstate-dom](/mono/synstate-dom/ja/) は SynState 自身の UI ライブラリです。Observable を DOM に直接束縛します。コンポーネントは一度だけ実行され、それ以降の更新は SynState のグラフから、それを束縛した属性・プロパティ・テキストノードへ直接届きます。仮想 DOM もコンパイラも、土台となるフレームワークもありません。
+
+SynState を画面に出すおすすめの手段がこれです。UI 全体が、非同期の処理も含めて 1 つの SynState のグラフになるので、ページに届くまでに値を別のライブラリのモデルへ変換する場所がありません（それがなぜ大事かは [Signals の上の operator](/mono/synstate/ja/guides/library-comparison/operators-on-signals/#synstate-で-ui-を作る)で説明しています）。
+
+以下のデモは、このページの中で synstate-dom を動かしています。ガイドと API リファレンスの全体は [synstate-dom のドキュメントサイト](/mono/synstate-dom/ja/)にあります。
+
+:::caution
+synstate-dom はまだバージョン 0.x なので、マイナーリリースで API が変わることがあります。
+:::
+
+## synstate-dom を使う理由
+
+- **コンポーネントは一度だけ実行されます。** マウント時に呼ばれて DOM の記述を返し、その後は二度と呼ばれません。メモ化するものはなく、変わる値はコンポーネントの本体ではなく Observable から読みます。
+- **更新は末端へ直接届きます。** 変更は SynState のグリッチのない 1 回の伝搬でグラフを通り、synstate-dom がそれを束縛された各ノードに書き込みます。差分を取ることはなく、古い入力と新しい入力の混ざった値をノードが表示することもありません。
+- **継ぎ目がありません。** `debounce`・`switchMap`・リクエストは、最後に表示されるテキストと同じグラフのノードです。別のライブラリへの橋渡しでは、そこを通る値がすべて変換され、その途中でイベントは値になってしまいます。
+- **何が更新されるかを型が示します。** データを受け取る props と子はすべて `Bindable<T>`、つまり初期値を持つ Observable、`constant(…)`、`view(…)` のいずれかを受け取ります。ただの値は型エラーになるので、スナップショットを誤って渡すことはありません。
+- **スコープが後片付けをします。** `If` と `Match` の各分岐と `For` の各行はスコープの中でマウントされ、そこで作ったものはスコープと一緒に破棄されます。
+
+SynState を描画する 3 つの方法の比較：
+
+|                             | synstate-dom                               | synstate-preact-signals                                                        | synstate-react-hooks・synstate-preact-hooks |
+| --------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------- |
+| 更新で実行されるもの        | 束縛された属性・プロパティ・テキストノード | signal を束縛したテキストノード。`.value` を読むコンポーネントは再レンダリング | 値を読むコンポーネントの再レンダリング      |
+| SynState が終わる場所       | なし（UI もグラフの一部）                  | `toSignal`・`fromSignal`。ここで値が変換される                                 | hook。ここで値が React や Preact に渡る     |
+| SynState のほかに必要なもの | なし                                       | Preact と `@preact/signals`                                                    | React または Preact                         |
+
+## インストール
+
+```sh
+npm install synstate-dom synstate
+```
+
+`tsconfig.json` で JSX の変換先を synstate-dom にします。Vite や esbuild など、`jsxImportSource` を読むバンドラーはこれに従います：
+
+```jsonc
+{
+    "compilerOptions": {
+        "jsx": "react-jsx",
+        "jsxImportSource": "synstate-dom",
+    },
+}
+```
+
+あとは `render(App, container)` がコンポーネントをマウントし、アンマウントする関数を返します。synstate-dom のサイトの[インストール](/mono/synstate-dom/ja/getting-started/installation/)を参照してください。
+
+---
+
+## デモ 1: コンポーネントは一度だけ実行される
+
+<SynstateDomDemo demo="counter" />
+
+<details>
+<summary>ソースコード</summary>
+
+```tsx
+import { createBooleanState, createState, map } from 'synstate';
+import { constant, If, type JSX } from 'synstate-dom';
+
+const [count$, , { updateState: updateCount, resetState: resetCount }] =
+    createState(0);
+
+// A derived value is an Observable like any other, bound where it is shown.
+const doubled$ = count$.pipe(map((n) => n * 2));
+
+const [isVisible$, { toggle: toggleVisibility }] = createBooleanState(true);
+
+// How many times `CounterDemo` itself has been called.
+const mut_componentCalls = { count: 0 };
+
+export const CounterDemo = (): JSX.Element => {
+    mut_componentCalls.count += 1;
+
+    return (
+        <div>
+            <div class={constant('row')}>
+                <span class={constant('label')}>{constant('Count:')}</span>
+                <span class={constant('value')}>{count$}</span>
+            </div>
+            <div class={constant('row')}>
+                <span class={constant('label')}>
+                    {constant('Doubled (map):')}
+                </span>
+                <span class={constant('value')}>{doubled$}</span>
+            </div>
+            <div class={constant('row')}>
+                <span class={constant('label')}>
+                    {constant('Component calls:')}
+                </span>
+                <span class={constant('value')}>
+                    {constant(mut_componentCalls.count)}
+                </span>
+            </div>
+            <If
+                cond={isVisible$}
+                then={
+                    <div class={constant('box')}>
+                        {constant('Mounted by If while isVisible$ is true.')}
+                    </div>
+                }
+            />
+            <div class={constant('controls')}>
+                <button type={constant('button')} onClick={decrement}>
+                    {constant('-1')}
+                </button>
+                <button type={constant('button')} onClick={increment}>
+                    {constant('+1')}
+                </button>
+                <button type={constant('button')} onClick={resetCount}>
+                    {constant('Reset')}
+                </button>
+                <button type={constant('button')} onClick={toggleVisibility}>
+                    {constant('Toggle visibility')}
+                </button>
+            </div>
+        </div>
+    );
+};
+
+const decrement = (): void => {
+    updateCount((n) => n - 1);
+};
+
+const increment = (): void => {
+    updateCount((n) => n + 1);
+};
+```
+
+</details>
+
+ボタンを押して **Component calls** を見てください：
+
+- **1 のままです。** `CounterDemo` はマウント時に一度だけ実行されました。その後の変更はすべて `count$` や `doubled$` を束縛したテキストノードに書き込まれ、コンポーネントは再び呼ばれません。
+- **`doubled$` はふつうの派生 Observable です。** 表示する場所に束縛するだけで、間に hook もメモも signal も挟みません。
+- **`If` は `isVisible$` が `true` の間 `then` をマウントし**、`false` になると取り除きます。テキストも `Bindable` なので、固定のテキストは `constant('…')` と書きます。
+
+同じカウンターでコンポーネントの再レンダリングを避けるのに `toSignal` が必要な [Preact Signals デモ](/mono/synstate/ja/preact-signals/demo/)と比べてみてください。
+
+---
+
+## デモ 2: キー入力から DOM まで 1 つのグラフで
+
+<SynstateDomDemo demo="search" />
+
+<details>
+<summary>ソースコード</summary>
+
+```tsx
+import {
+    createState,
+    debounce,
+    fromAbortablePromise,
+    just,
+    map,
+    switchMap,
+    withInitialValue,
+} from 'synstate';
+import { constant, For, view, type JSX } from 'synstate-dom';
+import { Result } from 'ts-data-forge';
+
+type Search = Readonly<
+    | { status: 'idle' }
+    | { status: 'loading'; query: string }
+    | { status: 'done'; query: string; hits: readonly string[] }
+    | { status: 'error'; query: string }
+>;
+
+const [query$, setQuery] = createState('');
+
+// Settles 300 ms after the last keystroke; an equal query is not sent again.
+const settledQuery$ = query$
+    .pipe(debounce(300))
+    .pipe(withInitialValue(''))
+    .pipe(map((q) => q.trim()));
+
+// `switchMap` completes the previous request when a newer query arrives, and
+// completing it aborts its `AbortSignal`.
+const search$ = settledQuery$
+    .pipe(
+        switchMap((query) =>
+            query === ''
+                ? just<Search>({ status: 'idle' })
+                : fromAbortablePromise((signal) => searchFruits(query, signal))
+                      .pipe(
+                          map((result): Search =>
+                              Result.isOk(result)
+                                  ? {
+                                        status: 'done',
+                                        query,
+                                        hits: result.value,
+                                    }
+                                  : { status: 'error', query },
+                          ),
+                      )
+                      // shown in the same update that sends the request
+                      .pipe(
+                          withInitialValue<Search>({
+                              status: 'loading',
+                              query,
+                          }),
+                      ),
+        ),
+    )
+    .pipe(withInitialValue<Search>({ status: 'idle' }));
+
+const hits$ = search$.pipe(map((s) => (s.status === 'done' ? s.hits : [])));
+
+export const SearchDemo = (): JSX.Element => (
+    <div>
+        <label class={constant('row')}>
+            <span class={constant('label')}>{constant('Fruit:')}</span>
+            <input
+                class={constant('input')}
+                placeholder={constant('Type "an" or "berry"')}
+                value={query$}
+                onInput={(event) => {
+                    setQuery(event.currentTarget.value);
+                }}
+            />
+        </label>
+        <p class={constant('status')}>{view(search$, describe)}</p>
+        <ul class={constant('list')}>
+            <For items={hits$} key={(fruit) => fruit}>
+                {(fruit$) => <li>{fruit$}</li>}
+            </For>
+        </ul>
+    </div>
+);
+
+const describe = (search: Search): string => {
+    switch (search.status) {
+        case 'idle':
+            return 'Type to search.';
+
+        case 'loading':
+            return `Searching for "${search.query}"…`;
+
+        case 'done':
+            return `${search.hits.length} results for "${search.query}"`;
+
+        case 'error':
+            return `The search for "${search.query}" failed.`;
+    }
+};
+```
+
+</details>
+
+素早く入力してから、手を止めてみてください：
+
+- **`debounce(300)`** は入力が止まるまでクエリを保留するので、連続したキー入力でもリクエストは 1 回です。
+- **`switchMap`** は新しいクエリが来ると前のリクエストを完了させ、`fromAbortablePromise` がその `AbortSignal` を中断します。古いクエリへの遅い応答が新しい結果を上書きすることはありません（`searchFruits` は `fetch` の代わりで、中断されなければ 400 ms 後に応答します）。
+- **読み込み中の状態は、リクエストを送るのと同じ更新に含まれます**（`withInitialValue`）。リクエストが送られた時点で状態の行は「Searching for …」に変わるので、応答を待つあいだ前のクエリの結果が残ることはありません。入力しているあいだと、入力が止まってから 300 ms は、前の結果がそのまま表示されます。
+- **変換はどこにもありません。** 入力は `query$` に書き込み、状態の行とリストは `search$` と `hits$` を読みます。すべて 1 つのグラフです。[Preact Signals デモ](/mono/synstate/ja/preact-signals/demo/#デモ-3-signal--observable-ブリッジ)では、同じようなパイプラインの両端に `fromSignal` と `toSignal` を置いています。
+
+---
+
+## デモ 3: `For` によるリスト
+
+<SynstateDomDemo demo="todo" />
+
+<details>
+<summary>ソースコード</summary>
+
+```tsx
+import { createState, map } from 'synstate';
+import { constant, For, If, view, type JSX } from 'synstate-dom';
+import { Arr } from 'ts-data-forge';
+
+type Todo = Readonly<{ id: number; title: string; done: boolean }>;
+
+const [todos$, , { updateState: updateTodos }] = createState<readonly Todo[]>([
+    { id: 0, title: 'Read the guide', done: true },
+    { id: 1, title: 'Try the demos', done: false },
+]);
+
+const [draft$, setDraft, { getSnapshot: getDraft }] = createState('');
+
+const remaining$ = todos$.pipe(
+    map((todos) => todos.filter((todo) => !todo.done).length),
+);
+
+// How many row functions `For` has called: once per todo, ever.
+const mut_rowsCreated = { count: 0 };
+
+export const TodoDemo = (): JSX.Element => (
+    <div>
+        <div class={constant('controls')}>
+            <input
+                class={constant('input')}
+                aria-label={constant('New todo')}
+                placeholder={constant('What needs doing?')}
+                value={draft$}
+                onInput={(event) => {
+                    setDraft(event.currentTarget.value);
+                }}
+                onKeyDown={(event) => {
+                    if (isSubmitEnter(event)) {
+                        add();
+                    }
+                }}
+            />
+            <button type={constant('button')} onClick={add}>
+                {constant('Add')}
+            </button>
+        </div>
+        <If
+            cond={view(todos$, Arr.isNonEmpty)}
+            then={
+                <ul class={constant('list')}>
+                    <For items={todos$} key={(todo) => todo.id}>
+                        {(todo$) => {
+                            mut_rowsCreated.count += 1;
+
+                            return (
+                                <li
+                                    class={{ done: view(todo$, (t) => t.done) }}
+                                >
+                                    <label>
+                                        <input
+                                            type={constant('checkbox')}
+                                            checked={view(todo$, (t) => t.done)}
+                                            onChange={() => {
+                                                toggle(
+                                                    todo$.getSnapshot().value
+                                                        .id,
+                                                );
+                                            }}
+                                        />
+                                        {view(todo$, (t) => ` ${t.title}`)}
+                                    </label>
+                                    <span class={constant('note')}>
+                                        {constant(
+                                            `row #${mut_rowsCreated.count}`,
+                                        )}
+                                    </span>
+                                    <button
+                                        type={constant('button')}
+                                        onClick={() => {
+                                            remove(
+                                                todo$.getSnapshot().value.id,
+                                            );
+                                        }}
+                                    >
+                                        {constant('Remove')}
+                                    </button>
+                                </li>
+                            );
+                        }}
+                    </For>
+                </ul>
+            }
+            else={<p>{constant('Nothing to do.')}</p>}
+        />
+        <p class={constant('status')}>
+            {view(remaining$, (n) => `${n} remaining`)}
+        </p>
+    </div>
+);
+
+const nextId = (todos: readonly Todo[]): number =>
+    Math.max(-1, ...todos.map((t) => t.id)) + 1;
+
+const add = (): void => {
+    const title = getDraft().trim();
+
+    if (title === '') {
+        return;
+    }
+
+    updateTodos((todos) =>
+        Arr.toPushed(todos, { id: nextId(todos), title, done: false }),
+    );
+
+    setDraft('');
+};
+
+const toggle = (id: number): void => {
+    updateTodos((todos) =>
+        todos.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
+    );
+};
+
+const remove = (id: number): void => {
+    updateTodos((todos) => todos.filter((t) => t.id !== id));
+};
+```
+
+</details>
+
+todo を追加・切り替え・削除して、**row #** の表示を見てください：
+
+- **`For` はキーごとに 1 つの行を保ちます。** 行の関数はその todo が最初に現れたときに一度だけ実行され、表示はその行が何番目に作られたかを示します。切り替えると `todos$` には新しい配列が書き込まれますが、変わるのはその行のチェックボックス・クラス・テキストだけで、番号は変わりません。
+- **行は自分の todo を `todo$` から読みます。** `For` が更新する Observable なので、行が古いコピーを持ち続けることはありません。
+- **リストと「Nothing to do.」は、どちらも `If` に渡す記述です。** 同時にマウントされるのは片方だけで、最後の todo を消すとリストのスコープが、`For` とその行も含めて破棄されます。
+
+## 次に読むもの
+
+- [Bindable な値](/mono/synstate-dom/ja/guides/bindable/) — `constant`・`view`・`derive` と、ただの値が拒否される理由。
+- [コンポーネント](/mono/synstate-dom/ja/guides/components/) — props はただの JavaScript であること、子、一度だけ実行されるもの。
+- [制御フロー](/mono/synstate-dom/ja/guides/control-flow/) — `If`・`Match`・`For`・`Portal`。
+- [ライフサイクルとスコープ](/mono/synstate-dom/ja/guides/lifecycle/) — 何がいつ破棄されるか。
+- [ベンチマーク](/mono/synstate-dom/ja/background/benchmark/)と[バンドルサイズ](/mono/synstate-dom/ja/background/bundle-size/) — Solid・Preact・React などとの比較。

@@ -1,0 +1,411 @@
+---
+title: Introducing synstate-dom
+description: synstate-dom, the recommended way to build a UI on SynState — components run once and Observables are bound straight to the DOM — with interactive demos.
+sidebar:
+    order: 1
+---
+
+import SynstateDomDemo from '../../../components/synstate-dom-demo/synstate-dom-demo-island.astro';
+
+[synstate-dom](/mono/synstate-dom/) is SynState's own UI library. It binds Observables directly to the DOM: a component runs once, and from then on an update goes from the SynState graph straight to the attribute, property or text node bound to it. There is no virtual DOM, no compiler and no framework underneath.
+
+It is the recommended way to put SynState on the screen. With it, the whole UI, async steps included, is one SynState graph, so no value has to be converted into another library's model on its way to the page ([Operators on Signals](/mono/synstate/guides/library-comparison/operators-on-signals/#building-the-ui-on-synstate) explains why that matters).
+
+The demos below run synstate-dom in this page. Its full guide and API reference are on [its own documentation site](/mono/synstate-dom/).
+
+:::caution
+synstate-dom is at version 0.x, so its API may still change in a minor release.
+:::
+
+## Why synstate-dom
+
+- **A component runs once.** It is called when it mounts and returns a description of the DOM. It is never called again, so there is nothing to memoize, and a value that changes is read from its Observable rather than from the component body.
+- **Updates go straight to the leaves.** A change propagates through the graph in SynState's single, glitch-free pass, and synstate-dom writes it into each bound node. Nothing is diffed, and no node shows a value computed from a mix of old and new inputs.
+- **No seam.** `debounce`, `switchMap` and a request are nodes of the same graph as the text they end in. A bridge to another library converts every value that crosses it, and turns an event into a value as it goes.
+- **The types say what updates.** Every prop and child that takes data takes a `Bindable<T>`: an Observable with an initial value, a `constant(…)` or a `view(…)`. A plain value is a type error, so a snapshot cannot be passed by mistake.
+- **Scopes clean up.** Each branch of `If` and `Match` and each row of `For` is mounted in a scope, and what it creates is disposed with it.
+
+How the three ways to render SynState compare:
+
+|                                | synstate-dom                               | synstate-preact-signals                                                     | synstate-react-hooks, synstate-preact-hooks           |
+| ------------------------------ | ------------------------------------------ | --------------------------------------------------------------------------- | ----------------------------------------------------- |
+| What an update runs            | The bound attribute, property or text node | A text node bound to a signal; a component that reads `.value`, re-rendered | The component that reads the value, re-rendered       |
+| Where SynState ends            | Nowhere: the UI is part of the graph       | At `toSignal` / `fromSignal`, where each value is converted                 | At the hook, which hands the value to React or Preact |
+| What it needs besides SynState | Nothing                                    | Preact and `@preact/signals`                                                | React or Preact                                       |
+
+## Installation
+
+```sh
+npm install synstate-dom synstate
+```
+
+Point the JSX transform at synstate-dom in `tsconfig.json`; any bundler that reads `jsxImportSource`, such as Vite or esbuild, follows it:
+
+```jsonc
+{
+    "compilerOptions": {
+        "jsx": "react-jsx",
+        "jsxImportSource": "synstate-dom",
+    },
+}
+```
+
+`render(App, container)` then mounts a component and returns a function that unmounts it. See [Installation](/mono/synstate-dom/getting-started/installation/) on the synstate-dom site.
+
+---
+
+## Demo 1: A Component Runs Once
+
+<SynstateDomDemo demo="counter" />
+
+<details>
+<summary>Source code</summary>
+
+```tsx
+import { createBooleanState, createState, map } from 'synstate';
+import { constant, If, type JSX } from 'synstate-dom';
+
+const [count$, , { updateState: updateCount, resetState: resetCount }] =
+    createState(0);
+
+// A derived value is an Observable like any other, bound where it is shown.
+const doubled$ = count$.pipe(map((n) => n * 2));
+
+const [isVisible$, { toggle: toggleVisibility }] = createBooleanState(true);
+
+// How many times `CounterDemo` itself has been called.
+const mut_componentCalls = { count: 0 };
+
+export const CounterDemo = (): JSX.Element => {
+    mut_componentCalls.count += 1;
+
+    return (
+        <div>
+            <div class={constant('row')}>
+                <span class={constant('label')}>{constant('Count:')}</span>
+                <span class={constant('value')}>{count$}</span>
+            </div>
+            <div class={constant('row')}>
+                <span class={constant('label')}>
+                    {constant('Doubled (map):')}
+                </span>
+                <span class={constant('value')}>{doubled$}</span>
+            </div>
+            <div class={constant('row')}>
+                <span class={constant('label')}>
+                    {constant('Component calls:')}
+                </span>
+                <span class={constant('value')}>
+                    {constant(mut_componentCalls.count)}
+                </span>
+            </div>
+            <If
+                cond={isVisible$}
+                then={
+                    <div class={constant('box')}>
+                        {constant('Mounted by If while isVisible$ is true.')}
+                    </div>
+                }
+            />
+            <div class={constant('controls')}>
+                <button type={constant('button')} onClick={decrement}>
+                    {constant('-1')}
+                </button>
+                <button type={constant('button')} onClick={increment}>
+                    {constant('+1')}
+                </button>
+                <button type={constant('button')} onClick={resetCount}>
+                    {constant('Reset')}
+                </button>
+                <button type={constant('button')} onClick={toggleVisibility}>
+                    {constant('Toggle visibility')}
+                </button>
+            </div>
+        </div>
+    );
+};
+
+const decrement = (): void => {
+    updateCount((n) => n - 1);
+};
+
+const increment = (): void => {
+    updateCount((n) => n + 1);
+};
+```
+
+</details>
+
+Click the buttons and watch **Component calls**:
+
+- **It stays at 1.** `CounterDemo` ran once, when it mounted. Every later change is written into the text node bound to `count$` or `doubled$`, without calling the component again.
+- **`doubled$` is an ordinary derived Observable.** It is bound where it is shown; there is no hook, memo or signal in between.
+- **`If` mounts its `then` while `isVisible$` is `true`** and removes it when it turns `false`. Text is a `Bindable` as well, which is why fixed text is written `constant('…')`.
+
+Compare the [Preact Signals demo](/mono/synstate/preact-signals/demo/), where the same counter needs `toSignal` to keep a component from re-rendering.
+
+---
+
+## Demo 2: From Keystroke to DOM in One Graph
+
+<SynstateDomDemo demo="search" />
+
+<details>
+<summary>Source code</summary>
+
+```tsx
+import {
+    createState,
+    debounce,
+    fromAbortablePromise,
+    just,
+    map,
+    switchMap,
+    withInitialValue,
+} from 'synstate';
+import { constant, For, view, type JSX } from 'synstate-dom';
+import { Result } from 'ts-data-forge';
+
+type Search = Readonly<
+    | { status: 'idle' }
+    | { status: 'loading'; query: string }
+    | { status: 'done'; query: string; hits: readonly string[] }
+    | { status: 'error'; query: string }
+>;
+
+const [query$, setQuery] = createState('');
+
+// Settles 300 ms after the last keystroke; an equal query is not sent again.
+const settledQuery$ = query$
+    .pipe(debounce(300))
+    .pipe(withInitialValue(''))
+    .pipe(map((q) => q.trim()));
+
+// `switchMap` completes the previous request when a newer query arrives, and
+// completing it aborts its `AbortSignal`.
+const search$ = settledQuery$
+    .pipe(
+        switchMap((query) =>
+            query === ''
+                ? just<Search>({ status: 'idle' })
+                : fromAbortablePromise((signal) => searchFruits(query, signal))
+                      .pipe(
+                          map((result): Search =>
+                              Result.isOk(result)
+                                  ? {
+                                        status: 'done',
+                                        query,
+                                        hits: result.value,
+                                    }
+                                  : { status: 'error', query },
+                          ),
+                      )
+                      // shown in the same update that sends the request
+                      .pipe(
+                          withInitialValue<Search>({
+                              status: 'loading',
+                              query,
+                          }),
+                      ),
+        ),
+    )
+    .pipe(withInitialValue<Search>({ status: 'idle' }));
+
+const hits$ = search$.pipe(map((s) => (s.status === 'done' ? s.hits : [])));
+
+export const SearchDemo = (): JSX.Element => (
+    <div>
+        <label class={constant('row')}>
+            <span class={constant('label')}>{constant('Fruit:')}</span>
+            <input
+                class={constant('input')}
+                placeholder={constant('Type "an" or "berry"')}
+                value={query$}
+                onInput={(event) => {
+                    setQuery(event.currentTarget.value);
+                }}
+            />
+        </label>
+        <p class={constant('status')}>{view(search$, describe)}</p>
+        <ul class={constant('list')}>
+            <For items={hits$} key={(fruit) => fruit}>
+                {(fruit$) => <li>{fruit$}</li>}
+            </For>
+        </ul>
+    </div>
+);
+
+const describe = (search: Search): string => {
+    switch (search.status) {
+        case 'idle':
+            return 'Type to search.';
+
+        case 'loading':
+            return `Searching for "${search.query}"…`;
+
+        case 'done':
+            return `${search.hits.length} results for "${search.query}"`;
+
+        case 'error':
+            return `The search for "${search.query}" failed.`;
+    }
+};
+```
+
+</details>
+
+Type quickly, then pause:
+
+- **`debounce(300)`** holds the query until typing pauses, so a burst of keystrokes sends one request.
+- **`switchMap`** completes the previous request when a newer query arrives, and `fromAbortablePromise` aborts its `AbortSignal`. A slow answer to an old query can never replace a newer one. (`searchFruits` stands in for a `fetch`: it answers after 400 ms unless aborted.)
+- **The loading state is part of the same update** that sends the request (`withInitialValue`): the status line turns to "Searching" as the request goes out, so the previous query's result is never left showing while a newer one is in flight. While typing goes on, and for 300 ms after it pauses, the previous result stays.
+- **Nothing is converted.** The input writes `query$`, and the status line and the list read `search$` and `hits$`, all in one graph. The [Preact Signals demo](/mono/synstate/preact-signals/demo/#demo-3-signal--observable-bridge) builds a similar pipeline with `fromSignal` and `toSignal` at both ends of it.
+
+---
+
+## Demo 3: Lists with `For`
+
+<SynstateDomDemo demo="todo" />
+
+<details>
+<summary>Source code</summary>
+
+```tsx
+import { createState, map } from 'synstate';
+import { constant, For, If, view, type JSX } from 'synstate-dom';
+import { Arr } from 'ts-data-forge';
+
+type Todo = Readonly<{ id: number; title: string; done: boolean }>;
+
+const [todos$, , { updateState: updateTodos }] = createState<readonly Todo[]>([
+    { id: 0, title: 'Read the guide', done: true },
+    { id: 1, title: 'Try the demos', done: false },
+]);
+
+const [draft$, setDraft, { getSnapshot: getDraft }] = createState('');
+
+const remaining$ = todos$.pipe(
+    map((todos) => todos.filter((todo) => !todo.done).length),
+);
+
+// How many row functions `For` has called: once per todo, ever.
+const mut_rowsCreated = { count: 0 };
+
+export const TodoDemo = (): JSX.Element => (
+    <div>
+        <div class={constant('controls')}>
+            <input
+                class={constant('input')}
+                aria-label={constant('New todo')}
+                placeholder={constant('What needs doing?')}
+                value={draft$}
+                onInput={(event) => {
+                    setDraft(event.currentTarget.value);
+                }}
+                onKeyDown={(event) => {
+                    if (isSubmitEnter(event)) {
+                        add();
+                    }
+                }}
+            />
+            <button type={constant('button')} onClick={add}>
+                {constant('Add')}
+            </button>
+        </div>
+        <If
+            cond={view(todos$, Arr.isNonEmpty)}
+            then={
+                <ul class={constant('list')}>
+                    <For items={todos$} key={(todo) => todo.id}>
+                        {(todo$) => {
+                            mut_rowsCreated.count += 1;
+
+                            return (
+                                <li
+                                    class={{ done: view(todo$, (t) => t.done) }}
+                                >
+                                    <label>
+                                        <input
+                                            type={constant('checkbox')}
+                                            checked={view(todo$, (t) => t.done)}
+                                            onChange={() => {
+                                                toggle(
+                                                    todo$.getSnapshot().value
+                                                        .id,
+                                                );
+                                            }}
+                                        />
+                                        {view(todo$, (t) => ` ${t.title}`)}
+                                    </label>
+                                    <span class={constant('note')}>
+                                        {constant(
+                                            `row #${mut_rowsCreated.count}`,
+                                        )}
+                                    </span>
+                                    <button
+                                        type={constant('button')}
+                                        onClick={() => {
+                                            remove(
+                                                todo$.getSnapshot().value.id,
+                                            );
+                                        }}
+                                    >
+                                        {constant('Remove')}
+                                    </button>
+                                </li>
+                            );
+                        }}
+                    </For>
+                </ul>
+            }
+            else={<p>{constant('Nothing to do.')}</p>}
+        />
+        <p class={constant('status')}>
+            {view(remaining$, (n) => `${n} remaining`)}
+        </p>
+    </div>
+);
+
+const nextId = (todos: readonly Todo[]): number =>
+    Math.max(-1, ...todos.map((t) => t.id)) + 1;
+
+const add = (): void => {
+    const title = getDraft().trim();
+
+    if (title === '') {
+        return;
+    }
+
+    updateTodos((todos) =>
+        Arr.toPushed(todos, { id: nextId(todos), title, done: false }),
+    );
+
+    setDraft('');
+};
+
+const toggle = (id: number): void => {
+    updateTodos((todos) =>
+        todos.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
+    );
+};
+
+const remove = (id: number): void => {
+    updateTodos((todos) => todos.filter((t) => t.id !== id));
+};
+```
+
+</details>
+
+Add, toggle and remove todos, and watch the **row #** labels:
+
+- **`For` keeps one row per key.** A row's function runs once, when its todo first appears; the label shows in which order the rows were created. Toggling writes a new array to `todos$`, but only that row's checkbox, class and text change, and its number stays.
+- **A row reads its todo through `todo$`**, an Observable that `For` updates, so a row never holds a stale copy.
+- **The list and "Nothing to do." are both descriptions given to `If`.** Only one is mounted at a time, and removing the last todo disposes the list's scope, `For` and its rows included.
+
+## Where to Go Next
+
+- [Bindable values](/mono/synstate-dom/guides/bindable/) — `constant`, `view`, `derive` and why a plain value is rejected.
+- [Components](/mono/synstate-dom/guides/components/) — props are plain JavaScript, children, and what runs once.
+- [Control flow](/mono/synstate-dom/guides/control-flow/) — `If`, `Match`, `For` and `Portal`.
+- [Lifecycle and scopes](/mono/synstate-dom/guides/lifecycle/) — what is disposed, and when.
+- [Benchmark](/mono/synstate-dom/background/benchmark/) and [Bundle size](/mono/synstate-dom/background/bundle-size/) — synstate-dom against Solid, Preact, React and others.

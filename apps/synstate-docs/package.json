@@ -65,6 +65,7 @@
     "remark-math": "^6.0.0",
     "satori": "^0.63.2",
     "synstate": "workspace:*",
+    "synstate-dom": "workspace:*",
     "synstate-preact-hooks": "workspace:*",
     "synstate-preact-signals": "workspace:*",
     "synstate-react-hooks": "workspace:*"

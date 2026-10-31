@@ -2471,6 +2471,9 @@ importers:
       synstate:
         specifier: workspace:*
         version: link:../../libs/synstate
+      synstate-dom:
+        specifier: workspace:*
+        version: link:../../libs/synstate-dom
       synstate-preact-hooks:
         specifier: workspace:*
         version: link:../../libs/synstate-preact-hooks

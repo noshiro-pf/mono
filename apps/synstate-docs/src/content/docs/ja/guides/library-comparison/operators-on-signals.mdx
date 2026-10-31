@@ -226,6 +226,6 @@ effect で書いた operator をグリッチフリーにするには、それぞ
 
 ## SynState で UI を作る
 
-SynState を画面に出すおすすめの手段は [synstate-dom](/mono/synstate-dom/ja/) です。Observable を DOM に直接束縛します。コンポーネントは 1 回しか実行されず、更新はグラフから、束縛された属性、プロパティ、テキストノードへ直接届きます。仮想 DOM もコンポーネントの再実行もありません。上の検索の段なら、クエリからページに表示するものまでが 1 つのグラフになり、Observable を別のものに変える箇所がどこにもありません。
+SynState を画面に出すおすすめの手段は [synstate-dom](/mono/synstate-dom/ja/) です。Observable を DOM に直接束縛します。コンポーネントは 1 回しか実行されず、更新はグラフから、束縛された属性、プロパティ、テキストノードへ直接届きます。仮想 DOM もコンポーネントの再実行もありません。上の検索の段なら、クエリからページに表示するものまでが 1 つのグラフになり、Observable を別のものに変える箇所がどこにもありません。[synstate-dom の紹介](/mono/synstate/ja/synstate-dom/introduction/)では、その検索とほか 2 つのデモをこのサイト上で動かしています。
 
 Preact のアプリケーションには、`synstate-preact-signals` が境界で両者をつなぎます。Observable を Preact の signal に（`toSignal`）、signal を Observable に（`fromSignal`）変換するので、`debounce`、`switchMap`、リクエストといったパイプラインを SynState で書き、その結果を signal として Preact に渡せます。[Preact Signals のデモ](/mono/synstate/ja/preact-signals/demo/)を参照してください。ただしそこには継ぎ目が残ります。継ぎ目を越える値はすべて変換され、signal に入ったイベントは値になり、どの処理もどちらか一方に置かなければならず、非同期の段は SynState の側に置くことになります。synstate-dom なら継ぎ目はなく、非同期の段も含めて UI 全体が 1 つの SynState のグラフになります。
